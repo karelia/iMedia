@@ -52,8 +52,8 @@ static NSMutableArray *_browserClasses = nil;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	_browserClasses = [[NSMutableArray alloc] init];
 	//register the default set in order
-	[self registerBrowser:NSClassFromString(@"iMBMusicController")];
 	[self registerBrowser:NSClassFromString(@"iMBPhotosController")];
+	[self registerBrowser:NSClassFromString(@"iMBMusicController")];
 	[self registerBrowser:NSClassFromString(@"iMBMoviesController")];
 	[pool release];
 }
