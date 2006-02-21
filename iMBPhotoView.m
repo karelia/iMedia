@@ -503,11 +503,18 @@ static NSImage *_badge = nil;
 			if (!NSEqualPoints(p, curPoint)) {
 				NSRect newRubberbandRect = SKTRectFromPoints(p, curPoint); // this is from the Sketch Sample
 				if (!NSEqualRects(rubberbandRect, newRubberbandRect)) {
+					//we only want to actually select what is actually visible
+					NSRect scrollerViewableRect = [[self enclosingScrollView] documentVisibleRect];
 					rubberbandRect = newRubberbandRect;
+					if (NSMinY(rubberbandRect) < NSMinY(scrollerViewableRect))
+					{
+						rubberbandRect.origin.y = NSMinY(scrollerViewableRect) - 1;
+					}
+					
 					[selectedCells removeAllObjects];
 					[selectedRects removeAllObjects];
 					
-					[self selectCellsInRect:rubberbandRect];
+					[self selectCellsInRect:newRubberbandRect]; // make the selection for the whole rect not just what is visible
 					[self setNeedsDisplay:YES];
 				}
 				//auto scroll down
