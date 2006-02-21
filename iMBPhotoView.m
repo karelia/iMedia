@@ -76,6 +76,7 @@
 
 #pragma mark 
 #pragma mark DATA STRUCTURES
+// This is from Apple's Sketch Example
 NSRect SKTRectFromPoints(NSPoint point1, NSPoint point2) {
     return NSMakeRect(((point1.x <= point2.x) ? point1.x : point2.x), ((point1.y <= point2.y) ? point1.y : point2.y), ((point1.x <= point2.x) ? point2.x - point1.x : point1.x - point2.x), ((point1.y <= point2.y) ? point2.y - point1.y : point1.y - point2.y));
 }
@@ -220,7 +221,7 @@ static NSDictionary *titleFontAttributes;
 #define iPhotoColumns 3
 #define CellPadding 5
 
-#pragma mark
+#pragma mark -
 #pragma mark VIEW
 - (void)drawRect:(NSRect)rect 
 {
@@ -415,13 +416,14 @@ static NSImage *_badge = nil;
 				size.width += badgeSize.width / 2;
 				size.height += badgeSize.height / 2;
 				
-				//				dragImage = [iMBPhotoView draggingIconWithTitle:[rec objectForKey:@"Caption"]
-				//													   andImage:[rec objectForKey:@"thumb"]];
-				//				[dragImage lockFocus];
-				//				[dragImage drawInRect:NSMakeRect(0,0,NSWidth(thumbRect),NSHeight(thumbRect))
-				//							 fromRect:NSZeroRect
-				//							operation:NSCompositeSourceOver
-				//							 fraction:1.0];
+				/*dragImage = [iMBPhotoView draggingIconWithTitle:[rec objectForKey:@"Caption"]
+													   andImage:[rec objectForKey:@"thumb"]];
+				[dragImage lockFocus];
+				[dragImage drawInRect:NSMakeRect(0,0,NSWidth(thumbRect),NSHeight(thumbRect))
+							 fromRect:NSZeroRect
+							operation:NSCompositeSourceOver
+							 fraction:1.0];
+				*/
 				
 				dragImage = [[NSImage alloc] initWithSize:size];
 				[dragImage lockFocus];
@@ -508,16 +510,19 @@ static NSImage *_badge = nil;
 					[self selectCellsInRect:rubberbandRect];
 					[self setNeedsDisplay:YES];
 				}
-				//auto scroll
+				//auto scroll down
 				if (NSMaxY([[self enclosingScrollView] documentVisibleRect]) - curPoint.y < 10) {
 					[[[self enclosingScrollView] contentView] scrollToPoint:NSMakePoint(0, NSMinY([[self enclosingScrollView] documentVisibleRect]) + (curPoint.y - lastPoint.y))];
 				}
+				
+				//auto scroll up
+				if (curPoint.y - NSMinY([[self enclosingScrollView] documentVisibleRect]) < 10) {
+					NSPoint newPoint = NSMakePoint(0, NSMinY([[self enclosingScrollView] documentVisibleRect]) - (lastPoint.y - curPoint.y));
+					if (newPoint.y < 0) newPoint.y = 0;
+					[[[self enclosingScrollView] contentView] scrollToPoint:newPoint];
+				}
+				
 				[[self enclosingScrollView] reflectScrolledClipView:[[self enclosingScrollView] contentView]];
-				//				if (curPoint.y - NSMinY([[self enclosingScrollView] documentVisibleRect]) < 10) {
-				//					NSPoint newPoint = NSMakePoint(0, NSMinY([[self enclosingScrollView] documentVisibleRect]) - (lastPoint.y - curPoint.y));
-				//					if (newPoint.y < 0) newPoint.y = 0;
-				//					[[[self enclosingScrollView] contentView] scrollToPoint:newPoint];
-				//				}
 			}
 			
 			if ([theEvent type] == NSLeftMouseUp) {
@@ -530,7 +535,7 @@ static NSImage *_badge = nil;
 	}
 }
 
-#pragma mark
+#pragma mark -
 #pragma mark PRIVATE API
 - (NSDictionary *)recordUnderPoint:(NSPoint)p
 {
@@ -584,7 +589,16 @@ static NSImage *_badge = nil;
 
 - (void)selectCellsInRect:(NSRect)rect
 {
-	[selectedCells addObjectsFromArray:[self cellsInRect:rect]];
+	NSEnumerator *e = [[self cellsInRect:rect] objectEnumerator];
+	NSDictionary *cur;
+	
+	while (cur = [e nextObject])
+	{
+		if ([selectedCells indexOfObject:cur] == NSNotFound)
+		{
+			[selectedCells addObject:cur];
+		}
+	}
 }
 
 - (NSMutableArray *)selectedCells {
@@ -612,7 +626,7 @@ static NSImage *_badge = nil;
 	return NO;
 }
 
-#pragma mark
+#pragma mark -
 #pragma mark ACCESSORS & MUTATORS
 - (NSArray*)images
 {

@@ -32,8 +32,6 @@
 #import "iMediaBrowser.h"
 #import "iMediaBrowserProtocol.h"
 #import "LibraryItemsValueTransformer.h"
-#import "iTunesValueTransformer.h"
-#import "TimeValueTransformer.h"
 
 #import <QuickTime/QuickTime.h>
 #import <QTKit/QTKit.h>
@@ -93,12 +91,6 @@ static NSMutableArray *_browserClasses = nil;
 	if (self = [super initWithWindowNibName:@"MediaBrowser"]) {
 		id libraryItemsValueTransformer = [[[LibraryItemsValueTransformer alloc] init] autorelease];
 		[NSValueTransformer setValueTransformer:libraryItemsValueTransformer forName:@"libraryItemsValueTransformer"];
-		
-		id itunesValueTransformer = [[[iTunesValueTransformer alloc] init] autorelease];
-		[NSValueTransformer setValueTransformer:itunesValueTransformer forName:@"itunesValueTransformer"];
-		
-		id timeValueTransformer = [[[TimeValueTransformer alloc] init] autorelease];
-		[NSValueTransformer setValueTransformer:timeValueTransformer forName:@"timeValueTransformer"];
 	}
 	return self;
 }
@@ -134,7 +126,17 @@ static NSMutableArray *_browserClasses = nil;
 	
 	//select the first browser
 	if ([myMediaBrowsers count] > 0) {
-		[oMediaMenu selectItemAtIndex:0];
+		//see if the last selected browser is in user defaults
+		NSString *lastSelectedBrowser = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowserSelectedBrowser"];
+		if (lastSelectedBrowser)
+		{
+			[oMediaMenu selectItemWithTitle:lastSelectedBrowser];
+		}
+		else
+		{
+			[oMediaMenu selectItemAtIndex:0];
+		}
+		
 		[self changeBrowser:oMediaMenu];
 	}
 	
@@ -159,6 +161,8 @@ static NSMutableArray *_browserClasses = nil;
 	[view setFrame:[oBrowserView bounds]];
 	[oBrowserView addSubview:[view retain]];
 	selectedBrowser = browser;
+	//save the selected browser
+	[[NSUserDefaults standardUserDefaults] setObject:[selectedBrowser name] forKey:@"iMediaBrowserSelectedBrowser"];
 	[NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:nil];
 }
 

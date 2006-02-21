@@ -32,6 +32,8 @@
 #import "iMediaBrowser.h"
 #import "DNDArrayController.h"
 #import "Library.h"
+#import "iTunesValueTransformer.h"
+#import "TimeValueTransformer.h"
 
 #import <QTKit/QTKit.h>
 #import <QTKit/QTMovieView.h>
@@ -52,6 +54,19 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 @end
 
 @implementation iMBMusicController
+
++ (void)load
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	id itunesValueTransformer = [[[iTunesValueTransformer alloc] init] autorelease];
+	[NSValueTransformer setValueTransformer:itunesValueTransformer forName:@"itunesValueTransformer"];
+	
+	id timeValueTransformer = [[[TimeValueTransformer alloc] init] autorelease];
+	[NSValueTransformer setValueTransformer:timeValueTransformer forName:@"timeValueTransformer"];
+	
+	[pool release];
+}
 
 // NOTE: THIS COULD DEFINITELY BE OPTIMIZED, OR MADE TO RUN IN THE BACKGROUND, ETC.
 
