@@ -190,7 +190,7 @@ static NSImage *_iphotoIcon = nil;
 {
 	if (!_iphotoIcon) {
 		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"photo_tiny" ofType:@"tiff"];
+		NSString *p = [b pathForResource:@"photo_tiny" ofType:@"png"];
 		_iphotoIcon = [[NSImage alloc] initWithContentsOfFile:p];
 	}
 	return _iphotoIcon;

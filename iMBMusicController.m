@@ -212,7 +212,7 @@ static NSImage *_itunesIcon = nil;
 {
 	if (!_itunesIcon) {
 		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"tunes_tiny" ofType:@"tiff"];
+		NSString *p = [b pathForResource:@"tunes_tiny" ofType:@"png"];
 		_itunesIcon = [[NSImage alloc] initWithContentsOfFile:p];
 	}
 	return _itunesIcon;
@@ -291,7 +291,7 @@ static NSImage *_stopImage = nil;
 	[playButton setState:NSOnState];
 	if (!_stopImage) {
 		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"MBNowPlayingButton" ofType:@"tif"];
+		NSString *p = [b pathForResource:@"MBNowPlayingButton" ofType:@"png"];
 		_stopImage = [[NSImage alloc] initWithContentsOfFile:p];
 	}
 	[playButton setImage:_stopImage];
@@ -309,7 +309,7 @@ static NSImage *_playImage = nil;
 	[playButton setState:NSOffState];
 	if (!_playImage) {
 		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"MBPlayN" ofType:@"tif"];
+		NSString *p = [b pathForResource:@"MBPlayN" ofType:@"png"];
 		_playImage = [[NSImage alloc] initWithContentsOfFile:p];
 	}
 	[playButton setImage:_playImage];

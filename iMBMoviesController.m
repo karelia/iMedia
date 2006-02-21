@@ -98,7 +98,7 @@ static NSImage *_movieIcon = nil;
 {
 	if (!_movieIcon) {
 		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"quicktime_tiny" ofType:@"tiff"];
+		NSString *p = [b pathForResource:@"quicktime_tiny" ofType:@"png"];
 		_movieIcon = [[NSImage alloc] initWithContentsOfFile:p];
 	}
 	return _movieIcon;

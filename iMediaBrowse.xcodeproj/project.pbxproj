@@ -12,25 +12,6 @@
 		79167A0D0975260C00D9EF74 /* iMBMoviesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 969656AF08C6A2C700F2F85C /* iMBMoviesController.m */; };
 		79167A160975261700D9EF74 /* iMBMusicController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A26018090CA99E00BCCCD6 /* iMBMusicController.m */; };
 		79167A170975262200D9EF74 /* iMBPhotosController.m in Sources */ = {isa = PBXBuildFile; fileRef = 968BF085090F3ECA00D00E5C /* iMBPhotosController.m */; };
-		79167A1B0975270600D9EF74 /* MBAudioPlaying.tif in Resources */ = {isa = PBXBuildFile; fileRef = 96A25EA2090C5F6400BCCCD6 /* MBAudioPlaying.tif */; };
-		79167A1C0975270700D9EF74 /* MBiPhoto4Library.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BF24D09105B3400D00E5C /* MBiPhoto4Library.tif */; };
-		79167A1D0975270700D9EF74 /* MBiPhotoAlbum.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BF24E09105B3400D00E5C /* MBiPhotoAlbum.tif */; };
-		79167A1F0975270900D9EF74 /* MBiPhotoCalendar.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BF24F09105B3400D00E5C /* MBiPhotoCalendar.tif */; };
-		79167A200975270A00D9EF74 /* MBiPhotoLibrary.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BF25009105B3400D00E5C /* MBiPhotoLibrary.tif */; };
-		79167A210975270B00D9EF74 /* MBiPhotoRoll.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BF25109105B3400D00E5C /* MBiPhotoRoll.tif */; };
-		79167A220975270B00D9EF74 /* MBiTunes4Song.tif in Resources */ = {isa = PBXBuildFile; fileRef = 965EBA0308E20280000DFF3A /* MBiTunes4Song.tif */; };
-		79167A230975270C00D9EF74 /* MBiTunesLibrary.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BEF50090E910200D00E5C /* MBiTunesLibrary.tif */; };
-		79167A240975270D00D9EF74 /* MBiTunesPartyShuffle.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BEF51090E910200D00E5C /* MBiTunesPartyShuffle.tif */; };
-		79167A250975270E00D9EF74 /* MBiTunesPlaylist.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BEF52090E910200D00E5C /* MBiTunesPlaylist.tif */; };
-		79167A260975271000D9EF74 /* MBiTunesPodcast.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BEF6B090EA92900D00E5C /* MBiTunesPodcast.tif */; };
-		79167A270975271100D9EF74 /* MBiTunesPurchasedPlaylist.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BEF53090E910200D00E5C /* MBiTunesPurchasedPlaylist.tif */; };
-		79167A280975271200D9EF74 /* MBNowPlayingButton.tif in Resources */ = {isa = PBXBuildFile; fileRef = 96A25EDF090C65E500BCCCD6 /* MBNowPlayingButton.tif */; };
-		79167A290975271200D9EF74 /* MBPlayN.tif in Resources */ = {isa = PBXBuildFile; fileRef = 965EBA0508E202A5000DFF3A /* MBPlayN.tif */; };
-		79167A2A0975271300D9EF74 /* MBStopN.tif in Resources */ = {isa = PBXBuildFile; fileRef = 965EBA0708E202AB000DFF3A /* MBStopN.tif */; };
-		79167A2B0975271300D9EF74 /* photo_tiny.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 112B9CB008E48DCA00557549 /* photo_tiny.tiff */; };
-		79167A2C0975271400D9EF74 /* picturesFolder.tif in Resources */ = {isa = PBXBuildFile; fileRef = 968BF26309105D1600D00E5C /* picturesFolder.tif */; };
-		79167A2D0975271500D9EF74 /* quicktime_tiny.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 112B9CB108E48DCA00557549 /* quicktime_tiny.tiff */; };
-		79167A2E0975271500D9EF74 /* tunes_tiny.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 112B9CAF08E48DCA00557549 /* tunes_tiny.tiff */; };
 		79167A6909752C3000D9EF74 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		79167A6A09752C3300D9EF74 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		79167A6B09752C3300D9EF74 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
@@ -52,7 +33,28 @@
 		791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */; };
 		792BFD93098066A50004D656 /* iMBPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 792BFD91098066A50004D656 /* iMBPhotoView.h */; };
 		792BFD94098066A50004D656 /* iMBPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 792BFD92098066A50004D656 /* iMBPhotoView.m */; };
-		799B4C8D09818AA600FEF7BB /* badge.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 799B4C8C09818AA600FEF7BB /* badge.tiff */; };
+		79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF5FF09AAE5D2000CB4B4 /* badge.png */; };
+		79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */; };
+		79FDF61709AAE5D2000CB4B4 /* MBiPhoto4Library.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */; };
+		79FDF61809AAE5D2000CB4B4 /* MBiPhotoAlbum.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60209AAE5D2000CB4B4 /* MBiPhotoAlbum.png */; };
+		79FDF61909AAE5D2000CB4B4 /* MBiPhotoCalendar.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60309AAE5D2000CB4B4 /* MBiPhotoCalendar.png */; };
+		79FDF61A09AAE5D2000CB4B4 /* MBiPhotoLibrary.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60409AAE5D2000CB4B4 /* MBiPhotoLibrary.png */; };
+		79FDF61B09AAE5D2000CB4B4 /* MBiPhotoRoll.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60509AAE5D2000CB4B4 /* MBiPhotoRoll.png */; };
+		79FDF61C09AAE5D2000CB4B4 /* MBiTunes4Song.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60609AAE5D2000CB4B4 /* MBiTunes4Song.png */; };
+		79FDF61D09AAE5D2000CB4B4 /* MBiTunesLibrary.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60709AAE5D2000CB4B4 /* MBiTunesLibrary.png */; };
+		79FDF61E09AAE5D2000CB4B4 /* MBiTunesPartyShuffle.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60809AAE5D2000CB4B4 /* MBiTunesPartyShuffle.png */; };
+		79FDF61F09AAE5D2000CB4B4 /* MBiTunesPlaylist.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60909AAE5D2000CB4B4 /* MBiTunesPlaylist.png */; };
+		79FDF62009AAE5D2000CB4B4 /* MBiTunesPodcast.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60A09AAE5D2000CB4B4 /* MBiTunesPodcast.png */; };
+		79FDF62109AAE5D2000CB4B4 /* MBiTunesPurchasedPlaylist.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60B09AAE5D2000CB4B4 /* MBiTunesPurchasedPlaylist.png */; };
+		79FDF62209AAE5D2000CB4B4 /* MBNowPlayingButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60C09AAE5D2000CB4B4 /* MBNowPlayingButton.png */; };
+		79FDF62309AAE5D2000CB4B4 /* MBPlayN.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60D09AAE5D2000CB4B4 /* MBPlayN.png */; };
+		79FDF62409AAE5D2000CB4B4 /* MBQuicktime.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60E09AAE5D2000CB4B4 /* MBQuicktime.png */; };
+		79FDF62509AAE5D2000CB4B4 /* MBStopH.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60F09AAE5D2000CB4B4 /* MBStopH.png */; };
+		79FDF62609AAE5D2000CB4B4 /* MBStopN.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF61009AAE5D2000CB4B4 /* MBStopN.png */; };
+		79FDF62709AAE5D2000CB4B4 /* photo_tiny.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF61109AAE5D2000CB4B4 /* photo_tiny.png */; };
+		79FDF62809AAE5D2000CB4B4 /* picturesFolder.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF61209AAE5D2000CB4B4 /* picturesFolder.png */; };
+		79FDF62909AAE5D2000CB4B4 /* quicktime_tiny.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF61309AAE5D2000CB4B4 /* quicktime_tiny.png */; };
+		79FDF62A09AAE5D2000CB4B4 /* tunes_tiny.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */; };
 		8D11072A0486CEB800E47090 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -61,7 +63,6 @@
 		965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		D94D1B4109A7A71500CD2946 /* TimeValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */; };
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
-		D94D1DCF09A8250900CD2946 /* MBQuicktime.tiff in Resources */ = {isa = PBXBuildFile; fileRef = D94D1DCE09A8250900CD2946 /* MBQuicktime.tiff */; };
 		D9659A3609A6A9680079ED9A /* Library.h in Headers */ = {isa = PBXBuildFile; fileRef = D9659A3409A6A9680079ED9A /* Library.h */; };
 		D9659A3709A6A9680079ED9A /* Library.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659A3509A6A9680079ED9A /* Library.m */; };
 		D9659C1109A6CB450079ED9A /* LibraryItemsValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */; };
@@ -125,9 +126,6 @@
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		112B9CAF08E48DCA00557549 /* tunes_tiny.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = tunes_tiny.tiff; sourceTree = "<group>"; };
-		112B9CB008E48DCA00557549 /* photo_tiny.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = photo_tiny.tiff; sourceTree = "<group>"; };
-		112B9CB108E48DCA00557549 /* quicktime_tiny.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = quicktime_tiny.tiff; sourceTree = "<group>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
@@ -152,38 +150,42 @@
 		791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKMainThreadProxy.m; sourceTree = "<group>"; };
 		792BFD91098066A50004D656 /* iMBPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBPhotoView.h; sourceTree = "<group>"; };
 		792BFD92098066A50004D656 /* iMBPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBPhotoView.m; sourceTree = "<group>"; };
-		799B4C8C09818AA600FEF7BB /* badge.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = badge.tiff; sourceTree = "<group>"; };
+		79FDF5FF09AAE5D2000CB4B4 /* badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge.png; sourceTree = "<group>"; };
+		79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBAudioPlaying.png; sourceTree = "<group>"; };
+		79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiPhoto4Library.png; sourceTree = "<group>"; };
+		79FDF60209AAE5D2000CB4B4 /* MBiPhotoAlbum.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiPhotoAlbum.png; sourceTree = "<group>"; };
+		79FDF60309AAE5D2000CB4B4 /* MBiPhotoCalendar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiPhotoCalendar.png; sourceTree = "<group>"; };
+		79FDF60409AAE5D2000CB4B4 /* MBiPhotoLibrary.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiPhotoLibrary.png; sourceTree = "<group>"; };
+		79FDF60509AAE5D2000CB4B4 /* MBiPhotoRoll.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiPhotoRoll.png; sourceTree = "<group>"; };
+		79FDF60609AAE5D2000CB4B4 /* MBiTunes4Song.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiTunes4Song.png; sourceTree = "<group>"; };
+		79FDF60709AAE5D2000CB4B4 /* MBiTunesLibrary.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiTunesLibrary.png; sourceTree = "<group>"; };
+		79FDF60809AAE5D2000CB4B4 /* MBiTunesPartyShuffle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiTunesPartyShuffle.png; sourceTree = "<group>"; };
+		79FDF60909AAE5D2000CB4B4 /* MBiTunesPlaylist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiTunesPlaylist.png; sourceTree = "<group>"; };
+		79FDF60A09AAE5D2000CB4B4 /* MBiTunesPodcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiTunesPodcast.png; sourceTree = "<group>"; };
+		79FDF60B09AAE5D2000CB4B4 /* MBiTunesPurchasedPlaylist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiTunesPurchasedPlaylist.png; sourceTree = "<group>"; };
+		79FDF60C09AAE5D2000CB4B4 /* MBNowPlayingButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBNowPlayingButton.png; sourceTree = "<group>"; };
+		79FDF60D09AAE5D2000CB4B4 /* MBPlayN.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBPlayN.png; sourceTree = "<group>"; };
+		79FDF60E09AAE5D2000CB4B4 /* MBQuicktime.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBQuicktime.png; sourceTree = "<group>"; };
+		79FDF60F09AAE5D2000CB4B4 /* MBStopH.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBStopH.png; sourceTree = "<group>"; };
+		79FDF61009AAE5D2000CB4B4 /* MBStopN.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBStopN.png; sourceTree = "<group>"; };
+		79FDF61109AAE5D2000CB4B4 /* photo_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = photo_tiny.png; sourceTree = "<group>"; };
+		79FDF61209AAE5D2000CB4B4 /* picturesFolder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = picturesFolder.png; sourceTree = "<group>"; };
+		79FDF61309AAE5D2000CB4B4 /* quicktime_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = quicktime_tiny.png; sourceTree = "<group>"; };
+		79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tunes_tiny.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* iMediaBrowse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		964006E108D7B9BF0046E052 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		965EB98608E1D345000DFF3A /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowser.h; sourceTree = "<group>"; };
 		965EB99708E1F7CE000DFF3A /* iMediaBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMediaBrowser.m; sourceTree = "<group>"; };
-		965EBA0308E20280000DFF3A /* MBiTunes4Song.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiTunes4Song.tif; sourceTree = "<group>"; };
-		965EBA0508E202A5000DFF3A /* MBPlayN.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBPlayN.tif; sourceTree = "<group>"; };
-		965EBA0708E202AB000DFF3A /* MBStopN.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBStopN.tif; sourceTree = "<group>"; };
-		968BEF50090E910200D00E5C /* MBiTunesLibrary.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiTunesLibrary.tif; sourceTree = "<group>"; };
-		968BEF51090E910200D00E5C /* MBiTunesPartyShuffle.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiTunesPartyShuffle.tif; sourceTree = "<group>"; };
-		968BEF52090E910200D00E5C /* MBiTunesPlaylist.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiTunesPlaylist.tif; sourceTree = "<group>"; };
-		968BEF53090E910200D00E5C /* MBiTunesPurchasedPlaylist.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiTunesPurchasedPlaylist.tif; sourceTree = "<group>"; };
-		968BEF6B090EA92900D00E5C /* MBiTunesPodcast.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiTunesPodcast.tif; sourceTree = "<group>"; };
 		968BF084090F3ECA00D00E5C /* iMBPhotosController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBPhotosController.h; sourceTree = "<group>"; };
 		968BF085090F3ECA00D00E5C /* iMBPhotosController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBPhotosController.m; sourceTree = "<group>"; };
-		968BF24D09105B3400D00E5C /* MBiPhoto4Library.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiPhoto4Library.tif; sourceTree = "<group>"; };
-		968BF24E09105B3400D00E5C /* MBiPhotoAlbum.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiPhotoAlbum.tif; sourceTree = "<group>"; };
-		968BF24F09105B3400D00E5C /* MBiPhotoCalendar.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiPhotoCalendar.tif; sourceTree = "<group>"; };
-		968BF25009105B3400D00E5C /* MBiPhotoLibrary.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiPhotoLibrary.tif; sourceTree = "<group>"; };
-		968BF25109105B3400D00E5C /* MBiPhotoRoll.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBiPhotoRoll.tif; sourceTree = "<group>"; };
-		968BF26309105D1600D00E5C /* picturesFolder.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = picturesFolder.tif; sourceTree = "<group>"; };
 		969656AE08C6A2C700F2F85C /* iMBMoviesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMoviesController.h; sourceTree = "<group>"; };
 		969656AF08C6A2C700F2F85C /* iMBMoviesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMoviesController.m; sourceTree = "<group>"; };
-		96A25EA2090C5F6400BCCCD6 /* MBAudioPlaying.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBAudioPlaying.tif; sourceTree = "<group>"; };
-		96A25EDF090C65E500BCCCD6 /* MBNowPlayingButton.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBNowPlayingButton.tif; sourceTree = "<group>"; };
 		96A26017090CA99E00BCCCD6 /* iMBMusicController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMusicController.h; sourceTree = "<group>"; };
 		96A26018090CA99E00BCCCD6 /* iMBMusicController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMusicController.m; sourceTree = "<group>"; };
 		D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeValueTransformer.h; sourceTree = "<group>"; };
 		D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeValueTransformer.m; sourceTree = "<group>"; };
-		D94D1DCE09A8250900CD2946 /* MBQuicktime.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MBQuicktime.tiff; sourceTree = "<group>"; };
 		D9659A3409A6A9680079ED9A /* Library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Library.h; sourceTree = "<group>"; };
 		D9659A3509A6A9680079ED9A /* Library.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Library.m; sourceTree = "<group>"; };
 		D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryItemsValueTransformer.h; sourceTree = "<group>"; };
@@ -310,27 +312,28 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
-				799B4C8C09818AA600FEF7BB /* badge.tiff */,
-				968BF26309105D1600D00E5C /* picturesFolder.tif */,
-				968BF24D09105B3400D00E5C /* MBiPhoto4Library.tif */,
-				968BF24E09105B3400D00E5C /* MBiPhotoAlbum.tif */,
-				968BF24F09105B3400D00E5C /* MBiPhotoCalendar.tif */,
-				968BF25009105B3400D00E5C /* MBiPhotoLibrary.tif */,
-				968BF25109105B3400D00E5C /* MBiPhotoRoll.tif */,
-				968BEF6B090EA92900D00E5C /* MBiTunesPodcast.tif */,
-				968BEF50090E910200D00E5C /* MBiTunesLibrary.tif */,
-				968BEF51090E910200D00E5C /* MBiTunesPartyShuffle.tif */,
-				968BEF52090E910200D00E5C /* MBiTunesPlaylist.tif */,
-				968BEF53090E910200D00E5C /* MBiTunesPurchasedPlaylist.tif */,
-				D94D1DCE09A8250900CD2946 /* MBQuicktime.tiff */,
-				112B9CAF08E48DCA00557549 /* tunes_tiny.tiff */,
-				112B9CB008E48DCA00557549 /* photo_tiny.tiff */,
-				112B9CB108E48DCA00557549 /* quicktime_tiny.tiff */,
-				965EBA0708E202AB000DFF3A /* MBStopN.tif */,
-				965EBA0508E202A5000DFF3A /* MBPlayN.tif */,
-				96A25EDF090C65E500BCCCD6 /* MBNowPlayingButton.tif */,
-				965EBA0308E20280000DFF3A /* MBiTunes4Song.tif */,
-				96A25EA2090C5F6400BCCCD6 /* MBAudioPlaying.tif */,
+				79FDF5FF09AAE5D2000CB4B4 /* badge.png */,
+				79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */,
+				79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */,
+				79FDF60209AAE5D2000CB4B4 /* MBiPhotoAlbum.png */,
+				79FDF60309AAE5D2000CB4B4 /* MBiPhotoCalendar.png */,
+				79FDF60409AAE5D2000CB4B4 /* MBiPhotoLibrary.png */,
+				79FDF60509AAE5D2000CB4B4 /* MBiPhotoRoll.png */,
+				79FDF60609AAE5D2000CB4B4 /* MBiTunes4Song.png */,
+				79FDF60709AAE5D2000CB4B4 /* MBiTunesLibrary.png */,
+				79FDF60809AAE5D2000CB4B4 /* MBiTunesPartyShuffle.png */,
+				79FDF60909AAE5D2000CB4B4 /* MBiTunesPlaylist.png */,
+				79FDF60A09AAE5D2000CB4B4 /* MBiTunesPodcast.png */,
+				79FDF60B09AAE5D2000CB4B4 /* MBiTunesPurchasedPlaylist.png */,
+				79FDF60C09AAE5D2000CB4B4 /* MBNowPlayingButton.png */,
+				79FDF60D09AAE5D2000CB4B4 /* MBPlayN.png */,
+				79FDF60E09AAE5D2000CB4B4 /* MBQuicktime.png */,
+				79FDF60F09AAE5D2000CB4B4 /* MBStopH.png */,
+				79FDF61009AAE5D2000CB4B4 /* MBStopN.png */,
+				79FDF61109AAE5D2000CB4B4 /* photo_tiny.png */,
+				79FDF61209AAE5D2000CB4B4 /* picturesFolder.png */,
+				79FDF61309AAE5D2000CB4B4 /* quicktime_tiny.png */,
+				79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */,
 			);
 			name = images;
 			sourceTree = "<group>";
@@ -549,31 +552,32 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				79167A1B0975270600D9EF74 /* MBAudioPlaying.tif in Resources */,
-				79167A1C0975270700D9EF74 /* MBiPhoto4Library.tif in Resources */,
-				79167A1D0975270700D9EF74 /* MBiPhotoAlbum.tif in Resources */,
-				79167A1F0975270900D9EF74 /* MBiPhotoCalendar.tif in Resources */,
-				79167A200975270A00D9EF74 /* MBiPhotoLibrary.tif in Resources */,
-				79167A210975270B00D9EF74 /* MBiPhotoRoll.tif in Resources */,
-				79167A220975270B00D9EF74 /* MBiTunes4Song.tif in Resources */,
-				79167A230975270C00D9EF74 /* MBiTunesLibrary.tif in Resources */,
-				79167A240975270D00D9EF74 /* MBiTunesPartyShuffle.tif in Resources */,
-				79167A250975270E00D9EF74 /* MBiTunesPlaylist.tif in Resources */,
-				79167A260975271000D9EF74 /* MBiTunesPodcast.tif in Resources */,
-				79167A270975271100D9EF74 /* MBiTunesPurchasedPlaylist.tif in Resources */,
-				79167A280975271200D9EF74 /* MBNowPlayingButton.tif in Resources */,
-				79167A290975271200D9EF74 /* MBPlayN.tif in Resources */,
-				79167A2A0975271300D9EF74 /* MBStopN.tif in Resources */,
-				79167A2B0975271300D9EF74 /* photo_tiny.tiff in Resources */,
-				79167A2C0975271400D9EF74 /* picturesFolder.tif in Resources */,
-				79167A2D0975271500D9EF74 /* quicktime_tiny.tiff in Resources */,
-				79167A2E0975271500D9EF74 /* tunes_tiny.tiff in Resources */,
 				791F97A40975DA170071B2E0 /* iTunes.nib in Resources */,
 				791F99390976023F0071B2E0 /* iPhoto.nib in Resources */,
 				791F9A72097628E60071B2E0 /* Movies.nib in Resources */,
 				3CAC73E90976F47800AF5020 /* MediaBrowser.nib in Resources */,
-				799B4C8D09818AA600FEF7BB /* badge.tiff in Resources */,
-				D94D1DCF09A8250900CD2946 /* MBQuicktime.tiff in Resources */,
+				79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */,
+				79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */,
+				79FDF61709AAE5D2000CB4B4 /* MBiPhoto4Library.png in Resources */,
+				79FDF61809AAE5D2000CB4B4 /* MBiPhotoAlbum.png in Resources */,
+				79FDF61909AAE5D2000CB4B4 /* MBiPhotoCalendar.png in Resources */,
+				79FDF61A09AAE5D2000CB4B4 /* MBiPhotoLibrary.png in Resources */,
+				79FDF61B09AAE5D2000CB4B4 /* MBiPhotoRoll.png in Resources */,
+				79FDF61C09AAE5D2000CB4B4 /* MBiTunes4Song.png in Resources */,
+				79FDF61D09AAE5D2000CB4B4 /* MBiTunesLibrary.png in Resources */,
+				79FDF61E09AAE5D2000CB4B4 /* MBiTunesPartyShuffle.png in Resources */,
+				79FDF61F09AAE5D2000CB4B4 /* MBiTunesPlaylist.png in Resources */,
+				79FDF62009AAE5D2000CB4B4 /* MBiTunesPodcast.png in Resources */,
+				79FDF62109AAE5D2000CB4B4 /* MBiTunesPurchasedPlaylist.png in Resources */,
+				79FDF62209AAE5D2000CB4B4 /* MBNowPlayingButton.png in Resources */,
+				79FDF62309AAE5D2000CB4B4 /* MBPlayN.png in Resources */,
+				79FDF62409AAE5D2000CB4B4 /* MBQuicktime.png in Resources */,
+				79FDF62509AAE5D2000CB4B4 /* MBStopH.png in Resources */,
+				79FDF62609AAE5D2000CB4B4 /* MBStopN.png in Resources */,
+				79FDF62709AAE5D2000CB4B4 /* photo_tiny.png in Resources */,
+				79FDF62809AAE5D2000CB4B4 /* picturesFolder.png in Resources */,
+				79FDF62909AAE5D2000CB4B4 /* quicktime_tiny.png in Resources */,
+				79FDF62A09AAE5D2000CB4B4 /* tunes_tiny.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

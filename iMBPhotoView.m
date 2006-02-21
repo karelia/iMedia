@@ -405,7 +405,7 @@ static NSImage *_badge = nil;
 				
 				if (!_badge) {
 					NSBundle *b = [NSBundle bundleForClass:[self class]];
-					NSString *p = [b pathForResource:@"badge" ofType:@"tiff"];
+					NSString *p = [b pathForResource:@"badge" ofType:@"png"];
 					_badge = [[NSImage alloc] initWithContentsOfFile:p];
 				}
 				
