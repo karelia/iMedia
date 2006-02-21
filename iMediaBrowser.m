@@ -180,11 +180,6 @@ static NSMutableArray *_browserClasses = nil;
 	[oLoading stopAnimation:self];
 }
 
-//- (IBAction)playlistSelected:(id)sender
-//{
-//	[selectedBrowser selectedPlaylistAtIndex:[sender selectedRow]];
-//}
-
 #pragma mark -
 #pragma mark Window Delegate Methods
 

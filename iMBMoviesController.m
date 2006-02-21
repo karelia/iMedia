@@ -119,39 +119,9 @@ static NSImage *_movieIcon = nil;
 	[previewMovieView pause:self];
 }
 
-//- (int)numberOfPlaylistItems
-//{
-//	return [pathList count];
-//}
-
-//- (NSString *)playlistAtIndex:(unsigned)idx
-//{
-//	return [[pathList objectAtIndex:idx] lastPathComponent];
-//}
-
 - (NSString *)iconNameForPlaylist:(NSString*)name
 {
 	return @"MBQuicktime.png";
 }
-
-//- (NSArray *)filePathsForPlaylistAtIndex:(unsigned)idx
-//{
-//	return [NSArray arrayWithObject:[pathList objectAtIndex:idx]];
-//}
-//
-//- (void)selectedPlaylistAtIndex:(unsigned)idx
-//{
-//	if (idx >= 0 && idx < [pathList count]) {
-//		NSURL *url = [NSURL fileURLWithPath:[pathList objectAtIndex:idx]];
-//		NSError *err = nil;
-//		QTMovie *movie = [QTMovie movieWithURL:url error:&err];
-//		if (err) {
-//			NSLog(@"%@", err);
-//		}
-//		[previewMovieView setMovie:movie];
-//		//[previewMovieView play:self]; //don't automatically play
-//	}
-//}
-
 
 @end
