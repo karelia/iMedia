@@ -131,7 +131,7 @@ static NSImage *_movieIcon = nil;
 
 - (NSString *)iconNameForPlaylist:(NSString*)name
 {
-	return @"MBQuicktime.tiff";
+	return @"MBQuicktime.png";
 }
 
 //- (NSArray *)filePathsForPlaylistAtIndex:(unsigned)idx
