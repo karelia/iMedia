@@ -98,6 +98,12 @@ static NSMutableArray *_browserClasses = nil;
 - (void)awakeFromNib
 {
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
+	myToolbar = [[NSToolbar alloc] initWithIdentifier:@"iMediaBrowserToolbar"];
+	
+	[myToolbar setAllowsUserCustomization:NO];
+	[myToolbar setShowsBaselineSeparator:YES];
+	[myToolbar setSizeMode:NSToolbarSizeModeSmall];
+	
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:@"mediaMenu"];
 	NSMenuItem *item;
 	NSEnumerator *e = [_browserClasses objectEnumerator];
@@ -112,17 +118,10 @@ static NSMutableArray *_browserClasses = nil;
 		}
 		[myMediaBrowsers addObject:browser];
 		[browser release];
-		
-		item = [[NSMenuItem alloc] initWithTitle:[browser name]
-										  action:nil
-								   keyEquivalent:@""];
-		[item setRepresentedObject:browser];
-		[item setImage:[browser menuIcon]];
-		[menu addItem:item];
-		[item release];
 	}
-	[oMediaMenu setMenu:menu];
-	[menu release];
+	
+	[myToolbar setDelegate:self];
+	[[self window] setToolbar:myToolbar];
 	
 	//select the first browser
 	if ([myMediaBrowsers count] > 0) {
@@ -130,14 +129,12 @@ static NSMutableArray *_browserClasses = nil;
 		NSString *lastSelectedBrowser = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowserSelectedBrowser"];
 		if (lastSelectedBrowser)
 		{
-			[oMediaMenu selectItemWithTitle:lastSelectedBrowser];
+			[myToolbar setSelectedItemIdentifier:lastSelectedBrowser];
 		}
 		else
 		{
-			[oMediaMenu selectItemAtIndex:0];
+			[myToolbar setSelectedItemIdentifier:[myMediaBrowsers objectAtIndex:0]];
 		}
-		
-		[self changeBrowser:oMediaMenu];
 	}
 	
 	NSString *position = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowserWindowPosition"];
@@ -148,12 +145,28 @@ static NSMutableArray *_browserClasses = nil;
 	[[self window] setDelegate:self];
 }
 
-- (IBAction)changeBrowser:(id)sender
+- (id <iMediaBrowser>)browserForClassName:(NSString *)name
+{
+	NSEnumerator *e = [myMediaBrowsers objectEnumerator];
+	id <iMediaBrowser>cur;
+	
+	while (cur = [e nextObject]) 
+	{
+		NSString *className = NSStringFromClass([cur class]);
+		if ([className isEqualToString:name])
+		{
+			return cur;
+		}
+	}
+	return nil;
+}
+
+- (void)toolbarItemChanged:(id)sender
 {
 	[oSplitView setHidden:YES];
 	[oLoadingView setHidden:NO];
 	[oLoading startAnimation:self];
-	id <iMediaBrowser>browser = [[sender selectedItem] representedObject];
+	id <iMediaBrowser>browser = [self browserForClassName:[sender itemIdentifier]];
 	NSView *view = [browser browserView];
 	//remove old view
 	[selectedBrowser didDeactivate];
@@ -161,8 +174,9 @@ static NSMutableArray *_browserClasses = nil;
 	[view setFrame:[oBrowserView bounds]];
 	[oBrowserView addSubview:[view retain]];
 	selectedBrowser = browser;
-	//save the selected browser
-	[[NSUserDefaults standardUserDefaults] setObject:[selectedBrowser name] forKey:@"iMediaBrowserSelectedBrowser"];
+	[myToolbar setSelectedItemIdentifier:NSStringFromClass([selectedBrowser class])];
+	//save the selected browse
+	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromClass([selectedBrowser class]) forKey:@"iMediaBrowserSelectedBrowser"];
 	[NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:nil];
 }
 
@@ -202,6 +216,60 @@ static NSMutableArray *_browserClasses = nil;
 	{
 		[libraryController removeObjectAtArrangedObjectIndexPath:[NSIndexPath indexPathWithIndex:controllerCount-1]];
 	}
+}
+
+#pragma mark -
+#pragma mark NSToolbar Delegate Methods
+
+- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar 
+	 itemForItemIdentifier:(NSString *)itemIdentifier 
+ willBeInsertedIntoToolbar:(BOOL)flag
+{
+	NSEnumerator *e = [myMediaBrowsers objectEnumerator];
+	id <iMediaBrowser>cur;
+	
+	while (cur = [e nextObject]) 
+	{
+		NSString *className = NSStringFromClass([cur class]);
+		if ([className isEqualToString:itemIdentifier])
+		{
+			NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
+			[item setLabel:[cur name]];
+			[item setImage:[cur menuIcon]];
+			[item setTarget:self];
+			[item setAction:@selector(toolbarItemChanged:)];
+			return [item autorelease];
+		}
+	}
+	return nil;
+}
+
+- (NSArray *)allControllerClassNames
+{
+	NSMutableArray *identifiers = [NSMutableArray array];
+	NSEnumerator *e = [myMediaBrowsers objectEnumerator];
+	id <iMediaBrowser>cur;
+	
+	while (cur = [e nextObject]) 
+	{
+		[identifiers addObject:NSStringFromClass([cur class])];
+	}
+	return identifiers;
+}
+
+- (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar
+{
+	return [self allControllerClassNames];
+}
+
+- (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar
+{
+	return [self allControllerClassNames];
+}
+
+- (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
+{
+	return [self allControllerClassNames];
 }
 
 @end

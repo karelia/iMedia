@@ -45,6 +45,7 @@
 	@private
 	NSMutableArray *myMediaBrowsers;
 	id <iMediaBrowser>selectedBrowser;
+	NSToolbar *myToolbar;
 }
 
 + (id)sharedBrowser;
