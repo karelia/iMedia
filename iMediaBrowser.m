@@ -44,6 +44,10 @@ static NSMutableArray *_browserClasses = nil;
 - (void)showMediaBrowser:(NSString *)browserClassName;
 @end
 
+@interface iMediaBrowser (Plugins)
++ (NSArray *)findBundlesWithExtension:(NSString *)ext inFolderName:(NSString *)folder;
+@end
+
 @implementation iMediaBrowser
 
 + (void)load
@@ -54,6 +58,27 @@ static NSMutableArray *_browserClasses = nil;
 	[self registerBrowser:NSClassFromString(@"iMBPhotosController")];
 	[self registerBrowser:NSClassFromString(@"iMBMusicController")];
 	[self registerBrowser:NSClassFromString(@"iMBMoviesController")];
+	
+	//find and load all plugins
+	NSArray *plugins = [iMediaBrowser findBundlesWithExtension:@"iMediaBrowser" inFolderName:@"iMediaBrowser"];
+	NSEnumerator *e = [plugins objectEnumerator];
+	NSString *cur;
+	
+	while (cur = [e nextObject])
+	{
+		NSBundle *b = [NSBundle bundleWithPath:cur];
+		Class mainClass = [b principalClass];
+		if ([mainClass conformsToProtocol:@protocol(iMediaBrowser)])
+		{
+			if (![b load])
+			{
+				NSLog(@"Failed to load iMediaBrowser plugin: %@", cur);
+				continue;
+			}
+			[self registerBrowser:mainClass];
+		}
+	}
+	
 	[pool release];
 }
 
@@ -281,6 +306,61 @@ static NSMutableArray *_browserClasses = nil;
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
 	return [self allControllerClassNames];
+}
+
+@end
+
+@implementation iMediaBrowser (Plugins)
+
++ (NSArray *)findModulesInDirectory:(NSString*)scanDir withExtension:(NSString *)ext
+{
+    NSEnumerator	*e;
+    NSString		*dir;
+    BOOL			isDir;
+	NSMutableArray	*bundles = [NSMutableArray array];
+	
+    // make sure scanDir exists and is a directory.
+    if (![[NSFileManager defaultManager] fileExistsAtPath:scanDir isDirectory:&isDir]) return nil;
+    if (!isDir) return nil;
+	
+    // scan the dir for .ext directories.
+    e = [[[NSFileManager defaultManager] directoryContentsAtPath:scanDir] objectEnumerator];
+    while (dir = [e nextObject]) {
+		if ([[dir pathExtension] isEqualToString:ext]) {
+			
+            [bundles addObject:[NSString stringWithFormat:@"%@/%@", scanDir, dir]];
+        }
+    }
+	return bundles;
+}
+
+
++ (NSArray *)findBundlesWithExtension:(NSString *)ext inFolderName:(NSString *)folder
+{
+	NSMutableArray *bundles = [NSMutableArray array];
+	
+    // look for bundles in the following places:
+	
+    //application wrapper
+    [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[[NSBundle mainBundle] resourcePath]
+														 withExtension:ext]];
+	
+    // ~/Library/
+    [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[NSString stringWithFormat:@"%@/Library/%@", NSHomeDirectory(), folder]
+														 withExtension:ext]];
+	
+    // /Local/Library/
+    [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[NSString stringWithFormat:@"/Library/%@", folder]
+														 withExtension:ext]];
+	
+    // /System/Library/
+    [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[NSString stringWithFormat:@"/System/Library/%@", folder]
+														 withExtension:ext]];
+	
+    // /Network/Library/
+    [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[NSString stringWithFormat:@"/Network/Library/%@", folder]
+														 withExtension:ext]];
+	return bundles;
 }
 
 @end
