@@ -46,6 +46,7 @@
 	NSMutableArray *myMediaBrowsers;
 	id <iMediaBrowser>selectedBrowser;
 	NSToolbar *myToolbar;
+	NSLock *myBackgroundLoadingLock;
 }
 
 + (id)sharedBrowser;

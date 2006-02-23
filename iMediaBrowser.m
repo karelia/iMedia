@@ -91,6 +91,7 @@ static NSMutableArray *_browserClasses = nil;
 	if (self = [super initWithWindowNibName:@"MediaBrowser"]) {
 		id libraryItemsValueTransformer = [[[LibraryItemsValueTransformer alloc] init] autorelease];
 		[NSValueTransformer setValueTransformer:libraryItemsValueTransformer forName:@"libraryItemsValueTransformer"];
+		myBackgroundLoadingLock = [[NSLock alloc] init];
 	}
 	return self;
 }
@@ -130,10 +131,12 @@ static NSMutableArray *_browserClasses = nil;
 		if (lastSelectedBrowser)
 		{
 			[myToolbar setSelectedItemIdentifier:lastSelectedBrowser];
+			[self showMediaBrowser:lastSelectedBrowser];
 		}
 		else
 		{
 			[myToolbar setSelectedItemIdentifier:[myMediaBrowsers objectAtIndex:0]];
+			[self showMediaBrowser:[myMediaBrowsers objectAtIndex:0]];
 		}
 	}
 	
@@ -161,23 +164,31 @@ static NSMutableArray *_browserClasses = nil;
 	return nil;
 }
 
+- (void)showMediaBrowser:(NSString *)browserClassName
+{
+	if ([myBackgroundLoadingLock tryLock])
+	{
+		[oSplitView setHidden:YES];
+		[oLoadingView setHidden:NO];
+		[oLoading startAnimation:self];
+		id <iMediaBrowser>browser = [self browserForClassName:browserClassName];
+		NSView *view = [browser browserView];
+		//remove old view
+		[selectedBrowser didDeactivate];
+		[[selectedBrowser browserView] removeFromSuperview];
+		[view setFrame:[oBrowserView bounds]];
+		[oBrowserView addSubview:[view retain]];
+		selectedBrowser = browser;
+		//save the selected browse
+		[[NSUserDefaults standardUserDefaults] setObject:NSStringFromClass([selectedBrowser class]) forKey:@"iMediaBrowserSelectedBrowser"];
+		[NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:nil];
+	}
+	[myToolbar setSelectedItemIdentifier:NSStringFromClass([selectedBrowser class])];
+}
+
 - (void)toolbarItemChanged:(id)sender
 {
-	[oSplitView setHidden:YES];
-	[oLoadingView setHidden:NO];
-	[oLoading startAnimation:self];
-	id <iMediaBrowser>browser = [self browserForClassName:[sender itemIdentifier]];
-	NSView *view = [browser browserView];
-	//remove old view
-	[selectedBrowser didDeactivate];
-	[[selectedBrowser browserView] removeFromSuperview];
-	[view setFrame:[oBrowserView bounds]];
-	[oBrowserView addSubview:[view retain]];
-	selectedBrowser = browser;
-	[myToolbar setSelectedItemIdentifier:NSStringFromClass([selectedBrowser class])];
-	//save the selected browse
-	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromClass([selectedBrowser class]) forKey:@"iMediaBrowserSelectedBrowser"];
-	[NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:nil];
+	[self showMediaBrowser:[sender itemIdentifier]];
 }
 
 - (void)backgroundLoadData:(id)sender
@@ -196,6 +207,7 @@ static NSMutableArray *_browserClasses = nil;
 	[oLoadingView setHidden:YES];
 	[oSplitView setHidden:NO];
 	[oLoading stopAnimation:self];
+	[myBackgroundLoadingLock unlock];
 }
 
 #pragma mark -
