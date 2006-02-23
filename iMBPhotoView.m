@@ -33,6 +33,14 @@
 
 #import "iMBPhotoView.h"
 
+enum {
+	AutoScrollNone = 0,
+	AutoScrollUp,
+	AutoScrollDown
+};
+
+const NSTimeInterval kAutoScrollThreshold = 0.150;
+
 #pragma mark OMNI
 
 @interface NSImage (Omni)
@@ -496,19 +504,41 @@ static NSImage *_badge = nil;
 		isRubberbanding = YES;
 		NSPoint curPoint = p;
 		NSPoint lastPoint = p;
+		int autoscrollDirection = AutoScrollNone;
+		
 		while (1) {
-			theEvent = [[self window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask)];
+			theEvent = [[self window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask) 
+												  untilDate:[NSDate dateWithTimeIntervalSinceNow:kAutoScrollThreshold]
+													 inMode:NSEventTrackingRunLoopMode
+													dequeue:YES];
 			curPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+			if (autoscrollDirection != AutoScrollNone)
+			{
+				if (autoscrollDirection == AutoScrollDown)
+				{
+					curPoint = NSMakePoint(curPoint.x, curPoint.y - 25);
+				}
+				else
+				{
+					curPoint = NSMakePoint(curPoint.x, curPoint.y - 25);
+				}
+			}
 			
-			if (!NSEqualPoints(p, curPoint)) {
+			if (!NSEqualPoints(p, curPoint)) 
+			{
 				NSRect newRubberbandRect = SKTRectFromPoints(p, curPoint); // this is from the Sketch Sample
-				if (!NSEqualRects(rubberbandRect, newRubberbandRect)) {
+				if (!NSEqualRects(rubberbandRect, newRubberbandRect)) 
+				{
 					//we only want to actually select what is actually visible
 					NSRect scrollerViewableRect = [[self enclosingScrollView] documentVisibleRect];
 					rubberbandRect = newRubberbandRect;
-					if (NSMinY(rubberbandRect) < NSMinY(scrollerViewableRect))
+					if (autoscrollDirection == AutoScrollDown)
 					{
-						rubberbandRect.origin.y = NSMinY(scrollerViewableRect) - 1;
+						rubberbandRect.origin.y = NSMinY(scrollerViewableRect) + 1;
+					}
+					else if (autoscrollDirection == AutoScrollUp)
+					{
+						rubberbandRect.origin.y = NSMaxY(scrollerViewableRect) - 1;
 					}
 					
 					[selectedCells removeAllObjects];
@@ -518,12 +548,17 @@ static NSImage *_badge = nil;
 					[self setNeedsDisplay:YES];
 				}
 				//auto scroll down
-				if (NSMaxY([[self enclosingScrollView] documentVisibleRect]) - curPoint.y < 10) {
+				autoscrollDirection = AutoScrollNone;
+				if (NSMaxY([[self enclosingScrollView] documentVisibleRect]) - curPoint.y < 10) 
+				{
+					autoscrollDirection = AutoScrollDown;
 					[[[self enclosingScrollView] contentView] scrollToPoint:NSMakePoint(0, NSMinY([[self enclosingScrollView] documentVisibleRect]) + (curPoint.y - lastPoint.y))];
 				}
 				
 				//auto scroll up
-				if (curPoint.y - NSMinY([[self enclosingScrollView] documentVisibleRect]) < 10) {
+				if (curPoint.y - NSMinY([[self enclosingScrollView] documentVisibleRect]) < 10) 
+				{
+					autoscrollDirection = AutoScrollUp;
 					NSPoint newPoint = NSMakePoint(0, NSMinY([[self enclosingScrollView] documentVisibleRect]) - (lastPoint.y - curPoint.y));
 					if (newPoint.y < 0) newPoint.y = 0;
 					[[[self enclosingScrollView] contentView] scrollToPoint:newPoint];
