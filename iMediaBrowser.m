@@ -159,8 +159,8 @@ static NSMutableArray *_browserClasses = nil;
 		}
 		else
 		{
-			[myToolbar setSelectedItemIdentifier:[myMediaBrowsers objectAtIndex:0]];
-			[self showMediaBrowser:[myMediaBrowsers objectAtIndex:0]];
+			[myToolbar setSelectedItemIdentifier:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class])];
+			[self showMediaBrowser:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class])];
 		}
 	}
 	
