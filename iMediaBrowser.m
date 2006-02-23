@@ -41,6 +41,7 @@ static NSMutableArray *_browserClasses = nil;
 
 @interface iMediaBrowser (PrivateAPI)
 - (void)resetLibraryController;
+- (void)showMediaBrowser:(NSString *)browserClassName;
 @end
 
 @implementation iMediaBrowser
@@ -105,8 +106,6 @@ static NSMutableArray *_browserClasses = nil;
 	[myToolbar setShowsBaselineSeparator:YES];
 	[myToolbar setSizeMode:NSToolbarSizeModeSmall];
 	
-	NSMenu *menu = [[NSMenu alloc] initWithTitle:@"mediaMenu"];
-	NSMenuItem *item;
 	NSEnumerator *e = [_browserClasses objectEnumerator];
 	NSString *cur;
 	
@@ -247,8 +246,8 @@ static NSMutableArray *_browserClasses = nil;
 		{
 			NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
 			[item setLabel:[cur name]];
-			[item setImage:[cur menuIcon]];
 			[item setTarget:self];
+			[item setImage:[cur toolbarIcon]];
 			[item setAction:@selector(toolbarItemChanged:)];
 			return [item autorelease];
 		}

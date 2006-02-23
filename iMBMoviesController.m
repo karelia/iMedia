@@ -92,16 +92,16 @@
 #pragma mark -
 #pragma mark Media Browser Protocol
 
-static NSImage *_movieIcon = nil;
+static NSImage *_toolbarIcon = nil;
 
-- (NSImage *)menuIcon
+- (NSImage*)toolbarIcon
 {
-	if (!_movieIcon) {
+	if(_toolbarIcon == nil)
+	{
 		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"quicktime_tiny" ofType:@"png"];
-		_movieIcon = [[NSImage alloc] initWithContentsOfFile:p];
+		NSString *p = [b pathForResource:@"MBiMovie" ofType:@"png"];
+		_toolbarIcon = [[NSImage alloc] initWithContentsOfFile:p];
 	}
-	return _movieIcon;
 }
 
 - (NSString *)name

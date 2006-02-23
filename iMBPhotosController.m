@@ -184,21 +184,21 @@
 #pragma mark -
 #pragma mark Media Browser Protocol
 
-static NSImage *_iphotoIcon = nil;
+static NSImage *_toolbarIcon = nil;
 
-- (NSImage *)menuIcon
+- (NSImage*)toolbarIcon
 {
-	if (!_iphotoIcon) {
+	if(_toolbarIcon == nil)
+	{
 		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"photo_tiny" ofType:@"png"];
-		_iphotoIcon = [[NSImage alloc] initWithContentsOfFile:p];
+		NSString *p = [b pathForResource:@"MBiPhotoLibrary" ofType:@"png"];
+		_toolbarIcon = [[NSImage alloc] initWithContentsOfFile:p];
 	}
-	return _iphotoIcon;
 }
 
 - (NSString *)name
 {
-	return NSLocalizedString(@"iPhoto", @"iPhoto");
+	return NSLocalizedString(@"Photos", @"Photos");
 }
 
 - (NSView *)browserView

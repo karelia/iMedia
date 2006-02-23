@@ -55,8 +55,4 @@
 //Register Other types of Browsers
 + (void)registerBrowser:(Class)aClass;
 + (void)unregisterBrowser:(Class)aClass;
-
-- (IBAction)changeBrowser:(id)sender;
-//- (IBAction)playlistSelected:(id)sender;
-
 @end

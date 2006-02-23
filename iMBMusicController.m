@@ -216,21 +216,21 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 
 #pragma mark Protocol Methods
 
-- (NSString *)name
+static NSImage *_toolbarIcon = nil;
+
+- (NSImage*)toolbarIcon
 {
-	return NSLocalizedString(@"iTunes", @"iMedia Browser Menu Item Name");
+	if(_toolbarIcon == nil)
+	{
+		NSBundle *b = [NSBundle bundleForClass:[self class]];
+		NSString *p = [b pathForResource:@"MBiTunes" ofType:@"png"];
+		_toolbarIcon = [[NSImage alloc] initWithContentsOfFile:p];
+	}
 }
 
-static NSImage *_itunesIcon = nil;
-
-- (NSImage *)menuIcon
+- (NSString *)name
 {
-	if (!_itunesIcon) {
-		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"tunes_tiny" ofType:@"png"];
-		_itunesIcon = [[NSImage alloc] initWithContentsOfFile:p];
-	}
-	return _itunesIcon;
+	return NSLocalizedString(@"Audio", @"Audio");
 }
 
 - (NSView *)browserView

@@ -34,7 +34,7 @@
 @protocol iMediaBrowser <NSObject>
 
 - (id)initWithPlaylistController:(NSTreeController*)ctrl;
-- (NSImage *)menuIcon;
+- (NSImage*)toolbarIcon;
 - (NSString *)name;
 - (NSView *)browserView;
 - (void)didDeactivate;
