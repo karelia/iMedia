@@ -28,12 +28,12 @@
 	<ben@scriptsoftware.com>
  */
 
-#import "DNDArrayController.h"
+#import "iMBDNDArrayController.h"
 
 static NSString *MovedRowsType = @"MOVED_ROWS_TYPE";
 static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
 
-@interface DNDArrayController (PrivateAPI)
+@interface iMBDNDArrayController (PrivateAPI)
 //Drag and drop
 - (BOOL)tableView:(NSTableView *)tv writeRows:(NSArray*)rows toPasteboard:(NSPasteboard*)pboard;
 - (NSDragOperation)tableView:(NSTableView*)tv validateDrop:(id <NSDraggingInfo>)info proposedRow:(int)row proposedDropOperation:(NSTableViewDropOperation)op;
@@ -47,7 +47,7 @@ static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
 - (int)rowsAboveRow:(int)row inIndexSet:(NSIndexSet *)indexSet;
 @end
 
-@implementation DNDArrayController
+@implementation iMBDNDArrayController
 
 - (void)dealloc
 {

@@ -31,7 +31,7 @@
 #import <Cocoa/Cocoa.h>
 #import "iMediaBrowserProtocol.h"
 
-@class QTMovieView,DNDArrayController;
+@class QTMovieView,iMBDNDArrayController;
 
 @interface iMBMusicController : NSObject <iMediaBrowser>
 {
@@ -43,7 +43,7 @@
 	IBOutlet NSTableView  *table;
 	IBOutlet QTMovieView *oAudioPlayer;
 	IBOutlet NSView *oView;
-	IBOutlet DNDArrayController *songsController;
+	IBOutlet iMBDNDArrayController *songsController;
 	NSTreeController *playlistController;	
 	
 	@private

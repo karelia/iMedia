@@ -30,7 +30,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface DNDArrayController : NSArrayController
+@interface iMBDNDArrayController : NSArrayController
 {
     IBOutlet NSTableView *tableView;
 	NSString *searchString;

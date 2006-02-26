@@ -1,14 +1,14 @@
 {
     IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = IMTimeFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
         {
             ACTIONS = {search = id; }; 
-            CLASS = DNDArrayController; 
+            CLASS = iMBDNDArrayController; 
             LANGUAGE = ObjC; 
             OUTLETS = {newObject = id; tableView = NSTableView; }; 
             SUPERCLASS = NSArrayController; 
         }, 
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = IMTimeFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
         {
             ACTIONS = {playMovie = id; scrubAudio = id; stopMovie = id; }; 
             CLASS = iMBMusicController; 

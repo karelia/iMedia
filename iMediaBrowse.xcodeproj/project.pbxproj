@@ -73,8 +73,8 @@
 		D9659F3509A6F36E0079ED9A /* iTunesValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659F3309A6F36E0079ED9A /* iTunesValueTransformer.m */; };
 		D98B7C6909AD49B500EAA95E /* MBiMovie.png in Resources */ = {isa = PBXBuildFile; fileRef = D98B7C6509AD499600EAA95E /* MBiMovie.png */; };
 		D98B7C6A09AD49B500EAA95E /* MBiTunes.png in Resources */ = {isa = PBXBuildFile; fileRef = D98B7C6609AD499600EAA95E /* MBiTunes.png */; };
-		D9B3EA6609A3F8AB00835FE4 /* DNDArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = D9B3EA5C09A3F82B00835FE4 /* DNDArrayController.h */; };
-		D9B3EA6709A3F8B300835FE4 /* DNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* DNDArrayController.m */; };
+		D9B3EA6609A3F8AB00835FE4 /* iMBDNDArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = D9B3EA5C09A3F82B00835FE4 /* iMBDNDArrayController.h */; };
+		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildStyle section */
@@ -179,7 +179,7 @@
 		79FDF61309AAE5D2000CB4B4 /* quicktime_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = quicktime_tiny.png; sourceTree = "<group>"; };
 		79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tunes_tiny.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* iMediaBrowse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* iMediaBrowse.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iMediaBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		964006E108D7B9BF0046E052 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		965EB98608E1D345000DFF3A /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowser.h; sourceTree = "<group>"; };
@@ -200,8 +200,8 @@
 		D9659F3309A6F36E0079ED9A /* iTunesValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesValueTransformer.m; sourceTree = "<group>"; };
 		D98B7C6509AD499600EAA95E /* MBiMovie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiMovie.png; sourceTree = "<group>"; };
 		D98B7C6609AD499600EAA95E /* MBiTunes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiTunes.png; sourceTree = "<group>"; };
-		D9B3EA5C09A3F82B00835FE4 /* DNDArrayController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = DNDArrayController.h; sourceTree = "<group>"; };
-		D9B3EA5D09A3F82B00835FE4 /* DNDArrayController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = DNDArrayController.m; sourceTree = "<group>"; };
+		D9B3EA5C09A3F82B00835FE4 /* iMBDNDArrayController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBDNDArrayController.h; sourceTree = "<group>"; };
+		D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBDNDArrayController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -404,8 +404,8 @@
 				791F964C0975B63E0071B2E0 /* iMediaBrowserProtocol.h */,
 				965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */,
 				965EB99708E1F7CE000DFF3A /* iMediaBrowser.m */,
-				D9B3EA5C09A3F82B00835FE4 /* DNDArrayController.h */,
-				D9B3EA5D09A3F82B00835FE4 /* DNDArrayController.m */,
+				D9B3EA5C09A3F82B00835FE4 /* iMBDNDArrayController.h */,
+				D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */,
 				969656AE08C6A2C700F2F85C /* iMBMoviesController.h */,
 				969656AF08C6A2C700F2F85C /* iMBMoviesController.m */,
 				968BF084090F3ECA00D00E5C /* iMBPhotosController.h */,
@@ -437,7 +437,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9B3EA6609A3F8AB00835FE4 /* DNDArrayController.h in Headers */,
+				D9B3EA6609A3F8AB00835FE4 /* iMBDNDArrayController.h in Headers */,
 				791F976D0975D5280071B2E0 /* iMediaBrowser.h in Headers */,
 				791F964D0975B63E0071B2E0 /* iMediaBrowserProtocol.h in Headers */,
 				791F9AF60976320A0071B2E0 /* UKFileWatcher.h in Headers */,
@@ -622,7 +622,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9B3EA6709A3F8B300835FE4 /* DNDArrayController.m in Sources */,
+				D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */,
 				79167A0B0975260A00D9EF74 /* iMediaBrowser.m in Sources */,
 				79167A0D0975260C00D9EF74 /* iMBMoviesController.m in Sources */,
 				79167A160975261700D9EF74 /* iMBMusicController.m in Sources */,

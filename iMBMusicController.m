@@ -30,7 +30,7 @@
 
 #import "iMBMusicController.h"
 #import "iMediaBrowser.h"
-#import "DNDArrayController.h"
+#import "iMBDNDArrayController.h"
 #import "Library.h"
 #import "iTunesValueTransformer.h"
 #import "TimeValueTransformer.h"
