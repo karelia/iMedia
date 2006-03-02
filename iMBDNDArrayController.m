@@ -64,6 +64,11 @@ static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
 	[super awakeFromNib];
 }
 
+
+#warning -- THIS IS QUITE BROKEN.  WHY ARE WE DECLARING NSTabularTextPboardType ?
+#warning -- WHY ARE WE DECLARING NSFilenamesPboardType BUT NOT PUTTING THE FILE PATH ON IT -- BREAKS FOR SANDVOX.
+#warning -- WHY ARE WE NOT ALLOWING MULTIPLE ITEMS DRAGGED AS A URL / FILE LIST?
+
 - (BOOL)tableView:(NSTableView *)tv
 		writeRows:(NSArray*)rows
 	 toPasteboard:(NSPasteboard*)pboard

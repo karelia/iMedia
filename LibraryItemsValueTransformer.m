@@ -67,6 +67,10 @@ int imageDateSort(id i1, id i2, void *context) {
 
 - (id)transformedValue:(id)beforeObject
 {
+	if (nil == beforeObject)
+	{
+		return nil;
+	}
 	NSMutableArray *newPhotos = [NSMutableArray array];
 	NSArray *playlistRecords = (NSArray*)beforeObject;
 	NSEnumerator *playlistRecordsEnum = [playlistRecords objectEnumerator];
@@ -76,7 +80,11 @@ int imageDateSort(id i1, id i2, void *context) {
 		[newPhotos addObjectsFromArray:[rec allValues]];
 	}
 	
-	[newPhotos sortUsingFunction:imageDateSort context:nil];
+#warning HACK to get past problem where in movie tab, we just have a list of paths, not dictionaries with dates.
+	if (([newPhotos count] > 0) && [[newPhotos objectAtIndex:0] isKindOfClass:[NSDictionary class]])
+	{
+		[newPhotos sortUsingFunction:imageDateSort context:nil];
+	}
 	return newPhotos;
 }
 
