@@ -228,4 +228,28 @@ static NSImage *_toolbarIcon = nil;
 	else
 		return @"MBiPhotoAlbum";
 }
+
+- (void)writePlaylistsToPasteboard:(NSPasteboard *)pboard
+{
+	NSMutableArray *files = [NSMutableArray array];
+	NSMutableArray *urls = [NSMutableArray array];
+	NSMutableArray *images = [NSMutableArray array];
+	NSMutableArray *albums = [NSMutableArray array];
+	NSEnumerator *indexEnum = [[playlistController selectedObjects] objectEnumerator];
+	NSNumber *index;
+	
+	while (index = [indexEnum nextObject])
+	{
+		
+	}
+	
+	[pboard addTypes:[NSArray arrayWithObjects:@"AlbumDataListPboardType", NSFilenamesPboardType, NSURLPboardType, nil] owner:nil];
+	
+	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:albums, @"List of Albums", images, @"Master Image List", nil];
+	[pboard setPropertyList:plist forType:@"AlbumDataListPboardType"];
+	[pboard setPropertyList:files forType:NSFilenamesPboardType];
+	[pboard setPropertyList:urls forType:NSURLPboardType];
+	
+}
+
 @end

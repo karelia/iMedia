@@ -57,7 +57,7 @@ int imageDateSort(id i1, id i2, void *context) {
 
 + (Class)transformedValueClass
 {
-	return [NSString self];
+	return [NSString class];
 }
 
 + (BOOL)allowsReverseTransformation

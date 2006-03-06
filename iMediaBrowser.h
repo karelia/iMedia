@@ -35,18 +35,18 @@
 
 @interface iMediaBrowser : NSWindowController
 {
-	IBOutlet NSPopUpButton *oMediaMenu;
-	IBOutlet NSView *oBrowserView;
-	IBOutlet NSBox *oLoadingView;
-	IBOutlet NSSplitView *oSplitView;
-	IBOutlet NSProgressIndicator *oLoading;
-	IBOutlet NSTreeController *libraryController;
+	IBOutlet NSPopUpButton			*oMediaMenu;
+	IBOutlet NSView					*oBrowserView;
+	IBOutlet NSBox					*oLoadingView;
+	IBOutlet NSSplitView			*oSplitView;
+	IBOutlet NSProgressIndicator	*oLoading;
+	IBOutlet NSTreeController		*libraryController;
 	
 	@private
-	NSMutableArray *myMediaBrowsers;
-	id <iMediaBrowser>selectedBrowser;
-	NSToolbar *myToolbar;
-	NSLock *myBackgroundLoadingLock;
+	NSMutableArray					*myMediaBrowsers;
+	id <iMediaBrowser>				mySelectedBrowser;
+	NSToolbar						*myToolbar;
+	NSLock							*myBackgroundLoadingLock;
 }
 
 + (id)sharedBrowser;

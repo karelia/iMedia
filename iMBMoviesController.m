@@ -124,4 +124,9 @@ static NSImage *_toolbarIcon = nil;
 	return @"MBQuicktime.png";
 }
 
+- (void)writePlaylistsToPasteboard:(NSPasteboard *)pboard
+{
+	
+}
+
 @end

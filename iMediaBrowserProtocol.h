@@ -33,10 +33,13 @@
 
 @protocol iMediaBrowser <NSObject>
 
-- (id)initWithPlaylistController:(NSTreeController*)ctrl;
+- (id)initWithPlaylistController:(NSTreeController *)ctrl;
 - (NSImage*)toolbarIcon;
 - (NSString *)name;
 - (NSView *)browserView;
 - (void)didDeactivate;
 - (NSArray*)loadDatabase;
+
+- (void)writePlaylistsToPasteboard:(NSPasteboard *)pboard;
+
 @end

@@ -151,11 +151,11 @@ static NSMutableArray *_browserClasses = nil;
 	//select the first browser
 	if ([myMediaBrowsers count] > 0) {
 		//see if the last selected browser is in user defaults
-		NSString *lastSelectedBrowser = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowserSelectedBrowser"];
-		if (lastSelectedBrowser)
+		NSString *lastmySelectedBrowser = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowsermySelectedBrowser"];
+		if (lastmySelectedBrowser)
 		{
-			[myToolbar setSelectedItemIdentifier:lastSelectedBrowser];
-			[self showMediaBrowser:lastSelectedBrowser];
+			[myToolbar setSelectedItemIdentifier:lastmySelectedBrowser];
+			[self showMediaBrowser:lastmySelectedBrowser];
 		}
 		else
 		{
@@ -198,16 +198,16 @@ static NSMutableArray *_browserClasses = nil;
 		id <iMediaBrowser>browser = [self browserForClassName:browserClassName];
 		NSView *view = [browser browserView];
 		//remove old view
-		[selectedBrowser didDeactivate];
-		[[selectedBrowser browserView] removeFromSuperview];
+		[mySelectedBrowser didDeactivate];
+		[[mySelectedBrowser browserView] removeFromSuperview];
 		[view setFrame:[oBrowserView bounds]];
 		[oBrowserView addSubview:[view retain]];
-		selectedBrowser = browser;
+		mySelectedBrowser = browser;
 		//save the selected browse
-		[[NSUserDefaults standardUserDefaults] setObject:NSStringFromClass([selectedBrowser class]) forKey:@"iMediaBrowserSelectedBrowser"];
+		[[NSUserDefaults standardUserDefaults] setObject:NSStringFromClass([mySelectedBrowser class]) forKey:@"iMediaBrowsermySelectedBrowser"];
 		[NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:nil];
 	}
-	[myToolbar setSelectedItemIdentifier:NSStringFromClass([selectedBrowser class])];
+	[myToolbar setSelectedItemIdentifier:NSStringFromClass([mySelectedBrowser class])];
 }
 
 - (void)toolbarItemChanged:(id)sender
@@ -220,7 +220,7 @@ static NSMutableArray *_browserClasses = nil;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	[self resetLibraryController];
-	[libraryController setContent:[selectedBrowser loadDatabase]];
+	[libraryController setContent:[mySelectedBrowser loadDatabase]];
 	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:NO];
 	
 	[pool release];

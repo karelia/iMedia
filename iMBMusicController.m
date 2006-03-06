@@ -256,8 +256,10 @@ static NSImage *_toolbarIcon = nil;
 		return @"MBiTunesPlaylist";
 }
 
-#pragma mark -
-#pragma mark Table Data Source Methods
+- (void)writePlaylistsToPasteboard:(NSPasteboard *)pboard
+{
+	
+}
 
 static NSImage *_playing = nil;
 static NSImage *_song = nil;

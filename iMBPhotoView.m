@@ -438,7 +438,7 @@ static NSImage *_badge = nil;
 				[[rec objectForKey:@"thumb"] drawInRect:NSMakeRect(0,0,NSWidth(thumbRect),NSHeight(thumbRect))
 											   fromRect:NSZeroRect
 											  operation:NSCompositeSourceOver
-											   fraction:1.0];
+											   fraction:0.5];
 				
 				if ([selectedCells count] > 1) {
 					NSRect badgeRect = NSMakeRect(size.width - badgeSize.width, size.height - badgeSize.height, badgeSize.width, badgeSize.height);
@@ -459,21 +459,32 @@ static NSImage *_badge = nil;
 				[dragImage autorelease];
 				// Write data to the pasteboard
 				NSMutableArray *fileList = [NSMutableArray array];
+				NSMutableArray *urlList = [NSMutableArray array];
 				NSMutableDictionary *iphotoData = [NSMutableDictionary dictionary];
 				NSEnumerator *e = [selectedCells objectEnumerator];
 				NSString *cur;
 				
 				while (cur = [e nextObject]) {
 					NSDictionary *rec = [self recordForThumb:cur];
+					NSLog(@"%@", [rec objectForKey:@"ImagePath"]);
 					[fileList addObject:[rec objectForKey:@"ImagePath"]];
 					[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
+					[urlList addObject:[[NSURL fileURLWithPath:[rec objectForKey:@"ImagePath"]] description]];
 				}
 				
 				NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
-				[pboard declareTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"ImageDataListPboardType", nil]
+				[pboard declareTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"ImageDataListPboardType", NSURLPboardType, nil]
 							   owner:nil];
 				[pboard setPropertyList:fileList forType:NSFilenamesPboardType];
 				[pboard setPropertyList:iphotoData forType:@"ImageDataListPboardType"];
+				[pboard setPropertyList:urlList forType:NSURLPboardType];
+				/*
+				//add the first selected image as a TIFF to the pboard
+				NSDictionary *first = [self recordForThumb:[selectedCells objectAtIndex:0]];
+				NSString *firstThumbPath = [first objectForKey:@"ThumbPath"];
+				NSImage *firstThumb = [myCache objectForKey:firstThumbPath];
+				[pboard setData:[firstThumb TIFFRepresentation] forType:NSTIFFPboardType];
+				*/
 				
 				// Start the drag operation
 				dragPosition = p;
