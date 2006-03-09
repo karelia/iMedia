@@ -285,7 +285,11 @@ static NSDictionary *titleFontAttributes;
 			
 			if (!img) { //only load the image if we have to
 				img = [[[NSImage alloc] initWithContentsOfFile:thumbPath] autorelease];
-				[myCache setObject:img forKey:thumbPath];
+				//sometimes an image will be nil, in the case the file is missing from the HDD.
+				if (img)
+				{
+					[myCache setObject:img forKey:thumbPath];
+				}
 			}
 			BOOL isSelected = [self isSelected:thumbPath];
 			NSRect drawable = centeredAspectRatioPreservedRect(NSInsetRect(cell, CellPadding, CellPadding), [img size], NSMakeSize(240,240));
