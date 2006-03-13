@@ -39,6 +39,12 @@ enum {
 	AutoScrollDown
 };
 
+enum {
+	SelectionNew = 0,
+	SelectionDiscreete,
+	SelectionContinuous
+};
+
 const NSTimeInterval kAutoScrollThreshold = 0.150;
 
 #pragma mark OMNI
@@ -120,7 +126,7 @@ NSRect centeredAspectRatioPreservedRect(NSRect rect, NSSize imgSize, NSSize maxC
 + (NSImage *)draggingIconWithTitle:(NSString *)title andImage:(NSImage *)image;
 
 //Selection
-- (NSMutableArray *)selectedCells;
+- (NSMutableArray *)mySelectedCells;
 - (void)selectCellsInRect:(NSRect)rect;
 - (BOOL)isSelected:(NSString *)thumb;
 - (void)removeSelectedCellForPath:(NSString*)thumb;
@@ -128,7 +134,7 @@ NSRect centeredAspectRatioPreservedRect(NSRect rect, NSSize imgSize, NSSize maxC
 - (NSDictionary *)recordForThumb:(NSString *)thumb;
 - (NSArray *)cellsInRect:(NSRect)rect;
 - (void)selectCellsInRect:(NSRect)rect;
-- (NSMutableArray *)selectedCells;
+- (NSMutableArray *)mySelectedCells;
 - (NSSize)cellSize;
 - (BOOL)isSelected:(NSString *)thumb;
 @end
@@ -205,8 +211,10 @@ static NSDictionary *titleFontAttributes;
 	if (self = [super initWithFrame:frame]) {
 		myCache = [[NSMutableDictionary dictionary] retain];
 		myRects = [[NSMutableArray array] retain];
-		selectedCells = [[NSMutableArray array] retain];
-		selectedRects = [[NSMutableArray array] retain];
+		mySelectedCells = [[NSMutableArray array] retain];
+		mySelectedRects = [[NSMutableArray array] retain];
+		mySelectionType = SelectionNew;
+		myLastSelectedCell = nil;
 	}
 	return self;
 }
@@ -216,14 +224,15 @@ static NSDictionary *titleFontAttributes;
 	[myCache release];
 	[myRects release];
 	[myImages release];
-	[selectedCells release];
-	[selectedRects release];
+	[mySelectedCells release];
+	[mySelectedRects release];
+	[myLastSelectedCell release];
 	[super dealloc];
 }
 
 - (void)removeSelectedCellForPath:(NSString*)thumb
 {
-	[selectedCells removeObject:[self recordForThumb:thumb]];
+	[mySelectedCells removeObject:[self recordForThumb:thumb]];
 }
 
 #define iPhotoColumns 3
@@ -270,7 +279,7 @@ static NSDictionary *titleFontAttributes;
 		cell.origin.y = i * cellSize.height;
 		//we can determine if we need to draw this cell at this early stage
 		
-		if (!NSIntersectsRect(cell,scrollerViewableRect) && ![selectedRects containsObject:[NSValue valueWithRect:cell]])
+		if (!NSIntersectsRect(cell,scrollerViewableRect) && ![mySelectedRects containsObject:[NSValue valueWithRect:cell]])
 		{
 			continue;
 		}
@@ -368,9 +377,11 @@ static NSDictionary *titleFontAttributes;
 - (void)flagsChanged:(NSEvent *)theEvent
 {
 	if ([theEvent modifierFlags] & NSShiftKeyMask) {
-		canAddToSelection = YES;
+		mySelectionType = SelectionContinuous;
+	} else if ([theEvent modifierFlags] & NSCommandKeyMask) {
+		mySelectionType = SelectionDiscreete;
 	} else {
-		canAddToSelection = NO;
+		mySelectionType = SelectionNew;
 	}
 }
 
@@ -382,10 +393,10 @@ static NSImage *_badge = nil;
 	NSDictionary *rec = [self recordUnderPoint:p];
 	
 	if (rec) {
-		if (!canAddToSelection && ![self isSelected:[rec objectForKey:@"thumbPath"]])
+		if (mySelectionType == SelectionNew && ![self isSelected:[rec objectForKey:@"thumbPath"]])
 		{
-			[selectedCells removeAllObjects];
-			[selectedRects removeAllObjects];
+			[mySelectedCells removeAllObjects];
+			[mySelectedRects removeAllObjects];
 		}
 		
 		//add to selection
@@ -400,12 +411,49 @@ static NSImage *_badge = nil;
 			curPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 			
 			if ([theEvent type] == NSLeftMouseUp) {
-				if ([self isSelected:[rec objectForKey:@"thumbPath"]]) {
-					[selectedCells removeObject:[rec objectForKey:@"thumbPath"]];
-					[selectedRects removeObject:[NSValue valueWithRect:NSRectFromString([rec objectForKey:@"rect"])]];						
-				} else {
-					[selectedCells addObject:[rec objectForKey:@"thumbPath"]];
-					[selectedRects addObject:[NSValue valueWithRect:NSRectFromString([rec objectForKey:@"rect"])]];
+				//see if we need to do a continuous or discreete selection
+				if (mySelectionType == SelectionContinuous)
+				{
+					unsigned firstIdx = [myRects indexOfObject:myLastSelectedCell];
+					unsigned thisIdx = [myRects indexOfObject:rec];
+					int i;
+					NSDictionary *curRec;
+										
+					if (thisIdx > firstIdx) // add to the selection
+					{
+						for (i = firstIdx; i <= thisIdx; i++)
+						{
+							curRec = [myRects objectAtIndex:i];
+							if (![mySelectedRects containsObject:[curRec objectForKey:@"thumbPath"]])
+							{
+								[mySelectedCells addObject:[curRec objectForKey:@"thumbPath"]];
+								[mySelectedRects addObject:[NSValue valueWithRect:NSRectFromString([curRec objectForKey:@"rect"])]];
+							}
+						}
+					}
+					else //remove from the selection as we are selecting backwards
+					{
+						for (i = firstIdx; i >= thisIdx; i--)
+						{
+							curRec = [myRects objectAtIndex:i];
+							[mySelectedCells removeObject:[curRec objectForKey:@"thumbPath"]];
+							[mySelectedRects removeObject:[NSValue valueWithRect:NSRectFromString([curRec objectForKey:@"rect"])]];
+						}
+					}
+					[myLastSelectedCell autorelease];
+					myLastSelectedCell = [rec retain];
+				}
+				else
+				{
+					if ([self isSelected:[rec objectForKey:@"thumbPath"]]) {
+						[mySelectedCells removeObject:[rec objectForKey:@"thumbPath"]];
+						[mySelectedRects removeObject:[NSValue valueWithRect:NSRectFromString([rec objectForKey:@"rect"])]];						
+					} else {
+						[mySelectedCells addObject:[rec objectForKey:@"thumbPath"]];
+						[mySelectedRects addObject:[NSValue valueWithRect:NSRectFromString([rec objectForKey:@"rect"])]];
+					}
+					[myLastSelectedCell autorelease];
+					myLastSelectedCell = [rec retain];
 				}
 				[self setNeedsDisplay:YES];
 				return;
@@ -444,13 +492,13 @@ static NSImage *_badge = nil;
 											  operation:NSCompositeSourceOver
 											   fraction:0.5];
 				
-				if ([selectedCells count] > 1) {
+				if ([mySelectedCells count] > 1) {
 					NSRect badgeRect = NSMakeRect(size.width - badgeSize.width, size.height - badgeSize.height, badgeSize.width, badgeSize.height);
 					[_badge drawInRect:badgeRect
 							  fromRect:NSZeroRect
 							 operation:NSCompositeSourceOver
 							  fraction:1.0];
-					NSString *count = [NSString stringWithFormat:@"%d", [selectedCells count]];
+					NSString *count = [NSString stringWithFormat:@"%d", [mySelectedCells count]];
 					static NSDictionary *badgeAttribs = nil;
 					if (!badgeAttribs) {
 						badgeAttribs = [[NSDictionary dictionaryWithObjectsAndKeys:[NSColor whiteColor], NSForegroundColorAttributeName, nil] retain];
@@ -465,7 +513,7 @@ static NSImage *_badge = nil;
 				NSMutableArray *fileList = [NSMutableArray array];
 				NSMutableArray *urlList = [NSMutableArray array];
 				NSMutableDictionary *iphotoData = [NSMutableDictionary dictionary];
-				NSEnumerator *e = [selectedCells objectEnumerator];
+				NSEnumerator *e = [mySelectedCells objectEnumerator];
 				NSString *cur;
 				
 				while (cur = [e nextObject]) {
@@ -484,7 +532,7 @@ static NSImage *_badge = nil;
 				[pboard setPropertyList:urlList forType:NSURLPboardType];
 				/*
 				//add the first selected image as a TIFF to the pboard
-				NSDictionary *first = [self recordForThumb:[selectedCells objectAtIndex:0]];
+				NSDictionary *first = [self recordForThumb:[mySelectedCells objectAtIndex:0]];
 				NSString *firstThumbPath = [first objectForKey:@"ThumbPath"];
 				NSImage *firstThumb = [myCache objectForKey:firstThumbPath];
 				[pboard setData:[firstThumb TIFFRepresentation] forType:NSTIFFPboardType];
@@ -509,10 +557,10 @@ static NSImage *_badge = nil;
 		
 	} else {
 		// we must be rubberbanding the selection
-		if (!canAddToSelection)
+		if (SelectionNew)
 		{
-			[selectedCells removeAllObjects];
-			[selectedRects removeAllObjects];
+			[mySelectedCells removeAllObjects];
+			[mySelectedRects removeAllObjects];
 		}
 		
 		
@@ -556,8 +604,8 @@ static NSImage *_badge = nil;
 						rubberbandRect.origin.y = NSMaxY(scrollerViewableRect) - 1;
 					}
 					
-					[selectedCells removeAllObjects];
-					[selectedRects removeAllObjects];
+					[mySelectedCells removeAllObjects];
+					[mySelectedRects removeAllObjects];
 					
 					[self selectCellsInRect:newRubberbandRect]; // make the selection for the whole rect not just what is visible
 					[self setNeedsDisplay:YES];
@@ -629,14 +677,14 @@ static NSImage *_badge = nil;
 		NSRect r = NSRectFromString([cur objectForKey:@"rect"]);
 		if (NSIntersectsRect(rect,r)) {
 			NSString *path = [cur objectForKey:@"thumbPath"];
-			if (![selectedCells containsObject:path])
+			if (![mySelectedCells containsObject:path])
 			{
 				[cells addObject:path];
 				
 				NSDictionary *recDict = [self recordForThumb:[cur objectForKey:@"thumbPath"]];
 				if(recDict != nil)
 				{
-					[selectedRects addObject:[NSValue valueWithRect:NSRectFromString([recDict objectForKey:@"rect"])]];
+					[mySelectedRects addObject:[NSValue valueWithRect:NSRectFromString([recDict objectForKey:@"rect"])]];
 				}
 			}
 		}
@@ -651,18 +699,18 @@ static NSImage *_badge = nil;
 	
 	while (cur = [e nextObject])
 	{
-		if ([selectedCells indexOfObject:cur] == NSNotFound)
+		if ([mySelectedCells indexOfObject:cur] == NSNotFound)
 		{
-			[selectedCells addObject:cur];
+			[mySelectedCells addObject:cur];
 		}
 	}
 }
 
-- (NSMutableArray *)selectedCells {
-    if (!selectedCells) {
-        selectedCells = [[NSMutableArray alloc] init];
+- (NSMutableArray *)mySelectedCells {
+    if (!mySelectedCells) {
+        mySelectedCells = [[NSMutableArray alloc] init];
     }
-    return [[selectedCells retain] autorelease];
+    return [[mySelectedCells retain] autorelease];
 }
 
 - (NSSize)cellSize
@@ -673,7 +721,7 @@ static NSImage *_badge = nil;
 
 - (BOOL)isSelected:(NSString *)thumb
 {
-	NSEnumerator *e = [selectedCells objectEnumerator];
+	NSEnumerator *e = [mySelectedCells objectEnumerator];
 	NSString *cur;
 	
 	while (cur = [e nextObject]) {
@@ -694,8 +742,8 @@ static NSImage *_badge = nil;
 {
 	[myImages autorelease];
 	myImages = [images copy];
-	[selectedCells removeAllObjects];
-	[selectedRects removeAllObjects];
+	[mySelectedCells removeAllObjects];
+	[mySelectedRects removeAllObjects];
 	
 	//need to reset the scroll view
 	[[[self enclosingScrollView] contentView] scrollToPoint:NSMakePoint(0,0)];

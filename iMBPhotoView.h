@@ -37,14 +37,15 @@
 @interface iMBPhotoView : NSView
 {
 	@private
-	NSMutableArray *myRects;
-	NSArray *myImages;
+	NSMutableArray		*myRects;
+	NSArray				*myImages;
 	NSMutableDictionary *myCache;
-	BOOL isRubberbanding;
-	NSRect rubberbandRect;
-	BOOL canAddToSelection;
-	NSMutableArray	*selectedCells;
-	NSMutableArray	*selectedRects;
+	BOOL				isRubberbanding;
+	NSRect				rubberbandRect;
+	int					mySelectionType;
+	NSMutableArray		*mySelectedCells;
+	NSMutableArray		*mySelectedRects;
+	NSDictionary		*myLastSelectedCell;
 }
 
 - (void)setImages:(NSArray *)images;
