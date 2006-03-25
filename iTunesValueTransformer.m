@@ -49,9 +49,10 @@
 	NSArray *playlistRecords = (NSArray*)beforeObject;
 	NSEnumerator *playlistRecordsEnum = [playlistRecords objectEnumerator];
 	NSDictionary *rec = nil;
+	
 	while(rec = [playlistRecordsEnum nextObject])
 	{
-		[libraries addObjectsFromArray:[rec allValues]];
+		[libraries addObjectsFromArray:[rec attributeForKey:@"Tracks"]];
 	}
 	
 	return libraries;

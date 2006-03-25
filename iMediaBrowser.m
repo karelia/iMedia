@@ -31,6 +31,7 @@
 
 #import "iMediaBrowser.h"
 #import "iMediaBrowserProtocol.h"
+#import "iMBLibraryNode.h"
 #import "LibraryItemsValueTransformer.h"
 
 #import <QuickTime/QuickTime.h>
@@ -38,6 +39,7 @@
 
 static iMediaBrowser *_sharedMediaBrowser = nil;
 static NSMutableArray *_browserClasses = nil;
+static NSMutableDictionary *_parsers = nil;
 
 @interface iMediaBrowser (PrivateAPI)
 - (void)resetLibraryController;
@@ -54,10 +56,13 @@ static NSMutableArray *_browserClasses = nil;
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	_browserClasses = [[NSMutableArray alloc] init];
+	_parsers = [[NSMutableDictionary dictionary] retain];
+	
 	//register the default set in order
 	[self registerBrowser:NSClassFromString(@"iMBPhotosController")];
 	[self registerBrowser:NSClassFromString(@"iMBMusicController")];
 	[self registerBrowser:NSClassFromString(@"iMBMoviesController")];
+	[self registerBrowser:NSClassFromString(@"iMBLinksController")];
 	
 	//find and load all plugins
 	NSArray *plugins = [iMediaBrowser findBundlesWithExtension:@"iMediaBrowser" inFolderName:@"iMediaBrowser"];
@@ -112,6 +117,30 @@ static NSMutableArray *_browserClasses = nil;
 	}
 }
 
++ (void)registerParser:(Class)aClass forMediaType:(NSString *)media
+{
+	NSMutableArray *parsers = [_parsers objectForKey:media];
+	if (!parsers)
+	{
+		parsers = [NSMutableArray array];
+		[_parsers setObject:parsers forKey:media];
+	}
+	[parsers addObject:NSStringFromClass(aClass)];
+}
+
++ (void)unregisterParser:(Class)aClass forMediaType:(NSString *)media
+{
+	NSEnumerator *e = [[_parsers objectForKey:media] objectEnumerator];
+	NSString *cur;
+	while (cur = [e nextObject]) {
+		Class bClass = NSClassFromString(cur);
+		if (aClass == bClass) {
+			[[_parsers objectForKey:media] removeObject:cur];
+			return;
+		}
+	}
+}
+
 - (id)init
 {
 	if (self = [super initWithWindowNibName:@"MediaBrowser"]) {
@@ -122,9 +151,20 @@ static NSMutableArray *_browserClasses = nil;
 	return self;
 }
 
+- (void)dealloc
+{
+	[myMediaBrowsers release];
+	[myLoadedParsers release];
+	[myToolbar release];
+	[myBackgroundLoadingLock release];
+	[super dealloc];
+}
+
 - (void)awakeFromNib
 {
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
+	myLoadedParsers = [[NSMutableArray alloc] init];
+	
 	myToolbar = [[NSToolbar alloc] initWithIdentifier:@"iMediaBrowserToolbar"];
 	
 	[myToolbar setAllowsUserCustomization:NO];
@@ -135,6 +175,13 @@ static NSMutableArray *_browserClasses = nil;
 	NSString *cur;
 	
 	while (cur = [e nextObject]) {
+		if (myFlags.willLoadBrowser)
+		{
+			if (![myDelegate iMediaBrowser:self willLoadBrowser:cur])
+			{
+				continue;
+			}
+		}
 		Class aClass = NSClassFromString(cur);
 		id <iMediaBrowser>browser = [[aClass alloc] initWithPlaylistController:libraryController];
 		if (![browser conformsToProtocol:@protocol(iMediaBrowser)]) {
@@ -143,6 +190,10 @@ static NSMutableArray *_browserClasses = nil;
 		}
 		[myMediaBrowsers addObject:browser];
 		[browser release];
+		if (myFlags.didLoadBrowser)
+		{
+			[myDelegate iMediaBrowser:self didLoadBrowser:cur];
+		}
 	}
 	
 	[myToolbar setDelegate:self];
@@ -223,7 +274,42 @@ static NSMutableArray *_browserClasses = nil;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	[self resetLibraryController];
-	[libraryController setContent:[mySelectedBrowser loadDatabase]];
+	NSMutableArray *root = [NSMutableArray array];
+	NSArray *parsers = [_parsers objectForKey:[mySelectedBrowser mediaType]];
+	NSEnumerator *e = [parsers objectEnumerator];
+	NSString *cur;
+	
+	while (cur = [e nextObject])
+	{
+		Class parserClass = NSClassFromString(cur);
+		if (![parserClass conformsToProtocol:@protocol(iMBParser)])
+		{
+			NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.");
+			continue;
+		}
+		if (myFlags.willLoadBrowser)
+		{
+			if (![myDelegate iMediaBrowser:self willUseMediaParser:cur forMediaType:[mySelectedBrowser mediaType]])
+			{
+				continue;
+			}
+		}
+		id <iMBParser>parser = [[parserClass alloc] init];
+		[myLoadedParsers addObject:parser];
+		[parser release];
+		
+		iMBLibraryNode *library = [parser library];
+		if (library) // it is possible for a parser to return nil if the db for it doesn't exist
+		{
+			[root addObject:library];
+		}
+		
+		if (myFlags.didUseParser)
+		{
+			[myDelegate iMediaBrowser:self didUseMediaParser:cur forMediaType:[mySelectedBrowser mediaType]];
+		}
+	}
+	[libraryController setContent:root];
 	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:NO];
 	
 	[pool release];
@@ -235,6 +321,30 @@ static NSMutableArray *_browserClasses = nil;
 	[oSplitView setHidden:NO];
 	[oLoading stopAnimation:self];
 	[myBackgroundLoadingLock unlock];
+	if ([[libraryController content] count] > 0)
+	{
+		[oPlaylists expandItem:[oPlaylists itemAtRow:0]];
+	}
+}
+
+#pragma mark -
+#pragma mark Delegate
+
+- (void)setDelegate:(id)delegate
+{
+	myFlags.willLoadBrowser = [myDelegate respondsToSelector:@selector(iMediaBrowser:willLoadBrowser:)];
+	myFlags.didLoadBrowser = [myDelegate respondsToSelector:@selector(iMediaBrowser:didLoadBrowser:)];
+	myFlags.willUseParser = [myDelegate respondsToSelector:@selector(iMediaBrowser:willUseMediaParser:forMediaType:)];
+	myFlags.didUseParser = [myDelegate respondsToSelector:@selector(iMediaBrowser:didUseMediaParser:forMediaType:)];
+	myFlags.willChangeBrowser = [myDelegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];
+	myFlags.didChangeBrowser = [myDelegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
+	
+	myDelegate = delegate;
+}
+
+- (id)delegate
+{
+	return myDelegate;
 }
 
 #pragma mark -

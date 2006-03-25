@@ -54,129 +54,12 @@
 	[super dealloc];
 }
 
-- (NSArray*)loadDatabase
-{
-	NSMutableDictionary *library = [NSMutableDictionary dictionary];
-	NSMutableArray *photoLists = [NSMutableArray array];
-	
-	//Find all iPhoto libraries
-	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",
-														(CFStringRef)@"com.apple.iApps");
-	
-	//Iterate over libraries, pulling dictionary from contents and adding to array for processing;
-	NSArray *libraries = (NSArray *)iApps;
-	NSEnumerator *e = [libraries objectEnumerator];
-	NSString *cur;
-	
-	while (cur = [e nextObject]) {
-		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:cur]];
-		if (db) {
-			[library addEntriesFromDictionary:db];
-		}
-	}
-	[libraries autorelease];
-	
-	NSDictionary *imageRecords = [library objectForKey:@"Master Image List"];
-	NSDictionary *keywordMap = [library objectForKey:@"List of Keywords"];
-	NSEnumerator *albumEnum = [[library objectForKey:@"List of Albums"] objectEnumerator];
-	NSDictionary *albumRec;
-	
-	//Parse dictionary creating libraries, and filling with track infromation
-	while (albumRec = [albumEnum nextObject])
-	{
-		Library *lib = [[Library alloc] init];
-		[lib setName:[albumRec objectForKey:@"AlbumName"]];
-		[lib setLibraryImageName:[self iconNameForPlaylist:[lib name]]];
-		
-		NSMutableDictionary *newPhotolist = [NSMutableDictionary dictionary];
-		NSArray * pictureItems = [albumRec objectForKey:@"KeyList"];
-		NSEnumerator *pictureItemsIter = [pictureItems objectEnumerator];
-		NSString *key;
-		
-		while (key = [pictureItemsIter nextObject])
-		{
-			NSDictionary *imageRecord = [imageRecords objectForKey:key];
-			[newPhotolist setObject:imageRecord forKey:key];
-			//swap the keyword index to names
-			NSArray *keywords = [imageRecord objectForKey:@"Keywords"];
-			if ([keywords count] > 0) {
-				NSEnumerator *keywordEnum = [keywords objectEnumerator];
-				NSString *keywordKey;
-				NSMutableArray *realKeywords = [NSMutableArray array];
-				
-				while (keywordKey = [keywordEnum nextObject]) {
-					NSString *actualKeyword = [keywordMap objectForKey:keywordKey];
-					[realKeywords addObject:actualKeyword];
-				}
-				
-				NSMutableDictionary *mutatedKeywordRecord = [NSMutableDictionary dictionaryWithDictionary:imageRecord];
-				[mutatedKeywordRecord setObject:realKeywords forKey:@"iMediaKeywords"];
-				[newPhotolist setObject:mutatedKeywordRecord forKey:key];
-			}
-			
-		}
-		[lib addLibraryItem:newPhotolist];
-		[photoLists addObject:lib];
-		[lib release];
-	}
-	
-	//Do the pictures folder
-	Library *lib = [[Library alloc] init];
-	[lib setName:@"Pictures Folder"];
-	[lib setLibraryImageName:[self iconNameForPlaylist:[lib name]]];
-	
-	NSArray *dirContents = [[NSFileManager defaultManager] subpathsAtPath:[NSHomeDirectory() stringByAppendingString:@"/Pictures/"]];
-	NSMutableArray * picturesFolder = [NSMutableArray arrayWithArray:dirContents];
-	NSMutableArray * picturesRemaining = [[NSMutableArray array] retain];
-	int count = [picturesFolder count];
-	NSArray *availableTypes = [NSImage imageFileTypes];
-	
-	int x;
-	for (x = 0; x < count; x++)
-	{
-		NSString *ext = [[[picturesFolder objectAtIndex:x] pathExtension] lowercaseString];
-		if ([availableTypes indexOfObject:ext] != NSNotFound)
-			[picturesRemaining addObject:[picturesFolder objectAtIndex:x]];
-	}
-	
-	NSMutableDictionary * picsFolderList = [[NSMutableDictionary dictionary] retain];
-	
-	for (x=0;x<[picturesRemaining count];x++)
-	{
-		NSNumber * stringNumber = [NSNumber numberWithInt:x];
-		NSMutableDictionary * newPicture = [NSMutableDictionary dictionary];
-		NSMutableString * pathString = [NSMutableString stringWithString:[picturesRemaining objectAtIndex:x]];
-		[pathString replaceOccurrencesOfString:@"%20" withString:@" " options:NSLiteralSearch range:NSMakeRange(0, [pathString length])];
-		[pathString replaceOccurrencesOfString:@"%5B" withString:@"[" options:NSLiteralSearch range:NSMakeRange(0, [pathString length])];
-		[pathString replaceOccurrencesOfString:@"%5D" withString:@"]" options:NSLiteralSearch range:NSMakeRange(0, [pathString length])];
-		NSArray * pathComps = [pathString pathComponents];
-		
-		if ([[pathComps objectAtIndex:0] isEqualToString:@"iPhoto Library"]) continue;
-		
-		NSString * slashChar = [NSHomeDirectory() stringByAppendingString:[@"/Pictures" stringByAppendingString:[NSString stringWithString:@"/"]]];
-		NSString * finalPath = [slashChar stringByAppendingString:[NSString pathWithComponents:pathComps]];
-		
-		NSDictionary *fileAttribs = [[NSFileManager defaultManager] fileAttributesAtPath:finalPath traverseLink:YES];
-		
-		// add items to dictionary
-		[newPicture setObject:finalPath forKey:@"ImagePath"];
-		[newPicture setObject:[finalPath lastPathComponent] forKey:@"Caption"];
-		[newPicture setObject:finalPath forKey:@"ThumbPath"];
-		[newPicture setObject:[fileAttribs valueForKey:NSFileModificationDate] forKey:@"DateAsTimerInterval"];
-		[picsFolderList setObject:newPicture forKey:[stringNumber stringValue]];
-	}
-	[lib addLibraryItem:picsFolderList];
-	[photoLists addObject:lib];
-	[lib release];
-	return photoLists;
-}
-
 - (void)awakeFromNib
 {	
 	//Bind images array of photo view to the current library selection
 	[oPhotoView bind:@"images" 
 			toObject:playlistController 
-		 withKeyPath:@"selection.libraryItems" 
+		 withKeyPath:@"selection.items" 
 			 options:[NSDictionary dictionaryWithObject:[NSValueTransformer valueTransformerForName:@"libraryItemsValueTransformer"]
 												 forKey:NSValueTransformerBindingOption]];
 }
@@ -194,6 +77,12 @@ static NSImage *_toolbarIcon = nil;
 		NSString *p = [b pathForResource:@"MBiPhotoLibrary" ofType:@"png"];
 		_toolbarIcon = [[NSImage alloc] initWithContentsOfFile:p];
 	}
+	return _toolbarIcon;
+}
+
+- (NSString *)mediaType
+{
+	return @"photos";
 }
 
 - (NSString *)name
@@ -209,24 +98,6 @@ static NSImage *_toolbarIcon = nil;
 - (void)didDeactivate
 {
 	[oView unbind:@"images"];
-}
-
-- (NSString *)iconNameForPlaylist:(NSString*)name
-{
-	if ([name hasSuffix:@"Roll"])
-		return @"MBiPhotoRoll";
-	else if ([name hasSuffix:@"Rolls"])
-		return @"MBiPhotoRoll";
-	else if ([name hasSuffix:@"Month"])
-		return @"MBiPhotoCalendar";
-	else if ([name hasSuffix:@"Months"])
-		return @"MBiPhotoCalendar";
-	else if ([name isEqualToString:@"Library"])
-		return @"MBiPhotoLibrary";
-	else if ([name isEqualToString:@"Pictures Folder"])
-		return @"picturesFolder";
-	else
-		return @"MBiPhotoAlbum";
 }
 
 - (void)writePlaylistsToPasteboard:(NSPasteboard *)pboard
@@ -249,6 +120,11 @@ static NSImage *_toolbarIcon = nil;
 	[pboard setPropertyList:plist forType:@"AlbumDataListPboardType"];
 	[pboard setPropertyList:files forType:NSFilenamesPboardType];
 	[pboard setPropertyList:urls forType:NSURLPboardType];
+	
+}
+
+- (void)refresh
+{
 	
 }
 

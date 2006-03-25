@@ -40,19 +40,62 @@
 	IBOutlet NSBox					*oLoadingView;
 	IBOutlet NSSplitView			*oSplitView;
 	IBOutlet NSProgressIndicator	*oLoading;
+	IBOutlet NSOutlineView			*oPlaylists;
 	IBOutlet NSTreeController		*libraryController;
 	
 	@private
 	NSMutableArray					*myMediaBrowsers;
+	NSMutableArray					*myLoadedParsers;
 	id <iMediaBrowser>				mySelectedBrowser;
 	NSToolbar						*myToolbar;
 	NSLock							*myBackgroundLoadingLock;
+	
+	id								myDelegate; //not retained
+	struct ___imbFlags {
+		unsigned willLoadBrowser: 1;
+		unsigned didLoadBrowser: 1;
+		unsigned willChangeBrowser: 1;
+		unsigned didChangeBrowser: 1;
+		unsigned willUseParser: 1;
+		unsigned didUseParser: 1;
+	} myFlags;
 }
 
 + (id)sharedBrowser;
 + (id)sharedBrowserWithoutLoading;
 
-//Register Other types of Browsers
+// Register Other types of Browsers
 + (void)registerBrowser:(Class)aClass;
 + (void)unregisterBrowser:(Class)aClass;
+
+/* Register different types of media parsers
+ 
+	Default media keys are: photos, music, videos, links
+*/
++ (void)registerParser:(Class)aClass forMediaType:(NSString *)media;
++ (void)unregisterParser:(Class)aClass forMediaType:(NSString *)media;
+
+- (void)setDelegate:(id)delegate;
+- (id)delegate;
+
+@end
+
+
+@interface NSObject (iMediaBrowserDelegate)
+
+// NB: These methods will be called on the main thread
+// the delegate can stop the browser from loading a certain media type
+- (BOOL)iMediaBrowser:(iMediaBrowser *)browser willLoadBrowser:(NSString *)browserClassname;
+- (void)iMediaBrowser:(iMediaBrowser *)browser didLoadBrowser:(NSString *)browserClassname;
+
+// NB: These delegate methods will most likely not be called on the main thread so you will have to make sure you code can handle this.
+// loading different parsers for media types
+- (BOOL)iMediaBrowser:(iMediaBrowser *)browser willUseMediaParser:(NSString *)parserClassname forMediaType:(NSString *)media;
+- (void)iMediaBrowser:(iMediaBrowser *)browser didUseMediaParser:(NSString *)parserClassname forMediaType:(NSString *)media;
+
+// NB: These methods will be called on the main thread
+// get called back if the media browser changes
+- (void)iMediaBrowser:(iMediaBrowser *)browser willChangeToBrowser:(NSString *)browserClassname;
+- (void)iMediaBrowser:(iMediaBrowser *)browser didChangeToBrowser:(NSString *)browserClassname;
+
 @end

@@ -50,7 +50,7 @@
 // Overridden by subclasses to specify the summary string
 - (NSString *)summaryString;
 
-- (void)addLibraryItem:(NSDictionary*)value;
+- (void)addLibraryItem:(id)value;
 
 // Accesors that allow displaying the name of the group with the corresponsing 
 // icon;  this is used in the outline view of the main window

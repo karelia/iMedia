@@ -17,6 +17,7 @@
                 oLoading = NSProgressIndicator; 
                 oLoadingView = NSBox; 
                 oMediaMenu = NSPopUpButton; 
+                oPlaylists = NSOutlineView; 
                 oSplitView = NSSplitView; 
                 selectedBrowser = id; 
             }; 

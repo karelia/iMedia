@@ -35,6 +35,33 @@
 		791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */; };
 		792BFD93098066A50004D656 /* iMBPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 792BFD91098066A50004D656 /* iMBPhotoView.h */; };
 		792BFD94098066A50004D656 /* iMBPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 792BFD92098066A50004D656 /* iMBPhotoView.m */; };
+		795D6F5109D35B77005F166D /* iMBLinksController.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D6F4F09D35B77005F166D /* iMBLinksController.h */; };
+		795D6F5209D35B77005F166D /* iMBLinksController.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D6F5009D35B77005F166D /* iMBLinksController.m */; };
+		795D705B09D38D22005F166D /* safari.png in Resources */ = {isa = PBXBuildFile; fileRef = 795D705A09D38D22005F166D /* safari.png */; };
+		795D70D609D39C43005F166D /* folder.png in Resources */ = {isa = PBXBuildFile; fileRef = 795D70D509D39C43005F166D /* folder.png */; };
+		795D70E109D39D73005F166D /* iMBLibraryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D70DF09D39D73005F166D /* iMBLibraryNode.h */; };
+		795D70E209D39D73005F166D /* iMBLibraryNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D70E009D39D73005F166D /* iMBLibraryNode.m */; };
+		795D715B09D3AB47005F166D /* iMBAbstractParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D715909D3AB47005F166D /* iMBAbstractParser.h */; };
+		795D715C09D3AB47005F166D /* iMBAbstractParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D715A09D3AB47005F166D /* iMBAbstractParser.m */; };
+		795D716109D3AB55005F166D /* iMBiPhotoPhotosParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D715F09D3AB55005F166D /* iMBiPhotoPhotosParser.h */; };
+		795D716209D3AB55005F166D /* iMBiPhotoPhotosParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D716009D3AB55005F166D /* iMBiPhotoPhotosParser.m */; };
+		795D716709D3AB64005F166D /* iMBiPhotoMoviesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D716509D3AB64005F166D /* iMBiPhotoMoviesParser.h */; };
+		795D716809D3AB64005F166D /* iMBiPhotoMoviesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D716609D3AB64005F166D /* iMBiPhotoMoviesParser.m */; };
+		795D71E109D3C00F005F166D /* iMBSafariBookmarkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D71DF09D3C00F005F166D /* iMBSafariBookmarkParser.h */; };
+		795D71E209D3C00F005F166D /* iMBSafariBookmarkParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D71E009D3C00F005F166D /* iMBSafariBookmarkParser.m */; };
+		795F742909D4B002000F21B5 /* photocast_folder.png in Resources */ = {isa = PBXBuildFile; fileRef = 795F742409D4B002000F21B5 /* photocast_folder.png */; };
+		795F742A09D4B002000F21B5 /* photocast.png in Resources */ = {isa = PBXBuildFile; fileRef = 795F742509D4B002000F21B5 /* photocast.png */; };
+		795F742B09D4B002000F21B5 /* slideshow.png in Resources */ = {isa = PBXBuildFile; fileRef = 795F742609D4B002000F21B5 /* slideshow.png */; };
+		795F742C09D4B002000F21B5 /* card.png in Resources */ = {isa = PBXBuildFile; fileRef = 795F742709D4B002000F21B5 /* card.png */; };
+		795F742D09D4B002000F21B5 /* cal.png in Resources */ = {isa = PBXBuildFile; fileRef = 795F742809D4B002000F21B5 /* cal.png */; };
+		795F745A09D4B380000F21B5 /* book.png in Resources */ = {isa = PBXBuildFile; fileRef = 795F745909D4B380000F21B5 /* book.png */; };
+		795F748409D4BA98000F21B5 /* iMBPicturesFolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F748209D4BA98000F21B5 /* iMBPicturesFolder.h */; };
+		795F748509D4BA98000F21B5 /* iMBPicturesFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 795F748309D4BA98000F21B5 /* iMBPicturesFolder.m */; };
+		795F7B2509D4D5E5000F21B5 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 795F7AF509D4D5E5000F21B5 /* WebKit.framework */; };
+		795F870509D4DA72000F21B5 /* iMBiTunesMusicParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F870309D4DA72000F21B5 /* iMBiTunesMusicParser.h */; };
+		795F870609D4DA72000F21B5 /* iMBiTunesMusicParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795F870409D4DA72000F21B5 /* iMBiTunesMusicParser.m */; };
+		795F881A09D4EF46000F21B5 /* iMBMoviesFolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F881809D4EF46000F21B5 /* iMBMoviesFolder.h */; };
+		795F881B09D4EF46000F21B5 /* iMBMoviesFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */; };
 		79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF5FF09AAE5D2000CB4B4 /* badge.png */; };
 		79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */; };
 		79FDF61709AAE5D2000CB4B4 /* MBiPhoto4Library.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */; };
@@ -130,7 +157,6 @@
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -156,6 +182,33 @@
 		791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKMainThreadProxy.m; sourceTree = "<group>"; };
 		792BFD91098066A50004D656 /* iMBPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBPhotoView.h; sourceTree = "<group>"; };
 		792BFD92098066A50004D656 /* iMBPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBPhotoView.m; sourceTree = "<group>"; };
+		795D6F4F09D35B77005F166D /* iMBLinksController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLinksController.h; sourceTree = "<group>"; };
+		795D6F5009D35B77005F166D /* iMBLinksController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBLinksController.m; sourceTree = "<group>"; };
+		795D705A09D38D22005F166D /* safari.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = safari.png; sourceTree = "<group>"; };
+		795D70D509D39C43005F166D /* folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = folder.png; sourceTree = "<group>"; };
+		795D70DF09D39D73005F166D /* iMBLibraryNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLibraryNode.h; sourceTree = "<group>"; };
+		795D70E009D39D73005F166D /* iMBLibraryNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBLibraryNode.m; sourceTree = "<group>"; };
+		795D715909D3AB47005F166D /* iMBAbstractParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAbstractParser.h; sourceTree = "<group>"; };
+		795D715A09D3AB47005F166D /* iMBAbstractParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAbstractParser.m; sourceTree = "<group>"; };
+		795D715F09D3AB55005F166D /* iMBiPhotoPhotosParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiPhotoPhotosParser.h; sourceTree = "<group>"; };
+		795D716009D3AB55005F166D /* iMBiPhotoPhotosParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiPhotoPhotosParser.m; sourceTree = "<group>"; };
+		795D716509D3AB64005F166D /* iMBiPhotoMoviesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiPhotoMoviesParser.h; sourceTree = "<group>"; };
+		795D716609D3AB64005F166D /* iMBiPhotoMoviesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiPhotoMoviesParser.m; sourceTree = "<group>"; };
+		795D71DF09D3C00F005F166D /* iMBSafariBookmarkParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBSafariBookmarkParser.h; sourceTree = "<group>"; };
+		795D71E009D3C00F005F166D /* iMBSafariBookmarkParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBSafariBookmarkParser.m; sourceTree = "<group>"; };
+		795F742409D4B002000F21B5 /* photocast_folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = photocast_folder.png; sourceTree = "<group>"; };
+		795F742509D4B002000F21B5 /* photocast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = photocast.png; sourceTree = "<group>"; };
+		795F742609D4B002000F21B5 /* slideshow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = slideshow.png; sourceTree = "<group>"; };
+		795F742709D4B002000F21B5 /* card.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = card.png; sourceTree = "<group>"; };
+		795F742809D4B002000F21B5 /* cal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cal.png; sourceTree = "<group>"; };
+		795F745909D4B380000F21B5 /* book.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = book.png; sourceTree = "<group>"; };
+		795F748209D4BA98000F21B5 /* iMBPicturesFolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBPicturesFolder.h; sourceTree = "<group>"; };
+		795F748309D4BA98000F21B5 /* iMBPicturesFolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBPicturesFolder.m; sourceTree = "<group>"; };
+		795F7AF509D4D5E5000F21B5 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		795F870309D4DA72000F21B5 /* iMBiTunesMusicParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiTunesMusicParser.h; sourceTree = "<group>"; };
+		795F870409D4DA72000F21B5 /* iMBiTunesMusicParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiTunesMusicParser.m; sourceTree = "<group>"; };
+		795F881809D4EF46000F21B5 /* iMBMoviesFolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMoviesFolder.h; sourceTree = "<group>"; };
+		795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMoviesFolder.m; sourceTree = "<group>"; };
 		79FDF5FF09AAE5D2000CB4B4 /* badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge.png; sourceTree = "<group>"; };
 		79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBAudioPlaying.png; sourceTree = "<group>"; };
 		79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiPhoto4Library.png; sourceTree = "<group>"; };
@@ -212,6 +265,7 @@
 				79167A6909752C3000D9EF74 /* QTKit.framework in Frameworks */,
 				79167A6A09752C3300D9EF74 /* Cocoa.framework in Frameworks */,
 				79167A6B09752C3300D9EF74 /* QuickTime.framework in Frameworks */,
+				795F7B2509D4D5E5000F21B5 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,6 +288,7 @@
 			children = (
 				D9B3EAAE09A3FD9400835FE4 /* Controllers */,
 				D9F92E6209AAAC19008CB6BE /* File Watcher */,
+				795D715109D3AACB005F166D /* Parsers */,
 				D9B3EAAD09A3FD8600835FE4 /* Models */,
 				D9659C0E09A6CB160079ED9A /* Value Transformers */,
 				D9659A2609A6A7C50079ED9A /* Views */,
@@ -244,6 +299,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				795F7AF509D4D5E5000F21B5 /* WebKit.framework */,
 				965EB98608E1D345000DFF3A /* QTKit.framework */,
 				964006E108D7B9BF0046E052 /* QuickTime.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
@@ -255,7 +311,6 @@
 			isa = PBXGroup;
 			children = (
 				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
-				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 			);
 			name = "Other Frameworks";
@@ -327,9 +382,38 @@
 			name = "Xcode Configurations";
 			sourceTree = "<group>";
 		};
+		795D715109D3AACB005F166D /* Parsers */ = {
+			isa = PBXGroup;
+			children = (
+				795D715909D3AB47005F166D /* iMBAbstractParser.h */,
+				795D715A09D3AB47005F166D /* iMBAbstractParser.m */,
+				795D715F09D3AB55005F166D /* iMBiPhotoPhotosParser.h */,
+				795D716009D3AB55005F166D /* iMBiPhotoPhotosParser.m */,
+				795D716509D3AB64005F166D /* iMBiPhotoMoviesParser.h */,
+				795D716609D3AB64005F166D /* iMBiPhotoMoviesParser.m */,
+				795D71DF09D3C00F005F166D /* iMBSafariBookmarkParser.h */,
+				795D71E009D3C00F005F166D /* iMBSafariBookmarkParser.m */,
+				795F748209D4BA98000F21B5 /* iMBPicturesFolder.h */,
+				795F748309D4BA98000F21B5 /* iMBPicturesFolder.m */,
+				795F870309D4DA72000F21B5 /* iMBiTunesMusicParser.h */,
+				795F870409D4DA72000F21B5 /* iMBiTunesMusicParser.m */,
+				795F881809D4EF46000F21B5 /* iMBMoviesFolder.h */,
+				795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */,
+			);
+			name = Parsers;
+			sourceTree = "<group>";
+		};
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				795F745909D4B380000F21B5 /* book.png */,
+				795F742409D4B002000F21B5 /* photocast_folder.png */,
+				795F742509D4B002000F21B5 /* photocast.png */,
+				795F742609D4B002000F21B5 /* slideshow.png */,
+				795F742709D4B002000F21B5 /* card.png */,
+				795F742809D4B002000F21B5 /* cal.png */,
+				795D70D509D39C43005F166D /* folder.png */,
+				795D705A09D38D22005F166D /* safari.png */,
 				D98B7C6509AD499600EAA95E /* MBiMovie.png */,
 				D98B7C6609AD499600EAA95E /* MBiTunes.png */,
 				79FDF5FF09AAE5D2000CB4B4 /* badge.png */,
@@ -394,6 +478,8 @@
 			children = (
 				D9659A3409A6A9680079ED9A /* Library.h */,
 				D9659A3509A6A9680079ED9A /* Library.m */,
+				795D70DF09D39D73005F166D /* iMBLibraryNode.h */,
+				795D70E009D39D73005F166D /* iMBLibraryNode.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -412,6 +498,8 @@
 				968BF085090F3ECA00D00E5C /* iMBPhotosController.m */,
 				96A26017090CA99E00BCCCD6 /* iMBMusicController.h */,
 				96A26018090CA99E00BCCCD6 /* iMBMusicController.m */,
+				795D6F4F09D35B77005F166D /* iMBLinksController.h */,
+				795D6F5009D35B77005F166D /* iMBLinksController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -449,6 +537,15 @@
 				D9659C1109A6CB450079ED9A /* LibraryItemsValueTransformer.h in Headers */,
 				D9659F3409A6F36E0079ED9A /* iTunesValueTransformer.h in Headers */,
 				D94D1B4109A7A71500CD2946 /* TimeValueTransformer.h in Headers */,
+				795D6F5109D35B77005F166D /* iMBLinksController.h in Headers */,
+				795D70E109D39D73005F166D /* iMBLibraryNode.h in Headers */,
+				795D715B09D3AB47005F166D /* iMBAbstractParser.h in Headers */,
+				795D716109D3AB55005F166D /* iMBiPhotoPhotosParser.h in Headers */,
+				795D716709D3AB64005F166D /* iMBiPhotoMoviesParser.h in Headers */,
+				795D71E109D3C00F005F166D /* iMBSafariBookmarkParser.h in Headers */,
+				795F748409D4BA98000F21B5 /* iMBPicturesFolder.h in Headers */,
+				795F870509D4DA72000F21B5 /* iMBiTunesMusicParser.h in Headers */,
+				795F881A09D4EF46000F21B5 /* iMBMoviesFolder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -602,6 +699,14 @@
 				79FDF62A09AAE5D2000CB4B4 /* tunes_tiny.png in Resources */,
 				3C371AFD09AD501A00501C1F /* Framework Debug.xcconfig in Resources */,
 				3C371B0109AD502700501C1F /* Framework Release.xcconfig in Resources */,
+				795D705B09D38D22005F166D /* safari.png in Resources */,
+				795D70D609D39C43005F166D /* folder.png in Resources */,
+				795F742909D4B002000F21B5 /* photocast_folder.png in Resources */,
+				795F742A09D4B002000F21B5 /* photocast.png in Resources */,
+				795F742B09D4B002000F21B5 /* slideshow.png in Resources */,
+				795F742C09D4B002000F21B5 /* card.png in Resources */,
+				795F742D09D4B002000F21B5 /* cal.png in Resources */,
+				795F745A09D4B380000F21B5 /* book.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -635,6 +740,15 @@
 				D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */,
 				D9659F3509A6F36E0079ED9A /* iTunesValueTransformer.m in Sources */,
 				D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */,
+				795D6F5209D35B77005F166D /* iMBLinksController.m in Sources */,
+				795D70E209D39D73005F166D /* iMBLibraryNode.m in Sources */,
+				795D715C09D3AB47005F166D /* iMBAbstractParser.m in Sources */,
+				795D716209D3AB55005F166D /* iMBiPhotoPhotosParser.m in Sources */,
+				795D716809D3AB64005F166D /* iMBiPhotoMoviesParser.m in Sources */,
+				795D71E209D3C00F005F166D /* iMBSafariBookmarkParser.m in Sources */,
+				795F748509D4BA98000F21B5 /* iMBPicturesFolder.m in Sources */,
+				795F870609D4DA72000F21B5 /* iMBiTunesMusicParser.m in Sources */,
+				795F881B09D4EF46000F21B5 /* iMBMoviesFolder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

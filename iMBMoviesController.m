@@ -102,6 +102,12 @@ static NSImage *_toolbarIcon = nil;
 		NSString *p = [b pathForResource:@"MBiMovie" ofType:@"png"];
 		_toolbarIcon = [[NSImage alloc] initWithContentsOfFile:p];
 	}
+	return _toolbarIcon;
+}
+
+- (NSString *)mediaType
+{
+	return @"movies";
 }
 
 - (NSString *)name
@@ -125,6 +131,11 @@ static NSImage *_toolbarIcon = nil;
 }
 
 - (void)writePlaylistsToPasteboard:(NSPasteboard *)pboard
+{
+	
+}
+
+- (void)refresh
 {
 	
 }

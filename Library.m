@@ -175,7 +175,7 @@ The summary string for the library.
     }
 }
 
-- (void)addLibraryItem:(NSDictionary*)value{    
+- (void)addLibraryItem:(id)value{    
 	[libraryItems addObject:value];
 }
 

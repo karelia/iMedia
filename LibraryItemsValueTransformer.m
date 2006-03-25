@@ -31,7 +31,7 @@
 
 
 #import "LibraryItemsValueTransformer.h"
-
+#import "iMBLibraryNode.h"
 
 @implementation LibraryItemsValueTransformer
 
@@ -74,14 +74,15 @@ int imageDateSort(id i1, id i2, void *context) {
 	NSMutableArray *newPhotos = [NSMutableArray array];
 	NSArray *playlistRecords = (NSArray*)beforeObject;
 	NSEnumerator *playlistRecordsEnum = [playlistRecords objectEnumerator];
-	NSDictionary *rec = nil;
+	iMBLibraryNode *rec = nil;
+	
 	while(rec = [playlistRecordsEnum nextObject])
 	{
-		[newPhotos addObjectsFromArray:[rec allValues]];
+		[newPhotos addObjectsFromArray:[rec items]];
 	}
 	
 #warning HACK to get past problem where in movie tab, we just have a list of paths, not dictionaries with dates.
-	if (([newPhotos count] > 0) && [[newPhotos objectAtIndex:0] isKindOfClass:[NSDictionary class]])
+	if (([newPhotos count] > 0) && [[newPhotos objectAtIndex:0] isKindOfClass:[iMBLibraryNode class]])
 	{
 		[newPhotos sortUsingFunction:imageDateSort context:nil];
 	}
