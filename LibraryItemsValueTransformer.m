@@ -78,7 +78,7 @@ int imageDateSort(id i1, id i2, void *context) {
 	
 	while(rec = [playlistRecordsEnum nextObject])
 	{
-		[newPhotos addObjectsFromArray:[rec items]];
+		[newPhotos addObjectsFromArray:[rec attributeForKey:@"Images"]];
 	}
 	
 #warning HACK to get past problem where in movie tab, we just have a list of paths, not dictionaries with dates.
