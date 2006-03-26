@@ -40,6 +40,9 @@
 - (void)insertItem:(iMBLibraryNode *)item atIndex:(unsigned)idx;
 - (void)setItems:(NSArray *)items;
 - (NSArray *)items;
+// this returns the aggregate of items from sub nodes
+- (NSArray *)allItems;
+
 
 // basically a transformer for the outline view
 - (NSAttributedString *)nameWithImage;

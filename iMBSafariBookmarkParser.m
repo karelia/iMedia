@@ -77,7 +77,7 @@
 	{
 		[library addItem:[self recursivelyParseItem:cur]];
 	}
-	return library;
+	return [library autorelease];
 }
 
 @end

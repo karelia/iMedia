@@ -518,7 +518,7 @@ static NSImage *_badge = nil;
 				
 				while (cur = [e nextObject]) {
 					NSDictionary *rec = [self recordForThumb:cur];
-					NSLog(@"%@", [rec objectForKey:@"ImagePath"]);
+					//NSLog(@"%@", [rec objectForKey:@"ImagePath"]);
 					[fileList addObject:[rec objectForKey:@"ImagePath"]];
 					[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
 					[urlList addObject:[[NSURL fileURLWithPath:[rec objectForKey:@"ImagePath"]] description]];

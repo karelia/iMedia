@@ -122,6 +122,20 @@
 	return [NSArray arrayWithArray:myItems];
 }
 
+- (NSArray *)allItems
+{
+	NSMutableArray *items = [NSMutableArray array];
+	NSEnumerator *e = [myItems objectEnumerator];
+	iMBLibraryNode *cur;
+	
+	while (cur = [e nextObject])
+	{
+		[items addObject:cur];
+		[items addObjectsFromArray:[cur items]];
+	}
+	return items;
+}
+
 - (NSAttributedString *)nameWithImage
 {
     // check the cache first... 
@@ -185,6 +199,49 @@
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"iMBLibraryNode: %@ (%@)", [self name], [[self attributes] allKeys]];
+}
+
+- (NSArray *)recursiveAttributesForKey:(NSString *)key
+{
+	NSMutableArray *items = [NSMutableArray array];
+	NSEnumerator *e = [myItems objectEnumerator];
+	iMBLibraryNode *cur;
+	id attrib;
+	
+	attrib = [self attributeForKey:key];
+	if (attrib != nil)
+	{
+		if ([attrib isKindOfClass:[NSArray class]])
+		{
+			[items addObjectsFromArray:attrib];
+		}
+		else
+		{
+			[items addObject:attrib];
+		}
+	}
+	
+	while (cur = [e nextObject])
+	{
+		attrib = [cur attributeForKey:key];
+		if (attrib != nil)
+		{
+			if ([attrib isKindOfClass:[NSArray class]])
+			{
+				[items addObjectsFromArray:attrib];
+			}
+			else
+			{
+				[items addObject:attrib];
+			}
+		}
+	}
+	return items;
+}
+
+- (id)valueForUndefinedKey:(NSString *)key
+{
+	return [self recursiveAttributesForKey:key];
 }
 
 @end

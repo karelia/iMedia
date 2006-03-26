@@ -121,7 +121,7 @@ static NSImage *_toolbarIcon = nil;
 }
 
 
-- (void)writePlaylistsToPasteboard:(NSPasteboard *)pboard
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
 	
 }

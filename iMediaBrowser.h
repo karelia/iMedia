@@ -45,7 +45,7 @@
 	
 	@private
 	NSMutableArray					*myMediaBrowsers;
-	NSMutableArray					*myLoadedParsers;
+	NSMutableDictionary				*myLoadedParsers;
 	id <iMediaBrowser>				mySelectedBrowser;
 	NSToolbar						*myToolbar;
 	NSLock							*myBackgroundLoadingLock;
@@ -80,6 +80,9 @@
 
 @end
 
+// This notification is for each specific media browser to post when their selection changes.
+// this is not a playlist/album change notification
+extern NSString *iMediaBrowserSelectionDidChangeNotification;
 
 @interface NSObject (iMediaBrowserDelegate)
 

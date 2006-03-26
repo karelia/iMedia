@@ -31,6 +31,8 @@
 
 #include <Cocoa/Cocoa.h>
 
+@class iMBLibraryNode;
+
 @protocol iMediaBrowser <NSObject>
 
 // designated initializer
@@ -52,7 +54,7 @@
 - (void)didDeactivate;
 
 // Drag and Drop support for the playlist/album
-- (void)writePlaylistsToPasteboard:(NSPasteboard *)pboard;
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard;
 
 // parsers can notify the browser to refresh if the underlying database changes
 - (void)refresh;

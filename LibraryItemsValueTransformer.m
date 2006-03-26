@@ -67,26 +67,33 @@ int imageDateSort(id i1, id i2, void *context) {
 
 - (id)transformedValue:(id)beforeObject
 {
+	NSLog(@"%@", [beforeObject className]);
 	if (nil == beforeObject)
 	{
 		return nil;
 	}
-	NSMutableArray *newPhotos = [NSMutableArray array];
-	NSArray *playlistRecords = (NSArray*)beforeObject;
-	NSEnumerator *playlistRecordsEnum = [playlistRecords objectEnumerator];
-	iMBLibraryNode *rec = nil;
 	
-	while(rec = [playlistRecordsEnum nextObject])
-	{
-		[newPhotos addObjectsFromArray:[rec attributeForKey:@"Images"]];
-	}
-	
+	if ([beforeObject isKindOfClass:[NSArray class]])
+	{		
+		NSMutableArray *newPhotos = [NSMutableArray array];
+		NSArray *playlistRecords = (NSArray*)beforeObject;
+		NSEnumerator *playlistRecordsEnum = [playlistRecords objectEnumerator];
+		iMBLibraryNode *rec = nil;
+		
+		while(rec = [playlistRecordsEnum nextObject])
+		{
+			[newPhotos addObject:rec];
+		}
+		
 #warning HACK to get past problem where in movie tab, we just have a list of paths, not dictionaries with dates.
-	if (([newPhotos count] > 0) && [[newPhotos objectAtIndex:0] isKindOfClass:[iMBLibraryNode class]])
-	{
-		[newPhotos sortUsingFunction:imageDateSort context:nil];
+		if (([newPhotos count] > 0) && [[newPhotos objectAtIndex:0] isKindOfClass:[iMBLibraryNode class]])
+		{
+			[newPhotos sortUsingFunction:imageDateSort context:nil];
+		}
+		return newPhotos;
 	}
-	return newPhotos;
+	
+	return nil;
 }
 
 @end

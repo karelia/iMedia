@@ -57,11 +57,15 @@
 - (void)awakeFromNib
 {	
 	//Bind images array of photo view to the current library selection
+	/*[oPhotoView bind:@"images" 
+			toObject:playlistController 
+		 withKeyPath:@"selection.Images" 
+			 options:[NSDictionary dictionaryWithObject:[NSValueTransformer valueTransformerForName:@"libraryItemsValueTransformer"]
+												 forKey:NSValueTransformerBindingOption]];*/
 	[oPhotoView bind:@"images" 
 			toObject:playlistController 
-		 withKeyPath:@"selection.items" 
-			 options:[NSDictionary dictionaryWithObject:[NSValueTransformer valueTransformerForName:@"libraryItemsValueTransformer"]
-												 forKey:NSValueTransformerBindingOption]];
+		 withKeyPath:@"selection.Images" 
+			 options:nil];
 }
 
 #pragma mark -
@@ -100,18 +104,31 @@ static NSImage *_toolbarIcon = nil;
 	[oView unbind:@"images"];
 }
 
-- (void)writePlaylistsToPasteboard:(NSPasteboard *)pboard
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *files = [NSMutableArray array];
 	NSMutableArray *urls = [NSMutableArray array];
 	NSMutableArray *images = [NSMutableArray array];
 	NSMutableArray *albums = [NSMutableArray array];
-	NSEnumerator *indexEnum = [[playlistController selectedObjects] objectEnumerator];
-	NSNumber *index;
 	
-	while (index = [indexEnum nextObject])
-	{
-		
+	// we don't want to overwrite any other existing types on the pboard
+	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
+	[types addObject:NSFilenamesPboardType];
+	[types addObject:@"ImageDataListPboardType"];
+	[types addObject:NSURLPboardType];
+	
+	[pboard declareTypes:types
+				   owner:nil];
+	
+	//we store the images as an attribute in the node
+	NSArray *imageRecords = [playlist attributeForKey:@"Images"];
+	NSEnumerator *e = [imageRecords objectEnumerator];
+	NSDictionary *rec;
+				
+	while (rec = [e nextObject]) {
+		[files addObject:[rec objectForKey:@"ImagePath"]];
+		//[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
+		[urls addObject:[[NSURL fileURLWithPath:[rec objectForKey:@"ImagePath"]] description]];
 	}
 	
 	[pboard addTypes:[NSArray arrayWithObjects:@"AlbumDataListPboardType", NSFilenamesPboardType, NSURLPboardType, nil] owner:nil];

@@ -37,6 +37,8 @@
 #import <QuickTime/QuickTime.h>
 #import <QTKit/QTKit.h>
 
+NSString *iMediaBrowserSelectionDidChangeNotification = @"iMediaBrowserSelectionDidChangeNotification";
+
 static iMediaBrowser *_sharedMediaBrowser = nil;
 static NSMutableArray *_browserClasses = nil;
 static NSMutableDictionary *_parsers = nil;
@@ -48,6 +50,10 @@ static NSMutableDictionary *_parsers = nil;
 
 @interface iMediaBrowser (Plugins)
 + (NSArray *)findBundlesWithExtension:(NSString *)ext inFolderName:(NSString *)folder;
+@end
+
+@interface NSObject (iMediaHack)
+- (id)observedObject;
 @end
 
 @implementation iMediaBrowser
@@ -163,7 +169,7 @@ static NSMutableDictionary *_parsers = nil;
 - (void)awakeFromNib
 {
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
-	myLoadedParsers = [[NSMutableArray alloc] init];
+	myLoadedParsers = [[NSMutableDictionary alloc] init];
 	
 	myToolbar = [[NSToolbar alloc] initWithIdentifier:@"iMediaBrowserToolbar"];
 	
@@ -221,6 +227,7 @@ static NSMutableDictionary *_parsers = nil;
 		[[self window] setFrame:r display:NO];
 	}
 	[[self window] setDelegate:self];
+	[oPlaylists setDataSource:self];
 }
 
 - (id <iMediaBrowser>)browserForClassName:(NSString *)name
@@ -294,9 +301,14 @@ static NSMutableDictionary *_parsers = nil;
 				continue;
 			}
 		}
-		id <iMBParser>parser = [[parserClass alloc] init];
-		[myLoadedParsers addObject:parser];
-		[parser release];
+		
+		id <iMBParser>parser = [myLoadedParsers objectForKey:cur];
+		if (!parser)
+		{
+			parser = [[parserClass alloc] init];
+			[myLoadedParsers setObject:parser forKey:cur];
+			[parser release];
+		}
 		
 		iMBLibraryNode *library = [parser library];
 		if (library) // it is possible for a parser to return nil if the db for it doesn't exist
@@ -420,6 +432,38 @@ static NSMutableDictionary *_parsers = nil;
 {
 	return [self allControllerClassNames];
 }
+
+// This Code is from http://theocacao.com/document.page/130
+
+#pragma mark -
+#pragma mark NSOutlineView Hacks for Drag and Drop
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
+{
+	NSEnumerator *e = [items objectEnumerator];
+	id cur;
+	
+	while (cur = [e nextObject])
+	{
+		[mySelectedBrowser writePlaylist:[cur observedObject] toPasteboard:pboard];
+	}
+	return YES;
+}
+
+- (BOOL) outlineView: (NSOutlineView *)ov
+	isItemExpandable: (id)item { return NO; }
+
+- (int)  outlineView: (NSOutlineView *)ov
+         numberOfChildrenOfItem:(id)item { return 0; }
+
+- (id)   outlineView: (NSOutlineView *)ov
+			   child:(int)index
+			  ofItem:(id)item { return nil; }
+
+- (id)   outlineView: (NSOutlineView *)ov
+         objectValueForTableColumn:(NSTableColumn*)col
+			  byItem:(id)item { return nil; }
+
 
 @end
 

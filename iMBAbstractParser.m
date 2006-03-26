@@ -71,7 +71,7 @@
 {
 	if (!myCachedLibrary)
 	{
-		myCachedLibrary = [self parseDatabase];
+		myCachedLibrary = [[self parseDatabase] retain];
 	}
 	return myCachedLibrary;
 }
