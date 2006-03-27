@@ -35,6 +35,7 @@
 		791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */; };
 		792BFD93098066A50004D656 /* iMBPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 792BFD91098066A50004D656 /* iMBPhotoView.h */; };
 		792BFD94098066A50004D656 /* iMBPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 792BFD92098066A50004D656 /* iMBPhotoView.m */; };
+		7956049409D78F9F00BF1DA5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 7956049309D78F9F00BF1DA5 /* LICENSE */; };
 		795D6F5109D35B77005F166D /* iMBLinksController.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D6F4F09D35B77005F166D /* iMBLinksController.h */; };
 		795D6F5209D35B77005F166D /* iMBLinksController.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D6F5009D35B77005F166D /* iMBLinksController.m */; };
 		795D705B09D38D22005F166D /* safari.png in Resources */ = {isa = PBXBuildFile; fileRef = 795D705A09D38D22005F166D /* safari.png */; };
@@ -192,6 +193,7 @@
 		791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKMainThreadProxy.m; sourceTree = "<group>"; };
 		792BFD91098066A50004D656 /* iMBPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBPhotoView.h; sourceTree = "<group>"; };
 		792BFD92098066A50004D656 /* iMBPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBPhotoView.m; sourceTree = "<group>"; };
+		7956049309D78F9F00BF1DA5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		795D6F4F09D35B77005F166D /* iMBLinksController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLinksController.h; sourceTree = "<group>"; };
 		795D6F5009D35B77005F166D /* iMBLinksController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBLinksController.m; sourceTree = "<group>"; };
 		795D705A09D38D22005F166D /* safari.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = safari.png; sourceTree = "<group>"; };
@@ -350,6 +352,7 @@
 		29B97314FDCFA39411CA2CEA /* iMediaBrowse */ = {
 			isa = PBXGroup;
 			children = (
+				7956049309D78F9F00BF1DA5 /* LICENSE */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				CE98A0CB097DC5DA00757094 /* Application */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
@@ -745,6 +748,7 @@
 				7990CDC109D76BDA00AD74BA /* iTunesVideo.png in Resources */,
 				7990CDE009D76E7800AD74BA /* iTunesSmartPlaylist.png in Resources */,
 				7990CDF209D772FF00AD74BA /* Links.nib in Resources */,
+				7956049409D78F9F00BF1DA5 /* LICENSE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
