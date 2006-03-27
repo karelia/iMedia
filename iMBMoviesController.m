@@ -17,13 +17,7 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
- In the case of iMediaBrowse, in addition to the terms noted above, in any 
- application that uses iMediaBrowse, we ask that you give a small attribution to 
- the members of CocoaDev.com who had a part in developing the project. Including, 
- but not limited to, Jason Terhorst, Greg Hulands and Ben Dunton.
- 
- Greg doesn't really want acknowledgement he just want bug fixes as he has rewritten
- practically everything but the xml parsing stuff. Please send fixes to 
+Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
@@ -31,8 +25,7 @@
 #import "iMBMoviesController.h"
 #import <QTKit/QTKit.h>
 #import "iMediaBrowser.h"
-#import "UKKQueue.h"
-#import "Library.h"
+#import "iMBLibraryNode.h"
 
 @interface iMBMoviesController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
@@ -42,51 +35,18 @@
 
 - (id)initWithPlaylistController:(NSTreeController*)ctrl
 {
-	if (self = [super init]) {
+	if (self = [super initWithPlaylistController:ctrl]) {
 		[NSBundle loadNibNamed:@"Movies" owner:self];
 	}
 	return self;
 }
 
-- (NSArray*)loadDatabase
-{
-	[pathList removeAllObjects];
-	NSString *dir = [NSHomeDirectory() stringByAppendingPathComponent:@"Movies"];
-	NSArray *files = [[NSFileManager defaultManager] subpathsAtPath:dir];
-	NSArray *movieTypes = [QTMovie movieFileTypes:QTIncludeCommonTypes];
-	NSEnumerator *e = [files objectEnumerator];
-	NSString *cur;
-	
-	Library *lib = [[Library alloc] init];
-	[lib setName:@"Movies"];
-	[lib setLibraryImageName:[self iconNameForPlaylist:[lib name]]];
-	
-	while (cur = [e nextObject]) {
-		NSMutableDictionary *newMovie = [NSMutableDictionary dictionary];
-		if ([movieTypes containsObject:[cur pathExtension]]) {
-			[newMovie setObject:[dir stringByAppendingPathComponent:cur] forKey:@"Location"];
-			[lib addLibraryItem:newMovie];
-		}
-	}
-	[counterField setStringValue:[NSString stringWithFormat:@"%d movies", [[lib libraryItems] count]]];
-	return [NSArray arrayWithObject:lib];
-}
-
-//run when first loaded.
 - (void)awakeFromNib
 {
-	pathList = [[NSMutableArray alloc] init];
-	NSString *dir = [NSHomeDirectory() stringByAppendingPathComponent:@"Movies"];
-	
-	//we want to watch this path for changes
-	UKKQueue *watcher = [UKKQueue sharedQueue];
-	[watcher setDelegate:self];
-	[watcher addPathToQueue:dir];
-}
-
--(void) kqueue: (UKKQueue*)kq receivedNotification: (NSString*)nm forFile: (NSString*)fpath
-{
-	[self loadDatabase];
+	[previewMovieView bind:@"images" 
+				  toObject:[self controller] 
+			   withKeyPath:@"selection.Movies" 
+				   options:nil];
 }
 
 #pragma mark -
@@ -115,11 +75,6 @@ static NSImage *_toolbarIcon = nil;
 	return NSLocalizedString(@"Movies", @"Movies");
 }
 
-- (NSView *)browserView
-{
-	return oView;
-}
-
 - (void)didDeactivate
 {
 	[previewMovieView pause:self];
@@ -131,11 +86,6 @@ static NSImage *_toolbarIcon = nil;
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
-{
-	
-}
-
-- (void)refresh
 {
 	
 }

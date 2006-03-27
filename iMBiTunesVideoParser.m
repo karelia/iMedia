@@ -17,22 +17,23 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
 
-#import "iMBiTunesMusicParser.h"
-#import "iMBLibraryNode.h"
+#import "iMBiTunesVideoParser.h"
 #import "iMediaBrowser.h"
+#import "iMBLibraryNode.h"
+#import <QTKit/QTKit.h>
 
-@implementation iMBiTunesMusicParser
+@implementation iMBiTunesVideoParser
 
 + (void)load
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
+	[iMediaBrowser registerParser:[self class] forMediaType:@"movies"];
 	
 	[pool release];
 }
@@ -102,6 +103,7 @@ Please send fixes to
 	iMBLibraryNode *library = [[iMBLibraryNode alloc] init];
 	iMBLibraryNode *podcastLib = [[iMBLibraryNode alloc] init];
 	iMBLibraryNode *partyShuffleLib = [[iMBLibraryNode alloc] init];
+	iMBLibraryNode *videoLib = [[iMBLibraryNode alloc] init];
 	iMBLibraryNode *purchasedLib = [[iMBLibraryNode alloc] init];
 	NSMutableArray *smartPlaylists = [NSMutableArray array];
 	
@@ -114,6 +116,9 @@ Please send fixes to
 	[partyShuffleLib setName:NSLocalizedString(@"Party Shuffle", @"Party Shuffle")];
 	[partyShuffleLib setIconName:@"MBiTunesPartyShuffle"];
 	
+	[videoLib setName:NSLocalizedString(@"Videos", @"Videos")];
+	[videoLib setIconName:@"iTunesVideo"];
+	
 	[purchasedLib setName:NSLocalizedString(@"Purchased", @"Purchased")];
 	[purchasedLib setIconName:@"MBiTunesPurchasedPlaylist"];
 	
@@ -121,78 +126,116 @@ Please send fixes to
 	
 	for (x=0;x<playlistCount;x++)
 	{
-		NSDictionary *playlistRecord = [[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x];
-		NSString * objectName = [playlistRecord objectForKey:@"Name"];
-		
-		iMBLibraryNode *node = nil;
-		if ([playlistRecord objectForKey:@"Master"] && [[playlistRecord objectForKey:@"Master"] boolValue])
-		{
-			node = library;
-		}
-		else if ([playlistRecord objectForKey:@"Podcasts"] && [[playlistRecord objectForKey:@"Podcasts"] boolValue])
-		{
-			node = podcastLib;		
-		}
-		else if ([playlistRecord objectForKey:@"Party Shuffle"] && [[playlistRecord objectForKey:@"Party Shuffle"] boolValue])
-		{
-			node = partyShuffleLib;
-		}
-		else if ([playlistRecord objectForKey:@"Videos"] && [[playlistRecord objectForKey:@"Videos"] boolValue])
-		{
-			continue;
-		}
-		else if ([playlistRecord objectForKey:@"Purchased Music"] && [[playlistRecord objectForKey:@"Purchased Music"] boolValue])
-		{
-			node = purchasedLib;
-		}
-		else
-		{
-			node = [[iMBLibraryNode alloc] init];
-			[node setName:objectName];
-			if ([[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Smart Info"])
-			{
-				[node setIconName:@"photocast_folder"];
-				[smartPlaylists addObject:node];
-			}
-			else
-			{
-				[node setIconName:[self iconNameForPlaylist:[node name]]];
-				[root addItem:node];
-			}
-			[node release];
-		}
-		
 		NSMutableArray *newPlaylist = [NSMutableArray array];
 		NSArray *libraryItems = [[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Playlist Items"];
 		int i;
+		BOOL hasVideos = NO;
 		for (i=0; i<[libraryItems count]; i++)
 		{
 			NSDictionary * tracksDictionary = [musicLibrary objectForKey:@"Tracks"];
 			NSDictionary * newPlaylistContent = [tracksDictionary objectForKey:[[[libraryItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue]];
-			if ([newPlaylistContent objectForKey:@"Name"] && [[newPlaylistContent objectForKey:@"Location"] length] > 0)
+			if ([newPlaylistContent objectForKey:@"Name"] && 
+				[[newPlaylistContent objectForKey:@"Location"] length] > 0 &&
+				[newPlaylistContent objectForKey:@"Has Video"] && [[newPlaylistContent objectForKey:@"Has Video"] boolValue]) 
 			{
+				// only add video tracks
 				[newPlaylist addObject:newPlaylistContent];
+				hasVideos = YES;
 			}
 		}
-		[node setAttribute:newPlaylist forKey:@"Tracks"];
+		if (hasVideos)
+		{
+			NSDictionary *playlistRecord = [[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x];
+			NSString * objectName = [playlistRecord objectForKey:@"Name"];
+			
+			iMBLibraryNode *node = nil;
+			if ([playlistRecord objectForKey:@"Master"] && [[playlistRecord objectForKey:@"Master"] boolValue])
+			{
+				node = library;
+			}
+			else if ([playlistRecord objectForKey:@"Podcasts"] && [[playlistRecord objectForKey:@"Podcasts"] boolValue])
+			{
+				node = podcastLib;		
+			}
+			else if ([playlistRecord objectForKey:@"Party Shuffle"] && [[playlistRecord objectForKey:@"Party Shuffle"] boolValue])
+			{
+				node = partyShuffleLib;
+			}
+			else if ([playlistRecord objectForKey:@"Videos"] && [[playlistRecord objectForKey:@"Videos"] boolValue])
+			{
+				node = videoLib;
+			}
+			else if ([playlistRecord objectForKey:@"Purchased Music"] && [[playlistRecord objectForKey:@"Purchased Music"] boolValue])
+			{
+				node = purchasedLib;
+			}
+			else
+			{
+				node = [[iMBLibraryNode alloc] init];
+				[node setName:objectName];
+				if ([[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Smart Info"])
+				{
+					[node setIconName:@"photocast_folder"];
+					[smartPlaylists addObject:node];
+				}
+				else
+				{
+					[node setIconName:[self iconNameForPlaylist:[node name]]];
+					[root addItem:node];
+				}
+				[node release];
+			}
+			[node setAttribute:newPlaylist forKey:@"Tracks"];
+		}
 	}
-	[root insertItem:library atIndex:0];
-	[root insertItem:podcastLib atIndex:1];
-	[root insertItem:partyShuffleLib atIndex:2];
-	[root insertItem:purchasedLib atIndex:3];
+	BOOL libraryHasVideos = NO;
 	
-	//insert the smart playlist
-	int i;
-	for (i = 0; i < [smartPlaylists count]; i++)
+	if ([library attributeForKey:@"Tracks"]) // there is a least one video
 	{
-		[root insertItem:[smartPlaylists objectAtIndex:i] atIndex:4 + i];
+		[root insertItem:library atIndex:0];
+		libraryHasVideos = YES;
+		int idx = 1;
+		if ([podcastLib attributeForKey:@"Tracks"])
+		{
+			[root insertItem:podcastLib atIndex:idx];
+			idx++;
+		}
+		if ([videoLib attributeForKey:@"Tracks"])
+		{
+			[root insertItem:videoLib atIndex:idx];
+			idx++;
+		}
+		if ([partyShuffleLib attributeForKey:@"Tracks"])
+		{
+			[root insertItem:partyShuffleLib atIndex:idx];
+			idx++;
+		}
+		if ([purchasedLib attributeForKey:@"Tracks"])
+		{
+			[root insertItem:purchasedLib atIndex:idx];
+			idx++;
+		}
+		//insert the smart playlist
+		int i;
+		for (i = 0; i < [smartPlaylists count]; i++)
+		{
+			[root insertItem:[smartPlaylists objectAtIndex:i] atIndex:idx + i];
+		}
 	}
 	
 	[library release];
 	[podcastLib release];
 	[partyShuffleLib release];
 	
-	return [root autorelease];
+	if (libraryHasVideos)
+	{
+		return [root autorelease];
+	}
+	else
+	{
+		[root release];
+		return nil;
+	}
 }
 
 @end

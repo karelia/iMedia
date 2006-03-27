@@ -17,13 +17,7 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
- In the case of iMediaBrowse, in addition to the terms noted above, in any 
- application that uses iMediaBrowse, we ask that you give a small attribution to 
- the members of CocoaDev.com who had a part in developing the project. Including, 
- but not limited to, Jason Terhorst, Greg Hulands and Ben Dunton.
- 
- Greg doesn't really want acknowledgement he just want bug fixes as he has rewritten
- practically everything but the xml parsing stuff. Please send fixes to 
+Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
@@ -32,21 +26,12 @@
 #import "iMBLinksController.h"
 #import "iMBLibraryNode.h"
 
-@interface iMBLinksController (Private)
-
-- (void)setPlaylistController:(NSTreeController *)value;
-- (NSTreeController *)playlistController;
-
-@end
-
 @implementation iMBLinksController
-
 
 - (id)initWithPlaylistController:(NSTreeController *)ctrl
 {
-	if (self = [super init]) {
-		[self setPlaylistController:ctrl];
-		//[NSBundle loadNibNamed:@"Links" owner:self];
+	if (self = [super initWithPlaylistController:ctrl]) {
+		[NSBundle loadNibNamed:@"Links" owner:self];
 	}
 	return self;
 }
@@ -90,25 +75,6 @@ static NSImage *_toolbarIcon = nil;
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
 	
-}
-
-- (void)refresh
-{
-	
-}
-
-- (NSTreeController *)playlistController 
-{
-    return [[playlistController retain] autorelease];
-}
-
-- (void)setPlaylistController:(NSTreeController *)value 
-{
-    if (playlistController != value) 
-	{
-        [playlistController release];
-        playlistController = [value retain];
-    }
 }
 
 @end

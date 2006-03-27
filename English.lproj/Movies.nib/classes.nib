@@ -1,6 +1,8 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = iMBMovieView; LANGUAGE = ObjC; SUPERCLASS = iMBPhotoView; }, 
+        {CLASS = iMBPhotoView; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }, 
         {
             CLASS = moviesController; 
             LANGUAGE = ObjC; 

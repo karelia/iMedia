@@ -17,13 +17,7 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
- In the case of iMediaBrowse, in addition to the terms noted above, in any 
- application that uses iMediaBrowse, we ask that you give a small attribution to 
- the members of CocoaDev.com who had a part in developing the project. Including, 
- but not limited to, Jason Terhorst, Greg Hulands and Ben Dunton.
- 
- Greg doesn't really want acknowledgement he just want bug fixes as he has rewritten
- practically everything but the xml parsing stuff. Please send fixes to 
+Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  
@@ -49,6 +43,9 @@
 
 // the custom view below the outline view
 - (NSView *)browserView;
+
+// Give the browser an opportunity to do some setup before display
+- (void)willActivate;
 
 // if you preview media, etc and need to get notified to stop playing
 - (void)didDeactivate;

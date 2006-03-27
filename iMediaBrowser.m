@@ -17,13 +17,7 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
- In the case of iMediaBrowse, in addition to the terms noted above, in any 
- application that uses iMediaBrowse, we ask that you give a small attribution to 
- the members of CocoaDev.com who had a part in developing the project. Including, 
- but not limited to, Jason Terhorst, Greg Hulands and Ben Dunton.
- 
- Greg doesn't really want acknowledgement he just want bug fixes as he has rewritten
- practically everything but the xml parsing stuff. Please send fixes to 
+Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  
@@ -79,7 +73,7 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		NSBundle *b = [NSBundle bundleWithPath:cur];
 		Class mainClass = [b principalClass];
-		if ([mainClass conformsToProtocol:@protocol(iMediaBrowser)])
+		if ([mainClass conformsToProtocol:@protocol(iMediaBrowser)] || [mainClass conformsToProtocol:@protocol(iMBParser)])
 		{
 			if (![b load])
 			{
@@ -87,6 +81,10 @@ static NSMutableDictionary *_parsers = nil;
 				continue;
 			}
 			[self registerBrowser:mainClass];
+		}
+		else
+		{
+			NSLog(@"Plugin located at: %@ does not implement either of the required protocols", cur);
 		}
 	}
 	
@@ -147,6 +145,9 @@ static NSMutableDictionary *_parsers = nil;
 	}
 }
 
+#pragma mark -
+#pragma mark Instance Methods
+
 - (id)init
 {
 	if (self = [super initWithWindowNibName:@"MediaBrowser"]) {
@@ -176,6 +177,9 @@ static NSMutableDictionary *_parsers = nil;
 	[myToolbar setAllowsUserCustomization:NO];
 	[myToolbar setShowsBaselineSeparator:YES];
 	[myToolbar setSizeMode:NSToolbarSizeModeSmall];
+	
+	// Load any plugins so they register
+	
 	
 	NSEnumerator *e = [_browserClasses objectEnumerator];
 	NSString *cur;
@@ -228,6 +232,9 @@ static NSMutableDictionary *_parsers = nil;
 	}
 	[[self window] setDelegate:self];
 	[oPlaylists setDataSource:self];
+	[oPlaylists setAllowsColumnReordering:NO];
+	[oPlaylists setSortDescriptors:nil];
+	[libraryController setSortDescriptors:nil];
 }
 
 - (id <iMediaBrowser>)browserForClassName:(NSString *)name
@@ -260,6 +267,7 @@ static NSMutableDictionary *_parsers = nil;
 			//remove old view
 			[mySelectedBrowser didDeactivate];
 			[[mySelectedBrowser browserView] removeFromSuperview];
+			[browser willActivate];
 			[view setFrame:[oBrowserView bounds]];
 			[oBrowserView addSubview:[view retain]];
 			mySelectedBrowser = browser;
@@ -309,6 +317,8 @@ static NSMutableDictionary *_parsers = nil;
 			[myLoadedParsers setObject:parser forKey:cur];
 			[parser release];
 		}
+		//set the browser the parser is in
+		[parser setBrowser:mySelectedBrowser];
 		
 		iMBLibraryNode *library = [parser library];
 		if (library) // it is possible for a parser to return nil if the db for it doesn't exist

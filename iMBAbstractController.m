@@ -20,34 +20,72 @@
 Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
+ 
  */
 
-#import <Cocoa/Cocoa.h>
 #import "iMBAbstractController.h"
+#import "iMBLibraryNode.h"
 
-@class QTMovieView, iMBDNDArrayController;
+@implementation iMBAbstractController
 
-@interface iMBMusicController : iMBAbstractController
+- (id)initWithPlaylistController:(NSTreeController *)ctrl
 {
-	IBOutlet NSTextField *counterField;
-	IBOutlet NSButton * playButton;
-	IBOutlet NSSlider * progressIndicator;
-	IBOutlet NSTextField * clockDisplay;
-	IBOutlet NSSearchField *oSearch;
-	IBOutlet NSTableView  *table;
-	IBOutlet QTMovieView *oAudioPlayer;
-	IBOutlet iMBDNDArrayController *songsController;
-	
-	@private
-		NSNumber *clockTime;
-		NSTimer * pollTimer;
+	if (self = [super init])
+	{
+		myController = [ctrl retain];
+	}
+	return self;
 }
 
-#pragma mark ACTIONS
-- (IBAction) playMovie: (id) sender;
-- (IBAction) stopMovie: (id) sender;
-- (IBAction) scrubAudio: (id) sender;
-@end
+- (void)dealloc
+{
+	[myController release];
+	[super dealloc];
+}
 
-extern const NSTimeInterval	k_Scrub_Slider_Update_Interval;
-extern const double			k_Scrub_Slider_Minimum;
+- (NSString *)mediaType
+{
+	return nil;
+}
+
+- (NSImage *)toolbarIcon
+{
+	return nil;
+}
+
+- (NSString *)name
+{
+	return nil;
+}
+
+- (NSView *)browserView
+{
+	return oView;
+}
+
+- (void)willActivate
+{
+	
+}
+
+- (void)didDeactivate
+{
+	
+}
+
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+{
+	
+}
+
+- (void)refresh
+{
+	[myController rearrangeObjects];
+}
+
+- (NSTreeController *)controller
+{
+	return [[myController retain] autorelease];
+}
+
+@end

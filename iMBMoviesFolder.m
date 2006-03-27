@@ -17,13 +17,7 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
- In the case of iMediaBrowse, in addition to the terms noted above, in any 
- application that uses iMediaBrowse, we ask that you give a small attribution to 
- the members of CocoaDev.com who had a part in developing the project. Including, 
- but not limited to, Jason Terhorst, Greg Hulands and Ben Dunton.
- 
- Greg doesn't really want acknowledgement he just want bug fixes as he has rewritten
- practically everything but the xml parsing stuff. Please send fixes to 
+Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
@@ -94,7 +88,15 @@
 				//we want to cache the first frame of the movie here as we will be in a background thread
 				QTMovie *movie = [[QTMovie alloc] initWithURL:[NSURL fileURLWithPath:filePath] error:nil];
 				NSImage *thumb = [movie posterImage];
-				[newPicture setObject:thumb forKey:@"CachedThumb"];
+				if (thumb)
+				{
+					[newPicture setObject:thumb forKey:@"CachedThumb"];
+				}
+				else
+				{
+					[newPicture setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
+								   forKey:@"CachedThumb"];
+				}
 				[movie release];
 				[movies addObject:newPicture];
 			}

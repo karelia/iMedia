@@ -17,37 +17,17 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
 
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "iMBAbstractParser.h"
 
-@class QTMovieView, iMBDNDArrayController;
-
-@interface iMBMusicController : iMBAbstractController
+@interface iMBiTunesVideoParser : iMBAbstractParser 
 {
-	IBOutlet NSTextField *counterField;
-	IBOutlet NSButton * playButton;
-	IBOutlet NSSlider * progressIndicator;
-	IBOutlet NSTextField * clockDisplay;
-	IBOutlet NSSearchField *oSearch;
-	IBOutlet NSTableView  *table;
-	IBOutlet QTMovieView *oAudioPlayer;
-	IBOutlet iMBDNDArrayController *songsController;
-	
-	@private
-		NSNumber *clockTime;
-		NSTimer * pollTimer;
+
 }
 
-#pragma mark ACTIONS
-- (IBAction) playMovie: (id) sender;
-- (IBAction) stopMovie: (id) sender;
-- (IBAction) scrubAudio: (id) sender;
 @end
-
-extern const NSTimeInterval	k_Scrub_Slider_Update_Interval;
-extern const double			k_Scrub_Slider_Minimum;

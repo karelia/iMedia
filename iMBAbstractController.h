@@ -20,34 +20,21 @@
 Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
+ 
  */
 
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "iMediaBrowser.h"
 
-@class QTMovieView, iMBDNDArrayController;
-
-@interface iMBMusicController : iMBAbstractController
+@interface iMBAbstractController : NSObject <iMediaBrowser>
 {
-	IBOutlet NSTextField *counterField;
-	IBOutlet NSButton * playButton;
-	IBOutlet NSSlider * progressIndicator;
-	IBOutlet NSTextField * clockDisplay;
-	IBOutlet NSSearchField *oSearch;
-	IBOutlet NSTableView  *table;
-	IBOutlet QTMovieView *oAudioPlayer;
-	IBOutlet iMBDNDArrayController *songsController;
-	
+	IBOutlet NSView *oView;
+
 	@private
-		NSNumber *clockTime;
-		NSTimer * pollTimer;
+		NSTreeController *myController;
 }
 
-#pragma mark ACTIONS
-- (IBAction) playMovie: (id) sender;
-- (IBAction) stopMovie: (id) sender;
-- (IBAction) scrubAudio: (id) sender;
-@end
+- (id)initWithPlaylistController:(NSTreeController *)ctrl;
+- (NSTreeController *)controller;
 
-extern const NSTimeInterval	k_Scrub_Slider_Update_Interval;
-extern const double			k_Scrub_Slider_Minimum;
+@end

@@ -17,13 +17,7 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
- In the case of iMediaBrowse, in addition to the terms noted above, in any 
- application that uses iMediaBrowse, we ask that you give a small attribution to 
- the members of CocoaDev.com who had a part in developing the project. Including, 
- but not limited to, Jason Terhorst, Greg Hulands and Ben Dunton.
- 
- Greg doesn't really want acknowledgement he just want bug fixes as he has rewritten
- practically everything but the xml parsing stuff. Please send fixes to 
+Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
@@ -33,6 +27,7 @@
 #import "iMBDNDArrayController.h"
 #import "iTunesValueTransformer.h"
 #import "TimeValueTransformer.h"
+#import "iMBLibraryNode.h"
 
 #import <QTKit/QTKit.h>
 #import <QTKit/QTMovieView.h>
@@ -68,28 +63,17 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 
 - (id) initWithPlaylistController:(NSTreeController*)ctrl
 {
-	if (self = [super init]) {
-		[self setPlaylistController:ctrl];
+	if (self = [super initWithPlaylistController:ctrl]) {
 		[NSBundle loadNibNamed:@"iTunes" owner:self];
 	}
 	return self;
-}
-
-- (void)dealloc
-{	
-	[playlistController release];
-	[super dealloc];
-}
-
-- (void) awakeFromNib
-{	
 }
 
 #pragma mark Protocol Methods
 
 static NSImage *_toolbarIcon = nil;
 
-- (NSImage*)toolbarIcon
+- (NSImage *)toolbarIcon
 {
 	if(_toolbarIcon == nil)
 	{
@@ -110,23 +94,12 @@ static NSImage *_toolbarIcon = nil;
 	return NSLocalizedString(@"Audio", @"Audio");
 }
 
-- (NSView *)browserView
-{
-	return oView;
-}
-
 - (void)didDeactivate
 {
 	[oAudioPlayer pause:self];
 }
 
-
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
-{
-	
-}
-
-- (void)refresh
 {
 	
 }
@@ -218,19 +191,6 @@ static NSImage *_playImage = nil;
 		[progressIndicator setDoubleValue: GetMovieTime([(QTMovie *)[oAudioPlayer movie] quickTimeMovie], NULL)];
 		[self setClockTime:[NSNumber numberWithInt:GetMovieTime([(QTMovie *)[oAudioPlayer movie] quickTimeMovie], NULL)]];
 	}
-}
-
-#pragma mark -
-#pragma mark Accessors
-- (NSTreeController *)playlistController {
-    return [[playlistController retain] autorelease];
-}
-
-- (void)setPlaylistController:(NSTreeController *)value {
-    if (playlistController != value) {
-        [playlistController release];
-        playlistController = [value retain];
-    }
 }
 
 - (NSNumber *)clockTime {

@@ -17,37 +17,40 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
+ 
+ This file was Authored by Greg Hulands
+ 
  */
 
-#import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "iMBMovieView.h"
+#import <QTKit/QTKit.h>
 
-@class QTMovieView, iMBDNDArrayController;
+@implementation iMBMovieView
 
-@interface iMBMusicController : iMBAbstractController
+- (void)previewMovie:(NSString *)path inRect:(NSRect)rect
 {
-	IBOutlet NSTextField *counterField;
-	IBOutlet NSButton * playButton;
-	IBOutlet NSSlider * progressIndicator;
-	IBOutlet NSTextField * clockDisplay;
-	IBOutlet NSSearchField *oSearch;
-	IBOutlet NSTableView  *table;
-	IBOutlet QTMovieView *oAudioPlayer;
-	IBOutlet iMBDNDArrayController *songsController;
-	
-	@private
-		NSNumber *clockTime;
-		NSTimer * pollTimer;
+	if (!myPreview)
+	{
+		myPreview = [[QTMovieView alloc] initWithFrame:rect];
+		[self addSubview:myPreview];
+	}
+	[myPreview pause:self];
+	QTMovie *movie = [QTMovie movieWithFile:path error:nil];
+	[myPreview setMovie:movie];
+	[myPreview play:self];
 }
 
-#pragma mark ACTIONS
-- (IBAction) playMovie: (id) sender;
-- (IBAction) stopMovie: (id) sender;
-- (IBAction) scrubAudio: (id) sender;
-@end
+- (IBAction)play:(id)sender
+{
+	
+}
 
-extern const NSTimeInterval	k_Scrub_Slider_Update_Interval;
-extern const double			k_Scrub_Slider_Minimum;
+- (IBAction)stop:(id)sender
+{
+	
+}
+
+@end
