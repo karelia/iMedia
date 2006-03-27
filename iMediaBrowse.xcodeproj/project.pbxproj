@@ -108,8 +108,6 @@
 		D9659A3709A6A9680079ED9A /* Library.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659A3509A6A9680079ED9A /* Library.m */; };
 		D9659C1109A6CB450079ED9A /* LibraryItemsValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */; };
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
-		D9659F3409A6F36E0079ED9A /* iTunesValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D9659F3209A6F36E0079ED9A /* iTunesValueTransformer.h */; };
-		D9659F3509A6F36E0079ED9A /* iTunesValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659F3309A6F36E0079ED9A /* iTunesValueTransformer.m */; };
 		D98B7C6909AD49B500EAA95E /* MBiMovie.png in Resources */ = {isa = PBXBuildFile; fileRef = D98B7C6509AD499600EAA95E /* MBiMovie.png */; };
 		D98B7C6A09AD49B500EAA95E /* MBiTunes.png in Resources */ = {isa = PBXBuildFile; fileRef = D98B7C6609AD499600EAA95E /* MBiTunes.png */; };
 		D9B3EA6609A3F8AB00835FE4 /* iMBDNDArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = D9B3EA5C09A3F82B00835FE4 /* iMBDNDArrayController.h */; };
@@ -273,8 +271,6 @@
 		D9659A3509A6A9680079ED9A /* Library.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Library.m; sourceTree = "<group>"; };
 		D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryItemsValueTransformer.h; sourceTree = "<group>"; };
 		D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LibraryItemsValueTransformer.m; sourceTree = "<group>"; };
-		D9659F3209A6F36E0079ED9A /* iTunesValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesValueTransformer.h; sourceTree = "<group>"; };
-		D9659F3309A6F36E0079ED9A /* iTunesValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iTunesValueTransformer.m; sourceTree = "<group>"; };
 		D98B7C6509AD499600EAA95E /* MBiMovie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiMovie.png; sourceTree = "<group>"; };
 		D98B7C6609AD499600EAA95E /* MBiTunes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiTunes.png; sourceTree = "<group>"; };
 		D9B3EA5C09A3F82B00835FE4 /* iMBDNDArrayController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBDNDArrayController.h; sourceTree = "<group>"; };
@@ -500,8 +496,6 @@
 			children = (
 				D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */,
 				D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */,
-				D9659F3209A6F36E0079ED9A /* iTunesValueTransformer.h */,
-				D9659F3309A6F36E0079ED9A /* iTunesValueTransformer.m */,
 				D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */,
 				D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */,
 			);
@@ -572,7 +566,6 @@
 				792BFD93098066A50004D656 /* iMBPhotoView.h in Headers */,
 				D9659A3609A6A9680079ED9A /* Library.h in Headers */,
 				D9659C1109A6CB450079ED9A /* LibraryItemsValueTransformer.h in Headers */,
-				D9659F3409A6F36E0079ED9A /* iTunesValueTransformer.h in Headers */,
 				D94D1B4109A7A71500CD2946 /* TimeValueTransformer.h in Headers */,
 				795D6F5109D35B77005F166D /* iMBLinksController.h in Headers */,
 				795D70E109D39D73005F166D /* iMBLibraryNode.h in Headers */,
@@ -783,7 +776,6 @@
 				792BFD94098066A50004D656 /* iMBPhotoView.m in Sources */,
 				D9659A3709A6A9680079ED9A /* Library.m in Sources */,
 				D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */,
-				D9659F3509A6F36E0079ED9A /* iTunesValueTransformer.m in Sources */,
 				D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */,
 				795D6F5209D35B77005F166D /* iMBLinksController.m in Sources */,
 				795D70E209D39D73005F166D /* iMBLibraryNode.m in Sources */,

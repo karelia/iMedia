@@ -87,7 +87,7 @@ Please send fixes to
 				[newPicture setObject:[fileAttribs valueForKey:NSFileModificationDate] forKey:@"DateAsTimerInterval"];
 				//we want to cache the first frame of the movie here as we will be in a background thread
 				QTMovie *movie = [[QTMovie alloc] initWithURL:[NSURL fileURLWithPath:filePath] error:nil];
-				NSImage *thumb = [movie posterImage];
+				NSImage *thumb = [movie currentFrameImage];
 				if (thumb)
 				{
 					[newPicture setObject:thumb forKey:@"CachedThumb"];

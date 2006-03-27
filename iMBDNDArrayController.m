@@ -51,159 +51,22 @@ static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
 
 - (void)awakeFromNib
 {
-    // register for drag and drop
-    [tableView registerForDraggedTypes:
-		[NSArray arrayWithObjects:CopiedRowsType, MovedRowsType, NSURLPboardType, NSFilenamesPboardType, nil]];
     [tableView setAllowsMultipleSelection:YES];
 	[super awakeFromNib];
 }
-
-
-#warning -- THIS IS QUITE BROKEN.  WHY ARE WE DECLARING NSTabularTextPboardType ?
-#warning -- WHY ARE WE DECLARING NSFilenamesPboardType BUT NOT PUTTING THE FILE PATH ON IT -- BREAKS FOR SANDVOX.
-#warning -- WHY ARE WE NOT ALLOWING MULTIPLE ITEMS DRAGGED AS A URL / FILE LIST?
 
 - (BOOL)tableView:(NSTableView *)tv
 		writeRows:(NSArray*)rows
 	 toPasteboard:(NSPasteboard*)pboard
 {
-	// declare our own pasteboard types
-    NSArray *typesArray = [NSArray arrayWithObjects:CopiedRowsType, MovedRowsType, NSTabularTextPboardType, NSFilenamesPboardType, nil];
-	
-	/*
-	 If the number of rows is not 1, then we only support our own types.
-	 If there is just one row, then try to create an NSURL from the url
-	 value in that row.  If that's possible, add NSURLPboardType to the
-	 list of supported types, and add the NSURL to the pasteboard.
-	 */
-	if ([rows count] != 1)
+	if ([myDelegate respondsToSelector:@selector(tableView:writeRows:toPasteboard:)])
 	{
-		[pboard declareTypes:typesArray owner:self];
+		return [myDelegate tableView:tv writeRows:rows toPasteboard:pboard];
 	}
-	else
-	{
-		// Try to create an URL
-		// If we can, add NSURLPboardType to the declared types and write
-		//the URL to the pasteboard; otherwise declare existing types
-		int row = [[rows objectAtIndex:0] intValue];
-		NSURL *url = [NSURL fileURLWithPath:[[[self arrangedObjects] objectAtIndex:row] valueForKey:@"Location"]];
-
-		if (url)
-		{
-			typesArray = [typesArray arrayByAddingObject:NSURLPboardType];	
-			[pboard declareTypes:typesArray owner:self];
-			[url writeToPasteboard:pboard];	
-		}
-		else
-		{
-			[pboard declareTypes:typesArray owner:self];
-		}
-	}
-	
-    // add rows array for local move
-    [pboard setPropertyList:rows forType:MovedRowsType];
-	
-	// create new array of selected rows for remote drop
-    // could do deferred provision, but keep it direct for clarity
-	NSMutableArray *rowCopies = [NSMutableArray arrayWithCapacity:[rows count]];    
-	NSEnumerator *rowEnumerator = [rows objectEnumerator];
-	NSNumber *idx;
-	while (idx = [rowEnumerator nextObject])
-	{
-		[rowCopies addObject:[[self arrangedObjects] objectAtIndex:[idx intValue]]];
-	}
-	// setPropertyList works here because we're using dictionaries, strings,
-	// and dates; otherwise, archive collection to NSData...
-	[pboard setPropertyList:rowCopies forType:CopiedRowsType];
-	
-    return YES;
+	return NO;
 }
 
-
-- (NSDragOperation)tableView:(NSTableView*)tv
-				validateDrop:(id <NSDraggingInfo>)info
-				 proposedRow:(int)row
-	   proposedDropOperation:(NSTableViewDropOperation)op
-{
-    
-    NSDragOperation dragOp = NSDragOperationCopy;
-    
-    // if drag source is self, it's a move
-    if ([info draggingSource] == tableView)
-	{
-		dragOp =  NSDragOperationMove;
-    }
-    // we want to put the object at, not over,
-    // the current row (contrast NSTableViewDropOn) 
-    [tv setDropRow:row dropOperation:NSTableViewDropAbove];
-	
-    return dragOp;
-}
-
-
-
-- (BOOL)tableView:(NSTableView*)tv
-	   acceptDrop:(id <NSDraggingInfo>)info
-			  row:(int)row
-	dropOperation:(NSTableViewDropOperation)op
-{
-    if (row < 0)
-	{
-		row = 0;
-	}
-    
-    // if drag source is self, it's a move
-    if ([info draggingSource] == tableView)
-    {
-		NSArray *rows = [[info draggingPasteboard] propertyListForType:MovedRowsType];
-		NSIndexSet  *indexSet = [self indexSetFromRows:rows];
-		
-		[self moveObjectsInArrangedObjectsFromIndexes:indexSet toIndex:row];
-		
-		// set selected rows to those that were just moved
-		// Need to work out what moved where to determine proper selection...
-		int rowsAbove = [self rowsAboveRow:row inIndexSet:indexSet];
-		
-		NSRange range = NSMakeRange(row - rowsAbove, [indexSet count]);
-		indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
-		[self setSelectionIndexes:indexSet];
-		
-		return YES;
-    }
-	
-	// Can we get rows from another document?  If so, add them, then return.
-	NSArray *newRows = [[info draggingPasteboard] propertyListForType:CopiedRowsType];
-	if (newRows)
-	{
-		NSRange range = NSMakeRange(row, [newRows count]);
-		NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
-		
-		[self insertObjects:newRows atArrangedObjectIndexes:indexSet];
-		// set selected rows to those that were just copied
-		[self setSelectionIndexes:indexSet];
-		return YES;
-    }
-	
-	// Can we get an URL?  If so, add a new row, configure it, then return.
-	NSURL *url = [NSURL URLFromPasteboard:[info draggingPasteboard]];
-	if (url)
-	{
-		id newObj = [self newObject];	
-		[self insertObject:newObj atArrangedObjectIndex:row];
-		// "new" -- returned with retain count of 1
-		[newObj release];
-		[newObj takeValue:[url absoluteString] forKey:@"url"];
-		[newObj takeValue:[NSCalendarDate date] forKey:@"date"];
-		// set selected rows to those that were just copied
-		[self setSelectionIndex:row];
-		return YES;		
-	}
-    return NO;
-}
-
-
-
--(void) moveObjectsInArrangedObjectsFromIndexes:(NSIndexSet*)indexSet
+- (void) moveObjectsInArrangedObjectsFromIndexes:(NSIndexSet*)indexSet
 										toIndex:(unsigned int)insertIndex
 {
 	
@@ -233,7 +96,6 @@ static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
     }
 }
 
-
 - (NSIndexSet *)indexSetFromRows:(NSArray *)rows
 {
     NSMutableIndexSet *indexSet = [NSMutableIndexSet indexSet];
@@ -245,7 +107,6 @@ static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
     }
     return indexSet;
 }
-
 
 - (int)rowsAboveRow:(int)row inIndexSet:(NSIndexSet *)indexSet
 {
@@ -287,6 +148,16 @@ static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
         [searchString release];
         searchString = [value copy];
     }
+}
+
+- (void)setDelegate:(id)delegate
+{
+	myDelegate = delegate;
+}
+
+- (id)delegate
+{
+	return myDelegate;
 }
 
 // Set default values, and keep reference to new object -- see arrangeObjects:
@@ -351,4 +222,5 @@ static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
     }
     return [super arrangeObjects:matchedObjects];
 }
+
 @end

@@ -139,7 +139,21 @@
 				[newPlaylistContent objectForKey:@"Has Video"] && [[newPlaylistContent objectForKey:@"Has Video"] boolValue]) 
 			{
 				// only add video tracks
-				[newPlaylist addObject:newPlaylistContent];
+				NSMutableDictionary *movieRec = [NSMutableDictionary dictionaryWithDictionary:newPlaylistContent];
+				QTMovie *movie = [[QTMovie alloc] initWithURL:[NSURL fileURLWithPath:[newPlaylistContent objectForKey:@"Location"]] error:nil];
+				NSImage *thumb = [movie currentFrameImage];
+				if (thumb)
+				{
+					[movieRec setObject:thumb forKey:@"CachedThumb"];
+				}
+				else
+				{
+					[movieRec setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
+								   forKey:@"CachedThumb"];
+				}
+				[movie release];
+				
+				[newPlaylist addObject:movieRec];
 				hasVideos = YES;
 			}
 		}
@@ -185,32 +199,32 @@
 				}
 				[node release];
 			}
-			[node setAttribute:newPlaylist forKey:@"Tracks"];
+			[node setAttribute:newPlaylist forKey:@"Movies"];
 		}
 	}
 	BOOL libraryHasVideos = NO;
 	
-	if ([library attributeForKey:@"Tracks"]) // there is a least one video
+	if ([library attributeForKey:@"Movies"]) // there is a least one video
 	{
 		[root insertItem:library atIndex:0];
 		libraryHasVideos = YES;
 		int idx = 1;
-		if ([podcastLib attributeForKey:@"Tracks"])
+		if ([podcastLib attributeForKey:@"Movies"])
 		{
 			[root insertItem:podcastLib atIndex:idx];
 			idx++;
 		}
-		if ([videoLib attributeForKey:@"Tracks"])
+		if ([videoLib attributeForKey:@"Movies"])
 		{
 			[root insertItem:videoLib atIndex:idx];
 			idx++;
 		}
-		if ([partyShuffleLib attributeForKey:@"Tracks"])
+		if ([partyShuffleLib attributeForKey:@"Movies"])
 		{
 			[root insertItem:partyShuffleLib atIndex:idx];
 			idx++;
 		}
-		if ([purchasedLib attributeForKey:@"Tracks"])
+		if ([purchasedLib attributeForKey:@"Movies"])
 		{
 			[root insertItem:purchasedLib atIndex:idx];
 			idx++;

@@ -166,7 +166,7 @@ Please send fixes to
 			hasMovies = YES;
 			[newPhotolist addObject:imageRecord];
 			QTMovie *movie = [[QTMovie alloc] initWithURL:[NSURL fileURLWithPath:[imageRecord objectForKey:@"ImagePath"]] error:nil];
-			NSImage *thumb = [movie posterImage];
+			NSImage *thumb = [movie currentFrameImage];
 			if (thumb)
 			{
 				[imageRecord setObject:thumb forKey:@"CachedThumb"];

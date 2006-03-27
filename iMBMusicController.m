@@ -25,7 +25,6 @@ Please send fixes to
 #import "iMBMusicController.h"
 #import "iMediaBrowser.h"
 #import "iMBDNDArrayController.h"
-#import "iTunesValueTransformer.h"
 #import "TimeValueTransformer.h"
 #import "iMBLibraryNode.h"
 
@@ -52,9 +51,6 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	id itunesValueTransformer = [[[iTunesValueTransformer alloc] init] autorelease];
-	[NSValueTransformer setValueTransformer:itunesValueTransformer forName:@"itunesValueTransformer"];
-	
 	id timeValueTransformer = [[[TimeValueTransformer alloc] init] autorelease];
 	[NSValueTransformer setValueTransformer:timeValueTransformer forName:@"timeValueTransformer"];
 	
@@ -67,6 +63,11 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 		[NSBundle loadNibNamed:@"iTunes" owner:self];
 	}
 	return self;
+}
+
+- (void)awakeFromNib
+{
+	[songsController setDelegate:self];
 }
 
 #pragma mark Protocol Methods
@@ -101,7 +102,66 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
+	// we don't want to overwrite any other existing types on the pboard
+	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
+	[types addObject:NSFilenamesPboardType];
+	//[types addObject:@"ImageDataListPboardType"];
+	[types addObject:NSURLPboardType];
 	
+	[pboard declareTypes:types
+				   owner:nil];
+	
+	NSEnumerator *e = [[playlist attributeForKey:@"Tracks"] objectEnumerator];
+	NSNumber *cur;
+	NSMutableArray *files = [NSMutableArray array];
+	NSMutableArray *urls = [NSMutableArray array];
+	
+	while (cur = [e nextObject])
+	{
+		NSString *loc = [cur objectForKey:@"Location"];
+		
+		NSURL *url = [NSURL URLWithString:loc];
+		
+		[files addObject:[url path]];
+		[urls addObject:url];
+	}
+	[pboard setPropertyList:files forType:NSFilenamesPboardType];
+	[pboard setPropertyList:urls forType:NSURLPboardType];
+}
+
+- (BOOL)tableView:(NSTableView *)tv
+		writeRows:(NSArray*)rows
+	 toPasteboard:(NSPasteboard*)pboard
+{
+	// we don't want to overwrite any other existing types on the pboard
+	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
+	[types addObject:NSFilenamesPboardType];
+	//[types addObject:@"ImageDataListPboardType"];
+	[types addObject:NSURLPboardType];
+	
+	[pboard declareTypes:types
+				   owner:nil];
+	
+	NSArray *content = [songsController arrangedObjects];
+	NSEnumerator *e = [rows objectEnumerator];
+	NSNumber *cur;
+	NSMutableArray *files = [NSMutableArray array];
+	NSMutableArray *urls = [NSMutableArray array];
+	
+	while (cur = [e nextObject])
+	{
+		NSDictionary *song = [content objectAtIndex:[cur unsignedIntValue]];
+		NSString *loc = [song objectForKey:@"Location"];
+		
+		NSURL *url = [NSURL URLWithString:loc];
+		
+		[files addObject:[url path]];
+		[urls addObject:url];
+	}
+	[pboard setPropertyList:files forType:NSFilenamesPboardType];
+	[pboard setPropertyList:urls forType:NSURLPboardType];
+	
+	return YES;
 }
 
 static NSImage *_playing = nil;

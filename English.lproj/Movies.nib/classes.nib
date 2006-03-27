@@ -6,7 +6,7 @@
         {
             CLASS = moviesController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {counterField = NSTextField; oView = NSView; previewMovieView = QTMovieView; }; 
+            OUTLETS = {counterField = NSTextField; oView = NSView; previewMovieView = iMBMovieView; }; 
             SUPERCLASS = NSObject; 
         }
     ); 

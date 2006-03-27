@@ -31,10 +31,16 @@ Please send fixes to
 	
 	@private
 		id newObject;
+		id myDelegate;
 }
+
 #pragma mark ACCESSORS
 - (NSString *)searchString;
 - (void)setSearchString:(NSString *)value;
+
+// The delegate needs to implement tableView:writeRows:toPasteboard: of NSTableDataSource protocol to handle drags
+- (void)setDelegate:(id)delegate;
+- (id)delegate;
 
 #pragma mark ACTIONS
 - (IBAction)search:(id)sender;

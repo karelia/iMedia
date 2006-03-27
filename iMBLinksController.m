@@ -74,7 +74,21 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
+	// we don't want to overwrite any other existing types on the pboard
+	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
+	[types addObject:NSURLPboardType];
 	
+	[pboard declareTypes:types
+				   owner:nil];
+	NSMutableArray *urls = [NSMutableArray array];
+	NSEnumerator *e = [[playlist attributeForKey:@"Links"] objectEnumerator];
+	NSDictionary *cur;
+	
+	while (cur = [e nextObject])
+	{
+		[urls addObject:[NSURL URLWithString:[cur objectForKey:@"URL"]]];
+	}
+	[pboard setPropertyList:urls forType:NSURLPboardType];
 }
 
 @end
