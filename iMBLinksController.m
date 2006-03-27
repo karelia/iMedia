@@ -124,18 +124,32 @@ static NSImage *_toolbarIcon = nil;
 	// we don't want to overwrite any other existing types on the pboard
 	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
 	[types addObject:NSURLPboardType];
+	[types addObject:@"WebURLsWithTitlesPboardType"]; // a type that Safari declares
 	
 	[pboard declareTypes:types
 				   owner:nil];
 	NSMutableArray *urls = [NSMutableArray array];
+	// for WebURLsWithTitlesPboardType
+    NSMutableArray *URLsWithTitles = [NSMutableArray array];
+    NSMutableArray *URLsAsStrings = [NSMutableArray array];
+    NSMutableArray *titles = [NSMutableArray array];
+	
 	NSEnumerator *e = [[playlist attributeForKey:@"Links"] objectEnumerator];
 	NSDictionary *cur;
 	
 	while (cur = [e nextObject])
 	{
-		[urls addObject:[NSURL URLWithString:[cur objectForKey:@"URL"]]];
+		NSString *loc = [cur objectForKey:@"URL"];
+		
+		[urls addObject:[NSURL URLWithString:loc]];
+		
+		[URLsAsStrings addObject:loc];
+        [titles addObject:[cur objectForKey:@"Name"]];
 	}
 	[pboard setPropertyList:urls forType:NSURLPboardType];
+	[URLsWithTitles insertObject:URLsAsStrings atIndex:0];
+    [URLsWithTitles insertObject:titles atIndex:1];
+    [pboard setPropertyList:URLsWithTitles forType:@"WebURLsWithTitlesPboardType"];
 }
 
 - (IBAction)openInBrowser:(id)sender
