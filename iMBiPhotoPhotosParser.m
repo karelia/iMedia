@@ -157,7 +157,8 @@ Please send fixes to
 		while (key = [pictureItemsEnum nextObject])
 		{
 			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
-			if (![[imageRecord objectForKey:@"MediaType"] isEqualToString:@"Image"])
+			
+			if ([imageRecord objectForKey:@"MediaType"] && ![[imageRecord objectForKey:@"MediaType"] isEqualToString:@"Image"])
 			{
 				continue;
 			}
