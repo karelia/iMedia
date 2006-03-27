@@ -84,7 +84,7 @@ Please send fixes to
 				[newPicture setObject:filePath forKey:@"ImagePath"];
 				[newPicture setObject:[filePath lastPathComponent] forKey:@"Caption"];
 				[newPicture setObject:filePath forKey:@"ThumbPath"];
-				[newPicture setObject:[fileAttribs valueForKey:NSFileModificationDate] forKey:@"DateAsTimerInterval"];
+				[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimerInterval"];
 				//we want to cache the first frame of the movie here as we will be in a background thread
 				QTMovie *movie = [[QTMovie alloc] initWithURL:[NSURL fileURLWithPath:filePath] error:nil];
 				NSImage *thumb = [movie currentFrameImage];
@@ -102,6 +102,7 @@ Please send fixes to
 			}
 		}
 	}
+	[root setAttribute:movies forKey:@"Movies"];
 }
 
 - (iMBLibraryNode *)parseDatabase
