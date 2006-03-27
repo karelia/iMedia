@@ -119,6 +119,10 @@ Please send fixes to
 	
 	int playlistCount = [[musicLibrary objectForKey:@"Playlists"] count];
 	
+	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
+	NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
+	NSImage *songIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+	
 	for (x=0;x<playlistCount;x++)
 	{
 		NSDictionary *playlistRecord = [[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x];
@@ -168,14 +172,18 @@ Please send fixes to
 		for (i=0; i<[libraryItems count]; i++)
 		{
 			NSDictionary * tracksDictionary = [musicLibrary objectForKey:@"Tracks"];
-			NSDictionary * newPlaylistContent = [tracksDictionary objectForKey:[[[libraryItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue]];
+			NSMutableDictionary * newPlaylistContent = [NSMutableDictionary dictionaryWithDictionary:[tracksDictionary objectForKey:[[[libraryItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue]]];
 			if ([newPlaylistContent objectForKey:@"Name"] && [[newPlaylistContent objectForKey:@"Location"] length] > 0)
 			{
+				id nameWithIcon = [self name:[newPlaylistContent objectForKey:@"Name"]
+								   withImage:songIcon];
+				[newPlaylistContent setObject:nameWithIcon forKey:@"NameWithIcon"];
 				[newPlaylist addObject:newPlaylistContent];
 			}
 		}
 		[node setAttribute:newPlaylist forKey:@"Tracks"];
 	}
+	[songIcon release];
 	[root insertItem:library atIndex:0];
 	[root insertItem:podcastLib atIndex:1];
 	[root insertItem:partyShuffleLib atIndex:2];

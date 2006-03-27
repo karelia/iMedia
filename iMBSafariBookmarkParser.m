@@ -99,14 +99,17 @@
 			WebHistoryItem *web = [[WebHistoryItem alloc] initWithURLString:[item objectForKey:@"URLString"]
 																	  title:[[item objectForKey:@"URIDictionary"] objectForKey:@"title"]
 													lastVisitedTimeInterval:60];
-			NSImage *icon = [web icon];
+			NSImage *icon = [[NSImage alloc] initWithData:[[web icon] TIFFRepresentation]];
 			if (icon)
 			{
 				[link setObject:icon forKey:@"Icon"];
 			}
+			id nameWithIcon = [self name:[[cur objectForKey:@"URIDictionary"] objectForKey:@"title"]
+							   withImage:icon];
+			[link setObject:nameWithIcon forKey:@"NameWithIcon"];
+			[icon release];
 			[web release];
 			[links addObject:link];
-			NSLog(@"%@", link);
 		}
 	}
 	[parsed setAttribute:links forKey:@"Links"];

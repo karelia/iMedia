@@ -52,4 +52,7 @@ Please send fixes to
 - (void)watchFile:(NSString *)file;
 - (void)stopWatchingFile:(NSString *)file;
 
+// helper method to generate an attributed string with icon and name
+- (NSAttributedString *)name:(NSString *)name withImage:(NSImage *)image;
+
 @end

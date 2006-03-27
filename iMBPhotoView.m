@@ -729,6 +729,20 @@ static NSImage *_badge = nil;
 	return NO;
 }
 
+- (void)keyDown:(NSEvent *)theEvent
+{
+	[self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
+}
+
+- (void)selectAll:(id)sender
+{
+	[mySelectedCells removeAllObjects];
+	[mySelectedRects removeAllObjects];
+#warning This will only select all visible images in the scrollview's clip
+	[self selectCellsInRect:[self frame]];
+	[self setNeedsDisplay:YES];
+}
+
 #pragma mark -
 #pragma mark ACCESSORS & MUTATORS
 - (NSArray*)images

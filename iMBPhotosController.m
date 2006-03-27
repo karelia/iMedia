@@ -80,6 +80,7 @@ static NSImage *_toolbarIcon = nil;
 			toObject:[self controller] 
 		 withKeyPath:@"selection.Images" 
 			 options:nil];
+	[[oPhotoView window] makeFirstResponder:oPhotoView];
 }
 
 - (void)didDeactivate

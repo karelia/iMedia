@@ -36,6 +36,11 @@ Please send fixes to
 	return self;
 }
 
+- (void)awakeFromNib
+{
+	[oLinkController setDelegate:self];
+}
+
 - (NSString *)mediaType
 {
 	return @"links";
@@ -72,6 +77,35 @@ static NSImage *_toolbarIcon = nil;
 	
 }
 
+- (BOOL)tableView:(NSTableView *)tv
+		writeRows:(NSArray*)rows
+	 toPasteboard:(NSPasteboard*)pboard
+{
+	// we don't want to overwrite any other existing types on the pboard
+	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
+	[types addObject:NSURLPboardType];
+	
+	[pboard declareTypes:types
+				   owner:nil];
+	
+	NSArray *content = [oLinkController arrangedObjects];
+	NSEnumerator *e = [rows objectEnumerator];
+	NSNumber *cur;
+	NSMutableArray *urls = [NSMutableArray array];
+	
+	while (cur = [e nextObject])
+	{
+		NSDictionary *link = [content objectAtIndex:[cur unsignedIntValue]];
+		NSString *loc = [link objectForKey:@"URL"];
+		
+		NSURL *url = [NSURL URLWithString:loc];
+		[urls addObject:url];
+	}
+	[pboard setPropertyList:urls forType:NSURLPboardType];
+	
+	return YES;
+}
+
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
 	// we don't want to overwrite any other existing types on the pboard
@@ -89,6 +123,18 @@ static NSImage *_toolbarIcon = nil;
 		[urls addObject:[NSURL URLWithString:[cur objectForKey:@"URL"]]];
 	}
 	[pboard setPropertyList:urls forType:NSURLPboardType];
+}
+
+- (IBAction)openInBrowser:(id)sender
+{
+	NSEnumerator *e = [[oLinkController selectedObjects] objectEnumerator];
+	NSDictionary *cur;
+	
+	while (cur = [e nextObject])
+	{		
+		NSURL *url = [NSURL URLWithString:[cur objectForKey:@"URL"]];
+		[[NSWorkspace sharedWorkspace] openURL:url];
+	}
 }
 
 @end

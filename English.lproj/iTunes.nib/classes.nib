@@ -6,7 +6,7 @@
             ACTIONS = {search = id; }; 
             CLASS = iMBDNDArrayController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {newObject = id; tableView = NSTableView; }; 
+            OUTLETS = {myDelegate = id; newObject = id; tableView = NSTableView; }; 
             SUPERCLASS = NSArrayController; 
         }, 
         {
@@ -21,7 +21,7 @@
                 oView = NSView; 
                 playButton = NSButton; 
                 progressIndicator = NSSlider; 
-                songsController = DNDArrayController; 
+                songsController = iMBDNDArrayController; 
                 table = NSTableView; 
             }; 
             SUPERCLASS = NSObject; 
