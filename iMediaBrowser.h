@@ -56,7 +56,7 @@ Please send fixes to
 }
 
 + (id)sharedBrowser;
-+ (id)sharedBrowserWithoutLoading;
++ (id)sharedBrowserWithDelegate:(id)delegate;
 
 // Register Other types of Browsers
 + (void)registerBrowser:(Class)aClass;

@@ -98,9 +98,11 @@ static NSMutableDictionary *_parsers = nil;
 	return _sharedMediaBrowser;
 }
 
-+ (id)sharedBrowserWithoutLoading
++ (id)sharedBrowserWithDelegate:(id)delegate
 {
-	return _sharedMediaBrowser;
+	iMediaBrowser *imb = [self sharedBrowser];
+	[imb setDelegate:delegate];
+	return imb;
 }
 
 + (void)registerBrowser:(Class)aClass

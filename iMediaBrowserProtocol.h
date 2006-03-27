@@ -67,3 +67,4 @@ Please send fixes to
 - (void)setBrowser:(id <iMediaBrowser>)browser;
 
 @end
+
