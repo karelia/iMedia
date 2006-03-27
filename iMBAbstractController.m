@@ -88,4 +88,11 @@ Please send fixes to
 	return [[myController retain] autorelease];
 }
 
+- (void)postSelectionChangeNotification:(NSArray *)selectedObjects
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDidChangeNotification
+														object:self
+													  userInfo:[NSDictionary dictionaryWithObject:selectedObjects forKey:@"Selection"]];
+}
+
 @end

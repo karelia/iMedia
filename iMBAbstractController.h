@@ -36,5 +36,8 @@ Please send fixes to
 
 - (id)initWithPlaylistController:(NSTreeController *)ctrl;
 - (NSTreeController *)controller;
+- (void)willActivate;
+
+- (void)postSelectionChangeNotification:(NSArray *)selectedObjects;
 
 @end

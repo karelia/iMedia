@@ -95,8 +95,27 @@ static NSImage *_toolbarIcon = nil;
 	return NSLocalizedString(@"Audio", @"Audio");
 }
 
+- (void)setSelectionChanged:(id)val
+{
+	[self postSelectionChangeNotification:val];
+}
+
+- (id)selectionChanged
+{
+	return nil;
+}
+
+- (void)willActivate
+{
+	[self bind:@"selectionChanged" 
+	  toObject:songsController
+		 withKeyPath:@"selectedObjects" 
+	   options:nil];
+}
+
 - (void)didDeactivate
 {
+	[self unbind:@"selectionChanged"];
 	[oAudioPlayer pause:self];
 }
 
@@ -112,7 +131,7 @@ static NSImage *_toolbarIcon = nil;
 				   owner:nil];
 	
 	NSEnumerator *e = [[playlist attributeForKey:@"Tracks"] objectEnumerator];
-	NSNumber *cur;
+	NSDictionary *cur;
 	NSMutableArray *files = [NSMutableArray array];
 	NSMutableArray *urls = [NSMutableArray array];
 	

@@ -39,6 +39,8 @@ enum {
 	SelectionContinuous
 };
 
+extern NSString *iMediaBrowserSelectionDidChangeNotification;
+
 const NSTimeInterval kAutoScrollThreshold = 0.150;
 
 #pragma mark OMNI
@@ -702,6 +704,17 @@ static NSImage *_badge = nil;
 			[mySelectedCells addObject:cur];
 		}
 	}
+	NSMutableArray *selection = [NSMutableArray array];
+	e = [mySelectedCells objectEnumerator];
+	NSString *thumb;
+	
+	while (thumb = [e nextObject])
+	{
+		[selection addObject:[self recordForThumb:thumb]];
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDidChangeNotification
+														object:self
+													  userInfo:[NSDictionary dictionaryWithObject:selection forKey:@"Selection"]];
 }
 
 - (NSMutableArray *)mySelectedCells {

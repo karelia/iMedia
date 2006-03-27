@@ -76,6 +76,7 @@ Please send fixes to
 
 // This notification is for each specific media browser to post when their selection changes.
 // this is not a playlist/album change notification
+// the userInfo dictionary contains the selection with key Selection
 extern NSString *iMediaBrowserSelectionDidChangeNotification;
 
 @interface NSObject (iMediaBrowserDelegate)
