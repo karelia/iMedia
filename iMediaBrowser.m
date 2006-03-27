@@ -302,7 +302,7 @@ static NSMutableDictionary *_parsers = nil;
 			NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.");
 			continue;
 		}
-		if (myFlags.willLoadBrowser)
+		if (myFlags.willUseParser)
 		{
 			if (![myDelegate iMediaBrowser:self willUseMediaParser:cur forMediaType:[mySelectedBrowser mediaType]])
 			{
@@ -359,7 +359,10 @@ static NSMutableDictionary *_parsers = nil;
 	myFlags.willUseParser = [delegate respondsToSelector:@selector(iMediaBrowser:willUseMediaParser:forMediaType:)];
 	myFlags.didUseParser = [delegate respondsToSelector:@selector(iMediaBrowser:didUseMediaParser:forMediaType:)];
 	myFlags.willChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];
+#warning the "willChangeBrowser" is never used, somebody needs to call iMediaBrowser:willChangeBrowser:
+	
 	myFlags.didChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
+#warning the "didChangeBrowser" is never used, somebody needs to call iMediaBrowser:didChangeBrowser:
 	
 	myDelegate = delegate;	// not retained
 }
