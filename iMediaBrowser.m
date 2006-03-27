@@ -354,14 +354,14 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)setDelegate:(id)delegate
 {
-	myFlags.willLoadBrowser = [myDelegate respondsToSelector:@selector(iMediaBrowser:willLoadBrowser:)];
-	myFlags.didLoadBrowser = [myDelegate respondsToSelector:@selector(iMediaBrowser:didLoadBrowser:)];
-	myFlags.willUseParser = [myDelegate respondsToSelector:@selector(iMediaBrowser:willUseMediaParser:forMediaType:)];
-	myFlags.didUseParser = [myDelegate respondsToSelector:@selector(iMediaBrowser:didUseMediaParser:forMediaType:)];
-	myFlags.willChangeBrowser = [myDelegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];
-	myFlags.didChangeBrowser = [myDelegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
+	myFlags.willLoadBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willLoadBrowser:)];
+	myFlags.didLoadBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didLoadBrowser:)];
+	myFlags.willUseParser = [delegate respondsToSelector:@selector(iMediaBrowser:willUseMediaParser:forMediaType:)];
+	myFlags.didUseParser = [delegate respondsToSelector:@selector(iMediaBrowser:didUseMediaParser:forMediaType:)];
+	myFlags.willChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];
+	myFlags.didChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
 	
-	myDelegate = delegate;
+	myDelegate = delegate;	// not retained
 }
 
 - (id)delegate
