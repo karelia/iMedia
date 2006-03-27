@@ -763,4 +763,9 @@ static NSImage *_badge = nil;
 	[self setNeedsDisplay:YES];
 }
 
+- (NSArray *)selectedCells
+{
+	return [[mySelectedCells retain] autorelease];
+}
+
 @end

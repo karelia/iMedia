@@ -35,8 +35,11 @@
 	if (!myPreview)
 	{
 		myPreview = [[QTMovieView alloc] initWithFrame:rect];
-		[self addSubview:myPreview];
+		[myPreview setControllerVisible:NO];
+		[myPreview setShowsResizeIndicator:NO];
+		[myPreview setPreservesAspectRatio:YES];
 	}
+	[self addSubview:myPreview];
 	[myPreview pause:self];
 	QTMovie *movie = [QTMovie movieWithFile:path error:nil];
 	[myPreview setMovie:movie];
@@ -50,7 +53,29 @@
 
 - (IBAction)stop:(id)sender
 {
-	
+	[myPreview pause:self];
 }
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	[super mouseDown:theEvent];
+	
+	if ([theEvent clickCount] == 2)
+	{
+		NSDictionary *rec = [self recordUnderPoint:[self convertPoint:[theEvent locationInWindow] fromView:nil]];
+		[self previewMovie:[rec objectForKey:@"file"]
+					inRect:NSRectFromString([rec objectForKey:@"rect"])];
+	}
+}
+
+- (void)setImages:(NSArray *)imgs
+{
+	[myPreview pause:self];
+	[myPreview retain];
+	[myPreview removeFromSuperview];
+	
+	[super setImages:imgs];
+}
+
 
 @end

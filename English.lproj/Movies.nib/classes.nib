@@ -1,7 +1,24 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = iMBMovieView; LANGUAGE = ObjC; SUPERCLASS = iMBPhotoView; }, 
+        {
+            CLASS = iMBAbstractController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oView = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {play = id; stop = id; }; 
+            CLASS = iMBMovieView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = iMBPhotoView; 
+        }, 
+        {
+            CLASS = iMBMoviesController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {counterField = NSTextField; previewMovieView = iMBMovieView; }; 
+            SUPERCLASS = iMBAbstractController; 
+        }, 
         {CLASS = iMBPhotoView; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }, 
         {
             CLASS = moviesController; 

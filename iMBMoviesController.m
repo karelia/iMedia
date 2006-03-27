@@ -49,6 +49,11 @@ Please send fixes to
 				   options:nil];
 }
 
+- (IBAction)play:(id)sender
+{
+	[previewMovieView play:sender];
+}
+
 #pragma mark -
 #pragma mark Media Browser Protocol
 

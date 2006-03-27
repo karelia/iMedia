@@ -33,4 +33,6 @@ Please send fixes to
 	IBOutlet iMBMovieView *previewMovieView;
 }
 
+- (IBAction)play:(id)sender;
+
 @end
