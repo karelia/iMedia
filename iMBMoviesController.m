@@ -77,7 +77,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)didDeactivate
 {
-	[previewMovieView pause:self];
+	[previewMovieView stop:self];
 }
 
 - (NSString *)iconNameForPlaylist:(NSString*)name
