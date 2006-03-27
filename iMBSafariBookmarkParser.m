@@ -96,7 +96,6 @@
 					 forKey:@"Name"];
 			[link setObject:[cur objectForKey:@"URLString"] forKey:@"URL"];
 			
-			
 			WebHistoryItem *web = [[WebHistoryItem alloc] initWithURLString:[item objectForKey:@"URLString"]
 																	  title:[[item objectForKey:@"URIDictionary"] objectForKey:@"title"]
 													lastVisitedTimeInterval:60];
@@ -107,6 +106,7 @@
 			}
 			[web release];
 			[links addObject:link];
+			NSLog(@"%@", link);
 		}
 	}
 	[parsed setAttribute:links forKey:@"Links"];
