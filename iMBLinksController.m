@@ -140,6 +140,7 @@ static NSImage *_toolbarIcon = nil;
 	while (cur = [e nextObject])
 	{
 		NSString *loc = [cur objectForKey:@"URL"];
+#warning What if NSURL can't be constructed?  e.g. if it's a javascript bookmarkelet?  We need to exit gracefully.
 		
 		[urls addObject:[NSURL URLWithString:loc]];
 		
