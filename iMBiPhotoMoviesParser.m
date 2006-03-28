@@ -25,6 +25,8 @@ Please send fixes to
 #import "iMBiPhotoMoviesParser.h"
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
+#import "NSWorkspace+Extensions.h"
+
 #import <QTKit/QTKit.h>
 
 @implementation iMBiPhotoMoviesParser
@@ -174,7 +176,9 @@ Please send fixes to
 			}
 			else
 			{
-				[imageRecord setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
+        [imageRecord setObject:[[NSWorkspace sharedWorkspace]
+            iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
+//				[imageRecord setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
 								forKey:@"CachedThumb"];
 			}
 			

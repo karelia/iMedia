@@ -25,6 +25,7 @@ Please send fixes to
 #import "iMBMoviesFolder.h"
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
+#import "NSWorkspace+Extensions.h"
 #import <QTKit/QTKit.h>
 
 @implementation iMBMoviesFolder
@@ -95,7 +96,10 @@ Please send fixes to
 				}
 				else
 				{
-					[newPicture setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
+          [newPicture setObject:[[NSWorkspace sharedWorkspace]
+            iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
+
+//					[newPicture setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
 								   forKey:@"CachedThumb"];
 				}
 				[movie release];

@@ -105,10 +105,20 @@ static NSMutableDictionary *_parsers = nil;
 	return imb;
 }
 
+#warning Filtering on the given browser types during the init is still to be implemented - jmj
++ (id)sharedBrowserWithDelegate:(id)delegate supportingBrowserTypes:(NSArray*)types;
+{
+  iMediaBrowser *imb = [self sharedBrowserWithDelegate:delegate];
+  [imb setPreferredBrowserTypes:types];
+  return imb;
+}
+
+
 + (id)sharedBrowserWithoutLoading;
 {
 	return _sharedMediaBrowser;
 }
+
 
 + (void)registerBrowser:(Class)aClass
 {
@@ -171,7 +181,14 @@ static NSMutableDictionary *_parsers = nil;
 	[myLoadedParsers release];
 	[myToolbar release];
 	[myBackgroundLoadingLock release];
+  [preferredBrowserTypes release];
 	[super dealloc];
+}
+
+-(void)setPreferredBrowserTypes:(NSArray*)types
+{
+  [preferredBrowserTypes autorelease];
+  preferredBrowserTypes = [types copy];
 }
 
 - (void)awakeFromNib

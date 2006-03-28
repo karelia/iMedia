@@ -25,6 +25,8 @@
 #import "iMBiTunesVideoParser.h"
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
+#import "NSWorkspace+Extensions.h"
+
 #import <QTKit/QTKit.h>
 
 @implementation iMBiTunesVideoParser
@@ -148,7 +150,10 @@
 				}
 				else
 				{
-					[movieRec setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
+          [movieRec setObject:[[NSWorkspace sharedWorkspace]
+            iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
+
+//					[movieRec setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
 								   forKey:@"CachedThumb"];
 				}
 				[movie release];

@@ -44,6 +44,7 @@ Please send fixes to
 	NSToolbar						*myToolbar;
 	NSLock							*myBackgroundLoadingLock;
 	
+  NSArray           *preferredBrowserTypes;
 	id								myDelegate; //not retained
 	struct ___imbFlags {
 		unsigned willLoadBrowser: 1;
@@ -58,6 +59,7 @@ Please send fixes to
 + (id)sharedBrowser;
 + (id)sharedBrowserWithoutLoading;
 + (id)sharedBrowserWithDelegate:(id)delegate;
++ (id)sharedBrowserWithDelegate:(id)delegate supportingBrowserTypes:(NSArray*)types;
 
 // Register Other types of Browsers
 + (void)registerBrowser:(Class)aClass;
@@ -68,10 +70,11 @@ Please send fixes to
 	Default media keys are: photos, music, videos, links
 */
 + (void)registerParser:(Class)aClass forMediaType:(NSString *)media;
-+ (void)unregisterParser:(Class)aClass forMediaType:(NSString *)media;
 
 - (void)setDelegate:(id)delegate;
 - (id)delegate;
+
+-(void)setPreferredBrowserTypes:(NSArray*)types;
 
 @end
 
