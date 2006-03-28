@@ -146,7 +146,8 @@ static NSMutableDictionary *_parsers = nil;
 		parsers = [NSMutableArray array];
 		[_parsers setObject:parsers forKey:media];
 	}
-	[parsers addObject:NSStringFromClass(aClass)];
+  if (aClass != Nil)
+    [parsers addObject:NSStringFromClass(aClass)];
 }
 
 + (void)unregisterParser:(Class)aClass forMediaType:(NSString *)media
