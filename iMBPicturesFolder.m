@@ -89,6 +89,7 @@ Please send fixes to
 			}
 		}
 	}
+	[root setAttribute:images forKey:@"Images"];
 }
 
 - (iMBLibraryNode *)parseDatabase
