@@ -37,7 +37,6 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	iMediaBrowser *browser = [iMediaBrowser sharedBrowser];
-	[iMediaBrowser registerParser:NSClassFromString(@"iMBBaseController") forMediaType:@"svxDesign"];
 	[browser showWindow:self];
 }
 
