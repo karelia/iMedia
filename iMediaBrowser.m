@@ -105,6 +105,11 @@ static NSMutableDictionary *_parsers = nil;
 	return imb;
 }
 
++ (id)sharedBrowserWithoutLoading;
+{
+	return _sharedMediaBrowser;
+}
+
 + (void)registerBrowser:(Class)aClass
 {
 	[_browserClasses addObject:NSStringFromClass(aClass)];

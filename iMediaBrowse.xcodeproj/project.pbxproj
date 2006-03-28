@@ -88,7 +88,6 @@
 		964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
 		965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
-		D9659A3709A6A9680079ED9A /* Library.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659A3509A6A9680079ED9A /* Library.m */; };
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D98B7C6909AD49B500EAA95E /* MBiMovie.png in Resources */ = {isa = PBXBuildFile; fileRef = D98B7C6509AD499600EAA95E /* MBiMovie.png */; };
 		D98B7C6A09AD49B500EAA95E /* MBiTunes.png in Resources */ = {isa = PBXBuildFile; fileRef = D98B7C6609AD499600EAA95E /* MBiTunes.png */; };
@@ -249,8 +248,6 @@
 		96A26018090CA99E00BCCCD6 /* iMBMusicController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMusicController.m; sourceTree = "<group>"; };
 		D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeValueTransformer.h; sourceTree = "<group>"; };
 		D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeValueTransformer.m; sourceTree = "<group>"; };
-		D9659A3409A6A9680079ED9A /* Library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Library.h; sourceTree = "<group>"; };
-		D9659A3509A6A9680079ED9A /* Library.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Library.m; sourceTree = "<group>"; };
 		D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryItemsValueTransformer.h; sourceTree = "<group>"; };
 		D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LibraryItemsValueTransformer.m; sourceTree = "<group>"; };
 		D98B7C6509AD499600EAA95E /* MBiMovie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiMovie.png; sourceTree = "<group>"; };
@@ -488,8 +485,6 @@
 		D9B3EAAD09A3FD8600835FE4 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				D9659A3409A6A9680079ED9A /* Library.h */,
-				D9659A3509A6A9680079ED9A /* Library.m */,
 				795D70DF09D39D73005F166D /* iMBLibraryNode.h */,
 				795D70E009D39D73005F166D /* iMBLibraryNode.m */,
 			);
@@ -738,7 +733,6 @@
 				791F9AFA0976320A0071B2E0 /* UKKQueue.m in Sources */,
 				791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */,
 				792BFD94098066A50004D656 /* iMBPhotoView.m in Sources */,
-				D9659A3709A6A9680079ED9A /* Library.m in Sources */,
 				D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */,
 				D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */,
 				795D6F5209D35B77005F166D /* iMBLinksController.m in Sources */,
