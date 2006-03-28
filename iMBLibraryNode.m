@@ -8,6 +8,9 @@
 
 #import "iMBLibraryNode.h"
 
+@interface iMBLibraryNode (Private)
+- (void)setParent:(iMBLibraryNode *)node;
+@end
 
 @implementation iMBLibraryNode
 
@@ -43,6 +46,16 @@
 	return copy;
 }
 
+- (void)setParent:(iMBLibraryNode *)node
+{
+	myParent = node;
+}
+
+- (iMBLibraryNode *)parent
+{
+	return [[myParent retain] autorelease];
+}
+
 - (void)setName:(NSString *)name
 {
 	[myName autorelease];
@@ -73,6 +86,12 @@
 
 - (NSImage *)icon
 {
+	if (!myIcon && myIconName)
+	{
+		NSBundle *b = [NSBundle bundleForClass:[self class]];
+		NSString *p = [b pathForImageResource:myIconName];
+		myIcon = [[NSImage alloc] initWithContentsOfFile:p];
+	}
 	return myIcon;
 }
 
@@ -99,22 +118,26 @@
 - (void)addItem:(iMBLibraryNode *)item
 {
 	[myItems addObject:item];
+	[item setParent:self];
 }
 
 - (void)removeItem:(iMBLibraryNode *)item
 {
 	[myItems removeObject:item];
+	[item setParent:nil];
 }
 
 - (void)insertItem:(iMBLibraryNode *)item atIndex:(unsigned)idx
 {
 	[myItems insertObject:item atIndex:idx];
+	[item setParent:self];
 }
 
 - (void)setItems:(NSArray *)items
 {
 	[myItems removeAllObjects];
 	[myItems addObjectsFromArray:items];
+	[items makeObjectsPerformSelector:@selector(setParent:) withObject:self];
 }
 
 - (NSArray *)items
@@ -242,6 +265,43 @@
 - (id)valueForUndefinedKey:(NSString *)key
 {
 	return [self recursiveAttributesForKey:key];
+}
+
+- (void)recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray *)array
+{
+	if ([self parent])
+	{
+		[[self parent] recursivelyWalkParentsAddingPathIndexTo:array];
+		[array addObject:[NSNumber numberWithUnsignedInt:[[[self parent] items] indexOfObject:self]]];
+	}
+}
+
+- (NSIndexPath *)indexPath
+{
+	NSMutableArray *indexes = [NSMutableArray array];
+	[self recursivelyWalkParentsAddingPathIndexTo:indexes];
+	
+	if ([indexes count] > 0)
+	{
+		unsigned int *idxs = (unsigned int *)malloc(sizeof(unsigned int) * [indexes count]);
+		int i;
+		
+		for (i = 0; i < [indexes count]; i++)
+		{
+			idxs[i] = [[indexes objectAtIndex:i] unsignedIntValue];
+		}
+		NSIndexPath *path = [NSIndexPath indexPathWithIndexes:idxs length:[indexes count]];
+		free(idxs);
+		return path;
+	}
+	return nil;
+}
+
+- (iMBLibraryNode *)root
+{
+	if ([self parent] == nil)
+		return self;
+	return [[self parent] root];
 }
 
 @end

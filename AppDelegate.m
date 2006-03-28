@@ -30,7 +30,7 @@
  */
 
 #import "AppDelegate.h"
-#import <iMediaBrowser/iMediaBrowser.h>
+#import <iMediaBrowser/iMedia.h>
 
 @implementation AppDelegate
 

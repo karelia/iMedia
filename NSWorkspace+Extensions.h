@@ -11,6 +11,6 @@
 
 @interface NSWorkspace (iMediaExtensions)
 
--(NSImage*)iconForAppWithBundleIdentifier:(NSString*)bundleID;
+- (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID;
 
 @end

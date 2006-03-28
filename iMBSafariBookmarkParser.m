@@ -123,6 +123,7 @@
 	NSDictionary *xml = [NSDictionary dictionaryWithContentsOfFile:[self databasePath]];
 	
 	[library setName:NSLocalizedString(@"Safari", @"Safari")];
+	[library setIconName:@"safari"];
 	
 	NSEnumerator *groupEnum = [[xml objectForKey:@"Children"] objectEnumerator];
 	NSDictionary *cur;

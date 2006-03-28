@@ -260,6 +260,7 @@ static NSMutableDictionary *_parsers = nil;
 	[oPlaylists setAllowsColumnReordering:NO];
 	[oPlaylists setSortDescriptors:nil];
 	[libraryController setSortDescriptors:nil];
+	[oSplitView setDelegate:self];
 }
 
 - (id <iMediaBrowser>)browserForClassName:(NSString *)name
@@ -284,6 +285,10 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		if ([myBackgroundLoadingLock tryLock])
 		{
+			if (myFlags.willChangeBrowser)
+			{
+				[myDelegate iMediaBrowser:self willChangeToBrowser:browserClassName];
+			}
 			[oSplitView setHidden:YES];
 			[oLoadingView setHidden:NO];
 			[oLoading startAnimation:self];
@@ -339,6 +344,10 @@ static NSMutableDictionary *_parsers = nil;
 		if (!parser)
 		{
 			parser = [[parserClass alloc] init];
+			if (parser == nil)
+			{
+				continue;
+			}
 			[myLoadedParsers setObject:parser forKey:cur];
 			[parser release];
 		}
@@ -362,6 +371,31 @@ static NSMutableDictionary *_parsers = nil;
 	[pool release];
 }
 
+- (void)recursivelyAddItemsToMenu:(NSMenu *)menu withNode:(iMBLibraryNode *)node indentation:(int)indentation
+{
+	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:[node name]
+												  action:@selector(playlistPopupChanged:)
+										   keyEquivalent:@""];
+	NSImage *icon = [[NSImage alloc] initWithData:[[node icon] TIFFRepresentation]];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16,16)];
+	[item setImage:icon];
+	[icon release];
+	[item setTarget:self];
+	[item setRepresentedObject:node];
+	[item setIndentationLevel:indentation];
+	[menu addItem:item];
+	[item release];
+	
+	NSEnumerator *e = [[node items] objectEnumerator];
+	iMBLibraryNode *cur;
+	
+	while (cur = [e nextObject])
+	{
+		[self recursivelyAddItemsToMenu:menu withNode:cur indentation:indentation+1];
+	}
+}
+
 - (void)controllerLoadedData:(id)sender
 {
 	[oLoadingView setHidden:YES];
@@ -371,7 +405,47 @@ static NSMutableDictionary *_parsers = nil;
 	if ([[libraryController content] count] > 0)
 	{
 		[oPlaylists expandItem:[oPlaylists itemAtRow:0]];
+		
+		NSEnumerator *e = [[libraryController content] objectEnumerator];
+		iMBLibraryNode *cur;
+		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"playlists"];
+		
+		while (cur = [e nextObject])
+		{
+			[self recursivelyAddItemsToMenu:menu withNode:cur indentation:0];
+		}
+		
+		[oPlaylistPopup setMenu:menu];
+		[menu release];
 	}
+	else
+	{
+		[oPlaylistPopup removeAllItems];
+		[oPlaylistPopup setEnabled:NO];
+	}
+	if (myFlags.didChangeBrowser)
+	{
+		[myDelegate iMediaBrowser:self didChangeToBrowser:NSStringFromClass([mySelectedBrowser class])];
+	}
+}
+
+- (void)playlistPopupChanged:(id)sender
+{
+	iMBLibraryNode *selected = [sender representedObject];
+	NSIndexPath *index = [selected indexPath];
+	NSIndexPath *full = nil;
+	unsigned int *idxs = (unsigned int *)malloc(sizeof(unsigned int) * ([index length] + 1));
+	
+	idxs[0] = [[libraryController content] indexOfObject:[selected root]];
+	
+	int i = 0;
+	for (i = 0; i < [index length]; i++)
+	{
+		idxs[i+1] = [index indexAtPosition:i];
+	}
+	full = [NSIndexPath indexPathWithIndexes:idxs length:i+1];
+	[libraryController setSelectionIndexPath:full];
+	free (idxs);
 }
 
 #pragma mark -
@@ -383,11 +457,8 @@ static NSMutableDictionary *_parsers = nil;
 	myFlags.didLoadBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didLoadBrowser:)];
 	myFlags.willUseParser = [delegate respondsToSelector:@selector(iMediaBrowser:willUseMediaParser:forMediaType:)];
 	myFlags.didUseParser = [delegate respondsToSelector:@selector(iMediaBrowser:didUseMediaParser:forMediaType:)];
-	myFlags.willChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];
-#warning the "willChangeBrowser" is never used, somebody needs to call iMediaBrowser:willChangeBrowser:
-	
+	myFlags.willChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];	
 	myFlags.didChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
-#warning the "didChangeBrowser" is never used, somebody needs to call iMediaBrowser:didChangeBrowser:
 	
 	myDelegate = delegate;	// not retained
 }
@@ -415,6 +486,33 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		[libraryController removeObjectAtArrangedObjectIndexPath:[NSIndexPath indexPathWithIndex:controllerCount-1]];
 	}
+}
+
+#pragma mark -
+#pragma mark NSSplitView Delegate Methods
+
+- (void)splitViewWillResizeSubviews:(NSNotification *)aNotification
+{
+	if (myFlags.inSplitViewResize) return; // stop possible recursion from NSSplitView
+	myFlags.inSplitViewResize = YES;
+	if([[oPlaylists enclosingScrollView] frame].size.height <= 50 && ![[oSplitView subviews] containsObject:oPlaylistPopup])
+	{
+		[oSplitView replaceSubview:[[oPlaylists enclosingScrollView] retain] with:oPlaylistPopup];
+		NSRect frame = [oPlaylistPopup frame];
+		frame.size.height = 24;
+		[oPlaylistPopup setFrame:frame];
+	}
+	
+	if([oPlaylistPopup frame].size.height > 50 && ![[oSplitView subviews] containsObject:oPlaylists])
+	{
+		[oSplitView replaceSubview:[oPlaylistPopup retain] with:[oPlaylists enclosingScrollView]];
+	}
+	myFlags.inSplitViewResize = NO;
+}
+
+- (float)splitView:(NSSplitView *)sender constrainMinCoordinate:(float)proposedMin ofSubviewAt:(int)offset
+{
+	return 24;
 }
 
 #pragma mark -

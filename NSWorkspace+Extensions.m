@@ -11,10 +11,10 @@
 
 @implementation NSWorkspace (iMediaExtensions)
 
--(NSImage*)iconForAppWithBundleIdentifier:(NSString*)bundleID;
+- (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID;
 {
-  NSString *path = [self absolutePathForAppBundleWithIdentifier:bundleID];
-  return [self iconForFile:path];
+	NSString *path = [self absolutePathForAppBundleWithIdentifier:bundleID];
+	return [self iconForFile:path];
 }
 
 @end

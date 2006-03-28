@@ -29,10 +29,11 @@ Please send fixes to
 
 @interface iMediaBrowser : NSWindowController
 {
-	IBOutlet NSPopUpButton			*oMediaMenu;
+	IBOutlet NSPopUpButton			*oPlaylistPopup;
 	IBOutlet NSView					*oBrowserView;
 	IBOutlet NSBox					*oLoadingView;
 	IBOutlet NSSplitView			*oSplitView;
+	IBOutlet NSView					*oPlaylistContainer;
 	IBOutlet NSProgressIndicator	*oLoading;
 	IBOutlet NSOutlineView			*oPlaylists;
 	IBOutlet NSTreeController		*libraryController;
@@ -44,7 +45,7 @@ Please send fixes to
 	NSToolbar						*myToolbar;
 	NSLock							*myBackgroundLoadingLock;
 	
-  NSArray           *preferredBrowserTypes;
+	NSArray							*preferredBrowserTypes;
 	id								myDelegate; //not retained
 	struct ___imbFlags {
 		unsigned willLoadBrowser: 1;
@@ -53,6 +54,7 @@ Please send fixes to
 		unsigned didChangeBrowser: 1;
 		unsigned willUseParser: 1;
 		unsigned didUseParser: 1;
+		unsigned inSplitViewResize: 1;
 	} myFlags;
 }
 

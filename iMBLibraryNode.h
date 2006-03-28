@@ -12,6 +12,7 @@
 
 @interface iMBLibraryNode : NSObject <NSCopying>
 {
+	iMBLibraryNode		*myParent; //not retained
 	NSString			*myName;
 	NSMutableArray		*myItems;
 	NSMutableDictionary *myAttributes;
@@ -43,8 +44,12 @@
 // this returns the aggregate of items from sub nodes
 - (NSArray *)allItems;
 
+- (iMBLibraryNode *)parent;
+- (iMBLibraryNode *)root;
 
 // basically a transformer for the outline view
 - (NSAttributedString *)nameWithImage;
+
+- (NSIndexPath *)indexPath;
 
 @end
