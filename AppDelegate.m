@@ -31,14 +31,13 @@
 
 #import "AppDelegate.h"
 #import <iMediaBrowser/iMediaBrowser.h>
-#import "iMBBaseController.h"
 
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	iMediaBrowser *browser = [iMediaBrowser sharedBrowser];
-	[iMediaBrowser registerParser:[iMBBaseController class] forMediaType:@"svxDesign"];
+	[iMediaBrowser registerParser:NSClassFromString(@"iMBBaseController") forMediaType:@"svxDesign"];
 	[browser showWindow:self];
 }
 
