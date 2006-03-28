@@ -30,6 +30,12 @@
 
 @implementation iMBMovieView
 
+- (void)dealloc
+{
+	[myPreview release];
+	[super dealloc];
+}
+
 - (void)previewMovie:(NSString *)path inRect:(NSRect)rect
 {
 	if (!myPreview)
