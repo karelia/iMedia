@@ -85,6 +85,7 @@ static NSImage *_toolbarIcon = nil;
 	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
 	[types addObject:NSURLPboardType];
     [types addObject:@"WebURLsWithTitlesPboardType"]; // a type that Safari declares
+    [types addObject:NSStringPboardType];
 	
 	[pboard declareTypes:types
 				   owner:nil];
@@ -98,10 +99,14 @@ static NSImage *_toolbarIcon = nil;
     NSMutableArray *URLsWithTitles = [NSMutableArray array];
     NSMutableArray *URLsAsStrings = [NSMutableArray array];
     NSMutableArray *titles = [NSMutableArray array];
+    
+    // for NSStringPboardType
+    BOOL addedStringPboardType = NO;
 	
 	while (cur = [e nextObject])
 	{
-		NSDictionary *link = [content objectAtIndex:[cur unsignedIntValue]];
+        unsigned int contextIndex = [cur unsignedIntValue];
+		NSDictionary *link = [content objectAtIndex:contextIndex];
 		NSString *loc = [link objectForKey:@"URL"];
 		
 		NSURL *url = [NSURL URLWithString:loc];
@@ -109,13 +114,20 @@ static NSImage *_toolbarIcon = nil;
         
         [URLsAsStrings addObject:loc];
         [titles addObject:[link objectForKey:@"Name"]];
+        
+        if ( NO == addedStringPboardType )
+        {
+            // we just add the first URL we find
+            [pboard setPropertyList:loc forType:NSStringPboardType];
+            addedStringPboardType = YES;
+        }
 	}
 	[pboard setPropertyList:urls forType:NSURLPboardType];
     
     [URLsWithTitles insertObject:URLsAsStrings atIndex:0];
     [URLsWithTitles insertObject:titles atIndex:1];
     [pboard setPropertyList:URLsWithTitles forType:@"WebURLsWithTitlesPboardType"];
-	
+    
 	return YES;
 }
 
