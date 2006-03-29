@@ -73,14 +73,13 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		NSBundle *b = [NSBundle bundleWithPath:cur];
 		Class mainClass = [b principalClass];
-		if ([mainClass conformsToProtocol:@protocol(iMediaBrowser)] || [mainClass conformsToProtocol:@protocol(iMBParser)])
+		if ([mainClass conformsToProtocol:@protocol(iMediaBrowser)] || [mainClass conformsToProtocol:@protocol(iMBParser)]) 
 		{
 			if (![b load])
 			{
 				NSLog(@"Failed to load iMediaBrowser plugin: %@", cur);
 				continue;
 			}
-			[self registerBrowser:mainClass];
 		}
 		else
 		{
