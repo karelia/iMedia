@@ -81,10 +81,16 @@ Please send fixes to
 				NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
 				
 				NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
-				[newPicture setObject:filePath forKey:@"ImagePath"];
-				[newPicture setObject:[filePath lastPathComponent] forKey:@"Caption"];
-				[newPicture setObject:filePath forKey:@"ThumbPath"];
-				[newPicture setObject:[fileAttribs valueForKey:NSFileModificationDate] forKey:@"DateAsTimerInterval"];
+				if (filePath)
+				{
+					[newPicture setObject:filePath forKey:@"ImagePath"];
+					[newPicture setObject:[filePath lastPathComponent] forKey:@"Caption"];
+					[newPicture setObject:filePath forKey:@"ThumbPath"];
+				}
+				if ([fileAttribs valueForKey:NSFileModificationDate])
+				{
+					[newPicture setObject:[fileAttribs valueForKey:NSFileModificationDate] forKey:@"DateAsTimerInterval"];
+				}
 				[images addObject:newPicture];
 			}
 		}
