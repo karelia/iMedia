@@ -181,7 +181,7 @@ static NSMutableDictionary *_parsers = nil;
 	[myLoadedParsers release];
 	[myToolbar release];
 	[myBackgroundLoadingLock release];
-  [preferredBrowserTypes release];
+	[preferredBrowserTypes release];
 	[super dealloc];
 }
 
@@ -296,7 +296,6 @@ static NSMutableDictionary *_parsers = nil;
 			//remove old view
 			[mySelectedBrowser didDeactivate];
 			[[mySelectedBrowser browserView] removeFromSuperview];
-			[browser willActivate];
 			[view setFrame:[oBrowserView bounds]];
 			[oBrowserView addSubview:[view retain]];
 			mySelectedBrowser = browser;
@@ -422,6 +421,9 @@ static NSMutableDictionary *_parsers = nil;
 		[oPlaylistPopup removeAllItems];
 		[oPlaylistPopup setEnabled:NO];
 	}
+	
+	[mySelectedBrowser willActivate];
+	
 	if (myFlags.didChangeBrowser)
 	{
 		[myDelegate iMediaBrowser:self didChangeToBrowser:NSStringFromClass([mySelectedBrowser class])];
