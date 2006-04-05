@@ -346,7 +346,7 @@ static NSDictionary *titleFontAttributes;
 
 - (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
 {
-	return [NSString stringWithString:userData];
+	return (nil == userData) ? @"???" : [NSString stringWithString:userData];
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent

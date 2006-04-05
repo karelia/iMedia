@@ -178,7 +178,9 @@ Please send fixes to
 			else
 			{
 				// find poster image from movie as a last resort, since it's slower
-				QTMovie *movie = [[QTMovie alloc] initWithURL:[NSURL fileURLWithPath:[imageRecord objectForKey:@"ImagePath"]] error:nil];
+				NSString *path = [imageRecord objectForKey:@"ImagePath"];
+				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
+				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:nil];
 				thumb = [movie posterImage];
 				[movie release];
 			}

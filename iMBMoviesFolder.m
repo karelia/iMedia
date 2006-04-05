@@ -89,7 +89,8 @@ Please send fixes to
 				//we want to cache the first frame of the movie here as we will be in a background thread
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
 				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:nil];
-				NSImage *thumb = [movie currentFrameImage];
+				NSImage *thumb = [movie posterImage];
+				[movie release];
 				if (thumb)
 				{
 					[newPicture setObject:thumb forKey:@"CachedThumb"];
@@ -102,7 +103,6 @@ Please send fixes to
 //					[newPicture setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
 								   forKey:@"CachedThumb"];
 				}
-				[movie release];
 				[movies addObject:newPicture];
 			}
 		}

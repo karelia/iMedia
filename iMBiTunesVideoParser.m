@@ -141,22 +141,34 @@
 				[newPlaylistContent objectForKey:@"Has Video"] && [[newPlaylistContent objectForKey:@"Has Video"] boolValue]) 
 			{
 				// only add video tracks
+				NSImage *thumb = nil;
 				NSMutableDictionary *movieRec = [NSMutableDictionary dictionaryWithDictionary:newPlaylistContent];
-				QTMovie *movie = [[QTMovie alloc] initWithURL:[NSURL fileURLWithPath:[newPlaylistContent objectForKey:@"Location"]] error:nil];
-				NSImage *thumb = [movie currentFrameImage];
-				if (thumb)
+				NSError *error = nil;
+				NSString *path = [[NSURL URLWithString:[newPlaylistContent objectForKey:@"Location"]] path];
+				
+				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
+				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:&error];
+				if (nil != movie)
 				{
-					[movieRec setObject:thumb forKey:@"CachedThumb"];
+					thumb = [movie posterImage];
+					
+					[movie release];
 				}
 				else
 				{
-          [movieRec setObject:[[NSWorkspace sharedWorkspace]
-            iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
-
-//					[movieRec setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
+					NSLog(@"Error reading movie '%@': %@", path, [error localizedDescription]);
+				}
+				if (thumb)
+				{
+					[movieRec setObject:thumb forKey:@"CachedThumb"];
+					NSLog(@"Got thumb for %@", path);
+				}
+				else
+				{
+					[movieRec setObject:[[NSWorkspace sharedWorkspace]
+						iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
 								   forKey:@"CachedThumb"];
 				}
-				[movie release];
 				
 				[newPlaylist addObject:movieRec];
 				hasVideos = YES;
