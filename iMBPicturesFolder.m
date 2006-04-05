@@ -55,15 +55,18 @@ Please send fixes to
 	NSEnumerator *e = [contents objectEnumerator];
 	NSString *cur;
 	BOOL isDir;
-	NSArray *imageTypes = [NSImage imageFileTypes];
 	NSMutableArray *images = [NSMutableArray array];
 	
 	while (cur = [e nextObject])
 	{
 		NSString *filePath = [path stringByAppendingFormat:@"/%@", cur];
+		NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
+		NSString *fileName = [filePath lastPathComponent];
 		
-		if ([filePath rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
-		if ([filePath rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
+		if ([fileName rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
+		if ([fileName rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
+		if ([fileName hasPrefix:@"."]) continue;		// invisible
+#warning TODO: Better check for invisible files; e.g. http://www.cocoabuilder.com/archive/message/cocoa/2003/6/17/86040
 		
 		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir)
 		{
@@ -76,10 +79,9 @@ Please send fixes to
 		}
 		else
 		{
-			if ([imageTypes indexOfObject:[[filePath lowercaseString] pathExtension]] != NSNotFound)
+			NSString *UTI = [NSString UTIForFileAtPath:filePath];
+			if ([NSString UTI:UTI conformsToUTI:(NSString *)kUTTypeImage])
 			{
-				NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
-				
 				NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
 				if (filePath)
 				{

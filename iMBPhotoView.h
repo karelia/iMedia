@@ -40,6 +40,7 @@ Please send fixes to
 	NSMutableArray		*mySelectedCells;
 	NSMutableArray		*mySelectedRects;
 	NSDictionary		*myLastSelectedCell;
+	int					myPhotoColumns;
 }
 
 - (void)setImages:(NSArray *)images;

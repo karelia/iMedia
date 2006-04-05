@@ -151,6 +151,9 @@ static NSShadow *_shadow = nil;
 #define X_SPACE_BETWEEN_ICON_AND_TEXT_BOX 2
 #define X_TEXT_BOX_BORDER 2
 #define Y_TEXT_BOX_BORDER 2
+#define CELL_PADDING 5
+#define MAX_THUMB_WIDTH 240
+
 static NSDictionary *titleFontAttributes;
 
 + (NSImage *)draggingIconWithTitle:(NSString *)title andImage:(NSImage *)image;
@@ -211,6 +214,7 @@ static NSDictionary *titleFontAttributes;
 		mySelectedRects = [[NSMutableArray array] retain];
 		mySelectionType = SelectionNew;
 		myLastSelectedCell = nil;
+		myPhotoColumns = 3;
 	}
 	return self;
 }
@@ -231,13 +235,13 @@ static NSDictionary *titleFontAttributes;
 	[mySelectedCells removeObject:[self recordForThumb:thumb]];
 }
 
-#define iPhotoColumns 3
-#define CellPadding 5
 
 #pragma mark -
 #pragma mark VIEW
 - (void)drawRect:(NSRect)rect 
 {
+	myPhotoColumns = MAX(3, (rect.size.width-CELL_PADDING) / (MAX_THUMB_WIDTH+CELL_PADDING));
+	
     [[NSColor whiteColor] set];
 	NSRectFill(rect);
 	
@@ -250,7 +254,7 @@ static NSDictionary *titleFontAttributes;
 	[self removeAllToolTips];
 	
 	NSSize cellSize = [self cellSize];
-	div_t rows = div([myImages count], iPhotoColumns);
+	div_t rows = div([myImages count], myPhotoColumns);
 	float matrixHeight = rows.quot * cellSize.height;
 	if (rows.rem > 0) {
 		rows.quot++;
@@ -280,9 +284,9 @@ static NSDictionary *titleFontAttributes;
 			continue;
 		}
 		
-		for (j = 0; j < iPhotoColumns; j++) {
+		for (j = 0; j < myPhotoColumns; j++) {
 			cell.origin.x = j * cellSize.width;
-			idx = (i * iPhotoColumns) + j;
+			idx = (i * myPhotoColumns) + j;
 			if (idx >= [myImages count]) continue;
 			NSDictionary *record = [myImages objectAtIndex: idx];
 			NSString *thumbPath = [record objectForKey:@"ThumbPath"];
@@ -301,7 +305,7 @@ static NSDictionary *titleFontAttributes;
 				}
 			}
 			BOOL isSelected = [self isSelected:thumbPath];
-			NSRect drawable = centeredAspectRatioPreservedRect(NSInsetRect(cell, CellPadding, CellPadding), [img size], NSMakeSize(240,240));
+			NSRect drawable = centeredAspectRatioPreservedRect(NSInsetRect(cell, CELL_PADDING, CELL_PADDING), [img size], NSMakeSize(MAX_THUMB_WIDTH, MAX_THUMB_WIDTH));
 			drawable = NSIntegralRect(drawable);
 			
 			[[NSGraphicsContext currentContext] saveGraphicsState];
@@ -726,7 +730,7 @@ static NSImage *_badge = nil;
 
 - (NSSize)cellSize
 {
-	float w = NSWidth([self frame]) / 3;
+	float w = NSWidth([self frame]) / myPhotoColumns;
 	return NSMakeSize(w,w);
 }
 
