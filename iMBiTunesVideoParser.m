@@ -26,6 +26,7 @@
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+Extensions.h"
+#import "QTMovie+iMedia.h"
 
 #import <QTKit/QTKit.h>
 
@@ -150,7 +151,7 @@
 				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:&error];
 				if (nil != movie)
 				{
-					thumb = [movie posterImage];
+					thumb = [movie betterPosterImage];
 					
 					[movie release];
 				}

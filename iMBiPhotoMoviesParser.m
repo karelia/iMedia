@@ -26,6 +26,7 @@ Please send fixes to
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+Extensions.h"
+#import "QTMovie+iMedia.h"
 
 #import <QTKit/QTKit.h>
 
@@ -181,7 +182,7 @@ Please send fixes to
 				NSString *path = [imageRecord objectForKey:@"ImagePath"];
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
 				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:nil];
-				thumb = [movie posterImage];
+				thumb = [movie betterPosterImage];
 				[movie release];
 			}
 			if (thumb)

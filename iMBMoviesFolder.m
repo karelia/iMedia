@@ -27,6 +27,7 @@ Please send fixes to
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+Extensions.h"
 #import <QTKit/QTKit.h>
+#import "QTMovie+iMedia.h"
 
 @implementation iMBMoviesFolder
 
@@ -89,7 +90,7 @@ Please send fixes to
 				//we want to cache the first frame of the movie here as we will be in a background thread
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
 				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:nil];
-				NSImage *thumb = [movie posterImage];
+				NSImage *thumb = [movie betterPosterImage];
 				[movie release];
 				if (thumb)
 				{

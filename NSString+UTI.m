@@ -115,4 +115,13 @@
 															 );	
 }
 
+// See list here:
+// http://developer.apple.com/documentation/Carbon/Conceptual/understanding_utis/utilist/chapter_4_section_1.html
+
++ (BOOL) UTI:(NSString *)aUTI conformsToUTI:(NSString *)aConformsToUTI
+{
+	return UTTypeConformsTo((CFStringRef)aUTI, (CFStringRef)aConformsToUTI);
+}
+
+
 @end
