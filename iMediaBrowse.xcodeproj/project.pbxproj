@@ -8,6 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		3CAC73E90976F47800AF5020 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */; };
+		7903561209E3AF7B00384D08 /* iMBContactsController.h in Headers */ = {isa = PBXBuildFile; fileRef = 7903561009E3AF7B00384D08 /* iMBContactsController.h */; };
+		7903561309E3AF7B00384D08 /* iMBContactsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7903561109E3AF7B00384D08 /* iMBContactsController.m */; };
+		7903561E09E3B17A00384D08 /* Contacts.nib in Resources */ = {isa = PBXBuildFile; fileRef = 7903561C09E3B17A00384D08 /* Contacts.nib */; };
+		7903562109E3B30F00384D08 /* contacts.png in Resources */ = {isa = PBXBuildFile; fileRef = 7903562009E3B30F00384D08 /* contacts.png */; };
+		7903562609E3B40D00384D08 /* iMBAddressBookParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 7903562409E3B40D00384D08 /* iMBAddressBookParser.h */; };
+		7903562709E3B40D00384D08 /* iMBAddressBookParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7903562509E3B40D00384D08 /* iMBAddressBookParser.m */; };
+		7903562D09E3B45F00384D08 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7903562C09E3B45F00384D08 /* AddressBook.framework */; };
 		79167A0B0975260A00D9EF74 /* iMediaBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 965EB99708E1F7CE000DFF3A /* iMediaBrowser.m */; };
 		79167A0D0975260C00D9EF74 /* iMBMoviesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 969656AF08C6A2C700F2F85C /* iMBMoviesController.m */; };
 		79167A160975261700D9EF74 /* iMBMusicController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A26018090CA99E00BCCCD6 /* iMBMusicController.m */; };
@@ -52,6 +59,7 @@
 		796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ADBBF09D6562C001CF400 /* iMBAbstractController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ADBC009D6562C001CF400 /* iMBAbstractController.m */; };
 		796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796ADBE109D65986001CF400 /* CoreData.framework */; };
+		79858F6809E3C3AB003EA241 /* contact.png in Resources */ = {isa = PBXBuildFile; fileRef = 79858F6709E3C3AB003EA241 /* contact.png */; };
 		7990CD5B09D75D4A00AD74BA /* iMBiTunesVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */; };
 		7990CDB309D769DE00AD74BA /* SafariBookmarksBar.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDB109D769DE00AD74BA /* SafariBookmarksBar.png */; };
 		7990CDB409D769DE00AD74BA /* SafariBookmarksMenu.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDB209D769DE00AD74BA /* SafariBookmarksMenu.png */; };
@@ -155,6 +163,13 @@
 		32CA4F630368D1EE00C91783 /* iMediaBrowse_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowse_Prefix.pch; sourceTree = "<group>"; };
 		3C371AFC09AD501A00501C1F /* Framework Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Framework Debug.xcconfig"; sourceTree = "<group>"; };
 		3C371B0009AD502700501C1F /* Framework Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Framework Release.xcconfig"; sourceTree = "<group>"; };
+		7903561009E3AF7B00384D08 /* iMBContactsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBContactsController.h; sourceTree = "<group>"; };
+		7903561109E3AF7B00384D08 /* iMBContactsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBContactsController.m; sourceTree = "<group>"; };
+		7903561D09E3B17A00384D08 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Contacts.nib; sourceTree = "<group>"; };
+		7903562009E3B30F00384D08 /* contacts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = contacts.png; sourceTree = "<group>"; };
+		7903562409E3B40D00384D08 /* iMBAddressBookParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAddressBookParser.h; sourceTree = "<group>"; };
+		7903562509E3B40D00384D08 /* iMBAddressBookParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAddressBookParser.m; sourceTree = "<group>"; };
+		7903562C09E3B45F00384D08 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = /System/Library/Frameworks/AddressBook.framework; sourceTree = "<absolute>"; };
 		791679FE0975255000D9EF74 /* iMediaBrowser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iMediaBrowser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		791679FF0975255000D9EF74 /* iMediaBrowser-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "iMediaBrowser-Info.plist"; sourceTree = "<group>"; };
 		791F964C0975B63E0071B2E0 /* iMediaBrowserProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowserProtocol.h; sourceTree = "<group>"; };
@@ -204,6 +219,7 @@
 		796ADBBF09D6562C001CF400 /* iMBAbstractController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAbstractController.h; sourceTree = "<group>"; };
 		796ADBC009D6562C001CF400 /* iMBAbstractController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAbstractController.m; sourceTree = "<group>"; };
 		796ADBE109D65986001CF400 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		79858F6709E3C3AB003EA241 /* contact.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = contact.png; sourceTree = "<group>"; };
 		7990CD5809D75D4A00AD74BA /* iMBiTunesVideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiTunesVideoParser.h; sourceTree = "<group>"; };
 		7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiTunesVideoParser.m; sourceTree = "<group>"; };
 		7990CDB109D769DE00AD74BA /* SafariBookmarksBar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SafariBookmarksBar.png; sourceTree = "<group>"; };
@@ -270,6 +286,7 @@
 				79167A6B09752C3300D9EF74 /* QuickTime.framework in Frameworks */,
 				795F7B2509D4D5E5000F21B5 /* WebKit.framework in Frameworks */,
 				796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */,
+				7903562D09E3B45F00384D08 /* AddressBook.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,6 +322,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7903562C09E3B45F00384D08 /* AddressBook.framework */,
 				795F7AF509D4D5E5000F21B5 /* WebKit.framework */,
 				965EB98608E1D345000DFF3A /* QTKit.framework */,
 				964006E108D7B9BF0046E052 /* QuickTime.framework */,
@@ -371,6 +389,7 @@
 				791F99370976023F0071B2E0 /* iPhoto.nib */,
 				791F9A6D097628DF0071B2E0 /* Movies.nib */,
 				7990CDF009D772FF00AD74BA /* Links.nib */,
+				7903561C09E3B17A00384D08 /* Contacts.nib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -412,6 +431,8 @@
 				795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */,
 				7990CD5809D75D4A00AD74BA /* iMBiTunesVideoParser.h */,
 				7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */,
+				7903562409E3B40D00384D08 /* iMBAddressBookParser.h */,
+				7903562509E3B40D00384D08 /* iMBAddressBookParser.m */,
 			);
 			name = Parsers;
 			sourceTree = "<group>";
@@ -419,6 +440,8 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				79858F6709E3C3AB003EA241 /* contact.png */,
+				7903562009E3B30F00384D08 /* contacts.png */,
 				7990CDDF09D76E7800AD74BA /* iTunesSmartPlaylist.png */,
 				7990CDC009D76BDA00AD74BA /* iTunesVideo.png */,
 				7990CDB109D769DE00AD74BA /* SafariBookmarksBar.png */,
@@ -524,6 +547,8 @@
 				96A26018090CA99E00BCCCD6 /* iMBMusicController.m */,
 				795D6F4F09D35B77005F166D /* iMBLinksController.h */,
 				795D6F5009D35B77005F166D /* iMBLinksController.m */,
+				7903561009E3AF7B00384D08 /* iMBContactsController.h */,
+				7903561109E3AF7B00384D08 /* iMBContactsController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -555,6 +580,8 @@
 				795D70E109D39D73005F166D /* iMBLibraryNode.h in Headers */,
 				795D715B09D3AB47005F166D /* iMBAbstractParser.h in Headers */,
 				796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */,
+				7903561209E3AF7B00384D08 /* iMBContactsController.h in Headers */,
+				7903562609E3B40D00384D08 /* iMBAddressBookParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -720,6 +747,9 @@
 				7990CDE009D76E7800AD74BA /* iTunesSmartPlaylist.png in Resources */,
 				7990CDF209D772FF00AD74BA /* Links.nib in Resources */,
 				7956049409D78F9F00BF1DA5 /* LICENSE in Resources */,
+				7903561E09E3B17A00384D08 /* Contacts.nib in Resources */,
+				7903562109E3B30F00384D08 /* contacts.png in Resources */,
+				79858F6809E3C3AB003EA241 /* contact.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -763,6 +793,8 @@
 				79D119FA09D6B93E00ED2FFC /* iMBMovieView.m in Sources */,
 				7990CD5B09D75D4A00AD74BA /* iMBiTunesVideoParser.m in Sources */,
 				96F908C809D9B6070071BFFB /* NSWorkspace+Extensions.m in Sources */,
+				7903561309E3AF7B00384D08 /* iMBContactsController.m in Sources */,
+				7903562709E3B40D00384D08 /* iMBAddressBookParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -800,6 +832,14 @@
 				29B97319FDCFA39411CA2CEA /* English */,
 			);
 			name = MediaBrowser.nib;
+			sourceTree = "<group>";
+		};
+		7903561C09E3B17A00384D08 /* Contacts.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7903561D09E3B17A00384D08 /* English */,
+			);
+			name = Contacts.nib;
 			sourceTree = "<group>";
 		};
 		791F97630975D4970071B2E0 /* MainMenu.nib */ = {
@@ -868,7 +908,7 @@
 		969656A208C6A24500F2F85C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = ppc;
+				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;

@@ -85,7 +85,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)didDeactivate
 {
-	[oView unbind:@"images"];
+	[oPhotoView unbind:@"images"];
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard

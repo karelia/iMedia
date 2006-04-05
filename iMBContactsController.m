@@ -1,0 +1,178 @@
+/*
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a 
+ copy of this software and associated documentation files (the "Software"), 
+ to deal in the Software without restriction, including without limitation 
+ the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ and/or sell copies of the Software, and to permit persons to whom the Software 
+ is furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in 
+ all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ 
+ Please send fixes to
+	<ghulands@framedphotographics.com>
+	<ben@scriptsoftware.com>
+ 
+ */
+
+#import "iMBContactsController.h"
+#import "iMBLibraryNode.h"
+
+@implementation iMBContactsController
+
+- (id)initWithPlaylistController:(NSTreeController *)ctrl
+{
+	if (self = [super initWithPlaylistController:ctrl]) {
+		[NSBundle loadNibNamed:@"Contacts" owner:self];
+	}
+	return self;
+}
+
+- (void)awakeFromNib
+{
+	//[oLinkController setDelegate:self];
+}
+
+- (NSString *)mediaType
+{
+	return @"contacts";
+}
+
+static NSImage *_toolbarIcon = nil;
+
+- (NSImage*)toolbarIcon
+{
+	if(_toolbarIcon == nil)
+	{
+		NSBundle *b = [NSBundle bundleForClass:[self class]];
+		NSString *p = [b pathForResource:@"contacts" ofType:@"png"];
+		_toolbarIcon = [[NSImage alloc] initWithContentsOfFile:p];
+		[_toolbarIcon setScalesWhenResized:YES];
+		[_toolbarIcon setSize:NSMakeSize(32,32)];
+	}
+	return _toolbarIcon;
+}
+
+
+- (NSString *)name
+{
+	return NSLocalizedString(@"Contacts", @"Browser Name");
+}
+
+- (NSView *)browserView
+{
+	return oView;
+}
+
+- (void)willActivate
+{
+	[super willActivate];
+	[oPhotoView bind:@"images" 
+			toObject:[self controller] 
+		 withKeyPath:@"selection.People" 
+			 options:nil];
+	[[oPhotoView window] makeFirstResponder:oPhotoView];
+}
+
+- (void)didDeactivate
+{
+	[oPhotoView unbind:@"images"];
+}
+
+- (BOOL)tableView:(NSTableView *)tv
+		writeRows:(NSArray*)rows
+	 toPasteboard:(NSPasteboard*)pboard
+{
+	// we don't want to overwrite any other existing types on the pboard
+	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
+	[types addObject:NSURLPboardType];
+    [types addObject:@"WebURLsWithTitlesPboardType"]; // a type that Safari declares
+    [types addObject:NSStringPboardType];
+	
+	[pboard declareTypes:types
+				   owner:nil];
+	
+	NSArray *content = nil; //[oLinkController arrangedObjects];
+	NSEnumerator *e = [rows objectEnumerator];
+	NSNumber *cur;
+	NSMutableArray *urls = [NSMutableArray array];
+    
+    // for WebURLsWithTitlesPboardType
+    NSMutableArray *URLsWithTitles = [NSMutableArray array];
+    NSMutableArray *URLsAsStrings = [NSMutableArray array];
+    NSMutableArray *titles = [NSMutableArray array];
+    
+    // for NSStringPboardType
+    BOOL addedStringPboardType = NO;
+	
+	while (cur = [e nextObject])
+	{
+        unsigned int contextIndex = [cur unsignedIntValue];
+		NSDictionary *link = [content objectAtIndex:contextIndex];
+		NSString *loc = [link objectForKey:@"URL"];
+		
+		NSURL *url = [NSURL URLWithString:loc];
+		[urls addObject:url];
+        
+        [URLsAsStrings addObject:loc];
+        [titles addObject:[link objectForKey:@"Name"]];
+        
+        if ( NO == addedStringPboardType )
+        {
+            // we just add the first URL we find
+            [pboard setPropertyList:loc forType:NSStringPboardType];
+            addedStringPboardType = YES;
+        }
+	}
+	[pboard setPropertyList:urls forType:NSURLPboardType];
+    
+    [URLsWithTitles insertObject:URLsAsStrings atIndex:0];
+    [URLsWithTitles insertObject:titles atIndex:1];
+    [pboard setPropertyList:URLsWithTitles forType:@"WebURLsWithTitlesPboardType"];
+    
+	return YES;
+}
+
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+{
+	// we don't want to overwrite any other existing types on the pboard
+	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
+	[types addObject:NSURLPboardType];
+	[types addObject:@"WebURLsWithTitlesPboardType"]; // a type that Safari declares
+	
+	[pboard declareTypes:types
+				   owner:nil];
+	NSMutableArray *urls = [NSMutableArray array];
+	// for WebURLsWithTitlesPboardType
+    NSMutableArray *URLsWithTitles = [NSMutableArray array];
+    NSMutableArray *URLsAsStrings = [NSMutableArray array];
+    NSMutableArray *titles = [NSMutableArray array];
+	
+	NSEnumerator *e = [[playlist attributeForKey:@"People"] objectEnumerator];
+	NSDictionary *cur;
+	
+	while (cur = [e nextObject])
+	{
+		NSString *loc = [cur objectForKey:@"URL"];
+#warning What if NSURL can't be constructed?  e.g. if it's a javascript bookmarkelet?  We need to exit gracefully.
+		
+		[urls addObject:[NSURL URLWithString:loc]];
+		
+		[URLsAsStrings addObject:loc];
+        [titles addObject:[cur objectForKey:@"Name"]];
+	}
+	[pboard setPropertyList:urls forType:NSURLPboardType];
+	[URLsWithTitles insertObject:URLsAsStrings atIndex:0];
+    [URLsWithTitles insertObject:titles atIndex:1];
+    [pboard setPropertyList:URLsWithTitles forType:@"WebURLsWithTitlesPboardType"];
+}
+
+@end
