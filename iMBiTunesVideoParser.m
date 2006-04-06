@@ -129,13 +129,16 @@
 	
 	for (x=0;x<playlistCount;x++)
 	{
-		NSMutableArray *newPlaylist = [NSMutableArray array];
+		NSMutableSet *newPlaylist = [NSMutableSet set];	// This is a set because the items seem to be listed multiple times
+#warning FIXME ??? I think we only want to scan the "Master" list, so we don't get redundancies?
+#warning -- Or maybe the problem is that the top level is combining all of the other playlists, so you get multiple copies...
+		
 		NSArray *libraryItems = [[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Playlist Items"];
 		int i;
 		BOOL hasVideos = NO;
+		NSDictionary * tracksDictionary = [musicLibrary objectForKey:@"Tracks"];
 		for (i=0; i<[libraryItems count]; i++)
 		{
-			NSDictionary * tracksDictionary = [musicLibrary objectForKey:@"Tracks"];
 			NSDictionary * newPlaylistContent = [tracksDictionary objectForKey:[[[libraryItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue]];
 			if ([newPlaylistContent objectForKey:@"Name"] && 
 				[[newPlaylistContent objectForKey:@"Location"] length] > 0 &&
@@ -161,8 +164,8 @@
 				}
 				if (thumb)
 				{
+#warning TODO: it will probably be much faster NOT to load any thumbnails until they are actually needed, THEN cache them.
 					[movieRec setObject:thumb forKey:@"CachedThumb"];
-					NSLog(@"Got thumb for %@", path);
 				}
 				else
 				{
@@ -217,7 +220,7 @@
 				}
 				[node release];
 			}
-			[node setAttribute:newPlaylist forKey:@"Movies"];
+			[node setAttribute:[newPlaylist allObjects] forKey:@"Movies"];
 		}
 	}
 	BOOL libraryHasVideos = NO;

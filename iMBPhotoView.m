@@ -97,7 +97,7 @@ NSRect centeredAspectRatioPreservedRect(NSRect rect, NSSize imgSize, NSSize maxC
 	float ratioV = imgSize.height / NSHeight(rect);
 	float destWidth = 0;
 	float destHeight = 0;
-	
+#warning TODO: Don't scale an image LARGER, only SMALLER.
 	if (ratioV > ratioH) {
 		destHeight = NSHeight(rect);
 		if (destHeight > maxCellSize.height)

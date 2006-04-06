@@ -85,6 +85,7 @@ Please send fixes to
 				NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
 				[newPicture setObject:filePath forKey:@"ImagePath"];
 				[newPicture setObject:[filePath lastPathComponent] forKey:@"Caption"];
+#warning TODO: you could get a richer caption out of the metadata from the movie, though it might be slow unless lazily instantiated.
 				[newPicture setObject:filePath forKey:@"ThumbPath"];
 				[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimerInterval"];
 				//we want to cache the first frame of the movie here as we will be in a background thread
@@ -94,14 +95,13 @@ Please send fixes to
 				[movie release];
 				if (thumb)
 				{
+#warning TODO: it will probably be much faster NOT to load any thumbnails until they are actually needed, THEN cache them.
 					[newPicture setObject:thumb forKey:@"CachedThumb"];
 				}
 				else
 				{
           [newPicture setObject:[[NSWorkspace sharedWorkspace]
             iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
-
-//					[newPicture setObject:[[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Quicktime Player.app"]
 								   forKey:@"CachedThumb"];
 				}
 				[movies addObject:newPicture];

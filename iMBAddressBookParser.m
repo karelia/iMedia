@@ -91,6 +91,7 @@
 		[rec setObject:[NSString stringWithFormat:@"%@ %@", firstName, lastName] forKey:@"Caption"];
 		[rec setObject:[NSString stringWithFormat:@"%@ %@", firstName, lastName] forKey:@"ThumbPath"];
 		[rec setObject:[NSString stringWithFormat:@"%@ %@", firstName, lastName] forKey:@"ImagePath"];
+#warning TODO: it will probably be much faster NOT to load any thumbnails until they are actually needed, THEN cache them.
 		[rec setObject:icon forKey:@"CachedThumb"];
 		NSMutableArray *emls = [NSMutableArray array];
 		if (home) [emls addObject:home];

@@ -40,25 +40,45 @@
 - (NSImage *)betterPosterImage;
 {
 	NSDictionary *attr = [self movieAttributes];
+	
+	// initialize with zero; we want something more interesting.
 	QTTime qttime = QTZeroTime;
+	
+	// first try to get CURRENT time.
 	NSValue *timeValue = [attr objectForKey:QTMovieCurrentTimeAttribute];
-	if (nil == timeValue)
+	if (nil != timeValue)
+	{
+		qttime = [timeValue QTTimeValue];
+	}
+	
+	// If still zero, get POSTER time.
+	if (NSOrderedSame == QTTimeCompare(qttime, QTZeroTime))
 	{
 		timeValue = [attr objectForKey:QTMoviePosterTimeAttribute];
+		if (nil != timeValue)
+		{
+			qttime = [timeValue QTTimeValue];
+		}
 	}
-	if (nil == timeValue)
+	
+	// if still zero, get 20 seconds in, capped at 1/5 movie time.
+	if (NSOrderedSame == QTTimeCompare(qttime, QTZeroTime))
 	{
+		qttime = QTMakeTimeWithTimeInterval(20.0);
+		
 		timeValue = [attr objectForKey:QTMovieDurationAttribute];
-		
-		// cap at 1/10 of total time
-		qttime = [timeValue QTTimeValue];
-		
+		if (nil != timeValue)
+		{
+			QTTime capTime = [timeValue QTTimeValue];
+			capTime.timeValue /= 5;
+			if (NSOrderedDescending == QTTimeCompare(qttime, capTime))	// 20 seconds > 1/5 total?
+			{
+				qttime = capTime;
+			}
+		}
 	}
-	qttime = [timeValue QTTimeValue];
-	return [self posterImage];
+	return [self frameImageAtTime:qttime];
 }
-//- (NSImage *)currentFrameImage;
-//- (NSImage *)frameImageAtTime:(QTTime)time;
 
 
 @end
