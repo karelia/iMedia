@@ -63,7 +63,7 @@ static NSMutableDictionary *_parsers = nil;
 	[self registerBrowser:NSClassFromString(@"iMBMusicController")];
 	[self registerBrowser:NSClassFromString(@"iMBMoviesController")];
 	[self registerBrowser:NSClassFromString(@"iMBLinksController")];
-	[self registerBrowser:NSClassFromString(@"iMBContactsController")];
+	//[self registerBrowser:NSClassFromString(@"iMBContactsController")];
 	
 	//find and load all plugins
 	NSArray *plugins = [iMediaBrowser findBundlesWithExtension:@"iMediaBrowser" inFolderName:@"iMediaBrowser"];
@@ -122,11 +122,15 @@ static NSMutableDictionary *_parsers = nil;
 
 + (void)registerBrowser:(Class)aClass
 {
-	[_browserClasses addObject:NSStringFromClass(aClass)];
+	if (aClass != NULL)
+	{
+		[_browserClasses addObject:NSStringFromClass(aClass)];
+	}
 }
 
 + (void)unregisterBrowser:(Class)aClass
 {
+	if (aClass == NULL) return;
 	NSEnumerator *e = [_browserClasses objectEnumerator];
 	NSString *cur;
 	while (cur = [e nextObject]) {
@@ -140,6 +144,9 @@ static NSMutableDictionary *_parsers = nil;
 
 + (void)registerParser:(Class)aClass forMediaType:(NSString *)media
 {
+	NSAssert(aClass != NULL, @"aClass is NULL");
+	NSAssert(media != nil, @"media is nil");
+	
 	NSMutableArray *parsers = [_parsers objectForKey:media];
 	if (!parsers)
 	{
