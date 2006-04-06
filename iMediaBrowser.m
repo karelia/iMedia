@@ -265,7 +265,6 @@ static NSMutableDictionary *_parsers = nil;
 	[[self window] setDelegate:self];
 	[oPlaylists setDataSource:self];
 	[oPlaylists setAllowsColumnReordering:NO];
-	[oPlaylists setSortDescriptors:nil];
 	[libraryController setSortDescriptors:nil];
 	[oSplitView setDelegate:self];
 }
