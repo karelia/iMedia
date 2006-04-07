@@ -8,11 +8,20 @@
 
 #import "iMBLibraryNode.h"
 
+static NSMutableDictionary *imageCache = nil;
+
 @interface iMBLibraryNode (Private)
 - (void)setParent:(iMBLibraryNode *)node;
 @end
 
 @implementation iMBLibraryNode
+
++ (void)initialize
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	imageCache = [[NSMutableDictionary dictionary] retain];
+	[pool release];
+}
 
 - (id)init
 {
@@ -88,9 +97,14 @@
 {
 	if (!myIcon && myIconName)
 	{
-		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForImageResource:myIconName];
-		myIcon = [[NSImage alloc] initWithContentsOfFile:p];
+		myIcon = [[imageCache objectForKey:myIconName] retain];
+		if (!myIcon)
+		{
+			NSBundle *b = [NSBundle bundleForClass:[self class]];
+			NSString *p = [b pathForImageResource:myIconName];
+			myIcon = [[NSImage alloc] initWithContentsOfFile:p];
+			[imageCache setObject:myIcon forKey:myIconName];
+		}
 	}
 	return myIcon;
 }
@@ -171,11 +185,6 @@
 		
 		// start with a mutablestring with the name (padding a space at beginning)
 		myCachedNameWithImage = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@",tmpValue]];
-		
-		if (!libraryImage)
-		{
-			libraryImage = [[[NSImage alloc] initWithContentsOfFile:[[NSBundle bundleForClass:[self class]] pathForImageResource:[self iconName]]] autorelease];
-		}
 		
 		[libraryImage setScalesWhenResized:YES];
 		[libraryImage setSize:NSMakeSize(14, 14)];
