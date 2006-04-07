@@ -173,7 +173,9 @@
 						iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
 								   forKey:@"CachedThumb"];
 				}
-				
+				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Location"] forKey:@"ImagePath"];
+				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Location"] forKey:@"ThumbPath"];
+				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Name"] forKey:@"Caption"];
 				[newPlaylist addObject:movieRec];
 				hasVideos = YES;
 			}
