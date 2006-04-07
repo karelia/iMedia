@@ -59,6 +59,8 @@ Please send fixes to
 	BOOL isDir;
 	NSArray *movieTypes = [QTMovie movieFileTypes:QTIncludeAllTypes];
 	NSMutableArray *movies = [NSMutableArray array];
+	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
+	int poolRelease = 0;
 	
 	while (cur = [e nextObject])
 	{
@@ -107,7 +109,15 @@ Please send fixes to
 				[movies addObject:newPicture];
 			}
 		}
+		poolRelease++;
+		if (poolRelease == 5)
+		{
+			poolRelease = 0;
+			[innerPool release];
+			innerPool = [[NSAutoreleasePool alloc] init];
+		}
 	}
+	[innerPool release];
 	[root setAttribute:movies forKey:@"Movies"];
 }
 
