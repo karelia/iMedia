@@ -27,6 +27,7 @@ Please send fixes to
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+Extensions.h"
 #import "QTMovie+iMedia.h"
+#import "iMedia.h"
 
 #import <QTKit/QTKit.h>
 
@@ -113,7 +114,7 @@ Please send fixes to
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:NSLocalizedString(@"iPhoto", @"iPhoto")];
+	[root setName:LocalizedStringInThisBundle(@"iPhoto", @"iPhoto")];
 	[root setIconName:@"photo_tiny"];
 	
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];

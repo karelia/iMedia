@@ -394,9 +394,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				3C3A131C09EAFB8100AF41BF /* Localizable.strings */,
 				968BEF3E090E904100D00E5C /* images */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
+				3C3A131C09EAFB8100AF41BF /* Localizable.strings */,
 				29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */,
 				791F97630975D4970071B2E0 /* MainMenu.nib */,
 				791F97A20975DA170071B2E0 /* iTunes.nib */,
@@ -785,7 +785,7 @@
 		3C3A132409EAFBA700AF41BF /* Generate Localizable.strings */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 8;
-			comments = "\nThis build phase runs genstrings against all .h and .m files in the project. This might prove to be excessive since it will pick up NSLocalizedStrings for classes only in the iMediaBrowse app as well. In practice, though, this shouldn't be a problem.\n\nNote that .strings files are in UTF-16 format. By passing the -u command to genstrings, we allow escaped Unicode sequences to be copied to the strings file without error. This is useful for things like smart quotes where the compiler will complain if it encounters certain Unicode characters, even in quoted NSString constants, but won't complain if they are escaped into \\\\Uxxxx sequences.\n\nNote further that this script runs only on Install. When creating an install build for end-user distribution, your Localizable.strings file will likely be marked as M(odified) by Subversion. You can either check the mods in or discard the file and update: the strings file will be regenerated during the next install build anyway.\n\n-- Terrence 4/10/2006\n\n";
+			comments = "\nThis build phase runs genstrings against all .h and .m files in the project. We use the -s flag to substitute our macro, LocalizedStringInThisBundle, for NSLocalizedString.\n\nNote that .strings files are in UTF-16 format. By passing the -u command to genstrings, we allow escaped Unicode sequences to be copied to the strings file without error. This is useful for things like smart quotes where the compiler will complain if it encounters certain Unicode characters, even in quoted NSString constants, but won't complain if they are escaped into \\\\Uxxxx sequences.\n\nNote further that this script runs only on Install. When creating an install build for end-user distribution, your Localizable.strings file will likely be marked as M(odified) by Subversion. You can either check the mods in or discard the file and update: the strings file will be regenerated during the next install build anyway.\n\n-- Terrence 4/10/2006\n\n";
 			files = (
 			);
 			inputPaths = (
@@ -795,7 +795,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "\n# see Comments for information on this script\n\necho \"Generating Localizable.strings ...\"\n\ncd ${SRCROOT}\ngenstrings -u -o English.lproj *.[hm]\n\n";
+			shellScript = "\n# see Comments for information on this script\n\necho \"Generating Localizable.strings ...\"\n\ncd ${SRCROOT}\ngenstrings -q -u -s LocalizedStringInThisBundle -o English.lproj *.[hm]\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

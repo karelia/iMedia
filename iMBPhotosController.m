@@ -26,6 +26,7 @@ Please send fixes to
 #import "iMediaBrowser.h"
 #import "iMBPhotoView.h"
 #import "iMBLibraryNode.h"
+#import "iMedia.h"
 
 @interface iMBPhotosController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
@@ -70,7 +71,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return NSLocalizedString(@"Photos", @"Photos");
+	return LocalizedStringInThisBundle(@"Photos", @"Photos");
 }
 
 - (void)willActivate

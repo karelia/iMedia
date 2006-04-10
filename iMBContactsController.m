@@ -25,6 +25,7 @@
 
 #import "iMBContactsController.h"
 #import "iMBLibraryNode.h"
+#import "iMedia.h"
 
 @implementation iMBContactsController
 
@@ -64,7 +65,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return NSLocalizedString(@"Contacts", @"Browser Name");
+	return LocalizedStringInThisBundle(@"Contacts", @"Browser Name");
 }
 
 - (NSView *)browserView

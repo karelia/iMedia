@@ -25,6 +25,8 @@ Please send fixes to
 #import "iMBiTunesMusicParser.h"
 #import "iMBLibraryNode.h"
 #import "iMediaBrowser.h"
+#import "iMedia.h"
+
 
 @implementation iMBiTunesMusicParser
 
@@ -96,7 +98,7 @@ Please send fixes to
 	int x = 0;
 	
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:NSLocalizedString(@"iTunes", @"iTunes")];
+	[root setName:LocalizedStringInThisBundle(@"iTunes", @"iTunes")];
 	[root setIconName:@"MBiTunes"];
 	
 	iMBLibraryNode *library = [[iMBLibraryNode alloc] init];
@@ -105,16 +107,16 @@ Please send fixes to
 	iMBLibraryNode *purchasedLib = [[iMBLibraryNode alloc] init];
 	NSMutableArray *smartPlaylists = [NSMutableArray array];
 	
-	[library setName:NSLocalizedString(@"Library", @"Library")];
+	[library setName:LocalizedStringInThisBundle(@"Library", @"Library")];
 	[library setIconName:@"MBiTunesLibrary"];
 	
-	[podcastLib setName:NSLocalizedString(@"Podcasts", @"Podcasts")];
+	[podcastLib setName:LocalizedStringInThisBundle(@"Podcasts", @"Podcasts")];
 	[podcastLib setIconName:@"MBiTunesPodcast"];
 	
-	[partyShuffleLib setName:NSLocalizedString(@"Party Shuffle", @"Party Shuffle")];
+	[partyShuffleLib setName:LocalizedStringInThisBundle(@"Party Shuffle", @"Party Shuffle")];
 	[partyShuffleLib setIconName:@"MBiTunesPartyShuffle"];
 	
-	[purchasedLib setName:NSLocalizedString(@"Purchased", @"Purchased")];
+	[purchasedLib setName:LocalizedStringInThisBundle(@"Purchased", @"Purchased")];
 	[purchasedLib setIconName:@"MBiTunesPurchasedPlaylist"];
 	
 	int playlistCount = [[musicLibrary objectForKey:@"Playlists"] count];

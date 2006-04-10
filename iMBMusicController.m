@@ -27,6 +27,7 @@ Please send fixes to
 #import "iMBDNDArrayController.h"
 #import "TimeValueTransformer.h"
 #import "iMBLibraryNode.h"
+#import "iMedia.h"
 
 #import <QTKit/QTKit.h>
 #import <QTKit/QTMovieView.h>
@@ -92,7 +93,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return NSLocalizedString(@"Audio", @"Audio");
+	return LocalizedStringInThisBundle(@"Audio", @"Audio");
 }
 
 - (void)setSelectionChanged:(id)val

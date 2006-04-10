@@ -23,7 +23,11 @@
   
  */
 
+#define LocalizedStringInThisBundle(key, comment) \
+    [[NSBundle bundleForClass:[self class]] localizedStringForKey:(key) value:@"" table:nil]
+
 #import <iMediaBrowser/iMediaBrowser.h>
 #import <iMediaBrowser/iMBLibraryNode.h>
 #import <iMediaBrowser/iMBAbstractParser.h>
 #import <iMediaBrowser/iMBAbstractController.h>
+

@@ -28,6 +28,7 @@ Please send fixes to
 #import "NSWorkspace+Extensions.h"
 #import <QTKit/QTKit.h>
 #import "QTMovie+iMedia.h"
+#import "iMedia.h"
 
 @implementation iMBMoviesFolder
 
@@ -124,7 +125,7 @@ Please send fixes to
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:NSLocalizedString(@"Movies Folder", @"Node name")];
+	[root setName:LocalizedStringInThisBundle(@"Movies Folder", @"Node name")];
 	[root setIconName:@"picturesFolder"];
 	
 	[self recursivelyParse:[NSHomeDirectory() stringByAppendingString:@"/Movies/"] 

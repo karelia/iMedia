@@ -25,6 +25,7 @@ Please send fixes to
 
 #import "iMBLinksController.h"
 #import "iMBLibraryNode.h"
+#import "iMedia.h"
 
 @implementation iMBLinksController
 
@@ -64,7 +65,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return NSLocalizedString(@"Links", @"Browser Name");
+	return LocalizedStringInThisBundle(@"Links", @"Browser Name");
 }
 
 - (NSView *)browserView

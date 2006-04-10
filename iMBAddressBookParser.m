@@ -26,6 +26,7 @@
 #import "iMBLibraryNode.h"
 #import "iMediaBrowser.h"
 #import <AddressBook/AddressBook.h>
+#import "iMedia.h"
 
 @implementation iMBAddressBookParser
 
@@ -120,7 +121,7 @@
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:NSLocalizedString(@"Address Book", @"Root Node Name")];
+	[root setName:LocalizedStringInThisBundle(@"Address Book", @"Root Node Name")];
 	[root setIcon:[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.AddressBook"]];
 	
 	ABAddressBook *ab = [ABAddressBook sharedAddressBook];

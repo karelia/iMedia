@@ -25,6 +25,7 @@ Please send fixes to
 #import "iMBiPhotoPhotosParser.h"
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
+#import "iMedia.h"
 
 @implementation iMBiPhotoPhotosParser
 
@@ -109,7 +110,7 @@ Please send fixes to
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:NSLocalizedString(@"iPhoto", @"iPhoto")];
+	[root setName:LocalizedStringInThisBundle(@"iPhoto", @"iPhoto")];
 	[root setIconName:@"photo_tiny"];
 	
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];

@@ -26,6 +26,7 @@ Please send fixes to
 #import "iMBPicturesFolder.h"
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
+#import "iMedia.h"
 
 @implementation iMBPicturesFolder
 
@@ -103,7 +104,7 @@ Please send fixes to
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:NSLocalizedString(@"Pictures Folder", @"Node name")];
+	[root setName:LocalizedStringInThisBundle(@"Pictures Folder", @"Node name")];
 	[root setIconName:@"picturesFolder"];
 	
 	[self recursivelyParse:[NSHomeDirectory() stringByAppendingString:@"/Pictures/"] 

@@ -26,6 +26,7 @@
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
 #import <WebKit/WebKit.h>
+#import "iMedia.h"
 
 @implementation iMBSafariBookmarkParser
 
@@ -53,12 +54,12 @@
 	
 	if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksBar"])
 	{
-		[parsed setName:NSLocalizedString(@"Bookmarks Bar", @"Bookmarks Bar")];
+		[parsed setName:LocalizedStringInThisBundle(@"Bookmarks Bar", @"Bookmarks Bar")];
 		[parsed setIconName:@"SafariBookmarksBar"];
 	}
 	else if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksMenu"])
 	{
-		[parsed setName:NSLocalizedString(@"Bookmarks Menu", @"Bookmarks Menu")];
+		[parsed setName:LocalizedStringInThisBundle(@"Bookmarks Menu", @"Bookmarks Menu")];
 		[parsed setIconName:@"SafariBookmarksMenu"];
 	}
 	else if ([[item objectForKey:@"Title"] isEqualToString:@"Address Book"] ||
@@ -122,7 +123,7 @@
 	iMBLibraryNode *library = [[iMBLibraryNode alloc] init];
 	NSDictionary *xml = [NSDictionary dictionaryWithContentsOfFile:[self databasePath]];
 	
-	[library setName:NSLocalizedString(@"Safari", @"Safari")];
+	[library setName:LocalizedStringInThisBundle(@"Safari", @"Safari")];
 	[library setIconName:@"safari"];
 	
 	NSEnumerator *groupEnum = [[xml objectForKey:@"Children"] objectEnumerator];

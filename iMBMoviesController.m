@@ -26,6 +26,7 @@ Please send fixes to
 #import <QTKit/QTKit.h>
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
+#import "iMedia.h"
 
 @interface iMBMoviesController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
@@ -77,7 +78,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return NSLocalizedString(@"Movies", @"Movies");
+	return LocalizedStringInThisBundle(@"Movies", @"Movies");
 }
 
 - (void)didDeactivate
