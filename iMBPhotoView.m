@@ -152,6 +152,12 @@ static NSShadow *_shadow = nil;
 #define X_TEXT_BOX_BORDER 2
 #define Y_TEXT_BOX_BORDER 2
 #define CELL_PADDING 5
+
+#warning This is a constant, but it (and height) really ought to be property of the data being viewed as thumbs.
+#warning For instance, address book entries could max out at 64x64 or something.
+
+#warning -- rubberbanding gets to be glacially slow as you add more and more items (like more than 25) to the selection.
+
 #define MAX_THUMB_WIDTH 240
 
 static NSDictionary *titleFontAttributes;
@@ -422,7 +428,11 @@ static NSImage *_badge = nil;
 					unsigned thisIdx = [myRects indexOfObject:rec];
 					int i;
 					NSDictionary *curRec;
-										
+
+#warning I got firstIdx set to NSNotFound -- need to deal with this.  (How is that possible?)
+					if (NSNotFound == firstIdx || NSNotFound == thisIdx) break;
+					
+																	   
 					if (thisIdx > firstIdx) // add to the selection
 					{
 						for (i = firstIdx; i <= thisIdx; i++)

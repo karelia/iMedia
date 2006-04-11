@@ -178,4 +178,7 @@ static NSImage *_toolbarIcon = nil;
 	}
 }
 
+#warning Suggestion: Could favicons be shown?  Only if we can use Safari's cache, and NOT slow down
+#warning responsiveness with network loads of images!
+
 @end

@@ -81,4 +81,25 @@
 }
 
 
+- (BOOL) isDRMProtected
+{
+	MediaHandler mh = GetMediaHandler([[[[self tracks] objectAtIndex:0] media] quickTimeMedia]);
+	
+	BOOL isProtected = NO;
+
+	ComponentResult result = 
+		QTGetComponentProperty(
+			mh,								// ComponentInstance        inComponent,
+			kQTPropertyClass_DRM,			// ComponentPropertyClass   inPropClass,
+			kQTDRMPropertyID_IsProtected,	// ComponentPropertyID      inPropID,
+			sizeof(BOOL),					// ByteCount                inPropValueSize,
+			&isProtected,					// ComponentValuePtr        outPropValueAddress,
+			NULL);							// ByteCount *              outPropValueSizeUsed)
+
+
+	
+}
+
+
+
 @end

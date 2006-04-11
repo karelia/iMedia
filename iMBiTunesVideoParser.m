@@ -155,13 +155,26 @@
 				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:&error];
 				if (nil != movie)
 				{
-					thumb = [movie betterPosterImage];
-					
+					if ([movie isDRMProtected])
+#warning It would  be nice to have an option for avoiding DRM files altogether in the browser, so we could skip each DRM file.
+					{
+						thumb = [[NSWorkspace sharedWorkspace] iconForFileType:@"MooV"];
+						
+						
+#warning How about for DRM movies, a lock icon composited over the standard QuickTime file instead?
+						// Badge we could composite: /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/LockedBadgeIcon.icns
+					}
+					else
+					{
+						thumb = [movie betterPosterImage];
+					}
 					[movie release];
 				}
 				else
 				{
-					NSLog(@"Error reading movie '%@': %@", path, [error localizedDescription]);
+					NSLog(@"Error reading movie '%@': %@", path, error);
+					
+					// -2126 means notAllowedToSaveMovieErr .... huh?
 				}
 				if (thumb)
 				{
@@ -171,7 +184,7 @@
 				else
 				{
 					[movieRec setObject:[[NSWorkspace sharedWorkspace]
-						iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
+								iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
 								   forKey:@"CachedThumb"];
 				}
 				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Location"] forKey:@"ImagePath"];

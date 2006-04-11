@@ -4,5 +4,6 @@
 @interface QTMovie ( iMedia )
 
 - (NSImage *)betterPosterImage;
+- (BOOL) isDRMProtected;
 
 @end
