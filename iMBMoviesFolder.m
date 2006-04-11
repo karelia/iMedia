@@ -90,7 +90,7 @@ Please send fixes to
 				[newPicture setObject:[filePath lastPathComponent] forKey:@"Caption"];
 #warning TODO: you could get a richer caption out of the metadata from the movie, though it might be slow unless lazily instantiated.
 				[newPicture setObject:filePath forKey:@"ThumbPath"];
-				[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimerInterval"];
+				[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimeInterval"];
 				//we want to cache the first frame of the movie here as we will be in a background thread
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
 				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:nil];

@@ -92,7 +92,8 @@ Please send fixes to
 				}
 				if ([fileAttribs valueForKey:NSFileModificationDate])
 				{
-					[newPicture setObject:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate] forKey:@"DateAsTimerInterval"];
+					[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]]
+                                                              forKey:@"DateAsTimeInterval"];
 				}
 				[images addObject:newPicture];
 			}
