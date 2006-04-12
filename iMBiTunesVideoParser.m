@@ -102,7 +102,7 @@
 	
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"iTunes", @"iTunes")];
-	[root setIconName:@"MBiTunes"];
+	[root setIconName:@"com.apple.iTunes"];
 	
 	iMBLibraryNode *library = [[iMBLibraryNode alloc] init];
 	iMBLibraryNode *podcastLib = [[iMBLibraryNode alloc] init];

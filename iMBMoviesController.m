@@ -64,8 +64,9 @@ static NSImage *_toolbarIcon = nil;
 {
 	if(_toolbarIcon == nil)
 	{
-		NSBundle *b = [NSBundle bundleForClass:[self class]];
 		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iMovie"] retain];
+		[_toolbarIcon setScalesWhenResized:YES];
+		[_toolbarIcon setSize:NSMakeSize(32,32)];
 	}
 	return _toolbarIcon;
 }

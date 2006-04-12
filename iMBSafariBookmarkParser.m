@@ -124,7 +124,7 @@
 	NSDictionary *xml = [NSDictionary dictionaryWithContentsOfFile:[self databasePath]];
 	
 	[library setName:LocalizedStringInThisBundle(@"Safari", @"Safari")];
-	[library setIconName:@"safari"];
+	[library setIconName:@"com.apple.Safari"];
 	
 	NSEnumerator *groupEnum = [[xml objectForKey:@"Children"] objectEnumerator];
 	NSDictionary *cur;

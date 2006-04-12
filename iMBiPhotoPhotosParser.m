@@ -68,8 +68,6 @@ Please send fixes to
 		return @"MBiPhotoCalendar";
 	else if ([name hasSuffix:@"Months"])
 		return @"MBiPhotoCalendar";
-	else if (name == nil)
-		return @"MBiPhotoLibrary";
 	else if ([name isEqualToString:@"Subscribed"])
 		return @"photocast";
 	else if ([name isEqualToString:@"Photocasts"])
@@ -82,6 +80,8 @@ Please send fixes to
 		return @"calendar";
 	else if ([name isEqualToString:@"Card"])
 		return @"card";
+	else if (name == nil)
+		return @"com.apple.iPhoto";			// top level library
 	else
 		return @"MBiPhotoAlbum";
 }

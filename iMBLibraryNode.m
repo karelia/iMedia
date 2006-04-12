@@ -89,10 +89,11 @@ static NSMutableDictionary *imageCache = nil;
 
 - (void)setIcon:(NSImage *)icon
 {
-	[myIcon autorelease];
+	[myIcon release];
 	myIcon = [icon retain];
 }
 
+// Get icon from named cache if possible.  Special case iPhoto app icon.
 - (NSImage *)icon
 {
 	if (!myIcon && myIconName)
@@ -100,9 +101,17 @@ static NSMutableDictionary *imageCache = nil;
 		myIcon = [[imageCache objectForKey:myIconName] retain];
 		if (!myIcon)
 		{
-			NSBundle *b = [NSBundle bundleForClass:[self class]];
-			NSString *p = [b pathForImageResource:myIconName];
-			myIcon = [[NSImage alloc] initWithContentsOfFile:p];
+			if ([myIconName hasPrefix:@"com.apple."])
+			{
+				myIcon = [[[NSWorkspace sharedWorkspace]
+					iconForAppWithBundleIdentifier:myIconName] retain];
+			}
+			else
+			{
+				NSBundle *b = [NSBundle bundleForClass:[self class]];
+				NSString *p = [b pathForImageResource:myIconName];
+				myIcon = [[NSImage alloc] initWithContentsOfFile:p];
+			}
 			[imageCache setObject:myIcon forKey:myIconName];
 		}
 	}

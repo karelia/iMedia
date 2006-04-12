@@ -56,8 +56,6 @@ static NSImage *_toolbarIcon = nil;
 {
 	if(_toolbarIcon == nil)
 	{
-		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"safari" ofType:@"png"];
 		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.Safari"] retain];
 		[_toolbarIcon setScalesWhenResized:YES];
 		[_toolbarIcon setSize:NSMakeSize(32,32)];
