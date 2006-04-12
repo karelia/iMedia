@@ -9,12 +9,6 @@
 /* Begin PBXBuildFile section */
 		3C3A131E09EAFB8100AF41BF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3C3A131C09EAFB8100AF41BF /* Localizable.strings */; };
 		3CAC73E90976F47800AF5020 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */; };
-		7903561209E3AF7B00384D08 /* iMBContactsController.h in Headers */ = {isa = PBXBuildFile; fileRef = 7903561009E3AF7B00384D08 /* iMBContactsController.h */; };
-		7903561309E3AF7B00384D08 /* iMBContactsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7903561109E3AF7B00384D08 /* iMBContactsController.m */; };
-		7903561E09E3B17A00384D08 /* Contacts.nib in Resources */ = {isa = PBXBuildFile; fileRef = 7903561C09E3B17A00384D08 /* Contacts.nib */; };
-		7903562109E3B30F00384D08 /* contacts.png in Resources */ = {isa = PBXBuildFile; fileRef = 7903562009E3B30F00384D08 /* contacts.png */; };
-		7903562609E3B40D00384D08 /* iMBAddressBookParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 7903562409E3B40D00384D08 /* iMBAddressBookParser.h */; };
-		7903562709E3B40D00384D08 /* iMBAddressBookParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7903562509E3B40D00384D08 /* iMBAddressBookParser.m */; };
 		7903562D09E3B45F00384D08 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7903562C09E3B45F00384D08 /* AddressBook.framework */; };
 		79167A0B0975260A00D9EF74 /* iMediaBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 965EB99708E1F7CE000DFF3A /* iMediaBrowser.m */; };
 		79167A0D0975260C00D9EF74 /* iMBMoviesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 969656AF08C6A2C700F2F85C /* iMBMoviesController.m */; };
@@ -60,7 +54,6 @@
 		796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ADBBF09D6562C001CF400 /* iMBAbstractController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ADBC009D6562C001CF400 /* iMBAbstractController.m */; };
 		796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796ADBE109D65986001CF400 /* CoreData.framework */; };
-		79858F6809E3C3AB003EA241 /* contact.png in Resources */ = {isa = PBXBuildFile; fileRef = 79858F6709E3C3AB003EA241 /* contact.png */; };
 		7990CD5B09D75D4A00AD74BA /* iMBiTunesVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */; };
 		7990CDB309D769DE00AD74BA /* SafariBookmarksBar.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDB109D769DE00AD74BA /* SafariBookmarksBar.png */; };
 		7990CDB409D769DE00AD74BA /* SafariBookmarksMenu.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDB209D769DE00AD74BA /* SafariBookmarksMenu.png */; };
@@ -97,7 +90,6 @@
 		965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		96F9076309D8D9690071BFFB /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9076209D8D9690071BFFB /* iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96F908C809D9B6070071BFFB /* NSWorkspace+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 96F908C609D9B6070071BFFB /* NSWorkspace+Extensions.m */; };
-		CEDB34CE09E479F300F75C8C /* QTMovie+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */; };
 		CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
 		CEF3F38609E449FF00D0058F /* NSString+UTI.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF3F38409E449FF00D0058F /* NSString+UTI.m */; };
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
@@ -594,9 +586,6 @@
 				795D70E109D39D73005F166D /* iMBLibraryNode.h in Headers */,
 				795D715B09D3AB47005F166D /* iMBAbstractParser.h in Headers */,
 				796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */,
-				7903561209E3AF7B00384D08 /* iMBContactsController.h in Headers */,
-				7903562609E3B40D00384D08 /* iMBAddressBookParser.h in Headers */,
-				CEDB34CE09E479F300F75C8C /* QTMovie+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -763,9 +752,6 @@
 				7990CDE009D76E7800AD74BA /* iTunesSmartPlaylist.png in Resources */,
 				7990CDF209D772FF00AD74BA /* Links.nib in Resources */,
 				7956049409D78F9F00BF1DA5 /* LICENSE in Resources */,
-				7903561E09E3B17A00384D08 /* Contacts.nib in Resources */,
-				7903562109E3B30F00384D08 /* contacts.png in Resources */,
-				79858F6809E3C3AB003EA241 /* contact.png in Resources */,
 				3C3A131E09EAFB8100AF41BF /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -828,8 +814,6 @@
 				79D119FA09D6B93E00ED2FFC /* iMBMovieView.m in Sources */,
 				7990CD5B09D75D4A00AD74BA /* iMBiTunesVideoParser.m in Sources */,
 				96F908C809D9B6070071BFFB /* NSWorkspace+Extensions.m in Sources */,
-				7903561309E3AF7B00384D08 /* iMBContactsController.m in Sources */,
-				7903562709E3B40D00384D08 /* iMBAddressBookParser.m in Sources */,
 				CEF3F38609E449FF00D0058F /* NSString+UTI.m in Sources */,
 				CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */,
 			);

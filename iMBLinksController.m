@@ -37,6 +37,9 @@ Please send fixes to
 	return self;
 }
 
+#warning Please put in a progress view when switching to links tab; this might be slow loading.
+
+
 - (void)awakeFromNib
 {
 	[oLinkController setDelegate:self];
