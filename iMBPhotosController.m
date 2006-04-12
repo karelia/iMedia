@@ -57,9 +57,7 @@ static NSImage *_toolbarIcon = nil;
 {
 	if(_toolbarIcon == nil)
 	{
-		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"MBiPhotoLibrary" ofType:@"png"];
-		_toolbarIcon = [[NSImage alloc] initWithContentsOfFile:p];
+		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iPhoto"] retain];
 	}
 	return _toolbarIcon;
 }
