@@ -65,7 +65,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return LocalizedStringInThisBundle(@"Contacts", @"Browser Name");
+	return LocalizedStringInThisBundle(@"Contacts", @"Name of Data Type");
 }
 
 - (NSView *)browserView

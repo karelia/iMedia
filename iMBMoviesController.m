@@ -78,7 +78,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return LocalizedStringInThisBundle(@"Movies", @"Movies");
+	return LocalizedStringInThisBundle(@"Movies", @"Name of Data Type");
 }
 
 - (void)didDeactivate

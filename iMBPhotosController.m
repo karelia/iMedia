@@ -71,7 +71,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return LocalizedStringInThisBundle(@"Photos", @"Photos");
+	return LocalizedStringInThisBundle(@"Photos", @"Name of Data Type");
 }
 
 - (void)willActivate

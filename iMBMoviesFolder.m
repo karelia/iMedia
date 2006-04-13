@@ -125,7 +125,7 @@ Please send fixes to
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:LocalizedStringInThisBundle(@"Movies Folder", @"Name of your 'Pictures' folder in your home directory")];
+	[root setName:LocalizedStringInThisBundle(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
 	[root setIconName:@"picturesFolder"];
 	
 	[self recursivelyParse:[NSHomeDirectory() stringByAppendingString:@"/Movies/"] 

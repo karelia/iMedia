@@ -93,7 +93,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return LocalizedStringInThisBundle(@"Audio", @"Audio");
+	return LocalizedStringInThisBundle(@"Audio", @"Name of Data Type");
 }
 
 - (void)setSelectionChanged:(id)val
