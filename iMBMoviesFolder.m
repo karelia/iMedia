@@ -76,7 +76,7 @@ Please send fixes to
 			[root addItem:folder];
 			[folder release];
 			[folder setIconName:@"folder"];
-			[folder setName:[cur lastPathComponent]];
+			[folder setName:[fm displayNameAtPath:[fm displayNameAtPath:[cur lastPathComponent]]]];
 			[self recursivelyParse:filePath withNode:folder];
 		}
 		else
@@ -87,7 +87,7 @@ Please send fixes to
 				
 				NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
 				[newPicture setObject:filePath forKey:@"ImagePath"];
-				[newPicture setObject:[filePath lastPathComponent] forKey:@"Caption"];
+				[newPicture setObject:[fm displayNameAtPath:[filePath lastPathComponent]] forKey:@"Caption"];
 #warning TODO: you could get a richer caption out of the metadata from the movie, though it might be slow unless lazily instantiated.
 				[newPicture setObject:filePath forKey:@"ThumbPath"];
 				[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimeInterval"];

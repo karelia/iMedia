@@ -172,9 +172,12 @@
 				}
 				else
 				{
-					NSLog(@"Error reading movie '%@': %@", path, error);
+					// Note: We'll probably get an error trying to read the thumb of a protected image.
+					if ([error code] != -2126)	// -2126 means notAllowedToSaveMovieErr .... huh?
+					{
+						NSLog(@"Error reading movie '%@': %@", path, error);
+					}
 					
-					// -2126 means notAllowedToSaveMovieErr .... huh?
 				}
 				if (thumb)
 				{

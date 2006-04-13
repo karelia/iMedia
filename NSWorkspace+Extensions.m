@@ -33,6 +33,10 @@
 - (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID;
 {
 	NSString *path = [self absolutePathForAppBundleWithIdentifier:bundleID];
+	if (nil == path)
+	{
+		return [NSImage imageNamed:@"NSDefaultApplicationIcon"];
+	}
 	return [self iconForFile:path];
 }
 

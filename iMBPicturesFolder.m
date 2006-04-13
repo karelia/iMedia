@@ -75,7 +75,7 @@ Please send fixes to
 			[root addItem:folder];
 			[folder release];
 			[folder setIconName:@"folder"];
-			[folder setName:[cur lastPathComponent]];
+			[folder setName:[fm displayNameAtPath:[cur lastPathComponent]]];
 			[self recursivelyParse:filePath withNode:folder];
 		}
 		else
@@ -87,7 +87,7 @@ Please send fixes to
 				if (filePath)
 				{
 					[newPicture setObject:filePath forKey:@"ImagePath"];
-					[newPicture setObject:[filePath lastPathComponent] forKey:@"Caption"];
+					[newPicture setObject:[fm displayNameAtPath:[filePath lastPathComponent]] forKey:@"Caption"];
 					[newPicture setObject:filePath forKey:@"ThumbPath"];
 				}
 				if ([fileAttribs valueForKey:NSFileModificationDate])
