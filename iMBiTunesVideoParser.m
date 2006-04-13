@@ -140,7 +140,7 @@
 		NSDictionary * tracksDictionary = [musicLibrary objectForKey:@"Tracks"];
 		for (i=0; i<[libraryItems count]; i++)
 		{
-			NSDictionary * newPlaylistContent = [tracksDictionary objectForKey:[[[libraryItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue]];
+			NSMutableDictionary * newPlaylistContent = [tracksDictionary objectForKey:[[[libraryItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue]];
 			if ([newPlaylistContent objectForKey:@"Name"] && 
 				[[newPlaylistContent objectForKey:@"Location"] length] > 0 &&
 				[newPlaylistContent objectForKey:@"Has Video"] && [[newPlaylistContent objectForKey:@"Has Video"] boolValue]) 

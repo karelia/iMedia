@@ -25,6 +25,7 @@ Please send fixes to
 
 #import "iMBLinksController.h"
 #import "iMBLibraryNode.h"
+#import "NSWorkspace+Extensions.h"
 #import "iMedia.h"
 
 @implementation iMBLinksController

@@ -28,6 +28,11 @@
 #import "iMBMovieView.h"
 #import <QTKit/QTKit.h>
 
+@interface iMBMovieView (PrivateAPI)
+- (NSDictionary *)recordUnderPoint:(NSPoint)p;
+@end
+
+
 #warning TODO: It may be useful to convert all QTMovie constructors to use initWithDataReference so more types are properly loaded.
 
 @implementation iMBMovieView

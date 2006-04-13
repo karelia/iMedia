@@ -78,6 +78,8 @@ Please send fixes to
 
 -(void)setPreferredBrowserTypes:(NSArray*)types;
 
+-(id<iMediaBrowser>)selectedBrowser;
+
 @end
 
 // This notification is for each specific media browser to post when their selection changes.
@@ -92,10 +94,17 @@ extern NSString *iMediaBrowserSelectionDidChangeNotification;
 - (BOOL)iMediaBrowser:(iMediaBrowser *)browser willLoadBrowser:(NSString *)browserClassname;
 - (void)iMediaBrowser:(iMediaBrowser *)browser didLoadBrowser:(NSString *)browserClassname;
 
+- (void)iMediaBrowser:(iMediaBrowser *)browser doubleClickedSelectedObjects:(NSArray*)selection;
+
+// Contextual menu support
+- (NSMenu*)iMediaBrowser:(iMediaBrowser *)browser menuForSelectedObjects:(NSArray*)selection;
+
 // NB: These delegate methods will most likely not be called on the main thread so you will have to make sure you code can handle this.
 // loading different parsers for media types
-- (BOOL)iMediaBrowser:(iMediaBrowser *)browser willUseMediaParser:(NSString *)parserClassname forMediaType:(NSString *)media;
-- (void)iMediaBrowser:(iMediaBrowser *)browser didUseMediaParser:(NSString *)parserClassname forMediaType:(NSString *)media;
+- (BOOL)iMediaBrowser:(iMediaBrowser *)browser
+   willUseMediaParser:(NSString *)parserClassname forMediaType:(NSString *)media;
+- (void)iMediaBrowser:(iMediaBrowser *)browser
+    didUseMediaParser:(NSString *)parserClassname forMediaType:(NSString *)media;
 
 // NB: These methods will be called on the main thread
 // get called back if the media browser changes

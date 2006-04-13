@@ -193,6 +193,10 @@ static NSMutableDictionary *_parsers = nil;
 	[super dealloc];
 }
 
+-(id<iMediaBrowser>)selectedBrowser {
+  return mySelectedBrowser;
+}
+
 -(void)setPreferredBrowserTypes:(NSArray*)types
 {
   [preferredBrowserTypes autorelease];

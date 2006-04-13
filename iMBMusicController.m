@@ -27,6 +27,7 @@ Please send fixes to
 #import "iMBDNDArrayController.h"
 #import "TimeValueTransformer.h"
 #import "iMBLibraryNode.h"
+#import "NSWorkspace+Extensions.h"
 #import "iMedia.h"
 
 #import <QTKit/QTKit.h>

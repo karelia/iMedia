@@ -23,6 +23,7 @@
 }
 
 - (id)init;
+- (id)initFolderWithName:(NSString*)key withItems:(NSArray*)items;
 
 - (void)setName:(NSString *)name;
 - (NSString *)name;

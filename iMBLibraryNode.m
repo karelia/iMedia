@@ -7,6 +7,7 @@
 //
 
 #import "iMBLibraryNode.h"
+#import "NSWorkspace+Extensions.h"
 
 static NSMutableDictionary *imageCache = nil;
 
@@ -29,6 +30,18 @@ static NSMutableDictionary *imageCache = nil;
 	{
 		myItems = [[NSMutableArray array] retain];
 		myAttributes = [[NSMutableDictionary dictionary] retain];
+	}
+	return self;
+}
+
+- (id)initFolderWithName:(NSString*)name withItems:(NSArray*)items;
+{
+	if (self = [super init])
+	{
+		myItems = [items mutableCopy];
+		myAttributes = [[NSMutableDictionary dictionary] retain];
+    [self setName:name];
+    [self setIconName:@"folder"];
 	}
 	return self;
 }

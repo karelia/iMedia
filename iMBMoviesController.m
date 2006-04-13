@@ -27,6 +27,7 @@ Please send fixes to
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
+#import "NSWorkspace+Extensions.h"
 
 @interface iMBMoviesController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
