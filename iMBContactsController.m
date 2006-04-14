@@ -26,6 +26,7 @@
 #import "iMBContactsController.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
+#import "NSPasteboard+iMedia.h"
 
 @implementation iMBContactsController
 
@@ -92,28 +93,17 @@ static NSImage *_toolbarIcon = nil;
 		writeRows:(NSArray*)rows
 	 toPasteboard:(NSPasteboard*)pboard
 {
-	// we don't want to overwrite any other existing types on the pboard
-	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
-	[types addObject:NSURLPboardType];
-    [types addObject:@"WebURLsWithTitlesPboardType"]; // a type that Safari declares
-    [types addObject:NSStringPboardType];
+	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
+	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	
-	[pboard declareTypes:types
-				   owner:nil];
+	[pboard declareTypes:types owner:nil];
 	
 	NSArray *content = nil; //[oLinkController arrangedObjects];
 	NSEnumerator *e = [rows objectEnumerator];
 	NSNumber *cur;
 	NSMutableArray *urls = [NSMutableArray array];
-    
-    // for WebURLsWithTitlesPboardType
-    NSMutableArray *URLsWithTitles = [NSMutableArray array];
-    NSMutableArray *URLsAsStrings = [NSMutableArray array];
     NSMutableArray *titles = [NSMutableArray array];
-    
-    // for NSStringPboardType
-    BOOL addedStringPboardType = NO;
-	
+    	
 	while (cur = [e nextObject])
 	{
         unsigned int contextIndex = [cur unsignedIntValue];
@@ -123,38 +113,22 @@ static NSImage *_toolbarIcon = nil;
 		NSURL *url = [NSURL URLWithString:loc];
 		[urls addObject:url];
         
-        [URLsAsStrings addObject:loc];
         [titles addObject:[link objectForKey:@"Name"]];
         
-        if ( NO == addedStringPboardType )
-        {
-            // we just add the first URL we find
-            [pboard setPropertyList:loc forType:NSStringPboardType];
-            addedStringPboardType = YES;
-        }
 	}
-	[pboard setPropertyList:urls forType:NSURLPboardType];
-    
-    [URLsWithTitles insertObject:URLsAsStrings atIndex:0];
-    [URLsWithTitles insertObject:titles atIndex:1];
-    [pboard setPropertyList:URLsWithTitles forType:@"WebURLsWithTitlesPboardType"];
-    
+ 	[pboard writeURLs:urls files:nil names:titles];
+
 	return YES;
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
-	// we don't want to overwrite any other existing types on the pboard
-	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
-	[types addObject:NSURLPboardType];
-	[types addObject:@"WebURLsWithTitlesPboardType"]; // a type that Safari declares
+	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
+	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	
-	[pboard declareTypes:types
-				   owner:nil];
+	[pboard declareTypes:types  owner:nil];
 	NSMutableArray *urls = [NSMutableArray array];
 	// for WebURLsWithTitlesPboardType
-    NSMutableArray *URLsWithTitles = [NSMutableArray array];
-    NSMutableArray *URLsAsStrings = [NSMutableArray array];
     NSMutableArray *titles = [NSMutableArray array];
 	
 	NSEnumerator *e = [[playlist attributeForKey:@"People"] objectEnumerator];
@@ -163,17 +137,11 @@ static NSImage *_toolbarIcon = nil;
 	while (cur = [e nextObject])
 	{
 		NSString *loc = [cur objectForKey:@"URL"];
-#warning What if NSURL can't be constructed?  e.g. if it's a javascript bookmarkelet?  We need to exit gracefully.
-		
 		[urls addObject:[NSURL URLWithString:loc]];
 		
-		[URLsAsStrings addObject:loc];
         [titles addObject:[cur objectForKey:@"Name"]];
 	}
-	[pboard setPropertyList:urls forType:NSURLPboardType];
-	[URLsWithTitles insertObject:URLsAsStrings atIndex:0];
-    [URLsWithTitles insertObject:titles atIndex:1];
-    [pboard setPropertyList:URLsWithTitles forType:@"WebURLsWithTitlesPboardType"];
+ 	[pboard writeURLs:urls files:nil names:titles];
 }
 
 @end

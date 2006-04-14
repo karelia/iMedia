@@ -28,6 +28,7 @@ Please send fixes to
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
 #import "NSWorkspace+Extensions.h"
+#import "NSPasteboard+iMedia.h"
 
 @interface iMBMoviesController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
@@ -100,30 +101,19 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
-	// we don't want to overwrite any other existing types on the pboard
-	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
-	[types addObject:NSFilenamesPboardType];
-	[types addObject:NSURLPboardType];
-	
-	[pboard declareTypes:types
-				   owner:nil];
+	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
+	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
+	[pboard declareTypes:types owner:nil];
 	
 	NSEnumerator *e = [[playlist attributeForKey:@"Movies"] objectEnumerator];
 	NSDictionary *cur;
 	NSMutableArray *files = [NSMutableArray array];
-	NSMutableArray *urls = [NSMutableArray array];
 	
 	while (cur = [e nextObject])
 	{
-		NSString *loc = [cur objectForKey:@"ImagePath"];
-		
-		NSURL *url = [NSURL fileURLWithPath:loc];
-		
-		[files addObject:[url path]];
-		[urls addObject:url];
+		[files addObject:[cur objectForKey:@"ImagePath"]];
 	}
-	[pboard setPropertyList:files forType:NSFilenamesPboardType];
-	[pboard setPropertyList:urls forType:NSURLPboardType];	
+	[pboard writeURLs:nil files:files names:nil];
 }
 
 @end

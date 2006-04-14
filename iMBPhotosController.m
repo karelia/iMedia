@@ -28,6 +28,7 @@ Please send fixes to
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+Extensions.h"
 #import "iMedia.h"
+#import "NSPasteboard+iMedia.h"
 
 @interface iMBPhotosController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
@@ -93,18 +94,15 @@ static NSImage *_toolbarIcon = nil;
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *files = [NSMutableArray array];
-	NSMutableArray *urls = [NSMutableArray array];
+	NSMutableArray *captions = [NSMutableArray array];
 	NSMutableArray *images = [NSMutableArray array];
 	NSMutableArray *albums = [NSMutableArray array];
 	
-	// we don't want to overwrite any other existing types on the pboard
-	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
-	[types addObject:NSFilenamesPboardType];
+	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
+	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	[types addObject:@"ImageDataListPboardType"];
-	[types addObject:NSURLPboardType];
-	
-	[pboard declareTypes:types
-				   owner:nil];
+	[types addObject:@"AlbumDataListPboardType"];
+	[pboard declareTypes:types owner:nil];
 	
 	//we store the images as an attribute in the node
 	NSArray *imageRecords = [playlist attributeForKey:@"Images"];
@@ -113,16 +111,13 @@ static NSImage *_toolbarIcon = nil;
 				
 	while (rec = [e nextObject]) {
 		[files addObject:[rec objectForKey:@"ImagePath"]];
+		[captions addObject:[rec objectForKey:@"Caption"]];
 		//[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
-		[urls addObject:[[NSURL fileURLWithPath:[rec objectForKey:@"ImagePath"]] description]];
 	}
-	
-	[pboard addTypes:[NSArray arrayWithObjects:@"AlbumDataListPboardType", NSFilenamesPboardType, NSURLPboardType, nil] owner:nil];
-	
+	[pboard writeURLs:nil files:files names:captions];
+
 	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:albums, @"List of Albums", images, @"Master Image List", nil];
 	[pboard setPropertyList:plist forType:@"AlbumDataListPboardType"];
-	[pboard setPropertyList:files forType:NSFilenamesPboardType];
-	[pboard setPropertyList:urls forType:NSURLPboardType];
 	
 }
 

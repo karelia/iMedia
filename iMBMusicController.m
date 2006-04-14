@@ -29,6 +29,7 @@ Please send fixes to
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+Extensions.h"
 #import "iMedia.h"
+#import "NSPasteboard+iMedia.h"
 
 #import <QTKit/QTKit.h>
 #import <QTKit/QTMovieView.h>
@@ -123,64 +124,51 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
-	// we don't want to overwrite any other existing types on the pboard
-	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
-	[types addObject:NSFilenamesPboardType];
+	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
+	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	//[types addObject:@"ImageDataListPboardType"];
-	[types addObject:NSURLPboardType];
 	
-	[pboard declareTypes:types
-				   owner:nil];
+	[pboard declareTypes:types owner:nil];
 	
 	NSEnumerator *e = [[playlist attributeForKey:@"Tracks"] objectEnumerator];
 	NSDictionary *cur;
 	NSMutableArray *files = [NSMutableArray array];
-	NSMutableArray *urls = [NSMutableArray array];
 	
 	while (cur = [e nextObject])
 	{
-		NSString *loc = [cur objectForKey:@"Location"];
-		
-		NSURL *url = [NSURL URLWithString:loc];
-		
-		[files addObject:[url path]];
-		[urls addObject:url];
+		NSString *locURLString = [cur objectForKey:@"Location"];
+		NSURL *locURL = [NSURL URLWithString:locURLString];
+		NSString *loc = [locURL path];
+		[files addObject:loc];
 	}
-	[pboard setPropertyList:files forType:NSFilenamesPboardType];
-	[pboard setPropertyList:urls forType:NSURLPboardType];
+	[pboard writeURLs:nil files:files names:nil];
 }
 
 - (BOOL)tableView:(NSTableView *)tv
 		writeRows:(NSArray*)rows
 	 toPasteboard:(NSPasteboard*)pboard
 {
-	// we don't want to overwrite any other existing types on the pboard
-	NSMutableArray *types = [NSMutableArray arrayWithArray:[pboard types]];
-	[types addObject:NSFilenamesPboardType];
+	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
+	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	//[types addObject:@"ImageDataListPboardType"];
-	[types addObject:NSURLPboardType];
 	
-	[pboard declareTypes:types
-				   owner:nil];
+	[pboard declareTypes:types owner:nil];
 	
 	NSArray *content = [songsController arrangedObjects];
 	NSEnumerator *e = [rows objectEnumerator];
 	NSNumber *cur;
 	NSMutableArray *files = [NSMutableArray array];
-	NSMutableArray *urls = [NSMutableArray array];
 	
 	while (cur = [e nextObject])
 	{
 		NSDictionary *song = [content objectAtIndex:[cur unsignedIntValue]];
-		NSString *loc = [song objectForKey:@"Location"];
-		
-		NSURL *url = [NSURL URLWithString:loc];
-		
-		[files addObject:[url path]];
-		[urls addObject:url];
+		NSString *locURLString = [song objectForKey:@"Location"];
+		NSURL *locURL = [NSURL URLWithString:locURLString];
+		NSString *loc = [locURL path];
+		[files addObject:loc];
 	}
-	[pboard setPropertyList:files forType:NSFilenamesPboardType];
-	[pboard setPropertyList:urls forType:NSURLPboardType];
+	// We add files, not URLs, since is is really a list of files
+	[pboard writeURLs:nil files:files names:nil];
 	
 	return YES;
 }

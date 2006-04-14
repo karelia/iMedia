@@ -26,6 +26,7 @@ Please send fixes to
  */
 
 #import "iMBPhotoView.h"
+#import "NSPasteboard+iMedia.h"
 
 enum {
 	AutoScrollNone = 0,
@@ -447,7 +448,7 @@ static NSImage *_badge = nil;
 					}
 					else //remove from the selection as we are selecting backwards
 					{
-						for (i = firstIdx; i >= thisIdx; i--)
+						for (i = firstIdx; i > thisIdx; i--)
 						{
 							curRec = [myRects objectAtIndex:i];
 							[mySelectedCells removeObject:[curRec objectForKey:@"thumbPath"]];
@@ -525,7 +526,7 @@ static NSImage *_badge = nil;
 				[dragImage autorelease];
 				// Write data to the pasteboard
 				NSMutableArray *fileList = [NSMutableArray array];
-				NSMutableArray *urlList = [NSMutableArray array];
+				NSMutableArray *captions = [NSMutableArray array];
 				NSMutableDictionary *iphotoData = [NSMutableDictionary dictionary];
 				NSEnumerator *e = [mySelectedCells objectEnumerator];
 				NSString *cur;
@@ -534,16 +535,20 @@ static NSImage *_badge = nil;
 					NSDictionary *rec = [self recordForThumb:cur];
 					//NSLog(@"%@", [rec objectForKey:@"ImagePath"]);
 					[fileList addObject:[rec objectForKey:@"ImagePath"]];
+					[captions addObject:[rec objectForKey:@"Caption"]];
 					[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
-					[urlList addObject:[[NSURL fileURLWithPath:[rec objectForKey:@"ImagePath"]] description]];
 				}
 				
 				NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
-				[pboard declareTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"ImageDataListPboardType", NSURLPboardType, nil]
-							   owner:nil];
-				[pboard setPropertyList:fileList forType:NSFilenamesPboardType];
+
+				NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
+				[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
+				[types addObject:@"ImageDataListPboardType"];
+					[pboard declareTypes:types  owner:nil];
+					
+				[pboard writeURLs:nil files:fileList names:captions];
+
 				[pboard setPropertyList:iphotoData forType:@"ImageDataListPboardType"];
-				[pboard setPropertyList:urlList forType:NSURLPboardType];
 				/*
 				//add the first selected image as a TIFF to the pboard
 				NSDictionary *first = [self recordForThumb:[mySelectedCells objectAtIndex:0]];
