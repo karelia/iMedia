@@ -65,7 +65,13 @@ static NSImage *_toolbarIcon = nil;
 {
 	if(_toolbarIcon == nil)
 	{
-		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iMovie"] retain];
+		NSString *identifier = @"com.apple.iMovie";
+		NSString *path = [self absolutePathForAppBundleWithIdentifier:identifier];
+		if (nil == path)
+		{
+			identifier = @"com.apple.quicktimeplayer";
+		}
+		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:identifier] retain];
 		[_toolbarIcon setScalesWhenResized:YES];
 		[_toolbarIcon setSize:NSMakeSize(32,32)];
 	}
