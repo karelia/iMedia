@@ -66,7 +66,7 @@ static NSImage *_toolbarIcon = nil;
 	if(_toolbarIcon == nil)
 	{
 		NSString *identifier = @"com.apple.iMovie";
-		NSString *path = [self absolutePathForAppBundleWithIdentifier:identifier];
+		NSString *path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
 		if (nil == path)
 		{
 			identifier = @"com.apple.quicktimeplayer";
