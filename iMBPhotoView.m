@@ -448,6 +448,7 @@ static NSImage *_badge = nil;
 					}
 					else //remove from the selection as we are selecting backwards
 					{
+#warning TODO: Actually if we clicked on an extension before the current selection, it should extend the selection, not deselect!
 						for (i = firstIdx; i > thisIdx; i--)
 						{
 							curRec = [myRects objectAtIndex:i];

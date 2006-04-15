@@ -66,8 +66,14 @@ static NSImage *_toolbarIcon = nil;
 {
 	if(_toolbarIcon == nil)
 	{
+		// Try to use iMovie, or older iMovie, or quicktime player for movies.
 		NSString *identifier = @"com.apple.iMovie";
 		NSString *path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
+		if (nil == path)
+		{
+			identifier = @"com.apple.iMovie3";
+			path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
+		}
 		if (nil == path)
 		{
 			identifier = @"com.apple.quicktimeplayer";
