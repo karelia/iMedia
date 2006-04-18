@@ -649,6 +649,8 @@ static NSMutableDictionary *_parsers = nil;
     //application wrapper
     [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[[NSBundle mainBundle] resourcePath]
 														 withExtension:ext]];
+
+#warning this should be rewritten with NSSearchPathForDirectoriesInDomains with NSLibraryDirectory
 	
     // ~/Library/
     [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[NSString stringWithFormat:@"%@/Library/%@", NSHomeDirectory(), folder]

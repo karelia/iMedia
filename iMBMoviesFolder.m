@@ -44,7 +44,7 @@ Please send fixes to
 
 - (id)init
 {
-	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingString:@"/Movies/"]])
+	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingPathComponent:@"Movies"]])
 	{
 		
 	}
@@ -65,7 +65,7 @@ Please send fixes to
 	
 	while (cur = [e nextObject])
 	{
-		NSString *filePath = [path stringByAppendingFormat:@"/%@", cur];
+		NSString *filePath = [path stringByAppendingPathComponent: cur];
 		
 	//	if ([filePath rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
 	//	if ([filePath rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
@@ -133,7 +133,7 @@ Please send fixes to
 	[root setName:LocalizedStringInThisBundle(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
 	[root setIconName:@"picturesFolder"];
 	
-	[self recursivelyParse:[NSHomeDirectory() stringByAppendingString:@"/Movies/"] 
+	[self recursivelyParse:[NSHomeDirectory() stringByAppendingPathComponent:@"Movies"] 
 				  withNode:root];
 	
 	return [root autorelease];

@@ -44,7 +44,7 @@ Please send fixes to
 
 - (id)init
 {
-	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingString:@"/Pictures/"]])
+	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"]])
 	{
 		
 	}
@@ -62,7 +62,7 @@ Please send fixes to
 	
 	while (cur = [e nextObject])
 	{
-		NSString *filePath = [path stringByAppendingFormat:@"/%@", cur];
+		NSString *filePath = [path stringByAppendingPathComponent: cur];
 		NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
 		NSString *fileName = [filePath lastPathComponent];
 		
@@ -110,7 +110,7 @@ Please send fixes to
 	[root setName:LocalizedStringInThisBundle(@"Pictures Folder", @"Name of your 'Pictures' folder in your home directory")];
 	[root setIconName:@"picturesFolder"];
 	
-	[self recursivelyParse:[NSHomeDirectory() stringByAppendingString:@"/Pictures/"] 
+	[self recursivelyParse:[NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"] 
 				  withNode:root];
 
 	return [root autorelease];

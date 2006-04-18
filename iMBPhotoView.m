@@ -538,7 +538,7 @@ static NSImage *_badge = nil;
 				
 				while (cur = [e nextObject]) {
 					NSDictionary *rec = [self recordForThumb:cur];
-					if (nil == rec)	// make sure not nil, that would generate exception below
+					if (nil != rec)	// make sure not nil, that would generate exception below
 					{
 						//NSLog(@"%@", [rec objectForKey:@"ImagePath"]);
 						[fileList addObject:[rec objectForKey:@"ImagePath"]];
