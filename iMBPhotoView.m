@@ -299,11 +299,15 @@ static NSDictionary *titleFontAttributes;
 			NSString *thumbPath = [record objectForKey:@"ThumbPath"];
 			NSImage *img = [record objectForKey:@"CachedThumb"];
 			
-			if (!img) { //only load the image if we have to
-				img = [myCache objectForKey:thumbPath];
-				if (!img)
+			if (!img)	 //only load the image if we have to
+			{
+				if (thumbPath)
 				{
-					img = [[[NSImage alloc] initWithContentsOfFile:thumbPath] autorelease];
+					img = [myCache objectForKey:thumbPath];
+					if (!img)
+					{
+						img = [[[NSImage alloc] initWithContentsOfFile:thumbPath] autorelease];
+					}
 				}
 				//sometimes an image will be nil, in the case the file is missing from the HDD.
 				if (img)
@@ -534,10 +538,13 @@ static NSImage *_badge = nil;
 				
 				while (cur = [e nextObject]) {
 					NSDictionary *rec = [self recordForThumb:cur];
-					//NSLog(@"%@", [rec objectForKey:@"ImagePath"]);
-					[fileList addObject:[rec objectForKey:@"ImagePath"]];
-					[captions addObject:[rec objectForKey:@"Caption"]];
-					[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
+					if (nil == rec)	// make sure not nil, that would generate exception below
+					{
+						//NSLog(@"%@", [rec objectForKey:@"ImagePath"]);
+						[fileList addObject:[rec objectForKey:@"ImagePath"]];
+						[captions addObject:[rec objectForKey:@"Caption"]];
+						[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
+					}
 				}
 				
 				NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
