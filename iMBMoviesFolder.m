@@ -93,7 +93,12 @@ Please send fixes to
 				[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimeInterval"];
 				//we want to cache the first frame of the movie here as we will be in a background thread
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
-				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:nil];
+				NSError *error = nil;
+				QTMovie *movie = [[QTMovie alloc] initWithAttributes:
+					[NSDictionary dictionaryWithObjectsAndKeys: 
+						ref, QTMovieDataReferenceAttribute,
+						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+						nil] error:&error];
 				NSImage *thumb = [movie betterPosterImage];
 				[movie release];
 				if (thumb)

@@ -182,10 +182,14 @@ static NSImage *_song = nil;
 - (void) loadAudioFile: (NSString *) urlString
 {		
 	NSURL * movieURL = [NSURL URLWithString:urlString];
-	
+	NSString *filePath = [movieURL path];
 	[oAudioPlayer pause:self];
 	NSError *err = nil;
-	QTMovie *audio = [QTMovie movieWithURL:movieURL error:&err];
+	QTMovie *audio = [[[QTMovie alloc] initWithAttributes:
+		[NSDictionary dictionaryWithObjectsAndKeys: 
+			filePath, QTMovieFileNameAttribute,
+			[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+			nil] error:&err] autorelease];
 	if (err) 
 		NSLog(@"%@", err);
 	[audio setDelegate:self];

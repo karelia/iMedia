@@ -54,7 +54,12 @@
 	}
 	[self addSubview:myPreview];
 	[myPreview pause:self];
-	QTMovie *movie = [QTMovie movieWithFile:path error:nil];
+	NSError *error = nil;
+	QTMovie *movie = [[[QTMovie alloc] initWithAttributes:
+		[NSDictionary dictionaryWithObjectsAndKeys: 
+			path, QTMovieFileNameAttribute,
+			[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+			nil] error:&error] autorelease];
 	[myPreview setMovie:movie];
 	[myPreview play:self];
 }

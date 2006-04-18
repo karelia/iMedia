@@ -152,7 +152,11 @@
 				NSString *path = [[NSURL URLWithString:[newPlaylistContent objectForKey:@"Location"]] path];
 				
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
-				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:&error];
+				QTMovie *movie = [[QTMovie alloc] initWithAttributes:
+					[NSDictionary dictionaryWithObjectsAndKeys: 
+						ref, QTMovieDataReferenceAttribute,
+						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+						nil] error:&error];
 				if (nil != movie)
 				{
 					if ([movie isDRMProtected])

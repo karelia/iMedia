@@ -182,7 +182,12 @@ Please send fixes to
 				// find poster image from movie as a last resort, since it's slower
 				NSString *path = [imageRecord objectForKey:@"ImagePath"];
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
-				QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:nil];
+				NSError *error = nil;
+				QTMovie *movie = [[QTMovie alloc] initWithAttributes:
+					[NSDictionary dictionaryWithObjectsAndKeys: 
+						ref, QTMovieDataReferenceAttribute,
+						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+						nil] error:&error];
 				thumb = [movie betterPosterImage];
 				[movie release];
 			}
