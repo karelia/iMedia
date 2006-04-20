@@ -273,7 +273,7 @@
 				<integer>29</integer>
 			</dict>
 			<key>NSsFlags</key>
-			<integer>82</integer>
+			<integer>210</integer>
 			<key>NSvFlags</key>
 			<integer>274</integer>
 		</dict>
@@ -417,7 +417,7 @@
 			<key>$classname</key>
 			<string>NSMutableArray</string>
 		</dict>
-		<string>{{1, 1}, {283, 250}}</string>
+		<string>{{1, 1}, {281, 250}}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -517,7 +517,7 @@
 			<key>NSvFlags</key>
 			<integer>256</integer>
 		</dict>
-		<string>{{284, 1}, {15, 250}}</string>
+		<string>{{282, 1}, {15, 250}}</string>
 		<string>_doScroller:</string>
 		<dict>
 			<key>$classes</key>
@@ -542,6 +542,8 @@
 				<key>CF$UID</key>
 				<integer>35</integer>
 			</dict>
+			<key>NSEnabled</key>
+			<true/>
 			<key>NSFrame</key>
 			<dict>
 				<key>CF$UID</key>
@@ -569,7 +571,7 @@
 		</dict>
 		<string>{{-100, -100}, {283, 15}}</string>
 		<string>_doScroller:</string>
-		<string>{{0, 34}, {300, 252}}</string>
+		<string>{{0, 34}, {298, 252}}</string>
 		<dict>
 			<key>$classes</key>
 			<array>
@@ -763,7 +765,19 @@
 			<array>
 				<dict>
 					<key>CF$UID</key>
+					<integer>44</integer>
+				</dict>
+				<dict>
+					<key>CF$UID</key>
+					<integer>12</integer>
+				</dict>
+				<dict>
+					<key>CF$UID</key>
 					<integer>2</integer>
+				</dict>
+				<dict>
+					<key>CF$UID</key>
+					<integer>10</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
@@ -772,18 +786,6 @@
 				<dict>
 					<key>CF$UID</key>
 					<integer>9</integer>
-				</dict>
-				<dict>
-					<key>CF$UID</key>
-					<integer>10</integer>
-				</dict>
-				<dict>
-					<key>CF$UID</key>
-					<integer>44</integer>
-				</dict>
-				<dict>
-					<key>CF$UID</key>
-					<integer>12</integer>
 				</dict>
 			</array>
 		</dict>
@@ -821,12 +823,12 @@
 				</dict>
 			</array>
 		</dict>
-		<integer>1</integer>
-		<integer>12</integer>
-		<integer>8</integer>
-		<integer>5</integer>
 		<integer>13</integer>
 		<integer>11</integer>
+		<integer>1</integer>
+		<integer>5</integer>
+		<integer>12</integer>
+		<integer>8</integer>
 		<dict>
 			<key>$class</key>
 			<dict>

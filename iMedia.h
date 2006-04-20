@@ -23,6 +23,13 @@
   
  */
 
+// LocalizedStringInThisBundle is for use by frameworks and plugins,
+// so it gets the right bundle -- not the application bundle.
+// Code in the application itself should always use NSLocalizedString
+// But WARNING -- it won't work in Category Methods, since the class will have the wrong bundle.
+// For that, you'll have to create a separate macro that gets you the correct bundle, and match
+// your genstrings to that key.
+
 #define LocalizedStringInThisBundle(key, comment) \
     [[NSBundle bundleForClass:[self class]] localizedStringForKey:(key) value:@"" table:nil]
 
