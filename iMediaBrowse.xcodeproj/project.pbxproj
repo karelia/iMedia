@@ -209,6 +209,7 @@
 		796ADBBF09D6562C001CF400 /* iMBAbstractController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAbstractController.h; sourceTree = "<group>"; };
 		796ADBC009D6562C001CF400 /* iMBAbstractController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAbstractController.m; sourceTree = "<group>"; };
 		796ADBE109D65986001CF400 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		797CC96C09F872AF0063FF9B /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
 		79858F6709E3C3AB003EA241 /* contact.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = contact.png; sourceTree = "<group>"; };
 		7990CD5809D75D4A00AD74BA /* iMBiTunesVideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiTunesVideoParser.h; sourceTree = "<group>"; };
 		7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiTunesVideoParser.m; sourceTree = "<group>"; };
@@ -219,6 +220,7 @@
 		7990CDF109D772FF00AD74BA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Links.nib; sourceTree = "<group>"; };
 		79D119F709D6B93E00ED2FFC /* iMBMovieView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMovieView.h; sourceTree = "<group>"; };
 		79D119F809D6B93E00ED2FFC /* iMBMovieView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMovieView.m; sourceTree = "<group>"; };
+		79FDF07F09F87B300058EB16 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		79FDF5FF09AAE5D2000CB4B4 /* badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge.png; sourceTree = "<group>"; };
 		79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBAudioPlaying.png; sourceTree = "<group>"; };
 		79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBiPhoto4Library.png; sourceTree = "<group>"; };
@@ -305,6 +307,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				791F964C0975B63E0071B2E0 /* iMediaBrowserProtocol.h */,
 				D9B3EAAE09A3FD9400835FE4 /* Controllers */,
 				D9F92E6209AAAC19008CB6BE /* File Watcher */,
 				795D715109D3AACB005F166D /* Parsers */,
@@ -532,7 +535,6 @@
 		D9B3EAAE09A3FD9400835FE4 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				791F964C0975B63E0071B2E0 /* iMediaBrowserProtocol.h */,
 				965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */,
 				965EB99708E1F7CE000DFF3A /* iMediaBrowser.m */,
 				796ADBBF09D6562C001CF400 /* iMBAbstractController.h */,
@@ -841,6 +843,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				3C3A131D09EAFB8100AF41BF /* English */,
+				797CC96C09F872AF0063FF9B /* French */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -857,6 +860,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				791F97640975D4970071B2E0 /* English */,
+				79FDF07F09F87B300058EB16 /* French */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -906,6 +910,14 @@
 			buildSettings = {
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+					"-seg1addr",
+					0xcf100000,
+				);
 				PRODUCT_NAME = iMediaBrowser;
 			};
 			name = Debug;
@@ -916,6 +928,14 @@
 			buildSettings = {
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+					"-seg1addr",
+					0xcf100000,
+				);
 				PRODUCT_NAME = iMediaBrowser;
 			};
 			name = Release;
