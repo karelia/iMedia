@@ -41,7 +41,7 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 
 @interface iMBMusicController (PrivateApi)
 
-- (void)loadAudioFile: (NSString *) path;
+- (BOOL)loadAudioFile: (NSString *) path;
 - (NSNumber *)clockTime;
 - (void)setClockTime:(NSNumber *)value;
 - (NSString*)iconNameForPlaylist:(NSString*)name;
@@ -119,7 +119,7 @@ static NSImage *_toolbarIcon = nil;
 - (void)didDeactivate
 {
 	[self unbind:@"selectionChanged"];
-	[oAudioPlayer pause:self];
+	[self stopMovie:self];
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
@@ -179,8 +179,9 @@ static NSImage *_song = nil;
 #pragma mark -
 #pragma mark Interface Methods
 
-- (void) loadAudioFile: (NSString *) urlString
+- (BOOL) loadAudioFile: (NSString *) urlString
 {		
+	BOOL success = YES;
 	NSURL * movieURL = [NSURL URLWithString:urlString];
 	NSString *filePath = [movieURL path];
 	[oAudioPlayer pause:self];
@@ -190,8 +191,12 @@ static NSImage *_song = nil;
 			filePath, QTMovieFileNameAttribute,
 			[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
 			nil] error:&err] autorelease];
-	if (err) 
+	if (err || !audio)
+	{
 		NSLog(@"%@", err);
+		success = NO;
+	}
+		
 	[audio setDelegate:self];
 	[oAudioPlayer setMovie:audio];
 	[playButton setEnabled: (audio != nil)];
@@ -200,34 +205,38 @@ static NSImage *_song = nil;
 	[progressIndicator setMinValue: k_Scrub_Slider_Minimum];
     [progressIndicator setMaxValue: GetMovieDuration( [audio quickTimeMovie] )];
     [progressIndicator setDoubleValue: k_Scrub_Slider_Minimum ];
+	return success;
 }
 
 static NSImage *_stopImage = nil;
 
 - (IBAction) playMovie: (id) sender
 {	
-	[self loadAudioFile:[[songsController selection] valueForKey:@"Location"]];
-	
-	[pollTimer invalidate];
-	pollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
-												 target:self
-											   selector:@selector(updateDisplay:)
-											   userInfo:nil
-												repeats:YES];
-	
-	[table reloadData];
-	
-	[oAudioPlayer gotoBeginning:self];
-	[oAudioPlayer play:self];
-	
-	[playButton setAction:@selector(stopMovie:)];
-	[playButton setState:NSOnState];
-	if (!_stopImage) {
-		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"MBNowPlayingButton" ofType:@"png"];
-		_stopImage = [[NSImage alloc] initWithContentsOfFile:p];
+	if ([self loadAudioFile:[[songsController selection] valueForKey:@"Location"]])
+	{
+		[pollTimer invalidate];
+		pollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
+													 target:self
+												   selector:@selector(updateDisplay:)
+												   userInfo:nil
+													repeats:YES];
+		
+		[table reloadData];
+		
+		[progressIndicator setDoubleValue:0];
+		[clockDisplay setStringValue:@"0:00"];
+		[oAudioPlayer gotoBeginning:self];
+		[oAudioPlayer play:self];
+		
+		[playButton setAction:@selector(stopMovie:)];
+		[playButton setState:NSOnState];
+		if (!_stopImage) {
+			NSBundle *b = [NSBundle bundleForClass:[self class]];
+			NSString *p = [b pathForResource:@"MBNowPlayingButton" ofType:@"png"];
+			_stopImage = [[NSImage alloc] initWithContentsOfFile:p];
+		}
+		[playButton setImage:_stopImage];
 	}
-	[playButton setImage:_stopImage];
 }
 
 static NSImage *_playImage = nil;

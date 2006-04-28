@@ -181,10 +181,7 @@ Please send fixes to
 			//[((NSMutableDictionary *)playlist) setObject:@"foo" forKey:@"bar"];	// TEST
 			if ([playlistTrack objectForKey:@"Name"] && [[playlistTrack objectForKey:@"Location"] length] > 0)
 			{
-#warning This is terribly slow and inefficient, accounting for 1/3 of load time.  A better approach would be to just draw the icon in the cell.  If we avoid this, can we avoid all this processing?
-				id nameWithIcon = [self name:[playlistTrack objectForKey:@"Name"]
-								   withImage:songIcon];
-				[playlistTrack setObject:nameWithIcon forKey:@"NameWithIcon"];
+				[playlistTrack setObject:songIcon forKey:@"Icon"];
 				[newPlaylist addObject:playlistTrack];
 			}
 		}
