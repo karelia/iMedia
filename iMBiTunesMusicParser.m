@@ -174,13 +174,18 @@ Please send fixes to
 		for (i=0; i<[libraryItems count]; i++)
 		{
 			NSDictionary * tracksDictionary = [musicLibrary objectForKey:@"Tracks"];
-			NSMutableDictionary * newPlaylistContent = [NSMutableDictionary dictionaryWithDictionary:[tracksDictionary objectForKey:[[[libraryItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue]]];
-			if ([newPlaylistContent objectForKey:@"Name"] && [[newPlaylistContent objectForKey:@"Location"] length] > 0)
+			
+			// This seems to be a mutable dictionary, so we can change it.
+			NSMutableDictionary *playlistTrack = (NSMutableDictionary *)[tracksDictionary objectForKey:[[[libraryItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue]];
+
+			//[((NSMutableDictionary *)playlist) setObject:@"foo" forKey:@"bar"];	// TEST
+			if ([playlistTrack objectForKey:@"Name"] && [[playlistTrack objectForKey:@"Location"] length] > 0)
 			{
-				id nameWithIcon = [self name:[newPlaylistContent objectForKey:@"Name"]
+#warning This is terribly slow and inefficient, accounting for 1/3 of load time.  A better approach would be to just draw the icon in the cell.  If we avoid this, can we avoid all this processing?
+				id nameWithIcon = [self name:[playlistTrack objectForKey:@"Name"]
 								   withImage:songIcon];
-				[newPlaylistContent setObject:nameWithIcon forKey:@"NameWithIcon"];
-				[newPlaylist addObject:newPlaylistContent];
+				[playlistTrack setObject:nameWithIcon forKey:@"NameWithIcon"];
+				[newPlaylist addObject:playlistTrack];
 			}
 		}
 		[node setAttribute:newPlaylist forKey:@"Tracks"];
