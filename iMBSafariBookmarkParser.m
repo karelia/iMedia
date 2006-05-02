@@ -54,12 +54,12 @@
 	
 	if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksBar"])
 	{
-		[parsed setName:LocalizedStringInThisBundle(@"Bookmarks Bar", @"Bookmarks Bar")];
+		[parsed setName:LocalizedStringInThisBundle(@"Bookmarks Bar", @"Bookmarks Bar as titled in Safari")];
 		[parsed setIconName:@"SafariBookmarksBar"];
 	}
 	else if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksMenu"])
 	{
-		[parsed setName:LocalizedStringInThisBundle(@"Bookmarks Menu", @"Bookmarks Menu")];
+		[parsed setName:LocalizedStringInThisBundle(@"Bookmarks Menu", @"Bookmarks Menu as titled in Safari")];
 		[parsed setIconName:@"SafariBookmarksMenu"];
 	}
 	else if ([[item objectForKey:@"Title"] isEqualToString:@"Address Book"] ||

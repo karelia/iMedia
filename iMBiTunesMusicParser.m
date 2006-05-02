@@ -107,16 +107,16 @@ Please send fixes to
 	iMBLibraryNode *purchasedLib = [[iMBLibraryNode alloc] init];
 	NSMutableArray *smartPlaylists = [NSMutableArray array];
 	
-	[library setName:LocalizedStringInThisBundle(@"Library", @"iTunes Library")];
+	[library setName:LocalizedStringInThisBundle(@"Library", @"Library as titled in iTunes source list")];
 	[library setIconName:@"MBiTunesLibrary"];
 	
-	[podcastLib setName:LocalizedStringInThisBundle(@"Podcasts", @"iTunes Podcasts")];
+	[podcastLib setName:LocalizedStringInThisBundle(@"Podcasts", @"Podcasts as titled in iTunes source list")];
 	[podcastLib setIconName:@"MBiTunesPodcast"];
 	
-	[partyShuffleLib setName:LocalizedStringInThisBundle(@"Party Shuffle", @"iTunes Party Shuffle")];
+	[partyShuffleLib setName:LocalizedStringInThisBundle(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
 	[partyShuffleLib setIconName:@"MBiTunesPartyShuffle"];
 	
-	[purchasedLib setName:LocalizedStringInThisBundle(@"Purchased", @"iTunes Purchased folder")];
+	[purchasedLib setName:LocalizedStringInThisBundle(@"Purchased", @"Purchased folder  as titled in iTunes source list")];
 	[purchasedLib setIconName:@"MBiTunesPurchasedPlaylist"];
 	
 	int playlistCount = [[musicLibrary objectForKey:@"Playlists"] count];
