@@ -108,9 +108,9 @@ static NSMutableDictionary *_parsers = nil;
 #warning Filtering on the given browser types during the init is still to be implemented - jmj
 + (id)sharedBrowserWithDelegate:(id)delegate supportingBrowserTypes:(NSArray*)types;
 {
-  iMediaBrowser *imb = [self sharedBrowserWithDelegate:delegate];
-  [imb setPreferredBrowserTypes:types];
-  return imb;
+	iMediaBrowser *imb = [self sharedBrowserWithDelegate:delegate];
+	[imb setPreferredBrowserTypes:types];
+	return imb;
 }
 
 
@@ -643,30 +643,20 @@ static NSMutableDictionary *_parsers = nil;
 + (NSArray *)findBundlesWithExtension:(NSString *)ext inFolderName:(NSString *)folder
 {
 	NSMutableArray *bundles = [NSMutableArray array];
-	
-    // look for bundles in the following places:
-	
+		
     //application wrapper
     [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[[NSBundle mainBundle] resourcePath]
 														 withExtension:ext]];
 
-#warning this should be rewritten with NSSearchPathForDirectoriesInDomains with NSLibraryDirectory
+	NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSAllDomainsMask, YES);
+	NSEnumerator *e = [dirs objectEnumerator];
+	NSString *cur;
 	
-    // ~/Library/
-    [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[NSString stringWithFormat:@"%@/Library/%@", NSHomeDirectory(), folder]
-														 withExtension:ext]];
-	
-    // /Local/Library/
-    [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[NSString stringWithFormat:@"/Library/%@", folder]
-														 withExtension:ext]];
-	
-    // /System/Library/
-    [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[NSString stringWithFormat:@"/System/Library/%@", folder]
-														 withExtension:ext]];
-	
-    // /Network/Library/
-    [bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[NSString stringWithFormat:@"/Network/Library/%@", folder]
-														 withExtension:ext]];
+	while (cur = [e nextObject])
+	{
+		[bundles addObjectsFromArray:[iMediaBrowser findModulesInDirectory:[cur stringByAppendingPathComponent:folder]
+															 withExtension:ext]];
+	}
 	return bundles;
 }
 
