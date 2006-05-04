@@ -97,7 +97,7 @@
 			NULL);							// ByteCount *              outPropValueSizeUsed)
 
 
-	
+	return isProtected;
 }
 
 
