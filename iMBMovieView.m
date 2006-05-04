@@ -55,11 +55,16 @@
 	[self addSubview:myPreview];
 	[myPreview pause:self];
 	NSError *error = nil;
+	QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
 	QTMovie *movie = [[[QTMovie alloc] initWithAttributes:
 		[NSDictionary dictionaryWithObjectsAndKeys: 
-			path, QTMovieFileNameAttribute,
+			ref, QTMovieDataReferenceAttribute,
 			[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
 			nil] error:&error] autorelease];
+	if (error)
+	{
+		NSLog(@"Failed to load QTMovie: %@", error);
+	}
 	[myPreview setMovie:movie];
 	[myPreview play:self];
 }
