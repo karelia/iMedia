@@ -169,10 +169,10 @@
 		7903562C09E3B45F00384D08 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = /System/Library/Frameworks/AddressBook.framework; sourceTree = "<absolute>"; };
 		790DBE3C0A09AEFF00A40A36 /* NSImage+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSImage+iMedia.h"; sourceTree = "<group>"; };
 		790DBE3D0A09AEFF00A40A36 /* NSImage+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSImage+iMedia.m"; sourceTree = "<group>"; };
-		790DBE480A09B19000A40A36 /* links.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = links.png; path = ../../../Desktop/links.png; sourceTree = SOURCE_ROOT; };
-		790DBE490A09B19000A40A36 /* movies.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = movies.png; path = ../../../Desktop/movies.png; sourceTree = SOURCE_ROOT; };
-		790DBE4A0A09B19000A40A36 /* music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = music.png; path = ../../../Desktop/music.png; sourceTree = SOURCE_ROOT; };
-		790DBE4B0A09B19000A40A36 /* photos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = photos.png; path = ../../../Desktop/photos.png; sourceTree = SOURCE_ROOT; };
+		790DBE480A09B19000A40A36 /* links.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = links.png; sourceTree = "<group>"; };
+		790DBE490A09B19000A40A36 /* movies.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = movies.png; sourceTree = "<group>"; };
+		790DBE4A0A09B19000A40A36 /* music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = music.png; sourceTree = "<group>"; };
+		790DBE4B0A09B19000A40A36 /* photos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = photos.png; sourceTree = "<group>"; };
 		791679FE0975255000D9EF74 /* iMediaBrowser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iMediaBrowser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		791679FF0975255000D9EF74 /* iMediaBrowser-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "iMediaBrowser-Info.plist"; sourceTree = "<group>"; };
 		791F964C0975B63E0071B2E0 /* iMediaBrowserProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowserProtocol.h; sourceTree = "<group>"; };

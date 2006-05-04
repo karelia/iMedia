@@ -24,7 +24,7 @@
 	else
 	{
 		NSBundle *ourBundle = [NSBundle bundleForClass:[self class]];
-		NSString *pathToImage = [otherApp pathForResource:[imageInOurBundle stringByDeletingPathExtension] ofType:[imageInOurBundle pathExtension]];
+		NSString *pathToImage = [ourBundle pathForResource:[imageInOurBundle stringByDeletingPathExtension] ofType:[imageInOurBundle pathExtension]];
 		NSImage *image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
 		return [image autorelease];
 	}
