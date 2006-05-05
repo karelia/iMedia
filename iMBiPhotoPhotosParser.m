@@ -137,6 +137,7 @@ Please send fixes to
 	NSDictionary *keywordMap = [library objectForKey:@"List of Keywords"];
 	NSEnumerator *albumEnum = [[library objectForKey:@"List of Albums"] objectEnumerator];
 	NSDictionary *albumRec;
+	int fakeAlbumID = 0;
 	
 	//Parse dictionary creating libraries, and filling with track infromation
 	while (albumRec = [albumEnum nextObject])
@@ -149,7 +150,14 @@ Please send fixes to
 		iMBLibraryNode *lib = [[iMBLibraryNode alloc] init];
 		[lib setName:[albumRec objectForKey:@"AlbumName"]];
 		[lib setIconName:[self iconNameForType:[albumRec objectForKey:@"Album Type"]]];
-		[lib setAttribute:[albumRec objectForKey:@"AlbumId"] forKey:@"AlbumId"];
+		// iPhoto 2 doesn't have albumID's so let's just fake them
+		NSNumber *aid = [albumRec objectForKey:@"AlbumId"];
+		if (!aid)
+		{
+			aid = [NSNumber numberWithInt:fakeAlbumID];
+			fakeAlbumID++;
+		}
+		[lib setAttribute:aid forKey:@"AlbumId"];
 		
 		NSMutableArray *newPhotolist = [NSMutableArray array];
 		NSEnumerator *pictureItemsEnum = [[albumRec objectForKey:@"KeyList"] objectEnumerator];
