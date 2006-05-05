@@ -36,6 +36,7 @@
 		791F9AFA0976320A0071B2E0 /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF30976320A0071B2E0 /* UKKQueue.m */; };
 		791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */; };
 		792BFD94098066A50004D656 /* iMBPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 792BFD92098066A50004D656 /* iMBPhotoView.m */; };
+		7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */; };
 		7956049409D78F9F00BF1DA5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 7956049309D78F9F00BF1DA5 /* LICENSE */; };
 		795D6F5209D35B77005F166D /* iMBLinksController.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D6F5009D35B77005F166D /* iMBLinksController.m */; };
 		795D70D609D39C43005F166D /* folder.png in Resources */ = {isa = PBXBuildFile; fileRef = 795D70D509D39C43005F166D /* folder.png */; };
@@ -191,6 +192,7 @@
 		791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKMainThreadProxy.m; sourceTree = "<group>"; };
 		792BFD91098066A50004D656 /* iMBPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBPhotoView.h; sourceTree = "<group>"; };
 		792BFD92098066A50004D656 /* iMBPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBPhotoView.m; sourceTree = "<group>"; };
+		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
 		7956049309D78F9F00BF1DA5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		795D6F4F09D35B77005F166D /* iMBLinksController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLinksController.h; sourceTree = "<group>"; };
 		795D6F5009D35B77005F166D /* iMBLinksController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBLinksController.m; sourceTree = "<group>"; };
@@ -461,6 +463,7 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */,
 				790DBE480A09B19000A40A36 /* links.png */,
 				790DBE490A09B19000A40A36 /* movies.png */,
 				790DBE4A0A09B19000A40A36 /* music.png */,
@@ -768,6 +771,7 @@
 				790DBE4D0A09B19000A40A36 /* movies.png in Resources */,
 				790DBE4E0A09B19000A40A36 /* music.png in Resources */,
 				790DBE4F0A09B19000A40A36 /* photos.png in Resources */,
+				7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

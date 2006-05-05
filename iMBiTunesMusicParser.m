@@ -124,6 +124,8 @@ Please send fixes to
 	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
 	NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
 	NSImage *songIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+	iconPath = [bndl pathForResource:@"iTunesDRM" ofType:@"png"];
+	NSImage *drmIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
 	
 	for (x=0;x<playlistCount;x++)
 	{
@@ -181,7 +183,15 @@ Please send fixes to
 			//[((NSMutableDictionary *)playlist) setObject:@"foo" forKey:@"bar"];	// TEST
 			if ([playlistTrack objectForKey:@"Name"] && [[playlistTrack objectForKey:@"Location"] length] > 0)
 			{
-				[playlistTrack setObject:songIcon forKey:@"Icon"];
+				if ([[playlistTrack objectForKey:@"Protected"] boolValue])
+				{
+					[playlistTrack setObject:drmIcon forKey:@"Icon"];
+				}
+				else
+				{
+					[playlistTrack setObject:songIcon forKey:@"Icon"];
+				}
+				
 				[newPlaylist addObject:playlistTrack];
 			}
 		}
