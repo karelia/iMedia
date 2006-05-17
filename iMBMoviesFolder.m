@@ -132,9 +132,15 @@ Please send fixes to
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
 	[root setIconName:@"picturesFolder"];
+	NSString *folder = [NSHomeDirectory() stringByAppendingPathComponent:@"Movies"];
 	
-	[self recursivelyParse:[NSHomeDirectory() stringByAppendingPathComponent:@"Movies"] 
-				  withNode:root];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
+	{
+		[root release];
+		return nil;
+	}
+	
+	[self recursivelyParse:folder withNode:root];
 	
 	return [root autorelease];
 }

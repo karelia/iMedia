@@ -110,7 +110,15 @@ Please send fixes to
 	[root setName:LocalizedStringInThisBundle(@"Pictures Folder", @"Name of your 'Pictures' folder in your home directory")];
 	[root setIconName:@"picturesFolder"];
 	
-	[self recursivelyParse:[NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"] 
+	NSString *folder = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
+	
+	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
+	{
+		[root release];
+		return nil;
+	}
+	
+	[self recursivelyParse:folder
 				  withNode:root];
 
 	return [root autorelease];
