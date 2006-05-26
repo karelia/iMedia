@@ -29,11 +29,12 @@ Please send fixes to
 
 @interface iMBPhotosController : iMBAbstractController
 {
-	@private
+	IBOutlet MUPhotoView *oPhotoView;
 	NSMutableDictionary *myCache;
 	NSMutableIndexSet *mySelection;
 	NSArray *myImages;
-	IBOutlet MUPhotoView *oPhotoView;
 }
+
+- (NSString *)nibName;
 
 @end

@@ -490,6 +490,9 @@
 	if ([sender respondsToSelector:@selector(doubleValue)])
 	{
 		[self setPhotoSize:[sender doubleValue]];
+		//fake a bounds resize notification
+		[[NSNotificationCenter defaultCenter] postNotificationName:NSViewFrameDidChangeNotification
+															object:self];
 	}
 }
 
@@ -794,7 +797,8 @@
 {
 	// Doubl-click Handling
 	if ([event clickCount] == 2) {
-        [delegate photoView:self doubleClickOnPhotoAtIndex:[self photoIndexForPoint:mouseDownPoint]];
+		unsigned idx = [self photoIndexForPoint:mouseDownPoint];
+        [delegate photoView:self doubleClickOnPhotoAtIndex:idx withFrame:[self photoRectForIndex:idx]];
         
 	} else if (0 < [dragSelectedPhotoIndexes count]) { // finishing a drag selection
         // move the drag indexes into the main selection indexes - firing off KVO messages or delegate messages
@@ -1434,6 +1438,7 @@
 
 - (NSRect)gridRectForIndex:(unsigned)index
 {
+	if (columns == 0) return NSZeroRect;
 	unsigned row = index / columns;
 	unsigned column = index % columns;
 	float x = column * gridSize.width;

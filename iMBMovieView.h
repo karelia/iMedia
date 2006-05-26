@@ -25,11 +25,11 @@
  
  */
 #import <Cocoa/Cocoa.h>
-#import "iMBPhotoView.h"
+#import "MUPhotoView.h"
 
 @class QTMovieView;
 
-@interface iMBMovieView : iMBPhotoView
+@interface iMBMovieView : MUPhotoView
 {
 	QTMovieView *myPreview;
 }

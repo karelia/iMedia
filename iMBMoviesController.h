@@ -23,14 +23,16 @@ Please send fixes to
  */
 
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "iMBPhotosController.h"
 
-@class iMBMovieView;
+@class QTMovieView;
 
-@interface iMBMoviesController : iMBAbstractController
+@interface iMBMoviesController : iMBPhotosController
 {
 	IBOutlet NSTextField *counterField;
-	IBOutlet iMBMovieView *previewMovieView;
+	@private
+	QTMovieView *previewMovieView;
+	unsigned movieIndex;
 }
 
 - (IBAction)play:(id)sender;

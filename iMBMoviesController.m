@@ -29,6 +29,7 @@ Please send fixes to
 #import "iMedia.h"
 #import "NSWorkspace+Extensions.h"
 #import "NSPasteboard+iMedia.h"
+#import "MUPhotoView.h"
 
 @interface iMBMoviesController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
@@ -44,12 +45,9 @@ Please send fixes to
 	return self;
 }
 
-- (void)awakeFromNib
+- (NSString *)nibName
 {
-	[previewMovieView bind:@"images" 
-				  toObject:[self controller] 
-			   withKeyPath:@"selection.Movies" 
-				   options:nil];
+	return @"iPhoto";
 }
 
 - (IBAction)play:(id)sender
@@ -57,8 +55,33 @@ Please send fixes to
 	[previewMovieView play:sender];
 }
 
+- (void)viewResized:(NSNotification *)n
+{
+	NSRect r = [oPhotoView photoRectForIndex:movieIndex];
+	[previewMovieView setFrame:r];
+	[previewMovieView play:self];
+}
+
 #pragma mark -
 #pragma mark Media Browser Protocol
+
+- (void)willActivate
+{
+	[super willActivate];
+	[self unbind:@"images"]; // stop the photo controller
+	[self bind:@"images" 
+	  toObject:[self controller] 
+		 withKeyPath:@"selection.Movies" 
+	   options:nil];
+}
+
+- (void)didDeactivate
+{
+	[self unbind:@"images"];
+	[previewMovieView pause:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[previewMovieView removeFromSuperview];
+}
 
 static NSImage *_toolbarIcon = nil;
 
@@ -95,11 +118,6 @@ static NSImage *_toolbarIcon = nil;
 	return LocalizedStringInThisBundle(@"Movies", @"Name of Data Type");
 }
 
-- (void)didDeactivate
-{
-	[previewMovieView stop:self];
-}
-
 - (NSString *)iconNameForPlaylist:(NSString*)name
 {
 	return @"MBQuicktime.png";
@@ -120,6 +138,44 @@ static NSImage *_toolbarIcon = nil;
 		[files addObject:[cur objectForKey:@"ImagePath"]];
 	}
 	[pboard writeURLs:nil files:files names:nil];
+}
+
+#pragma mark -
+#pragma mark MUPhotoView Delegate Methods
+
+- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index withFrame:(NSRect)frame
+{
+	movieIndex = index;
+	if (!previewMovieView)
+	{
+		previewMovieView = [[QTMovieView alloc] initWithFrame:frame];
+		[previewMovieView setControllerVisible:NO];
+		[previewMovieView setShowsResizeIndicator:NO];
+		[previewMovieView setPreservesAspectRatio:YES];
+	}
+	[previewMovieView setFrame:frame];
+	NSString *path = [[myImages objectAtIndex:index] objectForKey:@"ImagePath"];
+	
+	NSError *error = nil;
+	QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
+	QTMovie *movie = [[[QTMovie alloc] initWithAttributes:
+		[NSDictionary dictionaryWithObjectsAndKeys: 
+			ref, QTMovieDataReferenceAttribute,
+			[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+			nil] error:&error] autorelease];
+	if (error)
+	{
+		NSLog(@"Failed to load QTMovie: %@", error);
+	}
+	[previewMovieView setMovie:movie];
+	if (![previewMovieView superview])
+	{
+		[oPhotoView addSubview:previewMovieView];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(viewResized:)
+													 name:NSViewFrameDidChangeNotification
+												   object:oPhotoView];
+	}
 }
 
 @end

@@ -40,7 +40,7 @@ Please send fixes to
 {
 	if (self = [super initWithPlaylistController:ctrl]) {
 		mySelection = [[NSMutableIndexSet alloc] init];
-		[NSBundle loadNibNamed:@"iPhoto" owner:self];
+		[NSBundle loadNibNamed:[self nibName] owner:self];
 	}
 	return self;
 }
@@ -59,6 +59,11 @@ Please send fixes to
 	[oPhotoView setPhotoVerticalSpacing:15];
 	[oPhotoView setPhotoSize:75];
 	[oPhotoView setDelegate:self];
+}
+
+- (NSString *)nibName
+{
+	return @"iPhoto";
 }
 
 #pragma mark -
@@ -100,7 +105,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)didDeactivate
 {
-	[oPhotoView unbind:@"images"];
+	[self unbind:@"images"];
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard

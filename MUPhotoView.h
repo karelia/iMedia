@@ -206,7 +206,7 @@
 // double-click support
 /** The view will call this delegate method when the user double-clicks on the photo at the specified index. If you do not wish to support any double-click behavior, then you
     don't need to override this method. **/
-- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index;
+- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index withFrame:(NSRect)frame;
 
 // photo removal support
 /** The view will call this delegate method when the user selects photos and presses the delete key. The delegate should use this method to alter the photos that will
