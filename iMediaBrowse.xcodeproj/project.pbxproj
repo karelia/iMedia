@@ -35,7 +35,8 @@
 		791F9AF80976320A0071B2E0 /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF10976320A0071B2E0 /* UKFNSubscribeFileWatcher.m */; };
 		791F9AFA0976320A0071B2E0 /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF30976320A0071B2E0 /* UKKQueue.m */; };
 		791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */; };
-		792BFD94098066A50004D656 /* iMBPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 792BFD92098066A50004D656 /* iMBPhotoView.m */; };
+		7922748A0A27C51600E0A9BF /* iMBFavouritePicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 792274880A27C51600E0A9BF /* iMBFavouritePicturesParser.h */; };
+		7922748B0A27C51600E0A9BF /* iMBFavouritePicturesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */; };
 		794835F50A2709AD007E8268 /* MUPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 794835F30A2709AD007E8268 /* MUPhotoView.h */; };
 		794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 794835F40A2709AD007E8268 /* MUPhotoView.m */; };
 		7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */; };
@@ -67,7 +68,6 @@
 		7990CDC109D76BDA00AD74BA /* iTunesVideo.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDC009D76BDA00AD74BA /* iTunesVideo.png */; };
 		7990CDE009D76E7800AD74BA /* iTunesSmartPlaylist.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDDF09D76E7800AD74BA /* iTunesSmartPlaylist.png */; };
 		7990CDF209D772FF00AD74BA /* Links.nib in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDF009D772FF00AD74BA /* Links.nib */; };
-		79D119FA09D6B93E00ED2FFC /* iMBMovieView.m in Sources */ = {isa = PBXBuildFile; fileRef = 79D119F809D6B93E00ED2FFC /* iMBMovieView.m */; };
 		79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF5FF09AAE5D2000CB4B4 /* badge.png */; };
 		79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */; };
 		79FDF61709AAE5D2000CB4B4 /* MBiPhoto4Library.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */; };
@@ -165,8 +165,8 @@
 		791F9AF30976320A0071B2E0 /* UKKQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKKQueue.m; sourceTree = "<group>"; };
 		791F9AF40976320A0071B2E0 /* UKMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = UKMainThreadProxy.h; sourceTree = "<group>"; };
 		791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKMainThreadProxy.m; sourceTree = "<group>"; };
-		792BFD91098066A50004D656 /* iMBPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBPhotoView.h; sourceTree = "<group>"; };
-		792BFD92098066A50004D656 /* iMBPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBPhotoView.m; sourceTree = "<group>"; };
+		792274880A27C51600E0A9BF /* iMBFavouritePicturesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBFavouritePicturesParser.h; sourceTree = "<group>"; };
+		792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBFavouritePicturesParser.m; sourceTree = "<group>"; };
 		794835F30A2709AD007E8268 /* MUPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MUPhotoView.h; sourceTree = "<group>"; };
 		794835F40A2709AD007E8268 /* MUPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MUPhotoView.m; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
@@ -209,8 +209,6 @@
 		7990CDC009D76BDA00AD74BA /* iTunesVideo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesVideo.png; sourceTree = "<group>"; };
 		7990CDDF09D76E7800AD74BA /* iTunesSmartPlaylist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesSmartPlaylist.png; sourceTree = "<group>"; };
 		7990CDF109D772FF00AD74BA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Links.nib; sourceTree = "<group>"; };
-		79D119F709D6B93E00ED2FFC /* iMBMovieView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMovieView.h; sourceTree = "<group>"; };
-		79D119F809D6B93E00ED2FFC /* iMBMovieView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMovieView.m; sourceTree = "<group>"; };
 		79FDF07F09F87B300058EB16 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		79FDF5FF09AAE5D2000CB4B4 /* badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge.png; sourceTree = "<group>"; };
 		79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBAudioPlaying.png; sourceTree = "<group>"; };
@@ -433,6 +431,8 @@
 				7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */,
 				7903562409E3B40D00384D08 /* iMBAddressBookParser.h */,
 				7903562509E3B40D00384D08 /* iMBAddressBookParser.m */,
+				792274880A27C51600E0A9BF /* iMBFavouritePicturesParser.h */,
+				792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */,
 			);
 			name = Parsers;
 			sourceTree = "<group>";
@@ -504,10 +504,6 @@
 			children = (
 				794835F30A2709AD007E8268 /* MUPhotoView.h */,
 				794835F40A2709AD007E8268 /* MUPhotoView.m */,
-				792BFD91098066A50004D656 /* iMBPhotoView.h */,
-				792BFD92098066A50004D656 /* iMBPhotoView.m */,
-				79D119F709D6B93E00ED2FFC /* iMBMovieView.h */,
-				79D119F809D6B93E00ED2FFC /* iMBMovieView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -584,6 +580,7 @@
 				796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */,
 				790DBE3E0A09AEFF00A40A36 /* NSImage+iMedia.h in Headers */,
 				794835F50A2709AD007E8268 /* MUPhotoView.h in Headers */,
+				7922748A0A27C51600E0A9BF /* iMBFavouritePicturesParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -738,7 +735,6 @@
 				791F9AF80976320A0071B2E0 /* UKFNSubscribeFileWatcher.m in Sources */,
 				791F9AFA0976320A0071B2E0 /* UKKQueue.m in Sources */,
 				791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */,
-				792BFD94098066A50004D656 /* iMBPhotoView.m in Sources */,
 				D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */,
 				D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */,
 				795D6F5209D35B77005F166D /* iMBLinksController.m in Sources */,
@@ -751,13 +747,13 @@
 				795F870609D4DA72000F21B5 /* iMBiTunesMusicParser.m in Sources */,
 				795F881B09D4EF46000F21B5 /* iMBMoviesFolder.m in Sources */,
 				796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */,
-				79D119FA09D6B93E00ED2FFC /* iMBMovieView.m in Sources */,
 				96F908C809D9B6070071BFFB /* NSWorkspace+Extensions.m in Sources */,
 				CEF3F38609E449FF00D0058F /* NSString+UTI.m in Sources */,
 				CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */,
 				CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */,
 				790DBE3F0A09AEFF00A40A36 /* NSImage+iMedia.m in Sources */,
 				794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */,
+				7922748B0A27C51600E0A9BF /* iMBFavouritePicturesParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

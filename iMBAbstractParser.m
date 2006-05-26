@@ -41,7 +41,7 @@ Please send fixes to
 {
 	if (self = [super init])
 	{
-		myDatabase = [[NSString stringWithFormat:@"%@/Library/Safari/Bookmarks.plist", NSHomeDirectory()] retain];
+		myDatabase = [file copy];
 		myFileWatcher = [[UKKQueue alloc] init];
 		[myFileWatcher setDelegate:self];
 		if (file)

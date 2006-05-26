@@ -20,21 +20,19 @@
  Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
- 
- This file was Authored by Greg Hulands
- 
  */
+
 #import <Cocoa/Cocoa.h>
-#import "MUPhotoView.h"
+#import "iMBAbstractParser.h"
 
-@class QTMovieView;
+/*
+	This parser checks NSUserDefaults for the key iMBFavouritePictures which
+	is an array of paths to folders that will be added to a "Favourites" category
+ */
 
-@interface iMBMovieView : MUPhotoView
+@interface iMBFavouritePicturesParser : iMBAbstractParser
 {
-	QTMovieView *myPreview;
+	NSMutableArray *myParsers;
 }
-
-- (IBAction)play:(id)sender;
-- (IBAction)stop:(id)sender;
 
 @end

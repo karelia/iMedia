@@ -63,7 +63,6 @@ Please send fixes to
 	while (cur = [e nextObject])
 	{
 		NSString *filePath = [path stringByAppendingPathComponent: cur];
-		NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
 		NSString *fileName = [filePath lastPathComponent];
 		
 		if ([fileName rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
@@ -92,6 +91,7 @@ Please send fixes to
 					[newPicture setObject:[fm displayNameAtPath:[filePath lastPathComponent]] forKey:@"Caption"];
 					[newPicture setObject:filePath forKey:@"ThumbPath"];
 				}
+				NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
 				if ([fileAttribs valueForKey:NSFileModificationDate])
 				{
 					[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]]
@@ -109,16 +109,14 @@ Please send fixes to
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"Pictures Folder", @"Name of your 'Pictures' folder in your home directory")];
 	[root setIconName:@"picturesFolder"];
-	
-	NSString *folder = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
-	
-	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
+		
+	if (![[NSFileManager defaultManager] fileExistsAtPath:myDatabase])
 	{
 		[root release];
 		return nil;
 	}
 	
-	[self recursivelyParse:folder
+	[self recursivelyParse:myDatabase
 				  withNode:root];
 
 	return [root autorelease];

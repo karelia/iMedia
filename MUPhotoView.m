@@ -185,7 +185,7 @@
         
         // draw the current photo
         NSRect imageRect = NSMakeRect(0, 0, [photo size].width, [photo size].height);
-        [photo drawInRect:photoRect fromRect:imageRect operation:NSCompositeCopy fraction:1.0];
+        [photo drawInRect:photoRect fromRect:imageRect operation:NSCompositeSourceOver fraction:1.0];
         
         // restore the photo's flipped status
         [photo setFlipped:isFlipped];
