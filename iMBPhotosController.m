@@ -24,7 +24,7 @@ Please send fixes to
 
 #import "iMBPhotosController.h"
 #import "iMediaBrowser.h"
-#import "iMBPhotoView.h"
+#import "MUPhotoView.h"
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+Extensions.h"
 #import "iMedia.h"
@@ -39,6 +39,7 @@ Please send fixes to
 - (id) initWithPlaylistController:(NSTreeController*)ctrl
 {
 	if (self = [super initWithPlaylistController:ctrl]) {
+		mySelection = [[NSMutableIndexSet alloc] init];
 		[NSBundle loadNibNamed:@"iPhoto" owner:self];
 	}
 	return self;
@@ -46,9 +47,19 @@ Please send fixes to
 
 - (void)dealloc
 {
+	[mySelection release];
+	[myCache release];
+	[myImages release];
 	[super dealloc];
 }
 
+- (void)awakeFromNib
+{
+	[oPhotoView setPhotoHorizontalSpacing:15];
+	[oPhotoView setPhotoVerticalSpacing:15];
+	[oPhotoView setPhotoSize:75];
+	[oPhotoView setDelegate:self];
+}
 
 #pragma mark -
 #pragma mark Media Browser Protocol Overrides
@@ -79,10 +90,11 @@ static NSImage *_toolbarIcon = nil;
 - (void)willActivate
 {
 	[super willActivate];
-	[oPhotoView bind:@"images" 
-			toObject:[self controller] 
+	[self bind:@"images" 
+	  toObject:[self controller] 
 		 withKeyPath:@"selection.Images" 
-			 options:nil];
+	   options:nil];
+	
 	[[oPhotoView window] makeFirstResponder:oPhotoView];
 }
 
@@ -118,6 +130,97 @@ static NSImage *_toolbarIcon = nil;
 
 	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:albums, @"List of Albums", images, @"Master Image List", nil];
 	[pboard setPropertyList:plist forType:@"AlbumDataListPboardType"];
+	
+}
+
+#pragma mark -
+#pragma mark MUPhotoView Delegate Methods
+
+- (void)setImages:(NSArray *)images
+{
+	[myImages autorelease];
+	myImages = [images retain];
+	[myCache removeAllObjects];
+	[oPhotoView setNeedsDisplay:YES];
+}
+
+- (NSArray *)images
+{
+	return myImages;
+}
+
+- (unsigned)photoCountForPhotoView:(MUPhotoView *)view
+{
+	return [myImages count];
+}
+
+- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
+{
+	NSDictionary *rec = [myImages objectAtIndex:index];
+	NSImage *img = [rec objectForKey:@"CachedThumb"];
+	if (!img)
+	{
+		NSString *thumbPath = [rec objectForKey:@"ThumbPath"];
+		if (thumbPath)
+		{
+			img = [myCache objectForKey:thumbPath];
+			if (!img)
+			{
+				img = [[[NSImage alloc] initWithContentsOfFile:thumbPath] autorelease];
+			}
+			if (!img)
+			{
+				// The file doesn't exist so we need to display the ? image
+				
+			}
+		}
+	}
+	return img;
+}
+
+- (void)photoView:(MUPhotoView *)view didSetSelectionIndexes:(NSIndexSet *)indexes
+{
+	[mySelection removeAllIndexes];
+	[mySelection addIndexes:indexes];
+}
+
+- (NSIndexSet *)selectionIndexesForPhotoView:(MUPhotoView *)view
+{
+	return mySelection;
+}
+
+- (unsigned int)photoView:(MUPhotoView *)view draggingSourceOperationMaskForLocal:(BOOL)isLocal
+{
+	return NSDragOperationCopy;
+}
+
+- (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard
+{
+	NSMutableArray *fileList = [NSMutableArray array];
+	NSMutableArray *captions = [NSMutableArray array];
+	NSMutableDictionary *iphotoData = [NSMutableDictionary dictionary];
+	
+	NSMutableArray *types = [NSMutableArray array]; 
+	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
+	[types addObject:@"ImageDataListPboardType"];
+	[pboard declareTypes:types owner:nil];
+	
+	NSDictionary *cur;
+	
+	int i;
+	for(i = 0; i < [myImages count]; i++) 
+	{
+		if ([mySelection containsIndex:i]) 
+		{
+			cur = [myImages objectAtIndex:i];
+			[fileList addObject:[cur objectForKey:@"ImagePath"]];
+			[captions addObject:[cur objectForKey:@"Caption"]];
+			[iphotoData setObject:cur forKey:[NSNumber numberWithInt:i]];
+		}
+	}
+				
+	[pboard writeURLs:nil files:fileList names:captions];
+	[pboard setPropertyList:iphotoData forType:@"ImageDataListPboardType"];
 	
 }
 

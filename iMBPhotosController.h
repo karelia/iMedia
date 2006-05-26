@@ -25,11 +25,15 @@ Please send fixes to
 #import <Cocoa/Cocoa.h>
 #import "iMBAbstractController.h"
 
-@class iMBPhotoView;
+@class MUPhotoView;
 
 @interface iMBPhotosController : iMBAbstractController
 {
-	IBOutlet iMBPhotoView *oPhotoView;
+	@private
+	NSMutableDictionary *myCache;
+	NSMutableIndexSet *mySelection;
+	NSArray *myImages;
+	IBOutlet MUPhotoView *oPhotoView;
 }
 
 @end
