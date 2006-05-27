@@ -114,7 +114,7 @@ static NSMutableDictionary *imageCache = nil;
 		myIcon = [[imageCache objectForKey:myIconName] retain];
 		if (!myIcon)
 		{
-			if ([myIconName hasPrefix:@"com.apple."])
+			if ([myIconName rangeOfString:@"."].location != NSNotFound)
 			{
 				myIcon = [[[NSWorkspace sharedWorkspace]
 					iconForAppWithBundleIdentifier:myIconName] retain];

@@ -62,6 +62,13 @@
 		795F7B2509D4D5E5000F21B5 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 795F7AF509D4D5E5000F21B5 /* WebKit.framework */; };
 		795F870609D4DA72000F21B5 /* iMBiTunesMusicParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795F870409D4DA72000F21B5 /* iMBiTunesMusicParser.m */; };
 		795F881B09D4EF46000F21B5 /* iMBMoviesFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */; };
+		796ABF700A28462800EF92DB /* iMBOmniWebParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ABF6E0A28462800EF92DB /* iMBOmniWebParser.h */; };
+		796ABF710A28462800EF92DB /* iMBOmniWebParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ABF6F0A28462800EF92DB /* iMBOmniWebParser.m */; };
+		796ABF780A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt in Resources */ = {isa = PBXBuildFile; fileRef = 796ABF770A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt */; };
+		796ABFB40A284E3A00EF92DB /* iMBXBELParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ABFB20A284E3A00EF92DB /* iMBXBELParser.h */; };
+		796ABFB50A284E3A00EF92DB /* iMBXBELParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ABFB30A284E3A00EF92DB /* iMBXBELParser.m */; };
+		796AC02F0A28582200EF92DB /* NSAttributedString+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 796AC02D0A28582200EF92DB /* NSAttributedString+iMedia.h */; };
+		796AC0300A28582200EF92DB /* NSAttributedString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 796AC02E0A28582200EF92DB /* NSAttributedString+iMedia.m */; };
 		796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ADBBF09D6562C001CF400 /* iMBAbstractController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ADBC009D6562C001CF400 /* iMBAbstractController.m */; };
 		796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796ADBE109D65986001CF400 /* CoreData.framework */; };
@@ -206,6 +213,13 @@
 		795F870409D4DA72000F21B5 /* iMBiTunesMusicParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiTunesMusicParser.m; sourceTree = "<group>"; };
 		795F881809D4EF46000F21B5 /* iMBMoviesFolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMoviesFolder.h; sourceTree = "<group>"; };
 		795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMoviesFolder.m; sourceTree = "<group>"; };
+		796ABF6E0A28462800EF92DB /* iMBOmniWebParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBOmniWebParser.h; sourceTree = "<group>"; };
+		796ABF6F0A28462800EF92DB /* iMBOmniWebParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBOmniWebParser.m; sourceTree = "<group>"; };
+		796ABF770A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = OmniwebBookmarksToXBEL.xslt; sourceTree = "<group>"; };
+		796ABFB20A284E3A00EF92DB /* iMBXBELParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBXBELParser.h; sourceTree = "<group>"; };
+		796ABFB30A284E3A00EF92DB /* iMBXBELParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBXBELParser.m; sourceTree = "<group>"; };
+		796AC02D0A28582200EF92DB /* NSAttributedString+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+iMedia.h"; sourceTree = "<group>"; };
+		796AC02E0A28582200EF92DB /* NSAttributedString+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+iMedia.m"; sourceTree = "<group>"; };
 		796ADBBF09D6562C001CF400 /* iMBAbstractController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAbstractController.h; sourceTree = "<group>"; };
 		796ADBC009D6562C001CF400 /* iMBAbstractController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAbstractController.m; sourceTree = "<group>"; };
 		796ADBE109D65986001CF400 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -441,6 +455,11 @@
 				792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */,
 				79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */,
 				79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */,
+				796ABFB20A284E3A00EF92DB /* iMBXBELParser.h */,
+				796ABFB30A284E3A00EF92DB /* iMBXBELParser.m */,
+				796ABF770A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt */,
+				796ABF6E0A28462800EF92DB /* iMBOmniWebParser.h */,
+				796ABF6F0A28462800EF92DB /* iMBOmniWebParser.m */,
 			);
 			name = Parsers;
 			sourceTree = "<group>";
@@ -460,6 +479,8 @@
 				790DBE3D0A09AEFF00A40A36 /* NSImage+iMedia.m */,
 				798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */,
 				798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */,
+				796AC02D0A28582200EF92DB /* NSAttributedString+iMedia.h */,
+				796AC02E0A28582200EF92DB /* NSAttributedString+iMedia.m */,
 			);
 			name = "Cocoa Extensions";
 			sourceTree = "<group>";
@@ -613,6 +634,9 @@
 				798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */,
 				798E493D0A27E87900E0D4BC /* WebIconDatabase.h in Headers */,
 				79BBE52A0A282E440018CCCA /* iMBGarageBandParser.h in Headers */,
+				796ABF700A28462800EF92DB /* iMBOmniWebParser.h in Headers */,
+				796ABFB40A284E3A00EF92DB /* iMBXBELParser.h in Headers */,
+				796AC02F0A28582200EF92DB /* NSAttributedString+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,6 +749,7 @@
 				7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */,
 				7916744C0A2826FD003CBF48 /* larger.png in Resources */,
 				7916744D0A2826FE003CBF48 /* smaller.png in Resources */,
+				796ABF780A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -790,6 +815,9 @@
 				7922748B0A27C51600E0A9BF /* iMBFavouritePicturesParser.m in Sources */,
 				798E476F0A27CD8800E0D4BC /* NSFileManager+iMedia.m in Sources */,
 				79BBE52B0A282E440018CCCA /* iMBGarageBandParser.m in Sources */,
+				796ABF710A28462800EF92DB /* iMBOmniWebParser.m in Sources */,
+				796ABFB50A284E3A00EF92DB /* iMBXBELParser.m in Sources */,
+				796AC0300A28582200EF92DB /* NSAttributedString+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

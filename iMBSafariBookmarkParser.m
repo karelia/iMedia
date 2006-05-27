@@ -117,7 +117,6 @@
 			id nameWithIcon = [self name:[[cur objectForKey:@"URIDictionary"] objectForKey:@"title"]
 							   withImage:icon];
 			[link setObject:nameWithIcon forKey:@"NameWithIcon"];
-			[icon release];
 			[links addObject:link];
 		}
 	}
