@@ -61,7 +61,7 @@
 	xml = [xml objectByApplyingXSLTAtURL:xsltURL
 							   arguments:nil
 								   error:&err];
-	NSLog(@"%@", [xml XMLStringWithOptions:NSXMLNodePrettyPrint]);
+	//NSLog(@"%@", [xml XMLStringWithOptions:NSXMLNodePrettyPrint]);
 	iMBLibraryNode *library = nil;
 	
 	if (xml)

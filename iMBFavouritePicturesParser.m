@@ -59,7 +59,7 @@
 	
 	iMBLibraryNode *favs = [[iMBLibraryNode alloc] init];
 	[favs setName:LocalizedStringInThisBundle(@"Favourites", @"Favourite Pictures folder name")];
-	[favs setIconName:@"folder"];
+	[favs setIconName:@"heart"];
 	
 	NSFileManager *fm = [NSFileManager defaultManager];
 	iMBPicturesFolder *parser;

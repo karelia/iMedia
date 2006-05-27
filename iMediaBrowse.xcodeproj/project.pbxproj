@@ -39,6 +39,7 @@
 		791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */; };
 		7922748A0A27C51600E0A9BF /* iMBFavouritePicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 792274880A27C51600E0A9BF /* iMBFavouritePicturesParser.h */; };
 		7922748B0A27C51600E0A9BF /* iMBFavouritePicturesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */; };
+		79353D650A28621000284715 /* heart.png in Resources */ = {isa = PBXBuildFile; fileRef = 79353D640A28621000284715 /* heart.png */; };
 		794835F50A2709AD007E8268 /* MUPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 794835F30A2709AD007E8268 /* MUPhotoView.h */; };
 		794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 794835F40A2709AD007E8268 /* MUPhotoView.m */; };
 		7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */; };
@@ -183,6 +184,7 @@
 		791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKMainThreadProxy.m; sourceTree = "<group>"; };
 		792274880A27C51600E0A9BF /* iMBFavouritePicturesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBFavouritePicturesParser.h; sourceTree = "<group>"; };
 		792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBFavouritePicturesParser.m; sourceTree = "<group>"; };
+		79353D640A28621000284715 /* heart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = heart.png; sourceTree = "<group>"; };
 		794835F30A2709AD007E8268 /* MUPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MUPhotoView.h; sourceTree = "<group>"; };
 		794835F40A2709AD007E8268 /* MUPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MUPhotoView.m; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
@@ -488,6 +490,7 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				79353D640A28621000284715 /* heart.png */,
 				7916744A0A2826FD003CBF48 /* larger.png */,
 				7916744B0A2826FD003CBF48 /* smaller.png */,
 				7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */,
@@ -750,6 +753,7 @@
 				7916744C0A2826FD003CBF48 /* larger.png in Resources */,
 				7916744D0A2826FE003CBF48 /* smaller.png in Resources */,
 				796ABF780A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt in Resources */,
+				79353D650A28621000284715 /* heart.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
