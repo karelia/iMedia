@@ -74,6 +74,9 @@ Please send fixes to
 {
 	[mySelection removeAllIndexes];
 	[myFilteredImages removeAllObjects];
+	
+	if ([mySearchString length] == 0) return;
+	
 	NSEnumerator *e = [myImages objectEnumerator];
 	NSDictionary *cur;
 	
@@ -85,7 +88,6 @@ Please send fixes to
 			[myFilteredImages addObject:cur];
 		}
 	}
-	[oPhotoView setNeedsDisplay:YES];
 }
 
 - (IBAction)search:(id)sender
@@ -94,6 +96,7 @@ Please send fixes to
 	mySearchString = [[sender stringValue] copy];
 	
 	[self refilter];
+	[oPhotoView setNeedsDisplay:YES];
 }
 
 #pragma mark -
@@ -176,7 +179,7 @@ static NSImage *_toolbarIcon = nil;
 	[myImages autorelease];
 	myImages = [images retain];
 	[myCache removeAllObjects];
-	[mySelection removeAllIndexes];
+	[self refilter];
 	[oPhotoView setNeedsDisplay:YES];
 }
 
@@ -267,11 +270,11 @@ static NSImage *_toolbarIcon = nil;
 		{
 			if ([mySearchString length] > 0)
 			{
-				cur = [myFilteredImages objectAtIndex:index];
+				cur = [myFilteredImages objectAtIndex:i];
 			}
 			else
 			{
-				cur = [myImages objectAtIndex:index];
+				cur = [myImages objectAtIndex:i];
 			}
 			[fileList addObject:[cur objectForKey:@"ImagePath"]];
 			[captions addObject:[cur objectForKey:@"Caption"]];
