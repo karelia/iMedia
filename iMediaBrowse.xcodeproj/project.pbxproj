@@ -314,6 +314,7 @@
 				D9659C0E09A6CB160079ED9A /* Value Transformers */,
 				D9659A2609A6A7C50079ED9A /* Views */,
 				96F908C509D9B6070071BFFB /* NSWorkspace+Extensions.h */,
+				79BBE5090A282CCF0018CCCA /* New Group */,
 				96F908C609D9B6070071BFFB /* NSWorkspace+Extensions.m */,
 				CEF3F38309E449FF00D0058F /* NSString+UTI.h */,
 				CEF3F38409E449FF00D0058F /* NSString+UTI.m */,
@@ -448,6 +449,13 @@
 				792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */,
 			);
 			name = Parsers;
+			sourceTree = "<group>";
+		};
+		79BBE5090A282CCF0018CCCA /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "New Group";
 			sourceTree = "<group>";
 		};
 		968BEF3E090E904100D00E5C /* images */ = {
