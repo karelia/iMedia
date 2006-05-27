@@ -30,6 +30,7 @@
         }, 
         {CLASS = iMBPhotoView; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }, 
         {
+            ACTIONS = {search = id; }; 
             CLASS = iMBPhotosController; 
             LANGUAGE = ObjC; 
             OUTLETS = {oPhotoView = MUPhotoView; }; 

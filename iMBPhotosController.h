@@ -29,12 +29,15 @@ Please send fixes to
 
 @interface iMBPhotosController : iMBAbstractController
 {
-	IBOutlet MUPhotoView *oPhotoView;
-	NSMutableDictionary *myCache;
-	NSMutableIndexSet *mySelection;
-	NSArray *myImages;
+	IBOutlet MUPhotoView	*oPhotoView;
+	NSMutableDictionary		*myCache;
+	NSMutableIndexSet		*mySelection;
+	NSArray					*myImages;
+	NSMutableArray			*myFilteredImages;
+	NSString				*mySearchString;
 }
 
 - (NSString *)nibName;
+- (IBAction)search:(id)sender;
 
 @end

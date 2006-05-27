@@ -16,6 +16,8 @@
 		790DBE4D0A09B19000A40A36 /* movies.png in Resources */ = {isa = PBXBuildFile; fileRef = 790DBE490A09B19000A40A36 /* movies.png */; };
 		790DBE4E0A09B19000A40A36 /* music.png in Resources */ = {isa = PBXBuildFile; fileRef = 790DBE4A0A09B19000A40A36 /* music.png */; };
 		790DBE4F0A09B19000A40A36 /* photos.png in Resources */ = {isa = PBXBuildFile; fileRef = 790DBE4B0A09B19000A40A36 /* photos.png */; };
+		7916744C0A2826FD003CBF48 /* larger.png in Resources */ = {isa = PBXBuildFile; fileRef = 7916744A0A2826FD003CBF48 /* larger.png */; };
+		7916744D0A2826FE003CBF48 /* smaller.png in Resources */ = {isa = PBXBuildFile; fileRef = 7916744B0A2826FD003CBF48 /* smaller.png */; };
 		79167A0B0975260A00D9EF74 /* iMediaBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 965EB99708E1F7CE000DFF3A /* iMediaBrowser.m */; };
 		79167A0D0975260C00D9EF74 /* iMBMoviesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 969656AF08C6A2C700F2F85C /* iMBMoviesController.m */; };
 		79167A160975261700D9EF74 /* iMBMusicController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A26018090CA99E00BCCCD6 /* iMBMusicController.m */; };
@@ -152,6 +154,8 @@
 		790DBE490A09B19000A40A36 /* movies.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = movies.png; sourceTree = "<group>"; };
 		790DBE4A0A09B19000A40A36 /* music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = music.png; sourceTree = "<group>"; };
 		790DBE4B0A09B19000A40A36 /* photos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = photos.png; sourceTree = "<group>"; };
+		7916744A0A2826FD003CBF48 /* larger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = larger.png; sourceTree = "<group>"; };
+		7916744B0A2826FD003CBF48 /* smaller.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = smaller.png; sourceTree = "<group>"; };
 		791679FE0975255000D9EF74 /* iMediaBrowser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iMediaBrowser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		791679FF0975255000D9EF74 /* iMediaBrowser-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "iMediaBrowser-Info.plist"; sourceTree = "<group>"; };
 		791F964C0975B63E0071B2E0 /* iMediaBrowserProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowserProtocol.h; sourceTree = "<group>"; };
@@ -449,6 +453,8 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				7916744A0A2826FD003CBF48 /* larger.png */,
+				7916744B0A2826FD003CBF48 /* smaller.png */,
 				7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */,
 				790DBE480A09B19000A40A36 /* links.png */,
 				790DBE490A09B19000A40A36 /* movies.png */,
@@ -702,6 +708,8 @@
 				790DBE4E0A09B19000A40A36 /* music.png in Resources */,
 				790DBE4F0A09B19000A40A36 /* photos.png in Resources */,
 				7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */,
+				7916744C0A2826FD003CBF48 /* larger.png in Resources */,
+				7916744D0A2826FE003CBF48 /* smaller.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

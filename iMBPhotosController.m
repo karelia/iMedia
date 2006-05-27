@@ -40,6 +40,7 @@ Please send fixes to
 {
 	if (self = [super initWithPlaylistController:ctrl]) {
 		mySelection = [[NSMutableIndexSet alloc] init];
+		myFilteredImages = [[NSMutableArray alloc] init];
 		[NSBundle loadNibNamed:[self nibName] owner:self];
 	}
 	return self;
@@ -50,6 +51,9 @@ Please send fixes to
 	[mySelection release];
 	[myCache release];
 	[myImages release];
+	[myFilteredImages release];
+	[mySearchString release];
+	
 	[super dealloc];
 }
 
@@ -64,6 +68,32 @@ Please send fixes to
 - (NSString *)nibName
 {
 	return @"iPhoto";
+}
+
+- (void)refilter
+{
+	[mySelection removeAllIndexes];
+	[myFilteredImages removeAllObjects];
+	NSEnumerator *e = [myImages objectEnumerator];
+	NSDictionary *cur;
+	
+	while (cur = [e nextObject])
+	{
+		if ([[cur objectForKey:@"Caption"] rangeOfString:mySearchString options:NSCaseInsensitiveSearch].location != NSNotFound ||
+			[[cur objectForKey:@"ImagePath"] rangeOfString:mySearchString options:NSCaseInsensitiveSearch].location != NSNotFound)
+		{
+			[myFilteredImages addObject:cur];
+		}
+	}
+	[oPhotoView setNeedsDisplay:YES];
+}
+
+- (IBAction)search:(id)sender
+{
+	[mySearchString autorelease];
+	mySearchString = [[sender stringValue] copy];
+	
+	[self refilter];
 }
 
 #pragma mark -
@@ -146,6 +176,7 @@ static NSImage *_toolbarIcon = nil;
 	[myImages autorelease];
 	myImages = [images retain];
 	[myCache removeAllObjects];
+	[mySelection removeAllIndexes];
 	[oPhotoView setNeedsDisplay:YES];
 }
 
@@ -156,12 +187,25 @@ static NSImage *_toolbarIcon = nil;
 
 - (unsigned)photoCountForPhotoView:(MUPhotoView *)view
 {
+	if ([mySearchString length] > 0)
+	{
+		return [myFilteredImages count];
+	}
 	return [myImages count];
 }
 
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
 {
-	NSDictionary *rec = [myImages objectAtIndex:index];
+	NSDictionary *rec;
+	if ([mySearchString length] > 0)
+	{
+		rec = [myFilteredImages objectAtIndex:index];
+	}
+	else
+	{
+		rec = [myImages objectAtIndex:index];
+	}
+	
 	NSImage *img = [rec objectForKey:@"CachedThumb"];
 	if (!img)
 	{
@@ -221,7 +265,14 @@ static NSImage *_toolbarIcon = nil;
 	{
 		if ([mySelection containsIndex:i]) 
 		{
-			cur = [myImages objectAtIndex:i];
+			if ([mySearchString length] > 0)
+			{
+				cur = [myFilteredImages objectAtIndex:index];
+			}
+			else
+			{
+				cur = [myImages objectAtIndex:index];
+			}
 			[fileList addObject:[cur objectForKey:@"ImagePath"]];
 			[captions addObject:[cur objectForKey:@"Caption"]];
 			[iphotoData setObject:cur forKey:[NSNumber numberWithInt:i]];
@@ -235,7 +286,16 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
 {
-	return [[myImages objectAtIndex:index] objectForKey:@"Caption"];
+	NSDictionary *rec;
+	if ([mySearchString length] > 0)
+	{
+		rec = [myFilteredImages objectAtIndex:index];
+	}
+	else
+	{
+		rec = [myImages objectAtIndex:index];
+	}
+	return [rec objectForKey:@"Caption"];
 }
 
 @end
