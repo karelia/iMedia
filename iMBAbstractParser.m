@@ -46,7 +46,7 @@ Please send fixes to
 		[myFileWatcher setDelegate:self];
 		if (file)
 		{
-			[myFileWatcher addPath:file];
+			[myFileWatcher addPath:myDatabase];
 		}
 	}
 	return self;

@@ -29,6 +29,7 @@ Please send fixes to
 #import "iMBLibraryNode.h"
 #import "NSString+UTI.h"
 #import "iMedia.h"
+#import "NSFileManager+iMedia.h"
 
 @implementation iMBPicturesFolder
 
@@ -67,8 +68,7 @@ Please send fixes to
 		
 		if ([fileName rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
 		if ([fileName rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
-		if ([fileName hasPrefix:@"."]) continue;		// invisible
-#warning TODO: Better check for invisible files; e.g. http://www.cocoabuilder.com/archive/message/cocoa/2003/6/17/86040
+		if ([fm isPathHidden:fileName]) continue;
 		
 		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir)
 		{

@@ -220,6 +220,9 @@
     override this method and do the appropriate removals itself. The default implementation does nothing. **/
 - (void)photoView:(MUPhotoView *)view didRemovePhotosAtIndexes:(NSIndexSet *)indexes;
 
+// Tool tip support
+- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index;
+
 @end
 
 

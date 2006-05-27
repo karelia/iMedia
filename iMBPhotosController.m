@@ -171,12 +171,16 @@ static NSImage *_toolbarIcon = nil;
 			img = [myCache objectForKey:thumbPath];
 			if (!img)
 			{
-				img = [[[NSImage alloc] initWithContentsOfFile:thumbPath] autorelease];
+				img = [[[NSImage alloc] initByReferencingFile:thumbPath] autorelease];
 			}
 			if (!img)
 			{
 				// The file doesn't exist so we need to display the ? image
 				
+			}
+			if (img)
+			{
+				[(NSMutableDictionary *)rec setObject:img forKey:@"CachedThumb"];
 			}
 		}
 	}
@@ -227,6 +231,11 @@ static NSImage *_toolbarIcon = nil;
 	[pboard writeURLs:nil files:fileList names:captions];
 	[pboard setPropertyList:iphotoData forType:@"ImageDataListPboardType"];
 	
+}
+
+- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
+{
+	return [[myImages objectAtIndex:index] objectForKey:@"Caption"];
 }
 
 @end

@@ -105,7 +105,6 @@ static NSMutableDictionary *_parsers = nil;
 	return imb;
 }
 
-#warning Filtering on the given browser types during the init is still to be implemented - jmj
 + (id)sharedBrowserWithDelegate:(id)delegate supportingBrowserTypes:(NSArray*)types;
 {
 	iMediaBrowser *imb = [self sharedBrowserWithDelegate:delegate];
@@ -189,18 +188,19 @@ static NSMutableDictionary *_parsers = nil;
 	[myLoadedParsers release];
 	[myToolbar release];
 	[myBackgroundLoadingLock release];
-	[preferredBrowserTypes release];
+	[myPreferredBrowserTypes release];
 	[super dealloc];
 }
 
--(id<iMediaBrowser>)selectedBrowser {
-  return mySelectedBrowser;
+-(id <iMediaBrowser>)selectedBrowser 
+{
+	return mySelectedBrowser;
 }
 
 -(void)setPreferredBrowserTypes:(NSArray*)types
 {
-  [preferredBrowserTypes autorelease];
-  preferredBrowserTypes = [types copy];
+	[myPreferredBrowserTypes autorelease];
+	myPreferredBrowserTypes = [types copy];
 }
 
 - (void)awakeFromNib
@@ -215,25 +215,36 @@ static NSMutableDictionary *_parsers = nil;
 	[myToolbar setSizeMode:NSToolbarSizeModeSmall];
 	
 	// Load any plugins so they register
-	
-	
 	NSEnumerator *e = [_browserClasses objectEnumerator];
 	NSString *cur;
 	
 	while (cur = [e nextObject]) {
-		if (myFlags.willLoadBrowser)
-		{
-			if (![myDelegate iMediaBrowser:self willLoadBrowser:cur])
-			{
-				continue;
-			}
-		}
 		Class aClass = NSClassFromString(cur);
 		id <iMediaBrowser>browser = [[aClass alloc] initWithPlaylistController:libraryController];
 		if (![browser conformsToProtocol:@protocol(iMediaBrowser)]) {
 			NSLog(@"%@ must implement the iMediaBrowser protocol");
+			[browser release];
 			continue;
 		}
+		
+		// if we were setup with a set of browser types, lets filter now.
+		if (myPreferredBrowserTypes)
+		{
+			if (![myPreferredBrowserTypes containsObject:cur])
+			{
+				[browser release];
+				continue;
+			}
+		}
+		if (myFlags.willLoadBrowser)
+		{
+			if (![myDelegate iMediaBrowser:self willLoadBrowser:cur])
+			{
+				[browser release];
+				continue;
+			}
+		}
+		
 		[myMediaBrowsers addObject:browser];
 		[browser release];
 		if (myFlags.didLoadBrowser)

@@ -111,7 +111,8 @@
 
 - (void)drawRect:(NSRect)rect
 {
-    
+    [self removeAllToolTips];
+	
     // draw the background color
 	[[self backgroundColor] set];
 	[NSBezierPath fillRect:rect];
@@ -187,6 +188,9 @@
         NSRect imageRect = NSMakeRect(0, 0, [photo size].width, [photo size].height);
         [photo drawInRect:photoRect fromRect:imageRect operation:NSCompositeSourceOver fraction:1.0];
         
+		// register the tooltip area
+		[self addToolTipRect:imageRect owner:self userData:nil];
+		
         // restore the photo's flipped status
         [photo setFlipped:isFlipped];
         
@@ -231,6 +235,11 @@
 	}
     //**** END Selection Rectangle ****//
 	
+}
+
+- (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
+{
+	return [delegate photoView:self captionForPhotoAtIndex:[self photoIndexForPoint:point]];
 }
 
 #pragma mark -
@@ -710,9 +719,6 @@
 			[badgeString release];
 			[attributes release];
 		}
-		
-		// get the supported drag data types from the delegate
-        NSArray *types = [delegate pasteboardDragTypesForPhotoView:self];
         
         // get the pasteboard and register the returned types with delegate as the owner
 		NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSDragPboard];
@@ -1228,13 +1234,13 @@
     return [[[NSArray alloc] init] autorelease];
 }
 
-- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)index dataType:(NSString *)type
+- (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard
 {
-    return nil;
+
 }
 
 // double-click
-- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index
+- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index withFrame:(NSRect)frame
 {
     
 }
@@ -1248,6 +1254,11 @@
 - (void)photoView:(MUPhotoView *)view didRemovePhotosAtIndexes:(NSIndexSet *)indexes
 {
     
+}
+
+- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
+{
+	return nil;
 }
 
 @end

@@ -28,7 +28,7 @@ Please send fixes to
 
 @interface iMBSafariBookmarkParser : iMBAbstractParser 
 {
-
+	NSMutableDictionary *mySafariFaviconCache;
 }
 
 @end

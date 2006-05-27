@@ -45,7 +45,7 @@ Please send fixes to
 	NSToolbar						*myToolbar;
 	NSLock							*myBackgroundLoadingLock;
 	
-	NSArray							*preferredBrowserTypes;
+	NSArray							*myPreferredBrowserTypes;
 	id								myDelegate; //not retained
 	struct ___imbFlags {
 		unsigned willLoadBrowser: 1;

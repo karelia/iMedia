@@ -87,8 +87,6 @@ Please send fixes to
 				
 				NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
 				[newPicture setObject:filePath forKey:@"ImagePath"];
-				[newPicture setObject:[fm displayNameAtPath:[filePath lastPathComponent]] forKey:@"Caption"];
-#warning TODO: you could get a richer caption out of the metadata from the movie, though it might be slow unless lazily instantiated.
 				[newPicture setObject:filePath forKey:@"ThumbPath"];
 				[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimeInterval"];
 				//we want to cache the first frame of the movie here as we will be in a background thread
@@ -100,16 +98,19 @@ Please send fixes to
 						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
 						nil] error:&error];
 				NSImage *thumb = [movie betterPosterImage];
+				[newPicture setObject:[movie attributeForKey:QTMovieDisplayNameAttribute] forKey:@"Caption"];
+				
 				[movie release];
 				if (thumb)
 				{
-#warning TODO: it will probably be much faster NOT to load any thumbnails until they are actually needed, THEN cache them.
+// Dan "it will probably be much faster NOT to load any thumbnails until they are actually needed, THEN cache them."
+// Greg "we are in a background thread here so it doesn't block. If we were to delay it to when actually needed, then
+//		we would block the UI. We need to compromise somehow here. Not sure how to do it."
 					[newPicture setObject:thumb forKey:@"CachedThumb"];
 				}
 				else
 				{
-          [newPicture setObject:[[NSWorkspace sharedWorkspace]
-            iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
+					[newPicture setObject:[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
 								   forKey:@"CachedThumb"];
 				}
 				[movies addObject:newPicture];

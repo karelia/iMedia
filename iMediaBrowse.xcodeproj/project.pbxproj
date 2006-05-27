@@ -63,6 +63,9 @@
 		796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ADBBF09D6562C001CF400 /* iMBAbstractController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ADBC009D6562C001CF400 /* iMBAbstractController.m */; };
 		796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796ADBE109D65986001CF400 /* CoreData.framework */; };
+		798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */; };
+		798E476F0A27CD8800E0D4BC /* NSFileManager+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */; };
+		798E493D0A27E87900E0D4BC /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E493C0A27E87900E0D4BC /* WebIconDatabase.h */; };
 		7990CDB309D769DE00AD74BA /* SafariBookmarksBar.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDB109D769DE00AD74BA /* SafariBookmarksBar.png */; };
 		7990CDB409D769DE00AD74BA /* SafariBookmarksMenu.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDB209D769DE00AD74BA /* SafariBookmarksMenu.png */; };
 		7990CDC109D76BDA00AD74BA /* iTunesVideo.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDC009D76BDA00AD74BA /* iTunesVideo.png */; };
@@ -202,6 +205,9 @@
 		796ADBE109D65986001CF400 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		797CC96C09F872AF0063FF9B /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
 		79858F6709E3C3AB003EA241 /* contact.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = contact.png; sourceTree = "<group>"; };
+		798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+iMedia.h"; sourceTree = "<group>"; };
+		798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+iMedia.m"; sourceTree = "<group>"; };
+		798E493C0A27E87900E0D4BC /* WebIconDatabase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = WebIconDatabase.h; sourceTree = "<group>"; };
 		7990CD5809D75D4A00AD74BA /* iMBiTunesVideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiTunesVideoParser.h; sourceTree = "<group>"; };
 		7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiTunesVideoParser.m; sourceTree = "<group>"; };
 		7990CDB109D769DE00AD74BA /* SafariBookmarksBar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SafariBookmarksBar.png; sourceTree = "<group>"; };
@@ -313,6 +319,8 @@
 				CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */,
 				790DBE3C0A09AEFF00A40A36 /* NSImage+iMedia.h */,
 				790DBE3D0A09AEFF00A40A36 /* NSImage+iMedia.m */,
+				798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */,
+				798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -419,6 +427,7 @@
 				795D716009D3AB55005F166D /* iMBiPhotoPhotosParser.m */,
 				795D716509D3AB64005F166D /* iMBiPhotoMoviesParser.h */,
 				795D716609D3AB64005F166D /* iMBiPhotoMoviesParser.m */,
+				798E493C0A27E87900E0D4BC /* WebIconDatabase.h */,
 				795D71DF09D3C00F005F166D /* iMBSafariBookmarkParser.h */,
 				795D71E009D3C00F005F166D /* iMBSafariBookmarkParser.m */,
 				795F748209D4BA98000F21B5 /* iMBPicturesFolder.h */,
@@ -581,6 +590,8 @@
 				790DBE3E0A09AEFF00A40A36 /* NSImage+iMedia.h in Headers */,
 				794835F50A2709AD007E8268 /* MUPhotoView.h in Headers */,
 				7922748A0A27C51600E0A9BF /* iMBFavouritePicturesParser.h in Headers */,
+				798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */,
+				798E493D0A27E87900E0D4BC /* WebIconDatabase.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -754,6 +765,7 @@
 				790DBE3F0A09AEFF00A40A36 /* NSImage+iMedia.m in Sources */,
 				794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */,
 				7922748B0A27C51600E0A9BF /* iMBFavouritePicturesParser.m in Sources */,
+				798E476F0A27CD8800E0D4BC /* NSFileManager+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

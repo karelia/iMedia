@@ -27,6 +27,7 @@
 #import "iMBLibraryNode.h"
 #import <WebKit/WebKit.h>
 #import "iMedia.h"
+#import "WebIconDatabase.h"
 
 @implementation iMBSafariBookmarkParser
 
@@ -43,9 +44,15 @@
 {
 	if (self = [super initWithContentsOfFile:[NSString stringWithFormat:@"%@/Library/Safari/Bookmarks.plist", NSHomeDirectory()]])
 	{
-		
+		mySafariFaviconCache = [[NSMutableDictionary dictionary] retain];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[mySafariFaviconCache release];
+	[super dealloc];
 }
 
 - (iMBLibraryNode *)recursivelyParseItem:(NSDictionary *)item
@@ -79,6 +86,8 @@
 	NSMutableArray *links = [NSMutableArray array];
 	NSEnumerator *e = [[item objectForKey:@"Children"] objectEnumerator];
 	NSDictionary *cur;
+	[[NSUserDefaults standardUserDefaults] setObject:@"~/Library/Safari/Icons" forKey:WebIconDatabaseDirectoryDefaultsKey];
+	[[NSUserDefaults standardUserDefaults] synchronize];
 	
 	while (cur = [e nextObject])
 	{
@@ -97,10 +106,10 @@
 					 forKey:@"Name"];
 			[link setObject:[cur objectForKey:@"URLString"] forKey:@"URL"];
 			
-			WebHistoryItem *web = [[WebHistoryItem alloc] initWithURLString:[item objectForKey:@"URLString"]
-																	  title:[[item objectForKey:@"URIDictionary"] objectForKey:@"title"]
-													lastVisitedTimeInterval:60];
-			NSImage *icon = [[NSImage alloc] initWithData:[[web icon] TIFFRepresentation]];
+			NSImage *icon = [[WebIconDatabase sharedIconDatabase] iconForURL:[item objectForKey:@"URLString"]
+																	withSize:NSMakeSize(16,16)
+																	   cache:YES];
+			
 			if (icon)
 			{
 				[link setObject:icon forKey:@"Icon"];
@@ -109,7 +118,6 @@
 							   withImage:icon];
 			[link setObject:nameWithIcon forKey:@"NameWithIcon"];
 			[icon release];
-			[web release];
 			[links addObject:link];
 		}
 	}

@@ -39,9 +39,6 @@ Please send fixes to
 	return self;
 }
 
-#warning Please put in a progress view when switching to links tab; this might be slow loading.
-
-
 - (void)awakeFromNib
 {
 	[oLinkController setDelegate:self];
@@ -151,8 +148,5 @@ static NSImage *_toolbarIcon = nil;
 		[[NSWorkspace sharedWorkspace] openURL:url];
 	}
 }
-
-#warning Suggestion: Could favicons be shown?  Only if we can use Safari's cache, and NOT slow down
-#warning responsiveness with network loads of images!
 
 @end
