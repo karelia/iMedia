@@ -191,7 +191,7 @@ Please send fixes to
 				{
 					[playlistTrack setObject:songIcon forKey:@"Icon"];
 				}
-				
+				[playlistTrack setObject:[playlistTrack objectForKey:@"Location"] forKey:@"Preview"];
 				[newPlaylist addObject:playlistTrack];
 			}
 		}

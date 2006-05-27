@@ -73,6 +73,8 @@
 		7990CDC109D76BDA00AD74BA /* iTunesVideo.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDC009D76BDA00AD74BA /* iTunesVideo.png */; };
 		7990CDE009D76E7800AD74BA /* iTunesSmartPlaylist.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDDF09D76E7800AD74BA /* iTunesSmartPlaylist.png */; };
 		7990CDF209D772FF00AD74BA /* Links.nib in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDF009D772FF00AD74BA /* Links.nib */; };
+		79BBE52A0A282E440018CCCA /* iMBGarageBandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */; };
+		79BBE52B0A282E440018CCCA /* iMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */; };
 		79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF5FF09AAE5D2000CB4B4 /* badge.png */; };
 		79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */; };
 		79FDF61709AAE5D2000CB4B4 /* MBiPhoto4Library.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */; };
@@ -219,6 +221,8 @@
 		7990CDC009D76BDA00AD74BA /* iTunesVideo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesVideo.png; sourceTree = "<group>"; };
 		7990CDDF09D76E7800AD74BA /* iTunesSmartPlaylist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesSmartPlaylist.png; sourceTree = "<group>"; };
 		7990CDF109D772FF00AD74BA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Links.nib; sourceTree = "<group>"; };
+		79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBGarageBandParser.h; sourceTree = "<group>"; };
+		79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBGarageBandParser.m; sourceTree = "<group>"; };
 		79FDF07F09F87B300058EB16 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		79FDF5FF09AAE5D2000CB4B4 /* badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge.png; sourceTree = "<group>"; };
 		79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBAudioPlaying.png; sourceTree = "<group>"; };
@@ -313,19 +317,7 @@
 				D9B3EAAD09A3FD8600835FE4 /* Models */,
 				D9659C0E09A6CB160079ED9A /* Value Transformers */,
 				D9659A2609A6A7C50079ED9A /* Views */,
-				96F908C509D9B6070071BFFB /* NSWorkspace+Extensions.h */,
-				79BBE5090A282CCF0018CCCA /* New Group */,
-				96F908C609D9B6070071BFFB /* NSWorkspace+Extensions.m */,
-				CEF3F38309E449FF00D0058F /* NSString+UTI.h */,
-				CEF3F38409E449FF00D0058F /* NSString+UTI.m */,
-				CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */,
-				CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */,
-				CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */,
-				CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */,
-				790DBE3C0A09AEFF00A40A36 /* NSImage+iMedia.h */,
-				790DBE3D0A09AEFF00A40A36 /* NSImage+iMedia.m */,
-				798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */,
-				798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */,
+				79BBE5090A282CCF0018CCCA /* Cocoa Extensions */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -447,15 +439,29 @@
 				7903562509E3B40D00384D08 /* iMBAddressBookParser.m */,
 				792274880A27C51600E0A9BF /* iMBFavouritePicturesParser.h */,
 				792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */,
+				79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */,
+				79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */,
 			);
 			name = Parsers;
 			sourceTree = "<group>";
 		};
-		79BBE5090A282CCF0018CCCA /* New Group */ = {
+		79BBE5090A282CCF0018CCCA /* Cocoa Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				96F908C509D9B6070071BFFB /* NSWorkspace+Extensions.h */,
+				96F908C609D9B6070071BFFB /* NSWorkspace+Extensions.m */,
+				CEF3F38309E449FF00D0058F /* NSString+UTI.h */,
+				CEF3F38409E449FF00D0058F /* NSString+UTI.m */,
+				CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */,
+				CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */,
+				CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */,
+				CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */,
+				790DBE3C0A09AEFF00A40A36 /* NSImage+iMedia.h */,
+				790DBE3D0A09AEFF00A40A36 /* NSImage+iMedia.m */,
+				798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */,
+				798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */,
 			);
-			name = "New Group";
+			name = "Cocoa Extensions";
 			sourceTree = "<group>";
 		};
 		968BEF3E090E904100D00E5C /* images */ = {
@@ -606,6 +612,7 @@
 				7922748A0A27C51600E0A9BF /* iMBFavouritePicturesParser.h in Headers */,
 				798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */,
 				798E493D0A27E87900E0D4BC /* WebIconDatabase.h in Headers */,
+				79BBE52A0A282E440018CCCA /* iMBGarageBandParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -782,6 +789,7 @@
 				794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */,
 				7922748B0A27C51600E0A9BF /* iMBFavouritePicturesParser.m in Sources */,
 				798E476F0A27CD8800E0D4BC /* NSFileManager+iMedia.m in Sources */,
+				79BBE52B0A282E440018CCCA /* iMBGarageBandParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

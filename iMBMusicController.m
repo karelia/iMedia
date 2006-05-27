@@ -183,6 +183,9 @@ static NSImage *_song = nil;
 {		
 	BOOL success = YES;
 	NSURL * movieURL = [NSURL URLWithString:urlString];
+	if (!movieURL)
+		movieURL = [NSURL fileURLWithPath:urlString];
+	
 	NSString *filePath = [movieURL path];
 	[oAudioPlayer pause:self];
 	NSError *err = nil;
@@ -203,6 +206,7 @@ static NSImage *_song = nil;
 	
 	[clockDisplay setObjectValue:[NSNumber numberWithInt:0]];
 	[progressIndicator setMinValue: k_Scrub_Slider_Minimum];
+	QTTime dur = [audio duration];
     [progressIndicator setMaxValue: GetMovieDuration( [audio quickTimeMovie] )];
     [progressIndicator setDoubleValue: k_Scrub_Slider_Minimum ];
 	return success;
@@ -212,7 +216,7 @@ static NSImage *_stopImage = nil;
 
 - (IBAction) playMovie: (id) sender
 {	
-	if ([self loadAudioFile:[[songsController selection] valueForKey:@"Location"]])
+	if ([self loadAudioFile:[[songsController selection] valueForKey:@"Preview"]])
 	{
 		[pollTimer invalidate];
 		pollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
