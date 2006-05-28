@@ -27,7 +27,7 @@ Please send fixes to
 #import "iMediaBrowser.h"
 #import "NSWorkspace+Extensions.h"
 #import "iMBLibraryNode.h"
-#import "NSString+UTI.h"
+#import "NSString+iMedia.h"
 #import "iMedia.h"
 #import "NSFileManager+iMedia.h"
 

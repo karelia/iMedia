@@ -7,6 +7,7 @@
 //
 
 #import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
 
 @implementation NSImage (iMedia)
 
@@ -28,6 +29,16 @@
 		NSImage *image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
 		return [image autorelease];
 	}
+}
+
++ (NSImage *)imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime
+{
+	//need to strip the mime bit - data:image/x-icon;base64,
+	NSRange r = [base64WithMime rangeOfString:@"data:image/x-icon;base64,"];
+	NSString *base64 = [base64WithMime substringFromIndex:NSMaxRange(r)];
+	NSData *decoded = [base64 decodeBase64];
+	NSImage *img = [[NSImage alloc] initWithData:decoded];
+	return [img autorelease];
 }
 
 @end

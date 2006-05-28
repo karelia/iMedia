@@ -8,3 +8,11 @@
 + (BOOL) UTI:(NSString *)aUTI conformsToUTI:(NSString *)aConformsToUTI;
 
 @end
+
+@interface NSString (Base64)
+
+- (NSData *) decodeBase64;
+- (NSData *) decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
+
+@end
+
