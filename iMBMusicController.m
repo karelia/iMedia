@@ -33,7 +33,7 @@ Please send fixes to
 
 #import <QTKit/QTKit.h>
 #import <QTKit/QTMovieView.h>
-#import <Quicktime/Quicktime.h>
+#import <QuickTime/QuickTime.h>
 
 extern NSString *Time_Display_String( int Number_Of_Seconds );
 const NSTimeInterval	k_Scrub_Slider_Update_Interval = 0.1;

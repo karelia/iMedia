@@ -131,8 +131,6 @@
 	for (x=0;x<playlistCount;x++)
 	{
 		NSMutableSet *newPlaylist = [NSMutableSet set];	// This is a set because the items seem to be listed multiple times
-#warning FIXME ??? I think we only want to scan the "Master" list, so we don't get redundancies?
-#warning -- Or maybe the problem is that the top level is combining all of the other playlists, so you get multiple copies...
 		
 		NSArray *libraryItems = [[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Playlist Items"];
 		int i;

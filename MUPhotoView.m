@@ -1278,10 +1278,12 @@
 {
     float width = [self frame].size.width;
     [super setFrame:frame];
+    NSRect rect = [self visibleRect];
     
     if (width != frame.size.width) {
         // update internal grid size, adjust height based on the new grid size
         [self updateGridAndFrame];
+        rect = [self visibleRect];
         [self setNeedsDisplayInRect:[self visibleRect]];    
     }
 }
@@ -1294,7 +1296,8 @@
     
     // get the number of photos
     unsigned photoCount = [self photoCount];
-    
+
+   NSRect rect = [self visibleRect];
     // calculate the base grid size
     gridSize.height = [self photoSize] + [self photoVerticalSpacing];
     gridSize.width = [self photoSize] + [self photoHorizontalSpacing];
@@ -1304,8 +1307,11 @@
         columns = 0;
         rows = 0;
         float width = [self frame].size.width;
-        float height = [[[self enclosingScrollView] contentView] frame].size.height;
+   
+        float height = [[self enclosingScrollView] frame].size.height;
+        NSSize size = NSMakeSize(width, height);
         [self setFrameSize:NSMakeSize(width, height)];
+        rect = [self visibleRect];
         return;
     }
     
@@ -1332,7 +1338,7 @@
     float height = rows * gridSize.height;
     NSScrollView *scroll = [self enclosingScrollView];
     if ((nil != scroll) && (height < [[scroll contentView] frame].size.height))
-        height = [[scroll contentView] frame].size.height;
+        height = [[self enclosingScrollView] frame].size.height;
     
     // set my new frame size
     [self setFrameSize:NSMakeSize(width, height)];

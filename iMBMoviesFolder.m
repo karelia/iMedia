@@ -97,9 +97,13 @@ Please send fixes to
 						ref, QTMovieDataReferenceAttribute,
 						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
 						nil] error:&error];
+				NSString *cap = [movie attributeForKey:QTMovieDisplayNameAttribute];
+				if (!cap)
+				{
+					cap = [[filePath lastPathComponent] stringByDeletingPathExtension];
+				}
+				[newPicture setObject:cap forKey:@"Caption"];
 				NSImage *thumb = [movie betterPosterImage];
-				[newPicture setObject:[movie attributeForKey:QTMovieDisplayNameAttribute] forKey:@"Caption"];
-				
 				[movie release];
 				if (thumb)
 				{

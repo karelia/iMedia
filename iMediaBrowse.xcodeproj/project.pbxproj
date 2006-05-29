@@ -935,6 +935,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3C371AFC09AD501A00501C1F /* Framework Debug.xcconfig */;
 			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_DEBUGGING_SYMBOLS = full;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				OTHER_LDFLAGS = (
@@ -953,6 +956,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
 			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				OTHER_LDFLAGS = (

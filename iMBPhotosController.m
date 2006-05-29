@@ -180,6 +180,8 @@ static NSImage *_toolbarIcon = nil;
 	myImages = [images retain];
 	[myCache removeAllObjects];
 	[self refilter];
+	//reset the scroll position
+	[oPhotoView scrollRectToVisible:NSMakeRect(0,0,1,1)];
 	[oPhotoView setNeedsDisplay:YES];
 }
 
