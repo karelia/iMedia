@@ -502,6 +502,19 @@ static NSMutableDictionary *_parsers = nil;
 	[ud synchronize];
 }
 
+- (void)windowDidResize:(NSNotification *)aNotification
+{
+	if ([[oSplitView subviews] containsObject:oPlaylistPopup])
+	{
+		NSRect frame = [oPlaylistPopup frame];
+		if (frame.size.height < 24)
+		{
+			frame.size.height = 24;
+			[oPlaylistPopup setFrame:frame];
+		}
+	}
+}
+
 - (void)resetLibraryController
 {
 	int controllerCount = [[libraryController arrangedObjects] count];
