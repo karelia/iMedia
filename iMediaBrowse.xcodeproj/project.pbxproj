@@ -43,6 +43,7 @@
 		79353D9A0A28632D00284715 /* iMBFireFoxParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79353D980A28632D00284715 /* iMBFireFoxParser.h */; };
 		79353D9B0A28632D00284715 /* iMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79353D990A28632D00284715 /* iMBFireFoxParser.m */; };
 		79353E6D0A28754C00284715 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79353E6C0A28754C00284715 /* libcrypto.dylib */; };
+		793F98D30A2ABA1F00F68FF8 /* drm_movie.png in Resources */ = {isa = PBXBuildFile; fileRef = 793F98D20A2ABA1F00F68FF8 /* drm_movie.png */; };
 		794835F50A2709AD007E8268 /* MUPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 794835F30A2709AD007E8268 /* MUPhotoView.h */; };
 		794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 794835F40A2709AD007E8268 /* MUPhotoView.m */; };
 		7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */; };
@@ -191,6 +192,7 @@
 		79353D980A28632D00284715 /* iMBFireFoxParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBFireFoxParser.h; sourceTree = "<group>"; };
 		79353D990A28632D00284715 /* iMBFireFoxParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBFireFoxParser.m; sourceTree = "<group>"; };
 		79353E6C0A28754C00284715 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
+		793F98D20A2ABA1F00F68FF8 /* drm_movie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = drm_movie.png; sourceTree = "<group>"; };
 		794835F30A2709AD007E8268 /* MUPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MUPhotoView.h; sourceTree = "<group>"; };
 		794835F40A2709AD007E8268 /* MUPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MUPhotoView.m; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
@@ -500,6 +502,7 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				793F98D20A2ABA1F00F68FF8 /* drm_movie.png */,
 				79353D640A28621000284715 /* heart.png */,
 				7916744A0A2826FD003CBF48 /* larger.png */,
 				7916744B0A2826FD003CBF48 /* smaller.png */,
@@ -765,6 +768,7 @@
 				7916744D0A2826FE003CBF48 /* smaller.png in Resources */,
 				796ABF780A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt in Resources */,
 				79353D650A28621000284715 /* heart.png in Resources */,
+				793F98D30A2ABA1F00F68FF8 /* drm_movie.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -158,13 +158,8 @@
 				if (nil != movie)
 				{
 					if ([movie isDRMProtected])
-#warning It would  be nice to have an option for avoiding DRM files altogether in the browser, so we could skip each DRM file.
 					{
-						thumb = [[NSWorkspace sharedWorkspace] iconForFileType:@"MooV"];
-						
-						
-#warning How about for DRM movies, a lock icon composited over the standard QuickTime file instead?
-						// Badge we could composite: /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/LockedBadgeIcon.icns
+						thumb = [NSImage imageNamed:@"drm_movie"];
 					}
 					else
 					{

@@ -32,7 +32,17 @@
 #import "AppDelegate.h"
 #import <iMediaBrowser/iMedia.h>
 
+// see http://www.codecomments.com/message755849.html
+
+extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8_t *data);
+
 @implementation AppDelegate
+
+- (void)applicationWillFinishLaunching:(NSNotification *)aNotification
+{
+	char *fairplay = "FairPlay";
+	QTSetProcessProperty('dmmc', 'play', strlen(fairplay), (uint8_t *)fairplay);
+}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
