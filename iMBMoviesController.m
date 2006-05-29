@@ -163,18 +163,23 @@ static NSImage *_toolbarIcon = nil;
 			ref, QTMovieDataReferenceAttribute,
 			[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
 			nil] error:&error] autorelease];
-	if (error)
+	if (!movie && [error code] == -2126)
 	{
-		NSLog(@"Failed to load QTMovie: %@", error);
+		//NSLog(@"Failed to load DRMd QTMovie: %@", error);
+		[previewMovieView removeFromSuperview];
+		[previewMovieView setMovie:nil];
 	}
-	[previewMovieView setMovie:movie];
-	if (![previewMovieView superview])
+	else
 	{
-		[oPhotoView addSubview:previewMovieView];
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(viewResized:)
-													 name:NSViewFrameDidChangeNotification
-												   object:oPhotoView];
+		[previewMovieView setMovie:movie];
+		if (![previewMovieView superview])
+		{
+			[oPhotoView addSubview:previewMovieView];
+			[[NSNotificationCenter defaultCenter] addObserver:self
+													 selector:@selector(viewResized:)
+														 name:NSViewFrameDidChangeNotification
+													   object:oPhotoView];
+		}
 	}
 }
 

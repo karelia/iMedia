@@ -60,6 +60,8 @@ Please send fixes to
 	BOOL isDir;
 	NSArray *movieTypes = [QTMovie movieFileTypes:QTIncludeAllTypes];
 	NSMutableArray *movies = [NSMutableArray array];
+	NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
+	NSImage *drm = [[NSImage alloc] initWithContentsOfFile:drmIcon];
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;
 	
@@ -103,20 +105,18 @@ Please send fixes to
 					cap = [[filePath lastPathComponent] stringByDeletingPathExtension];
 				}
 				[newPicture setObject:cap forKey:@"Caption"];
-				NSImage *thumb = [movie betterPosterImage];
-				[movie release];
-				if (thumb)
+				
+				NSImage *thumb; 
+				if ((!movie && [error code] == -2126) || [movie isDRMProtected])
 				{
-// Dan "it will probably be much faster NOT to load any thumbnails until they are actually needed, THEN cache them."
-// Greg "we are in a background thread here so it doesn't block. If we were to delay it to when actually needed, then
-//		we would block the UI. We need to compromise somehow here. Not sure how to do it."
-					[newPicture setObject:thumb forKey:@"CachedThumb"];
+					thumb = drm;
 				}
 				else
 				{
-					[newPicture setObject:[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
-								   forKey:@"CachedThumb"];
+					thumb = [movie betterPosterImage];
 				}
+				[newPicture setObject:thumb forKey:@"CachedThumb"];
+				[movie release];
 				[movies addObject:newPicture];
 			}
 		}
@@ -129,6 +129,7 @@ Please send fixes to
 		}
 	}
 	[innerPool release];
+	[drm release];
 	[root setAttribute:movies forKey:@"Movies"];
 }
 
