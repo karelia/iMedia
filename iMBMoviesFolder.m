@@ -25,9 +25,7 @@ Please send fixes to
 #import "iMBMoviesFolder.h"
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
-#import "NSWorkspace+Extensions.h"
 #import <QTKit/QTKit.h>
-#import "QTMovie+iMedia.h"
 #import "iMedia.h"
 
 @implementation iMBMoviesFolder

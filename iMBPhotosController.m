@@ -26,9 +26,7 @@ Please send fixes to
 #import "iMediaBrowser.h"
 #import "MUPhotoView.h"
 #import "iMBLibraryNode.h"
-#import "NSWorkspace+Extensions.h"
 #import "iMedia.h"
-#import "NSPasteboard+iMedia.h"
 
 @interface iMBPhotosController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;

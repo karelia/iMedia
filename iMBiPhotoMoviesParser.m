@@ -25,8 +25,6 @@ Please send fixes to
 #import "iMBiPhotoMoviesParser.h"
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
-#import "NSWorkspace+Extensions.h"
-#import "QTMovie+iMedia.h"
 #import "iMedia.h"
 
 #import <QTKit/QTKit.h>

@@ -25,11 +25,8 @@ Please send fixes to
 
 #import "iMBPicturesFolder.h"
 #import "iMediaBrowser.h"
-#import "NSWorkspace+Extensions.h"
 #import "iMBLibraryNode.h"
-#import "NSString+iMedia.h"
 #import "iMedia.h"
-#import "NSFileManager+iMedia.h"
 
 @implementation iMBPicturesFolder
 

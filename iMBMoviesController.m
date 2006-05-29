@@ -27,8 +27,6 @@ Please send fixes to
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
-#import "NSWorkspace+Extensions.h"
-#import "NSPasteboard+iMedia.h"
 #import "MUPhotoView.h"
 
 @interface iMBMoviesController (PrivateAPI)

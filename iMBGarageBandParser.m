@@ -26,7 +26,6 @@
 #import "iMBLibraryNode.h"
 #import "iMediaBrowser.h"
 #import "iMedia.h"
-#import "NSWorkspace+Extensions.h"
 #import <QTKit/QTKit.h>
 
 @implementation iMBGarageBandParser
