@@ -50,7 +50,6 @@
 		7956049409D78F9F00BF1DA5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 7956049309D78F9F00BF1DA5 /* LICENSE */; };
 		7959CC280A2BBE4800E4980A /* NSPasteboard+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7959CC290A2BBE4900E4980A /* NSString+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF3F38309E449FF00D0058F /* NSString+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7959CC2A0A2BBE4A00E4980A /* NSWorkspace+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7959CBF60A2BBCB400E4980A /* NSWorkspace+Extensions.m */; };
 		7959CC2B0A2BBE4A00E4980A /* NSWorkspace+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7959CC2C0A2BBE4B00E4980A /* QTMovie+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		795D6F5209D35B77005F166D /* iMBLinksController.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D6F5009D35B77005F166D /* iMBLinksController.m */; };
@@ -72,6 +71,7 @@
 		795F7B2509D4D5E5000F21B5 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 795F7AF509D4D5E5000F21B5 /* WebKit.framework */; };
 		795F870609D4DA72000F21B5 /* iMBiTunesMusicParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795F870409D4DA72000F21B5 /* iMBiTunesMusicParser.m */; };
 		795F881B09D4EF46000F21B5 /* iMBMoviesFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */; };
+		7962BDC80A2BBF26004CF308 /* NSWorkspace+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 7962BDC70A2BBF26004CF308 /* NSWorkspace+iMedia.m */; };
 		796ABF700A28462800EF92DB /* iMBOmniWebParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ABF6E0A28462800EF92DB /* iMBOmniWebParser.h */; };
 		796ABF710A28462800EF92DB /* iMBOmniWebParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ABF6F0A28462800EF92DB /* iMBOmniWebParser.m */; };
 		796ABF780A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt in Resources */ = {isa = PBXBuildFile; fileRef = 796ABF770A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt */; };
@@ -201,7 +201,6 @@
 		794835F40A2709AD007E8268 /* MUPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MUPhotoView.m; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
 		7956049309D78F9F00BF1DA5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		7959CBF60A2BBCB400E4980A /* NSWorkspace+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSWorkspace+Extensions.m"; sourceTree = "<group>"; };
 		795D6F4F09D35B77005F166D /* iMBLinksController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLinksController.h; sourceTree = "<group>"; };
 		795D6F5009D35B77005F166D /* iMBLinksController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBLinksController.m; sourceTree = "<group>"; };
 		795D70D509D39C43005F166D /* folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = folder.png; sourceTree = "<group>"; };
@@ -228,6 +227,7 @@
 		795F870409D4DA72000F21B5 /* iMBiTunesMusicParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiTunesMusicParser.m; sourceTree = "<group>"; };
 		795F881809D4EF46000F21B5 /* iMBMoviesFolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMoviesFolder.h; sourceTree = "<group>"; };
 		795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMoviesFolder.m; sourceTree = "<group>"; };
+		7962BDC70A2BBF26004CF308 /* NSWorkspace+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = "NSWorkspace+iMedia.m"; sourceTree = "<group>"; };
 		796ABF6E0A28462800EF92DB /* iMBOmniWebParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBOmniWebParser.h; sourceTree = "<group>"; };
 		796ABF6F0A28462800EF92DB /* iMBOmniWebParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBOmniWebParser.m; sourceTree = "<group>"; };
 		796ABF770A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = OmniwebBookmarksToXBEL.xslt; sourceTree = "<group>"; };
@@ -486,7 +486,7 @@
 			isa = PBXGroup;
 			children = (
 				96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */,
-				7959CBF60A2BBCB400E4980A /* NSWorkspace+Extensions.m */,
+				7962BDC70A2BBF26004CF308 /* NSWorkspace+iMedia.m */,
 				CEF3F38309E449FF00D0058F /* NSString+iMedia.h */,
 				CEF3F38409E449FF00D0058F /* NSString+iMedia.m */,
 				CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */,
@@ -845,7 +845,7 @@
 				796ABFB50A284E3A00EF92DB /* iMBXBELParser.m in Sources */,
 				796AC0300A28582200EF92DB /* NSAttributedString+iMedia.m in Sources */,
 				79353D9B0A28632D00284715 /* iMBFireFoxParser.m in Sources */,
-				7959CC2A0A2BBE4A00E4980A /* NSWorkspace+Extensions.m in Sources */,
+				7962BDC80A2BBF26004CF308 /* NSWorkspace+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
