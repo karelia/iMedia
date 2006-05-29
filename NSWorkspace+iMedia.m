@@ -25,7 +25,7 @@
  
  */
 
-#import "NSWorkspace+Extensions.h"
+#import "NSWorkspace+iMedia.h"
 
 
 @implementation NSWorkspace (iMediaExtensions)

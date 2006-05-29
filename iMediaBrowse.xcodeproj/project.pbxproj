@@ -10,7 +10,7 @@
 		3C3A131E09EAFB8100AF41BF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3C3A131C09EAFB8100AF41BF /* Localizable.strings */; };
 		3CAC73E90976F47800AF5020 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */; };
 		7903562D09E3B45F00384D08 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7903562C09E3B45F00384D08 /* AddressBook.framework */; };
-		790DBE3E0A09AEFF00A40A36 /* NSImage+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 790DBE3C0A09AEFF00A40A36 /* NSImage+iMedia.h */; };
+		790DBE3E0A09AEFF00A40A36 /* NSImage+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 790DBE3C0A09AEFF00A40A36 /* NSImage+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		790DBE3F0A09AEFF00A40A36 /* NSImage+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 790DBE3D0A09AEFF00A40A36 /* NSImage+iMedia.m */; };
 		790DBE4C0A09B19000A40A36 /* links.png in Resources */ = {isa = PBXBuildFile; fileRef = 790DBE480A09B19000A40A36 /* links.png */; };
 		790DBE4D0A09B19000A40A36 /* movies.png in Resources */ = {isa = PBXBuildFile; fileRef = 790DBE490A09B19000A40A36 /* movies.png */; };
@@ -48,6 +48,11 @@
 		794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 794835F40A2709AD007E8268 /* MUPhotoView.m */; };
 		7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */; };
 		7956049409D78F9F00BF1DA5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 7956049309D78F9F00BF1DA5 /* LICENSE */; };
+		7959CC280A2BBE4800E4980A /* NSPasteboard+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7959CC290A2BBE4900E4980A /* NSString+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF3F38309E449FF00D0058F /* NSString+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7959CC2A0A2BBE4A00E4980A /* NSWorkspace+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7959CBF60A2BBCB400E4980A /* NSWorkspace+Extensions.m */; };
+		7959CC2B0A2BBE4A00E4980A /* NSWorkspace+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7959CC2C0A2BBE4B00E4980A /* QTMovie+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		795D6F5209D35B77005F166D /* iMBLinksController.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D6F5009D35B77005F166D /* iMBLinksController.m */; };
 		795D70D609D39C43005F166D /* folder.png in Resources */ = {isa = PBXBuildFile; fileRef = 795D70D509D39C43005F166D /* folder.png */; };
 		795D70E109D39D73005F166D /* iMBLibraryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D70DF09D39D73005F166D /* iMBLibraryNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -72,12 +77,12 @@
 		796ABF780A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt in Resources */ = {isa = PBXBuildFile; fileRef = 796ABF770A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt */; };
 		796ABFB40A284E3A00EF92DB /* iMBXBELParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ABFB20A284E3A00EF92DB /* iMBXBELParser.h */; };
 		796ABFB50A284E3A00EF92DB /* iMBXBELParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ABFB30A284E3A00EF92DB /* iMBXBELParser.m */; };
-		796AC02F0A28582200EF92DB /* NSAttributedString+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 796AC02D0A28582200EF92DB /* NSAttributedString+iMedia.h */; };
+		796AC02F0A28582200EF92DB /* NSAttributedString+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 796AC02D0A28582200EF92DB /* NSAttributedString+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796AC0300A28582200EF92DB /* NSAttributedString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 796AC02E0A28582200EF92DB /* NSAttributedString+iMedia.m */; };
 		796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ADBBF09D6562C001CF400 /* iMBAbstractController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ADBC009D6562C001CF400 /* iMBAbstractController.m */; };
 		796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796ADBE109D65986001CF400 /* CoreData.framework */; };
-		798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */; };
+		798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		798E476F0A27CD8800E0D4BC /* NSFileManager+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */; };
 		798E493D0A27E87900E0D4BC /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E493C0A27E87900E0D4BC /* WebIconDatabase.h */; };
 		7990CDB309D769DE00AD74BA /* SafariBookmarksBar.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDB109D769DE00AD74BA /* SafariBookmarksBar.png */; };
@@ -113,7 +118,6 @@
 		964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
 		965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		96F9076309D8D9690071BFFB /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9076209D8D9690071BFFB /* iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		96F908C809D9B6070071BFFB /* NSWorkspace+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 96F908C609D9B6070071BFFB /* NSWorkspace+Extensions.m */; };
 		CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */; };
 		CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
 		CEF3F38609E449FF00D0058F /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF3F38409E449FF00D0058F /* NSString+iMedia.m */; };
@@ -197,6 +201,7 @@
 		794835F40A2709AD007E8268 /* MUPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MUPhotoView.m; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
 		7956049309D78F9F00BF1DA5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		7959CBF60A2BBCB400E4980A /* NSWorkspace+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSWorkspace+Extensions.m"; sourceTree = "<group>"; };
 		795D6F4F09D35B77005F166D /* iMBLinksController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLinksController.h; sourceTree = "<group>"; };
 		795D6F5009D35B77005F166D /* iMBLinksController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBLinksController.m; sourceTree = "<group>"; };
 		795D70D509D39C43005F166D /* folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = folder.png; sourceTree = "<group>"; };
@@ -282,8 +287,7 @@
 		96A26017090CA99E00BCCCD6 /* iMBMusicController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMusicController.h; sourceTree = "<group>"; };
 		96A26018090CA99E00BCCCD6 /* iMBMusicController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMusicController.m; sourceTree = "<group>"; };
 		96F9076209D8D9690071BFFB /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.h; sourceTree = "<group>"; };
-		96F908C509D9B6070071BFFB /* NSWorkspace+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWorkspace+Extensions.h"; sourceTree = "<group>"; };
-		96F908C609D9B6070071BFFB /* NSWorkspace+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSWorkspace+Extensions.m"; sourceTree = "<group>"; };
+		96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWorkspace+iMedia.h"; sourceTree = "<group>"; };
 		CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPasteboard+iMedia.h"; sourceTree = "<group>"; };
 		CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPasteboard+iMedia.m"; sourceTree = "<group>"; };
 		CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QTMovie+iMedia.h"; sourceTree = "<group>"; };
@@ -481,8 +485,8 @@
 		79BBE5090A282CCF0018CCCA /* Cocoa Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				96F908C509D9B6070071BFFB /* NSWorkspace+Extensions.h */,
-				96F908C609D9B6070071BFFB /* NSWorkspace+Extensions.m */,
+				96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */,
+				7959CBF60A2BBCB400E4980A /* NSWorkspace+Extensions.m */,
 				CEF3F38309E449FF00D0058F /* NSString+iMedia.h */,
 				CEF3F38409E449FF00D0058F /* NSString+iMedia.m */,
 				CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */,
@@ -654,6 +658,10 @@
 				796ABFB40A284E3A00EF92DB /* iMBXBELParser.h in Headers */,
 				796AC02F0A28582200EF92DB /* NSAttributedString+iMedia.h in Headers */,
 				79353D9A0A28632D00284715 /* iMBFireFoxParser.h in Headers */,
+				7959CC280A2BBE4800E4980A /* NSPasteboard+iMedia.h in Headers */,
+				7959CC290A2BBE4900E4980A /* NSString+iMedia.h in Headers */,
+				7959CC2B0A2BBE4A00E4980A /* NSWorkspace+iMedia.h in Headers */,
+				7959CC2C0A2BBE4B00E4980A /* QTMovie+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -825,7 +833,6 @@
 				795F870609D4DA72000F21B5 /* iMBiTunesMusicParser.m in Sources */,
 				795F881B09D4EF46000F21B5 /* iMBMoviesFolder.m in Sources */,
 				796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */,
-				96F908C809D9B6070071BFFB /* NSWorkspace+Extensions.m in Sources */,
 				CEF3F38609E449FF00D0058F /* NSString+iMedia.m in Sources */,
 				CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */,
 				CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */,
@@ -838,6 +845,7 @@
 				796ABFB50A284E3A00EF92DB /* iMBXBELParser.m in Sources */,
 				796AC0300A28582200EF92DB /* NSAttributedString+iMedia.m in Sources */,
 				79353D9B0A28632D00284715 /* iMBFireFoxParser.m in Sources */,
+				7959CC2A0A2BBE4A00E4980A /* NSWorkspace+Extensions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

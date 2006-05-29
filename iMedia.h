@@ -38,3 +38,10 @@
 #import <iMediaBrowser/iMBAbstractParser.h>
 #import <iMediaBrowser/iMBAbstractController.h>
 
+#import <iMediaBrowser/NSString+iMedia.h>
+#import <iMediaBrowser/NSWorkspace+iMedia.h>
+#import <iMediaBrowser/QTMovie+iMedia.h>
+#import <iMediaBrowser/NSPasteboard+iMedia.h>
+#import <iMediaBrowser/NSImage+iMedia.h>
+#import <iMediaBrowser/NSFileManager+iMedia.h>
+#import <iMediaBrowser/NSAttributedString+iMedia.h>

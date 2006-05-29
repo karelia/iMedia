@@ -72,7 +72,7 @@ Please send fixes to
 	//	if ([filePath rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
 	//	if ([filePath rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
 		
-		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir)
+		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![fm isPathHidden:cur])
 		{
 			iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 			[root addItem:folder];

@@ -70,7 +70,7 @@
 	
 	while (cur = [e nextObject])
 	{
-		if ([fm fileExistsAtPath:cur isDirectory:&isDir])
+		if ([fm fileExistsAtPath:cur isDirectory:&isDir] && ![fm isPathHidden:cur])
 		{
 			parser = [[iMBPicturesFolder alloc] initWithContentsOfFile:cur];
 			node = [parser parseDatabase];
