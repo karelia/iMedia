@@ -43,6 +43,24 @@
 	[pool release];
 }
 
+- (BOOL)scrollRectToVisible:(NSRect)aRect;
+{
+	NSLog(@"scrollRectToVisible:%@", NSStringFromRect(aRect));
+	return [super scrollRectToVisible:aRect];
+}
+
+- (void)setFrameSize:(NSSize)newSize;
+{
+	NSLog(@"setFrameSize:%@", NSStringFromSize(newSize));
+	[super setFrameSize:newSize];
+}
+
+- (void)scrollPoint:(NSPoint)aPoint;
+{
+	NSLog(@"scrollPoint:%@", NSStringFromPoint(aPoint));
+	[super scrollPoint:aPoint];
+}
+
 - (id)initWithFrame:(NSRect)frameRect
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
@@ -1295,6 +1313,7 @@
 
 - (void)setFrame:(NSRect)frame
 {
+	NSLog(@"setFrame:%@", NSStringFromRect(frame));
     float width = [self frame].size.width;
     [super setFrame:frame];
     NSRect rect = [self visibleRect];
@@ -1317,6 +1336,9 @@
     unsigned photoCount = [self photoCount];
 
    NSRect rect = [self visibleRect];
+
+   NSLog(@"visibleRect = %@", NSStringFromRect(rect));
+   
     // calculate the base grid size
     gridSize.height = [self photoSize] + [self photoVerticalSpacing];
     gridSize.width = [self photoSize] + [self photoHorizontalSpacing];

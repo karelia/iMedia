@@ -116,7 +116,7 @@
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:LocalizedStringInThisBundle(@"Garage Band", @"Name of Node")];
+	[root setName:LocalizedStringInThisBundle(@"GarageBand", @"Name of Node")];
 	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.garageband"];
 	if (icon)
 	{

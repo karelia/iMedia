@@ -8,6 +8,7 @@
             OUTLETS = {delegate = id; }; 
             SUPERCLASS = NSView; 
         }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
         {
             CLASS = iMBAbstractController; 
             LANGUAGE = ObjC; 
@@ -20,6 +21,13 @@
             LANGUAGE = ObjC; 
             OUTLETS = {counterField = NSTextField; oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
             SUPERCLASS = iMBAbstractController; 
+        }, 
+        {CLASS = iMBPhotoView; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }, 
+        {
+            CLASS = photosAlbumController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oPhotoView = iMBPhotoView; oView = NSView; table = NSTableView; }; 
+            SUPERCLASS = NSObject; 
         }
     ); 
     IBVersion = 1; 
