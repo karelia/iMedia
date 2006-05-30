@@ -1463,7 +1463,7 @@
     [image setScalesWhenResized:YES];
     [image setSize:newSize];
     
-    return image;	// NOTE: putting a retain/autorelease was a band-aid that helped with zombie
+    return [[image retain] autorelease];	// NOTE: putting a retain/autorelease was a band-aid that helped with zombie
 }
 
 - (unsigned)photoIndexForPoint:(NSPoint)point

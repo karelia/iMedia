@@ -49,6 +49,46 @@ Please send fixes to
 	return self;
 }
 
+- (NSMutableDictionary *)recordForMovieWithPath:(NSString *)filePath
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
+	NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
+	[newPicture setObject:filePath forKey:@"ImagePath"];
+	[newPicture setObject:filePath forKey:@"Preview"];
+	
+	[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimeInterval"];
+	//we want to cache the first frame of the movie here as we will be in a background thread
+	QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
+	NSError *error = nil;
+	QTMovie *movie = [[QTMovie alloc] initWithAttributes:
+					[NSDictionary dictionaryWithObjectsAndKeys: 
+						ref, QTMovieDataReferenceAttribute,
+						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+						nil] error:&error];
+	NSString *cap = [movie attributeForKey:QTMovieDisplayNameAttribute];
+	if (!cap)
+	{
+		cap = [[filePath lastPathComponent] stringByDeletingPathExtension];
+	}
+	[newPicture setObject:cap forKey:@"Caption"];
+				
+	NSImage *thumb; 
+	if ((!movie && [error code] == -2126) || [movie isDRMProtected])
+	{
+		NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
+		NSImage *drm = [[NSImage alloc] initWithContentsOfFile:drmIcon];
+		thumb = [drm autorelease];
+	}
+	else
+	{
+		thumb = [movie betterPosterImage];
+	}
+	[newPicture setObject:thumb forKey:@"CachedThumb"];
+	[movie release];
+	return newPicture;
+}
+
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -58,8 +98,6 @@ Please send fixes to
 	BOOL isDir;
 	NSArray *movieTypes = [QTMovie movieFileTypes:QTIncludeAllTypes];
 	NSMutableArray *movies = [NSMutableArray array];
-	NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-	NSImage *drm = [[NSImage alloc] initWithContentsOfFile:drmIcon];
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;
 	
@@ -69,49 +107,29 @@ Please send fixes to
 		
 		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![fm isPathHidden:cur])
 		{
-			iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
-			[root addItem:folder];
-			[folder release];
-			[folder setIconName:@"folder"];
-			[folder setName:[fm displayNameAtPath:[fm displayNameAtPath:[cur lastPathComponent]]]];
-			[self recursivelyParse:filePath withNode:folder];
+			if ([[cur pathExtension] isEqualToString:@"iMovieProject"]) // handle the iMovie Project folder wrapper.
+			{
+				NSString *cache = [filePath stringByAppendingPathComponent:@"Cache/Timeline Movie.mov"];
+				NSMutableDictionary *rec = [self recordForMovieWithPath:cache];
+				[rec setObject:filePath forKey:@"ImagePath"];
+				[rec setObject:[filePath lastPathComponent] forKey:@"Caption"];
+				[movies addObject:rec];
+			}
+			else
+			{
+				iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
+				[root addItem:folder];
+				[folder release];
+				[folder setIconName:@"folder"];
+				[folder setName:[fm displayNameAtPath:[fm displayNameAtPath:[cur lastPathComponent]]]];
+				[self recursivelyParse:filePath withNode:folder];
+			}
 		}
 		else
 		{
 			if ([movieTypes indexOfObject:[[filePath lowercaseString] pathExtension]] != NSNotFound)
 			{
-				NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
-				NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
-				[newPicture setObject:filePath forKey:@"ImagePath"];
-				
-				[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimeInterval"];
-				//we want to cache the first frame of the movie here as we will be in a background thread
-				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
-				NSError *error = nil;
-				QTMovie *movie = [[QTMovie alloc] initWithAttributes:
-					[NSDictionary dictionaryWithObjectsAndKeys: 
-						ref, QTMovieDataReferenceAttribute,
-						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-						nil] error:&error];
-				NSString *cap = [movie attributeForKey:QTMovieDisplayNameAttribute];
-				if (!cap)
-				{
-					cap = [[filePath lastPathComponent] stringByDeletingPathExtension];
-				}
-				[newPicture setObject:cap forKey:@"Caption"];
-				
-				NSImage *thumb; 
-				if ((!movie && [error code] == -2126) || [movie isDRMProtected])
-				{
-					thumb = drm;
-				}
-				else
-				{
-					thumb = [movie betterPosterImage];
-				}
-				[newPicture setObject:thumb forKey:@"CachedThumb"];
-				[movie release];
-				[movies addObject:newPicture];
+				[movies addObject:[self recordForMovieWithPath:filePath]];
 			}
 		}
 		poolRelease++;
@@ -123,7 +141,6 @@ Please send fixes to
 		}
 	}
 	[innerPool release];
-	[drm release];
 	[root setAttribute:movies forKey:@"Movies"];
 }
 

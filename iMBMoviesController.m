@@ -300,7 +300,7 @@ static NSImage *_toolbarIcon = nil;
 		[previewMovieView setPreservesAspectRatio:YES];
 	}
 	[previewMovieView setFrame:frame];
-	NSString *path = [[myImages objectAtIndex:index] objectForKey:@"ImagePath"];
+	NSString *path = [[myImages objectAtIndex:index] objectForKey:@"Preview"];
 	
 	NSError *error = nil;
 	QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];

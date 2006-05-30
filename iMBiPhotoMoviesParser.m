@@ -168,6 +168,7 @@ Please send fixes to
 			}
 			hasMovies = YES;
 			[newPhotolist addObject:imageRecord];
+			[imageRecord setObject:[imageRecord objectForKey:@"ThumbPath"]forKey:@"Preview"];
 			
 			NSImage *thumb = nil;
 			NSString *thumbPath = [imageRecord objectForKey:@"ThumbPath"];
