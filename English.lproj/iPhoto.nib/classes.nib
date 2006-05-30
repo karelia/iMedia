@@ -20,7 +20,7 @@
             ACTIONS = {search = id; }; 
             CLASS = iMBPhotosController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {oPhotoView = MUPhotoView; }; 
+            OUTLETS = {oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
             SUPERCLASS = iMBAbstractController; 
         }, 
         {

@@ -16,12 +16,6 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {play = id; stop = id; }; 
-            CLASS = iMBMovieView; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = iMBPhotoView; 
-        }, 
-        {
             ACTIONS = {play = id; }; 
             CLASS = iMBMoviesController; 
             LANGUAGE = ObjC; 
@@ -33,13 +27,13 @@
             ACTIONS = {search = id; }; 
             CLASS = iMBPhotosController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {oPhotoView = MUPhotoView; }; 
+            OUTLETS = {oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
             SUPERCLASS = iMBAbstractController; 
         }, 
         {
-            CLASS = moviesController; 
+            CLASS = photosAlbumController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {counterField = NSTextField; oView = NSView; previewMovieView = iMBMovieView; }; 
+            OUTLETS = {oPhotoView = iMBPhotoView; oView = NSView; table = NSTableView; }; 
             SUPERCLASS = NSObject; 
         }
     ); 

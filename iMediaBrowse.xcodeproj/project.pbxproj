@@ -32,8 +32,6 @@
 		791F97650975D4970071B2E0 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97630975D4970071B2E0 /* MainMenu.nib */; };
 		791F976D0975D5280071B2E0 /* iMediaBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		791F97A40975DA170071B2E0 /* iTunes.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97A20975DA170071B2E0 /* iTunes.nib */; };
-		791F99390976023F0071B2E0 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F99370976023F0071B2E0 /* iPhoto.nib */; };
-		791F9A72097628E60071B2E0 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F9A6D097628DF0071B2E0 /* Movies.nib */; };
 		791F9AF80976320A0071B2E0 /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF10976320A0071B2E0 /* UKFNSubscribeFileWatcher.m */; };
 		791F9AFA0976320A0071B2E0 /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF30976320A0071B2E0 /* UKKQueue.m */; };
 		791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */; };
@@ -121,6 +119,8 @@
 		965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		96F9076309D8D9690071BFFB /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9076209D8D9690071BFFB /* iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */; };
+		CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */; };
+		CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC1450A2C0AA000179BA3 /* Movies.nib */; };
 		CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
 		CEF3F38609E449FF00D0058F /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF3F38409E449FF00D0058F /* NSString+iMedia.m */; };
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
@@ -311,13 +311,13 @@
 		96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWorkspace+iMedia.h"; sourceTree = "<group>"; };
 		CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPasteboard+iMedia.h"; sourceTree = "<group>"; };
 		CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPasteboard+iMedia.m"; sourceTree = "<group>"; };
+		CE8FC1420A2C0A9B00179BA3 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/iPhoto.nib; sourceTree = "<group>"; };
+		CE8FC1470A2C0AA600179BA3 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Movies.nib; sourceTree = "<group>"; };
 		CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QTMovie+iMedia.h"; sourceTree = "<group>"; };
 		CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QTMovie+iMedia.m"; sourceTree = "<group>"; };
 		CEE09FE609ED9930004850FB /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		CEE09FE809ED9938004850FB /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/iTunes.nib; sourceTree = "<group>"; };
-		CEE09FE909ED993E004850FB /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		CEE09FEA09ED9958004850FB /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Links.nib; sourceTree = "<group>"; };
-		CEE09FEB09ED9961004850FB /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Movies.nib; sourceTree = "<group>"; };
 		CEF3F38309E449FF00D0058F /* NSString+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+iMedia.h"; sourceTree = "<group>"; };
 		CEF3F38409E449FF00D0058F /* NSString+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+iMedia.m"; sourceTree = "<group>"; };
 		D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeValueTransformer.h; sourceTree = "<group>"; };
@@ -440,8 +440,8 @@
 				29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */,
 				791F97630975D4970071B2E0 /* MainMenu.nib */,
 				791F97A20975DA170071B2E0 /* iTunes.nib */,
-				791F99370976023F0071B2E0 /* iPhoto.nib */,
-				791F9A6D097628DF0071B2E0 /* Movies.nib */,
+				CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */,
+				CE8FC1450A2C0AA000179BA3 /* Movies.nib */,
 				7990CDF009D772FF00AD74BA /* Links.nib */,
 				7903561C09E3B17A00384D08 /* Contacts.nib */,
 			);
@@ -758,8 +758,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				791F97A40975DA170071B2E0 /* iTunes.nib in Resources */,
-				791F99390976023F0071B2E0 /* iPhoto.nib in Resources */,
-				791F9A72097628E60071B2E0 /* Movies.nib in Resources */,
+				CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */,
+				CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */,
 				3CAC73E90976F47800AF5020 /* MediaBrowser.nib in Resources */,
 				79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */,
 				79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */,
@@ -944,24 +944,6 @@
 			name = iTunes.nib;
 			sourceTree = "<group>";
 		};
-		791F99370976023F0071B2E0 /* iPhoto.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				791F99380976023F0071B2E0 /* English */,
-				CEE09FE909ED993E004850FB /* French */,
-			);
-			name = iPhoto.nib;
-			sourceTree = "<group>";
-		};
-		791F9A6D097628DF0071B2E0 /* Movies.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				791F9A6E097628DF0071B2E0 /* English */,
-				CEE09FEB09ED9961004850FB /* French */,
-			);
-			name = Movies.nib;
-			sourceTree = "<group>";
-		};
 		7990CDF009D772FF00AD74BA /* Links.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -969,6 +951,24 @@
 				CEE09FEA09ED9958004850FB /* French */,
 			);
 			name = Links.nib;
+			sourceTree = "<group>";
+		};
+		CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				791F99380976023F0071B2E0 /* English */,
+				CE8FC1420A2C0A9B00179BA3 /* French */,
+			);
+			name = iPhoto.nib;
+			sourceTree = "<group>";
+		};
+		CE8FC1450A2C0AA000179BA3 /* Movies.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				791F9A6E097628DF0071B2E0 /* English */,
+				CE8FC1470A2C0AA600179BA3 /* French */,
+			);
+			name = Movies.nib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
