@@ -1317,6 +1317,7 @@
 
 - (void)updateGridAndFrame
 {
+	[[self enclosingScrollView] reflectScrolledClipView:((NSClipView *)[self superview])];
     /**** BEGIN Dimension calculations and adjustments ****/
     // TODO: I don't need to make these adjustments cases where my grid size or frame haven't changed but need to play with frame notifications to make sure I can
     //       adjust them in the correct situations
@@ -1325,6 +1326,9 @@
     unsigned photoCount = [self photoCount];
 
    NSRect rect = [self visibleRect];
+   
+//   NSString *rectString = NSStringFromRect(rect);
+//   NSLog(@"visibleRect = %@", rectString);
    
     // calculate the base grid size
     gridSize.height = [self photoSize] + [self photoVerticalSpacing];
