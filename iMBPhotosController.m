@@ -280,6 +280,7 @@ static NSImage *_toolbarIcon = nil;
 {
 	[myImages autorelease];
 	myImages = [images retain];
+	[myCache removeAllObjects];
 	[self refilter];
 	//reset the scroll position
 	[oPhotoView scrollRectToVisible:NSMakeRect(0,0,1,1)];
