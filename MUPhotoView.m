@@ -250,7 +250,12 @@
 
 - (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
 {
-	return [delegate photoView:self captionForPhotoAtIndex:[self photoIndexForPoint:point]];
+	unsigned idx = [self photoIndexForPoint:point];
+	if (idx < [self photoCount])
+	{
+		return [delegate photoView:self captionForPhotoAtIndex:[self photoIndexForPoint:point]];
+	}
+	return nil;
 }
 
 #pragma mark -
