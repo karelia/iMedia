@@ -161,3 +161,16 @@
 
 @end
 
+@implementation NSString (UUID)
+
++ (id)uuid
+{
+	CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+	CFStringRef uuidStr = CFUUIDCreateString(kCFAllocatorDefault, uuid);
+	CFRelease(uuid);
+	[(NSString *)uuidStr autorelease];
+	return (NSString *)uuidStr;
+}
+
+@end
+

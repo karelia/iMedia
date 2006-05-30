@@ -186,7 +186,7 @@
         
         // draw the current photo
         NSRect imageRect = NSMakeRect(0, 0, [photo size].width, [photo size].height);
-        [photo drawInRect:photoRect fromRect:imageRect operation:NSCompositeSourceOver fraction:1.0];
+        [photo drawInRect:photoRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
         
 		// register the tooltip area
 		[self addToolTipRect:imageRect owner:self userData:nil];
@@ -1431,7 +1431,7 @@
     [image setScalesWhenResized:YES];
     [image setSize:newSize];
     
-    return image;
+    return [[image retain] autorelease];
 }
 
 - (unsigned)photoIndexForPoint:(NSPoint)point

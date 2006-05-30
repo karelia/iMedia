@@ -30,6 +30,7 @@ static NSMutableDictionary *imageCache = nil;
 	{
 		myItems = [[NSMutableArray array] retain];
 		myAttributes = [[NSMutableDictionary dictionary] retain];
+		myAttributeFilterMap = [[NSMutableDictionary dictionary] retain];
 	}
 	return self;
 }
@@ -40,8 +41,8 @@ static NSMutableDictionary *imageCache = nil;
 	{
 		myItems = [items mutableCopy];
 		myAttributes = [[NSMutableDictionary dictionary] retain];
-    [self setName:name];
-    [self setIconName:@"folder"];
+		[self setName:name];
+		[self setIconName:@"folder"];
 	}
 	return self;
 }
@@ -54,6 +55,8 @@ static NSMutableDictionary *imageCache = nil;
 	[myIcon release];
 	[myIconName release];
 	[myCachedNameWithImage release];
+	[myAttributeFilterMap release];
+	
 	[super dealloc];
 }
 
@@ -255,7 +258,62 @@ static NSMutableDictionary *imageCache = nil;
 	return [NSString stringWithFormat:@"iMBLibraryNode: %@ (%@)", [self name], [[self attributes] allKeys]];
 }
 
-- (NSArray *)recursiveAttributesForKey:(NSString *)key
+- (void)setFilterDuplicateKey:(NSString *)filterKey forAttributeKey:(NSString *)attributeKey
+{
+	[myAttributeFilterMap setObject:filterKey forKey:attributeKey];
+}
+
+- (void)removeFilterDuplicateKeyForAttributeKey:(NSString *)attributeKey
+{
+	[myAttributeFilterMap removeObjectForKey:attributeKey];
+}
+
+- (NSString *)filterDuplicateKeyForAttributeKey:(NSString *)attributeKey
+{
+	return [myAttributeFilterMap objectForKey:attributeKey];
+}
+
+- (NSArray *)recursiveAttributesForKey:(NSString *)key filterKey:(NSString *)filter excludingSet:(NSMutableSet *)alreadyAdded
+{
+	NSMutableArray *items = [NSMutableArray array];
+	NSEnumerator *e = [myItems objectEnumerator];
+	iMBLibraryNode *cur;
+	id attrib;
+	
+	attrib = [self attributeForKey:key];
+	if (attrib != nil)
+	{
+		if (![attrib isKindOfClass:[NSArray class]])
+		{
+			attrib = [NSArray arrayWithObject:attrib];
+		}
+		NSEnumerator *g = [attrib objectEnumerator];
+		id curAttrib;
+		NSString *filterKeyValue;
+		
+		while (curAttrib = [g nextObject])
+		{
+			if ([curAttrib isKindOfClass:[NSDictionary class]])
+			{
+				filterKeyValue = [curAttrib objectForKey:filter];
+				if (![alreadyAdded member:filterKeyValue])
+				{
+					[items addObject:curAttrib];
+					[alreadyAdded addObject:filterKeyValue];
+				}
+			}
+		}
+	}
+	
+	while (cur = [e nextObject])
+	{
+		attrib = [cur recursiveAttributesForKey:key filterKey:filter excludingSet:alreadyAdded];
+		[items addObjectsFromArray:attrib];
+	}
+	return items;
+}
+
+- (NSArray *)normalRecursiveAttributesForKey:(NSString *)key
 {
 	NSMutableArray *items = [NSMutableArray array];
 	NSEnumerator *e = [myItems objectEnumerator];
@@ -277,20 +335,27 @@ static NSMutableDictionary *imageCache = nil;
 	
 	while (cur = [e nextObject])
 	{
-		attrib = [cur attributeForKey:key];
-		if (attrib != nil)
-		{
-			if ([attrib isKindOfClass:[NSArray class]])
-			{
-				[items addObjectsFromArray:attrib];
-			}
-			else
-			{
-				[items addObject:attrib];
-			}
-		}
+		attrib = [cur recursiveAttributesForKey:key];
+		[items addObjectsFromArray:attrib];
 	}
 	return items;
+}
+
+- (NSArray *)recursiveAttributesForKey:(NSString *)key
+{
+	NSString *filter = [self filterDuplicateKeyForAttributeKey:key];
+	NSArray *results = nil;
+	
+	if (filter)
+	{
+		NSMutableSet *exists = [NSMutableSet set];
+		results = [self recursiveAttributesForKey:key filterKey:filter excludingSet:exists];
+	}
+	else
+	{
+		results = [self normalRecursiveAttributesForKey:key];
+	}
+	return results;
 }
 
 - (id)valueForUndefinedKey:(NSString *)key

@@ -86,7 +86,7 @@ Please send fixes to
 				{
 					[newPicture setObject:filePath forKey:@"ImagePath"];
 					[newPicture setObject:[fm displayNameAtPath:[filePath lastPathComponent]] forKey:@"Caption"];
-					[newPicture setObject:filePath forKey:@"ThumbPath"];
+					//[newPicture setObject:filePath forKey:@"ThumbPath"];
 				}
 				NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
 				if ([fileAttribs valueForKey:NSFileModificationDate])

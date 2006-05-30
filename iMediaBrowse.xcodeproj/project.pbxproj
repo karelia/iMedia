@@ -72,6 +72,8 @@
 		795F870609D4DA72000F21B5 /* iMBiTunesMusicParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795F870409D4DA72000F21B5 /* iMBiTunesMusicParser.m */; };
 		795F881B09D4EF46000F21B5 /* iMBMoviesFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */; };
 		7962BDC80A2BBF26004CF308 /* NSWorkspace+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 7962BDC70A2BBF26004CF308 /* NSWorkspace+iMedia.m */; };
+		7966412C0A2BE62E00941D65 /* placeholder.png in Resources */ = {isa = PBXBuildFile; fileRef = 7966412B0A2BE62E00941D65 /* placeholder.png */; };
+		796644520A2BEAB700941D65 /* missing_image.png in Resources */ = {isa = PBXBuildFile; fileRef = 796644510A2BEAB700941D65 /* missing_image.png */; };
 		796ABF700A28462800EF92DB /* iMBOmniWebParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ABF6E0A28462800EF92DB /* iMBOmniWebParser.h */; };
 		796ABF710A28462800EF92DB /* iMBOmniWebParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ABF6F0A28462800EF92DB /* iMBOmniWebParser.m */; };
 		796ABF780A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt in Resources */ = {isa = PBXBuildFile; fileRef = 796ABF770A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt */; };
@@ -125,23 +127,6 @@
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXBuildStyle section */
-		CE8022C00A2BC4F900073242 /* Development */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-			};
-			name = Development;
-		};
-		CE8022C10A2BC4F900073242 /* Deployment */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-			};
-			name = Deployment;
-		};
-/* End PBXBuildStyle section */
 
 /* Begin PBXContainerItemProxy section */
 		791F97340975D3600071B2E0 /* PBXContainerItemProxy */ = {
@@ -245,6 +230,8 @@
 		795F881809D4EF46000F21B5 /* iMBMoviesFolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMoviesFolder.h; sourceTree = "<group>"; };
 		795F881909D4EF46000F21B5 /* iMBMoviesFolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMoviesFolder.m; sourceTree = "<group>"; };
 		7962BDC70A2BBF26004CF308 /* NSWorkspace+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = "NSWorkspace+iMedia.m"; sourceTree = "<group>"; };
+		7966412B0A2BE62E00941D65 /* placeholder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = placeholder.png; sourceTree = "<group>"; };
+		796644510A2BEAB700941D65 /* missing_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = missing_image.png; sourceTree = "<group>"; };
 		796ABF6E0A28462800EF92DB /* iMBOmniWebParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBOmniWebParser.h; sourceTree = "<group>"; };
 		796ABF6F0A28462800EF92DB /* iMBOmniWebParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBOmniWebParser.m; sourceTree = "<group>"; };
 		796ABF770A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = OmniwebBookmarksToXBEL.xslt; sourceTree = "<group>"; };
@@ -523,6 +510,8 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				796644510A2BEAB700941D65 /* missing_image.png */,
+				7966412B0A2BE62E00941D65 /* placeholder.png */,
 				793F98D20A2ABA1F00F68FF8 /* drm_movie.png */,
 				79353D640A28621000284715 /* heart.png */,
 				7916744A0A2826FD003CBF48 /* larger.png */,
@@ -730,12 +719,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 969656A508C6A24500F2F85C /* Build configuration list for PBXProject "iMediaBrowse" */;
-			buildSettings = {
-			};
-			buildStyles = (
-				CE8022C00A2BC4F900073242 /* Development */,
-				CE8022C10A2BC4F900073242 /* Deployment */,
-			);
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* iMediaBrowse */;
 			projectDirPath = "";
@@ -800,6 +783,8 @@
 				796ABF780A28471100EF92DB /* OmniwebBookmarksToXBEL.xslt in Resources */,
 				79353D650A28621000284715 /* heart.png in Resources */,
 				793F98D30A2ABA1F00F68FF8 /* drm_movie.png in Resources */,
+				7966412C0A2BE62E00941D65 /* placeholder.png in Resources */,
+				796644520A2BEAB700941D65 /* missing_image.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

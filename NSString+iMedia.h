@@ -16,3 +16,8 @@
 
 @end
 
+@interface NSString (UUID)
+
++ (id)uuid;
+
+@end

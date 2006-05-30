@@ -35,6 +35,9 @@ Please send fixes to
 	NSArray					*myImages;
 	NSMutableArray			*myFilteredImages;
 	NSString				*mySearchString;
+	NSLock					*myCacheLock;
+	NSMutableArray			*myInFlightImageOperations;
+	int						myThreadCount;
 }
 
 - (NSString *)nibName;

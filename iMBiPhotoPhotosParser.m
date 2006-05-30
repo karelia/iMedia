@@ -112,6 +112,7 @@ Please send fixes to
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"iPhoto", @"iPhoto")];
 	[root setIconName:@"photo_tiny"];
+	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];
 	NSMutableArray *photoLists = [NSMutableArray array];

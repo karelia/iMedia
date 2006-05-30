@@ -13,6 +13,9 @@
 
 - (BOOL)isPathHidden:(NSString *)path
 {
+	// exit early
+	if ([path hasPrefix:@"."]) return YES;
+	
 	BOOL isHidden = NO;
 	OSStatus ret;
 	NSURL *url = [NSURL fileURLWithPath:path];

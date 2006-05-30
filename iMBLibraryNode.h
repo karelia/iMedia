@@ -18,6 +18,7 @@
 	NSMutableDictionary *myAttributes;
 	NSImage				*myIcon;
 	NSString			*myIconName;
+	NSMutableDictionary *myAttributeFilterMap;
 	
 	NSMutableAttributedString *myCachedNameWithImage;
 }
@@ -36,6 +37,13 @@
 - (id)attributeForKey:(NSString *)key;
 - (void)setAttributes:(NSDictionary *)attributes;
 - (NSDictionary *)attributes;
+
+// This allows us to filter out duplicate photos, music, movies etc.
+- (void)setFilterDuplicateKey:(NSString *)filterKey forAttributeKey:(NSString *)attributeKey;
+- (void)removeFilterDuplicateKeyForAttributeKey:(NSString *)attributeKey;
+- (NSString *)filterDuplicateKeyForAttributeKey:(NSString *)attributeKey;
+
+- (NSArray *)recursiveAttributesForKey:(NSString *)key;
 
 - (void)addItem:(iMBLibraryNode *)item;
 - (void)removeItem:(iMBLibraryNode *)item;
