@@ -48,6 +48,11 @@
 		79353D9B0A28632D00284715 /* iMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79353D990A28632D00284715 /* iMBFireFoxParser.m */; };
 		79353E6D0A28754C00284715 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79353E6C0A28754C00284715 /* libcrypto.dylib */; };
 		793F98D30A2ABA1F00F68FF8 /* drm_movie.png in Resources */ = {isa = PBXBuildFile; fileRef = 793F98D20A2ABA1F00F68FF8 /* drm_movie.png */; };
+		79430F0E0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79430F0C0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h */; };
+		79430F0F0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79430F0D0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m */; };
+		79430F140A2C2901009E0FC7 /* MBSoundEffect.png in Resources */ = {isa = PBXBuildFile; fileRef = 79430F130A2C2901009E0FC7 /* MBSoundEffect.png */; };
+		79430F1C0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79430F1A0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h */; };
+		79430F1D0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79430F1B0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m */; };
 		794835F50A2709AD007E8268 /* MUPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 794835F30A2709AD007E8268 /* MUPhotoView.h */; };
 		794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 794835F40A2709AD007E8268 /* MUPhotoView.m */; };
 		7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */; };
@@ -211,6 +216,11 @@
 		79353D990A28632D00284715 /* iMBFireFoxParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBFireFoxParser.m; sourceTree = "<group>"; };
 		79353E6C0A28754C00284715 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
 		793F98D20A2ABA1F00F68FF8 /* drm_movie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = drm_movie.png; sourceTree = "<group>"; };
+		79430F0C0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiLifeSoundEffectsParser.h; sourceTree = "<group>"; };
+		79430F0D0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiLifeSoundEffectsParser.m; sourceTree = "<group>"; };
+		79430F130A2C2901009E0FC7 /* MBSoundEffect.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBSoundEffect.png; sourceTree = "<group>"; };
+		79430F1A0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiMovieSoundEffectsParser.h; sourceTree = "<group>"; };
+		79430F1B0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiMovieSoundEffectsParser.m; sourceTree = "<group>"; };
 		794835F30A2709AD007E8268 /* MUPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MUPhotoView.h; sourceTree = "<group>"; };
 		794835F40A2709AD007E8268 /* MUPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MUPhotoView.m; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
@@ -500,6 +510,10 @@
 				796ABF6F0A28462800EF92DB /* iMBOmniWebParser.m */,
 				79353D980A28632D00284715 /* iMBFireFoxParser.h */,
 				79353D990A28632D00284715 /* iMBFireFoxParser.m */,
+				79430F0C0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h */,
+				79430F0D0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m */,
+				79430F1A0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h */,
+				79430F1B0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m */,
 			);
 			name = Parsers;
 			sourceTree = "<group>";
@@ -528,6 +542,7 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				79430F130A2C2901009E0FC7 /* MBSoundEffect.png */,
 				796644510A2BEAB700941D65 /* missing_image.png */,
 				7966412B0A2BE62E00941D65 /* placeholder.png */,
 				793F98D20A2ABA1F00F68FF8 /* drm_movie.png */,
@@ -689,6 +704,8 @@
 				791F55400A2C0BFC00D557F3 /* iMBFavouriteMoviesParser.h in Headers */,
 				791F55FD0A2C0E7000D557F3 /* iMBFavouriteMusicParser.h in Headers */,
 				7910D40C0A2C11C200094548 /* iMBMusicFolder.h in Headers */,
+				79430F0E0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h in Headers */,
+				79430F1C0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -806,6 +823,7 @@
 				793F98D30A2ABA1F00F68FF8 /* drm_movie.png in Resources */,
 				7966412C0A2BE62E00941D65 /* placeholder.png in Resources */,
 				796644520A2BEAB700941D65 /* missing_image.png in Resources */,
+				79430F140A2C2901009E0FC7 /* MBSoundEffect.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -878,6 +896,8 @@
 				791F55410A2C0BFC00D557F3 /* iMBFavouriteMoviesParser.m in Sources */,
 				791F55FE0A2C0E7000D557F3 /* iMBFavouriteMusicParser.m in Sources */,
 				7910D40D0A2C11C200094548 /* iMBMusicFolder.m in Sources */,
+				79430F0F0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m in Sources */,
+				79430F1D0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

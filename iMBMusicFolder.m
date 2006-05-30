@@ -31,9 +31,36 @@
 {
 	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingPathComponent:@"Music"]])
 	{
-		
+		myParseMetaData = YES;
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[myUnknownArtist autorelease];
+	[super dealloc];
+}
+
+- (void)setParseMetaData:(BOOL)flag
+{
+	myParseMetaData = flag;
+}
+
+- (BOOL)parseMetaData
+{
+	return myParseMetaData;
+}
+
+- (void)setUnknownArtist:(NSString *)artist
+{
+	[myUnknownArtist autorelease];
+	myUnknownArtist = [artist copy];
+}
+
+- (NSString *)unkownArtist
+{
+	return myUnknownArtist;
 }
 
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root
@@ -78,45 +105,74 @@
 				//we want to cache the first frame of the movie here as we will be in a background thread
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
 				NSError *error = nil;
-				QTMovie *movie = [[QTMovie alloc] initWithAttributes:
-					[NSDictionary dictionaryWithObjectsAndKeys: 
-						ref, QTMovieDataReferenceAttribute,
-						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-						nil] error:&error];
+				QTMovie *movie = nil;
+				
+				if (myParseMetaData)
+				{
+					movie = [[QTMovie alloc] initWithAttributes:
+						[NSDictionary dictionaryWithObjectsAndKeys: 
+							ref, QTMovieDataReferenceAttribute,
+							[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+							nil] error:&error];
+				}
 				
 				// Get the meta data from the QTMovie
-				NSString *val = [movie attributeWithFourCharCode:kUserDataTextFullName];
+				NSString *val = nil;
+				if (myParseMetaData)
+				{
+					val = [movie attributeWithFourCharCode:kUserDataTextFullName];
+				}
 				if (!val)
 				{
 					val = [cur stringByDeletingPathExtension];
 				}
 				[song setObject:val forKey:@"Name"];
-				val = [movie attributeWithFourCharCode:FOUR_CHAR_CODE('©ART')];
+				val = nil;
+				if (myParseMetaData)
+				{
+					val = [movie attributeWithFourCharCode:FOUR_CHAR_CODE('©ART')];
+				}
 				if (!val)
 				{
-					val = LocalizedStringInThisBundle(@"Unknown", @"Unkown music key");
+					if (myUnknownArtist)
+					{
+						val = myUnknownArtist;
+					}
+					else
+					{
+						val = LocalizedStringInThisBundle(@"Unknown", @"Unkown music key");
+					}
 				}
 				[song setObject:val forKey:@"Artist"];
-				QTTime duration = [movie duration];
-				NSNumber *time = [NSNumber numberWithDouble:GetMovieDuration( [movie quickTimeMovie] )];
-				[song setObject:time forKey:@"Total Time"];
-				[song setObject:filePath forKey:@"Location"];
-				[song setObject:filePath forKey:@"Preview"];
-				if (![movie isDRMProtected])
+				if (myParseMetaData)
 				{
-					[song setObject:songIcon forKey:@"Icon"];
+					QTTime duration = [movie duration];
+					NSNumber *time = [NSNumber numberWithDouble:GetMovieDuration( [movie quickTimeMovie] )];
+					[song setObject:time forKey:@"Total Time"];
+					if (![movie isDRMProtected])
+					{
+						[song setObject:songIcon forKey:@"Icon"];
+					}
+					else
+					{
+						[song setObject:drmIcon forKey:@"Icon"];
+					}
 				}
 				else
 				{
-					[song setObject:drmIcon forKey:@"Icon"];
+					[song setObject:[NSNumber numberWithInt:0] forKey:@"Total Time"];
+					[song setObject:songIcon forKey:@"Icon"];
 				}
+				
+				[song setObject:filePath forKey:@"Location"];
+				[song setObject:filePath forKey:@"Preview"];
 				
 				[movie release];
 				[tracks addObject:song];
 			}
 		}
 		poolRelease++;
-		if (poolRelease == 5)
+		if (poolRelease == 15)
 		{
 			poolRelease = 0;
 			[innerPool release];

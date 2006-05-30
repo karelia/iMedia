@@ -25,17 +25,16 @@
 #import <Cocoa/Cocoa.h>
 #import "iMBAbstractParser.h"
 
-@interface iMBMusicFolder : iMBAbstractParser
+/*
+ 
+	Ideally we would want to get access to the the format of /Library/Audio/Apple Audio Loops Index/
+	so we don't have to load in every loop to access the meta data. Bueller, Bueller, anyone, Bueller?
+ 
+ */
+
+@interface iMBiLifeSoundEffectsParser : iMBAbstractParser
 {
-	BOOL myParseMetaData;
-	NSString *myUnknownArtist;
+
 }
-
-// is on by default and can increase loading times substantially
-- (void)setParseMetaData:(BOOL)flag;
-- (BOOL)parseMetaData;
-
-- (void)setUnknownArtist:(NSString *)artist;
-- (NSString *)unkownArtist;
 
 @end

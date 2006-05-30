@@ -22,20 +22,45 @@
 	<ben@scriptsoftware.com>
  */
 
-#import <Cocoa/Cocoa.h>
-#import "iMBAbstractParser.h"
+#import "iMBiMovieSoundEffectsParser.h"
+#import "iMedia.h"
+#import "iMBMusicFolder.h"
 
-@interface iMBMusicFolder : iMBAbstractParser
+@implementation iMBiMovieSoundEffectsParser
+
++ (void)load
 {
-	BOOL myParseMetaData;
-	NSString *myUnknownArtist;
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
+	
+	[pool release];
 }
 
-// is on by default and can increase loading times substantially
-- (void)setParseMetaData:(BOOL)flag;
-- (BOOL)parseMetaData;
+- (id)init
+{
+	NSString *path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
+	if (self = [super initWithContentsOfFile:[path stringByAppendingPathComponent:@"/Contents/Resources/Sound Effects/"]])
+	{
+		
+	}
+	return self;
+}
 
-- (void)setUnknownArtist:(NSString *)artist;
-- (NSString *)unkownArtist;
+- (iMBLibraryNode *)parseDatabase
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
+	
+	iMBMusicFolder *parser = [[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath]];
+	[parser setUnknownArtist:LocalizedStringInThisBundle(@"Apple Loop", @"Artist")];
+	
+	iMBLibraryNode *sfx = [parser parseDatabase];
+	[sfx setName:LocalizedStringInThisBundle(@"iMovie Sound Effects", @"iMovie Sound Effects folder name")];
+	[sfx setIconName:@"com.apple.iMovie"];
+	[parser release];
+	
+	return sfx;
+}
 
 @end

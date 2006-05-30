@@ -25,17 +25,9 @@
 #import <Cocoa/Cocoa.h>
 #import "iMBAbstractParser.h"
 
-@interface iMBMusicFolder : iMBAbstractParser
+@interface iMBiMovieSoundEffectsParser : iMBAbstractParser
 {
-	BOOL myParseMetaData;
-	NSString *myUnknownArtist;
+
 }
-
-// is on by default and can increase loading times substantially
-- (void)setParseMetaData:(BOOL)flag;
-- (BOOL)parseMetaData;
-
-- (void)setUnknownArtist:(NSString *)artist;
-- (NSString *)unkownArtist;
 
 @end
