@@ -1340,6 +1340,7 @@
     if ((nil != scroll) && (height < [[scroll contentView] frame].size.height))
         height = [[self enclosingScrollView] frame].size.height;
     
+	height -= 2;				// subtract a few so it fits in scroller
     // set my new frame size
     [self setFrameSize:NSMakeSize(width, height)];
     
