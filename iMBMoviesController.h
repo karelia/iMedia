@@ -23,9 +23,9 @@ Please send fixes to
  */
 
 #import <Cocoa/Cocoa.h>
-#import "iMBPhotosController.h"
+#import "iMBAbstractController.h"
 
-@class QTMovieView;
+@class QTMovieView, MUPhotoView;
 
 @interface iMBMoviesController : iMBAbstractController
 {
@@ -43,5 +43,6 @@ Please send fixes to
 }
 
 - (IBAction)play:(id)sender;
+- (IBAction)search:(id)sender;
 
 @end

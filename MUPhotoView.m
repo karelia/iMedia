@@ -1322,9 +1322,9 @@
         rows = 0;
         float width = [self frame].size.width;
    
-        float height = [[self enclosingScrollView] frame].size.height;
-        NSSize size = NSMakeSize(width, height);
-        [self setFrameSize:NSMakeSize(width, height)];
+        NSSize size = NSMakeSize(width, [[self enclosingScrollView] frame].size.height);
+		if (size.height < 0) size.height = 1;
+        [self setFrameSize:size];
         rect = [self visibleRect];
         return;
     }
