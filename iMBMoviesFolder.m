@@ -115,7 +115,10 @@ Please send fixes to
 					NSMutableDictionary *rec = [self recordForMovieWithPath:cache];
 					[rec setObject:filePath forKey:@"ImagePath"];
 					[rec setObject:[filePath lastPathComponent] forKey:@"Caption"];
-					[movies addObject:rec];
+					if (!NSEqualSizes([[rec objectForKey:@"CachedThumb"] size], NSZeroSize))
+					{
+						[movies addObject:rec];
+					}
 				}
 			}
 			else
