@@ -110,10 +110,13 @@ Please send fixes to
 			if ([[cur pathExtension] isEqualToString:@"iMovieProject"]) // handle the iMovie Project folder wrapper.
 			{
 				NSString *cache = [filePath stringByAppendingPathComponent:@"Cache/Timeline Movie.mov"];
-				NSMutableDictionary *rec = [self recordForMovieWithPath:cache];
-				[rec setObject:filePath forKey:@"ImagePath"];
-				[rec setObject:[filePath lastPathComponent] forKey:@"Caption"];
-				[movies addObject:rec];
+				if ([fm fileExistsAtPath:cache])
+				{
+					NSMutableDictionary *rec = [self recordForMovieWithPath:cache];
+					[rec setObject:filePath forKey:@"ImagePath"];
+					[rec setObject:[filePath lastPathComponent] forKey:@"Caption"];
+					[movies addObject:rec];
+				}
 			}
 			else
 			{
