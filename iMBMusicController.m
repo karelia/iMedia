@@ -194,7 +194,7 @@ static NSImage *_song = nil;
 			nil] error:&err] autorelease];
 	if (err || !audio)
 	{
-		NSLog(@"%@", err);
+		NSLog(@"loadAudioFile: %@", err);
 		success = NO;
 	}
 		

@@ -67,6 +67,9 @@
     BOOL isDonePhotoResizing;
 }
 
+// We're selecting, prepare for display
+- (void)prepare;
+
 #pragma mark -
 // Delegate Methods
 #pragma mark Delegate Methods

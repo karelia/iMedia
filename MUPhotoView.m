@@ -43,24 +43,6 @@
 	[pool release];
 }
 
-- (BOOL)scrollRectToVisible:(NSRect)aRect;
-{
-	NSLog(@"scrollRectToVisible:%@", NSStringFromRect(aRect));
-	return [super scrollRectToVisible:aRect];
-}
-
-- (void)setFrameSize:(NSSize)newSize;
-{
-	NSLog(@"setFrameSize:%@", NSStringFromSize(newSize));
-	[super setFrameSize:newSize];
-}
-
-- (void)scrollPoint:(NSPoint)aPoint;
-{
-	NSLog(@"scrollPoint:%@", NSStringFromPoint(aPoint));
-	[super scrollPoint:aPoint];
-}
-
 - (id)initWithFrame:(NSRect)frameRect
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
@@ -76,7 +58,7 @@
         [self setBackgroundColor:[NSColor whiteColor]];
         
         useShadowBorder = YES;
-        useOutlineBorder = YES;
+        useOutlineBorder = NO;
         borderShadow = [[NSShadow alloc] init];
         [borderShadow setShadowOffset:NSMakeSize(2.0,-3.0)];
         [borderShadow setShadowBlurRadius:5.0];
@@ -122,6 +104,13 @@
     dragSelectedPhotoIndexes = nil;
     
 	[super dealloc];
+}
+
+- (void)prepare
+{
+	[self scrollPoint:([self frame].origin)];
+	[self updateGridAndFrame];
+	[self setNeedsDisplayInRect:[self visibleRect]];
 }
 
 #pragma mark -
@@ -341,8 +330,8 @@
         }
         
         // update internal grid size, adjust height based on the new grid size
-        [self updateGridAndFrame];
         [self scrollPoint:([self frame].origin)];
+        [self updateGridAndFrame];
         [self setNeedsDisplayInRect:[self visibleRect]];
     }
 }
@@ -513,7 +502,7 @@
     [self updateGridAndFrame];
     visibleRect.origin.y = heightRatio * [self frame].size.height;
     [self scrollRectToVisible:visibleRect];
-    
+	    
     [self setNeedsDisplayInRect:[self visibleRect]];
     
     // update time for live resizing
@@ -1313,7 +1302,7 @@
 
 - (void)setFrame:(NSRect)frame
 {
-	NSLog(@"setFrame:%@", NSStringFromRect(frame));
+//	NSLog(@"setFrame:%@", NSStringFromRect(frame));
     float width = [self frame].size.width;
     [super setFrame:frame];
     NSRect rect = [self visibleRect];
@@ -1336,8 +1325,6 @@
     unsigned photoCount = [self photoCount];
 
    NSRect rect = [self visibleRect];
-
-   NSLog(@"visibleRect = %@", NSStringFromRect(rect));
    
     // calculate the base grid size
     gridSize.height = [self photoSize] + [self photoVerticalSpacing];
