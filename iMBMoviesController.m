@@ -194,6 +194,7 @@ static NSImage *_toolbarIcon = nil;
 	myImages = [images retain];
 	[self refilter];
 	//reset the scroll position
+	[previewMovieView removeFromSuperview];
 	[oPhotoView scrollRectToVisible:NSMakeRect(0,0,1,1)];
 	[oPhotoView setNeedsDisplay:YES];
 }
