@@ -75,10 +75,9 @@ static NSImage *_missing = nil;
 - (void)awakeFromNib
 {
 	[oPhotoView setDelegate:self];
-	
+	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
 	[oPhotoView setPhotoHorizontalSpacing:15];
 	[oPhotoView setPhotoVerticalSpacing:15];
-	[oPhotoView setPhotoSize:75];
 }
 
 - (NSString *)nibName

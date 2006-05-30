@@ -30,6 +30,7 @@ Please send fixes to
 @interface iMBPhotosController : iMBAbstractController
 {
 	IBOutlet MUPhotoView	*oPhotoView;
+	IBOutlet NSSlider		*oSlider;
 	NSMutableDictionary		*myCache;
 	NSMutableIndexSet		*mySelection;
 	NSArray					*myImages;

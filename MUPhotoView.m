@@ -22,6 +22,13 @@
 
 + (void)initialize
 {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	NSDictionary *defaultsBase = [NSDictionary dictionaryWithObjectsAndKeys:
+		[NSNumber numberWithFloat:75.0], @"MUPhotoSize", nil];
+	[defaults registerDefaults:defaultsBase];
+
     [self exposeBinding:@"photosArray"];
     [self exposeBinding:@"selectedPhotoIndexes"];
     [self exposeBinding:@"backgroundColor"];
@@ -32,6 +39,8 @@
     [self exposeBinding:@"useOutlineSelection"];
     
     [self setKeys:[NSArray arrayWithObject:@"backgroundColor"] triggerChangeNotificationsForDependentKey:@"shadowBoxColor"];
+	
+	[pool release];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -65,7 +74,9 @@
         selectionBorderWidth = 3.0;
         [self setShadowBoxColor:[NSColor colorWithCalibratedWhite:0.0 alpha:0.5]];
         
-        photoSize = 100.0;
+		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+		photoSize = [defaults floatForKey:@"MUPhotoSize"];
+
         photoVerticalSpacing = 25.0;
         photoHorizontalSpacing = 25.0;
         
@@ -128,7 +139,7 @@
 
     // any other setup
     if (useHighQualityResize) {
-        [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
+        [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationDefault];	// whatever's appropriate for machine
     }
 	
     /**** BEGIN Drawing Photos ****/
@@ -186,7 +197,7 @@
         
         // draw the current photo
         NSRect imageRect = NSMakeRect(0, 0, [photo size].width, [photo size].height);
-        [photo drawInRect:photoRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+        [photo drawInRect:photoRect fromRect:imageRect operation:NSCompositeSourceOver fraction:1.0];
         
 		// register the tooltip area
 		[self addToolTipRect:imageRect owner:self userData:nil];
@@ -492,6 +503,9 @@
     if (nil == photoResizeTimer) {
         photoResizeTimer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(updatePhotoResizing) userInfo:nil repeats:YES];
     }
+	
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	[defaults setFloat:aPhotoSize forKey:@"MUPhotoSize"];
 }
 
 - (IBAction)takePhotoSizeFrom:(id)sender
