@@ -7,7 +7,7 @@
 //
 
 #import "iMBLibraryNode.h"
-#import "NSWorkspace+Extensions.h"
+#import "NSWorkspace+iMedia.h"
 
 static NSMutableDictionary *imageCache = nil;
 
