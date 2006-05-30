@@ -276,7 +276,7 @@
 - (NSArray *)photosArray
 {
     //NSLog(@"in -photosArray, returned photosArray = %@", photosArray);
-    return [[photosArray retain] autorelease]; 
+    return photosArray;
 }
 
 - (void)setPhotosArray:(NSArray *)aPhotosArray
@@ -331,7 +331,7 @@
 - (NSIndexSet *)selectedPhotoIndexes
 {
     //NSLog(@"in -selectedPhotoIndexes, returned selectedPhotoIndexes = %@", selectedPhotoIndexes);
-    return [[selectedPhotoIndexes retain] autorelease]; 
+    return selectedPhotoIndexes;
 }
 
 - (void)setSelectedPhotoIndexes:(NSIndexSet *)aSelectedPhotoIndexes
@@ -370,7 +370,7 @@
 - (NSColor *)selectionBorderColor
 {
     //NSLog(@"in -selectionBorderColor, returned selectionBorderColor = %@", selectionBorderColor);
-    return [[selectionBorderColor retain] autorelease]; 
+    return selectionBorderColor;
 }
 
 - (void)setSelectionBorderColor:(NSColor *)aSelectionBorderColor
@@ -439,7 +439,7 @@
 - (NSColor *)backgroundColor
 {
     //NSLog(@"in -backgroundColor, returned backgroundColor = %@", backgroundColor);
-    return [[backgroundColor retain] autorelease]; 
+    return backgroundColor;
 }
 
 - (void)setBackgroundColor:(NSColor *)aBackgroundColor
@@ -598,7 +598,7 @@
 - (NSColor *)borderOutlineColor
 {
     //NSLog(@"in -borderOutlineColor, returned borderOutlineColor = %@", borderOutlineColor);
-    return [[borderOutlineColor retain] autorelease]; 
+    return borderOutlineColor;
 }
 
 - (void)setBorderOutlineColor:(NSColor *)aBorderOutlineColor
@@ -617,7 +617,7 @@
 - (NSColor *)shadowBoxColor
 {
     //NSLog(@"in -shadowBoxColor, returned shadowBoxColor = %@", shadowBoxColor);
-    return [[shadowBoxColor retain] autorelease]; 
+    return shadowBoxColor;
 }
 
 - (void)setShadowBoxColor:(NSColor *)aShadowBoxColor
@@ -1245,7 +1245,7 @@
 
 - (NSArray *)pasteboardDragTypesForPhotoView:(MUPhotoView *)view
 {
-    return [[[NSArray alloc] init] autorelease];
+    return [NSArray array];
 }
 
 - (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard
@@ -1445,7 +1445,7 @@
     [image setScalesWhenResized:YES];
     [image setSize:newSize];
     
-    return [[image retain] autorelease];
+    return image;	// NOTE: putting a retain/autorelease was a band-aid that helped with zombie
 }
 
 - (unsigned)photoIndexForPoint:(NSPoint)point
