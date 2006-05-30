@@ -38,14 +38,31 @@ Please send fixes to
 - (id)initWithPlaylistController:(NSTreeController*)ctrl
 {
 	if (self = [super initWithPlaylistController:ctrl]) {
+		mySelection = [[NSMutableIndexSet alloc] init];
+		myFilteredImages = [[NSMutableArray alloc] init];
+		
 		[NSBundle loadNibNamed:@"Movies" owner:self];
 	}
 	return self;
 }
 
-- (NSString *)nibName
+- (void)dealloc
 {
-	return @"iPhoto";
+	[previewMovieView release];
+	[mySelection release];
+	[myImages release];
+	[myFilteredImages release];
+	[mySearchString release];
+	
+	[super dealloc];
+}
+
+- (void)awakeFromNib
+{
+	[oPhotoView setDelegate:self];
+	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
+	[oPhotoView setPhotoHorizontalSpacing:15];
+	[oPhotoView setPhotoVerticalSpacing:15];
 }
 
 - (IBAction)play:(id)sender
@@ -60,17 +77,46 @@ Please send fixes to
 	[previewMovieView play:self];
 }
 
+- (void)refilter
+{
+	[mySelection removeAllIndexes];
+	[myFilteredImages removeAllObjects];
+	
+	if ([mySearchString length] == 0) return;
+	
+	NSEnumerator *e = [myImages objectEnumerator];
+	NSDictionary *cur;
+	
+	while (cur = [e nextObject])
+	{
+		if ([[cur objectForKey:@"Caption"] rangeOfString:mySearchString options:NSCaseInsensitiveSearch].location != NSNotFound ||
+			[[cur objectForKey:@"ImagePath"] rangeOfString:mySearchString options:NSCaseInsensitiveSearch].location != NSNotFound)
+		{
+			[myFilteredImages addObject:cur];
+		}
+	}
+}
+
+- (IBAction)search:(id)sender
+{
+	[mySearchString autorelease];
+	mySearchString = [[sender stringValue] copy];
+	
+	[self refilter];
+	[oPhotoView setNeedsDisplay:YES];
+}
+
 #pragma mark -
 #pragma mark Media Browser Protocol
 
 - (void)willActivate
 {
 	[super willActivate];
-	[self unbind:@"images"]; // stop the photo controller
 	[self bind:@"images" 
 	  toObject:[self controller] 
 		 withKeyPath:@"selection.Movies" 
 	   options:nil];
+	[[oPhotoView window] makeFirstResponder:oPhotoView];
 }
 
 - (void)didDeactivate
@@ -140,6 +186,107 @@ static NSImage *_toolbarIcon = nil;
 
 #pragma mark -
 #pragma mark MUPhotoView Delegate Methods
+
+- (void)setImages:(NSArray *)images
+{
+	[myImages autorelease];
+	myImages = [images retain];
+	[self refilter];
+	//reset the scroll position
+	[oPhotoView scrollRectToVisible:NSMakeRect(0,0,1,1)];
+	[oPhotoView setNeedsDisplay:YES];
+}
+
+- (NSArray *)images
+{
+	return myImages;
+}
+
+- (unsigned)photoCountForPhotoView:(MUPhotoView *)view
+{
+	if ([mySearchString length] > 0)
+	{
+		return [myFilteredImages count];
+	}
+	return [myImages count];
+}
+
+- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
+{
+	NSDictionary *rec;
+	if ([mySearchString length] > 0)
+	{
+		rec = [myFilteredImages objectAtIndex:index];
+	}
+	else
+	{
+		rec = [myImages objectAtIndex:index];
+	}
+	
+	return [rec objectForKey:@"CachedThumb"];
+}
+
+- (void)photoView:(MUPhotoView *)view didSetSelectionIndexes:(NSIndexSet *)indexes
+{
+	[mySelection removeAllIndexes];
+	[mySelection addIndexes:indexes];
+}
+
+- (NSIndexSet *)selectionIndexesForPhotoView:(MUPhotoView *)view
+{
+	return mySelection;
+}
+
+- (unsigned int)photoView:(MUPhotoView *)view draggingSourceOperationMaskForLocal:(BOOL)isLocal
+{
+	return NSDragOperationCopy;
+}
+
+- (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard
+{
+	NSMutableArray *fileList = [NSMutableArray array];
+	NSMutableArray *captions = [NSMutableArray array];
+	
+	NSMutableArray *types = [NSMutableArray array]; 
+	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
+	[pboard declareTypes:types owner:nil];
+	
+	NSDictionary *cur;
+	
+	int i;
+	for(i = 0; i < [myImages count]; i++) 
+	{
+		if ([mySelection containsIndex:i]) 
+		{
+			if ([mySearchString length] > 0)
+			{
+				cur = [myFilteredImages objectAtIndex:i];
+			}
+			else
+			{
+				cur = [myImages objectAtIndex:i];
+			}
+			[fileList addObject:[cur objectForKey:@"ImagePath"]];
+			[captions addObject:[cur objectForKey:@"Caption"]];
+		}
+	}
+				
+	[pboard writeURLs:nil files:fileList names:captions];	
+}
+
+- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
+{
+	NSDictionary *rec;
+	if ([mySearchString length] > 0)
+	{
+		rec = [myFilteredImages objectAtIndex:index];
+	}
+	else
+	{
+		rec = [myImages objectAtIndex:index];
+	}
+	return [rec objectForKey:@"Caption"];
+}
 
 - (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index withFrame:(NSRect)frame
 {

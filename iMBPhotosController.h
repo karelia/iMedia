@@ -41,7 +41,6 @@ Please send fixes to
 	int						myThreadCount;
 }
 
-- (NSString *)nibName;
 - (IBAction)search:(id)sender;
 
 @end

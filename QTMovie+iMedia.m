@@ -108,6 +108,57 @@
 	return isProtected;
 }
 
+const UInt8 kUserDataIsText = 0xA9; // the copyright symbol
 
+- (NSString *)attributeWithFourCharCode:(OSType)code
+{
+	NSString *result = nil;
+	OSErr err = noErr;
+	OSType udType;
+	short count, i;
+	char nul = 0;
+	Handle hData = NULL;
+	Ptr p;
+	UserData inUserData = GetMovieUserData([self quickTimeMovie]);
+	
+	if ((code >> 24) == kUserDataIsText) 
+	{
+		hData = NewHandle(0);
+		udType = GetNextUserDataType(inUserData, 0);
+		do {
+			if (0 != udType) 
+			{
+				count = CountUserDataType(inUserData, udType);
+				for(i = 1; i <= count; i++)
+				{
+					if(udType == code) 
+					{
+						err = GetUserDataText(inUserData, hData, udType, i, langEnglish);
+						if (err) goto bail;
+						// null-terminate the string in the handle
+						PtrAndHand(&nul, hData, 1);
+						
+						// turn any CRs into spaces
+						p = *hData;
+						while(*p) {
+							if (*p == kReturnCharCode) *p = ' ';
+							p++;
+						};
+						
+						HLock(hData);
+						result = [NSString stringWithCString:*hData];
+						HUnlock(hData);
+						goto bail;
+					}
+				}
+			}	
+			udType = GetNextUserDataType(inUserData, udType);
+		} while (0 != udType);
+	}
+bail:
+	DisposeHandle(hData);
+	
+	return result;
+}
 
 @end

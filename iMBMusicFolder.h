@@ -17,31 +17,17 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
 
 #import <Cocoa/Cocoa.h>
-#import "iMBPhotosController.h"
+#import "iMBAbstractParser.h"
 
-@class QTMovieView;
-
-@interface iMBMoviesController : iMBAbstractController
+@interface iMBMusicFolder : iMBAbstractParser
 {
-	IBOutlet MUPhotoView	*oPhotoView;
-	IBOutlet NSSlider		*oSlider;
-	IBOutlet NSTextField	*counterField;
-	
-	@private
-	QTMovieView				*previewMovieView;
-	unsigned				movieIndex;
-	NSMutableIndexSet		*mySelection;
-	NSArray					*myImages;
-	NSMutableArray			*myFilteredImages;
-	NSString				*mySearchString;
-}
 
-- (IBAction)play:(id)sender;
+}
 
 @end

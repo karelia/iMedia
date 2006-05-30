@@ -78,11 +78,7 @@ int imageDateSort(id i1, id i2, void *context) {
 			[newPhotos addObject:rec];
 		}
 		
-#warning HACK to get past problem where in movie tab, we just have a list of paths, not dictionaries with dates.
-		//if (([newPhotos count] > 0) && [[newPhotos objectAtIndex:0] isKindOfClass:[iMBLibraryNode class]])
-		{
-			[newPhotos sortUsingFunction:imageDateSort context:nil];
-		}
+		[newPhotos sortUsingFunction:imageDateSort context:nil];
 		return newPhotos;
 	}
 	

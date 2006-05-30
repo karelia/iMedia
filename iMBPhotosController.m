@@ -54,7 +54,7 @@ static NSImage *_missing = nil;
 			_missing = [[NSImage alloc] initWithContentsOfFile:path];
 		}
 		
-		[NSBundle loadNibNamed:[self nibName] owner:self];
+		[NSBundle loadNibNamed:@"iPhoto" owner:self];
 	}
 	return self;
 }
@@ -78,11 +78,6 @@ static NSImage *_missing = nil;
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
 	[oPhotoView setPhotoHorizontalSpacing:15];
 	[oPhotoView setPhotoVerticalSpacing:15];
-}
-
-- (NSString *)nibName
-{
-	return @"iPhoto";
 }
 
 - (void)refilter

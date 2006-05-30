@@ -5,5 +5,7 @@
 
 - (NSImage *)betterPosterImage;
 - (BOOL) isDRMProtected;
+// get access to the mp3 meta data
+- (NSString *)attributeWithFourCharCode:(OSType)code;
 
 @end

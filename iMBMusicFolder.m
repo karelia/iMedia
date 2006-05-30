@@ -17,32 +17,19 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
-
-#import "iMBMoviesFolder.h"
-#import "iMediaBrowser.h"
-#import "iMBLibraryNode.h"
-#import <QTKit/QTKit.h>
+#import "iMBMusicFolder.h"
 #import "iMedia.h"
+#import <QTKit/QTKit.h>
 
-@implementation iMBMoviesFolder
-
-+ (void)load
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"movies"];
-	
-	[pool release];
-}
-
+@implementation iMBMusicFolder
 
 - (id)init
 {
-	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingPathComponent:@"Movies"]])
+	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingPathComponent:@"Music"]])
 	{
 		
 	}
@@ -57,15 +44,21 @@ Please send fixes to
 	NSString *cur;
 	BOOL isDir;
 	NSArray *movieTypes = [QTMovie movieFileTypes:QTIncludeAllTypes];
-	NSMutableArray *movies = [NSMutableArray array];
-	NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-	NSImage *drm = [[NSImage alloc] initWithContentsOfFile:drmIcon];
+	NSMutableArray *tracks = [NSMutableArray array];
+	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
+	NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
+	NSImage *songIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+	iconPath = [bndl pathForResource:@"iTunesDRM" ofType:@"png"];
+	NSImage *drmIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+	
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;
 	
 	while (cur = [e nextObject])
 	{
 		NSString *filePath = [path stringByAppendingPathComponent: cur];
+		if ([[filePath lastPathComponent] isEqualToString:@"iTunes"]) continue;
+		if ([[filePath lastPathComponent] isEqualToString:@"GarageBand"]) continue;
 		
 		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![fm isPathHidden:cur])
 		{
@@ -80,11 +73,8 @@ Please send fixes to
 		{
 			if ([movieTypes indexOfObject:[[filePath lowercaseString] pathExtension]] != NSNotFound)
 			{
-				NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
-				NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
-				[newPicture setObject:filePath forKey:@"ImagePath"];
+				NSMutableDictionary *song = [NSMutableDictionary dictionary]; 
 				
-				[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimeInterval"];
 				//we want to cache the first frame of the movie here as we will be in a background thread
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
 				NSError *error = nil;
@@ -93,25 +83,36 @@ Please send fixes to
 						ref, QTMovieDataReferenceAttribute,
 						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
 						nil] error:&error];
-				NSString *cap = [movie attributeForKey:QTMovieDisplayNameAttribute];
-				if (!cap)
-				{
-					cap = [[filePath lastPathComponent] stringByDeletingPathExtension];
-				}
-				[newPicture setObject:cap forKey:@"Caption"];
 				
-				NSImage *thumb; 
-				if ((!movie && [error code] == -2126) || [movie isDRMProtected])
+				// Get the meta data from the QTMovie
+				NSString *val = [movie attributeWithFourCharCode:kUserDataTextFullName];
+				if (!val)
 				{
-					thumb = drm;
+					val = [cur stringByDeletingPathExtension];
+				}
+				[song setObject:val forKey:@"Name"];
+				val = [movie attributeWithFourCharCode:FOUR_CHAR_CODE('©ART')];
+				if (!val)
+				{
+					val = LocalizedStringInThisBundle(@"Unknown", @"Unkown music key");
+				}
+				[song setObject:val forKey:@"Artist"];
+				QTTime duration = [movie duration];
+				NSNumber *time = [NSNumber numberWithDouble:GetMovieDuration( [movie quickTimeMovie] )];
+				[song setObject:time forKey:@"Total Time"];
+				[song setObject:filePath forKey:@"Location"];
+				[song setObject:filePath forKey:@"Preview"];
+				if (![movie isDRMProtected])
+				{
+					[song setObject:songIcon forKey:@"Icon"];
 				}
 				else
 				{
-					thumb = [movie betterPosterImage];
+					[song setObject:drmIcon forKey:@"Icon"];
 				}
-				[newPicture setObject:thumb forKey:@"CachedThumb"];
+				
 				[movie release];
-				[movies addObject:newPicture];
+				[tracks addObject:song];
 			}
 		}
 		poolRelease++;
@@ -123,15 +124,14 @@ Please send fixes to
 		}
 	}
 	[innerPool release];
-	[drm release];
-	[root setAttribute:movies forKey:@"Movies"];
+	[root setAttribute:tracks forKey:@"Tracks"];
 }
 
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:LocalizedStringInThisBundle(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
-	[root setIconName:@"picturesFolder"];
+	[root setName:LocalizedStringInThisBundle(@"Music Folder", @"Name of your 'Music' folder in your home directory")];
+	[root setIconName:@"folder"];
 	NSString *folder = [self databasePath];
 	
 	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
