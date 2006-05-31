@@ -39,6 +39,7 @@ Please send fixes to
 	NSString *clockTime;
 	@private
 		NSTimer * pollTimer;
+		NSMutableDictionary *myCurrentPlayingRecord;
 }
 
 #pragma mark ACCESSORS

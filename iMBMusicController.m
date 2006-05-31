@@ -109,11 +109,6 @@ static NSImage *_toolbarIcon = nil;
 	  toObject:songsController
 		 withKeyPath:@"selectedObjects" 
 	   options:nil];
-	
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(audioTimeDidChange:)
-												 name:QTMovieTimeDidChangeNotification
-											   object:nil];
 }
 
 - (void)didDeactivate
@@ -182,9 +177,19 @@ static NSImage *_song = nil;
 #pragma mark -
 #pragma mark Interface Methods
 
+static NSImage *_playingIcon = nil;
+
 - (BOOL) loadAudioFile: (NSString *) urlString
 {		
 	BOOL success = YES;
+	
+	// remove notification for currently playing song
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:QTMovieTimeDidChangeNotification
+												  object:[oAudioPlayer movie]];
+	//change the icon back
+	[myCurrentPlayingRecord setObject:[myCurrentPlayingRecord objectForKey:@"OriginalIcon"] forKey:@"Icon"];
+	
 	NSURL * movieURL = [NSURL URLWithString:urlString];
 	if (!movieURL)
 		movieURL = [NSURL fileURLWithPath:urlString];
@@ -202,10 +207,14 @@ static NSImage *_song = nil;
 		NSLog(@"loadAudioFile: %@", err);
 		success = NO;
 	}
-		
+	
 	[audio setDelegate:self];
 	[oAudioPlayer setMovie:audio];
 	[playButton setEnabled: (audio != nil)];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(audioTimeDidChange:)
+												 name:QTMovieTimeDidChangeNotification
+											   object:audio];
 	
 	[progressIndicator setMinValue: k_Scrub_Slider_Minimum];
 	QTTime dur = [audio duration];
@@ -213,6 +222,17 @@ static NSImage *_song = nil;
 	long long audioDurationSeconds = [audio durationInSeconds];
     [progressIndicator setMaxValue: audioDurationSeconds];
     [progressIndicator setDoubleValue: k_Scrub_Slider_Minimum ];
+	
+	// update the icon
+	if (!_playingIcon)
+	{
+		NSString *p = [[NSBundle bundleForClass:[self class]] pathForResource:@"MBAudioPlaying" ofType:@"png"];
+		_playingIcon = [[NSImage alloc] initWithContentsOfFile:p];
+	}
+	myCurrentPlayingRecord = [[songsController selectedObjects] objectAtIndex:0];
+	[myCurrentPlayingRecord setObject:[myCurrentPlayingRecord objectForKey:@"Icon"] forKey:@"OriginalIcon"];
+	[myCurrentPlayingRecord setObject:_playingIcon forKey:@"Icon"];
+	
 	return success;
 }
 
@@ -220,7 +240,7 @@ static NSImage *_stopImage = nil;
 
 - (IBAction) playMovie: (id) sender
 {	
-	if ([self loadAudioFile:[[songsController selection] valueForKey:@"Preview"]])
+	if ([self loadAudioFile:[[[songsController selectedObjects] objectAtIndex:0] valueForKey:@"Preview"]])
 	{
 		[pollTimer invalidate];
 		pollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
@@ -251,9 +271,9 @@ static NSImage *_playImage = nil;
 - (IBAction) stopMovie: (id) sender
 {
 	[oAudioPlayer pause:self];
-	[table reloadData];
 	[pollTimer invalidate];
 	pollTimer = nil;
+	[table reloadData];
 	[playButton setAction:@selector(playMovie:)];
 	[playButton setState:NSOffState];
 	if (!_playImage) {
@@ -293,8 +313,10 @@ static NSImage *_playImage = nil;
     }
 }
 
-#pragma mark NOTIFICATIONS
-- (void)audioTimeDidChange:(NSNotification*)aNotification
+#pragma mark -
+#pragma mark Audio Notifications
+
+- (void)audioTimeDidChange:(NSNotification *)aNotification
 {
 	[self setClockTime:[[oAudioPlayer movie] currentPlayTimeAsString]];
 }
