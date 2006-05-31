@@ -28,6 +28,7 @@
 @interface iMBApertureParser : iMBAbstractParser
 {
 	NSImage *myFolderIcon;
+	NSImage *myProjectIcon;
 }
 
 @end

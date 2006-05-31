@@ -42,6 +42,7 @@
 	if (self = [super initWithContentsOfFile:path])
 	{
 		myFolderIcon = [NSImage imageResourceNamed:@"icon-folder.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
+		myProjectIcon = [NSImage imageResourceNamed:@"Project_I_Project.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
 	}
 	return self;
 }
@@ -49,6 +50,7 @@
 - (void)dealloc
 {
 	[myFolderIcon release];
+	[myProjectIcon release];
 	
 	[super dealloc];
 }
@@ -65,8 +67,15 @@
 	}
 	else
 	{
-		[node setName:name];
-		[node setIcon:myFolderIcon];
+		[node setName:[name stringByDeletingPathExtension]];
+		if ([[name pathExtension] isEqualToString:@"approject"])
+		{
+			[node setIcon:myProjectIcon];
+		}
+		else
+		{
+			[node setIcon:myFolderIcon];
+		}
 			
 		NSManagedObjectContext *moc = [folder managedObjectContext];
 		NSError *error;
