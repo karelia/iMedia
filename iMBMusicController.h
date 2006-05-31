@@ -32,16 +32,18 @@ Please send fixes to
 	IBOutlet NSTextField *counterField;
 	IBOutlet NSButton * playButton;
 	IBOutlet NSSlider * progressIndicator;
-	IBOutlet NSTextField * clockDisplay;
 	IBOutlet NSSearchField *oSearch;
 	IBOutlet NSTableView  *table;
 	IBOutlet QTMovieView *oAudioPlayer;
 	IBOutlet iMBDNDArrayController *songsController;
-	
+	NSString *clockTime;
 	@private
-		NSNumber *clockTime;
 		NSTimer * pollTimer;
 }
+
+#pragma mark ACCESSORS
+- (NSString *)clockTime;
+- (void)setClockTime:(NSString *)value;
 
 #pragma mark ACTIONS
 - (IBAction) playMovie: (id) sender;

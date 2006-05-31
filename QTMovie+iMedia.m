@@ -161,4 +161,159 @@ bail:
 	return result;
 }
 
+// returns YES if the movie is currently playing, NO if not
+-(BOOL)isPlaying
+{
+	if ([self rate] == 0)
+	{
+		return NO;
+	}
+	
+	return YES;
+}
+
+// return the movie duration as a string
+-(NSString *)durationAsString
+{
+	QTTime durationQTTime = [self duration];
+	long long durationInSeconds = durationQTTime.timeValue/durationQTTime.timeScale;
+	long long durationInMinutes = durationInSeconds/60;
+	long long durationInHours = durationInMinutes/60;
+	return ([NSString stringWithFormat:@"%qi:%qi:%qi" , 
+								durationInHours, 
+		durationInMinutes, 
+		durationInSeconds]);
+}
+
+-(NSString *)currentPlayTimeAsString
+{
+	QTTime currQTTime = [self currentPlayTime];
+	int actualSeconds = currQTTime.timeValue/currQTTime.timeScale;
+	div_t hours = div(actualSeconds,3600);
+	div_t minutes = div(hours.rem,60);
+	
+	if (hours.quot == 0) {
+		return [NSString stringWithFormat:@"%2d:%.2d", minutes.quot, minutes.rem];
+	}
+	else {
+		return [NSString stringWithFormat:@"%2d:%02d:%02d", hours.quot, minutes.quot, minutes.rem];
+	}	
+}
+
+- (long long)durationInSeconds
+{
+	QTTime durationQTTime = [self duration];
+	long long durationInSeconds = durationQTTime.timeValue/durationQTTime.timeScale;
+	return durationInSeconds;
+}
+// return the movie's current play time
+-(QTTime)currentPlayTime
+{
+	NSValue *attribute = [self attributeForKey:QTMovieCurrentTimeAttribute];
+	QTTime movieTime = [attribute QTTimeValue];
+	
+	return (movieTime);
+}
+
+// set the movie's current time
+-(void)setTime:(int)timeValue
+{
+	QTTime movieQTTime;
+	NSValue *valueForQTTime;
+	
+	[self timeToQTTime:timeValue resultTime:&movieQTTime];
+	
+	valueForQTTime = [NSValue valueWithQTTime:movieQTTime];
+	
+	[self setAttribute:valueForQTTime forKey:QTMovieCurrentTimeAttribute];
+}
+
+// return the movie's current (non-playing) time
+-(double)currentTimeValue
+{
+	QTTime time = [self currentTime];
+	
+	return(time.timeValue);
+}
+
+// returns YES if the movie's current time is the movie end,
+// NO if not
+-(BOOL)currentTimeEqualsDuration
+{	
+	QTTime movDuration = [self duration];
+	QTTime curTime = [self currentTime];
+	if (QTTimeCompare(movDuration,curTime) == NSOrderedSame)
+	{
+		return YES;
+	}
+	
+	return NO;
+}
+
+// returns the movie's poster image - return a generic image
+// if there isn't one
+-(NSImage *)posterImage
+{
+	NSImage *moviePosterImage = nil;
+	
+	moviePosterImage = [self posterImage];
+	
+	// create a dummy poster image if none exists
+	if (nil == moviePosterImage)
+	{
+		moviePosterImage = [self currentFrameImage];
+	}
+	
+	if (!moviePosterImage) goto bail;
+	
+	// set a poster name if none exists
+	if (![moviePosterImage name])
+	{
+		NSString *aName = [self movieFileName];
+		if (aName)
+		{
+			[moviePosterImage setName:aName];
+		}
+		else
+		{
+			[moviePosterImage setName:@"<no name>"];
+		}
+	}
+	
+bail:
+		return moviePosterImage;
+}
+
+
+// convert a time value (long) to a QTTime structure
+-(void)timeToQTTime:(long)timeValue resultTime:(QTTime *)aQTTime
+{
+	NSNumber *timeScaleObj;
+	long timeScaleValue;
+	
+	timeScaleObj = [self attributeForKey:QTMovieTimeScaleAttribute];
+	timeScaleValue = [timeScaleObj longValue];
+	
+	*aQTTime = QTMakeTime(timeValue, timeScaleValue);
+}
+
+// return the movie file path
+-(NSString *)movieFilePath
+{
+	return ([self attributeForKey:QTMovieFileNameAttribute]);
+}
+
+// return the movie file name
+-(NSString *)movieFileName
+{
+	return ([self filenameFromFullPath:[self movieFilePath]]);
+}
+
+// returns the movie's filename specified by the full path
+- (NSString *)filenameFromFullPath:(NSString *)fullPath
+{
+	NSArray *pathComponents = [fullPath componentsSeparatedByString:@"/"];
+	return ([pathComponents objectAtIndex:([pathComponents count] - 1)]);
+}
+
 @end

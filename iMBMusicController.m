@@ -28,10 +28,9 @@ Please send fixes to
 #import "TimeValueTransformer.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
+#import "QTMovie+iMedia.h"
 
 #import <QTKit/QTKit.h>
-#import <QTKit/QTMovieView.h>
-#import <QuickTime/QuickTime.h>
 
 extern NSString *Time_Display_String( int Number_Of_Seconds );
 const NSTimeInterval	k_Scrub_Slider_Update_Interval = 0.1;
@@ -40,8 +39,6 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 @interface iMBMusicController (PrivateApi)
 
 - (BOOL)loadAudioFile: (NSString *) path;
-- (NSNumber *)clockTime;
-- (void)setClockTime:(NSNumber *)value;
 - (NSString*)iconNameForPlaylist:(NSString*)name;
 
 @end
@@ -112,12 +109,20 @@ static NSImage *_toolbarIcon = nil;
 	  toObject:songsController
 		 withKeyPath:@"selectedObjects" 
 	   options:nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(audioTimeDidChange:)
+												 name:QTMovieTimeDidChangeNotification
+											   object:nil];
 }
 
 - (void)didDeactivate
 {
 	[self unbind:@"selectionChanged"];
 	[self stopMovie:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:QTMovieTimeDidChangeNotification
+												  object:nil];
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
@@ -202,10 +207,11 @@ static NSImage *_song = nil;
 	[oAudioPlayer setMovie:audio];
 	[playButton setEnabled: (audio != nil)];
 	
-	[clockDisplay setObjectValue:[NSNumber numberWithInt:0]];
 	[progressIndicator setMinValue: k_Scrub_Slider_Minimum];
 	QTTime dur = [audio duration];
-    [progressIndicator setMaxValue: GetMovieDuration( [audio quickTimeMovie] )];
+	
+	long long audioDurationSeconds = [audio durationInSeconds];
+    [progressIndicator setMaxValue: audioDurationSeconds];
     [progressIndicator setDoubleValue: k_Scrub_Slider_Minimum ];
 	return success;
 }
@@ -226,7 +232,6 @@ static NSImage *_stopImage = nil;
 		[table reloadData];
 		
 		[progressIndicator setDoubleValue:0];
-		[clockDisplay setStringValue:@"0:00"];
 		[oAudioPlayer gotoBeginning:self];
 		[oAudioPlayer play:self];
 		
@@ -257,34 +262,40 @@ static NSImage *_playImage = nil;
 		_playImage = [[NSImage alloc] initWithContentsOfFile:p];
 	}
 	[playButton setImage:_playImage];
-	[clockDisplay setObjectValue:[NSNumber numberWithInt:0]];
 }
 
 - (IBAction) scrubAudio: (id) sender
 {
-	SetMovieTimeValue([(QTMovie *)[oAudioPlayer movie] quickTimeMovie], [progressIndicator doubleValue]);
-	[self setClockTime:[NSNumber numberWithInt:GetMovieTime([(QTMovie *)[oAudioPlayer movie] quickTimeMovie], NULL)]];
+	[[oAudioPlayer movie] setTime:(int)[progressIndicator doubleValue]*600];
 }
 
 - (void)updateDisplay:(NSTimer *)timer
 {
 	QTMovie *audio = [oAudioPlayer movie];
+	
 	if (GetMovieTime([audio quickTimeMovie], NULL) == GetMovieDuration([audio quickTimeMovie])) {
 		[self stopMovie:self];
 	} else {
-		[progressIndicator setDoubleValue: GetMovieTime([(QTMovie *)[oAudioPlayer movie] quickTimeMovie], NULL)];
-		[self setClockTime:[NSNumber numberWithInt:GetMovieTime([(QTMovie *)[oAudioPlayer movie] quickTimeMovie], NULL)]];
+		QTTime curPlayTime = [audio currentPlayTime];
+		[progressIndicator setDoubleValue: curPlayTime.timeValue/curPlayTime.timeScale];
+		[self setClockTime:[audio currentPlayTimeAsString]];
 	}
 }
 
-- (NSNumber *)clockTime {
+- (NSString *)clockTime {
     return [[clockTime retain] autorelease];
 }
 
-- (void)setClockTime:(NSNumber *)value {
+- (void)setClockTime:(NSString *)value {
     if (clockTime != value) {
         [clockTime release];
         clockTime = [value copy];
     }
+}
+
+#pragma mark NOTIFICATIONS
+- (void)audioTimeDidChange:(NSNotification*)aNotification
+{
+	[self setClockTime:[[oAudioPlayer movie] currentPlayTimeAsString]];
 }
 @end
