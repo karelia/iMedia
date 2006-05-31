@@ -282,6 +282,21 @@ static NSMutableDictionary *_parsers = nil;
 	[oPlaylists setAllowsColumnReordering:NO];
 	[libraryController setSortDescriptors:nil];
 	[oSplitView setDelegate:self];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(appWillQuit:)
+												 name:NSApplicationWillTerminateNotification
+											   object:nil];
+}
+
+- (void)appWillQuit:(NSNotification *)notification
+{
+	//we want to save the current selection to UD
+	NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+	NSIndexPath *selection = [libraryController selectionIndexPath];
+	NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
+	[ud setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+	[ud synchronize];
 }
 
 - (id <iMediaBrowser>)browserForClassName:(NSString *)name
@@ -306,6 +321,12 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		if ([myBackgroundLoadingLock tryLock])
 		{
+			//we want to save the current selection to UD
+			NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+			NSIndexPath *selection = [libraryController selectionIndexPath];
+			NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
+			[ud setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+			
 			if (myFlags.willChangeBrowser)
 			{
 				[myDelegate iMediaBrowser:self willChangeToBrowser:browserClassName];
@@ -424,7 +445,17 @@ static NSMutableDictionary *_parsers = nil;
 	[myBackgroundLoadingLock unlock];
 	if ([[libraryController content] count] > 0)
 	{
-		[oPlaylists expandItem:[oPlaylists itemAtRow:0]];
+		// select the previous selection
+		NSData *archivedSelection = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+		if (archivedSelection)
+		{
+			NSIndexPath *selection = [NSKeyedUnarchiver unarchiveObjectWithData:archivedSelection];
+			[libraryController setSelectionIndexPath:selection];
+		}
+		else
+		{
+			[oPlaylists expandItem:[oPlaylists itemAtRow:0]];
+		}
 		
 		NSEnumerator *e = [[libraryController content] objectEnumerator];
 		iMBLibraryNode *cur;
@@ -469,6 +500,16 @@ static NSMutableDictionary *_parsers = nil;
 	full = [NSIndexPath indexPathWithIndexes:idxs length:i+1];
 	[libraryController setSelectionIndexPath:full];
 	free (idxs);
+}
+
+- (void)setPlaylistSelection:(id)selection
+{
+	NSLog(@"%@", selection);
+}
+
+- (id)playlistSelection
+{
+	return nil;
 }
 
 #pragma mark -
