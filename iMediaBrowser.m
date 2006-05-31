@@ -561,6 +561,16 @@ static NSMutableDictionary *_parsers = nil;
 	}
 }
 
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+	[mySelectedBrowser didDeactivate];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)aNotification
+{
+	[mySelectedBrowser willActivate];
+}
+
 - (void)resetLibraryController
 {
 	int controllerCount = [[libraryController arrangedObjects] count];
