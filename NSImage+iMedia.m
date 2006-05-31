@@ -32,20 +32,22 @@
 + (NSImage *)imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle
 {
 	NSString *pathToOtherApp = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:bundleID];
+	NSImage *image = nil;
+	
 	if (pathToOtherApp)
 	{
 		NSBundle *otherApp = [NSBundle bundleWithPath:pathToOtherApp];
 		NSString *pathToImage = [otherApp pathForResource:[name stringByDeletingPathExtension] ofType:[name pathExtension]];
-		NSImage *image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
-		return [image autorelease];
+		image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
 	}
-	else
+	
+	if (!image)
 	{
 		NSBundle *ourBundle = [NSBundle bundleForClass:[self class]];
 		NSString *pathToImage = [ourBundle pathForResource:[imageInOurBundle stringByDeletingPathExtension] ofType:[imageInOurBundle pathExtension]];
 		NSImage *image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
-		return [image autorelease];
 	}
+	return [image autorelease];
 }
 
 + (NSImage *)imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime

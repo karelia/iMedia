@@ -106,13 +106,6 @@
 	[super dealloc];
 }
 
-- (void)prepare
-{
-	[self scrollPoint:([self frame].origin)];
-	[self updateGridAndFrame];
-	[self setNeedsDisplayInRect:[self visibleRect]];
-}
-
 #pragma mark -
 // Drawing Methods
 #pragma mark Drawing Methods
@@ -288,7 +281,7 @@
 - (NSArray *)photosArray
 {
     //NSLog(@"in -photosArray, returned photosArray = %@", photosArray);
-    return photosArray;
+    return [[photosArray retain] autorelease]; 
 }
 
 - (void)setPhotosArray:(NSArray *)aPhotosArray
@@ -330,8 +323,8 @@
         }
         
         // update internal grid size, adjust height based on the new grid size
-        [self scrollPoint:([self frame].origin)];
         [self updateGridAndFrame];
+        [self scrollPoint:([self frame].origin)];
         [self setNeedsDisplayInRect:[self visibleRect]];
     }
 }
@@ -531,6 +524,51 @@
 	}
 }
 
+static NSImage *_badge = nil;
+
+- (NSImage *)draggingImageWithSelection:(NSIndexSet *)selection selectedIndex:(unsigned int)selectedIndex
+{	
+	
+	if (!_badge) {
+		NSBundle *b = [NSBundle bundleForClass:[self class]];
+		NSString *p = [b pathForResource:@"badge" ofType:@"png"];
+		_badge = [[NSImage alloc] initWithContentsOfFile:p];
+	}
+	NSImage *thumbnail = [self photoAtIndex:selectedIndex];
+	NSSize size = [self scaledPhotoSizeForSize:[thumbnail size]];
+	
+	NSSize badgeSize = [_badge size];
+	NSSize imageSize = NSMakeSize(size.width + badgeSize.width/2, size.height + badgeSize.height/2);
+				
+	NSImage *dragImage = [[NSImage alloc] initWithSize:imageSize];
+	
+	[dragImage lockFocus];
+	
+	[thumbnail drawInRect:NSMakeRect(0,0,size.width, size.height)
+				 fromRect:NSZeroRect
+				operation:NSCompositeSourceOver
+				 fraction:0.5];
+				
+	if ([selection count] > 1) {
+		NSRect badgeRect = NSMakeRect(imageSize.width - badgeSize.width, imageSize.height - badgeSize.height, badgeSize.width, badgeSize.height);
+		[_badge drawInRect:badgeRect
+				  fromRect:NSZeroRect
+				 operation:NSCompositeSourceOver
+				  fraction:1.0];
+		
+		NSString *count = [NSString stringWithFormat:@"%d", [selection count]];
+		static NSDictionary *badgeAttribs = nil;
+		if (!badgeAttribs) {
+			badgeAttribs = [[NSDictionary dictionaryWithObjectsAndKeys:[NSColor whiteColor], NSForegroundColorAttributeName, nil] retain];
+		}
+		NSSize countSize = [count sizeWithAttributes:badgeAttribs];
+		[count drawInRect:NSMakeRect(NSMidX(badgeRect) - (countSize.width/2), NSMidY(badgeRect) - (countSize.height/2), countSize.width, countSize.height)
+		   withAttributes:badgeAttribs];
+	}
+	[dragImage unlockFocus];
+	return [dragImage autorelease];
+}
+
 
 #pragma mark -
 // Don't Mess With Texas
@@ -660,6 +698,11 @@
 // Mouse Event Methods
 #pragma mark Mouse Event Methods
 
+- (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
+{
+	return YES;
+}
+
 - (void)mouseDown:(NSEvent *)event
 {
     mouseDown = YES;
@@ -669,9 +712,27 @@
 	unsigned clickedIndex = [self photoIndexForPoint:mouseDownPoint];
     NSRect photoRect = [self photoRectForIndex:clickedIndex];
     
-	if (NSPointInRect(mouseDownPoint, photoRect) && [self isPhotoSelectedAtIndex:clickedIndex]) {
-		potentialDragDrop = YES;
-	} else {
+	if (NSPointInRect(mouseDownPoint, photoRect)) 
+	{
+		if ([self isPhotoSelectedAtIndex:clickedIndex])
+		{
+			potentialDragDrop = YES;
+		}
+		else
+		{
+			if ([[self selectionIndexes] count] == 0)
+			{
+				[dragSelectedPhotoIndexes removeAllIndexes];
+				[dragSelectedPhotoIndexes addIndex:clickedIndex];
+				potentialDragDrop = YES;
+			}
+			else
+			{
+				potentialDragDrop = NO;
+			}
+		}
+	} else 
+	{
 		potentialDragDrop = NO;
 	}
 }
@@ -688,68 +749,22 @@
         
 	} else if (potentialDragDrop && (nil != delegate)) {
         // create a drag image
-        NSImage *clickedImage = [self photoAtIndex:[self photoIndexForPoint:mouseDownPoint]];
-        BOOL flipped = [clickedImage isFlipped];
-        [clickedImage setFlipped:NO];
-        NSSize scaledSize = [self scaledPhotoSizeForSize:[clickedImage size]];
-		if (nil == clickedImage) { // creates a red image, which should let the user/developer know something is wrong
-            clickedImage = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
-            [clickedImage lockFocus];
-            [[NSColor redColor] set];
-            [NSBezierPath fillRect:NSMakeRect(0,0,photoSize,photoSize)];
-            [clickedImage unlockFocus];
-        }
-		NSImage *dragImage = [[NSImage alloc] initWithSize:scaledSize];
-
-		// draw the drag image as a semi-transparent copy of the image the user dragged, and optionally a red badge indicating the number of photos
-        [dragImage lockFocus];
-		[clickedImage drawInRect:NSMakeRect(0,0,scaledSize.width,scaledSize.height) fromRect:NSMakeRect(0,0,[clickedImage size].width,[clickedImage size].height)  operation:NSCompositeCopy fraction:0.5];
-		[dragImage unlockFocus];
-        
-        [clickedImage setFlipped:flipped];
+		NSMutableIndexSet *oldSelection = [NSMutableIndexSet indexSet];
+		[oldSelection addIndexes:[self selectionIndexes]];
 		
-		// if there's more than one image, put a badge on the photo
-		if ([[self selectionIndexes] count] > 1) {
-			NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
-			[attributes setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
-			[attributes setObject:[NSFont fontWithName:@"Helvetica" size:14] forKey:NSFontAttributeName];
-			NSAttributedString *badgeString = [[NSAttributedString alloc] initWithString:[[NSNumber numberWithInt:[[self selectionIndexes] count]] stringValue] attributes:attributes];
-			NSSize stringSize = [badgeString size];
-			int diameter = stringSize.width;
-			if (stringSize.height > diameter) diameter = stringSize.height;
-			diameter += 5;
-			
-			// calculate the badge circle
-			int minY = 5;
-			int maxX = [dragImage size].width - 5;
-			int maxY = minY + diameter;
-			int minX = maxX - diameter;
-			NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(minX,minY,maxX-minX,maxY-minY)];
-			// draw the circle
-			[dragImage lockFocus];
-			[[NSColor colorWithDeviceRed:1 green:0.1 blue:0.1 alpha:0.7] set];
-			[circle fill];
-			[dragImage unlockFocus];
-			
-			// draw the string
-			NSPoint point;
-			point.x = maxX - ((maxX - minX) / 2) - 1;
-			point.y = (maxY - minY) / 2;
-			point.x = point.x - (stringSize.width / 2);
-			point.y = point.y - (stringSize.height / 2) + 7;
-			
-			[dragImage lockFocus];
-			[badgeString drawAtPoint:point];
-			[dragImage unlockFocus];
-			
-			[badgeString release];
-			[attributes release];
-		}
-        
+		NSMutableIndexSet *unionSet = [NSMutableIndexSet indexSet];
+		[unionSet addIndexes:oldSelection];
+		[unionSet addIndexes:dragSelectedPhotoIndexes];
+		[self setSelectionIndexes:unionSet];
+		
+        NSImage *dragImage = [self draggingImageWithSelection:unionSet selectedIndex:[self photoIndexForPoint:mouseCurrentPoint]];
+		
         // get the pasteboard and register the returned types with delegate as the owner
 		NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSDragPboard];
 		
 		[delegate photoView:self fillPasteboardForDrag:pb];
+		
+		[self setSelectionIndexes:oldSelection];
 		
 		// place the cursor in the center of the drag image
 		NSPoint p = [self convertPoint:[event locationInWindow] fromView:nil];
@@ -757,10 +772,7 @@
 		p.x = p.x - imageSize.width / 2;
 		p.y = p.y + imageSize.height / 2;
 		
-		[self dragImage:dragImage at:p offset:NSMakeSize(0,0) event:event pasteboard:pb source:self slideBack:YES];
-
-        [dragImage release];
-
+		[self dragImage:dragImage at:p offset:NSZeroSize event:event pasteboard:pb source:self slideBack:YES];
     } else {
         // adjust the mouse current point so that it's not outside the frame
         NSRect frameRect = [self frame];
@@ -1302,34 +1314,25 @@
 
 - (void)setFrame:(NSRect)frame
 {
-//	NSLog(@"setFrame:%@", NSStringFromRect(frame));
     float width = [self frame].size.width;
     [super setFrame:frame];
-    NSRect rect = [self visibleRect];
     
     if (width != frame.size.width) {
         // update internal grid size, adjust height based on the new grid size
         [self updateGridAndFrame];
-        rect = [self visibleRect];
         [self setNeedsDisplayInRect:[self visibleRect]];    
     }
 }
 
 - (void)updateGridAndFrame
 {
-	[[self enclosingScrollView] reflectScrolledClipView:((NSClipView *)[self superview])];
     /**** BEGIN Dimension calculations and adjustments ****/
     // TODO: I don't need to make these adjustments cases where my grid size or frame haven't changed but need to play with frame notifications to make sure I can
     //       adjust them in the correct situations
     
     // get the number of photos
     unsigned photoCount = [self photoCount];
-
-   NSRect rect = [self visibleRect];
-   
-//   NSString *rectString = NSStringFromRect(rect);
-//   NSLog(@"visibleRect = %@", rectString);
-   
+    
     // calculate the base grid size
     gridSize.height = [self photoSize] + [self photoVerticalSpacing];
     gridSize.width = [self photoSize] + [self photoHorizontalSpacing];
@@ -1339,11 +1342,8 @@
         columns = 0;
         rows = 0;
         float width = [self frame].size.width;
-   
-        NSSize size = NSMakeSize(width, [[self enclosingScrollView] frame].size.height);
-		if (size.height < 0) size.height = 1;
-        [self setFrameSize:size];
-        rect = [self visibleRect];
+        float height = [[[self enclosingScrollView] contentView] frame].size.height;
+        [self setFrameSize:NSMakeSize(width, height)];
         return;
     }
     
@@ -1370,9 +1370,8 @@
     float height = rows * gridSize.height;
     NSScrollView *scroll = [self enclosingScrollView];
     if ((nil != scroll) && (height < [[scroll contentView] frame].size.height))
-        height = [[self enclosingScrollView] frame].size.height;
+        height = [[scroll contentView] frame].size.height;
     
-	height -= 2;				// subtract a few so it fits in scroller
     // set my new frame size
     [self setFrameSize:NSMakeSize(width, height)];
     
@@ -1463,7 +1462,7 @@
     [image setScalesWhenResized:YES];
     [image setSize:newSize];
     
-    return [[image retain] autorelease];	// NOTE: putting a retain/autorelease was a band-aid that helped with zombie
+    return image;
 }
 
 - (unsigned)photoIndexForPoint:(NSPoint)point

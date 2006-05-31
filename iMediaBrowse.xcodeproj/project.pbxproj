@@ -101,6 +101,8 @@
 		7990CDC109D76BDA00AD74BA /* iTunesVideo.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDC009D76BDA00AD74BA /* iTunesVideo.png */; };
 		7990CDE009D76E7800AD74BA /* iTunesSmartPlaylist.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDDF09D76E7800AD74BA /* iTunesSmartPlaylist.png */; };
 		7990CDF209D772FF00AD74BA /* Links.nib in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDF009D772FF00AD74BA /* Links.nib */; };
+		79A52B7E0A2D6894008D06C8 /* iMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79A52B7C0A2D6894008D06C8 /* iMBApertureParser.h */; };
+		79A52B7F0A2D6894008D06C8 /* iMBApertureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79A52B7D0A2D6894008D06C8 /* iMBApertureParser.m */; };
 		79BBE52A0A282E440018CCCA /* iMBGarageBandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */; };
 		79BBE52B0A282E440018CCCA /* iMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */; };
 		79CA91620A2D250400ABD1D8 /* NSIndexPath+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -278,6 +280,8 @@
 		7990CDC009D76BDA00AD74BA /* iTunesVideo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesVideo.png; sourceTree = "<group>"; };
 		7990CDDF09D76E7800AD74BA /* iTunesSmartPlaylist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesSmartPlaylist.png; sourceTree = "<group>"; };
 		7990CDF109D772FF00AD74BA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Links.nib; sourceTree = "<group>"; };
+		79A52B7C0A2D6894008D06C8 /* iMBApertureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBApertureParser.h; sourceTree = "<group>"; };
+		79A52B7D0A2D6894008D06C8 /* iMBApertureParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBApertureParser.m; sourceTree = "<group>"; };
 		79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBGarageBandParser.h; sourceTree = "<group>"; };
 		79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBGarageBandParser.m; sourceTree = "<group>"; };
 		79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexPath+iMedia.h"; sourceTree = "<group>"; };
@@ -518,6 +522,8 @@
 				79430F0D0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m */,
 				79430F1A0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h */,
 				79430F1B0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m */,
+				79A52B7C0A2D6894008D06C8 /* iMBApertureParser.h */,
+				79A52B7D0A2D6894008D06C8 /* iMBApertureParser.m */,
 			);
 			name = Parsers;
 			sourceTree = "<group>";
@@ -713,6 +719,7 @@
 				79430F0E0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h in Headers */,
 				79430F1C0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h in Headers */,
 				79CA91620A2D250400ABD1D8 /* NSIndexPath+iMedia.h in Headers */,
+				79A52B7E0A2D6894008D06C8 /* iMBApertureParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -906,6 +913,7 @@
 				79430F0F0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m in Sources */,
 				79430F1D0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m in Sources */,
 				79CA91630A2D250400ABD1D8 /* NSIndexPath+iMedia.m in Sources */,
+				79A52B7F0A2D6894008D06C8 /* iMBApertureParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

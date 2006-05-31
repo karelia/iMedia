@@ -52,7 +52,6 @@
     float photoVerticalSpacing;
     float photoHorizontalSpacing;
     
-	
     NSSize gridSize;
     unsigned columns;
     unsigned rows;
@@ -66,9 +65,6 @@
     NSDate *photoResizeTime;
     BOOL isDonePhotoResizing;
 }
-
-// We're selecting, prepare for display
-- (void)prepare;
 
 #pragma mark -
 // Delegate Methods
