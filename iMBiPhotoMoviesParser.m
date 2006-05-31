@@ -238,6 +238,12 @@ Please send fixes to
 		[lib release];
 	}
 	
+	if ([[root valueForKey:@"Movies"] count] == 0)
+	{
+		[root release];
+		return nil;
+	}
+	
 	return [root autorelease];
 }
 

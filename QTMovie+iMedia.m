@@ -162,7 +162,7 @@ bail:
 }
 
 // returns YES if the movie is currently playing, NO if not
--(BOOL)isPlaying
+- (BOOL)isPlaying
 {
 	if ([self rate] == 0)
 	{
@@ -173,7 +173,7 @@ bail:
 }
 
 // return the movie duration as a string
--(NSString *)durationAsString
+- (NSString *)durationAsString
 {
 	QTTime durationQTTime = [self duration];
 	long long durationInSeconds = durationQTTime.timeValue/durationQTTime.timeScale;
@@ -185,7 +185,7 @@ bail:
 		durationInSeconds]);
 }
 
--(NSString *)currentPlayTimeAsString
+- (NSString *)currentPlayTimeAsString
 {
 	QTTime currQTTime = [self currentPlayTime];
 	int actualSeconds = currQTTime.timeValue/currQTTime.timeScale;
@@ -207,7 +207,7 @@ bail:
 	return durationInSeconds;
 }
 // return the movie's current play time
--(QTTime)currentPlayTime
+- (QTTime)currentPlayTime
 {
 	NSValue *attribute = [self attributeForKey:QTMovieCurrentTimeAttribute];
 	QTTime movieTime = [attribute QTTimeValue];
@@ -216,7 +216,7 @@ bail:
 }
 
 // set the movie's current time
--(void)setTime:(int)timeValue
+- (void)setTime:(int)timeValue
 {
 	QTTime movieQTTime;
 	NSValue *valueForQTTime;
@@ -229,7 +229,7 @@ bail:
 }
 
 // return the movie's current (non-playing) time
--(double)currentTimeValue
+- (double)currentTimeValue
 {
 	QTTime time = [self currentTime];
 	
@@ -238,7 +238,7 @@ bail:
 
 // returns YES if the movie's current time is the movie end,
 // NO if not
--(BOOL)currentTimeEqualsDuration
+- (BOOL)currentTimeEqualsDuration
 {	
 	QTTime movDuration = [self duration];
 	QTTime curTime = [self currentTime];
@@ -252,7 +252,7 @@ bail:
 
 // returns the movie's poster image - return a generic image
 // if there isn't one
--(NSImage *)posterImage
+- (NSImage *)posterImage
 {
 	NSImage *moviePosterImage = nil;
 	
@@ -286,7 +286,7 @@ bail:
 
 
 // convert a time value (long) to a QTTime structure
--(void)timeToQTTime:(long)timeValue resultTime:(QTTime *)aQTTime
+- (void)timeToQTTime:(long)timeValue resultTime:(QTTime *)aQTTime
 {
 	NSNumber *timeScaleObj;
 	long timeScaleValue;
@@ -298,13 +298,13 @@ bail:
 }
 
 // return the movie file path
--(NSString *)movieFilePath
+- (NSString *)movieFilePath
 {
 	return ([self attributeForKey:QTMovieFileNameAttribute]);
 }
 
 // return the movie file name
--(NSString *)movieFileName
+- (NSString *)movieFileName
 {
 	return ([self filenameFromFullPath:[self movieFilePath]]);
 }

@@ -22,11 +22,40 @@
 	<ben@scriptsoftware.com>
  
  */
-#import <Cocoa/Cocoa.h>
+
+#import "NSIndexPath+iMedia.h"
 
 
-@interface NSAttributedString (iMedia)
+@implementation NSIndexPath (iMedia)
 
-+ (NSAttributedString *)attributedStringWithName:(NSString *)name image:(NSImage *)image;
+- (BOOL)isSubPathOf:(NSIndexPath *)parentPath
+{
+	if ([parentPath length] < [self length]) // we should have at least 1 more index in our path if we are a sub path
+	{
+		unsigned int parentIndex;
+		unsigned int myIndex;
+		unsigned int i;
+		
+		for (i = 0; i < [parentPath length]; i++)
+		{
+			parentIndex = [parentPath indexAtPosition:i];
+			myIndex = [self indexAtPosition:i];
+			if (parentIndex != myIndex)
+			{
+				return NO;
+			}
+		}
+		return YES;
+	}
+	return NO;
+}
+
+- (BOOL)isPeerPathOf:(NSIndexPath *)peerPath
+{
+	NSIndexPath *me = [self indexPathByRemovingLastIndex];
+	NSIndexPath *other = [peerPath indexPathByRemovingLastIndex];
+	
+	return ([me length] > 0) && ([me compare:other] == NSOrderedSame);
+}
 
 @end

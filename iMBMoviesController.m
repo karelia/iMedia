@@ -116,7 +116,6 @@ Please send fixes to
 	  toObject:[self controller] 
 		 withKeyPath:@"selection.Movies" 
 	   options:nil];
-	[oPhotoView prepare];
 	[[oPhotoView window] makeFirstResponder:oPhotoView];
 }
 

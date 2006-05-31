@@ -45,6 +45,7 @@ static NSImage *_missing = nil;
 		myCache = [[NSMutableDictionary dictionary] retain];
 		myCacheLock = [[NSLock alloc] init];
 		myInFlightImageOperations = [[NSMutableArray array] retain];
+		myProcessingImages = [[NSMutableSet set] retain];
 		
 		if (!_placeholder)
 		{
@@ -68,6 +69,8 @@ static NSImage *_missing = nil;
 	[myFilteredImages release];
 	[mySearchString release];
 	[myInFlightImageOperations release];
+	[mySelectedIndexPath release];
+	[myProcessingImages release];
 	
 	[super dealloc];
 }
@@ -142,7 +145,6 @@ static NSImage *_toolbarIcon = nil;
 	  toObject:[self controller] 
 		 withKeyPath:@"selection.Images" 
 	   options:nil];
-	[oPhotoView prepare];
 	[[oPhotoView window] makeFirstResponder:oPhotoView];
 }
 
@@ -185,25 +187,46 @@ static NSImage *_toolbarIcon = nil;
 #pragma mark -
 #pragma mark Threaded Image Loading
 
-- (void)backgroundLoadOfImage:(NSDictionary *)rec
+- (NSDictionary *)recordForPath:(NSString *)path
+{
+	NSEnumerator *e = [myImages objectEnumerator];
+	NSDictionary *cur;
+	
+	while (cur = [e nextObject])
+	{
+		if ([[cur objectForKey:@"ImagePath"] isEqualToString:path])
+		{
+			return cur;
+		}
+	}
+	return nil;
+}
+
+- (void)backgroundLoadOfImage:(NSString *)imagePath
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	// remove ourselves out of the queue
 	[myCacheLock lock];
-	[myInFlightImageOperations removeObject:rec];
+	imagePath = [[myInFlightImageOperations lastObject] retain];
+	if (imagePath)
+	{
+		[myInFlightImageOperations removeObject:imagePath];
+		[myProcessingImages addObject:imagePath];
+	}
 	[myCacheLock unlock];
 	
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSString *thumbPath;
-	NSString *imagePath;
 	NSImage *img;
 	NSDictionary *fullResAttribs;
+	NSDictionary *rec;
 	 
-	while (rec)
+	while (imagePath)
 	{
+		rec = [self recordForPath:imagePath];
+		
 		thumbPath = [rec objectForKey:@"ThumbPath"];
-		imagePath = [rec objectForKey:@"ImagePath"];
 		
 		if (thumbPath)
 		{
@@ -248,14 +271,21 @@ static NSImage *_toolbarIcon = nil;
 			img = [_missing retain];
 		}
 		
-		// get the last object in the queue because we would have scrolled and what is at the start won't be necessarily be what is displayed.
 		[myCacheLock lock];
-		[myCache setObject:img forKey:imagePath];
-		[img release];
-		rec = [myInFlightImageOperations lastObject];
-		if (rec)
+		if (![myCache objectForKey:imagePath])
 		{
-			[myInFlightImageOperations removeObject:rec];
+			[myCache setObject:img forKey:imagePath];
+			[img release];
+		}
+		
+		// get the last object in the queue because we would have scrolled and what is at the start won't be necessarily be what is displayed.
+		[myProcessingImages removeObject:imagePath];
+		[imagePath release];
+		imagePath = [[myInFlightImageOperations lastObject] retain];
+		if (imagePath)
+		{
+			[myInFlightImageOperations removeObject:imagePath];
+			[myProcessingImages addObject:imagePath];
 		}
 		[myCacheLock unlock];
 		
@@ -275,7 +305,17 @@ static NSImage *_toolbarIcon = nil;
 {
 	[myImages autorelease];
 	myImages = [images retain];
-	[myCache removeAllObjects];
+	NSIndexPath *selectionIndex = [[self controller] selectionIndexPath];
+	// only clear the cache if we go to another parser
+	if (!([selectionIndex isSubPathOf:mySelectedIndexPath] || 
+		  [mySelectedIndexPath isSubPathOf:selectionIndex] || 
+		  [mySelectedIndexPath isPeerPathOf:selectionIndex]))
+	{
+		[myCache removeAllObjects];
+	}
+	[mySelectedIndexPath autorelease];
+	mySelectedIndexPath = [selectionIndex retain];
+	
 	[self refilter];
 	//reset the scroll position
 	[oPhotoView scrollRectToVisible:NSMakeRect(0,0,1,1)];
@@ -309,7 +349,8 @@ static NSImage *_toolbarIcon = nil;
 	}
 	//try the caches
 	[myCacheLock lock];
-	NSImage *img = [myCache objectForKey:[rec objectForKey:@"ImagePath"]];
+	NSString *imagePath = [rec objectForKey:@"ImagePath"];
+	NSImage *img = [myCache objectForKey:imagePath];
 	[myCacheLock unlock];
 	
 	if (!img) img = [rec objectForKey:@"CachedThumb"];
@@ -318,31 +359,26 @@ static NSImage *_toolbarIcon = nil;
 	{
 		// background load the image
 		[myCacheLock lock];
-		BOOL needsToSpawnThread = ![myInFlightImageOperations containsObject:rec];
-		[myCacheLock unlock];
+		BOOL alreadyQueued = (([myInFlightImageOperations containsObject:imagePath]) || ([myProcessingImages containsObject:imagePath]));
 		
-		if (needsToSpawnThread)
+		if (!alreadyQueued)
 		{
-			[myCacheLock lock];
-			[myInFlightImageOperations addObject:rec];
-			[myCacheLock unlock];
-			if (myThreadCount < 6)
+			[myInFlightImageOperations addObject:imagePath];
+			if (myThreadCount < 4)
 			{
 				myThreadCount++;
 				[NSThread detachNewThreadSelector:@selector(backgroundLoadOfImage:)
 										 toTarget:self
-									   withObject:rec];
+									   withObject:nil];
 			}
 		}
 		else
 		{
 			//lets move it to the end of the queue so we get done next
-			[myCacheLock lock];
-			[myInFlightImageOperations removeObject:rec];
-			[myInFlightImageOperations addObject:rec];
-			[myCacheLock unlock];
+			[myInFlightImageOperations removeObject:imagePath];
+			[myInFlightImageOperations addObject:imagePath];
 		}
-		
+		[myCacheLock unlock];
 		// return the place holder image
 		img = _placeholder;
 	}

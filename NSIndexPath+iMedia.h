@@ -22,11 +22,13 @@
 	<ben@scriptsoftware.com>
  
  */
+
 #import <Cocoa/Cocoa.h>
 
 
-@interface NSAttributedString (iMedia)
+@interface NSIndexPath (iMedia) 
 
-+ (NSAttributedString *)attributedStringWithName:(NSString *)name image:(NSImage *)image;
+- (BOOL)isSubPathOf:(NSIndexPath *)parentPath;
+- (BOOL)isPeerPathOf:(NSIndexPath *)peerPath;
 
 @end

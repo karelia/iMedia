@@ -364,6 +364,7 @@ static NSMutableDictionary *_parsers = nil;
 	NSArray *parsers = [_parsers objectForKey:[mySelectedBrowser mediaType]];
 	NSEnumerator *e = [parsers objectEnumerator];
 	NSString *cur;
+	NSDate *timer;
 	
 	while (cur = [e nextObject])
 	{
@@ -395,7 +396,11 @@ static NSMutableDictionary *_parsers = nil;
 		//set the browser the parser is in
 		[parser setBrowser:mySelectedBrowser];
 		
+		timer = [NSDate date];
 		iMBLibraryNode *library = [parser library];
+#if DEBUG
+		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
+#endif
 		if (library) // it is possible for a parser to return nil if the db for it doesn't exist
 		{
 			[root addObject:library];

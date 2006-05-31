@@ -38,7 +38,9 @@ Please send fixes to
 	NSString				*mySearchString;
 	NSLock					*myCacheLock;
 	NSMutableArray			*myInFlightImageOperations;
+	NSMutableSet			*myProcessingImages;
 	int						myThreadCount;
+	NSIndexPath				*mySelectedIndexPath;
 }
 
 - (IBAction)search:(id)sender;
