@@ -103,6 +103,8 @@
 		7990CDF209D772FF00AD74BA /* Links.nib in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDF009D772FF00AD74BA /* Links.nib */; };
 		79BBE52A0A282E440018CCCA /* iMBGarageBandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */; };
 		79BBE52B0A282E440018CCCA /* iMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */; };
+		79CA91620A2D250400ABD1D8 /* NSIndexPath+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		79CA91630A2D250400ABD1D8 /* NSIndexPath+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */; };
 		79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF5FF09AAE5D2000CB4B4 /* badge.png */; };
 		79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */; };
 		79FDF61709AAE5D2000CB4B4 /* MBiPhoto4Library.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */; };
@@ -278,6 +280,8 @@
 		7990CDF109D772FF00AD74BA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Links.nib; sourceTree = "<group>"; };
 		79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBGarageBandParser.h; sourceTree = "<group>"; };
 		79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBGarageBandParser.m; sourceTree = "<group>"; };
+		79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexPath+iMedia.h"; sourceTree = "<group>"; };
+		79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSIndexPath+iMedia.m"; sourceTree = "<group>"; };
 		79FDF07F09F87B300058EB16 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		79FDF5FF09AAE5D2000CB4B4 /* badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge.png; sourceTree = "<group>"; };
 		79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBAudioPlaying.png; sourceTree = "<group>"; };
@@ -535,6 +539,8 @@
 				798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */,
 				796AC02D0A28582200EF92DB /* NSAttributedString+iMedia.h */,
 				796AC02E0A28582200EF92DB /* NSAttributedString+iMedia.m */,
+				79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */,
+				79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */,
 			);
 			name = "Cocoa Extensions";
 			sourceTree = "<group>";
@@ -706,6 +712,7 @@
 				7910D40C0A2C11C200094548 /* iMBMusicFolder.h in Headers */,
 				79430F0E0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h in Headers */,
 				79430F1C0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h in Headers */,
+				79CA91620A2D250400ABD1D8 /* NSIndexPath+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -898,6 +905,7 @@
 				7910D40D0A2C11C200094548 /* iMBMusicFolder.m in Sources */,
 				79430F0F0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m in Sources */,
 				79430F1D0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m in Sources */,
+				79CA91630A2D250400ABD1D8 /* NSIndexPath+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1002,8 +1010,10 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
+				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
