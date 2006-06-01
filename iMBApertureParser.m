@@ -38,7 +38,9 @@
 
 - (id)init
 {
-	NSString *path = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures/Aperture Library.aplibrary/Aperture.aplib/Library.apdb"];
+	CFPropertyListRef db = CFPreferencesCopyAppValue((CFStringRef)@"LibraryPath", (CFStringRef)@"com.apple.Aperture");	
+	NSString *path = [(NSString *)db stringByExpandingTildeInPath];
+	
 	if (self = [super initWithContentsOfFile:path])
 	{
 		myFolderIcon = [NSImage imageResourceNamed:@"icon-folder.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
@@ -96,6 +98,10 @@
 				[node addItem:subNode];
 			}
 		}
+		
+		// get the images for the current folder
+		NSString *folderPath = [[self databasePath] stringByAppendingPathComponent:[folder valueForKey:@"libraryRelativePath"]];
+		
 	}
 	
 	
@@ -105,7 +111,8 @@
 - (iMBLibraryNode *)parseDatabase
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
-	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
+	NSString *libraryPath = [[self databasePath] stringByAppendingPathComponent:@"Aperture.aplib/Library.apdb"];
+	if (![fm fileExistsAtPath:libraryPath]) return nil;
 	
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"Aperture", @"Aperture Node Name")];
@@ -118,7 +125,7 @@
 	
 	NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:[NSURL fileURLWithPath:mom]];
 	NSPersistentStoreCoordinator *psc = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
-	[psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:[NSURL fileURLWithPath:[self databasePath]] options:nil error:&error];
+	[psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:[NSURL fileURLWithPath:libraryPath] options:nil error:&error];
 	[model release];
 	
 	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
@@ -148,14 +155,44 @@
 			[root addItem:node];
 		}
 	}
-	NSLog(@"%@", [[model entitiesByName] allKeys]); 
-	//NSLog(@"%@", [[[NSEntityDescription entityForName:@"RKFolder" inManagedObjectContext:moc] attributesByName] allKeys]);
-	//NSLog(@"%@", [[[NSEntityDescription entityForName:@"RKFolder" inManagedObjectContext:moc] relationshipsByName] allKeys]);
+
 	[moc release];
 	[psc release];
 	
 	return [root autorelease];
 }
 
-
 @end
+
+/*
+ 
+ NSMutableString *dump = [NSMutableString stringWithFormat:@"Dump of %@", mom];
+	e = [[model entitiesByName] keyEnumerator];
+	NSString *entityName;
+	
+	while (entityName = [e nextObject])
+	{
+		id entity = [[model entitiesByName] objectForKey:entityName];
+		[dump appendFormat:@"%@:\nAttributes\n", entityName];
+		NSEnumerator *g = [[entity attributesByName] keyEnumerator];
+		id attribName;
+		while (attribName = [g nextObject])
+		{
+			id attrib = [[entity attributesByName] objectForKey:attribName];
+			[dump appendFormat:@"\t%@ - %@\n", attribName, [attrib attributeValueClassName]];
+		}
+		[dump appendString:@"Relationships\n"];
+		g = [[entity relationshipsByName] keyEnumerator];
+		id relName;
+		
+		while (relName = [g nextObject])
+		{
+			id relationship = [[entity relationshipsByName] objectForKey:relName];
+			[dump appendFormat:@"\t%@ -> %@ (%@)\n", relName, [[relationship destinationEntity] name], [[relationship inverseRelationship] name]];
+		}
+	}
+	NSLog(@"%@", dump); 
+	NSLog(@"%@", [[[NSEntityDescription entityForName:@"RKMaster" inManagedObjectContext:moc] attributesByName] allKeys]);
+	NSLog(@"%@", [[[NSEntityDescription entityForName:@"RKMaster" inManagedObjectContext:moc] relationshipsByName] allKeys]);
+ 
+ */

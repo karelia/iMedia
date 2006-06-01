@@ -55,6 +55,8 @@
 		79430F1D0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79430F1B0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m */; };
 		794835F50A2709AD007E8268 /* MUPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 794835F30A2709AD007E8268 /* MUPhotoView.h */; };
 		794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 794835F40A2709AD007E8268 /* MUPhotoView.m */; };
+		794C9F770A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 794C9F750A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		794C9F780A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 794C9F760A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m */; };
 		7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */; };
 		7956049409D78F9F00BF1DA5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 7956049309D78F9F00BF1DA5 /* LICENSE */; };
 		7959CC280A2BBE4800E4980A /* NSPasteboard+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -227,6 +229,8 @@
 		79430F1B0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiMovieSoundEffectsParser.m; sourceTree = "<group>"; };
 		794835F30A2709AD007E8268 /* MUPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MUPhotoView.h; sourceTree = "<group>"; };
 		794835F40A2709AD007E8268 /* MUPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MUPhotoView.m; sourceTree = "<group>"; };
+		794C9F750A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPopUpButton+iMedia.h"; sourceTree = "<group>"; };
+		794C9F760A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPopUpButton+iMedia.m"; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
 		7956049309D78F9F00BF1DA5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		795D6F4F09D35B77005F166D /* iMBLinksController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLinksController.h; sourceTree = "<group>"; };
@@ -547,6 +551,8 @@
 				796AC02E0A28582200EF92DB /* NSAttributedString+iMedia.m */,
 				79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */,
 				79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */,
+				794C9F750A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h */,
+				794C9F760A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m */,
 			);
 			name = "Cocoa Extensions";
 			sourceTree = "<group>";
@@ -720,6 +726,7 @@
 				79430F1C0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h in Headers */,
 				79CA91620A2D250400ABD1D8 /* NSIndexPath+iMedia.h in Headers */,
 				79A52B7E0A2D6894008D06C8 /* iMBApertureParser.h in Headers */,
+				794C9F770A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -914,6 +921,7 @@
 				79430F1D0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m in Sources */,
 				79CA91630A2D250400ABD1D8 /* NSIndexPath+iMedia.m in Sources */,
 				79A52B7F0A2D6894008D06C8 /* iMBApertureParser.m in Sources */,
+				794C9F780A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

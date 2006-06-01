@@ -25,7 +25,7 @@ Please send fixes to
 
 #import "iMediaBrowser.h"
 #import "iMediaBrowserProtocol.h"
-#import "iMBLibraryNode.h"
+#import "iMedia.h"
 #import "LibraryItemsValueTransformer.h"
 
 #import <QuickTime/QuickTime.h>
@@ -589,6 +589,8 @@ static NSMutableDictionary *_parsers = nil;
 	myFlags.inSplitViewResize = YES;
 	if([[oPlaylists enclosingScrollView] frame].size.height <= 50 && ![[oSplitView subviews] containsObject:oPlaylistPopup])
 	{
+		// select the currently selected item in the playlist
+		[oPlaylistPopup selectItemWithRepresentedObject:[[libraryController selectedObjects] lastObject]];
 		[oSplitView replaceSubview:[[oPlaylists enclosingScrollView] retain] with:oPlaylistPopup];
 		NSRect frame = [oPlaylistPopup frame];
 		frame.size.height = 24;

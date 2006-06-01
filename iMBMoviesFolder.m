@@ -107,17 +107,20 @@ Please send fixes to
 		
 		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![fm isPathHidden:cur])
 		{
-			if ([[cur pathExtension] isEqualToString:@"iMovieProject"]) // handle the iMovie Project folder wrapper.
+			if ([cur pathExtension] && [[cur pathExtension] length] > 0)
 			{
-				NSString *cache = [filePath stringByAppendingPathComponent:@"Cache/Timeline Movie.mov"];
-				if ([fm fileExistsAtPath:cache])
+				if ([[cur pathExtension] isEqualToString:@"iMovieProject"]) // handle the iMovie Project folder wrapper.
 				{
-					NSMutableDictionary *rec = [self recordForMovieWithPath:cache];
-					[rec setObject:filePath forKey:@"ImagePath"];
-					[rec setObject:[filePath lastPathComponent] forKey:@"Caption"];
-					if (!NSEqualSizes([[rec objectForKey:@"CachedThumb"] size], NSZeroSize))
+					NSString *cache = [filePath stringByAppendingPathComponent:@"Cache/Timeline Movie.mov"];
+					if ([fm fileExistsAtPath:cache])
 					{
-						[movies addObject:rec];
+						NSMutableDictionary *rec = [self recordForMovieWithPath:cache];
+						[rec setObject:filePath forKey:@"ImagePath"];
+						[rec setObject:[filePath lastPathComponent] forKey:@"Caption"];
+						if (!NSEqualSizes([[rec objectForKey:@"CachedThumb"] size], NSZeroSize))
+						{
+							[movies addObject:rec];
+						}
 					}
 				}
 			}
