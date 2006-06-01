@@ -162,7 +162,7 @@ static NSImage *_toolbarIcon = nil;
 	return YES;
 }
 
-- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+- (void)writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
@@ -174,7 +174,7 @@ static NSImage *_toolbarIcon = nil;
     NSMutableArray *titles = [NSMutableArray array];
 	NSMutableArray *uids = [NSMutableArray array];
 	
-	NSEnumerator *e = [[playlist valueForKey:@"People"] objectEnumerator];
+	NSEnumerator *e = [items objectEnumerator];
 	NSDictionary *cur;
 	NSString *dir = NSTemporaryDirectory();
 	[[NSFileManager defaultManager] createDirectoryAtPath:dir attributes:nil];
@@ -204,6 +204,11 @@ static NSImage *_toolbarIcon = nil;
  	[pboard writeURLs:urls files:nil names:titles];
 	[pboard setPropertyList:[vcards componentsJoinedByString:@"\n"] forType:@"Apple VCard pasteboard type"];
 	[pboard setPropertyList:uids forType:@"ABPeopleUIDsPboardType"];
+}
+
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+{
+	[self writeItems:[playlist valueForKey:@"People"] toPasteboard:pboard];
 }
 
 - (NSNumber *)imageCount
@@ -253,6 +258,8 @@ static NSImage *_toolbarIcon = nil;
 	return [myImages count];
 }
 
+static NSImage *noAvatarImage = nil;
+
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
 {
 	NSDictionary *rec;
@@ -272,22 +279,21 @@ static NSImage *_toolbarIcon = nil;
 	if (!img)
 	{
 		NSData *iconData = [[rec objectForKey:@"ABPerson"] imageData];
-		NSImage *icon = nil;
 		
 		if (iconData)
 		{
-			icon = [[[NSImage alloc] initWithData:iconData] autorelease];
+			img = [[[NSImage alloc] initWithData:iconData] autorelease];
 		}
 		else
 		{
-			static NSImage *noAvatarImage = nil;
-			if (noAvatarImage)
+			if (!noAvatarImage)
 			{
 				NSString *imgPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"contact" ofType:@"png"];
 				noAvatarImage = [[NSImage alloc] initWithContentsOfFile:imgPath];
 			}
-			icon = noAvatarImage;
+			img = noAvatarImage;
 		}
+		[(NSMutableDictionary *)rec setObject:img forKey:@"CachedThumb"];
 	}
 	
 	return img;
@@ -311,14 +317,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard
 {
-	NSMutableArray *fileList = [NSMutableArray array];
-	NSMutableArray *captions = [NSMutableArray array];
-	NSMutableDictionary *iphotoData = [NSMutableDictionary dictionary];
-	
-	NSMutableArray *types = [NSMutableArray array]; 
-	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
-	[types addObject:@"ImageDataListPboardType"];
-	[pboard declareTypes:types owner:nil];
+	NSMutableArray *items = [NSMutableArray array];
 	
 	NSDictionary *cur;
 	
@@ -335,15 +334,10 @@ static NSImage *_toolbarIcon = nil;
 			{
 				cur = [myImages objectAtIndex:i];
 			}
-			[fileList addObject:[cur objectForKey:@"ImagePath"]];
-			[captions addObject:[cur objectForKey:@"Caption"]];
-			[iphotoData setObject:cur forKey:[NSNumber numberWithInt:i]];
+			[items addObject:cur];
 		}
 	}
-				
-	[pboard writeURLs:nil files:fileList names:captions];
-	[pboard setPropertyList:iphotoData forType:@"ImageDataListPboardType"];
-	
+	[self writeItems:items toPasteboard:pboard];
 }
 
 - (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index

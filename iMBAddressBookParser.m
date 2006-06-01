@@ -46,6 +46,31 @@
 	return self;
 }
 
+- (NSMutableDictionary *)recordForPerson:(ABPerson *)cur
+{
+	NSString *firstName = [cur valueForProperty:kABFirstNameProperty];
+	NSString *lastName = [cur valueForProperty:kABLastNameProperty];
+	ABMultiValue *emails = [cur valueForProperty:kABEmailProperty];
+	
+	NSMutableDictionary *rec = [NSMutableDictionary dictionary];
+	
+	if (firstName) [rec setObject:firstName forKey:@"FirstName"];
+	if (lastName) [rec setObject:lastName forKey:@"LastName"];
+	[rec setObject:[NSString stringWithFormat:@"%@ %@", firstName, lastName] forKey:@"Caption"];
+	
+	NSMutableArray *emls = [NSMutableArray array];
+	
+	int i;
+	for (i = 0; i < [emails count]; i++)
+	{
+		[emls addObject:[emails valueAtIndex:i]];
+	}
+	[rec setObject:emls forKey:@"EmailAddresses"];
+	[rec setObject:cur forKey:@"ABPerson"];
+	
+	return rec;
+}
+
 - (iMBLibraryNode *)recursivelyParseGroup:(ABGroup *)group
 {
 	iMBLibraryNode *node = [[iMBLibraryNode alloc] init];
@@ -58,26 +83,7 @@
 	
 	while (cur = [e nextObject])
 	{
-		NSString *firstName = [cur valueForProperty:kABFirstNameProperty];
-		NSString *lastName = [cur valueForProperty:kABLastNameProperty];
-		ABMultiValue *emails = [cur valueForProperty:kABEmailProperty];
-		
-		NSMutableDictionary *rec = [NSMutableDictionary dictionary];
-		
-		if (firstName) [rec setObject:firstName forKey:@"FirstName"];
-		if (lastName) [rec setObject:lastName forKey:@"LastName"];
-		[rec setObject:[NSString stringWithFormat:@"%@ %@", firstName, lastName] forKey:@"Caption"];
-
-		NSMutableArray *emls = [NSMutableArray array];
-		
-		int i;
-		for (i = 0; i < [emails count]; i++)
-		{
-			[emls addObject:[emails valueAtIndex:i]];
-		}
-		[rec setObject:emls forKey:@"EmailAddresses"];
-		[rec setObject:cur forKey:@"ABPerson"];
-		[people addObject:rec];
+		[people addObject:[self recordForPerson:cur]];
 	}
 	
 	[node setAttribute:people forKey:@"People"];
@@ -119,6 +125,11 @@
 	{
 		[root addItem:[self recursivelyParseGroup:group]];
 	}
+	
+	// add ourselves to the root
+	ABPerson *me = [ab me];
+	NSMutableArray *a = [NSMutableArray arrayWithObject:[self recordForPerson:me]];
+	[root setAttribute:a forKey:@"People"];
 	
 	return [root autorelease];
 }
