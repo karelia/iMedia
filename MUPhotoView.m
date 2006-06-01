@@ -517,10 +517,18 @@
 {
 	if ([sender respondsToSelector:@selector(doubleValue)])
 	{
+		mouseCurrentPoint = mouseDownPoint = NSZeroPoint;
 		[self setPhotoSize:[sender doubleValue]];
 		//fake a bounds resize notification
 		[[NSNotificationCenter defaultCenter] postNotificationName:NSViewFrameDidChangeNotification
 															object:self];
+		if ([[self selectionIndexes] count] > 0)
+		{
+			unsigned lastSelectedIndex = [[self selectionIndexes] lastIndex];
+			NSRect r = [self photoRectForIndex:lastSelectedIndex];
+			r.size.height += photoVerticalSpacing; 
+			[self scrollRectToVisible:r];
+		}
 	}
 }
 
@@ -714,6 +722,7 @@ static NSImage *_badge = nil;
     
 	if (NSPointInRect(mouseDownPoint, photoRect)) 
 	{
+		NSLog(@"is in photo rect");
 		if ([self isPhotoSelectedAtIndex:clickedIndex])
 		{
 			potentialDragDrop = YES;
