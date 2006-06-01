@@ -120,7 +120,7 @@ static NSImage *_toolbarIcon = nil;
     NSMutableArray *URLsAsStrings = [NSMutableArray array];
     NSMutableArray *titles = [NSMutableArray array];
 	
-	NSEnumerator *e = [[playlist attributeForKey:@"Links"] objectEnumerator];
+	NSEnumerator *e = [[playlist valueForKey:@"Links"] objectEnumerator];
 	NSDictionary *cur;
 	
 	while (cur = [e nextObject])

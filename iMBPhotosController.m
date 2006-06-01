@@ -175,7 +175,7 @@ static NSImage *_toolbarIcon = nil;
 	[pboard declareTypes:types owner:nil];
 	
 	//we store the images as an attribute in the node
-	NSArray *imageRecords = [playlist attributeForKey:@"Images"];
+	NSArray *imageRecords = [playlist valueForKey:@"Images"];
 	NSEnumerator *e = [imageRecords objectEnumerator];
 	NSDictionary *rec;
 				

@@ -128,7 +128,7 @@ static NSImage *_toolbarIcon = nil;
 	
 	[pboard declareTypes:types owner:nil];
 	
-	NSEnumerator *e = [[playlist attributeForKey:@"Tracks"] objectEnumerator];
+	NSEnumerator *e = [[playlist valueForKey:@"Tracks"] objectEnumerator];
 	NSDictionary *cur;
 	NSMutableArray *files = [NSMutableArray array];
 	

@@ -200,7 +200,7 @@ static NSImage *_toolbarIcon = nil;
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	[pboard declareTypes:types owner:nil];
 	
-	NSEnumerator *e = [[playlist attributeForKey:@"Movies"] objectEnumerator];
+	NSEnumerator *e = [[playlist valueForKey:@"Movies"] objectEnumerator];
 	NSDictionary *cur;
 	NSMutableArray *files = [NSMutableArray array];
 	
@@ -217,7 +217,7 @@ static NSImage *_toolbarIcon = nil;
 - (void)setImages:(NSArray *)images
 {
 	NSLog(@"setting %u images", [images count]);
-	NSLog(@"%@", NSStringFromRect([[oPhotoView enclosingScrollView] documentVisibleRect]));
+	NSLog(@"%@", NSStringFromRect([oPhotoView visibleRect]));
 	[myImages autorelease];
 	myImages = [images retain];
 	[self refilter];
@@ -234,7 +234,6 @@ static NSImage *_toolbarIcon = nil;
 
 - (unsigned)photoCountForPhotoView:(MUPhotoView *)view
 {
-	NSLog(@"returning movie count");
 	if ([mySearchString length] > 0)
 	{
 		return [myFilteredImages count];

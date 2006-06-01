@@ -31,6 +31,14 @@
 @interface iMBContactsController : iMBAbstractController 
 {
 	IBOutlet MUPhotoView *oPhotoView;
+	IBOutlet NSSlider *oSlider;
+	
+	NSMutableIndexSet		*mySelection;
+	NSArray					*myImages;
+	NSMutableArray			*myFilteredImages;
+	NSString				*mySearchString;
 }
+
+- (IBAction)search:(id)sender;
 
 @end

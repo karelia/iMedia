@@ -26,13 +26,22 @@
 #import "iMBContactsController.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
-#import "NSPasteboard+iMedia.h"
+#import "MUPhotoView.h"
+#import <AddressBook/AddressBook.h>
 
 @implementation iMBContactsController
+
++ (void)initialize
+{
+	[iMBContactsController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+}
 
 - (id)initWithPlaylistController:(NSTreeController *)ctrl
 {
 	if (self = [super initWithPlaylistController:ctrl]) {
+		mySelection = [[NSMutableIndexSet alloc] init];
+		myFilteredImages = [[NSMutableArray alloc] init];
+		
 		[NSBundle loadNibNamed:@"Contacts" owner:self];
 	}
 	return self;
@@ -40,7 +49,40 @@
 
 - (void)awakeFromNib
 {
-	//[oLinkController setDelegate:self];
+	[oPhotoView setDelegate:self];
+	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
+	[oPhotoView setPhotoHorizontalSpacing:15];
+	[oPhotoView setPhotoVerticalSpacing:15];
+}
+
+- (void)refilter
+{
+	[mySelection removeAllIndexes];
+	[self willChangeValueForKey:@"images"];
+	[myFilteredImages removeAllObjects];
+	
+	if ([mySearchString length] == 0) return;
+	
+	NSEnumerator *e = [myImages objectEnumerator];
+	NSDictionary *cur;
+	
+	while (cur = [e nextObject])
+	{
+		if ([[cur objectForKey:@"Caption"] rangeOfString:mySearchString options:NSCaseInsensitiveSearch].location != NSNotFound)
+		{
+			[myFilteredImages addObject:cur];
+		}
+	}
+	[self didChangeValueForKey:@"images"];
+}
+
+- (IBAction)search:(id)sender
+{
+	[mySearchString autorelease];
+	mySearchString = [[sender stringValue] copy];
+	
+	[self refilter];
+	[oPhotoView setNeedsDisplay:YES];
 }
 
 - (NSString *)mediaType
@@ -54,8 +96,7 @@ static NSImage *_toolbarIcon = nil;
 {
 	if(_toolbarIcon == nil)
 	{
-		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"contacts" ofType:@"png"];
+		NSString *p = [[NSBundle bundleForClass:[self class]] pathForResource:@"contacts" ofType:@"png"];
 		_toolbarIcon = [[NSImage alloc] initWithContentsOfFile:p];
 		[_toolbarIcon setScalesWhenResized:YES];
 		[_toolbarIcon setSize:NSMakeSize(32,32)];
@@ -77,17 +118,16 @@ static NSImage *_toolbarIcon = nil;
 - (void)willActivate
 {
 	[super willActivate];
-	[oPhotoView bind:@"images" 
-			toObject:[self controller] 
+	[self bind:@"images" 
+	  toObject:[self controller] 
 		 withKeyPath:@"selection.People" 
-			 options:nil];
-	[oPhotoView prepare];
+	   options:nil];
 	[[oPhotoView window] makeFirstResponder:oPhotoView];
 }
 
 - (void)didDeactivate
 {
-	[oPhotoView unbind:@"images"];
+	[self unbind:@"images"];
 }
 
 - (BOOL)tableView:(NSTableView *)tv
@@ -126,23 +166,199 @@ static NSImage *_toolbarIcon = nil;
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
-	
+	[types addObjectsFromArray:[NSArray arrayWithObjects:@"ABPeopleUIDsPboardType", @"Apple VCard pasteboard type", nil]];
 	[pboard declareTypes:types  owner:nil];
+	NSMutableArray *vcards = [NSMutableArray array];
 	NSMutableArray *urls = [NSMutableArray array];
-	// for WebURLsWithTitlesPboardType
+	NSMutableArray *files = [NSMutableArray array];
     NSMutableArray *titles = [NSMutableArray array];
+	NSMutableArray *uids = [NSMutableArray array];
 	
-	NSEnumerator *e = [[playlist attributeForKey:@"People"] objectEnumerator];
+	NSEnumerator *e = [[playlist valueForKey:@"People"] objectEnumerator];
 	NSDictionary *cur;
+	NSString *dir = NSTemporaryDirectory();
+	[[NSFileManager defaultManager] createDirectoryAtPath:dir attributes:nil];
 	
 	while (cur = [e nextObject])
 	{
-		NSString *loc = [cur objectForKey:@"URL"];
-		[urls addObject:[NSURL URLWithString:loc]];
+		ABPerson *person = [cur objectForKey:@"ABPerson"];
+		NSData *vcard = [person vCardRepresentation];
+		[vcards addObject:[[[NSString alloc] initWithData:vcard encoding:NSUTF8StringEncoding] autorelease]];
+		NSString *vCardFile = [dir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.vcf", [cur objectForKey:@"Caption"]]];
+		[vcard writeToFile:vCardFile atomically:YES];
+		[files addObject:vCardFile];
+		[uids addObject:[person uniqueId]];
 		
-        [titles addObject:[cur objectForKey:@"Name"]];
+		NSArray *emails = [cur objectForKey:@"EmailAddresses"];
+		if ([emails count] > 0)
+		{
+			[urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"mailto:%@",[emails objectAtIndex:0]]]];
+		}
+		else
+		{
+			[urls addObject:[NSURL fileURLWithPath:vCardFile]];
+		}
+		
+        [titles addObject:[cur objectForKey:@"Caption"]];
 	}
  	[pboard writeURLs:urls files:nil names:titles];
+	[pboard setPropertyList:[vcards componentsJoinedByString:@"\n"] forType:@"Apple VCard pasteboard type"];
+	[pboard setPropertyList:uids forType:@"ABPeopleUIDsPboardType"];
 }
+
+- (NSNumber *)imageCount
+{
+	int count;
+	if ([mySearchString length] > 0)
+	{
+		count = [myFilteredImages count];
+	}
+	else
+	{
+		count = [myImages count];
+	}
+	
+	return [NSNumber numberWithUnsignedInt:count];
+}
+
+- (void)setImageCount:(NSNumber *)count 
+{
+	// do nothing
+}
+
+#pragma mark -
+#pragma mark MUPhotoView Delegate Methods
+
+- (void)setImages:(NSArray *)images
+{
+	[myImages autorelease];
+	myImages = [images retain];
+	[self refilter];
+	//reset the scroll position
+	[oPhotoView scrollRectToVisible:NSMakeRect(0,0,1,1)];
+	[oPhotoView setNeedsDisplay:YES];
+}
+
+- (NSArray *)images
+{
+	return myImages;
+}
+
+- (unsigned)photoCountForPhotoView:(MUPhotoView *)view
+{
+	if ([mySearchString length] > 0)
+	{
+		return [myFilteredImages count];
+	}
+	return [myImages count];
+}
+
+- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
+{
+	NSDictionary *rec;
+	if ([mySearchString length] > 0)
+	{
+		rec = [myFilteredImages objectAtIndex:index];
+	}
+	else
+	{
+		rec = [myImages objectAtIndex:index];
+	}
+	//try the caches
+	NSImage *img = [rec objectForKey:@"CachedThumb"];
+	
+	if (!img) img = [rec objectForKey:@"CachedThumb"];
+	
+	if (!img)
+	{
+		NSData *iconData = [[rec objectForKey:@"ABPerson"] imageData];
+		NSImage *icon = nil;
+		
+		if (iconData)
+		{
+			icon = [[[NSImage alloc] initWithData:iconData] autorelease];
+		}
+		else
+		{
+			static NSImage *noAvatarImage = nil;
+			if (noAvatarImage)
+			{
+				NSString *imgPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"contact" ofType:@"png"];
+				noAvatarImage = [[NSImage alloc] initWithContentsOfFile:imgPath];
+			}
+			icon = noAvatarImage;
+		}
+	}
+	
+	return img;
+}
+
+- (void)photoView:(MUPhotoView *)view didSetSelectionIndexes:(NSIndexSet *)indexes
+{
+	[mySelection removeAllIndexes];
+	[mySelection addIndexes:indexes];
+}
+
+- (NSIndexSet *)selectionIndexesForPhotoView:(MUPhotoView *)view
+{
+	return mySelection;
+}
+
+- (unsigned int)photoView:(MUPhotoView *)view draggingSourceOperationMaskForLocal:(BOOL)isLocal
+{
+	return NSDragOperationCopy;
+}
+
+- (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard
+{
+	NSMutableArray *fileList = [NSMutableArray array];
+	NSMutableArray *captions = [NSMutableArray array];
+	NSMutableDictionary *iphotoData = [NSMutableDictionary dictionary];
+	
+	NSMutableArray *types = [NSMutableArray array]; 
+	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
+	[types addObject:@"ImageDataListPboardType"];
+	[pboard declareTypes:types owner:nil];
+	
+	NSDictionary *cur;
+	
+	int i;
+	for(i = 0; i < [myImages count]; i++) 
+	{
+		if ([mySelection containsIndex:i]) 
+		{
+			if ([mySearchString length] > 0)
+			{
+				cur = [myFilteredImages objectAtIndex:i];
+			}
+			else
+			{
+				cur = [myImages objectAtIndex:i];
+			}
+			[fileList addObject:[cur objectForKey:@"ImagePath"]];
+			[captions addObject:[cur objectForKey:@"Caption"]];
+			[iphotoData setObject:cur forKey:[NSNumber numberWithInt:i]];
+		}
+	}
+				
+	[pboard writeURLs:nil files:fileList names:captions];
+	[pboard setPropertyList:iphotoData forType:@"ImageDataListPboardType"];
+	
+}
+
+- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
+{
+	NSDictionary *rec;
+	if ([mySearchString length] > 0)
+	{
+		rec = [myFilteredImages objectAtIndex:index];
+	}
+	else
+	{
+		rec = [myImages objectAtIndex:index];
+	}
+	return [rec objectForKey:@"Caption"];
+}
+
 
 @end
