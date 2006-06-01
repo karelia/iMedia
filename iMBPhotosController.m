@@ -37,6 +37,11 @@ static NSImage *_missing = nil;
 
 @implementation iMBPhotosController
 
++ (void)initialize
+{
+	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+}
+
 - (id) initWithPlaylistController:(NSTreeController*)ctrl
 {
 	if (self = [super initWithPlaylistController:ctrl]) {
@@ -86,6 +91,7 @@ static NSImage *_missing = nil;
 - (void)refilter
 {
 	[mySelection removeAllIndexes];
+	[self willChangeValueForKey:@"images"];
 	[myFilteredImages removeAllObjects];
 	
 	if ([mySearchString length] == 0) return;
@@ -101,6 +107,7 @@ static NSImage *_missing = nil;
 			[myFilteredImages addObject:cur];
 		}
 	}
+	[self didChangeValueForKey:@"images"];
 }
 
 - (IBAction)search:(id)sender
@@ -182,6 +189,26 @@ static NSImage *_toolbarIcon = nil;
 	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:albums, @"List of Albums", images, @"Master Image List", nil];
 	[pboard setPropertyList:plist forType:@"AlbumDataListPboardType"];
 	
+}
+
+- (NSNumber *)imageCount
+{
+	int count;
+	if ([mySearchString length] > 0)
+	{
+		count = [myFilteredImages count];
+	}
+	else
+	{
+		count = [myImages count];
+	}
+	
+	return [NSNumber numberWithUnsignedInt:count];
+}
+
+- (void)setImageCount:(NSNumber *)count 
+{
+	// do nothing
 }
 
 #pragma mark -

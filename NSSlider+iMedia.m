@@ -23,14 +23,21 @@
  
  */
 
-#import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "NSSlider+iMedia.h"
 
-@class MUPhotoView;
 
-@interface iMBContactsController : iMBAbstractController 
+@implementation NSSlider (iMedia)
+
+- (IBAction)moveToMaximumValue:(id)sender
 {
-	IBOutlet MUPhotoView *oPhotoView;
+	[self setDoubleValue:[self maxValue]];
+	[self performClick:self];
 }
 
+- (IBAction)moveToMinimumValue:(id)sender
+{
+	[self setDoubleValue:[self minValue]];
+	[self performClick:self];
+}
+						  
 @end

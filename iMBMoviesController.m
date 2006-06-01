@@ -35,6 +35,11 @@ Please send fixes to
 
 @implementation iMBMoviesController
 
++ (void)initialize
+{
+	[iMBMoviesController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+}
+
 - (id)initWithPlaylistController:(NSTreeController*)ctrl
 {
 	if (self = [super initWithPlaylistController:ctrl]) {
@@ -79,6 +84,7 @@ Please send fixes to
 
 - (void)refilter
 {
+	[self willChangeValueForKey:@"images"];
 	[mySelection removeAllIndexes];
 	[myFilteredImages removeAllObjects];
 	
@@ -95,6 +101,7 @@ Please send fixes to
 			[myFilteredImages addObject:cur];
 		}
 	}
+	[self didChangeValueForKey:@"images"];
 }
 
 - (IBAction)search:(id)sender
@@ -104,6 +111,26 @@ Please send fixes to
 	
 	[self refilter];
 	[oPhotoView setNeedsDisplay:YES];
+}
+
+- (NSNumber *)imageCount
+{
+	int count;
+	if ([mySearchString length] > 0)
+	{
+		count = [myFilteredImages count];
+	}
+	else
+	{
+		count = [myImages count];
+	}
+	
+	return [NSNumber numberWithUnsignedInt:count];
+}
+
+- (void)setImageCount:(NSNumber *)count 
+{
+	// do nothing
 }
 
 #pragma mark -
@@ -189,6 +216,8 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)setImages:(NSArray *)images
 {
+	NSLog(@"setting %u images", [images count]);
+	NSLog(@"%@", NSStringFromRect([[oPhotoView enclosingScrollView] documentVisibleRect]));
 	[myImages autorelease];
 	myImages = [images retain];
 	[self refilter];
@@ -205,6 +234,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (unsigned)photoCountForPhotoView:(MUPhotoView *)view
 {
+	NSLog(@"returning movie count");
 	if ([mySearchString length] > 0)
 	{
 		return [myFilteredImages count];

@@ -10,6 +10,12 @@
         }, 
         {CLASS = NSObject; LANGUAGE = ObjC; }, 
         {
+            ACTIONS = {moveToMaximumValue = id; moveToMinimumValue = id; }; 
+            CLASS = NSSlider; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSControl; 
+        }, 
+        {
             CLASS = iMBAbstractController; 
             LANGUAGE = ObjC; 
             OUTLETS = {oView = NSView; }; 

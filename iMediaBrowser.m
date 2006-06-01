@@ -609,6 +609,11 @@ static NSMutableDictionary *_parsers = nil;
 	return 24;
 }
 
+- (float)splitView:(NSSplitView *)sender constrainMaxCoordinate:(float)proposedMax ofSubviewAt:(int)offset
+{
+	return NSHeight([sender frame]) - 200;
+}
+
 #pragma mark -
 #pragma mark NSToolbar Delegate Methods
 

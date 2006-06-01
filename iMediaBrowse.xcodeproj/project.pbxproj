@@ -109,6 +109,8 @@
 		79BBE52B0A282E440018CCCA /* iMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */; };
 		79CA91620A2D250400ABD1D8 /* NSIndexPath+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79CA91630A2D250400ABD1D8 /* NSIndexPath+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */; };
+		79FA0F5F0A2E7D1500461872 /* NSSlider+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 79FA0F5D0A2E7D1500461872 /* NSSlider+iMedia.h */; };
+		79FA0F600A2E7D1500461872 /* NSSlider+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 79FA0F5E0A2E7D1500461872 /* NSSlider+iMedia.m */; };
 		79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF5FF09AAE5D2000CB4B4 /* badge.png */; };
 		79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */; };
 		79FDF61709AAE5D2000CB4B4 /* MBiPhoto4Library.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60109AAE5D2000CB4B4 /* MBiPhoto4Library.png */; };
@@ -290,6 +292,8 @@
 		79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBGarageBandParser.m; sourceTree = "<group>"; };
 		79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexPath+iMedia.h"; sourceTree = "<group>"; };
 		79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSIndexPath+iMedia.m"; sourceTree = "<group>"; };
+		79FA0F5D0A2E7D1500461872 /* NSSlider+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSSlider+iMedia.h"; sourceTree = "<group>"; };
+		79FA0F5E0A2E7D1500461872 /* NSSlider+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSSlider+iMedia.m"; sourceTree = "<group>"; };
 		79FDF07F09F87B300058EB16 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		79FDF5FF09AAE5D2000CB4B4 /* badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge.png; sourceTree = "<group>"; };
 		79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MBAudioPlaying.png; sourceTree = "<group>"; };
@@ -553,6 +557,8 @@
 				79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */,
 				794C9F750A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h */,
 				794C9F760A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m */,
+				79FA0F5D0A2E7D1500461872 /* NSSlider+iMedia.h */,
+				79FA0F5E0A2E7D1500461872 /* NSSlider+iMedia.m */,
 			);
 			name = "Cocoa Extensions";
 			sourceTree = "<group>";
@@ -727,6 +733,7 @@
 				79CA91620A2D250400ABD1D8 /* NSIndexPath+iMedia.h in Headers */,
 				79A52B7E0A2D6894008D06C8 /* iMBApertureParser.h in Headers */,
 				794C9F770A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h in Headers */,
+				79FA0F5F0A2E7D1500461872 /* NSSlider+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -922,6 +929,7 @@
 				79CA91630A2D250400ABD1D8 /* NSIndexPath+iMedia.m in Sources */,
 				79A52B7F0A2D6894008D06C8 /* iMBApertureParser.m in Sources */,
 				794C9F780A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m in Sources */,
+				79FA0F600A2E7D1500461872 /* NSSlider+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

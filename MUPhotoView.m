@@ -526,7 +526,9 @@
 		{
 			unsigned lastSelectedIndex = [[self selectionIndexes] lastIndex];
 			NSRect r = [self photoRectForIndex:lastSelectedIndex];
+			r.origin.y -= photoVerticalSpacing;
 			r.size.height += photoVerticalSpacing; 
+			
 			[self scrollRectToVisible:r];
 		}
 	}
