@@ -194,21 +194,28 @@ static NSImage *_toolbarIcon = nil;
 	return @"MBQuicktime.png";
 }
 
-- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+- (void)writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	[pboard declareTypes:types owner:nil];
 	
-	NSEnumerator *e = [[playlist valueForKey:@"Movies"] objectEnumerator];
+	NSEnumerator *e = [items objectEnumerator];
 	NSDictionary *cur;
 	NSMutableArray *files = [NSMutableArray array];
+	NSMutableArray *names = [NSMutableArray array];
 	
 	while (cur = [e nextObject])
 	{
 		[files addObject:[cur objectForKey:@"ImagePath"]];
+		[names addObject:[cur objectForKey:@"Caption"]];
 	}
-	[pboard writeURLs:nil files:files names:nil];
+	[pboard writeURLs:nil files:files names:names];
+}
+
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+{
+	[self writeItems:[playlist valueForKey:@"Movies"] toPasteboard:pboard];
 }
 
 #pragma mark -

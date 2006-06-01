@@ -161,7 +161,7 @@ static NSImage *_toolbarIcon = nil;
 	[myCache removeAllObjects];
 }
 
-- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+- (void)writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *files = [NSMutableArray array];
 	NSMutableArray *captions = [NSMutableArray array];
@@ -174,9 +174,7 @@ static NSImage *_toolbarIcon = nil;
 	[types addObject:@"AlbumDataListPboardType"];
 	[pboard declareTypes:types owner:nil];
 	
-	//we store the images as an attribute in the node
-	NSArray *imageRecords = [playlist valueForKey:@"Images"];
-	NSEnumerator *e = [imageRecords objectEnumerator];
+	NSEnumerator *e = [items objectEnumerator];
 	NSDictionary *rec;
 				
 	while (rec = [e nextObject]) {
@@ -185,10 +183,14 @@ static NSImage *_toolbarIcon = nil;
 		//[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
 	}
 	[pboard writeURLs:nil files:files names:captions];
-
+	
 	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:albums, @"List of Albums", images, @"Master Image List", nil];
 	[pboard setPropertyList:plist forType:@"AlbumDataListPboardType"];
-	
+}
+
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+{
+	[self writeItems:[playlist valueForKey:@"Images"] toPasteboard:pboard];	
 }
 
 - (NSNumber *)imageCount
@@ -431,18 +433,10 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard
 {
-	NSMutableArray *fileList = [NSMutableArray array];
-	NSMutableArray *captions = [NSMutableArray array];
-	NSMutableDictionary *iphotoData = [NSMutableDictionary dictionary];
-	
-	NSMutableArray *types = [NSMutableArray array]; 
-	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
-	[types addObject:@"ImageDataListPboardType"];
-	[pboard declareTypes:types owner:nil];
-	
+	NSMutableArray *items = [NSMutableArray array];
 	NSDictionary *cur;
-	
 	int i;
+	
 	for(i = 0; i < [myImages count]; i++) 
 	{
 		if ([mySelection containsIndex:i]) 
@@ -455,15 +449,10 @@ static NSImage *_toolbarIcon = nil;
 			{
 				cur = [myImages objectAtIndex:i];
 			}
-			[fileList addObject:[cur objectForKey:@"ImagePath"]];
-			[captions addObject:[cur objectForKey:@"Caption"]];
-			[iphotoData setObject:cur forKey:[NSNumber numberWithInt:i]];
+			[items addObject:cur];
 		}
 	}
-				
-	[pboard writeURLs:nil files:fileList names:captions];
-	[pboard setPropertyList:iphotoData forType:@"ImageDataListPboardType"];
-	
+	[self writeItems:items toPasteboard:pboard];
 }
 
 - (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
