@@ -223,8 +223,6 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)setImages:(NSArray *)images
 {
-	NSLog(@"setting %u images", [images count]);
-	NSLog(@"%@", NSStringFromRect([oPhotoView visibleRect]));
 	[myImages autorelease];
 	myImages = [images retain];
 	[self refilter];

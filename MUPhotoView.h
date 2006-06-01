@@ -64,6 +64,8 @@
     NSTimer *photoResizeTimer;
     NSDate *photoResizeTime;
     BOOL isDonePhotoResizing;
+	
+	NSArray *liveResizeSubviews;
 }
 
 #pragma mark -

@@ -495,7 +495,8 @@
     [self updateGridAndFrame];
     visibleRect.origin.y = heightRatio * [self frame].size.height;
     [self scrollRectToVisible:visibleRect];
-	    
+	
+	[self viewWillStartLiveResize];
     [self setNeedsDisplayInRect:[self visibleRect]];
     
     // update time for live resizing
@@ -505,9 +506,10 @@
     }
     isDonePhotoResizing = NO;
     photoResizeTime = [[NSDate date] retain];
-    if (nil == photoResizeTimer) {
-        photoResizeTimer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(updatePhotoResizing) userInfo:nil repeats:YES];
+    if (photoResizeTimer) {
+        [photoResizeTimer invalidate];
     }
+	photoResizeTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(updatePhotoResizing) userInfo:nil repeats:YES];
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	[defaults setFloat:aPhotoSize forKey:@"MUPhotoSize"];
@@ -908,6 +910,7 @@ static NSImage *_badge = nil;
 	}
     
     mouseDown = NO;
+	mouseCurrentPoint = mouseDownPoint = NSZeroPoint;
     [self setNeedsDisplayInRect:[self visibleRect]];
 }
 
@@ -1318,8 +1321,31 @@ static NSImage *_badge = nil;
 
 @implementation MUPhotoView (PrivateAPI)
 
+// This stops the stuttering of the movie view when changing the photo sizes from the slider
+- (void)viewWillStartLiveResize
+{
+	// remove all subviews
+	liveResizeSubviews = [[NSArray arrayWithArray:[self subviews]] retain];
+	NSEnumerator *e = [liveResizeSubviews objectEnumerator];
+	NSView *cur;
+	
+	while (cur = [e nextObject])
+	{
+		[cur removeFromSuperview];
+	}
+}
+
 - (void)viewDidEndLiveResize
 {
+	NSEnumerator *e = [liveResizeSubviews objectEnumerator];
+	NSView *cur;
+	
+	while (cur = [e nextObject])
+	{
+		[self addSubview:cur];
+	}
+	[liveResizeSubviews release];
+	liveResizeSubviews = nil;
     [self setNeedsDisplayInRect:[self visibleRect]];
 }
 
@@ -1419,6 +1445,7 @@ static NSImage *_badge = nil;
         [photoResizeTimer invalidate];
         photoResizeTimer = nil;
     }
+	[self viewDidEndLiveResize];
     [self setNeedsDisplayInRect:[self visibleRect]];
 }
 
