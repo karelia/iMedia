@@ -263,6 +263,7 @@ static NSImage *_stopImage = nil;
 			_stopImage = [[NSImage alloc] initWithContentsOfFile:p];
 		}
 		[playButton setImage:_stopImage];
+		[progressIndicator setEnabled:YES];
 	}
 }
 
@@ -273,7 +274,12 @@ static NSImage *_playImage = nil;
 	[oAudioPlayer pause:self];
 	[pollTimer invalidate];
 	pollTimer = nil;
+	//change the icon back
+	[myCurrentPlayingRecord setObject:[myCurrentPlayingRecord objectForKey:@"OriginalIcon"] forKey:@"Icon"];
 	[table reloadData];
+	[progressIndicator setDoubleValue:[progressIndicator minValue]];
+	[progressIndicator setEnabled:NO];
+	[self setClockTime:@"0:00"];
 	[playButton setAction:@selector(playMovie:)];
 	[playButton setState:NSOffState];
 	if (!_playImage) {
