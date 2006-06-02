@@ -214,6 +214,8 @@ Please send fixes to
 	[podcastLib release];
 	[partyShuffleLib release];
 	
+	[root setFilterDuplicateKey:@"Location" forAttributeKey:@"Tracks"];
+	
 	return [root autorelease];
 }
 
