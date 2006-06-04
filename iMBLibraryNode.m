@@ -374,6 +374,47 @@ static NSMutableDictionary *imageCache = nil;
 	return results;
 }
 
+- (NSArray *)searchAttribute:(NSString *)key withKeys:(NSArray *)keys matching:(id)value
+{
+	NSMutableArray *results = [NSMutableArray array];
+	id attrib = [self recursiveAttributesForKey:key];
+	
+	if ([attrib isKindOfClass:[NSArray class]])
+	{
+		NSEnumerator *e = [attrib objectEnumerator];
+		id cur;
+		
+		while (cur = [e nextObject])
+		{
+			NSEnumerator *g = [keys objectEnumerator];
+			NSString *curKey;
+			
+			while (curKey = [g nextObject])
+			{
+				id keyAttrib = [cur objectForKey:curKey];
+				if ([keyAttrib isKindOfClass:[NSString class]])
+				{
+					if ([keyAttrib rangeOfString:value options:NSCaseInsensitiveSearch].location != NSNotFound)
+					{
+						[results addObject:cur];
+						break;
+					}
+				}
+				else
+				{
+					if ([keyAttrib isEqual:value])
+					{
+						[results addObject:cur];
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	return results;
+}
+
 - (id)valueForUndefinedKey:(NSString *)key
 {
 	return [self recursiveAttributesForKey:key];

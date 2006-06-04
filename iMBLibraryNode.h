@@ -62,6 +62,11 @@
 
 - (NSArray *)recursiveAttributesForKey:(NSString *)key;
 
+// search attributes (uses recursiveAttributesForKey:)
+- (NSArray *)searchAttribute:(NSString *)key withKeys:(NSArray *)keys matching:(id)value;
+
+
+// Tree support
 - (void)addItem:(iMBLibraryNode *)item;
 - (void)removeItem:(iMBLibraryNode *)item;
 - (void)insertItem:(iMBLibraryNode *)item atIndex:(unsigned)idx;

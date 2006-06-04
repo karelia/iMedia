@@ -177,6 +177,11 @@ static NSImage *_song = nil;
 #pragma mark -
 #pragma mark Interface Methods
 
+- (IBAction)search:(id)sender
+{
+	[songsController setSearchString:[sender stringValue]];
+}
+
 static NSImage *_playingIcon = nil;
 
 - (BOOL) loadAudioFile: (NSString *) urlString

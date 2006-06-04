@@ -29,14 +29,14 @@ Please send fixes to
 
 @interface iMBMusicController : iMBAbstractController
 {
-	IBOutlet NSTextField *counterField;
-	IBOutlet NSButton * playButton;
-	IBOutlet NSSlider * progressIndicator;
-	IBOutlet NSSearchField *oSearch;
-	IBOutlet NSTableView  *table;
-	IBOutlet QTMovieView *oAudioPlayer;
-	IBOutlet iMBDNDArrayController *songsController;
-	NSString *clockTime;
+	IBOutlet NSTextField			*counterField;
+	IBOutlet NSButton				*playButton;
+	IBOutlet NSSlider				*progressIndicator;
+	IBOutlet NSSearchField			*oSearch;
+	IBOutlet NSTableView			*table;
+	IBOutlet QTMovieView			*oAudioPlayer;
+	IBOutlet iMBDNDArrayController	*songsController;
+	NSString						*clockTime;
 	@private
 		NSTimer * pollTimer;
 		NSMutableDictionary *myCurrentPlayingRecord;

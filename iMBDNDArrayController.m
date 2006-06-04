@@ -134,7 +134,6 @@ static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
 - (void)search:(id)sender
 {
     [self setSearchString:[sender stringValue]];
-    [self rearrangeObjects];    
 }
 
 #pragma mark ACCESSORS
@@ -147,6 +146,7 @@ static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
     if (searchString != value) {
         [searchString release];
         searchString = [value copy];
+		[self rearrangeObjects];
     }
 }
 

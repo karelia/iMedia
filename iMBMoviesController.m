@@ -90,17 +90,10 @@ Please send fixes to
 	
 	if ([mySearchString length] == 0) return;
 	
-	NSEnumerator *e = [myImages objectEnumerator];
-	NSDictionary *cur;
+	iMBLibraryNode *selectedNode = [[[self controller] selectedObjects] lastObject];
 	
-	while (cur = [e nextObject])
-	{
-		if ([[cur objectForKey:@"Caption"] rangeOfString:mySearchString options:NSCaseInsensitiveSearch].location != NSNotFound ||
-			[[cur objectForKey:@"ImagePath"] rangeOfString:mySearchString options:NSCaseInsensitiveSearch].location != NSNotFound)
-		{
-			[myFilteredImages addObject:cur];
-		}
-	}
+	[myFilteredImages addObjectsFromArray:[selectedNode searchAttribute:@"Movies" withKeys:[NSArray arrayWithObjects:@"Caption", @"ImagePath", nil] matching:mySearchString]];
+	
 	[self didChangeValueForKey:@"images"];
 }
 

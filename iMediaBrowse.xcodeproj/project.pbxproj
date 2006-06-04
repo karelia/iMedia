@@ -101,6 +101,8 @@
 		796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ADBBF09D6562C001CF400 /* iMBAbstractController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ADBC009D6562C001CF400 /* iMBAbstractController.m */; };
 		796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796ADBE109D65986001CF400 /* CoreData.framework */; };
+		7976F3770A33A5EC00D7BA3F /* MySearchField.h in Headers */ = {isa = PBXBuildFile; fileRef = 7976F3750A33A5EC00D7BA3F /* MySearchField.h */; };
+		7976F3780A33A5EC00D7BA3F /* MySearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 7976F3760A33A5EC00D7BA3F /* MySearchField.m */; };
 		798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		798E476F0A27CD8800E0D4BC /* NSFileManager+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */; };
 		798E493D0A27E87900E0D4BC /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E493C0A27E87900E0D4BC /* WebIconDatabase.h */; };
@@ -281,6 +283,8 @@
 		796ADBBF09D6562C001CF400 /* iMBAbstractController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAbstractController.h; sourceTree = "<group>"; };
 		796ADBC009D6562C001CF400 /* iMBAbstractController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAbstractController.m; sourceTree = "<group>"; };
 		796ADBE109D65986001CF400 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		7976F3750A33A5EC00D7BA3F /* MySearchField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySearchField.h; sourceTree = "<group>"; };
+		7976F3760A33A5EC00D7BA3F /* MySearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySearchField.m; sourceTree = "<group>"; };
 		797CC96C09F872AF0063FF9B /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
 		79858F6709E3C3AB003EA241 /* contact.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = contact.png; sourceTree = "<group>"; };
 		798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+iMedia.h"; sourceTree = "<group>"; };
@@ -728,6 +732,8 @@
 				795D6F5009D35B77005F166D /* iMBLinksController.m */,
 				7903561009E3AF7B00384D08 /* iMBContactsController.h */,
 				7903561109E3AF7B00384D08 /* iMBContactsController.m */,
+				7976F3750A33A5EC00D7BA3F /* MySearchField.h */,
+				7976F3760A33A5EC00D7BA3F /* MySearchField.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -782,6 +788,7 @@
 				79A52B7E0A2D6894008D06C8 /* iMBApertureParser.h in Headers */,
 				794C9F770A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h in Headers */,
 				79FA0F5F0A2E7D1500461872 /* NSSlider+iMedia.h in Headers */,
+				7976F3770A33A5EC00D7BA3F /* MySearchField.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -984,6 +991,7 @@
 				79FA0F600A2E7D1500461872 /* NSSlider+iMedia.m in Sources */,
 				7953E6AA0A2E8BC700C7AFBB /* iMBContactsController.m in Sources */,
 				7953E6E60A2E8EC600C7AFBB /* iMBAddressBookParser.m in Sources */,
+				7976F3780A33A5EC00D7BA3F /* MySearchField.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

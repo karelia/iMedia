@@ -10,7 +10,7 @@
             SUPERCLASS = NSArrayController; 
         }, 
         {
-            ACTIONS = {playMovie = id; scrubAudio = id; stopMovie = id; }; 
+            ACTIONS = {playMovie = id; scrubAudio = id; search = id; stopMovie = id; }; 
             CLASS = iMBMusicController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
