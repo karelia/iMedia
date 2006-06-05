@@ -175,6 +175,7 @@ static NSMutableDictionary *_parsers = nil;
 - (id)init
 {
 	if (self = [super initWithWindowNibName:@"MediaBrowser"]) {
+		[QTMovie initialize];
 		id libraryItemsValueTransformer = [[[LibraryItemsValueTransformer alloc] init] autorelease];
 		[NSValueTransformer setValueTransformer:libraryItemsValueTransformer forName:@"libraryItemsValueTransformer"];
 		myBackgroundLoadingLock = [[NSLock alloc] init];

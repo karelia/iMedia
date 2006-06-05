@@ -386,7 +386,7 @@ static NSImage *_toolbarIcon = nil;
 		if (!alreadyQueued)
 		{
 			[myInFlightImageOperations addObject:imagePath];
-			if (myThreadCount < 4)
+			if (myThreadCount < [NSProcessInfo numberOfProcessors])
 			{
 				myThreadCount++;
 				[NSThread detachNewThreadSelector:@selector(backgroundLoadOfImage:)

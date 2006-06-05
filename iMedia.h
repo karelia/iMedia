@@ -47,3 +47,5 @@
 #import <iMediaBrowser/NSAttributedString+iMedia.h>
 #import <iMediaBrowser/NSIndexPath+iMedia.h>
 #import <iMediaBrowser/NSPopUpButton+iMedia.h>
+#import <iMediaBrowser/NSSlider+iMedia.h>
+#import <iMediaBrowser/NSProcessInfo+iMedia.h>

@@ -47,6 +47,8 @@
 		79353D9A0A28632D00284715 /* iMBFireFoxParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79353D980A28632D00284715 /* iMBFireFoxParser.h */; };
 		79353D9B0A28632D00284715 /* iMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79353D990A28632D00284715 /* iMBFireFoxParser.m */; };
 		79353E6D0A28754C00284715 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79353E6C0A28754C00284715 /* libcrypto.dylib */; };
+		793810480A33AC53000A65EA /* NSProcessInfo+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 793810460A33AC53000A65EA /* NSProcessInfo+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		793810490A33AC53000A65EA /* NSProcessInfo+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */; };
 		793F98D30A2ABA1F00F68FF8 /* drm_movie.png in Resources */ = {isa = PBXBuildFile; fileRef = 793F98D20A2ABA1F00F68FF8 /* drm_movie.png */; };
 		79430F0E0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79430F0C0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h */; };
 		79430F0F0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79430F0D0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m */; };
@@ -101,8 +103,6 @@
 		796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ADBBF09D6562C001CF400 /* iMBAbstractController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ADBC009D6562C001CF400 /* iMBAbstractController.m */; };
 		796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796ADBE109D65986001CF400 /* CoreData.framework */; };
-		7976F3770A33A5EC00D7BA3F /* MySearchField.h in Headers */ = {isa = PBXBuildFile; fileRef = 7976F3750A33A5EC00D7BA3F /* MySearchField.h */; };
-		7976F3780A33A5EC00D7BA3F /* MySearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 7976F3760A33A5EC00D7BA3F /* MySearchField.m */; };
 		798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		798E476F0A27CD8800E0D4BC /* NSFileManager+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */; };
 		798E493D0A27E87900E0D4BC /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E493C0A27E87900E0D4BC /* WebIconDatabase.h */; };
@@ -117,7 +117,7 @@
 		79BBE52B0A282E440018CCCA /* iMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */; };
 		79CA91620A2D250400ABD1D8 /* NSIndexPath+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79CA91630A2D250400ABD1D8 /* NSIndexPath+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */; };
-		79FA0F5F0A2E7D1500461872 /* NSSlider+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 79FA0F5D0A2E7D1500461872 /* NSSlider+iMedia.h */; };
+		79FA0F5F0A2E7D1500461872 /* NSSlider+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 79FA0F5D0A2E7D1500461872 /* NSSlider+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79FA0F600A2E7D1500461872 /* NSSlider+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 79FA0F5E0A2E7D1500461872 /* NSSlider+iMedia.m */; };
 		79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF5FF09AAE5D2000CB4B4 /* badge.png */; };
 		79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF60009AAE5D2000CB4B4 /* MBAudioPlaying.png */; };
@@ -231,6 +231,8 @@
 		79353D980A28632D00284715 /* iMBFireFoxParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBFireFoxParser.h; sourceTree = "<group>"; };
 		79353D990A28632D00284715 /* iMBFireFoxParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBFireFoxParser.m; sourceTree = "<group>"; };
 		79353E6C0A28754C00284715 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
+		793810460A33AC53000A65EA /* NSProcessInfo+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSProcessInfo+iMedia.h"; sourceTree = "<group>"; };
+		793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSProcessInfo+iMedia.m"; sourceTree = "<group>"; };
 		793F98D20A2ABA1F00F68FF8 /* drm_movie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = drm_movie.png; sourceTree = "<group>"; };
 		79430F0C0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiLifeSoundEffectsParser.h; sourceTree = "<group>"; };
 		79430F0D0A2C27D5009E0FC7 /* iMBiLifeSoundEffectsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiLifeSoundEffectsParser.m; sourceTree = "<group>"; };
@@ -283,8 +285,6 @@
 		796ADBBF09D6562C001CF400 /* iMBAbstractController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAbstractController.h; sourceTree = "<group>"; };
 		796ADBC009D6562C001CF400 /* iMBAbstractController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAbstractController.m; sourceTree = "<group>"; };
 		796ADBE109D65986001CF400 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
-		7976F3750A33A5EC00D7BA3F /* MySearchField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySearchField.h; sourceTree = "<group>"; };
-		7976F3760A33A5EC00D7BA3F /* MySearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySearchField.m; sourceTree = "<group>"; };
 		797CC96C09F872AF0063FF9B /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
 		79858F6709E3C3AB003EA241 /* contact.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = contact.png; sourceTree = "<group>"; };
 		798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+iMedia.h"; sourceTree = "<group>"; };
@@ -610,6 +610,8 @@
 				794C9F760A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m */,
 				79FA0F5D0A2E7D1500461872 /* NSSlider+iMedia.h */,
 				79FA0F5E0A2E7D1500461872 /* NSSlider+iMedia.m */,
+				793810460A33AC53000A65EA /* NSProcessInfo+iMedia.h */,
+				793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */,
 			);
 			name = "Cocoa Extensions";
 			sourceTree = "<group>";
@@ -732,8 +734,6 @@
 				795D6F5009D35B77005F166D /* iMBLinksController.m */,
 				7903561009E3AF7B00384D08 /* iMBContactsController.h */,
 				7903561109E3AF7B00384D08 /* iMBContactsController.m */,
-				7976F3750A33A5EC00D7BA3F /* MySearchField.h */,
-				7976F3760A33A5EC00D7BA3F /* MySearchField.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -788,7 +788,7 @@
 				79A52B7E0A2D6894008D06C8 /* iMBApertureParser.h in Headers */,
 				794C9F770A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h in Headers */,
 				79FA0F5F0A2E7D1500461872 /* NSSlider+iMedia.h in Headers */,
-				7976F3770A33A5EC00D7BA3F /* MySearchField.h in Headers */,
+				793810480A33AC53000A65EA /* NSProcessInfo+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -991,7 +991,7 @@
 				79FA0F600A2E7D1500461872 /* NSSlider+iMedia.m in Sources */,
 				7953E6AA0A2E8BC700C7AFBB /* iMBContactsController.m in Sources */,
 				7953E6E60A2E8EC600C7AFBB /* iMBAddressBookParser.m in Sources */,
-				7976F3780A33A5EC00D7BA3F /* MySearchField.m in Sources */,
+				793810490A33AC53000A65EA /* NSProcessInfo+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -170,37 +170,6 @@ Please send fixes to
 			[newPhotolist addObject:imageRecord];
 			[imageRecord setObject:[imageRecord objectForKey:@"ThumbPath"]forKey:@"Preview"];
 			
-			NSImage *thumb = nil;
-			NSString *thumbPath = [imageRecord objectForKey:@"ThumbPath"];
-			if (nil != thumbPath)
-			{
-				thumb = [[[NSImage alloc] initWithContentsOfFile:thumbPath] autorelease];
-			}
-			else
-			{
-				// find poster image from movie as a last resort, since it's slower
-				NSString *path = [imageRecord objectForKey:@"ImagePath"];
-				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
-				NSError *error = nil;
-				QTMovie *movie = [[QTMovie alloc] initWithAttributes:
-					[NSDictionary dictionaryWithObjectsAndKeys: 
-						ref, QTMovieDataReferenceAttribute,
-						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-						nil] error:&error];
-				thumb = [movie betterPosterImage];
-				[movie release];
-			}
-			if (thumb)
-			{
-				[imageRecord setObject:thumb forKey:@"CachedThumb"];
-			}
-			else
-			{
-				[imageRecord setObject:[[NSWorkspace sharedWorkspace]
-					iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
-										forKey:@"CachedThumb"];
-			}
-			
 			//swap the keyword index to names
 			NSArray *keywords = [imageRecord objectForKey:@"Keywords"];
 			if ([keywords count] > 0) {

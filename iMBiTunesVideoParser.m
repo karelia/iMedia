@@ -143,50 +143,6 @@
 				[[newPlaylistContent objectForKey:@"Location"] length] > 0 &&
 				[newPlaylistContent objectForKey:@"Has Video"] && [[newPlaylistContent objectForKey:@"Has Video"] boolValue]) 
 			{
-				// only add video tracks
-				NSImage *thumb = nil;
-				NSMutableDictionary *movieRec = [NSMutableDictionary dictionaryWithDictionary:newPlaylistContent];
-				NSError *error = nil;
-				NSString *path = [[NSURL URLWithString:[newPlaylistContent objectForKey:@"Location"]] path];
-				
-				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
-				QTMovie *movie = [[QTMovie alloc] initWithAttributes:
-					[NSDictionary dictionaryWithObjectsAndKeys: 
-						ref, QTMovieDataReferenceAttribute,
-						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-						nil] error:&error];
-				if (nil != movie)
-				{
-					if ([movie isDRMProtected])
-					{
-						thumb = [NSImage imageNamed:@"drm_movie"];
-					}
-					else
-					{
-						thumb = [movie betterPosterImage];
-					}
-					[movie release];
-				}
-				else
-				{
-					// Note: We'll probably get an error trying to read the thumb of a protected image.
-					if ([error code] != -2126)	// -2126 means notAllowedToSaveMovieErr .... huh?
-					{
-						NSLog(@"Error reading movie '%@': %@", path, error);
-					}
-					
-				}
-				if (thumb)
-				{
-#warning TODO: it will probably be much faster NOT to load any thumbnails until they are actually needed, THEN cache them.
-					[movieRec setObject:thumb forKey:@"CachedThumb"];
-				}
-				else
-				{
-					[movieRec setObject:[[NSWorkspace sharedWorkspace]
-								iconForAppWithBundleIdentifier:@"com.apple.quicktimeplayer"]
-								   forKey:@"CachedThumb"];
-				}
 				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Location"] forKey:@"ImagePath"];
 				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Location"] forKey:@"Preview"];
 				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Location"] forKey:@"ThumbPath"];

@@ -17,37 +17,16 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
+ 
  */
-
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
 
-@class QTMovieView, MUPhotoView;
 
-@interface iMBMoviesController : iMBAbstractController
-{
-	IBOutlet MUPhotoView	*oPhotoView;
-	IBOutlet NSSlider		*oSlider;
-	IBOutlet NSTextField	*counterField;
-	
-	@private
-	QTMovieView				*previewMovieView;
-	unsigned				movieIndex;
-	NSMutableIndexSet		*mySelection;
-	NSArray					*myImages;
-	NSMutableArray			*myFilteredImages;
-	NSString				*mySearchString;
-	NSMutableArray			*myInFlightImageOperations;
-	NSMutableSet			*myProcessingImages;
-	NSLock					*myCacheLock;
-	NSMutableDictionary		*myCache;
-	int						myThreadCount;
-}
+@interface NSProcessInfo (iMedia)
 
-- (IBAction)play:(id)sender;
-- (IBAction)search:(id)sender;
++ (int)numberOfProcessors;
 
 @end

@@ -17,37 +17,35 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
+ 
  */
 
-#import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "NSProcessInfo+iMedia.h"
+#include <stdio.h>
+#include <sys/param.h>
+#include <sys/sysctl.h>
 
-@class QTMovieView, MUPhotoView;
+@implementation NSProcessInfo (iMedia)
 
-@interface iMBMoviesController : iMBAbstractController
+// from http://www.cocoabuilder.com/archive/message/cocoa/2001/8/7/49091
+
++ (int)numberOfProcessors
 {
-	IBOutlet MUPhotoView	*oPhotoView;
-	IBOutlet NSSlider		*oSlider;
-	IBOutlet NSTextField	*counterField;
+	int mib[2];
+	size_t len;
+	int maxproc = 1;
 	
-	@private
-	QTMovieView				*previewMovieView;
-	unsigned				movieIndex;
-	NSMutableIndexSet		*mySelection;
-	NSArray					*myImages;
-	NSMutableArray			*myFilteredImages;
-	NSString				*mySearchString;
-	NSMutableArray			*myInFlightImageOperations;
-	NSMutableSet			*myProcessingImages;
-	NSLock					*myCacheLock;
-	NSMutableDictionary		*myCache;
-	int						myThreadCount;
+	mib[0] = CTL_HW;
+	mib[1] = HW_NCPU;
+	len = sizeof(maxproc);
+	if (sysctl(mib, 2, &maxproc, &len, NULL, 0) == -1) {
+		perror("could not determine number of cpus available");
+	}
+	
+	return maxproc;
 }
-
-- (IBAction)play:(id)sender;
-- (IBAction)search:(id)sender;
 
 @end

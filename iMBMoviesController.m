@@ -33,6 +33,9 @@ Please send fixes to
 - (NSString *)iconNameForPlaylist:(NSString*)name;
 @end
 
+static NSImage *_missing = nil;
+static NSImage *_placeholder = nil;
+
 @implementation iMBMoviesController
 
 + (void)initialize
@@ -45,6 +48,18 @@ Please send fixes to
 	if (self = [super initWithPlaylistController:ctrl]) {
 		mySelection = [[NSMutableIndexSet alloc] init];
 		myFilteredImages = [[NSMutableArray alloc] init];
+		myCache = [[NSMutableDictionary dictionary] retain];
+		myInFlightImageOperations = [[NSMutableArray alloc] init];
+		myProcessingImages = [[NSMutableSet set] retain];
+		myCacheLock = [[NSLock alloc] init];
+		
+		if (!_placeholder)
+		{
+			NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"placeholder" ofType:@"png"];
+			_placeholder = [[NSImage alloc] initWithContentsOfFile:path];
+			path = [[NSBundle bundleForClass:[self class]] pathForResource:@"missing_image" ofType:@"png"];
+			_missing = [[NSImage alloc] initWithContentsOfFile:path];
+		}
 		
 		[NSBundle loadNibNamed:@"Movies" owner:self];
 	}
@@ -58,6 +73,10 @@ Please send fixes to
 	[myImages release];
 	[myFilteredImages release];
 	[mySearchString release];
+	[myCache release];
+	[myProcessingImages release];
+	[myInFlightImageOperations release];
+	[myCacheLock release];
 	
 	[super dealloc];
 }
@@ -212,6 +231,110 @@ static NSImage *_toolbarIcon = nil;
 }
 
 #pragma mark -
+#pragma mark Threaded Image Loading
+
+- (NSDictionary *)recordForPath:(NSString *)path
+{
+	NSEnumerator *e = [myImages objectEnumerator];
+	NSDictionary *cur;
+	
+	while (cur = [e nextObject])
+	{
+		if ([[cur objectForKey:@"Preview"] isEqualToString:path])
+		{
+			return cur;
+		}
+	}
+	return nil;
+}
+
+- (void)backgroundLoadOfImage:(NSString *)imagePath
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	// remove ourselves out of the queue
+	[myCacheLock lock];
+	imagePath = [[myInFlightImageOperations lastObject] retain];
+	if (imagePath)
+	{
+		[myInFlightImageOperations removeObject:imagePath];
+		[myProcessingImages addObject:imagePath];
+	}
+	[myCacheLock unlock];
+	
+	NSString *thumbPath;
+	NSImage *img;
+	NSDictionary *fullResAttribs;
+	NSDictionary *rec;
+	
+	while (imagePath)
+	{
+		rec = [self recordForPath:imagePath];		
+		thumbPath = [rec objectForKey:@"ThumbPath"];
+		
+		if (thumbPath)
+		{
+			img = [[NSImage alloc] initByReferencingFile:thumbPath];
+		}
+		else
+		{
+			QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
+			NSError *error = nil;
+			QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:&error];
+			
+			if ((!movie && [error code] == -2126) || [movie isDRMProtected])
+			{
+				NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
+				img = [[NSImage alloc] initWithContentsOfFile:drmIcon];
+			}
+			else
+			{
+				img = [[movie betterPosterImage] retain];
+			}
+			[movie release];
+		}
+		
+		if (!img) // we have a bad egg... need to display a ? icon
+		{
+			img = [_missing retain];
+		}
+		
+		if (NSEqualSizes([img size], NSZeroSize))
+		{
+			img = [[[NSWorkspace sharedWorkspace] iconForFile:[rec objectForKey:@"ImagePath"]] retain];
+			[img setScalesWhenResized:YES];
+			[img setSize:NSMakeSize(128,128)];
+		}
+		
+		[myCacheLock lock];
+		if (![myCache objectForKey:imagePath])
+		{
+			[myCache setObject:img forKey:imagePath];
+			[img autorelease];
+		}		
+		
+		// get the last object in the queue because we would have scrolled and what is at the start won't be necessarily be what is displayed.
+		[myProcessingImages removeObject:imagePath];
+		[imagePath release];
+		imagePath = [[myInFlightImageOperations lastObject] retain];
+		if (imagePath)
+		{
+			[myInFlightImageOperations removeObject:imagePath];
+			[myProcessingImages addObject:imagePath];
+		}
+		[myCacheLock unlock];
+		
+		[oPhotoView performSelectorOnMainThread:@selector(setNeedsDisplay:)
+									 withObject:[NSNumber numberWithBool:YES]
+								  waitUntilDone:NO];
+	}
+	
+	myThreadCount--;
+	[pool release];
+}
+
+
+#pragma mark -
 #pragma mark MUPhotoView Delegate Methods
 
 - (void)setImages:(NSArray *)images
@@ -250,8 +373,43 @@ static NSImage *_toolbarIcon = nil;
 	{
 		rec = [myImages objectAtIndex:index];
 	}
+	//try the caches
+	[myCacheLock lock];
+	NSString *imagePath = [rec objectForKey:@"Preview"];
+	NSImage *img = [myCache objectForKey:imagePath];
+	[myCacheLock unlock];
 	
-	return [rec objectForKey:@"CachedThumb"];
+	if (!img) img = [rec objectForKey:@"CachedThumb"];
+	
+	if (!img)
+	{
+		// background load the image
+		[myCacheLock lock];
+		BOOL alreadyQueued = (([myInFlightImageOperations containsObject:imagePath]) || ([myProcessingImages containsObject:imagePath]));
+		
+		if (!alreadyQueued)
+		{
+			[myInFlightImageOperations addObject:imagePath];
+			if (myThreadCount < [NSProcessInfo numberOfProcessors])
+			{
+				myThreadCount++;
+				[NSThread detachNewThreadSelector:@selector(backgroundLoadOfImage:)
+										 toTarget:self
+									   withObject:nil];
+			}
+		}
+		else
+		{
+			//lets move it to the end of the queue so we get done next
+			[myInFlightImageOperations removeObject:imagePath];
+			[myInFlightImageOperations addObject:imagePath];
+		}
+		[myCacheLock unlock];
+		// return the place holder image
+		img = _placeholder;
+	}
+	
+	return img;
 }
 
 - (void)photoView:(MUPhotoView *)view didSetSelectionIndexes:(NSIndexSet *)indexes

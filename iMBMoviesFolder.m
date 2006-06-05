@@ -58,34 +58,10 @@ Please send fixes to
 	[newPicture setObject:filePath forKey:@"Preview"];
 	
 	[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimeInterval"];
-	//we want to cache the first frame of the movie here as we will be in a background thread
-	QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
-	NSError *error = nil;
-	QTMovie *movie = [[QTMovie alloc] initWithAttributes:
-					[NSDictionary dictionaryWithObjectsAndKeys: 
-						ref, QTMovieDataReferenceAttribute,
-						[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-						nil] error:&error];
-	NSString *cap = [movie attributeForKey:QTMovieDisplayNameAttribute];
-	if (!cap)
-	{
-		cap = [[filePath lastPathComponent] stringByDeletingPathExtension];
-	}
+	
+	NSString *cap = [[filePath lastPathComponent] stringByDeletingPathExtension];
 	[newPicture setObject:cap forKey:@"Caption"];
 				
-	NSImage *thumb; 
-	if ((!movie && [error code] == -2126) || [movie isDRMProtected])
-	{
-		NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-		NSImage *drm = [[NSImage alloc] initWithContentsOfFile:drmIcon];
-		thumb = [drm autorelease];
-	}
-	else
-	{
-		thumb = [movie betterPosterImage];
-	}
-	[newPicture setObject:thumb forKey:@"CachedThumb"];
-	[movie release];
 	return newPicture;
 }
 
@@ -117,10 +93,8 @@ Please send fixes to
 						NSMutableDictionary *rec = [self recordForMovieWithPath:cache];
 						[rec setObject:filePath forKey:@"ImagePath"];
 						[rec setObject:[filePath lastPathComponent] forKey:@"Caption"];
-						if (!NSEqualSizes([[rec objectForKey:@"CachedThumb"] size], NSZeroSize))
-						{
-							[movies addObject:rec];
-						}
+						[rec setObject:cache forKey:@"Preview"];
+						[movies addObject:rec];
 					}
 				}
 			}
