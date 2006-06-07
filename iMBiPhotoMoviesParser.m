@@ -179,7 +179,10 @@ Please send fixes to
 				
 				while (keywordKey = [keywordEnum nextObject]) {
 					NSString *actualKeyword = [keywordMap objectForKey:keywordKey];
-					[realKeywords addObject:actualKeyword];
+					if (actualKeyword)
+					{
+						[realKeywords addObject:actualKeyword];
+					}
 				}
 				
 				NSMutableDictionary *mutatedKeywordRecord = [NSMutableDictionary dictionaryWithDictionary:imageRecord];
