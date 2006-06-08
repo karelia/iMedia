@@ -162,6 +162,8 @@ static NSImage *_toolbarIcon = nil;
 		NSDictionary *song = [content objectAtIndex:[cur unsignedIntValue]];
 		NSString *locURLString = [song objectForKey:@"Location"];
 		NSURL *locURL = [NSURL URLWithString:locURLString];
+		if (!locURL)
+			locURL = [NSURL fileURLWithPath:locURLString];
 		NSString *loc = [locURL path];
 		[files addObject:loc];
 	}
