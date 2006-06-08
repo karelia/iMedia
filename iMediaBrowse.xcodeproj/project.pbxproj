@@ -1198,6 +1198,62 @@
 			};
 			name = Release;
 		};
+		DB6E07FF0A379F30005CFFB2 /* Plugin */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
+				INSTALL_PATH = "@loader_path/../Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+					"-seg1addr",
+					0xcf100000,
+				);
+				PRODUCT_NAME = iMediaBrowser;
+			};
+			name = Plugin;
+		};
+		DB6E08000A379F30005CFFB2 /* Plugin */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = iMediaBrowse_Prefix.pch;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PREBINDING = NO;
+				PRODUCT_NAME = iMediaBrowse;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Plugin;
+		};
+		DB6E08010A379F30005CFFB2 /* Plugin */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Plugin;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1206,6 +1262,7 @@
 			buildConfigurations = (
 				79167A010975255100D9EF74 /* Debug */,
 				79167A020975255100D9EF74 /* Release */,
+				DB6E07FF0A379F30005CFFB2 /* Plugin */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1215,6 +1272,7 @@
 			buildConfigurations = (
 				969656A208C6A24500F2F85C /* Debug */,
 				969656A308C6A24500F2F85C /* Release */,
+				DB6E08000A379F30005CFFB2 /* Plugin */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1224,6 +1282,7 @@
 			buildConfigurations = (
 				969656A608C6A24500F2F85C /* Debug */,
 				969656A708C6A24500F2F85C /* Release */,
+				DB6E08010A379F30005CFFB2 /* Plugin */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
