@@ -405,7 +405,7 @@ static NSMutableDictionary *_parsers = nil;
 		timer = [NSDate date];
 		iMBLibraryNode *library = [parser library];
 #if DEBUG
-		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
+		// NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
 #endif
 		if (library) // it is possible for a parser to return nil if the db for it doesn't exist
 		{
@@ -515,7 +515,7 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)setPlaylistSelection:(id)selection
 {
-	NSLog(@"%@", selection);
+	//NSLog(@"%@", selection);
 }
 
 - (id)playlistSelection

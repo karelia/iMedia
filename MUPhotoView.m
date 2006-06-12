@@ -108,6 +108,7 @@
 
 - (void)prepare
 {
+	NSLog(@"Prepare, scroll point = %@", NSStringFromPoint([self frame].origin));
 	[self scrollPoint:([self frame].origin)];
 	[self updateGridAndFrame];
 	[self setNeedsDisplayInRect:[self visibleRect]];
@@ -733,7 +734,7 @@ static NSImage *_badge = nil;
     
 	if (NSPointInRect(mouseDownPoint, photoRect)) 
 	{
-		NSLog(@"is in photo rect");
+		//NSLog(@"is in photo rect");
 		if ([self isPhotoSelectedAtIndex:clickedIndex])
 		{
 			potentialDragDrop = YES;
