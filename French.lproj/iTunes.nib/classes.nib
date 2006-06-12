@@ -2,7 +2,6 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = IMTimeFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {CLASS = MySearchField; LANGUAGE = ObjC; SUPERCLASS = NSSearchField; }, 
         {
             ACTIONS = {search = id; }; 
             CLASS = iMBDNDArrayController; 
