@@ -155,6 +155,23 @@
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXBuildStyle section */
+		CE9F118D0A39DFFE004AE4EE /* Development */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Development;
+		};
+		CE9F118E0A39DFFE004AE4EE /* Deployment */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Deployment;
+		};
+/* End PBXBuildStyle section */
+
 /* Begin PBXContainerItemProxy section */
 		791F97340975D3600071B2E0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -840,6 +857,12 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 969656A508C6A24500F2F85C /* Build configuration list for PBXProject "iMediaBrowse" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				CE9F118D0A39DFFE004AE4EE /* Development */,
+				CE9F118E0A39DFFE004AE4EE /* Deployment */,
+			);
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* iMediaBrowse */;
 			projectDirPath = "";
