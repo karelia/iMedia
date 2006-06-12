@@ -108,7 +108,7 @@
 
 - (void)prepare
 {
-	NSLog(@"Prepare, scroll point = %@", NSStringFromPoint([self frame].origin));
+	// NSLog(@"Prepare, scroll point = %@", NSStringFromPoint([self frame].origin));
 	[self scrollPoint:([self frame].origin)];
 	[self updateGridAndFrame];
 	[self setNeedsDisplayInRect:[self visibleRect]];
@@ -289,7 +289,7 @@
 - (NSArray *)photosArray
 {
     //NSLog(@"in -photosArray, returned photosArray = %@", photosArray);
-    return [[photosArray retain] autorelease]; 
+    return photosArray; // return [[photosArray retain] autorelease]; 
 }
 
 - (void)setPhotosArray:(NSArray *)aPhotosArray
@@ -1476,7 +1476,7 @@ static NSImage *_badge = nil;
         fastPhoto = [self photoAtIndex:index];
     }
     
-    return fastPhoto;
+    return fastPhoto; // return [[fastPhoto retain] autorelease];
 }
 
 
@@ -1508,7 +1508,7 @@ static NSImage *_badge = nil;
     [image setScalesWhenResized:YES];
     [image setSize:newSize];
     
-    return image;
+	return image; // return [[image retain] autorelease];	// NOTE: putting a retain/autorelease was a band-aid that helped with zombie
 }
 
 - (unsigned)photoIndexForPoint:(NSPoint)point
