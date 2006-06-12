@@ -322,12 +322,14 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		if ([myBackgroundLoadingLock tryLock])
 		{
-			//we want to save the current selection to UD
-			NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-			NSIndexPath *selection = [libraryController selectionIndexPath];
-			NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
-			[ud setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
-			
+			if (nil != mySelectedBrowser)
+			{
+				//we want to save the current selection to UD
+				NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+				NSIndexPath *selection = [libraryController selectionIndexPath];
+				NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
+				[ud setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+			}
 			if (myFlags.willChangeBrowser)
 			{
 				[myDelegate iMediaBrowser:self willChangeToBrowser:browserClassName];
@@ -338,8 +340,11 @@ static NSMutableDictionary *_parsers = nil;
 			id <iMediaBrowser>browser = [self browserForClassName:browserClassName];
 			NSView *view = [browser browserView];
 			//remove old view
-			[mySelectedBrowser didDeactivate];
-			[[mySelectedBrowser browserView] removeFromSuperview];
+			if (nil != mySelectedBrowser)
+			{
+				[mySelectedBrowser didDeactivate];
+				[[mySelectedBrowser browserView] removeFromSuperview];
+			}
 			[view setFrame:[oBrowserView bounds]];
 			[oBrowserView addSubview:[view retain]];
 			mySelectedBrowser = browser;
