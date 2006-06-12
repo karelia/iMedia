@@ -68,6 +68,8 @@
 	NSArray *liveResizeSubviews;
 }
 
+- (void)prepare;
+
 #pragma mark -
 // Delegate Methods
 #pragma mark Delegate Methods

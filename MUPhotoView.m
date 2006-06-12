@@ -106,6 +106,13 @@
 	[super dealloc];
 }
 
+- (void)prepare
+{
+	[self scrollPoint:([self frame].origin)];
+	[self updateGridAndFrame];
+	[self setNeedsDisplayInRect:[self visibleRect]];
+}
+
 #pragma mark -
 // Drawing Methods
 #pragma mark Drawing Methods

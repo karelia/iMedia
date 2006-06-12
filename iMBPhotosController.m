@@ -145,6 +145,7 @@ static NSImage *_toolbarIcon = nil;
 	  toObject:[self controller] 
 		 withKeyPath:@"selection.Images" 
 	   options:nil];
+	[oPhotoView prepare];
 	[[oPhotoView window] makeFirstResponder:oPhotoView];
 }
 
