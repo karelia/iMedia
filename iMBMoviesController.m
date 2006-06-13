@@ -252,7 +252,6 @@ static NSImage *_toolbarIcon = nil;
 - (void)backgroundLoadOfImage:(NSString *)imagePath
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
 	// remove ourselves out of the queue
 	[myCacheLock lock];
 	imagePath = [[myInFlightImageOperations lastObject] retain];
@@ -279,20 +278,30 @@ static NSImage *_toolbarIcon = nil;
 		}
 		else
 		{
-			QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
+			QTDataReference *ref;
 			NSError *error = nil;
-			QTMovie *movie = [[QTMovie alloc] initWithDataReference:ref error:&error];
+			QTMovie *movie;
 			
-			if ((!movie && [error code] == -2126) || [movie isDRMProtected])
-			{
-				NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-				img = [[NSImage alloc] initWithContentsOfFile:drmIcon];
+			@try {
+				ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
+				movie = [[QTMovie alloc] initWithDataReference:ref error:&error];
+				
+				if ((!movie && [error code] == -2126) || [movie isDRMProtected])
+				{
+					NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
+					img = [[NSImage alloc] initWithContentsOfFile:drmIcon];
+				}
+				else
+				{
+					img = [[movie betterPosterImage] retain];
+				}
+			} 
+			@catch (NSException *ex) {
+				NSLog(@"Failed to load movie: %@", imagePath);
 			}
-			else
-			{
-				img = [[movie betterPosterImage] retain];
+			@finally {
+				[movie release];
 			}
-			[movie release];
 		}
 		
 		if (!img) // we have a bad egg... need to display a ? icon
