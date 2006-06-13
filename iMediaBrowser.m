@@ -63,7 +63,7 @@ static NSMutableDictionary *_parsers = nil;
 	[self registerBrowser:NSClassFromString(@"iMBMusicController")];
 	[self registerBrowser:NSClassFromString(@"iMBMoviesController")];
 	[self registerBrowser:NSClassFromString(@"iMBLinksController")];
-	[self registerBrowser:NSClassFromString(@"iMBContactsController")];
+	//[self registerBrowser:NSClassFromString(@"iMBContactsController")];
 	
 	//find and load all plugins
 	NSArray *plugins = [iMediaBrowser findBundlesWithExtension:@"iMediaBrowser" inFolderName:@"iMediaBrowser"];
