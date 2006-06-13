@@ -108,7 +108,7 @@
 
 - (void)prepare
 {
-	//NSLog(@"Prepare, visibleRect = %@", NSStringFromRect([[self enclosingScrollView] documentVisibleRect]));
+	//NSLog(@"Prepare, visibleRect = %@", NSStringFromRect([[self enclosingScrollView] visibleRect]));
 	[self scrollPoint:([self frame].origin)];
 	[self updateGridAndFrame];
 	[self setNeedsDisplayInRect:[self visibleRect]];
@@ -1372,8 +1372,7 @@ static NSImage *_badge = nil;
 - (void)updateGridAndFrame
 {
 	[[self enclosingScrollView] reflectScrolledClipView:((NSClipView *)[self superview])];		// IMPORTANT!  OTHERWISE VIEW IS MESSED UP
-
-    
+	
 	/**** BEGIN Dimension calculations and adjustments ****/
     // TODO: I don't need to make these adjustments cases where my grid size or frame haven't changed but need to play with frame notifications to make sure I can
     //       adjust them in the correct situations
@@ -1424,9 +1423,13 @@ static NSImage *_badge = nil;
     [self setFrameSize:NSMakeSize(width, height)];
     
     /**** END Dimension calculations and adjustments ****/
-	
-	// NSLog(@"end updateGridAndView, visibleRect = %@", NSStringFromRect([[self enclosingScrollView] documentVisibleRect]));
 
+	[[self enclosingScrollView] reflectScrolledClipView:((NSClipView *)[self superview])];		// IMPORTANT!  OTHERWISE VIEW IS MESSED UP
+
+#warning FIXME : This *mysteriously* helps with the screwed up scroll/clip problems.
+	(void) [[self enclosingScrollView] documentVisibleRect];
+	
+	// NSLog(@"end updateGridAndView, documentVisibleRect = %@", NSStringFromRect([[self enclosingScrollView] documentVisibleRect]));
 }
 
 // will fetch from the internal array if not nil, from delegate otherwise
