@@ -27,7 +27,10 @@ Please send fixes to
 #import "MUPhotoView.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
-#import <Epeg/EpegWrapperPublic.h>
+
+@interface NSObject (CompilerIsHappy)
++ (NSImage *)imageWithPath:(NSString *)path boundingBox:(NSSize)boundingBox;
+@end
 
 @interface iMBPhotosController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
