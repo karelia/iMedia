@@ -103,6 +103,8 @@
 		796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ADBBF09D6562C001CF400 /* iMBAbstractController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ADBC009D6562C001CF400 /* iMBAbstractController.m */; };
 		796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796ADBE109D65986001CF400 /* CoreData.framework */; };
+		7984F0F60A3E8A40003567B3 /* Epeg.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7984F0E90A3E8A11003567B3 /* Epeg.framework */; };
+		7984F10D0A3E8AAB003567B3 /* Epeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7984F0E90A3E8A11003567B3 /* Epeg.framework */; };
 		798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		798E476F0A27CD8800E0D4BC /* NSFileManager+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */; };
 		798E493D0A27E87900E0D4BC /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E493C0A27E87900E0D4BC /* WebIconDatabase.h */; };
@@ -155,23 +157,6 @@
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXBuildStyle section */
-		CE9F118D0A39DFFE004AE4EE /* Development */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-			};
-			name = Development;
-		};
-		CE9F118E0A39DFFE004AE4EE /* Deployment */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-			};
-			name = Deployment;
-		};
-/* End PBXBuildStyle section */
-
 /* Begin PBXContainerItemProxy section */
 		791F97340975D3600071B2E0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -189,7 +174,17 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				7984F0F60A3E8A40003567B3 /* Epeg.framework in CopyFiles */,
 				791F973B0975D38A0071B2E0 /* iMediaBrowser.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		795392910A3E67C000329AA4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,6 +298,7 @@
 		796ADBC009D6562C001CF400 /* iMBAbstractController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAbstractController.m; sourceTree = "<group>"; };
 		796ADBE109D65986001CF400 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		797CC96C09F872AF0063FF9B /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7984F0E90A3E8A11003567B3 /* Epeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Epeg.framework; sourceTree = "<group>"; };
 		79858F6709E3C3AB003EA241 /* contact.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = contact.png; sourceTree = "<group>"; };
 		798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+iMedia.h"; sourceTree = "<group>"; };
 		798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+iMedia.m"; sourceTree = "<group>"; };
@@ -396,6 +392,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7984F10D0A3E8AAB003567B3 /* Epeg.framework in Frameworks */,
 				791F97380975D3750071B2E0 /* iMediaBrowser.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */,
@@ -424,6 +421,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7984F0E90A3E8A11003567B3 /* Epeg.framework */,
 				79353E6C0A28754C00284715 /* libcrypto.dylib */,
 				7903562C09E3B45F00384D08 /* AddressBook.framework */,
 				795F7AF509D4D5E5000F21B5 /* WebKit.framework */,
@@ -821,6 +819,7 @@
 				791679FA0975255000D9EF74 /* Resources */,
 				791679FB0975255000D9EF74 /* Sources */,
 				791679FC0975255000D9EF74 /* Frameworks */,
+				795392910A3E67C000329AA4 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -857,12 +856,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 969656A508C6A24500F2F85C /* Build configuration list for PBXProject "iMediaBrowse" */;
-			buildSettings = {
-			};
-			buildStyles = (
-				CE9F118D0A39DFFE004AE4EE /* Development */,
-				CE9F118E0A39DFFE004AE4EE /* Deployment */,
-			);
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* iMediaBrowse */;
 			projectDirPath = "";
@@ -1117,6 +1110,13 @@
 			baseConfigurationReference = 3C371AFC09AD501A00501C1F /* Framework Debug.xcconfig */;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../Builds/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
 				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -1132,6 +1132,7 @@
 					0xcf100000,
 				);
 				PRODUCT_NAME = iMediaBrowser;
+				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
@@ -1140,6 +1141,13 @@
 			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../Builds/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				OTHER_LDFLAGS = (
@@ -1159,6 +1167,11 @@
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -1173,7 +1186,7 @@
 				PRODUCT_NAME = iMediaBrowse;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
+				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
@@ -1185,6 +1198,11 @@
 					i386,
 				);
 				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1226,6 +1244,13 @@
 			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../Builds/Deployment\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@loader_path/../Frameworks";
 				OTHER_LDFLAGS = (
@@ -1248,6 +1273,11 @@
 					i386,
 				);
 				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

@@ -83,9 +83,6 @@
         photoResizeTimer = nil;
         photoResizeTime = [[NSDate date] retain];
         isDonePhotoResizing = YES;
-        
-        [self updateGridAndFrame];
-        
 	}
 	
 	return self;
@@ -104,14 +101,6 @@
     dragSelectedPhotoIndexes = nil;
     
 	[super dealloc];
-}
-
-- (void)prepare
-{
-	//NSLog(@"Prepare, visibleRect = %@", NSStringFromRect([[self enclosingScrollView] visibleRect]));
-	[self scrollPoint:([self frame].origin)];
-	[self updateGridAndFrame];
-	[self setNeedsDisplayInRect:[self visibleRect]];
 }
 
 #pragma mark -
@@ -208,7 +197,7 @@
         [photo drawInRect:photoRect fromRect:imageRect operation:NSCompositeSourceOver fraction:1.0];
         
 		// register the tooltip area
-		[self addToolTipRect:imageRect owner:self userData:nil];
+		//[self addToolTipRect:imageRect owner:self userData:nil];
 		
         // restore the photo's flipped status
         [photo setFlipped:isFlipped];
@@ -331,7 +320,6 @@
         }
         
         // update internal grid size, adjust height based on the new grid size
-        [self updateGridAndFrame];
         [self scrollPoint:([self frame].origin)];
         [self setNeedsDisplayInRect:[self visibleRect]];
     }
@@ -500,7 +488,6 @@
     // to make sure the same photos stay in view, get a visible photos' index, then scroll to that photo after the update
     NSRect visibleRect = [self visibleRect];
     float heightRatio = visibleRect.origin.y / [self frame].size.height;
-    [self updateGridAndFrame];
     visibleRect.origin.y = heightRatio * [self frame].size.height;
     [self scrollRectToVisible:visibleRect];
 	
@@ -611,7 +598,6 @@ static NSImage *_badge = nil;
     // update internal grid size, adjust height based on the new grid size
     NSRect visibleRect = [self visibleRect];
     float heightRatio = visibleRect.origin.y / [self frame].size.height;
-    [self updateGridAndFrame];
     visibleRect.origin.y = heightRatio * [self frame].size.height;
     [self scrollRectToVisible:visibleRect];
     [self setNeedsDisplayInRect:[self visibleRect]]; 
@@ -646,7 +632,6 @@ static NSImage *_badge = nil;
     // update internal grid size, adjust height based on the new grid size
     NSRect visibleRect = [self visibleRect];
     float heightRatio = visibleRect.origin.y / [self frame].size.height;
-    [self updateGridAndFrame];
     visibleRect.origin.y = heightRatio * [self frame].size.height;
     [self scrollRectToVisible:visibleRect];
     [self setNeedsDisplayInRect:[self visibleRect]];    
@@ -1364,15 +1349,12 @@ static NSImage *_badge = nil;
     
     if (width != frame.size.width) {
         // update internal grid size, adjust height based on the new grid size
-        [self updateGridAndFrame];
         [self setNeedsDisplayInRect:[self visibleRect]];    
     }
 }
 
 - (void)updateGridAndFrame
-{
-	[[self enclosingScrollView] reflectScrolledClipView:((NSClipView *)[self superview])];		// IMPORTANT!  OTHERWISE VIEW IS MESSED UP
-	
+{	
 	/**** BEGIN Dimension calculations and adjustments ****/
     // TODO: I don't need to make these adjustments cases where my grid size or frame haven't changed but need to play with frame notifications to make sure I can
     //       adjust them in the correct situations
@@ -1423,13 +1405,6 @@ static NSImage *_badge = nil;
     [self setFrameSize:NSMakeSize(width, height)];
     
     /**** END Dimension calculations and adjustments ****/
-
-	[[self enclosingScrollView] reflectScrolledClipView:((NSClipView *)[self superview])];		// IMPORTANT!  OTHERWISE VIEW IS MESSED UP
-
-#warning FIXME : This *mysteriously* helps with the screwed up scroll/clip problems.
-	(void) [[self enclosingScrollView] documentVisibleRect];
-	
-	// NSLog(@"end updateGridAndView, documentVisibleRect = %@", NSStringFromRect([[self enclosingScrollView] documentVisibleRect]));
 }
 
 // will fetch from the internal array if not nil, from delegate otherwise
@@ -1663,7 +1638,6 @@ static NSImage *_badge = nil;
     [remaining release];
     
     // redisplay
-    [self updateGridAndFrame];
     [self setNeedsDisplayInRect:[self visibleRect]];
 }
 

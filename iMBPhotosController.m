@@ -27,6 +27,7 @@ Please send fixes to
 #import "MUPhotoView.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
+#import <Epeg/EpegWrapperPublic.h>
 
 @interface iMBPhotosController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
@@ -145,7 +146,6 @@ static NSImage *_toolbarIcon = nil;
 	  toObject:[self controller] 
 		 withKeyPath:@"selection.Images" 
 	   options:nil];
-	[oPhotoView prepare];
 	[[oPhotoView window] makeFirstResponder:oPhotoView];
 }
 
@@ -248,7 +248,7 @@ static NSImage *_toolbarIcon = nil;
 	while (imagePath)
 	{
 		rec = [self recordForPath:imagePath];
-		
+		img = nil;
 		thumbPath = [rec objectForKey:@"ThumbPath"];
 		
 		if (thumbPath)
@@ -257,12 +257,17 @@ static NSImage *_toolbarIcon = nil;
 		}
 		else
 		{
-			fullResAttribs = [fm fileAttributesAtPath:imagePath traverseLink:YES];
-			if ([[fullResAttribs objectForKey:NSFileSize] unsignedLongLongValue] < 1048576) // 1MB
+			if ([[[imagePath pathExtension] lowercaseString] isEqualToString:@"jpg"] ||
+				[[[imagePath pathExtension] lowercaseString] isEqualToString:@"jpeg"])
 			{
-				img = [[NSImage alloc] initWithContentsOfFile:imagePath];
+				Class epeg = NSClassFromString(@"EpegWrapper");
+				if (epeg)
+				{
+					img = [[epeg imageWithPath:imagePath boundingBox:NSMakeSize(256,256)] retain];
+				}
 			}
-			else //we have to gen a thumb from the full res one
+			
+			if (!img)//we have to gen a thumb from the full res one
 			{
 				NSString *tmpFile = [NSString stringWithFormat:@"/tmp/%@.jpg", [NSString uuid]];
 				NSTask *sips = [[NSTask alloc] init];
