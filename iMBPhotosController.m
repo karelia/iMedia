@@ -158,36 +158,47 @@ static NSImage *_toolbarIcon = nil;
 	[myCache removeAllObjects];
 }
 
-- (void)writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
+- (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *files = [NSMutableArray array];
 	NSMutableArray *captions = [NSMutableArray array];
-	NSMutableArray *images = [NSMutableArray array];
-	NSMutableArray *albums = [NSMutableArray array];
+	NSMutableDictionary *images = [NSMutableDictionary dictionary];
+	NSMutableDictionary *album = [NSMutableDictionary dictionary];
+	[album setObject:@"Regular" forKey:@"Album Type"];
+	[album setObject:[NSNumber numberWithInt:1] forKey:@"AlbumId"];
+	[album setObject:albumName forKey:@"AlbumName"];
+	NSMutableArray *imageCount = [NSMutableArray array];
+	int i;
+	for (i = 1; i <= [items count]; i++)
+	{
+		[imageCount addObject:[NSNumber numberWithInt:i]];
+	}
+	[album setObject:imageCount forKey:@"KeyList"];
 	
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
-	[types addObject:@"ImageDataListPboardType"];
 	[types addObject:@"AlbumDataListPboardType"];
 	[pboard declareTypes:types owner:nil];
 	
 	NSEnumerator *e = [items objectEnumerator];
 	NSDictionary *rec;
-				
+	i = 1;
 	while (rec = [e nextObject]) {
 		[files addObject:[rec objectForKey:@"ImagePath"]];
 		[captions addObject:[rec objectForKey:@"Caption"]];
+		[images setObject:rec forKey:[NSNumber numberWithInt:i]];
+		i++;
 		//[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
 	}
 	[pboard writeURLs:nil files:files names:captions];
 	
-	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:albums, @"List of Albums", images, @"Master Image List", nil];
+	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:album], @"List of Albums", images, @"Master Image List", nil];
 	[pboard setPropertyList:plist forType:@"AlbumDataListPboardType"];
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
-	[self writeItems:[playlist valueForKey:@"Images"] toPasteboard:pboard];	
+	[self writeItems:[playlist valueForKey:@"Images"] fromAlbum:[playlist name] toPasteboard:pboard];	
 }
 
 - (NSNumber *)imageCount
@@ -454,7 +465,7 @@ static NSImage *_toolbarIcon = nil;
 			[items addObject:cur];
 		}
 	}
-	[self writeItems:items toPasteboard:pboard];
+	[self writeItems:items fromAlbum:LocalizedStringInThisBundle(@"Selection", @"Photo selection for pasteboard album name") toPasteboard:pboard];
 }
 
 - (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
