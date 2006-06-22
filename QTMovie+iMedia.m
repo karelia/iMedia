@@ -250,41 +250,6 @@ bail:
 	return NO;
 }
 
-// returns the movie's poster image - return a generic image
-// if there isn't one
-- (NSImage *)posterImage
-{
-	NSImage *moviePosterImage = nil;
-	
-	moviePosterImage = [self posterImage];
-	
-	// create a dummy poster image if none exists
-	if (nil == moviePosterImage)
-	{
-		moviePosterImage = [self currentFrameImage];
-	}
-	
-	if (!moviePosterImage) goto bail;
-	
-	// set a poster name if none exists
-	if (![moviePosterImage name])
-	{
-		NSString *aName = [self movieFileName];
-		if (aName)
-		{
-			[moviePosterImage setName:aName];
-		}
-		else
-		{
-			[moviePosterImage setName:@"<no name>"];
-		}
-	}
-	
-bail:
-		return moviePosterImage;
-}
-
-
 // convert a time value (long) to a QTTime structure
 - (void)timeToQTTime:(long)timeValue resultTime:(QTTime *)aQTTime
 {

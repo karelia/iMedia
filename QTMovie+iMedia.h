@@ -42,7 +42,6 @@
 - (void)timeToQTTime:(long)timeValue resultTime:(QTTime *)aQTTime;
 - (void)setTime:(int)timeValue;
 - (BOOL)currentTimeEqualsDuration;
-- (NSImage *)posterImage;
 - (NSString *)movieFileName;
 - (NSString *)movieFilePath;
 - (NSString *)filenameFromFullPath:(NSString *)fullPath;

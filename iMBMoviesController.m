@@ -292,7 +292,7 @@ static NSImage *_toolbarIcon = nil;
 				}
 				else
 				{
-					img = [[movie betterPosterImage] retain];
+					img = [[movie posterImage] retain];
 				}
 			} 
 			@catch (NSException *ex) {
