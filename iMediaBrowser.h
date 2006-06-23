@@ -26,6 +26,7 @@ Please send fixes to
 #import <Cocoa/Cocoa.h>
 
 @protocol iMediaBrowser;
+@class iMBLibraryNode;
 
 @interface iMediaBrowser : NSWindowController
 {
@@ -55,6 +56,8 @@ Please send fixes to
 		unsigned willUseParser: 1;
 		unsigned didUseParser: 1;
 		unsigned inSplitViewResize: 1;
+		unsigned didChangeNode: 1;
+		unsigned unused: 23;
 	} myFlags;
 }
 
@@ -110,5 +113,7 @@ extern NSString *iMediaBrowserSelectionDidChangeNotification;
 // get called back if the media browser changes
 - (void)iMediaBrowser:(iMediaBrowser *)browser willChangeToBrowser:(NSString *)browserClassname;
 - (void)iMediaBrowser:(iMediaBrowser *)browser didChangeToBrowser:(NSString *)browserClassname;
+
+- (void)iMediaBrowser:(iMediaBrowser *)browser didSelectNode:(iMBLibraryNode *)node;
 
 @end

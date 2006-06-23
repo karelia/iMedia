@@ -31,8 +31,6 @@ Please send fixes to
 #import <QuickTime/QuickTime.h>
 #import <QTKit/QTKit.h>
 
-// TJT was here -- test check in -- please remove -- anyone
-
 NSString *iMediaBrowserSelectionDidChangeNotification = @"iMediaBrowserSelectionDidChangeNotification";
 
 static iMediaBrowser *_sharedMediaBrowser = nil;
@@ -515,14 +513,12 @@ static NSMutableDictionary *_parsers = nil;
 	free (idxs);
 }
 
-- (void)setPlaylistSelection:(id)selection
+- (void)playlistSelected:(id)sender
 {
-	//NSLog(@"%@", selection);
-}
-
-- (id)playlistSelection
-{
-	return nil;
+	if (myFlags.didChangeNode)
+	{
+		[myDelegate iMediaBrowser:self didSelectNode:[oPlaylists itemAtRow:[sender selectedRow]]];
+	}
 }
 
 #pragma mark -
@@ -536,6 +532,7 @@ static NSMutableDictionary *_parsers = nil;
 	myFlags.didUseParser = [delegate respondsToSelector:@selector(iMediaBrowser:didUseMediaParser:forMediaType:)];
 	myFlags.willChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];	
 	myFlags.didChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
+	myFlags.didChangeNode = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeNode:)];
 	
 	myDelegate = delegate;	// not retained
 }
