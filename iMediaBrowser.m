@@ -517,7 +517,7 @@ static NSMutableDictionary *_parsers = nil;
 {
 	if (myFlags.didSelectNode)
 	{
-		[myDelegate iMediaBrowser:self didSelectNode:[oPlaylists itemAtRow:[sender selectedRow]]];
+		[myDelegate iMediaBrowser:self didSelectNode:[[oPlaylists itemAtRow:[sender selectedRow]] observedObject]];
 	}
 }
 
