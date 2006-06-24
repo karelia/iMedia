@@ -56,7 +56,7 @@ Please send fixes to
 		unsigned willUseParser: 1;
 		unsigned didUseParser: 1;
 		unsigned inSplitViewResize: 1;
-		unsigned didChangeNode: 1;
+		unsigned didSelectNode: 1;
 		unsigned unused: 23;
 	} myFlags;
 }

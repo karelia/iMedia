@@ -515,7 +515,7 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)playlistSelected:(id)sender
 {
-	if (myFlags.didChangeNode)
+	if (myFlags.didSelectNode)
 	{
 		[myDelegate iMediaBrowser:self didSelectNode:[oPlaylists itemAtRow:[sender selectedRow]]];
 	}
@@ -532,7 +532,7 @@ static NSMutableDictionary *_parsers = nil;
 	myFlags.didUseParser = [delegate respondsToSelector:@selector(iMediaBrowser:didUseMediaParser:forMediaType:)];
 	myFlags.willChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];	
 	myFlags.didChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
-	myFlags.didChangeNode = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeNode:)];
+	myFlags.didSelectNode = [delegate respondsToSelector:@selector(iMediaBrowser:didSelectNode:)];
 	
 	myDelegate = delegate;	// not retained
 }
