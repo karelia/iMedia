@@ -31,7 +31,7 @@ Please send fixes to
 #import <QuickTime/QuickTime.h>
 #import <QTKit/QTKit.h>
 
-NSString *iMediaBrowserSelectionDidChangeNotification = @"iMediaBrowserSelectionDidChangeNotification";
+NSString *iMediaBrowserSelectionDidChangeNotification = @"iMediaSelectionChanged";
 
 static iMediaBrowser *_sharedMediaBrowser = nil;
 static NSMutableArray *_browserClasses = nil;
@@ -209,6 +209,11 @@ static NSMutableDictionary *_parsers = nil;
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
 	myLoadedParsers = [[NSMutableDictionary alloc] init];
 	
+	if (myFlags.orientation && ![myDelegate horizontalSplitViewForMediaBrowser:self])
+	{
+		[oSplitView setVertical:YES];
+	}
+
 	myToolbar = [[NSToolbar alloc] initWithIdentifier:@"iMediaBrowserToolbar"];
 	
 	[myToolbar setAllowsUserCustomization:NO];
@@ -533,7 +538,7 @@ static NSMutableDictionary *_parsers = nil;
 	myFlags.willChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];	
 	myFlags.didChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
 	myFlags.didSelectNode = [delegate respondsToSelector:@selector(iMediaBrowser:didSelectNode:)];
-	
+	myFlags.orientation = [delegate respondsToSelector:@selector(horizontalSplitViewForMediaBrowser:)];
 	myDelegate = delegate;	// not retained
 }
 
@@ -592,20 +597,24 @@ static NSMutableDictionary *_parsers = nil;
 {
 	if (myFlags.inSplitViewResize) return; // stop possible recursion from NSSplitView
 	myFlags.inSplitViewResize = YES;
-	if([[oPlaylists enclosingScrollView] frame].size.height <= 50 && ![[oSplitView subviews] containsObject:oPlaylistPopup])
+	if (![oSplitView isVertical])
 	{
-		// select the currently selected item in the playlist
-		[oPlaylistPopup selectItemWithRepresentedObject:[[libraryController selectedObjects] lastObject]];
-		[oSplitView replaceSubview:[[oPlaylists enclosingScrollView] retain] with:oPlaylistPopup];
-		NSRect frame = [oPlaylistPopup frame];
-		frame.size.height = 24;
-		[oPlaylistPopup setFrame:frame];
+		if([[oPlaylists enclosingScrollView] frame].size.height <= 50 && ![[oSplitView subviews] containsObject:oPlaylistPopup])
+		{
+			// select the currently selected item in the playlist
+			[oPlaylistPopup selectItemWithRepresentedObject:[[libraryController selectedObjects] lastObject]];
+			[oSplitView replaceSubview:[[oPlaylists enclosingScrollView] retain] with:oPlaylistPopup];
+			NSRect frame = [oPlaylistPopup frame];
+			frame.size.height = 24;
+			[oPlaylistPopup setFrame:frame];
+		}
+		
+		if([oPlaylistPopup frame].size.height > 50 && ![[oSplitView subviews] containsObject:oPlaylists])
+		{
+			[oSplitView replaceSubview:[oPlaylistPopup retain] with:[oPlaylists enclosingScrollView]];
+		}
 	}
 	
-	if([oPlaylistPopup frame].size.height > 50 && ![[oSplitView subviews] containsObject:oPlaylists])
-	{
-		[oSplitView replaceSubview:[oPlaylistPopup retain] with:[oPlaylists enclosingScrollView]];
-	}
 	myFlags.inSplitViewResize = NO;
 }
 
@@ -616,7 +625,10 @@ static NSMutableDictionary *_parsers = nil;
 
 - (float)splitView:(NSSplitView *)sender constrainMaxCoordinate:(float)proposedMax ofSubviewAt:(int)offset
 {
-	return NSHeight([sender frame]) - 200;
+	if (![sender isVertical])
+		return NSHeight([sender frame]) - 200;
+	else
+		return NSWidth([sender frame]) - 200;
 }
 
 #pragma mark -

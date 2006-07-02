@@ -57,7 +57,8 @@ Please send fixes to
 		unsigned didUseParser: 1;
 		unsigned inSplitViewResize: 1;
 		unsigned didSelectNode: 1;
-		unsigned unused: 23;
+		unsigned orientation: 1;
+		unsigned unused: 22;
 	} myFlags;
 }
 
@@ -79,7 +80,7 @@ Please send fixes to
 - (void)setDelegate:(id)delegate;
 - (id)delegate;
 
--(void)setPreferredBrowserTypes:(NSArray*)types;
+-(void)setPreferredBrowserTypes:(NSArray *)types;
 
 -(id<iMediaBrowser>)selectedBrowser;
 
@@ -115,5 +116,7 @@ extern NSString *iMediaBrowserSelectionDidChangeNotification;
 - (void)iMediaBrowser:(iMediaBrowser *)browser didChangeToBrowser:(NSString *)browserClassname;
 
 - (void)iMediaBrowser:(iMediaBrowser *)browser didSelectNode:(iMBLibraryNode *)node;
+
+- (BOOL)horizontalSplitViewForMediaBrowser:(iMediaBrowser *)browser;
 
 @end

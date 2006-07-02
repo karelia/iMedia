@@ -178,6 +178,7 @@ static NSImage *_toolbarIcon = nil;
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	[types addObject:@"AlbumDataListPboardType"];
+	[types addObject:@"ImageDataListPboardType"];
 	[pboard declareTypes:types owner:nil];
 	
 	NSEnumerator *e = [items objectEnumerator];
@@ -186,14 +187,18 @@ static NSImage *_toolbarIcon = nil;
 	while (rec = [e nextObject]) {
 		[files addObject:[rec objectForKey:@"ImagePath"]];
 		[captions addObject:[rec objectForKey:@"Caption"]];
-		[images setObject:rec forKey:[NSNumber numberWithInt:i]];
+		NSMutableDictionary *copy = [rec mutableCopy];
+		[copy removeObjectForKey:@"CachedThumb"];
+		[images setObject:copy forKey:[NSNumber numberWithInt:i]];
+		[copy release];
 		i++;
 		//[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
 	}
 	[pboard writeURLs:nil files:files names:captions];
 	
 	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:album], @"List of Albums", images, @"Master Image List", nil];
-	[pboard setPropertyList:plist forType:@"AlbumDataListPboardType"];
+	[pboard setString:[plist description] forType:@"AlbumDataListPboardType"];
+	[pboard setString:[images description] forType:@"ImageDataListPboardType"];
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
@@ -219,6 +224,22 @@ static NSImage *_toolbarIcon = nil;
 - (void)setImageCount:(NSNumber *)count 
 {
 	// do nothing
+}
+
+- (NSArray *)selectedRecords
+{
+	NSMutableArray *records = [NSMutableArray array];
+	int i, c = [myImages count];
+	
+	for (i = 0; i < c; i++)
+	{
+		if ([mySelection containsIndex:i])
+		{
+			[records addObject:[myImages objectAtIndex:i]];
+		}
+	}
+	
+	return records;
 }
 
 #pragma mark -
@@ -432,6 +453,23 @@ static NSImage *_toolbarIcon = nil;
 {
 	[mySelection removeAllIndexes];
 	[mySelection addIndexes:indexes];
+	
+	NSArray *selection = [self selectedRecords];
+	NSEvent *evt = [NSApp currentEvent];
+	NSDictionary *d = [NSDictionary dictionaryWithObjectsAndKeys:selection, @"records", evt, @"event", nil];
+	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDidChangeNotification
+														object:self
+													  userInfo:d];
+}
+
+- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index withFrame:(NSRect)frame
+{
+	NSArray *selection = [self selectedRecords];
+	NSEvent *evt = [NSApp currentEvent];
+	NSDictionary *d = [NSDictionary dictionaryWithObjectsAndKeys:selection, @"records", evt, @"event", nil];
+	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDidChangeNotification
+														object:self
+													  userInfo:d];
 }
 
 - (NSIndexSet *)selectionIndexesForPhotoView:(MUPhotoView *)view
