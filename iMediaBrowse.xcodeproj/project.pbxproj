@@ -360,6 +360,20 @@
 		CE8FC1470A2C0AA600179BA3 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Movies.nib; sourceTree = "<group>"; };
 		CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QTMovie+iMedia.h"; sourceTree = "<group>"; };
 		CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QTMovie+iMedia.m"; sourceTree = "<group>"; };
+		CEDE18CB0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/iPhoto.nib; sourceTree = "<group>"; };
+		CEDE18CC0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/iTunes.nib; sourceTree = "<group>"; };
+		CEDE18CD0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/Links.nib; sourceTree = "<group>"; };
+		CEDE18CE0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEDE18CF0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		CEDE18D00A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CEDE18D10A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/Movies.nib; sourceTree = "<group>"; };
+		CEDE18D20A5C69B40055352C /* Danish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Danish; path = Danish.lproj/iPhoto.nib; sourceTree = "<group>"; };
+		CEDE18D30A5C69B40055352C /* Danish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Danish; path = Danish.lproj/iTunes.nib; sourceTree = "<group>"; };
+		CEDE18D40A5C69B40055352C /* Danish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Danish; path = Danish.lproj/Links.nib; sourceTree = "<group>"; };
+		CEDE18D50A5C69B40055352C /* Danish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Danish; path = Danish.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEDE18D60A5C69B40055352C /* Danish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Danish; path = Danish.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		CEDE18D70A5C69B40055352C /* Danish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Danish; path = Danish.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CEDE18D80A5C69B40055352C /* Danish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Danish; path = Danish.lproj/Movies.nib; sourceTree = "<group>"; };
 		CEE09FE609ED9930004850FB /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		CEE09FE809ED9938004850FB /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/iTunes.nib; sourceTree = "<group>"; };
 		CEE09FEA09ED9958004850FB /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Links.nib; sourceTree = "<group>"; };
@@ -857,6 +871,14 @@
 			isa = PBXProject;
 			buildConfigurationList = 969656A508C6A24500F2F85C /* Build configuration list for PBXProject "iMediaBrowse" */;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				zh_TW,
+				Danish,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* iMediaBrowse */;
 			projectDirPath = "";
 			targets = (
@@ -1036,6 +1058,8 @@
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
 				CEE09FE609ED9930004850FB /* French */,
+				CEDE18D00A5C69AE0055352C /* zh_TW */,
+				CEDE18D70A5C69B40055352C /* Danish */,
 			);
 			name = MediaBrowser.nib;
 			sourceTree = "<group>";
@@ -1045,6 +1069,8 @@
 			children = (
 				3C3A131D09EAFB8100AF41BF /* English */,
 				797CC96C09F872AF0063FF9B /* French */,
+				CEDE18CE0A5C69AE0055352C /* zh_TW */,
+				CEDE18D50A5C69B40055352C /* Danish */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1062,6 +1088,8 @@
 			children = (
 				791F97640975D4970071B2E0 /* English */,
 				79FDF07F09F87B300058EB16 /* French */,
+				CEDE18CF0A5C69AE0055352C /* zh_TW */,
+				CEDE18D60A5C69B40055352C /* Danish */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1071,6 +1099,8 @@
 			children = (
 				791F97A30975DA170071B2E0 /* English */,
 				CEE09FE809ED9938004850FB /* French */,
+				CEDE18CC0A5C69AE0055352C /* zh_TW */,
+				CEDE18D30A5C69B40055352C /* Danish */,
 			);
 			name = iTunes.nib;
 			sourceTree = "<group>";
@@ -1080,6 +1110,8 @@
 			children = (
 				7990CDF109D772FF00AD74BA /* English */,
 				CEE09FEA09ED9958004850FB /* French */,
+				CEDE18CD0A5C69AE0055352C /* zh_TW */,
+				CEDE18D40A5C69B40055352C /* Danish */,
 			);
 			name = Links.nib;
 			sourceTree = "<group>";
@@ -1089,6 +1121,8 @@
 			children = (
 				791F99380976023F0071B2E0 /* English */,
 				CE8FC1420A2C0A9B00179BA3 /* French */,
+				CEDE18CB0A5C69AE0055352C /* zh_TW */,
+				CEDE18D20A5C69B40055352C /* Danish */,
 			);
 			name = iPhoto.nib;
 			sourceTree = "<group>";
@@ -1098,6 +1132,8 @@
 			children = (
 				791F9A6E097628DF0071B2E0 /* English */,
 				CE8FC1470A2C0AA600179BA3 /* French */,
+				CEDE18D10A5C69AE0055352C /* zh_TW */,
+				CEDE18D80A5C69B40055352C /* Danish */,
 			);
 			name = Movies.nib;
 			sourceTree = "<group>";

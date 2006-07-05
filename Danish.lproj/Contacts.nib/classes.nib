@@ -1,0 +1,28 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {takePhotoSizeFrom = id; }; 
+            CLASS = MUPhotoView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {delegate = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            CLASS = iMBAbstractController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oView = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {search = id; }; 
+            CLASS = iMBContactsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
+            SUPERCLASS = iMBAbstractController; 
+        }, 
+        {CLASS = iMBPhotoView; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }
+    ); 
+    IBVersion = 1; 
+}

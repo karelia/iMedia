@@ -1,0 +1,54 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = IMTimeFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {search = id; }; 
+            CLASS = iMBDNDArrayController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {myDelegate = id; newObject = id; tableView = NSTableView; }; 
+            SUPERCLASS = NSArrayController; 
+        }, 
+        {
+            ACTIONS = {playMovie = id; scrubAudio = id; search = id; stopMovie = id; }; 
+            CLASS = iMBMusicController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                clockDisplay = NSTextField; 
+                counterField = NSTextField; 
+                oAudioPlayer = QTMovieView; 
+                oSearch = NSSearchField; 
+                oView = NSView; 
+                playButton = NSButton; 
+                progressIndicator = NSSlider; 
+                songsController = iMBDNDArrayController; 
+                table = NSTableView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                playMovie = id; 
+                scrubAudio = id; 
+                search = id; 
+                songSelected = id; 
+                stopMovie = id; 
+            }; 
+            CLASS = tunesPlaylistController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                clockDisplay = NSTextField; 
+                counterField = NSTextField; 
+                mySelectedPlaylist = id; 
+                oAudioPlayer = QTMovieView; 
+                oSearch = NSSearchField; 
+                oView = NSView; 
+                playButton = NSButton; 
+                progressIndicator = NSSlider; 
+                table = NSTableView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
