@@ -358,6 +358,14 @@
 		CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPasteboard+iMedia.m"; sourceTree = "<group>"; };
 		CE8FC1420A2C0A9B00179BA3 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		CE8FC1470A2C0AA600179BA3 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Movies.nib; sourceTree = "<group>"; };
+		CEA9AF9B0A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/Contacts.nib; sourceTree = "<group>"; };
+		CEA9AF9C0A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/iPhoto.nib; sourceTree = "<group>"; };
+		CEA9AF9D0A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/iTunes.nib; sourceTree = "<group>"; };
+		CEA9AF9E0A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/Links.nib; sourceTree = "<group>"; };
+		CEA9AF9F0A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEA9AFA00A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		CEA9AFA10A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CEA9AFA20A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/Movies.nib; sourceTree = "<group>"; };
 		CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QTMovie+iMedia.h"; sourceTree = "<group>"; };
 		CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QTMovie+iMedia.m"; sourceTree = "<group>"; };
 		CEDE18CB0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/iPhoto.nib; sourceTree = "<group>"; };
@@ -1060,6 +1068,7 @@
 				CEE09FE609ED9930004850FB /* French */,
 				CEDE18D00A5C69AE0055352C /* zh_TW */,
 				CEDE18D70A5C69B40055352C /* Danish */,
+				CEA9AFA10A64214900855897 /* Japanese */,
 			);
 			name = MediaBrowser.nib;
 			sourceTree = "<group>";
@@ -1071,6 +1080,7 @@
 				797CC96C09F872AF0063FF9B /* French */,
 				CEDE18CE0A5C69AE0055352C /* zh_TW */,
 				CEDE18D50A5C69B40055352C /* Danish */,
+				CEA9AF9F0A64214900855897 /* Japanese */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1079,6 +1089,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				7903561D09E3B17A00384D08 /* English */,
+				CEA9AF9B0A64214900855897 /* Japanese */,
 			);
 			name = Contacts.nib;
 			sourceTree = "<group>";
@@ -1090,6 +1101,7 @@
 				79FDF07F09F87B300058EB16 /* French */,
 				CEDE18CF0A5C69AE0055352C /* zh_TW */,
 				CEDE18D60A5C69B40055352C /* Danish */,
+				CEA9AFA00A64214900855897 /* Japanese */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1101,6 +1113,7 @@
 				CEE09FE809ED9938004850FB /* French */,
 				CEDE18CC0A5C69AE0055352C /* zh_TW */,
 				CEDE18D30A5C69B40055352C /* Danish */,
+				CEA9AF9D0A64214900855897 /* Japanese */,
 			);
 			name = iTunes.nib;
 			sourceTree = "<group>";
@@ -1112,6 +1125,7 @@
 				CEE09FEA09ED9958004850FB /* French */,
 				CEDE18CD0A5C69AE0055352C /* zh_TW */,
 				CEDE18D40A5C69B40055352C /* Danish */,
+				CEA9AF9E0A64214900855897 /* Japanese */,
 			);
 			name = Links.nib;
 			sourceTree = "<group>";
@@ -1123,6 +1137,7 @@
 				CE8FC1420A2C0A9B00179BA3 /* French */,
 				CEDE18CB0A5C69AE0055352C /* zh_TW */,
 				CEDE18D20A5C69B40055352C /* Danish */,
+				CEA9AF9C0A64214900855897 /* Japanese */,
 			);
 			name = iPhoto.nib;
 			sourceTree = "<group>";
@@ -1134,6 +1149,7 @@
 				CE8FC1470A2C0AA600179BA3 /* French */,
 				CEDE18D10A5C69AE0055352C /* zh_TW */,
 				CEDE18D80A5C69B40055352C /* Danish */,
+				CEA9AFA20A64214900855897 /* Japanese */,
 			);
 			name = Movies.nib;
 			sourceTree = "<group>";
