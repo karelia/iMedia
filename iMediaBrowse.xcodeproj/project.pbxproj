@@ -297,7 +297,7 @@
 		796ADBBF09D6562C001CF400 /* iMBAbstractController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAbstractController.h; sourceTree = "<group>"; };
 		796ADBC009D6562C001CF400 /* iMBAbstractController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAbstractController.m; sourceTree = "<group>"; };
 		796ADBE109D65986001CF400 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
-		797CC96C09F872AF0063FF9B /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
+		797CC96C09F872AF0063FF9B /* French */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7984F0E90A3E8A11003567B3 /* Epeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Epeg.framework; sourceTree = "<group>"; };
 		79858F6709E3C3AB003EA241 /* contact.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = contact.png; sourceTree = "<group>"; };
 		798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+iMedia.h"; sourceTree = "<group>"; };
