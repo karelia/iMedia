@@ -264,11 +264,11 @@ static NSImage *_toolbarIcon = nil;
 	NSString *thumbPath;
 	NSImage *img;
 	NSDictionary *fullResAttribs;
-	NSDictionary *rec;
+	NSMutableDictionary *rec;
 	
 	while (imagePath)
 	{
-		rec = [self recordForPath:imagePath];		
+		rec = (NSMutableDictionary *)[self recordForPath:imagePath];		
 		thumbPath = [rec objectForKey:@"ThumbPath"];
 		
 		if (thumbPath)
@@ -277,13 +277,11 @@ static NSImage *_toolbarIcon = nil;
 		}
 		else
 		{
-			QTDataReference *ref;
 			NSError *error = nil;
 			QTMovie *movie;
 			
 			@try {
-				ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
-				movie = [[QTMovie alloc] initWithDataReference:ref error:&error];
+				movie = [rec objectForKey:@"qtmovie"];
 				
 				if ((!movie && [error code] == -2126) || [movie isDRMProtected])
 				{
@@ -299,7 +297,7 @@ static NSImage *_toolbarIcon = nil;
 				NSLog(@"Failed to load movie: %@", imagePath);
 			}
 			@finally {
-				[movie release];
+				[rec removeObjectForKey:@"qtmovie"];
 			}
 		}
 		
@@ -373,7 +371,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
 {
-	NSDictionary *rec;
+	NSMutableDictionary *rec;
 	if ([mySearchString length] > 0)
 	{
 		rec = [myFilteredImages objectAtIndex:index];
@@ -398,6 +396,9 @@ static NSImage *_toolbarIcon = nil;
 		
 		if (!alreadyQueued)
 		{
+			QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
+			QTMovie *mov = [QTMovie movieWithDataReference:ref error:nil];
+			[rec setObject:mov forKey:@"qtmovie"];
 			[myInFlightImageOperations addObject:imagePath];
 			if (myThreadCount < [NSProcessInfo numberOfProcessors])
 			{
