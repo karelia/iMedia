@@ -293,6 +293,17 @@ static NSMutableDictionary *_parsers = nil;
 											 selector:@selector(appWillQuit:)
 												 name:NSApplicationWillTerminateNotification
 											   object:nil];
+	
+	//set the splitview size
+	NSArray *sizes = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMBSplitViewSize"];
+	if (sizes)
+	{
+		NSRect rect = NSRectFromString([sizes objectAtIndex:0]);
+		[[[oSplitView subviews] objectAtIndex:0] setFrame:rect];
+		rect = NSRectFromString([sizes objectAtIndex:1]);
+		[[[oSplitView subviews] objectAtIndex:1] setFrame:rect];
+		[oSplitView setNeedsDisplay:YES];
+	}
 }
 
 - (void)appWillQuit:(NSNotification *)notification
@@ -302,6 +313,7 @@ static NSMutableDictionary *_parsers = nil;
 	NSIndexPath *selection = [libraryController selectionIndexPath];
 	NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
 	[ud setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+	[ud setObject:[NSArray arrayWithObjects:NSStringFromRect([oPlaylists frame]), NSStringFromRect([oBrowserView frame]), nil] forKey:@"iMBSplitViewSize"];
 	[ud synchronize];
 }
 
@@ -614,7 +626,6 @@ static NSMutableDictionary *_parsers = nil;
 			[oSplitView replaceSubview:[oPlaylistPopup retain] with:[oPlaylists enclosingScrollView]];
 		}
 	}
-	
 	myFlags.inSplitViewResize = NO;
 }
 
