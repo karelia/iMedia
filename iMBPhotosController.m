@@ -44,6 +44,7 @@ static NSImage *_missing = nil;
 + (void)initialize
 {
 	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:@"UseEpeg"]];
 }
 
 - (id) initWithPlaylistController:(NSTreeController*)ctrl
@@ -279,6 +280,7 @@ static NSImage *_toolbarIcon = nil;
 	NSImage *img;
 	NSDictionary *fullResAttribs;
 	NSDictionary *rec;
+	BOOL useEpeg = [[NSUserDefaults standardUserDefaults] boolForKey:@"UseEpeg"];
 	 
 	while (imagePath)
 	{
@@ -292,8 +294,9 @@ static NSImage *_toolbarIcon = nil;
 		}
 		else
 		{
-			if ([[[imagePath pathExtension] lowercaseString] isEqualToString:@"jpg"] ||
-				[[[imagePath pathExtension] lowercaseString] isEqualToString:@"jpeg"])
+			if (useEpeg && 
+				([[[imagePath pathExtension] lowercaseString] isEqualToString:@"jpg"] ||
+				 [[[imagePath pathExtension] lowercaseString] isEqualToString:@"jpeg"]))
 			{
 				Class epeg = NSClassFromString(@"EpegWrapper");
 				if (epeg)
