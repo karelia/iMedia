@@ -5,6 +5,7 @@
 	<key>IBPaletteDependency</key>
 	<array>
 		<string>QTKit</string>
+		<string>Controllers</string>
 	</array>
 </dict>
 </plist>
