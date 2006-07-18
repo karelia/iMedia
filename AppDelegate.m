@@ -47,7 +47,23 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	iMediaBrowser *browser = [iMediaBrowser sharedBrowser];
+	[browser setDelegate:self];
 	[browser showWindow:self];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(mediaSelectionChanged:)
+												 name:iMediaBrowserSelectionDidChangeNotification
+											   object:nil];
+}
+
+- (void)iMediaBrowser:(iMediaBrowser *)browser didSelectNode:(iMBLibraryNode *)node
+{
+	NSLog(@"%@", node);
+}
+
+- (void)mediaSelectionChanged:(NSNotification *)n
+{
+	NSLog(@"selection changed:\n%@", [n userInfo]);
 }
 
 @end

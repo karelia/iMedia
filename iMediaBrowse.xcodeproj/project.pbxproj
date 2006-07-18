@@ -255,6 +255,13 @@
 		794835F40A2709AD007E8268 /* MUPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MUPhotoView.m; sourceTree = "<group>"; };
 		794C9F750A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPopUpButton+iMedia.h"; sourceTree = "<group>"; };
 		794C9F760A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPopUpButton+iMedia.m"; sourceTree = "<group>"; };
+		79500A130A6D8F5D008A0D8A /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/Localizable.strings; sourceTree = "<group>"; };
+		79500A160A6D8FB5008A0D8A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		79500A1A0A6D8FE2008A0D8A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/iTunes.nib; sourceTree = "<group>"; };
+		79500A1D0A6D8FEA008A0D8A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/iPhoto.nib; sourceTree = "<group>"; };
+		79500A200A6D8FF1008A0D8A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/Movies.nib; sourceTree = "<group>"; };
+		79500A230A6D8FF7008A0D8A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/Links.nib; sourceTree = "<group>"; };
+		79500A260A6D9001008A0D8A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/Contacts.nib; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
 		7953E6BC0A2E8DC600C7AFBB /* ABGroup.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ABGroup.png; sourceTree = "<group>"; };
 		7956049309D78F9F00BF1DA5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -1065,6 +1072,7 @@
 				CEDE18D00A5C69AE0055352C /* zh_TW */,
 				CEDE18D70A5C69B40055352C /* Danish */,
 				CEA9AFA10A64214900855897 /* Japanese */,
+				79500A160A6D8FB5008A0D8A /* German */,
 			);
 			name = MediaBrowser.nib;
 			sourceTree = "<group>";
@@ -1077,6 +1085,7 @@
 				CEDE18CE0A5C69AE0055352C /* zh_TW */,
 				CEDE18D50A5C69B40055352C /* Danish */,
 				CEA9AF9F0A64214900855897 /* Japanese */,
+				79500A130A6D8F5D008A0D8A /* German */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1086,6 +1095,7 @@
 			children = (
 				7903561D09E3B17A00384D08 /* English */,
 				CEA9AF9B0A64214900855897 /* Japanese */,
+				79500A260A6D9001008A0D8A /* German */,
 			);
 			name = Contacts.nib;
 			sourceTree = "<group>";
@@ -1106,6 +1116,7 @@
 				CEDE18CC0A5C69AE0055352C /* zh_TW */,
 				CEDE18D30A5C69B40055352C /* Danish */,
 				CEA9AF9D0A64214900855897 /* Japanese */,
+				79500A1A0A6D8FE2008A0D8A /* German */,
 			);
 			name = iTunes.nib;
 			sourceTree = "<group>";
@@ -1118,6 +1129,7 @@
 				CEDE18CD0A5C69AE0055352C /* zh_TW */,
 				CEDE18D40A5C69B40055352C /* Danish */,
 				CEA9AF9E0A64214900855897 /* Japanese */,
+				79500A230A6D8FF7008A0D8A /* German */,
 			);
 			name = Links.nib;
 			sourceTree = "<group>";
@@ -1130,6 +1142,7 @@
 				CEDE18CB0A5C69AE0055352C /* zh_TW */,
 				CEDE18D20A5C69B40055352C /* Danish */,
 				CEA9AF9C0A64214900855897 /* Japanese */,
+				79500A1D0A6D8FEA008A0D8A /* German */,
 			);
 			name = iPhoto.nib;
 			sourceTree = "<group>";
@@ -1142,6 +1155,7 @@
 				CEDE18D10A5C69AE0055352C /* zh_TW */,
 				CEDE18D80A5C69B40055352C /* Danish */,
 				CEA9AFA20A64214900855897 /* Japanese */,
+				79500A200A6D8FF1008A0D8A /* German */,
 			);
 			name = Movies.nib;
 			sourceTree = "<group>";
