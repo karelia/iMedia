@@ -266,7 +266,7 @@ static NSMutableDictionary *_parsers = nil;
 	if ([myMediaBrowsers count] > 0) {
 		//see if the last selected browser is in user defaults
 		NSString *lastmySelectedBrowser = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowsermySelectedBrowser"];
-		if (lastmySelectedBrowser)
+		if (lastmySelectedBrowser && [myMediaBrowsers containsObject:lastmySelectedBrowser])
 		{
 			[myToolbar setSelectedItemIdentifier:lastmySelectedBrowser];
 			[self showMediaBrowser:lastmySelectedBrowser];

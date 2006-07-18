@@ -148,7 +148,7 @@ static NSImage *_toolbarIcon = nil;
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
-	//[types addObject:@"ImageDataListPboardType"];
+	[types addObject:@"CorePasteboardFlavorType 0x6974756E"];
 	
 	[pboard declareTypes:types owner:nil];
 	
@@ -160,6 +160,9 @@ static NSImage *_toolbarIcon = nil;
 	while (cur = [e nextObject])
 	{
 		NSDictionary *song = [content objectAtIndex:[cur unsignedIntValue]];
+		NSData *data = [NSArchiver archivedDataWithRootObject:song];
+		[pboard setData:data forType:@"CorePasteboardFlavorType 0x6974756E"];
+		
 		NSString *locURLString = [song objectForKey:@"Location"];
 		NSURL *locURL = [NSURL URLWithString:locURLString];
 		if (!locURL)

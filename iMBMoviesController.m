@@ -282,7 +282,7 @@ static NSImage *_toolbarIcon = nil;
 			
 			@try {
 				movie = [rec objectForKey:@"qtmovie"];
-				
+//				movie = [[QTMovie alloc] initWithFile:imagePath error:&error];
 				if ((!movie && [error code] == -2126) || [movie isDRMProtected])
 				{
 					NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
