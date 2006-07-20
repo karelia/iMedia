@@ -27,6 +27,15 @@
 
 @implementation iMBMusicFolder
 
++ (void)load
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
+	
+	[pool release];
+}
+
 - (id)init
 {
 	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingPathComponent:@"Music"]])
