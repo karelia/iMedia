@@ -51,3 +51,17 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 	[browser showWindow:self];
 }
 @end
+
+@interface iMBApplication : NSApplication
+{
+	
+}
+@end
+
+@implementation iMBApplication
++ (NSString *)applicationIdentifier
+{
+	return @"com.dlsxtreme.imb.demo";
+}
+@end
+

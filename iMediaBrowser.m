@@ -179,6 +179,17 @@ static NSMutableDictionary *_parsers = nil;
 		id libraryItemsValueTransformer = [[[LibraryItemsValueTransformer alloc] init] autorelease];
 		[NSValueTransformer setValueTransformer:libraryItemsValueTransformer forName:@"libraryItemsValueTransformer"];
 		myBackgroundLoadingLock = [[NSLock alloc] init];
+		Class cls = NSClassFromString([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPrincipalClass"]);
+		if ([cls respondsToSelector:@selector(applicationIdentifier)])
+		{
+			myFlags.unused = 1;
+		}
+		else
+		{
+			myFlags.unused = 0;
+			[self release];
+			return nil;
+		}
 	}
 	return self;
 }
