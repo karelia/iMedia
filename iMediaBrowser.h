@@ -80,9 +80,11 @@ Please send fixes to
 - (void)setDelegate:(id)delegate;
 - (id)delegate;
 
--(void)setPreferredBrowserTypes:(NSArray *)types;
+- (void)setPreferredBrowserTypes:(NSArray *)types;
 
--(id<iMediaBrowser>)selectedBrowser;
+- (id<iMediaBrowser>)selectedBrowser;
+
+- (NSArray *)searchSelectedBrowserNodeAttribute:(NSString *)nodeKey forKey:(NSString *)key matching:(NSString *)value;
 
 @end
 

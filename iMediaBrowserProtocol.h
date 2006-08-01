@@ -56,6 +56,9 @@ Please send fixes to
 // parsers can notify the browser to refresh if the underlying database changes
 - (void)refresh;
 
+// Access the root nodes
+- (NSArray *)rootNodes;
+
 @end
 
 @class iMBLibraryNode;

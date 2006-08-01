@@ -95,4 +95,17 @@ Please send fixes to
 													  userInfo:[NSDictionary dictionaryWithObject:selectedObjects forKey:@"Selection"]];
 }
 
+- (NSArray *)rootNodes
+{
+	NSMutableArray *nodes = [NSMutableArray array];
+	NSEnumerator *e = [[myController content] object];
+	id cur;
+	
+	while (cur = [e nextObject])
+	{
+		[nodes addObject:[cur observedObject]];
+	}
+	return nodes;
+}
+
 @end

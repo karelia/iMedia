@@ -549,6 +549,19 @@ static NSMutableDictionary *_parsers = nil;
 	}
 }
 
+- (NSArray *)searchSelectedBrowserNodeAttribute:(NSString *)nodeKey forKey:(NSString *)key matching:(NSString *)value
+{
+	NSMutableArray *results = [NSMutableArray array];
+	NSEnumerator *e = [[mySelectedBrowser rootNodes] objectEnumerator];
+	iMBLibraryNode *cur;
+	
+	while (cur = [e nextObject])
+	{
+		[results addObjectsFromArray:[cur searchAttribute:nodeKey withKeys:[NSArray arrayWithObjects:key, nil] matching:value]];
+	}
+	return results;
+}
+
 #pragma mark -
 #pragma mark Delegate
 

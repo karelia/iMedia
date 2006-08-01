@@ -396,9 +396,13 @@ static NSImage *_toolbarIcon = nil;
 		
 		if (!alreadyQueued)
 		{
-			QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
-			QTMovie *mov = [QTMovie movieWithDataReference:ref error:nil];
-			[rec setObject:mov forKey:@"qtmovie"];
+			
+			if ([QTMovie canInitWithFile:imagePath])
+			{
+				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
+				QTMovie *mov = [QTMovie movieWithDataReference:ref error:nil];
+				[rec setObject:mov forKey:@"qtmovie"];
+			}
 			[myInFlightImageOperations addObject:imagePath];
 			if (myThreadCount < [NSProcessInfo numberOfProcessors])
 			{
