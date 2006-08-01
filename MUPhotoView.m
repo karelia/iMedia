@@ -542,7 +542,8 @@ static NSImage *_badge = nil;
 		_badge = [[NSImage alloc] initWithContentsOfFile:p];
 	}
 	NSImage *thumbnail = [self photoAtIndex:selectedIndex];
-	NSSize size = [self scaledPhotoSizeForSize:[thumbnail size]];
+	NSSize thumbSize = [thumbnail size];
+	NSSize size = [self scaledPhotoSizeForSize:thumbSize];
 	
 	NSSize badgeSize = [_badge size];
 	NSSize imageSize = NSMakeSize(size.width + badgeSize.width/2, size.height + badgeSize.height/2);
@@ -763,7 +764,8 @@ static NSImage *_badge = nil;
 		[unionSet addIndexes:dragSelectedPhotoIndexes];
 		[self setSelectionIndexes:unionSet];
 		
-        NSImage *dragImage = [self draggingImageWithSelection:unionSet selectedIndex:[self photoIndexForPoint:mouseCurrentPoint]];
+		unsigned int photoIndex = [self photoIndexForPoint:mouseCurrentPoint];
+        NSImage *dragImage = [self draggingImageWithSelection:unionSet selectedIndex:photoIndex];
 		
         // get the pasteboard and register the returned types with delegate as the owner
 		NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSDragPboard];
