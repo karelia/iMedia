@@ -549,7 +549,7 @@ static NSImage *_badge = nil;
 	NSSize imageSize = NSMakeSize(size.width + badgeSize.width/2, size.height + badgeSize.height/2);
 				
 	NSImage *dragImage = [[NSImage alloc] initWithSize:imageSize];
-	
+	[dragImage setCachedSeparately:YES];
 	[dragImage lockFocus];
 	
 	[thumbnail drawInRect:NSMakeRect(0,0,size.width, size.height)
