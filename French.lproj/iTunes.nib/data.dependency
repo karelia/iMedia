@@ -4,8 +4,8 @@
 <dict>
 	<key>IBPaletteDependency</key>
 	<array>
-		<string>QTKit</string>
 		<string>Controllers</string>
+		<string>QTKit</string>
 	</array>
 </dict>
 </plist>
