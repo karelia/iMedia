@@ -401,7 +401,10 @@ static NSImage *_toolbarIcon = nil;
 			{
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
 				QTMovie *mov = [QTMovie movieWithDataReference:ref error:nil];
-				[rec setObject:mov forKey:@"qtmovie"];
+				if (mov)
+				{
+					[rec setObject:mov forKey:@"qtmovie"];
+				}
 			}
 			[myInFlightImageOperations addObject:imagePath];
 			if (myThreadCount < [NSProcessInfo numberOfProcessors])
@@ -490,40 +493,43 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index withFrame:(NSRect)frame
 {
-	movieIndex = index;
-	if (!previewMovieView)
+	if (index < [myImages count])
 	{
-		previewMovieView = [[QTMovieView alloc] initWithFrame:frame];
-		[previewMovieView setControllerVisible:NO];
-		[previewMovieView setShowsResizeIndicator:NO];
-		[previewMovieView setPreservesAspectRatio:YES];
-	}
-	[previewMovieView setFrame:frame];
-	NSString *path = [[myImages objectAtIndex:index] objectForKey:@"Preview"];
-	
-	NSError *error = nil;
-	QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
-	QTMovie *movie = [[[QTMovie alloc] initWithAttributes:
-		[NSDictionary dictionaryWithObjectsAndKeys: 
-			ref, QTMovieDataReferenceAttribute,
-			[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-			nil] error:&error] autorelease];
-	if (!movie && [error code] == -2126)
-	{
-		//NSLog(@"Failed to load DRMd QTMovie: %@", error);
-		[previewMovieView removeFromSuperview];
-		[previewMovieView setMovie:nil];
-	}
-	else
-	{
-		[previewMovieView setMovie:movie];
-		if (![previewMovieView superview])
+		movieIndex = index;
+		if (!previewMovieView)
 		{
-			[oPhotoView addSubview:previewMovieView];
-			[[NSNotificationCenter defaultCenter] addObserver:self
-													 selector:@selector(viewResized:)
-														 name:NSViewFrameDidChangeNotification
-													   object:oPhotoView];
+			previewMovieView = [[QTMovieView alloc] initWithFrame:frame];
+			[previewMovieView setControllerVisible:NO];
+			[previewMovieView setShowsResizeIndicator:NO];
+			[previewMovieView setPreservesAspectRatio:YES];
+		}
+		[previewMovieView setFrame:frame];
+		NSString *path = [[myImages objectAtIndex:index] objectForKey:@"Preview"];
+		
+		NSError *error = nil;
+		QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
+		QTMovie *movie = [[[QTMovie alloc] initWithAttributes:
+			[NSDictionary dictionaryWithObjectsAndKeys: 
+				ref, QTMovieDataReferenceAttribute,
+				[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+				nil] error:&error] autorelease];
+		if (!movie && [error code] == -2126)
+		{
+			//NSLog(@"Failed to load DRMd QTMovie: %@", error);
+			[previewMovieView removeFromSuperview];
+			[previewMovieView setMovie:nil];
+		}
+		else
+		{
+			[previewMovieView setMovie:movie];
+			if (![previewMovieView superview])
+			{
+				[oPhotoView addSubview:previewMovieView];
+				[[NSNotificationCenter defaultCenter] addObserver:self
+														 selector:@selector(viewResized:)
+															 name:NSViewFrameDidChangeNotification
+														   object:oPhotoView];
+			}
 		}
 	}
 }
