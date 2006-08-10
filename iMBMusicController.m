@@ -229,7 +229,7 @@ static NSImage *_playingIcon = nil;
 	[progressIndicator setMinValue: k_Scrub_Slider_Minimum];
 	QTTime dur = [audio duration];
 	
-	long long audioDurationSeconds = [audio durationInSeconds];
+	float audioDurationSeconds = [audio durationInSeconds];
     [progressIndicator setMaxValue: audioDurationSeconds];
     [progressIndicator setDoubleValue: k_Scrub_Slider_Minimum ];
 	
@@ -309,12 +309,12 @@ static NSImage *_playImage = nil;
 {
 	QTMovie *audio = [oAudioPlayer movie];
 	
-	if (GetMovieTime([audio quickTimeMovie], NULL) == GetMovieDuration([audio quickTimeMovie])) {
+	if ([audio currentTimeEqualsDuration]) {
 		[self stopMovie:self];
 	} else {
-		QTTime curPlayTime = [audio currentPlayTime];
+		QTTime curPlayTime = [audio currentTime];
 		[progressIndicator setDoubleValue: curPlayTime.timeValue/curPlayTime.timeScale];
-		[self setClockTime:[audio currentPlayTimeAsString]];
+		[self setClockTime:[audio currentTimeAsString]];
 	}
 }
 
@@ -334,6 +334,6 @@ static NSImage *_playImage = nil;
 
 - (void)audioTimeDidChange:(NSNotification *)aNotification
 {
-	[self setClockTime:[[oAudioPlayer movie] currentPlayTimeAsString]];
+	[self setClockTime:[[oAudioPlayer movie] currentTimeAsString]];
 }
 @end

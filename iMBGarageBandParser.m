@@ -88,8 +88,7 @@
 							nil] error:&error];
 					if (movie)
 					{
-						QTTime duration = [movie duration];
-						NSNumber *time = [NSNumber numberWithDouble:GetMovieDuration( [movie quickTimeMovie] )];
+						NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds]];
 						[rec setObject:time forKey:@"Total Time"];
 					}
 					[movie release];

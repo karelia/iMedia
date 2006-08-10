@@ -155,8 +155,8 @@
 				[song setObject:val forKey:@"Artist"];
 				if (myParseMetaData)
 				{
-					QTTime duration = [movie duration];
-					NSNumber *time = [NSNumber numberWithDouble:GetMovieDuration( [movie quickTimeMovie] )];
+					NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds]];
+					// Used for binding
 					[song setObject:time forKey:@"Total Time"];
 					if (![movie isDRMProtected])
 					{

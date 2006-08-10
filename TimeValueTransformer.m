@@ -45,10 +45,11 @@ Please send fixes to
 	
 	if([beforeObject intValue] == 0) return @"0:00";
 	
-	int actualSeconds = [beforeObject intValue] / 1000;
+	int actualSeconds = [beforeObject intValue];
 	div_t hours = div(actualSeconds,3600);
 	div_t minutes = div(hours.rem,60);
 	
+#warning really should internationalize
 	if (hours.quot == 0) {
 		return [NSString stringWithFormat:@"%2d:%.2d", minutes.quot, minutes.rem];
 	}

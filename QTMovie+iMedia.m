@@ -40,21 +40,14 @@
 - (NSImage *)betterPosterImage;
 {
 	NSDictionary *attr = [self movieAttributes];
-	
-	// initialize with zero; we want something more interesting.
-	QTTime qttime = QTZeroTime;
-	
+		
 	// first try to get CURRENT time.
-	NSValue *timeValue = [attr objectForKey:QTMovieCurrentTimeAttribute];
-	if (nil != timeValue)
-	{
-		qttime = [timeValue QTTimeValue];
-	}
-	
+	QTTime qttime = [self currentTime];
+
 	// If still zero, get POSTER time.
 	if (NSOrderedSame == QTTimeCompare(qttime, QTZeroTime))
 	{
-		timeValue = [attr objectForKey:QTMoviePosterTimeAttribute];
+		NSValue *timeValue = [attr objectForKey:QTMoviePosterTimeAttribute];
 		if (nil != timeValue)
 		{
 			qttime = [timeValue QTTimeValue];
@@ -66,7 +59,7 @@
 	{
 		qttime = QTMakeTimeWithTimeInterval(20.0);
 		
-		timeValue = [attr objectForKey:QTMovieDurationAttribute];
+		NSValue *timeValue = [attr objectForKey:QTMovieDurationAttribute];
 		if (nil != timeValue)
 		{
 			QTTime capTime = [timeValue QTTimeValue];
@@ -176,18 +169,18 @@ bail:
 - (NSString *)durationAsString
 {
 	QTTime durationQTTime = [self duration];
-	long long durationInSeconds = durationQTTime.timeValue/durationQTTime.timeScale;
-	long long durationInMinutes = durationInSeconds/60;
-	long long durationInHours = durationInMinutes/60;
+	int durationInSeconds = (float)durationQTTime.timeValue/durationQTTime.timeScale;
+	int durationInMinutes = durationInSeconds/60;
+	int durationInHours = durationInMinutes/60;
 	return ([NSString stringWithFormat:@"%qi:%qi:%qi" , 
 								durationInHours, 
 		durationInMinutes, 
 		durationInSeconds]);
 }
 
-- (NSString *)currentPlayTimeAsString
+- (NSString *)currentTimeAsString
 {
-	QTTime currQTTime = [self currentPlayTime];
+	QTTime currQTTime = [self currentTime];
 	int actualSeconds = currQTTime.timeValue/currQTTime.timeScale;
 	div_t hours = div(actualSeconds,3600);
 	div_t minutes = div(hours.rem,60);
@@ -200,19 +193,11 @@ bail:
 	}	
 }
 
-- (long long)durationInSeconds
+- (float)durationInSeconds
 {
 	QTTime durationQTTime = [self duration];
-	long long durationInSeconds = durationQTTime.timeValue/durationQTTime.timeScale;
+	float durationInSeconds = (float)durationQTTime.timeValue/durationQTTime.timeScale;
 	return durationInSeconds;
-}
-// return the movie's current play time
-- (QTTime)currentPlayTime
-{
-	NSValue *attribute = [self attributeForKey:QTMovieCurrentTimeAttribute];
-	QTTime movieTime = [attribute QTTimeValue];
-	
-	return (movieTime);
 }
 
 // set the movie's current time
@@ -228,13 +213,6 @@ bail:
 	[self setAttribute:valueForQTTime forKey:QTMovieCurrentTimeAttribute];
 }
 
-// return the movie's current (non-playing) time
-- (double)currentTimeValue
-{
-	QTTime time = [self currentTime];
-	
-	return(time.timeValue);
-}
 
 // returns YES if the movie's current time is the movie end,
 // NO if not

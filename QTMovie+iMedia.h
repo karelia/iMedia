@@ -35,10 +35,8 @@
 
 - (BOOL)isPlaying;
 - (NSString *)durationAsString;
-- (NSString *)currentPlayTimeAsString;
-- (long long)durationInSeconds;
-- (QTTime)currentPlayTime;
-- (double)currentTimeValue;
+- (NSString *)currentTimeAsString;
+- (float)durationInSeconds;
 - (void)timeToQTTime:(long)timeValue resultTime:(QTTime *)aQTTime;
 - (void)setTime:(int)timeValue;
 - (BOOL)currentTimeEqualsDuration;
