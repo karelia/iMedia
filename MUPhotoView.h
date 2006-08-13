@@ -66,6 +66,10 @@
     BOOL isDonePhotoResizing;
 	
 	NSArray *liveResizeSubviews;
+	
+	//Fading
+	NSRange myLastDrawnRange;
+	NSMutableDictionary *myFadingImages;
 }
 
 #pragma mark -

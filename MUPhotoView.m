@@ -14,6 +14,8 @@
 
 #import "MUPhotoView.h"
 
+const float kFadingTimeThreshold = 0.1;
+
 @implementation MUPhotoView
 
 #pragma mark -
@@ -83,6 +85,8 @@
         photoResizeTimer = nil;
         photoResizeTime = [[NSDate date] retain];
         isDonePhotoResizing = YES;
+		
+		myFadingImages = [[NSMutableDictionary dictionary] retain];
 	}
 	
 	return self;
@@ -141,11 +145,26 @@
 	
     /**** BEGIN Drawing Photos ****/
 	NSRange rangeToDraw = [self photoIndexRangeForRect:rect]; // adjusts for photoCount if the rect goes outside my range
+	NSMutableArray *imagesScrolledOutOfRange = [NSMutableArray array];
+	NSEnumerator *e = [myFadingImages keyEnumerator];
+	NSNumber *indexKey;
+	
+	// remove images that have been scrolled out of view
+	while ((indexKey = [e nextObject]))
+	{
+		if (!NSLocationInRange([indexKey unsignedIntValue], rangeToDraw))
+		{
+			[imagesScrolledOutOfRange addObject:indexKey];
+		}
+	}
+	[myFadingImages removeObjectsForKeys:imagesScrolledOutOfRange];
+	//NSLog(@"removing %@", imagesScrolledOutOfRange);
+	
     unsigned index;
     unsigned lastIndex = rangeToDraw.location + rangeToDraw.length;
-    for (index = rangeToDraw.location; index <= lastIndex; index++) {
+    for (index = rangeToDraw.location; index < lastIndex; index++) {
         
-        // Get the image at the current index - a red square anywhere in the view means it asked for an image, but got nil for that index
+        // Get the image at the current index - a gray bezier anywhere in the view means it asked for an image, but got nil for that index
         NSImage *photo = nil;
         if ([self inLiveResize]) {
             photo = [self fastPhotoAtIndex:index];
@@ -157,9 +176,27 @@
         
         if (nil == photo) {
             photo = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
-            [photo lockFocus];
-            [[NSColor redColor] set];
-            [NSBezierPath fillRect:NSMakeRect(0,0,photoSize,photoSize)];
+			float curveSize = photoSize - 8;
+			float curve = photoSize * 0.3;
+            NSBezierPath *p = [NSBezierPath bezierPath];
+			[p moveToPoint:NSMakePoint(curve, 0)];
+			[p lineToPoint:NSMakePoint(photoSize - curve, 0)];
+			[p curveToPoint:NSMakePoint(photoSize, curve) controlPoint1:NSMakePoint(photoSize, 0) controlPoint2:NSMakePoint(photoSize, 0)];
+			[p lineToPoint:NSMakePoint(photoSize, photoSize - curve)];
+			[p curveToPoint:NSMakePoint(photoSize - curve, photoSize) controlPoint1:NSMakePoint(photoSize,photoSize) controlPoint2:NSMakePoint(photoSize,photoSize)];
+			[p lineToPoint:NSMakePoint(curve, photoSize)];
+			[p curveToPoint:NSMakePoint(0, photoSize - curve) controlPoint1:NSMakePoint(0, photoSize) controlPoint2:NSMakePoint(0, photoSize)];
+			[p lineToPoint:NSMakePoint(0, curve)];
+			[p curveToPoint:NSMakePoint(curve, 0) controlPoint1:NSMakePoint(0, 0) controlPoint2:NSMakePoint(0, 0)];
+			[p closePath];
+			[photo lockFocus];
+
+			//[[NSColor whiteColor] set];
+			//[p fill];
+			[[NSColor grayColor] set];
+			[p setLineWidth:4];
+            [p stroke];
+			
             [photo unlockFocus];
         }
         
@@ -191,11 +228,32 @@
         if ([self useShadowBorder]) {
             [borderShadow set];
         }
+		
+		// find out how much to fade the image
+		NSMutableDictionary *fadeRec = [myFadingImages objectForKey:[NSNumber numberWithUnsignedInt:index]];
+		if (!fadeRec)
+		{
+			fadeRec = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:0.2], @"opactiy", [NSDate date], @"lastDrawn", nil];
+			[myFadingImages setObject:fadeRec forKey:[NSNumber numberWithUnsignedInt:index]];
+		}
+		NSNumber *opacity = [fadeRec objectForKey:@"opacity"];
+		NSDate *lastDrawn = [fadeRec objectForKey:@"lastDrawn"];
+		float fopacity = [opacity floatValue];
         
         // draw the current photo
         NSRect imageRect = NSMakeRect(0, 0, [photo size].width, [photo size].height);
-        [photo drawInRect:photoRect fromRect:imageRect operation:NSCompositeSourceOver fraction:1.0];
+        [photo drawInRect:photoRect fromRect:imageRect operation:NSCompositeSourceOver fraction:fopacity];
         
+		// update fade value
+		NSTimeInterval timeDiff = fabs([lastDrawn timeIntervalSinceNow]);
+		
+		if (fopacity < 1.0 && timeDiff >= kFadingTimeThreshold)
+		{
+			opacity = [NSNumber numberWithFloat:fopacity += 0.2];
+			[fadeRec setObject:opacity forKey:@"opacity"];
+			[fadeRec setObject:[NSDate date] forKey:@"lastDrawn"];
+		}
+		
 		// register the tooltip area
 		//[self addToolTipRect:imageRect owner:self userData:nil];
 		
@@ -220,8 +278,6 @@
         }
         
         //**** END Foreground Drawing ****//
-        
-        
     }
 
     //**** END Drawing Photos ****//
@@ -243,6 +299,26 @@
 	}
     //**** END Selection Rectangle ****//
 	
+	// see if we need to keep the fading going
+	BOOL needsRedraw = NO;
+	e = [myFadingImages keyEnumerator];
+	while (indexKey = [e nextObject])
+	{
+		if ([[[myFadingImages objectForKey:indexKey] objectForKey:@"opacity"] floatValue] < 1.0)
+		{
+			needsRedraw = YES;
+			break;
+		}
+	}
+	if (needsRedraw)
+	{
+		[self performSelector:@selector(runloopRedraw) withObject:nil afterDelay:kFadingTimeThreshold];
+	}
+}
+
+- (void)runloopRedraw
+{
+	[self setNeedsDisplay:YES];
 }
 
 - (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData

@@ -445,10 +445,8 @@ static NSImage *_toolbarIcon = nil;
 			[myInFlightImageOperations addObject:imagePath];
 		}
 		[myCacheLock unlock];
-		// return the place holder image
-		img = _placeholder;
+		img = nil; //return nil so the image view draws a bezierpath
 	}
-	
 	return img;
 }
 
