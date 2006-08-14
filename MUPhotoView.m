@@ -620,7 +620,10 @@ static NSImage *_badge = nil;
 	NSImage *thumbnail = [self photoAtIndex:selectedIndex];
 	NSSize thumbSize = [thumbnail size];
 	NSSize size = [self scaledPhotoSizeForSize:thumbSize];
-	
+	if ( NSEqualSizes(size,NSZeroSize))
+	{
+		size = NSMakeSize(128,128);
+	}
 	NSSize badgeSize = [_badge size];
 	NSSize imageSize = NSMakeSize(size.width + badgeSize.width/2, size.height + badgeSize.height/2);
 				
