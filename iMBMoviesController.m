@@ -33,7 +33,10 @@ Please send fixes to
 - (NSString *)iconNameForPlaylist:(NSString*)name;
 @end
 
-static NSImage *_missing = nil;
+@interface QTMovie (QTMoviePrivateInTigerButPublicInLeopard)
+- (void)setIdling:(BOOL)state;
+@end
+
 static NSImage *_placeholder = nil;
 
 @implementation iMBMoviesController
@@ -57,8 +60,6 @@ static NSImage *_placeholder = nil;
 		{
 			NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"placeholder" ofType:@"png"];
 			_placeholder = [[NSImage alloc] initWithContentsOfFile:path];
-			path = [[NSBundle bundleForClass:[self class]] pathForResource:@"missing_image" ofType:@"png"];
-			_missing = [[NSImage alloc] initWithContentsOfFile:path];
 		}
 		
 		[NSBundle loadNibNamed:@"Movies" owner:self];
@@ -248,12 +249,15 @@ static NSImage *_toolbarIcon = nil;
 	return nil;
 }
 
-- (void)backgroundLoadOfImage:(NSString *)imagePath
+- (void)backgroundLoadOfInFlightImage:(id)unused
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	// remove ourselves out of the queue
+	
+	EnterMoviesOnThread(0);	// we will be using QuickTime on the current thread.  See TN2125
+	
 	[myCacheLock lock];
-	imagePath = [[myInFlightImageOperations lastObject] retain];
+	NSString *imagePath = [[myInFlightImageOperations lastObject] retain];
 	if (imagePath)
 	{
 		[myInFlightImageOperations removeObject:imagePath];
@@ -261,52 +265,45 @@ static NSImage *_toolbarIcon = nil;
 	}
 	[myCacheLock unlock];
 	
-	NSString *thumbPath;
 	NSImage *img;
-	NSDictionary *fullResAttribs;
-	NSMutableDictionary *rec;
 	
 	while (imagePath)
 	{
-		rec = (NSMutableDictionary *)[self recordForPath:imagePath];		
-		thumbPath = [rec objectForKey:@"ThumbPath"];
+		NSMutableDictionary *rec = (NSMutableDictionary *)[self recordForPath:imagePath];		
 		
-		if (thumbPath)
-		{
-			img = [[NSImage alloc] initByReferencingFile:thumbPath];
-		}
-		else
-		{
-			NSError *error = nil;
-			QTMovie *movie;
+		@try {
+			QTMovie *movie = [rec objectForKey:@"qtmovie"];
+
+			OSErr err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread
+			if (err) {
+				NSLog(@"err is %d", err);
+			}
 			
-			@try {
-				movie = [rec objectForKey:@"qtmovie"];
-//				movie = [[QTMovie alloc] initWithFile:imagePath error:&error];
-				if ((!movie && [error code] == -2126) || [movie isDRMProtected])
-				{
-					NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-					img = [[NSImage alloc] initWithContentsOfFile:drmIcon];
-				}
-				else
-				{
-					img = [[movie posterImage] retain];
-				}
-			} 
-			@catch (NSException *ex) {
-				NSLog(@"Failed to load movie: %@", imagePath);
+			if ([movie respondsToSelector:@selector(setIdling:)])
+				[movie setIdling:NO];
+			
+			if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
+			{
+				NSLog(@"unable to get to movie, using drm icon"); 
+				NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
+				img = [[NSImage alloc] initWithContentsOfFile:drmIcon];
 			}
-			@finally {
-				[rec removeObjectForKey:@"qtmovie"];
+			else
+			{
+				img = [[movie betterPosterImage] retain];
 			}
+			
+		} 
+		@catch (NSException *ex) {
+			NSLog(@"Failed to load movie: %@", imagePath);
+		}
+		@finally {
+			// We would normally have to DetachMovieFromCurrentThread but we're done with the movie now!
+			[rec removeObjectForKey:@"qtmovie"];
 		}
 		
-		if (!img) // we have a bad egg... need to display a ? icon
-		{
-			img = [_missing retain];
-		}
-		
-		if (NSEqualSizes([img size], NSZeroSize))
+		// Valid movie but no image -- load file icon.
+		if (!img || NSEqualSizes([img size], NSZeroSize))
 		{
 			img = [[[NSWorkspace sharedWorkspace] iconForFile:[rec objectForKey:@"ImagePath"]] retain];
 			[img setScalesWhenResized:YES];
@@ -316,6 +313,8 @@ static NSImage *_toolbarIcon = nil;
 		[myCacheLock lock];
 		if (![myCache objectForKey:imagePath])
 		{
+#warning -- why would sojmething already be here?
+			
 			[myCache setObject:img forKey:imagePath];
 			[img autorelease];
 		}		
@@ -337,6 +336,9 @@ static NSImage *_toolbarIcon = nil;
 	}
 	
 	myThreadCount--;
+	
+	ExitMoviesOnThread();	// balance EnterMoviesOnThread
+	
 	[pool release];
 }
 
@@ -383,36 +385,62 @@ static NSImage *_toolbarIcon = nil;
 	//try the caches
 	[myCacheLock lock];
 	NSString *imagePath = [rec objectForKey:@"Preview"];
-	NSImage *img = [myCache objectForKey:imagePath];
+	NSImage *img = [myCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
 	[myCacheLock unlock];
 	
-	if (!img) img = [rec objectForKey:@"CachedThumb"];
+	// NOT USED ...if (!img) img = [rec objectForKey:@"CachedThumb"];
 	
-	if (!img)
+	if (!img)	// need to generate
 	{
+		BOOL imageLoading = NO;
+		
 		// background load the image
 		[myCacheLock lock];
 		BOOL alreadyQueued = (([myInFlightImageOperations containsObject:imagePath]) || ([myProcessingImages containsObject:imagePath]));
 		
 		if (!alreadyQueued)
 		{
-			
 			if ([QTMovie canInitWithFile:imagePath])
 			{
 				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
 				QTMovie *mov = [QTMovie movieWithDataReference:ref error:nil];
-				if (mov)
+				if (mov)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
 				{
-					[rec setObject:mov forKey:@"qtmovie"];
+					// do a background thread load if we have a spare processor, and if this movie is thread-safe
+					if (myThreadCount + 1 < [NSProcessInfo numberOfProcessors]
+						&&
+						noErr == DetachMovieFromCurrentThread([mov quickTimeMovie]) )	// -2098 = componentNotThreadSafeErr
+					{
+						NSLog(@"Detaching thread to load %@", imagePath);
+						[rec setObject:mov forKey:@"qtmovie"];
+						[myInFlightImageOperations addObject:imagePath];
+						myThreadCount++;
+						imageLoading = YES;
+						[NSThread detachNewThreadSelector:@selector(backgroundLoadOfInFlightImage:)
+												 toTarget:self
+											   withObject:nil];
+					} else {
+		#warning CLEAN THIS UP .. are we not holding onto image in our cache?
+						// Open movie on the main thread because we can't open on background thread
+						NSLog(@"Main thread loading %@", imagePath);
+
+						img = [mov betterPosterImage];
+						if (img)
+						{
+							[myCache setObject:img forKey:imagePath];
+						}
+					}
 				}
 			}
-			[myInFlightImageOperations addObject:imagePath];
-			if (myThreadCount < [NSProcessInfo numberOfProcessors])
+			
+			// Now if we aren't loading currently, and we don't have an image, generate a placeholder instead.
+			if (!imageLoading && ( !img || NSEqualSizes([img size], NSZeroSize) ) )
 			{
-				myThreadCount++;
-				[NSThread detachNewThreadSelector:@selector(backgroundLoadOfImage:)
-										 toTarget:self
-									   withObject:nil];
+				NSLog(@"Using file icon fallback %@", imagePath);
+				img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
+				[img setScalesWhenResized:YES];
+				[img setSize:NSMakeSize(128,128)];
+				[myCache setObject:img forKey:imagePath];
 			}
 		}
 		else
@@ -428,6 +456,7 @@ static NSImage *_toolbarIcon = nil;
 	return img;
 }
 
+#warning -- check for movie leaks -- Tim's diagnostic output gave me some warnings
 - (void)photoView:(MUPhotoView *)view didSetSelectionIndexes:(NSIndexSet *)indexes
 {
 	[mySelection removeAllIndexes];
@@ -514,7 +543,7 @@ static NSImage *_toolbarIcon = nil;
 				nil] error:&error] autorelease];
 		if (!movie && [error code] == -2126)
 		{
-			//NSLog(@"Failed to load DRMd QTMovie: %@", error);
+			NSLog(@"Failed to load DRMd QTMovie: %@", error);
 			[previewMovieView removeFromSuperview];
 			[previewMovieView setMovie:nil];
 		}

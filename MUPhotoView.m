@@ -255,7 +255,8 @@ const float kFadingTimeThreshold = 0.1;
 		}
 		
 		// register the tooltip area
-		//[self addToolTipRect:imageRect owner:self userData:nil];
+#warning -- why aren't tooltips working?  We seem to be adding 0,0,n,n all the time...
+		[self addToolTipRect:imageRect owner:self userData:nil];
 		
         // restore the photo's flipped status
         [photo setFlipped:isFlipped];
