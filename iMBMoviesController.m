@@ -269,39 +269,48 @@ static NSImage *_toolbarIcon = nil;
 	
 	while (imagePath)
 	{
-		NSMutableDictionary *rec = (NSMutableDictionary *)[self recordForPath:imagePath];		
+		NSMutableDictionary *rec = (NSMutableDictionary *)[self recordForPath:imagePath];
 		
-		@try {
-			QTMovie *movie = [rec objectForKey:@"qtmovie"];
+		// Look up thumbnail image, I assume from an iPhoto movie record
+		NSString *thumbPath = [rec objectForKey:@"ThumbPath"];
+		
+		if (thumbPath)
+		{
+			img = [[NSImage alloc] initByReferencingFile:thumbPath];
+		}
+		else
+		{
+			@try {
+				QTMovie *movie = [rec objectForKey:@"qtmovie"];
 
-			OSErr err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread
-			if (err) {
-				NSLog(@"err is %d", err);
+				OSErr err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread
+				if (err) {
+					NSLog(@"err is %d", err);
+				}
+				
+				if ([movie respondsToSelector:@selector(setIdling:)])
+					[movie setIdling:NO];
+				
+				if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
+				{
+					NSLog(@"unable to get to movie, using drm icon"); 
+					NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
+					img = [[NSImage alloc] initWithContentsOfFile:drmIcon];
+				}
+				else
+				{
+					img = [[movie betterPosterImage] retain];
+				}
+				
+			} 
+			@catch (NSException *ex) {
+				NSLog(@"Failed to load movie: %@", imagePath);
 			}
-			
-			if ([movie respondsToSelector:@selector(setIdling:)])
-				[movie setIdling:NO];
-			
-			if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
-			{
-				NSLog(@"unable to get to movie, using drm icon"); 
-				NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-				img = [[NSImage alloc] initWithContentsOfFile:drmIcon];
+			@finally {
+				// We would normally have to DetachMovieFromCurrentThread but we're done with the movie now!
+				[rec removeObjectForKey:@"qtmovie"];
 			}
-			else
-			{
-				img = [[movie betterPosterImage] retain];
-			}
-			
-		} 
-		@catch (NSException *ex) {
-			NSLog(@"Failed to load movie: %@", imagePath);
 		}
-		@finally {
-			// We would normally have to DetachMovieFromCurrentThread but we're done with the movie now!
-			[rec removeObjectForKey:@"qtmovie"];
-		}
-		
 		// Valid movie but no image -- load file icon.
 		if (!img || NSEqualSizes([img size], NSZeroSize))
 		{
@@ -388,7 +397,7 @@ static NSImage *_toolbarIcon = nil;
 	NSImage *img = [myCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
 	[myCacheLock unlock];
 	
-	// NOT USED ...if (!img) img = [rec objectForKey:@"CachedThumb"];
+	// NOT USED ???? ...if (!img) img = [rec objectForKey:@"CachedThumb"];
 	
 	if (!img)	// need to generate
 	{
