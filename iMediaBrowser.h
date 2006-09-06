@@ -58,7 +58,8 @@ Please send fixes to
 		unsigned inSplitViewResize: 1;
 		unsigned didSelectNode: 1;
 		unsigned orientation: 1;
-		unsigned unused: 22;
+		unsigned isLoading: 1;
+		unsigned unused: 21;
 	} myFlags;
 }
 
@@ -85,6 +86,11 @@ Please send fixes to
 - (id<iMediaBrowser>)selectedBrowser;
 
 - (NSArray *)searchSelectedBrowserNodeAttribute:(NSString *)nodeKey forKey:(NSString *)key matching:(NSString *)value;
+
+// access the playlist menu
+- (NSMenu *)playlistMenu;
+
+- (BOOL)isLoading;
 
 @end
 

@@ -65,6 +65,12 @@ Please send fixes to
 	return newPicture;
 }
 
+- (void)setFileExtensionHints:(NSArray *)extensions
+{
+	[myFileExtensionHints autorelease];
+	myFileExtensionHints = [extensions retain];
+}
+
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -72,7 +78,8 @@ Please send fixes to
 	NSEnumerator *e = [contents objectEnumerator];
 	NSString *cur;
 	BOOL isDir;
-	NSArray *movieTypes = [QTMovie movieFileTypes:QTIncludeAllTypes];
+	NSArray *movieTypes = myFileExtensionHints;
+	if (!movieTypes) movieTypes = [QTMovie movieFileTypes:QTIncludeAllTypes];
 	NSMutableArray *movies = [NSMutableArray array];
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;

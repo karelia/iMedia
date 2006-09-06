@@ -17,15 +17,10 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
- In the case of iMediaBrowse, in addition to the terms noted above, in any 
- application that uses iMediaBrowse, we ask that you give a small attribution to 
- the members of CocoaDev.com who had a part in developing the project. Including, 
- but not limited to, Jason Terhorst, Zac White, Andy Matuschak, and Greg Hulands.
- 
- Greg doesn't really want acknowledgement he just want bug fixes as he has rewritten
- practically everything but the xml parsing stuff. Please send fixes to 
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
+ 
  */
 
 #import <Cocoa/Cocoa.h>

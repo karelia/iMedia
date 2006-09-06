@@ -27,7 +27,9 @@ Please send fixes to
 
 @interface iMBMoviesFolder : iMBAbstractParser 
 {
-
+	NSArray *myFileExtensionHints;
 }
+
+- (void)setFileExtensionHints:(NSArray *)extensions;
 
 @end

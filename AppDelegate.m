@@ -17,13 +17,7 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
- In the case of iMediaBrowse, in addition to the terms noted above, in any 
- application that uses iMediaBrowse, we ask that you give a small attribution to 
- the members of CocoaDev.com who had a part in developing the project. Including, 
- but not limited to, Jason Terhorst, Zac White, Andy Matuschak, and Greg Hulands.
- 
- Greg doesn't really want acknowledgement he just want bug fixes as he has rewritten
- practically everything but the xml parsing stuff. Please send fixes to 
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  
@@ -46,10 +40,15 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	iMediaBrowser *browser = [iMediaBrowser sharedBrowser];
-	[browser setDelegate:self];
-	[browser showWindow:self];
+	//[iMediaBrowser sharedBrowserWithDelegate:self supportingBrowserTypes:[NSArray arrayWithObject:@"iMBMusicController"]];
+	[[iMediaBrowser sharedBrowserWithDelegate:self] showWindow:self];
 }
+
+- (BOOL)iMediaBrowser:(iMediaBrowser *)browser willLoadBrowser:(NSString *)browserClassname
+{
+	NSLog(@"loading %@", browserClassname);
+}
+
 @end
 
 @interface iMBApplication : NSApplication

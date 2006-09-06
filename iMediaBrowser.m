@@ -367,6 +367,7 @@ static NSMutableDictionary *_parsers = nil;
 			mySelectedBrowser = browser;
 			//save the selected browse
 			[[NSUserDefaults standardUserDefaults] setObject:NSStringFromClass([mySelectedBrowser class]) forKey:@"iMediaBrowsermySelectedBrowser"];
+			myFlags.isLoading = YES;
 			[NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:nil];
 		}
 		[myToolbar setSelectedItemIdentifier:NSStringFromClass([mySelectedBrowser class])];
@@ -484,18 +485,7 @@ static NSMutableDictionary *_parsers = nil;
 		{
 			[oPlaylists expandItem:[oPlaylists itemAtRow:0]];
 		}
-		
-		NSEnumerator *e = [[libraryController content] objectEnumerator];
-		iMBLibraryNode *cur;
-		NSMenu *menu = [[NSMenu alloc] initWithTitle:@"playlists"];
-		
-		while (cur = [e nextObject])
-		{
-			[self recursivelyAddItemsToMenu:menu withNode:cur indentation:0];
-		}
-		
-		[oPlaylistPopup setMenu:menu];
-		[menu release];
+		[oPlaylistPopup setMenu:[self playlistMenu]];
 	}
 	else
 	{
@@ -509,6 +499,26 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		[myDelegate iMediaBrowser:self didChangeToBrowser:NSStringFromClass([mySelectedBrowser class])];
 	}
+	myFlags.isLoading = NO;
+}
+
+- (BOOL)isLoading
+{
+	return myFlags.isLoading;
+}
+
+- (NSMenu *)playlistMenu
+{
+	NSEnumerator *e = [[libraryController content] objectEnumerator];
+	iMBLibraryNode *cur;
+	NSMenu *menu = [[NSMenu alloc] initWithTitle:@"playlists"];
+	
+	while (cur = [e nextObject])
+	{
+		[self recursivelyAddItemsToMenu:menu withNode:cur indentation:0];
+	}
+	
+	return [menu autorelease];
 }
 
 - (void)playlistPopupChanged:(id)sender
