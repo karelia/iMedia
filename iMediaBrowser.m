@@ -228,7 +228,7 @@ static NSMutableDictionary *_parsers = nil;
 		Class aClass = NSClassFromString(cur);
 		id <iMediaBrowser>browser = [[aClass alloc] initWithPlaylistController:libraryController];
 		if (![browser conformsToProtocol:@protocol(iMediaBrowser)]) {
-			NSLog(@"%@ must implement the iMediaBrowser protocol");
+			NSLog(@"%@ must implement the iMediaBrowser protocol", [browser class]);
 			[browser release];
 			continue;
 		}
