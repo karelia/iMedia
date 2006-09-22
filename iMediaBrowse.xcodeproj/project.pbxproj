@@ -369,6 +369,10 @@
 		CE1AD3860A7E83F20083C01E /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = Italian.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE1AD3870A7E83F20083C01E /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		CE1AD3880A7E83F20083C01E /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/Movies.nib; sourceTree = "<group>"; };
+		CE6F4A5B0AC456CA0094B818 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Contacts.nib; sourceTree = "<group>"; };
+		CE6F4A5C0AC456CF0094B818 /* Danish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Danish; path = Danish.lproj/Contacts.nib; sourceTree = "<group>"; };
+		CE6F4A5D0AC456D10094B818 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/Contacts.nib; sourceTree = "<group>"; };
+		CE6F4A5E0AC456D50094B818 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/Contacts.nib; sourceTree = "<group>"; };
 		CE8FC1420A2C0A9B00179BA3 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		CE8FC1470A2C0AA600179BA3 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Movies.nib; sourceTree = "<group>"; };
 		CEA9AF9B0A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/Contacts.nib; sourceTree = "<group>"; };
@@ -1107,6 +1111,10 @@
 				7903561D09E3B17A00384D08 /* English */,
 				CEA9AF9B0A64214900855897 /* Japanese */,
 				79500A260A6D9001008A0D8A /* German */,
+				CE6F4A5B0AC456CA0094B818 /* French */,
+				CE6F4A5C0AC456CF0094B818 /* Danish */,
+				CE6F4A5D0AC456D10094B818 /* zh_TW */,
+				CE6F4A5E0AC456D50094B818 /* Italian */,
 			);
 			name = Contacts.nib;
 			sourceTree = "<group>";
