@@ -25,6 +25,7 @@ Please send fixes to
 
 #import <Cocoa/Cocoa.h>
 #import "iMediaBrowser.h"
+#import "iMediaBrowserProtocol.h"
 
 @interface iMBAbstractController : NSObject <iMediaBrowser>
 {

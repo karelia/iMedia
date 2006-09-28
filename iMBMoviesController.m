@@ -322,7 +322,7 @@ static NSImage *_toolbarIcon = nil;
 		[myCacheLock lock];
 		if (![myCache objectForKey:imagePath])
 		{
-#warning -- why would sojmething already be here?
+#warning -- why would something already be here?
 			
 			[myCache setObject:img forKey:imagePath];
 			[img autorelease];

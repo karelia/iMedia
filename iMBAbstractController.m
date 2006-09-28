@@ -24,7 +24,14 @@ Please send fixes to
  */
 
 #import "iMBAbstractController.h"
+
 #import "iMBLibraryNode.h"
+
+
+@interface NSObject (iMediaHack)
+- (id)observedObject;
+@end
+
 
 @implementation iMBAbstractController
 
