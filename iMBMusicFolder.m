@@ -79,7 +79,8 @@
 	NSEnumerator *e = [contents objectEnumerator];
 	NSString *cur;
 	BOOL isDir;
-	NSArray *movieTypes = [QTMovie movieFileTypes:QTIncludeAllTypes];
+	NSMutableArray *movieTypes = [NSMutableArray arrayWithArray: [QTMovie movieFileTypes:QTIncludeAllTypes]];
+	[movieTypes removeObject:@"kar"];
 	NSMutableArray *tracks = [NSMutableArray array];
 	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
 	NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
@@ -139,7 +140,7 @@
 				val = nil;
 				if (myParseMetaData)
 				{
-					val = [movie attributeWithFourCharCode:FOUR_CHAR_CODE('©ART')];
+					val = [movie attributeWithFourCharCode:FOUR_CHAR_CODE(0xA9415254)]; //'©ART'
 				}
 				if (!val)
 				{
