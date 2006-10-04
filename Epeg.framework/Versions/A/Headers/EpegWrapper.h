@@ -6,14 +6,15 @@
 //  Copyright (c) 2004 __MyCompanyName__. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
-@interface EpegWrapper : NSObject {
 
+@interface EpegWrapper : NSObject 
+{
 	
 }
 
 + (NSImage *)imageWithPath:(NSString *)path boundingBox:(NSSize)boundingBox;
-+ (NSImage *)imageWithPath2:(NSString *)path boundingBox:(NSSize)boundingBox;
+
 
 @end
