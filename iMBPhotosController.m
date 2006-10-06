@@ -316,10 +316,10 @@ static NSImage *_toolbarIcon = nil;
 				[sips setStandardError:output];
 				[sips setStandardOutput:output];
 				
-				NSLog(@"sips %@", imagePath);
+				//NSLog(@"sips %@", imagePath);
 				[sips launch];
 				[sips waitUntilExit];
-				NSLog(@"DONE %@", imagePath);
+				//NSLog(@"DONE %@", imagePath);
 				
 				img = [[NSImage alloc] initWithContentsOfFile:tmpFile];
 				[img size];

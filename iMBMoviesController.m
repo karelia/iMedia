@@ -420,7 +420,7 @@ static NSImage *_toolbarIcon = nil;
 						&&
 						noErr == DetachMovieFromCurrentThread([mov quickTimeMovie]) )	// -2098 = componentNotThreadSafeErr
 					{
-						NSLog(@"Detaching thread to load %@", imagePath);
+						//NSLog(@"Detaching thread to load %@", imagePath);
 						[rec setObject:mov forKey:@"qtmovie"];
 						[myInFlightImageOperations addObject:imagePath];
 						myThreadCount++;
@@ -431,7 +431,7 @@ static NSImage *_toolbarIcon = nil;
 					} else {
 		#warning CLEAN THIS UP .. are we not holding onto image in our cache?
 						// Open movie on the main thread because we can't open on background thread
-						NSLog(@"Main thread loading %@", imagePath);
+						//NSLog(@"Main thread loading %@", imagePath);
 
 						img = [mov betterPosterImage];
 						if (img)
@@ -445,7 +445,7 @@ static NSImage *_toolbarIcon = nil;
 			// Now if we aren't loading currently, and we don't have an image, generate a placeholder instead.
 			if (!imageLoading && ( !img || NSEqualSizes([img size], NSZeroSize) ) )
 			{
-				NSLog(@"Using file icon fallback %@", imagePath);
+				//NSLog(@"Using file icon fallback %@", imagePath);
 				img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
 				[img setScalesWhenResized:YES];
 				[img setSize:NSMakeSize(128,128)];
@@ -552,7 +552,7 @@ static NSImage *_toolbarIcon = nil;
 				nil] error:&error] autorelease];
 		if (!movie && [error code] == -2126)
 		{
-			NSLog(@"Failed to load DRMd QTMovie: %@", error);
+			//NSLog(@"Failed to load DRMd QTMovie: %@", error);
 			[previewMovieView removeFromSuperview];
 			[previewMovieView setMovie:nil];
 		}

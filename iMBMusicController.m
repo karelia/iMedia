@@ -214,7 +214,7 @@ static NSImage *_playingIcon = nil;
 			nil] error:&err] autorelease];
 	if (err || !audio)
 	{
-		NSLog(@"loadAudioFile: %@", err);
+		//NSLog(@"loadAudioFile: %@", err);
 		success = NO;
 	}
 	

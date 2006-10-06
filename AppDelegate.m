@@ -46,7 +46,7 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 
 - (BOOL)iMediaBrowser:(iMediaBrowser *)browser willLoadBrowser:(NSString *)browserClassname
 {
-	NSLog(@"loading %@", browserClassname);
+	// NSLog(@"loading %@", browserClassname);
 	return YES;
 }
 
