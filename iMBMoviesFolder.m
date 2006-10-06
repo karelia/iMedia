@@ -112,7 +112,7 @@ Please send fixes to
 					[root addItem:folder];
 					[folder release];
 					[folder setIconName:@"folder"];
-					[folder setName:[fm displayNameAtPath:[fm displayNameAtPath:[cur lastPathComponent]]]];
+					[folder setName:[fm displayNameAtPath:filePath]];
 					[self recursivelyParse:filePath withNode:folder];
 				}
 			}

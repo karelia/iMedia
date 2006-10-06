@@ -215,6 +215,10 @@ const float kFadingTimeThreshold = 0.1;
         photoRect = [self centerScanRect:photoRect];
         
         //**** BEGIN Background Drawing - any drawing that technically goes under the image ****/
+	#if 0 // Debugging Aid - Enable this to fill each gridRect with a different gray
+		[[NSColor colorWithCalibratedWhite:(float)(index % 5) / 4.0 alpha:0.8] set];
+		[NSBezierPath fillRect:gridRect];
+	#endif
         // kSelectionStyleShadowBox draws a semi-transparent rounded rect behind/around the image
         if ([self isPhotoSelectedAtIndex:index] && [self useShadowSelection]) {
             NSBezierPath *shadowBoxPath = [self shadowBoxPathForRect:gridRect];
@@ -233,7 +237,7 @@ const float kFadingTimeThreshold = 0.1;
 		NSMutableDictionary *fadeRec = [myFadingImages objectForKey:[NSNumber numberWithUnsignedInt:index]];
 		if (!fadeRec)
 		{
-			fadeRec = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:0.2], @"opactiy", [NSDate date], @"lastDrawn", nil];
+			fadeRec = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:[self useFading] ? 0.2 : 1.0], @"opacity", [NSDate date], @"lastDrawn", nil];
 			[myFadingImages setObject:fadeRec forKey:[NSNumber numberWithUnsignedInt:index]];
 		}
 		NSNumber *opacity = [fadeRec objectForKey:@"opacity"];
@@ -607,6 +611,22 @@ const float kFadingTimeThreshold = 0.1;
 		}
 	}
 }
+
+- (BOOL)useFading
+{
+	return useFading;
+}
+
+- (void)setUseFading:(BOOL)fade
+{
+	if (fade != useFading)
+	{
+		[myFadingImages removeAllObjects];
+		useFading = fade;
+		[self runloopRedraw];
+	}
+}
+
 
 static NSImage *_badge = nil;
 
@@ -1193,6 +1213,20 @@ static NSImage *_badge = nil;
     [self scrollPoint:NSZeroPoint];
 }
 
+- (void)scrollPageDown:(id)sender
+{
+	NSScrollView* scrollView = [self enclosingScrollView];
+	NSRect r = [scrollView documentVisibleRect];
+    [self scrollPoint:NSMakePoint(NSMinX(r), NSMaxY(r) - [scrollView verticalPageScroll])];
+}
+
+- (void)scrollPageUp:(id)sender
+{
+	NSScrollView* scrollView = [self enclosingScrollView];
+	NSRect r = [scrollView documentVisibleRect];
+    [self scrollPoint:NSMakePoint(NSMinX(r), (NSMinY(r) - NSHeight(r)) + [scrollView verticalPageScroll])];
+}
+
 - (void)moveToEndOfLine:(id)sender
 {
 	NSIndexSet *indexes = [self selectionIndexes];
@@ -1586,14 +1620,19 @@ static NSImage *_badge = nil;
 
 - (NSRange)photoIndexRangeForRect:(NSRect)rect
 {
+	unsigned photoCount = [self photoCount];
+	if (!photoCount)
+		return NSMakeRange(NSNotFound, 0);
+
     unsigned start = [self photoIndexForPoint:rect.origin];
+	if (start >= photoCount)
+		return NSMakeRange(NSNotFound, 0);
+		
 	unsigned finish = [self photoIndexForPoint:NSMakePoint(NSMaxX(rect), NSMaxY(rect))];
-	
-    if (finish >= [self photoCount])
-        finish = [self photoCount] - 1;
+	if (finish >= photoCount)
+		finish = photoCount - 1;
     
-	return NSMakeRange(start, finish-start);
-    
+	return NSMakeRange(start, (finish + 1) - start);
 }
 
 - (NSRect)gridRectForIndex:(unsigned)index

@@ -73,7 +73,7 @@ Please send fixes to
 			[root addItem:folder];
 			[folder release];
 			[folder setIconName:@"folder"];
-			[folder setName:[fm displayNameAtPath:[cur lastPathComponent]]];
+			[folder setName:[fm displayNameAtPath:filePath]];
 			[self recursivelyParse:filePath withNode:folder];
 		}
 		else
@@ -85,13 +85,14 @@ Please send fixes to
 				if (filePath)
 				{
 					[newPicture setObject:filePath forKey:@"ImagePath"];
-					[newPicture setObject:[fm displayNameAtPath:[filePath lastPathComponent]] forKey:@"Caption"];
+					[newPicture setObject:[fm displayNameAtPath:filePath] forKey:@"Caption"];
 					//[newPicture setObject:filePath forKey:@"ThumbPath"];
 				}
 				NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
-				if ([fileAttribs valueForKey:NSFileModificationDate])
+				NSDate* modDate = [fileAttribs fileModificationDate];
+				if (modDate)
 				{
-					[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]]
+					[newPicture setObject:[NSNumber numberWithDouble:[modDate timeIntervalSinceReferenceDate]]
                                                               forKey:@"DateAsTimeInterval"];
 				}
 				[images addObject:newPicture];

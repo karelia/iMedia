@@ -104,7 +104,7 @@
 				[root addItem:folder];
 				[folder release];
 				[folder setIconName:@"folder"];
-				[folder setName:[fm displayNameAtPath:[cur lastPathComponent]]];
+				[folder setName:[fm displayNameAtPath:filePath]];
 				[self recursivelyParse:filePath withNode:folder artist:artist];
 			}
 		}

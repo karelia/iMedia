@@ -68,7 +68,7 @@
 		while (nil != (object = [theEnum nextObject]) )
 		{
 			NSString *path = (nil != urls) ? [((NSURL *)object) path] : (NSString *)object;
-			NSString *betterName = [[fm displayNameAtPath:[path lastPathComponent]] stringByDeletingPathExtension];
+			NSString *betterName = [[fm displayNameAtPath:path] stringByDeletingPathExtension];
 			[generatedNames addObject:betterName];
 		}
 		names = generatedNames;	// Probably better than just the first string

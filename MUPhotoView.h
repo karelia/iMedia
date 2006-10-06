@@ -68,6 +68,7 @@
 	NSArray *liveResizeSubviews;
 	
 	//Fading
+	BOOL useFading;
 	NSRange myLastDrawnRange;
 	NSMutableDictionary *myFadingImages;
 }
@@ -144,6 +145,10 @@
 - (void)setPhotoSize:(float)aPhotoSize;
 
 - (IBAction)takePhotoSizeFrom:(id)sender;
+
+/** Indicates whether the view fades in newly thumbnailed images or just draws them in one go **/
+- (BOOL)useFading;
+- (void)setUseFading:(BOOL)fade;
 
 #pragma mark -
 // Seriously, Don't Mess With Texas
