@@ -34,18 +34,18 @@
 	if ([path hasPrefix:@"."]) return YES;
 	
 	BOOL isHidden = NO;
-	OSStatus ret;
-	NSURL *url = [NSURL fileURLWithPath:path];
-	LSItemInfoRecord rec;
-	
-	ret = LSCopyItemInfoForURL((CFURLRef)url, kLSRequestAllInfo, &rec);
-	if (ret == noErr)
-	{
-		if (rec.flags & kLSItemInfoIsInvisible)
-		{
-			isHidden = YES;
-		}
-	}
+//	OSStatus ret;
+//	NSURL *url = [NSURL fileURLWithPath:path];
+//	LSItemInfoRecord rec;
+//	
+//	ret = LSCopyItemInfoForURL((CFURLRef)url, kLSRequestAllInfo, &rec);
+//	if (ret == noErr)
+//	{
+//		if (rec.flags & kLSItemInfoIsInvisible)
+//		{
+//			isHidden = YES;
+//		}
+//	}
 	return isHidden;
 }
 
