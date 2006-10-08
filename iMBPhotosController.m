@@ -189,10 +189,7 @@ static NSImage *_toolbarIcon = nil;
 	while (rec = [e nextObject]) {
 		[files addObject:[rec objectForKey:@"ImagePath"]];
 		[captions addObject:[rec objectForKey:@"Caption"]];
-		NSMutableDictionary *copy = [rec mutableCopy];
-		[copy removeObjectForKey:@"CachedThumb"];
-		[images setObject:copy forKey:[NSNumber numberWithInt:i]];
-		[copy release];
+		[images setObject:rec forKey:[NSNumber numberWithInt:i]];
 		i++;
 		//[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
 	}
@@ -316,10 +313,10 @@ static NSImage *_toolbarIcon = nil;
 				[sips setStandardError:output];
 				[sips setStandardOutput:output];
 				
-				//NSLog(@"sips %@", imagePath);
-				[sips launch];
-				[sips waitUntilExit];
-				//NSLog(@"DONE %@", imagePath);
+				while ([sips isRunning])
+				{
+					[NSThread sleepUntilDate:[NSDate distantPast]];
+				}
 				
 				img = [[NSImage alloc] initWithContentsOfFile:tmpFile];
 				[img size];
