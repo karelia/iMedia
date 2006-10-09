@@ -258,6 +258,11 @@ static NSMutableDictionary *imageCache = nil;
 			// finally, the attributed string for the icon
 			icon = [NSAttributedString attributedStringWithAttachment:attachment];
 			[myCachedNameWithImage insertAttributedString:icon atIndex:0];
+		
+			// Make the name truncate nicely if the destination is too narrow
+			NSMutableParagraphStyle* paraStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
+			[paraStyle setLineBreakMode:NSLineBreakByTruncatingTail];
+			[myCachedNameWithImage addAttribute:NSParagraphStyleAttributeName value:paraStyle range:NSMakeRange(0,[myCachedNameWithImage length])];
 			
 			// cleanup
 			[wrapper release];
