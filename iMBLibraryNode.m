@@ -99,13 +99,22 @@ static NSMutableDictionary *imageCache = nil;
 
 - (void)setName:(NSString *)name
 {
+	if (name && [myName isEqualToString:name])
+		return; 
 	[myName autorelease];
 	myName = [name copy];
+	[myCachedNameWithImage autorelease];
+	myCachedNameWithImage = nil;
 }
 
 - (NSString *)name
 {
 	return myName;
+}
+
+- (BOOL)isNameEditable
+{
+	return NO;
 }
 
 - (void)setIconName:(NSString *)name
@@ -258,6 +267,12 @@ static NSMutableDictionary *imageCache = nil;
     
     return myCachedNameWithImage;
 }
+
+- (void)setNameWithImage:(id)value
+{
+	// Not yet implemented, but needed if you experiment with isNameEditable returning YES
+}
+
 
 - (BOOL)isLeaf
 {

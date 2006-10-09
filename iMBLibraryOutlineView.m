@@ -23,6 +23,22 @@
 
 @implementation iMBLibraryOutlineView
 
-// Nothing yet, but here for simpler future expansion.
+/*
+	When editing is enabled in the view, and the user finishes editing using Enter/Return, we don't
+	want it to start editing the next row. 
+*/
+- (void)textDidEndEditing:(NSNotification *)notification;
+{
+    if ([[[notification userInfo] objectForKey:@"NSTextMovement"] intValue] == NSReturnTextMovement)
+	{
+        NSMutableDictionary *newUserInfo = [[notification userInfo] mutableCopy];
+        [newUserInfo setObject:[NSNumber numberWithInt:NSIllegalTextMovement] forKey:@"NSTextMovement"];
+        [super textDidEndEditing:[NSNotification notificationWithName:[notification name] object:[notification object] userInfo:newUserInfo]];
+		[newUserInfo release];
+        [[self window] makeFirstResponder:self];
+	}
+	else
+        [super textDidEndEditing:notification];
+}
 
 @end
