@@ -259,13 +259,13 @@ static NSImage *_toolbarIcon = nil;
 	return nil;
 }
 
-- (void)backgroundLoadOfImage:(NSString *)imagePath
+- (void)backgroundLoad
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	// remove ourselves out of the queue
 	[myCacheLock lock];
-	imagePath = [[myInFlightImageOperations lastObject] retain];
+	NSString* imagePath = [[myInFlightImageOperations lastObject] retain];
 	if (imagePath)
 	{
 		[myInFlightImageOperations removeObject:imagePath];
@@ -292,9 +292,10 @@ static NSImage *_toolbarIcon = nil;
 		}
 		else
 		{
-			if (useEpeg && 
-				([[[imagePath pathExtension] lowercaseString] isEqualToString:@"jpg"] ||
-				 [[[imagePath pathExtension] lowercaseString] isEqualToString:@"jpeg"]))
+			NSString* pathExtension = [[imagePath pathExtension] lowercaseString];
+			if (useEpeg &&
+				([pathExtension isEqualToString:@"jpg"] ||
+				 [pathExtension isEqualToString:@"jpeg"]))
 			{
 				Class epeg = NSClassFromString(@"EpegWrapper");
 				if (epeg)
@@ -303,26 +304,59 @@ static NSImage *_toolbarIcon = nil;
 				}
 			}
 			
-			if (!img)//we have to gen a thumb from the full res one
-			{
-				NSString *tmpFile = [NSString stringWithFormat:@"/tmp/%@.jpg", [NSString uuid]];
+			if (!img &&
+				![pathExtension isEqualToString:@"gif"])
+			{	// Try using sips (except for gif files which always seem to fail to be converted (as of 10.4.8))
+			#ifndef DEBUG_SIPS
+				#define DEBUG_SIPS 0
+			#endif
+				NSString *tmpFile = [@"/tmp/" stringByAppendingPathComponent:[NSString uuid]];
+				tmpFile = [tmpFile stringByAppendingPathExtension:@"jpg"];
 				NSTask *sips = [[NSTask alloc] init];
 				[sips setLaunchPath:@"/usr/bin/sips"];
 				[sips setArguments:[NSArray arrayWithObjects:@"-Z", @"256", imagePath, @"--out", tmpFile, nil]];
 				NSFileHandle *output = [NSFileHandle fileHandleWithNullDevice];
 				[sips setStandardError:output];
 				[sips setStandardOutput:output];
-				
+			
+			#if DEBUG_SIPS
+				NSLog(@"sips %@ -> %@", imagePath, tmpFile);
+			#endif
+				NSDate* dieTime = [NSDate dateWithTimeIntervalSinceNow:10.0];
+				[sips launch];
+				BOOL killedIt = NO;
 				while ([sips isRunning])
 				{
 					[NSThread sleepUntilDate:[NSDate distantPast]];
+					if ([dieTime earlierDate:[NSDate date]] == dieTime)
+					{
+					/*	For some reason, sips will hang for no obvious reason
+						As such we give it 10 seconds to succeed before we assume it has hung
+						and we kil it.
+					*/
+						killedIt = YES;
+						[sips terminate];
+						break;
+					}
 				}
-				
-				img = [[NSImage alloc] initWithContentsOfFile:tmpFile];
-				[img size];
-				
 				[sips release];
+				
+				BOOL didIt = !killedIt && [fm fileExistsAtPath:tmpFile];
+							
+			#if DEBUG_SIPS
+				if (didIt)
+					NSLog(@"GOOD %@ -> %@", imagePath, tmpFile);
+				else if (killedIt)
+					NSLog(@"KILL %@ -> %@", imagePath, tmpFile);
+				else
+					NSLog(@"BAD  %@ -> %@", imagePath, tmpFile);
+			#endif	
+				
+				if (didIt)
+					img = [[NSImage alloc] initWithContentsOfFile:tmpFile];
+					
 				[fm removeFileAtPath:tmpFile handler:nil];	
+			#undef DEBUG_SIPS
 			}
 		}
 		
@@ -338,7 +372,7 @@ static NSImage *_toolbarIcon = nil;
 		}
 		
 		[myCacheLock lock];
-		if (![myCache objectForKey:imagePath])
+		if (img && ![myCache objectForKey:imagePath])
 		{
 			[myCache setObject:img forKey:imagePath];
 			[img release];
@@ -355,8 +389,8 @@ static NSImage *_toolbarIcon = nil;
 		}
 		[myCacheLock unlock];
 		
-		[oPhotoView performSelectorOnMainThread:@selector(setNeedsDisplay:)
-									 withObject:[NSNumber numberWithBool:YES]
+		[oPhotoView performSelectorOnMainThread:@selector(runloopRedraw)
+									 withObject:nil
 								  waitUntilDone:NO];
 	}
 	
@@ -433,7 +467,7 @@ static NSImage *_toolbarIcon = nil;
 			if (myThreadCount < [NSProcessInfo numberOfProcessors])
 			{
 				myThreadCount++;
-				[NSThread detachNewThreadSelector:@selector(backgroundLoadOfImage:)
+				[NSThread detachNewThreadSelector:@selector(backgroundLoad)
 										 toTarget:self
 									   withObject:nil];
 			}
