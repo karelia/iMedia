@@ -149,6 +149,8 @@
 		964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
 		965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		96F9076309D8D9690071BFFB /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9076209D8D9690071BFFB /* iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A9FECB070ADA696A00AB3426 /* iMBLibraryOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */; };
+		A9FECB080ADA696A00AB3426 /* iMBLibraryOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */; };
 		CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */; };
 		CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */; };
 		CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC1450A2C0AA000179BA3 /* Movies.nib */; };
@@ -361,6 +363,8 @@
 		96A26018090CA99E00BCCCD6 /* iMBMusicController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMusicController.m; sourceTree = "<group>"; };
 		96F9076209D8D9690071BFFB /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.h; sourceTree = "<group>"; };
 		96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWorkspace+iMedia.h"; sourceTree = "<group>"; };
+		A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBLibraryOutlineView.h; sourceTree = "<group>"; };
+		A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBLibraryOutlineView.m; sourceTree = "<group>"; };
 		CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPasteboard+iMedia.h"; sourceTree = "<group>"; };
 		CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPasteboard+iMedia.m"; sourceTree = "<group>"; };
 		CE1AD3830A7E83F20083C01E /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/iPhoto.nib; sourceTree = "<group>"; };
@@ -748,6 +752,8 @@
 			children = (
 				794835F30A2709AD007E8268 /* MUPhotoView.h */,
 				794835F40A2709AD007E8268 /* MUPhotoView.m */,
+				A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */,
+				A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -851,6 +857,7 @@
 				793810480A33AC53000A65EA /* NSProcessInfo+iMedia.h in Headers */,
 				7907B4F80A96C3F600F79714 /* iMBMoviesFolder.h in Headers */,
 				7907B4F90A96C40000F79714 /* iMBPicturesFolder.h in Headers */,
+				A9FECB070ADA696A00AB3426 /* iMBLibraryOutlineView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1062,6 +1069,7 @@
 				79FA0F600A2E7D1500461872 /* NSSlider+iMedia.m in Sources */,
 				7953E6E60A2E8EC600C7AFBB /* iMBAddressBookParser.m in Sources */,
 				793810490A33AC53000A65EA /* NSProcessInfo+iMedia.m in Sources */,
+				A9FECB080ADA696A00AB3426 /* iMBLibraryOutlineView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
