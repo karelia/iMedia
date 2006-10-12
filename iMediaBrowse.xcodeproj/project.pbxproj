@@ -152,6 +152,7 @@
 		A9FECB070ADA696A00AB3426 /* iMBLibraryOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */; };
 		A9FECB080ADA696A00AB3426 /* iMBLibraryOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */; };
 		CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */; };
+		CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */ = {isa = PBXBuildFile; fileRef = CE7570610ADEE8CB009FE941 /* missingImage.png */; };
 		CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */; };
 		CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC1450A2C0AA000179BA3 /* Movies.nib */; };
 		CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
@@ -384,6 +385,7 @@
 		CE6F4A5C0AC456CF0094B818 /* Danish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Danish; path = Danish.lproj/Contacts.nib; sourceTree = "<group>"; };
 		CE6F4A5D0AC456D10094B818 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/Contacts.nib; sourceTree = "<group>"; };
 		CE6F4A5E0AC456D50094B818 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/Contacts.nib; sourceTree = "<group>"; };
+		CE7570610ADEE8CB009FE941 /* missingImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = missingImage.png; sourceTree = "<group>"; };
 		CE8FC1420A2C0A9B00179BA3 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		CE8FC1470A2C0AA600179BA3 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/Movies.nib; sourceTree = "<group>"; };
 		CEA9AF9B0A64214900855897 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/Contacts.nib; sourceTree = "<group>"; };
@@ -690,6 +692,7 @@
 				7916744B0A2826FD003CBF48 /* smaller.png */,
 				7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */,
 				790DBE480A09B19000A40A36 /* links.png */,
+				CE7570610ADEE8CB009FE941 /* missingImage.png */,
 				790DBE490A09B19000A40A36 /* movies.png */,
 				790DBE4A0A09B19000A40A36 /* music.png */,
 				790DBE4B0A09B19000A40A36 /* photos.png */,
@@ -989,6 +992,7 @@
 				7953E6BD0A2E8DC600C7AFBB /* ABGroup.png in Resources */,
 				7953E79A0A2E989200C7AFBB /* contact.png in Resources */,
 				7953E79B0A2E989300C7AFBB /* contacts.png in Resources */,
+				CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

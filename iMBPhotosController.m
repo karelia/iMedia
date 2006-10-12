@@ -61,7 +61,7 @@ static NSImage *_missing = nil;
 		{
 			NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"placeholder" ofType:@"png"];
 			_placeholder = [[NSImage alloc] initWithContentsOfFile:path];
-			path = [[NSBundle bundleForClass:[self class]] pathForResource:@"missing_image" ofType:@"png"];
+			path = [[NSBundle bundleForClass:[self class]] pathForResource:@"missingImage" ofType:@"png"];
 			_missing = [[NSImage alloc] initWithContentsOfFile:path];
 		}
 		
