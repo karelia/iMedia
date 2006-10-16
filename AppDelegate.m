@@ -61,7 +61,7 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 @implementation iMBApplication
 + (NSString *)applicationIdentifier
 {
-	return @"com.dlsxtreme.imb.demo";
+	return @"com.test";
 }
 @end
 
