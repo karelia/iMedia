@@ -161,6 +161,7 @@ static NSMutableDictionary *imageCache = nil;
 
 - (void)setAttribute:(id)attrib forKey:(NSString *)key
 {
+	if (!attrib || !key) return;
 	[myAttributes setObject:attrib forKey:key];
 }
 
