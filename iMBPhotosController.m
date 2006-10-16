@@ -63,6 +63,8 @@ static NSImage *_missing = nil;
 			_placeholder = [[NSImage alloc] initWithContentsOfFile:path];
 			path = [[NSBundle bundleForClass:[self class]] pathForResource:@"missingImage" ofType:@"png"];
 			_missing = [[NSImage alloc] initWithContentsOfFile:path];
+			if (!_missing)
+				NSLog(@"missingImage.png is missing. This can cause bad things to happen");
 		}
 		
 		[NSBundle loadNibNamed:@"iPhoto" owner:self];
@@ -259,6 +261,19 @@ static NSImage *_toolbarIcon = nil;
 	return nil;
 }
 
+NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension);
+NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
+	{
+	float max = fmax(ofSize.width, ofSize.height);
+	if (max <= toMaxDimension)
+		return ofSize;
+		
+	float scale = toMaxDimension / max;
+	ofSize.width *= scale;
+	ofSize.height *= scale;
+	return ofSize;
+	}
+
 - (void)backgroundLoad
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -303,67 +318,33 @@ static NSImage *_toolbarIcon = nil;
 					img = [[epeg imageWithPath:imagePath boundingBox:NSMakeSize(256,256)] retain];
 				}
 			}
-			
-			if (!img &&
-				![pathExtension isEqualToString:@"gif"])
-			{	// Try using sips (except for gif files which always seem to fail to be converted (as of 10.4.8))
-			#ifndef DEBUG_SIPS
-				#define DEBUG_SIPS 0
-			#endif
-				NSString *tmpFile = [@"/tmp/" stringByAppendingPathComponent:[NSString uuid]];
-				tmpFile = [tmpFile stringByAppendingPathExtension:@"jpg"];
-				NSTask *sips = [[NSTask alloc] init];
-				[sips setLaunchPath:@"/usr/bin/sips"];
-				[sips setArguments:[NSArray arrayWithObjects:@"-Z", @"256", imagePath, @"--out", tmpFile, nil]];
-				NSFileHandle *output = [NSFileHandle fileHandleWithNullDevice];
-				[sips setStandardError:output];
-				[sips setStandardOutput:output];
-			
-			#if DEBUG_SIPS
-				NSLog(@"sips %@ -> %@", imagePath, tmpFile);
-			#endif
-				NSDate* dieTime = [NSDate dateWithTimeIntervalSinceNow:10.0];
-				[sips launch];
-				BOOL killedIt = NO;
-				while ([sips isRunning])
-				{
-					[NSThread sleepUntilDate:[NSDate distantPast]];
-					if ([dieTime earlierDate:[NSDate date]] == dieTime)
-					{
-					/*	For some reason, sips will hang for no obvious reason
-						As such we give it 10 seconds to succeed before we assume it has hung
-						and we kil it.
-					*/
-						killedIt = YES;
-						[sips terminate];
-						break;
-					}
-				}
-				[sips release];
-				
-				BOOL didIt = !killedIt && [fm fileExistsAtPath:tmpFile];
-							
-			#if DEBUG_SIPS
-				if (didIt)
-					NSLog(@"GOOD %@ -> %@", imagePath, tmpFile);
-				else if (killedIt)
-					NSLog(@"KILL %@ -> %@", imagePath, tmpFile);
-				else
-					NSLog(@"BAD  %@ -> %@", imagePath, tmpFile);
-			#endif	
-				
-				if (didIt)
-					img = [[NSImage alloc] initWithContentsOfFile:tmpFile];
-					
-				[fm removeFileAtPath:tmpFile handler:nil];	
-			#undef DEBUG_SIPS
-			}
 		}
 		
 		// if still no image... use high res
 		if (!img)
 		{
 			img = [[NSImage alloc] initWithContentsOfFile:imagePath];
+			if (img)
+			{
+				NSSize imageSize = [img size];
+				NSSize thumbSize = LimitMaxWidthHeight(imageSize, 256);
+				if (!NSEqualSizes(imageSize, thumbSize))
+				{
+					NSImage* thumbImage = [[NSImage alloc] initWithSize:thumbSize];
+					if (thumbImage)
+					{
+						[thumbImage setCachedSeparately:YES]; // See http://lists.apple.com/archives/cocoa-dev/2004/Oct/msg01339.html
+						if (![img isFlipped])
+							[thumbImage setFlipped:YES];
+						[thumbImage lockFocus];
+						[img drawInRect:NSMakeRect(0, 0, thumbSize.width, thumbSize.height) fromRect:NSMakeRect(0, 0, imageSize.width, imageSize.height) operation:NSCompositeCopy fraction:1.0];
+						
+						[thumbImage unlockFocus];
+						[img release];
+						img = thumbImage;
+					}
+				}
+			}
 		}
 		
 		if (!img) // we have a bad egg... need to display a ? icon
