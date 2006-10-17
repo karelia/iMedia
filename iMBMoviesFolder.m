@@ -57,7 +57,7 @@ Please send fixes to
 	[newPicture setObject:filePath forKey:@"ImagePath"];
 	[newPicture setObject:filePath forKey:@"Preview"];
 	
-	[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimeInterval"];
+	[newPicture setObject:[NSNumber numberWithDouble:[[fileAttribs valueForKey:NSFileModificationDate] timeIntervalSinceReferenceDate]] forKey:@"DateAsTimerInterval"];
 	
 	NSString *cap = [[filePath lastPathComponent] stringByDeletingPathExtension];
 	[newPicture setObject:cap forKey:@"Caption"];

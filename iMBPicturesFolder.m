@@ -93,7 +93,7 @@ Please send fixes to
 				if (modDate)
 				{
 					[newPicture setObject:[NSNumber numberWithDouble:[modDate timeIntervalSinceReferenceDate]]
-                                                              forKey:@"DateAsTimeInterval"];
+                                                              forKey:@"DateAsTimerInterval"];
 				}
 				[images addObject:newPicture];
 			}

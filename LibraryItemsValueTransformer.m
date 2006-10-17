@@ -33,18 +33,18 @@ int imageDateSort(id i1, id i2, void *context) {
 	NSDate *date1;
 	NSDate *date2;
 	
-	if(![[i1 objectForKey:@"DateAsTimeInterval"] isKindOfClass:[NSDate class]])
+	if(![[i1 objectForKey:@"DateAsTimerInterval"] isKindOfClass:[NSDate class]])
 	{
-		NSNumber *d1 = [i1 objectForKey:@"DateAsTimeInterval"];
-		NSNumber *d2 = [i2 objectForKey:@"DateAsTimeInterval"];
+		NSNumber *d1 = [i1 objectForKey:@"DateAsTimerInterval"];
+		NSNumber *d2 = [i2 objectForKey:@"DateAsTimerInterval"];
 	
 		date1 = [NSDate dateWithTimeIntervalSinceReferenceDate:[d1 doubleValue]];
 		date2 = [NSDate dateWithTimeIntervalSinceReferenceDate:[d2 doubleValue]];
 	}
 	else
 	{
-		date1 = [i1 objectForKey:@"DateAsTimeInterval"];
-		date2 = [i2 objectForKey:@"DateAsTimeInterval"];
+		date1 = [i1 objectForKey:@"DateAsTimerInterval"];
+		date2 = [i2 objectForKey:@"DateAsTimerInterval"];
 	}
 	return [date1 compare:date2];
 }
