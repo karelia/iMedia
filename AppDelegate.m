@@ -58,6 +58,8 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 }
 @end
 
+// This can be implemented by the application's subclass as a class or instance method, or the app delegate as an instance method.
+
 @implementation iMBApplication
 + (NSString *)applicationIdentifier
 {
