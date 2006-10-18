@@ -115,7 +115,6 @@ Please send fixes to
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];
-	NSMutableArray *photoLists = [NSMutableArray array];
 	
 	//Find all iPhoto libraries
 	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",

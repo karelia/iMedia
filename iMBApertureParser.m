@@ -99,6 +99,11 @@
 			}
 		}
 		
+		/*
+			Would have liked to remove the following line when unused variable warnings was turned on.
+			However, since I don't have Aperture, I couldn't verify that there were no relied-upon
+			side-effects so I left it and let it do the warning. Please remove if it really isn't needed
+		*/
 		// get the images for the current folder
 		NSString *folderPath = [[self databasePath] stringByAppendingPathComponent:[folder valueForKey:@"libraryRelativePath"]];
 		

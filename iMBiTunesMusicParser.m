@@ -76,7 +76,6 @@ Please send fixes to
 - (iMBLibraryNode *)parseDatabase
 {
 	NSMutableDictionary *musicLibrary = [NSMutableDictionary dictionary];
-	NSMutableArray *playLists = [NSMutableArray array];
 	
 	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",
 														(CFStringRef)@"com.apple.iApps");
@@ -93,8 +92,6 @@ Please send fixes to
 	
 	// purge empty entries here....
 	
-	NSEnumerator * enumerator = [[musicLibrary objectForKey:@"Tracks"] keyEnumerator];
-	id key;
 	int x = 0;
 	
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];

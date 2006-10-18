@@ -61,7 +61,6 @@
 	while (cur = [e nextObject])
 	{
 		NSString *filePath = [path stringByAppendingPathComponent: cur];
-		NSString *fileName = [filePath lastPathComponent];
 		
 		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![fm isPathHidden:cur])
 		{

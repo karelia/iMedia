@@ -288,10 +288,8 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	}
 	[myCacheLock unlock];
 	
-	NSFileManager *fm = [NSFileManager defaultManager];
 	NSString *thumbPath;
 	NSImage *img;
-	NSDictionary *fullResAttribs;
 	NSDictionary *rec;
 	BOOL useEpeg = [[NSUserDefaults standardUserDefaults] boolForKey:@"UseEpeg"];
 	 

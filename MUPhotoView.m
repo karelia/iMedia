@@ -176,7 +176,6 @@ const float kFadingTimeThreshold = 0.1;
         
         if (nil == photo) {
             photo = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
-			float curveSize = photoSize - 8;
 			float curve = photoSize * 0.3;
             NSBezierPath *p = [NSBezierPath bezierPath];
 			[p moveToPoint:NSMakePoint(curve, 0)];
@@ -1563,7 +1562,7 @@ static NSImage *_badge = nil;
 
 - (NSImage *)fastPhotoAtIndex:(unsigned)index
 {
-    NSImage *fastPhoto;
+    NSImage *fastPhoto = nil;
     if ((nil != [self photosArray]) && (index < [[self photosArray] count])){
         fastPhoto = [photosFastArray objectAtIndex:index];
     } else if ((nil != delegate) && ([delegate respondsToSelector:@selector(photoView:fastPhotoAtIndex:)])) {

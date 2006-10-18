@@ -116,8 +116,6 @@ static NSImage *_toolbarIcon = nil;
 
 	NSMutableArray *urls = [NSMutableArray array];
 	// for WebURLsWithTitlesPboardType
-    NSMutableArray *URLsWithTitles = [NSMutableArray array];
-    NSMutableArray *URLsAsStrings = [NSMutableArray array];
     NSMutableArray *titles = [NSMutableArray array];
 	
 	NSEnumerator *e = [[playlist valueForKey:@"Links"] objectEnumerator];

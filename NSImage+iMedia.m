@@ -45,7 +45,7 @@
 	{
 		NSBundle *ourBundle = [NSBundle bundleForClass:[self class]];
 		NSString *pathToImage = [ourBundle pathForResource:[imageInOurBundle stringByDeletingPathExtension] ofType:[imageInOurBundle pathExtension]];
-		NSImage *image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+		image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
 	}
 	return [image autorelease];
 }

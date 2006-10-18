@@ -351,7 +351,7 @@
 		79FDF61309AAE5D2000CB4B4 /* quicktime_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = quicktime_tiny.png; sourceTree = "<group>"; };
 		79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tunes_tiny.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* iMediaBrowse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* iMediaBrowse.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iMediaBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		964006E108D7B9BF0046E052 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		965EB98608E1D345000DFF3A /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowser.h; sourceTree = "<group>"; };

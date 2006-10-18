@@ -635,7 +635,7 @@ static NSMutableDictionary *_parsers = nil;
 - (void)resetLibraryController
 {
 	int controllerCount = [[libraryController arrangedObjects] count];
-	for(controllerCount; controllerCount != 0;--controllerCount)
+	for(; controllerCount != 0;--controllerCount)
 	{
 		[libraryController removeObjectAtArrangedObjectIndexPath:[NSIndexPath indexPathWithIndex:controllerCount-1]];
 	}

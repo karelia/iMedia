@@ -24,9 +24,6 @@ Please send fixes to
 
 #import "iMBDNDArrayController.h"
 
-static NSString *MovedRowsType = @"MOVED_ROWS_TYPE";
-static NSString *CopiedRowsType = @"COPIED_ROWS_TYPE";
-
 @interface iMBDNDArrayController (PrivateAPI)
 //Drag and drop
 - (BOOL)tableView:(NSTableView *)tv writeRows:(NSArray*)rows toPasteboard:(NSPasteboard*)pboard;

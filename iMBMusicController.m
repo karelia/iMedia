@@ -176,8 +176,6 @@ static NSImage *_toolbarIcon = nil;
 	return YES;
 }
 
-static NSImage *_playing = nil;
-static NSImage *_song = nil;
 
 #pragma mark -
 #pragma mark Interface Methods
@@ -227,7 +225,6 @@ static NSImage *_playingIcon = nil;
 											   object:audio];
 	
 	[progressIndicator setMinValue: k_Scrub_Slider_Minimum];
-	QTTime dur = [audio duration];
 	
 	float audioDurationSeconds = [audio durationInSeconds];
     [progressIndicator setMaxValue: audioDurationSeconds];

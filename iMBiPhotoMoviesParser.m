@@ -116,7 +116,6 @@ Please send fixes to
 	[root setIconName:@"photo_tiny"];
 	
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];
-	NSMutableArray *photoLists = [NSMutableArray array];
 	
 	//Find all iPhoto libraries
 	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",
