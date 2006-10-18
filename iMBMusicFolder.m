@@ -156,7 +156,7 @@
 				[song setObject:val forKey:@"Artist"];
 				if (myParseMetaData)
 				{
-					NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds]];
+					NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
 					// Used for binding
 					[song setObject:time forKey:@"Total Time"];
 					if (![movie isDRMProtected])
@@ -185,7 +185,7 @@
 		if (poolRelease == 15)
 		{
 			poolRelease = 0;
-			[innerPool release];
+			[innerPool release];	// don't use drain, maybe we retain 10.3 compatibility?
 			innerPool = [[NSAutoreleasePool alloc] init];
 		}
 	}

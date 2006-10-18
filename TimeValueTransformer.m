@@ -45,7 +45,8 @@ Please send fixes to
 	
 	if([beforeObject intValue] == 0) return @"0:00";
 	
-	int actualSeconds = [beforeObject intValue];
+	// Convert number to seconds, and then to an appropriate time value
+	int actualSeconds = (int) roundf([beforeObject floatValue] / 1000.0);
 	div_t hours = div(actualSeconds,3600);
 	div_t minutes = div(hours.rem,60);
 	

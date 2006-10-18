@@ -34,6 +34,12 @@
 	
     if (image != nil) {
 		
+		[result setAttributes:
+			[NSDictionary dictionaryWithObjectsAndKeys:
+				[NSNumber numberWithFloat:3.0],
+				NSBaselineOffsetAttributeName, nil]
+			range:NSMakeRange(0,[result length])];
+		
         NSFileWrapper *wrapper = nil;
         NSTextAttachment *attachment = nil;
         NSAttributedString *icon = nil;
