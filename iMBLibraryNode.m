@@ -162,7 +162,9 @@ static NSMutableDictionary *imageCache = nil;
 - (void)setAttribute:(id)attrib forKey:(NSString *)key
 {
 	if (!attrib || !key) return;
+	[self willChangeValueForKey:key];
 	[myAttributes setObject:attrib forKey:key];
+	[self didChangeValueForKey:key];
 }
 
 - (id)attributeForKey:(NSString *)key
@@ -190,6 +192,12 @@ static NSMutableDictionary *imageCache = nil;
 {
 	[myItems removeObject:item];
 	[item setParent:nil];
+}
+
+- (void)removeAllItems
+{
+	[myItems makeObjectsPerformSelector:@selector(setParent:) withObject:nil];
+	[myItems removeAllObjects];
 }
 
 - (void)insertItem:(iMBLibraryNode *)item atIndex:(unsigned)idx

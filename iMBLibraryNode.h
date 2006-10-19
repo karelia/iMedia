@@ -69,6 +69,7 @@
 // Tree support
 - (void)addItem:(iMBLibraryNode *)item;
 - (void)removeItem:(iMBLibraryNode *)item;
+- (void)removeAllItems;
 - (void)insertItem:(iMBLibraryNode *)item atIndex:(unsigned)idx;
 - (void)setItems:(NSArray *)items;
 - (NSArray *)items;

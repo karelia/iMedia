@@ -134,8 +134,9 @@ Please send fixes to
 	
 	iMBLibraryNode *newDB = [self parseDatabase];
 	
-	[myCachedLibrary autorelease];
-	myCachedLibrary = [newDB retain];
+	[myCachedLibrary removeAllItems];
+	[myCachedLibrary setItems:[newDB items]];
+	[myCachedLibrary setAttributes:[newDB attributes]];
 	
 	// need to notify the browser that our data changed so it can refresh the outline view
 	[(NSObject *)myBrowser performSelectorOnMainThread:@selector(refresh)

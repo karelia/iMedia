@@ -148,6 +148,18 @@ static NSImage *_placeholder = nil;
 #pragma mark -
 #pragma mark Media Browser Protocol
 
+- (void)refresh
+{
+	[super refresh];
+	[self unbind:@"images"];
+	[previewMovieView pause:self];
+	[previewMovieView removeFromSuperview];
+	[self bind:@"images" 
+	  toObject:[self controller] 
+		 withKeyPath:@"selection.Movies" 
+	   options:nil];
+}
+
 - (void)willActivate
 {
 	[super willActivate];

@@ -120,6 +120,16 @@ static NSImage *_missing = nil;
 	[oPhotoView setNeedsDisplay:YES];
 }
 
+- (void)refresh
+{
+	[super refresh];
+	[self unbind:@"images"];
+	[self bind:@"images" 
+	  toObject:[self controller] 
+		 withKeyPath:@"selection.Images" 
+	   options:nil];
+}
+
 #pragma mark -
 #pragma mark Media Browser Protocol Overrides
 

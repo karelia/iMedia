@@ -103,6 +103,17 @@ static NSImage *_toolbarIcon = nil;
 	return nil;
 }
 
+- (void)refresh
+{
+	[super refresh];
+	[self unbind:@"selectionChanged"];
+	[self stopMovie:self];
+	[self bind:@"selectionChanged" 
+	  toObject:songsController
+		 withKeyPath:@"selectedObjects" 
+	   options:nil];
+}
+
 - (void)willActivate
 {
 	[self bind:@"selectionChanged" 
