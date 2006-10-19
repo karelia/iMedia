@@ -364,6 +364,13 @@
 		96A26018090CA99E00BCCCD6 /* iMBMusicController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMusicController.m; sourceTree = "<group>"; };
 		96F9076209D8D9690071BFFB /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.h; sourceTree = "<group>"; };
 		96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWorkspace+iMedia.h"; sourceTree = "<group>"; };
+		A93A664D0AE7709E00C77AA4 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A93A66520AE770E800C77AA4 /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = German.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A93A66530AE7710500C77AA4 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A93A66540AE7710E00C77AA4 /* Danish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Danish; path = Danish.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A93A66550AE7711700C77AA4 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A93A66560AE7712200C77AA4 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A93A66570AE7713100C77AA4 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBLibraryOutlineView.h; sourceTree = "<group>"; };
 		A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBLibraryOutlineView.m; sourceTree = "<group>"; };
 		CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPasteboard+iMedia.h"; sourceTree = "<group>"; };
@@ -1146,6 +1153,13 @@
 			isa = PBXVariantGroup;
 			children = (
 				791F97640975D4970071B2E0 /* English */,
+				A93A664D0AE7709E00C77AA4 /* French */,
+				A93A66520AE770E800C77AA4 /* German */,
+				A93A66530AE7710500C77AA4 /* zh_TW */,
+				A93A66540AE7710E00C77AA4 /* Danish */,
+				A93A66550AE7711700C77AA4 /* Japanese */,
+				A93A66560AE7712200C77AA4 /* Italian */,
+				A93A66570AE7713100C77AA4 /* zh_CN */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
