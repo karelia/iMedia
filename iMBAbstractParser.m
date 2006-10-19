@@ -55,6 +55,7 @@ Please send fixes to
 
 - (void)dealloc
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[myFileWatcher setDelegate:nil];
 	[myFileWatcher release];
 	[myDatabase release];
@@ -110,11 +111,21 @@ Please send fixes to
 #pragma mark -
 #pragma mark UKKQueue Delegate Methods
 
--(void) watcher:(id<UKFileWatcher>)kq receivedNotification:(NSString*)nm forPath:(NSString*)fpath
+-(void) doReparseLater
 {
 	[NSThread detachNewThreadSelector:@selector(threadedParseDatabase)
 							 toTarget:self
 						   withObject:nil];
+}
+
+-(void) watcher:(id<UKFileWatcher>)kq receivedNotification:(NSString*)nm forPath:(NSString*)fpath
+{
+	/*
+	UKKQueue will often send 3 or 4 notifications per change. There is no point in us reparsing each time
+	so we delay the reparse for a short while so we can ignore all but the last one.
+	*/
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doReparseLater) object:nil];
+	[self performSelector:@selector(doReparseLater) withObject:nil afterDelay:0.2];
 }
 
 - (void)threadedParseDatabase
