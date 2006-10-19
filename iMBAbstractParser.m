@@ -110,7 +110,7 @@ Please send fixes to
 #pragma mark -
 #pragma mark UKKQueue Delegate Methods
 
-- (void)kqueue:(UKKQueue *)kq receivedNotification:(NSString *)nm forFile:(NSString *)fpath
+-(void) watcher:(id<UKFileWatcher>)kq receivedNotification:(NSString*)nm forPath:(NSString*)fpath
 {
 	[NSThread detachNewThreadSelector:@selector(threadedParseDatabase)
 							 toTarget:self

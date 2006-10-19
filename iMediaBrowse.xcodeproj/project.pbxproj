@@ -149,6 +149,7 @@
 		964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
 		965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		96F9076309D8D9690071BFFB /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9076209D8D9690071BFFB /* iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A93A6A770AE77F2B00C77AA4 /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A93A6A760AE77F2B00C77AA4 /* UKFileWatcher.m */; };
 		A9FECB070ADA696A00AB3426 /* iMBLibraryOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */; };
 		A9FECB080ADA696A00AB3426 /* iMBLibraryOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */; };
 		CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */; };
@@ -371,6 +372,7 @@
 		A93A66550AE7711700C77AA4 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Japanese; path = Japanese.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A93A66560AE7712200C77AA4 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = Italian.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A93A66570AE7713100C77AA4 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A93A6A760AE77F2B00C77AA4 /* UKFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKFileWatcher.m; sourceTree = "<group>"; };
 		A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBLibraryOutlineView.h; sourceTree = "<group>"; };
 		A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBLibraryOutlineView.m; sourceTree = "<group>"; };
 		CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPasteboard+iMedia.h"; sourceTree = "<group>"; };
@@ -815,6 +817,7 @@
 			isa = PBXGroup;
 			children = (
 				791F9AEF0976320A0071B2E0 /* UKFileWatcher.h */,
+				A93A6A760AE77F2B00C77AA4 /* UKFileWatcher.m */,
 				791F9AF00976320A0071B2E0 /* UKFNSubscribeFileWatcher.h */,
 				791F9AF10976320A0071B2E0 /* UKFNSubscribeFileWatcher.m */,
 				791F9AF20976320A0071B2E0 /* UKKQueue.h */,
@@ -1081,6 +1084,7 @@
 				7953E6E60A2E8EC600C7AFBB /* iMBAddressBookParser.m in Sources */,
 				793810490A33AC53000A65EA /* NSProcessInfo+iMedia.m in Sources */,
 				A9FECB080ADA696A00AB3426 /* iMBLibraryOutlineView.m in Sources */,
+				A93A6A770AE77F2B00C77AA4 /* UKFileWatcher.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
