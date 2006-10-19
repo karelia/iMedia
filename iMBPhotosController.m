@@ -120,16 +120,6 @@ static NSImage *_missing = nil;
 	[oPhotoView setNeedsDisplay:YES];
 }
 
-- (void)refresh
-{
-	[super refresh];
-	[self unbind:@"images"];
-	[self bind:@"images" 
-	  toObject:[self controller] 
-		 withKeyPath:@"selection.Images" 
-	   options:nil];
-}
-
 #pragma mark -
 #pragma mark Media Browser Protocol Overrides
 
@@ -156,6 +146,16 @@ static NSImage *_toolbarIcon = nil;
 	return LocalizedStringInThisBundle(@"Photos", @"Name of Data Type");
 }
 
+- (void)refresh
+{
+	[super refresh];
+	[self unbind:@"images"];
+	[self bind:@"images" 
+	  toObject:[self controller] 
+		 withKeyPath:@"selection.Images" 
+	   options:nil];
+}
+
 - (void)willActivate
 {
 	[super willActivate];
@@ -170,6 +170,11 @@ static NSImage *_toolbarIcon = nil;
 {
 	[self unbind:@"images"];
 	[myCache removeAllObjects];
+}
+
+- (Class)parserForFolderDrop
+{
+	return NSClassFromString(@"iMBPicturesFolder");
 }
 
 - (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard

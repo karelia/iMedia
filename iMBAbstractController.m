@@ -80,6 +80,11 @@ Please send fixes to
 	
 }
 
+- (Class)parserForFolderDrop
+{
+	return nil; 
+}
+
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
 	

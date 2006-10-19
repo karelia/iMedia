@@ -59,6 +59,8 @@ Please send fixes to
 // Access the root nodes
 - (NSArray *)rootNodes;
 
+- (Class)parserForFolderDrop; //must respond to initWithContentsOfFile:
+
 @end
 
 @class iMBLibraryNode;
