@@ -99,7 +99,6 @@ static NSImage *_placeholder = nil;
 {
 	NSRect r = [oPhotoView photoRectForIndex:movieIndex];
 	[previewMovieView setFrame:r];
-	[previewMovieView play:self];
 }
 
 - (void)refilter
@@ -166,6 +165,7 @@ static NSImage *_placeholder = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[previewMovieView removeFromSuperview];
 }
+
 
 static NSImage *_toolbarIcon = nil;
 
@@ -284,16 +284,12 @@ static NSImage *_toolbarIcon = nil;
 				QTMovie *movie = [rec objectForKey:@"qtmovie"];
 
 				OSErr err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread
-				if (err) {
-					NSLog(@"err is %d", err);
-				}
 				
 				if ([movie respondsToSelector:@selector(setIdling:)])
 					[movie setIdling:NO];
 				
 				if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
 				{
-					NSLog(@"unable to get to movie, using drm icon"); 
 					NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
 					img = [[NSImage alloc] initWithContentsOfFile:drmIcon];
 				}
@@ -380,6 +376,8 @@ static NSImage *_toolbarIcon = nil;
 	return [myImages count];
 }
 
+#warning -- this is the big workhorse.  Anything that we can do to speed it up will improve things!  Perhaps cache images in a user directory specific to imedia?
+
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
 {
 	NSMutableDictionary *rec;
@@ -420,7 +418,6 @@ static NSImage *_toolbarIcon = nil;
 						&&
 						noErr == DetachMovieFromCurrentThread([mov quickTimeMovie]) )	// -2098 = componentNotThreadSafeErr
 					{
-						//NSLog(@"Detaching thread to load %@", imagePath);
 						[rec setObject:mov forKey:@"qtmovie"];
 						[myInFlightImageOperations addObject:imagePath];
 						myThreadCount++;
@@ -431,7 +428,6 @@ static NSImage *_toolbarIcon = nil;
 					} else {
 		#warning CLEAN THIS UP .. are we not holding onto image in our cache?
 						// Open movie on the main thread because we can't open on background thread
-						//NSLog(@"Main thread loading %@", imagePath);
 
 						img = [mov betterPosterImage];
 						if (img)
@@ -445,7 +441,6 @@ static NSImage *_toolbarIcon = nil;
 			// Now if we aren't loading currently, and we don't have an image, generate a placeholder instead.
 			if (!imageLoading && ( !img || NSEqualSizes([img size], NSZeroSize) ) )
 			{
-				//NSLog(@"Using file icon fallback %@", imagePath);
 				img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
 				[img setScalesWhenResized:YES];
 				[img setSize:NSMakeSize(128,128)];
@@ -540,6 +535,10 @@ static NSImage *_toolbarIcon = nil;
 			[previewMovieView setShowsResizeIndicator:NO];
 			[previewMovieView setPreservesAspectRatio:YES];
 		}
+		else
+		{
+			[previewMovieView pause:self];
+		}
 		[previewMovieView setFrame:frame];
 		NSString *path = [[myImages objectAtIndex:index] objectForKey:@"Preview"];
 		
@@ -552,7 +551,6 @@ static NSImage *_toolbarIcon = nil;
 				nil] error:&error] autorelease];
 		if (!movie && [error code] == -2126)
 		{
-			//NSLog(@"Failed to load DRMd QTMovie: %@", error);
 			[previewMovieView removeFromSuperview];
 			[previewMovieView setMovie:nil];
 		}
@@ -567,6 +565,9 @@ static NSImage *_toolbarIcon = nil;
 															 name:NSViewFrameDidChangeNotification
 														   object:oPhotoView];
 			}
+			
+			// now start playing -- but after a delay to prevent a flash-frame of the movie at full size!
+			[previewMovieView performSelector:@selector(play:) withObject:self afterDelay:0.0];
 		}
 	}
 }

@@ -1432,29 +1432,36 @@ static NSImage *_badge = nil;
 // This stops the stuttering of the movie view when changing the photo sizes from the slider
 - (void)viewWillStartLiveResize
 {
-	// remove all subviews
-	liveResizeSubviews = [[NSArray arrayWithArray:[self subviews]] retain];
-	NSEnumerator *e = [liveResizeSubviews objectEnumerator];
-	NSView *cur;
-	
-	while (cur = [e nextObject])
+	if (nil == liveResizeSubviews)
 	{
-		[cur removeFromSuperview];
+		// remove all subviews
+		liveResizeSubviews = [[NSArray arrayWithArray:[self subviews]] retain];
+		NSEnumerator *e = [liveResizeSubviews objectEnumerator];
+		NSView *cur;
+		
+		while (cur = [e nextObject])
+		{
+			[cur removeFromSuperview];
+		}
 	}
 }
 
 - (void)viewDidEndLiveResize
 {
-	NSEnumerator *e = [liveResizeSubviews objectEnumerator];
-	NSView *cur;
-	
-	while (cur = [e nextObject])
+	if (nil != liveResizeSubviews)
 	{
-		[self addSubview:cur];
+
+		NSEnumerator *e = [liveResizeSubviews objectEnumerator];
+		NSView *cur;
+		
+		while (cur = [e nextObject])
+		{
+			[self addSubview:cur];
+		}
+		[liveResizeSubviews release];
+		liveResizeSubviews = nil;
+		[self setNeedsDisplayInRect:[self visibleRect]];
 	}
-	[liveResizeSubviews release];
-	liveResizeSubviews = nil;
-    [self setNeedsDisplayInRect:[self visibleRect]];
 }
 
 - (void)setFrame:(NSRect)frame

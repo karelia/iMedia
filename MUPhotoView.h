@@ -15,6 +15,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+
 //! MUPhotoView displays a grid of photos similar to iPhoto's main photo view. The class gives developers several options for providing images - via bindings or delegation.
 
 //! MUPhotoView displays a resizeable grid of photos, similar to iPhoto's photo view functionality. MUPhotoView provides developers with two different options for passing photo information to the view
