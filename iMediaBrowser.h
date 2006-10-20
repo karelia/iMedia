@@ -42,6 +42,7 @@ Please send fixes to
 	@private
 	NSMutableArray					*myMediaBrowsers;
 	NSMutableDictionary				*myLoadedParsers;
+	NSMutableArray					*myUserDroppedParsers;
 	id <iMediaBrowser>				mySelectedBrowser;
 	NSToolbar						*myToolbar;
 	NSLock							*myBackgroundLoadingLock;

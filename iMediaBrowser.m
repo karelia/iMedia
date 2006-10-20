@@ -202,6 +202,7 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)dealloc
 {
+	[myUserDroppedParsers release];
 	[myMediaBrowsers release];
 	[myLoadedParsers release];
 	[myToolbar release];
@@ -223,8 +224,11 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)awakeFromNib
 {
+	[oPlaylists registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+	
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
 	myLoadedParsers = [[NSMutableDictionary alloc] init];
+	myUserDroppedParsers = [[NSMutableArray alloc] init];
 	
 	if (myFlags.orientation && ![myDelegate horizontalSplitViewForMediaBrowser:self])
 	{
@@ -452,6 +456,31 @@ static NSMutableDictionary *_parsers = nil;
 			[myDelegate iMediaBrowser:self didUseMediaParser:cur forMediaType:[mySelectedBrowser mediaType]];
 		}
 	}
+	
+	// Do any user dropped folders
+	NSArray *drops = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]];
+	e = [drops objectEnumerator];
+	NSString *drop;
+	NSFileManager *fm = [NSFileManager defaultManager];
+	BOOL isDir;
+	Class aClass = [mySelectedBrowser parserForFolderDrop];
+	
+	while ((drop = [e nextObject]))
+	{
+		if ([fm fileExistsAtPath:drop isDirectory:&isDir] && isDir)
+		{
+			iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:drop];
+			[parser setBrowser:mySelectedBrowser];
+			iMBLibraryNode *node = [parser parseDatabase];
+			[node setParser:parser];
+			[node setName:[drop lastPathComponent]];
+			[node setIconName:@"folder"];
+			[root addObject:node];
+			[myUserDroppedParsers addObject:parser];
+			[parser release];
+		}
+	}
+	
 	[libraryController setContent:root];
 	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:NO];
 	
@@ -767,6 +796,96 @@ static NSMutableDictionary *_parsers = nil;
          objectValueForTableColumn:(NSTableColumn*)col
 			  byItem:(id)item { return nil; }
 
+- (BOOL) outlineView: (NSOutlineView *)ov
+          acceptDrop: (id )info
+                item: (id)item
+          childIndex: (int)index
+{
+    NSArray *folders = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
+	NSFileManager *fm = [NSFileManager defaultManager];
+	BOOL isDir;
+	NSEnumerator *e = [folders objectEnumerator];
+	NSString *cur;
+	Class aClass = [mySelectedBrowser parserForFolderDrop];
+	NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
+	NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]]];
+	
+	while ((cur = [e nextObject]))
+	{
+		if ([fm fileExistsAtPath:cur isDirectory:&isDir] && isDir)
+		{
+			iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:cur];
+			iMBLibraryNode *node = [parser parseDatabase];
+			[node setParser:parser];
+			[node setName:[cur lastPathComponent]];
+			[node setIconName:@"folder"];
+			[content addObject:node];
+			[myUserDroppedParsers addObject:parser];
+			[parser release];
+			
+			[drops addObject:cur];
+		}
+	}
+	
+	[libraryController setContent:content];
+	
+	[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]];
+	
+	return YES;
+}
+
+- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index
+{
+	item = [item observedObject];
+	if ([mySelectedBrowser parserForFolderDrop])
+	{
+		if (item == nil)
+		{
+			NSArray *folders = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
+			if ([folders count] > 0)
+			{
+				NSFileManager *fm = [NSFileManager defaultManager];
+				BOOL isDir;
+				
+				[fm fileExistsAtPath:[folders objectAtIndex:0] isDirectory:&isDir];
+				if (isDir)
+				{
+					return NSDragOperationCopy;
+				}
+			}
+		}
+	}
+	return NSDragOperationNone;
+}
+
+- (void)outlineView:(NSOutlineView *)olv deleteItems:(NSArray *)items
+{
+	NSEnumerator *e = [items objectEnumerator];
+	iMBLibraryNode *cur;
+	
+	NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
+	NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]]];
+
+	while ((cur = [e nextObject]))
+	{
+		// we can only delete dragged folders
+		NSEnumerator *g = [myUserDroppedParsers objectEnumerator];
+		id parser;
+		
+		while ((parser = [g nextObject]))
+		{
+			if ([cur parser] == parser)
+			{
+				[drops removeObject:[parser databasePath]];
+				[myUserDroppedParsers removeObject:parser];
+				[content removeObject:cur];
+				break;
+			}
+		}
+	}
+	[libraryController setContent:content];
+	[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]];
+}
 
 @end
 

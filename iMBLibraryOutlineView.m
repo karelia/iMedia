@@ -41,4 +41,38 @@
         [super textDidEndEditing:notification];
 }
 
+- (void)keyDown:(NSEvent *)theEvent
+{
+	[self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
+}
+
+- (void)doDelete
+{
+	if ([[self dataSource] respondsToSelector:@selector(outlineView:deleteItems:)])
+	{
+		NSMutableArray *items = [NSMutableArray array];
+		NSEnumerator *e = [self selectedRowEnumerator];
+		NSNumber *row;
+		
+		while ((row = [e nextObject]))
+		{
+			[items addObject:[[self itemAtRow:[row intValue]] observedObject]];
+		}
+		[[self dataSource] outlineView:self deleteItems:items];
+	}
+}
+
+- (void)deleteForward:(NSEvent *)theEvent
+{
+#pragma unused (theEvent)
+	[self doDelete];
+}
+
+- (void)deleteBackward:(NSEvent *)theEvent
+{
+#pragma unused (theEvent)
+	[self doDelete];
+}
+
+
 @end

@@ -87,6 +87,16 @@ static NSMutableDictionary *imageCache = nil;
 	return copy;
 }
 
+- (void)setParser:(id)parser
+{
+	myParser = parser;
+}
+
+- (id)parser
+{
+	return myParser;
+}
+
 - (void)setParent:(iMBLibraryNode *)node
 {
 	myParent = node;

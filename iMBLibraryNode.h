@@ -36,6 +36,7 @@
 	NSImage				*myIcon;
 	NSString			*myIconName;
 	NSMutableDictionary *myAttributeFilterMap;
+	id					myParser;
 	
 	NSMutableAttributedString *myCachedNameWithImage;
 }
@@ -49,6 +50,9 @@
 - (NSString *)iconName;
 - (void)setIcon:(NSImage *)icon;
 - (NSImage *)icon;
+
+- (void)setParser:(id)parser;
+- (id)parser;
 
 - (void)setAttribute:(id)attrib forKey:(NSString *)key;
 - (id)attributeForKey:(NSString *)key;
