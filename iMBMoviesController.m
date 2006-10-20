@@ -148,6 +148,11 @@ static NSImage *_placeholder = nil;
 #pragma mark -
 #pragma mark Media Browser Protocol
 
+- (Class)parserForFolderDrop
+{
+	return NSClassFromString(@"iMBMoviesFolder");
+}
+
 - (void)refresh
 {
 	[super refresh];

@@ -103,6 +103,11 @@ static NSImage *_toolbarIcon = nil;
 	return nil;
 }
 
+- (Class)parserForFolderDrop
+{
+	return NSClassFromString(@"iMBMusicFolder");
+}
+
 - (void)refresh
 {
 	[super refresh];
