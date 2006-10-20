@@ -301,7 +301,9 @@ static NSImage *_toolbarIcon = nil;
 				QTMovie *movie = [rec objectForKey:@"qtmovie"];
 
 				OSErr err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread
-				
+				if(err!=noErr) 
+               @throw [NSException exceptionWithName:@"AttachMovieToCurrentThread failed" reason:[NSString stringWithFormat:@"AttachMovieToCurrentThread returned %d",(int)err] userInfo:nil];
+            
 				if ([movie respondsToSelector:@selector(setIdling:)])
 					[movie setIdling:NO];
 				

@@ -105,7 +105,8 @@
 			side-effects so I left it and let it do the warning. Please remove if it really isn't needed
 		*/
 		// get the images for the current folder
-		NSString *folderPath = [[self databasePath] stringByAppendingPathComponent:[folder valueForKey:@"libraryRelativePath"]];
+#warning -- Please remove if it really isn't needed
+		/*NSString *folderPath = */[[self databasePath] stringByAppendingPathComponent:[folder valueForKey:@"libraryRelativePath"]];
 		
 	}
 	

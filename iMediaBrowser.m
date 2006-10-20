@@ -458,7 +458,7 @@ static NSMutableDictionary *_parsers = nil;
 	}
 	
 	// Do any user dropped folders
-	NSArray *drops = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]];
+	NSArray *drops = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
 	e = [drops objectEnumerator];
 	NSString *drop;
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -808,7 +808,7 @@ static NSMutableDictionary *_parsers = nil;
 	NSString *cur;
 	Class aClass = [mySelectedBrowser parserForFolderDrop];
 	NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
-	NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]]];
+	NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]]];
 	
 	while ((cur = [e nextObject]))
 	{
@@ -829,7 +829,7 @@ static NSMutableDictionary *_parsers = nil;
 	
 	[libraryController setContent:content];
 	
-	[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]];
+	[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
 	
 	return YES;
 }
@@ -864,7 +864,7 @@ static NSMutableDictionary *_parsers = nil;
 	iMBLibraryNode *cur;
 	
 	NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
-	NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]]];
+	NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]]];
 
 	while ((cur = [e nextObject]))
 	{
@@ -884,7 +884,7 @@ static NSMutableDictionary *_parsers = nil;
 		}
 	}
 	[libraryController setContent:content];
-	[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [mySelectedBrowser className]]];
+	[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
 }
 
 @end
