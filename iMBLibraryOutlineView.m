@@ -74,5 +74,85 @@
 	[self doDelete];
 }
 
+- (void)doMove:(BOOL)up
+{
+	unsigned rows = [self numberOfRows];
+	if (!rows)
+		return;
+	
+	NSIndexSet* selected = [self selectedRowIndexes];
+	unsigned from;
+	unsigned newSelection;
+	if (up)
+	{
+		from = [selected firstIndex];
+		if (from == 0)
+			return;
+		else if (from == NSNotFound)
+			newSelection = rows - 1;
+		else
+			newSelection = from - 1;
+	}
+	else
+	{
+		from = [selected lastIndex];
+		if (from == rows - 1)
+			return;
+		else if (from == NSNotFound)
+			newSelection = 0;
+		else
+			newSelection = from + 1;
+	}
+	
+	[self selectRowIndexes:[NSIndexSet indexSetWithIndex:newSelection] byExtendingSelection:NO];
+	[self scrollRowToVisible:newSelection];
+}
+
+- (void)moveUp:(id)sender
+{
+	[self doMove:YES];
+}
+
+- (void)moveUpAndModifySelection:(id)sender
+{
+	[self doMove:YES];
+}
+
+- (void)moveDown:(id)sender
+{
+	[self doMove:NO];
+}
+
+- (void)moveDownAndModifySelection:(id)sender
+{
+	[self doMove:NO];
+}
+
+- (void)scrollToEndOfDocument:(id)sender
+{
+	unsigned rows = [self numberOfRows];
+	if (rows)
+		[self scrollRowToVisible:rows - 1];
+}
+
+- (void)scrollToBeginningOfDocument:(id)sender
+{
+	if ([self numberOfRows])
+		[self scrollRowToVisible:0];
+}
+
+- (void)scrollPageDown:(id)sender
+{
+	NSScrollView* scrollView = [self enclosingScrollView];
+	NSRect r = [scrollView documentVisibleRect];
+    [self scrollPoint:NSMakePoint(NSMinX(r), NSMaxY(r) - [scrollView verticalPageScroll])];
+}
+
+- (void)scrollPageUp:(id)sender
+{
+	NSScrollView* scrollView = [self enclosingScrollView];
+	NSRect r = [scrollView documentVisibleRect];
+    [self scrollPoint:NSMakePoint(NSMinX(r), (NSMinY(r) - NSHeight(r)) + [scrollView verticalPageScroll])];
+}
 
 @end
