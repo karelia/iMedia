@@ -41,11 +41,6 @@
         [super textDidEndEditing:notification];
 }
 
-- (void)keyDown:(NSEvent *)theEvent
-{
-	[self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
-}
-
 - (void)doDelete
 {
 	if ([[self dataSource] respondsToSelector:@selector(outlineView:deleteItems:)])
@@ -62,71 +57,6 @@
 	}
 }
 
-- (void)deleteForward:(NSEvent *)theEvent
-{
-#pragma unused (theEvent)
-	[self doDelete];
-}
-
-- (void)deleteBackward:(NSEvent *)theEvent
-{
-#pragma unused (theEvent)
-	[self doDelete];
-}
-
-- (void)doMove:(BOOL)up
-{
-	unsigned rows = [self numberOfRows];
-	if (!rows)
-		return;
-	
-	NSIndexSet* selected = [self selectedRowIndexes];
-	unsigned from;
-	unsigned newSelection;
-	if (up)
-	{
-		from = [selected firstIndex];
-		if (from == 0)
-			return;
-		else if (from == NSNotFound)
-			newSelection = rows - 1;
-		else
-			newSelection = from - 1;
-	}
-	else
-	{
-		from = [selected lastIndex];
-		if (from == rows - 1)
-			return;
-		else if (from == NSNotFound)
-			newSelection = 0;
-		else
-			newSelection = from + 1;
-	}
-	
-	[self selectRowIndexes:[NSIndexSet indexSetWithIndex:newSelection] byExtendingSelection:NO];
-	[self scrollRowToVisible:newSelection];
-}
-
-- (void)moveUp:(id)sender
-{
-	[self doMove:YES];
-}
-
-- (void)moveUpAndModifySelection:(id)sender
-{
-	[self doMove:YES];
-}
-
-- (void)moveDown:(id)sender
-{
-	[self doMove:NO];
-}
-
-- (void)moveDownAndModifySelection:(id)sender
-{
-	[self doMove:NO];
-}
 
 - (void)scrollToEndOfDocument:(id)sender
 {
@@ -141,18 +71,33 @@
 		[self scrollRowToVisible:0];
 }
 
-- (void)scrollPageDown:(id)sender
+- (void)keyDown:(NSEvent *)theEvent
 {
-	NSScrollView* scrollView = [self enclosingScrollView];
-	NSRect r = [scrollView documentVisibleRect];
-    [self scrollPoint:NSMakePoint(NSMinX(r), NSMaxY(r) - [scrollView verticalPageScroll])];
-}
-
-- (void)scrollPageUp:(id)sender
-{
-	NSScrollView* scrollView = [self enclosingScrollView];
-	NSRect r = [scrollView documentVisibleRect];
-    [self scrollPoint:NSMakePoint(NSMinX(r), (NSMinY(r) - NSHeight(r)) + [scrollView verticalPageScroll])];
+	NSString* chars = [theEvent characters];
+	if ([chars length] == 1)
+		{
+		unichar c = [chars characterAtIndex:0];
+		switch (c)
+		{
+			case 127:
+			case NSDeleteFunctionKey:
+			{
+				[self doDelete];
+				return;
+			}
+			case NSHomeFunctionKey:
+			{
+				[self scrollToBeginningOfDocument:theEvent];
+				return;
+			}
+			case NSEndFunctionKey:
+			{
+				[self scrollToEndOfDocument:theEvent];
+				return;
+			}
+		}
+	}
+	[super keyDown:theEvent];
 }
 
 @end
