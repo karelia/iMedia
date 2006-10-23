@@ -557,7 +557,7 @@ static NSImage *_toolbarIcon = nil;
 			[previewMovieView pause:self];
 		}
 		[previewMovieView setFrame:frame];
-		NSString *path = [[myImages objectAtIndex:index] objectForKey:@"Preview"];
+		NSString *path = [[myImages objectAtIndex:index] objectForKey:@"ImagePath"];
 		
 		NSError *error = nil;
 		QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
