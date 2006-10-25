@@ -426,9 +426,13 @@ static NSImage *_toolbarIcon = nil;
 		{
 			if ([QTMovie canInitWithFile:imagePath])
 			{
-				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
-				QTMovie *mov = [QTMovie movieWithDataReference:ref error:nil];
-				if (mov)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
+                NSError *movieError = nil;
+                QTMovie *mov = [QTMovie movieWithAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
+                    [QTDataReference dataReferenceWithReferenceToFile:imagePath], QTMovieDataReferenceAttribute,
+                    [NSNumber numberWithBool:NO], QTMovieAskUnresolvedDataRefsAttribute, nil] 
+                                                      error:&movieError];
+                
+                if (mov)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
 				{
 					// do a background thread load if we have a spare processor, and if this movie is thread-safe
 					if (myThreadCount + 1 < [NSProcessInfo numberOfProcessors]
