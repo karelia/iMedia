@@ -1,0 +1,98 @@
+/* Root Node Name of address book */
+"Address Book" = "Adressbok";
+
+/* Aperture Node Name */
+"Aperture" = "Aperture";
+
+/* Artist */
+"Apple Loop" = "Apple Loop";
+
+/* Name of Data Type */
+"Audio" = "Ljud";
+
+/* Bookmarks Bar as titled in Safari */
+"Bookmarks Bar" = "Bokmärkesrad";
+
+/* Bookmarks Menu as titled in Safari */
+"Bookmarks Menu" = "Bokmärkesmeny";
+
+/* Name of Data Type */
+"Contacts" = "Kontakter";
+
+/* artist name */
+"Demo" = "Demo";
+
+/* Favourite Movies folder name
+   Favourite Pictures folder name
+   Favourite Music folder name */
+"Favourites" = "Favoriter";
+
+/* FireFox */
+"FireFox" = "FireFox";
+
+/* Name of Node */
+"GarageBand" = "GarageBand";
+
+/* Node name */
+"GarageBand Demo Songs" = "GarageBand Demolåtar";
+
+/* iLife Sound Effects folder name */
+"iLife Sound Effects" = "iLife Ljudeffekter";
+
+/* iMovie Sound Effects folder name */
+"iMovie Sound Effects" = "iMovie Ljudeffekter";
+
+/* iPhoto */
+"iPhoto" = "iPhoto";
+
+/* iTunes */
+"iTunes" = "iTunes";
+
+/* Library as titled in iTunes source list */
+"Library" = "Bibliotek";
+
+/* Name of Data Type */
+"Links" = "Länkar";
+
+/* Name of Data Type */
+"Movies" = "Filmer";
+
+/* Name of your 'Movies' folder in your home directory */
+"Movies Folder" = "Filmer";
+
+/* Name of your 'Music' folder in your home directory */
+"Music Folder" = "Musik";
+
+/* Node name */
+"My Compositions" = "Mina kompositioner";
+
+/* OmniWeb */
+"OmniWeb" = "OmniWeb";
+
+/* Party Shuffle as titled in iTunes source list */
+"Party Shuffle" = "Partyblandning";
+
+/* Name of Data Type */
+"Photos" = "Bilder";
+
+/* Name of your 'Pictures' folder in your home directory */
+"Pictures Folder" = "Bilder";
+
+/* Podcasts as titled in iTunes source list */
+"Podcasts" = "Podcaster";
+
+/* Purchased folder as titled in iTunes source list
+   Purchased folder  as titled in iTunes source list */
+"Purchased" = "Inköp";
+
+/* Safari */
+"Safari" = "Safari";
+
+/* Photo selection for pasteboard album name */
+"Selection" = "Markering";
+
+/* Unkown music key */
+"Unknown" = "Okänd";
+
+/* Videos as titled in iTunes source list */
+"Videos" = "Filmer";
