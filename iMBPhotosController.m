@@ -59,15 +59,20 @@ static NSImage *_missing = nil;
 		
 		if (!_placeholder)
 		{
-			NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"placeholder" ofType:@"png"];
+			NSString *path = [[NSBundle bundleForClass:[iMBPhotosController class]] pathForResource:@"placeholder" ofType:@"png"];
 			_placeholder = [[NSImage alloc] initWithContentsOfFile:path];
-			path = [[NSBundle bundleForClass:[self class]] pathForResource:@"missingImage" ofType:@"png"];
+			path = [[NSBundle bundleForClass:[iMBPhotosController class]] pathForResource:@"missingImage" ofType:@"png"];
 			_missing = [[NSImage alloc] initWithContentsOfFile:path];
 			if (!_missing)
 				NSLog(@"missingImage.png is missing. This can cause bad things to happen");
 		}
 		
-		[NSBundle loadNibNamed:@"iPhoto" owner:self];
+		if (![[NSBundle bundleForClass:[iMBPhotosController class]] loadNibFile:@"iPhoto" 
+                                                         externalNameTable:[NSDictionary dictionaryWithObjectsAndKeys:self, @"NSOwner", nil] 
+                                                                  withZone:[self zone]])
+        {
+            NSLog(@"iPhoto.nib is missing. This can cause bad things to happen");
+        }
 	}
 	return self;
 }
@@ -143,7 +148,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return LocalizedStringInThisBundle(@"Photos", @"Name of Data Type");
+    return [[NSBundle bundleForClass:[iMBPhotosController class]] localizedStringForKey:@"Photos" value:@"" table:nil];
 }
 
 - (void)refresh
@@ -170,6 +175,7 @@ static NSImage *_toolbarIcon = nil;
 {
 	[self unbind:@"images"];
 	[myCache removeAllObjects];
+    [super didDeactivate];
 }
 
 - (Class)parserForFolderDrop
@@ -532,7 +538,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 			[items addObject:cur];
 		}
 	}
-	[self writeItems:items fromAlbum:LocalizedStringInThisBundle(@"Selection", @"Photo selection for pasteboard album name") toPasteboard:pboard];
+	[self writeItems:items fromAlbum:[[NSBundle bundleForClass:[iMBPhotosController class]] localizedStringForKey:@"Selection" value:@"" table:nil] toPasteboard:pboard];
 }
 
 - (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
