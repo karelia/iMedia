@@ -61,6 +61,36 @@ Please send fixes to
 
 - (Class)parserForFolderDrop; //must respond to initWithContentsOfFile:
 
+// Allows you to specify what you can support being dragged to the playlist outline view.
+// defaultTypes contains any types that lower level objects support
+- (NSArray*)fineTunePlaylistDragTypes:(NSArray *)defaultTypes;
+
+// Allows you to override drags to the play list. (e.g to allow drops on library nodes themselves).
+// The tryDefault parameter is used to let the calling code know whether it should try its own handling
+// if you return NSDragOperationNone. If you return any other value, then tryDefault is ignored and the caller will
+// not try its own handling.
+- (NSDragOperation)playlistOutlineView:(NSOutlineView *)outlineView
+						  validateDrop:(id <NSDraggingInfo>)info
+						  proposedItem:(id)item
+					proposedChildIndex:(int)index
+					tryDefaultHandling:(BOOL*)tryDefault;
+
+// Use this to do your own handling of drags to the playlist. If you want to let the default handling be tried,
+// return NO and set tryDefault to YES. If you return YES, then tryDefault is ignored and no default handling is performed.
+- (BOOL)playlistOutlineView:(NSOutlineView *)outlineView
+				 acceptDrop:(id <NSDraggingInfo>)info
+					   item:(id)item
+				 childIndex:(int)index
+		 tryDefaultHandling:(BOOL*)tryDefault;
+		 
+// There is a #ifed out version of a simple implementation of the above dragging messages in iMBPhotosController.m.
+// Look for SAMPLE_INCOMING_DRAG 
+
+// If you want to limit the type of folders that can be dragged to the playlist by the default folder dropping code
+// override this. iMBAbstractController implements this to prevent packages being dropped. 
+- (BOOL)allowPlaylistFolderDrop:(NSString*)path;
+
+
 @end
 
 @class iMBLibraryNode;

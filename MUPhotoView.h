@@ -72,6 +72,8 @@
 	BOOL useFading;
 	NSRange myLastDrawnRange;
 	NSMutableDictionary *myFadingImages;
+	
+	BOOL drawDragHilite;
 }
 
 #pragma mark -
@@ -208,11 +210,18 @@
 // drag and drop
 /** A delegate would use this method to specify whether the view should support drag operations. (i.e. whether the view should allow photos to be dragged out of the view.
     The semantics are identical to the -[NSDraggingSource draggingSourceOperationmaskForLocal] **/
-- (unsigned int)photoView:(MUPhotoView *)view draggingSourceOperationMaskForLocal:(BOOL)isLocal;
+- (NSDragOperation)photoView:(MUPhotoView *)view draggingSourceOperationMaskForLocal:(BOOL)isLocal;
 /** The view will call this method when it is about to initiate a drag. It will call this method once for *each* combination type returned from -pasteboardDragTypesForPhotoView:
     and each photo currently being dragged. The delegate should return the appropriate data for the given type. If you provide any implementation of
     -photoView:draggingSourceOperationMaskForLocal that returns anything other than NO, you should also implement this method. **/
 - (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard;
+
+// drag and drop receiving - Equivalent to the NSDraggingDestination methods
+- (NSDragOperation)photoView:(MUPhotoView *)view draggingEntered:(id <NSDraggingInfo>)sender;
+- (void)photoView:(MUPhotoView *)view draggingExited:(id <NSDraggingInfo>)sender;
+- (BOOL)photoView:(MUPhotoView *)view performDragOperation:(id <NSDraggingInfo>)sender;
+- (BOOL)photoView:(MUPhotoView *)view prepareForDragOperation:(id <NSDraggingInfo>)sender;
+- (void)photoView:(MUPhotoView *)view concludeDragOperation:(id <NSDraggingInfo>)sender;
 
 // double-click support
 /** The view will call this delegate method when the user double-clicks on the photo at the specified index. If you do not wish to support any double-click behavior, then you

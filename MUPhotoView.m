@@ -131,7 +131,7 @@ const float kFadingTimeThreshold = 0.1;
 	
     // get the number of photos
     unsigned photoCount = [self photoCount];
-    if (0 == photoCount)
+    if ((0 == photoCount) && !drawDragHilite)
         return;
 
     // update internal grid size, adjust height based on the new grid size
@@ -302,6 +302,14 @@ const float kFadingTimeThreshold = 0.1;
 		[NSBezierPath fillRect:selectionRectangle];
 	}
     //**** END Selection Rectangle ****//
+	
+	if (drawDragHilite)
+		{
+		NSRect dragRect = NSInsetRect(rect,1,1);
+		[NSBezierPath setDefaultLineWidth:2];
+		[[NSColor blackColor] set];
+		[NSBezierPath strokeRect:dragRect];
+		}
 	
 	// see if we need to keep the fading going
 	BOOL needsRedraw = NO;
@@ -843,6 +851,15 @@ static NSImage *_badge = nil;
 	}
 }
 
+
+- (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
+{
+	if (operation == NSDragOperationDelete)
+		[self removePhotosAtIndexes:[self selectionIndexes]];
+}
+
+
+
 - (void)mouseDragged:(NSEvent *)event
 {
     mouseCurrentPoint = [self convertPoint:[event locationInWindow] fromView:nil];
@@ -868,7 +885,7 @@ static NSImage *_badge = nil;
 		
         // get the pasteboard and register the returned types with delegate as the owner
 		NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSDragPboard];
-		
+		[pb declareTypes:[NSArray array] owner:nil]; // clear the pasteboard 
 		[delegate photoView:self fillPasteboardForDrag:pb];
 		
 		[self setSelectionIndexes:oldSelection];
@@ -1008,7 +1025,7 @@ static NSImage *_badge = nil;
     [self setNeedsDisplayInRect:[self visibleRect]];
 }
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)isLocal
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)isLocal
 {
 	if (nil != delegate)
         return [delegate photoView:self draggingSourceOperationMaskForLocal:isLocal];
@@ -1022,6 +1039,72 @@ static NSImage *_badge = nil;
 	[[self superview] autoscroll:[NSApp currentEvent]];
 	[self setNeedsDisplay:YES];
 }
+
+
+
+#pragma mark -
+#pragma mark Drag Receiving
+
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+{
+	if ([delegate respondsToSelector:@selector(photoView:draggingEntered:)])
+	{
+		NSDragOperation result = [delegate photoView:self draggingEntered:sender];
+		if (result != NSDragOperationNone)
+		{
+			drawDragHilite = YES;
+			[self setNeedsDisplay:YES];
+		}
+		return result;
+	}
+	else
+		return NSDragOperationNone;
+}
+
+
+- (void)draggingExited:(id <NSDraggingInfo>)sender
+{
+	if ([delegate respondsToSelector:@selector(photoView:draggingExited:)])
+		[delegate photoView:self draggingExited:sender];
+	
+	if (drawDragHilite)
+	{
+		drawDragHilite = NO;
+		[self setNeedsDisplay:YES];
+	}
+}
+
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+	BOOL result;
+	if ([delegate respondsToSelector:@selector(photoView:prepareForDragOperation:)])
+		result = [delegate photoView:self prepareForDragOperation:sender];
+	else
+		result = YES;
+	
+	if (drawDragHilite)
+	{
+		drawDragHilite = NO;
+		[self setNeedsDisplay:YES];
+	}
+	return result;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+	if ([delegate respondsToSelector:@selector(photoView:performDragOperation:)])
+		return [delegate photoView:self performDragOperation:sender];
+	else
+		return NO;
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+	if ([delegate respondsToSelector:@selector(photoView:concludeDragOperation:)])
+		[delegate photoView:self concludeDragOperation:sender];
+}
+
 
 #pragma mark -
 // Responder Method
@@ -1364,7 +1447,7 @@ static NSImage *_badge = nil;
 
 - (NSImage *)photoView:(MUPhotoView *)view fastPhotoAtIndex:(unsigned)index
 {
-    return [self photoView:view photoAtIndex:index];
+    return nil;
 }
 
 // selection
@@ -1384,7 +1467,7 @@ static NSImage *_badge = nil;
 }
 
 // drag and drop
-- (unsigned int)photoView:(MUPhotoView *)view draggingSourceOperationMaskForLocal:(BOOL)isLocal
+- (NSDragOperation)photoView:(MUPhotoView *)view draggingSourceOperationMaskForLocal:(BOOL)isLocal
 {
     return NSDragOperationNone;
 }
@@ -1419,6 +1502,31 @@ static NSImage *_badge = nil;
 - (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
 {
 	return nil;
+}
+
+- (NSDragOperation)photoView:(MUPhotoView *)view draggingEntered:(id <NSDraggingInfo>)sender
+{
+	return NSDragOperationNone;
+}
+
+- (void)photoView:(MUPhotoView *)view draggingExited:(id <NSDraggingInfo>)sender
+{
+
+}
+
+- (BOOL)photoView:(MUPhotoView *)view performDragOperation:(id <NSDraggingInfo>)sender
+{
+	return NO;
+}
+
+- (BOOL)photoView:(MUPhotoView *)view prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+	return YES;
+}
+
+- (void)photoView:(MUPhotoView *)view concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+
 }
 
 @end
@@ -1542,12 +1650,16 @@ static NSImage *_badge = nil;
 
 - (NSImage *)photoAtIndex:(unsigned)index
 {
+	NSImage *result = nil;
     if ((nil != [self photosArray]) && (index < [self photoCount]))
-        return [[self photosArray] objectAtIndex:index];
+        result = [[self photosArray] objectAtIndex:index];
     else if ((nil != delegate) && (index < [self photoCount]))
-        return [delegate photoView:self photoAtIndex:index];
-    else
-        return nil;
+        result = [delegate photoView:self photoAtIndex:index];
+   
+   if (![result isValid])
+        result = nil;
+	
+	return result;
 }
 
 - (void)updatePhotoResizing
@@ -1577,7 +1689,7 @@ static NSImage *_badge = nil;
     }
     
     // if the above calls failed, try to just fetch the full size image
-    if (nil == fastPhoto) {
+    if (![fastPhoto isValid]) {
         fastPhoto = [self photoAtIndex:index];
     }
     
@@ -1737,9 +1849,9 @@ static NSImage *_badge = nil;
 - (void)removePhotosAtIndexes:(NSIndexSet *)indexes
 {
     // let the delegate know that we're about to delete, give it a chance to modify the indexes we'll delete
-    NSIndexSet *modifiedIndexes = indexes;
+    NSIndexSet *modifiedIndexes = [[indexes copy] autorelease];
     if ((nil != delegate) && ([delegate respondsToSelector:@selector(photoView:willRemovePhotosAtIndexes:)])) {
-        modifiedIndexes = [delegate photoView:self willRemovePhotosAtIndexes:indexes];
+        modifiedIndexes = [delegate photoView:self willRemovePhotosAtIndexes:modifiedIndexes];
     }
     
     // if using bindings, do the removal

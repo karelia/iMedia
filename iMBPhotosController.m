@@ -28,6 +28,11 @@ Please send fixes to
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
 
+#ifndef SAMPLE_INCOMING_DRAG
+#define SAMPLE_INCOMING_DRAG 0
+#endif
+
+
 @interface NSObject (CompilerIsHappy)
 + (NSImage *)imageWithPath:(NSString *)path boundingBox:(NSSize)boundingBox;
 @end
@@ -99,6 +104,9 @@ static NSImage *_missing = nil;
 	[oPhotoView setPhotoHorizontalSpacing:15];
 	[oPhotoView setPhotoVerticalSpacing:15];
 	[oPhotoView setUseFading:[[NSUserDefaults standardUserDefaults] boolForKey:@"iMBUseFading"]];
+#if SAMPLE_INCOMING_DRAG
+	[oPhotoView registerForDraggedTypes:[NSArray arrayWithObject:NSTIFFPboardType]];
+#endif
 }
 
 - (void)refilter
@@ -289,9 +297,17 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	if (max <= toMaxDimension)
 		return ofSize;
 		
-	float scale = toMaxDimension / max;
-	ofSize.width *= scale;
-	ofSize.height *= scale;
+	if (ofSize.width >= ofSize.height)
+		{
+		ofSize.width = toMaxDimension;
+		ofSize.height *= toMaxDimension / max;
+		}
+	else
+		{
+		ofSize.height = toMaxDimension;
+		ofSize.width *= toMaxDimension / max;
+		}
+	
 	return ofSize;
 	}
 
@@ -556,3 +572,101 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 }
 
 @end
+
+#pragma mark -
+#pragma mark Sample Incoming drag code
+
+#if SAMPLE_INCOMING_DRAG
+
+#warning -- SAMPLE_INCOMING_DRAG is enabled
+
+@interface NSObject (iMediaHack)
+- (id)observedObject;
+@end
+
+@implementation iMBPhotosController (SampleIncomingDragging)
+- (NSArray*)fineTunePlaylistDragTypes:(NSArray *)defaultTypes
+{
+	NSMutableArray* result = [NSMutableArray arrayWithObject:NSTIFFPboardType];
+	[result addObjectsFromArray:defaultTypes];
+	return result;
+}
+
+
+- (NSDragOperation)playlistOutlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index tryDefaultHandling:(BOOL*)tryDefault
+{
+	NSDragOperation result = NSDragOperationNone;
+	*tryDefault = YES;
+	NSPasteboard* pboard = [info draggingPasteboard];
+	if ([pboard availableTypeFromArray:[NSArray arrayWithObject:NSTIFFPboardType]])
+	{
+		if (index == NSOutlineViewDropOnItemIndex) // We don't allow inter-item drags
+		{
+			iMBLibraryNode* node = [item observedObject];
+			if (node) // You would also want to check that the node is able to receive the drop here
+			{
+				result = NSDragOperationCopy;
+				*tryDefault = NO;
+			}
+			else
+				; // It must be a drop to the whole view
+		}
+	}
+	return result;
+}
+
+- (BOOL)importPasteboard:(NSPasteboard*)pboard intoLibraryNode:(iMBLibraryNode*)node
+{ // Your real importing code would go here
+	return YES;
+}
+
+- (BOOL)playlistOutlineView:(NSOutlineView *)outlineView
+				 acceptDrop:(id <NSDraggingInfo>)info
+					   item:(id)item
+				 childIndex:(int)index
+		 tryDefaultHandling:(BOOL*)tryDefault
+{
+	BOOL result = NO;
+	*tryDefault = YES;
+	
+	NSPasteboard* pboard = [info draggingPasteboard];
+	if ([pboard availableTypeFromArray:[NSArray arrayWithObject:NSTIFFPboardType]])
+	{
+		*tryDefault = NO;
+		result = [self importPasteboard:pboard intoLibraryNode:[item observedObject]];
+	}
+	
+	return result;
+}
+
+// Support for dragging directly into the photoview
+- (NSDragOperation)photoView:(MUPhotoView *)view draggingEntered:(id <NSDraggingInfo>)sender
+{
+	NSArray* selectedNodes = [[self controller] selectedObjects];
+	if ([selectedNodes count] != 1)
+		return NSDragOperationNone;
+		
+	NSPasteboard* pboard = [sender draggingPasteboard];
+	if ([pboard availableTypeFromArray:[NSArray arrayWithObject:NSTIFFPboardType]])
+		return NSDragOperationCopy;
+	
+	return NSDragOperationNone;
+}
+
+
+- (BOOL)photoView:(MUPhotoView *)view performDragOperation:(id <NSDraggingInfo>)sender
+{
+	NSPasteboard* pboard = [sender draggingPasteboard];
+	
+	NSArray* selectedLibraryNodes = [[self controller] selectedObjects];
+	if ([selectedLibraryNodes count] != 1)
+		return NO;
+	
+	iMBLibraryNode* node = [selectedLibraryNodes objectAtIndex:0];
+	
+	return [self importPasteboard:pboard intoLibraryNode:node];
+}
+
+
+@end
+#endif SAMPLE_INCOMING_DRAG

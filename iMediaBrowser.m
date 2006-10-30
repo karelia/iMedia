@@ -224,8 +224,6 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)awakeFromNib
 {
-	[oPlaylists registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
-	
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
 	myLoadedParsers = [[NSMutableDictionary alloc] init];
 	myUserDroppedParsers = [[NSMutableArray alloc] init];
@@ -389,6 +387,8 @@ static NSMutableDictionary *_parsers = nil;
 			[view setFrame:[oBrowserView bounds]];
 			[oBrowserView addSubview:[view retain]];
 			mySelectedBrowser = browser;
+			[oPlaylists registerForDraggedTypes:[mySelectedBrowser fineTunePlaylistDragTypes:[NSArray arrayWithObject:NSFilenamesPboardType]]];
+			
 			//save the selected browse
 			[[NSUserDefaults standardUserDefaults] setObject:NSStringFromClass([mySelectedBrowser class]) forKey:@"iMediaBrowsermySelectedBrowser"];
 			myFlags.isLoading = YES;
@@ -777,7 +777,7 @@ static NSMutableDictionary *_parsers = nil;
 {
 	NSEnumerator *e = [items objectEnumerator];
 	id cur;
-	
+	[pboard declareTypes:[NSArray array] owner:nil]; // clear the pasteboard incase the browser decides not to add anything
 	while (cur = [e nextObject])
 	{
 		[mySelectedBrowser writePlaylist:[cur observedObject] toPasteboard:pboard];
@@ -804,6 +804,11 @@ static NSMutableDictionary *_parsers = nil;
                 item: (id)item
           childIndex: (int)index
 {
+	BOOL doDefault = YES;
+	BOOL success = [mySelectedBrowser playlistOutlineView:ov acceptDrop:info item:item childIndex:index tryDefaultHandling:&doDefault];
+	if (success || !doDefault)
+		return success;
+
     NSArray *folders = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
 	NSFileManager *fm = [NSFileManager defaultManager];
 	BOOL isDir;
@@ -815,7 +820,7 @@ static NSMutableDictionary *_parsers = nil;
 	
 	while ((cur = [e nextObject]))
 	{
-		if ([fm fileExistsAtPath:cur isDirectory:&isDir] && isDir)
+		if ([fm fileExistsAtPath:cur isDirectory:&isDir] && isDir && [mySelectedBrowser allowPlaylistFolderDrop:cur])
 		{
 			iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:cur];
 			iMBLibraryNode *node = [parser parseDatabase];
@@ -839,20 +844,27 @@ static NSMutableDictionary *_parsers = nil;
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index
 {
-	item = [item observedObject];
+	BOOL doDefault = YES;
+	NSDragOperation dragOp = [mySelectedBrowser playlistOutlineView:outlineView validateDrop:info proposedItem:item proposedChildIndex:index tryDefaultHandling:&doDefault];
+	
+	if ((dragOp != NSDragOperationNone) || !doDefault)
+		return dragOp;
+		
 	if ([mySelectedBrowser parserForFolderDrop])
 	{
-		if (item == nil)
+		NSPasteboard *pboard = [info draggingPasteboard];
+		if ([pboard availableTypeFromArray:[NSArray arrayWithObject:NSFilenamesPboardType]])
 		{
-			NSArray *folders = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
+			NSArray *folders = [pboard propertyListForType:NSFilenamesPboardType];
 			if ([folders count] > 0)
 			{
+				NSString* path = [folders objectAtIndex:0];
 				NSFileManager *fm = [NSFileManager defaultManager];
-				BOOL isDir;
 				
-				[fm fileExistsAtPath:[folders objectAtIndex:0] isDirectory:&isDir];
-				if (isDir)
+				BOOL isDir;
+				if ([fm fileExistsAtPath:path isDirectory:&isDir] && isDir && [mySelectedBrowser allowPlaylistFolderDrop:path])
 				{
+					[outlineView setDropItem:nil dropChildIndex:NSOutlineViewDropOnItemIndex]; // Target the whole view
 					return NSDragOperationCopy;
 				}
 			}

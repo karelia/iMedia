@@ -85,6 +85,34 @@ Please send fixes to
 	return nil; 
 }
 
+
+- (NSArray*)fineTunePlaylistDragTypes:(NSArray *)defaultTypes
+{
+	return defaultTypes;
+}
+
+- (BOOL)allowPlaylistFolderDrop:(NSString*)path
+{
+	return ![[NSWorkspace sharedWorkspace] isFilePackageAtPath:path];
+}
+
+- (NSDragOperation)playlistOutlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index tryDefaultHandling:(BOOL*)tryDefault
+
+{
+	*tryDefault = YES;
+	return NSDragOperationNone;
+}
+
+- (BOOL)playlistOutlineView:(NSOutlineView *)outlineView
+				 acceptDrop:(id <NSDraggingInfo>)info
+					   item:(id)item
+				 childIndex:(int)index
+		 tryDefaultHandling:(BOOL*)tryDefault
+{
+	*tryDefault = YES;
+	return NO;
+}
+
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
 	
