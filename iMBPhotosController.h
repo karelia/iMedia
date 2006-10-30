@@ -44,5 +44,6 @@ Please send fixes to
 }
 
 - (IBAction)search:(id)sender;
+- (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard;
 
 @end
