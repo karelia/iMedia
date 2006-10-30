@@ -241,6 +241,9 @@ static NSMutableDictionary *_parsers = nil;
 	[myToolbar setShowsBaselineSeparator:YES];
 	[myToolbar setSizeMode:NSToolbarSizeModeSmall];
 	
+	NSString *lastmySelectedBrowser = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowsermySelectedBrowser"];
+	BOOL canRestoreLastSelectedBrowser = NO;
+
 	// Load any plugins so they register
 	NSEnumerator *e = [_browserClasses objectEnumerator];
 	NSString *cur;
@@ -271,6 +274,8 @@ static NSMutableDictionary *_parsers = nil;
 				continue;
 			}
 		}
+		if ([lastmySelectedBrowser isEqualToString:cur])
+			canRestoreLastSelectedBrowser = YES;
 		
 		[myMediaBrowsers addObject:browser];
 		[browser release];
@@ -285,9 +290,7 @@ static NSMutableDictionary *_parsers = nil;
 	
 	//select the first browser
 	if ([myMediaBrowsers count] > 0) {
-		//see if the last selected browser is in user defaults
-		NSString *lastmySelectedBrowser = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowsermySelectedBrowser"];
-		if (lastmySelectedBrowser && [myMediaBrowsers containsObject:lastmySelectedBrowser])
+		if (canRestoreLastSelectedBrowser)
 		{
 			[myToolbar setSelectedItemIdentifier:lastmySelectedBrowser];
 			[self showMediaBrowser:lastmySelectedBrowser];
