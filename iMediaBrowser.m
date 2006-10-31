@@ -610,6 +610,47 @@ static NSMutableDictionary *_parsers = nil;
 	return results;
 }
 
+
+
+- (NSArray*)addCustomFolders:(NSArray*)folders
+{
+	NSMutableArray *results = [NSMutableArray array];
+	if ([folders count])
+	{
+		NSFileManager *fm = [NSFileManager defaultManager];
+		BOOL isDir;
+		NSEnumerator *e = [folders objectEnumerator];
+		NSString *cur;
+		Class aClass = [mySelectedBrowser parserForFolderDrop];
+		NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
+		NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]]];
+		
+		while ((cur = [e nextObject]))
+		{
+			if (![drops containsObject:cur] && [fm fileExistsAtPath:cur isDirectory:&isDir] && isDir && [mySelectedBrowser allowPlaylistFolderDrop:cur])
+			{
+				iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:cur];
+				iMBLibraryNode *node = [parser parseDatabase];
+				[node setParser:parser];
+				[node setName:[cur lastPathComponent]];
+				[node setIconName:@"folder"];
+				[content addObject:node];
+				[results addObject:node];
+				[myUserDroppedParsers addObject:parser];
+				[parser release];
+				
+				[drops addObject:cur];
+			}
+		}
+		
+		[libraryController setContent:content];
+		
+		[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
+	}
+	
+	return results;
+}
+
 #pragma mark -
 #pragma mark Delegate
 
@@ -810,34 +851,7 @@ static NSMutableDictionary *_parsers = nil;
 		return success;
 
     NSArray *folders = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
-	NSFileManager *fm = [NSFileManager defaultManager];
-	BOOL isDir;
-	NSEnumerator *e = [folders objectEnumerator];
-	NSString *cur;
-	Class aClass = [mySelectedBrowser parserForFolderDrop];
-	NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
-	NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]]];
-	
-	while ((cur = [e nextObject]))
-	{
-		if ([fm fileExistsAtPath:cur isDirectory:&isDir] && isDir && [mySelectedBrowser allowPlaylistFolderDrop:cur])
-		{
-			iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:cur];
-			iMBLibraryNode *node = [parser parseDatabase];
-			[node setParser:parser];
-			[node setName:[cur lastPathComponent]];
-			[node setIconName:@"folder"];
-			[content addObject:node];
-			[myUserDroppedParsers addObject:parser];
-			[parser release];
-			
-			[drops addObject:cur];
-		}
-	}
-	
-	[libraryController setContent:content];
-	
-	[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
+	[self addCustomFolders:folders];
 	
 	return YES;
 }

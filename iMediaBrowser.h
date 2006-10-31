@@ -93,6 +93,10 @@ Please send fixes to
 
 - (BOOL)isLoading;
 
+// Performs the same action as dragging and dropping folders onto the playlist view
+// Returns the library nodes that were added.
+- (NSArray*)addCustomFolders:(NSArray*)folderPaths;
+
 @end
 
 // This notification is for each specific media browser to post when their selection changes.
