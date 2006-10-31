@@ -58,7 +58,6 @@ static NSMutableDictionary *imageCache = nil;
 		myItems = [items mutableCopy];
 		myAttributes = [[NSMutableDictionary dictionary] retain];
 		[self setName:name];
-		[self setIconName:@"folder"];
 	}
 	return self;
 }
@@ -70,6 +69,7 @@ static NSMutableDictionary *imageCache = nil;
 	[myAttributes release];
 	[myIcon release];
 	[myIconName release];
+    [myFilePath release];
 	[myCachedNameWithImage release];
 	[myAttributeFilterMap release];
 	
@@ -144,28 +144,57 @@ static NSMutableDictionary *imageCache = nil;
 	myIcon = [icon retain];
 }
 
+- (NSString *)filePath
+{
+	return myFilePath;
+}
+
+- (void)setFilePath:(NSString *)path
+{
+    if (myFilePath != path)
+    {
+        NSParameterAssert([path isAbsolutePath]);
+        
+        [myFilePath release];
+        myFilePath = [path copyWithZone:[self zone]];
+    }
+}
+
 // Get icon from named cache if possible.  Special case iPhoto app icon.
 - (NSImage *)icon
 {
-	if (!myIcon && myIconName)
+	if (!myIcon)
 	{
-		myIcon = [[imageCache objectForKey:myIconName] retain];
-		if (!myIcon)
-		{
-			if ([myIconName rangeOfString:@"."].location != NSNotFound)
-			{
-				myIcon = [[[NSWorkspace sharedWorkspace]
+        if (myIconName)
+        {
+            myIcon = [[imageCache objectForKey:myIconName] retain];
+            if (!myIcon)
+            {
+                if ([myIconName rangeOfString:@"."].location != NSNotFound)
+                {
+                    myIcon = [[[NSWorkspace sharedWorkspace]
 					iconForAppWithBundleIdentifier:myIconName] retain];
-			}
-			else
-			{
-				NSBundle *b = [NSBundle bundleForClass:[self class]];
-				NSString *p = [b pathForImageResource:myIconName];
-				myIcon = [[NSImage alloc] initWithContentsOfFile:p];
-			}
-			[imageCache setObject:myIcon forKey:myIconName];
-		}
-	}
+                }
+                else
+                {
+                    NSBundle *b = [NSBundle bundleForClass:[self class]];
+                    NSString *p = [b pathForImageResource:myIconName];
+                    myIcon = [[NSImage alloc] initWithContentsOfFile:p];
+                }
+                [imageCache setObject:myIcon forKey:myIconName];
+            }
+        }
+        if ([self filePath])
+        {
+            myIcon = [[imageCache objectForKey:[self filePath]] retain];
+            if (!myIcon)
+            {
+                myIcon = [[[NSWorkspace sharedWorkspace] iconForFile:[self filePath]] retain];
+                if (myIcon)
+                    [imageCache setObject:myIcon forKey:[self filePath]];
+            }
+        }
+    }
 	return myIcon;
 }
 
@@ -348,15 +377,12 @@ static NSMutableDictionary *imageCache = nil;
 		
 		while (curAttrib = [g nextObject])
 		{
-			if ([curAttrib isKindOfClass:[NSDictionary class]])
-			{
-				filterKeyValue = [curAttrib objectForKey:filter];
-				if (![alreadyAdded member:filterKeyValue])
-				{
-					[items addObject:curAttrib];
-					[alreadyAdded addObject:filterKeyValue];
-				}
-			}
+            filterKeyValue = [curAttrib valueForKey:filter];
+            if (![alreadyAdded member:filterKeyValue])
+            {
+                [items addObject:curAttrib];
+                [alreadyAdded addObject:filterKeyValue];
+            }
 		}
 	}
 	

@@ -78,7 +78,7 @@
 			if (node)
 			{
 				[node setName:[cur lastPathComponent]];
-				[node setIconName:@"folder"];
+				[node setFilePath:cur];
 				[favs addItem:node];
 				[myParsers addObject:parser];
 			}

@@ -111,7 +111,7 @@ Please send fixes to
 					iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 					[root addItem:folder];
 					[folder release];
-					[folder setIconName:@"folder"];
+					[folder setFilePath:filePath];
 					[folder setName:[fm displayNameAtPath:filePath]];
 					[self recursivelyParse:filePath withNode:folder];
 				}
@@ -143,9 +143,9 @@ Please send fixes to
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
-	[root setIconName:@"picturesFolder"];
 	NSString *folder = [self databasePath];
-	
+	[root setFilePath:folder];
+    
 	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
 	{
 		[root release];

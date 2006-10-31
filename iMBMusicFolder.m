@@ -102,8 +102,8 @@
 			iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 			[root addItem:folder];
 			[folder release];
-			[folder setIconName:@"folder"];
 			[folder setName:[fm displayNameAtPath:filePath]];
+            [folder setFilePath:filePath];
 			[self recursivelyParse:filePath withNode:folder];
 		}
 		else
@@ -197,15 +197,15 @@
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"Music Folder", @"Name of your 'Music' folder in your home directory")];
-	[root setIconName:@"folder"];
 	NSString *folder = [self databasePath];
+    [root setFilePath:folder];
 	
 	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
 	{
 		[root release];
 		return nil;
 	}
-	
+	    
 	[self recursivelyParse:folder withNode:root];
 	
 	return [root autorelease];

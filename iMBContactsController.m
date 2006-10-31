@@ -128,6 +128,7 @@ static NSImage *_toolbarIcon = nil;
 - (void)didDeactivate
 {
 	[self unbind:@"images"];
+    [super didDeactivate];
 }
 
 - (BOOL)tableView:(NSTableView *)tv
@@ -162,7 +163,7 @@ static NSImage *_toolbarIcon = nil;
 	return YES;
 }
 
-- (void)writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
+- (BOOL)writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
@@ -204,11 +205,12 @@ static NSImage *_toolbarIcon = nil;
  	[pboard writeURLs:urls files:nil names:titles];
 	[pboard setPropertyList:[vcards componentsJoinedByString:@"\n"] forType:@"Apple VCard pasteboard type"];
 	[pboard setPropertyList:uids forType:@"ABPeopleUIDsPboardType"];
+    return YES;
 }
 
-- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+- (BOOL)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
-	[self writeItems:[playlist valueForKey:@"People"] toPasteboard:pboard];
+	return [self writeItems:[playlist valueForKey:@"People"] toPasteboard:pboard];
 }
 
 - (NSNumber *)imageCount

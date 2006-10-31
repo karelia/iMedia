@@ -31,6 +31,8 @@ Please send fixes to
 {
 	IBOutlet NSView *oView;
 
+    BOOL    myIsEnabled;
+    
 	@private
 		NSTreeController *myController;
 }
