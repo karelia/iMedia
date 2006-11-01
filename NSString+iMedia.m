@@ -95,6 +95,7 @@
 																(CFStringRef)anExtension,
 																NULL
 																);
+		[UTI autorelease];
 	}
 	
 	// If we don't find it, add an entry to the info.plist of the APP,
@@ -109,11 +110,11 @@
 + (NSString *)UTIForFileType:(NSString *)aFileType;
 
 {
-	return (NSString *)UTTypeCreatePreferredIdentifierForTag(
+	return [(NSString *)UTTypeCreatePreferredIdentifierForTag(
 															 kUTTagClassOSType,
 															 (CFStringRef)aFileType,
 															 NULL
-															 );	
+															 ) autorelease];	
 }
 
 // See list here:

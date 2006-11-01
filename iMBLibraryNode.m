@@ -140,8 +140,11 @@ static NSMutableDictionary *imageCache = nil;
 
 - (void)setIcon:(NSImage *)icon
 {
-	[myIcon release];
-	myIcon = [icon retain];
+	if (icon != myIcon)
+	{
+		[myIcon release];
+		myIcon = [icon retain];
+	}
 }
 
 // Get icon from named cache if possible.  Special case iPhoto app icon.

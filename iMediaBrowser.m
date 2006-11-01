@@ -468,6 +468,7 @@ static NSMutableDictionary *_parsers = nil;
 	BOOL isDir;
 	Class aClass = [mySelectedBrowser parserForFolderDrop];
 	
+	[myUserDroppedParsers removeAllObjects]; // Clear out the old ones as otherwise we just grow and grow (and leak parsers)
 	while ((drop = [e nextObject]))
 	{
 		if ([fm fileExistsAtPath:drop isDirectory:&isDir] && isDir)
