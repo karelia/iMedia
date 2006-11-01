@@ -52,6 +52,7 @@ Please send fixes to
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
+	NSWorkspace *ws = [NSWorkspace sharedWorkspace];
 	NSArray *contents = [fm directoryContentsAtPath:path];
 	NSEnumerator *e = [contents objectEnumerator];
 	NSString *cur;
@@ -67,7 +68,7 @@ Please send fixes to
 		if ([fileName rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
 		if ([fm isPathHidden:fileName]) continue;
 		
-		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir)
+		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![ws isFilePackageAtPath:filePath] )
 		{
 			iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 			[root addItem:folder];
