@@ -823,7 +823,7 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		[mySelectedBrowser writePlaylist:[cur observedObject] toPasteboard:pboard];
 	}
-	return YES;
+	return [[pboard types] count] != 0;
 }
 
 - (BOOL) outlineView: (NSOutlineView *)ov
