@@ -1738,14 +1738,19 @@ static NSImage *_badge = nil;
 
 - (NSRange)photoIndexRangeForRect:(NSRect)rect
 {
-    unsigned	start = [self photoIndexForPoint:rect.origin];
-	unsigned	finish = [self photoIndexForPoint:NSMakePoint(NSMaxX(rect), NSMaxY(rect))];
-	unsigned	picCount = [self photoCount];
-	
-    if (finish >= picCount)
-        finish = picCount;
-	
-	return NSMakeRange(start, finish-start);	
+	unsigned photoCount = [self photoCount];
+	if (!photoCount)
+		return NSMakeRange(NSNotFound, 0);
+
+    unsigned start = [self photoIndexForPoint:rect.origin];
+	if (start >= photoCount)
+		return NSMakeRange(NSNotFound, 0);
+		
+	unsigned finish = [self photoIndexForPoint:NSMakePoint(NSMaxX(rect), NSMaxY(rect))];
+	if (finish >= photoCount)
+		finish = photoCount - 1;
+    
+	return NSMakeRange(start, (finish + 1) - start);
 }
 
 - (NSRect)gridRectForIndex:(unsigned)index
