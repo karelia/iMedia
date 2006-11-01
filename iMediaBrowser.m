@@ -477,7 +477,7 @@ static NSMutableDictionary *_parsers = nil;
 			iMBLibraryNode *node = [parser parseDatabase];
 			[node setParser:parser];
 			[node setName:[drop lastPathComponent]];
-            [node setFilePath:drop];
+			[node setIconName:@"folder"];
 			[root addObject:node];
 			[myUserDroppedParsers addObject:parser];
 			[parser release];
@@ -818,14 +818,12 @@ static NSMutableDictionary *_parsers = nil;
 {
 	NSEnumerator *e = [items objectEnumerator];
 	id cur;
-    int success = 0;
-	
-    [pboard declareTypes:[NSArray array] owner:nil]; // clear the pasteboard incase the browser decides not to add anything
-	
-    while (cur = [e nextObject])
-		success += [mySelectedBrowser writePlaylist:[cur observedObject] toPasteboard:pboard];
-
-	return (success > 0);
+	[pboard declareTypes:[NSArray array] owner:nil]; // clear the pasteboard incase the browser decides not to add anything
+	while (cur = [e nextObject])
+	{
+		[mySelectedBrowser writePlaylist:[cur observedObject] toPasteboard:pboard];
+	}
+	return YES;
 }
 
 - (BOOL) outlineView: (NSOutlineView *)ov

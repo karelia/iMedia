@@ -72,8 +72,8 @@ Please send fixes to
 			iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 			[root addItem:folder];
 			[folder release];
+			[folder setIconName:@"folder"];
 			[folder setName:[fm displayNameAtPath:filePath]];
-            [folder setFilePath:filePath];
 			[self recursivelyParse:filePath withNode:folder];
 		}
 		else
@@ -106,9 +106,9 @@ Please send fixes to
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"Pictures Folder", @"Name of your 'Pictures' folder in your home directory")];
-    [root setFilePath:[self databasePath]];
-    
-	if (![[NSFileManager defaultManager] fileExistsAtPath:[self databasePath]])
+	[root setIconName:@"picturesFolder"];
+		
+	if (![[NSFileManager defaultManager] fileExistsAtPath:myDatabase])
 	{
 		[root release];
 		return nil;

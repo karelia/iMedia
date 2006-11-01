@@ -121,7 +121,6 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)willActivate
 {
-    [super willActivate];
 	[self bind:@"selectionChanged" 
 	  toObject:songsController
 		 withKeyPath:@"selectedObjects" 
@@ -135,15 +134,16 @@ static NSImage *_toolbarIcon = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 													name:QTMovieTimeDidChangeNotification
 												  object:nil];
-    [super didDeactivate];
 }
 
-- (BOOL)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	//[types addObject:@"ImageDataListPboardType"];
-		
+	
+	[pboard declareTypes:types owner:nil];
+	
 	NSEnumerator *e = [[playlist valueForKey:@"Tracks"] objectEnumerator];
 	NSDictionary *cur;
 	NSMutableArray *files = [NSMutableArray array];
@@ -155,10 +155,7 @@ static NSImage *_toolbarIcon = nil;
 		NSString *loc = [locURL path];
 		[files addObject:loc];
 	}
-
-    [pboard declareTypes:types owner:nil];
-    [pboard writeURLs:nil files:files names:nil];
-    return YES;
+	[pboard writeURLs:nil files:files names:nil];
 }
 
 - (BOOL)tableView:(NSTableView *)tv

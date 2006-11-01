@@ -181,7 +181,6 @@ static NSImage *_placeholder = nil;
 	[previewMovieView pause:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[previewMovieView removeFromSuperview];
-    [super didDeactivate];
 }
 
 
@@ -225,7 +224,7 @@ static NSImage *_toolbarIcon = nil;
 	return @"MBQuicktime.png";
 }
 
-- (BOOL)writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
+- (void)writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
@@ -241,14 +240,12 @@ static NSImage *_toolbarIcon = nil;
 		[files addObject:[cur objectForKey:@"ImagePath"]];
 		[names addObject:[cur objectForKey:@"Caption"]];
 	}
-
-    [pboard writeURLs:nil files:files names:names];
-    return YES;
+	[pboard writeURLs:nil files:files names:names];
 }
 
-- (BOOL)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
-	return [self writeItems:[playlist valueForKey:@"Movies"] toPasteboard:pboard];
+	[self writeItems:[playlist valueForKey:@"Movies"] toPasteboard:pboard];
 }
 
 #pragma mark -

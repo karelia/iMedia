@@ -72,16 +72,12 @@ Please send fixes to
 
 - (void)willActivate
 {
-    [self willChangeValueForKey:@"controller"];
-	myIsEnabled = YES;
-    [self didChangeValueForKey:@"controller"];
+	
 }
 
 - (void)didDeactivate
 {
-    [self willChangeValueForKey:@"controller"];
-	myIsEnabled = NO;
-    [self didChangeValueForKey:@"controller"];
+	
 }
 
 - (Class)parserForFolderDrop
@@ -117,9 +113,9 @@ Please send fixes to
 	return NO;
 }
 
-- (BOOL)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
-	return NO;
+	
 }
 
 - (void)refresh
@@ -129,9 +125,6 @@ Please send fixes to
 
 - (NSTreeController *)controller
 {
-    if (!myIsEnabled)  
-        return nil;
-
 	return [[myController retain] autorelease];
 }
 

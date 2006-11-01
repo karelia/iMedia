@@ -51,7 +51,7 @@ Please send fixes to
 - (void)didDeactivate;
 
 // Drag and Drop support for the playlist/album
-- (BOOL)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard;
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard;
 
 // parsers can notify the browser to refresh if the underlying database changes
 - (void)refresh;

@@ -44,6 +44,6 @@ Please send fixes to
 }
 
 - (IBAction)search:(id)sender;
-- (BOOL)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard;
+- (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard;
 
 @end

@@ -35,7 +35,6 @@
 	NSMutableDictionary *myAttributes;
 	NSImage				*myIcon;
 	NSString			*myIconName;
-    NSString            *myFilePath;
 	NSMutableDictionary *myAttributeFilterMap;
 	id					myParser;
 	
@@ -51,8 +50,6 @@
 - (NSString *)iconName;
 - (void)setIcon:(NSImage *)icon;
 - (NSImage *)icon;
-- (NSString *) filePath;
-- (void) setFilePath:(NSString *)path;
 
 - (void)setParser:(id)parser;
 - (id)parser;

@@ -102,7 +102,7 @@
 				iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 				[root addItem:folder];
 				[folder release];
-				[folder setFilePath:filePath];
+				[folder setIconName:@"folder"];
 				[folder setName:[fm displayNameAtPath:filePath]];
 				[self recursivelyParse:filePath withNode:folder artist:artist];
 			}

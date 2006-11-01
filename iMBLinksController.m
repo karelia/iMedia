@@ -71,6 +71,11 @@ static NSImage *_toolbarIcon = nil;
 	return oView;
 }
 
+- (void)didDeactivate
+{
+	
+}
+
 - (BOOL)tableView:(NSTableView *)tv
 		writeRows:(NSArray*)rows
 	 toPasteboard:(NSPasteboard*)pboard
@@ -102,7 +107,7 @@ static NSImage *_toolbarIcon = nil;
 	return YES;
 }
 
-- (BOOL)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard URLTypes]];
@@ -126,7 +131,6 @@ static NSImage *_toolbarIcon = nil;
 		}
 	}
  	[pboard writeURLs:urls files:nil names:titles];
-    return YES;
 }
 
 - (IBAction)openInBrowser:(id)sender

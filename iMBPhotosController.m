@@ -191,7 +191,7 @@ static NSImage *_toolbarIcon = nil;
 	return NSClassFromString(@"iMBPicturesFolder");
 }
 
-- (BOOL)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard
+- (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard
 {
 	NSMutableArray *files = [NSMutableArray array];
 	NSMutableArray *captions = [NSMutableArray array];
@@ -224,18 +224,16 @@ static NSImage *_toolbarIcon = nil;
 		i++;
 		//[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
 	}
-    
-    [pboard writeURLs:nil files:files names:captions];
-    
-    NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:album], @"List of Albums", images, @"Master Image List", nil];
-    [pboard setString:[plist description] forType:@"AlbumDataListPboardType"];
-    [pboard setString:[images description] forType:@"ImageDataListPboardType"];
-    return YES;
+	[pboard writeURLs:nil files:files names:captions];
+	
+	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:album], @"List of Albums", images, @"Master Image List", nil];
+	[pboard setString:[plist description] forType:@"AlbumDataListPboardType"];
+	[pboard setString:[images description] forType:@"ImageDataListPboardType"];
 }
 
-- (BOOL)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
+- (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard
 {
-	return [self writeItems:[playlist valueForKey:@"Images"] fromAlbum:[playlist name] toPasteboard:pboard];	
+	[self writeItems:[playlist valueForKey:@"Images"] fromAlbum:[playlist name] toPasteboard:pboard];	
 }
 
 - (NSNumber *)imageCount
