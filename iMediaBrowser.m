@@ -311,6 +311,7 @@ static NSMutableDictionary *_parsers = nil;
 	[libraryController setSortDescriptors:nil];
 	[oSplitView setDelegate:self];
 	
+	[libraryController addObserver:self forKeyPath:@"content" options:0 context:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(appWillQuit:)
 												 name:NSApplicationWillTerminateNotification
@@ -516,6 +517,24 @@ static NSMutableDictionary *_parsers = nil;
 	}
 }
 
+- (void)updatePlaylistPopup
+{
+	if ([[libraryController content] count] > 0)
+		[oPlaylistPopup setMenu:[self playlistMenu]];
+	else
+		[oPlaylistPopup removeAllItems];
+	[oPlaylistPopup setEnabled:[oPlaylistPopup numberOfItems] > 0];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if ((object == libraryController) && [keyPath isEqualToString:@"content"])
+	{
+		[self updatePlaylistPopup];
+	}
+}
+
+
 - (void)controllerLoadedData:(id)sender
 {
 	[oLoadingView setHidden:YES];
@@ -535,14 +554,8 @@ static NSMutableDictionary *_parsers = nil;
 		{
 			[oPlaylists expandItem:[oPlaylists itemAtRow:0]];
 		}
-		[oPlaylistPopup setMenu:[self playlistMenu]];
-	}
-	else
-	{
-		[oPlaylistPopup removeAllItems];
 	}
 	
-	[oPlaylistPopup setEnabled:[oPlaylistPopup numberOfItems] > 0];
 	[mySelectedBrowser willActivate];
 	
 	if (myFlags.didChangeBrowser)
