@@ -337,6 +337,9 @@ static NSMutableDictionary *_parsers = nil;
 	NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
 	[ud setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
 	[ud setObject:[NSArray arrayWithObjects:NSStringFromRect([oPlaylists frame]), NSStringFromRect([oBrowserView frame]), nil] forKey:@"iMBSplitViewSize"];
+	[ud setObject:NSStringFromRect([[self window] frame]) forKey:@"iMediaBrowserWindowPosition"];
+	[ud synchronize];
+	
 	[ud synchronize];
 }
 
@@ -691,10 +694,6 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)windowDidMove:(NSNotification *)aNotification
 {
-	NSString *pos = NSStringFromRect([[self window] frame]);
-	NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-	[ud setObject:pos forKey:@"iMediaBrowserWindowPosition"];
-	[ud synchronize];
 }
 
 - (void)windowDidResize:(NSNotification *)aNotification
