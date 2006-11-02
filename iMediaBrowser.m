@@ -540,9 +540,9 @@ static NSMutableDictionary *_parsers = nil;
 	else
 	{
 		[oPlaylistPopup removeAllItems];
-		[oPlaylistPopup setEnabled:NO];
 	}
 	
+	[oPlaylistPopup setEnabled:[oPlaylistPopup numberOfItems] > 0];
 	[mySelectedBrowser willActivate];
 	
 	if (myFlags.didChangeBrowser)
