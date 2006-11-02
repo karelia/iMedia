@@ -55,7 +55,6 @@ const float kFadingTimeThreshold = 0.1;
         photosArray = nil;
         photosFastArray = nil;
         selectedPhotoIndexes = nil;
-        dragSelectedPhotoIndexes = [[NSMutableIndexSet alloc] init];
         
         [self setBackgroundColor:[NSColor whiteColor]];
         
@@ -131,7 +130,7 @@ const float kFadingTimeThreshold = 0.1;
 	
     // get the number of photos
     unsigned photoCount = [self photoCount];
-    if ((0 == photoCount) && !drawDragHilite)
+    if ((0 == photoCount) && !drawDropHilite)
         return;
 
     // update internal grid size, adjust height based on the new grid size
@@ -287,7 +286,7 @@ const float kFadingTimeThreshold = 0.1;
     //**** END Drawing Photos ****//
     
     //**** BEGIN Selection Rectangle ****//
-	if (mouseDown) {
+	if (mouseDown && dragSelectedPhotoIndexes) {
 		[noShadow set];
 		[[NSColor whiteColor] set];
 		
@@ -303,7 +302,7 @@ const float kFadingTimeThreshold = 0.1;
 	}
     //**** END Selection Rectangle ****//
 	
-	if (drawDragHilite)
+	if (drawDropHilite)
 		{
 		NSRect dragRect = NSInsetRect(rect,1,1);
 		[NSBezierPath setDefaultLineWidth:2];
@@ -818,6 +817,48 @@ static NSImage *_badge = nil;
 
 - (void)mouseDown:(NSEvent *)event
 {
+	/*	Overview
+		The logic here is based on how the iLife apps behave in their media browsers
+		
+		If they click a photo
+			{
+			If the photo is already selected
+				If the command or shift keys are keld down
+					deselect it
+				else
+					leave it selected
+			else
+				{
+				If the shift key is down
+					If nothing is already selected
+						select it
+					else
+						extend the selection up to and including the photo
+				else if the command key is down
+					add it to the existing selection
+				else
+					clear the current selection
+					select it
+				}
+			
+			If the clicked photo is now part of the selection
+				allow the click to initiate a Drag & Drop
+			else
+				do not allow the click to initiate a Drag & Drop
+
+			do not allow the click to initiate a drag select
+			}
+		else they didn't click a photo
+			{
+			deselect everything, regardless of the state of the shift and command keys
+			allow the click to initiate a drag select
+			do not allow the click to initiate a Drag & Drop
+			}
+	*/
+	
+	[dragSelectedPhotoIndexes release]; // Just in case the previous mouseUp got lost (e.g during debugging)
+	dragSelectedPhotoIndexes = nil;
+	
     mouseDown = YES;
 	mouseDownPoint = [self convertPoint:[event locationInWindow] fromView:nil];
 	mouseCurrentPoint = mouseDownPoint;
@@ -825,29 +866,51 @@ static NSImage *_badge = nil;
 	unsigned clickedIndex = [self photoIndexForPoint:mouseDownPoint];
     NSRect photoRect = [self photoRectForIndex:clickedIndex];
     
-	if (NSPointInRect(mouseDownPoint, photoRect)) 
-	{
-		//NSLog(@"is in photo rect");
-		if ([self isPhotoSelectedAtIndex:clickedIndex])
-		{
-			potentialDragDrop = YES;
-		}
-		else
-		{
-			if ([[self selectionIndexes] count] == 0)
-			{
-				[dragSelectedPhotoIndexes removeAllIndexes];
-				[dragSelectedPhotoIndexes addIndex:clickedIndex];
-				potentialDragDrop = YES;
+	
+	NSIndexSet* originalSelection = [self selectionIndexes];
+	NSMutableIndexSet *selection = [[originalSelection mutableCopy] autorelease];
+
+	potentialDragDrop = NO;
+	BOOL isHit = NSPointInRect(mouseDownPoint, photoRect);
+	if (isHit) {
+		unsigned int flags = [event modifierFlags];
+		
+		BOOL alreadySelected = [selection containsIndex:clickedIndex];
+		BOOL deselectIt = NO;
+		
+		if (alreadySelected)
+			deselectIt = (flags & (NSCommandKeyMask | NSShiftKeyMask)) != 0;
+			
+		if (deselectIt)
+			[selection removeIndex:clickedIndex];
+		else if (!alreadySelected) {
+			if (flags & NSShiftKeyMask) {
+				if (![selection count]) {
+					[selection addIndex:clickedIndex];
+				} else {
+					unsigned int origin = (clickedIndex < [selection lastIndex]) ? clickedIndex : [selection lastIndex];
+					unsigned int length = (clickedIndex < [selection lastIndex]) ? [selection lastIndex] - clickedIndex: clickedIndex - [selection lastIndex] ;
+					length++;
+					[selection addIndexesInRange:NSMakeRange(origin, length)];
+				}
+            
+			} else {
+				if (!(flags & NSCommandKeyMask))
+					[selection removeAllIndexes];
+				
+				[selection addIndex:clickedIndex];
 			}
-			else
-			{
-				potentialDragDrop = NO;
-			}
 		}
-	} else 
-	{
-		potentialDragDrop = NO;
+		
+		potentialDragDrop = !deselectIt && [selection count];
+	} else {
+		[selection removeAllIndexes];
+		dragSelectedPhotoIndexes = [[NSMutableIndexSet alloc] init];
+	}
+	
+	if (![originalSelection isEqualToIndexSet:selection]) {
+		[self setSelectionIndexes:selection];
+		[self setNeedsDisplayInRect:[self visibleRect]];
 	}
 }
 
@@ -872,23 +935,13 @@ static NSImage *_badge = nil;
         
 	} else if (potentialDragDrop && (nil != delegate)) {
         // create a drag image
-		NSMutableIndexSet *oldSelection = [NSMutableIndexSet indexSet];
-		[oldSelection addIndexes:[self selectionIndexes]];
-		
-		NSMutableIndexSet *unionSet = [NSMutableIndexSet indexSet];
-		[unionSet addIndexes:oldSelection];
-		[unionSet addIndexes:dragSelectedPhotoIndexes];
-		[self setSelectionIndexes:unionSet];
-		
 		unsigned int photoIndex = [self photoIndexForPoint:mouseCurrentPoint];
-        NSImage *dragImage = [self draggingImageWithSelection:unionSet selectedIndex:photoIndex];
+        NSImage *dragImage = [self draggingImageWithSelection:[self selectionIndexes] selectedIndex:photoIndex];
 		
         // get the pasteboard and register the returned types with delegate as the owner
 		NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSDragPboard];
 		[pb declareTypes:[NSArray array] owner:nil]; // clear the pasteboard 
 		[delegate photoView:self fillPasteboardForDrag:pb];
-		
-		[self setSelectionIndexes:oldSelection];
 		
 		// place the cursor in the center of the drag image
 		NSPoint p = [self convertPoint:[event locationInWindow] fromView:nil];
@@ -897,7 +950,7 @@ static NSImage *_badge = nil;
 		p.y = p.y + imageSize.height / 2;
 		
 		[self dragImage:dragImage at:p offset:NSZeroSize event:event pasteboard:pb source:self slideBack:YES];
-    } else {
+    } else if (dragSelectedPhotoIndexes) {
         // adjust the mouse current point so that it's not outside the frame
         NSRect frameRect = [self frame];
         if (mouseCurrentPoint.x < NSMinX(frameRect))
@@ -963,7 +1016,7 @@ static NSImage *_badge = nil;
 
 - (void)mouseUp:(NSEvent *)event
 {
-	// Doubl-click Handling
+	// Double-click Handling
 	if ([event clickCount] == 2) {
 		unsigned idx = [self photoIndexForPoint:mouseDownPoint];
         [delegate photoView:self doubleClickOnPhotoAtIndex:idx withFrame:[self photoRectForIndex:idx]];
@@ -971,55 +1024,15 @@ static NSImage *_badge = nil;
 	} else if (0 < [dragSelectedPhotoIndexes count]) { // finishing a drag selection
         // move the drag indexes into the main selection indexes - firing off KVO messages or delegate messages
         [self setSelectionIndexes:dragSelectedPhotoIndexes];
-        [dragSelectedPhotoIndexes removeAllIndexes];
-        [self setNeedsDisplayInRect:[self visibleRect]];
-        
-    } else if (NSEqualPoints(mouseDownPoint, mouseCurrentPoint)) { // single click
-        
-        // did the click hit a photo or empty space
-        unsigned index = [self photoIndexForPoint:mouseDownPoint];
-        NSRect photoRect = [self photoRectForIndex:index];
-        BOOL isHit = NO;
-        if (NSPointInRect(mouseDownPoint,photoRect)) 
-            isHit = YES;
-        
-        // update the selection based on the keyboard modifiers, whether the click hit a photo, and the current selection
-        unsigned int flags = [event modifierFlags];
-        NSMutableIndexSet *indexes = [[self selectionIndexes] mutableCopy];
-        if (isHit && (flags & NSCommandKeyMask)) { // flip the current photo's selection status
-            if ([indexes containsIndex:index])
-                [indexes removeIndex:index];
-            else
-                [indexes addIndex:index];
-
-        } else if (isHit && (flags & NSShiftKeyMask)) { // add a range to the selection
-			if (0 == [indexes count]) {
-				[indexes addIndex:index];
-			} else {
-				unsigned int origin = (index < [indexes lastIndex]) ? index : [indexes lastIndex];
-				unsigned int length = (index < [indexes lastIndex]) ? [indexes lastIndex] - index: index - [indexes lastIndex] ;
-				length++;
-				[indexes addIndexesInRange:NSMakeRange(origin, length)];
-			}
-            
-        } else if (isHit) { // hit a single photo
-            [indexes removeAllIndexes];
-            [indexes addIndex:index];
-            
-        } else { // missed the photo entirely
-            [indexes removeAllIndexes];
-        }
-        
-        // update the selection
-        [self setSelectionIndexes:indexes];
-        [indexes release];
-    }
-    
+    } 
+	
     if (autoscrollTimer != nil) {
 		[autoscrollTimer invalidate];
 		autoscrollTimer = nil;
 	}
     
+	[dragSelectedPhotoIndexes release];
+	dragSelectedPhotoIndexes = nil;
     mouseDown = NO;
 	mouseCurrentPoint = mouseDownPoint = NSZeroPoint;
     [self setNeedsDisplayInRect:[self visibleRect]];
@@ -1052,7 +1065,7 @@ static NSImage *_badge = nil;
 		NSDragOperation result = [delegate photoView:self draggingEntered:sender];
 		if (result != NSDragOperationNone)
 		{
-			drawDragHilite = YES;
+			drawDropHilite = YES;
 			[self setNeedsDisplay:YES];
 		}
 		return result;
@@ -1067,9 +1080,9 @@ static NSImage *_badge = nil;
 	if ([delegate respondsToSelector:@selector(photoView:draggingExited:)])
 		[delegate photoView:self draggingExited:sender];
 	
-	if (drawDragHilite)
+	if (drawDropHilite)
 	{
-		drawDragHilite = NO;
+		drawDropHilite = NO;
 		[self setNeedsDisplay:YES];
 	}
 }
@@ -1083,9 +1096,9 @@ static NSImage *_badge = nil;
 	else
 		result = YES;
 	
-	if (drawDragHilite)
+	if (drawDropHilite)
 	{
-		drawDragHilite = NO;
+		drawDropHilite = NO;
 		[self setNeedsDisplay:YES];
 	}
 	return result;

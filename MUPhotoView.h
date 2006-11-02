@@ -73,7 +73,7 @@
 	NSRange myLastDrawnRange;
 	NSMutableDictionary *myFadingImages;
 	
-	BOOL drawDragHilite;
+	BOOL drawDropHilite;
 }
 
 #pragma mark -
