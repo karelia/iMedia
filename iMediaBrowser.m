@@ -311,7 +311,7 @@ static NSMutableDictionary *_parsers = nil;
 	[libraryController setSortDescriptors:nil];
 	[oSplitView setDelegate:self];
 	
-	[libraryController addObserver:self forKeyPath:@"content" options:0 context:nil];
+	[libraryController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(appWillQuit:)
 												 name:NSApplicationWillTerminateNotification
@@ -531,7 +531,7 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if ((object == libraryController) && [keyPath isEqualToString:@"content"])
+	if ((object == libraryController) && [keyPath isEqualToString:@"arrangedObjects"])
 	{
 		[self updatePlaylistPopup];
 	}
