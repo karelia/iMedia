@@ -479,7 +479,7 @@ static NSMutableDictionary *_parsers = nil;
 		{
 			iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:drop];
 			[parser setBrowser:mySelectedBrowser];
-			iMBLibraryNode *node = [parser parseDatabase];
+			iMBLibraryNode *node = [parser library];
 			[node setParser:parser];
 			[node setName:[drop lastPathComponent]];
 			[node setIconName:@"folder"];
@@ -647,7 +647,7 @@ static NSMutableDictionary *_parsers = nil;
 			if (![drops containsObject:cur] && [fm fileExistsAtPath:cur isDirectory:&isDir] && isDir && [mySelectedBrowser allowPlaylistFolderDrop:cur])
 			{
 				iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:cur];
-				iMBLibraryNode *node = [parser parseDatabase];
+				iMBLibraryNode *node = [parser library];
 				[node setParser:parser];
 				[node setName:[cur lastPathComponent]];
 				[node setIconName:@"folder"];
