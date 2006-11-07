@@ -180,7 +180,8 @@ static NSMutableDictionary *_parsers = nil;
 		id libraryItemsValueTransformer = [[[LibraryItemsValueTransformer alloc] init] autorelease];
 		[NSValueTransformer setValueTransformer:libraryItemsValueTransformer forName:@"libraryItemsValueTransformer"];
 		myBackgroundLoadingLock = [[NSLock alloc] init];
-
+		myIdentifier = @"Default";
+		
 		// Make sure mainBundle (class) or app or app's delegate  implements applicationIdentifier.  Do not continue if it doesn't.
 		Class cls = NSClassFromString([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPrincipalClass"]);
 		if ([cls respondsToSelector:@selector(applicationIdentifier)]
@@ -208,15 +209,31 @@ static NSMutableDictionary *_parsers = nil;
 	[myToolbar release];
 	[myBackgroundLoadingLock release];
 	[myPreferredBrowserTypes release];
+	[myIdentifier release];
+	
 	[super dealloc];
 }
 
--(id <iMediaBrowser>)selectedBrowser 
+- (void)setIdentifier:(NSString *)identifier
+{
+	if (identifier != myIdentifier)
+	{
+		[myIdentifier autorelease];
+		myIdentifier = [identifier copy];
+	}
+}
+
+- (NSString *)identifier
+{
+	return myIdentifier;
+}
+
+- (id <iMediaBrowser>)selectedBrowser 
 {
 	return mySelectedBrowser;
 }
 
--(void)setPreferredBrowserTypes:(NSArray*)types
+- (void)setPreferredBrowserTypes:(NSArray*)types
 {
 	[myPreferredBrowserTypes autorelease];
 	myPreferredBrowserTypes = [types copy];
@@ -239,7 +256,9 @@ static NSMutableDictionary *_parsers = nil;
 	[myToolbar setShowsBaselineSeparator:YES];
 	[myToolbar setSizeMode:NSToolbarSizeModeSmall];
 	
-	NSString *lastmySelectedBrowser = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowsermySelectedBrowser"];
+	NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
+	
+	NSString *lastmySelectedBrowser = [d objectForKey:@"SelectedBrowser"];
 	BOOL canRestoreLastSelectedBrowser = NO;
 
 	// Load any plugins so they register
@@ -300,7 +319,7 @@ static NSMutableDictionary *_parsers = nil;
 		}
 	}
 	
-	NSString *position = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMediaBrowserWindowPosition"];
+	NSString *position = [d objectForKey:@"WindowPosition"];
 	if (position) {
 		NSRect r = NSRectFromString(position);
 		[[self window] setFrame:r display:NO];
@@ -318,7 +337,7 @@ static NSMutableDictionary *_parsers = nil;
 											   object:nil];
 	
 	//set the splitview size
-	NSArray *sizes = [[NSUserDefaults standardUserDefaults] objectForKey:@"iMBSplitViewSize"];
+	NSArray *sizes = [d objectForKey:@"SplitViewSize"];
 	if (sizes)
 	{
 		NSRect rect = NSRectFromString([sizes objectAtIndex:0]);
@@ -335,11 +354,13 @@ static NSMutableDictionary *_parsers = nil;
 	NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
 	NSIndexPath *selection = [libraryController selectionIndexPath];
 	NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
-	[ud setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
-	[ud setObject:[NSArray arrayWithObjects:NSStringFromRect([oPlaylists frame]), NSStringFromRect([oBrowserView frame]), nil] forKey:@"iMBSplitViewSize"];
-	[ud setObject:NSStringFromRect([[self window] frame]) forKey:@"iMediaBrowserWindowPosition"];
-	[ud synchronize];
+	NSMutableDictionary *d = [NSMutableDictionary dictionary];
 	
+	[d setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+	[d setObject:[NSArray arrayWithObjects:NSStringFromRect([oPlaylists frame]), NSStringFromRect([oBrowserView frame]), nil] forKey:@"SplitViewSize"];
+	[d setObject:NSStringFromRect([[self window] frame]) forKey:@"WindowPosition"];
+	
+	[ud setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
 	[ud synchronize];
 }
 
@@ -365,13 +386,16 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		if ([myBackgroundLoadingLock tryLock])
 		{
+			NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]]];
 			if (nil != mySelectedBrowser)
 			{
 				//we want to save the current selection to UD
-				NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
 				NSIndexPath *selection = [libraryController selectionIndexPath];
 				NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
-				[ud setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+		
+				[d setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+				
+				[[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
 			}
 			if (myFlags.willChangeBrowser)
 			{
@@ -394,7 +418,8 @@ static NSMutableDictionary *_parsers = nil;
 			[oPlaylists registerForDraggedTypes:[mySelectedBrowser fineTunePlaylistDragTypes:[NSArray arrayWithObject:NSFilenamesPboardType]]];
 			
 			//save the selected browse
-			[[NSUserDefaults standardUserDefaults] setObject:NSStringFromClass([mySelectedBrowser class]) forKey:@"iMediaBrowsermySelectedBrowser"];
+			[d setObject:NSStringFromClass([mySelectedBrowser class]) forKey:@"SelectedBrowser"];
+			[[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
 			myFlags.isLoading = YES;
 			[NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:nil];
 		}
@@ -465,7 +490,8 @@ static NSMutableDictionary *_parsers = nil;
 	}
 	
 	// Do any user dropped folders
-	NSArray *drops = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
+	NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
+	NSArray *drops = [d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
 	e = [drops objectEnumerator];
 	NSString *drop;
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -547,7 +573,9 @@ static NSMutableDictionary *_parsers = nil;
 	if ([[libraryController content] count] > 0)
 	{
 		// select the previous selection
-		NSData *archivedSelection = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+		NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
+		NSData *archivedSelection = [d objectForKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+		
 		if (archivedSelection)
 		{
 			NSIndexPath *selection = [NSKeyedUnarchiver unarchiveObjectWithData:archivedSelection];
@@ -640,7 +668,8 @@ static NSMutableDictionary *_parsers = nil;
 		NSString *cur;
 		Class aClass = [mySelectedBrowser parserForFolderDrop];
 		NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
-		NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]]];
+		NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]]];
+		NSMutableArray *drops = [NSMutableArray arrayWithArray:[d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]]];
 		
 		while ((cur = [e nextObject]))
 		{
@@ -662,7 +691,8 @@ static NSMutableDictionary *_parsers = nil;
 		
 		[libraryController setContent:content];
 		
-		[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
+		[d setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
+		[[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
 	}
 	
 	return results;
@@ -906,8 +936,9 @@ static NSMutableDictionary *_parsers = nil;
 	iMBLibraryNode *cur;
 	
 	NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
-	NSMutableArray *drops = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]]];
-
+	NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]]];
+	NSMutableArray *drops = [NSMutableArray arrayWithArray:[d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]]];
+	
 	while ((cur = [e nextObject]))
 	{
 		// we can only delete dragged folders
@@ -926,7 +957,8 @@ static NSMutableDictionary *_parsers = nil;
 		}
 	}
 	[libraryController setContent:content];
-	[[NSUserDefaults standardUserDefaults] setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
+	[d setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
+	[[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
 }
 
 @end

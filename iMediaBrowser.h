@@ -46,6 +46,7 @@ Please send fixes to
 	id <iMediaBrowser>				mySelectedBrowser;
 	NSToolbar						*myToolbar;
 	NSLock							*myBackgroundLoadingLock;
+	NSString						*myIdentifier;
 	
 	NSArray							*myPreferredBrowserTypes;
 	id								myDelegate; //not retained
@@ -78,6 +79,9 @@ Please send fixes to
 	Default media keys are: photos, music, videos, links
 */
 + (void)registerParser:(Class)aClass forMediaType:(NSString *)media;
+
+- (void)setIdentifier:(NSString *)identifier;
+- (NSString *)identifier;
 
 - (void)setDelegate:(id)delegate;
 - (id)delegate;
