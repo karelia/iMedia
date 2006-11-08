@@ -37,6 +37,7 @@ Please send fixes to
 	NSMutableArray			*myFilteredImages;
 	NSString				*mySearchString;
 	NSLock					*myCacheLock;
+	NSLock					*myEPEGLock;
 	NSMutableArray			*myInFlightImageOperations;
 	NSMutableSet			*myProcessingImages;
 	int						myThreadCount;

@@ -61,6 +61,7 @@ static NSImage *_missing = nil;
 		myCacheLock = [[NSLock alloc] init];
 		myInFlightImageOperations = [[NSMutableArray array] retain];
 		myProcessingImages = [[NSMutableSet set] retain];
+		myEPEGLock = [[NSLock alloc] init];
 		
 		if (!_placeholder)
 		{
@@ -84,6 +85,7 @@ static NSImage *_missing = nil;
 
 - (void)dealloc
 {
+	[myEPEGLock release];
 	[mySelection release];
 	[myCache release];
 	[myCacheLock release];
@@ -350,7 +352,9 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 				Class epeg = NSClassFromString(@"EpegWrapper");
 				if (epeg)
 				{
+					[myEPEGLock lock];
 					img = [[epeg imageWithPath:imagePath boundingBox:NSMakeSize(256,256)] retain];
+					[myEPEGLock unlock];
 				}
 			}
 		}
