@@ -325,10 +325,6 @@ static NSMutableDictionary *_parsers = nil;
 		[[self window] setFrame:r display:NO];
 	}
 	[[self window] setDelegate:self];
-	[oPlaylists setDataSource:self];
-	[oPlaylists setAllowsColumnReordering:NO];
-	[libraryController setSortDescriptors:nil];
-	[oSplitView setDelegate:self];
 	
 	[libraryController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -344,8 +340,14 @@ static NSMutableDictionary *_parsers = nil;
 		[[[oSplitView subviews] objectAtIndex:0] setFrame:rect];
 		rect = NSRectFromString([sizes objectAtIndex:1]);
 		[[[oSplitView subviews] objectAtIndex:1] setFrame:rect];
+		
 		[oSplitView setNeedsDisplay:YES];
 	}
+	
+	[oPlaylists setDataSource:self];
+	[oPlaylists setAllowsColumnReordering:NO];
+	[libraryController setSortDescriptors:nil];
+	[oSplitView setDelegate:self];
 }
 
 - (void)appWillQuit:(NSNotification *)notification

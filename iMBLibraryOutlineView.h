@@ -21,8 +21,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface iMBLibraryOutlineView : NSOutlineView {
-
+@interface iMBLibraryOutlineView : NSOutlineView 
+{
+	BOOL myIsReloading;
 }
 
 @end

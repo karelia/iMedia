@@ -23,6 +23,20 @@
 
 @implementation iMBLibraryOutlineView
 
+- (void)reloadData
+{
+	if (!myIsReloading)
+	{
+		myIsReloading = YES;
+		[super reloadData];
+		myIsReloading = NO;
+	}
+	else
+	{
+		[self performSelector:@selector(reloadData) withObject:nil afterDelay:0];
+	}
+}
+
 /*
 	When editing is enabled in the view, and the user finishes editing using Enter/Return, we don't
 	want it to start editing the next row. 
