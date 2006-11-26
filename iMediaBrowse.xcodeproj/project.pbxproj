@@ -161,6 +161,8 @@
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
+		FC6810380B1771ED0063CF05 /* iMBAperturePhotosParser.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = FC6810360B1771ED0063CF05 /* iMBAperturePhotosParser.h */; };
+		FC6810390B1771ED0063CF05 /* iMBAperturePhotosParser.m in Sources */ = {isa = PBXBuildFile; fileRef = FC6810370B1771ED0063CF05 /* iMBAperturePhotosParser.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -182,6 +184,7 @@
 			files = (
 				7984F0F60A3E8A40003567B3 /* Epeg.framework in CopyFiles */,
 				791F973B0975D38A0071B2E0 /* iMediaBrowser.framework in CopyFiles */,
+				FC6810380B1771ED0063CF05 /* iMBAperturePhotosParser.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +436,8 @@
 		D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LibraryItemsValueTransformer.m; sourceTree = "<group>"; };
 		D9B3EA5C09A3F82B00835FE4 /* iMBDNDArrayController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBDNDArrayController.h; sourceTree = "<group>"; };
 		D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBDNDArrayController.m; sourceTree = "<group>"; };
+		FC6810360B1771ED0063CF05 /* iMBAperturePhotosParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAperturePhotosParser.h; sourceTree = "<group>"; };
+		FC6810370B1771ED0063CF05 /* iMBAperturePhotosParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAperturePhotosParser.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -578,6 +583,8 @@
 		7953E6450A2E896700C7AFBB /* Photo */ = {
 			isa = PBXGroup;
 			children = (
+				FC6810360B1771ED0063CF05 /* iMBAperturePhotosParser.h */,
+				FC6810370B1771ED0063CF05 /* iMBAperturePhotosParser.m */,
 				795D715F09D3AB55005F166D /* iMBiPhotoPhotosParser.h */,
 				795D716009D3AB55005F166D /* iMBiPhotoPhotosParser.m */,
 				795F748209D4BA98000F21B5 /* iMBPicturesFolder.h */,
@@ -1099,6 +1106,7 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				791F97400975D3A90071B2E0 /* AppDelegate.m in Sources */,
+				FC6810390B1771ED0063CF05 /* iMBAperturePhotosParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
