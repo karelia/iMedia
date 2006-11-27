@@ -61,6 +61,7 @@
 		794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 794835F40A2709AD007E8268 /* MUPhotoView.m */; };
 		794C9F770A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 794C9F750A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		794C9F780A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 794C9F760A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m */; };
+		7950D53F0B1A78A500932A13 /* iMBAperturePhotosParser.m in Sources */ = {isa = PBXBuildFile; fileRef = FC6810370B1771ED0063CF05 /* iMBAperturePhotosParser.m */; };
 		7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */; };
 		7953E6BD0A2E8DC600C7AFBB /* ABGroup.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953E6BC0A2E8DC600C7AFBB /* ABGroup.png */; };
 		7953E6E60A2E8EC600C7AFBB /* iMBAddressBookParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7903562509E3B40D00384D08 /* iMBAddressBookParser.m */; };
@@ -162,7 +163,6 @@
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
 		FC6810380B1771ED0063CF05 /* iMBAperturePhotosParser.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = FC6810360B1771ED0063CF05 /* iMBAperturePhotosParser.h */; };
-		FC6810390B1771ED0063CF05 /* iMBAperturePhotosParser.m in Sources */ = {isa = PBXBuildFile; fileRef = FC6810370B1771ED0063CF05 /* iMBAperturePhotosParser.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1097,6 +1097,7 @@
 				793810490A33AC53000A65EA /* NSProcessInfo+iMedia.m in Sources */,
 				A9FECB080ADA696A00AB3426 /* iMBLibraryOutlineView.m in Sources */,
 				A93A6A770AE77F2B00C77AA4 /* UKFileWatcher.m in Sources */,
+				7950D53F0B1A78A500932A13 /* iMBAperturePhotosParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1106,7 +1107,6 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				791F97400975D3A90071B2E0 /* AppDelegate.m in Sources */,
-				FC6810390B1771ED0063CF05 /* iMBAperturePhotosParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

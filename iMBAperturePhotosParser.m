@@ -50,7 +50,7 @@ Please send fixes to
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	//	un-comment this line to use see the Aperture library in your iMedia browser:
-	//[iMediaBrowser registerParser:[self class] forMediaType:@"photos"];
+	[iMediaBrowser registerParser:[self class] forMediaType:@"photos"];
 	
 	[pool release];
 }
