@@ -78,7 +78,7 @@ Please send fixes to
 
 - (NSImage*) iconForType: (NSString*) name 
 {
-	// '7', '12' ???
+	// '12' ???
 	// cp: I found icons for a 'smart journal' or a 'smart book' but no menu command to create on.
 	
 	if ([name isEqualToString:@"1"]) // album
@@ -93,6 +93,8 @@ Please send fixes to
 		return [NSImage imageResourceNamed:@"List_Icons_Library.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"6"]) // folder		
 		return [NSImage imageResourceNamed:@"Project_I_Folder.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
+	else if ([name isEqualToString:@"7"]) // sub-folder of project
+		return [NSImage imageResourceNamed:@"Project_I_ProjectFolder.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"8"]) // book		
 		return [NSImage imageResourceNamed:@"Project_I_Book.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"9"]) // web gallery		
