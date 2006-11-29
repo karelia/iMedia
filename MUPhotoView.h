@@ -146,6 +146,12 @@
 /** Tells the view to draw photos scaled so their longest side is aPhotoSize pixels long. This will cause the visible area of the view to be redrawn - and the view will attempt to
     keep the currently-visible photos near the center of the scroll area. **/
 - (void)setPhotoSize:(float)aPhotoSize;
+/** Set whether high-quality resizing should be done. **/
+- (BOOL)useHighQualityResize;
+- (void)setUseHighQualityResize:(BOOL)flag;
+
+
+
 
 - (IBAction)takePhotoSizeFrom:(id)sender;
 

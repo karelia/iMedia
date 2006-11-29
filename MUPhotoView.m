@@ -558,6 +558,16 @@ const float kFadingTimeThreshold = 0.1;
     }
 }
 
+- (BOOL)useHighQualityResize
+{
+    return useHighQualityResize;
+}
+
+- (void)setUseHighQualityResize:(BOOL)flag
+{
+    useHighQualityResize = flag;
+}
+
 - (float)photoSize
 {
     //NSLog(@"in -photoSize, returned photoSize = %f", photoSize);

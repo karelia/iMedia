@@ -50,6 +50,9 @@
 - (void)awakeFromNib
 {
 	[oPhotoView setDelegate:self];
+	[oPhotoView setUseOutlineBorder:NO];
+	[oPhotoView setUseHighQualityResize:NO];
+
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
 	[oPhotoView setPhotoHorizontalSpacing:15];
 	[oPhotoView setPhotoVerticalSpacing:15];

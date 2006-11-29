@@ -27,6 +27,12 @@ Please send fixes to
 #import "iMBLibraryNode.h"
 #import "NSAttributedString+iMedia.h"
 
+
+#warning TODO: we should split the UKKQue stuff into a new abstract subclass of this, for better encapsulation since many subclasses don't need UKKQueue.
+
+
+
+
 @implementation iMBAbstractParser
 
 - (id)init
