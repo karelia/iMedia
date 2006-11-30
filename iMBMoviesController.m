@@ -87,6 +87,7 @@ static NSImage *_placeholder = nil;
 	[oPhotoView setDelegate:self];
 	[oPhotoView setUseOutlineBorder:NO];
 	[oPhotoView setUseHighQualityResize:NO];
+	[oPhotoView setBackgroundColor:[NSColor whiteColor]];
 	
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
 	[oPhotoView setPhotoHorizontalSpacing:15];
@@ -500,6 +501,20 @@ static NSImage *_toolbarIcon = nil;
 {
 	return NSDragOperationCopy;
 }
+
+// MUPHOTOVIEW STYLE
+
+- (NSArray *)pasteboardDragTypesForPhotoView:(MUPhotoView *)view
+{
+    return [[[NSArray alloc] init] autorelease];
+}
+
+- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)index dataType:(NSString *)type
+{
+    return nil;
+}
+
+// OUR STYLE
 
 - (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard
 {

@@ -104,11 +104,12 @@ static NSImage *_missing = nil;
 	[oPhotoView setDelegate:self];
 	[oPhotoView setUseOutlineBorder:NO];
 	[oPhotoView setUseHighQualityResize:NO];
+	[oPhotoView setBackgroundColor:[NSColor whiteColor]];
 
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
 	[oPhotoView setPhotoHorizontalSpacing:15];
 	[oPhotoView setPhotoVerticalSpacing:15];
-	[oPhotoView setUseFading:[[NSUserDefaults standardUserDefaults] boolForKey:@"iMBUseFading"]];
+//	[oPhotoView setUseFading:[[NSUserDefaults standardUserDefaults] boolForKey:@"iMBUseFading"]];
 #if SAMPLE_INCOMING_DRAG
 	[oPhotoView registerForDraggedTypes:[NSArray arrayWithObject:NSTIFFPboardType]];
 #endif
@@ -411,10 +412,6 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 			[myProcessingImages addObject:imagePath];
 		}
 		[myCacheLock unlock];
-		
-		[oPhotoView performSelectorOnMainThread:@selector(runloopRedraw)
-									 withObject:nil
-								  waitUntilDone:NO];
 	}
 	
 	myThreadCount--;
@@ -539,6 +536,20 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 {
 	return NSDragOperationCopy;
 }
+
+// MUPHOTOVIEW STYLE
+
+- (NSArray *)pasteboardDragTypesForPhotoView:(MUPhotoView *)view
+{
+    return [[[NSArray alloc] init] autorelease];
+}
+
+- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)index dataType:(NSString *)type
+{
+    return nil;
+}
+
+// OUR STYLE
 
 - (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard
 {

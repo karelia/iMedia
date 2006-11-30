@@ -2,19 +2,25 @@
 //
 //  MUPhotoView
 //
-//  Created by Blake Seely on 4/4/06.
-//  This code included in the MUPhotoView download is licensed by the Creative Commons Attribution-ShareAlike 2.5 license. You can see the details of this license at:
-//  http://creativecommons.org/licenses/by-sa/2.5/
-//  The documents at the above URL contain full details, but the basics are:
-//    You can use this code, as long as you include a link to http://www.blakeseely.com in your product / derivative work.
-//    You can modify this code as long as you maintain this license for your changes.//
+// Copyright (c) 2006 Blake Seely
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+// documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+// and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+//    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+//    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+//    OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//  * You include a link to http://www.blakeseely.com in your final product.
 //
 // Version History:
 //
 // Version 1.0 - April 17, 2006 - Initial Release
+// Version 1.1 - April 29, 2006 - Photo removal support, Added support for reduced-size drawing during live resize
+// Version 1.2 - September 24, 2006 - Updated selection behavior, Changed to MIT license, Fixed issue where no images would show, fixed autoscroll
 
 #import <Cocoa/Cocoa.h>
-
 
 //! MUPhotoView displays a grid of photos similar to iPhoto's main photo view. The class gives developers several options for providing images - via bindings or delegation.
 
@@ -53,6 +59,7 @@
     float photoVerticalSpacing;
     float photoHorizontalSpacing;
     
+	
     NSSize gridSize;
     unsigned columns;
     unsigned rows;
@@ -68,10 +75,6 @@
 	
 	NSArray *liveResizeSubviews;
 	
-	//Fading
-	BOOL useFading;
-	NSRange myLastDrawnRange;
-	NSMutableDictionary *myFadingImages;
 	
 	BOOL drawDropHilite;
 }
@@ -125,6 +128,11 @@
     be a semi-transparent white.**/
 - (void)setUseShadowSelection:(BOOL)flag;
 
+    /** Indicates whether the view is drawing with a high-quality, though possibly slower, algorithm for image interpolation. The default value is NO; the default setting for the machine is used. **/
+- (BOOL)useHighQualityResize;
+    /** By setting this value to YES, you tell MUPhotoView to draw with a higher-quality image, sacrificing speed. **/
+- (void)setUseHighQualityResize:(BOOL)flag;
+
 #pragma mark -
 // Appearance
 #pragma mark Appearance
@@ -146,18 +154,9 @@
 /** Tells the view to draw photos scaled so their longest side is aPhotoSize pixels long. This will cause the visible area of the view to be redrawn - and the view will attempt to
     keep the currently-visible photos near the center of the scroll area. **/
 - (void)setPhotoSize:(float)aPhotoSize;
-/** Set whether high-quality resizing should be done. **/
-- (BOOL)useHighQualityResize;
-- (void)setUseHighQualityResize:(BOOL)flag;
-
-
-
 
 - (IBAction)takePhotoSizeFrom:(id)sender;
 
-/** Indicates whether the view fades in newly thumbnailed images or just draws them in one go **/
-- (BOOL)useFading;
-- (void)setUseFading:(BOOL)fade;
 
 #pragma mark -
 // Seriously, Don't Mess With Texas
@@ -216,10 +215,15 @@
 // drag and drop
 /** A delegate would use this method to specify whether the view should support drag operations. (i.e. whether the view should allow photos to be dragged out of the view.
     The semantics are identical to the -[NSDraggingSource draggingSourceOperationmaskForLocal] **/
-- (NSDragOperation)photoView:(MUPhotoView *)view draggingSourceOperationMaskForLocal:(BOOL)isLocal;
+- (unsigned int)photoView:(MUPhotoView *)view draggingSourceOperationMaskForLocal:(BOOL)isLocal;
+/** The view will call this method at drag time. The delegate should pass an array indicating the types that it will put on the pasteboard for a given set of images. If
+    you provide an implementation for -photoView:draggingSourceOperationMaskForLocal: that returns anything other than NO, you should also implement this method and indicate
+    which types you will support. **/
+//- (NSArray *)pasteboardDragTypesForPhotoView:(MUPhotoView *)view;
 /** The view will call this method when it is about to initiate a drag. It will call this method once for *each* combination type returned from -pasteboardDragTypesForPhotoView:
     and each photo currently being dragged. The delegate should return the appropriate data for the given type. If you provide any implementation of
     -photoView:draggingSourceOperationMaskForLocal that returns anything other than NO, you should also implement this method. **/
+//- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)index dataType:(NSString *)type;
 - (void)photoView:(MUPhotoView *)view fillPasteboardForDrag:(NSPasteboard *)pboard;
 
 // drag and drop receiving - Equivalent to the NSDraggingDestination methods
@@ -282,4 +286,9 @@
 // photo removal
 - (void)removePhotosAtIndexes:(NSIndexSet *)indexes;
 
+// scaling
+- (NSImage *)scaleImage:(NSImage *)image toSize:(float)size;
+
+// For fast re-drawing during drag and selection
+- (void)dirtyDisplayRectsForNewSelection:(NSIndexSet *)newSelection oldSelection:(NSIndexSet *)oldSelection;
 @end
