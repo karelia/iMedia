@@ -213,6 +213,9 @@
 		5B0628D40AEDF63B00419AEB /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		5B0DEBB00AEDF849008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iTunes.nib; sourceTree = "<group>"; };
 		5B0DEBBE0AEDF923008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Links.nib; sourceTree = "<group>"; };
+		5B7C81A80B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Contacts.nib; sourceTree = "<group>"; };
+		5B7C81A90B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iPhoto.nib; sourceTree = "<group>"; };
+		5B7C81AA0B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Movies.nib; sourceTree = "<group>"; };
 		7903561009E3AF7B00384D08 /* iMBContactsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBContactsController.h; sourceTree = "<group>"; };
 		7903561109E3AF7B00384D08 /* iMBContactsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBContactsController.m; sourceTree = "<group>"; };
 		7903561D09E3B17A00384D08 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/Contacts.nib; sourceTree = "<group>"; };
@@ -1164,6 +1167,7 @@
 				CE6F4A5D0AC456D10094B818 /* zh_TW */,
 				CE6F4A5E0AC456D50094B818 /* it */,
 				CE55A69D0AD194C70091C8AE /* zh_CN */,
+				5B7C81A80B24319500F7D59C /* sv */,
 			);
 			name = Contacts.nib;
 			sourceTree = "<group>";
@@ -1226,6 +1230,7 @@
 				79500A1D0A6D8FEA008A0D8A /* de */,
 				CE1AD3830A7E83F20083C01E /* it */,
 				CE55A69E0AD194C70091C8AE /* zh_CN */,
+				5B7C81A90B24319500F7D59C /* sv */,
 			);
 			name = iPhoto.nib;
 			sourceTree = "<group>";
@@ -1241,6 +1246,7 @@
 				79500A200A6D8FF1008A0D8A /* de */,
 				CE1AD3880A7E83F20083C01E /* it */,
 				CE55A6A30AD194C70091C8AE /* zh_CN */,
+				5B7C81AA0B24319500F7D59C /* sv */,
 			);
 			name = Movies.nib;
 			sourceTree = "<group>";
