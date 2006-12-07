@@ -412,6 +412,10 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 			[myProcessingImages addObject:imagePath];
 		}
 		[myCacheLock unlock];
+        
+		[oPhotoView performSelectorOnMainThread:@selector(setNeedsDisplay:)
+									 withObject:[NSNumber numberWithBool:YES]
+								  waitUntilDone:NO];
 	}
 	
 	myThreadCount--;

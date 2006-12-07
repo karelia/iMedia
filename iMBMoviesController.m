@@ -439,7 +439,9 @@ static NSImage *_toolbarIcon = nil;
                 if (mov)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
 				{
 					// do a background thread load if we have a spare processor, and if this movie is thread-safe
-					if (myThreadCount + 1 < [NSProcessInfo numberOfProcessors]
+                    unsigned int maxThreadCount = [NSProcessInfo numberOfProcessors] - 1;
+                    maxThreadCount = MAX(maxThreadCount, 1);    // Allow at least 1 background thread
+					if (myThreadCount < maxThreadCount
 						&&
 						noErr == DetachMovieFromCurrentThread([mov quickTimeMovie]) )	// -2098 = componentNotThreadSafeErr
 					{

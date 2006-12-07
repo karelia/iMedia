@@ -149,7 +149,9 @@
 	NSRange rangeToDraw = [self photoIndexRangeForRect:rect]; // adjusts for photoCount if the rect goes outside my range
     unsigned index;
     unsigned lastIndex = rangeToDraw.location + rangeToDraw.length;
-    for (index = rangeToDraw.location; index <= lastIndex; index++) {
+    // Our version of photoIndexRangeForRect: returns one item more in the range than the MUPhotoView 1.2 version. Hence we also
+    // must do one less iteration so here we do < instead of <= 
+    for (index = rangeToDraw.location; index < lastIndex; index++) {
         
         // Get the image at the current index - a gray bezier anywhere in the view means it asked for an image, but got nil for that index
         NSImage *photo = nil;
