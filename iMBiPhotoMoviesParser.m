@@ -114,6 +114,7 @@ Please send fixes to
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"iPhoto", @"iPhoto")];
 	[root setIconName:@"photo_tiny"];
+	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Movies"];
 	
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];
 	
