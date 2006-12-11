@@ -740,7 +740,7 @@
 
 - (void)mouseDragged:(NSEvent *)event
 {
-    if (0 = columns) return;
+    if (0 == columns) return;
     mouseCurrentPoint = [self convertPoint:[event locationInWindow] fromView:nil];
     
     // if the mouse has moved less than 5px in either direction, don't register the drag yet
