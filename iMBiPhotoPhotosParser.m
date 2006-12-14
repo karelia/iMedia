@@ -109,7 +109,7 @@ Please send fixes to
 
 - (iMBLibraryNode *)parseDatabase
 {
-	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
+	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 	[root setName:LocalizedStringInThisBundle(@"iPhoto", @"iPhoto")];
 	[root setIconName:@"photo_tiny"];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
@@ -132,6 +132,11 @@ Please send fixes to
 		}
 	}
 	[libraries autorelease];
+	
+	if ([[library allKeys] count] == 0)
+	{
+		return nil;
+	}
 	
 	NSDictionary *imageRecords = [library objectForKey:@"Master Image List"];
 	NSDictionary *keywordMap = [library objectForKey:@"List of Keywords"];
@@ -210,7 +215,7 @@ Please send fixes to
 		[lib release];
 	}
 	
-	return [root autorelease];
+	return root;
 }
 
 @end
