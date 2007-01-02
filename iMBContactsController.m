@@ -171,7 +171,7 @@ static NSImage *_toolbarIcon = nil;
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	[types addObjectsFromArray:[NSArray arrayWithObjects:@"ABPeopleUIDsPboardType", @"Apple VCard pasteboard type", nil]];
-   [types addObject:kiMBNativePasteboardFlavor]; // Native iMB Data
+   [types addObject:iMBNativePasteboardFlavor]; // Native iMB Data
 	[pboard declareTypes:types  owner:nil];
 	NSMutableArray *vcards = [NSMutableArray array];
 	NSMutableArray *urls = [NSMutableArray array];
@@ -209,10 +209,10 @@ static NSImage *_toolbarIcon = nil;
         [titles addObject:[cur objectForKey:@"Caption"]];
 	}
    NSDictionary* nativeData = [NSDictionary dictionaryWithObjectsAndKeys:
-                                             [self className], kiMBControllerClass,
-                                             nativeDataArray, kiMBNativeDataArray,
+                                             [self className], iMBControllerClassName,
+                                             nativeDataArray, iMBNativeDataArray,
                                              nil];
-   [pboard setData:[NSArchiver archivedDataWithRootObject:nativeData] forType:kiMBNativePasteboardFlavor]; // Native iMB Data
+   [pboard setData:[NSArchiver archivedDataWithRootObject:nativeData] forType:iMBNativePasteboardFlavor]; // Native iMB Data
  	[pboard writeURLs:urls files:nil names:titles];
 	[pboard setPropertyList:[vcards componentsJoinedByString:@"\n"] forType:@"Apple VCard pasteboard type"];
 	[pboard setPropertyList:uids forType:@"ABPeopleUIDsPboardType"];
