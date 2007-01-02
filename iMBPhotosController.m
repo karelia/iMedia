@@ -218,18 +218,26 @@ static NSImage *_toolbarIcon = nil;
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	[types addObject:@"AlbumDataListPboardType"];
 	[types addObject:@"ImageDataListPboardType"];
+   [types addObject:iMBNativePasteboardFlavor]; // Native iMB Data
+
 	[pboard declareTypes:types owner:nil];
 	
 	NSEnumerator *e = [items objectEnumerator];
 	NSDictionary *rec;
 	i = 1;
-	while (rec = [e nextObject]) {
+	while (rec = [e nextObject])
+   {
 		[files addObject:[rec objectForKey:@"ImagePath"]];
 		[captions addObject:[rec objectForKey:@"Caption"]];
 		[images setObject:rec forKey:[NSNumber numberWithInt:i]];
 		i++;
 		//[iphotoData setObject:rec forKey:cur]; //the key should be irrelavant
 	}
+   NSDictionary* nativeData = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [self className], iMBControllerClassName,
+                                             items, iMBNativeDataArray,
+                                             nil];
+   [pboard setData:[NSArchiver archivedDataWithRootObject:nativeData] forType:iMBNativePasteboardFlavor]; // Native iMB Data
 	[pboard writeURLs:nil files:files names:captions];
 	
 	NSDictionary *plist = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:album], @"List of Albums", images, @"Master Image List", nil];

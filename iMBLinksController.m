@@ -82,19 +82,23 @@ static NSImage *_toolbarIcon = nil;
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard URLTypes]];
-	
+   [types addObject:iMBNativePasteboardFlavor]; // Native iMB Data
+
 	[pboard declareTypes:types owner:nil];
 	
 	NSArray *content = [oLinkController arrangedObjects];
 	NSEnumerator *e = [rows objectEnumerator];
 	NSNumber *cur;
 	NSMutableArray *urls = [NSMutableArray array];
-    NSMutableArray *titles = [NSMutableArray array];
-	
+   NSMutableArray *titles = [NSMutableArray array];
+   NSMutableArray* nativeDataArray = [NSMutableArray arrayWithCapacity:[rows count]];
 	while (cur = [e nextObject])
 	{
-        unsigned int contextIndex = [cur unsignedIntValue];
+      unsigned int contextIndex = [cur unsignedIntValue];
 		NSDictionary *link = [content objectAtIndex:contextIndex];
+      
+      [nativeDataArray addObject:link];
+
 		NSURL *url = [NSURL URLWithString:[link objectForKey:@"URL"]];
 		if (nil != url)
 		{
@@ -102,6 +106,11 @@ static NSImage *_toolbarIcon = nil;
 			[titles addObject:[link objectForKey:@"Name"]];
 		}
 	}
+   NSDictionary* nativeData = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [self className], iMBControllerClassName,
+                                             nativeDataArray, iMBNativeDataArray,
+                                             nil];
+   [pboard setData:[NSArchiver archivedDataWithRootObject:nativeData] forType:iMBNativePasteboardFlavor]; // Native iMB Data
  	[pboard writeURLs:urls files:nil names:titles];
    
 	return YES;

@@ -233,18 +233,30 @@ static NSImage *_toolbarIcon = nil;
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	[pboard declareTypes:types owner:nil];
+   [types addObject:iMBNativePasteboardFlavor]; // Native iMB Data
 	
 	NSEnumerator *e = [items objectEnumerator];
 	NSDictionary *cur;
 	NSMutableArray *files = [NSMutableArray array];
 	NSMutableArray *names = [NSMutableArray array];
 	
+   NSMutableArray* nativeDataArray = [NSMutableArray arrayWithCapacity:[items count]];
 	while (cur = [e nextObject])
 	{
+      [nativeDataArray addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+         [cur objectForKey:@"ImagePath"], @"ImagePath",
+         [cur objectForKey:@"Caption"], @"Caption",
+         nil]];
+         
 		[files addObject:[cur objectForKey:@"ImagePath"]];
 		[names addObject:[cur objectForKey:@"Caption"]];
 	}
-	[pboard writeURLs:nil files:files names:names];
+   NSDictionary* nativeData = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [self className], iMBControllerClassName,
+                                             nativeDataArray, iMBNativeDataArray,
+                                             nil];
+   [pboard setData:[NSArchiver archivedDataWithRootObject:nativeData] forType:iMBNativePasteboardFlavor]; // Native iMB Data
+   [pboard writeURLs:nil files:files names:names];
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard

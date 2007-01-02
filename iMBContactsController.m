@@ -171,6 +171,7 @@ static NSImage *_toolbarIcon = nil;
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	[types addObjectsFromArray:[NSArray arrayWithObjects:@"ABPeopleUIDsPboardType", @"Apple VCard pasteboard type", nil]];
+   [types addObject:kiMBNativePasteboardFlavor]; // Native iMB Data
 	[pboard declareTypes:types  owner:nil];
 	NSMutableArray *vcards = [NSMutableArray array];
 	NSMutableArray *urls = [NSMutableArray array];
@@ -182,7 +183,7 @@ static NSImage *_toolbarIcon = nil;
 	NSDictionary *cur;
 	NSString *dir = NSTemporaryDirectory();
 	[[NSFileManager defaultManager] createDirectoryAtPath:dir attributes:nil];
-	
+   NSMutableArray* nativeDataArray = [NSMutableArray arrayWithCapacity:[items count]];
 	while (cur = [e nextObject])
 	{
 		ABPerson *person = [cur objectForKey:@"ABPerson"];
@@ -193,6 +194,8 @@ static NSImage *_toolbarIcon = nil;
 		[files addObject:vCardFile];
 		[uids addObject:[person uniqueId]];
 		
+      [nativeDataArray addObject:cur];
+
 		NSArray *emails = [cur objectForKey:@"EmailAddresses"];
 		if ([emails count] > 0)
 		{
@@ -205,6 +208,11 @@ static NSImage *_toolbarIcon = nil;
 		
         [titles addObject:[cur objectForKey:@"Caption"]];
 	}
+   NSDictionary* nativeData = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [self className], kiMBControllerClass,
+                                             nativeDataArray, kiMBNativeDataArray,
+                                             nil];
+   [pboard setData:[NSArchiver archivedDataWithRootObject:nativeData] forType:kiMBNativePasteboardFlavor]; // Native iMB Data
  	[pboard writeURLs:urls files:nil names:titles];
 	[pboard setPropertyList:[vcards componentsJoinedByString:@"\n"] forType:@"Apple VCard pasteboard type"];
 	[pboard setPropertyList:uids forType:@"ABPeopleUIDsPboardType"];

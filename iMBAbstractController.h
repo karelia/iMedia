@@ -27,6 +27,11 @@ Please send fixes to
 #import "iMediaBrowser.h"
 #import "iMediaBrowserProtocol.h"
 
+// Unified name constatns for native data in pasteboard
+extern NSString *iMBNativePasteboardFlavor;
+extern NSString *iMBControllerClassName;
+extern NSString *iMBNativeDataArray;
+
 @interface iMBAbstractController : NSObject <iMediaBrowser>
 {
 	IBOutlet NSView *oView;

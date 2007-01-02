@@ -164,7 +164,8 @@ static NSImage *_toolbarIcon = nil;
 {
 	NSMutableArray *types = [NSMutableArray array]; // OLD BEHAVIOR: arrayWithArray:[pboard types]];
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
-	[types addObject:@"CorePasteboardFlavorType 0x6974756E"];
+	[types addObject:@"CorePasteboardFlavorType 0x6974756E"]; // iTunes track information
+	[types addObject:iMBNativePasteboardFlavor]; // Native iMB Data
 	
 	[pboard declareTypes:types owner:nil];
 	
@@ -172,12 +173,14 @@ static NSImage *_toolbarIcon = nil;
 	NSEnumerator *e = [rows objectEnumerator];
 	NSNumber *cur;
 	NSMutableArray *files = [NSMutableArray array];
-	
+   NSMutableArray* nativeDataArray = [NSMutableArray arrayWithCapacity:[rows count]];
 	while (cur = [e nextObject])
 	{
 		NSDictionary *song = [content objectAtIndex:[cur unsignedIntValue]];
 		NSData *data = [NSArchiver archivedDataWithRootObject:song];
-		[pboard setData:data forType:@"CorePasteboardFlavorType 0x6974756E"];
+		[pboard setData:data forType:@"CorePasteboardFlavorType 0x6974756E"]; // iTunes track information
+      
+      [nativeDataArray addObject:song];
 		
 		NSString *locURLString = [song objectForKey:@"Location"];
 		NSURL *locURL = [NSURL URLWithString:locURLString];
@@ -186,6 +189,11 @@ static NSImage *_toolbarIcon = nil;
 		NSString *loc = [locURL path];
 		[files addObject:loc];
 	}
+   NSDictionary* nativeData = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [self className], iMBControllerClassName,
+                                             nativeDataArray, iMBNativeDataArray,
+                                             nil];
+   [pboard setData:[NSArchiver archivedDataWithRootObject:nativeData] forType:iMBNativePasteboardFlavor]; // Native iMB Data
 	// We add files, not URLs, since is is really a list of files
 	[pboard writeURLs:nil files:files names:nil];
 	

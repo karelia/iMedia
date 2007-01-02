@@ -27,6 +27,9 @@ Please send fixes to
 
 #import "iMBLibraryNode.h"
 
+NSString *iMBNativePasteboardFlavor=@"iMBNativePasteboardFlavor";
+NSString *iMBControllerClassName=@"iMBControllerClassName";
+NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 @interface NSObject (iMediaHack)
 - (id)observedObject;
