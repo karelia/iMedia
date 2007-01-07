@@ -207,7 +207,6 @@ static NSImage *_toolbarIcon = nil;
 			identifier = @"com.apple.quicktimeplayer";
 		}
 		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:identifier] retain];
-		[_toolbarIcon setScalesWhenResized:YES];
 		[_toolbarIcon setSize:NSMakeSize(32,32)];
 	}
 	return _toolbarIcon;
@@ -287,7 +286,8 @@ static NSImage *_toolbarIcon = nil;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	// remove ourselves out of the queue
 	
-	EnterMoviesOnThread(0);	// we will be using QuickTime on the current thread.  See TN2125
+	OSErr err = EnterMoviesOnThread(0);	// we will be using QuickTime on the current thread.  See TN2125
+	if (noErr != err) NSLog(@"Error entering movies on thread");
 	
 	[myCacheLock lock];
 	NSString *imagePath = [[myInFlightImageOperations lastObject] retain];
@@ -375,8 +375,9 @@ static NSImage *_toolbarIcon = nil;
 	
 	myThreadCount--;
 	
-	ExitMoviesOnThread();	// balance EnterMoviesOnThread
-	
+	err = ExitMoviesOnThread();	// balance EnterMoviesOnThread
+	if (noErr != err) NSLog(@"Error entering movies on thread");
+
 	[pool release];
 }
 

@@ -20,6 +20,10 @@
 */
 #import "iMBLibraryOutlineView.h"
 
+@interface NSObject (iMediaHack)
+- (id)observedObject;
+- (void)outlineView:(NSOutlineView *)olv deleteItems:(NSArray *)items;
+@end
 
 @implementation iMBLibraryOutlineView
 

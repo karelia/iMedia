@@ -42,7 +42,8 @@ Please send fixes to
 // subclasses call this super method if they want auto watching of the db file.
 - (id)initWithContentsOfFile:(NSString *)file;
 
-- (id <iMediaBrowser>)browser;
+//- (id <iMediaBrowser>)browser;
+- (void)setBrowser:(id <iMediaBrowser>)browser;
 - (NSString *)databasePath;
 
 // subclasses implement this

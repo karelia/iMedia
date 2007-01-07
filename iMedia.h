@@ -50,4 +50,5 @@
 #import <iMediaBrowser/NSSlider+iMedia.h>
 #import <iMediaBrowser/NSProcessInfo+iMedia.h>
 
+#import <iMediaBrowser/MUPhotoView.h>
 

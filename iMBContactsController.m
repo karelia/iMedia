@@ -102,7 +102,6 @@ static NSImage *_toolbarIcon = nil;
 	{
 		NSString *p = [[NSBundle bundleForClass:[self class]] pathForResource:@"contacts" ofType:@"png"];
 		_toolbarIcon = [[NSImage alloc] initWithContentsOfFile:p];
-		[_toolbarIcon setScalesWhenResized:YES];
 		[_toolbarIcon setSize:NSMakeSize(32,32)];
 	}
 	return _toolbarIcon;

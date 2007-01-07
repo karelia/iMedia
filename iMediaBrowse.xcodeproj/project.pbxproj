@@ -57,14 +57,13 @@
 		79430F140A2C2901009E0FC7 /* MBSoundEffect.png in Resources */ = {isa = PBXBuildFile; fileRef = 79430F130A2C2901009E0FC7 /* MBSoundEffect.png */; };
 		79430F1C0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79430F1A0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.h */; };
 		79430F1D0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79430F1B0A2C2C88009E0FC7 /* iMBiMovieSoundEffectsParser.m */; };
-		794835F50A2709AD007E8268 /* MUPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 794835F30A2709AD007E8268 /* MUPhotoView.h */; };
+		794835F50A2709AD007E8268 /* MUPhotoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 794835F30A2709AD007E8268 /* MUPhotoView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		794835F60A2709AD007E8268 /* MUPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 794835F40A2709AD007E8268 /* MUPhotoView.m */; };
 		794C9F770A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 794C9F750A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		794C9F780A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 794C9F760A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m */; };
 		7950D53F0B1A78A500932A13 /* iMBAperturePhotosParser.m in Sources */ = {isa = PBXBuildFile; fileRef = FC6810370B1771ED0063CF05 /* iMBAperturePhotosParser.m */; };
 		7953019B0A0ADE9F00BCA0ED /* iTunesDRM.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */; };
 		7953E6BD0A2E8DC600C7AFBB /* ABGroup.png in Resources */ = {isa = PBXBuildFile; fileRef = 7953E6BC0A2E8DC600C7AFBB /* ABGroup.png */; };
-		7953E6E60A2E8EC600C7AFBB /* iMBAddressBookParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7903562509E3B40D00384D08 /* iMBAddressBookParser.m */; };
 		7953E79A0A2E989200C7AFBB /* contact.png in Resources */ = {isa = PBXBuildFile; fileRef = 79858F6709E3C3AB003EA241 /* contact.png */; };
 		7953E79B0A2E989300C7AFBB /* contacts.png in Resources */ = {isa = PBXBuildFile; fileRef = 7903562009E3B30F00384D08 /* contacts.png */; };
 		7956049409D78F9F00BF1DA5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 7956049309D78F9F00BF1DA5 /* LICENSE */; };
@@ -157,12 +156,24 @@
 		CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */ = {isa = PBXBuildFile; fileRef = CE7570610ADEE8CB009FE941 /* missingImage.png */; };
 		CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */; };
 		CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC1450A2C0AA000179BA3 /* Movies.nib */; };
+		CEC85B020B51508E006DA6AA /* iMBLinksController.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D6F4F09D35B77005F166D /* iMBLinksController.h */; };
+		CEC85B030B515095006DA6AA /* iMBDNDArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = D9B3EA5C09A3F82B00835FE4 /* iMBDNDArrayController.h */; };
+		CEC85B040B51509D006DA6AA /* UKMainThreadProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F9AF40976320A0071B2E0 /* UKMainThreadProxy.h */; };
+		CEC85B050B51509E006DA6AA /* UKKQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F9AF20976320A0071B2E0 /* UKKQueue.h */; };
+		CEC85B060B51509E006DA6AA /* UKFNSubscribeFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F9AF00976320A0071B2E0 /* UKFNSubscribeFileWatcher.h */; };
+		CEC85B070B5150A0006DA6AA /* UKFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F9AEF0976320A0071B2E0 /* UKFileWatcher.h */; };
+		CEC85B080B5150A7006DA6AA /* iMBAperturePhotosParser.h in Headers */ = {isa = PBXBuildFile; fileRef = FC6810360B1771ED0063CF05 /* iMBAperturePhotosParser.h */; };
+		CEC85B090B5150A8006DA6AA /* iMBiPhotoPhotosParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D715F09D3AB55005F166D /* iMBiPhotoPhotosParser.h */; };
+		CEC85B0A0B5150AB006DA6AA /* iMBiTunesMusicParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F870309D4DA72000F21B5 /* iMBiTunesMusicParser.h */; };
+		CEC85B0B0B5150AF006DA6AA /* iMBiPhotoMoviesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D716509D3AB64005F166D /* iMBiPhotoMoviesParser.h */; };
+		CEC85B0C0B5150B4006DA6AA /* iMBSafariBookmarkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D71DF09D3C00F005F166D /* iMBSafariBookmarkParser.h */; };
+		CEC85B0D0B5150C1006DA6AA /* LibraryItemsValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */; };
+		CEC85B0E0B5150C2006DA6AA /* TimeValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */; };
 		CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
 		CEF3F38609E449FF00D0058F /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF3F38409E449FF00D0058F /* NSString+iMedia.m */; };
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
-		FC6810380B1771ED0063CF05 /* iMBAperturePhotosParser.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = FC6810360B1771ED0063CF05 /* iMBAperturePhotosParser.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -184,7 +195,6 @@
 			files = (
 				7984F0F60A3E8A40003567B3 /* Epeg.framework in CopyFiles */,
 				791F973B0975D38A0071B2E0 /* iMediaBrowser.framework in CopyFiles */,
-				FC6810380B1771ED0063CF05 /* iMBAperturePhotosParser.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -885,6 +895,19 @@
 				7907B4F80A96C3F600F79714 /* iMBMoviesFolder.h in Headers */,
 				7907B4F90A96C40000F79714 /* iMBPicturesFolder.h in Headers */,
 				A9FECB070ADA696A00AB3426 /* iMBLibraryOutlineView.h in Headers */,
+				CEC85B020B51508E006DA6AA /* iMBLinksController.h in Headers */,
+				CEC85B030B515095006DA6AA /* iMBDNDArrayController.h in Headers */,
+				CEC85B040B51509D006DA6AA /* UKMainThreadProxy.h in Headers */,
+				CEC85B050B51509E006DA6AA /* UKKQueue.h in Headers */,
+				CEC85B060B51509E006DA6AA /* UKFNSubscribeFileWatcher.h in Headers */,
+				CEC85B070B5150A0006DA6AA /* UKFileWatcher.h in Headers */,
+				CEC85B080B5150A7006DA6AA /* iMBAperturePhotosParser.h in Headers */,
+				CEC85B090B5150A8006DA6AA /* iMBiPhotoPhotosParser.h in Headers */,
+				CEC85B0A0B5150AB006DA6AA /* iMBiTunesMusicParser.h in Headers */,
+				CEC85B0B0B5150AF006DA6AA /* iMBiPhotoMoviesParser.h in Headers */,
+				CEC85B0C0B5150B4006DA6AA /* iMBSafariBookmarkParser.h in Headers */,
+				CEC85B0D0B5150C1006DA6AA /* LibraryItemsValueTransformer.h in Headers */,
+				CEC85B0E0B5150C2006DA6AA /* TimeValueTransformer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1096,7 +1119,6 @@
 				79A52B7F0A2D6894008D06C8 /* iMBApertureParser.m in Sources */,
 				794C9F780A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m in Sources */,
 				79FA0F600A2E7D1500461872 /* NSSlider+iMedia.m in Sources */,
-				7953E6E60A2E8EC600C7AFBB /* iMBAddressBookParser.m in Sources */,
 				793810490A33AC53000A65EA /* NSProcessInfo+iMedia.m in Sources */,
 				A9FECB080ADA696A00AB3426 /* iMBLibraryOutlineView.m in Sources */,
 				A93A6A770AE77F2B00C77AA4 /* UKFileWatcher.m in Sources */,

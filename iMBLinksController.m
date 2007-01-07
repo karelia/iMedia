@@ -54,7 +54,6 @@ static NSImage *_toolbarIcon = nil;
 	if(_toolbarIcon == nil)
 	{
 		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.Safari"] retain];
-		[_toolbarIcon setScalesWhenResized:YES];
 		[_toolbarIcon setSize:NSMakeSize(32,32)];
 	}
 	return _toolbarIcon;

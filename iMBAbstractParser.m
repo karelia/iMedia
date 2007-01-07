@@ -89,11 +89,6 @@ Please send fixes to
 	myBrowser = browser;
 }
 
-- (id <iMediaBrowser>)browser
-{
-	return myBrowser;
-}
-
 - (NSString *)databasePath
 {
 	return myDatabase;

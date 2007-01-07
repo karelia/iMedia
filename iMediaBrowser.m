@@ -81,6 +81,21 @@ static NSMutableDictionary *_parsers = nil;
 				NSLog(@"Failed to load iMediaBrowser plugin: %@", cur);
 				continue;
 			}
+			else
+			{
+				// Register the parser/browser.  Note that the main class might be both!
+				// (Alternatively -- have a wakeup method sent to the main class to let it do its
+				// own registration, in case they are separate classes.)
+				
+//				if ([mainClass conformsToProtocol:@protocol(iMediaBrowser)])
+//				{
+//					[self registerBrowser:mainClass];
+//				}
+//				if ([mainClass conformsToProtocol:@protocol(iMBParser)])
+//				{
+//					[self registerParser:mainClass];
+//				}
+			}
 		}
 		else
 		{
@@ -346,6 +361,7 @@ static NSMutableDictionary *_parsers = nil;
 	
 	[oPlaylists setDataSource:self];
 	[oPlaylists setAllowsColumnReordering:NO];
+	[oPlaylists setDelegate:self];
 	[libraryController setSortDescriptors:nil];
 	[oSplitView setDelegate:self];
 }
@@ -638,11 +654,24 @@ static NSMutableDictionary *_parsers = nil;
 	free (idxs);
 }
 
-- (void)playlistSelected:(id)sender
+- (void)playlistSelected:(id)sender	// action from oPlaylists
 {
 	if (myFlags.didSelectNode)
 	{
 		[myDelegate iMediaBrowser:self didSelectNode:[[oPlaylists itemAtRow:[sender selectedRow]] observedObject]];
+	}
+}
+
+- (void)outlineViewItemWillExpand:(NSNotification *)notification	// notification from oPlaylists
+{
+	id objectToExpand = [[[notification userInfo] objectForKey:@"NSObject"] observedObject];
+	if (myFlags.willExpandNode)
+	{
+		[myDelegate iMediaBrowser:self willExpandNode:objectToExpand];
+	}
+	if ([[objectToExpand parser] respondsToSelector:@selector(iMediaBrowser:willExpandNode:)])
+	{
+		[[objectToExpand parser] iMediaBrowser:self willExpandNode:objectToExpand];
 	}
 }
 
@@ -714,6 +743,7 @@ static NSMutableDictionary *_parsers = nil;
 	myFlags.willChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];	
 	myFlags.didChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
 	myFlags.didSelectNode = [delegate respondsToSelector:@selector(iMediaBrowser:didSelectNode:)];
+	myFlags.willExpandNode = [delegate respondsToSelector:@selector(iMediaBrowser:willExpandNode:)];
 	myFlags.orientation = [delegate respondsToSelector:@selector(horizontalSplitViewForMediaBrowser:)];
 	myDelegate = delegate;	// not retained
 }
@@ -820,7 +850,9 @@ static NSMutableDictionary *_parsers = nil;
 			NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
 			[item setLabel:[cur name]];
 			[item setTarget:self];
-			[item setImage:[cur toolbarIcon]];
+			NSImage *image = [cur toolbarIcon];
+			[image setScalesWhenResized:YES];
+			[item setImage:image];
 			[item setAction:@selector(toolbarItemChanged:)];
 			return [item autorelease];
 		}

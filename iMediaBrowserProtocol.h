@@ -97,7 +97,6 @@ Please send fixes to
 
 @protocol iMBParser <NSObject>
 
-- (id)init;
 - (iMBLibraryNode *)library;
 - (void)setBrowser:(id <iMediaBrowser>)browser;
 

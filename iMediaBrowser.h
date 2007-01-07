@@ -61,7 +61,9 @@ Please send fixes to
 		unsigned didSelectNode: 1;
 		unsigned orientation: 1;
 		unsigned isLoading: 1;
-		unsigned unused: 21;
+		unsigned willExpandNode: 1;
+		
+		unsigned unused: 21;	// 32 minus the number above
 	} myFlags;
 }
 
@@ -133,6 +135,7 @@ extern NSString *iMediaBrowserSelectionDidChangeNotification;
 - (void)iMediaBrowser:(iMediaBrowser *)browser didChangeToBrowser:(NSString *)browserClassname;
 
 - (void)iMediaBrowser:(iMediaBrowser *)browser didSelectNode:(iMBLibraryNode *)node;
+- (void)iMediaBrowser:(iMediaBrowser *)browser willExpandNode:(iMBLibraryNode *)node;
 
 - (BOOL)horizontalSplitViewForMediaBrowser:(iMediaBrowser *)browser;
 
