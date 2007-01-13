@@ -3,6 +3,13 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = IMTimeFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
         {
+            ACTIONS = {reloadMediaBrowser = id; }; 
+            CLASS = iMBAbstractController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oView = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
             ACTIONS = {search = id; }; 
             CLASS = iMBDNDArrayController; 
             LANGUAGE = ObjC; 
@@ -10,21 +17,19 @@
             SUPERCLASS = NSArrayController; 
         }, 
         {
-            ACTIONS = {playMovie = id; scrubAudio = id; search = id; stopMovie = id; }; 
+            ACTIONS = {playMovie = id; scrubAudio = id; stopMovie = id; }; 
             CLASS = iMBMusicController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                clockDisplay = NSTextField; 
                 counterField = NSTextField; 
                 oAudioPlayer = QTMovieView; 
                 oSearch = NSSearchField; 
-                oView = NSView; 
                 playButton = NSButton; 
                 progressIndicator = NSSlider; 
                 songsController = iMBDNDArrayController; 
                 table = NSTableView; 
             }; 
-            SUPERCLASS = NSObject; 
+            SUPERCLASS = iMBAbstractController; 
         }, 
         {
             ACTIONS = {

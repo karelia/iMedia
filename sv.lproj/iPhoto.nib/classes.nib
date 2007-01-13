@@ -16,6 +16,7 @@
             SUPERCLASS = NSControl; 
         }, 
         {
+            ACTIONS = {reloadMediaBrowser = id; }; 
             CLASS = iMBAbstractController; 
             LANGUAGE = ObjC; 
             OUTLETS = {oView = NSView; }; 

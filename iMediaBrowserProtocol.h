@@ -97,7 +97,7 @@ Please send fixes to
 
 @protocol iMBParser <NSObject>
 
-- (iMBLibraryNode *)library;
+- (iMBLibraryNode *)library:(BOOL)reuseCachedData;
 - (void)setBrowser:(id <iMediaBrowser>)browser;
 
 @end

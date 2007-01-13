@@ -126,6 +126,11 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	[myController rearrangeObjects];
 }
 
+- (IBAction)reloadMediaBrowser:(id)sender
+{
+   [[iMediaBrowser sharedBrowser] reloadMediaBrowser];
+}
+
 - (NSTreeController *)controller
 {
 	return [[myController retain] autorelease];

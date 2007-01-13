@@ -39,7 +39,7 @@ static NSMutableDictionary *_parsers = nil;
 
 @interface iMediaBrowser (PrivateAPI)
 - (void)resetLibraryController;
-- (void)showMediaBrowser:(NSString *)browserClassName;
+- (void)showMediaBrowser:(NSString *)browserClassName reuseCachedData:(BOOL)reuseCachedData;
 @end
 
 @interface iMediaBrowser (Plugins)
@@ -171,13 +171,12 @@ static NSMutableDictionary *_parsers = nil;
     [parsers addObject:NSStringFromClass(aClass)];
 }
 
-+ (void)unregisterParser:(Class)aClass forMediaType:(NSString *)media
++ (void)unregisterParser:(NSString*)parserClassName forMediaType:(NSString *)media
 {
 	NSEnumerator *e = [[_parsers objectForKey:media] objectEnumerator];
 	NSString *cur;
 	while (cur = [e nextObject]) {
-		Class bClass = NSClassFromString(cur);
-		if (aClass == bClass) {
+		if ([parserClassName isEqualToString:cur]) {
 			[[_parsers objectForKey:media] removeObject:cur];
 			return;
 		}
@@ -325,12 +324,12 @@ static NSMutableDictionary *_parsers = nil;
 		if (canRestoreLastSelectedBrowser)
 		{
 			[myToolbar setSelectedItemIdentifier:lastmySelectedBrowser];
-			[self showMediaBrowser:lastmySelectedBrowser];
+			[self showMediaBrowser:lastmySelectedBrowser reuseCachedData:NO];
 		}
 		else
 		{
 			[myToolbar setSelectedItemIdentifier:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class])];
-			[self showMediaBrowser:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class])];
+			[self showMediaBrowser:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class]) reuseCachedData:NO];
 		}
 	}
 	
@@ -398,9 +397,14 @@ static NSMutableDictionary *_parsers = nil;
 	return nil;
 }
 
-- (void)showMediaBrowser:(NSString *)browserClassName
+- (void)reloadMediaBrowser
 {
-	if (![NSStringFromClass([mySelectedBrowser class]) isEqualToString:browserClassName])
+	[self showMediaBrowser:NSStringFromClass([mySelectedBrowser class]) reuseCachedData:NO];
+}
+
+- (void)showMediaBrowser:(NSString *)browserClassName reuseCachedData:(BOOL)reuseCachedData
+{
+	if (![NSStringFromClass([mySelectedBrowser class]) isEqualToString:browserClassName] || !reuseCachedData)
 	{
 		if ([myBackgroundLoadingLock tryLock])
 		{
@@ -439,7 +443,7 @@ static NSMutableDictionary *_parsers = nil;
 			[d setObject:NSStringFromClass([mySelectedBrowser class]) forKey:@"SelectedBrowser"];
 			[[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
 			myFlags.isLoading = YES;
-			[NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:nil];
+			[NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:[NSNumber numberWithBool:reuseCachedData]];
 		}
 		[myToolbar setSelectedItemIdentifier:NSStringFromClass([mySelectedBrowser class])];
 	}
@@ -447,13 +451,14 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)toolbarItemChanged:(id)sender
 {
-	[self showMediaBrowser:[sender itemIdentifier]];
+	[self showMediaBrowser:[sender itemIdentifier] reuseCachedData:YES];
 }
 
-- (void)backgroundLoadData:(id)sender
+- (void)backgroundLoadData:(id)reuseCachedDataArgument
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
+   
+	BOOL reuseCachedData = [reuseCachedDataArgument boolValue];
 	[self resetLibraryController];
 	NSMutableArray *root = [NSMutableArray array];
 	NSArray *parsers = [_parsers objectForKey:[mySelectedBrowser mediaType]];
@@ -492,7 +497,7 @@ static NSMutableDictionary *_parsers = nil;
 		[parser setBrowser:mySelectedBrowser];
 		
 		timer = [NSDate date];
-		iMBLibraryNode *library = [parser library];
+		iMBLibraryNode *library = [parser library:reuseCachedData];
 #if DEBUG
 		// NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
 #endif
@@ -525,7 +530,7 @@ static NSMutableDictionary *_parsers = nil;
 		{
 			iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:drop];
 			[parser setBrowser:mySelectedBrowser];
-			iMBLibraryNode *node = [parser library];
+			iMBLibraryNode *node = [parser library:YES];
 			[node setParser:parser];
 			[node setName:[drop lastPathComponent]];
 			[node setIconName:@"folder"];
@@ -709,7 +714,7 @@ static NSMutableDictionary *_parsers = nil;
 			if (![drops containsObject:cur] && [fm fileExistsAtPath:cur isDirectory:&isDir] && isDir && [mySelectedBrowser allowPlaylistFolderDrop:cur])
 			{
 				iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:cur];
-				iMBLibraryNode *node = [parser library];
+				iMBLibraryNode *node = [parser library:NO];
 				[node setParser:parser];
 				[node setName:[cur lastPathComponent]];
 				[node setIconName:@"folder"];

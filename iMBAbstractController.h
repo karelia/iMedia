@@ -46,4 +46,5 @@ extern NSString *iMBNativeDataArray;
 
 - (void)postSelectionChangeNotification:(NSArray *)selectedObjects;
 
+- (IBAction)reloadMediaBrowser:(id)sender;
 @end

@@ -81,6 +81,7 @@ Please send fixes to
 	Default media keys are: photos, music, videos, links
 */
 + (void)registerParser:(Class)aClass forMediaType:(NSString *)media;
++ (void)unregisterParser:(NSString*)parserClassName forMediaType:(NSString *)media;
 
 - (void)setIdentifier:(NSString *)identifier;
 - (NSString *)identifier;
@@ -103,6 +104,8 @@ Please send fixes to
 // Returns the library nodes that were added.
 - (NSArray*)addCustomFolders:(NSArray*)folderPaths;
 
+// reloads the current selected browser
+- (void)reloadMediaBrowser;
 @end
 
 // This notification is for each specific media browser to post when their selection changes.

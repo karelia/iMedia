@@ -69,10 +69,11 @@ Please send fixes to
 	[super dealloc];
 }
 
-- (iMBLibraryNode *)library
+- (iMBLibraryNode *)library:(BOOL)reuseCachedData
 {
-	if (!myCachedLibrary)
+	if (!myCachedLibrary || !reuseCachedData)
 	{
+      [myCachedLibrary release];
 		myCachedLibrary = [[self parseDatabase] retain];
 	}
 	return myCachedLibrary;
