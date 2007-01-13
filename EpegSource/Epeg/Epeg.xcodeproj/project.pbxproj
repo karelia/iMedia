@@ -29,7 +29,7 @@
 		1B4CB84B05B7F2A70048CDE7 /* Epeg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Epeg.h; sourceTree = "<group>"; };
 		1B4CB86005B7F77B0048CDE7 /* jpeglib.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = jpeglib.h; path = libjpeg/jpeglib.h; sourceTree = "<group>"; };
 		1B4CB87905B82E1E0048CDE7 /* EpegTest-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "EpegTest-Info.plist"; sourceTree = "<group>"; };
-		1B4CB8B505B834910048CDE7 /* Tester */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Tester; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B4CB8B505B834910048CDE7 /* Tester */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = Tester; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B4CB8BF05B834F90048CDE7 /* EpegTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EpegTester.m; sourceTree = "<group>"; };
 		32DBCF5E0370ADEE00C91783 /* Epeg_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Epeg_Prefix.pch; sourceTree = "<group>"; };
 		3C231B580A66F9DA00951F9E /* libjpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjpeg.a; path = /tmp/libjpeg.a; sourceTree = "<absolute>"; };
