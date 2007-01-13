@@ -54,7 +54,10 @@
 	int height_out = (int)((float)height_in * scalefactor);
 
 	epeg_decode_size_set(im, width_out, height_out);
-	epeg_decode_colorspace_set(im, EPEG_RGB8);
+	int cs;
+	epeg_colorspace_get(im, &cs);
+	if (cs == EPEG_CMYK) return nil; // epeg doesn't handle cmyk properly... they turn out to be a negative version
+	epeg_decode_colorspace_set(im, cs);
 
 	unsigned char *outbuffer;
 	int outsize = 0;
