@@ -1,0 +1,13 @@
+
+If you need to regenerate libjpeg:
+
+1) download source from http://www.ijg.org/files/. I used jpegsrc.v6b.tar.gz.
+
+2) ./configure
+
+3) edit Makefile, adding "-arch ppc -arch i386" to CFLAGS
+
+4) make libjpeg.a
+
+That should do it! -- TJT 7/12/2006
+
