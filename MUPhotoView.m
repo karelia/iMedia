@@ -282,8 +282,8 @@ static NSDictionary *sFilenameAttributes = nil;
 			
 			while (filenameSize.width > NSWidth(filenameRect))
 			{
-				[s1 deleteCharactersInRange:NSMakeRange(0, [s1 length] - 1)];
-				[s2 deleteCharactersInRange:NSMakeRange(1, [s2 length] - 1)];
+				[s1 deleteCharactersInRange:NSMakeRange([s1 length] - 1, 1)];
+				[s2 deleteCharactersInRange:NSMakeRange(0, 1)];
 				
 				filename = [NSString stringWithFormat:@"%@...%@", s1, s2];
 				filenameSize = [filename sizeWithAttributes:sFilenameAttributes];
