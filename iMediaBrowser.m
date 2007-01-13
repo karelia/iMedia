@@ -402,6 +402,11 @@ static NSMutableDictionary *_parsers = nil;
 	[self showMediaBrowser:NSStringFromClass([mySelectedBrowser class]) reuseCachedData:NO];
 }
 
+- (void)showMediaBrowser:(NSString *)browserClassName
+{
+	[self showMediaBrowser:browserClassName reuseCachedData:NO];
+}
+
 - (void)showMediaBrowser:(NSString *)browserClassName reuseCachedData:(BOOL)reuseCachedData
 {
 	if (![NSStringFromClass([mySelectedBrowser class]) isEqualToString:browserClassName] || !reuseCachedData)
