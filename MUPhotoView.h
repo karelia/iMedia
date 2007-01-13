@@ -50,6 +50,7 @@
     
     BOOL useBorderSelection;
     BOOL useShadowSelection;
+	BOOL showFilenames;
     NSColor *selectionBorderColor;
     NSColor *shadowBoxColor;
     float selectionBorderWidth;
@@ -157,6 +158,9 @@
 
 - (IBAction)takePhotoSizeFrom:(id)sender;
 
+- (void)setShowsFilenames:(BOOL)flag;
+- (BOOL)showsFilenames;
+
 
 #pragma mark -
 // Seriously, Don't Mess With Texas
@@ -196,6 +200,8 @@
     which forces the view to use the regular photos during resize. Avoid doing any time-consuming image manipulation in this method or there will be no benefit
     to drawing the small images. Ideally, you would only create a small version once - either ahead of time or during this call - and then reuse it. **/
 - (NSImage *)photoView:(MUPhotoView *)view fastPhotoAtIndex:(unsigned)index;
+
+- (NSString *)photoView:(MUPhotoView *)view filenameForPhotoAtIndex:(unsigned)index;
 
 // selection methods - will only get called if photoSelectionIndexes has not been bound
 /** The view will call this method if all of the following are true: (a) a valid NSIndexSet has not been bound to the @"photoSelectionIndexes" key, (b) 

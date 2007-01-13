@@ -468,6 +468,12 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	return [myImages count];
 }
 
+- (NSString *)photoView:(MUPhotoView *)view filenameForPhotoAtIndex:(unsigned)index
+{
+	NSDictionary *rec = [myImages objectAtIndex:index];
+	return [[rec objectForKey:@"ImagePath"] lastPathComponent];
+}
+
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
 {
 	NSDictionary *rec;

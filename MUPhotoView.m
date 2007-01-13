@@ -54,6 +54,8 @@
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
         
+		showFilenames = YES;
+		
         delegate = nil;
         sendsLiveSelectionUpdates = NO;
         useHighQualityResize = NO;
@@ -122,6 +124,8 @@
 {
 	return YES;
 }
+
+static NSDictionary *sFilenameAttributes = nil;
 
 - (void)drawRect:(NSRect)rect
 {
@@ -195,11 +199,30 @@
         
         // scale it to the appropriate size, this method should automatically set high quality if necessary
         photo = [self scalePhoto:photo];
-        
+		
+		NSString *filename = [delegate photoView:self filenameForPhotoAtIndex:index];
+        if (!sFilenameAttributes)
+		{
+			sFilenameAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont systemFontOfSize:10], NSFontAttributeName, [NSColor darkGrayColor], NSForegroundColorAttributeName, nil];
+			[sFilenameAttributes retain];
+		}
+		NSSize filenameSize = [filename sizeWithAttributes:sFilenameAttributes];
+		NSRect filenameRect = NSZeroRect;
         // get all the appropriate positioning information
         NSRect gridRect = [self centerScanRect:[self gridRectForIndex:index]];
+#define MU_PADDING 5.0
+		if (showFilenames)
+		{
+			NSRect tempRect = gridRect;
+			NSDivideRect(tempRect, &filenameRect, &gridRect, filenameSize.height + MU_PADDING, NSMaxYEdge);
+		}
         NSSize scaledSize = [self scaledPhotoSizeForSize:[photo size]];
         NSRect photoRect = [self rectCenteredInRect:gridRect withSize:scaledSize];
+		if (showFilenames)
+		{
+			photoRect = NSInsetRect(photoRect,6,6);
+		}
+		
         photoRect = [self centerScanRect:photoRect];
         
         //**** BEGIN Background Drawing - any drawing that technically goes under the image ****/
@@ -250,6 +273,26 @@
         
         //**** END Foreground Drawing ****//
         
+		// draw filename
+		if (showFilenames)
+		{
+			// center rect
+			NSMutableString *s1 = [NSMutableString stringWithString:[filename substringToIndex:[filename length] / 2]];
+			NSMutableString *s2 = [NSMutableString stringWithString:[filename substringFromIndex:[filename length] / 2]];
+			
+			while (filenameSize.width > NSWidth(filenameRect))
+			{
+				[s1 deleteCharactersInRange:NSMakeRange(0, [s1 length] - 1)];
+				[s2 deleteCharactersInRange:NSMakeRange(1, [s2 length] - 1)];
+				
+				filename = [NSString stringWithFormat:@"%@...%@", s1, s2];
+				filenameSize = [filename sizeWithAttributes:sFilenameAttributes];
+			}
+			filenameRect.origin.x = NSMidX(filenameRect) - (filenameSize.width / 2);
+			filenameRect.size.width = filenameSize.width;
+			
+			[filename drawInRect:filenameRect withAttributes:sFilenameAttributes];
+		}
         
     }
 
@@ -556,6 +599,17 @@
 			[self scrollRectToVisible:r];
 		}
 	}
+}
+
+- (void)setShowsFilenames:(BOOL)flag
+{
+	showFilenames = flag;
+	[self setNeedsDisplay:YES];
+}
+
+- (BOOL)showsFilenames
+{
+	return showFilenames;
 }
 
 
@@ -1380,6 +1434,11 @@
     return [self photoView:view photoAtIndex:index];
 }
 
+- (NSString *)photoView:(MUPhotoView *)view filenameForPhotoAtIndex:(unsigned)index
+{
+	return @"";
+}
+
 // selection
 - (NSIndexSet *)selectionIndexesForPhotoView:(MUPhotoView *)view
 {
@@ -1759,8 +1818,8 @@
 
 - (NSRect)rectCenteredInRect:(NSRect)rect withSize:(NSSize)size
 {
-    float x = rect.origin.x + ((rect.size.width - size.width) / 2);
-    float y = rect.origin.y + ((rect.size.height - size.height) / 2);
+	float x = NSMidX(rect) - (size.width / 2);
+	float y = NSMidY(rect) - (size.height / 2);
     
     return NSMakeRect(x, y, size.width, size.height);
 }
