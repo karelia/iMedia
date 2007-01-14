@@ -81,7 +81,7 @@ Please send fixes to
 	Default media keys are: photos, music, videos, links
 */
 + (void)registerParser:(Class)aClass forMediaType:(NSString *)media;
-+ (void)unregisterParser:(NSString*)parserClassName forMediaType:(NSString *)media;
++ (void)unregisterParserName:(NSString*)parserClassName forMediaType:(NSString *)media;
 
 - (void)setIdentifier:(NSString *)identifier;
 - (NSString *)identifier;

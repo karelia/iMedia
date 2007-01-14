@@ -173,7 +173,7 @@ static NSMutableDictionary *_parsers = nil;
     [parsers addObject:NSStringFromClass(aClass)];
 }
 
-+ (void)unregisterParser:(NSString*)parserClassName forMediaType:(NSString *)media
++ (void)unregisterParserName:(NSString*)parserClassName forMediaType:(NSString *)media
 {
 	NSEnumerator *e = [[_parsers objectForKey:media] objectEnumerator];
 	NSString *cur;
@@ -187,7 +187,7 @@ static NSMutableDictionary *_parsers = nil;
 
 + (void)unregisterParser:(Class)parserClass forMediaType:(NSString *)media
 {
-	[iMediaBrowser unregisterParser:NSStringFromClass(parserClass) forMediaType:media];
+	[iMediaBrowser unregisterParserName:NSStringFromClass(parserClass) forMediaType:media];
 }
 
 #pragma mark -
