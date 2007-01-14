@@ -377,6 +377,8 @@ static NSMutableDictionary *_parsers = nil;
 	[d setObject:NSStringFromRect([[self window] frame]) forKey:@"WindowPosition"];
 	
 	[ud setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
+	[oSplitView saveState:YES];
+	
 	[ud synchronize];
 }
 
