@@ -27,6 +27,8 @@ Please send fixes to
 #import "iMediaBrowserProtocol.h"
 #import "iMedia.h"
 #import "LibraryItemsValueTransformer.h"
+#import "RBSplitView.h"
+#import "RBSplitSubview.h"
 
 #import <QuickTime/QuickTime.h>
 #import <QTKit/QTKit.h>
@@ -259,10 +261,14 @@ static NSMutableDictionary *_parsers = nil;
 	myLoadedParsers = [[NSMutableDictionary alloc] init];
 	myUserDroppedParsers = [[NSMutableArray alloc] init];
 	
+	[oSplitView setAutosaveName:[NSString stringWithFormat:@"iMBSplitView-%@", myIdentifier] recursively:YES];
+	
 	if (myFlags.orientation && ![myDelegate horizontalSplitViewForMediaBrowser:self])
 	{
 		[oSplitView setVertical:YES];
 	}
+	[oSplitView restoreState:YES];
+	
 
 	myToolbar = [[NSToolbar alloc] initWithIdentifier:@"iMediaBrowserToolbar"];
 	
@@ -345,18 +351,6 @@ static NSMutableDictionary *_parsers = nil;
 											 selector:@selector(appWillQuit:)
 												 name:NSApplicationWillTerminateNotification
 											   object:nil];
-	
-	//set the splitview size
-	NSArray *sizes = [d objectForKey:@"SplitViewSize"];
-	if (sizes)
-	{
-		NSRect rect = NSRectFromString([sizes objectAtIndex:0]);
-		[[[oSplitView subviews] objectAtIndex:0] setFrame:rect];
-		rect = NSRectFromString([sizes objectAtIndex:1]);
-		[[[oSplitView subviews] objectAtIndex:1] setFrame:rect];
-		
-		[oSplitView setNeedsDisplay:YES];
-	}
 	
 	[oPlaylists setDataSource:self];
 	[oPlaylists setAllowsColumnReordering:NO];

@@ -20,7 +20,7 @@
                 oPlaylistContainer = NSView; 
                 oPlaylistPopup = NSPopUpButton; 
                 oPlaylists = NSOutlineView; 
-                oSplitView = NSSplitView; 
+                oSplitView = RBSplitView; 
                 selectedBrowser = id; 
             }; 
             SUPERCLASS = NSWindowController; 

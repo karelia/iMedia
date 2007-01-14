@@ -26,14 +26,14 @@ Please send fixes to
 #import <Cocoa/Cocoa.h>
 
 @protocol iMediaBrowser;
-@class iMBLibraryNode;
+@class iMBLibraryNode, RBSplitView;
 
 @interface iMediaBrowser : NSWindowController
 {
 	IBOutlet NSPopUpButton			*oPlaylistPopup;
 	IBOutlet NSView					*oBrowserView;
 	IBOutlet NSBox					*oLoadingView;
-	IBOutlet NSSplitView			*oSplitView;
+	IBOutlet RBSplitView			*oSplitView;
 	IBOutlet NSView					*oPlaylistContainer;
 	IBOutlet NSProgressIndicator	*oLoading;
 	IBOutlet NSOutlineView			*oPlaylists;
