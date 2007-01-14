@@ -185,6 +185,11 @@ static NSMutableDictionary *_parsers = nil;
 	}
 }
 
++ (void)unregisterParser:(Class)parserClass forMediaType:(NSString *)media
+{
+	[iMediaBrowser unregisterParser:NSStringFromClass(parserClass) forMediaType:media];
+}
+
 #pragma mark -
 #pragma mark Instance Methods
 
@@ -398,7 +403,7 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)showMediaBrowser:(NSString *)browserClassName
 {
-	[self showMediaBrowser:browserClassName reuseCachedData:NO];
+	[self showMediaBrowser:browserClassName reuseCachedData:YES];
 }
 
 - (void)showMediaBrowser:(NSString *)browserClassName reuseCachedData:(BOOL)reuseCachedData
