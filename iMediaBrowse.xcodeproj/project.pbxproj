@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3C3A131E09EAFB8100AF41BF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3C3A131C09EAFB8100AF41BF /* Localizable.strings */; };
-		3CAC73E90976F47800AF5020 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */; };
+		5B3AD87A0B5BA29D00C971A0 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */; };
+		5B3AD87D0B5BA2A600C971A0 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97630975D4970071B2E0 /* MainMenu.nib */; };
 		7903562D09E3B45F00384D08 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7903562C09E3B45F00384D08 /* AddressBook.framework */; };
 		7907B4F80A96C3F600F79714 /* iMBMoviesFolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F881809D4EF46000F21B5 /* iMBMoviesFolder.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7907B4F90A96C40000F79714 /* iMBPicturesFolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F748209D4BA98000F21B5 /* iMBPicturesFolder.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -37,7 +38,6 @@
 		791F97380975D3750071B2E0 /* iMediaBrowser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791679FE0975255000D9EF74 /* iMediaBrowser.framework */; };
 		791F973B0975D38A0071B2E0 /* iMediaBrowser.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 791679FE0975255000D9EF74 /* iMediaBrowser.framework */; };
 		791F97400975D3A90071B2E0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F973D0975D3A40071B2E0 /* AppDelegate.m */; };
-		791F97650975D4970071B2E0 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97630975D4970071B2E0 /* MainMenu.nib */; };
 		791F976D0975D5280071B2E0 /* iMediaBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		791F97A40975DA170071B2E0 /* iTunes.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97A20975DA170071B2E0 /* iTunes.nib */; };
 		791F9AF80976320A0071B2E0 /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF10976320A0071B2E0 /* UKFNSubscribeFileWatcher.m */; };
@@ -249,6 +249,8 @@
 		5B0628CF0AEDF38300419AEB /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B0DEBB00AEDF849008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iTunes.nib; sourceTree = "<group>"; };
 		5B0DEBBE0AEDF923008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Links.nib; sourceTree = "<group>"; };
+		5B3AD8600B5BA23800C971A0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		5B3AD8610B5BA23800C971A0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		5B7C81A80B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Contacts.nib; sourceTree = "<group>"; };
 		5B7C81A90B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		5B7C81AA0B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Movies.nib; sourceTree = "<group>"; };
@@ -1057,7 +1059,6 @@
 				791F97A40975DA170071B2E0 /* iTunes.nib in Resources */,
 				CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */,
 				CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */,
-				3CAC73E90976F47800AF5020 /* MediaBrowser.nib in Resources */,
 				7990CDF209D772FF00AD74BA /* Links.nib in Resources */,
 				79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */,
 				79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */,
@@ -1110,6 +1111,7 @@
 				7953E79B0A2E989300C7AFBB /* contacts.png in Resources */,
 				CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */,
 				E20764B80B597D8D00EAC95C /* tiny-reload.png in Resources */,
+				5B3AD87A0B5BA29D00C971A0 /* MediaBrowser.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1117,7 +1119,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				791F97650975D4970071B2E0 /* MainMenu.nib in Resources */,
+				5B3AD87D0B5BA2A600C971A0 /* MainMenu.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1239,6 +1241,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				29B97319FDCFA39411CA2CEA /* en */,
+				5B3AD8610B5BA23800C971A0 /* sv */,
 			);
 			name = MediaBrowser.nib;
 			sourceTree = "<group>";
@@ -1286,6 +1289,7 @@
 				A93A66550AE7711700C77AA4 /* ja */,
 				A93A66560AE7712200C77AA4 /* it */,
 				A93A66570AE7713100C77AA4 /* zh_CN */,
+				5B3AD8600B5BA23800C971A0 /* sv */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
