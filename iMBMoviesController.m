@@ -412,8 +412,13 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)photoView:(MUPhotoView *)view filenameForPhotoAtIndex:(unsigned)index
 {
-	NSDictionary *rec = [myImages objectAtIndex:index];
-	return [[rec objectForKey:@"ImagePath"] lastPathComponent];
+	if ([[self browser] showsFilenamesInPhotoBasedBrowsers])
+	{
+		NSDictionary *rec = [myImages objectAtIndex:index];
+		NSFileManager *fm = [NSFileManager defaultManager];
+		return [fm displayNameAtPath:[rec objectForKey:@"ImagePath"]];
+	}
+	return @"";
 }
 
 #warning -- this is the big workhorse.  Anything that we can do to speed it up will improve things!  Perhaps cache images in a user directory specific to imedia?

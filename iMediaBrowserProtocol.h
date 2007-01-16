@@ -25,12 +25,13 @@ Please send fixes to
 
 #include <Cocoa/Cocoa.h>
 
-@class iMBLibraryNode;
+@class iMBLibraryNode, iMediaBrowser;
 
 @protocol iMediaBrowser <NSObject>
 
 // designated initializer
 - (id)initWithPlaylistController:(NSTreeController *)ctrl;
+- (void)setBrowser:(iMediaBrowser *)browser;
 
 // used for the parser register to load the correct parsers
 - (NSString *)mediaType;

@@ -52,3 +52,5 @@
 
 #import <iMediaBrowser/MUPhotoView.h>
 
+#import <iMediaBrowser/RBSplitView.h>
+#import <iMediaBrowser/RBSplitSubview.h>

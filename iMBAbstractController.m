@@ -53,6 +53,16 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	[super dealloc];
 }
 
+- (void)setBrowser:(iMediaBrowser *)browser
+{
+	myBrowser = browser;
+}
+
+- (iMediaBrowser *)browser
+{
+	return myBrowser;
+}
+
 - (NSString *)mediaType
 {
 	return nil;

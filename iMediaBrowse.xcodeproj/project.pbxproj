@@ -51,9 +51,9 @@
 		79353E6D0A28754C00284715 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79353E6C0A28754C00284715 /* libcrypto.dylib */; };
 		793810480A33AC53000A65EA /* NSProcessInfo+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 793810460A33AC53000A65EA /* NSProcessInfo+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		793810490A33AC53000A65EA /* NSProcessInfo+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */; };
-		793AA45A0B59B460003F6BC4 /* RBSplitSubview.h in Headers */ = {isa = PBXBuildFile; fileRef = 793AA4550B59B460003F6BC4 /* RBSplitSubview.h */; };
+		793AA45A0B59B460003F6BC4 /* RBSplitSubview.h in Headers */ = {isa = PBXBuildFile; fileRef = 793AA4550B59B460003F6BC4 /* RBSplitSubview.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		793AA45B0B59B460003F6BC4 /* RBSplitSubview.m in Sources */ = {isa = PBXBuildFile; fileRef = 793AA4560B59B460003F6BC4 /* RBSplitSubview.m */; };
-		793AA45C0B59B460003F6BC4 /* RBSplitView.h in Headers */ = {isa = PBXBuildFile; fileRef = 793AA4570B59B460003F6BC4 /* RBSplitView.h */; };
+		793AA45C0B59B460003F6BC4 /* RBSplitView.h in Headers */ = {isa = PBXBuildFile; fileRef = 793AA4570B59B460003F6BC4 /* RBSplitView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		793AA45D0B59B460003F6BC4 /* RBSplitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 793AA4580B59B460003F6BC4 /* RBSplitView.m */; };
 		793AA45E0B59B460003F6BC4 /* RBSplitViewPrivateDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 793AA4590B59B460003F6BC4 /* RBSplitViewPrivateDefines.h */; };
 		793F98D30A2ABA1F00F68FF8 /* drm_movie.png in Resources */ = {isa = PBXBuildFile; fileRef = 793F98D20A2ABA1F00F68FF8 /* drm_movie.png */; };
@@ -969,7 +969,6 @@
 				791679FB0975255000D9EF74 /* Sources */,
 				791679FC0975255000D9EF74 /* Frameworks */,
 				795392910A3E67C000329AA4 /* CopyFiles */,
-				793AA4730B59B6BE003F6BC4 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1140,19 +1139,6 @@
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "\n# see Comments for information on this script\n\necho \"Generating Localizable.strings ...\"\n\ncd ${SRCROOT}\ngenstrings -q -u -s LocalizedStringInThisBundle -o en.lproj *.m\n\n";
-		};
-		793AA4730B59B6BE003F6BC4 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "HAS_SYMBOLS=`nm ${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH} |grep .objc_class_name_RBSplit |grep -w A`\necho $HAS_SYMBOLS\nif [ \"$HAS_SYMBOLS\" == \"\" ]\nthen\n\techo \"No need to strip symbols\"\nelse\n\tnmedit -R \"${SOURCE_ROOT}/RBSplitView.symbols\" \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

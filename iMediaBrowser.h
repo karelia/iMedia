@@ -62,8 +62,9 @@ Please send fixes to
 		unsigned orientation: 1;
 		unsigned isLoading: 1;
 		unsigned willExpandNode: 1;
+		unsigned showFilenames: 1;
 		
-		unsigned unused: 21;	// 32 minus the number above
+		unsigned unused: 20;	// 32 minus the number above
 	} myFlags;
 }
 
@@ -106,6 +107,10 @@ Please send fixes to
 
 // reloads the current selected browser
 - (void)reloadMediaBrowser;
+
+- (void)setShowsFilenamesInPhotoBasedBrowsers:(BOOL)flag;
+- (BOOL)showsFilenamesInPhotoBasedBrowsers;
+
 @end
 
 // This notification is for each specific media browser to post when their selection changes.

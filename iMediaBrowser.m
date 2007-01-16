@@ -293,6 +293,7 @@ static NSMutableDictionary *_parsers = nil;
 	while (cur = [e nextObject]) {
 		Class aClass = NSClassFromString(cur);
 		id <iMediaBrowser>browser = [[aClass alloc] initWithPlaylistController:libraryController];
+		[browser setBrowser:self];
 		if (![browser conformsToProtocol:@protocol(iMediaBrowser)]) {
 			NSLog(@"%@ must implement the iMediaBrowser protocol", [browser class]);
 			[browser release];
@@ -554,7 +555,9 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)recursivelyAddItemsToMenu:(NSMenu *)menu withNode:(iMBLibraryNode *)node indentation:(int)indentation
 {
-	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:[node name]
+	NSString *name = [node name];
+	if (!name) name = @"";
+	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:name
 												  action:@selector(playlistPopupChanged:)
 										   keyEquivalent:@""];
 	NSImage *icon = [[NSImage alloc] initWithData:[[node icon] TIFFRepresentation]];
@@ -740,6 +743,19 @@ static NSMutableDictionary *_parsers = nil;
 	}
 	
 	return results;
+}
+
+- (void)setShowsFilenamesInPhotoBasedBrowsers:(BOOL)flag
+{
+	if (flag != myFlags.showFilenames)
+	{
+		myFlags.showFilenames = flag;
+	}
+}
+
+- (BOOL)showsFilenamesInPhotoBasedBrowsers
+{
+	return myFlags.showFilenames;
 }
 
 #pragma mark -

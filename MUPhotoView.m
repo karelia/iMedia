@@ -54,7 +54,7 @@
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
         
-		showFilenames = YES;
+		showFilenames = NO;
 		
         delegate = nil;
         sendsLiveSelectionUpdates = NO;

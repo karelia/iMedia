@@ -37,14 +37,20 @@ extern NSString *iMBNativeDataArray;
 	IBOutlet NSView *oView;
 
 	@private
+		iMediaBrowser *myBrowser; //not retained
 		NSTreeController *myController;
 }
 
 - (id)initWithPlaylistController:(NSTreeController *)ctrl;
 - (NSTreeController *)controller;
+
+- (void)setBrowser:(iMediaBrowser *)browser;
+- (iMediaBrowser *)browser;
+
 - (void)willActivate;
 
 - (void)postSelectionChangeNotification:(NSArray *)selectedObjects;
 
 - (IBAction)reloadMediaBrowser:(id)sender;
+
 @end

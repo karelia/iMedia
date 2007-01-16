@@ -470,8 +470,13 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 
 - (NSString *)photoView:(MUPhotoView *)view filenameForPhotoAtIndex:(unsigned)index
 {
-	NSDictionary *rec = [myImages objectAtIndex:index];
-	return [[rec objectForKey:@"ImagePath"] lastPathComponent];
+	if ([[self browser] showsFilenamesInPhotoBasedBrowsers])
+	{
+		NSDictionary *rec = [myImages objectAtIndex:index];
+		NSFileManager *fm = [NSFileManager defaultManager];
+		return [fm displayNameAtPath:[rec objectForKey:@"ImagePath"]];
+	}
+	return @"";
 }
 
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
