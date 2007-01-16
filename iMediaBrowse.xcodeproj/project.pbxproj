@@ -10,6 +10,8 @@
 		3C3A131E09EAFB8100AF41BF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3C3A131C09EAFB8100AF41BF /* Localizable.strings */; };
 		5B3AD87A0B5BA29D00C971A0 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */; };
 		5B3AD87D0B5BA2A600C971A0 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97630975D4970071B2E0 /* MainMenu.nib */; };
+		5BE025270B5CE1FA0073DCF8 /* iMBiTunesVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */; };
+		5BE025280B5CE1FB0073DCF8 /* iMBiTunesVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 7990CD5809D75D4A00AD74BA /* iMBiTunesVideoParser.h */; };
 		7903562D09E3B45F00384D08 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7903562C09E3B45F00384D08 /* AddressBook.framework */; };
 		7907B4F80A96C3F600F79714 /* iMBMoviesFolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F881809D4EF46000F21B5 /* iMBMoviesFolder.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7907B4F90A96C40000F79714 /* iMBPicturesFolder.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F748209D4BA98000F21B5 /* iMBPicturesFolder.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -953,6 +955,7 @@
 				793AA45A0B59B460003F6BC4 /* RBSplitSubview.h in Headers */,
 				793AA45C0B59B460003F6BC4 /* RBSplitView.h in Headers */,
 				793AA45E0B59B460003F6BC4 /* RBSplitViewPrivateDefines.h in Headers */,
+				5BE025280B5CE1FB0073DCF8 /* iMBiTunesVideoParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1195,6 +1198,7 @@
 				7950D53F0B1A78A500932A13 /* iMBAperturePhotosParser.m in Sources */,
 				793AA45B0B59B460003F6BC4 /* RBSplitSubview.m in Sources */,
 				793AA45D0B59B460003F6BC4 /* RBSplitView.m in Sources */,
+				5BE025270B5CE1FA0073DCF8 /* iMBiTunesVideoParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -25,7 +25,6 @@
 #import "iMBiTunesVideoParser.h"
 #import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
-#import "NSWorkspace+Extensions.h"
 #import "QTMovie+iMedia.h"
 #import "iMedia.h"
 
@@ -78,8 +77,8 @@
 
 - (iMBLibraryNode *)parseDatabase
 {
-	NSMutableDictionary *musicLibrary = [NSMutableDictionary dictionary];
-	NSMutableArray *playLists = [NSMutableArray array];
+    // Load the iTunes Library dict 
+	NSMutableDictionary *iTunesLibrary = [NSMutableDictionary dictionary];
 	
 	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",
 														(CFStringRef)@"com.apple.iApps");
@@ -90,24 +89,21 @@
 	while (cur = [e nextObject]) {
 		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:cur]];
 		if (db) {
-			[musicLibrary addEntriesFromDictionary:db];
+			[iTunesLibrary addEntriesFromDictionary:db];
 		}
 	}
 	
-	// purge empty entries here....
-	
-	NSEnumerator * enumerator = [[musicLibrary objectForKey:@"Tracks"] keyEnumerator];
-	id key;
-	int x = 0;
-	
+    // Create the root node
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"iTunes", @"iTunes")];
 	[root setIconName:@"com.apple.iTunes"];
+	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Movies"];
 	
+    // Create default subnodes
 	iMBLibraryNode *library = [[iMBLibraryNode alloc] init];
 	iMBLibraryNode *podcastLib = [[iMBLibraryNode alloc] init];
 	iMBLibraryNode *partyShuffleLib = [[iMBLibraryNode alloc] init];
-	iMBLibraryNode *videoLib = [[iMBLibraryNode alloc] init];
+	iMBLibraryNode *moviesLib = [[iMBLibraryNode alloc] init];
 	iMBLibraryNode *purchasedLib = [[iMBLibraryNode alloc] init];
 	NSMutableArray *smartPlaylists = [NSMutableArray array];
 	
@@ -120,68 +116,77 @@
 	[partyShuffleLib setName:LocalizedStringInThisBundle(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
 	[partyShuffleLib setIconName:@"MBiTunesPartyShuffle"];
 	
-	[videoLib setName:LocalizedStringInThisBundle(@"Videos", @"Videos as titled in iTunes source list")];
-	[videoLib setIconName:@"iTunesVideo"];
+	[moviesLib setName:LocalizedStringInThisBundle(@"Videos", @"Videos as titled in iTunes source list")];
+	[moviesLib setIconName:@"iTunesVideo"];
 	
 	[purchasedLib setName:LocalizedStringInThisBundle(@"Purchased", @"Purchased folder as titled in iTunes source list")];
 	[purchasedLib setIconName:@"MBiTunesPurchasedPlaylist"];
 	
-	int playlistCount = [[musicLibrary objectForKey:@"Playlists"] count];
+    // Look through the iTunes playlists for movies
+    NSDictionary    *tracksDictionary = [iTunesLibrary objectForKey:@"Tracks"];
+    NSArray         *playListDicts = [iTunesLibrary objectForKey:@"Playlists"];
+    NSEnumerator    *playListDictEnum = [playListDicts objectEnumerator];
+    NSDictionary    *playListDict;
 	
-	for (x=0;x<playlistCount;x++)
+    while ((playListDict = [playListDictEnum nextObject]))
 	{
-		NSMutableSet *newPlaylist = [NSMutableSet set];	// This is a set because the items seem to be listed multiple times
-		
-		NSArray *libraryItems = [[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Playlist Items"];
-		int i;
-		BOOL hasVideos = NO;
-		NSDictionary * tracksDictionary = [musicLibrary objectForKey:@"Tracks"];
-		for (i=0; i<[libraryItems count]; i++)
+        NSAutoreleasePool   *pool = [[NSAutoreleasePool allocWithZone:[self zone]] init];
+        NSMutableSet        *addedLocations = [NSMutableSet set];       // for avoiding duplicates
+		NSMutableArray      *attributeDicts = [NSMutableArray array];   // The records for the node
+		NSArray             *playListTracks = [playListDict objectForKey:@"Playlist Items"];
+        NSEnumerator        *tracksEnum = [playListTracks objectEnumerator];
+        NSDictionary        *playListTrackDict;
+        BOOL                 hasVideos = NO;
+        
+        while ((playListTrackDict = [tracksEnum nextObject]))
 		{
-			NSMutableDictionary * newPlaylistContent = [tracksDictionary objectForKey:[[[libraryItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue]];
-			if ([newPlaylistContent objectForKey:@"Name"] && 
-				[[newPlaylistContent objectForKey:@"Location"] length] > 0 &&
-				[newPlaylistContent objectForKey:@"Has Video"] && [[newPlaylistContent objectForKey:@"Has Video"] boolValue]) 
+            NSString    *trackId = [[playListTrackDict objectForKey:@"Track ID"] stringValue];
+            if (!trackId)
+                continue;
+            
+            NSDictionary    *trackDict = [tracksDictionary objectForKey:trackId];
+            NSString        *urlString = [trackDict objectForKey:@"Location"];
+            
+			if ([trackDict objectForKey:@"Name"] && 
+                [[trackDict objectForKey:@"Has Video"] boolValue] &&
+				[urlString length] > 0 &&
+                ![addedLocations containsObject:urlString]) 
 			{
-				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Location"] forKey:@"ImagePath"];
-				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Location"] forKey:@"Preview"];
-				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Location"] forKey:@"ThumbPath"];
-				[newPlaylistContent setObject:[newPlaylistContent objectForKey:@"Name"] forKey:@"Caption"];
-				[newPlaylist addObject:movieRec];
+                NSMutableDictionary    *attributeDict = [trackDict mutableCopyWithZone:[self zone]];
+                NSURL   *url = [NSURL URLWithString:urlString];
+                NSString    *path = [url path];
+                if (!path)
+                    continue;
+                
+                [addedLocations addObject:urlString];
+				[attributeDict setObject:path forKey:@"ImagePath"];
+				[attributeDict setObject:path forKey:@"Preview"];
+				[attributeDict setObject:[trackDict objectForKey:@"Name"] forKey:@"Caption"];
+				[attributeDicts addObject:attributeDict];
+                [attributeDict release];
 				hasVideos = YES;
 			}
 		}
+        
 		if (hasVideos)
 		{
-			NSDictionary *playlistRecord = [[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x];
-			NSString * objectName = [playlistRecord objectForKey:@"Name"];
-			
 			iMBLibraryNode *node = nil;
-			if ([playlistRecord objectForKey:@"Master"] && [[playlistRecord objectForKey:@"Master"] boolValue])
-			{
+            
+			if ([[playListDict objectForKey:@"Master"] boolValue])
 				node = library;
-			}
-			else if ([playlistRecord objectForKey:@"Podcasts"] && [[playlistRecord objectForKey:@"Podcasts"] boolValue])
-			{
+			else if ([[playListDict objectForKey:@"Podcasts"] boolValue])
 				node = podcastLib;		
-			}
-			else if ([playlistRecord objectForKey:@"Party Shuffle"] && [[playlistRecord objectForKey:@"Party Shuffle"] boolValue])
-			{
+			else if ([[playListDict objectForKey:@"Party Shuffle"] boolValue])
 				node = partyShuffleLib;
-			}
-			else if ([playlistRecord objectForKey:@"Videos"] && [[playlistRecord objectForKey:@"Videos"] boolValue])
-			{
-				node = videoLib;
-			}
-			else if ([playlistRecord objectForKey:@"Purchased Music"] && [[playlistRecord objectForKey:@"Purchased Music"] boolValue])
-			{
+			else if ([[playListDict objectForKey:@"Movies"] boolValue])
+				node = moviesLib;
+			else if ([[playListDict objectForKey:@"Purchased Music"] boolValue])
 				node = purchasedLib;
-			}
 			else
-			{
+			{   // Create a new node for this playlist
 				node = [[iMBLibraryNode alloc] init];
-				[node setName:objectName];
-				if ([[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Smart Info"])
+				[node setName:[playListDict objectForKey:@"Name"]];
+				if ([playListDict objectForKey:@"Smart Info"])
 				{
 					[node setIconName:@"photocast_folder"];
 					[smartPlaylists addObject:node];
@@ -193,9 +198,11 @@
 				}
 				[node release];
 			}
-			[node setAttribute:[newPlaylist allObjects] forKey:@"Movies"];
+			[node setAttribute:attributeDicts forKey:@"Movies"];
 		}
+        [pool release];
 	}
+    
 	BOOL libraryHasVideos = NO;
 	
 	if ([library attributeForKey:@"Movies"]) // there is a least one video
@@ -208,9 +215,9 @@
 			[root insertItem:podcastLib atIndex:idx];
 			idx++;
 		}
-		if ([videoLib attributeForKey:@"Movies"])
+		if ([moviesLib attributeForKey:@"Movies"])
 		{
-			[root insertItem:videoLib atIndex:idx];
+			[root insertItem:moviesLib atIndex:idx];
 			idx++;
 		}
 		if ([partyShuffleLib attributeForKey:@"Movies"])
@@ -234,7 +241,9 @@
 	[library release];
 	[podcastLib release];
 	[partyShuffleLib release];
-	
+	[moviesLib release];
+    [purchasedLib release];
+    
 	if (libraryHasVideos)
 	{
 		return [root autorelease];
