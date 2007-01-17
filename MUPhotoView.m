@@ -249,7 +249,7 @@ static NSDictionary *sFilenameAttributes = nil;
         [photo drawInRect:photoRect fromRect:imageRect operation:NSCompositeSourceOver fraction:1.0];
         		
 		// register the tooltip area
-		[self addToolTipRect:imageRect owner:self userData:nil];
+		[self addToolTipRect:photoRect owner:self userData:nil];
 		
         // restore the photo's flipped status
         [photo setFlipped:isFlipped];
