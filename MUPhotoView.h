@@ -25,7 +25,7 @@
 //! MUPhotoView displays a grid of photos similar to iPhoto's main photo view. The class gives developers several options for providing images - via bindings or delegation.
 
 //! MUPhotoView displays a resizeable grid of photos, similar to iPhoto's photo view functionality. MUPhotoView provides developers with two different options for passing photo information to the view
-//!  Most importantly, MUPhotoView currently only deals with an array of photos. It does not yet know how to display titles or any other metadata. It also does not know how to find NSImage objects
+//!  Most importantly, MUPhotoView currently only deals with an array of photos. It also does not know how to find NSImage objects
 //!  that are inside another object - it expects NSImage objects. The first method for providing those objects it by binding an array of NSImage objects to the "photosArray" key of the view.
 //!  If this key has been bound, MUPhotoView will fetch all the images it displays from that binding. The second method is to have a delegate object provide the photos. MUPhotoView will only
 //!  call the delegate's photo methods if the photosArray key has not been bound. Please see the MUPhotoViewDelegate category documentation for descriptions of the methods. 
@@ -50,7 +50,6 @@
     
     BOOL useBorderSelection;
     BOOL useShadowSelection;
-	BOOL showFilenames;
     NSColor *selectionBorderColor;
     NSColor *shadowBoxColor;
     float selectionBorderWidth;
@@ -158,10 +157,6 @@
 
 - (IBAction)takePhotoSizeFrom:(id)sender;
 
-- (void)setShowsFilenames:(BOOL)flag;
-- (BOOL)showsFilenames;
-
-
 #pragma mark -
 // Seriously, Don't Mess With Texas
 #pragma mark Seriously, Don't Mess With Texas
@@ -201,7 +196,8 @@
     to drawing the small images. Ideally, you would only create a small version once - either ahead of time or during this call - and then reuse it. **/
 - (NSImage *)photoView:(MUPhotoView *)view fastPhotoAtIndex:(unsigned)index;
 
-- (NSString *)photoView:(MUPhotoView *)view filenameForPhotoAtIndex:(unsigned)index;
+- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)index;
+    // If a title is returned it will be drawn under the photo. Return nil to avoid titles.
 
 // selection methods - will only get called if photoSelectionIndexes has not been bound
 /** The view will call this method if all of the following are true: (a) a valid NSIndexSet has not been bound to the @"photoSelectionIndexes" key, (b) 

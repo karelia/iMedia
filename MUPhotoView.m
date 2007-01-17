@@ -53,8 +53,6 @@
 - (id)initWithFrame:(NSRect)frameRect
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
-        
-		showFilenames = NO;
 		
         delegate = nil;
         sendsLiveSelectionUpdates = NO;
@@ -125,7 +123,7 @@
 	return YES;
 }
 
-static NSDictionary *sFilenameAttributes = nil;
+static NSDictionary *sTitleAttributes = nil;
 
 - (void)drawRect:(NSRect)rect
 {
@@ -200,28 +198,30 @@ static NSDictionary *sFilenameAttributes = nil;
         // scale it to the appropriate size, this method should automatically set high quality if necessary
         photo = [self scalePhoto:photo];
 		
-		NSString *filename = [delegate photoView:self filenameForPhotoAtIndex:index];
-        if (!sFilenameAttributes)
+        NSRect    gridRect = [self centerScanRect:[self gridRectForIndex:index]];
+        
+        NSString *title = [delegate photoView:self titleForPhotoAtIndex:index];
+        NSSize    titleSize = NSZeroSize;
+        NSRect    titleRect = NSZeroRect;
+        
+        if (title)
 		{
-			sFilenameAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont systemFontOfSize:10], NSFontAttributeName, [NSColor darkGrayColor], NSForegroundColorAttributeName, nil];
-			[sFilenameAttributes retain];
+            title = [delegate photoView:self titleForPhotoAtIndex:index];
+            if (!sTitleAttributes)
+            {   // This could be improved by setting the color to something that works well with a non white background color.
+                sTitleAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:[NSFont labelFontSize]], NSFontAttributeName, [NSColor darkGrayColor], NSForegroundColorAttributeName, nil];
+                [sTitleAttributes retain];
+            }
+            titleSize = [title sizeWithAttributes:sTitleAttributes];
+            
+            NSDivideRect(gridRect, &titleRect, &gridRect, titleSize.height + 6.0f, NSMaxYEdge);
 		}
-		NSSize filenameSize = [filename sizeWithAttributes:sFilenameAttributes];
-		NSRect filenameRect = NSZeroRect;
-        // get all the appropriate positioning information
-        NSRect gridRect = [self centerScanRect:[self gridRectForIndex:index]];
-#define MU_PADDING 5.0
-		if (showFilenames)
-		{
-			NSRect tempRect = gridRect;
-			NSDivideRect(tempRect, &filenameRect, &gridRect, filenameSize.height + MU_PADDING, NSMaxYEdge);
-		}
+
         NSSize scaledSize = [self scaledPhotoSizeForSize:[photo size]];
         NSRect photoRect = [self rectCenteredInRect:gridRect withSize:scaledSize];
-		if (showFilenames)
-		{
+
+		if (title)
 			photoRect = NSInsetRect(photoRect,6,6);
-		}
 		
         photoRect = [self centerScanRect:photoRect];
         
@@ -273,25 +273,25 @@ static NSDictionary *sFilenameAttributes = nil;
         
         //**** END Foreground Drawing ****//
         
-		// draw filename
-		if (showFilenames)
+		// draw title
+		if (title)
 		{
 			// center rect
-			NSMutableString *s1 = [NSMutableString stringWithString:[filename substringToIndex:[filename length] / 2]];
-			NSMutableString *s2 = [NSMutableString stringWithString:[filename substringFromIndex:[filename length] / 2]];
+			NSMutableString *s1 = [NSMutableString stringWithString:[title substringToIndex:[title length] / 2]];
+			NSMutableString *s2 = [NSMutableString stringWithString:[title substringFromIndex:[title length] / 2]];
 			
-			while (filenameSize.width > NSWidth(filenameRect))
+			while (titleSize.width > NSWidth(titleRect))
 			{
 				[s1 deleteCharactersInRange:NSMakeRange([s1 length] - 1, 1)];
 				[s2 deleteCharactersInRange:NSMakeRange(0, 1)];
 				
-				filename = [NSString stringWithFormat:@"%@...%@", s1, s2];
-				filenameSize = [filename sizeWithAttributes:sFilenameAttributes];
+				title = [NSString stringWithFormat:@"%@...%@", s1, s2];
+				titleSize = [title sizeWithAttributes:sTitleAttributes];
 			}
-			filenameRect.origin.x = NSMidX(filenameRect) - (filenameSize.width / 2);
-			filenameRect.size.width = filenameSize.width;
+			titleRect.origin.x = NSMidX(titleRect) - (titleSize.width / 2);
+			titleRect.size.width = titleSize.width;
 			
-			[filename drawInRect:filenameRect withAttributes:sFilenameAttributes];
+			[title drawInRect:titleRect withAttributes:sTitleAttributes];
 		}
         
     }
@@ -600,18 +600,6 @@ static NSDictionary *sFilenameAttributes = nil;
 		}
 	}
 }
-
-- (void)setShowsFilenames:(BOOL)flag
-{
-	showFilenames = flag;
-	[self setNeedsDisplay:YES];
-}
-
-- (BOOL)showsFilenames
-{
-	return showFilenames;
-}
-
 
 #pragma mark -
 // Don't Mess With Texas
@@ -1434,9 +1422,9 @@ static NSDictionary *sFilenameAttributes = nil;
     return [self photoView:view photoAtIndex:index];
 }
 
-- (NSString *)photoView:(MUPhotoView *)view filenameForPhotoAtIndex:(unsigned)index
+- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)index
 {
-	return @"";
+	return nil;
 }
 
 // selection
