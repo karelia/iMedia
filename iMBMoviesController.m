@@ -49,13 +49,14 @@ static NSImage *_placeholder = nil;
 - (id)initWithPlaylistController:(NSTreeController*)ctrl
 {
 	if (self = [super initWithPlaylistController:ctrl]) {
-		mySelection = [[NSMutableIndexSet alloc] init];
-		myFilteredImages = [[NSMutableArray alloc] init];
+		mySelection = [[NSMutableIndexSet allocWithZone:[self zone]] init];
+		myFilteredImages = [[NSMutableArray allocWithZone:[self zone]] init];
 		myCache = [[NSMutableDictionary dictionary] retain];
-		myInFlightImageOperations = [[NSMutableArray alloc] init];
+		myInFlightImageOperations = [[NSMutableArray allocWithZone:[self zone]] init];
+        myImageRecordsToLoad = [[NSMutableArray allocWithZone:[self zone]] init];
 		myProcessingImages = [[NSMutableSet set] retain];
-		myCacheLock = [[NSLock alloc] init];
-		
+		myCacheLock = [[NSLock allocWithZone:[self zone]] init];
+        
 		if (!_placeholder)
 		{
 			NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"placeholder" ofType:@"png"];
@@ -78,7 +79,8 @@ static NSImage *_placeholder = nil;
 	[myProcessingImages release];
 	[myInFlightImageOperations release];
 	[myCacheLock release];
-	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    
 	[super dealloc];
 }
 
@@ -328,7 +330,7 @@ static NSImage *_toolbarIcon = nil;
 				}
 				else
 				{
-					img = [[movie betterPosterImage] retain];
+                    img = [[movie betterPosterImage] retain];
 				}
 				
 			} 
@@ -349,13 +351,8 @@ static NSImage *_toolbarIcon = nil;
 		}
 		
 		[myCacheLock lock];
-		if (![myCache objectForKey:imagePath])
-		{
-#warning -- why would something already be here?
-			
-			[myCache setObject:img forKey:imagePath];
-			[img autorelease];
-		}		
+        [myCache setObject:img forKey:imagePath];
+        [img release];
 		
 		// get the last object in the queue because we would have scrolled and what is at the start won't be necessarily be what is displayed.
 		[myProcessingImages removeObject:imagePath];
@@ -421,7 +418,81 @@ static NSImage *_toolbarIcon = nil;
 	return @"";
 }
 
-#warning -- this is the big workhorse.  Anything that we can do to speed it up will improve things!  Perhaps cache images in a user directory specific to imedia?
+- (void) startLoadingOneMovie:sender
+// This runs asynchronously in the main thread to do the non thread safe work involved when
+// loading QuickTime movies. It also spawns off worker threads if possible.
+// We do this via a performSelector:afterDelay: to allow the app to respond to events.
+{
+    NSMutableDictionary *rec = [myImageRecordsToLoad lastObject];
+    if (!rec)
+        return;
+    
+	[myCacheLock lock];
+	NSString *imagePath = [rec objectForKey:@"Preview"];
+    BOOL alreadyQueued = (([myInFlightImageOperations containsObject:imagePath]) || ([myProcessingImages containsObject:imagePath]));
+    [myCacheLock unlock];
+    
+    if (!alreadyQueued)
+    {
+        if ([QTMovie canInitWithFile:imagePath])
+        {
+            NSError *movieError = nil;
+            QTMovie *mov = [QTMovie movieWithAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
+                [QTDataReference dataReferenceWithReferenceToFile:imagePath], QTMovieDataReferenceAttribute,
+                [NSNumber numberWithBool:NO], QTMovieAskUnresolvedDataRefsAttribute, nil] 
+                                                  error:&movieError];
+            
+            if (mov)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
+            {
+                // do a background thread load if we have a spare processor, and if this movie is thread-safe
+                unsigned int maxThreadCount = [NSProcessInfo numberOfProcessors] - 1;
+                maxThreadCount = MAX(maxThreadCount, 1);    // Allow at least 1 background thread
+                if (myThreadCount < maxThreadCount
+                    &&
+                    noErr == DetachMovieFromCurrentThread([mov quickTimeMovie]) )	// -2098 = componentNotThreadSafeErr
+                {
+                    [myCacheLock lock];
+                    [rec setObject:mov forKey:@"qtmovie"];
+                    [myInFlightImageOperations addObject:imagePath];
+                    [myCacheLock unlock];
+                    myThreadCount++;
+                    [NSThread detachNewThreadSelector:@selector(backgroundLoadOfInFlightImage:)
+                                             toTarget:self
+                                           withObject:nil];
+                } 
+                else 
+                {
+                    // Load movie on the main thread because we can't open on background thread
+                    NSImage *img = [mov betterPosterImage];
+                    
+                    if (img)
+                    {
+                        [myCacheLock lock];
+                        [myCache setObject:img forKey:imagePath];
+                        [myCacheLock unlock];
+                        [oPhotoView setNeedsDisplay:YES];
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        //lets move it to the end of the queue so we get done next
+        [myCacheLock lock];
+        [myInFlightImageOperations removeObject:imagePath];
+        [myInFlightImageOperations addObject:imagePath];
+        [myCacheLock unlock];
+    }
+    
+    [myImageRecordsToLoad removeLastObject];
+    if ([myImageRecordsToLoad count] > 0)
+    {
+        // There is still work to be done so let's continue after a tiny delay
+        [self performSelector:_cmd withObject:self afterDelay:0.001f inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode,NSModalPanelRunLoopMode,
+            NSEventTrackingRunLoopMode,nil]];
+    }
+}
 
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
 {
@@ -434,80 +505,26 @@ static NSImage *_toolbarIcon = nil;
 	{
 		rec = [myImages objectAtIndex:index];
 	}
+    
 	//try the caches
-	[myCacheLock lock];
 	NSString *imagePath = [rec objectForKey:@"Preview"];
+	[myCacheLock lock];
 	NSImage *img = [myCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
 	[myCacheLock unlock];
-	
-	// NOT USED ???? ...if (!img) img = [rec objectForKey:@"CachedThumb"];
-	
+		
 	if (!img)	// need to generate
-	{
-		BOOL imageLoading = NO;
-		
-		// background load the image
-		[myCacheLock lock];
-		BOOL alreadyQueued = (([myInFlightImageOperations containsObject:imagePath]) || ([myProcessingImages containsObject:imagePath]));
-		
-		if (!alreadyQueued)
-		{
-			if ([QTMovie canInitWithFile:imagePath])
-			{
-                NSError *movieError = nil;
-                QTMovie *mov = [QTMovie movieWithAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
-                    [QTDataReference dataReferenceWithReferenceToFile:imagePath], QTMovieDataReferenceAttribute,
-                    [NSNumber numberWithBool:NO], QTMovieAskUnresolvedDataRefsAttribute, nil] 
-                                                      error:&movieError];
-                
-                if (mov)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
-				{
-					// do a background thread load if we have a spare processor, and if this movie is thread-safe
-                    unsigned int maxThreadCount = [NSProcessInfo numberOfProcessors] - 1;
-                    maxThreadCount = MAX(maxThreadCount, 1);    // Allow at least 1 background thread
-					if (myThreadCount < maxThreadCount
-						&&
-						noErr == DetachMovieFromCurrentThread([mov quickTimeMovie]) )	// -2098 = componentNotThreadSafeErr
-					{
-						[rec setObject:mov forKey:@"qtmovie"];
-						[myInFlightImageOperations addObject:imagePath];
-						myThreadCount++;
-						imageLoading = YES;
-						[NSThread detachNewThreadSelector:@selector(backgroundLoadOfInFlightImage:)
-												 toTarget:self
-											   withObject:nil];
-					} else {
-		#warning CLEAN THIS UP .. are we not holding onto image in our cache?
-						// Open movie on the main thread because we can't open on background thread
-
-						img = [mov betterPosterImage];
-						if (img)
-						{
-							[myCache setObject:img forKey:imagePath];
-						}
-					}
-				}
-			}
-			
-			// Now if we aren't loading currently, and we don't have an image, generate a placeholder instead.
-			if (!imageLoading && ( !img || NSEqualSizes([img size], NSZeroSize) ) )
-			{
-				img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
-				[img setScalesWhenResized:YES];
-				[img setSize:NSMakeSize(128,128)];
-				[myCache setObject:img forKey:imagePath];
-			}
-		}
-		else
-		{
-			//lets move it to the end of the queue so we get done next
-			[myInFlightImageOperations removeObject:imagePath];
-			[myInFlightImageOperations addObject:imagePath];
-		}
-		[myCacheLock unlock];
-		img = nil; 
+    {
+        [myImageRecordsToLoad addObject:rec];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startLoadingOneMovie:) object:self];
+        [self performSelector:@selector(startLoadingOneMovie:) withObject:self afterDelay:0.001f inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode,NSModalPanelRunLoopMode,
+            NSEventTrackingRunLoopMode,nil]];
+        
+        // Use a placeholder for now
+        img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
+        [img setScalesWhenResized:YES];
+        [img setSize:NSMakeSize(128,128)];
+        [myCache setObject:img forKey:imagePath];
 	}
-	
 	return img;
 }
 

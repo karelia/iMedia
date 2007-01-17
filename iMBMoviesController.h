@@ -41,6 +41,7 @@ Please send fixes to
 	NSMutableArray			*myFilteredImages;
 	NSString				*mySearchString;
 	NSMutableArray			*myInFlightImageOperations;
+    NSMutableArray          *myImageRecordsToLoad;
 	NSMutableSet			*myProcessingImages;
 	NSLock					*myCacheLock;
 	NSMutableDictionary		*myCache;
