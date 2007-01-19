@@ -57,7 +57,10 @@
 	// if still zero, get 20 seconds in, capped at 1/5 movie time.
 	if (NSOrderedSame == QTTimeCompare(qttime, QTZeroTime))
 	{
-		qttime = QTMakeTimeWithTimeInterval(20.0);
+        qttime.timeScale = [[attr objectForKey:QTMovieTimeScaleAttribute] longValue];
+        if (qttime.timeScale == 0)
+            qttime.timeScale = 60;
+		qttime.timeValue = qttime.timeScale * 20;
 		
 		NSValue *timeValue = [attr objectForKey:QTMovieDurationAttribute];
 		if (nil != timeValue)
@@ -69,10 +72,15 @@
 				qttime = capTime;
 			}
 		}
+        // Move the time to the next key frame so QT to speed things up a little
+        OSType		whichMediaType = VIDEO_TYPE;
+        TimeValue   newTimeValue = 0;
+        GetMovieNextInterestingTime([self quickTimeMovie], nextTimeSyncSample, 1, &whichMediaType, qttime.timeValue, 0, &newTimeValue, NULL);
+        if (newTimeValue > 0 && newTimeValue < qttime.timeValue * 1.25) // stay within a reasonable time
+            qttime.timeValue = newTimeValue;
 	}
 	return [self frameImageAtTime:qttime];
 }
-
 
 - (BOOL) isDRMProtected
 {
