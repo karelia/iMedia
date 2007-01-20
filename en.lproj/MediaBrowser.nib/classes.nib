@@ -7,13 +7,16 @@
             SUPERCLASS = NSImageView; 
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
         {CLASS = iMBLibraryOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
         {
-            ACTIONS = {changeBrowser = id; playlistSelected = id; }; 
+            ACTIONS = {playlistSelected = id; }; 
             CLASS = iMediaBrowser; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 libraryController = NSTreeController; 
+                myDelegate = id; 
+                mySelectedBrowser = id; 
                 oBrowserView = NSView; 
                 oLoading = NSProgressIndicator; 
                 oLoadingView = NSBox; 
@@ -21,7 +24,6 @@
                 oPlaylistPopup = NSPopUpButton; 
                 oPlaylists = NSOutlineView; 
                 oSplitView = RBSplitView; 
-                selectedBrowser = id; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

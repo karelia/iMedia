@@ -313,7 +313,21 @@ static NSMutableDictionary *imageCache = nil;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"iMBLibraryNode: %@ (%@)", [self name], [[self attributes] allKeys]];
+	NSMutableString *s = [NSMutableString stringWithFormat:@"iMBLibraryNode: '%@'", [self name]];
+	int c = [myItems count];
+	if (1 == c)
+	{
+		[s appendString:@" 1 child"];
+	}
+	else if (c)
+	{
+		[s appendFormat:@" %d children", c];
+	}
+	if ([[self attributes] count])
+	{
+		[s appendFormat:@"; attributes: %@", [[self attributes] allKeys]];
+	}
+	return s;
 }
 
 - (void)setFilterDuplicateKey:(NSString *)filterKey forAttributeKey:(NSString *)attributeKey

@@ -668,24 +668,31 @@ static NSMutableDictionary *_parsers = nil;
 	free (idxs);
 }
 
-- (void)playlistSelected:(id)sender	// action from oPlaylists
+- (IBAction)playlistSelected:(id)sender	// action from oPlaylists
 {
+	id observedObject = [[oPlaylists itemAtRow:[sender selectedRow]] observedObject];
+	if ([[observedObject parser] respondsToSelector:@selector(iMediaBrowser:didSelectNode:)])
+	{
+		[[observedObject parser] iMediaBrowser:self didSelectNode:observedObject];
+	}
 	if (myFlags.didSelectNode)
 	{
-		[myDelegate iMediaBrowser:self didSelectNode:[[oPlaylists itemAtRow:[sender selectedRow]] observedObject]];
+		[myDelegate iMediaBrowser:self didSelectNode:observedObject];
 	}
 }
 
 - (void)outlineViewItemWillExpand:(NSNotification *)notification	// notification from oPlaylists
 {
-	id objectToExpand = [[[notification userInfo] objectForKey:@"NSObject"] observedObject];
-	if (myFlags.willExpandNode)
+	id row = [[notification userInfo] objectForKey:@"NSObject"];
+	NSOutlineView *outline = [notification object];
+	id objectToExpand = [row observedObject];
+	if (myFlags.willExpand)
 	{
-		[myDelegate iMediaBrowser:self willExpandNode:objectToExpand];
+		[myDelegate iMediaBrowser:self willExpandOutline:outline row:row node:objectToExpand];
 	}
-	if ([[objectToExpand parser] respondsToSelector:@selector(iMediaBrowser:willExpandNode:)])
+	if ([[objectToExpand parser] respondsToSelector:@selector(iMediaBrowser:willExpandOutline:row:node:)])
 	{
-		[[objectToExpand parser] iMediaBrowser:self willExpandNode:objectToExpand];
+		[[objectToExpand parser] iMediaBrowser:self willExpandOutline:outline row:row node:objectToExpand];
 	}
 }
 
@@ -770,7 +777,7 @@ static NSMutableDictionary *_parsers = nil;
 	myFlags.willChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:willChangeBrowser:)];	
 	myFlags.didChangeBrowser = [delegate respondsToSelector:@selector(iMediaBrowser:didChangeBrowser:)];
 	myFlags.didSelectNode = [delegate respondsToSelector:@selector(iMediaBrowser:didSelectNode:)];
-	myFlags.willExpandNode = [delegate respondsToSelector:@selector(iMediaBrowser:willExpandNode:)];
+	myFlags.willExpand = [delegate respondsToSelector:@selector(iMediaBrowser:willExpandOutline:row:node:)];
 	myFlags.orientation = [delegate respondsToSelector:@selector(horizontalSplitViewForMediaBrowser:)];
 	myDelegate = delegate;	// not retained
 }

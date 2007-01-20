@@ -61,7 +61,7 @@ Please send fixes to
 		unsigned didSelectNode: 1;
 		unsigned orientation: 1;
 		unsigned isLoading: 1;
-		unsigned willExpandNode: 1;
+		unsigned willExpand: 1;
 		unsigned showFilenames: 1;
 		
 		unsigned unused: 20;	// 32 minus the number above
@@ -111,6 +111,8 @@ Please send fixes to
 - (void)setShowsFilenamesInPhotoBasedBrowsers:(BOOL)flag;
 - (BOOL)showsFilenamesInPhotoBasedBrowsers;
 
+- (IBAction)playlistSelected:(id)sender;
+
 @end
 
 // This notification is for each specific media browser to post when their selection changes.
@@ -143,7 +145,7 @@ extern NSString *iMediaBrowserSelectionDidChangeNotification;
 - (void)iMediaBrowser:(iMediaBrowser *)browser didChangeToBrowser:(NSString *)browserClassname;
 
 - (void)iMediaBrowser:(iMediaBrowser *)browser didSelectNode:(iMBLibraryNode *)node;
-- (void)iMediaBrowser:(iMediaBrowser *)browser willExpandNode:(iMBLibraryNode *)node;
+- (void)iMediaBrowser:(iMediaBrowser *)browser willExpandOutline:(NSOutlineView *)outline row:(id)row node:(iMBLibraryNode *)node;
 
 - (BOOL)horizontalSplitViewForMediaBrowser:(iMediaBrowser *)browser;
 
