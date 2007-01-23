@@ -224,6 +224,9 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)dealloc
 {
+	[[oPlaylists enclosingScrollView] release];
+	[oPlaylistPopup release];
+
 	[myUserDroppedParsers release];
 	[myMediaBrowsers release];
 	[myLoadedParsers release];
@@ -262,6 +265,10 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)awakeFromNib
 {
+	// save these since they get swapped out
+	[[oPlaylists enclosingScrollView] retain];
+	[oPlaylistPopup retain];
+	
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
 	myLoadedParsers = [[NSMutableDictionary alloc] init];
 	myUserDroppedParsers = [[NSMutableArray alloc] init];
@@ -274,6 +281,7 @@ static NSMutableDictionary *_parsers = nil;
 	}
 	[oSplitView restoreState:YES];
 	
+	[[oSplitView subviewAtPosition:0] setMinDimension:24.0 andMaxDimension:0.0];
 
 	myToolbar = [[NSToolbar alloc] initWithIdentifier:@"iMediaBrowserToolbar"];
 	
@@ -505,8 +513,8 @@ static NSMutableDictionary *_parsers = nil;
 		
 		timer = [NSDate date];
 		iMBLibraryNode *library = [parser library:reuseCachedData];
-#if DEBUG
-		// NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
+#ifdef DEBUG
+		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
 #endif
 		if (library) // it is possible for a parser to return nil if the db for it doesn't exist
 		{
@@ -796,7 +804,7 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)windowDidResize:(NSNotification *)aNotification
 {
-	if ([[oSplitView subviews] containsObject:oPlaylistPopup])
+	if ([[[oSplitView subviewAtPosition:0] subviews] containsObject:oPlaylistPopup])
 	{
 		NSRect frame = [oPlaylistPopup frame];
 		if (frame.size.height < 24)
@@ -829,34 +837,37 @@ static NSMutableDictionary *_parsers = nil;
 #pragma mark -
 #pragma mark NSSplitView Delegate Methods
 
-- (void)splitViewWillResizeSubviews:(NSNotification *)aNotification
+- (void)splitView:(RBSplitView*)sender changedFrameOfSubview:(RBSplitSubview*)subview from:(NSRect)fromRect to:(NSRect)toRect;
 {
-	if (myFlags.inSplitViewResize) return; // stop possible recursion from NSSplitView
-	myFlags.inSplitViewResize = YES;
-	if (![oSplitView isVertical])
+	if (subview == [oSplitView subviewAtPosition:0])
 	{
-		if([[oPlaylists enclosingScrollView] frame].size.height <= 50 && ![[oSplitView subviews] containsObject:oPlaylistPopup])
+		if (myFlags.inSplitViewResize) return; // stop possible recursion from NSSplitView
+		myFlags.inSplitViewResize = YES;
+		if (![oSplitView isVertical])
 		{
-			// select the currently selected item in the playlist
-			[oPlaylistPopup selectItemWithRepresentedObject:[[libraryController selectedObjects] lastObject]];
-			[oSplitView replaceSubview:[[oPlaylists enclosingScrollView] retain] with:oPlaylistPopup];
-			NSRect frame = [oPlaylistPopup frame];
-			frame.size.height = 24;
-			[oPlaylistPopup setFrame:frame];
+			if(toRect.size.height <= 50 && ![[[oSplitView subviewAtPosition:0] subviews] containsObject:oPlaylistPopup])
+			{
+				// select the currently selected item in the playlist
+				[oPlaylistPopup selectItemWithRepresentedObject:[[libraryController selectedObjects] lastObject]];
+				[[oSplitView subviewAtPosition:0] replaceSubview:[oPlaylists enclosingScrollView] with:oPlaylistPopup];
+				NSRect frame = [oPlaylistPopup frame];
+				// frame.size.height = 24;
+				frame.origin.y = 0;
+				// [oPlaylistPopup setAutoresizingMask:NSViewMinYMargin];
+				[oPlaylistPopup setFrame:frame];
+			}
+			
+			if(toRect.size.height > 50 && [[[oSplitView subviewAtPosition:0] subviews] containsObject:oPlaylistPopup])
+			{
+				NSScrollView *scrollView = [oPlaylists enclosingScrollView];
+				[[oSplitView subviewAtPosition:0] replaceSubview:oPlaylistPopup with:scrollView];
+			}
 		}
-		
-		if([oPlaylistPopup frame].size.height > 50 && ![[oSplitView subviews] containsObject:oPlaylists])
-		{
-			[oSplitView replaceSubview:[oPlaylistPopup retain] with:[oPlaylists enclosingScrollView]];
-		}
+		myFlags.inSplitViewResize = NO;
 	}
-	myFlags.inSplitViewResize = NO;
 }
 
-- (float)splitView:(NSSplitView *)sender constrainMinCoordinate:(float)proposedMin ofSubviewAt:(int)offset
-{
-	return 24;
-}
+/*  NOT SURE HOW TO TRANSLATE THIS QUITE YET
 
 - (float)splitView:(NSSplitView *)sender constrainMaxCoordinate:(float)proposedMax ofSubviewAt:(int)offset
 {
@@ -865,6 +876,8 @@ static NSMutableDictionary *_parsers = nil;
 	else
 		return NSWidth([sender frame]) - 200;
 }
+*/
+
 
 #pragma mark -
 #pragma mark NSToolbar Delegate Methods

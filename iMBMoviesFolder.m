@@ -87,38 +87,41 @@ Please send fixes to
 		NSString *filePath = [path stringByAppendingPathComponent: cur];
 		
 		@try {
-			if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![fm isPathHidden:cur])
+			if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath])
 			{
-				if ([cur pathExtension] && [[cur pathExtension] length] > 0)
+				if (isDir)
 				{
-					if ([[cur pathExtension] isEqualToString:@"iMovieProject"]) // handle the iMovie Project folder wrapper.
+					if ([cur pathExtension] && [[cur pathExtension] length] > 0)
 					{
-						NSString *cache = [filePath stringByAppendingPathComponent:@"Cache/Timeline Movie.mov"];
-						if ([fm fileExistsAtPath:cache])
+						if ([[cur pathExtension] isEqualToString:@"iMovieProject"]) // handle the iMovie Project folder wrapper.
 						{
-							NSMutableDictionary *rec = [self recordForMovieWithPath:cache];
-							[rec setObject:filePath forKey:@"ImagePath"];
-							[rec setObject:[filePath lastPathComponent] forKey:@"Caption"];
-							[rec setObject:cache forKey:@"Preview"];
-							[movies addObject:rec];
+							NSString *cache = [filePath stringByAppendingPathComponent:@"Cache/Timeline Movie.mov"];
+							if ([fm fileExistsAtPath:cache])
+							{
+								NSMutableDictionary *rec = [self recordForMovieWithPath:cache];
+								[rec setObject:filePath forKey:@"ImagePath"];
+								[rec setObject:[filePath lastPathComponent] forKey:@"Caption"];
+								[rec setObject:cache forKey:@"Preview"];
+								[movies addObject:rec];
+							}
 						}
+					}
+					else
+					{
+						iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
+						[root addItem:folder];
+						[folder release];
+						[folder setIconName:@"folder"];
+						[folder setName:[fm displayNameAtPath:filePath]];
+						[self recursivelyParse:filePath withNode:folder];
 					}
 				}
 				else
 				{
-					iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
-					[root addItem:folder];
-					[folder release];
-					[folder setIconName:@"folder"];
-					[folder setName:[fm displayNameAtPath:filePath]];
-					[self recursivelyParse:filePath withNode:folder];
-				}
-			}
-			else
-			{
-				if ([movieTypes indexOfObject:[[filePath lowercaseString] pathExtension]] != NSNotFound)
-				{
-					[movies addObject:[self recordForMovieWithPath:filePath]];
+					if ([movieTypes indexOfObject:[[filePath lowercaseString] pathExtension]] != NSNotFound)
+					{
+						[movies addObject:[self recordForMovieWithPath:filePath]];
+					}
 				}
 			}
 		}

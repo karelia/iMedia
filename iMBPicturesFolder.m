@@ -62,41 +62,42 @@ Please send fixes to
 	while (cur = [e nextObject])
 	{
 		NSString *filePath = [path stringByAppendingPathComponent: cur];
-		NSString *fileName = [filePath lastPathComponent];
 		
-		if ([fileName rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
-		if ([fileName rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
-		if ([fm isPathHidden:fileName]) continue;
+		if ([cur rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
+		if ([cur rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
 		
-		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![ws isFilePackageAtPath:filePath] )
+		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath] && ![ws isFilePackageAtPath:filePath] )
 		{
-			iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
-			[root addItem:folder];
-			[folder release];
-			[folder setIconName:@"folder"];
-			[folder setName:[fm displayNameAtPath:filePath]];
-			[self recursivelyParse:filePath withNode:folder];
-		}
-		else
-		{
-			NSString *UTI = [NSString UTIForFileAtPath:filePath];
-			if ([NSString UTI:UTI conformsToUTI:(NSString *)kUTTypeImage])
+			if (isDir)
 			{
-				NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
-				if (filePath)
+				iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
+				[root addItem:folder];
+				[folder release];
+				[folder setIconName:@"folder"];
+				[folder setName:[fm displayNameAtPath:filePath]];
+				[self recursivelyParse:filePath withNode:folder];
+			}
+			else
+			{
+				NSString *UTI = [NSString UTIForFileAtPath:filePath];
+				if ([NSString UTI:UTI conformsToUTI:(NSString *)kUTTypeImage])
 				{
-					[newPicture setObject:filePath forKey:@"ImagePath"];
-					[newPicture setObject:[fm displayNameAtPath:filePath] forKey:@"Caption"];
-					//[newPicture setObject:filePath forKey:@"ThumbPath"];
+					NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
+					if (filePath)
+					{
+						[newPicture setObject:filePath forKey:@"ImagePath"];
+						[newPicture setObject:[fm displayNameAtPath:filePath] forKey:@"Caption"];
+						//[newPicture setObject:filePath forKey:@"ThumbPath"];
+					}
+					NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
+					NSDate* modDate = [fileAttribs fileModificationDate];
+					if (modDate)
+					{
+						[newPicture setObject:[NSNumber numberWithDouble:[modDate timeIntervalSinceReferenceDate]]
+																  forKey:@"DateAsTimerInterval"];
+					}
+					[images addObject:newPicture];
 				}
-				NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
-				NSDate* modDate = [fileAttribs fileModificationDate];
-				if (modDate)
-				{
-					[newPicture setObject:[NSNumber numberWithDouble:[modDate timeIntervalSinceReferenceDate]]
-                                                              forKey:@"DateAsTimerInterval"];
-				}
-				[images addObject:newPicture];
 			}
 		}
 	}

@@ -100,95 +100,98 @@
 		if ([[filePath lastPathComponent] isEqualToString:@"iTunes"]) continue;
 		if ([[filePath lastPathComponent] isEqualToString:@"GarageBand"]) continue;
 		
-		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![fm isPathHidden:cur] && ![ws isFilePackageAtPath:filePath])
+		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath] && ![ws isFilePackageAtPath:filePath])
 		{
-			iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
-			[root addItem:folder];
-			[folder release];
-			[folder setIconName:@"folder"];
-			[folder setName:[fm displayNameAtPath:filePath]];
-			[self recursivelyParse:filePath withNode:folder];
-		}
-		else
-		{
-			if ([movieTypes indexOfObject:[[filePath lowercaseString] pathExtension]] != NSNotFound)
+			if (isDir)
 			{
-				OSErr err = EnterMoviesOnThread(0);
-				if (err != noErr) NSLog(@"Unable to EnterMoviesOnThread; %d", err);
+				iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
+				[root addItem:folder];
+				[folder release];
+				[folder setIconName:@"folder"];
+				[folder setName:[fm displayNameAtPath:filePath]];
+				[self recursivelyParse:filePath withNode:folder];
+			}
+			else
+			{
+				if ([movieTypes indexOfObject:[[filePath lowercaseString] pathExtension]] != NSNotFound)
+				{
+					OSErr err = EnterMoviesOnThread(0);
+					if (err != noErr) NSLog(@"Unable to EnterMoviesOnThread; %d", err);
 
-				NSMutableDictionary *song = [NSMutableDictionary dictionary]; 
-				
-				//we want to cache the first frame of the movie here as we will be in a background thread
-				QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
-				NSError *error = nil;
-				QTMovie *movie = nil;
-				
-				if (myParseMetaData)
-				{
-					movie = [[QTMovie alloc] initWithAttributes:
-						[NSDictionary dictionaryWithObjectsAndKeys: 
-							ref, QTMovieDataReferenceAttribute,
-							[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-							nil] error:&error];
-				}
-				
-				// Get the meta data from the QTMovie
-				NSString *val = nil;
-				if (myParseMetaData)
-				{
-					val = [movie attributeWithFourCharCode:kUserDataTextFullName];
-				}
-				if (!val)
-				{
-					val = [cur stringByDeletingPathExtension];
-				}
-				[song setObject:val forKey:@"Name"];
-				val = nil;
-				if (myParseMetaData)
-				{
-					val = [movie attributeWithFourCharCode:FOUR_CHAR_CODE(0xA9415254)]; //'©ART'
-				}
-				if (!val)
-				{
-					if (myUnknownArtist)
+					NSMutableDictionary *song = [NSMutableDictionary dictionary]; 
+					
+					//we want to cache the first frame of the movie here as we will be in a background thread
+					QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
+					NSError *error = nil;
+					QTMovie *movie = nil;
+					
+					if (myParseMetaData)
 					{
-						val = myUnknownArtist;
+						movie = [[QTMovie alloc] initWithAttributes:
+							[NSDictionary dictionaryWithObjectsAndKeys: 
+								ref, QTMovieDataReferenceAttribute,
+								[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+								nil] error:&error];
+					}
+					
+					// Get the meta data from the QTMovie
+					NSString *val = nil;
+					if (myParseMetaData)
+					{
+						val = [movie attributeWithFourCharCode:kUserDataTextFullName];
+					}
+					if (!val)
+					{
+						val = [cur stringByDeletingPathExtension];
+					}
+					[song setObject:val forKey:@"Name"];
+					val = nil;
+					if (myParseMetaData)
+					{
+						val = [movie attributeWithFourCharCode:FOUR_CHAR_CODE(0xA9415254)]; //'©ART'
+					}
+					if (!val)
+					{
+						if (myUnknownArtist)
+						{
+							val = myUnknownArtist;
+						}
+						else
+						{
+							val = LocalizedStringInThisBundle(@"Unknown", @"Unkown music key");
+						}
+					}
+					[song setObject:val forKey:@"Artist"];
+					if (myParseMetaData)
+					{
+						NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
+						// Used for binding
+						[song setObject:time forKey:@"Total Time"];
+						if (![movie isDRMProtected])
+						{
+							[song setObject:songIcon forKey:@"Icon"];
+						}
+						else
+						{
+							[song setObject:drmIcon forKey:@"Icon"];
+						}
 					}
 					else
 					{
-						val = LocalizedStringInThisBundle(@"Unknown", @"Unkown music key");
-					}
-				}
-				[song setObject:val forKey:@"Artist"];
-				if (myParseMetaData)
-				{
-					NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
-					// Used for binding
-					[song setObject:time forKey:@"Total Time"];
-					if (![movie isDRMProtected])
-					{
+						[song setObject:[NSNumber numberWithInt:0] forKey:@"Total Time"];
 						[song setObject:songIcon forKey:@"Icon"];
 					}
-					else
-					{
-						[song setObject:drmIcon forKey:@"Icon"];
-					}
-				}
-				else
-				{
-					[song setObject:[NSNumber numberWithInt:0] forKey:@"Total Time"];
-					[song setObject:songIcon forKey:@"Icon"];
-				}
-				
-				[song setObject:filePath forKey:@"Location"];
-				[song setObject:filePath forKey:@"Preview"];
-				
-				[movie release];
-				[tracks addObject:song];
+					
+					[song setObject:filePath forKey:@"Location"];
+					[song setObject:filePath forKey:@"Preview"];
+					
+					[movie release];
+					[tracks addObject:song];
 
-				err = ExitMoviesOnThread();
-				if (err != noErr) NSLog(@"Unable to ExitMoviesOnThread; %d", err);
+					err = ExitMoviesOnThread();
+					if (err != noErr) NSLog(@"Unable to ExitMoviesOnThread; %d", err);
 
+				}
 			}
 		}
 		poolRelease++;

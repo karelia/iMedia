@@ -147,7 +147,7 @@ const UInt8 kUserDataIsText = 0xA9; // the copyright symbol
 						};
 						
 						HLock(hData);
-						result = [NSString stringWithCString:*hData];
+						result = [NSString stringWithUTF8String:*hData];
 						HUnlock(hData);
 						goto bail;
 					}

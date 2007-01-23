@@ -29,5 +29,7 @@
 @interface NSFileManager (iMedia)
 
 - (BOOL)isPathHidden:(NSString *)path;
+- (NSString *)cachePathForKey:(NSString *)aKey;
+
 
 @end

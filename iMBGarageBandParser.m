@@ -64,56 +64,59 @@
 	{
 		NSString *filePath = [path stringByAppendingPathComponent: cur];
 		
-		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && isDir && ![fm isPathHidden:cur])
+		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath])
 		{
-			if ([[[filePath pathExtension] lowercaseString] isEqualToString:@"band"])
+			if (isDir)
 			{
-				// see if we have the preview to the gb composition
-				NSString *output = [filePath stringByAppendingPathComponent:@"Output/Output.aif"];
-				BOOL hasSample = [fm fileExistsAtPath:output];
-				rec = [NSMutableDictionary dictionary];
-				[rec setObject:[[filePath lastPathComponent] stringByDeletingPathExtension] forKey:@"Name"];
-				[rec setObject:filePath forKey:@"Location"];
-				[rec setObject:artist forKey:@"Artist"];
-				
-				if (hasSample)
+				if ([[[filePath pathExtension] lowercaseString] isEqualToString:@"band"])
 				{
-					[rec setObject:output forKey:@"Preview"];
-					// we need to load it into a qt movie so we can get the duration
-					QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:output];
-					NSError *error = nil;
-
-					OSErr err = EnterMoviesOnThread(0);
-					if (err != noErr) NSLog(@"Unable to EnterMoviesOnThread; %d", err);
-
-					QTMovie *movie = [[QTMovie alloc] initWithAttributes:
-						[NSDictionary dictionaryWithObjectsAndKeys: 
-							ref, QTMovieDataReferenceAttribute,
-							[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-							nil] error:&error];
-					if (movie)
+					// see if we have the preview to the gb composition
+					NSString *output = [filePath stringByAppendingPathComponent:@"Output/Output.aif"];
+					BOOL hasSample = [fm fileExistsAtPath:output];
+					rec = [NSMutableDictionary dictionary];
+					[rec setObject:[[filePath lastPathComponent] stringByDeletingPathExtension] forKey:@"Name"];
+					[rec setObject:filePath forKey:@"Location"];
+					[rec setObject:artist forKey:@"Artist"];
+					
+					if (hasSample)
 					{
-						NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
-						[rec setObject:time forKey:@"Total Time"];
-					}
-					[movie release];
+						[rec setObject:output forKey:@"Preview"];
+						// we need to load it into a qt movie so we can get the duration
+						QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:output];
+						NSError *error = nil;
 
-					err = ExitMoviesOnThread();
-					if (err != noErr) NSLog(@"Unable to ExitMoviesOnThread; %d", err);
+						OSErr err = EnterMoviesOnThread(0);
+						if (err != noErr) NSLog(@"Unable to EnterMoviesOnThread; %d", err);
+
+						QTMovie *movie = [[QTMovie alloc] initWithAttributes:
+							[NSDictionary dictionaryWithObjectsAndKeys: 
+								ref, QTMovieDataReferenceAttribute,
+								[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+								nil] error:&error];
+						if (movie)
+						{
+							NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
+							[rec setObject:time forKey:@"Total Time"];
+						}
+						[movie release];
+
+						err = ExitMoviesOnThread();
+						if (err != noErr) NSLog(@"Unable to ExitMoviesOnThread; %d", err);
+					}
+					NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:filePath];
+					[rec setObject:icon forKey:@"Icon"];
+					
+					[songs addObject:rec];
 				}
-				NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:filePath];
-				[rec setObject:icon forKey:@"Icon"];
-				
-				[songs addObject:rec];
-			}
-			else
-			{
-				iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
-				[root addItem:folder];
-				[folder release];
-				[folder setIconName:@"folder"];
-				[folder setName:[fm displayNameAtPath:filePath]];
-				[self recursivelyParse:filePath withNode:folder artist:artist];
+				else
+				{
+					iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
+					[root addItem:folder];
+					[folder release];
+					[folder setIconName:@"folder"];
+					[folder setName:[fm displayNameAtPath:filePath]];
+					[self recursivelyParse:filePath withNode:folder artist:artist];
+				}
 			}
 		}
 	}

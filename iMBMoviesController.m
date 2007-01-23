@@ -516,6 +516,8 @@ static NSImage *_toolbarIcon = nil;
 		
 	if (!img)	// need to generate
     {
+		NSString *cachePath = [[NSFileManager defaultManager] cachePathForKey:imagePath];
+		
         [myImageRecordsToLoad addObject:rec];
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startLoadingOneMovie:) object:self];
         [self performSelector:@selector(startLoadingOneMovie:) withObject:self afterDelay:0.001f inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode,NSModalPanelRunLoopMode,
@@ -530,7 +532,6 @@ static NSImage *_toolbarIcon = nil;
 	return img;
 }
 
-#warning -- check for movie leaks -- Tim's diagnostic output gave me some warnings
 - (void)photoView:(MUPhotoView *)view didSetSelectionIndexes:(NSIndexSet *)indexes
 {
 	[mySelection removeAllIndexes];
