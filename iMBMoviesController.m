@@ -318,7 +318,8 @@ static NSImage *_toolbarIcon = nil;
 
 				QTMovie *movie = [rec objectForKey:@"qtmovie"];
 
-				(void)AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread.  Don't care if it succeeded or not
+				err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread.  Don't care if it succeeded or not
+				if (noErr != err) NSLog(@"Error attaching movie to current thread %d", err);
             
 				if ([movie respondsToSelector:@selector(setIdling:)])
 					[movie setIdling:NO];
@@ -338,11 +339,14 @@ static NSImage *_toolbarIcon = nil;
 				NSLog(@"Failed to load movie: %@", imagePath);
 			}
 			@finally {
-				// We would normally have to DetachMovieFromCurrentThread but we're done with the movie now!
-				[rec removeObjectForKey:@"qtmovie"];
+				QTMovie *movie = [rec objectForKey:@"qtmovie"];
+				OSErr err = DetachMovieFromCurrentThread([movie quickTimeMovie]); 	// -2098 = componentNotThreadSafeErr
+				if (noErr != err) NSLog(@"Error detaching from background thread");
+
+				[rec removeObjectForKey:@"qtmovie"];	// movie is still retained internally
 				
-				//err = ExitMoviesOnThread();	// balance EnterMoviesOnThread
-				//if (noErr != err) NSLog(@"Error entering movies on thread");
+				err = ExitMoviesOnThread();	// balance EnterMoviesOnThread
+				if (noErr != err) NSLog(@"Error entering movies on thread");
 
 			}
 		}
@@ -439,7 +443,7 @@ static NSImage *_toolbarIcon = nil;
                 [QTDataReference dataReferenceWithReferenceToFile:imagePath], QTMovieDataReferenceAttribute,
                 [NSNumber numberWithBool:NO], QTMovieAskUnresolvedDataRefsAttribute, nil] 
                                                   error:&movieError];
-            
+			            
             if (mov)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
             {
                 // do a background thread load if we have a spare processor, and if this movie is thread-safe
