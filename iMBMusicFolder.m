@@ -67,10 +67,12 @@
 	myUnknownArtist = [artist copy];
 }
 
-- (NSString *)unkownArtist
+- (NSString *)unknownArtist
 {
 	return myUnknownArtist;
 }
+
+#warning Note: We could definitely speed this up, if it's an issue, by delaying the processing of the QTMovie objects.
 
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root
 {

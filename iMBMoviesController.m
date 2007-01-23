@@ -287,10 +287,7 @@ static NSImage *_toolbarIcon = nil;
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	// remove ourselves out of the queue
-	
-	OSErr err = EnterMoviesOnThread(0);	// we will be using QuickTime on the current thread.  See TN2125
-	if (noErr != err) NSLog(@"Error entering movies on thread");
-	
+		
 	[myCacheLock lock];
 	NSString *imagePath = [[myInFlightImageOperations lastObject] retain];
 	if (imagePath)
@@ -316,6 +313,9 @@ static NSImage *_toolbarIcon = nil;
 		else
 		{
 			@try {
+				OSErr err = EnterMoviesOnThread(0);	// we will be using QuickTime on the current thread.  See TN2125
+				if (noErr != err) NSLog(@"Error entering movies on thread");
+
 				QTMovie *movie = [rec objectForKey:@"qtmovie"];
 
 				(void)AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread.  Don't care if it succeeded or not
@@ -340,6 +340,10 @@ static NSImage *_toolbarIcon = nil;
 			@finally {
 				// We would normally have to DetachMovieFromCurrentThread but we're done with the movie now!
 				[rec removeObjectForKey:@"qtmovie"];
+				
+				//err = ExitMoviesOnThread();	// balance EnterMoviesOnThread
+				//if (noErr != err) NSLog(@"Error entering movies on thread");
+
 			}
 		}
 		// Valid movie but no image -- load file icon.
@@ -372,9 +376,6 @@ static NSImage *_toolbarIcon = nil;
 	
 	myThreadCount--;
 	
-	err = ExitMoviesOnThread();	// balance EnterMoviesOnThread
-	if (noErr != err) NSLog(@"Error entering movies on thread");
-
 	[pool release];
 }
 

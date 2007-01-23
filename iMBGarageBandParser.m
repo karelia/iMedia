@@ -48,6 +48,8 @@
 	return self;
 }
 
+#warning Note: We could definitely speed this up, if it's an issue, by delaying the processing of the QTMovie objects.
+
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root artist:(NSString *)artist
 {
 	NSFileManager *fm = [NSFileManager defaultManager];

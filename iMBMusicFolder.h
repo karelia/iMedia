@@ -36,6 +36,6 @@
 - (BOOL)parseMetaData;
 
 - (void)setUnknownArtist:(NSString *)artist;
-- (NSString *)unkownArtist;
+- (NSString *)unkmownArtist;
 
 @end
