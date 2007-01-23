@@ -228,40 +228,64 @@ static NSImage *_playingIcon = nil;
 	NSString *filePath = [movieURL path];
 	[oAudioPlayer pause:self];
 	NSError *err = nil;
+		
+	// Note: this is called from the foreground thread so this is all good
 	QTMovie *audio = [[[QTMovie alloc] initWithAttributes:
 		[NSDictionary dictionaryWithObjectsAndKeys: 
 			filePath, QTMovieFileNameAttribute,
 			[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
 			nil] error:&err] autorelease];
+	
 	if (err || !audio)
 	{
 		success = NO;
 	}
-	
-	[audio setDelegate:self];
-	[oAudioPlayer setMovie:audio];
-	[playButton setEnabled: (audio != nil)];
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(audioTimeDidChange:)
-												 name:QTMovieTimeDidChangeNotification
-											   object:audio];
-	
-	[progressIndicator setMinValue: k_Scrub_Slider_Minimum];
-	
-	float audioDurationSeconds = [audio durationInSeconds];
-    [progressIndicator setMaxValue: audioDurationSeconds];
-    [progressIndicator setDoubleValue: k_Scrub_Slider_Minimum ];
-	
-	// update the icon
-	if (!_playingIcon)
+	else
 	{
-		NSString *p = [[NSBundle bundleForClass:[self class]] pathForResource:@"MBAudioPlaying" ofType:@"png"];
-		_playingIcon = [[NSImage alloc] initWithContentsOfFile:p];
+		NSEnumerator *enumerator = [[audio tracks] objectEnumerator];
+		QTTrack *track;
+		bool hasAudio = NO;
+		
+		while ((track = [enumerator nextObject]) != nil)
+		{
+			NSString *mediaType = [track attributeForKey:QTTrackMediaTypeAttribute];
+			if (![mediaType isEqualToString:QTMediaTypeSound])
+			{
+				[track setEnabled:NO];
+			}
+			else
+			{
+				hasAudio = YES;
+			}
+		}
+		success = hasAudio;
+		if (success)
+		{
+			[audio setDelegate:self];
+			[oAudioPlayer setMovie:audio];
+			[playButton setEnabled: (audio != nil)];
+			[[NSNotificationCenter defaultCenter] addObserver:self
+													 selector:@selector(audioTimeDidChange:)
+														 name:QTMovieTimeDidChangeNotification
+													   object:audio];
+			
+			[progressIndicator setMinValue: k_Scrub_Slider_Minimum];
+			
+			float audioDurationSeconds = [audio durationInSeconds];
+			[progressIndicator setMaxValue: audioDurationSeconds];
+			[progressIndicator setDoubleValue: k_Scrub_Slider_Minimum ];
+			
+			// update the icon
+			if (!_playingIcon)
+			{
+				NSString *p = [[NSBundle bundleForClass:[self class]] pathForResource:@"MBAudioPlaying" ofType:@"png"];
+				_playingIcon = [[NSImage alloc] initWithContentsOfFile:p];
+			}
+			myCurrentPlayingRecord = [[songsController selectedObjects] objectAtIndex:0];
+			[myCurrentPlayingRecord setObject:[myCurrentPlayingRecord objectForKey:@"Icon"] forKey:@"OriginalIcon"];
+			[myCurrentPlayingRecord setObject:_playingIcon forKey:@"Icon"];
+		}
 	}
-	myCurrentPlayingRecord = [[songsController selectedObjects] objectAtIndex:0];
-	[myCurrentPlayingRecord setObject:[myCurrentPlayingRecord objectForKey:@"Icon"] forKey:@"OriginalIcon"];
-	[myCurrentPlayingRecord setObject:_playingIcon forKey:@"Icon"];
-	
 	return success;
 }
 
@@ -283,6 +307,7 @@ static NSImage *_stopImage = nil;
 		[progressIndicator setDoubleValue:0];
 		[oAudioPlayer gotoBeginning:self];
 		[oAudioPlayer play:self];
+		[oAudioPlayer setHidden:YES];
 		
 		[playButton setAction:@selector(stopMovie:)];
 		[playButton setState:NSOnState];

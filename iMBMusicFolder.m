@@ -111,6 +111,9 @@
 		{
 			if ([movieTypes indexOfObject:[[filePath lowercaseString] pathExtension]] != NSNotFound)
 			{
+				OSErr err = EnterMoviesOnThread(0);
+				if (err != noErr) NSLog(@"Unable to EnterMoviesOnThread; %d", err);
+
 				NSMutableDictionary *song = [NSMutableDictionary dictionary]; 
 				
 				//we want to cache the first frame of the movie here as we will be in a background thread
@@ -180,6 +183,10 @@
 				
 				[movie release];
 				[tracks addObject:song];
+
+				err = ExitMoviesOnThread();
+				if (err != noErr) NSLog(@"Unable to ExitMoviesOnThread; %d", err);
+
 			}
 		}
 		poolRelease++;

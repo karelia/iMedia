@@ -80,6 +80,10 @@
 					// we need to load it into a qt movie so we can get the duration
 					QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:output];
 					NSError *error = nil;
+
+					OSErr err = EnterMoviesOnThread(0);
+					if (err != noErr) NSLog(@"Unable to EnterMoviesOnThread; %d", err);
+
 					QTMovie *movie = [[QTMovie alloc] initWithAttributes:
 						[NSDictionary dictionaryWithObjectsAndKeys: 
 							ref, QTMovieDataReferenceAttribute,
@@ -91,6 +95,9 @@
 						[rec setObject:time forKey:@"Total Time"];
 					}
 					[movie release];
+
+					err = ExitMoviesOnThread();
+					if (err != noErr) NSLog(@"Unable to ExitMoviesOnThread; %d", err);
 				}
 				NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:filePath];
 				[rec setObject:icon forKey:@"Icon"];

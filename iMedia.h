@@ -33,24 +33,24 @@
 #define LocalizedStringInThisBundle(key, comment) \
     [[NSBundle bundleForClass:[self class]] localizedStringForKey:(key) value:@"" table:nil]
 
-#import <iMediaBrowser/iMediaBrowser.h>
-#import <iMediaBrowser/iMBLibraryNode.h>
-#import <iMediaBrowser/iMBAbstractParser.h>
-#import <iMediaBrowser/iMBAbstractController.h>
-
+#import <iMediaBrowser/LibraryItemsValueTransformer.h>
+#import <iMediaBrowser/MUPhotoView.h>
+#import <iMediaBrowser/NSAttributedString+iMedia.h>
+#import <iMediaBrowser/NSFileManager+iMedia.h>
+#import <iMediaBrowser/NSImage+iMedia.h>
+#import <iMediaBrowser/NSIndexPath+iMedia.h>
+#import <iMediaBrowser/NSPasteboard+iMedia.h>
+#import <iMediaBrowser/NSPopUpButton+iMedia.h>
+#import <iMediaBrowser/NSProcessInfo+iMedia.h>
+#import <iMediaBrowser/NSSlider+iMedia.h>
 #import <iMediaBrowser/NSString+iMedia.h>
 #import <iMediaBrowser/NSWorkspace+iMedia.h>
 #import <iMediaBrowser/QTMovie+iMedia.h>
-#import <iMediaBrowser/NSPasteboard+iMedia.h>
-#import <iMediaBrowser/NSImage+iMedia.h>
-#import <iMediaBrowser/NSFileManager+iMedia.h>
-#import <iMediaBrowser/NSAttributedString+iMedia.h>
-#import <iMediaBrowser/NSIndexPath+iMedia.h>
-#import <iMediaBrowser/NSPopUpButton+iMedia.h>
-#import <iMediaBrowser/NSSlider+iMedia.h>
-#import <iMediaBrowser/NSProcessInfo+iMedia.h>
-
-#import <iMediaBrowser/MUPhotoView.h>
-
-#import <iMediaBrowser/RBSplitView.h>
 #import <iMediaBrowser/RBSplitSubview.h>
+#import <iMediaBrowser/RBSplitView.h>
+#import <iMediaBrowser/TimeValueTransformer.h>
+#import <iMediaBrowser/iMBAbstractController.h>
+#import <iMediaBrowser/iMBAbstractParser.h>
+#import <iMediaBrowser/iMBLibraryNode.h>
+#import <iMediaBrowser/iMediaBrowser.h>
+

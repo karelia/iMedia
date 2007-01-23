@@ -628,7 +628,7 @@ static NSImage *_toolbarIcon = nil;
 				ref, QTMovieDataReferenceAttribute,
 				[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
 				nil] error:&error] autorelease];
-		if (!movie && [error code] == -2126)
+		if (!movie && [error code] == -2126)	// DRM, I think
 		{
 			[previewMovieView removeFromSuperview];
 			[previewMovieView setMovie:nil];
