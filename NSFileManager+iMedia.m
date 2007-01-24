@@ -28,6 +28,37 @@
 
 @implementation NSFileManager (iMedia)
 
+- (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes
+{
+	if ( ![path isAbsolutePath] )
+	{
+		[NSException raise:@"iMediaException" format:@"createDirectoryPath:attributes: path not absolute:%@", path];
+		return NO;
+	}
+	
+	NSString *thePath = @"";
+	BOOL result = YES;
+	
+    NSEnumerator *enumerator = [[path pathComponents] objectEnumerator];
+    NSString *component;
+    while ( component = [enumerator nextObject] )
+    {
+        thePath = [thePath stringByAppendingPathComponent:component];
+        if ( ![[NSFileManager defaultManager] fileExistsAtPath:thePath] )
+		{
+			result = result && [[NSFileManager defaultManager] createDirectoryAtPath:thePath 
+																		  attributes:attributes];
+			if ( NO == result )
+			{
+				[NSException raise:@"iMediaException" format:@"createDirectory:attributes: failed at path: %@", path];
+				return NO;
+			}
+		}
+    }
+	
+    return ( (YES == result) && [[NSFileManager defaultManager] fileExistsAtPath:path] );
+}
+
 - (BOOL)isPathHidden:(NSString *)path
 {
 	// exit early
@@ -96,9 +127,8 @@
 	}
 
 	NSString *sha1String = [[[NSString alloc] initWithBytes:(const char *)digestString length:(unsigned)2*SHA1_DIGEST_LENGTH encoding:NSASCIIStringEncoding] autorelease];
-	NSString *result = [NSString stringWithFormat:@"%@/%02d/%02d/%s",
-		sBasePath, digest[0], digest[1], [sha1String substringFromIndex:2]];
-	NSLog(@"%@ = %%@", sha1String, result);
+	NSString *result = [NSString stringWithFormat:@"%@/iMedia/%02d/%02d/%@",
+		sBasePath, digest[0] >> 4, digest[0] & 0x0f, [sha1String substringFromIndex:2]];
 	return result;
 }
 

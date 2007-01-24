@@ -151,6 +151,20 @@ static NSImage *_placeholder = nil;
 	// do nothing
 }
 
+// Store the image that is from the given path.
+- (void) cacheImage:(NSImage *)anImage path:(NSString *)aPath
+{
+	NSData *data = [anImage TIFFRepresentationUsingCompression:NSTIFFCompressionLZW factor:1.0];
+	if (data)
+	{
+		NSString *cachePath = [[[NSFileManager defaultManager] cachePathForKey:aPath] stringByAppendingPathExtension:@"tiff"];
+		if ([[NSFileManager defaultManager] createDirectoryPath:[cachePath stringByDeletingLastPathComponent] attributes:nil])
+		{
+			[data writeToFile:cachePath atomically:NO];
+		}
+	}
+}
+
 #pragma mark -
 #pragma mark Media Browser Protocol
 
@@ -297,7 +311,7 @@ static NSImage *_toolbarIcon = nil;
 	}
 	[myCacheLock unlock];
 	
-	NSImage *img;
+	NSImage *img = nil;
 	
 	while (imagePath)
 	{
@@ -308,7 +322,7 @@ static NSImage *_toolbarIcon = nil;
 		
 		if (thumbPath)
 		{
-			img = [[NSImage alloc] initByReferencingFile:thumbPath];
+			img = [[[NSImage alloc] initByReferencingFile:thumbPath] autorelease];
 		}
 		else
 		{
@@ -327,13 +341,17 @@ static NSImage *_toolbarIcon = nil;
 				if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
 				{
 					NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-					img = [[NSImage alloc] initWithContentsOfFile:drmIcon];
+					img = [[[NSImage alloc] initWithContentsOfFile:drmIcon] autorelease];
 				}
 				else
 				{
-                    img = [[movie betterPosterImage] retain];
+                    img = [movie betterPosterImage];
 				}
 				
+				if (img)
+				{
+					[self cacheImage:img path:thumbPath];
+				}
 			} 
 			@catch (NSException *ex) {
 				NSLog(@"Failed to load movie: %@", imagePath);
@@ -353,14 +371,13 @@ static NSImage *_toolbarIcon = nil;
 		// Valid movie but no image -- load file icon.
 		if (!img || NSEqualSizes([img size], NSZeroSize))
 		{
-			img = [[[NSWorkspace sharedWorkspace] iconForFile:[rec objectForKey:@"ImagePath"]] retain];
+			img = [[NSWorkspace sharedWorkspace] iconForFile:[rec objectForKey:@"ImagePath"]];
 			[img setScalesWhenResized:YES];
 			[img setSize:NSMakeSize(128,128)];
 		}
 		
 		[myCacheLock lock];
         [myCache setObject:img forKey:imagePath];
-        [img release];
 		
 		// get the last object in the queue because we would have scrolled and what is at the start won't be necessarily be what is displayed.
 		[myProcessingImages removeObject:imagePath];
@@ -473,6 +490,7 @@ static NSImage *_toolbarIcon = nil;
                         [myCache setObject:img forKey:imagePath];
                         [myCacheLock unlock];
                         [oPhotoView setNeedsDisplay:YES];
+						[self cacheImage:img path:imagePath];
                     }
                 }
             }
@@ -513,11 +531,25 @@ static NSImage *_toolbarIcon = nil;
 	[myCacheLock lock];
 	NSImage *img = [myCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
 	[myCacheLock unlock];
-		
+	
+	if (!img)
+	{
+		// look on disk cache
+		NSString *cachePath = [[[NSFileManager defaultManager] cachePathForKey:imagePath] stringByAppendingPathExtension:@"tiff"];
+		BOOL isDir;
+		if ([[NSFileManager defaultManager] fileExistsAtPath:cachePath isDirectory:&isDir] && !isDir)
+		{
+			img = [[[NSImage alloc] initWithContentsOfFile:cachePath] autorelease];
+			if (img)
+			{
+				// cache in memory now
+				[myCache setObject:img forKey:imagePath];
+			}
+		}
+	}
+
 	if (!img)	// need to generate
-    {
-		NSString *cachePath = [[NSFileManager defaultManager] cachePathForKey:imagePath];
-		
+    {		
         [myImageRecordsToLoad addObject:rec];
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startLoadingOneMovie:) object:self];
         [self performSelector:@selector(startLoadingOneMovie:) withObject:self afterDelay:0.001f inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode,NSModalPanelRunLoopMode,

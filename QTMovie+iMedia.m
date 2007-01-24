@@ -40,21 +40,15 @@
 - (NSImage *)betterPosterImage;
 {
 	NSDictionary *attr = [self movieAttributes];
-		
-	// first try to get CURRENT time.
-	QTTime qttime = [self currentTime];
-
-	// If still zero, get POSTER time.
-	if (NSOrderedSame == QTTimeCompare(qttime, QTZeroTime))
+	
+	QTTime qttime = QTZeroTime;
+	NSValue *timeValue = [attr objectForKey:QTMoviePosterTimeAttribute];
+	if (nil != timeValue)
 	{
-		NSValue *timeValue = [attr objectForKey:QTMoviePosterTimeAttribute];
-		if (nil != timeValue)
-		{
-			qttime = [timeValue QTTimeValue];
-		}
+		qttime = [timeValue QTTimeValue];
 	}
 	
-	// if still zero, get 20 seconds in, capped at 1/5 movie time.
+	// if zero, get 20 seconds in, capped at 1/5 movie time.
 	if (NSOrderedSame == QTTimeCompare(qttime, QTZeroTime))
 	{
         qttime.timeScale = [[attr objectForKey:QTMovieTimeScaleAttribute] longValue];
