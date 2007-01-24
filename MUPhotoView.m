@@ -127,7 +127,7 @@ static NSDictionary *sTitleAttributes = nil;
 
 - (void)drawRect:(NSRect)rect
 {
-	[self removeAllToolTips];		// djw: are these really working?
+	[self removeAllToolTips];
 	
    // draw the background color
 	[[self backgroundColor] set];
@@ -162,29 +162,34 @@ static NSDictionary *sTitleAttributes = nil;
         }
         
         if (nil == photo) {
-           photo = [self photoAtIndex:index]; 
+			photo = [self photoAtIndex:index]; 
         }
-        
+        BOOL placeholder = NO;
+		
         if (nil == photo) {
+			placeholder = YES;
             photo = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
 			
 			// Note: it would be nice to have an NSBezierPath category method like bezierPathWithRoundedRect:radius:
-			float curve = photoSize * 0.3;
+			const float curve = MIN(photoSize * 0.3, 50);
+			const int width = 4;
+			const int margin = width / 2;
+			const int boxSize = photoSize - margin;
             NSBezierPath *p = [NSBezierPath bezierPath];
-			[p moveToPoint:NSMakePoint(curve, 0)];
-			[p lineToPoint:NSMakePoint(photoSize - curve, 0)];
-			[p curveToPoint:NSMakePoint(photoSize, curve) controlPoint1:NSMakePoint(photoSize, 0) controlPoint2:NSMakePoint(photoSize, 0)];
-			[p lineToPoint:NSMakePoint(photoSize, photoSize - curve)];
-			[p curveToPoint:NSMakePoint(photoSize - curve, photoSize) controlPoint1:NSMakePoint(photoSize,photoSize) controlPoint2:NSMakePoint(photoSize,photoSize)];
-			[p lineToPoint:NSMakePoint(curve, photoSize)];
-			[p curveToPoint:NSMakePoint(0, photoSize - curve) controlPoint1:NSMakePoint(0, photoSize) controlPoint2:NSMakePoint(0, photoSize)];
-			[p lineToPoint:NSMakePoint(0, curve)];
-			[p curveToPoint:NSMakePoint(curve, 0) controlPoint1:NSMakePoint(0, 0) controlPoint2:NSMakePoint(0, 0)];
+			[p moveToPoint:NSMakePoint(curve, margin)];
+			[p lineToPoint:NSMakePoint(boxSize - curve, margin)];
+			[p curveToPoint:NSMakePoint(boxSize, curve) controlPoint1:NSMakePoint(boxSize, margin) controlPoint2:NSMakePoint(boxSize, margin)];
+			[p lineToPoint:NSMakePoint(boxSize, boxSize - curve)];
+			[p curveToPoint:NSMakePoint(boxSize - curve, boxSize) controlPoint1:NSMakePoint(boxSize,boxSize) controlPoint2:NSMakePoint(boxSize,boxSize)];
+			[p lineToPoint:NSMakePoint(curve, boxSize)];
+			[p curveToPoint:NSMakePoint(margin, boxSize - curve) controlPoint1:NSMakePoint(margin, boxSize) controlPoint2:NSMakePoint(margin, boxSize)];
+			[p lineToPoint:NSMakePoint(margin, curve)];
+			[p curveToPoint:NSMakePoint(curve, margin) controlPoint1:NSMakePoint(margin, margin) controlPoint2:NSMakePoint(margin, margin)];
 			[p closePath];
 			
 			[photo lockFocus];
-			[[NSColor lightGrayColor] set];
-			[p setLineWidth:4];
+			[[NSColor colorWithCalibratedWhite:0.8 alpha:1.0] set];
+			[p setLineWidth:width];
             [p stroke];
 			
             [photo unlockFocus];
@@ -240,7 +245,7 @@ static NSDictionary *sTitleAttributes = nil;
         //**** END Background Drawing ****/
         
         // kBorderStyleShadow - set the appropriate shadow
-        if ([self useShadowBorder]) {
+        if ([self useShadowBorder] && !placeholder) {
             [borderShadow set];
         }
  
@@ -1745,10 +1750,12 @@ static NSDictionary *sTitleAttributes = nil;
     
     float scale = [self photoSize] / longSide;
     
-    NSSize scaledSize;
-    scaledSize.width = size.width * scale;
-    scaledSize.height = size.height * scale;
-    
+    NSSize scaledSize = size;
+	if (scale < 1.0)			// do not enlarge  (POSSIBLY MAKE THIS A PREFERENCE?)
+	{
+		scaledSize.width = size.width * scale;
+		scaledSize.height = size.height * scale;
+    }
     return scaledSize;
 }
 

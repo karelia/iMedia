@@ -272,16 +272,6 @@ static NSMutableDictionary *_parsers = nil;
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
 	myLoadedParsers = [[NSMutableDictionary alloc] init];
 	myUserDroppedParsers = [[NSMutableArray alloc] init];
-	
-	[oSplitView setAutosaveName:[NSString stringWithFormat:@"iMBSplitView-%@", myIdentifier] recursively:YES];
-	
-	if (myFlags.orientation && ![myDelegate horizontalSplitViewForMediaBrowser:self])
-	{
-		[oSplitView setVertical:YES];
-	}
-	[oSplitView restoreState:YES];
-	
-	[[oSplitView subviewAtPosition:0] setMinDimension:24.0 andMaxDimension:0.0];
 
 	myToolbar = [[NSToolbar alloc] initWithIdentifier:@"iMediaBrowserToolbar"];
 	
@@ -334,6 +324,17 @@ static NSMutableDictionary *_parsers = nil;
 		{
 			[myDelegate iMediaBrowser:self didLoadBrowser:cur];
 		}
+		[oSplitView setAutosaveName:[NSString stringWithFormat:@"iMBSplitView-%@", myIdentifier] recursively:YES];
+		
+		if (myFlags.orientation && ![myDelegate horizontalSplitViewForMediaBrowser:self])
+		{
+			[oSplitView setVertical:YES];
+		}
+		[oSplitView restoreState:YES];
+		[[oSplitView subviewAtPosition:0] setMinDimension:26.0 andMaxDimension:0.0];
+		// Simulate a resize to possibly swap out outline view
+		[self splitView:oSplitView changedFrameOfSubview:[oSplitView subviewAtPosition:0] from:NSZeroRect to:[[oSplitView subviewAtPosition:0] frame]];
+		[oSplitView adjustSubviews];	// just to be safe.
 	}
 	
 	[myToolbar setDelegate:self];
@@ -627,6 +628,7 @@ static NSMutableDictionary *_parsers = nil;
 		{
 			[oPlaylists expandItem:[oPlaylists itemAtRow:0]];
 		}
+		[oPlaylistPopup selectItemWithRepresentedObject:[[libraryController selectedObjects] lastObject]];
 	}
 	
 	[mySelectedBrowser willActivate];
@@ -797,24 +799,6 @@ static NSMutableDictionary *_parsers = nil;
 
 #pragma mark -
 #pragma mark Window Delegate Methods
-
-- (void)windowDidMove:(NSNotification *)aNotification
-{
-}
-
-- (void)windowDidResize:(NSNotification *)aNotification
-{
-	if ([[[oSplitView subviewAtPosition:0] subviews] containsObject:oPlaylistPopup])
-	{
-		NSRect frame = [oPlaylistPopup frame];
-		if (frame.size.height < 24)
-		{
-			frame.size.height = 24;
-			[oPlaylistPopup setFrame:frame];
-		}
-	}
-}
-
 - (void)windowWillClose:(NSNotification *)aNotification
 {
 	[mySelectedBrowser didDeactivate];
@@ -851,15 +835,20 @@ static NSMutableDictionary *_parsers = nil;
 				[oPlaylistPopup selectItemWithRepresentedObject:[[libraryController selectedObjects] lastObject]];
 				[[oSplitView subviewAtPosition:0] replaceSubview:[oPlaylists enclosingScrollView] with:oPlaylistPopup];
 				NSRect frame = [oPlaylistPopup frame];
-				// frame.size.height = 24;
-				frame.origin.y = 0;
-				// [oPlaylistPopup setAutoresizingMask:NSViewMinYMargin];
+				frame.origin.y = [[oSplitView subviewAtPosition:0] frame].size.height - frame.size.height;
+				frame.origin.x = 0;
+				frame.size.width = [[oSplitView subviewAtPosition:0] frame].size.width;
+				[oPlaylistPopup setAutoresizingMask:NSViewMinYMargin | NSViewWidthSizable];
 				[oPlaylistPopup setFrame:frame];
 			}
 			
 			if(toRect.size.height > 50 && [[[oSplitView subviewAtPosition:0] subviews] containsObject:oPlaylistPopup])
 			{
 				NSScrollView *scrollView = [oPlaylists enclosingScrollView];
+				NSRect frame = [scrollView frame];
+				frame.size.height = [[oSplitView subviewAtPosition:0] frame].size.height;
+				frame.size.width = [[oSplitView subviewAtPosition:0] frame].size.width;
+				[scrollView setFrame:frame];
 				[[oSplitView subviewAtPosition:0] replaceSubview:oPlaylistPopup with:scrollView];
 			}
 		}
