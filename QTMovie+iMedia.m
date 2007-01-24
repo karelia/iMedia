@@ -73,7 +73,28 @@
         if (newTimeValue > 0 && newTimeValue < qttime.timeValue * 1.25) // stay within a reasonable time
             qttime.timeValue = newTimeValue;
 	}
-	return [self frameImageAtTime:qttime];
+    return [self frameImageAtTime:qttime];
+}
+
+- (NSImage *)betterPosterImageWithMaxSize:(NSSize)maxSize;  // Shrinks the image if it's larger than maxSize
+{
+    NSImage *image = [self betterPosterImage];
+    NSSize   size = [image size];
+    
+    if (size.width < maxSize.width + 0.5f && size.height < maxSize.height + 0.5f)
+        return image;
+    
+    float scale = fminf (maxSize.width / size.width, maxSize.height / size.height);
+    NSSize  newSize = NSMakeSize(size.width * scale, size.height * scale);
+    NSImage  *newImage = [[NSImage allocWithZone:[self zone]] initWithSize:newSize];    
+    [newImage setDataRetained:YES];
+    [newImage setScalesWhenResized:YES];
+    [newImage lockFocus];
+    [image drawInRect:NSMakeRect(0.0f, 0.0f, newSize.width, newSize.height) 
+             fromRect:NSMakeRect(0.0f, 0.0f, size.width, size.height)
+            operation:NSCompositeCopy fraction:1.0f];
+    [newImage unlockFocus];
+    return [newImage autorelease];
 }
 
 - (BOOL) isDRMProtected

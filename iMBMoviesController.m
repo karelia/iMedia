@@ -29,6 +29,8 @@ Please send fixes to
 #import "iMedia.h"
 #import "MUPhotoView.h"
 
+#define MAX_POSTER_SIZE (NSMakeSize(320, 240))
+
 @interface iMBMoviesController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
 @end
@@ -152,16 +154,35 @@ static NSImage *_placeholder = nil;
 }
 
 // Store the image that is from the given path.
-- (void) cacheImage:(NSImage *)anImage path:(NSString *)aPath
+- (void) saveImageForPath:(NSString *)imagePath
 {
-	NSData *data = [anImage TIFFRepresentationUsingCompression:NSTIFFCompressionLZW factor:1.0];
+	[myCacheLock lock];
+	NSImage *anImage = [myCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
+	[myCacheLock unlock];
+
+    NSAssert1 (anImage != nil, @"Found no cached image for '%@'", imagePath);
+    
+	NSData *data = [anImage TIFFRepresentationUsingCompression:NSTIFFCompressionLZW factor:1.0];    
 	if (data)
 	{
-		NSString *cachePath = [[[NSFileManager defaultManager] cachePathForKey:aPath] stringByAppendingPathExtension:@"tiff"];
+		NSString *cachePath = [[[NSFileManager defaultManager] cachePathForKey:imagePath] stringByAppendingPathExtension:@"tiff"];
 		if ([[NSFileManager defaultManager] createDirectoryPath:[cachePath stringByDeletingLastPathComponent] attributes:nil])
 		{
 			[data writeToFile:cachePath atomically:NO];
 		}
+        
+        // Images are sometimes drawn upside down after saving. I don't know why, but as the saved image is correct we can create
+        // a new one that works. Does someone know why this is?
+        anImage = [[NSImage allocWithZone:[self zone]] initWithData:data];
+        if (anImage)
+        {
+            [anImage setDataRetained:YES];
+            [anImage setScalesWhenResized:YES];
+            [myCacheLock lock];
+            [myCache setObject:anImage forKey:imagePath];
+            [anImage release];
+            [myCacheLock unlock];
+        }
 	}
 }
 
@@ -317,68 +338,49 @@ static NSImage *_toolbarIcon = nil;
 	{
 		NSMutableDictionary *rec = (NSMutableDictionary *)[self recordForPath:imagePath];
 		
-		// Look up thumbnail image, I assume from an iPhoto movie record
-		NSString *thumbPath = [rec objectForKey:@"ThumbPath"];
-		
-		if (thumbPath)
-		{
-			img = [[[NSImage alloc] initByReferencingFile:thumbPath] autorelease];
-		}
-		else
-		{
-			@try {
-				OSErr err = EnterMoviesOnThread(0);	// we will be using QuickTime on the current thread.  See TN2125
-				if (noErr != err) NSLog(@"Error entering movies on thread");
-
-				QTMovie *movie = [rec objectForKey:@"qtmovie"];
-
-				err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread.  Don't care if it succeeded or not
-				if (noErr != err) NSLog(@"Error attaching movie to current thread %d", err);
+        @try {
+            OSErr err = EnterMoviesOnThread(0);	// we will be using QuickTime on the current thread.  See TN2125
+            if (noErr != err) NSLog(@"Error entering movies on thread");
             
-				if ([movie respondsToSelector:@selector(setIdling:)])
-					[movie setIdling:NO];
-				
-				if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
-				{
-					NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-					img = [[[NSImage alloc] initWithContentsOfFile:drmIcon] autorelease];
-				}
-				else
-				{
-                    img = [movie betterPosterImage];
-				}
-				
-				if (img)
-				{
-					[self cacheImage:img path:thumbPath];
-				}
-			} 
-			@catch (NSException *ex) {
-				NSLog(@"Failed to load movie: %@", imagePath);
-			}
-			@finally {
-				QTMovie *movie = [rec objectForKey:@"qtmovie"];
-				OSErr err = DetachMovieFromCurrentThread([movie quickTimeMovie]); 	// -2098 = componentNotThreadSafeErr
-				if (noErr != err) NSLog(@"Error detaching from background thread");
-
-				[rec removeObjectForKey:@"qtmovie"];	// movie is still retained internally
-				
-				err = ExitMoviesOnThread();	// balance EnterMoviesOnThread
-				if (noErr != err) NSLog(@"Error entering movies on thread");
-
-			}
-		}
-		// Valid movie but no image -- load file icon.
-		if (!img || NSEqualSizes([img size], NSZeroSize))
-		{
-			img = [[NSWorkspace sharedWorkspace] iconForFile:[rec objectForKey:@"ImagePath"]];
-			[img setScalesWhenResized:YES];
-			[img setSize:NSMakeSize(128,128)];
-		}
+            QTMovie *movie = [rec objectForKey:@"qtmovie"];
+            
+            err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread.  Don't care if it succeeded or not
+            if (noErr != err) NSLog(@"Error attaching movie to current thread %d", err);
+                        
+            if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
+            {
+                NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
+                img = [[[NSImage alloc] initWithContentsOfFile:drmIcon] autorelease];
+            }
+            else
+            {
+                img = [movie betterPosterImageWithMaxSize:MAX_POSTER_SIZE];
+            }
+            
+            if (img)
+            {
+                [myCacheLock lock];
+                [myCache setObject:img forKey:imagePath];
+                [myCacheLock unlock];
+                [self performSelectorOnMainThread:@selector(saveImageForPath:) withObject:imagePath waitUntilDone:NO];
+            }
+        } 
+        @catch (NSException *ex) {
+            NSLog(@"Failed to load movie: %@", imagePath);
+        }
+        @finally {
+            QTMovie *movie = [rec objectForKey:@"qtmovie"];
+            OSErr err = DetachMovieFromCurrentThread([movie quickTimeMovie]); 	// -2098 = componentNotThreadSafeErr
+            if (noErr != err) NSLog(@"Error detaching from background thread");
+            
+            [rec removeObjectForKey:@"qtmovie"];	// movie is still retained internally
+            
+            err = ExitMoviesOnThread();	// balance EnterMoviesOnThread
+            if (noErr != err) NSLog(@"Error entering movies on thread");
+            
+        }
 		
-		[myCacheLock lock];
-        [myCache setObject:img forKey:imagePath];
-		
+		[myCacheLock lock];		
 		// get the last object in the queue because we would have scrolled and what is at the start won't be necessarily be what is displayed.
 		[myProcessingImages removeObject:imagePath];
 		[imagePath release];
@@ -463,6 +465,9 @@ static NSImage *_toolbarIcon = nil;
 			            
             if (mov)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
             {
+                if ([mov respondsToSelector:@selector(setIdling:)])
+                    [mov setIdling:NO]; // Prevents crash due to missing gworld
+
                 // do a background thread load if we have a spare processor, and if this movie is thread-safe
                 unsigned int maxThreadCount = [NSProcessInfo numberOfProcessors] - 1;
                 maxThreadCount = MAX(maxThreadCount, 1);    // Allow at least 1 background thread
@@ -482,7 +487,7 @@ static NSImage *_toolbarIcon = nil;
                 else 
                 {
                     // Load movie on the main thread because we can't open on background thread
-                    NSImage *img = [mov betterPosterImage];
+                    NSImage *img = [mov betterPosterImageWithMaxSize:MAX_POSTER_SIZE];
                     
                     if (img)
                     {
@@ -490,7 +495,7 @@ static NSImage *_toolbarIcon = nil;
                         [myCache setObject:img forKey:imagePath];
                         [myCacheLock unlock];
                         [oPhotoView setNeedsDisplay:YES];
-						[self cacheImage:img path:imagePath];
+						[self saveImageForPath:imagePath];
                     }
                 }
             }
@@ -532,9 +537,21 @@ static NSImage *_toolbarIcon = nil;
 	NSImage *img = [myCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
 	[myCacheLock unlock];
 	
+    if (!img)
+    {   // Perhaps there's a ThumbPath
+        NSString *thumbPath = [rec objectForKey:@"ThumbPath"];
+        if (thumbPath)
+        {
+            img = [[[NSImage alloc] initByReferencingFile:thumbPath] autorelease];
+            // cache in memory now
+            [myCacheLock lock];
+            [myCache setObject:img forKey:imagePath];
+            [myCacheLock unlock];
+        }
+    }
+    
 	if (!img)
-	{
-		// look on disk cache
+	{   // look on disk cache
 		NSString *cachePath = [[[NSFileManager defaultManager] cachePathForKey:imagePath] stringByAppendingPathExtension:@"tiff"];
 		BOOL isDir;
 		if ([[NSFileManager defaultManager] fileExistsAtPath:cachePath isDirectory:&isDir] && !isDir)
@@ -543,7 +560,9 @@ static NSImage *_toolbarIcon = nil;
 			if (img)
 			{
 				// cache in memory now
+                [myCacheLock lock];
 				[myCache setObject:img forKey:imagePath];
+                [myCacheLock unlock];
 			}
 		}
 	}
@@ -559,7 +578,9 @@ static NSImage *_toolbarIcon = nil;
         img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
         [img setScalesWhenResized:YES];
         [img setSize:NSMakeSize(128,128)];
+        [myCacheLock lock];
         [myCache setObject:img forKey:imagePath];
+        [myCacheLock unlock];
 	}
 	return img;
 }
