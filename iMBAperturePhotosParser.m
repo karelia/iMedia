@@ -149,7 +149,7 @@ Please send fixes to
 														(CFStringRef)@"com.apple.iApps");
 	
 	//	Iterate over libraries, pulling dictionary from contents and adding to array for processing;
-	NSArray *libraries = (NSArray *)[iApps autorelease];
+	NSArray *libraries = [((NSArray *)iApps) autorelease];
 	NSEnumerator *e = [libraries objectEnumerator];
 	NSString *cur;
 	

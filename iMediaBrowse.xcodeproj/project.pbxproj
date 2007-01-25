@@ -187,8 +187,6 @@
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
-		E2075F4C0B5974EC00EAC95C /* Epeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79BCF8500B58686B00F75D67 /* Epeg.framework */; };
-		E2075F520B59751E00EAC95C /* Epeg.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 79BCF8500B58686B00F75D67 /* Epeg.framework */; };
 		E20764B80B597D8D00EAC95C /* tiny-reload.png in Resources */ = {isa = PBXBuildFile; fileRef = E20764B70B597D8C00EAC95C /* tiny-reload.png */; };
 /* End PBXBuildFile section */
 
@@ -200,27 +198,6 @@
 			remoteGlobalIDString = 791679FD0975255000D9EF74;
 			remoteInfo = iMediaBrowser;
 		};
-		79BCF84F0B58686B00F75D67 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 79BCF84A0B58686B00F75D67 /* Epeg.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
-			remoteInfo = Epeg;
-		};
-		79BCF8510B58686B00F75D67 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 79BCF84A0B58686B00F75D67 /* Epeg.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1B4CB8B505B834910048CDE7;
-			remoteInfo = Tester;
-		};
-		79BCF8560B5868B900F75D67 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 79BCF84A0B58686B00F75D67 /* Epeg.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = Epeg;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -230,7 +207,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E2075F520B59751E00EAC95C /* Epeg.framework in CopyFiles */,
 				791F973B0975D38A0071B2E0 /* iMediaBrowser.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -385,7 +361,6 @@
 		7990CDF109D772FF00AD74BA /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/Links.nib; sourceTree = "<group>"; };
 		79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBGarageBandParser.h; sourceTree = "<group>"; };
 		79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBGarageBandParser.m; sourceTree = "<group>"; };
-		79BCF84A0B58686B00F75D67 /* Epeg.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Epeg.xcodeproj; path = EpegSource/Epeg/Epeg.xcodeproj; sourceTree = "<group>"; };
 		79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexPath+iMedia.h"; sourceTree = "<group>"; };
 		79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSIndexPath+iMedia.m"; sourceTree = "<group>"; };
 		79FA0F5D0A2E7D1500461872 /* NSSlider+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSSlider+iMedia.h"; sourceTree = "<group>"; };
@@ -517,7 +492,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E2075F4C0B5974EC00EAC95C /* Epeg.framework in Frameworks */,
 				791F97380975D3750071B2E0 /* iMediaBrowser.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */,
@@ -546,7 +520,6 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				79BCF84A0B58686B00F75D67 /* Epeg.xcodeproj */,
 				79353E6C0A28754C00284715 /* libcrypto.dylib */,
 				7903562C09E3B45F00384D08 /* AddressBook.framework */,
 				795F7AF509D4D5E5000F21B5 /* WebKit.framework */,
@@ -764,15 +737,6 @@
 				793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */,
 			);
 			name = "Cocoa Extensions";
-			sourceTree = "<group>";
-		};
-		79BCF84B0B58686B00F75D67 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				79BCF8500B58686B00F75D67 /* Epeg.framework */,
-				79BCF8520B58686B00F75D67 /* Tester */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		968BEF3E090E904100D00E5C /* images */ = {
@@ -1023,7 +987,6 @@
 			);
 			dependencies = (
 				791F97350975D3600071B2E0 /* PBXTargetDependency */,
-				79BCF8570B5868B900F75D67 /* PBXTargetDependency */,
 			);
 			name = iMediaBrowse;
 			productInstallPath = "$(HOME)/Applications";
@@ -1051,35 +1014,12 @@
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* iMediaBrowse */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 79BCF84B0B58686B00F75D67 /* Products */;
-					ProjectRef = 79BCF84A0B58686B00F75D67 /* Epeg.xcodeproj */;
-				},
-			);
 			targets = (
 				8D1107260486CEB800E47090 /* iMediaBrowse */,
 				791679FD0975255000D9EF74 /* iMediaBrowser */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		79BCF8500B58686B00F75D67 /* Epeg.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Epeg.framework;
-			remoteRef = 79BCF84F0B58686B00F75D67 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		79BCF8520B58686B00F75D67 /* Tester */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = Tester;
-			remoteRef = 79BCF8510B58686B00F75D67 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		791679FA0975255000D9EF74 /* Resources */ = {
@@ -1250,11 +1190,6 @@
 			isa = PBXTargetDependency;
 			target = 791679FD0975255000D9EF74 /* iMediaBrowser */;
 			targetProxy = 791F97340975D3600071B2E0 /* PBXContainerItemProxy */;
-		};
-		79BCF8570B5868B900F75D67 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Epeg;
-			targetProxy = 79BCF8560B5868B900F75D67 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

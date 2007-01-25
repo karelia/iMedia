@@ -37,7 +37,7 @@
 	[pool release];
 }
 
-#warning really I ought to use search paths and get /System/Libray/Sounds etc.
+#warning really I ought to use search paths and get /System/Library/Sounds etc.  See iMBScreenSaverPicturesParser for some ideas.
 
 - (id)init
 {
