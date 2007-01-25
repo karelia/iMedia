@@ -188,7 +188,7 @@ static NSDictionary *sTitleAttributes = nil;
 			[p closePath];
 			
 			[photo lockFocus];
-			[[NSColor colorWithCalibratedWhite:0.8 alpha:1.0] set];
+			[[NSColor colorWithCalibratedWhite:0.95 alpha:1.0] set];
 			[p setLineWidth:width];
             [p stroke];
 			

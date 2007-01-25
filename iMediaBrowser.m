@@ -519,9 +519,7 @@ static NSMutableDictionary *_parsers = nil;
 #endif
 		if (library) // it is possible for a parser to return nil if the db for it doesn't exist
 		{
-			if ([[library allItems] count] > 0) {
-				[root addObject:library];
-			}
+			[root addObject:library];
 		}
 		
 		if (myFlags.didUseParser)

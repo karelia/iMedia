@@ -63,14 +63,13 @@ Please send fixes to
 		CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",
 															(CFStringRef)@"com.apple.iApps");
 		
-		NSArray *libraries = (NSArray *)iApps;
+		NSArray *libraries = [(NSArray *)iApps autorelease];
 		NSEnumerator *e = [libraries objectEnumerator];
 		NSString *cur;
 		
 		while (cur = [e nextObject]) {
 			[self watchFile:cur];
 		}
-		[libraries autorelease];
 	}
 	return self;
 }
@@ -138,7 +137,7 @@ Please send fixes to
 
 - (iMBLibraryNode *)parseDatabase
 {
-	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
+	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 	[root setName:LocalizedStringInThisBundle(@"Aperture", @"Aperture")];
 	[root setIconName:@"com.apple.Aperture"];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
@@ -150,7 +149,7 @@ Please send fixes to
 														(CFStringRef)@"com.apple.iApps");
 	
 	//	Iterate over libraries, pulling dictionary from contents and adding to array for processing;
-	NSArray *libraries = (NSArray *)iApps;
+	NSArray *libraries = (NSArray *)[iApps autorelease];
 	NSEnumerator *e = [libraries objectEnumerator];
 	NSString *cur;
 	
@@ -160,7 +159,6 @@ Please send fixes to
 			[library addEntriesFromDictionary:db];
 		}
 	}
-	[libraries autorelease];
 	
 	NSDictionary *imageRecords = [library objectForKey:@"Master Image List"];
 	
@@ -169,7 +167,8 @@ Please send fixes to
 		NSDictionary *keywordMap = [library objectForKey:@"List of Keywords"];
 	#endif
 	
-	NSEnumerator *albumEnum = [[library objectForKey:@"List of Albums"] objectEnumerator];
+	NSArray *albums = [library objectForKey:@"List of Albums"];
+	NSEnumerator *albumEnum = [albums objectEnumerator];
 	NSDictionary *albumRec;
 	int fakeAlbumID = 0;
 	
@@ -261,7 +260,7 @@ Please send fixes to
 		[lib release];
 	}
 	
-	return [root autorelease];
+	return [albums count] ? root : nil;
 }
 
 @end

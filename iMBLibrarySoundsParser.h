@@ -22,46 +22,12 @@
 	<ben@scriptsoftware.com>
  */
 
-#import "iMBiLifeSoundEffectsParser.h"
-#import "iMedia.h"
-#import "iMBMusicFolder.h"
+#import <Cocoa/Cocoa.h>
+#import "iMBAbstractParser.h"
 
-@implementation iMBiLifeSoundEffectsParser
 
-+ (void)load
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
-	
-	[pool release];
-}
+@interface iMBLibrarySoundsParser : iMBAbstractParser {
 
-- (id)init
-{
-	if (self = [super initWithContentsOfFile:@"/Library/Audio/Apple Loops/Apple/iLife Sound Effects/"])
-	{
-		
-	}
-	return self;
-}
-
-- (iMBLibraryNode *)parseDatabase
-{
-	NSFileManager *fm = [NSFileManager defaultManager];
-	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
-	
-	iMBMusicFolder *parser = [[[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath]] autorelease];
-	[parser setParseMetaData:NO];
-	[parser setUnknownArtist:LocalizedStringInThisBundle(@"Apple Loop", @"Artist")];
-	
-	iMBLibraryNode *sfx = [parser parseDatabase];
-	if (nil != sfx)
-	{
-		[sfx setName:LocalizedStringInThisBundle(@"iLife Sound Effects", @"iLife Sound Effects folder name")];
-		[sfx setIconName:@"MBSoundEffect"];
-	}	
-	return sfx;
 }
 
 @end

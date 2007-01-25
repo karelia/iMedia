@@ -22,13 +22,47 @@
 	<ben@scriptsoftware.com>
  */
 
-#import <Cocoa/Cocoa.h>
-#import "iMBAbstractParser.h"
+#import "iMBLibrarySoundsParser.h"
+#import "iMedia.h"
+#import "iMBMusicFolder.h"
 
-@interface iMBApertureParser : iMBAbstractParser
+@implementation iMBLibrarySoundsParser
+
++ (void)load
 {
-	NSImage *myFolderIcon;
-	NSImage *myProjectIcon;
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
+	
+	[pool release];
+}
+
+#warning really I ought to use search paths and get /System/Libray/Sounds etc.
+
+- (id)init
+{
+	if (self = [super initWithContentsOfFile:[NSString stringWithFormat:@"%@/Library/Sounds/", NSHomeDirectory()]])
+	{
+		;
+	}
+	return self;
+}
+
+- (iMBLibraryNode *)parseDatabase
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
+	
+	iMBMusicFolder *parser = [[[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath]] autorelease];
+	[parser setUnknownArtist:LocalizedStringInThisBundle(@"Unknown", @"Artist of sound is unknown")];
+	
+	iMBLibraryNode *sfx = [parser parseDatabase];
+	if (sfx)
+	{
+		[sfx setName:LocalizedStringInThisBundle(@"Sounds Folder", @"~/Library/Sounds folder name")];
+		[sfx setIconName:@"folder"];
+	}	
+	return sfx;
 }
 
 @end

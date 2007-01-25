@@ -127,8 +127,11 @@
 
 - (iMBLibraryNode *)parseDatabase
 {
-	iMBLibraryNode *library = [[iMBLibraryNode alloc] init];
-	NSDictionary *xml = [NSDictionary dictionaryWithContentsOfFile:[self databasePath]];
+	NSString *path = [self databasePath];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:path]) return nil;
+	
+	iMBLibraryNode *library = [[[iMBLibraryNode alloc] init] autorelease];
+	NSDictionary *xml = [NSDictionary dictionaryWithContentsOfFile:path];
 	
 	[library setName:LocalizedStringInThisBundle(@"Safari", @"Safari")];
 	[library setIconName:@"com.apple.Safari"];
@@ -145,7 +148,7 @@
 			[library addItem:child];
 		}
 	}
-	return [library autorelease];
+	return library;
 }
 
 

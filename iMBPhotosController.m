@@ -188,7 +188,6 @@ static NSImage *_toolbarIcon = nil;
 - (void)didDeactivate
 {
 	[self unbind:@"images"];
-	[myCache removeAllObjects];
     [super didDeactivate];
 }
 
@@ -397,6 +396,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 				}
 			}
 		}
+#warning TODO: Perhaps handle alias files, resolve a file if it's really an alias.
 		
 		if (!img) // we have a bad egg... need to display a ? icon
 		{

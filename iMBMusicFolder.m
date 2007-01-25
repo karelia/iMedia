@@ -208,20 +208,19 @@
 
 - (iMBLibraryNode *)parseDatabase
 {
-	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
+	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 	[root setName:LocalizedStringInThisBundle(@"Music Folder", @"Name of your 'Music' folder in your home directory")];
 	[root setIconName:@"folder"];
 	NSString *folder = [self databasePath];
 	
 	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
 	{
-		[root release];
 		return nil;
 	}
 	
 	[self recursivelyParse:folder withNode:root];
 	
-	return [root autorelease];
+	return root;
 }
 
 @end
