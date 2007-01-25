@@ -17,33 +17,48 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
 
-#import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "iMBUserPicturesParser.h"
+#import "iMedia.h"
+#import "iMBPicturesFolder.h"
 
-@class MUPhotoView;
+@implementation iMBUserPicturesParser
 
-@interface iMBPhotosController : iMBAbstractController
++ (void)load
 {
-	IBOutlet MUPhotoView	*oPhotoView;
-	IBOutlet NSSlider		*oSlider;
-	NSMutableDictionary		*myCache;
-	NSMutableIndexSet		*mySelection;
-	NSArray					*myImages;
-	NSMutableArray			*myFilteredImages;
-	NSString				*mySearchString;
-	NSLock					*myCacheLock;
-	NSMutableArray			*myInFlightImageOperations;
-	NSMutableSet			*myProcessingImages;
-	int						myThreadCount;
-	NSIndexPath				*mySelectedIndexPath;
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	[iMediaBrowser registerParser:[self class] forMediaType:@"photos"];
+	
+	[pool release];
 }
 
-- (IBAction)search:(id)sender;
-- (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard;
+- (id)init
+{
+	if (self = [super initWithContentsOfFile:@"/Library/User Pictures/"])
+	{
+		;
+	}
+	return self;
+}
+
+- (iMBLibraryNode *)parseDatabase
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
+	
+	iMBPicturesFolder *parser = [[[iMBPicturesFolder alloc] initWithContentsOfFile:[self databasePath]] autorelease];	
+	iMBLibraryNode *db = [parser parseDatabase];
+	if (db)
+	{
+		[db setName:LocalizedStringInThisBundle(@"User Pictures", @"folder name")];
+		[db setIconName:@"folder"];
+	}	
+	return db;
+}
 
 @end

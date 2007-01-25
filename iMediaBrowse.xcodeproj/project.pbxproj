@@ -158,6 +158,14 @@
 		CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */; };
 		CE11017E0B69080B00783570 /* iMBLibrarySoundsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE11017C0B69080B00783570 /* iMBLibrarySoundsParser.h */; };
 		CE11017F0B69080B00783570 /* iMBLibrarySoundsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11017D0B69080B00783570 /* iMBLibrarySoundsParser.m */; };
+		CE1114E00B6950B500783570 /* iMBUserPicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE1114DE0B6950B500783570 /* iMBUserPicturesParser.h */; };
+		CE1114E10B6950B500783570 /* iMBUserPicturesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1114DF0B6950B500783570 /* iMBUserPicturesParser.m */; };
+		CE1114E60B6950C200783570 /* iMBDesktopPicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE1114E40B6950C200783570 /* iMBDesktopPicturesParser.h */; };
+		CE1114E70B6950C200783570 /* iMBDesktopPicturesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1114E50B6950C200783570 /* iMBDesktopPicturesParser.m */; };
+		CE1116F80B69593D00783570 /* iMBScreenSaverPicturesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11152E0B6953C800783570 /* iMBScreenSaverPicturesParser.m */; };
+		CE1116F90B69593D00783570 /* iMBScreenSaverPicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE11152D0B6953C800783570 /* iMBScreenSaverPicturesParser.h */; };
+		CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE1117DD0B695D8F00783570 /* iMBiChatIconsParser.h */; };
+		CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1117DE0B695D8F00783570 /* iMBiChatIconsParser.m */; };
 		CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */ = {isa = PBXBuildFile; fileRef = CE7570610ADEE8CB009FE941 /* missingImage.png */; };
 		CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */; };
 		CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC1450A2C0AA000179BA3 /* Movies.nib */; };
@@ -431,6 +439,14 @@
 		CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPasteboard+iMedia.m"; sourceTree = "<group>"; };
 		CE11017C0B69080B00783570 /* iMBLibrarySoundsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLibrarySoundsParser.h; sourceTree = "<group>"; };
 		CE11017D0B69080B00783570 /* iMBLibrarySoundsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBLibrarySoundsParser.m; sourceTree = "<group>"; };
+		CE1114DE0B6950B500783570 /* iMBUserPicturesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBUserPicturesParser.h; sourceTree = "<group>"; };
+		CE1114DF0B6950B500783570 /* iMBUserPicturesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBUserPicturesParser.m; sourceTree = "<group>"; };
+		CE1114E40B6950C200783570 /* iMBDesktopPicturesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBDesktopPicturesParser.h; sourceTree = "<group>"; };
+		CE1114E50B6950C200783570 /* iMBDesktopPicturesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBDesktopPicturesParser.m; sourceTree = "<group>"; };
+		CE11152D0B6953C800783570 /* iMBScreenSaverPicturesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBScreenSaverPicturesParser.h; sourceTree = "<group>"; };
+		CE11152E0B6953C800783570 /* iMBScreenSaverPicturesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBScreenSaverPicturesParser.m; sourceTree = "<group>"; };
+		CE1117DD0B695D8F00783570 /* iMBiChatIconsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiChatIconsParser.h; sourceTree = "<group>"; };
+		CE1117DE0B695D8F00783570 /* iMBiChatIconsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiChatIconsParser.m; sourceTree = "<group>"; };
 		CE1AD3830A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		CE1AD3840A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/iTunes.nib; sourceTree = "<group>"; };
 		CE1AD3850A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/Links.nib; sourceTree = "<group>"; };
@@ -633,11 +649,19 @@
 				795F748309D4BA98000F21B5 /* iMBPicturesFolder.m */,
 				792274880A27C51600E0A9BF /* iMBFavouritePicturesParser.h */,
 				792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */,
+				CE1114DE0B6950B500783570 /* iMBUserPicturesParser.h */,
+				CE1114DF0B6950B500783570 /* iMBUserPicturesParser.m */,
+				CE1117DD0B695D8F00783570 /* iMBiChatIconsParser.h */,
+				CE1117DE0B695D8F00783570 /* iMBiChatIconsParser.m */,
+				CE1114E40B6950C200783570 /* iMBDesktopPicturesParser.h */,
+				CE1114E50B6950C200783570 /* iMBDesktopPicturesParser.m */,
+				CE11152D0B6953C800783570 /* iMBScreenSaverPicturesParser.h */,
+				CE11152E0B6953C800783570 /* iMBScreenSaverPicturesParser.m */,
 			);
 			name = Photo;
 			sourceTree = "<group>";
 		};
-		7953E6480A2E896C00C7AFBB /* Music */ = {
+		7953E6480A2E896C00C7AFBB /* Audio */ = {
 			isa = PBXGroup;
 			children = (
 				795F870309D4DA72000F21B5 /* iMBiTunesMusicParser.h */,
@@ -655,7 +679,7 @@
 				CE11017C0B69080B00783570 /* iMBLibrarySoundsParser.h */,
 				CE11017D0B69080B00783570 /* iMBLibrarySoundsParser.m */,
 			);
-			name = Music;
+			name = Audio;
 			sourceTree = "<group>";
 		};
 		7953E64B0A2E896F00C7AFBB /* Movies */ = {
@@ -705,7 +729,7 @@
 				795D715909D3AB47005F166D /* iMBAbstractParser.h */,
 				795D715A09D3AB47005F166D /* iMBAbstractParser.m */,
 				7953E6450A2E896700C7AFBB /* Photo */,
-				7953E6480A2E896C00C7AFBB /* Music */,
+				7953E6480A2E896C00C7AFBB /* Audio */,
 				7953E64B0A2E896F00C7AFBB /* Movies */,
 				7953E64E0A2E897200C7AFBB /* Links */,
 				7953E6510A2E897400C7AFBB /* Contacts */,
@@ -956,6 +980,10 @@
 				793AA45E0B59B460003F6BC4 /* RBSplitViewPrivateDefines.h in Headers */,
 				5BE025280B5CE1FB0073DCF8 /* iMBiTunesVideoParser.h in Headers */,
 				CE11017E0B69080B00783570 /* iMBLibrarySoundsParser.h in Headers */,
+				CE1114E00B6950B500783570 /* iMBUserPicturesParser.h in Headers */,
+				CE1114E60B6950C200783570 /* iMBDesktopPicturesParser.h in Headers */,
+				CE1116F90B69593D00783570 /* iMBScreenSaverPicturesParser.h in Headers */,
+				CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1199,6 +1227,10 @@
 				793AA45D0B59B460003F6BC4 /* RBSplitView.m in Sources */,
 				5BE025270B5CE1FA0073DCF8 /* iMBiTunesVideoParser.m in Sources */,
 				CE11017F0B69080B00783570 /* iMBLibrarySoundsParser.m in Sources */,
+				CE1114E10B6950B500783570 /* iMBUserPicturesParser.m in Sources */,
+				CE1114E70B6950C200783570 /* iMBDesktopPicturesParser.m in Sources */,
+				CE1116F80B69593D00783570 /* iMBScreenSaverPicturesParser.m in Sources */,
+				CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

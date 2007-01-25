@@ -20,8 +20,8 @@
  Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
- 
  */
+
 
 #import "iMBContactsController.h"
 #import "iMBLibraryNode.h"

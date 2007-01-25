@@ -17,33 +17,17 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
+ Please send fixes to
 	<ghulands@framedphotographics.com>
 	<ben@scriptsoftware.com>
  */
 
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "iMBAbstractParser.h"
 
-@class MUPhotoView;
-
-@interface iMBPhotosController : iMBAbstractController
+@interface iMBUserPicturesParser : iMBAbstractParser
 {
-	IBOutlet MUPhotoView	*oPhotoView;
-	IBOutlet NSSlider		*oSlider;
-	NSMutableDictionary		*myCache;
-	NSMutableIndexSet		*mySelection;
-	NSArray					*myImages;
-	NSMutableArray			*myFilteredImages;
-	NSString				*mySearchString;
-	NSLock					*myCacheLock;
-	NSMutableArray			*myInFlightImageOperations;
-	NSMutableSet			*myProcessingImages;
-	int						myThreadCount;
-	NSIndexPath				*mySelectedIndexPath;
+	
 }
-
-- (IBAction)search:(id)sender;
-- (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard;
 
 @end

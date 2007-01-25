@@ -29,7 +29,7 @@ Please send fixes to
 #import "iMedia.h"
 #import "MUPhotoView.h"
 
-#define MAX_POSTER_SIZE (NSMakeSize(320, 240))
+#define MAX_POSTER_SIZE (NSMakeSize(240, 180))	// our thumbnail view maxes out at 240.
 
 @interface iMBMoviesController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
@@ -38,8 +38,6 @@ Please send fixes to
 @interface QTMovie (QTMoviePrivateInTigerButPublicInLeopard)
 - (void)setIdling:(BOOL)state;
 @end
-
-static NSImage *_placeholder = nil;
 
 @implementation iMBMoviesController
 
@@ -58,13 +56,7 @@ static NSImage *_placeholder = nil;
         myImageRecordsToLoad = [[NSMutableArray allocWithZone:[self zone]] init];
 		myProcessingImages = [[NSMutableSet set] retain];
 		myCacheLock = [[NSLock allocWithZone:[self zone]] init];
-        
-		if (!_placeholder)
-		{
-			NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"placeholder" ofType:@"png"];
-			_placeholder = [[NSImage alloc] initWithContentsOfFile:path];
-		}
-		
+        		
 		[NSBundle loadNibNamed:@"Movies" owner:self];
 	}
 	return self;

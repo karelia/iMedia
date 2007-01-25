@@ -32,6 +32,8 @@ Please send fixes to
 #define SAMPLE_INCOMING_DRAG 0
 #endif
 
+#define MAX_THUMB_SIZE 240	// our thumbnail view maxes out at 240.
+
 
 @interface NSObject (CompilerIsHappy)
 + (NSImage *)imageWithPath:(NSString *)path boundingBox:(NSSize)boundingBox;
@@ -41,7 +43,6 @@ Please send fixes to
 - (NSString *)iconNameForPlaylist:(NSString*)name;
 @end
 
-static NSImage *_placeholder = nil;
 static NSImage *_missing = nil;
 
 @implementation iMBPhotosController
@@ -49,7 +50,6 @@ static NSImage *_missing = nil;
 + (void)initialize
 {
 	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
-	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:@"UseEpeg"]];
 }
 
 - (id) initWithPlaylistController:(NSTreeController*)ctrl
@@ -61,13 +61,10 @@ static NSImage *_missing = nil;
 		myCacheLock = [[NSLock alloc] init];
 		myInFlightImageOperations = [[NSMutableArray array] retain];
 		myProcessingImages = [[NSMutableSet set] retain];
-		myEPEGLock = [[NSLock alloc] init];
 		
-		if (!_placeholder)
+		if (!_missing)
 		{
-			NSString *path = [[NSBundle bundleForClass:[iMBPhotosController class]] pathForResource:@"placeholder" ofType:@"png"];
-			_placeholder = [[NSImage alloc] initWithContentsOfFile:path];
-			path = [[NSBundle bundleForClass:[iMBPhotosController class]] pathForResource:@"missingImage" ofType:@"png"];
+			NSString *path = [[NSBundle bundleForClass:[iMBPhotosController class]] pathForResource:@"missingImage" ofType:@"png"];
 			_missing = [[NSImage alloc] initWithContentsOfFile:path];
 			if (!_missing)
 				NSLog(@"missingImage.png is missing. This can cause bad things to happen");
@@ -85,7 +82,6 @@ static NSImage *_missing = nil;
 
 - (void)dealloc
 {
-	[myEPEGLock release];
 	[mySelection release];
 	[myCache release];
 	[myCacheLock release];
@@ -329,23 +325,22 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	// remove ourselves out of the queue
-	[myCacheLock lock];
-	NSString* imagePath = [[myInFlightImageOperations lastObject] retain];
-	if (imagePath)
+	[myCacheLock lock];	// ============================================================ LOCK
+	NSString* imagePathRetained = [[myInFlightImageOperations lastObject] retain];
+	if (imagePathRetained)
 	{
-		[myInFlightImageOperations removeObject:imagePath];
-		[myProcessingImages addObject:imagePath];
+		[myInFlightImageOperations removeObject:imagePathRetained];
+		[myProcessingImages addObject:imagePathRetained];
 	}
-	[myCacheLock unlock];
+	[myCacheLock unlock];	// ======================================================== UNLOCK
 	
 	NSString *thumbPath;
 	NSImage *img;
 	NSDictionary *rec;
-	BOOL useEpeg = [[NSUserDefaults standardUserDefaults] boolForKey:@"UseEpeg"];
 	 
-	while (imagePath)
+	while (imagePathRetained)
 	{
-		rec = [self recordForPath:imagePath];
+		rec = [self recordForPath:imagePathRetained];
 		img = nil;
 		thumbPath = [rec objectForKey:@"ThumbPath"];
 		
@@ -353,73 +348,69 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 		{
 			img = [[NSImage alloc] initByReferencingFile:thumbPath];
 		}
-		else
-		{
-			NSString* pathExtension = [[imagePath pathExtension] lowercaseString];
-			if (useEpeg &&
-				([pathExtension isEqualToString:@"jpg"] ||
-				 [pathExtension isEqualToString:@"jpeg"]))
-			{
-				Class epeg = NSClassFromString(@"EpegWrapper");
-				if (epeg)
-				{
-					[myEPEGLock lock];
-					img = [[epeg imageWithPath:imagePath boundingBox:NSMakeSize(256,256)] retain];
-					[myEPEGLock unlock];
-				}
-			}
-		}
 		
-		// if still no image... use high res
+		// If we didn't have a thumbnail, create it from Core Graphics.
 		if (!img)
 		{
-			img = [[NSImage alloc] initWithContentsOfFile:imagePath];
-			if (img)
+			NSURL *url = [NSURL fileURLWithPath:imagePathRetained];
+			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
+
+			// image thumbnail options
+			NSDictionary* thumbOpts = [NSDictionary dictionaryWithObjectsAndKeys:
+				(id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailWithTransform,
+				(id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+				[NSNumber numberWithInt:MAX_THUMB_SIZE], (id)kCGImageSourceThumbnailMaxPixelSize, 
+				nil];
+			
+			// make image thumbnail
+			CGImageRef theCGImage = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)thumbOpts);
+			
+			if (theCGImage)
 			{
-				NSSize imageSize = [img size];
-				NSSize thumbSize = LimitMaxWidthHeight(imageSize, 256);
-				if (!NSEqualSizes(imageSize, thumbSize))
-				{
-					NSImage* thumbImage = [[NSImage alloc] initWithSize:thumbSize];
-					if (thumbImage)
-					{
-						[thumbImage setCachedSeparately:YES]; // See http://lists.apple.com/archives/cocoa-dev/2004/Oct/msg01339.html
-						if (![img isFlipped])
-							[thumbImage setFlipped:YES];
-						[thumbImage lockFocus];
-						[img drawInRect:NSMakeRect(0, 0, thumbSize.width, thumbSize.height) fromRect:NSMakeRect(0, 0, imageSize.width, imageSize.height) operation:NSCompositeCopy fraction:1.0];
-						
-						[thumbImage unlockFocus];
-						[img release];
-						img = thumbImage;
-					}
-				}
+				// Now draw into an NSImage
+				NSRect imageRect = NSMakeRect(0.0, 0.0, 0.0, 0.0);
+				CGContextRef imageContext = nil;
+				
+				// Get the image dimensions.
+				imageRect.size.height = CGImageGetHeight(theCGImage);
+				imageRect.size.width = CGImageGetWidth(theCGImage);
+				
+				// Create a new image to receive the Quartz image data.
+				img = [[[NSImage alloc] initWithSize:imageRect.size] autorelease];
+				[img setFlipped:YES];
+				[img lockFocus];
+				
+				// Get the Quartz context and draw.
+				imageContext = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+				CGContextDrawImage(imageContext, *(CGRect*)&imageRect, theCGImage);
+				[img unlockFocus];
 			}
 		}
+	
 #warning TODO: Perhaps handle alias files, resolve a file if it's really an alias.
 		
 		if (!img) // we have a bad egg... need to display a ? icon
 		{
-			img = [_missing retain];
+			img = _missing;
 		}
 		
-		[myCacheLock lock];
-		if (img && ![myCache objectForKey:imagePath])
+		[myCacheLock lock];	// ============================================================ LOCK
+		if (img && ![myCache objectForKey:imagePathRetained])
 		{
-			[myCache setObject:img forKey:imagePath];
-			[img release];
+			[myCache setObject:img forKey:imagePathRetained];
 		}
 		
 		// get the last object in the queue because we would have scrolled and what is at the start won't be necessarily be what is displayed.
-		[myProcessingImages removeObject:imagePath];
-		[imagePath release];
-		imagePath = [[myInFlightImageOperations lastObject] retain];
-		if (imagePath)
+		[myProcessingImages removeObject:imagePathRetained];
+		[imagePathRetained release];
+		// Now try to get another one. Or nil.
+		imagePathRetained = [[myInFlightImageOperations lastObject] retain];
+		if (imagePathRetained)
 		{
-			[myInFlightImageOperations removeObject:imagePath];
-			[myProcessingImages addObject:imagePath];
+			[myInFlightImageOperations removeObject:imagePathRetained];
+			[myProcessingImages addObject:imagePathRetained];
 		}
-		[myCacheLock unlock];
+		[myCacheLock unlock];	// ======================================================== UNLOCK
         
 		[oPhotoView performSelectorOnMainThread:@selector(setNeedsDisplay:)
 									 withObject:[NSNumber numberWithBool:YES]
@@ -488,17 +479,15 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 		rec = [myImages objectAtIndex:index];
 	}
 	//try the caches
-	[myCacheLock lock];
+	[myCacheLock lock];	// ============================================================ LOCK
 	NSString *imagePath = [rec objectForKey:@"ImagePath"];
 	NSImage *img = [myCache objectForKey:imagePath];
-	[myCacheLock unlock];
 	
 	if (!img) img = [rec objectForKey:@"CachedThumb"];
 	
 	if (!img)
 	{
 		// background load the image
-		[myCacheLock lock];
 		BOOL alreadyQueued = (([myInFlightImageOperations containsObject:imagePath]) || ([myProcessingImages containsObject:imagePath]));
 		
 		if (!alreadyQueued)
@@ -518,9 +507,10 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 			[myInFlightImageOperations removeObject:imagePath];
 			[myInFlightImageOperations addObject:imagePath];
 		}
-		[myCacheLock unlock];
 		img = nil; //return nil so the image view draws a bezierpath
 	}
+	[myCacheLock unlock];	// ======================================================== UNLOCK
+
 	return img;
 }
 
