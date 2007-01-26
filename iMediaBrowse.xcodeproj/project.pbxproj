@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3C3A131E09EAFB8100AF41BF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3C3A131C09EAFB8100AF41BF /* Localizable.strings */; };
-		5B3AD87A0B5BA29D00C971A0 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */; };
 		5B3AD87D0B5BA2A600C971A0 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97630975D4970071B2E0 /* MainMenu.nib */; };
 		5BE025270B5CE1FA0073DCF8 /* iMBiTunesVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */; };
 		5BE025280B5CE1FB0073DCF8 /* iMBiTunesVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 7990CD5809D75D4A00AD74BA /* iMBiTunesVideoParser.h */; };
@@ -155,6 +154,7 @@
 		A93A6A770AE77F2B00C77AA4 /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A93A6A760AE77F2B00C77AA4 /* UKFileWatcher.m */; };
 		A9FECB070ADA696A00AB3426 /* iMBLibraryOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */; };
 		A9FECB080ADA696A00AB3426 /* iMBLibraryOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */; };
+		CE05A2390B6A89BE00A25808 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE05A2370B6A89BE00A25808 /* MediaBrowser.nib */; };
 		CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */; };
 		CE11017E0B69080B00783570 /* iMBLibrarySoundsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE11017C0B69080B00783570 /* iMBLibrarySoundsParser.h */; };
 		CE11017F0B69080B00783570 /* iMBLibrarySoundsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11017D0B69080B00783570 /* iMBLibrarySoundsParser.m */; };
@@ -225,7 +225,6 @@
 /* Begin PBXFileReference section */
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		29B97319FDCFA39411CA2CEA /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* iMediaBrowse_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowse_Prefix.pch; sourceTree = "<group>"; };
@@ -236,7 +235,6 @@
 		5B0DEBB00AEDF849008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iTunes.nib; sourceTree = "<group>"; };
 		5B0DEBBE0AEDF923008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Links.nib; sourceTree = "<group>"; };
 		5B3AD8600B5BA23800C971A0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		5B3AD8610B5BA23800C971A0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		5B7C81A80B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Contacts.nib; sourceTree = "<group>"; };
 		5B7C81A90B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		5B7C81AA0B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Movies.nib; sourceTree = "<group>"; };
@@ -387,7 +385,7 @@
 		79FDF61309AAE5D2000CB4B4 /* quicktime_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = quicktime_tiny.png; sourceTree = "<group>"; };
 		79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tunes_tiny.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* iMediaBrowse.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iMediaBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* iMediaBrowse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		964006E108D7B9BF0046E052 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		965EB98608E1D345000DFF3A /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowser.h; sourceTree = "<group>"; };
@@ -410,6 +408,15 @@
 		A93A6A760AE77F2B00C77AA4 /* UKFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKFileWatcher.m; sourceTree = "<group>"; };
 		A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBLibraryOutlineView.h; sourceTree = "<group>"; };
 		A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBLibraryOutlineView.m; sourceTree = "<group>"; };
+		CE05A2380B6A89BE00A25808 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE05A2480B6A89FD00A25808 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE05A2800B6A8A6700A25808 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE05A2850B6A8A7100A25808 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE05A28B0B6A8A8400A25808 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE05A2960B6A8A8C00A25808 /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE05A2970B6A8A9700A25808 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE05A2980B6A8AA500A25808 /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE05A2990B6A8AB400A25808 /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPasteboard+iMedia.h"; sourceTree = "<group>"; };
 		CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPasteboard+iMedia.m"; sourceTree = "<group>"; };
 		CE11017C0B69080B00783570 /* iMBLibrarySoundsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLibrarySoundsParser.h; sourceTree = "<group>"; };
@@ -584,8 +591,8 @@
 			children = (
 				968BEF3E090E904100D00E5C /* images */,
 				3C3A131C09EAFB8100AF41BF /* Localizable.strings */,
-				29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */,
 				791F97630975D4970071B2E0 /* MainMenu.nib */,
+				CE05A2370B6A89BE00A25808 /* MediaBrowser.nib */,
 				791F97A20975DA170071B2E0 /* iTunes.nib */,
 				CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */,
 				CE8FC1450A2C0AA000179BA3 /* Movies.nib */,
@@ -1085,7 +1092,7 @@
 				7953E79B0A2E989300C7AFBB /* contacts.png in Resources */,
 				CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */,
 				E20764B80B597D8D00EAC95C /* tiny-reload.png in Resources */,
-				5B3AD87A0B5BA29D00C971A0 /* MediaBrowser.nib in Resources */,
+				CE05A2390B6A89BE00A25808 /* MediaBrowser.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1198,15 +1205,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		29B97318FDCFA39411CA2CEA /* MediaBrowser.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				29B97319FDCFA39411CA2CEA /* en */,
-				5B3AD8610B5BA23800C971A0 /* sv */,
-			);
-			name = MediaBrowser.nib;
-			sourceTree = "<group>";
-		};
 		3C3A131C09EAFB8100AF41BF /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1285,6 +1283,22 @@
 				5B0DEBBE0AEDF923008DA136 /* sv */,
 			);
 			name = Links.nib;
+			sourceTree = "<group>";
+		};
+		CE05A2370B6A89BE00A25808 /* MediaBrowser.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE05A2380B6A89BE00A25808 /* en */,
+				CE05A2480B6A89FD00A25808 /* sv */,
+				CE05A2800B6A8A6700A25808 /* zh_TW */,
+				CE05A2850B6A8A7100A25808 /* zh_CN */,
+				CE05A28B0B6A8A8400A25808 /* ja */,
+				CE05A2960B6A8A8C00A25808 /* it */,
+				CE05A2970B6A8A9700A25808 /* fr */,
+				CE05A2980B6A8AA500A25808 /* de */,
+				CE05A2990B6A8AB400A25808 /* da */,
+			);
+			name = MediaBrowser.nib;
 			sourceTree = "<group>";
 		};
 		CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */ = {
