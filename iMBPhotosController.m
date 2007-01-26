@@ -268,13 +268,23 @@ static NSImage *_toolbarIcon = nil;
 - (NSArray *)selectedRecords
 {
 	NSMutableArray *records = [NSMutableArray array];
+	NSArray *whichPhotos = nil;
+	
+	if ([mySearchString length] > 0)
+	{
+		whichPhotos = myFilteredImages;
+	}
+	else
+	{
+		whichPhotos = myImages;
+	}
 	int i, c = [myImages count];
 	
 	for (i = 0; i < c; i++)
 	{
 		if ([mySelection containsIndex:i])
 		{
-			[records addObject:[myImages objectAtIndex:i]];
+			[records addObject:[whichPhotos objectAtIndex:i]];
 		}
 	}
 	
