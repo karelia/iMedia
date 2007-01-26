@@ -1669,9 +1669,13 @@ static NSDictionary *sTitleAttributes = nil;
         result = [[self photosArray] objectAtIndex:index];
     else if ((nil != delegate) && (index < [self photoCount]))
         result = [delegate photoView:self photoAtIndex:index];
-	
-	if (![result isValid])
-        result = nil;
+
+// commenting out. This is really slow, and maybe not needed.
+//	if (![result isValid])
+//        result = nil;
+	/*
+	 If the receiver is initialized with an existing image file, but the corresponding image data is not yet loaded into memory, this method loads the data and expands it as needed. If the receiver contains no image representations and no associated image file, this method creates a valid cached image representation and initializes it to the default bit depth. This method returns NO in cases where the file or URL from which it was initialized is nonexistent or when the data in an existing file is invalid.
+	 */
 	
 	return result;
 }
@@ -1733,7 +1737,7 @@ static NSDictionary *sTitleAttributes = nil;
     }
     
     // if the above calls failed, try to just fetch the full size image
-    if (![fastPhoto isValid]) {
+    if (0 == fastPhoto || ![fastPhoto isValid]) {
         fastPhoto = [self photoAtIndex:index];
     }
     

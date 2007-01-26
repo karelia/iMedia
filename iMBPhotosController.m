@@ -17,10 +17,11 @@
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  
-Please send fixes to
-	<ghulands@framedphotographics.com>
-	<ben@scriptsoftware.com>
- */
+ iMedia Browser Home Page: <http://imedia.karelia.com/>
+ 
+ Please send fixes to <imedia@lists.karelia.com>
+
+*/
 
 #import "iMBPhotosController.h"
 #import "iMediaBrowser.h"
@@ -293,6 +294,10 @@ static NSImage *_toolbarIcon = nil;
 
 #pragma mark -
 #pragma mark Threaded Image Loading
+
+#warning ---- According to Shark, this uses up a LOT of time.  Maybe we could have a parallel NSDictionary
+#warning ---- that shadows myImages.  Key by path, return the record.  Or perhaps myImages could be
+#warning ---- just the ordered paths, with a dictionary to get the record.
 
 - (NSDictionary *)recordForPath:(NSString *)path
 {

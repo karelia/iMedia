@@ -422,6 +422,8 @@
 		CE11152E0B6953C800783570 /* iMBScreenSaverPicturesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBScreenSaverPicturesParser.m; sourceTree = "<group>"; };
 		CE1117DD0B695D8F00783570 /* iMBiChatIconsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiChatIconsParser.h; sourceTree = "<group>"; };
 		CE1117DE0B695D8F00783570 /* iMBiChatIconsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiChatIconsParser.m; sourceTree = "<group>"; };
+		CE11337A0B69BC9B00783570 /* iMBAddressBookImagesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAddressBookImagesParser.h; sourceTree = "<group>"; };
+		CE11337B0B69BC9B00783570 /* iMBAddressBookImagesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAddressBookImagesParser.m; sourceTree = "<group>"; };
 		CE1AD3830A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		CE1AD3840A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/iTunes.nib; sourceTree = "<group>"; };
 		CE1AD3850A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/Links.nib; sourceTree = "<group>"; };
@@ -630,6 +632,8 @@
 				CE1114E50B6950C200783570 /* iMBDesktopPicturesParser.m */,
 				CE11152D0B6953C800783570 /* iMBScreenSaverPicturesParser.h */,
 				CE11152E0B6953C800783570 /* iMBScreenSaverPicturesParser.m */,
+				CE11337A0B69BC9B00783570 /* iMBAddressBookImagesParser.h */,
+				CE11337B0B69BC9B00783570 /* iMBAddressBookImagesParser.m */,
 			);
 			name = Photo;
 			sourceTree = "<group>";

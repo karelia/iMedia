@@ -19,43 +19,17 @@
  
  iMedia Browser Home Page: <http://imedia.karelia.com/>
  
- Please send fixes to <imedia@lists.karelia.com>  
+ Please send fixes to <imedia@lists.karelia.com>
 
 */
 
-#import "TimeValueTransformer.h"
+
+#import <Cocoa/Cocoa.h>
+#import "iMBAbstractParser.h"
 
 
-@implementation TimeValueTransformer
-+ (Class)transformedValueClass
-{
-	return [NSString self];
+@interface iMBAddressBookImagesParser : iMBAbstractParser {
+
 }
 
-+ (BOOL)allowsReverseTransformation
-{
-	return NO;
-}
-
-- (id)transformedValue:(id)beforeObject
-{
-    if (![beforeObject isKindOfClass:[NSNumber class]]) {
-        return nil;
-    }
-	
-	if([beforeObject intValue] == 0) return @"0:00";
-	
-	// Convert number to seconds, and then to an appropriate time value
-	int actualSeconds = (int) roundf([beforeObject floatValue] / 1000.0);
-	div_t hours = div(actualSeconds,3600);
-	div_t minutes = div(hours.rem,60);
-	
-#warning really should internationalize
-	if (hours.quot == 0) {
-		return [NSString stringWithFormat:@"%2d:%.2d", minutes.quot, minutes.rem];
-	}
-	else {
-		return [NSString stringWithFormat:@"%2d:%02d:%02d", hours.quot, minutes.quot, minutes.rem];
-	}
-}
 @end

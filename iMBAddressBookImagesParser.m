@@ -16,58 +16,79 @@
  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  
  
  iMedia Browser Home Page: <http://imedia.karelia.com/>
  
- Please send fixes to <imedia@lists.karelia.com>
+ Please send fixes to <imedia@lists.karelia.com>  
 
 */
 
-#import "iMBAddressBookParser.h"
-#import "iMBLibraryNode.h"
-#import "iMediaBrowser.h"
-#import <AddressBook/AddressBook.h>
-#import "iMedia.h"
+imedia@lists.karelia.com
 
-@implementation iMBAddressBookParser
+/*
+
+ The idea here is to show images of people in your address book who have pictures associated with them.
+ 
+ SORT OF WORKS, BUT THERE ARE PROBLEMS:
+ 
+ * We really should parse all the cards into the top level, since some records may not exist
+   in groups.  (The AddressBookParser would have the same issue).
+ 
+ * There is no image path, since the images are created from data, so you can't drag.
+   I'm not sure how to deal with this - maybe any place that asks for the image path (other than
+   for generating the thumbnail, which we already have) should check if there is an image path,
+   and if not, writing it out to a temporary file or something.
+ 
+ * Since entries can live in more than one group, the combined view should only show the entries
+   ONCE but we're seeing multiple versions of the same people.
+ 
+ */
+
+
+
+#import "iMBAddressBookImagesParser.h"
+#import "iMedia.h"
+#import <AddressBook/AddressBook.h>
+
+@implementation iMBAddressBookImagesParser
 
 + (void)load
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	[iMediaBrowser registerParser:[self class] forMediaType:@"contacts"];
+	
+	[iMediaBrowser registerParser:[self class] forMediaType:@"photos"];
+	
 	[pool release];
-}
-
-- (id)init
-{
-	if (self = [super initWithContentsOfFile:nil])
-	{
-		
-	}
-	return self;
 }
 
 - (NSMutableDictionary *)recordForPerson:(ABPerson *)cur
 {
-	NSString *firstName = [cur valueForProperty:kABFirstNameProperty];
-	NSString *lastName = [cur valueForProperty:kABLastNameProperty];
-	ABMultiValue *emails = [cur valueForProperty:kABEmailProperty];
+	NSData *imageData = [cur imageData];
+	if (!imageData) return nil;
+	NSImage *image = [[[NSImage alloc] initWithData:imageData] autorelease];
+	if (!image) return nil;
 	
 	NSMutableDictionary *rec = [NSMutableDictionary dictionary];
+	NSString *firstName = [cur valueForProperty:kABFirstNameProperty];
+	NSString *lastName = [cur valueForProperty:kABLastNameProperty];
+	NSString *company = [cur valueForProperty:kABOrganizationProperty];
 	
-	if (firstName) [rec setObject:firstName forKey:@"FirstName"];
-	if (lastName) [rec setObject:lastName forKey:@"LastName"];
-	[rec setObject:[NSString stringWithFormat:@"%@ %@", firstName, lastName] forKey:@"Caption"];
-	
-	NSMutableArray *emls = [NSMutableArray array];
-	
-	int i;
-	for (i = 0; i < [emails count]; i++)
+	NSMutableString *name = [NSMutableString string];
+	if (firstName && ![firstName isEqualToString:@""]) [name appendString:firstName];
+	if (lastName && ![lastName isEqualToString:@""])
 	{
-		[emls addObject:[emails valueAtIndex:i]];
+		if (![name isEqualToString:@""]) [name appendString:@" "];
+		[name appendString:lastName];
 	}
-	[rec setObject:emls forKey:@"EmailAddresses"];
-	[rec setObject:cur forKey:@"ABPerson"];
+	if ([name isEqualToString:@""] && company && ![company isEqualToString:@""])
+	{
+		[name appendString:company];
+	}
+	[rec setObject:name forKey:@"Caption"];
+	[rec setObject:image forKey:@"CachedThumb"];
+	
+	// NOTE: no path!
 	
 	return rec;
 }
@@ -84,10 +105,12 @@
 	
 	while (cur = [e nextObject])
 	{
-		[people addObject:[self recordForPerson:cur]];
+		NSDictionary *record = [self recordForPerson:cur];
+		if (nil != record)
+		[people addObject:record];
 	}
 	
-	[node setAttribute:people forKey:@"People"];
+	[node setAttribute:people forKey:@"Images"];
 	
 	// append any sub groups
 	NSEnumerator *subGroupEnum = [[group subgroups] objectEnumerator];
@@ -130,7 +153,7 @@
 	// add ourselves to the root
 	ABPerson *me = [ab me];
 	NSMutableArray *a = [NSMutableArray arrayWithObject:[self recordForPerson:me]];
-	[root setAttribute:a forKey:@"People"];
+	[root setAttribute:a forKey:@"Images"];
 	
 	return [root autorelease];
 }
