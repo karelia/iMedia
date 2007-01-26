@@ -35,6 +35,7 @@
 	NSMutableDictionary		*myCache;
 	NSMutableIndexSet		*mySelection;
 	NSArray					*myImages;
+	NSDictionary			*myImageDict;
 	NSMutableArray			*myFilteredImages;
 	NSString				*mySearchString;
 	NSLock					*myCacheLock;

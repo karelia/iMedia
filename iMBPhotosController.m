@@ -87,6 +87,7 @@ static NSImage *_missing = nil;
 	[myCache release];
 	[myCacheLock release];
 	[myImages release];
+	[myImageDict release];
 	[myFilteredImages release];
 	[mySearchString release];
 	[myInFlightImageOperations release];
@@ -121,7 +122,7 @@ static NSImage *_missing = nil;
 	if ([mySearchString length]) 
 	{
 		iMBLibraryNode *selectedNode = [[[self controller] selectedObjects] lastObject];
-		[myFilteredImages addObjectsFromArray:[selectedNode searchAttribute:@"Images" withKeys:[NSArray arrayWithObjects:@"Caption", @"ImagePath", nil] matching:mySearchString]];		
+		[myFilteredImages addObjectsFromArray:[selectedNode searchAttribute:@"Images" withKeys:[NSArray arrayWithObjects:@"Caption", @"ImagePath", nil] matching:mySearchString]];	
 	}	
 	
 	[self didChangeValueForKey:@"images"];
@@ -295,23 +296,10 @@ static NSImage *_toolbarIcon = nil;
 #pragma mark -
 #pragma mark Threaded Image Loading
 
-#warning ---- According to Shark, this uses up a LOT of time.  Maybe we could have a parallel NSDictionary
-#warning ---- that shadows myImages.  Key by path, return the record.  Or perhaps myImages could be
-#warning ---- just the ordered paths, with a dictionary to get the record.
 
 - (NSDictionary *)recordForPath:(NSString *)path
 {
-	NSEnumerator *e = [myImages objectEnumerator];
-	NSDictionary *cur;
-	
-	while (cur = [e nextObject])
-	{
-		if ([[cur objectForKey:@"ImagePath"] isEqualToString:path])
-		{
-			return cur;
-		}
-	}
-	return nil;
+	return [myImageDict objectForKey:@"path"];
 }
 
 NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension);
@@ -442,7 +430,20 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 - (void)setImages:(NSArray *)images
 {
 	[myImages autorelease];
+	[myImageDict autorelease];
 	myImages = [images retain];
+	
+	// Make a dictionary that echos myImages
+	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+	NSEnumerator *enumerator = [myImages objectEnumerator];
+	NSDictionary *record;
+
+	while ((record = [enumerator nextObject]) != nil)
+	{
+		[dict setObject:record forKey:[record objectForKey:@"ImagePath"]];
+	}
+	myImageDict = [[NSDictionary alloc] initWithDictionary:dict];	// retained
+	
 	NSIndexPath *selectionIndex = [[self controller] selectionIndexPath];
 	// only clear the cache if we go to another parser
 	if (!([selectionIndex isSubPathOf:mySelectedIndexPath] || 
