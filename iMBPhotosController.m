@@ -357,36 +357,41 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 		{
 			NSURL *url = [NSURL fileURLWithPath:imagePathRetained];
 			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
-
-			// image thumbnail options
-			NSDictionary* thumbOpts = [NSDictionary dictionaryWithObjectsAndKeys:
-				(id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailWithTransform,
-				(id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
-				[NSNumber numberWithInt:MAX_THUMB_SIZE], (id)kCGImageSourceThumbnailMaxPixelSize, 
-				nil];
-			
-			// make image thumbnail
-			CGImageRef theCGImage = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)thumbOpts);
-			
-			if (theCGImage)
+			if (source)
 			{
-				// Now draw into an NSImage
-				NSRect imageRect = NSMakeRect(0.0, 0.0, 0.0, 0.0);
-				CGContextRef imageContext = nil;
+				// image thumbnail options
+				NSDictionary* thumbOpts = [NSDictionary dictionaryWithObjectsAndKeys:
+					(id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailWithTransform,
+					(id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+					[NSNumber numberWithInt:MAX_THUMB_SIZE], (id)kCGImageSourceThumbnailMaxPixelSize, 
+					nil];
 				
-				// Get the image dimensions.
-				imageRect.size.height = CGImageGetHeight(theCGImage);
-				imageRect.size.width = CGImageGetWidth(theCGImage);
+				// make image thumbnail
+				CGImageRef theCGImage = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)thumbOpts);
 				
-				// Create a new image to receive the Quartz image data.
-				img = [[[NSImage alloc] initWithSize:imageRect.size] autorelease];
-				[img setFlipped:YES];
-				[img lockFocus];
-				
-				// Get the Quartz context and draw.
-				imageContext = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
-				CGContextDrawImage(imageContext, *(CGRect*)&imageRect, theCGImage);
-				[img unlockFocus];
+				if (theCGImage)
+				{
+					// Now draw into an NSImage
+					NSRect imageRect = NSMakeRect(0.0, 0.0, 0.0, 0.0);
+					CGContextRef imageContext = nil;
+					
+					// Get the image dimensions.
+					imageRect.size.height = CGImageGetHeight(theCGImage);
+					imageRect.size.width = CGImageGetWidth(theCGImage);
+					
+					// Create a new image to receive the Quartz image data.
+					img = [[[NSImage alloc] initWithSize:imageRect.size] autorelease];
+					[img setFlipped:YES];
+					[img lockFocus];
+					
+					// Get the Quartz context and draw.
+					imageContext = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+					CGContextDrawImage(imageContext, *(CGRect*)&imageRect, theCGImage);
+					[img unlockFocus];
+					
+					CFRelease(theCGImage);
+				}
+				CFRelease(source);
 			}
 		}
 	
