@@ -473,9 +473,7 @@ static NSMutableDictionary *_parsers = nil;
 }
 
 - (void)backgroundLoadData:(id)reuseCachedDataArgument
-{
-	NSLog(@"backgroundLoadData:%d", reuseCachedDataArgument);
-	
+{	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
    
 	BOOL reuseCachedData = [reuseCachedDataArgument boolValue];
@@ -562,8 +560,6 @@ static NSMutableDictionary *_parsers = nil;
 	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:NO];
 	
 	[pool release];
-	
-	NSLog(@"backgroundLoadData:  END");
 
 }
 
