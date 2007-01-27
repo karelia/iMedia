@@ -36,7 +36,7 @@
 	NSImage				*myIcon;
 	NSString			*myIconName;
 	NSMutableDictionary *myAttributeFilterMap;
-	id					myParser;
+	id					myParser;	// not retained
 	
 	NSMutableAttributedString *myCachedNameWithImage;
 }

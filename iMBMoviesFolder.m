@@ -50,6 +50,11 @@
 	return self;
 }
 
+- (void) dealloc {
+	[myFileExtensionHints release];
+	[super dealloc];
+}
+
 - (NSMutableDictionary *)recordForMovieWithPath:(NSString *)filePath
 {
 	NSFileManager *fm = [NSFileManager defaultManager];

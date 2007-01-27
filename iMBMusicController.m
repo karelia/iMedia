@@ -64,6 +64,13 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 	return self;
 }
 
+- (void) dealloc {
+	[clockTime release];
+	[pollTimer release];
+	[myCurrentPlayingRecord release];
+	[super dealloc];
+}
+
 - (void)awakeFromNib
 {
 	[songsController setDelegate:self];

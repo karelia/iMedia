@@ -48,7 +48,7 @@
 
 - (void)dealloc
 {
-	[myUnknownArtist autorelease];
+	[myUnknownArtist release];
 	[super dealloc];
 }
 

@@ -48,6 +48,15 @@
 	return self;
 }
 
+- (void)dealloc
+{
+    [mySelection release];
+    [myImages release];
+    [myFilteredImages release];
+    [mySearchString release];
+    [super dealloc];
+}
+
 - (void)awakeFromNib
 {
 	[oPhotoView setDelegate:self];

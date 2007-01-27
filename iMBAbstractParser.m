@@ -67,6 +67,7 @@
 	[myFileWatcher release];
 	[myDatabase release];
 	[myCachedLibrary release];
+	[myBrowser release];
 	[super dealloc];
 }
 

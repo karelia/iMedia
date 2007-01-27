@@ -31,8 +31,8 @@
 	NSString *searchString;
 	
 	@private
-		id newObject;
-		id myDelegate;
+		id newObject;		// Is this an iVar *and* a method?
+		id myDelegate;		// not retained
 }
 
 #pragma mark ACCESSORS

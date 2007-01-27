@@ -137,6 +137,13 @@ static NSImage *_missing = nil;
 	[oPhotoView setNeedsDisplay:YES];
 }
 
+- (void)clearCache
+{
+	[myCacheLock lock];	// ============================================================ LOCK
+	[myCache removeAllObjects];
+	[myCacheLock unlock];	// ======================================================== UNLOCK
+}
+
 #pragma mark -
 #pragma mark Media Browser Protocol Overrides
 

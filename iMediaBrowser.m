@@ -234,6 +234,7 @@ static NSMutableDictionary *_parsers = nil;
 	[myBackgroundLoadingLock release];
 	[myPreferredBrowserTypes release];
 	[myIdentifier release];
+	[mySelectedBrowser release];
 	
 	[super dealloc];
 }
@@ -339,7 +340,8 @@ static NSMutableDictionary *_parsers = nil;
 	
 	[myToolbar setDelegate:self];
 	[[self window] setToolbar:myToolbar];
-	
+
+#ifndef DEBUG
 	//select the first browser
 	if ([myMediaBrowsers count] > 0) {
 		if (canRestoreLastSelectedBrowser)
@@ -353,7 +355,7 @@ static NSMutableDictionary *_parsers = nil;
 			[self showMediaBrowser:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class]) reuseCachedData:NO];
 		}
 	}
-	
+#endif	
 	NSString *position = [d objectForKey:@"WindowPosition"];
 	if (position) {
 		NSRect r = NSRectFromString(position);
@@ -472,6 +474,8 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)backgroundLoadData:(id)reuseCachedDataArgument
 {
+	NSLog(@"backgroundLoadData:%d", reuseCachedDataArgument);
+	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
    
 	BOOL reuseCachedData = [reuseCachedDataArgument boolValue];
@@ -558,6 +562,9 @@ static NSMutableDictionary *_parsers = nil;
 	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:NO];
 	
 	[pool release];
+	
+	NSLog(@"backgroundLoadData:  END");
+
 }
 
 - (void)recursivelyAddItemsToMenu:(NSMenu *)menu withNode:(iMBLibraryNode *)node indentation:(int)indentation
@@ -771,6 +778,18 @@ static NSMutableDictionary *_parsers = nil;
 - (BOOL)showsFilenamesInPhotoBasedBrowsers
 {
 	return myFlags.showFilenames;
+}
+
+- (IBAction) clearCache:(id)sender
+{
+	if ([mySelectedBrowser respondsToSelector:@selector(clearCache)])
+	{
+		[mySelectedBrowser clearCache];
+	}
+	else
+	{
+		NSBeep();
+	}
 }
 
 #pragma mark -

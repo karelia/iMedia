@@ -74,6 +74,7 @@
 	[myProcessingImages release];
 	[myInFlightImageOperations release];
 	[myCacheLock release];
+	[myImageRecordsToLoad release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     
 	[super dealloc];
