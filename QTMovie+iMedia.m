@@ -34,45 +34,68 @@
 
 @implementation QTMovie ( iMedia )
 
-// Get current time, or poster time, or ~20 seconds in
+// Get current time, or poster time, or <1 minute in
+
+#define CONST_SECONDS (32)
 
 - (NSImage *)betterPosterImage;
 {
 	NSDictionary *attr = [self movieAttributes];
 	
 	QTTime qttime = QTZeroTime;
-	NSValue *timeValue = [attr objectForKey:QTMoviePosterTimeAttribute];
-	if (nil != timeValue)
+	NSValue *posterTimeValue = [attr objectForKey:QTMoviePosterTimeAttribute];
+	if (nil != posterTimeValue)
 	{
-		qttime = [timeValue QTTimeValue];
+		qttime = [posterTimeValue QTTimeValue];
 	}
 	
-	// if zero, get 20 seconds in, capped at 1/5 movie time.
+	// if zero, get ~1 minute in, capped at 1/5 movie time.
 	if (NSOrderedSame == QTTimeCompare(qttime, QTZeroTime))
-	{
-        qttime.timeScale = [[attr objectForKey:QTMovieTimeScaleAttribute] longValue];
-        if (qttime.timeScale == 0)
-            qttime.timeScale = 60;
-		qttime.timeValue = qttime.timeScale * 20;
-		
-		NSValue *timeValue = [attr objectForKey:QTMovieDurationAttribute];
-		if (nil != timeValue)
+	{		
+		NSValue *durValue = [attr objectForKey:QTMovieDurationAttribute];
+		if (nil != durValue)
 		{
-			QTTime capTime = [timeValue QTTimeValue];
-			capTime.timeValue /= 5;
-			if (NSOrderedDescending == QTTimeCompare(qttime, capTime))	// 20 seconds > 1/5 total?
+			QTTime durTime = [durValue QTTimeValue];
+			if (durTime.timeScale == 0)
+				durTime.timeScale = 60;	// make sure there's a time scale
+			
+			QTTime constTime = durTime;
+			constTime.timeValue = durTime.timeScale * CONST_SECONDS;	// n seconds in -- get past commercials, titles, etc.
+			
+			QTTime capTime = durTime;
+			capTime.timeValue /= 5;							// cap off at one-fifth of length
+			
+//			NSLog(@"durTime = %qi/%d; constTime = %qi/%d; capTime = %qi/%d", durTime.timeValue, durTime.timeScale, constTime.timeValue, constTime.timeScale, capTime.timeValue, capTime.timeScale);
+			
+			if (NSOrderedDescending == QTTimeCompare(constTime, capTime))	// const seconds > 1/5 total?
 			{
 				qttime = capTime;
+//				NSLog(@"Capping off at %qi/%d", qttime.timeValue, qttime.timeScale);
+			}
+			else
+			{
+				qttime = constTime;
+//				NSLog(@"Using constant value of %qi/%d", qttime.timeValue, qttime.timeScale);
 			}
 		}
         // Move the time to the next key frame so QT to speed things up a little
         OSType		whichMediaType = VIDEO_TYPE;
         TimeValue   newTimeValue = 0;
         GetMovieNextInterestingTime([self quickTimeMovie], nextTimeSyncSample, 1, &whichMediaType, qttime.timeValue, 0, &newTimeValue, NULL);
-        if (newTimeValue > 0 && newTimeValue < qttime.timeValue * 1.25) // stay within a reasonable time
+        if (newTimeValue > 0 && newTimeValue <= qttime.timeValue * 1.5) // stay within a reasonable time
+		{
             qttime.timeValue = newTimeValue;
+//			NSLog(@"Adjusting to %qi/%d", qttime.timeValue, qttime.timeScale);
+		}
 	}
-    return [self frameImageAtTime:qttime];
+#ifdef DEBUG
+	NSDate *timer = [NSDate date];
+#endif
+    NSImage *result = [self frameImageAtTime:qttime];
+#ifdef DEBUG
+	NSLog(@"Time to load better poster image: %.3f", fabs([timer timeIntervalSinceNow]));
+#endif
+	return result;
 }
 
 - (NSImage *)betterPosterImageWithMaxSize:(NSSize)maxSize;  // Shrinks the image if it's larger than maxSize

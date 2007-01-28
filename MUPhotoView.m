@@ -1796,7 +1796,7 @@ static NSDictionary *sTitleAttributes = nil;
 	if (start >= photoCount)
 		return NSMakeRange(NSNotFound, 0);
 	
-	unsigned finish = [self photoIndexForPoint:NSMakePoint(NSMaxX(rect), NSMaxY(rect))];
+	unsigned finish = [self photoIndexForPoint:NSMakePoint(NSMaxX(rect)-1, NSMaxY(rect)-1)];
 	if (finish >= photoCount)
 		finish = photoCount - 1;
     
