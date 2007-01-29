@@ -801,7 +801,7 @@ static NSDictionary *sTitleAttributes = nil;
 		unsigned clickedIndex = [self photoIndexForPoint:mouseDownPoint];
         NSImage *clickedImage = [self photoAtIndex:clickedIndex];
         BOOL flipped = [clickedImage isFlipped];
-        [clickedImage setFlipped:NO];
+        [clickedImage setFlipped:YES];
         NSSize scaledSize = [self scaledPhotoSizeForSize:[clickedImage size]];
 		if (nil == clickedImage) { // creates a red image, which should let the user/developer know something is wrong
             clickedImage = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
@@ -817,6 +817,7 @@ static NSDictionary *sTitleAttributes = nil;
 		[clickedImage drawInRect:NSMakeRect(0,0,scaledSize.width,scaledSize.height) fromRect:NSMakeRect(0,0,[clickedImage size].width,[clickedImage size].height)  operation:NSCompositeCopy fraction:0.5];
 		[dragImage unlockFocus];
         
+		[dragImage setFlipped:YES];
         [clickedImage setFlipped:flipped];
 
 		// if there's more than one image, put a badge on the photo
