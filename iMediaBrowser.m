@@ -341,7 +341,11 @@ static NSMutableDictionary *_parsers = nil;
 	[myToolbar setDelegate:self];
 	[[self window] setToolbar:myToolbar];
 
-#ifndef DEBUG
+#ifdef DEBUG
+	// DEBUG -- don't load, and present an empty window.
+	[oSplitView setHidden:YES];
+	[oLoadingView setHidden:YES];
+#else
 	//select the first browser
 	if ([myMediaBrowsers count] > 0) {
 		if (canRestoreLastSelectedBrowser)
