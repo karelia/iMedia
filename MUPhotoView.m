@@ -801,7 +801,7 @@ static NSDictionary *sTitleAttributes = nil;
 		unsigned clickedIndex = [self photoIndexForPoint:mouseDownPoint];
         NSImage *clickedImage = [self photoAtIndex:clickedIndex];
         BOOL flipped = [clickedImage isFlipped];
-        [clickedImage setFlipped:NO];
+        [clickedImage setFlipped:YES];
         NSSize scaledSize = [self scaledPhotoSizeForSize:[clickedImage size]];
 		if (nil == clickedImage) { // creates a red image, which should let the user/developer know something is wrong
             clickedImage = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
@@ -817,6 +817,7 @@ static NSDictionary *sTitleAttributes = nil;
 		[clickedImage drawInRect:NSMakeRect(0,0,scaledSize.width,scaledSize.height) fromRect:NSMakeRect(0,0,[clickedImage size].width,[clickedImage size].height)  operation:NSCompositeCopy fraction:0.7];
 		[dragImage unlockFocus];
         
+		[clickedImage setFlipped:flipped];
 
 		// if there's more than one image, put a badge on the photo
 		if ([[self selectionIndexes] count] > 1) {
@@ -835,24 +836,30 @@ static NSDictionary *sTitleAttributes = nil;
 			int minY = maxY - diameter;
 			int minX = maxX - diameter;
 			NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(minX,minY,maxX-minX,maxY-minY)];
-			// draw the circle
-			[dragImage lockFocus];
-			[[NSColor colorWithDeviceRed:1 green:0.1 blue:0.1 alpha:0.7] set];
-			[circle fill];
-			[dragImage unlockFocus];
 			
 			// draw the string
 			NSPoint point;
 			point.x = maxX - ((maxX - minX) / 2) - 1 - (stringSize.width / 2);
 			point.y = maxY - diameter + (stringSize.height / 2) - 6;
 			
+			NSAffineTransform *t = [NSAffineTransform transform];
+			[t translateXBy:0 yBy:maxY];
+			[t scaleXBy:1 yBy:-1];
+			
 			[dragImage lockFocus];
+			[t concat];
+			[[NSColor colorWithDeviceRed:1 green:0.1 blue:0.1 alpha:0.7] set];
+			[circle fill];
 			[badgeString drawAtPoint:point];
+			[t invert];
+			[t concat];
 			[dragImage unlockFocus];
 
 			[badgeString release];
 			[attributes release];
 		}
+		
+		[dragImage setFlipped:YES];
 		
         // get the pasteboard and register the returned types with delegate as the owner
 		NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSDragPboard];
