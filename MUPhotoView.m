@@ -801,7 +801,7 @@ static NSDictionary *sTitleAttributes = nil;
 		unsigned clickedIndex = [self photoIndexForPoint:mouseDownPoint];
         NSImage *clickedImage = [self photoAtIndex:clickedIndex];
         BOOL flipped = [clickedImage isFlipped];
-        [clickedImage setFlipped:YES];
+        [clickedImage setFlipped:NO];
         NSSize scaledSize = [self scaledPhotoSizeForSize:[clickedImage size]];
 		if (nil == clickedImage) { // creates a red image, which should let the user/developer know something is wrong
             clickedImage = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
@@ -814,11 +814,9 @@ static NSDictionary *sTitleAttributes = nil;
 
 		// draw the drag image as a semi-transparent copy of the image the user dragged, and optionally a red badge indicating the number of photos
         [dragImage lockFocus];
-		[clickedImage drawInRect:NSMakeRect(0,0,scaledSize.width,scaledSize.height) fromRect:NSMakeRect(0,0,[clickedImage size].width,[clickedImage size].height)  operation:NSCompositeCopy fraction:0.5];
+		[clickedImage drawInRect:NSMakeRect(0,0,scaledSize.width,scaledSize.height) fromRect:NSMakeRect(0,0,[clickedImage size].width,[clickedImage size].height)  operation:NSCompositeCopy fraction:0.7];
 		[dragImage unlockFocus];
         
-		[dragImage setFlipped:YES];
-        [clickedImage setFlipped:flipped];
 
 		// if there's more than one image, put a badge on the photo
 		if ([[self selectionIndexes] count] > 1) {
@@ -832,9 +830,9 @@ static NSDictionary *sTitleAttributes = nil;
 			diameter += 5;
 			
 			// calculate the badge circle
-			int minY = 5;
+			int maxY = [dragImage size].height - 5;
 			int maxX = [dragImage size].width - 5;
-			int maxY = minY + diameter;
+			int minY = maxY - diameter;
 			int minX = maxX - diameter;
 			NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(minX,minY,maxX-minX,maxY-minY)];
 			// draw the circle
@@ -845,15 +843,13 @@ static NSDictionary *sTitleAttributes = nil;
 			
 			// draw the string
 			NSPoint point;
-			point.x = maxX - ((maxX - minX) / 2) - 1;
-			point.y = (maxY - minY) / 2;
-			point.x = point.x - (stringSize.width / 2);
-			point.y = point.y - (stringSize.height / 2) + 7;
+			point.x = maxX - ((maxX - minX) / 2) - 1 - (stringSize.width / 2);
+			point.y = maxY - diameter + (stringSize.height / 2) - 6;
 			
 			[dragImage lockFocus];
 			[badgeString drawAtPoint:point];
 			[dragImage unlockFocus];
-			
+
 			[badgeString release];
 			[attributes release];
 		}
