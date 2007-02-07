@@ -26,6 +26,9 @@
 #import "iMedia.h"
 #import <QTKit/QTKit.h>
 
+static NSImage *sSongIcon = nil;
+static NSImage *sDRMIcon = nil;
+
 @implementation iMBMusicFolder
 
 + (void)load
@@ -33,6 +36,13 @@
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
+	
+	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
+	NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
+	sSongIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+	iconPath = [bndl pathForResource:@"iTunesDRM" ofType:@"png"];
+	sDRMIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+	
 	
 	[pool release];
 }
@@ -86,11 +96,6 @@
 	NSMutableArray *movieTypes = [NSMutableArray arrayWithArray: [QTMovie movieFileTypes:QTIncludeAllTypes]];
 	[movieTypes removeObject:@"kar"];
 	NSMutableArray *tracks = [NSMutableArray array];
-	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
-	NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
-	NSImage *songIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
-	iconPath = [bndl pathForResource:@"iTunesDRM" ofType:@"png"];
-	NSImage *drmIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
 	
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;
@@ -170,17 +175,17 @@
 						[song setObject:time forKey:@"Total Time"];
 						if (![movie isDRMProtected])
 						{
-							[song setObject:songIcon forKey:@"Icon"];
+							[song setObject:sSongIcon forKey:@"Icon"];
 						}
 						else
 						{
-							[song setObject:drmIcon forKey:@"Icon"];
+							[song setObject:sDRMIcon forKey:@"Icon"];
 						}
 					}
 					else
 					{
 						[song setObject:[NSNumber numberWithInt:0] forKey:@"Total Time"];
-						[song setObject:songIcon forKey:@"Icon"];
+						[song setObject:sSongIcon forKey:@"Icon"];
 					}
 					
 					[song setObject:filePath forKey:@"Location"];

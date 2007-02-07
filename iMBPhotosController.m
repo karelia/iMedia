@@ -44,13 +44,28 @@
 - (NSString *)iconNameForPlaylist:(NSString*)name;
 @end
 
-static NSImage *_missing = nil;
+static NSImage *sMissingImage = nil;
+static Class sNSCGImageRepClass = nil;
 
 @implementation iMBPhotosController
 
 + (void)initialize
 {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+	
+	sNSCGImageRepClass = NSClassFromString(@"NSCGImageRep");	// private class; we're being careful here
+	if (![sNSCGImageRepClass respondsToSelector:@selector(initWithCGImage:)])
+	{
+		sNSCGImageRepClass = nil;	// make sure this class will do the job for us!
+	}
+	
+	NSString *path = [[NSBundle bundleForClass:[iMBPhotosController class]] pathForResource:@"missingImage" ofType:@"png"];
+	sMissingImage = [[NSImage alloc] initWithContentsOfFile:path];
+	if (!sMissingImage)
+		NSLog(@"missingImage.png is missing. This can cause bad things to happen");
+	
+	[pool release];
 }
 
 - (id) initWithPlaylistController:(NSTreeController*)ctrl
@@ -62,14 +77,6 @@ static NSImage *_missing = nil;
 		myCacheLock = [[NSLock alloc] init];
 		myInFlightImageOperations = [[NSMutableArray array] retain];
 		myProcessingImages = [[NSMutableSet set] retain];
-		
-		if (!_missing)
-		{
-			NSString *path = [[NSBundle bundleForClass:[iMBPhotosController class]] pathForResource:@"missingImage" ofType:@"png"];
-			_missing = [[NSImage alloc] initWithContentsOfFile:path];
-			if (!_missing)
-				NSLog(@"missingImage.png is missing. This can cause bad things to happen");
-		}
 		
 		if (![[NSBundle bundleForClass:[iMBPhotosController class]] loadNibFile:@"iPhoto" 
                                                          externalNameTable:[NSDictionary dictionaryWithObjectsAndKeys:self, @"NSOwner", nil] 
@@ -389,13 +396,22 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 					// Create a new image to receive the Quartz image data.
 					img = [[[NSImage alloc] initWithSize:imageRect.size] autorelease];
 					[img setFlipped:YES];
-					[img lockFocus];
 					
-					// Get the Quartz context and draw.
-					imageContext = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
-					CGContextDrawImage(imageContext, *(CGRect*)&imageRect, theCGImage);
-					[img unlockFocus];
-					
+					// Try to use private NSCGImageRep
+					if (sNSCGImageRepClass)
+					{
+						id cgRep = [[[sNSCGImageRepClass alloc] initWithCGImage:theCGImage] autorelease];
+						[img addRepresentation:cgRep];
+					}
+					else	// not found, go the old-fashioned route (which may have some sort of deadlock with drawing?
+					{
+						[img lockFocus];
+						
+						// Get the Quartz context and draw.
+						imageContext = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+						CGContextDrawImage(imageContext, *(CGRect*)&imageRect, theCGImage);
+						[img unlockFocus];
+					}
 					CFRelease(theCGImage);
 				}
 				CFRelease(source);
@@ -406,7 +422,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 		
 		if (!img) // we have a bad egg... need to display a ? icon
 		{
-			img = _missing;
+			img = sMissingImage;
 		}
 		
 		[myCacheLock lock];	// ============================================================ LOCK

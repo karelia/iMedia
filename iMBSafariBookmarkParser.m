@@ -58,7 +58,7 @@
 
 - (iMBLibraryNode *)recursivelyParseItem:(NSDictionary *)item
 {
-	iMBLibraryNode *parsed = [[iMBLibraryNode alloc] init];
+	iMBLibraryNode *parsed = [[[iMBLibraryNode alloc] init] autorelease];
 	
 	if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksBar"])
 	{
@@ -75,7 +75,6 @@
 			 [[item objectForKey:@"Title"] isEqualToString:@"History"] ||
 			 [[item objectForKey:@"Title"] isEqualToString:@"All RSS Feeds"])
 	{
-		[parsed release];
 		return nil;
 	}
 	else
