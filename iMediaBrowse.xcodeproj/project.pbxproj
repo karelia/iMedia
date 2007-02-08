@@ -166,6 +166,8 @@
 		CE1116F90B69593D00783570 /* iMBScreenSaverPicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE11152D0B6953C800783570 /* iMBScreenSaverPicturesParser.h */; };
 		CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE1117DD0B695D8F00783570 /* iMBiChatIconsParser.h */; };
 		CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1117DE0B695D8F00783570 /* iMBiChatIconsParser.m */; };
+		CE58DAF00B7BDCD400BECE74 /* reload_border.png in Resources */ = {isa = PBXBuildFile; fileRef = CE58DAEC0B7BDC8A00BECE74 /* reload_border.png */; };
+		CE58DB500B7BE14900BECE74 /* reload_border_on.png in Resources */ = {isa = PBXBuildFile; fileRef = CE58DB4F0B7BE14900BECE74 /* reload_border_on.png */; };
 		CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */ = {isa = PBXBuildFile; fileRef = CE7570610ADEE8CB009FE941 /* missingImage.png */; };
 		CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */; };
 		CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC1450A2C0AA000179BA3 /* Movies.nib */; };
@@ -445,6 +447,8 @@
 		CE55A6A00AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/Links.nib; sourceTree = "<group>"; };
 		CE55A6A10AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE55A6A30AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/Movies.nib; sourceTree = "<group>"; };
+		CE58DAEC0B7BDC8A00BECE74 /* reload_border.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload_border.png; sourceTree = "<group>"; };
+		CE58DB4F0B7BE14900BECE74 /* reload_border_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload_border_on.png; sourceTree = "<group>"; };
 		CE6F4A5B0AC456CA0094B818 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/Contacts.nib; sourceTree = "<group>"; };
 		CE6F4A5C0AC456CF0094B818 /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/Contacts.nib; sourceTree = "<group>"; };
 		CE6F4A5D0AC456D10094B818 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/Contacts.nib; sourceTree = "<group>"; };
@@ -760,6 +764,8 @@
 			isa = PBXGroup;
 			children = (
 				CEFC515B0B792BD1009F114D /* reload.png */,
+				CE58DAEC0B7BDC8A00BECE74 /* reload_border.png */,
+				CE58DB4F0B7BE14900BECE74 /* reload_border_on.png */,
 				7953E6BC0A2E8DC600C7AFBB /* ABGroup.png */,
 				79430F130A2C2901009E0FC7 /* MBSoundEffect.png */,
 				7966412B0A2BE62E00941D65 /* placeholder.png */,
@@ -1104,6 +1110,8 @@
 				E20764B80B597D8D00EAC95C /* tiny-reload.png in Resources */,
 				CE05A2390B6A89BE00A25808 /* MediaBrowser.nib in Resources */,
 				CEFC515C0B792BD1009F114D /* reload.png in Resources */,
+				CE58DAF00B7BDCD400BECE74 /* reload_border.png in Resources */,
+				CE58DB500B7BE14900BECE74 /* reload_border_on.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

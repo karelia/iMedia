@@ -114,8 +114,8 @@
 			placardFrame.origin.y = NSMaxY(vertScrollerFrame);
 		}
 		// Adjust WIDTH of placard
-		placardFrame.size.width = vertScrollerFrame.size.width + 1.0;
-		placardFrame.origin.x = [self bounds].size.width - placardFrame.size.width + 1.0;
+		placardFrame.size.width = vertScrollerFrame.size.width;
+		placardFrame.origin.x = [self bounds].size.width - placardFrame.size.width - 1.0;
 		
 		// Move the placard into place
 		[placard setFrame:placardFrame];

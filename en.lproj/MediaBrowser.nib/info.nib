@@ -9,7 +9,7 @@
 		<key>484</key>
 		<string>1124 1033 311 87 0 0 2560 1578 </string>
 		<key>523</key>
-		<string>685 355 152 257 0 0 1440 878 </string>
+		<string>927 475 292 336 0 0 1920 1178 </string>
 	</dict>
 	<key>IBFramework Version</key>
 	<string>446.1</string>
@@ -20,7 +20,7 @@
 		<integer>523</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>8L2127</string>
+	<string>8L127</string>
 	<key>IBUsesTextArchiving</key>
 	<true/>
 </dict>
