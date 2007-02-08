@@ -10,7 +10,13 @@
         {CLASS = NSObject; LANGUAGE = ObjC; }, 
         {CLASS = iMBLibraryOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
         {
-            ACTIONS = {playlistSelected = id; }; 
+            CLASS = iMBPlacardScrollView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {placard = NSView; }; 
+            SUPERCLASS = NSScrollView; 
+        }, 
+        {
+            ACTIONS = {playlistSelected = id; reloadMediaBrowser = id; }; 
             CLASS = iMediaBrowser; 
             LANGUAGE = ObjC; 
             OUTLETS = {

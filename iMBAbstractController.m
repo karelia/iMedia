@@ -136,9 +136,9 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	[myController rearrangeObjects];
 }
 
-- (IBAction)reloadMediaBrowser:(id)sender
+- (IBAction)reloadMediaBrowser:(id)sender		// OBSOLETE - GOING AWAY WHEN THE NIBS LOSE THIER VERSION
 {
-   [[iMediaBrowser sharedBrowser] reloadMediaBrowser];
+	[[iMediaBrowser sharedBrowser] reloadMediaBrowser:sender];
 }
 
 - (NSTreeController *)controller

@@ -184,6 +184,9 @@
 		CEC85B0E0B5150C2006DA6AA /* TimeValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
 		CEF3F38609E449FF00D0058F /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF3F38409E449FF00D0058F /* NSString+iMedia.m */; };
+		CEFC515C0B792BD1009F114D /* reload.png in Resources */ = {isa = PBXBuildFile; fileRef = CEFC515B0B792BD1009F114D /* reload.png */; };
+		CEFC515F0B792C11009F114D /* iMBPlacardScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEFC515D0B792C11009F114D /* iMBPlacardScrollView.h */; };
+		CEFC51600B792C11009F114D /* iMBPlacardScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEFC515E0B792C11009F114D /* iMBPlacardScrollView.m */; };
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
@@ -471,6 +474,9 @@
 		CEE09FEA09ED9958004850FB /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/Links.nib; sourceTree = "<group>"; };
 		CEF3F38309E449FF00D0058F /* NSString+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+iMedia.h"; sourceTree = "<group>"; };
 		CEF3F38409E449FF00D0058F /* NSString+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+iMedia.m"; sourceTree = "<group>"; };
+		CEFC515B0B792BD1009F114D /* reload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload.png; sourceTree = "<group>"; };
+		CEFC515D0B792C11009F114D /* iMBPlacardScrollView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBPlacardScrollView.h; sourceTree = "<group>"; };
+		CEFC515E0B792C11009F114D /* iMBPlacardScrollView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBPlacardScrollView.m; sourceTree = "<group>"; };
 		D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeValueTransformer.h; sourceTree = "<group>"; };
 		D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeValueTransformer.m; sourceTree = "<group>"; };
 		D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryItemsValueTransformer.h; sourceTree = "<group>"; };
@@ -753,6 +759,7 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CEFC515B0B792BD1009F114D /* reload.png */,
 				7953E6BC0A2E8DC600C7AFBB /* ABGroup.png */,
 				79430F130A2C2901009E0FC7 /* MBSoundEffect.png */,
 				7966412B0A2BE62E00941D65 /* placeholder.png */,
@@ -833,6 +840,8 @@
 				794835F40A2709AD007E8268 /* MUPhotoView.m */,
 				A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */,
 				A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */,
+				CEFC515D0B792C11009F114D /* iMBPlacardScrollView.h */,
+				CEFC515E0B792C11009F114D /* iMBPlacardScrollView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -959,6 +968,7 @@
 				CE1114E60B6950C200783570 /* iMBDesktopPicturesParser.h in Headers */,
 				CE1116F90B69593D00783570 /* iMBScreenSaverPicturesParser.h in Headers */,
 				CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */,
+				CEFC515F0B792C11009F114D /* iMBPlacardScrollView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1093,6 +1103,7 @@
 				CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */,
 				E20764B80B597D8D00EAC95C /* tiny-reload.png in Resources */,
 				CE05A2390B6A89BE00A25808 /* MediaBrowser.nib in Resources */,
+				CEFC515C0B792BD1009F114D /* reload.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1182,6 +1193,7 @@
 				CE1114E70B6950C200783570 /* iMBDesktopPicturesParser.m in Sources */,
 				CE1116F80B69593D00783570 /* iMBScreenSaverPicturesParser.m in Sources */,
 				CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */,
+				CEFC51600B792C11009F114D /* iMBPlacardScrollView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -29,6 +29,7 @@
 #import "LibraryItemsValueTransformer.h"
 #import "RBSplitView.h"
 #import "RBSplitSubview.h"
+#import "iMBPlacardScrollView.h"
 
 #import <QuickTime/QuickTime.h>
 #import <QTKit/QTKit.h>
@@ -270,6 +271,8 @@ static NSMutableDictionary *_parsers = nil;
 	[[oPlaylists enclosingScrollView] retain];
 	[oPlaylistPopup retain];
 	
+	// [((iMBPlacardScrollView *)[oPlaylists enclosingScrollView]) setSide:PLACARD_BOTTOM_RIGHT];
+	
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
 	myLoadedParsers = [[NSMutableDictionary alloc] init];
 	myUserDroppedParsers = [[NSMutableArray alloc] init];
@@ -414,7 +417,7 @@ static NSMutableDictionary *_parsers = nil;
 	return nil;
 }
 
-- (void)reloadMediaBrowser
+- (IBAction)reloadMediaBrowser:(id)sender
 {
 	[self showMediaBrowser:NSStringFromClass([mySelectedBrowser class]) reuseCachedData:NO];
 }

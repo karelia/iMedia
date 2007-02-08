@@ -106,7 +106,7 @@
 - (NSArray*)addCustomFolders:(NSArray*)folderPaths;
 
 // reloads the current selected browser
-- (void)reloadMediaBrowser;
+- (IBAction)reloadMediaBrowser:(id)sender;
 
 - (void)setShowsFilenamesInPhotoBasedBrowsers:(BOOL)flag;
 - (BOOL)showsFilenamesInPhotoBasedBrowsers;
