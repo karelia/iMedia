@@ -1,6 +1,5 @@
 {
     IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = IMTimeFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
         {
             ACTIONS = {reloadMediaBrowser = id; }; 
