@@ -34,7 +34,8 @@
 
 + (void)initialize
 {
-	[iMBContactsController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+	[iMBContactsController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"itemCount"];
+	[iMBContactsController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"itemCountString"];
 }
 
 - (id)initWithPlaylistController:(NSTreeController *)ctrl
@@ -67,6 +68,17 @@
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
 	[oPhotoView setPhotoHorizontalSpacing:15];
 	[oPhotoView setPhotoVerticalSpacing:15];
+
+	NSDictionary *optionsDict =
+		[NSDictionary dictionaryWithObject:
+			LocalizedStringInThisBundle(@"%{value1}@ contacts", @"Formatting: number of contacts in address book")
+									forKey:@"NSDisplayPattern"];
+	
+	[counterField bind:@"displayPatternValue1"
+			  toObject:self
+		   withKeyPath:@"imageCount"
+			   options:optionsDict];
+#warning It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
 }
 
 - (void)refilter

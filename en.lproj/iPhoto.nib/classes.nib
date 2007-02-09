@@ -27,7 +27,7 @@
             ACTIONS = {search = id; }; 
             CLASS = iMBPhotosController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
+            OUTLETS = {counterField = NSTextField; oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
             SUPERCLASS = iMBAbstractController; 
         }, 
         {

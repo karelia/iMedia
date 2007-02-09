@@ -32,6 +32,8 @@
 {
 	IBOutlet MUPhotoView	*oPhotoView;
 	IBOutlet NSSlider		*oSlider;
+	IBOutlet NSTextField	*counterField;
+
 	NSMutableDictionary		*myCache;
 	NSMutableIndexSet		*mySelection;
 	NSArray					*myImages;

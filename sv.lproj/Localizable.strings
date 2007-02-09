@@ -1,11 +1,26 @@
+﻿/* Formatting: number of contacts in address book */
+"%{value1}@ contacts" = "%{value1}@ contacts";
+
+/* Formatting: tracks of audio -- song or sound effect */
+"%{value1}@ movies" = "%{value1}@ movies";
+
+/* Formatting: number of photos displayed */
+"%{value1}@ photos" = "%{value1}@ photos";
+
+/* Formatting: tracks of audio -- song or sound effect */
+"%{value1}@ tracks" = "%{value1}@ tracks";
+
 /* Root Node Name of address book */
 "Address Book" = "Adressbok";
 
-/* Aperture Node Name */
+/* Aperture */
 "Aperture" = "Aperture";
 
 /* Artist */
 "Apple Loop" = "Apple Loop";
+
+/* Table Column Title - music artist or creator */
+"Artist" = "Artist";
 
 /* Name of Data Type */
 "Audio" = "Ljud";
@@ -22,9 +37,14 @@
 /* artist name */
 "Demo" = "Demo";
 
+/* folder name */
+"Desktop Pictures" = "Desktop Pictures";
+
 /* Favourite Movies folder name
    Favourite Pictures folder name
    Favourite Music folder name */
+
+
 "Favourites" = "Favoriter";
 
 /* FireFox */
@@ -35,6 +55,9 @@
 
 /* Node name */
 "GarageBand Demo Songs" = "GarageBand Demolåtar";
+
+/* folder name */
+"iChat Icons" = "iChat Icons";
 
 /* iLife Sound Effects folder name */
 "iLife Sound Effects" = "iLife Ljudeffekter";
@@ -54,6 +77,12 @@
 /* Name of Data Type */
 "Links" = "Länkar";
 
+/* Text that shows that we are loading contents */
+"Loading..." = "Laddar...";
+
+/* Window name of iMediaBrowser */
+"Media" = "Media";
+
 /* Name of Data Type */
 "Movies" = "Filmer";
 
@@ -72,9 +101,6 @@
 /* Party Shuffle as titled in iTunes source list */
 "Party Shuffle" = "Partyblandning";
 
-/* Name of Data Type */
-"Photos" = "Bilder";
-
 /* Name of your 'Pictures' folder in your home directory */
 "Pictures Folder" = "Bilder";
 
@@ -83,16 +109,34 @@
 
 /* Purchased folder as titled in iTunes source list
    Purchased folder  as titled in iTunes source list */
+
 "Purchased" = "Inköp";
 
 /* Safari */
 "Safari" = "Safari";
 
-/* Photo selection for pasteboard album name */
-"Selection" = "Markering";
+/* Screen Savers -- source of some images in iMedia */
+"Screen Savers" = "Screen Savers";
 
-/* Unkown music key */
+/* ~/Library/Sounds folder name */
+"Sounds Folder" = "Sounds Folder";
+
+/* Spotlight searching pseudo-folder name */
+"Spotlight" = "Spotlight";
+
+/* Table Column Title - time of song or audio track */
+"Time" = "Tid";
+
+/* Table Column Title - title of song or audio track */
+"Title" = "Title";
+
+/* Artist of sound is unknown
+   Unkown music key */
+
 "Unknown" = "Okänd";
+
+/* folder name */
+"User Pictures" = "User Pictures";
 
 /* Videos as titled in iTunes source list */
 "Videos" = "Filmer";

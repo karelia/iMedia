@@ -53,6 +53,7 @@ static Class sNSCGImageRepClass = nil;
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCountString"];
 	
 	sNSCGImageRepClass = NSClassFromString(@"NSCGImageRep");	// private class; we're being careful here
 	if (![sNSCGImageRepClass respondsToSelector:@selector(initWithCGImage:)])
@@ -118,6 +119,20 @@ static Class sNSCGImageRepClass = nil;
 #if SAMPLE_INCOMING_DRAG
 	[oPhotoView registerForDraggedTypes:[NSArray arrayWithObject:NSTIFFPboardType]];
 #endif
+
+
+	NSDictionary *optionsDict =
+		[NSDictionary dictionaryWithObject:
+			LocalizedStringInThisBundle(@"%{value1}@ photos", @"Formatting: number of photos displayed")
+									forKey:@"NSDisplayPattern"];
+	
+	[counterField bind:@"displayPatternValue1"
+			  toObject:self
+		   withKeyPath:@"imageCount"
+			   options:optionsDict];
+#warning It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
+
+
 }
 
 - (void)refilter

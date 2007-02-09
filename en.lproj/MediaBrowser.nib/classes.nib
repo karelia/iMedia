@@ -25,6 +25,7 @@
                 mySelectedBrowser = id; 
                 oBrowserView = NSView; 
                 oLoading = NSProgressIndicator; 
+                oLoadingText = NSTextField; 
                 oLoadingView = NSBox; 
                 oPlaylistContainer = NSView; 
                 oPlaylistPopup = NSPopUpButton; 

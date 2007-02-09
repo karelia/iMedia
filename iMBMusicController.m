@@ -74,6 +74,24 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 - (void)awakeFromNib
 {
 	[songsController setDelegate:self];
+	
+	[[[table tableColumnWithIdentifier:@"Name"] headerCell] setStringValue:
+		LocalizedStringInThisBundle(@"Title", @"Table Column Title - title of song or audio track")];
+	[[[table tableColumnWithIdentifier:@"Artist"] headerCell] setStringValue:
+		LocalizedStringInThisBundle(@"Artist", @"Table Column Title - music artist or creator")];
+	[[[table tableColumnWithIdentifier:@"Time"] headerCell] setStringValue:
+		LocalizedStringInThisBundle(@"Time", @"Table Column Title - time of song or audio track")];
+
+	NSDictionary *optionsDict =
+		[NSDictionary dictionaryWithObject:
+			LocalizedStringInThisBundle(@"%{value1}@ tracks", @"Formatting: tracks of audio -- song or sound effect")
+									forKey:@"NSDisplayPattern"];
+	
+	[counterField bind:@"displayPatternValue1"
+			  toObject:songsController
+		   withKeyPath:@"arrangedObjects.@count"
+			   options:optionsDict];
+#warning It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
 }
 
 #pragma mark Protocol Methods

@@ -26,7 +26,7 @@
             ACTIONS = {play = id; search = id; }; 
             CLASS = iMBMoviesController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
+            OUTLETS = {counterField = NSTextField; oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
             SUPERCLASS = iMBAbstractController; 
         }, 
         {CLASS = iMBPhotoView; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }, 

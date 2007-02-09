@@ -90,6 +90,17 @@
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
 	[oPhotoView setPhotoHorizontalSpacing:15];
 	[oPhotoView setPhotoVerticalSpacing:15];
+
+	NSDictionary *optionsDict =
+		[NSDictionary dictionaryWithObject:
+			LocalizedStringInThisBundle(@"%{value1}@ movies", @"Formatting: tracks of audio -- song or sound effect")
+									forKey:@"NSDisplayPattern"];
+	
+	[counterField bind:@"displayPatternValue1"
+			  toObject:self
+		   withKeyPath:@"imageCount"
+			   options:optionsDict];
+#warning It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
 }
 
 - (IBAction)play:(id)sender
@@ -146,6 +157,8 @@
 {
 	// do nothing
 }
+
+
 
 // Store the image that is from the given path.
 - (void) saveImageForPath:(NSString *)imagePath

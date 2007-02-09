@@ -267,6 +267,10 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)awakeFromNib
 {
+	[oLoadingText setStringValue:
+		LocalizedStringInThisBundle(@"Loading...", @"Text that shows that we are loading contents")];
+	[[self window] setTitle:LocalizedStringInThisBundle(@"Media", @"Window name of iMediaBrowser")];
+	
 	// save these since they get swapped out
 	[[oPlaylists enclosingScrollView] retain];
 	[oPlaylistPopup retain];
@@ -787,7 +791,8 @@ static NSMutableDictionary *_parsers = nil;
 {
 	if ([mySelectedBrowser respondsToSelector:@selector(clearCache)])
 	{
-		[mySelectedBrowser clearCache];
+		id browser = ((id)mySelectedBrowser);
+		[browser clearCache];
 	}
 	else
 	{

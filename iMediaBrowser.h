@@ -36,6 +36,7 @@
 	IBOutlet RBSplitView			*oSplitView;
 	IBOutlet NSView					*oPlaylistContainer;
 	IBOutlet NSProgressIndicator	*oLoading;
+	IBOutlet NSTextField			*oLoadingText;
 	IBOutlet NSOutlineView			*oPlaylists;
 	IBOutlet NSTreeController		*libraryController;
 	
