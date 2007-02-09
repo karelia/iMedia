@@ -1082,7 +1082,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		3C3A132409EAFBA700AF41BF /* Generate Localizable.strings */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 12;
+			buildActionMask = 8;
 			comments = "\nThis build phase runs genstrings against all .m files in the project. We use the -s flag to substitute our macro, LocalizedStringInThisBundle, for NSLocalizedString.\n\nNote that .strings files are in UTF-16 format. By passing the -u command to genstrings, we allow escaped Unicode sequences to be copied to the strings file without error. This is useful for things like smart quotes where the compiler will complain if it encounters certain Unicode characters, even in quoted NSString constants, but won't complain if they are escaped into \\\\Uxxxx sequences.\n\nNote further that this script runs only on Install. When creating an install build for end-user distribution, your Localizable.strings file will likely be marked as M(odified) by Subversion. You can either check the mods in or discard the file and update: the strings file will be regenerated during the next install build anyway.\n\n-- Terrence 4/10/2006\n\n";
 			files = (
 			);
@@ -1091,7 +1091,7 @@
 			name = "Generate Localizable.strings";
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "\n# see Comments for information on this script\n\necho \"Generating Localizable.strings ...\"\n\ncd ${SRCROOT}\ngenstrings -q -u -s LocalizedStringInThisBundle -o en.lproj *.m\n\n";
 		};
