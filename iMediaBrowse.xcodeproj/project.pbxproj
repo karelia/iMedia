@@ -240,7 +240,6 @@
 		5B0DEBB00AEDF849008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iTunes.nib; sourceTree = "<group>"; };
 		5B0DEBBE0AEDF923008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Links.nib; sourceTree = "<group>"; };
 		5B3AD8600B5BA23800C971A0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		5B7C81A80B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Contacts.nib; sourceTree = "<group>"; };
 		5B7C81A90B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		5B7C81AA0B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Movies.nib; sourceTree = "<group>"; };
 		7903561009E3AF7B00384D08 /* iMBContactsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBContactsController.h; sourceTree = "<group>"; };
@@ -308,7 +307,6 @@
 		79500A1D0A6D8FEA008A0D8A /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		79500A200A6D8FF1008A0D8A /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/Movies.nib; sourceTree = "<group>"; };
 		79500A230A6D8FF7008A0D8A /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/Links.nib; sourceTree = "<group>"; };
-		79500A260A6D9001008A0D8A /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/Contacts.nib; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
 		7953E6BC0A2E8DC600C7AFBB /* ABGroup.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ABGroup.png; sourceTree = "<group>"; };
 		7956049309D78F9F00BF1DA5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -441,7 +439,6 @@
 		CE1AD3850A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/Links.nib; sourceTree = "<group>"; };
 		CE1AD3860A7E83F20083C01E /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE1AD3880A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/Movies.nib; sourceTree = "<group>"; };
-		CE55A69D0AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/Contacts.nib; sourceTree = "<group>"; };
 		CE55A69E0AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		CE55A69F0AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/iTunes.nib; sourceTree = "<group>"; };
 		CE55A6A00AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/Links.nib; sourceTree = "<group>"; };
@@ -449,14 +446,9 @@
 		CE55A6A30AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/Movies.nib; sourceTree = "<group>"; };
 		CE58DAEC0B7BDC8A00BECE74 /* reload_border.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload_border.png; sourceTree = "<group>"; };
 		CE58DB4F0B7BE14900BECE74 /* reload_border_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload_border_on.png; sourceTree = "<group>"; };
-		CE6F4A5B0AC456CA0094B818 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/Contacts.nib; sourceTree = "<group>"; };
-		CE6F4A5C0AC456CF0094B818 /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/Contacts.nib; sourceTree = "<group>"; };
-		CE6F4A5D0AC456D10094B818 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/Contacts.nib; sourceTree = "<group>"; };
-		CE6F4A5E0AC456D50094B818 /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/Contacts.nib; sourceTree = "<group>"; };
 		CE7570610ADEE8CB009FE941 /* missingImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = missingImage.png; sourceTree = "<group>"; };
 		CE8FC1420A2C0A9B00179BA3 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		CE8FC1470A2C0AA600179BA3 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/Movies.nib; sourceTree = "<group>"; };
-		CEA9AF9B0A64214900855897 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/Contacts.nib; sourceTree = "<group>"; };
 		CEA9AF9C0A64214900855897 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/iPhoto.nib; sourceTree = "<group>"; };
 		CEA9AF9D0A64214900855897 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/iTunes.nib; sourceTree = "<group>"; };
 		CEA9AF9E0A64214900855897 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/Links.nib; sourceTree = "<group>"; };
@@ -1245,14 +1237,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				7903561D09E3B17A00384D08 /* en */,
-				CEA9AF9B0A64214900855897 /* ja */,
-				79500A260A6D9001008A0D8A /* de */,
-				CE6F4A5B0AC456CA0094B818 /* fr */,
-				CE6F4A5C0AC456CF0094B818 /* da */,
-				CE6F4A5D0AC456D10094B818 /* zh_TW */,
-				CE6F4A5E0AC456D50094B818 /* it */,
-				CE55A69D0AD194C70091C8AE /* zh_CN */,
-				5B7C81A80B24319500F7D59C /* sv */,
 			);
 			name = Contacts.nib;
 			sourceTree = "<group>";
