@@ -40,7 +40,6 @@
 		791F973B0975D38A0071B2E0 /* iMediaBrowser.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 791679FE0975255000D9EF74 /* iMediaBrowser.framework */; };
 		791F97400975D3A90071B2E0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F973D0975D3A40071B2E0 /* AppDelegate.m */; };
 		791F976D0975D5280071B2E0 /* iMediaBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		791F97A40975DA170071B2E0 /* iTunes.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97A20975DA170071B2E0 /* iTunes.nib */; };
 		791F9AF80976320A0071B2E0 /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF10976320A0071B2E0 /* UKFNSubscribeFileWatcher.m */; };
 		791F9AFA0976320A0071B2E0 /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF30976320A0071B2E0 /* UKKQueue.m */; };
 		791F9AFC0976320A0071B2E0 /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F9AF50976320A0071B2E0 /* UKMainThreadProxy.m */; };
@@ -115,7 +114,6 @@
 		7990CDB409D769DE00AD74BA /* SafariBookmarksMenu.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDB209D769DE00AD74BA /* SafariBookmarksMenu.png */; };
 		7990CDC109D76BDA00AD74BA /* iTunesVideo.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDC009D76BDA00AD74BA /* iTunesVideo.png */; };
 		7990CDE009D76E7800AD74BA /* iTunesSmartPlaylist.png in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDDF09D76E7800AD74BA /* iTunesSmartPlaylist.png */; };
-		7990CDF209D772FF00AD74BA /* Links.nib in Resources */ = {isa = PBXBuildFile; fileRef = 7990CDF009D772FF00AD74BA /* Links.nib */; };
 		79BBE52A0A282E440018CCCA /* iMBGarageBandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */; };
 		79BBE52B0A282E440018CCCA /* iMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */; };
 		79BDDE330A96BEBF006BD7FC /* iMBMoviesController.h in Headers */ = {isa = PBXBuildFile; fileRef = 969656AE08C6A2C700F2F85C /* iMBMoviesController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -154,7 +152,6 @@
 		A93A6A770AE77F2B00C77AA4 /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A93A6A760AE77F2B00C77AA4 /* UKFileWatcher.m */; };
 		A9FECB070ADA696A00AB3426 /* iMBLibraryOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */; };
 		A9FECB080ADA696A00AB3426 /* iMBLibraryOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */; };
-		CE05A2390B6A89BE00A25808 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE05A2370B6A89BE00A25808 /* MediaBrowser.nib */; };
 		CE080CE909F03A6600020ED0 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */; };
 		CE11017E0B69080B00783570 /* iMBLibrarySoundsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE11017C0B69080B00783570 /* iMBLibrarySoundsParser.h */; };
 		CE11017F0B69080B00783570 /* iMBLibrarySoundsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE11017D0B69080B00783570 /* iMBLibrarySoundsParser.m */; };
@@ -166,11 +163,15 @@
 		CE1116F90B69593D00783570 /* iMBScreenSaverPicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE11152D0B6953C800783570 /* iMBScreenSaverPicturesParser.h */; };
 		CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE1117DD0B695D8F00783570 /* iMBiChatIconsParser.h */; };
 		CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1117DE0B695D8F00783570 /* iMBiChatIconsParser.m */; };
+		CE52AD7F0B7D21D800DA5F23 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD790B7D21D800DA5F23 /* iPhoto.nib */; };
+		CE52AD800B7D21D800DA5F23 /* iTunes.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */; };
+		CE52AD810B7D21D800DA5F23 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7B0B7D21D800DA5F23 /* MediaBrowser.nib */; };
+		CE52AD820B7D21D800DA5F23 /* Links.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7C0B7D21D800DA5F23 /* Links.nib */; };
+		CE52AD830B7D21D800DA5F23 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7D0B7D21D800DA5F23 /* Movies.nib */; };
+		CE52AD840B7D21D800DA5F23 /* Contacts.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7E0B7D21D800DA5F23 /* Contacts.nib */; };
 		CE58DAF00B7BDCD400BECE74 /* reload_border.png in Resources */ = {isa = PBXBuildFile; fileRef = CE58DAEC0B7BDC8A00BECE74 /* reload_border.png */; };
 		CE58DB500B7BE14900BECE74 /* reload_border_on.png in Resources */ = {isa = PBXBuildFile; fileRef = CE58DB4F0B7BE14900BECE74 /* reload_border_on.png */; };
 		CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */ = {isa = PBXBuildFile; fileRef = CE7570610ADEE8CB009FE941 /* missingImage.png */; };
-		CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */; };
-		CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE8FC1450A2C0AA000179BA3 /* Movies.nib */; };
 		CEC85B020B51508E006DA6AA /* iMBLinksController.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D6F4F09D35B77005F166D /* iMBLinksController.h */; };
 		CEC85B030B515095006DA6AA /* iMBDNDArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = D9B3EA5C09A3F82B00835FE4 /* iMBDNDArrayController.h */; };
 		CEC85B040B51509D006DA6AA /* UKMainThreadProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F9AF40976320A0071B2E0 /* UKMainThreadProxy.h */; };
@@ -237,14 +238,9 @@
 		3C371B0009AD502700501C1F /* Framework Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Framework Release.xcconfig"; sourceTree = "<group>"; };
 		3C3A131D09EAFB8100AF41BF /* en */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B0628CF0AEDF38300419AEB /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
-		5B0DEBB00AEDF849008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iTunes.nib; sourceTree = "<group>"; };
-		5B0DEBBE0AEDF923008DA136 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Links.nib; sourceTree = "<group>"; };
 		5B3AD8600B5BA23800C971A0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		5B7C81A90B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/iPhoto.nib; sourceTree = "<group>"; };
-		5B7C81AA0B24319500F7D59C /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/Movies.nib; sourceTree = "<group>"; };
 		7903561009E3AF7B00384D08 /* iMBContactsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBContactsController.h; sourceTree = "<group>"; };
 		7903561109E3AF7B00384D08 /* iMBContactsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBContactsController.m; sourceTree = "<group>"; };
-		7903561D09E3B17A00384D08 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/Contacts.nib; sourceTree = "<group>"; };
 		7903562009E3B30F00384D08 /* contacts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = contacts.png; sourceTree = "<group>"; };
 		7903562409E3B40D00384D08 /* iMBAddressBookParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAddressBookParser.h; sourceTree = "<group>"; };
 		7903562509E3B40D00384D08 /* iMBAddressBookParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAddressBookParser.m; sourceTree = "<group>"; };
@@ -269,9 +265,6 @@
 		791F973C0975D3A40071B2E0 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		791F973D0975D3A40071B2E0 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		791F97640975D4970071B2E0 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		791F97A30975DA170071B2E0 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/iTunes.nib; sourceTree = "<group>"; };
-		791F99380976023F0071B2E0 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/iPhoto.nib; sourceTree = "<group>"; };
-		791F9A6E097628DF0071B2E0 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/Movies.nib; sourceTree = "<group>"; };
 		791F9AEF0976320A0071B2E0 /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = UKFileWatcher.h; sourceTree = "<group>"; };
 		791F9AF00976320A0071B2E0 /* UKFNSubscribeFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = UKFNSubscribeFileWatcher.h; sourceTree = "<group>"; };
 		791F9AF10976320A0071B2E0 /* UKFNSubscribeFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKFNSubscribeFileWatcher.m; sourceTree = "<group>"; };
@@ -303,10 +296,6 @@
 		794C9F750A2E6B3A000A8A85 /* NSPopUpButton+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPopUpButton+iMedia.h"; sourceTree = "<group>"; };
 		794C9F760A2E6B3A000A8A85 /* NSPopUpButton+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPopUpButton+iMedia.m"; sourceTree = "<group>"; };
 		79500A130A6D8F5D008A0D8A /* de */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		79500A1A0A6D8FE2008A0D8A /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/iTunes.nib; sourceTree = "<group>"; };
-		79500A1D0A6D8FEA008A0D8A /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/iPhoto.nib; sourceTree = "<group>"; };
-		79500A200A6D8FF1008A0D8A /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/Movies.nib; sourceTree = "<group>"; };
-		79500A230A6D8FF7008A0D8A /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/Links.nib; sourceTree = "<group>"; };
 		7953019A0A0ADE9F00BCA0ED /* iTunesDRM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesDRM.png; sourceTree = "<group>"; };
 		7953E6BC0A2E8DC600C7AFBB /* ABGroup.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ABGroup.png; sourceTree = "<group>"; };
 		7956049309D78F9F00BF1DA5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -359,7 +348,6 @@
 		7990CDB209D769DE00AD74BA /* SafariBookmarksMenu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SafariBookmarksMenu.png; sourceTree = "<group>"; };
 		7990CDC009D76BDA00AD74BA /* iTunesVideo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesVideo.png; sourceTree = "<group>"; };
 		7990CDDF09D76E7800AD74BA /* iTunesSmartPlaylist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesSmartPlaylist.png; sourceTree = "<group>"; };
-		7990CDF109D772FF00AD74BA /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/Links.nib; sourceTree = "<group>"; };
 		79BBE5280A282E440018CCCA /* iMBGarageBandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBGarageBandParser.h; sourceTree = "<group>"; };
 		79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBGarageBandParser.m; sourceTree = "<group>"; };
 		79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexPath+iMedia.h"; sourceTree = "<group>"; };
@@ -411,15 +399,6 @@
 		A93A6A760AE77F2B00C77AA4 /* UKFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = UKFileWatcher.m; sourceTree = "<group>"; };
 		A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBLibraryOutlineView.h; sourceTree = "<group>"; };
 		A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBLibraryOutlineView.m; sourceTree = "<group>"; };
-		CE05A2380B6A89BE00A25808 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
-		CE05A2480B6A89FD00A25808 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
-		CE05A2800B6A8A6700A25808 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
-		CE05A2850B6A8A7100A25808 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
-		CE05A28B0B6A8A8400A25808 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
-		CE05A2960B6A8A8C00A25808 /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
-		CE05A2970B6A8A9700A25808 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
-		CE05A2980B6A8AA500A25808 /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
-		CE05A2990B6A8AB400A25808 /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		CE080CE609F03A6600020ED0 /* NSPasteboard+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPasteboard+iMedia.h"; sourceTree = "<group>"; };
 		CE080CE709F03A6600020ED0 /* NSPasteboard+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPasteboard+iMedia.m"; sourceTree = "<group>"; };
 		CE11017C0B69080B00783570 /* iMBLibrarySoundsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLibrarySoundsParser.h; sourceTree = "<group>"; };
@@ -434,40 +413,22 @@
 		CE1117DE0B695D8F00783570 /* iMBiChatIconsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiChatIconsParser.m; sourceTree = "<group>"; };
 		CE11337A0B69BC9B00783570 /* iMBAddressBookImagesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAddressBookImagesParser.h; sourceTree = "<group>"; };
 		CE11337B0B69BC9B00783570 /* iMBAddressBookImagesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAddressBookImagesParser.m; sourceTree = "<group>"; };
-		CE1AD3830A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/iPhoto.nib; sourceTree = "<group>"; };
-		CE1AD3840A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/iTunes.nib; sourceTree = "<group>"; };
-		CE1AD3850A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/Links.nib; sourceTree = "<group>"; };
 		CE1AD3860A7E83F20083C01E /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CE1AD3880A7E83F20083C01E /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/Movies.nib; sourceTree = "<group>"; };
-		CE55A69E0AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/iPhoto.nib; sourceTree = "<group>"; };
-		CE55A69F0AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/iTunes.nib; sourceTree = "<group>"; };
-		CE55A6A00AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/Links.nib; sourceTree = "<group>"; };
+		CE52AD790B7D21D800DA5F23 /* iPhoto.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = iPhoto.nib; sourceTree = "<group>"; };
+		CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = iTunes.nib; sourceTree = "<group>"; };
+		CE52AD7B0B7D21D800DA5F23 /* MediaBrowser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MediaBrowser.nib; sourceTree = "<group>"; };
+		CE52AD7C0B7D21D800DA5F23 /* Links.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Links.nib; sourceTree = "<group>"; };
+		CE52AD7D0B7D21D800DA5F23 /* Movies.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Movies.nib; sourceTree = "<group>"; };
+		CE52AD7E0B7D21D800DA5F23 /* Contacts.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Contacts.nib; sourceTree = "<group>"; };
 		CE55A6A10AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CE55A6A30AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/Movies.nib; sourceTree = "<group>"; };
 		CE58DAEC0B7BDC8A00BECE74 /* reload_border.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload_border.png; sourceTree = "<group>"; };
 		CE58DB4F0B7BE14900BECE74 /* reload_border_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload_border_on.png; sourceTree = "<group>"; };
 		CE7570610ADEE8CB009FE941 /* missingImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = missingImage.png; sourceTree = "<group>"; };
-		CE8FC1420A2C0A9B00179BA3 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/iPhoto.nib; sourceTree = "<group>"; };
-		CE8FC1470A2C0AA600179BA3 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/Movies.nib; sourceTree = "<group>"; };
-		CEA9AF9C0A64214900855897 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/iPhoto.nib; sourceTree = "<group>"; };
-		CEA9AF9D0A64214900855897 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/iTunes.nib; sourceTree = "<group>"; };
-		CEA9AF9E0A64214900855897 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/Links.nib; sourceTree = "<group>"; };
 		CEA9AF9F0A64214900855897 /* ja */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CEA9AFA20A64214900855897 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/Movies.nib; sourceTree = "<group>"; };
 		CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QTMovie+iMedia.h"; sourceTree = "<group>"; };
 		CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QTMovie+iMedia.m"; sourceTree = "<group>"; };
-		CEDE18CB0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/iPhoto.nib; sourceTree = "<group>"; };
-		CEDE18CC0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/iTunes.nib; sourceTree = "<group>"; };
-		CEDE18CD0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/Links.nib; sourceTree = "<group>"; };
 		CEDE18CE0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CEDE18D10A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/Movies.nib; sourceTree = "<group>"; };
-		CEDE18D20A5C69B40055352C /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/iPhoto.nib; sourceTree = "<group>"; };
-		CEDE18D30A5C69B40055352C /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/iTunes.nib; sourceTree = "<group>"; };
-		CEDE18D40A5C69B40055352C /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/Links.nib; sourceTree = "<group>"; };
 		CEDE18D50A5C69B40055352C /* da */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CEDE18D80A5C69B40055352C /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/Movies.nib; sourceTree = "<group>"; };
-		CEE09FE809ED9938004850FB /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/iTunes.nib; sourceTree = "<group>"; };
-		CEE09FEA09ED9958004850FB /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/Links.nib; sourceTree = "<group>"; };
 		CEF3F38309E449FF00D0058F /* NSString+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+iMedia.h"; sourceTree = "<group>"; };
 		CEF3F38409E449FF00D0058F /* NSString+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+iMedia.m"; sourceTree = "<group>"; };
 		CEFC515B0B792BD1009F114D /* reload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload.png; sourceTree = "<group>"; };
@@ -591,15 +552,15 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				968BEF3E090E904100D00E5C /* images */,
+				CE52AD790B7D21D800DA5F23 /* iPhoto.nib */,
+				CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */,
+				CE52AD7B0B7D21D800DA5F23 /* MediaBrowser.nib */,
+				CE52AD7C0B7D21D800DA5F23 /* Links.nib */,
+				CE52AD7D0B7D21D800DA5F23 /* Movies.nib */,
+				CE52AD7E0B7D21D800DA5F23 /* Contacts.nib */,
 				3C3A131C09EAFB8100AF41BF /* Localizable.strings */,
+				968BEF3E090E904100D00E5C /* images */,
 				791F97630975D4970071B2E0 /* MainMenu.nib */,
-				CE05A2370B6A89BE00A25808 /* MediaBrowser.nib */,
-				791F97A20975DA170071B2E0 /* iTunes.nib */,
-				CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */,
-				CE8FC1450A2C0AA000179BA3 /* Movies.nib */,
-				7990CDF009D772FF00AD74BA /* Links.nib */,
-				7903561C09E3B17A00384D08 /* Contacts.nib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1045,10 +1006,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				791F97A40975DA170071B2E0 /* iTunes.nib in Resources */,
-				CE8FC13F0A2C0A8F00179BA3 /* iPhoto.nib in Resources */,
-				CE8FC1460A2C0AA000179BA3 /* Movies.nib in Resources */,
-				7990CDF209D772FF00AD74BA /* Links.nib in Resources */,
 				79FDF61509AAE5D2000CB4B4 /* badge.png in Resources */,
 				79FDF61609AAE5D2000CB4B4 /* MBAudioPlaying.png in Resources */,
 				79FDF61709AAE5D2000CB4B4 /* MBiPhoto4Library.png in Resources */,
@@ -1100,10 +1057,15 @@
 				7953E79B0A2E989300C7AFBB /* contacts.png in Resources */,
 				CE7570620ADEE8CB009FE941 /* missingImage.png in Resources */,
 				E20764B80B597D8D00EAC95C /* tiny-reload.png in Resources */,
-				CE05A2390B6A89BE00A25808 /* MediaBrowser.nib in Resources */,
 				CEFC515C0B792BD1009F114D /* reload.png in Resources */,
 				CE58DAF00B7BDCD400BECE74 /* reload_border.png in Resources */,
 				CE58DB500B7BE14900BECE74 /* reload_border_on.png in Resources */,
+				CE52AD7F0B7D21D800DA5F23 /* iPhoto.nib in Resources */,
+				CE52AD800B7D21D800DA5F23 /* iTunes.nib in Resources */,
+				CE52AD810B7D21D800DA5F23 /* MediaBrowser.nib in Resources */,
+				CE52AD820B7D21D800DA5F23 /* Links.nib in Resources */,
+				CE52AD830B7D21D800DA5F23 /* Movies.nib in Resources */,
+				CE52AD840B7D21D800DA5F23 /* Contacts.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1233,14 +1195,6 @@
 			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
-		7903561C09E3B17A00384D08 /* Contacts.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7903561D09E3B17A00384D08 /* en */,
-			);
-			name = Contacts.nib;
-			sourceTree = "<group>";
-		};
 		791F97630975D4970071B2E0 /* MainMenu.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1255,86 +1209,6 @@
 				5B3AD8600B5BA23800C971A0 /* sv */,
 			);
 			name = MainMenu.nib;
-			sourceTree = "<group>";
-		};
-		791F97A20975DA170071B2E0 /* iTunes.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				791F97A30975DA170071B2E0 /* en */,
-				CEE09FE809ED9938004850FB /* fr */,
-				CEDE18CC0A5C69AE0055352C /* zh_TW */,
-				CEDE18D30A5C69B40055352C /* da */,
-				CEA9AF9D0A64214900855897 /* ja */,
-				79500A1A0A6D8FE2008A0D8A /* de */,
-				CE1AD3840A7E83F20083C01E /* it */,
-				CE55A69F0AD194C70091C8AE /* zh_CN */,
-				5B0DEBB00AEDF849008DA136 /* sv */,
-			);
-			name = iTunes.nib;
-			sourceTree = "<group>";
-		};
-		7990CDF009D772FF00AD74BA /* Links.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7990CDF109D772FF00AD74BA /* en */,
-				CEE09FEA09ED9958004850FB /* fr */,
-				CEDE18CD0A5C69AE0055352C /* zh_TW */,
-				CEDE18D40A5C69B40055352C /* da */,
-				CEA9AF9E0A64214900855897 /* ja */,
-				79500A230A6D8FF7008A0D8A /* de */,
-				CE1AD3850A7E83F20083C01E /* it */,
-				CE55A6A00AD194C70091C8AE /* zh_CN */,
-				5B0DEBBE0AEDF923008DA136 /* sv */,
-			);
-			name = Links.nib;
-			sourceTree = "<group>";
-		};
-		CE05A2370B6A89BE00A25808 /* MediaBrowser.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CE05A2380B6A89BE00A25808 /* en */,
-				CE05A2480B6A89FD00A25808 /* sv */,
-				CE05A2800B6A8A6700A25808 /* zh_TW */,
-				CE05A2850B6A8A7100A25808 /* zh_CN */,
-				CE05A28B0B6A8A8400A25808 /* ja */,
-				CE05A2960B6A8A8C00A25808 /* it */,
-				CE05A2970B6A8A9700A25808 /* fr */,
-				CE05A2980B6A8AA500A25808 /* de */,
-				CE05A2990B6A8AB400A25808 /* da */,
-			);
-			name = MediaBrowser.nib;
-			sourceTree = "<group>";
-		};
-		CE8FC13E0A2C0A8F00179BA3 /* iPhoto.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				791F99380976023F0071B2E0 /* en */,
-				CE8FC1420A2C0A9B00179BA3 /* fr */,
-				CEDE18CB0A5C69AE0055352C /* zh_TW */,
-				CEDE18D20A5C69B40055352C /* da */,
-				CEA9AF9C0A64214900855897 /* ja */,
-				79500A1D0A6D8FEA008A0D8A /* de */,
-				CE1AD3830A7E83F20083C01E /* it */,
-				CE55A69E0AD194C70091C8AE /* zh_CN */,
-				5B7C81A90B24319500F7D59C /* sv */,
-			);
-			name = iPhoto.nib;
-			sourceTree = "<group>";
-		};
-		CE8FC1450A2C0AA000179BA3 /* Movies.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				791F9A6E097628DF0071B2E0 /* en */,
-				CE8FC1470A2C0AA600179BA3 /* fr */,
-				CEDE18D10A5C69AE0055352C /* zh_TW */,
-				CEDE18D80A5C69B40055352C /* da */,
-				CEA9AFA20A64214900855897 /* ja */,
-				79500A200A6D8FF1008A0D8A /* de */,
-				CE1AD3880A7E83F20083C01E /* it */,
-				CE55A6A30AD194C70091C8AE /* zh_CN */,
-				5B7C81AA0B24319500F7D59C /* sv */,
-			);
-			name = Movies.nib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

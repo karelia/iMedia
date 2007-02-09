@@ -130,7 +130,7 @@ static Class sNSCGImageRepClass = nil;
 			  toObject:self
 		   withKeyPath:@"imageCount"
 			   options:optionsDict];
-#warning It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
+// It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
 
 
 }

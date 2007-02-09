@@ -91,7 +91,7 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 			  toObject:songsController
 		   withKeyPath:@"arrangedObjects.@count"
 			   options:optionsDict];
-#warning It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
+// It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
 }
 
 #pragma mark Protocol Methods
