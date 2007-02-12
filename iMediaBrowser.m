@@ -55,7 +55,7 @@ static NSMutableDictionary *_parsers = nil;
 
 @implementation iMediaBrowser
 
-+ (void)load
++ (void)initialize	// preferred over +load in most cases
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	_browserClasses = [[NSMutableArray alloc] init];

@@ -31,7 +31,20 @@ static NSImage *sDRMIcon = nil;
 
 @implementation iMBMusicFolder
 
-+ (void)load
++ (void)initialize	// preferred over +load in most cases
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
+	NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
+	sSongIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+	iconPath = [bndl pathForResource:@"iTunesDRM" ofType:@"png"];
+	sDRMIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+	
+	[pool release];
+}
+
++ (void)load	// registration of this class
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
