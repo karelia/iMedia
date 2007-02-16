@@ -81,11 +81,56 @@
 }
 
 
+
+/* Alternate to rolling our own cache -- use Cocoa's.  Robert Blum has the beginnings of this but I need to
+figure out the details.
+
+From: 	  r.blum@gmx.net
+Subject: 	[Dan Wood] Cocoa caching
+Date: 	January 29, 2007 7:23:35 PM PST (CA)
+
+No need to put it on your blog - I'm writing an article of my own ;) (Feel free to put yours up, too, though)
+
+Apologies for the untidiness of the code - I banged this out between shower and breakfast....
+
+NSURLCache* cache = [NSURLCache sharedURLCache]; // Get the standard URL cache. Haven't played with custom ones
+
+NSURL* existingURL = [ [NSURL alloc] initWithString:@"myapp://pictures/cachedresponse"];
+NSURLResponse* response = [[NSURLResponse alloc] initWithURL: existingURL MIMEType:@"binary" expectedContentLength:-1 textEncodingName:nil];
+NSData* responseData = [NSData dataWithBytes:"1234" length:5];  // That's the data you want to cache. It's probably not too hard to turn NSImage into NSData
+
+
+NSCachedURLResponse* cachedResponse = [ [NSCachedURLResponse alloc] initWithResponse: response data: responseData];
+NSURLRequest* request = [NSURLRequest requestWithURL: existingURL];
+[cache storeCachedResponse: cachedResponse forRequest: request];
+
+NSCachedURLResponse* lookupResponse = [cache cachedResponseForRequest: request];
+NSData * newData = [lookupResponse data];
+
+lookupResponse = [cache cachedResponseForRequest: [NSURLRequest requestWithURL: [NSURL URLWithString:@"myapp://pictures/noresponse"]]];
+if( lookupResponse != nil )
+MY_ASSERT( "This shouldn't happen - we don't have data for the request" );
+
+
+Hope that helps clear things up a bit.... mail me if you've got questions.
+
+- Robert
+
+*/
+
+
+
+
+
 // Returns a path for caching a file at the given key (such as a file name or other unique descriptor)
 // This is not like the NSURLRequest method, which seems to make a 72-bit (9-byte) hash
 // and then possibly deal with collisions.  They go like this:  ~/Library/Caches/ nibble / nibble / Uint32-Uint32
 // We will instead just do an SHA1 to get a pretty darn unique hash, then use the first two nibbles like they do,
 // and then the rest, in hex.
+
+
+
+
 
 #include <openssl/sha.h>
 

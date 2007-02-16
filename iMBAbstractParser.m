@@ -87,9 +87,12 @@
 	return nil;
 }
 
-- (void)setBrowser:(id <iMediaBrowser>)browser
+
+- (void)setBrowser:(id <iMediaBrowser>)aBrowser
 {
-	myBrowser = browser;
+    [aBrowser retain];
+    [myBrowser release];
+    myBrowser = aBrowser;
 }
 
 - (NSString *)databasePath
