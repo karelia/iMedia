@@ -44,7 +44,7 @@
 	NSMutableArray					*myMediaBrowsers;
 	NSMutableDictionary				*myLoadedParsers;
 	NSMutableArray					*myUserDroppedParsers;
-	id <iMediaBrowser>				mySelectedBrowser;
+	id <iMediaBrowser>				mySelectedBrowser;		// not retained
 	NSToolbar						*myToolbar;
 	NSLock							*myBackgroundLoadingLock;
 	NSString						*myIdentifier;
@@ -73,6 +73,7 @@
 + (id)sharedBrowserWithoutLoading;
 + (id)sharedBrowserWithDelegate:(id)delegate;
 + (id)sharedBrowserWithDelegate:(id)delegate supportingBrowserTypes:(NSArray*)types;
++ (NSURLCache *)sharedURLCache;	// use this instead of [NSURLCache sharedURLCache] to store cache across applications
 
 // Register Other types of Browsers
 + (void)registerBrowser:(Class)aClass;

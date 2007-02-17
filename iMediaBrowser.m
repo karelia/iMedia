@@ -39,6 +39,7 @@ NSString *iMediaBrowserSelectionDidChangeNotification = @"iMediaSelectionChanged
 static iMediaBrowser *_sharedMediaBrowser = nil;
 static NSMutableArray *_browserClasses = nil;
 static NSMutableDictionary *_parsers = nil;
+static NSURLCache *_URLCache = nil;
 
 @interface iMediaBrowser (PrivateAPI)
 - (void)resetLibraryController;
@@ -60,6 +61,25 @@ static NSMutableDictionary *_parsers = nil;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	_browserClasses = [[NSMutableArray alloc] init];
 	_parsers = [[NSMutableDictionary dictionary] retain];
+	
+	// Create URL cache path, so all instances of iMedia Browser can share a cache
+	
+	// COMMENTED OUT CUSTOM CACHE FOR NOW, UNTIL WE CAN FIGURE OUT HOW TO GET THE FILES TO BE WRITTEN TO DISK!
+//	NSString *cachePath = nil;
+//	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory,NSUserDomainMask,YES);
+//	if ( [libraryPaths count] >= 1 )
+//	{
+//		cachePath = [libraryPaths objectAtIndex:0];
+//		cachePath = [cachePath stringByAppendingPathComponent:@"iMedia"];
+//		_URLCache = [[NSURLCache alloc] initWithMemoryCapacity: 0				// Try 0 to force saving to disk
+//												  diskCapacity: 20*1024*1024	// standard value of Shared URL cache
+//													  diskPath: cachePath];
+//	}
+//	else
+//	{
+		_URLCache = [NSURLCache sharedURLCache];	// shouldn't happen; just in case.
+//	}
+	
 	
 	//register the default set in order
 	[self registerBrowser:NSClassFromString(@"iMBPhotosController")];
@@ -191,6 +211,11 @@ static NSMutableDictionary *_parsers = nil;
 	[iMediaBrowser unregisterParserName:NSStringFromClass(parserClass) forMediaType:media];
 }
 
++ (NSURLCache *)sharedURLCache;	// use this instead of [NSURLCache sharedURLCache] to store cache across applications
+{
+	return _URLCache;
+}
+
 #pragma mark -
 #pragma mark Instance Methods
 
@@ -235,7 +260,6 @@ static NSMutableDictionary *_parsers = nil;
 	[myBackgroundLoadingLock release];
 	[myPreferredBrowserTypes release];
 	[myIdentifier release];
-	[mySelectedBrowser release];
 	
 	[super dealloc];
 }
@@ -524,11 +548,11 @@ static NSMutableDictionary *_parsers = nil;
 		//set the browser the parser is in
 		[parser setBrowser:mySelectedBrowser];
 #ifdef DEBUG
-		NSDate *timer = [NSDate date];
+//		NSDate *timer = [NSDate date];
 #endif
 		iMBLibraryNode *library = [parser library:reuseCachedData];
 #ifdef DEBUG
-		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
+//		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
 #endif
 		if (library) // it is possible for a parser to return nil if the db for it doesn't exist
 		{

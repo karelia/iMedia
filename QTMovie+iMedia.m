@@ -89,11 +89,11 @@
 		}
 	}
 #ifdef DEBUG
-	NSDate *timer = [NSDate date];
+//	NSDate *timer = [NSDate date];
 #endif
     NSImage *result = [self frameImageAtTime:qttime];
 #ifdef DEBUG
-	NSLog(@"Time to load better poster image: %.3f", fabs([timer timeIntervalSinceNow]));
+//	NSLog(@"Time to load better poster image: %.3f", fabs([timer timeIntervalSinceNow]));
 #endif
 	return result;
 }

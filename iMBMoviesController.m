@@ -29,6 +29,7 @@
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
 #import "MUPhotoView.h"
+#import "NSURLCache+iMedia.h"
 
 #define MAX_POSTER_SIZE (NSMakeSize(240, 180))	// our thumbnail view maxes out at 240.
 
@@ -158,8 +159,6 @@
 	// do nothing
 }
 
-
-
 // Store the image that is from the given path.
 - (void) saveImageForPath:(NSString *)imagePath
 {
@@ -172,11 +171,8 @@
 	NSData *data = [anImage TIFFRepresentationUsingCompression:NSTIFFCompressionLZW factor:1.0];    
 	if (data)
 	{
-		NSString *cachePath = [[[NSFileManager defaultManager] cachePathForKey:imagePath] stringByAppendingPathExtension:@"tiff"];
-		if ([[NSFileManager defaultManager] createDirectoryPath:[cachePath stringByDeletingLastPathComponent] attributes:nil])
-		{
-			[data writeToFile:cachePath atomically:NO];
-		}
+		NSURLCache* cache = [iMediaBrowser sharedURLCache];
+		[cache cacheData:data forPath:[imagePath stringByAppendingPathExtension:@"tiff"]];
         
         // Images are sometimes drawn upside down after saving. I don't know why, but as the saved image is correct we can create
         // a new one that works. Does someone know why this is?
@@ -325,6 +321,34 @@ static NSImage *_toolbarIcon = nil;
 	return nil;
 }
 
+- (NSImage *) getPosterImageOrPlaceholderFromMovie:(QTMovie *)movie
+{
+	NSImage *img = nil;
+	bool hasVideo = NO;
+	
+	if (movie)
+	{
+		NSDictionary *attr = [movie movieAttributes];
+		NSValue *theSizeValue = [attr objectForKey:QTMovieNaturalSizeAttribute];
+		NSSize size = [theSizeValue sizeValue];
+		hasVideo = !NSEqualSizes(size,NSZeroSize);
+	}
+	if (!movie || !hasVideo)
+	{
+		img = (NSImage *)[NSNull null];		// don't try to load again
+	}
+	else if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
+	{
+		NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
+		img = [[[NSImage alloc] initWithContentsOfFile:drmIcon] autorelease];
+	}
+	else
+	{
+		img = [movie betterPosterImageWithMaxSize:MAX_POSTER_SIZE];
+	}
+	return img;
+}
+
 - (void)backgroundLoadOfInFlightImage:(id)unused
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -338,9 +362,7 @@ static NSImage *_toolbarIcon = nil;
 		[myProcessingImages addObject:imagePath];
 	}
 	[myCacheLock unlock];
-	
-	NSImage *img = nil;
-	
+		
 	while (imagePath)
 	{
 		NSMutableDictionary *rec = (NSMutableDictionary *)[self recordForPath:imagePath];
@@ -353,23 +375,21 @@ static NSImage *_toolbarIcon = nil;
             
             err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread.  Don't care if it succeeded or not
             if (noErr != err) NSLog(@"Error attaching movie to current thread %d", err);
-                        
-            if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
-            {
-                NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-                img = [[[NSImage alloc] initWithContentsOfFile:drmIcon] autorelease];
-            }
-            else
-            {
-                img = [movie betterPosterImageWithMaxSize:MAX_POSTER_SIZE];
-            }
-            
-            if (img)
+			
+			NSImage *img = [self getPosterImageOrPlaceholderFromMovie:movie];
+			
+            if (img && (img != (NSImage *)[NSNull null]) )
+				// Note: NSNull means no thumbnail can be generated.  This is NOT cached, meaning that each time we run the app,
+				// it will query the movie again, not finding it in the cache.  I suppose we could optimize that by caching a
+				// placeholder so that the file is not queried.
             {
                 [myCacheLock lock];
                 [myCache setObject:img forKey:imagePath];
                 [myCacheLock unlock];
-                [self performSelectorOnMainThread:@selector(saveImageForPath:) withObject:imagePath waitUntilDone:NO];
+				if (img != (NSImage *)[NSNull null])
+				{
+					[self performSelectorOnMainThread:@selector(saveImageForPath:) withObject:imagePath waitUntilDone:NO];
+				}
             }
         } 
         @catch (NSException *ex) {
@@ -465,25 +485,29 @@ static NSImage *_toolbarIcon = nil;
         if ([QTMovie canInitWithFile:imagePath])
         {
             NSError *movieError = nil;
-            QTMovie *mov = [QTMovie movieWithAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
+            QTMovie *movie = [QTMovie movieWithAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
                 [QTDataReference dataReferenceWithReferenceToFile:imagePath], QTMovieDataReferenceAttribute,
                 [NSNumber numberWithBool:NO], QTMovieAskUnresolvedDataRefsAttribute, nil] 
                                                   error:&movieError];
 			            
-            if (mov)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
+            if (movie)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
             {
-                if ([mov respondsToSelector:@selector(setIdling:)])
-                    [mov setIdling:NO]; // Prevents crash due to missing gworld
+                if ([movie respondsToSelector:@selector(setIdling:)])
+                    [movie setIdling:NO]; // Prevents crash due to missing gworld
 
                 // do a background thread load if we have a spare processor, and if this movie is thread-safe
                 unsigned int maxThreadCount = [NSProcessInfo numberOfProcessors] - 1;
                 maxThreadCount = MAX(maxThreadCount, 1);    // Allow at least 1 background thread
-                if (myThreadCount < maxThreadCount
+                if (
+#ifdef SINGLETHREADED
+					NO &&	// define SINGLETHREADED to test the single-threaded mode
+#endif
+					myThreadCount < maxThreadCount
                     &&
-                    noErr == DetachMovieFromCurrentThread([mov quickTimeMovie]) )	// -2098 = componentNotThreadSafeErr
+                    noErr == DetachMovieFromCurrentThread([movie quickTimeMovie]) )	// -2098 = componentNotThreadSafeErr
                 {
                     [myCacheLock lock];
-                    [rec setObject:mov forKey:@"qtmovie"];
+                    [rec setObject:movie forKey:@"qtmovie"];
                     [myInFlightImageOperations addObject:imagePath];
                     [myCacheLock unlock];
                     myThreadCount++;
@@ -494,9 +518,8 @@ static NSImage *_toolbarIcon = nil;
                 else 
                 {
                     // Load movie on the main thread because we can't open on background thread
-                    NSImage *img = [mov betterPosterImageWithMaxSize:MAX_POSTER_SIZE];
-                    
-                    if (img)
+					NSImage *img = [self getPosterImageOrPlaceholderFromMovie:movie];
+					if (img && (img != (NSImage *)[NSNull null]) )
                     {
                         [myCacheLock lock];
                         [myCache setObject:img forKey:imagePath];
@@ -506,6 +529,11 @@ static NSImage *_toolbarIcon = nil;
                     }
                 }
             }
+			else
+			{
+				// Perhaps come up with some indication that this movie isn't really loadable?
+				NSLog(@"unable to make a movie from %@", imagePath);
+			}
         }
     }
     else
@@ -559,22 +587,22 @@ static NSImage *_toolbarIcon = nil;
     
 	if (!img)
 	{   // look on disk cache
-		NSString *cachePath = [[[NSFileManager defaultManager] cachePathForKey:imagePath] stringByAppendingPathExtension:@"tiff"];
-		BOOL isDir;
-		if ([[NSFileManager defaultManager] fileExistsAtPath:cachePath isDirectory:&isDir] && !isDir)
+		NSURLCache* cache = [iMediaBrowser sharedURLCache];
+		NSData *data = [cache cachedDataForPath:[imagePath stringByAppendingPathExtension:@"tiff"]]; // will return nil if not cached
+		if (data)
 		{
-			img = [[[NSImage alloc] initWithContentsOfFile:cachePath] autorelease];
+			img = [[[NSImage alloc] initWithData:data] autorelease];
 			if (img)
 			{
-				// cache in memory now
-                [myCacheLock lock];
+				// cache in memory now --- maybe not needed since the NSURLCache actually caches in memory now!
+				[myCacheLock lock];
 				[myCache setObject:img forKey:imagePath];
-                [myCacheLock unlock];
+				[myCacheLock unlock];
 			}
 		}
 	}
 
-	if (!img)	// need to generate
+	if (!img && (img != (NSImage *)[NSNull null]))	// need to generate, but not if NSNull
     {		
         [myImageRecordsToLoad addObject:rec];
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startLoadingOneMovie:) object:self];
@@ -589,6 +617,8 @@ static NSImage *_toolbarIcon = nil;
         [myCache setObject:img forKey:imagePath];
         [myCacheLock unlock];
 	}
+	if (img == (NSImage *)[NSNull null])	img = nil;	// don't return NSNull
+	
 	return img;
 }
 

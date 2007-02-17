@@ -163,6 +163,8 @@
 		CE1116F90B69593D00783570 /* iMBScreenSaverPicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE11152D0B6953C800783570 /* iMBScreenSaverPicturesParser.h */; };
 		CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE1117DD0B695D8F00783570 /* iMBiChatIconsParser.h */; };
 		CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1117DE0B695D8F00783570 /* iMBiChatIconsParser.m */; };
+		CE3F200B0B8646A000A1CD2A /* NSURLCache+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3F20090B8646A000A1CD2A /* NSURLCache+iMedia.h */; };
+		CE3F200C0B8646A000A1CD2A /* NSURLCache+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */; };
 		CE52AD7F0B7D21D800DA5F23 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD790B7D21D800DA5F23 /* iPhoto.nib */; };
 		CE52AD800B7D21D800DA5F23 /* iTunes.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */; };
 		CE52AD810B7D21D800DA5F23 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7B0B7D21D800DA5F23 /* MediaBrowser.nib */; };
@@ -414,6 +416,8 @@
 		CE11337A0B69BC9B00783570 /* iMBAddressBookImagesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBAddressBookImagesParser.h; sourceTree = "<group>"; };
 		CE11337B0B69BC9B00783570 /* iMBAddressBookImagesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBAddressBookImagesParser.m; sourceTree = "<group>"; };
 		CE1AD3860A7E83F20083C01E /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CE3F20090B8646A000A1CD2A /* NSURLCache+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLCache+iMedia.h"; sourceTree = "<group>"; };
+		CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLCache+iMedia.m"; sourceTree = "<group>"; };
 		CE52AD790B7D21D800DA5F23 /* iPhoto.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = iPhoto.nib; sourceTree = "<group>"; };
 		CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = iTunes.nib; sourceTree = "<group>"; };
 		CE52AD7B0B7D21D800DA5F23 /* MediaBrowser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MediaBrowser.nib; sourceTree = "<group>"; };
@@ -709,6 +713,8 @@
 				79FA0F5E0A2E7D1500461872 /* NSSlider+iMedia.m */,
 				793810460A33AC53000A65EA /* NSProcessInfo+iMedia.h */,
 				793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */,
+				CE3F20090B8646A000A1CD2A /* NSURLCache+iMedia.h */,
+				CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */,
 			);
 			name = "Cocoa Extensions";
 			sourceTree = "<group>";
@@ -928,6 +934,7 @@
 				CE1116F90B69593D00783570 /* iMBScreenSaverPicturesParser.h in Headers */,
 				CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */,
 				CEFC515F0B792C11009F114D /* iMBPlacardScrollView.h in Headers */,
+				CE3F200B0B8646A000A1CD2A /* NSURLCache+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1156,6 +1163,7 @@
 				CE1116F80B69593D00783570 /* iMBScreenSaverPicturesParser.m in Sources */,
 				CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */,
 				CEFC51600B792C11009F114D /* iMBPlacardScrollView.m in Sources */,
+				CE3F200C0B8646A000A1CD2A /* NSURLCache+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
