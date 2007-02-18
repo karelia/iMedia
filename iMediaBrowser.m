@@ -179,6 +179,11 @@ static NSURLCache *_URLCache = nil;
 	}
 }
 
++ (void)unregisterAllBrowsers
+{
+	[_browserClasses removeAllObjects];
+}
+
 + (void)registerParser:(Class)aClass forMediaType:(NSString *)media
 {
 	NSAssert(aClass != NULL, @"aClass is NULL");
@@ -252,7 +257,7 @@ static NSURLCache *_URLCache = nil;
 {
 	[[oPlaylists enclosingScrollView] release];
 	[oPlaylistPopup release];
-
+	
 	[myUserDroppedParsers release];
 	[myMediaBrowsers release];
 	[myLoadedParsers release];

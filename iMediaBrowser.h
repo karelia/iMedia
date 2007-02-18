@@ -78,6 +78,7 @@
 // Register Other types of Browsers
 + (void)registerBrowser:(Class)aClass;
 + (void)unregisterBrowser:(Class)aClass;
++ (void)unregisterAllBrowsers;
 
 /* Register different types of media parsers
  
