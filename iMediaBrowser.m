@@ -255,7 +255,34 @@ static NSURLCache *_URLCache = nil;
 
 - (void)dealloc
 {
+	if (nil != mySelectedBrowser)
+	{
+		[mySelectedBrowser didDeactivate];
+		[[mySelectedBrowser browserView] removeFromSuperview];
+	}
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+	[libraryController removeObserver:self forKeyPath:nil];
+	
+	// Begin unbind
+	// Somehow the window's content view might still linger in an NSAutoreleasePool after
+	// this controller has been deallocated. When the view finally gets deallocated, attempts
+	// to undo bindings fail as the controller has long been deallocated. 
+	// The workaround is to explicitely undo bindings now as we dealloc the controller.
+	NSTableColumn *tableColumn = [[oPlaylists tableColumns] objectAtIndex:0];
+	
+	[tableColumn unbind:@"value"];
+	[tableColumn unbind:@"editable"];
+	// End unbind
+	
+	[oPlaylists setDelegate:nil];
+	[oPlaylists setDataSource:nil];
+	[oSplitView setDelegate:nil];
+	
 	[[oPlaylists enclosingScrollView] release];
+	[oPlaylists removeFromSuperview];
+	
 	[oPlaylistPopup release];
 	
 	[myUserDroppedParsers release];
