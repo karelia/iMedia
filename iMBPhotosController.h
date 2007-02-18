@@ -47,6 +47,8 @@
 	NSIndexPath				*mySelectedIndexPath;
 }
 
+- (void)loadNib;
+
 - (IBAction)search:(id)sender;
 - (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard;
 

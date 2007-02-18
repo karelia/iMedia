@@ -79,15 +79,21 @@ static Class sNSCGImageRepClass = nil;
 		myInFlightImageOperations = [[NSMutableArray array] retain];
 		myProcessingImages = [[NSMutableSet set] retain];
 		
-		if (![[NSBundle bundleForClass:[iMBPhotosController class]] loadNibFile:@"iPhoto" 
-                                                         externalNameTable:[NSDictionary dictionaryWithObjectsAndKeys:self, @"NSOwner", nil] 
-                                                                  withZone:[self zone]])
-        {
-            NSLog(@"iPhoto.nib is missing. This can cause bad things to happen");
-        }
+		[self loadNib];
 	}
 	return self;
 }
+
+- (void)loadNib
+{
+	if (![[NSBundle bundleForClass:[iMBPhotosController class]] loadNibFile:@"iPhoto" 
+														  externalNameTable:[NSDictionary dictionaryWithObjectsAndKeys:self, @"NSOwner", nil] 
+																   withZone:[self zone]])
+	{
+		NSLog(@"iPhoto.nib is missing. This can cause bad things to happen");
+	}
+}
+
 
 - (void)dealloc
 {
