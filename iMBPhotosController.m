@@ -108,6 +108,8 @@ static Class sNSCGImageRepClass = nil;
 	[mySelectedIndexPath release];
 	[myProcessingImages release];
 	
+	[oView release];
+	
 	[super dealloc];
 }
 
