@@ -47,16 +47,7 @@ static NSImage *sDRMIcon = nil;
 + (void)load	// registration of this class
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
 	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
-	
-	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
-	NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
-	sSongIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
-	iconPath = [bndl pathForResource:@"iTunesDRM" ofType:@"png"];
-	sDRMIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
-	
-	
 	[pool release];
 }
 
