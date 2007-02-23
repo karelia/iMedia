@@ -109,7 +109,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	return ![[NSWorkspace sharedWorkspace] isFilePackageAtPath:path];
 }
 
-- (NSDragOperation)playlistOutlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index tryDefaultHandling:(BOOL*)tryDefault
+- (NSDragOperation)playlistOutlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)aIndex tryDefaultHandling:(BOOL*)tryDefault
 
 {
 	*tryDefault = YES;
@@ -119,7 +119,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 - (BOOL)playlistOutlineView:(NSOutlineView *)outlineView
 				 acceptDrop:(id <NSDraggingInfo>)info
 					   item:(id)item
-				 childIndex:(int)index
+				 childIndex:(int)aIndex
 		 tryDefaultHandling:(BOOL*)tryDefault
 {
 	*tryDefault = YES;

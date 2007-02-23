@@ -98,15 +98,15 @@
 	return result;
 }
 
-- (NSImage *)betterPosterImageWithMaxSize:(NSSize)maxSize;  // Shrinks the image if it's larger than maxSize
+- (NSImage *)betterPosterImageWithMaxSize:(NSSize)aMaxSize;  // Shrinks the image if it's larger than aMaxSize
 {
     NSImage *image = [self betterPosterImage];
     NSSize   size = [image size];
     
-    if (size.width < maxSize.width + 0.5f && size.height < maxSize.height + 0.5f)
+    if (size.width < aMaxSize.width + 0.5f && size.height < aMaxSize.height + 0.5f)
         return image;
     
-    float scale = fminf (maxSize.width / size.width, maxSize.height / size.height);
+    float scale = fminf (aMaxSize.width / size.width, aMaxSize.height / size.height);
     NSSize  newSize = NSMakeSize(size.width * scale, size.height * scale);
     NSImage  *newImage = [[NSImage allocWithZone:[self zone]] initWithSize:newSize];    
     [newImage setDataRetained:YES];

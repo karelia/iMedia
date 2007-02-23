@@ -458,10 +458,10 @@ static NSImage *_toolbarIcon = nil;
 	return [myImages count];
 }
 
-- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)index
+- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)aIndex
 {
 	if ([[self browser] showsFilenamesInPhotoBasedBrowsers])
-        return [self photoView:view captionForPhotoAtIndex:index];
+        return [self photoView:view captionForPhotoAtIndex:aIndex];
     
 	return nil;
 }
@@ -497,7 +497,7 @@ static NSImage *_toolbarIcon = nil;
 
                 // do a background thread load if we have a spare processor, and if this movie is thread-safe
                 unsigned int maxThreadCount = [NSProcessInfo numberOfProcessors] - 1;
-                maxThreadCount = MAX(maxThreadCount, 1);    // Allow at least 1 background thread
+                maxThreadCount = MAX(maxThreadCount, (unsigned int)1);    // Allow at least 1 background thread
                 if (
 #ifdef SINGLETHREADED
 					NO &&	// define SINGLETHREADED to test the single-threaded mode
@@ -554,16 +554,16 @@ static NSImage *_toolbarIcon = nil;
     }
 }
 
-- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
+- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)aIndex
 {
 	NSMutableDictionary *rec;
 	if ([mySearchString length] > 0)
 	{
-		rec = [myFilteredImages objectAtIndex:index];
+		rec = [myFilteredImages objectAtIndex:aIndex];
 	}
 	else
 	{
-		rec = [myImages objectAtIndex:index];
+		rec = [myImages objectAtIndex:aIndex];
 	}
     
 	//try the caches
@@ -645,7 +645,7 @@ static NSImage *_toolbarIcon = nil;
     return [[[NSArray alloc] init] autorelease];
 }
 
-- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)index dataType:(NSString *)type
+- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)aIndex dataType:(NSString *)type
 {
     return nil;
 }
@@ -663,7 +663,7 @@ static NSImage *_toolbarIcon = nil;
 	
 	NSDictionary *cur;
 	
-	int i;
+	unsigned int i;
 	for(i = 0; i < [myImages count]; i++) 
 	{
 		if ([mySelection containsIndex:i]) 
@@ -684,25 +684,25 @@ static NSImage *_toolbarIcon = nil;
 	[pboard writeURLs:nil files:fileList names:captions];	
 }
 
-- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
+- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)aIndex
 {
 	NSDictionary *rec;
 	if ([mySearchString length] > 0)
 	{
-		rec = [myFilteredImages objectAtIndex:index];
+		rec = [myFilteredImages objectAtIndex:aIndex];
 	}
 	else
 	{
-		rec = [myImages objectAtIndex:index];
+		rec = [myImages objectAtIndex:aIndex];
 	}
 	return [rec objectForKey:@"Caption"];
 }
 
-- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index withFrame:(NSRect)frame
+- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)aIndex withFrame:(NSRect)frame
 {
-	if (index < [myImages count])
+	if (aIndex < [myImages count])
 	{
-		movieIndex = index;
+		movieIndex = aIndex;
 		if (!previewMovieView)
 		{
 			previewMovieView = [[QTMovieView alloc] initWithFrame:frame];
@@ -715,7 +715,7 @@ static NSImage *_toolbarIcon = nil;
 			[previewMovieView pause:self];
 		}
 		[previewMovieView setFrame:frame];
-		NSString *path = [[myImages objectAtIndex:index] objectForKey:@"ImagePath"];
+		NSString *path = [[myImages objectAtIndex:aIndex] objectForKey:@"ImagePath"];
 		
 		NSError *error = nil;
 		QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];

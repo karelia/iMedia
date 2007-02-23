@@ -33,10 +33,10 @@
 
 //Utility
 - (void)moveObjectsInArrangedObjectsFromIndexes:(NSIndexSet *)indexSet 
-									   toIndex:(unsigned)index;
+									   toIndex:(unsigned)aIndex;
 
 - (NSIndexSet *)indexSetFromRows:(NSArray *)rows;
-- (int)rowsAboveRow:(int)row inIndexSet:(NSIndexSet *)indexSet;
+- (int)rowsAboveRow:(unsigned int)row inIndexSet:(NSIndexSet *)indexSet;
 @end
 
 @implementation iMBDNDArrayController
@@ -68,29 +68,29 @@
 										toIndex:(unsigned int)insertIndex
 {
 	
-    NSArray		*objects = [self arrangedObjects];
-	int			index = [indexSet lastIndex];
+    NSArray			*objects = [self arrangedObjects];
+	unsigned int	theIndex = [indexSet lastIndex];
 	
-    int			aboveInsertIndexCount = 0;
-    id			object;
-    int			removeIndex;
+    int				aboveInsertIndexCount = 0;
+    id				object;
+    int				removeIndex;
 	
-    while (NSNotFound != index)
+    while (NSNotFound != theIndex)
 	{
-		if (index >= insertIndex) {
-			removeIndex = index + aboveInsertIndexCount;
+		if (theIndex >= insertIndex) {
+			removeIndex = theIndex + aboveInsertIndexCount;
 			aboveInsertIndexCount += 1;
 		}
 		else
 		{
-			removeIndex = index;
+			removeIndex = theIndex;
 			insertIndex -= 1;
 		}
 		object = [objects objectAtIndex:removeIndex];
 		[self removeObjectAtArrangedObjectIndex:removeIndex];
 		[self insertObject:object atArrangedObjectIndex:insertIndex];
 		
-		index = [indexSet indexLessThanIndex:index];
+		theIndex = [indexSet indexLessThanIndex:theIndex];
     }
 }
 
@@ -106,7 +106,7 @@
     return indexSet;
 }
 
-- (int)rowsAboveRow:(int)row inIndexSet:(NSIndexSet *)indexSet
+- (int)rowsAboveRow:(unsigned int)row inIndexSet:(NSIndexSet *)indexSet
 {
     unsigned currentIndex = [indexSet firstIndex];
     int i = 0;

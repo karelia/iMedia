@@ -73,7 +73,7 @@
 - (NSDragOperation)playlistOutlineView:(NSOutlineView *)outlineView
 						  validateDrop:(id <NSDraggingInfo>)info
 						  proposedItem:(id)item
-					proposedChildIndex:(int)index
+					proposedChildIndex:(int)aIndex
 					tryDefaultHandling:(BOOL*)tryDefault;
 
 // Use this to do your own handling of drags to the playlist. If you want to let the default handling be tried,
@@ -81,7 +81,7 @@
 - (BOOL)playlistOutlineView:(NSOutlineView *)outlineView
 				 acceptDrop:(id <NSDraggingInfo>)info
 					   item:(id)item
-				 childIndex:(int)index
+				 childIndex:(int)aIndex
 		 tryDefaultHandling:(BOOL*)tryDefault;
 		 
 // There is a #ifed out version of a simple implementation of the above dragging messages in iMBPhotosController.m.

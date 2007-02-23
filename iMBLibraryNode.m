@@ -493,7 +493,7 @@ static NSMutableDictionary *imageCache = nil;
 	if ([indexes count] > 0)
 	{
 		unsigned int *idxs = (unsigned int *)malloc(sizeof(unsigned int) * ([indexes count] + 1));
-		int i;
+		unsigned int i;
 		
 		for (i = 0; i < [indexes count]; i++)
 		{

@@ -96,8 +96,8 @@
 								nil] error:&error];
 						if (movie)
 						{
-							NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
-							[rec setObject:time forKey:@"Total Time"];
+							NSNumber *theTime = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
+							[rec setObject:theTime forKey:@"Total Time"];
 						}
 						[movie release];
 

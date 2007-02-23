@@ -172,7 +172,7 @@
 			
 			NSMutableArray *newPlaylist = [NSMutableArray array];
 			NSArray *libraryItems = [[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Playlist Items"];
-			int i;
+			unsigned int i;
 			for (i=0; i<[libraryItems count]; i++)
 			{
 				NSDictionary * tracksDictionary = [musicLibrary objectForKey:@"Tracks"];
@@ -204,7 +204,7 @@
 		[root insertItem:purchasedLib atIndex:3];
 		
 		//insert the smart playlist
-		int i;
+		unsigned int i;
 		for (i = 0; i < [smartPlaylists count]; i++)
 		{
 			[root insertItem:[smartPlaylists objectAtIndex:i] atIndex:4 + i];

@@ -730,16 +730,16 @@ static NSURLCache *_URLCache = nil;
 - (void)playlistPopupChanged:(id)sender
 {
 	iMBLibraryNode *selected = [sender representedObject];
-	NSIndexPath *index = [selected indexPath];
+	NSIndexPath *theIndex = [selected indexPath];
 	NSIndexPath *full = nil;
-	unsigned int *idxs = (unsigned int *)malloc(sizeof(unsigned int) * ([index length] + 1));
+	unsigned int *idxs = (unsigned int *)malloc(sizeof(unsigned int) * ([theIndex length] + 1));
 	
 	idxs[0] = [[libraryController content] indexOfObject:[selected root]];
 	
 	int i = 0;
-	for (i = 0; i < [index length]; i++)
+	for (i = 0; i < [theIndex length]; i++)
 	{
-		idxs[i+1] = [index indexAtPosition:i];
+		idxs[i+1] = [theIndex indexAtPosition:i];
 	}
 	full = [NSIndexPath indexPathWithIndexes:idxs length:i+1];
 	[libraryController setSelectionIndexPath:full];
@@ -762,15 +762,15 @@ static NSURLCache *_URLCache = nil;
 - (void)outlineViewItemWillExpand:(NSNotification *)notification	// notification from oPlaylists
 {
 	id row = [[notification userInfo] objectForKey:@"NSObject"];
-	NSOutlineView *outline = [notification object];
+	NSOutlineView *theOutline = [notification object];
 	id objectToExpand = [row observedObject];
 	if (myFlags.willExpand)
 	{
-		[myDelegate iMediaBrowser:self willExpandOutline:outline row:row node:objectToExpand];
+		[myDelegate iMediaBrowser:self willExpandOutline:theOutline row:row node:objectToExpand];
 	}
 	if ([[objectToExpand parser] respondsToSelector:@selector(iMediaBrowser:willExpandOutline:row:node:)])
 	{
-		[[objectToExpand parser] iMediaBrowser:self willExpandOutline:outline row:row node:objectToExpand];
+		[[objectToExpand parser] iMediaBrowser:self willExpandOutline:theOutline row:row node:objectToExpand];
 	}
 }
 
@@ -1029,7 +1029,7 @@ static NSURLCache *_URLCache = nil;
          numberOfChildrenOfItem:(id)item { return 0; }
 
 - (id)   outlineView: (NSOutlineView *)ov
-			   child:(int)index
+			   child:(int)aIndex
 			  ofItem:(id)item { return nil; }
 
 - (id)   outlineView: (NSOutlineView *)ov
@@ -1039,10 +1039,10 @@ static NSURLCache *_URLCache = nil;
 - (BOOL) outlineView: (NSOutlineView *)ov
           acceptDrop: (id )info
                 item: (id)item
-          childIndex: (int)index
+          childIndex: (int)aIndex
 {
 	BOOL doDefault = YES;
-	BOOL success = [mySelectedBrowser playlistOutlineView:ov acceptDrop:info item:item childIndex:index tryDefaultHandling:&doDefault];
+	BOOL success = [mySelectedBrowser playlistOutlineView:ov acceptDrop:info item:item childIndex:aIndex tryDefaultHandling:&doDefault];
 	if (success || !doDefault)
 		return success;
 
@@ -1052,10 +1052,10 @@ static NSURLCache *_URLCache = nil;
 	return YES;
 }
 
-- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index
+- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)aIndex
 {
 	BOOL doDefault = YES;
-	NSDragOperation dragOp = [mySelectedBrowser playlistOutlineView:outlineView validateDrop:info proposedItem:item proposedChildIndex:index tryDefaultHandling:&doDefault];
+	NSDragOperation dragOp = [mySelectedBrowser playlistOutlineView:outlineView validateDrop:info proposedItem:item proposedChildIndex:aIndex tryDefaultHandling:&doDefault];
 	
 	if ((dragOp != NSDragOperationNone) || !doDefault)
 		return dragOp;

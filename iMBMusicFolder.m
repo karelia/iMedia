@@ -174,9 +174,9 @@ static NSImage *sDRMIcon = nil;
 					[song setObject:val forKey:@"Artist"];
 					if (myParseMetaData)
 					{
-						NSNumber *time = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
+						NSNumber *theTime = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
 						// Used for binding
-						[song setObject:time forKey:@"Total Time"];
+						[song setObject:theTime forKey:@"Total Time"];
 						if (![movie isDRMProtected])
 						{
 							[song setObject:sSongIcon forKey:@"Icon"];

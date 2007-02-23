@@ -293,16 +293,16 @@ static NSImage *_toolbarIcon = nil;
 
 static NSImage *noAvatarImage = nil;
 
-- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
+- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)aIndex
 {
 	NSDictionary *rec;
 	if ([mySearchString length] > 0)
 	{
-		rec = [myFilteredImages objectAtIndex:index];
+		rec = [myFilteredImages objectAtIndex:aIndex];
 	}
 	else
 	{
-		rec = [myImages objectAtIndex:index];
+		rec = [myImages objectAtIndex:aIndex];
 	}
 	//try the caches
 	NSImage *img = [rec objectForKey:@"CachedThumb"];
@@ -355,7 +355,7 @@ static NSImage *noAvatarImage = nil;
     return [[[NSArray alloc] init] autorelease];
 }
 
-- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)index dataType:(NSString *)type
+- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)aIndex dataType:(NSString *)type
 {
     return nil;
 }
@@ -387,16 +387,16 @@ static NSImage *noAvatarImage = nil;
 	[self writeItems:items toPasteboard:pboard];
 }
 
-- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
+- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)aIndex
 {
 	NSDictionary *rec;
 	if ([mySearchString length] > 0)
 	{
-		rec = [myFilteredImages objectAtIndex:index];
+		rec = [myFilteredImages objectAtIndex:aIndex];
 	}
 	else
 	{
-		rec = [myImages objectAtIndex:index];
+		rec = [myImages objectAtIndex:aIndex];
 	}
 	return [rec objectForKey:@"Caption"];
 }

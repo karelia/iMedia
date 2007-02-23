@@ -13,7 +13,7 @@
 
 #import "NSURLCache+iMedia.h"
 
-static NSString *sApplicationCachingScheme = @"iMediaCache";
+//static NSString *sApplicationCachingScheme = @"iMediaCache";
 
 @implementation NSURLCache ( iMedia )
 

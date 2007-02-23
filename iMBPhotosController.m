@@ -241,7 +241,7 @@ static NSImage *_toolbarIcon = nil;
 	[album setObject:[NSNumber numberWithInt:1] forKey:@"AlbumId"];
 	[album setObject:albumName forKey:@"AlbumName"];
 	NSMutableArray *imageCount = [NSMutableArray array];
-	int i;
+	unsigned int i;
 	for (i = 1; i <= [items count]; i++)
 	{
 		[imageCount addObject:[NSNumber numberWithInt:i]];
@@ -526,24 +526,24 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	return [myImages count];
 }
 
-- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)index
+- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)aIndex
 {
 	if ([[self browser] showsFilenamesInPhotoBasedBrowsers])
-        return [self photoView:view captionForPhotoAtIndex:index];
+        return [self photoView:view captionForPhotoAtIndex:aIndex];
     
 	return nil;
 }
 
-- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
+- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)aIndex
 {
 	NSDictionary *rec;
 	if ([mySearchString length] > 0)
 	{
-		rec = [myFilteredImages objectAtIndex:index];
+		rec = [myFilteredImages objectAtIndex:aIndex];
 	}
 	else
 	{
-		rec = [myImages objectAtIndex:index];
+		rec = [myImages objectAtIndex:aIndex];
 	}
 	//try the caches
 	[myCacheLock lock];	// ============================================================ LOCK
@@ -594,7 +594,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 													  userInfo:d];
 }
 
-- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index withFrame:(NSRect)frame
+- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)aIndex withFrame:(NSRect)frame
 {
 	NSArray *selection = [self selectedRecords];
 	NSEvent *evt = [NSApp currentEvent];
@@ -621,7 +621,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
     return [[[NSArray alloc] init] autorelease];
 }
 
-- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)index dataType:(NSString *)type
+- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)aIndex dataType:(NSString *)type
 {
     return nil;
 }
@@ -632,7 +632,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 {
 	NSMutableArray *items = [NSMutableArray array];
 	NSDictionary *cur;
-	int i;
+	unsigned int i;
 	
 	for(i = 0; i < [myImages count]; i++) 
 	{
@@ -652,16 +652,16 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	[self writeItems:items fromAlbum:[[NSBundle bundleForClass:[iMBPhotosController class]] localizedStringForKey:@"Selection" value:@"" table:nil] toPasteboard:pboard];
 }
 
-- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
+- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)aIndex
 {
 	NSDictionary *rec;
 	if ([mySearchString length] > 0)
 	{
-		rec = [myFilteredImages objectAtIndex:index];
+		rec = [myFilteredImages objectAtIndex:aIndex];
 	}
 	else
 	{
-		rec = [myImages objectAtIndex:index];
+		rec = [myImages objectAtIndex:aIndex];
 	}
 	return [rec objectForKey:@"Caption"];
 }
@@ -688,14 +688,14 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 }
 
 
-- (NSDragOperation)playlistOutlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index tryDefaultHandling:(BOOL*)tryDefault
+- (NSDragOperation)playlistOutlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)aIndex tryDefaultHandling:(BOOL*)tryDefault
 {
 	NSDragOperation result = NSDragOperationNone;
 	*tryDefault = YES;
 	NSPasteboard* pboard = [info draggingPasteboard];
 	if ([pboard availableTypeFromArray:[NSArray arrayWithObject:NSTIFFPboardType]])
 	{
-		if (index == NSOutlineViewDropOnItemIndex) // We don't allow inter-item drags
+		if (aIndex == NSOutlineViewDropOnItemIndex) // We don't allow inter-item drags
 		{
 			iMBLibraryNode* node = [item observedObject];
 			if (node) // You would also want to check that the node is able to receive the drop here
@@ -718,7 +718,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 - (BOOL)playlistOutlineView:(NSOutlineView *)outlineView
 				 acceptDrop:(id <NSDraggingInfo>)info
 					   item:(id)item
-				 childIndex:(int)index
+				 childIndex:(int)aIndex
 		 tryDefaultHandling:(BOOL*)tryDefault
 {
 	BOOL result = NO;

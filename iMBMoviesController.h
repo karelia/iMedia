@@ -46,7 +46,7 @@
 	NSMutableSet			*myProcessingImages;
 	NSLock					*myCacheLock;
 	NSMutableDictionary		*myCache;
-	int						myThreadCount;
+	unsigned int			myThreadCount;
 }
 
 - (IBAction)play:(id)sender;

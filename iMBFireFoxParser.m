@@ -139,10 +139,10 @@
 		
 		NSString *html = [[[NSString alloc] initWithData:[NSData dataWithContentsOfFile:bookmarksPath] encoding:NSUTF8StringEncoding] autorelease];
 		html = [self _removeTags:_tags fromHtml:html];
-		NSError *err;
-		NSXMLDocument *xml = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:bookmarksPath]
-																  options:NSXMLDocumentTidyHTML
-																	error:&err];
+//unused		NSError *err;
+//unused		NSXMLDocument *xml = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:bookmarksPath]
+//																  options:NSXMLDocumentTidyHTML
+//																	error:&err];
 //		NSLog(@"%@: %@", NSStringFromSelector(_cmd), [xml XMLStringWithOptions:NSXMLNodePrettyPrint]);
 	}
     
