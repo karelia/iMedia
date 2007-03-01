@@ -148,9 +148,15 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (void)postSelectionChangeNotification:(NSArray *)selectedObjects
 {
+	NSEvent *evt = [NSApp currentEvent];
+	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+		selectedObjects, @"Selection", 
+		evt, @"Event",
+		selectedObjects, @"records", // XXX legacy keys for backwards compatability
+		evt, @"event", nil];	// XXX legacy key for backwards compatability
 	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDidChangeNotification
 														object:self
-													  userInfo:[NSDictionary dictionaryWithObject:selectedObjects forKey:@"Selection"]];
+													  userInfo:info];
 }
 
 - (NSArray *)rootNodes

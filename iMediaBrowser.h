@@ -111,6 +111,9 @@
 // reloads the current selected browser
 - (IBAction)reloadMediaBrowser:(id)sender;
 
+// loads the specified browser
+- (void)showMediaBrowser:(NSString *)browserClassName;
+
 - (void)setShowsFilenamesInPhotoBasedBrowsers:(BOOL)flag;
 - (BOOL)showsFilenamesInPhotoBasedBrowsers;
 

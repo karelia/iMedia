@@ -586,22 +586,12 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	[mySelection removeAllIndexes];
 	[mySelection addIndexes:indexes];
 	
-	NSArray *selection = [self selectedRecords];
-	NSEvent *evt = [NSApp currentEvent];
-	NSDictionary *d = [NSDictionary dictionaryWithObjectsAndKeys:selection, @"records", evt, @"event", nil];
-	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDidChangeNotification
-														object:self
-													  userInfo:d];
+	[self postSelectionChangeNotification:[self selectedRecords]];
 }
 
 - (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)aIndex withFrame:(NSRect)frame
 {
-	NSArray *selection = [self selectedRecords];
-	NSEvent *evt = [NSApp currentEvent];
-	NSDictionary *d = [NSDictionary dictionaryWithObjectsAndKeys:selection, @"records", evt, @"event", nil];
-	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDidChangeNotification
-														object:self
-													  userInfo:d];
+	[self postSelectionChangeNotification:[self selectedRecords]];
 }
 
 - (NSIndexSet *)selectionIndexesForPhotoView:(MUPhotoView *)view

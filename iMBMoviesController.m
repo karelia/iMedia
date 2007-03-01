@@ -120,7 +120,8 @@
 	[self willChangeValueForKey:@"images"];
 	[mySelection removeAllIndexes];
 	[myFilteredImages removeAllObjects];
-	
+	[self postSelectionChangeNotification:[self selectedItems]];
+
 	if ([mySearchString length] == 0) return;
 	
 	iMBLibraryNode *selectedNode = [[[self controller] selectedObjects] lastObject];
@@ -187,6 +188,20 @@
             [myCacheLock unlock];
         }
 	}
+}
+
+- (NSArray*) selectedItems
+{
+	NSArray* records = nil;
+	if ([mySearchString length] > 0)
+	{
+		records = [myFilteredImages objectsAtIndexes:mySelection];
+	}
+	else
+	{
+		records = [myImages objectsAtIndexes:mySelection];
+	}
+	return records;
 }
 
 #pragma mark -
@@ -626,6 +641,7 @@ static NSImage *_toolbarIcon = nil;
 {
 	[mySelection removeAllIndexes];
 	[mySelection addIndexes:indexes];
+	[self postSelectionChangeNotification:[self selectedItems]];
 }
 
 - (NSIndexSet *)selectionIndexesForPhotoView:(MUPhotoView *)view
@@ -744,6 +760,8 @@ static NSImage *_toolbarIcon = nil;
 			// now start playing -- but after a delay to prevent a flash-frame of the movie at full size!
 			[previewMovieView performSelector:@selector(play:) withObject:self afterDelay:0.0];
 		}
+		
+		[self postSelectionChangeNotification:[self selectedItems]];
 	}
 }
 
