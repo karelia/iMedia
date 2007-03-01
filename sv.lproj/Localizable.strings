@@ -10,6 +10,9 @@
 /* Formatting: tracks of audio -- song or sound effect */
 "%{value1}@ tracks" = "%{value1}@ tracks";
 
+/* format for width X height */
+"\n%.0f \\U2715 %.0f" = "\n%1$.0f ✕ %2$.0f";
+
 /* Root Node Name of address book */
 "Address Book" = "Adressbok";
 
