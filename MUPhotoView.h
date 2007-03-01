@@ -35,6 +35,7 @@
     
     BOOL sendsLiveSelectionUpdates;
     BOOL useHighQualityResize;
+	BOOL showCaptions;
     
     NSMutableArray *photosArray;
     NSMutableArray *photosFastArray;
@@ -133,6 +134,11 @@
     /** By setting this value to YES, you tell MUPhotoView to draw with a higher-quality image, sacrificing speed. **/
 - (void)setUseHighQualityResize:(BOOL)flag;
 
+/** Indicates whether captions should be shown below the photo */
+- (BOOL)showCaptions;
+/** By setting this value to YES, you tell MUPhotoView to draw captions below the thumbnails. **/
+- (void)setShowCaptions:(BOOL)flag;
+
 #pragma mark -
 // Appearance
 #pragma mark Appearance
@@ -197,7 +203,7 @@
 - (NSImage *)photoView:(MUPhotoView *)view fastPhotoAtIndex:(unsigned)index;
 
 - (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)index;
-    // If a title is returned it will be drawn under the photo. Return nil to avoid titles.
+    // If a title is returned it will be drawn under the photo, if that option is set.
 
 // selection methods - will only get called if photoSelectionIndexes has not been bound
 /** The view will call this method if all of the following are true: (a) a valid NSIndexSet has not been bound to the @"photoSelectionIndexes" key, (b) 
@@ -253,7 +259,7 @@
 - (void)photoView:(MUPhotoView *)view didRemovePhotosAtIndexes:(NSIndexSet *)indexes;
 
 // Tool tip support
-- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index;
+- (NSString *)photoView:(MUPhotoView *)view tooltipForPhotoAtIndex:(unsigned)index;
 
 @end
 

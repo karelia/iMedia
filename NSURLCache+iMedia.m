@@ -17,7 +17,7 @@
 
 @implementation NSURLCache ( iMedia )
 
-- (void) cacheData:(NSData *)aData forPath:(NSString *)aPath;
+- (void) cacheData:(NSData *)aData userInfo:(NSDictionary *)aUserInfo forPath:(NSString *)aPath;
 {
 	
 	NSURL *cacheURL = [NSURL fileURLWithPath:aPath]; // [[[NSURL alloc] initWithScheme:sApplicationCachingScheme host:@"" path:aPath] autorelease];
@@ -25,7 +25,10 @@
 														 MIMEType:@"application/octet-stream"
 											expectedContentLength:[aData length]
 												 textEncodingName:nil] autorelease];
-	NSCachedURLResponse *cachedResponse = [[[NSCachedURLResponse alloc] initWithResponse:response data:aData] autorelease];
+	NSCachedURLResponse *cachedResponse = [[[NSCachedURLResponse alloc] initWithResponse:response
+																					data:aData
+																				userInfo:aUserInfo
+																		   storagePolicy:NSURLCacheStorageAllowed] autorelease];
 	NSURLRequest *request = [NSURLRequest requestWithURL:cacheURL];
 	[self storeCachedResponse:cachedResponse forRequest:request];
 	
@@ -45,12 +48,17 @@
 //	}
 }
 
-- (NSData *)cachedDataForPath:(NSString *)aPath;	// will return nil if not cached
+- (NSData *)cachedDataForPath:(NSString *)aPath userInfo:(NSDictionary **)outUserInfo;	// will return nil if not cached
 {
 	NSURL *cacheURL = [NSURL fileURLWithPath:aPath]; // [[[NSURL alloc] initWithScheme:sApplicationCachingScheme host:@"" path:aPath] autorelease];
 	NSURLRequest *request = [NSURLRequest requestWithURL:cacheURL];
 	NSCachedURLResponse *lookupResponse = [self cachedResponseForRequest:request];
 	NSData  *result = [lookupResponse data];
+	NSDictionary *userInfo = [lookupResponse userInfo];
+	if (outUserInfo)
+	{
+		*outUserInfo = userInfo;
+	}
 	
 //	if (result)
 //		NSLog(@"found data for %@", aPath);

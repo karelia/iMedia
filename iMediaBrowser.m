@@ -210,6 +210,13 @@ static NSMutableDictionary *_parsers = nil;
 {
 	if (self = [super initWithWindowNibName:@"MediaBrowser"]) {
 		
+		// Make sure we are running Tiger
+		if (NSAppKitVersionNumber < 824)  /* NSAppKitVersionNumber10_4 */
+		{
+			NSLog(@"ERROR - Mac OS X 10.4, or greater, required for the iMediaBrowser");
+			[self release];
+			return nil;
+		}
 		[QTMovie initialize];
 		id libraryItemsValueTransformer = [[[LibraryItemsValueTransformer alloc] init] autorelease];
 		[NSValueTransformer setValueTransformer:libraryItemsValueTransformer forName:@"libraryItemsValueTransformer"];

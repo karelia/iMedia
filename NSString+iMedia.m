@@ -129,7 +129,7 @@
 
 // This is from cocoadev.com -- public domain
 
-@implementation NSString (Base64)
+@implementation NSString ( iMedia )
 
 - (NSData *) decodeBase64;
 {
@@ -159,10 +159,6 @@
     return data;
 }
 
-@end
-
-@implementation NSString (UUID)
-
 + (id)uuid
 {
 	CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
@@ -172,5 +168,23 @@
 	return (NSString *)uuidStr;
 }
 
+- (NSString *)exifDateToLocalizedDisplayDate
+{
+	NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
+	[formatter setDateFormat:@"yyyy':'MM':'dd kk':'mm':'ss"];
+	NSDate *date = [formatter dateFromString:self];
+	[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+	[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
+	[formatter setTimeStyle:NSDateFormatterShortStyle];	// no seconds
+	NSString *result = [formatter stringFromDate:date];
+	return result;
+}
+
++ (NSString *)stringFromStarRating:(unsigned int)aRating;
+{
+	static unichar blackStars[] = { 0x2605, 0x2605, 0x2605, 0x2605, 0x2605 };
+	aRating = MIN((unsigned int)5,aRating);	// make sure not above 5
+	return [NSString stringWithCharacters:blackStars length:aRating];
+}
 @end
 

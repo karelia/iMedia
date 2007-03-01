@@ -11,8 +11,8 @@
 
 @interface NSURLCache ( iMedia )
 
-- (void) cacheData:(NSData *)aData forPath:(NSString *)aPath;
+- (void) cacheData:(NSData *)aData userInfo:(NSDictionary *)aUserInfo forPath:(NSString *)aPath;
 
-- (NSData *)cachedDataForPath:(NSString *)aPath;	// will return nil if not cached
+- (NSData *)cachedDataForPath:(NSString *)aPath userInfo:(NSDictionary **)outUserInfo;	// will return nil if not cached
 
 @end

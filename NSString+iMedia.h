@@ -34,15 +34,15 @@
 
 @end
 
-@interface NSString (Base64)
+@interface NSString ( iMedia )
 
 - (NSData *) decodeBase64;
 - (NSData *) decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
 
-@end
-
-@interface NSString (UUID)
-
 + (id)uuid;
+
+- (NSString *)exifDateToLocalizedDisplayDate;
+
++ (NSString *)stringFromStarRating:(unsigned int)aRating;
 
 @end

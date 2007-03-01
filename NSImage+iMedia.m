@@ -60,5 +60,41 @@
 	return [img autorelease];
 }
 
+// Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
++ (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
+{
+	NSDictionary *result = nil;
+	CGImageSourceRef source = nil;
+	NSURL *url = [NSURL fileURLWithPath:aPath];
+	source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
+	if (source)
+	{
+		CFDictionaryRef propsCF = CGImageSourceCopyPropertiesAtIndex(source,  0,  NULL );
+		NSDictionary *props = (NSDictionary *)propsCF;
+		if (props)
+		{
+			NSMutableDictionary *md = [NSMutableDictionary dictionary];
+			NSNumber *width = [NSNumber numberWithFloat:[[props objectForKey:(NSString *)kCGImagePropertyPixelWidth] floatValue]];
+			NSNumber *height= [NSNumber numberWithFloat:[[props objectForKey:(NSString *)kCGImagePropertyPixelHeight] floatValue]];
+			[md setObject:width forKey:@"width"];
+			[md setObject:height forKey:@"height"];
+			NSDictionary *exif = [props objectForKey:(NSString *)kCGImagePropertyExifDictionary];
+			if ( nil != exif )
+			{
+				NSString *dateTime = [exif objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal];
+				// format from EXIF -- we could convert to a date and make more localized....
+				if (nil != dateTime)
+				{
+					[md setObject:[dateTime exifDateToLocalizedDisplayDate] forKey:@"dateTimeLocalized"];
+				}
+			}
+			CFRelease(props);
+			result = [NSDictionary dictionaryWithDictionary:md];
+		}
+		CFRelease(source);
+	}
+	return [NSDictionary dictionaryWithDictionary:result];
+}
+
 @end
 

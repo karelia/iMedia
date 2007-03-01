@@ -230,11 +230,12 @@ bail:
 	div_t hours = div(actualSeconds,3600);
 	div_t minutes = div(hours.rem,60);
 	
+#warning really should internationalize, if we can figure out how!
 	if (hours.quot == 0) {
-		return [NSString stringWithFormat:@"%2d:%.2d", minutes.quot, minutes.rem];
+		return [NSString stringWithFormat:@"%d:%.2d", minutes.quot, minutes.rem];
 	}
 	else {
-		return [NSString stringWithFormat:@"%2d:%02d:%02d", hours.quot, minutes.quot, minutes.rem];
+		return [NSString stringWithFormat:@"%d:%02d:%02d", hours.quot, minutes.quot, minutes.rem];
 	}	
 }
 

@@ -63,6 +63,7 @@
 	[oPhotoView setDelegate:self];
 	[oPhotoView setUseOutlineBorder:NO];
 	[oPhotoView setUseHighQualityResize:NO];
+	[oPhotoView setShowCaptions:[[self browser] showsFilenamesInPhotoBasedBrowsers]];
 	[oPhotoView setBackgroundColor:[NSColor whiteColor]];
 
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
@@ -387,7 +388,7 @@ static NSImage *noAvatarImage = nil;
 	[self writeItems:items toPasteboard:pboard];
 }
 
-- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)aIndex
+- (NSString *)photoView:(MUPhotoView *)view tooltipForPhotoAtIndex:(unsigned)aIndex
 {
 	NSDictionary *rec;
 	if ([mySearchString length] > 0)

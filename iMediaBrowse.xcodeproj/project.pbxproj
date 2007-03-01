@@ -187,6 +187,8 @@
 		CEC85B0C0B5150B4006DA6AA /* iMBSafariBookmarkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D71DF09D3C00F005F166D /* iMBSafariBookmarkParser.h */; };
 		CEC85B0D0B5150C1006DA6AA /* LibraryItemsValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEC85B0E0B5150C2006DA6AA /* TimeValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CEC915010B97648C0072492B /* iMBiPhotoAbstractParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEC914FF0B97648C0072492B /* iMBiPhotoAbstractParser.h */; };
+		CEC915020B97648C0072492B /* iMBiPhotoAbstractParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC915000B97648C0072492B /* iMBiPhotoAbstractParser.m */; };
 		CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
 		CEF3F38609E449FF00D0058F /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF3F38409E449FF00D0058F /* NSString+iMedia.m */; };
 		CEFC515C0B792BD1009F114D /* reload.png in Resources */ = {isa = PBXBuildFile; fileRef = CEFC515B0B792BD1009F114D /* reload.png */; };
@@ -429,6 +431,8 @@
 		CE58DB4F0B7BE14900BECE74 /* reload_border_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload_border_on.png; sourceTree = "<group>"; };
 		CE7570610ADEE8CB009FE941 /* missingImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = missingImage.png; sourceTree = "<group>"; };
 		CEA9AF9F0A64214900855897 /* ja */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEC914FF0B97648C0072492B /* iMBiPhotoAbstractParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBiPhotoAbstractParser.h; sourceTree = "<group>"; };
+		CEC915000B97648C0072492B /* iMBiPhotoAbstractParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBiPhotoAbstractParser.m; sourceTree = "<group>"; };
 		CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "QTMovie+iMedia.h"; sourceTree = "<group>"; };
 		CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QTMovie+iMedia.m"; sourceTree = "<group>"; };
 		CEDE18CE0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -679,6 +683,8 @@
 			children = (
 				795D715909D3AB47005F166D /* iMBAbstractParser.h */,
 				795D715A09D3AB47005F166D /* iMBAbstractParser.m */,
+				CEC914FF0B97648C0072492B /* iMBiPhotoAbstractParser.h */,
+				CEC915000B97648C0072492B /* iMBiPhotoAbstractParser.m */,
 				7953E6450A2E896700C7AFBB /* Photo */,
 				7953E6480A2E896C00C7AFBB /* Audio */,
 				7953E64B0A2E896F00C7AFBB /* Movies */,
@@ -935,6 +941,7 @@
 				CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */,
 				CEFC515F0B792C11009F114D /* iMBPlacardScrollView.h in Headers */,
 				CE3F200B0B8646A000A1CD2A /* NSURLCache+iMedia.h in Headers */,
+				CEC915010B97648C0072492B /* iMBiPhotoAbstractParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1164,6 +1171,7 @@
 				CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */,
 				CEFC51600B792C11009F114D /* iMBPlacardScrollView.m in Sources */,
 				CE3F200C0B8646A000A1CD2A /* NSURLCache+iMedia.m in Sources */,
+				CEC915020B97648C0072492B /* iMBiPhotoAbstractParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1227,17 +1235,11 @@
 			baseConfigurationReference = 3C371AFC09AD501A00501C1F /* Framework Debug.xcconfig */;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
 				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
-				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1247,7 +1249,6 @@
 					0xcf100000,
 				);
 				PRODUCT_NAME = iMediaBrowser;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
@@ -1353,13 +1354,6 @@
 			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/../../Builds/Deployment\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@loader_path/../Frameworks";
 				OTHER_LDFLAGS = (
@@ -1411,6 +1405,7 @@
 					ppc,
 					i386,
 				);
+				GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};

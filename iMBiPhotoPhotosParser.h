@@ -23,9 +23,9 @@
 
 */
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractParser.h"
+#import "iMBiPhotoAbstractParser.h"
 
-@interface iMBiPhotoPhotosParser : iMBAbstractParser 
+@interface iMBiPhotoPhotosParser : iMBiPhotoAbstractParser 
 {
 
 }

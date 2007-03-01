@@ -118,6 +118,7 @@ static Class sNSCGImageRepClass = nil;
 	[oPhotoView setDelegate:self];
 	[oPhotoView setUseOutlineBorder:NO];
 	[oPhotoView setUseHighQualityResize:NO];
+	[oPhotoView setShowCaptions:[[self browser] showsFilenamesInPhotoBasedBrowsers]];
 	[oPhotoView setBackgroundColor:[NSColor whiteColor]];
 
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
@@ -181,7 +182,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSImage*)toolbarIcon
 {
-	if(_toolbarIcon == nil)
+	if (_toolbarIcon == nil)
 	{
 		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iPhoto"] retain];
 		[_toolbarIcon setScalesWhenResized:YES];
@@ -526,14 +527,6 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	return [myImages count];
 }
 
-- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)aIndex
-{
-	if ([[self browser] showsFilenamesInPhotoBasedBrowsers])
-        return [self photoView:view captionForPhotoAtIndex:aIndex];
-    
-	return nil;
-}
-
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)aIndex
 {
 	NSDictionary *rec;
@@ -642,7 +635,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	[self writeItems:items fromAlbum:[[NSBundle bundleForClass:[iMBPhotosController class]] localizedStringForKey:@"Selection" value:@"" table:nil] toPasteboard:pboard];
 }
 
-- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)aIndex
+- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)aIndex
 {
 	NSDictionary *rec;
 	if ([mySearchString length] > 0)
@@ -653,7 +646,69 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	{
 		rec = [myImages objectAtIndex:aIndex];
 	}
-	return [rec objectForKey:@"Caption"];
+	NSString *result = [rec objectForKey:@"Caption"];
+	return result;
+}
+
+- (NSString *)photoView:(MUPhotoView *)view tooltipForPhotoAtIndex:(unsigned)aIndex
+{
+	NSMutableString *result = [NSMutableString string];
+	NSDictionary *rec;
+	if ([mySearchString length] > 0)
+	{
+		rec = [myFilteredImages objectAtIndex:aIndex];
+	}
+	else
+	{
+		rec = [myImages objectAtIndex:aIndex];
+	}
+	[result appendString:[rec objectForKey:@"Caption"]];	// the title of the image, often the file name.
+	
+	NSString *imagePath = [rec objectForKey:@"ImagePath"];
+	if (imagePath)
+	{
+		NSDictionary *metadata = [NSImage metadataFromImageAtPath:imagePath];
+		NSString *dimensionsFormat = LocalizedStringInThisBundle(@"\n%.0f \\U2715 %.0f", @"format for width X height");
+		[result appendFormat:dimensionsFormat,
+			[[metadata objectForKey:@"width"]  floatValue],
+			[[metadata objectForKey:@"height"] floatValue]];
+		NSString *dateTimeLocalized = [metadata objectForKey:@"dateTimeLocalized"];
+		if (dateTimeLocalized)
+		{
+			[result appendFormat:@"\n%@", dateTimeLocalized];
+		}
+		int rating = [[rec objectForKey:@"Rating"] intValue];
+		NSString *comment = [rec objectForKey:@"Comment"];
+		BOOL hasComment = (nil != comment && ![comment isEqualToString:@""]);
+		NSArray *keywords = [rec objectForKey:@"iMediaKeywords"];
+		BOOL hasKeywords = keywords && [keywords count];
+		if (rating > 0 || hasComment || hasKeywords)
+		{
+			[result appendString:@"\n"];	// extra blank line before comment or rating
+			if (hasComment)
+			{
+				[result appendFormat:@"\n%@", comment];
+			}
+			if (rating > 0)
+			{
+				[result appendFormat:@"\n%@", 
+					[NSString stringFromStarRating:rating]];
+			}
+			if (hasKeywords)
+			{
+				[result appendFormat:@"\n"];
+				NSEnumerator *keywordsEnum = [keywords objectEnumerator];
+				NSString *keyword;
+				
+				while ((keyword = [keywordsEnum nextObject]) != nil)
+				{
+					[result appendFormat:@"%@, ", keyword];
+				}
+				[result deleteCharactersInRange:NSMakeRange([result length] - 2, 2)];	// remove last comma+space
+			}
+		}
+	}
+	return result;
 }
 
 @end

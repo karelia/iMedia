@@ -31,4 +31,8 @@
 + (NSImage *)imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle;
 
 + (NSImage *)imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime;
+
+// Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
++ (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
+
 @end

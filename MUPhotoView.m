@@ -205,29 +205,32 @@ static NSDictionary *sTitleAttributes = nil;
 		
         NSRect    gridRect = [self centerScanRect:[self gridRectForIndex:index]];
         
-        NSString *title = [delegate photoView:self titleForPhotoAtIndex:index];
         NSSize    titleSize = NSZeroSize;
         NSRect    titleRect = NSZeroRect;
-        
-        if (title)
-		{
-            title = [delegate photoView:self titleForPhotoAtIndex:index];
-            if (!sTitleAttributes)
-            {   // This could be improved by setting the color to something that works well with a non white background color.
-                sTitleAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:[NSFont labelFontSize]], NSFontAttributeName, [NSColor darkGrayColor], NSForegroundColorAttributeName, nil];
-                [sTitleAttributes retain];
-            }
-            titleSize = [title sizeWithAttributes:sTitleAttributes];
-            
-            NSDivideRect(gridRect, &titleRect, &gridRect, titleSize.height + 6.0f, NSMaxYEdge);
-		}
+		NSString	*title = nil;
 
+		if (showCaptions)
+		{
+			title = [delegate photoView:self titleForPhotoAtIndex:index];
+			if (title)
+			{
+				if (!sTitleAttributes)
+				{   // This could be improved by setting the color to something that works well with a non white background color.
+					sTitleAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:[NSFont labelFontSize]], NSFontAttributeName, [NSColor darkGrayColor], NSForegroundColorAttributeName, nil];
+					[sTitleAttributes retain];
+				}
+				titleSize = [title sizeWithAttributes:sTitleAttributes];
+				
+				NSDivideRect(gridRect, &titleRect, &gridRect, titleSize.height + 6.0f, NSMaxYEdge);
+			}
+		}
         NSSize scaledSize = [self scaledPhotoSizeForSize:[photo size]];
         NSRect photoRect = [self rectCenteredInRect:gridRect withSize:scaledSize];
 
-		if (title)
+		if (!NSEqualSizes(NSZeroSize,titleSize))
+		{
 			photoRect = NSInsetRect(photoRect,6,6);
-		
+		}
         photoRect = [self centerScanRect:photoRect];
         
         //**** BEGIN Background Drawing - any drawing that technically goes under the image ****/
@@ -327,7 +330,7 @@ static NSDictionary *sTitleAttributes = nil;
 	unsigned idx = [self photoIndexForPoint:point];
 	if (idx < [self photoCount])
 	{
-		return [delegate photoView:self captionForPhotoAtIndex:[self photoIndexForPoint:point]];
+		return [delegate photoView:self tooltipForPhotoAtIndex:[self photoIndexForPoint:point]];
 	}
 	return nil;
 }
@@ -541,6 +544,16 @@ static NSDictionary *sTitleAttributes = nil;
 - (void)setUseHighQualityResize:(BOOL)flag
 {
     useHighQualityResize = flag;
+}
+
+- (BOOL)showCaptions
+{
+    return showCaptions;
+}
+
+- (void)setShowCaptions:(BOOL)flag
+{
+    showCaptions = flag;
 }
 
 - (float)photoSize
@@ -1484,7 +1497,7 @@ static NSDictionary *sTitleAttributes = nil;
     
 }
 
-- (NSString *)photoView:(MUPhotoView *)view captionForPhotoAtIndex:(unsigned)index
+- (NSString *)photoView:(MUPhotoView *)view tooltipForPhotoAtIndex:(unsigned)index
 {
 	return nil;
 }

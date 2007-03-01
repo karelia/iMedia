@@ -22,35 +22,17 @@
  Please send fixes to <imedia@lists.karelia.com>
 
 */
-
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "iMBAbstractParser.h"
 
-@class QTMovieView, MUPhotoView;
-
-@interface iMBMoviesController : iMBAbstractController
+@interface iMBiPhotoAbstractParser : iMBAbstractParser 
 {
-	IBOutlet MUPhotoView	*oPhotoView;
-	IBOutlet NSSlider		*oSlider;
-	IBOutlet NSTextField	*counterField;
-	
-	@private
-	QTMovieView				*previewMovieView;
-	unsigned				movieIndex;
-	NSMutableIndexSet		*mySelection;
-	NSArray					*myImages;
-	NSMutableArray			*myFilteredImages;
-	NSString				*mySearchString;
-	NSMutableArray			*myInFlightImageOperations;
-    NSMutableArray          *myImageRecordsToLoad;
-	NSMutableSet			*myProcessingImages;
-	NSLock					*myCacheLock;
-	NSMutableDictionary		*myImageCache;
-	NSMutableDictionary		*myMetaCache;
-	unsigned int			myThreadCount;
+
 }
 
-- (IBAction)play:(id)sender;
-- (IBAction)search:(id)sender;
+- (iMBLibraryNode *)parseDatabaseAttributeKey:(NSString *)anImagePath
+									mediaType:(NSString *)aMediaType
+								  wantUntyped:(BOOL)aWantUntyped
+								wantThumbPath:(BOOL)aWantThumbPath;
 
 @end
