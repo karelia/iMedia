@@ -172,8 +172,7 @@
 	NSData *data = [anImage TIFFRepresentationUsingCompression:NSTIFFCompressionLZW factor:1.0];    
 	if (data)
 	{
-		NSURLCache* cache = [iMediaBrowser sharedURLCache];
-		[cache cacheData:data forPath:[imagePath stringByAppendingPathExtension:@"tiff"]];
+		[[NSURLCache sharedURLCache] cacheData:data forPath:[imagePath stringByAppendingPathExtension:@"tiff"]];
         
         // Images are sometimes drawn upside down after saving. I don't know why, but as the saved image is correct we can create
         // a new one that works. Does someone know why this is?
@@ -602,8 +601,7 @@ static NSImage *_toolbarIcon = nil;
     
 	if (!img)
 	{   // look on disk cache
-		NSURLCache* cache = [iMediaBrowser sharedURLCache];
-		NSData *data = [cache cachedDataForPath:[imagePath stringByAppendingPathExtension:@"tiff"]]; // will return nil if not cached
+		NSData *data = [[NSURLCache sharedURLCache] cachedDataForPath:[imagePath stringByAppendingPathExtension:@"tiff"]]; // will return nil if not cached
 		if (data)
 		{
 			img = [[[NSImage alloc] initWithData:data] autorelease];

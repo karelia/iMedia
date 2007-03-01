@@ -73,7 +73,6 @@
 + (id)sharedBrowserWithoutLoading;
 + (id)sharedBrowserWithDelegate:(id)delegate;
 + (id)sharedBrowserWithDelegate:(id)delegate supportingBrowserTypes:(NSArray*)types;
-+ (NSURLCache *)sharedURLCache;	// use this instead of [NSURLCache sharedURLCache] to store cache across applications
 
 // Register Other types of Browsers
 + (void)registerBrowser:(Class)aClass;

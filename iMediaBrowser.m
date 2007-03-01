@@ -39,7 +39,6 @@ NSString *iMediaBrowserSelectionDidChangeNotification = @"iMediaSelectionChanged
 static iMediaBrowser *_sharedMediaBrowser = nil;
 static NSMutableArray *_browserClasses = nil;
 static NSMutableDictionary *_parsers = nil;
-static NSURLCache *_URLCache = nil;
 
 @interface iMediaBrowser (PrivateAPI)
 - (void)resetLibraryController;
@@ -62,25 +61,13 @@ static NSURLCache *_URLCache = nil;
 	_browserClasses = [[NSMutableArray alloc] init];
 	_parsers = [[NSMutableDictionary dictionary] retain];
 	
+	// Note: Originally I wanted a custom NSURLCache, but apparently there's only one way to do this,
+	// and that is to create a new sharedURLCache used by your entire application.  I don't know how
+	// to have just imedia's data cached in a particular, separate cache -- if I create a custom
+	// NSURLCache and reference it instead of the shared URL cache, then the data don't get saved
+	// to disk ever.  So unless Apple has a better way, we are stuck 
 	// Create URL cache path, so all instances of iMedia Browser can share a cache
-	
-	// COMMENTED OUT CUSTOM CACHE FOR NOW, UNTIL WE CAN FIGURE OUT HOW TO GET THE FILES TO BE WRITTEN TO DISK!
-//	NSString *cachePath = nil;
-//	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory,NSUserDomainMask,YES);
-//	if ( [libraryPaths count] >= 1 )
-//	{
-//		cachePath = [libraryPaths objectAtIndex:0];
-//		cachePath = [cachePath stringByAppendingPathComponent:@"iMedia"];
-//		_URLCache = [[NSURLCache alloc] initWithMemoryCapacity: 0				// Try 0 to force saving to disk
-//												  diskCapacity: 20*1024*1024	// standard value of Shared URL cache
-//													  diskPath: cachePath];
-//	}
-//	else
-//	{
-		_URLCache = [NSURLCache sharedURLCache];	// shouldn't happen; just in case.
-//	}
-	
-	
+		
 	//register the default set in order
 	[self registerBrowser:NSClassFromString(@"iMBPhotosController")];
 	[self registerBrowser:NSClassFromString(@"iMBMusicController")];
@@ -214,11 +201,6 @@ static NSURLCache *_URLCache = nil;
 + (void)unregisterParser:(Class)parserClass forMediaType:(NSString *)media
 {
 	[iMediaBrowser unregisterParserName:NSStringFromClass(parserClass) forMediaType:media];
-}
-
-+ (NSURLCache *)sharedURLCache;	// use this instead of [NSURLCache sharedURLCache] to store cache across applications
-{
-	return _URLCache;
 }
 
 #pragma mark -
