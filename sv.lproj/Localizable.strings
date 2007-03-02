@@ -1,14 +1,14 @@
 ﻿/* Formatting: number of contacts in address book */
-"%{value1}@ contacts" = "%{value1}@ contacts";
+"%{value1}@ contacts" = "%{value1}@ kontakter";
 
 /* Formatting: tracks of audio -- song or sound effect */
-"%{value1}@ movies" = "%{value1}@ movies";
+"%{value1}@ movies" = "%{value1}@ filmer";
 
 /* Formatting: number of photos displayed */
-"%{value1}@ photos" = "%{value1}@ photos";
+"%{value1}@ photos" = "%{value1}@ bilder";
 
 /* Formatting: tracks of audio -- song or sound effect */
-"%{value1}@ tracks" = "%{value1}@ tracks";
+"%{value1}@ tracks" = "%{value1}@ spår";
 
 /* format for width X height */
 "\n%.0f \\U2715 %.0f" = "\n%1$.0f ✕ %2$.0f";
@@ -41,13 +41,9 @@
 "Demo" = "Demo";
 
 /* folder name */
-"Desktop Pictures" = "Desktop Pictures";
+"Desktop Pictures" = "Skrivbordsbilder";
 
-/* Favourite Movies folder name
-   Favourite Pictures folder name
-   Favourite Music folder name */
-
-
+/* Favourite Movies folder name */
 "Favourites" = "Favoriter";
 
 /* FireFox */
@@ -57,16 +53,16 @@
 "GarageBand" = "GarageBand";
 
 /* Node name */
-"GarageBand Demo Songs" = "GarageBand Demolåtar";
+"GarageBand Demo Songs" = "GarageBand-demolåtar";
 
 /* folder name */
-"iChat Icons" = "iChat Icons";
+"iChat Icons" = "iChat-bilder";
 
 /* iLife Sound Effects folder name */
-"iLife Sound Effects" = "iLife Ljudeffekter";
+"iLife Sound Effects" = "iLife-ljudeffekter";
 
 /* iMovie Sound Effects folder name */
-"iMovie Sound Effects" = "iMovie Ljudeffekter";
+"iMovie Sound Effects" = "iMovie-ljudeffekter";
 
 /* iPhoto */
 "iPhoto" = "iPhoto";
@@ -108,21 +104,19 @@
 "Pictures Folder" = "Bilder";
 
 /* Podcasts as titled in iTunes source list */
-"Podcasts" = "Podcaster";
+"Podcasts" = "Podsändningar";
 
-/* Purchased folder as titled in iTunes source list
-   Purchased folder  as titled in iTunes source list */
-
+/* Purchased folder as titled in iTunes source list */
 "Purchased" = "Inköp";
 
 /* Safari */
 "Safari" = "Safari";
 
 /* Screen Savers -- source of some images in iMedia */
-"Screen Savers" = "Screen Savers";
+"Screen Savers" = "Skärmsläckare";
 
 /* ~/Library/Sounds folder name */
-"Sounds Folder" = "Sounds Folder";
+"Sounds Folder" = "Ljudmapp";
 
 /* Spotlight searching pseudo-folder name */
 "Spotlight" = "Spotlight";
@@ -131,15 +125,16 @@
 "Time" = "Tid";
 
 /* Table Column Title - title of song or audio track */
-"Title" = "Title";
+"Title" = "Titel";
 
-/* Artist of sound is unknown
-   Unkown music key */
-
+/* Artist of sound is unknown Unkown music key */
 "Unknown" = "Okänd";
 
 /* folder name */
-"User Pictures" = "User Pictures";
+"User Pictures" = "Användarbilder";
 
 /* Videos as titled in iTunes source list */
 "Videos" = "Filmer";
+
+/* Photos media type */
+"Photos" = "Bilder";
