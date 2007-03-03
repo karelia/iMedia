@@ -325,6 +325,20 @@ static NSDictionary *sTitleAttributes = nil;
 	
 }
 
+- (void)setNeedsDisplayInRect:(NSRect)invalidRect
+{
+	// Make the view redraw some more pixels, to avoid the "disappearing shadows on scroll" problem
+	if ([[borderShadow shadowColor] alphaComponent]!=0.0) {
+		NSRect shadowRect = invalidRect;
+		shadowRect.origin.x += [borderShadow shadowOffset].width;
+		shadowRect.origin.y -= [borderShadow shadowOffset].height;
+		shadowRect = NSInsetRect(shadowRect, -[borderShadow shadowBlurRadius], -[borderShadow shadowBlurRadius]);
+		invalidRect = NSUnionRect(invalidRect, shadowRect);
+	}
+	[super setNeedsDisplayInRect:invalidRect];
+}
+
+
 - (NSString *)view:(NSView *)view stringForToolTip:(NSToolTipTag)tag point:(NSPoint)point userData:(void *)userData
 {
 	unsigned idx = [self photoIndexForPoint:point];
