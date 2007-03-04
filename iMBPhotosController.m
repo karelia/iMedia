@@ -198,7 +198,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-    return [[NSBundle bundleForClass:[iMBPhotosController class]] localizedStringForKey:@"Photos" value:@"" table:nil];
+	return LocalizedStringInThisBundle(@"Photos", @"Photos media type");
 }
 
 - (void)refresh
