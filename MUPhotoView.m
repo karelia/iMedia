@@ -67,8 +67,9 @@
         useShadowBorder = YES;
         useOutlineBorder = YES;
         borderShadow = [[NSShadow alloc] init];
-        [borderShadow setShadowOffset:NSMakeSize(2.0,-3.0)];
-        [borderShadow setShadowBlurRadius:5.0];
+        [borderShadow setShadowColor:[NSColor colorWithCalibratedWhite:0.5 alpha:1.0]];
+        [borderShadow setShadowOffset:NSMakeSize(0.0, -2.0)];
+        [borderShadow setShadowBlurRadius:4.0];
         noShadow = [[NSShadow alloc] init];
         [noShadow setShadowOffset:NSMakeSize(0,0)];
         [noShadow setShadowBlurRadius:0.0];
