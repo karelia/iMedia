@@ -679,7 +679,14 @@ static NSMutableDictionary *_parsers = nil;
 		if (archivedSelection)
 		{
 			NSIndexPath *selection = [NSKeyedUnarchiver unarchiveObjectWithData:archivedSelection];
-			[libraryController setSelectionIndexPath:selection];
+			
+			@try
+			{
+				[libraryController setSelectionIndexPath:selection];
+			}
+			@catch (NSException *ex) {
+				NSLog(@"Exception caught in setSelectionIndexPath, ignoring");
+			}
 		}
 		else
 		{
