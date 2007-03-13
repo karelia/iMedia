@@ -76,8 +76,8 @@
 			NSMutableDictionary *md = [NSMutableDictionary dictionary];
 			NSNumber *width = [NSNumber numberWithFloat:[[props objectForKey:(NSString *)kCGImagePropertyPixelWidth] floatValue]];
 			NSNumber *height= [NSNumber numberWithFloat:[[props objectForKey:(NSString *)kCGImagePropertyPixelHeight] floatValue]];
-			[md setObject:width forKey:@"width"];
-			[md setObject:height forKey:@"height"];
+			if (width) [md setObject:width forKey:@"width"];
+			if (height) [md setObject:height forKey:@"height"];
 			NSDictionary *exif = [props objectForKey:(NSString *)kCGImagePropertyExifDictionary];
 			if ( nil != exif )
 			{
