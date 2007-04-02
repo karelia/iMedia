@@ -441,7 +441,9 @@ static NSMutableDictionary *_parsers = nil;
 	NSMutableDictionary *d = [NSMutableDictionary dictionary];
 	
 	[d setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
-	[d setObject:[NSArray arrayWithObjects:NSStringFromRect([oPlaylists frame]), NSStringFromRect([oBrowserView frame]), nil] forKey:@"SplitViewSize"];
+
+	// This isn't being restored -- should we?
+	//	[d setObject:[NSArray arrayWithObjects:NSStringFromRect([oPlaylists frame]), NSStringFromRect([oBrowserView frame]), nil] forKey:@"SplitViewSize"];
 	[d setObject:NSStringFromRect([[self window] frame]) forKey:@"WindowPosition"];
 	
 	[ud setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
