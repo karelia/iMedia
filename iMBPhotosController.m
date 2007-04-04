@@ -447,6 +447,14 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 		if (!img) // we have a bad egg... need to display a ? icon
 		{
 			img = sMissingImage;
+			if (thumbPath)
+			{
+				NSLog(@"Unable to load thumb image at %@", thumbPath);
+			}
+			else
+			{
+				NSLog(@"Unable to load image at %@", imagePathRetained);
+			}
 		}
 		
 		[myCacheLock lock];	// ============================================================ LOCK
