@@ -25,7 +25,7 @@
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+iMedia.h"
 
-static NSMutableDictionary *imageCache = nil;
+static NSMutableDictionary *sImageCache = nil;
 
 @interface iMBLibraryNode (Private)
 - (void)setParent:(iMBLibraryNode *)node;
@@ -36,7 +36,7 @@ static NSMutableDictionary *imageCache = nil;
 + (void)initialize
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	imageCache = [[NSMutableDictionary dictionary] retain];
+	sImageCache = [[NSMutableDictionary dictionary] retain];
 	[pool release];
 }
 
@@ -152,21 +152,65 @@ static NSMutableDictionary *imageCache = nil;
 {
 	if (!myIcon && myIconName)
 	{
-		myIcon = [[imageCache objectForKey:myIconName] retain];
+		myIcon = [[sImageCache objectForKey:myIconName] retain];
 		if (!myIcon)
 		{
-			if ([myIconName rangeOfString:@"."].location != NSNotFound)
+			NSString *imagePath = nil;
+			
+			unsigned int whereColon = [myIconName rangeOfString:@":"].location;
+			if (whereColon != NSNotFound)		// split into app identifier for bundle, then resource name.
 			{
-				myIcon = [[[NSWorkspace sharedWorkspace]
-					iconForAppWithBundleIdentifier:myIconName] retain];
+				NSString *identifier = [myIconName substringToIndex:whereColon];
+				NSString *resource = [myIconName substringFromIndex:whereColon+1];
+				NSString *appPath = [[NSWorkspace sharedWorkspace]
+						absolutePathForAppBundleWithIdentifier:identifier];
+				
+				// No resource specified, e.g. "com.apple.iTunes:" means use app icon
+				if ([resource isEqualToString:@""])
+				{
+					if ([[NSFileManager defaultManager] fileExistsAtPath:appPath])
+					{
+						myIcon = [[NSWorkspace sharedWorkspace] iconForFile:appPath];
+					}
+					else
+					{
+						myIcon = [NSImage imageNamed:@"NSDefaultApplicationIcon"];	// fallback
+					}
+					[myIcon retain];
+				}
+				else	// image resource after app, e.g. "com.apple.iTunes:podcast.png"
+				{
+					NSBundle *appBundle = [NSBundle bundleWithPath:appPath];
+					imagePath = [appBundle pathForImageResource:resource];
+				}
 			}
-			else
+			
+			// OLD-style backward compatibilty -- make sure there are >= 2 "."s
+			else if ([[myIconName componentsSeparatedByString:@"."] count] >= 2)
+			{
+					myIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:myIconName] retain];
+			}
+			
+			else	// basic image name (w/ or w/o extension): look in iMedia's bundle ONLY
 			{
 				NSBundle *b = [NSBundle bundleForClass:[self class]];
-				NSString *p = [b pathForImageResource:myIconName];
-				myIcon = [[NSImage alloc] initWithContentsOfFile:p];
+				imagePath = [b pathForImageResource:myIconName];
 			}
-			[imageCache setObject:myIcon forKey:myIconName];
+			
+			if (!myIcon)	// not already set yet?
+			{
+				if ([[NSFileManager defaultManager] fileExistsAtPath:imagePath])
+				{
+					myIcon = [[NSImage alloc] initWithContentsOfFile:imagePath];
+				}
+				if (!myIcon)	// nonexistent path or invalid image file?  FALLBACK
+				{
+					NSBundle *b = [NSBundle bundleForClass:[self class]];
+					imagePath = [b pathForImageResource:@"folder"];
+					myIcon = [[NSImage alloc] initWithContentsOfFile:imagePath];
+				}
+			}
+			[sImageCache setObject:myIcon forKey:myIconName];
 		}
 	}
 	return myIcon;
@@ -250,36 +294,37 @@ static NSMutableDictionary *imageCache = nil;
     // check the cache first... 
     if (myCachedNameWithImage == nil) 
 	{
-		NSString *tmpValue = [self name];
+		NSString *rawName = [self name];
 		NSImage *libraryImage = [self icon];
 		
-		tmpValue = (tmpValue == nil) ? @"" : tmpValue;
+		rawName = (rawName == nil) ? @"" : rawName;
 		
 		// start with a mutablestring with the name (padding a space at beginning)
-		myCachedNameWithImage = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@",tmpValue]];
+		myCachedNameWithImage = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@",rawName]];
 		
-		[libraryImage setScalesWhenResized:YES];
-		[libraryImage setSize:NSMakeSize(14, 14)];
 		
 		if (libraryImage != nil) 
 		{
-			
-			NSFileWrapper *wrapper = nil;
-			NSTextAttachment *attachment = nil;
-			NSAttributedString *icon = nil;
-			
+			[libraryImage setScalesWhenResized:YES];
+			[libraryImage setSize:NSMakeSize(14, 14)];
+
 			// need a filewrapper to create an NSTextAttachment
-			wrapper = [[NSFileWrapper alloc] init];
+			NSFileWrapper *wrapper = [[NSFileWrapper alloc] init];
 			
 			// set the icon (this is what'll show up in attributed strings)
 			[wrapper setIcon:libraryImage];
 			
 			// you need an attachment to create the attributed string as an RTFd
-			attachment = [[NSTextAttachment alloc] initWithFileWrapper:wrapper];
+			NSTextAttachment *attachment = [[NSTextAttachment alloc] initWithFileWrapper:wrapper];
 			
 			// finally, the attributed string for the icon
-			icon = [NSAttributedString attributedStringWithAttachment:attachment];
-			[myCachedNameWithImage insertAttributedString:icon atIndex:0];
+			NSAttributedString *icon = [NSAttributedString attributedStringWithAttachment:attachment];
+			NSMutableAttributedString *iconString
+				= [[[NSMutableAttributedString alloc] initWithAttributedString:icon] autorelease];
+			[iconString addAttribute:NSBaselineOffsetAttributeName
+							   value:[NSNumber numberWithFloat:-2.0]
+							   range:NSMakeRange(0,[iconString length])];
+			[myCachedNameWithImage insertAttributedString:iconString atIndex:0];
 		
 			// Make the name truncate nicely if the destination is too narrow
 			NSMutableParagraphStyle* paraStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];

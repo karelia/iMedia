@@ -46,7 +46,7 @@
 
 - (void)setName:(NSString *)name;
 - (NSString *)name;
-- (void)setIconName:(NSString *)name;
+- (void)setIconName:(NSString *)name;	// for the identifier of the app, or an image resource (sans .extention) in imedia bundle only
 - (NSString *)iconName;
 - (void)setIcon:(NSImage *)icon;
 - (NSImage *)icon;

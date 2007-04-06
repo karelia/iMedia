@@ -487,7 +487,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 #pragma mark -
 #pragma mark MUPhotoView Delegate Methods
 
-- (void)setImages:(NSArray *)images
+- (void)setImages:(NSArray *)images	// not called from code directly; set by binding in willActivate
 {
 	[myImages autorelease];
 	[myImageDict autorelease];

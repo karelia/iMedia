@@ -140,7 +140,7 @@
 {
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 	[root setName:LocalizedStringInThisBundle(@"Aperture", @"Aperture")];
-	[root setIconName:@"com.apple.Aperture"];
+	[root setIconName:@"com.apple.Aperture:"];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];

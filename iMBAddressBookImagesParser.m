@@ -128,7 +128,7 @@ imedia@lists.karelia.com
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInThisBundle(@"Address Book", @"Root Node Name of address book")];
-	[root setIconName:@"com.apple.AddressBook"];
+	[root setIconName:@"com.apple.AddressBook:"];
 	
 	ABAddressBook *ab = [ABAddressBook sharedAddressBook];
 	NSEnumerator *groupEnum = [[ab groups] objectEnumerator];

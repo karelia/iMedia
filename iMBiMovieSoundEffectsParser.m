@@ -60,7 +60,7 @@
 	if (sfx)
 	{
 		[sfx setName:LocalizedStringInThisBundle(@"iMovie Sound Effects", @"iMovie Sound Effects folder name")];
-		[sfx setIconName:@"com.apple.iMovie"];
+		[sfx setIconName:@"com.apple.iMovie:"];
 	}	
 	return sfx;
 }

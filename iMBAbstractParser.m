@@ -71,7 +71,7 @@
 	[super dealloc];
 }
 
-- (iMBLibraryNode *)library:(BOOL)reuseCachedData
+- (id)library:(BOOL)reuseCachedData
 {
 	if (!myCachedLibrary || !reuseCachedData)
 	{
@@ -127,6 +127,8 @@
 
 -(void) watcher:(id<UKFileWatcher>)kq receivedNotification:(NSString*)nm forPath:(NSString*)fpath
 {
+	if ([nm isEqualToString:UKFileWatcherAttributeChangeNotification]) return;	// ignore; seems to happen sometimes
+	
 	/*
 	UKKQueue will often send 3 or 4 notifications per change. There is no point in us reparsing each time
 	so we delay the reparse for a short while so we can ignore all but the last one.

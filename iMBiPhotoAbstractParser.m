@@ -72,7 +72,7 @@
 	else if ([name isEqualToString:@"Card"])
 		return @"card";
 	else if (name == nil)
-		return @"com.apple.iPhoto";			// top level library
+		return @"com.apple.iPhoto:";			// top level library
 	else
 		return @"MBiPhotoAlbum";
 }

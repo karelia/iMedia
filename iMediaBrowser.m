@@ -573,15 +573,25 @@ static NSMutableDictionary *_parsers = nil;
 #ifdef DEBUG
 //		NSDate *timer = [NSDate date];
 #endif
-		iMBLibraryNode *library = [parser library:reuseCachedData];
+		id libraryOrLibraries = [parser library:reuseCachedData];
 #ifdef DEBUG
-//		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
+		//		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
 #endif
-		if (library) // it is possible for a parser to return nil if the db for it doesn't exist
+		if (libraryOrLibraries)
 		{
-			[root addObject:library];
+			if ([libraryOrLibraries isKindOfClass:[iMBLibraryNode class]])
+			{
+				[root addObject:libraryOrLibraries];
+			}
+			else if ([libraryOrLibraries isKindOfClass:[NSArray class]])
+			{
+				[root addObjectsFromArray:libraryOrLibraries];
+			}
+			else
+			{
+				NSLog(@"Don't know what to do with %@ returned from -[%@ library:]", [libraryOrLibraries class], [parser class]);
+			}
 		}
-		
 		if (myFlags.didUseParser)
 		{
 			[myDelegate iMediaBrowser:self didUseMediaParser:cur forMediaType:[mySelectedBrowser mediaType]];
