@@ -88,7 +88,7 @@
 					NSString *displayDate = [dateTime exifDateToLocalizedDisplayDate];
 					if (displayDate)
 					{
-						[md setObject: forKey:@"dateTimeLocalized"];
+						[md setObject:displayDate forKey:@"dateTimeLocalized"];
 					}
 				}
 			}
