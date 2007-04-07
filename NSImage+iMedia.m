@@ -85,7 +85,11 @@
 				// format from EXIF -- we could convert to a date and make more localized....
 				if (nil != dateTime)
 				{
-					[md setObject:[dateTime exifDateToLocalizedDisplayDate] forKey:@"dateTimeLocalized"];
+					NSString *displayDate = [dateTime exifDateToLocalizedDisplayDate];
+					if (displayDate)
+					{
+						[md setObject: forKey:@"dateTimeLocalized"];
+					}
 				}
 			}
 			CFRelease(props);

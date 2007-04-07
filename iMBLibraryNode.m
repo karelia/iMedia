@@ -370,7 +370,7 @@ static NSMutableDictionary *sImageCache = nil;
 	}
 	if ([[self attributes] count])
 	{
-		[s appendFormat:@"; attributes: %@", [[self attributes] allKeys]];
+		[s appendFormat:@"; attributes: %@", [[[self attributes] allKeys] description] ];
 	}
 	return s;
 }
