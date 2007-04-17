@@ -803,7 +803,7 @@ static NSImage *_toolbarIcon = nil;
 	if (userInfo)
 	{
 		NSString *displayName = [userInfo objectForKey:QTMovieDisplayNameAttribute];
-		if (displayName && ![displayName isEqualToString:title])
+		if (displayName && ![displayName isEqual:title] && ![[NSNull null] isEqual:displayName])
 		{
 			title = displayName;	// and use the display name to override the title
 		}
@@ -820,7 +820,7 @@ static NSImage *_toolbarIcon = nil;
 	if (userInfo)
 	{
 		NSString *copyright = [userInfo objectForKey:QTMovieCopyrightAttribute];
-		if (copyright) [result appendFormat:@"\n%@", copyright];
+		if (copyright && ![[NSNull null] isEqual:copyright]) [result appendFormat:@"\n%@", copyright];
 	}
 
 	
@@ -836,7 +836,7 @@ static NSImage *_toolbarIcon = nil;
 	{
 		NSDate *creationTime = [userInfo objectForKey:QTMovieCreationTimeAttribute];
 
-		if (creationTime)
+		if (creationTime && ![[NSNull null] isEqual:creationTime])
 		{
 			NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
 			[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
@@ -848,7 +848,7 @@ static NSImage *_toolbarIcon = nil;
 		NSNumber *hasDuration = [userInfo objectForKey:QTMovieHasDurationAttribute];
 		NSValue *durValue = [userInfo objectForKey:QTMovieDurationAttribute];
 		
-		if (hasDuration && [hasDuration boolValue] && durValue)
+		if (hasDuration && ![[NSNull null] isEqual:hasDuration] && [hasDuration boolValue] && durValue)
 		{
 			QTTime durTime = [durValue QTTimeValue];
 			if (durTime.timeScale == 0)
@@ -859,7 +859,7 @@ static NSImage *_toolbarIcon = nil;
 		
 		NSValue *sizeValue = [userInfo objectForKey:QTMovieNaturalSizeAttribute];
 
-		if (sizeValue)
+		if (sizeValue && ![[NSNull null] isEqual:sizeValue])
 		{
 			NSSize size = [sizeValue sizeValue];
 			width = size.width;
