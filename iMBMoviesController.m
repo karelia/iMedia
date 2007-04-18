@@ -524,8 +524,11 @@ static NSImage *_toolbarIcon = nil;
     
     if (!alreadyQueued)
     {
+		///NSLog(@"startLoadingOneMovie:%@ not already queued", imagePath);
         if ([QTMovie canInitWithFile:imagePath])
         {
+			///NSLog(@"startLoadingOneMovie:%@ canInitWithFile", imagePath);
+
             NSError *movieError = nil;
             QTMovie *movie = [QTMovie movieWithAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
                 [QTDataReference dataReferenceWithReferenceToFile:imagePath], QTMovieDataReferenceAttribute,
@@ -534,6 +537,8 @@ static NSImage *_toolbarIcon = nil;
 			            
             if (movie)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
             {
+				///NSLog(@"startLoadingOneMovie:%@ movieWithAttributes", imagePath);
+
                 if ([movie respondsToSelector:@selector(setIdling:)])
                     [movie setIdling:NO]; // Prevents crash due to missing gworld
 
@@ -787,6 +792,9 @@ static NSImage *_toolbarIcon = nil;
 	{
 		// Get our own User info from the file directly by making a quicktime movie.
 		NSError *error = nil;
+		
+		///NSLog(@"photoView:tooltipForPhotoAtIndex:%@ going to load movie", imagePath);
+
 		QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
 		QTMovie *movie = [[[QTMovie alloc] initWithAttributes:
 			[NSDictionary dictionaryWithObjectsAndKeys: 
@@ -982,6 +990,7 @@ static NSImage *_toolbarIcon = nil;
 		NSString *path = [[myImages objectAtIndex:aIndex] objectForKey:@"ImagePath"];
 		
 		NSError *error = nil;
+		///NSLog(@"photoView:doubleClickOnPhotoAtIndex:%@ going to load movie", path);
 		QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:path];
 		QTMovie *movie = [[[QTMovie alloc] initWithAttributes:
 			[NSDictionary dictionaryWithObjectsAndKeys: 

@@ -238,6 +238,8 @@ static NSImage *_playingIcon = nil;
 
 - (BOOL) loadAudioFile: (NSString *) urlString
 {		
+	if (nil == urlString || [urlString isEqualToString:@""]) return NO;
+
 	BOOL success = YES;
 	
 	// remove notification for currently playing song
@@ -249,7 +251,9 @@ static NSImage *_playingIcon = nil;
 	
 	NSURL * movieURL = [NSURL URLWithString:urlString];
 	if (!movieURL)
+	{
 		movieURL = [NSURL fileURLWithPath:urlString];
+	}
 	
 	NSString *filePath = [movieURL path];
 	[oAudioPlayer pause:self];
