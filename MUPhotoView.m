@@ -1114,14 +1114,14 @@ static NSDictionary *sTitleAttributes = nil;
 {
 	NSString*					eventKey = [theEvent charactersIgnoringModifiers];
 	unichar						keyChar = 0;
-
+	
 	if ([eventKey length] == 1)
 	{
 		keyChar = [eventKey characterAtIndex:0];
 		if (keyChar == ' ')
 		{
 			unsigned int			selectedIndex = [[self selectionIndexes] firstIndex];
-
+			
 			while (selectedIndex != NSNotFound)
 			{
 				[delegate photoView:self doubleClickOnPhotoAtIndex:selectedIndex withFrame:[self photoRectForIndex:selectedIndex]];
@@ -1129,8 +1129,13 @@ static NSDictionary *sTitleAttributes = nil;
 			}
 			return;
 		}
+		else if ((keyChar = NSCarriageReturnCharacter) || (keyChar = NSEnterCharacter)) {
+			[super keyDown:theEvent];
+			return;
+		}
 	}
-
+	
+	
 	[self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
 }
 
