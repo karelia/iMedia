@@ -178,7 +178,14 @@ static NSImage *_toolbarIcon = nil;
 		NSString *locURLString = [cur objectForKey:@"Location"];
 		NSURL *locURL = [NSURL URLWithString:locURLString];
 		NSString *loc = [locURL path];
-		[files addObject:loc];
+		if (loc)
+		{
+			[files addObject:loc];
+		}
+		else if (locURLString)	// couldn't build URL; try just adding path
+		{
+			[files addObject:locURLString];
+		}
 	}
 	[pboard writeURLs:nil files:files names:nil];
 }
