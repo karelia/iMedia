@@ -438,7 +438,8 @@ static NSMutableDictionary *_parsers = nil;
 	NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
 	NSIndexPath *selection = [libraryController selectionIndexPath];
 	NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
-	NSMutableDictionary *d = [NSMutableDictionary dictionary];
+    NSString    *myDefaultsKey = [NSString stringWithFormat:@"iMB-%@", myIdentifier];
+    NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[ud objectForKey:myDefaultsKey]];
 	
 	[d setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
 
@@ -446,7 +447,7 @@ static NSMutableDictionary *_parsers = nil;
 	//	[d setObject:[NSArray arrayWithObjects:NSStringFromRect([oPlaylists frame]), NSStringFromRect([oBrowserView frame]), nil] forKey:@"SplitViewSize"];
 	[d setObject:NSStringFromRect([[self window] frame]) forKey:@"WindowPosition"];
 	
-	[ud setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
+	[ud setObject:d forKey:myDefaultsKey];
 	[oSplitView saveState:YES];
 	
 	[ud synchronize];
