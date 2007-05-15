@@ -625,11 +625,10 @@ static NSMutableDictionary *_parsers = nil;
 		}
 	}
 	
-	[libraryController setContent:root];
-	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:NO];
+	[libraryController performSelectorOnMainThread:@selector(setContent:) withObject:root waitUntilDone:YES];
+	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:YES];
 	
 	[pool release];
-
 }
 
 - (void)recursivelyAddItemsToMenu:(NSMenu *)menu withNode:(iMBLibraryNode *)node indentation:(int)indentation
