@@ -49,6 +49,8 @@
 	NSLock							*myBackgroundLoadingLock;
 	NSString						*myIdentifier;
 	
+   NSArray                 *myExcludedFolders;
+   
 	NSArray							*myPreferredBrowserTypes;
 	id								myDelegate; //not retained
 	struct ___imbFlags {
@@ -67,6 +69,7 @@
 		
 		unsigned unused: 20;	// 32 minus the number above
 	} myFlags;
+   
 }
 
 + (id)sharedBrowser;
@@ -118,6 +121,9 @@
 
 - (IBAction)playlistSelected:(id)sender;
 
+// Setting & Getting the excluded folder list
+- (NSArray *)excludedFolders;
+- (void)setExcludedFolders:(NSArray *)value;
 @end
 
 // This notification is for each specific media browser to post when their selection changes.

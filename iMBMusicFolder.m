@@ -100,16 +100,18 @@ static NSImage *sDRMIcon = nil;
 	NSMutableArray *movieTypes = [NSMutableArray arrayWithArray: [QTMovie movieFileTypes:QTIncludeAllTypes]];
 	[movieTypes removeObject:@"kar"];
 	NSMutableArray *tracks = [NSMutableArray array];
-	
+   
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;
-	
+   NSArray * excludedFolders = [[iMediaBrowser sharedBrowserWithoutLoading] excludedFolders];
+   
 	while (cur = [e nextObject])
 	{
 		NSString *filePath = [path stringByAppendingPathComponent: cur];
 		if ([[filePath lastPathComponent] isEqualToString:@"iTunes"]) continue;
 		if ([[filePath lastPathComponent] isEqualToString:@"GarageBand"]) continue;
-		
+      if ([excludedFolders containsObject:filePath]) continue;
+      
 		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath] && ![ws isFilePackageAtPath:filePath])
 		{
 			if (isDir)
@@ -227,9 +229,12 @@ static NSImage *sDRMIcon = nil;
 	{
 		return nil;
 	}
+
+	NSMutableArray *movieTypes = [NSMutableArray arrayWithArray: [QTMovie movieFileTypes:QTIncludeAllTypes]];
+	[movieTypes removeObject:@"kar"];
 	
 	[self recursivelyParse:folder withNode:root];
-	
+   	
 	return root;
 }
 

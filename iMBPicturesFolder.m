@@ -59,6 +59,7 @@
 	NSString *cur;
 	BOOL isDir;
 	NSMutableArray *images = [NSMutableArray array];
+   NSArray * excludedFolders = [[iMediaBrowser sharedBrowserWithoutLoading] excludedFolders];
 	
 	while (cur = [e nextObject])
 	{
@@ -66,7 +67,8 @@
 		
 		if ([cur rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
 		if ([cur rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
-		
+		if ([excludedFolders containsObject:filePath]) continue;
+      
 		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath] && ![ws isFilePackageAtPath:filePath] )
 		{
 			if (isDir)

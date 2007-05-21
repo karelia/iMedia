@@ -87,11 +87,13 @@
 	NSMutableArray *movies = [NSMutableArray array];
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;
-	
+	NSArray * excludedFolders = [[iMediaBrowser sharedBrowserWithoutLoading] excludedFolders];
+   
 	while (cur = [e nextObject])
 	{
 		NSString *filePath = [path stringByAppendingPathComponent: cur];
-		
+      if ([excludedFolders containsObject:filePath]) continue;
+
 		@try {
 			if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath])
 			{

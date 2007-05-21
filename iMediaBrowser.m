@@ -264,7 +264,7 @@ static NSMutableDictionary *_parsers = nil;
 	[tableColumn unbind:@"value"];
 	[tableColumn unbind:@"editable"];
 	// End unbind
-	
+	   
 	[oPlaylists setDelegate:nil];
 	[oPlaylists setDataSource:nil];
 	[oSplitView setDelegate:nil];
@@ -281,7 +281,8 @@ static NSMutableDictionary *_parsers = nil;
 	[myBackgroundLoadingLock release];
 	[myPreferredBrowserTypes release];
 	[myIdentifier release];
-	
+   [myExcludedFolders release];
+
 	[super dealloc];
 }
 
@@ -862,6 +863,19 @@ static NSMutableDictionary *_parsers = nil;
 	{
 		NSBeep();
 	}
+}
+
+- (NSArray *)excludedFolders {
+    return [[myExcludedFolders retain] autorelease];
+}
+
+- (void)setExcludedFolders:(NSArray *)value
+{
+    if (myExcludedFolders != value)
+    {
+        [myExcludedFolders release];
+        myExcludedFolders = [value copy];
+    }
 }
 
 #pragma mark -
