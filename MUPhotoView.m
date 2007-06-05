@@ -249,7 +249,10 @@ static NSDictionary *sTitleAttributes = nil;
         //**** END Background Drawing ****/
         
         // kBorderStyleShadow - set the appropriate shadow
-        if ([self useShadowBorder] && !placeholder) {
+        // Don't draw the shadow for placeholders, or if we have a border and the item is selected.
+        if ([self useShadowBorder] && !placeholder &&
+            ([self useBorderSelection] == NO || [[self selectionIndexes] containsIndex:index] == NO)) {
+
             [borderShadow set];
         }
  
@@ -1176,7 +1179,7 @@ static NSDictionary *sTitleAttributes = nil;
 	}
 	else
 	{
-		if (([indexes count] == 0) && ([self photoCount] > 0))
+		if ((([indexes count] == 0) || ([indexes count] == [self photoCount])) && ([self photoCount] > 0))
 		{
 			[newIndexes addIndex:[self photoCount] - 1];
 		}
@@ -1214,7 +1217,7 @@ static NSDictionary *sTitleAttributes = nil;
 	}
 	else
 	{
-		if (([indexes count] == 0) && ([self photoCount] > 0))
+		if ((([indexes count] == 0) || ([indexes count] == [self photoCount])) && ([self photoCount] > 0))
 		{
 			[newIndexes addIndex:0];
 		}
@@ -1254,7 +1257,7 @@ static NSDictionary *sTitleAttributes = nil;
 	}
 	else
 	{
-		if (([indexes count] == 0) && ([self photoCount] > 0))
+		if ((([indexes count] == 0) || ([indexes count] == [self photoCount])) && ([self photoCount] > 0))
 		{
 			[newIndexes addIndex:0];
 		}
@@ -1298,7 +1301,7 @@ static NSDictionary *sTitleAttributes = nil;
 	}
 	else
 	{
-		if (([indexes count] == 0) && ([self photoCount] > 0))
+		if ((([indexes count] == 0) || ([indexes count] == [self photoCount])) && ([self photoCount] > 0))
 		{
 			[newIndexes addIndex:[self photoCount] - 1];
 		}
@@ -1665,6 +1668,9 @@ static NSDictionary *sTitleAttributes = nil;
         columns = 1;
     
     // if we have fewer photos than columns, adjust downward
+    // This behaviour is incorrect - a single row will be evenly
+    // spaced instead of left justified. Comment out the
+    // conditional below to get the arguably correct behav.
     if (photoCount < columns)
         columns = photoCount;
     
