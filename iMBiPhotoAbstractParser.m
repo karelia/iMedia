@@ -171,6 +171,10 @@
 		while (key = [pictureItemsEnum nextObject])
 		{
 			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
+			if (imageRecord == nil) 
+			{
+				continue;	// skip if the whole record is missing for some reason
+			}
 			NSString *mediaType = [imageRecord objectForKey:@"MediaType"];
 			if (!aWantUntyped && !mediaType)
 			{
@@ -181,9 +185,10 @@
 				continue;	// skip if this media type doesn't match what we are looking for
 			}
 			hasItems = YES;
-			if (aWantThumbPath)
+			NSString *thumbPath = [imageRecord objectForKey:@"ThumbPath"];
+			if (aWantThumbPath && thumbPath)
 			{
-				[imageRecord setObject:[imageRecord objectForKey:@"ThumbPath"] forKey:@"Preview"];
+				[imageRecord setObject:thumbPath forKey:@"Preview"];
 			}
 				
 			[newPhotolist addObject:imageRecord];
