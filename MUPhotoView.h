@@ -275,8 +275,18 @@
 - (NSImage *)photoAtIndex:(unsigned)index;
 - (NSImage *)fastPhotoAtIndex:(unsigned)index;
 - (void)updatePhotoResizing;
+- (NSString *)titleAtIndex:(unsigned)index;
+
+// This may be the actual photo, or a fast photo, or a placeholder image
+- (NSImage*) currentDisplayImageAtIndex:(unsigned)thisPhotoIndex allowsShadows:(BOOL *)allowShadows;
 
 // placement and hit detection
+
+// The central powerhouse for determining geometry distribution on a given index, with a given photo and title.
+// By consolidating a lot of this stuff into one freakin' method name, we are assured that hit detection matches
+// up with drawing, even as optional features like caption titles bloom... - DCJ, July 2007
+- (void)getDrawingRectsAtIndex:(unsigned)photoIndex withPhoto:(NSImage *)cellPhoto withTitle:(NSString*)title outGridRect:(NSRect *)outGridRect outPhotoRect:(NSRect *)outPhotoRect outTitleRect:(NSRect *)outTitleRect;
+
 - (NSSize)scaledPhotoSizeForSize:(NSSize)size;
 - (NSImage *)scalePhoto:(NSImage *)image;
 - (unsigned)photoIndexForPoint:(NSPoint)point;
@@ -284,6 +294,7 @@
 - (NSRect)gridRectForIndex:(unsigned)index;
 - (NSRect)rectCenteredInRect:(NSRect)rect withSize:(NSSize)size;
 - (NSRect)photoRectForIndex:(unsigned)index;
+- (NSSize)sizeOfTitleWithCurrentAttributes:(NSString*)title;
 
 // selection
 - (BOOL)isPhotoSelectedAtIndex:(unsigned)index;
