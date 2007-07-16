@@ -124,6 +124,52 @@
 	return YES;
 }
 
+- (NSImage*) currentDisplayImageAtIndex:(unsigned)thisPhotoIndex allowsShadows:(BOOL *)allowShadows;
+{
+	NSImage *photo = nil;
+	if ([self inLiveResize]) {
+		photo = [self fastPhotoAtIndex:thisPhotoIndex];
+	}
+	
+	if (nil == photo) {
+		photo = [self photoAtIndex:thisPhotoIndex]; 
+	}
+	BOOL placeholder = NO;
+	
+	if (nil == photo) {
+		placeholder = YES;
+		photo = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
+		
+		// Note: it would be nice to have an NSBezierPath category method like bezierPathWithRoundedRect:radius:
+		const float curve = MIN(photoSize * 0.3, 50);
+		const int width = 4;
+		const int margin = width / 2;
+		const int boxSize = photoSize - margin;
+		NSBezierPath *p = [NSBezierPath bezierPath];
+		[p moveToPoint:NSMakePoint(curve, margin)];
+		[p lineToPoint:NSMakePoint(boxSize - curve, margin)];
+		[p curveToPoint:NSMakePoint(boxSize, curve) controlPoint1:NSMakePoint(boxSize, margin) controlPoint2:NSMakePoint(boxSize, margin)];
+		[p lineToPoint:NSMakePoint(boxSize, boxSize - curve)];
+		[p curveToPoint:NSMakePoint(boxSize - curve, boxSize) controlPoint1:NSMakePoint(boxSize,boxSize) controlPoint2:NSMakePoint(boxSize,boxSize)];
+		[p lineToPoint:NSMakePoint(curve, boxSize)];
+		[p curveToPoint:NSMakePoint(margin, boxSize - curve) controlPoint1:NSMakePoint(margin, boxSize) controlPoint2:NSMakePoint(margin, boxSize)];
+		[p lineToPoint:NSMakePoint(margin, curve)];
+		[p curveToPoint:NSMakePoint(curve, margin) controlPoint1:NSMakePoint(margin, margin) controlPoint2:NSMakePoint(margin, margin)];
+		[p closePath];
+		
+		[photo lockFocus];
+		[[NSColor colorWithCalibratedWhite:0.95 alpha:1.0] set];
+		[p setLineWidth:width];
+		[p stroke];
+		
+		[photo unlockFocus];
+	}
+	
+	// Disable shadows for placeholder image
+	if (allowShadows != nil) *allowShadows = (placeholder == NO);
+	
+	return photo;
+}
 static NSDictionary *sTitleAttributes = nil;
 
 - (void)drawRect:(NSRect)rect
@@ -157,83 +203,21 @@ static NSDictionary *sTitleAttributes = nil;
     for (thisPhotoIndex = rangeToDraw.location; thisPhotoIndex < lastIndex; thisPhotoIndex++) {
         
         // Get the image at the current index - a gray bezier anywhere in the view means it asked for an image, but got nil for that index
-        NSImage *photo = nil;
-        if ([self inLiveResize]) {
-            photo = [self fastPhotoAtIndex:thisPhotoIndex];
-        }
-        
-        if (nil == photo) {
-			photo = [self photoAtIndex:thisPhotoIndex]; 
-        }
-        BOOL placeholder = NO;
-		
-        if (nil == photo) {
-			placeholder = YES;
-            photo = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
-			
-			// Note: it would be nice to have an NSBezierPath category method like bezierPathWithRoundedRect:radius:
-			const float curve = MIN(photoSize * 0.3, 50);
-			const int width = 4;
-			const int margin = width / 2;
-			const int boxSize = photoSize - margin;
-            NSBezierPath *p = [NSBezierPath bezierPath];
-			[p moveToPoint:NSMakePoint(curve, margin)];
-			[p lineToPoint:NSMakePoint(boxSize - curve, margin)];
-			[p curveToPoint:NSMakePoint(boxSize, curve) controlPoint1:NSMakePoint(boxSize, margin) controlPoint2:NSMakePoint(boxSize, margin)];
-			[p lineToPoint:NSMakePoint(boxSize, boxSize - curve)];
-			[p curveToPoint:NSMakePoint(boxSize - curve, boxSize) controlPoint1:NSMakePoint(boxSize,boxSize) controlPoint2:NSMakePoint(boxSize,boxSize)];
-			[p lineToPoint:NSMakePoint(curve, boxSize)];
-			[p curveToPoint:NSMakePoint(margin, boxSize - curve) controlPoint1:NSMakePoint(margin, boxSize) controlPoint2:NSMakePoint(margin, boxSize)];
-			[p lineToPoint:NSMakePoint(margin, curve)];
-			[p curveToPoint:NSMakePoint(curve, margin) controlPoint1:NSMakePoint(margin, margin) controlPoint2:NSMakePoint(margin, margin)];
-			[p closePath];
-			
-			[photo lockFocus];
-			[[NSColor colorWithCalibratedWhite:0.95 alpha:1.0] set];
-			[p setLineWidth:width];
-            [p stroke];
-			
-            [photo unlockFocus];
-        }
-        
+		BOOL allowShadows = YES;
+		NSImage* photo = [self currentDisplayImageAtIndex:thisPhotoIndex allowsShadows:&allowShadows];
         
         // set it to draw correctly in a flipped view (will restore it after drawing)
         BOOL isFlipped = [photo isFlipped];
         [photo setFlipped:YES];
         
-        // scale it to the appropriate size, this method should automatically set high quality if necessary
-        photo = [self scalePhoto:photo];
+		NSString* title = [self titleAtIndex:thisPhotoIndex];
+        NSRect    gridRect = NSZeroRect;
+        NSRect    photoRect = NSZeroRect;
+        NSRect    titleRect = NSZeroRect;		
 		
-        NSRect    gridRect = [self centerScanRect:[self gridRectForIndex:thisPhotoIndex]];
-        
-        NSSize    titleSize = NSZeroSize;
-        NSRect    titleRect = NSZeroRect;
-		NSString	*title = nil;
-
-		if (showCaptions)
-		{
-			title = [delegate photoView:self titleForPhotoAtIndex:thisPhotoIndex];
-			if (title)
-			{
-				if (!sTitleAttributes)
-				{   // This could be improved by setting the color to something that works well with a non white background color.
-					sTitleAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:[NSFont labelFontSize]], NSFontAttributeName, [NSColor darkGrayColor], NSForegroundColorAttributeName, nil];
-					[sTitleAttributes retain];
-				}
-				titleSize = [title sizeWithAttributes:sTitleAttributes];
-				
-				NSDivideRect(gridRect, &titleRect, &gridRect, titleSize.height + 6.0f, NSMaxYEdge);
-			}
-		}
-        NSSize scaledSize = [self scaledPhotoSizeForSize:[photo size]];
-        NSRect photoRect = [self rectCenteredInRect:gridRect withSize:scaledSize];
-
-		if (!NSEqualSizes(NSZeroSize,titleSize))
-		{
-			photoRect = NSInsetRect(photoRect,6,6);
-		}
-        photoRect = [self centerScanRect:photoRect];
-        
+		// Note this will automatically cause the photo to scale as necessary
+		[self getDrawingRectsAtIndex:thisPhotoIndex withPhoto:photo withTitle:title outGridRect:&gridRect outPhotoRect:&photoRect outTitleRect:&titleRect];
+		        
         //**** BEGIN Background Drawing - any drawing that technically goes under the image ****/
 	#if 0 // Debugging Aid - Enable this to fill each gridRect with a different gray
 		[[NSColor colorWithCalibratedWhite:(float)(thisPhotoIndex % 5) / 4.0 alpha:0.8] set];
@@ -249,9 +233,9 @@ static NSDictionary *sTitleAttributes = nil;
         //**** END Background Drawing ****/
         
         // kBorderStyleShadow - set the appropriate shadow
-        // Don't draw the shadow for placeholders, or if we have a border and the item is selected.
-        if ([self useShadowBorder] && !placeholder &&
-            ([self useBorderSelection] == NO || [[self selectionIndexes] containsIndex:index] == NO)) {
+        // Don't draw the shadow if we have a border and the item is selected, or if shadows are disabled for this image
+        if ([self useShadowBorder] && (allowShadows == YES) &&
+            ([self useBorderSelection] == NO || [[self selectionIndexes] containsIndex:thisPhotoIndex] == NO)) {
 
             [borderShadow set];
         }
@@ -291,7 +275,7 @@ static NSDictionary *sTitleAttributes = nil;
 			// center rect
 			NSMutableString *s1 = [NSMutableString stringWithString:[title substringToIndex:[title length] / 2]];
 			NSMutableString *s2 = [NSMutableString stringWithString:[title substringFromIndex:[title length] / 2]];
-			
+			NSSize titleSize = [self sizeOfTitleWithCurrentAttributes:title];
 			while (titleSize.width > NSWidth(titleRect))
 			{
 				[s1 deleteCharactersInRange:NSMakeRange([s1 length] - 1, 1)];
@@ -1724,6 +1708,17 @@ static NSDictionary *sTitleAttributes = nil;
 	return result;
 }
 
+- (NSString *)titleAtIndex:(unsigned)photoIndex
+{
+	NSString  *title = nil;
+
+	if ([self showCaptions])
+	{
+		title = [delegate photoView:self titleForPhotoAtIndex:photoIndex];
+	}
+	return title;
+}
+
 - (void)updatePhotoResizing
 {
     NSTimeInterval timeSinceResize = [[NSDate date] timeIntervalSinceReferenceDate] - [photoResizeTime timeIntervalSinceReferenceDate];
@@ -1867,29 +1862,67 @@ static NSDictionary *sTitleAttributes = nil;
     return NSMakeRect(x, y, size.width, size.height);
 }
 
+- (NSSize)sizeOfTitleWithCurrentAttributes:(NSString*)title
+{
+	if (!sTitleAttributes)
+	{   // This could be improved by setting the color to something that works well with a non white background color.
+		sTitleAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:[NSFont labelFontSize]], NSFontAttributeName, [NSColor darkGrayColor], NSForegroundColorAttributeName, nil];
+		[sTitleAttributes retain];
+	}
+	return [title sizeWithAttributes:sTitleAttributes];
+}
+
+- (void)getDrawingRectsAtIndex:(unsigned)photoIndex withPhoto:(NSImage *)cellPhoto withTitle:(NSString*)title outGridRect:(NSRect *)outGridRect outPhotoRect:(NSRect *)outPhotoRect outTitleRect:(NSRect *)outTitleRect
+{
+	NSRect titleRect = NSZeroRect;
+	NSRect photoRect = NSZeroRect;
+	NSRect gridRect = NSZeroRect;
+	 
+	// Only bother if the requested index is within our range
+	if ((photoIndex + 1) <= [self photoCount])
+	{
+		NSSize titleSize = NSZeroSize;
+
+		gridRect = [self centerScanRect:[self gridRectForIndex:photoIndex]];
+		
+		if (title)
+		{
+			titleSize = [self sizeOfTitleWithCurrentAttributes:title];				
+			NSDivideRect(gridRect, &titleRect, &gridRect, titleSize.height + 6.0f, NSMaxYEdge);
+		}
+		
+		NSSize scaledSize = [self scaledPhotoSizeForSize:[cellPhoto size]];
+		photoRect = [self rectCenteredInRect:gridRect withSize:scaledSize];
+
+// DCJ - I don't think this is necessary because the title rect is already considered when determining the photoRect
+// Furthermore, doing this caused a nasty bug when either dimension is less than 12: it causes the dimension to 
+// inset to a NEGATIVE dimension :) 
+//		if (!NSEqualSizes(NSZeroSize,titleSize))
+//		{
+//			photoRect = NSInsetRect(photoRect,6,6);
+//		}
+		photoRect = [self centerScanRect:photoRect];
+	}
+	
+	if (outGridRect != nil) *outGridRect = gridRect;
+	if (outPhotoRect != nil) *outPhotoRect = photoRect;
+	if (outTitleRect != nil) *outTitleRect = titleRect;
+}
+
 - (NSRect)photoRectForIndex:(unsigned)photoIndex
 {
-	if ([self photoCount] == 0)
-        return NSZeroRect;
-
-    // get the grid rect for this index
-    NSRect gridRect = [self gridRectForIndex:photoIndex];
-    
     // get the actual image
     NSImage *photo = [self photoAtIndex:photoIndex];
     if (nil == photo)
+	{
         return NSZeroRect;
-    
-    // scale to the current photoSize
-    photo = [self scalePhoto:photo];
-    
-    // scale the dimensions
-    NSSize scaledSize = [self scaledPhotoSizeForSize:[photo size]];
-    
-    // get the photo rect centered in the grid
-    NSRect photoRect = [self rectCenteredInRect:gridRect withSize:scaledSize];
-    
-    return photoRect;
+    }
+	else
+	{
+		NSRect photoRect;
+		[self getDrawingRectsAtIndex:photoIndex withPhoto:photo withTitle:[self titleAtIndex:photoIndex] outGridRect:nil outPhotoRect:&photoRect outTitleRect:nil];
+		return photoRect;
+	}
 }
 
 // selection
