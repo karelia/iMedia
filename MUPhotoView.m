@@ -150,20 +150,20 @@ static NSDictionary *sTitleAttributes = nil;
 	
     /**** BEGIN Drawing Photos ****/
 	NSRange rangeToDraw = [self photoIndexRangeForRect:rect]; // adjusts for photoCount if the rect goes outside my range
-    unsigned index;
+    unsigned thisPhotoIndex;
     unsigned lastIndex = rangeToDraw.location + rangeToDraw.length;
     // Our version of photoIndexRangeForRect: returns one item more in the range than the MUPhotoView 1.2 version. Hence we also
     // must do one less iteration so here we do < instead of <= 
-    for (index = rangeToDraw.location; index < lastIndex; index++) {
+    for (thisPhotoIndex = rangeToDraw.location; thisPhotoIndex < lastIndex; thisPhotoIndex++) {
         
         // Get the image at the current index - a gray bezier anywhere in the view means it asked for an image, but got nil for that index
         NSImage *photo = nil;
         if ([self inLiveResize]) {
-            photo = [self fastPhotoAtIndex:index];
+            photo = [self fastPhotoAtIndex:thisPhotoIndex];
         }
         
         if (nil == photo) {
-			photo = [self photoAtIndex:index]; 
+			photo = [self photoAtIndex:thisPhotoIndex]; 
         }
         BOOL placeholder = NO;
 		
@@ -204,7 +204,7 @@ static NSDictionary *sTitleAttributes = nil;
         // scale it to the appropriate size, this method should automatically set high quality if necessary
         photo = [self scalePhoto:photo];
 		
-        NSRect    gridRect = [self centerScanRect:[self gridRectForIndex:index]];
+        NSRect    gridRect = [self centerScanRect:[self gridRectForIndex:thisPhotoIndex]];
         
         NSSize    titleSize = NSZeroSize;
         NSRect    titleRect = NSZeroRect;
@@ -212,7 +212,7 @@ static NSDictionary *sTitleAttributes = nil;
 
 		if (showCaptions)
 		{
-			title = [delegate photoView:self titleForPhotoAtIndex:index];
+			title = [delegate photoView:self titleForPhotoAtIndex:thisPhotoIndex];
 			if (title)
 			{
 				if (!sTitleAttributes)
@@ -236,11 +236,11 @@ static NSDictionary *sTitleAttributes = nil;
         
         //**** BEGIN Background Drawing - any drawing that technically goes under the image ****/
 	#if 0 // Debugging Aid - Enable this to fill each gridRect with a different gray
-		[[NSColor colorWithCalibratedWhite:(float)(index % 5) / 4.0 alpha:0.8] set];
+		[[NSColor colorWithCalibratedWhite:(float)(thisPhotoIndex % 5) / 4.0 alpha:0.8] set];
 		[NSBezierPath fillRect:gridRect];
 	#endif
         // kSelectionStyleShadowBox draws a semi-transparent rounded rect behind/around the image
-        if ([self isPhotoSelectedAtIndex:index] && [self useShadowSelection]) {
+        if ([self isPhotoSelectedAtIndex:thisPhotoIndex] && [self useShadowSelection]) {
             NSBezierPath *shadowBoxPath = [self shadowBoxPathForRect:gridRect];
             [shadowBoxColor set];
             [shadowBoxPath fill];
@@ -270,17 +270,17 @@ static NSDictionary *sTitleAttributes = nil;
         [noShadow set];
         
         //**** BEGIN Foreground Drawing - includes outline borders, selection rectangles ****/
-        if ([self isPhotoSelectedAtIndex:index] && [self useBorderSelection]) {
+        if ([self isPhotoSelectedAtIndex:thisPhotoIndex] && [self useBorderSelection]) {
             NSBezierPath *selectionBorder = [NSBezierPath bezierPathWithRect:NSInsetRect(photoRect,-3.0,-3.0)];
             [selectionBorder setLineWidth:[self selectionBorderWidth]];
             [[self selectionBorderColor] set];
             [selectionBorder stroke];
         } else if ([self useOutlineBorder]) {
             photoRect = NSInsetRect(photoRect,0.5,0.5); // line up the 1px border so it completely fills a single row of pixels
-            NSBezierPath *outline = [NSBezierPath bezierPathWithRect:photoRect];
-            [outline setLineWidth:1.0];
+            NSBezierPath *outlinePath = [NSBezierPath bezierPathWithRect:photoRect];
+            [outlinePath setLineWidth:1.0];
             [borderOutlineColor set];
-            [outline stroke];
+            [outlinePath stroke];
         }
         
         //**** END Foreground Drawing ****//
@@ -329,17 +329,17 @@ static NSDictionary *sTitleAttributes = nil;
 	
 }
 
-- (void)setNeedsDisplayInRect:(NSRect)invalidRect
+- (void)setNeedsDisplayInRect:(NSRect)invalidatedRect
 {
 	// Make the view redraw some more pixels, to avoid the "disappearing shadows on scroll" problem
 	if ([[borderShadow shadowColor] alphaComponent]!=0.0) {
-		NSRect shadowRect = invalidRect;
+		NSRect shadowRect = invalidatedRect;
 		shadowRect.origin.x += [borderShadow shadowOffset].width;
 		shadowRect.origin.y -= [borderShadow shadowOffset].height;
 		shadowRect = NSInsetRect(shadowRect, -[borderShadow shadowBlurRadius], -[borderShadow shadowBlurRadius]);
-		invalidRect = NSUnionRect(invalidRect, shadowRect);
+		invalidatedRect = NSUnionRect(invalidatedRect, shadowRect);
 	}
-	[super setNeedsDisplayInRect:invalidRect];
+	[super setNeedsDisplayInRect:invalidatedRect];
 }
 
 
@@ -943,10 +943,10 @@ static NSDictionary *sTitleAttributes = nil;
 		[dragSelectedPhotoIndexes addIndexes:[self selectionIndexes]];
         
         // add indexes in the drag rectangle
-        int i;
+        unsigned i;
 		for (i = 0; i <= selectedRows; i++) {
 			unsigned rowStartIndex = (i * columns) + minIndex;
-            int j;
+            unsigned j;
             for (j = rowStartIndex; j < (rowStartIndex + xRun); j++) {
                 if (NSIntersectsRect([self photoRectForIndex:j],selectionRect))
                     [dragSelectedPhotoIndexes addIndex:j];
@@ -985,7 +985,8 @@ static NSDictionary *sTitleAttributes = nil;
 			[delegate photoView:self doubleClickOnPhotoAtIndex:selectedIndex withFrame:[self photoRectForIndex:selectedIndex]];
 			selectedIndex = [[self selectionIndexes] indexGreaterThanIndex:selectedIndex];
 		}
-	} else if (0 < [dragSelectedPhotoIndexes count]) { // finishing a drag selection
+	}
+	else if (0 < [dragSelectedPhotoIndexes count]) { // finishing a drag selection 
         // move the drag indexes into the main selection indexes - firing off KVO messages or delegate messages
         [self setSelectionIndexes:dragSelectedPhotoIndexes];
         [dragSelectedPhotoIndexes removeAllIndexes];
@@ -1457,17 +1458,17 @@ static NSDictionary *sTitleAttributes = nil;
     return 0;
 }
 
-- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)index
+- (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)photoIndex
 {
     return nil;
 }
 
-- (NSImage *)photoView:(MUPhotoView *)view fastPhotoAtIndex:(unsigned)index
+- (NSImage *)photoView:(MUPhotoView *)view fastPhotoAtIndex:(unsigned)photoIndex
 {
-    return [self photoView:view photoAtIndex:index];
+    return [self photoView:view photoAtIndex:photoIndex];
 }
 
-- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)index
+- (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)photoIndex
 {
 	return nil;
 }
@@ -1498,13 +1499,13 @@ static NSDictionary *sTitleAttributes = nil;
     return [[[NSArray alloc] init] autorelease];
 }
 
-- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)index dataType:(NSString *)type
+- (NSData *)photoView:(MUPhotoView *)view pasteboardDataForPhotoAtIndex:(unsigned)photoIndex dataType:(NSString *)type
 {
     return nil;
 }
 
 // double-click
-- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)index withFrame:(NSRect)frame
+- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)photoIndex withFrame:(NSRect)frame
 {
 
 }
@@ -1520,7 +1521,7 @@ static NSDictionary *sTitleAttributes = nil;
     
 }
 
-- (NSString *)photoView:(MUPhotoView *)view tooltipForPhotoAtIndex:(unsigned)index
+- (NSString *)photoView:(MUPhotoView *)view tooltipForPhotoAtIndex:(unsigned)photoIndex
 {
 	return nil;
 }
@@ -1705,13 +1706,13 @@ static NSDictionary *sTitleAttributes = nil;
         return 0;
 }
 
-- (NSImage *)photoAtIndex:(unsigned)index
+- (NSImage *)photoAtIndex:(unsigned)photoIndex
 {
 	NSImage *result = nil;
-    if ((nil != [self photosArray]) && (index < [self photoCount]))
-        result = [[self photosArray] objectAtIndex:index];
-    else if ((nil != delegate) && (index < [self photoCount]))
-        result = [delegate photoView:self photoAtIndex:index];
+    if ((nil != [self photosArray]) && (photoIndex < [self photoCount]))
+        result = [[self photosArray] objectAtIndex:photoIndex];
+    else if ((nil != delegate) && (photoIndex < [self photoCount]))
+        result = [delegate photoView:self photoAtIndex:photoIndex];
 
 // commenting out. This is really slow, and maybe not needed.
 //	if (![result isValid])
@@ -1739,18 +1740,18 @@ static NSDictionary *sTitleAttributes = nil;
     return ([super inLiveResize]) || (mouseDown) || (!isDonePhotoResizing);
 }
 
-- (NSImage *)fastPhotoAtIndex:(unsigned)index
+- (NSImage *)fastPhotoAtIndex:(unsigned)photoIndex
 {
     NSImage *fastPhoto = nil;
-    if ((nil != [self photosArray]) && (index < [[self photosArray] count]))
+    if ((nil != [self photosArray]) && (photoIndex < [[self photosArray] count]))
     {
-        fastPhoto = [photosFastArray objectAtIndex:index];
+        fastPhoto = [photosFastArray objectAtIndex:photoIndex];
         if ((NSNull *)fastPhoto == [NSNull null])
         {
 			// Change this if you want higher/lower quality fast photos
 			float fastPhotoSize = 100.0;
 			
-			NSImageRep *fullSizePhotoRep = [[self scalePhoto:[self photoAtIndex:index]] bestRepresentationForDevice:nil];
+			NSImageRep *fullSizePhotoRep = [[self scalePhoto:[self photoAtIndex:photoIndex]] bestRepresentationForDevice:nil];
 	        
 			// Figure out what the scaled size is
 			float longSide = [fullSizePhotoRep pixelsWide];
@@ -1771,17 +1772,17 @@ static NSDictionary *sTitleAttributes = nil;
 	        [fastPhoto unlockFocus];
 
 			// Save it off
-            [photosFastArray replaceObjectAtIndex:index withObject:fastPhoto];
+            [photosFastArray replaceObjectAtIndex:photoIndex withObject:fastPhoto];
 			
 			[fastPhoto autorelease];
         }
     } else if ((nil != delegate) && ([delegate respondsToSelector:@selector(photoView:fastPhotoAtIndex:)])) {
-        fastPhoto = [delegate photoView:self fastPhotoAtIndex:index];
+        fastPhoto = [delegate photoView:self fastPhotoAtIndex:photoIndex];
     }
     
     // if the above calls failed, try to just fetch the full size image
     if (0 == fastPhoto || ![fastPhoto isValid]) {
-        fastPhoto = [self photoAtIndex:index];
+        fastPhoto = [self photoAtIndex:photoIndex];
     }
     
     return fastPhoto;
@@ -1846,12 +1847,12 @@ static NSDictionary *sTitleAttributes = nil;
 	return NSMakeRange(start, (finish + 1) - start);
 }
 
-- (NSRect)gridRectForIndex:(unsigned)index
+- (NSRect)gridRectForIndex:(unsigned)photoIndex
 {
 	if (columns == 0) return NSZeroRect;
 
-	unsigned row = index / columns;
-	unsigned column = index % columns;
+	unsigned row = photoIndex / columns;
+	unsigned column = photoIndex % columns;
 	float x = column * gridSize.width;
 	float y = row * gridSize.height;
 	
@@ -1866,16 +1867,16 @@ static NSDictionary *sTitleAttributes = nil;
     return NSMakeRect(x, y, size.width, size.height);
 }
 
-- (NSRect)photoRectForIndex:(unsigned)index
+- (NSRect)photoRectForIndex:(unsigned)photoIndex
 {
 	if ([self photoCount] == 0)
         return NSZeroRect;
 
     // get the grid rect for this index
-    NSRect gridRect = [self gridRectForIndex:index];
+    NSRect gridRect = [self gridRectForIndex:photoIndex];
     
     // get the actual image
-    NSImage *photo = [self photoAtIndex:index];
+    NSImage *photo = [self photoAtIndex:photoIndex];
     if (nil == photo)
         return NSZeroRect;
     
@@ -1892,15 +1893,15 @@ static NSDictionary *sTitleAttributes = nil;
 }
 
 // selection
-- (BOOL)isPhotoSelectedAtIndex:(unsigned)index;
+- (BOOL)isPhotoSelectedAtIndex:(unsigned)photoIndex;
 {
     if (0 < [dragSelectedPhotoIndexes count]) {
-        if ([dragSelectedPhotoIndexes containsIndex:index])
+        if ([dragSelectedPhotoIndexes containsIndex:photoIndex])
             return YES;
-    } else if ((nil != [self selectedPhotoIndexes]) && [[self selectedPhotoIndexes] containsIndex:index])
+    } else if ((nil != [self selectedPhotoIndexes]) && [[self selectedPhotoIndexes] containsIndex:photoIndex])
         return YES;
     else if (nil != delegate) 
-        return [[delegate selectionIndexesForPhotoView:self] containsIndex:index];
+        return [[delegate selectionIndexesForPhotoView:self] containsIndex:photoIndex];
     
     
     return NO;
@@ -2030,38 +2031,38 @@ static NSDictionary *sTitleAttributes = nil;
 	if (oldSelection && newSelection)
 	{
 		// First, see which of the old are different than the new
-		unsigned int index = [newSelection firstIndex];
+		unsigned int thisIndex = [newSelection firstIndex];
 		
-		while (index != NSNotFound)
+		while (thisIndex != NSNotFound)
 		{
-			if (![oldSelection containsIndex:index])
+			if (![oldSelection containsIndex:thisIndex])
 			{
-				[changedIndexes addIndex:index];
+				[changedIndexes addIndex:thisIndex];
 			}
-			index = [newSelection indexGreaterThanIndex:index];
+			thisIndex = [newSelection indexGreaterThanIndex:thisIndex];
 		}
 			
 		// Next, see which of the new are different from the old
-		index = [oldSelection firstIndex];
-		while (index != NSNotFound)
+		thisIndex = [oldSelection firstIndex];
+		while (thisIndex != NSNotFound)
 		{
-			if (![newSelection containsIndex:index])
+			if (![newSelection containsIndex:thisIndex])
 			{
-				[changedIndexes addIndex:index];
+				[changedIndexes addIndex:thisIndex];
 			}
-			index = [oldSelection indexGreaterThanIndex:index];
+			thisIndex = [oldSelection indexGreaterThanIndex:thisIndex];
 		}
 			
 		// Loop through the changes and dirty the rect for each
-		index = [changedIndexes firstIndex];
-		while (index != NSNotFound)
+		thisIndex = [changedIndexes firstIndex];
+		while (thisIndex != NSNotFound)
 		{
-			NSRect photoRect = [self gridRectForIndex:index];
+			NSRect photoRect = [self gridRectForIndex:thisIndex];
 			if (NSIntersectsRect(visibleRect, photoRect))
 			{
 				[self setNeedsDisplayInRect:photoRect];
 			}
-			index = [changedIndexes indexGreaterThanIndex:index];
+			thisIndex = [changedIndexes indexGreaterThanIndex:thisIndex];
 		}
 			
 	}
