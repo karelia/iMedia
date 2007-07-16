@@ -393,7 +393,12 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 		// If we didn't have a thumbnail, create it from Core Graphics.
 		if (!img)
 		{
-			NSURL *url = [NSURL fileURLWithPath:imagePathRetained];
+			// Some versions of iPhoto somehow link to aliases of images instead of the images themselves.
+			// so resolve the path if it is an alias. This may occur if the iPhoto preferences dictate that
+			// the photos should not be copied into the Pictures folder. It may also occur during some
+			// upgrade events.
+			NSString *resolvedPath = [[NSFileManager defaultManager] pathResolved:imagePathRetained];
+			NSURL *url = [NSURL fileURLWithPath:resolvedPath];
 			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
 			if (source)
 			{
@@ -441,8 +446,6 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 				CFRelease(source);
 			}
 		}
-	
-#warning TODO: Perhaps handle alias files, resolve a file if it's really an alias.
 		
 		if (!img) // we have a bad egg... need to display a ? icon
 		{
@@ -675,7 +678,12 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	NSString *imagePath = [rec objectForKey:@"ImagePath"];
 	if (imagePath)
 	{
-		NSDictionary *metadata = [NSImage metadataFromImageAtPath:imagePath];
+		// Some versions of iPhoto somehow link to aliases of images instead of the images themselves.
+		// so resolve the path if it is an alias. This may occur if the iPhoto preferences dictate that
+		// the photos should not be copied into the Pictures folder. It may also occur during some
+		// upgrade events.
+		NSString *resolvedPath = [[NSFileManager defaultManager] pathResolved:imagePath];
+		NSDictionary *metadata = [NSImage metadataFromImageAtPath:resolvedPath];
 		NSString *dimensionsFormat = LocalizedStringInThisBundle(@"\n%.0f \\U2715 %.0f", @"format for width X height");
 		[result appendFormat:dimensionsFormat,
 			[[metadata objectForKey:@"width"]  floatValue],

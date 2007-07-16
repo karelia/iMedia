@@ -30,6 +30,6 @@
 
 - (BOOL)isPathHidden:(NSString *)path;
 - (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
-
+- (NSString *)pathResolved:(NSString *)path;
 
 @end

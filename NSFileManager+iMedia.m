@@ -80,4 +80,40 @@
 	return isHidden;
 }
 
+// Will resolve an alias into a path.. this code was taken from
+// see http://cocoa.karelia.com/Foundation_Categories/
+// see http://developer.apple.com/documentation/Cocoa/Conceptual/LowLevelFileMgmt/Tasks/ResolvingAliases.html
+- (NSString *)pathResolved:(NSString *)path
+{
+    NSString *resolvedPath = NULL;
+    
+    CFURLRef url = CFURLCreateWithFileSystemPath(NULL /*allocator*/, (CFStringRef)path, kCFURLPOSIXPathStyle, NO /*isDirectory*/);
+    if (url != NULL)
+    {
+        FSRef fsRef;
+        if (CFURLGetFSRef(url, &fsRef))
+        {
+            Boolean targetIsFolder, wasAliased;
+            if (FSResolveAliasFile (&fsRef, true /*resolveAliasChains*/, 
+                                    &targetIsFolder, &wasAliased) == noErr && wasAliased)
+            {
+                CFURLRef resolvedUrl = CFURLCreateFromFSRef(NULL, &fsRef);
+                if (resolvedUrl != NULL)
+                {
+                    resolvedPath = (NSString*)
+                    CFURLCopyFileSystemPath(resolvedUrl,
+                                            kCFURLPOSIXPathStyle);
+                    CFRelease(resolvedUrl);
+                }
+            }
+        }
+        CFRelease(url);
+    }
+    
+    if ( resolvedPath == NULL )
+        resolvedPath = [[path copy] autorelease];
+    
+    return resolvedPath;
+}
+
 @end
