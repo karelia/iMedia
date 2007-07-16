@@ -1117,7 +1117,7 @@ static NSDictionary *sTitleAttributes = nil;
 			}
 			return;
 		}
-		else if ((keyChar = NSCarriageReturnCharacter) || (keyChar = NSEnterCharacter)) {
+		else if ((keyChar == NSCarriageReturnCharacter) || (keyChar == NSEnterCharacter)) {
 			[super keyDown:theEvent];
 			return;
 		}
