@@ -136,30 +136,14 @@
 }
 
 
-- (iMBLibraryNode *)parseDatabase
+- (iMBLibraryNode *)parseOneDatabaseWithContentsOfURL:(NSURL *)url
 {
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 	[root setName:LocalizedStringInThisBundle(@"Aperture", @"Aperture")];
 	[root setIconName:@"com.apple.Aperture:"];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	
-	NSMutableDictionary *library = [NSMutableDictionary dictionary];
-	
-	//	Find all Aperture libraries
-	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",
-														(CFStringRef)@"com.apple.iApps");
-	
-	//	Iterate over libraries, pulling dictionary from contents and adding to array for processing;
-	NSArray *libraries = [((NSArray *)iApps) autorelease];
-	NSEnumerator *e = [libraries objectEnumerator];
-	NSString *cur;
-	
-	while (cur = [e nextObject]) {
-		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:cur]];
-		if (db) {
-			[library addEntriesFromDictionary:db];
-		}
-	}
+    NSDictionary *library = [NSDictionary dictionaryWithContentsOfURL:url];
 	
 	NSDictionary *imageRecords = [library objectForKey:@"Master Image List"];
 	
@@ -262,6 +246,29 @@
 	}
 	
 	return [albums count] ? root : nil;
+}
+
+- (NSArray *)parseDatabase
+{
+	NSMutableArray *libraryNodes = [NSMutableArray array];
+	
+	//	Find all Aperture libraries
+	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",
+														(CFStringRef)@"com.apple.iApps");
+	
+	//	Iterate over libraries, pulling dictionary from contents and adding to array for processing;
+	NSArray *libraries = [((NSArray *)iApps) autorelease];
+	NSEnumerator *e = [libraries objectEnumerator];
+	NSString *cur;
+	
+	while (cur = [e nextObject]) {
+        iMBLibraryNode *library = [self parseOneDatabaseWithContentsOfURL:[NSURL URLWithString:cur]];
+		if (library) {
+			[libraryNodes addObject:library];
+		}
+	}
+    
+    return libraryNodes;
 }
 
 @end
