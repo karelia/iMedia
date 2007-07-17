@@ -167,7 +167,6 @@
 		CE3F200C0B8646A000A1CD2A /* NSURLCache+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */; };
 		CE52AD7F0B7D21D800DA5F23 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD790B7D21D800DA5F23 /* iPhoto.nib */; };
 		CE52AD800B7D21D800DA5F23 /* iTunes.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */; };
-		CE52AD810B7D21D800DA5F23 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7B0B7D21D800DA5F23 /* MediaBrowser.nib */; };
 		CE52AD820B7D21D800DA5F23 /* Links.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7C0B7D21D800DA5F23 /* Links.nib */; };
 		CE52AD830B7D21D800DA5F23 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7D0B7D21D800DA5F23 /* Movies.nib */; };
 		CE52AD840B7D21D800DA5F23 /* Contacts.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7E0B7D21D800DA5F23 /* Contacts.nib */; };
@@ -190,6 +189,17 @@
 		CEC915010B97648C0072492B /* iMBiPhotoAbstractParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEC914FF0B97648C0072492B /* iMBiPhotoAbstractParser.h */; };
 		CEC915020B97648C0072492B /* iMBiPhotoAbstractParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC915000B97648C0072492B /* iMBiPhotoAbstractParser.m */; };
 		CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
+		CEE57B070C4D3C4A00FCE138 /* NSWindow_Flipr.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE57B050C4D3C4A00FCE138 /* NSWindow_Flipr.h */; };
+		CEE57B080C4D3C4A00FCE138 /* NSWindow_Flipr.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE57B060C4D3C4A00FCE138 /* NSWindow_Flipr.m */; };
+		CEE57B0B0C4D3C7300FCE138 /* i.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEE57B090C4D3C7300FCE138 /* i.tiff */; };
+		CEE57B0C0C4D3C7300FCE138 /* i2.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEE57B0A0C4D3C7300FCE138 /* i2.tiff */; };
+		CEE57B2B0C4D3C9300FCE138 /* iMBBackgroundImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE57B270C4D3C9300FCE138 /* iMBBackgroundImageView.h */; };
+		CEE57B2C0C4D3C9300FCE138 /* iMBBackgroundImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE57B280C4D3C9300FCE138 /* iMBBackgroundImageView.m */; };
+		CEE57B2D0C4D3C9300FCE138 /* iMBHoverButton.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE57B290C4D3C9300FCE138 /* iMBHoverButton.h */; };
+		CEE57B2E0C4D3C9300FCE138 /* iMBHoverButton.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE57B2A0C4D3C9300FCE138 /* iMBHoverButton.m */; };
+		CEE57B550C4D3F4800FCE138 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE57B540C4D3F4800FCE138 /* QuartzCore.framework */; };
+		CEE57B890C4D41C500FCE138 /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = CEE57B880C4D41C500FCE138 /* MediaBrowser.nib */; };
+		CEE57B900C4D420A00FCE138 /* Info.html in Resources */ = {isa = PBXBuildFile; fileRef = CEE57B8F0C4D420A00FCE138 /* Info.html */; };
 		CEF3F38609E449FF00D0058F /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF3F38409E449FF00D0058F /* NSString+iMedia.m */; };
 		CEFC515C0B792BD1009F114D /* reload.png in Resources */ = {isa = PBXBuildFile; fileRef = CEFC515B0B792BD1009F114D /* reload.png */; };
 		CEFC515F0B792C11009F114D /* iMBPlacardScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEFC515D0B792C11009F114D /* iMBPlacardScrollView.h */; };
@@ -422,7 +432,6 @@
 		CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLCache+iMedia.m"; sourceTree = "<group>"; };
 		CE52AD790B7D21D800DA5F23 /* iPhoto.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = iPhoto.nib; sourceTree = "<group>"; };
 		CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = iTunes.nib; sourceTree = "<group>"; };
-		CE52AD7B0B7D21D800DA5F23 /* MediaBrowser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MediaBrowser.nib; sourceTree = "<group>"; };
 		CE52AD7C0B7D21D800DA5F23 /* Links.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Links.nib; sourceTree = "<group>"; };
 		CE52AD7D0B7D21D800DA5F23 /* Movies.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Movies.nib; sourceTree = "<group>"; };
 		CE52AD7E0B7D21D800DA5F23 /* Contacts.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Contacts.nib; sourceTree = "<group>"; };
@@ -437,6 +446,17 @@
 		CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "QTMovie+iMedia.m"; sourceTree = "<group>"; };
 		CEDE18CE0A5C69AE0055352C /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEDE18D50A5C69B40055352C /* da */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEE57B050C4D3C4A00FCE138 /* NSWindow_Flipr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NSWindow_Flipr.h; sourceTree = "<group>"; };
+		CEE57B060C4D3C4A00FCE138 /* NSWindow_Flipr.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NSWindow_Flipr.m; sourceTree = "<group>"; };
+		CEE57B090C4D3C7300FCE138 /* i.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = i.tiff; sourceTree = "<group>"; };
+		CEE57B0A0C4D3C7300FCE138 /* i2.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = i2.tiff; sourceTree = "<group>"; };
+		CEE57B270C4D3C9300FCE138 /* iMBBackgroundImageView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBBackgroundImageView.h; sourceTree = "<group>"; };
+		CEE57B280C4D3C9300FCE138 /* iMBBackgroundImageView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBBackgroundImageView.m; sourceTree = "<group>"; };
+		CEE57B290C4D3C9300FCE138 /* iMBHoverButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iMBHoverButton.h; sourceTree = "<group>"; };
+		CEE57B2A0C4D3C9300FCE138 /* iMBHoverButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iMBHoverButton.m; sourceTree = "<group>"; };
+		CEE57B540C4D3F4800FCE138 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
+		CEE57B8A0C4D41D400FCE138 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CEE57B910C4D420F00FCE138 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = en; path = en.lproj/Info.html; sourceTree = "<group>"; };
 		CEF3F38309E449FF00D0058F /* NSString+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+iMedia.h"; sourceTree = "<group>"; };
 		CEF3F38409E449FF00D0058F /* NSString+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+iMedia.m"; sourceTree = "<group>"; };
 		CEFC515B0B792BD1009F114D /* reload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload.png; sourceTree = "<group>"; };
@@ -465,6 +485,7 @@
 				796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */,
 				7903562D09E3B45F00384D08 /* AddressBook.framework in Frameworks */,
 				79353E6D0A28754C00284715 /* libcrypto.dylib in Frameworks */,
+				CEE57B550C4D3F4800FCE138 /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -506,6 +527,7 @@
 				965EB98608E1D345000DFF3A /* QTKit.framework */,
 				964006E108D7B9BF0046E052 /* QuickTime.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+				CEE57B540C4D3F4800FCE138 /* QuartzCore.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -560,12 +582,13 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				CEE57B880C4D41C500FCE138 /* MediaBrowser.nib */,
 				CE52AD790B7D21D800DA5F23 /* iPhoto.nib */,
 				CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */,
-				CE52AD7B0B7D21D800DA5F23 /* MediaBrowser.nib */,
 				CE52AD7C0B7D21D800DA5F23 /* Links.nib */,
 				CE52AD7D0B7D21D800DA5F23 /* Movies.nib */,
 				CE52AD7E0B7D21D800DA5F23 /* Contacts.nib */,
+				CEE57B8F0C4D420A00FCE138 /* Info.html */,
 				3C3A131C09EAFB8100AF41BF /* Localizable.strings */,
 				968BEF3E090E904100D00E5C /* images */,
 				791F97630975D4970071B2E0 /* MainMenu.nib */,
@@ -697,6 +720,8 @@
 		79BBE5090A282CCF0018CCCA /* Cocoa Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				CEE57B050C4D3C4A00FCE138 /* NSWindow_Flipr.h */,
+				CEE57B060C4D3C4A00FCE138 /* NSWindow_Flipr.m */,
 				96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */,
 				7962BDC70A2BBF26004CF308 /* NSWorkspace+iMedia.m */,
 				CEF3F38309E449FF00D0058F /* NSString+iMedia.h */,
@@ -728,6 +753,8 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CEE57B090C4D3C7300FCE138 /* i.tiff */,
+				CEE57B0A0C4D3C7300FCE138 /* i2.tiff */,
 				CEFC515B0B792BD1009F114D /* reload.png */,
 				CE58DAEC0B7BDC8A00BECE74 /* reload_border.png */,
 				CE58DB4F0B7BE14900BECE74 /* reload_border_on.png */,
@@ -813,6 +840,10 @@
 				A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */,
 				CEFC515D0B792C11009F114D /* iMBPlacardScrollView.h */,
 				CEFC515E0B792C11009F114D /* iMBPlacardScrollView.m */,
+				CEE57B270C4D3C9300FCE138 /* iMBBackgroundImageView.h */,
+				CEE57B280C4D3C9300FCE138 /* iMBBackgroundImageView.m */,
+				CEE57B290C4D3C9300FCE138 /* iMBHoverButton.h */,
+				CEE57B2A0C4D3C9300FCE138 /* iMBHoverButton.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -942,6 +973,9 @@
 				CEFC515F0B792C11009F114D /* iMBPlacardScrollView.h in Headers */,
 				CE3F200B0B8646A000A1CD2A /* NSURLCache+iMedia.h in Headers */,
 				CEC915010B97648C0072492B /* iMBiPhotoAbstractParser.h in Headers */,
+				CEE57B070C4D3C4A00FCE138 /* NSWindow_Flipr.h in Headers */,
+				CEE57B2B0C4D3C9300FCE138 /* iMBBackgroundImageView.h in Headers */,
+				CEE57B2D0C4D3C9300FCE138 /* iMBHoverButton.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1076,10 +1110,13 @@
 				CE58DB500B7BE14900BECE74 /* reload_border_on.png in Resources */,
 				CE52AD7F0B7D21D800DA5F23 /* iPhoto.nib in Resources */,
 				CE52AD800B7D21D800DA5F23 /* iTunes.nib in Resources */,
-				CE52AD810B7D21D800DA5F23 /* MediaBrowser.nib in Resources */,
+				CEE57B890C4D41C500FCE138 /* MediaBrowser.nib in Resources */,
 				CE52AD820B7D21D800DA5F23 /* Links.nib in Resources */,
 				CE52AD830B7D21D800DA5F23 /* Movies.nib in Resources */,
 				CE52AD840B7D21D800DA5F23 /* Contacts.nib in Resources */,
+				CEE57B0B0C4D3C7300FCE138 /* i.tiff in Resources */,
+				CEE57B0C0C4D3C7300FCE138 /* i2.tiff in Resources */,
+				CEE57B900C4D420A00FCE138 /* Info.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1172,6 +1209,9 @@
 				CEFC51600B792C11009F114D /* iMBPlacardScrollView.m in Sources */,
 				CE3F200C0B8646A000A1CD2A /* NSURLCache+iMedia.m in Sources */,
 				CEC915020B97648C0072492B /* iMBiPhotoAbstractParser.m in Sources */,
+				CEE57B080C4D3C4A00FCE138 /* NSWindow_Flipr.m in Sources */,
+				CEE57B2C0C4D3C9300FCE138 /* iMBBackgroundImageView.m in Sources */,
+				CEE57B2E0C4D3C9300FCE138 /* iMBHoverButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1225,6 +1265,22 @@
 				5B3AD8600B5BA23800C971A0 /* sv */,
 			);
 			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		CEE57B880C4D41C500FCE138 /* MediaBrowser.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CEE57B8A0C4D41D400FCE138 /* en */,
+			);
+			name = MediaBrowser.nib;
+			sourceTree = "<group>";
+		};
+		CEE57B8F0C4D420A00FCE138 /* Info.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CEE57B910C4D420F00FCE138 /* en */,
+			);
+			name = Info.html;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

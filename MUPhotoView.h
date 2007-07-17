@@ -20,7 +20,11 @@
 // Version 1.1 - April 29, 2006 - Photo removal support, Added support for reduced-size drawing during live resize
 // Version 1.2 - September 24, 2006 - Updated selection behavior, Changed to MIT license, Fixed issue where no images would show, fixed autoscroll
 
+// Modified for the iMedia project http://imedia.karelia.com/
+
 #import <Cocoa/Cocoa.h>
+
+extern NSString *ShowCaptionChangedNotification;
 
 //! MUPhotoView displays a grid of photos similar to iPhoto's main photo view. The class gives developers several options for providing images - via bindings or delegation.
 

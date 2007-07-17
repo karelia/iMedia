@@ -63,7 +63,6 @@
 	[oPhotoView setDelegate:self];
 	[oPhotoView setUseOutlineBorder:NO];
 	[oPhotoView setUseHighQualityResize:NO];
-	[oPhotoView setShowCaptions:[[self browser] showsFilenamesInPhotoBasedBrowsers]];
 	[oPhotoView setBackgroundColor:[NSColor whiteColor]];
 
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
@@ -80,6 +79,12 @@
 		   withKeyPath:@"imageCount"
 			   options:optionsDict];
 // It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
+}
+
+- (void)setBrowser:(iMediaBrowser *)browser	// hook up captions prefs now that we have a browser associated with this controller.
+{
+	[super setBrowser:browser];
+	[oPhotoView setShowCaptions:[browser prefersFilenamesInPhotoBasedBrowsers]];
 }
 
 - (void)refilter

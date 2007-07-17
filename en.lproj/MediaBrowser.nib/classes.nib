@@ -8,6 +8,7 @@
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = iMBBackgroundImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
         {CLASS = iMBLibraryOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
         {
             CLASS = iMBPlacardScrollView; 
@@ -16,14 +17,17 @@
             SUPERCLASS = NSScrollView; 
         }, 
         {
-            ACTIONS = {playlistSelected = id; reloadMediaBrowser = id; }; 
+            ACTIONS = {flipBack = id; info = id; playlistSelected = id; reloadMediaBrowser = id; }; 
             CLASS = iMediaBrowser; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 libraryController = NSTreeController; 
                 myDelegate = id; 
                 mySelectedBrowser = id; 
+                oBackgroundImageView = iMBBackgroundImageView; 
                 oBrowserView = NSView; 
+                oInfoTextView = NSTextView; 
+                oInfoWindow = NSWindow; 
                 oLoading = NSProgressIndicator; 
                 oLoadingText = NSTextField; 
                 oLoadingView = NSBox; 

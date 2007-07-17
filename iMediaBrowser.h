@@ -26,7 +26,7 @@
 #import <Cocoa/Cocoa.h>
 
 @protocol iMediaBrowser;
-@class iMBLibraryNode, RBSplitView;
+@class iMBLibraryNode, RBSplitView, iMBBackgroundImageView;
 
 @interface iMediaBrowser : NSWindowController
 {
@@ -39,6 +39,10 @@
 	IBOutlet NSTextField			*oLoadingText;
 	IBOutlet NSOutlineView			*oPlaylists;
 	IBOutlet NSTreeController		*libraryController;
+
+	IBOutlet NSWindow				*oInfoWindow;
+	IBOutlet NSTextView				*oInfoTextView;
+	IBOutlet iMBBackgroundImageView *oBackgroundImageView;
 	
 	@private
 	NSMutableArray					*myMediaBrowsers;
@@ -116,14 +120,23 @@
 // loads the specified browser
 - (void)showMediaBrowser:(NSString *)browserClassName;
 
-- (void)setShowsFilenamesInPhotoBasedBrowsers:(BOOL)flag;
-- (BOOL)showsFilenamesInPhotoBasedBrowsers;
+- (void)setShowsFilenamesInPhotoBasedBrowsers:(BOOL)flag;	// API to set initial value
+- (BOOL)prefersFilenamesInPhotoBasedBrowsers;				// binding for user defaults
+- (void)setPrefersFilenamesInPhotoBasedBrowsers:(BOOL)flag;	// binding for user defaults
 
 - (IBAction)playlistSelected:(id)sender;
+- (IBAction) info:(id)sender;
+- (IBAction) flipBack:(id)sender;
 
 // Setting & Getting the excluded folder list
 - (NSArray *)excludedFolders;
 - (void)setExcludedFolders:(NSArray *)value;
+
+- (int) toolbarDisplayMode;
+- (void) setToolbarDisplayMode:(int)aMode;
+- (BOOL)toolbarIsSmall;
+- (void) setToolbarIsSmall:(BOOL)aFlag;
+
 @end
 
 // This notification is for each specific media browser to post when their selection changes.

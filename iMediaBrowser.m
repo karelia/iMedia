@@ -30,6 +30,9 @@
 #import "RBSplitView.h"
 #import "RBSplitSubview.h"
 #import "iMBPlacardScrollView.h"
+#import "iMBHoverButton.h"
+#import "NSWindow_Flipr.h"
+#import "iMBBackgroundImageView.h"
 
 #import <QuickTime/QuickTime.h>
 #import <QTKit/QTKit.h>
@@ -331,7 +334,8 @@ static NSMutableDictionary *_parsers = nil;
 	
 	[myToolbar setAllowsUserCustomization:NO];
 	[myToolbar setShowsBaselineSeparator:YES];
-	[myToolbar setSizeMode:NSToolbarSizeModeSmall];
+	[self setToolbarDisplayMode:[self toolbarDisplayMode]];
+	[self setToolbarIsSmall:[self toolbarIsSmall]];			
 	
 	NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
 	
@@ -394,6 +398,56 @@ static NSMutableDictionary *_parsers = nil;
 	[myToolbar setDelegate:self];
 	[[self window] setToolbar:myToolbar];
 
+	[[self window] setShowsToolbarButton:NO];	// don't use the toolbar button
+	
+	// set up special button
+	NSButton *but = [[self window] standardWindowButton:NSWindowCloseButton];
+	NSView *container = [but superview];
+	float containerWidth = [container frame].size.width;
+	NSRect frame = [but frame];
+	NSButton *iButton = [[[iMBHoverButton alloc] initWithFrame:NSMakeRect(frame.origin.x + containerWidth - 11 - 11,frame.origin.y+2,11,11)] autorelease];
+	[iButton setAutoresizingMask:NSViewMinYMargin|NSViewMinXMargin];
+	
+	[iButton setAction:@selector(info:)];
+	[iButton setTarget:self];
+	[container addSubview:iButton];
+	
+	// Now do another button on the flip-side
+	but = [oInfoWindow standardWindowButton:NSWindowCloseButton];
+	container = [but superview];
+	containerWidth = [container frame].size.width;
+	frame = [but frame];
+	iButton = [[[iMBHoverButton alloc] initWithFrame:NSMakeRect(frame.origin.x + containerWidth - 11 - 11,frame.origin.y+2,11,11)] autorelease];
+	[iButton setAutoresizingMask:NSViewMinYMargin|NSViewMinXMargin];
+	
+	[iButton setAction:@selector(flipBack:)];
+	[iButton setTarget:self];
+	[container addSubview:iButton];
+	
+	// get flipping window ready
+	[NSWindow flippingWindow];
+	[oInfoTextView setDrawsBackground:NO];
+	NSScrollView *scrollView = [oInfoTextView enclosingScrollView];
+	[scrollView setDrawsBackground:NO];
+	[[scrollView contentView] setCopiesOnScroll:NO];
+	
+	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"Info" ofType:@"html"];
+
+	NSData *htmlContents = [NSData dataWithContentsOfFile:path];
+	NSAttributedString *attr = [[[NSAttributedString alloc] initWithHTML:htmlContents documentAttributes:nil] autorelease];
+	[[oInfoTextView textStorage] setAttributedString:attr];
+	
+	// set up cursors in text
+	NSEnumerator* attrRuns = [[[oInfoTextView textStorage] attributeRuns] objectEnumerator];
+	NSTextStorage* run;
+	while ((run = [attrRuns nextObject])) {
+		if ([run attribute:NSLinkAttributeName atIndex:0 effectiveRange:NULL]) {
+			[run addAttribute:NSCursorAttributeName value:[NSCursor pointingHandCursor] range:NSMakeRange(0,[run length])];
+		}
+	};
+	
+	
+	
 #ifdef DEBUG
 	// DEBUG -- don't load, and present an empty window.
 	[oSplitView setHidden:YES];
@@ -839,17 +893,55 @@ static NSMutableDictionary *_parsers = nil;
 	return results;
 }
 
+// This is a method that a client can call to set the default value of whether
+// captions are shown.  Users can override this by checking checkbox on "back" of window.
+
 - (void)setShowsFilenamesInPhotoBasedBrowsers:(BOOL)flag
 {
-	if (flag != myFlags.showFilenames)
-	{
-		myFlags.showFilenames = flag;
-	}
+	myFlags.showFilenames = flag;
 }
 
-- (BOOL)showsFilenamesInPhotoBasedBrowsers
+// variation of the above that also sets a preference - for binding
+
+- (void)setPrefersFilenamesInPhotoBasedBrowsers:(BOOL)flag
 {
-	return myFlags.showFilenames;
+	[self setShowsFilenamesInPhotoBasedBrowsers:flag];	// set internal value
+
+	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+		[NSNumber numberWithBool:flag], @"flag", 
+		nil];
+	[[NSNotificationCenter defaultCenter]
+			postNotificationName:ShowCaptionChangedNotification
+						  object:self
+						userInfo:info];
+	
+	[[NSUserDefaults standardUserDefaults] setBool:flag forKey:[NSString stringWithFormat:@"iMBShowCaptions-%@", myIdentifier]];
+
+}
+
+- (BOOL)prefersFilenamesInPhotoBasedBrowsers
+{
+	id preferred = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMBShowCaptions-%@", myIdentifier]];
+	if (nil != preferred)
+	{
+		return [preferred boolValue];
+	}
+	return myFlags.showFilenames;	// return the fallback set through code
+}
+
+
+
+
+- (IBAction) info:(id)sender
+{
+	[oInfoWindow setFrame:[[self window] frame] display:NO];
+	[[self window] flipToShowWindow:oInfoWindow forward:YES reflectInto:oBackgroundImageView];
+}
+
+- (IBAction) flipBack:(id)sender
+{
+	[[self window] setFrame:[oInfoWindow frame] display:NO];	// not really needed unless window is resized
+	[oInfoWindow flipToShowWindow:[self window] forward:NO reflectInto:nil];
 }
 
 - (IBAction) clearCache:(id)sender
@@ -877,6 +969,42 @@ static NSMutableDictionary *_parsers = nil;
         myExcludedFolders = [value copy];
     }
 }
+
+#pragma mark -
+#pragma mark Bindings for toolbar
+
+#warning TODO -- store in defaults too
+
+- (int) toolbarDisplayMode
+{
+	int displayMode = [[NSUserDefaults standardUserDefaults] integerForKey:[NSString stringWithFormat:@"iMBToolbarMode-%@", myIdentifier]];
+	if (0 == displayMode) displayMode = NSToolbarDisplayModeIconAndLabel;
+	return displayMode;
+}
+- (void) setToolbarDisplayMode:(int)aMode
+{
+	[[NSUserDefaults standardUserDefaults]
+		setInteger:aMode
+			forKey:[NSString stringWithFormat:@"iMBToolbarMode-%@", myIdentifier]];
+	[myToolbar setDisplayMode:aMode];
+}
+
+- (BOOL)toolbarIsSmall
+{
+	int sizeMode = [[NSUserDefaults standardUserDefaults] integerForKey:[NSString stringWithFormat:@"iMBToolbarSizeMode-%@", myIdentifier]];
+	if (0 == sizeMode) sizeMode = NSToolbarSizeModeSmall;
+	return (sizeMode == NSToolbarSizeModeSmall);
+}
+
+- (void) setToolbarIsSmall:(BOOL)aFlag
+{
+	int sizeMode = (aFlag ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
+	[myToolbar setSizeMode:sizeMode];
+	[[NSUserDefaults standardUserDefaults]
+		setInteger:sizeMode
+			forKey:[NSString stringWithFormat:@"iMBToolbarSizeMode-%@", myIdentifier]];
+}
+
 
 #pragma mark -
 #pragma mark Delegate

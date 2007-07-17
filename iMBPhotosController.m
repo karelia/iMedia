@@ -84,6 +84,12 @@ static Class sNSCGImageRepClass = nil;
 	return self;
 }
 
+- (void)setBrowser:(iMediaBrowser *)browser	// hook up captions prefs now that we have a browser associated with this controller.
+{
+	[super setBrowser:browser];
+	[oPhotoView setShowCaptions:[browser prefersFilenamesInPhotoBasedBrowsers]];
+}
+
 - (void)loadNib
 {
 	if (![[NSBundle bundleForClass:[iMBPhotosController class]] loadNibFile:@"iPhoto" 
@@ -118,7 +124,6 @@ static Class sNSCGImageRepClass = nil;
 	[oPhotoView setDelegate:self];
 	[oPhotoView setUseOutlineBorder:NO];
 	[oPhotoView setUseHighQualityResize:NO];
-	[oPhotoView setShowCaptions:[[self browser] showsFilenamesInPhotoBasedBrowsers]];
 	[oPhotoView setBackgroundColor:[NSColor whiteColor]];
 
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
@@ -673,11 +678,17 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	{
 		rec = [myImages objectAtIndex:aIndex];
 	}
-	[result appendString:[rec objectForKey:@"Caption"]];	// the title of the image, often the file name.
 	
 	NSString *imagePath = [rec objectForKey:@"ImagePath"];
-	if (imagePath)
+	if (!imagePath)
 	{
+		[result appendString:[rec objectForKey:@"Caption"]];	// the title of the image, often the file name.
+	}
+	else
+	{
+		NSString *fileName = [imagePath lastPathComponent];
+		[result appendFormat:@"%@", fileName];
+		
 		// Some versions of iPhoto somehow link to aliases of images instead of the images themselves.
 		// so resolve the path if it is an alias. This may occur if the iPhoto preferences dictate that
 		// the photos should not be copied into the Pictures folder. It may also occur during some

@@ -89,7 +89,7 @@
 					if (filePath)
 					{
 						[newPicture setObject:filePath forKey:@"ImagePath"];
-						[newPicture setObject:[fm displayNameAtPath:filePath] forKey:@"Caption"];
+						[newPicture setObject:[[fm displayNameAtPath:filePath] stringByDeletingPathExtension] forKey:@"Caption"];
 						//[newPicture setObject:filePath forKey:@"ThumbPath"];
 					}
 					NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];

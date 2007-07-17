@@ -19,7 +19,11 @@
 // Version 1.1 - April 29, 2006 - Photo removal support, Added support for reduced-size drawing during live resize
 // Version 1.2 - September 24, 2006 - Updated selection behavior, Changed to MIT license, Fixed issue where no images would show, fixed autoscroll
 
+// Modified for the iMedia project http://imedia.karelia.com/
+
 #import "MUPhotoView.h"
+
+NSString *ShowCaptionChangedNotification = @"ShowCaptionChangedNotification";
 
 @implementation MUPhotoView
 
@@ -86,6 +90,11 @@
 		photoSize = [defaults floatForKey:@"MUPhotoSize"];
         photoVerticalSpacing = 25.0;
         photoHorizontalSpacing = 25.0;
+
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(resetCaptionShowing:)
+													 name:ShowCaptionChangedNotification
+												   object:nil];
         
         photoResizeTimer = nil;
         photoResizeTime = [[NSDate date] retain];
@@ -106,6 +115,7 @@
     [photoResizeTime release];
     [dragSelectedPhotoIndexes release];
     dragSelectedPhotoIndexes = nil;
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
     
 	[super dealloc];
 }
@@ -510,6 +520,13 @@ static NSDictionary *sTitleAttributes = nil;
 - (void)setShowCaptions:(BOOL)flag
 {
     showCaptions = flag;
+}
+
+- (void) resetCaptionShowing:(NSNotification *)notification
+{
+	NSDictionary *ui = [notification userInfo];
+	BOOL flag = [[ui objectForKey:@"flag"] boolValue];
+	[self setShowCaptions:flag];
 }
 
 - (float)photoSize
@@ -1587,7 +1604,12 @@ static NSDictionary *sTitleAttributes = nil;
     // calculate the base grid size
     gridSize.height = [self photoSize] + [self photoVerticalSpacing];
     gridSize.width = [self photoSize] + [self photoHorizontalSpacing];
-    
+	
+	if ([self showCaptions])
+	{
+		gridSize.height += [self sizeOfTitleWithCurrentAttributes:@"Example"].height;
+	}
+	    
     // if there are no photos, return
     if (0 == photoCount) {
         columns = 0;
@@ -1831,7 +1853,7 @@ static NSDictionary *sTitleAttributes = nil;
 	NSRect titleRect = NSZeroRect;
 	NSRect photoRect = NSZeroRect;
 	NSRect gridRect = NSZeroRect;
-	 
+
 	// Only bother if the requested index is within our range
 	if ((photoIndex + 1) <= [self photoCount])
 	{
