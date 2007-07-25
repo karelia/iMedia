@@ -53,7 +53,7 @@
 	NSLock							*myBackgroundLoadingLock;
 	NSString						*myIdentifier;
 	
-   NSArray                 *myExcludedFolders;
+	NSArray							*myExcludedFolders;
    
 	NSArray							*myPreferredBrowserTypes;
 	id								myDelegate; //not retained

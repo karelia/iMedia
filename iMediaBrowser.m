@@ -914,6 +914,18 @@ static NSMutableDictionary *_parsers = nil;
 	return myFlags.showFilenames;	// return the fallback set through code
 }
 
+- (IBAction)showWindow:(id)sender;
+{
+	// If we are actually showing the back of the window, flip to the front.
+	if ([oInfoWindow isVisible])
+	{
+		[self flipBack:sender];
+	}
+	else
+	{
+		[super showWindow:sender];
+	}
+}
 
 
 
