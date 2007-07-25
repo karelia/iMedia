@@ -225,22 +225,6 @@ static NSMutableDictionary *_parsers = nil;
 		[NSValueTransformer setValueTransformer:libraryItemsValueTransformer forName:@"libraryItemsValueTransformer"];
 		myBackgroundLoadingLock = [[NSLock alloc] init];
 		myIdentifier = @"Default";
-		
-		// Make sure mainBundle (class) or app or app's delegate  implements applicationIdentifier.  Do not continue if it doesn't.
-		Class cls = NSClassFromString([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPrincipalClass"]);
-		if ([cls respondsToSelector:@selector(applicationIdentifier)]
-			|| [NSApp respondsToSelector:@selector(applicationIdentifier)]
-			|| [[NSApp delegate] respondsToSelector:@selector(applicationIdentifier)]
-			)
-		{
-			myFlags.unused = 1;
-		}
-		else
-		{
-			myFlags.unused = 0;
-			[self release];
-			return nil;
-		}
 	}
 	return self;
 }
@@ -427,6 +411,7 @@ static NSMutableDictionary *_parsers = nil;
 	// get flipping window ready
 	[NSWindow flippingWindow];
 	[oInfoTextView setDrawsBackground:NO];
+	[oInfoTextView setTextContainerInset:NSMakeSize(8,8)];
 	NSScrollView *scrollView = [oInfoTextView enclosingScrollView];
 	[scrollView setDrawsBackground:NO];
 	[[scrollView contentView] setCopiesOnScroll:NO];

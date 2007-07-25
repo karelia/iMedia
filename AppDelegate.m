@@ -51,21 +51,6 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 
 @end
 
-@interface iMBApplication : NSApplication
-{
-	
-}
-@end
-
-// This can be implemented by the application's subclass as a class or instance method, or the app delegate as an instance method.
-
-@implementation iMBApplication
-+ (NSString *)applicationIdentifier
-{
-	return @"com.test";
-}
-@end
-
 #ifdef DEBUG
 
 /*!	Override debugDescription so it's easier to use the debugger.  Not compiled for non-debug versions.

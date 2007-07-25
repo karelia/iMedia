@@ -21,6 +21,6 @@
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
-	<string>iMBApplication</string>
+	<string>NSApplication</string>
 </dict>
 </plist>

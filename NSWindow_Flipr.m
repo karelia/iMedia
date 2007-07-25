@@ -112,7 +112,7 @@
 // The initial and final windows aren't retained, so weird things might happen if
 // they go away during the animation. We assume both windows have the exact same frame.
 
-- (CIImage*)setInitialWindow:(NSWindow*)initial andFinalWindow:(NSWindow*)final forward:(BOOL)forward reflectInto:(NSImageView*)reflection {
+- (void)setInitialWindow:(NSWindow*)initial andFinalWindow:(NSWindow*)final forward:(BOOL)forward reflectInto:(NSImageView*)reflection {
 	NSWindow* flipr = [NSWindow flippingWindow];
 	if (flipr) {
 		initialWindow = initial;
@@ -155,9 +155,9 @@
 			im = [f valueForKey:@"outputImage"];
 			
 			f = [CIFilter filterWithName:@"CIColorControls"];
-			[f setValue:[NSNumber numberWithFloat:0.32] forKey:@"inputBrightness"];
+			[f setValue:[NSNumber numberWithFloat:0.42] forKey:@"inputBrightness"];
 			[f setValue:[NSNumber numberWithFloat:1.0] forKey:@"inputSaturation"];
-			[f setValue:[NSNumber numberWithFloat:0.25] forKey:@"inputContrast"];
+			[f setValue:[NSNumber numberWithFloat:0.15] forKey:@"inputContrast"];
 			[f setValue:im forKey:@"inputImage"];
 			im = [f valueForKey:@"outputImage"];
 			
