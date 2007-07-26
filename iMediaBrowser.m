@@ -927,7 +927,10 @@ static NSMutableDictionary *_parsers = nil;
 	}
 }
 
-
+- (BOOL)infoWindowIsVisible
+{
+	return [oInfoWindow isVisible];
+}
 
 - (IBAction) info:(id)sender
 {
