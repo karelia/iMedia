@@ -1,5 +1,4 @@
 /*
-/*
  iMedia Browser <http://kareia.com/imedia>
  
  Copyright (c) 2005-2007 by Karelia Software et al.
@@ -24,7 +23,7 @@
 	following copyright notice: Copyright (c) 2005-2007 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window,Acknowledgments window, or similar, either a) the original
+	e.g., About window, Acknowledgments window, or similar, either a) the original
 	terms stated here, including this list of conditions, the disclaimer noted
 	below, and the aforementioned copyright notice, or b) the aforementioned
 	copyright notice and a link to karelia.com/imedia.
