@@ -1,5 +1,5 @@
 /*
- iMedia Browser <http://kareia.com/imedia>
+ iMedia Browser <http://karelia.com/imedia>
  
  Copyright (c) 2005-2007 by Karelia Software et al.
  
