@@ -411,7 +411,7 @@ static NSMutableDictionary *_parsers = nil;
 	// get flipping window ready
 	[NSWindow flippingWindow];
 	[oInfoTextView setDrawsBackground:NO];
-	[oInfoTextView setTextContainerInset:NSMakeSize(8,8)];
+	[oInfoTextView setTextContainerInset:NSMakeSize(4,4)];
 	NSScrollView *scrollView = [oInfoTextView enclosingScrollView];
 	[scrollView setDrawsBackground:NO];
 	[[scrollView contentView] setCopiesOnScroll:NO];
