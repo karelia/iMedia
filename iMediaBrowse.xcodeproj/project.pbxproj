@@ -430,6 +430,22 @@
 		CE1AD3860A7E83F20083C01E /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE3F20090B8646A000A1CD2A /* NSURLCache+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLCache+iMedia.h"; sourceTree = "<group>"; };
 		CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLCache+iMedia.m"; sourceTree = "<group>"; };
+		CE4E78F30C5E76F30044A5F9 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = da; path = da.lproj/Info.html; sourceTree = "<group>"; };
+		CE4E79090C5E76F90044A5F9 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/Info.html; sourceTree = "<group>"; };
+		CE4E790A0C5E76FF0044A5F9 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/Info.html; sourceTree = "<group>"; };
+		CE4E790B0C5E77060044A5F9 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = it; path = it.lproj/Info.html; sourceTree = "<group>"; };
+		CE4E790C0C5E770C0044A5F9 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ja; path = ja.lproj/Info.html; sourceTree = "<group>"; };
+		CE4E790D0C5E77120044A5F9 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = sv; path = sv.lproj/Info.html; sourceTree = "<group>"; };
+		CE4E790E0C5E77170044A5F9 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = zh_CN; path = zh_CN.lproj/Info.html; sourceTree = "<group>"; };
+		CE4E790F0C5E771C0044A5F9 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = zh_TW; path = zh_TW.lproj/Info.html; sourceTree = "<group>"; };
+		CE4E79100C5E773E0044A5F9 /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE4E79160C5E77440044A5F9 /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE4E791C0C5E774B0044A5F9 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE4E79220C5E77530044A5F9 /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE4E79280C5E77590044A5F9 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE4E792E0C5E775D0044A5F9 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE4E79340C5E77630044A5F9 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE4E793A0C5E77690044A5F9 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		CE52AD790B7D21D800DA5F23 /* iPhoto.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = iPhoto.nib; sourceTree = "<group>"; };
 		CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = iTunes.nib; sourceTree = "<group>"; };
 		CE52AD7C0B7D21D800DA5F23 /* Links.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Links.nib; sourceTree = "<group>"; };
@@ -1271,6 +1287,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				CEE57B8A0C4D41D400FCE138 /* en */,
+				CE4E79100C5E773E0044A5F9 /* da */,
+				CE4E79160C5E77440044A5F9 /* de */,
+				CE4E791C0C5E774B0044A5F9 /* fr */,
+				CE4E79220C5E77530044A5F9 /* it */,
+				CE4E79280C5E77590044A5F9 /* ja */,
+				CE4E792E0C5E775D0044A5F9 /* sv */,
+				CE4E79340C5E77630044A5F9 /* zh_CN */,
+				CE4E793A0C5E77690044A5F9 /* zh_TW */,
 			);
 			name = MediaBrowser.nib;
 			sourceTree = "<group>";
@@ -1279,6 +1303,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				CEE57B910C4D420F00FCE138 /* en */,
+				CE4E78F30C5E76F30044A5F9 /* da */,
+				CE4E79090C5E76F90044A5F9 /* de */,
+				CE4E790A0C5E76FF0044A5F9 /* fr */,
+				CE4E790B0C5E77060044A5F9 /* it */,
+				CE4E790C0C5E770C0044A5F9 /* ja */,
+				CE4E790D0C5E77120044A5F9 /* sv */,
+				CE4E790E0C5E77170044A5F9 /* zh_CN */,
+				CE4E790F0C5E771C0044A5F9 /* zh_TW */,
 			);
 			name = Info.html;
 			sourceTree = "<group>";
