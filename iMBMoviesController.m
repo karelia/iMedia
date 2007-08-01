@@ -67,7 +67,11 @@
 
 + (void)initialize
 {
+	if ( self == [iMBMoviesController class] ) 
+	{
+		// Only do some work when not called because one of our subclasses does not implement +initialize
 	[iMBMoviesController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+}
 }
 
 - (id)initWithPlaylistController:(NSTreeController*)ctrl
@@ -469,8 +473,8 @@ static NSImage *_toolbarIcon = nil;
 		}
 		[myCacheLock unlock];
 		
-		[oPhotoView performSelectorOnMainThread:@selector(setNeedsDisplay:)
-									 withObject:[NSNumber numberWithBool:YES]
+		[oPhotoView performSelectorOnMainThread:@selector(forceRedisplay)
+									 withObject:nil
 								  waitUntilDone:NO];
 	}
 	

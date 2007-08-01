@@ -53,6 +53,9 @@ static NSImage *sDRMIcon = nil;
 
 + (void)initialize	// preferred over +load in most cases
 {
+	if ( self == [iMBMusicFolder class] ) 
+	{
+		// Only do some work when not called because one of our subclasses does not implement +initialize
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
@@ -62,6 +65,7 @@ static NSImage *sDRMIcon = nil;
 	sDRMIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
 	
 	[pool release];
+}
 }
 
 + (void)load	// registration of this class

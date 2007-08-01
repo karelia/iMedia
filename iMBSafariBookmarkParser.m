@@ -56,6 +56,12 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
+	// Force the shared instance to be build on main thread - some webkit versions
+	// seem to complain when it's not the case
+	[WebIconDatabase performSelectorOnMainThread:@selector(sharedIconDatabase)
+									  withObject:nil
+								   waitUntilDone:YES];
+	
 	[iMediaBrowser registerParser:[self class] forMediaType:@"links"];
 	
 	[pool release];

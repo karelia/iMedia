@@ -33,6 +33,9 @@ NSString *ShowCaptionChangedNotification = @"ShowCaptionChangedNotification";
 
 + (void)initialize
 {
+	if ( self == [MUPhotoView class] ) 
+	{
+		// Only do some work when not called because one of our subclasses does not implement +initialize
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -52,6 +55,7 @@ NSString *ShowCaptionChangedNotification = @"ShowCaptionChangedNotification";
     [self setKeys:[NSArray arrayWithObject:@"backgroundColor"] triggerChangeNotificationsForDependentKey:@"shadowBoxColor"];
 	
 	[pool release];
+}
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -275,6 +279,11 @@ static NSDictionary *sTitleAttributes = nil;
 	}
     //**** END Selection Rectangle ****//
 	
+}
+
+- (void)forceRedisplay
+{
+	[self setNeedsDisplay:YES];
 }
 
 - (void)setNeedsDisplayInRect:(NSRect)invalidatedRect

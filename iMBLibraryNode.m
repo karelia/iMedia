@@ -55,9 +55,13 @@ static NSMutableDictionary *sImageCache = nil;
 
 + (void)initialize
 {
+	if ( self == [iMBLibraryNode class] ) 
+	{
+		// Only do some work when not called because one of our subclasses does not implement +initialize
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	sImageCache = [[NSMutableDictionary dictionary] retain];
 	[pool release];
+}
 }
 
 - (id)init

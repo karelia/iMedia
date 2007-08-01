@@ -65,28 +65,41 @@
 @end
 
 static NSImage *sMissingImage = nil;
-static Class sNSCGImageRepClass = nil;
+static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initialized with initWithCGImage
 
 @implementation iMBPhotosController
 
 + (void)initialize
 {
+	if ( self == [iMBPhotosController class] ) 
+	{
+		// Only do some work when not called because one of our subclasses does not implement +initialize
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
 	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCountString"];
 	
+		// Try to find some NSImageRep class that can be initialized from a CGImage
+		if ([NSBitmapImageRep instancesRespondToSelector:@selector(initWithCGImage:)])
+		{
+			// New to 10.5
+			sNSCGImageRepClass = [NSBitmapImageRep class];
+		} 
+		else 
+		{
+			// Check if the NSCGImageRep private class can be used here
 	sNSCGImageRepClass = NSClassFromString(@"NSCGImageRep");	// private class; we're being careful here
-	if (![sNSCGImageRepClass respondsToSelector:@selector(initWithCGImage:)])
+			if (![sNSCGImageRepClass instancesRespondToSelector:@selector(initWithCGImage:)])
 	{
 		sNSCGImageRepClass = nil;	// make sure this class will do the job for us!
 	}
-	
+		}
 	NSString *path = [[NSBundle bundleForClass:[iMBPhotosController class]] pathForResource:@"missingImage" ofType:@"png"];
 	sMissingImage = [[NSImage alloc] initWithContentsOfFile:path];
 	if (!sMissingImage)
 		NSLog(@"missingImage.png is missing. This can cause bad things to happen");
 	
 	[pool release];
+}
 }
 
 - (id) initWithPlaylistController:(NSTreeController*)ctrl
@@ -412,7 +425,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 		
 		if (thumbPath)
 		{
-			img = [[NSImage alloc] initByReferencingFile:thumbPath];
+			img = [[[NSImage alloc] initByReferencingFile:thumbPath] autorelease];
 		}
 		
 		// If we didn't have a thumbnail, create it from Core Graphics.
@@ -451,13 +464,13 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 					img = [[[NSImage alloc] initWithSize:imageRect.size] autorelease];
 					[img setFlipped:YES];
 					
-					// Try to use private NSCGImageRep
-					if (sNSCGImageRepClass)
+					// Create a new image to receive the Quartz image data.
+					if (sNSCGImageRepClass) // Try to use some imageRep class that can be initialized from a CGImage
 					{
 						id cgRep = [[[sNSCGImageRepClass alloc] initWithCGImage:theCGImage] autorelease];
 						[img addRepresentation:cgRep];
 					}
-					else	// not found, go the old-fashioned route (which may have some sort of deadlock with drawing?
+					else // not found, go the old-fashioned route (which may have some sort of deadlock with drawing?)
 					{
 						[img lockFocus];
 						
@@ -503,8 +516,8 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 		}
 		[myCacheLock unlock];	// ======================================================== UNLOCK
         
-		[oPhotoView performSelectorOnMainThread:@selector(setNeedsDisplay:)
-									 withObject:[NSNumber numberWithBool:YES]
+		[oPhotoView performSelectorOnMainThread:@selector(forceRedisplay)
+									 withObject:nil
 								  waitUntilDone:NO];
 	}
 	

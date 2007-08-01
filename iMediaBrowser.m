@@ -80,6 +80,10 @@ static NSMutableDictionary *_parsers = nil;
 
 + (void)initialize	// preferred over +load in most cases
 {
+	if ( self == [iMediaBrowser class] ) 
+	{
+		// Only do some work when not called because one of our subclasses does not implement +initialize
+
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	_browserClasses = [[NSMutableArray alloc] init];
 	_parsers = [[NSMutableDictionary dictionary] retain];
@@ -135,8 +139,8 @@ static NSMutableDictionary *_parsers = nil;
 			NSLog(@"Plugin located at: %@ does not implement either of the required protocols", cur);
 		}
 	}
-	
 	[pool release];
+}
 }
 
 + (id)sharedBrowser
