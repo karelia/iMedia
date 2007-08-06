@@ -62,6 +62,7 @@
 
 @interface iMBPhotosController (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
+- (void)updatePhotoView;
 @end
 
 static NSImage *sMissingImage = nil;
@@ -515,14 +516,18 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 			[myProcessingImages addObject:imagePathRetained];
 		}
 		[myCacheLock unlock];	// ======================================================== UNLOCK
-        
-		[oPhotoView performSelectorOnMainThread:@selector(forceRedisplay)
-									 withObject:nil
-								  waitUntilDone:NO];
+
+		[self updatePhotoView];
 	}
 	
 	myThreadCount--;
 	[pool release];
+}
+
+- (void)updatePhotoView {
+	[oPhotoView performSelectorOnMainThread:@selector(forceRedisplay)
+									 withObject:nil
+ 								  waitUntilDone:NO];
 }
 
 #pragma mark -

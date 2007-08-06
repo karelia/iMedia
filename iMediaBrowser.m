@@ -53,6 +53,7 @@
 #import "iMBHoverButton.h"
 #import "NSWindow_Flipr.h"
 #import "iMBBackgroundImageView.h"
+#import "iMBPhotosController.h"
 
 #import <QuickTime/QuickTime.h>
 #import <QTKit/QTKit.h>
@@ -64,7 +65,9 @@ static NSMutableArray *_browserClasses = nil;
 static NSMutableDictionary *_parsers = nil;
 
 @interface iMediaBrowser (PrivateAPI)
+- (id)initializeInstance;
 - (void)resetLibraryController;
+- (void)setupInfoWindow;
 - (void)showMediaBrowser:(NSString *)browserClassName reuseCachedData:(BOOL)reuseCachedData;
 @end
 
@@ -230,26 +233,45 @@ static NSMutableDictionary *_parsers = nil;
 	[iMediaBrowser unregisterParserName:NSStringFromClass(parserClass) forMediaType:media];
 }
 
+
 #pragma mark -
 #pragma mark Instance Methods
 
 - (id)init
 {
 	if (self = [super initWithWindowNibName:@"MediaBrowser"]) {
-		
-		// Make sure we are running Tiger
-		if (NSAppKitVersionNumber < 824)  /* NSAppKitVersionNumber10_4 */
-		{
-			NSLog(@"ERROR - Mac OS X 10.4, or greater, required for the iMediaBrowser");
-			[self release];
-			return nil;
-		}
-		[QTMovie initialize];
-		id libraryItemsValueTransformer = [[[LibraryItemsValueTransformer alloc] init] autorelease];
-		[NSValueTransformer setValueTransformer:libraryItemsValueTransformer forName:@"libraryItemsValueTransformer"];
-		myBackgroundLoadingLock = [[NSLock alloc] init];
-		myIdentifier = @"Default";
+		self = [self initializeInstance];
+		myToolbar = [[NSToolbar alloc] initWithIdentifier:@"iMediaBrowserToolbar"];
 	}
+	return self;
+}
+
+
+- (id)initWithoutWindow 
+{
+	if (self = [super init]) {
+		self = [self initializeInstance];
+	}
+	return self;
+}
+
+
+- (id)initializeInstance {
+		// Make sure we are running Tiger
+	if (NSAppKitVersionNumber < 824)  /* NSAppKitVersionNumber10_4 */
+	{
+		NSLog(@"ERROR - Mac OS X 10.4, or greater, required for the iMediaBrowser");
+		[self release];
+		return nil;
+	}
+	
+	[QTMovie initialize];
+	id libraryItemsValueTransformer = [[[LibraryItemsValueTransformer alloc] init] autorelease];
+	[NSValueTransformer setValueTransformer:libraryItemsValueTransformer forName:@"libraryItemsValueTransformer"];
+	
+	myBackgroundLoadingLock = [[NSLock alloc] init];
+	myIdentifier = @"Default";
+	
 	return self;
 }
 
@@ -338,12 +360,13 @@ static NSMutableDictionary *_parsers = nil;
 	myLoadedParsers = [[NSMutableDictionary alloc] init];
 	myUserDroppedParsers = [[NSMutableArray alloc] init];
 
-	myToolbar = [[NSToolbar alloc] initWithIdentifier:@"iMediaBrowserToolbar"];
-	
-	[myToolbar setAllowsUserCustomization:NO];
-	[myToolbar setShowsBaselineSeparator:YES];
-	[self setToolbarDisplayMode:[self toolbarDisplayMode]];
-	[self setToolbarIsSmall:[self toolbarIsSmall]];			
+	if (myToolbar) 
+	{
+		[myToolbar setAllowsUserCustomization:NO];
+		[myToolbar setShowsBaselineSeparator:YES];
+		[self setToolbarDisplayMode:[self toolbarDisplayMode]];
+		[self setToolbarIsSmall:[self toolbarIsSmall]];			
+	}
 	
 	NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
 	
@@ -403,11 +426,60 @@ static NSMutableDictionary *_parsers = nil;
 		[oSplitView adjustSubviews];	// just to be safe.
 	}
 	
-	[myToolbar setDelegate:self];
-	[[self window] setToolbar:myToolbar];
-
-	[[self window] setShowsToolbarButton:NO];	// don't use the toolbar button
+	if (myToolbar) 
+	{
+		[myToolbar setDelegate:self];
+		[[self window] setToolbar:myToolbar];
+		[[self window] setShowsToolbarButton:NO];	// don't use the toolbar button
+	}
 	
+	[self setupInfoWindow];
+	
+	
+#ifdef DEBUG
+	// DEBUG -- don't load, and present an empty window.
+	[oSplitView setHidden:YES];
+	[oLoadingView setHidden:YES];
+#else
+	//select the first browser
+	if ([myMediaBrowsers count] > 0) {
+		if (canRestoreLastSelectedBrowser)
+		{
+			[myToolbar setSelectedItemIdentifier:lastmySelectedBrowser];
+			[self showMediaBrowser:lastmySelectedBrowser reuseCachedData:NO];
+		}
+		else
+		{
+			[myToolbar setSelectedItemIdentifier:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class])];
+			[self showMediaBrowser:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class]) reuseCachedData:NO];
+		}
+	}
+#endif	
+	if ([self window])
+	{
+		NSString *position = [d objectForKey:@"WindowPosition"];
+		if (position) {
+			NSRect r = NSRectFromString(position);
+			[[self window] setFrame:r display:NO];
+		}
+		[[self window] setDelegate:self];
+	}
+	
+	[libraryController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(appWillQuit:)
+												 name:NSApplicationWillTerminateNotification
+											   object:nil];
+	
+	[oPlaylists setDataSource:self];
+	[oPlaylists setAllowsColumnReordering:NO];
+	[oPlaylists setDelegate:self];
+	[libraryController setSortDescriptors:nil];
+	[oSplitView setDelegate:self];
+}
+
+- (void)setupInfoWindow 
+{
 	// set up special button
 	NSButton *but = [[self window] standardWindowButton:NSWindowCloseButton];
 	NSView *container = [but superview];
@@ -441,7 +513,7 @@ static NSMutableDictionary *_parsers = nil;
 	[[scrollView contentView] setCopiesOnScroll:NO];
 	
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"Info" ofType:@"html"];
-
+	
 	NSData *htmlContents = [NSData dataWithContentsOfFile:path];
 	NSAttributedString *attr = [[[NSAttributedString alloc] initWithHTML:htmlContents documentAttributes:nil] autorelease];
 	[[oInfoTextView textStorage] setAttributedString:attr];
@@ -454,46 +526,6 @@ static NSMutableDictionary *_parsers = nil;
 			[run addAttribute:NSCursorAttributeName value:[NSCursor pointingHandCursor] range:NSMakeRange(0,[run length])];
 		}
 	};
-	
-	
-	
-#ifdef DEBUG
-	// DEBUG -- don't load, and present an empty window.
-	[oSplitView setHidden:YES];
-	[oLoadingView setHidden:YES];
-#else
-	//select the first browser
-	if ([myMediaBrowsers count] > 0) {
-		if (canRestoreLastSelectedBrowser)
-		{
-			[myToolbar setSelectedItemIdentifier:lastmySelectedBrowser];
-			[self showMediaBrowser:lastmySelectedBrowser reuseCachedData:NO];
-		}
-		else
-		{
-			[myToolbar setSelectedItemIdentifier:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class])];
-			[self showMediaBrowser:NSStringFromClass([[myMediaBrowsers objectAtIndex:0] class]) reuseCachedData:NO];
-		}
-	}
-#endif	
-	NSString *position = [d objectForKey:@"WindowPosition"];
-	if (position) {
-		NSRect r = NSRectFromString(position);
-		[[self window] setFrame:r display:NO];
-	}
-	[[self window] setDelegate:self];
-	
-	[libraryController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(appWillQuit:)
-												 name:NSApplicationWillTerminateNotification
-											   object:nil];
-	
-	[oPlaylists setDataSource:self];
-	[oPlaylists setAllowsColumnReordering:NO];
-	[oPlaylists setDelegate:self];
-	[libraryController setSortDescriptors:nil];
-	[oSplitView setDelegate:self];
 }
 
 - (void)appWillQuit:(NSNotification *)notification
@@ -1221,7 +1253,13 @@ static NSMutableDictionary *_parsers = nil;
 		return success;
 
     NSArray *folders = [[info draggingPasteboard] propertyListForType:NSFilenamesPboardType];
-	[self addCustomFolders:folders];
+	NSArray* addedNodes = [self addCustomFolders:folders];
+	if ([addedNodes count] > 0) 
+	{
+		iMBLibraryNode* node = [addedNodes objectAtIndex:0];
+		NSIndexPath* indexPath = [NSIndexPath indexPathWithIndex:[[libraryController content] indexOfObject:node]];
+		[libraryController setSelectionIndexPath:indexPath];
+	}
 	
 	return YES;
 }
@@ -1266,6 +1304,7 @@ static NSMutableDictionary *_parsers = nil;
 	NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]]];
 	NSMutableArray *drops = [NSMutableArray arrayWithArray:[d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]]];
 	
+	BOOL foundSomethingToDelete = NO;
 	while ((cur = [e nextObject]))
 	{
 		// we can only delete dragged folders
@@ -1279,10 +1318,16 @@ static NSMutableDictionary *_parsers = nil;
 				[drops removeObject:[parser databasePath]];
 				[myUserDroppedParsers removeObject:parser];
 				[content removeObject:cur];
+				foundSomethingToDelete = YES;
 				break;
 			}
 		}
 	}
+	if (!foundSomethingToDelete)
+	{
+		NSBeep ();
+	}
+	
 	[libraryController setContent:content];
 	[d setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];
 	[[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];

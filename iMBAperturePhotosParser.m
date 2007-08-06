@@ -69,10 +69,7 @@
 + (void)load
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	//	un-comment this line to use see the Aperture library in your iMedia browser:
 	[iMediaBrowser registerParser:[self class] forMediaType:@"photos"];
-	
 	[pool release];
 }
 
@@ -215,7 +212,14 @@
 			{
 				continue;
 			}
-				
+			
+			//	Better have the modification date than no date.
+			if (![imageRecord objectForKey:@"DateAsTimerInterval"]) 
+			{
+				NSNumber* date = [imageRecord objectForKey:@"ModDateAsTimerInterval"];
+				if (date) [imageRecord setObject:date forKey:@"DateAsTimerInterval"];
+			}
+			
 			[newPhotolist addObject:imageRecord];
 			
 			//	cp: No keywords in Aperture XML.

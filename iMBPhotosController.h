@@ -72,4 +72,9 @@
 - (IBAction)search:(id)sender;
 - (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard;
 
+- (void)clearCache;
+
+- (void)setImages:(NSArray *)images;
+- (NSArray *)images;
+
 @end

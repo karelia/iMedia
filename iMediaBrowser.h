@@ -106,6 +106,8 @@
 + (void)unregisterBrowser:(Class)aClass;
 + (void)unregisterAllBrowsers;
 
+- (id) initWithoutWindow;
+
 /* Register different types of media parsers
  
 	Default media keys are: photos, music, videos, links

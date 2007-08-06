@@ -47,7 +47,7 @@
 #import "iMediaBrowser.h"
 #import "iMediaBrowserProtocol.h"
 
-// Unified name constatns for native data in pasteboard
+// Unified name constants for native data in pasteboard
 extern NSString *iMBNativePasteboardFlavor;
 extern NSString *iMBControllerClassName;
 extern NSString *iMBNativeDataArray;
