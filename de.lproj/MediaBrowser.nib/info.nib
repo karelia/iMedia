@@ -17,10 +17,8 @@
 	<integer>4</integer>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>484</integer>
-		<integer>523</integer>
-		<integer>528</integer>
 		<integer>21</integer>
+		<integer>528</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>8R2218</string>

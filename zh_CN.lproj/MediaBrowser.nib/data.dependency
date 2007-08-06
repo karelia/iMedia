@@ -5,6 +5,7 @@
 	<key>IBPaletteDependency</key>
 	<array>
 		<string>RBSplitView</string>
+		<string>Controllers</string>
 	</array>
 </dict>
 </plist>
