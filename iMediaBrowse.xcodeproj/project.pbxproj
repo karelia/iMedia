@@ -390,7 +390,7 @@
 		79FDF61309AAE5D2000CB4B4 /* quicktime_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = quicktime_tiny.png; sourceTree = "<group>"; };
 		79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tunes_tiny.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* iMediaBrowse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* iMedia Tester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iMedia Tester.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		964006E108D7B9BF0046E052 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		965EB98608E1D345000DFF3A /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMediaBrowser.h; sourceTree = "<group>"; };
@@ -561,7 +561,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D1107320486CEB800E47090 /* iMediaBrowse.app */,
+				8D1107320486CEB800E47090 /* iMedia Tester.app */,
 				791679FE0975255000D9EF74 /* iMediaBrowser.framework */,
 			);
 			name = Products;
@@ -1018,9 +1018,9 @@
 			productReference = 791679FE0975255000D9EF74 /* iMediaBrowser.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		8D1107260486CEB800E47090 /* iMediaBrowse */ = {
+		8D1107260486CEB800E47090 /* iMediaTester */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 969656A108C6A24500F2F85C /* Build configuration list for PBXNativeTarget "iMediaBrowse" */;
+			buildConfigurationList = 969656A108C6A24500F2F85C /* Build configuration list for PBXNativeTarget "iMediaTester" */;
 			buildPhases = (
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
@@ -1032,10 +1032,10 @@
 			dependencies = (
 				791F97350975D3600071B2E0 /* PBXTargetDependency */,
 			);
-			name = iMediaBrowse;
+			name = iMediaTester;
 			productInstallPath = "$(HOME)/Applications";
 			productName = iMediaBrowse;
-			productReference = 8D1107320486CEB800E47090 /* iMediaBrowse.app */;
+			productReference = 8D1107320486CEB800E47090 /* iMedia Tester.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -1059,7 +1059,7 @@
 			mainGroup = 29B97314FDCFA39411CA2CEA /* iMediaBrowse */;
 			projectDirPath = "";
 			targets = (
-				8D1107260486CEB800E47090 /* iMediaBrowse */,
+				8D1107260486CEB800E47090 /* iMediaTester */,
 				791679FD0975255000D9EF74 /* iMediaBrowser */,
 			);
 		};
@@ -1380,7 +1380,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PREBINDING = NO;
-				PRODUCT_NAME = iMediaBrowse;
+				PRODUCT_NAME = "iMedia Tester";
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
@@ -1494,7 +1494,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		969656A108C6A24500F2F85C /* Build configuration list for PBXNativeTarget "iMediaBrowse" */ = {
+		969656A108C6A24500F2F85C /* Build configuration list for PBXNativeTarget "iMediaTester" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				969656A208C6A24500F2F85C /* Debug */,
