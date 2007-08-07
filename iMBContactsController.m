@@ -90,7 +90,7 @@
 
 	NSDictionary *optionsDict =
 		[NSDictionary dictionaryWithObject:
-			LocalizedStringInThisBundle(@"%{value1}@ contacts", @"Formatting: number of contacts in address book")
+			xxxxxxxxxxxxxTO_FIXxxxxxxx(@"%{value1}@ contacts", @"Formatting: number of contacts in address book")
 									forKey:@"NSDisplayPattern"];
 	
 	[counterField bind:@"displayPatternValue1"
