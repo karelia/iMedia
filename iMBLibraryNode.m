@@ -58,10 +58,13 @@ static NSMutableDictionary *sImageCache = nil;
 	if ( self == [iMBLibraryNode class] ) 
 	{
 		// Only do some work when not called because one of our subclasses does not implement +initialize
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	sImageCache = [[NSMutableDictionary dictionary] retain];
-	[pool release];
-}
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        sImageCache = [[NSMutableDictionary dictionary] retain];
+        [pool release];
+        
+        // make sure nameWithImage is KVC compliant so that the bindings work properly.
+        [iMBLibraryNode setKeys:[NSArray arrayWithObjects:@"name", @"icon", nil] triggerChangeNotificationsForDependentKey:@"nameWithImage"];
+    }
 }
 
 - (id)init

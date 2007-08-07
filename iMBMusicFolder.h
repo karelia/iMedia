@@ -48,15 +48,17 @@
 
 @interface iMBMusicFolder : iMBAbstractParser
 {
-	BOOL myParseMetaData;
-	NSString *myUnknownArtist;
+    // note: these fields are only used during parsing; so there are no accessor functions for now.
+	NSString *  myMusicFolderName;      // the name of the music folder as it appears to the user
+	NSString *  myUnknownArtistName;    // artist name to be displayed when artist cannot be read from metadata
+	NSString *  myIconName;             // the icon identifier for this folder
+	BOOL        myParseMetadata;        // whether to parse metadata or not
 }
 
-// is on by default and can increase loading times substantially
-- (void)setParseMetaData:(BOOL)flag;
-- (BOOL)parseMetaData;
+// designated initializer
+- (id)initWithContentsOfFile:(NSString *)file musicFolderName:(NSString *)musicFolderName unknownArtistName:(NSString *)unknownArtistName iconName:(NSString *)iconName parseMetadata:(BOOL)parseMetadata;
 
-- (void)setUnknownArtist:(NSString *)artist;
-- (NSString *)unknownArtist;
+// default values
+- (id)initWithContentsOfFile:(NSString *)file;
 
 @end

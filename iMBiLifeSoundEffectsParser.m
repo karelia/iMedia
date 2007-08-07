@@ -71,18 +71,15 @@
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
 	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
+    
+    NSString *musicFolderName = LocalizedStringInThisBundle(@"iLife Sound Effects", @"iLife Sound Effects folder name");
+    NSString *unknownArtistName = LocalizedStringInThisBundle(@"Apple Loop", @"Artist");
+    NSString *iconName = @"MBSoundEffect";
+    BOOL parseMetadata = YES;
 	
-	iMBMusicFolder *parser = [[[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath]] autorelease];
-	[parser setParseMetaData:NO];
-	[parser setUnknownArtist:LocalizedStringInThisBundle(@"Apple Loop", @"Artist")];
+	iMBMusicFolder *parser = [[[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath] musicFolderName:musicFolderName unknownArtistName:unknownArtistName iconName:iconName parseMetadata:parseMetadata] autorelease];
 	
-	iMBLibraryNode *sfx = [parser parseDatabase];
-	if (nil != sfx)
-	{
-		[sfx setName:LocalizedStringInThisBundle(@"iLife Sound Effects", @"iLife Sound Effects folder name")];
-		[sfx setIconName:@"MBSoundEffect"];
-	}	
-	return sfx;
+	return [parser parseDatabase];
 }
 
 @end

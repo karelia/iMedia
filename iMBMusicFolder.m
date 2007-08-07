@@ -75,158 +75,206 @@ static NSImage *sDRMIcon = nil;
 	[pool release];
 }
 
+- (id)initWithContentsOfFile:(NSString *)file musicFolderName:(NSString *)musicFolderName unknownArtistName:(NSString *)unknownArtistName iconName:(NSString *)iconName parseMetadata:(BOOL)parseMetadata
+{
+    self = [super initWithContentsOfFile:file];
+    if (self)
+    {
+        myMusicFolderName = [musicFolderName copy];
+        myUnknownArtistName = [unknownArtistName copy];
+        myIconName = [iconName copy];
+        myParseMetadata = parseMetadata;
+    }
+    return self;
+}
+
+- (id)initWithContentsOfFile:(NSString *)file
+{
+    NSString *musicFolderName = LocalizedStringInThisBundle(@"Music Folder", @"Name of your 'Music' folder in your home directory");
+    NSString *unknownArtistName = LocalizedStringInThisBundle(@"Unknown", @"Unknown music key");
+    NSString *iconName = @"folder";
+
+	return [self initWithContentsOfFile:file musicFolderName:musicFolderName unknownArtistName:unknownArtistName iconName:iconName parseMetadata:YES];
+}
+
 - (id)init
 {
-	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingPathComponent:@"Music"]])
-	{
-		myParseMetaData = YES;
-	}
-	return self;
+	return [self initWithContentsOfFile:[NSHomeDirectory() stringByAppendingPathComponent:@"Music"]];
 }
 
 - (void)dealloc
 {
-	[myUnknownArtist release];
-	[super dealloc];
-}
+    [myMusicFolderName release]; myMusicFolderName = nil;
+    [myUnknownArtistName release]; myUnknownArtistName = nil;
+    [myIconName release]; myIconName = nil;
 
-- (void)setParseMetaData:(BOOL)flag
-{
-	myParseMetaData = flag;
-}
-
-- (BOOL)parseMetaData
-{
-	return myParseMetaData;
-}
-
-- (void)setUnknownArtist:(NSString *)artist
-{
-	[myUnknownArtist autorelease];
-	myUnknownArtist = [artist copy];
-}
-
-- (NSString *)unknownArtist
-{
-	return myUnknownArtist;
+    [super dealloc];
 }
 
 #warning Note: We could definitely speed this up, if it's an issue, by delaying the processing of the QTMovie objects.
 
-- (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root
+// arguments should have the following input and output keys:
+//
+//      inputFile:              the filename to parse
+//      inputParseMetaTags:     whether to parse the meta data tags
+//
+//      outputValid:            whether the movie is a valid movie
+//      outputDuration:         the duration of the file
+//      outputName:             the name of the song
+//      outputArtist:           the artist of the song
+//      outputIsDRMProtected:   whether the song is DRM protected
+//
+- (void)getMusicInfo:(NSMutableDictionary *)arguments
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
-	NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-	NSArray *contents = [fm directoryContentsAtPath:path];
+    NSString *file = [arguments objectForKey:@"inputFile"];
+    NSNumber *parseMetaDataValue = [arguments objectForKey:@"inputParseMetaData"];
+    BOOL parseMetaData = (parseMetaDataValue != nil) ? [parseMetaDataValue boolValue] : NO;
+    
+    NSError *error = nil;
+    QTMovie *movie = [[QTMovie alloc] initWithFile:file error:&error];
+    
+    if ( movie != nil && error == nil )
+    {
+        [arguments setValue:[NSNumber numberWithBool:YES] forKey:@"outputValid"];
+        
+        NSNumber *duration = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
+        
+        [arguments setValue:duration forKey:@"outputDuration"];
+
+        // Get the meta data from the QTMovie
+        NSString *name = nil;
+        if (parseMetaData)
+        {
+            name = [movie attributeWithFourCharCode:kUserDataTextFullName];
+        }
+        if (!name || [name length] == 0)
+        {
+            name = [[file lastPathComponent] stringByDeletingPathExtension];
+        }
+        if (name)
+        {
+            [arguments setObject:name forKey:@"outputName"];
+        }
+
+        NSString *artist = nil;
+        if (parseMetaData)
+        {
+            artist = [movie attributeWithFourCharCode:kUserDataTextArtist];
+        }
+        if (!artist)
+        {
+            artist = [[myUnknownArtistName retain] autorelease];
+        }
+        if (artist)
+        {
+            [arguments setObject:artist forKey:@"outputArtist"];
+        }
+        
+        if (parseMetaData && [movie isDRMProtected])
+        {
+            [arguments setObject:[NSNumber numberWithBool:YES] forKey:@"outputIsDRMProtected"];
+        }
+        else
+        {
+            [arguments setObject:[NSNumber numberWithBool:NO] forKey:@"outputIsDRMProtected"];
+        }
+        
+        [movie release];
+    }
+}
+
+- (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root movieTypes:(NSArray *)movieTypes
+{
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+	NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+	NSArray *contents = [fileManager directoryContentsAtPath:path];
 	NSEnumerator *e = [contents objectEnumerator];
-	NSString *cur;
-	BOOL isDir;
-	NSMutableArray *movieTypes = [NSMutableArray arrayWithArray: [QTMovie movieFileTypes:QTIncludeAllTypes]];
-	[movieTypes removeObject:@"kar"];
 	NSMutableArray *tracks = [NSMutableArray array];
    
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;
-   NSArray * excludedFolders = [[iMediaBrowser sharedBrowserWithoutLoading] excludedFolders];
+	NSArray *excludedFolders = [[iMediaBrowser sharedBrowserWithoutLoading] excludedFolders];
    
-	while (cur = [e nextObject])
+	NSString *currentFile;
+	while (currentFile = [e nextObject])
 	{
-		NSString *filePath = [path stringByAppendingPathComponent: cur];
+		NSString *filePath = [path stringByAppendingPathComponent:currentFile];
+
+        // skip files that are likely to be included elsewhere or have been explicitly excluded
 		if ([[filePath lastPathComponent] isEqualToString:@"iTunes"]) continue;
 		if ([[filePath lastPathComponent] isEqualToString:@"GarageBand"]) continue;
-      if ([excludedFolders containsObject:filePath]) continue;
+		if ([excludedFolders containsObject:filePath]) continue;
       
-		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath] && ![ws isFilePackageAtPath:filePath])
+        BOOL isDirectory;
+		if ( [fileManager fileExistsAtPath:filePath isDirectory:&isDirectory] &&
+            ![fileManager isPathHidden:filePath] &&
+            ![workspace isFilePackageAtPath:filePath])
 		{
-			if (isDir)
+			if (isDirectory)
 			{
-				iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
+				iMBLibraryNode *folder = [[[iMBLibraryNode alloc] init] autorelease];
 				[root addItem:folder];
-				[folder release];
 				[folder setIconName:@"folder"];
-				[folder setName:[fm displayNameAtPath:filePath]];
-				[self recursivelyParse:filePath withNode:folder];
+				[folder setName:[fileManager displayNameAtPath:filePath]];
+				[self recursivelyParse:filePath withNode:folder movieTypes:movieTypes];
 			}
 			else
 			{
 				if ([movieTypes indexOfObject:[[filePath lowercaseString] pathExtension]] != NSNotFound)
 				{
-					OSErr err = EnterMoviesOnThread(0);
-					if (err != noErr) NSLog(@"Unable to EnterMoviesOnThread; %d", err);
-
 					NSMutableDictionary *song = [NSMutableDictionary dictionary]; 
 					
-					//we want to cache the first frame of the movie here as we will be in a background thread
-					QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:[[NSURL fileURLWithPath:filePath] path]];
-					NSError *error = nil;
-					QTMovie *movie = nil;
-					
-					if (myParseMetaData)
-					{
-						movie = [[QTMovie alloc] initWithAttributes:
-							[NSDictionary dictionaryWithObjectsAndKeys: 
-								ref, QTMovieDataReferenceAttribute,
-								[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-								nil] error:&error];
-					}
-					
-					// Get the meta data from the QTMovie
-					NSString *val = nil;
-					if (myParseMetaData)
-					{
-						val = [movie attributeWithFourCharCode:kUserDataTextFullName];
-					}
-					if (!val)
-					{
-						val = [cur stringByDeletingPathExtension];
-					}
-					[song setObject:val forKey:@"Name"];
-					val = nil;
-					if (myParseMetaData)
-					{
-						val = [movie attributeWithFourCharCode:FOUR_CHAR_CODE(0xA9415254)]; //'©ART'
-					}
-					if (!val)
-					{
-						if (myUnknownArtist)
-						{
-							val = myUnknownArtist;
-						}
-						else
-						{
-							val = LocalizedStringInThisBundle(@"Unknown", @"Unkown music key");
-						}
-					}
-					[song setObject:val forKey:@"Artist"];
-					if (myParseMetaData)
-					{
-						NSNumber *theTime = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
-						// Used for binding
-						[song setObject:theTime forKey:@"Total Time"];
-						if (![movie isDRMProtected])
-						{
-							[song setObject:sSongIcon forKey:@"Icon"];
-						}
-						else
-						{
-							[song setObject:sDRMIcon forKey:@"Icon"];
-						}
-					}
-					else
-					{
-						[song setObject:[NSNumber numberWithInt:0] forKey:@"Total Time"];
-						[song setObject:sSongIcon forKey:@"Icon"];
-					}
-					
-					[song setObject:filePath forKey:@"Location"];
-					[song setObject:filePath forKey:@"Preview"];
-					
-					[movie release];
-					[tracks addObject:song];
-
-					err = ExitMoviesOnThread();
-					if (err != noErr) NSLog(@"Unable to ExitMoviesOnThread; %d", err);
-
+                    NSMutableDictionary *arguments = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                        filePath, @"inputFile",
+                        [NSNumber numberWithBool:myParseMetadata], @"inputParseMetaData",
+                        nil];
+                    
+                    [self performSelectorOnMainThread:@selector(getMusicInfo:) withObject:arguments waitUntilDone:YES];
+                    
+                    NSNumber *valid = [arguments objectForKey:@"outputDuration"];
+                    if ( valid != nil && [valid boolValue] == YES )
+                    {
+                        // handle the song duration
+                        NSNumber *duration = [arguments objectForKey:@"outputDuration"];
+                        if ( duration != nil )
+                        {
+                            [song setObject:duration forKey:@"Total Time"];
+                        }
+                        else
+                        {
+                            [song setObject:[NSNumber numberWithInt:0] forKey:@"Total Time"];
+                        }
+                        
+                        // handle the song name
+                        NSString *name = [arguments objectForKey:@"outputName"];
+                        if ( name != nil )
+                        {
+                            [song setObject:name forKey:@"Name"];
+                        }
+                        
+                        // handle the song artist
+                        NSString *artist = [arguments objectForKey:@"outputArtist"];
+                        if ( artist != nil )
+                        {
+                            [song setObject:artist forKey:@"Artist"];
+                        }
+                        
+                        // handle the song protected vs. unprotected icon
+                        NSNumber *isProtected = [arguments objectForKey:@"outputIsDRMProtected"];
+                        if ( isProtected != nil && [isProtected boolValue] == YES )
+                        {
+                            [song setObject:sDRMIcon forKey:@"Icon"];
+                        }
+                        else
+                        {
+                            [song setObject:sSongIcon forKey:@"Icon"];
+                        }
+                        
+                        [song setObject:filePath forKey:@"Location"];
+                        [song setObject:filePath forKey:@"Preview"];
+                        
+                        [tracks addObject:song];
+                    }
 				}
 			}
 		}
@@ -242,24 +290,48 @@ static NSImage *sDRMIcon = nil;
 	[root setAttribute:tracks forKey:@"Tracks"];
 }
 
+- (void)populateLibraryNode:(iMBLibraryNode *)root
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+	NSString *folder = [self databasePath];
+	if ( [[NSFileManager defaultManager] fileExistsAtPath:folder] )
+    {
+        NSMutableArray *movieTypes = [NSMutableArray arrayWithArray:[QTMovie movieFileTypes:QTIncludeAllTypes]];
+        
+        // TODO: Why is this type being removed? What is it? cmeyer 2007/08/07.
+        [movieTypes removeObject:@"kar"];
+        
+        [self recursivelyParse:folder withNode:root movieTypes:movieTypes];
+    }
+    
+    // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
+	[root performSelectorOnMainThread:@selector(setName:) withObject:myMusicFolderName waitUntilDone:NO];
+	
+	[pool release];
+}
+
 - (iMBLibraryNode *)parseDatabase
 {
-	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-	[root setName:LocalizedStringInThisBundle(@"Music Folder", @"Name of your 'Music' folder in your home directory")];
-	[root setIconName:@"folder"];
 	NSString *folder = [self databasePath];
-	
-	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
-	{
-		return nil;
-	}
-
-	NSMutableArray *movieTypes = [NSMutableArray arrayWithArray: [QTMovie movieFileTypes:QTIncludeAllTypes]];
-	[movieTypes removeObject:@"kar"];
-	
-	[self recursivelyParse:folder withNode:root];
-   	
-	return root;
+	if ( [[NSFileManager defaultManager] fileExistsAtPath:folder] )
+    {
+        iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
+        
+        // the name will include 'loading' until it is populated.
+        NSString *loadingString = LocalizedStringInThisBundle(@" (Loading...)", @"Name extension to indicate it is loading.");
+        [root setName:[myMusicFolderName stringByAppendingString:loadingString]];
+        [root setIconName:myIconName];
+        
+        // the node itself will be returned immediately. now launch _another_ thread to populate the node.
+        [NSThread detachNewThreadSelector:@selector(populateLibraryNode:) toTarget:self withObject:root];
+        
+        return root;
+    }
+    else
+    {
+        return nil;
+    }
 }
 
 @end

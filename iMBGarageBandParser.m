@@ -71,6 +71,29 @@
 
 #warning Note: We could definitely speed this up, if it's an issue, by delaying the processing of the QTMovie objects.
 
+// arguments should have the following input and output keys:
+//
+//      inputFile: the filename to parse
+//
+//      outputDuration: the duration of the file
+//
+- (void)getDurationInfo:(NSMutableDictionary *)arguments
+{
+    NSString *file = [arguments objectForKey:@"inputFile"];
+    
+    NSError *error = nil;
+    QTMovie *movie = [[QTMovie alloc] initWithFile:file error:&error];
+    
+    if ( movie != nil && error == nil )
+    {
+        NSNumber *duration = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
+
+        [arguments setValue:duration forKey:@"outputDuration"];
+        
+        [movie release];
+    }
+}
+
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root artist:(NSString *)artist
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -102,27 +125,17 @@
 					if (hasSample)
 					{
 						[rec setObject:output forKey:@"Preview"];
-						// we need to load it into a qt movie so we can get the duration
-						QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:output];
-						NSError *error = nil;
+                        
+                        NSMutableDictionary *arguments = [NSMutableDictionary dictionaryWithObject:output forKey:@"inputFile"];
+                        
+                        [self performSelectorOnMainThread:@selector(getDurationInfo:) withObject:arguments waitUntilDone:YES];
+                        
+                        NSNumber *duration = [arguments objectForKey:@"outputDuration"];
 
-						OSErr err = EnterMoviesOnThread(0);
-						if (err != noErr) NSLog(@"Unable to EnterMoviesOnThread; %d", err);
-
-						QTMovie *movie = [[QTMovie alloc] initWithAttributes:
-							[NSDictionary dictionaryWithObjectsAndKeys: 
-								ref, QTMovieDataReferenceAttribute,
-								[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-								nil] error:&error];
-						if (movie)
-						{
-							NSNumber *theTime = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
-							[rec setObject:theTime forKey:@"Total Time"];
+                        if ( duration != nil )
+                        {
+							[rec setObject:duration forKey:@"Total Time"];
 						}
-						[movie release];
-
-						err = ExitMoviesOnThread();
-						if (err != noErr) NSLog(@"Unable to ExitMoviesOnThread; %d", err);
 					}
 					NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:filePath];
 					[rec setObject:icon forKey:@"Icon"];

@@ -72,17 +72,15 @@
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
 	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
+
+    NSString *musicFolderName = LocalizedStringInThisBundle(@"iMovie Sound Effects", @"iMovie Sound Effects folder name");
+    NSString *unknownArtistName = LocalizedStringInThisBundle(@"Apple Loop", @"Artist");
+    NSString *iconName = @"com.apple.iMovie:";
+    BOOL parseMetadata = YES;
 	
-	iMBMusicFolder *parser = [[[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath]] autorelease];
-	[parser setUnknownArtist:LocalizedStringInThisBundle(@"Apple Loop", @"Artist")];
+	iMBMusicFolder *parser = [[[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath] musicFolderName:musicFolderName unknownArtistName:unknownArtistName iconName:iconName parseMetadata:parseMetadata] autorelease];
 	
-	iMBLibraryNode *sfx = [parser parseDatabase];
-	if (sfx)
-	{
-		[sfx setName:LocalizedStringInThisBundle(@"iMovie Sound Effects", @"iMovie Sound Effects folder name")];
-		[sfx setIconName:@"com.apple.iMovie:"];
-	}	
-	return sfx;
+	return [parser parseDatabase];
 }
 
 @end

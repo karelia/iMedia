@@ -73,17 +73,15 @@
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
 	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
+
+    NSString *musicFolderName = LocalizedStringInThisBundle(@"Sounds Folder", @"~/Library/Sounds folder name");
+    NSString *unknownArtistName = LocalizedStringInThisBundle(@"Unknown", @"Artist of sound is unknown");
+    NSString *iconName = @"folder";
+    BOOL parseMetadata = YES;
 	
-	iMBMusicFolder *parser = [[[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath]] autorelease];
-	[parser setUnknownArtist:LocalizedStringInThisBundle(@"Unknown", @"Artist of sound is unknown")];
+	iMBMusicFolder *parser = [[[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath] musicFolderName:musicFolderName unknownArtistName:unknownArtistName iconName:iconName parseMetadata:parseMetadata] autorelease];
 	
-	iMBLibraryNode *sfx = [parser parseDatabase];
-	if (sfx)
-	{
-		[sfx setName:LocalizedStringInThisBundle(@"Sounds Folder", @"~/Library/Sounds folder name")];
-		[sfx setIconName:@"folder"];
-	}	
-	return sfx;
+	return [parser parseDatabase];
 }
 
 @end

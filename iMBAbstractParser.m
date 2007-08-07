@@ -95,7 +95,7 @@
 {
 	if (!myCachedLibrary || !reuseCachedData)
 	{
-      [myCachedLibrary release];
+		[myCachedLibrary release];
 		myCachedLibrary = [[self parseDatabase] retain];
 	}
 	return myCachedLibrary;
