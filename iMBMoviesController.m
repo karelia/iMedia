@@ -57,6 +57,7 @@
 - (NSString *)iconNameForPlaylist:(NSString*)name;
 - (NSArray*) selectedItems;
 - (NSDictionary *)displayableAttributesOfMovie:(QTMovie *)aMovie;
+- (NSString *)imageCountPluralityAdjustedString;
 @end
 
 @interface QTMovie (QTMoviePrivateInTigerButPublicInLeopard)
@@ -123,14 +124,19 @@
 
 	NSDictionary *optionsDict =
 		[NSDictionary dictionaryWithObject:
-			LocalizedStringInThisBundle(@"%{value1}@ movies", @"Formatting: tracks of audio -- song or sound effect")
-									forKey:@"NSDisplayPattern"];
+		 LocalizedStringInThisBundle(@"%{value1}@ %{value2}@", @"Formatting: # tracks, # photos, # movies, etc.  Value1 = count, value2 is singular or plural form.")
+									forKey:NSDisplayPatternBindingOption];
 	
 	[counterField bind:@"displayPatternValue1"
 			  toObject:self
 		   withKeyPath:@"imageCount"
 			   options:optionsDict];
-// It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
+
+	[counterField bind:@"displayPatternValue2"
+			  toObject:self
+		   withKeyPath:@"imageCountPluralityAdjustedString"
+			   options:optionsDict];
+	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
 }
 
 - (void)setBrowser:(iMediaBrowser *)browser	// hook up captions prefs now that we have a browser associated with this controller.
@@ -240,6 +246,14 @@
 	}
 	return records;
 }
+
+- (NSString *)imageCountPluralityAdjustedString
+{
+	int count = [[self imageCount] intValue];
+	
+	return abs(count) != 1 ? LocalizedStringInThisBundle(@"movies", @"plural form for showing how many items there are") :  LocalizedStringInThisBundle(@"movie", @"singular form for showing how many items there are");
+}
+
 
 #pragma mark -
 #pragma mark Media Browser Protocol

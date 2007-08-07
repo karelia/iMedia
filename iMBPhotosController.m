@@ -171,15 +171,20 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 
 	NSDictionary *optionsDict =
 		[NSDictionary dictionaryWithObject:
-			LocalizedStringInThisBundle(@"%{value1}@ photos", @"Formatting: number of photos displayed")
-									forKey:@"NSDisplayPattern"];
+		 LocalizedStringInThisBundle(@"%{value1}@ %{value2}@", @"Formatting: # tracks, # photos, # movies, etc.  Value1 = count, value2 is singular or plural form.")
+									forKey:NSDisplayPatternBindingOption];
 	
 	[counterField bind:@"displayPatternValue1"
 			  toObject:self
 		   withKeyPath:@"imageCount"
 			   options:optionsDict];
-// It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
-
+	
+	[counterField bind:@"displayPatternValue2"
+			  toObject:self
+		   withKeyPath:@"imageCountPluralityAdjustedString"
+			   options:optionsDict];
+	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
+	
 
 }
 
@@ -368,6 +373,13 @@ static NSImage *_toolbarIcon = nil;
 	}
 	
 	return records;
+}
+
+- (NSString *)imageCountPluralityAdjustedString
+{
+	int count = [[self imageCount] intValue];
+	
+	return abs(count) != 1 ? LocalizedStringInThisBundle(@"photos", @"plural form for showing how many items there are") :  LocalizedStringInThisBundle(@"photo", @"singular form for showing how many items there are");
 }
 
 #pragma mark -

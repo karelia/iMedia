@@ -61,6 +61,7 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 
 - (BOOL)loadAudioFile: (NSString *) path;
 - (NSString*)iconNameForPlaylist:(NSString*)name;
+- (NSString *)tracksCountPluralityAdjustedString;
 
 @end
 
@@ -104,14 +105,19 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 
 	NSDictionary *optionsDict =
 		[NSDictionary dictionaryWithObject:
-			LocalizedStringInThisBundle(@"%{value1}@ tracks", @"Formatting: tracks of audio -- song or sound effect")
-									forKey:@"NSDisplayPattern"];
+			LocalizedStringInThisBundle(@"%{value1}@ %{value2}@", @"Formatting: # tracks, # photos, # movies, etc.  Value1 = count, value2 is singular or plural form.")
+									forKey:NSDisplayPatternBindingOption];
 	
 	[counterField bind:@"displayPatternValue1"
 			  toObject:songsController
 		   withKeyPath:@"arrangedObjects.@count"
 			   options:optionsDict];
-// It would be nice to properly show single/plural form; maybe also indicate # selected if there is a selection.  How to do with bindings?
+	
+	[counterField bind:@"displayPatternValue2"
+			  toObject:self
+		   withKeyPath:@"tracksCountPluralityAdjustedString"
+			   options:optionsDict];
+	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
 }
 
 #pragma mark Protocol Methods
@@ -428,6 +434,13 @@ static NSImage *_playImage = nil;
         [clockTime release];
         clockTime = [value copy];
     }
+}
+
+- (NSString *)tracksCountPluralityAdjustedString
+{
+	int count = [[songsController arrangedObjects] count];
+	
+	return abs(count) != 1 ? LocalizedStringInThisBundle(@"tracks", @"plural form for showing how many items there are") :  LocalizedStringInThisBundle(@"track", @"singular form for showing how many items there are");
 }
 
 #pragma mark -

@@ -426,5 +426,13 @@ static NSImage *noAvatarImage = nil;
 	return [rec objectForKey:@"Caption"];
 }
 
+// TO DO: HOOK THIS UP
+- (NSString *)contactsCountPluralityAdjustedString
+{
+	int count = [[self imageCount] intValue];
+	
+	return abs(count) != 1 ? LocalizedStringInThisBundle(@"contacts", @"plural form for showing how many items there are") :  LocalizedStringInThisBundle(@"contact", @"singular form for showing how many items there are");
+}
+
 
 @end
