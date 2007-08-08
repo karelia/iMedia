@@ -570,7 +570,6 @@
 		29B97314FDCFA39411CA2CEA /* iMediaBrowse */ = {
 			isa = PBXGroup;
 			children = (
-				96F9069209D8BC7D0071BFFB /* Plugins */,
 				7956049309D78F9F00BF1DA5 /* LICENSE */,
 				96F9076209D8D9690071BFFB /* iMedia.h */,
 				080E96DDFE201D6D7F000001 /* Classes */,
@@ -824,13 +823,6 @@
 				E20764B70B597D8C00EAC95C /* tiny-reload.png */,
 			);
 			name = images;
-			sourceTree = "<group>";
-		};
-		96F9069209D8BC7D0071BFFB /* Plugins */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Plugins;
 			sourceTree = "<group>";
 		};
 		CE98A0CB097DC5DA00757094 /* Application */ = {

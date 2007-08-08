@@ -370,7 +370,6 @@ static NSImage *_stopImage = nil;
 		[progressIndicator setDoubleValue:0];
 		[oAudioPlayer gotoBeginning:self];
 		[oAudioPlayer play:self];
-		[oAudioPlayer setHidden:YES];
 		
 		[playButton setAction:@selector(stopMovie:)];
 		[playButton setState:NSOnState];
