@@ -196,7 +196,7 @@
 		[root addItem:myCompositions];
 	}
 	
-	return [[root items] count] ? root : nil;
+	return [[root allItems] count] ? root : nil;
 }
 
 @end

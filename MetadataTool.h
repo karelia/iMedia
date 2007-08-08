@@ -40,73 +40,23 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
+@protocol MetadataToolProtocol
 
-#import <Cocoa/Cocoa.h>
+- (NSDictionary *)getMusicInfoForFile:(oneway NSString *)file;
 
-// This is the common data structure used for anything been parsed into the media browser
+@end
 
-@interface iMBLibraryNode : NSObject <NSCopying>
+@interface MainThread : NSObject
 {
-	iMBLibraryNode		*myParent; //not retained
-	NSString			*myName;
-	NSMutableArray		*myItems;
-	NSMutableDictionary *myAttributes;
-	NSImage				*myIcon;
-	NSString			*myIconName;
-	NSMutableDictionary *myAttributeFilterMap;
-	id					myParser;	// not retained
-	
-	NSMutableAttributedString *myCachedNameWithImage;
+    // keep this to allow the client to connect.
+    NSString *myServerIdentifier;
+
+    // keep these to track the parent process to see if it exits.
+    int myParentProcessIdentifier;
 }
 
-- (id)init;
-- (id)initFolderWithName:(NSString*)key withItems:(NSArray*)items;
-
-- (void)setName:(NSString *)name;
-- (NSString *)name;
-- (void)setIconName:(NSString *)name;	// for the identifier of the app, or an image resource (sans .extention) in imedia bundle only
-- (NSString *)iconName;
-- (void)setIcon:(NSImage *)icon;
-- (NSImage *)icon;
-
-- (void)setParser:(id)parser;
-- (id)parser;
-
-- (void)setAttribute:(id)attrib forKey:(NSString *)key;
-- (id)attributeForKey:(NSString *)key;
-- (void)setAttributes:(NSDictionary *)attributes;
-- (NSDictionary *)attributes;
-
-// This allows us to filter out duplicate photos, music, movies etc.
-- (void)setFilterDuplicateKey:(NSString *)filterKey forAttributeKey:(NSString *)attributeKey;
-- (void)removeFilterDuplicateKeyForAttributeKey:(NSString *)attributeKey;
-- (NSString *)filterDuplicateKeyForAttributeKey:(NSString *)attributeKey;
-
-- (NSArray *)recursiveAttributesForKey:(NSString *)key;
-
-// search attributes (uses recursiveAttributesForKey:)
-- (NSArray *)searchAttribute:(NSString *)key withKeys:(NSArray *)keys matching:(id)value;
-
-
-// Tree support
-- (void)addItem:(iMBLibraryNode *)item;
-- (void)removeItem:(iMBLibraryNode *)item;
-- (void)removeAllItems;
-- (void)insertItem:(iMBLibraryNode *)item atIndex:(unsigned)idx;
-// use 'allItems' below instead of 'items' so that we don't conflict with KVC
-- (void)setAllItems:(NSArray *)items;
-- (NSArray *)allItems;
-// this returns the aggregate of items from sub nodes
-- (NSArray *)flattenedItems;
-
-- (iMBLibraryNode *)parent;
-- (iMBLibraryNode *)root;
-
-// basically a transformer for the outline view
-- (NSAttributedString *)nameWithImage;
-
-- (NSIndexPath *)indexPath;
+- (void)run;
 
 @end

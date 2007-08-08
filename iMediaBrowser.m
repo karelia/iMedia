@@ -745,7 +745,7 @@ static NSMutableDictionary *_parsers = nil;
 	[menu addItem:item];
 	[item release];
 	
-	NSEnumerator *e = [[node items] objectEnumerator];
+	NSEnumerator *e = [[node allItems] objectEnumerator];
 	iMBLibraryNode *cur;
 	
 	while (cur = [e nextObject])

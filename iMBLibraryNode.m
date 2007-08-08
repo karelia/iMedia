@@ -109,10 +109,57 @@ static NSMutableDictionary *sImageCache = nil;
 	[copy setName:[self name]];
 	[copy setIcon:[self icon]];
 	[copy setIconName:[self iconName]];
-	[copy setItems:[self items]];
+	[copy setAllItems:[self allItems]];
 	[copy setAttributes:[self attributes]];
 	return copy;
 }
+
+// BEGIN KVC FOR items
+
+- (unsigned)countOfItems
+{
+    return [myItems count];
+}
+
+- (iMBLibraryNode *)objectInItemsAtIndex:(unsigned)index
+{
+    return [myItems objectAtIndex:index];
+}
+
+- (void)insertObject:(iMBLibraryNode *)item inItemsAtIndex:(unsigned)index
+{
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+
+    [self willChangeValueForKey:@"isLeaf"];
+
+    [myItems insertObject:item atIndex:index];
+	[item setParent:self];
+
+    [self didChangeValueForKey:@"isLeaf"];
+
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+}
+
+- (void)removeObjectFromItemsAtIndex:(unsigned)index
+{
+    [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+
+    [self willChangeValueForKey:@"isLeaf"];
+
+    [[myItems objectAtIndex:index] setParent:nil];
+    [myItems removeObjectAtIndex:index];
+
+    [self didChangeValueForKey:@"isLeaf"];
+
+    [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+}
+
+- (NSMutableArray *)mutableItems
+{
+    return [self mutableArrayValueForKey:@"items"];
+}
+
+// END KVC FOR items
 
 - (void)setParser:(id)parser
 {
@@ -268,41 +315,35 @@ static NSMutableDictionary *sImageCache = nil;
 
 - (void)addItem:(iMBLibraryNode *)item
 {
-	[myItems addObject:item];
-	[item setParent:self];
+    [[self mutableItems] addObject:item];
 }
 
 - (void)removeItem:(iMBLibraryNode *)item
 {
-	[myItems removeObject:item];
-	[item setParent:nil];
+    [[self mutableItems] removeObject:item];
 }
 
 - (void)removeAllItems
 {
-	[myItems makeObjectsPerformSelector:@selector(setParent:) withObject:nil];
-	[myItems removeAllObjects];
+    [[self mutableItems] removeAllObjects];
 }
 
 - (void)insertItem:(iMBLibraryNode *)item atIndex:(unsigned)idx
 {
-	[myItems insertObject:item atIndex:idx];
-	[item setParent:self];
+    [[self mutableItems] insertObject:item atIndex:idx];
 }
 
-- (void)setItems:(NSArray *)items
+- (void)setAllItems:(NSArray *)items
 {
-	[myItems removeAllObjects];
-	[myItems addObjectsFromArray:items];
-	[items makeObjectsPerformSelector:@selector(setParent:) withObject:self];
-}
-
-- (NSArray *)items
-{
-	return [NSArray arrayWithArray:myItems];
+    [[self mutableItems] setArray:items];
 }
 
 - (NSArray *)allItems
+{
+	return [NSArray arrayWithArray:[self mutableItems]];
+}
+
+- (NSArray *)flattenedItems
 {
 	NSMutableArray *items = [NSMutableArray array];
 	NSEnumerator *e = [myItems objectEnumerator];
@@ -311,7 +352,7 @@ static NSMutableDictionary *sImageCache = nil;
 	while (cur = [e nextObject])
 	{
 		[items addObject:cur];
-		[items addObjectsFromArray:[cur items]];
+		[items addObjectsFromArray:[cur flattenedItems]];
 	}
 	return items;
 }
@@ -553,7 +594,7 @@ static NSMutableDictionary *sImageCache = nil;
 	if ([self parent])
 	{
 		[[self parent] recursivelyWalkParentsAddingPathIndexTo:array];
-		[array addObject:[NSNumber numberWithUnsignedInt:[[[self parent] items] indexOfObject:self]]];
+		[array addObject:[NSNumber numberWithUnsignedInt:[[[self parent] allItems] indexOfObject:self]]];
 	}
 }
 

@@ -44,7 +44,7 @@
 
 #import "iMBMusicFolder.h"
 #import "iMedia.h"
-#import <QTKit/QTKit.h>
+#import "MetadataUtility.h"
 
 static NSImage *sSongIcon = nil;
 static NSImage *sDRMIcon = nil;
@@ -111,78 +111,6 @@ static NSImage *sDRMIcon = nil;
     [super dealloc];
 }
 
-#warning Note: We could definitely speed this up, if it's an issue, by delaying the processing of the QTMovie objects.
-
-// arguments should have the following input and output keys:
-//
-//      inputFile:              the filename to parse
-//      inputParseMetaTags:     whether to parse the meta data tags
-//
-//      outputValid:            whether the movie is a valid movie
-//      outputDuration:         the duration of the file
-//      outputName:             the name of the song
-//      outputArtist:           the artist of the song
-//      outputIsDRMProtected:   whether the song is DRM protected
-//
-- (void)getMusicInfo:(NSMutableDictionary *)arguments
-{
-    NSString *file = [arguments objectForKey:@"inputFile"];
-    NSNumber *parseMetaDataValue = [arguments objectForKey:@"inputParseMetaData"];
-    BOOL parseMetaData = (parseMetaDataValue != nil) ? [parseMetaDataValue boolValue] : NO;
-    
-    NSError *error = nil;
-    QTMovie *movie = [[QTMovie alloc] initWithFile:file error:&error];
-    
-    if ( movie != nil && error == nil )
-    {
-        [arguments setValue:[NSNumber numberWithBool:YES] forKey:@"outputValid"];
-        
-        NSNumber *duration = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
-        
-        [arguments setValue:duration forKey:@"outputDuration"];
-
-        // Get the meta data from the QTMovie
-        NSString *name = nil;
-        if (parseMetaData)
-        {
-            name = [movie attributeWithFourCharCode:kUserDataTextFullName];
-        }
-        if (!name || [name length] == 0)
-        {
-            name = [[file lastPathComponent] stringByDeletingPathExtension];
-        }
-        if (name)
-        {
-            [arguments setObject:name forKey:@"outputName"];
-        }
-
-        NSString *artist = nil;
-        if (parseMetaData)
-        {
-            artist = [movie attributeWithFourCharCode:kUserDataTextArtist];
-        }
-        if (!artist)
-        {
-            artist = [[myUnknownArtistName retain] autorelease];
-        }
-        if (artist)
-        {
-            [arguments setObject:artist forKey:@"outputArtist"];
-        }
-        
-        if (parseMetaData && [movie isDRMProtected])
-        {
-            [arguments setObject:[NSNumber numberWithBool:YES] forKey:@"outputIsDRMProtected"];
-        }
-        else
-        {
-            [arguments setObject:[NSNumber numberWithBool:NO] forKey:@"outputIsDRMProtected"];
-        }
-        
-        [movie release];
-    }
-}
-
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root movieTypes:(NSArray *)movieTypes
 {
 	NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -204,7 +132,7 @@ static NSImage *sDRMIcon = nil;
 		if ([[filePath lastPathComponent] isEqualToString:@"iTunes"]) continue;
 		if ([[filePath lastPathComponent] isEqualToString:@"GarageBand"]) continue;
 		if ([excludedFolders containsObject:filePath]) continue;
-      
+        
         BOOL isDirectory;
 		if ( [fileManager fileExistsAtPath:filePath isDirectory:&isDirectory] &&
             ![fileManager isPathHidden:filePath] &&
@@ -213,10 +141,13 @@ static NSImage *sDRMIcon = nil;
 			if (isDirectory)
 			{
 				iMBLibraryNode *folder = [[[iMBLibraryNode alloc] init] autorelease];
-				[root addItem:folder];
 				[folder setIconName:@"folder"];
 				[folder setName:[fileManager displayNameAtPath:filePath]];
 				[self recursivelyParse:filePath withNode:folder movieTypes:movieTypes];
+
+                // NOTE: It is not legal to add items on a thread; so we do it on the main thread.
+                // [root addItem:folder];
+                [root performSelectorOnMainThread:@selector(addItem:) withObject:folder waitUntilDone:YES];
 			}
 			else
 			{
@@ -224,44 +155,46 @@ static NSImage *sDRMIcon = nil;
 				{
 					NSMutableDictionary *song = [NSMutableDictionary dictionary]; 
 					
-                    NSMutableDictionary *arguments = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                        filePath, @"inputFile",
-                        [NSNumber numberWithBool:myParseMetadata], @"inputParseMetaData",
-                        nil];
+                    NSDictionary *arguments = [[MetadataUtility sharedMetadataUtility] getMetadataForFile:filePath];
                     
-                    [self performSelectorOnMainThread:@selector(getMusicInfo:) withObject:arguments waitUntilDone:YES];
-                    
-                    NSNumber *valid = [arguments objectForKey:@"outputDuration"];
-                    if ( valid != nil && [valid boolValue] == YES )
+                    if (arguments)
                     {
                         // handle the song duration
-                        NSNumber *duration = [arguments objectForKey:@"outputDuration"];
+                        NSNumber *duration = [arguments objectForKey:@"kMDItemDurationSeconds"];
                         if ( duration != nil )
                         {
-                            [song setObject:duration forKey:@"Total Time"];
+                            [song setObject:[NSNumber numberWithFloat:[duration floatValue]*1000] forKey:@"Total Time"];
                         }
                         else
                         {
                             [song setObject:[NSNumber numberWithInt:0] forKey:@"Total Time"];
                         }
                         
-                        // handle the song name
-                        NSString *name = [arguments objectForKey:@"outputName"];
-                        if ( name != nil )
+                        // handle the song title
+                        NSString *title = [arguments objectForKey:@"kMDItemTitle"];
+                        if ( title != nil )
                         {
-                            [song setObject:name forKey:@"Name"];
+                            [song setObject:title forKey:@"Name"];
+                        }
+                        else
+                        {
+                            [song setObject:[[filePath lastPathComponent] stringByDeletingPathExtension] forKey:@"Name"];
                         }
                         
                         // handle the song artist
-                        NSString *artist = [arguments objectForKey:@"outputArtist"];
-                        if ( artist != nil )
+                        NSArray *authors = [arguments objectForKey:@"kMDItemAuthors"];
+                        if ( authors != nil && [authors count] > 0 )
                         {
-                            [song setObject:artist forKey:@"Artist"];
+                            [song setObject:[authors objectAtIndex:0] forKey:@"Artist"];
+                        }
+                        else
+                        {
+                            [song setObject:myUnknownArtistName forKey:@"Artist"];
                         }
                         
                         // handle the song protected vs. unprotected icon
-                        NSNumber *isProtected = [arguments objectForKey:@"outputIsDRMProtected"];
-                        if ( isProtected != nil && [isProtected boolValue] == YES )
+                        NSString *kind = [arguments objectForKey:@"kMDItemKind"];
+                        if ( kind != nil && [kind rangeOfString:@"Protected"].location != NSNotFound )
                         {
                             [song setObject:sDRMIcon forKey:@"Icon"];
                         }

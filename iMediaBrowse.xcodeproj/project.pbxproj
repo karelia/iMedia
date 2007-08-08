@@ -188,6 +188,7 @@
 		CEC85B0E0B5150C2006DA6AA /* TimeValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEC915010B97648C0072492B /* iMBiPhotoAbstractParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEC914FF0B97648C0072492B /* iMBiPhotoAbstractParser.h */; };
 		CEC915020B97648C0072492B /* iMBiPhotoAbstractParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC915000B97648C0072492B /* iMBiPhotoAbstractParser.m */; };
+		CED9A7990C6A37870058BF78 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
 		CEDB34CF09E479F300F75C8C /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
 		CEE57B070C4D3C4A00FCE138 /* NSWindow_Flipr.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE57B050C4D3C4A00FCE138 /* NSWindow_Flipr.h */; };
 		CEE57B080C4D3C4A00FCE138 /* NSWindow_Flipr.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE57B060C4D3C4A00FCE138 /* NSWindow_Flipr.m */; };
@@ -208,6 +209,12 @@
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
 		E20764B80B597D8D00EAC95C /* tiny-reload.png in Resources */ = {isa = PBXBuildFile; fileRef = E20764B70B597D8C00EAC95C /* tiny-reload.png */; };
+		FD2EAFC70C6981E000023B2E /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
+		FD2EAFD80C69821100023B2E /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
+		FD2EB01E0C69837300023B2E /* MetadataTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = FD8EE5BC0C697C6C00E425BB /* MetadataTool */; };
+		FD2EB2730C69A0BF00023B2E /* MetadataUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = FD2EB2710C69A0BF00023B2E /* MetadataUtility.h */; };
+		FD2EB2740C69A0BF00023B2E /* MetadataUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = FD2EB2720C69A0BF00023B2E /* MetadataUtility.m */; };
+		FD8EE60E0C697CEA00E425BB /* MetadataTool.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8EE60D0C697CEA00E425BB /* MetadataTool.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -217,6 +224,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 791679FD0975255000D9EF74;
 			remoteInfo = iMediaBrowser;
+		};
+		FD8EE6080C697CC400E425BB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FD8EE5BB0C697C6C00E425BB;
+			remoteInfo = MetadataTool;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -231,12 +245,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		795392910A3E67C000329AA4 /* CopyFiles */ = {
+		FD2EB0140C6982BD00023B2E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstSubfolderSpec = 7;
 			files = (
+				FD2EB01E0C69837300023B2E /* MetadataTool in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -487,6 +502,11 @@
 		E20764B70B597D8C00EAC95C /* tiny-reload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tiny-reload.png"; sourceTree = "<group>"; };
 		FC6810360B1771ED0063CF05 /* iMBAperturePhotosParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMBAperturePhotosParser.h; sourceTree = "<group>"; };
 		FC6810370B1771ED0063CF05 /* iMBAperturePhotosParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iMBAperturePhotosParser.m; sourceTree = "<group>"; };
+		FD2EB2710C69A0BF00023B2E /* MetadataUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataUtility.h; sourceTree = "<group>"; };
+		FD2EB2720C69A0BF00023B2E /* MetadataUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataUtility.m; sourceTree = "<group>"; };
+		FD8EE5BC0C697C6C00E425BB /* MetadataTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MetadataTool; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD8EE60C0C697CEA00E425BB /* MetadataTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataTool.h; sourceTree = "<group>"; };
+		FD8EE60D0C697CEA00E425BB /* MetadataTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataTool.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -513,6 +533,15 @@
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */,
 				965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FD8EE5BA0C697C6C00E425BB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD2EAFC70C6981E000023B2E /* QTKit.framework in Frameworks */,
+				CED9A7990C6A37870058BF78 /* QuickTime.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -563,6 +592,7 @@
 			children = (
 				8D1107320486CEB800E47090 /* iMediaTester.app */,
 				791679FE0975255000D9EF74 /* iMediaBrowser.framework */,
+				FD8EE5BC0C697C6C00E425BB /* MetadataTool */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -575,6 +605,7 @@
 				080E96DDFE201D6D7F000001 /* Classes */,
 				CE98A0CB097DC5DA00757094 /* Application */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				FD8EE6070C697CA600E425BB /* MetadataTool */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -914,6 +945,17 @@
 			name = "File Watcher";
 			sourceTree = "<group>";
 		};
+		FD8EE6070C697CA600E425BB /* MetadataTool */ = {
+			isa = PBXGroup;
+			children = (
+				FD8EE60C0C697CEA00E425BB /* MetadataTool.h */,
+				FD8EE60D0C697CEA00E425BB /* MetadataTool.m */,
+				FD2EB2710C69A0BF00023B2E /* MetadataUtility.h */,
+				FD2EB2720C69A0BF00023B2E /* MetadataUtility.m */,
+			);
+			name = MetadataTool;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -984,6 +1026,7 @@
 				CEE57B070C4D3C4A00FCE138 /* NSWindow_Flipr.h in Headers */,
 				CEE57B2B0C4D3C9300FCE138 /* iMBBackgroundImageView.h in Headers */,
 				CEE57B2D0C4D3C9300FCE138 /* iMBHoverButton.h in Headers */,
+				FD2EB2730C69A0BF00023B2E /* MetadataUtility.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -999,11 +1042,12 @@
 				791679FA0975255000D9EF74 /* Resources */,
 				791679FB0975255000D9EF74 /* Sources */,
 				791679FC0975255000D9EF74 /* Frameworks */,
-				795392910A3E67C000329AA4 /* CopyFiles */,
+				FD2EB0140C6982BD00023B2E /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				FD8EE6090C697CC400E425BB /* PBXTargetDependency */,
 			);
 			name = iMediaBrowser;
 			productName = iMediaBrowser;
@@ -1030,6 +1074,22 @@
 			productReference = 8D1107320486CEB800E47090 /* iMediaTester.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FD8EE5BB0C697C6C00E425BB /* MetadataTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FD8EE6010C697C8B00E425BB /* Build configuration list for PBXNativeTarget "MetadataTool" */;
+			buildPhases = (
+				FD8EE5B90C697C6C00E425BB /* Sources */,
+				FD8EE5BA0C697C6C00E425BB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MetadataTool;
+			productName = MetadataTool;
+			productReference = FD8EE5BC0C697C6C00E425BB /* MetadataTool */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1055,6 +1115,7 @@
 			targets = (
 				8D1107260486CEB800E47090 /* iMediaTester */,
 				791679FD0975255000D9EF74 /* iMediaBrowser */,
+				FD8EE5BB0C697C6C00E425BB /* MetadataTool */,
 			);
 		};
 /* End PBXProject section */
@@ -1222,6 +1283,7 @@
 				CEE57B080C4D3C4A00FCE138 /* NSWindow_Flipr.m in Sources */,
 				CEE57B2C0C4D3C9300FCE138 /* iMBBackgroundImageView.m in Sources */,
 				CEE57B2E0C4D3C9300FCE138 /* iMBHoverButton.m in Sources */,
+				FD2EB2740C69A0BF00023B2E /* MetadataUtility.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1234,6 +1296,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FD8EE5B90C697C6C00E425BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD8EE60E0C697CEA00E425BB /* MetadataTool.m in Sources */,
+				FD2EAFD80C69821100023B2E /* QTMovie+iMedia.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1241,6 +1312,11 @@
 			isa = PBXTargetDependency;
 			target = 791679FD0975255000D9EF74 /* iMediaBrowser */;
 			targetProxy = 791F97340975D3600071B2E0 /* PBXContainerItemProxy */;
+		};
+		FD8EE6090C697CC400E425BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FD8EE5BB0C697C6C00E425BB /* MetadataTool */;
+			targetProxy = FD8EE6080C697CC400E425BB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1475,6 +1551,75 @@
 			};
 			name = Plugin;
 		};
+		FD8EE6020C697C8B00E425BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MetadataTool;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		FD8EE6030C697C8B00E425BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MetadataTool;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		FD8EE6040C697C8B00E425BB /* Plugin */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MetadataTool;
+				ZERO_LINK = YES;
+			};
+			name = Plugin;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1504,6 +1649,16 @@
 				969656A608C6A24500F2F85C /* Debug */,
 				969656A708C6A24500F2F85C /* Release */,
 				DB6E08010A379F30005CFFB2 /* Plugin */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FD8EE6010C697C8B00E425BB /* Build configuration list for PBXNativeTarget "MetadataTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD8EE6020C697C8B00E425BB /* Debug */,
+				FD8EE6030C697C8B00E425BB /* Release */,
+				FD8EE6040C697C8B00E425BB /* Plugin */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -103,7 +103,7 @@
 	{
 		return root;
 	}
-	NSEnumerator *e = [[root items] objectEnumerator];
+	NSEnumerator *e = [[root allItems] objectEnumerator];
 	iMBLibraryNode *cur;
 	iMBLibraryNode *found;
 	

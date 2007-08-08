@@ -164,7 +164,7 @@
 	iMBLibraryNode *newDB = [self parseDatabase];
 	
 	[myCachedLibrary removeAllItems];
-	[myCachedLibrary setItems:[newDB items]];
+	[myCachedLibrary setAllItems:[newDB allItems]];
 	[myCachedLibrary setAttributes:[newDB attributes]];
 	
 	// need to notify the browser that our data changed so it can refresh the outline view
