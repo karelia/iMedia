@@ -170,9 +170,8 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 
 
 	NSDictionary *optionsDict =
-		[NSDictionary dictionaryWithObject:
-		 LocalizedStringInThisBundle(@"%{value1}@ %{value2}@", @"Formatting: # tracks, # photos, # movies, etc.  Value1 = count, value2 is singular or plural form.")
-									forKey:NSDisplayPatternBindingOption];
+	[NSDictionary dictionaryWithObject:@"%{value1}@ %{value2}@"  
+								forKey:NSDisplayPatternBindingOption];
 	
 	[counterField bind:@"displayPatternValue1"
 			  toObject:self
