@@ -201,10 +201,12 @@ static MetadataUtility *theMetadataUtility = nil;
     
     NSArray *attributeNames = [NSArray arrayWithObjects:@"kMDItemMediaTypes", @"kMDItemTitle", @"kMDItemDurationSeconds", @"kMDItemAuthors", @"kMDItemKind", nil];
     
-    NSDictionary *attributes = (NSDictionary *)MDItemCopyAttributes(item,(CFArrayRef)attributeNames);
-    
-    [attributes autorelease];
-    
+    CFDictionaryRef attributes_cf = MDItemCopyAttributes(item,(CFArrayRef)attributeNames);
+
+    NSDictionary *attributes = [NSDictionary dictionaryWithDictionary:(NSDictionary *)attributes_cf];
+
+    CFRelease(attributes_cf);
+
     CFRelease(item);
     
     NSArray *mediaTypes = [attributes objectForKey:@"kMDItemMediaTypes"];
