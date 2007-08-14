@@ -1029,7 +1029,7 @@ static NSMutableDictionary *_parsers = nil;
 #pragma mark -
 #pragma mark Bindings for toolbar
 
-#warning TODO -- store in defaults too
+// TODO: Store in defaults too. (What does this comment mean? cmeyer 2007-08-14.)
 
 - (int) toolbarDisplayMode
 {

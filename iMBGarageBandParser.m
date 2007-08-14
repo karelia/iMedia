@@ -69,7 +69,7 @@
 	return self;
 }
 
-#warning Note: We could definitely speed this up, if it's an issue, by delaying the processing of the QTMovie objects.
+// TODO: Speed this up by having the external MetadataTool process do the work.
 
 // arguments should have the following input and output keys:
 //

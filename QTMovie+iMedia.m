@@ -250,7 +250,7 @@ bail:
 	div_t hours = div(actualSeconds,3600);
 	div_t minutes = div(hours.rem,60);
 	
-#warning really should internationalize, if we can figure out how!
+	// TODO: Internationalize these time strings if necessary.
 	if (hours.quot == 0) {
 		return [NSString stringWithFormat:@"%d:%.2d", minutes.quot, minutes.rem];
 	}

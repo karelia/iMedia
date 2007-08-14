@@ -830,7 +830,7 @@ static NSImage *_toolbarIcon = nil;
 	}
 	
 	// Don't have User Info from cache?  Try to get it from the movie itself
-#warning Attributes generated from a movie file for the tooltip are not cached in memory
+	// TODO: Attributes generated from a movie file for the tooltip are not cached in memory.
 	if (!userInfo && [NSString UTI:imagePathUTI conformsToUTI:(NSString *)kUTTypeAudiovisualContent])
 	{
 		// Get our own User info from the file directly by making a quicktime movie.
@@ -949,7 +949,7 @@ static NSImage *_toolbarIcon = nil;
 		div_t minutes = div(hours.rem,60);
 		
 		NSString *timeString = nil;
-#warning really should internationalize, if we can figure out how!
+		// TODO: Internationalize these time strings if necessary.
 		if (hours.quot == 0) {
 			timeString = [NSString stringWithFormat:@"%d:%.2d", minutes.quot, minutes.rem];
 		}

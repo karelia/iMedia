@@ -1096,7 +1096,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 969656A508C6A24500F2F85C /* Build configuration list for PBXProject "iMediaBrowse" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
