@@ -61,6 +61,7 @@
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
+    [myLock lock];
     myServerIdentifier = [[[NSProcessInfo processInfo] globallyUniqueString] retain];
     
     myServerTask = [[NSTask alloc] init];
