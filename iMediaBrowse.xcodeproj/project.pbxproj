@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3C3A131E09EAFB8100AF41BF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3C3A131C09EAFB8100AF41BF /* Localizable.strings */; };
+		3C6355470C91B1210045E9E0 /* iMedia.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 3C6355460C91B1210045E9E0 /* iMedia.tiff */; };
 		5B3AD87D0B5BA2A600C971A0 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97630975D4970071B2E0 /* MainMenu.nib */; };
 		5BE025270B5CE1FA0073DCF8 /* iMBiTunesVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */; };
 		5BE025280B5CE1FB0073DCF8 /* iMBiTunesVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 7990CD5809D75D4A00AD74BA /* iMBiTunesVideoParser.h */; };
@@ -266,6 +267,7 @@
 		3C371AFC09AD501A00501C1F /* Framework Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Framework Debug.xcconfig"; sourceTree = "<group>"; };
 		3C371B0009AD502700501C1F /* Framework Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Framework Release.xcconfig"; sourceTree = "<group>"; };
 		3C3A131D09EAFB8100AF41BF /* en */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; lineEnding = 0; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		3C6355460C91B1210045E9E0 /* iMedia.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = iMedia.tiff; sourceTree = "<group>"; };
 		5B0628CF0AEDF38300419AEB /* sv */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; lineEnding = 0; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B3AD8600B5BA23800C971A0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		7903561009E3AF7B00384D08 /* iMBContactsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMBContactsController.h; sourceTree = "<group>"; };
@@ -405,7 +407,7 @@
 		79FDF61309AAE5D2000CB4B4 /* quicktime_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = quicktime_tiny.png; sourceTree = "<group>"; };
 		79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tunes_tiny.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* iMediaTester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* iMediaTester.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iMediaTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		964006E108D7B9BF0046E052 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		965EB98608E1D345000DFF3A /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMediaBrowser.h; sourceTree = "<group>"; };
@@ -799,6 +801,7 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				3C6355460C91B1210045E9E0 /* iMedia.tiff */,
 				CEE57B090C4D3C7300FCE138 /* i.tiff */,
 				CEE57B0A0C4D3C7300FCE138 /* i2.tiff */,
 				CEFC515B0B792BD1009F114D /* reload.png */,
@@ -1187,6 +1190,7 @@
 				CEE57B0B0C4D3C7300FCE138 /* i.tiff in Resources */,
 				CEE57B0C0C4D3C7300FCE138 /* i2.tiff in Resources */,
 				CEE57B900C4D420A00FCE138 /* Info.html in Resources */,
+				3C6355470C91B1210045E9E0 /* iMedia.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
