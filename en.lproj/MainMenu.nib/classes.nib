@@ -1,9 +1,27 @@
 {
     IBClasses = (
-        {CLASS = AppDelegate; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {clearCache = id; }; 
-            CLASS = FirstResponder; 
+            ACTIONS = {
+                provideFeedback = id; 
+                showAbout = id; 
+                showPreferences = id; 
+                toggleBrowserShown = id; 
+            }; 
+            CLASS = KMBAppDelegate; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                oHelpMenuItem = NSMenuItem; 
+                oSparkleUpdater = SUUpdater; 
+                oStatusHelpMenuItem = NSMenuItem; 
+                oStatusMenu = NSMenu; 
+                oToggleMenuItem = NSMenuItem; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {checkForUpdates = id; }; 
+            CLASS = SUUpdater; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 
         }
