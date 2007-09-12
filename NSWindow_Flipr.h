@@ -3,7 +3,7 @@
 //  Flipr
 //
 //  Created by Rainer Brockerhoff on 12/20/06.
-//  Copyright 2006 Rainer Brockerhoff. Some rights reserved.
+//  Copyright 2006,2007 Rainer Brockerhoff. Some rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>

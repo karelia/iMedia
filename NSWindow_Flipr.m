@@ -3,12 +3,12 @@
 //  Flipr
 //
 //  Created by Rainer Brockerhoff on 12/20/06.
-//  Copyright 2006 Rainer Brockerhoff. Some rights reserved.
+//  Copyright 2006,2007 Rainer Brockerhoff. Some rights reserved.
 //
 
 #import "NSWindow_Flipr.h"
+#import <QuartzCore/QuartzCore.h>
 #include <sys/sysctl.h>
-#include <QuartzCore/QuartzCore.h>
 
 // Read the "ReadMe.rtf" file for general discussion.
 
@@ -24,26 +24,45 @@
 
 @implementation FliprAnimation
 
+// We initialize the animation with some huge default value.
+
+- (id)initWithAnimationCurve:(NSAnimationCurve)animationCurve {
+	self = [super initWithDuration:1.0E8 animationCurve:animationCurve];
+	if (self) {
+		starter = 0.0;
+	}
+	return self;
+}
+
 // We call this to start the animation just beyond the first frame.
 
-- (void)startAnimationAtProgress:(NSAnimationProgress)value {
+- (void)startNormalAtProgress:(NSAnimationProgress)value withDuration:(NSTimeInterval)duration {
 	starter = value;
+	[super setCurrentProgress:value];
+	[self setDuration:duration];
 	[self startAnimation];
+}
+
+// Called once to draw the second frame while animation hasn't started yet.
+
+- (void)setStarter:(NSAnimationProgress)value {
+	starter = value;
+	[super setCurrentProgress:value];
 }
 
 // Called periodically by the NSAnimation timer.
 
 - (void)setCurrentProgress:(NSAnimationProgress)progress {
-// Skip the first part of the animation (spent in drawing the first frame).
-	if (progress<starter) {
-		progress = starter;
-	}
+	if ([self isAnimating]) {
 // Call super to update the progress value.
-    [super setCurrentProgress:progress];
+		[super setCurrentProgress:progress];
 // Update the window unless we're nearly at the end. No sense duplicating the final window.
-	if (progress<0.95) {
+		if (progress<0.99) {
 // We can be sure the delegate responds to display.
-		[[self delegate] display];
+			[[self delegate] display];
+		}
+	} else {
+		[super setCurrentProgress:starter];
 	}
 }
 
@@ -81,12 +100,12 @@
 		transitionFilter = [[CIFilter filterWithName:@"CIPerspectiveTransform"] retain];
 		[transitionFilter setDefaults];
 // These parameters come from http://boredzo.org/imageshadowadder/ by Peter Hosey,
-// and reproduce reasonably well the standard window shadow.
-// We will probably need to update this for Leopard!
+// and reproduce reasonably well the standard Tiger NSWindow shadow.
+// You should change these when flipping NSPanels and/or on Leopard.
 		shadow = [[NSShadow alloc] init];
-		[shadow setShadowColor:[[NSColor shadowColor] colorWithAlphaComponent:0.8]];
-		[shadow setShadowBlurRadius:23];
-		[shadow setShadowOffset:NSMakeSize(0,-8)];
+		[shadow setShadowColor:[[NSColor shadowColor] colorWithAlphaComponent:0.6]];
+		[shadow setShadowBlurRadius:5];
+		[shadow setShadowOffset:NSMakeSize(0,-4)];
 	}
 	return self;
 }
@@ -115,6 +134,7 @@
 - (void)setInitialWindow:(NSWindow*)initial andFinalWindow:(NSWindow*)final forward:(BOOL)forward reflectInto:(NSImageView*)reflection {
 	NSWindow* flipr = [NSWindow flippingWindow];
 	if (flipr) {
+		[NSCursor hide];
 		initialWindow = initial;
 		finalWindow = final;
 		direction = forward?1:-1;
@@ -177,46 +197,45 @@
 		[initialImage release];
 // To prevent flicker...
 		NSDisableScreenUpdates();
-		// We bring the final window to the front in order to build the final image.
+// We bring the final window to the front in order to build the final image.
 		[finalWindow makeKeyAndOrderFront:self];
-		// Here we get an image of the final window and make a CIImage from it.
+// Here we get an image of the final window and make a CIImage from it.
 		view = [[finalWindow contentView] superview];
 		flp = [view bounds];
 		bitmap = [view bitmapImageRepForCachingDisplayInRect:flp];
 		[view cacheDisplayInRect:flp toBitmapImageRep:bitmap];
 		finalImage = [[CIImage alloc] initWithBitmapImageRep:bitmap];
-		// To save time, we don't order the final window out, just make it completely transparent.
+// To save time, we don't order the final window out, just make it completely transparent.
 		[finalWindow setAlphaValue:0];
 		[initialWindow orderOut:self];
-		// This will draw the first frame at value 0, duplicating the initial window. This is not really optimal,
-		// but we need to compensate for the time spent here, which seems to be about 3 to 5x what's needed
-		// for subsequent frames.
+// This will draw the first frame at value 0, duplicating the initial window. This is not really optimal,
+// but we need to compensate for the time spent here, which seems to be about 3 to 5x what's needed
+// for subsequent frames.
+		animation = [[FliprAnimation alloc] initWithAnimationCurve:NSAnimationEaseInOut];
+		[animation setDelegate:self];
 		frameTime = 0.0;
 		[flipr orderWindow:NSWindowBelow relativeTo:[finalWindow windowNumber]];
-		// We accumulate drawing time and draw a second frame at the point where the rotation starts to show.
-		float totalTime = frameTime;
 		float duration = DURATION;
-		frameTime = 0.05;
-		// Demo mode if shift key is down!
+// Slow down by a factor of 10 if the shift key is down.
 		if ([[NSApp currentEvent] modifierFlags]&NSShiftKeyMask) {
-			duration *= 5.0;
-			frameTime /= 5.0;
+			duration *= 10.0;
 		}
+// We accumulate drawing time and draw a second frame at the point where the rotation starts to show.
+		float totalTime = frameTime;
+		[animation setStarter:DURATION/15];
 		[self display];
-		// Now we update the screen and the second frame appears, boom! 
+// Now we update the screen and the second frame appears, boom! :-)
 		NSEnableScreenUpdates();
 		totalTime += frameTime;
-		// We set up the animation. At this point, totalTime will be the time needed to draw the first two frames,
-		// and frameTime the time for the second (normal) frame.
-		// We stretch the duration, if necessary, to make sure at least 5 more frames will be drawn. 
+// We set up the animation. At this point, totalTime will be the time needed to draw the first two frames,
+// and frameTime the time for the second (normal) frame.
+// We stretch the duration, if necessary, to make sure at least 5 more frames will be drawn. 
 		if ((duration-totalTime)<(frameTime*5)) {
 			duration = totalTime+frameTime*5;
 		}
-		animation = [[FliprAnimation alloc] initWithDuration:duration animationCurve:NSAnimationEaseInOut];
-		[animation setDelegate:self];
-		// ...and everything else happens in the animation delegates. We start the animation just
-		// after the second frame.
-		[animation startAnimationAtProgress:totalTime/duration];
+// ...and everything else happens in the animation delegates. We start the animation just
+// after the second frame.
+		[animation startNormalAtProgress:totalTime/duration withDuration:duration];
 	}
 }
 
@@ -236,6 +255,7 @@
 	finalWindow = nil;
 	[finalImage release];
 	finalImage = nil;
+	[NSCursor unhide];
 }
 
 // All the magic happens here... drawing the flipping animation.
@@ -247,8 +267,8 @@
 	}
 // For calculating the draw time...
 	AbsoluteTime startTime = UpTime();
-// time will vary from 0.0 to 1.0. 0.5 means halfway. If there's no animation yet, we use frameTime.
-	float time = animation?[animation currentValue]:0.00615583; // progress for 0.05
+// time will vary from 0.0 to 1.0. 0.5 means halfway.
+	float time = [animation currentValue];
 // This code was adapted from http://www.macs.hw.ac.uk/~rpointon/osx/coreimage.html by Robert Pointon.
 // First we calculate the perspective.
 	float radius = originalRect.size.width/2;
