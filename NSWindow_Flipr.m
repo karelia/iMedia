@@ -147,20 +147,26 @@
 			[f setValue:im forKey:@"inputImage"];
 			im = [f valueForKey:@"outputImage"];
 			
-			// Maybe I need an affine clamp or something to stop the blurry edge?
-
 			f = [CIFilter filterWithName:@"CIGaussianBlur"];
 			[f setValue:[NSNumber numberWithFloat:1.0] forKey:@"inputRadius"];
 			[f setValue:im forKey:@"inputImage"];
 			im = [f valueForKey:@"outputImage"];
-			
+
 			f = [CIFilter filterWithName:@"CIColorControls"];
 			[f setValue:[NSNumber numberWithFloat:0.42] forKey:@"inputBrightness"];
 			[f setValue:[NSNumber numberWithFloat:1.0] forKey:@"inputSaturation"];
 			[f setValue:[NSNumber numberWithFloat:0.15] forKey:@"inputContrast"];
 			[f setValue:im forKey:@"inputImage"];
 			im = [f valueForKey:@"outputImage"];
-			
+
+			f = [CIFilter filterWithName:@"CICrop"];
+			[f setValue:[CIVector vectorWithX: 0
+											Y: 0
+											Z: flp.size.width
+											W: flp.size.height] forKey:@"inputRectangle"];
+			[f setValue:im forKey:@"inputImage"];
+			im = [f valueForKey:@"outputImage"];
+
 			NSCIImageRep *ir = [NSCIImageRep imageRepWithCIImage:im];
 			NSImage* reflex = [[[NSImage alloc] initWithSize:flp.size] autorelease];
 			[reflex addRepresentation:ir];
@@ -242,7 +248,7 @@
 // For calculating the draw time...
 	AbsoluteTime startTime = UpTime();
 // time will vary from 0.0 to 1.0. 0.5 means halfway. If there's no animation yet, we use frameTime.
-	float time = animation?[animation currentValue]:frameTime;
+	float time = animation?[animation currentValue]:0.00615583; // progress for 0.05
 // This code was adapted from http://www.macs.hw.ac.uk/~rpointon/osx/coreimage.html by Robert Pointon.
 // First we calculate the perspective.
 	float radius = originalRect.size.width/2;
