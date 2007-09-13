@@ -18,7 +18,6 @@
 // We subclass NSAnimation to maximize frame rate, instead of using progress marks.
 
 @interface FliprAnimation : NSAnimation {
-	NSAnimationProgress starter;
 }
 @end
 
@@ -28,41 +27,26 @@
 
 - (id)initWithAnimationCurve:(NSAnimationCurve)animationCurve {
 	self = [super initWithDuration:1.0E8 animationCurve:animationCurve];
-	if (self) {
-		starter = 0.0;
-	}
 	return self;
 }
 
 // We call this to start the animation just beyond the first frame.
 
-- (void)startNormalAtProgress:(NSAnimationProgress)value withDuration:(NSTimeInterval)duration {
-	starter = value;
+- (void)startAtProgress:(NSAnimationProgress)value withDuration:(NSTimeInterval)duration {
 	[super setCurrentProgress:value];
 	[self setDuration:duration];
 	[self startAnimation];
 }
 
-// Called once to draw the second frame while animation hasn't started yet.
-
-- (void)setStarter:(NSAnimationProgress)value {
-	starter = value;
-	[super setCurrentProgress:value];
-}
-
 // Called periodically by the NSAnimation timer.
 
 - (void)setCurrentProgress:(NSAnimationProgress)progress {
-	if ([self isAnimating]) {
 // Call super to update the progress value.
-		[super setCurrentProgress:progress];
-// Update the window unless we're nearly at the end. No sense duplicating the final window.
-		if (progress<0.99) {
+	[super setCurrentProgress:progress];
+	if ([self isAnimating]&&(progress<0.99)) {
+/// Update the window unless we're nearly at the end. No sense duplicating the final window.
 // We can be sure the delegate responds to display.
-			[[self delegate] display];
-		}
-	} else {
-		[super setCurrentProgress:starter];
+		[[self delegate] display];
 	}
 }
 
@@ -79,7 +63,7 @@
 	NSShadow* shadow;
 	FliprAnimation* animation;
 	float direction;				// this will be 1 (forward) or -1 (backward).
-	float frameTime;				// time for drawRect:
+	float frameTime;				// time for last drawRect:
 }
 @end
 
@@ -213,17 +197,17 @@
 // for subsequent frames.
 		animation = [[FliprAnimation alloc] initWithAnimationCurve:NSAnimationEaseInOut];
 		[animation setDelegate:self];
-		frameTime = 0.0;
+// This is probably redundant...
+		[animation setCurrentProgress:0.0];
 		[flipr orderWindow:NSWindowBelow relativeTo:[finalWindow windowNumber]];
 		float duration = DURATION;
-// Slow down by a factor of 10 if the shift key is down.
+// Slow down by a factor of 5 if the shift key is down.
 		if ([[NSApp currentEvent] modifierFlags]&NSShiftKeyMask) {
-			duration *= 10.0;
+			duration *= 5.0;
 		}
 // We accumulate drawing time and draw a second frame at the point where the rotation starts to show.
 		float totalTime = frameTime;
-		[animation setStarter:DURATION/15];
-		[self display];
+		[animation setCurrentProgress:DURATION/15];
 // Now we update the screen and the second frame appears, boom! :-)
 		NSEnableScreenUpdates();
 		totalTime += frameTime;
@@ -235,7 +219,7 @@
 		}
 // ...and everything else happens in the animation delegates. We start the animation just
 // after the second frame.
-		[animation startNormalAtProgress:totalTime/duration withDuration:duration];
+		[animation startAtProgress:totalTime/duration withDuration:duration];
 	}
 }
 
