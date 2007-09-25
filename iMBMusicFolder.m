@@ -252,8 +252,8 @@ static NSImage *sDRMIcon = nil;
         iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
         
         // the name will include 'loading' until it is populated.
-        NSString *loadingString = LocalizedStringInThisBundle(@" (Loading...)", @"Name extension to indicate it is loading.");
-        [root setName:[myMusicFolderName stringByAppendingString:loadingString]];
+        NSString *loadingString = LocalizedStringInThisBundle(@"Loading...", @"Name extension to indicate it is loading.");
+        [root setName:[myMusicFolderName stringByAppendingFormat:@" (%@)", loadingString]];
         [root setIconName:myIconName];
         
         // the node itself will be returned immediately. now launch _another_ thread to populate the node.
