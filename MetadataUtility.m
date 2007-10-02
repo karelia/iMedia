@@ -200,15 +200,23 @@ static MetadataUtility *theMetadataUtility = nil;
 {
     MDItemRef item = MDItemCreate(kCFAllocatorDefault, (CFStringRef)file);
     
-    NSArray *attributeNames = [NSArray arrayWithObjects:@"kMDItemMediaTypes", @"kMDItemTitle", @"kMDItemDurationSeconds", @"kMDItemAuthors", @"kMDItemKind", nil];
+    NSDictionary *attributes = NULL;
     
-    CFDictionaryRef attributes_cf = MDItemCopyAttributes(item,(CFArrayRef)attributeNames);
-
-    NSDictionary *attributes = [NSDictionary dictionaryWithDictionary:(NSDictionary *)attributes_cf];
-
-    CFRelease(attributes_cf);
-
-    CFRelease(item);
+    if ( item != NULL )
+    {
+        NSArray *attributeNames = [NSArray arrayWithObjects:@"kMDItemMediaTypes", @"kMDItemTitle", @"kMDItemDurationSeconds", @"kMDItemAuthors", @"kMDItemKind", nil];
+        
+        CFDictionaryRef attributes_cf = MDItemCopyAttributes(item,(CFArrayRef)attributeNames);
+        
+        if ( attributes_cf != NULL )
+        {
+            attributes = [NSDictionary dictionaryWithDictionary:(NSDictionary *)attributes_cf];
+            
+            CFRelease(attributes_cf);
+        }
+        
+        CFRelease(item);
+    }
     
     NSArray *mediaTypes = [attributes objectForKey:@"kMDItemMediaTypes"];
     if ( mediaTypes != nil && [mediaTypes containsObject:@"Sound"] )
