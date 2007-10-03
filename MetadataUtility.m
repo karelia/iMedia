@@ -179,7 +179,7 @@ static MetadataUtility *theMetadataUtility = nil;
 // to the metadata tool process all come from a single thread.
 - (NSDictionary *)getMetadataForFileThroughConnection:(oneway NSString *)file
 {
-    return [myServerProxy getMetadataForFile:file];
+    return [(id<MetadataToolProtocol>)myServerProxy getMusicInfoForFile:file];
 }
 
 /*

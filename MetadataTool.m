@@ -102,7 +102,7 @@
     }
 }
 
-- (NSDictionary *)getMetadataForFile:(oneway NSString *)file
+- (NSDictionary *)getMusicInfoForFile:(oneway NSString *)file
 {
     NSError *error = nil;
     QTMovie *movie = [[[QTMovie alloc] initWithFile:file error:&error] autorelease];
