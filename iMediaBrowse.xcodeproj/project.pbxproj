@@ -1575,6 +1575,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = MetadataTool;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1602,6 +1603,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = MetadataTool;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1623,6 +1625,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = MetadataTool;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = YES;
 			};
 			name = Plugin;
