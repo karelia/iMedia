@@ -81,6 +81,20 @@ void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon
     [super dealloc];
 }
 
+-(void) finalize
+{
+    NSEnumerator*   enny = [subscriptions objectEnumerator];
+    NSValue*        subValue = nil;
+    
+    while( (subValue = [enny nextObject]) )
+    {
+        FNSubscriptionRef   subscription = [subValue pointerValue];
+        FNUnsubscribe( subscription );
+    }
+    
+    [super finalize];
+}
+
 
 // -----------------------------------------------------------------------------
 //  addPath:

@@ -176,6 +176,19 @@ static UKKQueue * gUKKQueueSharedQueueSingleton = nil;
     //NSLog(@"kqueue released.");
 }
 
+- (void) finalize
+{
+	// Close all our file descriptors so the files can be deleted:
+	NSEnumerator*	enny = [watchedFDs objectEnumerator];
+	NSNumber*		fdNum;
+	while( (fdNum = [enny nextObject]) )
+	{
+    	if( close( [fdNum intValue] ) == -1 )
+            NSLog(@"dealloc: Couldn't close file descriptor (%d)", errno);
+    }
+	[super finalize];
+}
+
 
 // -----------------------------------------------------------------------------
 //	queueFD:

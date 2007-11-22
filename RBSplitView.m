@@ -292,6 +292,15 @@ static inline float fMAX(float a,float b) {
 	[super dealloc];
 }
 
+- (void) finalize
+{
+	if (dividers) {
+		free(dividers);
+	}
+	[super finalize];
+}
+
+
 // Sets and gets the coupling between the view and its containing RBSplitView (if any). Coupled
 // RBSplitViews take some parameters, such as divider images, from the containing view. The default
 // is for nested RBSplitViews is YES; however, isCoupled returns NO if we're not nested.

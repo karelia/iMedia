@@ -314,7 +314,7 @@ static NSMutableDictionary *_parsers = nil;
 	[myBackgroundLoadingLock release];
 	[myPreferredBrowserTypes release];
 	[myIdentifier release];
-   [myExcludedFolders release];
+	[myExcludedFolders release];
 
 	[super dealloc];
 }

@@ -89,6 +89,14 @@
 	[super dealloc];
 }
 
+- (void)finalize
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[myFileWatcher setDelegate:nil];
+	[super finalize];
+}
+
+
 - (id)library:(BOOL)reuseCachedData
 {
 	if (!myCachedLibrary || !reuseCachedData)

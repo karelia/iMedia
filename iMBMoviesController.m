@@ -110,6 +110,12 @@
 	[super dealloc];
 }
 
+- (void)finalize
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super finalize];
+}
+
 - (void)awakeFromNib
 {
 	[oPhotoView setDelegate:self];
