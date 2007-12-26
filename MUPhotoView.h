@@ -63,6 +63,7 @@ extern NSString *ShowCaptionChangedNotification;
     float photoSize;
     float photoVerticalSpacing;
     float photoHorizontalSpacing;
+	NSString *autosaveName;
     
 	
     NSSize gridSize;
@@ -164,6 +165,11 @@ extern NSString *ShowCaptionChangedNotification;
 /** Tells the view to draw photos scaled so their longest side is aPhotoSize pixels long. This will cause the visible area of the view to be redrawn - and the view will attempt to
     keep the currently-visible photos near the center of the scroll area. **/
 - (void)setPhotoSize:(float)aPhotoSize;
+/** Returns the current autosaveName. The default value is nil **/
+- (NSString *)autosaveName;
+/** If set, the photo size will be stored in the user defaults with key "MUPhotoSize autosaveName"
+ If not set, the phot size will be stored in the user defaults with key "MUPhotoSize"**/ 
+- (void)setAutosaveName:(NSString *)value;
 
 - (IBAction)takePhotoSizeFrom:(id)sender;
 

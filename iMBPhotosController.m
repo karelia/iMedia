@@ -159,6 +159,7 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 	[oPhotoView setUseOutlineBorder:NO];
 	[oPhotoView setUseHighQualityResize:NO];
 	[oPhotoView setBackgroundColor:[NSColor whiteColor]];
+	[oPhotoView setAutosaveName:@"iMBPhotos"];
 
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
 	[oPhotoView setPhotoHorizontalSpacing:15];

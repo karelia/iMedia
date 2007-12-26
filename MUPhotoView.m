@@ -119,6 +119,8 @@ NSString *ShowCaptionChangedNotification = @"ShowCaptionChangedNotification";
     [photoResizeTime release];
     [dragSelectedPhotoIndexes release];
     dragSelectedPhotoIndexes = nil;
+	[autosaveName release];
+	autosaveName = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     
 	[super dealloc];
@@ -577,7 +579,26 @@ static NSDictionary *sTitleAttributes = nil;
 	photoResizeTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(updatePhotoResizing) userInfo:nil repeats:YES];
 
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	[defaults setFloat:aPhotoSize forKey:@"MUPhotoSize"];
+	NSString *defaultsKey = (autosaveName) ? [NSString stringWithFormat:@"MUPhotoSize %@",autosaveName] : @"MUPhotoSize";	
+	[defaults setFloat:aPhotoSize forKey:defaultsKey];
+}
+
+- (NSString *)autosaveName
+{
+	return [[autosaveName retain] autorelease];
+}
+
+- (void)setAutosaveName:(NSString *)value
+{
+	if([autosaveName isEqualToString:value]) return;
+	
+	[autosaveName release];
+	autosaveName = [value retain];
+	
+	NSNumber *defaultsPhotoSize = [[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"MUPhotoSize %@",autosaveName]];
+	if(defaultsPhotoSize && [defaultsPhotoSize floatValue] >= 16) {
+		[self setPhotoSize:[defaultsPhotoSize floatValue]];
+	}
 }
 
 - (IBAction)takePhotoSizeFrom:(id)sender	// allow hooking up to a slider
