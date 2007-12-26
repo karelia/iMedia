@@ -867,7 +867,16 @@ static NSMutableDictionary *_parsers = nil;
 {
 	id row = [[notification userInfo] objectForKey:@"NSObject"];
 	NSOutlineView *theOutline = [notification object];
-	id objectToExpand = [row observedObject];
+	id objectToExpand = nil;
+    // The framework's built with the 10.5 SDK/Target
+	if ([row respondsToSelector:@selector(representedObject)])
+	{
+		objectToExpand = [row representedObject];	// We're running on Leopard, so use the new API
+	}
+	else if ([row respondsToSelector:@selector(observedObject)])
+	{
+		objectToExpand = [row observedObject];	// continue using the iMediaHack
+	}
 	if (myFlags.willExpand)
 	{
 		[myDelegate iMediaBrowser:self willExpandOutline:theOutline row:row node:objectToExpand];
