@@ -131,6 +131,7 @@
     NSImage  *newImage = [[NSImage allocWithZone:[self zone]] initWithSize:newSize];    
     [newImage setDataRetained:YES];
     [newImage setScalesWhenResized:YES];
+    [newImage setCachedSeparately:YES]; // If we don't do this we get crashes on Leopard
     [newImage lockFocus];
     [image drawInRect:NSMakeRect(0.0f, 0.0f, newSize.width, newSize.height) 
              fromRect:NSMakeRect(0.0f, 0.0f, size.width, size.height)
