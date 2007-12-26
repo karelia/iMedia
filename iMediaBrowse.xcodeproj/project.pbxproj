@@ -147,6 +147,13 @@
 		79FDF62A09AAE5D2000CB4B4 /* tunes_tiny.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		8F18A1960D147E2000C30170 /* iMBLightroomPhotosParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A1950D147E2000C30170 /* iMBLightroomPhotosParser.m */; };
+		8F18A4840D16007600C30170 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A47F0D16007600C30170 /* FMDatabase.m */; };
+		8F18A4850D16007600C30170 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A4810D16007600C30170 /* FMDatabaseAdditions.m */; };
+		8F18A4860D16007600C30170 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A4830D16007600C30170 /* FMResultSet.m */; };
+		8FA5F2920D17FE560060232A /* CIImage+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA5F2910D17FE560060232A /* CIImage+iMedia.m */; };
+		8FA5F3FA0D1803960060232A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE57B540C4D3F4800FCE138 /* QuartzCore.framework */; };
+		8FA5F4460D193F8E0060232A /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA5F4450D193F8E0060232A /* libsqlite3.a */; };
 		964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
 		965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		96F9076309D8D9690071BFFB /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9076209D8D9690071BFFB /* iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -408,6 +415,18 @@
 		79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tunes_tiny.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* iMediaTester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F18A1940D147E2000C30170 /* iMBLightroomPhotosParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLightroomPhotosParser.h; sourceTree = "<group>"; };
+		8F18A1950D147E2000C30170 /* iMBLightroomPhotosParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBLightroomPhotosParser.m; sourceTree = "<group>"; };
+		8F18A47C0D16005700C30170 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sqlite3.h; sourceTree = "<group>"; };
+		8F18A47E0D16007600C30170 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabase.h; sourceTree = "<group>"; };
+		8F18A47F0D16007600C30170 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabase.m; sourceTree = "<group>"; };
+		8F18A4800D16007600C30170 /* FMDatabaseAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseAdditions.h; sourceTree = "<group>"; };
+		8F18A4810D16007600C30170 /* FMDatabaseAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseAdditions.m; sourceTree = "<group>"; };
+		8F18A4820D16007600C30170 /* FMResultSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMResultSet.h; sourceTree = "<group>"; };
+		8F18A4830D16007600C30170 /* FMResultSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMResultSet.m; sourceTree = "<group>"; };
+		8FA5F2900D17FE560060232A /* CIImage+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CIImage+iMedia.h"; sourceTree = "<group>"; };
+		8FA5F2910D17FE560060232A /* CIImage+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CIImage+iMedia.m"; sourceTree = "<group>"; };
+		8FA5F4450D193F8E0060232A /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsqlite3.a; sourceTree = "<group>"; };
 		964006E108D7B9BF0046E052 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		965EB98608E1D345000DFF3A /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		965EB99608E1F7CE000DFF3A /* iMediaBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMediaBrowser.h; sourceTree = "<group>"; };
@@ -531,6 +550,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8FA5F4460D193F8E0060232A /* libsqlite3.a in Frameworks */,
+				8FA5F3FA0D1803960060232A /* QuartzCore.framework in Frameworks */,
 				791F97380975D3750071B2E0 /* iMediaBrowser.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */,
@@ -560,6 +581,7 @@
 				D9B3EAAD09A3FD8600835FE4 /* Models */,
 				D9659C0E09A6CB160079ED9A /* Value Transformers */,
 				D9659A2609A6A7C50079ED9A /* Views */,
+				8F18A4740D16004100C30170 /* FMDatabase */,
 				79BBE5090A282CCF0018CCCA /* Cocoa Extensions */,
 			);
 			name = Classes;
@@ -683,6 +705,8 @@
 				CE11152E0B6953C800783570 /* iMBScreenSaverPicturesParser.m */,
 				CE11337A0B69BC9B00783570 /* iMBAddressBookImagesParser.h */,
 				CE11337B0B69BC9B00783570 /* iMBAddressBookImagesParser.m */,
+				8F18A1940D147E2000C30170 /* iMBLightroomPhotosParser.h */,
+				8F18A1950D147E2000C30170 /* iMBLightroomPhotosParser.m */,
 			);
 			name = Photo;
 			sourceTree = "<group>";
@@ -794,8 +818,33 @@
 				793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */,
 				CE3F20090B8646A000A1CD2A /* NSURLCache+iMedia.h */,
 				CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */,
+				8FA5F2900D17FE560060232A /* CIImage+iMedia.h */,
+				8FA5F2910D17FE560060232A /* CIImage+iMedia.m */,
 			);
 			name = "Cocoa Extensions";
+			sourceTree = "<group>";
+		};
+		8F18A4740D16004100C30170 /* FMDatabase */ = {
+			isa = PBXGroup;
+			children = (
+				8F18A47E0D16007600C30170 /* FMDatabase.h */,
+				8F18A47F0D16007600C30170 /* FMDatabase.m */,
+				8F18A4800D16007600C30170 /* FMDatabaseAdditions.h */,
+				8F18A4810D16007600C30170 /* FMDatabaseAdditions.m */,
+				8F18A4820D16007600C30170 /* FMResultSet.h */,
+				8F18A4830D16007600C30170 /* FMResultSet.m */,
+				8F18A47A0D16005700C30170 /* sqlite */,
+			);
+			name = FMDatabase;
+			sourceTree = "<group>";
+		};
+		8F18A47A0D16005700C30170 /* sqlite */ = {
+			isa = PBXGroup;
+			children = (
+				8FA5F4450D193F8E0060232A /* libsqlite3.a */,
+				8F18A47C0D16005700C30170 /* sqlite3.h */,
+			);
+			path = sqlite;
 			sourceTree = "<group>";
 		};
 		968BEF3E090E904100D00E5C /* images */ = {
@@ -1297,6 +1346,11 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				791F97400975D3A90071B2E0 /* AppDelegate.m in Sources */,
+				8F18A1960D147E2000C30170 /* iMBLightroomPhotosParser.m in Sources */,
+				8F18A4840D16007600C30170 /* FMDatabase.m in Sources */,
+				8F18A4850D16007600C30170 /* FMDatabaseAdditions.m in Sources */,
+				8F18A4860D16007600C30170 /* FMResultSet.m in Sources */,
+				8FA5F2920D17FE560060232A /* CIImage+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1453,6 +1507,13 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/sqlite\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/sqlite\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = iMediaTester;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
@@ -1481,6 +1542,13 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/sqlite\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/sqlite\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = iMediaTester;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
@@ -1540,6 +1608,13 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/sqlite\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/sqlite\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = iMediaTester;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
