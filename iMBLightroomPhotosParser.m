@@ -18,20 +18,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2007 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2007 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -40,8 +40,7 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
- */
-
+*/
 
 #import "iMBLightroomPhotosParser.h"
 #import "iMediaBrowser.h"
@@ -99,8 +98,10 @@
 #pragma mark -
 #pragma mark instance methods
 
-- (NSArray*)parseDatabase
+- (iMBLibraryNode*)parseDatabase
 {
+	iMBLibraryNode* libraryNode = nil;
+	
 	NSMutableArray *libraryNodes = [NSMutableArray array];
 	NSEnumerator *enumerator = [[iMBLightroomPhotosParser libraryPaths] objectEnumerator];
 	NSString *currentPath;
@@ -121,7 +122,7 @@
 		[library setName:LocalizedStringInThisBundle(@"Lightroom", @"Lightroom")];
 		[library setIconName:@"com.adobe.Lightroom:"];
 		
-		return [NSArray arrayWithObject:library];
+		libraryNode = library;
 	}
 	else {
 		iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
@@ -136,10 +137,10 @@
 			[root addItem:library];
 		}
 		
-		return [NSArray arrayWithObject:root];
+		libraryNode = root;
 	}
 	
-    return libraryNodes;
+    return [[libraryNode allItems] count] ? libraryNode : nil;
 }
 
 @end
@@ -151,20 +152,21 @@
 	BOOL isReadable = [[NSFileManager defaultManager] isReadableFileAtPath:path];
 	
 	if (isReadable) {
-			iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-			
-			[root setName:[[path lastPathComponent] stringByDeletingPathExtension]];
-			[root setIconName:@"com.adobe.Lightroom"];
-			[root setAttribute:[NSNumber numberWithLong:0] forKey:@"idLocal"];
-			[root setAttribute:path forKey:@"path"];
-			[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
-
-		NS_DURING
+		iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
+		
+		[root setName:[[path lastPathComponent] stringByDeletingPathExtension]];
+		[root setIconName:@"com.adobe.Lightroom"];
+		[root setAttribute:[NSNumber numberWithLong:0] forKey:@"idLocal"];
+		[root setAttribute:path forKey:@"path"];
+		[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
+		
+		@try {
 			[iMBLightroomPhotosParser parseAllImagesForRoot:root];
 			[iMBLightroomPhotosParser parseCollectionsForRoot:root];
-		NS_HANDLER
-			NSLog(@"Failed to parse %@: %@", path);
-		NS_ENDHANDLER
+		}
+		@catch (NSException *exception) {
+			NSLog(@"Failed to parse %@: %@", path, exception);
+		}
 		
 		return root;
 	}	
@@ -240,16 +242,16 @@
 				[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
 				[imageQuery appendString:@" WHERE "];
 				[imageQuery appendString:@" alti.tag = ?"];
-
-//				NSLog(@"imageQuery: %@", imageQuery);
-
+				
+				//				NSLog(@"imageQuery: %@", imageQuery);
+				
 				FMResultSet *rsImages = [localDatabase executeQuery:imageQuery, @"AgCaptionTagKind", idLocal];
 				
 				while ([rsImages next]) {
 					NSString *absolutePath = [rsImages stringForColumnIndex:0];
 					
-//					NSLog(@"absolutePath: %@", absolutePath);
-
+					//					NSLog(@"absolutePath: %@", absolutePath);
+					
 					if ([CIImage isReadableFile:absolutePath]) {
 						NSMutableDictionary *imageRecord = [NSMutableDictionary dictionary];
 						
@@ -275,10 +277,10 @@
 						
 						[images addObject:imageRecord];
 						
-//						NSLog(@"%@", imageRecord);
+						//						NSLog(@"%@", imageRecord);
 					}
 				}
-
+				
 				[currentNode setAttribute:images forKey:@"Images"];
 				
 				[rsImages close];
@@ -305,13 +307,13 @@
 	[imagesNode setName:LocalizedStringInThisBundle(@"Images", @"Images")];
 	[imagesNode setIconName:@"folder"];
 	[imagesNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
-
+	
 	[root addItem:imagesNode];
 	
 	NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
 	NSString *path = [root attributeForKey:@"path"];
 	FMDatabase *database = [FMDatabase databaseWithPath:path];
-
+	
 	if ([database open]) {
 		NSMutableArray *images = [NSMutableArray array];
 		NSMutableString *imageQuery = [NSMutableString string];
@@ -324,16 +326,16 @@
 		[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
 		[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
 		[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
-				
-//		NSLog(@"imageQuery: %@", imageQuery);
-
+		
+		//		NSLog(@"imageQuery: %@", imageQuery);
+		
 		FMResultSet *rsImages = [database executeQuery:imageQuery, @"AgCaptionTagKind"];
 		
 		while ([rsImages next]) {
 			NSString *absolutePath = [rsImages stringForColumnIndex:0];
 			
-//			NSLog(@"absolutePath: %@", absolutePath);
-
+			//			NSLog(@"absolutePath: %@", absolutePath);
+			
 			if ([CIImage isReadableFile:absolutePath]) {
 				NSMutableDictionary *imageRecord = [NSMutableDictionary dictionary];
 				
@@ -354,12 +356,12 @@
 					NSString *fileName = [rsImages stringForColumnIndex:1];
 					
 					[imageRecord setObject:fileName forKey:@"Caption"];
-
+					
 				}
 				
 				[images addObject:imageRecord];
-
-//				NSLog(@"%@", imageRecord);
+				
+				//				NSLog(@"%@", imageRecord);
 			}
 		}
 		
@@ -447,7 +449,7 @@
 			CFRelease(activeLibraryPath);
 		}
 	}
-		
+	
 	return libraryFilePaths;
 }
 

@@ -670,24 +670,13 @@ static NSMutableDictionary *_parsers = nil;
 #ifdef DEBUG
 //		NSDate *timer = [NSDate date];
 #endif
-		id libraryOrLibraries = [parser library:reuseCachedData];
+		NSArray *libraries = [parser librariesReusingCache:reuseCachedData];
 #ifdef DEBUG
 		//		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
 #endif
-		if (libraryOrLibraries)
+		if (libraries)
 		{
-			if ([libraryOrLibraries isKindOfClass:[iMBLibraryNode class]])
-			{
-				[root addObject:libraryOrLibraries];
-			}
-			else if ([libraryOrLibraries isKindOfClass:[NSArray class]])
-			{
-				[root addObjectsFromArray:libraryOrLibraries];
-			}
-			else
-			{
-				NSLog(@"Don't know what to do with %@ returned from -[%@ library:]", [libraryOrLibraries class], [parser class]);
-			}
+			[root addObjectsFromArray:libraries];
 		}
 		if (myFlags.didUseParser)
 		{
@@ -711,11 +700,19 @@ static NSMutableDictionary *_parsers = nil;
 		{
 			iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:drop];
 			[parser setBrowser:mySelectedBrowser];
-			iMBLibraryNode *node = [parser library:YES];
-			[node setParser:parser];
-			[node setName:[drop lastPathComponent]];
-			[node setIconName:@"folder"];
-			[root addObject:node];
+			NSArray *nodes = [parser librariesReusingCache:YES];	// should be only 1 but let's enum
+			
+			NSEnumerator *e = [nodes objectEnumerator];
+			iMBLibraryNode *node;
+			
+			while (node = [e nextObject])
+			{
+				[node setParser:parser];
+				[node setName:[drop lastPathComponent]];
+				[node setIconName:@"folder"];
+				[root addObject:node];
+			}
+			
 			[myUserDroppedParsers addObject:parser];
 			[parser release];
 		}
@@ -852,38 +849,32 @@ static NSMutableDictionary *_parsers = nil;
 
 - (IBAction)playlistSelected:(id)sender	// action from oPlaylists
 {
-	id observedObject = [[oPlaylists itemAtRow:[sender selectedRow]] observedObject];
-	if ([[observedObject parser] respondsToSelector:@selector(iMediaBrowser:didSelectNode:)])
+	id rowItem = [oPlaylists itemAtRow:[sender selectedRow]];
+	id representedObject = [rowItem respondsToSelector:@selector(representedObject)] ? [rowItem representedObject] : [rowItem observedObject];
+
+	if ([[representedObject parser] respondsToSelector:@selector(iMediaBrowser:didSelectNode:)])
 	{
-		[[observedObject parser] iMediaBrowser:self didSelectNode:observedObject];
+		[[representedObject parser] iMediaBrowser:self didSelectNode:representedObject];
 	}
 	if (myFlags.didSelectNode)
 	{
-		[myDelegate iMediaBrowser:self didSelectNode:observedObject];
+		[myDelegate iMediaBrowser:self didSelectNode:representedObject];
 	}
 }
 
 - (void)outlineViewItemWillExpand:(NSNotification *)notification	// notification from oPlaylists
 {
-	id row = [[notification userInfo] objectForKey:@"NSObject"];
 	NSOutlineView *theOutline = [notification object];
-	id objectToExpand = nil;
-    // The framework's built with the 10.5 SDK/Target
-	if ([row respondsToSelector:@selector(representedObject)])
-	{
-		objectToExpand = [row representedObject];	// We're running on Leopard, so use the new API
-	}
-	else if ([row respondsToSelector:@selector(observedObject)])
-	{
-		objectToExpand = [row observedObject];	// continue using the iMediaHack
-	}
+	id rowItem = [[notification userInfo] objectForKey:@"NSObject"];
+	id representedObject = [rowItem respondsToSelector:@selector(representedObject)] ? [rowItem representedObject] : [rowItem observedObject];
+
 	if (myFlags.willExpand)
 	{
-		[myDelegate iMediaBrowser:self willExpandOutline:theOutline row:row node:objectToExpand];
+		[myDelegate iMediaBrowser:self willExpandOutline:theOutline row:rowItem node:representedObject];
 	}
-	if ([[objectToExpand parser] respondsToSelector:@selector(iMediaBrowser:willExpandOutline:row:node:)])
+	if ([[representedObject parser] respondsToSelector:@selector(iMediaBrowser:willExpandOutline:row:node:)])
 	{
-		[[objectToExpand parser] iMediaBrowser:self willExpandOutline:theOutline row:row node:objectToExpand];
+		[[representedObject parser] iMediaBrowser:self willExpandOutline:theOutline row:rowItem node:representedObject];
 	}
 }
 
@@ -921,12 +912,19 @@ static NSMutableDictionary *_parsers = nil;
 			if (![drops containsObject:cur] && [fm fileExistsAtPath:cur isDirectory:&isDir] && isDir && [mySelectedBrowser allowPlaylistFolderDrop:cur])
 			{
 				iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:cur];
-				iMBLibraryNode *node = [parser library:NO];
-				[node setParser:parser];
-				[node setName:[cur lastPathComponent]];
-				[node setIconName:@"folder"];
-				[content addObject:node];
-				[results addObject:node];
+				NSArray *nodes = [parser librariesReusingCache:NO];
+				
+				NSEnumerator *e = [nodes objectEnumerator];
+				iMBLibraryNode *node;
+				
+				while (node = [e nextObject])
+				{
+					[node setParser:parser];
+					[node setName:[cur lastPathComponent]];
+					[node setIconName:@"folder"];
+					[content addObject:node];
+					[results addObject:node];
+				}
 				[myUserDroppedParsers addObject:parser];
 				[parser release];
 				
@@ -1232,7 +1230,9 @@ static NSMutableDictionary *_parsers = nil;
 	[pboard declareTypes:[NSArray array] owner:nil]; // clear the pasteboard incase the browser decides not to add anything
 	while (cur = [e nextObject])
 	{
-		[mySelectedBrowser writePlaylist:[cur observedObject] toPasteboard:pboard];
+		id representedObject = [cur respondsToSelector:@selector(representedObject)] ? [cur representedObject] : [cur observedObject];
+
+		[mySelectedBrowser writePlaylist:representedObject toPasteboard:pboard];
 	}
 	return [[pboard types] count] != 0;
 }

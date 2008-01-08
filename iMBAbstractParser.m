@@ -84,7 +84,7 @@
 	[myFileWatcher setDelegate:nil];
 	[myFileWatcher release];
 	[myDatabase release];
-	[myCachedLibrary release];
+	[myCachedLibraries release];
 	[myBrowser release];
 	[super dealloc];
 }
@@ -97,20 +97,14 @@
 }
 
 
-- (id)library:(BOOL)reuseCachedData
+- (NSArray *)librariesReusingCache:(BOOL)reuseCachedData
 {
-	if (!myCachedLibrary || !reuseCachedData)
+	if (!myCachedLibraries || !reuseCachedData)
 	{
-		[myCachedLibrary release];
-		myCachedLibrary = [[self parseDatabase] retain];
+		[myCachedLibraries release];
+		myCachedLibraries = [[self nodesFromParsingDatabase] retain];
 	}
-	return myCachedLibrary;
-}
-
-- (iMBLibraryNode *)parseDatabase
-{
-	// we do nothing, let the subclass do the hard yards.
-	return nil;
+	return myCachedLibraries;
 }
 
 
@@ -167,11 +161,7 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	iMBLibraryNode *newDB = [self parseDatabase];
-	
-	[myCachedLibrary removeAllItems];
-	[myCachedLibrary setAllItems:[newDB allItems]];
-	[myCachedLibrary setAttributes:[newDB attributes]];
+	(void) [self librariesReusingCache:NO];
 	
 	// need to notify the browser that our data changed so it can refresh the outline view
 	[(NSObject *)myBrowser performSelectorOnMainThread:@selector(refresh)
@@ -180,5 +170,30 @@
 	
 	[pool release];
 }
+
+
+- (iMBLibraryNode *)parseDatabase
+{
+	// we do nothing, let the subclass do the hard yards.
+	return nil;
+}
+
+
+// standard implementation for single-item nodes.  Override if we return multiple items.
+
+- (NSArray *)nodesFromParsingDatabase
+{
+	iMBLibraryNode *oneNodeParsed = [self parseDatabase];
+	if (oneNodeParsed)
+	{
+		return [NSArray arrayWithObject:oneNodeParsed];
+	}
+	else
+	{
+		return nil;
+	}
+}
+
+
 
 @end

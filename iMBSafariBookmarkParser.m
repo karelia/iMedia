@@ -85,6 +85,7 @@
 - (iMBLibraryNode *)recursivelyParseItem:(NSDictionary *)item
 {
 	iMBLibraryNode *parsed = [[[iMBLibraryNode alloc] init] autorelease];
+	NSArray *collectionArray = [item objectForKey:@"Children"];		// default group of children, if this is a collection
 	
 	if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksBar"])
 	{
@@ -103,14 +104,23 @@
 	{
 		return nil;
 	}
-	else
+	else if (nil == [item objectForKey:@"Title"] && nil != [item objectForKey:@"URIDictionary"])	// actual bookmark
+	{
+		NSDictionary *URIDictionary = [item objectForKey:@"URIDictionary"];
+		[parsed setName:[URIDictionary objectForKey:@"title"]];
+		[parsed setIconName:@"com.apple.Safari"];
+		
+		// This is the item, so fake things so that this is treated as a collection
+		collectionArray = [NSArray arrayWithObject:item];
+	}
+	else if (nil != [item objectForKey:@"Title"])
 	{
 		[parsed setName:[item objectForKey:@"Title"]];
 		[parsed setIconName:@"folder"];
 	}
 	
 	NSMutableArray *links = [NSMutableArray array];
-	NSEnumerator *e = [[item objectForKey:@"Children"] objectEnumerator];
+	NSEnumerator *e = [collectionArray objectEnumerator];
 	NSDictionary *cur;
 	[[NSUserDefaults standardUserDefaults] setObject:@"~/Library/Safari/Icons" forKey:WebIconDatabaseDirectoryDefaultsKey];
 	[[NSUserDefaults standardUserDefaults] synchronize];

@@ -27,7 +27,7 @@
     FMResultSet *rs = [self executeQuery:objs];
     
     if (![rs next]) {
-        return nil;
+        return NO;
     }
     
     long ret = [rs longForColumnIndex:0];
@@ -43,7 +43,7 @@
     FMResultSet *rs = [self executeQuery:objs];
     
     if (![rs next]) {
-        return nil;
+        return NO;
     }
     
     int ret = [rs intForColumnIndex:0];
@@ -59,7 +59,7 @@
     FMResultSet *rs = [self executeQuery:objs];
     
     if (![rs next]) {
-        return nil;
+        return NO;
     }
     
     BOOL ret = [rs boolForColumnIndex:0];
@@ -75,7 +75,7 @@
     FMResultSet *rs = [self executeQuery:objs];
     
     if (![rs next]) {
-        return nil;
+        return 0.0;
     }
     
     double ret = [rs doubleForColumnIndex:0];

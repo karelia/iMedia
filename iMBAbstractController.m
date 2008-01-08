@@ -187,7 +187,8 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	
 	while (cur = [e nextObject])
 	{
-		[nodes addObject:[cur observedObject]];
+		id representedObject = [cur respondsToSelector:@selector(representedObject)] ? [cur representedObject] : [cur observedObject];
+		[nodes addObject:representedObject];
 	}
 	return nodes;
 }

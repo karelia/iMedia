@@ -819,7 +819,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	{
 		if (aIndex == NSOutlineViewDropOnItemIndex) // We don't allow inter-item drags
 		{
-			iMBLibraryNode* node = [item observedObject];
+			iMBLibraryNode* node = [item respondsToSelector:@selector(representedObject)] ? [item representedObject] : [item observedObject]
 			if (node) // You would also want to check that the node is able to receive the drop here
 			{
 				result = NSDragOperationCopy;
@@ -850,7 +850,8 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	if ([pboard availableTypeFromArray:[NSArray arrayWithObject:NSTIFFPboardType]])
 	{
 		*tryDefault = NO;
-		result = [self importPasteboard:pboard intoLibraryNode:[item observedObject]];
+		id representedObject = [item respondsToSelector:@selector(representedObject)] ? [item representedObject] : [item observedObject]
+		result = [self importPasteboard:pboard intoLibraryNode:representedObject];
 	}
 	
 	return result;

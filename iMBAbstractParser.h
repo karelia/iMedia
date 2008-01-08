@@ -52,7 +52,7 @@
 {
 	NSString			*myDatabase;
 	UKKQueue			*myFileWatcher;
-	iMBLibraryNode		*myCachedLibrary;
+	NSArray				*myCachedLibraries;	// array of iMBLibraryNode
 	id <iMediaBrowser>	myBrowser;
 }
 
@@ -67,8 +67,11 @@
 - (void)setBrowser:(id <iMediaBrowser>)browser;
 - (NSString *)databasePath;
 
-// subclasses implement this
+// subclasses generally implement this.  Return nil if no items to avoid showing up
 - (iMBLibraryNode *)parseDatabase;
+
+// subclasses MAY implement this
+- (NSArray *)nodesFromParsingDatabase;  // Return nil if no items to avoid showing up
 
 // extended support for subclasses that watch multiple databases
 - (void)watchFile:(NSString *)file;

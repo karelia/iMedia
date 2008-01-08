@@ -94,7 +94,9 @@
 		
 		while ((row = [e nextObject]))
 		{
-			[items addObject:[[self itemAtRow:[row intValue]] observedObject]];
+			id rowObject = [self itemAtRow:[row intValue]];
+			id representedObject = [rowObject respondsToSelector:@selector(representedObject)] ? [rowObject representedObject] : [rowObject observedObject];
+			[items addObject:representedObject];
 		}
 		[[self dataSource] outlineView:self deleteItems:items];
 	}

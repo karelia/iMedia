@@ -272,7 +272,8 @@
 	return [albums count] ? root : nil;
 }
 
-- (NSArray *)parseDatabase
+// Note: we do NOT implement parseDatabase; we implement this to return multiple top level nodes
+- (NSArray *)nodesFromParsingDatabase
 {
 	NSMutableArray *libraryNodes = [NSMutableArray array];
 	
@@ -292,7 +293,7 @@
 		}
 	}
     
-    return libraryNodes;
+    return [libraryNodes count] ? libraryNodes : nil;
 }
 
 @end
