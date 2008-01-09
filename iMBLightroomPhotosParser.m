@@ -140,6 +140,8 @@
 		libraryNode = root;
 	}
 	
+	[libraryNode setPrioritySortOrder:1];
+
     return [[libraryNode allItems] count] ? libraryNode : nil;
 }
 

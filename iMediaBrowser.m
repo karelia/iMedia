@@ -684,6 +684,15 @@ static NSMutableDictionary *_parsers = nil;
 		}
 	}
 	
+	NSSortDescriptor *priorityOrderSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"prioritySortOrder" 
+																				 ascending:NO] autorelease];
+	NSSortDescriptor *nameSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"name" 
+																		ascending:YES 
+																		 selector:@selector(caseInsensitiveCompare:)] autorelease];
+	NSArray *librarySortDescriptor = [NSArray arrayWithObjects:priorityOrderSortDescriptor, nameSortDescriptor, nil];
+	
+	[root sortUsingDescriptors:librarySortDescriptor];
+	
 	// Do any user dropped folders
 	NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", myIdentifier]];
 	NSArray *drops = [d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)mySelectedBrowser className]]];

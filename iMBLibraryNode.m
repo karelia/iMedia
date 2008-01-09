@@ -74,6 +74,7 @@ static NSMutableDictionary *sImageCache = nil;
 		myItems = [[NSMutableArray array] retain];
 		myAttributes = [[NSMutableDictionary dictionary] retain];
 		myAttributeFilterMap = [[NSMutableDictionary dictionary] retain];
+		myPrioritySortOrder = 0;
 	}
 	return self;
 }
@@ -84,6 +85,8 @@ static NSMutableDictionary *sImageCache = nil;
 	{
 		myItems = [items mutableCopy];
 		myAttributes = [[NSMutableDictionary dictionary] retain];
+		myPrioritySortOrder = 0;
+
 		[self setName:name];
 		[self setIconName:@"folder"];
 	}
@@ -288,6 +291,16 @@ static NSMutableDictionary *sImageCache = nil;
 		}
 	}
 	return myIcon;
+}
+
+- (int)prioritySortOrder
+{
+	return myPrioritySortOrder;
+}
+
+- (void)setPrioritySortOrder:(int)value
+{
+	myPrioritySortOrder = value;
 }
 
 - (void)setAttribute:(id)attrib forKey:(NSString *)key

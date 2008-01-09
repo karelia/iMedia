@@ -256,6 +256,8 @@
 		root = nil;
 	}
 	
+	[root setPrioritySortOrder:1];
+
 	return root;
 }
 

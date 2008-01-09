@@ -289,6 +289,8 @@
 	while (cur = [e nextObject]) {
         iMBLibraryNode *library = [self parseOneDatabaseWithContentsOfURL:[NSURL URLWithString:cur]];
 		if (library) {
+			[library setPrioritySortOrder:1];
+
 			[libraryNodes addObject:library];
 		}
 	}

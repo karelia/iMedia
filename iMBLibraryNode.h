@@ -54,6 +54,7 @@
 	NSMutableArray		*myItems;
 	NSMutableDictionary *myAttributes;
 	NSImage				*myIcon;
+	int					myPrioritySortOrder;
 	NSString			*myIconName;
 	NSMutableDictionary *myAttributeFilterMap;
 	id					myParser;	// not retained
@@ -70,6 +71,9 @@
 - (NSString *)iconName;
 - (void)setIcon:(NSImage *)icon;
 - (NSImage *)icon;
+
+- (int)prioritySortOrder; // The higher the better
+- (void)setPrioritySortOrder:(int)value;
 
 - (void)setParser:(id)parser;
 - (id)parser;
