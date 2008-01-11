@@ -208,6 +208,14 @@
 		{
 			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
 			
+            // It's always possible that the record might not exist. Can't fully trusty
+            // the integrity of the librrary
+            if (!imageRecord)
+            {
+                NSLog(@"IMBAperturePhotosParser: no image record found with key %@", key);
+                continue;
+            }
+            
 			if ([imageRecord objectForKey:@"MediaType"] && ![[imageRecord objectForKey:@"MediaType"] isEqualToString:@"Image"])
 			{
 				continue;
@@ -220,7 +228,7 @@
 				if (date) [imageRecord setObject:date forKey:@"DateAsTimerInterval"];
 			}
 			
-			[newPhotolist addObject:imageRecord];
+            [newPhotolist addObject:imageRecord];
 			
 			//	cp: No keywords in Aperture XML.
 			#if 0
