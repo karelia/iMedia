@@ -216,6 +216,12 @@
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
+		DB9327D70D37D00000EC949C /* iMBLightroomPhotosParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A1950D147E2000C30170 /* iMBLightroomPhotosParser.m */; };
+		DB9327D90D37D03000EC949C /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A47F0D16007600C30170 /* FMDatabase.m */; };
+		DB9327DA0D37D03000EC949C /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A4810D16007600C30170 /* FMDatabaseAdditions.m */; };
+		DB9327DB0D37D03000EC949C /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A4830D16007600C30170 /* FMResultSet.m */; };
+		DB9327E30D37D08100EC949C /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA5F4450D193F8E0060232A /* libsqlite3.a */; };
+		DB9327F70D37D18C00EC949C /* CIImage+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA5F2910D17FE560060232A /* CIImage+iMedia.m */; };
 		E20764B80B597D8D00EAC95C /* tiny-reload.png in Resources */ = {isa = PBXBuildFile; fileRef = E20764B70B597D8C00EAC95C /* tiny-reload.png */; };
 		FD2EAFC70C6981E000023B2E /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		FD2EAFD80C69821100023B2E /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
@@ -535,6 +541,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB9327E30D37D08100EC949C /* libsqlite3.a in Frameworks */,
 				79167A6909752C3000D9EF74 /* QTKit.framework in Frameworks */,
 				79167A6A09752C3300D9EF74 /* Cocoa.framework in Frameworks */,
 				79167A6B09752C3300D9EF74 /* QuickTime.framework in Frameworks */,
@@ -1148,7 +1155,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 969656A508C6A24500F2F85C /* Build configuration list for PBXProject "iMediaBrowse" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -1277,6 +1283,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB9327F70D37D18C00EC949C /* CIImage+iMedia.m in Sources */,
+				DB9327D90D37D03000EC949C /* FMDatabase.m in Sources */,
+				DB9327DA0D37D03000EC949C /* FMDatabaseAdditions.m in Sources */,
+				DB9327DB0D37D03000EC949C /* FMResultSet.m in Sources */,
+				DB9327D70D37D00000EC949C /* iMBLightroomPhotosParser.m in Sources */,
 				D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */,
 				79167A0B0975260A00D9EF74 /* iMediaBrowser.m in Sources */,
 				79167A0D0975260C00D9EF74 /* iMBMoviesController.m in Sources */,
@@ -1456,6 +1467,11 @@
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/sqlite\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1475,6 +1491,11 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/sqlite\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1576,6 +1597,11 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/sqlite\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
