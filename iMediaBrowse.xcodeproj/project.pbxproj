@@ -147,11 +147,6 @@
 		79FDF62A09AAE5D2000CB4B4 /* tunes_tiny.png in Resources */ = {isa = PBXBuildFile; fileRef = 79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-		8F18A1960D147E2000C30170 /* iMBLightroomPhotosParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A1950D147E2000C30170 /* iMBLightroomPhotosParser.m */; };
-		8F18A4840D16007600C30170 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A47F0D16007600C30170 /* FMDatabase.m */; };
-		8F18A4850D16007600C30170 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A4810D16007600C30170 /* FMDatabaseAdditions.m */; };
-		8F18A4860D16007600C30170 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A4830D16007600C30170 /* FMResultSet.m */; };
-		8FA5F2920D17FE560060232A /* CIImage+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA5F2910D17FE560060232A /* CIImage+iMedia.m */; };
 		8FA5F3FA0D1803960060232A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE57B540C4D3F4800FCE138 /* QuartzCore.framework */; };
 		8FA5F4460D193F8E0060232A /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA5F4450D193F8E0060232A /* libsqlite3.a */; };
 		964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
@@ -420,7 +415,7 @@
 		79FDF61309AAE5D2000CB4B4 /* quicktime_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = quicktime_tiny.png; sourceTree = "<group>"; };
 		79FDF61409AAE5D2000CB4B4 /* tunes_tiny.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tunes_tiny.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* iMediaTester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* iMediaTester.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iMediaTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F18A1940D147E2000C30170 /* iMBLightroomPhotosParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBLightroomPhotosParser.h; sourceTree = "<group>"; };
 		8F18A1950D147E2000C30170 /* iMBLightroomPhotosParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBLightroomPhotosParser.m; sourceTree = "<group>"; };
 		8F18A47C0D16005700C30170 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sqlite3.h; sourceTree = "<group>"; };
@@ -1155,7 +1150,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 969656A508C6A24500F2F85C /* Build configuration list for PBXProject "iMediaBrowse" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -1358,11 +1352,6 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				791F97400975D3A90071B2E0 /* AppDelegate.m in Sources */,
-				8F18A1960D147E2000C30170 /* iMBLightroomPhotosParser.m in Sources */,
-				8F18A4840D16007600C30170 /* FMDatabase.m in Sources */,
-				8F18A4850D16007600C30170 /* FMDatabaseAdditions.m in Sources */,
-				8F18A4860D16007600C30170 /* FMResultSet.m in Sources */,
-				8FA5F2920D17FE560060232A /* CIImage+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
