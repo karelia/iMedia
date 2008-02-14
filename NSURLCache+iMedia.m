@@ -52,6 +52,7 @@
 
 
 #import "NSURLCache+iMedia.h"
+#import <QTKit/QTKit.h>
 
 //static NSString *sApplicationCachingScheme = @"iMediaCache";
 
@@ -65,9 +66,14 @@
 														 MIMEType:@"application/octet-stream"
 											expectedContentLength:[aData length]
 												 textEncodingName:nil] autorelease];
+	
+	// ??? Can't encode NSValue?
+	NSMutableDictionary *mUserInfo = [NSMutableDictionary dictionaryWithDictionary:aUserInfo];
+	[mUserInfo removeObjectForKey:QTMovieDurationAttribute];	/// ???
+	[mUserInfo removeObjectForKey:QTMovieNaturalSizeAttribute];	/// ???
 	NSCachedURLResponse *cachedResponse = [[[NSCachedURLResponse alloc] initWithResponse:response
 																					data:aData
-																				userInfo:aUserInfo
+																				userInfo:mUserInfo
 																		   storagePolicy:NSURLCacheStorageAllowed] autorelease];
 	NSURLRequest *request = [NSURLRequest requestWithURL:cacheURL];
 	[self storeCachedResponse:cachedResponse forRequest:request];

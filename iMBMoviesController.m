@@ -230,6 +230,7 @@
         {
             [anImage setDataRetained:YES];
             [anImage setScalesWhenResized:YES];
+//			[anImage setCachedSeparately:YES];	// hopeful fix for TIFFRepresentation crasher, see  http://xrl.us/bf3kv
             [myCacheLock lock];
             [myImageCache setObject:anImage forKey:imagePath];
             [anImage release];
@@ -412,10 +413,12 @@ static NSImage *_toolbarIcon = nil;
 	{
 		NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
 		img = [[[NSImage alloc] initWithContentsOfFile:drmIcon] autorelease];
+//?		[img setCachedSeparately:YES];
 	}
 	else
 	{
 		img = [movie betterPosterImageWithMaxSize:MAX_POSTER_SIZE];
+//?		[img setCachedSeparately:YES];
 	}
 	return img;
 }
@@ -675,6 +678,7 @@ static NSImage *_toolbarIcon = nil;
         if (thumbPath)
         {
             img = [[[NSImage alloc] initByReferencingFile:thumbPath] autorelease];
+//?			[img setCachedSeparately:YES];
             // cache in memory now
             [myCacheLock lock];
             [myImageCache setObject:img forKey:imagePath];
@@ -693,6 +697,7 @@ static NSImage *_toolbarIcon = nil;
 			img = [[[NSImage alloc] initWithData:data] autorelease];
 			if (img)
 			{
+//?				[img setCachedSeparately:YES];
 				// cache in memory now --- maybe not needed since the NSURLCache actually caches in memory now!
 				[myCacheLock lock];
 				[myImageCache setObject:img forKey:imagePath];
