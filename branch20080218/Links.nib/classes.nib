@@ -1,0 +1,27 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {reloadMediaBrowser = id; }; 
+            CLASS = iMBAbstractController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oView = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {search = id; }; 
+            CLASS = iMBDNDArrayController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {newObject = id; tableView = NSTableView; }; 
+            SUPERCLASS = NSArrayController; 
+        }, 
+        {
+            ACTIONS = {openInBrowser = id; }; 
+            CLASS = iMBLinksController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oLinkController = iMBDNDArrayController; oLinks = NSTableView; }; 
+            SUPERCLASS = iMBAbstractController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

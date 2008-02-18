@@ -1,0 +1,41 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {takePhotoSizeFrom = id; }; 
+            CLASS = MUPhotoView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {delegate = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {moveToMaximumValue = id; moveToMinimumValue = id; }; 
+            CLASS = NSSlider; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSControl; 
+        }, 
+        {
+            ACTIONS = {reloadMediaBrowser = id; }; 
+            CLASS = iMBAbstractController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oView = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {play = id; search = id; }; 
+            CLASS = iMBMoviesController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {counterField = NSTextField; oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
+            SUPERCLASS = iMBAbstractController; 
+        }, 
+        {CLASS = iMBPhotoView; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }, 
+        {
+            CLASS = photosAlbumController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oPhotoView = iMBPhotoView; oView = NSView; table = NSTableView; }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
