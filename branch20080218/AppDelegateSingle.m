@@ -43,34 +43,50 @@
 */
 
 
-#import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+#import "AppDelegateSingle.h"
+#import <iMediaBrowser/iMedia.h>
+#import <iMediaBrowser/iMBPhotosView.h>
+#import <iMediaBrowser/iMBMusicView.h>
 
-@class QTMovieView, MUPhotoView;
+@implementation AppDelegateSingle
 
-@interface iMBMoviesController : iMBAbstractController
+- (void)dealloc
 {
-	IBOutlet MUPhotoView	*oPhotoView;
-	IBOutlet NSSlider		*oSlider;
-	IBOutlet NSTextField	*counterField;
-	
-	@private
-	QTMovieView				*previewMovieView;
-	unsigned				movieIndex;
-	NSMutableIndexSet		*mySelection;
-	NSArray					*myImages;
-	NSMutableArray			*myFilteredImages;
-	NSString				*mySearchString;
-	NSMutableArray			*myInFlightImageOperations;
-    NSMutableArray          *myImageRecordsToLoad;
-	NSMutableSet			*myProcessingImages;
-	NSLock					*myCacheLock;
-	NSMutableDictionary		*myImageCache;
-	NSMutableDictionary		*myMetaCache;
-	unsigned int			myThreadCount;
+    [photosView release];
+    [musicView release];
+
+    [super dealloc];
 }
 
-- (IBAction)play:(id)sender;
-- (IBAction)search:(id)sender;
+- (void)awakeFromNib
+{
+    photosView = [[iMBPhotosView alloc] initWithFrame:[photosContainerView bounds]];
+    musicView = [[iMBMusicView alloc] initWithFrame:[musicContainerView bounds]];
+
+    [photosContainerView addSubview:(NSView *)photosView];
+    [musicContainerView addSubview:(NSView *)musicView];
+    
+    [(NSView *)photosView setAutoresizingMask:(NSViewHeightSizable|NSViewWidthSizable)];
+    [(NSView *)musicView setAutoresizingMask:(NSViewHeightSizable|NSViewWidthSizable)];
+    
+    [photosView willActivate];
+    [musicView willActivate];
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+	//id configuration = [iMediaConfiguration sharedConfigurationWithDelegate:self];
+}
+
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+    [photosView didDeactivate];
+    [musicView didDeactivate];
+}
+
+- (BOOL)iMediaConfiguration:(iMediaConfiguration *)configuration willUseMediaParser:(NSString *)parserClassname forMediaType:(NSString *)media;
+{
+	return YES;
+}
 
 @end

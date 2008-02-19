@@ -42,61 +42,66 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+#import <Cocoa/Cocoa.h>
 
-#import "iMBOmniWebParser.h"
-#import "iMBLibraryNode.h"
-#import "iMediaConfiguration.h"
-#import "iMedia.h"
-#import "iMBXBELParser.h"
+#import "iMediaBrowserProtocol.h"
 
-@implementation iMBOmniWebParser
+// Unified name constants for native data in pasteboard
+extern NSString *iMBNativePasteboardFlavor;
+extern NSString *iMBControllerClassName;
+extern NSString *iMBNativeDataArray;
 
-+ (void)load
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	[iMediaConfiguration registerParser:[self class] forMediaType:@"links"];
-	
-	[pool release];
+@class RBSplitView, RBSplitSubview;
+
+@interface iMBAbstractView : NSView <iMediaBrowser> {
+    IBOutlet id                     browserController;
+
+    IBOutlet NSView                 *mediaView;
+
+	IBOutlet RBSplitView            *splitView;
+
+    IBOutlet RBSplitSubview         *libraryContainer;
+    IBOutlet NSOutlineView			*libraryView;
+    IBOutlet NSPopUpButton			*libraryPopUpButton;
+
+    IBOutlet RBSplitSubview         *browserContainer;
+    IBOutlet NSView                 *browserView;
+
+	IBOutlet NSTreeController		*libraryController;
+    
+	IBOutlet NSBox					*loadingView;
+	IBOutlet NSProgressIndicator	*loadingProgressIndicator;
+	IBOutlet NSTextField			*loadingTextField;
+
+    NSLock                          *backgroundLoadingLock;
+
+@private    
+    
+    NSMutableDictionary             *loadedParsers;
+	NSMutableArray					*userDroppedParsers;
+    
+    BOOL inSplitViewResize;
+    BOOL isLoading;
+    BOOL didLoad;
 }
 
-- (id)init
-{
-	NSArray *appSupport = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory,NSUserDomainMask,YES);
-	if (self = [super initWithContentsOfFile:[[appSupport objectAtIndex:0] stringByAppendingPathComponent:@"OmniWeb 5/Bookmarks.html"]])
-	{
-		
-	}
-	return self;
-}
+- (NSImage *)toolbarIcon;
 
-- (iMBLibraryNode *)parseDatabase
-{
-	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
-	NSURL *docURL = [NSURL fileURLWithPath:[self databasePath]];
-	NSURL *xsltURL = [NSURL fileURLWithPath:[bndl pathForResource:@"OmniwebBookmarksToXBEL" ofType:@"xslt"]];
-	NSError *err;
-	NSXMLDocument *xml = [[[NSXMLDocument alloc] initWithContentsOfURL:docURL
-															  options:NSXMLDocumentTidyHTML
-																error:&err] autorelease];
-	xml = [xml objectByApplyingXSLTAtURL:xsltURL
-							   arguments:nil
-								   error:&err];
-	//NSLog(@"%@", [xml XMLStringWithOptions:NSXMLNodePrettyPrint]);
-	iMBLibraryNode *library = nil;
-	
-	if (xml)
-	{
-		library = [[iMBLibraryNode alloc] init];
-		[library setName:LocalizedStringInThisBundle(@"OmniWeb", @"OmniWeb")];
-		[library setIconName:@"com.omnigroup.OmniWeb5"];
-		
-		iMBXBELParser *parser = [[iMBXBELParser alloc] init];
-		[parser parseWithXMLDocument:xml node:library];
-		[parser release];
-	}
+- (NSString *)name;
 
-	return [library autorelease];
-}
+- (IBAction)reload:(id)sender;
+
+// access the playlist menu
+- (NSMenu *)playlistMenu;
+
+- (NSTreeController *)controller;
+- (IBAction)playlistSelected:(id)sender;
+
+- (NSArray*)addCustomFolders:(NSArray*)folders;
+
+- (void)postSelectionChangeNotification:(NSArray *)selectedObjects;
+
+- (void)willActivate;
+- (void)didDeactivate;
 
 @end

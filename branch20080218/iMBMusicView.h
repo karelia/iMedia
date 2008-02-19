@@ -42,35 +42,42 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 #import <Cocoa/Cocoa.h>
-#import "iMediaBrowser.h"
-#import "iMediaBrowserProtocol.h"
 
-// Unified name constants for native data in pasteboard
-extern NSString *iMBNativePasteboardFlavor;
-extern NSString *iMBControllerClassName;
-extern NSString *iMBNativeDataArray;
+#import "iMBAbstractView.h"
 
-@interface iMBAbstractController : NSObject <iMediaBrowser>
-{
-	IBOutlet NSView *oView;
+@class QTMovieView, iMBDNDArrayController;
 
-	@private
-		iMediaBrowser *myBrowser; //not retained
-		NSTreeController *myController;
+@interface iMBMusicView : iMBAbstractView {
+	IBOutlet NSTableView			*table;
+
+	IBOutlet NSTextField			*counterField;
+
+	IBOutlet NSSlider				*progressIndicator;
+	IBOutlet NSButton				*playButton;
+    
+	IBOutlet QTMovieView			*oAudioPlayer;
+    
+	IBOutlet iMBDNDArrayController	*songsController;
+    
+    NSString						*clockTime;
+
+    BOOL finishedInit;
+    
+@private
+    NSTimer * pollTimer;
+    NSMutableDictionary *myCurrentPlayingRecord;
 }
 
-- (id)initWithPlaylistController:(NSTreeController *)ctrl;
-- (NSTreeController *)controller;
+#pragma mark ACCESSORS
+- (NSString *)clockTime;
+- (void)setClockTime:(NSString *)value;
 
-- (void)setBrowser:(iMediaBrowser *)browser;
-- (iMediaBrowser *)browser;
-
-- (void)willActivate;
-
-- (void)postSelectionChangeNotification:(NSArray *)selectedObjects;
-
-- (IBAction)reloadMediaBrowser:(id)sender;
-
+#pragma mark ACTIONS
+- (IBAction) playMovie: (id) sender;
+- (IBAction) stopMovie: (id) sender;
+- (IBAction) scrubAudio: (id) sender;
 @end
+
+extern const NSTimeInterval	k_Scrub_Slider_Update_Interval;
+extern const double			k_Scrub_Slider_Minimum;

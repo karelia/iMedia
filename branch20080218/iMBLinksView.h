@@ -42,36 +42,18 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
 
-@class QTMovieView, iMBDNDArrayController;
+#import "iMBAbstractView.h"
 
-@interface iMBMusicController : iMBAbstractController
-{
-	IBOutlet NSTextField			*counterField;
-	IBOutlet NSButton				*playButton;
-	IBOutlet NSSlider				*progressIndicator;
-	IBOutlet NSSearchField			*oSearch;
+@class iMBDNDArrayController;
+
+@interface iMBLinksView : iMBAbstractView {
 	IBOutlet NSTableView			*table;
-	IBOutlet QTMovieView			*oAudioPlayer;
-	IBOutlet iMBDNDArrayController	*songsController;
-	NSString						*clockTime;
-	@private
-		NSTimer * pollTimer;
-		NSMutableDictionary *myCurrentPlayingRecord;
+    
+	IBOutlet iMBDNDArrayController	*oLinkController;
+    
+    BOOL finishedInit;
 }
 
-#pragma mark ACCESSORS
-- (NSString *)clockTime;
-- (void)setClockTime:(NSString *)value;
-
-#pragma mark ACTIONS
-- (IBAction) playMovie: (id) sender;
-- (IBAction) stopMovie: (id) sender;
-- (IBAction) scrubAudio: (id) sender;
 @end
-
-extern const NSTimeInterval	k_Scrub_Slider_Update_Interval;
-extern const double			k_Scrub_Slider_Minimum;

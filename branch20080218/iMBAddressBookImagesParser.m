@@ -73,7 +73,7 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"photos"];
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"photos"];
 	
 	[pool release];
 }

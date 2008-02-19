@@ -42,9 +42,8 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+#import "iMBPhotosView.h"
 
-#import "iMBPhotosController.h"
-#import "iMediaBrowser.h"
 #import "MUPhotoView.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
@@ -60,7 +59,7 @@
 + (NSImage *)imageWithPath:(NSString *)path boundingBox:(NSSize)boundingBox;
 @end
 
-@interface iMBPhotosController (PrivateAPI)
+@interface iMBPhotosView (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
 - (void)updatePhotoView;
 @end
@@ -68,16 +67,16 @@
 static NSImage *sMissingImage = nil;
 static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initialized with initWithCGImage
 
-@implementation iMBPhotosController
+@implementation iMBPhotosView
 
 + (void)initialize
 {
-	if ( self == [iMBPhotosController class] ) 
+	if ( self == [iMBPhotosView class] ) 
 	{
 		// Only do some work when not called because one of our subclasses does not implement +initialize
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
-	[iMBPhotosController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCountString"];
+	[iMBPhotosView setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+	[iMBPhotosView setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCountString"];
 	
 		// Try to find some NSImageRep class that can be initialized from a CGImage
 		if ([NSBitmapImageRep instancesRespondToSelector:@selector(initWithCGImage:)])
@@ -94,7 +93,7 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 		sNSCGImageRepClass = nil;	// make sure this class will do the job for us!
 	}
 		}
-	NSString *path = [[NSBundle bundleForClass:[iMBPhotosController class]] pathForResource:@"missingImage" ofType:@"png"];
+	NSString *path = [[NSBundle bundleForClass:[iMBPhotosView class]] pathForResource:@"missingImage" ofType:@"png"];
 	sMissingImage = [[NSImage alloc] initWithContentsOfFile:path];
 	if (!sMissingImage)
 		NSLog(@"missingImage.png is missing. This can cause bad things to happen");
@@ -103,40 +102,29 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 }
 }
 
-- (id) initWithPlaylistController:(NSTreeController*)ctrl
+- (id)initWithFrame:(NSRect)frame
 {
-	if (self = [super initWithPlaylistController:ctrl]) {
+    if (self = [super initWithFrame:frame]) {        
 		mySelection = [[NSMutableIndexSet alloc] init];
 		myFilteredImages = [[NSMutableArray alloc] init];
 		myCache = [[NSMutableDictionary dictionary] retain];
 		myCacheLock = [[NSLock alloc] init];
 		myInFlightImageOperations = [[NSMutableArray array] retain];
 		myProcessingImages = [[NSMutableSet set] retain];
-		
-		[self loadNib];
-	}
-	return self;
-}
+        
+        finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
 
-- (void)setBrowser:(iMediaBrowser *)browser	// hook up captions prefs now that we have a browser associated with this controller.
-{
-	[super setBrowser:browser];
-	[oPhotoView setShowCaptions:[browser prefersFilenamesInPhotoBasedBrowsers]];
+		[NSBundle loadNibNamed:@"iPhoto" owner:self];
+    }
+            
+    return self;
 }
-
-- (void)loadNib
-{
-	if (![[NSBundle bundleForClass:[iMBPhotosController class]] loadNibFile:@"iPhoto" 
-														  externalNameTable:[NSDictionary dictionaryWithObjectsAndKeys:self, @"NSOwner", nil] 
-																   withZone:[self zone]])
-	{
-		NSLog(@"iPhoto.nib is missing. This can cause bad things to happen");
-	}
-}
-
 
 - (void)dealloc
 {
+	[counterField unbind:@"displayPatternValue2"];
+	[counterField unbind:@"displayPatternValue1"];
+
 	[mySelection release];
 	[myCache release];
 	[myCacheLock release];
@@ -148,13 +136,15 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 	[mySelectedIndexPath release];
 	[myProcessingImages release];
 	
-	[oView release];
-	
 	[super dealloc];
 }
 
 - (void)awakeFromNib
 {
+    if ( finishedInit )
+    {
+	[super awakeFromNib];
+
 	[oPhotoView setDelegate:self];
 	[oPhotoView setUseOutlineBorder:NO];
 	[oPhotoView setUseHighQualityResize:NO];
@@ -186,6 +176,7 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
 	
 
+    }
 }
 
 - (void)refilter
@@ -243,16 +234,6 @@ static NSImage *_toolbarIcon = nil;
 - (NSString *)name
 {
 	return LocalizedStringInThisBundle(@"Photos", @"Photos media type");
-}
-
-- (void)refresh
-{
-	[super refresh];
-	[self unbind:@"images"];
-	[self bind:@"images" 
-	  toObject:[self controller] 
-		 withKeyPath:@"selection.Images" 
-	   options:nil];
 }
 
 - (void)willActivate
@@ -698,7 +679,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 			[items addObject:cur];
 		}
 	}
-	[self writeItems:items fromAlbum:[[NSBundle bundleForClass:[iMBPhotosController class]] localizedStringForKey:@"Selection" value:@"" table:nil] toPasteboard:pboard];
+	[self writeItems:items fromAlbum:[[NSBundle bundleForClass:[iMBPhotosView class]] localizedStringForKey:@"Selection" value:@"" table:nil] toPasteboard:pboard];
 }
 
 - (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)aIndex

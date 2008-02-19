@@ -42,18 +42,36 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
 
-@class iMBDNDArrayController;
+#import "iMBAbstractView.h"
 
-@interface iMBLinksController : iMBAbstractController
-{	
-	IBOutlet NSTableView			*oLinks;
-	IBOutlet iMBDNDArrayController	*oLinkController;
+@class MUPhotoView, QTMovieView;
+
+@interface iMBMoviesView : iMBAbstractView {
+	IBOutlet MUPhotoView        *oPhotoView;
+	IBOutlet NSSlider           *oSlider;
+	IBOutlet NSTextField        *counterField;
+    
+    BOOL finishedInit;
+    
+@private
+	QTMovieView				*previewMovieView;
+	unsigned				movieIndex;
+	NSMutableIndexSet		*mySelection;
+	NSArray					*myImages;
+	NSMutableArray			*myFilteredImages;
+	NSString				*mySearchString;
+	NSMutableArray			*myInFlightImageOperations;
+    NSMutableArray          *myImageRecordsToLoad;
+	NSMutableSet			*myProcessingImages;
+	NSLock					*myCacheLock;
+	NSMutableDictionary		*myImageCache;
+	NSMutableDictionary		*myMetaCache;
+	unsigned int			myThreadCount;
 }
 
-- (IBAction)openInBrowser:(id)sender;
+- (IBAction)play:(id)sender;
+- (IBAction)search:(id)sender;
 
 @end

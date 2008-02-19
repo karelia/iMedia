@@ -44,7 +44,7 @@
 
 
 #import "iMBiPhotoAbstractParser.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
 

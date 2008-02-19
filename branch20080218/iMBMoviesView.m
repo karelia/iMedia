@@ -42,10 +42,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+#import "iMBMoviesView.h"
 
-#import "iMBMoviesController.h"
 #import <QTKit/QTKit.h>
-#import "iMediaBrowser.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
 #import "MUPhotoView.h"
@@ -53,7 +52,7 @@
 
 #define MAX_POSTER_SIZE (NSMakeSize(240, 180))	// our thumbnail view maxes out at 240.
 
-@interface iMBMoviesController (PrivateAPI)
+@interface iMBMoviesView (PrivateAPI)
 - (NSString *)iconNameForPlaylist:(NSString*)name;
 - (NSArray*) selectedItems;
 - (NSDictionary *)displayableAttributesOfMovie:(QTMovie *)aMovie;
@@ -64,20 +63,20 @@
 - (void)setIdling:(BOOL)state;
 @end
 
-@implementation iMBMoviesController
+@implementation iMBMoviesView
 
 + (void)initialize
 {
-	if ( self == [iMBMoviesController class] ) 
+	if ( self == [iMBMoviesView class] ) 
 	{
 		// Only do some work when not called because one of our subclasses does not implement +initialize
-	[iMBMoviesController setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+	[iMBMoviesView setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
 }
 }
 
-- (id)initWithPlaylistController:(NSTreeController*)ctrl
+- (id)initWithFrame:(NSRect)frame
 {
-	if (self = [super initWithPlaylistController:ctrl]) {
+    if (self = [super initWithFrame:frame]) {
 		mySelection = [[NSMutableIndexSet allocWithZone:[self zone]] init];
 		myFilteredImages = [[NSMutableArray allocWithZone:[self zone]] init];
 		myImageCache = [[NSMutableDictionary dictionary] retain];
@@ -87,6 +86,8 @@
 		myProcessingImages = [[NSMutableSet set] retain];
 		myCacheLock = [[NSLock allocWithZone:[self zone]] init];
         		
+        finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
+
 		[NSBundle loadNibNamed:@"Movies" owner:self];
 	}
 	return self;
@@ -94,6 +95,9 @@
 
 - (void)dealloc
 {
+	[counterField unbind:@"displayPatternValue2"];
+	[counterField unbind:@"displayPatternValue1"];
+
 	[previewMovieView release];
 	[mySelection release];
 	[myImages release];
@@ -118,6 +122,10 @@
 
 - (void)awakeFromNib
 {
+    if ( finishedInit )
+    {
+        [super awakeFromNib];
+        
 	[oPhotoView setDelegate:self];
 	[oPhotoView setUseOutlineBorder:NO];
 	[oPhotoView setUseHighQualityResize:NO];
@@ -127,6 +135,8 @@
 	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
 	[oPhotoView setPhotoHorizontalSpacing:15];
 	[oPhotoView setPhotoVerticalSpacing:15];
+        
+	[oPhotoView setShowCaptions:[[iMediaConfiguration sharedConfiguration] prefersFilenamesInPhotoBasedBrowsers]];
 
 	NSDictionary *optionsDict =
 	[NSDictionary dictionaryWithObject:@"%{value1}@ %{value2}@"  
@@ -142,12 +152,7 @@
 		   withKeyPath:@"imageCountPluralityAdjustedString"
 			   options:optionsDict];
 	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
-}
-
-- (void)setBrowser:(iMediaBrowser *)browser	// hook up captions prefs now that we have a browser associated with this controller.
-{
-	[super setBrowser:browser];
-	[oPhotoView setShowCaptions:[browser prefersFilenamesInPhotoBasedBrowsers]];
+    }
 }
 
 - (IBAction)play:(id)sender
@@ -269,18 +274,6 @@
 	return NSClassFromString(@"iMBMoviesFolder");
 }
 
-- (void)refresh
-{
-	[super refresh];
-	[self unbind:@"images"];
-	[previewMovieView pause:self];
-	[previewMovieView removeFromSuperview];
-	[self bind:@"images" 
-	  toObject:[self controller] 
-		 withKeyPath:@"selection.Movies" 
-	   options:nil];
-}
-
 - (void)willActivate
 {
 	[super willActivate];
@@ -288,7 +281,6 @@
 	  toObject:[self controller] 
 		 withKeyPath:@"selection.Movies" 
 	   options:nil];
-	[[oPhotoView window] makeFirstResponder:oPhotoView];
 }
 
 - (void)didDeactivate
@@ -297,6 +289,7 @@
 	[previewMovieView pause:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[previewMovieView removeFromSuperview];
+    [super didDeactivate];
 }
 
 

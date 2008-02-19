@@ -71,7 +71,9 @@ static NSImage *sDRMIcon = nil;
 + (void)load	// registration of this class
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
+    
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"music"];
+
 	[pool release];
 }
 
@@ -121,7 +123,7 @@ static NSImage *sDRMIcon = nil;
    
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;
-	NSArray *excludedFolders = [[iMediaBrowser sharedBrowserWithoutLoading] excludedFolders];
+	NSArray *excludedFolders = [[iMediaConfiguration sharedConfiguration] excludedFolders];
    
 	NSString *currentFile;
 	while (currentFile = [e nextObject])

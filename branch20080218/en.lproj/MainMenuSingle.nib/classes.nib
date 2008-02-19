@@ -1,47 +1,40 @@
 {
     IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {takePhotoSizeFrom = id; }; 
-            CLASS = MUPhotoView; 
+            CLASS = AppDelegateSingle; 
             LANGUAGE = ObjC; 
-            OUTLETS = {delegate = id; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {
-            CLASS = iMBAbstractController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {oView = NSView; }; 
+            OUTLETS = {
+                musicContainerView = NSView; 
+                musicView = id; 
+                photosContainerView = NSView; 
+                photosView = id; 
+            }; 
             SUPERCLASS = NSObject; 
         }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
+            ACTIONS = {playlistSelected = id; reload = id; }; 
             CLASS = iMBAbstractView; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 browserContainer = RBSplitSubview; 
                 browserController = id; 
                 browserView = NSView; 
+                libraryContainer = RBSplitSubview; 
                 libraryController = NSTreeController; 
+                libraryPopUpButton = NSPopUpButton; 
+                libraryView = NSOutlineView; 
                 loadingProgressIndicator = NSProgressIndicator; 
                 loadingTextField = NSTextField; 
                 loadingView = NSBox; 
-                outlineContainer = RBSplitSubview; 
-                outlinePopUpButton = NSPopUpButton; 
-                outlineView = NSOutlineView; 
+                mediaView = NSView; 
                 splitView = RBSplitView; 
             }; 
             SUPERCLASS = NSView; 
         }, 
         {
             ACTIONS = {search = id; }; 
-            CLASS = iMBContactsController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
-            SUPERCLASS = iMBAbstractController; 
-        }, 
-        {
-            CLASS = iMBContactsView; 
+            CLASS = iMBPhotosView; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 countTextField = NSTextField; 
@@ -49,8 +42,7 @@
                 sizeSlider = NSSlider; 
             }; 
             SUPERCLASS = iMBAbstractView; 
-        }, 
-        {CLASS = iMBPhotoView; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }
+        }
     ); 
     IBVersion = 1; 
 }

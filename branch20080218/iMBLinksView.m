@@ -42,16 +42,15 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
-#import "iMBLinksController.h"
-#import "iMBLibraryNode.h"
+#import "iMBLinksView.h"
 #import "iMedia.h"
 
-@implementation iMBLinksController
+@implementation iMBLinksView
 
-- (id)initWithPlaylistController:(NSTreeController *)ctrl
+- (id)initWithFrame:(NSRect)frame
 {
-	if (self = [super initWithPlaylistController:ctrl]) {
+	if (self = [super initWithFrame:frame]) {
+		finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
 		[NSBundle loadNibNamed:@"Links" owner:self];
 	}
 	return self;
@@ -59,7 +58,12 @@
 
 - (void)awakeFromNib
 {
+    if ( finishedInit )
+    {
+	[super awakeFromNib];
+
 	[oLinkController setDelegate:self];
+    }
 }
 
 - (NSString *)mediaType
@@ -83,16 +87,6 @@ static NSImage *_toolbarIcon = nil;
 - (NSString *)name
 {
 	return LocalizedStringInThisBundle(@"Links", @"Name of Data Type");
-}
-
-- (NSView *)browserView
-{
-	return oView;
-}
-
-- (void)didDeactivate
-{
-	
 }
 
 - (BOOL)tableView:(NSTableView *)tv

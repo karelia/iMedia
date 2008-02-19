@@ -46,7 +46,7 @@
 #import "iMBFireFoxParser.h"
 #import <WebKit/WebKit.h>
 #import "iMBLibraryNode.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import "iMedia.h"
 
 // Some of this code is used from the Shiira Project - BSD Licensed
@@ -57,7 +57,7 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	//[iMediaBrowser registerParser:[self class] forMediaType:@"links"];
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"links"];
 	
 	[pool release];
 }

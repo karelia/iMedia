@@ -42,9 +42,8 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+#import "iMBMusicView.h"
 
-#import "iMBMusicController.h"
-#import "iMediaBrowser.h"
 #import "iMBDNDArrayController.h"
 #import "TimeValueTransformer.h"
 #import "iMBLibraryNode.h"
@@ -57,7 +56,7 @@ extern NSString *Time_Display_String( int Number_Of_Seconds );
 const NSTimeInterval	k_Scrub_Slider_Update_Interval = 0.1;
 const double		k_Scrub_Slider_Minimum = 0.0;
 
-@interface iMBMusicController (PrivateApi)
+@interface iMBMusicView (PrivateApi)
 
 - (BOOL)loadAudioFile: (NSString *) path;
 - (NSString*)iconNameForPlaylist:(NSString*)name;
@@ -65,7 +64,7 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 
 @end
 
-@implementation iMBMusicController
+@implementation iMBMusicView
 
 + (void)load
 {
@@ -77,15 +76,18 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 	[pool release];
 }
 
-- (id) initWithPlaylistController:(NSTreeController*)ctrl
+- (id)initWithFrame:(NSRect)frame
 {
-	if (self = [super initWithPlaylistController:ctrl]) {
+    if (self = [super initWithFrame:frame]) {
+        finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
 		[NSBundle loadNibNamed:@"iTunes" owner:self];
 	}
 	return self;
 }
 
 - (void) dealloc {
+	[counterField unbind:@"displayPatternValue2"];
+	[counterField unbind:@"displayPatternValue1"];
 	[clockTime release];
 	[pollTimer release];
 	[myCurrentPlayingRecord release];
@@ -94,6 +96,10 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 
 - (void)awakeFromNib
 {
+    if ( finishedInit )
+    {
+	[super awakeFromNib];
+
 	[songsController setDelegate:self];
 	
 	[[[table tableColumnWithIdentifier:@"Name"] headerCell] setStringValue:
@@ -117,6 +123,7 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 		   withKeyPath:@"tracksCountPluralityAdjustedString"
 			   options:optionsDict];
 	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
+    }
 }
 
 #pragma mark Protocol Methods
@@ -158,19 +165,9 @@ static NSImage *_toolbarIcon = nil;
 	return NSClassFromString(@"iMBMusicFolder");
 }
 
-- (void)refresh
-{
-	[super refresh];
-	[self unbind:@"selectionChanged"];
-	[self stopMovie:self];
-	[self bind:@"selectionChanged" 
-	  toObject:songsController
-		 withKeyPath:@"selectedObjects" 
-	   options:nil];
-}
-
 - (void)willActivate
 {
+    [super willActivate];
 	[self bind:@"selectionChanged" 
 	  toObject:songsController
 		 withKeyPath:@"selectedObjects" 
@@ -184,6 +181,7 @@ static NSImage *_toolbarIcon = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 													name:QTMovieTimeDidChangeNotification
 												  object:nil];
+	[super didDeactivate];
 }
 
 - (void)writePlaylist:(iMBLibraryNode *)playlist toPasteboard:(NSPasteboard *)pboard

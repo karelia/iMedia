@@ -42,24 +42,25 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
+
+#import "iMBAbstractView.h"
 
 @class MUPhotoView;
 
-@interface iMBContactsController : iMBAbstractController 
-{
-	IBOutlet MUPhotoView *oPhotoView;
-	IBOutlet NSSlider *oSlider;
-	IBOutlet NSTextField	*counterField;
-	
-	NSMutableIndexSet		*mySelection;
+@interface iMBContactsView : iMBAbstractView {
+	IBOutlet MUPhotoView        *photoView;
+    
+	IBOutlet NSSlider           *sizeSlider;
+	IBOutlet NSTextField        *countTextField;
+    
+    BOOL finishedInit;
+
+@private    
+    NSMutableIndexSet		*mySelection;
 	NSArray					*myImages;
 	NSMutableArray			*myFilteredImages;
 	NSString				*mySearchString;
 }
-
-- (IBAction)search:(id)sender;
 
 @end

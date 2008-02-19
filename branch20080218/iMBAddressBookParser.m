@@ -45,7 +45,7 @@
 
 #import "iMBAddressBookParser.h"
 #import "iMBLibraryNode.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import <AddressBook/AddressBook.h>
 #import "iMedia.h"
 
@@ -54,7 +54,9 @@
 + (void)load
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	[iMediaBrowser registerParser:[self class] forMediaType:@"contacts"];
+
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"contacts"];
+
 	[pool release];
 }
 

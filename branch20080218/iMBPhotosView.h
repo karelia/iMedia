@@ -42,61 +42,34 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+#import <Cocoa/Cocoa.h>
 
-#import "iMBOmniWebParser.h"
-#import "iMBLibraryNode.h"
-#import "iMediaConfiguration.h"
-#import "iMedia.h"
-#import "iMBXBELParser.h"
+#import "iMBAbstractView.h"
 
-@implementation iMBOmniWebParser
+@class MUPhotoView;
 
-+ (void)load
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	[iMediaConfiguration registerParser:[self class] forMediaType:@"links"];
-	
-	[pool release];
+@interface iMBPhotosView : iMBAbstractView {
+	IBOutlet MUPhotoView        *oPhotoView;
+    
+	IBOutlet NSSlider           *oSlider;
+	IBOutlet NSTextField        *counterField;
+
+    BOOL finishedInit;
+    
+@private    
+    NSMutableDictionary		*myCache;
+	NSMutableIndexSet		*mySelection;
+	NSArray					*myImages;
+	NSDictionary			*myImageDict;
+	NSMutableArray			*myFilteredImages;
+	NSString				*mySearchString;
+	NSLock					*myCacheLock;
+	NSMutableArray			*myInFlightImageOperations;
+	NSMutableSet			*myProcessingImages;
+	int						myThreadCount;
+	NSIndexPath				*mySelectedIndexPath;
 }
 
-- (id)init
-{
-	NSArray *appSupport = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory,NSUserDomainMask,YES);
-	if (self = [super initWithContentsOfFile:[[appSupport objectAtIndex:0] stringByAppendingPathComponent:@"OmniWeb 5/Bookmarks.html"]])
-	{
-		
-	}
-	return self;
-}
-
-- (iMBLibraryNode *)parseDatabase
-{
-	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
-	NSURL *docURL = [NSURL fileURLWithPath:[self databasePath]];
-	NSURL *xsltURL = [NSURL fileURLWithPath:[bndl pathForResource:@"OmniwebBookmarksToXBEL" ofType:@"xslt"]];
-	NSError *err;
-	NSXMLDocument *xml = [[[NSXMLDocument alloc] initWithContentsOfURL:docURL
-															  options:NSXMLDocumentTidyHTML
-																error:&err] autorelease];
-	xml = [xml objectByApplyingXSLTAtURL:xsltURL
-							   arguments:nil
-								   error:&err];
-	//NSLog(@"%@", [xml XMLStringWithOptions:NSXMLNodePrettyPrint]);
-	iMBLibraryNode *library = nil;
-	
-	if (xml)
-	{
-		library = [[iMBLibraryNode alloc] init];
-		[library setName:LocalizedStringInThisBundle(@"OmniWeb", @"OmniWeb")];
-		[library setIconName:@"com.omnigroup.OmniWeb5"];
-		
-		iMBXBELParser *parser = [[iMBXBELParser alloc] init];
-		[parser parseWithXMLDocument:xml node:library];
-		[parser release];
-	}
-
-	return [library autorelease];
-}
+- (IBAction)search:(id)sender;
 
 @end

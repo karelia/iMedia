@@ -44,37 +44,17 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractController.h"
 
-@class MUPhotoView;
+@protocol iMediaBrowser;
 
-@interface iMBPhotosController : iMBAbstractController
+@interface AppDelegateSingle : NSObject 
 {
-	IBOutlet MUPhotoView	*oPhotoView;
-	IBOutlet NSSlider		*oSlider;
-	IBOutlet NSTextField	*counterField;
-
-	NSMutableDictionary		*myCache;
-	NSMutableIndexSet		*mySelection;
-	NSArray					*myImages;
-	NSDictionary			*myImageDict;
-	NSMutableArray			*myFilteredImages;
-	NSString				*mySearchString;
-	NSLock					*myCacheLock;
-	NSMutableArray			*myInFlightImageOperations;
-	NSMutableSet			*myProcessingImages;
-	int						myThreadCount;
-	NSIndexPath				*mySelectedIndexPath;
+    IBOutlet NSView *photosContainerView;
+    IBOutlet NSView *musicContainerView;
+    
+@private
+    id <iMediaBrowser> photosView;
+    id <iMediaBrowser> musicView;
 }
-
-- (void)loadNib;
-
-- (IBAction)search:(id)sender;
-- (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard;
-
-- (void)clearCache;
-
-- (void)setImages:(NSArray *)images;
-- (NSArray *)images;
 
 @end

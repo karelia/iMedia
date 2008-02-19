@@ -9,6 +9,24 @@
             SUPERCLASS = NSObject; 
         }, 
         {
+            CLASS = iMBAbstractView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                browserContainer = RBSplitSubview; 
+                browserController = id; 
+                browserView = NSView; 
+                libraryController = NSTreeController; 
+                loadingProgressIndicator = NSProgressIndicator; 
+                loadingTextField = NSTextField; 
+                loadingView = NSBox; 
+                outlineContainer = RBSplitSubview; 
+                outlinePopUpButton = NSPopUpButton; 
+                outlineView = NSOutlineView; 
+                splitView = RBSplitView; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
             ACTIONS = {search = id; }; 
             CLASS = iMBDNDArrayController; 
             LANGUAGE = ObjC; 
@@ -29,6 +47,20 @@
                 table = NSTableView; 
             }; 
             SUPERCLASS = iMBAbstractController; 
+        }, 
+        {
+            ACTIONS = {playMovie = id; scrubAudio = id; stopMovie = id; }; 
+            CLASS = iMBMusicView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                counterField = NSTextField; 
+                oAudioPlayer = QTMovieView; 
+                playButton = NSButton; 
+                progressIndicator = NSSlider; 
+                songsController = iMBDNDArrayController; 
+                table = NSTableView; 
+            }; 
+            SUPERCLASS = iMBAbstractView; 
         }, 
         {
             ACTIONS = {

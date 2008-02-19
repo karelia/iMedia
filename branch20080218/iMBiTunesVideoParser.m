@@ -44,7 +44,7 @@
 
 
 #import "iMBiTunesVideoParser.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "QTMovie+iMedia.h"
 #import "iMedia.h"
@@ -56,7 +56,9 @@
 + (void)load
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	[iMediaBrowser registerParser:[self class] forMediaType:@"movies"];
+
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"movies"];
+
 	[pool release];
 }
 
