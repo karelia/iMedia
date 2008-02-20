@@ -69,6 +69,8 @@
     NSMutableDictionary *myCurrentPlayingRecord;
 }
 
+- (IBAction)search:(id)sender;
+
 #pragma mark ACCESSORS
 - (NSString *)clockTime;
 - (void)setClockTime:(NSString *)value;

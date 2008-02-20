@@ -49,7 +49,7 @@
             SUPERCLASS = iMBAbstractController; 
         }, 
         {
-            ACTIONS = {playMovie = id; scrubAudio = id; stopMovie = id; }; 
+            ACTIONS = {playMovie = id; scrubAudio = id; search = id; stopMovie = id; }; 
             CLASS = iMBMusicView; 
             LANGUAGE = ObjC; 
             OUTLETS = {

@@ -38,8 +38,6 @@ Known issue: custom parsers are not loaded.
 
 Known issue: activate and deactive may not be handled correctly in all cases.
 
-Known issue: search field in music browser does not work.
-
 Known issue: no attempt was made to update the previously and still non-working contacts view.
 
 Known issue: many minor code formatting issues to make diff easier to read.
