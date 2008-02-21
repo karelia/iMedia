@@ -32,8 +32,6 @@ The code in iMediaBrowser has been split out into iMBAbstractView and iMediaConf
 It is also possible to compare the older iMBxxxController.m with iMBxxxView.m with a command something like this:
 diff -u iMBPhotosView.m ../imedia-trunk/iMBPhotosController.m
 
-Known issue: the iMediaTesterSingle does not properly save the selected views.
-
 Known issue: custom parsers are not loaded.
 
 Known issue: activate and deactive may not be handled correctly in all cases.

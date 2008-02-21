@@ -457,6 +457,8 @@ static NSMutableArray *_browserClasses = nil;
 
 - (void)appWillQuit:(NSNotification *)notification
 {
+	// TODO: Saving the defaults should be handled in didDeactivate rather than here.
+
 	//we want to save the current selection to UD
 	NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
 	NSIndexPath *selection = [[mySelectedBrowser controller] selectionIndexPath];
@@ -502,6 +504,8 @@ static NSMutableArray *_browserClasses = nil;
     NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]]];
     if (nil != mySelectedBrowser)
     {
+        // TODO: Saving the defaults should be handled in didDeactivate rather than here.
+
         //we want to save the current selection to UD
         NSIndexPath *selection = [[mySelectedBrowser controller] selectionIndexPath];
         NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
