@@ -707,6 +707,10 @@ static NSMutableArray *_browserClasses = nil;
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotification
 {
+	// TODO: Why is this needed? It does not update the photos without it. But why?
+
+	// the browser will already be active; to balance calls, call deactivate first.
+	[mySelectedBrowser didDeactivate];
 	[mySelectedBrowser willActivate];
 }
 
