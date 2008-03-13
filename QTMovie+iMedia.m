@@ -57,7 +57,7 @@
 // Get current time, or poster time, or <1 minute in
 
 #define CONST_SECONDS (32)
-
+/*
 - (NSImage *)betterPosterImage;
 {
 	NSDictionary *attr = [self movieAttributes];
@@ -139,7 +139,7 @@
     [newImage unlockFocus];
     return [newImage autorelease];
 }
-
+*/
 - (BOOL) isDRMProtected
 {
 	BOOL isProtected = NO;
@@ -306,7 +306,7 @@ bail:
 	
 	*aQTTime = QTMakeTime(timeValue, timeScaleValue);
 }
-
+/*
 // return the movie file path
 - (NSString *)movieFilePath
 {
@@ -325,5 +325,5 @@ bail:
 	NSArray *pathComponents = [fullPath componentsSeparatedByString:@"/"];
 	return ([pathComponents objectAtIndex:([pathComponents count] - 1)]);
 }
-
+*/
 @end

@@ -9,6 +9,17 @@
 /* Begin PBXBuildFile section */
 		3C3A131E09EAFB8100AF41BF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3C3A131C09EAFB8100AF41BF /* Localizable.strings */; };
 		3C6355470C91B1210045E9E0 /* iMedia.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 3C6355460C91B1210045E9E0 /* iMedia.tiff */; };
+		5B1AA72B0D6C72CA003585CD /* MovieCache.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 5B1AA7240D6C72CA003585CD /* MovieCache.xcdatamodel */; };
+		5B1AA7310D6C72CA003585CD /* minimovie.atomdata in Resources */ = {isa = PBXBuildFile; fileRef = 5B1AA72A0D6C72CA003585CD /* minimovie.atomdata */; };
+		5B1AA7430D6C738B003585CD /* movietool.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B1AA7250D6C72CA003585CD /* movietool.m */; };
+		5B1AA7450D6C739E003585CD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		5B1AA7460D6C73A0003585CD /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
+		5B1AA7470D6C73A0003585CD /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
+		5B1AA74B0D6C740C003585CD /* movietool in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5B1AA73A0D6C7320003585CD /* movietool */; };
+		5B29F2850D6D726F0045CD86 /* iMBMovieCacheDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B1AA7290D6C72CA003585CD /* iMBMovieCacheDB.m */; };
+		5B29F28A0D6D72960045CD86 /* iMBMovieReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B1AA7270D6C72CA003585CD /* iMBMovieReference.m */; };
+		5B29F47C0D6EB38B0045CD86 /* iMBMovieReference.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B1AA7260D6C72CA003585CD /* iMBMovieReference.h */; };
+		5B29F47D0D6EB38C0045CD86 /* iMBMovieCacheDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B1AA7280D6C72CA003585CD /* iMBMovieCacheDB.h */; };
 		5B3AD87D0B5BA2A600C971A0 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97630975D4970071B2E0 /* MainMenu.nib */; };
 		5BE025270B5CE1FA0073DCF8 /* iMBiTunesVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */; };
 		5BE025280B5CE1FB0073DCF8 /* iMBiTunesVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 7990CD5809D75D4A00AD74BA /* iMBiTunesVideoParser.h */; };
@@ -107,7 +118,6 @@
 		796AC0300A28582200EF92DB /* NSAttributedString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 796AC02E0A28582200EF92DB /* NSAttributedString+iMedia.m */; };
 		796ADBC109D6562C001CF400 /* iMBAbstractController.h in Headers */ = {isa = PBXBuildFile; fileRef = 796ADBBF09D6562C001CF400 /* iMBAbstractController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		796ADBC209D6562C001CF400 /* iMBAbstractController.m in Sources */ = {isa = PBXBuildFile; fileRef = 796ADBC009D6562C001CF400 /* iMBAbstractController.m */; };
-		796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 796ADBE109D65986001CF400 /* CoreData.framework */; };
 		798E476E0A27CD8800E0D4BC /* NSFileManager+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E476C0A27CD8800E0D4BC /* NSFileManager+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		798E476F0A27CD8800E0D4BC /* NSFileManager+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 798E476D0A27CD8800E0D4BC /* NSFileManager+iMedia.m */; };
 		798E493D0A27E87900E0D4BC /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 798E493C0A27E87900E0D4BC /* WebIconDatabase.h */; };
@@ -166,8 +176,6 @@
 		CE1116F90B69593D00783570 /* iMBScreenSaverPicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE11152D0B6953C800783570 /* iMBScreenSaverPicturesParser.h */; };
 		CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE1117DD0B695D8F00783570 /* iMBiChatIconsParser.h */; };
 		CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1117DE0B695D8F00783570 /* iMBiChatIconsParser.m */; };
-		CE3F200B0B8646A000A1CD2A /* NSURLCache+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3F20090B8646A000A1CD2A /* NSURLCache+iMedia.h */; };
-		CE3F200C0B8646A000A1CD2A /* NSURLCache+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */; };
 		CE52AD7F0B7D21D800DA5F23 /* iPhoto.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD790B7D21D800DA5F23 /* iPhoto.nib */; };
 		CE52AD800B7D21D800DA5F23 /* iTunes.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7A0B7D21D800DA5F23 /* iTunes.nib */; };
 		CE52AD820B7D21D800DA5F23 /* Links.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7C0B7D21D800DA5F23 /* Links.nib */; };
@@ -227,6 +235,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5B1AA7490D6C7400003585CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5B1AA7390D6C7320003585CD;
+			remoteInfo = movietool;
+		};
 		791F97340975D3600071B2E0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -260,6 +275,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
+				5B1AA74B0D6C740C003585CD /* movietool in CopyFiles */,
 				FD2EB01E0C69837300023B2E /* MetadataTool in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -277,6 +293,14 @@
 		3C3A131D09EAFB8100AF41BF /* en */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; lineEnding = 0; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3C6355460C91B1210045E9E0 /* iMedia.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = iMedia.tiff; sourceTree = "<group>"; };
 		5B0628CF0AEDF38300419AEB /* sv */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; lineEnding = 0; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
+		5B1AA7240D6C72CA003585CD /* MovieCache.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = MovieCache.xcdatamodel; sourceTree = "<group>"; };
+		5B1AA7250D6C72CA003585CD /* movietool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = movietool.m; sourceTree = "<group>"; };
+		5B1AA7260D6C72CA003585CD /* iMBMovieReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMovieReference.h; sourceTree = "<group>"; };
+		5B1AA7270D6C72CA003585CD /* iMBMovieReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMovieReference.m; sourceTree = "<group>"; };
+		5B1AA7280D6C72CA003585CD /* iMBMovieCacheDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBMovieCacheDB.h; sourceTree = "<group>"; };
+		5B1AA7290D6C72CA003585CD /* iMBMovieCacheDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBMovieCacheDB.m; sourceTree = "<group>"; };
+		5B1AA72A0D6C72CA003585CD /* minimovie.atomdata */ = {isa = PBXFileReference; comments = "This is an archive of an AtomContainer for the QuickTime export settings.\n\nIt specifies a QuickTime movie with jp2 compression and a 2 frames per second framerate.\n"; lastKnownFileType = file; path = minimovie.atomdata; sourceTree = "<group>"; };
+		5B1AA73A0D6C7320003585CD /* movietool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = movietool; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B3AD8600B5BA23800C971A0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		7903561009E3AF7B00384D08 /* iMBContactsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMBContactsController.h; sourceTree = "<group>"; };
 		7903561109E3AF7B00384D08 /* iMBContactsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iMBContactsController.m; sourceTree = "<group>"; };
@@ -465,8 +489,6 @@
 		CE11337A0B69BC9B00783570 /* iMBAddressBookImagesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMBAddressBookImagesParser.h; sourceTree = "<group>"; };
 		CE11337B0B69BC9B00783570 /* iMBAddressBookImagesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iMBAddressBookImagesParser.m; sourceTree = "<group>"; };
 		CE1AD3860A7E83F20083C01E /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; lineEnding = 0; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CE3F20090B8646A000A1CD2A /* NSURLCache+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSURLCache+iMedia.h"; sourceTree = "<group>"; };
-		CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSURLCache+iMedia.m"; sourceTree = "<group>"; };
 		CE4E78F30C5E76F30044A5F9 /* da */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = da; path = da.lproj/Info.html; sourceTree = "<group>"; };
 		CE4E79090C5E76F90044A5F9 /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = de; path = de.lproj/Info.html; sourceTree = "<group>"; };
 		CE4E790A0C5E76FF0044A5F9 /* fr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = fr; path = fr.lproj/Info.html; sourceTree = "<group>"; };
@@ -532,6 +554,16 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5B1AA7380D6C7320003585CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B1AA7450D6C739E003585CD /* Cocoa.framework in Frameworks */,
+				5B1AA7460D6C73A0003585CD /* QTKit.framework in Frameworks */,
+				5B1AA7470D6C73A0003585CD /* QuickTime.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		791679FC0975255000D9EF74 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -541,7 +573,6 @@
 				79167A6A09752C3300D9EF74 /* Cocoa.framework in Frameworks */,
 				79167A6B09752C3300D9EF74 /* QuickTime.framework in Frameworks */,
 				795F7B2509D4D5E5000F21B5 /* WebKit.framework in Frameworks */,
-				796ADBF309D65986001CF400 /* CoreData.framework in Frameworks */,
 				7903562D09E3B45F00384D08 /* AddressBook.framework in Frameworks */,
 				79353E6D0A28754C00284715 /* libcrypto.dylib in Frameworks */,
 				CEE57B550C4D3F4800FCE138 /* QuartzCore.framework in Frameworks */,
@@ -619,6 +650,7 @@
 				8D1107320486CEB800E47090 /* iMediaTester.app */,
 				791679FE0975255000D9EF74 /* iMediaBrowser.framework */,
 				FD8EE5BC0C697C6C00E425BB /* MetadataTool */,
+				5B1AA73A0D6C7320003585CD /* movietool */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -632,6 +664,7 @@
 				CE98A0CB097DC5DA00757094 /* Application */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				FD8EE6070C697CA600E425BB /* MetadataTool */,
+				5B1AA7230D6C72CA003585CD /* MovieCache */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -684,6 +717,20 @@
 				3C371B0009AD502700501C1F /* Framework Release.xcconfig */,
 			);
 			name = "Xcode Configurations";
+			sourceTree = "<group>";
+		};
+		5B1AA7230D6C72CA003585CD /* MovieCache */ = {
+			isa = PBXGroup;
+			children = (
+				5B1AA7240D6C72CA003585CD /* MovieCache.xcdatamodel */,
+				5B1AA7250D6C72CA003585CD /* movietool.m */,
+				5B1AA7260D6C72CA003585CD /* iMBMovieReference.h */,
+				5B1AA7270D6C72CA003585CD /* iMBMovieReference.m */,
+				5B1AA7280D6C72CA003585CD /* iMBMovieCacheDB.h */,
+				5B1AA7290D6C72CA003585CD /* iMBMovieCacheDB.m */,
+				5B1AA72A0D6C72CA003585CD /* minimovie.atomdata */,
+			);
+			name = MovieCache;
 			sourceTree = "<group>";
 		};
 		7953E6450A2E896700C7AFBB /* Photo */ = {
@@ -818,8 +865,6 @@
 				79FA0F5E0A2E7D1500461872 /* NSSlider+iMedia.m */,
 				793810460A33AC53000A65EA /* NSProcessInfo+iMedia.h */,
 				793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */,
-				CE3F20090B8646A000A1CD2A /* NSURLCache+iMedia.h */,
-				CE3F200A0B8646A000A1CD2A /* NSURLCache+iMedia.m */,
 				8FA5F2900D17FE560060232A /* CIImage+iMedia.h */,
 				8FA5F2910D17FE560060232A /* CIImage+iMedia.m */,
 			);
@@ -1075,18 +1120,35 @@
 				CE1116F90B69593D00783570 /* iMBScreenSaverPicturesParser.h in Headers */,
 				CE1117DF0B695D8F00783570 /* iMBiChatIconsParser.h in Headers */,
 				CEFC515F0B792C11009F114D /* iMBPlacardScrollView.h in Headers */,
-				CE3F200B0B8646A000A1CD2A /* NSURLCache+iMedia.h in Headers */,
 				CEC915010B97648C0072492B /* iMBiPhotoAbstractParser.h in Headers */,
 				CEE57B070C4D3C4A00FCE138 /* NSWindow_Flipr.h in Headers */,
 				CEE57B2B0C4D3C9300FCE138 /* iMBBackgroundImageView.h in Headers */,
 				CEE57B2D0C4D3C9300FCE138 /* iMBHoverButton.h in Headers */,
 				FD2EB2730C69A0BF00023B2E /* MetadataUtility.h in Headers */,
+				5B29F47C0D6EB38B0045CD86 /* iMBMovieReference.h in Headers */,
+				5B29F47D0D6EB38C0045CD86 /* iMBMovieCacheDB.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		5B1AA7390D6C7320003585CD /* movietool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5B1AA7420D6C733E003585CD /* Build configuration list for PBXNativeTarget "movietool" */;
+			buildPhases = (
+				5B1AA7370D6C7320003585CD /* Sources */,
+				5B1AA7380D6C7320003585CD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = movietool;
+			productName = movietool;
+			productReference = 5B1AA73A0D6C7320003585CD /* movietool */;
+			productType = "com.apple.product-type.tool";
+		};
 		791679FD0975255000D9EF74 /* iMediaBrowser */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 79167A000975255100D9EF74 /* Build configuration list for PBXNativeTarget "iMediaBrowser" */;
@@ -1101,6 +1163,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				5B1AA74A0D6C7400003585CD /* PBXTargetDependency */,
 				FD8EE6090C697CC400E425BB /* PBXTargetDependency */,
 			);
 			name = iMediaBrowser;
@@ -1170,6 +1233,7 @@
 				8D1107260486CEB800E47090 /* iMediaTester */,
 				791679FD0975255000D9EF74 /* iMediaBrowser */,
 				FD8EE5BB0C697C6C00E425BB /* MetadataTool */,
+				5B1AA7390D6C7320003585CD /* movietool */,
 			);
 		};
 /* End PBXProject section */
@@ -1243,6 +1307,7 @@
 				CEE57B0C0C4D3C7300FCE138 /* i2.tiff in Resources */,
 				CEE57B900C4D420A00FCE138 /* Info.html in Resources */,
 				3C6355470C91B1210045E9E0 /* iMedia.tiff in Resources */,
+				5B1AA7310D6C72CA003585CD /* minimovie.atomdata in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1275,6 +1340,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5B1AA7370D6C7320003585CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B1AA7430D6C738B003585CD /* movietool.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		791679FB0975255000D9EF74 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1338,12 +1411,14 @@
 				CE1116F80B69593D00783570 /* iMBScreenSaverPicturesParser.m in Sources */,
 				CE1117E00B695D8F00783570 /* iMBiChatIconsParser.m in Sources */,
 				CEFC51600B792C11009F114D /* iMBPlacardScrollView.m in Sources */,
-				CE3F200C0B8646A000A1CD2A /* NSURLCache+iMedia.m in Sources */,
 				CEC915020B97648C0072492B /* iMBiPhotoAbstractParser.m in Sources */,
 				CEE57B080C4D3C4A00FCE138 /* NSWindow_Flipr.m in Sources */,
 				CEE57B2C0C4D3C9300FCE138 /* iMBBackgroundImageView.m in Sources */,
 				CEE57B2E0C4D3C9300FCE138 /* iMBHoverButton.m in Sources */,
 				FD2EB2740C69A0BF00023B2E /* MetadataUtility.m in Sources */,
+				5B1AA72B0D6C72CA003585CD /* MovieCache.xcdatamodel in Sources */,
+				5B29F2850D6D726F0045CD86 /* iMBMovieCacheDB.m in Sources */,
+				5B29F28A0D6D72960045CD86 /* iMBMovieReference.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1368,6 +1443,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5B1AA74A0D6C7400003585CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5B1AA7390D6C7320003585CD /* movietool */;
+			targetProxy = 5B1AA7490D6C7400003585CD /* PBXContainerItemProxy */;
+		};
 		791F97350975D3600071B2E0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 791679FD0975255000D9EF74 /* iMediaBrowser */;
@@ -1448,6 +1528,33 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		5B1AA73C0D6C7320003585CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				INSTALL_PATH = "@executable_path/../Contents/MacOS";
+				PRODUCT_NAME = movietool;
+			};
+			name = Debug;
+		};
+		5B1AA73D0D6C7320003585CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				INSTALL_PATH = "@executable_path/../Contents/MacOS";
+				PRODUCT_NAME = movietool;
+			};
+			name = Release;
+		};
+		5B1AA73E0D6C7320003585CD /* Plugin */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INSTALL_PATH = "@executable_path/../Contents/MacOS";
+				PRODUCT_NAME = movietool;
+			};
+			name = Plugin;
+		};
 		79167A010975255100D9EF74 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3C371AFC09AD501A00501C1F /* Framework Debug.xcconfig */;
@@ -1504,10 +1611,6 @@
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -1528,7 +1631,6 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/sqlite\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = iMediaTester;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -1542,10 +1644,6 @@
 					i386,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1563,7 +1661,6 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/sqlite\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = iMediaTester;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -1572,12 +1669,18 @@
 		969656A608C6A24500F2F85C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 			};
 			name = Debug;
 		};
 		969656A708C6A24500F2F85C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 			};
 			name = Release;
 		};
@@ -1613,10 +1716,6 @@
 					i386,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1634,7 +1733,6 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/sqlite\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = iMediaTester;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -1644,6 +1742,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
 			buildSettings = {
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 			};
 			name = Plugin;
 		};
@@ -1668,7 +1769,6 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = MetadataTool;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1696,7 +1796,6 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = MetadataTool;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1718,7 +1817,6 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = MetadataTool;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = YES;
 			};
 			name = Plugin;
@@ -1726,6 +1824,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5B1AA7420D6C733E003585CD /* Build configuration list for PBXNativeTarget "movietool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B1AA73C0D6C7320003585CD /* Debug */,
+				5B1AA73D0D6C7320003585CD /* Release */,
+				5B1AA73E0D6C7320003585CD /* Plugin */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		79167A000975255100D9EF74 /* Build configuration list for PBXNativeTarget "iMediaBrowser" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

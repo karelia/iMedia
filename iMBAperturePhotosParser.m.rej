@@ -1,0 +1,40 @@
+***************
+*** 208,213 ****
+  		{
+  			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
+  			
+  			if ([imageRecord objectForKey:@"MediaType"] && ![[imageRecord objectForKey:@"MediaType"] isEqualToString:@"Image"])
+  			{
+  				continue;
+--- 208,221 ----
+  		{
+  			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
+  			
++             // It's always possible that the record might not exist. Can't fully trusty
++             // the integrity of the librrary
++             if (!imageRecord)
++             {
++                 NSLog(@"IMBAperturePhotosParser: no image record found with key %@", key);
++                 continue;
++             }
++             
+  			if ([imageRecord objectForKey:@"MediaType"] && ![[imageRecord objectForKey:@"MediaType"] isEqualToString:@"Image"])
+  			{
+  				continue;
+***************
+*** 220,226 ****
+  				if (date) [imageRecord setObject:date forKey:@"DateAsTimerInterval"];
+  			}
+  			
+- 			[newPhotolist addObject:imageRecord];
+  			
+  			//	cp: No keywords in Aperture XML.
+  			#if 0
+--- 228,234 ----
+  				if (date) [imageRecord setObject:date forKey:@"DateAsTimerInterval"];
+  			}
+  			
++             [newPhotolist addObject:imageRecord];
+  			
+  			//	cp: No keywords in Aperture XML.
+  			#if 0
