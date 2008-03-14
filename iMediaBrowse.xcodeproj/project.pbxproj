@@ -1532,7 +1532,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
-				INSTALL_PATH = "@executable_path/../Contents/MacOS";
 				PRODUCT_NAME = movietool;
 			};
 			name = Debug;
@@ -1542,15 +1541,14 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				INSTALL_PATH = "@executable_path/../Contents/MacOS";
 				PRODUCT_NAME = movietool;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
 		5B1AA73E0D6C7320003585CD /* Plugin */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = "@executable_path/../Contents/MacOS";
 				PRODUCT_NAME = movietool;
 			};
 			name = Plugin;
@@ -1564,7 +1562,6 @@
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
-				INSTALL_PATH = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
@@ -1579,6 +1576,7 @@
 					0xcf100000,
 				);
 				PRODUCT_NAME = iMediaBrowser;
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -1603,6 +1601,7 @@
 					0xcf100000,
 				);
 				PRODUCT_NAME = iMediaBrowser;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -1639,10 +1638,6 @@
 		969656A308C6A24500F2F85C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -1672,15 +1667,21 @@
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Debug;
 		};
 		969656A708C6A24500F2F85C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Release;
 		};
@@ -1690,7 +1691,6 @@
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
-				INSTALL_PATH = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
@@ -1705,6 +1705,7 @@
 					0xcf100000,
 				);
 				PRODUCT_NAME = iMediaBrowser;
+				SKIP_INSTALL = YES;
 			};
 			name = Plugin;
 		};
@@ -1745,6 +1746,7 @@
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Plugin;
 		};
@@ -1760,7 +1762,6 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INSTALL_PATH = "$(HOME)/bin";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1776,10 +1777,6 @@
 		FD8EE6030C697C8B00E425BB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -1787,7 +1784,6 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INSTALL_PATH = "$(HOME)/bin";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1796,6 +1792,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = MetadataTool;
+				SKIP_INSTALL = YES;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1808,7 +1805,6 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INSTALL_PATH = "$(HOME)/bin";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
