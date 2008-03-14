@@ -80,7 +80,8 @@ static QTMovie *openMovie(NSString *urlString, NSMutableDictionary *cache)
         
         NSNumber    *loadState = [movie attributeForKey:QTMovieLoadStateAttribute];
         NSDate  *date = [NSDate date];
-        while ([loadState longValue] < QTMovieLoadStateLoaded && [[NSDate date] timeIntervalSinceDate:date] < 600)
+		// Use kMovieLoadState... not QTMovieLoadState... -- latter not available in Tiger.
+        while ([loadState longValue] < kMovieLoadStateLoaded && [[NSDate date] timeIntervalSinceDate:date] < 600)
         {
             MoviesTask([movie quickTimeMovie], 5);
             loadState = [movie attributeForKey:QTMovieLoadStateAttribute];
@@ -175,7 +176,7 @@ static int runConnectedToServer(NSString * serverName, BOOL shouldDoPosterImages
                 // Get the frame image
                 NSNumber    *loadState = [movie attributeForKey:QTMovieLoadStateAttribute];
                 NSDate  *date = [NSDate date];
-                while ([loadState longValue] < QTMovieLoadStatePlaythroughOK && [[NSDate date] timeIntervalSinceDate:date] < 600)
+                while ([loadState longValue] < kMovieLoadStatePlaythroughOK && [[NSDate date] timeIntervalSinceDate:date] < 600)
                 {
                     MoviesTask([movie quickTimeMovie], 10);
                     loadState = [movie attributeForKey:QTMovieLoadStateAttribute];
@@ -296,7 +297,7 @@ static int runConnectedToServer(NSString * serverName, BOOL shouldDoPosterImages
             
             NSNumber    *loadState = [movie attributeForKey:QTMovieLoadStateAttribute];
             NSDate  *date = [NSDate date];
-            while ([loadState longValue] < QTMovieLoadStateComplete && [[NSDate date] timeIntervalSinceDate:date] < 600)
+            while ([loadState longValue] < kMovieLoadStateComplete && [[NSDate date] timeIntervalSinceDate:date] < 600)
             {
                 MoviesTask([movie quickTimeMovie], 10);
                 loadState = [movie attributeForKey:QTMovieLoadStateAttribute];
