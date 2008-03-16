@@ -52,8 +52,8 @@
 + (void)load
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
+
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"music"];
 	
 	[pool release];
 }

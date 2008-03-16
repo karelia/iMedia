@@ -69,8 +69,7 @@
 #import <iMediaBrowser/RBSplitSubview.h>
 #import <iMediaBrowser/RBSplitView.h>
 #import <iMediaBrowser/TimeValueTransformer.h>
-#import <iMediaBrowser/iMBAbstractController.h>
 #import <iMediaBrowser/iMBAbstractParser.h>
 #import <iMediaBrowser/iMBLibraryNode.h>
+#import <iMediaBrowser/iMediaConfiguration.h>
 #import <iMediaBrowser/iMediaBrowser.h>
-

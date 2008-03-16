@@ -44,7 +44,7 @@
 
 
 #import "iMBiPhotoPhotosParser.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
 
@@ -53,7 +53,9 @@
 + (void)load
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	[iMediaBrowser registerParser:[self class] forMediaType:@"photos"];
+
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"photos"];
+
 	[pool release];
 }
 

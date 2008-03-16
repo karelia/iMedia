@@ -44,7 +44,7 @@
 
 
 #import "iMBMoviesFolder.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import <QTKit/QTKit.h>
 #import "iMedia.h"
@@ -55,8 +55,8 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"movies"];
-	
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"movies"];
+
 	[pool release];
 }
 
@@ -107,7 +107,7 @@
 	NSMutableArray *movies = [NSMutableArray array];
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;
-	NSArray * excludedFolders = [[iMediaBrowser sharedBrowserWithoutLoading] excludedFolders];
+	NSArray * excludedFolders = [[iMediaConfiguration sharedConfiguration] excludedFolders];
    
 	while (cur = [e nextObject])
 	{

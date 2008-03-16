@@ -23,11 +23,36 @@
             SUPERCLASS = NSObject; 
         }, 
         {
+            CLASS = iMBAbstractView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                browserContainer = RBSplitSubview; 
+                browserController = id; 
+                browserView = NSView; 
+                libraryController = NSTreeController; 
+                loadingProgressIndicator = NSProgressIndicator; 
+                loadingTextField = NSTextField; 
+                loadingView = NSBox; 
+                outlineContainer = RBSplitSubview; 
+                outlinePopUpButton = NSPopUpButton; 
+                outlineView = NSOutlineView; 
+                splitView = RBSplitView; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
             ACTIONS = {play = id; search = id; }; 
             CLASS = iMBMoviesController; 
             LANGUAGE = ObjC; 
             OUTLETS = {counterField = NSTextField; oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
             SUPERCLASS = iMBAbstractController; 
+        }, 
+        {
+            ACTIONS = {play = id; search = id; }; 
+            CLASS = iMBMoviesView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {counterField = NSTextField; oPhotoView = MUPhotoView; oSlider = NSSlider; }; 
+            SUPERCLASS = iMBAbstractView; 
         }, 
         {CLASS = iMBPhotoView; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }, 
         {

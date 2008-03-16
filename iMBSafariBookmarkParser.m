@@ -44,7 +44,7 @@
 
 
 #import "iMBSafariBookmarkParser.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import <WebKit/WebKit.h>
 #import "iMedia.h"
@@ -62,8 +62,8 @@
 									  withObject:nil
 								   waitUntilDone:YES];
 	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"links"];
-	
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"links"];
+
 	[pool release];
 }
 

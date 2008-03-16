@@ -45,7 +45,7 @@
 
 #import "iMBiTunesMusicParser.h"
 #import "iMBLibraryNode.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import "iMedia.h"
 
 
@@ -54,9 +54,9 @@
 + (void)load
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"music"];
-	
+	    
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"music"];
+
 	[pool release];
 }
 

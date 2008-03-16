@@ -50,50 +50,18 @@
 
 @interface iMediaBrowser : NSWindowController
 {
-	IBOutlet NSPopUpButton			*oPlaylistPopup;
-	IBOutlet NSView					*oBrowserView;
-	IBOutlet NSBox					*oLoadingView;
-	IBOutlet RBSplitView			*oSplitView;
-	IBOutlet NSView					*oPlaylistContainer;
-	IBOutlet NSProgressIndicator	*oLoading;
-	IBOutlet NSTextField			*oLoadingText;
-	IBOutlet NSOutlineView			*oPlaylists;
-	IBOutlet NSTreeController		*libraryController;
-
+	IBOutlet id						myDelegate;
+	IBOutlet NSTabView				*browserTabView;
+    
 	IBOutlet NSWindow				*oInfoWindow;
 	IBOutlet NSTextView				*oInfoTextView;
 	IBOutlet iMBBackgroundImageView *oBackgroundImageView;
-	
-	@private
-	NSMutableArray					*myMediaBrowsers;
-	NSMutableDictionary				*myLoadedParsers;
-	NSMutableArray					*myUserDroppedParsers;
-	id <iMediaBrowser>				mySelectedBrowser;		// not retained
+
+@private
 	NSToolbar						*myToolbar;
-	NSLock							*myBackgroundLoadingLock;
-	NSString						*myIdentifier;
-	
-	NSArray							*myExcludedFolders;
-   
-	NSArray							*myPreferredBrowserTypes;
-	id								myDelegate; //not retained
-	struct ___imbFlags {
-		unsigned willLoadBrowser: 1;
-		unsigned didLoadBrowser: 1;
-		unsigned willChangeBrowser: 1;
-		unsigned didChangeBrowser: 1;
-		unsigned willUseParser: 1;
-		unsigned didUseParser: 1;
-		unsigned inSplitViewResize: 1;
-		unsigned didSelectNode: 1;
-		unsigned orientation: 1;
-		unsigned isLoading: 1;
-		unsigned willExpand: 1;
-		unsigned showFilenames: 1;
-		
-		unsigned unused: 20;	// 32 minus the number above
-	} myFlags;
-   
+    NSMutableArray					*myMediaBrowsers;
+    id <iMediaBrowser>				mySelectedBrowser;		// not retained
+    NSArray							*myPreferredBrowserTypes;
 }
 
 + (id)sharedBrowser;

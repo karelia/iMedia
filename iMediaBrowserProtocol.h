@@ -50,8 +50,7 @@
 @protocol iMediaBrowser <NSObject>
 
 // designated initializer
-- (id)initWithPlaylistController:(NSTreeController *)ctrl;
-- (void)setBrowser:(iMediaBrowser *)browser;
+- (id)initWithFrame:(NSRect)frame;
 
 // used for the parser register to load the correct parsers
 - (NSString *)mediaType;
@@ -61,9 +60,6 @@
 
 // localized name for the browser
 - (NSString *)name;
-
-// the custom view below the outline view
-- (NSView *)browserView;
 
 // Give the browser an opportunity to do some setup before display
 - (void)willActivate;
@@ -111,6 +107,14 @@
 // override this. iMBAbstractController implements this to prevent packages being dropped. 
 - (BOOL)allowPlaylistFolderDrop:(NSString*)path;
 
+// reload 
+- (IBAction)reload:(id)sender;
+
+// return tree controller
+- (NSTreeController *)controller;
+
+// return YES if loading is in progress
+- (BOOL)isLoading;
 
 @end
 

@@ -44,7 +44,7 @@
 
 
 #import "iMBPicturesFolder.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
 
@@ -54,7 +54,7 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"photos"];
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"photos"];
 	
 	[pool release];
 }
@@ -78,7 +78,7 @@
 	NSString *cur;
 	BOOL isDir;
 	NSMutableArray *images = [NSMutableArray array];
-   NSArray * excludedFolders = [[iMediaBrowser sharedBrowserWithoutLoading] excludedFolders];
+   NSArray * excludedFolders = [[iMediaConfiguration sharedConfiguration] excludedFolders];
 	
 	while (cur = [e nextObject])
 	{

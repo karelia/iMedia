@@ -45,7 +45,7 @@
 
 #import "iMBOmniWebParser.h"
 #import "iMBLibraryNode.h"
-#import "iMediaBrowser.h"
+#import "iMediaConfiguration.h"
 #import "iMedia.h"
 #import "iMBXBELParser.h"
 
@@ -55,7 +55,7 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"links"];
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"links"];
 	
 	[pool release];
 }

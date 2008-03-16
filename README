@@ -1,0 +1,39 @@
+This document describes the restructuring of the iMediaBrowser to allow media specific sub-views to be easily
+embedded in existing windows.
+
+This change moves much of the "view" functionality that is currently in iMediaBrowser into a new class named 
+iMBAbstractView with subclasses for each media type. To do this, the outline container (outline view + popup) 
+and tree controller is no longer shared between various media types. Instead there is a copy in the 
+iMBAbstractView subclass (and subsequently in each subclass for each media type).
+
+iMediaBrowser becomes a window controller containing a tabless tab view containing various iMBAbstractView 
+subclasses. Switching tabs is still handled/supported by the toolbar.
+
+iMBAbstractView subclasses represent the browser + controls + media specific view for each media type, for 
+instance iMBPhotosView and iMBMusicView, etc. Existing media specific NIBs (such as iPhoto.nib) are 
+unchanged but are now contained in iMBAbstractViews subclasses.
+
+The iMBAbstractController and all of its derived classes have been removed, replaced by the iMBAbstractView
+hierarchy.
+
+The media specific NIB files were changed only to reflect their media view specific owner instead of the controller.
+
+Since iMediaBrowser is no longer the primary class, a new class 'iMediaConfiguration' is now used for configuration.
+The iMediaBrowser now forwards much of its configuration methods to the configuration object to maintain backwards
+compatibility.
+
+The iMediaBrowserProtocol was changed to reflect the new architecture.
+
+There are some cases where outlets have been renamed.
+
+For those interested in comparing the old code to the new code, the bulk of the changes are in iMediaBrowser.
+The code in iMediaBrowser has been split out into iMBAbstractView and iMediaConfiguration or left in place.
+
+It is also possible to compare the older iMBxxxController.m with iMBxxxView.m with a command something like this:
+diff -u iMBPhotosView.m ../imedia-trunk/iMBPhotosController.m
+
+Known issue: custom parsers are not loaded.
+
+Known issue: no attempt was made to update the previously and still non-working contacts view.
+
+Known issue: many minor code formatting issues to make diff easier to read.

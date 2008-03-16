@@ -53,7 +53,7 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[iMediaBrowser registerParser:[self class] forMediaType:@"movies"];
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"movies"];
 	
 	[pool release];
 }
