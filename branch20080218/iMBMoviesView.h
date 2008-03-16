@@ -62,13 +62,7 @@
 	NSArray					*myImages;
 	NSMutableArray			*myFilteredImages;
 	NSString				*mySearchString;
-	NSMutableArray			*myInFlightImageOperations;
-    NSMutableArray          *myImageRecordsToLoad;
-	NSMutableSet			*myProcessingImages;
-	NSLock					*myCacheLock;
 	NSMutableDictionary		*myImageCache;
-	NSMutableDictionary		*myMetaCache;
-	unsigned int			myThreadCount;
 }
 
 - (IBAction)play:(id)sender;

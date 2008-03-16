@@ -48,7 +48,8 @@
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
 #import "MUPhotoView.h"
-#import "NSURLCache+iMedia.h"
+#import "iMBMovieCacheDB.h"
+#import "iMBMovieReference.h"
 
 #define MAX_POSTER_SIZE (NSMakeSize(240, 180))	// our thumbnail view maxes out at 240.
 
@@ -57,10 +58,6 @@
 - (NSArray*) selectedItems;
 - (NSDictionary *)displayableAttributesOfMovie:(QTMovie *)aMovie;
 - (NSString *)imageCountPluralityAdjustedString;
-@end
-
-@interface QTMovie (QTMoviePrivateInTigerButPublicInLeopard)
-- (void)setIdling:(BOOL)state;
 @end
 
 @implementation iMBMoviesView
@@ -80,14 +77,10 @@
 		mySelection = [[NSMutableIndexSet allocWithZone:[self zone]] init];
 		myFilteredImages = [[NSMutableArray allocWithZone:[self zone]] init];
 		myImageCache = [[NSMutableDictionary dictionary] retain];
-		myMetaCache = [[NSMutableDictionary dictionary] retain];
-		myInFlightImageOperations = [[NSMutableArray allocWithZone:[self zone]] init];
-        myImageRecordsToLoad = [[NSMutableArray allocWithZone:[self zone]] init];
-		myProcessingImages = [[NSMutableSet set] retain];
-		myCacheLock = [[NSLock allocWithZone:[self zone]] init];
-        		
         finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
-
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(posterImageWasLoaded:) name:kMBMovieCacheLoadedPosterImageNotification object:nil];
+        
 		[NSBundle loadNibNamed:@"Movies" owner:self];
 	}
 	return self;
@@ -104,11 +97,6 @@
 	[myFilteredImages release];
 	[mySearchString release];
 	[myImageCache release];
-	[myMetaCache release];
-	[myProcessingImages release];
-	[myInFlightImageOperations release];
-	[myCacheLock release];
-	[myImageRecordsToLoad release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     
 	[super dealloc];
@@ -153,6 +141,11 @@
 			   options:optionsDict];
 	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
     }
+}
+
+- (void)posterImageWasLoaded:(NSNotification *)notification
+{
+    [oPhotoView setNeedsDisplay:YES];
 }
 
 - (IBAction)play:(id)sender
@@ -211,39 +204,6 @@
 	// do nothing
 }
 
-// Store the image that is from the given path.
-- (void) saveImageForPath:(NSString *)imagePath
-{
-	[myCacheLock lock];
-	NSImage *anImage = [myImageCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
-	NSDictionary *userInfo = [myMetaCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
-	[myCacheLock unlock];
-
-    NSAssert1 (anImage != nil, @"Found no cached image for '%@'", imagePath);
-    NSAssert1 (userInfo != nil, @"Found no metadata for '%@'", imagePath);
-    
-	NSData *data = [anImage TIFFRepresentationUsingCompression:NSTIFFCompressionLZW factor:1.0];    
-	if (data)
-	{
-		[[NSURLCache sharedURLCache] cacheData:data userInfo:userInfo forPath:[imagePath stringByAppendingPathExtension:@"tif"]];
-        
-        // Images are sometimes drawn upside down after saving. I don't know why, but as the saved image is correct we can create
-        // a new one that works. Does someone know why this is?
-		// Doing this essentially converts the PICT representation to NSBitmapImageRep.
-        anImage = [[NSImage allocWithZone:[self zone]] initWithData:data];
-        if (anImage)
-        {
-            [anImage setDataRetained:YES];
-            [anImage setScalesWhenResized:YES];
-//			[anImage setCachedSeparately:YES];	// hopeful fix for TIFFRepresentation crasher, see  http://xrl.us/bf3kv
-            [myCacheLock lock];
-            [myImageCache setObject:anImage forKey:imagePath];
-            [anImage release];
-            [myCacheLock unlock];
-        }
-	}
-}
-
 - (NSArray*) selectedItems
 {
 	NSArray* records = nil;
@@ -299,9 +259,17 @@ static NSImage *_toolbarIcon = nil;
 {
 	if(_toolbarIcon == nil)
 	{
+        NSString *path = @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarMovieFolderIcon.icns";
+        if ([[NSFileManager defaultManager] fileExistsAtPath:path])
+        {
+            _toolbarIcon = [[NSImage allocWithZone:[self zone]] initByReferencingFile:path];
+            if (_toolbarIcon)
+                return _toolbarIcon;
+        }
+        
 		// Try to use iMovie, or older iMovie, or quicktime player for movies.
 		NSString *identifier = @"com.apple.iMovie";
-		NSString *path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
+		path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
 		if (nil == path)
 		{
 			identifier = @"com.apple.iMovie3";
@@ -386,118 +354,6 @@ static NSImage *_toolbarIcon = nil;
 	return nil;
 }
 
-- (NSImage *) getPosterImageOrPlaceholderFromMovie:(QTMovie *)movie
-{
-	NSImage *img = nil;
-	bool hasVideo = NO;
-	
-	if (movie)
-	{
-		NSDictionary *attr = [movie movieAttributes];
-		NSValue *theSizeValue = [attr objectForKey:QTMovieNaturalSizeAttribute];
-		NSSize size = [theSizeValue sizeValue];
-		hasVideo = !NSEqualSizes(size,NSZeroSize);
-	}
-	if (!movie || !hasVideo)
-	{
-		img = (NSImage *)[NSNull null];		// don't try to load again
-	}
-	else if ((!movie /* ???? && [error code] == -2126 */) || [movie isDRMProtected])
-	{
-		NSString *drmIcon = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
-		img = [[[NSImage alloc] initWithContentsOfFile:drmIcon] autorelease];
-//?		[img setCachedSeparately:YES];
-	}
-	else
-	{
-		img = [movie betterPosterImageWithMaxSize:MAX_POSTER_SIZE];
-//?		[img setCachedSeparately:YES];
-	}
-	return img;
-}
-
-- (void)backgroundLoadOfInFlightImage:(id)unused
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	// remove ourselves out of the queue
-		
-	[myCacheLock lock];
-	NSString *imagePath = [[myInFlightImageOperations lastObject] retain];
-	if (imagePath)
-	{
-		[myInFlightImageOperations removeObject:imagePath];
-		[myProcessingImages addObject:imagePath];
-	}
-	[myCacheLock unlock];
-		
-	while (imagePath)
-	{
-		NSMutableDictionary *rec = (NSMutableDictionary *)[self recordForPath:imagePath];
-		
-        @try {
-            OSErr err = EnterMoviesOnThread(0);	// we will be using QuickTime on the current thread.  See TN2125
-            if (noErr != err) NSLog(@"Error entering movies on thread");
-            
-            QTMovie *movie = [rec objectForKey:@"qtmovie"];
-            
-            err = AttachMovieToCurrentThread([movie quickTimeMovie]);	// get access to movie from this thread.  Don't care if it succeeded or not
-            if (noErr != err) NSLog(@"Error attaching movie to current thread %d", err);
-			
-			NSImage *img = [self getPosterImageOrPlaceholderFromMovie:movie];
-			
-            if (img && (img != (NSImage *)[NSNull null]) )
-				// Note: NSNull means no thumbnail can be generated.  This is NOT cached, meaning that each time we run the app,
-				// it will query the movie again, not finding it in the cache.  I suppose we could optimize that by caching a
-				// placeholder so that the file is not queried.
-            {
-                [myCacheLock lock];
-                [myImageCache setObject:img forKey:imagePath];
-				
-				[myMetaCache setObject:[self displayableAttributesOfMovie:movie] forKey:imagePath];
-                [myCacheLock unlock];
-				if (img != (NSImage *)[NSNull null])
-				{
-					[self performSelectorOnMainThread:@selector(saveImageForPath:) withObject:imagePath waitUntilDone:NO];
-				}
-            }
-        } 
-        @catch (NSException *ex) {
-            NSLog(@"Failed to load movie: %@", imagePath);
-        }
-        @finally {
-            QTMovie *movie = [rec objectForKey:@"qtmovie"];
-            OSErr err = DetachMovieFromCurrentThread([movie quickTimeMovie]); 	// -2098 = componentNotThreadSafeErr
-            if (noErr != err) NSLog(@"Error detaching from background thread");
-            
-            [rec removeObjectForKey:@"qtmovie"];	// movie is still retained internally
-            
-            err = ExitMoviesOnThread();	// balance EnterMoviesOnThread
-            if (noErr != err) NSLog(@"Error entering movies on thread");
-            
-        }
-		
-		[myCacheLock lock];		
-		// get the last object in the queue because we would have scrolled and what is at the start won't be necessarily be what is displayed.
-		[myProcessingImages removeObject:imagePath];
-		[imagePath release];
-		imagePath = [[myInFlightImageOperations lastObject] retain];
-		if (imagePath)
-		{
-			[myInFlightImageOperations removeObject:imagePath];
-			[myProcessingImages addObject:imagePath];
-		}
-		[myCacheLock unlock];
-		
-		[oPhotoView performSelectorOnMainThread:@selector(forceRedisplay)
-									 withObject:nil
-								  waitUntilDone:NO];
-	}
-	
-	myThreadCount--;
-	
-	[pool release];
-}
-
 - (NSDictionary *)displayableAttributesOfMovie:(QTMovie *)aMovie
 {
 	NSDictionary *attr = [aMovie movieAttributes];
@@ -553,100 +409,6 @@ static NSImage *_toolbarIcon = nil;
 	return [myImages count];
 }
 
-- (void) startLoadingOneMovie:sender
-// This runs asynchronously in the main thread to do the non thread safe work involved when
-// loading QuickTime movies. It also spawns off worker threads if possible.
-// We do this via a performSelector:afterDelay: to allow the app to respond to events.
-{
-    NSMutableDictionary *rec = [myImageRecordsToLoad lastObject];
-    if (!rec)
-        return;
-    
-	[myCacheLock lock];
-	NSString *imagePath = [rec objectForKey:@"Preview"];
-    BOOL alreadyQueued = (([myInFlightImageOperations containsObject:imagePath]) || ([myProcessingImages containsObject:imagePath]));
-    [myCacheLock unlock];
-    
-    if (!alreadyQueued)
-    {
-		///NSLog(@"startLoadingOneMovie:%@ not already queued", imagePath);
-        if ([QTMovie canInitWithFile:imagePath])
-        {
-			///NSLog(@"startLoadingOneMovie:%@ canInitWithFile", imagePath);
-
-            NSError *movieError = nil;
-            QTMovie *movie = [QTMovie movieWithAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
-                [QTDataReference dataReferenceWithReferenceToFile:imagePath], QTMovieDataReferenceAttribute,
-                [NSNumber numberWithBool:NO], QTMovieAskUnresolvedDataRefsAttribute, nil] 
-                                                  error:&movieError];
-			            
-            if (movie)	// make sure we really have a movie -- in some cases, canInitWithFile returns YES but we still get nil
-            {
-				///NSLog(@"startLoadingOneMovie:%@ movieWithAttributes", imagePath);
-
-                if ([movie respondsToSelector:@selector(setIdling:)])
-                    [movie setIdling:NO]; // Prevents crash due to missing gworld
-
-                // do a background thread load if we have a spare processor, and if this movie is thread-safe
-                unsigned int maxThreadCount = [NSProcessInfo numberOfProcessors] - 1;
-                maxThreadCount = MAX(maxThreadCount, (unsigned int)1);    // Allow at least 1 background thread
-                if (
-#ifdef SINGLETHREADED
-					NO &&	// define SINGLETHREADED to test the single-threaded mode
-#endif
-					myThreadCount < maxThreadCount
-                    &&
-                    noErr == DetachMovieFromCurrentThread([movie quickTimeMovie]) )	// -2098 = componentNotThreadSafeErr
-                {
-                    [myCacheLock lock];
-                    [rec setObject:movie forKey:@"qtmovie"];
-                    [myInFlightImageOperations addObject:imagePath];
-                    [myCacheLock unlock];
-                    myThreadCount++;
-                    [NSThread detachNewThreadSelector:@selector(backgroundLoadOfInFlightImage:)
-                                             toTarget:self
-                                           withObject:nil];
-                } 
-                else 
-                {
-                    // Load movie on the main thread because we can't open on background thread
-					NSImage *img = [self getPosterImageOrPlaceholderFromMovie:movie];
-					if (img && (img != (NSImage *)[NSNull null]) )
-                    {
-                        [myCacheLock lock];
-                        [myImageCache setObject:img forKey:imagePath];
-						[myMetaCache setObject:[self displayableAttributesOfMovie:movie] forKey:imagePath];
-                        [myCacheLock unlock];
-                        [oPhotoView setNeedsDisplay:YES];
-						[self saveImageForPath:imagePath];
-                    }
-                }
-            }
-			else
-			{
-				// Perhaps come up with some indication that this movie isn't really loadable?
-				// NSLog(@"unable to make a movie from %@", imagePath);
-			}
-        }
-    }
-    else
-    {
-        //lets move it to the end of the queue so we get done next
-        [myCacheLock lock];
-        [myInFlightImageOperations removeObject:imagePath];
-        [myInFlightImageOperations addObject:imagePath];
-        [myCacheLock unlock];
-    }
-    
-    [myImageRecordsToLoad removeLastObject];
-    if ([myImageRecordsToLoad count] > 0)
-    {
-        // There is still work to be done so let's continue after a tiny delay
-        [self performSelector:_cmd withObject:self afterDelay:0.001f inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode,NSModalPanelRunLoopMode,
-            NSEventTrackingRunLoopMode,nil]];
-    }
-}
-
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)aIndex
 {
 	NSMutableDictionary *rec;
@@ -661,9 +423,7 @@ static NSImage *_toolbarIcon = nil;
     
 	//try the caches
 	NSString *imagePath = [rec objectForKey:@"Preview"];
-	[myCacheLock lock];
 	NSImage *img = [myImageCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
-	[myCacheLock unlock];
 	
     if (!img)
     {   // Perhaps there's a ThumbPath
@@ -671,53 +431,30 @@ static NSImage *_toolbarIcon = nil;
         if (thumbPath)
         {
             img = [[[NSImage alloc] initByReferencingFile:thumbPath] autorelease];
-//?			[img setCachedSeparately:YES];
-            // cache in memory now
-            [myCacheLock lock];
-            [myImageCache setObject:img forKey:imagePath];
-			// no movie metadata to cache now
-            [myCacheLock unlock];
+            if (img)
+                [myImageCache setObject:img forKey:imagePath];
         }
     }
-    
-	if (!img)
-	{   // look on disk cache
-		NSDictionary *userInfo = nil;
-		NSData *data = [[NSURLCache sharedURLCache] cachedDataForPath:[imagePath stringByAppendingPathExtension:@"tif"]
-															 userInfo:&userInfo]; // will return nil if not cached
-		if (data)
-		{
-			img = [[[NSImage alloc] initWithData:data] autorelease];
-			if (img)
-			{
-//?				[img setCachedSeparately:YES];
-				// cache in memory now --- maybe not needed since the NSURLCache actually caches in memory now!
-				[myCacheLock lock];
-				[myImageCache setObject:img forKey:imagePath];
-				if (userInfo)
-				{
-					[myMetaCache setObject:userInfo forKey:imagePath];
-				}
-				[myCacheLock unlock];
-			}
-		}
-	}
 
 	if (!img && (img != (NSImage *)[NSNull null]))	// need to generate, but not if NSNull
     {		
-        [myImageRecordsToLoad addObject:rec];
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startLoadingOneMovie:) object:self];
-        [self performSelector:@selector(startLoadingOneMovie:) withObject:self afterDelay:0.001f inModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode,NSModalPanelRunLoopMode,
-            NSEventTrackingRunLoopMode,nil]];
-        
-        // Use a placeholder for now
-        img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
-        [img setScalesWhenResized:YES];
-        [img setSize:NSMakeSize(128,128)];
-        [myCacheLock lock];
-        [myImageCache setObject:img forKey:imagePath];
-		// No movie could be generated, so also no metadata
-        [myCacheLock unlock];
+        iMBMovieReference    *movieRef = [[iMBMovieCacheDB sharedMovieCacheDB] movieReferenceWithURL:[NSURL fileURLWithPath:imagePath]];
+        img = [movieRef posterImage];
+        if (img)
+        {
+            [myImageCache setObject:img forKey:imagePath];
+            // No movie could be generated, so also no metadata
+        }
+        else
+            img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
+        NSDictionary    *movieAttributes = [movieRef movieAttributes];
+        if (movieAttributes)
+        {
+            [rec setObject:movieAttributes forKey:@"movieAttributes"];
+            NSString    *displayName = [movieAttributes objectForKey:QTMovieDisplayNameAttribute];
+            if (displayName && [displayName length] > 0)
+                [rec setObject:displayName forKey:@"Caption"];
+        }
 	}
 	if (img == (NSImage *)[NSNull null])	img = nil;	// don't return NSNull
 	
@@ -817,21 +554,10 @@ static NSImage *_toolbarIcon = nil;
 	}
 	
 	// GET METADATA, WE MIGHT USE THAT FOR DISPLAY NAME INSTEAD OF "Caption"
-	NSDictionary *userInfo = nil;
+	NSDictionary *userInfo = [rec objectForKey:@"movieAttributes"];
 	NSString *title = [rec objectForKey:@"Caption"];	// default
 	NSString *imagePath = [rec objectForKey:@"ImagePath"];
 	NSString *imagePathUTI = nil;
-
-	if (imagePath)
-	{
-		// GET QUICKTIME METADATA
-		
-		[myCacheLock lock];
-		userInfo = [myMetaCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
-		[myCacheLock unlock];
-		imagePathUTI = [NSString UTIForFileAtPath:imagePath];
-
-	}
 	
 	// Don't have User Info from cache?  Try to get it from the movie itself
 	// TODO: Attributes generated from a movie file for the tooltip are not cached in memory.
@@ -921,7 +647,6 @@ static NSImage *_toolbarIcon = nil;
 			height = size.height;
 		}
 	}
-	
 		
 	// COLLECT TECHNICAL ITUNES METADATA
 	NSNumber *iTunesDuration = [rec objectForKey:@"Total Time"];
@@ -1003,18 +728,6 @@ static NSImage *_toolbarIcon = nil;
 		}
 	}
 	return result;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
 
 - (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)aIndex withFrame:(NSRect)frame

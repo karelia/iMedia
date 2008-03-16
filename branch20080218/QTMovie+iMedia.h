@@ -48,22 +48,22 @@
 
 @interface QTMovie ( iMedia )
 
-- (NSImage *)betterPosterImage;
-- (NSImage *)betterPosterImageWithMaxSize:(NSSize)maxSize;  // Shrinks the image if it's larger than maxSize
+//- (NSImage *)betterPosterImage;
+//- (NSImage *)betterPosterImageWithMaxSize:(NSSize)maxSize;  // Shrinks the image if it's larger than maxSize
 
 - (BOOL) isDRMProtected;
 // get access to the mp3 meta data
 - (NSString *)attributeWithFourCharCode:(OSType)code;
 
-- (BOOL)isPlaying;
-- (NSString *)durationAsString;
+//- (BOOL)isPlaying;
+//- (NSString *)durationAsString;
 - (NSString *)currentTimeAsString;
 - (float)durationInSeconds;
 - (void)timeToQTTime:(long)timeValue resultTime:(QTTime *)aQTTime;
 - (void)setTime:(int)timeValue;
 - (BOOL)currentTimeEqualsDuration;
-- (NSString *)movieFileName;
-- (NSString *)movieFilePath;
-- (NSString *)filenameFromFullPath:(NSString *)fullPath;
+//- (NSString *)movieFileName;
+//- (NSString *)movieFilePath;
+//- (NSString *)filenameFromFullPath:(NSString *)fullPath;
 
 @end

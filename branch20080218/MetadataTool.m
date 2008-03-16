@@ -97,8 +97,20 @@
     {
         NSRunLoop *run_loop = [NSRunLoop currentRunLoop];
         
-        while ( [self isParentProcessStillAlive] && [run_loop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.5]] )
-            ;
+        BOOL result = YES;
+        BOOL is_parent_process_alive = YES;
+        
+        do
+        {
+            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+            
+            result = [run_loop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+
+            is_parent_process_alive = [self isParentProcessStillAlive];
+            
+            [pool release];
+        }
+        while (is_parent_process_alive && result);
     }
 }
 
