@@ -482,13 +482,6 @@
 		965EB98608E1D345000DFF3A /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		96F9076209D8D9690071BFFB /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMedia.h; sourceTree = "<group>"; };
 		96F908C509D9B6070071BFFB /* NSWorkspace+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSWorkspace+iMedia.h"; sourceTree = "<group>"; };
-		A93A664D0AE7709E00C77AA4 /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A93A66520AE770E800C77AA4 /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A93A66530AE7710500C77AA4 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A93A66540AE7710E00C77AA4 /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = da.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A93A66550AE7711700C77AA4 /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = ja.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A93A66560AE7712200C77AA4 /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A93A66570AE7713100C77AA4 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A93A6A760AE77F2B00C77AA4 /* UKFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = UKFileWatcher.m; sourceTree = "<group>"; };
 		A9FECB050ADA696A00AB3426 /* iMBLibraryOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMBLibraryOutlineView.h; sourceTree = "<group>"; };
 		A9FECB060ADA696A00AB3426 /* iMBLibraryOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iMBLibraryOutlineView.m; sourceTree = "<group>"; };
@@ -582,6 +575,28 @@
 		FD8EE5BC0C697C6C00E425BB /* MetadataTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MetadataTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD8EE60C0C697CEA00E425BB /* MetadataTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataTool.h; sourceTree = "<group>"; };
 		FD8EE60D0C697CEA00E425BB /* MetadataTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataTool.m; sourceTree = "<group>"; };
+		FDA345F20D8CDBBE008CEF0D /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/da.lproj/MediaBrowser.nib"; sourceTree = "<absolute>"; };
+		FDA346090D8CDBCB008CEF0D /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/de.lproj/MediaBrowser.nib"; sourceTree = "<absolute>"; };
+		FDA3460D0D8CDBD8008CEF0D /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/fr.lproj/MediaBrowser.nib"; sourceTree = "<absolute>"; };
+		FDA346110D8CDBEA008CEF0D /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/it.lproj/MediaBrowser.nib"; sourceTree = "<absolute>"; };
+		FDA346150D8CDBF3008CEF0D /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/ja.lproj/MediaBrowser.nib"; sourceTree = "<absolute>"; };
+		FDA346190D8CDC00008CEF0D /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/sv.lproj/MediaBrowser.nib"; sourceTree = "<absolute>"; };
+		FDA3461D0D8CDC08008CEF0D /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/zh_CN.lproj/MediaBrowser.nib"; sourceTree = "<absolute>"; };
+		FDA3462C0D8CE0B6008CEF0D /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/fr.lproj/MainMenu.nib"; sourceTree = "<absolute>"; };
+		FDA3462D0D8CE0B6008CEF0D /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/da.lproj/MainMenu.nib"; sourceTree = "<absolute>"; };
+		FDA3462E0D8CE0B6008CEF0D /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/it.lproj/MainMenu.nib"; sourceTree = "<absolute>"; };
+		FDA3462F0D8CE0B6008CEF0D /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/de.lproj/MainMenu.nib"; sourceTree = "<absolute>"; };
+		FDA346300D8CE0B6008CEF0D /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/zh_CN.lproj/MainMenu.nib"; sourceTree = "<absolute>"; };
+		FDA346310D8CE0B6008CEF0D /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/zh_TW.lproj/MainMenu.nib"; sourceTree = "<absolute>"; };
+		FDA346320D8CE0B6008CEF0D /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/ja.lproj/MainMenu.nib"; sourceTree = "<absolute>"; };
+		FDA346340D8CE136008CEF0D /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/fr.lproj/MainMenuSingle.nib"; sourceTree = "<absolute>"; };
+		FDA346350D8CE136008CEF0D /* da */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = da; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/da.lproj/MainMenuSingle.nib"; sourceTree = "<absolute>"; };
+		FDA346360D8CE136008CEF0D /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/it.lproj/MainMenuSingle.nib"; sourceTree = "<absolute>"; };
+		FDA346370D8CE136008CEF0D /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/de.lproj/MainMenuSingle.nib"; sourceTree = "<absolute>"; };
+		FDA346380D8CE136008CEF0D /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/sv.lproj/MainMenuSingle.nib"; sourceTree = "<absolute>"; };
+		FDA346390D8CE136008CEF0D /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/zh_CN.lproj/MainMenuSingle.nib"; sourceTree = "<absolute>"; };
+		FDA3463A0D8CE136008CEF0D /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/zh_TW.lproj/MainMenuSingle.nib"; sourceTree = "<absolute>"; };
+		FDA3463B0D8CE136008CEF0D /* ja */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ja; path = "/Users/cmeyer/Developer/PhotoToMovie/imedia-branch/ja.lproj/MainMenuSingle.nib"; sourceTree = "<absolute>"; };
 		FDD6A5010D6A512E00CA57D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/MainMenuSingle.nib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1582,14 +1597,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				791F97640975D4970071B2E0 /* en */,
-				A93A664D0AE7709E00C77AA4 /* fr */,
-				A93A66520AE770E800C77AA4 /* de */,
-				A93A66530AE7710500C77AA4 /* zh_TW */,
-				A93A66540AE7710E00C77AA4 /* da */,
-				A93A66550AE7711700C77AA4 /* ja */,
-				A93A66560AE7712200C77AA4 /* it */,
-				A93A66570AE7713100C77AA4 /* zh_CN */,
 				5B3AD8600B5BA23800C971A0 /* sv */,
+				FDA3462C0D8CE0B6008CEF0D /* fr */,
+				FDA3462D0D8CE0B6008CEF0D /* da */,
+				FDA3462E0D8CE0B6008CEF0D /* it */,
+				FDA3462F0D8CE0B6008CEF0D /* de */,
+				FDA346300D8CE0B6008CEF0D /* zh_CN */,
+				FDA346310D8CE0B6008CEF0D /* zh_TW */,
+				FDA346320D8CE0B6008CEF0D /* ja */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1614,6 +1629,13 @@
 			isa = PBXVariantGroup;
 			children = (
 				FD6008F50D6A553F00A1146F /* en */,
+				FDA345F20D8CDBBE008CEF0D /* da */,
+				FDA346090D8CDBCB008CEF0D /* de */,
+				FDA3460D0D8CDBD8008CEF0D /* fr */,
+				FDA346110D8CDBEA008CEF0D /* it */,
+				FDA346150D8CDBF3008CEF0D /* ja */,
+				FDA346190D8CDC00008CEF0D /* sv */,
+				FDA3461D0D8CDC08008CEF0D /* zh_CN */,
 			);
 			name = MediaBrowser.nib;
 			sourceTree = "<group>";
@@ -1622,6 +1644,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				FDD6A5010D6A512E00CA57D2 /* en */,
+				FDA346340D8CE136008CEF0D /* fr */,
+				FDA346350D8CE136008CEF0D /* da */,
+				FDA346360D8CE136008CEF0D /* it */,
+				FDA346370D8CE136008CEF0D /* de */,
+				FDA346380D8CE136008CEF0D /* sv */,
+				FDA346390D8CE136008CEF0D /* zh_CN */,
+				FDA3463A0D8CE136008CEF0D /* zh_TW */,
+				FDA3463B0D8CE136008CEF0D /* ja */,
 			);
 			name = MainMenuSingle.nib;
 			sourceTree = "<group>";

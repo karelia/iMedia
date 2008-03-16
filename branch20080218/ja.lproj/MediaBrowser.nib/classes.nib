@@ -1,103 +1,65 @@
-{
-    IBClasses = (
-        {
-            CLASS = DragNDropImageBox; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {appController = id; filePathField = id; }; 
-            SUPERCLASS = NSImageView; 
-        }, 
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {CLASS = iMBBackgroundImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
-        {CLASS = iMBLibraryOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
-        {
-            CLASS = iMBPlacardScrollView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {placard = NSView; }; 
-            SUPERCLASS = NSScrollView; 
-        }, 
-        {
-            ACTIONS = {flipBack = id; info = id; playlistSelected = id; reloadMediaBrowser = id; }; 
-            CLASS = iMediaBrowser; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                libraryController = NSTreeController; 
-                myDelegate = id; 
-                mySelectedBrowser = id; 
-                oBackgroundImageView = iMBBackgroundImageView; 
-                oBrowserView = NSView; 
-                oInfoTextView = NSTextView; 
-                oInfoWindow = NSWindow; 
-                oLoading = NSProgressIndicator; 
-                oLoadingText = NSTextField; 
-                oLoadingView = NSBox; 
-                oPlaylistContainer = NSView; 
-                oPlaylistPopup = NSPopUpButton; 
-                oPlaylists = NSOutlineView; 
-                oSplitView = RBSplitView; 
-            }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {
-            ACTIONS = {"_getThumnailImage" = id; }; 
-            CLASS = mainController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                "_iMovieDocumentPathTextField" = NSTextField; 
-                "_thumbnailImageView" = NSImageView; 
-                moviesMenuItem = id; 
-                photosMenuItem = id; 
-                tunesMenuItem = id; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = moviesController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {counterField = id; previewMovieView = id; table = id; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = photosAlbumController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {newPhotosController = id; table = id; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = photosController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {counterField = id; table = id; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {playMovie = id; scrubAudio = id; stopMovie = id; }; 
-            CLASS = tunesController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                clockDisplay = NSTextField; 
-                counterField = id; 
-                playButton = NSButton; 
-                progressIndicator = NSSlider; 
-                table = id; 
-                window = NSWindow; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {playMovie = id; scrubAudio = id; songSelected = id; stopMovie = id; }; 
-            CLASS = tunesPlaylistController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                clockDisplay = NSTextField; 
-                counterField = NSTextField; 
-                mySelectedPlaylist = id; 
-                oView = NSView; 
-                playButton = NSButton; 
-                progressIndicator = NSSlider; 
-                table = NSTableView; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>iMBBackgroundImageView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSImageView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>flipBack</key>
+				<string>id</string>
+				<key>info</key>
+				<string>id</string>
+				<key>playlistSelected</key>
+				<string>id</string>
+				<key>reloadMediaBrowser</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>iMediaBrowser</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>browserDelegate</key>
+				<string>id</string>
+				<key>browserTabView</key>
+				<string>NSTabView</string>
+				<key>oBackgroundImageView</key>
+				<string>iMBBackgroundImageView</string>
+				<key>oInfoTextView</key>
+				<string>NSTextView</string>
+				<key>oInfoWindow</key>
+				<string>NSWindow</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
