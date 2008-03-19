@@ -48,9 +48,6 @@
 
 @interface QTMovie ( iMedia )
 
-//- (NSImage *)betterPosterImage;
-//- (NSImage *)betterPosterImageWithMaxSize:(NSSize)maxSize;  // Shrinks the image if it's larger than maxSize
-
 - (BOOL) isDRMProtected;
 // get access to the mp3 meta data
 - (NSString *)attributeWithFourCharCode:(OSType)code;
