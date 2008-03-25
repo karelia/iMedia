@@ -205,6 +205,9 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
             [loadingView setHidden:NO];
             [loadingProgressIndicator startAnimation:self];
 
+            // put this outside of the thread so that there are no race conditions involving bindings.
+            [self resetLibraryController];
+
             [NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:[NSNumber numberWithBool:NO]];
         }
     }
@@ -224,6 +227,9 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
         [splitView setHidden:YES];
         [loadingView setHidden:NO];
         [loadingProgressIndicator startAnimation:self];
+
+        // put this outside of the thread so that there are no race conditions involving bindings.
+        [self resetLibraryController];
 
         [NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:[NSNumber numberWithBool:NO]];
     }
@@ -398,7 +404,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
    
 	BOOL reuseCachedData = [reuseCachedDataArgument boolValue];
 
-	[self resetLibraryController];
 	NSMutableArray *root = [NSMutableArray array];
     NSArray *parsers = [[[iMediaConfiguration sharedConfiguration] parsers] objectForKey:[self mediaType]];
 
