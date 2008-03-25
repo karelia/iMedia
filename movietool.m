@@ -56,6 +56,7 @@
 #import <QuickTime/QuickTime.h>
 #import <QTKit/QTKit.h>
 #import "iMBMovieCacheDB.h"
+#import "QTMovie+iMedia.h"
 
 #define CONST_SECONDS (32)
 #define MAX_IMAGE_SIZE  300.0f
@@ -157,7 +158,13 @@ static int runConnectedToServer(NSString * serverName, BOOL shouldDoPosterImages
             movie = openMovie(sourceURLString, movieCacheDict);
             if (!movie) 
                 return -2;
-                                                            
+            
+            if ([movie isDRMProtected])
+            {
+                [server setPosterImageFilePath:@"DRM" forURLString:sourceURLString];
+                continue;
+            }
+            
             // Get the attributes
             NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity:[attributeKeys count]];
             NSEnumerator *keyEnum = [attributeKeys objectEnumerator];
@@ -287,6 +294,12 @@ static int runConnectedToServer(NSString * serverName, BOOL shouldDoPosterImages
             movie = openMovie (sourceURLString, movieCacheDict);
             if (!movie)
                 return -2;
+            
+            if ([movie isDRMProtected])
+            {
+                [server setMiniMovieFilePath:@"DRM" forURLString:sourceURLString];
+                continue;
+            }
             
             NSNumber    *hasDurationNumber = [movie attributeForKey:QTMovieHasDurationAttribute];
             if (hasDurationNumber && ![hasDurationNumber boolValue])

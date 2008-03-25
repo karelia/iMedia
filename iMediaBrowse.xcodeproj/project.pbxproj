@@ -21,6 +21,7 @@
 		5B29F47C0D6EB38B0045CD86 /* iMBMovieReference.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B1AA7260D6C72CA003585CD /* iMBMovieReference.h */; };
 		5B29F47D0D6EB38C0045CD86 /* iMBMovieCacheDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B1AA7280D6C72CA003585CD /* iMBMovieCacheDB.h */; };
 		5B3AD87D0B5BA2A600C971A0 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 791F97630975D4970071B2E0 /* MainMenu.nib */; };
+		5B43F5450D993766001C7365 /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
 		5BE025270B5CE1FA0073DCF8 /* iMBiTunesVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7990CD5909D75D4A00AD74BA /* iMBiTunesVideoParser.m */; };
 		5BE025280B5CE1FB0073DCF8 /* iMBiTunesVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 7990CD5809D75D4A00AD74BA /* iMBiTunesVideoParser.h */; };
 		7903562D09E3B45F00384D08 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7903562C09E3B45F00384D08 /* AddressBook.framework */; };
@@ -1445,6 +1446,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B1AA7430D6C738B003585CD /* movietool.m in Sources */,
+				5B43F5450D993766001C7365 /* QTMovie+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

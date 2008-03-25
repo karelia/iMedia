@@ -191,14 +191,21 @@
         return nil;
     }
     
-    NSString    *path = [[[iMBMovieCacheDB sharedMovieCacheDB] posterImagesDirPath] stringByAppendingPathComponent:posterImageFileName];
-
-    if (![[NSFileManager defaultManager] changeFileAttributes:[NSDictionary dictionaryWithObject:[NSDate date] forKey:NSFileModificationDate] atPath:path]
-        && ![[NSFileManager defaultManager] fileExistsAtPath:path])
+    NSString    *path = nil;
+    
+    if ([posterImageFileName isEqual:@"DRM"])
+        path = [[NSBundle bundleForClass:[self class]] pathForResource:@"drm_movie" ofType:@"png"];
+    else
     {
-        [self setPosterImageFileName:nil];
-        [[iMBMovieCacheDB sharedMovieCacheDB] generatePosterImageAndAttributesForURLString: [self urlString]];
-        return nil;
+        path = [[[iMBMovieCacheDB sharedMovieCacheDB] posterImagesDirPath] stringByAppendingPathComponent:posterImageFileName];
+        
+        if (![[NSFileManager defaultManager] changeFileAttributes:[NSDictionary dictionaryWithObject:[NSDate date] forKey:NSFileModificationDate] atPath:path]
+            && ![[NSFileManager defaultManager] fileExistsAtPath:path])
+        {
+            [self setPosterImageFileName:nil];
+            [[iMBMovieCacheDB sharedMovieCacheDB] generatePosterImageAndAttributesForURLString: [self urlString]];
+            return nil;
+        }
     }
     
     NSImage *image = [[NSImage alloc] initByReferencingFile:path];
