@@ -224,19 +224,19 @@ static NSMutableArray *_browserClasses = nil;
 + (void)registerParser:(Class)aClass forMediaType:(NSString *)media
 {
     // call method on shared iMediaConfiguration object
-    [[iMediaConfiguration sharedConfiguration] registerParser:aClass forMediaType:media];
+    [iMediaConfiguration registerParser:aClass forMediaType:media];
 }    
 
 + (void)unregisterParserName:(NSString*)parserClassName forMediaType:(NSString *)media
 {
     // call method on shared iMediaConfiguration object
-    [[iMediaConfiguration sharedConfiguration] unregisterParserName:parserClassName forMediaType:media];
+    [iMediaConfiguration unregisterParserName:parserClassName forMediaType:media];
 }
 
 + (void)unregisterParser:(Class)parserClass forMediaType:(NSString *)media
 {
     // call method on shared iMediaConfiguration object
-    [[iMediaConfiguration sharedConfiguration] unregisterParser:parserClass forMediaType:media];
+    [iMediaConfiguration unregisterParser:parserClass forMediaType:media];
 }
 
 
