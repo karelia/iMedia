@@ -62,6 +62,7 @@
 
 + (void)registerParser:(Class)aClass forMediaType:(NSString *)media;
 + (void)unregisterParserName:(NSString *)parserClassName forMediaType:(NSString *)media;
++ (void)unregisterParser:(Class)parserClass forMediaType:(NSString *)media;
 
 - (NSDictionary *)parsers;
 
