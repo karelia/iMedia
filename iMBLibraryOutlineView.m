@@ -51,6 +51,16 @@
 @end
 
 @implementation iMBLibraryOutlineView
+- (void) awakeFromNib
+{
+    if ([self respondsToSelector:@selector(setSelectionHighlightStyle:)])
+    {
+        // Here's how we'd do it on Leopard:
+        // [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
+        // but then we'd get compile problems on Tiger so we do it like this instead:
+        [self setValue:[NSNumber numberWithInt:1] forKey:@"selectionHighlightStyle"];
+    }
+}
 
 - (void)reloadData
 {
