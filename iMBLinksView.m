@@ -60,9 +60,12 @@
 {
     if ( finishedInit )
     {
-	[super awakeFromNib];
+		[super awakeFromNib];
 
-	[oLinkController setDelegate:self];
+		[oLinkController setDelegate:self];
+		
+		// See http://developer.apple.com/documentation/Cocoa/Conceptual/DragandDrop/Tasks/faq.html
+		[table setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
     }
 }
 

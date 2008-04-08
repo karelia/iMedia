@@ -98,31 +98,33 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 {
     if ( finishedInit )
     {
-	[super awakeFromNib];
+		[super awakeFromNib];
 
-	[songsController setDelegate:self];
-	
-	[[[table tableColumnWithIdentifier:@"Name"] headerCell] setStringValue:
-		LocalizedStringInThisBundle(@"Title", @"Table Column Title - title of song or audio track")];
-	[[[table tableColumnWithIdentifier:@"Artist"] headerCell] setStringValue:
-		LocalizedStringInThisBundle(@"Artist", @"Table Column Title - music artist or creator")];
-	[[[table tableColumnWithIdentifier:@"Time"] headerCell] setStringValue:
-		LocalizedStringInThisBundle(@"Time", @"Table Column Title - time of song or audio track")];
+		[songsController setDelegate:self];
+		
+		[[[table tableColumnWithIdentifier:@"Name"] headerCell] setStringValue:
+			LocalizedStringInThisBundle(@"Title", @"Table Column Title - title of song or audio track")];
+		[[[table tableColumnWithIdentifier:@"Artist"] headerCell] setStringValue:
+			LocalizedStringInThisBundle(@"Artist", @"Table Column Title - music artist or creator")];
+		[[[table tableColumnWithIdentifier:@"Time"] headerCell] setStringValue:
+			LocalizedStringInThisBundle(@"Time", @"Table Column Title - time of song or audio track")];
 
-	NSDictionary *optionsDict =
-	[NSDictionary dictionaryWithObject:@"%{value1}@ %{value2}@"  
-								forKey:NSDisplayPatternBindingOption];
-	
-	[counterField bind:@"displayPatternValue1"
-			  toObject:songsController
-		   withKeyPath:@"arrangedObjects.@count"
-			   options:optionsDict];
-	
-	[counterField bind:@"displayPatternValue2"
-			  toObject:self
-		   withKeyPath:@"tracksCountPluralityAdjustedString"
-			   options:optionsDict];
-	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
+		NSDictionary *optionsDict =
+		[NSDictionary dictionaryWithObject:@"%{value1}@ %{value2}@"  
+									forKey:NSDisplayPatternBindingOption];
+		
+		[counterField bind:@"displayPatternValue1"
+				  toObject:songsController
+			   withKeyPath:@"arrangedObjects.@count"
+				   options:optionsDict];
+		
+		[counterField bind:@"displayPatternValue2"
+				  toObject:self
+			   withKeyPath:@"tracksCountPluralityAdjustedString"
+				   options:optionsDict];
+		// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
+		
+		[table setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
     }
 }
 

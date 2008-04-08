@@ -59,6 +59,9 @@
         // [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
         // but then we'd get compile problems on Tiger so we do it like this instead:
         [self setValue:[NSNumber numberWithInt:1] forKey:@"selectionHighlightStyle"];
+		
+		// See: http://developer.apple.com/documentation/Cocoa/Conceptual/DragandDrop/Tasks/faq.html
+		[self setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
     }
 }
 
