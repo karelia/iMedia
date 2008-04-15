@@ -182,6 +182,7 @@
 // To prevent flicker...
 		NSDisableScreenUpdates();
 // We bring the final window to the front in order to build the final image.
+		[finalWindow setAlphaValue:0];
 		[finalWindow makeKeyAndOrderFront:self];
 // Here we get an image of the final window and make a CIImage from it.
 		view = [[finalWindow contentView] superview];
@@ -190,7 +191,6 @@
 		[view cacheDisplayInRect:flp toBitmapImageRep:bitmap];
 		finalImage = [[CIImage alloc] initWithBitmapImageRep:bitmap];
 // To save time, we don't order the final window out, just make it completely transparent.
-		[finalWindow setAlphaValue:0];
 		[initialWindow orderOut:self];
 // This will draw the first frame at value 0, duplicating the initial window. This is not really optimal,
 // but we need to compensate for the time spent here, which seems to be about 3 to 5x what's needed
