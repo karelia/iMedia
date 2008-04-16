@@ -200,6 +200,8 @@
 		CEE57B2E0C4D3C9300FCE138 /* iMBHoverButton.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE57B2A0C4D3C9300FCE138 /* iMBHoverButton.m */; };
 		CEE57B550C4D3F4800FCE138 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE57B540C4D3F4800FCE138 /* QuartzCore.framework */; };
 		CEE57B900C4D420A00FCE138 /* Info.html in Resources */ = {isa = PBXBuildFile; fileRef = CEE57B8F0C4D420A00FCE138 /* Info.html */; };
+		CEEE54150DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEE54130DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CEEE54160DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEE54140DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.m */; };
 		CEF3F38609E449FF00D0058F /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF3F38409E449FF00D0058F /* NSString+iMedia.m */; };
 		CEFC515C0B792BD1009F114D /* reload.png in Resources */ = {isa = PBXBuildFile; fileRef = CEFC515B0B792BD1009F114D /* reload.png */; };
 		CEFC515F0B792C11009F114D /* iMBPlacardScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEFC515D0B792C11009F114D /* iMBPlacardScrollView.h */; };
@@ -534,6 +536,8 @@
 		CEE57B2A0C4D3C9300FCE138 /* iMBHoverButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iMBHoverButton.m; sourceTree = "<group>"; };
 		CEE57B540C4D3F4800FCE138 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
 		CEE57B910C4D420F00FCE138 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = en; path = en.lproj/Info.html; sourceTree = "<group>"; };
+		CEEE54130DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBVerticallyAlignedTextCell.h; sourceTree = "<group>"; };
+		CEEE54140DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBVerticallyAlignedTextCell.m; sourceTree = "<group>"; };
 		CEF3F38309E449FF00D0058F /* NSString+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSString+iMedia.h"; sourceTree = "<group>"; };
 		CEF3F38409E449FF00D0058F /* NSString+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSString+iMedia.m"; sourceTree = "<group>"; };
 		CEFC515B0B792BD1009F114D /* reload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload.png; sourceTree = "<group>"; };
@@ -1061,6 +1065,8 @@
 				CEE57B280C4D3C9300FCE138 /* iMBBackgroundImageView.m */,
 				CEE57B290C4D3C9300FCE138 /* iMBHoverButton.h */,
 				CEE57B2A0C4D3C9300FCE138 /* iMBHoverButton.m */,
+				CEEE54130DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.h */,
+				CEEE54140DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -1198,6 +1204,7 @@
 				E549259E0D53418D002B9F89 /* iMediaConfiguration.h in Headers */,
 				5B29F47C0D6EB38B0045CD86 /* iMBMovieReference.h in Headers */,
 				5B29F47D0D6EB38C0045CD86 /* iMBMovieCacheDB.h in Headers */,
+				CEEE54150DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1523,6 +1530,7 @@
 				5B1AA72B0D6C72CA003585CD /* MovieCache.xcdatamodel in Sources */,
 				5B29F2850D6D726F0045CD86 /* iMBMovieCacheDB.m in Sources */,
 				5B29F28A0D6D72960045CD86 /* iMBMovieReference.m in Sources */,
+				CEEE54160DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

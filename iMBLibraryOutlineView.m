@@ -42,28 +42,128 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
+#import "iMedia.h"
 #import "iMBLibraryOutlineView.h"
+#import "iMBVerticallyAlignedTextCell.h"
 
 @interface NSObject (iMediaHack)
 - (id)observedObject;
 - (void)outlineView:(NSOutlineView *)olv deleteItems:(NSArray *)items;
 @end
 
+@interface iMBLibraryOutlineView ( Private )
+- (iMBVerticallyAlignedTextCell *)placeholderTextCell;
+@end
+
 @implementation iMBLibraryOutlineView
-- (void) awakeFromNib
+
+# pragma mark *** Init & Dealloc ***
+
+- (void)awakeFromNib
 {
-    if ([self respondsToSelector:@selector(setSelectionHighlightStyle:)])
-    {
-        // Here's how we'd do it on Leopard:
-        // [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
-        // but then we'd get compile problems on Tiger so we do it like this instead:
-        [self setValue:[NSNumber numberWithInt:1] forKey:@"selectionHighlightStyle"];
-		
-		// See: http://developer.apple.com/documentation/Cocoa/Conceptual/DragandDrop/Tasks/faq.html
-		[self setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
-    }
+	if ([self respondsToSelector:@selector(setSelectionHighlightStyle:)])
+	{
+		// Here's how we'd do it on Leopard:
+		// [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
+		// but then we'd get compile problems on Tiger so we do it like this instead:
+		[self setValue:[NSNumber numberWithInt:1] forKey:@"selectionHighlightStyle"];
+	}
+
+	// See: http://developer.apple.com/documentation/Cocoa/Conceptual/DragandDrop/Tasks/faq.html
+	[self setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+
+	// Monitor the clip view containing us
+	[[self superview] setPostsBoundsChangedNotifications:YES];
+
+//	[[NSNotificationCenter defaultCenter] addObserver:self
+//											 selector:@selector(clipViewBoundsChanged:)
+//												 name:NSViewBoundsDidChangeNotification
+//											   object:[self superview]];
+	
+	[self setPlaceholderString:LocalizedStringInThisBundle(@"Drag additional source folders here", @"Instructions for media browser source list")];
 }
+
+- (void)dealloc
+{
+	// De-register from clip view notifications
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:NSViewBoundsDidChangeNotification
+												  object:[self superview]];
+	// Release ivars
+	[myPlaceholder release];
+	[myPlaceholderCell release];
+	[super dealloc];
+}
+
+#pragma mark -
+#pragma mark Accessors
+
+- (NSString *)placeholderString { return myPlaceholder; }
+
+- (void)setPlaceholderString:(NSString *)placeholder
+{
+	placeholder = [placeholder copy];
+	[myPlaceholder release];
+	myPlaceholder = placeholder;
+	
+	[self setNeedsDisplay:YES];
+}
+
+- (NSColor *)placeholderStringColor { return [[self placeholderTextCell] textColor]; }
+
+- (void)setPlaceholderStringColor:(NSColor *)color { [[self placeholderTextCell] setTextColor:color]; }
+
+# pragma mark *** Drawing ***
+
+- (void)drawRect:(NSRect)aRect	// draw the drag and drop zone.  Fade in depending on how much empty area.
+{
+	[super drawRect:aRect];
+	
+	int meHeight = [self bounds].size.height;
+//	int scrollHeight = [[[self superview] superview] bounds].size.height;
+	int dataHeight = [self rowHeight] * [self numberOfRows];	
+	const int MARGIN_BELOW = 10;
+	const int FADE_AREA = 30;
+	
+	// If there are no rows in the table, draw the placeholder
+	if ([self placeholderString]
+			&& [[self dataSource] respondsToSelector:@selector(parserForFolderDrop)]
+			&& nil != [[self dataSource] parserForFolderDrop]
+			&& dataHeight + MARGIN_BELOW <= meHeight)		// show if we have some room below
+	{
+		int fadeHeight = MIN(meHeight - dataHeight, MARGIN_BELOW+FADE_AREA) - MARGIN_BELOW;
+		float alpha = (float)fadeHeight / FADE_AREA;
+		[self setPlaceholderStringColor:[NSColor colorWithCalibratedWhite:0.5 alpha:alpha]];
+
+		NSTextFieldCell *cell = [self placeholderTextCell];
+		[cell setStringValue:[self placeholderString]];
+		
+		NSRect textRect = NSInsetRect([self bounds], 12.0, 12.0);
+		[cell drawWithFrame:textRect inView:self];
+	}
+}
+
+- (iMBVerticallyAlignedTextCell *)placeholderTextCell
+{
+	if (!myPlaceholderCell)
+	{
+		// Create the new cell with appropriate attributes
+		myPlaceholderCell = [[iMBVerticallyAlignedTextCell alloc] initTextCell:@""];
+		
+		[myPlaceholderCell setAlignment:NSCenterTextAlignment];
+		[myPlaceholderCell setVerticalAlignment:iMBBottomTextAlignment];
+		
+		float fontSize = [NSFont systemFontSizeForControlSize:NSSmallControlSize];
+		NSFont *font = [NSFont boldSystemFontOfSize:fontSize];
+		[myPlaceholderCell setFont:font];
+		[myPlaceholderCell setTextColor:[NSColor grayColor]];
+	}
+	
+	return myPlaceholderCell;
+}
+
+#pragma mark -
+#pragma mark Data
 
 - (void)reloadData
 {
@@ -157,5 +257,6 @@
 	}
 	[super keyDown:theEvent];
 }
+
 
 @end
