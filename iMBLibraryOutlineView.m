@@ -122,8 +122,8 @@
 	int meHeight = [self bounds].size.height;
 //	int scrollHeight = [[[self superview] superview] bounds].size.height;
 	int dataHeight = [self rowHeight] * [self numberOfRows];	
-	const int MARGIN_BELOW = 10;
-	const int FADE_AREA = 30;
+	const int MARGIN_BELOW = 15;
+	const int FADE_AREA = 35;
 	
 	// If there are no rows in the table, draw the placeholder
 	if ([self placeholderString]
@@ -133,7 +133,7 @@
 	{
 		int fadeHeight = MIN(meHeight - dataHeight, MARGIN_BELOW+FADE_AREA) - MARGIN_BELOW;
 		float alpha = (float)fadeHeight / FADE_AREA;
-		[self setPlaceholderStringColor:[NSColor colorWithCalibratedWhite:0.5 alpha:alpha]];
+		[self setPlaceholderStringColor:[NSColor colorWithCalibratedWhite:0.66667 alpha:alpha]];
 
 		NSTextFieldCell *cell = [self placeholderTextCell];
 		[cell setStringValue:[self placeholderString]];
