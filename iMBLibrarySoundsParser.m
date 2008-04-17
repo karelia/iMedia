@@ -75,7 +75,7 @@
 	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
 
     NSString *musicFolderName = LocalizedStringInThisBundle(@"Sounds Folder", @"~/Library/Sounds folder name");
-    NSString *unknownArtistName = LocalizedStringInThisBundle(@"Unknown", @"Artist of sound is unknown");
+    NSString *unknownArtistName = LocalizedStringInThisBundle(@"Unknown", @"Unknown music/sound artist");
     NSString *iconName = @"folder";
     BOOL parseMetadata = YES;
 	

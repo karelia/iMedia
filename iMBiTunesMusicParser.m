@@ -136,7 +136,7 @@
 		[partyShuffleLib setName:LocalizedStringInThisBundle(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
 		[partyShuffleLib setIconName:@"MBiTunesPartyShuffle"];
 		
-		[purchasedLib setName:LocalizedStringInThisBundle(@"Purchased", @"Purchased folder  as titled in iTunes source list")];
+		[purchasedLib setName:LocalizedStringInThisBundle(@"Purchased", @"Purchased folder as titled in iTunes source list")];
 		[purchasedLib setIconName:@"MBiTunesPurchasedPlaylist"];
 		
 		int playlistCount = [[musicLibrary objectForKey:@"Playlists"] count];

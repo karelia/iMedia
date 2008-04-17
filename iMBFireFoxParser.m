@@ -146,7 +146,7 @@
 	if (bookmarksPath)
 	{
 		root = [[iMBLibraryNode alloc] init];
-		[root setName:LocalizedStringInThisBundle(@"FireFox", @"FireFox")];
+		[root setName:LocalizedStringInThisBundle(@"Firefox", @"Firefox")];
 		[root setIconName:@"org.mozilla.firefox"];
 		
 		
