@@ -1231,9 +1231,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 79167A000975255100D9EF74 /* Build configuration list for PBXNativeTarget "iMediaBrowser" */;
 			buildPhases = (
-				791679F90975255000D9EF74 /* Headers */,
 				3C3A132409EAFBA700AF41BF /* Generate Localizable.strings */,
 				791679FA0975255000D9EF74 /* Resources */,
+				791679F90975255000D9EF74 /* Headers */,
 				791679FB0975255000D9EF74 /* Sources */,
 				791679FC0975255000D9EF74 /* Frameworks */,
 				FD2EB0140C6982BD00023B2E /* CopyFiles */,
