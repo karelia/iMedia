@@ -234,7 +234,7 @@ static NSImage *sDRMIcon = nil;
     {
         NSMutableArray *movieTypes = [NSMutableArray arrayWithArray:[QTMovie movieFileTypes:QTIncludeAllTypes]];
         
-		// TODO: Why is this type being removed? What is it? cmeyer 2007/08/07.
+		// This was put in as part of an "ubercaster fix" in r250. (Not sure exactly what file type this is)
         [movieTypes removeObject:@"kar"];
         
         [self recursivelyParse:folder withNode:root movieTypes:movieTypes];
