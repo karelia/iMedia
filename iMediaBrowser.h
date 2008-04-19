@@ -119,6 +119,7 @@
 - (IBAction) flipBack:(id)sender;
 
 - (BOOL)infoWindowIsVisible;
+- (NSWindow *)infoWindow;
 
 // Setting & Getting the excluded folder list
 - (NSArray *)excludedFolders;

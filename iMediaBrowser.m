@@ -624,6 +624,11 @@ static NSMutableArray *_browserClasses = nil;
 	return [oInfoWindow isVisible];
 }
 
+- (NSWindow *)infoWindow;
+{
+	return oInfoWindow;
+}
+
 - (IBAction) info:(id)sender
 {
 	[oInfoWindow setFrame:[[self window] frame] display:NO];
