@@ -505,7 +505,7 @@
 		CE4E78F30C5E76F30044A5F9 /* da */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = da; path = da.lproj/Info.html; sourceTree = "<group>"; };
 		CE4E79090C5E76F90044A5F9 /* de */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = de; path = de.lproj/Info.html; sourceTree = "<group>"; };
 		CE4E790A0C5E76FF0044A5F9 /* fr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = fr; path = fr.lproj/Info.html; sourceTree = "<group>"; };
-		CE4E790B0C5E77060044A5F9 /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = it; path = it.lproj/Info.html; sourceTree = "<group>"; };
+		CE4E790B0C5E77060044A5F9 /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.html; lineEnding = 0; name = it; path = it.lproj/Info.html; sourceTree = "<group>"; };
 		CE4E790C0C5E770C0044A5F9 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/Info.html; sourceTree = "<group>"; };
 		CE4E790D0C5E77120044A5F9 /* sv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = sv; path = sv.lproj/Info.html; sourceTree = "<group>"; };
 		CE4E790E0C5E77170044A5F9 /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = zh_CN; path = zh_CN.lproj/Info.html; sourceTree = "<group>"; };

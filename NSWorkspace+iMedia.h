@@ -1,14 +1,14 @@
 /*
- iMedia Browser <http://karelia.com/imedia/>
+ iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2007 by Karelia Software et al.
+ Copyright (c) 2005-2008 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
  Contributions have also been made by Matt Gough, Martin Wennerberg and others
  as indicated in source files.
  
- iMedia Browser is licensed under the following terms:
+ The iMedia Browser Framework is licensed under the following terms:
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2007 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2008 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
