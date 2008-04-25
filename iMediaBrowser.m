@@ -304,6 +304,8 @@ static NSMutableArray *_browserClasses = nil;
 {
 	[[self window] setTitle:LocalizedStringInThisBundle(@"Media", @"Window name of iMediaBrowser")];
 	
+	[[self window] setContentMinSize:NSMakeSize(292,292)];	// not so small that we lose the back of window content
+	 
 	myMediaBrowsers = [[NSMutableArray arrayWithCapacity:[_browserClasses count]] retain];
 
 	if (myToolbar) 
