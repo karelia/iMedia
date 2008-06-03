@@ -77,11 +77,8 @@
 		mySelection = [[NSMutableIndexSet allocWithZone:[self zone]] init];
 		myFilteredImages = [[NSMutableArray allocWithZone:[self zone]] init];
 		myImageCache = [[NSMutableDictionary dictionary] retain];
-        finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(posterImageWasLoaded:) name:kMBMovieCacheLoadedPosterImageNotification object:nil];
-        
-		[NSBundle loadNibNamed:@"Movies" owner:self];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(posterImageWasLoaded:) name:kMBMovieCacheLoadedPosterImageNotification object:nil];        
 	}
 	return self;
 }
@@ -106,6 +103,13 @@
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super finalize];
+}
+
+- (void)loadViewNib
+{
+	[super loadViewNib];
+	finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
+	[NSBundle loadNibNamed:@"Movies" owner:self];
 }
 
 - (void)awakeFromNib

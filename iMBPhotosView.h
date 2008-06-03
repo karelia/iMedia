@@ -56,7 +56,7 @@
 
     BOOL finishedInit;
     
-@private    
+@protected    
     NSMutableDictionary		*myCache;
 	NSMutableIndexSet		*mySelection;
 	NSArray					*myImages;

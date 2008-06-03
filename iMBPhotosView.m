@@ -111,10 +111,6 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 		myCacheLock = [[NSLock alloc] init];
 		myInFlightImageOperations = [[NSMutableArray array] retain];
 		myProcessingImages = [[NSMutableSet set] retain];
-        
-        finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
-
-		[NSBundle loadNibNamed:@"iPhoto" owner:self];
     }
             
     return self;
@@ -137,6 +133,13 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 	[myProcessingImages release];
 	
 	[super dealloc];
+}
+
+- (void)loadViewNib
+{
+	[super loadViewNib];
+	finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
+	[NSBundle loadNibNamed:@"iPhoto" owner:self];
 }
 
 - (void)awakeFromNib

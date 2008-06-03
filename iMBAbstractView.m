@@ -100,8 +100,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
             return nil;
         }
 
-		[NSBundle loadNibNamed:@"Abstract" owner:self];
-
     	loadedParsers = [[NSMutableDictionary alloc] init];
         userDroppedParsers = [[NSMutableArray alloc] init];
 
@@ -124,6 +122,11 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
     [backgroundLoadingLock release];
 
 	[super dealloc];
+}
+
+- (void)loadViewNib
+{
+	[NSBundle loadNibNamed:@"Abstract" owner:self];
 }
 
 - (void)awakeFromNib
@@ -192,6 +195,12 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (void)willActivate
 {
+	if (!didLoadNib)
+	{
+		[self loadViewNib];
+		didLoadNib = YES;
+	}
+	
     [splitView restoreState:YES];
     [splitView adjustSubviews];
     

@@ -47,13 +47,11 @@
 
 @implementation iMBLinksView
 
-- (id)initWithFrame:(NSRect)frame
+- (void)loadViewNib
 {
-	if (self = [super initWithFrame:frame]) {
-		finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
-		[NSBundle loadNibNamed:@"Links" owner:self];
-	}
-	return self;
+	[super loadViewNib];
+	finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
+	[NSBundle loadNibNamed:@"Links" owner:self];
 }
 
 - (void)awakeFromNib

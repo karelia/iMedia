@@ -76,15 +76,6 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 	[pool release];
 }
 
-- (id)initWithFrame:(NSRect)frame
-{
-    if (self = [super initWithFrame:frame]) {
-        finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
-		[NSBundle loadNibNamed:@"iTunes" owner:self];
-	}
-	return self;
-}
-
 - (void) dealloc {
 	[counterField unbind:@"displayPatternValue2"];
 	[counterField unbind:@"displayPatternValue1"];
@@ -92,6 +83,13 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 	[pollTimer release];
 	[myCurrentPlayingRecord release];
 	[super dealloc];
+}
+
+- (void)loadViewNib
+{
+	[super loadViewNib];
+	finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
+	[NSBundle loadNibNamed:@"iTunes" owner:self];
 }
 
 - (void)awakeFromNib

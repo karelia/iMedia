@@ -83,6 +83,7 @@ extern NSString *iMBNativeDataArray;
     BOOL inSplitViewResize;
     BOOL isLoading;
     BOOL didLoad;
+	BOOL didLoadNib;
 }
 
 - (NSImage *)toolbarIcon;
@@ -103,5 +104,7 @@ extern NSString *iMBNativeDataArray;
 
 - (void)willActivate;
 - (void)didDeactivate;
+
+- (void)loadViewNib;
 
 @end

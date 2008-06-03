@@ -50,17 +50,11 @@
 
 @implementation iMBContactsView
 
-- (id)initWithFrame:(NSRect)frame
+- (void)loadViewNib
 {
-    self = [super initWithFrame:frame];
-
-    if (self) {
-        finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
-
-		[NSBundle loadNibNamed:@"Contacts" owner:self];
-    }
-    
-    return self;
+	[super loadViewNib];
+	finishedInit = YES; // so we know when the abstract view has finished so awakeFromNib doesn't get called twice
+	[NSBundle loadNibNamed:@"Contacts" owner:self];
 }
 
 - (void)awakeFromNib

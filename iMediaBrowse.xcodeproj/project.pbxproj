@@ -44,7 +44,7 @@
 		791F55410A2C0BFC00D557F3 /* iMBFavouriteMoviesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F553F0A2C0BFC00D557F3 /* iMBFavouriteMoviesParser.m */; };
 		791F55FD0A2C0E7000D557F3 /* iMBFavouriteMusicParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F55FB0A2C0E7000D557F3 /* iMBFavouriteMusicParser.h */; };
 		791F55FE0A2C0E7000D557F3 /* iMBFavouriteMusicParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F55FC0A2C0E7000D557F3 /* iMBFavouriteMusicParser.m */; };
-		791F964D0975B63E0071B2E0 /* iMediaBrowserProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F964C0975B63E0071B2E0 /* iMediaBrowserProtocol.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		791F964D0975B63E0071B2E0 /* iMediaBrowserProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F964C0975B63E0071B2E0 /* iMediaBrowserProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		791F97380975D3750071B2E0 /* iMediaBrowser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791679FE0975255000D9EF74 /* iMediaBrowser.framework */; };
 		791F973B0975D38A0071B2E0 /* iMediaBrowser.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 791679FE0975255000D9EF74 /* iMediaBrowser.framework */; };
 		791F97400975D3A90071B2E0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 791F973D0975D3A40071B2E0 /* AppDelegate.m */; };
@@ -87,7 +87,7 @@
 		795D70D609D39C43005F166D /* folder.png in Resources */ = {isa = PBXBuildFile; fileRef = 795D70D509D39C43005F166D /* folder.png */; };
 		795D70E109D39D73005F166D /* iMBLibraryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D70DF09D39D73005F166D /* iMBLibraryNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		795D70E209D39D73005F166D /* iMBLibraryNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D70E009D39D73005F166D /* iMBLibraryNode.m */; };
-		795D715B09D3AB47005F166D /* iMBAbstractParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D715909D3AB47005F166D /* iMBAbstractParser.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		795D715B09D3AB47005F166D /* iMBAbstractParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D715909D3AB47005F166D /* iMBAbstractParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		795D715C09D3AB47005F166D /* iMBAbstractParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D715A09D3AB47005F166D /* iMBAbstractParser.m */; };
 		795D716209D3AB55005F166D /* iMBiPhotoPhotosParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D716009D3AB55005F166D /* iMBiPhotoPhotosParser.m */; };
 		795D716809D3AB64005F166D /* iMBiPhotoMoviesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 795D716609D3AB64005F166D /* iMBiPhotoMoviesParser.m */; };
