@@ -54,8 +54,6 @@
 		7922748A0A27C51600E0A9BF /* iMBFavouritePicturesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 792274880A27C51600E0A9BF /* iMBFavouritePicturesParser.h */; };
 		7922748B0A27C51600E0A9BF /* iMBFavouritePicturesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 792274890A27C51600E0A9BF /* iMBFavouritePicturesParser.m */; };
 		79353D650A28621000284715 /* heart.png in Resources */ = {isa = PBXBuildFile; fileRef = 79353D640A28621000284715 /* heart.png */; };
-		79353D9A0A28632D00284715 /* iMBFireFoxParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 79353D980A28632D00284715 /* iMBFireFoxParser.h */; };
-		79353D9B0A28632D00284715 /* iMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79353D990A28632D00284715 /* iMBFireFoxParser.m */; };
 		79353E6D0A28754C00284715 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79353E6C0A28754C00284715 /* libcrypto.dylib */; };
 		793810480A33AC53000A65EA /* NSProcessInfo+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 793810460A33AC53000A65EA /* NSProcessInfo+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		793810490A33AC53000A65EA /* NSProcessInfo+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */; };
@@ -1150,7 +1148,6 @@
 				796ABF700A28462800EF92DB /* iMBOmniWebParser.h in Headers */,
 				796ABFB40A284E3A00EF92DB /* iMBXBELParser.h in Headers */,
 				796AC02F0A28582200EF92DB /* NSAttributedString+iMedia.h in Headers */,
-				79353D9A0A28632D00284715 /* iMBFireFoxParser.h in Headers */,
 				7959CC280A2BBE4800E4980A /* NSPasteboard+iMedia.h in Headers */,
 				7959CC290A2BBE4900E4980A /* NSString+iMedia.h in Headers */,
 				7959CC2B0A2BBE4A00E4980A /* NSWorkspace+iMedia.h in Headers */,
@@ -1492,7 +1489,6 @@
 				796ABF710A28462800EF92DB /* iMBOmniWebParser.m in Sources */,
 				796ABFB50A284E3A00EF92DB /* iMBXBELParser.m in Sources */,
 				796AC0300A28582200EF92DB /* NSAttributedString+iMedia.m in Sources */,
-				79353D9B0A28632D00284715 /* iMBFireFoxParser.m in Sources */,
 				7962BDC80A2BBF26004CF308 /* NSWorkspace+iMedia.m in Sources */,
 				791F55410A2C0BFC00D557F3 /* iMBFavouriteMoviesParser.m in Sources */,
 				791F55FE0A2C0E7000D557F3 /* iMBFavouriteMusicParser.m in Sources */,
