@@ -801,6 +801,88 @@ static NSDictionary *sTitleAttributes = nil;
 	[indexes release];
 }
 
+- (NSImage*) imageForDraggingFromMouseDownPoint
+{
+	NSImage *dragImage = nil;
+	unsigned clickedIndex = [self photoIndexForPoint:mouseDownPoint];
+	NSImage *clickedImage = [self photoAtIndex:clickedIndex];
+	
+	// if we don't have an image, try using the display image
+	if (nil == clickedImage) {
+		BOOL ignoredAllowsShadows = YES;	
+		clickedImage = [self currentDisplayImageAtIndex:clickedIndex allowsShadows:&ignoredAllowsShadows];    
+	}
+	
+	// if we still have nothing, create a red image, which should let the user/developer know something is wrong	
+	if (nil == clickedImage) { 
+		clickedImage = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
+		[clickedImage lockFocus];
+		[[NSColor redColor] set];
+		[NSBezierPath fillRect:NSMakeRect(0,0,photoSize,photoSize)];
+		[clickedImage unlockFocus];
+	}
+
+	// make sure the source image is flipped, we'll restore it later
+	BOOL imageWasFlipped = [clickedImage isFlipped];
+	[clickedImage setFlipped:YES];
+	NSSize scaledSize = [self scaledPhotoSizeForSize:[clickedImage size]];
+	
+	// create the image at the desired size
+	dragImage = [[[NSImage alloc] initWithSize:scaledSize] autorelease];
+
+	// draw the drag image as a semi-transparent copy of the image the user dragged, and optionally a red badge indicating the number of photos
+	[dragImage lockFocus];
+	[clickedImage drawInRect:NSMakeRect(0,0,scaledSize.width,scaledSize.height) fromRect:NSMakeRect(0,0,[clickedImage size].width,[clickedImage size].height)  operation:NSCompositeCopy fraction:0.7];
+	[dragImage unlockFocus];
+	
+	// restore flipped state of the image
+	[clickedImage setFlipped:imageWasFlipped];
+
+	// if there's more than one image, put a badge on the photo
+	if ([[self selectionIndexes] count] > 1) {
+		NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
+		[attributes setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
+		[attributes setObject:[NSFont fontWithName:@"Helvetica" size:14] forKey:NSFontAttributeName];
+		NSAttributedString *badgeString = [[NSAttributedString alloc] initWithString:[[NSNumber numberWithInt:[[self selectionIndexes] count]] stringValue] attributes:attributes];
+		NSSize stringSize = [badgeString size];
+		int diameter = stringSize.width;
+		if (stringSize.height > diameter) diameter = stringSize.height;
+		diameter += 5;
+		
+		// calculate the badge circle
+		int maxY = [dragImage size].height - 5;
+		int maxX = [dragImage size].width - 5;
+		int minY = maxY - diameter;
+		int minX = maxX - diameter;
+		NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(minX,minY,maxX-minX,maxY-minY)];
+		
+		// draw the string
+		NSPoint point;
+		point.x = maxX - ((maxX - minX) / 2) - 1 - (stringSize.width / 2);
+		point.y = maxY - diameter + (stringSize.height / 2) - 6;
+		
+		NSAffineTransform *t = [NSAffineTransform transform];
+		[t translateXBy:0 yBy:maxY];
+		[t scaleXBy:1 yBy:-1];
+		
+		[dragImage lockFocus];
+		[t concat];
+		[[NSColor colorWithDeviceRed:1 green:0.1 blue:0.1 alpha:0.7] set];
+		[circle fill];
+		[badgeString drawAtPoint:point];
+		[t invert];
+		[t concat];
+		[dragImage unlockFocus];
+
+		[badgeString release];
+		[attributes release];
+	}	
+
+	[dragImage setFlipped:YES];
+	
+	return dragImage;	
+}
+
 - (void)mouseDragged:(NSEvent *)event
 {
     if (0 == columns) return;
@@ -814,68 +896,7 @@ static NSDictionary *sTitleAttributes = nil;
         
 	} else if (potentialDragDrop && (nil != delegate)) {
         // create a drag image
-		unsigned clickedIndex = [self photoIndexForPoint:mouseDownPoint];
-        NSImage *clickedImage = [self photoAtIndex:clickedIndex];
-        BOOL flipped = [clickedImage isFlipped];
-        [clickedImage setFlipped:YES];
-        NSSize scaledSize = [self scaledPhotoSizeForSize:[clickedImage size]];
-		if (nil == clickedImage) { // creates a red image, which should let the user/developer know something is wrong
-            clickedImage = [[[NSImage alloc] initWithSize:NSMakeSize(photoSize,photoSize)] autorelease];
-            [clickedImage lockFocus];
-            [[NSColor redColor] set];
-            [NSBezierPath fillRect:NSMakeRect(0,0,photoSize,photoSize)];
-            [clickedImage unlockFocus];
-        }
-		NSImage *dragImage = [[NSImage alloc] initWithSize:scaledSize];
-
-		// draw the drag image as a semi-transparent copy of the image the user dragged, and optionally a red badge indicating the number of photos
-        [dragImage lockFocus];
-		[clickedImage drawInRect:NSMakeRect(0,0,scaledSize.width,scaledSize.height) fromRect:NSMakeRect(0,0,[clickedImage size].width,[clickedImage size].height)  operation:NSCompositeCopy fraction:0.7];
-		[dragImage unlockFocus];
-        
-		[clickedImage setFlipped:flipped];
-
-		// if there's more than one image, put a badge on the photo
-		if ([[self selectionIndexes] count] > 1) {
-			NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
-			[attributes setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
-			[attributes setObject:[NSFont fontWithName:@"Helvetica" size:14] forKey:NSFontAttributeName];
-			NSAttributedString *badgeString = [[NSAttributedString alloc] initWithString:[[NSNumber numberWithInt:[[self selectionIndexes] count]] stringValue] attributes:attributes];
-			NSSize stringSize = [badgeString size];
-			int diameter = stringSize.width;
-			if (stringSize.height > diameter) diameter = stringSize.height;
-			diameter += 5;
-			
-			// calculate the badge circle
-			int maxY = [dragImage size].height - 5;
-			int maxX = [dragImage size].width - 5;
-			int minY = maxY - diameter;
-			int minX = maxX - diameter;
-			NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(minX,minY,maxX-minX,maxY-minY)];
-			
-			// draw the string
-			NSPoint point;
-			point.x = maxX - ((maxX - minX) / 2) - 1 - (stringSize.width / 2);
-			point.y = maxY - diameter + (stringSize.height / 2) - 6;
-			
-			NSAffineTransform *t = [NSAffineTransform transform];
-			[t translateXBy:0 yBy:maxY];
-			[t scaleXBy:1 yBy:-1];
-			
-			[dragImage lockFocus];
-			[t concat];
-			[[NSColor colorWithDeviceRed:1 green:0.1 blue:0.1 alpha:0.7] set];
-			[circle fill];
-			[badgeString drawAtPoint:point];
-			[t invert];
-			[t concat];
-			[dragImage unlockFocus];
-
-			[badgeString release];
-			[attributes release];
-		}
-		
-		[dragImage setFlipped:YES];
+		NSImage* dragImage = [self imageForDraggingFromMouseDownPoint];
 		
         // get the pasteboard and register the returned types with delegate as the owner
 		NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSDragPboard];
@@ -888,10 +909,8 @@ static NSDictionary *sTitleAttributes = nil;
 		p.x = p.x - imageSize.width / 2;
 		p.y = p.y + imageSize.height / 2;
 		
+		// perform the drag operation
 		[self dragImage:dragImage at:p offset:NSZeroSize event:event pasteboard:pb source:self slideBack:YES];
-
-        [dragImage release];
-
     } else {
         // adjust the mouse current point so that it's not outside the frame
         NSRect frameRect = [self frame];
@@ -1920,7 +1939,13 @@ static NSDictionary *sTitleAttributes = nil;
     // get the actual image
     NSImage *photo = [self photoAtIndex:photoIndex];
     if (nil == photo)
-	{
+    {
+        // If we a placeholder image, it makes sense to use that for purposes of hit testing, drag intersection, etc.
+        BOOL ignoredAllowsShadows = YES;	
+        photo = [self currentDisplayImageAtIndex:photoIndex allowsShadows:&ignoredAllowsShadows];
+    }
+    if (nil == photo)
+    {
         return NSZeroRect;
     }
 	else
