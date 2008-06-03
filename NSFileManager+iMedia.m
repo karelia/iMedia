@@ -124,6 +124,7 @@
                     CFURLCopyFileSystemPath(resolvedUrl,
                                             kCFURLPOSIXPathStyle);
                     CFRelease(resolvedUrl);
+                    resolvedPath = [resolvedPath autorelease];
                 }
             }
         }
