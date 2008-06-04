@@ -111,6 +111,7 @@ static NSMutableDictionary *sImageCache = nil;
 	iMBLibraryNode *copy = [[iMBLibraryNode allocWithZone:zone] init];
 	[copy setName:[self name]];
 	[copy setIcon:[self icon]];
+	[copy setParser:[self parser]];
 	[copy setIconName:[self iconName]];
 	[copy setAllItems:[self allItems]];
 	[copy setAttributes:[self attributes]];
@@ -248,6 +249,8 @@ static NSMutableDictionary *sImageCache = nil;
 					if ([[NSFileManager defaultManager] fileExistsAtPath:appPath])
 					{
 						myIcon = [[NSWorkspace sharedWorkspace] iconForFile:appPath];
+						[myIcon setScalesWhenResized:YES];	// 30.05.2008 PB: fix the size of the icon so that it 
+						[myIcon setSize:NSMakeSize(16,16)];	// fits into a menu item of the popup
 					}
 					else
 					{
@@ -638,5 +641,6 @@ static NSMutableDictionary *sImageCache = nil;
 		return self;
 	return [[self parent] root];
 }
+
 
 @end

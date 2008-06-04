@@ -50,7 +50,7 @@
 
 @implementation NSWorkspace (iMediaExtensions)
 
-- (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID;
+- (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID
 {
 	NSString *path = [self absolutePathForAppBundleWithIdentifier:bundleID];
 	if (nil == path)
@@ -58,6 +58,14 @@
 		return [NSImage imageNamed:@"NSDefaultApplicationIcon"];
 	}
 	return [self iconForFile:path];
+}
+
+- (NSImage *)iconForFile:(NSString *)path size:(NSSize)size
+{
+	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:path];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:size];
+	return icon;
 }
 
 @end

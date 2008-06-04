@@ -48,5 +48,6 @@
 @interface NSWorkspace (iMediaExtensions)
 
 - (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID;
+- (NSImage *)iconForFile:(NSString *)path size:(NSSize)size;
 
 @end

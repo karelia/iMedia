@@ -48,7 +48,7 @@
 
 @interface iMBiTunesMusicParser : iMBAbstractParser 
 {
-
+	int _version;
 }
 
 @end

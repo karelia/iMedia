@@ -48,6 +48,7 @@
 #import "iMediaConfiguration.h"
 #import "iMedia.h"
 
+#define RECURSIVE_PARSEDATABASE 1
 
 @implementation iMBiTunesMusicParser
 
@@ -61,10 +62,23 @@
 }
 
 
+- (NSString *)pathForURLString:(NSString *)urlString
+{
+	if ([urlString hasPrefix:@"file://"])
+	{
+		NSURL* url = [NSURL URLWithString:urlString];
+		return [url path];
+	}
+		
+	return urlString;
+}
+
 - (id)init
 {
 	if (self = [super initWithContentsOfFile:nil])
 	{
+		_version = 0;
+		
 		//Find all iTunes libraries
 		CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",
 															(CFStringRef)@"com.apple.iApps");
@@ -74,33 +88,247 @@
 		NSString *cur;
 		
 		while (cur = [e nextObject]) {
-			[self watchFile:cur];
+			[self watchFile:[self pathForURLString:cur]];
 		}
 		[libraries autorelease];
 	}
 	return self;
 }
 
-- (NSString *)iconNameForPlaylist:(NSString*)name{	
-	if ([name isEqualToString:@"Library"])
-		return @"MBiTunesLibrary";
-	else if ([name isEqualToString:@"Party Shuffle"])
-		return @"MBiTunesPartyShuffle";
-	else if ([name isEqualToString:@"Purchased Music"])
-		return @"MBiTunesPurchasedPlaylist";
-	else if ([name isEqualToString:@"Podcasts"])
-		return @"MBiTunesPodcast";
+- (NSString *)iconNameForPlaylist:(NSString*)name
+{	
+	if (_version < 7)
+	{
+		if ([name isEqualToString:@"Library"])
+			return @"itunes-icon-library";
+		else if ([name isEqualToString:@"Party Shuffle"])
+			return @"itunes-icon-partyshuffle";
+		else if ([name isEqualToString:@"Purchased Music"])
+			return @"itunes-icon-playlist-purchased";
+		else if ([name isEqualToString:@"Podcasts"])
+			return @"itunes-icon-podcasts";
+	}
 	else
-		return @"MBiTunesPlaylist";
+	{
+		if ([name isEqualToString:@"Library"])
+			return @"itunes-icon-music";
+		else if ([name isEqualToString:@"Party Shuffle"])
+			return @"itunes-icon-partyshuffle7";
+		else if ([name isEqualToString:@"Purchased Music"])
+			return @"itunes-icon-purchased7";
+		else if ([name isEqualToString:@"Podcasts"])
+			return @"itunes-icon-podcasts7";
+		else if ([name isEqualToString:@"Audiobooks"])
+			return @"itunes-icon-audiobooks";
+	}
+	
+	return @"MBiTunesPlaylist";
+}
+
+- (void)populateNode:(iMBLibraryNode *)inNode withTracks:(NSDictionary *)inTracks fromPlaylist:(NSDictionary *)inPlaylist
+{
+	if (inNode != nil && inPlaylist != nil)
+	{
+		NSImage *songIcon = [[NSWorkspace sharedWorkspace] iconForFileType:@"mp3"];
+		NSImage *drmIcon = [[NSWorkspace sharedWorkspace] iconForFileType:@"m4p"];
+
+		NSArray *playlistItems = [inPlaylist objectForKey:@"Playlist Items"];
+		NSMutableArray *playlistTracks = [NSMutableArray array];
+		NSMutableDictionary *track;
+		NSString *key;
+						
+		if (playlistItems)
+		{
+			unsigned int i,n = [playlistItems count];
+			
+			for (i=0; i<n; i++)
+			{
+				key = [[[playlistItems objectAtIndex:i] objectForKey:@"Track ID"] stringValue];
+				
+				if (track = [NSMutableDictionary dictionaryWithDictionary:[inTracks objectForKey:key]])
+				{
+					if ([track objectForKey:@"Name"] && [[track objectForKey:@"Location"] length] > 0)
+					{
+						[track setObject:[track objectForKey:@"Location"] forKey:@"Preview"];
+						if ([[track objectForKey:@"Protected"] boolValue]) [track setObject:drmIcon forKey:@"Icon"];
+						else [track setObject:songIcon forKey:@"Icon"];
+							
+						[playlistTracks addObject:track];	
+					}
+				}
+			}
+		}
+		
+		[inNode setAttribute:playlistTracks forKey:@"Tracks"];
+	}
+}
+
+- (iMBLibraryNode *)parseDatabase:(NSMutableDictionary *)inLibrary forPlaylistWithKey:(NSString *)inKey name:(NSString *)inName iconName:(NSString *)inIconName
+{
+	// Create a node for the playlist with the specified key...
+	
+	iMBLibraryNode *node = nil;
+	NSDictionary *tracks = nil;
+	NSArray *playlists = nil;
+	NSDictionary *playlist = nil;
+	 
+	if (inLibrary)
+	{
+		if (tracks = [inLibrary objectForKey:@"Tracks"])
+		{
+			if (playlists = [inLibrary objectForKey:@"Playlists"])
+			{
+				unsigned int i,n = [playlists count];
+				
+				for (i=0; i<n; i++)
+				{
+					if (playlist = [playlists objectAtIndex:i])
+					{
+						if ([playlist objectForKey:inKey])
+						{
+							node = [[[iMBLibraryNode alloc] init] autorelease];
+							[node setName:inName];
+							[node setIconName:inIconName];
+							[node setParser:self];
+							
+							[self populateNode:node withTracks:tracks fromPlaylist:playlist];
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	return node;	
+}
+
+- (NSMutableArray *)parseDatabase:(NSMutableDictionary *)inLibrary forPlaylistsWithParentID:(NSString *)inParentID
+{
+	// Create nodes for playlists at the specified level...
+	
+	NSMutableArray *nodes = [NSMutableArray array];
+	iMBLibraryNode *node = nil;
+	NSDictionary *tracks = nil;
+	NSArray *playlists = nil;
+	NSDictionary *playlist = nil;
+	 
+	if (inLibrary)
+	{
+		if (tracks = [inLibrary objectForKey:@"Tracks"])
+		{
+			if (playlists = [inLibrary objectForKey:@"Playlists"])
+			{
+				unsigned int i,n = [playlists count];
+				
+				// First look for folders...
+				
+				for (i=0; i<n; i++)
+				{
+					if (playlist = [playlists objectAtIndex:i])
+					{
+						if ([playlist objectForKey:@"Folder"]) 
+						{
+							NSString *selfID = [playlist objectForKey:@"Playlist Persistent ID"];
+							NSString *parentID = [playlist objectForKey:@"Parent Persistent ID"];
+
+							if (inParentID==nil && parentID==nil || parentID!=nil && [parentID isEqualToString:inParentID])
+							{
+								node = [[[iMBLibraryNode alloc] init] autorelease];
+								[node setName:[playlist objectForKey:@"Name"]];
+								[node setIconName:@"itunes-icon-folder7"];
+								[node setParser:self];
+								
+								[node setAllItems:[self parseDatabase:inLibrary forPlaylistsWithParentID:selfID]];
+								if (node) [nodes addObject:node];
+							}
+						}
+					}
+				}
+				
+				// Next look for smart playlists...
+				
+				for (i=0; i<n; i++)
+				{
+					if (playlist = [playlists objectAtIndex:i])
+					{
+						NSString *parentID = [playlist objectForKey:@"Parent Persistent ID"];
+
+						if (inParentID==nil && parentID==nil || parentID!=nil && [parentID isEqualToString:inParentID])
+						{
+							if ([playlist objectForKey:@"Folder"] == nil &&
+								[playlist objectForKey:@"Smart Info"] != nil && 
+								[playlist objectForKey:@"Master"] == nil &&
+								[playlist objectForKey:@"Music"] == nil &&
+								[playlist objectForKey:@"Podcasts"] == nil &&
+								[playlist objectForKey:@"Audiobooks"] == nil &&
+								[playlist objectForKey:@"Purchased Music"] == nil &&
+								[playlist objectForKey:@"Party Shuffle"] == nil &&
+								[playlist objectForKey:@"Movies"] == nil &&
+								[playlist objectForKey:@"Music Videos"] == nil &&
+								[playlist objectForKey:@"TV Shows"] == nil)
+							{
+								node = [[[iMBLibraryNode alloc] init] autorelease];
+								[node setName:[playlist objectForKey:@"Name"]];
+								if (_version == 7) [node setIconName:@"itunes-icon-playlist-smart7"];
+								else [node setIconName:@"itunes-icon-playlist-smart"];
+								[node setParser:self];
+								
+								[self populateNode:node withTracks:tracks fromPlaylist:playlist];
+								if (node) [nodes addObject:node];
+							}
+						}
+					}
+				}
+
+				// Finally look for normal playlists...
+				
+				for (i=0; i<n; i++)
+				{
+					if (playlist = [playlists objectAtIndex:i])
+					{
+						NSString *parentID = [playlist objectForKey:@"Parent Persistent ID"];
+
+						if (inParentID==nil && parentID==nil || parentID!=nil && [parentID isEqualToString:inParentID])
+						{
+							if ([playlist objectForKey:@"Master"] == nil &&
+								[playlist objectForKey:@"Music"] == nil &&
+								[playlist objectForKey:@"Podcasts"] == nil &&
+								[playlist objectForKey:@"Audiobooks"] == nil &&
+								[playlist objectForKey:@"Purchased Music"] == nil &&
+								[playlist objectForKey:@"Party Shuffle"] == nil &&
+								[playlist objectForKey:@"Movies"] == nil &&
+								[playlist objectForKey:@"Music Videos"] == nil &&
+								[playlist objectForKey:@"TV Shows"] == nil &&
+								[playlist objectForKey:@"Folder"] == nil &&
+								[playlist objectForKey:@"Smart Info"] == nil)
+							{
+								node = [[[iMBLibraryNode alloc] init] autorelease];
+								[node setName:[playlist objectForKey:@"Name"]];
+								if (_version == 7) [node setIconName:@"itunes-icon-playlist-normal7"];
+								else [node setIconName:@"itunes-icon-playlist-normal"];
+								[node setParser:self];
+								
+								[self populateNode:node withTracks:tracks fromPlaylist:playlist];
+								if (node) [nodes addObject:node];
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	return nodes;	
 }
 
 - (iMBLibraryNode *)parseDatabase
 {
+	// Read the iTunes database from the XML file...
+	
 	iMBLibraryNode *root = nil;
 	NSMutableDictionary *musicLibrary = [NSMutableDictionary dictionary];
 	
-	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",
-														(CFStringRef)@"com.apple.iApps");
+	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
 	NSArray *libraries = [(NSArray *)iApps autorelease];
 	NSEnumerator *e = [libraries objectEnumerator];
 	NSString *cur;
@@ -108,18 +336,90 @@
 	while (cur = [e nextObject]) {
 		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:cur]];
 		if (db) {
+			_version = [[db objectForKey:@"Application Version"] intValue];
 			[musicLibrary addEntriesFromDictionary:db];
 		}
 	}
+
 	if ([musicLibrary count])
 	{
-		// purge empty entries here....
+		iMBLibraryNode *node;
+		NSString *name,*icon;
 		
-		int x = 0;
+		// Create a root node for iTunes...
 		
 		root = [[[iMBLibraryNode alloc] init] autorelease];
 		[root setName:LocalizedStringInThisBundle(@"iTunes", @"iTunes")];
 		[root setIconName:@"com.apple.iTunes:"];
+		[root setParser:self];
+		
+		#if RECURSIVE_PARSEDATABASE
+	
+		// Create standard nodes for iTunes 7...
+		
+		if (_version == 7)
+		{
+			name = LocalizedStringInThisBundle(@"Music", @"Library as titled in iTunes source list");
+			icon = @"itunes-icon-music";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Music" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInThisBundle(@"Podcasts", @"Library as titled in iTunes source list");
+			icon = @"itunes-icon-podcasts7";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Podcasts" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInThisBundle(@"Audiobooks", @"Library as titled in iTunes source list");
+			icon = @"itunes-icon-audiobooks";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Audiobooks" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInThisBundle(@"Purchased", @"Library as titled in iTunes source list");
+			icon = @"itunes-icon-purchased7";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Purchased Music" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInThisBundle(@"Party Shuffle", @"Library as titled in iTunes source list");
+			icon = @"itunes-icon-partyshuffle7";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Party Shuffle" name:name iconName:icon];
+			if (node) [root addItem:node];
+		}
+		
+		// Create standard nodes for older iTunes versions...
+		
+		else
+		{
+			name = LocalizedStringInThisBundle(@"Library", @"Library as titled in iTunes source list");
+			icon = @"itunes-icon-library";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Master" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInThisBundle(@"Podcasts", @"Library as titled in iTunes source list");
+			icon = @"itunes-icon-podcasts";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Podcasts" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInThisBundle(@"Purchased", @"Library as titled in iTunes source list");
+			icon = @"itunes-icon-purchased";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Purchased Music" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInThisBundle(@"Party Shuffle", @"Library as titled in iTunes source list");
+			icon = @"itunes-icon-partyshuffle";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Party Shuffle" name:name iconName:icon];
+			if (node) [root addItem:node];
+		}
+		
+		// Create user nodes...
+		
+		NSEnumerator *nodes = [[self parseDatabase:musicLibrary forPlaylistsWithParentID:nil] objectEnumerator];
+		while (node = [nodes nextObject]) [root addItem:node];
+		
+		#else
+	
+		// purge empty entries here....
+		
+		int x = 0;
 		
 		iMBLibraryNode *library = [[iMBLibraryNode alloc] init];
 		iMBLibraryNode *podcastLib = [[iMBLibraryNode alloc] init];
@@ -127,25 +427,27 @@
 		iMBLibraryNode *purchasedLib = [[iMBLibraryNode alloc] init];
 		NSMutableArray *smartPlaylists = [NSMutableArray array];
 		
-		[library setName:LocalizedStringInThisBundle(@"Library", @"Library as titled in iTunes source list")];
-		[library setIconName:@"MBiTunesLibrary"];
+		if (_version<7) [library setName:LocalizedStringInThisBundle(@"Library", @"Library as titled in iTunes source list")];
+		else [library setName:LocalizedStringInThisBundle(@"Music", @"Library as titled in iTunes source list")];
+		[library setIconName:[self iconNameForPlaylist:@"Library"]]; //@"MBiTunesLibrary"];
+		[library setParser:self];
 		
 		[podcastLib setName:LocalizedStringInThisBundle(@"Podcasts", @"Podcasts as titled in iTunes source list")];
-		[podcastLib setIconName:@"MBiTunesPodcast"];
+		[podcastLib setIconName:[self iconNameForPlaylist:@"Podcasts"]]; //@"MBiTunesPodcast"];
+		[podcastLib setParser:self];
 		
 		[partyShuffleLib setName:LocalizedStringInThisBundle(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
-		[partyShuffleLib setIconName:@"MBiTunesPartyShuffle"];
+		[partyShuffleLib setIconName:[self iconNameForPlaylist:@"Party Shuffle"]]; //@"MBiTunesPartyShuffle"];
+		[partyShuffleLib setParser:self];
 		
 		[purchasedLib setName:LocalizedStringInThisBundle(@"Purchased", @"Purchased folder as titled in iTunes source list")];
-		[purchasedLib setIconName:@"MBiTunesPurchasedPlaylist"];
+		[purchasedLib setIconName:[self iconNameForPlaylist:@"Purchased Music"]]; //@"MBiTunesPurchasedPlaylist"];
+		[purchasedLib setParser:self];
 		
 		int playlistCount = [[musicLibrary objectForKey:@"Playlists"] count];
 		
-		NSBundle *bndl = [NSBundle bundleForClass:[self class]];
-		NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
-		NSImage *songIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
-		iconPath = [bndl pathForResource:@"iTunesDRM" ofType:@"png"];
-		NSImage *drmIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+		NSImage* songIcon = [[NSWorkspace sharedWorkspace] iconForFileType:@"mp3"];
+		NSImage* drmIcon = [[NSWorkspace sharedWorkspace] iconForFileType:@"m4p"];
 		
 		for (x=0;x<playlistCount;x++)
 		{
@@ -165,18 +467,32 @@
 			{
 				node = partyShuffleLib;
 			}
+			else if ([playlistRecord objectForKey:@"Purchased Music"] && [[playlistRecord objectForKey:@"Purchased Music"] boolValue])
+			{
+				node = purchasedLib;
+			}
+			else if ([playlistRecord objectForKey:@"Movies"] && [[playlistRecord objectForKey:@"Movies"] boolValue])
+			{
+				continue;
+			}
 			else if ([playlistRecord objectForKey:@"Videos"] && [[playlistRecord objectForKey:@"Videos"] boolValue])
 			{
 				continue;
 			}
-			else if ([playlistRecord objectForKey:@"Purchased Music"] && [[playlistRecord objectForKey:@"Purchased Music"] boolValue])
+			else if ([playlistRecord objectForKey:@"TV Shows"] && [[playlistRecord objectForKey:@"TV Shows"] boolValue])
 			{
-				node = purchasedLib;
+				continue;
+			}
+			else if ([playlistRecord objectForKey:@"Music Videos"] && [[playlistRecord objectForKey:@"Music Videos"] boolValue])
+			{
+				continue;
 			}
 			else
 			{
 				node = [[iMBLibraryNode alloc] init];
 				[node setName:objectName];
+				[node setParser:self];
+				
 				if ([[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Smart Info"])
 				{
 					[node setIconName:@"photocast_folder"];
@@ -235,7 +551,10 @@
 		[partyShuffleLib release];
 		
 		[root setFilterDuplicateKey:@"Location" forAttributeKey:@"Tracks"];
+	
+		#endif
 	}
+	
 	return root;
 }
 

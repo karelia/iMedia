@@ -61,7 +61,7 @@
 		image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
 	}
 	
-	if (!image)
+	if (image==nil && imageInOurBundle!=nil)
 	{
 		NSBundle *ourBundle = [NSBundle bundleForClass:[self class]];
 		NSString *pathToImage = [ourBundle pathForResource:[imageInOurBundle stringByDeletingPathExtension] ofType:[imageInOurBundle pathExtension]];
