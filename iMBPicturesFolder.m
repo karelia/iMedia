@@ -78,7 +78,7 @@
 	NSString *cur;
 	BOOL isDir;
 	NSMutableArray *images = [NSMutableArray array];
-   NSArray * excludedFolders = [[iMediaConfiguration sharedConfiguration] excludedFolders];
+	NSArray * excludedFolders = [[iMediaConfiguration sharedConfiguration] excludedFolders];
 	
 	while (cur = [e nextObject])
 	{

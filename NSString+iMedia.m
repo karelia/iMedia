@@ -60,16 +60,31 @@
 + (NSString *)UTIForFileAtPath:(NSString *)anAbsolutePath
 {
 	NSString *result = nil;
+    FSRef fileRef;
+    Boolean isDirectory;
 	
-	// check extension first
-	NSString *extension = [anAbsolutePath pathExtension];
-	if ( (nil != extension) && ![extension isEqualToString:@""] )
+    if (FSPathMakeRef((const UInt8 *)[anAbsolutePath fileSystemRepresentation], &fileRef, &isDirectory) == noErr)
+    {
+        // get the content type (UTI) of this file
+		CFStringRef uti;
+		if (LSCopyItemAttribute(&fileRef, kLSRolesViewer, kLSItemContentType, (CFTypeRef*)&uti)==noErr)
+		{
+			result = [[((NSString *)uti) retain] autorelease];	// I want an autoreleased copy of this.
+		}
+    }
+	
+	// check extension if we can't find the actual file
+	if (nil == result)
 	{
-		result = [self UTIForFilenameExtension:extension];
+		NSString *extension = [anAbsolutePath pathExtension];
+		if ( (nil != extension) && ![extension isEqualToString:@""] )
+		{
+			result = [self UTIForFilenameExtension:extension];
+		}
 	}
 	
 	// if no extension or no result, check file type
-	if ( nil == result )
+	if ( nil == result || [result isEqualToString:(NSString *)kUTTypeData])
 	{
 		NSString *fileType = NSHFSTypeOfFile(anAbsolutePath);
 		if (6 == [fileType length])
@@ -109,12 +124,11 @@
 	}
 	else
 	{
-		UTI = (NSString *)UTTypeCreatePreferredIdentifierForTag(
-																kUTTagClassFilenameExtension,
-																(CFStringRef)anExtension,
-																NULL
-																);
-		[UTI autorelease];
+		UTI = [(NSString *)UTTypeCreatePreferredIdentifierForTag(
+																 kUTTagClassFilenameExtension,
+																 (CFStringRef)anExtension,
+																 NULL
+																 ) autorelease];
 	}
 	
 	// If we don't find it, add an entry to the info.plist of the APP,
