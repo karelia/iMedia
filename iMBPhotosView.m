@@ -146,38 +146,39 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 {
     if ( finishedInit )
     {
-	[super awakeFromNib];
+		[super awakeFromNib];
 
-	[oPhotoView setDelegate:self];
-	[oPhotoView setUseOutlineBorder:NO];
-	[oPhotoView setUseHighQualityResize:NO];
-	[oPhotoView setBackgroundColor:[NSColor whiteColor]];
-	[oPhotoView setAutosaveName:@"iMBPhotos"];
+		[oPhotoView setDelegate:self];
+		[oPhotoView setUseOutlineBorder:NO];
+		[oPhotoView setUseHighQualityResize:NO];
+		[oPhotoView setBackgroundColor:[NSColor whiteColor]];
+		[oPhotoView setAutosaveName:@"iMBPhotos"];
 
-	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
-	[oPhotoView setPhotoHorizontalSpacing:15];
-	[oPhotoView setPhotoVerticalSpacing:15];
-//	[oPhotoView setUseFading:[[NSUserDefaults standardUserDefaults] boolForKey:@"iMBUseFading"]];
-#if SAMPLE_INCOMING_DRAG
-	[oPhotoView registerForDraggedTypes:[NSArray arrayWithObject:NSTIFFPboardType]];
-#endif
+		[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
+		[oPhotoView setPhotoHorizontalSpacing:15];
+		[oPhotoView setPhotoVerticalSpacing:15];
+	//	[oPhotoView setUseFading:[[NSUserDefaults standardUserDefaults] boolForKey:@"iMBUseFading"]];
+	#if SAMPLE_INCOMING_DRAG
+		[oPhotoView registerForDraggedTypes:[NSArray arrayWithObject:NSTIFFPboardType]];
+	#endif
 
+		[oPhotoView setShowCaptions:[[iMediaConfiguration sharedConfiguration] prefersFilenamesInPhotoBasedBrowsers]];
 
-	NSDictionary *optionsDict =
-	[NSDictionary dictionaryWithObject:@"%{value1}@ %{value2}@"  
-								forKey:NSDisplayPatternBindingOption];
-	
-	[counterField bind:@"displayPatternValue1"
-			  toObject:self
-		   withKeyPath:@"imageCount"
-			   options:optionsDict];
-	
-	[counterField bind:@"displayPatternValue2"
-			  toObject:self
-		   withKeyPath:@"imageCountPluralityAdjustedString"
-			   options:optionsDict];
-	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
-	
+		NSDictionary *optionsDict =
+		[NSDictionary dictionaryWithObject:@"%{value1}@ %{value2}@"  
+									forKey:NSDisplayPatternBindingOption];
+		
+		[counterField bind:@"displayPatternValue1"
+				  toObject:self
+			   withKeyPath:@"imageCount"
+				   options:optionsDict];
+		
+		[counterField bind:@"displayPatternValue2"
+				  toObject:self
+			   withKeyPath:@"imageCountPluralityAdjustedString"
+				   options:optionsDict];
+		// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
+		
 
     }
 }

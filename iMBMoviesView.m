@@ -118,32 +118,32 @@
     {
         [super awakeFromNib];
         
-	[oPhotoView setDelegate:self];
-	[oPhotoView setUseOutlineBorder:NO];
-	[oPhotoView setUseHighQualityResize:NO];
-	
-	[oPhotoView setBackgroundColor:[NSColor whiteColor]];
-	
-	[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
-	[oPhotoView setPhotoHorizontalSpacing:15];
-	[oPhotoView setPhotoVerticalSpacing:15];
-        
-	[oPhotoView setShowCaptions:[[iMediaConfiguration sharedConfiguration] prefersFilenamesInPhotoBasedBrowsers]];
+		[oPhotoView setDelegate:self];
+		[oPhotoView setUseOutlineBorder:NO];
+		[oPhotoView setUseHighQualityResize:NO];
+		
+		[oPhotoView setBackgroundColor:[NSColor whiteColor]];
+		
+		[oSlider setFloatValue:[oPhotoView photoSize]];	// initialize.  Changes are put into defaults.
+		[oPhotoView setPhotoHorizontalSpacing:15];
+		[oPhotoView setPhotoVerticalSpacing:15];
+			
+		[oPhotoView setShowCaptions:[[iMediaConfiguration sharedConfiguration] prefersFilenamesInPhotoBasedBrowsers]];
 
-	NSDictionary *optionsDict =
-	[NSDictionary dictionaryWithObject:@"%{value1}@ %{value2}@"  
-								forKey:NSDisplayPatternBindingOption];
-	
-	[counterField bind:@"displayPatternValue1"
-			  toObject:self
-		   withKeyPath:@"imageCount"
-			   options:optionsDict];
+		NSDictionary *optionsDict =
+		[NSDictionary dictionaryWithObject:@"%{value1}@ %{value2}@"  
+									forKey:NSDisplayPatternBindingOption];
+		
+		[counterField bind:@"displayPatternValue1"
+				  toObject:self
+			   withKeyPath:@"imageCount"
+				   options:optionsDict];
 
-	[counterField bind:@"displayPatternValue2"
-			  toObject:self
-		   withKeyPath:@"imageCountPluralityAdjustedString"
-			   options:optionsDict];
-	// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
+		[counterField bind:@"displayPatternValue2"
+				  toObject:self
+			   withKeyPath:@"imageCountPluralityAdjustedString"
+				   options:optionsDict];
+		// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
     }
 }
 
