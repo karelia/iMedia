@@ -23,6 +23,11 @@
 
 #import "MUPhotoView.h"
 
+// Compile time determination of whether to use a star or a plain circle for multi-item drags
+#ifndef USESTARSHAPEDBADGES
+#define USESTARSHAPEDBADGES 1
+#endif
+
 NSString *ShowCaptionChangedNotification = @"ShowCaptionChangedNotification";
 
 @implementation MUPhotoView
@@ -801,6 +806,65 @@ static NSDictionary *sTitleAttributes = nil;
 	[indexes release];
 }
 
+- (NSColor*) draggedItemsBadgeColor
+{
+	return [NSColor colorWithDeviceRed:0.9 green:0.1 blue:0.1 alpha:1.0];
+}
+
+#if USESTARSHAPEDBADGES
+// Star path method based on code from Paul Kim, http://www.noodlesoft.com/
+// Included by Daniel Jalkut with explicit permission from author.
+- (NSBezierPath*) starPathWithCenter:(NSPoint)center radius:(float)radius hubRadius:(float)innerRadius numberOfPoints:(int)numberOfPoints
+{
+	NSBezierPath* starPath = [NSBezierPath bezierPath];	
+	int                                        i;
+	double                                angle;
+	NSPoint                                starPoint, hubPoint, calcPoint;
+	NSAffineTransform        *preTransform, *transform, *postTransform;
+	
+	preTransform = [NSAffineTransform transform];
+	[preTransform translateXBy:-center.x yBy:-center.y];
+	postTransform = [NSAffineTransform transform];
+	[postTransform translateXBy:center.x yBy:center.y];
+	
+	angle = 2 * M_PI / numberOfPoints;
+	
+	starPoint = NSMakePoint(center.x, center.y + radius);
+	
+	transform = [NSAffineTransform transform];
+	
+	[transform rotateByRadians:angle / 2];
+	[transform prependTransform:preTransform];
+	[transform appendTransform:postTransform];
+	
+	hubPoint = [transform transformPoint:NSMakePoint(center.x, center.y + innerRadius)];
+	
+	[starPath moveToPoint:starPoint];
+	[starPath lineToPoint:hubPoint];
+	
+	for (i = 1; i < numberOfPoints; i++)
+	{
+			// Start the transform over
+			const NSAffineTransformStruct identityTransformStruct = { 1, 0, 0, 1, 0, 0 };
+			[transform setTransformStruct:identityTransformStruct];
+			
+			[transform rotateByRadians:angle * i];
+			[transform prependTransform:preTransform];
+			[transform appendTransform:postTransform];
+			
+			calcPoint = [transform transformPoint:starPoint];
+			
+			[starPath lineToPoint:calcPoint];
+			
+			calcPoint = [transform transformPoint:hubPoint];
+			
+			[starPath lineToPoint:calcPoint];
+	}
+	[starPath closePath];
+	return starPath;
+}
+#endif
+
 - (NSImage*) imageForDraggingFromMouseDownPoint
 {
 	NSImage *dragImage = nil;
@@ -840,38 +904,66 @@ static NSDictionary *sTitleAttributes = nil;
 
 	// if there's more than one image, put a badge on the photo
 	if ([[self selectionIndexes] count] > 1) {
+		const float kBadgeMargin = 3.0;				// Leave a 3 pixels margin to the top and right of the badge
+		const float kBadgePaddingPercentage = 0.3;	// Make the badge about 30% larger than the text
+
 		NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
 		[attributes setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
-		[attributes setObject:[NSFont fontWithName:@"Helvetica" size:14] forKey:NSFontAttributeName];
+		[attributes setObject:[NSFont fontWithName:@"Helvetica Bold" size:16] forKey:NSFontAttributeName];
 		NSAttributedString *badgeString = [[NSAttributedString alloc] initWithString:[[NSNumber numberWithInt:[[self selectionIndexes] count]] stringValue] attributes:attributes];
 		NSSize stringSize = [badgeString size];
-		int diameter = stringSize.width;
-		if (stringSize.height > diameter) diameter = stringSize.height;
-		diameter += 5;
 		
-		// calculate the badge circle
-		int maxY = [dragImage size].height - 5;
-		int maxX = [dragImage size].width - 5;
-		int minY = maxY - diameter;
-		int minX = maxX - diameter;
-		NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(minX,minY,maxX-minX,maxY-minY)];
+		// Make the badge big enough to hold the text, with some room to breathe
+		float badgeDiameter = stringSize.width;
+		if (stringSize.height > badgeDiameter) badgeDiameter = stringSize.height;
+		badgeDiameter += (badgeDiameter * kBadgePaddingPercentage);
 		
-		// draw the string
-		NSPoint point;
-		point.x = maxX - ((maxX - minX) / 2) - 1 - (stringSize.width / 2);
-		point.y = maxY - diameter + (stringSize.height / 2) - 6;
-		
+		NSRect badgeRect = NSMakeRect([dragImage size].width - badgeDiameter - kBadgeMargin, [dragImage size].height - badgeDiameter - kBadgeMargin, badgeDiameter, badgeDiameter); 
+
 		NSAffineTransform *t = [NSAffineTransform transform];
-		[t translateXBy:0 yBy:maxY];
+
+		// We need to flip to get text to draw right		
+		[t translateXBy:0 yBy:[dragImage size].height];
 		[t scaleXBy:1 yBy:-1];
-		
+				
 		[dragImage lockFocus];
 		[t concat];
-		[[NSColor colorWithDeviceRed:1 green:0.1 blue:0.1 alpha:0.7] set];
-		[circle fill];
-		[badgeString drawAtPoint:point];
+
+		// We'll shadow the circle a bit...
+		[NSGraphicsContext saveGraphicsState];
+
+		NSShadow* theShadow = [[NSShadow alloc] init];
+		[theShadow setShadowOffset:NSMakeSize(0.0, 0.0)];
+		[theShadow setShadowBlurRadius:3.0]; 
+		[theShadow setShadowColor:[[NSColor blackColor] colorWithAlphaComponent:0.7]];
+		[theShadow set];
+		
+		// draw the circle (or star?)
+#if !USESTARSHAPEDBADGES
+		NSBezierPath *badgeBackgroundPath = [NSBezierPath bezierPathWithOvalInRect:badgeRect];
+#else
+		NSPoint rectCenter = NSMakePoint(NSMidX(badgeRect), NSMidY(badgeRect));
+		float badgeRadius = badgeRect.size.width / 2.0;
+		float hubRadius = badgeRadius * 0.8;
+		int pointCount = 20;
+		NSBezierPath *badgeBackgroundPath = [self starPathWithCenter:rectCenter radius:badgeRadius hubRadius:hubRadius numberOfPoints:pointCount];
+#endif
+
+		[[self draggedItemsBadgeColor] set];
+		[badgeBackgroundPath fill];
+
+		[NSGraphicsContext restoreGraphicsState];
+		[theShadow release];
+		
+		// draw the string
+		NSPoint stringPoint;
+		stringPoint.x = NSMinX(badgeRect) + ((badgeDiameter - stringSize.width) / 2);
+		stringPoint.y = NSMinY(badgeRect) + ((badgeDiameter - stringSize.height) / 2);
+		[badgeString drawAtPoint:stringPoint];
+		
 		[t invert];
 		[t concat];
+
 		[dragImage unlockFocus];
 
 		[badgeString release];
