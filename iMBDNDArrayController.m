@@ -63,6 +63,7 @@
 
 - (void)dealloc
 {
+	[searchableProperties release];
 	[self setSearchString:nil];
 	[super dealloc];
 }
@@ -71,6 +72,7 @@
 {
     [tableView setAllowsMultipleSelection:YES];
 	[super awakeFromNib];
+	[self setSearchableProperties:[NSArray arrayWithObjects:@"Name",@"Artist",@"Album",@"Genre",nil]]; 
 }
 
 - (BOOL)tableView:(NSTableView *)tv
@@ -168,6 +170,12 @@
     }
 }
 
+- (void)setSearchableProperties:(NSArray *)properties 
+{
+	[searchableProperties autorelease];
+	searchableProperties = [properties retain];
+}
+
 - (void)setDelegate:(id)delegate
 {
 	myDelegate = delegate;
@@ -220,24 +228,30 @@
 		}
 		else
 		{
-			//  Use of local autorelease pool here is probably overkill, but may be useful in a larger-scale application.
+			// Search all properties in the array. Please note that we need to check for the existance 
+			// of a property (value!=nil) BEFORE checking rangeOfString: or a nil value will provide 
+			// us with a positive match. This would yield way to many false results...
+			
 			NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-			NSString *name = [[item valueForKeyPath:@"Name"] lowercaseString];
-			if ([name rangeOfString:lowerSearch].location != NSNotFound)
+			unsigned int i,n = [searchableProperties count];
+			NSString *key,*value;
+			
+			for (i=0; i<n; i++)
 			{
-				[matchedObjects addObject:item];
-			}
-			else
-			{
-				name = [[item valueForKeyPath:@"Artist"] lowercaseString];
-				if ([name rangeOfString:lowerSearch].location != NSNotFound)
+				key = [searchableProperties objectAtIndex:i];
+				value = [[item valueForKeyPath:key] lowercaseString];
+				
+				if (value!=nil && [value rangeOfString:lowerSearch].location!=NSNotFound)
 				{
 					[matchedObjects addObject:item];
+					continue;
 				}
 			}
+			
 			[pool release];
 		}
     }
+	
     return [super arrangeObjects:matchedObjects];
 }
 

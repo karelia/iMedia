@@ -49,6 +49,7 @@
 {
     IBOutlet NSTableView *tableView;
 	NSString *searchString;
+	NSArray *searchableProperties;
 	
 	@private
 		id newObject;		// Is this an iVar *and* a method?
@@ -58,6 +59,7 @@
 #pragma mark ACCESSORS
 - (NSString *)searchString;
 - (void)setSearchString:(NSString *)value;
+- (void)setSearchableProperties:(NSArray *)properties;
 
 // The delegate needs to implement tableView:writeRows:toPasteboard: of NSTableDataSource protocol to handle drags
 - (void)setDelegate:(id)delegate;
