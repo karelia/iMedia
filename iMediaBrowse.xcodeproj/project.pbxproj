@@ -220,6 +220,8 @@
 		CEF3F38609E449FF00D0058F /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF3F38409E449FF00D0058F /* NSString+iMedia.m */; };
 		CEFC515F0B792C11009F114D /* iMBPlacardScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEFC515D0B792C11009F114D /* iMBPlacardScrollView.h */; };
 		CEFC51600B792C11009F114D /* iMBPlacardScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEFC515E0B792C11009F114D /* iMBPlacardScrollView.m */; };
+		D03A71D50DF82FFF0030EDA5 /* itunes-icon-tvshows.png in Resources */ = {isa = PBXBuildFile; fileRef = D03A71D30DF82FFF0030EDA5 /* itunes-icon-tvshows.png */; };
+		D03A71D60DF82FFF0030EDA5 /* itunes-icon-movies.png in Resources */ = {isa = PBXBuildFile; fileRef = D03A71D40DF82FFF0030EDA5 /* itunes-icon-movies.png */; };
 		D94D1B4209A7A71500CD2946 /* TimeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */; };
 		D9659C1209A6CB450079ED9A /* LibraryItemsValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D9659C1009A6CB450079ED9A /* LibraryItemsValueTransformer.m */; };
 		D9B3EA6709A3F8B300835FE4 /* iMBDNDArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B3EA5D09A3F82B00835FE4 /* iMBDNDArrayController.m */; };
@@ -572,6 +574,8 @@
 		CEF3F38409E449FF00D0058F /* NSString+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSString+iMedia.m"; sourceTree = "<group>"; };
 		CEFC515D0B792C11009F114D /* iMBPlacardScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMBPlacardScrollView.h; sourceTree = "<group>"; };
 		CEFC515E0B792C11009F114D /* iMBPlacardScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iMBPlacardScrollView.m; sourceTree = "<group>"; };
+		D03A71D30DF82FFF0030EDA5 /* itunes-icon-tvshows.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-tvshows.png"; sourceTree = "<group>"; };
+		D03A71D40DF82FFF0030EDA5 /* itunes-icon-movies.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-movies.png"; sourceTree = "<group>"; };
 		D94D1B3F09A7A71500CD2946 /* TimeValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = TimeValueTransformer.h; sourceTree = "<group>"; };
 		D94D1B4009A7A71500CD2946 /* TimeValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = TimeValueTransformer.m; sourceTree = "<group>"; };
 		D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = LibraryItemsValueTransformer.h; sourceTree = "<group>"; };
@@ -1022,6 +1026,8 @@
 				CE05E0D80DF74B96001D2356 /* itunes-icon-podcasts.png */,
 				CE05E0D90DF74B96001D2356 /* itunes-icon-podcasts7.png */,
 				CE05E0DA0DF74B96001D2356 /* itunes-icon-purchased7.png */,
+				D03A71D30DF82FFF0030EDA5 /* itunes-icon-tvshows.png */,
+				D03A71D40DF82FFF0030EDA5 /* itunes-icon-movies.png */,
 				CE05E0DB0DF74B96001D2356 /* iTunesDRM.png */,
 				CE05E0DC0DF74B96001D2356 /* iTunesSmartPlaylist.png */,
 				CE05E0DD0DF74B96001D2356 /* iTunesVideo.png */,
@@ -1465,6 +1471,8 @@
 				CE05E1430DF74B96001D2356 /* tiny-reload.png in Resources */,
 				CE05E1440DF74B96001D2356 /* tunes_tiny.png in Resources */,
 				CE05E1460DF74BB1001D2356 /* spotlight.gif in Resources */,
+				D03A71D50DF82FFF0030EDA5 /* itunes-icon-tvshows.png in Resources */,
+				D03A71D60DF82FFF0030EDA5 /* itunes-icon-movies.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

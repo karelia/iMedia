@@ -48,7 +48,7 @@
 
 @interface iMBiTunesVideoParser : iMBAbstractParser 
 {
-
+	int _version;
 }
 
 @end
