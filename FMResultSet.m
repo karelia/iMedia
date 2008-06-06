@@ -1,6 +1,3 @@
-// FMDATABASE SQLITE WRAPPER HAS BEEN INTO THE PUBLIC DOMAIN BY GUS MUELLER,
-// ACCORDING TO EMAIL CORRESPONDENCE WITH PIERRE BERNARD DATED DECEMBER 17, 2007
-
 #import "FMResultSet.h"
 #import "FMDatabase.h"
 
@@ -11,7 +8,7 @@
 
 @implementation FMResultSet
 
-+ (id) resultSetWithStatement:(sqlite3_stmt *)stmt usingParentDatabase:(FMDatabase*)aDB; {
++ (id) resultSetWithStatement:(sqlite3_stmt *)stmt usingParentDatabase:(FMDatabase*)aDB {
     
     FMResultSet *rs = [[FMResultSet alloc] init];
     
@@ -43,7 +40,7 @@
 	[super dealloc];
 }
 
-- (void) close; {
+- (void) close {
     
     [parentDB setInUse:NO]; 
     
@@ -75,10 +72,12 @@
 
 - (void) kvcMagic:(id)object {
     
+    
     int columnCount = sqlite3_column_count(pStmt);
     
     int columnIdx = 0;
     for (columnIdx = 0; columnIdx < columnCount; columnIdx++) {
+        
         
         const char *c = (const char *)sqlite3_column_text(pStmt, columnIdx);
         
@@ -108,33 +107,32 @@
             usleep(20);
             
             if ([parentDB busyRetryTimeout] && (numberOfRetries++ > [parentDB busyRetryTimeout])) {
-                [NSException raise:@"FMDatabaseException" format:@"Database too busy."];
+                
+                NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [parentDB databasePath]);
+                NSLog(@"Database busy");
+                break;
             }
-            
         }
         else if (SQLITE_DONE == rc || SQLITE_ROW == rc) {
             // all is well, let's return.
         }
         else if (SQLITE_ERROR == rc) {
             NSLog(@"Error calling sqlite3_step (%d: %s) rs", rc, sqlite3_errmsg([parentDB sqliteHandle]));
-            [NSException raise:@"SQLITE_ERROR" format:@"sqlite3_step"];
+            break;
         } 
         else if (SQLITE_MISUSE == rc) {
             // uh oh.
             NSLog(@"Error calling sqlite3_step (%d: %s) rs", rc, sqlite3_errmsg([parentDB sqliteHandle]));
-            [NSException raise:@"SQLITE_MISUSE" format:@"sqlite3_step"];
+            break;
         }
         else {
             // wtf?
             NSLog(@"Unknown error calling sqlite3_step (%d: %s) rs", rc, sqlite3_errmsg([parentDB sqliteHandle]));
-            [NSException raise:@"sqlite unknown rs" format:@"sqlite3_step"];
+            break;
         }
         
     } while (retry);
     
-    if (!columnNamesSetup) {
-        [self setupColumnNames];
-    }
     
     if (rc != SQLITE_ROW) {
         [self close];
@@ -144,6 +142,10 @@
 }
 
 - (int) columnIndexForName:(NSString*)columnName {
+    
+    if (!columnNamesSetup) {
+        [self setupColumnNames];
+    }
     
     columnName = [columnName lowercaseString];
     
@@ -160,7 +162,11 @@
 
 
 
-- (int) intForColumn:(NSString*)columnName; {
+- (int) intForColumn:(NSString*)columnName {
+    
+    if (!columnNamesSetup) {
+        [self setupColumnNames];
+    }
     
     int columnIdx = [self columnIndexForName:columnName];
     
@@ -170,11 +176,15 @@
     
     return sqlite3_column_int(pStmt, columnIdx);
 }
-- (int) intForColumnIndex:(int)columnIdx; {
+- (int) intForColumnIndex:(int)columnIdx {
     return sqlite3_column_int(pStmt, columnIdx);
 }
 
-- (long) longForColumn:(NSString*)columnName; {
+- (long) longForColumn:(NSString*)columnName {
+    
+    if (!columnNamesSetup) {
+        [self setupColumnNames];
+    }
     
     int columnIdx = [self columnIndexForName:columnName];
     
@@ -184,19 +194,24 @@
     
     return sqlite3_column_int64(pStmt, columnIdx);
 }
-- (long) longForColumnIndex:(int)columnIdx; {
+
+- (long) longForColumnIndex:(int)columnIdx {
     return sqlite3_column_int64(pStmt, columnIdx);
 }
 
-- (BOOL) boolForColumn:(NSString*)columnName; {
+- (BOOL) boolForColumn:(NSString*)columnName {
     return ([self intForColumn:columnName] != 0);
 }
 
-- (BOOL) boolForColumnIndex:(int)columnIdx; {
+- (BOOL) boolForColumnIndex:(int)columnIdx {
     return ([self intForColumnIndex:columnIdx] != 0);
 }
 
-- (double) doubleForColumn:(NSString*)columnName; {
+- (double) doubleForColumn:(NSString*)columnName {
+    
+    if (!columnNamesSetup) {
+        [self setupColumnNames];
+    }
     
     int columnIdx = [self columnIndexForName:columnName];
     
@@ -207,14 +222,14 @@
     return sqlite3_column_double(pStmt, columnIdx);
 }
 
-- (double) doubleForColumnIndex:(int)columnIdx; {
+- (double) doubleForColumnIndex:(int)columnIdx {
     return sqlite3_column_double(pStmt, columnIdx);
 }
 
 
 #pragma mark string functions
 
-- (NSString*) stringForColumnIndex:(int)columnIdx; {
+- (NSString*) stringForColumnIndex:(int)columnIdx {
     
     const char *c = (const char *)sqlite3_column_text(pStmt, columnIdx);
     
@@ -226,7 +241,11 @@
     return [NSString stringWithUTF8String:c];
 }
 
-- (NSString*) stringForColumn:(NSString*)columnName; {
+- (NSString*) stringForColumn:(NSString*)columnName {
+    
+    if (!columnNamesSetup) {
+        [self setupColumnNames];
+    }
     
     int columnIdx = [self columnIndexForName:columnName];
     
@@ -240,7 +259,12 @@
 
 
 
-- (NSDate*) dateForColumn:(NSString*)columnName; {
+- (NSDate*) dateForColumn:(NSString*)columnName {
+    
+    if (!columnNamesSetup) {
+        [self setupColumnNames];
+    }
+    
     int columnIdx = [self columnIndexForName:columnName];
     
     if (columnIdx == -1) {
@@ -250,12 +274,17 @@
     return [NSDate dateWithTimeIntervalSince1970:[self doubleForColumn:columnName]];
 }
 
-- (NSDate*) dateForColumnIndex:(int)columnIdx; {
+- (NSDate*) dateForColumnIndex:(int)columnIdx {
     return [NSDate dateWithTimeIntervalSince1970:[self doubleForColumnIndex:columnIdx]];
 }
 
 
-- (NSData*) dataForColumn:(NSString*)columnName; {
+- (NSData*) dataForColumn:(NSString*)columnName {
+    
+    if (!columnNamesSetup) {
+        [self setupColumnNames];
+    }
+    
     int columnIdx = [self columnIndexForName:columnName];
     
     if (columnIdx == -1) {
@@ -271,7 +300,7 @@
     return data;
 }
 
-- (NSData*) dataForColumnIndex:(int)columnIdx; {
+- (NSData*) dataForColumnIndex:(int)columnIdx {
     
     int dataSize = sqlite3_column_bytes(pStmt, columnIdx);
     
@@ -288,7 +317,7 @@
     pStmt = newsqlite3_stmt;
 }
 
-- (void)setParentDB:(FMDatabase *)newDb;{
+- (void)setParentDB:(FMDatabase *)newDb {
     parentDB = newDb;
 }
 

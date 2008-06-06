@@ -1,105 +1,53 @@
-// FMDATABASE SQLITE WRAPPER HAS BEEN INTO THE PUBLIC DOMAIN BY GUS MUELLER,
-// ACCORDING TO EMAIL CORRESPONDENCE WITH PIERRE BERNARD DATED DECEMBER 17, 2007
+//
+//  FMDatabaseAdditions.m
+//  fmkit
+//
+//  Created by August Mueller on 10/30/05.
+//  Copyright 2005 Flying Meat Inc.. All rights reserved.
+//
 
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 
 @implementation FMDatabase (FMDatabaseAdditions)
 
-- (NSString*) stringForQuery:(NSString*)objs, ...; {
-    
-    FMResultSet *rs = [self executeQuery:objs];
-    
-    if (![rs next]) {
-        return nil;
-    }
-    
-    NSString *ret = [rs stringForColumnIndex:0];
-    
-    // clear it out.
-    [rs close];
-    
-    return ret;
+// People who think macros are bad are lamerz.
+// (so says Zach Wily, not Mr. Mueller.  Although Mr. Mueller thinks this is kinda neat)
+
+#define RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(type, sel)             \
+va_list args;                                                        \
+va_start(args, query);                                               \
+FMResultSet *resultSet = [self executeQuery:query arguments:args];   \
+va_end(args);                                                        \
+if (![resultSet next]) { return (type)0; }                           \
+type ret = [resultSet sel:0];                                        \
+[resultSet close];                                                   \
+[resultSet setParentDB:nil];                                         \
+return ret;
+
+
+- (NSString*)stringForQuery:(NSString*)query, ...; {
+    RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSString *, stringForColumnIndex);
 }
 
-- (int) intForQuery:(NSString*)objs, ...; {
-    
-    FMResultSet *rs = [self executeQuery:objs];
-    
-    if (![rs next]) {
-        return NO;
-    }
-    
-    long ret = [rs longForColumnIndex:0];
-    
-    // clear it out.
-    [rs close];
-    
-    return ret;
+- (int)intForQuery:(NSString*)query, ...; {
+    RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(int, intForColumnIndex);
 }
 
-- (long) longForQuery:(NSString*)objs, ...; {
-    
-    FMResultSet *rs = [self executeQuery:objs];
-    
-    if (![rs next]) {
-        return NO;
-    }
-    
-    int ret = [rs intForColumnIndex:0];
-    
-    // clear it out.
-    [rs close];
-    
-    return ret;
+- (long)longForQuery:(NSString*)query, ...; {
+    RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(long, longForColumnIndex);
 }
 
-- (BOOL) boolForQuery:(NSString*)objs, ...; {
-    
-    FMResultSet *rs = [self executeQuery:objs];
-    
-    if (![rs next]) {
-        return NO;
-    }
-    
-    BOOL ret = [rs boolForColumnIndex:0];
-    
-    // clear it out.
-    [rs close];
-    
-    return ret;
+- (BOOL)boolForQuery:(NSString*)query, ...; {
+    RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(BOOL, boolForColumnIndex);
 }
 
-- (double) doubleForQuery:(NSString*)objs, ...; {
-    
-    FMResultSet *rs = [self executeQuery:objs];
-    
-    if (![rs next]) {
-        return 0.0;
-    }
-    
-    double ret = [rs doubleForColumnIndex:0];
-    
-    // clear it out.
-    [rs close];
-    
-    return ret;
+- (double)doubleForQuery:(NSString*)query, ...; {
+    RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(double, doubleForColumnIndex);
 }
 
-- (NSData*) dataForQuery:(NSString*)objs, ...; {
-    
-    FMResultSet *rs = [self executeQuery:objs];
-    
-    if (![rs next]) {
-        return nil;
-    }
-    
-    NSData *data = [rs dataForColumnIndex:0];
-    
-    // clear it out.
-    [rs close];
-    
-    return data;
+- (NSData*)dataForQuery:(NSString*)query, ...; {
+    RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSData *, dataForColumnIndex);
 }
 
 @end

@@ -1,6 +1,3 @@
-// FMDATABASE SQLITE WRAPPER HAS BEEN INTO THE PUBLIC DOMAIN BY GUS MUELLER,
-// ACCORDING TO EMAIL CORRESPONDENCE WITH PIERRE BERNARD DATED DECEMBER 17, 2007
-
 #import <Foundation/Foundation.h>
 #import "sqlite3.h"
 #import "FMResultSet.h"
@@ -24,16 +21,26 @@
 - (BOOL) open;
 - (void) close;
 - (BOOL) goodConnection;
+#ifdef SQLITE_HAS_CODEC
+- (BOOL) setKey:(NSString*)key;
+- (BOOL) rekey:(NSString*)key;
+#endif
+
+- (NSString *) databasePath;
 
 - (NSString*) lastErrorMessage;
+
 - (int) lastErrorCode;
 - (BOOL) hadError;
 - (sqlite_int64) lastInsertRowId;
 
 - (sqlite3*) sqliteHandle;
 
-- (BOOL) executeUpdate:(NSString*)objs, ...;
-- (id) executeQuery:(NSString*)obj, ...;
+- (BOOL) executeUpdate:(NSString *)sql arguments:(va_list)args;
+- (BOOL) executeUpdate:(NSString*)sql, ...;
+
+- (id) executeQuery:(NSString *)sql arguments:(va_list)args;
+- (id) executeQuery:(NSString*)sql, ...;
 
 - (BOOL) rollback;
 - (BOOL) commit;
