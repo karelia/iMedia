@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>IBFramework Version</key>
-	<string>629</string>
+	<string>667</string>
 	<key>IBLastKnownRelativeProjectPath</key>
-	<string>../../iMediaBrowse.xcodeproj</string>
+	<string>../iMediaBrowse.xcodeproj</string>
 	<key>IBOldestOS</key>
 	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array/>
 	<key>IBSystem Version</key>
-	<string>9C31</string>
+	<string>9D34</string>
 	<key>targetFramework</key>
 	<string>IBCocoaFramework</string>
 </dict>
