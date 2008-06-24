@@ -152,7 +152,7 @@
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:LocalizedStringInThisBundle(@"Screen Savers", @"Screen Savers -- source of some images in iMedia")];
+	[root setName:LocalizedStringInIMedia(@"Screen Savers", @"Screen Savers -- source of some images in iMedia")];
 	[root setIconName:@"folder"];
 		
 	[self parseWithNode:root];

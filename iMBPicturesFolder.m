@@ -129,7 +129,7 @@
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:LocalizedStringInThisBundle(@"Pictures Folder", @"Name of your 'Pictures' folder in your home directory")];
+	[root setName:LocalizedStringInIMedia(@"Pictures Folder", @"Name of your 'Pictures' folder in your home directory")];
 	[root setIconName:@"picturesFolder"];
 		
 	if (![[NSFileManager defaultManager] fileExistsAtPath:myDatabase])

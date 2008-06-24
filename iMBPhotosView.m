@@ -237,7 +237,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return LocalizedStringInThisBundle(@"Photos", @"Photos media type");
+	return LocalizedStringInIMedia(@"Photos", @"Photos media type");
 }
 
 - (void)willActivate
@@ -364,7 +364,7 @@ static NSImage *_toolbarIcon = nil;
 {
 	int count = [[self imageCount] intValue];
 	
-	return abs(count) != 1 ? LocalizedStringInThisBundle(@"photos", @"plural form for showing how many items there are") :  LocalizedStringInThisBundle(@"photo", @"singular form for showing how many items there are");
+	return abs(count) != 1 ? LocalizedStringInIMedia(@"photos", @"plural form for showing how many items there are") :  LocalizedStringInIMedia(@"photo", @"singular form for showing how many items there are");
 }
 
 #pragma mark -
@@ -730,7 +730,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 		// upgrade events.
 		NSString *resolvedPath = [[NSFileManager defaultManager] pathResolved:imagePath];
 		NSDictionary *metadata = [NSImage metadataFromImageAtPath:resolvedPath];
-		NSString *dimensionsFormat = LocalizedStringInThisBundle(@"\n%.0f \\U2715 %.0f", @"format for width X height");
+		NSString *dimensionsFormat = LocalizedStringInIMedia(@"\n%.0f \\U2715 %.0f", @"format for width X height");
 		[result appendFormat:dimensionsFormat,
 			[[metadata objectForKey:@"width"]  floatValue],
 			[[metadata objectForKey:@"height"] floatValue]];

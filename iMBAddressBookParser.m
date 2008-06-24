@@ -126,7 +126,7 @@
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:LocalizedStringInThisBundle(@"Address Book", @"Root Node Name of address book")];
+	[root setName:LocalizedStringInIMedia(@"Address Book", @"Root Node Name of address book")];
 	[root setIconName:@"com.apple.AddressBook"];
 	
 	ABAddressBook *ab = [ABAddressBook sharedAddressBook];

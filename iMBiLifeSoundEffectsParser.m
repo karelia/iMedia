@@ -72,8 +72,8 @@
 	NSFileManager *fm = [NSFileManager defaultManager];
 	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
     
-    NSString *musicFolderName = LocalizedStringInThisBundle(@"iLife Sound Effects", @"iLife Sound Effects folder name");
-    NSString *unknownArtistName = LocalizedStringInThisBundle(@"Apple Loop", @"Artist");
+    NSString *musicFolderName = LocalizedStringInIMedia(@"iLife Sound Effects", @"iLife Sound Effects folder name");
+    NSString *unknownArtistName = LocalizedStringInIMedia(@"Apple Loop", @"Artist");
     NSString *iconName = @"MBSoundEffect";
     BOOL parseMetadata = YES;
 	

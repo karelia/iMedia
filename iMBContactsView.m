@@ -97,7 +97,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return LocalizedStringInThisBundle(@"Contacts", @"Name of Data Type");
+	return LocalizedStringInIMedia(@"Contacts", @"Name of Data Type");
 }
 
 - (BOOL)tableView:(NSTableView *)tv

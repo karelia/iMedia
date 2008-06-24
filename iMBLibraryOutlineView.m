@@ -80,7 +80,7 @@
 //												 name:NSViewBoundsDidChangeNotification
 //											   object:[self superview]];
 	
-	[self setPlaceholderString:LocalizedStringInThisBundle(@"Drag additional source folders here", @"Instructions for media browser source list")];
+	[self setPlaceholderString:LocalizedStringInIMedia(@"Drag additional source folders here", @"Instructions for media browser source list")];
 }
 
 - (void)dealloc

@@ -171,7 +171,7 @@
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:LocalizedStringInThisBundle(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
+	[root setName:LocalizedStringInIMedia(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
 	[root setIconName:@"picturesFolder"];
 	NSString *folder = [self databasePath];
 	

@@ -101,11 +101,11 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 		[songsController setDelegate:self];
 		
 		[[[table tableColumnWithIdentifier:@"Name"] headerCell] setStringValue:
-			LocalizedStringInThisBundle(@"Title", @"Table Column Title - title of song or audio track")];
+			LocalizedStringInIMedia(@"Title", @"Table Column Title - title of song or audio track")];
 		[[[table tableColumnWithIdentifier:@"Artist"] headerCell] setStringValue:
-			LocalizedStringInThisBundle(@"Artist", @"Table Column Title - music artist or creator")];
+			LocalizedStringInIMedia(@"Artist", @"Table Column Title - music artist or creator")];
 		[[[table tableColumnWithIdentifier:@"Time"] headerCell] setStringValue:
-			LocalizedStringInThisBundle(@"Time", @"Table Column Title - time of song or audio track")];
+			LocalizedStringInIMedia(@"Time", @"Table Column Title - time of song or audio track")];
 
 		NSDictionary *optionsDict =
 		[NSDictionary dictionaryWithObject:@"%{value1}@ %{value2}@"  
@@ -147,7 +147,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return LocalizedStringInThisBundle(@"Audio", @"Name of Data Type");
+	return LocalizedStringInIMedia(@"Audio", @"Name of Data Type");
 }
 
 - (void)setSelectionChanged:(id)val
@@ -436,7 +436,7 @@ static NSImage *_playImage = nil;
 {
 	int count = [[songsController arrangedObjects] count];
 	
-	return abs(count) != 1 ? LocalizedStringInThisBundle(@"tracks", @"plural form for showing how many items there are") :  LocalizedStringInThisBundle(@"track", @"singular form for showing how many items there are");
+	return abs(count) != 1 ? LocalizedStringInIMedia(@"tracks", @"plural form for showing how many items there are") :  LocalizedStringInIMedia(@"track", @"singular form for showing how many items there are");
 }
 
 #pragma mark -

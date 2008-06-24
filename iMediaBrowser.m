@@ -302,7 +302,7 @@ static NSMutableArray *_browserClasses = nil;
 
 - (void)awakeFromNib
 {
-	[[self window] setTitle:LocalizedStringInThisBundle(@"Media", @"Window name of iMediaBrowser")];
+	[[self window] setTitle:LocalizedStringInIMedia(@"Media", @"Window name of iMediaBrowser")];
 	
 	[[self window] setContentMinSize:NSMakeSize(292,292)];	// not so small that we lose the back of window content
 	 

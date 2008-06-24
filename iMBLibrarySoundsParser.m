@@ -74,8 +74,8 @@
 	NSFileManager *fm = [NSFileManager defaultManager];
 	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
 
-    NSString *musicFolderName = LocalizedStringInThisBundle(@"Sounds Folder", @"~/Library/Sounds folder name");
-    NSString *unknownArtistName = LocalizedStringInThisBundle(@"Unknown", @"Unknown music/sound artist");
+    NSString *musicFolderName = LocalizedStringInIMedia(@"Sounds Folder", @"~/Library/Sounds folder name");
+    NSString *unknownArtistName = LocalizedStringInIMedia(@"Unknown", @"Unknown music/sound artist");
     NSString *iconName = @"folder";
     BOOL parseMetadata = YES;
 	

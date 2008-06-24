@@ -43,11 +43,11 @@
 */
 
 
-// LocalizedStringInThisBundle is for use by frameworks and plugins,
+// LocalizedStringInIMedia is for use by frameworks and plugins,
 // so it gets the right bundle -- not the application bundle.
 // Code in the application itself should always use NSLocalizedString
 
-#define LocalizedStringInThisBundle(key, comment) \
+#define LocalizedStringInIMedia(key, comment) \
     [[NSBundle bundleForClass:[iMediaBrowser class]] localizedStringForKey:(key) value:@"" table:nil]
 
 #import <iMediaBrowser/LibraryItemsValueTransformer.h>

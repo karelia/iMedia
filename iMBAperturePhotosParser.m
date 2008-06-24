@@ -158,7 +158,7 @@
 - (iMBLibraryNode *)parseOneDatabaseWithContentsOfURL:(NSURL *)url
 {
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-	[root setName:LocalizedStringInThisBundle(@"Aperture", @"Aperture")];
+	[root setName:LocalizedStringInIMedia(@"Aperture", @"Aperture")];
 	[root setIconName:@"com.apple.Aperture:"];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	

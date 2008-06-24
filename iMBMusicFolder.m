@@ -92,8 +92,8 @@ static NSImage *sDRMIcon = nil;
 
 - (id)initWithContentsOfFile:(NSString *)file
 {
-    NSString *musicFolderName = LocalizedStringInThisBundle(@"Music Folder", @"Name of your 'Music' folder in your home directory");
-    NSString *unknownArtistName = LocalizedStringInThisBundle(@"Unknown", @"Unknown music/sound artist");
+    NSString *musicFolderName = LocalizedStringInIMedia(@"Music Folder", @"Name of your 'Music' folder in your home directory");
+    NSString *unknownArtistName = LocalizedStringInIMedia(@"Unknown", @"Unknown music/sound artist");
     NSString *iconName = @"folder";
 
 	return [self initWithContentsOfFile:file musicFolderName:musicFolderName unknownArtistName:unknownArtistName iconName:iconName parseMetadata:YES];
@@ -254,7 +254,7 @@ static NSImage *sDRMIcon = nil;
         iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
         
         // the name will include 'loading' until it is populated.
-        NSString *loadingString = LocalizedStringInThisBundle(@"Loading...", @"Text that shows that we are loading");
+        NSString *loadingString = LocalizedStringInIMedia(@"Loading...", @"Text that shows that we are loading");
         [root setName:[myMusicFolderName stringByAppendingFormat:@" (%@)", loadingString]];
         [root setIconName:myIconName];
         

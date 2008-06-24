@@ -132,7 +132,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 - (void)awakeFromNib
 {
     [loadingTextField setStringValue:
-        LocalizedStringInThisBundle(@"Loading...", @"Text that shows that we are loading")];
+        LocalizedStringInIMedia(@"Loading...", @"Text that shows that we are loading")];
 
     if ( splitView != nil )
     {

@@ -88,7 +88,7 @@
 	if (xml)
 	{
 		library = [[iMBLibraryNode alloc] init];
-		[library setName:LocalizedStringInThisBundle(@"OmniWeb", @"OmniWeb")];
+		[library setName:LocalizedStringInIMedia(@"OmniWeb", @"OmniWeb")];
 		[library setIconName:@"com.omnigroup.OmniWeb5"];
 		
 		iMBXBELParser *parser = [[iMBXBELParser alloc] init];

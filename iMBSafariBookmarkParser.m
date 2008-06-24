@@ -89,12 +89,12 @@
 	
 	if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksBar"])
 	{
-		[parsed setName:LocalizedStringInThisBundle(@"Bookmarks Bar", @"Bookmarks Bar as titled in Safari")];
+		[parsed setName:LocalizedStringInIMedia(@"Bookmarks Bar", @"Bookmarks Bar as titled in Safari")];
 		[parsed setIconName:@"SafariBookmarksBar"];
 	}
 	else if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksMenu"])
 	{
-		[parsed setName:LocalizedStringInThisBundle(@"Bookmarks Menu", @"Bookmarks Menu as titled in Safari")];
+		[parsed setName:LocalizedStringInIMedia(@"Bookmarks Menu", @"Bookmarks Menu as titled in Safari")];
 		[parsed setIconName:@"SafariBookmarksMenu"];
 	}
 	else if ([[item objectForKey:@"Title"] isEqualToString:@"Address Book"] ||
@@ -169,7 +169,7 @@
 	iMBLibraryNode *library = [[[iMBLibraryNode alloc] init] autorelease];
 	NSDictionary *xml = [NSDictionary dictionaryWithContentsOfFile:path];
 	
-	[library setName:LocalizedStringInThisBundle(@"Safari", @"Safari")];
+	[library setName:LocalizedStringInIMedia(@"Safari", @"Safari")];
 	[library setIconName:@"com.apple.Safari"];
 	
 	NSEnumerator *groupEnum = [[xml objectForKey:@"Children"] objectEnumerator];

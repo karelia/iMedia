@@ -76,7 +76,7 @@
 	iMBLibraryNode *db = [parser parseDatabase];
 	if (db)
 	{
-		[db setName:LocalizedStringInThisBundle(@"iChat Icons", @"folder name")];
+		[db setName:LocalizedStringInIMedia(@"iChat Icons", @"folder name")];
 		[db setIconName:@"folder"];
 	}	
 	return db;

@@ -121,7 +121,7 @@
 	if (lCount == 1) {
 		iMBLibraryNode *library = [libraryNodes objectAtIndex:0];
 		
-		[library setName:LocalizedStringInThisBundle(@"Lightroom", @"Lightroom")];
+		[library setName:LocalizedStringInIMedia(@"Lightroom", @"Lightroom")];
 		[library setIconName:@"com.adobe.Lightroom:"];
 		
 		libraryNode = library;
@@ -129,7 +129,7 @@
 	else {
 		iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 		
-		[root setName:LocalizedStringInThisBundle(@"Lightroom", @"Lightroom")];
+		[root setName:LocalizedStringInIMedia(@"Lightroom", @"Lightroom")];
 		[root setIconName:@"com.adobe.Lightroom:"];
 		
 		int l;
@@ -202,10 +202,10 @@
 			
 			if (name == nil) {
 				if ([idParentLocal intValue] == 0) {
-					name = LocalizedStringInThisBundle(@"Collections", @"Collections");
+					name = LocalizedStringInIMedia(@"Collections", @"Collections");
 				}
 				else {
-					name = LocalizedStringInThisBundle(@"Unnamed", @"Unnamed");
+					name = LocalizedStringInIMedia(@"Unnamed", @"Unnamed");
 				}
 			}
 			
@@ -308,7 +308,7 @@
 	iMBLibraryNode *imagesNode = [[[iMBLibraryNode alloc] init] autorelease];	
 	
 	[imagesNode setAttribute:[NSNumber numberWithInt:-1] forKey:@"idLocal"];
-	[imagesNode setName:LocalizedStringInThisBundle(@"Images", @"Images")];
+	[imagesNode setName:LocalizedStringInIMedia(@"Images", @"Images")];
 	[imagesNode setIconName:@"folder"];
 	[imagesNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	

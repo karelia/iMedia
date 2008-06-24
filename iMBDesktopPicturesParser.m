@@ -76,7 +76,7 @@
 	iMBLibraryNode *db = [parser parseDatabase];
 	if (db)
 	{
-		[db setName:LocalizedStringInThisBundle(@"Desktop Pictures", @"folder name")];
+		[db setName:LocalizedStringInIMedia(@"Desktop Pictures", @"folder name")];
 		[db setIconName:@"folder"];
 	}	
 	return db;

@@ -160,7 +160,7 @@
 - (iMBLibraryNode *)parseDatabase
 {
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-	[root setName:LocalizedStringInThisBundle(@"GarageBand", @"Name of Node")];
+	[root setName:LocalizedStringInIMedia(@"GarageBand", @"Name of Node")];
 	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.garageband"];
 	if (icon)
 	{
@@ -176,16 +176,16 @@
 	if ([[NSFileManager defaultManager] fileExistsAtPath:demoPath])
 	{
 		iMBLibraryNode *demo = [[iMBLibraryNode alloc] init];
-		[demo setName:LocalizedStringInThisBundle(@"GarageBand Demo Songs", @"Node name")];
+		[demo setName:LocalizedStringInIMedia(@"GarageBand Demo Songs", @"Node name")];
 		[demo setIconName:@"folder"];
 		
-		[self recursivelyParse:demoPath withNode:demo artist:LocalizedStringInThisBundle(@"Demo", @"artist name")];
+		[self recursivelyParse:demoPath withNode:demo artist:LocalizedStringInIMedia(@"Demo", @"artist name")];
 		[root addItem:demo];
 		[demo release];
 	}
 	
 	iMBLibraryNode *myCompositions = [[[iMBLibraryNode alloc] init] autorelease];
-	[myCompositions setName:LocalizedStringInThisBundle(@"My Compositions", @"Node name")];
+	[myCompositions setName:LocalizedStringInIMedia(@"My Compositions", @"Node name")];
 	[myCompositions setIconName:@"folder"];
 	
 	[self recursivelyParse:myDatabase

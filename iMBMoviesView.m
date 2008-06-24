@@ -226,7 +226,7 @@
 {
 	int count = [[self imageCount] intValue];
 	
-	return abs(count) != 1 ? LocalizedStringInThisBundle(@"movies", @"plural form for showing how many items there are") :  LocalizedStringInThisBundle(@"movie", @"singular form for showing how many items there are");
+	return abs(count) != 1 ? LocalizedStringInIMedia(@"movies", @"plural form for showing how many items there are") :  LocalizedStringInIMedia(@"movie", @"singular form for showing how many items there are");
 }
 
 
@@ -296,7 +296,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)name
 {
-	return LocalizedStringInThisBundle(@"Movies", @"Name of Data Type");
+	return LocalizedStringInIMedia(@"Movies", @"Name of Data Type");
 }
 
 - (NSString *)iconNameForPlaylist:(NSString*)name
@@ -670,7 +670,7 @@ static NSImage *_toolbarIcon = nil;
 	// OUTPUT DIMENSIONS
 	if (width >= 1.0 && height >= 1.0)
 	{
-		NSString *dimensionsFormat = LocalizedStringInThisBundle(@"\n%.0f \\U2715 %.0f", @"format for width X height");
+		NSString *dimensionsFormat = LocalizedStringInIMedia(@"\n%.0f \\U2715 %.0f", @"format for width X height");
 		[result appendFormat:dimensionsFormat, width, height];
 	}
 

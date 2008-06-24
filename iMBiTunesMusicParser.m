@@ -349,7 +349,7 @@
 		// Create a root node for iTunes...
 		
 		root = [[[iMBLibraryNode alloc] init] autorelease];
-		[root setName:LocalizedStringInThisBundle(@"iTunes", @"iTunes")];
+		[root setName:LocalizedStringInIMedia(@"iTunes", @"iTunes")];
 		[root setIconName:@"com.apple.iTunes:"];
 		[root setParser:self];
 		
@@ -359,27 +359,27 @@
 		
 		if (_version == 7)
 		{
-			name = LocalizedStringInThisBundle(@"Music", @"Library as titled in iTunes source list");
+			name = LocalizedStringInIMedia(@"Music", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-music";
 			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Music" name:name iconName:icon];
 			if (node) [root addItem:node];
 			
-			name = LocalizedStringInThisBundle(@"Podcasts", @"Library as titled in iTunes source list");
+			name = LocalizedStringInIMedia(@"Podcasts", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-podcasts7";
 			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Podcasts" name:name iconName:icon];
 			if (node) [root addItem:node];
 			
-			name = LocalizedStringInThisBundle(@"Audiobooks", @"Library as titled in iTunes source list");
+			name = LocalizedStringInIMedia(@"Audiobooks", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-audiobooks";
 			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Audiobooks" name:name iconName:icon];
 			if (node) [root addItem:node];
 			
-			name = LocalizedStringInThisBundle(@"Purchased", @"Library as titled in iTunes source list");
+			name = LocalizedStringInIMedia(@"Purchased", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-purchased7";
 			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Purchased Music" name:name iconName:icon];
 			if (node) [root addItem:node];
 			
-			name = LocalizedStringInThisBundle(@"Party Shuffle", @"Library as titled in iTunes source list");
+			name = LocalizedStringInIMedia(@"Party Shuffle", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-partyshuffle7";
 			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Party Shuffle" name:name iconName:icon];
 			if (node) [root addItem:node];
@@ -389,22 +389,22 @@
 		
 		else
 		{
-			name = LocalizedStringInThisBundle(@"Library", @"Library as titled in iTunes source list");
+			name = LocalizedStringInIMedia(@"Library", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-library";
 			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Master" name:name iconName:icon];
 			if (node) [root addItem:node];
 			
-			name = LocalizedStringInThisBundle(@"Podcasts", @"Library as titled in iTunes source list");
+			name = LocalizedStringInIMedia(@"Podcasts", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-podcasts";
 			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Podcasts" name:name iconName:icon];
 			if (node) [root addItem:node];
 			
-			name = LocalizedStringInThisBundle(@"Purchased", @"Library as titled in iTunes source list");
+			name = LocalizedStringInIMedia(@"Purchased", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-purchased";
 			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Purchased Music" name:name iconName:icon];
 			if (node) [root addItem:node];
 			
-			name = LocalizedStringInThisBundle(@"Party Shuffle", @"Library as titled in iTunes source list");
+			name = LocalizedStringInIMedia(@"Party Shuffle", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-partyshuffle";
 			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Party Shuffle" name:name iconName:icon];
 			if (node) [root addItem:node];
@@ -427,20 +427,20 @@
 		iMBLibraryNode *purchasedLib = [[iMBLibraryNode alloc] init];
 		NSMutableArray *smartPlaylists = [NSMutableArray array];
 		
-		if (_version<7) [library setName:LocalizedStringInThisBundle(@"Library", @"Library as titled in iTunes source list")];
-		else [library setName:LocalizedStringInThisBundle(@"Music", @"Library as titled in iTunes source list")];
+		if (_version<7) [library setName:LocalizedStringInIMedia(@"Library", @"Library as titled in iTunes source list")];
+		else [library setName:LocalizedStringInIMedia(@"Music", @"Library as titled in iTunes source list")];
 		[library setIconName:[self iconNameForPlaylist:@"Library"]]; //@"MBiTunesLibrary"];
 		[library setParser:self];
 		
-		[podcastLib setName:LocalizedStringInThisBundle(@"Podcasts", @"Podcasts as titled in iTunes source list")];
+		[podcastLib setName:LocalizedStringInIMedia(@"Podcasts", @"Podcasts as titled in iTunes source list")];
 		[podcastLib setIconName:[self iconNameForPlaylist:@"Podcasts"]]; //@"MBiTunesPodcast"];
 		[podcastLib setParser:self];
 		
-		[partyShuffleLib setName:LocalizedStringInThisBundle(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
+		[partyShuffleLib setName:LocalizedStringInIMedia(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
 		[partyShuffleLib setIconName:[self iconNameForPlaylist:@"Party Shuffle"]]; //@"MBiTunesPartyShuffle"];
 		[partyShuffleLib setParser:self];
 		
-		[purchasedLib setName:LocalizedStringInThisBundle(@"Purchased", @"Purchased folder as titled in iTunes source list")];
+		[purchasedLib setName:LocalizedStringInIMedia(@"Purchased", @"Purchased folder as titled in iTunes source list")];
 		[purchasedLib setIconName:[self iconNameForPlaylist:@"Purchased Music"]]; //@"MBiTunesPurchasedPlaylist"];
 		[purchasedLib setParser:self];
 		

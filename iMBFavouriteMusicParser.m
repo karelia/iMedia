@@ -79,7 +79,7 @@
 	if ([paths count] == 0) return nil;
 	
 	iMBLibraryNode *favs = [[iMBLibraryNode alloc] init];
-	[favs setName:LocalizedStringInThisBundle(@"Favorites", @"Favourite folder name")];
+	[favs setName:LocalizedStringInIMedia(@"Favorites", @"Favourite folder name")];
 	[favs setIconName:@"heart"];
 	
 	NSFileManager *fm = [NSFileManager defaultManager];

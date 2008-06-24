@@ -126,7 +126,7 @@
 							 wantThumbPath:(BOOL)aWantThumbPath
 {
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-	[root setName:LocalizedStringInThisBundle(@"iPhoto", @"iPhoto")];
+	[root setName:LocalizedStringInIMedia(@"iPhoto", @"iPhoto")];
 	[root setIconName:@"photo_tiny"];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:anImagePath];
 	
