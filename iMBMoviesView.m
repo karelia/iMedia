@@ -46,10 +46,13 @@
 
 #import <QTKit/QTKit.h>
 #import "iMBLibraryNode.h"
-#import "iMedia.h"
 #import "MUPhotoView.h"
 #import "iMBMovieCacheDB.h"
 #import "iMBMovieReference.h"
+#import "iMediaConfiguration.h"
+#import "NSString+iMedia.h"
+#import "NSPasteboard+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
 #define MAX_POSTER_SIZE (NSMakeSize(240, 180))	// our thumbnail view maxes out at 240.
 

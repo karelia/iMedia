@@ -44,8 +44,10 @@
 
 
 #import "iMBFavouriteMoviesParser.h"
-#import "iMedia.h"
 #import "iMBMoviesFolder.h"
+#import "iMediaConfiguration.h"
+#import "iMBLibraryNode.h"
+#import "NSFileManager+iMedia.h"
 
 @implementation iMBFavouriteMoviesParser
 

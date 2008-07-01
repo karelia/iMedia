@@ -47,8 +47,9 @@
 #import "iMBDNDArrayController.h"
 #import "TimeValueTransformer.h"
 #import "iMBLibraryNode.h"
-#import "iMedia.h"
 #import "QTMovie+iMedia.h"
+#import "NSPasteboard+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
 #import <QTKit/QTKit.h>
 

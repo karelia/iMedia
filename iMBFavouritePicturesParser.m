@@ -45,7 +45,9 @@
 
 #import "iMBFavouritePicturesParser.h"
 #import "iMBPicturesFolder.h"
-#import "iMedia.h"
+#import "iMBLibraryNode.h"
+#import "iMediaConfiguration.h"
+#import "NSFileManager+iMedia.h"
 
 @implementation iMBFavouritePicturesParser
 

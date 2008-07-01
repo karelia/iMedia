@@ -46,8 +46,7 @@
 #import "iMBAperturePhotosParser.h"
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
-#import "iMedia.h"
-
+#import "NSImage+iMedia.h"
 
 //	CONFIGURATION
 //	

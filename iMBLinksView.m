@@ -43,7 +43,8 @@
 */
 
 #import "iMBLinksView.h"
-#import "iMedia.h"
+#import "NSPasteboard+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
 @implementation iMBLinksView
 

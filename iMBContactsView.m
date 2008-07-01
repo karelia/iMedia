@@ -43,8 +43,10 @@
 */
 
 #import "iMBContactsView.h"
+#import "iMediaConfiguration.h"
+#import "NSPasteboard+iMedia.h"
+#import "MUPhotoView.h"
 
-#import "iMedia.h"
 #import <AddressBook/AddressBook.h>
 
 

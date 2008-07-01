@@ -46,7 +46,6 @@
 #import "iMBiPhotoAbstractParser.h"
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
-#import "iMedia.h"
 
 @interface iMBiPhotoAbstractParser (private)
 - (void) parseAlbums: (NSEnumerator*) albumEnum 

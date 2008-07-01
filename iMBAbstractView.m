@@ -45,12 +45,16 @@
 #import "iMBAbstractView.h"
 
 #import "iMBLibraryNode.h"
-
-#import "iMedia.h"
 #import "iMediaConfiguration.h"
 #import "iMediaBrowser.h"
+#import "iMBAbstractParser.h"
+#import "LibraryItemsValueTransformer.h"
+#import "NSPopUpButton+iMedia.h"
 #import "RBSplitView.h"
 #import "RBSplitSubview.h"
+
+#import <QTKit/QTKit.h>
+
 
 NSString *iMBNativePasteboardFlavor=@"iMBNativePasteboardFlavor";
 NSString *iMBControllerClassName=@"iMBControllerClassName";

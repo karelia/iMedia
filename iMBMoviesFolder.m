@@ -46,8 +46,9 @@
 #import "iMBMoviesFolder.h"
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
+#import "NSFileManager+iMedia.h"
+
 #import <QTKit/QTKit.h>
-#import "iMedia.h"
 
 @implementation iMBMoviesFolder
 

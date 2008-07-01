@@ -47,9 +47,6 @@
 // so it gets the right bundle -- not the application bundle.
 // Code in the application itself should always use NSLocalizedString
 
-#define LocalizedStringInIMedia(key, comment) \
-    [[NSBundle bundleForClass:[iMediaBrowser class]] localizedStringForKey:(key) value:@"" table:nil]
-
 #import <iMediaBrowser/LibraryItemsValueTransformer.h>
 #import <iMediaBrowser/MUPhotoView.h>
 #import <iMediaBrowser/NSAttributedString+iMedia.h>

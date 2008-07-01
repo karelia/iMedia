@@ -47,7 +47,6 @@
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import <WebKit/WebKit.h>
-#import "iMedia.h"
 #import "WebIconDatabase.h"
 
 @implementation iMBSafariBookmarkParser

@@ -46,7 +46,6 @@
 #import "iMBOmniWebParser.h"
 #import "iMBLibraryNode.h"
 #import "iMediaConfiguration.h"
-#import "iMedia.h"
 #import "iMBXBELParser.h"
 
 @implementation iMBOmniWebParser

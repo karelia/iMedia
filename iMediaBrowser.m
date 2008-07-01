@@ -45,12 +45,12 @@
 
 #import "iMediaBrowser.h"
 #import "iMediaBrowserProtocol.h"
-#import "iMedia.h"
 #import "iMediaConfiguration.h"
 #import "iMBAbstractView.h"
 #import "iMBHoverButton.h"
 #import "NSWindow_Flipr.h"
 #import "iMBBackgroundImageView.h"
+#import "iMBLibraryNode.h"
 
 NSString *iMediaBrowserSelectionDidChangeNotification = @"iMediaSelectionChanged";
 

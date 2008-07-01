@@ -42,9 +42,10 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-#import "iMedia.h"
+#import "iMediaConfiguration.h"
 #import "iMBLibraryOutlineView.h"
 #import "iMBVerticallyAlignedTextCell.h"
+#import "iMediaBrowserProtocol.h"
 
 @interface NSObject (iMediaHack)
 - (id)observedObject;

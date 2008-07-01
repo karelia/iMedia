@@ -46,7 +46,6 @@
 #import "iMBiTunesMusicParser.h"
 #import "iMBLibraryNode.h"
 #import "iMediaConfiguration.h"
-#import "iMedia.h"
 
 #define RECURSIVE_PARSEDATABASE 1
 

@@ -44,8 +44,9 @@
 
 
 #import "iMBiChatIconsParser.h"
-#import "iMedia.h"
+#import "iMediaConfiguration.h"
 #import "iMBPicturesFolder.h"
+#import "iMBLibraryNode.h"
 
 @implementation iMBiChatIconsParser
 

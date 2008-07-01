@@ -44,8 +44,9 @@
 
 
 #import "iMBUserPicturesParser.h"
-#import "iMedia.h"
+#import "iMediaConfiguration.h"
 #import "iMBPicturesFolder.h"
+#import "iMBLibraryNode.h"
 
 @implementation iMBUserPicturesParser
 

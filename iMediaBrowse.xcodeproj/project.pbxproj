@@ -94,6 +94,7 @@
 		79BBE52B0A282E440018CCCA /* iMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */; };
 		79CA91620A2D250400ABD1D8 /* NSIndexPath+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79CA91630A2D250400ABD1D8 /* NSIndexPath+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */; };
+		79F4DC4B0E1AC1630001C072 /* iMedia.pch in Headers */ = {isa = PBXBuildFile; fileRef = 79F4DC4A0E1AC1630001C072 /* iMedia.pch */; };
 		79FA0F5F0A2E7D1500461872 /* NSSlider+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 79FA0F5D0A2E7D1500461872 /* NSSlider+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79FA0F600A2E7D1500461872 /* NSSlider+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 79FA0F5E0A2E7D1500461872 /* NSSlider+iMedia.m */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -433,6 +434,7 @@
 		79BBE5290A282E440018CCCA /* iMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iMBGarageBandParser.m; sourceTree = "<group>"; };
 		79CA91600A2D250400ABD1D8 /* NSIndexPath+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSIndexPath+iMedia.h"; sourceTree = "<group>"; };
 		79CA91610A2D250400ABD1D8 /* NSIndexPath+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSIndexPath+iMedia.m"; sourceTree = "<group>"; };
+		79F4DC4A0E1AC1630001C072 /* iMedia.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.pch; sourceTree = "<group>"; };
 		79FA0F5D0A2E7D1500461872 /* NSSlider+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "NSSlider+iMedia.h"; sourceTree = "<group>"; };
 		79FA0F5E0A2E7D1500461872 /* NSSlider+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = "NSSlider+iMedia.m"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -760,6 +762,7 @@
 			children = (
 				7956049309D78F9F00BF1DA5 /* LICENSE */,
 				96F9076209D8D9690071BFFB /* iMedia.h */,
+				79F4DC4A0E1AC1630001C072 /* iMedia.pch */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				CE98A0CB097DC5DA00757094 /* Application */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
@@ -1256,6 +1259,7 @@
 				5B29F47C0D6EB38B0045CD86 /* iMBMovieReference.h in Headers */,
 				5B29F47D0D6EB38C0045CD86 /* iMBMovieCacheDB.h in Headers */,
 				CEEE54150DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.h in Headers */,
+				79F4DC4B0E1AC1630001C072 /* iMedia.pch in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1771,6 +1775,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_PREFIX_HEADER = iMedia.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
@@ -1797,6 +1802,7 @@
 			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_PREFIX_HEADER = iMedia.pch;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -1902,6 +1908,7 @@
 			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_PREFIX_HEADER = iMedia.pch;
 				INFOPLIST_FILE = "iMediaBrowser-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

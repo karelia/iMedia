@@ -46,7 +46,6 @@
 #import "iMBiPhotoMoviesParser.h"
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
-#import "iMedia.h"
 
 #import <QTKit/QTKit.h>
 

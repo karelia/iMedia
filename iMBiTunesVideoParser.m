@@ -47,7 +47,6 @@
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "QTMovie+iMedia.h"
-#import "iMedia.h"
 
 #import <QTKit/QTKit.h>
 

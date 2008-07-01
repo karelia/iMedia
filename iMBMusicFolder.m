@@ -43,8 +43,12 @@
 */
 
 #import "iMBMusicFolder.h"
-#import "iMedia.h"
 #import "MetadataUtility.h"
+#import "iMediaConfiguration.h"
+#import "iMBLibraryNode.h"
+#import "NSFileManager+iMedia.h"
+
+#import <QTKit/QTKit.h>
 
 static NSImage *sSongIcon = nil;
 static NSImage *sDRMIcon = nil;

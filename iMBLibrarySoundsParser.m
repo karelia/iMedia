@@ -44,8 +44,8 @@
 
 
 #import "iMBLibrarySoundsParser.h"
-#import "iMedia.h"
 #import "iMBMusicFolder.h"
+#import "iMediaConfiguration.h"
 
 @implementation iMBLibrarySoundsParser
 

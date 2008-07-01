@@ -45,7 +45,6 @@
 #import "iMBLightroomPhotosParser.h"
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
-#import "iMedia.h"
 
 #import "CIImage+iMedia.h"
 

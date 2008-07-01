@@ -46,7 +46,14 @@
 
 #import "MUPhotoView.h"
 #import "iMBLibraryNode.h"
-#import "iMedia.h"
+#import "iMediaConfiguration.h"
+#import "NSString+iMedia.h"
+#import "NSImage+iMedia.h"
+#import "NSFileManager+iMedia.h"
+#import "NSProcessInfo+iMedia.h"
+#import "NSIndexPath+iMedia.h"
+#import "NSPasteboard+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
 #ifndef SAMPLE_INCOMING_DRAG
 #define SAMPLE_INCOMING_DRAG 0

@@ -47,7 +47,6 @@
 #import <WebKit/WebKit.h>
 #import "iMBLibraryNode.h"
 #import "iMediaConfiguration.h"
-#import "iMedia.h"
 
 // Some of this code is used from the Shiira Project - BSD Licensed
 

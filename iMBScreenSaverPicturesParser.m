@@ -46,7 +46,8 @@
 #import "iMBScreenSaverPicturesParser.h"
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
-#import "iMedia.h"
+#import "NSString+iMedia.h"
+#import "NSFileManager+iMedia.h"
 
 @implementation iMBScreenSaverPicturesParser
 

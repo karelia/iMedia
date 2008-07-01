@@ -64,7 +64,7 @@
 
 
 #import "iMBAddressBookImagesParser.h"
-#import "iMedia.h"
+#import "iMediaConfiguration.h"
 #import <AddressBook/AddressBook.h>
 
 @implementation iMBAddressBookImagesParser

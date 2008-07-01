@@ -44,8 +44,10 @@
 
 
 #import "iMBFavouriteMusicParser.h"
-#import "iMedia.h"
 #import "iMBMusicFolder.h"
+#import "iMediaConfiguration.h"
+#import "iMBLibraryNode.h"
+#import "NSFileManager+iMedia.h"
 
 @implementation iMBFavouriteMusicParser
 

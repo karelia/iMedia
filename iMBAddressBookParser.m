@@ -47,7 +47,6 @@
 #import "iMBLibraryNode.h"
 #import "iMediaConfiguration.h"
 #import <AddressBook/AddressBook.h>
-#import "iMedia.h"
 
 @implementation iMBAddressBookParser
 
