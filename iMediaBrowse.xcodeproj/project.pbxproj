@@ -191,6 +191,7 @@
 		CE52AD820B7D21D800DA5F23 /* Links.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7C0B7D21D800DA5F23 /* Links.nib */; };
 		CE52AD830B7D21D800DA5F23 /* Movies.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7D0B7D21D800DA5F23 /* Movies.nib */; };
 		CE52AD840B7D21D800DA5F23 /* Contacts.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE52AD7E0B7D21D800DA5F23 /* Contacts.nib */; };
+		CEC64CAB0E1AA2370065C3D0 /* events.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEC64CAA0E1AA2370065C3D0 /* events.tiff */; };
 		CEC85B030B515095006DA6AA /* iMBDNDArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = D9B3EA5C09A3F82B00835FE4 /* iMBDNDArrayController.h */; };
 		CEC85B040B51509D006DA6AA /* UKMainThreadProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F9AF40976320A0071B2E0 /* UKMainThreadProxy.h */; };
 		CEC85B050B51509E006DA6AA /* UKKQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F9AF20976320A0071B2E0 /* UKKQueue.h */; };
@@ -554,6 +555,7 @@
 		CE52AD7E0B7D21D800DA5F23 /* Contacts.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Contacts.nib; sourceTree = "<group>"; };
 		CE55A6A10AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; lineEnding = 0; name = zh_CN; path = zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEA9AF9F0A64214900855897 /* ja */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; lineEnding = 0; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEC64CAA0E1AA2370065C3D0 /* events.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = events.tiff; sourceTree = "<group>"; };
 		CEC914FF0B97648C0072492B /* iMBiPhotoAbstractParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMBiPhotoAbstractParser.h; sourceTree = "<group>"; };
 		CEC915000B97648C0072492B /* iMBiPhotoAbstractParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iMBiPhotoAbstractParser.m; sourceTree = "<group>"; };
 		CEDB34CC09E479F300F75C8C /* QTMovie+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "QTMovie+iMedia.h"; sourceTree = "<group>"; };
@@ -998,6 +1000,7 @@
 		968BEF3E090E904100D00E5C /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CEC64CAA0E1AA2370065C3D0 /* events.tiff */,
 				CE05E1450DF74BB1001D2356 /* spotlight.gif */,
 				CE05E0BD0DF74B84001D2356 /* i.tiff */,
 				CE05E0BE0DF74B84001D2356 /* i2.tiff */,
@@ -1473,6 +1476,7 @@
 				CE05E1460DF74BB1001D2356 /* spotlight.gif in Resources */,
 				D03A71D50DF82FFF0030EDA5 /* itunes-icon-tvshows.png in Resources */,
 				D03A71D60DF82FFF0030EDA5 /* itunes-icon-movies.png in Resources */,
+				CEC64CAB0E1AA2370065C3D0 /* events.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

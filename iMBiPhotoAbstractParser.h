@@ -47,12 +47,15 @@
 
 @interface iMBiPhotoAbstractParser : iMBAbstractParser 
 {
-
+	@private
+	int myFakeAlbumID;
 }
 
 - (iMBLibraryNode *)parseDatabaseAttributeKey:(NSString *)anImagePath
 									mediaType:(NSString *)aMediaType
 								  wantUntyped:(BOOL)aWantUntyped
 								wantThumbPath:(BOOL)aWantThumbPath;
+
+- (BOOL) showAlbumType:(NSString *)albumType;
 
 @end

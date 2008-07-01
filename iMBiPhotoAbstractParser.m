@@ -48,6 +48,26 @@
 #import "iMBLibraryNode.h"
 #import "iMedia.h"
 
+@interface iMBiPhotoAbstractParser (private)
+- (void) parseAlbums: (NSEnumerator*) albumEnum 
+		imageRecords: (NSDictionary*) imageRecords
+		   mediaType: (NSString*) aMediaType 
+		  keywordMap: (NSDictionary*) keywordMap
+		 wantUntyped: (BOOL) aWantUntyped
+	   wantThumbPath: (BOOL) aWantThumbPath
+		   imagePath: (NSString*) anImagePath
+			 forRoot: (iMBLibraryNode*) root;
+
+- (void) parseRolls: (NSEnumerator*) rollsEnum 
+	   imageRecords: (NSDictionary*) imageRecords
+		  mediaType: (NSString*) aMediaType 
+		 keywordMap: (NSDictionary*) keywordMap
+		wantUntyped: (BOOL) aWantUntyped
+	  wantThumbPath: (BOOL) aWantThumbPath
+		  imagePath: (NSString*) anImagePath
+			forRoot: (iMBLibraryNode*) root;
+@end
+
 @implementation iMBiPhotoAbstractParser
 
 - (id)init
@@ -91,6 +111,10 @@
 		return @"calendar";
 	else if ([name isEqualToString:@"Card"])
 		return @"card";
+	else if ([name hasSuffix:@"Events"])
+		return @"MBiPhotoAlbum";
+	else if ([name hasSuffix:@"EventsFolder"])
+		return @"events";
 	else if (name == nil)
 		return @"com.apple.iPhoto:";			// top level library
 	else
@@ -156,21 +180,61 @@
 	
 	NSDictionary *imageRecords = [library objectForKey:@"Master Image List"];
 	NSDictionary *keywordMap = [library objectForKey:@"List of Keywords"];
-	NSEnumerator *albumEnum = [[library objectForKey:@"List of Albums"] objectEnumerator];
-	NSDictionary *albumRec;
-	int fakeAlbumID = 0;
+	myFakeAlbumID = 0;
+
+	//	TODO: Should we do this only for dedicated iPhoto versions? Or is this
+	//	"handled" implicitly by the existence of the key "List of Rolls"?
+	NSEnumerator *rollsEnum = [[library objectForKey:@"List of Rolls"] objectEnumerator];
+	[self parseRolls:rollsEnum 
+		imageRecords:imageRecords
+		   mediaType:aMediaType 
+		  keywordMap:keywordMap
+		 wantUntyped:aWantUntyped
+	   wantThumbPath:aWantThumbPath
+		   imagePath:anImagePath
+			 forRoot:root];
 	
-	//Parse dictionary creating libraries, and filling with track infromation
+	NSEnumerator *albumEnum = [[library objectForKey:@"List of Albums"] objectEnumerator];
+	[self parseAlbums:albumEnum 
+		 imageRecords:imageRecords
+			mediaType:aMediaType 
+		   keywordMap:keywordMap
+		  wantUntyped:aWantUntyped
+		wantThumbPath:aWantThumbPath
+			imagePath:anImagePath
+			  forRoot:root];	
+	
+	if ([[root valueForKey:anImagePath] count] == 0)
+	{
+		root = nil;
+	}
+	
+	[root setPrioritySortOrder:1];
+
+	return root;
+}
+
+
+- (void) parseAlbums: (NSEnumerator*) albumEnum 
+		imageRecords: (NSDictionary*) imageRecords
+		   mediaType: (NSString*) aMediaType 
+		  keywordMap: (NSDictionary*) keywordMap
+		 wantUntyped: (BOOL) aWantUntyped
+	   wantThumbPath: (BOOL) aWantThumbPath
+		   imagePath: (NSString*) anImagePath
+			 forRoot: (iMBLibraryNode*) root {
+	
+	//	Parse dictionary creating libraries, and filling with track infromation
+	NSDictionary *albumRec;
 	while (albumRec = [albumEnum nextObject])
 	{
-		if ([[albumRec objectForKey:@"Album Type"] isEqualToString:@"Book"] ||
-			[[albumRec objectForKey:@"Album Type"] isEqualToString:@"Slideshow"])
+		if (![self showAlbumType:[albumRec objectForKey:@"Album Type"]])
 		{
 			continue;
 		}
-
+		
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
+		
 		iMBLibraryNode *lib = [[[iMBLibraryNode alloc] init] autorelease];
 		[lib setName:[albumRec objectForKey:@"AlbumName"]];
 		[lib setIconName:[self iconNameForType:[albumRec objectForKey:@"Album Type"]]];
@@ -178,8 +242,8 @@
 		NSNumber *aid = [albumRec objectForKey:@"AlbumId"];
 		if (!aid)
 		{
-			aid = [NSNumber numberWithInt:fakeAlbumID];
-			fakeAlbumID++;
+			aid = [NSNumber numberWithInt:myFakeAlbumID]; 
+			myFakeAlbumID++;
 		}
 		[lib setAttribute:aid forKey:@"AlbumId"];
 		
@@ -187,7 +251,7 @@
 		NSEnumerator *pictureItemsEnum = [[albumRec objectForKey:@"KeyList"] objectEnumerator];
 		NSString *key;
 		BOOL hasItems = NO;
-
+		
 		while (key = [pictureItemsEnum nextObject])
 		{
 			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
@@ -210,7 +274,7 @@
 			{
 				[imageRecord setObject:thumbPath forKey:@"Preview"];
 			}
-				
+			
 			[newPhotolist addObject:imageRecord];
 			//swap the keyword index to names
 			NSArray *keywords = [imageRecord objectForKey:@"Keywords"];
@@ -234,7 +298,7 @@
 		
 		if (hasItems) // only display albums that have movies.... what happens when a child album has items we want, but the parent doesn't?
 		{
-
+			
 			if ([albumRec objectForKey:@"Parent"])
 			{
 				iMBLibraryNode *parent = [self nodeWithAlbumID:[albumRec objectForKey:@"Parent"]
@@ -250,15 +314,118 @@
 		}		
 		[pool release];
 	}
+}
 
-	if ([[root valueForKey:anImagePath] count] == 0)
-	{
-		root = nil;
-	}
+
+- (void) parseRolls: (NSEnumerator*) rollsEnum 
+	   imageRecords: (NSDictionary*) imageRecords
+		  mediaType: (NSString*) aMediaType 
+		 keywordMap: (NSDictionary*) keywordMap
+		wantUntyped: (BOOL) aWantUntyped
+	  wantThumbPath: (BOOL) aWantThumbPath
+		  imagePath: (NSString*) anImagePath
+			forRoot: (iMBLibraryNode*) root {
 	
-	[root setPrioritySortOrder:1];
+	//	Parse dictionary creating libraries, and filling with track infromation
+	NSDictionary *rollRec;
+	iMBLibraryNode *eventsFolder = nil;
+	while (rollRec = [rollsEnum nextObject])
+	{		
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+		
+		iMBLibraryNode *lib = [[[iMBLibraryNode alloc] init] autorelease];
+		[lib setName:[rollRec objectForKey:@"RollName"]];
+		[lib setIconName:[self iconNameForType:@"Events"]];
+		// iPhoto 2 doesn't have albumID's so let's just fake them
+		NSNumber *aid = [rollRec objectForKey:@"RollID"];
+		if (!aid)
+		{
+			aid = [NSNumber numberWithInt:myFakeAlbumID];
+			myFakeAlbumID++;
+		}
+		[lib setAttribute:aid forKey:@"RollID"];
+		
+		NSMutableArray *newPhotolist = [NSMutableArray array];
+		NSEnumerator *pictureItemsEnum = [[rollRec objectForKey:@"KeyList"] objectEnumerator];
+		NSString *key;
+		BOOL hasItems = NO;
+		
+		while (key = [pictureItemsEnum nextObject])
+		{
+			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
+			if (imageRecord == nil) 
+			{
+				continue;	// skip if the whole record is missing for some reason
+			}
+			NSString *mediaType = [imageRecord objectForKey:@"MediaType"];
+			if (!aWantUntyped && !mediaType)
+			{
+				continue;	// skip if media type is missing and we require a media type
+			}
+			if (mediaType && ![mediaType isEqualToString:aMediaType])
+			{
+				continue;	// skip if this media type doesn't match what we are looking for
+			}
+			hasItems = YES;
+			NSString *thumbPath = [imageRecord objectForKey:@"ThumbPath"];
+			if (aWantThumbPath && thumbPath)
+			{
+				[imageRecord setObject:thumbPath forKey:@"Preview"];
+			}
+			
+			[newPhotolist addObject:imageRecord];
+			//swap the keyword index to names
+			NSArray *keywords = [imageRecord objectForKey:@"Keywords"];
+			if ([keywords count] > 0) {
+				NSEnumerator *keywordEnum = [keywords objectEnumerator];
+				NSString *keywordKey;
+				NSMutableArray *realKeywords = [NSMutableArray array];
+				
+				while (keywordKey = [keywordEnum nextObject]) {
+					NSString *actualKeyword = [keywordMap objectForKey:keywordKey];
+					if (actualKeyword)
+					{
+						[realKeywords addObject:actualKeyword];
+					}
+				}
+				
+				[imageRecord setObject:realKeywords forKey:@"iMediaKeywords"];
+			}
+		}
+		[lib setAttribute:newPhotolist forKey:anImagePath];
+		
+		if (hasItems) // only display events that have movies.... what happens when a child album has items we want, but the parent doesn't?
+		{
+			//	place the events in an own folder...
+			if (!eventsFolder) {
+				eventsFolder = [[iMBLibraryNode alloc] init];
+				[root addItem:eventsFolder];
+				[eventsFolder release];
+				[eventsFolder setIconName:[self iconNameForType:@"EventsFolder"]];
+				[eventsFolder setName:@"Events"];
+				root = eventsFolder;
+			}
+			
+			if ([rollRec objectForKey:@"Parent"])
+			{
+				iMBLibraryNode *parent = [self nodeWithAlbumID:[rollRec objectForKey:@"Parent"]
+													  withRoot:root];
+				if (!parent)
+					NSLog(@"Failed to find parent node");
+				[parent addItem:lib];
+			}
+			else
+			{
+				[root addItem:lib];
+			}
+		}		
+		[pool release];
+	}
+}
 
-	return root;
+
+- (BOOL) showAlbumType:(NSString *)albumType {
+	return !([albumType isEqualToString:@"Book"] || [albumType isEqualToString:@"Slideshow"]);
 }
 
 @end
