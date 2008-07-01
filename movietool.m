@@ -77,6 +77,11 @@ static QTMovie *openMovie(NSString *urlString, NSMutableDictionary *cache)
             return nil;
         }
         
+		if (nil == movie)
+		{
+            NSLog(@"Unable to create QTMovie from %@", urlString);
+            return nil;
+		}
         [cache setObject:movie forKey:urlString];
         
         NSNumber    *loadState = [movie attributeForKey:QTMovieLoadStateAttribute];
