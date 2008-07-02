@@ -66,10 +66,16 @@
     if (FSPathMakeRef((const UInt8 *)[anAbsolutePath fileSystemRepresentation], &fileRef, &isDirectory) == noErr)
     {
         // get the content type (UTI) of this file
-		CFStringRef uti;
+		CFStringRef uti = NULL;
 		if (LSCopyItemAttribute(&fileRef, kLSRolesViewer, kLSItemContentType, (CFTypeRef*)&uti)==noErr)
 		{
-			result = [[((NSString *)uti) retain] autorelease];	// I want an autoreleased copy of this.
+//			result = [[((NSString *)uti) retain] autorelease];	// I want an autoreleased copy of this.
+
+			if (uti)											// PB 06/18/08: fixes a memory leak
+			{
+				result = [NSString stringWithString:(NSString*)uti];
+				CFRelease(uti);
+			}
 		}
     }
 	
