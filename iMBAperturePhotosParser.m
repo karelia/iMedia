@@ -115,14 +115,20 @@
 		return [NSImage imageResourceNamed:@"Project_I_ProjectFolder.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"8"]) // book		
 		return [NSImage imageResourceNamed:@"Project_I_Book.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"9"]) // web gallery		
-		return [NSImage imageResourceNamed:@"Project_I_WebGallery.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
+	else if ([name isEqualToString:@"9"]) // web gallery	
+	{
+		NSImage* icon = [NSImage imageResourceNamed:@"Project_I_WebPage.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:nil];
+		if (icon==nil) icon = [NSImage imageResourceNamed:@"Project_I_WebGallery.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
+		return icon;
+	}
 	else if ([name isEqualToString:@"10"]) // web journal		
 		return [NSImage imageResourceNamed:@"Project_I_WebJournal.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"11"]) // light	table	
 		return [NSImage imageResourceNamed:@"Project_I_LightTable.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"13"]) // smart web gallery		
 		return [NSImage imageResourceNamed:@"Project_I_SWebGallery.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
+	else if ([name isEqualToString:@"97"]) // library
+		return [NSImage imageResourceNamed:@"Project_I_Projects.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"98"]) // library
 		return [NSImage imageResourceNamed:@"AppIcon.icns" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"99"]) // library (knot holding all images)
