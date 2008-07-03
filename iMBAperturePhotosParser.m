@@ -163,7 +163,15 @@
 - (iMBLibraryNode *)parseOneDatabaseWithContentsOfURL:(NSURL *)url
 {
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-	[root setName:LocalizedStringInIMedia(@"Aperture", @"Aperture")];
+	if (myHasMultipleLibraries)
+	{
+		NSLog(@"%@", url);
+		[root setName:[NSString stringWithFormat:@"%@ (%@)", LocalizedStringInIMedia(@"Aperture", @"Aperture"), [[[[url path] stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension]]];
+	}
+	else
+	{
+		[root setName:LocalizedStringInIMedia(@"Aperture", @"Aperture")];
+	}
 	[root setIconName:@"com.apple.Aperture:"];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	
@@ -298,6 +306,7 @@
 	
 	//	Iterate over libraries, pulling dictionary from contents and adding to array for processing;
 	NSArray *libraries = [((NSArray *)iApps) autorelease];
+	myHasMultipleLibraries = [libraries count] > 1;
 	NSEnumerator *e = [libraries objectEnumerator];
 	NSString *cur;
 	
