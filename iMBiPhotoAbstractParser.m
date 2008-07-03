@@ -46,6 +46,7 @@
 #import "iMBiPhotoAbstractParser.h"
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
+#import "NSString+iMedia.h"
 
 @interface iMBiPhotoAbstractParser (private)
 - (void) parseAlbums: (NSEnumerator*) albumEnum 
@@ -81,7 +82,7 @@
 		NSString *cur;
 		
 		while (cur = [e nextObject]) {
-			[self watchFile:cur];
+			[self watchFile:[cur pathForURLString]];
 		}
 		[libraries autorelease];
 	}

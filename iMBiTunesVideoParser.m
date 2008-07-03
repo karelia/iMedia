@@ -47,6 +47,7 @@
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "QTMovie+iMedia.h"
+#import "NSString+iMedia.h"
 
 #import <QTKit/QTKit.h>
 
@@ -64,18 +65,6 @@
 }
 
 
-- (NSString *)pathForURLString:(NSString *)urlString
-{
-	if ([urlString hasPrefix:@"file://"])
-	{
-		NSURL* url = [NSURL URLWithString:urlString];
-		return [url path];
-	}
-		
-	return urlString;
-}
-
-
 - (id)init
 {
 	if (self = [super initWithContentsOfFile:nil])
@@ -89,7 +78,7 @@
 		NSString *cur;
 		
 		while (cur = [e nextObject]) {
-			[self watchFile:[self pathForURLString:cur]];
+			[self watchFile:[cur pathForURLString]];
 		}
 		[libraries autorelease];
 	}

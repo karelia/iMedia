@@ -56,6 +56,8 @@
 
 @interface NSString ( iMedia )
 
+- (NSString *)pathForURLString;
+
 - (NSData *) decodeBase64;
 - (NSData *) decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
 

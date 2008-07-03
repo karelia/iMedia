@@ -54,7 +54,6 @@
 
 @implementation NSString ( UTI )
 
-
 //  convert to UTI
 
 + (NSString *)UTIForFileAtPath:(NSString *)anAbsolutePath
@@ -170,6 +169,19 @@
 // This is from cocoadev.com -- public domain
 
 @implementation NSString ( iMedia )
+
+// Convert a file:// URL (as a string) to just its path
+- (NSString *)pathForURLString;
+{
+	NSString *result = self;
+	if ([self hasPrefix:@"file://"])
+	{
+		NSURL* url = [NSURL URLWithString:self];
+		result = [url path];
+	}
+	return result;
+}
+
 
 - (NSData *) decodeBase64;
 {

@@ -47,6 +47,7 @@
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
 
 //	CONFIGURATION
 //	
@@ -74,7 +75,6 @@
     [pool release];
 }
 
-
 - (id)init
 {
 	if (self = [super initWithContentsOfFile:nil])
@@ -87,7 +87,7 @@
 		NSString *cur;
 		
 		while (cur = [e nextObject]) {
-			[self watchFile:cur];
+			[self watchFile:[cur pathForURLString]];
 		}
 	}
 	return self;

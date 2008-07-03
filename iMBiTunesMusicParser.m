@@ -46,6 +46,7 @@
 #import "iMBiTunesMusicParser.h"
 #import "iMBLibraryNode.h"
 #import "iMediaConfiguration.h"
+#import "NSString+iMedia.h"
 
 #define RECURSIVE_PARSEDATABASE 1
 
@@ -60,17 +61,6 @@
 	[pool release];
 }
 
-
-- (NSString *)pathForURLString:(NSString *)urlString
-{
-	if ([urlString hasPrefix:@"file://"])
-	{
-		NSURL* url = [NSURL URLWithString:urlString];
-		return [url path];
-	}
-		
-	return urlString;
-}
 
 - (id)init
 {
@@ -87,7 +77,7 @@
 		NSString *cur;
 		
 		while (cur = [e nextObject]) {
-			[self watchFile:[self pathForURLString:cur]];
+			[self watchFile:[cur pathForURLString]];
 		}
 		[libraries autorelease];
 	}
