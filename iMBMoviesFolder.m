@@ -96,6 +96,56 @@
 	myFileExtensionHints = [extensions retain];
 }
 
+- (NSMutableArray*) movieTypes
+{
+	// Return a (filtered) array of file extensions for movie files that QT can open...
+	
+	static NSMutableArray* sMovieTypes = nil;
+	static NSString* sMovieTypesMutex = @"mutex";
+	
+	@synchronized(sMovieTypesMutex)
+	{
+		if (sMovieTypes == nil)
+		{
+			sMovieTypes = [[NSMutableArray alloc] init];
+			NSArray* movieTypes = [QTMovie movieTypesWithOptions:QTIncludeAllTypes];
+			NSEnumerator* e = [movieTypes objectEnumerator];
+			NSString* uti;
+			CFDictionaryRef utiDeclaration;
+			CFDictionaryRef utiSpecification;
+			CFTypeRef extension;
+			
+			while (uti = [e nextObject])
+			{
+				if (UTTypeConformsTo((CFStringRef)uti,kUTTypeMovie))
+				{
+					if (utiDeclaration = UTTypeCopyDeclaration((CFStringRef)uti))
+					{
+						if (utiSpecification = CFDictionaryGetValue(utiDeclaration, kUTTypeTagSpecificationKey))
+						{
+							if (extension = CFDictionaryGetValue(utiSpecification, kUTTagClassFilenameExtension))
+							{
+								if (CFGetTypeID(extension) == CFStringGetTypeID())
+								{
+									[sMovieTypes addObject:(NSString*)extension];
+								}
+								else if (CFGetTypeID(extension) == CFArrayGetTypeID())
+								{
+									[sMovieTypes addObjectsFromArray:(NSArray*)extension];
+								}
+							}
+						}
+						
+						CFRelease(utiDeclaration);
+					}
+				}
+			}
+		}
+	}
+	
+    return sMovieTypes;
+}
+
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -104,7 +154,7 @@
 	NSString *cur;
 	BOOL isDir;
 	NSArray *movieTypes = myFileExtensionHints;
-	if (!movieTypes) movieTypes = [QTMovie movieFileTypes:QTIncludeAllTypes];
+	if (!movieTypes) movieTypes = [self movieTypes];
 	NSMutableArray *movies = [NSMutableArray array];
 	NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 	int poolRelease = 0;

@@ -229,24 +229,76 @@ static NSImage *sDRMIcon = nil;
 	[root setAttribute:tracks forKey:@"Tracks"];
 }
 
+
+- (NSMutableArray*) audioTypes
+{
+	// Return a (filtered) array of file extensions for audio files that QT can open...
+	
+	static NSMutableArray* sAudioTypes = nil;
+	static NSString* sAudioTypesMutex = @"mutex";
+	
+	@synchronized(sAudioTypesMutex)
+	{
+		if (sAudioTypes == nil)
+		{
+			sAudioTypes = [[NSMutableArray alloc] init];
+			NSArray* movieTypes = [QTMovie movieTypesWithOptions:QTIncludeAllTypes];
+			NSEnumerator* e = [movieTypes objectEnumerator];
+			NSString* uti;
+			CFDictionaryRef utiDeclaration;
+			CFDictionaryRef utiSpecification;
+			CFTypeRef extension;
+			
+			while (uti = [e nextObject])
+			{
+				if (UTTypeConformsTo((CFStringRef)uti,kUTTypeAudio))
+				{
+					if (utiDeclaration = UTTypeCopyDeclaration((CFStringRef)uti))
+					{
+						if (utiSpecification = CFDictionaryGetValue(utiDeclaration, kUTTypeTagSpecificationKey))
+						{
+							if (extension = CFDictionaryGetValue(utiSpecification, kUTTagClassFilenameExtension))
+							{
+								if (CFGetTypeID(extension) == CFStringGetTypeID())
+								{
+									[sAudioTypes addObject:(NSString*)extension];
+								}
+								else if (CFGetTypeID(extension) == CFArrayGetTypeID())
+								{
+									[sAudioTypes addObjectsFromArray:(NSArray*)extension];
+								}
+							}
+						}
+						
+						CFRelease(utiDeclaration);
+					}
+				}
+			}
+			
+			// This was put in as part of an "ubercaster fix" in r250. (Not sure exactly what file type this is)
+			[sAudioTypes removeObject:@"kar"];
+		}
+	}
+	
+    return sAudioTypes;
+}
+
 - (void)populateLibraryNode:(iMBLibraryNode *)root
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
+	NSFileManager *mgr = [NSFileManager defaultManager];
 	NSString *folder = [self databasePath];
-	if ( [[NSFileManager defaultManager] fileExistsAtPath:folder] )
+	
+	if ( [mgr fileExistsAtPath:folder] )
     {
-        NSMutableArray *movieTypes = [NSMutableArray arrayWithArray:[QTMovie movieFileTypes:QTIncludeAllTypes]];
-        
-		// This was put in as part of an "ubercaster fix" in r250. (Not sure exactly what file type this is)
-        [movieTypes removeObject:@"kar"];
-        
-        [self recursivelyParse:folder withNode:root movieTypes:movieTypes];
+		NSMutableArray *movieTypes = [self audioTypes];
+		
+		[self recursivelyParse:folder withNode:root movieTypes:movieTypes];
     }
     
     // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
-	[root performSelectorOnMainThread:@selector(setName:) withObject:myMusicFolderName waitUntilDone:NO];
-	
+	[root performSelectorOnMainThread:@selector(setName:) withObject:[mgr displayNameAtPath:folder] waitUntilDone:NO];
+
 	[pool release];
 }
 
