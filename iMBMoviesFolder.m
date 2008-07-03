@@ -47,6 +47,7 @@
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "NSFileManager+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
 #import <QTKit/QTKit.h>
 
@@ -190,8 +191,10 @@
 						iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 						[root addItem:folder];
 						[folder release];
-						[folder setIconName:@"folder"];
+						[folder setIcon:[[NSWorkspace sharedWorkspace] iconForFile:filePath size:NSMakeSize(16,16)]];
 						[folder setName:[fm displayNameAtPath:filePath]];
+						[folder setParser:self];
+						
 						[self recursivelyParse:filePath withNode:folder];
 					}
 				}
@@ -221,10 +224,12 @@
 
 - (iMBLibraryNode *)parseDatabase
 {
+	NSString *folder = [self databasePath];
+	
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInIMedia(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
-	[root setIconName:@"picturesFolder"];
-	NSString *folder = [self databasePath];
+	[root setIcon:[[NSWorkspace sharedWorkspace] iconForFile:folder size:NSMakeSize(16,16)]];
+	[root setParser:self];
 	
 	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
 	{
