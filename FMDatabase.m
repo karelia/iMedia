@@ -208,8 +208,6 @@
         NSLog(@"%@ executeQuery: %@", self, sql);
     }
     
-    NSLog(@"sql: %@", sql);
-    
     int numberOfRetries = 0;
     BOOL retry;
     do {
@@ -257,8 +255,6 @@
         if (!obj) {
             break;
         }
-        
-        NSLog(@"obj: %@", obj);
         
         idx++;
         
