@@ -45,7 +45,7 @@
 #import "iMBLightroomPhotosParser.h"
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
-#import "NSWorkspace+iMedia.h"
+
 #import "CIImage+iMedia.h"
 
 #import "FMDatabase.h"
@@ -122,7 +122,6 @@
 		
 		[library setName:LocalizedStringInIMedia(@"Lightroom", @"Lightroom")];
 		[library setIconName:@"com.adobe.Lightroom:"];
-		[library setParser:self];
 		
 		libraryNode = library;
 	}
@@ -131,7 +130,6 @@
 		
 		[root setName:LocalizedStringInIMedia(@"Lightroom", @"Lightroom")];
 		[root setIconName:@"com.adobe.Lightroom:"];
-		[root setParser:self];
 		
 		int l;
 		for (l = 0; l < lCount; l++) {
@@ -164,7 +162,6 @@
 		[root setAttribute:[NSNumber numberWithLong:0] forKey:@"idLocal"];
 		[root setAttribute:path forKey:@"path"];
 		[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
-		[root setParser:self];
 		
 		@try {
 			[iMBLightroomPhotosParser parseAllImagesForRoot:root];
@@ -223,9 +220,8 @@
 			[currentNode setAttribute:kind forKey:@"kind"];
 			
 			[currentNode setName:name];
-			[currentNode setIcon:[[NSWorkspace sharedWorkspace] iconForFile:@"/System/Library/Frameworks" size:NSMakeSize(16,16)]];
+			[currentNode setIconName:@"folder"];
 			[currentNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
-			[currentNode setParser:self];
 			
 			iMBLibraryNode *parentNode = [iMBLightroomPhotosParser nodeWithLocalID:idParentLocal withRoot:root];
 			
@@ -312,9 +308,8 @@
 	
 	[imagesNode setAttribute:[NSNumber numberWithInt:-1] forKey:@"idLocal"];
 	[imagesNode setName:LocalizedStringInIMedia(@"Images", @"Images")];
-	[imagesNode setIcon:[[NSWorkspace sharedWorkspace] iconForFile:@"/System/Library/Frameworks" size:NSMakeSize(16,16)]];
+	[imagesNode setIconName:@"folder"];
 	[imagesNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
-	[imagesNode setParser:self];
 	
 	[root addItem:imagesNode];
 	

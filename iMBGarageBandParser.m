@@ -152,8 +152,6 @@
 					[folder release];
 					[folder setIconName:@"folder"];
 					[folder setName:[fm displayNameAtPath:filePath]];
-					[folder setParser:self];
-					
 					[self recursivelyParse:filePath withNode:folder artist:artist];
 				}
 			}
@@ -166,13 +164,9 @@
 {
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 	[root setName:LocalizedStringInIMedia(@"GarageBand", @"Name of Node")];
-	[root setParser:self];
-	
 	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.garageband"];
 	if (icon)
 	{
-		[icon setScalesWhenResized:YES];
-		[icon setSize:NSMakeSize(16,16)];
 		[root setIcon:icon];
 	}
 	else
@@ -186,8 +180,7 @@
 	{
 		iMBLibraryNode *demo = [[iMBLibraryNode alloc] init];
 		[demo setName:LocalizedStringInIMedia(@"GarageBand Demo Songs", @"Node name")];
-		[demo setIcon:[[NSWorkspace sharedWorkspace] iconForFile:demoPath size:NSMakeSize(16,16)]];
-		[demo setParser:self];
+		[demo setIconName:@"folder"];
 		
 		[self recursivelyParse:demoPath withNode:demo artist:LocalizedStringInIMedia(@"Demo", @"artist name")];
 		[root addItem:demo];
@@ -196,8 +189,7 @@
 	
 	iMBLibraryNode *myCompositions = [[[iMBLibraryNode alloc] init] autorelease];
 	[myCompositions setName:LocalizedStringInIMedia(@"My Compositions", @"Node name")];
-	[myCompositions setIcon:[[NSWorkspace sharedWorkspace] iconForFile:myDatabase size:NSMakeSize(16,16)]];
-	[myCompositions setParser:self];
+	[myCompositions setIconName:@"folder"];
 	
 	[self recursivelyParse:myDatabase
 				  withNode:myCompositions

@@ -48,7 +48,6 @@
 #import "iMBLibraryNode.h"
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
-#import "NSWorkspace+iMedia.h"
 
 @implementation iMBPicturesFolder
 
@@ -80,7 +79,7 @@
 	NSString *cur;
 	BOOL isDir;
 	NSMutableArray *images = [NSMutableArray array];
-    NSArray * excludedFolders = [[iMediaConfiguration sharedConfiguration] excludedFolders];
+	NSArray * excludedFolders = [[iMediaConfiguration sharedConfiguration] excludedFolders];
 	
 	while (cur = [e nextObject])
 	{
@@ -97,10 +96,8 @@
 				iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 				[root addItem:folder];
 				[folder release];
-				[folder setIcon:[[NSWorkspace sharedWorkspace] iconForFile:filePath size:NSMakeSize(16,16)]];
+				[folder setIconName:@"folder"];
 				[folder setName:[fm displayNameAtPath:filePath]];
-				[folder setParser:self];
-				
 				[self recursivelyParse:filePath withNode:folder];
 			}
 			else
@@ -134,9 +131,8 @@
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInIMedia(@"Pictures Folder", @"Name of your 'Pictures' folder in your home directory")];
-	[root setIcon:[[NSWorkspace sharedWorkspace] iconForFile:myDatabase size:NSMakeSize(16,16)]];
-	[root setParser:self];
-	
+	[root setIconName:@"picturesFolder"];
+		
 	if (![[NSFileManager defaultManager] fileExistsAtPath:myDatabase])
 	{
 		[root release];
