@@ -221,7 +221,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
             // put this outside of the thread so that there are no race conditions involving bindings.
             [self resetLibraryController];
 
-            [NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:[NSNumber numberWithBool:NO]];
+            [NSThread detachNewThreadSelector:@selector(backgroundLoadData) toTarget:self withObject:NULL];
         }
     }
 }
@@ -244,7 +244,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
         // put this outside of the thread so that there are no race conditions involving bindings.
         [self resetLibraryController];
 
-        [NSThread detachNewThreadSelector:@selector(backgroundLoadData:) toTarget:self withObject:[NSNumber numberWithBool:NO]];
+        [NSThread detachNewThreadSelector:@selector(backgroundLoadData) toTarget:self withObject:NULL];
     }
 }
 
@@ -330,11 +330,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 {
 	id rowItem = [libraryView itemAtRow:[sender selectedRow]];
 	id representedObject = [rowItem respondsToSelector:@selector(representedObject)] ? [rowItem representedObject] : [rowItem observedObject];
-
-	if ([[representedObject parser] respondsToSelector:@selector(iMediaConfiguration:didSelectNode:)])
-	{
-		[[representedObject parser] iMediaConfiguration:[iMediaConfiguration sharedConfiguration] didSelectNode:representedObject];
-	}
     
     id delegate = [[iMediaConfiguration sharedConfiguration] delegate];
     
@@ -349,11 +344,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	NSOutlineView *theOutline = [notification object];
 	id rowItem = [[notification userInfo] objectForKey:@"NSObject"];
 	id representedObject = [rowItem respondsToSelector:@selector(representedObject)] ? [rowItem representedObject] : [rowItem observedObject];
-
-	if ([[representedObject parser] respondsToSelector:@selector(iMediaConfiguration:willExpandOutline:row:node:)])
-	{
-		[[representedObject parser] iMediaConfiguration:[iMediaConfiguration sharedConfiguration] willExpandOutline:theOutline row:rowItem node:representedObject];
-	}
     
     id delegate = [[iMediaConfiguration sharedConfiguration] delegate];
 
@@ -382,14 +372,13 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 			if (![drops containsObject:cur] && [fm fileExistsAtPath:cur isDirectory:&isDir] && isDir && [self allowPlaylistFolderDrop:cur])
 			{
 				iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:cur];
-				NSArray *nodes = [parser librariesReusingCache:NO];
+				NSArray *nodes = [parser nodesFromParsingDatabase];
 				
 				NSEnumerator *e = [nodes objectEnumerator];
 				iMBLibraryNode *node;
 				
 				while (node = [e nextObject])
 				{
-					[node setParser:parser];
 					[node setName:[cur lastPathComponent]];
 					[node setIconName:@"folder"];
 					[content addObject:node];
@@ -411,12 +400,10 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	return results;
 }
 
-- (void)backgroundLoadData:(id)reuseCachedDataArgument
+- (void)backgroundLoadData
 {	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
    
-	BOOL reuseCachedData = [reuseCachedDataArgument boolValue];
-
 	NSMutableArray *root = [NSMutableArray array];
     NSArray *parsers = [[[iMediaConfiguration sharedConfiguration] parsers] objectForKey:[self mediaType]];
 
@@ -453,14 +440,11 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 			[loadedParsers setObject:parser forKey:cur];
 			[parser release];
 		}
-        
-		//set the browser the parser is in
-		[parser setBrowser:self];
 
 #ifdef DEBUG
 //		NSDate *timer = [NSDate date];
 #endif
-		NSArray *libraries = [parser librariesReusingCache:reuseCachedData];
+		NSArray *libraries = [parser nodesFromParsingDatabase];
 #ifdef DEBUG
 		//		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
 #endif
@@ -499,15 +483,13 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 		if ([fm fileExistsAtPath:drop isDirectory:&isDir] && isDir)
 		{
 			iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:drop];
-			[parser setBrowser:self];
-			NSArray *nodes = [parser librariesReusingCache:YES];	// should be only 1 but let's enum
+			NSArray *nodes = [parser nodesFromParsingDatabase];	// should be only 1 but let's enum
 			
 			NSEnumerator *e = [nodes objectEnumerator];
 			iMBLibraryNode *node;
 			
 			while (node = [e nextObject])
 			{
-				[node setParser:parser];
 				[node setName:[drop lastPathComponent]];
 				[node setIconName:@"folder"];
 				[root addObject:node];
@@ -740,6 +722,10 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (void)outlineView:(NSOutlineView *)olv deleteItems:(NSArray *)items
 {
+#if 0
+    // TODO: Issue 59. Restore this functionality.
+    // DISABLED UNTIL A BETTER SOLUTION IS FOUND THAN TRACKING BY PARSER (WHICH IS NO LONGER AVAILABLE)
+
 	NSEnumerator *e = [items objectEnumerator];
 	iMBLibraryNode *cur;
 	
@@ -774,7 +760,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	[libraryController setContent:content];
 	[d setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]];
 	[[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
-
+#endif
 }
 
 #pragma mark -

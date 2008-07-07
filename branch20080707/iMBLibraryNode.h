@@ -57,7 +57,6 @@
 	int					myPrioritySortOrder;
 	NSString			*myIconName;
 	NSMutableDictionary *myAttributeFilterMap;
-	id					myParser;	// not retained
 	
 	NSMutableAttributedString *myCachedNameWithImage;
 }
@@ -74,9 +73,6 @@
 
 - (int)prioritySortOrder; // The higher the better
 - (void)setPrioritySortOrder:(int)value;
-
-- (void)setParser:(id)parser;
-- (id)parser;
 
 - (void)setAttribute:(id)attrib forKey:(NSString *)key;
 - (id)attributeForKey:(NSString *)key;

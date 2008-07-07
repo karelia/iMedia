@@ -111,7 +111,6 @@ static NSMutableDictionary *sImageCache = nil;
 	iMBLibraryNode *copy = [[iMBLibraryNode allocWithZone:zone] init];
 	[copy setName:[self name]];
 	[copy setIcon:[self icon]];
-	[copy setParser:[self parser]];
 	[copy setIconName:[self iconName]];
 	[copy setAllItems:[self allItems]];
 	[copy setAttributes:[self attributes]];
@@ -164,16 +163,6 @@ static NSMutableDictionary *sImageCache = nil;
 }
 
 // END KVC FOR items
-
-- (void)setParser:(id)parser
-{
-	myParser = parser;
-}
-
-- (id)parser
-{
-	return myParser;
-}
 
 - (void)setParent:(iMBLibraryNode *)node
 {

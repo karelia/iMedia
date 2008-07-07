@@ -85,12 +85,6 @@
 {
 	if (self = [super initWithContentsOfFile:nil])
 	{
-		NSEnumerator *enumerator = [[iMBLightroomPhotosParser libraryPaths] objectEnumerator];
-		NSString *currentPath;
-		
-		while ((currentPath = [enumerator nextObject]) != nil) {
-			[self watchFile:currentPath];
-		}
 	}
 	
 	return self;

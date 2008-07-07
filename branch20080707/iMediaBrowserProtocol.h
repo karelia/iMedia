@@ -122,8 +122,7 @@
 
 @protocol iMBParser <NSObject>
 
-- (NSArray *)librariesReusingCache:(BOOL)reuseCachedData;	// return NSArray of iMBLibraryNode
-- (void)setBrowser:(id <iMediaBrowser>)browser;
+- (NSArray *)nodesFromParsingDatabase;	// return NSArray of iMBLibraryNode
 
 @end
 

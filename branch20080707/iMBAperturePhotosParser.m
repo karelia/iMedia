@@ -79,16 +79,6 @@
 {
 	if (self = [super initWithContentsOfFile:nil])
 	{
-		CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",
-															(CFStringRef)@"com.apple.iApps");
-		
-		NSArray *libraries = [(NSArray *)iApps autorelease];
-		NSEnumerator *e = [libraries objectEnumerator];
-		NSString *cur;
-		
-		while (cur = [e nextObject]) {
-			[self watchFile:[cur pathForURLString]];
-		}
 	}
 	return self;
 }

@@ -69,18 +69,6 @@
 {
 	if (self = [super initWithContentsOfFile:nil])
 	{
-		//Find all iTunes libraries
-		CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",
-															(CFStringRef)@"com.apple.iApps");
-		
-		NSArray *libraries = (NSArray *)iApps;
-		NSEnumerator *e = [libraries objectEnumerator];
-		NSString *cur;
-		
-		while (cur = [e nextObject]) {
-			[self watchFile:[cur pathForURLString]];
-		}
-		[libraries autorelease];
 	}
 	return self;
 }
@@ -185,7 +173,6 @@
 							node = [[[iMBLibraryNode alloc] init] autorelease];
 							[node setName:inName];
 							[node setIconName:inIconName];
-							[node setParser:self];
 							
 							hasVideos = [self populateNode:node withTracks:tracks fromPlaylist:playlist];
 						}
@@ -235,7 +222,6 @@
 								node = [[[iMBLibraryNode alloc] init] autorelease];
 								[node setName:[playlist objectForKey:@"Name"]];
 								[node setIconName:@"itunes-icon-folder7"];
-								[node setParser:self];
 								
 								NSMutableArray* subnodes = [self parseDatabase:inLibrary forPlaylistsWithParentID:selfID];
 								if (node!=nil && subnodes!=nil && [subnodes count] > 0)
@@ -274,7 +260,6 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								if (_version == 7) [node setIconName:@"itunes-icon-playlist-smart7"];
 								else [node setIconName:@"itunes-icon-playlist-smart"];
-								[node setParser:self];
 								
 								if (node)
 								{
@@ -312,7 +297,6 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								if (_version == 7) [node setIconName:@"itunes-icon-playlist-normal7"];
 								else [node setIconName:@"itunes-icon-playlist-normal"];
-								[node setParser:self];
 								
 								if (node)
 								{
@@ -359,7 +343,6 @@
 		iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 		[root setName:LocalizedStringInIMedia(@"iTunes", @"iTunes")];
 		[root setIconName:@"com.apple.iTunes:"];
-		[root setParser:self];
 		
 		[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Movies"];
 		
