@@ -1,0 +1,45 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {didAdjustSubviews = id; willAdjustSubviews = id; }; 
+            CLASS = NSObject; 
+            LANGUAGE = ObjC; 
+        }, 
+        {CLASS = RBSplitSubview; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            CLASS = RBSplitView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {delegate = id; }; 
+            SUPERCLASS = RBSplitSubview; 
+        }, 
+        {
+            ACTIONS = {playlistSelected = id; reload = id; }; 
+            CLASS = iMBAbstractView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                browserContainer = RBSplitSubview; 
+                browserController = id; 
+                browserView = NSView; 
+                libraryContainer = RBSplitSubview; 
+                libraryController = NSTreeController; 
+                libraryPopUpButton = NSPopUpButton; 
+                libraryView = NSOutlineView; 
+                loadingProgressIndicator = NSProgressIndicator; 
+                loadingTextField = NSTextField; 
+                loadingView = NSBox; 
+                mediaView = NSView; 
+                splitView = RBSplitView; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = iMBLibraryOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
+        {
+            CLASS = iMBPlacardScrollView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {placard = NSView; }; 
+            SUPERCLASS = NSScrollView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

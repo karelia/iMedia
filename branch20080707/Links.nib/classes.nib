@@ -1,0 +1,51 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {reloadMediaBrowser = id; }; 
+            CLASS = iMBAbstractController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oView = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = iMBAbstractView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                browserContainer = RBSplitSubview; 
+                browserController = id; 
+                browserView = NSView; 
+                libraryController = NSTreeController; 
+                loadingProgressIndicator = NSProgressIndicator; 
+                loadingTextField = NSTextField; 
+                loadingView = NSBox; 
+                outlineContainer = RBSplitSubview; 
+                outlinePopUpButton = NSPopUpButton; 
+                outlineView = NSOutlineView; 
+                splitView = RBSplitView; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {search = id; }; 
+            CLASS = iMBDNDArrayController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {newObject = id; tableView = NSTableView; }; 
+            SUPERCLASS = NSArrayController; 
+        }, 
+        {
+            ACTIONS = {openInBrowser = id; }; 
+            CLASS = iMBLinksController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oLinkController = iMBDNDArrayController; oLinks = NSTableView; }; 
+            SUPERCLASS = iMBAbstractController; 
+        }, 
+        {
+            CLASS = iMBLinksView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {oLinkController = iMBDNDArrayController; table = NSTableView; }; 
+            SUPERCLASS = iMBAbstractView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

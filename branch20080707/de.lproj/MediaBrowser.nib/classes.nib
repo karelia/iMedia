@@ -1,0 +1,66 @@
+{
+    IBClasses =     (
+                {
+            CLASS = FirstResponder;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            ACTIONS =             {
+                didAdjustSubviews = RBSplitView;
+                willAdjustSubviews = RBSplitView;
+            };
+            CLASS = NSObject;
+            LANGUAGE = ObjC;
+        },
+                {
+            CLASS = NSPopUpButton;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSButton;
+        },
+                {
+            CLASS = NSWindow;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSResponder;
+        },
+                {
+            CLASS = RBSplitSubview;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSView;
+        },
+                {
+            CLASS = RBSplitView;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                delegate = id;
+            };
+            SUPERCLASS = RBSplitSubview;
+        },
+                {
+            CLASS = iMBBackgroundImageView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSImageView;
+        },
+                {
+            ACTIONS =             {
+                flipBack = id;
+                info = id;
+                playlistSelected = id;
+                reloadMediaBrowser = id;
+            };
+            CLASS = iMediaBrowser;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                browserDelegate = id;
+                browserTabView = NSTabView;
+                myDelegate = id;
+                mySelectedBrowser = id;
+                oBackgroundImageView = iMBBackgroundImageView;
+                oInfoTextView = NSTextView;
+                oInfoWindow = NSWindow;
+            };
+            SUPERCLASS = NSWindowController;
+        }
+    );
+    IBVersion = 1;
+}
