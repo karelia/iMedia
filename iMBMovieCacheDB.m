@@ -487,7 +487,6 @@ static NSString * uuidString()
             @synchronized (self){
                 numberOfTasks = [miniMovieTasks count] + [posterImageTasks count];
             }
-            [pool drain];
 			[pool release];
             pool = [[NSAutoreleasePool alloc] init];
         }
@@ -611,7 +610,6 @@ static NSString * uuidString()
             [movieRef deleteExternalFiles];
             [moc deleteObject:movieRef]; // We could be smart and only update the entry, but this is simpler
         }
-        [pool drain];
 		[pool release];
     }
 
@@ -653,6 +651,7 @@ static NSString * uuidString()
         if (fetchError)
         {
             NSLog (@"Fetch error %@ when looking for %@", fetchError, fetchRequest);
+			[pool release];
             return;
         }
         if ([array count] == 0)
@@ -661,11 +660,10 @@ static NSString * uuidString()
             if (![fileManager removeFileAtPath:fullPath handler:nil])
             {
                 NSLog (@"Error %@ when deleting unused file %@", error, fullPath);
-                return;
+				[pool release];
+				return;
             }
         }
-        
-        [pool drain];
 		[pool release];
     }
 }
@@ -729,7 +727,6 @@ static NSComparisonResult compareFileModificationDate (NSString *key1, NSString 
     [self cleanUpdatedMovies];
     [self cleanUnusedFiles];
     [self shrinkUntilValidSize];
-    [pool drain];
 	[pool release];
 }
 

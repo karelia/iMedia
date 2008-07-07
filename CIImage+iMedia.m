@@ -52,7 +52,8 @@
 	static NSSet *readableTypes = nil;
 	
 	if (readableTypes == nil) {
-		readableTypes = [[NSSet setWithArray:(NSArray*)CGImageSourceCopyTypeIdentifiers()] retain];
+		NSArray *readableTypesArray = [((NSArray*)CGImageSourceCopyTypeIdentifiers()) autorelease];
+		readableTypes = [[NSSet setWithArray:readableTypesArray] retain];
 	}
 	
     return readableTypes;

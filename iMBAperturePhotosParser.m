@@ -198,7 +198,7 @@
 			if ([[albumRec objectForKey:@"Album Type"] isEqualToString:@"99"]) continue;
 		#endif
 		
-		iMBLibraryNode *lib = [[iMBLibraryNode alloc] init];
+		iMBLibraryNode *lib = [[[iMBLibraryNode alloc] init] autorelease];
 		[lib setName:[albumRec objectForKey:@"AlbumName"]];
 		[lib setIcon:[self iconForType:[albumRec objectForKey:@"Album Type"]]];
 		
@@ -288,8 +288,6 @@
 		{
 			[root addItem:lib];
 		}
-		
-		[lib release];
 	}
 	
 	return [albums count] ? root : nil;

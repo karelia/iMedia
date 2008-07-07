@@ -1531,7 +1531,7 @@ static NSDictionary *sTitleAttributes = nil;
 
 - (void)moveToEndOfDocumentAndModifySelection:(id)sender
 {
-	NSMutableIndexSet *indexes = [[self selectionIndexes] mutableCopy];
+	NSMutableIndexSet *indexes = [[[self selectionIndexes] mutableCopy] autorelease];
 	if ([indexes count] > 0) {
 		[indexes addIndexesInRange:NSMakeRange([indexes lastIndex], ([self photoCount] - [indexes lastIndex]))];
 		[self setSelectionIndexes:indexes];
