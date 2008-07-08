@@ -68,6 +68,12 @@
 // ensures that it is threadable.
 - (iMBLibraryNode *)parseDatabase;
 
+// subclassers can optional implement populateLibraryNode: and invoke parseDatabaseInThreadWithName:iconName:
+// directly from parseDatabase to implement threaded parsing. populateLibraryNode: must be threadsafe and
+// will be invoked on a thread so it needs its own autorelease pool.
+- (iMBLibraryNode *)parseDatabaseInThreadWithName:(NSString *)name iconName:(NSString *)iconName;
+- (void)populateLibraryNode:(iMBLibraryNode *)root;
+
 // subclasses MAY implement this. this method should not have "side effects" on the class.
 // it should be a pure method to return the list of iMBLibraryNode's representing the data
 // in the database. this ensures that it is threadable.

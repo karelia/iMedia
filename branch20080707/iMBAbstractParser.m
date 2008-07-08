@@ -99,6 +99,32 @@
 	return nil;
 }
 
+- (iMBLibraryNode *)parseDatabaseInThreadWithName:(NSString *)name iconName:(NSString *)iconName
+{
+	NSString *folder = [self databasePath];
+	if ( [[NSFileManager defaultManager] fileExistsAtPath:folder] )
+    {
+        iMBLibraryNode *rootLibraryNode = [[[iMBLibraryNode alloc] init] autorelease];
+        
+        // the name will include 'loading' until it is populated.
+        NSString *loadingString = LocalizedStringInIMedia(@"Loading...", @"Text that shows that we are loading");
+        [rootLibraryNode setName:[name stringByAppendingFormat:@" (%@)", loadingString]];
+        [rootLibraryNode setIconName:iconName];
+        
+        // the node itself will be returned immediately. now launch _another_ thread to populate the node.
+        [NSThread detachNewThreadSelector:@selector(populateLibraryNode:) toTarget:self withObject:rootLibraryNode];
+        
+        return rootLibraryNode;
+    }
+    else
+    {
+        return nil;
+    }
+}
+
+- (void)populateLibraryNode:(iMBLibraryNode *)root
+{
+}
 
 // standard implementation for single-item nodes.  Override if we return multiple items.
 
