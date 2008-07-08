@@ -42,18 +42,14 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractParser.h"
+#import "iMBPhotoFolderParser.h"
 
 /*
-	This parser checks NSUserDefaults for the key iMBFavouritePictures which
-	is an array of paths to folders that will be added to a "Favourites" category
+ This parser checks NSUserDefaults for the key iMBFavouritePictures which
+ is an array of paths to folders that will be added to a "Favourites" category
  */
 
-@interface iMBFavouritePicturesParser : iMBAbstractParser
-{
-	NSMutableArray *myParsers;
-}
+@interface iMBFavouritePicturesParser : iMBPhotoFolderParser
 
 @end

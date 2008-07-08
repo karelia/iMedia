@@ -63,86 +63,21 @@
 
 - (id)init
 {
-	if (self = [super initWithContentsOfFile:[NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"]])
+    NSString *name = LocalizedStringInIMedia(@"Pictures Folder", @"Name of your 'Pictures' folder in your home directory");
+    NSString *iconName = @"picturesFolder";
+    NSString *folderPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
+    self = [super initWithName:name iconName:iconName folderPath:folderPath];
+	if (self != NULL)
 	{
-		
 	}
 	return self;
 }
 
-- (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root
+- (BOOL)shouldIncludeFile:(NSString *)filename
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
-	NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-	NSArray *contents = [fm directoryContentsAtPath:path];
-	NSEnumerator *e = [contents objectEnumerator];
-	NSString *cur;
-	BOOL isDir;
-	NSMutableArray *images = [NSMutableArray array];
-	NSArray * excludedFolders = [[iMediaConfiguration sharedConfiguration] excludedFolders];
-	
-	while (cur = [e nextObject])
-	{
-		NSString *filePath = [path stringByAppendingPathComponent: cur];
-		
-		if ([cur rangeOfString:@"iPhoto Library"].location != NSNotFound) continue;
-		if ([cur rangeOfString:@"Aperture Library"].location != NSNotFound) continue;
-		if ([excludedFolders containsObject:filePath]) continue;
-      
-		if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath] && ![ws isFilePackageAtPath:filePath] )
-		{
-			if (isDir)
-			{
-				iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
-				[root addItem:folder];
-				[folder release];
-				[folder setIconName:@"folder"];
-				[folder setName:[fm displayNameAtPath:filePath]];
-				[self recursivelyParse:filePath withNode:folder];
-			}
-			else
-			{
-				NSString *UTI = [NSString UTIForFileAtPath:filePath];
-				if ([NSString UTI:UTI conformsToUTI:(NSString *)kUTTypeImage])
-				{
-					NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
-					if (filePath)
-					{
-						[newPicture setObject:filePath forKey:@"ImagePath"];
-						[newPicture setObject:[[fm displayNameAtPath:filePath] stringByDeletingPathExtension] forKey:@"Caption"];
-						//[newPicture setObject:filePath forKey:@"ThumbPath"];
-					}
-					NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
-					NSDate* modDate = [fileAttribs fileModificationDate];
-					if (modDate)
-					{
-						[newPicture setObject:[NSNumber numberWithDouble:[modDate timeIntervalSinceReferenceDate]]
-																  forKey:@"DateAsTimerInterval"];
-					}
-					[images addObject:newPicture];
-				}
-			}
-		}
-	}
-	[root setAttribute:images forKey:@"Images"];
-}
-
-- (iMBLibraryNode *)parseDatabase
-{
-	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
-	[root setName:LocalizedStringInIMedia(@"Pictures Folder", @"Name of your 'Pictures' folder in your home directory")];
-	[root setIconName:@"picturesFolder"];
-		
-	if (![[NSFileManager defaultManager] fileExistsAtPath:myDatabase])
-	{
-		[root release];
-		return nil;
-	}
-	
-	[self recursivelyParse:myDatabase
-				  withNode:root];
-
-	return [root autorelease];
+    if ([filename rangeOfString:@"iPhoto Library"].location != NSNotFound) return NO;
+    if ([filename rangeOfString:@"Aperture Library"].location != NSNotFound) return NO;
+    return YES;
 }
 
 @end

@@ -45,8 +45,6 @@
 
 #import "iMBiChatIconsParser.h"
 #import "iMediaConfiguration.h"
-#import "iMBPicturesFolder.h"
-#import "iMBLibraryNode.h"
 
 @implementation iMBiChatIconsParser
 
@@ -61,26 +59,14 @@
 
 - (id)init
 {
-	if (self = [super initWithContentsOfFile:@"/Library/Application Support/Apple/iChat Icons"])
+    NSString *name = LocalizedStringInIMedia(@"iChat Icons", @"folder name");
+    NSString *iconName = @"folder";
+    NSString *folderPath = @"/Library/Application Support/Apple/iChat Icons";
+    self = [super initWithName:name iconName:iconName folderPath:folderPath];
+	if (self != NULL)
 	{
-		;
 	}
 	return self;
-}
-
-- (iMBLibraryNode *)parseDatabase
-{
-	NSFileManager *fm = [NSFileManager defaultManager];
-	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
-	
-	iMBPicturesFolder *parser = [[[iMBPicturesFolder alloc] initWithContentsOfFile:[self databasePath]] autorelease];	
-	iMBLibraryNode *db = [parser parseDatabase];
-	if (db)
-	{
-		[db setName:LocalizedStringInIMedia(@"iChat Icons", @"folder name")];
-		[db setIconName:@"folder"];
-	}	
-	return db;
 }
 
 @end

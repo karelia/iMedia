@@ -99,22 +99,27 @@
 	return nil;
 }
 
-- (iMBLibraryNode *)parseDatabaseInThreadWithName:(NSString *)name iconName:(NSString *)iconName
+- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName
 {
-	NSString *folder = [self databasePath];
+	NSString *folder = databasePath;
 	if ( [[NSFileManager defaultManager] fileExistsAtPath:folder] )
     {
-        iMBLibraryNode *rootLibraryNode = [[[iMBLibraryNode alloc] init] autorelease];
+        iMBLibraryNode *libraryNode = [[[iMBLibraryNode alloc] init] autorelease];
         
         // the name will include 'loading' until it is populated.
         NSString *loadingString = LocalizedStringInIMedia(@"Loading...", @"Text that shows that we are loading");
-        [rootLibraryNode setName:[name stringByAppendingFormat:@" (%@)", loadingString]];
-        [rootLibraryNode setIconName:iconName];
+        [libraryNode setName:[name stringByAppendingFormat:@" (%@)", loadingString]];
+        [libraryNode setIconName:iconName];
         
         // the node itself will be returned immediately. now launch _another_ thread to populate the node.
-        [NSThread detachNewThreadSelector:@selector(populateLibraryNode:) toTarget:self withObject:rootLibraryNode];
+        NSDictionary *populateLibraryNodeArguments = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                      libraryNode,          @"rootLibraryNode",
+                                                      databasePath,         @"databasePath",
+                                                      name,                 @"name",
+                                                      NULL];
+        [NSThread detachNewThreadSelector:@selector(populateLibraryNodeWithArguments:) toTarget:self withObject:populateLibraryNodeArguments];
         
-        return rootLibraryNode;
+        return libraryNode;
     }
     else
     {
@@ -122,8 +127,18 @@
     }
 }
 
-- (void)populateLibraryNode:(iMBLibraryNode *)root
+// NOTE: subclassers SHOULD override this method
+- (void)populateLibraryNode:(iMBLibraryNode *)rootLibraryNode name:(NSString *)name databasePath:(NSString *)databasePath
 {
+}
+
+// NOTE: subclassers should NOT override this method
+- (void)populateLibraryNodeWithArguments:(NSDictionary *)arguments
+{
+    iMBLibraryNode *rootLibraryNode = [arguments objectForKey:@"rootLibraryNode"];
+    NSString *name = [arguments objectForKey:@"name"];
+    NSString *databasePath = [arguments objectForKey:@"databasePath"];
+    [self populateLibraryNode:rootLibraryNode name:name databasePath:databasePath];
 }
 
 // standard implementation for single-item nodes.  Override if we return multiple items.

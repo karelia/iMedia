@@ -44,11 +44,8 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import "iMBAbstractParser.h"
+#import "iMBPhotoFolderParser.h"
 
-@interface iMBiChatIconsParser : iMBAbstractParser
-{
-	
-}
+@interface iMBiChatIconsParser : iMBPhotoFolderParser
 
 @end
