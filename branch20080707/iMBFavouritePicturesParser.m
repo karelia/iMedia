@@ -74,7 +74,7 @@
 	NSArray *paths = [[NSUserDefaults standardUserDefaults] arrayForKey:@"iMBFavouritePictures"];
 	if ([paths count] == 0) return nil;
 	
-	iMBLibraryNode *rootLibraryNode = [[iMBLibraryNode alloc] init];
+	iMBLibraryNode *rootLibraryNode = [[[iMBLibraryNode alloc] init] autorelease];
 	[rootLibraryNode setName:LocalizedStringInIMedia(@"Favorites", @"Favourite folder name")];
 	[rootLibraryNode setIconName:@"heart"];
 
