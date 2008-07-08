@@ -45,6 +45,7 @@
 #import <QTKit/QTKit.h>
 
 #import "iMediaConfiguration.h"
+#import "iMBParserController.h"
 #import "LibraryItemsValueTransformer.h"
 #import "MUPhotoView.h"
 
@@ -171,6 +172,9 @@ static NSMutableDictionary *_parsers = nil;
 	if (self = [super init])
     {
 		[self setIdentifier:@"Default"];
+        
+        myParserControllers = [[NSMutableDictionary alloc] init];
+        myCustomFolderParsers = [[NSMutableDictionary alloc] init];
 	}
     
 	return self;
@@ -178,8 +182,10 @@ static NSMutableDictionary *_parsers = nil;
 
 - (void)dealloc
 {
-    [myIdentifier release];
-    [excludedFolders release];
+    [myIdentifier release]; myIdentifier = NULL;
+    [excludedFolders release]; excludedFolders = NULL;
+    [myParserControllers release]; myParserControllers = NULL;
+    [myCustomFolderParsers release]; myCustomFolderParsers = NULL;
     [super dealloc];
 }
 
@@ -252,6 +258,66 @@ static NSMutableDictionary *_parsers = nil;
 	return showFilenames;	// return the fallback set through code
 }
 
+- (iMBParserController *)parserControllerForMediaType:(NSString *)mediaType
+{
+    iMBParserController *parserController = NULL;
+    
+    @synchronized (self)
+    {
+        parserController = [myParserControllers objectForKey:mediaType];
+        
+        if (parserController == NULL)
+        {
+            parserController = [[[iMBParserController alloc] initWithMediaType:mediaType] autorelease];
+            [myParserControllers setObject:parserController forKey:mediaType];
+        }
+    }
+    
+    return parserController;
+}
+
+#pragma mark -
+#pragma mark Custom folder handling
+
+- (void)registerCustomFolderParser:(Class)aClass forMediaType:(NSString *)mediaType
+{
+    @synchronized (myCustomFolderParsers)
+    {
+        [myCustomFolderParsers setObject:aClass forKey:mediaType];
+    }
+}
+
+- (void)unregisterCustomFolderParserForMediaType:(NSString *)mediaType
+{
+    @synchronized (myCustomFolderParsers)
+    {
+        [myCustomFolderParsers removeObjectForKey:mediaType];
+    }
+}
+
+- (BOOL)hasCustomFolderParserForMediaType:(NSString *)mediaType
+{
+    BOOL result = NO;
+    @synchronized (myCustomFolderParsers)
+    {
+        result = [myCustomFolderParsers objectForKey:mediaType] != NULL;
+    }
+    return result;
+}
+
+- (iMBAbstractParser *)createCustomFolderParserForMediaType:(NSString *)mediaType folderPath:(NSString *)folderPath
+{
+    iMBAbstractParser *parser = NULL;
+    @synchronized (myCustomFolderParsers)
+    {
+        Class parserClass = [myCustomFolderParsers objectForKey:mediaType];
+        if (parserClass != NULL)
+        {
+            parser = [[[parserClass alloc] initWithContentsOfFile:folderPath] autorelease];
+        }
+    }
+    return parser;
+}
 
 #pragma mark -
 #pragma mark Delegate

@@ -46,6 +46,7 @@
 
 #import "iMBLibraryNode.h"
 #import "iMediaConfiguration.h"
+#import "iMBParserController.h"
 #import "iMediaBrowser.h"
 #import "iMBAbstractParser.h"
 #import "LibraryItemsValueTransformer.h"
@@ -104,9 +105,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
             return nil;
         }
 
-    	loadedParsers = [[NSMutableDictionary alloc] init];
-        userDroppedParsers = [[NSMutableArray alloc] init];
-
         backgroundLoadingLock = [[NSLock alloc] init];
     }
     return self;
@@ -121,8 +119,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
     [[libraryView enclosingScrollView] release];
     [libraryPopUpButton release];
 
-	[userDroppedParsers release];
-	[loadedParsers release];
     [backgroundLoadingLock release];
 
 	[super dealloc];
@@ -233,6 +229,8 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (IBAction)reload:(id)sender
 {
+#if 0
+    // TODO: Issue 59. no longer works
     if ([backgroundLoadingLock tryLock])
     {    
         isLoading = YES;
@@ -246,6 +244,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
         [NSThread detachNewThreadSelector:@selector(backgroundLoadData) toTarget:self withObject:NULL];
     }
+#endif
 }
 
 - (void)recursivelyAddItemsToMenu:(NSMenu *)menu withNode:(iMBLibraryNode *)node indentation:(int)indentation
@@ -353,154 +352,58 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	}
 }
 
-- (NSArray*)addCustomFolders:(NSArray*)folders
+- (NSArray *)addCustomFolders:(NSArray *)folders
 {
 	NSMutableArray *results = [NSMutableArray array];
+
 	if ([folders count])
 	{
 		NSFileManager *fm = [NSFileManager defaultManager];
-		BOOL isDir;
-		NSEnumerator *e = [folders objectEnumerator];
-		NSString *cur;
-		Class aClass = [self parserForFolderDrop];
-		NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
+		NSEnumerator *folderEnumerator = [folders objectEnumerator];
+		NSString *currentFolder;
 		NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]]];
-		NSMutableArray *drops = [NSMutableArray arrayWithArray:[d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]]];
+		NSMutableArray *customFolders = [NSMutableArray arrayWithArray:[d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]]];
 		
-		while ((cur = [e nextObject]))
+		while ((currentFolder = [folderEnumerator nextObject]))
 		{
-			if (![drops containsObject:cur] && [fm fileExistsAtPath:cur isDirectory:&isDir] && isDir && [self allowPlaylistFolderDrop:cur])
+            BOOL isDirectory;
+			if (![customFolders containsObject:currentFolder] && [fm fileExistsAtPath:currentFolder isDirectory:&isDirectory] && isDirectory && [self allowPlaylistFolderDrop:currentFolder])
 			{
-				iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:cur];
-				NSArray *nodes = [parser nodesFromParsingDatabase];
+                iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:[self mediaType]];
+                
+                [results addObjectsFromArray:[parserController addCustomFolderPath:currentFolder]];
 				
-				NSEnumerator *e = [nodes objectEnumerator];
-				iMBLibraryNode *node;
-				
-				while (node = [e nextObject])
-				{
-					[node setName:[cur lastPathComponent]];
-					[node setIconName:@"folder"];
-					[content addObject:node];
-					[results addObject:node];
-				}
-				[userDroppedParsers addObject:parser];
-				[parser release];
-				
-				[drops addObject:cur];
+				[customFolders addObject:currentFolder];
 			}
 		}
 		
-		[libraryController setContent:content];
-		
-		[d setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]];
+		[d setObject:customFolders forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]];
 		[[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
 	}
-	
+
 	return results;
+}
+
+- (void)bindLibraryControllerContentToParserController:(iMBParserController *)parserController
+{
+    [libraryController setAutomaticallyPreparesContent:YES];
+    [libraryController bind:@"contentArray" toObject:parserController withKeyPath:@"libraryNodes" options:[NSDictionary dictionary]];
 }
 
 - (void)backgroundLoadData
 {	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-   
-	NSMutableArray *root = [NSMutableArray array];
-    NSArray *parsers = [[[iMediaConfiguration sharedConfiguration] parsers] objectForKey:[self mediaType]];
 
-	NSEnumerator *e = [parsers objectEnumerator];
-	NSString *cur;
-	
-	while (cur = [e nextObject])
-	{
-		Class parserClass = NSClassFromString(cur);
-		if (![parserClass conformsToProtocol:@protocol(iMBParser)])
-		{
-			NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.");
-			continue;
-		}
-        
-        id delegate = [[iMediaConfiguration sharedConfiguration] delegate];
-        
-		if ([delegate respondsToSelector:@selector(iMediaConfiguration:willUseMediaParser:forMediaType:)])
-		{
-			if (![delegate iMediaConfiguration:[iMediaConfiguration sharedConfiguration] willUseMediaParser:cur forMediaType:[self mediaType]])
-			{
-				continue;
-			}
-		}
-		
-		id <iMBParser>parser = [loadedParsers objectForKey:cur];
-		if (!parser)
-		{
-			parser = [[parserClass alloc] init];
-			if (parser == nil)
-			{
-				continue;
-			}
-			[loadedParsers setObject:parser forKey:cur];
-			[parser release];
-		}
+    iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:[self mediaType]];
 
-#ifdef DEBUG
-//		NSDate *timer = [NSDate date];
-#endif
-		NSArray *libraries = [parser nodesFromParsingDatabase];
-#ifdef DEBUG
-		//		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
-#endif
-		if (libraries)
-		{
-			[root addObjectsFromArray:libraries];
-		}
-                
-		if ([delegate respondsToSelector:@selector(iMediaConfiguration:didUseMediaParser:forMediaType:)])
-		{
-			[delegate iMediaConfiguration:[iMediaConfiguration sharedConfiguration] didUseMediaParser:cur forMediaType:[self mediaType]];
-		}
-	}
-	
-	NSSortDescriptor *priorityOrderSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"prioritySortOrder" 
-																				 ascending:NO] autorelease];
-	NSSortDescriptor *nameSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"name" 
-																		ascending:YES 
-																		 selector:@selector(caseInsensitiveCompare:)] autorelease];
-	NSArray *librarySortDescriptor = [NSArray arrayWithObjects:priorityOrderSortDescriptor, nameSortDescriptor, nil];
-	
-	[root sortUsingDescriptors:librarySortDescriptor];
-	
-	// Do any user dropped folders
+    // Start parsing any custom folders that have been added
 	NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
-	NSArray *drops = [d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]];
-	e = [drops objectEnumerator];
-	NSString *drop;
-	NSFileManager *fm = [NSFileManager defaultManager];
-	BOOL isDir;
-	Class aClass = [self parserForFolderDrop];
-	
-	[userDroppedParsers removeAllObjects]; // Clear out the old ones as otherwise we just grow and grow (and leak parsers)
-	while ((drop = [e nextObject]))
-	{
-		if ([fm fileExistsAtPath:drop isDirectory:&isDir] && isDir)
-		{
-			iMBAbstractParser *parser = [[aClass alloc] initWithContentsOfFile:drop];
-			NSArray *nodes = [parser nodesFromParsingDatabase];	// should be only 1 but let's enum
-			
-			NSEnumerator *e = [nodes objectEnumerator];
-			iMBLibraryNode *node;
-			
-			while (node = [e nextObject])
-			{
-				[node setName:[drop lastPathComponent]];
-				[node setIconName:@"folder"];
-				[root addObject:node];
-			}
-			
-			[userDroppedParsers addObject:parser];
-			[parser release];
-		}
-	}
-
-	[libraryController performSelectorOnMainThread:@selector(setContent:) withObject:root waitUntilDone:YES];
+	NSArray *customFolders = [d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]];
+    
+    // precalculate on the thread
+    [parserController buildLibraryNodesWithCustomFolders:customFolders];
+    
+	[self performSelectorOnMainThread:@selector(bindLibraryControllerContentToParserController:) withObject:parserController waitUntilDone:YES];
 
 	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:YES];
 	
@@ -545,9 +448,9 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
     didLoad = YES;
 }
 
-- (Class)parserForFolderDrop
+- (BOOL)hasCustomFolderParser
 {
-	return nil; 
+    return [[iMediaConfiguration sharedConfiguration] hasCustomFolderParserForMediaType:[self mediaType]];
 }
 
 - (NSArray*)fineTunePlaylistDragTypes:(NSArray *)defaultTypes
@@ -695,8 +598,8 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	
 	if ((dragOp != NSDragOperationNone) || !doDefault)
 		return dragOp;
-    
-	if ([self parserForFolderDrop])
+
+    if ([[iMediaConfiguration sharedConfiguration] hasCustomFolderParserForMediaType:[self mediaType]])
 	{
 		NSPasteboard *pboard = [info draggingPasteboard];
 		if ([pboard availableTypeFromArray:[NSArray arrayWithObject:NSFilenamesPboardType]])
@@ -722,45 +625,24 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (void)outlineView:(NSOutlineView *)olv deleteItems:(NSArray *)items
 {
-#if 0
-    // TODO: Issue 59. Restore this functionality.
-    // DISABLED UNTIL A BETTER SOLUTION IS FOUND THAN TRACKING BY PARSER (WHICH IS NO LONGER AVAILABLE)
-
-	NSEnumerator *e = [items objectEnumerator];
-	iMBLibraryNode *cur;
-	
-	NSMutableArray *content = [NSMutableArray arrayWithArray:[libraryController content]];
 	NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]]];
-	NSMutableArray *drops = [NSMutableArray arrayWithArray:[d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]]];
+	NSMutableArray *customFolders = [NSMutableArray arrayWithArray:[d objectForKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]]];
 	
-	BOOL foundSomethingToDelete = NO;
-	while ((cur = [e nextObject]))
-	{
-		// we can only delete dragged folders
-		NSEnumerator *g = [userDroppedParsers objectEnumerator];
-		id parser;
-		
-		while ((parser = [g nextObject]))
-		{
-			if ([cur parser] == parser)
-			{
-				[drops removeObject:[parser databasePath]];
-				[userDroppedParsers removeObject:parser];
-				[content removeObject:cur];
-				foundSomethingToDelete = YES;
-				break;
-			}
-		}
-	}
-	if (!foundSomethingToDelete)
+    iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:[self mediaType]];
+
+    // items should be an array of library nodes
+    NSArray *customFoldersRemoved = [parserController removeLibraryNodes:items];
+    
+    [customFolders removeObjectsInArray:customFoldersRemoved];
+
+    // beep if no folders were removed
+	if ([customFoldersRemoved count] == 0)
 	{
 		NSBeep ();
 	}
 	
-	[libraryController setContent:content];
-	[d setObject:drops forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]];
+	[d setObject:customFolders forKey:[NSString stringWithFormat:@"%@Dropped", [(NSObject*)self className]]];
 	[[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
-#endif
 }
 
 #pragma mark -

@@ -45,12 +45,16 @@
 #import <Cocoa/Cocoa.h>
 
 @class iMBLibraryNode;
+@class iMBParserController;
+@class iMBAbstractParser;
 
 @interface iMediaConfiguration : NSObject {
     IBOutlet id configurationDelegate;
 
 @private
-	NSArray     *excludedFolders;
+    NSMutableDictionary *myParserControllers;
+    NSMutableDictionary *myCustomFolderParsers;
+	NSArray *excludedFolders;
     
     NSString *myIdentifier;
     
@@ -64,6 +68,15 @@
 + (void)unregisterParserName:(NSString *)parserClassName forMediaType:(NSString *)media;
 + (void)unregisterParser:(Class)parserClass forMediaType:(NSString *)media;
 
+#pragma mark -
+#pragma mark Custom folder handling
+
+// TODO: Make aClass a id<protocol> that must respond to initWithContentsOfFile: ?
+- (void)registerCustomFolderParser:(Class)aClass forMediaType:(NSString *)mediaType;
+- (void)unregisterCustomFolderParserForMediaType:(NSString *)mediaType;
+- (BOOL)hasCustomFolderParserForMediaType:(NSString *)mediaType;
+- (iMBAbstractParser *)createCustomFolderParserForMediaType:(NSString *)mediaType folderPath:(NSString *)folderPath;
+
 - (NSDictionary *)parsers;
 
 - (NSArray *)excludedFolders;
@@ -75,6 +88,8 @@
 - (void)setShowsFilenamesInPhotoBasedBrowsers:(BOOL)flag;	// API to set initial value
 - (BOOL)prefersFilenamesInPhotoBasedBrowsers;				// binding for user defaults
 - (void)setPrefersFilenamesInPhotoBasedBrowsers:(BOOL)flag;	// binding for user defaults
+
+- (iMBParserController *)parserControllerForMediaType:(NSString *)mediaType;
 
 #pragma mark -
 #pragma mark Delegate

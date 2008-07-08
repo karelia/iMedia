@@ -70,8 +70,10 @@
 	if ( self == [iMBMoviesView class] ) 
 	{
 		// Only do some work when not called because one of our subclasses does not implement +initialize
-	[iMBMoviesView setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
-}
+        [iMBMoviesView setKeys:[NSArray arrayWithObject:@"images"] triggerChangeNotificationsForDependentKey:@"imageCount"];
+
+        [[iMediaConfiguration sharedConfiguration] registerCustomFolderParser:NSClassFromString(@"iMBMoviesFolder") forMediaType:@"movies"];
+    }
 }
 
 - (id)initWithFrame:(NSRect)frame
@@ -235,11 +237,6 @@
 
 #pragma mark -
 #pragma mark Media Browser Protocol
-
-- (Class)parserForFolderDrop
-{
-	return NSClassFromString(@"iMBMoviesFolder");
-}
 
 - (void)willActivate
 {

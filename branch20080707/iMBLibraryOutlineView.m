@@ -128,8 +128,8 @@
 	
 	// If there are no rows in the table, draw the placeholder
 	if ([self placeholderString]
-			&& [[self dataSource] respondsToSelector:@selector(parserForFolderDrop)]
-			&& nil != [[self dataSource] parserForFolderDrop]
+			&& [[self dataSource] respondsToSelector:@selector(hasCustomFolderParser)]
+			&& nil != [((iMediaBrowser *)[self dataSource]) hasCustomFolderParser]
 			&& dataHeight + MARGIN_BELOW <= meHeight)		// show if we have some room below
 	{
 		int fadeHeight = MIN(meHeight - dataHeight, MARGIN_BELOW+FADE_AREA) - MARGIN_BELOW;
