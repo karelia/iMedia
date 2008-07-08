@@ -318,6 +318,37 @@ static NSMutableDictionary *sImageCache = nil;
 	return [NSDictionary dictionaryWithDictionary:myAttributes];
 }
 
+- (void)setAttributeForKeyFromArguments:(NSDictionary *)dictionary
+{
+    id attrib = [dictionary objectForKey:@"attrib"];
+    NSString *key = [dictionary objectForKey:@"key"];
+    [self setAttribute:attrib forKey:key];
+}
+
+- (void)fromThreadSetAttribute:(id)attrib forKey:(NSString *)key
+{
+    NSDictionary *arguments = [NSDictionary dictionaryWithObjectsAndKeys:attrib, @"attrib", key, @"key", NULL];
+    [self performSelectorOnMainThread:@selector(setAttributeForKeyFromArguments:) withObject:arguments waitUntilDone:YES];
+}
+
+- (void)setFilterDuplicateKeyForAttributeKeyFromArguments:(NSDictionary *)dictionary
+{
+    NSString *filterKey = [dictionary objectForKey:@"filterKey"];
+    NSString *attributeKey = [dictionary objectForKey:@"attributeKey"];
+    [self setFilterDuplicateKey:filterKey forAttributeKey:attributeKey];
+}
+
+- (void)fromThreadSetFilterDuplicateKey:(NSString *)filterKey forAttributeKey:(NSString *)attributeKey
+{
+    NSDictionary *arguments = [NSDictionary dictionaryWithObjectsAndKeys:filterKey, @"filterKey", attributeKey, @"attributeKey", NULL];
+    [self performSelectorOnMainThread:@selector(setFilterDuplicateKeyForAttributeKeyFromArguments:) withObject:arguments waitUntilDone:YES];
+}
+
+- (void)fromThreadAddItem:(iMBLibraryNode *)item
+{
+    [self performSelectorOnMainThread:@selector(addItem:) withObject:item waitUntilDone:YES];
+}
+
 - (void)addItem:(iMBLibraryNode *)item
 {
     [[self mutableItems] addObject:item];
