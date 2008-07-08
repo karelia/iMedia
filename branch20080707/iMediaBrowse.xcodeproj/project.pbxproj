@@ -267,6 +267,8 @@
 		FD6008F20D6A552000A1146F /* MediaBrowser.nib in Resources */ = {isa = PBXBuildFile; fileRef = FD6008F10D6A552000A1146F /* MediaBrowser.nib */; };
 		FD8EE60E0C697CEA00E425BB /* MetadataTool.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8EE60D0C697CEA00E425BB /* MetadataTool.m */; };
 		FDD6A4F80D6A510F00CA57D2 /* MainMenuSingle.nib in Resources */ = {isa = PBXBuildFile; fileRef = FDD6A4F70D6A510F00CA57D2 /* MainMenuSingle.nib */; };
+		FDD974F40E23EA9800C2A092 /* iMBPhotoFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = FDD974F20E23EA9800C2A092 /* iMBPhotoFolderParser.h */; };
+		FDD974F50E23EA9800C2A092 /* iMBPhotoFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = FDD974F30E23EA9800C2A092 /* iMBPhotoFolderParser.m */; };
 		FDE557E70E22C386007E4706 /* iMBParserController.h in Headers */ = {isa = PBXBuildFile; fileRef = FDE557E50E22C386007E4706 /* iMBParserController.h */; };
 		FDE557E80E22C386007E4706 /* iMBParserController.m in Sources */ = {isa = PBXBuildFile; fileRef = FDE557E60E22C386007E4706 /* iMBParserController.m */; };
 /* End PBXBuildFile section */
@@ -642,6 +644,8 @@
 		FD8EE60C0C697CEA00E425BB /* MetadataTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataTool.h; sourceTree = "<group>"; };
 		FD8EE60D0C697CEA00E425BB /* MetadataTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataTool.m; sourceTree = "<group>"; };
 		FDD6A5010D6A512E00CA57D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/MainMenuSingle.nib; sourceTree = "<group>"; };
+		FDD974F20E23EA9800C2A092 /* iMBPhotoFolderParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBPhotoFolderParser.h; sourceTree = "<group>"; };
+		FDD974F30E23EA9800C2A092 /* iMBPhotoFolderParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBPhotoFolderParser.m; sourceTree = "<group>"; };
 		FDE557E50E22C386007E4706 /* iMBParserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBParserController.h; sourceTree = "<group>"; };
 		FDE557E60E22C386007E4706 /* iMBParserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBParserController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -851,6 +855,8 @@
 				FC6810370B1771ED0063CF05 /* iMBAperturePhotosParser.m */,
 				795D715F09D3AB55005F166D /* iMBiPhotoPhotosParser.h */,
 				795D716009D3AB55005F166D /* iMBiPhotoPhotosParser.m */,
+				FDD974F20E23EA9800C2A092 /* iMBPhotoFolderParser.h */,
+				FDD974F30E23EA9800C2A092 /* iMBPhotoFolderParser.m */,
 				795F748209D4BA98000F21B5 /* iMBPicturesFolder.h */,
 				795F748309D4BA98000F21B5 /* iMBPicturesFolder.m */,
 				792274880A27C51600E0A9BF /* iMBFavouritePicturesParser.h */,
@@ -1268,6 +1274,7 @@
 				CEEE54150DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.h in Headers */,
 				79F4DC4B0E1AC1630001C072 /* iMedia.pch in Headers */,
 				FDE557E70E22C386007E4706 /* iMBParserController.h in Headers */,
+				FDD974F40E23EA9800C2A092 /* iMBPhotoFolderParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1613,6 +1620,7 @@
 				5B29F28A0D6D72960045CD86 /* iMBMovieReference.m in Sources */,
 				CEEE54160DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.m in Sources */,
 				FDE557E80E22C386007E4706 /* iMBParserController.m in Sources */,
+				FDD974F50E23EA9800C2A092 /* iMBPhotoFolderParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
