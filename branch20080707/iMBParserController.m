@@ -19,6 +19,7 @@
     if (self != NULL)
     {
         myMediaType = [mediaType copy];
+        myLibraryNodes = [[NSMutableArray alloc] init];
         myCustomFolderInfo = [[NSMutableArray alloc] init];
     }
     return self;
@@ -32,14 +33,38 @@
     [super dealloc];
 }
 
+// WARNING: MAIN THREAD ONLY
+- (void)doSetLibraryNodes:(NSArray *)libraryNodes
+{
+    [[self mutableLibraryNodes] setArray:libraryNodes];
+}
+
+- (void)doAddLibraryNodes:(NSArray *)libraryNodes
+{
+    [[self mutableLibraryNodes] addObjectsFromArray:libraryNodes];
+}
+
+- (void)doRemoveLibraryNodes:(NSArray *)libraryNodes
+{
+    [[self mutableLibraryNodes] removeObjectsInArray:libraryNodes];
+}
+
 - (void)buildLibraryNodesWithCustomFolders:(NSArray *)customFolders
 {
+    NSMutableArray *libraryNodes = NULL;
+    
     @synchronized (self)
     {
-        if (myLibraryNodes != NULL)
+        if (myIsBuilt)
             return;
         
-        myLibraryNodes = [[NSMutableArray alloc] init];
+        myIsBuilt = YES;
+
+        // NOTE: It is not legal to add items on a thread; so we do it on the main thread.
+        // [self doAddLibraryNodes:libraryNodes];
+        [self performSelectorOnMainThread:@selector(doSetLibraryNodes:) withObject:[NSArray array] waitUntilDone:YES];
+        
+        libraryNodes = [NSMutableArray array];
         
         NSArray *parsers = [[[iMediaConfiguration sharedConfiguration] parsers] objectForKey:myMediaType];
         
@@ -88,7 +113,7 @@
 #endif
             if (libraries)
             {
-                [myLibraryNodes addObjectsFromArray:libraries];
+                [libraryNodes addObjectsFromArray:libraries];
             }
             
             if ([delegate respondsToSelector:@selector(iMediaConfiguration:didUseMediaParser:forMediaType:)])
@@ -104,19 +129,44 @@
                                                                              selector:@selector(caseInsensitiveCompare:)] autorelease];
         NSArray *librarySortDescriptor = [NSArray arrayWithObjects:priorityOrderSortDescriptor, nameSortDescriptor, nil];
         
-        [myLibraryNodes sortUsingDescriptors:librarySortDescriptor];
+        [libraryNodes sortUsingDescriptors:librarySortDescriptor];
+    }
+    
+    // NOTE: It is not legal to add items on a thread; so we do it on the main thread.
+    // [self doAddLibraryNodes:libraryNodes];
+    [self performSelectorOnMainThread:@selector(doSetLibraryNodes:) withObject:libraryNodes waitUntilDone:YES];
+    
+    if ( customFolders != NULL )
+    {
+        NSEnumerator *enumerator = [customFolders objectEnumerator];
+        NSString *folderPath;
         
-        if ( customFolders != NULL )
+        while ((folderPath = [enumerator nextObject]))
         {
-            NSEnumerator *enumerator = [customFolders objectEnumerator];
-            NSString *folderPath;
-            
-            while ((folderPath = [enumerator nextObject]))
-            {
-                [self addCustomFolderPath:folderPath];
-            }
+            [self addCustomFolderPath:folderPath];
         }
     }
+}
+
+- (void)rebuildLibrary
+{
+    NSArray *oldCustomFolderInfo = [[myCustomFolderInfo copy] autorelease];
+    
+    NSMutableArray *customFolders = [NSMutableArray array];
+    
+    [myCustomFolderInfo removeAllObjects];
+    
+    NSEnumerator *enumerator = [oldCustomFolderInfo objectEnumerator];
+    NSDictionary *info;
+    while ( (info = [enumerator nextObject]) != NULL )
+    {
+        NSString *folderPath = [info objectForKey:@"folderPath"];
+        [customFolders addObject:folderPath];
+    }
+    
+    myIsBuilt = NO;
+    
+    [self buildLibraryNodesWithCustomFolders:customFolders];
 }
 
 // BEGIN KVC FOR libraryNodes
@@ -174,12 +224,11 @@
         {
             [libraryNode setName:[folderPath lastPathComponent]];
             [libraryNode setIconName:@"folder"];
-            @synchronized (self)
-            {
-                [[self mutableLibraryNodes] addObject:libraryNode];
-                [results addObject:libraryNode];
-                [myCustomFolderInfo addObject:[NSDictionary dictionaryWithObjectsAndKeys:libraryNode, @"libraryNode", folderPath, @"folderPath", NULL]];
-            }
+            // NOTE: It is not legal to add items on a thread; so we do it on the main thread.
+            // [self doAddLibraryNodes:[NSArray arrayWithObject:libraryNode]];
+            [self performSelectorOnMainThread:@selector(doAddLibraryNodes:) withObject:[NSArray arrayWithObject:libraryNode] waitUntilDone:YES];
+            [results addObject:libraryNode];
+            [myCustomFolderInfo addObject:[NSDictionary dictionaryWithObjectsAndKeys:libraryNode, @"libraryNode", folderPath, @"folderPath", NULL]];
         }
     }
     
@@ -199,7 +248,9 @@
         {
             if ([[info objectForKey:@"libraryNode"] isEqual:libraryNode])
             {
-                [[self mutableLibraryNodes] removeObject:libraryNode];
+                // NOTE: It is not legal to modify library nodes array on a thread; so we do it on the main thread.
+                // [[self mutableLibraryNodes] removeObject:libraryNode];
+                [self performSelectorOnMainThread:@selector(doRemoveLibraryNodes:) withObject:[NSArray arrayWithObject:libraryNode] waitUntilDone:YES];
                 [myCustomFolderInfo removeObject:info];
                 [folderPathsRemoved addObject:[info objectForKey:@"folderPath"]];
             }

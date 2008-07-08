@@ -61,10 +61,6 @@ NSString *iMBNativePasteboardFlavor=@"iMBNativePasteboardFlavor";
 NSString *iMBControllerClassName=@"iMBControllerClassName";
 NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
-@interface iMBAbstractView (PrivateAPI)
-- (void)resetLibraryController;
-@end
-
 @interface NSObject (iMediaHack)
 - (id)observedObject;
 @end
@@ -214,8 +210,10 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
             [loadingView setHidden:NO];
             [loadingProgressIndicator startAnimation:self];
 
-            // put this outside of the thread so that there are no race conditions involving bindings.
-            [self resetLibraryController];
+            iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:[self mediaType]];
+
+            [libraryController setAutomaticallyPreparesContent:YES];
+            [libraryController bind:@"contentArray" toObject:parserController withKeyPath:@"libraryNodes" options:[NSDictionary dictionary]];
 
             [NSThread detachNewThreadSelector:@selector(backgroundLoadData) toTarget:self withObject:NULL];
         }
@@ -229,8 +227,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (IBAction)reload:(id)sender
 {
-#if 0
-    // TODO: Issue 59. no longer works
     if ([backgroundLoadingLock tryLock])
     {    
         isLoading = YES;
@@ -239,12 +235,8 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
         [loadingView setHidden:NO];
         [loadingProgressIndicator startAnimation:self];
 
-        // put this outside of the thread so that there are no race conditions involving bindings.
-        [self resetLibraryController];
-
-        [NSThread detachNewThreadSelector:@selector(backgroundLoadData) toTarget:self withObject:NULL];
+        [NSThread detachNewThreadSelector:@selector(backgroundReloadData) toTarget:self withObject:NULL];
     }
-#endif
 }
 
 - (void)recursivelyAddItemsToMenu:(NSMenu *)menu withNode:(iMBLibraryNode *)node indentation:(int)indentation
@@ -384,12 +376,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	return results;
 }
 
-- (void)bindLibraryControllerContentToParserController:(iMBParserController *)parserController
-{
-    [libraryController setAutomaticallyPreparesContent:YES];
-    [libraryController bind:@"contentArray" toObject:parserController withKeyPath:@"libraryNodes" options:[NSDictionary dictionary]];
-}
-
 - (void)backgroundLoadData
 {	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -402,9 +388,20 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
     
     // precalculate on the thread
     [parserController buildLibraryNodesWithCustomFolders:customFolders];
-    
-	[self performSelectorOnMainThread:@selector(bindLibraryControllerContentToParserController:) withObject:parserController waitUntilDone:YES];
 
+	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:YES];
+	
+	[pool release];
+}
+
+- (void)backgroundReloadData
+{	
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:[self mediaType]];
+    
+    [parserController rebuildLibrary];
+    
 	[self performSelectorOnMainThread:@selector(controllerLoadedData:) withObject:self waitUntilDone:YES];
 	
 	[pool release];
@@ -525,15 +522,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 		[nodes addObject:representedObject];
 	}
 	return nodes;
-}
-
-- (void)resetLibraryController
-{
-	int controllerCount = [[libraryController arrangedObjects] count];
-	for(; controllerCount != 0;--controllerCount)
-	{
-		[libraryController removeObjectAtArrangedObjectIndexPath:[NSIndexPath indexPathWithIndex:controllerCount-1]];
-	}
 }
 
 // This Code is from http://theocacao.com/document.page/130
