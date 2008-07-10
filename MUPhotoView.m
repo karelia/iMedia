@@ -760,6 +760,8 @@ static NSDictionary *sTitleAttributes = nil;
 	mouseCurrentPoint = mouseDownPoint;
 
 	unsigned				clickedIndex = [self photoIndexForPoint:mouseDownPoint];
+	clickedIndex = MIN(clickedIndex, [self photoCount]-1);
+
 	NSRect					photoRect = [self photoRectForIndex:clickedIndex];
 	unsigned int			flags = [event modifierFlags];
 	NSMutableIndexSet*		indexes = [[self selectionIndexes] mutableCopy];
@@ -769,11 +771,11 @@ static NSDictionary *sTitleAttributes = nil;
 		if (flags & NSCommandKeyMask) {
 			// Flip current image selection state.
 			if ([indexes containsIndex:clickedIndex]) {
-                [indexes removeIndex:clickedIndex];
+				[indexes removeIndex:clickedIndex];
 			} else {
-                [indexes addIndex:clickedIndex];
+				[indexes addIndex:clickedIndex];
 			}
-        } else {
+		} else {
 			if (flags & NSShiftKeyMask) {
 				// Add range to selection.
 				if ([indexes count] == 0) {
@@ -869,6 +871,8 @@ static NSDictionary *sTitleAttributes = nil;
 {
 	NSImage *dragImage = nil;
 	unsigned clickedIndex = [self photoIndexForPoint:mouseDownPoint];
+	clickedIndex = MIN(clickedIndex, [self photoCount]-1);
+	
 	NSImage *clickedImage = [self photoAtIndex:clickedIndex];
 	
 	// if we don't have an image, try using the display image
@@ -1031,6 +1035,10 @@ static NSDictionary *sTitleAttributes = nil;
 		unsigned minIndex = [self photoIndexForPoint:NSMakePoint(minX, minY)];
 		unsigned xRun = [self photoIndexForPoint:NSMakePoint(maxX, minY)] - minIndex + 1;
 		unsigned yRun = [self photoIndexForPoint:NSMakePoint(minX, maxY)] - minIndex + 1;
+
+		xRun = MIN(xRun, [self photoCount]-1);
+		yRun = MIN(yRun, [self photoCount]-1);
+
 		unsigned selectedRows = (yRun / columns);
         
         // Save the current selection (if any), then populate the drag indexes
@@ -1044,8 +1052,11 @@ static NSDictionary *sTitleAttributes = nil;
 			unsigned rowStartIndex = (i * columns) + minIndex;
             unsigned j;
             for (j = rowStartIndex; j < (rowStartIndex + xRun); j++) {
-                if (NSIntersectsRect([self photoRectForIndex:j],selectionRect))
-                    [dragSelectedPhotoIndexes addIndex:j];
+				if (j < [self photoCount])
+				{
+					if (NSIntersectsRect([self photoRectForIndex:j],selectionRect))
+						[dragSelectedPhotoIndexes addIndex:j];
+				}
             }
 		}
         
@@ -1666,6 +1677,7 @@ static NSDictionary *sTitleAttributes = nil;
 	mouseEventLocation = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 
 	unsigned clickedIndex = [self photoIndexForPoint:mouseEventLocation];
+	clickedIndex = MIN(clickedIndex, [self photoCount]-1);
 	NSRect photoRect = [self photoRectForIndex:clickedIndex];
 
 	return(NSPointInRect(mouseEventLocation, photoRect));
@@ -1684,6 +1696,8 @@ static NSDictionary *sTitleAttributes = nil;
 	mouseEventLocation = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 
 	unsigned clickedIndex = [self photoIndexForPoint:mouseEventLocation];
+	clickedIndex = MIN(clickedIndex, [self photoCount]-1);
+
 	NSRect photoRect = [self photoRectForIndex:clickedIndex];
 
 	return NSPointInRect(mouseEventLocation, photoRect);
@@ -1934,6 +1948,7 @@ static NSDictionary *sTitleAttributes = nil;
     return image;
 }
 
+// NOTE: This can return an index out of bounds, if it's clicked on the last row in an empty space.
 - (unsigned)photoIndexForPoint:(NSPoint)point
 {
 	unsigned column = point.x / gridSize.width;
