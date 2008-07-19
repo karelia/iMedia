@@ -44,6 +44,7 @@
 
 #import "iMBMusicView.h"
 
+#import "iMediaConfiguration.h"
 #import "iMBDNDArrayController.h"
 #import "TimeValueTransformer.h"
 #import "iMBLibraryNode.h"
@@ -73,8 +74,16 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 	
 	id timeValueTransformer = [[[TimeValueTransformer alloc] init] autorelease];
 	[NSValueTransformer setValueTransformer:timeValueTransformer forName:@"timeValueTransformer"];
-	
+
 	[pool release];
+}
+
++ (void)initialize
+{
+	if ( self == [iMBMusicView class] ) 
+	{
+        [[iMediaConfiguration sharedConfiguration] registerCustomFolderParser:NSClassFromString(@"iMBMusicFolder") forMediaType:@"music"];
+    }
 }
 
 - (void) dealloc {
@@ -159,11 +168,6 @@ static NSImage *_toolbarIcon = nil;
 - (id)selectionChanged
 {
 	return nil;
-}
-
-- (Class)parserForFolderDrop
-{
-	return NSClassFromString(@"iMBMusicFolder");
 }
 
 - (void)willActivate

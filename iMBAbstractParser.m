@@ -68,51 +68,19 @@
 	if (self = [super init])
 	{
 		myDatabase = [file copy];
-		myFileWatcher = [[UKKQueue alloc] init];
-		[myFileWatcher setDelegate:self];
-		if (file)
-		{
-			[myFileWatcher addPath:myDatabase];
-		}
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[myFileWatcher setDelegate:nil];
-	[myFileWatcher release];
 	[myDatabase release];
-	[myCachedLibraries release];
-	[myBrowser release];
 	[super dealloc];
 }
 
 - (void)finalize
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[myFileWatcher setDelegate:nil];
 	[super finalize];
-}
-
-
-- (NSArray *)librariesReusingCache:(BOOL)reuseCachedData
-{
-	if (!myCachedLibraries || !reuseCachedData)
-	{
-		[myCachedLibraries release];
-		myCachedLibraries = [[self nodesFromParsingDatabase] retain];
-	}
-	return myCachedLibraries;
-}
-
-
-- (void)setBrowser:(id <iMediaBrowser>)aBrowser
-{
-    [aBrowser retain];
-    [myBrowser release];
-    myBrowser = aBrowser;
 }
 
 - (NSString *)databasePath
@@ -120,57 +88,10 @@
 	return myDatabase;
 }
 
-- (void)watchFile:(NSString *)file
-{
-	[myFileWatcher addPath:file];
-}
-
-- (void)stopWatchingFile:(NSString *)file
-{
-	[myFileWatcher removePath:file];
-}
-
 - (NSAttributedString *)name:(NSString *)name withImage:(NSImage *)image
 {
 	return [NSAttributedString attributedStringWithName:name image:image];
 }
-
-#pragma mark -
-#pragma mark UKKQueue Delegate Methods
-
--(void) doReparseLater
-{
-	[NSThread detachNewThreadSelector:@selector(threadedParseDatabase)
-							 toTarget:self
-						   withObject:nil];
-}
-
--(void) watcher:(id<UKFileWatcher>)kq receivedNotification:(NSString*)nm forPath:(NSString*)fpath
-{
-	if ([nm isEqualToString:UKFileWatcherAttributeChangeNotification]) return;	// ignore; seems to happen sometimes
-	
-	/*
-	UKKQueue will often send 3 or 4 notifications per change. There is no point in us reparsing each time
-	so we delay the reparse for a short while so we can ignore all but the last one.
-	*/
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doReparseLater) object:nil];
-	[self performSelector:@selector(doReparseLater) withObject:nil afterDelay:0.2];
-}
-
-- (void)threadedParseDatabase
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	(void) [self librariesReusingCache:NO];
-	
-	// need to notify the browser that our data changed so it can refresh the outline view
-	[(NSObject *)myBrowser performSelectorOnMainThread:@selector(refresh)
-											withObject:nil
-										 waitUntilDone:YES];
-	
-	[pool release];
-}
-
 
 - (iMBLibraryNode *)parseDatabase
 {
@@ -178,6 +99,47 @@
 	return nil;
 }
 
+- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName
+{
+	NSString *folder = databasePath;
+	if ( [[NSFileManager defaultManager] fileExistsAtPath:folder] )
+    {
+        iMBLibraryNode *libraryNode = [[[iMBLibraryNode alloc] init] autorelease];
+        
+        // the name will include 'loading' until it is populated.
+        NSString *loadingString = LocalizedStringInIMedia(@"Loading...", @"Text that shows that we are loading");
+        [libraryNode setName:[name stringByAppendingFormat:@" (%@)", loadingString]];
+        [libraryNode setIconName:iconName];
+        
+        // the node itself will be returned immediately. now launch _another_ thread to populate the node.
+        NSDictionary *populateLibraryNodeArguments = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                      libraryNode,          @"rootLibraryNode",
+                                                      databasePath,         @"databasePath",
+                                                      name,                 @"name",
+                                                      NULL];
+        [NSThread detachNewThreadSelector:@selector(populateLibraryNodeWithArguments:) toTarget:self withObject:populateLibraryNodeArguments];
+        
+        return libraryNode;
+    }
+    else
+    {
+        return nil;
+    }
+}
+
+// NOTE: subclassers SHOULD override this method
+- (void)populateLibraryNode:(iMBLibraryNode *)rootLibraryNode name:(NSString *)name databasePath:(NSString *)databasePath
+{
+}
+
+// NOTE: subclassers should NOT override this method
+- (void)populateLibraryNodeWithArguments:(NSDictionary *)arguments
+{
+    iMBLibraryNode *rootLibraryNode = [arguments objectForKey:@"rootLibraryNode"];
+    NSString *name = [arguments objectForKey:@"name"];
+    NSString *databasePath = [arguments objectForKey:@"databasePath"];
+    [self populateLibraryNode:rootLibraryNode name:name databasePath:databasePath];
+}
 
 // standard implementation for single-item nodes.  Override if we return multiple items.
 
@@ -193,7 +155,5 @@
 		return nil;
 	}
 }
-
-
 
 @end

@@ -47,8 +47,5 @@
 
 
 @interface iMBAperturePhotosParser : iMBAbstractParser 
-{
-	BOOL myHasMultipleLibraries;
-}
 
 @end

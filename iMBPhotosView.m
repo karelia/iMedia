@@ -104,7 +104,9 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 	sMissingImage = [[NSImage alloc] initWithContentsOfFile:path];
 	if (!sMissingImage)
 		NSLog(@"missingImage.png is missing. This can cause bad things to happen");
-	
+
+    [[iMediaConfiguration sharedConfiguration] registerCustomFolderParser:NSClassFromString(@"iMBPicturesFolder") forMediaType:@"photos"];
+
 	[pool release];
 }
 }
@@ -261,11 +263,6 @@ static NSImage *_toolbarIcon = nil;
 {
 	[self unbind:@"images"];
     [super didDeactivate];
-}
-
-- (Class)parserForFolderDrop
-{
-	return NSClassFromString(@"iMBPicturesFolder");
 }
 
 - (void)writeItems:(NSArray *)items fromAlbum:(NSString *)albumName toPasteboard:(NSPasteboard *)pboard

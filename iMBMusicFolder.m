@@ -283,11 +283,11 @@ static NSImage *sDRMIcon = nil;
     return sAudioTypes;
 }
 
-- (void)populateLibraryNode:(iMBLibraryNode *)root
+- (void)populateLibraryNode:(iMBLibraryNode *)root name:(NSString *)name databasePath:(NSString *)databasePath
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSFileManager *mgr = [NSFileManager defaultManager];
-	NSString *folder = [self databasePath];
+	NSString *folder = databasePath;
 	
 	if ( [mgr fileExistsAtPath:folder] )
     {
@@ -304,25 +304,7 @@ static NSImage *sDRMIcon = nil;
 
 - (iMBLibraryNode *)parseDatabase
 {
-	NSString *folder = [self databasePath];
-	if ( [[NSFileManager defaultManager] fileExistsAtPath:folder] )
-    {
-        iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-        
-        // the name will include 'loading' until it is populated.
-        NSString *loadingString = LocalizedStringInIMedia(@"Loading...", @"Text that shows that we are loading");
-        [root setName:[myMusicFolderName stringByAppendingFormat:@" (%@)", loadingString]];
-        [root setIconName:myIconName];
-        
-        // the node itself will be returned immediately. now launch _another_ thread to populate the node.
-        [NSThread detachNewThreadSelector:@selector(populateLibraryNode:) toTarget:self withObject:root];
-        
-        return root;
-    }
-    else
-    {
-        return nil;
-    }
+    return [self parseDatabaseInThread:[self databasePath] name:myMusicFolderName iconName:myIconName];
 }
 
 @end

@@ -76,7 +76,8 @@
 // Access the root nodes
 - (NSArray *)rootNodes;
 
-- (Class)parserForFolderDrop; //must respond to initWithContentsOfFile:
+// determine whether this view supports custom folders
+- (BOOL)hasCustomFolderParser;
 
 // Allows you to specify what you can support being dragged to the playlist outline view.
 // defaultTypes contains any types that lower level objects support
@@ -122,8 +123,7 @@
 
 @protocol iMBParser <NSObject>
 
-- (NSArray *)librariesReusingCache:(BOOL)reuseCachedData;	// return NSArray of iMBLibraryNode
-- (void)setBrowser:(id <iMediaBrowser>)browser;
+- (NSArray *)nodesFromParsingDatabase;	// return NSArray of iMBLibraryNode
 
 @end
 

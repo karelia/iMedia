@@ -74,17 +74,6 @@
 {
 	if (self = [super initWithContentsOfFile:nil])
 	{
-		CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",
-															(CFStringRef)@"com.apple.iApps");
-		
-		NSArray *libraries = (NSArray *)iApps;
-		NSEnumerator *e = [libraries objectEnumerator];
-		NSString *cur;
-		
-		while (cur = [e nextObject]) {
-			[self watchFile:[cur pathForURLString]];
-		}
-		[libraries autorelease];
 	}
 	return self;
 }

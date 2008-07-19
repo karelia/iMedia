@@ -51,9 +51,6 @@
 @interface iMBAbstractParser : NSObject <iMBParser>
 {
 	NSString			*myDatabase;
-	UKKQueue			*myFileWatcher;
-	NSArray				*myCachedLibraries;	// array of iMBLibraryNode
-	id <iMediaBrowser>	myBrowser;
 }
 
 // default initializer from the protocol
@@ -63,19 +60,24 @@
 // subclasses call this super method if they want auto watching of the db file.
 - (id)initWithContentsOfFile:(NSString *)file;
 
-//- (id <iMediaBrowser>)browser;
-- (void)setBrowser:(id <iMediaBrowser>)browser;
 - (NSString *)databasePath;
 
-// subclasses generally implement this.  Return nil if no items to avoid showing up
+// subclasses generally implement this.  Return nil if no items to avoid showing up.
+// this method should not have "side effects" on instance variables. it should be a pure method
+// to return the list of iMBLibraryNodes representing the data in the database. this
+// ensures that it is threadable.
 - (iMBLibraryNode *)parseDatabase;
 
-// subclasses MAY implement this
-- (NSArray *)nodesFromParsingDatabase;  // Return nil if no items to avoid showing up
+// subclassers can optional implement populateLibraryNode: and invoke parseDatabaseInThread:name:iconName:
+// directly from parseDatabase to implement threaded parsing. populateLibraryNode:name:databasePath must be threadsafe
+// and will be invoked on a thread so it needs its own autorelease pool.
+- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName;
+- (void)populateLibraryNode:(iMBLibraryNode *)rootLibraryNode name:(NSString *)name databasePath:(NSString *)databasePath;
 
-// extended support for subclasses that watch multiple databases
-- (void)watchFile:(NSString *)file;
-- (void)stopWatchingFile:(NSString *)file;
+// subclasses MAY implement this. this method should not have "side effects" on the class.
+// it should be a pure method to return the list of iMBLibraryNode's representing the data
+// in the database. this ensures that it is threadable.
+- (NSArray *)nodesFromParsingDatabase;  // Return nil if no items to avoid showing up
 
 // helper method to generate an attributed string with icon and name
 - (NSAttributedString *)name:(NSString *)name withImage:(NSImage *)image;

@@ -57,7 +57,6 @@
 	int					myPrioritySortOrder;
 	NSString			*myIconName;
 	NSMutableDictionary *myAttributeFilterMap;
-	id					myParser;	// not retained
 	
 	NSMutableAttributedString *myCachedNameWithImage;
 }
@@ -75,9 +74,6 @@
 - (int)prioritySortOrder; // The higher the better
 - (void)setPrioritySortOrder:(int)value;
 
-- (void)setParser:(id)parser;
-- (id)parser;
-
 - (void)setAttribute:(id)attrib forKey:(NSString *)key;
 - (id)attributeForKey:(NSString *)key;
 - (void)setAttributes:(NSDictionary *)attributes;
@@ -93,6 +89,11 @@
 // search attributes (uses recursiveAttributesForKey:)
 - (NSArray *)searchAttribute:(NSString *)key withKeys:(NSArray *)keys matching:(id)value;
 
+// Thread support. Call these to modify this node from a thread. They will package up the arguments and call
+// from the main thread.
+- (void)fromThreadSetAttribute:(id)attrib forKey:(NSString *)key;
+- (void)fromThreadSetFilterDuplicateKey:(NSString *)filterKey forAttributeKey:(NSString *)attributeKey;
+- (void)fromThreadAddItem:(iMBLibraryNode *)item;
 
 // Tree support
 - (void)addItem:(iMBLibraryNode *)item;

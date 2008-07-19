@@ -55,11 +55,11 @@
 
 @interface iMBLightroomPhotosParser (Private)
 
-+ (iMBLibraryNode*)parseOneDatabaseWithPath:(NSString*)path;
-+ (iMBLibraryNode*)parseAllImagesForRoot:(iMBLibraryNode*)root;
-+ (iMBLibraryNode*)parseCollectionsForRoot:(iMBLibraryNode*)root;
+- (iMBLibraryNode *)parseOneDatabaseWithPath:(NSString*)path intoLibraryNode:(iMBLibraryNode *)root;
+- (iMBLibraryNode *)parseAllImagesForRoot:(iMBLibraryNode*)root;
+- (iMBLibraryNode *)parseCollectionsForRoot:(iMBLibraryNode*)root;
 
-+ (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)aid withRoot:(iMBLibraryNode*)root;
+- (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)aid withRoot:(iMBLibraryNode*)root;
 
 + (NSArray*)libraryPaths;
 
@@ -85,12 +85,6 @@
 {
 	if (self = [super initWithContentsOfFile:nil])
 	{
-		NSEnumerator *enumerator = [[iMBLightroomPhotosParser libraryPaths] objectEnumerator];
-		NSString *currentPath;
-		
-		while ((currentPath = [enumerator nextObject]) != nil) {
-			[self watchFile:currentPath];
-		}
 	}
 	
 	return self;
@@ -99,73 +93,54 @@
 #pragma mark -
 #pragma mark instance methods
 
-- (iMBLibraryNode*)parseDatabase
+- (void)populateLibraryNode:(iMBLibraryNode *)rootLibraryNode name:(NSString *)name databasePath:(NSString *)databasePath
 {
-	iMBLibraryNode* libraryNode = nil;
-	
-	NSMutableArray *libraryNodes = [NSMutableArray array];
-	NSEnumerator *enumerator = [[iMBLightroomPhotosParser libraryPaths] objectEnumerator];
-	NSString *currentPath;
-	
-	while ((currentPath = [enumerator nextObject]) != nil) {
-        iMBLibraryNode *library = [iMBLightroomPhotosParser parseOneDatabaseWithPath:currentPath];
-		
-		if (library) {
-			[libraryNodes addObject:library];
-		}
-	}
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
-	int lCount = [libraryNodes count];
-	
-	if (lCount == 1) {
-		iMBLibraryNode *library = [libraryNodes objectAtIndex:0];
-		
-		[library setName:LocalizedStringInIMedia(@"Lightroom", @"Lightroom")];
-		[library setIconName:@"com.adobe.Lightroom:"];
-		
-		libraryNode = library;
-	}
-	else {
-		iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-		
-		[root setName:LocalizedStringInIMedia(@"Lightroom", @"Lightroom")];
-		[root setIconName:@"com.adobe.Lightroom:"];
-		
-		int l;
-		for (l = 0; l < lCount; l++) {
-			iMBLibraryNode *library = [libraryNodes objectAtIndex:l];
-			
-			[root addItem:library];
-		}
-		
-		libraryNode = root;
-	}
-	
-	[libraryNode setPrioritySortOrder:1];
+    [self parseOneDatabaseWithPath:databasePath intoLibraryNode:rootLibraryNode];
 
-    return [[libraryNode allItems] count] ? libraryNode : nil;
+    // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
+	[rootLibraryNode performSelectorOnMainThread:@selector(setName:) withObject:name waitUntilDone:NO];
+
+    [pool release];
+}
+
+- (NSArray *)nodesFromParsingDatabase
+{
+    NSMutableArray *libraryNodes = [NSMutableArray array];
+    NSArray *libraryPaths = [iMBLightroomPhotosParser libraryPaths];
+	NSEnumerator *enumerator = [libraryPaths objectEnumerator];
+	NSString *currentPath;
+	while ((currentPath = [enumerator nextObject]) != nil)
+    {
+		NSString *name = LocalizedStringInIMedia(@"Lightroom", @"Lightroom");
+        NSString *iconName = @"com.adobe.Lightroom:";
+        iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath name:name iconName:iconName];
+        if (libraryNode != NULL)
+        {
+			[libraryNode setPrioritySortOrder:1];
+            [libraryNodes addObject:libraryNode];
+        }
+    }
+    return libraryNodes;
 }
 
 @end
 
 @implementation iMBLightroomPhotosParser (Private)
 
-+ (iMBLibraryNode*)parseOneDatabaseWithPath:(NSString*)path
+- (iMBLibraryNode *)parseOneDatabaseWithPath:(NSString*)path intoLibraryNode:(iMBLibraryNode *)root
 {
 	BOOL isReadable = [[NSFileManager defaultManager] isReadableFileAtPath:path];
 	
 	if (isReadable) {
-		iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-		
-		[root setName:[[path lastPathComponent] stringByDeletingPathExtension]];
-		[root setIconName:@"com.adobe.Lightroom"];
-		[root setAttribute:[NSNumber numberWithLong:0] forKey:@"idLocal"];
-		[root setAttribute:path forKey:@"path"];
-		[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
+		[root fromThreadSetAttribute:[NSNumber numberWithLong:0] forKey:@"idLocal"];
+		[root fromThreadSetAttribute:path forKey:@"path"];
+		[root fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 		
 		@try {
-			[iMBLightroomPhotosParser parseAllImagesForRoot:root];
-			[iMBLightroomPhotosParser parseCollectionsForRoot:root];
+			[self parseAllImagesForRoot:root];
+			[self parseCollectionsForRoot:root];
 		}
 		@catch (NSException *exception) {
 			NSLog(@"Failed to parse %@: %@", path, exception);
@@ -177,7 +152,7 @@
 	return nil;
 }
 
-+ (iMBLibraryNode*)parseCollectionsForRoot:(iMBLibraryNode*)root
+- (iMBLibraryNode*)parseCollectionsForRoot:(iMBLibraryNode*)root
 {
 	NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
 	NSString *path = [root attributeForKey:@"path"];
@@ -208,7 +183,7 @@
 				}
 			}
 			
-			iMBLibraryNode *currentNode = [iMBLightroomPhotosParser nodeWithLocalID:idLocal withRoot:root];
+			iMBLibraryNode *currentNode = [self nodeWithLocalID:idLocal withRoot:root];
 			
 			if (currentNode == nil) {
 				currentNode = [[[iMBLibraryNode alloc] init] autorelease];
@@ -223,9 +198,9 @@
 			[currentNode setIconName:@"folder"];
 			[currentNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 			
-			iMBLibraryNode *parentNode = [iMBLightroomPhotosParser nodeWithLocalID:idParentLocal withRoot:root];
+			iMBLibraryNode *parentNode = [self nodeWithLocalID:idParentLocal withRoot:root];
 			
-			[parentNode addItem:currentNode];
+			[parentNode fromThreadAddItem:currentNode];
 			
 			NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
 			FMDatabase *localDatabase = [FMDatabase databaseWithPath:path];
@@ -302,7 +277,7 @@
 	return root;
 }
 
-+ (iMBLibraryNode*)parseAllImagesForRoot:(iMBLibraryNode*)root
+- (iMBLibraryNode*)parseAllImagesForRoot:(iMBLibraryNode*)root
 {		
 	iMBLibraryNode *imagesNode = [[[iMBLibraryNode alloc] init] autorelease];	
 	
@@ -311,7 +286,7 @@
 	[imagesNode setIconName:@"folder"];
 	[imagesNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	
-	[root addItem:imagesNode];
+	[root fromThreadAddItem:imagesNode];
 	
 	NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
 	NSString *path = [root attributeForKey:@"path"];
@@ -379,7 +354,7 @@
 	return root;
 }
 
-+ (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)aid withRoot:(iMBLibraryNode*)root
+- (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)aid withRoot:(iMBLibraryNode*)root
 {
 	if ([[root attributeForKey:@"idLocal"] longValue] == [aid longValue])
 	{
@@ -391,7 +366,7 @@
 	
 	while (cur = [e nextObject])
 	{
-		found = [iMBLightroomPhotosParser nodeWithLocalID:[[aid retain] autorelease] withRoot:cur];
+		found = [self nodeWithLocalID:[[aid retain] autorelease] withRoot:cur];
 		if (found)
 		{
 			return found;

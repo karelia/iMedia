@@ -45,8 +45,6 @@
 
 #import "iMBDesktopPicturesParser.h"
 #import "iMediaConfiguration.h"
-#import "iMBPicturesFolder.h"
-#import "iMBLibraryNode.h"
 
 @implementation iMBDesktopPicturesParser
 
@@ -61,26 +59,14 @@
 
 - (id)init
 {
-	if (self = [super initWithContentsOfFile:@"/Library/Desktop Pictures/"])
+    NSString *name = LocalizedStringInIMedia(@"Desktop Pictures", @"folder name");
+    NSString *iconName = @"folder";
+    NSString *folderPath = @"/Library/Desktop Pictures/";
+    self = [super initWithName:name iconName:iconName folderPath:folderPath];
+	if (self != NULL)
 	{
-		;
 	}
 	return self;
-}
-
-- (iMBLibraryNode *)parseDatabase
-{
-	NSFileManager *fm = [NSFileManager defaultManager];
-	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
-	
-	iMBPicturesFolder *parser = [[[iMBPicturesFolder alloc] initWithContentsOfFile:[self databasePath]] autorelease];	
-	iMBLibraryNode *db = [parser parseDatabase];
-	if (db)
-	{
-		[db setName:LocalizedStringInIMedia(@"Desktop Pictures", @"folder name")];
-		[db setIconName:@"folder"];
-	}	
-	return db;
 }
 
 @end

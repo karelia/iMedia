@@ -42,12 +42,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 #import "iMBFavouritePicturesParser.h"
-#import "iMBPicturesFolder.h"
-#import "iMBLibraryNode.h"
 #import "iMediaConfiguration.h"
-#import "NSFileManager+iMedia.h"
+#import "iMBLibraryNode.h"
 
 @implementation iMBFavouritePicturesParser
 
@@ -62,17 +59,14 @@
 
 - (id)init
 {
-	if (self = [super initWithContentsOfFile:nil])
+    NSString *name = LocalizedStringInIMedia(@"Favorites", @"Favourite folder name");
+    NSString *iconName = @"heart";
+    NSString *folderPath = NULL;
+    self = [super initWithName:name iconName:iconName folderPath:folderPath];
+	if (self != NULL)
 	{
-		myParsers = [[NSMutableArray array] retain];
 	}
 	return self;
-}
-
-- (void)dealloc
-{
-	[myParsers release];
-	[super dealloc];
 }
 
 - (iMBLibraryNode *)parseDatabase
@@ -80,34 +74,24 @@
 	NSArray *paths = [[NSUserDefaults standardUserDefaults] arrayForKey:@"iMBFavouritePictures"];
 	if ([paths count] == 0) return nil;
 	
-	iMBLibraryNode *favs = [[iMBLibraryNode alloc] init];
-	[favs setName:LocalizedStringInIMedia(@"Favorites", @"Favourite folder name")];
-	[favs setIconName:@"heart"];
+	iMBLibraryNode *rootLibraryNode = [[[iMBLibraryNode alloc] init] autorelease];
+	[rootLibraryNode setName:LocalizedStringInIMedia(@"Favorites", @"Favourite folder name")];
+	[rootLibraryNode setIconName:@"heart"];
+
+    NSEnumerator *pathsEnumerator = [paths objectEnumerator];
+	NSString *currentPath;
 	
-	NSFileManager *fm = [NSFileManager defaultManager];
-	iMBPicturesFolder *parser;
-	iMBLibraryNode *node;
-	BOOL isDir;
-	NSEnumerator *e = [paths objectEnumerator];
-	NSString *cur;
-	
-	while (cur = [e nextObject])
-	{
-		if ([fm fileExistsAtPath:cur isDirectory:&isDir] && ![fm isPathHidden:cur])
-		{
-			parser = [[iMBPicturesFolder alloc] initWithContentsOfFile:cur];
-			node = [parser parseDatabase];
-			if (node)
-			{
-				[node setName:[cur lastPathComponent]];
-				[node setIconName:@"folder"];
-				[favs addItem:node];
-				[myParsers addObject:parser];
-			}
-			[parser release];
-		}
-	}
-	return [favs autorelease];
+	while (currentPath = [pathsEnumerator nextObject])
+    {
+        NSString *name = [currentPath lastPathComponent];
+        iMBLibraryNode *node = [self parseDatabaseInThread:currentPath name:name iconName:@"folder"];
+        if (node != NULL)
+        {
+            [rootLibraryNode addItem:node];
+        }
+    }
+    
+    return rootLibraryNode;
 }
 
 @end

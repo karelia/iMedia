@@ -77,9 +77,6 @@ extern NSString *iMBNativeDataArray;
 
 @private    
     
-    NSMutableDictionary             *loadedParsers;
-	NSMutableArray					*userDroppedParsers;
-    
     BOOL inSplitViewResize;
     BOOL isLoading;
     BOOL didLoad;

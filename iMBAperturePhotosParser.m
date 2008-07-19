@@ -79,16 +79,6 @@
 {
 	if (self = [super initWithContentsOfFile:nil])
 	{
-		CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",
-															(CFStringRef)@"com.apple.iApps");
-		
-		NSArray *libraries = [(NSArray *)iApps autorelease];
-		NSEnumerator *e = [libraries objectEnumerator];
-		NSString *cur;
-		
-		while (cur = [e nextObject]) {
-			[self watchFile:[cur pathForURLString]];
-		}
 	}
 	return self;
 }
@@ -160,22 +150,11 @@
 }
 
 
-- (iMBLibraryNode *)parseOneDatabaseWithContentsOfURL:(NSURL *)url
+- (void)parseOneDatabaseWithPath:(NSString *)databasePath intoLibraryNode:(iMBLibraryNode *)root
 {
-	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
-	if (myHasMultipleLibraries)
-	{
-		NSLog(@"%@", url);
-		[root setName:[NSString stringWithFormat:@"%@ (%@)", LocalizedStringInIMedia(@"Aperture", @"Aperture"), [[[[url path] stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension]]];
-	}
-	else
-	{
-		[root setName:LocalizedStringInIMedia(@"Aperture", @"Aperture")];
-	}
-	[root setIconName:@"com.apple.Aperture:"];
-	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
+	[root fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	
-    NSDictionary *library = [NSDictionary dictionaryWithContentsOfURL:url];
+    NSDictionary *library = [NSDictionary dictionaryWithContentsOfFile:databasePath];
 	
 	NSDictionary *imageRecords = [library objectForKey:@"Master Image List"];
 	
@@ -213,7 +192,7 @@
 			aid = [NSNumber numberWithInt:fakeAlbumID];
 			fakeAlbumID++;
 		}
-		[lib setAttribute:aid forKey:@"AlbumId"];
+		[lib fromThreadSetAttribute:aid forKey:@"AlbumId"];
 		
 		NSMutableArray *newPhotolist = [NSMutableArray array];
 		NSEnumerator *pictureItemsEnum = [[albumRec objectForKey:@"KeyList"] objectEnumerator];
@@ -268,7 +247,7 @@
 				}
 			#endif
 		}
-		[lib setAttribute:newPhotolist forKey:@"Images"];
+		[lib fromThreadSetAttribute:newPhotolist forKey:@"Images"];
 		if ([albumRec objectForKey:@"Parent"])
 		{
 			NSNumber* parentId = [albumRec objectForKey:@"Parent"];
@@ -282,42 +261,53 @@
 			#endif
 			if (!parent)
 				NSLog(@"Failed to find parent node");
-			[parent addItem:lib];
+			[parent fromThreadAddItem:lib];
 		}
 		else
 		{
-			[root addItem:lib];
+			[root fromThreadAddItem:lib];
 		}
 	}
-	
-	return [albums count] ? root : nil;
 }
 
-// Note: we do NOT implement parseDatabase; we implement this to return multiple top level nodes
+- (void)populateLibraryNode:(iMBLibraryNode *)rootLibraryNode name:(NSString *)name databasePath:(NSString *)databasePath
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    [self parseOneDatabaseWithPath:databasePath intoLibraryNode:rootLibraryNode];
+    
+    // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
+	[rootLibraryNode performSelectorOnMainThread:@selector(setName:) withObject:name waitUntilDone:NO];
+    
+    [pool release];
+}
+
 - (NSArray *)nodesFromParsingDatabase
 {
-	NSMutableArray *libraryNodes = [NSMutableArray array];
-	
+    NSMutableArray *libraryNodes = [NSMutableArray array];
 	//	Find all Aperture libraries
 	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",
 														(CFStringRef)@"com.apple.iApps");
-	
-	//	Iterate over libraries, pulling dictionary from contents and adding to array for processing;
-	NSArray *libraries = [((NSArray *)iApps) autorelease];
-	myHasMultipleLibraries = [libraries count] > 1;
-	NSEnumerator *e = [libraries objectEnumerator];
-	NSString *cur;
-	
-	while (cur = [e nextObject]) {
-        iMBLibraryNode *library = [self parseOneDatabaseWithContentsOfURL:[NSURL URLWithString:cur]];
-		if (library) {
-			[library setPrioritySortOrder:1];
-
-			[libraryNodes addObject:library];
-		}
-	}
-    
-    return [libraryNodes count] ? libraryNodes : nil;
+	NSArray *libraryURLs = [((NSArray *)iApps) autorelease];
+	NSEnumerator *enumerator = [libraryURLs objectEnumerator];
+	NSString *currentURLString;
+	while ((currentURLString = [enumerator nextObject]) != nil)
+    {
+        NSURL *currentURL = [NSURL URLWithString:currentURLString];
+        if ( [currentURL isFileURL] )
+        {
+            NSString *currentPath = [currentURL path];
+            NSString *name = [NSString stringWithFormat:@"%@ (%@)", LocalizedStringInIMedia(@"Aperture", @"Aperture"), [[[currentPath stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension]];
+            NSString *iconName = @"com.apple.Aperture:";
+            iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath name:name iconName:iconName];
+            if (libraryNode != NULL)
+            {
+                [libraryNode setPrioritySortOrder:1];
+                [libraryNodes addObject:libraryNode];
+            }
+        }
+    }
+    return libraryNodes;
 }
 
 @end
