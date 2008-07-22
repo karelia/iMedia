@@ -138,4 +138,32 @@
 	}
 }
 
+#ifdef DEBUG
+
+- (NSString *)verboseDescription
+{
+	NSMutableString *buf = [NSMutableString string];
+	NSEnumerator *enumerator = [[self types] objectEnumerator];
+	NSString *type;
+
+	while ((type = [enumerator nextObject]) != nil)
+	{
+		if ([type hasPrefix:@"dyn."]) continue;
+		
+		NSData *data = [self dataForType:type];
+		NSString *asciiString = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+		if (nil == asciiString)
+		{
+			[buf appendFormat: @"%@: %@\n\n", type, [data description]];
+		}
+		else
+		{
+			[buf appendFormat:@"%@: \"%@\"\n\n", type, asciiString];
+		}
+	}
+	return buf;	
+}
+
+#endif
+
 @end
