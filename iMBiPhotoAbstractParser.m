@@ -293,7 +293,7 @@
 				iMBLibraryNode *parent = [self nodeWithAlbumID:[albumRec objectForKey:@"Parent"]
 													  withRoot:root];
 				if (!parent)
-					NSLog(@"Failed to find parent node");
+					NSLog(@"iMBiPhotoAbstractParser (parseAlbums) failed to find parent node");
 				[parent addItem:lib];
 			}
 			else
@@ -400,7 +400,7 @@
 				iMBLibraryNode *parent = [self nodeWithAlbumID:[rollRec objectForKey:@"Parent"]
 													  withRoot:root];
 				if (!parent)
-					NSLog(@"Failed to find parent node");
+					NSLog(@"iMBiPhotoAbstractParser (parseRolls) failed to find parent node");
 				[parent addItem:lib];
 			}
 			else

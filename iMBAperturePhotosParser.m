@@ -260,7 +260,7 @@
 				parent = [self nodeWithAlbumID:parentId withRoot:root];
 			#endif
 			if (!parent)
-				NSLog(@"Failed to find parent node");
+				NSLog(@"iMBAperturePhotosParser failed to find parent node");
 			[parent fromThreadAddItem:lib];
 		}
 		else
