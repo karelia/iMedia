@@ -55,4 +55,6 @@
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
 + (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
 
++ (NSImage *)genericFolderIcon;
+
 @end

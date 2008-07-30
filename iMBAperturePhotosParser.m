@@ -179,8 +179,12 @@
 		
 		iMBLibraryNode *lib = [[[iMBLibraryNode alloc] init] autorelease];
 		[lib setName:[albumRec objectForKey:@"AlbumName"]];
-		[lib setIcon:[self iconForType:[albumRec objectForKey:@"Album Type"]]];
-		
+//		[lib setIcon:[self iconForType:[albumRec objectForKey:@"Album Type"]]];
+		NSImage* icon = [self iconForType:[albumRec objectForKey:@"Album Type"]];
+		[icon setScalesWhenResized:YES];
+		[icon setSize:NSMakeSize(36.0,36.0)];
+		[lib setIcon:icon];
+
 		NSNumber *aid = [albumRec objectForKey:@"AlbumId"];
 		#ifndef SHOW_TOP_LEVEL_APERTURE_KNOT
 			if ([aid longValue] == 1) continue;
@@ -289,6 +293,7 @@
 	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",
 														(CFStringRef)@"com.apple.iApps");
 	NSArray *libraryURLs = [((NSArray *)iApps) autorelease];
+	unsigned int n = [libraryURLs count];
 	NSEnumerator *enumerator = [libraryURLs objectEnumerator];
 	NSString *currentURLString;
 	while ((currentURLString = [enumerator nextObject]) != nil)
@@ -297,8 +302,9 @@
         if ( [currentURL isFileURL] )
         {
             NSString *currentPath = [currentURL path];
-            NSString *name = [NSString stringWithFormat:@"%@ (%@)", LocalizedStringInIMedia(@"Aperture", @"Aperture"), [[[currentPath stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension]];
-            NSString *iconName = @"com.apple.Aperture:";
+			NSString *name = LocalizedStringInIMedia(@"Aperture", @"Aperture");
+            if (n>1) name = [NSString stringWithFormat:@"%@ (%@)", LocalizedStringInIMedia(@"Aperture", @"Aperture"), [[[currentPath stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension]];
+			NSString *iconName = @"com.apple.Aperture:";
             iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath name:name iconName:iconName];
             if (libraryNode != NULL)
             {

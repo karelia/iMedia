@@ -48,6 +48,7 @@
 #import "iMBLibraryNode.h"
 #import <WebKit/WebKit.h>
 #import "WebIconDatabase.h"
+#import "NSImage+iMedia.h"
 
 @implementation iMBSafariBookmarkParser
 
@@ -115,7 +116,7 @@
 	else if (nil != [item objectForKey:@"Title"])
 	{
 		[parsed setName:[item objectForKey:@"Title"]];
-		[parsed setIconName:@"folder"];
+		[parsed setIcon:[NSImage genericFolderIcon]];
 	}
 	
 	NSMutableArray *links = [NSMutableArray array];

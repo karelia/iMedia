@@ -47,13 +47,14 @@
 #import "iMBLibraryNode.h"
 #import "WebIconDatabase.h"
 #import "NSAttributedString+iMedia.h"
+#import "NSImage+iMedia.h"
 
 @implementation iMBXBELParser
 
 - (iMBLibraryNode *)recursivelyParseFolder:(NSXMLElement *)folder
 {
 	iMBLibraryNode *node = [[iMBLibraryNode alloc] init];
-	[node setIconName:@"folder"];
+	[node setIcon:[NSImage genericFolderIcon]];
 	[node setName:[[[folder elementsForName:@"title"] objectAtIndex:0] stringValue]];
 	NSEnumerator *e = [[folder elementsForName:@"folder"] objectEnumerator];
 	NSXMLElement *cur;

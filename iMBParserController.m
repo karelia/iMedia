@@ -10,6 +10,7 @@
 #import "iMediaConfiguration.h"
 #import "iMediaBrowserProtocol.h"
 #import "iMBLibraryNode.h"
+#import "NSWorkspace+iMedia.h"
 
 @implementation iMBParserController
 
@@ -222,8 +223,8 @@
         
         while (libraryNode = [enumerator nextObject])
         {
-            [libraryNode setName:[folderPath lastPathComponent]];
-            [libraryNode setIconName:@"folder"];
+            [libraryNode setName:[[NSFileManager defaultManager] displayNameAtPath:folderPath]];
+			[libraryNode setIcon:[[NSWorkspace sharedWorkspace] iconForFile:folderPath size:NSMakeSize(16,16)]];
             // NOTE: It is not legal to add items on a thread; so we do it on the main thread.
             // [self doAddLibraryNodes:[NSArray arrayWithObject:libraryNode]];
             [self performSelectorOnMainThread:@selector(doAddLibraryNodes:) withObject:[NSArray arrayWithObject:libraryNode] waitUntilDone:YES];

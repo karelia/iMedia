@@ -72,6 +72,8 @@
 // directly from parseDatabase to implement threaded parsing. populateLibraryNode:name:databasePath must be threadsafe
 // and will be invoked on a thread so it needs its own autorelease pool.
 - (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName;
+- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name icon:(NSImage*)icon;
+
 - (void)populateLibraryNode:(iMBLibraryNode *)rootLibraryNode name:(NSString *)name databasePath:(NSString *)databasePath;
 
 // subclasses MAY implement this. this method should not have "side effects" on the class.

@@ -47,6 +47,8 @@
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "NSFileManager+iMedia.h"
+#import "NSWorkspace+iMedia.h"
+#import "NSImage+iMedia.h"
 
 #import <QTKit/QTKit.h>
 
@@ -62,11 +64,8 @@ static NSImage *sDRMIcon = nil;
 		// Only do some work when not called because one of our subclasses does not implement +initialize
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		
-		NSBundle *bndl = [NSBundle bundleForClass:[self class]];
-		NSString *iconPath = [bndl pathForResource:@"MBiTunes4Song" ofType:@"png"];
-		sSongIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
-		iconPath = [bndl pathForResource:@"iTunesDRM" ofType:@"png"];
-		sDRMIcon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+		sSongIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:@"mp3"] retain];
+		sDRMIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:@"m4p"] retain];
 		
 		[pool release];
 	}
@@ -147,7 +146,7 @@ static NSImage *sDRMIcon = nil;
 			if (isDirectory)
 			{
 				iMBLibraryNode *folder = [[[iMBLibraryNode alloc] init] autorelease];
-				[folder setIconName:@"folder"];
+				[folder setIcon:[NSImage genericFolderIcon]];
 				[folder setName:[fileManager displayNameAtPath:filePath]];
 				[self recursivelyParse:filePath withNode:folder movieTypes:movieTypes];
 
@@ -304,7 +303,8 @@ static NSImage *sDRMIcon = nil;
 
 - (iMBLibraryNode *)parseDatabase
 {
-    return [self parseDatabaseInThread:[self databasePath] name:myMusicFolderName iconName:myIconName];
+	NSImage* icon = [[NSWorkspace sharedWorkspace] iconForFile:[self databasePath] size:NSMakeSize(16,16)];
+    return [self parseDatabaseInThread:[self databasePath] name:myMusicFolderName icon:icon];
 }
 
 @end

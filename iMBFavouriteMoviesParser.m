@@ -48,6 +48,7 @@
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
 #import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
 
 @implementation iMBFavouriteMoviesParser
 
@@ -100,7 +101,7 @@
 			if (node)
 			{
 				[node setName:[cur lastPathComponent]];
-				[node setIconName:@"folder"];
+				[node setIcon:[NSImage genericFolderIcon]];
 				[favs addItem:node];
 				[myParsers addObject:parser];
 			}

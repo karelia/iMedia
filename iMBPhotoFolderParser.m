@@ -48,8 +48,20 @@
 #import "iMBLibraryNode.h"
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSWorkspace+iMedia.h"
+#import "NSImage+iMedia.h"
 
 @implementation iMBPhotoFolderParser
+
+- (id)initWithContentsOfFile:(NSString *)file
+{
+	if (self = [super initWithContentsOfFile:file])
+	{
+        myName = [[[NSFileManager defaultManager] displayNameAtPath:file] copy];
+        myIconName = nil;
+	}
+	return self;
+}
 
 - (id)initWithName:(NSString *)name iconName:(NSString *)iconName folderPath:(NSString *)folderPath
 {
@@ -59,6 +71,13 @@
         myIconName = [iconName copy];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[myName release];
+	[myIconName release];
+	[super dealloc];
 }
 
 - (BOOL)shouldIncludeFile:(NSString *)filename
@@ -90,7 +109,7 @@
 			{
 				iMBLibraryNode *folder = [[[iMBLibraryNode alloc] init] autorelease];
 				[root addItem:folder];
-				[folder setIconName:myIconName];
+				[folder setIcon:[NSImage genericFolderIcon]];
 				[folder setName:[fileManager displayNameAtPath:filePath]];
 				[self recursivelyParse:filePath withNode:folder];
 			}
@@ -118,6 +137,8 @@
 			}
 		}
 	}
+	
+	[root setIcon:[workspace iconForFile:folderPath size:NSMakeSize(16,16)]];
 	[root setAttribute:images forKey:@"Images"];
 }
 

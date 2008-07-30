@@ -48,6 +48,7 @@
 #import "iMBLibraryNode.h"
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
 @implementation iMBPicturesFolder
 

@@ -47,6 +47,7 @@
 #import "iMBLibraryNode.h"
 
 #import "CIImage+iMedia.h"
+#import "NSImage+iMedia.h"
 
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
@@ -195,7 +196,7 @@
 			[currentNode setAttribute:kind forKey:@"kind"];
 			
 			[currentNode setName:name];
-			[currentNode setIconName:@"folder"];
+			[currentNode setIcon:[NSImage genericFolderIcon]];
 			[currentNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 			
 			iMBLibraryNode *parentNode = [self nodeWithLocalID:idParentLocal withRoot:root];
@@ -283,7 +284,7 @@
 	
 	[imagesNode setAttribute:[NSNumber numberWithInt:-1] forKey:@"idLocal"];
 	[imagesNode setName:LocalizedStringInIMedia(@"Images", @"Images")];
-	[imagesNode setIconName:@"folder"];
+	[imagesNode setIcon:[NSImage genericFolderIcon]];
 	[imagesNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	
 	[root fromThreadAddItem:imagesNode];

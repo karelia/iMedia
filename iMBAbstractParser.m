@@ -99,7 +99,7 @@
 	return nil;
 }
 
-- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName
+- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName icon:(NSImage*)icon
 {
 	NSString *folder = databasePath;
 	if ( [[NSFileManager defaultManager] fileExistsAtPath:folder] )
@@ -110,6 +110,7 @@
         NSString *loadingString = LocalizedStringInIMedia(@"Loading...", @"Text that shows that we are loading");
         [libraryNode setName:[name stringByAppendingFormat:@" (%@)", loadingString]];
         [libraryNode setIconName:iconName];
+        [libraryNode setIcon:icon];
         
         // the node itself will be returned immediately. now launch _another_ thread to populate the node.
         NSDictionary *populateLibraryNodeArguments = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -125,6 +126,16 @@
     {
         return nil;
     }
+}
+
+- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName
+{
+	return [self parseDatabaseInThread:databasePath name:name iconName:iconName icon:nil];
+}
+
+- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name icon:(NSImage*)icon
+{
+	return [self parseDatabaseInThread:databasePath name:name iconName:nil icon:icon];
 }
 
 // NOTE: subclassers SHOULD override this method

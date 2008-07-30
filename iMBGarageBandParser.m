@@ -47,7 +47,7 @@
 #import "iMBLibraryNode.h"
 #import "iMediaConfiguration.h"
 #import "QTMovie+iMedia.h"
-#import "NSWorkspace+iMedia.h"
+#import "NSImage+iMedia.h"
 #import "NSFileManager+iMedia.h"
 
 #import <QTKit/QTKit.h>
@@ -150,7 +150,7 @@
 					iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 					[root addItem:folder];
 					[folder release];
-					[folder setIconName:@"folder"];
+					[folder setIcon:[NSImage genericFolderIcon]];
 					[folder setName:[fm displayNameAtPath:filePath]];
 					[self recursivelyParse:filePath withNode:folder artist:artist];
 				}
@@ -164,23 +164,15 @@
 {
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 	[root setName:LocalizedStringInIMedia(@"GarageBand", @"Name of Node")];
-	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.garageband"];
-	if (icon)
-	{
-		[root setIcon:icon];
-	}
-	else
-	{
-		[root setIconName:@"folder"];
-	}
-	
+	[root setIconName:@"com.apple.garageband"];
+
 	// Do the demo songs
 	NSString *demoPath = @"/Library/Application Support/GarageBand/GarageBand Demo Songs/GarageBand Demo Songs/";
 	if ([[NSFileManager defaultManager] fileExistsAtPath:demoPath])
 	{
 		iMBLibraryNode *demo = [[iMBLibraryNode alloc] init];
 		[demo setName:LocalizedStringInIMedia(@"GarageBand Demo Songs", @"Node name")];
-		[demo setIconName:@"folder"];
+		[demo setIcon:[NSImage genericFolderIcon]];
 		
 		[self recursivelyParse:demoPath withNode:demo artist:LocalizedStringInIMedia(@"Demo", @"artist name")];
 		[root addItem:demo];
@@ -189,7 +181,7 @@
 	
 	iMBLibraryNode *myCompositions = [[[iMBLibraryNode alloc] init] autorelease];
 	[myCompositions setName:LocalizedStringInIMedia(@"My Compositions", @"Node name")];
-	[myCompositions setIconName:@"folder"];
+	[myCompositions setIcon:[NSImage genericFolderIcon]];
 	
 	[self recursivelyParse:myDatabase
 				  withNode:myCompositions

@@ -48,6 +48,8 @@
 #import "iMBLibraryNode.h"
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSWorkspace+iMedia.h"
+#import "NSImage+iMedia.h"
 
 @implementation iMBScreenSaverPicturesParser
 
@@ -140,7 +142,7 @@
 			iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
 			[root addItem:folder];
 			[folder release];
-			[folder setIconName:@"folder"];
+			[folder setIcon:[[NSWorkspace sharedWorkspace] iconForFile:ssPath size:NSMakeSize(16,16)]];
 			[folder setName:[fm displayNameAtPath:[ssPath stringByDeletingPathExtension]]];
 			
 			// Collected images, set.
@@ -154,7 +156,7 @@
 {
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInIMedia(@"Screen Savers", @"Screen Savers -- source of some images in iMedia")];
-	[root setIconName:@"folder"];
+	[root setIcon:[NSImage genericFolderIcon]];
 		
 	[self parseWithNode:root];
 	

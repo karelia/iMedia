@@ -120,5 +120,25 @@
 	return [NSDictionary dictionaryWithDictionary:result];
 }
 
++ (NSImage *)genericFolderIcon
+{
+	static NSImage *sGenericFolderIcon = nil;
+	
+	if (sGenericFolderIcon == nil)
+	{
+		sGenericFolderIcon = [[NSImage alloc] initWithContentsOfFile:@"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GenericFolderIcon.icns"];
+		[sGenericFolderIcon setScalesWhenResized:YES];
+		[sGenericFolderIcon setSize:NSMakeSize(16,16)];
+	}
+	
+	if (sGenericFolderIcon == nil)
+	{
+		NSString *path = [[NSBundle bundleForClass:[self class]] pathForImageResource:@"folder"];
+		sGenericFolderIcon = [[NSImage alloc] initWithContentsOfFile:path];
+	}
+	
+	return sGenericFolderIcon;
+}
+
 @end
 
