@@ -47,6 +47,17 @@
 
 // This is the common data structure used for anything been parsed into the media browser
 
+// *******************************************************
+// IMPORANT NOTE: THREAD SAFETY
+// *******************************************************
+//
+// The following methods can be used from a thread:
+//  - (void)fromThread* methods
+//  - (NSArray *)allItems;
+//
+// You can init a library node and modify it in a thread. Once it is
+// added as a "item" of another node, it is not thread safe.
+
 @interface iMBLibraryNode : NSObject <NSCopying>
 {
 	iMBLibraryNode		*myParent; //not retained
@@ -66,7 +77,7 @@
 
 - (void)setName:(NSString *)name;
 - (NSString *)name;
-- (void)setIconName:(NSString *)name;	// for the identifier of the app, or an image resource (sans .extention) in imedia bundle only
+- (void)setIconName:(NSString *)iconName;	// for the identifier of the app, or an image resource (sans .extention) in imedia bundle only
 - (NSString *)iconName;
 - (void)setIcon:(NSImage *)icon;
 - (NSImage *)icon;
@@ -94,6 +105,8 @@
 - (void)fromThreadSetAttribute:(id)attrib forKey:(NSString *)key;
 - (void)fromThreadSetFilterDuplicateKey:(NSString *)filterKey forAttributeKey:(NSString *)attributeKey;
 - (void)fromThreadAddItem:(iMBLibraryNode *)item;
+- (void)fromThreadSetName:(NSString *)name;
+- (void)fromThreadSetIcon:(NSImage *)icon;
 
 // Tree support
 - (void)addItem:(iMBLibraryNode *)item;

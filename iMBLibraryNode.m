@@ -121,45 +121,67 @@ static NSMutableDictionary *sImageCache = nil;
 
 - (unsigned)countOfItems
 {
-    return [myItems count];
+    unsigned count = 0;
+    @synchronized (myItems)
+    {
+        count = [myItems count];
+    }
+    return count;
 }
 
 - (iMBLibraryNode *)objectInItemsAtIndex:(unsigned)index
 {
-    return [myItems objectAtIndex:index];
+    iMBLibraryNode *item = NULL;
+    @synchronized (myItems)
+    {
+        item = [myItems objectAtIndex:index];
+    }
+    return item;
 }
 
 - (void)insertObject:(iMBLibraryNode *)item inItemsAtIndex:(unsigned)index
 {
-    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
-
-    [self willChangeValueForKey:@"isLeaf"];
-
-    [myItems insertObject:item atIndex:index];
-	[item setParent:self];
-
-    [self didChangeValueForKey:@"isLeaf"];
-
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+    @synchronized (myItems)
+    {
+        [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+        
+        [self willChangeValueForKey:@"isLeaf"];
+        
+        [myItems insertObject:item atIndex:index];
+        [item setParent:self];
+        
+        [self didChangeValueForKey:@"isLeaf"];
+        
+        [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+    }
 }
 
 - (void)removeObjectFromItemsAtIndex:(unsigned)index
 {
-    [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
-
-    [self willChangeValueForKey:@"isLeaf"];
-
-    [[myItems objectAtIndex:index] setParent:nil];
-    [myItems removeObjectAtIndex:index];
-
-    [self didChangeValueForKey:@"isLeaf"];
-
-    [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+    @synchronized (myItems)
+    {
+        [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+        
+        [self willChangeValueForKey:@"isLeaf"];
+        
+        [[myItems objectAtIndex:index] setParent:nil];
+        [myItems removeObjectAtIndex:index];
+        
+        [self didChangeValueForKey:@"isLeaf"];
+        
+        [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"items"];
+    }
 }
 
 - (NSMutableArray *)mutableItems
 {
-    return [self mutableArrayValueForKey:@"items"];
+    NSMutableArray *items = NULL;
+    // synchronized to ensure that this is an atomic operation
+    @synchronized (myItems)
+    {
+        items = [self mutableArrayValueForKey:@"items"];
+    }
+    return items;
 }
 
 // END KVC FOR items
@@ -184,6 +206,11 @@ static NSMutableDictionary *sImageCache = nil;
 	myCachedNameWithImage = nil;
 }
 
+- (void)fromThreadSetName:(NSString *)name
+{
+    [self performSelectorOnMainThread:@selector(setName:) withObject:name waitUntilDone:YES];
+}
+
 - (NSString *)name
 {
 	return myName;
@@ -198,6 +225,11 @@ static NSMutableDictionary *sImageCache = nil;
 {
 	[myIconName autorelease];
 	myIconName = [name copy];
+}
+
+- (void)fromThreadSetIcon:(NSImage *)icon
+{
+    [self performSelectorOnMainThread:@selector(setIcon:) withObject:icon waitUntilDone:YES];
 }
 
 - (NSString *)iconName
@@ -374,15 +406,22 @@ static NSMutableDictionary *sImageCache = nil;
     [[self mutableItems] setArray:items];
 }
 
+// this method is thread safe. it does not generate any extra 'mutable items' in the
+// autorelease pool that could cause a deadlock.
 - (NSArray *)allItems
 {
-	return [NSArray arrayWithArray:[self mutableItems]];
+    NSArray *allItemsCopy = NULL;
+    @synchronized (myItems)
+    {
+        allItemsCopy = [NSArray arrayWithArray:myItems];
+    }
+    return allItemsCopy;
 }
 
 - (NSArray *)flattenedItems
 {
 	NSMutableArray *items = [NSMutableArray array];
-	NSEnumerator *e = [myItems objectEnumerator];
+	NSEnumerator *e = [[self allItems] objectEnumerator];
 	iMBLibraryNode *cur;
 	
 	while (cur = [e nextObject])
@@ -452,7 +491,12 @@ static NSMutableDictionary *sImageCache = nil;
 
 - (BOOL)isLeaf
 {
-	return [myItems count] == 0;
+    BOOL isLeaf = NO;
+    @synchronized (myItems)
+    {
+        isLeaf = [myItems count] == 0;
+    }
+    return isLeaf;
 }
 
 - (id)objectForKey:(id)key
@@ -463,7 +507,11 @@ static NSMutableDictionary *sImageCache = nil;
 - (NSString *)description
 {
 	NSMutableString *s = [NSMutableString stringWithFormat:@"iMBLibraryNode: '%@'", [self name]];
-	int c = [myItems count];
+    int c = 0;
+    @synchronized (myItems)
+    {
+        c = [myItems count];
+    }
 	if (1 == c)
 	{
 		[s appendString:@" 1 child"];
@@ -497,7 +545,7 @@ static NSMutableDictionary *sImageCache = nil;
 - (NSArray *)recursiveAttributesForKey:(NSString *)key filterKey:(NSString *)filter excludingSet:(NSMutableSet *)alreadyAdded
 {
 	NSMutableArray *items = [NSMutableArray array];
-	NSEnumerator *e = [myItems objectEnumerator];
+	NSEnumerator *e = [[self allItems] objectEnumerator];
 	iMBLibraryNode *cur;
 	id attrib;
 	
@@ -537,7 +585,7 @@ static NSMutableDictionary *sImageCache = nil;
 - (NSArray *)normalRecursiveAttributesForKey:(NSString *)key
 {
 	NSMutableArray *items = [NSMutableArray array];
-	NSEnumerator *e = [myItems objectEnumerator];
+	NSEnumerator *e = [[self allItems] objectEnumerator];
 	iMBLibraryNode *cur;
 	id attrib;
 	
