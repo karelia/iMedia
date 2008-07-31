@@ -62,7 +62,7 @@
         myIsBuilt = YES;
 
         // NOTE: It is not legal to add items on a thread; so we do it on the main thread.
-        // [self doAddLibraryNodes:libraryNodes];
+        // [self doSetLibraryNodes:libraryNodes];
         [self performSelectorOnMainThread:@selector(doSetLibraryNodes:) withObject:[NSArray array] waitUntilDone:YES];
         
         libraryNodes = [NSMutableArray array];
@@ -135,7 +135,7 @@
     
     // NOTE: It is not legal to add items on a thread; so we do it on the main thread.
     // [self doAddLibraryNodes:libraryNodes];
-    [self performSelectorOnMainThread:@selector(doSetLibraryNodes:) withObject:libraryNodes waitUntilDone:YES];
+    [self performSelectorOnMainThread:@selector(doAddLibraryNodes:) withObject:libraryNodes waitUntilDone:YES];
     
     if ( customFolders != NULL )
     {
