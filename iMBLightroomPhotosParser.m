@@ -56,13 +56,14 @@
 
 @interface iMBLightroomPhotosParser (Private)
 
-- (iMBLibraryNode *)parseOneDatabaseWithPath:(NSString*)path intoLibraryNode:(iMBLibraryNode *)root;
-- (iMBLibraryNode *)parseAllImagesForRoot:(iMBLibraryNode*)root;
-- (iMBLibraryNode *)parseCollectionsForRoot:(iMBLibraryNode*)root;
+- (iMBLibraryNode *)parseOneDatabaseWithPath:(NSString*)path intoLibraryNode:(iMBLibraryNode *)root version:(int)lightroom_version;
+- (iMBLibraryNode *)parseAllImagesForRoot:(iMBLibraryNode*)root version:(int)lightroom_version;
+- (iMBLibraryNode *)parseCollectionsForRoot:(iMBLibraryNode*)root version:(int)lightroom_version;
 
 - (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)aid withRoot:(iMBLibraryNode*)root;
 
-+ (NSArray*)libraryPaths;
++ (NSArray *)libraryPathsV2;
++ (NSArray *)libraryPathsV1;
 
 @end
 
@@ -97,8 +98,10 @@
 - (void)populateLibraryNode:(iMBLibraryNode *)rootLibraryNode name:(NSString *)name databasePath:(NSString *)databasePath
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    [self parseOneDatabaseWithPath:databasePath intoLibraryNode:rootLibraryNode];
+
+    int lightroom_version = [[rootLibraryNode attributeForKey:@"LightroomVersion"] intValue];
+
+    [self parseOneDatabaseWithPath:databasePath intoLibraryNode:rootLibraryNode version:lightroom_version];
 
     // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
 	[rootLibraryNode performSelectorOnMainThread:@selector(setName:) withObject:name waitUntilDone:NO];
@@ -109,20 +112,44 @@
 - (NSArray *)nodesFromParsingDatabase
 {
     NSMutableArray *libraryNodes = [NSMutableArray array];
-    NSArray *libraryPaths = [iMBLightroomPhotosParser libraryPaths];
-	NSEnumerator *enumerator = [libraryPaths objectEnumerator];
+
+    NSEnumerator *enumerator;
 	NSString *currentPath;
+    
+    NSArray *libraryPathsV2 = [iMBLightroomPhotosParser libraryPathsV2];
+	enumerator = [libraryPathsV2 objectEnumerator];
 	while ((currentPath = [enumerator nextObject]) != nil)
     {
-		NSString *name = LocalizedStringInIMedia(@"Lightroom", @"Lightroom");
+		NSString *name = LocalizedStringInIMedia(@"Lightroom 2", @"Lightroom");
+        if ([libraryPathsV2 count] > 1)
+            name = [name stringByAppendingFormat:@" (%@)", [[currentPath stringByDeletingLastPathComponent] lastPathComponent]];
         NSString *iconName = @"com.adobe.Lightroom:";
         iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath name:name iconName:iconName];
+        [libraryNode setAttribute:[NSNumber numberWithInt:2] forKey:@"LightroomVersion"];
         if (libraryNode != NULL)
         {
 			[libraryNode setPrioritySortOrder:1];
             [libraryNodes addObject:libraryNode];
         }
     }
+    
+    NSArray *libraryPathsV1 = [iMBLightroomPhotosParser libraryPathsV1];
+	enumerator = [libraryPathsV1 objectEnumerator];
+	while ((currentPath = [enumerator nextObject]) != nil)
+    {
+		NSString *name = LocalizedStringInIMedia(@"Lightroom", @"Lightroom");
+        if ([libraryPathsV1 count] > 1)
+            name = [name stringByAppendingFormat:@" (%@)", [[currentPath stringByDeletingLastPathComponent] lastPathComponent]];
+        NSString *iconName = @"com.adobe.Lightroom:";
+        iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath name:name iconName:iconName];
+        [libraryNode setAttribute:[NSNumber numberWithInt:1] forKey:@"LightroomVersion"];
+        if (libraryNode != NULL)
+        {
+			[libraryNode setPrioritySortOrder:1];
+            [libraryNodes addObject:libraryNode];
+        }
+    }
+
     return libraryNodes;
 }
 
@@ -130,7 +157,7 @@
 
 @implementation iMBLightroomPhotosParser (Private)
 
-- (iMBLibraryNode *)parseOneDatabaseWithPath:(NSString*)path intoLibraryNode:(iMBLibraryNode *)root
+- (iMBLibraryNode *)parseOneDatabaseWithPath:(NSString*)path intoLibraryNode:(iMBLibraryNode *)root version:(int)lightroom_version
 {
 	BOOL isReadable = [[NSFileManager defaultManager] isReadableFileAtPath:path];
 	
@@ -140,8 +167,8 @@
 		[root fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 		
 		@try {
-			[self parseAllImagesForRoot:root];
-			[self parseCollectionsForRoot:root];
+			[self parseAllImagesForRoot:root version:lightroom_version];
+			[self parseCollectionsForRoot:root version:lightroom_version];
 		}
 		@catch (NSException *exception) {
 			NSLog(@"Failed to parse %@: %@", path, exception);
@@ -153,7 +180,7 @@
 	return nil;
 }
 
-- (iMBLibraryNode*)parseCollectionsForRoot:(iMBLibraryNode*)root
+- (iMBLibraryNode*)parseCollectionsForRoot:(iMBLibraryNode*)root version:(int)lightroom_version
 {
 	NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
 	NSString *path = [root attributeForKey:@"path"];
@@ -170,10 +197,10 @@
 		FMResultSet *rsCollections = [database executeQuery:collectionQuery, @"AgCollectionTagKind"];
 		
 		while ([rsCollections next]) {
-			NSNumber *idLocal = [NSNumber numberWithLong:[rsCollections longForColumnIndex:0]]; 
-			NSNumber *idParentLocal = [NSNumber numberWithLong:[rsCollections longForColumnIndex:1]];
-			NSString *kind = [rsCollections stringForColumnIndex:2];
-			NSString *name = [rsCollections stringForColumnIndex:3];
+			NSNumber *idLocal = [NSNumber numberWithLong:[rsCollections longForColumn:@"id_local"]]; 
+			NSNumber *idParentLocal = [NSNumber numberWithLong:[rsCollections longForColumn:@"parent"]];
+			NSString *kind = [rsCollections stringForColumn:@"kindName"];
+			NSString *name = [rsCollections stringForColumn:@"name"];
 			
 			if (name == nil) {
 				if ([idParentLocal intValue] == 0) {
@@ -189,15 +216,17 @@
 			if (currentNode == nil) {
 				currentNode = [[[iMBLibraryNode alloc] init] autorelease];
 			}
+            
+            // after this point, all accesses to currentNode need to be thread safe (i.e. happen on the main thread)
 			
-			[currentNode setAttribute:idLocal forKey:@"idLocal"];
-			[currentNode setAttribute:idParentLocal forKey:@"idParentLocal"];
-			[currentNode setAttribute:name forKey:@"name"];
-			[currentNode setAttribute:kind forKey:@"kind"];
+			[currentNode fromThreadSetAttribute:idLocal forKey:@"idLocal"];
+			[currentNode fromThreadSetAttribute:idParentLocal forKey:@"idParentLocal"];
+			[currentNode fromThreadSetAttribute:name forKey:@"name"];
+			[currentNode fromThreadSetAttribute:kind forKey:@"kind"];
 			
-			[currentNode setName:name];
-			[currentNode setIcon:[NSImage genericFolderIcon]];
-			[currentNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
+			[currentNode fromThreadSetName:name];
+			[currentNode fromThreadSetIcon:[NSImage genericFolderIcon]];
+			[currentNode fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 			
 			iMBLibraryNode *parentNode = [self nodeWithLocalID:idParentLocal withRoot:root];
 			
@@ -209,58 +238,74 @@
 			if ([localDatabase open]) {
 				NSMutableArray *images = [NSMutableArray array];				
 				NSMutableString *imageQuery = [NSMutableString string];
-				
-				[imageQuery appendString:@" SELECT aif.absolutePath, aif.idx_filename, am.xmp, captionName"];
-				[imageQuery appendString:@" FROM Adobe_imageFiles aif"];
-				[imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
-				[imageQuery appendString:@" INNER JOIN Adobe_AdditionalMetadata am ON ai.id_local = am.image"];
-				[imageQuery appendString:@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"];
-				[imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
-				[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
-				[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-				[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
-				[imageQuery appendString:@" WHERE "];
-				[imageQuery appendString:@" alti.tag = ?"];
-				
-				//				NSLog(@"imageQuery: %@", imageQuery);
+                
+                if (lightroom_version == 1)
+                {
+                    [imageQuery appendString:@" SELECT aif.absolutePath, aif.idx_filename, captionName"];
+                    [imageQuery appendString:@" FROM Adobe_imageFiles aif"];
+                    [imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
+                    [imageQuery appendString:@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"];
+                    [imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
+                    [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
+                    [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
+                    [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+                    [imageQuery appendString:@" WHERE "];
+                    [imageQuery appendString:@" alti.tag = ?"];
+                }
+                else if (lightroom_version == 2)
+                {
+                    [imageQuery appendString:@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, captionName"];
+                    [imageQuery appendString:@" FROM AgLibraryFile aif"];
+                    [imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
+                    [imageQuery appendString:@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"];
+                    [imageQuery appendString:@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"];
+                    [imageQuery appendString:@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"];
+                    [imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
+                    [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
+                    [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
+                    [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+                    [imageQuery appendString:@" WHERE "];
+                    [imageQuery appendString:@" alti.tag = ?"];
+                }
 				
 				FMResultSet *rsImages = [localDatabase executeQuery:imageQuery, @"AgCaptionTagKind", idLocal];
 				
 				while ([rsImages next]) {
-					NSString *absolutePath = [rsImages stringForColumnIndex:0];
-					
-					//					NSLog(@"absolutePath: %@", absolutePath);
-					
-					if ([CIImage isReadableFile:absolutePath]) {
+                    NSString *absolutePath = NULL;
+                    if (lightroom_version == 1 )
+                    {
+                        absolutePath = [rsImages stringForColumn:@"absolutePath"];
+                    }
+                    else if (lightroom_version == 2)
+                    {
+                        NSString *absoluteRootPath = [rsImages stringForColumn:@"absolutePath"];
+                        NSString *pathFromRoot = [rsImages stringForColumn:@"pathFromRoot"];
+                        NSString *filename = [rsImages stringForColumn:@"idx_filename"];
+                        absolutePath = [[absoluteRootPath stringByAppendingString:pathFromRoot] stringByAppendingString:filename];
+                    }
+                    
+					if (1||[CIImage isReadableFile:absolutePath]) {
 						NSMutableDictionary *imageRecord = [NSMutableDictionary dictionary];
 						
 						[imageRecord setObject:absolutePath forKey:@"ImagePath"];
 						
-						NSString *xmp = [rsImages stringForColumnIndex:2];
-						
-						if (xmp != nil) {
-							[imageRecord setObject:xmp forKey:@"XMP"];
-						}
-						
-						NSString *caption = [rsImages stringForColumnIndex:3];
+						NSString *caption = [rsImages stringForColumn:@"captionName"];
 						
 						if (caption != nil) {
 							[imageRecord setObject:caption forKey:@"Caption"];
 						}
 						else {
-							NSString *fileName = [rsImages stringForColumnIndex:1];
+							NSString *fileName = [rsImages stringForColumn:@"idx_filename"];
 							
 							[imageRecord setObject:fileName forKey:@"Caption"];
 							
 						}
 						
-						[images addObject:imageRecord];
-						
-						//						NSLog(@"%@", imageRecord);
+                        [images addObject:imageRecord];
 					}
 				}
 				
-				[currentNode setAttribute:images forKey:@"Images"];
+				[currentNode fromThreadSetAttribute:images forKey:@"Images"];
 				
 				[rsImages close];
 			}
@@ -274,11 +319,11 @@
 	
 	[database close];
 	[outerPool release];
-	
+
 	return root;
 }
 
-- (iMBLibraryNode*)parseAllImagesForRoot:(iMBLibraryNode*)root
+- (iMBLibraryNode*)parseAllImagesForRoot:(iMBLibraryNode*)root version:(int)lightroom_version
 {		
 	iMBLibraryNode *imagesNode = [[[iMBLibraryNode alloc] init] autorelease];	
 	
@@ -287,6 +332,7 @@
 	[imagesNode setIcon:[NSImage genericFolderIcon]];
 	[imagesNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	
+    // after this point, all accesses to imagesNode need to be thread safe (i.e. happen on the main thread)
 	[root fromThreadAddItem:imagesNode];
 	
 	NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
@@ -296,55 +342,68 @@
 	if ([database open]) {
 		NSMutableArray *images = [NSMutableArray array];
 		NSMutableString *imageQuery = [NSMutableString string];
-		
-		[imageQuery appendString:@" SELECT aif.absolutePath, aif.idx_filename, am.xmp, captionName"];
-		[imageQuery appendString:@" FROM Adobe_imageFiles aif"];
-		[imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
-		[imageQuery appendString:@" INNER JOIN Adobe_AdditionalMetadata am ON ai.id_local = am.image"];
-		[imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
-		[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
-		[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-		[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
-		
-		//		NSLog(@"imageQuery: %@", imageQuery);
+
+        if (lightroom_version == 1)
+        {
+            [imageQuery appendString:@" SELECT aif.absolutePath, aif.idx_filename, captionName"];
+            [imageQuery appendString:@" FROM Adobe_imageFiles aif"];
+            [imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
+            [imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
+            [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
+            [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
+            [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+        }
+        else if (lightroom_version == 2)
+        {
+            [imageQuery appendString:@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, captionName"];
+            [imageQuery appendString:@" FROM AgLibraryFile aif"];
+            [imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
+            [imageQuery appendString:@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"];
+            [imageQuery appendString:@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"];
+            [imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
+            [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
+            [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
+            [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+        }
 		
 		FMResultSet *rsImages = [database executeQuery:imageQuery, @"AgCaptionTagKind"];
-		
+
 		while ([rsImages next]) {
-			NSString *absolutePath = [rsImages stringForColumnIndex:0];
-			
-			//			NSLog(@"absolutePath: %@", absolutePath);
-			
-			if ([CIImage isReadableFile:absolutePath]) {
+            NSString *absolutePath = NULL;
+            if (lightroom_version == 1 )
+            {
+                absolutePath = [rsImages stringForColumn:@"absolutePath"];
+            }
+            else if (lightroom_version == 2)
+            {
+                NSString *absoluteRootPath = [rsImages stringForColumn:@"absolutePath"];
+                NSString *pathFromRoot = [rsImages stringForColumn:@"pathFromRoot"];
+                NSString *filename = [rsImages stringForColumn:@"idx_filename"];
+                absolutePath = [[absoluteRootPath stringByAppendingString:pathFromRoot] stringByAppendingString:filename];
+            }
+
+			if (1||[CIImage isReadableFile:absolutePath]) {
 				NSMutableDictionary *imageRecord = [NSMutableDictionary dictionary];
 				
 				[imageRecord setObject:absolutePath forKey:@"ImagePath"];
 				
-				NSString *xmp = [rsImages stringForColumnIndex:2];
-				
-				if (xmp != nil) {
-					[imageRecord setObject:xmp forKey:@"XMP"];
-				}
-				
-				NSString *caption = nil; //[rsImages stringForColumnIndex:3];
+				NSString *caption = nil; //[rsImages stringForColumn:@"captionName"];
 				
 				if (caption != nil) {
 					[imageRecord setObject:caption forKey:@"Caption"];
 				}
 				else {
-					NSString *fileName = [rsImages stringForColumnIndex:1];
+					NSString *fileName = [rsImages stringForColumn:@"idx_filename"];
 					
 					[imageRecord setObject:fileName forKey:@"Caption"];
 					
 				}
 				
 				[images addObject:imageRecord];
-				
-				//				NSLog(@"%@", imageRecord);
 			}
 		}
 		
-		[imagesNode setAttribute:images forKey:@"Images"];
+		[imagesNode fromThreadSetAttribute:images forKey:@"Images"];
 		
 		[rsImages close];
 	}
@@ -376,49 +435,76 @@
 	return nil;
 }
 
-+ (NSArray*)libraryPaths
++ (void)parseRecentLibrariesList:(NSString *)recentLibrariesList into:(NSMutableArray *)libraryFilePaths
+{
+    NSCharacterSet *newlineCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"\n\r"];
+    NSScanner *scanner = [NSScanner scannerWithString:recentLibrariesList];
+    
+    NSString *path = @"";
+    while (![scanner isAtEnd])
+    {
+        NSString *token;
+        if ([scanner scanUpToCharactersFromSet:newlineCharacterSet intoString:&token])
+        {
+            NSString *string = [token stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            
+            if (([string length] == 0) || 
+                [string isEqualTo:@"recentLibraries = {"] || 
+                [string isEqualTo:@"}"])
+            {
+                continue;
+            }
+            
+            path = [path stringByAppendingString:string];
+            
+            if ([path hasSuffix:@"\","])
+            {
+                [libraryFilePaths addObject:[path substringWithRange:NSMakeRange(1, [path length] - 3)]];
+                path = @"";
+            }
+        }
+        
+        [scanner scanCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] intoString:nil];
+    }
+}
+
++ (NSArray*)libraryPathsV2
 {
 	NSMutableArray *libraryFilePaths = [NSMutableArray array];
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
-																(CFStringRef)@"com.adobe.Lightroom");
+    
+	CFStringRef recentLibrariesList20 = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",
+                                                                  (CFStringRef)@"com.adobe.Lightroom2");
 	
-	if (recentLibrariesList != nil) {
-		/*
-		 recentLibraries = {
-		 "/Users/pierre/Desktop/MyCatalog/MyCatalog.lrcat",
-		 "/Users/pierre/Pictures/Lightroom/Lightroom Catalog.lrcat",
-		 }
-		 */
-		NSCharacterSet *newlineCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"\n\r"];
-		NSScanner *scanner = [NSScanner scannerWithString:(NSString*)recentLibrariesList];
-		
-		NSString *path = @"";
-		while (![scanner isAtEnd]) {			
-			NSString *token;
-			if ([scanner scanUpToCharactersFromSet:newlineCharacterSet intoString:&token])
-			{
-				NSString *string = [token stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-				
-				if (([string length] == 0) || 
-					[string isEqualTo:@"recentLibraries = {"] || 
-					[string isEqualTo:@"}"]) {
-					continue;
-				}
-				
-				path = [path stringByAppendingString:string];
-				
-				if ([path hasSuffix:@"\","]) {
-					[libraryFilePaths addObject:[path substringWithRange:NSMakeRange(1, [path length] - 3)]];
-					path = @"";
-				}
-			}
-			
-			[scanner scanCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] intoString:nil];
-		}
-		
-		CFRelease(recentLibrariesList);
+	if (recentLibrariesList20 != nil) {
+        [iMBLightroomPhotosParser parseRecentLibrariesList:(NSString*)recentLibrariesList20 into:libraryFilePaths];
+        CFRelease(recentLibrariesList20);
 	}
+
+    if ([libraryFilePaths count] == 0) {
+		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",
+																		(CFStringRef)@"com.adobe.Lightroom2");
+		
+		if (activeLibraryPath != nil) {
+			
+			CFRelease(activeLibraryPath);
+		}
+    }
+    
+	return libraryFilePaths;
+}
+
++ (NSArray*)libraryPathsV1
+{
+	NSMutableArray *libraryFilePaths = [NSMutableArray array];
+    
+	CFStringRef recentLibrariesList11 = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
+                                                                  (CFStringRef)@"com.adobe.Lightroom");
 	
+	if (recentLibrariesList11 != nil) {
+        [iMBLightroomPhotosParser parseRecentLibrariesList:(NSString*)recentLibrariesList11 into:libraryFilePaths];
+        CFRelease(recentLibrariesList11);
+	}
+    
 	if ([libraryFilePaths count] == 0) {
 		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
 																		(CFStringRef)@"com.adobe.Lightroom");
@@ -428,7 +514,7 @@
 			CFRelease(activeLibraryPath);
 		}
 	}
-	
+    
 	return libraryFilePaths;
 }
 

@@ -100,7 +100,6 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		8FA5F3FA0D1803960060232A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE57B540C4D3F4800FCE138 /* QuartzCore.framework */; };
-		8FA5F4460D193F8E0060232A /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA5F4450D193F8E0060232A /* libsqlite3.a */; };
 		964006E208D7B9BF0046E052 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964006E108D7B9BF0046E052 /* QuickTime.framework */; };
 		965EB98708E1D345000DFF3A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		96F9076309D8D9690071BFFB /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9076209D8D9690071BFFB /* iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -231,7 +230,6 @@
 		DB9327D90D37D03000EC949C /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A47F0D16007600C30170 /* FMDatabase.m */; };
 		DB9327DA0D37D03000EC949C /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A4810D16007600C30170 /* FMDatabaseAdditions.m */; };
 		DB9327DB0D37D03000EC949C /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F18A4830D16007600C30170 /* FMResultSet.m */; };
-		DB9327E30D37D08100EC949C /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA5F4450D193F8E0060232A /* libsqlite3.a */; };
 		DB9327F70D37D18C00EC949C /* CIImage+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA5F2910D17FE560060232A /* CIImage+iMedia.m */; };
 		E541A8F90D34C4AB0056AEC5 /* iMBAbstractView.h in Headers */ = {isa = PBXBuildFile; fileRef = E541A8F70D34C4AB0056AEC5 /* iMBAbstractView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E541A8FA0D34C4AB0056AEC5 /* iMBAbstractView.m in Sources */ = {isa = PBXBuildFile; fileRef = E541A8F80D34C4AB0056AEC5 /* iMBAbstractView.m */; };
@@ -251,7 +249,6 @@
 		E5CE10320D38B5810081CD76 /* iMediaBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = E5CE10300D38B5810081CD76 /* iMediaBrowser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E5CE10330D38B5810081CD76 /* iMediaBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = E5CE10310D38B5810081CD76 /* iMediaBrowser.m */; };
 		E5DF5D070D68C03000E2FF8A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
-		E5DF5D0A0D68C03000E2FF8A /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA5F4450D193F8E0060232A /* libsqlite3.a */; };
 		E5DF5D0B0D68C03000E2FF8A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEE57B540C4D3F4800FCE138 /* QuartzCore.framework */; };
 		E5DF5D0C0D68C03000E2FF8A /* iMediaBrowser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791679FE0975255000D9EF74 /* iMediaBrowser.framework */; };
 		E5DF5D0D0D68C03000E2FF8A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -259,6 +256,7 @@
 		E5DF5D0F0D68C03000E2FF8A /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		E5DF5D110D68C03000E2FF8A /* iMediaBrowser.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 791679FE0975255000D9EF74 /* iMediaBrowser.framework */; };
 		E5DF5D1F0D68C0CE00E2FF8A /* AppDelegateSingle.m in Sources */ = {isa = PBXBuildFile; fileRef = E5DF5B4D0D68B57B00E2FF8A /* AppDelegateSingle.m */; };
+		FD279BDA0E3B7B7B00650A8D /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = FD279BD90E3B7B7B00650A8D /* sqlite3.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		FD2EAFC70C6981E000023B2E /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965EB98608E1D345000DFF3A /* QTKit.framework */; };
 		FD2EAFD80C69821100023B2E /* QTMovie+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CEDB34CD09E479F300F75C8C /* QTMovie+iMedia.m */; };
 		FD2EB01E0C69837300023B2E /* MetadataTool in CopyFiles */ = {isa = PBXBuildFile; fileRef = FD8EE5BC0C697C6C00E425BB /* MetadataTool */; };
@@ -454,7 +452,6 @@
 		8F18A4830D16007600C30170 /* FMResultSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMResultSet.m; sourceTree = "<group>"; };
 		8FA5F2900D17FE560060232A /* CIImage+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CIImage+iMedia.h"; sourceTree = "<group>"; };
 		8FA5F2910D17FE560060232A /* CIImage+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CIImage+iMedia.m"; sourceTree = "<group>"; };
-		8FA5F4450D193F8E0060232A /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsqlite3.a; sourceTree = "<group>"; };
 		964006E108D7B9BF0046E052 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		965EB98608E1D345000DFF3A /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		96F9076209D8D9690071BFFB /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMedia.h; sourceTree = "<group>"; };
@@ -637,6 +634,7 @@
 		FD0220CB0D8F1A5100B48AAB /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		FD0220CC0D8F1A5100B48AAB /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
 		FD0220CD0D8F1A5100B48AAB /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		FD279BD90E3B7B7B00650A8D /* sqlite3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sqlite3.c; sourceTree = "<group>"; };
 		FD2EB2710C69A0BF00023B2E /* MetadataUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetadataUtility.h; sourceTree = "<group>"; };
 		FD2EB2720C69A0BF00023B2E /* MetadataUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetadataUtility.m; sourceTree = "<group>"; };
 		FD6008F50D6A553F00A1146F /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
@@ -665,7 +663,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB9327E30D37D08100EC949C /* libsqlite3.a in Frameworks */,
 				79167A6909752C3000D9EF74 /* QTKit.framework in Frameworks */,
 				79167A6A09752C3300D9EF74 /* Cocoa.framework in Frameworks */,
 				79167A6B09752C3300D9EF74 /* QuickTime.framework in Frameworks */,
@@ -680,7 +677,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8FA5F4460D193F8E0060232A /* libsqlite3.a in Frameworks */,
 				8FA5F3FA0D1803960060232A /* QuartzCore.framework in Frameworks */,
 				791F97380975D3750071B2E0 /* iMediaBrowser.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
@@ -693,7 +689,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E5DF5D0A0D68C03000E2FF8A /* libsqlite3.a in Frameworks */,
 				E5DF5D0B0D68C03000E2FF8A /* QuartzCore.framework in Frameworks */,
 				E5DF5D0C0D68C03000E2FF8A /* iMediaBrowser.framework in Frameworks */,
 				E5DF5D0D0D68C03000E2FF8A /* Cocoa.framework in Frameworks */,
@@ -1005,7 +1000,7 @@
 		8F18A47A0D16005700C30170 /* sqlite */ = {
 			isa = PBXGroup;
 			children = (
-				8FA5F4450D193F8E0060232A /* libsqlite3.a */,
+				FD279BD90E3B7B7B00650A8D /* sqlite3.c */,
 				8F18A47C0D16005700C30170 /* sqlite3.h */,
 			);
 			path = sqlite;
@@ -1621,6 +1616,7 @@
 				CEEE54160DAC30EF00B7F6A2 /* iMBVerticallyAlignedTextCell.m in Sources */,
 				FDE557E80E22C386007E4706 /* iMBParserController.m in Sources */,
 				FDD974F50E23EA9800C2A092 /* iMBPhotoFolderParser.m in Sources */,
+				FD279BDA0E3B7B7B00650A8D /* sqlite3.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
