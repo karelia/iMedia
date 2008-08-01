@@ -301,10 +301,20 @@ static NSImage *sDRMIcon = nil;
 	[pool release];
 }
 
-- (iMBLibraryNode *)parseDatabase
+- (NSArray *)nodesFromParsingDatabase:(NSLock *)gate
 {
-	NSImage* icon = [[NSWorkspace sharedWorkspace] iconForFile:[self databasePath] size:NSMakeSize(16,16)];
-    return [self parseDatabaseInThread:[self databasePath] name:myMusicFolderName icon:icon];
+	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:[self databasePath] size:NSMakeSize(16,16)];
+
+    iMBLibraryNode *oneNodeParsed = [self parseDatabaseInThread:[self databasePath] gate:gate name:myMusicFolderName iconName:NULL icon:icon];
+    
+	if (oneNodeParsed)
+	{
+		return [NSArray arrayWithObject:oneNodeParsed];
+	}
+	else
+	{
+		return nil;
+	}
 }
 
 @end

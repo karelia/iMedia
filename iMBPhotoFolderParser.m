@@ -159,9 +159,18 @@
 	[pool release];
 }
 
-- (iMBLibraryNode *)parseDatabase
+- (NSArray *)nodesFromParsingDatabase:(NSLock *)gate
 {
-    return [self parseDatabaseInThread:[self databasePath] name:myName iconName:myIconName];
+    iMBLibraryNode *oneNodeParsed = [self parseDatabaseInThread:[self databasePath] gate:gate name:myName iconName:myIconName icon:NULL];
+
+	if (oneNodeParsed)
+	{
+		return [NSArray arrayWithObject:oneNodeParsed];
+	}
+	else
+	{
+		return nil;
+	}
 }
 
 @end

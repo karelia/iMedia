@@ -54,6 +54,10 @@
 {
     NSMutableArray *libraryNodes = NULL;
     
+    NSLock *gate = [[NSLock alloc] init];
+    
+    [gate lock];
+    
     @synchronized (self)
     {
         if (myIsBuilt)
@@ -108,7 +112,7 @@
 #ifdef DEBUG
             //		NSDate *timer = [NSDate date];
 #endif
-            NSArray *libraries = [parser nodesFromParsingDatabase];
+            NSArray *libraries = [parser nodesFromParsingDatabase:gate];
 #ifdef DEBUG
             //		NSLog(@"Time to load parser (%@): %.3f", NSStringFromClass(parserClass), fabs([timer timeIntervalSinceNow]));
 #endif
@@ -136,6 +140,9 @@
     // NOTE: It is not legal to add items on a thread; so we do it on the main thread.
     // [self doAddLibraryNodes:libraryNodes];
     [self performSelectorOnMainThread:@selector(doAddLibraryNodes:) withObject:libraryNodes waitUntilDone:YES];
+    
+    // release the hounds!
+    [gate unlock];
     
     if ( customFolders != NULL )
     {
@@ -216,7 +223,7 @@
     if ([fileManager fileExistsAtPath:folderPath isDirectory:&isDirectory] && isDirectory)
     {
         iMBAbstractParser *parser = [[iMediaConfiguration sharedConfiguration] createCustomFolderParserForMediaType:myMediaType folderPath:folderPath];
-        NSArray *libraryNodes = [parser nodesFromParsingDatabase];
+        NSArray *libraryNodes = [parser nodesFromParsingDatabase:NULL /*gate*/];
         
         NSEnumerator *enumerator = [libraryNodes objectEnumerator];
         iMBLibraryNode *libraryNode;

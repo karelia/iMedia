@@ -123,7 +123,7 @@
 
 @protocol iMBParser <NSObject>
 
-- (NSArray *)nodesFromParsingDatabase;	// return NSArray of iMBLibraryNode
+- (NSArray *)nodesFromParsingDatabase:(NSLock *)gate;	// return NSArray of iMBLibraryNode
 
 @end
 

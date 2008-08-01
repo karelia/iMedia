@@ -286,7 +286,7 @@
     [pool release];
 }
 
-- (NSArray *)nodesFromParsingDatabase
+- (NSArray *)nodesFromParsingDatabase:(NSLock *)gate
 {
     NSMutableArray *libraryNodes = [NSMutableArray array];
 	//	Find all Aperture libraries
@@ -305,7 +305,7 @@
 			NSString *name = LocalizedStringInIMedia(@"Aperture", @"Aperture");
             if (n>1) name = [NSString stringWithFormat:@"%@ (%@)", LocalizedStringInIMedia(@"Aperture", @"Aperture"), [[[currentPath stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension]];
 			NSString *iconName = @"com.apple.Aperture:";
-            iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath name:name iconName:iconName];
+            iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath gate:gate name:name iconName:iconName icon:NULL];
             if (libraryNode != NULL)
             {
                 [libraryNode setPrioritySortOrder:1];

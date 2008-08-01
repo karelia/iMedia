@@ -68,18 +68,19 @@
 // ensures that it is threadable.
 - (iMBLibraryNode *)parseDatabase;
 
-// subclassers can optional implement populateLibraryNode: and invoke parseDatabaseInThread:name:iconName:
+// subclassers can optional implement populateLibraryNode: and invoke parseDatabaseInThread:gate:name:iconName:icon:
 // directly from parseDatabase to implement threaded parsing. populateLibraryNode:name:databasePath must be threadsafe
 // and will be invoked on a thread so it needs its own autorelease pool.
-- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName;
-- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name icon:(NSImage*)icon;
+// gate is used to delay background parsing until all top level nodes have been displayed in table view
+- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath gate:(NSLock *)gate name:(NSString *)name iconName:(NSString *)iconName icon:(NSImage*)icon;
 
 - (void)populateLibraryNode:(iMBLibraryNode *)rootLibraryNode name:(NSString *)name databasePath:(NSString *)databasePath;
 
 // subclasses MAY implement this. this method should not have "side effects" on the class.
 // it should be a pure method to return the list of iMBLibraryNode's representing the data
 // in the database. this ensures that it is threadable.
-- (NSArray *)nodesFromParsingDatabase;  // Return nil if no items to avoid showing up
+// gate is used to delay background parsing until all top level nodes have been displayed in table view
+- (NSArray *)nodesFromParsingDatabase:(NSLock *)gate;  // Return nil if no items to avoid showing up
 
 // helper method to generate an attributed string with icon and name
 - (NSAttributedString *)name:(NSString *)name withImage:(NSImage *)image;

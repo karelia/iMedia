@@ -99,7 +99,7 @@
 	return nil;
 }
 
-- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName icon:(NSImage*)icon
+- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath gate:(NSLock *)gate name:(NSString *)name iconName:(NSString *)iconName icon:(NSImage*)icon
 {
 	NSString *folder = databasePath;
 	if ( [[NSFileManager defaultManager] fileExistsAtPath:folder] )
@@ -117,6 +117,7 @@
                                                       libraryNode,          @"rootLibraryNode",
                                                       databasePath,         @"databasePath",
                                                       name,                 @"name",
+                                                      gate,                 @"gate",
                                                       NULL];
         [NSThread detachNewThreadSelector:@selector(populateLibraryNodeWithArguments:) toTarget:self withObject:populateLibraryNodeArguments];
         
@@ -126,16 +127,6 @@
     {
         return nil;
     }
-}
-
-- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name iconName:(NSString *)iconName
-{
-	return [self parseDatabaseInThread:databasePath name:name iconName:iconName icon:nil];
-}
-
-- (iMBLibraryNode *)parseDatabaseInThread:(NSString *)databasePath name:(NSString *)name icon:(NSImage*)icon
-{
-	return [self parseDatabaseInThread:databasePath name:name iconName:nil icon:icon];
 }
 
 // NOTE: subclassers SHOULD override this method
@@ -149,12 +140,18 @@
     iMBLibraryNode *rootLibraryNode = [arguments objectForKey:@"rootLibraryNode"];
     NSString *name = [arguments objectForKey:@"name"];
     NSString *databasePath = [arguments objectForKey:@"databasePath"];
+    NSLock *gate = [arguments objectForKey:@"gate"];
+    if (gate != NULL)
+    {
+        [gate lock];
+        [gate unlock];
+    }
     [self populateLibraryNode:rootLibraryNode name:name databasePath:databasePath];
 }
 
 // standard implementation for single-item nodes.  Override if we return multiple items.
 
-- (NSArray *)nodesFromParsingDatabase
+- (NSArray *)nodesFromParsingDatabase:(NSLock *)gate
 {
 	iMBLibraryNode *oneNodeParsed = [self parseDatabase];
 	if (oneNodeParsed)

@@ -69,7 +69,7 @@
 	return self;
 }
 
-- (iMBLibraryNode *)parseDatabase
+- (NSArray *)nodesFromParsingDatabase:(NSLock *)gate
 {
 	NSArray *paths = [[NSUserDefaults standardUserDefaults] arrayForKey:@"iMBFavouritePictures"];
 	if ([paths count] == 0) return nil;
@@ -84,14 +84,14 @@
 	while (currentPath = [pathsEnumerator nextObject])
     {
         NSString *name = [currentPath lastPathComponent];
-        iMBLibraryNode *node = [self parseDatabaseInThread:currentPath name:name iconName:@"folder"];
+        iMBLibraryNode *node = [self parseDatabaseInThread:currentPath gate:gate name:name iconName:@"folder" icon:NULL];
         if (node != NULL)
         {
             [rootLibraryNode addItem:node];
         }
     }
     
-    return rootLibraryNode;
+    return [NSArray arrayWithObject:rootLibraryNode];
 }
 
 @end
