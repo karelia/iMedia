@@ -146,13 +146,13 @@ static NSImage *sDRMIcon = nil;
 			if (isDirectory)
 			{
 				iMBLibraryNode *folder = [[[iMBLibraryNode alloc] init] autorelease];
+
 				[folder setIcon:[NSImage genericFolderIcon]];
 				[folder setName:[fileManager displayNameAtPath:filePath]];
-				[self recursivelyParse:filePath withNode:folder movieTypes:movieTypes];
-
-                // NOTE: It is not legal to add items on a thread; so we do it on the main thread.
-                // [root addItem:folder];
-                [root performSelectorOnMainThread:@selector(addItem:) withObject:folder waitUntilDone:YES];
+                
+                [root fromThreadAddItem:folder];
+				
+                [self recursivelyParse:filePath withNode:folder movieTypes:movieTypes];
 			}
 			else
 			{
@@ -225,7 +225,8 @@ static NSImage *sDRMIcon = nil;
 		}
 	}
 	[innerPool release];
-	[root setAttribute:tracks forKey:@"Tracks"];
+
+	[root fromThreadSetAttribute:tracks forKey:@"Tracks"];
 }
 
 

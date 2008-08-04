@@ -333,15 +333,14 @@
 			
 			if ([albumRec objectForKey:@"Parent"])
 			{
-				iMBLibraryNode *parent = [self nodeWithAlbumID:[albumRec objectForKey:@"Parent"]
-													  withRoot:root];
+				iMBLibraryNode *parent = [self nodeWithAlbumID:[albumRec objectForKey:@"Parent"] withRoot:root];
 				if (!parent)
 					NSLog(@"iMBiPhotoAbstractParser (parseAlbums) failed to find parent node");
-				[parent addItem:lib];
+				[parent fromThreadAddItem:lib];
 			}
 			else
 			{
-				[root addItem:lib];
+				[root fromThreadAddItem:lib];
 			}
 		}		
 		[pool release];
@@ -430,25 +429,23 @@
 		{
 			//	place the events in an own folder...
 			if (!eventsFolder) {
-				eventsFolder = [[iMBLibraryNode alloc] init];
-				[root addItem:eventsFolder];
-				[eventsFolder release];
+				eventsFolder = [[[iMBLibraryNode alloc] init] autorelease];
 				[eventsFolder setIcon:[self iconForType:@"Events"]];
 				[eventsFolder setName:@"Events"];
+				[root fromThreadAddItem:eventsFolder];
 				root = eventsFolder;
 			}
 			
 			if ([rollRec objectForKey:@"Parent"])
 			{
-				iMBLibraryNode *parent = [self nodeWithAlbumID:[rollRec objectForKey:@"Parent"]
-													  withRoot:root];
+				iMBLibraryNode *parent = [self nodeWithAlbumID:[rollRec objectForKey:@"Parent"] withRoot:root];
 				if (!parent)
 					NSLog(@"iMBiPhotoAbstractParser (parseRolls) failed to find parent node");
-				[parent addItem:lib];
+				[parent fromThreadAddItem:lib];
 			}
 			else
 			{
-				[root addItem:lib];
+				[root fromThreadAddItem:lib];
 			}
 		}		
 		[pool release];

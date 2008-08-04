@@ -116,7 +116,6 @@
 			BOOL isDir;
 			if ([fm fileExistsAtPath:filePath isDirectory:&isDir] && ![fm isPathHidden:filePath] && !isDir)
 			{
-				
 				NSString *UTI = [NSString UTIForFileAtPath:filePath];
 				if ([NSString UTI:UTI conformsToUTI:(NSString *)kUTTypeImage])
 				{
@@ -128,7 +127,7 @@
 					}
 					NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
 					NSDate* modDate = [fileAttribs fileModificationDate];
-					if (modDate)
+					if (modDate != NULL)
 					{
 						[newPicture setObject:[NSNumber numberWithDouble:[modDate timeIntervalSinceReferenceDate]]
 									   forKey:@"DateAsTimerInterval"];
@@ -137,30 +136,33 @@
 				}
 			}
 		}
-		if ([images count])
+
+		if ([images count] > 0)
 		{
-			iMBLibraryNode *folder = [[iMBLibraryNode alloc] init];
-			[root addItem:folder];
-			[folder release];
+			iMBLibraryNode *folder = [[[iMBLibraryNode alloc] init] autorelease];
+
 			[folder setIcon:[[NSWorkspace sharedWorkspace] iconForFile:ssPath size:NSMakeSize(16,16)]];
 			[folder setName:[fm displayNameAtPath:[ssPath stringByDeletingPathExtension]]];
 			
 			// Collected images, set.
 			[folder setAttribute:images forKey:@"Images"];
-		}
+
+            [root fromThreadAddItem:folder];
+        }
 	}
 	// done each screen saver
 }
 
 - (iMBLibraryNode *)parseDatabase
 {
-	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
+	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
+
 	[root setName:LocalizedStringInIMedia(@"Screen Savers", @"Screen Savers -- source of some images in iMedia")];
 	[root setIcon:[NSImage genericFolderIcon]];
 		
 	[self parseWithNode:root];
 	
-	return [root autorelease];
+	return root;
 }
 
 @end

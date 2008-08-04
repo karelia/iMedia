@@ -108,9 +108,9 @@
 			if (isDirectory)
 			{
 				iMBLibraryNode *folder = [[[iMBLibraryNode alloc] init] autorelease];
-				[root addItem:folder];
 				[folder setIcon:[NSImage genericFolderIcon]];
 				[folder setName:[fileManager displayNameAtPath:filePath]];
+				[root fromThreadAddItem:folder];
 				[self recursivelyParse:filePath withNode:folder];
 			}
 			else
@@ -138,8 +138,8 @@
 		}
 	}
 	
-	[root setIcon:[workspace iconForFile:folderPath size:NSMakeSize(16,16)]];
-	[root setAttribute:images forKey:@"Images"];
+	[root fromThreadSetIcon:[workspace iconForFile:folderPath size:NSMakeSize(16,16)]];
+	[root fromThreadSetAttribute:images forKey:@"Images"];
 }
 
 - (void)populateLibraryNode:(iMBLibraryNode *)root name:(NSString *)name databasePath:(NSString *)databasePath
