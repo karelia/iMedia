@@ -191,20 +191,12 @@
 
 - (void)insertObject:(iMBLibraryNode *)libraryNode inLibraryNodesAtIndex:(unsigned)index
 {
-    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"libraryNodes"];
-    
     [myLibraryNodes insertObject:libraryNode atIndex:index];
-    
-    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"libraryNodes"];
 }
 
 - (void)removeObjectFromLibraryNodesAtIndex:(unsigned)index
 {
-    [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"libraryNodes"];
-    
     [myLibraryNodes removeObjectAtIndex:index];
-    
-    [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:[NSIndexSet indexSetWithIndex:index] forKey:@"libraryNodes"];
 }
 
 - (NSMutableArray *)mutableLibraryNodes
