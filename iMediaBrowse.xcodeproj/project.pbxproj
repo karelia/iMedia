@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		13957A130E46DFB40043CE22 /* NSBundle+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 13957A110E46DFB40043CE22 /* NSBundle+iMedia.h */; };
+		13957A140E46DFB40043CE22 /* NSBundle+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 13957A120E46DFB40043CE22 /* NSBundle+iMedia.m */; };
 		3C3A131E09EAFB8100AF41BF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3C3A131C09EAFB8100AF41BF /* Localizable.strings */; };
 		5B1AA72B0D6C72CA003585CD /* MovieCache.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 5B1AA7240D6C72CA003585CD /* MovieCache.xcdatamodel */; };
 		5B1AA7310D6C72CA003585CD /* minimovie.atomdata in Resources */ = {isa = PBXBuildFile; fileRef = 5B1AA72A0D6C72CA003585CD /* minimovie.atomdata */; };
@@ -338,6 +340,8 @@
 
 /* Begin PBXFileReference section */
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		13957A110E46DFB40043CE22 /* NSBundle+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+iMedia.h"; sourceTree = "<group>"; };
+		13957A120E46DFB40043CE22 /* NSBundle+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+iMedia.m"; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = main.m; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -979,6 +983,8 @@
 				793810470A33AC53000A65EA /* NSProcessInfo+iMedia.m */,
 				8FA5F2900D17FE560060232A /* CIImage+iMedia.h */,
 				8FA5F2910D17FE560060232A /* CIImage+iMedia.m */,
+				13957A110E46DFB40043CE22 /* NSBundle+iMedia.h */,
+				13957A120E46DFB40043CE22 /* NSBundle+iMedia.m */,
 			);
 			name = "Cocoa Extensions";
 			sourceTree = "<group>";
@@ -1270,6 +1276,7 @@
 				79F4DC4B0E1AC1630001C072 /* iMedia.pch in Headers */,
 				FDE557E70E22C386007E4706 /* iMBParserController.h in Headers */,
 				FDD974F40E23EA9800C2A092 /* iMBPhotoFolderParser.h in Headers */,
+				13957A130E46DFB40043CE22 /* NSBundle+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1617,6 +1624,7 @@
 				FDE557E80E22C386007E4706 /* iMBParserController.m in Sources */,
 				FDD974F50E23EA9800C2A092 /* iMBPhotoFolderParser.m in Sources */,
 				FD279BDA0E3B7B7B00650A8D /* sqlite3.c in Sources */,
+				13957A140E46DFB40043CE22 /* NSBundle+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -53,6 +53,7 @@
 #import "NSPopUpButton+iMedia.h"
 #import "RBSplitView.h"
 #import "RBSplitSubview.h"
+#import "NSBundle+iMedia.h"
 
 #import <QTKit/QTKit.h>
 
@@ -122,7 +123,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (void)loadViewNib
 {
-	[NSBundle loadNibNamed:@"Abstract" owner:self];
+	[[NSBundle bundleForClass:[iMBAbstractView class]] loadNibNamed:@"Abstract" owner:self];
 }
 
 - (void)awakeFromNib
