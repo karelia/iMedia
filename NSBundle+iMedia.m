@@ -19,7 +19,7 @@
 	NSNib*      aNib = [[NSNib alloc] initWithNibNamed:aNibName bundle:self];
     NSArray*    topLevelObjs = nil;
 	
-    BOOL success = (![aNib instantiateNibWithOwner:owner topLevelObjects:&topLevelObjs])
+    BOOL success = (![aNib instantiateNibWithOwner:owner topLevelObjects:&topLevelObjs]);
 	// Release the raw nib data no matter what.
 	[aNib release];
     
