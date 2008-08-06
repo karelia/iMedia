@@ -284,7 +284,7 @@
                         absolutePath = [[absoluteRootPath stringByAppendingString:pathFromRoot] stringByAppendingString:filename];
                     }
                     
-					if (1||[CIImage isReadableFile:absolutePath]) {
+					if ([CIImage isReadableFile:absolutePath]) {
 						NSMutableDictionary *imageRecord = [NSMutableDictionary dictionary];
 						
 						[imageRecord setObject:absolutePath forKey:@"ImagePath"];
@@ -382,7 +382,7 @@
                 absolutePath = [[absoluteRootPath stringByAppendingString:pathFromRoot] stringByAppendingString:filename];
             }
 
-			if (1||[CIImage isReadableFile:absolutePath]) {
+			if ([CIImage isReadableFile:absolutePath]) {
 				NSMutableDictionary *imageRecord = [NSMutableDictionary dictionary];
 				
 				[imageRecord setObject:absolutePath forKey:@"ImagePath"];
