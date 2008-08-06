@@ -52,24 +52,8 @@
 
 #import <QTKit/QTKit.h>
 
-static NSImage *sSongIcon = nil;
-static NSImage *sDRMIcon = nil;
 
 @implementation iMBMusicFolder
-
-+ (void)initialize	// preferred over +load in most cases
-{
-	if ( self == [iMBMusicFolder class] ) 
-	{
-		// Only do some work when not called because one of our subclasses does not implement +initialize
-		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-		
-		sSongIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:@"mp3"] retain];
-		sDRMIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:@"m4p"] retain];
-		
-		[pool release];
-	}
-}
 
 + (void)load	// registration of this class
 {
@@ -201,10 +185,20 @@ static NSImage *sDRMIcon = nil;
                         NSString *kind = [arguments objectForKey:@"kMDItemKind"];
                         if ( kind != nil && [kind rangeOfString:@"Protected"].location != NSNotFound )
                         {
+							static NSImage *sDRMIcon = nil;
+							if (!sDRMIcon)
+							{
+								sDRMIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:@"m4p"] retain];
+							}
                             [song setObject:sDRMIcon forKey:@"Icon"];
                         }
                         else
                         {
+							static NSImage *sSongIcon = nil;
+							if (!sSongIcon)
+							{
+								sSongIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:@"mp3"] retain];
+							}
                             [song setObject:sSongIcon forKey:@"Icon"];
                         }
                         
