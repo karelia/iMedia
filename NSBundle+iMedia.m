@@ -19,13 +19,15 @@
 	NSNib*      aNib = [[NSNib alloc] initWithNibNamed:aNibName bundle:self];
     NSArray*    topLevelObjs = nil;
 	
-    if (![aNib instantiateNibWithOwner:owner topLevelObjects:&topLevelObjs])
-    {
+    BOOL success = (![aNib instantiateNibWithOwner:owner topLevelObjects:&topLevelObjs])
+	// Release the raw nib data no matter what.
+	[aNib release];
+    
+	if (!success)
+	{
         NSLog(@"Warning! Could not load nib file.\n");
         return NO;
     }
-    // Release the raw nib data.
-    [aNib release];
 	
     // Release the top-level objects so that they are just owned by the array.
     [topLevelObjs makeObjectsPerformSelector:@selector(release)];
