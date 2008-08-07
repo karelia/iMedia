@@ -59,3 +59,9 @@
 - (void)setPlaceholderStringColor:(NSColor *)color;
 
 @end
+
+@interface iMBLibraryOutlineView (Delegate)
+
+- (NSMenu *)outlineView:(NSOutlineView *)olv menuForEvent:(NSEvent *)theEvent;
+
+@end

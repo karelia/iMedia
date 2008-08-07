@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class iMBLibraryNode;
 
 //
 // Control a set of parsers for a given media type.
@@ -41,5 +42,8 @@
 
 // removes an array of library nodes representing custom folders. returns a list of paths that were actually removed. not thread safe.
 - (NSArray *)removeLibraryNodes:(NSArray *)libraryNodes;
+
+// determine whether a particular library node can be removed.
+- (BOOL)canRemoveLibraryNode:(iMBLibraryNode *)libraryNode;
 
 @end

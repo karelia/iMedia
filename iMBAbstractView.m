@@ -635,6 +635,104 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 }
 
 #pragma mark -
+#pragma mark iMBLibraryOutlineView Delegate Methods
+
+- (NSMenu *)outlineView:(NSOutlineView *)outlineView menuForEvent:(NSEvent *)theEvent
+{
+    NSPoint point = [outlineView convertPoint:[theEvent locationInWindow] fromView:NULL];
+
+    int row = [outlineView rowAtPoint:point];
+
+    id treeNode = [outlineView itemAtRow:row];
+    
+    iMBLibraryNode *libraryNode = ([treeNode respondsToSelector:@selector(representedObject)]) ?
+		[treeNode representedObject] : [treeNode observedObject];
+
+    NSMenu *menu = [[[NSMenu alloc] init] autorelease];
+
+    NSMenuItem *addCustomFoldersMenuItem = [[[NSMenuItem alloc] initWithTitle:LocalizedStringInIMedia(@"Add Custom Folders...", @"Add custom folders contextual menu item")
+                                                                       action:@selector(addCustomFoldersAction:) keyEquivalent:@""] autorelease];
+    [addCustomFoldersMenuItem setTarget:self];
+    [menu addItem:addCustomFoldersMenuItem];
+
+    NSMenuItem *removeCustomFoldersMenuItem = [[[NSMenuItem alloc] initWithTitle:LocalizedStringInIMedia(@"Remove Custom Folder", @"Remove custom folder contextual menu item")
+                                                                          action:@selector(removeCustomFolderAction:) keyEquivalent:@""] autorelease];
+    [removeCustomFoldersMenuItem setRepresentedObject:libraryNode];
+    [removeCustomFoldersMenuItem setTarget:self];
+    [menu addItem:removeCustomFoldersMenuItem];
+    
+    return menu;
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    if ([menuItem action] == @selector(addCustomFoldersAction:))
+        return YES;
+    
+    if ([menuItem action] == @selector(removeCustomFolderAction:))
+    {
+        iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:[self mediaType]];
+        iMBLibraryNode *libraryNode = [menuItem representedObject];
+        if (libraryNode != NULL && [parserController canRemoveLibraryNode:libraryNode])
+            return YES;
+        return NO;
+    }
+    
+    if ([menuItem action] == @selector(delete:))
+    {
+        iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:[self mediaType]];
+        id rowItem = [libraryView itemAtRow:[libraryView selectedRow]];
+        iMBLibraryNode *libraryNode = [rowItem respondsToSelector:@selector(representedObject)] ? [rowItem representedObject] : [rowItem observedObject];
+        if (libraryNode != NULL && [parserController canRemoveLibraryNode:libraryNode])
+            return YES;
+        return NO;
+    }
+
+    return [super validateMenuItem:menuItem];
+}
+
+- (void)addCustomFoldersAction:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    // That has got to be one of the most repetitive Cocoa lines of code ;-)
+    
+    [openPanel setCanChooseDirectories:YES];
+    [openPanel setCanCreateDirectories:YES];
+    [openPanel setPrompt:LocalizedStringInIMedia(@"Add", @"Add custom folders button")];
+    [openPanel setCanChooseFiles:NO];
+    [openPanel setAllowsMultipleSelection:YES];
+    [openPanel setResolvesAliases:YES];
+    
+    if ([openPanel runModalForDirectory:NULL file:NULL types:NULL] == NSOKButton)
+    {
+        NSArray *folders = [openPanel filenames];
+        NSArray* addedNodes = [self addCustomFolders:folders];
+        if ([addedNodes count] > 0) 
+        {
+            iMBLibraryNode* node = [addedNodes objectAtIndex:0];
+            NSIndexPath* indexPath = [NSIndexPath indexPathWithIndex:[[libraryController content] indexOfObject:node]];
+            [libraryController setSelectionIndexPath:indexPath];
+        }
+    }
+}
+
+- (void)removeCustomFolderAction:(id)sender
+{
+    iMBLibraryNode *libraryNode = [sender representedObject];
+
+    [self outlineView:libraryView deleteItems:[NSArray arrayWithObject:libraryNode]];
+}
+
+- (void)delete:(id)sender
+{
+    id rowItem = [libraryView itemAtRow:[libraryView selectedRow]];
+
+    iMBLibraryNode *libraryNode = [rowItem respondsToSelector:@selector(representedObject)] ? [rowItem representedObject] : [rowItem observedObject];
+    
+    [self outlineView:libraryView deleteItems:[NSArray arrayWithObject:libraryNode]];
+}
+
+#pragma mark -
 #pragma mark NSSplitView Delegate Methods
 
 - (void)splitView:(RBSplitView*)sender changedFrameOfSubview:(RBSplitSubview*)subview from:(NSRect)fromRect to:(NSRect)toRect;

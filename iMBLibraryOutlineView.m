@@ -58,7 +58,8 @@
 
 @implementation iMBLibraryOutlineView
 
-# pragma mark *** Init & Dealloc ***
+#pragma mark -
+#pragma mark Init and Dealloc
 
 - (void)awakeFromNib
 {
@@ -114,7 +115,8 @@
 
 - (void)setPlaceholderStringColor:(NSColor *)color { [[self placeholderTextCell] setTextColor:color]; }
 
-# pragma mark *** Drawing ***
+#pragma mark -
+#pragma mark Drawing
 
 - (void)drawRect:(NSRect)aRect	// draw the drag and drop zone.  Fade in depending on how much empty area.
 {
@@ -259,5 +261,16 @@
 	[super keyDown:theEvent];
 }
 
+#pragma mark -
+#pragma mark Mouse handling
+
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+    id delegate = [self delegate];
+    if ([delegate respondsToSelector:@selector(outlineView:menuForEvent:)])
+        return [delegate outlineView:self menuForEvent:theEvent];
+    else
+        return [super menuForEvent:theEvent];
+}
 
 @end

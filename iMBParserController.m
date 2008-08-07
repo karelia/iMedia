@@ -235,6 +235,18 @@
     return results;
 }
 
+- (BOOL)canRemoveLibraryNode:(iMBLibraryNode *)libraryNode
+{
+    NSEnumerator *info_enum = [[[myCustomFolderInfo copy] autorelease] objectEnumerator];
+    NSDictionary *info;
+    while ( (info = [info_enum nextObject]) != NULL )
+    {
+        if ([[info objectForKey:@"libraryNode"] isEqual:libraryNode])
+            return YES;
+    }
+    return NO;
+}
+
 - (NSArray *)removeLibraryNodes:(NSArray *)libraryNodes
 {
     NSMutableArray *folderPathsRemoved = [NSMutableArray array];
