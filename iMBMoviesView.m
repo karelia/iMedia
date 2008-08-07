@@ -261,19 +261,17 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSImage*)toolbarIcon
 {
-	if(_toolbarIcon == nil)
+	if (_toolbarIcon == nil)
 	{
-        NSString *path = @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarMovieFolderIcon.icns";
-        if ([[NSFileManager defaultManager] fileExistsAtPath:path])
-        {
-            _toolbarIcon = [[NSImage allocWithZone:[self zone]] initByReferencingFile:path];
-            if (_toolbarIcon)
-                return _toolbarIcon;
-        }
-        
+		// tMov is listed in /System/Library/CoreServices/CoreTypes.bundle/Contents/Info.plist
+		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('tMov')] retain];
+		[_toolbarIcon setSize:NSMakeSize(32,32)];
+	}
+	if (_toolbarIcon == nil)
+	{
 		// Try to use iMovie, or older iMovie, or quicktime player for movies.
 		NSString *identifier = @"com.apple.iMovie";
-		path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
+		NSString *path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
 		if (nil == path)
 		{
 			identifier = @"com.apple.iMovie3";

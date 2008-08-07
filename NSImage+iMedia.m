@@ -126,7 +126,7 @@
 	
 	if (sGenericFolderIcon == nil)
 	{
-		sGenericFolderIcon = [[NSImage alloc] initWithContentsOfFile:@"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GenericFolderIcon.icns"];
+		sGenericFolderIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
 		[sGenericFolderIcon setScalesWhenResized:YES];
 		[sGenericFolderIcon setSize:NSMakeSize(16,16)];
 	}
