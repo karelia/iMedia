@@ -481,7 +481,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 						CGContextDrawImage(imageContext, *(CGRect*)&imageRect, theCGImage);
 						[img unlockFocus];
 					}
-					CFRelease(theCGImage);
+					CGImageRelease(theCGImage);
 				}
 				CFRelease(source);
 			}
