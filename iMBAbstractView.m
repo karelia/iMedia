@@ -251,7 +251,6 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16,16)];
 	[item setImage:icon];
-	[icon release];
 	[item setTarget:self];
 	[item setRepresentedObject:node];
 	[item setIndentationLevel:indentation];
