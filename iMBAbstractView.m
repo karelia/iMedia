@@ -687,7 +687,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
         return NO;
     }
 
-    return [super validateMenuItem:menuItem];
+    return YES; // [super validateMenuItem:menuItem];	// there is no super!
 }
 
 - (void)addCustomFoldersAction:(id)sender
