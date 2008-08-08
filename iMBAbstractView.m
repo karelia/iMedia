@@ -247,7 +247,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:name
 												  action:@selector(playlistPopupChanged:)
 										   keyEquivalent:@""];
-	NSImage *icon = [[NSImage alloc] initWithData:[[node icon] TIFFRepresentation]];
+	NSImage *icon = [node icon];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16,16)];
 	[item setImage:icon];
