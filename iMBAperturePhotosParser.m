@@ -251,7 +251,7 @@
 				}
 			#endif
 		}
-		[lib fromThreadSetAttribute:newPhotolist forKey:@"Images"];
+
 		if ([albumRec objectForKey:@"Parent"])
 		{
 			NSNumber* parentId = [albumRec objectForKey:@"Parent"];
@@ -271,7 +271,12 @@
 		{
 			[root fromThreadAddItem:lib];
 		}
-	}
+
+        // set the "Images" key AFTER lib has been added into the library node tree.
+        // this allows the "Images" change to be propagated up the tree so that the
+        // outline view gets displayed properly.
+        [lib fromThreadSetAttribute:newPhotolist forKey:@"Images"];
+    }
 }
 
 - (void)populateLibraryNode:(iMBLibraryNode *)rootLibraryNode name:(NSString *)name databasePath:(NSString *)databasePath

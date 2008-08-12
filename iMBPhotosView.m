@@ -553,11 +553,15 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	
 	NSIndexPath *selectionIndex = [[self controller] selectionIndexPath];
 	// only clear the cache if we go to another parser
+
 	if (!([selectionIndex isSubPathOf:mySelectedIndexPath] || 
 		  [mySelectedIndexPath isSubPathOf:selectionIndex] || 
-		  [mySelectedIndexPath isPeerPathOf:selectionIndex]))
+		  [mySelectedIndexPath isPeerPathOf:selectionIndex] ||
+		  [mySelectedIndexPath isEqual:selectionIndex]))
 	{
+		[myCacheLock lock];	// ============================================================ LOCK
 		[myCache removeAllObjects];
+		[myCacheLock unlock];	// ======================================================== UNLOCK
 	}
 	[mySelectedIndexPath autorelease];
 	mySelectedIndexPath = [selectionIndex retain];

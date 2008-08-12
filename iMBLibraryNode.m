@@ -327,12 +327,24 @@ static NSMutableDictionary *sImageCache = nil;
 	myPrioritySortOrder = value;
 }
 
+- (void)upwardRecursiveWillChangeValueForKey:(NSString *)key
+{
+	[self willChangeValueForKey:key];
+    [[self parent] upwardRecursiveWillChangeValueForKey:key];
+}
+
+- (void)upwardRecursiveDidChangeValueForKey:(NSString *)key
+{
+	[self didChangeValueForKey:key];
+    [[self parent] upwardRecursiveDidChangeValueForKey:key];
+}
+
 - (void)setAttribute:(id)attrib forKey:(NSString *)key
 {
 	if (!attrib || !key) return;
-	[self willChangeValueForKey:key];
+	[self upwardRecursiveWillChangeValueForKey:key];
 	[myAttributes setObject:attrib forKey:key];
-	[self didChangeValueForKey:key];
+	[self upwardRecursiveDidChangeValueForKey:key];
 }
 
 - (id)attributeForKey:(NSString *)key
