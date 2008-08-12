@@ -49,6 +49,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
 
 #import <QTKit/QTKit.h>
 
@@ -236,22 +237,44 @@
 		if (sAudioTypes == nil)
 		{
 			sAudioTypes = [[NSMutableArray alloc] init];
-			NSArray* movieTypes = [QTMovie movieTypesWithOptions:QTIncludeAllTypes];
-			NSEnumerator* e = [movieTypes objectEnumerator];
-			NSString* uti;
-			CFDictionaryRef utiDeclaration;
-			CFDictionaryRef utiSpecification;
-			CFTypeRef extension;
+
+			// This is a QuickTime 7.2 API which you don't get in Tiger.
+			BOOL useUTIs = [QTMovie respondsToSelector:@selector(movieTypesWithOptions:)];
 			
-			while (uti = [e nextObject])
+			NSArray* movieTypes = useUTIs ? [QTMovie movieTypesWithOptions:QTIncludeAllTypes] : [QTMovie movieFileTypes:QTIncludeAllTypes];
+			NSEnumerator* e = [movieTypes objectEnumerator];
+			NSString* utiOrType;
+			
+			while (utiOrType = [e nextObject])
 			{
+				NSString *uti = utiOrType;
+				if (!useUTIs)				// convert extension or file type into a UTI for our normal processing.
+				{
+					if ([utiOrType hasPrefix:@"'"] && [utiOrType hasSuffix:@"'"] && 6 == [utiOrType length])	// e.g. 'PICS'
+					{
+						utiOrType = [utiOrType substringWithRange:NSMakeRange(1,4)];
+						uti = [NSString UTIForFileType:utiOrType];
+					}
+					else	// just an extension
+					{
+						uti = [NSString UTIForFilenameExtension:utiOrType];
+					}
+					if ([uti hasPrefix:@"dyn."])
+					{
+						continue;		// couldn't decode ... oh well.
+					}
+				}
+				
 				if (UTTypeConformsTo((CFStringRef)uti,kUTTypeAudio))
 				{
-					if (utiDeclaration = UTTypeCopyDeclaration((CFStringRef)uti))
+					CFDictionaryRef utiDeclaration = UTTypeCopyDeclaration((CFStringRef)uti);
+					if (utiDeclaration)
 					{
-						if (utiSpecification = CFDictionaryGetValue(utiDeclaration, kUTTypeTagSpecificationKey))
+						CFDictionaryRef utiSpecification = CFDictionaryGetValue(utiDeclaration, kUTTypeTagSpecificationKey);
+						if (utiSpecification)
 						{
-							if (extension = CFDictionaryGetValue(utiSpecification, kUTTagClassFilenameExtension))
+							CFTypeRef extension = CFDictionaryGetValue(utiSpecification, kUTTagClassFilenameExtension);
+							if (extension)
 							{
 								if (CFGetTypeID(extension) == CFStringGetTypeID())
 								{
@@ -263,12 +286,10 @@
 								}
 							}
 						}
-						
 						CFRelease(utiDeclaration);
 					}
 				}
 			}
-			
 			// This was put in as part of an "ubercaster fix" in r250. (Not sure exactly what file type this is)
 			[sAudioTypes removeObject:@"kar"];
 		}

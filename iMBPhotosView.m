@@ -232,7 +232,13 @@ static NSImage *_toolbarIcon = nil;
 {
 	if (_toolbarIcon == nil)
 	{
-		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iPhoto"] retain];
+		NSString *identifier = @"com.apple.iPhoto";
+		NSString *path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
+		if (nil == path)
+		{
+			identifier = @"com.apple.Preview";
+		}
+		_toolbarIcon = [[[NSWorkspace sharedWorkspace] iconForAppWithBundleIdentifier:identifier] retain];
 		[_toolbarIcon setScalesWhenResized:YES];
 		[_toolbarIcon setSize:NSMakeSize(32,32)];
 	}
