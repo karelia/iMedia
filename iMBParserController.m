@@ -54,7 +54,7 @@
 {
     NSMutableArray *libraryNodes = NULL;
     
-    NSLock *gate = [[NSLock alloc] init];
+    NSLock *gate = [[[NSLock alloc] init] autorelease];
     
     [gate lock];
     
