@@ -307,7 +307,8 @@ static NSMutableDictionary *sImageCache = nil;
 				if (!myIcon)	// nonexistent path or invalid image file?  FALLBACK
 				{
 					NSBundle *b = [NSBundle bundleForClass:[self class]];
-					imagePath = [b pathForImageResource:@"folder"];
+					imagePath = [b pathForImageResource:@"folder"];	
+					// TODO: use the folder from the API in all instances like this, remove our image here
 					myIcon = [[NSImage alloc] initWithContentsOfFile:imagePath];
 				}
 			}

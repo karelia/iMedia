@@ -79,38 +79,6 @@
 	return self;
 }
 
-- (NSString *)iconNameForType:(NSString*)name
-{
-	if ([name isEqualToString:@"Special Roll"])
-		return @"MBiPhotoRoll";
-	else if ([name hasSuffix:@"Rolls"])
-		return @"MBiPhotoRoll";
-	else if ([name isEqualToString:@"Special Month"])
-		return @"MBiPhotoCalendar";
-	else if ([name hasSuffix:@"Months"])
-		return @"MBiPhotoCalendar";
-	else if ([name isEqualToString:@"Subscribed"])
-		return @"photocast";
-	else if ([name isEqualToString:@"Photocasts"])
-		return @"photocast_folder";
-	else if ([name isEqualToString:@"Slideshow"])
-		return @"slideshow";
-	else if ([name isEqualToString:@"Book"])
-		return @"book";
-	else if ([name isEqualToString:@"Calendar"])
-		return @"calendar";
-	else if ([name isEqualToString:@"Card"])
-		return @"card";
-	else if ([name hasSuffix:@"Events"])
-		return @"events";
-	else if ([name hasSuffix:@"Event"])
-		return @"MBiPhotoRoll.png";
-	else if (name == nil)
-		return @"com.apple.iPhoto:";			// top level library
-	else
-		return @"MBiPhotoAlbum";
-}
-
 - (NSImage*) iconForType: (NSString*) name 
 {
 	// iPhoto 7
