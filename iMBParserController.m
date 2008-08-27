@@ -87,6 +87,13 @@
                 continue;
             }
             
+			// Special case -- old del.icio.us parser (note the odd class spelling) breaks now.
+			if ([cur isEqualToString:@"LHDeliciosParser"])
+			{
+				NSLog(@"Disabling obsolete '%@'", cur);
+				continue;
+			}
+
             id delegate = [[iMediaConfiguration sharedConfiguration] delegate];
             
             if ([delegate respondsToSelector:@selector(iMediaConfiguration:willUseMediaParser:forMediaType:)])
