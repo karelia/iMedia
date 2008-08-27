@@ -195,15 +195,8 @@
 
 - (NSNumber *)imageCount
 {
-	int count;
-	if ([mySearchString length] > 0)
-	{
-		count = [myFilteredImages count];
-	}
-	else
-	{
-		count = [myImages count];
-	}
+	NSArray *array = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	int count= [array count];
 	
 	return [NSNumber numberWithUnsignedInt:count];
 }
@@ -215,15 +208,8 @@
 
 - (NSArray*) selectedItems
 {
-	NSArray* records = nil;
-	if ([mySearchString length] > 0)
-	{
-		records = [myFilteredImages objectsAtIndexes:mySelection];
-	}
-	else
-	{
-		records = [myImages objectsAtIndexes:mySelection];
-	}
+	NSArray *array = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	NSArray* records = [array objectsAtIndexes:mySelection];
 	return records;
 }
 
@@ -343,7 +329,8 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSDictionary *)recordForPath:(NSString *)path
 {
-	NSEnumerator *e = [myImages objectEnumerator];
+	NSArray *array = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	NSEnumerator *e = [array objectEnumerator];
 	NSDictionary *cur;
 	
 	while (cur = [e nextObject])
@@ -404,62 +391,62 @@ static NSImage *_toolbarIcon = nil;
 
 - (unsigned)photoCountForPhotoView:(MUPhotoView *)view
 {
-	if ([mySearchString length] > 0)
-	{
-		return [myFilteredImages count];
-	}
-	return [myImages count];
+	NSArray *array = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	return [array count];
 }
 
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)aIndex
 {
-	NSMutableDictionary *rec;
-	if ([mySearchString length] > 0)
-	{
-		rec = [myFilteredImages objectAtIndex:aIndex];
-	}
-	else
-	{
-		rec = [myImages objectAtIndex:aIndex];
-	}
-    
-	//try the caches
-	NSString *imagePath = [rec objectForKey:@"Preview"];
-	NSImage *img = [myImageCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
+	NSImage *img = nil;
 	
-    if (!img)
-    {   // Perhaps there's a ThumbPath
-        NSString *thumbPath = [rec objectForKey:@"ThumbPath"];
-        if (thumbPath)
-        {
-            img = [[[NSImage alloc] initByReferencingFile:thumbPath] autorelease];
-            if (img)
-                [myImageCache setObject:img forKey:imagePath];
-        }
-    }
+	NSArray *array = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	if (aIndex < [array count])
+	{
+		NSMutableDictionary *rec = [array objectAtIndex:aIndex];
+		
+		//try the caches
+		NSString *imagePath = [rec objectForKey:@"Preview"];
+		img = [myImageCache objectForKey:imagePath];		// preview image is keyed by the path of the preview
+		
+		if (!img)
+		{   // Perhaps there's a ThumbPath
+			NSString *thumbPath = [rec objectForKey:@"ThumbPath"];
+			if (thumbPath)
+			{
+				img = [[[NSImage alloc] initByReferencingFile:thumbPath] autorelease];
+				if (img)
+				{
+					[myImageCache setObject:img forKey:imagePath];
+				}
+			}
+		}
 
-	if (!img && (img != (NSImage *)[NSNull null]))	// need to generate, but not if NSNull
-    {		
-        iMBMovieReference    *movieRef = [[iMBMovieCacheDB sharedMovieCacheDB] movieReferenceWithURL:[NSURL fileURLWithPath:imagePath]];
-        img = [movieRef posterImage];
-        if (img)
-        {
-            [myImageCache setObject:img forKey:imagePath];
-            // No movie could be generated, so also no metadata
-        }
-        else
-            img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
-        NSDictionary    *movieAttributes = [movieRef movieAttributes];
-        if (movieAttributes)
-        {
-            [rec setObject:movieAttributes forKey:@"movieAttributes"];
-            NSString    *displayName = [movieAttributes objectForKey:QTMovieDisplayNameAttribute];
-            if (displayName && [displayName length] > 0)
-                [rec setObject:displayName forKey:@"Caption"];
-        }
+		if (!img && (img != (NSImage *)[NSNull null]))	// need to generate, but not if NSNull
+		{		
+			iMBMovieReference    *movieRef = [[iMBMovieCacheDB sharedMovieCacheDB] movieReferenceWithURL:[NSURL fileURLWithPath:imagePath]];
+			img = [movieRef posterImage];
+			if (img)
+			{
+				[myImageCache setObject:img forKey:imagePath];
+				// No movie could be generated, so also no metadata
+			}
+			else
+			{
+				img = [[NSWorkspace sharedWorkspace] iconForFile:imagePath];
+			}
+			NSDictionary    *movieAttributes = [movieRef movieAttributes];
+			if (movieAttributes)
+			{
+				[rec setObject:movieAttributes forKey:@"movieAttributes"];
+				NSString    *displayName = [movieAttributes objectForKey:QTMovieDisplayNameAttribute];
+				if (displayName && [displayName length] > 0)
+				{
+					[rec setObject:displayName forKey:@"Caption"];
+				}
+			}
+		}
+		if (img == (NSImage *)[NSNull null])	img = nil;	// don't return NSNull
 	}
-	if (img == (NSImage *)[NSNull null])	img = nil;	// don't return NSNull
-	
 	return img;
 }
 
@@ -503,21 +490,13 @@ static NSImage *_toolbarIcon = nil;
 	[types addObjectsFromArray:[NSPasteboard fileAndURLTypes]];
 	[pboard declareTypes:types owner:nil];
 	
-	NSDictionary *cur;
-	
 	unsigned int i;
-	for(i = 0; i < [myImages count]; i++) 
+	NSArray *array = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	for(i = 0; i < [array count]; i++) 
 	{
 		if ([mySelection containsIndex:i]) 
 		{
-			if ([mySearchString length] > 0)
-			{
-				cur = [myFilteredImages objectAtIndex:i];
-			}
-			else
-			{
-				cur = [myImages objectAtIndex:i];
-			}
+			NSDictionary *cur = [array objectAtIndex:i];
 			[fileList addObject:[cur objectForKey:@"ImagePath"]];
 			[captions addObject:[cur objectForKey:@"Caption"]];
 		}
@@ -528,213 +507,210 @@ static NSImage *_toolbarIcon = nil;
 
 - (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)aIndex
 {
-	NSDictionary *rec;
-	if ([mySearchString length] > 0)
+	NSString *result = nil;
+	NSArray *array = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	if (aIndex < [array count])
 	{
-		rec = [myFilteredImages objectAtIndex:aIndex];
+		NSDictionary *rec = [array objectAtIndex:aIndex];
+		result = [rec objectForKey:@"Caption"];
 	}
-	else
-	{
-		rec = [myImages objectAtIndex:aIndex];
-	}
-	return [rec objectForKey:@"Caption"];
+	return result;
 }
 
 // called in thread 1 so it's safe to open the movie for more info.
 // BETTER YET -- PUT THE MOVIE METADATA WITH THE CACHED THUMBNAIL SO WE DON'T HAVE TO OPEN UP MOVIE AS WELL.
 - (NSString *)photoView:(MUPhotoView *)view tooltipForPhotoAtIndex:(unsigned)aIndex
 {
-	NSMutableString *result = [NSMutableString string];
-	NSDictionary *rec;
-	if ([mySearchString length] > 0)
+	NSMutableString *result = nil;
+	NSArray *array = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	if (aIndex < [array count])
 	{
-		rec = [myFilteredImages objectAtIndex:aIndex];
-	}
-	else
-	{
-		rec = [myImages objectAtIndex:aIndex];
-	}
-	
-	// GET METADATA, WE MIGHT USE THAT FOR DISPLAY NAME INSTEAD OF "Caption"
-	NSDictionary *userInfo = [rec objectForKey:@"movieAttributes"];
-	NSString *title = [rec objectForKey:@"Caption"];	// default
-	NSString *imagePath = [rec objectForKey:@"ImagePath"];
-	NSString *imagePathUTI = nil;
-	
-	// Don't have User Info from cache?  Try to get it from the movie itself
-	// TODO: Attributes generated from a movie file for the tooltip are not cached in memory.
-	if (!userInfo && [NSString UTI:imagePathUTI conformsToUTI:(NSString *)kUTTypeAudiovisualContent])
-	{
-		// Get our own User info from the file directly by making a quicktime movie.
-		NSError *error = nil;
+		NSDictionary *rec = [array objectAtIndex:aIndex];
+
+		// GET METADATA, WE MIGHT USE THAT FOR DISPLAY NAME INSTEAD OF "Caption"
+		NSDictionary *userInfo = [rec objectForKey:@"movieAttributes"];
+		NSString *title = [rec objectForKey:@"Caption"];	// default
+		NSString *imagePath = [rec objectForKey:@"ImagePath"];
+		NSString *imagePathUTI = nil;
 		
-		///NSLog(@"photoView:tooltipForPhotoAtIndex:%@ going to load movie", imagePath);
-
-		QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
-		QTMovie *movie = [[[QTMovie alloc] initWithAttributes:
-			[NSDictionary dictionaryWithObjectsAndKeys: 
-				ref, QTMovieDataReferenceAttribute,
-				[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
-				nil] error:&error] autorelease];
-		if (movie)
+		// Don't have User Info from cache?  Try to get it from the movie itself
+		// TODO: Attributes generated from a movie file for the tooltip are not cached in memory.
+		if (!userInfo && [NSString UTI:imagePathUTI conformsToUTI:(NSString *)kUTTypeAudiovisualContent])
 		{
-			userInfo = [movie movieAttributes];
-		}
-	}
-	
-	// Possibly override title by using the metadata from quicktime file
-	if (userInfo)
-	{
-		NSString *displayName = [userInfo objectForKey:QTMovieDisplayNameAttribute];
-		if (displayName && ![displayName isEqual:title] && ![[NSNull null] isEqual:displayName])
-		{
-			title = displayName;	// and use the display name to override the title
-		}
-	}
-	
-	// APPEND THE TITLE FIRST
-	[result appendString:title];	// the title of the image, often the file name.
-
-	// APPEND SOME GENERAL ITUNES METADATA
-	if ([rec objectForKey:@"Artist"]) [result appendFormat:@"\n%@", [rec objectForKey:@"Artist"]];
-	if ([rec objectForKey:@"Album"]) [result appendFormat:@"\n%@", [rec objectForKey:@"Album"]];
-	
-	// APPEND GENERAL QUICKTIME METADATA
-	if (userInfo)
-	{
-		NSString *copyright = [userInfo objectForKey:QTMovieCopyrightAttribute];
-		if (copyright && ![[NSNull null] isEqual:copyright]) [result appendFormat:@"\n%@", copyright];
-	}
-
-	
-	// ---------------------- COLLECT TECHNICAL METADATA
-	
-	float durationSeconds = 0.0;
-	float width = 0.0;
-	float height = 0.0;
-	NSString *dateTimeLocalized = nil;
-	
-	// COLLECT TECHNICAL QUICKTIME METADATA
-	if (userInfo)
-	{
-		NSDate *creationTime = [userInfo objectForKey:QTMovieCreationTimeAttribute];
-
-		if (creationTime && ![[NSNull null] isEqual:creationTime])
-		{
-			NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
-			[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-			[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
-			[formatter setTimeStyle:NSDateFormatterShortStyle];	// no seconds
-			dateTimeLocalized = [formatter stringFromDate:creationTime];
-		}
-		
-		NSNumber *hasDuration = [userInfo objectForKey:QTMovieHasDurationAttribute];
-		NSValue *durValue = [userInfo objectForKey:QTMovieDurationAttribute];
-		
-		if (hasDuration && ![[NSNull null] isEqual:hasDuration] && [hasDuration boolValue] && durValue)
-		{
-			QTTime durTime = [durValue QTTimeValue];
-			if (durTime.timeScale == 0)
-				durTime.timeScale = 60;	// make sure there's a time scale
+			// Get our own User info from the file directly by making a quicktime movie.
+			NSError *error = nil;
 			
-			durationSeconds = durTime.timeValue / durTime.timeScale;
-		}
-		
-		NSValue *sizeValue = [userInfo objectForKey:QTMovieNaturalSizeAttribute];
-
-		if (sizeValue && ![[NSNull null] isEqual:sizeValue])
-		{
-			NSSize size = [sizeValue sizeValue];
-			width = size.width;
-			height = size.height;
-		}
-	}
-		
-	// COLLECT TECHNICAL ITUNES METADATA
-	NSNumber *iTunesDuration = [rec objectForKey:@"Total Time"];
-	if (iTunesDuration)
-	{
-		durationSeconds = [iTunesDuration floatValue] / 1000.0;
-	}
-		
-	// -------------------------- OUTPUT TECHNICAL METADATA
-
-	// OUTPUT DATE/TIME
-	if (dateTimeLocalized)
-	{
-		[result appendFormat:@"\n%@", dateTimeLocalized];
-	}
-	
-	// OUTPUT DIMENSIONS
-	if (width >= 1.0 && height >= 1.0)
-	{
-		NSString *dimensionsFormat = LocalizedStringInIMedia(@"\n%.0f \\U2715 %.0f", @"format for width X height");
-		[result appendFormat:dimensionsFormat, width, height];
-	}
-
-	// OUTPUT DURATION	
-	if (durationSeconds > 0.01)
-	{
-		int actualSeconds = (int) roundf(durationSeconds);
-		div_t hours = div(actualSeconds,3600);
-		div_t minutes = div(hours.rem,60);
-		
-		NSString *timeString = nil;
-		// TODO: Internationalize these time strings if necessary.
-		if (hours.quot == 0) {
-			timeString = [NSString stringWithFormat:@"%d:%.2d", minutes.quot, minutes.rem];
-		}
-		else {
-			timeString = [NSString stringWithFormat:@"%d:%02d:%02d", hours.quot, minutes.quot, minutes.rem];
-		}
-		[result appendFormat:@"\n%@", timeString];
-	}		
-	
-	
-	// --------------------- OUTPUT USER INFORMATION, IF ANY, AFTER A BLANK LINE
-	
-	int rating = [[rec objectForKey:@"Rating"] intValue];
-	NSString *iTunesComments = [rec objectForKey:@"Comments"];
-	BOOL hasITunesComment = (nil != iTunesComments && ![iTunesComments isEqualToString:@""]);
-	NSString *iPhotoComment = [rec objectForKey:@"Comment"];
-	BOOL hasIPhotoComment = (nil != iPhotoComment && ![iPhotoComment isEqualToString:@""]);
-	NSArray *keywords = [rec objectForKey:@"iMediaKeywords"];
-	BOOL hasKeywords = keywords && [keywords count];
-	if (rating > 0 || hasITunesComment || hasIPhotoComment || hasKeywords)
-	{
-		[result appendString:@"\n"];	// extra blank line before comment or rating
-		if (hasITunesComment)
-		{
-			[result appendFormat:@"\n%@", iTunesComments];
-		}
-		if (hasIPhotoComment)
-		{
-			[result appendFormat:@"\n%@", iPhotoComment];
-		}
-		if (rating > 0)
-		{
-			[result appendFormat:@"\n%@", 
-				[NSString stringFromStarRating:rating]];
-		}
-		if (hasKeywords)
-		{
-			[result appendFormat:@"\n"];
-			NSEnumerator *keywordsEnum = [keywords objectEnumerator];
-			NSString *keyword;
+			///NSLog(@"photoView:tooltipForPhotoAtIndex:%@ going to load movie", imagePath);
 			
-			while ((keyword = [keywordsEnum nextObject]) != nil)
+			QTDataReference *ref = [QTDataReference dataReferenceWithReferenceToFile:imagePath];
+			QTMovie *movie = [[[QTMovie alloc] initWithAttributes:
+							   [NSDictionary dictionaryWithObjectsAndKeys: 
+								ref, QTMovieDataReferenceAttribute,
+								[NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
+								nil] error:&error] autorelease];
+			if (movie)
 			{
-				[result appendFormat:@"%@, ", keyword];
+				userInfo = [movie movieAttributes];
 			}
-			[result deleteCharactersInRange:NSMakeRange([result length] - 2, 2)];	// remove last comma+space
+		}
+		
+		// Possibly override title by using the metadata from quicktime file
+		if (userInfo)
+		{
+			NSString *displayName = [userInfo objectForKey:QTMovieDisplayNameAttribute];
+			if (displayName && ![displayName isEqual:title] && ![[NSNull null] isEqual:displayName])
+			{
+				title = displayName;	// and use the display name to override the title
+			}
+		}
+
+		result = [NSMutableString string];
+
+		// APPEND THE TITLE FIRST
+		[result appendString:title];	// the title of the image, often the file name.
+		
+		// APPEND SOME GENERAL ITUNES METADATA
+		if ([rec objectForKey:@"Artist"]) [result appendFormat:@"\n%@", [rec objectForKey:@"Artist"]];
+		if ([rec objectForKey:@"Album"]) [result appendFormat:@"\n%@", [rec objectForKey:@"Album"]];
+		
+		// APPEND GENERAL QUICKTIME METADATA
+		if (userInfo)
+		{
+			NSString *copyright = [userInfo objectForKey:QTMovieCopyrightAttribute];
+			if (copyright && ![[NSNull null] isEqual:copyright]) [result appendFormat:@"\n%@", copyright];
+		}
+		
+		// ---------------------- COLLECT TECHNICAL METADATA
+		
+		float durationSeconds = 0.0;
+		float width = 0.0;
+		float height = 0.0;
+		NSString *dateTimeLocalized = nil;
+		
+		// COLLECT TECHNICAL QUICKTIME METADATA
+		if (userInfo)
+		{
+			NSDate *creationTime = [userInfo objectForKey:QTMovieCreationTimeAttribute];
+			
+			if (creationTime && ![[NSNull null] isEqual:creationTime])
+			{
+				NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
+				[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+				[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
+				[formatter setTimeStyle:NSDateFormatterShortStyle];	// no seconds
+				dateTimeLocalized = [formatter stringFromDate:creationTime];
+			}
+			
+			NSNumber *hasDuration = [userInfo objectForKey:QTMovieHasDurationAttribute];
+			NSValue *durValue = [userInfo objectForKey:QTMovieDurationAttribute];
+			
+			if (hasDuration && ![[NSNull null] isEqual:hasDuration] && [hasDuration boolValue] && durValue)
+			{
+				QTTime durTime = [durValue QTTimeValue];
+				if (durTime.timeScale == 0)
+					durTime.timeScale = 60;	// make sure there's a time scale
+				
+				durationSeconds = durTime.timeValue / durTime.timeScale;
+			}
+			
+			NSValue *sizeValue = [userInfo objectForKey:QTMovieNaturalSizeAttribute];
+			
+			if (sizeValue && ![[NSNull null] isEqual:sizeValue])
+			{
+				NSSize size = [sizeValue sizeValue];
+				width = size.width;
+				height = size.height;
+			}
+		}
+		
+		// COLLECT TECHNICAL ITUNES METADATA
+		NSNumber *iTunesDuration = [rec objectForKey:@"Total Time"];
+		if (iTunesDuration)
+		{
+			durationSeconds = [iTunesDuration floatValue] / 1000.0;
+		}
+		
+		// -------------------------- OUTPUT TECHNICAL METADATA
+		
+		// OUTPUT DATE/TIME
+		if (dateTimeLocalized)
+		{
+			[result appendFormat:@"\n%@", dateTimeLocalized];
+		}
+		
+		// OUTPUT DIMENSIONS
+		if (width >= 1.0 && height >= 1.0)
+		{
+			NSString *dimensionsFormat = LocalizedStringInIMedia(@"\n%.0f \\U2715 %.0f", @"format for width X height");
+			[result appendFormat:dimensionsFormat, width, height];
+		}
+		
+		// OUTPUT DURATION	
+		if (durationSeconds > 0.01)
+		{
+			int actualSeconds = (int) roundf(durationSeconds);
+			div_t hours = div(actualSeconds,3600);
+			div_t minutes = div(hours.rem,60);
+			
+			NSString *timeString = nil;
+			// TODO: Internationalize these time strings if necessary.
+			if (hours.quot == 0) {
+				timeString = [NSString stringWithFormat:@"%d:%.2d", minutes.quot, minutes.rem];
+			}
+			else {
+				timeString = [NSString stringWithFormat:@"%d:%02d:%02d", hours.quot, minutes.quot, minutes.rem];
+			}
+			[result appendFormat:@"\n%@", timeString];
+		}		
+		
+		
+		// --------------------- OUTPUT USER INFORMATION, IF ANY, AFTER A BLANK LINE
+		
+		int rating = [[rec objectForKey:@"Rating"] intValue];
+		NSString *iTunesComments = [rec objectForKey:@"Comments"];
+		BOOL hasITunesComment = (nil != iTunesComments && ![iTunesComments isEqualToString:@""]);
+		NSString *iPhotoComment = [rec objectForKey:@"Comment"];
+		BOOL hasIPhotoComment = (nil != iPhotoComment && ![iPhotoComment isEqualToString:@""]);
+		NSArray *keywords = [rec objectForKey:@"iMediaKeywords"];
+		BOOL hasKeywords = keywords && [keywords count];
+		if (rating > 0 || hasITunesComment || hasIPhotoComment || hasKeywords)
+		{
+			[result appendString:@"\n"];	// extra blank line before comment or rating
+			if (hasITunesComment)
+			{
+				[result appendFormat:@"\n%@", iTunesComments];
+			}
+			if (hasIPhotoComment)
+			{
+				[result appendFormat:@"\n%@", iPhotoComment];
+			}
+			if (rating > 0)
+			{
+				[result appendFormat:@"\n%@", 
+				 [NSString stringFromStarRating:rating]];
+			}
+			if (hasKeywords)
+			{
+				[result appendFormat:@"\n"];
+				NSEnumerator *keywordsEnum = [keywords objectEnumerator];
+				NSString *keyword;
+				
+				while ((keyword = [keywordsEnum nextObject]) != nil)
+				{
+					[result appendFormat:@"%@, ", keyword];
+				}
+				[result deleteCharactersInRange:NSMakeRange([result length] - 2, 2)];	// remove last comma+space
+			}
 		}
 	}
 	return result;
 }
 
+
 - (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)aIndex withFrame:(NSRect)frame
 {
-	if (aIndex < [myImages count])
+	NSArray *array = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	if (aIndex < [array count])
 	{
 		movieIndex = aIndex;
 		if (!previewMovieView)
@@ -749,7 +725,7 @@ static NSImage *_toolbarIcon = nil;
 			[previewMovieView pause:self];
 		}
 		[previewMovieView setFrame:frame];
-		NSString *path = [[myImages objectAtIndex:aIndex] objectForKey:@"ImagePath"];
+		NSString *path = [[array objectAtIndex:aIndex] objectForKey:@"ImagePath"];
 		
 		NSError *error = nil;
 		///NSLog(@"photoView:doubleClickOnPhotoAtIndex:%@ going to load movie", path);
