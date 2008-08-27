@@ -87,6 +87,8 @@
 		return [NSImage imageResourceNamed:@"sl-icon-small_events.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"Event"])
 		return [NSImage imageResourceNamed:@"sl-icon-small_event.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
+	else if ([name isEqualToString:@"Roll"])
+		return [NSImage imageResourceNamed:@"sl-icon-small_roll.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
 	else if (name == nil || [name isEqualToString:@"Photos"]) 
 		return [NSImage imageResourceNamed:@"sl-icon-small_library.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"Selected Event Album"])
@@ -133,7 +135,7 @@
 	
 	while (cur = [e nextObject])
 	{
-		found = [self nodeWithAlbumID:[[aid retain] autorelease] withRoot:cur];
+		found = [self nodeWithAlbumID:aid withRoot:cur];
 		if (found)
 		{
 			return found;
@@ -162,6 +164,7 @@
 	
 	//Iterate over libraries, pulling dictionary from contents and adding to array for processing;
 	NSArray *libraries = (NSArray *)iApps;
+    
 	NSEnumerator *e = [libraries objectEnumerator];
 	NSString *cur;
 	
@@ -181,7 +184,17 @@
 	NSDictionary *imageRecords = [library objectForKey:@"Master Image List"];
 	NSDictionary *keywordMap = [library objectForKey:@"List of Keywords"];
 	myFakeAlbumID = 0;
-
+	
+	NSEnumerator *albumEnum = [[library objectForKey:@"List of Albums"] objectEnumerator];
+	[self parseAlbums:albumEnum 
+		 imageRecords:imageRecords
+			mediaType:aMediaType 
+		   keywordMap:keywordMap
+		  wantUntyped:aWantUntyped
+		wantThumbPath:aWantThumbPath
+			imagePath:anImagePath
+			  forRoot:root];	
+    
 	//	TODO: Should we do this only for dedicated iPhoto versions? Or is this
 	//	"handled" implicitly by the existence of the key "List of Rolls"?
 	NSEnumerator *rollsEnum = [[library objectForKey:@"List of Rolls"] objectEnumerator];
@@ -193,16 +206,6 @@
 	   wantThumbPath:aWantThumbPath
 		   imagePath:anImagePath
 			 forRoot:root];
-	
-	NSEnumerator *albumEnum = [[library objectForKey:@"List of Albums"] objectEnumerator];
-	[self parseAlbums:albumEnum 
-		 imageRecords:imageRecords
-			mediaType:aMediaType 
-		   keywordMap:keywordMap
-		  wantUntyped:aWantUntyped
-		wantThumbPath:aWantThumbPath
-			imagePath:anImagePath
-			  forRoot:root];	
 	
 	if ([[root valueForKey:anImagePath] count] == 0)
 	{
@@ -327,17 +330,43 @@
 	
 	//	Parse dictionary creating libraries, and filling with track infromation
 	NSDictionary *rollRec;
-	iMBLibraryNode *eventsFolder = nil;
+
+    // create the events folder but don't add it unless we actually have an event
+    BOOL eventsFolderAdded = NO;
+	iMBLibraryNode *eventsFolder = [[[iMBLibraryNode alloc] init] autorelease];
+    [eventsFolder setIcon:[self iconForType:@"Events"]];
+    [eventsFolder setName:@"Events"];
+    
 	while (rollRec = [rollsEnum nextObject])
 	{		
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		
 		iMBLibraryNode *lib = [[[iMBLibraryNode alloc] init] autorelease];
-		[lib setName:[rollRec objectForKey:@"RollName"]];
-		[lib setIcon:[self iconForType:@"Event"]];
-		// iPhoto 2 doesn't have albumID's so let's just fake them
-		NSNumber *aid = [rollRec objectForKey:@"RollID"];
-		if (!aid)
+
+        NSNumber *aid = NULL;
+        iMBLibraryNode *parent = NULL;
+
+        if ([rollRec objectForKey:@"RollName"] != NULL)
+        {
+            // we're looking at iPhoto 7 records or better
+            [lib setName:[rollRec objectForKey:@"RollName"]];
+            [lib setIcon:[self iconForType:@"Event"]];
+            aid = [rollRec objectForKey:@"RollID"];
+            parent = eventsFolder;
+        }
+        else if ([rollRec objectForKey:@"AlbumName"] != NULL)
+        {
+            // we're looking at iPhoto 6 records
+            [lib setName:[rollRec objectForKey:@"AlbumName"]];
+            [lib setIcon:[self iconForType:@"Event"]];
+            aid = [rollRec objectForKey:@"AlbumId"];
+            parent = [self nodeWithAlbumID:[rollRec objectForKey:@"Parent"] withRoot:root];
+        }
+        
+		// iPhoto 2 doesn't have albumID's so let's just fake them.
+        // this code may be unnecessary now. anyone have older files to check?
+        // in any case, it seems like a good fallback.
+		if (aid == NULL)
 		{
 			aid = [NSNumber numberWithInt:myFakeAlbumID];
 			myFakeAlbumID++;
@@ -395,26 +424,14 @@
 		
 		if (hasItems) // only display events that have movies.... what happens when a child album has items we want, but the parent doesn't?
 		{
-			//	place the events in an own folder...
-			if (!eventsFolder) {
-				eventsFolder = [[[iMBLibraryNode alloc] init] autorelease];
-				[eventsFolder setIcon:[self iconForType:@"Events"]];
-				[eventsFolder setName:@"Events"];
-				[root fromThreadAddItem:eventsFolder];
-				root = eventsFolder;
-			}
-			
-			if ([rollRec objectForKey:@"Parent"])
-			{
-				iMBLibraryNode *parent = [self nodeWithAlbumID:[rollRec objectForKey:@"Parent"] withRoot:root];
-				if (!parent)
-					NSLog(@"iMBiPhotoAbstractParser (parseRolls) failed to find parent node");
-				[parent fromThreadAddItem:lib];
-			}
-			else
-			{
-				[root fromThreadAddItem:lib];
-			}
+            // check to see if we need to add the 'events' folder.
+            if (!eventsFolderAdded && parent == eventsFolder)
+            {
+                [root fromThreadAddItem:eventsFolder];
+                eventsFolderAdded = YES;
+            }
+
+            [parent fromThreadAddItem:lib];
 		}		
 		[pool release];
 	}
