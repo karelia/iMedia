@@ -104,4 +104,13 @@ extern NSString *iMBNativeDataArray;
 
 - (void)loadViewNib;
 
+// selecting & revealing
+- (iMBLibraryNode *)libraryNodeWithIdentifier:(NSString *)inIdentifier;
+- (iMBLibraryNode *)selectedLibraryNode;
+- (NSString *)selectedLibraryNodeIdentifier;
+- (void)selectLibraryNodeWithIdentifier:(NSString*)inIdentifier;
+- (void)selectLibraryNode:(iMBLibraryNode *)inLibraryNode;
+- (void)revealLibraryNodeWithIdentifier:(NSString*)inIdentifier;
+- (void)revealLibraryNode:(iMBLibraryNode *)inLibraryNode;
+
 @end

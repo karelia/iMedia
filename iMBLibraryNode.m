@@ -89,6 +89,7 @@ static NSMutableDictionary *sImageCache = nil;
 
 		[self setName:name];
 		[self setIconName:@"folder"];
+		[self setIdentifier:name];
 	}
 	return self;
 }
@@ -316,6 +317,47 @@ static NSMutableDictionary *sImageCache = nil;
 		}
 	}
 	return myIcon;
+}
+
+- (void)setIdentifier:(NSString *)identifier
+{
+	if (identifier)
+		[myAttributes setObject:identifier forKey:@"identifier"];
+	else
+		[myAttributes removeObjectForKey:@"identifier"];
+}
+
+- (NSString *)identifier
+{
+	NSString *identifier = [myAttributes objectForKey:@"identifier"];
+	if (identifier == nil) identifier = myName;
+	return identifier;
+}
+
+- (void)setParserClassName:(NSString *)parserClassName
+{
+	if (parserClassName)
+		[myAttributes setObject:parserClassName forKey:@"parserClassName"];
+	else
+		[myAttributes removeObjectForKey:@"parserClassName"];
+}
+
+- (NSString *)parserClassName
+{
+	return [myAttributes objectForKey:@"parserClassName"];
+}
+
+- (void)setWatchedPath:(NSString *)watchedPath
+{
+	if (watchedPath)
+		[myAttributes setObject:watchedPath forKey:@"watchedPath"];
+	else
+		[myAttributes removeObjectForKey:@"watchedPath"];
+}
+
+- (NSString *)watchedPath
+{
+	return [myAttributes objectForKey:@"watchedPath"];
 }
 
 - (int)prioritySortOrder
@@ -716,6 +758,32 @@ static NSMutableDictionary *sImageCache = nil;
 	return nil;
 }
 
+- (NSIndexPath *)indexPathForRootArray:(NSArray *)inRootArray
+{
+	// Get the index path from iMBLibraryNode. Since this implmentation is broken we need 
+	// to fix it...
+	
+	NSIndexPath* indexPath = [self indexPath];
+	
+	// Get the individual indexes and store them in an array. Leave one free entry at the beginning...
+	
+	unsigned int n = [indexPath length];
+	unsigned int* indexes = (unsigned int*) malloc(sizeof(unsigned int) * (n+1));
+	[indexPath getIndexes:indexes+1];
+	
+	// Now fill the first free entry with the index of the root node...
+	
+	unsigned int rootIndex = [inRootArray indexOfObjectIdenticalTo:[self root]];
+	indexes[0] = rootIndex;
+	indexPath = [NSIndexPath indexPathWithIndexes:indexes length:n+1];
+	
+	// Cleanup...
+	
+	free(indexes);
+	
+	return indexPath;
+}
+
 - (iMBLibraryNode *)root
 {
 	if ([self parent] == nil)
@@ -723,5 +791,22 @@ static NSMutableDictionary *sImageCache = nil;
 	return [[self parent] root];
 }
 
+- (NSString *)recursiveIdentifier
+{
+	NSString *identifier = [self identifier];
+	NSString *result;
+	
+	if (myParent)
+		result = [[myParent recursiveIdentifier] stringByAppendingFormat:@"/%@",identifier];
+	else if ([identifier hasPrefix:@"/"])
+		result = [NSString stringWithFormat:@"%@:/%@",[self parserClassName],identifier];
+	else
+		result = [NSString stringWithFormat:@"%@://%@",[self parserClassName],identifier];
+		
+	if ([result hasSuffix:@"/"])
+		result = [result substringToIndex:[result length]-1];
+	
+	return result;
+}
 
 @end

@@ -110,6 +110,9 @@
 				iMBLibraryNode *folder = [[[iMBLibraryNode alloc] init] autorelease];
 				[folder setIcon:[NSImage genericFolderIcon]];
 				[folder setName:[fileManager displayNameAtPath:filePath]];
+				[folder setIdentifier:[filePath lastPathComponent]];
+				[folder setParserClassName:NSStringFromClass([self class])];
+				[folder setWatchedPath:filePath];
 				[root fromThreadAddItem:folder];
 				[self recursivelyParse:filePath withNode:folder];
 			}
@@ -162,7 +165,8 @@
 - (NSArray *)nodesFromParsingDatabase:(NSLock *)gate
 {
     iMBLibraryNode *oneNodeParsed = [self parseDatabaseInThread:[self databasePath] gate:gate name:myName iconName:myIconName icon:NULL];
-
+	[oneNodeParsed setIdentifier:[self databasePath]];
+	
 	if (oneNodeParsed)
 	{
 		return [NSArray arrayWithObject:oneNodeParsed];

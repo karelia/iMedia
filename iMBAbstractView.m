@@ -276,11 +276,33 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	[libraryPopUpButton setEnabled:[libraryPopUpButton numberOfItems] > 0];
 }
 
+- (void)restoreSelectedNode
+{
+	if ([[libraryController content] count] > 0)
+	{
+		NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
+		NSString *identifier = [d objectForKey:[NSString stringWithFormat:@"%@SelectionIdentifier", NSStringFromClass([self class])]];
+		if (identifier)
+		{
+			iMBLibraryNode* node = [self libraryNodeWithIdentifier:identifier];
+			[self revealLibraryNode:node];
+			[self selectLibraryNode:node];
+		}
+	}
+}
+
+- (void)arrangedObjectsDidChange
+{
+	[self updatePlaylistPopup];
+	[self restoreSelectedNode];
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if ((object == libraryController) && [keyPath isEqualToString:@"arrangedObjects"])
 	{
-		[self updatePlaylistPopup];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(arrangedObjectsDidChange) object:nil];
+		[self performSelector:@selector(arrangedObjectsDidChange) withObject:nil afterDelay:0.01 inModes:[NSArray arrayWithObject:(NSString*)kCFRunLoopCommonModes]];
 	}
 }
 
@@ -301,27 +323,15 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 - (void)playlistPopupChanged:(id)sender
 {
 	iMBLibraryNode *selected = [sender representedObject];
-	NSIndexPath *theIndex = [selected indexPath];
-	NSIndexPath *full = nil;
-	unsigned int *idxs = (unsigned int *)malloc(sizeof(unsigned int) * ([theIndex length] + 1));
-	
-	idxs[0] = [[libraryController content] indexOfObject:[selected root]];
-	
-	int i = 0;
-	for (i = 0; i < [theIndex length]; i++)
-	{
-		idxs[i+1] = [theIndex indexAtPosition:i];
-	}
-	full = [NSIndexPath indexPathWithIndexes:idxs length:i+1];
-	[libraryController setSelectionIndexPath:full];
-	free (idxs);
+	[self selectLibraryNode:selected];
 }
 
 - (IBAction)playlistSelected:(id)sender	// action from oPlaylists
 {
 	id rowItem = [libraryView itemAtRow:[sender selectedRow]];
 	id representedObject = [rowItem respondsToSelector:@selector(representedObject)] ? [rowItem representedObject] : [rowItem observedObject];
-    
+    [self selectLibraryNode:(iMBLibraryNode*)representedObject];
+	
     id delegate = [[iMediaConfiguration sharedConfiguration] delegate];
     
 	if ([delegate respondsToSelector:@selector(iMediaConfiguration:didSelectNode:)])
@@ -412,34 +422,9 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	[loadingView setHidden:YES];
 	[splitView setHidden:NO];
 	[loadingProgressIndicator stopAnimation:self];
-
 	[backgroundLoadingLock unlock];
 
-	if ([[libraryController content] count] > 0)
-	{
-		// select the previous selection
-		NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
-		NSData *archivedSelection = [d objectForKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([self class])]];
-		
-		if (archivedSelection)
-		{
-			NSIndexPath *selection = [NSKeyedUnarchiver unarchiveObjectWithData:archivedSelection];
-			
-			@try
-			{
-				[libraryController setSelectionIndexPath:selection];
-			}
-			@catch (NSException *ex) {
-				NSLog(@"Exception caught in setSelectionIndexPath, ignoring");
-			}
-		}
-		else
-		{
-            [libraryView expandItem:[libraryView itemAtRow:0]];
-		}
-
-		[libraryPopUpButton selectItemWithRepresentedObject:[[libraryController selectedObjects] lastObject]];
-	}
+	[self restoreSelectedNode];
 	
 	isLoading = NO;
     didLoad = YES;
@@ -572,8 +557,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	if ([addedNodes count] > 0) 
 	{
 		iMBLibraryNode* node = [addedNodes objectAtIndex:0];
-		NSIndexPath* indexPath = [NSIndexPath indexPathWithIndex:[[libraryController content] indexOfObject:node]];
-		[libraryController setSelectionIndexPath:indexPath];
+		[self selectLibraryNode:node];
 	}
 	
 	return YES;
@@ -709,8 +693,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
         if ([addedNodes count] > 0) 
         {
             iMBLibraryNode* node = [addedNodes objectAtIndex:0];
-            NSIndexPath* indexPath = [NSIndexPath indexPathWithIndex:[[libraryController content] indexOfObject:node]];
-            [libraryController setSelectionIndexPath:indexPath];
+			[self selectLibraryNode:node];
         }
     }
 }
@@ -766,6 +749,144 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 			}
 		}
 		inSplitViewResize = NO;
+	}
+}
+
+#pragma mark -
+#pragma mark Selectig & Revealing
+
+
+- (iMBLibraryNode*) libraryNodeWithIdentifier:(NSString*)inIdentifier
+{
+	if (inIdentifier)
+	{
+		iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:[self mediaType]];
+		return [parserController libraryNodeWithIdentifier:inIdentifier];
+	}
+	
+	return nil;
+}
+
+
+- (iMBLibraryNode*) selectedLibraryNode
+{
+	NSArray* selection = [libraryController selectedObjects];
+	if ([selection count]) return [selection lastObject];
+	return nil;
+}
+
+
+- (NSString*) selectedLibraryNodeIdentifier
+{
+	return [[self selectedLibraryNode] identifier];
+}
+
+
+- (void) selectLibraryNodeWithIdentifier:(NSString*)inIdentifier
+{
+	iMBLibraryNode* node = [self libraryNodeWithIdentifier:inIdentifier];
+	[self selectLibraryNode:node];
+}
+
+
+- (void) selectLibraryNode:(iMBLibraryNode*)inLibraryNode
+{
+	if (inLibraryNode)
+	{
+		// Select the correct node in the NSOutlineView...
+		
+		iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:[self mediaType]];
+		NSIndexPath* indexPath = [inLibraryNode indexPathForRootArray:[parserController mutableLibraryNodes]];
+		
+		if (![indexPath isEqual:[libraryController selectionIndexPath]])
+		{
+			[libraryController setSelectionIndexPath:indexPath];
+		}
+		
+		// Also select the same node in the popup...
+		
+		if ([[libraryPopUpButton selectedItem] representedObject] != inLibraryNode)
+		{
+			[libraryPopUpButton selectItemWithRepresentedObject:inLibraryNode];
+		}
+		
+		// Store identifier in preferences...
+		
+		NSString *identifier = [inLibraryNode recursiveIdentifier];
+		NSString *key = [NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]];
+		NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:key]];
+		[d setObject:identifier forKey:[NSString stringWithFormat:@"%@SelectionIdentifier", NSStringFromClass([self class])]];
+		[[NSUserDefaults standardUserDefaults] setObject:d forKey:key];
+	}
+}
+
+
+- (void) revealLibraryNodeWithIdentifier:(NSString*)inIdentifier
+{
+	iMBLibraryNode* node = [self libraryNodeWithIdentifier:inIdentifier];
+	[self revealLibraryNode:node];
+}
+
+
+- (iMBLibraryNode*) _nodeForProxy:(id)inProxy
+{
+	return (iMBLibraryNode*)([inProxy respondsToSelector:@selector(representedObject)] ? [inProxy representedObject] : [inProxy observedObject]);
+}
+
+
+- (BOOL) _subtree:(id)inProxy containsLibraryNode:(iMBLibraryNode*)inLibraryNode
+{
+	iMBLibraryNode* node = [self _nodeForProxy:inProxy];
+	if (node == inLibraryNode) return YES;
+
+	int level = [libraryView levelForItem:inProxy];
+	int row = [libraryView rowForItem:inProxy];
+	unsigned int i,n = [libraryView numberOfRows];
+	
+	for (i=row+1; i<n; i++)
+	{
+		id proxy = [libraryView itemAtRow:i];
+		int lvl = [libraryView levelForItem:proxy];
+		if (lvl<=level) break;
+		
+		iMBLibraryNode* node = [self _nodeForProxy:proxy];
+		if (node == inLibraryNode) return YES;
+	}
+	
+	return NO;
+}
+
+
+- (void) revealLibraryNode:(iMBLibraryNode*)inLibraryNode
+{
+	// First expand everything, so that we have access to ALL nodes. Please note that we 
+	// are doing this with reverse enumeration so that we do not mess up indexes...
+	
+	int i,n = [libraryView numberOfRows];
+	id proxy;
+	
+	for (i=n-1; i>=0; i--)
+	{
+		if (proxy = [libraryView itemAtRow:i])
+		{
+			[libraryView expandItem:proxy expandChildren:YES];
+		}	
+	}
+
+	// Then we can collapse every subtree that does not contain our node, so that we do not  
+	// waste any display space in the outline view...
+	
+	for (i=0; i<[libraryView numberOfRows]; i++)
+	{
+		if (proxy = [libraryView itemAtRow:i])
+		{
+			iMBLibraryNode* node = [self _nodeForProxy:proxy];
+			
+			if (![self _subtree:proxy containsLibraryNode:inLibraryNode] || node==inLibraryNode)
+			{
+				[libraryView collapseItem:proxy collapseChildren:YES];
+			}
+		}
 	}
 }
 

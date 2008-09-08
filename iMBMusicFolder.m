@@ -134,6 +134,9 @@
 
 				[folder setIcon:[NSImage genericFolderIcon]];
 				[folder setName:[fileManager displayNameAtPath:filePath]];
+				[folder setIdentifier:[filePath lastPathComponent]];
+				[folder setParserClassName:NSStringFromClass([self class])];
+				[folder setWatchedPath:filePath];
                 
                 [root fromThreadAddItem:folder];
 				
@@ -322,7 +325,8 @@
 	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:[self databasePath] size:NSMakeSize(16,16)];
 
     iMBLibraryNode *oneNodeParsed = [self parseDatabaseInThread:[self databasePath] gate:gate name:myMusicFolderName iconName:NULL icon:icon];
-    
+ 	[oneNodeParsed setIdentifier:[self databasePath]];
+       
 	if (oneNodeParsed)
 	{
 		return [NSArray arrayWithObject:oneNodeParsed];

@@ -46,7 +46,7 @@
 #import <Cocoa/Cocoa.h>
 #import "iMediaBrowserProtocol.h"
 
-@class iMBLibraryNode, UKKQueue;
+@class iMBLibraryNode;
 
 @interface iMBAbstractParser : NSObject <iMBParser>
 {

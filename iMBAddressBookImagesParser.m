@@ -114,6 +114,9 @@
 	iMBLibraryNode *node = [[iMBLibraryNode alloc] init];
 	[node setName:[group valueForProperty:kABGroupNameProperty]];
 	[node setIconName:@"ABGroup"];
+	[node setIdentifier:[group valueForProperty:kABGroupNameProperty]];
+	[node setParserClassName:NSStringFromClass([self class])];
+	[node setWatchedPath:myDatabase];
 	
 	NSMutableArray *people = [NSMutableArray array];
 	NSEnumerator *e = [[group members] objectEnumerator];
@@ -145,6 +148,9 @@
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInIMedia(@"Address Book", @"Root Node Name of address book")];
 	[root setIconName:@"com.apple.AddressBook:"];
+	[root setIdentifier:@"Address Book"];
+	[root setParserClassName:NSStringFromClass([self class])];
+	[root setWatchedPath:myDatabase];
 	
 	ABAddressBook *ab = [ABAddressBook sharedAddressBook];
 	NSEnumerator *groupEnum = [[ab groups] objectEnumerator];

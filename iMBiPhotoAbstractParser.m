@@ -154,6 +154,9 @@
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 	[root setName:LocalizedStringInIMedia(@"iPhoto", @"iPhoto")];
 	[root setIconName:@"com.apple.iPhoto:"];
+	[root setIdentifier:@"iPhoto"];
+	[root setParserClassName:NSStringFromClass([self class])];
+	[root setWatchedPath:myDatabase];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:anImagePath];
 	
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];
@@ -241,6 +244,9 @@
 		iMBLibraryNode *lib = [[[iMBLibraryNode alloc] init] autorelease];
 		[lib setName:[albumRec objectForKey:@"AlbumName"]];
 		[lib setIcon:[self iconForType:[albumRec objectForKey:@"Album Type"]]];
+        [lib setIdentifier:[albumRec objectForKey:@"AlbumName"]];
+        [lib setParserClassName:NSStringFromClass([self class])];
+		[lib setWatchedPath:myDatabase];
 		// iPhoto 2 doesn't have albumID's so let's just fake them
 		NSNumber *aid = [albumRec objectForKey:@"AlbumId"];
 		if (!aid)
@@ -336,6 +342,9 @@
 	iMBLibraryNode *eventsFolder = [[[iMBLibraryNode alloc] init] autorelease];
     [eventsFolder setIcon:[self iconForType:@"Events"]];
     [eventsFolder setName:@"Events"];
+	[eventsFolder setIdentifier:@"Events"];
+	[eventsFolder setParserClassName:NSStringFromClass([self class])];
+	[eventsFolder setWatchedPath:myDatabase];
     
 	while (rollRec = [rollsEnum nextObject])
 	{		
@@ -351,6 +360,9 @@
             // we're looking at iPhoto 7 records or better
             [lib setName:[rollRec objectForKey:@"RollName"]];
             [lib setIcon:[self iconForType:@"Event"]];
+			[lib setIdentifier:[rollRec objectForKey:@"RollName"]];
+			[lib setParserClassName:NSStringFromClass([self class])];
+			[lib setWatchedPath:myDatabase];
             aid = [rollRec objectForKey:@"RollID"];
             parent = eventsFolder;
         }
@@ -359,6 +371,9 @@
             // we're looking at iPhoto 6 records
             [lib setName:[rollRec objectForKey:@"AlbumName"]];
             [lib setIcon:[self iconForType:@"Event"]];
+			[lib setIdentifier:[rollRec objectForKey:@"AlbumName"]];
+			[lib setParserClassName:NSStringFromClass([self class])];
+			[lib setWatchedPath:myDatabase];
             aid = [rollRec objectForKey:@"AlbumId"];
             parent = [self nodeWithAlbumID:[rollRec objectForKey:@"Parent"] withRoot:root];
         }

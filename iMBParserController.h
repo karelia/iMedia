@@ -46,4 +46,10 @@
 // determine whether a particular library node can be removed.
 - (BOOL)canRemoveLibraryNode:(iMBLibraryNode *)libraryNode;
 
+// get a node by identifier.
+- (iMBLibraryNode*) libraryNodeWithIdentifier:(NSString*)inIdentifier;
+
+// debugging.
+- (void)logNodes;
+
 @end

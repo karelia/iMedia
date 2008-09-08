@@ -89,6 +89,9 @@
 		library = [[iMBLibraryNode alloc] init];
 		[library setName:LocalizedStringInIMedia(@"OmniWeb", @"OmniWeb")];
 		[library setIconName:@"com.omnigroup.OmniWeb5"];
+        [library setIdentifier:@"OmniWeb"];
+        [library setParserClassName:NSStringFromClass([self class])];
+		[library setWatchedPath:myDatabase];
 		
 		iMBXBELParser *parser = [[iMBXBELParser alloc] init];
 		[parser parseWithXMLDocument:xml node:library];

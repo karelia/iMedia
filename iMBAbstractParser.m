@@ -111,7 +111,10 @@
         [libraryNode setName:[name stringByAppendingFormat:@" (%@)", loadingString]];
         [libraryNode setIconName:iconName];
         [libraryNode setIcon:icon];
-        
+        [libraryNode setIdentifier:name];
+        [libraryNode setParserClassName:NSStringFromClass([self class])];
+		[libraryNode setWatchedPath:myDatabase];
+       
         // the node itself will be returned immediately. now launch _another_ thread to populate the node.
         NSDictionary *populateLibraryNodeArguments = [NSDictionary dictionaryWithObjectsAndKeys:
                                                       libraryNode,          @"rootLibraryNode",

@@ -179,6 +179,9 @@
 		
 		iMBLibraryNode *lib = [[[iMBLibraryNode alloc] init] autorelease];
 		[lib setName:[albumRec objectForKey:@"AlbumName"]];
+        [lib setIdentifier:[albumRec objectForKey:@"AlbumName"]];
+        [lib setParserClassName:NSStringFromClass([self class])];
+		[lib setWatchedPath:myDatabase];
 //		[lib setIcon:[self iconForType:[albumRec objectForKey:@"Album Type"]]];
 		NSImage* icon = [self iconForType:[albumRec objectForKey:@"Album Type"]];
 		[icon setScalesWhenResized:YES];

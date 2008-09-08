@@ -77,6 +77,9 @@
 	iMBLibraryNode *rootLibraryNode = [[[iMBLibraryNode alloc] init] autorelease];
 	[rootLibraryNode setName:LocalizedStringInIMedia(@"Favorites", @"Favourite folder name")];
 	[rootLibraryNode setIconName:@"heart"];
+	[rootLibraryNode setIdentifier:@"Favorites"];
+	[rootLibraryNode setParserClassName:NSStringFromClass([self class])];
+	[rootLibraryNode setWatchedPath:myDatabase];
 
     NSEnumerator *pathsEnumerator = [paths objectEnumerator];
 	NSString *currentPath;

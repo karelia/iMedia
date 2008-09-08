@@ -216,6 +216,9 @@
 						[folder release];
 						[folder setIcon:[NSImage genericFolderIcon]];
 						[folder setName:[fm displayNameAtPath:filePath]];
+						[folder setIdentifier:[filePath lastPathComponent]];
+						[folder setParserClassName:NSStringFromClass([self class])];
+						[folder setWatchedPath:filePath];
 						[self recursivelyParse:filePath withNode:folder];
 					}
 				}
@@ -249,6 +252,9 @@
 	[root setName:LocalizedStringInIMedia(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
 	NSString *folder = [self databasePath];
 	[root setIcon:[[NSWorkspace sharedWorkspace] iconForFile:folder size:NSMakeSize(16,16)]];
+	[root setIdentifier:folder];
+	[root setParserClassName:NSStringFromClass([self class])];
+	[root setWatchedPath:folder];
 	
 	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
 	{

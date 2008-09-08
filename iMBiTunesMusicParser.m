@@ -165,6 +165,9 @@
 							node = [[[iMBLibraryNode alloc] init] autorelease];
 							[node setName:inName];
 							[node setIconName:inIconName];
+							[node setIdentifier:inName];
+							[node setParserClassName:NSStringFromClass([self class])];
+							[node setWatchedPath:myDatabase];
 							
 							[self populateNode:node withTracks:tracks fromPlaylist:playlist];
 						}
@@ -211,6 +214,9 @@
 								node = [[[iMBLibraryNode alloc] init] autorelease];
 								[node setName:[playlist objectForKey:@"Name"]];
 								[node setIconName:@"itunes-icon-folder7"];
+								[node setIdentifier:[playlist objectForKey:@"Name"]];
+								[node setParserClassName:NSStringFromClass([self class])];
+								[node setWatchedPath:myDatabase];
 								
 								[node setAllItems:[self parseDatabase:inLibrary forPlaylistsWithParentID:selfID]];
 								if (node) [nodes addObject:node];
@@ -243,6 +249,9 @@
 							{
 								node = [[[iMBLibraryNode alloc] init] autorelease];
 								[node setName:[playlist objectForKey:@"Name"]];
+								[node setIdentifier:[playlist objectForKey:@"Name"]];
+								[node setParserClassName:NSStringFromClass([self class])];
+								[node setWatchedPath:myDatabase];
 								if (_version == 7) [node setIconName:@"itunes-icon-playlist-smart7"];
 								else [node setIconName:@"itunes-icon-playlist-smart"];
 								
@@ -277,6 +286,9 @@
 							{
 								node = [[[iMBLibraryNode alloc] init] autorelease];
 								[node setName:[playlist objectForKey:@"Name"]];
+								[node setIdentifier:[playlist objectForKey:@"Name"]];
+								[node setParserClassName:NSStringFromClass([self class])];
+								[node setWatchedPath:myDatabase];
 								if (_version == 7) [node setIconName:@"itunes-icon-playlist-normal7"];
 								else [node setIconName:@"itunes-icon-playlist-normal"];
 								
@@ -323,6 +335,9 @@
 		root = [[[iMBLibraryNode alloc] init] autorelease];
 		[root setName:LocalizedStringInIMedia(@"iTunes", @"iTunes")];
 		[root setIconName:@"com.apple.iTunes:"];
+        [root setIdentifier:@"iTunes"];
+        [root setParserClassName:NSStringFromClass([self class])];
+		[root setWatchedPath:myDatabase];
 		
 		#if RECURSIVE_PARSEDATABASE
 	
@@ -401,15 +416,27 @@
 		if (_version<7) [library setName:LocalizedStringInIMedia(@"Library", @"Library as titled in iTunes source list")];
 		else [library setName:LocalizedStringInIMedia(@"Music", @"Library as titled in iTunes source list")];
 		[library setIconName:[self iconNameForPlaylist:@"Library"]]; //@"MBiTunesLibrary"];
+        [library setIdentifier:@"Music"];
+        [library setParserClassName:NSStringFromClass([self class])];
+		[library setWatchedPath:myDatabase];
 		
 		[podcastLib setName:LocalizedStringInIMedia(@"Podcasts", @"Podcasts as titled in iTunes source list")];
 		[podcastLib setIconName:[self iconNameForPlaylist:@"Podcasts"]]; //@"MBiTunesPodcast"];
+        [podcastLib setIdentifier:@"Podcasts"];
+        [podcastLib setParserClassName:NSStringFromClass([self class])];
+		[podcastLib setWatchedPath:myDatabase];
 		
 		[partyShuffleLib setName:LocalizedStringInIMedia(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
 		[partyShuffleLib setIconName:[self iconNameForPlaylist:@"Party Shuffle"]]; //@"MBiTunesPartyShuffle"];
+        [partyShuffleLib setIdentifier:@"Party Shuffle"];
+        [partyShuffleLib setParserClassName:NSStringFromClass([self class])];
+		[partyShuffleLib setWatchedPath:myDatabase];
 		
 		[purchasedLib setName:LocalizedStringInIMedia(@"Purchased", @"Purchased folder as titled in iTunes source list")];
 		[purchasedLib setIconName:[self iconNameForPlaylist:@"Purchased Music"]]; //@"MBiTunesPurchasedPlaylist"];
+        [purchasedLib setIdentifier:@"Purchased"];
+        [purchasedLib setParserClassName:NSStringFromClass([self class])];
+		[purchasedLib setWatchedPath:myDatabase];
 		
 		int playlistCount = [[musicLibrary objectForKey:@"Playlists"] count];
 		
@@ -458,6 +485,9 @@
 			{
 				node = [[iMBLibraryNode alloc] init];
 				[node setName:objectName];
+				[node setIdentifier:objectName];
+				[node setParserClassName:NSStringFromClass([self class])];
+				[node setWatchedPath:myDatabase];
 				
 				if ([[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Smart Info"])
 				{

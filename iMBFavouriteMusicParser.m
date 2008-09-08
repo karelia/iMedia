@@ -83,6 +83,8 @@
 	iMBLibraryNode *favs = [[iMBLibraryNode alloc] init];
 	[favs setName:LocalizedStringInIMedia(@"Favorites", @"Favourite folder name")];
 	[favs setIconName:@"heart"];
+	[favs setIdentifier:@"Favorites"];
+	[favs setParserClassName:NSStringFromClass([self class])];
 	
 	NSFileManager *fm = [NSFileManager defaultManager];
 	iMBMusicFolder *parser;
@@ -101,6 +103,9 @@
 			{
 				[node setName:[cur lastPathComponent]];
 				[node setIconName:@"folder"];
+				[node setIdentifier:[cur lastPathComponent]];
+				[node setParserClassName:NSStringFromClass([self class])];
+				[node setWatchedPath:cur];
 				[favs addItem:node];
 				[myParsers addObject:parser];
 			}

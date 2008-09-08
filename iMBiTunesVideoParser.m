@@ -173,6 +173,9 @@
 							node = [[[iMBLibraryNode alloc] init] autorelease];
 							[node setName:inName];
 							[node setIconName:inIconName];
+							[node setIdentifier:inName];
+							[node setParserClassName:NSStringFromClass([self class])];
+							[node setWatchedPath:myDatabase];
 							
 							hasVideos = [self populateNode:node withTracks:tracks fromPlaylist:playlist];
 						}
@@ -222,6 +225,9 @@
 								node = [[[iMBLibraryNode alloc] init] autorelease];
 								[node setName:[playlist objectForKey:@"Name"]];
 								[node setIconName:@"itunes-icon-folder7"];
+								[node setIdentifier:[playlist objectForKey:@"Name"]];
+								[node setParserClassName:NSStringFromClass([self class])];
+								[node setWatchedPath:myDatabase];
 								
 								NSMutableArray* subnodes = [self parseDatabase:inLibrary forPlaylistsWithParentID:selfID];
 								if (node!=nil && subnodes!=nil && [subnodes count] > 0)
@@ -260,6 +266,9 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								if (_version == 7) [node setIconName:@"itunes-icon-playlist-smart7"];
 								else [node setIconName:@"itunes-icon-playlist-smart"];
+								[node setIdentifier:[playlist objectForKey:@"Name"]];
+								[node setParserClassName:NSStringFromClass([self class])];
+								[node setWatchedPath:myDatabase];
 								
 								if (node)
 								{
@@ -297,6 +306,9 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								if (_version == 7) [node setIconName:@"itunes-icon-playlist-normal7"];
 								else [node setIconName:@"itunes-icon-playlist-normal"];
+								[node setIdentifier:[playlist objectForKey:@"Name"]];
+								[node setParserClassName:NSStringFromClass([self class])];
+								[node setWatchedPath:myDatabase];
 								
 								if (node)
 								{
@@ -343,6 +355,9 @@
 		iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 		[root setName:LocalizedStringInIMedia(@"iTunes", @"iTunes")];
 		[root setIconName:@"com.apple.iTunes:"];
+        [root setIdentifier:@"iTunes"];
+        [root setParserClassName:NSStringFromClass([self class])];
+		[root setWatchedPath:myDatabase];
 		
 		[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Movies"];
 		
@@ -442,6 +457,9 @@
 	[root setName:LocalizedStringInIMedia(@"iTunes", @"iTunes")];
 	[root setIconName:@"com.apple.iTunes"];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Movies"];
+	[root setIdentifier:@"iTunes"];
+	[root setParserClassName:NSStringFromClass([self class])];
+	[root setWatchedPath:myDatabase];
 	
     // Create default subnodes
 	iMBLibraryNode *library = [[iMBLibraryNode alloc] init];
@@ -453,18 +471,33 @@
 	
 	[library setName:LocalizedStringInIMedia(@"Library", @"Library as titled in iTunes source list")];
 	[library setIconName:@"MBiTunesLibrary"];
+	[library setIdentifier:@"Library"];
+	[library setParserClassName:NSStringFromClass([self class])];
+	[library setWatchedPath:myDatabase];
 	
 	[podcastLib setName:LocalizedStringInIMedia(@"Podcasts", @"Podcasts as titled in iTunes source list")];
 	[podcastLib setIconName:@"MBiTunesPodcast"];
+	[podcastLib setIdentifier:@"Podcasts"];
+	[podcastLib setParserClassName:NSStringFromClass([self class])];
+	[podcastLib setWatchedPath:myDatabase];
 	
 	[partyShuffleLib setName:LocalizedStringInIMedia(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
 	[partyShuffleLib setIconName:@"MBiTunesPartyShuffle"];
+	[partyShuffleLib setIdentifier:@"Party Shuffle"];
+	[partyShuffleLib setParserClassName:NSStringFromClass([self class])];
+	[partyShuffleLib setWatchedPath:myDatabase];
 	
 	[moviesLib setName:LocalizedStringInIMedia(@"Videos", @"Videos as titled in iTunes source list")];
 	[moviesLib setIconName:@"iTunesVideo"];
+	[moviesLib setIdentifier:@"Videos"];
+	[moviesLib setParserClassName:NSStringFromClass([self class])];
+	[moviesLib setWatchedPath:myDatabase];
 	
 	[purchasedLib setName:LocalizedStringInIMedia(@"Purchased", @"Purchased folder as titled in iTunes source list")];
 	[purchasedLib setIconName:@"MBiTunesPurchasedPlaylist"];
+	[purchasedLib setIdentifier:@"Purchased"];
+	[purchasedLib setParserClassName:NSStringFromClass([self class])];
+	[purchasedLib setWatchedPath:myDatabase];
 	
     // Look through the iTunes playlists for movies
     NSDictionary    *tracksDictionary = [iTunesLibrary objectForKey:@"Tracks"];
@@ -530,6 +563,9 @@
 			{   // Create a new node for this playlist
 				node = [[iMBLibraryNode alloc] init];
 				[node setName:[playListDict objectForKey:@"Name"]];
+				[node setIdentifier:[playListDict objectForKey:@"Name"]];
+				[node setParserClassName:NSStringFromClass([self class])];
+				[node setWatchedPath:myDatabase];
 				if ([playListDict objectForKey:@"Smart Info"])
 				{
 					[node setIconName:@"photocast_folder"];

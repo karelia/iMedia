@@ -81,6 +81,12 @@
 - (NSString *)iconName;
 - (void)setIcon:(NSImage *)icon;
 - (NSImage *)icon;
+- (void)setIdentifier:(NSString *)identifier;
+- (NSString *)identifier;
+- (void)setParserClassName:(NSString *)parserClassName;
+- (NSString *)parserClassName;
+- (void)setWatchedPath:(NSString *)watchedPath;
+- (NSString *)watchedPath;
 
 - (int)prioritySortOrder; // The higher the better
 - (void)setPrioritySortOrder:(int)value;
@@ -126,5 +132,7 @@
 - (NSAttributedString *)nameWithImage;
 
 - (NSIndexPath *)indexPath;
+- (NSIndexPath *)indexPathForRootArray:(NSArray *)inRootArray;
+- (NSString *)recursiveIdentifier;
 
 @end

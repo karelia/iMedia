@@ -278,4 +278,88 @@
     return folderPathsRemoved;
 }
 
+- (void)recursiveLogNode:(iMBLibraryNode *)inNode
+{
+	NSLog(@"%@",[inNode recursiveIdentifier]);
+	
+	NSEnumerator* e = [[inNode allItems] objectEnumerator];
+	iMBLibraryNode *node;
+	
+	while (node =[e nextObject])
+	{
+		[self recursiveLogNode:node];
+	}
+}
+
+
+- (iMBLibraryNode*) libraryNodeWithIdentifier:(NSString*)inIdentifier inParentNode:(iMBLibraryNode*)inParentNode
+{
+	// Find the node with the specified identifier...
+	
+	NSArray* nodes = inParentNode ? [inParentNode allItems] : myLibraryNodes;
+	NSEnumerator* list = [nodes objectEnumerator];
+	iMBLibraryNode* node;
+	
+	while (node = [list nextObject])
+	{
+		if ([[node recursiveIdentifier] isEqualToString:inIdentifier])
+		{
+			return node;
+		}
+		else
+		{
+			iMBLibraryNode* match = [self libraryNodeWithIdentifier:inIdentifier inParentNode:node];
+			if (match) return match;
+		}
+	}
+	
+	return nil;
+}
+
+- (iMBLibraryNode*) libraryNodeWithIdentifier:(NSString*)inIdentifier
+{
+	iMBLibraryNode* node = nil;
+	int tries = 0;
+	
+	// First try to get the specified node, falling back to the next best ancestor if that node doesn't exist...
+	
+	NSString* identifier = [inIdentifier copy];
+	
+	do
+	{
+		node = [self libraryNodeWithIdentifier:identifier inParentNode:nil];
+		if (node) break;
+		
+		tries++;
+		
+		NSRange range = [identifier rangeOfString:@"/" options:NSBackwardsSearch];
+		if (range.location != NSNotFound)
+			identifier = [identifier substringToIndex:range.location];
+	}
+	while (![identifier hasSuffix:@":/"] && tries<10);
+	
+	// If that fails, then simply return the first top-level node...
+	
+	if (node == nil)
+	{
+		if ([self countOfLibraryNodes])
+		{
+			node = [self objectInLibraryNodesAtIndex:0];
+		}
+	}
+	
+	return node;
+}
+
+- (void)logNodes
+{
+	NSEnumerator* e = [myLibraryNodes objectEnumerator];
+	iMBLibraryNode *node;
+	
+	while (node =[e nextObject])
+	{
+		[self recursiveLogNode:node];
+	}
+}
+
 @end

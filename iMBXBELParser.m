@@ -56,6 +56,8 @@
 	iMBLibraryNode *node = [[iMBLibraryNode alloc] init];
 	[node setIcon:[NSImage genericFolderIcon]];
 	[node setName:[[[folder elementsForName:@"title"] objectAtIndex:0] stringValue]];
+	[node setIdentifier:[node name]];
+	[node setParserClassName:NSStringFromClass([self class])];
 	NSEnumerator *e = [[folder elementsForName:@"folder"] objectEnumerator];
 	NSXMLElement *cur;
 	

@@ -463,12 +463,12 @@ static NSMutableArray *_browserClasses = nil;
 
 	//we want to save the current selection to UD
 	NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-	NSIndexPath *selection = [[mySelectedBrowser controller] selectionIndexPath];
-	NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
+//	NSIndexPath *selection = [[mySelectedBrowser controller] selectionIndexPath];
+//	NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
     NSString    *myDefaultsKey = [NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]];
     NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[ud objectForKey:myDefaultsKey]];
 	
-	[d setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+//	[d setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
 
 	// This isn't being restored -- should we?
 	//	[d setObject:[NSArray arrayWithObjects:NSStringFromRect([oPlaylists frame]), NSStringFromRect([oBrowserView frame]), nil] forKey:@"SplitViewSize"];
@@ -508,13 +508,13 @@ static NSMutableArray *_browserClasses = nil;
     {
         // TODO: Saving the defaults should be handled in didDeactivate rather than here.
 
-        //we want to save the current selection to UD
-        NSIndexPath *selection = [[mySelectedBrowser controller] selectionIndexPath];
-        NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
-
-        [d setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
-        
-        [[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
+//        //we want to save the current selection to UD
+//        NSIndexPath *selection = [[mySelectedBrowser controller] selectionIndexPath];
+//        NSData *archivedSelection = [NSKeyedArchiver archivedDataWithRootObject:selection];
+//
+//        [d setObject:archivedSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([mySelectedBrowser class])]];
+//        
+//        [[NSUserDefaults standardUserDefaults] setObject:d forKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
     }
 
     if ([myDelegate respondsToSelector:@selector(iMediaBrowser:willChangeToBrowser:)])

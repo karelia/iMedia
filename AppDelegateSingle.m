@@ -80,27 +80,27 @@
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
-    // TODO: Saving the defaults should be handled in didDeactivate rather than here.
-
-    NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]]];
-    
-    // save current selection in photo view to user defaults
-    NSIndexPath *photosSelection = [[photosView controller] selectionIndexPath];
-    NSData *archivedPhotosSelection = [NSKeyedArchiver archivedDataWithRootObject:photosSelection];
-
-    [dictionary setObject:archivedPhotosSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([photosView class])]];
-    
-    [[NSUserDefaults standardUserDefaults] setObject:dictionary forKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
-    
-    // save current selection in music view to user defaults
-    NSIndexPath *musicSelection = [[musicView controller] selectionIndexPath];
-    NSData *archivedMusicSelection = [NSKeyedArchiver archivedDataWithRootObject:musicSelection];
-
-    [dictionary setObject:archivedMusicSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([musicView class])]];
-
-    [[NSUserDefaults standardUserDefaults] setObject:dictionary forKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
-    
-    [[NSUserDefaults standardUserDefaults] synchronize];
+//    // TODO: Saving the defaults should be handled in didDeactivate rather than here.
+//
+//    NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]]];
+//    
+//    // save current selection in photo view to user defaults
+//    NSIndexPath *photosSelection = [[photosView controller] selectionIndexPath];
+//    NSData *archivedPhotosSelection = [NSKeyedArchiver archivedDataWithRootObject:photosSelection];
+//
+//    [dictionary setObject:archivedPhotosSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([photosView class])]];
+//    
+//    [[NSUserDefaults standardUserDefaults] setObject:dictionary forKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
+//    
+//    // save current selection in music view to user defaults
+//    NSIndexPath *musicSelection = [[musicView controller] selectionIndexPath];
+//    NSData *archivedMusicSelection = [NSKeyedArchiver archivedDataWithRootObject:musicSelection];
+//
+//    [dictionary setObject:archivedMusicSelection forKey:[NSString stringWithFormat:@"%@Selection", NSStringFromClass([musicView class])]];
+//
+//    [[NSUserDefaults standardUserDefaults] setObject:dictionary forKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
+//    
+//    [[NSUserDefaults standardUserDefaults] synchronize];
 
     [photosView didDeactivate];
     [musicView didDeactivate];

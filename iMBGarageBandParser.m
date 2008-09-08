@@ -152,6 +152,9 @@
 					[folder release];
 					[folder setIcon:[NSImage genericFolderIcon]];
 					[folder setName:[fm displayNameAtPath:filePath]];
+					[folder setIdentifier:[filePath lastPathComponent]];
+					[folder setParserClassName:NSStringFromClass([self class])];
+					[folder setWatchedPath:filePath];
 					[self recursivelyParse:filePath withNode:folder artist:artist];
 				}
 			}
@@ -165,6 +168,9 @@
 	iMBLibraryNode *root = [[[iMBLibraryNode alloc] init] autorelease];
 	[root setName:LocalizedStringInIMedia(@"GarageBand", @"Name of Node")];
 	[root setIconName:@"com.apple.garageband"];
+	[root setIdentifier:@"GarageBand"];
+	[root setParserClassName:NSStringFromClass([self class])];
+	[root setWatchedPath:myDatabase];
 
 	// Do the demo songs
 	NSString *demoPath = @"/Library/Application Support/GarageBand/GarageBand Demo Songs/GarageBand Demo Songs/";
@@ -173,6 +179,9 @@
 		iMBLibraryNode *demo = [[iMBLibraryNode alloc] init];
 		[demo setName:LocalizedStringInIMedia(@"GarageBand Demo Songs", @"Node name")];
 		[demo setIcon:[NSImage genericFolderIcon]];
+		[demo setIdentifier:@"GarageBand Demo Songs"];
+		[demo setParserClassName:NSStringFromClass([self class])];
+		[demo setWatchedPath:demoPath];
 		
 		[self recursivelyParse:demoPath withNode:demo artist:LocalizedStringInIMedia(@"Demo", @"artist name")];
 		[root addItem:demo];
@@ -182,6 +191,9 @@
 	iMBLibraryNode *myCompositions = [[[iMBLibraryNode alloc] init] autorelease];
 	[myCompositions setName:LocalizedStringInIMedia(@"My Compositions", @"Node name")];
 	[myCompositions setIcon:[NSImage genericFolderIcon]];
+	[myCompositions setIdentifier:@"My Compositions"];
+	[myCompositions setParserClassName:NSStringFromClass([self class])];
+	[myCompositions setWatchedPath:myDatabase];
 	
 	[self recursivelyParse:myDatabase
 				  withNode:myCompositions

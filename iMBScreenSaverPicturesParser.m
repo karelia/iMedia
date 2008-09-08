@@ -143,6 +143,9 @@
 
 			[folder setIcon:[[NSWorkspace sharedWorkspace] iconForFile:ssPath size:NSMakeSize(16,16)]];
 			[folder setName:[fm displayNameAtPath:[ssPath stringByDeletingPathExtension]]];
+			[folder setIdentifier:[ssPath lastPathComponent]];
+			[folder setParserClassName:NSStringFromClass([self class])];
+			[folder setWatchedPath:myDatabase];
 			
 			// Collected images, set.
 			[folder setAttribute:images forKey:@"Images"];
@@ -159,6 +162,9 @@
 
 	[root setName:LocalizedStringInIMedia(@"Screen Savers", @"Screen Savers -- source of some images in iMedia")];
 	[root setIcon:[NSImage genericFolderIcon]];
+	[root setIdentifier:@"Screen Savers"];
+	[root setParserClassName:NSStringFromClass([self class])];
+	[root setWatchedPath:myDatabase];
 		
 	[self parseWithNode:root];
 	

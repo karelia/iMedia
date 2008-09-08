@@ -85,15 +85,19 @@
 - (iMBLibraryNode *)recursivelyParseItem:(NSDictionary *)item
 {
 	iMBLibraryNode *parsed = [[[iMBLibraryNode alloc] init] autorelease];
+	[parsed setParserClassName:NSStringFromClass([self class])];
+	[parsed setWatchedPath:myDatabase];
 	NSArray *collectionArray = [item objectForKey:@"Children"];		// default group of children, if this is a collection
 	
 	if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksBar"])
 	{
+        [parsed setIdentifier:@"Bookmarks Bar"];
 		[parsed setName:LocalizedStringInIMedia(@"Bookmarks Bar", @"Bookmarks Bar as titled in Safari")];
 		[parsed setIconName:@"SafariBookmarksBar"];
 	}
 	else if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksMenu"])
 	{
+        [parsed setIdentifier:@"Bookmarks Menu"];
 		[parsed setName:LocalizedStringInIMedia(@"Bookmarks Menu", @"Bookmarks Menu as titled in Safari")];
 		[parsed setIconName:@"SafariBookmarksMenu"];
 	}
@@ -107,6 +111,7 @@
 	else if (nil == [item objectForKey:@"Title"] && nil != [item objectForKey:@"URIDictionary"])	// actual bookmark
 	{
 		NSDictionary *URIDictionary = [item objectForKey:@"URIDictionary"];
+        [parsed setIdentifier:[URIDictionary objectForKey:@"title"]];
 		[parsed setName:[URIDictionary objectForKey:@"title"]];
 		[parsed setIconName:@"com.apple.Safari"];
 		
@@ -115,6 +120,7 @@
 	}
 	else if (nil != [item objectForKey:@"Title"])
 	{
+		[parsed setIdentifier:[item objectForKey:@"Title"]];
 		[parsed setName:[item objectForKey:@"Title"]];
 		[parsed setIcon:[NSImage genericFolderIcon]];
 	}
@@ -171,6 +177,9 @@
 	
 	[library setName:LocalizedStringInIMedia(@"Safari", @"Safari")];
 	[library setIconName:@"com.apple.Safari"];
+	[library setIdentifier:@"Safari"];
+	[library setParserClassName:NSStringFromClass([self class])];
+	[library setWatchedPath:myDatabase];
 	
 	NSEnumerator *groupEnum = [[xml objectForKey:@"Children"] objectEnumerator];
 	NSDictionary *cur;

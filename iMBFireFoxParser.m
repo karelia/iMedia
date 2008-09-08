@@ -147,7 +147,9 @@
 		root = [[iMBLibraryNode alloc] init];
 		[root setName:LocalizedStringInIMedia(@"Firefox", @"Firefox")];
 		[root setIconName:@"org.mozilla.firefox"];
-		
+        [root setIdentifier:@"Firefox"];
+        [root setParserClassName:NSStringFromClass([self class])];
+		[root setWatchedPath:myDatabase];
 		
 		// Remove unneccessary tags
 		static NSArray* _tags = nil;

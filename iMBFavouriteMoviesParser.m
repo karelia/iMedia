@@ -84,6 +84,9 @@
 	iMBLibraryNode *favs = [[iMBLibraryNode alloc] init];
 	[favs setName:LocalizedStringInIMedia(@"Favorites", @"Favourite folder name")];
 	[favs setIconName:@"heart"];
+	[favs setIdentifier:@"Favorites"];
+	[favs setParserClassName:NSStringFromClass([self class])];
+	[favs setWatchedPath:myDatabase];
 	
 	NSFileManager *fm = [NSFileManager defaultManager];
 	iMBMoviesFolder *parser;
@@ -102,6 +105,9 @@
 			{
 				[node setName:[cur lastPathComponent]];
 				[node setIcon:[NSImage genericFolderIcon]];
+				[node setIdentifier:[cur lastPathComponent]];
+				[node setParserClassName:NSStringFromClass([self class])];
+				[node setWatchedPath:cur];
 				[favs addItem:node];
 				[myParsers addObject:parser];
 			}
