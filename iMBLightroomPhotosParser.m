@@ -128,6 +128,7 @@
         [libraryNode setAttribute:[NSNumber numberWithInt:2] forKey:@"LightroomVersion"];
         if (libraryNode != NULL)
         {
+			[libraryNode setWatchedPath:currentPath];
 			[libraryNode setPrioritySortOrder:1];
             [libraryNodes addObject:libraryNode];
         }
@@ -145,6 +146,7 @@
         [libraryNode setAttribute:[NSNumber numberWithInt:1] forKey:@"LightroomVersion"];
         if (libraryNode != NULL)
         {
+			[libraryNode setWatchedPath:currentPath];
 			[libraryNode setPrioritySortOrder:1];
             [libraryNodes addObject:libraryNode];
         }
@@ -225,7 +227,7 @@
 			[currentNode fromThreadSetAttribute:kind forKey:@"kind"];
 			[currentNode fromThreadSetAttribute:name forKey:@"identifier"];
 			[currentNode fromThreadSetAttribute:NSStringFromClass([self class]) forKey:@"parserClassName"];
-			[currentNode fromThreadSetAttribute:myDatabase forKey:@"watchedPath"];
+//			[currentNode fromThreadSetAttribute:myDatabase forKey:@"watchedPath"];
 			
 			[currentNode fromThreadSetName:name];
 			[currentNode fromThreadSetIcon:[NSImage genericFolderIcon]];
@@ -336,7 +338,7 @@
 	[imagesNode setFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 	[imagesNode setIdentifier:@"Images"];
 	[imagesNode setParserClassName:NSStringFromClass([self class])];
-	[imagesNode setWatchedPath:myDatabase];
+//	[imagesNode setWatchedPath:myDatabase];
 	
     // after this point, all accesses to imagesNode need to be thread safe (i.e. happen on the main thread)
 	[root fromThreadAddItem:imagesNode];

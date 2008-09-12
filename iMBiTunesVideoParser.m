@@ -175,7 +175,7 @@
 							[node setIconName:inIconName];
 							[node setIdentifier:inName];
 							[node setParserClassName:NSStringFromClass([self class])];
-							[node setWatchedPath:myDatabase];
+//							[node setWatchedPath:myDatabase];
 							
 							hasVideos = [self populateNode:node withTracks:tracks fromPlaylist:playlist];
 						}
@@ -227,7 +227,7 @@
 								[node setIconName:@"itunes-icon-folder7"];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								[node setWatchedPath:myDatabase];
+//								[node setWatchedPath:myDatabase];
 								
 								NSMutableArray* subnodes = [self parseDatabase:inLibrary forPlaylistsWithParentID:selfID];
 								if (node!=nil && subnodes!=nil && [subnodes count] > 0)
@@ -268,7 +268,7 @@
 								else [node setIconName:@"itunes-icon-playlist-smart"];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								[node setWatchedPath:myDatabase];
+//								[node setWatchedPath:myDatabase];
 								
 								if (node)
 								{
@@ -308,7 +308,7 @@
 								else [node setIconName:@"itunes-icon-playlist-normal"];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								[node setWatchedPath:myDatabase];
+//								[node setWatchedPath:myDatabase];
 								
 								if (node)
 								{
@@ -340,7 +340,10 @@
 	
 	while (cur = [e nextObject])
 	{
-		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:cur]];
+		NSURL* url = [NSURL URLWithString:cur];
+		[myDatabase release];
+		myDatabase = [[url path] retain];
+		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:url];
 		if (db)
 		{
 			_version = [[db objectForKey:@"Application Version"] intValue];
@@ -446,7 +449,10 @@
 	NSString *cur;
 	
 	while (cur = [e nextObject]) {
-		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:cur]];
+		NSURL* url = [NSURL URLWithString:cur];
+		[myDatabase release];
+		myDatabase = [[url path] retain];
+		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:url];
 		if (db) {
 			[iTunesLibrary addEntriesFromDictionary:db];
 		}
@@ -473,31 +479,31 @@
 	[library setIconName:@"MBiTunesLibrary"];
 	[library setIdentifier:@"Library"];
 	[library setParserClassName:NSStringFromClass([self class])];
-	[library setWatchedPath:myDatabase];
+//	[library setWatchedPath:myDatabase];
 	
 	[podcastLib setName:LocalizedStringInIMedia(@"Podcasts", @"Podcasts as titled in iTunes source list")];
 	[podcastLib setIconName:@"MBiTunesPodcast"];
 	[podcastLib setIdentifier:@"Podcasts"];
 	[podcastLib setParserClassName:NSStringFromClass([self class])];
-	[podcastLib setWatchedPath:myDatabase];
+//	[podcastLib setWatchedPath:myDatabase];
 	
 	[partyShuffleLib setName:LocalizedStringInIMedia(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
 	[partyShuffleLib setIconName:@"MBiTunesPartyShuffle"];
 	[partyShuffleLib setIdentifier:@"Party Shuffle"];
 	[partyShuffleLib setParserClassName:NSStringFromClass([self class])];
-	[partyShuffleLib setWatchedPath:myDatabase];
+//	[partyShuffleLib setWatchedPath:myDatabase];
 	
 	[moviesLib setName:LocalizedStringInIMedia(@"Videos", @"Videos as titled in iTunes source list")];
 	[moviesLib setIconName:@"iTunesVideo"];
 	[moviesLib setIdentifier:@"Videos"];
 	[moviesLib setParserClassName:NSStringFromClass([self class])];
-	[moviesLib setWatchedPath:myDatabase];
+//	[moviesLib setWatchedPath:myDatabase];
 	
 	[purchasedLib setName:LocalizedStringInIMedia(@"Purchased", @"Purchased folder as titled in iTunes source list")];
 	[purchasedLib setIconName:@"MBiTunesPurchasedPlaylist"];
 	[purchasedLib setIdentifier:@"Purchased"];
 	[purchasedLib setParserClassName:NSStringFromClass([self class])];
-	[purchasedLib setWatchedPath:myDatabase];
+//	[purchasedLib setWatchedPath:myDatabase];
 	
     // Look through the iTunes playlists for movies
     NSDictionary    *tracksDictionary = [iTunesLibrary objectForKey:@"Tracks"];
@@ -565,7 +571,7 @@
 				[node setName:[playListDict objectForKey:@"Name"]];
 				[node setIdentifier:[playListDict objectForKey:@"Name"]];
 				[node setParserClassName:NSStringFromClass([self class])];
-				[node setWatchedPath:myDatabase];
+//				[node setWatchedPath:myDatabase];
 				if ([playListDict objectForKey:@"Smart Info"])
 				{
 					[node setIconName:@"photocast_folder"];

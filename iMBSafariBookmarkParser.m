@@ -86,7 +86,7 @@
 {
 	iMBLibraryNode *parsed = [[[iMBLibraryNode alloc] init] autorelease];
 	[parsed setParserClassName:NSStringFromClass([self class])];
-	[parsed setWatchedPath:myDatabase];
+//	[parsed setWatchedPath:myDatabase];
 	NSArray *collectionArray = [item objectForKey:@"Children"];		// default group of children, if this is a collection
 	
 	if ([[item objectForKey:@"Title"] isEqualToString:@"BookmarksBar"])

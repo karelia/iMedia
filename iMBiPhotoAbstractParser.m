@@ -156,7 +156,7 @@
 	[root setIconName:@"com.apple.iPhoto:"];
 	[root setIdentifier:@"iPhoto"];
 	[root setParserClassName:NSStringFromClass([self class])];
-	[root setWatchedPath:myDatabase];
+//	[root setWatchedPath:myDatabase];
 	[root setFilterDuplicateKey:@"ImagePath" forAttributeKey:anImagePath];
 	
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];
@@ -172,7 +172,9 @@
 	NSString *cur;
 	
 	while (cur = [e nextObject]) {
-		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:cur]];
+		NSURL* url = [NSURL URLWithString:cur];
+		[root setWatchedPath:[url path]];
+		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:url];
 		if (db) {
 			[library addEntriesFromDictionary:db];
 		}
@@ -188,16 +190,6 @@
 	NSDictionary *keywordMap = [library objectForKey:@"List of Keywords"];
 	myFakeAlbumID = 0;
 	
-	NSEnumerator *albumEnum = [[library objectForKey:@"List of Albums"] objectEnumerator];
-	[self parseAlbums:albumEnum 
-		 imageRecords:imageRecords
-			mediaType:aMediaType 
-		   keywordMap:keywordMap
-		  wantUntyped:aWantUntyped
-		wantThumbPath:aWantThumbPath
-			imagePath:anImagePath
-			  forRoot:root];	
-    
 	//	TODO: Should we do this only for dedicated iPhoto versions? Or is this
 	//	"handled" implicitly by the existence of the key "List of Rolls"?
 	NSEnumerator *rollsEnum = [[library objectForKey:@"List of Rolls"] objectEnumerator];
@@ -210,6 +202,16 @@
 		   imagePath:anImagePath
 			 forRoot:root];
 	
+	NSEnumerator *albumEnum = [[library objectForKey:@"List of Albums"] objectEnumerator];
+	[self parseAlbums:albumEnum 
+		 imageRecords:imageRecords
+			mediaType:aMediaType 
+		   keywordMap:keywordMap
+		  wantUntyped:aWantUntyped
+		wantThumbPath:aWantThumbPath
+			imagePath:anImagePath
+			  forRoot:root];	
+    
 	if ([[root valueForKey:anImagePath] count] == 0)
 	{
 		root = nil;
@@ -246,7 +248,7 @@
 		[lib setIcon:[self iconForType:[albumRec objectForKey:@"Album Type"]]];
         [lib setIdentifier:[albumRec objectForKey:@"AlbumName"]];
         [lib setParserClassName:NSStringFromClass([self class])];
-		[lib setWatchedPath:myDatabase];
+//		[lib setWatchedPath:myDatabase];
 		// iPhoto 2 doesn't have albumID's so let's just fake them
 		NSNumber *aid = [albumRec objectForKey:@"AlbumId"];
 		if (!aid)
@@ -344,7 +346,7 @@
     [eventsFolder setName:@"Events"];
 	[eventsFolder setIdentifier:@"Events"];
 	[eventsFolder setParserClassName:NSStringFromClass([self class])];
-	[eventsFolder setWatchedPath:myDatabase];
+//	[eventsFolder setWatchedPath:myDatabase];
     
 	while (rollRec = [rollsEnum nextObject])
 	{		
@@ -362,7 +364,7 @@
             [lib setIcon:[self iconForType:@"Event"]];
 			[lib setIdentifier:[rollRec objectForKey:@"RollName"]];
 			[lib setParserClassName:NSStringFromClass([self class])];
-			[lib setWatchedPath:myDatabase];
+//			[lib setWatchedPath:myDatabase];
             aid = [rollRec objectForKey:@"RollID"];
             parent = eventsFolder;
         }
@@ -373,7 +375,7 @@
             [lib setIcon:[self iconForType:@"Event"]];
 			[lib setIdentifier:[rollRec objectForKey:@"AlbumName"]];
 			[lib setParserClassName:NSStringFromClass([self class])];
-			[lib setWatchedPath:myDatabase];
+//			[lib setWatchedPath:myDatabase];
             aid = [rollRec objectForKey:@"AlbumId"];
             parent = [self nodeWithAlbumID:[rollRec objectForKey:@"Parent"] withRoot:root];
         }

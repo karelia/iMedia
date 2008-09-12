@@ -280,6 +280,9 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 {
 	if ([[libraryController content] count] > 0)
 	{
+		// Try to select the desired node. Please note that this may fall back to parent nodes if the desired node
+		// doesn't exist...
+		
 		NSDictionary *d = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]]];
 		NSString *identifier = [d objectForKey:[NSString stringWithFormat:@"%@SelectionIdentifier", NSStringFromClass([self class])]];
 		if (identifier)
@@ -287,6 +290,14 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 			iMBLibraryNode* node = [self libraryNodeWithIdentifier:identifier];
 			[self revealLibraryNode:node];
 			[self selectLibraryNode:node];
+
+			// Since the fallback mechanism described above can change the identifier in the prefs, restore it again,
+			// just i case the desired node appears in the future (due to threaded parsing)...
+			
+			NSString *key = [NSString stringWithFormat:@"iMB-%@", [[iMediaConfiguration sharedConfiguration] identifier]];
+			NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:key]];
+			[d setObject:identifier forKey:[NSString stringWithFormat:@"%@SelectionIdentifier", NSStringFromClass([self class])]];
+			[[NSUserDefaults standardUserDefaults] setObject:d forKey:key];
 		}
 	}
 }

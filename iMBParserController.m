@@ -11,6 +11,9 @@
 #import "iMediaBrowserProtocol.h"
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+iMedia.h"
+#import "UKKQueue.h"
+
+//#define DEBUG 0
 
 @implementation iMBParserController
 
@@ -22,7 +25,10 @@
         myMediaType = [mediaType copy];
         myLibraryNodes = [[NSMutableArray alloc] init];
         myCustomFolderInfo = [[NSMutableArray alloc] init];
-    }
+ 		[[UKKQueue sharedFileWatcher] setDelegate:self];
+		myChangedPathLock = [[NSRecursiveLock alloc] init];
+		myChangedPathQueue = [[NSMutableArray alloc] init];
+   }
     return self;
 }
 
@@ -31,22 +37,28 @@
 	[myCustomFolderInfo release]; myCustomFolderInfo = NULL;
     [myLibraryNodes release]; myLibraryNodes = NULL;
     [myMediaType release]; myMediaType = NULL;
+	[myChangedPathLock release]; myChangedPathLock = NULL;
+	[myChangedPathQueue release]; myChangedPathQueue = NULL;
     [super dealloc];
 }
 
 // WARNING: MAIN THREAD ONLY
 - (void)doSetLibraryNodes:(NSArray *)libraryNodes
 {
+	[self stopWatchingPathsForNodes:myLibraryNodes];
     [[self mutableLibraryNodes] setArray:libraryNodes];
+	[self startWatchingPathsForNodes:libraryNodes];
 }
 
 - (void)doAddLibraryNodes:(NSArray *)libraryNodes
 {
     [[self mutableLibraryNodes] addObjectsFromArray:libraryNodes];
+	[self startWatchingPathsForNodes:libraryNodes];
 }
 
 - (void)doRemoveLibraryNodes:(NSArray *)libraryNodes
 {
+	[self stopWatchingPathsForNodes:libraryNodes];
     [[self mutableLibraryNodes] removeObjectsInArray:libraryNodes];
 }
 
@@ -292,6 +304,18 @@
 }
 
 
+- (void)logNodes
+{
+	NSEnumerator* e = [myLibraryNodes objectEnumerator];
+	iMBLibraryNode *node;
+	
+	while (node =[e nextObject])
+	{
+		[self recursiveLogNode:node];
+	}
+}
+
+
 - (iMBLibraryNode*) libraryNodeWithIdentifier:(NSString*)inIdentifier inParentNode:(iMBLibraryNode*)inParentNode
 {
 	// Find the node with the specified identifier...
@@ -318,6 +342,8 @@
 
 - (iMBLibraryNode*) libraryNodeWithIdentifier:(NSString*)inIdentifier
 {
+//	return [self libraryNodeWithIdentifier:inIdentifier inParentNode:nil];
+
 	iMBLibraryNode* node = nil;
 	int tries = 0;
 	
@@ -351,15 +377,257 @@
 	return node;
 }
 
-- (void)logNodes
+
+#pragma mark File watching
+
+- (void)startWatchingPathsForNodes:(NSArray *)libraryNodes
 {
-	NSEnumerator* e = [myLibraryNodes objectEnumerator];
+	NSEnumerator *nodes = [libraryNodes objectEnumerator];
 	iMBLibraryNode *node;
-	
-	while (node =[e nextObject])
+	while (node = [nodes nextObject])
 	{
-		[self recursiveLogNode:node];
+		if ([node watchedPath])
+			[[UKKQueue sharedFileWatcher] addPath:[node watchedPath]];
+		
+		[self startWatchingPathsForNodes:[node allItems]];
+	}	
+}
+
+- (void)stopWatchingPathsForNodes:(NSArray *)libraryNodes
+{
+	NSEnumerator *nodes = [libraryNodes objectEnumerator];
+	iMBLibraryNode *node;
+	while (node = [nodes nextObject])
+	{
+		if ([node watchedPath])
+			[[UKKQueue sharedFileWatcher] removePath:[node watchedPath]];
+			
+		[self stopWatchingPathsForNodes:[node allItems]];
+	}	
+}
+
+-(void) watcher:(id<UKFileWatcher>)kq receivedNotification:(NSString*)nm forPath:(NSString*)path
+{
+	// Called multiple times. Simply put the path in the queue (is not already in the queue), but coalesce 
+	// into a single delayed perform request every few seconds, so that we avoid heavy CPU load due to 
+	// reparsing too often...
+
+	[myChangedPathLock lock];
+	if ([myChangedPathQueue indexOfObject:path] == NSNotFound)
+		[myChangedPathQueue addObject:path];
+	[myChangedPathLock unlock];
+
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(rebuildNodeWithWatchedPath:) object:path];
+	[self performSelector:@selector(rebuildChangedNodes) withObject:nil afterDelay:5.0 inModes:[NSArray arrayWithObject:(NSString*)kCFRunLoopCommonModes]];
+}
+
+
+-(void) recursiveAddNodes:(iMBLibraryNode*)inRoot withWatchedPath:(NSString*)inPath toChangedNodes:(NSMutableDictionary*)inChangedNodes
+{	
+	// If we found a node with the correct watched path, then add it to the list, grouped by parserClassName and watchedPath...
+	
+	if ([[inRoot watchedPath] isEqualToString:inPath])
+	{
+		NSMutableDictionary* watchedPathList = [inChangedNodes objectForKey:[inRoot parserClassName]];
+		if (watchedPathList == nil)
+		{
+			watchedPathList = [NSMutableDictionary dictionary];
+			[inChangedNodes setObject:watchedPathList forKey:[inRoot parserClassName]];
+		}
+		
+		NSMutableDictionary* nodesList = [watchedPathList objectForKey:inPath];
+		if (nodesList == nil)
+		{
+			nodesList = [NSMutableDictionary dictionary];
+			[watchedPathList setObject:nodesList forKey:inPath];
+		}
+		
+		NSMutableArray* oldNodes = [nodesList objectForKey:@"oldNodes"];
+		if (oldNodes == nil)
+		{
+			oldNodes = [NSMutableArray array];
+			[nodesList setObject:oldNodes forKey:@"oldNodes"];
+		}
+		
+		[oldNodes addObject:inRoot];
 	}
+	
+	// If not, then keep searching subnodes...
+	
+	else
+	{
+		NSEnumerator *subnodes = [[inRoot allItems] objectEnumerator];
+		iMBLibraryNode *node;
+		while (node = [subnodes nextObject])
+		{
+			[self recursiveAddNodes:node withWatchedPath:inPath toChangedNodes:inChangedNodes];
+		}	
+	}
+}
+
+
+-(NSMutableDictionary*) changedNodes
+{	
+	NSMutableDictionary* changedNodes = [NSMutableDictionary dictionary];
+
+	[myChangedPathLock lock];
+	NSEnumerator *paths = [myChangedPathQueue objectEnumerator];
+	NSString *path;
+	
+	while (path = [paths nextObject])
+	{
+		NSEnumerator *nodes = [[self mutableLibraryNodes] objectEnumerator];
+		iMBLibraryNode *node;
+		while (node = [nodes nextObject])
+		{
+			[self recursiveAddNodes:node withWatchedPath:path toChangedNodes:changedNodes];
+		}	
+	}	
+	
+	[myChangedPathQueue removeAllObjects];
+	[myChangedPathLock unlock];
+	
+	return changedNodes;
+}
+
+
+-(void) rebuildChangedNodes
+{	
+	NSMutableDictionary* nodes = [self changedNodes];
+	#if DEBUG
+	NSLog(@"%s %@",__FUNCTION__,nodes);
+	#endif
+	[NSThread detachNewThreadSelector:@selector(doRebuildChangedNodes:) toTarget:self withObject:nodes];
+}
+
+
+- (NSMutableArray*) filterNodes:(NSArray*)inNodes forWatchedPath:(NSString*)inWatchedPath
+{
+	NSMutableArray* filteredNodes = [NSMutableArray array];
+	
+	NSEnumerator* e = [inNodes objectEnumerator];
+	iMBLibraryNode* node;
+	while (node = [e nextObject])
+	{
+		if ([[node watchedPath] isEqualToString:inWatchedPath])
+		{
+			[filteredNodes addObject:node];
+		}
+	}
+	
+	return filteredNodes;
+}
+
+
+-(void) doRebuildChangedNodes:(NSMutableDictionary*)inNodesList parserClassName:(NSString*)inParserClassName watchedPath:(NSString*)inWatchedPath
+{
+	NSString *parserClassName = inParserClassName;
+	NSString *watchedPath = inWatchedPath;
+	Class parserClass = NSClassFromString(parserClassName);
+    NSLock *gate = [[[NSLock alloc] init] autorelease];
+    [gate lock];
+	
+	// Check if we are allowed to use this parser.
+	
+	if (![parserClass conformsToProtocol:@protocol(iMBParser)])
+	{
+		NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.");
+		return;
+	}
+            
+	id delegate = [[iMediaConfiguration sharedConfiguration] delegate];
+
+	if ([delegate respondsToSelector:@selector(iMediaConfiguration:willUseMediaParser:forMediaType:)])
+	{
+		if (![delegate iMediaConfiguration:[iMediaConfiguration sharedConfiguration] willUseMediaParser:parserClassName forMediaType:myMediaType])
+		{
+			return;
+		}
+	}
+       
+	// Create the parser instance and get the nodes from the parser...
+	
+	id <iMBParser>parser = [[[parserClass alloc] initWithContentsOfFile:watchedPath] autorelease];
+	NSArray *newNodes = [parser nodesFromParsingDatabase:gate];
+
+	// Notify delegate that we are done with this parser...
+	
+	if ([delegate respondsToSelector:@selector(iMediaConfiguration:didUseMediaParser:forMediaType:)])
+	{
+		[delegate iMediaConfiguration:[iMediaConfiguration sharedConfiguration] didUseMediaParser:parserClassName forMediaType:myMediaType];
+	}
+
+	// Replace nodes in library tree...
+	
+	if (newNodes != nil && [newNodes count] > 0)
+	{
+		NSMutableArray* filteredNodes = [self filterNodes:newNodes forWatchedPath:(NSString*)inWatchedPath];
+		[inNodesList setObject:filteredNodes forKey:@"newNodes"];
+		[self performSelectorOnMainThread:@selector(doReplaceNodes:) withObject:inNodesList waitUntilDone:NO];
+	}
+	
+	[gate unlock];
+}
+
+
+-(void) doRebuildChangedNodes:(NSMutableDictionary*)inChangedNodes 
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	NSEnumerator *parserEnumerator = [[inChangedNodes allKeys] objectEnumerator];
+	NSString *parserClassName;
+	while (parserClassName = [parserEnumerator nextObject])
+	{
+		NSMutableDictionary* watchedPathList = [inChangedNodes objectForKey:parserClassName];
+		
+		NSEnumerator *watchedPathEnumerator = [[watchedPathList allKeys] objectEnumerator];
+		NSString *watchedPath;
+		while (watchedPath = [watchedPathEnumerator nextObject])
+		{
+			NSMutableDictionary* nodesList = [watchedPathList objectForKey:watchedPath];
+			[self doRebuildChangedNodes:nodesList parserClassName:parserClassName watchedPath:watchedPath];
+		}
+	}
+
+	[pool release];
+}
+
+
+-(void) doReplaceNodes:(NSMutableDictionary*)inNodesList inArray:(NSMutableArray *)array
+{
+	NSMutableArray* oldNodes = [inNodesList objectForKey:@"oldNodes"];
+	if ([oldNodes count] < 1) return;
+
+	NSMutableArray* newNodes = [inNodesList objectForKey:@"newNodes"];
+	if ([newNodes count] < 1) return;
+	
+	unsigned int index = [array indexOfObjectIdenticalTo:[oldNodes objectAtIndex:0]];
+
+	if (index != NSNotFound)
+	{
+		// FIXME: KVO notification should probably be done in a smarter way here
+		[self willChangeValueForKey:@"libraryNodes"];
+		[self stopWatchingPathsForNodes:oldNodes];
+		[array removeObjectsInArray:oldNodes];
+		[array insertObjects:newNodes atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index,[newNodes count])]];
+		[self startWatchingPathsForNodes:newNodes];
+		[self didChangeValueForKey:@"libraryNodes"];
+	}
+	else
+	{
+		NSString *node;
+		NSEnumerator *e = [array objectEnumerator];
+		while (node = [e nextObject])
+		{
+			[self doReplaceNodes:inNodesList inArray:(NSMutableArray*)[node valueForKey:@"mutableItems"]];
+		}	
+	}
+}
+
+
+-(void) doReplaceNodes:(NSMutableDictionary*)inNodesList
+{
+	[self doReplaceNodes:inNodesList inArray:myLibraryNodes];
 }
 
 @end

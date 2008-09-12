@@ -170,7 +170,7 @@
 	[root setIconName:@"com.apple.garageband"];
 	[root setIdentifier:@"GarageBand"];
 	[root setParserClassName:NSStringFromClass([self class])];
-	[root setWatchedPath:myDatabase];
+//	[root setWatchedPath:myDatabase];
 
 	// Do the demo songs
 	NSString *demoPath = @"/Library/Application Support/GarageBand/GarageBand Demo Songs/GarageBand Demo Songs/";

@@ -167,7 +167,6 @@
 							[node setIconName:inIconName];
 							[node setIdentifier:inName];
 							[node setParserClassName:NSStringFromClass([self class])];
-							[node setWatchedPath:myDatabase];
 							
 							[self populateNode:node withTracks:tracks fromPlaylist:playlist];
 						}
@@ -216,7 +215,6 @@
 								[node setIconName:@"itunes-icon-folder7"];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								[node setWatchedPath:myDatabase];
 								
 								[node setAllItems:[self parseDatabase:inLibrary forPlaylistsWithParentID:selfID]];
 								if (node) [nodes addObject:node];
@@ -251,7 +249,6 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								[node setWatchedPath:myDatabase];
 								if (_version == 7) [node setIconName:@"itunes-icon-playlist-smart7"];
 								else [node setIconName:@"itunes-icon-playlist-smart"];
 								
@@ -288,7 +285,6 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								[node setWatchedPath:myDatabase];
 								if (_version == 7) [node setIconName:@"itunes-icon-playlist-normal7"];
 								else [node setIconName:@"itunes-icon-playlist-normal"];
 								
@@ -318,7 +314,10 @@
 	NSString *cur;
 	
 	while (cur = [e nextObject]) {
-		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:cur]];
+		NSURL* url = [NSURL URLWithString:cur];
+		[myDatabase release];
+		myDatabase = [[url path] retain];
+		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:url];
 		if (db) {
 			_version = [[db objectForKey:@"Application Version"] intValue];
 			[musicLibrary addEntriesFromDictionary:db];
@@ -418,25 +417,21 @@
 		[library setIconName:[self iconNameForPlaylist:@"Library"]]; //@"MBiTunesLibrary"];
         [library setIdentifier:@"Music"];
         [library setParserClassName:NSStringFromClass([self class])];
-		[library setWatchedPath:myDatabase];
 		
 		[podcastLib setName:LocalizedStringInIMedia(@"Podcasts", @"Podcasts as titled in iTunes source list")];
 		[podcastLib setIconName:[self iconNameForPlaylist:@"Podcasts"]]; //@"MBiTunesPodcast"];
         [podcastLib setIdentifier:@"Podcasts"];
         [podcastLib setParserClassName:NSStringFromClass([self class])];
-		[podcastLib setWatchedPath:myDatabase];
 		
 		[partyShuffleLib setName:LocalizedStringInIMedia(@"Party Shuffle", @"Party Shuffle as titled in iTunes source list")];
 		[partyShuffleLib setIconName:[self iconNameForPlaylist:@"Party Shuffle"]]; //@"MBiTunesPartyShuffle"];
         [partyShuffleLib setIdentifier:@"Party Shuffle"];
         [partyShuffleLib setParserClassName:NSStringFromClass([self class])];
-		[partyShuffleLib setWatchedPath:myDatabase];
 		
 		[purchasedLib setName:LocalizedStringInIMedia(@"Purchased", @"Purchased folder as titled in iTunes source list")];
 		[purchasedLib setIconName:[self iconNameForPlaylist:@"Purchased Music"]]; //@"MBiTunesPurchasedPlaylist"];
         [purchasedLib setIdentifier:@"Purchased"];
         [purchasedLib setParserClassName:NSStringFromClass([self class])];
-		[purchasedLib setWatchedPath:myDatabase];
 		
 		int playlistCount = [[musicLibrary objectForKey:@"Playlists"] count];
 		
@@ -487,7 +482,6 @@
 				[node setName:objectName];
 				[node setIdentifier:objectName];
 				[node setParserClassName:NSStringFromClass([self class])];
-				[node setWatchedPath:myDatabase];
 				
 				if ([[[musicLibrary objectForKey:@"Playlists"] objectAtIndex:x] objectForKey:@"Smart Info"])
 				{

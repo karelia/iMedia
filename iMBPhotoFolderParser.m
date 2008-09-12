@@ -100,6 +100,7 @@
 	{
 		NSString *filePath = [folderPath stringByAppendingPathComponent:currentFilename];
 
+		if ([[filePath lastPathComponent] isEqualToString:@"Lightroom"]) continue;
 		if ([self shouldIncludeFile:currentFilename] != YES) continue;
 		if ([excludedFolders containsObject:filePath]) continue;
         

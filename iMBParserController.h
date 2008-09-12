@@ -23,6 +23,8 @@
     NSMutableArray                  *myLibraryNodes;
 	NSMutableArray                  *myCustomFolderInfo;
     BOOL                             myIsBuilt;
+	NSRecursiveLock					*myChangedPathLock;
+	NSMutableArray                  *myChangedPathQueue;
 }
 
 // private constructor.
@@ -51,5 +53,9 @@
 
 // debugging.
 - (void)logNodes;
+
+// file watching.
+- (void)startWatchingPathsForNodes:(NSArray *)libraryNodes;
+- (void)stopWatchingPathsForNodes:(NSArray *)libraryNodes;
 
 @end

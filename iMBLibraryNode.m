@@ -44,6 +44,7 @@
 
 #import "iMBLibraryNode.h"
 #import "NSWorkspace+iMedia.h"
+#import "UKKQueue.h"
 
 static NSMutableDictionary *sImageCache = nil;
 
@@ -434,6 +435,9 @@ static NSMutableDictionary *sImageCache = nil;
 - (void)fromThreadAddItem:(iMBLibraryNode *)item
 {
     [self performSelectorOnMainThread:@selector(addItem:) withObject:item waitUntilDone:YES];
+
+	NSString* path = [item watchedPath];
+	if (path) [[UKKQueue sharedFileWatcher] addPath:path];
 }
 
 - (void)addItem:(iMBLibraryNode *)item

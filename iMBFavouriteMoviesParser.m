@@ -86,7 +86,7 @@
 	[favs setIconName:@"heart"];
 	[favs setIdentifier:@"Favorites"];
 	[favs setParserClassName:NSStringFromClass([self class])];
-	[favs setWatchedPath:myDatabase];
+//	[favs setWatchedPath:myDatabase];
 	
 	NSFileManager *fm = [NSFileManager defaultManager];
 	iMBMoviesFolder *parser;

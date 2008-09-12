@@ -316,6 +316,7 @@
             iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath gate:gate name:name iconName:iconName icon:NULL];
             if (libraryNode != NULL)
             {
+				[libraryNode setWatchedPath:currentPath];
                 [libraryNode setPrioritySortOrder:1];
                 [libraryNodes addObject:libraryNode];
             }
