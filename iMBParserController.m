@@ -494,9 +494,6 @@
 -(void) rebuildChangedNodes
 {	
 	NSMutableDictionary* nodes = [self changedNodes];
-	#if DEBUG
-	NSLog(@"%s %@",__FUNCTION__,nodes);
-	#endif
 	[NSThread detachNewThreadSelector:@selector(doRebuildChangedNodes:) toTarget:self withObject:nodes];
 }
 
