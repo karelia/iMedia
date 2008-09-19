@@ -49,6 +49,10 @@
 #import "NSString+iMedia.h"
 #import "NSImage+iMedia.h"
 
+#ifndef NSMakeCollectable
+#define NSMakeCollectable(x) (id)(x)
+#endif
+
 @interface iMBiPhotoAbstractParser (private)
 - (void) parseAlbums: (NSEnumerator*) albumEnum 
 		imageRecords: (NSDictionary*) imageRecords
@@ -162,11 +166,10 @@
 	NSMutableDictionary *library = [NSMutableDictionary dictionary];
 	
 	//Find all iPhoto libraries
-	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",
-														(CFStringRef)@"com.apple.iApps");
+	NSArray *libraries = [NSMakeCollectable(CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",
+														(CFStringRef)@"com.apple.iApps")) autorelease];
 	
 	//Iterate over libraries, pulling dictionary from contents and adding to array for processing;
-	NSArray *libraries = (NSArray *)iApps;
     
 	NSEnumerator *e = [libraries objectEnumerator];
 	NSString *cur;
@@ -179,7 +182,6 @@
 			[library addEntriesFromDictionary:db];
 		}
 	}
-	[libraries autorelease];
 	
 	if ([[library allKeys] count] == 0)
 	{

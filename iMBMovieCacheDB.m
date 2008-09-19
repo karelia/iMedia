@@ -240,7 +240,7 @@ static NSString * uuidString()
 	NSArray *array = [moc executeFetchRequest:fetchRequest error:&fetchError];
     if (fetchError)
     {
-        NSLog ([fetchError description]);
+        NSLog (@"%@", [fetchError description]);
         return nil;
     }
     
@@ -591,7 +591,7 @@ static NSString * uuidString()
 	NSArray *array = [moc executeFetchRequest:fetchRequest error:&fetchError];
     if (fetchError)
     {
-        NSLog ([fetchError description]);
+        NSLog (@"%@", [fetchError description]);
         return;
     }
         
@@ -674,7 +674,7 @@ static NSString * uuidString()
     [self cleanUnusedFilesInDirectory:[self posterImagesDirPath] attribute:@"posterImageFileName"];
 }
 
-static NSComparisonResult compareFileModificationDate (NSString *key1, NSString *key2, void *context)
+static int compareFileModificationDate (id key1, id key2, void *context)
 {
     NSDictionary *fileDict = context;
     NSDate  *date1 = [[fileDict objectForKey:key1] fileModificationDate];

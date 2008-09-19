@@ -64,6 +64,7 @@
 
 + (NSArray *)libraryPathsV2;
 + (NSArray *)libraryPathsV1;
++ (void)parseRecentLibrariesList:(NSString *)recentLibrariesList into:(NSMutableArray *)libraryFilePaths;
 
 @end
 

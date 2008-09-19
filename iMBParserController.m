@@ -95,7 +95,7 @@
             Class parserClass = NSClassFromString(cur);
             if (![parserClass conformsToProtocol:@protocol(iMBParser)])
             {
-                NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.");
+                NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.", cur);
                 continue;
             }
             
@@ -349,7 +349,7 @@
 	
 	// First try to get the specified node, falling back to the next best ancestor if that node doesn't exist...
 	
-	NSString* identifier = [inIdentifier copy];
+	NSString* identifier = [[inIdentifier copy] autorelease];
 	
 	do
 	{
@@ -531,7 +531,7 @@
 	
 	if (![parserClass conformsToProtocol:@protocol(iMBParser)])
 	{
-		NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.");
+		NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.", parserClassName);
 		return;
 	}
             

@@ -303,7 +303,7 @@
             if ([[NSFileManager defaultManager] removeFileAtPath:path handler:nil])
                 [self setMiniMovieFileName:nil];
             else
-                NSLog (@"Error %@ when deleting %@", error);
+                NSLog (@"Error %@ when deleting %@", error, path);
         }
     }
     fileName = [self posterImageFileName];
@@ -315,7 +315,7 @@
             if ([[NSFileManager defaultManager] removeFileAtPath:path handler:nil])
                 [self setPosterImageFileName:nil];
             else
-                NSLog (@"Error %@ when deleting %@", error);
+                NSLog (@"Error %@ when deleting %@", error, path);
         }
     }
 }

@@ -49,6 +49,10 @@
 #import "NSImage+iMedia.h"
 #import "NSString+iMedia.h"
 
+#ifndef NSMakeCollectable
+#define NSMakeCollectable(x) (id)(x)
+#endif
+
 //	CONFIGURATION
 //	
 //	If you switch off both defines below you get the same contents as the Aperture
@@ -298,9 +302,8 @@
 {
     NSMutableArray *libraryNodes = [NSMutableArray array];
 	//	Find all Aperture libraries
-	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",
-														(CFStringRef)@"com.apple.iApps");
-	NSArray *libraryURLs = [((NSArray *)iApps) autorelease];
+	NSArray *libraryURLs = [NSMakeCollectable(CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",
+														(CFStringRef)@"com.apple.iApps"))  autorelease];
 	unsigned int n = [libraryURLs count];
 	NSEnumerator *enumerator = [libraryURLs objectEnumerator];
 	NSString *currentURLString;

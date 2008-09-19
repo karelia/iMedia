@@ -48,6 +48,10 @@
 #import "iMediaConfiguration.h"
 #import "NSString+iMedia.h"
 
+#ifndef NSMakeCollectable
+#define NSMakeCollectable(x) (id)(x)
+#endif
+
 #define RECURSIVE_PARSEDATABASE 1
 
 @implementation iMBiTunesMusicParser
@@ -308,8 +312,7 @@
 	iMBLibraryNode *root = nil;
 	NSMutableDictionary *musicLibrary = [NSMutableDictionary dictionary];
 	
-	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
-	NSArray *libraries = [(NSArray *)iApps autorelease];
+	NSArray *libraries = [NSMakeCollectable(CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps")) autorelease];
 	NSEnumerator *e = [libraries objectEnumerator];
 	NSString *cur;
 	

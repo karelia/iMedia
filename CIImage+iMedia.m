@@ -45,6 +45,10 @@
 #import "CIImage+iMedia.h"
 #import <QuartzCore/QuartzCore.h>
 
+#ifndef NSMakeCollectable
+#define NSMakeCollectable(x) (id)(x)
+#endif
+
 @implementation CIImage (iMedia)
 
 + (NSSet*) readableTypes
@@ -52,7 +56,7 @@
 	static NSSet *readableTypes = nil;
 	
 	if (readableTypes == nil) {
-		NSArray *readableTypesArray = [((NSArray*)CGImageSourceCopyTypeIdentifiers()) autorelease];
+		NSArray *readableTypesArray = [NSMakeCollectable(CGImageSourceCopyTypeIdentifiers()) autorelease];
 		readableTypes = [[NSSet setWithArray:readableTypesArray] retain];
 	}
 	

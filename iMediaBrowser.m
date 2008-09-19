@@ -59,6 +59,7 @@ static NSMutableArray *_browserClasses = nil;
 
 @interface iMediaBrowser (PrivateAPI)
 - (void)setupInfoWindow;
++ (NSArray *)findModulesInDirectory:(NSString*)scanDir withExtension:(NSString *)ext;
 @end
 
 @interface iMediaBrowser (Plugins)
