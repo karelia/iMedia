@@ -28,7 +28,9 @@
  		[[UKKQueue sharedFileWatcher] setDelegate:self];
 		myChangedPathLock = [[NSRecursiveLock alloc] init];
 		myChangedPathQueue = [[NSMutableArray alloc] init];
-   }
+ 		myFileWatcher = [[UKKQueue alloc] init];
+ 		[myFileWatcher setDelegate:self];
+  }
     return self;
 }
 
@@ -39,6 +41,7 @@
     [myMediaType release]; myMediaType = NULL;
 	[myChangedPathLock release]; myChangedPathLock = NULL;
 	[myChangedPathQueue release]; myChangedPathQueue = NULL;
+	[myFileWatcher release]; myFileWatcher = NULL;
     [super dealloc];
 }
 
@@ -382,43 +385,52 @@
 
 - (void)startWatchingPathsForNodes:(NSArray *)libraryNodes
 {
-	NSEnumerator *nodes = [libraryNodes objectEnumerator];
-	iMBLibraryNode *node;
-	while (node = [nodes nextObject])
+	if ([iMediaConfiguration isLiveUpdatingEnabled])
 	{
-		if ([node watchedPath])
-			[[UKKQueue sharedFileWatcher] addPath:[node watchedPath]];
-		
-		[self startWatchingPathsForNodes:[node allItems]];
-	}	
+		NSEnumerator *nodes = [libraryNodes objectEnumerator];
+		iMBLibraryNode *node;
+		while (node = [nodes nextObject])
+		{
+			if ([node watchedPath])
+				[myFileWatcher addPath:[node watchedPath]];
+			
+			[self startWatchingPathsForNodes:[node allItems]];
+		}	
+	}
 }
 
 - (void)stopWatchingPathsForNodes:(NSArray *)libraryNodes
 {
-	NSEnumerator *nodes = [libraryNodes objectEnumerator];
-	iMBLibraryNode *node;
-	while (node = [nodes nextObject])
+	if ([iMediaConfiguration isLiveUpdatingEnabled])
 	{
-		if ([node watchedPath])
-			[[UKKQueue sharedFileWatcher] removePath:[node watchedPath]];
-			
-		[self stopWatchingPathsForNodes:[node allItems]];
-	}	
+		NSEnumerator *nodes = [libraryNodes objectEnumerator];
+		iMBLibraryNode *node;
+		while (node = [nodes nextObject])
+		{
+			if ([node watchedPath])
+				[myFileWatcher removePath:[node watchedPath]];
+				
+			[self stopWatchingPathsForNodes:[node allItems]];
+		}	
+	}
 }
 
 -(void) watcher:(id<UKFileWatcher>)kq receivedNotification:(NSString*)nm forPath:(NSString*)path
 {
-	// Called multiple times. Simply put the path in the queue (is not already in the queue), but coalesce 
-	// into a single delayed perform request every few seconds, so that we avoid heavy CPU load due to 
-	// reparsing too often...
+	if ([iMediaConfiguration isLiveUpdatingEnabled])
+	{
+		// Called multiple times. Simply put the path in the queue (is not already in the queue), but coalesce 
+		// into a single delayed perform request every few seconds, so that we avoid heavy CPU load due to 
+		// reparsing too often...
 
-	[myChangedPathLock lock];
-	if ([myChangedPathQueue indexOfObject:path] == NSNotFound)
-		[myChangedPathQueue addObject:path];
-	[myChangedPathLock unlock];
+		[myChangedPathLock lock];
+		if ([myChangedPathQueue indexOfObject:path] == NSNotFound)
+			[myChangedPathQueue addObject:path];
+		[myChangedPathLock unlock];
 
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(rebuildNodeWithWatchedPath:) object:path];
-	[self performSelector:@selector(rebuildChangedNodes) withObject:nil afterDelay:5.0 inModes:[NSArray arrayWithObject:(NSString*)kCFRunLoopCommonModes]];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(rebuildNodeWithWatchedPath:) object:path];
+		[self performSelector:@selector(rebuildChangedNodes) withObject:nil afterDelay:5.0 inModes:[NSArray arrayWithObject:(NSString*)kCFRunLoopCommonModes]];
+	}
 }
 
 

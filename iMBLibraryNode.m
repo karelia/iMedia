@@ -43,6 +43,8 @@
 */
 
 #import "iMBLibraryNode.h"
+#import "iMediaConfiguration.h"
+#import "iMBParserController.h"
 #import "NSWorkspace+iMedia.h"
 #import "UKKQueue.h"
 
@@ -436,9 +438,35 @@ static NSMutableDictionary *sImageCache = nil;
 {
     [self performSelectorOnMainThread:@selector(addItem:) withObject:item waitUntilDone:YES];
 
-	NSString* path = [item watchedPath];
-	if (path) [[UKKQueue sharedFileWatcher] addPath:path];
+	if ([iMediaConfiguration isLiveUpdatingEnabled])
+	{
+		NSString* path = [item watchedPath];
+		if (path) [self performSelectorOnMainThread:@selector(addWatchedPath:) withObject:path waitUntilDone:YES];
+	}
 }
+
+- (void)addWatchedPath:(NSString *)path
+{
+	// Use our parserClassName attribute to find the corresponding mediaType (via iMediaConfiguration), then
+	// use the mediaType to access the correct parserController instance, which then can start watching the path...
+	
+	NSString *parserClassName = [self parserClassName];
+	NSArray *mediaTypes = [NSArray arrayWithObjects:@"photos",@"music",@"movies",@"links",@"contacts",nil];
+	NSEnumerator *e = [mediaTypes objectEnumerator];
+	NSString *mediaType;
+	
+	while (mediaType = [e nextObject])
+	{
+		NSArray *parsers = [[[iMediaConfiguration sharedConfiguration] parsers] objectForKey:mediaType];
+		
+		if ([parsers containsObject:parserClassName])
+		{
+			iMBParserController * parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:mediaType];
+			[parserController startWatchingPathsForNodes:[NSArray arrayWithObject:self]];
+		}
+	}
+}
+
 
 - (void)addItem:(iMBLibraryNode *)item
 {

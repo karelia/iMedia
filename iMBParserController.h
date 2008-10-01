@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class iMBLibraryNode;
+@class UKFileWatcher;
 
 //
 // Control a set of parsers for a given media type.
@@ -25,6 +26,7 @@
     BOOL                             myIsBuilt;
 	NSRecursiveLock					*myChangedPathLock;
 	NSMutableArray                  *myChangedPathQueue;
+	UKFileWatcher					*myFileWatcher;
 }
 
 // private constructor.

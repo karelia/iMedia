@@ -53,6 +53,8 @@ static iMediaConfiguration *_sharedMediaConfiguration = nil;
 
 static NSMutableDictionary *_parsers = nil;
 
+static BOOL _liveUpdatingEnabled = NO;
+
 @implementation iMediaConfiguration
 
 + (void)initialize	// preferred over +load in most cases
@@ -167,6 +169,16 @@ static NSMutableDictionary *_parsers = nil;
 	[iMediaConfiguration unregisterParserName:NSStringFromClass(parserClass) forMediaType:media];
 }
 
++ (void)setLiveUpdatingEnabled:(BOOL)enabled
+{
+	_liveUpdatingEnabled = enabled;
+}
+
++ (BOOL)isLiveUpdatingEnabled
+{
+	return _liveUpdatingEnabled;
+}
+
 - (id)init
 {
 	if (self = [super init])
@@ -222,6 +234,7 @@ static NSMutableDictionary *_parsers = nil;
 {
 	return [[myIdentifier retain] autorelease];
 }
+
 
 // This is a method that a client can call to set the default value of whether
 // captions are shown.  Users can override this by checking checkbox on "back" of window.

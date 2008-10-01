@@ -60,6 +60,8 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+	//[iMediaConfiguration setLiveUpdatingEnabled:YES];
+	
 	//[iMediaBrowser sharedBrowserWithDelegate:self supportingBrowserTypes:[NSArray arrayWithObject:@"iMBMusicController"]];
 	[[iMediaBrowser sharedBrowserWithDelegate:self] showWindow:self];
 }
@@ -67,6 +69,24 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 - (BOOL)iMediaBrowser:(iMediaBrowser *)browser willLoadBrowser:(NSString *)browserClassname
 {
 	return YES;
+}
+
+- (BOOL)iMediaBrowser:(iMediaBrowser *)browser willUseMediaParser:(NSString *)parserClassname forMediaType:(NSString *)media
+{
+#if 0
+    // sample code to only enable certain browsers. useful for testing.
+    if ([media isEqual:@"photos"])
+    {
+//        if ([parserClassname isEqualToString:@"iMBAperturePhotosParser"])
+//            return YES;
+        if ([parserClassname isEqualToString:@"iMBiPhotoPhotosParser"])
+            return YES;
+//        if ([parserClassname isEqualToString:@"iMBLightroomPhotosParser"])
+//            return YES;
+        return NO;
+    }
+#endif
+    return YES;
 }
 
 @end

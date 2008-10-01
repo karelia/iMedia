@@ -68,6 +68,9 @@
 + (void)unregisterParserName:(NSString *)parserClassName forMediaType:(NSString *)media;
 + (void)unregisterParser:(Class)parserClass forMediaType:(NSString *)media;
 
++ (void)setLiveUpdatingEnabled:(BOOL)enabled;
++ (BOOL)isLiveUpdatingEnabled;
+
 #pragma mark -
 #pragma mark Custom folder handling
 
@@ -90,6 +93,7 @@
 - (void)setPrefersFilenamesInPhotoBasedBrowsers:(BOOL)flag;	// binding for user defaults
 
 - (iMBParserController *)parserControllerForMediaType:(NSString *)mediaType;
+
 
 #pragma mark -
 #pragma mark Delegate
