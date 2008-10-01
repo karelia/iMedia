@@ -69,7 +69,7 @@
 	return self;
 }
 
-- (iMBLibraryNode *)parseDatabase
+- (NSArray *)nodesFromParsingDatabase:(NSLock *)gate
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
 	if (![fm fileExistsAtPath:[self databasePath]]) return nil;
@@ -81,7 +81,7 @@
 	
 	iMBMusicFolder *parser = [[[iMBMusicFolder alloc] initWithContentsOfFile:[self databasePath] musicFolderName:musicFolderName unknownArtistName:unknownArtistName iconName:iconName parseMetadata:parseMetadata] autorelease];
 	
-	return [parser parseDatabase];
+	return [parser nodesFromParsingDatabase:gate];
 }
 
 @end
