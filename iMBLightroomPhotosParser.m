@@ -124,7 +124,7 @@
 		NSString *name = LocalizedStringInIMedia(@"Lightroom 2", @"Lightroom");
         if ([libraryPathsV2 count] > 1)
             name = [name stringByAppendingFormat:@" (%@)", [[currentPath stringByDeletingLastPathComponent] lastPathComponent]];
-        NSString *iconName = @"com.adobe.Lightroom:";
+        NSString *iconName = @"com.adobe.Lightroom2:";
         iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath gate:gate name:name iconName:iconName icon:NULL];
         [libraryNode setAttribute:[NSNumber numberWithInt:2] forKey:@"LightroomVersion"];
         if (libraryNode != NULL)
