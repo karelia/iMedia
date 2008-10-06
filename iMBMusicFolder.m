@@ -54,6 +54,13 @@
 #import <QTKit/QTKit.h>
 
 
+// put this here to compile cleanly under 10.4 SDK
+@interface QTMovie (iMedia_10_5_Additions)
+
++ (NSArray *)movieTypesWithOptions:(QTMovieFileTypeOptions)types;
+
+@end
+
 @implementation iMBMusicFolder
 
 + (void)load	// registration of this class
