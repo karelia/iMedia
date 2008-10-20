@@ -421,7 +421,7 @@ static NSImage *_toolbarIcon = nil;
 			}
 		}
 
-		if (!img && (img != (NSImage *)[NSNull null]))	// need to generate, but not if NSNull
+		if (!img && (img != (NSImage *)[NSNull null]) && imagePath)	// need to generate, but not if NSNull
 		{		
 			iMBMovieReference    *movieRef = [[iMBMovieCacheDB sharedMovieCacheDB] movieReferenceWithURL:[NSURL fileURLWithPath:imagePath]];
 			img = [movieRef posterImage];
