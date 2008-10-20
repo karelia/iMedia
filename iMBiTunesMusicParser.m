@@ -253,7 +253,7 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								if (_version == 7) [node setIconName:@"itunes-icon-playlist-smart7"];
+								if (_version >= 7) [node setIconName:@"itunes-icon-playlist-smart7"];
 								else [node setIconName:@"itunes-icon-playlist-smart"];
 								
 								[self populateNode:node withTracks:tracks fromPlaylist:playlist];
@@ -289,7 +289,7 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								if (_version == 7) [node setIconName:@"itunes-icon-playlist-normal7"];
+								if (_version >= 7) [node setIconName:@"itunes-icon-playlist-normal7"];
 								else [node setIconName:@"itunes-icon-playlist-normal"];
 								
 								[self populateNode:node withTracks:tracks fromPlaylist:playlist];
@@ -343,9 +343,9 @@
 		
 		#if RECURSIVE_PARSEDATABASE
 	
-		// Create standard nodes for iTunes 7...
+		// Create standard nodes for iTunes 7 and later...
 		
-		if (_version == 7)
+		if (_version >= 7)
 		{
 			name = LocalizedStringInIMedia(@"Music", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-music";
