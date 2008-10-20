@@ -360,6 +360,7 @@ static NSWindow* flippingWindow = nil;
 		[self orderOut:self];
 		return;
 	}
+	[flipr setLevel:[self level]];
 	[(FliprView*)[flipr contentView] setInitialWindow:self andFinalWindow:window forward:forward reflectInto:reflection];
 }
 
