@@ -179,7 +179,7 @@
 		CEC85B070B5150A0006DA6AA /* UKFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 791F9AEF0976320A0071B2E0 /* UKFileWatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEC85B080B5150A7006DA6AA /* iMBAperturePhotosParser.h in Headers */ = {isa = PBXBuildFile; fileRef = FC6810360B1771ED0063CF05 /* iMBAperturePhotosParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEC85B090B5150A8006DA6AA /* iMBiPhotoPhotosParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D715F09D3AB55005F166D /* iMBiPhotoPhotosParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CEC85B0A0B5150AB006DA6AA /* iMBiTunesMusicParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F870309D4DA72000F21B5 /* iMBiTunesMusicParser.h */; };
+		CEC85B0A0B5150AB006DA6AA /* iMBiTunesMusicParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795F870309D4DA72000F21B5 /* iMBiTunesMusicParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEC85B0B0B5150AF006DA6AA /* iMBiPhotoMoviesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D716509D3AB64005F166D /* iMBiPhotoMoviesParser.h */; settings = {ATTRIBUTES = (); }; };
 		CEC85B0C0B5150B4006DA6AA /* iMBSafariBookmarkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 795D71DF09D3C00F005F166D /* iMBSafariBookmarkParser.h */; };
 		CEC85B0D0B5150C1006DA6AA /* LibraryItemsValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D9659C0F09A6CB450079ED9A /* LibraryItemsValueTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };

@@ -65,6 +65,22 @@
 	[pool release];
 }
 
++ (NSArray *)iTunesRecentDatabaseURLs
+{
+    NSArray *libraries = [NSMakeCollectable(CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps")) autorelease];
+    NSMutableArray *result = [NSMutableArray arrayWithCapacity:[libraries count]];
+    
+	NSEnumerator *librariesEnumerator = [libraries objectEnumerator];
+	NSString *aLibraryURLString;
+	while (aLibraryURLString = [librariesEnumerator nextObject])
+    {
+		NSURL *url = [[NSURL alloc] initWithString:aLibraryURLString];
+		if (url) [result addObject:url];
+        [url release];
+	}
+    
+    return result;
+}
 
 - (id)init
 {
@@ -312,15 +328,14 @@
 	iMBLibraryNode *root = nil;
 	NSMutableDictionary *musicLibrary = [NSMutableDictionary dictionary];
 	
-	NSArray *libraries = [NSMakeCollectable(CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps")) autorelease];
-	NSEnumerator *e = [libraries objectEnumerator];
-	NSString *cur;
+    NSArray *libaryURLs = [[self class] iTunesRecentDatabaseURLs];
+	NSEnumerator *e = [libaryURLs objectEnumerator];
+	NSURL *cur;
 	
 	while (cur = [e nextObject]) {
-		NSURL* url = [NSURL URLWithString:cur];
 		[myDatabase release];
-		myDatabase = [[url path] retain];
-		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:url];
+		myDatabase = [[cur path] retain];
+		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:cur];
 		if (db) {
 			_version = [[db objectForKey:@"Application Version"] intValue];
 			[musicLibrary addEntriesFromDictionary:db];

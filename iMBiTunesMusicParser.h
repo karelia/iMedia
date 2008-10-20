@@ -51,4 +51,6 @@
 	int _version;
 }
 
++ (NSArray *)iTunesRecentDatabaseURLs;
+
 @end
