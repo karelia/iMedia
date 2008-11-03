@@ -170,9 +170,11 @@ static MetadataUtility *theMetadataUtility = nil;
         {
             [arguments setObject:@"Protected" forKey:@"kMDItemKind"];
         }
-        
+	}
+	if (movie)
+	{
         [movie release];
-    }
+	}
 }
 
 // this method should only be called via a connection (to ourself). used to make sure all calls

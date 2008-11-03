@@ -92,7 +92,9 @@
         NSNumber *duration = [NSNumber numberWithFloat:[movie durationInSeconds] * 1000];
 
         [arguments setValue:duration forKey:@"outputDuration"];
-        
+	}
+	if (movie)
+	{
         [movie release];
     }
 }

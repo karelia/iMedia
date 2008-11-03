@@ -161,8 +161,11 @@ static int runConnectedToServer(NSString * serverName, BOOL shouldDoPosterImages
             
             // Open the movie
             movie = openMovie(sourceURLString, movieCacheDict);
-            if (!movie) 
+            if (!movie)
+			{
+				[pool release];
                 return -2;
+			}
             
             if ([movie isDRMProtected])
             {
@@ -279,8 +282,7 @@ static int runConnectedToServer(NSString * serverName, BOOL shouldDoPosterImages
                     [bitmap release];
                 }
             }
-            [pool drain];
-			[pool release];
+			[pool drain];	// same as release, or hint to GC if we are in a GC environment
             pool = [[NSAutoreleasePool alloc] init];
         }
         
@@ -298,7 +300,10 @@ static int runConnectedToServer(NSString * serverName, BOOL shouldDoPosterImages
             }
             movie = openMovie (sourceURLString, movieCacheDict);
             if (!movie)
+			{
+				[pool release];
                 return -2;
+			}
             
             if ([movie isDRMProtected])
             {
@@ -331,23 +336,23 @@ static int runConnectedToServer(NSString * serverName, BOOL shouldDoPosterImages
             if (err != noErr)
             {
                 NSLog (@"Error %d when creating data ref to %@", err, destinationPath);
+				[pool release];
                 return err;
             }
             err = CreateMiniMovie(movie, dataRefRecord);
             if (err != noErr)
             {
                 NSLog (@"Error %d when ConvertMovieToDataRef for %@", err, movie);
+				[pool release];
                 return err;
             }
             [server setMiniMovieFilePath:destinationPath forURLString:sourceURLString];
         }
 
-        [pool drain];
-		[pool release];
+		[pool drain];	// same as release, or hint to GC if we are in a GC environment
         pool = [[NSAutoreleasePool alloc] init];
     }
         
-    [pool drain];
 	[pool release];
     return 0;
 }
@@ -385,7 +390,6 @@ int main (int argc, const char * argv[]) {
     if (server)
         result = runConnectedToServer(server, shouldDoPosterImages, shouldDoMiniMovies);
 
-    [pool drain];
  	[pool release];
    
     return result;

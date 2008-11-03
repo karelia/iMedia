@@ -74,7 +74,7 @@
 								   sizeof(BOOL),					// ByteCount                inPropValueSize,
 								   &isProtected,					// ComponentValuePtr        outPropValueAddress,
 								   NULL);							// ByteCount *              outPropValueSizeUsed)
-		if (isProtected)
+		if (isProtected || result != noErr)
 			break;
 	}
 

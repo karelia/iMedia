@@ -123,19 +123,20 @@
 					{
 						NSURL *url = [NSURL URLWithString:location];
 						NSString *path = [url path];
-						if (path == nil) continue;
-						[locations addObject:locations];
-						
-						NSMutableDictionary* movieTrack = [track mutableCopy];
-						[movieTrack setObject:path forKey:@"ImagePath"];
-						[movieTrack setObject:path forKey:@"Preview"];
-						[movieTrack setObject:[track objectForKey:@"Name"] forKey:@"Caption"];
-						[playlistTracks addObject:movieTrack];
-						[movieTrack release];
-						hasVideos = YES;
+						if (path != nil)
+						{
+							[locations addObject:locations];
+							
+							NSMutableDictionary* movieTrack = [track mutableCopy];
+							[movieTrack setObject:path forKey:@"ImagePath"];
+							[movieTrack setObject:path forKey:@"Preview"];
+							[movieTrack setObject:[track objectForKey:@"Name"] forKey:@"Caption"];
+							[playlistTracks addObject:movieTrack];
+							[movieTrack release];
+							hasVideos = YES;
+						}
 					}
 				}
-				
 				[pool release];
 			}
 		}
