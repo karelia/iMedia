@@ -244,6 +244,9 @@ static UKKQueue * gUKKQueueSharedQueueSingleton = nil;
 
 -(void) addPathToQueue: (NSString*)path notifyingAbout: (u_int)fflags
 {
+	if ([watchedPaths containsObject:path]) {
+		return;
+	}
 	struct timespec		nullts = { 0, 0 };
 	struct kevent		ev;
 	int					fd = open( [path fileSystemRepresentation], O_EVTONLY, 0 );
