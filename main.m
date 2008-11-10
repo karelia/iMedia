@@ -28,7 +28,7 @@
 	below, and the aforementioned copyright notice, or b) the aforementioned
 	copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	Neither the name o f Karelia Software, nor Sandvox, nor the names of
 	contributors to iMedia Browser may be used to endorse or promote products
 	derived from the Software without prior and express written permission from
 	Karelia Software or individual contributors, as appropriate.
@@ -43,8 +43,18 @@
 */
 
 #import <Cocoa/Cocoa.h>
+#include <sys/resource.h>
 
 int main(int argc, char *argv[])
 {
+#define NEW_MAX 4000
+	struct rlimit limit = {0,0};
+	getrlimit(RLIMIT_NOFILE,&limit);
+	if (limit.rlim_cur<NEW_MAX)
+	{
+		limit.rlim_cur = NEW_MAX;
+		setrlimit(RLIMIT_NOFILE,&limit);
+	}
+	
     return NSApplicationMain(argc,  (const char **) argv);
 }

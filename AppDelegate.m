@@ -60,7 +60,8 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	//[iMediaConfiguration setLiveUpdatingEnabled:YES];
+	// turn this on so we can test it
+	[iMediaConfiguration setLiveUpdatingEnabled:YES];
 	
 	//[iMediaBrowser sharedBrowserWithDelegate:self supportingBrowserTypes:[NSArray arrayWithObject:@"iMBMusicController"]];
 	[[iMediaBrowser sharedBrowserWithDelegate:self] showWindow:self];
