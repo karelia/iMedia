@@ -293,7 +293,10 @@
 					if ([CIImage isReadableFile:absolutePath]) {
 						NSMutableDictionary *imageRecord = [NSMutableDictionary dictionary];
 						
+						// Issue 68: ImagePath should point to a preview extracted from Previews.lrdata
 						[imageRecord setObject:absolutePath forKey:@"ImagePath"];
+						
+						[imageRecord setObject:absolutePath forKey:@"OriginalPath"];
 						
 						NSString *caption = [rsImages stringForColumn:@"captionName"];
 						
@@ -304,7 +307,6 @@
 							NSString *fileName = [rsImages stringForColumn:@"idx_filename"];
 							
 							[imageRecord setObject:fileName forKey:@"Caption"];
-							
 						}
 						
                         [images addObject:imageRecord];
@@ -394,7 +396,10 @@
 			if ([CIImage isReadableFile:absolutePath]) {
 				NSMutableDictionary *imageRecord = [NSMutableDictionary dictionary];
 				
+				// Issue 68: ImagePath should point to a preview extracted from Previews.lrdata
 				[imageRecord setObject:absolutePath forKey:@"ImagePath"];
+				
+				[imageRecord setObject:absolutePath forKey:@"OriginalPath"];
 				
 				NSString *caption = nil; //[rsImages stringForColumn:@"captionName"];
 				
@@ -405,7 +410,6 @@
 					NSString *fileName = [rsImages stringForColumn:@"idx_filename"];
 					
 					[imageRecord setObject:fileName forKey:@"Caption"];
-					
 				}
 				
 				[images addObject:imageRecord];

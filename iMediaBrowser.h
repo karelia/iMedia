@@ -130,6 +130,11 @@
 - (BOOL)toolbarIsSmall;
 - (void) setToolbarIsSmall:(BOOL)aFlag;
 
++ (NSDictionary*)recordForPath:(NSString*)path ofMediaType:(NSString*)mediaType;
++ (NSDictionary*)recordForPath:(NSString*)path inNode:(iMBLibraryNode*)node;
++ (NSDictionary*)enhancedRecordForRecord:(NSDictionary*)record ofMediaType:(NSString*)mediaType;
++ (NSDictionary*)enhancedRecordForPath:(NSString*)path ofMediaType:(NSString*)mediaType;
+
 @end
 
 // This notification is for each specific media browser to post when their selection changes.

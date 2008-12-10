@@ -127,3 +127,9 @@
 
 @end
 
+@protocol iMBEnhanceParser <iMBParser>
+
++ (NSDictionary*)enhancedRecordForRecord:(NSDictionary*)record;
+
+@end
+

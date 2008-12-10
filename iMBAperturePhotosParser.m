@@ -49,6 +49,10 @@
 #import "NSImage+iMedia.h"
 #import "NSString+iMedia.h"
 
+#import "FMDatabase.h"
+#import "FMDatabaseAdditions.h"
+#import "FMResultSet.h"
+
 #ifndef NSMakeCollectable
 #define NSMakeCollectable(x) (id)(x)
 #endif
@@ -220,7 +224,7 @@
                 NSLog(@"IMBAperturePhotosParser: no image record found with key %@", key);
                 continue;
             }
-            
+            			
 			if ([imageRecord objectForKey:@"MediaType"] && ![[imageRecord objectForKey:@"MediaType"] isEqualToString:@"Image"])
 			{
 				continue;
@@ -233,7 +237,9 @@
 				if (date) [imageRecord setObject:date forKey:@"DateAsTimerInterval"];
 			}
 			
-            [newPhotolist addObject:imageRecord];
+ 			[imageRecord setObject:key forKey:@"VersionUUID"];
+
+			[newPhotolist addObject:imageRecord];
 			
 			//	cp: No keywords in Aperture XML.
 			#if 0
@@ -326,6 +332,147 @@
         }
     }
     return libraryNodes;
+}
+
++ (NSDictionary*)enhancedRecordForRecord:(NSDictionary*)record
+{
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+	NSString *masterPath = nil;
+	NSString *previewPath = [record valueForKey:@"ImagePath"];
+	NSString *imageName = [[previewPath lastPathComponent] stringByDeletingPathExtension];
+	NSString *basePath = [[previewPath stringByDeletingLastPathComponent] stringByDeletingLastPathComponent];
+	NSArray *files = [fileManager directoryContentsAtPath:basePath];
+	int fCount = [files count];
+	int f = 0;
+	
+	for (f = 0; f < fCount; f++) {
+		NSString *fileName = [files objectAtIndex:f];
+		
+		if ([imageName isEqualToString:[fileName stringByDeletingPathExtension]]) {
+			masterPath = [basePath stringByAppendingPathComponent:fileName];
+			
+			break;
+		}
+	}
+	
+	if (masterPath == nil) { // The master file is a referenced external file	
+		NSRange range = [previewPath rangeOfString:@".aplibrary/"];
+		NSString *libraryPath = [previewPath substringToIndex:(range.location + range.length)];
+		NSString *databasePath = [[libraryPath stringByAppendingPathComponent:@"Aperture.aplib"] stringByAppendingPathComponent:@"Library.apdb"];
+		FMDatabase *database = [FMDatabase databaseWithPath:databasePath];
+		
+		if ([database open]) {
+			NSString *fileUUID = nil;
+			NSString *imagePath = nil;
+			NSString *fileVolumeUUID = nil;
+			NSString *volumeName = nil;
+			
+			NSString *versionUUID = [record valueForKey:@"VersionUUID"];
+			FMResultSet *fileUUIDResult = [database executeQuery:@"SELECT zfileuuid FROM zrkversion WHERE zuuid = ?", versionUUID];
+			
+			if ([fileUUIDResult next]) {
+				fileUUID = [fileUUIDResult stringForColumn:@"zfileuuid"];
+			}
+			
+			[fileUUIDResult close];		
+
+			if (fileUUID != nil) {
+				FMResultSet *imagePathResult = [database executeQuery:@"SELECT zimagepath FROM zrkfile WHERE zuuid = ?", fileUUID];
+			
+				if ([imagePathResult next]) {
+					imagePath =[imagePathResult stringForColumn:@"zimagepath"];
+				}
+				
+				[imagePathResult close];		
+
+				FMResultSet *fileVolumeUUIDResult = [database executeQuery:@"SELECT zfilevolumeuuid FROM zrkfile WHERE zuuid = ?", fileUUID];
+				
+				if ([fileVolumeUUIDResult next]) {
+					fileVolumeUUID =[fileVolumeUUIDResult stringForColumn:@"zfilevolumeuuid"];
+				}
+				
+				[fileVolumeUUIDResult close];		
+			
+				if (fileVolumeUUID != nil) {
+					FMResultSet *volumeNameResult = [database executeQuery:@"SELECT zname FROM zrkvolume WHERE zuuid = ?", fileVolumeUUID];
+						
+					if ([volumeNameResult next]) {
+						volumeName = [volumeNameResult stringForColumn:@"zname"];
+					}
+
+					[volumeNameResult close];		
+				}
+			}
+			else { // We may be looking at a pre-2.0 library
+				NSMutableString *imagePathQuery = [NSMutableString string];
+				
+				[imagePathQuery appendString:@"SELECT zimagepath FROM zrkfile"];
+				[imagePathQuery appendString:@" WHERE z_pk = ("];
+				[imagePathQuery appendString:@"    SELECT zoriginalfile FROM zrkmaster"];
+				[imagePathQuery appendString:@"     WHERE z_pk = ("];
+				[imagePathQuery appendString:@"        SELECT zmaster FROM zrkversion"];
+				[imagePathQuery appendString:@"         WHERE zuuid = ?"];
+				[imagePathQuery appendString:@"      )"];
+				[imagePathQuery appendString:@" )"];
+				
+				FMResultSet *imagePathResult = [database executeQuery:imagePathQuery, versionUUID];
+				
+				if ([imagePathResult next]) {
+					imagePath = [imagePathResult stringForColumn:@"zimagepath"];
+				}
+
+				[imagePathResult close];
+				
+				if (imagePath != nil) {
+					NSMutableString *volumeNameQuery = [NSMutableString string];
+					
+					[volumeNameQuery appendString:@"SELECT zname FROM zrkvolume"];
+					[volumeNameQuery appendString:@" WHERE z_pk = ("];
+					[volumeNameQuery appendString:@"    SELECT zfilevolume FROM zrkfile"];
+					[volumeNameQuery appendString:@"     WHERE z_pk = ("];
+					[volumeNameQuery appendString:@"        SELECT zoriginalfile FROM zrkmaster"];
+					[volumeNameQuery appendString:@"         WHERE z_pk = ("];
+					[volumeNameQuery appendString:@"            SELECT zmaster FROM zrkversion"];
+					[volumeNameQuery appendString:@"             WHERE zuuid = ?"];
+					[volumeNameQuery appendString:@"         )"];
+					[volumeNameQuery appendString:@"     )"];
+					[volumeNameQuery appendString:@" )"];
+					
+					FMResultSet *volumeNameResult = [database executeQuery:volumeNameQuery, versionUUID];
+					
+					if ([volumeNameResult next]) {
+						volumeName  =[volumeNameResult stringForColumn:@"zname"];
+					}
+					
+					[volumeNameResult close];		
+				}
+			}
+			
+			if (imagePath != nil) {
+				if (volumeName == nil) {
+					volumeName = @"/";
+				}
+				else if (![volumeName hasPrefix:@"/Volumes/"]) {
+					volumeName = [@"/Volumes/" stringByAppendingPathComponent:volumeName];
+				}
+				
+				masterPath = [volumeName stringByAppendingPathComponent:imagePath];
+			}
+			
+			[database close];
+		}
+	}
+	
+	if (masterPath != nil) {
+		NSMutableDictionary *enhancedRecord = [NSMutableDictionary dictionaryWithDictionary:record];
+		
+		[enhancedRecord setObject:masterPath forKey:@"OriginalPath"];
+		[enhancedRecord setObject:masterPath forKey:@"MasterPath"];
+		
+		return enhancedRecord;
+	}
+	
+	return record;
 }
 
 @end

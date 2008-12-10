@@ -862,6 +862,102 @@ static NSMutableArray *_browserClasses = nil;
     return YES;
 }
 
++ (NSDictionary*)recordForPath:(NSString*)path ofMediaType:(NSString*)mediaType
+{
+	iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:mediaType];
+	NSArray *nodes = [parserController valueForKey:@"libraryNodes"];
+	int nCount = [nodes count];
+	int n = 0;
+	
+	for (n = 0; n < nCount; n++) {
+		iMBLibraryNode *node = [nodes objectAtIndex:n];
+		NSDictionary *record = [self recordForPath:path inNode:node];
+		
+		if (record != nil) {
+			return record;
+		}
+	}
+	
+	return nil;
+}
+
++ (NSDictionary*)recordForPath:(NSString*)path inNode:(iMBLibraryNode*)node
+{
+	NSArray *nodes = [node valueForKey:@"items"];
+	int nCount = [nodes count];
+	
+	if (nCount == 0) {
+		NSArray *images = [node valueForKey:@"Images"];
+		int iCount = [images count];
+		int i = 0;
+		
+		for (i = 0; i < iCount; i++) {
+			NSDictionary *record = [images objectAtIndex:i];
+			NSString *imagePath = [record valueForKey:@"ImagePath"];
+			
+			if ([path isEqual:imagePath]) {
+				NSMutableDictionary *mutableRecord = [NSMutableDictionary dictionaryWithDictionary:record];
+				
+				[mutableRecord setObject:[node parserClassName] forKey:@"PaserClassName"];
+				[mutableRecord setObject:[node recursiveIdentifier] forKey:@"NodeIdentifier"];
+				
+				return mutableRecord;
+			}
+		}
+	}
+	else {
+		int n = 0;
+		
+		for (n = 0; n < nCount; n++) {
+			iMBLibraryNode *node = [nodes objectAtIndex:n];
+			NSDictionary *record = [self recordForPath:path inNode:node];
+			
+			if (record != nil) {
+				return record;
+			}
+		}
+	}
+	
+	return nil;
+}
+
++ (NSDictionary*)enhancedRecordForRecord:(NSDictionary*)record ofMediaType:(NSString*)mediaType
+{
+	NSString *imagePath = [record valueForKey:@"ImagePath"];
+	
+	if (imagePath == nil) {
+		return record;
+	}
+	
+	NSString *paserClassName = [record objectForKey:@"PaserClassName"];
+	
+	if (paserClassName == nil) {
+		NSDictionary *completeRecord = [self recordForPath:imagePath ofMediaType:mediaType];
+		
+		return [self enhancedRecordForRecord:completeRecord ofMediaType:mediaType];
+	}
+	
+	Class parserClass = NSClassFromString(paserClassName);
+	
+	if ([parserClass conformsToProtocol:@protocol(iMBEnhanceParser)])
+	{
+		NSMutableDictionary *mutableRecord = [NSMutableDictionary dictionaryWithDictionary:record];
+		
+		[mutableRecord addEntriesFromDictionary:[parserClass enhancedRecordForRecord:mutableRecord]];
+		
+		return mutableRecord;
+	}
+	
+	return record;
+}
+
++ (NSDictionary*)enhancedRecordForPath:(NSString*)path ofMediaType:(NSString*)mediaType
+{
+	NSDictionary *completeRecord = [self recordForPath:path ofMediaType:mediaType];
+	
+	return [self enhancedRecordForRecord:completeRecord ofMediaType:mediaType];
+}
+
 @end
 
 @implementation iMediaBrowser (Plugins)

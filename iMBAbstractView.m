@@ -514,6 +514,13 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDidChangeNotification
 														object:self
 													  userInfo:info];
+	
+	if ([selectedObjects count] > 0) {
+		NSDictionary *record = [selectedObjects objectAtIndex:0];
+		NSString *path = [record valueForKey:@"ImagePath"];
+		
+		NSLog(@"%@", [iMediaBrowser enhancedRecordForPath:path ofMediaType:@"photos"]);
+	}
 }
 
 - (NSArray *)rootNodes

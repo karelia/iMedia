@@ -68,6 +68,8 @@
         [columnNameToIndexMap setObject:[NSNumber numberWithInt:columnIdx]
                                  forKey:[[NSString stringWithUTF8String:sqlite3_column_name(pStmt, columnIdx)] lowercaseString]];
     }
+	
+	columnNamesSetup = YES; 
 }
 
 - (void) kvcMagic:(id)object {

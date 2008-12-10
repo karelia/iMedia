@@ -213,7 +213,7 @@
 		wantThumbPath:aWantThumbPath
 			imagePath:anImagePath
 			  forRoot:root];	
-    
+    	
 	if ([[root valueForKey:anImagePath] count] == 0)
 	{
 		root = nil;
