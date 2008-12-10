@@ -109,6 +109,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (void)dealloc
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[libraryController removeObserver:self forKeyPath:@"arrangedObjects"];
 
     [splitView setDelegate:nil];
@@ -313,7 +314,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	if ((object == libraryController) && [keyPath isEqualToString:@"arrangedObjects"])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(arrangedObjectsDidChange) object:nil];
-		[self performSelector:@selector(arrangedObjectsDidChange) withObject:nil afterDelay:0.01 inModes:[NSArray arrayWithObject:(NSString*)kCFRunLoopCommonModes]];
+		[self performSelector:@selector(arrangedObjectsDidChange) withObject:nil afterDelay:0.2 inModes:[NSArray arrayWithObject:(NSString*)kCFRunLoopCommonModes]];
 	}
 }
 
@@ -879,32 +880,35 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (void) revealLibraryNode:(iMBLibraryNode*)inLibraryNode
 {
-	// First expand everything, so that we have access to ALL nodes. Please note that we 
-	// are doing this with reverse enumeration so that we do not mess up indexes...
-	
-	int i,n = [libraryView numberOfRows];
-	id proxy;
-	
-	for (i=n-1; i>=0; i--)
+	if (inLibraryNode)
 	{
-		if (proxy = [libraryView itemAtRow:i])
+		// First expand everything, so that we have access to ALL nodes. Please note that we 
+		// are doing this with reverse enumeration so that we do not mess up indexes...
+		
+		int i,n = [libraryView numberOfRows];
+		id proxy;
+		
+		for (i=n-1; i>=0; i--)
 		{
-			[libraryView expandItem:proxy expandChildren:YES];
-		}	
-	}
-
-	// Then we can collapse every subtree that does not contain our node, so that we do not  
-	// waste any display space in the outline view...
-	
-	for (i=0; i<[libraryView numberOfRows]; i++)
-	{
-		if (proxy = [libraryView itemAtRow:i])
-		{
-			iMBLibraryNode* node = [self _nodeForProxy:proxy];
-			
-			if (![self _subtree:proxy containsLibraryNode:inLibraryNode] || node==inLibraryNode)
+			if (proxy = [libraryView itemAtRow:i])
 			{
-				[libraryView collapseItem:proxy collapseChildren:YES];
+				[libraryView expandItem:proxy expandChildren:YES];
+			}	
+		}
+
+		// Then we can collapse every subtree that does not contain our node, so that we do not  
+		// waste any display space in the outline view...
+		
+		for (i=0; i<[libraryView numberOfRows]; i++)
+		{
+			if (proxy = [libraryView itemAtRow:i])
+			{
+				iMBLibraryNode* node = [self _nodeForProxy:proxy];
+				
+				if (![self _subtree:proxy containsLibraryNode:inLibraryNode] || node==inLibraryNode)
+				{
+					[libraryView collapseItem:proxy collapseChildren:YES];
+				}
 			}
 		}
 	}
