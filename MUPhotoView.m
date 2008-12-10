@@ -73,6 +73,7 @@ NSString *ShowCaptionChangedNotification = @"ShowCaptionChangedNotification";
         photosArray = nil;
         photosFastArray = nil;
         selectedPhotoIndexes = nil;
+        previousSelectionRect = NSZeroRect;
         dragSelectedPhotoIndexes = [[NSMutableIndexSet alloc] init];
         
         [self setBackgroundColor:[NSColor grayColor]];
@@ -464,7 +465,7 @@ static NSDictionary *sTitleAttributes = nil;
     [self willChangeValueForKey:@"useShadowBorder"];
     useShadowBorder = flag;
     [self didChangeValueForKey:@"useShadowBorder"];
-    
+
     [self setNeedsDisplayInRect:[self visibleRect]];
 }
 
@@ -1043,9 +1044,10 @@ static NSDictionary *sTitleAttributes = nil;
         
         // Save the current selection (if any), then populate the drag indexes
 		// this allows us to shift band select to add to the current selection.
+		NSIndexSet* previousSelectionIndexes = [[dragSelectedPhotoIndexes copy] autorelease];
 		[dragSelectedPhotoIndexes removeAllIndexes];
 		[dragSelectedPhotoIndexes addIndexes:[self selectionIndexes]];
-        
+		
         // add indexes in the drag rectangle
         unsigned i;
 		for (i = 0; i <= selectedRows; i++) {
@@ -1068,14 +1070,22 @@ static NSDictionary *sTitleAttributes = nil;
             [self setSelectionIndexes:dragSelectedPhotoIndexes];
         }
 		
-        // autoscrolling
+        // While we are dragging, we make sure to fire an autoscroll periodically so that if the cursor 
+		// has been dragged outside the visible area of the view, it will provoke continuous scrolling 
+		// in that direction.
         if (autoscrollTimer == nil) {
             autoscrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(autoscroll) userInfo:nil repeats:YES];
         }
 
-        [[self superview] autoscroll:event];
-        
-		[self setNeedsDisplayInRect:[self visibleRect]];
+		// We need to update the union of the previous selection rect and the current selection rect,
+		// so we update the visual selection marquee appropriately.
+		NSRect updateRect = NSUnionRect(previousSelectionRect, selectionRect);		
+		[self setNeedsDisplayInRect:updateRect];
+		previousSelectionRect = selectionRect;
+		
+		// And to accommodate any change in selection apperances, which may lie inside or 
+		// outside of the selection rect itself.
+		[self dirtyDisplayRectsForNewSelection:dragSelectedPhotoIndexes oldSelection:previousSelectionIndexes];
     }
     
 }
@@ -1120,10 +1130,20 @@ static NSDictionary *sTitleAttributes = nil;
 
 - (void)autoscroll
 {
-	mouseCurrentPoint = [self convertPoint:[[NSApp currentEvent] locationInWindow] fromView:nil];
-	[[self superview] autoscroll:[NSApp currentEvent]];
-	
-    [self mouseDragged:[NSApp currentEvent]];
+	// Only autoscroll if we're outside the container clip view's visible bounds
+	NSView* myClipView = [self superview];
+	if ([myClipView isKindOfClass:[NSClipView class]])
+	{
+		NSPoint windowBasedPoint = [[NSApp currentEvent] locationInWindow];
+		NSPoint clipViewBasedPoint = [myClipView convertPoint:windowBasedPoint fromView:nil];
+		if (NSPointInRect(clipViewBasedPoint, [myClipView bounds]) == NO)
+		{		
+			[super autoscroll:[NSApp currentEvent]];
+			
+			// Calling mouseDragged: forces the selection to update, which would otherwise not happen while autoscrolling.
+			[self mouseDragged:[NSApp currentEvent]];
+		}
+	}
 }
 
 

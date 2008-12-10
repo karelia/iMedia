@@ -70,11 +70,14 @@ extern NSString *ShowCaptionChangedNotification;
     unsigned columns;
     unsigned rows;
     
+	// Dragging/tracking
     BOOL mouseDown;
 	BOOL potentialDragDrop;
 	NSPoint mouseDownPoint;
 	NSPoint mouseCurrentPoint;
+	NSRect previousSelectionRect;
 	NSTimer *autoscrollTimer;
+	
     NSTimer *photoResizeTimer;
     NSDate *photoResizeTime;
     BOOL isDonePhotoResizing;
