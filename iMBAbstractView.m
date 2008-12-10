@@ -339,12 +339,21 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
 - (IBAction)playlistSelected:(id)sender	// action from oPlaylists
 {
-	id rowItem = [libraryView itemAtRow:[sender selectedRow]];
-	id representedObject = [rowItem respondsToSelector:@selector(representedObject)] ? [rowItem representedObject] : [rowItem observedObject];
-    [self selectLibraryNode:(iMBLibraryNode*)representedObject];
+	int row = [sender selectedRow];
+	if (row < 0 || row == NSNotFound)
+		return;
 	
-    id delegate = [[iMediaConfiguration sharedConfiguration] delegate];
-    
+	id rowItem = [libraryView itemAtRow:row];
+	if (rowItem == nil)
+		return;
+	
+	id representedObject = [rowItem respondsToSelector:@selector(representedObject)] ? [rowItem representedObject] : [rowItem observedObject];
+	if (representedObject == nil)
+		return;
+	
+	[self selectLibraryNode:representedObject];
+	
+	id delegate = [[iMediaConfiguration sharedConfiguration] delegate];
 	if ([delegate respondsToSelector:@selector(iMediaConfiguration:didSelectNode:)])
 	{
 		[delegate iMediaConfiguration:[iMediaConfiguration sharedConfiguration] didSelectNode:representedObject];
