@@ -244,7 +244,7 @@
 				if (value!=nil && [value rangeOfString:lowerSearch].location!=NSNotFound)
 				{
 					[matchedObjects addObject:item];
-					continue;
+					break;
 				}
 			}
 			
