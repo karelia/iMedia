@@ -2033,13 +2033,11 @@ static NSDictionary *sTitleAttributes = nil;
 	// Only bother if the requested index is within our range
 	if ((photoIndex + 1) <= [self photoCount])
 	{
-		NSSize titleSize = NSZeroSize;
-
 		gridRect = [self centerScanRect:[self gridRectForIndex:photoIndex]];
 		
 		if (title)
 		{
-			titleSize = [self sizeOfTitleWithCurrentAttributes:title];				
+			NSSize titleSize = [self sizeOfTitleWithCurrentAttributes:title];				
 			NSDivideRect(gridRect, &titleRect, &gridRect, titleSize.height + 6.0f, NSMaxYEdge);
 		}
 		
