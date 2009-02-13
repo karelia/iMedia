@@ -153,7 +153,7 @@
                                                                                      ascending:NO] autorelease];
         NSSortDescriptor *nameSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"name" 
                                                                             ascending:YES 
-                                                                             selector:@selector(caseInsensitiveCompare:)] autorelease];
+                                                                             selector:@selector(finderCompare:)] autorelease];
         NSArray *librarySortDescriptor = [NSArray arrayWithObjects:priorityOrderSortDescriptor, nameSortDescriptor, nil];
         
         [libraryNodes sortUsingDescriptors:librarySortDescriptor];

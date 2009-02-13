@@ -103,6 +103,7 @@
 {
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSArray *contents = [fm directoryContentsAtPath:path];
+	contents = [contents sortedArrayUsingSelector:@selector(finderCompare:)];
 	NSEnumerator *e = [contents objectEnumerator];
 	NSString *cur;
 	BOOL isDir;

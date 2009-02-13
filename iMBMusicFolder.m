@@ -113,6 +113,7 @@
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 	NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
 	NSArray *contents = [fileManager directoryContentsAtPath:path];
+	contents = [contents sortedArrayUsingSelector:@selector(finderCompare:)];
 	NSEnumerator *e = [contents objectEnumerator];
 	NSMutableArray *tracks = [NSMutableArray array];
    

@@ -67,4 +67,6 @@
 
 + (NSString *)stringFromStarRating:(unsigned int)aRating;
 
+- (NSComparisonResult)finderCompare:(NSString *)aString;
+
 @end

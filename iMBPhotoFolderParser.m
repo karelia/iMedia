@@ -90,6 +90,7 @@
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 	NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
 	NSArray *folderContents = [fileManager directoryContentsAtPath:folderPath];
+	folderContents = [folderContents sortedArrayUsingSelector:@selector(finderCompare:)];
 	NSEnumerator *folderContentsEnumerator = [folderContents objectEnumerator];
 	NSString *currentFilename;
 	BOOL isDirectory;

@@ -79,6 +79,7 @@
 	{
 		NSString *ssDir = [libraryPath stringByAppendingPathComponent:@"Screen Savers"];
 		NSArray *contents = [fm directoryContentsAtPath:ssDir];
+		contents = [contents sortedArrayUsingSelector:@selector(finderCompare:)];
 		NSEnumerator *e = [contents objectEnumerator];
 		NSString *cur;
 		BOOL isDir;
@@ -106,6 +107,7 @@
 		
 		// Now give me all image in there please
 		NSArray *ssContents = [fm directoryContentsAtPath:imageFolderPath];
+		ssContents = [ssContents sortedArrayUsingSelector:@selector(finderCompare:)];
 		NSEnumerator *ssFilesEnum = [ssContents objectEnumerator];
 		NSString *aFileName;
 		NSMutableArray *images = [NSMutableArray array];
