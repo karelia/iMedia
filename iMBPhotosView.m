@@ -594,48 +594,48 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 
 - (NSImage *)photoView:(MUPhotoView *)view photoAtIndex:(unsigned)aIndex
 {
-	NSDictionary *rec;
-	if ([mySearchString length] > 0)
+	NSImage *img = nil;
+	NSDictionary *rec = nil;
+	NSArray * arr = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	if (aIndex < [arr count])
 	{
-		rec = [myFilteredImages objectAtIndex:aIndex];
+		rec = [arr objectAtIndex:aIndex];
 	}
-	else
+	if (rec)
 	{
-		rec = [myImages objectAtIndex:aIndex];
-	}
-	//try the caches
-	[myCacheLock lock];	// ============================================================ LOCK
-	NSString *imagePath = [rec objectForKey:@"ImagePath"];
-	NSImage *img = [myCache objectForKey:imagePath];
-	
-	if (!img) img = [rec objectForKey:@"CachedThumb"];
-	
-	if (!img)
-	{
-		// background load the image
-		BOOL alreadyQueued = (([myInFlightImageOperations containsObject:imagePath]) || ([myProcessingImages containsObject:imagePath]));
+		//try the caches
+		[myCacheLock lock];	// ============================================================ LOCK
+		NSString *imagePath = [rec objectForKey:@"ImagePath"];
+		img = [myCache objectForKey:imagePath];
 		
-		if (!alreadyQueued)
+		if (!img) img = [rec objectForKey:@"CachedThumb"];
+		
+		if (!img)
 		{
-			[myInFlightImageOperations addObject:imagePath];
-			if (myThreadCount < [NSProcessInfo numberOfProcessors])
+			// background load the image
+			BOOL alreadyQueued = (([myInFlightImageOperations containsObject:imagePath]) || ([myProcessingImages containsObject:imagePath]));
+			
+			if (!alreadyQueued)
 			{
-				myThreadCount++;
-				[NSThread detachNewThreadSelector:@selector(backgroundLoad)
-										 toTarget:self
-									   withObject:nil];
+				[myInFlightImageOperations addObject:imagePath];
+				if (myThreadCount < [NSProcessInfo numberOfProcessors])
+				{
+					myThreadCount++;
+					[NSThread detachNewThreadSelector:@selector(backgroundLoad)
+											 toTarget:self
+										   withObject:nil];
+				}
 			}
+			else
+			{
+				//lets move it to the end of the queue so we get done next
+				[myInFlightImageOperations removeObject:imagePath];
+				[myInFlightImageOperations addObject:imagePath];
+			}
+			img = nil; //return nil so the image view draws a bezierpath
 		}
-		else
-		{
-			//lets move it to the end of the queue so we get done next
-			[myInFlightImageOperations removeObject:imagePath];
-			[myInFlightImageOperations addObject:imagePath];
-		}
-		img = nil; //return nil so the image view draws a bezierpath
+		[myCacheLock unlock];	// ======================================================== UNLOCK
 	}
-	[myCacheLock unlock];	// ======================================================== UNLOCK
-
 	return img;
 }
 
@@ -702,85 +702,85 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 
 - (NSString *)photoView:(MUPhotoView *)view titleForPhotoAtIndex:(unsigned)aIndex
 {
-	NSDictionary *rec;
-	if ([mySearchString length] > 0)
+	NSString *result = nil;
+	NSDictionary *rec = nil;
+	NSArray * arr = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	if (aIndex < [arr count])
 	{
-		rec = [myFilteredImages objectAtIndex:aIndex];
+		rec = [arr objectAtIndex:aIndex];
 	}
-	else
+	if (rec)
 	{
-		rec = [myImages objectAtIndex:aIndex];
+		result = [rec objectForKey:@"Caption"];
 	}
-	NSString *result = [rec objectForKey:@"Caption"];
 	return result;
 }
 
 - (NSString *)photoView:(MUPhotoView *)view tooltipForPhotoAtIndex:(unsigned)aIndex
 {
 	NSMutableString *result = [NSMutableString string];
-	NSDictionary *rec;
-	if ([mySearchString length] > 0)
+	NSDictionary *rec = nil;
+	NSArray * arr = ([mySearchString length] > 0) ? myFilteredImages : myImages;
+	if (aIndex < [arr count])
 	{
-		rec = [myFilteredImages objectAtIndex:aIndex];
+		rec = [arr objectAtIndex:aIndex];
 	}
-	else
+	if (rec)
 	{
-		rec = [myImages objectAtIndex:aIndex];
-	}
-	
-	NSString *imagePath = [rec objectForKey:@"ImagePath"];
-	if (!imagePath)
-	{
-		[result appendString:[rec objectForKey:@"Caption"]];	// the title of the image, often the file name.
-	}
-	else
-	{
-		NSString *fileName = [imagePath lastPathComponent];
-		[result appendFormat:@"%@", fileName];
-		
-		// Some versions of iPhoto somehow link to aliases of images instead of the images themselves.
-		// so resolve the path if it is an alias. This may occur if the iPhoto preferences dictate that
-		// the photos should not be copied into the Pictures folder. It may also occur during some
-		// upgrade events.
-		NSString *resolvedPath = [[NSFileManager defaultManager] pathResolved:imagePath];
-		NSDictionary *metadata = [NSImage metadataFromImageAtPath:resolvedPath];
-		NSString *dimensionsFormat = LocalizedStringInIMedia(@"\n%.0f \\U2715 %.0f", @"format for width X height");
-		[result appendFormat:dimensionsFormat,
-			[[metadata objectForKey:@"width"]  floatValue],
-			[[metadata objectForKey:@"height"] floatValue]];
-		NSString *dateTimeLocalized = [metadata objectForKey:@"dateTimeLocalized"];
-		if (dateTimeLocalized)
+		NSString *imagePath = [rec objectForKey:@"ImagePath"];
+		if (!imagePath)
 		{
-			[result appendFormat:@"\n%@", dateTimeLocalized];
+			[result appendString:[rec objectForKey:@"Caption"]];	// the title of the image, often the file name.
 		}
-		int rating = [[rec objectForKey:@"Rating"] intValue];
-		NSString *comment = [rec objectForKey:@"Comment"];
-		BOOL hasComment = (nil != comment && ![comment isEqualToString:@""]);
-		NSArray *keywords = [rec objectForKey:@"iMediaKeywords"];
-		BOOL hasKeywords = keywords && [keywords count];
-		if (rating > 0 || hasComment || hasKeywords)
+		else
 		{
-			[result appendString:@"\n"];	// extra blank line before comment or rating
-			if (hasComment)
+			NSString *fileName = [imagePath lastPathComponent];
+			[result appendFormat:@"%@", fileName];
+			
+			// Some versions of iPhoto somehow link to aliases of images instead of the images themselves.
+			// so resolve the path if it is an alias. This may occur if the iPhoto preferences dictate that
+			// the photos should not be copied into the Pictures folder. It may also occur during some
+			// upgrade events.
+			NSString *resolvedPath = [[NSFileManager defaultManager] pathResolved:imagePath];
+			NSDictionary *metadata = [NSImage metadataFromImageAtPath:resolvedPath];
+			NSString *dimensionsFormat = LocalizedStringInIMedia(@"\n%.0f \\U2715 %.0f", @"format for width X height");
+			[result appendFormat:dimensionsFormat,
+				[[metadata objectForKey:@"width"]  floatValue],
+				[[metadata objectForKey:@"height"] floatValue]];
+			NSString *dateTimeLocalized = [metadata objectForKey:@"dateTimeLocalized"];
+			if (dateTimeLocalized)
 			{
-				[result appendFormat:@"\n%@", comment];
+				[result appendFormat:@"\n%@", dateTimeLocalized];
 			}
-			if (rating > 0)
+			int rating = [[rec objectForKey:@"Rating"] intValue];
+			NSString *comment = [rec objectForKey:@"Comment"];
+			BOOL hasComment = (nil != comment && ![comment isEqualToString:@""]);
+			NSArray *keywords = [rec objectForKey:@"iMediaKeywords"];
+			BOOL hasKeywords = keywords && [keywords count];
+			if (rating > 0 || hasComment || hasKeywords)
 			{
-				[result appendFormat:@"\n%@", 
-					[NSString stringFromStarRating:rating]];
-			}
-			if (hasKeywords)
-			{
-				[result appendFormat:@"\n"];
-				NSEnumerator *keywordsEnum = [keywords objectEnumerator];
-				NSString *keyword;
-				
-				while ((keyword = [keywordsEnum nextObject]) != nil)
+				[result appendString:@"\n"];	// extra blank line before comment or rating
+				if (hasComment)
 				{
-					[result appendFormat:@"%@, ", keyword];
+					[result appendFormat:@"\n%@", comment];
 				}
-				[result deleteCharactersInRange:NSMakeRange([result length] - 2, 2)];	// remove last comma+space
+				if (rating > 0)
+				{
+					[result appendFormat:@"\n%@", 
+						[NSString stringFromStarRating:rating]];
+				}
+				if (hasKeywords)
+				{
+					[result appendFormat:@"\n"];
+					NSEnumerator *keywordsEnum = [keywords objectEnumerator];
+					NSString *keyword;
+					
+					while ((keyword = [keywordsEnum nextObject]) != nil)
+					{
+						[result appendFormat:@"%@, ", keyword];
+					}
+					[result deleteCharactersInRange:NSMakeRange([result length] - 2, 2)];	// remove last comma+space
+				}
 			}
 		}
 	}
