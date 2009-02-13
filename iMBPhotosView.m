@@ -201,7 +201,7 @@ static Class sNSCGImageRepClass = nil; // NSImageRep subclass that can be initia
 	if ([mySearchString length]) 
 	{
 		iMBLibraryNode *selectedNode = [[[self controller] selectedObjects] lastObject];
-		[myFilteredImages addObjectsFromArray:[selectedNode searchAttribute:@"Images" withKeys:[NSArray arrayWithObjects:@"Caption", @"ImagePath", nil] matching:mySearchString]];	
+		[myFilteredImages addObjectsFromArray:[selectedNode searchAttribute:@"Images" withKeys:[NSArray arrayWithObjects:@"Caption", @"ImagePath", @"Comment", @"iMediaKeywords", nil] matching:mySearchString]];	
 	}	
 	
 	[self didChangeValueForKey:@"images"];

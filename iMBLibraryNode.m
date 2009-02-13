@@ -740,6 +740,21 @@ static NSMutableDictionary *sImageCache = nil;
 						break;
 					}
 				}
+				else if ([keyAttrib isKindOfClass:[NSArray class]])	// for iMediaKeywords array
+				{
+					NSEnumerator *arrayEnum = [keyAttrib objectEnumerator];
+					NSString *eachAttrib;
+
+					while ((eachAttrib = [arrayEnum nextObject]) != nil)
+					{
+						if ([eachAttrib rangeOfString:value options:NSCaseInsensitiveSearch].location != NSNotFound)
+						{
+							[results addObject:cur];
+							goto doneLookingForMatch;	// Apologies, but we need to break out of two loops.
+						}
+						
+					}
+				}
 				else
 				{
 					if ([keyAttrib isEqual:value])
@@ -749,6 +764,10 @@ static NSMutableDictionary *sImageCache = nil;
 					}
 				}
 			}
+			
+		doneLookingForMatch:	 ;
+			
+			
 		}
 	}
 	
