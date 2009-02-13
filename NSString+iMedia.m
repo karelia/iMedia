@@ -253,7 +253,6 @@
 
 - (NSComparisonResult)finderCompare:(NSString *)aString
 {
-	NSLog(@"Compare %@ and %@", self, aString);
 	SInt32 compareResult;
 	
 	CFIndex lhsLen = [self length];;
