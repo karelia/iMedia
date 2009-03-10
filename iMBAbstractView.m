@@ -514,14 +514,19 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDidChangeNotification
 														object:self
 													  userInfo:info];
-	
-	if ([selectedObjects count] > 0) {
-		NSDictionary *record = [selectedObjects objectAtIndex:0];
-		NSString *path = [record valueForKey:@"ImagePath"];
-		
-		NSLog(@"%@", [iMediaBrowser enhancedRecordForPath:path ofMediaType:@"photos"]);
-	}
 }
+
+- (void)postSelectionDoubleClickNotification:(NSArray *)selectedObjects
+{
+	NSEvent *evt = [NSApp currentEvent];
+	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+						  selectedObjects, @"Selection", 
+						  evt, @"Event", nil];
+	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserSelectionDoubleClickNotification
+														object:self
+													  userInfo:info];
+}
+
 
 - (NSArray *)rootNodes
 {

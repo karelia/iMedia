@@ -650,6 +650,7 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 - (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)aIndex withFrame:(NSRect)frame
 {
 	[self postSelectionChangeNotification:[self selectedRecords]];
+	[self postSelectionDoubleClickNotification:[self selectedRecords]];
 }
 
 - (NSIndexSet *)selectionIndexesForPhotoView:(MUPhotoView *)view

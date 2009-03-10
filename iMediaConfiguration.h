@@ -110,8 +110,6 @@
 - (BOOL)iMediaConfiguration:(iMediaConfiguration *)configuration willLoadBrowser:(NSString *)browserClassname;
 - (void)iMediaConfiguration:(iMediaConfiguration *)configuration didLoadBrowser:(NSString *)browserClassname;
 
-- (void)iMediaConfiguration:(iMediaConfiguration *)configuration doubleClickedSelectedObjects:(NSArray*)selection;
-
 // Contextual menu support
 - (NSMenu*)iMediaConfiguration:(iMediaConfiguration *)configuration menuForSelectedObjects:(NSArray*)selection;
 

@@ -53,6 +53,7 @@
 #import "iMBLibraryNode.h"
 
 NSString *iMediaBrowserSelectionDidChangeNotification = @"iMediaSelectionChanged";
+NSString *iMediaBrowserSelectionDoubleClickNotification = @"iMediaSelectionDoubleClicked";
 
 static iMediaBrowser *_sharedMediaBrowser = nil;
 static NSMutableArray *_browserClasses = nil;
@@ -797,14 +798,6 @@ static NSMutableArray *_browserClasses = nil;
     if ([myDelegate respondsToSelector:@selector(iMediaBrowser:didLoadBrowser:)])
     {
         [myDelegate iMediaBrowser:self didLoadBrowser:browserClassname];
-    }
-}
-
-- (void)iMediaConfiguration:(iMediaConfiguration *)configuration doubleClickedSelectedObjects:(NSArray*)selection
-{
-    if ([myDelegate respondsToSelector:@selector(iMediaBrowser:doubleClickedSelectedObjects:)])
-    {
-        [myDelegate iMediaBrowser:self doubleClickedSelectedObjects:selection];
     }
 }
 

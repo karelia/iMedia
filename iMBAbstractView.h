@@ -98,6 +98,7 @@ extern NSString *iMBNativeDataArray;
 - (NSArray*)addCustomFolders:(NSArray*)folders;
 
 - (void)postSelectionChangeNotification:(NSArray *)selectedObjects;
+- (void)postSelectionDoubleClickNotification:(NSArray *)selectedObjects;
 
 - (void)willActivate;
 - (void)didDeactivate;

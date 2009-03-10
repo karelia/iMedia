@@ -142,14 +142,16 @@
 // the userInfo dictionary contains the selection with key Selection
 extern NSString *iMediaBrowserSelectionDidChangeNotification;
 
+// This notification is for each specific media browser to post when their selection is double-clicked.
+// the userInfo dictionary contains the selection with key Selection
+extern NSString *iMediaBrowserSelectionDoubleClickNotification;
+
 @interface NSObject (iMediaBrowserDelegate)
 
 // NB: These methods will be called on the main thread
 // the delegate can stop the browser from loading a certain media type
 - (BOOL)iMediaBrowser:(iMediaBrowser *)browser willLoadBrowser:(NSString *)browserClassname;
 - (void)iMediaBrowser:(iMediaBrowser *)browser didLoadBrowser:(NSString *)browserClassname;
-
-- (void)iMediaBrowser:(iMediaBrowser *)browser doubleClickedSelectedObjects:(NSArray*)selection;
 
 // Contextual menu support
 - (NSMenu*)iMediaBrowser:(iMediaBrowser *)browser menuForSelectedObjects:(NSArray*)selection;
