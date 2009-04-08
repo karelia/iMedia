@@ -146,7 +146,27 @@ NSString *ShowCaptionChangedNotification = @"ShowCaptionChangedNotification";
 	return YES;
 }
 
-static NSDictionary *sTitleAttributes = nil;
+- (NSDictionary*)titleAttributes
+{
+	static NSDictionary* sTitleAttributes = nil;
+
+	if (!sTitleAttributes)
+	{   // This could be improved by setting the color to something that works well with a non white background color.
+		NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
+
+		[paragraphStyle setAlignment:NSCenterTextAlignment];
+		[paragraphStyle setLineBreakMode:NSLineBreakByTruncatingMiddle];
+
+		sTitleAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+								[NSFont labelFontOfSize:[NSFont labelFontSize]],	NSFontAttributeName,
+								[NSColor darkGrayColor],							NSForegroundColorAttributeName,
+								paragraphStyle,										NSParagraphStyleAttributeName,
+								nil];
+	}
+
+	return sTitleAttributes;
+}
+
 
 - (void)drawRect:(NSRect)rect
 {
@@ -248,22 +268,7 @@ static NSDictionary *sTitleAttributes = nil;
 		// draw title
 		if (title)
 		{
-			// center rect
-			NSMutableString *s1 = [NSMutableString stringWithString:[title substringToIndex:[title length] / 2]];
-			NSMutableString *s2 = [NSMutableString stringWithString:[title substringFromIndex:[title length] / 2]];
-			NSSize titleSize = [self sizeOfTitleWithCurrentAttributes:title];
-			while (titleSize.width > NSWidth(titleRect))
-			{
-				[s1 deleteCharactersInRange:NSMakeRange([s1 length] - 1, 1)];
-				[s2 deleteCharactersInRange:NSMakeRange(0, 1)];
-				
-				title = [NSString stringWithFormat:@"%@...%@", s1, s2];
-				titleSize = [title sizeWithAttributes:sTitleAttributes];
-			}
-			titleRect.origin.x = NSMidX(titleRect) - (titleSize.width / 2);
-			titleRect.size.width = titleSize.width;
-			
-			[title drawInRect:titleRect withAttributes:sTitleAttributes];
+			[title drawInRect:titleRect withAttributes:[self titleAttributes]];
 		}
         
     }
@@ -2016,12 +2021,7 @@ static NSDictionary *sTitleAttributes = nil;
 
 - (NSSize)sizeOfTitleWithCurrentAttributes:(NSString*)title
 {
-	if (!sTitleAttributes)
-	{   // This could be improved by setting the color to something that works well with a non white background color.
-		sTitleAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:[NSFont labelFontSize]], NSFontAttributeName, [NSColor darkGrayColor], NSForegroundColorAttributeName, nil];
-		[sTitleAttributes retain];
-	}
-	return [title sizeWithAttributes:sTitleAttributes];
+	return [title sizeWithAttributes:[self titleAttributes]];
 }
 
 - (void)getDrawingRectsAtIndex:(unsigned)photoIndex withPhoto:(NSImage *)cellPhoto withTitle:(NSString*)title outGridRect:(NSRect *)outGridRect outPhotoRect:(NSRect *)outPhotoRect outTitleRect:(NSRect *)outTitleRect
@@ -2039,6 +2039,8 @@ static NSDictionary *sTitleAttributes = nil;
 		{
 			NSSize titleSize = [self sizeOfTitleWithCurrentAttributes:title];				
 			NSDivideRect(gridRect, &titleRect, &gridRect, titleSize.height + 6.0f, NSMaxYEdge);
+			if (NSWidth(titleRect) > 12)
+				titleRect = NSInsetRect(titleRect, 6, 0);
 		}
 		
 		NSSize scaledSize = [self scaledPhotoSizeForSize:[cellPhoto size]];
