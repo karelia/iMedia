@@ -45,6 +45,7 @@
 #import "iMBLightroomPhotosParser.h"
 #import "iMediaConfiguration.h"
 #import "iMBLibraryNode.h"
+#import "iMBParserController.h"
 
 #import "CIImage+iMedia.h"
 #import "NSImage+iMedia.h"
@@ -59,12 +60,26 @@
 - (iMBLibraryNode *)parseOneDatabaseWithPath:(NSString*)path intoLibraryNode:(iMBLibraryNode *)root version:(int)lightroom_version;
 - (iMBLibraryNode *)parseAllImagesForRoot:(iMBLibraryNode*)root version:(int)lightroom_version;
 - (iMBLibraryNode *)parseCollectionsForRoot:(iMBLibraryNode*)root version:(int)lightroom_version;
+- (iMBLibraryNode*)parseFoldersForRoot:(iMBLibraryNode*)root;
 
-- (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)aid withRoot:(iMBLibraryNode*)root;
+- (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)idLocal inDictionary:(NSMutableDictionary*)dictionary;
+- (iMBLibraryNode*)nodeWithPath:(NSString*)path inDictionary:(NSMutableDictionary*)dictionary;
 
 + (NSArray *)libraryPathsV2;
 + (NSArray *)libraryPathsV1;
 + (void)parseRecentLibrariesList:(NSString *)recentLibrariesList into:(NSMutableArray *)libraryFilePaths;
+
++ (NSString*)cachePath;
+
+@end
+
+
+@interface NSData (IndexExtensions)
+
+- (unsigned)lastIndexOfBytes:(const void *)patternBytes length:(unsigned int)patternLength;
+- (unsigned)indexOfBytes:(const void *)patternBytes length:(unsigned int)patternLength;
+- (unsigned)indexOfBytes:(const void *)patternBytes length:(unsigned int)patternLength options:(int)mask;
+- (unsigned)indexOfBytes:(const void *)patternBytes length:(unsigned int)patternLength options:(int)mask range:(NSRange)searchRange;
 
 @end
 
@@ -103,9 +118,6 @@
     int lightroom_version = [[rootLibraryNode attributeForKey:@"LightroomVersion"] intValue];
 
     [self parseOneDatabaseWithPath:databasePath intoLibraryNode:rootLibraryNode version:lightroom_version];
-
-    // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
-	[rootLibraryNode performSelectorOnMainThread:@selector(setName:) withObject:name waitUntilDone:NO];
 
     [pool release];
 }
@@ -156,8 +168,82 @@
     return libraryNodes;
 }
 
++ (NSDictionary*)enhancedRecordForRecord:(NSDictionary*)record
+{
+	NSString *previewPath = [record valueForKey:@"PreviewPath"];
+	NSString *pyramidPath = [record valueForKey:@"PyramidPath"];
+
+	if ((previewPath == nil) && (pyramidPath != nil)) {
+		iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:@"photos"];
+		NSString *nodeIdentifier = [record valueForKey:@"NodeIdentifier"];
+		iMBLibraryNode *node = [parserController libraryNodeWithIdentifier:nodeIdentifier];
+		iMBLibraryNode *rootNode = [node root];
+		NSString *rootPath = [rootNode attributeForKey:@"path"];
+		NSString *dataPath = [[[rootPath stringByDeletingPathExtension]
+							   stringByAppendingString:@" Previews"]
+							  stringByAppendingPathExtension:@"lrdata"];
+		
+		NSFileManager *fileManager = [NSFileManager defaultManager];
+		
+		BOOL isDirectory;
+		if ([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory) {
+			NSString *originalPath = [record valueForKey:@"OriginalPath"];
+			NSDictionary *originalAttributes = [fileManager fileAttributesAtPath:originalPath traverseLink:YES];
+			NSDate *originalDate = [originalAttributes objectForKey:NSFileModificationDate];
+			
+			NSString *cacheFile = [[pyramidPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"jpg"];
+			NSString *cachePath = [iMBLightroomPhotosParser cachePath];
+			NSString *cacheFilePath = [cachePath stringByAppendingPathComponent:cacheFile];
+			NSDictionary *cacheAttributes = [fileManager fileAttributesAtPath:cacheFilePath traverseLink:YES];
+			NSDate *cacheDate = [cacheAttributes objectForKey:NSFileModificationDate];
+
+			if ((cacheDate == nil) || ([cacheDate compare:originalDate] == NSOrderedAscending)) {
+				NSString *fullPath = [dataPath stringByAppendingPathComponent:pyramidPath];
+				NSData *data = [NSData dataWithContentsOfFile:fullPath];
+				const char pattern[3] = { 0xFF, 0xD8, 0xFF };
+				unsigned index = [data lastIndexOfBytes:pattern length:3];
+				
+				if (index != NSNotFound) {
+					NSEnumerator *pathComponents = [[[cacheFile stringByDeletingLastPathComponent] pathComponents] objectEnumerator];
+					NSString *tmpPath = cachePath;
+					NSString *tmpComponent = nil;
+					
+					while ((tmpComponent = [pathComponents nextObject]) != nil) {
+						tmpPath = [tmpPath stringByAppendingPathComponent:tmpComponent];
+						
+						if (![fileManager fileExistsAtPath:tmpPath]) {
+							[fileManager createDirectoryAtPath:tmpPath attributes:nil];
+						}
+					}
+					
+					NSData *jpgData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
+					BOOL success = [jpgData writeToFile:cacheFilePath atomically:YES];
+
+					if (success) {
+						previewPath = cacheFilePath;
+					}
+				}
+			}
+			else {
+				previewPath = cacheFilePath;
+			}
+		}
+	}
+	
+	if (previewPath != nil) {
+		NSMutableDictionary *enhancedRecord = [NSMutableDictionary dictionaryWithDictionary:record];
+		
+		[enhancedRecord setObject:previewPath forKey:@"PreviewPath"];
+		
+		return enhancedRecord;
+	}
+	
+	return record;
+}
+
 @end
 
+					
 @implementation iMBLightroomPhotosParser (Private)
 
 - (iMBLibraryNode *)parseOneDatabaseWithPath:(NSString*)path intoLibraryNode:(iMBLibraryNode *)root version:(int)lightroom_version
@@ -170,7 +256,13 @@
 		[root fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 		
 		@try {
-			[self parseAllImagesForRoot:root version:lightroom_version];
+			if (lightroom_version == 2) {
+				[self parseFoldersForRoot:root];
+			}
+			else {
+				[self parseAllImagesForRoot:root version:lightroom_version];
+			}
+			
 			[self parseCollectionsForRoot:root version:lightroom_version];
 		}
 		@catch (NSException *exception) {
@@ -185,6 +277,7 @@
 
 - (iMBLibraryNode*)parseCollectionsForRoot:(iMBLibraryNode*)root version:(int)lightroom_version
 {
+	NSMutableDictionary *nodesById = [NSMutableDictionary dictionary];
 	NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
 	NSString *path = [root attributeForKey:@"path"];
 	FMDatabase *database = [FMDatabase databaseWithPath:path];
@@ -202,7 +295,6 @@
 		while ([rsCollections next]) {
 			NSNumber *idLocal = [NSNumber numberWithLong:[rsCollections longForColumn:@"id_local"]]; 
 			NSNumber *idParentLocal = [NSNumber numberWithLong:[rsCollections longForColumn:@"parent"]];
-			NSString *kind = [rsCollections stringForColumn:@"kindName"];
 			NSString *name = [rsCollections stringForColumn:@"name"];
 			
 			if (name == nil) {
@@ -214,18 +306,13 @@
 				}
 			}
 			
-			iMBLibraryNode *currentNode = [self nodeWithLocalID:idLocal withRoot:root];
+			iMBLibraryNode *currentNode = [self nodeWithLocalID:idLocal inDictionary:nodesById];
 			
-			if (currentNode == nil) {
-				currentNode = [[[iMBLibraryNode alloc] init] autorelease];
-			}
-            
             // after this point, all accesses to currentNode need to be thread safe (i.e. happen on the main thread)
 			
 			[currentNode fromThreadSetAttribute:idLocal forKey:@"idLocal"];
 			[currentNode fromThreadSetAttribute:idParentLocal forKey:@"idParentLocal"];
 			[currentNode fromThreadSetAttribute:name forKey:@"name"];
-			[currentNode fromThreadSetAttribute:kind forKey:@"kind"];
 			[currentNode fromThreadSetAttribute:name forKey:@"identifier"];
 			[currentNode fromThreadSetAttribute:NSStringFromClass([self class]) forKey:@"parserClassName"];
 //			[currentNode fromThreadSetAttribute:myDatabase forKey:@"watchedPath"];
@@ -234,7 +321,14 @@
 			[currentNode fromThreadSetIcon:[NSImage genericFolderIcon]];
 			[currentNode fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 			
-			iMBLibraryNode *parentNode = [self nodeWithLocalID:idParentLocal withRoot:root];
+			iMBLibraryNode *parentNode;
+			
+			if ([idParentLocal intValue] == 0) {
+				parentNode = root;
+			}
+			else {
+				parentNode = [self nodeWithLocalID:idParentLocal inDictionary:nodesById];
+			}
 			
 			[parentNode fromThreadAddItem:currentNode];
 			
@@ -245,9 +339,8 @@
 				NSMutableArray *images = [NSMutableArray array];				
 				NSMutableString *imageQuery = [NSMutableString string];
                 
-                if (lightroom_version == 1)
-                {
-                    [imageQuery appendString:@" SELECT aif.absolutePath, aif.idx_filename, captionName"];
+                if (lightroom_version == 1) {
+                    [imageQuery appendString:@" SELECT aif.absolutePath, aif.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
                     [imageQuery appendString:@" FROM Adobe_imageFiles aif"];
                     [imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
                     [imageQuery appendString:@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"];
@@ -255,12 +348,13 @@
                     [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
                     [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
                     [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+                    [imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
                     [imageQuery appendString:@" WHERE "];
                     [imageQuery appendString:@" alti.tag = ?"];
-                }
-                else if (lightroom_version == 2)
-                {
-                    [imageQuery appendString:@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, captionName"];
+					[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
+               }
+                else if (lightroom_version == 2) {
+                    [imageQuery appendString:@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
                     [imageQuery appendString:@" FROM AgLibraryFile aif"];
                     [imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
                     [imageQuery appendString:@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"];
@@ -270,23 +364,25 @@
                     [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
                     [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
                     [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+                    [imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
                     [imageQuery appendString:@" WHERE "];
                     [imageQuery appendString:@" alti.tag = ?"];
+                    [imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
                 }
 				
 				FMResultSet *rsImages = [localDatabase executeQuery:imageQuery, @"AgCaptionTagKind", idLocal];
 				
 				while ([rsImages next]) {
-                    NSString *absolutePath = NULL;
-                    if (lightroom_version == 1 )
-                    {
+                    NSString *absolutePath = nil;
+					
+                    if (lightroom_version == 1) {
                         absolutePath = [rsImages stringForColumn:@"absolutePath"];
                     }
-                    else if (lightroom_version == 2)
-                    {
+                    else if (lightroom_version == 2) {
                         NSString *absoluteRootPath = [rsImages stringForColumn:@"absolutePath"];
                         NSString *pathFromRoot = [rsImages stringForColumn:@"pathFromRoot"];
                         NSString *filename = [rsImages stringForColumn:@"idx_filename"];
+						
                         absolutePath = [[absoluteRootPath stringByAppendingString:pathFromRoot] stringByAppendingString:filename];
                     }
                     
@@ -309,6 +405,12 @@
 							[imageRecord setObject:fileName forKey:@"Caption"];
 						}
 						
+						NSString *pyramidPath = [rsImages stringForColumn:@"pyramidPath"];
+
+						if (pyramidPath != nil) {
+							[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+						}
+
                         [images addObject:imageRecord];
 					}
 				}
@@ -329,6 +431,226 @@
 	[outerPool release];
 
 	return root;
+}
+
+- (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)idLocal inDictionary:(NSMutableDictionary*)dictionary
+{	
+	iMBLibraryNode *node = [dictionary objectForKey:idLocal];
+	
+	if (node == nil) {
+		node = [[[iMBLibraryNode alloc] init] autorelease];
+		
+		[dictionary setObject:node forKey:idLocal];
+	}
+	
+	return node;
+}
+
+- (iMBLibraryNode*)parseFoldersForRoot:(iMBLibraryNode*)root
+{
+	NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
+	NSString *path = [root attributeForKey:@"path"];
+	FMDatabase *database = [FMDatabase databaseWithPath:path];
+	
+	if ([database open]) {
+		NSNumber *foldersRootNodeID = [NSNumber numberWithInt:-1];
+		NSString *foldersRootName = LocalizedStringInIMedia(@"Folders", @"Folders");
+		iMBLibraryNode *foldersRootNode = [[[iMBLibraryNode alloc] init] autorelease];
+		
+		[foldersRootNode fromThreadSetAttribute:foldersRootNodeID forKey:@"idLocal"];
+		[foldersRootNode fromThreadSetAttribute:foldersRootName forKey:@"name"];
+		[foldersRootNode fromThreadSetAttribute:foldersRootName forKey:@"identifier"];
+		[foldersRootNode fromThreadSetAttribute:NSStringFromClass([self class]) forKey:@"parserClassName"];
+		
+		[foldersRootNode fromThreadSetName:foldersRootName];
+		[foldersRootNode fromThreadSetIcon:[NSImage genericFolderIcon]];
+		[foldersRootNode fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
+		
+		[root fromThreadAddItem:foldersRootNode];
+
+		NSMutableString *rootFoldersQuery = [NSMutableString stringWithString:@"SELECT id_local, absolutePath, name"];
+		
+		[rootFoldersQuery appendString:@" FROM "];
+		[rootFoldersQuery appendString:@"AgLibraryRootFolder"];
+		[rootFoldersQuery appendString:@" ORDER BY name ASC"];
+		
+		FMResultSet *rsRootFolders = [database executeQuery:rootFoldersQuery];
+		
+		while ([rsRootFolders next]) {
+			NSNumber *rootFolderID = [NSNumber numberWithLong:[rsRootFolders longForColumn:@"id_local"]];
+			NSString *absolutePath = [rsRootFolders stringForColumn:@"absolutePath"];
+			NSString *rootFolderName = [rsRootFolders stringForColumn:@"name"];
+			
+			if (rootFolderName == nil) {
+				rootFolderName = LocalizedStringInIMedia(@"Unnamed", @"Unnamed");
+			}
+			
+			iMBLibraryNode *rootFolderNode = [[[iMBLibraryNode alloc] init] autorelease];
+			
+            // after this point, all accesses to currentNode need to be thread safe (i.e. happen on the main thread)
+			
+			[rootFolderNode fromThreadSetAttribute:rootFolderID forKey:@"idLocal"];
+			[rootFolderNode fromThreadSetAttribute:rootFolderName forKey:@"name"];
+			[rootFolderNode fromThreadSetAttribute:rootFolderName forKey:@"identifier"];
+			[rootFolderNode fromThreadSetAttribute:NSStringFromClass([self class]) forKey:@"parserClassName"];
+			
+			[rootFolderNode fromThreadSetName:rootFolderName];
+			[rootFolderNode fromThreadSetIcon:[NSImage genericFolderIcon]];
+			[rootFolderNode fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
+									
+			[foldersRootNode fromThreadAddItem:rootFolderNode];
+			
+			NSAutoreleasePool *rootFolderPool = [[NSAutoreleasePool alloc] init];
+			FMDatabase *rootFolderDatabase = [FMDatabase databaseWithPath:path];
+			
+			if ([rootFolderDatabase open]) {
+				NSMutableDictionary *folders = [NSMutableDictionary dictionary];				
+				NSMutableString *foldersQuery = [NSMutableString stringWithString:@"SELECT id_local, pathFromRoot"];
+				
+				[foldersQuery appendString:@" FROM "];
+				[foldersQuery appendString:@"AgLibraryFolder"];
+				[foldersQuery appendString:@" WHERE rootFolder = ?"];
+				[foldersQuery appendString:@" ORDER BY robustRepresentation ASC"];
+				
+				FMResultSet *rsFolders = [rootFolderDatabase executeQuery:foldersQuery, rootFolderID];
+				
+				while ([rsFolders next]) {
+					NSNumber *folderID = [NSNumber numberWithLong:[rsFolders longForColumn:@"id_local"]];
+					NSString *pathFromRoot = [rsFolders stringForColumn:@"pathFromRoot"];
+					
+					if ([pathFromRoot hasSuffix:@"/"]) {
+						pathFromRoot = [pathFromRoot substringToIndex:([pathFromRoot length] - 1)];
+					}
+					
+					NSString *parentPath = [pathFromRoot stringByDeletingLastPathComponent];
+					NSString *folderName = [pathFromRoot lastPathComponent];
+					
+					if ([folderName length] == 0) {
+						folderName = LocalizedStringInIMedia(@"Unfiled", @"Unfiled");
+					}
+					
+					iMBLibraryNode *parentNode = nil;
+					
+					if ([parentPath length] > 0) {
+						parentNode = [self nodeWithPath:parentPath inDictionary:folders];
+					}
+					
+					if (parentNode == nil) {
+						parentNode = rootFolderNode;
+					}
+
+					iMBLibraryNode *folderNode = [self nodeWithPath:pathFromRoot inDictionary:folders];
+					
+					// after this point, all accesses to currentNode need to be thread safe (i.e. happen on the main thread)
+					
+					[folderNode fromThreadSetAttribute:folderID forKey:@"idLocal"];
+					[folderNode fromThreadSetAttribute:folderName forKey:@"name"];
+					[folderNode fromThreadSetAttribute:folderName forKey:@"identifier"];
+					[folderNode fromThreadSetAttribute:NSStringFromClass([self class]) forKey:@"parserClassName"];
+					
+					[folderNode fromThreadSetName:folderName];
+					[folderNode fromThreadSetIcon:[NSImage genericFolderIcon]];
+					[folderNode fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
+					
+					[parentNode fromThreadAddItem:folderNode];
+					
+					NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
+					FMDatabase *localDatabase = [FMDatabase databaseWithPath:path];
+					
+					if ([localDatabase open]) {
+						NSMutableArray *images = [NSMutableArray array];				
+						NSMutableString *imageQuery = [NSMutableString string];
+						
+						[imageQuery appendString:@" SELECT alf.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
+						[imageQuery appendString:@" FROM AgLibraryFile alf"];
+						[imageQuery appendString:@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"];
+						[imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
+						[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
+						[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
+						[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+						[imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
+						[imageQuery appendString:@" WHERE "];
+						[imageQuery appendString:@" alf.folder = ?"];
+						[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
+						
+						FMResultSet *rsImages = [localDatabase executeQuery:imageQuery, @"AgCaptionTagKind", folderID];
+						
+						if ([folderID intValue] == 295) {
+							NSLog(@"%@", pathFromRoot);
+						}
+						
+						while ([rsImages next]) {
+							NSString *filename = [rsImages stringForColumn:@"idx_filename"];
+							NSString *absoluteFilePath = [[absolutePath stringByAppendingPathComponent:pathFromRoot] stringByAppendingPathComponent:filename];
+							
+							if ([CIImage isReadableFile:absoluteFilePath]) {
+								NSMutableDictionary *imageRecord = [NSMutableDictionary dictionary];
+								
+								[imageRecord setObject:absoluteFilePath forKey:@"ImagePath"];
+								[imageRecord setObject:absoluteFilePath forKey:@"OriginalPath"];
+								
+								NSString *caption = [rsImages stringForColumn:@"captionName"];
+								
+								if (caption != nil) {
+									[imageRecord setObject:caption forKey:@"Caption"];
+								}
+								else {									
+									[imageRecord setObject:filename forKey:@"Caption"];
+								}
+								
+								NSString *pyramidPath = [rsImages stringForColumn:@"pyramidPath"];
+								
+								if (pyramidPath != nil) {
+									[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+								}
+								
+								[images addObject:imageRecord];
+							}
+						}
+						
+						[folderNode fromThreadSetAttribute:images forKey:@"Images"];
+						
+//						if([images count] == 0) {
+//							NSLog(@"%@ %d", folderNode, [images count]);
+//							NSLog(@"%@", imageQuery);
+//							NSLog(@"%@", folderID);
+//							NSLog(@"%@", pathFromRoot);
+//						}
+						
+						[rsImages close];
+					}
+					
+					[localDatabase close];
+					[innerPool release];					
+				}
+				
+				[rsFolders close];
+			}
+			
+			[rootFolderDatabase close];
+			[rootFolderPool release];
+		}
+		
+		[rsRootFolders close];
+	}
+	
+	[database close];
+	[outerPool release];
+	
+	return root;
+}
+
+- (iMBLibraryNode*)nodeWithPath:(NSString*)path inDictionary:(NSMutableDictionary*)dictionary
+{
+	iMBLibraryNode *node = [dictionary objectForKey:path];
+	
+	if (node == nil) {
+		node = [[[iMBLibraryNode alloc] init] autorelease];
+		
+		[dictionary setObject:node forKey:path];
+	}
+	
+	return node;
 }
 
 - (iMBLibraryNode*)parseAllImagesForRoot:(iMBLibraryNode*)root version:(int)lightroom_version
@@ -356,26 +678,30 @@
 
         if (lightroom_version == 1)
         {
-            [imageQuery appendString:@" SELECT aif.absolutePath, aif.idx_filename, captionName"];
-            [imageQuery appendString:@" FROM Adobe_imageFiles aif"];
-            [imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
-            [imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
-            [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
-            [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-            [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+			[imageQuery appendString:@" SELECT aif.absolutePath, aif.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
+			[imageQuery appendString:@" FROM Adobe_imageFiles aif"];
+			[imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
+			[imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
+			[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
+			[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
+			[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+			[imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
+			[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
         }
         else if (lightroom_version == 2)
         {
-            [imageQuery appendString:@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, captionName"];
-            [imageQuery appendString:@" FROM AgLibraryFile aif"];
-            [imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
-            [imageQuery appendString:@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"];
-            [imageQuery appendString:@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"];
-            [imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
-            [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
-            [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-            [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
-        }
+			[imageQuery appendString:@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
+			[imageQuery appendString:@" FROM AgLibraryFile aif"];
+			[imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
+			[imageQuery appendString:@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"];
+			[imageQuery appendString:@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"];
+			[imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
+			[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
+			[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
+			[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+			[imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
+			[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
+		}
 		
 		FMResultSet *rsImages = [database executeQuery:imageQuery, @"AgCaptionTagKind"];
 
@@ -412,6 +738,12 @@
 					[imageRecord setObject:fileName forKey:@"Caption"];
 				}
 				
+				NSString *pyramidPath = [rsImages stringForColumn:@"pyramidPath"];
+								
+				if (pyramidPath != nil) {
+					[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+				}
+
 				[images addObject:imageRecord];
 			}
 		}
@@ -425,27 +757,6 @@
 	[outerPool release];
 	
 	return root;
-}
-
-- (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)aid withRoot:(iMBLibraryNode*)root
-{
-	if ([[root attributeForKey:@"idLocal"] longValue] == [aid longValue])
-	{
-		return root;
-	}
-	NSEnumerator *e = [[root allItems] objectEnumerator];
-	iMBLibraryNode *cur;
-	iMBLibraryNode *found;
-	
-	while (cur = [e nextObject])
-	{
-		found = [self nodeWithLocalID:[[aid retain] autorelease] withRoot:cur];
-		if (found)
-		{
-			return found;
-		}
-	}
-	return nil;
 }
 
 + (void)parseRecentLibrariesList:(NSString *)recentLibrariesList into:(NSMutableArray *)libraryFilePaths
@@ -529,6 +840,137 @@
 	}
     
 	return libraryFilePaths;
+}
+
++ (NSString*)cachePath
+{
+	static NSString *cachePath = nil;
+	
+	if (cachePath == nil) {
+		NSFileManager *fileManager = [NSFileManager defaultManager];
+
+		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+		NSString *cacheDirPath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
+		NSString *imediaCacheDirPath = [cacheDirPath stringByAppendingPathComponent:[[NSBundle bundleForClass:[self class]] bundleIdentifier]];
+		
+		if (![fileManager fileExistsAtPath:imediaCacheDirPath]) {
+			[fileManager createDirectoryAtPath:imediaCacheDirPath attributes:nil];
+		}
+		
+		NSString *parserCacheDirPath = [imediaCacheDirPath stringByAppendingPathComponent:[self className]];
+		
+		if (![fileManager fileExistsAtPath:parserCacheDirPath]) {
+			[fileManager createDirectoryAtPath:parserCacheDirPath attributes:nil];
+		}
+		
+		cachePath = [parserCacheDirPath retain];
+	}
+	
+	return cachePath;
+}
+
+@end
+
+
+@implementation NSData (IndexExtensions)
+
+// Code from NSData_SKExtensions.m
+/*
+ This software is Copyright (c) 2007-2008
+ Christiaan Hofman. All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+ - Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ 
+ - Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in
+ the documentation and/or other materials provided with the
+ distribution.
+ 
+ - Neither the name of Christiaan Hofman nor the names of any
+ contributors may be used to endorse or promote products derived
+ from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+- (unsigned)lastIndexOfBytes:(const void *)patternBytes length:(unsigned int)patternLength
+{
+    return [self indexOfBytes:patternBytes length:patternLength options:NSBackwardsSearch range:NSMakeRange(0, [self length])];
+}
+
+- (unsigned)indexOfBytes:(const void *)patternBytes length:(unsigned int)patternLength
+{
+    return [self indexOfBytes:patternBytes length:patternLength options:0 range:NSMakeRange(0, [self length])];
+}
+
+- (unsigned)indexOfBytes:(const void *)patternBytes length:(unsigned int)patternLength options:(int)mask
+{
+    return [self indexOfBytes:patternBytes length:patternLength options:mask range:NSMakeRange(0, [self length])];
+}
+
+- (unsigned)indexOfBytes:(const void *)patternBytes length:(unsigned int)patternLength options:(int)mask range:(NSRange)searchRange
+{
+    unsigned int selfLength = [self length];
+    if (searchRange.location > selfLength || NSMaxRange(searchRange) > selfLength)
+        [NSException raise:NSRangeException format:@"Range {%u,%u} exceeds length %u", searchRange.location, searchRange.length, selfLength];
+    
+    unsigned const char *selfBufferStart, *selfPtr, *selfPtrEnd, *selfPtrMax;
+    unsigned const char firstPatternByte = *(const char *)patternBytes;
+    BOOL backward = (mask & NSBackwardsSearch) != 0;
+    
+    if (patternLength == 0)
+        return searchRange.location;
+    if (patternLength > searchRange.length) {
+        // This test is a nice shortcut, but it's also necessary to avoid crashing: zero-length CFDatas will sometimes(?) return NULL for their bytes pointer, and the resulting pointer arithmetic can underflow.
+        return NSNotFound;
+    }
+    
+    selfBufferStart = [self bytes];
+    selfPtrMax = selfBufferStart + NSMaxRange(searchRange) + 1 - patternLength;
+    if (backward) {
+        selfPtr = selfPtrMax - 1;
+        selfPtrEnd = selfBufferStart + searchRange.location - 1;
+    } else {
+        selfPtr = selfBufferStart + searchRange.location;
+        selfPtrEnd = selfPtrMax;
+    }
+    
+    for (;;) {
+        if (memcmp(selfPtr, patternBytes, patternLength) == 0)
+            return (selfPtr - selfBufferStart);
+        
+        if (backward) {
+            do {
+                selfPtr--;
+            } while (*selfPtr != firstPatternByte && selfPtr > selfPtrEnd);
+            if (*selfPtr != firstPatternByte)
+                break;
+        } else {
+            selfPtr++;
+            if (selfPtr == selfPtrEnd)
+                break;
+            selfPtr = memchr(selfPtr, firstPatternByte, (selfPtrMax - selfPtr));
+            if (selfPtr == NULL)
+                break;
+        }
+    }
+	
+    return NSNotFound;
 }
 
 @end

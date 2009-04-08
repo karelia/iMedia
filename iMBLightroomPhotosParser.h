@@ -46,7 +46,7 @@
 #import "iMBAbstractParser.h"
 
 
-@interface iMBLightroomPhotosParser : iMBAbstractParser 
+@interface iMBLightroomPhotosParser : iMBAbstractParser <iMBEnhanceParser>
 {
 	
 }
