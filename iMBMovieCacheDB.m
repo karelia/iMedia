@@ -584,7 +584,6 @@ static NSString * uuidString()
 	NSFetchRequest			*fetchRequest = [[[NSFetchRequest alloc] init] autorelease]; 
 	NSError					*fetchError = nil; 
     NSManagedObjectContext  *moc = [self managedObjectContext];
-    NSError *error = nil;
     
 	[fetchRequest setEntity:[NSEntityDescription entityForName:@"MovieReference" inManagedObjectContext:moc]]; 
     
@@ -615,6 +614,8 @@ static NSString * uuidString()
 
     if ([urlStrings count] > 0)
     {
+		NSError *error = nil;
+
         if (![moc save:&error])
         {
             NSLog (@"Error %@ when saving after cleaning movie cache", error);
@@ -636,7 +637,6 @@ static NSString * uuidString()
     NSFetchRequest			*fetchRequest = [[[NSFetchRequest alloc] init] autorelease]; 
     NSError					*fetchError = nil; 
     NSManagedObjectContext  *moc = [self managedObjectContext];
-    NSError *error = nil;
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"MovieReference" inManagedObjectContext:moc]];
     NSArray *files = [fileManager directoryContentsAtPath:dirPath];
     NSEnumerator    *fileEnum = [files objectEnumerator];
@@ -659,7 +659,7 @@ static NSString * uuidString()
             NSString    *fullPath = [dirPath stringByAppendingPathComponent:fileName];
             if (![fileManager removeFileAtPath:fullPath handler:nil])
             {
-                NSLog (@"Error %@ when deleting unused file %@", error, fullPath);
+                NSLog (@"Error when deleting unused file %@", fullPath);
 				[pool release];
 				return;
             }
