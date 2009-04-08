@@ -11,9 +11,6 @@
 
 @implementation FMDatabase (FMDatabaseAdditions)
 
-// People who think macros are bad are lamerz.
-// (so says Zach Wily, not Mr. Mueller.  Although Mr. Mueller thinks this is kinda neat)
-
 #define RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(type, sel)             \
 va_list args;                                                        \
 va_start(args, query);                                               \
@@ -49,5 +46,6 @@ return ret;
 - (NSData*)dataForQuery:(NSString*)query, ...; {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSData *, dataForColumnIndex);
 }
+
 
 @end

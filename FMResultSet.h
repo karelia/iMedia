@@ -1,28 +1,30 @@
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "sqlite3.h"
 
 @class FMDatabase;
+@class FMStatement;
 
 @interface FMResultSet : NSObject {
     FMDatabase *parentDB;
-    sqlite3_stmt *pStmt;
-    //sqlite3 *db;
+    FMStatement *statement;
+    
     NSString *query;
     NSMutableDictionary *columnNameToIndexMap;
     BOOL columnNamesSetup;
 }
 
-+ (id) resultSetWithStatement:(sqlite3_stmt *)stmt usingParentDatabase:(FMDatabase*)aDB;
+
++ (id) resultSetWithStatement:(FMStatement *)statement usingParentDatabase:(FMDatabase*)aDB;
 
 - (void) close;
 
 - (NSString *)query;
 - (void)setQuery:(NSString *)value;
 
-- (void)setPStmt:(sqlite3_stmt *)newsqlite3_stmt;
+- (FMStatement *)statement;
+- (void)setStatement:(FMStatement *)value;
+
 - (void)setParentDB:(FMDatabase *)newDb;
-
-
 
 - (BOOL) next;
 
@@ -31,6 +33,9 @@
 
 - (long) longForColumn:(NSString*)columnName;
 - (long) longForColumnIndex:(int)columnIdx;
+
+- (long long int) longLongIntForColumn:(NSString*)columnName;
+- (long long int) longLongIntForColumnIndex:(int)columnIdx;
 
 - (BOOL) boolForColumn:(NSString*)columnName;
 - (BOOL) boolForColumnIndex:(int)columnIdx;
@@ -46,6 +51,14 @@
 
 - (NSData*) dataForColumn:(NSString*)columnName;
 - (NSData*) dataForColumnIndex:(int)columnIdx;
+
+/*
+If you are going to use this data after you iterate over the next row, or after you close the
+result set, make sure to make a copy of the data first (or just use dataForColumn:/dataForColumnIndex:)
+If you don't, you're going to be in a world of hurt when you try and use the data.
+*/
+- (NSData*) dataNoCopyForColumn:(NSString*)columnName;
+- (NSData*) dataNoCopyForColumnIndex:(int)columnIdx;
 
 - (void) kvcMagic:(id)object;
 
