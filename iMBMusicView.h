@@ -52,6 +52,8 @@
 	IBOutlet NSTableView			*table;
 
 	IBOutlet NSTextField			*counterField;
+	
+	IBOutlet NSSearchField          *searchField;
 
 	IBOutlet NSSlider				*progressIndicator;
 	IBOutlet NSButton				*playButton;
@@ -61,6 +63,8 @@
 	IBOutlet iMBDNDArrayController	*songsController;
     
     NSString						*clockTime;
+	
+	int selectedSearchProperty;
 
     BOOL finishedInit;
     
@@ -74,11 +78,13 @@
 #pragma mark ACCESSORS
 - (NSString *)clockTime;
 - (void)setClockTime:(NSString *)value;
+- (NSArray*)defaultSearchableProperties;
 
 #pragma mark ACTIONS
 - (IBAction) playMovie: (id) sender;
 - (IBAction) stopMovie: (id) sender;
 - (IBAction) scrubAudio: (id) sender;
+- (IBAction) setSearchedProperties: (id) sender;
 @end
 
 extern const NSTimeInterval	k_Scrub_Slider_Update_Interval;

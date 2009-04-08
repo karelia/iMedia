@@ -95,6 +95,16 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 	[super dealloc];
 }
 
+static NSArray *_defaultProperties = nil;
+
+- (NSArray*)defaultSearchableProperties
+{
+	if (_defaultProperties == nil) {
+		_defaultProperties = [[NSArray alloc] initWithObjects:@"Name",@"Artist",@"Album",@"Genre",nil];
+	}
+	return _defaultProperties;
+}
+
 - (void)loadViewNib
 {
 	[super loadViewNib];
@@ -133,6 +143,33 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 		// It would be nice to also indicate # selected if there is a selection.  How to do with bindings?
 		
 		[table setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+		
+		NSDictionary* localizationDict = [NSDictionary dictionaryWithObjectsAndKeys:
+										  LocalizedStringInIMedia(@"Search all", @"Search Menu - search all properties"), @"All", 
+										  LocalizedStringInIMedia(@"Title", @"Search Menu - search title"), @"Name", 
+										  LocalizedStringInIMedia(@"Album", @"Search Menu - search album"), @"Album", 
+										  LocalizedStringInIMedia(@"Artist", @"Search Menu - search artist"), @"Artist", 
+										  LocalizedStringInIMedia(@"Genre", @"Search Menu - search genre"), @"Genre", 
+										  nil];
+		
+		NSMenu* searchMenu = [[[NSMenu alloc] initWithTitle:@"Search"] autorelease];
+		NSString* property;
+		NSMutableArray* menuItems = [NSMutableArray arrayWithObject:@"All"];
+		[menuItems addObjectsFromArray:[self defaultSearchableProperties]];
+		NSEnumerator* en = [menuItems objectEnumerator];
+		int i = 0;
+		while (property = (NSString*)[en nextObject]) {
+			NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:[localizationDict objectForKey:property]
+														  action:@selector(setSearchedProperties:) 
+												   keyEquivalent:@""];
+			[item setTarget:self];
+			[item setTag:i++];
+			[searchMenu addItem:item];
+			[item release];
+		}
+		[[searchField cell] setSearchMenuTemplate:searchMenu];
+		[searchMenu performActionForItemAtIndex:0];
+//		[self setSearchedProperties:[searchMenu itemAtIndex:0]];
     }
 }
 
@@ -267,6 +304,25 @@ static NSImage *_toolbarIcon = nil;
 - (IBAction)search:(id)sender
 {
 	[songsController setSearchString:[sender stringValue]];
+}
+
+- (IBAction)setSearchedProperties:(id)sender
+{
+	int tag = [sender tag];
+	[[[sender menu] itemWithTag:selectedSearchProperty] setState:NSOffState];
+	selectedSearchProperty = tag;
+	[sender setState:NSOnState];
+
+	NSArray* defaultProperties = [self defaultSearchableProperties];
+	NSArray* properties;
+	if (tag == 0) {
+		properties = defaultProperties;
+	} else {
+		properties = [NSArray arrayWithObject:[defaultProperties objectAtIndex:(tag-1)]];
+	}
+	[songsController setSearchableProperties:properties];
+	[[searchField cell] setPlaceholderString:[sender title]];
+	
 }
 
 static NSImage *_playingIcon = nil;

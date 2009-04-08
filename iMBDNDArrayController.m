@@ -72,7 +72,6 @@
 {
     [tableView setAllowsMultipleSelection:YES];
 	[super awakeFromNib];
-	[self setSearchableProperties:[NSArray arrayWithObjects:@"Name",@"Artist",@"Album",@"Genre",nil]]; 
 }
 
 - (BOOL)tableView:(NSTableView *)tv
@@ -174,6 +173,7 @@
 {
 	[searchableProperties autorelease];
 	searchableProperties = [properties retain];
+	[self rearrangeObjects];
 }
 
 - (void)setDelegate:(id)delegate
