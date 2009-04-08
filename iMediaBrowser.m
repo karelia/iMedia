@@ -951,6 +951,14 @@ static NSMutableArray *_browserClasses = nil;
 	return [self enhancedRecordForRecord:completeRecord ofMediaType:mediaType];
 }
 
++ (iMBLibraryNode*)libraryNodeWithIdentifier:(NSString*)inIdentifier ofMediaType:(NSString*)mediaType
+{
+	iMBParserController *parserController = [[iMediaConfiguration sharedConfiguration] parserControllerForMediaType:@"photos"];
+	iMBLibraryNode *node = [parserController libraryNodeWithIdentifier:inIdentifier];
+	
+	return node;
+}
+
 @end
 
 @implementation iMediaBrowser (Plugins)

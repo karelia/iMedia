@@ -134,6 +134,7 @@
 + (NSDictionary*)recordForPath:(NSString*)path inNode:(iMBLibraryNode*)node;
 + (NSDictionary*)enhancedRecordForRecord:(NSDictionary*)record ofMediaType:(NSString*)mediaType;
 + (NSDictionary*)enhancedRecordForPath:(NSString*)path ofMediaType:(NSString*)mediaType;
++ (iMBLibraryNode*)libraryNodeWithIdentifier:(NSString*)inIdentifier ofMediaType:(NSString*)mediaType;
 
 @end
 
