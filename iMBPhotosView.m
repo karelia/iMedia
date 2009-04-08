@@ -647,10 +647,24 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	[self postSelectionChangeNotification:[self selectedRecords]];
 }
 
-- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)aIndex withFrame:(NSRect)frame
+- (void)photoView:(MUPhotoView *)view doubleClickOnPhotoAtIndex:(unsigned)aIndex 
+		withFrame:(NSRect)frame
 {
-	[self postSelectionChangeNotification:[self selectedRecords]];
-	[self postSelectionDoubleClickNotification:[self selectedRecords]];
+	NSArray *selectedRecords = [self selectedRecords];
+	
+	[iMBPhotosView cancelPreviousPerformRequestsWithTarget:self 
+												  selector:@selector(postSelectionChangeNotification)
+													object:nil];
+	[self performSelector:@selector(postSelectionChangeNotification:)
+			   withObject:nil
+			   afterDelay:0.0];
+	
+	[iMBPhotosView cancelPreviousPerformRequestsWithTarget:self 
+												  selector:@selector(postSelectionDoubleClickNotification:)
+													object:selectedRecords];
+	[self performSelector:@selector(postSelectionDoubleClickNotification:)
+			   withObject:selectedRecords 
+			   afterDelay:0.0];
 }
 
 - (NSIndexSet *)selectionIndexesForPhotoView:(MUPhotoView *)view
