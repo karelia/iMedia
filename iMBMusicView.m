@@ -58,6 +58,9 @@ extern NSString *Time_Display_String( int Number_Of_Seconds );
 const NSTimeInterval	k_Scrub_Slider_Update_Interval = 0.1;
 const double		k_Scrub_Slider_Minimum = 0.0;
 
+static NSImage *_playImage = nil;
+static NSImage *_stopImage = nil;
+
 @interface iMBMusicView (PrivateApi)
 
 - (BOOL)loadAudioFile: (NSString *) path;
@@ -75,6 +78,17 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 	id timeValueTransformer = [[[TimeValueTransformer alloc] init] autorelease];
 	[NSValueTransformer setValueTransformer:timeValueTransformer forName:@"timeValueTransformer"];
 
+	if (!_playImage) {
+		NSBundle *b = [NSBundle bundleForClass:[self class]];
+		NSString *p = [b pathForResource:@"MBPlayN" ofType:@"png"];
+		_playImage = [[NSImage alloc] initWithContentsOfFile:p];
+	}
+	if (!_stopImage) {
+		NSBundle *b = [NSBundle bundleForClass:[self class]];
+		NSString *p = [b pathForResource:@"MBNowPlayingButton" ofType:@"png"];
+		_stopImage = [[NSImage alloc] initWithContentsOfFile:p];
+	}
+	
 	[pool release];
 }
 
@@ -91,7 +105,7 @@ const double		k_Scrub_Slider_Minimum = 0.0;
 	[counterField unbind:@"displayPatternValue1"];
 	[clockTime release];
 	[pollTimer release];
-	[myCurrentPlayingRecord release];
+	[myCurrentPlayingRecord release]; myCurrentPlayingRecord = nil;
 	[super dealloc];
 }
 
@@ -199,6 +213,7 @@ static NSImage *_toolbarIcon = nil;
 
 - (void)setSelectionChanged:(id)val
 {
+	selectionWasChanged = YES;
 	[self postSelectionChangeNotification:val];
 }
 
@@ -219,7 +234,7 @@ static NSImage *_toolbarIcon = nil;
 - (void)didDeactivate
 {
 	[self unbind:@"selectionChanged"];
-	[self stopMovie:self];
+//	[self pauseMovie:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 													name:QTMovieTimeDidChangeNotification
 												  object:nil];
@@ -297,6 +312,53 @@ static NSImage *_toolbarIcon = nil;
 	return YES;
 }
 
+
+#pragma mark -
+#pragma mark Keyboard Methods
+
+- (BOOL)tableView:(NSTableView *)tableView shouldTypeSelectForEvent:(NSEvent *)event withCurrentSearchString:(NSString *)searchString
+{
+	NSString*					eventKey = [event charactersIgnoringModifiers];
+	if ( (nil == searchString || [searchString isEqualToString:@""])
+		&& [eventKey isEqualToString:@" "] )
+	{
+//		[self keyDown:event];		// we seem to have swallowed the event already
+		return NO;		// let key down intercept, I think
+	}
+	NSLog(@"search string = %@ + %@", searchString, eventKey);
+	return YES;
+}
+
+- (void)keyDown:(NSEvent *)theEvent
+{
+	NSString*					eventKey = [theEvent charactersIgnoringModifiers];
+	unichar						keyChar = 0;
+	
+	if ([eventKey length] == 1)
+	{
+		keyChar = [eventKey characterAtIndex:0];
+		if (keyChar == ' ')
+		{
+			if (myCurrentPlayingRecord && [[oAudioPlayer movie] rate] > 0)	// playing now?
+			{
+				[self pauseMovie:nil];
+			}
+			else
+			{
+				if (selectionWasChanged)		// if we changed selection since we paused, don't resume -- start over.
+				{
+					[self playMovie:nil];
+				}
+				else
+				{
+					// resume, or play
+					[self resumeMovie:nil];
+				}
+			}
+			return;
+		}
+	}
+}
 
 #pragma mark -
 #pragma mark Interface Methods
@@ -402,7 +464,12 @@ static NSImage *_playingIcon = nil;
 				NSString *p = [[NSBundle bundleForClass:[self class]] pathForResource:@"MBAudioPlaying" ofType:@"png"];
 				_playingIcon = [[NSImage alloc] initWithContentsOfFile:p];
 			}
-			myCurrentPlayingRecord = [[songsController selectedObjects] objectAtIndex:0];
+			if (myCurrentPlayingRecord)
+			{
+				[myCurrentPlayingRecord release];
+				myCurrentPlayingRecord = nil;
+			}
+			myCurrentPlayingRecord = [[[songsController selectedObjects] objectAtIndex:0] retain];
 			[myCurrentPlayingRecord setObject:[myCurrentPlayingRecord objectForKey:@"Icon"] forKey:@"OriginalIcon"];
 			[myCurrentPlayingRecord setObject:_playingIcon forKey:@"Icon"];
 		}
@@ -410,12 +477,12 @@ static NSImage *_playingIcon = nil;
 	return success;
 }
 
-static NSImage *_stopImage = nil;
 
 - (IBAction) playMovie: (id) sender
 {	
 	if ([self loadAudioFile:[[[songsController selectedObjects] objectAtIndex:0] valueForKey:@"Preview"]])
 	{
+		selectionWasChanged = NO;	// clear this, so that we will pay attention to new selections from now on
 		[pollTimer invalidate];
 		pollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
 													 target:self
@@ -431,17 +498,11 @@ static NSImage *_stopImage = nil;
 		
 		[playButton setAction:@selector(stopMovie:)];
 		[playButton setState:NSOnState];
-		if (!_stopImage) {
-			NSBundle *b = [NSBundle bundleForClass:[self class]];
-			NSString *p = [b pathForResource:@"MBNowPlayingButton" ofType:@"png"];
-			_stopImage = [[NSImage alloc] initWithContentsOfFile:p];
-		}
 		[playButton setImage:_stopImage];
 		[progressIndicator setEnabled:YES];
 	}
 }
 
-static NSImage *_playImage = nil;
 
 - (IBAction) stopMovie: (id) sender
 {
@@ -449,24 +510,68 @@ static NSImage *_playImage = nil;
 	[pollTimer invalidate];
 	pollTimer = nil;
 	//change the icon back
-	[myCurrentPlayingRecord setObject:[myCurrentPlayingRecord objectForKey:@"OriginalIcon"] forKey:@"Icon"];
+	if (myCurrentPlayingRecord)
+	{
+		[myCurrentPlayingRecord setObject:[myCurrentPlayingRecord objectForKey:@"OriginalIcon"] forKey:@"Icon"];
+		[myCurrentPlayingRecord release]; myCurrentPlayingRecord = nil;
+	}
 	[table reloadData];
 	[progressIndicator setDoubleValue:[progressIndicator minValue]];
 	[progressIndicator setEnabled:NO];
 	[self setClockTime:@"0:00"];
 	[playButton setAction:@selector(playMovie:)];
 	[playButton setState:NSOffState];
-	if (!_playImage) {
-		NSBundle *b = [NSBundle bundleForClass:[self class]];
-		NSString *p = [b pathForResource:@"MBPlayN" ofType:@"png"];
-		_playImage = [[NSImage alloc] initWithContentsOfFile:p];
-	}
 	[playButton setImage:_playImage];
 }
 
+- (IBAction) resumeMovie: (id) sender
+{	
+	// if no current record then treat as play...
+	if (!myCurrentPlayingRecord)
+	{
+		[self playMovie:sender];
+	}
+	else
+	{
+		[pollTimer invalidate];
+		pollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
+													 target:self
+												   selector:@selector(updateDisplay:)
+												   userInfo:nil
+													repeats:YES];
+		
+		[table reloadData];
+		
+		[oAudioPlayer play:self];
+		
+		[playButton setAction:@selector(stopMovie:)];
+		[playButton setState:NSOnState];
+		[playButton setImage:_stopImage];
+		[progressIndicator setEnabled:YES];
+	}
+}
+
+
+- (IBAction) pauseMovie: (id) sender
+{
+	[oAudioPlayer pause:self];
+	[pollTimer invalidate];
+	pollTimer = nil;
+	//change the icon back
+	[myCurrentPlayingRecord setObject:[myCurrentPlayingRecord objectForKey:@"OriginalIcon"] forKey:@"Icon"];
+	[table reloadData];
+	[playButton setAction:@selector(resumeMovie:)];
+	[playButton setState:NSOffState];
+	[playButton setImage:_playImage];
+}
+
+
 - (IBAction) scrubAudio: (id) sender
 {
-	[[oAudioPlayer movie] setTime:(int)[progressIndicator doubleValue]*600];
+	if ([[NSApp currentEvent] type] != NSLeftMouseUp)		// ignore the mouseup -- otherwise it will hiccup from where we are already playing.
+	{
+		[[oAudioPlayer movie] setTime:(int)[progressIndicator doubleValue]*600];
+	}
 }
 
 - (void)updateDisplay:(NSTimer *)timer

@@ -7,7 +7,11 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>pauseMovie</key>
+				<string>id</string>
 				<key>playMovie</key>
+				<string>id</string>
+				<key>resumeMovie</key>
 				<string>id</string>
 				<key>scrubAudio</key>
 				<string>id</string>

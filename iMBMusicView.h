@@ -67,6 +67,7 @@
 	int selectedSearchProperty;
 
     BOOL finishedInit;
+	BOOL selectionWasChanged;
     
 @private
     NSTimer * pollTimer;
@@ -83,6 +84,8 @@
 #pragma mark ACTIONS
 - (IBAction) playMovie: (id) sender;
 - (IBAction) stopMovie: (id) sender;
+- (IBAction) pauseMovie: (id) sender;
+- (IBAction) resumeMovie: (id) sender;
 - (IBAction) scrubAudio: (id) sender;
 - (IBAction) setSearchedProperties: (id) sender;
 @end
