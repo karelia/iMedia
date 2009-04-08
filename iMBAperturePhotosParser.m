@@ -297,10 +297,7 @@
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     [self parseOneDatabaseWithPath:databasePath intoLibraryNode:rootLibraryNode];
-    
-    // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
-	[rootLibraryNode performSelectorOnMainThread:@selector(setName:) withObject:name waitUntilDone:NO];
-    
+        
     [pool release];
 }
 
@@ -339,22 +336,39 @@
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 	NSString *masterPath = nil;
 	NSString *previewPath = [record valueForKey:@"ImagePath"];
-	NSString *imageName = [[previewPath lastPathComponent] stringByDeletingPathExtension];
 	NSString *basePath = [[previewPath stringByDeletingLastPathComponent] stringByDeletingLastPathComponent];
-	NSArray *files = [fileManager directoryContentsAtPath:basePath];
-	int fCount = [files count];
-	int f = 0;
 	
-	for (f = 0; f < fCount; f++) {
-		NSString *fileName = [files objectAtIndex:f];
+	// Look for the master within the library
+	NSString *infoPath = [[basePath stringByAppendingPathComponent:@"OriginalVersionInfo"] stringByAppendingPathExtension:@"apversion"];
+    NSDictionary *infoDict = [NSDictionary dictionaryWithContentsOfFile:infoPath];
+	NSString *masterName = [infoDict objectForKey:@"fileName"];
+	
+	if (masterName != nil) {
+		NSString *localPath = [basePath stringByAppendingPathComponent:masterName];
 		
-		if ([imageName isEqualToString:[fileName stringByDeletingPathExtension]]) {
-			masterPath = [basePath stringByAppendingPathComponent:fileName];
+		if ([fileManager fileExistsAtPath:localPath]) {
+			masterPath = localPath;
+		}
+		else {
+			NSString *apFile = [localPath stringByAppendingPathExtension:@"apfile"];
+			NSDictionary *apDict = [NSDictionary dictionaryWithContentsOfFile:apFile];
+			NSString *imagePath = [apDict objectForKey:@"imagePath"];
+			NSDictionary *volumeInfo = [apDict objectForKey:@"volumeInfo"];
+			NSString *volumeName = [volumeInfo objectForKey:@"volumeName"];
 			
-			break;
+			if (volumeName != nil) {
+				imagePath = [[@"/Volumes" stringByAppendingPathComponent:volumeName] stringByAppendingPathComponent:imagePath];
+			}
+			else {
+				imagePath = [@"/" stringByAppendingString:imagePath];
+			}
+
+			if ([fileManager fileExistsAtPath:imagePath]) {
+				masterPath = imagePath;
+			}
 		}
 	}
-	
+		
 	if (masterPath == nil) { // The master file is a referenced external file	
 		NSRange range = [previewPath rangeOfString:@".aplibrary/"];
 		NSString *libraryPath = [previewPath substringToIndex:(range.location + range.length)];
@@ -456,7 +470,11 @@
 					volumeName = [@"/Volumes/" stringByAppendingPathComponent:volumeName];
 				}
 				
-				masterPath = [volumeName stringByAppendingPathComponent:imagePath];
+				NSString *imagePath = [volumeName stringByAppendingPathComponent:imagePath];
+				
+				if ([fileManager fileExistsAtPath:imagePath]) {
+					masterPath = imagePath;
+				}
 			}
 			
 			[database close];

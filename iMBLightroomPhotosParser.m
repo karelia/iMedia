@@ -575,10 +575,6 @@
 						
 						FMResultSet *rsImages = [localDatabase executeQuery:imageQuery, @"AgCaptionTagKind", folderID];
 						
-						if ([folderID intValue] == 295) {
-							NSLog(@"%@", pathFromRoot);
-						}
-						
 						while ([rsImages next]) {
 							NSString *filename = [rsImages stringForColumn:@"idx_filename"];
 							NSString *absoluteFilePath = [[absolutePath stringByAppendingPathComponent:pathFromRoot] stringByAppendingPathComponent:filename];
@@ -609,14 +605,7 @@
 						}
 						
 						[folderNode fromThreadSetAttribute:images forKey:@"Images"];
-						
-//						if([images count] == 0) {
-//							NSLog(@"%@ %d", folderNode, [images count]);
-//							NSLog(@"%@", imageQuery);
-//							NSLog(@"%@", folderID);
-//							NSLog(@"%@", pathFromRoot);
-//						}
-						
+												
 						[rsImages close];
 					}
 					

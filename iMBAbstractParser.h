@@ -48,6 +48,10 @@
 
 @class iMBLibraryNode;
 
+extern NSString *iMediaBrowserParserDidStartNotification;
+extern NSString *iMediaBrowserParserDidEndNotification;
+
+
 @interface iMBAbstractParser : NSObject <iMBParser>
 {
 	NSString			*myDatabase;

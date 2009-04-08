@@ -322,9 +322,6 @@
 		[self recursivelyParse:folder withNode:root movieTypes:movieTypes];
     }
     
-    // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
-	[root performSelectorOnMainThread:@selector(setName:) withObject:[mgr displayNameAtPath:folder] waitUntilDone:NO];
-
 	[pool release];
 }
 

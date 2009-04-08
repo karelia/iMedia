@@ -51,7 +51,7 @@
 - (BOOL)canRemoveLibraryNode:(iMBLibraryNode *)libraryNode;
 
 // get a node by identifier.
-- (iMBLibraryNode*) libraryNodeWithIdentifier:(NSString*)inIdentifier;
+- (iMBLibraryNode*)libraryNodeWithIdentifier:(NSString*)inIdentifier;
 
 // debugging.
 - (void)logNodes;

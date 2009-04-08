@@ -48,9 +48,18 @@
 #import "iMBLibraryNode.h"
 #import "NSAttributedString+iMedia.h"
 
+NSString *iMediaBrowserParserDidStartNotification = @"iMediaBrowserParserDidStart";
+NSString *iMediaBrowserParserDidEndNotification = @"iMediaBrowserParserDidEnd";
+
 
 // TODO: Split the UKKQueue stuff into a new abstract subclass of this, for better encapsulation since many subclasses don't need UKKQueue.
 
+@interface iMBAbstractParser (Private)
+
+- (void)registerForNotifications;
+- (void)unRegisterFromNotifications;
+
+@end
 
 @implementation iMBAbstractParser
 
@@ -58,7 +67,7 @@
 {
 	if (self = [super init])
 	{
-		
+		[self registerForNotifications];
 	}
 	return self;
 }
@@ -68,12 +77,28 @@
 	if (self = [super init])
 	{
 		myDatabase = [file copy];
+		
+		[self registerForNotifications];
 	}
 	return self;
 }
 
+- (void)registerForNotifications
+{
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(parserDidStart:) name:iMediaBrowserParserDidStartNotification object:self];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(parserDidEnd:) name:iMediaBrowserParserDidEndNotification object:self];
+}
+
+- (void)unRegisterFromNotifications
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:iMediaBrowserParserDidStartNotification object:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:iMediaBrowserParserDidEndNotification object:self];
+}
+
 - (void)dealloc
 {
+	[self unRegisterFromNotifications];
+	
 	[myDatabase release];
 	[super dealloc];
 }
@@ -106,9 +131,7 @@
     {
         iMBLibraryNode *libraryNode = [[[iMBLibraryNode alloc] init] autorelease];
         
-        // the name will include 'loading' until it is populated.
-        NSString *loadingString = LocalizedStringInIMedia(@"Loading...", @"Text that shows that we are loading");
-        [libraryNode setName:[name stringByAppendingFormat:@" (%@)", loadingString]];
+        [libraryNode setName:name];
         [libraryNode setIconName:iconName];
         [libraryNode setIcon:icon];
         [libraryNode setIdentifier:name];
@@ -139,9 +162,11 @@
 
 // NOTE: subclassers should NOT override this method
 - (void)populateLibraryNodeWithArguments:(NSDictionary *)arguments
-{
+{	
+	[self performSelectorOnMainThread:@selector(postParserDidStartNotification:) withObject:arguments waitUntilDone:YES];
+
     iMBLibraryNode *rootLibraryNode = [arguments objectForKey:@"rootLibraryNode"];
-    NSString *name = [arguments objectForKey:@"name"];
+	NSString *name = [arguments objectForKey:@"name"];
     NSString *databasePath = [arguments objectForKey:@"databasePath"];
     NSLock *gate = [arguments objectForKey:@"gate"];
     if (gate != NULL)
@@ -150,6 +175,44 @@
         [gate unlock];
     }
     [self populateLibraryNode:rootLibraryNode name:name databasePath:databasePath];
+
+	[self performSelectorOnMainThread:@selector(postParserDidEndNotification:) withObject:arguments waitUntilDone:YES];
+}
+
+- (void)postParserDidStartNotification:(NSDictionary *)arguments
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserParserDidStartNotification
+														object:self
+													  userInfo:arguments];
+}
+
+- (void)postParserDidEndNotification:(NSDictionary *)arguments
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:iMediaBrowserParserDidEndNotification
+														object:self
+													  userInfo:arguments];
+}
+
+- (void)parserDidStart:(NSNotification*)notification
+{
+	NSDictionary *arguments = [notification userInfo];
+    iMBLibraryNode *rootLibraryNode = [arguments objectForKey:@"rootLibraryNode"];
+	NSString *name = [arguments objectForKey:@"name"];
+	
+	// the name will include 'loading' until it is populated.
+	NSString *loadingString = LocalizedStringInIMedia(@"Loading...", @"Text that shows that we are loading");
+	
+	[rootLibraryNode setName:[name stringByAppendingFormat:@" (%@)", loadingString]];	
+}
+
+- (void)parserDidEnd:(NSNotification*)notification
+{
+	NSDictionary *arguments = [notification userInfo];
+    iMBLibraryNode *rootLibraryNode = [arguments objectForKey:@"rootLibraryNode"];
+	NSString *name = [arguments objectForKey:@"name"];
+	
+    // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
+	[rootLibraryNode setName:name];	
 }
 
 // standard implementation for single-item nodes.  Override if we return multiple items.

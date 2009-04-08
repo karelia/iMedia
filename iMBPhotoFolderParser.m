@@ -157,10 +157,7 @@
     {
         [self recursivelyParse:folder withNode:root];
     }
-    
-    // the node is populated, so remove the 'loading' moniker. do this on the main thread to be friendly to bindings.
-	[root performSelectorOnMainThread:@selector(setName:) withObject:name waitUntilDone:NO];
-    
+        
 	[pool release];
 }
 

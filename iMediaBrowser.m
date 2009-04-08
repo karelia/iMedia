@@ -932,8 +932,7 @@ static NSMutableArray *_browserClasses = nil;
 	
 	Class parserClass = NSClassFromString(paserClassName);
 	
-	if ([parserClass conformsToProtocol:@protocol(iMBEnhanceParser)])
-	{
+	if ([parserClass conformsToProtocol:@protocol(iMBEnhanceParser)]) {
 		NSMutableDictionary *mutableRecord = [NSMutableDictionary dictionaryWithDictionary:record];
 		
 		[mutableRecord addEntriesFromDictionary:[parserClass enhancedRecordForRecord:mutableRecord]];
