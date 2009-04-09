@@ -48,6 +48,39 @@
 
 @implementation NSFileManager (iMedia)
 
++ (NSFileManager *)threadSafeManager
+{
+	static NSString* sMutex = @"threadSafeManagerMutex";
+	static NSMutableDictionary *sPerThreadInstances = nil;
+	NSFileManager *instance = nil;
+	
+	if (floor(NSAppKitVersionNumber) > 824)	// Leopard
+	{
+		@synchronized(sMutex)
+		{
+			if (sPerThreadInstances == nil)
+			{
+				sPerThreadInstances =[[NSMutableDictionary alloc] init];
+			}
+			
+			NSString *threadID = [NSString stringWithFormat:@"%p",[NSThread currentThread]];
+			instance = [sPerThreadInstances objectForKey:threadID];
+			
+			if (instance == nil)
+			{
+				instance = [[NSFileManager alloc] init];
+				[sPerThreadInstances setObject:instance forKey:threadID];
+			}	 
+		}
+	}
+	else // Tiger and earlier
+	{
+		instance = [NSFileManager defaultManager];				
+	}
+
+	return instance;	
+}
+
 - (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes
 {
 	if ( ![path isAbsolutePath] )

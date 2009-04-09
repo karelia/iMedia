@@ -87,8 +87,8 @@
 
 - (void)recursivelyParse:(NSString *)folderPath withNode:(iMBLibraryNode *)root
 {
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+	NSFileManager *fileManager = [NSFileManager threadSafeManager];
+	NSWorkspace *workspace = [NSWorkspace threadSafeWorkspace];
 	NSArray *folderContents = [fileManager directoryContentsAtPath:folderPath];
 	folderContents = [folderContents sortedArrayUsingSelector:@selector(finderCompare:)];
 	NSEnumerator *folderContentsEnumerator = [folderContents objectEnumerator];
@@ -150,7 +150,7 @@
 - (void)populateLibraryNode:(iMBLibraryNode *)root name:(NSString *)name databasePath:(NSString *)databasePath
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSFileManager *mgr = [NSFileManager defaultManager];
+	NSFileManager *mgr = [NSFileManager threadSafeManager];
 	NSString *folder = databasePath;
 	
 	if ( [mgr fileExistsAtPath:folder] )

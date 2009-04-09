@@ -88,7 +88,7 @@
 
 - (NSMutableDictionary *)recordForMovieWithPath:(NSString *)filePath
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
+	NSFileManager *fm = [NSFileManager threadSafeManager];
 	NSDictionary *fileAttribs = [fm fileAttributesAtPath:filePath traverseLink:YES];
 	NSMutableDictionary *newPicture = [NSMutableDictionary dictionary]; 
 	[newPicture setObject:filePath forKey:@"ImagePath"];
@@ -179,7 +179,7 @@
 
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
+	NSFileManager *fm = [NSFileManager threadSafeManager];
 	NSArray *contents = [fm directoryContentsAtPath:path];
 	contents = [contents sortedArrayUsingSelector:@selector(finderCompare:)];
 	NSEnumerator *e = [contents objectEnumerator];
@@ -259,12 +259,12 @@
 	iMBLibraryNode *root = [[iMBLibraryNode alloc] init];
 	[root setName:LocalizedStringInIMedia(@"Movies Folder", @"Name of your 'Movies' folder in your home directory")];
 	NSString *folder = [self databasePath];
-	[root setIcon:[[NSWorkspace sharedWorkspace] iconForFile:folder size:NSMakeSize(16,16)]];
+	[root setIcon:[[NSWorkspace threadSafeWorkspace] iconForFile:folder size:NSMakeSize(16,16)]];
 	[root setIdentifier:folder];
 	[root setParserClassName:NSStringFromClass([self class])];
 	[root setWatchedPath:folder];
 	
-	if (![[NSFileManager defaultManager] fileExistsAtPath:folder])
+	if (![[NSFileManager threadSafeManager] fileExistsAtPath:folder])
 	{
 		[root release];
 		return nil;

@@ -50,6 +50,39 @@
 
 @implementation NSWorkspace (iMediaExtensions)
 
++ (NSWorkspace *)threadSafeWorkspace
+{
+	static NSString* sMutex = @"threadSafeWorkspaceMutex";
+	static NSMutableDictionary *sPerThreadInstances = nil;
+	NSWorkspace *instance = nil;
+	
+	if (floor(NSAppKitVersionNumber) > 824)	// Leopard
+	{
+		@synchronized(sMutex)
+		{
+			if (sPerThreadInstances == nil)
+			{
+				sPerThreadInstances =[[NSMutableDictionary alloc] init];
+			}
+			
+			NSString *threadID = [NSString stringWithFormat:@"%p",[NSThread currentThread]];
+			instance = [sPerThreadInstances objectForKey:threadID];
+			
+			if (instance == nil)
+			{
+				instance = [[NSWorkspace alloc] init];
+				[sPerThreadInstances setObject:instance forKey:threadID];
+			}	 
+		}
+	}
+	else // Tiger and earlier
+	{
+		instance = [NSWorkspace sharedWorkspace];				
+	}
+
+	return instance;	
+}
+	
 - (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID
 {
 	NSString *path = [self absolutePathForAppBundleWithIdentifier:bundleID];
@@ -62,7 +95,7 @@
 
 - (NSImage *)iconForFile:(NSString *)path size:(NSSize)size
 {
-	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:path];
+	NSImage *icon = [self iconForFile:path];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:size];
 	return icon;

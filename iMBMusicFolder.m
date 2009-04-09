@@ -110,8 +110,8 @@
 
 - (void)recursivelyParse:(NSString *)path withNode:(iMBLibraryNode *)root movieTypes:(NSArray *)movieTypes
 {
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+	NSFileManager *fileManager = [NSFileManager threadSafeManager];
+	NSWorkspace *workspace = [NSWorkspace threadSafeWorkspace];
 	NSArray *contents = [fileManager directoryContentsAtPath:path];
 	contents = [contents sortedArrayUsingSelector:@selector(finderCompare:)];
 	NSEnumerator *e = [contents objectEnumerator];
@@ -312,7 +312,7 @@
 - (void)populateLibraryNode:(iMBLibraryNode *)root name:(NSString *)name databasePath:(NSString *)databasePath
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSFileManager *mgr = [NSFileManager defaultManager];
+	NSFileManager *mgr = [NSFileManager threadSafeManager];
 	NSString *folder = databasePath;
 	
 	if ( [mgr fileExistsAtPath:folder] )
@@ -327,11 +327,11 @@
 
 - (NSArray *)nodesFromParsingDatabase:(NSLock *)gate
 {
-	NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:[self databasePath] size:NSMakeSize(16,16)];
+	NSImage *icon = [[NSWorkspace threadSafeWorkspace] iconForFile:[self databasePath] size:NSMakeSize(16,16)];
 
     iMBLibraryNode *oneNodeParsed = [self parseDatabaseInThread:[self databasePath] gate:gate name:myMusicFolderName iconName:NULL icon:icon];
  	[oneNodeParsed setIdentifier:[self databasePath]];
-       
+      
 	if (oneNodeParsed)
 	{
 		return [NSArray arrayWithObject:oneNodeParsed];
