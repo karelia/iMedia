@@ -470,7 +470,7 @@
 					volumeName = [@"/Volumes/" stringByAppendingPathComponent:volumeName];
 				}
 				
-				NSString *imagePath = [volumeName stringByAppendingPathComponent:imagePath];
+				imagePath = [volumeName stringByAppendingPathComponent:imagePath];
 				
 				if ([fileManager fileExistsAtPath:imagePath]) {
 					masterPath = imagePath;
