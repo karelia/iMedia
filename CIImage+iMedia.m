@@ -66,38 +66,43 @@
 + (NSSet*) readableExtensions
 {
 	static NSSet *readableExtensions = nil;
+	static NSString *readableExtensionsMutex = @"readableExtensionsMutex";
 	
-	if (readableExtensions == nil) {
-		NSMutableSet *set = [NSMutableSet set];
-		NSEnumerator *types = [[CIImage readableTypes] objectEnumerator];
-		
-		NSString *typeName;
-		while ((typeName = [types nextObject]) != nil) {
-			CFDictionaryRef utiDecl = UTTypeCopyDeclaration((CFStringRef)typeName);
+	@synchronized(readableExtensionsMutex)
+	{
+		if (readableExtensions == nil) {
+			NSMutableSet *set = [NSMutableSet set];
+			NSEnumerator *types = [[CIImage readableTypes] objectEnumerator];
 			
-			if (utiDecl)
-			{
-				CFDictionaryRef utiSpec = CFDictionaryGetValue(utiDecl, kUTTypeTagSpecificationKey);
-				if (utiSpec)
+			NSString *typeName;
+			while ((typeName = [types nextObject]) != nil) {
+				CFDictionaryRef utiDecl = UTTypeCopyDeclaration((CFStringRef)typeName);
+				
+				if (utiDecl)
 				{
-					CFTypeRef ext = CFDictionaryGetValue(utiSpec, kUTTagClassFilenameExtension);
-					
-					if (ext != nil) {
-						if (CFGetTypeID(ext) == CFStringGetTypeID()) {
-							[set addObject:(id)ext];
-						}
-						else if (CFGetTypeID(ext) == CFArrayGetTypeID()) {
-							[set addObjectsFromArray:(NSArray*)ext];
+					CFDictionaryRef utiSpec = CFDictionaryGetValue(utiDecl, kUTTypeTagSpecificationKey);
+					if (utiSpec)
+					{
+						CFTypeRef ext = CFDictionaryGetValue(utiSpec, kUTTagClassFilenameExtension);
+						
+						if (ext != nil) {
+							if (CFGetTypeID(ext) == CFStringGetTypeID()) {
+								[set addObject:(id)ext];
+							}
+							else if (CFGetTypeID(ext) == CFArrayGetTypeID()) {
+								[set addObjectsFromArray:(NSArray*)ext];
+							}
 						}
 					}
+					
+					CFRelease(utiDecl);
 				}
-				
-				CFRelease(utiDecl);
 			}
+			
+			readableExtensions = [[NSSet setWithSet:set] retain];
 		}
-		
-		readableExtensions = [[NSSet setWithSet:set] retain];
 	}
+	
     return readableExtensions;
 }
 
