@@ -122,7 +122,19 @@
 	else if ([name isEqualToString:@"Calendar"]) 
 		return [NSImage imageResourceNamed:@"sl-icon-small_calendar.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
 	else if ([name isEqualToString:@"Published"]) 
-		return [NSImage imageResourceNamed:@"sl-icon-small_publishedAlbum.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
+	{
+		NSImage* image = [NSImage imageResourceNamed:@"sl-icon-small_publishedAlbum.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
+
+		if (image==nil) 
+		{
+			NSBundle* bundle = [NSBundle bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
+			NSString* path = [bundle pathForResource:@"dotMacLogo.icns" ofType:nil];
+			image = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+			[image setSize:NSMakeSize(16.0,16.0)];
+		}
+
+		return image;
+	}
 
 	return [NSImage imageResourceNamed:@"sl-icon-small_album.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
 }
