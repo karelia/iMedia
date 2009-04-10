@@ -337,7 +337,7 @@
     rs = [FMResultSet resultSetWithStatement:statement usingParentDatabase:self];
     [rs setQuery:sql];
     
-    statement.useCount = statement.useCount + 1;
+	[statement setUseCount:([statement useCount] + 1)];
     
     [statement release];    
     
@@ -501,7 +501,7 @@
     }
     
     if (cachedStmt) {
-        cachedStmt.useCount = cachedStmt.useCount + 1;
+		[cachedStmt setUseCount:([cachedStmt useCount] + 1)];
         rc = sqlite3_reset(pStmt);
     }
     else {
