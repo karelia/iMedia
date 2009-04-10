@@ -267,18 +267,22 @@
 		
 		while (key = [pictureItemsEnum nextObject])
 		{
+			NSAutoreleasePool *pool2 = [[NSAutoreleasePool alloc] init];
 			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
 			if (imageRecord == nil) 
 			{
+				[pool2 release];
 				continue;	// skip if the whole record is missing for some reason
 			}
 			NSString *mediaType = [imageRecord objectForKey:@"MediaType"];
 			if (!aWantUntyped && !mediaType)
 			{
+				[pool2 release];
 				continue;	// skip if media type is missing and we require a media type
 			}
 			if (mediaType && ![mediaType isEqualToString:aMediaType])
 			{
+				[pool2 release];
 				continue;	// skip if this media type doesn't match what we are looking for
 			}
 			hasItems = YES;
@@ -306,6 +310,8 @@
 				
 				[imageRecord setObject:realKeywords forKey:@"iMediaKeywords"];
 			}
+			
+			[pool2 release];
 		}
 		[lib setAttribute:newPhotolist forKey:anImagePath];
 		
@@ -399,18 +405,22 @@
 		
 		while (key = [pictureItemsEnum nextObject])
 		{
+			NSAutoreleasePool *pool2 = [[NSAutoreleasePool alloc] init];
 			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
 			if (imageRecord == nil) 
 			{
+				[pool2 release]; 
 				continue;	// skip if the whole record is missing for some reason
 			}
 			NSString *mediaType = [imageRecord objectForKey:@"MediaType"];
 			if (!aWantUntyped && !mediaType)
 			{
+				[pool2 release]; 
 				continue;	// skip if media type is missing and we require a media type
 			}
 			if (mediaType && ![mediaType isEqualToString:aMediaType])
 			{
+				[pool2 release]; 
 				continue;	// skip if this media type doesn't match what we are looking for
 			}
 			hasItems = YES;
@@ -438,6 +448,7 @@
 				
 				[imageRecord setObject:realKeywords forKey:@"iMediaKeywords"];
 			}
+			[pool2 release];
 		}
 		[lib setAttribute:newPhotolist forKey:anImagePath];
 		

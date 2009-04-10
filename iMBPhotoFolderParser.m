@@ -99,11 +99,26 @@
 	
 	while (currentFilename = [folderContentsEnumerator nextObject])
 	{
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		NSString *filePath = [folderPath stringByAppendingPathComponent:currentFilename];
 
-		if ([[filePath lastPathComponent] isEqualToString:@"Lightroom"]) continue;
-		if ([self shouldIncludeFile:currentFilename] != YES) continue;
-		if ([excludedFolders containsObject:filePath]) continue;
+		if ([[filePath lastPathComponent] isEqualToString:@"Lightroom"])
+		{ 
+			[pool release]; 
+			continue; 
+		}
+		
+		if ([self shouldIncludeFile:currentFilename] != YES)
+		{ 
+			[pool release]; 
+			continue; 
+		}
+		
+		if ([excludedFolders containsObject:filePath])
+ 		{ 
+			[pool release]; 
+			continue; 
+		}
         
 		if ([fileManager fileExistsAtPath:filePath isDirectory:&isDirectory] && ![fileManager isPathHidden:filePath] && ![workspace isFilePackageAtPath:filePath] )
 		{
@@ -141,6 +156,8 @@
 				}
 			}
 		}
+		
+		[pool release];
 	}
 	
 	[root fromThreadSetIcon:[workspace iconForFile:folderPath size:NSMakeSize(16,16)]];

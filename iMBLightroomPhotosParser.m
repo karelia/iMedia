@@ -695,6 +695,7 @@
 		FMResultSet *rsImages = [database executeQuery:imageQuery, @"AgCaptionTagKind"];
 
 		while ([rsImages next]) {
+			NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
             NSString *absolutePath = NULL;
             if (lightroom_version == 1 )
             {
@@ -735,6 +736,7 @@
 
 				[images addObject:imageRecord];
 			}
+			[innerPool release];
 		}
 		
 		[imagesNode fromThreadSetAttribute:images forKey:@"Images"];

@@ -95,10 +95,12 @@
         
         while (cur = [e nextObject])
         {
+			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
             Class parserClass = NSClassFromString(cur);
             if (![parserClass conformsToProtocol:@protocol(iMBParser)])
             {
-                NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.", cur);
+                NSLog(@"Media Parser %@ does not conform to the iMBParser protocol. Skipping parser.",cur);
+				[pool release];
                 continue;
             }
             
@@ -106,6 +108,7 @@
 			if ([cur isEqualToString:@"LHDeliciosParser"])
 			{
 				NSLog(@"Disabling obsolete '%@'", cur);
+				[pool release];
 				continue;
 			}
 
@@ -115,7 +118,8 @@
             {
                 if (![delegate iMediaConfiguration:[iMediaConfiguration sharedConfiguration] willUseMediaParser:cur forMediaType:myMediaType])
                 {
-                    continue;
+  					[pool release];
+ 					continue;
                 }
             }
             
@@ -125,7 +129,8 @@
                 parser = [[parserClass alloc] init];
                 if (parser == nil)
                 {
-                    continue;
+					[pool release];
+					continue;
                 }
                 [loadedParsers setObject:parser forKey:cur];
                 [parser release];
@@ -147,6 +152,8 @@
             {
                 [delegate iMediaConfiguration:[iMediaConfiguration sharedConfiguration] didUseMediaParser:cur forMediaType:myMediaType];
             }
+			
+			[pool release];
         }
         
         NSSortDescriptor *priorityOrderSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"prioritySortOrder" 

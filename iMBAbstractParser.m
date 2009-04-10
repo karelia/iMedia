@@ -163,6 +163,7 @@ NSString *iMediaBrowserParserDidEndNotification = @"iMediaBrowserParserDidEnd";
 // NOTE: subclassers should NOT override this method
 - (void)populateLibraryNodeWithArguments:(NSDictionary *)arguments
 {	
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[self performSelectorOnMainThread:@selector(postParserDidStartNotification:) withObject:arguments waitUntilDone:YES];
 
     iMBLibraryNode *rootLibraryNode = [arguments objectForKey:@"rootLibraryNode"];
@@ -175,8 +176,8 @@ NSString *iMediaBrowserParserDidEndNotification = @"iMediaBrowserParserDidEnd";
         [gate unlock];
     }
     [self populateLibraryNode:rootLibraryNode name:name databasePath:databasePath];
-
 	[self performSelectorOnMainThread:@selector(postParserDidEndNotification:) withObject:arguments waitUntilDone:YES];
+	[pool release];
 }
 
 - (void)postParserDidStartNotification:(NSDictionary *)arguments

@@ -179,10 +179,15 @@
 	//Parse dictionary creating libraries, and filling with track information
 	while (albumRec = [albumEnum nextObject])
 	{
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		
 		//	'99': library knot holding all images, not just the "top of the stack" images
 		#ifndef SHOW_ALL_IMAGES_FOLDER
-			if ([[albumRec objectForKey:@"Album Type"] isEqualToString:@"99"]) continue;
+		if ([[albumRec objectForKey:@"Album Type"] isEqualToString:@"99"])
+		{
+			[pool release];
+			continue;
+		}	
 		#endif
 		
 		iMBLibraryNode *lib = [[[iMBLibraryNode alloc] init] autorelease];
@@ -198,7 +203,11 @@
 
 		NSNumber *aid = [albumRec objectForKey:@"AlbumId"];
 		#ifndef SHOW_TOP_LEVEL_APERTURE_KNOT
-			if ([aid longValue] == 1) continue;
+		if ([aid longValue] == 1)
+		{
+			[pool release];
+			continue;
+		}	
 		#endif
 			
 		// cp: Aperture does have albumID's so do we need the fake?
@@ -215,6 +224,7 @@
 		
 		while (key = [pictureItemsEnum nextObject])
 		{
+			NSAutoreleasePool *pool2 = [[NSAutoreleasePool alloc] init];
 			NSMutableDictionary *imageRecord = [[[imageRecords objectForKey:key] mutableCopy] autorelease];
 			
             // It's always possible that the record might not exist. Can't fully trusty
@@ -222,11 +232,13 @@
             if (!imageRecord)
             {
                 NSLog(@"IMBAperturePhotosParser: no image record found with key %@", key);
+				[pool2 release];
                 continue;
             }
-            			
+            
 			if ([imageRecord objectForKey:@"MediaType"] && ![[imageRecord objectForKey:@"MediaType"] isEqualToString:@"Image"])
 			{
+				[pool2 release];
 				continue;
 			}
 			
@@ -263,6 +275,7 @@
 					[imageRecord setObject:mutatedKeywordRecord forKey:key];
 				}
 			#endif
+			[pool2 release];
 		}
 
 		if ([albumRec objectForKey:@"Parent"])
@@ -289,6 +302,7 @@
         // this allows the "Images" change to be propagated up the tree so that the
         // outline view gets displayed properly.
         [lib fromThreadSetAttribute:newPhotolist forKey:@"Images"];
+		[pool release];
     }
 }
 
