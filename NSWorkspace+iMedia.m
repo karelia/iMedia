@@ -47,6 +47,10 @@
 
 #import "NSWorkspace+iMedia.h"
 
+#ifndef NSAppKitVersionNumber10_4
+#define NSAppKitVersionNumber10_4 824
+#endif
+
 @implementation NSWorkspace (iMediaExtensions)
 
 + (NSWorkspace *)threadSafeWorkspace
