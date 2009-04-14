@@ -47,37 +47,43 @@
 
 #import "NSWorkspace+iMedia.h"
 
-
 @implementation NSWorkspace (iMediaExtensions)
 
 + (NSWorkspace *)threadSafeWorkspace
 {
-	static NSString* sMutex = @"threadSafeWorkspaceMutex";
-	static NSMutableDictionary *sPerThreadInstances = nil;
-	NSWorkspace *instance = nil;
-	
-	if (floor(NSAppKitVersionNumber) > 824)	// Leopard
+	NSWorkspace*	instance = nil;
+
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+	// Tiger and earlier...
+	if (NSAppKitVersionNumber <= NSAppKitVersionNumber10_4)
 	{
+		instance = [NSWorkspace sharedWorkspace];
+	}
+	else
+#endif
+
+	// Leopard and later...
+	{
+		static NSString* sMutex = @"threadSafeWorkspaceMutex";
+
 		@synchronized(sMutex)
 		{
+			static NSMutableDictionary* sPerThreadInstances = nil;
+	
 			if (sPerThreadInstances == nil)
 			{
 				sPerThreadInstances =[[NSMutableDictionary alloc] init];
 			}
 			
 			NSString *threadID = [NSString stringWithFormat:@"%p",[NSThread currentThread]];
+
 			instance = [sPerThreadInstances objectForKey:threadID];
-			
 			if (instance == nil)
 			{
 				instance = [[NSWorkspace alloc] init];
 				[sPerThreadInstances setObject:instance forKey:threadID];
 			}	 
 		}
-	}
-	else // Tiger and earlier
-	{
-		instance = [NSWorkspace sharedWorkspace];				
 	}
 
 	return instance;	

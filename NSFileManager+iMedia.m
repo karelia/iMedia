@@ -50,17 +50,28 @@
 
 + (NSFileManager *)threadSafeManager
 {
-	static NSString* sMutex = @"threadSafeManagerMutex";
-	static NSMutableDictionary *sPerThreadInstances = nil;
-	NSFileManager *instance = nil;
-	
-	if (floor(NSAppKitVersionNumber) > 824)	// Leopard
+	NSFileManager*	instance = nil;
+
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+	// Tiger and earlier...
+	if (NSAppKitVersionNumber <= NSAppKitVersionNumber10_4)
 	{
+		instance = [NSFileManager defaultManager];
+	}
+	else
+#endif
+
+	// Leopard and later...
+	{
+		static NSString* sMutex = @"threadSafeFileManagerMutex";
+
 		@synchronized(sMutex)
 		{
+			static NSMutableDictionary* sPerThreadInstances = nil;
+
 			if (sPerThreadInstances == nil)
 			{
-				sPerThreadInstances =[[NSMutableDictionary alloc] init];
+				sPerThreadInstances = [[NSMutableDictionary alloc] init];
 			}
 			
 			NSString *threadID = [NSString stringWithFormat:@"%p",[NSThread currentThread]];
@@ -73,64 +84,43 @@
 			}	 
 		}
 	}
-	else // Tiger and earlier
-	{
-		instance = [NSFileManager defaultManager];				
-	}
 
 	return instance;	
 }
 
 - (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes
 {
-	if ( ![path isAbsolutePath] )
+	if ([path isAbsolutePath])
 	{
-		[NSException raise:@"iMediaException" format:@"createDirectoryPath:attributes: path not absolute:%@", path];
-		return NO;
-	}
-	
-	NSString *thePath = @"";
-	BOOL result = YES;
-	
-    NSEnumerator *enumerator = [[path pathComponents] objectEnumerator];
-    NSString *component;
-    while ( component = [enumerator nextObject] )
-    {
-        thePath = [thePath stringByAppendingPathComponent:component];
-        if ( ![[NSFileManager defaultManager] fileExistsAtPath:thePath] )
+		NSString*		thePath = @"";
+		NSEnumerator*	enumerator = [[path pathComponents] objectEnumerator];
+		NSString*		component;
+
+		while ((component = [enumerator nextObject]) != nil)
 		{
-			result = result && [[NSFileManager defaultManager] createDirectoryAtPath:thePath 
-																		  attributes:attributes];
-			if ( NO == result )
+			thePath = [thePath stringByAppendingPathComponent:component];
+			if (![[NSFileManager defaultManager] fileExistsAtPath:thePath] &&
+				![[NSFileManager defaultManager] createDirectoryAtPath:thePath attributes:attributes])
 			{
 				[NSException raise:@"iMediaException" format:@"createDirectory:attributes: failed at path: %@", path];
-				return NO;
 			}
 		}
-    }
-	
-    return ( (YES == result) && [[NSFileManager defaultManager] fileExistsAtPath:path] );
+	}
+	else
+	{
+		[NSException raise:@"iMediaException" format:@"createDirectoryPath:attributes: path not absolute:%@", path];
+	}
+
+	return [[NSFileManager defaultManager] fileExistsAtPath:path];
 }
 
 - (BOOL)isPathHidden:(NSString *)path
 {
-	// exit early
-	if ([[path lastPathComponent] hasPrefix:@"."]) return YES;
-	
-	BOOL isHidden = NO;
-//	OSStatus ret;
-//	NSURL *url = [NSURL fileURLWithPath:path];
-//	LSItemInfoRecord rec;
-//	
-//	ret = LSCopyItemInfoForURL((CFURLRef)url, kLSRequestAllInfo, &rec);
-//	if (ret == noErr)
-//	{
-//		if (rec.flags & kLSItemInfoIsInvisible)
-//		{
-//			isHidden = YES;
-//		}
-//	}
-	return isHidden;
+	LSItemInfoRecord	itemInfo;
+	NSURL*				pathURL = [NSURL fileURLWithPath:path];
+
+	return ((LSCopyItemInfoForURL((CFURLRef)pathURL, kLSRequestBasicFlagsOnly, &itemInfo) == noErr) &&
+			(itemInfo.flags & kLSItemInfoIsInvisible));
 }
 
 // Will resolve an alias into a path.. this code was taken from
