@@ -55,7 +55,6 @@
 		@"WebURLsWithTitlesPboardType",
 		NSFilenamesPboardType,
 		NSURLPboardType,
-		NSStringPboardType,
 		nil];
 }
 
@@ -92,7 +91,6 @@
 		}
 		names = generatedNames;	// Probably better than just the first string
 	}
-	[self setString:[names componentsJoinedByString:@"\n"] forType:NSStringPboardType];
 	
 	NSMutableArray *urlStrings = [NSMutableArray array];
 	
