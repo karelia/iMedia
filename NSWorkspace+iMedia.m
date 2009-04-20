@@ -59,7 +59,7 @@
 
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	// Tiger and earlier...
-	if (NSAppKitVersionNumber <= NSAppKitVersionNumber10_4)
+	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4)
 	{
 		instance = [NSWorkspace sharedWorkspace];
 	}
