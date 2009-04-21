@@ -632,7 +632,8 @@ static NSMutableDictionary *sImageCache = nil;
 - (NSArray *)recursiveAttributesForKey:(NSString *)key filterKey:(NSString *)filter excludingSet:(NSMutableSet *)alreadyAdded
 {
 	NSMutableArray *items = [NSMutableArray array];
-	NSEnumerator *e = [[self allItems] objectEnumerator];
+	NSArray *allItems = [self allItems];
+	//NSEnumerator *e = [[self allItems] objectEnumerator];
 	iMBLibraryNode *cur;
 	id attrib;
 	
@@ -643,12 +644,16 @@ static NSMutableDictionary *sImageCache = nil;
 		{
 			attrib = [NSArray arrayWithObject:attrib];
 		}
-		NSEnumerator *g = [attrib objectEnumerator];
+		//NSEnumerator *g = [attrib objectEnumerator];
 		id curAttrib;
 		NSString *filterKeyValue;
 		
-		while (curAttrib = [g nextObject])
+//		while (curAttrib = [g nextObject])
+//		{
+		int j;
+		for ( j=0; j<[attrib count]; j++ )
 		{
+			curAttrib = [attrib objectAtIndex:j];
 			if ([curAttrib isKindOfClass:[NSDictionary class]])
 			{
 				filterKeyValue = [curAttrib objectForKey:filter];
@@ -659,13 +664,21 @@ static NSMutableDictionary *sImageCache = nil;
 				}
 			}
 		}
+//		}
 	}
 	
-	while (cur = [e nextObject])
+	
+//	while (cur = [e nextObject])
+//	{
+	int i;
+	for ( i=0; i<[allItems count]; i++ )
 	{
+		cur = [allItems objectAtIndex:i];
 		attrib = [cur recursiveAttributesForKey:key filterKey:filter excludingSet:alreadyAdded];
 		[items addObjectsFromArray:attrib];
 	}
+//	}
+	
 	return items;
 }
 
