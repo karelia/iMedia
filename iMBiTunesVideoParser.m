@@ -125,7 +125,7 @@
 						NSString *path = [url path];
 						if (path != nil)
 						{
-							[locations addObject:locations];
+							[locations addObject:location];
 							
 							NSMutableDictionary* movieTrack = [track mutableCopy];
 							[movieTrack setObject:path forKey:@"ImagePath"];
