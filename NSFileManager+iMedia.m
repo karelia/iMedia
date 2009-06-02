@@ -49,6 +49,10 @@
 #define NSAppKitVersionNumber10_4 824
 #endif
 
+#ifndef NSMakeCollectable
+#define NSMakeCollectable(x) (id)(x)
+#endif
+
 @implementation NSFileManager (iMedia)
 
 + (NSFileManager *)threadSafeManager
@@ -82,7 +86,7 @@
 			
 			if (instance == nil)
 			{
-				instance = [[NSFileManager alloc] init];
+				instance = [[[NSFileManager alloc] init] autorelease];
 				[sPerThreadInstances setObject:instance forKey:threadID];
 			}	 
 		}
@@ -146,9 +150,9 @@
                 CFURLRef resolvedUrl = CFURLCreateFromFSRef(NULL, &fsRef);
                 if (resolvedUrl != NULL)
                 {
-                    resolvedPath = (NSString*)
+                    resolvedPath = NSMakeCollectable(
                     CFURLCopyFileSystemPath(resolvedUrl,
-                                            kCFURLPOSIXPathStyle);
+                                            kCFURLPOSIXPathStyle));
                     CFRelease(resolvedUrl);
                     resolvedPath = [resolvedPath autorelease];
                 }

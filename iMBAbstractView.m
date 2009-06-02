@@ -170,7 +170,12 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
     [splitView restoreState:YES];
     [[splitView subviewAtPosition:0] setMinDimension:26.0 andMaxDimension:0.0];
     // Simulate a resize to possibly swap out outline view
-    [self splitView:splitView changedFrameOfSubview:[splitView subviewAtPosition:0] from:NSZeroRect to:[[splitView subviewAtPosition:0] frame]];
+	NSRect newRect = NSZeroRect;
+	if ([splitView subviewAtPosition:0])
+	{
+		newRect = [[splitView subviewAtPosition:0] frame];	// nil test before calling since it's undefined result when returning a struct
+	}
+    [self splitView:splitView changedFrameOfSubview:[splitView subviewAtPosition:0] from:NSZeroRect to:newRect];
     [splitView adjustSubviews];	// just to be safe.
 
     [libraryController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];

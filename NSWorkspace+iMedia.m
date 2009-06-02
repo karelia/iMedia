@@ -84,7 +84,7 @@
 			instance = [sPerThreadInstances objectForKey:threadID];
 			if (instance == nil)
 			{
-				instance = [[NSWorkspace alloc] init];
+				instance = [[[NSWorkspace alloc] init] autorelease];
 				[sPerThreadInstances setObject:instance forKey:threadID];
 			}	 
 		}

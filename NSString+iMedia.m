@@ -52,6 +52,10 @@
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 
+#ifndef NSMakeCollectable
+#define NSMakeCollectable(x) (id)(x)
+#endif
+
 @implementation NSString ( UTI )
 
 //  convert to UTI
@@ -129,11 +133,11 @@
 	}
 	else
 	{
-		UTI = [(NSString *)UTTypeCreatePreferredIdentifierForTag(
+		UTI = [NSMakeCollectable(UTTypeCreatePreferredIdentifierForTag(
 																 kUTTagClassFilenameExtension,
 																 (CFStringRef)anExtension,
 																 NULL
-																 ) autorelease];
+																 )) autorelease];
 	}
 	
 	// If we don't find it, add an entry to the info.plist of the APP,
@@ -148,11 +152,11 @@
 + (NSString *)UTIForFileType:(NSString *)aFileType;
 
 {
-	return [(NSString *)UTTypeCreatePreferredIdentifierForTag(
+	return [NSMakeCollectable(UTTypeCreatePreferredIdentifierForTag(
 															 kUTTagClassOSType,
 															 (CFStringRef)aFileType,
 															 NULL
-															 ) autorelease];	
+															 )) autorelease];	
 }
 
 // See list here:
@@ -217,7 +221,7 @@
 	CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
 	CFStringRef uuidStr = CFUUIDCreateString(kCFAllocatorDefault, uuid);
 	CFRelease(uuid);
-	[(NSString *)uuidStr autorelease];
+	[NSMakeCollectable(uuidStr) autorelease];
 	return (NSString *)uuidStr;
 }
 

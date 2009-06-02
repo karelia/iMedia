@@ -53,6 +53,10 @@
 
 #define RECURSIVE_PARSEDATABASE 1
 
+#ifndef NSMakeCollectable
+#define NSMakeCollectable(x) (id)(x)
+#endif
+
 @implementation iMBiTunesVideoParser
 
 + (void)load
@@ -335,7 +339,7 @@
 	
 	NSMutableDictionary *iTunesLibrary = [NSMutableDictionary dictionary];
 	CFPropertyListRef iApps = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
-	NSArray *libraries = [(NSArray *)iApps autorelease];
+	NSArray *libraries = [NSMakeCollectable(iApps) autorelease];
 	NSEnumerator *e = [libraries objectEnumerator];
 	NSString *cur;
 	

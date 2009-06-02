@@ -698,8 +698,10 @@ static int compareFileModificationDate (id key1, id key2, void *context)
         NSString    *fullPath = [dirPath stringByAppendingPathComponent:fileName];
         NSDictionary *attributes = [fileManager fileAttributesAtPath:fullPath traverseLink:NO];
         if (attributes)
+		{
             [fileDict setObject:attributes forKey:fileName];
-        totSize += [attributes fileSize];
+			totSize += [attributes fileSize];
+		}
     }
     if (totSize < [self maxFileSize] * 1024 * 1024)
         return;

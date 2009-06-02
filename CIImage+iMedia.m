@@ -60,7 +60,7 @@
 		readableTypes = [[NSSet setWithArray:readableTypesArray] retain];
 	}
 	
-    return readableTypes;
+    return readableTypes;		// leaking on purpose
 }
 
 + (NSSet*) readableExtensions
