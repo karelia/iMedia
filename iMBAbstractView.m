@@ -114,7 +114,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
 
     [splitView setDelegate:nil];
 
-    [[libraryView enclosingScrollView] release];
+    [[libraryView enclosingScrollView] release];		// balance the "leak" retain
     [libraryPopUpButton release];
 
     [backgroundLoadingLock release];
@@ -152,7 +152,7 @@ NSString *iMBNativeDataArray=@"iMBNativeDataArray";
     [libraryView registerForDraggedTypes:[self fineTunePlaylistDragTypes:[NSArray arrayWithObject:NSFilenamesPboardType]]];
 
     // save these since they get swapped out    
-    [[libraryView enclosingScrollView] retain];
+    [[libraryView enclosingScrollView] retain];		// leaking on purpose
     [libraryPopUpButton retain];
 
     [splitView setAutosaveName:[NSString stringWithFormat:@"iMBSplitView-%@", [[iMediaConfiguration sharedConfiguration] identifier]] recursively:YES];

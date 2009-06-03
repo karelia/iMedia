@@ -336,7 +336,7 @@
     
     NSData *data = [NSData dataWithBytesNoCopy:(void *)sqlite3_column_blob([statement statement], columnIdx) length:dataSize freeWhenDone:NO];
     
-    return [[data retain] autorelease];		// Fix Clang warning									
+	return data;
 }
 
 
