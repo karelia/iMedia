@@ -1828,6 +1828,7 @@
 		969656A608C6A24500F2F85C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = 4.0;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -1842,6 +1843,7 @@
 					i386,
 					ppc,
 				);
+				GCC_VERSION = 4.0;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -1908,6 +1910,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3C371B0009AD502700501C1F /* Framework Release.xcconfig */;
 			buildSettings = {
+				GCC_VERSION = 4.0;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
