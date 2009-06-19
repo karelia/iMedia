@@ -83,60 +83,39 @@
 	return self;
 }
 
-- (NSImage*) iconForType: (NSString*) name 
+- (NSImage*) iconForType:(NSString*)name 
 {
-	// iPhoto 7
-	
-	if ([name isEqualToString:@"Events"]) 
-		return [NSImage imageResourceNamed:@"sl-icon-small_events.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Event"])
-		return [NSImage imageResourceNamed:@"sl-icon-small_event.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Roll"])
-		return [NSImage imageResourceNamed:@"sl-icon-small_roll.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if (name == nil || [name isEqualToString:@"Photos"]) 
-		return [NSImage imageResourceNamed:@"sl-icon-small_library.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Selected Event Album"])
-		return [NSImage imageResourceNamed:@"sl-icon-small_event.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Special Month"]) 
-		return [NSImage imageResourceNamed:@"sl-icon-small_cal.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Special Roll"]) 
-		return [NSImage imageResourceNamed:@"sl-icon_lastImport.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Shelf"]) 		
-		return [NSImage imageResourceNamed:@"sl-icon_flag.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Folder"])	
-		return [NSImage imageResourceNamed:@"sl-icon-small_folder.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Regular"])
-		return [NSImage imageResourceNamed:@"sl-icon-small_album.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Smart"]) 	
-		return [NSImage imageResourceNamed:@"sl-icon-small_smartAlbum.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Slideshow"]) 
-		return [NSImage imageResourceNamed:@"sl-icon-small_slideshow.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Book"]) 	
-		return [NSImage imageResourceNamed:@"sl-icon-small_book.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Subscribed"]) 	
-		return [NSImage imageResourceNamed:@"sl-icon-small_subscribedAlbum.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Photocasts"])	
-		return [NSImage imageResourceNamed:@"sl-icon-small_subscriptions.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Card"]) 
-		return [NSImage imageResourceNamed:@"sl-icon-small_card.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Calendar"]) 
-		return [NSImage imageResourceNamed:@"sl-icon-small_calendar.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"Published"]) 
+	static const SiMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
-		NSImage* image = [NSImage imageResourceNamed:@"sl-icon-small_publishedAlbum.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
+		// iPhoto 7
+		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
+		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
+		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
+		{@"Event",					@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
+		{@"Events",					@"sl-icon-small_events.tiff",			@"folder",	nil,				nil},
+		{@"Folder",					@"sl-icon-small_folder.tiff",			@"folder",	nil,				nil},
+		{@"Photocasts",				@"sl-icon-small_subscriptions.tiff",	@"folder",	nil,				nil},
+		{@"Photos",					@"sl-icon-small_library.tiff",			@"folder",	nil,				nil},
+		{@"Published",				@"sl-icon-small_publishedAlbum.tiff",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
+		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil},
+		{@"Roll",					@"sl-icon-small_roll.tiff",				@"folder",	nil,				nil},
+		{@"Selected Event Album",	@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
+		{@"Shelf",					@"sl-icon_flag.tiff",					@"folder",	nil,				nil},
+		{@"Slideshow",				@"sl-icon-small_slideshow.tiff",		@"folder",	nil,				nil},
+		{@"Smart",					@"sl-icon-small_smartAlbum.tiff",		@"folder",	nil,				nil},
+		{@"Special Month",			@"sl-icon-small_cal.tiff",				@"folder",	nil,				nil},
+		{@"Special Roll",			@"sl-icon_lastImport.tiff",				@"folder",	nil,				nil},
+		{@"Subscribed",				@"sl-icon-small_subscribedAlbum.tiff",	@"folder",	nil,				nil},
+	};
 
-		if (image==nil) 
-		{
-			NSBundle* bundle = [NSBundle bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
-			NSString* path = [bundle pathForResource:@"dotMacLogo.icns" ofType:nil];
-			image = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
-			[image setSize:NSMakeSize(16.0,16.0)];
-		}
+	static const SiMBIconTypeMapping kIconTypeMapping =
+	{
+		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
+		kIconTypeMappingEntries,
+		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil}	// fallback image
+	};
 
-		return image;
-	}
-
-	return [NSImage imageResourceNamed:@"sl-icon-small_album.tiff" fromApplication:@"com.apple.iPhoto" fallbackTo:@"folder"];
+	return [self iconForType:((name != nil) ? name : @"Photos") fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
 }
 
 - (iMBLibraryNode *)nodeWithAlbumID:(NSNumber *)aid withRoot:(iMBLibraryNode *)root

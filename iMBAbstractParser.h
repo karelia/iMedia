@@ -46,6 +46,24 @@
 #import <Cocoa/Cocoa.h>
 #import "iMediaBrowserProtocol.h"
 
+
+typedef struct _SiMBIconTypeMappingEntry
+{
+	NSString*						fIconType;
+	NSString*						fApplicationIconName;
+	NSString*						fFallbackIconName;
+	NSString*						fAlternateIconName;
+	NSString*						fAlternateBundlePath;
+} SiMBIconTypeMappingEntry;
+
+typedef struct _SiMBIconTypeMapping
+{
+	unsigned int					fCount;
+	const SiMBIconTypeMappingEntry*	fEntries;
+	const SiMBIconTypeMappingEntry	fUnknownTypeEntry;
+} SiMBIconTypeMapping;
+
+
 @class iMBLibraryNode;
 
 extern NSString *iMediaBrowserParserDidStartNotification;
@@ -88,5 +106,8 @@ extern NSString *iMediaBrowserParserDidEndNotification;
 
 // helper method to generate an attributed string with icon and name
 - (NSAttributedString *)name:(NSString *)name withImage:(NSImage *)image;
+
+// utility method for subclasses to call to handle retrieving parser-specific icons, with underlying caching
+- (NSImage*) iconForType:(NSString*)name fromBundleID:(NSString*)bundleID withMappingTable:(const SiMBIconTypeMapping*)mappingTable;
 
 @end

@@ -92,49 +92,40 @@
 }
 
 
-- (NSImage*) iconForType: (NSString*) name 
+- (NSImage*) iconForType:(NSString*)name 
 {
 	// '12' ???
 	// cp: I found icons for a 'smart journal' or a 'smart book' but no menu command to create on.
 	
-	if ([name isEqualToString:@"1"]) // album
-		return [NSImage imageResourceNamed:@"Project_I_Album.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"2"]) // smart album
-		return [NSImage imageResourceNamed:@"Project_I_SAlbum.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"3"]) // library **** ... 200X	
-		return [NSImage imageResourceNamed:@"List_Icons_LibrarySAlbum.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"4"]) // project
-		return [NSImage imageResourceNamed:@"Project_I_Project.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"5"]) // library (top level)		
-		return [NSImage imageResourceNamed:@"List_Icons_Library.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"6"]) // folder		
-		return [NSImage imageResourceNamed:@"Project_I_Folder.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"7"]) // sub-folder of project
-		return [NSImage imageResourceNamed:@"Project_I_ProjectFolder.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"8"]) // book		
-		return [NSImage imageResourceNamed:@"Project_I_Book.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"9"]) // web gallery	
+	static const SiMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
-		NSImage* icon = [NSImage imageResourceNamed:@"Project_I_WebPage.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:nil];
-		if (icon==nil) icon = [NSImage imageResourceNamed:@"Project_I_WebGallery.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-		return icon;
-	}
-	else if ([name isEqualToString:@"10"]) // web journal		
-		return [NSImage imageResourceNamed:@"Project_I_WebJournal.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"11"]) // light	table	
-		return [NSImage imageResourceNamed:@"Project_I_LightTable.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"13"]) // smart web gallery		
-		return [NSImage imageResourceNamed:@"Project_I_SWebGallery.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"97"]) // library
-		return [NSImage imageResourceNamed:@"Project_I_Projects.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"98"]) // library
-		return [NSImage imageResourceNamed:@"AppIcon.icns" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
-	else if ([name isEqualToString:@"99"]) // library (knot holding all images)
-		return [NSImage imageResourceNamed:@"List_Icons_Library.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
+		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil},	// album
+		{@"2",	@"Project_I_SAlbum.tiff",			@"folder",	nil,	nil},	// smart album
+		{@"3",	@"List_Icons_LibrarySAlbum.tiff",	@"folder",	nil,	nil},	// library **** ... 200X
+		{@"4",	@"Project_I_Project.tiff",			@"folder",	nil,	nil},	// project
+		{@"5",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (top level)
+		{@"6",	@"Project_I_Folder.tiff",			@"folder",	nil,	nil},	// folder
+		{@"7",	@"Project_I_ProjectFolder.tiff",	@"folder",	nil,	nil},	// sub-folder of project
+		{@"8",	@"Project_I_Book.tiff",				@"folder",	nil,	nil},	// book
+		{@"9",	@"Project_I_WebPage.tiff",			@"folder",	nil,	nil},	// web gallery
+		{@"9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
+		{@"10",	@"Project_I_WebJournal.tiff",		@"folder",	nil,	nil},	// web journal
+		{@"11",	@"Project_I_LightTable.tiff",		@"folder",	nil,	nil},	// light table
+		{@"13",	@"Project_I_SWebGallery.tiff",		@"folder",	nil,	nil},	// smart web gallery
+		{@"97",	@"Project_I_Projects.tiff",			@"folder",	nil,	nil},	// library
+		{@"98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
+		{@"99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
+	};
 
-	return [NSImage imageResourceNamed:@"Project_I_Album.tiff" fromApplication:@"com.apple.Aperture" fallbackTo:@"folder"];
+	static const SiMBIconTypeMapping kIconTypeMapping =
+	{
+		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
+		kIconTypeMappingEntries,
+		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil}	// fallback image
+	};
+
+	return [self iconForType:name fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
 }
-
 
 - (iMBLibraryNode *)nodeWithAlbumID:(NSNumber *)aid withRoot:(iMBLibraryNode *)root
 {

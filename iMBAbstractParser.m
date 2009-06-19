@@ -47,6 +47,7 @@
 #import "UKKQueue.h"
 #import "iMBLibraryNode.h"
 #import "NSAttributedString+iMedia.h"
+#import "NSImage+iMedia.h"
 
 NSString *iMediaBrowserParserDidStartNotification = @"iMediaBrowserParserDidStart";
 NSString *iMediaBrowserParserDidEndNotification = @"iMediaBrowserParserDidEnd";
@@ -229,6 +230,86 @@ NSString *iMediaBrowserParserDidEndNotification = @"iMediaBrowserParserDidEnd";
 	{
 		return nil;
 	}
+}
+
+- (NSImage*) __loadIconForType:(NSString*)name fromBundleID:(NSString*)bundleID withMappingTable:(const SiMBIconTypeMapping*)mappingTable
+{
+	if ((name != nil) && (bundleID != nil) && (mappingTable != NULL))
+	{
+		unsigned int iconIndex;
+
+		// iterate over the entries in the table...
+		for (iconIndex = 0; iconIndex < mappingTable->fCount; iconIndex++)
+		{
+			const SiMBIconTypeMappingEntry* entry = &mappingTable->fEntries[iconIndex];
+
+			// check for a match with the current entry's icon type
+			if ([name isEqualToString:entry->fIconType])
+			{
+				// first try to find the specified image in the application bundle associated with the parser
+				NSImage* image = [NSImage imageResourceNamed:entry->fApplicationIconName
+											 fromApplication:bundleID
+												  fallbackTo:entry->fFallbackIconName];
+
+				// if the image doesn't exist, try using another image at a specific location
+				if ((image == nil) && (entry->fAlternateBundlePath != nil))
+				{
+					NSBundle* bundle = [NSBundle bundleWithPath:entry->fAlternateBundlePath];
+					NSString* path = [bundle pathForResource:entry->fAlternateIconName ofType:nil];
+
+					image = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+					[image setSize:NSMakeSize(16.0,16.0)];
+				}
+
+				if (image != nil)
+					return image;
+			}
+		}
+
+		// if no type-specific image was found, use the fallback image
+		return [NSImage imageResourceNamed:mappingTable->fUnknownTypeEntry.fApplicationIconName
+						   fromApplication:bundleID
+								fallbackTo:mappingTable->fUnknownTypeEntry.fFallbackIconName];
+	}
+
+	return nil;
+}
+
+- (NSImage*) iconForType:(NSString*)name fromBundleID:(NSString*)bundleID withMappingTable:(const SiMBIconTypeMapping*)mappingTable
+{
+	NSImage* image = nil;
+
+	if (name != nil)
+	{
+		static NSString* sMutex = @"iconForTypeMutex";
+
+		@synchronized(sMutex)
+		{
+			static NSMutableDictionary* sIconCache = nil;
+
+			NSMutableDictionary*	bundleCache;
+
+			if (sIconCache == nil)
+				sIconCache = [[NSMutableDictionary alloc] initWithCapacity:0];
+
+			bundleCache = [sIconCache objectForKey:bundleID];
+			if (bundleCache == nil)
+			{
+				bundleCache = [NSMutableDictionary dictionary];
+				[sIconCache setObject:bundleCache forKey:bundleID];
+			}
+
+			image = [bundleCache objectForKey:name];
+			if (image == nil)
+			{
+				image = [self __loadIconForType:name fromBundleID:bundleID withMappingTable:mappingTable];
+				if (image != nil)
+					[bundleCache setObject:image forKey:name];
+			}
+		}
+	}
+
+	return image;
 }
 
 @end
