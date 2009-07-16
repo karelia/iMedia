@@ -66,40 +66,47 @@
 + (NSSet*) readableExtensions
 {
 	static NSSet *readableExtensions = nil;
-	static NSString *readableExtensionsMutex = @"readableExtensionsMutex";
-	
-	@synchronized(readableExtensionsMutex)
+
+	// don't wait on a mutex if the extensions set is already initialized
+	if (readableExtensions == nil)
 	{
-		if (readableExtensions == nil) {
-			NSMutableSet *set = [NSMutableSet set];
-			NSEnumerator *types = [[CIImage readableTypes] objectEnumerator];
-			
-			NSString *typeName;
-			while ((typeName = [types nextObject]) != nil) {
-				CFDictionaryRef utiDecl = UTTypeCopyDeclaration((CFStringRef)typeName);
+		static NSString *readableExtensionsMutex = @"readableExtensionsMutex";
+
+		@synchronized(readableExtensionsMutex)
+		{
+			// only initialize the extensions set once: if one thread was waiting on the mutex
+			// while another was initializing the set, make sure that the set isn't rebuilt
+			if (readableExtensions == nil) {
+				NSMutableSet *set = [NSMutableSet set];
+				NSEnumerator *types = [[CIImage readableTypes] objectEnumerator];
 				
-				if (utiDecl)
-				{
-					CFDictionaryRef utiSpec = CFDictionaryGetValue(utiDecl, kUTTypeTagSpecificationKey);
-					if (utiSpec)
+				NSString *typeName;
+				while ((typeName = [types nextObject]) != nil) {
+					CFDictionaryRef utiDecl = UTTypeCopyDeclaration((CFStringRef)typeName);
+					
+					if (utiDecl)
 					{
-						CFTypeRef ext = CFDictionaryGetValue(utiSpec, kUTTagClassFilenameExtension);
-						
-						if (ext != nil) {
-							if (CFGetTypeID(ext) == CFStringGetTypeID()) {
-								[set addObject:(id)ext];
-							}
-							else if (CFGetTypeID(ext) == CFArrayGetTypeID()) {
-								[set addObjectsFromArray:(NSArray*)ext];
+						CFDictionaryRef utiSpec = CFDictionaryGetValue(utiDecl, kUTTypeTagSpecificationKey);
+						if (utiSpec)
+						{
+							CFTypeRef ext = CFDictionaryGetValue(utiSpec, kUTTagClassFilenameExtension);
+							
+							if (ext != nil) {
+								if (CFGetTypeID(ext) == CFStringGetTypeID()) {
+									[set addObject:(id)ext];
+								}
+								else if (CFGetTypeID(ext) == CFArrayGetTypeID()) {
+									[set addObjectsFromArray:(NSArray*)ext];
+								}
 							}
 						}
+						
+						CFRelease(utiDecl);
 					}
-					
-					CFRelease(utiDecl);
 				}
+				
+				readableExtensions = [[NSSet setWithSet:set] retain];
 			}
-			
-			readableExtensions = [[NSSet setWithSet:set] retain];
 		}
 	}
 	
