@@ -305,6 +305,8 @@ NSString *iMediaBrowserParserDidEndNotification = @"iMediaBrowserParserDidEnd";
 				image = [self __loadIconForType:name fromBundleID:bundleID withMappingTable:mappingTable];
 				if (image != nil)
 					[bundleCache setObject:image forKey:name];
+				else
+					image = [NSImage genericFolderIcon];
 			}
 		}
 	}
