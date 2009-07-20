@@ -1,0 +1,666 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
+		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B41010F6C100C527B7 /* IMBCommon.h */; };
+		D09930C51010F6C100C527B7 /* IMBLibraryController.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B51010F6C100C527B7 /* IMBLibraryController.h */; };
+		D09930C61010F6C100C527B7 /* IMBLibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930B61010F6C100C527B7 /* IMBLibraryController.m */; };
+		D09930C71010F6C100C527B7 /* IMBNode.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B71010F6C100C527B7 /* IMBNode.h */; };
+		D09930C81010F6C100C527B7 /* IMBNode.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930B81010F6C100C527B7 /* IMBNode.m */; };
+		D09930C91010F6C100C527B7 /* IMBObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B91010F6C100C527B7 /* IMBObject.h */; };
+		D09930CA1010F6C100C527B7 /* IMBObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930BA1010F6C100C527B7 /* IMBObject.m */; };
+		D09930CB1010F6C100C527B7 /* IMBObjectArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */; };
+		D09930CC1010F6C100C527B7 /* IMBOperationQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930BC1010F6C100C527B7 /* IMBOperationQueue.h */; };
+		D09930CD1010F6C100C527B7 /* IMBOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930BD1010F6C100C527B7 /* IMBOperationQueue.m */; };
+		D09930D01010F6C100C527B7 /* IMBParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930C01010F6C100C527B7 /* IMBParser.h */; };
+		D09930D11010F6C100C527B7 /* IMBParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930C11010F6C100C527B7 /* IMBParser.m */; };
+		D09930D21010F6C100C527B7 /* IMBParserController.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930C21010F6C100C527B7 /* IMBParserController.h */; };
+		D09930D31010F6C100C527B7 /* IMBParserController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930C31010F6C100C527B7 /* IMBParserController.m */; };
+		D09930FD1010FF9700C527B7 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D09931A910110E8900C527B7 /* IMBConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = D09931A710110E8900C527B7 /* IMBConfig.m */; };
+		D09931AA10110E8900C527B7 /* IMBConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = D09931A810110E8900C527B7 /* IMBConfig.h */; };
+		D09931EB1011132300C527B7 /* IMBCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = D09931EA1011132300C527B7 /* IMBCommon.m */; };
+		D099320E1011158400C527B7 /* IMBFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D099320C1011158400C527B7 /* IMBFolderParser.h */; };
+		D099320F1011158400C527B7 /* IMBFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D099320D1011158400C527B7 /* IMBFolderParser.m */; };
+		D099324710111A2900C527B7 /* NSFileManager+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D099324310111A2900C527B7 /* NSFileManager+iMedia.h */; };
+		D099324810111A2900C527B7 /* NSFileManager+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D099324410111A2900C527B7 /* NSFileManager+iMedia.m */; };
+		D099324910111A2900C527B7 /* NSWorkspace+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D099324510111A2900C527B7 /* NSWorkspace+iMedia.h */; };
+		D099324A10111A2900C527B7 /* NSWorkspace+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D099324610111A2900C527B7 /* NSWorkspace+iMedia.m */; };
+		D099326A10111DCB00C527B7 /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D099326810111DCB00C527B7 /* NSString+iMedia.m */; };
+		D099326B10111DCB00C527B7 /* NSString+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D099326910111DCB00C527B7 /* NSString+iMedia.h */; };
+		D09932911011227100C527B7 /* IMBPhotosFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D099328F1011227100C527B7 /* IMBPhotosFolderParser.h */; };
+		D09932921011227100C527B7 /* IMBPhotosFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D09932901011227100C527B7 /* IMBPhotosFolderParser.m */; };
+		D0993295101124EE00C527B7 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D0993294101124EE00C527B7 /* libcrypto.dylib */; };
+		D0993304101197D100C527B7 /* IMBUserInterfaceController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993302101197D100C527B7 /* IMBUserInterfaceController.m */; };
+		D0993305101197D100C527B7 /* IMBUserInterfaceController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0993303101197D100C527B7 /* IMBUserInterfaceController.h */; };
+		D099330C10119D8200C527B7 /* IMBNodeTreeController.h in Headers */ = {isa = PBXBuildFile; fileRef = D099330B10119D8200C527B7 /* IMBNodeTreeController.h */; };
+		D099333110119EA300C527B7 /* IMBNodeTreeController.m in Sources */ = {isa = PBXBuildFile; fileRef = D099333010119EA300C527B7 /* IMBNodeTreeController.m */; };
+		D099333310119F3400C527B7 /* IMBObjectArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D099333210119F3400C527B7 /* IMBObjectArrayController.m */; };
+		D099335C1011B28500C527B7 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D09933AF1011B2CD00C527B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		D09933B31011B32B00C527B7 /* IMBTestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D09933B21011B32B00C527B7 /* IMBTestAppDelegate.m */; };
+		D09933B71011B3CE00C527B7 /* IMBTestApp.xib in Resources */ = {isa = PBXBuildFile; fileRef = D09933B61011B3CE00C527B7 /* IMBTestApp.xib */; };
+		D09934341011B63600C527B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D09934331011B63600C527B7 /* main.m */; };
+		D0993931101236AB00C527B7 /* IMBOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = D099392F101236AB00C527B7 /* IMBOutlineView.h */; };
+		D0993932101236AB00C527B7 /* IMBOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993930101236AB00C527B7 /* IMBOutlineView.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D09934591011B6FA00C527B7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = iMedia;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		089C1667FE841158C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		32DBCF5E0370ADEE00C91783 /* iMedia.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.pch; sourceTree = "<group>"; };
+		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8DC2EF5B0486A6940098B216 /* iMedia.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iMedia.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D09930B41010F6C100C527B7 /* IMBCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBCommon.h; sourceTree = "<group>"; };
+		D09930B51010F6C100C527B7 /* IMBLibraryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLibraryController.h; sourceTree = "<group>"; };
+		D09930B61010F6C100C527B7 /* IMBLibraryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLibraryController.m; sourceTree = "<group>"; };
+		D09930B71010F6C100C527B7 /* IMBNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNode.h; sourceTree = "<group>"; };
+		D09930B81010F6C100C527B7 /* IMBNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNode.m; sourceTree = "<group>"; };
+		D09930B91010F6C100C527B7 /* IMBObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObject.h; sourceTree = "<group>"; };
+		D09930BA1010F6C100C527B7 /* IMBObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObject.m; sourceTree = "<group>"; };
+		D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectArrayController.h; sourceTree = "<group>"; };
+		D09930BC1010F6C100C527B7 /* IMBOperationQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBOperationQueue.h; sourceTree = "<group>"; };
+		D09930BD1010F6C100C527B7 /* IMBOperationQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBOperationQueue.m; sourceTree = "<group>"; };
+		D09930C01010F6C100C527B7 /* IMBParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBParser.h; sourceTree = "<group>"; };
+		D09930C11010F6C100C527B7 /* IMBParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBParser.m; sourceTree = "<group>"; };
+		D09930C21010F6C100C527B7 /* IMBParserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBParserController.h; sourceTree = "<group>"; };
+		D09930C31010F6C100C527B7 /* IMBParserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBParserController.m; sourceTree = "<group>"; };
+		D09930FC1010FF9700C527B7 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		D09931A710110E8900C527B7 /* IMBConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBConfig.m; sourceTree = "<group>"; };
+		D09931A810110E8900C527B7 /* IMBConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBConfig.h; sourceTree = "<group>"; };
+		D09931EA1011132300C527B7 /* IMBCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBCommon.m; sourceTree = "<group>"; };
+		D099320C1011158400C527B7 /* IMBFolderParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFolderParser.h; sourceTree = "<group>"; };
+		D099320D1011158400C527B7 /* IMBFolderParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFolderParser.m; sourceTree = "<group>"; };
+		D099324310111A2900C527B7 /* NSFileManager+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+iMedia.h"; sourceTree = "<group>"; };
+		D099324410111A2900C527B7 /* NSFileManager+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+iMedia.m"; sourceTree = "<group>"; };
+		D099324510111A2900C527B7 /* NSWorkspace+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWorkspace+iMedia.h"; sourceTree = "<group>"; };
+		D099324610111A2900C527B7 /* NSWorkspace+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSWorkspace+iMedia.m"; sourceTree = "<group>"; };
+		D099326810111DCB00C527B7 /* NSString+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+iMedia.m"; sourceTree = "<group>"; };
+		D099326910111DCB00C527B7 /* NSString+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+iMedia.h"; sourceTree = "<group>"; };
+		D099328F1011227100C527B7 /* IMBPhotosFolderParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPhotosFolderParser.h; sourceTree = "<group>"; };
+		D09932901011227100C527B7 /* IMBPhotosFolderParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPhotosFolderParser.m; sourceTree = "<group>"; };
+		D0993294101124EE00C527B7 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
+		D0993302101197D100C527B7 /* IMBUserInterfaceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBUserInterfaceController.m; sourceTree = "<group>"; };
+		D0993303101197D100C527B7 /* IMBUserInterfaceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBUserInterfaceController.h; sourceTree = "<group>"; };
+		D099330B10119D8200C527B7 /* IMBNodeTreeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeTreeController.h; sourceTree = "<group>"; };
+		D099333010119EA300C527B7 /* IMBNodeTreeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeTreeController.m; sourceTree = "<group>"; };
+		D099333210119F3400C527B7 /* IMBObjectArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectArrayController.m; sourceTree = "<group>"; };
+		D09933551011B26E00C527B7 /* iMedia2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMedia2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D09933571011B26E00C527B7 /* TestApp-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestApp-Info.plist"; sourceTree = "<group>"; };
+		D09933B11011B32B00C527B7 /* IMBTestAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestAppDelegate.h; sourceTree = "<group>"; };
+		D09933B21011B32B00C527B7 /* IMBTestAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestAppDelegate.m; sourceTree = "<group>"; };
+		D09933B61011B3CE00C527B7 /* IMBTestApp.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBTestApp.xib; sourceTree = "<group>"; };
+		D09934331011B63600C527B7 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		D099392F101236AB00C527B7 /* IMBOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBOutlineView.h; sourceTree = "<group>"; };
+		D0993930101236AB00C527B7 /* IMBOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBOutlineView.m; sourceTree = "<group>"; };
+		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DC2EF560486A6940098B216 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
+				D09930FD1010FF9700C527B7 /* Quartz.framework in Frameworks */,
+				D0993295101124EE00C527B7 /* libcrypto.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D09933531011B26E00C527B7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D09933AF1011B2CD00C527B7 /* Cocoa.framework in Frameworks */,
+				D099335C1011B28500C527B7 /* iMedia.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		034768DFFF38A50411DB9C8B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DC2EF5B0486A6940098B216 /* iMedia.framework */,
+				D09933551011B26E00C527B7 /* iMedia2.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0867D691FE84028FC02AAC07 /* iMedia */ = {
+			isa = PBXGroup;
+			children = (
+				32DBCF5E0370ADEE00C91783 /* iMedia.pch */,
+				08FB77AEFE84172EC02AAC07 /* Framework */,
+				D099334E1011B22600C527B7 /* Test Application */,
+				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
+				034768DFFF38A50411DB9C8B /* Products */,
+			);
+			name = iMedia;
+			sourceTree = "<group>";
+		};
+		0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */,
+				1058C7B2FEA5585E11CA2CBB /* Other Frameworks */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		08FB77AEFE84172EC02AAC07 /* Framework */ = {
+			isa = PBXGroup;
+			children = (
+				8DC2EF5A0486A6940098B216 /* Info.plist */,
+				089C1666FE841158C02AAC07 /* InfoPlist.strings */,
+				D09930F51010FDF700C527B7 /* Common */,
+				D09930F11010FD5000C527B7 /* Model */,
+				D09930F41010FD9900C527B7 /* Parsers */,
+				D09930F21010FD5D00C527B7 /* Controllers */,
+				D09930F31010FD6400C527B7 /* Views */,
+				D099323410111A1600C527B7 /* Cocoa Additions */,
+			);
+			name = Framework;
+			sourceTree = "<group>";
+		};
+		1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
+				D09930FC1010FF9700C527B7 /* Quartz.framework */,
+				D0993294101124EE00C527B7 /* libcrypto.dylib */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7B2FEA5585E11CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
+				D2F7E79907B2D74100F64583 /* CoreData.framework */,
+				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		D09930F11010FD5000C527B7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				D09930B71010F6C100C527B7 /* IMBNode.h */,
+				D09930B81010F6C100C527B7 /* IMBNode.m */,
+				D09930B91010F6C100C527B7 /* IMBObject.h */,
+				D09930BA1010F6C100C527B7 /* IMBObject.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		D09930F21010FD5D00C527B7 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				D09930C21010F6C100C527B7 /* IMBParserController.h */,
+				D09930C31010F6C100C527B7 /* IMBParserController.m */,
+				D09930B51010F6C100C527B7 /* IMBLibraryController.h */,
+				D09930B61010F6C100C527B7 /* IMBLibraryController.m */,
+				D0993303101197D100C527B7 /* IMBUserInterfaceController.h */,
+				D0993302101197D100C527B7 /* IMBUserInterfaceController.m */,
+				D099330B10119D8200C527B7 /* IMBNodeTreeController.h */,
+				D099333010119EA300C527B7 /* IMBNodeTreeController.m */,
+				D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */,
+				D099333210119F3400C527B7 /* IMBObjectArrayController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		D09930F31010FD6400C527B7 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D099392F101236AB00C527B7 /* IMBOutlineView.h */,
+				D0993930101236AB00C527B7 /* IMBOutlineView.m */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		D09930F41010FD9900C527B7 /* Parsers */ = {
+			isa = PBXGroup;
+			children = (
+				D09930C01010F6C100C527B7 /* IMBParser.h */,
+				D09930C11010F6C100C527B7 /* IMBParser.m */,
+				D099320C1011158400C527B7 /* IMBFolderParser.h */,
+				D099320D1011158400C527B7 /* IMBFolderParser.m */,
+				D09933491011AE6B00C527B7 /* Photos */,
+			);
+			name = Parsers;
+			sourceTree = "<group>";
+		};
+		D09930F51010FDF700C527B7 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				D09930B41010F6C100C527B7 /* IMBCommon.h */,
+				D09931EA1011132300C527B7 /* IMBCommon.m */,
+				D09931A810110E8900C527B7 /* IMBConfig.h */,
+				D09931A710110E8900C527B7 /* IMBConfig.m */,
+				D09930BC1010F6C100C527B7 /* IMBOperationQueue.h */,
+				D09930BD1010F6C100C527B7 /* IMBOperationQueue.m */,
+			);
+			name = Common;
+			sourceTree = "<group>";
+		};
+		D099323410111A1600C527B7 /* Cocoa Additions */ = {
+			isa = PBXGroup;
+			children = (
+				D099324310111A2900C527B7 /* NSFileManager+iMedia.h */,
+				D099324410111A2900C527B7 /* NSFileManager+iMedia.m */,
+				D099324510111A2900C527B7 /* NSWorkspace+iMedia.h */,
+				D099324610111A2900C527B7 /* NSWorkspace+iMedia.m */,
+				D099326910111DCB00C527B7 /* NSString+iMedia.h */,
+				D099326810111DCB00C527B7 /* NSString+iMedia.m */,
+			);
+			name = "Cocoa Additions";
+			sourceTree = "<group>";
+		};
+		D09933491011AE6B00C527B7 /* Photos */ = {
+			isa = PBXGroup;
+			children = (
+				D099328F1011227100C527B7 /* IMBPhotosFolderParser.h */,
+				D09932901011227100C527B7 /* IMBPhotosFolderParser.m */,
+			);
+			name = Photos;
+			sourceTree = "<group>";
+		};
+		D099334E1011B22600C527B7 /* Test Application */ = {
+			isa = PBXGroup;
+			children = (
+				D09933571011B26E00C527B7 /* TestApp-Info.plist */,
+				D09934331011B63600C527B7 /* main.m */,
+				D09933B11011B32B00C527B7 /* IMBTestAppDelegate.h */,
+				D09933B21011B32B00C527B7 /* IMBTestAppDelegate.m */,
+				D09933B61011B3CE00C527B7 /* IMBTestApp.xib */,
+			);
+			name = "Test Application";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		8DC2EF500486A6940098B216 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */,
+				D09931AA10110E8900C527B7 /* IMBConfig.h in Headers */,
+				D09930CC1010F6C100C527B7 /* IMBOperationQueue.h in Headers */,
+				D09930C71010F6C100C527B7 /* IMBNode.h in Headers */,
+				D09930C91010F6C100C527B7 /* IMBObject.h in Headers */,
+				D09930D01010F6C100C527B7 /* IMBParser.h in Headers */,
+				D099320E1011158400C527B7 /* IMBFolderParser.h in Headers */,
+				D09932911011227100C527B7 /* IMBPhotosFolderParser.h in Headers */,
+				D09930D21010F6C100C527B7 /* IMBParserController.h in Headers */,
+				D09930C51010F6C100C527B7 /* IMBLibraryController.h in Headers */,
+				D09930CB1010F6C100C527B7 /* IMBObjectArrayController.h in Headers */,
+				D099324710111A2900C527B7 /* NSFileManager+iMedia.h in Headers */,
+				D099324910111A2900C527B7 /* NSWorkspace+iMedia.h in Headers */,
+				D099326B10111DCB00C527B7 /* NSString+iMedia.h in Headers */,
+				D0993305101197D100C527B7 /* IMBUserInterfaceController.h in Headers */,
+				D099330C10119D8200C527B7 /* IMBNodeTreeController.h in Headers */,
+				D0993931101236AB00C527B7 /* IMBOutlineView.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		8DC2EF4F0486A6940098B216 /* iMedia */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "iMedia" */;
+			buildPhases = (
+				8DC2EF500486A6940098B216 /* Headers */,
+				8DC2EF520486A6940098B216 /* Resources */,
+				8DC2EF540486A6940098B216 /* Sources */,
+				8DC2EF560486A6940098B216 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = iMedia;
+			productInstallPath = "$(HOME)/Library/Frameworks";
+			productName = iMedia;
+			productReference = 8DC2EF5B0486A6940098B216 /* iMedia.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		D09933541011B26E00C527B7 /* iMedia2 Tester */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D099335B1011B27000C527B7 /* Build configuration list for PBXNativeTarget "iMedia2 Tester" */;
+			buildPhases = (
+				D09933511011B26E00C527B7 /* Resources */,
+				D09933521011B26E00C527B7 /* Sources */,
+				D09933531011B26E00C527B7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D099345A1011B6FA00C527B7 /* PBXTargetDependency */,
+			);
+			name = "iMedia2 Tester";
+			productName = TestApp;
+			productReference = D09933551011B26E00C527B7 /* iMedia2.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0867D690FE84028FC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "iMedia" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 0867D691FE84028FC02AAC07 /* iMedia */;
+			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DC2EF4F0486A6940098B216 /* iMedia */,
+				D09933541011B26E00C527B7 /* iMedia2 Tester */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8DC2EF520486A6940098B216 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D09933511011B26E00C527B7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D09933B71011B3CE00C527B7 /* IMBTestApp.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DC2EF540486A6940098B216 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D09931EB1011132300C527B7 /* IMBCommon.m in Sources */,
+				D09931A910110E8900C527B7 /* IMBConfig.m in Sources */,
+				D09930CD1010F6C100C527B7 /* IMBOperationQueue.m in Sources */,
+				D09930C81010F6C100C527B7 /* IMBNode.m in Sources */,
+				D09930CA1010F6C100C527B7 /* IMBObject.m in Sources */,
+				D09930D11010F6C100C527B7 /* IMBParser.m in Sources */,
+				D099320F1011158400C527B7 /* IMBFolderParser.m in Sources */,
+				D09932921011227100C527B7 /* IMBPhotosFolderParser.m in Sources */,
+				D09930D31010F6C100C527B7 /* IMBParserController.m in Sources */,
+				D09930C61010F6C100C527B7 /* IMBLibraryController.m in Sources */,
+				D099324810111A2900C527B7 /* NSFileManager+iMedia.m in Sources */,
+				D099324A10111A2900C527B7 /* NSWorkspace+iMedia.m in Sources */,
+				D099326A10111DCB00C527B7 /* NSString+iMedia.m in Sources */,
+				D0993304101197D100C527B7 /* IMBUserInterfaceController.m in Sources */,
+				D099333110119EA300C527B7 /* IMBNodeTreeController.m in Sources */,
+				D099333310119F3400C527B7 /* IMBObjectArrayController.m in Sources */,
+				D0993932101236AB00C527B7 /* IMBOutlineView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D09933521011B26E00C527B7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D09933B31011B32B00C527B7 /* IMBTestAppDelegate.m in Sources */,
+				D09934341011B63600C527B7 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D099345A1011B6FA00C527B7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* iMedia */;
+			targetProxy = D09934591011B6FA00C527B7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		089C1666FE841158C02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C1667FE841158C02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB91AE08733DA50010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = iMedia.pch;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				PRODUCT_NAME = iMedia;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		1DEB91AF08733DA50010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = iMedia.pch;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				PRODUCT_NAME = iMedia;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
+		1DEB91B208733DA50010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = 4.2;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+			};
+			name = Debug;
+		};
+		1DEB91B308733DA50010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = 4.2;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+			};
+			name = Release;
+		};
+		D09930B21010F68B00C527B7 /* Test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = 4.2;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+			};
+			name = Test;
+		};
+		D09930B31010F68B00C527B7 /* Test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = iMedia.pch;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				PRODUCT_NAME = iMedia;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Test;
+		};
+		D09933581011B27000C527B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = iMedia.pch;
+				INFOPLIST_FILE = "TestApp-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = iMedia2;
+			};
+			name = Debug;
+		};
+		D09933591011B27000C527B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = iMedia.pch;
+				INFOPLIST_FILE = "TestApp-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = iMedia2;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		D099335A1011B27000C527B7 /* Test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = iMedia.pch;
+				INFOPLIST_FILE = "TestApp-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = iMedia2;
+			};
+			name = Test;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "iMedia" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91AE08733DA50010E9CD /* Debug */,
+				1DEB91AF08733DA50010E9CD /* Release */,
+				D09930B31010F68B00C527B7 /* Test */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "iMedia" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91B208733DA50010E9CD /* Debug */,
+				1DEB91B308733DA50010E9CD /* Release */,
+				D09930B21010F68B00C527B7 /* Test */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D099335B1011B27000C527B7 /* Build configuration list for PBXNativeTarget "iMedia2 Tester" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D09933581011B27000C527B7 /* Debug */,
+				D09933591011B27000C527B7 /* Release */,
+				D099335A1011B27000C527B7 /* Test */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0867D690FE84028FC02AAC07 /* Project object */;
+}
