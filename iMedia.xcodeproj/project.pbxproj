@@ -26,6 +26,7 @@
 		D08E8D821019EB09005D8614 /* IMBFSEventsWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D801019EB09005D8614 /* IMBFSEventsWatcher.m */; };
 		D08E8D851019EB4D005D8614 /* IMBMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D831019EB4D005D8614 /* IMBMainThreadProxy.m */; };
 		D08E8D861019EB4D005D8614 /* IMBMainThreadProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8D841019EB4D005D8614 /* IMBMainThreadProxy.h */; };
+		D08E8FB7101A0F0D005D8614 /* iMedia.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
 		D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B41010F6C100C527B7 /* IMBCommon.h */; };
 		D09930C51010F6C100C527B7 /* IMBLibraryController.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B51010F6C100C527B7 /* IMBLibraryController.h */; };
 		D09930C61010F6C100C527B7 /* IMBLibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930B61010F6C100C527B7 /* IMBLibraryController.m */; };
@@ -78,6 +79,20 @@
 			remoteInfo = iMedia;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D08E8FBA101A0F15005D8614 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D08E8FB7101A0F0D005D8614 /* iMedia.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -452,6 +467,7 @@
 				D09933511011B26E00C527B7 /* Resources */,
 				D09933521011B26E00C527B7 /* Sources */,
 				D09933531011B26E00C527B7 /* Frameworks */,
+				D08E8FBA101A0F15005D8614 /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
@@ -577,7 +593,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = iMedia.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -595,7 +611,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = iMedia.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -654,7 +670,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = iMedia.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
 				WRAPPER_EXTENSION = framework;
 			};
