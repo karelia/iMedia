@@ -61,6 +61,8 @@
 @implementation IMBObjectArrayController
 
 @synthesize delegate = _delegate;
+@synthesize objectUnitSingular = _objectUnitSingular;
+@synthesize objectUnitPlural = _objectUnitPlural;
 @synthesize searchableProperties = _searchableProperties;
 @synthesize searchString = _searchString;
 
@@ -72,9 +74,7 @@
 {
 	if (self = [super init])
 	{
-		_searchableProperties = nil;
-		_searchString = nil;
-		_delegate = nil;	
+
 	}
 	
 	return self; 
@@ -83,13 +83,19 @@
 
 - (void) dealloc
 {
+	IMBRelease(_objectUnitSingular);
+	IMBRelease(_objectUnitPlural);
 	IMBRelease(_searchableProperties);
 	IMBRelease(_searchString);
+	
 	[super dealloc];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 
 
 - (IBAction) search:(id)inSender
@@ -109,6 +115,21 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Set default values, and keep reference to new object -- see arrangeObjects:
+
+- (id) newObject
+{
+    _newObject = [super newObject];
+	
+//	for (NSString* key in _searchableProperties)
+//	{
+//		[_newObject setValue:key forKey:key];
+//	}
+
+    return _newObject;
+}
 
 
 - (NSArray*) arrangeObjects:(NSArray*)inObjects
@@ -200,18 +221,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Set default values, and keep reference to new object -- see arrangeObjects:
+#pragma mark 
 
-- (id) newObject
-{
-    _newObject = [super newObject];
 	
-//	for (NSString* key in _searchableProperties)
-//	{
-//		[_newObject setValue:key forKey:key];
-//	}
+// When the number of objects changes, then rebuild the description string. The UI can bind this string...
 
-    return _newObject;
+
++ (NSSet*) keyPathsForValuesAffectingValueForKey:(NSString*)inKey
+{
+    NSSet* keyPaths = [super keyPathsForValuesAffectingValueForKey:inKey];
+ 
+    if ([inKey isEqualToString:@"objectCountString"])
+    {
+        keyPaths = [keyPaths setByAddingObjectsFromSet:[NSSet setWithObjects:@"arrangedObjects",@"objectUnitSingular",@"objectUnitPlural",nil]];
+    }
+	
+    return keyPaths;
+}
+
+
+- (NSString*) objectCountString
+{
+	NSUInteger count = [[self arrangedObjects] count];
+	NSString* unit = count==1 ? self.objectUnitSingular : self.objectUnitPlural;
+	return [NSString stringWithFormat:@"%d %@",count,unit];
 }
 
 
