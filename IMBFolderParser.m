@@ -99,6 +99,7 @@
 	NSError* error = nil;
 	NSString* parserClassName = NSStringFromClass([self class]);
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
+	path = [path stringByStandardizingPath];
 	
 	// Create an empty root node (unpopulated and without subnodes)...
 	
@@ -111,6 +112,18 @@
 	newNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
 	newNode.parser = self;
 	newNode.leaf = NO;
+
+	// Enable FSEvents based file watching for root nodes...
+	
+	if (newNode.parentNode == nil)
+	{
+		newNode.watcherType = kIMBWatcherTypeFSEvent;
+		newNode.watchedPath = path;
+	}
+	else
+	{
+		newNode.watcherType = kIMBWatcherTypeNone;
+	}
 	
 	// If the old node had subnodes, then look for subnodes in the new node...
 	
@@ -123,7 +136,7 @@
 	
 	if ([inOldNode.objects count] > 0)
 	{
-		[self populatedNode:newNode options:inOptions error:&error];
+		[self populateNode:newNode options:inOptions error:&error];
 	}
 
 	
@@ -184,7 +197,7 @@
 // The supplied node is a private copy which may be modified here in the background operation. Scan the folder
 // for files that match our desired UTI and create an IMBObject for each file that qualifies...
 
-- (BOOL) populatedNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
 	

@@ -67,6 +67,8 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 @class IMBParser;
 @class IMBNode;
+@class IMBKQueue;
+@class IMBFSEventsWatcher;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -81,6 +83,9 @@ extern NSString* kIMBNodesDidChangeNotification;
 	NSMutableArray* _nodes;
 	IMBOptions _options;
 	id _delegate;
+
+	IMBKQueue* _watcherKQueue;
+	IMBFSEventsWatcher* _watcherFSEvents;
 }
 
 // Create singleton instance of the controller. Don't forget to set the delegate early in the app lifetime...
@@ -92,6 +97,9 @@ extern NSString* kIMBNodesDidChangeNotification;
 @property (retain) NSMutableArray* nodes;
 @property (assign) IMBOptions options;
 @property (assign) id delegate;
+
+@property (retain) IMBKQueue* watcherKQueue;
+@property (retain) IMBFSEventsWatcher* watcherFSEvents;
 
 // Loading...
 

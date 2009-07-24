@@ -54,6 +54,8 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBCommon.h"
+#import "IMBKQueue.h"
+#import "IMBFSEventsWatcher.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,6 +132,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _didSelectNode:(IMBNode*)inNode;
 - (void) _replaceNode:(NSDictionary*)inOldAndNewNode;
 - (void) _presentError:(NSError*)inError;
+- (void) _fileWatcherDidFireForPath:(NSString*)inPath;
+- (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
+- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
 @end
 
 
@@ -260,7 +265,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) main
 {
 	NSError* error = nil;
-	[_parser populatedNode:self.newNode options:self.options error:&error];
+	[_parser populateNode:self.newNode options:self.options error:&error];
 	
 	if (error == nil)
 	{
@@ -287,6 +292,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @synthesize nodes = _nodes;
 @synthesize options = _options;
 @synthesize delegate = _delegate;
+
+@synthesize watcherKQueue = _watcherKQueue;
+@synthesize watcherFSEvents = _watcherFSEvents;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -329,6 +337,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		self.mediaType = inMediaType;
 		self.nodes = [NSMutableArray array];
 		self.options = kIMBOptionNone;
+		
+		self.watcherKQueue = [[[IMBKQueue alloc] init] autorelease];
+		self.watcherKQueue.delegate = self;
+		
+		self.watcherFSEvents = [[[IMBFSEventsWatcher alloc] init] autorelease];
+		self.watcherFSEvents.delegate = self;
 	}
 	
 	return self;
@@ -339,6 +353,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	IMBRelease(_mediaType);
 	IMBRelease(_nodes);
+	IMBRelease(_watcherKQueue);
+	IMBRelease(_watcherFSEvents);
+
 	[super dealloc];
 }
 
@@ -413,6 +430,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _replaceNode:(NSDictionary*)inOldAndNewNode
 {
+	NSString* watchedPath = nil;
+	
 	// Tell IMBUserInterfaceController that we are goind to modify the data model...
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillChangeNotification object:self];
@@ -440,14 +459,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		parent = oldNode.parentNode;
 	
 	NSMutableArray* siblings = nil;
-//	siblings = parent ? (NSMutableArray*)parent.subNodes : self.nodes;
 
 	if (parent)
 		siblings = [parent mutableArrayValueForKey:@"subNodes"];
 	else
 		siblings = [self mutableArrayValueForKey:@"nodes"];
 
-	// Remove the old node from the correct place (but remember its index)...
+	// Remove the old node from the correct place (but remember its index). Also unregister from file watching...
 	
 	if (parent) [parent willChangeValueForKey:@"subNodes"];
 	else [self willChangeValueForKey:@"nodes"];
@@ -456,32 +474,32 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (oldNode)
 	{
+		if (watchedPath = oldNode.watchedPath)
+		{
+			if (oldNode.watcherType == kIMBWatcherTypeKQueue)
+				[self.watcherKQueue removePath:watchedPath];
+			else if (oldNode.watcherType == kIMBWatcherTypeFSEvent)
+				[self.watcherFSEvents removePath:watchedPath];
+		}
+			
 		index = [siblings indexOfObjectIdenticalTo:oldNode];
-//		NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
-//
-//		if (parent) [parent willChange:NSKeyValueChangeRemoval valuesAtIndexes:indexSet forKey:@"subNodes"];
-//		else [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:indexSet forKey:@"nodes"];
-
 		[siblings removeObjectIdenticalTo:oldNode];
-		
-//		if (parent) [parent didChange:NSKeyValueChangeRemoval valuesAtIndexes:indexSet forKey:@"subNodes"];
-//		else [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:indexSet forKey:@"nodes"];
 	}
 	
-	// Insert the new node in the same location...
+	// Insert the new node in the same location. Optionally register the node for file watching...
 		
 	if (newNode)
 	{
 		if (index == NSNotFound) index = siblings.count;
-//		NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
-//
-//		if (parent) [parent willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexSet forKey:@"subNodes"];
-//		else [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexSet forKey:@"nodes"];
-
 		[siblings insertObject:newNode atIndex:index];
 		
-//		if (parent) [parent willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexSet forKey:@"subNodes"];
-//		else [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexSet forKey:@"nodes"];
+		if (watchedPath = newNode.watchedPath)
+		{
+			if (newNode.watcherType == kIMBWatcherTypeKQueue)
+				[self.watcherKQueue addPath:watchedPath];
+			else if (newNode.watcherType == kIMBWatcherTypeFSEvent)
+				[self.watcherFSEvents addPath:watchedPath];
+		}
 	}
 	
 	if (parent) [parent didChangeValueForKey:@"subNodes"];
@@ -594,6 +612,67 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didSelectNode:)])
 	{
 		[_delegate controller:self didSelectNode:inNode];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// A file watcher has fired for one of the paths we have registered...
+
+- (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath
+{
+	if ([inNotificationName isEqualToString:IMBFileWatcherRenameNotification] ||
+		[inNotificationName isEqualToString:IMBFileWatcherWriteNotification] ||
+		[inNotificationName isEqualToString:IMBFileWatcherDeleteNotification] )
+	{
+		SEL method = @selector(_fileWatcherDidFireForPath:);
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:inPath];
+		[self performSelector:method withObject:inPath afterDelay:0.5 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+}
+
+
+// Pass the message on to the main thread...
+
+- (void) _fileWatcherDidFireForPath:(NSString*)inPath
+{
+	if ([NSThread isMainThread])
+	{
+		[self _reloadNodesWithWatchedPath:inPath];
+	}
+	else
+	{
+		[self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:inPath waitUntilDone:NO];
+	}
+}	
+
+
+// Now look for all nodes that are interested in that path and reload them...
+
+- (void) _reloadNodesWithWatchedPath:(NSString*)inPath
+{
+	[self _reloadNodesWithWatchedPath:inPath nodes:self.nodes];
+}	
+
+
+- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes
+{
+	NSString* watchedPath = [inPath stringByStandardizingPath];
+	
+	for (IMBNode* node in inNodes)
+	{
+		NSString* nodePath = [(NSString*)node.mediaSource stringByStandardizingPath];
+		
+		if ([nodePath isEqualToString:watchedPath])
+		{
+			[self reloadNode:node];
+		}
+		else
+		{
+			[self _reloadNodesWithWatchedPath:inPath nodes:node.subNodes];
+		}
 	}
 }
 
