@@ -53,15 +53,18 @@
 {
 	IBOutlet NSSearchField* ibSearchField;
 	IBOutlet id _delegate;
+	NSString* _objectUnitSingular;
+	NSString* _objectUnitPlural;
 	
 	NSArray* _searchableProperties;
 	NSString* _searchString;
 	id _newObject;
 }
 
-// Delegate...
-
 @property (assign) id delegate;
+@property (retain) NSString* objectUnitSingular;
+@property (retain) NSString* objectUnitPlural;
+- (NSString*) objectCountString;
 
 // Filtering...
 

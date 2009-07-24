@@ -112,13 +112,13 @@
 
 - (void) awakeFromNib
 {
-	[ibObjectArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:NULL];
+	ibObjectArrayController.objectUnitSingular = NSLocalizedString(@"objectUnitSingular",@"Name of object media type (singular)");
+	ibObjectArrayController.objectUnitPlural = NSLocalizedString(@"objectUnitPlural",@"Name of object media type (singular)");
 }
 
 
 - (void) dealloc
 {
-	[ibObjectArrayController removeObserver:self forKeyPath:@"arrangedObjects"];
 	[self _stopObservingLibraryController];
 	
 	IMBRelease(_libraryController);
@@ -271,7 +271,7 @@
 {
 	// Expanded nodes...
 	
-	while ([self.expandedNodeIdentifiers count] > 0)
+	while ([_expandedNodeIdentifiers count] > 0)
 	{
 		NSInteger rows = [ibNodeOutlineView numberOfRows];
 		
@@ -281,10 +281,10 @@
 			IMBNode* node = [item representedObject];
 			NSString* identifier = node.identifier;
 			
-			if ([self.expandedNodeIdentifiers indexOfObject:identifier] != NSNotFound)
+			if ([_expandedNodeIdentifiers indexOfObject:identifier] != NSNotFound)
 			{
 				[ibNodeOutlineView expandItem:item];
-				[self.expandedNodeIdentifiers removeObjectIdenticalTo:identifier];
+				[_expandedNodeIdentifiers removeObject:identifier];
 			}
 		}
 	}
@@ -377,41 +377,6 @@
 - (IBAction) removeNode:(id)inSender
 {
 
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-
-- (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)iChange context:(void*)inContext
-{
-	[self willChangeValueForKey:@"objectCountString"];
-	[self didChangeValueForKey:@"objectCountString"];
-}
-
-
-- (NSString*) objectUnitSingular
-{
-	return @"image";
-	return NSLocalizedString(@"objectUnitSingular",@"Name of object media type (singular)");
-}	
-
-
-- (NSString*) objectUnitPlural
-{
-	return @"images";
-	return NSLocalizedString(@"objectUnitPlural",@"Name of object media type (singular)");
-}
-
-
-- (NSString*) objectCountString
-{
-	NSUInteger count = [[ibObjectArrayController arrangedObjects] count];
-	NSString* unit = count==1 ? self.objectUnitSingular : self.objectUnitPlural;
-	return [NSString stringWithFormat:@"%d %@",count,unit];
 }
 
 

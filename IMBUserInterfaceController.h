@@ -139,7 +139,6 @@
 @property (readonly) NSTabView* objectTabView;
 @property (readonly) NSTableView* objectTableView;
 @property (readonly) IKImageBrowserView* objectImageBrowserView;
-@property (readonly) NSString* objectCountString;
 @property (assign) NSInteger objectViewType;
 @property (assign) double objectIconSize;
 
