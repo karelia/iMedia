@@ -105,7 +105,7 @@
 }
 
 
-- (BOOL) populatedNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	return NO;
 }
