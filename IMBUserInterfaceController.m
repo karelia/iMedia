@@ -65,10 +65,18 @@
 // Private methods...
 
 @interface IMBUserInterfaceController ()
+
 - (void) _startObservingLibraryController;
 - (void) _stopObservingLibraryController;
-- (void) _saveUserInterfaceState;
+
+- (NSMutableDictionary*) _preferences;
+- (void) _setPreferences:(NSMutableDictionary*)inDict;
+- (void) _saveStateToPreferences;
+- (void) _loadStateFromPreferences;
+
+- (NSMutableArray*) _expandedNodeIdentifiers;
 - (void) _restoreUserInterfaceState;
+
 @end
 
 
@@ -104,6 +112,7 @@
 	{
 		_selectedNodeIdentifier = nil;
 		_expandedNodeIdentifiers = nil;
+		_shouldStoreIdentifiers = YES;
 	}
 	
 	return self;
@@ -114,12 +123,21 @@
 {
 	ibObjectArrayController.objectUnitSingular = NSLocalizedString(@"objectUnitSingular",@"Name of object media type (singular)");
 	ibObjectArrayController.objectUnitPlural = NSLocalizedString(@"objectUnitPlural",@"Name of object media type (singular)");
+	
+	// Load the last known state from preferences, and save once the app is about to quit...
+	
+	[[NSNotificationCenter defaultCenter] 
+		addObserver:self 
+		selector:@selector(_saveStateToPreferences) 
+		name:NSApplicationWillTerminateNotification 
+		object:nil];
 }
 
 
 - (void) dealloc
 {
 	[self _stopObservingLibraryController];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	IMBRelease(_libraryController);
 	IMBRelease(_selectedNodeIdentifier);
@@ -143,16 +161,23 @@
 	[old release];
 	
 	[self _startObservingLibraryController];
+	[self _loadStateFromPreferences];
+}
+
+
+- (NSString*) mediaType
+{
+	return self.libraryController.mediaType;
 }
 
 
 - (void) _startObservingLibraryController
 {
-	[[NSNotificationCenter defaultCenter] 
-		addObserver:self 
-		selector:@selector(_saveUserInterfaceState) 
-		name:kIMBNodesWillChangeNotification 
-		object:_libraryController];
+//	[[NSNotificationCenter defaultCenter] 
+//		addObserver:self 
+//		selector:@selector(_saveUserInterfaceState) 
+//		name:kIMBNodesWillChangeNotification 
+//		object:_libraryController];
 		
 	[[NSNotificationCenter defaultCenter] 
 		addObserver:self 
@@ -164,10 +189,10 @@
 
 - (void) _stopObservingLibraryController
 {
-	[[NSNotificationCenter defaultCenter] 
-		removeObserver:self 
-		name:kIMBNodesWillChangeNotification 
-		object:_libraryController];
+//	[[NSNotificationCenter defaultCenter] 
+//		removeObserver:self 
+//		name:kIMBNodesWillChangeNotification 
+//		object:_libraryController];
 
 	[[NSNotificationCenter defaultCenter] 
 		removeObserver:self 
@@ -179,9 +204,39 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSString*) mediaType
+- (NSMutableDictionary*) _preferences
 {
-	return self.libraryController.mediaType;
+	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+	return [NSMutableDictionary dictionaryWithDictionary:[classDict objectForKey:self.mediaType]];
+}
+
+
+- (void) _setPreferences:(NSMutableDictionary*)inDict
+{
+	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+	[classDict setObject:inDict forKey:self.mediaType];
+	[IMBConfig setPrefs:classDict forClass:self.class];
+}
+
+
+- (void) _saveStateToPreferences
+{
+	NSMutableDictionary* stateDict = [self _preferences];
+	[stateDict setObject:self.expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
+	[stateDict setObject:self.selectedNodeIdentifier forKey:@"selectedNodeIdentifier"];
+	[self _setPreferences:stateDict];
+}
+
+
+- (void) _loadStateFromPreferences
+{
+	NSMutableDictionary* stateDict = [self _preferences];
+	
+	self.expandedNodeIdentifiers = [stateDict objectForKey:@"expandedNodeIdentifiers"];
+	self.selectedNodeIdentifier = [stateDict objectForKey:@"selectedNodeIdentifier"];
+	
+	float splitviewPosition = [[stateDict objectForKey:@"splitviewPosition"] floatValue];
+	if (splitviewPosition > 0.0) [ibSplitView setPosition:splitviewPosition ofDividerAtIndex:0];
 }
 
 
@@ -189,13 +244,7 @@
 
 
 #pragma mark 
-#pragma mark Actions
-
-
-- (IBAction) selectNodeFromPopup:(id)inSender
-{
-
-}
+#pragma mark NSOutlineView Delegate
 
 
 // The user just tried to select a row in the IMBOutlineView. Notify the library controller. It will in turn populate 
@@ -203,14 +252,41 @@
 
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldSelectItem:(id)inItem
 {
+	BOOL shouldSelect = YES;
 	IMBNode* node = [inItem representedObject];
-	[self.libraryController selectNode:node];
-	return YES;	
+	id delegate = self.libraryController.delegate;
+	
+	if ([delegate respondsToSelector:@selector(controller:willSelectNode:)])
+	{
+		shouldSelect = [delegate controller:self.libraryController willSelectNode:node];
+	}
+
+	if (shouldSelect)
+	{
+		if (_shouldStoreIdentifiers) self.selectedNodeIdentifier = node.identifier;
+		[self.libraryController selectNode:node];
+	}
+	
+	return shouldSelect;	
 }
 
 
 // The user is going to expand an item in the IMBOutlineView. Notify the library controller. It will in turn add  
 // subnodes to the node if necessary...
+
+- (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldExpandItem:(id)inItem
+{
+	BOOL shouldExpand = YES;
+	IMBNode* node = [inItem representedObject];
+	id delegate = self.libraryController.delegate;
+	
+	if ([delegate respondsToSelector:@selector(controller:willExpandNode:)])
+	{
+		shouldExpand = [delegate controller:self.libraryController willExpandNode:node];
+	}
+	
+	return shouldExpand;
+}
 
 - (void) outlineViewItemWillExpand:(NSNotification*)inNotification
 {
@@ -223,20 +299,96 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// When nodes were expanded, collapsed, or selected, then store the current state of the user interface...
+
+
+- (void) outlineViewItemDidExpand:(NSNotification*)inNotification
+{
+	if (_shouldStoreIdentifiers)
+	{
+		self.expandedNodeIdentifiers = [self _expandedNodeIdentifiers];
+	}	
+}
+
+
+- (void) outlineViewItemDidCollapse:(NSNotification*)inNotification
+{
+	if (_shouldStoreIdentifiers)
+	{
+		self.expandedNodeIdentifiers = [self _expandedNodeIdentifiers];
+	}	
+}
+
+//- (void) outlineViewSelectionDidChange:(NSNotification*)inNotification
+//{
+//	NSInteger selectedRow = [ibNodeOutlineView selectedRow];
+//	
+//	if (selectedRow >= 0)
+//	{
+//		id selectedItem = [ibNodeOutlineView itemAtRow:selectedRow];
+//		IMBNode* selectedNode = [selectedItem representedObject]; 
+//		if (selectedNode) self.selectedNodeIdentifier = selectedNode.identifier;
+//	}
+//}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark NSSplitView Delegate
+
+
+// Store the current divider position in the preferences...
+
+- (CGFloat) splitView:(NSSplitView*)inSplitView constrainSplitPosition:(CGFloat)inPosition ofSubviewAt:(NSInteger)inIndex
+{
+	NSMutableDictionary* stateDict = [self _preferences];
+	[stateDict setObject:[NSNumber numberWithFloat:inPosition] forKey:@"splitviewPosition"];
+	[self _setPreferences:stateDict];
+
+	return inPosition;
+}
+
+
+// When resising the splitview, then make sure that only the bottom part (object view) gets resized, and that the
+// IMBOutlineView is not affected...
+
+- (void) splitView:(NSSplitView*)inSplitView resizeSubviewsWithOldSize:(NSSize)inOldSize
+{
+    NSView* topView = [[inSplitView subviews] objectAtIndex:0];  
+    NSView* bottomView = [[inSplitView subviews] objectAtIndex:1];
+    float dividerThickness = [inSplitView dividerThickness]; 
+	
+    NSRect newFrame = [inSplitView frame];   
+	                
+    NSRect topFrame = [topView frame];                    
+	topFrame.size.width = newFrame.size.width;
+   
+    NSRect bottomFrame = [bottomView frame];    
+    bottomFrame.origin = NSMakePoint(0,0);  
+    bottomFrame.size.height = newFrame.size.height - topFrame.size.height - dividerThickness;
+    bottomFrame.size.width = newFrame.size.width;          
+    bottomFrame.origin.y = topFrame.size.height + dividerThickness; 
+ 
+	[topView setFrame:topFrame];
+    [bottomView setFrame:bottomFrame];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 #pragma mark Saving & Restoring State
 
 
-// Called in response to a IMBNodesWillChangeNotification notification. Store the identifiers of all expanded 
-// nodes an the identifier of the selected node. Since the node objects are about to be replaced (different 
-// instances, but same contents) we won't be able to know them by their object pointers. That's why we need
-// their identifiers...
+// Get the identifiers of all currently expanded nodes. The result is a flat array, which is needed in the method
+// _restoreUserInterfaceState to try to restore the state of the user interface...
 
-- (void) _saveUserInterfaceState
+- (NSMutableArray*) _expandedNodeIdentifiers
 {
-	// Expanded nodes...
-	
-	self.expandedNodeIdentifiers = [NSMutableArray array];
+	NSMutableArray* expandedNodeIdentifiers = [NSMutableArray array];
 	
 	NSInteger n = [ibNodeOutlineView numberOfRows];
 	
@@ -247,16 +399,11 @@
 		if ([ibNodeOutlineView isItemExpanded:item])
 		{
 			IMBNode* node = [item representedObject];
-			[self.expandedNodeIdentifiers addObject:node.identifier];
+			[expandedNodeIdentifiers addObject:node.identifier];
 		}
 	}
 
-	// Selected node...
-	
-	NSInteger selectedRow = [ibNodeOutlineView selectedRow];
-	id selectedItem = [ibNodeOutlineView itemAtRow:selectedRow];
-	IMBNode* selectedNode = [selectedItem representedObject]; 
-	if (selectedNode) self.selectedNodeIdentifier = selectedNode.identifier;
+	return expandedNodeIdentifiers;
 }
 
 
@@ -269,9 +416,14 @@
 
 - (void) _restoreUserInterfaceState
 {
+	_shouldStoreIdentifiers = NO;
+	
 	// Expanded nodes...
 	
-	while ([_expandedNodeIdentifiers count] > 0)
+	NSMutableArray* expandedNodeIdentifiers = [NSMutableArray arrayWithArray:self.expandedNodeIdentifiers];
+	NSUInteger count;
+	
+	while (count = [expandedNodeIdentifiers count])
 	{
 		NSInteger rows = [ibNodeOutlineView numberOfRows];
 		
@@ -281,20 +433,24 @@
 			IMBNode* node = [item representedObject];
 			NSString* identifier = node.identifier;
 			
-			if ([_expandedNodeIdentifiers indexOfObject:identifier] != NSNotFound)
+			if ([expandedNodeIdentifiers indexOfObject:identifier] != NSNotFound)
 			{
 				[ibNodeOutlineView expandItem:item];
-				[_expandedNodeIdentifiers removeObject:identifier];
+				[expandedNodeIdentifiers removeObject:identifier];
 			}
 		}
+		
+		if ([expandedNodeIdentifiers count] == count)
+		{
+			break;
+		}
 	}
-	
-	self.expandedNodeIdentifiers = nil;
 	
 	// Selected node...
 	
 	[self selectNodeWithIdentifier:self.selectedNodeIdentifier];
-	self.selectedNodeIdentifier = nil;
+	
+	_shouldStoreIdentifiers = YES;
 }
 
 
@@ -314,6 +470,7 @@
 	{	
 		NSIndexPath* indexPath = inNode.indexPath;
 		[ibNodeTreeController setSelectionIndexPath:indexPath];
+		[self.libraryController selectNode:inNode];
 	}	
 }
 

@@ -667,6 +667,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		if ([nodePath isEqualToString:watchedPath])
 		{
+			if ([node.parser respondsToSelector:@selector(watchedPathDidChange:)])
+			{
+				[node.parser watchedPathDidChange:watchedPath];
+			}
+				
 			[self reloadNode:node];
 		}
 		else

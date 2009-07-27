@@ -70,17 +70,34 @@ static NSString* sIMBPrefsKey = @"iMedia2";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Low level accessors for preferences values...
+
+
++ (void) setPrefsValue:(id)inValue forKey:(NSString*)inKey
+{
+	NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
+	NSMutableDictionary* iMediaDict = [NSMutableDictionary dictionaryWithDictionary:[prefs dictionaryForKey:sIMBPrefsKey]];
+	[iMediaDict setObject:inValue forKey:inKey];
+	[prefs setObject:iMediaDict forKey:sIMBPrefsKey];
+}
+
+
++ (id) prefsValueForKey:(NSString*)inKey
+{
+	NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
+	NSDictionary* iMediaDict = [prefs dictionaryForKey:sIMBPrefsKey];
+	return [iMediaDict objectForKey:inKey];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Store the specified dictionary in the iMedia section of the preferences under its class name...
 
 + (void) setPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass
 {
-	NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
-	
-	NSMutableDictionary* iMediaDict = [[[prefs dictionaryForKey:sIMBPrefsKey] mutableCopy] autorelease];
-	if (iMediaDict == nil) iMediaDict = [NSMutableDictionary dictionary];
-	
-	[iMediaDict setObject:inClassDict forKey:NSStringFromClass(inClass)];
-	[prefs setObject:iMediaDict forKey:sIMBPrefsKey];
+	[self setPrefsValue:inClassDict forKey:NSStringFromClass(inClass)];
 }
 
 
@@ -89,11 +106,7 @@ static NSString* sIMBPrefsKey = @"iMedia2";
 
 + (NSMutableDictionary*) prefsForClass:(Class)inClass
 {
-	NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
-	NSDictionary* iMediaDict = [prefs dictionaryForKey:sIMBPrefsKey];
-	NSDictionary* classDict = [iMediaDict objectForKey:NSStringFromClass(inClass)];
-	
-	return [NSMutableDictionary dictionaryWithDictionary:classDict];
+	return [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:NSStringFromClass(inClass)]];
 }
 
 

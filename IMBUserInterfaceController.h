@@ -88,8 +88,10 @@
 	IBOutlet IMBNodeTreeController* ibNodeTreeController;
 	IBOutlet IMBOutlineView* ibNodeOutlineView;
 	IBOutlet NSPopUpButton* ibNodePopupButton;
+	
 	NSString* _selectedNodeIdentifier;
 	NSMutableArray* _expandedNodeIdentifiers;
+	BOOL _shouldStoreIdentifiers;
 	
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
 	IBOutlet NSTabView* ibObjectTabView;
@@ -100,7 +102,6 @@
 	
 //	IBOutlet NSSlider* ibSizeSlider;
 //	IBOutlet NSSearchField* ibSearchField;
-	
 }
 
 // Library...
@@ -114,24 +115,11 @@
 @property (readonly) IMBOutlineView* nodeOutlineView;
 @property (readonly) NSPopUpButton* nodePopupButton;
 
-- (IBAction) selectNodeFromPopup:(id)inSender;
-
 @property (retain) NSString* selectedNodeIdentifier;
 @property (retain) NSMutableArray* expandedNodeIdentifiers;
-
 - (void) selectNodeWithIdentifier:(NSString*)inIdentifier;
 - (void) selectNode:(IMBNode*)inNode;
 - (IMBNode*) selectedNode;
-
-
-- (BOOL) canReload;
-- (IBAction) reload:(id)inSender;
-
-- (BOOL) canAddNode;
-- (IBAction) addNode:(id)inSender;
-
-- (BOOL) canRemoveNode;
-- (IBAction) removeNode:(id)inSender;
 
 // Objects (media files)...
 
@@ -141,6 +129,17 @@
 @property (readonly) IKImageBrowserView* objectImageBrowserView;
 @property (assign) NSInteger objectViewType;
 @property (assign) double objectIconSize;
+
+// Actions...
+
+- (BOOL) canReload;
+- (IBAction) reload:(id)inSender;
+
+- (BOOL) canAddNode;
+- (IBAction) addNode:(id)inSender;
+
+- (BOOL) canRemoveNode;
+- (IBAction) removeNode:(id)inSender;
 
 @end
 
