@@ -53,6 +53,13 @@
 
 #define UKFileWatcher									IMBFileWatcher 
 #define UKFileWatcherDelegate							IMBFileWatcherDelegate 
+#define UKKQueue										IMBKQueue
+#define UKKQueuePathEntry								IMBKQueuePathEntry
+#define UKKQueueCentral									IMBKQueueCentral
+#define UKFNSubscribeFileWatcher						IMBFNSubscribeFileWatcher 
+#define UKFSEventsWatcher								IMBFSEventsWatcher 
+#define UKMainThreadProxy								IMBMainThreadProxy
+
 #define UKFileWatcherRenameNotification					IMBFileWatcherRenameNotification 
 #define UKFileWatcherWriteNotification					IMBFileWatcherWriteNotification 
 #define UKFileWatcherDeleteNotification					IMBFileWatcherDeleteNotification 
@@ -60,13 +67,6 @@
 #define UKFileWatcherSizeIncreaseNotification			IMBFileWatcherSizeIncreaseNotification 
 #define UKFileWatcherLinkCountChangeNotification		IMBFileWatcherLinkCountChangeNotification 
 #define UKFileWatcherAccessRevocationNotification		IMBFileWatcherAccessRevocationNotification 
-
-#define UKKQueue										IMBKQueue
-#define UKKQueuePathEntry								IMBKQueuePathEntry
-#define UKKQueueCentral									IMBKQueueCentral
-#define UKFNSubscribeFileWatcher						IMBFNSubscribeFileWatcher 
-#define UKFSEventsWatcher								IMBFSEventsWatcher 
-#define UKMainThreadProxy								IMBMainThreadProxy
 
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -48,7 +48,9 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
+#import "IMBiPhotoParser.h"
+#import "IMBNode.h"
+#import "IMBParserController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,11 +58,22 @@
 
 #pragma mark 
 
-@implementation IMBParser
+@implementation IMBiPhotoParser
 
-@synthesize mediaSource = _mediaSource;
-@synthesize mediaType = _mediaType;
-@synthesize custom = _custom;
+@synthesize plist = _plist;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
+	[pool release];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,9 +83,22 @@
 {
 	if (self = [super init])
 	{
-		_mediaSource = nil;
-		_mediaType = nil;
-		_custom = NO;
+		_plist = nil;
+		self.mediaSource = nil;
+		
+		// Find the path to the first iPhoto library...
+		
+		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
+		NSArray* libraries = (NSArray*)recentLibraries;
+		
+		for (NSString* library in libraries)
+		{
+			NSURL* url = [NSURL URLWithString:library];
+			self.mediaSource = [url path];
+			break;
+		}
+		
+		CFRelease(recentLibraries);
 	}
 	
 	return self;
@@ -81,8 +107,7 @@
 
 - (void) dealloc
 {
-	IMBRelease(_mediaSource);
-	IMBRelease(_mediaType);
+	IMBRelease(_plist);
 	[super dealloc];
 }
 
@@ -90,45 +115,88 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// The following three methods must be overridden by subclasses...
+#pragma mark 
+#pragma mark Parser Methods
 
 
 - (IMBNode*) createNode:(IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
 {
-	return nil;
+	NSError* error = nil;
+	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
+	path = [path stringByStandardizingPath];
+	
+	// Create an empty root node (unpopulated and without subnodes)...
+	
+	IMBNode* newNode = [[IMBNode alloc] init];
+	
+	newNode.parentNode = inOldNode.parentNode;
+	newNode.mediaSource = path;
+	newNode.identifier = [self identifierForPath:@"/"];
+	newNode.name = @"iPhoto";
+//	newNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+	newNode.parser = self;
+	newNode.leaf = NO;
+
+	// Enable FSEvents based file watching for root nodes...
+	
+	if (newNode.parentNode == nil)
+	{
+		newNode.watcherType = kIMBWatcherTypeFSEvent;
+		newNode.watchedPath = path;
+	}
+	else
+	{
+		newNode.watcherType = kIMBWatcherTypeNone;
+	}
+	
+	// If the old node had subnodes, then look for subnodes in the new node...
+	
+	if ([inOldNode.subNodes count] > 0)
+	{
+		[self expandNode:newNode options:inOptions error:&error];
+	}
+	
+	// If the old node was populated, then also populate the new node...
+	
+	if ([inOldNode.objects count] > 0)
+	{
+		[self populateNode:newNode options:inOptions error:&error];
+	}
+
+	
+	if (outError) *outError = error;
+	return newNode;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Scan the our folder for subfolders and add a subnode for each one we find...
 
 - (BOOL) expandNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
-	return NO;
+	NSError* error = nil;
+	
+	if (outError) *outError = error;
+	return error == nil;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// The supplied node is a private copy which may be modified here in the background operation. Scan the folder
+// for files that match our desired UTI and create an IMBObject for each file that qualifies...
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
-	return NO;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Can be overridden by subclass to invalidate any caches...
-
-- (void) watchedPathDidChange:(NSString*)inWatchedPath
-{
-
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSString*) identifierForPath:(NSString*)inPath
-{
-	NSString* parserClassName = NSStringFromClass([self class]);
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+	NSError* error = nil;
+		
+	// Return error...
+	
+	if (outError) *outError = error;
+	return error == nil;
 }
 
 

@@ -68,6 +68,8 @@
 		D09934341011B63600C527B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D09934331011B63600C527B7 /* main.m */; };
 		D0993931101236AB00C527B7 /* IMBOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = D099392F101236AB00C527B7 /* IMBOutlineView.h */; };
 		D0993932101236AB00C527B7 /* IMBOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993930101236AB00C527B7 /* IMBOutlineView.m */; };
+		D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */; };
+		D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -166,6 +168,8 @@
 		D09934331011B63600C527B7 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D099392F101236AB00C527B7 /* IMBOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBOutlineView.h; sourceTree = "<group>"; };
 		D0993930101236AB00C527B7 /* IMBOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBOutlineView.m; sourceTree = "<group>"; };
+		D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoParser.h; sourceTree = "<group>"; };
+		D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoParser.m; sourceTree = "<group>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
@@ -383,6 +387,8 @@
 			children = (
 				D099328F1011227100C527B7 /* IMBPhotosFolderParser.h */,
 				D09932901011227100C527B7 /* IMBPhotosFolderParser.m */,
+				D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */,
+				D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */,
 			);
 			name = Photos;
 			sourceTree = "<group>";
@@ -435,6 +441,7 @@
 				D08E8D7E1019EAB8005D8614 /* IMBFNSubscribeFileWatcher.h in Headers */,
 				D08E8D811019EB09005D8614 /* IMBFSEventsWatcher.h in Headers */,
 				D08E8D861019EB4D005D8614 /* IMBMainThreadProxy.h in Headers */,
+				D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -544,6 +551,7 @@
 				D08E8D7D1019EAB8005D8614 /* IMBFNSubscribeFileWatcher.m in Sources */,
 				D08E8D821019EB09005D8614 /* IMBFSEventsWatcher.m in Sources */,
 				D08E8D851019EB4D005D8614 /* IMBMainThreadProxy.m in Sources */,
+				D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

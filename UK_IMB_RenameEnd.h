@@ -53,6 +53,13 @@
 
 #undef UKFileWatcher
 #undef UKFileWatcherDelegate
+#undef UKKQueue
+#undef UKKQueuePathEntry
+#undef UKKQueueCentral
+#undef UKFNSubscribeFileWatcher
+#undef UKFSEventsWatcher
+#undef UKMainThreadProxy
+
 #undef UKFileWatcherRenameNotification
 #undef UKFileWatcherWriteNotification
 #undef UKFileWatcherDeleteNotification
@@ -60,13 +67,6 @@
 #undef UKFileWatcherSizeIncreaseNotification
 #undef UKFileWatcherLinkCountChangeNotification
 #undef UKFileWatcherAccessRevocationNotification 
-
-#undef UKKQueue
-#undef UKKQueuePathEntry
-#undef UKKQueueCentral
-#undef UKFNSubscribeFileWatcher
-#undef UKFSEventsWatcher
-#undef UKMainThreadProxy
 
 
 //----------------------------------------------------------------------------------------------------------------------

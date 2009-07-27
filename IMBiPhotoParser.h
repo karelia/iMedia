@@ -48,13 +48,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBCommon.h"
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-@class IMBNode;
+#import "IMBParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,66 +56,14 @@
 
 #pragma mark 
 
-
-@protocol IMBParserProtocol
-
-@required
-
-// The media source is usually a path pointing to the folder or database, but it could be an NSURL as well. 
-// However, it is always stored as a string, so that putting it into property lists (prefs) is easier...
-
-@property (retain) NSString* mediaSource;
-
-// The media type can be @"photos",@"music",@"movies",etc. IMBCommon.h contains constants for the type...
-
-@property (retain) NSString* mediaType;
-
-// Indicates that this is a custom (user generated) parser. Usually a folder dragged into the outline view...
-
-@property (assign,getter=isCustom) BOOL custom;
-
-// ATTENTION: inOldNode is readonly and is only passed in for reference, but must not be modified by the parser in 
-// a background operation. It is passed as an argument to the parser so that existing old nodes can be recreated
-// as faithfully as possible...
-
-- (IMBNode*) createNode:(IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
-- (BOOL) expandNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError;
-- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError;
-
-@optional
-
-// Called in various situations just before a parser is going to be used. Can be used to prepare the instance 
-// or update cached data...
-
-- (void) willUseParser;
-
-// Called after a node was deselected. The parser can release its cached data (if present)...
-
-- (void) didDeselectParser;
-
-// Called when a file watcher fires and it concerns a parser. Also give a parser a chance to update any cached data...
-
-- (void) watchedPathDidChange:(NSString*)inWatchedPath;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-
-@interface IMBParser : NSObject <IMBParserProtocol>
+// This parser class creates nodes for a folder and populates it with files that conform to the specified uti...
+ 
+@interface IMBiPhotoParser : IMBParser
 {
-	NSString* _mediaSource;
-	NSString* _mediaType;
-	BOOL _custom;
+	NSDictionary* _plist;
 }
 
-// Helper methods...
-
-- (NSString*) identifierForPath:(NSString*)inPath;
+@property (retain) NSDictionary* plist;
 
 @end
 

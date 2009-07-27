@@ -63,15 +63,27 @@
 @end
 
 
-// This subclass looks only in ~/Pictures...
+// This subclass looks only in "~/Pictures"...
 
 @interface IMBPicturesFolderParser : IMBPhotosFolderParser
 @end
 
 
-// This subclass looks only in /Library/Desktop Pictures...
+// This subclass looks only in "/Library/Desktop Pictures"...
 
 @interface IMBDesktopPicturesFolderParser : IMBPhotosFolderParser
+@end
+
+
+// This subclass looks only in "/Library/User Pictures"...
+
+@interface IMBUserPicturesFolderParser : IMBPhotosFolderParser
+@end
+
+
+// This subclass looks only in "/Library/Application Support/Apple/iChat Icons"...
+
+@interface IMBiChatIconsFolderParser : IMBPhotosFolderParser
 @end
 
 

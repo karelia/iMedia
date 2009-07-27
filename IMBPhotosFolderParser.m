@@ -58,7 +58,6 @@
 
 #pragma mark 
 
-
 @implementation IMBPhotosFolderParser
 
 // Restrict this parser to image files...
@@ -81,7 +80,6 @@
 
 
 #pragma mark 
-
 
 @implementation IMBPicturesFolderParser
 
@@ -114,7 +112,6 @@
 
 #pragma mark 
 
-
 @implementation IMBDesktopPicturesFolderParser
 
 // Register this parser, so that it gets automatically loaded...
@@ -133,6 +130,68 @@
 	if (self = [super init])
 	{
 		self.mediaSource = @"/Library/Desktop Pictures";
+	}
+	
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBUserPicturesFolderParser
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
+	[pool release];
+}
+
+// Set the folder path to the /Library/Desktop Pictures...
+
+- (id) init
+{
+	if (self = [super init])
+	{
+		self.mediaSource = @"/Library/User Pictures";
+	}
+	
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBiChatIconsFolderParser
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
+	[pool release];
+}
+
+// Set the folder path to the /Library/Desktop Pictures...
+
+- (id) init
+{
+	if (self = [super init])
+	{
+		self.mediaSource = @"/Library/Application Support/Apple/iChat Icons";
 	}
 	
 	return self;

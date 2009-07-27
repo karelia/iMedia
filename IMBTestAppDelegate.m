@@ -16,6 +16,7 @@
 #import "IMBUserInterfaceController.h"
 #import "IMBParser.h"
 #import "IMBNode.h"
+#import "IMBiPhotoParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -151,7 +152,8 @@
 	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
 
-	return YES;
+	BOOL iPhoto = [inNode.parser isKindOfClass:[IMBiPhotoParser class]];
+	return !iPhoto;
 }
 
 
@@ -171,7 +173,8 @@
 	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
 
-	return YES;
+	BOOL iPhoto = [inNode.parser isKindOfClass:[IMBiPhotoParser class]];
+	return !iPhoto;
 }
 
 

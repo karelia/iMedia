@@ -97,7 +97,6 @@
 - (IMBNode*) createNode:(IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
 {
 	NSError* error = nil;
-	NSString* parserClassName = NSStringFromClass([self class]);
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
 	path = [path stringByStandardizingPath];
 	
@@ -107,7 +106,7 @@
 	
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
-	newNode.identifier = [NSString stringWithFormat:@"%@:/%@",parserClassName,path];
+	newNode.identifier = [self identifierForPath:path]; 
 	newNode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
 	newNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
 	newNode.parser = self;
