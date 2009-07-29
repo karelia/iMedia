@@ -135,6 +135,7 @@
 // Helper methods
 
 - (NSIndexPath*) indexPath;
+- (NSComparisonResult) compare:(IMBNode*)inNode;
 
 @end
 

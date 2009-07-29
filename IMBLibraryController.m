@@ -398,6 +398,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // For each node in the list, change its state to loading (so that the spinning activity indicator appears), 
 // then create a background operation that causes the parser to create a new node...
 
@@ -425,6 +428,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // This method is called on the main thread as a result of any IMBLibraryOperation. We are given both the old  
 // and the new node. Replace the old with the new node...
 
@@ -432,7 +438,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	NSString* watchedPath = nil;
 	
-	// Tell IMBUserInterfaceController that we are goind to modify the data model...
+	// Tell IMBUserInterfaceController that we are going to modify the data model...
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillChangeNotification object:self];
 	
@@ -505,10 +511,20 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (parent) [parent didChangeValueForKey:@"subNodes"];
 	else [self didChangeValueForKey:@"nodes"];
 	
+	// Sort the root nodes by name...
+	
+	if (newNode.parentNode == nil)
+	{
+		[self.nodes sortUsingSelector:@selector(compare:)];
+	}
+	
 	// Tell IMBUserInterfaceController that we are done modifying the data model...
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // This method is called on the main thread as a result of IMBCreateNodesOperation...
@@ -520,6 +536,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[_delegate controller:self didCreateNode:inNode withParser:inNode.parser];
 	}
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // This method is called on the main thread incase an error has occurred in an IMBLibraryOperation...
 
@@ -543,10 +563,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	BOOL shouldExpandNode = inNode.subNodes == nil;
 
-	if (shouldExpandNode && _delegate != nil && [_delegate respondsToSelector:@selector(controller:willExpandNode:)])
-	{
-		shouldExpandNode = [_delegate controller:self willExpandNode:inNode];
-	}
+//	if (shouldExpandNode && _delegate != nil && [_delegate respondsToSelector:@selector(controller:willExpandNode:)])
+//	{
+//		shouldExpandNode = [_delegate controller:self willExpandNode:inNode];
+//	}
 	
 	if (shouldExpandNode)
 	{
@@ -585,10 +605,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	BOOL shouldSelectNode = inNode.objects == nil;
 
-	if (shouldSelectNode && _delegate != nil && [_delegate respondsToSelector:@selector(controller:willSelectNode:)])
-	{
-		shouldSelectNode = [_delegate controller:self willSelectNode:inNode];
-	}
+//	if (shouldSelectNode && _delegate != nil && [_delegate respondsToSelector:@selector(controller:willSelectNode:)])
+//	{
+//		shouldSelectNode = [_delegate controller:self willSelectNode:inNode];
+//	}
 	
 	if (shouldSelectNode)
 	{
@@ -701,7 +721,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSArray*) nodesForParser:(IMBParser*)inParser
+- (IMBNode*) nodeForParser:(IMBParser*)inParser
 {
 	return nil;
 }
@@ -740,38 +760,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 	
 	return nil;
-	
-//	IMBNode* node = nil;
-//	int tries = 0;
-//	
-//	// First try to get the specified node, falling back to the next best ancestor if that node doesn't exist...
-//	
-//	NSString* identifier = [[inIdentifier copy] autorelease];
-//	
-//	do
-//	{
-//		node = [self libraryNodeWithIdentifier:identifier inParentNode:nil];
-//		if (node) break;
-//		
-//		tries++;
-//		
-//		NSRange range = [identifier rangeOfString:@"/" options:NSBackwardsSearch];
-//		if (range.location != NSNotFound)
-//			identifier = [identifier substringToIndex:range.location];
-//	}
-//	while (![identifier hasSuffix:@":/"] && tries<10);
-//	
-//	// If that fails, then simply return the first top-level node...
-//	
-//	if (node == nil)
-//	{
-//		if ([self countOfLibraryNodes])
-//		{
-//			node = [self objectInLibraryNodesAtIndex:0];
-//		}
-//	}
-//	
-//	return node;
 }
 
 

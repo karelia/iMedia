@@ -94,7 +94,7 @@
 #pragma mark Parser Methods
 
 
-- (IMBNode*) createNode:(IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
+- (IMBNode*) createNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
 {
 	NSError* error = nil;
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;

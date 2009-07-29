@@ -65,7 +65,8 @@ enum
 {
 	kIMBWatcherTypeNone,
 	kIMBWatcherTypeKQueue,
-	kIMBWatcherTypeFSEvent
+	kIMBWatcherTypeFSEvent,
+	kIMBWatcherTypeFirstCustom = 1000
 };
 typedef NSUInteger IMBWatcherType;
 

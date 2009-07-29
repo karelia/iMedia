@@ -111,7 +111,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 // Node accessors (must only be called on the main thread)...
 
-- (NSArray*) nodesForParser:(IMBParser*)inParser;
+- (IMBNode*) nodeForParser:(IMBParser*)inParser;
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 
 // Custom folders...

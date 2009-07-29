@@ -181,6 +181,35 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 
 #pragma mark
+
+
+- (id) init
+{
+	if (self = [super init])
+	{
+		[[NSNotificationCenter defaultCenter]				// Unload parsers before we quit, so that custom have 
+			addObserver:self								// a chance to clean up (e.g. remove callbacks, etc...)
+			selector:@selector(unloadParsers) 
+			name:NSApplicationWillTerminateNotification 
+			object:nil];
+	}
+	
+	return self;
+}
+
+
+- (void) dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[self unloadParsers];
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 #pragma mark Loading & Unloading
 
 
