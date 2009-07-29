@@ -52,6 +52,7 @@
 #import "IMBObject.h"
 #import "IMBParser.h"
 #import "IMBLibraryController.h"
+#import "NSString+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -286,6 +287,14 @@
 
 #pragma mark
 #pragma mark Helpers
+
+
+// Sort nodes by name...
+
+- (NSComparisonResult) compare:(IMBNode*)inNode
+{
+	return [self.name finderCompare:inNode.name];
+}
 
 
 // Returns the path to this node as a NSIndexSet. Useful for working with NSTreeController and NSOutlineView...

@@ -98,7 +98,8 @@
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
 	#endif
 	
-	return YES;
+	BOOL iPhoto = [NSStringFromClass(inParserClass) isEqualToString:@"IMBiPhotoParser"];
+	return !iPhoto;
 }
 
 

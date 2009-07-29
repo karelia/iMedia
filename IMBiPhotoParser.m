@@ -119,50 +119,52 @@
 #pragma mark Parser Methods
 
 
-- (IMBNode*) createNode:(IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
+- (IMBNode*) createNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
 {
 	NSError* error = nil;
-	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
-	path = [path stringByStandardizingPath];
+	
+	if (self.mediaSource == nil)
+	{
+		return nil;
+	}
 	
 	// Create an empty root node (unpopulated and without subnodes)...
 	
 	IMBNode* newNode = [[IMBNode alloc] init];
 	
 	newNode.parentNode = inOldNode.parentNode;
-	newNode.mediaSource = path;
+	newNode.mediaSource = self.mediaSource;
 	newNode.identifier = [self identifierForPath:@"/"];
 	newNode.name = @"iPhoto";
 //	newNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
 	newNode.parser = self;
 	newNode.leaf = NO;
 
-	// Enable FSEvents based file watching for root nodes...
-	
-	if (newNode.parentNode == nil)
-	{
-		newNode.watcherType = kIMBWatcherTypeFSEvent;
-		newNode.watchedPath = path;
-	}
-	else
-	{
-		newNode.watcherType = kIMBWatcherTypeNone;
-	}
-	
-	// If the old node had subnodes, then look for subnodes in the new node...
-	
-	if ([inOldNode.subNodes count] > 0)
-	{
-		[self expandNode:newNode options:inOptions error:&error];
-	}
-	
-	// If the old node was populated, then also populate the new node...
-	
-	if ([inOldNode.objects count] > 0)
-	{
-		[self populateNode:newNode options:inOptions error:&error];
-	}
-
+//	// Enable FSEvents based file watching for root nodes...
+//	
+//	if (newNode.parentNode == nil)
+//	{
+//		newNode.watcherType = kIMBWatcherTypeFSEvent;
+//		newNode.watchedPath = path;
+//	}
+//	else
+//	{
+//		newNode.watcherType = kIMBWatcherTypeNone;
+//	}
+//	
+//	// If the old node had subnodes, then look for subnodes in the new node...
+//	
+//	if ([inOldNode.subNodes count] > 0)
+//	{
+//		[self expandNode:newNode options:inOptions error:&error];
+//	}
+//	
+//	// If the old node was populated, then also populate the new node...
+//	
+//	if ([inOldNode.objects count] > 0)
+//	{
+//		[self populateNode:newNode options:inOptions error:&error];
+//	}
 	
 	if (outError) *outError = error;
 	return newNode;

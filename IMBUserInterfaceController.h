@@ -91,7 +91,8 @@
 	
 	NSString* _selectedNodeIdentifier;
 	NSMutableArray* _expandedNodeIdentifiers;
-	BOOL _shouldStoreIdentifiers;
+	BOOL _isReplacingNodes;
+	BOOL _isRestoringState;
 	
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
 	IBOutlet NSTabView* ibObjectTabView;
@@ -117,7 +118,6 @@
 
 @property (retain) NSString* selectedNodeIdentifier;
 @property (retain) NSMutableArray* expandedNodeIdentifiers;
-- (void) selectNodeWithIdentifier:(NSString*)inIdentifier;
 - (void) selectNode:(IMBNode*)inNode;
 - (IMBNode*) selectedNode;
 
