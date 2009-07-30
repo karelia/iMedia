@@ -44,46 +44,24 @@
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
 	[parserController setDelegate:self];
-	[parserController logRegisteredParsers];
+//	[parserController logRegisteredParsers];
 	[parserController loadParsers];
-	[parserController logLoadedParsers];
+//	[parserController logLoadedParsers];
 	
 	// Create libraries (singleton per mediaType)...
 	
 	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBPhotosMediaType];
 	[libraryController setDelegate:self];
-	[libraryController reload];
 	
 	// Link the user interface (possible multiple instances) to the	singleton library...
 	
 	ibUserInterfaceController.libraryController = libraryController;
+
+	// Load the library...
+	
+	[libraryController reload];
 }
 	
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (IBAction) select:(id)inSender
-{
-	IMBLibraryController* libraryController =  [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBPhotosMediaType];
-	IMBNode* node = [libraryController.nodes objectAtIndex:0];
-	[libraryController selectNode:node];
-}
-
-- (IBAction) expand:(id)inSender
-{
-	IMBLibraryController* libraryController =  [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBPhotosMediaType];
-	IMBNode* node = [libraryController.nodes objectAtIndex:0];
-	[libraryController expandNode:node];
-}
-
-- (IBAction) update:(id)inSender
-{
-	IMBLibraryController* libraryController =  [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBPhotosMediaType];
-	IMBNode* node = [libraryController.nodes objectAtIndex:0];
-	[libraryController reloadNode:node];
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -94,9 +72,9 @@
 
 - (BOOL) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
 {
-	#if DEBUG
-	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
-	#endif
+//	#if DEBUG
+//	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
+//	#endif
 	
 	BOOL iPhoto = [NSStringFromClass(inParserClass) isEqualToString:@"IMBiPhotoParser"];
 	return !iPhoto;
@@ -105,17 +83,17 @@
 
 - (void) controller:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
-	#if DEBUG
-	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
-	#endif
+//	#if DEBUG
+//	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
+//	#endif
 }
 
 
 - (void) controller:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
-	#if DEBUG
-	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
-	#endif
+//	#if DEBUG
+//	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
+//	#endif
 }
 
 
@@ -126,7 +104,7 @@
 #pragma mark IMBLibraryController Delegate
 
 
-- (BOOL) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
+- (BOOL) controller:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
 {
 	#if DEBUG
 	NSLog(@"%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
@@ -136,57 +114,83 @@
 }
 
 
-- (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
+- (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
 {
 	#if DEBUG
-	NSLog(@"%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
+	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
 	#endif
-
-	[inController logNodes];
-//	[inController selectNode:[inController.nodes objectAtIndex:0]];
 }
 
 
-- (BOOL) controller:(IMBLibraryController*)inController willExpandNode:(IMBNode*)inNode
+- (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
+{
+	#if DEBUG
+	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
+	#endif
+
+//	[inController logNodes];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (BOOL) controller:(IMBLibraryController*)inController shouldExpandNode:(IMBNode*)inNode
 {
 	#if DEBUG
 	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
 
-	BOOL iPhoto = [inNode.parser isKindOfClass:[IMBiPhotoParser class]];
-	return !iPhoto;
+	return YES;
+}
+
+
+- (void) controller:(IMBLibraryController*)inController willExpandNode:(IMBNode*)inNode
+{
+	#if DEBUG
+	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
+	#endif
 }
 
 
 - (void) controller:(IMBLibraryController*)inController didExpandNode:(IMBNode*)inNode
 {
 	#if DEBUG
-	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
+	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
 
-	[inController logNodes];
+//	[inController logNodes];
 }
 
 
-- (BOOL) controller:(IMBLibraryController*)inController willSelectNode:(IMBNode*)inNode
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (BOOL) controller:(IMBLibraryController*)inController shouldSelectNode:(IMBNode*)inNode
 {
 	#if DEBUG
 	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
 
-	BOOL iPhoto = [inNode.parser isKindOfClass:[IMBiPhotoParser class]];
-	return !iPhoto;
+	return YES;
+}
+
+
+- (void) controller:(IMBLibraryController*)inController willSelectNode:(IMBNode*)inNode
+{
+	#if DEBUG
+	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
+	#endif
 }
 
 
 - (void) controller:(IMBLibraryController*)inController didSelectNode:(IMBNode*)inNode
 {
 	#if DEBUG
-	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
+	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
 
-	[inController logNodes];
-//	[inController expandNode:[inController.nodes objectAtIndex:0]];
+//	[inController logNodes];
 }
 
 

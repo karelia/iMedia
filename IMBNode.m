@@ -83,9 +83,14 @@
 
 // Accessors for navigating up or down the node tree...
 
-@synthesize leaf = _leaf;
 @synthesize subNodes = _subNodes;
 @synthesize parentNode = _parentNode;
+
+// State information...
+
+@synthesize leaf = _leaf;
+@synthesize expanding = _expanding;
+@synthesize populating = _populating;
 
 // Support for live watching...
 
@@ -113,6 +118,9 @@
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
+
+		_expanding = NO;
+		_populating = NO;
 	}
 	
 	return self;
@@ -135,9 +143,11 @@
 	if (self.objects) copy.objects = [NSMutableArray arrayWithArray:self.objects];
 	else copy.objects = nil;
 	
-	
-	copy.parentNode = self.parentNode;
 	copy.leaf = self.leaf;
+	copy.expanding = self.expanding;
+	copy.populating = self.populating;
+
+	copy.parentNode = self.parentNode;
 	copy.parser = self.parser;
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -295,6 +305,24 @@
 {
 	return [self.name finderCompare:inNode.name];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Check if this node or one of its ancestors is current loading in the background. In this case it will be 
+// replaced shortly and is not considered to be eligible for a new background operation...
+
+- (BOOL) isLoading
+{
+	if (_expanding) return YES;
+	if (_populating) return YES;
+	if (_parentNode) return [_parentNode isLoading];
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Returns the path to this node as a NSIndexSet. Useful for working with NSTreeController and NSOutlineView...

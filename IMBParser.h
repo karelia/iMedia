@@ -99,7 +99,7 @@
 
 - (void) didDeselectParser;
 
-// Called when a file watcher fires and it concerns a parser. Also give a parser a chance to update any cached data...
+// Called when a file watcher fires and it concerns a parser. Also gives a parser a chance to update any cached data...
 
 - (void) watchedPathDidChange:(NSString*)inWatchedPath;
 

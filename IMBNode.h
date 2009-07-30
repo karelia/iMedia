@@ -78,6 +78,8 @@
 	NSArray* _subNodes;
 	IMBNode* _parentNode;	// not retained!
 	BOOL _leaf;
+	BOOL _expanding;
+	BOOL _populating;
 	
 	IMBParser* _parser;
 	IMBWatcherType _watcherType;
@@ -104,7 +106,6 @@
 @property (retain) NSArray* subNodes;				
 @property (assign) IMBNode* parentNode;
 @property (readonly) IMBNode* rootNode;
-@property (assign,getter=isLeaf) BOOL leaf;
 
 // Object accessors. If the objects property is nil, that doesn't mean that there are no objects - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
@@ -117,6 +118,14 @@
 
 - (NSUInteger) countOfRecursiveObjects;
 - (IMBObject*) objectInRecursiveObjectsAtIndex:(NSUInteger)inIndex;
+
+// State information about a node...
+
+@property (assign,getter=isLeaf) BOOL leaf;
+@property (assign,getter=isExpanding) BOOL expanding;
+@property (assign,getter=isPopulating) BOOL populating;
+@property (readonly) BOOL isLoading;
+
 
 // Support for live watching and asynchronous nodes
 

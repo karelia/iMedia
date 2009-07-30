@@ -23,10 +23,6 @@
 	IBOutlet IMBUserInterfaceController* ibUserInterfaceController;
 }
 
-- (IBAction) select:(id)inSender;
-- (IBAction) expand:(id)inSender;
-- (IBAction) update:(id)inSender;
-
 @end
 
 
