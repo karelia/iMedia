@@ -84,6 +84,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 	IMBOptions _options;
 	id _delegate;
 
+	BOOL _isReplacingNode;
 	IMBKQueue* _watcherKQueue;
 	IMBFSEventsWatcher* _watcherFSEvents;
 }
@@ -100,6 +101,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 @property (retain) IMBKQueue* watcherKQueue;
 @property (retain) IMBFSEventsWatcher* watcherFSEvents;
+@property (readonly) BOOL isReplacingNode;
 
 // Loading...
 
@@ -143,13 +145,16 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 @optional
 
-- (BOOL) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser;
+- (BOOL) controller:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser;
+- (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser;
 - (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser;
 
-- (BOOL) controller:(IMBLibraryController*)inController willExpandNode:(IMBNode*)inNode;
+- (BOOL) controller:(IMBLibraryController*)inController shouldExpandNode:(IMBNode*)inNode;
+- (void) controller:(IMBLibraryController*)inController willExpandNode:(IMBNode*)inNode;
 - (void) controller:(IMBLibraryController*)inController didExpandNode:(IMBNode*)inNode;
 
-- (BOOL) controller:(IMBLibraryController*)inController willSelectNode:(IMBNode*)inNode;
+- (BOOL) controller:(IMBLibraryController*)inController shouldSelectNode:(IMBNode*)inNode;
+- (void) controller:(IMBLibraryController*)inController willSelectNode:(IMBNode*)inNode;
 - (void) controller:(IMBLibraryController*)inController didSelectNode:(IMBNode*)inNode;
 
 @end

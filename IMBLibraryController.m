@@ -214,8 +214,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (error == nil)
 	{
-		[self replaceNode:self.oldNode withNode:newNode];
 		[self performSelectorOnMainThread:@selector(_didCreateNode:) withObject:newNode];
+		[self replaceNode:self.oldNode withNode:newNode];
 	}
 	else
 	{
@@ -242,8 +242,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (error == nil)
 	{
-		[self replaceNode:self.oldNode withNode:self.newNode];
 		[self performSelectorOnMainThread:@selector(_didExpandNode:) withObject:self.newNode];
+		[self replaceNode:self.oldNode withNode:self.newNode];
 	}
 	else
 	{
@@ -269,8 +269,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (error == nil)
 	{
-		[self replaceNode:self.oldNode withNode:self.newNode];
 		[self performSelectorOnMainThread:@selector(_didSelectNode:) withObject:self.newNode];
+		[self replaceNode:self.oldNode withNode:self.newNode];
 	}
 	else
 	{
@@ -295,6 +295,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @synthesize watcherKQueue = _watcherKQueue;
 @synthesize watcherFSEvents = _watcherFSEvents;
+@synthesize isReplacingNode = _isReplacingNode;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -343,6 +344,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		self.watcherFSEvents = [[[IMBFSEventsWatcher alloc] init] autorelease];
 		self.watcherFSEvents.delegate = self;
+		
+		_isReplacingNode = NO;
 	}
 	
 	return self;
@@ -364,6 +367,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 #pragma mark 
+#pragma mark Creating Nodes
 
 
 // This method triggers a full reload of all nodes. First remove all existing nodes. Then iterate over all 
@@ -372,19 +376,27 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) reload
 {
 	NSMutableArray* parsers = [[IMBParserController sharedParserController] loadedParsersForMediaType:self.mediaType];
+	
+	[self willChangeValueForKey:@"nodes"];
 	[self.nodes removeAllObjects];
+	[self didChangeValueForKey:@"nodes"];
 	
 	for (IMBParser* parser in parsers)
 	{
 		BOOL shouldCreateNode = YES;
 
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willCreateNodeWithParser:)])
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldCreateNodeWithParser:)])
 		{
-			shouldCreateNode = [_delegate controller:self willCreateNodeWithParser:parser];
+			shouldCreateNode = [_delegate controller:self shouldCreateNodeWithParser:parser];
 		}
 		
 		if (shouldCreateNode)
 		{
+			if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willCreateNodeWithParser:)])
+			{
+				[_delegate controller:self willCreateNodeWithParser:parser];
+			}
+
 			IMBCreateNodeOperation* operation = [[IMBCreateNodeOperation alloc] init];
 			operation.libraryController = self;
 			operation.parser = parser;
@@ -406,15 +418,20 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) reloadNode:(IMBNode*)inNode
 {
-	BOOL shouldCreateNode = YES;
+	BOOL shouldCreateNode = _isReplacingNode==NO;
 
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willCreateNodeWithParser:)])
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldCreateNodeWithParser:)])
 	{
-		shouldCreateNode = [_delegate controller:self willCreateNodeWithParser:inNode.parser];
+		shouldCreateNode = [_delegate controller:self shouldCreateNodeWithParser:inNode.parser];
 	}
 	
 	if (shouldCreateNode)
 	{
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willCreateNodeWithParser:)])
+		{
+			[_delegate controller:self willCreateNodeWithParser:inNode.parser];
+		}
+
 		IMBCreateNodeOperation* operation = [[IMBCreateNodeOperation alloc] init];
 		operation.libraryController = self;
 		operation.parser = inNode.parser;
@@ -437,6 +454,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _replaceNode:(NSDictionary*)inOldAndNewNode
 {
 	NSString* watchedPath = nil;
+	
+	_isReplacingNode = YES;
 	
 	// Tell IMBUserInterfaceController that we are going to modify the data model...
 	
@@ -508,15 +527,16 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 	
-	if (parent) [parent didChangeValueForKey:@"subNodes"];
-	else [self didChangeValueForKey:@"nodes"];
-	
 	// Sort the root nodes by name...
 	
 	if (newNode.parentNode == nil)
 	{
 		[self.nodes sortUsingSelector:@selector(compare:)];
 	}
+	
+	if (parent) [parent didChangeValueForKey:@"subNodes"];
+	else [self didChangeValueForKey:@"nodes"];
+	_isReplacingNode = NO;
 	
 	// Tell IMBUserInterfaceController that we are done modifying the data model...
 	
@@ -553,6 +573,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 #pragma mark 
+#pragma mark Expanding Nodes
 
 
 // If a node doesn't have any subnodes yet, we need to create the subnodes lazily when this node is expanded.
@@ -561,15 +582,17 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) expandNode:(IMBNode*)inNode
 {
-	BOOL shouldExpandNode = inNode.subNodes == nil;
+	BOOL shouldExpandNode = inNode.subNodes==nil && inNode.isExpanding==NO && _isReplacingNode==NO;
 
-//	if (shouldExpandNode && _delegate != nil && [_delegate respondsToSelector:@selector(controller:willExpandNode:)])
-//	{
-//		shouldExpandNode = [_delegate controller:self willExpandNode:inNode];
-//	}
-	
 	if (shouldExpandNode)
 	{
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willExpandNode:)])
+		{
+			[_delegate controller:self willExpandNode:inNode];
+		}
+
+		inNode.expanding = YES;
+		
 		IMBExpandNodeOperation* operation = [[IMBExpandNodeOperation alloc] init];
 		operation.libraryController = self;
 		operation.parser = inNode.parser;
@@ -591,10 +614,16 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		[_delegate controller:self didExpandNode:inNode];
 	}
+
+	inNode.expanding = NO;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Selecting Nodes
 
 
 // If a node wasn't populated with objects yet, we need to populated it lazily when this node is selected.
@@ -603,7 +632,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) selectNode:(IMBNode*)inNode
 {
-	BOOL shouldSelectNode = inNode.objects == nil;
+	BOOL shouldSelectNode = inNode.objects==nil && inNode.isPopulating==NO && _isReplacingNode==NO;
 
 //	if (shouldSelectNode && _delegate != nil && [_delegate respondsToSelector:@selector(controller:willSelectNode:)])
 //	{
@@ -612,6 +641,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (shouldSelectNode)
 	{
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willSelectNode:)])
+		{
+			[_delegate controller:self willSelectNode:inNode];
+		}
+
+		inNode.populating = YES;
+		
 		IMBSelectNodeOperation* operation = [[IMBSelectNodeOperation alloc] init];
 		operation.libraryController = self;
 		operation.parser = inNode.parser;
@@ -633,10 +669,16 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		[_delegate controller:self didSelectNode:inNode];
 	}
+
+	inNode.populating = NO;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark File Watching
 
 
 // A file watcher has fired for one of the paths we have registered...

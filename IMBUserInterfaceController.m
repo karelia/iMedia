@@ -75,7 +75,8 @@
 - (void) _loadStateFromPreferences;
 
 - (NSMutableArray*) _expandedNodeIdentifiers;
-- (void) _restoreUserInterfaceState;
+- (void) _nodesWillChange;
+- (void) _nodesDidChange;
 
 @end
 
@@ -112,7 +113,6 @@
 	{
 		_selectedNodeIdentifier = nil;
 		_expandedNodeIdentifiers = nil;
-		_isReplacingNodes = NO;
 		_isRestoringState = NO;
 	}
 	
@@ -176,13 +176,13 @@
 {
 	[[NSNotificationCenter defaultCenter] 
 		addObserver:self 
-		selector:@selector(_startReplacingNodes) 
+		selector:@selector(_nodesWillChange) 
 		name:kIMBNodesWillChangeNotification 
 		object:_libraryController];
 		
 	[[NSNotificationCenter defaultCenter] 
 		addObserver:self 
-		selector:@selector(_restoreUserInterfaceState) 
+		selector:@selector(_nodesDidChange) 
 		name:kIMBNodesDidChangeNotification 
 		object:_libraryController];
 }
@@ -248,56 +248,23 @@
 #pragma mark NSOutlineView Delegate
 
 
-// The user just tried to select a row in the IMBOutlineView. Notify the library controller. It will in turn populate 
-// the node if necessary...
-
-- (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldSelectItem:(id)inItem
-{
-	if (_isReplacingNodes || _isRestoringState)
-	{
-		return YES;
-	}
-	
-	BOOL shouldSelect = YES;
-	IMBNode* node = [inItem representedObject];
-	id delegate = self.libraryController.delegate;
-	
-	if ([delegate respondsToSelector:@selector(controller:willSelectNode:)])
-	{
-		shouldSelect = [delegate controller:self.libraryController willSelectNode:node];
-	}
-
-	if (shouldSelect)
-	{
-		self.selectedNodeIdentifier = node.identifier;
-		[self.libraryController selectNode:node];
-	}
-	
-	return shouldSelect;	
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // If the user is  expanding an item in the IMBOutlineView then ask the delegate of the library controller if 
 // we are allowed to expand the node. If expansion was not triggered by a user event, but by the controllers
 // then always allow it...
 
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldExpandItem:(id)inItem
 {
-	if (_isReplacingNodes || _isRestoringState)
-	{
-		return YES;
-	}
-	
 	BOOL shouldExpand = YES;
-	id delegate = self.libraryController.delegate;
 	
-	if ([delegate respondsToSelector:@selector(controller:willExpandNode:)])
+	if (!_isRestoringState)
 	{
-		IMBNode* node = [inItem representedObject];
-		shouldExpand = [delegate controller:self.libraryController willExpandNode:node];
+		id delegate = self.libraryController.delegate;
+		
+		if ([delegate respondsToSelector:@selector(controller:shouldExpandNode:)])
+		{
+			IMBNode* node = [inItem representedObject];
+			shouldExpand = [delegate controller:self.libraryController shouldExpandNode:node];
+		}
 	}
 	
 	return shouldExpand;
@@ -308,27 +275,83 @@
 
 - (void) outlineViewItemWillExpand:(NSNotification*)inNotification
 {
-	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
-	IMBNode* node = [item representedObject];
-	[self.libraryController expandNode:node];
+//	if (!_isRestoringState)
+	{
+		id item = [[inNotification userInfo] objectForKey:@"NSObject"];
+		IMBNode* node = [item representedObject];
+		[self.libraryController expandNode:node];
+	}
 }
 
 
 // When nodes were expanded or collapsed, then store the current state of the user interface...
 
-- (void) outlineViewItemDidExpand:(NSNotification*)inNotification
+- (void) _setExpandedNodeIdentifiers
 {
-	if (!_isReplacingNodes && !_isRestoringState)
+	if (!_isRestoringState && !self.libraryController.isReplacingNode)
 	{
 		self.expandedNodeIdentifiers = [self _expandedNodeIdentifiers];
 	}
 }
 
+- (void) outlineViewItemDidExpand:(NSNotification*)inNotification
+{
+	[self _setExpandedNodeIdentifiers];
+}
+
 - (void) outlineViewItemDidCollapse:(NSNotification*)inNotification
 {
-	if (!_isReplacingNodes && !_isRestoringState)
+	[self _setExpandedNodeIdentifiers];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Ask the library delegate if we may change the selection...
+
+- (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldSelectItem:(id)inItem
+{
+	BOOL shouldSelect = YES;
+
+	if (!_isRestoringState)
 	{
-		self.expandedNodeIdentifiers = [self _expandedNodeIdentifiers];
+		IMBNode* node = [inItem representedObject];
+		id delegate = self.libraryController.delegate;
+		
+		if ([delegate respondsToSelector:@selector(controller:shouldSelectNode:)])
+		{
+			shouldSelect = [delegate controller:self.libraryController shouldSelectNode:node];
+		}
+	}
+	
+	return shouldSelect;	
+}
+
+
+// If the selection just changed due to a direct user event (clicking), then instruct the library controller 
+// to populate the node (if necessary) and remember the identifier of the selected node...
+
+- (void) outlineViewSelectionDidChange:(NSNotification*)inNotification;
+{
+	if (!_isRestoringState && !self.libraryController.isReplacingNode)
+	{
+		NSInteger row = [ibNodeOutlineView selectedRow];
+		id item = row>=0 ? [ibNodeOutlineView itemAtRow:row] : nil;
+		IMBNode* node = [item representedObject];
+
+		if (node)
+		{
+			id delegate = self.libraryController.delegate;
+			
+			if ([delegate respondsToSelector:@selector(controller:willSelectNode:)])
+			{
+				[delegate controller:self.libraryController willSelectNode:node];
+			}
+			
+			[self.libraryController selectNode:node];
+			self.selectedNodeIdentifier = node.identifier;
+		}
 	}
 }
 
@@ -425,9 +448,9 @@
 // thing in the IMBOutlineView delegate methods. If nodes are currently being replaced, then we will allow any 
 // changes, because those changes were not initiated by user events...
 
-- (void) _startReplacingNodes
+- (void) _nodesWillChange
 {
-	_isReplacingNodes = YES;
+
 }
 
 
@@ -438,7 +461,7 @@
 // We now have new node instances, but we can use the identifiers to locate the correct ones. First expand nodes
 // as needed, then select the correct node...
 
-- (void) _restoreUserInterfaceState
+- (void) _nodesDidChange
 {
 	NSInteger i,rows,count;
 	IMBNode* node;
@@ -446,7 +469,6 @@
 	
 	// Temporarily disable storing of saved state (we only want that when the user actuall clicks in the UI...
 	
-	_isReplacingNodes = NO;
 	_isRestoringState = YES;
 	
 	// Restore the expanded nodes...

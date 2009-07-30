@@ -91,7 +91,6 @@
 	
 	NSString* _selectedNodeIdentifier;
 	NSMutableArray* _expandedNodeIdentifiers;
-	BOOL _isReplacingNodes;
 	BOOL _isRestoringState;
 	
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
