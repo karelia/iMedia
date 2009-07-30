@@ -626,13 +626,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #pragma mark Selecting Nodes
 
 
-// If a node wasn't populated with objects yet, we need to populated it lazily when this node is selected.
+// If a node wasn't populated with objects yet, we need to populate it lazily when this node is selected.
 // Also ask the delegate whether we are allowed to do so. Create an operation and put it on the queue to
 // execute this job in the background...
 
 - (void) selectNode:(IMBNode*)inNode
 {
-	BOOL shouldSelectNode = inNode.objects==nil && inNode.isPopulating==NO && _isReplacingNode==NO;
+	BOOL shouldSelectNode = inNode.objects==nil && inNode.isLoading==NO && _isReplacingNode==NO;
 
 //	if (shouldSelectNode && _delegate != nil && [_delegate respondsToSelector:@selector(controller:willSelectNode:)])
 //	{
