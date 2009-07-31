@@ -5,6 +5,7 @@
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
+ Additional development for version 2.0 was contributed by Peter Baumgartner.
  Contributions have also been made by Matt Gough, Martin Wennerberg and others
  as indicated in source files.
  
@@ -282,8 +283,8 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 	else if (inContext == (void*)kObjectsContext)
 	{
 		[ibObjectImageBrowserView reloadData];
-		[ibObjectArrayController willChangeValueForKey:@"objectCountString"];
-		[ibObjectArrayController didChangeValueForKey:@"objectCountString"];
+//		[ibObjectArrayController willChangeValueForKey:@"objectCountString"];
+//		[ibObjectArrayController didChangeValueForKey:@"objectCountString"];
 	}
 	else
 	{
