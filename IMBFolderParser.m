@@ -215,7 +215,7 @@
 			
 			if ([self fileAtPath:path conformsToUTI:_fileUTI])
 			{
-				IMBObject* object = [[IMBObject alloc] init];
+				IMBVisualObject* object = [[IMBVisualObject alloc] init];
 				object.value = (id)path;
 				object.name = file;
 				object.metadata = [self metadataForFileAtPath:path];

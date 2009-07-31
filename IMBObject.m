@@ -49,6 +49,7 @@
 #pragma mark HEADERS
 
 #import "IMBObject.h"
+#import <Quartz/Quartz.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,6 +86,17 @@
 @synthesize imageRepresentationType = _imageRepresentationType;
 @synthesize imageVersion = _imageVersion;
 
+
+- (NSString*) imageRepresentationType
+{
+	return IKImageBrowserPathRepresentationType;
+}
+
+
+- (id) imageRepresentation
+{
+	return _value;
+}
 
 // Use the path or URL as the unique identifier...
 
