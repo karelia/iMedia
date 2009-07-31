@@ -200,12 +200,8 @@
 {
 	NSError* error = nil;
 	
-	// Get the contents of our folder...
-	
 	NSString* folder = inNode.mediaSource;
 	NSArray* files = [[NSFileManager threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
-	
-	// Populate the node with one IMBObject per file. If we encounter a folder, then add a subnode...
 	
 	if (error == nil)
 	{
@@ -217,8 +213,6 @@
 		{
 			NSString* path = [folder stringByAppendingPathComponent:file];
 			
-			// For each file with matching UTI add an IMBObject...
-			
 			if ([self fileAtPath:path conformsToUTI:_fileUTI])
 			{
 				IMBObject* object = [[IMBObject alloc] init];
@@ -229,25 +223,8 @@
 				[objects addObject:object];
 				[object release];
 			}
-			
-//			// For each folder add a subnode ...
-//			
-//			else if ([self fileAtPath:path conformsToUTI:(NSString*)kUTTypeFolder])
-//			{
-//				NSString* parserClassName = NSStringFromClass([self class]);
-//				
-//				IMBNode* subnode = [[IMBNode alloc] init];
-//				subnode.identifier = [NSString stringWithFormat:@"%@:/%@",parserClassName,path];
-//				subnode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
-//				subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
-//				subnode.parser = self;
-//				
-//				[(NSMutableArray*)inNode.subNodes addObject:subnode];
-//			}
 		}
 	}
-	
-	// Return error...
 	
 	if (outError) *outError = error;
 	return error == nil;

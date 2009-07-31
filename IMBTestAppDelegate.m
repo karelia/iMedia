@@ -70,14 +70,21 @@
 #pragma mark IMBParserController Delegate
 
 
-- (BOOL) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
+- (BOOL) controller:(IMBParserController*)inController shouldLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
 {
 //	#if DEBUG
 //	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
 //	#endif
 	
-	BOOL iPhoto = [NSStringFromClass(inParserClass) isEqualToString:@"IMBiPhotoParser"];
-	return !iPhoto;
+	return ![NSStringFromClass(inParserClass) isEqualToString:@"IMBiPhotoParser"];
+}
+
+
+- (void) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
+{
+//	#if DEBUG
+//	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
+//	#endif
 }
 
 

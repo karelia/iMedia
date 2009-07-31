@@ -54,6 +54,7 @@
 #import "IMBObjectArrayController.h"
 #import "IMBOutlineView.h"
 #import "IMBConfig.h"
+#import "IMBParser.h"
 #import "IMBNode.h"
 
 
@@ -68,15 +69,15 @@
 
 - (void) _startObservingLibraryController;
 - (void) _stopObservingLibraryController;
-
 - (NSMutableDictionary*) _preferences;
 - (void) _setPreferences:(NSMutableDictionary*)inDict;
 - (void) _saveStateToPreferences;
 - (void) _loadStateFromPreferences;
-
 - (NSMutableArray*) _expandedNodeIdentifiers;
 - (void) _nodesWillChange;
 - (void) _nodesDidChange;
+- (void) _updatePopupMenu;
+- (void) _syncPopupMenuSelection;
 
 @end
 
@@ -245,6 +246,68 @@
 
 
 #pragma mark 
+#pragma mark NSSplitView Delegate
+
+
+// Store the current divider position in the preferences...
+
+- (CGFloat) splitView:(NSSplitView*)inSplitView constrainSplitPosition:(CGFloat)inPosition ofSubviewAt:(NSInteger)inIndex
+{
+	NSMutableDictionary* stateDict = [self _preferences];
+	[stateDict setObject:[NSNumber numberWithFloat:inPosition] forKey:@"splitviewPosition"];
+	[self _setPreferences:stateDict];
+
+	if (inIndex == 0)
+	{
+		inPosition = MAX(inPosition,36.0);
+	}
+	
+	return inPosition;
+}
+
+
+// When resising the splitview, then make sure that only the bottom part (object view) gets resized, and 
+// that the IMBOutlineView is not affected...
+
+- (void) splitView:(NSSplitView*)inSplitView resizeSubviewsWithOldSize:(NSSize)inOldSize
+{
+    NSView* topView = [[inSplitView subviews] objectAtIndex:0];  
+    NSView* bottomView = [[inSplitView subviews] objectAtIndex:1];
+    float dividerThickness = [inSplitView dividerThickness]; 
+	
+    NSRect newFrame = [inSplitView frame];   
+	                
+    NSRect topFrame = [topView frame];                    
+	topFrame.size.width = newFrame.size.width;
+   
+    NSRect bottomFrame = [bottomView frame];    
+    bottomFrame.origin = NSMakePoint(0,0);  
+    bottomFrame.size.height = newFrame.size.height - topFrame.size.height - dividerThickness;
+    bottomFrame.size.width = newFrame.size.width;          
+    bottomFrame.origin.y = topFrame.size.height + dividerThickness; 
+ 
+	[topView setFrame:topFrame];
+    [bottomView setFrame:bottomFrame];
+}
+
+
+// When the splitview moved up so far that the IMBOutlineView gets too small, then hide the outline and show 
+// the popup instead...
+
+- (void) splitViewDidResizeSubviews:(NSNotification*)inNotification
+{
+	NSRect frame = [[ibNodeOutlineView enclosingScrollView] frame];
+	BOOL collapsed = frame.size.height < 60.0;
+	
+	[[ibNodeOutlineView enclosingScrollView] setHidden:collapsed];
+	[ibNodePopupButton setHidden:!collapsed];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 #pragma mark NSOutlineView Delegate
 
 
@@ -342,61 +405,14 @@
 
 		if (node)
 		{
-			id delegate = self.libraryController.delegate;
-			
-			if ([delegate respondsToSelector:@selector(controller:willSelectNode:)])
-			{
-				[delegate controller:self.libraryController willSelectNode:node];
-			}
-			
 			[self.libraryController selectNode:node];
 			self.selectedNodeIdentifier = node.identifier;
 		}
 	}
-}
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark NSSplitView Delegate
-
-
-// Store the current divider position in the preferences...
-
-- (CGFloat) splitView:(NSSplitView*)inSplitView constrainSplitPosition:(CGFloat)inPosition ofSubviewAt:(NSInteger)inIndex
-{
-	NSMutableDictionary* stateDict = [self _preferences];
-	[stateDict setObject:[NSNumber numberWithFloat:inPosition] forKey:@"splitviewPosition"];
-	[self _setPreferences:stateDict];
-
-	return inPosition;
-}
-
-
-// When resising the splitview, then make sure that only the bottom part (object view) gets resized, and 
-// that the IMBOutlineView is not affected...
-
-- (void) splitView:(NSSplitView*)inSplitView resizeSubviewsWithOldSize:(NSSize)inOldSize
-{
-    NSView* topView = [[inSplitView subviews] objectAtIndex:0];  
-    NSView* bottomView = [[inSplitView subviews] objectAtIndex:1];
-    float dividerThickness = [inSplitView dividerThickness]; 
+	// Sync the selection of the popup menu...
 	
-    NSRect newFrame = [inSplitView frame];   
-	                
-    NSRect topFrame = [topView frame];                    
-	topFrame.size.width = newFrame.size.width;
-   
-    NSRect bottomFrame = [bottomView frame];    
-    bottomFrame.origin = NSMakePoint(0,0);  
-    bottomFrame.size.height = newFrame.size.height - topFrame.size.height - dividerThickness;
-    bottomFrame.size.width = newFrame.size.width;          
-    bottomFrame.origin.y = topFrame.size.height + dividerThickness; 
- 
-	[topView setFrame:topFrame];
-    [bottomView setFrame:bottomFrame];
+	[self _syncPopupMenuSelection];
 }
 
 
@@ -513,6 +529,10 @@
 		}
 	}
 	
+	// Rebuild the popup menu manually. Please note that the popup menu does not currently use bindings...
+	
+	[self _updatePopupMenu];
+		
 	// We are done, now the user is once again in charge...
 	
 	_isRestoringState = NO;
@@ -521,6 +541,10 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+// Selecting a node requires two parts. First the node needs to be selected in the NSTreeController. This will
+// be directly reflected in the selection of the NSOutlineView and the NSPopUpButton. The second part is that
+// a previously empty nodes needs to be populated by the libraryController...
 
 - (void) selectNode:(IMBNode*)inNode
 {
@@ -532,6 +556,9 @@
 	}	
 }
 
+
+// Return the first selected node. Here we assume that the NSTreeController was configured to only allow single
+// selection or no selection...
 
 - (IMBNode*) selectedNode
 {
@@ -550,23 +577,77 @@
 
 
 #pragma mark 
-#pragma mark Adding & Removing
+#pragma mark Popup Menu
 
 
-- (BOOL) canReload
+// Rebuild the popup menu and. Please note that the popup menu does not currently use bindings...
+
+- (void) _updatePopupMenu
 {
-	return YES;
+	NSMenu* menu = [self.libraryController 
+		menuWithSelector:@selector(setSelectedNodeFromPopup:) 
+		target:self 
+		addSeparators:YES];
+		
+	[ibNodePopupButton setMenu:menu];
 }
 
 
-- (IBAction) reload:(id)inSender
-{
+// This action is only called by a direct user event from the popup menu...
 
+- (IBAction) setSelectedNodeFromPopup:(id)inSender
+{
+	NSString* identifier = (NSString*) ibNodePopupButton.selectedItem.representedObject;
+	IMBNode* node = [self.libraryController nodeWithIdentifier:identifier];
+	[self selectNode:node];
+}
+
+
+// Make sure that the selected item of the popup menu matches the selected node in the outline view...
+
+- (void) _syncPopupMenuSelection
+{
+	// Sync the selection of the popup menu...
+	
+	NSMenu* menu = [ibNodePopupButton menu];
+	NSInteger n = [menu numberOfItems];
+	
+	for (NSInteger i=0; i<n; i++)
+	{
+		NSMenuItem* item = [menu itemAtIndex:i];
+		NSString* identifier = (NSString*) item.representedObject;
+		if ([identifier isEqualToString:self.selectedNodeIdentifier])
+		{
+			[ibNodePopupButton selectItem:item];
+		}
+	}
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark 
+#pragma mark Actions
+
+
+// A node can be reloaded if it is not already being loaded, expanded, or populated in a background operation...
+
+- (BOOL) canReloadNode
+{
+	IMBNode* node = [self selectedNode];
+	return !node.isLoading;
+}
+
+
+- (IBAction) reloadNode:(id)inSender
+{
+	IMBNode* node = [self selectedNode];
+	[self.libraryController reloadNode:node];
+}
+
+
+// We can always add a custom node...
 
 - (BOOL) canAddNode
 {
@@ -576,22 +657,26 @@
 
 - (IBAction) addNode:(id)inSender
 {
-
+	// TODO: implement...
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Custom root nodes that are not currently being loaded can be removed...
+
 - (BOOL) canRemoveNode
 {
-	return NO;
+	IMBNode* node = [self selectedNode];
+	if (node.isLoading) return NO;
+	return node.parser.isCustom && node.parentNode==nil;
 }
 
 
 - (IBAction) removeNode:(id)inSender
 {
-
+	// TODO: implement...
 }
 
 

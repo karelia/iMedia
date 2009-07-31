@@ -107,8 +107,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @property (retain) IMBNode* oldNode;	
 @property (copy) IMBNode* newNode;		// Copied so that background operation can modify the node
 
-//- (void) replaceNode:(NSDictionary*)inOldAndNewNode;
-
 @end
 
 
@@ -122,6 +120,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @interface IMBSelectNodeOperation : IMBLibraryOperation
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Private controller methods...
@@ -147,8 +148,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // Pass the new nodes back to the main thread where the IMBLibraryController assumes ownership   
 // of them and discards the old nodes. The dictionary contains the following key/value pairs:
 //
-//   NSArray* newNodes
-//   NSArray* oldNodes (optional)
+//   IMBNode* newNode
+//   IMBNode* oldNode (optional)
 //   NSError* error (optional)
 	
 	
@@ -203,7 +204,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 // Create a new node here in this background operation. When done, pass back the result to the libraryController 
-// in the main thread and notify the delegate...
+// in the main thread...
 	
 @implementation IMBCreateNodeOperation
 
@@ -231,7 +232,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 // Tell the parser to popuplate the node in this background operation. When done, pass back the result to the 
-// libraryController in the main thread and notify the delegate...
+// libraryController in the main thread...
 	
 @implementation IMBExpandNodeOperation
 
@@ -258,7 +259,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 // Tell parser to popuplate the node here in this background operation. When done, pass back the result to the 
-// libraryController in the main thread and notify the delegate...
+// libraryController in the main thread...
 	
 @implementation IMBSelectNodeOperation
 
@@ -292,7 +293,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @synthesize nodes = _nodes;
 @synthesize options = _options;
 @synthesize delegate = _delegate;
-
 @synthesize watcherKQueue = _watcherKQueue;
 @synthesize watcherFSEvents = _watcherFSEvents;
 @synthesize isReplacingNode = _isReplacingNode;
@@ -413,8 +413,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// For each node in the list, change its state to loading (so that the spinning activity indicator appears), 
-// then create a background operation that causes the parser to create a new node...
+// If the delegate allows reloading, then create a background operation that causes the parser to create a new node. 
+// Please note that this method causes the node (and all its subnodes) to be replaced at a later time in the main 
+// thread (once the background operation has concluded). Afterwards we have a different node instance! That way
+// we can handle various different cases, like subnodes appearing/dissappearing, or objects appearing/disappearing.
+
 
 - (void) reloadNode:(IMBNode*)inNode
 {
@@ -449,7 +452,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 // This method is called on the main thread as a result of any IMBLibraryOperation. We are given both the old  
-// and the new node. Replace the old with the new node...
+// and the new node. Replace the old with the new node. The node we are given here can be a root node or a node
+// somewhere deep inside the tree. So we need to find the correct place where to put the new node. Note that the 
+// new node is registered with a file watcher (if desired) and the old node is unregistered...
 
 - (void) _replaceNode:(NSDictionary*)inOldAndNewNode
 {
@@ -634,11 +639,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	BOOL shouldSelectNode = inNode.objects==nil && inNode.isLoading==NO && _isReplacingNode==NO;
 
-//	if (shouldSelectNode && _delegate != nil && [_delegate respondsToSelector:@selector(controller:willSelectNode:)])
-//	{
-//		shouldSelectNode = [_delegate controller:self willSelectNode:inNode];
-//	}
-	
 	if (shouldSelectNode)
 	{
 		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willSelectNode:)])
@@ -748,6 +748,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 #pragma mark 
+#pragma mark Custom Nodes
+
 
 - (void) addNodeForFolder:(NSString*)inPath
 {
@@ -763,8 +765,22 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+#pragma mark Nodes Accessors
+
+
+// Returns the root node for the specified parser...
+
 - (IMBNode*) nodeForParser:(IMBParser*)inParser
 {
+	for (IMBNode* node in self.nodes)
+	{
+		if (node.parser == inParser)
+		{
+			return node;
+		}
+	}
+
 	return nil;
 }
 
@@ -772,10 +788,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Find the node with the specified identifier...
+	
 - (IMBNode*) _nodeWithIdentifier:(NSString*)inIdentifier inParentNode:(IMBNode*)inParentNode
 {
-	// Find the node with the specified identifier...
-	
 	NSArray* nodes = inParentNode ? inParentNode.subNodes : self.nodes;
 	
 	for (IMBNode* node in nodes)
@@ -828,6 +844,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 #pragma mark 
+#pragma mark Popup Menu
 
 
 - (void) _recursivelyAddItemsToMenu:(NSMenu*)inMenu 
@@ -849,7 +866,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:inSelector keyEquivalent:@""];
 		[item setImage:icon];
 		[item setTarget:inTarget];
-		[item setRepresentedObject:inNode];
+		[item setRepresentedObject:inNode.identifier];
 		[item setIndentationLevel:inIndentation];
 		[inMenu addItem:item];
 		[item release];

@@ -46,6 +46,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark ABSTRACT
+
+// There is one instance of this controller per media type. So this is essentially a per-media-type singleton.
+// The library controller is responsible for maintaining a list of IMBNode trees. It is the owner of these nodes.
+// Other controllers (IMBNodeTreeController and IMBObjectArrayController) can bind to the nodes property of this
+// controller. 
+
+// When user events (expanding or selection nodes), file system events (kqueue or FSEvent), or other external event 
+// occur, the tree of nodes usually needs to be updated or rebuilt. The only correct way of doing this is using the 
+// methods in this controller. Use reloadNode:, expandNode:, or selectNode: to update a node (or node tree) in a 
+// background operation...
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark HEADERS
 
 #import "IMBCommon.h"
@@ -94,14 +110,20 @@ extern NSString* kIMBNodesDidChangeNotification;
 + (IMBLibraryController*) sharedLibraryControllerWithMediaType:(NSString*)inMediaType;
 - (id) initWithMediaType:(NSString*)inMediaType;
 
+// Accessors...
+
 @property (retain) NSString* mediaType;
-@property (retain) NSMutableArray* nodes;
 @property (assign) IMBOptions options;
 @property (assign) id delegate;
-
 @property (retain) IMBKQueue* watcherKQueue;
 @property (retain) IMBFSEventsWatcher* watcherFSEvents;
 @property (readonly) BOOL isReplacingNode;
+
+// Node accessors (must only be called on the main thread)...
+
+@property (retain) NSMutableArray* nodes;
+- (IMBNode*) nodeForParser:(IMBParser*)inParser;
+- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 
 // Loading...
 
@@ -111,12 +133,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 - (void) expandNode:(IMBNode*)inNode;
 - (void) selectNode:(IMBNode*)inNode;
 
-// Node accessors (must only be called on the main thread)...
-
-- (IMBNode*) nodeForParser:(IMBParser*)inParser;
-- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
-
-// Custom folders...
+// Custom nodes...
 
 - (void) addNodeForFolder:(NSString*)inPath;
 - (BOOL) removeNode:(IMBNode*)inNode;
@@ -138,8 +155,8 @@ extern NSString* kIMBNodesDidChangeNotification;
 #pragma mark 
 
 
-// The following delegate methods are called multiple time during the app lifetime. When return NO from the
-// will method the delegate can suppress the operation. The delegate methods are called on the main thread... 
+// The following delegate methods are called multiple times during the app lifetime. Return NO from the  
+// should methods to suppress an operation. The delegate methods are called on the main thread... 
 
 @protocol IMBLibraryControllerDelegate
 
