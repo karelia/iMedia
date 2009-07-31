@@ -133,7 +133,7 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 
 - (void) awakeFromNib
 {
-	ibObjectArrayController.objectUnitSingular = NSLocalizedString(@"objectUnitSingular",@"Name of object media type (singular)");
+	ibObjectArrayController.objectUnitSingular = @""; //NSLocalizedString(@"objectUnitSingular",@"Name of object media type (singular)");
 	ibObjectArrayController.objectUnitPlural = NSLocalizedString(@"objectUnitPlural",@"Name of object media type (singular)");
 	
 	// Load the last known state from preferences, and save once the app is about to quit...
