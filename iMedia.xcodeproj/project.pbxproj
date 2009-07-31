@@ -68,6 +68,8 @@
 		D09934341011B63600C527B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D09934331011B63600C527B7 /* main.m */; };
 		D0993931101236AB00C527B7 /* IMBOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = D099392F101236AB00C527B7 /* IMBOutlineView.h */; };
 		D0993932101236AB00C527B7 /* IMBOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993930101236AB00C527B7 /* IMBOutlineView.m */; };
+		D0C5B23C1022F68A00A97A60 /* icon-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2291022F4CA00A97A60 /* icon-view.png */; };
+		D0C5B23D1022F68A00A97A60 /* list-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2271022F4AA00A97A60 /* list-view.png */; };
 		D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */; };
 		D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */; };
 /* End PBXBuildFile section */
@@ -168,6 +170,8 @@
 		D09934331011B63600C527B7 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D099392F101236AB00C527B7 /* IMBOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBOutlineView.h; sourceTree = "<group>"; };
 		D0993930101236AB00C527B7 /* IMBOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBOutlineView.m; sourceTree = "<group>"; };
+		D0C5B2271022F4AA00A97A60 /* list-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "list-view.png"; sourceTree = "<group>"; };
+		D0C5B2291022F4CA00A97A60 /* icon-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-view.png"; sourceTree = "<group>"; };
 		D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoParser.h; sourceTree = "<group>"; };
 		D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoParser.m; sourceTree = "<group>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -401,6 +405,8 @@
 				D09933B11011B32B00C527B7 /* IMBTestAppDelegate.h */,
 				D09933B21011B32B00C527B7 /* IMBTestAppDelegate.m */,
 				D09933B61011B3CE00C527B7 /* IMBTestApp.xib */,
+				D0C5B2291022F4CA00A97A60 /* icon-view.png */,
+				D0C5B2271022F4AA00A97A60 /* list-view.png */,
 			);
 			name = "Test Application";
 			sourceTree = "<group>";
@@ -519,6 +525,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D09933B71011B3CE00C527B7 /* IMBTestApp.xib in Resources */,
+				D0C5B23C1022F68A00A97A60 /* icon-view.png in Resources */,
+				D0C5B23D1022F68A00A97A60 /* list-view.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

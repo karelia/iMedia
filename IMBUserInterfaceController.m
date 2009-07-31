@@ -413,6 +413,10 @@
 	// Sync the selection of the popup menu...
 	
 	[self _syncPopupMenuSelection];
+	
+	// Reload the images in the IKImageBrowserView...
+	
+	[ibObjectImageBrowserView reloadData];
 }
 
 
@@ -621,6 +625,25 @@
 			[ibNodePopupButton selectItem:item];
 		}
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark IKImageBrowserView 
+
+
+- (NSUInteger) numberOfItemsInImageBrowser:(IKImageBrowserView*)inBrowser
+{
+	return [[ibObjectArrayController arrangedObjects] count];
+}
+
+
+- (id) imageBrowser:(IKImageBrowserView*)inBrowser itemAtIndex:(NSUInteger)inIndex
+{
+	return [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
 }
 
 
