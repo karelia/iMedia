@@ -61,6 +61,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CONSTANTS
+
+const NSString* kNodesContext = @"nodes.arrangedObjects";
+const NSString* kNodesSelectionContext = @"nodes.selection";
+const NSString* kObjectsContext = @"objects.arrangedObjects";
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 // Private methods...
@@ -133,11 +143,25 @@
 		selector:@selector(_saveStateToPreferences) 
 		name:NSApplicationWillTerminateNotification 
 		object:nil];
+		
+	[ibNodeTreeController retain];
+	[ibNodeTreeController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:(void*)kNodesContext];
+	[ibNodeTreeController addObserver:self forKeyPath:@"selection" options:0 context:(void*)kNodesSelectionContext];
+
+	[ibObjectArrayController retain];
+	[ibObjectArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:(void*)kObjectsContext];
 }
 
 
 - (void) dealloc
 {
+	[ibObjectArrayController removeObserver:self forKeyPath:@"arrangedObjects"];
+	[ibObjectArrayController release];
+
+	[ibNodeTreeController removeObserver:self forKeyPath:@"arrangedObjects"];
+	[ibNodeTreeController removeObserver:self forKeyPath:@"selection"];
+	[ibNodeTreeController release];
+
 	[self _stopObservingLibraryController];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
@@ -239,6 +263,32 @@
 	
 	float splitviewPosition = [[stateDict objectForKey:@"splitviewPosition"] floatValue];
 	if (splitviewPosition > 0.0) [ibSplitView setPosition:splitviewPosition ofDividerAtIndex:0];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
+{
+	if (inContext == (void*)kNodesContext)
+	{
+//		[self _updatePopupMenu];
+	}
+	else if (inContext == (void*)kNodesSelectionContext)
+	{
+		[self _syncPopupMenuSelection];
+	}
+	else if (inContext == (void*)kObjectsContext)
+	{
+		[ibObjectImageBrowserView reloadData];
+		[ibObjectArrayController willChangeValueForKey:@"objectCountString"];
+		[ibObjectArrayController didChangeValueForKey:@"objectCountString"];
+	}
+	else
+	{
+		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
+	}
 }
 
 
@@ -413,10 +463,6 @@
 	// Sync the selection of the popup menu...
 	
 	[self _syncPopupMenuSelection];
-	
-	// Reload the images in the IKImageBrowserView...
-	
-	[ibObjectImageBrowserView reloadData];
 }
 
 
@@ -536,6 +582,7 @@
 	// Rebuild the popup menu manually. Please note that the popup menu does not currently use bindings...
 	
 	[self _updatePopupMenu];
+	[self _syncPopupMenuSelection];
 		
 	// We are done, now the user is once again in charge...
 	
