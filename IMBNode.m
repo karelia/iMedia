@@ -137,12 +137,6 @@
 	copy.icon = self.icon;
 	copy.attributes = self.attributes;
 	
-	if (self.subNodes) copy.subNodes = [NSMutableArray arrayWithArray:self.subNodes];
-	else copy.subNodes = nil;
-
-	if (self.objects) copy.objects = [NSMutableArray arrayWithArray:self.objects];
-	else copy.objects = nil;
-	
 	copy.leaf = self.leaf;
 	copy.expanding = self.expanding;
 	copy.populating = self.populating;
@@ -157,6 +151,29 @@
 	copy.badgeTarget = self.badgeTarget;
 	copy.badgeSelector = self.badgeSelector;
 	
+	// Create a shallow copy of objects array...
+	
+	if (self.objects) copy.objects = [NSMutableArray arrayWithArray:self.objects];
+	else copy.objects = nil;
+
+	// Create a deep copy of the subnodes. This is essential to make background operations completely threadsafe...
+	
+	if (self.subNodes)
+	{
+		copy.subNodes = [NSMutableArray arrayWithCapacity:self.subNodes.count];
+
+		for (IMBNode* subnode in self.subNodes)
+		{
+			IMBNode* copiedSubnode = [subnode copy];
+			copiedSubnode.parentNode = copy;
+			[(NSMutableArray*)copy.subNodes addObject:copiedSubnode];
+		}
+	}
+	else 
+	{
+		copy.subNodes = nil;
+	}
+
 	return copy;
 }
 
