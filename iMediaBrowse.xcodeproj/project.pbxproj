@@ -1457,7 +1457,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "\n# see Comments for information on this script\n\necho \"Generating Localizable.strings ...\"\n\ncd ${SRCROOT}\ngenstrings -littleEndian -q -u -s LocalizedStringInIMedia -o en.lproj *.m\n\n";
+			shellScript = "\n# see Comments for information on this script\n\necho \"Generating Localizable.strings ...\"\n\ncd \"${SRCROOT}\"\ngenstrings -littleEndian -q -u -s LocalizedStringInIMedia -o en.lproj *.m\n\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
