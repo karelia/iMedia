@@ -236,17 +236,21 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 				BOOL shouldLoad = YES;
 				IMBParser* parser = nil;
 				
-				if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willLoadParser:forMediaType:)])
+				if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldLoadParser:forMediaType:)])
 				{
-					shouldLoad = [_delegate controller:self willLoadParser:parserClass forMediaType:mediaType];
+					shouldLoad = [_delegate controller:self shouldLoadParser:parserClass forMediaType:mediaType];
 				}
 				
 				// If yes, then create an instance, store it in _loadedParsers, and tell the delegate...
 				
 				if (shouldLoad)
 				{
+					if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willLoadParser:forMediaType:)])
+					{
+						[_delegate controller:self willLoadParser:parserClass forMediaType:mediaType];
+					}
+
 					NSMutableArray* parsers = [self loadedParsersForMediaType:mediaType];
-					
 					parser = [[parserClass alloc] init];
 					[parsers addObject:parser];
 					[parser release];
@@ -306,9 +310,9 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	
 	BOOL shouldLoad = YES;
 	
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willLoadParser:forMediaType:)])
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldLoadParser:forMediaType:)])
 	{
-		shouldLoad = [_delegate controller:self willLoadParser:[inParser class] forMediaType:inMediaType];
+		shouldLoad = [_delegate controller:self shouldLoadParser:[inParser class] forMediaType:inMediaType];
 	}
 
 	// Check if the parser is already in the list...
@@ -327,6 +331,11 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	
 	if (shouldLoad)
 	{
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willLoadParser:forMediaType:)])
+		{
+			[_delegate controller:self willLoadParser:[inParser class] forMediaType:inMediaType];
+		}
+
 		inParser.custom = YES;
 		[parsers addObject:inParser];
 

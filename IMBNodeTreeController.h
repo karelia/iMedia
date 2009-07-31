@@ -50,11 +50,6 @@
 #pragma mark 
 
 @interface IMBNodeTreeController : NSTreeController
-{
-	NSString* _selectedNodeIdentifier;
-}
-
-@property (retain) NSString* selectedNodeIdentifier;
 
 @end
 

@@ -52,12 +52,12 @@
 @interface IMBObjectArrayController : NSArrayController
 {
 	IBOutlet NSSearchField* ibSearchField;
-	IBOutlet id _delegate;
-	NSString* _objectUnitSingular;
-	NSString* _objectUnitPlural;
-	
 	NSArray* _searchableProperties;
 	NSString* _searchString;
+
+	NSString* _objectUnitSingular;
+	NSString* _objectUnitPlural;
+	IBOutlet id _delegate;
 	id _newObject;
 }
 

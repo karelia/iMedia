@@ -46,12 +46,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
+#pragma mark ABSTRACT
 
-//#import "IMBCommon.h"
-//#import "IMBNodeTreeController.h"
-//#import "IMBObjectArrayController.h"
-//#import "IMBOutlineView.h"
+// There is an instance of this controller per window and per media type. If we have 4 media types (photos, music,
+// video, links) and 3 windows containing media browser UI, then we need 12 instances of this controller. This 
+// controller coordinates between the views and the IMBLibraryController. Essentially IMBLibraryController is a 
+// backend controller, while IMBUserInterfaceController is a frontend controller.
+
+// This controller is also responsible for handling selection and expansion of nodes, and for making sure that the
+// state is persistent across application launches. 
+
+// Please note that this controller is the delegate of all views, so do not modify those delegates. If you do need
+// delegate messages for various events, then use the delegate methods of IMBLibraryController...
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,16 +88,14 @@
 @interface IMBUserInterfaceController : NSObject
 {
 	IMBLibraryController* _libraryController;
-	
-	IBOutlet NSSplitView* ibSplitView;
-	
-	IBOutlet IMBNodeTreeController* ibNodeTreeController;
-	IBOutlet IMBOutlineView* ibNodeOutlineView;
-	IBOutlet NSPopUpButton* ibNodePopupButton;
-	
 	NSString* _selectedNodeIdentifier;
 	NSMutableArray* _expandedNodeIdentifiers;
 	BOOL _isRestoringState;
+	
+	IBOutlet NSSplitView* ibSplitView;
+	IBOutlet IMBNodeTreeController* ibNodeTreeController;
+	IBOutlet IMBOutlineView* ibNodeOutlineView;
+	IBOutlet NSPopUpButton* ibNodePopupButton;
 	
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
 	IBOutlet NSTabView* ibObjectTabView;
@@ -99,9 +103,6 @@
 	IBOutlet IKImageBrowserView* ibObjectImageBrowserView;
 	NSInteger _objectViewType;
 	double _objectIconSize;
-	
-//	IBOutlet NSSlider* ibSizeSlider;
-//	IBOutlet NSSearchField* ibSearchField;
 }
 
 // Library...
@@ -131,8 +132,8 @@
 
 // Actions...
 
-- (BOOL) canReload;
-- (IBAction) reload:(id)inSender;
+- (BOOL) canReloadNode;
+- (IBAction) reloadNode:(id)inSender;
 
 - (BOOL) canAddNode;
 - (IBAction) addNode:(id)inSender;

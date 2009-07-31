@@ -50,8 +50,6 @@
 #pragma mark HEADERS
 
 #import "IMBNodeTreeController.h"
-#import "IMBConfig.h"
-#import "IMBNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,8 +59,6 @@
 
 @implementation IMBNodeTreeController
 
-@synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -71,7 +67,7 @@
 {
 	if (self = [super init])
 	{
-		_selectedNodeIdentifier = nil;
+
 	}
 	
 	return self;
@@ -80,30 +76,7 @@
 
 - (void) dealloc
 {
-	IMBRelease(_selectedNodeIdentifier);
 	[super dealloc];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (BOOL)outlineView:(NSOutlineView*)inOutlineView shouldSelectItem:(id)inItem
-{
-	IMBNode* node = [inItem representedObject];
-	self.selectedNodeIdentifier = node.identifier;
-//	[self.libraryController selectNode:node];
-		
-	return YES;	
-}
-
-
-- (BOOL)outlineView:(NSOutlineView*)inOutlineView shouldExpandItem:(id)inItem
-{
-	IMBNode* node = [inItem representedObject];
-//	[self.libraryController expandNode:node];
-		
-	return !node.isLeaf;	
 }
 
 

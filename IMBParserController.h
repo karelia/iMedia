@@ -46,6 +46,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark ABSTRACT
+
+// This singleton class loads all registered parsers and keeps instances around for the duration of the app lifetime.
+// A parser is thus an extremely long-lived object, which can store state and talk to asynchronous APIs. This gives
+// developers the chance to implmenent parsers for web based services, Spotlight, Image Capture etc. Just before the
+// app quits the parsers are unloaded, at which time they can clean up...
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark CLASSES
 
 @class IMBParser;
@@ -113,10 +124,11 @@
 
 @optional
 
-// Called once o main thread early in app lifetime, when all parsers are registered and loaded. Return NO to  
-// suppress loading a particular parser...
+// Called once on main thread early in app lifetime, when all parsers are registered and loaded. 
+// Return NO to suppress loading a particular parser...
 
-- (BOOL) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType;
+- (BOOL) controller:(IMBParserController*)inController shouldLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType;
+- (void) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType;
 - (void) controller:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
 - (void) controller:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
 

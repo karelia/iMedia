@@ -227,16 +227,9 @@
 // When the number of objects changes, then rebuild the description string. The UI can bind this string...
 
 
-+ (NSSet*) keyPathsForValuesAffectingValueForKey:(NSString*)inKey
++ (NSSet*) keyPathsForValuesAffectingObjectCountString
 {
-    NSSet* keyPaths = [super keyPathsForValuesAffectingValueForKey:inKey];
- 
-    if ([inKey isEqualToString:@"objectCountString"])
-    {
-        keyPaths = [keyPaths setByAddingObjectsFromSet:[NSSet setWithObjects:@"arrangedObjects",@"objectUnitSingular",@"objectUnitPlural",nil]];
-    }
-	
-    return keyPaths;
+    return [NSSet setWithObjects:@"arrangedObjects",@"objectUnitSingular",@"objectUnitPlural",nil];
 }
 
 
