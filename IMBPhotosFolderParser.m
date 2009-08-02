@@ -63,12 +63,12 @@
 
 // Restrict this parser to image files...
 
-- (id) init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super init])
+	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.fileUTI = (NSString*)kUTTypeImage; 
-		self.mediaType =  kIMBPhotosMediaType;
+//		self.mediaType =  kIMBPhotosMediaType;
 	}
 	
 	return self;
@@ -95,9 +95,9 @@
 
 // Set the folder path to the ~/Pictures...
 
-- (id) init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super init])
+	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
 	}
@@ -126,9 +126,9 @@
 
 // Set the folder path to the /Library/Desktop Pictures...
 
-- (id) init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super init])
+	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.mediaSource = @"/Library/Desktop Pictures";
 	}
@@ -157,9 +157,9 @@
 
 // Set the folder path to the /Library/Desktop Pictures...
 
-- (id) init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super init])
+	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.mediaSource = @"/Library/User Pictures";
 	}
@@ -188,9 +188,9 @@
 
 // Set the folder path to the /Library/Desktop Pictures...
 
-- (id) init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super init])
+	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.mediaSource = @"/Library/Application Support/Apple/iChat Icons";
 	}

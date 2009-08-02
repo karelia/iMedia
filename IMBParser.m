@@ -67,13 +67,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
 	if (self = [super init])
 	{
-		_mediaSource = nil;
-		_mediaType = nil;
-		_custom = NO;
+		self.mediaSource = nil;
+		self.mediaType = inMediaType;
+		self.custom = NO;
 	}
 	
 	return self;
@@ -98,12 +98,6 @@
 {
 	return nil;
 }
-
-
-//- (BOOL) expandNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
-//{
-//	return NO;
-//}
 
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
