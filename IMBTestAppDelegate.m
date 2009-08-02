@@ -13,7 +13,8 @@
 #import "IMBTestAppDelegate.h"
 #import "IMBParserController.h"
 #import "IMBLibraryController.h"
-#import "IMBUserInterfaceController.h"
+#import "IMBNodeViewController.h"
+#import "IMBPhotosViewController.h"
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBiPhotoParser.h"
@@ -34,6 +35,9 @@
 
 @implementation IMBTestAppDelegate
 
+@synthesize nodeViewController = _nodeViewController;
+@synthesize objectViewController = _objectViewController;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -44,9 +48,7 @@
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
 	[parserController setDelegate:self];
-//	[parserController logRegisteredParsers];
 	[parserController loadParsers];
-//	[parserController logLoadedParsers];
 	
 	// Create libraries (singleton per mediaType)...
 	
@@ -55,13 +57,32 @@
 	
 	// Link the user interface (possible multiple instances) to the	singleton library...
 	
-	ibUserInterfaceController.libraryController = libraryController;
+	self.nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
+	NSView* nodeView = self.nodeViewController.view;
+	NSView* containerView = self.nodeViewController.objectContainerView;
+	
+	self.objectViewController = [IMBPhotosViewController viewControllerForLibraryController:libraryController];
+	self.objectViewController.nodeTreeController = self.nodeViewController.nodeTreeController;
+	NSView* objectView = self.objectViewController.view;
+
+	[objectView setFrame:[containerView bounds]];
+	[containerView addSubview:objectView];
+	[nodeView setFrame:[ibWindow.contentView bounds]];
+	[ibWindow setContentView:nodeView];
 
 	// Load the library...
 	
 	[libraryController reload];
 }
 	
+
+- (void) dealloc
+{
+	IMBRelease(_nodeViewController);
+	IMBRelease(_objectViewController);
+	[super dealloc];
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

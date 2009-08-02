@@ -16,12 +16,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class IMBNodeViewController;
+@class IMBObjectViewController;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @class IMBUserInterfaceController;
 
 @interface IMBTestAppDelegate : NSObject
 {
-	IBOutlet IMBUserInterfaceController* ibUserInterfaceController;
+	IBOutlet NSWindow* ibWindow;
+	IBOutlet IMBNodeViewController* _nodeViewController;
+	IBOutlet IMBObjectViewController* _objectViewController;
 }
+
+@property (retain) IMBNodeViewController* nodeViewController;
+@property (retain) IMBObjectViewController* objectViewController;
 
 @end
 
