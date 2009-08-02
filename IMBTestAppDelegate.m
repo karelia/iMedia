@@ -15,6 +15,7 @@
 #import "IMBLibraryController.h"
 #import "IMBNodeViewController.h"
 #import "IMBPhotosViewController.h"
+#import "IMBConfig.h"
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBiPhotoParser.h"
@@ -70,11 +71,27 @@
 	[nodeView setFrame:[ibWindow.contentView bounds]];
 	[ibWindow setContentView:nodeView];
 
+	// Restore window size...
+	
+	NSString* frame = [IMBConfig prefsValueForKey:@"windowFrame"];
+	if (frame) [ibWindow setFrame:NSRectFromString(frame) display:YES animate:NO];
+	
 	// Load the library...
 	
 	[libraryController reload];
 }
 	
+
+// Save window frame to prefs...
+
+- (void) applicationWillTerminate:(NSNotification*)inNotification;
+{
+	NSString* frame = NSStringFromRect(ibWindow.frame);
+	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
+}
+	
+
+// Cleanup...
 
 - (void) dealloc
 {
@@ -163,7 +180,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (BOOL) controller:(IMBLibraryController*)inController shouldExpandNode:(IMBNode*)inNode
+- (BOOL) controller:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
 {
 	#if DEBUG
 	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
@@ -173,7 +190,7 @@
 }
 
 
-- (void) controller:(IMBLibraryController*)inController willExpandNode:(IMBNode*)inNode
+- (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode
 {
 	#if DEBUG
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
@@ -181,38 +198,7 @@
 }
 
 
-- (void) controller:(IMBLibraryController*)inController didExpandNode:(IMBNode*)inNode
-{
-	#if DEBUG
-	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
-	#endif
-
-//	[inController logNodes];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (BOOL) controller:(IMBLibraryController*)inController shouldSelectNode:(IMBNode*)inNode
-{
-	#if DEBUG
-	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
-	#endif
-
-	return YES;
-}
-
-
-- (void) controller:(IMBLibraryController*)inController willSelectNode:(IMBNode*)inNode
-{
-	#if DEBUG
-	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
-	#endif
-}
-
-
-- (void) controller:(IMBLibraryController*)inController didSelectNode:(IMBNode*)inNode
+- (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode
 {
 	#if DEBUG
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);

@@ -50,14 +50,31 @@
 #pragma mark ABSTRACT
 
 // This subclass of NSViewController is responsible for the lower half of a browser window, i.e. the object views.
-// It load the views and handles things like selection. Please note that this controller is the delegate of all  
-// views, so do not modify those delegates. If you do need delegate messages for various events, then use the 
-// delegate methods of IMBLibraryController...
+// It loads the views and handles things like view options and their presistence. Please note that this controller   
+// is the delegate of all views, so do not modify those delegates. If you do need delegate messages for various  
+// events, then use the delegate methods of IMBLibraryController.
 
 // There is an instance of this controller per window and per media type. If we have 4 media types (photos, music,
 // video, links) and 3 windows containing media browser UI, then we need 12 instances of this controller. This 
 // controller coordinates between the views and the IMBLibraryController. Essentially IMBLibraryController is a 
 // backend controller, while IMBObjectViewController is a frontend controller.
+
+// ATTENTION: This is an abstract base class. Do not use an instance of this class, but use a specific subclass
+// like IMBPhotosViewController or IMBMusicViewController instead...
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
+
+enum
+{
+	kIMBObjectViewTypeIcon,
+	kIMBObjectViewTypeList,
+	kIMBObjectViewTypeCombo,
+};
+typedef NSUInteger kIMBObjectViewType;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,7 +105,7 @@
 	IBOutlet IKImageBrowserView* ibIconView;
 	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
-	NSInteger _viewType;
+	NSUInteger _viewType;
 	double _iconSize;
 	
 	NSString* _objectCountFormatSingular;
@@ -114,8 +131,9 @@
 @property (readonly) NSTableView* listView;
 @property (readonly) NSTableView* comboView;
 
-@property (assign) NSInteger viewType;
+@property (assign) NSUInteger viewType;
 @property (assign) double iconSize;
+@property (readonly) BOOL canUseIconSize;
 
 // Localized string for object count...
  

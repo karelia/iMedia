@@ -97,7 +97,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 @interface IMBLibraryController : NSObject
 {
 	NSString* _mediaType;
-	NSMutableArray* _nodes;
+	NSMutableArray* _rootNodes;
 	IMBOptions _options;
 	id _delegate;
 
@@ -122,22 +122,20 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 // Node accessors (must only be called on the main thread)...
 
-@property (retain) NSMutableArray* nodes;				//rename to rootNodes or mediaSourceNodes
-- (IMBNode*) nodeForParser:(IMBParser*)inParser;		// rename rootNodeForMediaSource
+@property (retain) NSMutableArray* rootNodes;			
+- (IMBNode*) rootNodeForParser:(IMBParser*)inParser;
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 
 // Loading...
 
 - (void) reload;
-
 - (void) reloadNode:(IMBNode*)inNode;
-- (void) expandNode:(IMBNode*)inNode;
-- (void) selectNode:(IMBNode*)inNode;
+- (void) populateNode:(IMBNode*)inNode;
 
 // Custom nodes...
 
-- (void) addNodeForFolder:(NSString*)inPath;
-- (BOOL) removeNode:(IMBNode*)inNode;
+- (void) addCustomRootNodeForFolder:(NSString*)inPath;
+- (BOOL) removeCustomRootNode:(IMBNode*)inNode;
 
 // Popup menu...
 
@@ -167,13 +165,9 @@ extern NSString* kIMBNodesDidChangeNotification;
 - (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser;
 - (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser;
 
-- (BOOL) controller:(IMBLibraryController*)inController shouldExpandNode:(IMBNode*)inNode;
-- (void) controller:(IMBLibraryController*)inController willExpandNode:(IMBNode*)inNode;
-- (void) controller:(IMBLibraryController*)inController didExpandNode:(IMBNode*)inNode;
-
-- (BOOL) controller:(IMBLibraryController*)inController shouldSelectNode:(IMBNode*)inNode;
-- (void) controller:(IMBLibraryController*)inController willSelectNode:(IMBNode*)inNode;
-- (void) controller:(IMBLibraryController*)inController didSelectNode:(IMBNode*)inNode;
+- (BOOL) controller:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode;
+- (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode;
+- (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode;
 
 @end
 
