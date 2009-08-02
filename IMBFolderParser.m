@@ -95,6 +95,11 @@
 #pragma mark Parser Methods
 
 
+// If we were not suplied an old node, then we will just create an empty root node. If on the other hand we were
+// given a node, then we will try to recreate the same node as faithfully as possible. That means is should be 
+// the node with the same position/identifier, and if it was populated before, then it should also be populated 
+// afterwards...
+
 - (IMBNode*) createNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
 {
 	NSError* error = nil;
@@ -125,21 +130,13 @@
 		newNode.watcherType = kIMBWatcherTypeNone;
 	}
 	
-	// If the old node had subnodes, then look for subnodes in the new node...
-	
-	if ([inOldNode.subNodes count] > 0)
-	{
-		[self expandNode:newNode options:inOptions error:&error];
-	}
-	
 	// If the old node was populated, then also populate the new node...
 	
-	if ([inOldNode.objects count] > 0)
+	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
 	{
 		[self populateNode:newNode options:inOptions error:&error];
 	}
 
-	
 	if (outError) *outError = error;
 	return newNode;
 }
@@ -150,19 +147,75 @@
 
 // Scan the our folder for subfolders and add a subnode for each one we find...
 
-- (BOOL) expandNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+//- (BOOL) expandNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+//{
+//	NSError* error = nil;
+//	NSString* folder = inNode.mediaSource;
+//	NSArray* files = [[NSFileManager threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
+//	
+//	if (error == nil)
+//	{
+//		NSMutableArray* subnodes = [NSMutableArray array];
+//		
+//		for (NSString* file in files)
+//		{
+//			NSString* path = [folder stringByAppendingPathComponent:file];
+//			
+//			if ([self fileAtPath:path conformsToUTI:(NSString*)kUTTypeFolder])
+//			{
+//				NSString* parserClassName = NSStringFromClass([self class]);
+//				
+//				IMBNode* subnode = [[IMBNode alloc] init];
+//
+//				subnode.parentNode = inNode;
+//				subnode.mediaSource = path;
+//				subnode.identifier = [NSString stringWithFormat:@"%@:/%@",parserClassName,path];
+//				subnode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
+//				subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+//				subnode.parser = self;
+//				subnode.leaf = NO;
+//				
+//				[subnodes addObject:subnode];
+//				[subnode release];
+//			}
+//		}
+//		
+//		inNode.subNodes = subnodes;
+//	}
+//	
+//	if (outError) *outError = error;
+//	return error == nil;
+//}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// The supplied node is a private copy which may be modified here in the background operation. Scan the folder
+// for folder or for files that match our desired UTI and create an IMBObject for each file that qualifies...
+
+- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
+	
 	NSString* folder = inNode.mediaSource;
 	NSArray* files = [[NSFileManager threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
 	
 	if (error == nil)
 	{
-		NSMutableArray* subnodes = [NSMutableArray array];
+		NSMutableArray* subnodes = [[NSMutableArray alloc] init];
+		inNode.subNodes = subnodes;
+		[subnodes release];
 		
+		NSMutableArray* objects = [[NSMutableArray alloc] initWithCapacity:files.count];
+		inNode.objects = objects;
+		[objects release];
+
 		for (NSString* file in files)
 		{
 			NSString* path = [folder stringByAppendingPathComponent:file];
+			
+			// For folders create a subnode...
 			
 			if ([self fileAtPath:path conformsToUTI:(NSString*)kUTTypeFolder])
 			{
@@ -181,40 +234,10 @@
 				[subnodes addObject:subnode];
 				[subnode release];
 			}
-		}
-		
-		inNode.subNodes = subnodes;
-	}
-	
-	if (outError) *outError = error;
-	return error == nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// The supplied node is a private copy which may be modified here in the background operation. Scan the folder
-// for files that match our desired UTI and create an IMBObject for each file that qualifies...
-
-- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
-{
-	NSError* error = nil;
-	
-	NSString* folder = inNode.mediaSource;
-	NSArray* files = [[NSFileManager threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
-	
-	if (error == nil)
-	{
-		NSMutableArray* objects = [[NSMutableArray alloc] initWithCapacity:files.count];
-		inNode.objects = objects;
-		[objects release];
-
-		for (NSString* file in files)
-		{
-			NSString* path = [folder stringByAppendingPathComponent:file];
 			
-			if ([self fileAtPath:path conformsToUTI:_fileUTI])
+			// For qualifying files create an object...
+			
+			else if ([self fileAtPath:path conformsToUTI:_fileUTI])
 			{
 				IMBVisualObject* object = [[IMBVisualObject alloc] init];
 				object.value = (id)path;

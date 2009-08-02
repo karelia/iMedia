@@ -103,6 +103,9 @@ extern NSString* kIMBContactsMediaType;
 #define IMBRelease(object) if (object) {[object release]; object=nil;}
 #endif
 
+#ifndef IMBLocalizedString
+#define IMBLocalizedString(key,value,comment) NSLocalizedStringWithDefaultValue(key,nil,[NSBundle bundleForClass:NSClassFromString(@"IMBConfig")],value,comment)
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 

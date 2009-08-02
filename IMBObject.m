@@ -74,6 +74,15 @@
 	return copy;
 }
 
+// Return a small generic icon for this file. Is the icon cached by NSWorkspace, or should be provide some 
+// caching ourself?
+
+- (NSImage*) icon
+{
+	NSString* extension = [(NSString*)_value pathExtension];
+	return [[NSWorkspace sharedWorkspace] iconForFileType:extension];
+}
+
 
 @end
 
@@ -88,11 +97,13 @@
 @synthesize imageVersion = _imageVersion;
 
 
+// Use path as image representation type for now. IKImageBrowserView then does all the thumbnail loading and 
+// caching all by itself...
+
 - (NSString*) imageRepresentationType
 {
 	return IKImageBrowserPathRepresentationType;
 }
-
 
 - (id) imageRepresentation
 {

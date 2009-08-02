@@ -68,6 +68,7 @@
 @property (retain) id value;								// Path or URL
 @property (retain) NSString* name;
 @property (retain) NSDictionary* metadata;
+@property (readonly) NSImage* icon;
 
 @end
 

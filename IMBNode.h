@@ -79,8 +79,7 @@
 	NSArray* _subNodes;
 	IMBNode* _parentNode;	// not retained!
 	BOOL _leaf;
-	BOOL _expanding;
-	BOOL _populating;
+	BOOL _loading;
 	
 	IMBParser* _parser;
 	IMBWatcherType _watcherType;
@@ -123,10 +122,7 @@
 // State information about a node...
 
 @property (assign,getter=isLeaf) BOOL leaf;
-@property (assign,getter=isExpanding) BOOL expanding;
-@property (assign,getter=isPopulating) BOOL populating;
-@property (readonly) BOOL isLoading;
-
+@property (assign,getter=isLoading) BOOL loading;
 
 // Support for live watching and asynchronous nodes
 

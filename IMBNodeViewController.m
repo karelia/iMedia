@@ -113,14 +113,23 @@ static NSString* kSelectionKey = @"selection";
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (NSBundle*) bundle
+{
+	return [NSBundle bundleForClass:[self class]];
+}
+
+
++ (NSString*) nibName
+{
+	return @"IMBLibraryView";
+}
+
+
 + (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
 {
-	NSBundle* frameworkBundle = [NSBundle bundleForClass:[self class]];
-	IMBNodeViewController* controller = [[[IMBNodeViewController alloc] initWithNibName:@"IMBLibraryView" bundle:frameworkBundle] autorelease];
-
+	IMBNodeViewController* controller = [[[IMBNodeViewController alloc] initWithNibName:self.nibName bundle:self.bundle] autorelease];
 	[controller view];										// Load the view *before* setting the libraryController, 
 	controller.libraryController = inLibraryController;		// so that outlets are set before we load the preferences.
-	
 	return controller;
 }
 
@@ -286,10 +295,6 @@ static NSString* kSelectionKey = @"selection";
 
 - (CGFloat) splitView:(NSSplitView*)inSplitView constrainSplitPosition:(CGFloat)inPosition ofSubviewAt:(NSInteger)inIndex
 {
-	NSMutableDictionary* stateDict = [self _preferences];
-	[stateDict setObject:[NSNumber numberWithFloat:inPosition] forKey:@"splitviewPosition"];
-	[self _setPreferences:stateDict];
-
 	if (inIndex == 0)
 	{
 		double minPos = 36.0;
@@ -298,6 +303,10 @@ static NSString* kSelectionKey = @"selection";
 		inPosition = MIN(inPosition,maxPos);
 	}
 	
+	NSMutableDictionary* stateDict = [self _preferences];
+	[stateDict setObject:[NSNumber numberWithFloat:inPosition] forKey:@"splitviewPosition"];
+	[self _setPreferences:stateDict];
+
 	return inPosition;
 }
 
@@ -359,10 +368,10 @@ static NSString* kSelectionKey = @"selection";
 	{
 		id delegate = self.libraryController.delegate;
 		
-		if ([delegate respondsToSelector:@selector(controller:shouldExpandNode:)])
+		if ([delegate respondsToSelector:@selector(controller:shouldPopulateNode:)])
 		{
 			IMBNode* node = [inItem representedObject];
-			shouldExpand = [delegate controller:self.libraryController shouldExpandNode:node];
+			shouldExpand = [delegate controller:self.libraryController shouldPopulateNode:node];
 		}
 	}
 	
@@ -374,12 +383,9 @@ static NSString* kSelectionKey = @"selection";
 
 - (void) outlineViewItemWillExpand:(NSNotification*)inNotification
 {
-//	if (!_isRestoringState)
-	{
-		id item = [[inNotification userInfo] objectForKey:@"NSObject"];
-		IMBNode* node = [item representedObject];
-		[self.libraryController expandNode:node];
-	}
+	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
+	IMBNode* node = [item representedObject];
+	[self.libraryController populateNode:node];
 }
 
 
@@ -418,9 +424,9 @@ static NSString* kSelectionKey = @"selection";
 		IMBNode* node = [inItem representedObject];
 		id delegate = self.libraryController.delegate;
 		
-		if ([delegate respondsToSelector:@selector(controller:shouldSelectNode:)])
+		if ([delegate respondsToSelector:@selector(controller:shouldPopulateNode:)])
 		{
-			shouldSelect = [delegate controller:self.libraryController shouldSelectNode:node];
+			shouldSelect = [delegate controller:self.libraryController shouldPopulateNode:node];
 		}
 	}
 	
@@ -441,7 +447,7 @@ static NSString* kSelectionKey = @"selection";
 
 		if (node)
 		{
-			[self.libraryController selectNode:node];
+			[self.libraryController populateNode:node];
 			self.selectedNodeIdentifier = node.identifier;
 		}
 	}
@@ -589,7 +595,7 @@ static NSString* kSelectionKey = @"selection";
 	{	
 		NSIndexPath* indexPath = inNode.indexPath;
 		[ibNodeTreeController setSelectionIndexPath:indexPath];
-		[self.libraryController selectNode:inNode];
+		[self.libraryController populateNode:inNode];
 	}	
 }
 
@@ -742,19 +748,14 @@ static NSString* kSelectionKey = @"selection";
 - (BOOL) canRemoveNode
 {
 	IMBNode* node = [self selectedNode];
-	if (node.isLoading) return NO;
-	return node.parser.isCustom && node.parentNode==nil;
+	return node.parentNode==nil && node.parser.isCustom && !node.isLoading;
 }
 
 
 - (IBAction) removeNode:(id)inSender
 {
 	IMBNode* node = [self selectedNode];
-	
-	if (node.parser.isCustom && node.parentNode==nil && !node.isLoading)
-	{
-		[self.libraryController removeNode:node];
-	}
+	[self.libraryController removeCustomRootNode:node];
 }
 
 

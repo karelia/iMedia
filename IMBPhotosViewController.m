@@ -50,6 +50,7 @@
 #pragma mark HEADERS
 
 #import "IMBPhotosViewController.h"
+#import "IMBCommon.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,13 +78,19 @@
 
 + (NSString*) objectCountFormatSingular
 {
-	return @"%d photo";
+	return IMBLocalizedString(
+		@"PhotoCountFormatSingular",
+		@"%d photo",
+		@"Format string for object count in singluar");
 }
 
 
 + (NSString*) objectCountFormatPlural
 {
-	return @"%d photos";
+	return IMBLocalizedString(
+		@"PhotoCountFormatPlural",
+		@"%d photos",
+		@"Format string for object count in plural");
 }
 
 

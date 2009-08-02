@@ -115,11 +115,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @end
 
 
-@interface IMBExpandNodeOperation : IMBLibraryOperation
-@end
-
-
-@interface IMBSelectNodeOperation : IMBLibraryOperation
+@interface IMBPopulateNodeOperation : IMBLibraryOperation
 @end
 
 
@@ -130,8 +126,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @interface IMBLibraryController ()
 - (void) _didCreateNode:(IMBNode*)inNode;
-- (void) _didExpandNode:(IMBNode*)inNode;
-- (void) _didSelectNode:(IMBNode*)inNode;
+- (void) _didPopulateNode:(IMBNode*)inNode;
 - (void) _replaceNode:(NSDictionary*)inOldAndNewNode;
 - (void) _presentError:(NSError*)inError;
 - (void) _fileWatcherDidFireForPath:(NSString*)inPath;
@@ -235,34 +230,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // Tell the parser to popuplate the node in this background operation. When done, pass back the result to the 
 // libraryController in the main thread...
 	
-@implementation IMBExpandNodeOperation
-
-- (void) main
-{
-	NSError* error = nil;
-	[_parser expandNode:self.newNode options:self.options error:&error];
-	
-	if (error == nil)
-	{
-		[self performSelectorOnMainThread:@selector(_didExpandNode:) withObject:self.newNode];
-		[self replaceNode:self.oldNode withNode:self.newNode];
-	}
-	else
-	{
-		[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
-	}
-}
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Tell parser to popuplate the node here in this background operation. When done, pass back the result to the 
-// libraryController in the main thread...
-	
-@implementation IMBSelectNodeOperation
+@implementation IMBPopulateNodeOperation
 
 - (void) main
 {
@@ -271,7 +239,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (error == nil)
 	{
-		[self performSelectorOnMainThread:@selector(_didSelectNode:) withObject:self.newNode];
+		[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.newNode];
 		[self replaceNode:self.oldNode withNode:self.newNode];
 	}
 	else
@@ -291,7 +259,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @implementation IMBLibraryController
 
 @synthesize mediaType = _mediaType;
-@synthesize nodes = _nodes;
+@synthesize rootNodes = _rootNodes;
 @synthesize options = _options;
 @synthesize delegate = _delegate;
 @synthesize watcherKQueue = _watcherKQueue;
@@ -337,7 +305,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (self = [super init])
 	{
 		self.mediaType = inMediaType;
-		self.nodes = [NSMutableArray array];
+		self.rootNodes = [NSMutableArray array];
 		self.options = kIMBOptionNone;
 		
 		self.watcherKQueue = [[[IMBKQueue alloc] init] autorelease];
@@ -356,7 +324,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) dealloc
 {
 	IMBRelease(_mediaType);
-	IMBRelease(_nodes);
+	IMBRelease(_rootNodes);
 	IMBRelease(_watcherKQueue);
 	IMBRelease(_watcherFSEvents);
 
@@ -378,9 +346,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	NSMutableArray* parsers = [[IMBParserController sharedParserController] loadedParsersForMediaType:self.mediaType];
 	
-	[self willChangeValueForKey:@"nodes"];
-	[self.nodes removeAllObjects];
-	[self didChangeValueForKey:@"nodes"];
+	[self willChangeValueForKey:@"rootNodes"];
+	[self.rootNodes removeAllObjects];
+	[self didChangeValueForKey:@"rootNodes"];
 	
 	for (IMBParser* parser in parsers)
 	{
@@ -435,6 +403,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			[_delegate controller:self willCreateNodeWithParser:inNode.parser];
 		}
+
+		inNode.loading = YES;
 
 		IMBCreateNodeOperation* operation = [[IMBCreateNodeOperation alloc] init];
 		operation.libraryController = self;
@@ -494,12 +464,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (parent)
 		siblings = [parent mutableArrayValueForKey:@"subNodes"];
 	else
-		siblings = [self mutableArrayValueForKey:@"nodes"];
+		siblings = [self mutableArrayValueForKey:@"rootNodes"];
 
 	// Remove the old node from the correct place (but remember its index). Also unregister from file watching...
 	
 	if (parent) [parent willChangeValueForKey:@"subNodes"];
-	else [self willChangeValueForKey:@"nodes"];
+	else [self willChangeValueForKey:@"rootNodes"];
 
 	NSUInteger index = NSNotFound;
 	
@@ -537,11 +507,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (newNode.parentNode == nil)
 	{
-		[self.nodes sortUsingSelector:@selector(compare:)];
+		[self.rootNodes sortUsingSelector:@selector(compare:)];
 	}
 	
 	if (parent) [parent didChangeValueForKey:@"subNodes"];
-	else [self didChangeValueForKey:@"nodes"];
+	else [self didChangeValueForKey:@"rootNodes"];
 	_isReplacingNode = NO;
 	
 	// Tell IMBUserInterfaceController that we are done modifying the data model...
@@ -561,6 +531,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		[_delegate controller:self didCreateNode:inNode withParser:inNode.parser];
 	}
+	
+	inNode.loading = NO;
 }
 
 
@@ -579,27 +551,31 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 #pragma mark 
-#pragma mark Expanding Nodes
+#pragma mark Populating Nodes
 
 
 // If a node doesn't have any subnodes yet, we need to create the subnodes lazily when this node is expanded.
 // Also ask the delegate whether we are allowed to do so. Create an operation and put it on the queue to
 // execute this job in the background...
 
-- (void) expandNode:(IMBNode*)inNode
+- (void) populateNode:(IMBNode*)inNode
 {
-	BOOL shouldExpandNode = inNode.subNodes==nil && inNode.isExpanding==NO && _isReplacingNode==NO;
+	BOOL shouldPopulateNode = 
+	
+		(inNode.subNodes==nil || inNode.objects==nil) && 
+		inNode.isLoading==NO && 
+		_isReplacingNode==NO;
 
-	if (shouldExpandNode)
+	if (shouldPopulateNode)
 	{
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willExpandNode:)])
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willPopulateNode:)])
 		{
-			[_delegate controller:self willExpandNode:inNode];
+			[_delegate controller:self willPopulateNode:inNode];
 		}
 
-		inNode.expanding = YES;
+		inNode.loading = YES;
 		
-		IMBExpandNodeOperation* operation = [[IMBExpandNodeOperation alloc] init];
+		IMBPopulateNodeOperation* operation = [[IMBPopulateNodeOperation alloc] init];
 		operation.libraryController = self;
 		operation.parser = inNode.parser;
 		operation.options = self.options;
@@ -614,64 +590,14 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Called back in the main thread as a result of IMBExpandNodeOperation...
 
-- (void) _didExpandNode:(IMBNode*)inNode
+- (void) _didPopulateNode:(IMBNode*)inNode
 {
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didExpandNode:)])
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didPopulateNode:)])
 	{
-		[_delegate controller:self didExpandNode:inNode];
+		[_delegate controller:self didPopulateNode:inNode];
 	}
 
-	inNode.expanding = NO;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Selecting Nodes
-
-
-// If a node wasn't populated with objects yet, we need to populate it lazily when this node is selected.
-// Also ask the delegate whether we are allowed to do so. Create an operation and put it on the queue to
-// execute this job in the background...
-
-- (void) selectNode:(IMBNode*)inNode
-{
-	BOOL shouldSelectNode = inNode.objects==nil && inNode.isLoading==NO && _isReplacingNode==NO;
-
-	if (shouldSelectNode)
-	{
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willSelectNode:)])
-		{
-			[_delegate controller:self willSelectNode:inNode];
-		}
-
-		inNode.populating = YES;
-		
-		IMBSelectNodeOperation* operation = [[IMBSelectNodeOperation alloc] init];
-		operation.libraryController = self;
-		operation.parser = inNode.parser;
-		operation.options = self.options;
-		operation.oldNode = inNode;
-		operation.newNode = inNode;		// This will automatically create a copy!
-		
-		[[IMBOperationQueue sharedQueue] addOperation:operation];
-		[operation release];
-	}	
-}
-
-
-// Called back in the main thread as a result of IMBSelectNodeOperation...
-
-- (void) _didSelectNode:(IMBNode*)inNode
-{
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didSelectNode:)])
-	{
-		[_delegate controller:self didSelectNode:inNode];
-	}
-
-	inNode.populating = NO;
+	inNode.loading = NO;
 }
 
 
@@ -716,7 +642,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath
 {
-	[self _reloadNodesWithWatchedPath:inPath nodes:self.nodes];
+	[self _reloadNodesWithWatchedPath:inPath nodes:self.rootNodes];
 }	
 
 
@@ -752,13 +678,20 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #pragma mark Custom Nodes
 
 
-- (void) addNodeForFolder:(NSString*)inPath
+- (void) addCustomRootNodeForFolder:(NSString*)inPath
 {
+	NSBeep();
 }
 
 
-- (BOOL) removeNode:(IMBNode*)inNode
+- (BOOL) removeCustomRootNode:(IMBNode*)inNode
 {
+	if (inNode.parentNode==nil && inNode.parser.isCustom && !inNode.isLoading)
+	{
+		NSBeep();
+		return YES;
+	}
+		
 	return NO;
 }
 
@@ -772,9 +705,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Returns the root node for the specified parser...
 
-- (IMBNode*) nodeForParser:(IMBParser*)inParser
+- (IMBNode*) rootNodeForParser:(IMBParser*)inParser
 {
-	for (IMBNode* node in self.nodes)
+	for (IMBNode* node in self.rootNodes)
 	{
 		if (node.parser == inParser)
 		{
@@ -793,7 +726,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 - (IMBNode*) _nodeWithIdentifier:(NSString*)inIdentifier inParentNode:(IMBNode*)inParentNode
 {
-	NSArray* nodes = inParentNode ? inParentNode.subNodes : self.nodes;
+	NSArray* nodes = inParentNode ? inParentNode.subNodes : self.rootNodes;
 	
 	for (IMBNode* node in nodes)
 	{
@@ -829,9 +762,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	NSMutableString* text = [NSMutableString string];
 	
-	if (_nodes)
+	if (_rootNodes)
 	{
-		for (IMBNode* node in _nodes)
+		for (IMBNode* node in _rootNodes)
 		{
 			[text appendFormat:@"%@\n",[node description]];
 		}
@@ -889,7 +822,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	// Walk through all nodes...
 	
-	for (IMBNode* node in _nodes)
+	for (IMBNode* node in _rootNodes)
 	{
 		didAddSeparator = NO;
 		

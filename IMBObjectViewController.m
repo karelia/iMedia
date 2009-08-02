@@ -53,8 +53,7 @@
 #import "IMBLibraryController.h"
 #import "IMBObjectArrayController.h"
 #import "IMBConfig.h"
-//#import "IMBParser.h"
-#import "IMBNode.h"
+//#import "IMBNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -108,43 +107,61 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (NSBundle*) bundle
+{
+	return [NSBundle bundleForClass:[self class]];
+}
+
+
 + (NSString*) mediaType
 {
-	return @"photos";
+	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...");
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
+
+	return nil;
 }
 
 
 + (NSString*) nibName
 {
-	return @"IMBPhotosView";
+	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...");
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
+
+	return nil;
 }
 
 
 + (NSString*) objectCountFormatSingular
 {
-	return @"%d item";
+	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...");
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
+
+	return nil;
 }
 
 
 + (NSString*) objectCountFormatPlural
 {
-	return @"%d items";
+	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...");
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
+
+	return nil;
 }
 
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
 {
-	NSBundle* frameworkBundle = [NSBundle bundleForClass:[self class]];
-	IMBObjectViewController* controller = [[[[self class] alloc] initWithNibName:self.nibName bundle:frameworkBundle] autorelease];
-
+	IMBObjectViewController* controller = [[[[self class] alloc] initWithNibName:self.nibName bundle:self.bundle] autorelease];
 	[controller view];										// Load the view *before* setting the libraryController, 
 	controller.libraryController = inLibraryController;		// so that outlets are set before we load the preferences.
-
 	return controller;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 
 
 - (id) initWithNibName:(NSString*)inNibName bundle:(NSBundle*)inBundle
@@ -161,7 +178,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (void) awakeFromNib
 {
-	// We need to save preferences before tha app quits...
+	// We need to save preferences before the app quits...
 	
 	[[NSNotificationCenter defaultCenter] 
 		addObserver:self 
@@ -196,6 +213,16 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 #pragma mark Persistence 
 
 
+- (void) setLibraryController:(IMBLibraryController*)inLibraryController
+{
+	id old = _libraryController;
+	_libraryController = [inLibraryController retain];
+	[old release];
+
+	[self _loadStateFromPreferences];
+}
+
+
 - (NSString*) mediaType
 {
 	return self.libraryController.mediaType;
@@ -222,22 +249,18 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (void) _saveStateToPreferences
 {
-//	NSMutableDictionary* stateDict = [self _preferences];
-//	[stateDict setObject:self.expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
-//	[stateDict setObject:self.selectedNodeIdentifier forKey:@"selectedNodeIdentifier"];
-//	[self _setPreferences:stateDict];
+	NSMutableDictionary* stateDict = [self _preferences];
+	[stateDict setObject:[NSNumber numberWithUnsignedInteger:self.viewType] forKey:@"viewType"];
+	[stateDict setObject:[NSNumber numberWithDouble:self.iconSize] forKey:@"iconSize"];
+	[self _setPreferences:stateDict];
 }
 
 
 - (void) _loadStateFromPreferences
 {
-//	NSMutableDictionary* stateDict = [self _preferences];
-	
-//	self.expandedNodeIdentifiers = [stateDict objectForKey:@"expandedNodeIdentifiers"];
-//	self.selectedNodeIdentifier = [stateDict objectForKey:@"selectedNodeIdentifier"];
-//	
-//	float splitviewPosition = [[stateDict objectForKey:@"splitviewPosition"] floatValue];
-//	if (splitviewPosition > 0.0) [ibSplitView setPosition:splitviewPosition ofDividerAtIndex:0];
+	NSMutableDictionary* stateDict = [self _preferences];
+	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntValue];
+	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
 }
 
 
@@ -257,6 +280,27 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (id) imageBrowser:(IKImageBrowserView*)inBrowser itemAtIndex:(NSUInteger)inIndex
 {
 	return [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark View Options 
+
+
+- (void) setViewType:(NSUInteger)inViewType
+{
+	[self willChangeValueForKey:@"canUseIconSize"];
+	_viewType = inViewType;
+	[self didChangeValueForKey:@"canUseIconSize"];
+}
+
+
+- (BOOL) canUseIconSize
+{
+	return self.viewType != kIMBObjectViewTypeList;
 }
 
 

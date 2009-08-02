@@ -90,8 +90,7 @@
 // State information...
 
 @synthesize leaf = _leaf;
-@synthesize expanding = _expanding;
-@synthesize populating = _populating;
+@synthesize loading = _loading;
 
 // Support for live watching...
 
@@ -120,8 +119,7 @@
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
 
-		_expanding = NO;
-		_populating = NO;
+		_loading = NO;
 	}
 	
 	return self;
@@ -139,8 +137,7 @@
 	copy.attributes = self.attributes;
 	
 	copy.leaf = self.leaf;
-	copy.expanding = self.expanding;
-	copy.populating = self.populating;
+	copy.loading = self.loading;
 
 	copy.parentNode = self.parentNode;
 	copy.parser = self.parser;
@@ -333,8 +330,7 @@
 
 - (BOOL) isLoading
 {
-	if (_expanding) return YES;
-	if (_populating) return YES;
+	if (_loading) return YES;
 	if (_parentNode) return [_parentNode isLoading];
 	return NO;
 }
@@ -392,7 +388,7 @@
 	{
 		NSString* mediaType = _parser.mediaType;
 		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
-		NSUInteger index = [libraryController.nodes indexOfObjectIdenticalTo:self];
+		NSUInteger index = [libraryController.rootNodes indexOfObjectIdenticalTo:self];
 		[inIndexArray addObject:[NSNumber numberWithUnsignedInt:index]];
 	}
 }
