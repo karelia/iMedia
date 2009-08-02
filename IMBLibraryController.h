@@ -5,6 +5,7 @@
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
+ The new architecture for version 2.0 was developed by Peter Baumgartner.
  Contributions have also been made by Matt Gough, Martin Wennerberg and others
  as indicated in source files.
  
@@ -121,8 +122,8 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 // Node accessors (must only be called on the main thread)...
 
-@property (retain) NSMutableArray* nodes;
-- (IMBNode*) nodeForParser:(IMBParser*)inParser;
+@property (retain) NSMutableArray* nodes;				//rename to rootNodes or mediaSourceNodes
+- (IMBNode*) nodeForParser:(IMBParser*)inParser;		// rename rootNodeForMediaSource
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 
 // Loading...
