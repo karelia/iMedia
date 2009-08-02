@@ -5,7 +5,7 @@
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
- Additional development for version 2.0 was contributed by Peter Baumgartner.
+ The new architecture for version 2.0 was developed by Peter Baumgartner.
  Contributions have also been made by Matt Gough, Martin Wennerberg and others
  as indicated in source files.
  
@@ -49,10 +49,9 @@
 
 #pragma mark HEADERS
 
-#import "IMBUserInterfaceController.h"
+#import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
 #import "IMBNodeTreeController.h"
-#import "IMBObjectArrayController.h"
 #import "IMBOutlineView.h"
 #import "IMBConfig.h"
 #import "IMBParser.h"
@@ -64,9 +63,8 @@
 
 #pragma mark CONSTANTS
 
-const NSString* kNodesContext = @"nodes.arrangedObjects";
-const NSString* kNodesSelectionContext = @"nodes.selection";
-const NSString* kObjectsContext = @"objects.arrangedObjects";
+static NSString* kArrangedObjectsKey = @"arrangedObjects";
+static NSString* kSelectionKey = @"selection";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,15 +74,17 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 
 // Private methods...
 
-@interface IMBUserInterfaceController ()
+@interface IMBNodeViewController ()
 
 - (void) _startObservingLibraryController;
 - (void) _stopObservingLibraryController;
+
 - (NSMutableDictionary*) _preferences;
 - (void) _setPreferences:(NSMutableDictionary*)inDict;
 - (void) _saveStateToPreferences;
 - (void) _loadStateFromPreferences;
 - (NSMutableArray*) _expandedNodeIdentifiers;
+
 - (void) _nodesWillChange;
 - (void) _nodesDidChange;
 - (void) _updatePopupMenu;
@@ -98,30 +98,39 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 
 #pragma mark 
 
-@implementation IMBUserInterfaceController
+@implementation IMBNodeViewController
 
 @synthesize libraryController = _libraryController;
-
 @synthesize nodeTreeController = ibNodeTreeController;
-@synthesize nodeOutlineView = ibNodeOutlineView;
-@synthesize nodePopupButton = ibNodePopupButton;
 @synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
 @synthesize expandedNodeIdentifiers = _expandedNodeIdentifiers;
 
-@synthesize objectArrayController = ibObjectArrayController;
-@synthesize objectTabView = ibObjectTabView;
-@synthesize objectTableView = ibObjectTableView;
-@synthesize objectImageBrowserView = ibObjectImageBrowserView;
-@synthesize objectViewType = _objectViewType;
-@synthesize objectIconSize = _objectIconSize;
+@synthesize nodeOutlineView = ibNodeOutlineView;
+@synthesize nodePopupButton = ibNodePopupButton;
+@synthesize objectContainerView = ibObjectContainerView;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) init
++ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
 {
-	if (self = [super init])
+	NSBundle* frameworkBundle = [NSBundle bundleForClass:[self class]];
+	IMBNodeViewController* controller = [[[IMBNodeViewController alloc] initWithNibName:@"IMBLibraryView" bundle:frameworkBundle] autorelease];
+
+	[controller view];										// Load the view *before* setting the libraryController, 
+	controller.libraryController = inLibraryController;		// so that outlets are set before we load the preferences.
+	
+	return controller;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) initWithNibName:(NSString*)inNibName bundle:(NSBundle*)inBundle
+{
+	if (self = [super initWithNibName:inNibName bundle:inBundle])
 	{
 		_selectedNodeIdentifier = nil;
 		_expandedNodeIdentifiers = nil;
@@ -134,37 +143,31 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 
 - (void) awakeFromNib
 {
-	ibObjectArrayController.objectUnitSingular = @"image"; //NSLocalizedString(@"objectUnitSingular",@"Name of object media type (singular)");
-	ibObjectArrayController.objectUnitPlural =  @"images"; //NSLocalizedString(@"objectUnitPlural",@"Name of object media type (singular)");
-	
-	// Load the last known state from preferences, and save once the app is about to quit...
+	// We need to save preferences before tha app quits...
 	
 	[[NSNotificationCenter defaultCenter] 
 		addObserver:self 
 		selector:@selector(_saveStateToPreferences) 
 		name:NSApplicationWillTerminateNotification 
 		object:nil];
-		
+	
+	// Observe changes to the libary node tree...
+	
 	[ibNodeTreeController retain];
-	[ibNodeTreeController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:(void*)kNodesContext];
-	[ibNodeTreeController addObserver:self forKeyPath:@"selection" options:0 context:(void*)kNodesSelectionContext];
+	[ibNodeTreeController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
+	[ibNodeTreeController addObserver:self forKeyPath:kSelectionKey options:0 context:(void*)kSelectionKey];
 
-	[ibObjectArrayController retain];
-	[ibObjectArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:(void*)kObjectsContext];
 }
 
 
 - (void) dealloc
 {
-	[ibObjectArrayController removeObserver:self forKeyPath:@"arrangedObjects"];
-	[ibObjectArrayController release];
-
-	[ibNodeTreeController removeObserver:self forKeyPath:@"arrangedObjects"];
-	[ibNodeTreeController removeObserver:self forKeyPath:@"selection"];
-	[ibNodeTreeController release];
-
-	[self _stopObservingLibraryController];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[self _stopObservingLibraryController];
+
+	[ibNodeTreeController removeObserver:self forKeyPath:kArrangedObjectsKey];
+	[ibNodeTreeController removeObserver:self forKeyPath:kSelectionKey];
+	[ibNodeTreeController release];
 	
 	IMBRelease(_libraryController);
 	IMBRelease(_selectedNodeIdentifier);
@@ -178,6 +181,7 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 
 
 #pragma mark 
+
 
 - (void) setLibraryController:(IMBLibraryController*)inLibraryController
 {
@@ -231,6 +235,9 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
+
 - (NSMutableDictionary*) _preferences
 {
 	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
@@ -270,37 +277,12 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
-{
-	if (inContext == (void*)kNodesContext)
-	{
-//		[self _updatePopupMenu];
-	}
-	else if (inContext == (void*)kNodesSelectionContext)
-	{
-		[self _syncPopupMenuSelection];
-	}
-	else if (inContext == (void*)kObjectsContext)
-	{
-		[ibObjectImageBrowserView reloadData];
-//		[ibObjectArrayController willChangeValueForKey:@"objectCountString"];
-//		[ibObjectArrayController didChangeValueForKey:@"objectCountString"];
-	}
-	else
-	{
-		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark 
 #pragma mark NSSplitView Delegate
 
 
-// Store the current divider position in the preferences...
+// Store the current divider position in the preferences. Since there is no getter for the current position we
+// cannot do it a quit time and have to store it here in the delegate method...
 
 - (CGFloat) splitView:(NSSplitView*)inSplitView constrainSplitPosition:(CGFloat)inPosition ofSubviewAt:(NSInteger)inIndex
 {
@@ -310,7 +292,10 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 
 	if (inIndex == 0)
 	{
-		inPosition = MAX(inPosition,36.0);
+		double minPos = 36.0;
+		double maxPos = inSplitView.frame.size.height - 144.0;
+		inPosition = MAX(inPosition,minPos);
+		inPosition = MIN(inPosition,maxPos);
 	}
 	
 	return inPosition;
@@ -348,7 +333,7 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 - (void) splitViewDidResizeSubviews:(NSNotification*)inNotification
 {
 	NSRect frame = [[ibNodeOutlineView enclosingScrollView] frame];
-	BOOL collapsed = frame.size.height < 60.0;
+	BOOL collapsed = frame.size.height < 52.0;
 	
 	[[ibNodeOutlineView enclosingScrollView] setHidden:collapsed];
 	[ibNodePopupButton setHidden:!collapsed];
@@ -632,6 +617,23 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 #pragma mark Popup Menu
 
 
+- (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
+{
+	if (inContext == (void*)kArrangedObjectsKey)
+	{
+//		[self _updatePopupMenu];
+	}
+	else if (inContext == (void*)kSelectionKey)
+	{
+		[self _syncPopupMenuSelection];
+	}
+	else
+	{
+		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
+	}
+}
+
+
 // Rebuild the popup menu and. Please note that the popup menu does not currently use bindings...
 
 - (void) _updatePopupMenu
@@ -680,18 +682,18 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 
 
 #pragma mark 
-#pragma mark IKImageBrowserView 
+#pragma mark Context Menu
 
 
-- (NSUInteger) numberOfItemsInImageBrowser:(IKImageBrowserView*)inBrowser
+- (NSMenu*) menuForNode:(IMBNode*)inNode
 {
-	return [[ibObjectArrayController arrangedObjects] count];
+	return nil;
 }
 
 
-- (id) imageBrowser:(IKImageBrowserView*)inBrowser itemAtIndex:(NSUInteger)inIndex
+- (NSMenu*) menuForBackground
 {
-	return [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+	return nil;
 }
 
 
@@ -728,7 +730,7 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 
 - (IBAction) addNode:(id)inSender
 {
-	// TODO: implement...
+	NSBeep();
 }
 
 
@@ -747,7 +749,12 @@ const NSString* kObjectsContext = @"objects.arrangedObjects";
 
 - (IBAction) removeNode:(id)inSender
 {
-	// TODO: implement...
+	IMBNode* node = [self selectedNode];
+	
+	if (node.parser.isCustom && node.parentNode==nil && !node.isLoading)
+	{
+		[self.libraryController removeNode:node];
+	}
 }
 
 

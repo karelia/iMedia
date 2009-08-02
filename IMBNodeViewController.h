@@ -5,6 +5,7 @@
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
+ The new architecture for version 2.0 was developed by Peter Baumgartner.
  Contributions have also been made by Matt Gough, Martin Wennerberg and others
  as indicated in source files.
  
@@ -48,16 +49,17 @@
 
 #pragma mark ABSTRACT
 
-// There is an instance of this controller per window and per media type. If we have 4 media types (photos, music,
-// video, links) and 3 windows containing media browser UI, then we need 12 instances of this controller. This 
-// controller coordinates between the views and the IMBLibraryController. Essentially IMBLibraryController is a 
-// backend controller, while IMBUserInterfaceController is a frontend controller.
-
-// This controller is also responsible for handling selection and expansion of nodes, and for making sure that the
-// state is persistent across application launches. 
+// This subclass of NSViewController is responsible for the splitview and the outline view which shows the library 
+// nodes (upper half of the window). It loads the views and is also responsible for handling selection and expansion  
+// of nodes, and for making sure that the state is persistent across application launches. 
 
 // Please note that this controller is the delegate of all views, so do not modify those delegates. If you do need
 // delegate messages for various events, then use the delegate methods of IMBLibraryController...
+
+// There is an instance of this controller per window and per media type. If we have 4 media types (photos, music,
+// video, links) and 3 windows containing media browser UI, then we need 12 instances of this controller. This 
+// controller coordinates between the views and the IMBLibraryController. Essentially IMBLibraryController is a 
+// backend controller, while IMBNodeViewController is a frontend controller.
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,9 +69,7 @@
 
 @class IMBLibraryController;
 @class IMBNodeTreeController;
-@class IMBObjectArrayController;
 @class IMBOutlineView;
-@class IKImageBrowserView;
 @class IMBNode;
 
 
@@ -79,13 +79,7 @@
 #pragma mark 
 
 
-// This controller is instantiated per mediaType and per window. Consider an example: If we have a document based 
-// app that uses the photos, music, and video types, we have three IMBLibraryControllers (one for each media type).
-// If we have 3 documents open (and each document has its own user interface for iMedia), we need a total of 3x3=9
-// instances of IMBUserInterfaceController...
-
-
-@interface IMBUserInterfaceController : NSObject
+@interface IMBNodeViewController : NSViewController
 {
 	IMBLibraryController* _libraryController;
 	NSString* _selectedNodeIdentifier;
@@ -96,14 +90,10 @@
 	IBOutlet IMBNodeTreeController* ibNodeTreeController;
 	IBOutlet IMBOutlineView* ibNodeOutlineView;
 	IBOutlet NSPopUpButton* ibNodePopupButton;
-	
-	IBOutlet IMBObjectArrayController* ibObjectArrayController;
-	IBOutlet NSTabView* ibObjectTabView;
-	IBOutlet NSTableView* ibObjectTableView;
-	IBOutlet IKImageBrowserView* ibObjectImageBrowserView;
-	NSInteger _objectViewType;
-	double _objectIconSize;
+	IBOutlet NSView* ibObjectContainerView;
 }
+
++ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
 
 // Library...
 
@@ -115,20 +105,17 @@
 @property (readonly) IMBNodeTreeController* nodeTreeController;
 @property (readonly) IMBOutlineView* nodeOutlineView;
 @property (readonly) NSPopUpButton* nodePopupButton;
+@property (readonly) NSView* objectContainerView;
 
 @property (retain) NSString* selectedNodeIdentifier;
 @property (retain) NSMutableArray* expandedNodeIdentifiers;
 - (void) selectNode:(IMBNode*)inNode;
 - (IMBNode*) selectedNode;
 
-// Objects (media files)...
+// Context menu support...
 
-@property (readonly) IMBObjectArrayController* objectArrayController;
-@property (readonly) NSTabView* objectTabView;
-@property (readonly) NSTableView* objectTableView;
-@property (readonly) IKImageBrowserView* objectImageBrowserView;
-@property (assign) NSInteger objectViewType;
-@property (assign) double objectIconSize;
+- (NSMenu*) menuForNode:(IMBNode*)inNode;
+- (NSMenu*) menuForBackground;
 
 // Actions...
 
