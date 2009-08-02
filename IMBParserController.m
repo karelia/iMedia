@@ -252,7 +252,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 					}
 
 					NSMutableArray* parsers = [self loadedParsersForMediaType:mediaType];
-					parser = [[parserClass alloc] init];
+					parser = [[parserClass alloc] initWithMediaType:mediaType];
 					[parsers addObject:parser];
 					[parser release];
 					

@@ -70,9 +70,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super init])
+	if (self = [super initWithMediaType:inMediaType])
 	{
 		_fileUTI = nil;
 	}
@@ -140,52 +140,6 @@
 	if (outError) *outError = error;
 	return newNode;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Scan the our folder for subfolders and add a subnode for each one we find...
-
-//- (BOOL) expandNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
-//{
-//	NSError* error = nil;
-//	NSString* folder = inNode.mediaSource;
-//	NSArray* files = [[NSFileManager threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
-//	
-//	if (error == nil)
-//	{
-//		NSMutableArray* subnodes = [NSMutableArray array];
-//		
-//		for (NSString* file in files)
-//		{
-//			NSString* path = [folder stringByAppendingPathComponent:file];
-//			
-//			if ([self fileAtPath:path conformsToUTI:(NSString*)kUTTypeFolder])
-//			{
-//				NSString* parserClassName = NSStringFromClass([self class]);
-//				
-//				IMBNode* subnode = [[IMBNode alloc] init];
-//
-//				subnode.parentNode = inNode;
-//				subnode.mediaSource = path;
-//				subnode.identifier = [NSString stringWithFormat:@"%@:/%@",parserClassName,path];
-//				subnode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
-//				subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
-//				subnode.parser = self;
-//				subnode.leaf = NO;
-//				
-//				[subnodes addObject:subnode];
-//				[subnode release];
-//			}
-//		}
-//		
-//		inNode.subNodes = subnodes;
-//	}
-//	
-//	if (outError) *outError = error;
-//	return error == nil;
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------

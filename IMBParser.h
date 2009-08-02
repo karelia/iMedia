@@ -86,7 +86,6 @@
 // as faithfully as possible...
 
 - (IMBNode*) createNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
-//- (BOOL) expandNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError;
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError;
 
 @optional
@@ -122,6 +121,7 @@
 
 // Helper methods...
 
+- (id) initWithMediaType:(NSString*)inMediaType;
 - (NSString*) identifierForPath:(NSString*)inPath;
 
 @end

@@ -80,9 +80,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super init])
+	if (self = [super initWithMediaType:inMediaType])
 	{
 		_plist = nil;
 		self.mediaSource = nil;
