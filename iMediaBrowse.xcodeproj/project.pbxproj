@@ -521,6 +521,9 @@
 		CE52AD7D0B7D21D800DA5F23 /* Movies.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Movies.nib; sourceTree = "<group>"; };
 		CE52AD7E0B7D21D800DA5F23 /* Contacts.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Contacts.nib; sourceTree = "<group>"; };
 		CE55A6A10AD194C70091C8AE /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; lineEnding = 0; name = zh_CN; path = zh_CN.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CE953A5E102BAD8A0066C08F /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/MediaBrowser.nib; sourceTree = "<group>"; };
+		CE953A65102BADB60066C08F /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt_BR; path = pt_BR.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CE953A68102BADC20066C08F /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = pt_BR; path = pt_BR.lproj/Info.html; sourceTree = "<group>"; };
 		CEA9AF9F0A64214900855897 /* ja */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; lineEnding = 0; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEC914FF0B97648C0072492B /* iMBiPhotoAbstractParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = iMBiPhotoAbstractParser.h; sourceTree = "<group>"; };
 		CEC915000B97648C0072492B /* iMBiPhotoAbstractParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iMBiPhotoAbstractParser.m; sourceTree = "<group>"; };
@@ -1344,6 +1347,7 @@
 				it,
 				zh_CN,
 				sv,
+				pt_BR,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* iMediaBrowse */;
 			projectDirPath = "";
@@ -1617,6 +1621,7 @@
 				CE1AD3860A7E83F20083C01E /* it */,
 				CE55A6A10AD194C70091C8AE /* zh_CN */,
 				5B0628CF0AEDF38300419AEB /* sv */,
+				CE953A65102BADB60066C08F /* pt_BR */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1649,6 +1654,7 @@
 				CE4E790D0C5E77120044A5F9 /* sv */,
 				CE4E790E0C5E77170044A5F9 /* zh_CN */,
 				CE4E790F0C5E771C0044A5F9 /* zh_TW */,
+				CE953A68102BADC20066C08F /* pt_BR */,
 			);
 			name = Info.html;
 			sourceTree = "<group>";
@@ -1665,6 +1671,7 @@
 				FD0220CC0D8F1A5100B48AAB /* de */,
 				FD0220CD0D8F1A5100B48AAB /* fr */,
 				CE2A55000E1DDE3200AC9DE2 /* zh_TW */,
+				CE953A5E102BAD8A0066C08F /* pt_BR */,
 			);
 			name = MediaBrowser.nib;
 			sourceTree = "<group>";
