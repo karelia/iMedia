@@ -55,6 +55,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSString+iMedia.h"
+#import <Quartz/Quartz.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -196,8 +197,9 @@
 				IMBVisualObject* object = [[IMBVisualObject alloc] init];
 				object.value = (id)path;
 				object.name = file;
-				object.metadata = [self metadataForFileAtPath:path];
-				
+				object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+				object.imageRepresentation = path;
+			
 				[objects addObject:object];
 				[object release];
 			}
