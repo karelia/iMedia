@@ -97,19 +97,6 @@
 @synthesize imageVersion = _imageVersion;
 
 
-// Use path as image representation type for now. IKImageBrowserView then does all the thumbnail loading and 
-// caching all by itself...
-
-- (NSString*) imageRepresentationType
-{
-	return IKImageBrowserPathRepresentationType;
-}
-
-- (id) imageRepresentation
-{
-	return _value;
-}
-
 // Use the path or URL as the unique identifier...
 
 - (NSString *) imageUID
