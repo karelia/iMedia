@@ -62,6 +62,7 @@
 #pragma mark CONSTANTS
 
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
+static NSString* kImageRepresentationKey = @"arrangedObjects.imageRepresentation";
 static NSString* kObjectCountStringKey = @"objectCountString";
 
 
@@ -78,6 +79,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (void) _setPreferences:(NSMutableDictionary*)inDict;
 - (void) _saveStateToPreferences;
 - (void) _loadStateFromPreferences;
+- (void) _reloadIconView;
 
 @end
 
@@ -190,11 +192,13 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 	[ibObjectArrayController retain];
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
+	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKey options:0 context:(void*)kImageRepresentationKey];
 }
 
 
 - (void) dealloc
 {
+	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKey];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
 
@@ -313,16 +317,32 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 - (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
 {
+	// If the array itself has changed then display the new object count...
+	
 	if (inContext == (void*)kArrangedObjectsKey)
 	{
-		[ibIconView reloadData];
+		[self _reloadIconView];
 		[self willChangeValueForKey:kObjectCountStringKey];
 		[self didChangeValueForKey:kObjectCountStringKey];
+	}
+	
+	// If single thumbnails have changed (due to asynchronous loading) then trigger a reload of the IKIMageBrowserView...
+	
+	else if (inContext == (void*)kImageRepresentationKey)
+	{
+		[self _reloadIconView];
 	}
 	else
 	{
 		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
 	}
+}
+
+
+- (void) _reloadIconView
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
+	[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 }
 
 
