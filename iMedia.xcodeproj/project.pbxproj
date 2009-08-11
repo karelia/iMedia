@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		D05A9493102EB022005DF9CE /* IMBMTPParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D05A9491102EB022005DF9CE /* IMBMTPParser.h */; };
+		D05A9494102EB022005DF9CE /* IMBMTPParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D05A9492102EB022005DF9CE /* IMBMTPParser.m */; };
 		D08E8B701019C916005D8614 /* UKFNSubscribeFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */; };
 		D08E8B721019C916005D8614 /* UKFSEventsWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B6A1019C916005D8614 /* UKFSEventsWatcher.h */; };
 		D08E8B741019C916005D8614 /* UKKQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B6C1019C916005D8614 /* UKKQueue.h */; };
@@ -78,6 +80,7 @@
 		D0C5B23D1022F68A00A97A60 /* list-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2271022F4AA00A97A60 /* list-view.png */; };
 		D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */; };
 		D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */; };
+		D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -112,6 +115,9 @@
 		32DBCF5E0370ADEE00C91783 /* iMedia.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.pch; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* iMedia.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iMedia.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05A9491102EB022005DF9CE /* IMBMTPParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMTPParser.h; sourceTree = "<group>"; };
+		D05A9492102EB022005DF9CE /* IMBMTPParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMTPParser.m; sourceTree = "<group>"; };
+		D05A94A4102EB14A005DF9CE /* ICADevices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICADevices.framework; path = System/Library/Frameworks/ICADevices.framework; sourceTree = SDKROOT; };
 		D08E8B661019C916005D8614 /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UKFileWatcher.h; sourceTree = "<group>"; };
 		D08E8B671019C916005D8614 /* UKFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UKFileWatcher.m; sourceTree = "<group>"; };
 		D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UKFNSubscribeFileWatcher.h; sourceTree = "<group>"; };
@@ -186,6 +192,7 @@
 		D0C5B2291022F4CA00A97A60 /* icon-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-view.png"; sourceTree = "<group>"; };
 		D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoParser.h; sourceTree = "<group>"; };
 		D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoParser.m; sourceTree = "<group>"; };
+		D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
@@ -197,6 +204,7 @@
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
 				D09930FD1010FF9700C527B7 /* Quartz.framework in Frameworks */,
 				D0993295101124EE00C527B7 /* libcrypto.dylib in Frameworks */,
+				D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,6 +237,8 @@
 				D099334E1011B22600C527B7 /* Test Application */,
 				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
 				034768DFFF38A50411DB9C8B /* Products */,
+				D05A94A4102EB14A005DF9CE /* ICADevices.framework */,
+				D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */,
 			);
 			name = iMedia;
 			sourceTree = "<group>";
@@ -411,6 +421,8 @@
 				D09932901011227100C527B7 /* IMBPhotosFolderParser.m */,
 				D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */,
 				D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */,
+				D05A9491102EB022005DF9CE /* IMBMTPParser.h */,
+				D05A9492102EB022005DF9CE /* IMBMTPParser.m */,
 			);
 			name = Photos;
 			sourceTree = "<group>";
@@ -468,6 +480,7 @@
 				D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */,
 				D0C2DAF21024178E001B1198 /* IMBObjectViewController.h in Headers */,
 				D0C2DD0F1025905A001B1198 /* IMBPhotosViewController.h in Headers */,
+				D05A9493102EB022005DF9CE /* IMBMTPParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -584,6 +597,7 @@
 				D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */,
 				D0C2DAF31024178E001B1198 /* IMBObjectViewController.m in Sources */,
 				D0C2DD0E1025905A001B1198 /* IMBPhotosViewController.m in Sources */,
+				D05A9494102EB022005DF9CE /* IMBMTPParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
