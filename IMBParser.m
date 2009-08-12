@@ -94,7 +94,7 @@
 // The following three methods must be overridden by subclasses...
 
 
-- (IMBNode*) createNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
+- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	return nil;
 }

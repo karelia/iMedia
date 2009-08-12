@@ -138,14 +138,14 @@
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,path];	
 }
 	  
-- (IMBNode *) createNodeCopy:(IMBNode*)inOldNode
+- (IMBNode *) nodeCopy:(IMBNode*)inOldNode
 {
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
 	path = [path stringByStandardizingPath];
 	
 	// Create an empty root node (unpopulated and without subnodes)...
 	
-	IMBNode* newNode = [IMBNode new];
+	IMBNode* newNode = [[[IMBNode alloc] init] autorelease];
 	
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
@@ -162,12 +162,12 @@
 	return newNode;
 }
 
-- (IMBNode*) createNode:(IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
+- (IMBNode*) nodeWithOldNode:(IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
 	
 	// note: if inOldNode is nil, this represents the device list root object
-	IMBNode* newNode = [self createNodeCopy:inOldNode];
+	IMBNode* newNode = [self nodeCopy:inOldNode];
 	
 	// If the old node had subnodes, then look for subnodes in the new node...
 	

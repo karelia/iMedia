@@ -101,7 +101,7 @@
 // the node with the same position/identifier, and if it was populated before, then it should also be populated 
 // afterwards...
 
-- (IMBNode*) createNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
+- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
@@ -109,7 +109,7 @@
 	
 	// Create an empty root node (unpopulated and without subnodes)...
 	
-	IMBNode* newNode = [[IMBNode alloc] init];
+	IMBNode* newNode = [[[IMBNode alloc] init] autorelease];
 	
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
