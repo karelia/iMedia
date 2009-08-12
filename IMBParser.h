@@ -83,9 +83,9 @@
 
 // ATTENTION: inOldNode is readonly and is only passed in for reference, but must not be modified by the parser in 
 // a background operation. It is passed as an argument to the parser so that existing old nodes can be recreated
-// as faithfully as possible...
+// as faithfully as possible. Must return an autoreleased object...
 
-- (IMBNode*) createNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
+- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError;
 
 @optional

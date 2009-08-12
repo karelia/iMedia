@@ -120,7 +120,7 @@
 #pragma mark Parser Methods
 
 
-- (IMBNode*) createNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError;
+- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
 	
@@ -131,7 +131,7 @@
 	
 	// Create an empty root node (unpopulated and without subnodes)...
 	
-	IMBNode* newNode = [[IMBNode alloc] init];
+	IMBNode* newNode = [[[IMBNode alloc] init] autorelease];
 	
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = self.mediaSource;

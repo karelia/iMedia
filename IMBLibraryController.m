@@ -207,7 +207,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) main
 {
 	NSError* error = nil;
-	IMBNode* newNode = [_parser createNode:self.oldNode options:self.options error:&error];
+	IMBNode* newNode = [_parser nodeWithOldNode:self.oldNode options:self.options error:&error];
 	
 	if (error == nil)
 	{
