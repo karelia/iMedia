@@ -59,16 +59,10 @@
 
 #pragma mark 
 
-// This parser class creates nodes for a folder and populates it with files that conform to the specified uti...
+// This parser class uses Image Capture to parse MTP devices
 
 @interface IMBMTPParser : IMBParser
 {
-// 	NSString* _fileUTI;
 }
-
-// @property (retain) NSString* fileUTI;
-
-// - (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI;
-// - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
 
 @end

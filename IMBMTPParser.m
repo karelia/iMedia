@@ -91,13 +91,10 @@
 
 @implementation IMBMTPParser
 
-// static NSMutableArray *sICANotificationListeners = nil; // putting all objects in an Listner array is leading to an retain cycle
-
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
-// 	sNotificationListeners = [NSMutableArray new];
 	[pool release];
 }
 
@@ -150,8 +147,11 @@
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForICAObject:self.mediaSource];
-	newNode.name = @"Camera Devices"; // [[NSFileManager threadSafeManager] displayNameAtPath:path];
-//	newNode.icon = [NSImage imageNamed:]; // [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+	newNode.name = NSLocalizedString( @"Camera Devices", @"Caption for Image Capture Root node" ); 
+	newNode.icon = inOldNode.icon;
+	if ( !newNode.icon ) {
+		newNode.icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Image Capture.app"];
+	}
 	newNode.parser = self;
 	newNode.leaf = NO;
 	
@@ -230,6 +230,33 @@
 	}
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+- (NSImage *) _getThumbnailSync:(id) anObject
+{
+	NSImage *image = NULL;
+	NSData *data = NULL;
+    OSErr   err;
+    ICACopyObjectThumbnailPB    pb = { 0  };
+    
+    pb.header.refcon   = 0L; // (unsigned long) self;
+    pb.thumbnailFormat = kICAThumbnailFormatTIFF; // gives transparency
+    // use the ICAObject out of the mDeviceDictionary
+    pb.object          = [anObject intValue];
+	pb.thumbnailData   = &data;
+    
+    // asynchronous call - callback proc will get called when call completes
+    err = ICACopyObjectThumbnail( &pb, NULL );
+	if (noErr == pb.header.err)
+    {
+        // got the thumbnail data, now create an image...
+        // NSData * data  = (NSData*)*(pb.thumbnailData);		
+        image = [[NSImage alloc] initWithData:data];
+		[data release];
+		NSLog( @"Received Thumbnail %@", self );
+    }
+	return [image autorelease];
+}
+
 // recursive creation of subtree nodes 
 // R: object had children
 
@@ -255,7 +282,12 @@
 				subnode.mediaSource = imageCaptureID;
 				subnode.identifier = [self identifierForICAObject:imageCaptureID];
 				subnode.name = name;
-				subnode.icon = [anItem valueForKey:(NSString *)kICAThumbnailPropertyKey];
+				// test implementation:
+				if( [anItem valueForKey:@"thuP"] )
+					subnode.icon = [self _getThumbnailSync:imageCaptureID];
+				if( !subnode.icon )
+					subnode.icon = [[NSWorkspace sharedWorkspace] iconForFileType:@"'fldr'"];
+				// subnode.icon = [anItem valueForKey:(NSString *)kICAThumbnailPropertyKey];
 				subnode.parser = self;
 				subnode.attributes = anItem;	
 				
@@ -281,7 +313,7 @@
 				
 				for( NSDictionary *tmpObject in subObjects )
 					[self _addICAObject:tmpObject toArray:tmpObjects];
-				// tbd: test if realyl only one object remained
+				// tbd: test if really only one object remained
 				// tbd2: test if an problem occurs with later handled removal notificatons
 				[objects addObjectsFromArray:tmpObjects];
 				
@@ -298,6 +330,7 @@
 	return [subnodes count] > 0;
 	
 }
+
 
 // Scan the our folder for subfolders and add a subnode for each one we find...
 
@@ -343,7 +376,7 @@
 					if( !name || ![name length] )
 						name = [anDevice valueForKey:@"ifil"];
 					subnode.name = name;
-					subnode.icon = [anDevice valueForKey:(NSString *)kICAThumbnailPropertyKey];
+					subnode.icon = [self _getThumbnailSync:subnode.mediaSource]; 
 					subnode.parser = self;
 					subnode.leaf = NO;
 					
@@ -402,6 +435,8 @@ static void HandleICANotification(CFStringRef notificationType, CFDictionaryRef 
 								(NSString *) kICANotificationTypeDeviceInfoChanged, // issued when another driver takes over 
 								(NSString *) kICANotificationTypeDeviceWasReset, 
 							//	kICANotificationTypeDevicePropertyChanged, 
+// the following two constants are tagged as appearing from 10.5 on in the 10.6
+// but in reality they appear in the 10.6 SDK 										
 //								(NSString *) kICANotificationTypeDeviceStatusInfo, 
 //								(NSString *) kICANotificationTypeDeviceStatusError,
 							// kICANotificationTypeCaptureComplete,
@@ -491,9 +526,6 @@ static void MyThumbnailCallback (ICAHeader* pbHeader)
         [handler gotThumbnailCallback: (ICACopyObjectThumbnailPB*) pbHeader];
 }
  
-
-
-
 @implementation MTPVisualObject
 @synthesize isLoading = _isLoading;
 
