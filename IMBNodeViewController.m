@@ -56,6 +56,7 @@
 #import "IMBConfig.h"
 #import "IMBParser.h"
 #import "IMBNode.h"
+#import "IMBNodeCell.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -166,6 +167,11 @@ static NSString* kSelectionKey = @"selection";
 	[ibNodeTreeController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
 	[ibNodeTreeController addObserver:self forKeyPath:kSelectionKey options:0 context:(void*)kSelectionKey];
 
+	// Set the cell class on the outline view...
+	
+	NSTableColumn* column = [[ibNodeOutlineView tableColumns] objectAtIndex:0];
+	IMBNodeCell* cell = [[[IMBNodeCell alloc] init] autorelease];	
+	[column setDataCell:cell];		
 }
 
 
@@ -455,6 +461,17 @@ static NSString* kSelectionKey = @"selection";
 	// Sync the selection of the popup menu...
 	
 	[self _syncPopupMenuSelection];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) outlineView:(NSOutlineView*)inOutlineView willDisplayCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inTableColumn item:(id)inItem
+{	 
+	IMBNode* node = [inItem representedObject];
+	NSImage* icon = node.icon;
+	[(IMBNodeCell*)inCell setImage:icon];
 }
 
 
