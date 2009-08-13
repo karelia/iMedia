@@ -47,31 +47,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
-
-#import "IMBParser.h"
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBiPhotoParser : IMBParser
+@interface IMBNodeCell : NSTextFieldCell
 {
-	NSString* _appPath;
-	NSString* _libraryPath;
-	NSDictionary* _plist;
-	int _fakeAlbumID;					// for iPhoto2 compatibility
+	NSImage* _image;
 }
 
-@property (retain) NSString* appPath;
-@property (retain) NSString* libraryPath;
-@property (retain) NSDictionary* plist;
-- (BOOL) allowAlbumType:(NSString*)inAlbumType;
+@property (retain) NSImage* image;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-

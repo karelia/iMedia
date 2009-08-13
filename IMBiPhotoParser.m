@@ -53,6 +53,8 @@
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBIconCache.h"
+#import "NSWorkspace+iMedia.h"
 #import <Quartz/Quartz.h>
 
 
@@ -68,6 +70,7 @@
 - (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier withRoot:(IMBNode*)inRootNode;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode listOfAlbums:(NSArray*)inListOfAlbums listOfImages:(NSDictionary*)inListOfImages;
 - (void) populateNode:(IMBNode*)inNode listOfAlbums:(NSArray*)inListOfAlbums listOfImages:(NSDictionary*)inListOfImages iPhotoMediaType:(NSString*)iPhotoMediaType;
+- (NSImage*) iconForAlbumType:(NSString*)inAlbumType;
 
 @end
 
@@ -79,6 +82,8 @@
 
 @implementation IMBiPhotoParser
 
+@synthesize appPath = _appPath;
+@synthesize libraryPath = _libraryPath;
 @synthesize plist = _plist;
 
 
@@ -126,7 +131,9 @@
 		_plist = nil;
 		_fakeAlbumID = 0;
 		
-		self.mediaSource = [[self class] iPhotoLibraryPath];
+		self.appPath = [[NSWorkspace threadSafeWorkspace] fullPathForApplication:@"iPhoto"];
+		self.libraryPath = [[self class] iPhotoLibraryPath];
+		self.mediaSource = self.libraryPath;
 	}
 	
 	return self;
@@ -135,6 +142,8 @@
 
 - (void) dealloc
 {
+	IMBRelease(_appPath);
+	IMBRelease(_libraryPath);
 	IMBRelease(_plist);
 	[super dealloc];
 }
@@ -166,7 +175,7 @@
 	rootNode.mediaSource = self.mediaSource;
 	rootNode.identifier = [self identifierForPath:@"/"];
 	rootNode.name = @"iPhoto";
-//	rootNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+	rootNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
 	rootNode.parser = self;
 	rootNode.leaf = NO;
 
@@ -216,6 +225,10 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Helper Methods
 
 
 // Load the XML file into a plist lazily (on demand)...
@@ -311,7 +324,7 @@
 			
 			albumNode.mediaSource = self.mediaSource;
 			albumNode.name = [albumDict objectForKey:@"AlbumName"];
-//			albumNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];	// Depends on album type
+			albumNode.icon = [self iconForAlbumType:albumType];
 			albumNode.parser = self;
 			albumNode.leaf = ![albumType isEqualToString:@"Folder"];
 
@@ -391,6 +404,47 @@
 		
 		[pool1 release];
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSImage*) iconForAlbumType:(NSString*)inAlbumType
+{
+	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
+	{
+		// iPhoto 7
+		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
+		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
+		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
+		{@"Event",					@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
+		{@"Events",					@"sl-icon-small_events.tiff",			@"folder",	nil,				nil},
+		{@"Folder",					@"sl-icon-small_folder.tiff",			@"folder",	nil,				nil},
+		{@"Photocasts",				@"sl-icon-small_subscriptions.tiff",	@"folder",	nil,				nil},
+		{@"Photos",					@"sl-icon-small_library.tiff",			@"folder",	nil,				nil},
+		{@"Published",				@"sl-icon-small_publishedAlbum.tiff",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
+		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil},
+		{@"Roll",					@"sl-icon-small_roll.tiff",				@"folder",	nil,				nil},
+		{@"Selected Event Album",	@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
+		{@"Shelf",					@"sl-icon_flag.tiff",					@"folder",	nil,				nil},
+		{@"Slideshow",				@"sl-icon-small_slideshow.tiff",		@"folder",	nil,				nil},
+		{@"Smart",					@"sl-icon-small_smartAlbum.tiff",		@"folder",	nil,				nil},
+		{@"Special Month",			@"sl-icon-small_cal.tiff",				@"folder",	nil,				nil},
+		{@"Special Roll",			@"sl-icon_lastImport.tiff",				@"folder",	nil,				nil},
+		{@"Subscribed",				@"sl-icon-small_subscribedAlbum.tiff",	@"folder",	nil,				nil},
+	};
+
+	static const IMBIconTypeMapping kIconTypeMapping =
+	{
+		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
+		kIconTypeMappingEntries,
+		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil}	// fallback image
+	};
+
+	NSString* type = inAlbumType;
+	if (type == nil) type = @"Photos";
+	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
 }
 
 

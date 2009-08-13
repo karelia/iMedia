@@ -5,7 +5,6 @@
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
- The new architecture for version 2.0 was developed by Peter Baumgartner.
  Contributions have also been made by Matt Gough, Martin Wennerberg and others
  as indicated in source files.
  
@@ -43,35 +42,19 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark HEADERS
-
-#import "IMBParser.h"
+#import <Cocoa/Cocoa.h>
 
 
-//----------------------------------------------------------------------------------------------------------------------
+@interface NSImage (iMedia)
 
+// Try to load an image out of the bundle for another application and if not found fallback to one of our own.
++ (NSImage *)imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle;
 
-#pragma mark 
++ (NSImage *)imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime;
 
-@interface IMBiPhotoParser : IMBParser
-{
-	NSString* _appPath;
-	NSString* _libraryPath;
-	NSDictionary* _plist;
-	int _fakeAlbumID;					// for iPhoto2 compatibility
-}
+// Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
++ (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
 
-@property (retain) NSString* appPath;
-@property (retain) NSString* libraryPath;
-@property (retain) NSDictionary* plist;
-- (BOOL) allowAlbumType:(NSString*)inAlbumType;
++ (NSImage *)genericFolderIcon;
 
 @end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-

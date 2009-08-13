@@ -151,7 +151,7 @@
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForICAObject:self.mediaSource];
 	newNode.name = @"Camera Devices"; // [[NSFileManager threadSafeManager] displayNameAtPath:path];
-	// newNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+//	newNode.icon = [NSImage imageNamed:]; // [[NSWorkspace threadSafeWorkspace] iconForFile:path];
 	newNode.parser = self;
 	newNode.leaf = NO;
 	
