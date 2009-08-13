@@ -57,14 +57,14 @@
 
 #pragma mark 
 
-// This parser class creates nodes for a folder and populates it with files that conform to the specified uti...
- 
 @interface IMBiPhotoParser : IMBParser
 {
 	NSDictionary* _plist;
+	int _fakeAlbumID;					// for iPhoto2 compatibility
 }
 
 @property (retain) NSDictionary* plist;
+- (BOOL) allowAlbumType:(NSString*)inAlbumType;
 
 @end
 
