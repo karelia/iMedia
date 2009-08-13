@@ -26,7 +26,9 @@
 
 #pragma mark MACROS
 
-#define DEBUG 1
+#define LOG_PARSERS 0
+#define LOG_CREATE_NODE 0
+#define LOG_POPULATE_NODE 1
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -110,35 +112,35 @@
 
 - (BOOL) controller:(IMBParserController*)inController shouldLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
 {
-//	#if DEBUG
-//	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
-//	#endif
+	#if LOG_PARSERS
+	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
+	#endif
 	
-	return ![NSStringFromClass(inParserClass) isEqualToString:@"IMBiPhotoParser"];
+	return YES;
 }
 
 
 - (void) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
 {
-//	#if DEBUG
-//	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
-//	#endif
+	#if LOG_PARSERS
+	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
+	#endif
 }
 
 
 - (void) controller:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
-//	#if DEBUG
-//	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
-//	#endif
+	#if LOG_PARSERS
+	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
+	#endif
 }
 
 
 - (void) controller:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
-//	#if DEBUG
-//	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
-//	#endif
+	#if LOG_PARSERS
+	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
+	#endif
 }
 
 
@@ -151,7 +153,7 @@
 
 - (BOOL) controller:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
 {
-	#if DEBUG
+	#if LOG_CREATE_NODE
 	NSLog(@"%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
 	#endif
 
@@ -161,7 +163,7 @@
 
 - (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
 {
-	#if DEBUG
+	#if LOG_CREATE_NODE
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
 	#endif
 }
@@ -169,11 +171,9 @@
 
 - (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
 {
-	#if DEBUG
+	#if LOG_CREATE_NODE
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
 	#endif
-
-//	[inController logNodes];
 }
 
 
@@ -182,7 +182,7 @@
 
 - (BOOL) controller:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
 {
-	#if DEBUG
+	#if LOG_POPULATE_NODE
 	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
 
@@ -192,7 +192,7 @@
 
 - (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode
 {
-	#if DEBUG
+	#if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
 }
@@ -200,11 +200,9 @@
 
 - (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode
 {
-	#if DEBUG
+	#if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
-
-//	[inController logNodes];
 }
 
 
