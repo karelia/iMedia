@@ -47,9 +47,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
+#pragma mark TYPEDEFS
 
-#import "IMBParser.h"
+typedef struct _IMBIconTypeMappingEntry
+{
+	NSString* fIconType;
+	NSString* fApplicationIconName;
+	NSString* fFallbackIconName;
+	NSString* fAlternateIconName;
+	NSString* fAlternateBundlePath;
+} 
+IMBIconTypeMappingEntry;
+
+
+typedef struct _IMBIconTypeMapping
+{
+	unsigned int fCount;
+	const IMBIconTypeMappingEntry* fEntries;
+	const IMBIconTypeMappingEntry fUnknownTypeEntry;
+} 
+IMBIconTypeMapping;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,18 +74,14 @@
 
 #pragma mark 
 
-@interface IMBiPhotoParser : IMBParser
+
+@interface IMBIconCache : NSObject
 {
-	NSString* _appPath;
-	NSString* _libraryPath;
-	NSDictionary* _plist;
-	int _fakeAlbumID;					// for iPhoto2 compatibility
+	NSMutableDictionary* _iconCache;
 }
 
-@property (retain) NSString* appPath;
-@property (retain) NSString* libraryPath;
-@property (retain) NSDictionary* plist;
-- (BOOL) allowAlbumType:(NSString*)inAlbumType;
++ (IMBIconCache*) sharedIconCache;
+- (NSImage*) iconForType:(NSString*)inType fromBundleID:(NSString*)inBundleID withMappingTable:(const IMBIconTypeMapping*)inMappingTable;
 
 @end
 
