@@ -314,11 +314,19 @@
 #pragma mark Helpers
 
 
-// Sort nodes by name...
+// Nodes of same subtype are sorted alphabetically. Subtypes are grouped: libraries, devices, folders, custom...
 
 - (NSComparisonResult) compare:(IMBNode*)inNode
 {
-	return [self.name finderCompare:inNode.name];
+	NSString* selfSubType = self.parser.subType;
+	NSString* otherSubType = inNode.parser.subType;
+
+	if ([selfSubType isEqualToString:otherSubType])
+	{
+		return [self.name finderCompare:inNode.name];
+	}
+	
+	return [selfSubType compare:otherSubType];
 }
 
 

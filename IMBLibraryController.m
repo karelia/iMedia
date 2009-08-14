@@ -207,6 +207,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) main
 {
 	NSError* error = nil;
+	[_parser willUseParser];
 	IMBNode* newNode = [_parser nodeWithOldNode:self.oldNode options:self.options error:&error];
 	
 	if (error == nil)
@@ -235,6 +236,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) main
 {
 	NSError* error = nil;
+	[_parser willUseParser];
 	[_parser populateNode:self.newNode options:self.options error:&error];
 	
 	if (error == nil)
@@ -405,7 +407,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 
 		inNode.loading = YES;
-
+		inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
+		
 		IMBCreateNodeOperation* operation = [[IMBCreateNodeOperation alloc] init];
 		operation.libraryController = self;
 		operation.parser = inNode.parser;
@@ -533,6 +536,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 	
 	inNode.loading = NO;
+	inNode.badgeTypeNormal = kIMBBadgeTypeNone;
 }
 
 
@@ -574,6 +578,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 
 		inNode.loading = YES;
+		inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
 		
 		IMBPopulateNodeOperation* operation = [[IMBPopulateNodeOperation alloc] init];
 		operation.libraryController = self;
@@ -598,6 +603,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 
 	inNode.loading = NO;
+	inNode.badgeTypeNormal = kIMBBadgeTypeNone;
 }
 
 

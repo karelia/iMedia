@@ -68,18 +68,22 @@
 
 @required
 
+// This factory method creates parser instances. Usually just return a single instance, but subclasses may 
+// opt to return more than one instance (e.g. Aperture may create one parser instance per library)...
+
++ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType;
+
 // The media source is usually a path pointing to the folder or database, but it could be an NSURL as well. 
 // However, it is always stored as a string, so that putting it into property lists (prefs) is easier...
 
 @property (retain) NSString* mediaSource;
 
-// The media type can be @"photos",@"music",@"movies",etc. IMBCommon.h contains constants for the type...
+// The mediaType can be @"photos",@"music",@"movies",etc. IMBCommon.h contains constants for the type.
+// The subType is used for sorting and can be @"library",@"device",@"folder",@"custom"...
 
 @property (retain) NSString* mediaType;
-
-// Indicates that this is a custom (user generated) parser. Usually a folder dragged into the outline view...
-
-@property (assign,getter=isCustom) BOOL custom;
+@property (retain) NSString* subType;
+@property (getter=isCustom) BOOL custom;
 
 // ATTENTION: inOldNode is readonly and is only passed in for reference, but must not be modified by the parser in 
 // a background operation. It is passed as an argument to the parser so that existing old nodes can be recreated
@@ -116,6 +120,7 @@
 {
 	NSString* _mediaSource;
 	NSString* _mediaType;
+	NSString* _subType;
 	BOOL _custom;
 }
 
@@ -123,7 +128,7 @@
 
 - (id) initWithMediaType:(NSString*)inMediaType;
 - (NSString*) identifierForPath:(NSString*)inPath;
-
+	
 @end
 
 

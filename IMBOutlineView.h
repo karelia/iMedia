@@ -48,6 +48,9 @@
 
 
 @interface IMBOutlineView : NSOutlineView
+{
+	NSMutableDictionary* _subviewsInVisibleRows;
+}
 
 @end
 

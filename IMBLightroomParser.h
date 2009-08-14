@@ -47,31 +47,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark ABSTRACT
+#pragma mark HEADERS
 
-// This subclass of NSViewController is responsible for the splitview and the outline view which shows the library 
-// nodes (upper half of the window). It loads the views and is also responsible for handling selection and expansion  
-// of nodes, and for making sure that the state is persistent across application launches. 
-
-// Please note that this controller is the delegate of all views, so do not modify those delegates. If you do need
-// delegate messages for various events, then use the delegate methods of IMBLibraryController...
-
-// There is an instance of this controller per window and per media type. If we have 4 media types (photos, music,
-// video, links) and 3 windows containing media browser UI, then we need 12 instances of this controller. This 
-// controller coordinates between the views and the IMBLibraryController. Essentially IMBLibraryController is a 
-// backend controller, while IMBNodeViewController is a frontend controller.
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark CLASSES
-
-@class IMBLibraryController;
-@class IMBNodeTreeController;
-@class IMBOutlineView;
-@class IMBParser;
-@class IMBNode;
+#import "IMBParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,57 +57,16 @@
 
 #pragma mark 
 
-
-@interface IMBNodeViewController : NSViewController
+@interface IMBLightroomParser : IMBParser
 {
-	IMBLibraryController* _libraryController;
-	NSString* _selectedNodeIdentifier;
-	NSMutableArray* _expandedNodeIdentifiers;
-	BOOL _isRestoringState;
-	IMBParser* _selectedParser;
-	
-	IBOutlet NSSplitView* ibSplitView;
-	IBOutlet IMBNodeTreeController* ibNodeTreeController;
-	IBOutlet IMBOutlineView* ibNodeOutlineView;
-	IBOutlet NSPopUpButton* ibNodePopupButton;
-	IBOutlet NSView* ibObjectContainerView;
+	NSString* _appPath;
+	NSString* _libraryPath;
+	NSDictionary* _plist;
 }
 
-+ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
-
-// Library...
-
-@property (retain) IMBLibraryController* libraryController;
-@property (readonly) NSString* mediaType;
-
-// Nodes (sourcelist)...
-
-@property (readonly) IMBNodeTreeController* nodeTreeController;
-@property (readonly) IMBOutlineView* nodeOutlineView;
-@property (readonly) NSPopUpButton* nodePopupButton;
-@property (readonly) NSView* objectContainerView;
-
-@property (retain) NSString* selectedNodeIdentifier;
-@property (retain) NSMutableArray* expandedNodeIdentifiers;
-- (void) selectNode:(IMBNode*)inNode;
-@property (readonly) IMBNode* selectedNode;
-@property (retain) IMBParser* selectedParser;
-
-// Context menu support...
-
-- (NSMenu*) menuForNode:(IMBNode*)inNode;
-- (NSMenu*) menuForBackground;
-
-// Actions...
-
-- (BOOL) canReloadNode;
-- (IBAction) reloadNode:(id)inSender;
-
-- (BOOL) canAddNode;
-- (IBAction) addNode:(id)inSender;
-
-- (BOOL) canRemoveNode;
-- (IBAction) removeNode:(id)inSender;
+@property (retain) NSString* appPath;
+@property (retain) NSString* libraryPath;
+@property (retain) NSDictionary* plist;
 
 @end
 

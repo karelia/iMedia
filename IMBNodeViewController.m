@@ -105,6 +105,7 @@ static NSString* kSelectionKey = @"selection";
 @synthesize nodeTreeController = ibNodeTreeController;
 @synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
 @synthesize expandedNodeIdentifiers = _expandedNodeIdentifiers;
+@synthesize selectedParser = _selectedParser;
 
 @synthesize nodeOutlineView = ibNodeOutlineView;
 @synthesize nodePopupButton = ibNodePopupButton;
@@ -434,6 +435,11 @@ static NSString* kSelectionKey = @"selection";
 		{
 			shouldSelect = [delegate controller:self.libraryController shouldPopulateNode:node];
 		}
+		
+		if (node.icon == nil)
+		{
+			shouldSelect = NO;
+		}
 	}
 	
 	return shouldSelect;	
@@ -456,6 +462,15 @@ static NSString* kSelectionKey = @"selection";
 			[self.libraryController populateNode:node];
 			self.selectedNodeIdentifier = node.identifier;
 		}
+		
+		// If a completely different parser was selected, then notify the previous parser, that it is most
+		// likely no longer needed any can get rid of its cached data...
+		
+		if (self.selectedParser != node.parser)
+		{
+			[self.selectedParser didDeselectParser];
+			self.selectedParser = node.parser;
+		}
 	}
 
 	// Sync the selection of the popup menu...
@@ -468,10 +483,22 @@ static NSString* kSelectionKey = @"selection";
 
 
 - (void) outlineView:(NSOutlineView*)inOutlineView willDisplayCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inTableColumn item:(id)inItem
-{	 
+{	
 	IMBNode* node = [inItem representedObject];
-	NSImage* icon = node.icon;
-	[(IMBNodeCell*)inCell setImage:icon];
+	IMBNodeCell* cell = (IMBNodeCell*)inCell;
+
+	[cell setImage:node.icon];
+	[cell setBadgeType:node.badgeTypeNormal];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+-(BOOL)outlineView:(NSOutlineView*)inOutlineView isGroupItem:(id)inItem
+{
+	IMBNode* node = [inItem representedObject];
+	return node.icon == nil;
 }
 
 

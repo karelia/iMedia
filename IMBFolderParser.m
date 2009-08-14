@@ -75,7 +75,8 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		_fileUTI = nil;
+		self.fileUTI = nil;
+		self.subType = kIMBSubTypeFolder;
 	}
 	
 	return self;

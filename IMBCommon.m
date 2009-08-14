@@ -51,11 +51,18 @@
 
 // Media types...
 
-NSString* kIMBPhotosMediaType = @"photos";
-NSString* kIMBMusicMediaType = @"music";
-NSString* kIMBMoviesMediaType = @"movies";
-NSString* kIMBLinksMediaType = @"links";
-NSString* kIMBContactsMediaType = @"contacts";
+NSString* kIMBMediaTypePhotos = @"photos";
+NSString* kIMBMediaTypeMusic = @"music";
+NSString* kIMBMediaTypeMovies = @"movies";
+NSString* kIMBMediaTypeLinks = @"links";
+NSString* kIMBMediaTypeContacts = @"contacts";
+
+// Sub types...
+
+NSString* kIMBSubTypeLibrary = @"1-library";
+NSString* kIMBSubTypeDevice = @"2-device";
+NSString* kIMBSubTypeFolder = @"3-folder";
+NSString* kIMBSubTypeCustom = @"4-custom";
 
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -50,6 +50,7 @@
 #pragma mark HEADERS
 
 #import "IMBOutlineView.h"
+#import "IMBNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,7 +58,112 @@
 
 @implementation IMBOutlineView
 
-@end
+
+- (id) initWithFrame:(NSRect)inFrame
+{
+	if (self = [super initWithFrame:inFrame])
+	{
+		_subviewsInVisibleRows = [[NSMutableDictionary alloc] init];
+	}
+	
+	return self;
+}
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		_subviewsInVisibleRows = [[NSMutableDictionary alloc] init];
+	}
+	
+	return self;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_subviewsInVisibleRows);
+    [super dealloc];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Calculate the frame rect for progress indicator wheels...
+
+- (NSRect) badgeRectForRow:(NSInteger)inRow
+{
+	NSRect cellRect = NSIntersectionRect([self rectOfRow:inRow],self.visibleRect);
+	
+	NSRect badgeRect = cellRect;
+	badgeRect.size.width = 16.0;
+	badgeRect.size.height = 16.0;
+	badgeRect.origin.x = NSMaxX(cellRect) - badgeRect.size.width - 4.0;
+	badgeRect.origin.y += floor(0.5*(cellRect.size.height-badgeRect.size.height));
+		
+	return badgeRect;	
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) viewWillDraw
+{
+	[super viewWillDraw];
+
+	// First get rid of any progress indicators that are not currently visible or no longer needed...
+	
+	NSRect visibleRect = self.visibleRect;
+	NSRange visibleRows = [self rowsInRect:visibleRect];
+	
+	for (NSNumber* row in _subviewsInVisibleRows)
+	{
+		NSInteger i = row.intValue;
+		id item = [self itemAtRow:i];
+		IMBNode* node = [item representedObject];
+		
+		if (!NSLocationInRange(i,visibleRows) || node.badgeTypeNormal != kIMBBadgeTypeLoading)
+		{
+			NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
+			[wheel stopAnimation:nil];
+			[wheel removeFromSuperview];
+			[_subviewsInVisibleRows removeObjectForKey:row];
+		}
+	}
+	
+	// Then add progress indicators for all nodes that need one (currently loading) and are currently visible...
+	
+	for (NSInteger i=visibleRows.location; i<visibleRows.location+visibleRows.length; i++)
+	{
+		id item = [self itemAtRow:i];
+		IMBNode* node = [item representedObject];
+		NSNumber* row = [NSNumber numberWithInt:i];
+		NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
+		
+		if (wheel == nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)
+		{
+			NSRect badgeRect = [self badgeRectForRow:i];
+			NSProgressIndicator* wheel = [[NSProgressIndicator alloc] initWithFrame:badgeRect];
+			
+			[wheel setAutoresizingMask:NSViewNotSizable];
+			[wheel setStyle:NSProgressIndicatorSpinningStyle];
+			[wheel setControlSize:NSSmallControlSize];
+			[wheel setUsesThreadedAnimation:YES];
+			[wheel setIndeterminate:YES];
+			
+			[_subviewsInVisibleRows setObject:wheel forKey:row];
+			[self addSubview:wheel];
+			[wheel startAnimation:nil];
+			[wheel release];
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end

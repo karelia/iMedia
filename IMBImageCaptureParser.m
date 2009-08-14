@@ -50,7 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#import "IMBMTPParser.h"
+#import "IMBImageCaptureParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
@@ -62,7 +62,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBMTPParser (internal)
+@interface IMBImageCaptureParser (internal)
 - (void) installNotification;
 - (void) uninstallNotification;
 - (BOOL) _isAppropriateICAType:(uint32_t) inType;
@@ -89,12 +89,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@implementation IMBMTPParser
+@implementation IMBImageCaptureParser
 
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
 	[pool release];
 }
 
@@ -112,6 +112,7 @@
 		if( err == noErr )
 		{
 			self.mediaSource = [[NSNumber numberWithInt:deviceListPB.object] stringValue];
+			self.subType = kIMBSubTypeDevice;
 			[self installNotification];
 		}
 	}
@@ -203,13 +204,13 @@
 		case kICAFileOther:
  */ 
 		case kICAFileImage:
-			isOurType = [self.mediaType isEqualTo:kIMBPhotosMediaType];
+			isOurType = [self.mediaType isEqualTo:kIMBMediaTypePhotos];
 			break;
 		case kICAFileMovie:
-			isOurType = [self.mediaType isEqualTo:kIMBMoviesMediaType];
+			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeMovies];
 			break;
 		case kICAFileAudio:
-			isOurType = [self.mediaType isEqualTo:kIMBMusicMediaType];
+			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeMusic];
 			break;
 	}
 	return isOurType;
@@ -251,6 +252,7 @@
         // got the thumbnail data, now create an image...
         // NSData * data  = (NSData*)*(pb.thumbnailData);		
         image = [[NSImage alloc] initWithData:data];
+		[image setScalesWhenResized:YES];
 		[data release];
 		NSLog( @"Received Thumbnail %@", self );
     }

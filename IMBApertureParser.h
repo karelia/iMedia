@@ -43,26 +43,33 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-//  Created by Thomas Engelmeier on 25.07.09.
-//  Copyright 2009 Thomas Engelmeier. All rights reserved.
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark HEADERS
 
-#import <Cocoa/Cocoa.h>
 #import "IMBParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 #pragma mark 
 
-// This parser class uses Image Capture to parse MTP devices
-
-@interface IMBMTPParser : IMBParser
+@interface IMBApertureParser : IMBParser
 {
+	NSString* _appPath;
+	NSString* _libraryPath;
+	NSDictionary* _plist;
 }
 
+@property (retain) NSString* appPath;
+@property (retain) NSString* libraryPath;
+@property (retain) NSDictionary* plist;
+
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
