@@ -89,7 +89,7 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
 	[pool release];
 }
 
@@ -120,7 +120,7 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
 	[pool release];
 }
 
@@ -151,7 +151,7 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
 	[pool release];
 }
 
@@ -182,7 +182,7 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
 	[pool release];
 }
 

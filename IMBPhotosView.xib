@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="578"/>
+			<integer value="570"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -230,7 +230,7 @@
 							<object class="NSTabViewItem" id="710976510">
 								<string key="NSIdentifier">1</string>
 								<object class="NSView" key="NSView" id="828354452">
-									<nil key="NSNextResponder"/>
+									<reference key="NSNextResponder" ref="646749311"/>
 									<int key="NSvFlags">274</int>
 									<object class="NSMutableArray" key="NSSubviews">
 										<bool key="EncodedWithXMLCoder">YES</bool>
@@ -420,6 +420,7 @@
 										</object>
 									</object>
 									<string key="NSFrameSize">{408, 474}</string>
+									<reference key="NSSuperview" ref="646749311"/>
 								</object>
 								<string key="NSLabel">Tab</string>
 								<reference key="NSColor" ref="849578898"/>
@@ -428,7 +429,7 @@
 							<object class="NSTabViewItem" id="79242324">
 								<string key="NSIdentifier">2</string>
 								<object class="NSView" key="NSView" id="887286997">
-									<reference key="NSNextResponder" ref="646749311"/>
+									<nil key="NSNextResponder"/>
 									<int key="NSvFlags">274</int>
 									<object class="NSMutableArray" key="NSSubviews">
 										<bool key="EncodedWithXMLCoder">YES</bool>
@@ -496,7 +497,7 @@
 																	<reference key="NSTableView" ref="409421689"/>
 																</object>
 																<object class="NSTableColumn" id="166570936">
-																	<double key="NSWidth">3.760000e+02</double>
+																	<double key="NSWidth">3.800000e+02</double>
 																	<double key="NSMinWidth">4.000000e+01</double>
 																	<double key="NSMaxWidth">1.000000e+03</double>
 																	<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -588,7 +589,6 @@
 										</object>
 									</object>
 									<string key="NSFrameSize">{408, 474}</string>
-									<reference key="NSSuperview" ref="646749311"/>
 								</object>
 								<string key="NSLabel">View</string>
 								<reference key="NSColor" ref="849578898"/>
@@ -710,13 +710,13 @@
 								<reference key="NSTabView" ref="646749311"/>
 							</object>
 						</object>
-						<reference key="NSSelectedTabViewItem" ref="79242324"/>
+						<reference key="NSSelectedTabViewItem" ref="710976510"/>
 						<reference key="NSFont" ref="404275500"/>
 						<int key="NSTvFlags">6</int>
 						<bool key="NSAllowTruncatedLabels">YES</bool>
 						<object class="NSMutableArray" key="NSSubviews">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="887286997"/>
+							<reference ref="828354452"/>
 						</object>
 					</object>
 				</object>
@@ -990,14 +990,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">dataSource</string>
-						<reference key="source" ref="3005548"/>
-						<reference key="destination" ref="1021"/>
-					</object>
-					<int key="connectionID">630</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="3005548"/>
 						<reference key="destination" ref="1021"/>
@@ -1027,22 +1019,6 @@
 						</object>
 					</object>
 					<int key="connectionID">633</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">zoomValue: iconSize</string>
-						<reference key="source" ref="3005548"/>
-						<reference key="destination" ref="1021"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="3005548"/>
-							<reference key="NSDestination" ref="1021"/>
-							<string key="NSLabel">zoomValue: iconSize</string>
-							<string key="NSBinding">zoomValue</string>
-							<string key="NSKeyPath">iconSize</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">634</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -1090,6 +1066,56 @@
 						</object>
 					</object>
 					<int key="connectionID">641</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">content: arrangedObjects</string>
+						<reference key="source" ref="3005548"/>
+						<reference key="destination" ref="918073312"/>
+						<object class="NSNibBindingConnector" key="connector" id="552384567">
+							<reference key="NSSource" ref="3005548"/>
+							<reference key="NSDestination" ref="918073312"/>
+							<string key="NSLabel">content: arrangedObjects</string>
+							<string key="NSBinding">content</string>
+							<string key="NSKeyPath">arrangedObjects</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">648</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">selectionIndexes: selectionIndexes</string>
+						<reference key="source" ref="3005548"/>
+						<reference key="destination" ref="918073312"/>
+						<object class="NSNibBindingConnector" key="connector" id="493842819">
+							<reference key="NSSource" ref="3005548"/>
+							<reference key="NSDestination" ref="918073312"/>
+							<string key="NSLabel">selectionIndexes: selectionIndexes</string>
+							<string key="NSBinding">selectionIndexes</string>
+							<string key="NSKeyPath">selectionIndexes</string>
+							<reference key="NSPreviousConnector" ref="552384567"/>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">649</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">zoomValue: iconSize</string>
+						<reference key="source" ref="3005548"/>
+						<reference key="destination" ref="1021"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="3005548"/>
+							<reference key="NSDestination" ref="1021"/>
+							<string key="NSLabel">zoomValue: iconSize</string>
+							<string key="NSBinding">zoomValue</string>
+							<string key="NSKeyPath">iconSize</string>
+							<reference key="NSPreviousConnector" ref="493842819"/>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">650</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1500,7 +1526,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">642</int>
+			<int key="maxID">650</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

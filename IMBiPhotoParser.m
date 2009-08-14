@@ -95,29 +95,36 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBPhotosMediaType];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
 	[pool release];
 }
 
 
-// Find the path to the first iPhoto library...
-		
-+ (NSString*) iPhotoLibraryPath
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Look at the iApps preferences file and find all iPhoto libraries. Create a parser instance for each libary...
+
++ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
-	NSString* path = nil;
+	NSMutableArray* parserInstances = [NSMutableArray array];
 	CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
 	NSArray* libraries = (NSArray*)recentLibraries;
 		
 	for (NSString* library in libraries)
 	{
 		NSURL* url = [NSURL URLWithString:library];
-		path = [url path];
-		break;
+		NSString* path = [url path];
+
+		IMBiPhotoParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+		parser.libraryPath = path;
+		parser.mediaSource = path;
+		[parserInstances addObject:parser];
 	}
 	
 	CFRelease(recentLibraries);
 	
-	return path;
+	return parserInstances;
 }
 
 
@@ -128,12 +135,10 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		_plist = nil;
+		self.subType = kIMBSubTypeLibrary;
+		self.appPath = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iPhoto"];
+		self.plist = nil;
 		_fakeAlbumID = 0;
-		
-		self.appPath = [[NSWorkspace threadSafeWorkspace] fullPathForApplication:@"iPhoto"];
-		self.libraryPath = [[self class] iPhotoLibraryPath];
-		self.mediaSource = self.libraryPath;
 	}
 	
 	return self;
@@ -145,6 +150,7 @@
 	IMBRelease(_appPath);
 	IMBRelease(_libraryPath);
 	IMBRelease(_plist);
+	
 	[super dealloc];
 }
 
@@ -221,6 +227,18 @@
 
 	if (outError) *outError = error;
 	return error == nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// When the parser is deselected, then get rid of the cached plist data. It will be loaded into memory lazily 
+// once it is needed again...
+
+- (void) didDeselectParser
+{
+	self.plist = nil;
 }
 
 

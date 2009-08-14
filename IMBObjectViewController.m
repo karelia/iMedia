@@ -253,9 +253,13 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (void) _saveStateToPreferences
 {
+//	NSIndexSet* selectionIndexes = [ibObjectArrayController selectionIndexes];
+//	NSData* selectionData = [NSKeyedArchiver archivedDataWithRootObject:selectionIndexes];
+	
 	NSMutableDictionary* stateDict = [self _preferences];
 	[stateDict setObject:[NSNumber numberWithUnsignedInteger:self.viewType] forKey:@"viewType"];
 	[stateDict setObject:[NSNumber numberWithDouble:self.iconSize] forKey:@"iconSize"];
+//	[stateDict setObject:selectionData forKey:@"selectionData"];
 	[self _setPreferences:stateDict];
 }
 
@@ -265,25 +269,10 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	NSMutableDictionary* stateDict = [self _preferences];
 	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntValue];
 	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark IKImageBrowserView 
-
-
-- (NSUInteger) numberOfItemsInImageBrowser:(IKImageBrowserView*)inBrowser
-{
-	return [[ibObjectArrayController arrangedObjects] count];
-}
-
-
-- (id) imageBrowser:(IKImageBrowserView*)inBrowser itemAtIndex:(NSUInteger)inIndex
-{
-	return [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+	
+//	NSData* selectionData = [stateDict objectForKey:@"selectionData"];
+//	NSIndexSet* selectionIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:selectionData];
+//	[ibObjectArrayController setSelectionIndexes:selectionIndexes];
 }
 
 

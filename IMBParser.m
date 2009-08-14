@@ -61,7 +61,21 @@
 
 @synthesize mediaSource = _mediaSource;
 @synthesize mediaType = _mediaType;
+@synthesize subType = _subType;
 @synthesize custom = _custom;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// The default implementation just returns a single parser instance. Subclasses like iPhoto, Aperture, or Lightroom
+// may opt to return multiple instances (preconfigured with correct mediaSource) if multiple libraries are detected...
+
++ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
+{
+	IMBParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+	return [NSArray arrayWithObject:parser];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -73,6 +87,7 @@
 	{
 		self.mediaSource = nil;
 		self.mediaType = inMediaType;
+		self.subType = nil;
 		self.custom = NO;
 	}
 	
@@ -84,6 +99,7 @@
 {
 	IMBRelease(_mediaSource);
 	IMBRelease(_mediaType);
+	IMBRelease(_subType);
 	[super dealloc];
 }
 
@@ -109,7 +125,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Can be overridden by subclass to invalidate any caches...
+// Optional methods do nothing in the base class and can be overridden in subclasses, e.g. to update  
+// or get rid of cached data...
+
+- (void) willUseParser
+{
+
+}
+
+
+- (void) didDeselectParser
+{
+
+}
+
 
 - (void) watchedPathDidChange:(NSString*)inWatchedPath
 {

@@ -60,7 +60,7 @@
 
 #define kIconImageSize		16.0
 #define kImageOriginXOffset 3
-#define kImageOriginYOffset 1
+#define kImageOriginYOffset 0
 #define kTextOriginXOffset	2
 #define kTextOriginYOffset	1
 #define kTextHeightAdjust	4
@@ -74,6 +74,7 @@
 @implementation IMBNodeCell
 
 @synthesize image = _image;
+@synthesize badgeType = _badgeType;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -94,6 +95,7 @@
 {
     IMBNodeCell* cell = (IMBNodeCell*) [super copyWithZone:inZone];
     cell->_image = [_image retain];
+    cell->_badgeType = _badgeType;
     return cell;
 }
 
@@ -102,6 +104,70 @@
 {
 	IMBRelease(_image);
     [super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+
+- (NSRect) imageRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
+{	
+	NSRect imageRect = inBounds;
+	
+	imageRect.origin.x += kImageOriginXOffset;
+	imageRect.origin.y -= kImageOriginYOffset;
+	imageRect.size = [_image size];
+
+	if (inFlipped)
+		imageRect.origin.y += ceil(0.5 * (inBounds.size.height + imageRect.size.height));
+	else
+		imageRect.origin.y += ceil(0.5 * (inBounds.size.height - imageRect.size.height));
+
+	return imageRect;
+}
+
+
+- (NSRect) titleRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
+{	
+	// the cell has an image: draw the normal item cell
+	NSRect imageFrame;
+
+	NSSize imageSize = [_image size];
+	NSDivideRect(inBounds, &imageFrame, &inBounds, 3 + imageSize.width, NSMinXEdge);
+
+	imageFrame.origin.x += kImageOriginXOffset;
+	imageFrame.origin.y -= kImageOriginYOffset;
+	imageFrame.size = imageSize;
+	
+	imageFrame.origin.y += ceil((inBounds.size.height - imageFrame.size.height) / 2);
+	
+	NSRect titleRect = inBounds;
+	titleRect.origin.x += kTextOriginXOffset;
+	titleRect.origin.y += kTextOriginYOffset;
+	titleRect.size.width -= 19.0;
+	titleRect.size.height -= kTextHeightAdjust;
+
+	return titleRect;
+}
+
+
+- (NSRect) badgeRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
+{	
+	NSRect badgeRect = inBounds;
+	
+	badgeRect.origin.x = NSMaxX(inBounds) - kImageOriginXOffset - 16.0;
+	badgeRect.origin.y -= kImageOriginYOffset;
+	badgeRect.size = NSMakeSize(16.0,16.0);
+
+	if (inFlipped)
+		badgeRect.origin.y += ceil(0.5 * (inBounds.size.height + badgeRect.size.height));
+	else
+		badgeRect.origin.y += ceil(0.5 * (inBounds.size.height - badgeRect.size.height));
+
+	return badgeRect;
 }
 
 
@@ -117,101 +183,75 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSRect) titleRectForBounds:(NSRect)cellRect
-{	
-	// the cell has an image: draw the normal item cell
-	NSRect imageFrame;
-
-	NSSize imageSize = [_image size];
-	NSDivideRect(cellRect, &imageFrame, &cellRect, 3 + imageSize.width, NSMinXEdge);
-
-	imageFrame.origin.x += kImageOriginXOffset;
-	imageFrame.origin.y -= kImageOriginYOffset;
-	imageFrame.size = imageSize;
-	
-	imageFrame.origin.y += ceil((cellRect.size.height - imageFrame.size.height) / 2);
-	
-	NSRect newFrame = cellRect;
-	newFrame.origin.x += kTextOriginXOffset;
-	newFrame.origin.y += kTextOriginYOffset;
-	newFrame.size.height -= kTextHeightAdjust;
-
-	return newFrame;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) editWithFrame:(NSRect)aRect inView:(NSView*)controlView editor:(NSText*)textObj delegate:(id)anObject event:(NSEvent*)theEvent
-{
-	NSRect textFrame = [self titleRectForBounds:aRect];
-	[super editWithFrame:textFrame inView:controlView editor:textObj delegate:anObject event:theEvent];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void)selectWithFrame:(NSRect)aRect inView:(NSView*)controlView editor:(NSText*)textObj delegate:(id)anObject start:(int)selStart length:(int)selLength
-{
-	NSRect textFrame = [self titleRectForBounds:aRect];
-	[super selectWithFrame:textFrame inView:controlView editor:textObj delegate:anObject start:selStart length:selLength];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
-{
-	if (_image != nil)
-	{
-		// the cell has an image: draw the normal item cell
-		NSSize imageSize;
-        NSRect imageFrame;
-
-        imageSize = [_image size];
-        NSDivideRect(cellFrame, &imageFrame, &cellFrame, 3 + imageSize.width, NSMinXEdge);
- 
-        imageFrame.origin.x += kImageOriginXOffset;
-		imageFrame.origin.y -= kImageOriginYOffset;
-        imageFrame.size = imageSize;
-		
-        if ([controlView isFlipped])
-            imageFrame.origin.y += ceil((cellFrame.size.height + imageFrame.size.height) / 2);
-        else
-            imageFrame.origin.y += ceil((cellFrame.size.height - imageFrame.size.height) / 2);
-		[_image compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
-
-		NSRect newFrame = cellFrame;
-		newFrame.origin.x += kTextOriginXOffset;
-		newFrame.origin.y += kTextOriginYOffset;
-		newFrame.size.height -= kTextHeightAdjust;
-		[super drawWithFrame:newFrame inView:controlView];
-    }
-	else
-	{
-		if ([self isGroupCell])
-		{
-			// Center the text in the cellFrame, and call super to do thew ork of actually drawing. 
-			CGFloat yOffset = floor((NSHeight(cellFrame) - [[self attributedStringValue] size].height) / 2.0);
-			cellFrame.origin.y += yOffset;
-			cellFrame.size.height -= (kTextOriginYOffset*yOffset);
-			[super drawWithFrame:cellFrame inView:controlView];
-		}
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSSize)cellSize
+- (NSSize) cellSize
 {
     NSSize cellSize = [super cellSize];
     cellSize.width += (_image ? [_image size].width : 0) + 3;
     return cellSize;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) drawWithFrame:(NSRect)inFrame inView:(NSView*)inControlView
+{
+	BOOL isFlipped = inControlView.isFlipped;
+
+	// If we have an image then draw cell contents in several steps...
+	
+	if (_image)
+	{
+		NSRect imageRect = [self imageRectForBounds:inFrame flipped:isFlipped];
+		[_image compositeToPoint:imageRect.origin operation:NSCompositeSourceOver];
+
+		NSRect titleRect = [self titleRectForBounds:inFrame flipped:isFlipped];
+		[super drawWithFrame:titleRect inView:inControlView];
+ 
+   }
+	
+	// Otherwise let the superclass do the drawing (but center the text vertically)...
+	
+	else 
+	{
+//		if ([self isGroupCell])
+//		{
+			CGFloat yOffset = -2.0;
+			inFrame.origin.y -= 2.0;
+			[super drawWithFrame:inFrame inView:inControlView];
+//		}
+	}
+
+	// Add the spinning wheel subview if we are currently loading a node...
+	
+//	NSRect badgeRect = [self badgeRectForBounds:inFrame flipped:isFlipped];
+//	NSImage* badge = [NSImage imageNamed:NSImageNameFollowLinkFreestandingTemplate];
+//	[badge compositeToPoint:badgeRect.origin operation:NSCompositeSourceOver fraction:0.5];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+- (void) editWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate event:(NSEvent*)inEvent
+{
+	NSRect titleRect = [self titleRectForBounds:inFrame];
+	[super editWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate event:inEvent];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) selectWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate start:(int)inStart length:(int)inLength
+{
+	NSRect titleRect = [self titleRectForBounds:inFrame];
+	[super selectWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate start:inStart length:inLength];
 }
 
 

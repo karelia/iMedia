@@ -28,7 +28,7 @@
 
 #define LOG_PARSERS 0
 #define LOG_CREATE_NODE 0
-#define LOG_POPULATE_NODE 1
+#define LOG_POPULATE_NODE 0
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@
 	
 	// Create libraries (singleton per mediaType)...
 	
-	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBPhotosMediaType];
+	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBMediaTypePhotos];
 	[libraryController setDelegate:self];
 	
 	// Link the user interface (possible multiple instances) to the	singleton library...

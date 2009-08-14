@@ -43,77 +43,26 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+//  Created by Thomas Engelmeier on 25.07.09.
+//  Copyright 2009 Thomas Engelmeier. All rights reserved.
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark CONSTANTS
+#pragma mark HEADERS
 
-
-// Options to control behavior of the framework...
-
-enum
-{
-	kIMBOptionNone = 0,
-	kIMBOptionForceRecursiveLoading = 1
-};
-typedef NSUInteger IMBOptions;
-
-
-// File watcher type for an IMBNode...
-
-enum 
-{
-	kIMBWatcherTypeNone,
-	kIMBWatcherTypeKQueue,
-	kIMBWatcherTypeFSEvent,
-	kIMBWatcherTypeFirstCustom = 1000
-};
-typedef NSUInteger IMBWatcherType;
-
-
-// Badge type for IMBNode. A corresponding icon will be displayed in the cell...
-
-enum IMBBadgeType 
-{
-	kIMBBadgeTypeNone,
-	kIMBBadgeTypeLoading,
-	kIMBBadgeTypeStop,
-	kIMBBadgeTypeEject,
-	kIMBBadgeTypeOffline
-};
-typedef NSUInteger IMBBadgeType;
-
-
-// Media types...
-
-extern NSString* kIMBMediaTypePhotos;
-extern NSString* kIMBMediaTypeMusic;
-extern NSString* kIMBMediaTypeMovies;
-extern NSString* kIMBMediaTypeLinks;
-extern NSString* kIMBMediaTypeContacts;
-
-// Sub types...
-
-extern NSString* kIMBSubTypeLibrary;
-extern NSString* kIMBSubTypeDevice;
-extern NSString* kIMBSubTypeFolder;
-extern NSString* kIMBSubTypeCustom;
+#import <Cocoa/Cocoa.h>
+#import "IMBParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#pragma mark 
 
-#pragma mark MACROS
+// This parser class uses Image Capture to parse MTP devices
 
-#ifndef IMBRelease
-#define IMBRelease(object) if (object) {[object release]; object=nil;}
-#endif
+@interface IMBImageCaptureParser : IMBParser
+{
+}
 
-#ifndef IMBLocalizedString
-#define IMBLocalizedString(key,value,comment) NSLocalizedStringWithDefaultValue(key,nil,[NSBundle bundleForClass:NSClassFromString(@"IMBConfig")],value,comment)
-#endif
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
+@end
