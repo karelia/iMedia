@@ -95,10 +95,11 @@ extern NSString* kIMBMediaTypeContacts;
 
 // Sub types...
 
-extern NSString* kIMBSubTypeLibrary;
-extern NSString* kIMBSubTypeDevice;
-extern NSString* kIMBSubTypeFolder;
-extern NSString* kIMBSubTypeCustom;
+extern NSString* kIMBGroupTypeLibrary;
+extern NSString* kIMBGroupTypeDevice;
+extern NSString* kIMBGroupTypeFolder;
+extern NSString* kIMBGroupTypeCustom;
+extern NSString* kIMBGroupTypeNone;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -113,6 +114,7 @@ extern NSString* kIMBSubTypeCustom;
 #ifndef IMBLocalizedString
 #define IMBLocalizedString(key,value,comment) NSLocalizedStringWithDefaultValue(key,nil,[NSBundle bundleForClass:NSClassFromString(@"IMBConfig")],value,comment)
 #endif
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

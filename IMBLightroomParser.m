@@ -74,8 +74,8 @@
 @implementation IMBLightroomParser
 
 @synthesize appPath = _appPath;
-@synthesize libraryPath = _libraryPath;
 @synthesize plist = _plist;
+@synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,7 +112,6 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.subType = kIMBSubTypeLibrary;
 		self.appPath = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
 		self.plist = nil;
 	}
@@ -124,7 +123,6 @@
 - (void) dealloc
 {
 	IMBRelease(_appPath);
-	IMBRelease(_libraryPath);
 	IMBRelease(_plist);
 	
 	[super dealloc];
@@ -159,8 +157,16 @@
 	rootNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
 	rootNode.parser = self;
 	rootNode.leaf = NO;
+	rootNode.groupType = kIMBGroupTypeLibrary;
 	rootNode.subNodes = [NSMutableArray array];	// JUST TEMP
 	rootNode.objects = [NSMutableArray array];	// JUST TEMP
+
+	if (self.shouldDisplayLibraryName)
+	{
+		NSString* path = (NSString*)rootNode.mediaSource;
+		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+		rootNode.name = [NSString stringWithFormat:@"%@ (%@)",rootNode.name,name];
+	}
 
 	IMBNode* subNode = [[[IMBNode alloc] init] autorelease];
 	subNode.parentNode = rootNode;

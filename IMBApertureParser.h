@@ -60,13 +60,13 @@
 @interface IMBApertureParser : IMBParser
 {
 	NSString* _appPath;
-	NSString* _libraryPath;
 	NSDictionary* _plist;
+	BOOL _shouldDisplayLibraryName;
 }
 
 @property (retain) NSString* appPath;
-@property (retain) NSString* libraryPath;
 @property (retain) NSDictionary* plist;
+@property (assign) BOOL shouldDisplayLibraryName;
 
 @end
 

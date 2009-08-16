@@ -49,9 +49,11 @@
 
 @interface IMBConfig : NSObject
 
++ (void) registerDefaultPrefsValue:(id)inValue forKey:(NSString*)inKey;
 + (void) setPrefsValue:(id)inValue forKey:(NSString*)inKey;
 + (id) prefsValueForKey:(NSString*)inKey;
 
++ (void) registerDefaultPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass;
 + (void) setPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass;
 + (NSMutableDictionary*) prefsForClass:(Class)inClass;
 

@@ -83,8 +83,8 @@
 @implementation IMBiPhotoParser
 
 @synthesize appPath = _appPath;
-@synthesize libraryPath = _libraryPath;
 @synthesize plist = _plist;
+@synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -117,8 +117,8 @@
 		NSString* path = [url path];
 
 		IMBiPhotoParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-		parser.libraryPath = path;
 		parser.mediaSource = path;
+		parser.shouldDisplayLibraryName = libraries.count > 1;
 		[parserInstances addObject:parser];
 	}
 	
@@ -135,7 +135,6 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.subType = kIMBSubTypeLibrary;
 		self.appPath = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iPhoto"];
 		self.plist = nil;
 		_fakeAlbumID = 0;
@@ -148,7 +147,6 @@
 - (void) dealloc
 {
 	IMBRelease(_appPath);
-	IMBRelease(_libraryPath);
 	IMBRelease(_plist);
 	
 	[super dealloc];
@@ -184,6 +182,14 @@
 	rootNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
 	rootNode.parser = self;
 	rootNode.leaf = NO;
+	rootNode.groupType = kIMBGroupTypeLibrary;
+
+	if (self.shouldDisplayLibraryName)
+	{
+		NSString* path = (NSString*)rootNode.mediaSource;
+		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+		rootNode.name = [NSString stringWithFormat:@"%@ (%@)",rootNode.name,name];
+	}
 
 	// Watch the root node via UKKQueue. Whenever something in iPhoto changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding WHAT has changed in iPhoto...

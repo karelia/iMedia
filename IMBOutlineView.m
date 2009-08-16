@@ -118,6 +118,7 @@
 	
 	NSRect visibleRect = self.visibleRect;
 	NSRange visibleRows = [self rowsInRect:visibleRect];
+	NSMutableArray* keysToRemove = [NSMutableArray array];
 	
 	for (NSNumber* row in _subviewsInVisibleRows)
 	{
@@ -130,10 +131,12 @@
 			NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 			[wheel stopAnimation:nil];
 			[wheel removeFromSuperview];
-			[_subviewsInVisibleRows removeObjectForKey:row];
+			[keysToRemove addObject:keysToRemove];
 		}
 	}
 	
+	[_subviewsInVisibleRows removeObjectsForKeys:keysToRemove];
+
 	// Then add progress indicators for all nodes that need one (currently loading) and are currently visible...
 	
 	for (NSInteger i=visibleRows.location; i<visibleRows.location+visibleRows.length; i++)

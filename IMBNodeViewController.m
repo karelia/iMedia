@@ -115,6 +115,37 @@ static NSString* kSelectionKey = @"selection";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Set default preferences to make sure that group nodes are initially expanded and the user sees all root nodes...
+
++ (void) initialize
+{
+	if (self == [IMBNodeViewController class])
+	{   
+		NSArray* expandedNodeIdentifiers = [NSArray arrayWithObjects:
+			@"group://LIBRARY",
+			@"group://FOLDER",
+			@"group://DEVICE",
+			@"group://CUSTOM",
+			nil];
+		
+		NSMutableDictionary* stateDict = [NSMutableDictionary dictionary];
+		[stateDict setObject:expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
+
+		NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+		[classDict setObject:stateDict forKey:kIMBMediaTypePhotos];
+		[classDict setObject:stateDict forKey:kIMBMediaTypeMusic];
+		[classDict setObject:stateDict forKey:kIMBMediaTypeMovies];
+		[classDict setObject:stateDict forKey:kIMBMediaTypeLinks];
+		[classDict setObject:stateDict forKey:kIMBMediaTypeContacts];
+
+		[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 + (NSBundle*) bundle
 {
 	return [NSBundle bundleForClass:[self class]];
@@ -264,7 +295,7 @@ static NSString* kSelectionKey = @"selection";
 - (void) _setPreferences:(NSMutableDictionary*)inDict
 {
 	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
-	[classDict setObject:inDict forKey:self.mediaType];
+	if (inDict) [classDict setObject:inDict forKey:self.mediaType];
 	[IMBConfig setPrefs:classDict forClass:self.class];
 }
 
@@ -272,8 +303,20 @@ static NSString* kSelectionKey = @"selection";
 - (void) _saveStateToPreferences
 {
 	NSMutableDictionary* stateDict = [self _preferences];
-	[stateDict setObject:self.expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
-	[stateDict setObject:self.selectedNodeIdentifier forKey:@"selectedNodeIdentifier"];
+	
+	if (self.expandedNodeIdentifiers) 
+	{
+		[stateDict setObject:self.expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
+	}
+	
+	if (self.selectedNodeIdentifier)
+	{
+		[stateDict setObject:self.selectedNodeIdentifier forKey:@"selectedNodeIdentifier"];
+	}
+	
+	// Please note: Due to lack of position getter in NSSplitView we cannot set splitviewPosition here, 
+	// but need to do it in NSSplitView delegate method instead...
+	
 	[self _setPreferences:stateDict];
 }
 
@@ -436,7 +479,7 @@ static NSString* kSelectionKey = @"selection";
 			shouldSelect = [delegate controller:self.libraryController shouldPopulateNode:node];
 		}
 		
-		if (node.icon == nil)
+		if (node.isGroup)
 		{
 			shouldSelect = NO;
 		}
@@ -495,10 +538,10 @@ static NSString* kSelectionKey = @"selection";
 //----------------------------------------------------------------------------------------------------------------------
 
 
--(BOOL)outlineView:(NSOutlineView*)inOutlineView isGroupItem:(id)inItem
+-(BOOL) outlineView:(NSOutlineView*)inOutlineView isGroupItem:(id)inItem
 {
 	IMBNode* node = [inItem representedObject];
-	return node.icon == nil;
+	return node.isGroup;
 }
 
 

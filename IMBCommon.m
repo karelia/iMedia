@@ -59,10 +59,11 @@ NSString* kIMBMediaTypeContacts = @"contacts";
 
 // Sub types...
 
-NSString* kIMBSubTypeLibrary = @"1-library";
-NSString* kIMBSubTypeDevice = @"2-device";
-NSString* kIMBSubTypeFolder = @"3-folder";
-NSString* kIMBSubTypeCustom = @"4-custom";
+NSString* kIMBGroupTypeLibrary = @"1-library";
+NSString* kIMBGroupTypeDevice = @"2-device";
+NSString* kIMBGroupTypeFolder = @"3-folder";
+NSString* kIMBGroupTypeCustom = @"4-custom";
+NSString* kIMBGroupTypeNone = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------

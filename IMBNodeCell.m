@@ -222,7 +222,7 @@
 	{
 //		if ([self isGroupCell])
 //		{
-			CGFloat yOffset = -2.0;
+//			CGFloat yOffset = -2.0;
 			inFrame.origin.y -= 2.0;
 			[super drawWithFrame:inFrame inView:inControlView];
 //		}

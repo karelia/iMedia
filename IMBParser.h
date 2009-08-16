@@ -82,7 +82,6 @@
 // The subType is used for sorting and can be @"library",@"device",@"folder",@"custom"...
 
 @property (retain) NSString* mediaType;
-@property (retain) NSString* subType;
 @property (getter=isCustom) BOOL custom;
 
 // ATTENTION: inOldNode is readonly and is only passed in for reference, but must not be modified by the parser in 
@@ -120,7 +119,6 @@
 {
 	NSString* _mediaSource;
 	NSString* _mediaType;
-	NSString* _subType;
 	BOOL _custom;
 }
 

@@ -60,14 +60,14 @@
 @interface IMBiPhotoParser : IMBParser
 {
 	NSString* _appPath;
-	NSString* _libraryPath;
 	NSDictionary* _plist;
+	BOOL _shouldDisplayLibraryName;
 	int _fakeAlbumID;					// for iPhoto2 compatibility
 }
 
 @property (retain) NSString* appPath;
-@property (retain) NSString* libraryPath;
 @property (retain) NSDictionary* plist;
+@property (assign) BOOL shouldDisplayLibraryName;
 - (BOOL) allowAlbumType:(NSString*)inAlbumType;
 
 @end
