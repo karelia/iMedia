@@ -425,6 +425,68 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Check if the desired group node is already present. If yes return it, otherwise create and add it...
+
+- (IMBNode*) _groupNodeForNewNode:(IMBNode*)inNewNode
+{
+	NSString* groupType = inNewNode.groupType;
+	if (groupType ==  nil) return nil;
+	
+	for (IMBNode* node in _rootNodes)
+	{
+		if ([node.groupType isEqualToString:groupType])
+		{
+			return node;
+		}
+	}
+		
+	IMBNode* groupNode = [[[IMBNode alloc] init] autorelease];
+	groupNode.group = YES;
+	groupNode.leaf = NO;
+	groupNode.parentNode = nil;
+	groupNode.parser = nil;
+	groupNode.subNodes = [NSMutableArray array];
+	groupNode.objects = [NSMutableArray array];
+	
+	if ([groupType isEqualToString:kIMBGroupTypeLibrary])
+	{
+		groupNode.groupType = kIMBGroupTypeLibrary;
+		groupNode.identifier = @"group://LIBRARY";
+		groupNode.name = @"LIBRARIES";
+	}
+	else if ([groupType isEqualToString:kIMBGroupTypeFolder])
+	{
+		groupNode.groupType = kIMBGroupTypeFolder;
+		groupNode.identifier = @"group://FOLDER";
+		groupNode.name = @"FOLDERS";
+	}
+	else if ([groupType isEqualToString:kIMBGroupTypeDevice])
+	{
+		groupNode.groupType = kIMBGroupTypeDevice;
+		groupNode.identifier = @"group://DEVICE";
+		groupNode.name = @"DEVICES";
+	}
+	else if ([groupType isEqualToString:kIMBGroupTypeCustom])
+	{
+		groupNode.groupType = kIMBGroupTypeCustom;
+		groupNode.identifier = @"group://CUSTOM";
+		groupNode.name = @"CUSTOM";
+	}
+	
+	groupNode.parser = inNewNode.parser;	// Important to make lookup in -[IMBNode indexPath] work correctly!
+
+	[self willChangeValueForKey:@"rootNodes"];
+	[_rootNodes addObject:groupNode];
+	[_rootNodes sortUsingSelector:@selector(compare:)];
+	[self didChangeValueForKey:@"rootNodes"];
+
+	return groupNode;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // This method is called on the main thread as a result of any IMBLibraryOperation. We are given both the old  
 // and the new node. Replace the old with the new node. The node we are given here can be a root node or a node
 // somewhere deep inside the tree. So we need to find the correct place where to put the new node. Note that the 
@@ -455,19 +517,21 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	// The parentNode property of the node tells us where we are supposed to replace the old with the 
 	// new node. If parentNode is nil then we are going to use the root level array...
 
+	IMBNode* groupNode = [self _groupNodeForNewNode:newNode];
+
 	IMBNode* parent = nil;
+	if (newNode) parent = newNode.parentNode;
+	else if (oldNode) parent = oldNode.parentNode;
 	
-	if (newNode)
-		parent = newNode.parentNode;
-	else if (oldNode)
-		parent = oldNode.parentNode;
+	if (parent==nil && groupNode!=nil)
+	{
+		parent = groupNode;
+		newNode.parentNode = groupNode;
+	}
 	
 	NSMutableArray* siblings = nil;
-
-	if (parent)
-		siblings = [parent mutableArrayValueForKey:@"subNodes"];
-	else
-		siblings = [self mutableArrayValueForKey:@"rootNodes"];
+	if (parent) siblings = [parent mutableArrayValueForKey:@"subNodes"];
+	else siblings = [self mutableArrayValueForKey:@"rootNodes"];
 
 	// Remove the old node from the correct place (but remember its index). Also unregister from file watching...
 	
@@ -506,18 +570,26 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 	
-	// Sort the root nodes by name...
+	// Sort the root nodes and first level of group nodes...
 	
 	if (newNode.parentNode == nil)
 	{
 		[self.rootNodes sortUsingSelector:@selector(compare:)];
 	}
 	
+	for (IMBNode* node in self.rootNodes)
+	{
+		if (node.isGroup)
+		{
+			[(NSMutableArray*)node.subNodes sortUsingSelector:@selector(compare:)];
+		}
+	}
+	
+	// We are now done...
+	
 	if (parent) [parent didChangeValueForKey:@"subNodes"];
 	else [self didChangeValueForKey:@"rootNodes"];
 	_isReplacingNode = NO;
-	
-	// Tell IMBUserInterfaceController that we are done modifying the data model...
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
 }

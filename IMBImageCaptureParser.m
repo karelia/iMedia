@@ -112,7 +112,7 @@
 		if( err == noErr )
 		{
 			self.mediaSource = [[NSNumber numberWithInt:deviceListPB.object] stringValue];
-			self.subType = kIMBSubTypeDevice;
+//			self.groupType = kIMBGroupTypeNone;
 			[self installNotification];
 		}
 	}
@@ -148,13 +148,16 @@
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForICAObject:self.mediaSource];
-	newNode.name = NSLocalizedString( @"Camera Devices", @"Caption for Image Capture Root node" ); 
-	newNode.icon = inOldNode.icon;
-	if ( !newNode.icon ) {
-		newNode.icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Image Capture.app"];
-	}
+	newNode.name = NSLocalizedString( @"DEVICES", @"Caption for Image Capture Root node" ); 
+//	newNode.name = NSLocalizedString( @"Camera Devices", @"Caption for Image Capture Root node" ); 
+//	newNode.icon = inOldNode.icon;
+//	if ( !newNode.icon ) {
+//		newNode.icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Image Capture.app"];
+//	}
 	newNode.parser = self;
 	newNode.leaf = NO;
+	newNode.group = YES;
+	newNode.groupType = kIMBGroupTypeNone;
 	
 	// Enable ICA Event watching for all nodes...
 	newNode.watcherType = kIMBWatcherTypeFirstCustom;

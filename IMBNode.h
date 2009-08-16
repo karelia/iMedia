@@ -74,10 +74,12 @@
 	NSImage* _icon;
 	NSString* _name;
 	NSDictionary* _attributes;
-	
+	NSString* _groupType;
 	NSArray* _objects;
 	NSArray* _subNodes;
+	
 	IMBNode* _parentNode;	// not retained!
+	BOOL _group;
 	BOOL _leaf;
 	BOOL _loading;
 	
@@ -98,6 +100,7 @@
 @property (copy) NSString* name;					// Display name for user interface
 @property (retain) NSImage* icon;					// 16x16 icon for user interface
 @property (retain) NSDictionary* attributes;		// Optional metadata about the node
+@property (retain) NSString* groupType;				// Used for grouping root level nodes
 
 // Node tree accessors. If the subNodes property is nil, that doesn't mean that there are no subNodes - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
@@ -121,6 +124,7 @@
 
 // State information about a node...
 
+@property (assign,getter=isGroup) BOOL group;
 @property (assign,getter=isLeaf) BOOL leaf;
 @property (assign,getter=isLoading) BOOL loading;
 

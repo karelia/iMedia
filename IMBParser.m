@@ -61,7 +61,6 @@
 
 @synthesize mediaSource = _mediaSource;
 @synthesize mediaType = _mediaType;
-@synthesize subType = _subType;
 @synthesize custom = _custom;
 
 
@@ -87,7 +86,6 @@
 	{
 		self.mediaSource = nil;
 		self.mediaType = inMediaType;
-		self.subType = nil;
 		self.custom = NO;
 	}
 	
@@ -99,7 +97,6 @@
 {
 	IMBRelease(_mediaSource);
 	IMBRelease(_mediaType);
-	IMBRelease(_subType);
 	[super dealloc];
 }
 

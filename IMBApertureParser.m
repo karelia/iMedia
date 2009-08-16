@@ -52,7 +52,6 @@
 #import "IMBApertureParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-//#import "IMBObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 //#import <Quartz/Quartz.h>
@@ -76,8 +75,8 @@
 @implementation IMBApertureParser
 
 @synthesize appPath = _appPath;
-@synthesize libraryPath = _libraryPath;
 @synthesize plist = _plist;
+@synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -105,15 +104,15 @@
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.iApps");
 	NSArray* libraries = (NSArray*)recentLibraries;
-		
+
 	for (NSString* library in libraries)
 	{
 		NSURL* url = [NSURL URLWithString:library];
 		NSString* path = [url path];
 
 		IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-		parser.libraryPath = path;
 		parser.mediaSource = path;
+		parser.shouldDisplayLibraryName = libraries.count > 1;
 		[parserInstances addObject:parser];
 	}
 	
@@ -130,7 +129,6 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.subType = kIMBSubTypeLibrary;
 		self.appPath = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Aperture"];
 		self.plist = nil;
 	}
@@ -142,7 +140,6 @@
 - (void) dealloc
 {
 	IMBRelease(_appPath);
-	IMBRelease(_libraryPath);
 	IMBRelease(_plist);
 	
 	[super dealloc];
@@ -177,8 +174,16 @@
 	rootNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
 	rootNode.parser = self;
 	rootNode.leaf = NO;
+	rootNode.groupType = kIMBGroupTypeLibrary;
 	rootNode.subNodes = [NSMutableArray array];	// JUST TEMP
 	rootNode.objects = [NSMutableArray array];	// JUST TEMP
+	
+	if (self.shouldDisplayLibraryName)
+	{
+		NSString* path = (NSString*)rootNode.mediaSource;
+		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+		rootNode.name = [NSString stringWithFormat:@"%@ (%@)",rootNode.name,name];
+	}
 	
 	IMBNode* subNode = [[[IMBNode alloc] init] autorelease];
 	subNode.parentNode = rootNode;

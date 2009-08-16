@@ -79,6 +79,7 @@
 @synthesize identifier = _identifier;
 @synthesize name = _name;
 @synthesize icon = _icon;
+@synthesize groupType = _groupType;
 @synthesize attributes = _attributes;
 @synthesize objects = _objects;
 
@@ -89,6 +90,7 @@
 
 // State information...
 
+@synthesize group = _group;
 @synthesize leaf = _leaf;
 @synthesize loading = _loading;
 
@@ -113,6 +115,8 @@
 {
 	if (self = [super init])
 	{
+		self.group = NO;
+		self.leaf = NO;
 		self.objects = nil;
 		self.subNodes = nil;
 		self.watcherType = kIMBWatcherTypeNone;
@@ -135,7 +139,9 @@
 	copy.name = self.name;
 	copy.icon = self.icon;
 	copy.attributes = self.attributes;
+	copy.groupType = self.groupType;
 	
+	copy.group = self.group;
 	copy.leaf = self.leaf;
 	copy.loading = self.loading;
 
@@ -182,6 +188,7 @@
 	IMBRelease(_icon);
 	IMBRelease(_name);
 	IMBRelease(_attributes);
+	IMBRelease(_groupType);
 	IMBRelease(_objects);
 	IMBRelease(_subNodes);
 	IMBRelease(_parser);
@@ -314,19 +321,32 @@
 #pragma mark Helpers
 
 
-// Nodes of same subtype are sorted alphabetically. Subtypes are grouped: libraries, devices, folders, custom...
+// Nodes are grouped by type, but within a group nodes are sorted alphabetically. Nodes without a group type
+// are at the end of the list...
 
 - (NSComparisonResult) compare:(IMBNode*)inNode
 {
-	NSString* selfSubType = self.parser.subType;
-	NSString* otherSubType = inNode.parser.subType;
+	NSString* selfGroupType = self.groupType;
+	NSString* otherGroupType = inNode.groupType;
 
-	if ([selfSubType isEqualToString:otherSubType])
+	if (selfGroupType==nil && otherGroupType==nil)
+	{
+		return [self.name finderCompare:inNode.name];
+	}
+	else if (selfGroupType==nil && otherGroupType!=nil)
+	{
+		return NSOrderedDescending;
+	}
+	else if (selfGroupType!=nil && otherGroupType==nil)
+	{
+		return NSOrderedAscending;
+	}
+	else if ([selfGroupType isEqualToString:otherGroupType])
 	{
 		return [self.name finderCompare:inNode.name];
 	}
 	
-	return [selfSubType compare:otherSubType];
+	return [selfGroupType compare:otherGroupType];
 }
 
 

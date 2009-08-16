@@ -74,6 +74,15 @@ static NSString* sIMBPrefsKey = @"iMedia2";
 // Low level accessors for preferences values...
 
 
++ (void) registerDefaultPrefsValue:(id)inValue forKey:(NSString*)inKey
+{
+	NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
+	NSMutableDictionary* iMediaDict = [NSMutableDictionary dictionaryWithDictionary:[prefs dictionaryForKey:sIMBPrefsKey]];
+	[iMediaDict setObject:inValue forKey:inKey];
+	[prefs registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:iMediaDict,sIMBPrefsKey,nil]];
+}
+
+
 + (void) setPrefsValue:(id)inValue forKey:(NSString*)inKey
 {
 	NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
@@ -92,6 +101,14 @@ static NSString* sIMBPrefsKey = @"iMedia2";
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Store the specified dictionary in the iMedia section of the preferences under its class name...
+
++ (void) registerDefaultPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass
+{
+	[self registerDefaultPrefsValue:inClassDict forKey:NSStringFromClass(inClass)];
+}
 
 
 // Store the specified dictionary in the iMedia section of the preferences under its class name...

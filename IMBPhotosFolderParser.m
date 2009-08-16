@@ -68,7 +68,6 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.fileUTI = (NSString*)kUTTypeImage; 
-//		self.mediaType =  kIMBPhotosMediaType;
 	}
 	
 	return self;

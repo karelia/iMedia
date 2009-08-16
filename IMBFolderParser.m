@@ -76,7 +76,6 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.fileUTI = nil;
-		self.subType = kIMBSubTypeFolder;
 	}
 	
 	return self;
@@ -120,6 +119,11 @@
 	newNode.parser = self;
 	newNode.leaf = NO;
 
+	if (newNode.parentNode == nil)
+	{
+		newNode.groupType = kIMBGroupTypeFolder;
+	}
+		
 	// Enable FSEvents based file watching for root nodes...
 	
 	if (newNode.parentNode == nil)
