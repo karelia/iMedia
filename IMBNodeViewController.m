@@ -203,7 +203,7 @@ static NSString* kSelectionKey = @"selection";
 	
 	NSTableColumn* column = [[ibNodeOutlineView tableColumns] objectAtIndex:0];
 	IMBNodeCell* cell = [[[IMBNodeCell alloc] init] autorelease];	
-	[column setDataCell:cell];		
+	[column setDataCell:cell];	
 }
 
 
@@ -740,6 +740,12 @@ static NSString* kSelectionKey = @"selection";
 }
 
 
+- (BOOL) validateMenuItem:(NSMenuItem*)inMenuItem
+{
+	return inMenuItem.action == @selector(setSelectedNodeFromPopup:);
+}
+
+
 // This action is only called by a direct user event from the popup menu...
 
 - (IBAction) setSelectedNodeFromPopup:(id)inSender
@@ -754,8 +760,6 @@ static NSString* kSelectionKey = @"selection";
 
 - (void) _syncPopupMenuSelection
 {
-	// Sync the selection of the popup menu...
-	
 	NSMenu* menu = [ibNodePopupButton menu];
 	NSInteger n = [menu numberOfItems];
 	

@@ -874,10 +874,21 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 		NSImage* icon = inNode.icon;
 		[icon setSize:NSMakeSize(16,16)];
+		
+		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:nil keyEquivalent:@""];
 
-		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:inSelector keyEquivalent:@""];
+		if (inNode.isGroup) 
+		{
+			[item setTarget:inTarget];						// Group nodes get a dummy action that will be disabled
+			[item setAction:@selector(__dummyAction:)];		// in - [IMBNodeViewController validateMenuItem:]
+		}
+		else
+		{
+			[item setTarget:inTarget];						// Normal nodes get the desired target/action
+			[item setAction:inSelector];
+		}
+		
 		[item setImage:icon];
-		[item setTarget:inTarget];
 		[item setRepresentedObject:inNode.identifier];
 		[item setIndentationLevel:inIndentation];
 		[inMenu addItem:item];
@@ -929,9 +940,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 			NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:inSelector keyEquivalent:@""];
 			[item setImage:icon];
+			[item setRepresentedObject:node.identifier];
 			[item setTarget:inTarget];
-			[item setRepresentedObject:node];
 			[item setIndentationLevel:0];
+			
 			[menu addItem:item];
 			[item release];
 		}
