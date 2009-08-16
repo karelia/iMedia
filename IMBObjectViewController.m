@@ -75,11 +75,15 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 @interface IMBObjectViewController ()
 
+- (void) _configureIconView;
+- (void) _configureListView;
+- (void) _configureComboView;
+
 - (NSMutableDictionary*) _preferences;
 - (void) _setPreferences:(NSMutableDictionary*)inDict;
 - (void) _saveStateToPreferences;
 - (void) _loadStateFromPreferences;
-- (void) _reloadIconView;
+//- (void) _reloadIconView;
 
 @end
 
@@ -193,6 +197,12 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	[ibObjectArrayController retain];
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKey options:0 context:(void*)kImageRepresentationKey];
+	
+	// Configure the object views...
+	
+	[self _configureIconView];
+	[self _configureListView];
+	[self _configureComboView];
 }
 
 
@@ -207,6 +217,30 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	IMBRelease(_libraryController);
 	IMBRelease(_nodeTreeController);
 	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+
+- (void) _configureIconView
+{
+	// Subclasses can override this method to customize look & feel...
+}
+
+
+- (void) _configureListView
+{
+	// Subclasses can override this method to customize look & feel...
+}
+
+
+- (void) _configureComboView
+{
+	// Subclasses can override this method to customize look & feel...
 }
 
 
@@ -310,7 +344,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 	if (inContext == (void*)kArrangedObjectsKey)
 	{
-		[self _reloadIconView];
+//		[self _reloadIconView];
 		[self willChangeValueForKey:kObjectCountStringKey];
 		[self didChangeValueForKey:kObjectCountStringKey];
 	}
@@ -319,7 +353,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 	else if (inContext == (void*)kImageRepresentationKey)
 	{
-		[self _reloadIconView];
+//		[self _reloadIconView];
 	}
 	else
 	{
@@ -328,11 +362,11 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 }
 
 
-- (void) _reloadIconView
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
-	[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-}
+//- (void) _reloadIconView
+//{
+//	[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
+//	[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+//}
 
 
 - (NSString*) objectCountString
