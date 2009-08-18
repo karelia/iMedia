@@ -157,9 +157,10 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
-	
 	NSString* folder = inNode.mediaSource;
 	NSArray* files = [[NSFileManager threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
+	NSAutoreleasePool* pool = nil;
+	NSInteger i = 0;
 	
 	if (error == nil)
 	{
@@ -173,44 +174,57 @@
 
 		for (NSString* file in files)
 		{
-			NSString* path = [folder stringByAppendingPathComponent:file];
-			
-			// For folders create a subnode...
-			
-			if ([self fileAtPath:path conformsToUTI:(NSString*)kUTTypeFolder])
+			if (![file hasPrefix:@"."])
 			{
-				NSString* parserClassName = NSStringFromClass([self class]);
+				if (i%32 == 0)
+				{
+					IMBRelease(pool);
+					pool = [[NSAutoreleasePool alloc] init];
+				}
 				
-				IMBNode* subnode = [[IMBNode alloc] init];
+				NSString* path = [folder stringByAppendingPathComponent:file];
+				
+				// For folders create a subnode...
+				
+				if ([self fileAtPath:path conformsToUTI:(NSString*)kUTTypeFolder])
+				{
+					NSString* parserClassName = NSStringFromClass([self class]);
+					
+					IMBNode* subnode = [[IMBNode alloc] init];
 
-				subnode.parentNode = inNode;
-				subnode.mediaSource = path;
-				subnode.identifier = [NSString stringWithFormat:@"%@:/%@",parserClassName,path];
-				subnode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
-				subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
-				subnode.parser = self;
-				subnode.leaf = NO;
+					subnode.parentNode = inNode;
+					subnode.mediaSource = path;
+					subnode.identifier = [NSString stringWithFormat:@"%@:/%@",parserClassName,path];
+					subnode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
+					subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+					subnode.parser = self;
+					subnode.leaf = NO;
+					
+					[subnodes addObject:subnode];
+					[subnode release];
+				}
 				
-				[subnodes addObject:subnode];
-				[subnode release];
+				// For qualifying files create an object...
+				
+				else if ([self fileAtPath:path conformsToUTI:_fileUTI])
+				{
+					IMBVisualObject* object = [[IMBVisualObject alloc] init];
+					object.value = (id)path;
+					object.name = file;
+					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+					object.imageRepresentation = path;
+				
+					[objects addObject:object];
+					[object release];
+				}
 			}
 			
-			// For qualifying files create an object...
-			
-			else if ([self fileAtPath:path conformsToUTI:_fileUTI])
-			{
-				IMBVisualObject* object = [[IMBVisualObject alloc] init];
-				object.value = (id)path;
-				object.name = file;
-				object.imageRepresentationType = IKImageBrowserPathRepresentationType;
-				object.imageRepresentation = path;
-			
-				[objects addObject:object];
-				[object release];
-			}
+			i++;
 		}
 	}
 	
+	IMBRelease(pool);
+					
 	if (outError) *outError = error;
 	return error == nil;
 }

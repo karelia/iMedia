@@ -249,7 +249,7 @@
 	pb.thumbnailData   = (CFDataRef*) &data;
     
     // asynchronous call - callback proc will get called when call completes
-    err = ICACopyObjectThumbnail( &pb, NULL );
+    /*err =*/ ICACopyObjectThumbnail( &pb, NULL );
 	if (noErr == pb.header.err)
     {
         // got the thumbnail data, now create an image...
@@ -299,6 +299,7 @@
 				
 				BOOL hasSubnodes = [self _addICATree:[anItem valueForKey:@"tree"] toNode:subnode];
 				subnode.leaf = !hasSubnodes;
+				subnode.wantsRecursiveObjects = YES;
 				
 				[subnodes addObject:subnode];
 				[subnode release];	
@@ -384,6 +385,7 @@
 					subnode.icon = [self _getThumbnailSync:subnode.mediaSource]; 
 					subnode.parser = self;
 					subnode.leaf = NO;
+					subnode.wantsRecursiveObjects = YES;
 					
 					subnode.attributes = anDevice;
 					[subnodes addObject:subnode];
@@ -576,7 +578,7 @@ static void MyThumbnailCallback (ICAHeader* pbHeader)
     pb.object          = (ICAObject)[self.value integerValue];
     
     // asynchronous call - callback proc will get called when call completes
-    err = ICACopyObjectThumbnail(&pb, MyThumbnailCallback);
+    /*err =*/ ICACopyObjectThumbnail(&pb, MyThumbnailCallback);
 	
 	NSLog( @"Loading Thumbnail %@", self );
     // ... error handling ...

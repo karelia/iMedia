@@ -105,9 +105,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Check if iPhoto is installed...
+
 + (NSString*) iPhotoPath
 {
 	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iPhoto"];
+}
+
+
++ (BOOL) isInstalled
+{
+	return [self iPhotoPath] != nil;
 }
 
 
@@ -120,7 +128,7 @@
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
 
-	if ([self iPhotoPath])
+	if ([self isInstalled])
 	{
 		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
 		NSArray* libraries = (NSArray*)recentLibraries;
@@ -452,6 +460,11 @@
 				[pool2 release];
 			}
 			
+//			// If this is the "Photos" node, then assign the same object array to the parent node (iPhoto),
+//			// so that selecting the parent node also displays all images...
+//			
+//			NSNumber* master = [albumDict objectForKey:@"Master"];
+//			if ([master boolValue]) inNode.parentNode.objects = inNode.objects;
 		}
 		
 		[pool1 release];
