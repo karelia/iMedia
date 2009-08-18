@@ -275,7 +275,7 @@
 
 - (NSUInteger) countOfRecursiveObjects
 {
-	NSUInteger count = self.countOfRecursiveObjects;
+	NSUInteger count = self.countOfShallowObjects;
 	
 	for (IMBNode* node in _subNodes)
 	{

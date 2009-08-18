@@ -70,6 +70,8 @@
 @property (retain) NSDictionary* metadata;
 @property (readonly) NSImage* icon;
 
+- (BOOL) isEqual:(IMBObject*)inObject;						// Considered equal if value is equal
+
 @end
 
 

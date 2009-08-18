@@ -73,7 +73,9 @@
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
 	IMBParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-	return [NSArray arrayWithObject:parser];
+	NSArray* parserInstances = [NSArray arrayWithObject:parser];
+	[parser release];
+	return parserInstances;
 }
 
 

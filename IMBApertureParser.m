@@ -97,26 +97,40 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (NSString*) aperturePath
+{
+	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Aperture"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Look at the iApps preferences file and find all iPhoto libraries. Create a parser instance for each libary...
 
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
-	CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.iApps");
-	NSArray* libraries = (NSArray*)recentLibraries;
 
-	for (NSString* library in libraries)
+	if ([self aperturePath])
 	{
-		NSURL* url = [NSURL URLWithString:library];
-		NSString* path = [url path];
+		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.Aperture");
+		NSArray* libraries = (NSArray*)recentLibraries;
 
-		IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-		parser.mediaSource = path;
-		parser.shouldDisplayLibraryName = libraries.count > 1;
-		[parserInstances addObject:parser];
+		for (NSString* library in libraries)
+		{
+			NSURL* url = [NSURL URLWithString:library];
+			NSString* path = [url path];
+
+			IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+			parser.mediaSource = path;
+			parser.shouldDisplayLibraryName = libraries.count > 1;
+			[parserInstances addObject:parser];
+			[parser release];
+		}
+		
+		if (recentLibraries) CFRelease(recentLibraries);
 	}
-	
-	CFRelease(recentLibraries);
 	
 	return parserInstances;
 }
@@ -129,7 +143,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.appPath = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Aperture"];
+		self.appPath = [[self class] aperturePath];
 		self.plist = nil;
 	}
 	

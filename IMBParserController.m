@@ -253,7 +253,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 					NSMutableArray* parsers = [self loadedParsersForMediaType:mediaType];
 					NSArray* parserInstances = [parserClass parserInstancesForMediaType:mediaType];
-					[parsers addObjectsFromArray:parserInstances];
+					if (parserInstances) [parsers addObjectsFromArray:parserInstances];
 					
 					if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didLoadParser:forMediaType:)])
 					{

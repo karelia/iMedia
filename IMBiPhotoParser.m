@@ -105,26 +105,40 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (NSString*) iPhotoPath
+{
+	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iPhoto"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Look at the iApps preferences file and find all iPhoto libraries. Create a parser instance for each libary...
 
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
-	CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
-	NSArray* libraries = (NSArray*)recentLibraries;
-		
-	for (NSString* library in libraries)
-	{
-		NSURL* url = [NSURL URLWithString:library];
-		NSString* path = [url path];
 
-		IMBiPhotoParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-		parser.mediaSource = path;
-		parser.shouldDisplayLibraryName = libraries.count > 1;
-		[parserInstances addObject:parser];
+	if ([self iPhotoPath])
+	{
+		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
+		NSArray* libraries = (NSArray*)recentLibraries;
+			
+		for (NSString* library in libraries)
+		{
+			NSURL* url = [NSURL URLWithString:library];
+			NSString* path = [url path];
+
+			IMBiPhotoParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+			parser.mediaSource = path;
+			parser.shouldDisplayLibraryName = libraries.count > 1;
+			[parserInstances addObject:parser];
+			[parser release];
+		}
+		
+		if (recentLibraries) CFRelease(recentLibraries);
 	}
-	
-	CFRelease(recentLibraries);
 	
 	return parserInstances;
 }
@@ -137,7 +151,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.appPath = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iPhoto"];
+		self.appPath = [[self class] iPhotoPath];
 		self.plist = nil;
 		_fakeAlbumID = 0;
 	}
