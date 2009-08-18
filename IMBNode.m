@@ -93,6 +93,7 @@
 @synthesize group = _group;
 @synthesize leaf = _leaf;
 @synthesize loading = _loading;
+@synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 
 // Support for live watching...
 
@@ -117,13 +118,15 @@
 	{
 		self.group = NO;
 		self.leaf = NO;
+		self.loading = NO;
+		self.wantsRecursiveObjects = NO;
+
 		self.objects = nil;
 		self.subNodes = nil;
+		
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
-
-		_loading = NO;
 	}
 	
 	return self;
@@ -144,6 +147,7 @@
 	copy.group = self.group;
 	copy.leaf = self.leaf;
 	copy.loading = self.loading;
+	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 
 	copy.parentNode = self.parentNode;
 	copy.parser = self.parser;
@@ -312,6 +316,38 @@
 	// Couldn't find a object with this index (index to large). Return nil...
 	
 	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// The bindableObjects property is used to bind the contentArray of IMBObjectArrayController. In this property 
+// the node can select whether it wants to display shallow or deep (recursive) objects...
+
+- (NSUInteger) countOfBindableObjects
+{
+	if (self.wantsRecursiveObjects)
+	{
+		return self.countOfRecursiveObjects;
+	}
+	else
+	{
+		return self.countOfShallowObjects;
+	}
+}
+
+
+- (IMBObject*) objectInBindableObjectsAtIndex:(NSUInteger)inIndex
+{
+	if (self.wantsRecursiveObjects)
+	{
+		return [self objectInRecursiveObjectsAtIndex:inIndex];
+	}
+	else
+	{
+		return [self objectInShallowObjectsAtIndex:inIndex];
+	}
 }
 
 

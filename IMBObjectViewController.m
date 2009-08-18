@@ -53,7 +53,9 @@
 #import "IMBLibraryController.h"
 #import "IMBObjectArrayController.h"
 #import "IMBConfig.h"
-//#import "IMBNode.h"
+#import "IMBNode.h"
+#import "IMBObject.h"
+#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -393,6 +395,50 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (NSMenu*) menuForBackground;
 {
 	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark IKImageBrowserDelegate
+ 
+
+- (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
+{
+
+}
+
+
+// Double-clicking and object opens the file (with its default app)...
+
+- (void) imageBrowser:(IKImageBrowserView*)inView cellWasDoubleClickedAtIndex:(NSUInteger)inIndex
+{
+	IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+	
+	if ([[object value] isKindOfClass:[NSString class]])
+	{
+		NSString* path = (NSString*)[object value];
+		[[NSWorkspace threadSafeWorkspace] openFile:path];
+	}	
+	else if ([[object value] isKindOfClass:[NSURL class]])
+	{
+		NSURL* url = (NSURL*)[object value];
+		[[NSWorkspace threadSafeWorkspace] openURL:url];
+	}	
+}
+
+
+- (void) imageBrowser:(IKImageBrowserView*)inView backgroundWasRightClickedWithEvent:(NSEvent*)inEvent
+{
+
+}
+
+
+- (void) imageBrowser:(IKImageBrowserView*)inView cellWasRightClickedAtIndex:(NSUInteger)inIndex withEvent:(NSEvent*)inEvent
+{
+
 }
 
 

@@ -82,6 +82,7 @@
 	BOOL _group;
 	BOOL _leaf;
 	BOOL _loading;
+	BOOL _wantsRecursiveObjects;
 	
 	IMBParser* _parser;
 	IMBWatcherType _watcherType;
@@ -122,11 +123,15 @@
 - (NSUInteger) countOfRecursiveObjects;
 - (IMBObject*) objectInRecursiveObjectsAtIndex:(NSUInteger)inIndex;
 
+- (NSUInteger) countOfBindableObjects;
+- (IMBObject*) objectInBindableObjectsAtIndex:(NSUInteger)inIndex;
+
 // State information about a node...
 
 @property (assign,getter=isGroup) BOOL group;
 @property (assign,getter=isLeaf) BOOL leaf;
 @property (assign,getter=isLoading) BOOL loading;
+@property (assign) BOOL wantsRecursiveObjects;
 
 // Support for live watching and asynchronous nodes
 

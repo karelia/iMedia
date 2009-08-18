@@ -97,9 +97,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Check if Aperture is installed...
+
 + (NSString*) aperturePath
 {
 	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Aperture"];
+}
+
+
++ (BOOL) isInstalled
+{
+	return [self aperturePath] != nil;
 }
 
 
@@ -112,7 +120,7 @@
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
 
-	if ([self aperturePath])
+	if ([self isInstalled])
 	{
 		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.Aperture");
 		NSArray* libraries = (NSArray*)recentLibraries;

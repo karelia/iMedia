@@ -96,9 +96,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Check if Lightroom is installed...
+
 + (NSString*) lightroomPath
 {
 	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
+}
+
+
++ (BOOL) isInstalled
+{
+	return [self lightroomPath] != nil;
 }
 
 
@@ -109,7 +117,7 @@
 
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
-	if ([self lightroomPath])
+	if ([self isInstalled])
 	{
 		IMBLightroomParser* parser = [[IMBLightroomParser alloc] initWithMediaType:inMediaType];
 		NSArray* parserInstances = [NSArray arrayWithObject:parser];
