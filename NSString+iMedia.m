@@ -208,7 +208,7 @@
     // Decode into an NSMutableData
     NSMutableData * data = [NSMutableData data];
     char inbuf[512];
-    int inlen;
+    NSInteger inlen;
     while ((inlen = BIO_read(mem, inbuf, sizeof(inbuf))) > 0)
         [data appendBytes: inbuf length: inlen];
     
@@ -238,10 +238,10 @@
 	return result;
 }
 
-+ (NSString *)stringFromStarRating:(unsigned int)aRating;
++ (NSString *)stringFromStarRating:(NSUInteger)aRating;
 {
 	static unichar blackStars[] = { 0x2605, 0x2605, 0x2605, 0x2605, 0x2605 };
-	aRating = MIN((unsigned int)5,aRating);	// make sure not above 5
+	aRating = MIN((NSUInteger)5,aRating);	// make sure not above 5
 	return [NSString stringWithCharacters:blackStars length:aRating];
 }
 

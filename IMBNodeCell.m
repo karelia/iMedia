@@ -248,7 +248,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) selectWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate start:(int)inStart length:(int)inLength
+- (void) selectWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate start:(NSInteger)inStart length:(NSInteger)inLength
 {
 	NSRect titleRect = [self titleRectForBounds:inFrame];
 	[super selectWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate start:inStart length:inLength];

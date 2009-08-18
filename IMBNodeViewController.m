@@ -160,7 +160,7 @@ static NSString* kSelectionKey = @"selection";
 
 + (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
 {
-	IMBNodeViewController* controller = [[[IMBNodeViewController alloc] initWithNibName:self.nibName bundle:self.bundle] autorelease];
+	IMBNodeViewController* controller = [[[IMBNodeViewController alloc] initWithNibName:[self nibName] bundle:[self bundle]] autorelease];
 	[controller view];										// Load the view *before* setting the libraryController, 
 	controller.libraryController = inLibraryController;		// so that outlets are set before we load the preferences.
 	return controller;
