@@ -129,7 +129,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _didPopulateNode:(IMBNode*)inNode;
 - (void) _replaceNode:(NSDictionary*)inOldAndNewNode;
 - (void) _presentError:(NSError*)inError;
-- (void) _fileWatcherDidFireForPath:(NSString*)inPath;
+- (void) _coalescedUKKQueueCallback;
+- (void) _coalescedFSEventsCallback;
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
 @end
@@ -264,7 +265,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @synthesize rootNodes = _rootNodes;
 @synthesize options = _options;
 @synthesize delegate = _delegate;
-@synthesize watcherKQueue = _watcherKQueue;
+@synthesize watcherUKKQueue = _watcherUKKQueue;
 @synthesize watcherFSEvents = _watcherFSEvents;
 @synthesize isReplacingNode = _isReplacingNode;
 
@@ -310,13 +311,16 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		self.rootNodes = [NSMutableArray array];
 		self.options = kIMBOptionNone;
 		
-		self.watcherKQueue = [[[IMBKQueue alloc] init] autorelease];
-		self.watcherKQueue.delegate = self;
+		self.watcherUKKQueue = [[[IMBKQueue alloc] init] autorelease];
+		self.watcherUKKQueue.delegate = self;
 		
 		self.watcherFSEvents = [[[IMBFSEventsWatcher alloc] init] autorelease];
 		self.watcherFSEvents.delegate = self;
 		
 		_isReplacingNode = NO;
+		_watcherLock = [[NSRecursiveLock alloc] init];
+		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
+		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
 	}
 	
 	return self;
@@ -327,8 +331,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	IMBRelease(_mediaType);
 	IMBRelease(_rootNodes);
-	IMBRelease(_watcherKQueue);
+	IMBRelease(_watcherUKKQueue);
 	IMBRelease(_watcherFSEvents);
+	IMBRelease(_watcherLock);
+	IMBRelease(_watcherUKKQueuePaths);
+	IMBRelease(_watcherFSEventsPaths);
 
 	[super dealloc];
 }
@@ -545,7 +552,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		if (watchedPath = oldNode.watchedPath)
 		{
 			if (oldNode.watcherType == kIMBWatcherTypeKQueue)
-				[self.watcherKQueue removePath:watchedPath];
+				[self.watcherUKKQueue removePath:watchedPath];
 			else if (oldNode.watcherType == kIMBWatcherTypeFSEvent)
 				[self.watcherFSEvents removePath:watchedPath];
 		}
@@ -564,7 +571,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		if (watchedPath = newNode.watchedPath)
 		{
 			if (newNode.watcherType == kIMBWatcherTypeKQueue)
-				[self.watcherKQueue addPath:watchedPath];
+				[self.watcherUKKQueue addPath:watchedPath];
 			else if (newNode.watcherType == kIMBWatcherTypeFSEvent)
 				[self.watcherFSEvents addPath:watchedPath];
 		}
@@ -686,33 +693,72 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #pragma mark File Watching
 
 
-// A file watcher has fired for one of the paths we have registered...
+// A file watcher has fired for one of the paths we have registered. Since file watchers (especially UKKQueue can 
+// fire multiple times for a single change) we need to coalesce the calls. Please note that the parameter inPath  
+// is a different NSString instance every single time, so we cannot pass it as a param to the coalesced message 
+// (canceling wouldn't work). Instead we'll put it in an array, which is iterated in _coalescedFileWatcherCallback...
 
 - (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath
 {
-	if ([inNotificationName isEqualToString:IMBFileWatcherRenameNotification] ||
-		[inNotificationName isEqualToString:IMBFileWatcherWriteNotification] ||
-		[inNotificationName isEqualToString:IMBFileWatcherDeleteNotification] )
+	if ([inNotificationName isEqualToString:IMBFileWatcherWriteNotification])
 	{
-		SEL method = @selector(_fileWatcherDidFireForPath:);
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:inPath];
-		[self performSelector:method withObject:inPath afterDelay:0.5 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		if (inWatcher == _watcherUKKQueue)
+		{
+			[_watcherLock lock];
+			if ([_watcherUKKQueuePaths indexOfObject:inPath] == NSNotFound) [_watcherUKKQueuePaths addObject:inPath];
+			[_watcherLock unlock];
+			
+			SEL method = @selector(_coalescedUKKQueueCallback);
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
+			[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		}
+		else if (inWatcher == _watcherFSEvents)
+		{
+			[_watcherLock lock];
+			if ([_watcherFSEventsPaths indexOfObject:inPath] == NSNotFound) [_watcherFSEventsPaths addObject:inPath];
+			[_watcherLock unlock];
+
+			SEL method = @selector(_coalescedFSEventsCallback);
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
+			[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		}
 	}
 }
 
 
 // Pass the message on to the main thread...
 
-- (void) _fileWatcherDidFireForPath:(NSString*)inPath
+- (void) _coalescedUKKQueueCallback
 {
-	if ([NSThread isMainThread])
+	BOOL isMainThread = [NSThread isMainThread];
+	
+	[_watcherLock lock];
+	
+	for (NSString* path in _watcherUKKQueuePaths)
 	{
-		[self _reloadNodesWithWatchedPath:inPath];
+		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
+		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
 	}
-	else
+	
+	[_watcherUKKQueuePaths removeAllObjects];
+	[_watcherLock unlock];
+}	
+
+
+- (void) _coalescedFSEventsCallback
+{
+	BOOL isMainThread = [NSThread isMainThread];
+	
+	[_watcherLock lock];
+	
+	for (NSString* path in _watcherFSEventsPaths)
 	{
-		[self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:inPath waitUntilDone:NO];
+		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
+		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
 	}
+	
+	[_watcherFSEventsPaths removeAllObjects];
+	[_watcherLock unlock];
 }	
 
 
@@ -730,7 +776,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	for (IMBNode* node in inNodes)
 	{
-		NSString* nodePath = [(NSString*)node.mediaSource stringByStandardizingPath];
+		NSString* nodePath = [(NSString*)node.watchedPath stringByStandardizingPath];
 		
 		if ([nodePath isEqualToString:watchedPath])
 		{

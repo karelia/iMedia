@@ -146,6 +146,7 @@
 
 - (NSIndexPath*) indexPath;
 - (NSComparisonResult) compare:(IMBNode*)inNode;
+- (BOOL) isRootNode;
 
 @end
 

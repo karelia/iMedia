@@ -55,6 +55,7 @@
 #import "IMBObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSFileManager+iMedia.h"
 #import <Quartz/Quartz.h>
 
 
@@ -84,6 +85,7 @@
 
 @synthesize appPath = _appPath;
 @synthesize plist = _plist;
+@synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
 
@@ -148,7 +150,7 @@
 {
 	IMBRelease(_appPath);
 	IMBRelease(_plist);
-	
+	IMBRelease(_modificationDate);
 	[super dealloc];
 }
 
@@ -191,13 +193,13 @@
 		rootNode.name = [NSString stringWithFormat:@"%@ (%@)",rootNode.name,name];
 	}
 
-	// Watch the root node via UKKQueue. Whenever something in iPhoto changes, we have to replace the
-	// WHOLE node tree, as we have no way of finding WHAT has changed in iPhoto...
+	// Watch the XML file. Whenever something in iPhoto changes, we have to replace the WHOLE tree from the root 
+	// node down, as we have no way of finding WHAT has changed in iPhoto...
 	
-	if (rootNode.parentNode == nil)
+	if (rootNode.isRootNode)
 	{
-		rootNode.watcherType = kIMBWatcherTypeKQueue;
-		rootNode.watchedPath = (NSString*)rootNode.mediaSource;
+		rootNode.watcherType = kIMBWatcherTypeFSEvent;
+		rootNode.watchedPath = [(NSString*)rootNode.mediaSource stringByDeletingLastPathComponent];
 	}
 	else
 	{
@@ -255,13 +257,25 @@
 #pragma mark Helper Methods
 
 
-// Load the XML file into a plist lazily (on demand)...
+// Load the XML file into a plist lazily (on demand). If we notice that an existing cached plist is out-of-date 
+// we get rid of it and load it anew...
 
 - (NSDictionary*) plist
 {
+	NSError* error = nil;
+	NSString* path = (NSString*)self.mediaSource;
+	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
+	
+	if ([self.modificationDate compare:modificationDate] == NSOrderedAscending)
+	{
+		self.plist = nil;
+	}
+	
 	if (_plist == nil)
 	{
 		self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
+		self.modificationDate = modificationDate;
 	}
 	
 	return _plist;
