@@ -517,7 +517,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (oldNode!=nil && newNode!=nil && oldNode.parentNode!=oldNode.parentNode)
 	{
-		NSLog(@"%s Error parent of oldNode and newNode must be the same...");
+		NSLog(@"%s Error parent of oldNode and newNode must be the same...",__FUNCTION__);
 		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error parent of oldNode and newNode must be the same" userInfo:nil] raise];
 	}
 	
@@ -907,7 +907,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _recursivelyAddItemsToMenu:(NSMenu*)inMenu 
 		 withNode:(IMBNode*)inNode 
-		 indentation:(int)inIndentation 
+		 indentation:(NSInteger)inIndentation 
 		 selector:(SEL)inSelector 
 		 target:(id)inTarget
 {
@@ -999,7 +999,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (didAddSeparator) 
 	{
-		int n = [menu numberOfItems];
+		NSInteger n = [menu numberOfItems];
 		[menu removeItemAtIndex:n-1];
 	}
 	

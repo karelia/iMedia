@@ -34,7 +34,7 @@
 #define DEBUG_LOG_THREAD_LIFETIME		1
 #define DEBUG_DETAILED_MESSAGES			1
 
-#ifndef MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
 #define NSUInteger		unsigned
 #endif
 
@@ -45,9 +45,9 @@
 @interface UKKQueuePathEntry : NSObject
 {
 	NSString*		path;
-	int				watchedFD;
+	NSInteger				watchedFD;
 	u_int			subscriptionFlags;
-	int				pathRefCount;
+	NSInteger				pathRefCount;
 }
 
 -(id)	initWithPath: (NSString*)inPath flags: (u_int)fflags;
@@ -56,7 +56,7 @@
 -(BOOL)			releasePath;
 
 -(NSString*)	path;
--(int)			watchedFD;
+-(NSInteger)			watchedFD;
 
 -(u_int)		subscriptionFlags;
 -(void)			setSubscriptionFlags: (u_int)fflags;
@@ -120,7 +120,7 @@
 	return path;
 }
 
--(int)	watchedFD
+-(NSInteger)	watchedFD
 {
 	return watchedFD;
 }
@@ -146,12 +146,12 @@
 
 @interface UKKQueueCentral : NSObject
 {
-	int						queueFD;				// The actual queue ID (Unix file descriptor).
+	NSInteger						queueFD;				// The actual queue ID (Unix file descriptor).
 	NSMutableDictionary*	watchedFiles;			// List of UKKQueuePathEntries.
 	BOOL					keepThreadRunning;
 }
 
--(int)		queueFD;				// I know you unix geeks want this...
+-(NSInteger)		queueFD;				// I know you unix geeks want this...
 
 // UKFileWatcher protocol methods:
 -(void)		addPath: (NSString*)path;
@@ -268,7 +268,7 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 //		2004-03-13	UK	Documented.
 // -----------------------------------------------------------------------------
 
--(int)  queueFD
+-(NSInteger)  queueFD
 {
 	return queueFD;
 }
@@ -362,7 +362,7 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 -(NSString*)	descriptionWithLocale: (id)locale indent: (NSUInteger)level
 {
 	NSMutableString*	mutStr = [NSMutableString string];
-	int					x = 0;
+	NSInteger					x = 0;
 	
 	for( x = 0; x < level; x++ )
 		[mutStr appendString: @"    "];
@@ -404,10 +404,10 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 
 -(void)		watcherThread: (id)sender
 {
-	int					n;
+	NSInteger					n;
     struct kevent		ev;
     struct timespec     timeout = { 1, 0 }; // 1 second timeout. Should be longer, but we need this thread to exit when a kqueue is dealloced, so 1 second timeout is quite a while to wait.
-	int					theFD = queueFD;	// So we don't have to risk accessing iVars when the thread is terminated.
+	NSInteger					theFD = queueFD;	// So we don't have to risk accessing iVars when the thread is terminated.
     
 	#if DEBUG_LOG_THREAD_LIFETIME
 	NSLog(@"watcherThread started.");
@@ -590,7 +590,7 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 }
 
 
--(int)		queueFD
+-(NSInteger)		queueFD
 {
 	return [[UKKQueue sharedFileWatcher] queueFD];	// We're all one big, happy family now.
 }

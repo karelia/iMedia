@@ -121,7 +121,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 + (NSString*) mediaType
 {
-	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...");
+	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
 
 	return nil;
@@ -130,7 +130,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 + (NSString*) nibName
 {
-	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...");
+	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
 
 	return nil;
@@ -139,7 +139,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 + (NSString*) objectCountFormatSingular
 {
-	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...");
+	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
 
 	return nil;
@@ -148,7 +148,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 + (NSString*) objectCountFormatPlural
 {
-	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...");
+	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
 
 	return nil;
@@ -157,7 +157,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
 {
-	IMBObjectViewController* controller = [[[[self class] alloc] initWithNibName:self.nibName bundle:self.bundle] autorelease];
+	IMBObjectViewController* controller = [[[[self class] alloc] initWithNibName:[self nibName] bundle:[self bundle]] autorelease];
 	[controller view];										// Load the view *before* setting the libraryController, 
 	controller.libraryController = inLibraryController;		// so that outlets are set before we load the preferences.
 	return controller;

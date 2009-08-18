@@ -66,7 +66,7 @@
 
 - (NSString *)exifDateToLocalizedDisplayDate;
 
-+ (NSString *)stringFromStarRating:(unsigned int)aRating;
++ (NSString *)stringFromStarRating:(NSUInteger)aRating;
 
 - (NSComparisonResult)finderCompare:(NSString *)aString;
 

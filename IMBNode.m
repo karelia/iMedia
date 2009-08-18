@@ -171,6 +171,7 @@
 			IMBNode* copiedSubnode = [subnode copy];
 			copiedSubnode.parentNode = copy;
 			[(NSMutableArray*)copy.subNodes addObject:copiedSubnode];
+			[copiedSubnode release];
 		}
 	}
 	else 

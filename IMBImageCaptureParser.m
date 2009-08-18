@@ -136,14 +136,14 @@
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,path];	
 }
 	  
-- (IMBNode *) nodeCopy:(IMBNode*)inOldNode
+- (IMBNode *) nodeCopy:(const IMBNode*)inOldNode
 {
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
 	path = [path stringByStandardizingPath];
 	
 	// Create an empty root node (unpopulated and without subnodes)...
 	
-	IMBNode* newNode = [[[IMBNode alloc] init] autorelease];
+	IMBNode* newNode = [[IMBNode alloc] init];
 	
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
@@ -166,12 +166,12 @@
 	return newNode;
 }
 
-- (IMBNode*) nodeWithOldNode:(IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
+- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
 	
 	// note: if inOldNode is nil, this represents the device list root object
-	IMBNode* newNode = [self nodeCopy:inOldNode];
+	IMBNode* newNode = [[self nodeCopy:inOldNode] autorelease];
 	
 	// If the old node had subnodes, then look for subnodes in the new node...
 	
@@ -246,7 +246,7 @@
     pb.thumbnailFormat = kICAThumbnailFormatTIFF; // gives transparency
     // use the ICAObject out of the mDeviceDictionary
     pb.object          = [anObject intValue];
-	pb.thumbnailData   = &data;
+	pb.thumbnailData   = (CFDataRef*) &data;
     
     // asynchronous call - callback proc will get called when call completes
     err = ICACopyObjectThumbnail( &pb, NULL );

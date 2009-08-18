@@ -106,9 +106,13 @@
 
 		while ((component = [enumerator nextObject]) != nil)
 		{
+			NSError* eatError = nil;
 			thePath = [thePath stringByAppendingPathComponent:component];
 			if (![[NSFileManager defaultManager] fileExistsAtPath:thePath] &&
-				![[NSFileManager defaultManager] createDirectoryAtPath:thePath attributes:attributes])
+				![[NSFileManager defaultManager] createDirectoryAtPath:thePath 
+										   withIntermediateDirectories:YES
+															attributes:attributes
+																 error:&eatError])
 			{
 				[NSException raise:@"iMediaException" format:@"createDirectory:attributes: failed at path: %@", path];
 			}

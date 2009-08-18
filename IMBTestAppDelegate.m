@@ -9,16 +9,19 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+//	iMedia Framework
+#import <iMedia/IMBParserController.h>
+#import <iMedia/IMBLibraryController.h>
+#import <iMedia/IMBNodeViewController.h>
+#import <iMedia/IMBPhotosViewController.h>
+#import <iMedia/IMBConfig.h>
+#import <iMedia/IMBParser.h>
+#import <iMedia/IMBNode.h>
+#import <iMedia/IMBiPhotoParser.h>
 
+//	Test Application
 #import "IMBTestAppDelegate.h"
-#import "IMBParserController.h"
-#import "IMBLibraryController.h"
-#import "IMBNodeViewController.h"
-#import "IMBPhotosViewController.h"
-#import "IMBConfig.h"
-#import "IMBParser.h"
-#import "IMBNode.h"
-#import "IMBiPhotoParser.h"
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
