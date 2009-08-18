@@ -102,8 +102,11 @@ extern NSString* kIMBNodesDidChangeNotification;
 	id _delegate;
 
 	BOOL _isReplacingNode;
-	IMBKQueue* _watcherKQueue;
+	IMBKQueue* _watcherUKKQueue;
 	IMBFSEventsWatcher* _watcherFSEvents;
+	NSRecursiveLock* _watcherLock;
+	NSMutableArray* _watcherUKKQueuePaths;
+	NSMutableArray* _watcherFSEventsPaths;
 }
 
 // Create singleton instance of the controller. Don't forget to set the delegate early in the app lifetime...
@@ -116,7 +119,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 @property (retain) NSString* mediaType;
 @property (assign) IMBOptions options;
 @property (assign) id delegate;
-@property (retain) IMBKQueue* watcherKQueue;
+@property (retain) IMBKQueue* watcherUKKQueue;
 @property (retain) IMBFSEventsWatcher* watcherFSEvents;
 @property (readonly) BOOL isReplacingNode;
 

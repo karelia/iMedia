@@ -61,12 +61,14 @@
 {
 	NSString* _appPath;
 	NSDictionary* _plist;
+	NSDate* _modificationDate;
 	BOOL _shouldDisplayLibraryName;
 	int _fakeAlbumID;					// for iPhoto2 compatibility
 }
 
 @property (retain) NSString* appPath;
 @property (retain) NSDictionary* plist;
+@property (retain) NSDate* modificationDate;
 @property (assign) BOOL shouldDisplayLibraryName;
 - (BOOL) allowAlbumType:(NSString*)inAlbumType;
 

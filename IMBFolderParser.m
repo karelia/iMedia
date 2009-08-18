@@ -126,7 +126,7 @@
 		
 	// Enable FSEvents based file watching for root nodes...
 	
-	if (newNode.parentNode == nil)
+	if (newNode.isRootNode)
 	{
 		newNode.watcherType = kIMBWatcherTypeFSEvent;
 		newNode.watchedPath = path;

@@ -425,6 +425,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// A node is considered a root node if it really is a root node (nil parent) or if it is indented by one under 
+// a group node...
+
+- (BOOL) isRootNode
+{
+	return self.parentNode == nil || self.parentNode.isGroup;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark
 #pragma mark Debugging
 
