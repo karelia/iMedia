@@ -942,26 +942,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">contentArray: nodeTreeController.selection.objects</string>
-						<reference key="source" ref="918073312"/>
-						<reference key="destination" ref="1021"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="918073312"/>
-							<reference key="NSDestination" ref="1021"/>
-							<string key="NSLabel">contentArray: nodeTreeController.selection.objects</string>
-							<string key="NSBinding">contentArray</string>
-							<string key="NSKeyPath">nodeTreeController.selection.objects</string>
-							<object class="NSDictionary" key="NSOptions">
-								<string key="NS.key.0">NSConditionallySetsEditable</string>
-								<reference key="NS.object.0" ref="6"/>
-							</object>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">626</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: objectCountString</string>
 						<reference key="source" ref="912974408"/>
 						<reference key="destination" ref="1021"/>
@@ -1116,6 +1096,26 @@
 						</object>
 					</object>
 					<int key="connectionID">650</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">contentArray: nodeTreeController.selection.shallowObjects</string>
+						<reference key="source" ref="918073312"/>
+						<reference key="destination" ref="1021"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="918073312"/>
+							<reference key="NSDestination" ref="1021"/>
+							<string key="NSLabel">contentArray: nodeTreeController.selection.shallowObjects</string>
+							<string key="NSBinding">contentArray</string>
+							<string key="NSKeyPath">nodeTreeController.selection.shallowObjects</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSConditionallySetsEditable</string>
+								<reference key="NS.object.0" ref="6"/>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">652</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1526,7 +1526,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">650</int>
+			<int key="maxID">652</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

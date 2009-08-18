@@ -84,6 +84,13 @@
 }
 
 
+// Objects are equal if their value (paths or urls) are equal...
+
+- (BOOL) isEqual:(IMBObject*)inObject
+{
+	return [self.value isEqual:inObject.value];
+}
+
 @end
 
 

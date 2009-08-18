@@ -96,12 +96,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (NSString*) lightroomPath
+{
+	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Factory method for the parser instances. Create one instance per library and configure it...
 
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
-	IMBLightroomParser* parser = [[[IMBLightroomParser alloc] initWithMediaType:inMediaType] autorelease];
-	return [NSArray arrayWithObject:parser];
+	if ([self lightroomPath])
+	{
+		IMBLightroomParser* parser = [[IMBLightroomParser alloc] initWithMediaType:inMediaType];
+		NSArray* parserInstances = [NSArray arrayWithObject:parser];
+		[parser release];
+		return parserInstances;
+	}
+	
+	return nil;
 }
 
 
@@ -112,7 +128,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.appPath = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
+		self.appPath = [[self class] lightroomPath];
 		self.plist = nil;
 	}
 	
