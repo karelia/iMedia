@@ -174,14 +174,17 @@
 
 		for (NSString* file in files)
 		{
-			if (![file hasPrefix:@"."])
+			if (i%32 == 0)
 			{
-				if (i%32 == 0)
-				{
-					IMBRelease(pool);
-					pool = [[NSAutoreleasePool alloc] init];
-				}
-				
+				IMBRelease(pool);
+				pool = [[NSAutoreleasePool alloc] init];
+			}
+			i++;
+			
+			// Hidden folders (e.g. ".thumbnails") will be skipped...
+			
+			if (![file hasPrefix:@"."])	
+			{
 				NSString* path = [folder stringByAppendingPathComponent:file];
 				
 				// For folders create a subnode...
@@ -219,7 +222,6 @@
 				}
 			}
 			
-			i++;
 		}
 	}
 	

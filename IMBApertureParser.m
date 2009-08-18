@@ -122,8 +122,8 @@
 
 	if ([self isInstalled])
 	{
-		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.Aperture");
-		NSArray* libraries = (NSArray*)recentLibraries;
+		CFArrayRef apertureLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.iApps");
+		NSArray* libraries = (NSArray*)apertureLibraries;
 
 		for (NSString* library in libraries)
 		{
@@ -137,7 +137,7 @@
 			[parser release];
 		}
 		
-		if (recentLibraries) CFRelease(recentLibraries);
+		if (apertureLibraries) CFRelease(apertureLibraries);
 	}
 	
 	return parserInstances;

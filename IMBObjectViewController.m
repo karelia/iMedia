@@ -85,7 +85,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (void) _setPreferences:(NSMutableDictionary*)inDict;
 - (void) _saveStateToPreferences;
 - (void) _loadStateFromPreferences;
-//- (void) _reloadIconView;
+- (void) _reloadIconView;
 
 @end
 
@@ -355,7 +355,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 	else if (inContext == (void*)kImageRepresentationKey)
 	{
-//		[self _reloadIconView];
+		[self _reloadIconView];
 	}
 	else
 	{
@@ -364,11 +364,11 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 }
 
 
-//- (void) _reloadIconView
-//{
-//	[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
-//	[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-//}
+- (void) _reloadIconView
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
+	[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+}
 
 
 - (NSString*) objectCountString
