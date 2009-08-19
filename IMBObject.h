@@ -47,14 +47,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
-
-//#import <ImageKit/ImageKit.h>
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // This object encapsulates information about a single media item (e.g. image file or audio file). The value 
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
 
