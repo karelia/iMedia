@@ -234,15 +234,15 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 {
 	// Subclasses can override this method to customize look & feel...
 	
-	if ([ibIconView respondsToSelector:@selector(setCanControlQuickLookPanel:)])
-	{
-		[ibIconView setCanControlQuickLookPanel:YES];
-	}
-
-	if ([ibIconView respondsToSelector:@selector(setIntercellSpacing:)])
-	{
-		[ibIconView setIntercellSpacing:NSMakeSize(4.0,6.0)];
-	}
+//	if ([ibIconView respondsToSelector:@selector(setCanControlQuickLookPanel:)])
+//	{
+//		[ibIconView setCanControlQuickLookPanel:YES];
+//	}
+//
+//	if ([ibIconView respondsToSelector:@selector(setIntercellSpacing:)])
+//	{
+//		[ibIconView setIntercellSpacing:NSMakeSize(10.0,4.0)];
+//	}
 }
 
 
@@ -434,13 +434,16 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 {
 	NSArray* selectedNodes = [_nodeTreeController selectedObjects];
 	IMBNode* node = selectedNodes.count>0 ? [selectedNodes objectAtIndex:0] : nil;
-	IMBParser* parser = node.parser;
 	
-	IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
-	NSArray* objects = [NSArray arrayWithObject:object];
-	
-	IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-	[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalFiles:)];
+	if (node)
+	{
+		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+		NSArray* objects = [NSArray arrayWithObject:object];
+		
+		IMBParser* parser = node.parser;
+		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalFiles:)];
+	}
 }
 
 
@@ -456,9 +459,29 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
+// start loading the objects in the promise and iterate over the resulting files...
+
 - (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
+	NSArray* selectedNodes = [_nodeTreeController selectedObjects];
+	IMBNode* node = selectedNodes.count>0 ? [selectedNodes objectAtIndex:0] : nil;
 
+	if (node)
+	{
+		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
+
+		IMBParser* parser = node.parser;
+		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
+		
+		[inPasteboard declareTypes:[NSArray arrayWithObject:kIMBObjectPromiseType] owner:nil];
+		[inPasteboard setData:data forType:kIMBObjectPromiseType];
+		
+		return 1;
+	}
+	
+	return 0;
 }
 
 

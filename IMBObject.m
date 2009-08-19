@@ -74,6 +74,28 @@
 	return copy;
 }
 
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[inCoder encodeObject:self.value forKey:@"value"];
+	[inCoder encodeObject:self.name forKey:@"name"];
+	[inCoder encodeObject:self.metadata forKey:@"metadata"];
+}
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super init])
+	{
+		self.value = [inCoder decodeObjectForKey:@"value"];
+		self.name = [inCoder decodeObjectForKey:@"name"];
+		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
+	}
+	
+	return self;
+}
+
+
 // Return a small generic icon for this file. Is the icon cached by NSWorkspace, or should be provide some 
 // caching ourself?
 
@@ -102,6 +124,28 @@
 @synthesize imageRepresentation = _imageRepresentation;
 @synthesize imageRepresentationType = _imageRepresentationType;
 @synthesize imageVersion = _imageVersion;
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	[inCoder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
+	[inCoder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
+	[inCoder encodeInteger:self.imageVersion forKey:@"imageVersion"];
+}
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		self.imageRepresentation = [inCoder decodeObjectForKey:@"imageRepresentation"];
+		self.imageRepresentationType = [inCoder decodeObjectForKey:@"imageRepresentationType"];
+		self.imageVersion = [inCoder decodeIntegerForKey:@"imageVersion"];
+	}
+	
+	return self;
+}
 
 
 // Use the path or URL as the unique identifier...

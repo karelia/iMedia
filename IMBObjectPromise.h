@@ -47,6 +47,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CONSTANTS
+	
+extern NSString* kIMBObjectPromiseType;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // An IMBObjectPromise is a abstraction that is sitting between the iMedia framework and the client application. 
 // Objects from some parsers reside on the local file system, but objects from other parser may reside on a remote 
 // server or a camera device. In these cases we only have lores thumbnails available. To access the hires data, we
@@ -54,7 +62,7 @@
 // this access. The frameworks hands the promise to the client app, which can then trigger a download as desired...
 
 
-@interface IMBObjectPromise : NSObject
+@interface IMBObjectPromise : NSObject <NSCopying,NSCoding>
 {
 	NSArray* _objects; 
 	NSMutableArray* _localFiles;
@@ -105,7 +113,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Protocol that notifies the delegate (client application) of download progress...
+// Protocol that notifies the delegate (usually the client application) of download progress...
 
 @protocol IMBObjectPromiseDelegate
 

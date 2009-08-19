@@ -239,7 +239,7 @@
 {
 	NSImage *image = NULL;
 	NSData *data = NULL;
-    OSErr   err;
+//    OSErr   err;
     ICACopyObjectThumbnailPB    pb = { 0  };
     
     pb.header.refcon   = 0L; // (unsigned long) self;
@@ -569,7 +569,7 @@ static void MyThumbnailCallback (ICAHeader* pbHeader)
 - (void) _getThumbnail
 {
 	self.isLoading = YES;
-    OSErr                       err;
+//    OSErr                       err;
     ICACopyObjectThumbnailPB    pb = { };
     
     pb.header.refcon   = (unsigned long) self;

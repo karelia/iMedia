@@ -57,12 +57,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CONSTANTS
+	
+NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
 @implementation IMBObjectPromise
 
 @synthesize objects = _objects;
 @synthesize localFiles = _localFiles;
 @synthesize delegate = _delegate;
 @synthesize finishSelector = _finishSelector;
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (id) initWithObjects:(NSArray*)inObjects
@@ -79,6 +92,52 @@
 }
 
 
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBObjectPromise* copy = [[[self class] allocWithZone:inZone] init];
+	
+	copy.objects = self.objects;
+	copy.localFiles = self.localFiles;
+	copy.delegate = self.delegate;
+	copy.finishSelector = self.finishSelector;
+	
+	return copy;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[inCoder encodeObject:self.objects forKey:@"objects"];
+//	[inCoder encodeObject:self.localFiles forKey:@"localFiles"];
+}
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super init])
+	{
+		self.objects = [inCoder decodeObjectForKey:@"objects"];
+		self.localFiles = [NSMutableArray arrayWithCapacity:self.objects.count];
+		self.delegate = nil;
+		self.finishSelector = NULL;
+	}
+	
+	return self;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_objects);
+	IMBRelease(_localFiles);
+	IMBRelease(_delegate);
+	[super dealloc];
+} 
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector
 {
 	self.delegate = inDelegate;
@@ -91,37 +150,32 @@
 }
 
 
-- (void) dealloc
-{
-	IMBRelease(_objects);
-	IMBRelease(_localFiles);
-	IMBRelease(_delegate);
-	[super dealloc];
-}
-
-
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// A promise for local files doesn't really have to do any work since now loadloading is required. The delegate
+// A promise for local files doesn't really have to do any work since no loading is required. The delegate
 // methods for progress display are probably not necessary...
+
+
+#pragma mark
 
 @implementation IMBLocalObjectPromise
 
 
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector
 {
-	[super startLoadingWithDelegate:inDelegate finishSelector:inSelector];
-
-	NSUInteger n  = [self.objects count];
-	NSUInteger i  = 0;
+	// Start and notify the delegate...
 	
-	[self retain];
+	[super startLoadingWithDelegate:inDelegate finishSelector:inSelector];
 	if (_hasWillStartLoading) [_delegate objectPromiseWillStartLoading:self];
 	
+	// Copy the path (value) of each object into our paths array...
+	
+	NSUInteger n  = [self.objects count];
+	NSUInteger i  = 0;
 	for (IMBObject* object in self.objects)
 	{
 		NSString* path = (NSString*)[object value];
@@ -131,10 +185,10 @@
 		if (_hasNameProgress) [_delegate objectPromise:self name:object.name progress:fraction];
 	}
 
+	// Notify the delegate that we are done...
+	
 	if (_hasDidFinishLoading) [_delegate objectPromiseDidFinishLoading:self];
 	if (_hasFinishSelector) [_delegate performSelector:_finishSelector withObject:self];
-	
-	[self release];
 }
 
 
@@ -146,28 +200,36 @@
 
 // A promise for remote files needs to start NSURL downloads...
 
+
+#pragma mark
+
 @implementation IMBRemoteObjectPromise
 
 
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector
 {
+	// Make sure this object stays alive until the loading has finished...
+	
+	[self retain];
+
+	// Start and notify the delegate...
+	
 	[super startLoadingWithDelegate:inDelegate finishSelector:inSelector];
+	if (_hasWillStartLoading) [_delegate objectPromiseWillStartLoading:self];
 
 	NSUInteger n  = [self.objects count];
 	NSUInteger i  = 0;
 	
-	[self retain];
-	if (_hasWillStartLoading) [_delegate objectPromiseWillStartLoading:self];
-	
 	for (IMBObject* object in self.objects)
 	{
-		NSString* path = (NSString*)[object value];
-		[self.localFiles addObject:path];
-		
-		double fraction = (double)(++i) / (double)(n);
-		if (_hasNameProgress) [_delegate objectPromise:self name:object.name progress:fraction];
+		NSURL* url = (NSURL*)[object value];
+		NSURLRequest* request = [NSURLRequest requestWithURL:url];
+		NSURLDownload* download = nil;
+		// ...
 	}
 
+	// Notify the delegate that we are done...
+	
 	if (_hasDidFinishLoading) [_delegate objectPromiseDidFinishLoading:self];
 	if (_hasFinishSelector) [_delegate performSelector:_finishSelector withObject:self];
 	
