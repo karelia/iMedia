@@ -53,8 +53,10 @@
 #import "IMBLibraryController.h"
 #import "IMBObjectArrayController.h"
 #import "IMBConfig.h"
+#import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBObjectPromise.h"
 #import "NSWorkspace+iMedia.h"
 
 
@@ -231,6 +233,16 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (void) _configureIconView
 {
 	// Subclasses can override this method to customize look & feel...
+	
+	if ([ibIconView respondsToSelector:@selector(setCanControlQuickLookPanel:)])
+	{
+		[ibIconView setCanControlQuickLookPanel:YES];
+	}
+
+	if ([ibIconView respondsToSelector:@selector(setIntercellSpacing:)])
+	{
+		[ibIconView setIntercellSpacing:NSMakeSize(4.0,6.0)];
+	}
 }
 
 
@@ -411,23 +423,46 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 }
 
 
-// Double-clicking and object opens the file (with its default app)...
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Double-clicking opens the file (with its default app). Please note that IMBObjects are first passed through an 
+// IMBObjectPromise (which is returned by the parser), because the files may not yet be available locally. In this
+// case the promise object loads them asynchronously and calls _openLocalFiles: once the download has finsihed...
 
 - (void) imageBrowser:(IKImageBrowserView*)inView cellWasDoubleClickedAtIndex:(NSUInteger)inIndex
 {
-	IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+	NSArray* selectedNodes = [_nodeTreeController selectedObjects];
+	IMBNode* node = selectedNodes.count>0 ? [selectedNodes objectAtIndex:0] : nil;
+	IMBParser* parser = node.parser;
 	
-	if ([[object value] isKindOfClass:[NSString class]])
+	IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+	NSArray* objects = [NSArray arrayWithObject:object];
+	
+	IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+	[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalFiles:)];
+}
+
+
+- (void) _openLocalFiles:(IMBObjectPromise*)inObjectPromise
+{
+	for (NSString* path in inObjectPromise.localFiles)
 	{
-		NSString* path = (NSString*)[object value];
 		[[NSWorkspace threadSafeWorkspace] openFile:path];
 	}	
-	else if ([[object value] isKindOfClass:[NSURL class]])
-	{
-		NSURL* url = (NSURL*)[object value];
-		[[NSWorkspace threadSafeWorkspace] openURL:url];
-	}	
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
+{
+
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (void) imageBrowser:(IKImageBrowserView*)inView backgroundWasRightClickedWithEvent:(NSEvent*)inEvent

@@ -47,123 +47,75 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
-
-#import "IMBParser.h"
-#import "IMBObjectPromise.h"
-
-
-//----------------------------------------------------------------------------------------------------------------------
+// An IMBObjectPromise is a abstraction that is sitting between the iMedia framework and the client application. 
+// Objects from some parsers reside on the local file system, but objects from other parser may reside on a remote 
+// server or a camera device. In these cases we only have lores thumbnails available. To access the hires data, we
+// first need to start an asynchronous download operation. To be as lazy as possible, IMBObjectPromise encapsulates
+// this access. The frameworks hands the promise to the client app, which can then trigger a download as desired...
 
 
-#pragma mark 
-
-@implementation IMBParser
-
-@synthesize mediaSource = _mediaSource;
-@synthesize mediaType = _mediaType;
-@synthesize custom = _custom;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// The default implementation just returns a single parser instance. Subclasses like iPhoto, Aperture, or Lightroom
-// may opt to return multiple instances (preconfigured with correct mediaSource) if multiple libraries are detected...
-
-+ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
+@interface IMBObjectPromise : NSObject
 {
-	IMBParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-	NSArray* parserInstances = [NSArray arrayWithObject:parser];
-	[parser release];
-	return parserInstances;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) initWithMediaType:(NSString*)inMediaType
-{
-	if (self = [super init])
-	{
-		self.mediaSource = nil;
-		self.mediaType = inMediaType;
-		self.custom = NO;
-	}
+	NSArray* _objects; 
+	NSMutableArray* _localFiles;
 	
-	return self;
+	id _delegate;
+	SEL _finishSelector;
+	
+	BOOL _hasWillStartLoading;
+	BOOL _hasNameProgress;
+	BOOL _hasDidFinishLoading;
+	BOOL _hasFinishSelector;
 }
 
 
-- (void) dealloc
-{
-	IMBRelease(_mediaSource);
-	IMBRelease(_mediaType);
-	[super dealloc];
-}
+@property (retain) NSArray* objects;			// Array of IMBObjects
+@property (retain) NSMutableArray* localFiles;	// Array of paths
+@property (retain) id delegate;					// Retained due to asynchronous nature of the promise
+@property (assign) SEL finishSelector;			// Method with signature - (void) finish:(IMBObjectPromise*)inObjectPromise 
+
+- (id) initWithObjects:(NSArray*)inObjects;
+- (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
+		
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// The following two methods must be overridden by subclasses...
+// This subclass is used for local object files that can be returned immediately. In this case a promise isn't 
+// really necessary, but to make the architecture more consistent, this abstraction is used nonetheless... 
 
-- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
-{
-	return nil;
-}
-
-
-- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
-{
-	return NO;
-}
-
-
-// This method can be overridden by subclasses if the default promise is not useful...
-
-- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects
-{
-	return [[[IMBLocalObjectPromise alloc] initWithObjects:inObjects] autorelease];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Optional methods do nothing in the base class and can be overridden in subclasses, e.g. to update  
-// or get rid of cached data...
-
-- (void) willUseParser
-{
-
-}
-
-
-- (void) didDeselectParser
-{
-
-}
-
-
-- (void) watchedPathDidChange:(NSString*)inWatchedPath
-{
-
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSString*) identifierForPath:(NSString*)inPath
-{
-	NSString* parserClassName = NSStringFromClass([self class]);
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+@interface IMBLocalObjectPromise : IMBObjectPromise
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This subclass is used for remote object files that can be downloaded from a network. NSURLDownload is used to
+// pull the object files of the network onto the local file system, where it can then be accessed by the delegate... 
+
+@interface IMBRemoteObjectPromise : IMBObjectPromise
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Protocol that notifies the delegate (client application) of download progress...
+
+@protocol IMBObjectPromiseDelegate
+
+@optional
+
+- (void) objectPromiseWillStartLoading:(IMBObjectPromise*)inObjectPromise;
+- (void) objectPromise:(IMBObjectPromise*)inObjectPromise name:(NSString*)inName progress:(double)inFraction;
+- (void) objectPromiseDidFinishLoading:(IMBObjectPromise*)inObjectPromise;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
