@@ -50,7 +50,7 @@
 // This object encapsulates information about a single media item (e.g. image file or audio file). The value 
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
 
-@interface IMBObject : NSObject <NSCopying>
+@interface IMBObject : NSObject <NSCopying,NSCoding>
 {
 	id _value;												
 	NSString* _name;
