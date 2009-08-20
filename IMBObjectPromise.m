@@ -217,16 +217,16 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	[super startLoadingWithDelegate:inDelegate finishSelector:inSelector];
 	if (_hasWillStartLoading) [_delegate objectPromiseWillStartLoading:self];
 
-	NSUInteger n  = [self.objects count];
-	NSUInteger i  = 0;
-	
-	for (IMBObject* object in self.objects)
-	{
-		NSURL* url = (NSURL*)[object value];
-		NSURLRequest* request = [NSURLRequest requestWithURL:url];
-		NSURLDownload* download = nil;
-		// ...
-	}
+//	NSUInteger n  = [self.objects count];
+//	NSUInteger i  = 0;
+//	
+//	for (IMBObject* object in self.objects)
+//	{
+//		NSURL* url = (NSURL*)[object value];
+//		NSURLRequest* request = [NSURLRequest requestWithURL:url];
+//		NSURLDownload* download = nil;
+//		// ...
+//	}
 
 	// Notify the delegate that we are done...
 	

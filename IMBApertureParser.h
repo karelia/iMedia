@@ -61,11 +61,13 @@
 {
 	NSString* _appPath;
 	NSDictionary* _plist;
+	NSDate* _modificationDate;
 	BOOL _shouldDisplayLibraryName;
 }
 
 @property (retain) NSString* appPath;
 @property (retain) NSDictionary* plist;
+@property (retain) NSDate* modificationDate;
 @property (assign) BOOL shouldDisplayLibraryName;
 
 @end

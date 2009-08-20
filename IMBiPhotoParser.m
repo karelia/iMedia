@@ -66,12 +66,13 @@
 
 @interface IMBiPhotoParser ()
 
-- (BOOL) allowAlbumType:(NSString*)inAlbumType;
 - (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId;
 - (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier withRoot:(IMBNode*)inRootNode;
+- (BOOL) allowAlbumType:(NSString*)inAlbumType;
+- (NSImage*) iconForAlbumType:(NSString*)inAlbumType;
+- (BOOL) isLeafAlbumType:(NSString*)inAlbumType;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode listOfAlbums:(NSArray*)inListOfAlbums listOfImages:(NSDictionary*)inListOfImages;
 - (void) populateNode:(IMBNode*)inNode listOfAlbums:(NSArray*)inListOfAlbums listOfImages:(NSDictionary*)inListOfImages iPhotoMediaType:(NSString*)iPhotoMediaType;
-- (NSImage*) iconForAlbumType:(NSString*)inAlbumType;
 
 @end
 
@@ -161,6 +162,7 @@
 	{
 		self.appPath = [[self class] iPhotoPath];
 		self.plist = nil;
+		self.modificationDate = nil;
 		_fakeAlbumID = 0;
 	}
 	
@@ -230,7 +232,8 @@
 	
 	// If the old node was populated, then also populate the new node...
 	
-	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
+//	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
+	if (inOldNode.isPopulated)
 	{
 		[self populateNode:rootNode options:inOptions error:&error];
 	}
@@ -307,20 +310,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Exclude some album types...
-
-- (BOOL) allowAlbumType:(NSString*)inAlbumType
-{
-	if (inAlbumType == nil) return YES;
-	if ([inAlbumType isEqualToString:@"Slideshow"]) return NO;
-	if ([inAlbumType isEqualToString:@"Book"]) return NO;
-	return YES;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBiPhotoParser://AlbumId/17"...
 
 - (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId
@@ -355,24 +344,89 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Exclude some album types...
+
+- (BOOL) allowAlbumType:(NSString*)inAlbumType
+{
+	if (inAlbumType == nil) return YES;
+	if ([inAlbumType isEqualToString:@"Slideshow"]) return NO;
+	if ([inAlbumType isEqualToString:@"Book"]) return NO;
+	return YES;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSImage*) iconForAlbumType:(NSString*)inAlbumType
+{
+	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
+	{
+		// iPhoto 7
+		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
+		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
+		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
+		{@"Event",					@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
+		{@"Events",					@"sl-icon-small_events.tiff",			@"folder",	nil,				nil},
+		{@"Folder",					@"sl-icon-small_folder.tiff",			@"folder",	nil,				nil},
+		{@"Photocasts",				@"sl-icon-small_subscriptions.tiff",	@"folder",	nil,				nil},
+		{@"Photos",					@"sl-icon-small_library.tiff",			@"folder",	nil,				nil},
+		{@"Published",				@"sl-icon-small_publishedAlbum.tiff",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
+		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil},
+		{@"Roll",					@"sl-icon-small_roll.tiff",				@"folder",	nil,				nil},
+		{@"Selected Event Album",	@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
+		{@"Shelf",					@"sl-icon_flag.tiff",					@"folder",	nil,				nil},
+		{@"Slideshow",				@"sl-icon-small_slideshow.tiff",		@"folder",	nil,				nil},
+		{@"Smart",					@"sl-icon-small_smartAlbum.tiff",		@"folder",	nil,				nil},
+		{@"Special Month",			@"sl-icon-small_cal.tiff",				@"folder",	nil,				nil},
+		{@"Special Roll",			@"sl-icon_lastImport.tiff",				@"folder",	nil,				nil},
+		{@"Subscribed",				@"sl-icon-small_subscribedAlbum.tiff",	@"folder",	nil,				nil},
+	};
+
+	static const IMBIconTypeMapping kIconTypeMapping =
+	{
+		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
+		kIconTypeMappingEntries,
+		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil}	// fallback image
+	};
+
+	NSString* type = inAlbumType;
+	if (type == nil) type = @"Photos";
+	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (BOOL) isLeafAlbumType:(NSString*)inType
+{
+	return ![inType isEqualToString:@"Folder"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void) addSubNodesToNode:(IMBNode*)inParentNode
 		 listOfAlbums:(NSArray*)inListOfAlbums
 		 listOfImages:(NSDictionary*)inListOfImages
 {
-	// Create the subNodes array on demand  - even if turns out to be empty after exiting this method, because
-	// without creating an array we would cause an endless loop...
+	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
+	// because without creating an array we would cause an endless loop...
 	
 	NSMutableArray* subNodes = (NSMutableArray*) inParentNode.subNodes;
 	if (subNodes == nil) inParentNode.subNodes = subNodes = [NSMutableArray array];
 
-	// Now parse the iPhoto XML plist and look for albums whose parent matches our parent node. We are only
-	// going to add subnodes that are direct children of inParentNode...
+	// Now parse the iPhoto XML plist and look for albums whose parent matches our parent node. We are 
+	// only going to add subnodes that are direct children of inParentNode...
 	
 	for (NSDictionary* albumDict in inListOfAlbums)
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		
 		NSString* albumType = [albumDict objectForKey:@"Album Type"];
+		NSString* albumName = [albumDict objectForKey:@"AlbumName"];
 		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
 		NSString* parentIdentifier = parentId ? [self identifierWithAlbumId:parentId] : [self identifierForPath:@"/"];
 		
@@ -382,11 +436,11 @@
 			
 			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
 			
-			albumNode.mediaSource = self.mediaSource;
-			albumNode.name = [albumDict objectForKey:@"AlbumName"];
+			albumNode.leaf = [self isLeafAlbumType:albumType];
 			albumNode.icon = [self iconForAlbumType:albumType];
+			albumNode.name = albumName;
+			albumNode.mediaSource = self.mediaSource;
 			albumNode.parser = self;
-			albumNode.leaf = ![albumType isEqualToString:@"Folder"];
 
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
@@ -469,47 +523,6 @@
 		
 		[pool1 release];
 	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSImage*) iconForAlbumType:(NSString*)inAlbumType
-{
-	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
-	{
-		// iPhoto 7
-		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
-		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
-		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
-		{@"Event",					@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-		{@"Events",					@"sl-icon-small_events.tiff",			@"folder",	nil,				nil},
-		{@"Folder",					@"sl-icon-small_folder.tiff",			@"folder",	nil,				nil},
-		{@"Photocasts",				@"sl-icon-small_subscriptions.tiff",	@"folder",	nil,				nil},
-		{@"Photos",					@"sl-icon-small_library.tiff",			@"folder",	nil,				nil},
-		{@"Published",				@"sl-icon-small_publishedAlbum.tiff",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
-		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil},
-		{@"Roll",					@"sl-icon-small_roll.tiff",				@"folder",	nil,				nil},
-		{@"Selected Event Album",	@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-		{@"Shelf",					@"sl-icon_flag.tiff",					@"folder",	nil,				nil},
-		{@"Slideshow",				@"sl-icon-small_slideshow.tiff",		@"folder",	nil,				nil},
-		{@"Smart",					@"sl-icon-small_smartAlbum.tiff",		@"folder",	nil,				nil},
-		{@"Special Month",			@"sl-icon-small_cal.tiff",				@"folder",	nil,				nil},
-		{@"Special Roll",			@"sl-icon_lastImport.tiff",				@"folder",	nil,				nil},
-		{@"Subscribed",				@"sl-icon-small_subscribedAlbum.tiff",	@"folder",	nil,				nil},
-	};
-
-	static const IMBIconTypeMapping kIconTypeMapping =
-	{
-		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
-		kIconTypeMappingEntries,
-		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil}	// fallback image
-	};
-
-	NSString* type = inAlbumType;
-	if (type == nil) type = @"Photos";
-	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
 }
 
 

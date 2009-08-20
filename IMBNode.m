@@ -471,6 +471,15 @@
 }
 
 
+// A node is pouplated if the subnodes and objects arrays are present. Please note that these arrays may still
+// be empty (this is also consider to be pouplated)...
+
+- (BOOL) isPopulated
+{
+	return self.subNodes != nil && self.objects !=nil;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
