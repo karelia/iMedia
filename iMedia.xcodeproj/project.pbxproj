@@ -15,6 +15,8 @@
 		D049F00B1034993E003CC49C /* NSImage+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D049F0091034993E003CC49C /* NSImage+iMedia.m */; };
 		D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0401034A86B003CC49C /* IMBIconCache.h */; };
 		D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D049F0411034A86B003CC49C /* IMBIconCache.m */; };
+		D04FFEBB103BE81600104EB8 /* IMBObjectPromise.h in Headers */ = {isa = PBXBuildFile; fileRef = D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */; };
+		D04FFEBC103BE81600104EB8 /* IMBObjectPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */; };
 		D05A9493102EB022005DF9CE /* IMBImageCaptureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */; };
 		D05A9494102EB022005DF9CE /* IMBImageCaptureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */; };
 		D08E8B701019C916005D8614 /* UKFNSubscribeFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */; };
@@ -131,6 +133,8 @@
 		D049F0091034993E003CC49C /* NSImage+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSImage+iMedia.m"; sourceTree = "<group>"; };
 		D049F0401034A86B003CC49C /* IMBIconCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBIconCache.h; sourceTree = "<group>"; };
 		D049F0411034A86B003CC49C /* IMBIconCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBIconCache.m; sourceTree = "<group>"; };
+		D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectPromise.h; sourceTree = "<group>"; };
+		D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectPromise.m; sourceTree = "<group>"; };
 		D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageCaptureParser.h; sourceTree = "<group>"; };
 		D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageCaptureParser.m; sourceTree = "<group>"; };
 		D05A94A4102EB14A005DF9CE /* ICADevices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICADevices.framework; path = System/Library/Frameworks/ICADevices.framework; sourceTree = SDKROOT; };
@@ -428,6 +432,8 @@
 			children = (
 				D049F0401034A86B003CC49C /* IMBIconCache.h */,
 				D049F0411034A86B003CC49C /* IMBIconCache.m */,
+				D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */,
+				D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */,
 				D099324310111A2900C527B7 /* NSFileManager+iMedia.h */,
 				D099324410111A2900C527B7 /* NSFileManager+iMedia.m */,
 				D099324510111A2900C527B7 /* NSWorkspace+iMedia.h */,
@@ -516,6 +522,7 @@
 				D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */,
 				D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */,
 				D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */,
+				D04FFEBB103BE81600104EB8 /* IMBObjectPromise.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -638,6 +645,7 @@
 				D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */,
 				D0D635ED1035B4C500FF8631 /* IMBLightroomParser.m in Sources */,
 				D0D635EF1035B4C500FF8631 /* IMBApertureParser.m in Sources */,
+				D04FFEBC103BE81600104EB8 /* IMBObjectPromise.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -724,6 +732,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = macosx10.5;
 			};
 			name = Debug;
 		};
@@ -738,6 +748,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PREBINDING = NO;
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = macosx10.5;
 			};
 			name = Release;
 		};
@@ -752,6 +764,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PREBINDING = NO;
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = macosx10.5;
 			};
 			name = Test;
 		};

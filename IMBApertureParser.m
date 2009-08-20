@@ -54,6 +54,7 @@
 #import "IMBNode.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSFileManager+iMedia.h"
 //#import <Quartz/Quartz.h>
 
 
@@ -63,6 +64,15 @@
 #pragma mark 
 
 @interface IMBApertureParser ()
+
+- (NSDictionary*) plist;
+- (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId;
+- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier withRoot:(IMBNode*)inRootNode;
+- (BOOL) allowAlbumType:(NSString*)inAlbumType;
+- (NSImage*) iconForAlbumType:(NSString*)inType;
+- (BOOL) isLeafAlbumType:(NSString*)inType;
+- (void) addSubNodesToNode:(IMBNode*)inParentNode listOfAlbums:(NSArray*)inListOfAlbums listOfImages:(NSDictionary*)inListOfImages;
+- (void) populateNode:(IMBNode*)inNode listOfAlbums:(NSArray*)inListOfAlbums listOfImages:(NSDictionary*)inListOfImages;
 
 @end
 
@@ -76,6 +86,7 @@
 
 @synthesize appPath = _appPath;
 @synthesize plist = _plist;
+@synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
 
@@ -153,6 +164,7 @@
 	{
 		self.appPath = [[self class] aperturePath];
 		self.plist = nil;
+		self.modificationDate = nil;
 	}
 	
 	return self;
@@ -163,7 +175,7 @@
 {
 	IMBRelease(_appPath);
 	IMBRelease(_plist);
-	
+	IMBRelease(_modificationDate);
 	[super dealloc];
 }
 
@@ -197,8 +209,6 @@
 	rootNode.parser = self;
 	rootNode.leaf = NO;
 	rootNode.groupType = kIMBGroupTypeLibrary;
-	rootNode.subNodes = [NSMutableArray array];	// JUST TEMP
-	rootNode.objects = [NSMutableArray array];	// JUST TEMP
 	
 	if (self.shouldDisplayLibraryName)
 	{
@@ -207,25 +217,13 @@
 		rootNode.name = [NSString stringWithFormat:@"%@ (%@)",rootNode.name,name];
 	}
 	
-	IMBNode* subNode = [[[IMBNode alloc] init] autorelease];
-	subNode.parentNode = rootNode;
-	subNode.mediaSource = self.mediaSource;
-	subNode.identifier = [self identifierForPath:@"/temp"];
-	subNode.name = @"coming soon...";
-	subNode.parser = self;
-	subNode.leaf = YES;
-	subNode.subNodes = [NSMutableArray array];	// JUST TEMP
-	subNode.objects = [NSMutableArray array];	// JUST TEMP
-
-	[(NSMutableArray*)rootNode.subNodes addObject:subNode];
-	
 	// Watch the root node via UKKQueue. Whenever something in iPhoto changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding WHAT has changed in iPhoto...
 	
-	if (rootNode.parentNode == nil)
+	if (rootNode.isRootNode)
 	{
-		rootNode.watcherType = kIMBWatcherTypeKQueue;
-		rootNode.watchedPath = (NSString*)rootNode.mediaSource;
+		rootNode.watcherType = kIMBWatcherTypeFSEvent;
+		rootNode.watchedPath = [(NSString*)rootNode.mediaSource stringByDeletingLastPathComponent];
 	}
 	else
 	{
@@ -234,7 +232,8 @@
 	
 	// If the old node was populated, then also populate the new node...
 	
-	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
+//	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
+	if (inOldNode.isPopulated)
 	{
 		[self populateNode:rootNode options:inOptions error:&error];
 	}
@@ -254,10 +253,10 @@
 {
 	NSError* error = nil;
 	
-//	NSArray* listOfAlbums = [self.plist objectForKey:@"List of Albums"];
-//	NSDictionary* listOfImages = [self.plist objectForKey:@"Master Image List"];
-//	[self addSubNodesToNode:inNode listOfAlbums:listOfAlbums listOfImages:listOfImages]; 
-//	[self populateNode:inNode listOfAlbums:listOfAlbums listOfImages:listOfImages iPhotoMediaType:@"Image"]; 
+	NSArray* listOfAlbums = [self.plist objectForKey:@"List of Albums"];
+	NSDictionary* listOfImages = [self.plist objectForKey:@"Master Image List"];
+	[self addSubNodesToNode:inNode listOfAlbums:listOfAlbums listOfImages:listOfImages]; 
+	[self populateNode:inNode listOfAlbums:listOfAlbums listOfImages:listOfImages]; 
 
 	if (outError) *outError = error;
 	return error == nil;
@@ -283,16 +282,40 @@
 #pragma mark Helper Methods
 
 
-// Load the XML file into a plist lazily (on demand)...
+// Load the XML file into a plist lazily (on demand). If we notice that an existing cached plist is out-of-date 
+// we get rid of it and load it anew...
 
 - (NSDictionary*) plist
 {
+	NSError* error = nil;
+	NSString* path = (NSString*)self.mediaSource;
+	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
+	
+	if ([self.modificationDate compare:modificationDate] == NSOrderedAscending)
+	{
+		self.plist = nil;
+	}
+	
 	if (_plist == nil)
 	{
 		self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
+		self.modificationDate = modificationDate;
 	}
 	
 	return _plist;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBApertureParser://AlbumId/17"...
+
+- (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId
+{
+	NSString* albumPath = [NSString stringWithFormat:@"/AlbumId/%@",inAlbumId];
+	return [self identifierForPath:albumPath];
 }
 
 
@@ -321,93 +344,149 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (void) addSubNodesToNode:(IMBNode*)inParentNode
-//		 listOfAlbums:(NSArray*)inListOfAlbums
-//		 listOfImages:(NSDictionary*)inListOfImages
-//{
-//	// Create the subNodes array on demand  - even if turns out to be empty after exiting this method, because
-//	// without creating an array we would cause an endless loop...
-//	
-//	NSMutableArray* subNodes = (NSMutableArray*) inParentNode.subNodes;
-//	if (subNodes == nil) inParentNode.subNodes = subNodes = [NSMutableArray array];
-//
-//	// Now parse the iPhoto XML plist and look for albums whose parent matches our parent node. We are only
-//	// going to add subnodes that are direct children of inParentNode...
-//	
-//	for (NSDictionary* albumDict in inListOfAlbums)
-//	{
-//		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-//		
-//		NSString* albumType = [albumDict objectForKey:@"Album Type"];
-//		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
-//		NSString* parentIdentifier = parentId ? [self identifierWithAlbumId:parentId] : [self identifierForPath:@"/"];
-//		
-//		if ([self allowAlbumType:albumType] && [inParentNode.identifier isEqualToString:parentIdentifier])
-//		{
-//			// Create node for this album...
-//			
-//			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
-//			
-//			albumNode.mediaSource = self.mediaSource;
-//			albumNode.name = [albumDict objectForKey:@"AlbumName"];
-//			albumNode.icon = [self iconForAlbumType:albumType];
-//			albumNode.parser = self;
-//			albumNode.leaf = ![albumType isEqualToString:@"Folder"];
-//
-//			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
-//			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
-//			// for backwards compatibility...
-//			
-//			NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
-//			if (albumId == nil) albumId = [NSNumber numberWithInt:_fakeAlbumID++]; 
-//			albumNode.identifier = [self identifierWithAlbumId:albumId];
-//
-//			// Add the new album node to its parent (inRootNode)...
-//			
-//			[subNodes addObject:albumNode];
-//			albumNode.parentNode = inParentNode;
-//		}
-//		
-//		[pool release];
-//	}
-//}
+// Exclude some album types...
+
+- (BOOL) allowAlbumType:(NSString*)inAlbumType
+{
+	return YES; //![inAlbumType isEqualToString:@"98"];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (void) populateNode:(IMBNode*)inNode
-//		 listOfAlbums:(NSArray*)inListOfAlbums
-//		 listOfImages:(NSDictionary*)inListOfImages
-//		 iPhotoMediaType:(NSString*)iPhotoMediaType	// this mediaType is special to iPhoto, not the same as IMB mediaType!
-//{
-//	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
-//	// without creating an array we would cause an endless loop...
-//	
-//	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
-//	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
-//
-//	// Look for the correct album in the iPhoto XML plist. Once we find it, populate the node with IMBVisualObjects
-//	// for each image in this album...
-//	
-//	for (NSDictionary* albumDict in inListOfAlbums)
-//	{
-//		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
-//		NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
-//		NSString* albumIdentifier = albumId ? [self identifierWithAlbumId:albumId] : [self identifierForPath:@"/"];
-//		
-//		if ([inNode.identifier isEqualToString:albumIdentifier])
-//		{
-//			NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
-//
-//			for (NSString* key in imageKeys)
-//			{
-//				NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
-//				NSDictionary* imageDict = [inListOfImages objectForKey:key];
-//				NSString* mediaType = [imageDict objectForKey:@"MediaType"];
-//			
-//				if (imageDict!=nil && ([mediaType isEqualToString:iPhotoMediaType] || mediaType==nil))
-//				{
+- (NSImage*) iconForAlbumType:(NSString*)inType
+{
+	// '12' ???
+	// cp: I found icons for a 'smart journal' or a 'smart book' but no menu command to create on.
+	
+	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
+	{
+		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil},	// album
+		{@"2",	@"Project_I_SAlbum.tiff",			@"folder",	nil,	nil},	// smart album
+		{@"3",	@"List_Icons_LibrarySAlbum.tiff",	@"folder",	nil,	nil},	// library **** ... 200X
+		{@"4",	@"Project_I_Project.tiff",			@"folder",	nil,	nil},	// project
+		{@"5",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (top level)
+		{@"6",	@"Project_I_Folder.tiff",			@"folder",	nil,	nil},	// folder
+		{@"7",	@"Project_I_ProjectFolder.tiff",	@"folder",	nil,	nil},	// sub-folder of project
+		{@"8",	@"Project_I_Book.tiff",				@"folder",	nil,	nil},	// book
+		{@"9",	@"Project_I_WebPage.tiff",			@"folder",	nil,	nil},	// web gallery
+		{@"9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
+		{@"10",	@"Project_I_WebJournal.tiff",		@"folder",	nil,	nil},	// web journal
+		{@"11",	@"Project_I_LightTable.tiff",		@"folder",	nil,	nil},	// light table
+		{@"13",	@"Project_I_SWebGallery.tiff",		@"folder",	nil,	nil},	// smart web gallery
+		{@"97",	@"Project_I_Projects.tiff",			@"folder",	nil,	nil},	// library
+		{@"98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
+		{@"99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
+	};
+
+	static const IMBIconTypeMapping kIconTypeMapping =
+	{
+		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
+		kIconTypeMappingEntries,
+		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil}	// fallback image
+	};
+
+	return [[IMBIconCache sharedIconCache] iconForType:inType fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (BOOL) isLeafAlbumType:(NSString*)inType
+{
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) addSubNodesToNode:(IMBNode*)inParentNode
+		 listOfAlbums:(NSArray*)inListOfAlbums
+		 listOfImages:(NSDictionary*)inListOfImages
+{
+	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
+	// because without creating an array we would cause an endless loop...
+	
+	NSMutableArray* subNodes = (NSMutableArray*) inParentNode.subNodes;
+	if (subNodes == nil) inParentNode.subNodes = subNodes = [NSMutableArray array];
+
+	// Now parse the Aperture XML plist and look for albums whose parent matches our parent node. We are 
+	// only going to add subnodes that are direct children of inParentNode...
+	
+	for (NSDictionary* albumDict in inListOfAlbums)
+	{
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		
+		NSString* albumType = [albumDict objectForKey:@"Album Type"];
+		NSString* albumName = [albumDict objectForKey:@"AlbumName"];
+		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
+		NSString* parentIdentifier = parentId ? [self identifierWithAlbumId:parentId] : [self identifierForPath:@"/"];
+		
+		if ([self allowAlbumType:albumType] && [inParentNode.identifier isEqualToString:parentIdentifier])
+		{
+			// Create node for this album...
+			
+			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
+			
+			albumNode.leaf = [self isLeafAlbumType:albumType];
+			albumNode.icon = [self iconForAlbumType:albumType];
+			albumNode.name = albumName;
+			albumNode.mediaSource = self.mediaSource;
+			albumNode.parser = self;
+
+			// Set the node's identifier. This is needed later to link it to the correct parent node...
+			
+			NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
+			albumNode.identifier = [self identifierWithAlbumId:albumId];
+
+			// Add the new album node to its parent (inRootNode)...
+			
+			[subNodes addObject:albumNode];
+			albumNode.parentNode = inParentNode;
+		}
+		
+		[pool release];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) populateNode:(IMBNode*)inNode
+		 listOfAlbums:(NSArray*)inListOfAlbums
+		 listOfImages:(NSDictionary*)inListOfImages
+{
+	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
+	// without creating an array we would cause an endless loop...
+	
+	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
+	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
+
+	// Look for the correct album in the iPhoto XML plist. Once we find it, populate the node with IMBVisualObjects
+	// for each image in this album...
+	
+	for (NSDictionary* albumDict in inListOfAlbums)
+	{
+		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
+		NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
+		NSString* albumIdentifier = albumId ? [self identifierWithAlbumId:albumId] : [self identifierForPath:@"/"];
+		
+		if ([inNode.identifier isEqualToString:albumIdentifier])
+		{
+			NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
+
+			for (NSString* key in imageKeys)
+			{
+				NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
+				NSDictionary* imageDict = [inListOfImages objectForKey:key];
+				NSString* mediaType = [imageDict objectForKey:@"MediaType"];
+			
+				if (imageDict!=nil && ([mediaType isEqualToString:@"Image"] || mediaType==nil))
+				{
 //					NSString* imagePath = [imageDict objectForKey:@"ImagePath"];
 //					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
 //					NSString* caption   = [imageDict objectForKey:@"Caption"];
@@ -421,57 +500,15 @@
 //					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 //					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
 //					object.metadata = imageDict;
-//				}
-//				
-//				[pool2 release];
-//			}
-//			
-//		}
-//		
-//		[pool1 release];
-//	}
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (NSImage*) iconForAlbumType:(NSString*)inAlbumType
-//{
-//	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
-//	{
-//		// iPhoto 7
-//		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
-//		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
-//		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
-//		{@"Event",					@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-//		{@"Events",					@"sl-icon-small_events.tiff",			@"folder",	nil,				nil},
-//		{@"Folder",					@"sl-icon-small_folder.tiff",			@"folder",	nil,				nil},
-//		{@"Photocasts",				@"sl-icon-small_subscriptions.tiff",	@"folder",	nil,				nil},
-//		{@"Photos",					@"sl-icon-small_library.tiff",			@"folder",	nil,				nil},
-//		{@"Published",				@"sl-icon-small_publishedAlbum.tiff",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
-//		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil},
-//		{@"Roll",					@"sl-icon-small_roll.tiff",				@"folder",	nil,				nil},
-//		{@"Selected Event Album",	@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-//		{@"Shelf",					@"sl-icon_flag.tiff",					@"folder",	nil,				nil},
-//		{@"Slideshow",				@"sl-icon-small_slideshow.tiff",		@"folder",	nil,				nil},
-//		{@"Smart",					@"sl-icon-small_smartAlbum.tiff",		@"folder",	nil,				nil},
-//		{@"Special Month",			@"sl-icon-small_cal.tiff",				@"folder",	nil,				nil},
-//		{@"Special Roll",			@"sl-icon_lastImport.tiff",				@"folder",	nil,				nil},
-//		{@"Subscribed",				@"sl-icon-small_subscribedAlbum.tiff",	@"folder",	nil,				nil},
-//	};
-//
-//	static const IMBIconTypeMapping kIconTypeMapping =
-//	{
-//		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
-//		kIconTypeMappingEntries,
-//		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil}	// fallback image
-//	};
-//
-//	NSString* type = inAlbumType;
-//	if (type == nil) type = @"Photos";
-//	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
-//}
+				}
+				
+				[pool2 release];
+			}
+		}
+		
+		[pool1 release];
+	}
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

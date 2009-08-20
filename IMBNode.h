@@ -152,6 +152,7 @@
 - (NSIndexPath*) indexPath;
 - (NSComparisonResult) compare:(IMBNode*)inNode;
 - (BOOL) isRootNode;
+- (BOOL) isPopulated;
 
 @end
 
