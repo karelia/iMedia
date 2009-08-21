@@ -66,6 +66,7 @@ extern NSString* kIMBObjectPromiseType;
 {
 	NSArray* _objects; 
 	NSMutableArray* _localFiles;
+	NSError* _error;
 	
 	id _delegate;
 	SEL _finishSelector;
@@ -73,14 +74,15 @@ extern NSString* kIMBObjectPromiseType;
 	BOOL _hasWillStartLoading;
 	BOOL _hasNameProgress;
 	BOOL _hasDidFinishLoading;
-	BOOL _hasFinishSelector;
+	BOOL _hasCustomFinishSelector;
 }
 
 
 @property (retain) NSArray* objects;			// Array of IMBObjects
-@property (retain) NSMutableArray* localFiles;	// Array of paths
+@property (retain) NSMutableArray* localFiles;	// Array of paths (may contain NSNull objects in case of failure)
 @property (retain) id delegate;					// Retained due to asynchronous nature of the promise
-@property (assign) SEL finishSelector;			// Method with signature - (void) finish:(IMBObjectPromise*)inObjectPromise 
+@property (assign) SEL finishSelector;			// Method with signature - (void) didFinish:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
+@property (retain) NSError* error;				// Contains error in case of failure
 
 - (id) initWithObjects:(NSArray*)inObjects;
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
@@ -121,7 +123,7 @@ extern NSString* kIMBObjectPromiseType;
 
 - (void) objectPromiseWillStartLoading:(IMBObjectPromise*)inObjectPromise;
 - (void) objectPromise:(IMBObjectPromise*)inObjectPromise name:(NSString*)inName progress:(double)inFraction;
-- (void) objectPromiseDidFinishLoading:(IMBObjectPromise*)inObjectPromise;
+- (void) objectPromise:(IMBObjectPromise*)inObjectPromise didFinishLoadingWithError:(NSError*)inError;
 
 @end
 

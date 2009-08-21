@@ -9,19 +9,11 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-//	iMedia Framework
-#import <iMedia/IMBParserController.h>
-#import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBPhotosViewController.h>
-#import <iMedia/IMBConfig.h>
-#import <iMedia/IMBParser.h>
-#import <iMedia/IMBNode.h>
-#import <iMedia/IMBiPhotoParser.h>
 
-//	Test Application
+#pragma mark HEADERS
+
 #import "IMBTestAppDelegate.h"
-
+#import <iMedia/iMedia.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -50,6 +42,9 @@
 
 - (void) awakeFromNib
 {
+	[IMBConfig registerDefaultValues];
+	[IMBConfig setShowsGroupNodes:YES];
+	
 	// Load parsers...
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];

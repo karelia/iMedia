@@ -57,14 +57,6 @@ NSString* kIMBMediaTypeMovies = @"movies";
 NSString* kIMBMediaTypeLinks = @"links";
 NSString* kIMBMediaTypeContacts = @"contacts";
 
-// Sub types...
-
-NSString* kIMBGroupTypeLibrary = @"1-library";
-NSString* kIMBGroupTypeDevice = @"2-device";
-NSString* kIMBGroupTypeFolder = @"3-folder";
-NSString* kIMBGroupTypeCustom = @"4-custom";
-NSString* kIMBGroupTypeNone = nil;
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

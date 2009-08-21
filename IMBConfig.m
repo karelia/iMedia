@@ -57,7 +57,9 @@
 
 #pragma mark CONSTANTS
 
-static NSString* sIMBPrefsKey = @"iMedia2";
+static NSString* sIMBPrefsKeyFormat = @"iMedia2_%@";
+static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
+//static NSString* sIMBHidesEmptyGroupNodesKey = @"iMedia2_hidesEmptyGroupNodes";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,27 +78,23 @@ static NSString* sIMBPrefsKey = @"iMedia2";
 
 + (void) registerDefaultPrefsValue:(id)inValue forKey:(NSString*)inKey
 {
-	NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
-	NSMutableDictionary* iMediaDict = [NSMutableDictionary dictionaryWithDictionary:[prefs dictionaryForKey:sIMBPrefsKey]];
-	[iMediaDict setObject:inValue forKey:inKey];
-	[prefs registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:iMediaDict,sIMBPrefsKey,nil]];
+	NSString* key = [NSString stringWithFormat:sIMBPrefsKeyFormat,inKey];
+	NSDictionary* defaults = [NSDictionary dictionaryWithObjectsAndKeys:inValue,key,nil];
+	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
 
 + (void) setPrefsValue:(id)inValue forKey:(NSString*)inKey
 {
-	NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
-	NSMutableDictionary* iMediaDict = [NSMutableDictionary dictionaryWithDictionary:[prefs dictionaryForKey:sIMBPrefsKey]];
-	[iMediaDict setObject:inValue forKey:inKey];
-	[prefs setObject:iMediaDict forKey:sIMBPrefsKey];
+	NSString* key = [NSString stringWithFormat:sIMBPrefsKeyFormat,inKey];
+	[[NSUserDefaults standardUserDefaults] setObject:inValue forKey:key];
 }
 
 
 + (id) prefsValueForKey:(NSString*)inKey
 {
-	NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
-	NSDictionary* iMediaDict = [prefs dictionaryForKey:sIMBPrefsKey];
-	return [iMediaDict objectForKey:inKey];
+	NSString* key = [NSString stringWithFormat:sIMBPrefsKeyFormat,inKey];
+	return [[NSUserDefaults standardUserDefaults] objectForKey:key];
 }
 
 
@@ -125,6 +123,31 @@ static NSString* sIMBPrefsKey = @"iMedia2";
 + (NSMutableDictionary*) prefsForClass:(Class)inClass
 {
 	return [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:NSStringFromClass(inClass)]];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+
++ (void) registerDefaultValues
+{
+	[self registerDefaultPrefsValue:[NSNumber numberWithBool:YES] forKey:sIMBShowsGroupNodesKey];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) setShowsGroupNodes:(BOOL)inState
+{
+	[self setPrefsValue:[NSNumber numberWithBool:inState] forKey:sIMBShowsGroupNodesKey];
+}
+
+
++ (BOOL) showsGroupNodes
+{
+	return [[self prefsValueForKey:sIMBShowsGroupNodesKey] boolValue];
 }
 
 

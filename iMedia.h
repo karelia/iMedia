@@ -47,78 +47,50 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark CONSTANTS
+// Common...
 
+#import <iMedia/IMBCommon.h>
+#import <iMedia/IMBConfig.h>
+#import <iMedia/IMBOperationQueue.h>
+#import <iMedia/IMBIconCache.h>
 
-// Options to control behavior of the framework...
+// Model...
 
-enum
-{
-	kIMBOptionNone = 0,
-	kIMBOptionForceRecursiveLoading = 1
-};
-typedef NSUInteger IMBOptions;
+#import <iMedia/IMBNode.h>
+#import <iMedia/IMBObject.h>
+#import <iMedia/IMBObjectPromise.h>
 
+// Parsers...
 
-// File watcher type for an IMBNode...
+#import <iMedia/IMBParser.h>
+#import <iMedia/IMBFolderParser.h>
+#import <iMedia/IMBPhotosFolderParser.h>
+#import <iMedia/IMBiPhotoParser.h>
+#import <iMedia/IMBApertureParser.h>
+#import <iMedia/IMBLightroomParser.h>
+#import <iMedia/IMBImageCaptureParser.h>
 
-enum 
-{
-	kIMBWatcherTypeNone,
-	kIMBWatcherTypeKQueue,
-	kIMBWatcherTypeFSEvent,
-	kIMBWatcherTypeFirstCustom = 1000
-};
-typedef NSUInteger IMBWatcherType;
+// Controllers...
 
+#import <iMedia/IMBParserController.h>
+#import <iMedia/IMBLibraryController.h>
+#import <iMedia/IMBNodeTreeController.h>
+#import <iMedia/IMBObjectArrayController.h>
+#import <iMedia/IMBNodeViewController.h>
+#import <iMedia/IMBObjectViewController.h>
+#import <iMedia/IMBPhotosViewController.h>
 
-// Badge type for IMBNode. A corresponding icon will be displayed in the cell...
+// Views...
 
-enum 
-{
-	kIMBBadgeTypeNone,
-	kIMBBadgeTypeLoading,
-	kIMBBadgeTypeStop,
-	kIMBBadgeTypeEject,
-	kIMBBadgeTypeOffline
-};
-typedef NSUInteger IMBBadgeType;
+#import <iMedia/IMBOutlineView.h>
+#import <iMedia/IMBNodeCell.h>
 
+// Categories...
 
-// Media types...
-
-extern NSString* kIMBMediaTypePhotos;
-extern NSString* kIMBMediaTypeMusic;
-extern NSString* kIMBMediaTypeMovies;
-extern NSString* kIMBMediaTypeLinks;
-extern NSString* kIMBMediaTypeContacts;
-
-// Group types...
-
-enum 
-{
-	kIMBGroupTypeLibrary,
-	kIMBGroupTypeFolder,
-	kIMBGroupTypeSearches,
-	kIMBGroupTypeInternet,
-	kIMBGroupTypeDevice,
-	kIMBGroupTypeNone
-};
-typedef NSUInteger IMBGroupType;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark MACROS
-
-#ifndef IMBRelease
-#define IMBRelease(object) if (object) {[object release]; object=nil;}
-#endif
-
-#ifndef IMBLocalizedString
-#define IMBLocalizedString(key,value,comment) NSLocalizedStringWithDefaultValue(key,nil,[NSBundle bundleForClass:NSClassFromString(@"IMBConfig")],value,comment)
-#endif
+#import <iMedia/NSFileManager+iMedia.h>
+#import <iMedia/NSWorkspace+iMedia.h>
+#import <iMedia/NSString+iMedia.h>
+#import <iMedia/NSImage+iMedia.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------

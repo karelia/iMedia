@@ -57,6 +57,10 @@
 + (void) setPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass;
 + (NSMutableDictionary*) prefsForClass:(Class)inClass;
 
++ (void) registerDefaultValues;
++ (void) setShowsGroupNodes:(BOOL)inState;
++ (BOOL) showsGroupNodes;
+
 @end
 
 

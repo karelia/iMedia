@@ -193,7 +193,6 @@
 	IMBRelease(_icon);
 	IMBRelease(_name);
 	IMBRelease(_attributes);
-	IMBRelease(_groupType);
 	IMBRelease(_objects);
 	IMBRelease(_subNodes);
 	IMBRelease(_parser);
@@ -363,27 +362,19 @@
 
 - (NSComparisonResult) compare:(IMBNode*)inNode
 {
-	NSString* selfGroupType = self.groupType;
-	NSString* otherGroupType = inNode.groupType;
+	NSUInteger selfGroupType = self.groupType;
+	NSUInteger otherGroupType = inNode.groupType;
 
-	if (selfGroupType==nil && otherGroupType==nil)
-	{
-		return [self.name finderCompare:inNode.name];
-	}
-	else if (selfGroupType==nil && otherGroupType!=nil)
+	if (selfGroupType > otherGroupType)
 	{
 		return NSOrderedDescending;
 	}
-	else if (selfGroupType!=nil && otherGroupType==nil)
+	else if (selfGroupType < otherGroupType)
 	{
 		return NSOrderedAscending;
 	}
-	else if ([selfGroupType isEqualToString:otherGroupType])
-	{
-		return [self.name finderCompare:inNode.name];
-	}
 	
-	return [selfGroupType compare:otherGroupType];
+	return [self.name finderCompare:inNode.name];
 }
 
 
