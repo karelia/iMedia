@@ -348,7 +348,9 @@
 
 - (BOOL) allowAlbumType:(NSString*)inAlbumType
 {
-	return YES; //![inAlbumType isEqualToString:@"98"];
+	if ([inAlbumType isEqualToString:@"99"]) return NO;
+//	if ([inAlbumType isEqualToString:@"98"]) return NO;
+	return YES;
 }
 
 

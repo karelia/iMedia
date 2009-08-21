@@ -73,6 +73,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 @synthesize localFiles = _localFiles;
 @synthesize delegate = _delegate;
 @synthesize finishSelector = _finishSelector;
+@synthesize error = _error;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,6 +87,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		self.finishSelector = NULL;
 		self.objects = inObjects;
 		self.localFiles = [NSMutableArray arrayWithCapacity:inObjects.count];
+		self.error = nil;
 	}
 	
 	return self;
@@ -100,6 +102,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	copy.localFiles = self.localFiles;
 	copy.delegate = self.delegate;
 	copy.finishSelector = self.finishSelector;
+	copy.error = self.error;
 	
 	return copy;
 }
@@ -120,6 +123,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		self.localFiles = [NSMutableArray arrayWithCapacity:self.objects.count];
 		self.delegate = nil;
 		self.finishSelector = NULL;
+		self.error = nil;
 	}
 	
 	return self;
@@ -131,6 +135,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	IMBRelease(_objects);
 	IMBRelease(_localFiles);
 	IMBRelease(_delegate);
+	IMBRelease(_error);
 	[super dealloc];
 } 
 
@@ -143,10 +148,10 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	self.delegate = inDelegate;
 	self.finishSelector = inSelector;
 	
-	_hasWillStartLoading = _delegate != nil && [_delegate respondsToSelector:@selector(objectPromiseWillStartLoading:)];
-	_hasNameProgress	 = _delegate != nil && [_delegate respondsToSelector:@selector(objectPromise:name:progress:)];
-	_hasDidFinishLoading = _delegate != nil && [_delegate respondsToSelector:@selector(objectPromiseDidFinishLoading:)];
-	_hasFinishSelector	 = _delegate != nil && [_delegate respondsToSelector:inSelector];
+	_hasWillStartLoading	 = _delegate != nil && [_delegate respondsToSelector:@selector(objectPromiseWillStartLoading:)];
+	_hasNameProgress		 = _delegate != nil && [_delegate respondsToSelector:@selector(objectPromise:name:progress:)];
+	_hasDidFinishLoading	 = _delegate != nil && [_delegate respondsToSelector:@selector(objectPromise:didFinishLoadingWithError:)];
+	_hasCustomFinishSelector = _delegate != nil && [_delegate respondsToSelector:inSelector];
 }
 
 
@@ -187,8 +192,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 	// Notify the delegate that we are done...
 	
-	if (_hasDidFinishLoading) [_delegate objectPromiseDidFinishLoading:self];
-	if (_hasFinishSelector) [_delegate performSelector:_finishSelector withObject:self];
+	if (_hasDidFinishLoading) [_delegate objectPromise:self didFinishLoadingWithError:nil];
+	if (_hasCustomFinishSelector) [_delegate performSelector:_finishSelector withObject:self withObject:nil];
 }
 
 
@@ -230,8 +235,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 	// Notify the delegate that we are done...
 	
-	if (_hasDidFinishLoading) [_delegate objectPromiseDidFinishLoading:self];
-	if (_hasFinishSelector) [_delegate performSelector:_finishSelector withObject:self];
+	if (_hasDidFinishLoading) [_delegate objectPromise:self didFinishLoadingWithError:nil];
+	if (_hasCustomFinishSelector) [_delegate performSelector:_finishSelector withObject:self withObject:nil];
 	
 	[self release];
 }

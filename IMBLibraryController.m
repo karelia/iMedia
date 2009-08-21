@@ -55,6 +55,7 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBCommon.h"
+#import "IMBConfig.h"
 #import "IMBKQueue.h"
 #import "IMBFSEventsWatcher.h"
 
@@ -436,12 +437,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (IMBNode*) _groupNodeForNewNode:(IMBNode*)inNewNode
 {
-	NSString* groupType = inNewNode.groupType;
-	if (groupType ==  nil) return nil;
+	NSUInteger groupType = inNewNode.groupType;
+	if (groupType ==  kIMBGroupTypeNone) return nil;
 	
 	for (IMBNode* node in _rootNodes)
 	{
-		if ([node.groupType isEqualToString:groupType])
+		if (node.groupType == groupType)
 		{
 			return node;
 		}
@@ -455,29 +456,29 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	groupNode.subNodes = [NSMutableArray array];
 	groupNode.objects = [NSMutableArray array];
 	
-	if ([groupType isEqualToString:kIMBGroupTypeLibrary])
+	if (groupType == kIMBGroupTypeLibrary)
 	{
 		groupNode.groupType = kIMBGroupTypeLibrary;
 		groupNode.identifier = @"group://LIBRARY";
 		groupNode.name = @"LIBRARIES";
 	}
-	else if ([groupType isEqualToString:kIMBGroupTypeFolder])
+	else if (groupType == kIMBGroupTypeFolder)
 	{
 		groupNode.groupType = kIMBGroupTypeFolder;
 		groupNode.identifier = @"group://FOLDER";
 		groupNode.name = @"FOLDERS";
 	}
-	else if ([groupType isEqualToString:kIMBGroupTypeDevice])
+	else if (groupType == kIMBGroupTypeSearches)
 	{
-		groupNode.groupType = kIMBGroupTypeDevice;
-		groupNode.identifier = @"group://DEVICE";
-		groupNode.name = @"DEVICES";
+		groupNode.groupType = kIMBGroupTypeSearches;
+		groupNode.identifier = @"group://SEARCHES";
+		groupNode.name = @"SEARCHES";
 	}
-	else if ([groupType isEqualToString:kIMBGroupTypeCustom])
+	else if (groupType == kIMBGroupTypeInternet)
 	{
-		groupNode.groupType = kIMBGroupTypeCustom;
-		groupNode.identifier = @"group://CUSTOM";
-		groupNode.name = @"CUSTOM";
+		groupNode.groupType = kIMBGroupTypeInternet;
+		groupNode.identifier = @"group://INTERNET";
+		groupNode.name = @"INTERNET";
 	}
 	
 	groupNode.parser = inNewNode.parser;	// Important to make lookup in -[IMBNode indexPath] work correctly!
@@ -524,16 +525,19 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	// The parentNode property of the node tells us where we are supposed to replace the old with the 
 	// new node. If parentNode is nil then we are going to use the root level array...
 
-	IMBNode* groupNode = [self _groupNodeForNewNode:newNode];
-
 	IMBNode* parent = nil;
 	if (newNode) parent = newNode.parentNode;
 	else if (oldNode) parent = oldNode.parentNode;
 	
-	if (parent==nil && groupNode!=nil)
+	if ([IMBConfig showsGroupNodes])
 	{
-		parent = groupNode;
-		newNode.parentNode = groupNode;
+		IMBNode* groupNode = [self _groupNodeForNewNode:newNode];
+
+		if (parent==nil && groupNode!=nil)
+		{
+			parent = groupNode;
+			newNode.parentNode = groupNode;
+		}
 	}
 	
 	NSMutableArray* siblings = nil;
@@ -576,6 +580,22 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				[self.watcherFSEvents addPath:watchedPath];
 		}
 	}
+	
+	// Hide empty group nodes that do not have any subnodes...
+	
+//	if ([IMBConfig hidesEmptyGroupNodes])
+//	{
+//		NSInteger n =  self.rootNodes.count;
+//		for (NSInteger i=n-1; i>=0; i--)
+//		{
+//			IMBNode* node = [self.rootNodes objectAtIndex:i];
+//			
+//			if (node.isGroup && node.subNodes.count==0)
+//			{
+//				[self.rootNodes removeObjectIdenticalTo:node];
+//			}
+//		}
+//	}
 	
 	// Sort the root nodes and first level of group nodes...
 	

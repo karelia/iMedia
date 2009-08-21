@@ -54,6 +54,7 @@
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBConfig.h"
 #import "IMBLibraryController.h"
 #import <Carbon/Carbon.h>
 #import <Quartz/Quartz.h>
@@ -140,6 +141,7 @@
 {
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
 	path = [path stringByStandardizingPath];
+	BOOL showsGroupNodes = [IMBConfig showsGroupNodes];
 	
 	// Create an empty root node (unpopulated and without subnodes)...
 	
@@ -148,15 +150,20 @@
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForICAObject:self.mediaSource];
-	newNode.name = NSLocalizedString( @"DEVICES", @"Caption for Image Capture Root node" ); 
-//	newNode.name = NSLocalizedString( @"Camera Devices", @"Caption for Image Capture Root node" ); 
-//	newNode.icon = inOldNode.icon;
-//	if ( !newNode.icon ) {
-//		newNode.icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Image Capture.app"];
-//	}
+	
+	NSString* name = NSLocalizedString( @"Devices", @"Caption for Image Capture Root node" );
+	if (showsGroupNodes) name = [name uppercaseString];
+	newNode.name = name;
+	
+	if (!showsGroupNodes)
+	{
+		newNode.icon = inOldNode.icon;
+		if (newNode.icon==nil) newNode.icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Image Capture.app"];
+	}	
+
 	newNode.parser = self;
 	newNode.leaf = NO;
-	newNode.group = YES;
+	newNode.group = showsGroupNodes;
 	newNode.groupType = kIMBGroupTypeNone;
 	
 	// Enable ICA Event watching for all nodes...
