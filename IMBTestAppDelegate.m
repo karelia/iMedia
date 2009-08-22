@@ -63,7 +63,7 @@
 	NSView* containerView = self.nodeViewController.objectContainerView;
 	
 	self.objectViewController = [IMBPhotosViewController viewControllerForLibraryController:libraryController];
-	self.objectViewController.nodeTreeController = self.nodeViewController.nodeTreeController;
+	self.objectViewController.nodeViewController = self.nodeViewController;
 	NSView* objectView = self.objectViewController.view;
 
 	[objectView setFrame:[containerView bounds]];

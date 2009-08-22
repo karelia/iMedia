@@ -83,10 +83,11 @@ typedef NSUInteger kIMBObjectViewType;
 #pragma mark CLASSES
 
 @class IMBLibraryController;
-@class IMBNodeTreeController;
+@class IMBNodeViewController;
 @class IMBObjectArrayController;
 @class IKImageBrowserView;
 @class IMBObject;
+@class IMBNode;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -98,8 +99,8 @@ typedef NSUInteger kIMBObjectViewType;
 @interface IMBObjectViewController : NSViewController
 {
 	IMBLibraryController* _libraryController;
-	IMBNodeTreeController* _nodeTreeController;
-	
+	IMBNodeViewController* _nodeViewController;
+		
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet IKImageBrowserView* ibIconView;
@@ -117,7 +118,7 @@ typedef NSUInteger kIMBObjectViewType;
 // Library...
 
 @property (retain) IMBLibraryController* libraryController;
-@property (retain) IMBNodeTreeController* nodeTreeController;
+@property (retain) IMBNodeViewController* nodeViewController;
 @property (readonly) NSString* mediaType;
 
 // Objects (media files)...
@@ -145,6 +146,11 @@ typedef NSUInteger kIMBObjectViewType;
 
 - (NSMenu*) menuForObject:(IMBObject*)inObject;
 - (NSMenu*) menuForBackground;
+
+// Helpers...
+
+- (void) openObject:(IMBObject*)inObject inSelectedNode:(IMBNode*)inSelectedNode;
+
 
 @end
 

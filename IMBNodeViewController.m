@@ -706,6 +706,55 @@ static NSString* kSelectionKey = @"selection";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (void) expandSelectedNodeAndSelectNodeWithIdentifier:(NSString*)inIdentifier
+{
+	NSInteger i,rows;
+	IMBNode* node;
+	NSString* identifier;
+	
+	// Expand the selected node...
+	
+	rows = [ibNodeOutlineView numberOfRows];
+	
+	for (i=0; i<rows; i++)
+	{
+		if ([ibNodeOutlineView isRowSelected:i])
+		{
+			id item = [ibNodeOutlineView itemAtRow:i];
+			[ibNodeOutlineView expandItem:item];
+			[self _setExpandedNodeIdentifiers];
+			break;
+		}
+	}
+	
+	
+	// Now select a new node (most likely a subnode)...
+	
+	rows = [ibNodeOutlineView numberOfRows];
+	
+	for (i=0; i<rows; i++)
+	{
+		node = [self _nodeAtRow:i];
+		identifier = node.identifier;
+		
+		if ([identifier isEqualToString:inIdentifier])
+		{
+			self.selectedNodeIdentifier = inIdentifier;
+			[self selectNode:node];
+			break;
+		}
+	}
+	
+	// Rebuild the popup menu manually. Please note that the popup menu does not currently use bindings...
+	
+	[self _updatePopupMenu];
+	[self _syncPopupMenuSelection];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 #pragma mark Popup Menu
 

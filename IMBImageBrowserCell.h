@@ -47,56 +47,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This object encapsulates information about a single media item (e.g. image file or audio file). The value 
-// property uniquely identifies the item. In the case of files it could be a path or NSURL...
-
-@interface IMBObject : NSObject <NSCopying,NSCoding>
-{
-	id _value;												
-	NSString* _name;
-	NSDictionary* _metadata;
-}
-
-@property (retain) id value;								// Path or URL
-@property (retain) NSString* name;
-@property (retain) NSDictionary* metadata;
-@property (readonly) NSImage* icon;
-
-- (BOOL) isEqual:(IMBObject*)inObject;						// Considered equal if value is equal
-
-@end
+#import "IMBImageKit.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This subclass can be used for image or movie files, i.e. items that need a visual representation and are
-// displayed with IKIMageBrowserView... 
+// This subclass of a private ImageKit class is used to customize the drawing for some items in the IKImageBrowserView.
+// While we do want outlines and shadows for most items (e.g. images or movies), we absolutely do not want them for
+// folders. Unfortunately IKImageBrowserView will only let us set those params on a global basis, so we need to 
+// implemenent the per-cell parameters ourself.
 
-@interface IMBVisualObject : IMBObject
+// ATTENTION: since this relies on a non-documented internal behavior of IKImageBrowserView and IKImageBrowserCell it
+// could break with any system release if Apple chooses to change its implementation...
+ 
+ 
+@interface IMBImageBrowserCell : IKImageBrowserCell
 {
-	id _imageRepresentation;								
-	NSString* _imageRepresentationType;		
-	NSUInteger _imageVersion;				
+	BOOL _imbShouldDrawOutline;
+	BOOL _imbShouldDrawShadow;
 }
 
-@property (readonly) NSString* imageUID;
-@property (retain) id imageRepresentation;					// NSImage, CIImage, or CGImageRef
-@property (retain) NSString* imageRepresentationType;		// See IKImageBrowserItem for possible values
-@property (readonly) NSString* imageTitle;
-@property (assign) NSUInteger imageVersion;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This subclass is used to represent nodes in the object views (examples are folder and events). The reason we 
-// have these hybrid objects is to have a double clickable item in the object views, which can be used to drill
-// down the hierarchy... 
-
-@interface IMBNodeObject : IMBVisualObject
+@property BOOL imbShouldDrawOutline;
+@property BOOL imbShouldDrawShadow;
 
 @end
 
