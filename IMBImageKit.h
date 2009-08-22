@@ -4,21 +4,25 @@
  *     class-dump is Copyright (C) 1997-1998, 2000-2001, 2004-2007 by Steve Nygard.
  */
 
+// ATTENTION: This header was generated with ClassDumper on 10.5 but was edited heavily to make it compile on
+// both 10.5 and 10.6 development systems...
 
-struct _NSPoint {
+
+struct __NSPoint {
     float x;
     float y;
 };
 
-struct _NSSize {
+struct __NSSize {
     float width;
     float height;
 };
 
-struct _NSRect {
-    struct _NSPoint origin;
-    struct _NSSize size;
+struct __NSRect {
+    struct __NSPoint origin;
+    struct __NSSize size;
 };
+
 
 
 @protocol IKImageProxy <NSObject>
@@ -56,7 +60,7 @@ struct _NSRect {
     unsigned int _generatedWithIconServices:1;
     unsigned int _underlyingDataAreVolatile:1;
     unsigned int _isReference:1;
-    struct _NSSize _cachedSize;
+    struct __NSSize _cachedSize;
     NSDictionary *_info;
 }
 
@@ -187,7 +191,7 @@ struct _NSRect {
     IKMipmapItem *_originalMipmap;
     IKMipmapItem *_customMipmap;
     unsigned long _version;
-    struct _NSSize _originalImageSizeCache;
+    struct __NSSize _originalImageSizeCache;
     unsigned int _originalImageIsInvalid:1;
     unsigned int _dirty:1;
     unsigned int _mark:1;
@@ -359,13 +363,13 @@ struct _NSRect {
     unsigned int _hidden:1;
     unsigned int _reordering:1;
     unsigned int _selected:1;
-    struct _NSRect _frame;
-    struct _NSRect _imageFrame;
+    struct __NSRect _frame;
+    struct __NSRect _imageFrame;
     unsigned int _layoutValid:1;
     unsigned int _imageFrameValid:1;
     float _aspectRatio;
     unsigned int _aspectRatioValid:1;
-    struct _NSSize _titleSize;
+    struct __NSSize _titleSize;
     unsigned int _mipmapImageValid:1;
     unsigned int _imageValid:1;
     unsigned int _contentCanBePlayed:1;

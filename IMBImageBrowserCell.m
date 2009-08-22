@@ -79,11 +79,21 @@
 }
 
 
-//- (void) drawOverlays
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawOverlays]; // 4			//6
-//}
+- (void) setDataSource:(id)inDataSource
+{
+	[super setDataSource:inDataSource];
+
+	if ([inDataSource isKindOfClass:[IMBNodeObject class]])
+	{
+		_imbShouldDrawOutline = NO;
+		_imbShouldDrawShadow = NO;
+	}
+	else
+	{
+		_imbShouldDrawOutline = YES;
+		_imbShouldDrawShadow = YES;
+	}
+}
 
 
 - (void) drawShadow
@@ -108,6 +118,27 @@
 }
 
 
+//- (void) drawSelection
+//{
+//	NSLog(@"%s %@",__FUNCTION__,self);
+//	[super drawSelection];
+//}
+//
+//
+//- (void) drawSelectionOnTitle
+//{
+//	NSLog(@"%s %@",__FUNCTION__,self);
+//	[super drawSelectionOnTitle];
+//}
+//
+//
+//- (void) drawOverlays
+//{
+//	NSLog(@"%s %@",__FUNCTION__,self);
+//	[super drawOverlays]; // 4			//6
+//}
+//
+//
 //- (void) drawPlaceHolder
 //{
 //	NSLog(@"%s %@",__FUNCTION__,self);
@@ -136,13 +167,6 @@
 //}
 //
 //
-//- (void) drawSelectionOnTitle
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawSelectionOnTitle];
-//}
-//
-//
 //- (void) drawTitleBackground
 //{
 //	NSLog(@"%s %@",__FUNCTION__,self);
@@ -161,13 +185,6 @@
 //{
 //	NSLog(@"%s %@",__FUNCTION__,self);
 //	[super drawSubtitle];
-//}
-//
-//
-//- (void) drawSelection
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawSelection];
 //}
 
 
