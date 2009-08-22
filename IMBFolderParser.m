@@ -172,6 +172,8 @@
 		inNode.objects = objects;
 		[objects release];
 
+		NSMutableArray* folders = [NSMutableArray array];
+	
 		for (NSString* file in files)
 		{
 			if (i%32 == 0)
@@ -181,33 +183,20 @@
 			}
 			i++;
 			
-			// Hidden folders (e.g. ".thumbnails") will be skipped...
+			// Hidden file system items (e.g. ".thumbnails") will be skipped...
 			
 			if (![file hasPrefix:@"."])	
 			{
 				NSString* path = [folder stringByAppendingPathComponent:file];
 				
-				// For folders create a subnode...
+				// For folders will be handled later. Just remember it for now...
 				
 				if ([self fileAtPath:path conformsToUTI:(NSString*)kUTTypeFolder])
 				{
-					NSString* parserClassName = NSStringFromClass([self class]);
-					
-					IMBNode* subnode = [[IMBNode alloc] init];
-
-					subnode.parentNode = inNode;
-					subnode.mediaSource = path;
-					subnode.identifier = [NSString stringWithFormat:@"%@:/%@",parserClassName,path];
-					subnode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
-					subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
-					subnode.parser = self;
-					subnode.leaf = NO;
-					
-					[subnodes addObject:subnode];
-					[subnode release];
+					[folders addObject:path];
 				}
 				
-				// For qualifying files create an object...
+				// Create an IMBVisualObject for each qualifying file...
 				
 				else if ([self fileAtPath:path conformsToUTI:_fileUTI])
 				{
@@ -221,7 +210,32 @@
 					[object release];
 				}
 			}
+		}
+		
+		// Add a subnode and an IMBNodeObject for each folder...
+				
+		for (NSString* folder in folders)
+		{
+			NSString* name = [[NSFileManager threadSafeManager] displayNameAtPath:folder];
 			
+			IMBNode* subnode = [[IMBNode alloc] init];
+			subnode.parentNode = inNode;
+			subnode.mediaSource = folder;
+			subnode.identifier = [[self class] identifierForPath:folder];
+			subnode.name = name;
+			subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:folder];
+			subnode.parser = self;
+			subnode.leaf = NO;
+			[subnodes addObject:subnode];
+			[subnode release];
+
+			IMBNodeObject* object = [[IMBNodeObject alloc] init];
+			object.value = (id)folder;
+			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:folder];
+			object.name = name;
+			[objects addObject:object];
+			[object release];
 		}
 	}
 	
@@ -254,6 +268,13 @@
 }
 
 
++ (NSString*) identifierForPath:(NSString*)inPath
+{
+	NSString* parserClassName = NSStringFromClass([self class]);
+	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+}
+
+	
 //----------------------------------------------------------------------------------------------------------------------
 
 

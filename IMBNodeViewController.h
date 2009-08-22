@@ -111,9 +111,11 @@
 
 @property (retain) NSString* selectedNodeIdentifier;
 @property (retain) NSMutableArray* expandedNodeIdentifiers;
-- (void) selectNode:(IMBNode*)inNode;
 @property (readonly) IMBNode* selectedNode;
 @property (retain) IMBParser* selectedParser;
+
+- (void) selectNode:(IMBNode*)inNode;
+- (void) expandSelectedNodeAndSelectNodeWithIdentifier:(NSString*)inIdentifier;
 
 // Context menu support...
 

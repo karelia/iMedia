@@ -56,6 +56,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
 @implementation IMBObject
 
 @synthesize value = _value;
@@ -119,6 +121,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
 @implementation IMBVisualObject
 
 @synthesize imageRepresentation = _imageRepresentation;
@@ -162,6 +166,24 @@
 	return _name;
 }
 
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+// Override to show a folder icon instead of a generic file icon...
+
+@implementation IMBNodeObject
+
+- (NSImage*) icon
+{
+	NSString* path = (NSString*)_value;
+	return [[NSWorkspace sharedWorkspace] iconForFile:path];
+}
 
 @end
 

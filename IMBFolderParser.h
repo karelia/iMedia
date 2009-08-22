@@ -68,6 +68,8 @@
 
 - (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI;
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
++ (NSString*) identifierForPath:(NSString*)inPath;
+
 
 @end
 

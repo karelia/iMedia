@@ -196,7 +196,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	if (_hasCustomFinishSelector) [_delegate performSelector:_finishSelector withObject:self withObject:nil];
 }
 
-
 @end
 
 

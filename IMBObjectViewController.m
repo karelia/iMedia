@@ -50,13 +50,16 @@
 #pragma mark HEADERS
 
 #import "IMBObjectViewController.h"
+#import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
 #import "IMBObjectArrayController.h"
+#import "IMBFolderParser.h"
 #import "IMBConfig.h"
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBObjectPromise.h"
+#import "IMBImageBrowserCell.h"
 #import "NSWorkspace+iMedia.h"
 
 
@@ -100,7 +103,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 @implementation IMBObjectViewController
 
 @synthesize libraryController = _libraryController;
-@synthesize nodeTreeController = _nodeTreeController;
+@synthesize nodeViewController = _nodeViewController;
 @synthesize objectArrayController = ibObjectArrayController;
 
 @synthesize viewType = _viewType;
@@ -219,7 +222,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	IMBRelease(_libraryController);
-	IMBRelease(_nodeTreeController);
+	IMBRelease(_nodeViewController);
 	[super dealloc];
 }
 
@@ -232,6 +235,8 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (void) _configureIconView
 {
+	[ibIconView setCellClass:[IMBImageBrowserCell class]];
+	
 	// Subclasses can override this method to customize look & feel...
 	
 //	if ([ibIconView respondsToSelector:@selector(setCanControlQuickLookPanel:)])
@@ -249,12 +254,18 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (void) _configureListView
 {
 	// Subclasses can override this method to customize look & feel...
+	
+	[ibListView setTarget:self];
+	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
 }
 
 
 - (void) _configureComboView
 {
 	// Subclasses can override this method to customize look & feel...
+	
+	[ibComboView setTarget:self];
+	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
 }
 
 
@@ -426,33 +437,13 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Double-clicking opens the file (with its default app). Please note that IMBObjects are first passed through an 
-// IMBObjectPromise (which is returned by the parser), because the files may not yet be available locally. In this
-// case the promise object loads them asynchronously and calls _openLocalFiles: once the download has finsihed...
+// Double-clicking opens the file (with its default app)...
 
 - (void) imageBrowser:(IKImageBrowserView*)inView cellWasDoubleClickedAtIndex:(NSUInteger)inIndex
 {
-	NSArray* selectedNodes = [_nodeTreeController selectedObjects];
-	IMBNode* node = selectedNodes.count>0 ? [selectedNodes objectAtIndex:0] : nil;
-	
-	if (node)
-	{
-		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
-		NSArray* objects = [NSArray arrayWithObject:object];
-		
-		IMBParser* parser = node.parser;
-		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalFiles:)];
-	}
-}
-
-
-- (void) _openLocalFiles:(IMBObjectPromise*)inObjectPromise
-{
-	for (NSString* path in inObjectPromise.localFiles)
-	{
-		[[NSWorkspace threadSafeWorkspace] openFile:path];
-	}	
+	IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+	IMBNode* selectedNode = [_nodeViewController selectedNode];
+	[self openObject:object inSelectedNode:selectedNode];
 }
 
 
@@ -464,14 +455,13 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
-	NSArray* selectedNodes = [_nodeTreeController selectedObjects];
-	IMBNode* node = selectedNodes.count>0 ? [selectedNodes objectAtIndex:0] : nil;
+	IMBNode* selectedNode = [_nodeViewController selectedNode];
 
-	if (node)
+	if (selectedNode)
 	{
 		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
 
-		IMBParser* parser = node.parser;
+		IMBParser* parser = selectedNode.parser;
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
 		
@@ -497,6 +487,88 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (void) imageBrowser:(IKImageBrowserView*)inView cellWasRightClickedAtIndex:(NSUInteger)inIndex withEvent:(NSEvent*)inEvent
 {
 
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark NSTableViewDelegate
+ 
+
+- (BOOL) tableView:(NSTableView*)inTableView shouldEditTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
+{
+	return NO;
+}
+
+
+- (IBAction) tableViewWasDoubleClicked:(id)inSender
+{
+	IMBNode* selectedNode = [_nodeViewController selectedNode];
+	NSIndexSet* rows = [ibListView selectedRowIndexes];
+	NSUInteger row = [rows firstIndex];
+		
+	while (row != NSNotFound)
+	{
+		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
+		[self openObject:object inSelectedNode:selectedNode];
+		row = [rows indexGreaterThanIndex:row];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Helpers
+ 
+
+// Double-clicking opens the file (with its default app). Please note that IMBObjects are first passed through an 
+// IMBObjectPromise (which is returned by the parser), because the files may not yet be available locally. In this
+// case the promise object loads them asynchronously and calls _openLocalFiles: once the download has finsihed...
+
+- (void) openObject:(IMBObject*)inObject inSelectedNode:(IMBNode*)inSelectedNode
+{
+	if (inSelectedNode)
+	{
+		IMBParser* parser = inSelectedNode.parser;
+
+		// If this is a folder object, then expand the currently selected node and select the appropriate subnode...
+		
+		if ([inObject isKindOfClass:[IMBNodeObject class]])
+		{
+			NSString* path = (NSString*)inObject.value;
+			NSString* identifier = [(IMBFolderParser*)parser identifierForPath:path];
+			[_nodeViewController expandSelectedNodeAndSelectNodeWithIdentifier:identifier];
+		}
+		
+		// Regular objects are just opened upon double click...
+		
+		else
+		{
+			NSArray* objects = [NSArray arrayWithObject:inObject];
+			IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+			[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalFiles:withError:)];
+		}
+	}
+}
+
+
+- (void) _openLocalFiles:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
+{
+	if (inError == nil)
+	{
+		for (NSString* path in inObjectPromise.localFiles)
+		{
+			[[NSWorkspace threadSafeWorkspace] openFile:path];
+		}
+	}
+	else
+	{
+		[NSApp presentError:inError];
+	}
 }
 
 
