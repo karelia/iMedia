@@ -235,18 +235,23 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (void) _configureIconView
 {
-	// Subclasses can override this method to customize look & feel...
+	// Subclasses can override this method to customize look & feel. Please note that we check for the existance
+	// of the base class first, as it is un undocumented internal class that may chane or disappear in future
+	// system releases...
 	
-	[ibIconView setCellClass:[IMBImageBrowserCell class]];
+	if (NSClassFromString(@"IKImageBrowserCell"))
+	{
+		[ibIconView setCellClass:[IMBImageBrowserCell class]];
+	}
 	
-//	if ([ibIconView respondsToSelector:@selector(setCanControlQuickLookPanel:)])
-//	{
-//		[ibIconView setCanControlQuickLookPanel:YES];
-//	}
-//
 //	if ([ibIconView respondsToSelector:@selector(setIntercellSpacing:)])
 //	{
 //		[ibIconView setIntercellSpacing:NSMakeSize(10.0,4.0)];
+//	}
+
+//	if ([ibIconView respondsToSelector:@selector(setCanControlQuickLookPanel:)])
+//	{
+//		[ibIconView setCanControlQuickLookPanel:YES];
 //	}
 }
 
