@@ -52,10 +52,11 @@
 #import "IMBApertureParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
+#import "IMBObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
-//#import <Quartz/Quartz.h>
+#import <Quartz/Quartz.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -203,7 +204,7 @@
 	IMBNode* rootNode = [[[IMBNode alloc] init] autorelease];
 	rootNode.parentNode = inOldNode.parentNode;
 	rootNode.mediaSource = self.mediaSource;
-	rootNode.identifier = [self identifierForPath:@"/"];
+	rootNode.identifier = [self identifierForPath:@"/AlbumId/1"];
 	rootNode.name = @"Aperture";
 	rootNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
 	rootNode.parser = self;
@@ -398,6 +399,27 @@
 
 - (BOOL) isLeafAlbumType:(NSString*)inType
 {
+	NSInteger type = [inType integerValue];
+	
+	switch (type)
+	{
+		case 1:	 return YES;
+		case 2:	 return YES;
+		case 3:	 return YES;
+		case 4:	 return NO;
+		case 5:	 return NO;
+		case 6:	 return NO;
+		case 7:	 return NO;
+		case 8:	 return YES;
+		case 9:	 return YES;
+		case 10: return YES;
+		case 11: return YES;
+		case 13: return YES;
+		case 97: return NO;
+		case 98: return NO;
+		case 99: return NO;
+	}
+	
 	return NO;
 }
 
@@ -489,19 +511,19 @@
 			
 				if (imageDict!=nil && ([mediaType isEqualToString:@"Image"] || mediaType==nil))
 				{
-//					NSString* imagePath = [imageDict objectForKey:@"ImagePath"];
-//					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
-//					NSString* caption   = [imageDict objectForKey:@"Caption"];
-//	
-//					IMBVisualObject* object = [[IMBVisualObject alloc] init];
-//					[objects addObject:object];
-//					[object release];
-//
-//					object.value = (id)imagePath;
-//					object.name = caption;
-//					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
-//					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
-//					object.metadata = imageDict;
+					NSString* imagePath = [imageDict objectForKey:@"ImagePath"];
+					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
+					NSString* caption   = [imageDict objectForKey:@"Caption"];
+	
+					IMBVisualObject* object = [[IMBVisualObject alloc] init];
+					[objects addObject:object];
+					[object release];
+
+					object.value = (id)imagePath;
+					object.name = caption;
+					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
+					object.metadata = imageDict;
 				}
 				
 				[pool2 release];
