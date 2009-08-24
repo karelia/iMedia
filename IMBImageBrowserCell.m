@@ -56,6 +56,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+@interface IKImageBrowserCell ()
+
+- (void) setDataSource:(id)inDataSource;
+- (void) drawShadow;
+- (void) drawImageOutline;
+
+@end
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 @implementation IMBImageBrowserCell
@@ -79,113 +90,42 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Disable outline and shadow drawing for folders (IMBNodeObject)...
+
 - (void) setDataSource:(id)inDataSource
 {
 	[super setDataSource:inDataSource];
-
+	
 	if ([inDataSource isKindOfClass:[IMBNodeObject class]])
 	{
 		_imbShouldDrawOutline = NO;
 		_imbShouldDrawShadow = NO;
 	}
-	else
-	{
-		_imbShouldDrawOutline = YES;
-		_imbShouldDrawShadow = YES;
-	}
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (void) drawShadow
 {
-//	NSLog(@"%s %@",__FUNCTION__,self);
-	
 	if (_imbShouldDrawShadow)
 	{
-		[super drawShadow];					//2
+		[super drawShadow];	
 	}
 }
 
 
 - (void) drawImageOutline
 {
-//	NSLog(@"%s %@",__FUNCTION__,self);
-
 	if (_imbShouldDrawOutline)
 	{
-		[super drawImageOutline];			//4
+		[super drawImageOutline];	
 	}	
 }
-
-
-//- (void) drawSelection
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawSelection];
-//}
-//
-//
-//- (void) drawSelectionOnTitle
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawSelectionOnTitle];
-//}
-//
-//
-//- (void) drawOverlays
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawOverlays]; // 4			//6
-//}
-//
-//
-//- (void) drawPlaceHolder
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawPlaceHolder]; // 2
-//}
-//
-//
-//- (void) drawBackground
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawBackground]; // 1		//1
-//}
-//
-//
-//- (void) drawCenteredIcon:(id)inIcon
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawCenteredIcon:inIcon];
-//}
-//
-//
-//- (void) drawImage:(id)inImage
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawImage:inImage];			//3
-//}
-//
-//
-//- (void) drawTitleBackground
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawTitleBackground];
-//}
-//
-//
-//- (void) drawTitle
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawTitle]; // 3				//5
-//}
-//
-//
-//- (void) drawSubtitle
-//{
-//	NSLog(@"%s %@",__FUNCTION__,self);
-//	[super drawSubtitle];
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
