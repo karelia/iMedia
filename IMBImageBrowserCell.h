@@ -53,13 +53,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This subclass of a private ImageKit class is used to customize the drawing for some items in the IKImageBrowserView.
-// While we do want outlines and shadows for most items (e.g. images or movies), we absolutely do not want them for
-// folders. Unfortunately IKImageBrowserView will only let us set those params on a global basis, so we need to 
+// This subclass is used to customize the drawing for some items in the IKImageBrowserView. While we do want  
+// outlines and shadows for most items (e.g. images or movies), we absolutely do not want them for folders. 
+// Unfortunately IKImageBrowserView will only let us set those params on a global basis, so we need to 
 // implemenent the per-cell parameters ourself.
 
-// ATTENTION: since this relies on a non-documented internal behavior of IKImageBrowserView and IKImageBrowserCell it
-// could break with any system release if Apple chooses to change its implementation...
+// ATTENTION: since this relies on a non-documented internal behavior of IKImageBrowserView and IKImageBrowserCell 
+// it could break with any system release if Apple chooses to change its implementation...
  
  
 @interface IMBImageBrowserCell : IKImageBrowserCell

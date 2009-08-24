@@ -233,33 +233,22 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 #pragma mark 
 
 
+// Subclasses can override these methods to configure or customize look & feel of the various object views...
+
 - (void) _configureIconView
 {
-	// Subclasses can override this method to customize look & feel. Please note that we check for the existance
-	// of the base class first, as it is un undocumented internal class that may chane or disappear in future
-	// system releases...
+	// Make the IKImageBrowserView use our custom cell class. Please note that we check for the existence 
+	// of the base class first, as it is un undocumented internal class on 10.5. In 10.6 it is always there...
 	
-	if (NSClassFromString(@"IKImageBrowserCell"))
+	if ([ibIconView respondsToSelector:@selector(setCellClass:)] && NSClassFromString(@"IKImageBrowserCell"))
 	{
-		[ibIconView setCellClass:[IMBImageBrowserCell class]];
+		[ibIconView performSelector:@selector(setCellClass:) withObject:[IMBImageBrowserCell class]];
 	}
-	
-//	if ([ibIconView respondsToSelector:@selector(setIntercellSpacing:)])
-//	{
-//		[ibIconView setIntercellSpacing:NSMakeSize(10.0,4.0)];
-//	}
-
-//	if ([ibIconView respondsToSelector:@selector(setCanControlQuickLookPanel:)])
-//	{
-//		[ibIconView setCanControlQuickLookPanel:YES];
-//	}
 }
 
 
 - (void) _configureListView
 {
-	// Subclasses can override this method to customize look & feel...
-	
 	[ibListView setTarget:self];
 	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
 }
@@ -267,8 +256,6 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (void) _configureComboView
 {
-	// Subclasses can override this method to customize look & feel...
-	
 	[ibComboView setTarget:self];
 	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
 }

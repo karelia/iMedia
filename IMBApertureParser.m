@@ -490,7 +490,7 @@
 	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
 	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
 
-	// Look for the correct album in the iPhoto XML plist. Once we find it, populate the node with IMBVisualObjects
+	// Look for the correct album in the Aperture XML plist. Once we find it, populate the node with IMBVisualObjects
 	// for each image in this album...
 	
 	for (NSDictionary* albumDict in inListOfAlbums)
