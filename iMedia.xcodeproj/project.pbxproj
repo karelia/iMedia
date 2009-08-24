@@ -92,7 +92,6 @@
 		D0C5B23D1022F68A00A97A60 /* list-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2271022F4AA00A97A60 /* list-view.png */; };
 		D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */; };
-		D0D074B81042E5160048DCC6 /* IKImageBrowserCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D074B61042E5160048DCC6 /* IKImageBrowserCell.h */; };
 		D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0D635ED1035B4C500FF8631 /* IMBLightroomParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D635E91035B4C500FF8631 /* IMBLightroomParser.m */; };
 		D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -221,7 +220,6 @@
 		D0C5B2291022F4CA00A97A60 /* icon-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-view.png"; sourceTree = "<group>"; };
 		D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoParser.h; sourceTree = "<group>"; };
 		D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoParser.m; sourceTree = "<group>"; };
-		D0D074B61042E5160048DCC6 /* IKImageBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IKImageBrowserCell.h; path = ../iMedia2/IKImageBrowserCell.h; sourceTree = SOURCE_ROOT; };
 		D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroomParser.h; sourceTree = "<group>"; };
 		D0D635E91035B4C500FF8631 /* IMBLightroomParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroomParser.m; sourceTree = "<group>"; };
 		D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBApertureParser.h; sourceTree = "<group>"; };
@@ -410,7 +408,6 @@
 				D049EF5310346C1C003CC49C /* IMBNodeCell.h */,
 				D049EF5410346C1C003CC49C /* IMBNodeCell.m */,
 				D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */,
-				D0D074B61042E5160048DCC6 /* IKImageBrowserCell.h */,
 				D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */,
 				D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */,
 				D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */,
@@ -540,7 +537,6 @@
 				D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */,
 				D04FFEBB103BE81600104EB8 /* IMBObjectPromise.h in Headers */,
 				D0BF8C69103F32700014B3B7 /* IMBImageBrowserCell.h in Headers */,
-				D0D074B81042E5160048DCC6 /* IKImageBrowserCell.h in Headers */,
 				D0B6FA6B1042F3D800280DDC /* IMBImageKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
