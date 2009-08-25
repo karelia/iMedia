@@ -95,7 +95,7 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
 
@@ -214,13 +214,13 @@
 		case kICAFileOther:
  */ 
 		case kICAFileImage:
-			isOurType = [self.mediaType isEqualTo:kIMBMediaTypePhotos];
+			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeImage];
 			break;
 		case kICAFileMovie:
-			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeMovies];
+			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeMovie];
 			break;
 		case kICAFileAudio:
-			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeMusic];
+			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeAudio];
 			break;
 	}
 	return isOurType;

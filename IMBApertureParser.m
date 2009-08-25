@@ -99,7 +99,7 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
 

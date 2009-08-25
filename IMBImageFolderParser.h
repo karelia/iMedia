@@ -47,74 +47,46 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This object encapsulates information about a single media item (e.g. image file or audio file). The value 
-// property uniquely identifies the item. In the case of files it could be a path or NSURL...
+#pragma mark HEADERS
 
-@interface IMBObject : NSObject <NSCopying,NSCoding>
-{
-	id _value;												
-	NSString* _name;
-	NSDictionary* _metadata;
-}
+#import "IMBFolderParser.h"
 
-@property (retain) id value;								// Path or URL
-@property (retain) NSString* name;
-@property (retain) NSDictionary* metadata;
-@property (readonly) NSImage* icon;
 
-- (BOOL) isEqual:(IMBObject*)inObject;						// Considered equal if value is equal
+//----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark 
+
+
+// This parser scans any folder for image files...
+
+@interface IMBImageFolderParser : IMBFolderParser
+@end
+
+
+// This subclass looks only in "~/Pictures"...
+
+@interface IMBPicturesFolderParser : IMBImageFolderParser
+@end
+
+
+// This subclass looks only in "/Library/Desktop Pictures"...
+
+@interface IMBDesktopPicturesFolderParser : IMBImageFolderParser
+@end
+
+
+// This subclass looks only in "/Library/User Pictures"...
+
+@interface IMBUserPicturesFolderParser : IMBImageFolderParser
+@end
+
+
+// This subclass looks only in "/Library/Application Support/Apple/iChat Icons"...
+
+@interface IMBiChatIconsFolderParser : IMBImageFolderParser
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// This subclass can be used for image or movie files, i.e. items that need a visual representation and are
-// displayed with IKIMageBrowserView... 
-
-@interface IMBVisualObject : IMBObject
-{
-	id _imageRepresentation;								
-	NSString* _imageRepresentationType;		
-	NSUInteger _imageVersion;				
-}
-
-@property (readonly) NSString* imageUID;
-@property (retain) id imageRepresentation;					// NSImage, CIImage, or CGImageRef
-@property (retain) NSString* imageRepresentationType;		// See IKImageBrowserItem for possible values
-@property (readonly) NSString* imageTitle;
-@property (assign) NSUInteger imageVersion;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This subclass is used to represent nodes in the object views (examples are folder and events). The reason we 
-// have these hybrid objects is to have a double clickable item in the object views, which can be used to drill
-// down the hierarchy... 
-
-@interface IMBNodeObject : IMBVisualObject
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This specialized node object represent iPhoto events (which can be skimmed). This data model object can update 
-// its imageRepresentation... 
-
-//@interface IMBEventObject : IMBNodeObject
-//{
-//	double _skimFraction;
-//}
-//
-//@property double skimFraction;
-//
-//@end
-
-
-//----------------------------------------------------------------------------------------------------------------------

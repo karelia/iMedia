@@ -132,11 +132,11 @@ static NSString* kSelectionKey = @"selection";
 		[stateDict setObject:expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
 
 		NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
-		[classDict setObject:stateDict forKey:kIMBMediaTypePhotos];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeMusic];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeMovies];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeLinks];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeContacts];
+		[classDict setObject:stateDict forKey:kIMBMediaTypeImage];
+		[classDict setObject:stateDict forKey:kIMBMediaTypeAudio];
+		[classDict setObject:stateDict forKey:kIMBMediaTypeMovie];
+		[classDict setObject:stateDict forKey:kIMBMediaTypeLink];
+		[classDict setObject:stateDict forKey:kIMBMediaTypeContact];
 
 		[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
 	}

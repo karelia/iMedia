@@ -189,3 +189,32 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+//#pragma mark 
+//
+//@implementation IMBEventObject
+//
+//@synthesize skimFraction = _skimFraction;
+//
+//- (void) setSkimFraction:(double)inFraction
+//{
+//	if (_skimFraction != inFraction)
+//	{
+//		_skimFraction = inFraction;
+//		self.imageRepresentation = nil;
+//		self.imageVersion += 1;
+//	}
+//}
+//
+//
+//- (id) imageRepresentation
+//{
+//
+//}
+//
+//
+//@end
+
+
+//----------------------------------------------------------------------------------------------------------------------

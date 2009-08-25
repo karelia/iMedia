@@ -64,7 +64,7 @@
 
 #import <iMedia/IMBParser.h>
 #import <iMedia/IMBFolderParser.h>
-#import <iMedia/IMBPhotosFolderParser.h>
+#import <iMedia/IMBImageFolderParser.h>
 #import <iMedia/IMBiPhotoParser.h>
 #import <iMedia/IMBApertureParser.h>
 #import <iMedia/IMBLightroomParser.h>

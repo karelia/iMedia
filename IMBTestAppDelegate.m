@@ -53,7 +53,7 @@
 	
 	// Create libraries (singleton per mediaType)...
 	
-	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBMediaTypePhotos];
+	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBMediaTypeImage];
 	[libraryController setDelegate:self];
 	
 	// Link the user interface (possible multiple instances) to the	singleton library...
