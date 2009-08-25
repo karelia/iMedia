@@ -58,33 +58,15 @@
 #pragma mark 
 
 
-// This parser scans any folder for image files...
+// This parser scans any folder for audio files...
 
-@interface IMBPhotosFolderParser : IMBFolderParser
+@interface IMBAudioFolderParser : IMBFolderParser
 @end
 
 
-// This subclass looks only in "~/Pictures"...
+// This subclass looks only in "~/Music"...
 
-@interface IMBPicturesFolderParser : IMBPhotosFolderParser
-@end
-
-
-// This subclass looks only in "/Library/Desktop Pictures"...
-
-@interface IMBDesktopPicturesFolderParser : IMBPhotosFolderParser
-@end
-
-
-// This subclass looks only in "/Library/User Pictures"...
-
-@interface IMBUserPicturesFolderParser : IMBPhotosFolderParser
-@end
-
-
-// This subclass looks only in "/Library/Application Support/Apple/iChat Icons"...
-
-@interface IMBiChatIconsFolderParser : IMBPhotosFolderParser
+@interface IMBMusicFolderParser : IMBAudioFolderParser
 @end
 
 

@@ -44,47 +44,31 @@
 */
 
 
+///----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark HEADERS
+
+#import "IMBObjectViewController.h"
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This object encapsulates information about a single media item (e.g. image file or audio file). The value 
-// property uniquely identifies the item. In the case of files it could be a path or NSURL...
+#pragma mark 
 
-@interface IMBObject : NSObject <NSCopying,NSCoding>
+@interface IMBPanelController : NSObject
 {
-	id _value;												
-	NSString* _name;
-	NSDictionary* _metadata;
+	id _delegate;
+	NSMutableArray* _mediaTypes;
+	NSWindow* _window;
 }
 
-@property (retain) id value;								// Path or URL
-@property (retain) NSString* name;
-@property (retain) NSDictionary* metadata;
-@property (readonly) NSImage* icon;
++ (IMBPanelController*) sharedPanelController;
++ (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
 
-- (BOOL) isEqual:(IMBObject*)inObject;						// Considered equal if value is equal
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This subclass can be used for image or movie files, i.e. items that need a visual representation and are
-// displayed with IKIMageBrowserView... 
-
-@interface IMBVisualObject : IMBObject
-{
-	id _imageRepresentation;								
-	NSString* _imageRepresentationType;		
-	NSUInteger _imageVersion;				
-}
-
-@property (readonly) NSString* imageUID;
-@property (retain) id imageRepresentation;					// NSImage, CIImage, or CGImageRef
-@property (retain) NSString* imageRepresentationType;		// See IKImageBrowserItem for possible values
-@property (readonly) NSString* imageTitle;
-@property (assign) NSUInteger imageVersion;
+- (void) showWindow;
+- (void) hideWindow;
 
 @end
 
@@ -92,29 +76,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This subclass is used to represent nodes in the object views (examples are folder and events). The reason we 
-// have these hybrid objects is to have a double clickable item in the object views, which can be used to drill
-// down the hierarchy... 
+#pragma mark 
 
-@interface IMBNodeObject : IMBVisualObject
+@protocol IMBPanelDelegate
+
+@optional
+
+- (BOOL) controller:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
+- (void) controller:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
+- (void) controller:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
+- (void) controller:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
+- (void) controller:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// This specialized node object represent iPhoto events (which can be skimmed). This data model object can update 
-// its imageRepresentation... 
-
-//@interface IMBEventObject : IMBNodeObject
-//{
-//	double _skimFraction;
-//}
-//
-//@property double skimFraction;
-//
-//@end
-
-
-//----------------------------------------------------------------------------------------------------------------------

@@ -51,11 +51,11 @@
 
 // Media types...
 
-NSString* kIMBMediaTypePhotos = @"photos";
-NSString* kIMBMediaTypeMusic = @"music";
-NSString* kIMBMediaTypeMovies = @"movies";
-NSString* kIMBMediaTypeLinks = @"links";
-NSString* kIMBMediaTypeContacts = @"contacts";
+NSString* kIMBMediaTypeImage = @"image";
+NSString* kIMBMediaTypeAudio = @"audio";
+NSString* kIMBMediaTypeMovie = @"movie";
+NSString* kIMBMediaTypeLink = @"link";
+NSString* kIMBMediaTypeContact = @"contact";
 
 
 //----------------------------------------------------------------------------------------------------------------------

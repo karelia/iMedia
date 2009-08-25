@@ -49,7 +49,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBPhotosFolderParser.h"
+#import "IMBImageFolderParser.h"
 #import "IMBParserController.h"
 #import "IMBCommon.h"
 
@@ -59,7 +59,7 @@
 
 #pragma mark 
 
-@implementation IMBPhotosFolderParser
+@implementation IMBImageFolderParser
 
 // Restrict this parser to image files...
 
@@ -83,14 +83,16 @@
 
 @implementation IMBPicturesFolderParser
 
+
 // Register this parser, so that it gets automatically loaded...
 
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
+
 
 // Set the folder path to the ~/Pictures...
 
@@ -114,14 +116,16 @@
 
 @implementation IMBDesktopPicturesFolderParser
 
+
 // Register this parser, so that it gets automatically loaded...
 
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
+
 
 // Set the folder path to the /Library/Desktop Pictures...
 
@@ -145,14 +149,16 @@
 
 @implementation IMBUserPicturesFolderParser
 
+
 // Register this parser, so that it gets automatically loaded...
 
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
+
 
 // Set the folder path to the /Library/Desktop Pictures...
 
@@ -176,14 +182,16 @@
 
 @implementation IMBiChatIconsFolderParser
 
+
 // Register this parser, so that it gets automatically loaded...
 
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypePhotos];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
+
 
 // Set the folder path to the /Library/Desktop Pictures...
 

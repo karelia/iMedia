@@ -87,11 +87,11 @@ typedef NSUInteger IMBBadgeType;
 
 // Media types...
 
-extern NSString* kIMBMediaTypePhotos;
-extern NSString* kIMBMediaTypeMusic;
-extern NSString* kIMBMediaTypeMovies;
-extern NSString* kIMBMediaTypeLinks;
-extern NSString* kIMBMediaTypeContacts;
+extern NSString* kIMBMediaTypeImage;
+extern NSString* kIMBMediaTypeAudio;
+extern NSString* kIMBMediaTypeMovie;
+extern NSString* kIMBMediaTypeLink;
+extern NSString* kIMBMediaTypeContact;
 
 // Group types...
 
