@@ -219,7 +219,7 @@
 		D0B6FABE1043246800280DDC /* IMBMovieFolderParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieFolderParser.m; sourceTree = "<group>"; };
 		D0B87F21103D998D00C48C6F /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.h; sourceTree = "<group>"; };
 		D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageBrowserCell.h; sourceTree = "<group>"; };
-		D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IMBImageBrowserCell.m; path = ../iMedia2/IMBImageBrowserCell.m; sourceTree = SOURCE_ROOT; };
+		D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageBrowserCell.m; sourceTree = "<group>"; };
 		D0C2DAA110240C0B001B1198 /* IMBPhotosView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBPhotosView.xib; sourceTree = "<group>"; };
 		D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectViewController.h; sourceTree = "<group>"; };
 		D0C2DAF11024178E001B1198 /* IMBObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectViewController.m; sourceTree = "<group>"; };
