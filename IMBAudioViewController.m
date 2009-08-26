@@ -49,7 +49,9 @@
 
 #pragma mark HEADERS
 
-#import "IMBObjectViewController.h"
+#import "IMBAudioViewController.h"
+#import "IMBCommon.h"
+#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,10 +59,62 @@
 
 #pragma mark 
 
-@interface IMBPhotosViewController : IMBObjectViewController
-
-@end
+@implementation IMBAudioViewController
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) mediaType
+{
+	return kIMBMediaTypeAudio;
+}
+
+
++ (NSString*) nibName
+{
+	return @"IMBAudioView";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) objectCountFormatSingular
+{
+	return IMBLocalizedString(
+		@"ImageCountFormatSingular",
+		@"%d song",
+		@"Format string for object count in singluar");
+}
+
+
++ (NSString*) objectCountFormatPlural
+{
+	return IMBLocalizedString(
+		@"ImageCountFormatPlural",
+		@"%d songs",
+		@"Format string for object count in plural");
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSImage*) iconForMediaType
+{
+	NSString* identifier = @"com.apple.iTunes";
+
+	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:identifier];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(32,32)];
+	
+	return icon;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end
 

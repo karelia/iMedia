@@ -172,6 +172,8 @@ extern NSString* kIMBNodesDidChangeNotification;
 - (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode;
 - (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode;
 
+- (void) controller:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
+
 @end
 
 

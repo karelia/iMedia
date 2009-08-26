@@ -47,48 +47,78 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark HEADERS
+
+#import "IMBImageViewController.h"
+#import "IMBCommon.h"
+#import "NSWorkspace+iMedia.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
-@interface IMBPanelController : NSWindowController
-{
-	id _delegate;
-	NSArray* _mediaTypes;
-	NSMutableArray* _viewControllers;
+@implementation IMBImageViewController
 
-	IBOutlet NSTabView* ibTabView;
-	IBOutlet NSToolbar* ibToolbar;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) mediaType
+{
+	return kIMBMediaTypeImage;
 }
 
-+ (IMBPanelController*) sharedPanelController;
-+ (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
 
-@property (assign) id delegate;
-@property (retain) NSArray* mediaTypes;
-@property (retain) NSMutableArray* viewControllers;
-
-- (IBAction) showWindow:(id)inSender;
-- (IBAction) hideWindow:(id)inSender;
-
-@end
++ (NSString*) nibName
+{
+	return @"IMBImageView";
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
++ (NSString*) objectCountFormatSingular
+{
+	return IMBLocalizedString(
+		@"ImageCountFormatSingular",
+		@"%d image",
+		@"Format string for object count in singluar");
+}
 
-@protocol IMBPanelDelegate
 
-@optional
-
-- (BOOL) controller:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
-
-@end
++ (NSString*) objectCountFormatPlural
+{
+	return IMBLocalizedString(
+		@"ImageCountFormatPlural",
+		@"%d images",
+		@"Format string for object count in plural");
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSImage*) iconForMediaType
+{
+	NSString* identifier = @"com.apple.iPhoto";
+	NSString* path = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
+
+	if (path == nil) identifier = @"com.apple.Preview";
+	path = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
+	
+	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:identifier];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(32,32)];
+	
+	return icon;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end
 

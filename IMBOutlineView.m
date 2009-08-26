@@ -50,6 +50,7 @@
 #pragma mark HEADERS
 
 #import "IMBOutlineView.h"
+#import "IMBNodeViewController.h"
 #import "IMBNode.h"
 
 
@@ -166,6 +167,30 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Ask the IMBNodeViewController (which is our delegate) to return a context menu for the clicked node. If  
+// the user clicked on the background node is nil...
+
+- (NSMenu*) menuForEvent:(NSEvent*)inEvent
+{
+	NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
+	NSInteger i = [self rowAtPoint:mouse];
+	NSInteger n = [self numberOfRows];
+	IMBNode* node = nil;
+	
+	if (i>=0 && i<n)
+	{
+		id item = [self itemAtRow:i];
+		node = [item representedObject];
+	}
+
+	IMBNodeViewController* controller = (IMBNodeViewController*) self.delegate;
+	return [controller menuForNode:node];
+}
+
+			
 //----------------------------------------------------------------------------------------------------------------------
 
 

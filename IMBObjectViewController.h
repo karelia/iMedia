@@ -150,7 +150,7 @@ typedef NSUInteger kIMBObjectViewType;
 // Helpers...
 
 - (void) openObject:(IMBObject*)inObject inSelectedNode:(IMBNode*)inSelectedNode;
-
+- (NSImage*) iconForMediaType;
 
 @end
 
