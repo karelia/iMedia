@@ -47,29 +47,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark HEADERS
 
-@interface IMBPanelController : NSWindowController
-{
-	id _delegate;
-	NSArray* _mediaTypes;
-	NSMutableArray* _viewControllers;
-
-	IBOutlet NSTabView* ibTabView;
-	IBOutlet NSToolbar* ibToolbar;
-}
-
-+ (IMBPanelController*) sharedPanelController;
-+ (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
-
-@property (assign) id delegate;
-@property (retain) NSArray* mediaTypes;
-@property (retain) NSMutableArray* viewControllers;
-
-- (IBAction) showWindow:(id)inSender;
-- (IBAction) hideWindow:(id)inSender;
-
-@end
+#import "IMBObjectViewController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,15 +57,7 @@
 
 #pragma mark 
 
-@protocol IMBPanelDelegate
-
-@optional
-
-- (BOOL) controller:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
+@interface IMBAudioViewController : IMBObjectViewController
 
 @end
 

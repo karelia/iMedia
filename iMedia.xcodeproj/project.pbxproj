@@ -19,6 +19,13 @@
 		D04FFEBC103BE81600104EB8 /* IMBObjectPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */; };
 		D05A9493102EB022005DF9CE /* IMBImageCaptureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D05A9494102EB022005DF9CE /* IMBImageCaptureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */; };
+		D08070BF10442CD700891137 /* IMBMovieViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070BD10442CD700891137 /* IMBMovieViewController.h */; };
+		D08070C010442CD700891137 /* IMBMovieViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D08070BE10442CD700891137 /* IMBMovieViewController.m */; };
+		D08070C310442CE100891137 /* IMBAudioViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070C110442CE100891137 /* IMBAudioViewController.h */; };
+		D08070C410442CE100891137 /* IMBAudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D08070C210442CE100891137 /* IMBAudioViewController.m */; };
+		D08070C810442DAE00891137 /* IMBAudioView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070C710442DAE00891137 /* IMBAudioView.xib */; };
+		D08070CA10442DC800891137 /* IMBMovieView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070C910442DC800891137 /* IMBMovieView.xib */; };
+		D08070EA10442F0500891137 /* IMBPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070E910442F0500891137 /* IMBPanel.xib */; };
 		D08E8B701019C916005D8614 /* UKFNSubscribeFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8B721019C916005D8614 /* UKFSEventsWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B6A1019C916005D8614 /* UKFSEventsWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8B741019C916005D8614 /* UKKQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B6C1019C916005D8614 /* UKKQueue.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -78,20 +85,20 @@
 		D09934341011B63600C527B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D09934331011B63600C527B7 /* main.m */; };
 		D0993931101236AB00C527B7 /* IMBOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = D099392F101236AB00C527B7 /* IMBOutlineView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0993932101236AB00C527B7 /* IMBOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993930101236AB00C527B7 /* IMBOutlineView.m */; };
-		D0B6FA6B1042F3D800280DDC /* IMBImageKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */; };
-		D0B6FABB1043243800280DDC /* IMBAudioFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FAB91043243800280DDC /* IMBAudioFolderParser.h */; };
+		D0B6FA6B1042F3D800280DDC /* IMBImageKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		D0B6FABB1043243800280DDC /* IMBAudioFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FAB91043243800280DDC /* IMBAudioFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0B6FABC1043243800280DDC /* IMBAudioFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0B6FABA1043243800280DDC /* IMBAudioFolderParser.m */; };
-		D0B6FABF1043246800280DDC /* IMBMovieFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FABD1043246800280DDC /* IMBMovieFolderParser.h */; };
+		D0B6FABF1043246800280DDC /* IMBMovieFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FABD1043246800280DDC /* IMBMovieFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0B6FAC01043246800280DDC /* IMBMovieFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0B6FABE1043246800280DDC /* IMBMovieFolderParser.m */; };
 		D0B87F22103D998D00C48C6F /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B87F21103D998D00C48C6F /* iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D0BF8C69103F32700014B3B7 /* IMBImageBrowserCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */; };
+		D0BF8C69103F32700014B3B7 /* IMBImageBrowserCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0BF8C6A103F32700014B3B7 /* IMBImageBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */; };
-		D0C2DAA210240C0B001B1198 /* IMBPhotosView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0C2DAA110240C0B001B1198 /* IMBPhotosView.xib */; };
+		D0C2DAA210240C0B001B1198 /* IMBImageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0C2DAA110240C0B001B1198 /* IMBImageView.xib */; };
 		D0C2DAF21024178E001B1198 /* IMBObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0C2DAF31024178E001B1198 /* IMBObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C2DAF11024178E001B1198 /* IMBObjectViewController.m */; };
 		D0C2DB6D1024DBCC001B1198 /* IMBLibraryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */; };
-		D0C2DD0E1025905A001B1198 /* IMBPhotosViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C2DD0C1025905A001B1198 /* IMBPhotosViewController.m */; };
-		D0C2DD0F1025905A001B1198 /* IMBPhotosViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DD0D1025905A001B1198 /* IMBPhotosViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0C2DD0E1025905A001B1198 /* IMBImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C2DD0C1025905A001B1198 /* IMBImageViewController.m */; };
+		D0C2DD0F1025905A001B1198 /* IMBImageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0C5B23C1022F68A00A97A60 /* icon-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2291022F4CA00A97A60 /* icon-view.png */; };
 		D0C5B23D1022F68A00A97A60 /* list-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2271022F4AA00A97A60 /* list-view.png */; };
 		D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -101,7 +108,7 @@
 		D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0D635EF1035B4C500FF8631 /* IMBApertureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D635EB1035B4C500FF8631 /* IMBApertureParser.m */; };
 		D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */; };
-		D0E96D1C104410BD0015979F /* IMBPanelController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E96D1A104410BD0015979F /* IMBPanelController.h */; };
+		D0E96D1C104410BD0015979F /* IMBPanelController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E96D1A104410BD0015979F /* IMBPanelController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0E96D1D104410BD0015979F /* IMBPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E96D1B104410BD0015979F /* IMBPanelController.m */; };
 /* End PBXBuildFile section */
 
@@ -148,6 +155,13 @@
 		D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageCaptureParser.h; sourceTree = "<group>"; };
 		D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageCaptureParser.m; sourceTree = "<group>"; };
 		D05A94A4102EB14A005DF9CE /* ICADevices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICADevices.framework; path = System/Library/Frameworks/ICADevices.framework; sourceTree = SDKROOT; };
+		D08070BD10442CD700891137 /* IMBMovieViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieViewController.h; sourceTree = "<group>"; };
+		D08070BE10442CD700891137 /* IMBMovieViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieViewController.m; sourceTree = "<group>"; };
+		D08070C110442CE100891137 /* IMBAudioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAudioViewController.h; sourceTree = "<group>"; };
+		D08070C210442CE100891137 /* IMBAudioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAudioViewController.m; sourceTree = "<group>"; };
+		D08070C710442DAE00891137 /* IMBAudioView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBAudioView.xib; sourceTree = "<group>"; };
+		D08070C910442DC800891137 /* IMBMovieView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBMovieView.xib; sourceTree = "<group>"; };
+		D08070E910442F0500891137 /* IMBPanel.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBPanel.xib; sourceTree = "<group>"; };
 		D08E8B661019C916005D8614 /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UKFileWatcher.h; sourceTree = "<group>"; };
 		D08E8B671019C916005D8614 /* UKFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UKFileWatcher.m; sourceTree = "<group>"; };
 		D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UKFNSubscribeFileWatcher.h; sourceTree = "<group>"; };
@@ -220,12 +234,12 @@
 		D0B87F21103D998D00C48C6F /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.h; sourceTree = "<group>"; };
 		D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageBrowserCell.h; sourceTree = "<group>"; };
 		D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageBrowserCell.m; sourceTree = "<group>"; };
-		D0C2DAA110240C0B001B1198 /* IMBPhotosView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBPhotosView.xib; sourceTree = "<group>"; };
+		D0C2DAA110240C0B001B1198 /* IMBImageView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBImageView.xib; sourceTree = "<group>"; };
 		D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectViewController.h; sourceTree = "<group>"; };
 		D0C2DAF11024178E001B1198 /* IMBObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectViewController.m; sourceTree = "<group>"; };
 		D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBLibraryView.xib; sourceTree = "<group>"; };
-		D0C2DD0C1025905A001B1198 /* IMBPhotosViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPhotosViewController.m; sourceTree = "<group>"; };
-		D0C2DD0D1025905A001B1198 /* IMBPhotosViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPhotosViewController.h; sourceTree = "<group>"; };
+		D0C2DD0C1025905A001B1198 /* IMBImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageViewController.m; sourceTree = "<group>"; };
+		D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageViewController.h; sourceTree = "<group>"; };
 		D0C5B2271022F4AA00A97A60 /* list-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "list-view.png"; sourceTree = "<group>"; };
 		D0C5B2291022F4CA00A97A60 /* icon-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-view.png"; sourceTree = "<group>"; };
 		D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoParser.h; sourceTree = "<group>"; };
@@ -406,8 +420,12 @@
 				D0993302101197D100C527B7 /* IMBNodeViewController.m */,
 				D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */,
 				D0C2DAF11024178E001B1198 /* IMBObjectViewController.m */,
-				D0C2DD0D1025905A001B1198 /* IMBPhotosViewController.h */,
-				D0C2DD0C1025905A001B1198 /* IMBPhotosViewController.m */,
+				D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */,
+				D0C2DD0C1025905A001B1198 /* IMBImageViewController.m */,
+				D08070C110442CE100891137 /* IMBAudioViewController.h */,
+				D08070C210442CE100891137 /* IMBAudioViewController.m */,
+				D08070BD10442CD700891137 /* IMBMovieViewController.h */,
+				D08070BE10442CD700891137 /* IMBMovieViewController.m */,
 				D0E96D1A104410BD0015979F /* IMBPanelController.h */,
 				D0E96D1B104410BD0015979F /* IMBPanelController.m */,
 			);
@@ -425,7 +443,10 @@
 				D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */,
 				D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */,
 				D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */,
-				D0C2DAA110240C0B001B1198 /* IMBPhotosView.xib */,
+				D0C2DAA110240C0B001B1198 /* IMBImageView.xib */,
+				D08070C710442DAE00891137 /* IMBAudioView.xib */,
+				D08070C910442DC800891137 /* IMBMovieView.xib */,
+				D08070E910442F0500891137 /* IMBPanel.xib */,
 			);
 			name = Views;
 			sourceTree = SOURCE_ROOT;
@@ -562,7 +583,7 @@
 				D08E8D861019EB4D005D8614 /* IMBMainThreadProxy.h in Headers */,
 				D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */,
 				D0C2DAF21024178E001B1198 /* IMBObjectViewController.h in Headers */,
-				D0C2DD0F1025905A001B1198 /* IMBPhotosViewController.h in Headers */,
+				D0C2DD0F1025905A001B1198 /* IMBImageViewController.h in Headers */,
 				D05A9493102EB022005DF9CE /* IMBImageCaptureParser.h in Headers */,
 				D049EF5510346C1C003CC49C /* IMBNodeCell.h in Headers */,
 				D049F00A1034993E003CC49C /* NSImage+iMedia.h in Headers */,
@@ -575,6 +596,8 @@
 				D0B6FABB1043243800280DDC /* IMBAudioFolderParser.h in Headers */,
 				D0B6FABF1043246800280DDC /* IMBMovieFolderParser.h in Headers */,
 				D0E96D1C104410BD0015979F /* IMBPanelController.h in Headers */,
+				D08070BF10442CD700891137 /* IMBMovieViewController.h in Headers */,
+				D08070C310442CE100891137 /* IMBAudioViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -644,8 +667,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */,
-				D0C2DAA210240C0B001B1198 /* IMBPhotosView.xib in Resources */,
+				D0C2DAA210240C0B001B1198 /* IMBImageView.xib in Resources */,
 				D0C2DB6D1024DBCC001B1198 /* IMBLibraryView.xib in Resources */,
+				D08070C810442DAE00891137 /* IMBAudioView.xib in Resources */,
+				D08070CA10442DC800891137 /* IMBMovieView.xib in Resources */,
+				D08070EA10442F0500891137 /* IMBPanel.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -690,7 +716,7 @@
 				D08E8D851019EB4D005D8614 /* IMBMainThreadProxy.m in Sources */,
 				D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */,
 				D0C2DAF31024178E001B1198 /* IMBObjectViewController.m in Sources */,
-				D0C2DD0E1025905A001B1198 /* IMBPhotosViewController.m in Sources */,
+				D0C2DD0E1025905A001B1198 /* IMBImageViewController.m in Sources */,
 				D05A9494102EB022005DF9CE /* IMBImageCaptureParser.m in Sources */,
 				D049EF5610346C1C003CC49C /* IMBNodeCell.m in Sources */,
 				D049F00B1034993E003CC49C /* NSImage+iMedia.m in Sources */,
@@ -702,6 +728,8 @@
 				D0B6FABC1043243800280DDC /* IMBAudioFolderParser.m in Sources */,
 				D0B6FAC01043246800280DDC /* IMBMovieFolderParser.m in Sources */,
 				D0E96D1D104410BD0015979F /* IMBPanelController.m in Sources */,
+				D08070C010442CD700891137 /* IMBMovieViewController.m in Sources */,
+				D08070C410442CE100891137 /* IMBAudioViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

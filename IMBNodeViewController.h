@@ -120,7 +120,6 @@
 // Context menu support...
 
 - (NSMenu*) menuForNode:(IMBNode*)inNode;
-- (NSMenu*) menuForBackground;
 
 // Actions...
 

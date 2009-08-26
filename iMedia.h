@@ -78,7 +78,8 @@
 #import <iMedia/IMBObjectArrayController.h>
 #import <iMedia/IMBNodeViewController.h>
 #import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBPhotosViewController.h>
+#import <iMedia/IMBImageViewController.h>
+#import <iMedia/IMBPanelController.h>
 
 // Views...
 

@@ -49,8 +49,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBPhotosViewController.h"
-#import "IMBCommon.h"
+#import "IMBObjectViewController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,44 +57,10 @@
 
 #pragma mark 
 
-@implementation IMBPhotosViewController
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-+ (NSString*) mediaType
-{
-	return @"photos";
-}
-
-
-+ (NSString*) nibName
-{
-	return @"IMBPhotosView";
-}
-
-
-+ (NSString*) objectCountFormatSingular
-{
-	return IMBLocalizedString(
-		@"PhotoCountFormatSingular",
-		@"%d photo",
-		@"Format string for object count in singluar");
-}
-
-
-+ (NSString*) objectCountFormatPlural
-{
-	return IMBLocalizedString(
-		@"PhotoCountFormatPlural",
-		@"%d photos",
-		@"Format string for object count in plural");
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+@interface IMBMovieViewController : IMBObjectViewController
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
 

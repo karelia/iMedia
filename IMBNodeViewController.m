@@ -789,12 +789,6 @@ static NSString* kSelectionKey = @"selection";
 }
 
 
-- (BOOL) validateMenuItem:(NSMenuItem*)inMenuItem
-{
-	return inMenuItem.action == @selector(setSelectedNodeFromPopup:);
-}
-
-
 // This action is only called by a direct user event from the popup menu...
 
 - (IBAction) setSelectedNodeFromPopup:(id)inSender
@@ -828,25 +822,6 @@ static NSString* kSelectionKey = @"selection";
 
 
 #pragma mark 
-#pragma mark Context Menu
-
-
-- (NSMenu*) menuForNode:(IMBNode*)inNode
-{
-	return nil;
-}
-
-
-- (NSMenu*) menuForBackground
-{
-	return nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
 #pragma mark Actions
 
 
@@ -864,6 +839,9 @@ static NSString* kSelectionKey = @"selection";
 	IMBNode* node = [self selectedNode];
 	[self.libraryController reloadNode:node];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // We can always add a custom node...
@@ -888,7 +866,7 @@ static NSString* kSelectionKey = @"selection";
 - (BOOL) canRemoveNode
 {
 	IMBNode* node = [self selectedNode];
-	return node.parentNode==nil && node.parser.isCustom && !node.isLoading;
+	return node.isRootNode && node.parser.isCustom && !node.isLoading;
 }
 
 
@@ -896,6 +874,97 @@ static NSString* kSelectionKey = @"selection";
 {
 	IMBNode* node = [self selectedNode];
 	[self.libraryController removeCustomRootNode:node];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Context Menu
+
+
+- (NSMenu*) menuForNode:(IMBNode*)inNode
+{
+	NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"contextMenu"] autorelease];
+	NSMenuItem* item = nil;
+	NSString* title = nil;
+	
+	// First we'll add standard menu items...
+	
+	if (self.canAddNode)
+	{
+		title = NSLocalizedString(@"Add…",@"Menu item in context menu of outline view");
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(addNode:) keyEquivalent:@""];
+		[item setTarget:self];
+		[menu addItem:item];
+		[item release];
+	}
+	
+	if (inNode != nil && self.canRemoveNode)
+	{
+		title = NSLocalizedString(@"Remove",@"Menu item in context menu of outline view");
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(removeNode:) keyEquivalent:@""];
+		[item setTarget:self];
+		[menu addItem:item];
+		[item release];
+	}
+	
+	if (inNode != nil && self.canReloadNode)
+	{
+		title = NSLocalizedString(@"Reload",@"Menu item in context menu of outline view");
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(reloadNode:) keyEquivalent:@""];
+		[item setTarget:self];
+		[menu addItem:item];
+		[item release];
+	}
+	
+	// Then the parser can add custom menu items...
+	
+	if ([inNode.parser respondsToSelector:@selector(addMenuItemsToContextMenu:forNode:)])
+	{
+		[inNode.parser addMenuItemsToContextMenu:menu forNode:inNode];
+	}
+	
+	// Finally give the delegate a chance to add menu items...
+	
+	id delegate = self.libraryController.delegate;
+	
+	if (delegate!=nil && [delegate respondsToSelector:@selector(controller:willShowContextMenu:forNode:)])
+	{
+		[delegate controller:self.libraryController willShowContextMenu:menu forNode:inNode];
+	}
+	
+	return menu;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (BOOL) validateMenuItem:(NSMenuItem*)inMenuItem
+{
+	if (inMenuItem.action == @selector(setSelectedNodeFromPopup:))
+	{
+		return YES;
+	}
+
+	if (inMenuItem.action == @selector(addNode:))
+	{
+		return self.canAddNode;
+	}
+
+	if (inMenuItem.action == @selector(removeNode:))
+	{
+		return self.canRemoveNode;
+	}
+
+	if (inMenuItem.action == @selector(reloadNode:))
+	{
+		return self.canReloadNode;
+	}
+	
+	return NO;
 }
 
 

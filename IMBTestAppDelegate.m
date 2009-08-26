@@ -13,6 +13,7 @@
 #pragma mark HEADERS
 
 #import "IMBTestAppDelegate.h"
+#import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
 
 
@@ -24,6 +25,8 @@
 #define LOG_PARSERS 0
 #define LOG_CREATE_NODE 0
 #define LOG_POPULATE_NODE 0
+
+#define CUSTOM_USER_INTERFACE 0
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -45,6 +48,8 @@
 	[IMBConfig registerDefaultValues];
 	[IMBConfig setShowsGroupNodes:YES];
 	
+	#if CUSTOM_USER_INTERFACE
+	
 	// Load parsers...
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
@@ -62,7 +67,7 @@
 	NSView* nodeView = self.nodeViewController.view;
 	NSView* containerView = self.nodeViewController.objectContainerView;
 	
-	self.objectViewController = [IMBPhotosViewController viewControllerForLibraryController:libraryController];
+	self.objectViewController = [IMBImageViewController viewControllerForLibraryController:libraryController];
 	self.objectViewController.nodeViewController = self.nodeViewController;
 	NSView* objectView = self.objectViewController.view;
 
@@ -79,6 +84,17 @@
 	// Load the library...
 	
 	[libraryController reload];
+	[ibWindow makeKeyAndOrderFront:nil];
+	
+	#else
+	
+	// Just open the standard iMedia panel...
+	
+	NSArray* mediaTypes = [NSArray arrayWithObjects:kIMBMediaTypeImage,kIMBMediaTypeAudio,kIMBMediaTypeMovie,nil];
+	IMBPanelController* panelController = [IMBPanelController sharedPanelControllerWithDelegate:self mediaTypes:mediaTypes];
+	[panelController showWindow:nil];
+	
+	#endif
 }
 	
 
