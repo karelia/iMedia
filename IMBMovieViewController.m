@@ -80,6 +80,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (NSImage*) icon
+{
+	NSBundle* coreTypes = [NSBundle	bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
+	NSString* path = [coreTypes pathForResource:@"ToolbarMovieFolderIcon.icns" ofType:nil];
+	return [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+}
+
+
+- (NSString*) displayName
+{
+	return IMBLocalizedString(
+		@"ImagesDisplayName",
+		@"Movies",
+		@"mediaType display name");
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 + (NSString*) objectCountFormatSingular
 {
 	return IMBLocalizedString(
@@ -95,21 +115,6 @@
 		@"ImageCountFormatPlural",
 		@"%d movies",
 		@"Format string for object count in plural");
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSImage*) iconForMediaType
-{
-	NSString* identifier = @"com.apple.iMovie";
-
-	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:identifier];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(32,32)];
-	
-	return icon;
 }
 
 

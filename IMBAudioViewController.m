@@ -80,6 +80,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (NSImage*) icon
+{
+	return [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
+}
+
+
+- (NSString*) displayName
+{
+	return IMBLocalizedString(
+		@"ImagesDisplayName",
+		@"Audio",
+		@"mediaType display name");
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 + (NSString*) objectCountFormatSingular
 {
 	return IMBLocalizedString(
@@ -95,21 +113,6 @@
 		@"ImageCountFormatPlural",
 		@"%d songs",
 		@"Format string for object count in plural");
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSImage*) iconForMediaType
-{
-	NSString* identifier = @"com.apple.iTunes";
-
-	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:identifier];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(32,32)];
-	
-	return icon;
 }
 
 

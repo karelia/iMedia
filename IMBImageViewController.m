@@ -80,6 +80,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (NSImage*) icon
+{
+	return [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iPhoto"];
+}
+
+
+- (NSString*) displayName
+{
+	return IMBLocalizedString(
+		@"ImagesDisplayName",
+		@"Images",
+		@"mediaType display name");
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 + (NSString*) objectCountFormatSingular
 {
 	return IMBLocalizedString(
@@ -95,25 +113,6 @@
 		@"ImageCountFormatPlural",
 		@"%d images",
 		@"Format string for object count in plural");
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSImage*) iconForMediaType
-{
-	NSString* identifier = @"com.apple.iPhoto";
-	NSString* path = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
-
-	if (path == nil) identifier = @"com.apple.Preview";
-	path = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:identifier];
-	
-	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:identifier];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(32,32)];
-	
-	return icon;
 }
 
 

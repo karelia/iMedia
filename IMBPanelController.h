@@ -54,7 +54,8 @@
 	id _delegate;
 	NSArray* _mediaTypes;
 	NSMutableArray* _viewControllers;
-
+	NSString* _oldMediaType;
+	
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet NSToolbar* ibToolbar;
 }
@@ -66,6 +67,7 @@
 @property (retain) NSArray* mediaTypes;
 @property (retain) NSMutableArray* viewControllers;
 
+- (void) loadControllers;
 - (IBAction) showWindow:(id)inSender;
 - (IBAction) hideWindow:(id)inSender;
 

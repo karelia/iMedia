@@ -100,7 +100,7 @@
 
 // Save window frame to prefs...
 
-- (void) applicationWillTerminate:(NSNotification*)inNotification;
+- (void) applicationWillTerminate:(NSNotification*)inNotification
 {
 	NSString* frame = NSStringFromRect(ibWindow.frame);
 	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
