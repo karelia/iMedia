@@ -197,49 +197,67 @@
 		return nil;
 	}
 	
-	// Create an empty root node (without subnodes, but with empty objects array)...
+	// Create an empty root node...
 	
-	IMBNode* rootNode = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	
-	rootNode.parentNode = inOldNode.parentNode;
-	rootNode.mediaSource = self.mediaSource;
-	rootNode.identifier = [self identifierForPath:@"/"];
-	rootNode.name = @"iPhoto";
-	rootNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
-	rootNode.parser = self;
-	rootNode.leaf = NO;
-	rootNode.groupType = kIMBGroupTypeLibrary;
-
-	if (self.shouldDisplayLibraryName)
+	if (inOldNode == nil)
 	{
-		NSString* path = (NSString*)rootNode.mediaSource;
+		node.parentNode = nil;
+		node.mediaSource = self.mediaSource;
+		node.identifier = [self identifierForPath:@"/"];
+		node.name = @"iPhoto";
+		node.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
+		node.groupType = kIMBGroupTypeLibrary;
+		node.leaf = NO;
+		node.parser = self;
+	}
+	
+	// Or an empty subnode...
+	
+	else
+	{
+		node.parentNode = inOldNode.parentNode;
+		node.mediaSource = self.mediaSource;
+		node.identifier = inOldNode.identifier;
+		node.name = inOldNode.name;
+		node.icon = inOldNode.icon;
+		node.groupType = inOldNode.groupType;
+		node.leaf = inOldNode.leaf;
+		node.parser = self;
+	}
+	
+	// Set custom name on root nodes (if necessary)...
+	
+	if (node.isRootNode && self.shouldDisplayLibraryName)
+	{
+		NSString* path = (NSString*)node.mediaSource;
 		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
-		rootNode.name = [NSString stringWithFormat:@"%@ (%@)",rootNode.name,name];
+		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,name];
 	}
 
-	// Watch the XML file. Whenever something in iPhoto changes, we have to replace the WHOLE tree from the root 
-	// node down, as we have no way of finding WHAT has changed in iPhoto...
+	// Watch the XML file. Whenever something in iPhoto changes, we have to replace the WHOLE tree from  
+	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
 	
-	if (rootNode.isRootNode)
+	if (node.isRootNode)
 	{
-		rootNode.watcherType = kIMBWatcherTypeFSEvent;
-		rootNode.watchedPath = [(NSString*)rootNode.mediaSource stringByDeletingLastPathComponent];
+		node.watcherType = kIMBWatcherTypeFSEvent;
+		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
 	}
 	else
 	{
-		rootNode.watcherType = kIMBWatcherTypeNone;
+		node.watcherType = kIMBWatcherTypeNone;
 	}
 	
 	// If the old node was populated, then also populate the new node...
 	
-//	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
 	if (inOldNode.isPopulated)
 	{
-		[self populateNode:rootNode options:inOptions error:&error];
+		[self populateNode:node options:inOptions error:&error];
 	}
 	
 	if (outError) *outError = error;
-	return rootNode;
+	return node;
 }
 
 

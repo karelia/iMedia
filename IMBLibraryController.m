@@ -460,25 +460,37 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		groupNode.groupType = kIMBGroupTypeLibrary;
 		groupNode.identifier = @"group://LIBRARY";
-		groupNode.name = @"LIBRARIES";
+		groupNode.name = IMBLocalizedString(
+			@"LibrariesDisplayName",
+			@"LIBRARIES",
+			@"group node display name");
 	}
 	else if (groupType == kIMBGroupTypeFolder)
 	{
 		groupNode.groupType = kIMBGroupTypeFolder;
 		groupNode.identifier = @"group://FOLDER";
-		groupNode.name = @"FOLDERS";
+		groupNode.name = IMBLocalizedString(
+			@"FoldersDisplayName",
+			@"FOLDERS",
+			@"group node display name");
 	}
 	else if (groupType == kIMBGroupTypeSearches)
 	{
 		groupNode.groupType = kIMBGroupTypeSearches;
 		groupNode.identifier = @"group://SEARCHES";
-		groupNode.name = @"SEARCHES";
+		groupNode.name = IMBLocalizedString(
+			@"SearchesDisplayName",
+			@"SEARCHES",
+			@"group node display name");
 	}
 	else if (groupType == kIMBGroupTypeInternet)
 	{
 		groupNode.groupType = kIMBGroupTypeInternet;
 		groupNode.identifier = @"group://INTERNET";
-		groupNode.name = @"INTERNET";
+		groupNode.name = IMBLocalizedString(
+			@"InternetDisplayName",
+			@"INTERNET",
+			@"group node display name");
 	}
 	
 	groupNode.parser = inNewNode.parser;	// Important to make lookup in -[IMBNode indexPath] work correctly!
@@ -583,19 +595,19 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	// Hide empty group nodes that do not have any subnodes...
 	
-//	if ([IMBConfig hidesEmptyGroupNodes])
-//	{
-//		NSInteger n =  self.rootNodes.count;
-//		for (NSInteger i=n-1; i>=0; i--)
-//		{
-//			IMBNode* node = [self.rootNodes objectAtIndex:i];
-//			
-//			if (node.isGroup && node.subNodes.count==0)
-//			{
-//				[self.rootNodes removeObjectIdenticalTo:node];
-//			}
-//		}
-//	}
+	if (NO)
+	{
+		NSInteger n =  self.rootNodes.count;
+		for (NSInteger i=n-1; i>=0; i--)
+		{
+			IMBNode* node = [self.rootNodes objectAtIndex:i];
+			
+			if (node.isGroup && node.subNodes.count==0)
+			{
+				[self.rootNodes removeObjectIdenticalTo:node];
+			}
+		}
+	}
 	
 	// Sort the root nodes and first level of group nodes...
 	

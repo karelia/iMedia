@@ -230,6 +230,9 @@
 
 	// Add the spinning wheel subview if we are currently loading a node...
 	
+//	NSImageNameRefreshTemplate
+//	NSImageNameRefreshFreestandingTemplate
+	
 //	NSRect badgeRect = [self badgeRectForBounds:inFrame flipped:isFlipped];
 //	NSImage* badge = [NSImage imageNamed:NSImageNameFollowLinkFreestandingTemplate];
 //	[badge compositeToPoint:badgeRect.origin operation:NSCompositeSourceOver fraction:0.5];
