@@ -563,7 +563,15 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	{
 		for (NSString* path in inObjectPromise.localFiles)
 		{
-			[[NSWorkspace threadSafeWorkspace] openFile:path];
+			NSURL* pathURL = [NSURL URLWithString:path];
+			if ([pathURL isFileURL])
+			{
+				[[NSWorkspace threadSafeWorkspace] openFile:path];
+			} 
+			else 
+			{
+				[[NSWorkspace threadSafeWorkspace] openURL:pathURL];
+			}
 		}
 	}
 	else

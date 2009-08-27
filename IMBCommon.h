@@ -78,6 +78,7 @@ enum
 {
 	kIMBBadgeTypeNone,
 	kIMBBadgeTypeLoading,
+	kIMBBadgeTypeReload,
 	kIMBBadgeTypeStop,
 	kIMBBadgeTypeEject,
 	kIMBBadgeTypeOffline

@@ -15,6 +15,7 @@
 #import "IMBTestAppDelegate.h"
 #import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
+#import "SampleAPIKey.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -147,6 +148,14 @@
 	#if LOG_PARSERS
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
 	#endif
+
+	if ([inParser isKindOfClass:[IMBFlickrParser class]])
+	{
+		#warning Supply your own Flickr API key and shared secret, or apply for key and secret at: http://flickr.com/services/api/keys/apply
+		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
+		flickrParser.flickrAPIKey = OBJECTIVE_FLICKR_SAMPLE_API_KEY;
+		flickrParser.flickrSharedSecret = OBJECTIVE_FLICKR_SAMPLE_API_SHARED_SECRET;
+	}
 }
 
 

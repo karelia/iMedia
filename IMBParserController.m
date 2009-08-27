@@ -235,7 +235,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 				// First ask the delegate whether we should load this parser...
 				
 				BOOL shouldLoad = YES;
-				IMBParser* parser = nil;
 				
 				if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldLoadParser:forMediaType:)])
 				{
@@ -257,7 +256,10 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 					
 					if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didLoadParser:forMediaType:)])
 					{
-						[_delegate controller:self didLoadParser:parser forMediaType:mediaType];
+						for (IMBParser* parser in parsers) 
+						{
+							[_delegate controller:self didLoadParser:parser forMediaType:mediaType];
+						}
 					}
 				}
 			}

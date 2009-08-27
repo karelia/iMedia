@@ -147,7 +147,7 @@
 		NSNumber* row = [NSNumber numberWithInt:i];
 		NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 		
-		if (wheel == nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)
+		if (wheel == nil && node != nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)
 		{
 			NSRect badgeRect = [self badgeRectForRow:i];
 			NSProgressIndicator* wheel = [[NSProgressIndicator alloc] initWithFrame:badgeRect];
@@ -187,6 +187,7 @@
 	}
 
 	IMBNodeViewController* controller = (IMBNodeViewController*) self.delegate;
+	if (node) [controller selectNode:node];
 	return [controller menuForNode:node];
 }
 
