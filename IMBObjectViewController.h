@@ -136,8 +136,11 @@ typedef NSUInteger kIMBObjectViewType;
 @property (assign) double iconSize;
 @property (readonly) BOOL canUseIconSize;
 
-// Localized string for object count...
+// User Interface...
  
+- (NSImage*) icon;
+- (NSString*) displayName;
+
 @property (retain) NSString* objectCountFormatSingular;
 @property (retain) NSString* objectCountFormatPlural;
 @property (readonly) NSString* objectCountString;
@@ -145,12 +148,10 @@ typedef NSUInteger kIMBObjectViewType;
 // Context menu support...
 
 - (NSMenu*) menuForObject:(IMBObject*)inObject;
-- (NSMenu*) menuForBackground;
 
 // Helpers...
 
 - (void) openObject:(IMBObject*)inObject inSelectedNode:(IMBNode*)inSelectedNode;
-- (NSImage*) iconForMediaType;
 
 @end
 

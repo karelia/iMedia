@@ -230,34 +230,27 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-
-// Subclasses can override these methods to configure or customize look & feel of the various object views...
-
-- (void) _configureIconView
+- (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
 {
-	// Make the IKImageBrowserView use our custom cell class. Please note that we check for the existence 
-	// of the base class first, as it is un undocumented internal class on 10.5. In 10.6 it is always there...
+	// If the array itself has changed then display the new object count...
 	
-	if ([ibIconView respondsToSelector:@selector(setCellClass:)] && NSClassFromString(@"IKImageBrowserCell"))
+	if (inContext == (void*)kArrangedObjectsKey)
 	{
-		[ibIconView performSelector:@selector(setCellClass:) withObject:[IMBImageBrowserCell class]];
+//		[self _reloadIconView];
+		[self willChangeValueForKey:kObjectCountStringKey];
+		[self didChangeValueForKey:kObjectCountStringKey];
 	}
-}
-
-
-- (void) _configureListView
-{
-	[ibListView setTarget:self];
-	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
-}
-
-
-- (void) _configureComboView
-{
-	[ibComboView setTarget:self];
-	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
+	
+	// If single thumbnails have changed (due to asynchronous loading) then trigger a reload of the IKIMageBrowserView...
+	
+	else if (inContext == (void*)kImageRepresentationKey)
+	{
+		[self _reloadIconView];
+	}
+	else
+	{
+		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
+	}
 }
 
 
@@ -331,8 +324,47 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 
 #pragma mark 
-#pragma mark View Options 
+#pragma mark User Interface
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+
+// Subclasses can override these methods to configure or customize look & feel of the various object views...
+
+- (void) _configureIconView
+{
+	// Make the IKImageBrowserView use our custom cell class. Please note that we check for the existence 
+	// of the base class first, as it is un undocumented internal class on 10.5. In 10.6 it is always there...
+	
+	if ([ibIconView respondsToSelector:@selector(setCellClass:)] && NSClassFromString(@"IKImageBrowserCell"))
+	{
+		[ibIconView performSelector:@selector(setCellClass:) withObject:[IMBImageBrowserCell class]];
+	}
+}
+
+
+- (void) _configureListView
+{
+	[ibListView setTarget:self];
+	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
+}
+
+
+- (void) _configureComboView
+{
+	[ibComboView setTarget:self];
+	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Availability of the icon size slide depends on the view type (e.g. not available in list view...
 
 - (void) setViewType:(NSUInteger)inViewType
 {
@@ -349,34 +381,6 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Object Count
-
-	
-- (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
-{
-	// If the array itself has changed then display the new object count...
-	
-	if (inContext == (void*)kArrangedObjectsKey)
-	{
-//		[self _reloadIconView];
-		[self willChangeValueForKey:kObjectCountStringKey];
-		[self didChangeValueForKey:kObjectCountStringKey];
-	}
-	
-	// If single thumbnails have changed (due to asynchronous loading) then trigger a reload of the IKIMageBrowserView...
-	
-	else if (inContext == (void*)kImageRepresentationKey)
-	{
-		[self _reloadIconView];
-	}
-	else
-	{
-		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
-	}
-}
 
 
 - (void) _reloadIconView
@@ -397,17 +401,22 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-#pragma mark Context Menu 
-
-
-- (NSMenu*) menuForObject:(IMBObject*)inObject
+- (NSImage*) icon
 {
-	return nil;
+	return nil;	// Must be overridden by subclass
 }
 
 
-- (NSMenu*) menuForBackground;
+- (NSString*) displayName
+{
+	return nil;	// Must be overridden by subclass
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSMenu*) menuForObject:(IMBObject*)inObject
 {
 	return nil;
 }
@@ -561,15 +570,6 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	{
 		[NSApp presentError:inError];
 	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSImage*) iconForMediaType
-{
-	return nil;
 }
 
 
