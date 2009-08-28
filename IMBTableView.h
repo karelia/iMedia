@@ -47,53 +47,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-@interface IMBPanelController : NSWindowController
-{
-	id _delegate;
-	NSArray* _mediaTypes;
-	NSMutableArray* _viewControllers;
-	NSMutableDictionary* _loadedLibraries;
-	NSString* _oldMediaType;
-	
-	IBOutlet NSTabView* ibTabView;
-	IBOutlet NSToolbar* ibToolbar;
-}
-
-+ (IMBPanelController*) sharedPanelController;
-+ (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
-
-@property (assign) id delegate;
-@property (retain) NSArray* mediaTypes;
-@property (retain) NSMutableArray* viewControllers;
-@property (retain) NSMutableDictionary* loadedLibraries;
-@property (retain) NSString* oldMediaType;
-
-- (void) loadControllers;
-- (IBAction) showWindow:(id)inSender;
-- (IBAction) hideWindow:(id)inSender;
+@interface IMBTableView : NSTableView
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@protocol IMBPanelDelegate
-
-@optional
-
-- (BOOL) controller:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-

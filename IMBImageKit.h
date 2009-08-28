@@ -607,10 +607,10 @@ struct __NSRect {
 - (id)delegate;
 - (void)setDelegate:(id)fp8;
 - (void)zoomValueDidChange;
-- (struct _NSSize)cellSize;
+- (struct __NSSize)cellSize;
 - (void)setCellSize:(struct _NSSize)fp8;
 - (void)setImageBoundingBoxSize:(struct _NSSize)fp8;
-- (struct _NSSize)imageBoundingBoxSize;
+- (struct __NSSize)imageBoundingBoxSize;
 - (void)setZoomValue:(float)fp8;
 - (float)zoomValue;
 - (BOOL)maximizedMode;

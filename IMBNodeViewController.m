@@ -680,9 +680,16 @@ static NSString* kSelectionKey = @"selection";
 {
 	if (inNode)
 	{	
-		NSIndexPath* indexPath = inNode.indexPath;
-		[ibNodeTreeController setSelectionIndexPath:indexPath];
-		[self.libraryController populateNode:inNode];
+		if (inNode.isGroup)
+		{
+			[ibNodeTreeController setSelectionIndexPaths:nil];
+		}
+		else
+		{
+			NSIndexPath* indexPath = inNode.indexPath;
+			[ibNodeTreeController setSelectionIndexPath:indexPath];
+			[self.libraryController populateNode:inNode];
+		}
 	}	
 }
 
@@ -825,30 +832,12 @@ static NSString* kSelectionKey = @"selection";
 #pragma mark Actions
 
 
-// A node can be reloaded if it is not already being loaded, expanded, or populated in a background operation...
-
-- (BOOL) canReloadNode
-{
-	IMBNode* node = [self selectedNode];
-	return !node.isLoading;
-}
-
-
-- (IBAction) reloadNode:(id)inSender
-{
-	IMBNode* node = [self selectedNode];
-	[self.libraryController reloadNode:node];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// We can always add a custom node...
+// We can always add a custom node (folder) is we clicked on the background or if the folders group node is selected...
 
 - (BOOL) canAddNode
 {
-	return YES;
+	IMBNode* node = [self selectedNode];
+	return node == nil || node.isGroup && node.groupType == kIMBGroupTypeFolder;
 }
 
 
@@ -880,6 +869,25 @@ static NSString* kSelectionKey = @"selection";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// A node can be reloaded if it is not already being loaded, expanded, or populated in a background operation...
+
+- (BOOL) canReloadNode
+{
+	IMBNode* node = [self selectedNode];
+	return node!=nil && !node.isGroup && !node.isLoading;
+}
+
+
+- (IBAction) reloadNode:(id)inSender
+{
+	IMBNode* node = [self selectedNode];
+	[self.libraryController reloadNode:node];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 #pragma mark Context Menu
 
@@ -892,27 +900,39 @@ static NSString* kSelectionKey = @"selection";
 	
 	// First we'll add standard menu items...
 	
-	if (self.canAddNode)
+	if (inNode==nil || inNode.isGroup && inNode.groupType==kIMBGroupTypeFolder)
 	{
-		title = NSLocalizedString(@"Add…",@"Menu item in context menu of outline view");
+		title = IMBLocalizedString(
+			@"IMBNodeViewController.menuItem.add",
+			@"Add…",
+			@"Menu item in context menu of outline view");
+
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(addNode:) keyEquivalent:@""];
 		[item setTarget:self];
 		[menu addItem:item];
 		[item release];
 	}
 	
-	if (inNode != nil && self.canRemoveNode)
+	if (inNode!=nil && inNode.parser.isCustom && !inNode.isLoading)
 	{
-		title = NSLocalizedString(@"Remove",@"Menu item in context menu of outline view");
+		title = IMBLocalizedString(
+			@"IMBNodeViewController.menuItem.remove",
+			@"Remove",
+			@"Menu item in context menu of outline view");
+
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(removeNode:) keyEquivalent:@""];
 		[item setTarget:self];
 		[menu addItem:item];
 		[item release];
 	}
 	
-	if (inNode != nil && self.canReloadNode)
+	if (inNode!=nil && !inNode.isGroup && !inNode.isLoading)
 	{
-		title = NSLocalizedString(@"Reload",@"Menu item in context menu of outline view");
+		title = IMBLocalizedString(
+			@"IMBNodeViewController.menuItem.reload",
+			@"Reload",
+			@"Menu item in context menu of outline view");
+
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(reloadNode:) keyEquivalent:@""];
 		[item setTarget:self];
 		[menu addItem:item];

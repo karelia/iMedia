@@ -103,7 +103,16 @@
 
 - (NSImage*) icon
 {
-	NSString* extension = [(NSString*)_value pathExtension];
+	NSString* path = nil;
+	
+	if ([_value isKindOfClass:[NSURL class]])
+		path = [(NSURL*)_value path];
+	else if ([_value isKindOfClass:[NSString class]])
+		path = (NSString*)_value;
+		
+	NSString* extension = [path pathExtension];
+	if (extension==nil || [extension length]==0) extension = @"jpg";
+	
 	return [[NSWorkspace sharedWorkspace] iconForFileType:extension];
 }
 

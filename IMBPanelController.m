@@ -79,7 +79,8 @@ static IMBPanelController* sSharedPanelController = nil;
 @synthesize delegate = _delegate;
 @synthesize mediaTypes = _mediaTypes;
 @synthesize viewControllers = _viewControllers;
-
+@synthesize loadedLibraries = _loadedLibraries;
+@synthesize oldMediaType = _oldMediaType;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,7 +126,8 @@ static IMBPanelController* sSharedPanelController = nil;
 	if (self = [super initWithWindowNibName:@"IMBPanel"])
 	{
 		self.viewControllers = [NSMutableArray array];
-
+		self.loadedLibraries = [NSMutableDictionary dictionary];
+		
 		[[NSNotificationCenter defaultCenter] 
 			addObserver:self 
 			selector:@selector(applicationWillTerminate:) 
@@ -143,6 +145,7 @@ static IMBPanelController* sSharedPanelController = nil;
 
 	IMBRelease(_mediaTypes);
 	IMBRelease(_viewControllers);
+	IMBRelease(_loadedLibraries);
 	IMBRelease(_oldMediaType);
 	
 	[super dealloc];
@@ -173,7 +176,6 @@ static IMBPanelController* sSharedPanelController = nil;
 		
 		libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
 		[libraryController setDelegate:self];
-		[libraryController reload];
 
 		// Create the node view controllers for each media type...
 		
@@ -352,14 +354,24 @@ static IMBPanelController* sSharedPanelController = nil;
 }
 
 
-// Notify the delegate that we are about to switch...
+// We are about to switch tabs...
 
 - (void) tabView:(NSTabView*)inTabView willSelectTabViewItem:(NSTabViewItem*)inTabViewItem
 {
-	IMBRelease(_oldMediaType);
-	_oldMediaType = [inTabView.selectedTabViewItem.identifier retain];
+	self.oldMediaType = inTabView.selectedTabViewItem.identifier;
 	NSString* newMediaType = inTabViewItem.identifier;
+
+	// If the library for the new tab has been loaded yet then do it now...
 	
+	if ([_loadedLibraries objectForKey:newMediaType] == nil)
+	{
+		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:newMediaType];
+		[libraryController reload];
+		[_loadedLibraries setObject:newMediaType forKey:newMediaType];
+	}
+	
+	// Notify the delegate...
+
 	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:willHidePanelForMediaType:)])
 	{
 		return [_delegate controller:self willHidePanelForMediaType:_oldMediaType];

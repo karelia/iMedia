@@ -129,7 +129,6 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-
 + (void) registerDefaultValues
 {
 	NSString* path = [NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"];
@@ -169,8 +168,6 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 {
 	return [self prefsValueForKey:sIMBDownloadFolderPathKey];
 }
-
-
 
 
 //----------------------------------------------------------------------------------------------------------------------

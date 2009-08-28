@@ -126,6 +126,7 @@
 	}
 	else
 	{
+		newNode.groupType = kIMBGroupTypeNone;
 		newNode.includedInPopup = NO;
 	}
 	

@@ -307,11 +307,12 @@
 - (IMBNode*) createRecentPhotosNodeForRoot: (IMBNode*) root {
 	IMBNode* node = [self createGenericFlickrNodeForRoot:root];
 	node.mediaSource = @"recent-100";
-	node.icon = [self iconForAlbumType:@"Photos"];
+	node.icon = [self smartFolderIcon];
 	node.identifier = node.mediaSource;
 	node.name = @"Recent 100 Images";
 	
-	[node setFlickrMethod:@"flickr.photos.getRecent"
+//	[node setFlickrMethod:@"flickr.photos.getRecent"
+	[node setFlickrMethod:@"flickr.interestingness.getList"
 				arguments:[NSDictionary dictionaryWithObjectsAndKeys:@"100", @"per_page", nil]];
 	
 	return node;
