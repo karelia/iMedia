@@ -81,8 +81,8 @@
 }
 
 @property (readonly) NSString* imageUID;
-@property (retain) id imageRepresentation;					// NSString, NSURL, NSImage, CIImage, or CGImageRef
-@property (retain) NSString* imageRepresentationType;		// See IKImageBrowserItem for possible values
+@property (retain) id imageRepresentation;					///< NSString, NSURL, NSImage, CIImage, or CGImageRef
+@property (retain) NSString* imageRepresentationType;		///< See IKImageBrowserItem for possible values
 @property (readonly) NSString* imageTitle;
 @property (assign) NSUInteger imageVersion;
 

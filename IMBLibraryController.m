@@ -943,7 +943,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		 selector:(SEL)inSelector 
 		 target:(id)inTarget
 {
-	if (inNode)
+	if (inNode!=nil && inNode.includedInPopup)
 	{
 		// Create a menu item with the node name...
 		
@@ -951,6 +951,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		if (name == nil) name = @"";
 
 		NSImage* icon = inNode.icon;
+		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16,16)];
 		
 		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:nil keyEquivalent:@""];

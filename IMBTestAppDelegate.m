@@ -15,7 +15,6 @@
 #import "IMBTestAppDelegate.h"
 #import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
-#import "SampleAPIKey.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -153,8 +152,8 @@
 	{
 		#warning Supply your own Flickr API key and shared secret, or apply for key and secret at: http://flickr.com/services/api/keys/apply
 		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
-		flickrParser.flickrAPIKey = OBJECTIVE_FLICKR_SAMPLE_API_KEY;
-		flickrParser.flickrSharedSecret = OBJECTIVE_FLICKR_SAMPLE_API_SHARED_SECRET;
+		flickrParser.flickrAPIKey = nil;
+		flickrParser.flickrSharedSecret = nil;
 	}
 }
 

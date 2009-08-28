@@ -115,15 +115,20 @@
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForPath:path]; 
 	newNode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
-	newNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+	newNode.icon = [self iconForPath:path];
 	newNode.parser = self;
 	newNode.leaf = NO;
-
-	if (newNode.parentNode == nil)
+	
+	if (newNode.isRootNode)
 	{
 		newNode.groupType = kIMBGroupTypeFolder;
+		newNode.includedInPopup = YES;
 	}
-		
+	else
+	{
+		newNode.includedInPopup = NO;
+	}
+	
 	// Enable FSEvents based file watching for root nodes...
 	
 	if (newNode.isRootNode)
@@ -223,9 +228,11 @@
 			subnode.mediaSource = folder;
 			subnode.identifier = [[self class] identifierForPath:folder];
 			subnode.name = name;
-			subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:folder];
+			subnode.icon = [self iconForPath:folder]; //[[NSWorkspace threadSafeWorkspace] iconForFile:folder];
 			subnode.parser = self;
 			subnode.leaf = NO;
+			subnode.includedInPopup = NO;
+
 			[subnodes addObject:subnode];
 			[subnode release];
 
@@ -259,6 +266,15 @@
 	return (BOOL) UTTypeConformsTo((CFStringRef)uti,(CFStringRef)inRequiredUTI);
 }
 
+
+- (NSImage*) iconForPath:(NSString*)inPath
+{
+	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:inPath];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16,16)];
+	return icon;
+}
+	
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {

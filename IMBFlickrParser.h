@@ -46,7 +46,11 @@
 //  Created by Christoph Priebe on 2009-08-24.
 //  Copyright 2009 Christoph Priebe. All rights reserved.
 
-//	Systemx
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+//	System
 #import <Cocoa/Cocoa.h>
 
 //	Objective Flickr
@@ -55,6 +59,8 @@
 //	iMedia
 #import "IMBParser.h"
 
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 /**
@@ -73,28 +79,6 @@
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#import "IMBNode.h"
-
-@interface IMBNode (FlickrParserAdditions)
-
-- (void) clearResponse;
-- (OFFlickrAPIRequest*) flickrRequestWithContext: (OFFlickrAPIContext*) context;
-- (NSDictionary*) flickrResponse;
-- (BOOL) hasFlickrRequest;
-- (BOOL) hasFlickrResponse;
-- (void) setFlickrMethod: (NSString*) method arguments: (NSDictionary*) arguments;
-- (void) setFlickrResponse: (NSDictionary*) response;
-- (void) startFlickrRequestWithContext: (OFFlickrAPIContext*) context delegate: (id) delegate;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 @interface IMBFlickrParser: IMBParser <OFFlickrAPIRequestDelegate> {

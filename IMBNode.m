@@ -94,6 +94,7 @@
 @synthesize leaf = _leaf;
 @synthesize loading = _loading;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
+@synthesize includedInPopup = _includedInPopup;
 
 // Support for live watching...
 
@@ -120,7 +121,8 @@
 		self.leaf = NO;
 		self.loading = NO;
 		self.wantsRecursiveObjects = NO;
-
+		self.includedInPopup = YES;
+		
 		self.objects = nil;
 		self.subNodes = nil;
 		
@@ -148,7 +150,8 @@
 	copy.leaf = self.leaf;
 	copy.loading = self.loading;
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
-
+	copy.includedInPopup = self.includedInPopup;
+	
 	copy.parentNode = self.parentNode;
 	copy.parser = self.parser;
 	copy.watcherType = self.watcherType;
