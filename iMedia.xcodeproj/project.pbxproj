@@ -27,6 +27,8 @@
 		D08070C810442DAE00891137 /* IMBAudioView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070C710442DAE00891137 /* IMBAudioView.xib */; };
 		D08070CA10442DC800891137 /* IMBMovieView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070C910442DC800891137 /* IMBMovieView.xib */; };
 		D08070EA10442F0500891137 /* IMBPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070E910442F0500891137 /* IMBPanel.xib */; };
+		D08C5C9E104862540068FF07 /* IMBTextFieldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */; };
+		D08C5C9F104862540068FF07 /* IMBTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D08C5C9D104862540068FF07 /* IMBTextFieldCell.m */; };
 		D08E8B701019C916005D8614 /* UKFNSubscribeFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8B721019C916005D8614 /* UKFSEventsWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B6A1019C916005D8614 /* UKFSEventsWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8B741019C916005D8614 /* UKKQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B6C1019C916005D8614 /* UKKQueue.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -118,6 +120,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		D08F391D10487A43004A9468 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 6A8666480F9593B200325E1C /* ObjectiveFlickr (framework) */;
+			remoteInfo = "ObjectiveFlickr (framework)";
+		};
 		D09934591011B6FA00C527B7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -182,6 +191,8 @@
 		D08070C710442DAE00891137 /* IMBAudioView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBAudioView.xib; sourceTree = "<group>"; };
 		D08070C910442DC800891137 /* IMBMovieView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBMovieView.xib; sourceTree = "<group>"; };
 		D08070E910442F0500891137 /* IMBPanel.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBPanel.xib; sourceTree = "<group>"; };
+		D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTextFieldCell.h; sourceTree = "<group>"; };
+		D08C5C9D104862540068FF07 /* IMBTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTextFieldCell.m; sourceTree = "<group>"; };
 		D08E8B661019C916005D8614 /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UKFileWatcher.h; sourceTree = "<group>"; };
 		D08E8B671019C916005D8614 /* UKFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UKFileWatcher.m; sourceTree = "<group>"; };
 		D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UKFNSubscribeFileWatcher.h; sourceTree = "<group>"; };
@@ -467,9 +478,11 @@
 				D0BE0A8B104802A7009AE844 /* IMBTableView.m */,
 				D049EF5310346C1C003CC49C /* IMBNodeCell.h */,
 				D049EF5410346C1C003CC49C /* IMBNodeCell.m */,
+				D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */,
+				D08C5C9D104862540068FF07 /* IMBTextFieldCell.m */,
+				D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */,
 				D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */,
 				D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */,
-				D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */,
 				D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */,
 				D0C2DAA110240C0B001B1198 /* IMBImageView.xib */,
 				D08070C710442DAE00891137 /* IMBAudioView.xib */,
@@ -639,6 +652,7 @@
 				D08070C310442CE100891137 /* IMBAudioViewController.h in Headers */,
 				D0B779651047B65D00D12548 /* IMBFlickrParser.h in Headers */,
 				D0BE0A8C104802A7009AE844 /* IMBTableView.h in Headers */,
+				D08C5C9E104862540068FF07 /* IMBTextFieldCell.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -657,6 +671,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				D08F391E10487A43004A9468 /* PBXTargetDependency */,
 			);
 			name = iMedia;
 			productInstallPath = "$(HOME)/Library/Frameworks";
@@ -796,6 +811,7 @@
 				D08070C410442CE100891137 /* IMBAudioViewController.m in Sources */,
 				D062B0F81047B75100CA9B56 /* IMBFlickrParser.m in Sources */,
 				D0BE0A8D104802A7009AE844 /* IMBTableView.m in Sources */,
+				D08C5C9F104862540068FF07 /* IMBTextFieldCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -811,6 +827,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		D08F391E10487A43004A9468 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "ObjectiveFlickr (framework)";
+			targetProxy = D08F391D10487A43004A9468 /* PBXContainerItemProxy */;
+		};
 		D099345A1011B6FA00C527B7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* iMedia */;

@@ -431,10 +431,11 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	for (NSDictionary* info in customParsers)
 	{
 		Class parserClass = NSClassFromString([info objectForKey:@"className"]);
-		IMBParser* parser = [[parserClass alloc] init];
+		NSString* mediaType = [info objectForKey:@"mediaType"];
+		IMBParser* parser = [[parserClass alloc] initWithMediaType:mediaType];
 		
 		parser.mediaSource = [info objectForKey:@"mediaSource"];
-		parser.mediaType = [info objectForKey:@"mediaType"];
+		parser.mediaType = mediaType;
 		parser.custom = YES;
 		
 		[self addCustomParser:parser forMediaType:parser.mediaType];

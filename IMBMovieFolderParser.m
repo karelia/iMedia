@@ -61,6 +61,7 @@
 
 @implementation IMBMovieFolderParser
 
+
 // Restrict this parser to image files...
 
 - (id) initWithMediaType:(NSString*)inMediaType
@@ -73,6 +74,15 @@
 	return self;
 }
 
+
+// Return metadata specific to audio files...
+
+- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
+{
+	return nil;
+}
+
+
 @end
 
 
@@ -83,6 +93,7 @@
 
 @implementation IMBMoviesFolderParser
 
+
 // Register this parser, so that it gets automatically loaded...
 
 + (void) load
@@ -91,6 +102,7 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
 	[pool release];
 }
+
 
 // Set the folder path to the ~/Pictures...
 
@@ -103,6 +115,7 @@
 	
 	return self;
 }
+
 
 @end
 

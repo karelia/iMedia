@@ -52,6 +52,7 @@
 #import "IMBOutlineView.h"
 #import "IMBNodeViewController.h"
 #import "IMBNode.h"
+#import "IMBTextFieldCell.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,6 +61,12 @@
 #pragma mark
 
 @implementation IMBOutlineView
+
+@synthesize draggingPrompt = _draggingPrompt;
+@synthesize textCell = _textCell;
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (id) initWithFrame:(NSRect)inFrame
@@ -84,9 +91,29 @@
 }
 
 
+- (void) awakeFromNib
+{
+	self.draggingPrompt = IMBLocalizedString(
+		@"IMBOutlineView.draggingPrompt",
+		@"Drag additional folders here",
+		@"String that is displayed in the IMBOutlineView");
+
+	CGFloat size = [NSFont systemFontSizeForControlSize:NSSmallControlSize];
+	NSFont* font = [NSFont boldSystemFontOfSize:size];
+	
+	self.textCell = [[[IMBTextFieldCell alloc] initTextCell:@""] autorelease];
+	[self.textCell setAlignment:NSCenterTextAlignment];
+	[self.textCell setVerticalAlignment:kIMBBottomTextAlignment];
+	[self.textCell setFont:font];
+	[self.textCell setTextColor:[NSColor grayColor]];
+}
+
+
 - (void) dealloc
 {
 	IMBRelease(_subviewsInVisibleRows);
+	IMBRelease(_draggingPrompt);
+	IMBRelease(_textCell);
     [super dealloc];
 }
 
@@ -172,6 +199,37 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (void) drawRect:(NSRect)inRect	
+{
+	// First draw the NSOutlineView...
+	
+	[super drawRect:inRect];
+	
+	// Then draw the prompt string at the bottom...
+	
+	const CGFloat MARGIN_BELOW = 15.0;
+	const CGFloat FADE_AREA = 35.0;
+	CGFloat viewHeight = self.bounds.size.height;
+	CGFloat dataHeight = self.rowHeight * self.numberOfRows;	
+	
+	if (dataHeight+MARGIN_BELOW <= viewHeight)
+	{
+		CGFloat fadeHeight = MIN(viewHeight-dataHeight,MARGIN_BELOW+FADE_AREA) - MARGIN_BELOW;
+		CGFloat alpha = (float)fadeHeight / FADE_AREA;
+
+		NSTextFieldCell* textCell = self.textCell;
+		[textCell setTextColor:[NSColor colorWithCalibratedWhite:0.66667 alpha:alpha]];
+		[textCell setStringValue:self.draggingPrompt];
+		
+		NSRect textRect = NSInsetRect([self visibleRect], 12.0, 12.0);
+		[textCell drawWithFrame:textRect inView:self];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Ask the IMBNodeViewController (which is our delegate) to return a context menu for the clicked node. If  
 // the user clicked on the background node is nil...
 
@@ -189,7 +247,7 @@
 	}
 
 	IMBNodeViewController* controller = (IMBNodeViewController*) self.delegate;
-	if (node) [controller selectNode:node];
+	[controller selectNode:node];
 	return [controller menuForNode:node];
 }
 

@@ -138,7 +138,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 // Custom nodes...
 
-- (void) addCustomRootNodeForFolder:(NSString*)inPath;
+- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath;
 - (BOOL) removeCustomRootNode:(IMBNode*)inNode;
 
 // Popup menu...
