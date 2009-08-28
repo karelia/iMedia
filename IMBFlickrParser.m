@@ -66,6 +66,24 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+@interface IMBNode (FlickrParserAdditions)
+
+- (void) clearResponse;
+- (OFFlickrAPIRequest*) flickrRequestWithContext: (OFFlickrAPIContext*) context;
+- (NSDictionary*) flickrResponse;
+- (BOOL) hasFlickrRequest;
+- (BOOL) hasFlickrResponse;
+- (void) setFlickrMethod: (NSString*) method arguments: (NSDictionary*) arguments;
+- (void) setFlickrResponse: (NSDictionary*) response;
+- (void) startFlickrRequestWithContext: (OFFlickrAPIContext*) context delegate: (id) delegate;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 //	Some additions to the iMB node useful for Flickr handling:
 @implementation IMBNode (FlickrParserAdditions)
 
@@ -256,6 +274,16 @@
 /// ... JUST TEMP TO PLEASE THE EYE
 
 
+- (NSImage*) smartFolderIcon {
+	NSBundle* coreTypes = [NSBundle	bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
+	NSString* path = [coreTypes pathForResource:@"SmartFolderIcon.icns" ofType:nil];
+	NSImage* icon = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16.0,16.0)];
+	return icon;
+}
+
+	
 - (IMBNode*) createGenericFlickrNodeForRoot: (IMBNode*) root {
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	node.parentNode = root;
@@ -296,7 +324,7 @@
 	
 	IMBNode* node = [self createGenericFlickrNodeForRoot:root];
 	node.mediaSource = [NSString stringWithFormat:@"search:%@", text];
-	node.icon = [self iconForAlbumType:@"Smart"];
+	node.icon = [self smartFolderIcon];
 	node.identifier = node.mediaSource;
 	node.name = title;
 	
@@ -315,9 +343,9 @@
 	
 	IMBNode* node = [self createGenericFlickrNodeForRoot:root];
 	node.mediaSource = [NSString stringWithFormat:@"taged:%@", tags];
-	node.icon = [self iconForAlbumType:@"Smart"];
 	node.identifier = node.mediaSource;
 	node.name = title;
+	node.icon = [self smartFolderIcon];
 	
 	[node setFlickrMethod:@"flickr.photos.search"
 				arguments:[NSDictionary dictionaryWithObjectsAndKeys:
@@ -340,7 +368,7 @@
 	rootNode.parser = self;
 	rootNode.leaf = NO;
 	rootNode.groupType = kIMBGroupTypeInternet;
-	
+
 	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
 	rootNode.subNodes = nil;

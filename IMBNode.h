@@ -83,6 +83,7 @@
 	BOOL _leaf;
 	BOOL _loading;
 	BOOL _wantsRecursiveObjects;
+	BOOL _includedInPopup;
 	
 	IMBParser* _parser;
 	IMBWatcherType _watcherType;
@@ -132,6 +133,7 @@
 @property (assign,getter=isLeaf) BOOL leaf;
 @property (assign,getter=isLoading) BOOL loading;
 @property (assign) BOOL wantsRecursiveObjects;
+@property (assign) BOOL includedInPopup;
 
 // Support for live watching and asynchronous nodes
 
