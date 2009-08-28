@@ -61,6 +61,7 @@
 
 @implementation IMBImageFolderParser
 
+
 // Restrict this parser to image files...
 
 - (id) initWithMediaType:(NSString*)inMediaType
@@ -72,6 +73,15 @@
 	
 	return self;
 }
+
+
+// Return metadata specific to image files...
+
+- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
+{
+	return nil;
+}
+
 
 @end
 

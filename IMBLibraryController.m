@@ -58,6 +58,9 @@
 #import "IMBConfig.h"
 #import "IMBKQueue.h"
 #import "IMBFSEventsWatcher.h"
+#import "IMBImageFolderParser.h"
+#import "IMBAudioFolderParser.h"
+#import "IMBMovieFolderParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -459,7 +462,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (groupType == kIMBGroupTypeLibrary)
 	{
 		groupNode.groupType = kIMBGroupTypeLibrary;
-		groupNode.identifier = @"group://LIBRARY";
+		groupNode.identifier = @"group://LIBRARIES";
 		groupNode.name = IMBLocalizedString(
 			@"LibrariesDisplayName",
 			@"LIBRARIES",
@@ -468,7 +471,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	else if (groupType == kIMBGroupTypeFolder)
 	{
 		groupNode.groupType = kIMBGroupTypeFolder;
-		groupNode.identifier = @"group://FOLDER";
+		groupNode.identifier = @"group://FOLDERS";
 		groupNode.name = IMBLocalizedString(
 			@"FoldersDisplayName",
 			@"FOLDERS",
@@ -834,17 +837,49 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #pragma mark Custom Nodes
 
 
-- (void) addCustomRootNodeForFolder:(NSString*)inPath
+- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath
 {
-	NSBeep();
+	IMBParser* parser = nil;
+
+	if (inPath)
+	{
+		// Create an IMBFolderParser for our media type...
+		
+		NSString* mediaType = self.mediaType;
+		
+		if ([mediaType isEqualToString:kIMBMediaTypeImage])
+		{
+			parser = [[[IMBImageFolderParser alloc] initWithMediaType:mediaType] autorelease];
+		}
+		else if ([mediaType isEqualToString:kIMBMediaTypeAudio])
+		{
+			parser = [[[IMBAudioFolderParser alloc] initWithMediaType:mediaType] autorelease];
+		}
+		else if ([mediaType isEqualToString:kIMBMediaTypeMovie])
+		{
+			parser = [[[IMBMovieFolderParser alloc] initWithMediaType:mediaType] autorelease];
+		}
+
+		parser.mediaSource = inPath;
+		
+		// Register it with the IMBParserController and reload the library...
+		
+		if (parser)
+		{
+			[[IMBParserController sharedParserController] addCustomParser:parser forMediaType:mediaType];
+		}
+	}
+	
+	return parser;
 }
 
 
 - (BOOL) removeCustomRootNode:(IMBNode*)inNode
 {
-	if (inNode.parentNode==nil && inNode.parser.isCustom && !inNode.isLoading)
+	if (inNode.isRootNode && inNode.parser.isCustom && !inNode.isLoading)
 	{
-		NSBeep();
+		[[IMBParserController sharedParserController] removeCustomParser:inNode.parser];
+		[self reload];
 		return YES;
 	}
 		

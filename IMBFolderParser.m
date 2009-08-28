@@ -209,6 +209,7 @@
 					IMBVisualObject* object = [[IMBVisualObject alloc] init];
 					object.value = (id)path;
 					object.name = file;
+					object.metadata = [self metadataForFileAtPath:path];
 					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 					object.imageRepresentation = path;
 				
@@ -233,15 +234,15 @@
 			subnode.parser = self;
 			subnode.leaf = NO;
 			subnode.includedInPopup = NO;
-
 			[subnodes addObject:subnode];
 			[subnode release];
 
 			IMBNodeObject* object = [[IMBNodeObject alloc] init];
 			object.value = (id)folder;
+			object.name = name;
+			object.metadata = nil;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:folder];
-			object.name = name;
 			[objects addObject:object];
 			[object release];
 		}

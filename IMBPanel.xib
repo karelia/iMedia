@@ -42,7 +42,7 @@
 				<int key="NSWindowStyleMask">159</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{18, 274}, {408, 853}}</string>
-				<int key="NSWTFlags">-461896704</int>
+				<int key="NSWTFlags">1685586944</int>
 				<string key="NSWindowTitle"/>
 				<string key="NSWindowClass">NSPanel</string>
 				<object class="NSToolbar" key="NSViewClass" id="816740796">

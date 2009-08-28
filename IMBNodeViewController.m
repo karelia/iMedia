@@ -122,12 +122,12 @@ static NSString* kSelectionKey = @"selection";
 	if (self == [IMBNodeViewController class])
 	{   
 		NSArray* expandedNodeIdentifiers = [NSArray arrayWithObjects:
-			@"group://LIBRARY",
-			@"group://FOLDER",
-			@"group://DEVICE",
-			@"group://CUSTOM",
+			@"group://LIBRARIES",
+			@"group://FOLDERS",
+			@"group://SEARCHES",
+			@"group://INTERNET",
 			nil];
-		
+
 		NSMutableDictionary* stateDict = [NSMutableDictionary dictionary];
 		[stateDict setObject:expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
 
@@ -204,6 +204,10 @@ static NSString* kSelectionKey = @"selection";
 	NSTableColumn* column = [[ibNodeOutlineView tableColumns] objectAtIndex:0];
 	IMBNodeCell* cell = [[[IMBNodeCell alloc] init] autorelease];	
 	[column setDataCell:cell];	
+	
+	// Register the the outline view as a dragging destination...
+	
+	[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
 }
 
 
@@ -548,6 +552,55 @@ static NSString* kSelectionKey = @"selection";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Check if we have any folder paths in the dragging pasteboard...
+
+- (NSDragOperation) outlineView:(NSOutlineView*)inOutlineView validateDrop:(id<NSDraggingInfo>)inInfo proposedItem:(id)inItem proposedChildIndex:(NSInteger)inIndex
+{
+	NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
+	BOOL exists,directory;
+	
+	for (NSString* path in paths)
+	{
+		exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&directory];
+		
+		if (exists && directory)
+		{
+			[inOutlineView setDropItem:nil dropChildIndex:NSOutlineViewDropOnItemIndex]; // Target the whole view
+			return NSDragOperationCopy;
+		}
+	}
+
+	return NSDragOperationNone;
+}
+
+
+// For each folder path that was dropped onto the outline view create a new custom parser. Then reload the library...
+ 
+- (BOOL) outlineView:(NSOutlineView*)inOutlineView acceptDrop:(id<NSDraggingInfo>)inInfo item:(id)inItem childIndex:(NSInteger)inIndex
+{
+    NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
+	BOOL exists,directory;
+	
+	for (NSString* path in paths)
+	{
+		exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&directory];
+		
+		if (exists && directory)
+		{
+			IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+			self.selectedNodeIdentifier = [parser identifierForPath:path];
+		}	
+	}		
+	
+	[inOutlineView.window makeFirstResponder:inOutlineView];
+	[self.libraryController reload];
+	return YES;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 #pragma mark Saving & Restoring State
 
@@ -691,6 +744,10 @@ static NSString* kSelectionKey = @"selection";
 			[self.libraryController populateNode:inNode];
 		}
 	}	
+	else
+	{
+		[ibNodeTreeController setSelectionIndexPaths:nil];
+	}
 }
 
 
@@ -841,9 +898,35 @@ static NSString* kSelectionKey = @"selection";
 }
 
 
+// Choose a folder...
+	
 - (IBAction) addNode:(id)inSender
 {
-	NSBeep();
+	NSOpenPanel* panel = [NSOpenPanel openPanel];
+	[panel setCanChooseDirectories:YES];
+	[panel setCanChooseFiles:NO];
+	[panel setResolvesAliases:YES];
+
+	NSWindow* window = [ibSplitView window];
+	[panel beginSheetForDirectory:nil file:nil types:nil modalForWindow:window modalDelegate:self didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:) contextInfo:NULL];
+}
+
+
+// Add a root node for this each folder and the reload the library...
+	
+- (void) openPanelDidEnd:(NSOpenPanel*)inPanel returnCode:(int)inReturnCode contextInfo:(void*)inContextInfo
+{
+	if (inReturnCode == NSOKButton)
+	{
+		NSArray* paths = [inPanel filenames];
+		for (NSString* path in paths)
+		{
+			IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+			self.selectedNodeIdentifier = [parser identifierForPath:path];
+		}	
+		
+		[self.libraryController reload];
+	}
 }
 
 
