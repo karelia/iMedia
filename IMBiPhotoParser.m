@@ -197,7 +197,7 @@
 		return nil;
 	}
 	
-	// Create an empty root node...
+	// Create a root node...
 	
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	
@@ -213,7 +213,7 @@
 		node.parser = self;
 	}
 	
-	// Or an empty subnode...
+	// Or an subnode...
 	
 	else
 	{
@@ -227,7 +227,7 @@
 		node.parser = self;
 	}
 	
-	// Set custom name on root nodes (if necessary)...
+	// If we have more than one library then append the library name to the root node...
 	
 	if (node.isRootNode && self.shouldDisplayLibraryName)
 	{
