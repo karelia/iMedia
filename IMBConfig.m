@@ -59,7 +59,7 @@
 
 static NSString* sIMBPrefsKeyFormat = @"iMedia2_%@";
 static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
-//static NSString* sIMBHidesEmptyGroupNodesKey = @"iMedia2_hidesEmptyGroupNodes";
+static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,7 +132,12 @@ static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
 
 + (void) registerDefaultValues
 {
+	NSString* path = [NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"];
+	NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,NSUserDomainMask,YES);
+	if ([paths count] > 0) path = [paths objectAtIndex:0];
+	
 	[self registerDefaultPrefsValue:[NSNumber numberWithBool:YES] forKey:sIMBShowsGroupNodesKey];
+	[self registerDefaultPrefsValue:path forKey:sIMBDownloadFolderPathKey];
 }
 
 
@@ -149,6 +154,23 @@ static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
 {
 	return [[self prefsValueForKey:sIMBShowsGroupNodesKey] boolValue];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) setDownloadFolderPath:(NSString*)inPath
+{
+	[self setPrefsValue:inPath forKey:sIMBDownloadFolderPathKey];
+}
+
+
++ (NSString*) downloadFolderPath
+{
+	return [self prefsValueForKey:sIMBDownloadFolderPathKey];
+}
+
+
 
 
 //----------------------------------------------------------------------------------------------------------------------

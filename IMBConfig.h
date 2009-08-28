@@ -60,6 +60,8 @@
 + (void) registerDefaultValues;
 + (void) setShowsGroupNodes:(BOOL)inState;
 + (BOOL) showsGroupNodes;
++ (void) setDownloadFolderPath:(NSString*)inPath;
++ (NSString*) downloadFolderPath;
 
 @end
 
