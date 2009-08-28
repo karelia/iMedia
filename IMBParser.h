@@ -56,6 +56,7 @@
 
 
 @class IMBNode;
+@class IMBObject;
 @class IMBObjectPromise;
 
 
@@ -112,10 +113,17 @@
 
 - (void) watchedPathDidChange:(NSString*)inWatchedPath;
 
+// Called when the icon size in the object view has changed. Parsers may use this callback to change the thumbnails
+// of the IMBObjects they create. At first they may want to supply small thumbnails so it's faster, but as a user
+// zooms the icons, the parser may want to supply larger thumbnails...
+
+- (void) objectViewDidChangeIconSize:(NSSize)inSize;
+
 // Called when the user right-clicks on a node in the IMBOutlineView. Here the parser has a chance to add custom
 // menu items of its own, that go beyond the funtionality of the standard items added by teh controllers...
 
 - (void) addMenuItemsToContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
+- (void) addMenuItemsToContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
 
 @end
 

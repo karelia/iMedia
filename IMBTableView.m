@@ -47,53 +47,78 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark HEADERS
 
-@interface IMBPanelController : NSWindowController
+#import "IMBTableView.h"
+#import "IMBObjectViewController.h"
+#import "IMBObject.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@implementation IMBTableView
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) initWithFrame:(NSRect)inFrame
 {
-	id _delegate;
-	NSArray* _mediaTypes;
-	NSMutableArray* _viewControllers;
-	NSMutableDictionary* _loadedLibraries;
-	NSString* _oldMediaType;
+	if (self = [super initWithFrame:inFrame])
+	{
+
+	}
 	
-	IBOutlet NSTabView* ibTabView;
-	IBOutlet NSToolbar* ibToolbar;
+	return self;
 }
 
-+ (IMBPanelController*) sharedPanelController;
-+ (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
 
-@property (assign) id delegate;
-@property (retain) NSArray* mediaTypes;
-@property (retain) NSMutableArray* viewControllers;
-@property (retain) NSMutableDictionary* loadedLibraries;
-@property (retain) NSString* oldMediaType;
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
 
-- (void) loadControllers;
-- (IBAction) showWindow:(id)inSender;
-- (IBAction) hideWindow:(id)inSender;
-
-@end
+	}
+	
+	return self;
+}
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@protocol IMBPanelDelegate
-
-@optional
-
-- (BOOL) controller:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
-
-@end
+- (void) dealloc
+{
+    [super dealloc];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+// Ask the IMBNodeViewController (which is our delegate) to return a context menu for the clicked node. If  
+// the user clicked on the background node is nil...
+
+- (NSMenu*) menuForEvent:(NSEvent*)inEvent
+{
+	NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
+	NSInteger i = [self rowAtPoint:mouse];
+	NSInteger n = [self numberOfRows];
+	IMBObject* object = nil;
+	
+	IMBObjectViewController* viewController = (IMBObjectViewController*) self.delegate;
+
+	if (i>=0 && i<n)
+	{
+		object = [[viewController.objectArrayController arrangedObjects] objectAtIndex:i];
+		[viewController.objectArrayController setSelectionIndex:i];
+	}
+
+	return [viewController menuForObject:object];
+}
+
+			
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end

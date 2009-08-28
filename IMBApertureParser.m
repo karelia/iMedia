@@ -199,48 +199,67 @@
 		return nil;
 	}
 	
-	// Create an empty root node (without subnodes, but with empty objects array)...
+	// Create a root node...
 	
-	IMBNode* rootNode = [[[IMBNode alloc] init] autorelease];
-	rootNode.parentNode = inOldNode.parentNode;
-	rootNode.mediaSource = self.mediaSource;
-	rootNode.identifier = [self identifierForPath:@"/AlbumId/1"];
-	rootNode.name = @"Aperture";
-	rootNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
-	rootNode.parser = self;
-	rootNode.leaf = NO;
-	rootNode.groupType = kIMBGroupTypeLibrary;
+	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	
-	if (self.shouldDisplayLibraryName)
+	if (inOldNode == nil)
 	{
-		NSString* path = (NSString*)rootNode.mediaSource;
-		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
-		rootNode.name = [NSString stringWithFormat:@"%@ (%@)",rootNode.name,name];
+		node.parentNode = inOldNode.parentNode;
+		node.mediaSource = self.mediaSource;
+		node.identifier = [self identifierForPath:@"/AlbumId/1"];
+		node.name = @"Aperture";
+		node.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
+		node.groupType = kIMBGroupTypeLibrary;
+		node.parser = self;
+		node.leaf = NO;
 	}
 	
-	// Watch the root node via UKKQueue. Whenever something in iPhoto changes, we have to replace the
-	// WHOLE node tree, as we have no way of finding WHAT has changed in iPhoto...
+	// Or a subnode...
 	
-	if (rootNode.isRootNode)
+	else
 	{
-		rootNode.watcherType = kIMBWatcherTypeFSEvent;
-		rootNode.watchedPath = [(NSString*)rootNode.mediaSource stringByDeletingLastPathComponent];
+		node.parentNode = inOldNode.parentNode;
+		node.mediaSource = self.mediaSource;
+		node.identifier = inOldNode.identifier;
+		node.name = inOldNode.name;
+		node.icon = inOldNode.icon;
+		node.groupType = inOldNode.groupType;
+		node.leaf = inOldNode.leaf;
+		node.parser = self;
+	}
+	
+	// If we have more than one library then append the library name to the root node...
+	
+	if (node.isRootNode && self.shouldDisplayLibraryName)
+	{
+		NSString* path = (NSString*)node.mediaSource;
+		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,name];
+	}
+	
+	// Watch the XML file. Whenever something in Aperture changes, we have to replace the
+	// WHOLE node tree, as we have no way of finding WHAT has changed inside the library...
+	
+	if (node.isRootNode)
+	{
+		node.watcherType = kIMBWatcherTypeFSEvent;
+		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
 	}
 	else
 	{
-		rootNode.watcherType = kIMBWatcherTypeNone;
+		node.watcherType = kIMBWatcherTypeNone;
 	}
 	
 	// If the old node was populated, then also populate the new node...
 	
-//	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
 	if (inOldNode.isPopulated)
 	{
-		[self populateNode:rootNode options:inOptions error:&error];
+		[self populateNode:node options:inOptions error:&error];
 	}
 	
 	if (outError) *outError = error;
-	return rootNode;
+	return node;
 }
 
 

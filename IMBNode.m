@@ -117,6 +117,7 @@
 {
 	if (self = [super init])
 	{
+		self.groupType = kIMBGroupTypeNone;
 		self.group = NO;
 		self.leaf = NO;
 		self.loading = NO;

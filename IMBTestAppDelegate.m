@@ -152,8 +152,8 @@
 	{
 		#warning Supply your own Flickr API key and shared secret, or apply for key and secret at: http://flickr.com/services/api/keys/apply
 		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
-		flickrParser.flickrAPIKey = nil;
-		flickrParser.flickrSharedSecret = nil;
+		flickrParser.flickrAPIKey = @"0505f0b32db96aa0aba28dc1ff21cddb";
+		flickrParser.flickrSharedSecret = @"7b385b6f23155296";
 	}
 }
 
