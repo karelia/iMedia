@@ -49,7 +49,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBFolderParser.h"
+#import "IMBParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,34 +57,21 @@
 
 #pragma mark 
 
+@interface IMBiTunesParser : IMBParser
+{
+	NSString* _appPath;
+	NSDictionary* _plist;
+	NSDate* _modificationDate;
+	BOOL _shouldDisplayLibraryName;
+	NSInteger _version;
+}
 
-// This parser scans any folder for audio files...
+@property (retain) NSString* appPath;
+@property (retain) NSDictionary* plist;
+@property (retain) NSDate* modificationDate;
+@property (assign) BOOL shouldDisplayLibraryName;
+@property (assign) NSInteger version;
 
-@interface IMBAudioFolderParser : IMBFolderParser
-@end
-
-
-// This subclass looks only in "~/Music"...
-
-@interface IMBMusicFolderParser : IMBAudioFolderParser
-@end
-
-
-// This subclass looks only in "/Library/Audio/Apple Loops/Apple/iLife Sound Effects"...
-
-@interface IMBiLifeSoundEffectsFolderParser : IMBAudioFolderParser
-@end
-
-
-// This subclass looks only in "iMovie.app/Contents/Resources/Sound Effects"...
-
-@interface IMBiMovieSoundEffectsFolderParser : IMBAudioFolderParser
-@end
-
-
-// This subclass looks only in "~/Library/Sounds"...
-
-@interface IMBLibrarySoundsFolderParser : IMBAudioFolderParser
 @end
 
 

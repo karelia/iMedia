@@ -115,7 +115,8 @@
 @property (retain) IMBParser* selectedParser;
 
 - (void) selectNode:(IMBNode*)inNode;
-- (void) expandSelectedNodeAndSelectNodeWithIdentifier:(NSString*)inIdentifier;
+- (void) expandSelectedNode;
+//- (void) expandSelectedNodeAndSelectNodeWithIdentifier:(NSString*)inIdentifier;
 
 // Context menu support...
 

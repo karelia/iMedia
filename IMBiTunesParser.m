@@ -49,7 +49,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBApertureParser.h"
+#import "IMBiTunesParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
@@ -64,15 +64,15 @@
 
 #pragma mark 
 
-@interface IMBApertureParser ()
+@interface IMBiTunesParser ()
 
-- (NSDictionary*) plist;
-- (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId;
-- (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
-- (BOOL) isLeafAlbumType:(NSString*)inType;
-- (NSImage*) iconForAlbumType:(NSString*)inType;
-- (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
-- (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
+- (NSString*) identifierWithPersistentID:(NSString*)inPersistentID;
+- (BOOL) shoudlUsePlaylist:(NSDictionary*)inPlaylistDict;
+- (BOOL) shouldUseTrack:(NSDictionary*)inTrackDict;
+- (BOOL) isLeafPlaylist:(NSDictionary*)inPlaylistDict;
+- (NSImage*) iconForPlaylist:(NSDictionary*)inPlaylistDict;
+- (void) addSubNodesToNode:(IMBNode*)inParentNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks;
+- (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks;
 
 @end
 
@@ -82,12 +82,13 @@
 
 #pragma mark 
 
-@implementation IMBApertureParser
+@implementation IMBiTunesParser
 
 @synthesize appPath = _appPath;
 @synthesize plist = _plist;
 @synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
+@synthesize version = _version;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -98,27 +99,25 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
 	[pool release];
 }
-
-
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Check if Aperture is installed...
+// Check if iTunes is installed...
 
-+ (NSString*) aperturePath
++ (NSString*) iTunesPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Aperture"];
+	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iTunes"];
 }
 
 
 + (BOOL) isInstalled
 {
-	return [self aperturePath] != nil;
+	return [self iTunesPath] != nil;
 }
 
 
@@ -133,22 +132,22 @@
 
 	if ([self isInstalled])
 	{
-		CFArrayRef apertureLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.iApps");
-		NSArray* libraries = (NSArray*)apertureLibraries;
-
+		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
+		NSArray* libraries = (NSArray*)recentLibraries;
+			
 		for (NSString* library in libraries)
 		{
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
 
-			IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+			IMBiTunesParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = path;
 			parser.shouldDisplayLibraryName = libraries.count > 1;
 			[parserInstances addObject:parser];
 			[parser release];
 		}
 		
-		if (apertureLibraries) CFRelease(apertureLibraries);
+		if (recentLibraries) CFRelease(recentLibraries);
 	}
 	
 	return parserInstances;
@@ -162,9 +161,10 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.appPath = [[self class] aperturePath];
+		self.appPath = [[self class] iTunesPath];
 		self.plist = nil;
 		self.modificationDate = nil;
+		self.version = 0;
 	}
 	
 	return self;
@@ -204,17 +204,17 @@
 	
 	if (inOldNode == nil)
 	{
-		node.parentNode = inOldNode.parentNode;
+		node.parentNode = nil;
 		node.mediaSource = self.mediaSource;
-		node.identifier = [self identifierForPath:@"/AlbumId/1"];
-		node.name = @"Aperture";
+		node.identifier = [self identifierForPath:@"/"];
+		node.name = @"iTunes";
 		node.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
 		node.groupType = kIMBGroupTypeLibrary;
-		node.parser = self;
 		node.leaf = NO;
+		node.parser = self;
 	}
 	
-	// Or a subnode...
+	// Or an subnode...
 	
 	else
 	{
@@ -236,9 +236,9 @@
 		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
 		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,name];
 	}
-	
-	// Watch the XML file. Whenever something in Aperture changes, we have to replace the
-	// WHOLE node tree, as we have no way of finding WHAT has changed inside the library...
+
+	// Watch the XML file. Whenever something in iPhoto changes, we have to replace the WHOLE tree from  
+	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
 	
 	if (node.isRootNode)
 	{
@@ -272,10 +272,10 @@
 {
 	NSError* error = nil;
 	
-	NSArray* albums = [self.plist objectForKey:@"List of Albums"];
-	NSDictionary* images = [self.plist objectForKey:@"Master Image List"];
-	[self addSubNodesToNode:inNode albums:albums images:images]; 
-	[self populateNode:inNode albums:albums images:images]; 
+	NSArray* playlists = [self.plist objectForKey:@"Playlists"];
+	NSDictionary* tracks = [self.plist objectForKey:@"Tracks"];
+	[self addSubNodesToNode:inNode playlists:playlists tracks:tracks]; 
+	[self populateNode:inNode playlists:playlists tracks:tracks]; 
 
 	if (outError) *outError = error;
 	return error == nil;
@@ -320,6 +320,7 @@
 	{
 		self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
 		self.modificationDate = modificationDate;
+		self.version = [[self.plist objectForKey:@"Application Version"] intValue];
 	}
 	
 	return _plist;
@@ -329,24 +330,43 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBApertureParser://AlbumId/17"...
+// Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBiPhotoParser://AlbumId/17"...
 
-- (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId
+- (NSString*) identifierWithPersistentID:(NSString*)inPersistentID
 {
-	NSString* albumPath = [NSString stringWithFormat:@"/AlbumId/%@",inAlbumId];
-	return [self identifierForPath:albumPath];
+	NSString* path = [NSString stringWithFormat:@"/PlaylistPersistentID/%@",inPersistentID];
+	return [self identifierForPath:path];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Exclude some album types...
+// Exclude some playlist types...
 
-- (BOOL) shouldUseAlbumType:(NSString*)inAlbumType
+- (BOOL) shoudlUsePlaylist:(NSDictionary*)inPlaylistDict
 {
-	if ([inAlbumType isEqualToString:@"99"]) return NO;
-//	if ([inAlbumType isEqualToString:@"98"]) return NO;
+	if (inPlaylistDict == nil) return NO;
+	
+	NSNumber* visible = [inPlaylistDict objectForKey:@"Visible"];
+	if (visible!=nil && [visible boolValue]==NO) return NO;
+	
+	if ([[inPlaylistDict objectForKey:@"Distinguished Kind"] intValue]==26) return NO;	// Genius
+	
+	if ([self.mediaType isEqualToString:kIMBMediaTypeAudio])
+	{
+		if ([inPlaylistDict objectForKey:@"Movies"]) return NO;
+		if ([inPlaylistDict objectForKey:@"TV Shows"]) return NO;
+	}
+	else if ([self.mediaType isEqualToString:kIMBMediaTypeMovie])
+	{
+		if ([inPlaylistDict objectForKey:@"Music"]) return NO;
+		if ([inPlaylistDict objectForKey:@"Podcasts"]) return NO;
+		if ([inPlaylistDict objectForKey:@"Audiobooks"]) return NO;
+		if ([inPlaylistDict objectForKey:@"Purchased Music"]) return NO;
+		if ([inPlaylistDict objectForKey:@"Party Shuffle"]) return NO;
+	}
+	
 	return YES;
 }
 
@@ -354,76 +374,87 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSImage*) iconForAlbumType:(NSString*)inType
+// Everything except folders is a leaf node...
+
+- (BOOL) isLeafPlaylist:(NSDictionary*)inPlaylistDict
 {
-	// '12' ???
-	// cp: I found icons for a 'smart journal' or a 'smart book' but no menu command to create on.
-	
-	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
-	{
-		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil},	// album
-		{@"2",	@"Project_I_SAlbum.tiff",			@"folder",	nil,	nil},	// smart album
-		{@"3",	@"List_Icons_LibrarySAlbum.tiff",	@"folder",	nil,	nil},	// library **** ... 200X
-		{@"4",	@"Project_I_Project.tiff",			@"folder",	nil,	nil},	// project
-		{@"5",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (top level)
-		{@"6",	@"Project_I_Folder.tiff",			@"folder",	nil,	nil},	// folder
-		{@"7",	@"Project_I_ProjectFolder.tiff",	@"folder",	nil,	nil},	// sub-folder of project
-		{@"8",	@"Project_I_Book.tiff",				@"folder",	nil,	nil},	// book
-		{@"9",	@"Project_I_WebPage.tiff",			@"folder",	nil,	nil},	// web gallery
-		{@"9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
-		{@"10",	@"Project_I_WebJournal.tiff",		@"folder",	nil,	nil},	// web journal
-		{@"11",	@"Project_I_LightTable.tiff",		@"folder",	nil,	nil},	// light table
-		{@"13",	@"Project_I_SWebGallery.tiff",		@"folder",	nil,	nil},	// smart web gallery
-		{@"97",	@"Project_I_Projects.tiff",			@"folder",	nil,	nil},	// library
-		{@"98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
-		{@"99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
-	};
-
-	static const IMBIconTypeMapping kIconTypeMapping =
-	{
-		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
-		kIconTypeMappingEntries,
-		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil}	// fallback image
-	};
-
-	return [[IMBIconCache sharedIconCache] iconForType:inType fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
+	return [inPlaylistDict objectForKey:@"Folder"] == nil;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (BOOL) isLeafAlbumType:(NSString*)inType
+- (NSImage*) iconForPlaylist:(NSDictionary*)inPlaylistDict
 {
-	NSInteger type = [inType integerValue];
+	NSString* filename = nil;
 	
-	switch (type)
+	if (_version < 7)
 	{
-		case 1:	 return YES;
-		case 2:	 return YES;
-		case 3:	 return YES;
-		case 4:	 return NO;
-		case 5:	 return NO;
-		case 6:	 return NO;
-		case 7:	 return NO;
-		case 8:	 return YES;
-		case 9:	 return YES;
-		case 10: return YES;
-		case 11: return YES;
-		case 13: return YES;
-		case 97: return NO;
-		case 98: return NO;
-		case 99: return NO;
+		if ([inPlaylistDict objectForKey:@"Library"])
+			filename = @"itunes-icon-library.png";
+		else if ([inPlaylistDict objectForKey:@"Movies"])
+			filename =  @"itunes-icon-movies.png";
+		else if ([inPlaylistDict objectForKey:@"TV Shows"])
+			filename =  @"itunes-icon-tvshows.png";
+		else if ([inPlaylistDict objectForKey:@"Podcasts"])
+			filename =  @"itunes-icon-podcasts.png";
+		else if ([inPlaylistDict objectForKey:@"Audiobooks"])
+			filename =  @"itunes-icon-audiobooks.png";
+		else if ([inPlaylistDict objectForKey:@"Purchased Music"])
+			filename =  @"itunes-icon-purchased.png";
+		else if ([inPlaylistDict objectForKey:@"Party Shuffle"])
+			filename =  @"itunes-icon-partyshuffle.png";
+		else if ([inPlaylistDict objectForKey:@"Folder"])
+			filename =  @"itunes-icon-folder.png";
+		else if ([inPlaylistDict objectForKey:@"Smart Info"])
+			filename =  @"itunes-icon-playlist-smart.png";
+		else 
+			filename =  @"itunes-icon-playlist-normal.png";
+	}
+	else
+	{
+		if ([inPlaylistDict objectForKey:@"master"])
+			filename =  @"itunes-icon-music.png";
+		else if ([inPlaylistDict objectForKey:@"Library"])
+			filename =  @"itunes-icon-music.png";
+		else if ([inPlaylistDict objectForKey:@"Music"])
+			filename =  @"itunes-icon-music.png";
+		else if ([inPlaylistDict objectForKey:@"Movies"])
+			filename =  @"itunes-icon-movies.png";
+		else if ([inPlaylistDict objectForKey:@"TV Shows"])
+			filename =  @"itunes-icon-tvshows.png";
+		else if ([inPlaylistDict objectForKey:@"Podcasts"])
+			filename =  @"itunes-icon-podcasts7.png";
+		else if ([inPlaylistDict objectForKey:@"Audiobooks"])
+			filename =  @"itunes-icon-audiobooks.png";
+		else if ([inPlaylistDict objectForKey:@"Purchased Music"])
+			filename =  @"itunes-icon-purchased7.png";
+		else if ([inPlaylistDict objectForKey:@"Party Shuffle"])
+			filename =  @"itunes-icon-partyshuffle7.png";
+		else if ([inPlaylistDict objectForKey:@"Folder"])
+			filename =  @"itunes-icon-folder7.png";
+		else if ([inPlaylistDict objectForKey:@"Smart Info"])
+			filename =  @"itunes-icon-playlist-smart7.png";
+		else 
+			filename =  @"itunes-icon-playlist-normal7.png";
 	}
 	
-	return NO;
+	if (filename)
+	{
+		NSBundle* bundle = [NSBundle bundleForClass:[self class]];
+		NSString* path = [bundle pathForResource:filename ofType:nil];
+		return [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+	}
+	
+	return nil;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
+- (void) addSubNodesToNode:(IMBNode*)inParentNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
@@ -431,39 +462,40 @@
 	NSMutableArray* subNodes = (NSMutableArray*) inParentNode.subNodes;
 	if (subNodes == nil) inParentNode.subNodes = subNodes = [NSMutableArray array];
 
-	// Now parse the Aperture XML plist and look for albums whose parent matches our parent node. We are 
+	// Now parse the iTunes XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
 	
-	for (NSDictionary* albumDict in inAlbums)
+	for (NSDictionary* playlistDict in inPlaylists)
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		
-		NSString* albumType = [albumDict objectForKey:@"Album Type"];
-		NSString* albumName = [albumDict objectForKey:@"AlbumName"];
-		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
-		NSString* parentIdentifier = parentId ? [self identifierWithAlbumId:parentId] : [self identifierForPath:@"/"];
+		NSString* albumName = [playlistDict objectForKey:@"Name"];
+		NSString* parentID = [playlistDict objectForKey:@"Parent Persistent ID"];
+		NSString* parentIdentifier = parentID ? [self identifierWithPersistentID:parentID] : [self identifierForPath:@"/"];
 		
-		if ([self shouldUseAlbumType:albumType] && [inParentNode.identifier isEqualToString:parentIdentifier])
+		if ([self shoudlUsePlaylist:playlistDict] && [inParentNode.identifier isEqualToString:parentIdentifier])
 		{
 			// Create node for this album...
 			
-			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* playlistNode = [[[IMBNode alloc] init] autorelease];
 			
-			albumNode.leaf = [self isLeafAlbumType:albumType];
-			albumNode.icon = [self iconForAlbumType:albumType];
-			albumNode.name = albumName;
-			albumNode.mediaSource = self.mediaSource;
-			albumNode.parser = self;
+			playlistNode.leaf = [self isLeafPlaylist:playlistDict];
+			playlistNode.icon = [self iconForPlaylist:playlistDict];
+			playlistNode.name = albumName;
+			playlistNode.mediaSource = self.mediaSource;
+			playlistNode.parser = self;
 
-			// Set the node's identifier. This is needed later to link it to the correct parent node...
+			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
+			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
+			// for backwards compatibility...
 			
-			NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
-			albumNode.identifier = [self identifierWithAlbumId:albumId];
+			NSString* playlistID = [playlistDict objectForKey:@"Playlist Persistent ID"];
+			playlistNode.identifier = [self identifierWithPersistentID:playlistID];
 
 			// Add the new album node to its parent (inRootNode)...
 			
-			[subNodes addObject:albumNode];
-			albumNode.parentNode = inParentNode;
+			[subNodes addObject:playlistNode];
+			playlistNode.parentNode = inParentNode;
 		}
 		
 		[pool release];
@@ -474,7 +506,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
+- (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
@@ -482,40 +514,75 @@
 	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
 	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
 
-	// Look for the correct album in the Aperture XML plist. Once we find it, populate the node with IMBVisualObjects
-	// for each image in this album...
+	// Look for the correct playlist in the iTunes XML plist. Once we find it, populate the node with IMBVisualObjects
+	// for each song in this playlist...
 	
-	for (NSDictionary* albumDict in inAlbums)
+	for (NSDictionary* playlistDict in inPlaylists)
 	{
 		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
-		NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
-		NSString* albumIdentifier = albumId ? [self identifierWithAlbumId:albumId] : [self identifierForPath:@"/"];
-		
-		if ([inNode.identifier isEqualToString:albumIdentifier])
-		{
-			NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
+		NSString* playlistID = [playlistDict objectForKey:@"Playlist Persistent ID"];
+		NSString* playlistIdentifier = [self identifierWithPersistentID:playlistID];
 
-			for (NSString* key in imageKeys)
+		if ([inNode.identifier isEqualToString:playlistIdentifier])
+		{
+			NSArray* trackKeys = [playlistDict objectForKey:@"Playlist Items"];
+
+			for (NSDictionary* trackID in trackKeys)
 			{
 				NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
-				NSDictionary* imageDict = [inImages objectForKey:key];
-				NSString* mediaType = [imageDict objectForKey:@"MediaType"];
+				NSString* key = [[trackID objectForKey:@"Track ID"] stringValue];
+				NSDictionary* trackDict = [inTracks objectForKey:key];
 			
-				if (imageDict!=nil && ([mediaType isEqualToString:@"Image"] || mediaType==nil))
+				if ([self shouldUseTrack:trackDict])
 				{
-					NSString* imagePath = [imageDict objectForKey:@"ImagePath"];
-					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
-					NSString* caption   = [imageDict objectForKey:@"Caption"];
-	
+					// Get name and path to file...
+					
+					NSString* name = [trackDict objectForKey:@"Name"];
+					NSString* location = [trackDict objectForKey:@"Location"];
+					NSURL* url = [NSURL URLWithString:location];
+					NSString* path = [url path];
+					BOOL isFileURL = [url isFileURL];
+					
+					// Create an object...
+					
 					IMBVisualObject* object = [[IMBVisualObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
-					object.value = (id)imagePath;
-					object.name = caption;
-					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
-					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
-					object.metadata = imageDict;
+					// For local files path is preferred (as we gain automatic support for some context menu items)...
+					
+					if (isFileURL)
+					{
+						object.name = name;
+						object.value = (id)path;
+						object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+						object.imageRepresentation = path;
+					}
+					
+					// For remote files we'll use a URL (less context menu support)...
+					
+					else
+					{
+						object.name = name;
+						object.value = (id)url;
+						object.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
+						object.imageRepresentation = url;
+					}
+					
+					// Add metadata and convert the duration property to seconds. Also note that the original
+					// key "Total Time" is not bindings compatible as it contains a space...
+					
+					NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:trackDict];
+					object.metadata = metadata;
+
+					double duration = [[trackDict objectForKey:@"Total Time"] doubleValue] / 1000.0;
+					[metadata setObject:[NSNumber numberWithDouble:duration] forKey:@"duration"]; 
+					
+					NSString* artist = [trackDict objectForKey:@"Artist"];
+					if (artist) [metadata setObject:artist forKey:@"artist"]; 
+					
+					NSString* album = [trackDict objectForKey:@"Album"];
+					if (album) [metadata setObject:album forKey:@"album"]; 
 				}
 				
 				[pool2 release];
@@ -526,6 +593,21 @@
 	}
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// A track is eligible if it has a name, a url, and if it is not a movie file...
+
+- (BOOL) shouldUseTrack:(NSDictionary*)inTrackDict
+{
+	if (inTrackDict == nil) return NO;
+	if ([inTrackDict objectForKey:@"Name"] == nil) return NO;
+	if ([[inTrackDict objectForKey:@"Location"] length] == 0) return NO;
+	if ([[inTrackDict objectForKey:@"Has Video"] boolValue] == 1) return NO;
+	
+	return YES;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

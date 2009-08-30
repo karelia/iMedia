@@ -748,10 +748,15 @@ static NSString* kSelectionKey = @"selection";
 	{
 		[ibNodeTreeController setSelectionIndexPaths:nil];
 	}
+
+	// Make sure that the selection in the popup matches...
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_syncPopupMenuSelection) object:nil];
+	[self performSelector:@selector(_syncPopupMenuSelection) withObject:nil afterDelay:0.0];
 }
 
 
-// Return the first selected node. Here we assume that the NSTreeController was configured to only allow single
+// Return the selected node. Here we assume that the NSTreeController was configured to only allow single
 // selection or no selection...
 
 - (IMBNode*) selectedNode
@@ -770,17 +775,13 @@ static NSString* kSelectionKey = @"selection";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) expandSelectedNodeAndSelectNodeWithIdentifier:(NSString*)inIdentifier
+- (void) expandSelectedNode
 {
-	NSInteger i,rows;
-	IMBNode* node;
-	NSString* identifier;
-	
 	// Expand the selected node...
 	
-	rows = [ibNodeOutlineView numberOfRows];
+	NSInteger rows = [ibNodeOutlineView numberOfRows];
 	
-	for (i=0; i<rows; i++)
+	for (NSInteger i=0; i<rows; i++)
 	{
 		if ([ibNodeOutlineView isRowSelected:i])
 		{
@@ -791,28 +792,10 @@ static NSString* kSelectionKey = @"selection";
 		}
 	}
 	
+	// Rebuild the popup menu manually...
 	
-	// Now select a new node (most likely a subnode)...
-	
-	rows = [ibNodeOutlineView numberOfRows];
-	
-	for (i=0; i<rows; i++)
-	{
-		node = [self _nodeAtRow:i];
-		identifier = node.identifier;
-		
-		if ([identifier isEqualToString:inIdentifier])
-		{
-			self.selectedNodeIdentifier = inIdentifier;
-			[self selectNode:node];
-			break;
-		}
-	}
-	
-	// Rebuild the popup menu manually. Please note that the popup menu does not currently use bindings...
-	
-	[self _updatePopupMenu];
-	[self _syncPopupMenuSelection];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_updatePopupMenu) object:nil];
+	[self performSelector:@selector(_updatePopupMenu) withObject:nil afterDelay:0.0];
 }
 
 
@@ -828,10 +811,14 @@ static NSString* kSelectionKey = @"selection";
 	if (inContext == (void*)kArrangedObjectsKey)
 	{
 //		[self _updatePopupMenu];
+//		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_updatePopupMenu) object:nil];
+//		[self performSelector:@selector(_updatePopupMenu) withObject:nil afterDelay:0.0];
 	}
 	else if (inContext == (void*)kSelectionKey)
 	{
 		[self _syncPopupMenuSelection];
+//		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_syncPopupMenuSelection) object:nil];
+//		[self performSelector:@selector(_syncPopupMenuSelection) withObject:nil afterDelay:0.0];
 	}
 	else
 	{

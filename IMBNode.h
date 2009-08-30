@@ -155,6 +155,7 @@
 - (NSComparisonResult) compare:(IMBNode*)inNode;
 - (BOOL) isRootNode;
 - (BOOL) isPopulated;
+- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier;
 
 @end
 

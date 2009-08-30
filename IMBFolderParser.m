@@ -238,7 +238,8 @@
 			[subnode release];
 
 			IMBNodeObject* object = [[IMBNodeObject alloc] init];
-			object.value = (id)folder;
+			object.value = (id)subnode;
+			object.path = (id)folder;
 			object.name = name;
 			object.metadata = nil;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;

@@ -67,12 +67,11 @@
 @interface IMBiPhotoParser ()
 
 - (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId;
-- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier withRoot:(IMBNode*)inRootNode;
-- (BOOL) allowAlbumType:(NSString*)inAlbumType;
+- (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
 - (NSImage*) iconForAlbumType:(NSString*)inAlbumType;
 - (BOOL) isLeafAlbumType:(NSString*)inAlbumType;
-- (void) addSubNodesToNode:(IMBNode*)inParentNode listOfAlbums:(NSArray*)inListOfAlbums listOfImages:(NSDictionary*)inListOfImages;
-- (void) populateNode:(IMBNode*)inNode listOfAlbums:(NSArray*)inListOfAlbums listOfImages:(NSDictionary*)inListOfImages iPhotoMediaType:(NSString*)iPhotoMediaType;
+- (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
+- (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages iPhotoMediaType:(NSString*)iPhotoMediaType;
 
 @end
 
@@ -271,10 +270,10 @@
 {
 	NSError* error = nil;
 	
-	NSArray* listOfAlbums = [self.plist objectForKey:@"List of Albums"];
-	NSDictionary* listOfImages = [self.plist objectForKey:@"Master Image List"];
-	[self addSubNodesToNode:inNode listOfAlbums:listOfAlbums listOfImages:listOfImages]; 
-	[self populateNode:inNode listOfAlbums:listOfAlbums listOfImages:listOfImages iPhotoMediaType:@"Image"]; 
+	NSArray* albums = [self.plist objectForKey:@"List of Albums"];
+	NSDictionary* images = [self.plist objectForKey:@"Master Image List"];
+	[self addSubNodesToNode:inNode albums:albums images:images]; 
+	[self populateNode:inNode albums:albums images:images iPhotoMediaType:@"Image"]; 
 
 	if (outError) *outError = error;
 	return error == nil;
@@ -340,31 +339,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Look in our node tree for a node with the specified identifier...
-
-- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier withRoot:(IMBNode*)inRootNode
-{
-	if ([inRootNode.identifier isEqualToString:inIdentfier])
-	{
-		return inRootNode;
-	}
-	
-	for (IMBNode* subnode in inRootNode.subNodes)
-	{
-		IMBNode* found = [self subNodeWithIdentifier:inIdentfier withRoot:subnode];
-		if (found) return found;
-	}
-
-	return nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Exclude some album types...
 
-- (BOOL) allowAlbumType:(NSString*)inAlbumType
+- (BOOL) shouldUseAlbumType:(NSString*)inAlbumType
 {
 	if (inAlbumType == nil) return YES;
 	if ([inAlbumType isEqualToString:@"Slideshow"]) return NO;
@@ -426,9 +403,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) addSubNodesToNode:(IMBNode*)inParentNode
-		 listOfAlbums:(NSArray*)inListOfAlbums
-		 listOfImages:(NSDictionary*)inListOfImages
+- (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
 {
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
@@ -439,7 +414,7 @@
 	// Now parse the iPhoto XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
 	
-	for (NSDictionary* albumDict in inListOfAlbums)
+	for (NSDictionary* albumDict in inAlbums)
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		
@@ -448,7 +423,7 @@
 		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
 		NSString* parentIdentifier = parentId ? [self identifierWithAlbumId:parentId] : [self identifierForPath:@"/"];
 		
-		if ([self allowAlbumType:albumType] && [inParentNode.identifier isEqualToString:parentIdentifier])
+		if ([self shouldUseAlbumType:albumType] && [inParentNode.identifier isEqualToString:parentIdentifier])
 		{
 			// Create node for this album...
 			
@@ -482,9 +457,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) populateNode:(IMBNode*)inNode
-		 listOfAlbums:(NSArray*)inListOfAlbums
-		 listOfImages:(NSDictionary*)inListOfImages
+- (void) populateNode:(IMBNode*)inNode 
+		 albums:(NSArray*)inAlbums 
+		 images:(NSDictionary*)inImages
 		 iPhotoMediaType:(NSString*)iPhotoMediaType	// this mediaType is special to iPhoto, not the same as IMB mediaType!
 {
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
@@ -496,7 +471,7 @@
 	// Look for the correct album in the iPhoto XML plist. Once we find it, populate the node with IMBVisualObjects
 	// for each image in this album...
 	
-	for (NSDictionary* albumDict in inListOfAlbums)
+	for (NSDictionary* albumDict in inAlbums)
 	{
 		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
 		NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
@@ -509,7 +484,7 @@
 			for (NSString* key in imageKeys)
 			{
 				NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
-				NSDictionary* imageDict = [inListOfImages objectForKey:key];
+				NSDictionary* imageDict = [inImages objectForKey:key];
 				NSString* mediaType = [imageDict objectForKey:@"MediaType"];
 			
 				if (imageDict!=nil && ([mediaType isEqualToString:iPhotoMediaType] || mediaType==nil))

@@ -65,6 +65,7 @@ extern NSString* kIMBObjectPromiseType;
 @interface IMBObjectPromise : NSObject <NSCopying,NSCoding>
 {
 	NSArray* _objects; 
+	BOOL _recursive;
 	NSMutableArray* _localFiles;
 	NSError* _error;
 	
@@ -77,14 +78,28 @@ extern NSString* kIMBObjectPromiseType;
 	BOOL _hasCustomFinishSelector;
 }
 
+/// Array of IMBObjects
+@property (retain) NSArray* objects;
 
-@property (retain) NSArray* objects;			// Array of IMBObjects
-@property (retain) NSMutableArray* localFiles;	// Array of paths (may contain NSNull objects in case of failure)
-@property (retain) id delegate;					// Retained due to asynchronous nature of the promise
-@property (assign) SEL finishSelector;			// Method with signature - (void) didFinish:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
-@property (retain) NSError* error;				// Contains error in case of failure
+/// If YES the promise descends recursively into subnodes and adds contained objects
+@property (assign,getter=isRecursive) BOOL recursive;
 
+/// Array of paths (may contain NSNull objects in case of failure)
+@property (retain) NSMutableArray* localFiles;	
+
+/// Retained due to asynchronous nature of the promise
+@property (retain) id delegate;			
+
+/// Method with signature - (void) didFinish:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
+@property (assign) SEL finishSelector;	
+
+/// Contains error in case of failure		
+@property (retain) NSError* error;				
+
+/// Create a promise with an array of objects
 - (id) initWithObjects:(NSArray*)inObjects;
+
+/// Clients can start loading objects asynchronously. Once the finish selector is called the loading is done and local files can be retrieved.
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
 		
 @end
