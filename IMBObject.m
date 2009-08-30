@@ -50,6 +50,7 @@
 #pragma mark HEADERS
 
 #import "IMBObject.h"
+#import "IMBCommon.h"
 #import <Quartz/Quartz.h>
 
 
@@ -65,15 +66,16 @@
 @synthesize metadata = _metadata;
 
 
-- (id) copyWithZone:(NSZone*)inZone
+- (id) initWithCoder:(NSCoder*)inCoder
 {
-	IMBObject* copy = [[IMBObject allocWithZone:inZone] init];
+	if (self = [super init])
+	{
+		self.value = [inCoder decodeObjectForKey:@"value"];
+		self.name = [inCoder decodeObjectForKey:@"name"];
+		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
+	}
 	
-	copy.value = self.value;
-	copy.name = self.name;
-	copy.metadata = self.metadata;
-	
-	return copy;
+	return self;
 }
 
 
@@ -85,16 +87,22 @@
 }
 
 
-- (id) initWithCoder:(NSCoder*)inCoder
+- (id) copyWithZone:(NSZone*)inZone
 {
-	if (self = [super init])
-	{
-		self.value = [inCoder decodeObjectForKey:@"value"];
-		self.name = [inCoder decodeObjectForKey:@"name"];
-		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
-	}
-	
-	return self;
+	IMBObject* copy = [[IMBObject allocWithZone:inZone] init];
+	copy.value = self.value;
+	copy.name = self.name;
+	copy.metadata = self.metadata;
+	return copy;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_value);
+	IMBRelease(_name);
+	IMBRelease(_metadata);
+	[super dealloc];
 }
 
 
@@ -139,15 +147,6 @@
 @synthesize imageVersion = _imageVersion;
 
 
-- (void) encodeWithCoder:(NSCoder*)inCoder
-{
-	[super encodeWithCoder:inCoder];
-	[inCoder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
-	[inCoder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
-	[inCoder encodeInteger:self.imageVersion forKey:@"imageVersion"];
-}
-
-
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if (self = [super initWithCoder:inCoder])
@@ -161,16 +160,43 @@
 }
 
 
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	[inCoder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
+	[inCoder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
+	[inCoder encodeInteger:self.imageVersion forKey:@"imageVersion"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBVisualObject* copy = (IMBVisualObject*)[super copyWithZone:inZone];
+	copy.imageRepresentation = self.imageRepresentation;
+	copy.imageRepresentationType = self.imageRepresentationType;
+	copy.imageVersion = self.imageVersion;
+	return copy;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_imageRepresentation);
+	IMBRelease(_imageRepresentationType);
+	[super dealloc];
+}
+
+
 // Use the path or URL as the unique identifier...
 
-- (NSString *) imageUID
+- (NSString*) imageUID
 {
 	return _value;
 }
 
 // The name of the object will be used as the title in IKIMageBrowserView...
 
-- (NSString *) imageTitle
+- (NSString*) imageTitle
 {
 	return _name;
 }
@@ -188,42 +214,55 @@
 
 @implementation IMBNodeObject
 
-- (NSImage*) icon
+@synthesize path = _path;
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
 {
-	NSString* path = (NSString*)_value;
-	return [[NSWorkspace sharedWorkspace] iconForFile:path];
+	if (self = [super initWithCoder:inCoder])
+	{
+		self.path = [inCoder decodeObjectForKey:@"path"];
+	}
+	
+	return self;
 }
 
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	[inCoder encodeObject:self.path forKey:@"path"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBNodeObject* copy = (IMBNodeObject*) [super copyWithZone:inZone];
+	copy.path = self.path;
+	return copy;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_path);
+	[super dealloc];
+}
+
+
+- (NSString*) imageUID
+{
+	return _path;
+}
+
+
+- (NSImage*) icon
+{
+	return [[NSWorkspace sharedWorkspace] iconForFile:self.path];
+}
+
+
 @end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//#pragma mark 
-//
-//@implementation IMBEventObject
-//
-//@synthesize skimFraction = _skimFraction;
-//
-//- (void) setSkimFraction:(double)inFraction
-//{
-//	if (_skimFraction != inFraction)
-//	{
-//		_skimFraction = inFraction;
-//		self.imageRepresentation = nil;
-//		self.imageVersion += 1;
-//	}
-//}
-//
-//
-//- (id) imageRepresentation
-//{
-//
-//}
-//
-//
-//@end
 
 
 //----------------------------------------------------------------------------------------------------------------------

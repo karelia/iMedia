@@ -680,6 +680,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	BOOL shouldPopulateNode = 
 	
+//		inNode.isPopulated==NO &&
 		(inNode.subNodes==nil || inNode.objects==nil) && 
 		inNode.isLoading==NO && 
 		_isReplacingNode==NO;
@@ -862,7 +863,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 		parser.mediaSource = inPath;
 		
-		// Register it with the IMBParserController and reload the library...
+		// Register it with the IMBParserController...
 		
 		if (parser)
 		{
@@ -873,6 +874,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return parser;
 }
 
+
+// If we were given a root node with a custom parser, then this node is eligible for removal. Remove the parser
+// from the registered list and reload everything. After that the node will be gone...
 
 - (BOOL) removeCustomRootNode:(IMBNode*)inNode
 {

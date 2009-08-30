@@ -50,8 +50,11 @@
 #pragma mark HEADERS
 
 #import "IMBObjectPromise.h"
-#import "IMBObject.h"
 #import "IMBCommon.h"
+#import "IMBObject.h"
+#import "IMBNode.h"
+#import "IMBParser.h"
+#import "IMBLibraryController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,10 +73,11 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 @implementation IMBObjectPromise
 
 @synthesize objects = _objects;
+@synthesize recursive = _recursive;
 @synthesize localFiles = _localFiles;
+@synthesize error = _error;
 @synthesize delegate = _delegate;
 @synthesize finishSelector = _finishSelector;
-@synthesize error = _error;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,11 +87,12 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	if (self = [super init])
 	{
-		self.delegate = nil;
-		self.finishSelector = NULL;
 		self.objects = inObjects;
+		self.recursive = NO;
 		self.localFiles = [NSMutableArray arrayWithCapacity:inObjects.count];
 		self.error = nil;
+		self.delegate = nil;
+		self.finishSelector = NULL;
 	}
 	
 	return self;
@@ -99,10 +104,11 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	IMBObjectPromise* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.objects = self.objects;
+	copy.recursive = self.recursive;
 	copy.localFiles = self.localFiles;
+	copy.error = self.error;
 	copy.delegate = self.delegate;
 	copy.finishSelector = self.finishSelector;
-	copy.error = self.error;
 	
 	return copy;
 }
@@ -111,7 +117,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[inCoder encodeObject:self.objects forKey:@"objects"];
-//	[inCoder encodeObject:self.localFiles forKey:@"localFiles"];
+	[inCoder encodeBool:self.isRecursive forKey:@"recursive"];
 }
 
 
@@ -120,6 +126,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	if (self = [super init])
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
+		self.recursive = [inCoder decodeBoolForKey:@"recursive"];
 		self.localFiles = [NSMutableArray arrayWithCapacity:self.objects.count];
 		self.delegate = nil;
 		self.finishSelector = NULL;
@@ -143,8 +150,40 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Count the number of objects to be loaded. If the promise is recursive then this requires descending down the tree...
+
+- (NSUInteger) _countObjects:(NSArray*)inObjects
+{
+	NSUInteger count  = [inObjects count];
+
+	for (IMBObject* object in inObjects)
+	{
+		if ([object isKindOfClass:[IMBNodeObject class]] && self.isRecursive)
+		{
+			IMBNode* node = (IMBNode*)object.value;
+//			#warning Recursive loading may be a problem if subnodes may not be populated yet!
+//			NSString* mediaType = node.parser.mediaType;
+//			[[IMBLibraryController sharedLibraryControllerWithMediaType:mediaType] populateNode:node];
+			count += [self _countObjects:node.objects];
+		}
+	}
+	
+	return count;
+}
+
+
+- (NSUInteger) _loadObjects:(NSArray*)inObjects done:(NSUInteger)inDone total:(NSUInteger)inTotal
+{
+	// To be overridden by subclass...
+	
+	return 0;
+}
+
+
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector
 {
+	// Prepare for laoding...
+	
 	self.delegate = inDelegate;
 	self.finishSelector = inSelector;
 	
@@ -152,6 +191,15 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	_hasNameProgress		 = _delegate != nil && [_delegate respondsToSelector:@selector(objectPromise:name:progress:)];
 	_hasDidFinishLoading	 = _delegate != nil && [_delegate respondsToSelector:@selector(objectPromise:didFinishLoadingWithError:)];
 	_hasCustomFinishSelector = _delegate != nil && [_delegate respondsToSelector:inSelector];
+
+	NSUInteger total  = [self _countObjects:self.objects];
+
+	// Load the objects...
+	
+	if (_hasWillStartLoading) [_delegate objectPromiseWillStartLoading:self];
+	[self _loadObjects:self.objects done:0 total:total];
+	if (_hasDidFinishLoading) [_delegate objectPromise:self didFinishLoadingWithError:nil];
+	if (_hasCustomFinishSelector) [_delegate performSelector:_finishSelector withObject:self withObject:nil];
 }
 
 
@@ -170,31 +218,30 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 @implementation IMBLocalObjectPromise
 
 
-- (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector
+// Copy the path (value) of each object into our paths array...
+	
+- (NSUInteger) _loadObjects:(NSArray*)inObjects done:(NSUInteger)inDone total:(NSUInteger)inTotal
 {
-	// Start and notify the delegate...
-	
-	[super startLoadingWithDelegate:inDelegate finishSelector:inSelector];
-	if (_hasWillStartLoading) [_delegate objectPromiseWillStartLoading:self];
-	
-	// Copy the path (value) of each object into our paths array...
-	
-	NSUInteger n  = [self.objects count];
-	NSUInteger i  = 0;
-	for (IMBObject* object in self.objects)
+	for (IMBObject* object in inObjects)
 	{
-		NSString* path = (NSString*)[object value];
-		[self.localFiles addObject:path];
+		if ([object isKindOfClass:[IMBNodeObject class]] && self.isRecursive)
+		{
+			IMBNode* node = (IMBNode*)object.value;
+			inDone = [self _loadObjects:node.objects done:inDone total:inTotal];
+		}
+		else
+		{
+			NSString* path = (NSString*)[object value];
+			[self.localFiles addObject:path];
+		}
 		
-		double fraction = (double)(++i) / (double)(n);
+		double fraction = (double)(++inDone) / (double)(inTotal);
 		if (_hasNameProgress) [_delegate objectPromise:self name:object.name progress:fraction];
 	}
-
-	// Notify the delegate that we are done...
 	
-	if (_hasDidFinishLoading) [_delegate objectPromise:self didFinishLoadingWithError:nil];
-	if (_hasCustomFinishSelector) [_delegate performSelector:_finishSelector withObject:self withObject:nil];
+	return inDone;
 }
+
 
 @end
 
@@ -210,34 +257,31 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 @implementation IMBRemoteObjectPromise
 
 
-- (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector
+- (NSUInteger) _loadObjects:(NSArray*)inObjects done:(NSUInteger)inDone total:(NSUInteger)inTotal
 {
-	// Make sure this object stays alive until the loading has finished...
-	
-	[self retain];
+	[self retain];	// Make sure this object stays alive until the loading has finished...
 
-	// Start and notify the delegate...
+	for (IMBObject* object in inObjects)
+	{
+		if ([object isKindOfClass:[IMBNodeObject class]] && self.isRecursive)
+		{
+			IMBNode* node = (IMBNode*)object.value;
+			inDone = [self _loadObjects:node.objects done:inDone total:inTotal];
+		}
+		else
+		{
+//			NSURL* url = (NSURL*)[object value];
+//			NSURLRequest* request = [NSURLRequest requestWithURL:url];
+//			NSURLDownload* download = nil;
+//			...
+		}
+		
+		double fraction = (double)(++inDone) / (double)(inTotal);
+		if (_hasNameProgress) [_delegate objectPromise:self name:object.name progress:fraction];
+	}
 	
-	[super startLoadingWithDelegate:inDelegate finishSelector:inSelector];
-	if (_hasWillStartLoading) [_delegate objectPromiseWillStartLoading:self];
-
-//	NSUInteger n  = [self.objects count];
-//	NSUInteger i  = 0;
-//	
-//	for (IMBObject* object in self.objects)
-//	{
-//		NSURL* url = (NSURL*)[object value];
-//		NSURLRequest* request = [NSURLRequest requestWithURL:url];
-//		NSURLDownload* download = nil;
-//		// ...
-//	}
-
-	// Notify the delegate that we are done...
-	
-	if (_hasDidFinishLoading) [_delegate objectPromise:self didFinishLoadingWithError:nil];
-	if (_hasCustomFinishSelector) [_delegate performSelector:_finishSelector withObject:self withObject:nil];
-	
-	[self release];
+	[self autorelease];
+	return inDone;
 }
 
 

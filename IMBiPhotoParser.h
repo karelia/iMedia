@@ -70,7 +70,6 @@
 @property (retain) NSDictionary* plist;
 @property (retain) NSDate* modificationDate;
 @property (assign) BOOL shouldDisplayLibraryName;
-- (BOOL) allowAlbumType:(NSString*)inAlbumType;
 
 @end
 

@@ -58,6 +58,14 @@
 #pragma mark 
 
 @interface IMBAudioViewController : IMBObjectViewController
+{
+	IBOutlet NSButton* _playButton;
+	QTMovie* _playingAudio;
+}
+
+- (IBAction) play:(id)inSender;
+- (void) playAudioObject:(IMBObject*)inObject;
+@property (retain) QTMovie* playingAudio;
 
 @end
 

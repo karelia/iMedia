@@ -104,13 +104,122 @@
 }
 
 
-// Set the folder path to the ~/Pictures...
+// Set the folder path to ~/Music...
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Music"];
+	}
+	
+	return self;
+}
+
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBiLifeSoundEffectsFolderParser
+
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
+	[pool release];
+}
+
+
+// Set the folder path to /Library/Audio/Apple Loops/Apple/iLife Sound Effects...
+
+- (id) initWithMediaType:(NSString*)inMediaType
+{
+	if (self = [super initWithMediaType:inMediaType])
+	{
+		self.mediaSource = @"/Library/Audio/Apple Loops/Apple/iLife Sound Effects";
+	}
+	
+	return self;
+}
+
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBiMovieSoundEffectsFolderParser
+
+
++ (id) folderPath
+{
+	NSString* path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
+	return [path stringByAppendingPathComponent:@"/Contents/Resources/Sound Effects"];
+}
+
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	if ([self folderPath]) [IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
+	[pool release];
+}
+
+
+// Set the folder path to iMovie.app/Contents/Resources/Sound Effects...
+
+- (id) initWithMediaType:(NSString*)inMediaType
+{
+	if (self = [super initWithMediaType:inMediaType])
+	{
+		self.mediaSource = [[self class] folderPath];
+	}
+	
+	return self;
+}
+
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBLibrarySoundsFolderParser
+
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
+	[pool release];
+}
+
+
+// Set the folder path to ~/Library/Sounds...
+
+- (id) initWithMediaType:(NSString*)inMediaType
+{
+	if (self = [super initWithMediaType:inMediaType])
+	{
+		self.mediaSource = [@"~/Library/Sounds" stringByStandardizingPath];
 	}
 	
 	return self;

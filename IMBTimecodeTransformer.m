@@ -44,178 +44,117 @@
 */
 
 
+//  ©2009 Peter Baumgartner. All rights reserved.
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark HEADERS
-
-#import "IMBImageFolderParser.h"
-#import "IMBParserController.h"
-#import "IMBCommon.h"
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@implementation IMBImageFolderParser
-
-
-// Restrict this parser to image files...
-
-- (id) initWithMediaType:(NSString*)inMediaType
-{
-	if (self = [super initWithMediaType:inMediaType])
-	{
-		self.fileUTI = (NSString*)kUTTypeImage; 
-	}
 	
-	return self;
-}
-
-
-// Return metadata specific to image files...
-
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
-{
-	return nil;
-}
-
-
-@end
-
+#import "IMBTimecodeTransformer.h"
+	
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark
 
-@implementation IMBPicturesFolderParser
+@implementation IMBTimecodeTransformer
+
+ 
+//----------------------------------------------------------------------------------------------------------------------
 
 
-// Register this parser, so that it gets automatically loaded...
+// Register the transformer...
 
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
+	IMBTimecodeTransformer* transformer = [[IMBTimecodeTransformer alloc] init];
+	[NSValueTransformer setValueTransformer:transformer forName:NSStringFromClass(self)];
+	[transformer release];
 	[pool release];
 }
-
-
-// Set the folder path to ~/Pictures...
-
-- (id) initWithMediaType:(NSString*)inMediaType
-{
-	if (self = [super initWithMediaType:inMediaType])
-	{
-		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
-	}
-	
-	return self;
-}
-
-@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-@implementation IMBDesktopPicturesFolderParser
-
-
-// Register this parser, so that it gets automatically loaded...
-
-+ (void) load
++ (Class) transformedValueClass
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-	[pool release];
+	return [NSString class];
 }
 
 
-// Set the folder path to /Library/Desktop Pictures...
-
-- (id) initWithMediaType:(NSString*)inMediaType
++ (BOOL) allowsReverseTransformation
 {
-	if (self = [super initWithMediaType:inMediaType])
+	return YES;
+}
+	
+	
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Convert from NSNumber to NSString...
+
+- (id) transformedValue:(id)inValue
+{
+	id result = nil;
+	
+	if (inValue)
 	{
-		self.mediaSource = @"/Library/Desktop Pictures";
+		if ([inValue respondsToSelector:@selector(doubleValue)]) 
+		{
+			double t = [inValue doubleValue];
+			NSInteger T = (NSInteger) t;
+			
+			NSInteger HH = T / 3600;
+			NSInteger MM = (T / 60) % 60;
+			NSInteger SS = T % 60;
+			
+			if (HH > 0)
+			{
+				result = [NSString stringWithFormat:@"%d:%d:%02d",HH,MM,SS];
+			}	
+			else
+			{
+				result = [NSString stringWithFormat:@"%d:%02d",MM,SS];
+			}	
+		}
 	}
 	
-	return self;
+	return result;
 }
 
-@end
 
+// Convert from NSString to NSNumber...
+
+- (id) reverseTransformedValue:(id)inValue
+{
+	double t = 0.0;
+	
+	if (inValue != nil && [inValue isKindOfClass:[NSString class]])
+	{
+		NSArray* parts = [(NSString*)inValue componentsSeparatedByString:@":"];
+		NSInteger n = [parts count];
+		double multiplier = 1.0;
+		
+		for (NSInteger i=n-1; i>=0; i--)
+		{
+			NSString* string = [parts objectAtIndex:i];
+			double value = [string doubleValue];
+			t += value * multiplier;
+			multiplier *= 60.0;
+		}
+	}
+	
+	return [NSNumber numberWithDouble:t];
+}
+	
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-@implementation IMBUserPicturesFolderParser
-
-
-// Register this parser, so that it gets automatically loaded...
-
-+ (void) load
-{
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-	[pool release];
-}
-
-
-// Set the folder path to /Library/User Pictures...
-
-- (id) initWithMediaType:(NSString*)inMediaType
-{
-	if (self = [super initWithMediaType:inMediaType])
-	{
-		self.mediaSource = @"/Library/User Pictures";
-	}
+	@end
 	
-	return self;
-}
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@implementation IMBiChatIconsFolderParser
-
-
-// Register this parser, so that it gets automatically loaded...
-
-+ (void) load
-{
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-	[pool release];
-}
-
-
-// Set the folder path to /Library/Application Support/Apple/iChat Icons...
-
-- (id) initWithMediaType:(NSString*)inMediaType
-{
-	if (self = [super initWithMediaType:inMediaType])
-	{
-		self.mediaSource = @"/Library/Application Support/Apple/iChat Icons";
-	}
-	
-	return self;
-}
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------

@@ -50,8 +50,13 @@
 #pragma mark HEADERS
 
 #import "IMBAudioViewController.h"
+#import "IMBNodeViewController.h"
 #import "IMBCommon.h"
+#import "IMBObject.h"
+#import "IMBNode.h"
+#import "IMBFolderParser.h"
 #import "NSWorkspace+iMedia.h"
+#import <QTKit/QTKit.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,6 +65,18 @@
 #pragma mark 
 
 @implementation IMBAudioViewController
+
+@synthesize playingAudio = _playingAudio;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) dealloc
+{
+	IMBRelease(_playingAudio);
+	[super dealloc];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -113,6 +130,109 @@
 		@"ImageCountFormatPlural",
 		@"%d songs",
 		@"Format string for object count in plural");
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark NSTableViewDelegate
+ 
+
+// Upon doubleclick start playing the selection...
+
+- (IBAction) tableViewWasDoubleClicked:(id)inSender
+{
+//	IMBNode* selectedNode = [_nodeViewController selectedNode];
+	NSIndexSet* rows = [ibListView selectedRowIndexes];
+	NSUInteger row = [rows firstIndex];
+		
+	while (row != NSNotFound)
+	{
+		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
+
+		if ([object isKindOfClass:[IMBNodeObject class]])
+		{
+			IMBNode* node = (IMBNode*)object.value;
+			[_nodeViewController expandSelectedNode];
+			[_nodeViewController selectNode:node];
+		}
+		else
+		{
+			[self play:inSender];
+			return;
+		}
+		
+		row = [rows indexGreaterThanIndex:row];
+	}
+}
+
+
+// If we already has some audio playing, then play the new song if the selection changes...
+
+- (void) tableViewSelectionDidChange:(NSNotification*)inNotification
+{
+	if (self.playingAudio.rate > 0.0)
+	{
+		[self play:nil];
+	}
+	else
+	{
+		self.playingAudio = nil;
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IBAction) play:(id)inSender
+{
+	// First stop any audio that may currently be playing...
+	
+	[self.playingAudio stop];
+	self.playingAudio = nil;
+	
+	// Start playing what the new selection...
+	
+	NSIndexSet* rows = [ibListView selectedRowIndexes];
+	NSUInteger row = [rows firstIndex];
+		
+	if (row != NSNotFound)
+	{
+		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
+		[self playAudioObject:object];
+	}
+}
+
+
+- (void) playAudioObject:(IMBObject*)inObject
+{
+	// Create a QTMovie for the selected item...
+	
+	NSError* error = nil;
+	QTMovie* movie = nil;
+	
+	if ([inObject.value isKindOfClass:[NSString class]])
+	{
+		NSString* path = (NSString*)[inObject value];
+		movie = [QTMovie movieWithFile:path error:&error];
+	}
+	else if ([inObject.value isKindOfClass:[NSURL class]])
+	{
+		NSURL* url = (NSURL*)[inObject value];
+		movie = [QTMovie movieWithURL:url error:&error];
+	}
+	
+	// Start playing it...
+	
+	if (error == nil)
+	{
+		[movie gotoBeginning];
+		[movie play];
+		self.playingAudio = movie;
+	}
 }
 
 

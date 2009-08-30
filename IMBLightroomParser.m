@@ -284,28 +284,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Look in our node tree for a node with the specified identifier...
-
-- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier withRoot:(IMBNode*)inRootNode
-{
-	if ([inRootNode.identifier isEqualToString:inIdentfier])
-	{
-		return inRootNode;
-	}
-	
-	for (IMBNode* subnode in inRootNode.subNodes)
-	{
-		IMBNode* found = [self subNodeWithIdentifier:inIdentfier withRoot:subnode];
-		if (found) return found;
-	}
-
-	return nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 //- (void) addSubNodesToNode:(IMBNode*)inParentNode
 //		 listOfAlbums:(NSArray*)inListOfAlbums
 //		 listOfImages:(NSDictionary*)inListOfImages

@@ -97,24 +97,13 @@
 // down the hierarchy... 
 
 @interface IMBNodeObject : IMBVisualObject
+{
+	NSString* _path;
+}
+
+@property (retain) NSString* path;	
 
 @end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This specialized node object represent iPhoto events (which can be skimmed). This data model object can update 
-// its imageRepresentation... 
-
-//@interface IMBEventObject : IMBNodeObject
-//{
-//	double _skimFraction;
-//}
-//
-//@property double skimFraction;
-//
-//@end
 
 
 //----------------------------------------------------------------------------------------------------------------------

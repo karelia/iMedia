@@ -475,6 +475,25 @@
 }
 
 
+// Look in our node tree for a node with the specified identifier...
+
+- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier
+{
+	if ([self.identifier isEqualToString:inIdentfier])
+	{
+		return self;
+	}
+	
+	for (IMBNode* subnode in self.subNodes)
+	{
+		IMBNode* found = [subnode subNodeWithIdentifier:inIdentfier];
+		if (found) return found;
+	}
+
+	return nil;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

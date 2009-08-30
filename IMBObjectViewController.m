@@ -581,11 +581,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (IBAction) openSubNode:(id)inSender
 {
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	IMBParser* parser = selectedNode.parser;
-	NSString* path = (NSString*)[inSender representedObject];
-	NSString* identifier = [(IMBFolderParser*)parser identifierForPath:path];
-	[_nodeViewController expandSelectedNodeAndSelectNodeWithIdentifier:identifier];
+	IMBNode* node = (IMBNode*)[inSender representedObject];
+	[_nodeViewController expandSelectedNode];
+	[_nodeViewController selectNode:node];
 }
 
 
@@ -710,9 +708,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 		
 		if ([inObject isKindOfClass:[IMBNodeObject class]])
 		{
-			NSString* path = (NSString*)inObject.value;
-			NSString* identifier = [(IMBFolderParser*)parser identifierForPath:path];
-			[_nodeViewController expandSelectedNodeAndSelectNodeWithIdentifier:identifier];
+			IMBNode* node = (IMBNode*)inObject.value;
+			[_nodeViewController expandSelectedNode];
+			[_nodeViewController selectNode:node];
 		}
 		
 		// Regular objects are just opened upon double click...

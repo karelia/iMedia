@@ -108,6 +108,27 @@
 		D0C2DD0F1025905A001B1198 /* IMBImageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0C5B23C1022F68A00A97A60 /* icon-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2291022F4CA00A97A60 /* icon-view.png */; };
 		D0C5B23D1022F68A00A97A60 /* list-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2271022F4AA00A97A60 /* list-view.png */; };
+		D0CA93E7104917A400725DA3 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0CA93E6104917A400725DA3 /* QTKit.framework */; };
+		D0CA9427104932CD00725DA3 /* IMBiTunesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */; };
+		D0CA9428104932CD00725DA3 /* IMBiTunesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CA9426104932CD00725DA3 /* IMBiTunesParser.m */; };
+		D0CA94C91049455B00725DA3 /* itunes-icon-audiobooks.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94B91049455B00725DA3 /* itunes-icon-audiobooks.png */; };
+		D0CA94CA1049455B00725DA3 /* itunes-icon-folder7.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94BA1049455B00725DA3 /* itunes-icon-folder7.png */; };
+		D0CA94CB1049455B00725DA3 /* itunes-icon-library.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94BB1049455B00725DA3 /* itunes-icon-library.png */; };
+		D0CA94CC1049455B00725DA3 /* itunes-icon-movies.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94BC1049455B00725DA3 /* itunes-icon-movies.png */; };
+		D0CA94CD1049455B00725DA3 /* itunes-icon-music.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94BD1049455B00725DA3 /* itunes-icon-music.png */; };
+		D0CA94CE1049455B00725DA3 /* itunes-icon-partyshuffle.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94BE1049455B00725DA3 /* itunes-icon-partyshuffle.png */; };
+		D0CA94CF1049455B00725DA3 /* itunes-icon-partyshuffle7.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94BF1049455B00725DA3 /* itunes-icon-partyshuffle7.png */; };
+		D0CA94D01049455B00725DA3 /* itunes-icon-playlist-normal.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94C01049455B00725DA3 /* itunes-icon-playlist-normal.png */; };
+		D0CA94D11049455B00725DA3 /* itunes-icon-playlist-normal7.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94C11049455B00725DA3 /* itunes-icon-playlist-normal7.png */; };
+		D0CA94D21049455B00725DA3 /* itunes-icon-playlist-purchased.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94C21049455B00725DA3 /* itunes-icon-playlist-purchased.png */; };
+		D0CA94D31049455B00725DA3 /* itunes-icon-playlist-smart.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94C31049455B00725DA3 /* itunes-icon-playlist-smart.png */; };
+		D0CA94D41049455B00725DA3 /* itunes-icon-playlist-smart7.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94C41049455B00725DA3 /* itunes-icon-playlist-smart7.png */; };
+		D0CA94D51049455B00725DA3 /* itunes-icon-podcasts.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94C51049455B00725DA3 /* itunes-icon-podcasts.png */; };
+		D0CA94D61049455B00725DA3 /* itunes-icon-podcasts7.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94C61049455B00725DA3 /* itunes-icon-podcasts7.png */; };
+		D0CA94D71049455B00725DA3 /* itunes-icon-purchased7.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94C71049455B00725DA3 /* itunes-icon-purchased7.png */; };
+		D0CA94D81049455B00725DA3 /* itunes-icon-tvshows.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94C81049455B00725DA3 /* itunes-icon-tvshows.png */; };
+		D0CA961510498F7C00725DA3 /* IMBTimecodeTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CA961310498F7C00725DA3 /* IMBTimecodeTransformer.h */; };
+		D0CA961610498F7C00725DA3 /* IMBTimecodeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CA961410498F7C00725DA3 /* IMBTimecodeTransformer.m */; };
 		D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */; };
 		D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -124,7 +145,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 6A8666480F9593B200325E1C /* ObjectiveFlickr (framework) */;
+			remoteGlobalIDString = 6A8666480F9593B200325E1C;
 			remoteInfo = "ObjectiveFlickr (framework)";
 		};
 		D09934591011B6FA00C527B7 /* PBXContainerItemProxy */ = {
@@ -277,6 +298,27 @@
 		D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageViewController.h; sourceTree = "<group>"; };
 		D0C5B2271022F4AA00A97A60 /* list-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "list-view.png"; sourceTree = "<group>"; };
 		D0C5B2291022F4CA00A97A60 /* icon-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-view.png"; sourceTree = "<group>"; };
+		D0CA93E6104917A400725DA3 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
+		D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiTunesParser.h; sourceTree = "<group>"; };
+		D0CA9426104932CD00725DA3 /* IMBiTunesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiTunesParser.m; sourceTree = "<group>"; };
+		D0CA94B91049455B00725DA3 /* itunes-icon-audiobooks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-audiobooks.png"; sourceTree = "<group>"; };
+		D0CA94BA1049455B00725DA3 /* itunes-icon-folder7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-folder7.png"; sourceTree = "<group>"; };
+		D0CA94BB1049455B00725DA3 /* itunes-icon-library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-library.png"; sourceTree = "<group>"; };
+		D0CA94BC1049455B00725DA3 /* itunes-icon-movies.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-movies.png"; sourceTree = "<group>"; };
+		D0CA94BD1049455B00725DA3 /* itunes-icon-music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-music.png"; sourceTree = "<group>"; };
+		D0CA94BE1049455B00725DA3 /* itunes-icon-partyshuffle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-partyshuffle.png"; sourceTree = "<group>"; };
+		D0CA94BF1049455B00725DA3 /* itunes-icon-partyshuffle7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-partyshuffle7.png"; sourceTree = "<group>"; };
+		D0CA94C01049455B00725DA3 /* itunes-icon-playlist-normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-playlist-normal.png"; sourceTree = "<group>"; };
+		D0CA94C11049455B00725DA3 /* itunes-icon-playlist-normal7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-playlist-normal7.png"; sourceTree = "<group>"; };
+		D0CA94C21049455B00725DA3 /* itunes-icon-playlist-purchased.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-playlist-purchased.png"; sourceTree = "<group>"; };
+		D0CA94C31049455B00725DA3 /* itunes-icon-playlist-smart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-playlist-smart.png"; sourceTree = "<group>"; };
+		D0CA94C41049455B00725DA3 /* itunes-icon-playlist-smart7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-playlist-smart7.png"; sourceTree = "<group>"; };
+		D0CA94C51049455B00725DA3 /* itunes-icon-podcasts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-podcasts.png"; sourceTree = "<group>"; };
+		D0CA94C61049455B00725DA3 /* itunes-icon-podcasts7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-podcasts7.png"; sourceTree = "<group>"; };
+		D0CA94C71049455B00725DA3 /* itunes-icon-purchased7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-purchased7.png"; sourceTree = "<group>"; };
+		D0CA94C81049455B00725DA3 /* itunes-icon-tvshows.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "itunes-icon-tvshows.png"; sourceTree = "<group>"; };
+		D0CA961310498F7C00725DA3 /* IMBTimecodeTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTimecodeTransformer.h; sourceTree = "<group>"; };
+		D0CA961410498F7C00725DA3 /* IMBTimecodeTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTimecodeTransformer.m; sourceTree = "<group>"; };
 		D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoParser.h; sourceTree = "<group>"; };
 		D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoParser.m; sourceTree = "<group>"; };
 		D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroomParser.h; sourceTree = "<group>"; };
@@ -297,6 +339,7 @@
 				D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */,
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
 				D09930FD1010FF9700C527B7 /* Quartz.framework in Frameworks */,
+				D0CA93E7104917A400725DA3 /* QTKit.framework in Frameworks */,
 				D0993295101124EE00C527B7 /* libcrypto.dylib in Frameworks */,
 				D0BE03151047C540009AE844 /* ObjectiveFlickr.framework in Frameworks */,
 			);
@@ -334,6 +377,7 @@
 				034768DFFF38A50411DB9C8B /* Products */,
 				D05A94A4102EB14A005DF9CE /* ICADevices.framework */,
 				D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */,
+				D0CA93E6104917A400725DA3 /* QTKit.framework */,
 			);
 			name = iMedia;
 			sourceTree = "<group>";
@@ -483,6 +527,8 @@
 				D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */,
 				D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */,
 				D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */,
+				D0CA961310498F7C00725DA3 /* IMBTimecodeTransformer.h */,
+				D0CA961410498F7C00725DA3 /* IMBTimecodeTransformer.m */,
 				D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */,
 				D0C2DAA110240C0B001B1198 /* IMBImageView.xib */,
 				D08070C710442DAE00891137 /* IMBAudioView.xib */,
@@ -574,6 +620,24 @@
 			children = (
 				D0B6FAB91043243800280DDC /* IMBAudioFolderParser.h */,
 				D0B6FABA1043243800280DDC /* IMBAudioFolderParser.m */,
+				D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */,
+				D0CA9426104932CD00725DA3 /* IMBiTunesParser.m */,
+				D0CA94B91049455B00725DA3 /* itunes-icon-audiobooks.png */,
+				D0CA94BA1049455B00725DA3 /* itunes-icon-folder7.png */,
+				D0CA94BB1049455B00725DA3 /* itunes-icon-library.png */,
+				D0CA94BC1049455B00725DA3 /* itunes-icon-movies.png */,
+				D0CA94BD1049455B00725DA3 /* itunes-icon-music.png */,
+				D0CA94BE1049455B00725DA3 /* itunes-icon-partyshuffle.png */,
+				D0CA94BF1049455B00725DA3 /* itunes-icon-partyshuffle7.png */,
+				D0CA94C01049455B00725DA3 /* itunes-icon-playlist-normal.png */,
+				D0CA94C11049455B00725DA3 /* itunes-icon-playlist-normal7.png */,
+				D0CA94C21049455B00725DA3 /* itunes-icon-playlist-purchased.png */,
+				D0CA94C31049455B00725DA3 /* itunes-icon-playlist-smart.png */,
+				D0CA94C41049455B00725DA3 /* itunes-icon-playlist-smart7.png */,
+				D0CA94C51049455B00725DA3 /* itunes-icon-podcasts.png */,
+				D0CA94C61049455B00725DA3 /* itunes-icon-podcasts7.png */,
+				D0CA94C71049455B00725DA3 /* itunes-icon-purchased7.png */,
+				D0CA94C81049455B00725DA3 /* itunes-icon-tvshows.png */,
 			);
 			name = Audio;
 			sourceTree = "<group>";
@@ -653,6 +717,8 @@
 				D0B779651047B65D00D12548 /* IMBFlickrParser.h in Headers */,
 				D0BE0A8C104802A7009AE844 /* IMBTableView.h in Headers */,
 				D08C5C9E104862540068FF07 /* IMBTextFieldCell.h in Headers */,
+				D0CA9427104932CD00725DA3 /* IMBiTunesParser.h in Headers */,
+				D0CA961510498F7C00725DA3 /* IMBTimecodeTransformer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -751,6 +817,22 @@
 				D08070C810442DAE00891137 /* IMBAudioView.xib in Resources */,
 				D08070CA10442DC800891137 /* IMBMovieView.xib in Resources */,
 				D08070EA10442F0500891137 /* IMBPanel.xib in Resources */,
+				D0CA94C91049455B00725DA3 /* itunes-icon-audiobooks.png in Resources */,
+				D0CA94CA1049455B00725DA3 /* itunes-icon-folder7.png in Resources */,
+				D0CA94CB1049455B00725DA3 /* itunes-icon-library.png in Resources */,
+				D0CA94CC1049455B00725DA3 /* itunes-icon-movies.png in Resources */,
+				D0CA94CD1049455B00725DA3 /* itunes-icon-music.png in Resources */,
+				D0CA94CE1049455B00725DA3 /* itunes-icon-partyshuffle.png in Resources */,
+				D0CA94CF1049455B00725DA3 /* itunes-icon-partyshuffle7.png in Resources */,
+				D0CA94D01049455B00725DA3 /* itunes-icon-playlist-normal.png in Resources */,
+				D0CA94D11049455B00725DA3 /* itunes-icon-playlist-normal7.png in Resources */,
+				D0CA94D21049455B00725DA3 /* itunes-icon-playlist-purchased.png in Resources */,
+				D0CA94D31049455B00725DA3 /* itunes-icon-playlist-smart.png in Resources */,
+				D0CA94D41049455B00725DA3 /* itunes-icon-playlist-smart7.png in Resources */,
+				D0CA94D51049455B00725DA3 /* itunes-icon-podcasts.png in Resources */,
+				D0CA94D61049455B00725DA3 /* itunes-icon-podcasts7.png in Resources */,
+				D0CA94D71049455B00725DA3 /* itunes-icon-purchased7.png in Resources */,
+				D0CA94D81049455B00725DA3 /* itunes-icon-tvshows.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -812,6 +894,8 @@
 				D062B0F81047B75100CA9B56 /* IMBFlickrParser.m in Sources */,
 				D0BE0A8D104802A7009AE844 /* IMBTableView.m in Sources */,
 				D08C5C9F104862540068FF07 /* IMBTextFieldCell.m in Sources */,
+				D0CA9428104932CD00725DA3 /* IMBiTunesParser.m in Sources */,
+				D0CA961610498F7C00725DA3 /* IMBTimecodeTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
