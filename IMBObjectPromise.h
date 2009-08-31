@@ -69,39 +69,58 @@ extern NSString* kIMBObjectPromiseType;
 	NSMutableArray* _localFiles;
 	NSError* _error;
 	
+	double _objectCount;
+	double _objectIndex;
+	
 	id _delegate;
 	SEL _finishSelector;
-	
-	BOOL _hasWillStartLoading;
-	BOOL _hasNameProgress;
-	BOOL _hasDidFinishLoading;
-	BOOL _hasCustomFinishSelector;
 }
 
 /// Array of IMBObjects
+
 @property (retain) NSArray* objects;
 
-/// If YES the promise descends recursively into subnodes and adds contained objects
+/// If YES the promise descends recursively into IMBNodeObjects and adds contained IMBObjects
+
 @property (assign,getter=isRecursive) BOOL recursive;
 
 /// Array of paths (may contain NSNull objects in case of failure)
+
 @property (retain) NSMutableArray* localFiles;	
 
 /// Retained due to asynchronous nature of the promise
+
 @property (retain) id delegate;			
 
 /// Method with signature - (void) didFinish:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
+
 @property (assign) SEL finishSelector;	
 
-/// Contains error in case of failure		
+/// Contains error in case of failure	
+	
 @property (retain) NSError* error;				
 
 /// Create a promise with an array of objects
+
 - (id) initWithObjects:(NSArray*)inObjects;
 
 /// Clients can start loading objects asynchronously. Once the finish selector is called the loading is done and local files can be retrieved.
+
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
 		
+@end
+
+
+/// Protocol that notifies the delegate (usually the client application) of download progress
+
+@protocol IMBObjectPromiseDelegate
+
+@optional
+
+- (void) objectPromiseWillStartLoading:(IMBObjectPromise*)inObjectPromise;
+- (void) objectPromise:(IMBObjectPromise*)inObjectPromise name:(NSString*)inName progress:(double)inFraction;
+- (void) objectPromise:(IMBObjectPromise*)inObjectPromise didFinishLoadingWithError:(NSError*)inError;
+
 @end
 
 
@@ -123,22 +142,6 @@ extern NSString* kIMBObjectPromiseType;
 // pull the object files of the network onto the local file system, where it can then be accessed by the delegate... 
 
 @interface IMBRemoteObjectPromise : IMBObjectPromise
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Protocol that notifies the delegate (usually the client application) of download progress...
-
-@protocol IMBObjectPromiseDelegate
-
-@optional
-
-- (void) objectPromiseWillStartLoading:(IMBObjectPromise*)inObjectPromise;
-- (void) objectPromise:(IMBObjectPromise*)inObjectPromise name:(NSString*)inName progress:(double)inFraction;
-- (void) objectPromise:(IMBObjectPromise*)inObjectPromise didFinishLoadingWithError:(NSError*)inError;
 
 @end
 
