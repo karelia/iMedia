@@ -22,7 +22,7 @@
 
 #pragma mark MACROS
 
-#define LOG_PARSERS 0
+#define LOG_PARSERS 1
 #define LOG_CREATE_NODE 0
 #define LOG_POPULATE_NODE 0
 
@@ -150,11 +150,76 @@
 
 	if ([inParser isKindOfClass:[IMBFlickrParser class]])
 	{
+		// To test this, get your own API key from flickr (noncommercial at first, but you are planning
+		// on supporting flickr in iMedia on a commmercial app, you will have to apply for a commercial
+		// API key at least 30 days before shipping)
+		
 		#warning Supply your own Flickr API key and shared secret, or apply for key and secret at: http://flickr.com/services/api/keys/apply
 		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
+
+		// For your actual app, you would put in the hard-wired strings here.
 		flickrParser.flickrAPIKey = nil;
 		flickrParser.flickrSharedSecret = nil;
-	}
+		
+		// For this test application, we will ask for the flickr key out of the keychain.
+		//
+		// To put in a key into your keychain, create a new keychain item in Keychain Access.
+		// Give it the name of "flickr_api" with the key as the account name, and the secret as the password.
+		SecKeychainItemRef item = nil;
+		OSStatus theStatus = noErr;
+		char *buffer;
+		UInt32 stringLength;
+		
+		theStatus = SecKeychainFindGenericPassword(NULL,
+												   10,	// length of name
+												   "flickr_api",
+												   0,
+												   nil,
+												   &stringLength,
+												   (void *)&buffer,
+												   &item);
+		
+		if (noErr == theStatus)
+		{
+			if (stringLength > 0)
+			{
+				flickrParser.flickrSharedSecret = [[[NSString alloc] initWithBytes:buffer length:stringLength encoding:NSUTF8StringEncoding] autorelease];
+				
+				// now get the 'account'
+				
+				SecKeychainAttribute attributes[8];
+				SecKeychainAttribute attr;
+				SecKeychainAttributeList list;
+				
+				attributes[0].tag = kSecAccountItemAttr;
+				list.count = 1;
+				list.attr = attributes;
+				attr = list.attr[0];
+				
+				theStatus = SecKeychainItemCopyContent (item, NULL, &list, NULL, NULL);
+				
+				// make it clear that this is the beginning of a new
+				// keychain item
+				if (theStatus == noErr)
+				{
+					flickrParser.flickrAPIKey = [[[NSString alloc] initWithBytes:attributes[0].data length:attributes[0].length encoding:NSUTF8StringEncoding] autorelease];
+					
+				NSLog(@"Flickr credentials: %@ %@", flickrParser.flickrAPIKey, flickrParser.flickrSharedSecret);
+					SecKeychainItemFreeContent (&list, NULL);
+				}
+				else NSLog(@"%@ unable to fetch 'flickr_api' account from keychain: status %d", NSStringFromSelector(_cmd), theStatus);
+			}
+			else
+			{
+				NSLog(@"%@ Empty password for 'flickr_api' account in keychain: status %d", NSStringFromSelector(_cmd), theStatus);
+			}
+			SecKeychainItemFreeContent(NULL, buffer);
+		}
+		else
+		{
+			NSLog(@"%@ Couldn't find 'flickr_api' account in keychain: status %d", NSStringFromSelector(_cmd), theStatus);
+		}
+	}		// end IMBFlickrParser code
 }
 
 
