@@ -228,10 +228,12 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	{
 		for (NSString* mediaType in sRegisteredParserClasses)
 		{
+			NSLog(@"\n\n--- Media Type: %@\n\n", mediaType);
 			NSMutableSet* parserClasses = [IMBParserController registeredParserClassesForMediaType:mediaType];
 
 			for (Class parserClass in parserClasses)
 			{
+				NSLog(@"\n---- Class: %@\n\n", NSStringFromClass(parserClass));
 				// First ask the delegate whether we should load this parser...
 				
 				BOOL shouldLoad = YES;
