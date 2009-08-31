@@ -151,7 +151,7 @@ typedef NSUInteger kIMBObjectViewType;
 
 // Helpers...
 
-- (void) openObject:(IMBObject*)inObject inSelectedNode:(IMBNode*)inSelectedNode;
+- (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode;
 
 @end
 

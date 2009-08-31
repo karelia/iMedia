@@ -314,8 +314,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	NSString* folder = [IMBConfig downloadFolderPath];
 	NSString* filename = [[url path] lastPathComponent];
 	NSString* localFilePath = [folder stringByAppendingPathComponent:filename];
-	[download setDestination:localFilePath allowOverwrite:YES];
-	[download setDeletesFileUponFailure:NO];
+	[download setDestination:localFilePath allowOverwrite:NO];
+	[download setDeletesFileUponFailure:YES];
 }
 
 
@@ -323,7 +323,15 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) download:(NSURLDownload*)inDownload didCreateDestination:(NSString*)inPath
 {
+	NSString* key = [[[inDownload request] URL] path];
+	
 	// TODO: here we should remember the path to the file
+}
+
+
+- (void) download:(NSURLDownload*)inDownload didReceiveDataOfLength:(NSUInteger)inLength
+{
+	// TODO: ...
 }
 
 
@@ -343,8 +351,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) download:(NSURLDownload*)inDownload didFailWithError:(NSError*)inError
 {
-	self.error = inError;
-	_objectIndex = _objectCount;
+	[self.localFiles addObject:inError];
+	_objectIndex++;
 	[self _notifyDelegateOfProgressForObject:nil];
 }
 
