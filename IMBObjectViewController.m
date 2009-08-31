@@ -607,9 +607,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (void) imageBrowser:(IKImageBrowserView*)inView cellWasDoubleClickedAtIndex:(NSUInteger)inIndex
 {
-	IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+	NSArray* objects = [ibObjectArrayController selectedObjects];
 	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	[self openObject:object inSelectedNode:selectedNode];
+	[self openObjects:objects inSelectedNode:selectedNode];
 }
 
 
@@ -675,15 +675,8 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
 	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	NSIndexSet* rows = [ibListView selectedRowIndexes];
-	NSUInteger row = [rows firstIndex];
-		
-	while (row != NSNotFound)
-	{
-		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
-		[self openObject:object inSelectedNode:selectedNode];
-		row = [rows indexGreaterThanIndex:row];
-	}
+	NSArray* objects = [ibObjectArrayController selectedObjects];
+	[self openObjects:objects inSelectedNode:selectedNode];
 }
 
 
@@ -694,33 +687,30 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 #pragma mark Helpers
  
 
-// Double-clicking opens the file (with its default app). Please note that IMBObjects are first passed through an 
-// IMBObjectPromise (which is returned by the parser), because the files may not yet be available locally. In this
-// case the promise object loads them asynchronously and calls _openLocalFiles: once the download has finsihed...
+// Open the specified objects...
 
-- (void) openObject:(IMBObject*)inObject inSelectedNode:(IMBNode*)inSelectedNode
+- (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode
 {
-	if (inSelectedNode)
+	IMBObject* firstObject = [inObjects count]>0 ? [inObjects objectAtIndex:0] : nil;
+	
+	// If this is a single IMBNodeObject, then expand the currently selected node and select the appropriate subnode...
+	
+	if ([firstObject isKindOfClass:[IMBNodeObject class]])
+	{
+		IMBNode* subnode = (IMBNode*)firstObject.value;
+		[_nodeViewController expandSelectedNode];
+		[_nodeViewController selectNode:subnode];
+	}
+		
+	// Double-clicking opens the files (with the default app). Please note that IMBObjects are first passed through an 
+	// IMBObjectPromise (which is returned by the parser), because the files may not yet be available locally. In this
+	// case the promise object loads them asynchronously and calls _openLocalFiles: once the download has finsihed...
+		
+	else if (inSelectedNode)
 	{
 		IMBParser* parser = inSelectedNode.parser;
-
-		// If this is a folder object, then expand the currently selected node and select the appropriate subnode...
-		
-		if ([inObject isKindOfClass:[IMBNodeObject class]])
-		{
-			IMBNode* node = (IMBNode*)inObject.value;
-			[_nodeViewController expandSelectedNode];
-			[_nodeViewController selectNode:node];
-		}
-		
-		// Regular objects are just opened upon double click...
-		
-		else
-		{
-			NSArray* objects = [NSArray arrayWithObject:inObject];
-			IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-			[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalFiles:withError:)];
-		}
+		IMBObjectPromise* promise = [parser objectPromiseWithObjects:inObjects];
+		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalFiles:withError:)];
 	}
 }
 

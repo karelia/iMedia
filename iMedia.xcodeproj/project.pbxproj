@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
 		D049EF5510346C1C003CC49C /* IMBNodeCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D049EF5310346C1C003CC49C /* IMBNodeCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049EF5610346C1C003CC49C /* IMBNodeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D049EF5410346C1C003CC49C /* IMBNodeCell.m */; };
 		D049F00A1034993E003CC49C /* NSImage+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0081034993E003CC49C /* NSImage+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -106,8 +107,6 @@
 		D0C2DB6D1024DBCC001B1198 /* IMBLibraryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */; };
 		D0C2DD0E1025905A001B1198 /* IMBImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C2DD0C1025905A001B1198 /* IMBImageViewController.m */; };
 		D0C2DD0F1025905A001B1198 /* IMBImageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D0C5B23C1022F68A00A97A60 /* icon-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2291022F4CA00A97A60 /* icon-view.png */; };
-		D0C5B23D1022F68A00A97A60 /* list-view.png in Resources */ = {isa = PBXBuildFile; fileRef = D0C5B2271022F4AA00A97A60 /* list-view.png */; };
 		D0CA93E7104917A400725DA3 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0CA93E6104917A400725DA3 /* QTKit.framework */; };
 		D0CA9427104932CD00725DA3 /* IMBiTunesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */; };
 		D0CA9428104932CD00725DA3 /* IMBiTunesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CA9426104932CD00725DA3 /* IMBiTunesParser.m */; };
@@ -193,6 +192,7 @@
 		32DBCF5E0370ADEE00C91783 /* iMedia.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.pch; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* iMedia.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iMedia.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = IMBComboViewTemplate.pdf; sourceTree = "<group>"; };
 		D049EF5310346C1C003CC49C /* IMBNodeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeCell.h; sourceTree = "<group>"; };
 		D049EF5410346C1C003CC49C /* IMBNodeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeCell.m; sourceTree = "<group>"; };
 		D049F0081034993E003CC49C /* NSImage+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSImage+iMedia.h"; sourceTree = "<group>"; };
@@ -296,8 +296,6 @@
 		D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBLibraryView.xib; sourceTree = "<group>"; };
 		D0C2DD0C1025905A001B1198 /* IMBImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageViewController.m; sourceTree = "<group>"; };
 		D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageViewController.h; sourceTree = "<group>"; };
-		D0C5B2271022F4AA00A97A60 /* list-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "list-view.png"; sourceTree = "<group>"; };
-		D0C5B2291022F4CA00A97A60 /* icon-view.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-view.png"; sourceTree = "<group>"; };
 		D0CA93E6104917A400725DA3 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
 		D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiTunesParser.h; sourceTree = "<group>"; };
 		D0CA9426104932CD00725DA3 /* IMBiTunesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiTunesParser.m; sourceTree = "<group>"; };
@@ -534,6 +532,7 @@
 				D08070C710442DAE00891137 /* IMBAudioView.xib */,
 				D08070C910442DC800891137 /* IMBMovieView.xib */,
 				D08070E910442F0500891137 /* IMBPanel.xib */,
+				D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */,
 			);
 			name = Views;
 			sourceTree = SOURCE_ROOT;
@@ -609,8 +608,6 @@
 				D09933B11011B32B00C527B7 /* IMBTestAppDelegate.h */,
 				D09933B21011B32B00C527B7 /* IMBTestAppDelegate.m */,
 				D09933B61011B3CE00C527B7 /* IMBTestApp.xib */,
-				D0C5B2291022F4CA00A97A60 /* icon-view.png */,
-				D0C5B2271022F4AA00A97A60 /* list-view.png */,
 			);
 			name = "Test Application";
 			sourceTree = "<group>";
@@ -833,6 +830,7 @@
 				D0CA94D61049455B00725DA3 /* itunes-icon-podcasts7.png in Resources */,
 				D0CA94D71049455B00725DA3 /* itunes-icon-purchased7.png in Resources */,
 				D0CA94D81049455B00725DA3 /* itunes-icon-tvshows.png in Resources */,
+				D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -841,8 +839,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D09933B71011B3CE00C527B7 /* IMBTestApp.xib in Resources */,
-				D0C5B23C1022F68A00A97A60 /* icon-view.png in Resources */,
-				D0C5B23D1022F68A00A97A60 /* list-view.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
