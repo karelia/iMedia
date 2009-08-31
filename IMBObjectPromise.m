@@ -323,7 +323,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) download:(NSURLDownload*)inDownload didCreateDestination:(NSString*)inPath
 {
-	NSString* key = [[[inDownload request] URL] path];
+//	NSString* key = [[[inDownload request] URL] path];
 	
 	// TODO: here we should remember the path to the file
 }
