@@ -188,6 +188,8 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 {
 	if (self = [super init])
 	{
+		_loadingCustomParsers = NO;
+		
 		[[NSNotificationCenter defaultCenter]				// Unload parsers before we quit, so that custom have 
 			addObserver:self								// a chance to clean up (e.g. remove callbacks, etc...)
 			selector:@selector(unloadParsers) 
@@ -228,12 +230,10 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	{
 		for (NSString* mediaType in sRegisteredParserClasses)
 		{
-			NSLog(@"\n\n--- Media Type: %@\n\n", mediaType);
 			NSMutableSet* parserClasses = [IMBParserController registeredParserClassesForMediaType:mediaType];
 
 			for (Class parserClass in parserClasses)
 			{
-				NSLog(@"\n---- Class: %@\n\n", NSStringFromClass(parserClass));
 				// First ask the delegate whether we should load this parser...
 				
 				BOOL shouldLoad = YES;
@@ -258,7 +258,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 					
 					if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didLoadParser:forMediaType:)])
 					{
-						for (IMBParser* parser in parsers) 
+						for (IMBParser* parser in parserInstances) 
 						{
 							[_delegate controller:self didLoadParser:parser forMediaType:mediaType];
 						}
@@ -390,7 +390,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 - (void) saveCustomParsersToPreferences
 {
-	if (_loadedParsers)
+	if (_loadedParsers != nil && _loadingCustomParsers == NO)
 	{
 		NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
 		NSMutableArray* customParsers = [NSMutableArray array];
@@ -423,10 +423,14 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Restore the custom parser instances from the list which was stored in the prefs...
+// Restore the custom parser instances from the list which was stored in the prefs. The flag _loadingCustomParsers
+// is used to skip the saveCustomParsersToPreferences method call when calling addCustomParser:forMediaType: which
+// is totally useless while we are loading from the prefs...
 
 - (void) loadCustomParsersFromPreferences
 {
+	_loadingCustomParsers = YES;
+	
 	NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
 	NSArray* customParsers = [prefs objectForKey:@"customParsers"];
 	
@@ -443,6 +447,8 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		[self addCustomParser:parser forMediaType:parser.mediaType];
 		[parser release];
 	}
+	
+	_loadingCustomParsers = NO;
 }
 
 

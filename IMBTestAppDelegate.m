@@ -20,12 +20,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark MACROS
+#pragma mark CONSTANTS
 
-#define LOG_PARSERS 1
+#define LOG_PARSERS 0
 #define LOG_CREATE_NODE 0
 #define LOG_POPULATE_NODE 0
-
 #define CUSTOM_USER_INTERFACE 0
 
 
