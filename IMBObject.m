@@ -132,6 +132,11 @@
 	return [self.value isEqual:inObject.value];
 }
 
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"%@ name=%@ value=%@ metadata=%p", [super description], self.name, self.value, self.metadata];
+}
+
 @end
 
 
@@ -159,7 +164,6 @@
 	return self;
 }
 
-
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[super encodeWithCoder:inCoder];
@@ -184,6 +188,11 @@
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
 	[super dealloc];
+}
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"%@ imageRepresentation=%@ imageRepresentationType=%@ imageVersion=%d", [super description], self.imageRepresentation, self.imageRepresentationType, self.imageVersion];
 }
 
 
@@ -261,6 +270,11 @@
 	return [[NSWorkspace sharedWorkspace] iconForFile:self.path];
 }
 
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"%@ path=%@", [super description], self.path];
+}
 
 @end
 
