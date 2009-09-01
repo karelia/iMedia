@@ -46,9 +46,10 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#import <Quartz/Quartz.h>
 
 #if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5
-#import <Quartz/Quartz.h>
+
 #else
 #import "IMBImageKit.h"
 #endif

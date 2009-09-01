@@ -17,7 +17,7 @@
  without limitation the rights to use, copy, modify, merge, publish,
  distribute, sublicense, and/or sell copies of the Software, and to permit
  persons to whom the Software is furnished to do so, subject to the following
- conditions:
+ conditions: 
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
@@ -127,6 +127,21 @@
 	}	
 }
 
+- (void)sizeDidChange;
+{
+	int points = 0;
+	int width = [self size].width;
+	
+	if (width < 50) points = 9;
+	else if (width < 60) points = 10;
+	else if (width < 70) points = 11;
+	else if (width < 80) points = 12;
+	else points = 13;
+
+	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont fontWithName:@"Lucida Grande" size:points] forKey:NSFontAttributeName];
+	[[self parent] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
+	[super sizeDidChange];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
