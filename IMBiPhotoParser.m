@@ -210,6 +210,9 @@
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
 		node.parser = self;
+		
+		[node.icon setScalesWhenResized:YES];
+		[node.icon setSize:NSMakeSize(16.0,16.0)];
 	}
 	
 	// Or an subnode...

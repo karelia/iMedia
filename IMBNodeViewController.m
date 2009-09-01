@@ -89,7 +89,9 @@ static NSString* kSelectionKey = @"selection";
 - (void) _nodesWillChange;
 - (void) _nodesDidChange;
 - (void) _updatePopupMenu;
+- (void) __updatePopupMenu;
 - (void) _syncPopupMenuSelection;
+- (void) __syncPopupMenuSelection;
 
 @end
 
@@ -522,7 +524,7 @@ static NSString* kSelectionKey = @"selection";
 
 	// Sync the selection of the popup menu...
 	
-	[self _syncPopupMenuSelection];
+	[self __syncPopupMenuSelection];
 }
 
 
@@ -713,9 +715,9 @@ static NSString* kSelectionKey = @"selection";
 	
 	// Rebuild the popup menu manually. Please note that the popup menu does not currently use bindings...
 	
-	[self _updatePopupMenu];
-	[self _syncPopupMenuSelection];
-		
+	[self __updatePopupMenu];
+	[self __syncPopupMenuSelection];
+
 	// We are done, now the user is once again in charge...
 	
 	_isRestoringState = NO;
@@ -741,18 +743,13 @@ static NSString* kSelectionKey = @"selection";
 		{
 			NSIndexPath* indexPath = inNode.indexPath;
 			[ibNodeTreeController setSelectionIndexPath:indexPath];
-			[self.libraryController populateNode:inNode];
+			[self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
 		}
 	}	
 	else
 	{
 		[ibNodeTreeController setSelectionIndexPaths:nil];
 	}
-
-//	// Make sure that the selection in the popup matches...
-//	
-//	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_syncPopupMenuSelection) object:nil];
-//	[self performSelector:@selector(_syncPopupMenuSelection) withObject:nil afterDelay:0.0];
 }
 
 
@@ -791,11 +788,6 @@ static NSString* kSelectionKey = @"selection";
 			break;
 		}
 	}
-	
-	// Rebuild the popup menu manually...
-	
-//	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_updatePopupMenu) object:nil];
-//	[self performSelector:@selector(_updatePopupMenu) withObject:nil afterDelay:0.0];
 }
 
 
@@ -810,15 +802,11 @@ static NSString* kSelectionKey = @"selection";
 {
 	if (inContext == (void*)kArrangedObjectsKey)
 	{
-//		[self _updatePopupMenu];
-//		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_updatePopupMenu) object:nil];
-//		[self performSelector:@selector(_updatePopupMenu) withObject:nil afterDelay:0.0];
+//		[self __updatePopupMenu];
 	}
 	else if (inContext == (void*)kSelectionKey)
 	{
-		[self _syncPopupMenuSelection];
-//		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_syncPopupMenuSelection) object:nil];
-//		[self performSelector:@selector(_syncPopupMenuSelection) withObject:nil afterDelay:0.0];
+		[self __syncPopupMenuSelection];
 	}
 	else
 	{
@@ -837,6 +825,13 @@ static NSString* kSelectionKey = @"selection";
 		addSeparators:YES];
 		
 	[ibNodePopupButton setMenu:menu];
+}
+
+
+- (void) __updatePopupMenu
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_updatePopupMenu) object:nil];
+	[self performSelector:@selector(_updatePopupMenu) withObject:nil afterDelay:0.0];
 }
 
 
@@ -866,6 +861,13 @@ static NSString* kSelectionKey = @"selection";
 			[ibNodePopupButton selectItem:item];
 		}
 	}
+}
+
+
+- (void) __syncPopupMenuSelection
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_syncPopupMenuSelection) object:nil];
+	[self performSelector:@selector(_syncPopupMenuSelection) withObject:nil afterDelay:0.0];
 }
 
 

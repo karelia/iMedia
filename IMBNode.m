@@ -438,8 +438,21 @@
 	if (_parentNode)
 	{
 		[_parentNode _recursivelyWalkParentsAddingPathIndexTo:inIndexArray];
-		NSUInteger index = [_parentNode.subNodes indexOfObjectIdenticalTo:self];
-		[inIndexArray addObject:[NSNumber numberWithUnsignedInt:index]];
+//		NSUInteger index = [_parentNode.subNodes indexOfObjectIdenticalTo:self];
+//		[inIndexArray addObject:[NSNumber numberWithUnsignedInt:index]];
+		
+		NSUInteger index = 0;
+		
+		for (IMBNode* siblingNode in _parentNode.subNodes)
+		{
+			if ([siblingNode.identifier isEqualToString:self.identifier])
+			{
+				[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:index]];
+				return;
+			}
+			
+			index++;
+		}
 	}
 	
 	// If we are at the root the get the node index in the controllers nodes array...
@@ -448,9 +461,26 @@
 	{
 		NSString* mediaType = _parser.mediaType;
 		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
-		NSUInteger index = [libraryController.rootNodes indexOfObjectIdenticalTo:self];
-		[inIndexArray addObject:[NSNumber numberWithUnsignedInt:index]];
+//		NSUInteger index = [libraryController.rootNodes indexOfObjectIdenticalTo:self];
+//		[inIndexArray addObject:[NSNumber numberWithUnsignedInt:index]];
+
+		NSUInteger index = 0;
+		
+		for (IMBNode* siblingNode in libraryController.rootNodes)
+		{
+			if ([siblingNode.identifier isEqualToString:self.identifier])
+			{
+				[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:index]];
+				return;
+			}
+			
+			index++;
+		}
 	}
+	
+	// Oops, we shouldn't be here...
+	
+	[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:NSNotFound]];
 }
 
 
