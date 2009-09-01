@@ -749,10 +749,10 @@ static NSString* kSelectionKey = @"selection";
 		[ibNodeTreeController setSelectionIndexPaths:nil];
 	}
 
-	// Make sure that the selection in the popup matches...
-	
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_syncPopupMenuSelection) object:nil];
-	[self performSelector:@selector(_syncPopupMenuSelection) withObject:nil afterDelay:0.0];
+//	// Make sure that the selection in the popup matches...
+//	
+//	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_syncPopupMenuSelection) object:nil];
+//	[self performSelector:@selector(_syncPopupMenuSelection) withObject:nil afterDelay:0.0];
 }
 
 
@@ -794,8 +794,8 @@ static NSString* kSelectionKey = @"selection";
 	
 	// Rebuild the popup menu manually...
 	
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_updatePopupMenu) object:nil];
-	[self performSelector:@selector(_updatePopupMenu) withObject:nil afterDelay:0.0];
+//	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_updatePopupMenu) object:nil];
+//	[self performSelector:@selector(_updatePopupMenu) withObject:nil afterDelay:0.0];
 }
 
 

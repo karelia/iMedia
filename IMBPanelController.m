@@ -175,7 +175,7 @@ static IMBPanelController* sSharedPanelController = nil;
 		// Load the library for each media type...
 		
 		libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
-		[libraryController setDelegate:self];
+		[libraryController setDelegate:self.delegate];
 
 		// Create the node view controllers for each media type...
 		

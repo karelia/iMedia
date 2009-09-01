@@ -73,6 +73,7 @@
 {
 	NSMutableDictionary* _loadedParsers;
 	id _delegate;
+	BOOL _loadingCustomParsers;
 }
 
 // Create singleton instance of the controller. Don't forget to set the delegate early in the app lifetime...
