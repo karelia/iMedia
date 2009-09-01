@@ -188,6 +188,10 @@
 		NSURL* imageURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
 		NSURL* photoSourcePage = [_flickrContext photoWebPageURLFromDictionary:photoDict];
 		
+		// We will need to get the URL of the original photo (or the largest possible)
+		// Or, perhaps, we may want to have a callback to the application for what size of photo it would like
+		// to receive.  (There's no point in getting larger size than the application will need.)
+		
 		IMBVisualObject* obj = [[IMBVisualObject alloc] init];
 		obj.name = [photoDict objectForKey:@"title"];
 		obj.imageRepresentation = imageURL;
@@ -224,7 +228,7 @@
 - (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
 		 didFailWithError: (NSError*) inError {
 	
-	NSLog (@"flickrAPIRequest:didFailWithError:");	
+	NSLog (@"flickrAPIRequest:didFailWithError: %@", inError);	
 	//	TODO: Error Handling
 }
 

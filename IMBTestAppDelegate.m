@@ -154,6 +154,8 @@
 		// API key at least 30 days before shipping)
 		
 		#warning Supply your own Flickr API key and shared secret, or apply for key and secret at: http://flickr.com/services/api/keys/apply
+		// If you already have an API key, you will find it here:  http://www.flickr.com/services/api/keys/
+		
 		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
 
 		// For your actual app, you would put in the hard-wired strings here.
