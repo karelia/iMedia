@@ -290,6 +290,9 @@
 		D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveFlickr.xcodeproj; path = ObjectiveFlickr/ObjectiveFlickr.xcodeproj; sourceTree = "<group>"; };
 		D0B779631047B65D00D12548 /* IMBFlickrParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrParser.h; sourceTree = "<group>"; };
 		D0B87F21103D998D00C48C6F /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.h; sourceTree = "<group>"; };
+		D0B91931104D8709009218A5 /* IMBQuickLookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBQuickLookController.h; sourceTree = "<group>"; };
+		D0B91932104D8709009218A5 /* IMBQuickLookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBQuickLookController.m; sourceTree = "<group>"; };
+		D0B91935104D870F009218A5 /* QLPreviewPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QLPreviewPanel.h; sourceTree = "<group>"; };
 		D0BE0A8A104802A7009AE844 /* IMBTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTableView.h; sourceTree = "<group>"; };
 		D0BE0A8B104802A7009AE844 /* IMBTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTableView.m; sourceTree = "<group>"; };
 		D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageBrowserCell.h; sourceTree = "<group>"; };
@@ -431,9 +434,20 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
+		D004A9CB104D890B005DBB2B /* BXQuickLookController */ = {
+			isa = PBXGroup;
+			children = (
+				D0B91931104D8709009218A5 /* IMBQuickLookController.h */,
+				D0B91932104D8709009218A5 /* IMBQuickLookController.m */,
+				D0B91935104D870F009218A5 /* QLPreviewPanel.h */,
+			);
+			name = BXQuickLookController;
+			sourceTree = "<group>";
+		};
 		D08E8B5A1019C8EF005D8614 /* Third Party */ = {
 			isa = PBXGroup;
 			children = (
+				D004A9CB104D890B005DBB2B /* BXQuickLookController */,
 				D08E8D8B1019EBFB005D8614 /* IMBFileWatcher */,
 				D08E8B5C1019C900005D8614 /* UKFileWatcher */,
 				D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */,

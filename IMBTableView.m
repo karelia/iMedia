@@ -52,6 +52,7 @@
 #import "IMBTableView.h"
 #import "IMBObjectViewController.h"
 #import "IMBObject.h"
+#import "IMBQuickLookController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,18 +107,58 @@
 	NSInteger n = [self numberOfRows];
 	IMBObject* object = nil;
 	
-	IMBObjectViewController* viewController = (IMBObjectViewController*) self.delegate;
+	IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
 
 	if (i>=0 && i<n)
 	{
-		object = [[viewController.objectArrayController arrangedObjects] objectAtIndex:i];
-		[viewController.objectArrayController setSelectionIndex:i];
+		object = [[objectViewController.objectArrayController arrangedObjects] objectAtIndex:i];
+		[objectViewController.objectArrayController setSelectionIndex:i];
 	}
 
-	return [viewController menuForObject:object];
+	return [objectViewController menuForObject:object];
 }
 
 			
+//----------------------------------------------------------------------------------------------------------------------
+
+
+//- (void) keyDown:(NSEvent*)inEvent
+//{
+//	int key = [[inEvent characters] characterAtIndex:0];
+//
+//	if (key == ' ')
+//	{
+//		IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
+//		[objectViewController quicklook:self];
+//	}
+//	else
+//	{
+//		[super keyDown:(NSEvent*)inEvent];
+//	}
+//}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+//- (BOOL) acceptsPreviewPanelControl:(id)inPanel
+//{
+//	return YES;
+//}
+//
+//
+//- (void) beginPreviewPanelControl:(id)inPanel
+//{
+//	[[IMBQuickLookController sharedController] beginPreviewPanelControl:inPanel];
+//}
+//
+//
+//- (void) endPreviewPanelControl:(id)inPanel
+//{
+//	[[IMBQuickLookController sharedController] endPreviewPanelControl:inPanel];
+//}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

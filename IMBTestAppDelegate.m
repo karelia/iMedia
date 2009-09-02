@@ -129,6 +129,15 @@
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
 	#endif
 	
+	if ([NSStringFromClass(inParserClass) isEqualToString:@"IMBFlickrParser"])
+	{
+		SecKeychainItemRef item = nil;
+		UInt32 stringLength;
+		char* buffer;
+		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void*)&buffer,&item);
+		return item != nil && err == noErr;
+	}
+	
 	return YES;
 }
 
