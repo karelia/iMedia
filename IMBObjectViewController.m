@@ -60,6 +60,7 @@
 #import "IMBObject.h"
 #import "IMBObjectPromise.h"
 #import "IMBImageBrowserCell.h"
+#import "IMBQuickLookController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import <Quartz/Quartz.h>
@@ -534,6 +535,19 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 		[item release];
 	}
 	
+//	// QuickLook...
+//	
+//	title = IMBLocalizedString(
+//		@"IMBObjectViewController.menuItem.quickLook",
+//		@"Quicklook",
+//		@"Menu item in context menu of IMBObjectViewController");
+//		
+//	item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
+//	[item setRepresentedObject:inObject];
+//	[item setTarget:self];
+//	[menu addItem:item];
+//	[item release];
+
 	// Give parser a chance to add menu items...
 	
 	IMBNode* selectedNode = [_nodeViewController selectedNode];
@@ -585,6 +599,13 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	[_nodeViewController expandSelectedNode];
 	[_nodeViewController selectNode:node];
 }
+
+
+//- (IBAction) quicklook:(id)inSender
+//{
+//	[[IMBQuickLookController sharedController] setDataSource:self];
+//	[[IMBQuickLookController sharedController] toggle:nil];
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -678,6 +699,114 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	NSArray* objects = [ibObjectArrayController selectedObjects];
 	[self openObjects:objects inSelectedNode:selectedNode];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark QuickLook Delegate
+ 
+
+//- (NSURL*) _urlForObject:(IMBObject*)inObject
+//{
+//	if ([inObject.value isKindOfClass:[NSURL class]])
+//	{
+//		return (NSURL*) inObject.value;
+//	}
+//	else if ([inObject.value isKindOfClass:[NSString class]])
+//	{
+//		NSString* path = (NSString*) inObject.value;
+//		return [NSURL fileURLWithPath:path];
+//	}
+//	
+//	return nil;
+//}
+//
+//
+//- (NSArray*) URLsForQuickLookController:(IMBQuickLookController*)inController
+//{
+//	NSMutableArray* urls = [NSMutableArray array];
+//	
+//	for (IMBObject* object in ibObjectArrayController.selectedObjects)
+//	{
+//		NSURL* url = [self _urlForObject:object];
+//		if (url) [urls addObject:url];
+//	}
+//	
+//	return urls;
+//}
+//
+//
+//- (NSRect) quickLookController:(IMBQuickLookController*)inController frameForURL:(NSURL*)inURL
+//{
+//	NSRect frame = NSZeroRect;
+//	NSView* srcView = nil;
+//	
+//	for (IMBObject* object in ibObjectArrayController.selectedObjects)
+//	{
+// 		NSURL* url = [self _urlForObject:object];
+//		
+//		if ([url isEqual:inURL])
+//		{
+//			NSInteger index = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:object];
+//
+//			if (index != NSNotFound)
+//			{
+//				if (_viewType == kIMBObjectViewTypeIcon)
+//				{
+//					frame = [ibIconView itemFrameAtIndex:index];
+//					srcView = ibIconView;
+//				}	
+//				else if (_viewType == kIMBObjectViewTypeList)
+//				{
+//					frame = [ibListView frameOfCellAtColumn:0 row:index];
+//					srcView = ibListView;
+//				}	
+//				else if (_viewType == kIMBObjectViewTypeCombo)
+//				{
+//					frame = [ibComboView frameOfCellAtColumn:0 row:index];
+//					srcView = ibComboView;
+//				}	
+//			}
+//
+//			frame = [srcView convertRectToBase:frame];
+//			frame.origin = [srcView.window convertBaseToScreen:frame.origin];
+//		}
+//	}
+//
+//NSLog(@"%s frame=%@",__FUNCTION__,NSStringFromRect(frame));
+//	return frame;
+//}
+//
+//
+//- (BOOL) quickLookController:(IMBQuickLookController*)inController handleEvent:(NSEvent*)inEvent
+//{
+//	NSString* characters = [inEvent charactersIgnoringModifiers];
+//	unichar c = ([characters length] > 0) ? [characters characterAtIndex:0] : 0;
+//	NSView* srcView = nil;
+//	
+//	switch (c)
+//	{
+//		case NSLeftArrowFunctionKey:
+//		case NSRightArrowFunctionKey:
+//		case NSUpArrowFunctionKey:
+//		case NSDownArrowFunctionKey:
+//		
+//			if (_viewType == kIMBObjectViewTypeIcon)
+//				srcView = ibIconView;
+//			else if (_viewType == kIMBObjectViewTypeList)
+//				srcView = ibListView;
+//			else if (_viewType == kIMBObjectViewTypeCombo)
+//				srcView = ibComboView;
+//
+//			[srcView keyDown:inEvent];
+//			[inController update:nil];
+//			return YES;
+//	}
+//	
+//	return NO;
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
