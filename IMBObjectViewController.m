@@ -454,8 +454,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 	if ([inObject isKindOfClass:[IMBNodeObject class]])
 	{
-		title = IMBLocalizedString(
+		title = NSLocalizedStringWithDefaultValue(
 			@"IMBObjectViewController.menuItem.open",
+			nil,IMBBundle(),
 			@"Open",
 			@"Menu item in context menu of IMBObjectViewController");
 			
@@ -482,8 +483,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 			
 			if (found)
 			{
-				title = IMBLocalizedString(
+				title = NSLocalizedStringWithDefaultValue(
 					@"IMBObjectViewController.menuItem.openInApp",
+					nil,IMBBundle(),
 					@"Open in %@",
 					@"Menu item in context menu of IMBObjectViewController");
 				
@@ -492,8 +494,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 			}
 			else
 			{
-				title = IMBLocalizedString(
+				title = NSLocalizedStringWithDefaultValue(
 					@"IMBObjectViewController.menuItem.openWithFinder",
+					nil,IMBBundle(),
 					@"Open with Finder",
 					@"Menu item in context menu of IMBObjectViewController");
 			}
@@ -506,8 +509,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 			// Reveal in Finder...
 			
-			title = IMBLocalizedString(
+			title = NSLocalizedStringWithDefaultValue(
 				@"IMBObjectViewController.menuItem.revealInFinder",
+				nil,IMBBundle(),
 				@"Reveal in Finder",
 				@"Menu item in context menu of IMBObjectViewController");
 				
@@ -523,8 +527,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 	else if ([[inObject value] isKindOfClass:[NSURL class]])
 	{
-		title = IMBLocalizedString(
+		title = NSLocalizedStringWithDefaultValue(
 			@"IMBObjectViewController.menuItem.openInBrowser",
+			nil,IMBBundle(),
 			@"Open in Browser",
 			@"Menu item in context menu of IMBObjectViewController");
 			
@@ -537,8 +542,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 //	// QuickLook...
 //	
-//	title = IMBLocalizedString(
+//	title = NSLocalizedStringWithDefaultValue(
 //		@"IMBObjectViewController.menuItem.quickLook",
+//		nil,IMBBundle(),
 //		@"Quicklook",
 //		@"Menu item in context menu of IMBObjectViewController");
 //		
@@ -555,7 +561,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 	if ([parser respondsToSelector:@selector(addMenuItemsToContextMenu:forObject:)])
 	{
-		[parser addMenuItemsToContextMenu:menu forObject:inObject];
+		[parser willShowContextMenu:menu forObject:inObject];
 	}
 	
 	// Give delegate a chance to add custom menu items...
@@ -624,13 +630,29 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Double-clicking opens the file (with its default app)...
+// First give the delegate a chance to handle the double click. It it chooses not to, then we will 
+// handle it ourself by simply opening the files (with their default app)...
 
 - (void) imageBrowser:(IKImageBrowserView*)inView cellWasDoubleClickedAtIndex:(NSUInteger)inIndex
 {
-	NSArray* objects = [ibObjectArrayController selectedObjects];
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	[self openObjects:objects inSelectedNode:selectedNode];
+	IMBLibraryController* controller = self.libraryController;
+	id delegate = controller.delegate;
+	BOOL didHandleEvent = NO;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
+		{
+			IMBNode* node = [_nodeViewController selectedNode];
+			NSArray* objects = [ibObjectArrayController selectedObjects];
+			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
+		}
+	}
+	
+	if (!didHandleEvent)
+	{
+		[self openSelectedObjects:inView];
+	}	
 }
 
 
@@ -695,9 +717,24 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	NSArray* objects = [ibObjectArrayController selectedObjects];
-	[self openObjects:objects inSelectedNode:selectedNode];
+	IMBLibraryController* controller = self.libraryController;
+	id delegate = controller.delegate;
+	BOOL didHandleEvent = NO;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
+		{
+			IMBNode* node = [_nodeViewController selectedNode];
+			NSArray* objects = [ibObjectArrayController selectedObjects];
+			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
+		}
+	}
+	
+	if (!didHandleEvent)
+	{
+		[self openSelectedObjects:inSender];
+	}	
 }
 
 
@@ -815,6 +852,16 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 #pragma mark 
 #pragma mark Helpers
  
+
+// Open the selected objects...
+
+- (IBAction) openSelectedObjects:(id)inSender
+{
+	IMBNode* selectedNode = [_nodeViewController selectedNode];
+	NSArray* objects = [ibObjectArrayController selectedObjects];
+	[self openObjects:objects inSelectedNode:selectedNode];
+}
+
 
 // Open the specified objects...
 

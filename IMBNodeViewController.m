@@ -990,8 +990,9 @@ static NSString* kSelectionKey = @"selection";
 	
 	if (inNode==nil || inNode.isGroup && inNode.groupType==kIMBGroupTypeFolder)
 	{
-		title = IMBLocalizedString(
+		title = NSLocalizedStringWithDefaultValue(
 			@"IMBNodeViewController.menuItem.add",
+			nil,IMBBundle(),
 			@"Add…",
 			@"Menu item in context menu of outline view");
 
@@ -1003,8 +1004,9 @@ static NSString* kSelectionKey = @"selection";
 	
 	if (inNode!=nil && inNode.parser.isCustom && !inNode.isLoading)
 	{
-		title = IMBLocalizedString(
+		title = NSLocalizedStringWithDefaultValue(
 			@"IMBNodeViewController.menuItem.remove",
+			nil,IMBBundle(),
 			@"Remove",
 			@"Menu item in context menu of outline view");
 
@@ -1016,8 +1018,9 @@ static NSString* kSelectionKey = @"selection";
 	
 	if (inNode!=nil && !inNode.isGroup && !inNode.isLoading)
 	{
-		title = IMBLocalizedString(
+		title = NSLocalizedStringWithDefaultValue(
 			@"IMBNodeViewController.menuItem.reload",
+			nil,IMBBundle(),
 			@"Reload",
 			@"Menu item in context menu of outline view");
 
@@ -1031,7 +1034,7 @@ static NSString* kSelectionKey = @"selection";
 	
 	if ([inNode.parser respondsToSelector:@selector(addMenuItemsToContextMenu:forNode:)])
 	{
-		[inNode.parser addMenuItemsToContextMenu:menu forNode:inNode];
+		[inNode.parser willShowContextMenu:menu forNode:inNode];
 	}
 	
 	// Finally give the delegate a chance to add menu items...

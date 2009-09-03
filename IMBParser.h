@@ -122,8 +122,8 @@
 // Called when the user right-clicks on a node in the IMBOutlineView. Here the parser has a chance to add custom
 // menu items of its own, that go beyond the funtionality of the standard items added by teh controllers...
 
-- (void) addMenuItemsToContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
-- (void) addMenuItemsToContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
+- (void) willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
+- (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
 
 @end
 

@@ -117,8 +117,8 @@ typedef NSUInteger IMBGroupType;
 #define IMBRelease(object) if (object) {[object release]; object=nil;}
 #endif
 
-#ifndef IMBLocalizedString
-#define IMBLocalizedString(key,value,comment) NSLocalizedStringWithDefaultValue(key,nil,[NSBundle bundleForClass:NSClassFromString(@"IMBConfig")],value,comment)
+#ifndef IMBBundle
+#define IMBBundle() [NSBundle bundleForClass:NSClassFromString(@"IMBConfig")]
 #endif
 
 

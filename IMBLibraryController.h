@@ -158,12 +158,12 @@ extern NSString* kIMBNodesDidChangeNotification;
 #pragma mark 
 
 
-// The following delegate methods are called multiple times during the app lifetime. Return NO from the  
-// should methods to suppress an operation. The delegate methods are called on the main thread... 
-
 @protocol IMBLibraryControllerDelegate
 
 @optional
+
+// The following delegate methods are called multiple times during the app lifetime. Return NO from the  
+// should methods to suppress an operation. The delegate methods are called on the main thread... 
 
 - (BOOL) controller:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser;
 - (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser;
@@ -173,8 +173,17 @@ extern NSString* kIMBNodesDidChangeNotification;
 - (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode;
 - (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode;
 
+// Called when the user right clicks a node or object. These methods give the delegate a chance to add 
+// custom menu items to the exisiting context menu...
+
 - (void) controller:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
 - (void) controller:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
+
+// Called when the user double clicks selected object in one of the object views. If the delegate chooses to
+// handle the event iteself it must return YES. If NO is returned, the framework will invoke the default event
+// handling behavior (downloading the files to standard loaction and opening in default app)...
+
+- (BOOL) controller:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
 
 @end
 

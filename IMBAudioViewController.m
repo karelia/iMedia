@@ -105,8 +105,9 @@
 
 - (NSString*) displayName
 {
-	return IMBLocalizedString(
-		@"ImagesDisplayName",
+	return NSLocalizedStringWithDefaultValue(
+		@"AudioDisplayName",
+		nil,IMBBundle(),
 		@"Audio",
 		@"mediaType display name");
 }
@@ -117,8 +118,9 @@
 
 + (NSString*) objectCountFormatSingular
 {
-	return IMBLocalizedString(
-		@"ImageCountFormatSingular",
+	return NSLocalizedStringWithDefaultValue(
+		@"AudioCountFormatSingular",
+		nil,IMBBundle(),
 		@"%d song",
 		@"Format string for object count in singluar");
 }
@@ -126,8 +128,9 @@
 
 + (NSString*) objectCountFormatPlural
 {
-	return IMBLocalizedString(
-		@"ImageCountFormatPlural",
+	return NSLocalizedStringWithDefaultValue(
+		@"AudioCountFormatPlural",
+		nil,IMBBundle(),
 		@"%d songs",
 		@"Format string for object count in plural");
 }
