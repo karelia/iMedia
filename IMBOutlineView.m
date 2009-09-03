@@ -93,8 +93,9 @@
 
 - (void) awakeFromNib
 {
-	self.draggingPrompt = IMBLocalizedString(
+	self.draggingPrompt = NSLocalizedStringWithDefaultValue(
 		@"IMBOutlineView.draggingPrompt",
+		nil,IMBBundle(),
 		@"Drag additional folders here",
 		@"String that is displayed in the IMBOutlineView");
 

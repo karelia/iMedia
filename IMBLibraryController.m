@@ -463,8 +463,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		groupNode.groupType = kIMBGroupTypeLibrary;
 		groupNode.identifier = @"group://LIBRARIES";
-		groupNode.name = IMBLocalizedString(
-			@"LibrariesDisplayName",
+		groupNode.name =  NSLocalizedStringWithDefaultValue(
+			@"LibrariesGroupNodeDisplayName",
+			nil,IMBBundle(),
 			@"LIBRARIES",
 			@"group node display name");
 	}
@@ -472,8 +473,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		groupNode.groupType = kIMBGroupTypeFolder;
 		groupNode.identifier = @"group://FOLDERS";
-		groupNode.name = IMBLocalizedString(
-			@"FoldersDisplayName",
+		groupNode.name = NSLocalizedStringWithDefaultValue(
+			@"FoldersGroupNodeDisplayName",
+			nil,IMBBundle(),
 			@"FOLDERS",
 			@"group node display name");
 	}
@@ -481,8 +483,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		groupNode.groupType = kIMBGroupTypeSearches;
 		groupNode.identifier = @"group://SEARCHES";
-		groupNode.name = IMBLocalizedString(
-			@"SearchesDisplayName",
+		groupNode.name = NSLocalizedStringWithDefaultValue(
+			@"SearchesGroupNodeDisplayName",
+			nil,IMBBundle(),
 			@"SEARCHES",
 			@"group node display name");
 	}
@@ -490,8 +493,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		groupNode.groupType = kIMBGroupTypeInternet;
 		groupNode.identifier = @"group://INTERNET";
-		groupNode.name = IMBLocalizedString(
-			@"InternetDisplayName",
+		groupNode.name = NSLocalizedStringWithDefaultValue(
+			@"InternetGroupNodeDisplayName",
+			nil,IMBBundle(),
 			@"INTERNET",
 			@"group node display name");
 	}

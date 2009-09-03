@@ -151,6 +151,7 @@ typedef NSUInteger kIMBObjectViewType;
 
 // Helpers...
 
+- (IBAction) openSelectedObjects:(id)inSender;
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode;
 //- (IBAction) quicklook:(id)inSender;
 
