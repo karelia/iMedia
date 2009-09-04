@@ -51,6 +51,7 @@
 
 #import "IMBOutlineView.h"
 #import "IMBNodeViewController.h"
+#import "IMBLibraryController.h"
 #import "IMBNode.h"
 #import "IMBTextFieldCell.h"
 
@@ -107,15 +108,32 @@
 	[self.textCell setVerticalAlignment:kIMBBottomTextAlignment];
 	[self.textCell setFont:font];
 	[self.textCell setTextColor:[NSColor grayColor]];
+
+	// We need to save preferences before tha app quits...
+	
+	[[NSNotificationCenter defaultCenter] 
+		addObserver:self 
+		selector:@selector(_redraw) 
+		name:kIMBNodesWillReloadNotification 
+		object:nil];
+
+	[[NSNotificationCenter defaultCenter] 
+		addObserver:self 
+		selector:@selector(_redraw) 
+		name:kIMBNodesDidChangeNotification 
+		object:nil];
 }
 
 
 - (void) dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+
 	IMBRelease(_subviewsInVisibleRows);
 	IMBRelease(_draggingPrompt);
 	IMBRelease(_textCell);
-    [super dealloc];
+ 
+	[super dealloc];
 }
 
 
@@ -141,6 +159,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (void) _redraw
+{
+	[self setNeedsDisplay:YES];
+}
+
+
 - (void) viewWillDraw
 {
 	[super viewWillDraw];
@@ -151,18 +175,19 @@
 	NSRange visibleRows = [self rowsInRect:visibleRect];
 	NSMutableArray* keysToRemove = [NSMutableArray array];
 	
-	for (NSNumber* row in _subviewsInVisibleRows)
+	for (NSString* row in _subviewsInVisibleRows)
 	{
-		NSInteger i = row.intValue;
+		NSInteger i = [row intValue];
 		id item = [self itemAtRow:i];
 		IMBNode* node = [item representedObject];
 		
 		if (!NSLocationInRange(i,visibleRows) || node.badgeTypeNormal != kIMBBadgeTypeLoading)
 		{
+NSLog(@"Removing wheel for node %@",node.identifier);		
 			NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 			[wheel stopAnimation:nil];
 			[wheel removeFromSuperview];
-			[keysToRemove addObject:keysToRemove];
+			[keysToRemove addObject:row];
 		}
 	}
 	
@@ -174,11 +199,12 @@
 	{
 		id item = [self itemAtRow:i];
 		IMBNode* node = [item representedObject];
-		NSNumber* row = [NSNumber numberWithInt:i];
+		NSString* row = [NSString stringWithFormat:@"%d",i];
 		NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 		
 		if (wheel == nil && node != nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)
 		{
+NSLog(@"Adding wheel for node %@",node.identifier);		
 			NSRect badgeRect = [self badgeRectForRow:i];
 			NSProgressIndicator* wheel = [[NSProgressIndicator alloc] initWithFrame:badgeRect];
 			

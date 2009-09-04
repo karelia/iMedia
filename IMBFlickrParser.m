@@ -57,6 +57,7 @@
 #import "IMBLibraryController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBObjectPromise.h"
 #import "IMBParserController.h"
 #import "NSWorkspace+iMedia.h"
 
@@ -185,8 +186,8 @@
 	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
 	for (NSDictionary* photoDict in photos) {
-		NSURL* imageURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
-		NSURL* photoSourcePage = [_flickrContext photoWebPageURLFromDictionary:photoDict];
+		NSURL* thumbnailURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
+		NSURL* imageURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrLargeSize];
 		
 		// We will need to get the URL of the original photo (or the largest possible)
 		// Or, perhaps, we may want to have a callback to the application for what size of photo it would like
@@ -194,9 +195,9 @@
 		
 		IMBVisualObject* obj = [[IMBVisualObject alloc] init];
 		obj.name = [photoDict objectForKey:@"title"];
-		obj.imageRepresentation = imageURL;
+		obj.imageRepresentation = thumbnailURL;
 		obj.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
-		obj.value = [photoSourcePage absoluteString];		
+		obj.value = imageURL;		
 		[objects addObject:obj];
 		[obj release];
 	}
@@ -459,6 +460,13 @@
 		NSAssert (self.flickrSharedSecret, @"Flickr shared secret property not set!");
 		_flickrContext = [[OFFlickrAPIContext alloc] initWithAPIKey:self.flickrAPIKey sharedSecret:self.flickrSharedSecret];
 	}	
+}
+
+
+// For Flickr we need a remote promise that downloads the files off the internet
+- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects
+{
+	return [[(IMBObjectPromise*)[IMBRemoteObjectPromise alloc] initWithObjects:inObjects] autorelease];
 }
 
 

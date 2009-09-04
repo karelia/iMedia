@@ -77,6 +77,7 @@
 
 #pragma mark CONSTANTS
 
+NSString* kIMBNodesWillReloadNotification = @"IMBNodesWillReloadNotification";
 NSString* kIMBNodesWillChangeNotification = @"IMBNodesWillChangeNotification";
 NSString* kIMBNodesDidChangeNotification = @"IMBNodesDidChangeNotification";
 
@@ -357,6 +358,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) reload
 {
+	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
+
 	NSMutableArray* parsers = [[IMBParserController sharedParserController] loadedParsersForMediaType:self.mediaType];
 	
 	[self willChangeValueForKey:@"rootNodes"];
@@ -412,6 +415,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (shouldCreateNode)
 	{
+		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
+
 		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willCreateNodeWithParser:)])
 		{
 			[_delegate controller:self willCreateNodeWithParser:inNode.parser];
@@ -534,7 +539,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	IMBNode* oldNode = [inOldAndNewNode objectForKey:@"oldNode"];
 	IMBNode* newNode = [inOldAndNewNode objectForKey:@"newNode"];
-	
+
 	if (oldNode!=nil && newNode!=nil && oldNode.parentNode!=oldNode.parentNode)
 	{
 		NSLog(@"%s Error parent of oldNode and newNode must be the same...",__FUNCTION__);

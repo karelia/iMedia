@@ -55,6 +55,8 @@ extern NSString* kIMBObjectPromiseType;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
 // An IMBObjectPromise is a abstraction that is sitting between the iMedia framework and the client application. 
 // Objects from some parsers reside on the local file system, but objects from other parser may reside on a remote 
 // server or a camera device. In these cases we only have lores thumbnails available. To access the hires data, we
@@ -65,7 +67,7 @@ extern NSString* kIMBObjectPromiseType;
 @interface IMBObjectPromise : NSObject <NSCopying,NSCoding>
 {
 	NSArray* _objects; 
-	BOOL _recursive;
+	NSString* _downloadFolderPath;
 	NSMutableArray* _localFiles;
 	NSError* _error;
 	
@@ -80,9 +82,9 @@ extern NSString* kIMBObjectPromiseType;
 
 @property (retain) NSArray* objects;
 
-/// If YES the promise descends recursively into IMBNodeObjects and adds contained IMBObjects
+/// Optional download folder (only needed for remote files that need to be downloaded)
 
-@property (assign,getter=isRecursive) BOOL recursive;
+@property (retain) NSString* downloadFolderPath;
 
 /// Array of paths (may contain NSNull objects in case of failure)
 
@@ -111,14 +113,20 @@ extern NSString* kIMBObjectPromiseType;
 @end
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
 /// Protocol that notifies the delegate (usually the client application) of download progress
 
 @protocol IMBObjectPromiseDelegate
 
 @optional
 
-- (void) objectPromiseWillStartLoading:(IMBObjectPromise*)inObjectPromise;
-- (void) objectPromise:(IMBObjectPromise*)inObjectPromise name:(NSString*)inName progress:(double)inFraction;
+- (BOOL) objectPromiseShouldStartLoadingAsynchronously:(IMBObjectPromise*)inObjectPromise;
+- (void) objectPromise:(IMBObjectPromise*)inObjectPromise wantsProgressUI:(BOOL)inWantsProgressUI;
+- (void) objectPromise:(IMBObjectPromise*)inObjectPromise loadingProgress:(double)inFraction;
 - (void) objectPromise:(IMBObjectPromise*)inObjectPromise didFinishLoadingWithError:(NSError*)inError;
 
 @end
@@ -126,6 +134,8 @@ extern NSString* kIMBObjectPromiseType;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark 
 
 // This subclass is used for local object files that can be returned immediately. In this case a promise isn't 
 // really necessary, but to make the architecture more consistent, this abstraction is used nonetheless... 
@@ -138,10 +148,17 @@ extern NSString* kIMBObjectPromiseType;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
 // This subclass is used for remote object files that can be downloaded from a network. NSURLDownload is used to
 // pull the object files of the network onto the local file system, where it can then be accessed by the delegate... 
 
 @interface IMBRemoteObjectPromise : IMBObjectPromise
+{
+	NSMutableDictionary* _urlToLocalFileMap;
+}
+
+@property (retain) NSMutableDictionary* urlToLocalFileMap;
 
 @end
 

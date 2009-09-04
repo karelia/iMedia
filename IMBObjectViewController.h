@@ -106,6 +106,9 @@ typedef NSUInteger kIMBObjectViewType;
 	IBOutlet IKImageBrowserView* ibIconView;
 	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
+	IBOutlet NSWindow* ibProgressWindow;
+	IBOutlet NSProgressIndicator* ibProgressBar;
+	
 	NSUInteger _viewType;
 	double _iconSize;
 	
