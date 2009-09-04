@@ -155,10 +155,10 @@ extern NSString* kIMBObjectPromiseType;
 
 @interface IMBRemoteObjectPromise : IMBObjectPromise
 {
-	NSMutableDictionary* _urlToLocalFileMap;
+	NSMutableDictionary* _urlToPathMap;
 }
 
-@property (retain) NSMutableDictionary* urlToLocalFileMap;
+@property (retain) NSMutableDictionary* urlToPathMap;
 
 @end
 

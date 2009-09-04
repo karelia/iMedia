@@ -368,7 +368,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 @implementation IMBRemoteObjectPromise
 
-@synthesize urlToLocalFileMap = _urlToLocalFileMap;
+@synthesize urlToPathMap = _urlToPathMap;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -378,7 +378,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	if (self = [super initWithObjects:inObjects])
 	{
-		self.urlToLocalFileMap = [NSMutableDictionary dictionary];
+		self.urlToPathMap = [NSMutableDictionary dictionary];
 	}
 	
 	return self;
@@ -389,7 +389,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	if (self = [super initWithCoder:inCoder])
 	{
-		self.urlToLocalFileMap = [NSMutableDictionary dictionary];
+		self.urlToPathMap = [NSMutableDictionary dictionary];
 	}
 	
 	return self;
@@ -398,7 +398,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) dealloc
 {
-	IMBRelease(_urlToLocalFileMap);
+	IMBRelease(_urlToPathMap);
 	[super dealloc];
 } 
 
@@ -467,7 +467,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 - (void) download:(NSURLDownload*)inDownload didCreateDestination:(NSString*)inPath
 {
 	NSString* key = [[[inDownload request] URL] absoluteString];
-	[self.urlToLocalFileMap setObject:inPath forKey:key];
+	[self.urlToPathMap setObject:inPath forKey:key];
 }
 
 
@@ -484,7 +484,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 - (void) downloadDidFinish:(NSURLDownload*)inDownload
 {
 	NSString* key = [[[inDownload request] URL] absoluteString];
-	NSString* path = [self.urlToLocalFileMap objectForKey:key];	
+	NSString* path = [self.urlToPathMap objectForKey:key];	
 	
 	if (path)
 	{

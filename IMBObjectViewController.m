@@ -695,7 +695,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
 		
-		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,nil] owner:nil];
+		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,nil] owner:self];
 		[inPasteboard setData:data forType:kIMBObjectPromiseType];
 		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
 		
