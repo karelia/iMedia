@@ -73,6 +73,7 @@
 
 #pragma mark CONSTANTS
 
+extern NSString* kIMBNodesWillReloadNotification;
 extern NSString* kIMBNodesWillChangeNotification;
 extern NSString* kIMBNodesDidChangeNotification;
 
