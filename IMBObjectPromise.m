@@ -470,6 +470,15 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	[self.urlToPathMap setObject:inPath forKey:key];
 }
 
+- (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)response
+{
+	NSLog(@"expectedContentLength = %d", [response expectedContentLength]);
+	if (NSURLResponseUnknownLength == [response expectedContentLength])
+	{
+		NSLog(@"That's unknown");
+	}
+	
+}
 
 // Display progress in the UI...
 
