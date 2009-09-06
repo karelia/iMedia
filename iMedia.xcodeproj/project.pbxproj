@@ -21,6 +21,9 @@
 		D04FFEBC103BE81600104EB8 /* IMBObjectPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */; };
 		D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; };
 		D052AFD310538B7B00988F53 /* IMBURLDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */; };
+		D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D052B0931053B0F700988F53 /* IMBProgressWindowController.h */; };
+		D052B0961053B0F700988F53 /* IMBProgressWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D052B0941053B0F700988F53 /* IMBProgressWindowController.m */; };
+		D052B0C11053B4AB00988F53 /* IMBProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = D052B0C01053B4AB00988F53 /* IMBProgress.xib */; };
 		D05A9493102EB022005DF9CE /* IMBImageCaptureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D05A9494102EB022005DF9CE /* IMBImageCaptureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */; };
 		D062B0F81047B75100CA9B56 /* IMBFlickrParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D062B0F71047B75100CA9B56 /* IMBFlickrParser.m */; };
@@ -207,8 +210,11 @@
 		D049F0411034A86B003CC49C /* IMBIconCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBIconCache.m; sourceTree = "<group>"; };
 		D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectPromise.h; sourceTree = "<group>"; };
 		D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectPromise.m; sourceTree = "<group>"; };
-		D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMBURLDownloadOperation.h; path = ../iMedia2/IMBURLDownloadOperation.h; sourceTree = SOURCE_ROOT; };
-		D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IMBURLDownloadOperation.m; path = ../iMedia2/IMBURLDownloadOperation.m; sourceTree = SOURCE_ROOT; };
+		D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBURLDownloadOperation.h; sourceTree = "<group>"; };
+		D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBURLDownloadOperation.m; sourceTree = "<group>"; };
+		D052B0931053B0F700988F53 /* IMBProgressWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBProgressWindowController.h; sourceTree = "<group>"; };
+		D052B0941053B0F700988F53 /* IMBProgressWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBProgressWindowController.m; sourceTree = "<group>"; };
+		D052B0C01053B4AB00988F53 /* IMBProgress.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBProgress.xib; sourceTree = "<group>"; };
 		D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageCaptureParser.h; sourceTree = "<group>"; };
 		D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageCaptureParser.m; sourceTree = "<group>"; };
 		D05A94A4102EB14A005DF9CE /* ICADevices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICADevices.framework; path = System/Library/Frameworks/ICADevices.framework; sourceTree = SDKROOT; };
@@ -531,6 +537,8 @@
 				D08070BE10442CD700891137 /* IMBMovieViewController.m */,
 				D0E96D1A104410BD0015979F /* IMBPanelController.h */,
 				D0E96D1B104410BD0015979F /* IMBPanelController.m */,
+				D052B0931053B0F700988F53 /* IMBProgressWindowController.h */,
+				D052B0941053B0F700988F53 /* IMBProgressWindowController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -555,6 +563,7 @@
 				D0C2DAA110240C0B001B1198 /* IMBImageView.xib */,
 				D08070C710442DAE00891137 /* IMBAudioView.xib */,
 				D08070C910442DC800891137 /* IMBMovieView.xib */,
+				D052B0C01053B4AB00988F53 /* IMBProgress.xib */,
 				D08070E910442F0500891137 /* IMBPanel.xib */,
 				D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */,
 			);
@@ -743,6 +752,7 @@
 				D0CA9427104932CD00725DA3 /* IMBiTunesParser.h in Headers */,
 				D0CA961510498F7C00725DA3 /* IMBTimecodeTransformer.h in Headers */,
 				D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */,
+				D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -858,6 +868,7 @@
 				D0CA94D71049455B00725DA3 /* itunes-icon-purchased7.png in Resources */,
 				D0CA94D81049455B00725DA3 /* itunes-icon-tvshows.png in Resources */,
 				D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */,
+				D052B0C11053B4AB00988F53 /* IMBProgress.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -920,6 +931,7 @@
 				D0CA9428104932CD00725DA3 /* IMBiTunesParser.m in Sources */,
 				D0CA961610498F7C00725DA3 /* IMBTimecodeTransformer.m in Sources */,
 				D052AFD310538B7B00988F53 /* IMBURLDownloadOperation.m in Sources */,
+				D052B0961053B0F700988F53 /* IMBProgressWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
