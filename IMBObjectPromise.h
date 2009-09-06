@@ -71,8 +71,8 @@ extern NSString* kIMBObjectPromiseType;
 	NSMutableArray* _localFiles;
 	NSError* _error;
 	
-	double _objectCount;
-	double _objectIndex;
+	double _objectCountTotal;
+	double _objectCountLoaded;
 	
 	id _delegate;
 	SEL _finishSelector;
@@ -109,6 +109,7 @@ extern NSString* kIMBObjectPromiseType;
 /// Clients can start loading objects asynchronously. Once the finish selector is called the loading is done and local files can be retrieved.
 
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
+- (void) waitUntilDone;
 		
 @end
 
@@ -118,16 +119,18 @@ extern NSString* kIMBObjectPromiseType;
 
 #pragma mark 
 
-/// Protocol that notifies the delegate (usually the client application) of download progress
+// These delegate methods should be used by the client application to display a progress panel or sheet. They
+// are only called if necessary, i.e. if a lengthy loading operation is needed (e.g. downloads from the internet 
+// or form a camera device). Accessing local files on the hard disk on the other is instantaneous and does not 
+// require showing a progres bar...
 
 @protocol IMBObjectPromiseDelegate
 
 @optional
 
-- (BOOL) objectPromiseShouldStartLoadingAsynchronously:(IMBObjectPromise*)inObjectPromise;
-- (void) objectPromise:(IMBObjectPromise*)inObjectPromise wantsProgressUI:(BOOL)inWantsProgressUI;
-- (void) objectPromise:(IMBObjectPromise*)inObjectPromise loadingProgress:(double)inFraction;
-- (void) objectPromise:(IMBObjectPromise*)inObjectPromise didFinishLoadingWithError:(NSError*)inError;
+- (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise;
+- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise;
+- (void) cleanupProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise;
 
 @end
 
@@ -155,10 +158,13 @@ extern NSString* kIMBObjectPromiseType;
 
 @interface IMBRemoteObjectPromise : IMBObjectPromise
 {
-	NSMutableDictionary* _urlToPathMap;
+	NSMutableArray* _downloadOperations;
+	long long _totalBytes;
+	long long _currentBytes;
 }
 
-@property (retain) NSMutableDictionary* urlToPathMap;
+@property (retain) NSMutableArray* downloadOperations;
+- (IBAction) cancel:(id)inSender;
 
 @end
 

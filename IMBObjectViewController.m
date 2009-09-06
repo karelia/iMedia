@@ -695,24 +695,14 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
 		
-		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,nil] owner:self];
+		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType,nil] owner:self];
 		[inPasteboard setData:data forType:kIMBObjectPromiseType];
 		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
 		
-		return 1;
+		return objects.count;
 	}
 	
 	return 0;
-}
-
-
-// For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
-// the IMBObjectPromise for the client and block it until all objects are loaded...
-
-- (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
-{
-	[self _downloadSelectedObjectsToDestination:inDropDestination];
-	return [self _namesOfPromisedFiles];
 }
 
 
@@ -770,7 +760,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
 		
-		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,nil] owner:nil];
+		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType,nil] owner:self];
 		[inPasteboard setData:data forType:kIMBObjectPromiseType];
 		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
 		
@@ -859,6 +849,35 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 #pragma mark Dragging
  
 
+// For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
+// the IMBObjectPromise for the client and block it until all objects are loaded...
+
+- (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
+{
+	[self _downloadSelectedObjectsToDestination:inDropDestination];
+	return [self _namesOfPromisedFiles];
+}
+
+
+// Even dumber are apps that do not support NSFilesPromisePboardType, but only know about NSFilenamesPboardType.
+// In this case we'll download to the temp folder and block synchronously until the download has completed...
+
+- (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
+{
+    if ([inType isEqualToString:NSFilenamesPboardType])
+	{
+		NSData* data = [inPasteboard dataForType:kIMBObjectPromiseType];
+		IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+
+		promise.downloadFolderPath = NSTemporaryDirectory();
+		[promise startLoadingWithDelegate:self finishSelector:nil];
+		[promise waitUntilDone];
+		
+		[inPasteboard setPropertyList:promise.localFiles forType:NSFilenamesPboardType];
+    }
+}
+
+
 - (void) _downloadSelectedObjectsToDestination:(NSURL*)inDestination
 {
 	IMBNode* selectedNode = [_nodeViewController selectedNode];
@@ -896,29 +915,27 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 }
 
 
-- (void) objectPromise:(IMBObjectPromise*)inObjectPromise wantsProgressUI:(BOOL)inWantsProgressUI
+- (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
-	if (inWantsProgressUI)
-	{
-		[ibProgressBar setMinValue:0.0];
-		[ibProgressBar setMaxValue:1.0];
-		[ibProgressBar setDoubleValue:0.0];
-		[ibProgressBar setIndeterminate:YES];
-		[ibProgressBar setUsesThreadedAnimation:YES];
-		
-		[ibProgressWindow makeKeyAndOrderFront:nil];
-		[ibProgressBar startAnimation:nil];
-	}
+	[ibProgressBar setMinValue:0.0];
+	[ibProgressBar setMaxValue:1.0];
+	[ibProgressBar setDoubleValue:0.0];
+	[ibProgressBar setIndeterminate:YES];
+	[ibProgressBar setUsesThreadedAnimation:YES];
+	
+	[ibProgressWindow makeKeyAndOrderFront:nil];
+	[ibProgressBar startAnimation:nil];
 }
 
 
-- (void) objectPromise:(IMBObjectPromise*)inObjectPromise loadingProgress:(double)inFraction
+- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
 	[ibProgressBar setDoubleValue:inFraction];
+	[ibProgressBar setIndeterminate:NO];
 }
 
 
-- (void) objectPromise:(IMBObjectPromise*)inObjectPromise didFinishLoadingWithError:(NSError*)inError
+- (void) cleanupProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
 	[ibProgressBar stopAnimation:nil];
 	[ibProgressWindow orderOut:nil];

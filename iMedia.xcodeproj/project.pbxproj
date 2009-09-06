@@ -19,6 +19,8 @@
 		D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D049F0411034A86B003CC49C /* IMBIconCache.m */; };
 		D04FFEBB103BE81600104EB8 /* IMBObjectPromise.h in Headers */ = {isa = PBXBuildFile; fileRef = D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D04FFEBC103BE81600104EB8 /* IMBObjectPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */; };
+		D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; };
+		D052AFD310538B7B00988F53 /* IMBURLDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */; };
 		D05A9493102EB022005DF9CE /* IMBImageCaptureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D05A9494102EB022005DF9CE /* IMBImageCaptureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */; };
 		D062B0F81047B75100CA9B56 /* IMBFlickrParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D062B0F71047B75100CA9B56 /* IMBFlickrParser.m */; };
@@ -205,6 +207,8 @@
 		D049F0411034A86B003CC49C /* IMBIconCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBIconCache.m; sourceTree = "<group>"; };
 		D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectPromise.h; sourceTree = "<group>"; };
 		D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectPromise.m; sourceTree = "<group>"; };
+		D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMBURLDownloadOperation.h; path = ../iMedia2/IMBURLDownloadOperation.h; sourceTree = SOURCE_ROOT; };
+		D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IMBURLDownloadOperation.m; path = ../iMedia2/IMBURLDownloadOperation.m; sourceTree = SOURCE_ROOT; };
 		D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageCaptureParser.h; sourceTree = "<group>"; };
 		D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageCaptureParser.m; sourceTree = "<group>"; };
 		D05A94A4102EB14A005DF9CE /* ICADevices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICADevices.framework; path = System/Library/Frameworks/ICADevices.framework; sourceTree = SDKROOT; };
@@ -582,6 +586,8 @@
 				D09930BD1010F6C100C527B7 /* IMBOperationQueue.m */,
 				D049F0401034A86B003CC49C /* IMBIconCache.h */,
 				D049F0411034A86B003CC49C /* IMBIconCache.m */,
+				D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */,
+				D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -736,6 +742,7 @@
 				D08C5C9E104862540068FF07 /* IMBTextFieldCell.h in Headers */,
 				D0CA9427104932CD00725DA3 /* IMBiTunesParser.h in Headers */,
 				D0CA961510498F7C00725DA3 /* IMBTimecodeTransformer.h in Headers */,
+				D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -912,6 +919,7 @@
 				D08C5C9F104862540068FF07 /* IMBTextFieldCell.m in Sources */,
 				D0CA9428104932CD00725DA3 /* IMBiTunesParser.m in Sources */,
 				D0CA961610498F7C00725DA3 /* IMBTimecodeTransformer.m in Sources */,
+				D052AFD310538B7B00988F53 /* IMBURLDownloadOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
