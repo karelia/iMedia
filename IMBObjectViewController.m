@@ -60,6 +60,7 @@
 #import "IMBObject.h"
 #import "IMBObjectPromise.h"
 #import "IMBImageBrowserCell.h"
+#import "IMBProgressWindowController.h"
 #import "IMBQuickLookController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
@@ -111,6 +112,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 @synthesize libraryController = _libraryController;
 @synthesize nodeViewController = _nodeViewController;
 @synthesize objectArrayController = ibObjectArrayController;
+@synthesize progressWindowController = _progressWindowController;
 
 @synthesize viewType = _viewType;
 @synthesize tabView = ibTabView;
@@ -229,6 +231,8 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	
 	IMBRelease(_libraryController);
 	IMBRelease(_nodeViewController);
+	IMBRelease(_progressWindowController);
+	
 	[super dealloc];
 }
 
@@ -917,28 +921,22 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
-	[ibProgressBar setMinValue:0.0];
-	[ibProgressBar setMaxValue:1.0];
-	[ibProgressBar setDoubleValue:0.0];
-	[ibProgressBar setIndeterminate:YES];
-	[ibProgressBar setUsesThreadedAnimation:YES];
-	
-	[ibProgressWindow makeKeyAndOrderFront:nil];
-	[ibProgressBar startAnimation:nil];
+	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
+	[controller.window makeKeyAndOrderFront:nil];
+	[controller.progressBar startAnimation:nil];
+	self.progressWindowController = controller;
 }
 
 
 - (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
-	[ibProgressBar setDoubleValue:inFraction];
-	[ibProgressBar setIndeterminate:NO];
+	[self.progressWindowController setProgress:inFraction];
 }
 
 
 - (void) cleanupProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
-	[ibProgressBar stopAnimation:nil];
-	[ibProgressWindow orderOut:nil];
+	self.progressWindowController = nil;
 }
 
 

@@ -85,6 +85,7 @@ typedef NSUInteger kIMBObjectViewType;
 @class IMBLibraryController;
 @class IMBNodeViewController;
 @class IMBObjectArrayController;
+@class IMBProgressWindowController;
 @class IKImageBrowserView;
 @class IMBObject;
 @class IMBNode;
@@ -100,14 +101,13 @@ typedef NSUInteger kIMBObjectViewType;
 {
 	IMBLibraryController* _libraryController;
 	IMBNodeViewController* _nodeViewController;
+	IMBProgressWindowController* _progressWindowController;
 		
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet IKImageBrowserView* ibIconView;
 	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
-	IBOutlet NSWindow* ibProgressWindow;
-	IBOutlet NSProgressIndicator* ibProgressBar;
 	
 	NSUInteger _viewType;
 	double _iconSize;
@@ -127,6 +127,7 @@ typedef NSUInteger kIMBObjectViewType;
 // Objects (media files)...
 
 @property (readonly) IMBObjectArrayController* objectArrayController;
+@property (retain) IMBProgressWindowController* progressWindowController;
 
 // Views...
 
