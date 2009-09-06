@@ -55,7 +55,9 @@
 #import "IMBNode.h"
 #import "IMBParser.h"
 #import "IMBConfig.h"
+#import "IMBOperationQueue.h"
 #import "IMBLibraryController.h"
+#import "IMBURLDownloadOperation.h"
 #import "NSFileManager+iMedia.h"
 
 
@@ -76,7 +78,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 - (void) _countObjects:(NSArray*)inObjects;
 - (void) _loadObjects:(NSArray*)inObjects;
 - (void) _loadObject:(IMBObject*)inObject;
-- (void) _sendLoadingProgress;
 @end
 
 
@@ -109,8 +110,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		self.delegate = nil;
 		self.finishSelector = NULL;
 
-		_objectCount = 0;
-		_objectIndex = 0;
+		_objectCountTotal = 0;
+		_objectCountLoaded = 0;
 	}
 	
 	return self;
@@ -128,8 +129,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		self.finishSelector = NULL;
 		self.error = nil;
 
-		_objectCount = 0;
-		_objectIndex = 0;
+		_objectCountTotal = 0;
+		_objectCountLoaded = 0;
 	}
 	
 	return self;
@@ -159,11 +160,14 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) dealloc
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	
 	IMBRelease(_objects);
 	IMBRelease(_downloadFolderPath);
 	IMBRelease(_localFiles);
 	IMBRelease(_delegate);
 	IMBRelease(_error);
+	
 	[super dealloc];
 } 
 
@@ -179,7 +183,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	{
 		if (![object isKindOfClass:[IMBNodeObject class]])
 		{
-			_objectCount++;
+			_objectCountTotal++;
 		}
 	}
 }
@@ -207,47 +211,26 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 }
 
 
-// Notify the delegate that we are going to start. If the loading is async then the delegate should 
-// display a progress panel or sheet...
-
-- (void) _sendWantsProgressUI:(BOOL)inWantsProgressUI
-{
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(objectPromise:wantsProgressUI:)]) 
-	{
-		[_delegate objectPromise:self wantsProgressUI:(BOOL)inWantsProgressUI];
-	}
-}
-
-
-// Notify the delegate of the current loading progress...
-
-- (void) _sendLoadingProgress
-{
-	if (_delegate != nil)
-	{
-		if ([_delegate respondsToSelector:@selector(objectPromise:loadingProgress:)]) 
-		{
-			double fraction = _objectIndex / _objectCount;
-			[_delegate objectPromise:self loadingProgress:fraction];
-		}	
-	}
-}
-
-
 // Notify the delegate that loading is done...
 
-- (void) _sendDidFinish
+- (void) _didFinish
 {
 	if (_delegate != nil)
 	{
-		if ([_delegate respondsToSelector:@selector(objectPromise:didFinishLoadingWithError:)])
-		{
-			[_delegate objectPromise:self didFinishLoadingWithError:nil];
-		}
-			
 		if ([_delegate respondsToSelector:_finishSelector]) 
 		{
-			[_delegate performSelector:_finishSelector withObject:self withObject:nil];
+			if ([NSThread isMainThread])
+			{
+				[_delegate performSelector:_finishSelector withObject:self withObject:self.error];
+			}
+			else
+			{
+				[_delegate 
+					performSelectorOnMainThread:_finishSelector 
+					withObject:self 
+					waitUntilDone:NO 
+					modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+			}	
 		}	
 	}
 }
@@ -262,10 +245,25 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	self.delegate = inDelegate;
 	self.finishSelector = inSelector;
-	
-	[self _sendWantsProgressUI:NO];
 	[self _countObjects:self.objects];
 	[self _loadObjects:self.objects];
+}
+
+
+// Spin a runloop (blocking the caller) until all objects are available...
+
+- (void) waitUntilDone
+{
+	while (_objectCountLoaded < _objectCountTotal)
+	{
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		
+		[[NSRunLoop currentRunLoop] 
+			runMode:NSModalPanelRunLoopMode 
+			beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+			
+		[pool release];
+	}
 }
 
 
@@ -287,7 +285,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 - (void) _loadObjects:(NSArray*)inObjects
 {
 	[super _loadObjects:inObjects];
-	[self _sendDidFinish];
+	[self _didFinish];
 }
 
 
@@ -316,7 +314,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		if (exists && !directory)
 		{
 			[self.localFiles addObject:path];
-			_objectIndex++;
+			_objectCountLoaded++;
 		}
 		else 
 		{
@@ -339,22 +337,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		NSError* error = [NSError errorWithDomain:@"com.karelia.imedia" code:fnfErr userInfo:info];
 		
 		[self.localFiles addObject:error];
-		_objectIndex++;
+		_objectCountLoaded++;
 	}
-}
-
-
-// No loading progress needed...
-
-- (void) _sendWantsProgressUI:(BOOL)inWantsProgressUI
-{
-	[super _sendWantsProgressUI:NO];
-}
-
-
-- (void) _sendLoadingProgress
-{
-
 }
 
 
@@ -368,7 +352,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 @implementation IMBRemoteObjectPromise
 
-@synthesize urlToPathMap = _urlToPathMap;
+@synthesize downloadOperations = _downloadOperations;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -378,7 +362,9 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	if (self = [super initWithObjects:inObjects])
 	{
-		self.urlToPathMap = [NSMutableDictionary dictionary];
+		self.downloadOperations = [NSMutableArray array];
+		_totalBytes = 0;
+		_currentBytes = 0;
 	}
 	
 	return self;
@@ -389,7 +375,9 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	if (self = [super initWithCoder:inCoder])
 	{
-		self.urlToPathMap = [NSMutableDictionary dictionary];
+		self.downloadOperations = [NSMutableArray array];
+		_totalBytes = 0;
+		_currentBytes = 0;
 	}
 	
 	return self;
@@ -398,7 +386,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) dealloc
 {
-	IMBRelease(_urlToPathMap);
+	IMBRelease(_downloadOperations);
 	[super dealloc];
 } 
 
@@ -406,139 +394,202 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Let the delegate know that we want progress UI since this is a lengthy operation...
+// Tell delegate to prepare the progress UI (must be done in main thread)...
 
-- (void) _sendWantsProgressUI:(BOOL)inWantsProgressUI
+- (void) _prepareProgress
 {
-	[super _sendWantsProgressUI:YES];
+	if (_delegate)
+	{
+		if ([_delegate respondsToSelector:@selector(prepareProgressForObjectPromise:)])
+		{
+			if ([NSThread isMainThread])
+			{
+				[_delegate performSelector:@selector(prepareProgressForObjectPromise:) withObject:self];
+			}
+			else
+			{
+				[_delegate 
+					performSelectorOnMainThread:@selector(prepareProgressForObjectPromise:) 
+					withObject:self 
+					waitUntilDone:NO 
+					modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+			}		
+		}
+	}
 }
 
 
-// Load all objects. A dumb client is automatically blocked (synchrnous loading)...
+// Tell delegate to display the current progress (must be done in main thread)...
+
+- (void) _displayProgress:(double)inFraction
+{
+	if (_delegate)
+	{
+		if ([_delegate respondsToSelector:@selector(displayProgress:forObjectPromise:)])
+		{
+			[self performSelectorOnMainThread:@selector(__displayProgress:) 
+				  withObject:[NSNumber numberWithDouble:inFraction] 
+				  waitUntilDone:NO 
+				  modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		}
+	}
+}
+
+
+- (void) __displayProgress:(NSNumber*)inFraction
+{
+	[_delegate displayProgress:[inFraction doubleValue] forObjectPromise:self];
+}
+
+
+// Tell delegate to remove the progress UI (must be done in main thread)...
+
+- (void) _cleanupProgress
+{
+	if (_delegate)
+	{
+		if ([_delegate respondsToSelector:@selector(cleanupProgressForObjectPromise:)])
+		{
+			if ([NSThread isMainThread])
+			{
+				[_delegate performSelector:@selector(cleanupProgressForObjectPromise:) withObject:self];
+			}
+			else
+			{
+				[_delegate 
+					performSelectorOnMainThread:@selector(cleanupProgressForObjectPromise:) 
+					withObject:self 
+					waitUntilDone:NO 
+					modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+			}		
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Load all objects...
 
 - (void) _loadObjects:(NSArray*)inObjects
-{
-	// Ask delegate whether async loading is supported (default is NO)...
+{	
+	// Retain self until all download operations have finished. We are going to release self in the   
+	// didFinish: and didReceiveError: delegate messages...
 	
-	BOOL async = NO;
+	[self retain];
 	
-	if ([_delegate respondsToSelector:@selector(objectPromiseShouldStartLoadingAsynchronously:)])
+	// Show the progress, which is indeterminate for now as we do not know the file sizes yet...
+	
+	[self _prepareProgress];
+
+	// Create all download operations...
+	
+	for (IMBObject* object in inObjects)
 	{
-		async = [_delegate objectPromiseShouldStartLoadingAsynchronously:self];
+		if (![object isKindOfClass:[IMBNodeObject class]])
+		{
+			NSURL* url = (NSURL*)[object value];
+			IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
+			op.downloadFolderPath = self.downloadFolderPath;
+			[self.downloadOperations addObject:op];
+			[op release];
+		}
 	}
 
-	// Load the objects...
+	// Get combined file sizes so that the progress bar can be configured...
 	
-	[super _loadObjects:inObjects];
+	_totalBytes = 0;
 	
-	// If synchronous, then block the caller until download is complete...
-	
-	if (!async)
+	for (IMBURLDownloadOperation* op in self.downloadOperations)
 	{
-		#warning TODO
+		_totalBytes += [op getSize];
+	}
+
+	// Start downloading...
+	
+	for (IMBURLDownloadOperation* op in self.downloadOperations)
+	{
+		[[IMBOperationQueue sharedQueue] addOperation:op];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IBAction) cancel:(id)inSender
+{
+	for (IMBURLDownloadOperation* op in self.downloadOperations)
+	{
+		[op cancel];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// We received some data, so display the current progress...
+
+- (void) didReceiveData:(IMBURLDownloadOperation*)inOperation
+{
+	_currentBytes = 0;
+
+	for (IMBURLDownloadOperation* op in self.downloadOperations)
+	{
+		_currentBytes += [op bytesDone];
+	}
+	
+	double fraction = (double)_currentBytes / (double)_totalBytes;
+	[self _displayProgress:fraction];
+}
+
+
+// A download has finished. Store the path to the downloaded file. Once all downloads are complete, we can hide 
+// the progress UI, Notify the delegate and release self...
+
+- (void) didFinish:(IMBURLDownloadOperation*)inOperation
+{
+	[self.localFiles addObject:inOperation.localPath];
+	_objectCountLoaded++;
+	
+	if (_objectCountLoaded >= _objectCountTotal)
+	{
+		NSLog(@"%s",__FUNCTION__);
+		[self _cleanupProgress];
 		
-//		while (_objectIndex < _objectCount)
-//		{
-//			[[NSRunLoop currentRunLoop] runMode:NSModalPanelRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
-//		}
-	}
+		[self performSelectorOnMainThread:@selector(_didFinish) 
+			withObject:nil 
+			waitUntilDone:YES 
+			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+
+		[self release];
+	}	  
 }
 
 
-// A promise for remote files needs to start NSURL downloads...
+// If an error has occured in one of the downloads, then store the error instead of the file path, but everything 
+// else is the same as in the previous method...
 
-- (void) _loadObject:(IMBObject*)inObject
+- (void) didReceiveError:(IMBURLDownloadOperation*)inOperation
 {
-	NSURL* url = (NSURL*)[inObject value];
-	NSURLRequest* request = [NSURLRequest requestWithURL:url];
-	NSURLDownload* download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
-	
-	NSString* downloadFolderPath = self.downloadFolderPath;
-	NSString* filename = [[url path] lastPathComponent];
-	NSString* localFilePath = [downloadFolderPath stringByAppendingPathComponent:filename];
-	
-	[download setDestination:localFilePath allowOverwrite:NO];
-	[download setDeletesFileUponFailure:YES];
-}
+	[self.localFiles addObject:inOperation.error];
+	self.error = inOperation.error;
+	_objectCountLoaded++;
 
-
-// The file was created. Store the local filename in our urlToLocalFileMap...
-
-- (void) download:(NSURLDownload*)inDownload didCreateDestination:(NSString*)inPath
-{
-	NSString* key = [[[inDownload request] URL] absoluteString];
-	[self.urlToPathMap setObject:inPath forKey:key];
-}
-
-- (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)response
-{
-	NSLog(@"expectedContentLength = %d", [response expectedContentLength]);
-	if (NSURLResponseUnknownLength == [response expectedContentLength])
+	if (_objectCountLoaded >= _objectCountTotal)
 	{
-		NSLog(@"That's unknown");
-	}
-	
-}
-
-// Display progress in the UI...
-
-- (void) download:(NSURLDownload*)inDownload didReceiveDataOfLength:(NSUInteger)inLength
-{
-	[self _sendLoadingProgress];
-}
-
-
-// After a successful download store the path of the downloaded file...
-
-- (void) downloadDidFinish:(NSURLDownload*)inDownload
-{
-	NSString* key = [[[inDownload request] URL] absoluteString];
-	NSString* path = [self.urlToPathMap objectForKey:key];	
-	
-	if (path)
-	{
-		BOOL exists,directory;
-		exists = [[NSFileManager threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
-		if (!exists || directory) path = nil;
-	}
-	
-	if (path)
-	{
-		[self.localFiles addObject:path];
-		_objectIndex++;
-	}
-	else
-	{
-		NSString* format = NSLocalizedStringWithDefaultValue(
-			@"IMBLocalObjectPromise.error",
-			nil,IMBBundle(),
-			@"The media file %@ could not be loaded (file not found)",
-			@"Error when loading a object file synchronously has failed.");
+		NSLog(@"%s",__FUNCTION__);
+		[self _cleanupProgress];
 		
-		NSString* description = [NSString stringWithFormat:format,key];
-		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
-		NSError* error = [NSError errorWithDomain:@"com.karelia.imedia" code:fnfErr userInfo:info];
-
-		[self.localFiles addObject:error];
-		_objectIndex++;
-	}
-	
-	[self _sendLoadingProgress];
-	if (_objectIndex >= _objectCount) [self _sendDidFinish];
-	[inDownload release];
-}
-
-
-// In case of an error store the error and abort...
-
-- (void) download:(NSURLDownload*)inDownload didFailWithError:(NSError*)inError
-{
-	[self.localFiles addObject:inError];
-	_objectIndex++;
-
-	[self _sendLoadingProgress];
-	if (_objectIndex >= _objectCount) [self _sendDidFinish];
-	[inDownload release];
+		[self performSelectorOnMainThread:@selector(_didFinish) 
+			withObject:nil 
+			waitUntilDone:YES 
+			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+			
+		[self release];
+	}	  
 }
 
 
