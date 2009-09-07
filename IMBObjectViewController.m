@@ -922,8 +922,27 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
 	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
-	[controller.window makeKeyAndOrderFront:nil];
+
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBObjectViewController.progress.title",
+		nil,IMBBundle(),
+		@"Downloading",
+		@"Window title of progress panel of IMBObjectViewController");
+
+	NSString* message = NSLocalizedStringWithDefaultValue(
+		@"IMBObjectViewController.progress.message.preparing",
+		nil,IMBBundle(),
+		@"Preparing…",
+		@"Text message in progress panel of IMBObjectViewController");
+
+	[controller setTitle:title];
+	[controller setMessage:message];
 	[controller.progressBar startAnimation:nil];
+	[controller setCancelTarget:inObjectPromise];
+	[controller setCancelAction:@selector(cancel:)];
+	[controller.cancelButton setEnabled:NO];
+	[controller.window makeKeyAndOrderFront:nil];
+	
 	self.progressWindowController = controller;
 }
 
@@ -931,6 +950,8 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 - (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
 	[self.progressWindowController setProgress:inFraction];
+	[self.progressWindowController setMessage:@""];
+	[self.progressWindowController.cancelButton setEnabled:YES];
 }
 
 

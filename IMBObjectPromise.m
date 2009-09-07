@@ -520,10 +520,33 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (IBAction) cancel:(id)inSender
 {
+	// Cancel outstanding operations...
+	
 	for (IMBURLDownloadOperation* op in self.downloadOperations)
 	{
 		[op cancel];
 	}
+	
+	// Trash any files that we already have...
+	
+	NSFileManager* mgr = [NSFileManager threadSafeManager];
+	
+	for (NSString* path in self.localFiles)
+	{
+		NSError* error = nil;
+		[mgr removeItemAtPath:path error:&error];
+	}
+	
+	// Cleanup...
+	
+	[self _cleanupProgress];
+		
+	[self performSelectorOnMainThread:@selector(_didFinish) 
+		withObject:nil 
+		waitUntilDone:YES 
+		modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+
+	[self release];
 }
 
 
