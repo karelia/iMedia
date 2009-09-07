@@ -92,7 +92,7 @@
 
 - (void) setTitle:(NSString*)inTitle
 {
-	[self.window setTitle:inTitle];
+	[ibTitleField setStringValue:inTitle];
 }
 
 
@@ -105,7 +105,7 @@
 
 - (void) setMessage:(NSString*)inMessage
 {
-	[ibTextField setStringValue:inMessage];
+	[ibMessageField setStringValue:inMessage];
 }
 
 

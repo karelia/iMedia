@@ -52,8 +52,9 @@
 
 @interface IMBProgressWindowController : NSWindowController
 {
+	IBOutlet NSTextField* ibTitleField;
 	IBOutlet NSProgressIndicator* ibProgressBar;
-	IBOutlet NSTextField* ibTextField;
+	IBOutlet NSTextField* ibMessageField;
 	IBOutlet NSButton* ibCancelButton;
 }
 

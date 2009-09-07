@@ -79,7 +79,38 @@
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
-	return nil;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
+	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inPath); 
+	
+	if (item)
+	{
+		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
+		CFArrayRef authors = MDItemCopyAttribute(item,kMDItemAuthors);
+		CFStringRef album = MDItemCopyAttribute(item,kMDItemAlbum);
+
+		if (seconds)
+		{
+			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
+			CFRelease(seconds);
+		}
+		
+		if (authors)
+		{
+			NSArray* artists = (NSArray*)authors;
+			if (artists.count > 0)[metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
+			CFRelease(authors);
+		}
+		
+		if (album)
+		{
+			[metadata setObject:(NSString*)album forKey:@"album"]; 
+			CFRelease(album);
+		}
+		
+		CFRelease(item);
+	}
+	
+	return metadata;
 }
 
 

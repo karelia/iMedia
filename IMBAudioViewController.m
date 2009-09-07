@@ -51,6 +51,7 @@
 
 #import "IMBAudioViewController.h"
 #import "IMBNodeViewController.h"
+#import "IMBObjectArrayController.h"
 #import "IMBCommon.h"
 #import "IMBObject.h"
 #import "IMBNode.h"
@@ -70,6 +71,18 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) awakeFromNib
+{
+	[super awakeFromNib];
+	
+	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
+		@"name",
+		@"metadata.artist",
+		@"metadata.album",
+		nil];
+}
 
 
 - (void) dealloc

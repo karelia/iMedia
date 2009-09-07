@@ -183,7 +183,6 @@
 		
 		if (!NSLocationInRange(i,visibleRows) || node.badgeTypeNormal != kIMBBadgeTypeLoading)
 		{
-NSLog(@"Removing wheel for node %@",node.identifier);		
 			NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 			[wheel stopAnimation:nil];
 			[wheel removeFromSuperview];
@@ -204,7 +203,6 @@ NSLog(@"Removing wheel for node %@",node.identifier);
 		
 		if (wheel == nil && node != nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)
 		{
-NSLog(@"Adding wheel for node %@",node.identifier);		
 			NSRect badgeRect = [self badgeRectForRow:i];
 			NSProgressIndicator* wheel = [[NSProgressIndicator alloc] initWithFrame:badgeRect];
 			

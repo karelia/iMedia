@@ -926,7 +926,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	NSString* title = NSLocalizedStringWithDefaultValue(
 		@"IMBObjectViewController.progress.title",
 		nil,IMBBundle(),
-		@"Downloading",
+		@"Downloading Media Files",
 		@"Window title of progress panel of IMBObjectViewController");
 
 	NSString* message = NSLocalizedStringWithDefaultValue(
@@ -935,6 +935,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 		@"Preparing…",
 		@"Text message in progress panel of IMBObjectViewController");
 
+	[controller window];
 	[controller setTitle:title];
 	[controller setMessage:message];
 	[controller.progressBar startAnimation:nil];
