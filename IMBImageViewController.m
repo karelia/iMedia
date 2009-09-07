@@ -50,6 +50,7 @@
 #pragma mark HEADERS
 
 #import "IMBImageViewController.h"
+#import "IMBObjectArrayController.h"
 #import "IMBCommon.h"
 #import "NSWorkspace+iMedia.h"
 
@@ -60,6 +61,19 @@
 #pragma mark 
 
 @implementation IMBImageViewController
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) awakeFromNib
+{
+	[super awakeFromNib];
+	
+	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
+		@"name",
+		nil];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

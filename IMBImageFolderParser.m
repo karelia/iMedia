@@ -79,7 +79,30 @@
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
-	return nil;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
+	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inPath);
+	
+	if (item)
+	{
+		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
+		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
+
+		if (width)
+		{
+			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
+			CFRelease(width);
+		}
+		
+		if (height)
+		{
+			[metadata setObject:(NSNumber*)width forKey:@"height"]; 
+			CFRelease(height);
+		}
+		
+		CFRelease(item);
+	}
+	
+	return metadata;
 }
 
 

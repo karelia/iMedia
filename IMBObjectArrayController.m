@@ -56,6 +56,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CONSTANTS
+
+const NSString* kSearchStringContext = @"searchString";
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 @implementation IMBObjectArrayController
@@ -79,11 +87,17 @@
 }
 
 
+- (void) awakeFromNib
+{
+	[self addObserver:self forKeyPath:@"searchString" options:0 context:(void*)kSearchStringContext];
+}
+
+
 - (void) dealloc
 {
+	[self removeObserver:self forKeyPath:@"searchString"];
 	IMBRelease(_searchableProperties);
 	IMBRelease(_searchString);
-	
 	[super dealloc];
 }
 
@@ -107,6 +121,20 @@
 		[ibSearchField setStringValue:@""];
 		[self search:ibSearchField];
 	}	
+}
+
+
+- (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
+{
+    if (inContext == (void*)kSearchStringContext)
+	{
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(rearrangeObjects) object:nil];
+		[self performSelector:@selector(rearrangeObjects) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+	else
+	{
+		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
+	}
 }
 
 
