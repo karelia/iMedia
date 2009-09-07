@@ -61,7 +61,12 @@
 @property (readonly) NSTextField* textField;
 @property (readonly) NSButton* cancelButton;
 
+- (void) setTitle:(NSString*)inTitle;
 - (void) setProgress:(double)inFraction;
+- (void) setMessage:(NSString*)inMessage;
+
+- (void) setCancelTarget:(id)inTarget;
+- (void) setCancelAction:(SEL)inAction;
 
 @end
 

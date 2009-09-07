@@ -87,10 +87,40 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) setTitle:(NSString*)inTitle
+{
+	[self.window setTitle:inTitle];
+}
+
+
 - (void) setProgress:(double)inFraction
 {
 	[ibProgressBar setDoubleValue:inFraction];
 	[ibProgressBar setIndeterminate:NO];
+}
+
+
+- (void) setMessage:(NSString*)inMessage
+{
+	[ibTextField setStringValue:inMessage];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) setCancelTarget:(id)inTarget
+{
+	[ibCancelButton setTarget:inTarget];
+}
+
+
+- (void) setCancelAction:(SEL)inAction
+{
+	[ibCancelButton setAction:inAction];
 }
 
 

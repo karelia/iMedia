@@ -50,6 +50,7 @@
 #pragma mark HEADERS
 
 #import "IMBURLDownloadOperation.h"
+#import "NSFileManager+iMedia.h"
 #import "IMBCommon.h"
 
 
@@ -153,10 +154,7 @@
 	
 	do 
 	{
-//		NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
 		CFRunLoopRunInMode(kCFRunLoopDefaultMode,1.0,false);
-//		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
-//		[pool2 release];
 	}
 	while (_finished == NO);
 	
@@ -167,6 +165,16 @@
 - (void) cancel
 {
 	[self.download cancel];
+	
+	if (self.localPath)
+	{
+		NSError* error = nil;
+		[[NSFileManager threadSafeManager] removeItemAtPath:self.localPath error:&error];
+	}
+	
+	self.delegate = nil;
+	self.download = nil;
+	self.finished = YES;
 }
 
 
