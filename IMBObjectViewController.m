@@ -368,6 +368,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 {
 	[ibListView setTarget:self];
 	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
+
+    [ibListView setDraggingSourceOperationMask:(NSDragOperationCopy|NSDragOperationGeneric) forLocal:YES];
+    [ibListView setDraggingSourceOperationMask:(NSDragOperationCopy|NSDragOperationGeneric) forLocal:NO];
 }
 
 
@@ -375,6 +378,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 {
 	[ibComboView setTarget:self];
 	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
+
+    [ibComboView setDraggingSourceOperationMask:(NSDragOperationCopy|NSDragOperationGeneric) forLocal:YES];
+    [ibComboView setDraggingSourceOperationMask:(NSDragOperationCopy|NSDragOperationGeneric) forLocal:NO];
 }
 
 
