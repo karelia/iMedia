@@ -653,13 +653,6 @@ NSSize LimitMaxWidthHeight(NSSize ofSize, float toMaxDimension)
 	NSArray *selectedRecords = [self selectedRecords];
 	
 	[iMBPhotosView cancelPreviousPerformRequestsWithTarget:self 
-												  selector:@selector(postSelectionChangeNotification:)
-													object:nil];
-	[self performSelector:@selector(postSelectionChangeNotification:)
-			   withObject:nil
-			   afterDelay:0.0];
-	
-	[iMBPhotosView cancelPreviousPerformRequestsWithTarget:self 
 												  selector:@selector(postSelectionDoubleClickNotification:)
 													object:selectedRecords];
 	[self performSelector:@selector(postSelectionDoubleClickNotification:)
