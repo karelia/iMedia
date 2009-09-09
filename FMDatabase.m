@@ -284,7 +284,7 @@
                     NSLog(@"DB Query: %@", sql);
                     if (crashOnErrors) {
 #ifdef __BIG_ENDIAN__
-                        asm{ trap };
+//                        asm{ trap };
 #endif
                         NSAssert2(false, @"DB Error: %d \"%@\"", [self lastErrorCode], [self lastErrorMessage]);
                     }
@@ -407,7 +407,7 @@
                     NSLog(@"DB Query: %@", sql);
                     if (crashOnErrors) {
 #ifdef __BIG_ENDIAN__
-                        asm{ trap };
+//                        asm{ trap };
 #endif
                         NSAssert2(false, @"DB Error: %d \"%@\"", [self lastErrorCode], [self lastErrorMessage]);
                     }
