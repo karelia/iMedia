@@ -17,7 +17,7 @@
  without limitation the rights to use, copy, modify, merge, publish,
  distribute, sublicense, and/or sell copies of the Software, and to permit
  persons to whom the Software is furnished to do so, subject to the following
- conditions: 
+ conditions:
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
@@ -49,108 +49,15 @@
 
 #pragma mark HEADERS
 
-#import "IMBImageBrowserCell.h"
-#import "IMBObject.h"
+#import <Quartz/Quartz.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IKImageBrowserCell ()
-
-- (void) setDataSource:(id)inDataSource;
-- (void) drawShadow;
-- (void) drawImageOutline;
+@interface IMBImageBrowserView : IKImageBrowserView
 
 @end
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@implementation IMBImageBrowserCell
-
-@synthesize imbShouldDrawOutline = _imbShouldDrawOutline;
-@synthesize imbShouldDrawShadow = _imbShouldDrawShadow;
-
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) init
-{
-	if (self = [super init])
-	{
-		_imbShouldDrawOutline = YES;
-		_imbShouldDrawShadow = YES;
-	}
-	
-	return self;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Disable outline and shadow drawing for folders (IMBNodeObject)...
-
-- (void) setDataSource:(id)inDataSource
-{
-	[super setDataSource:inDataSource];
-	
-	if ([inDataSource isKindOfClass:[IMBNodeObject class]])
-	{
-		_imbShouldDrawOutline = NO;
-		_imbShouldDrawShadow = NO;
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) drawShadow
-{
-	if (_imbShouldDrawShadow)
-	{
-		[super drawShadow];	
-	}
-}
-
-
-- (void) drawImageOutline
-{
-	if (_imbShouldDrawOutline)
-	{
-		[super drawImageOutline];	
-	}	
-}
-
-
-- (void) sizeDidChange
-{	
-#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5
-#else
-	CGFloat points = 0;
-	CGFloat width = [self size].width;
-	
-	if (width < 50) points = 9;
-	else if (width < 60) points = 10;
-	else if (width < 70) points = 11;
-	else if (width < 80) points = 12;
-	else points = 13;
-
-	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont fontWithName:@"Lucida Grande" size:points] forKey:NSFontAttributeName];
-	[[self parent] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
-#endif
-	
-	[super sizeDidChange];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-@end
-

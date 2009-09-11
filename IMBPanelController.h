@@ -47,9 +47,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+	
+@class IMBObjectViewController;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
-@interface IMBPanelController : NSWindowController
+#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5
+	@interface IMBPanelController : NSWindowController <NSTabViewDelegate>
+#else
+	@interface IMBPanelController : NSWindowController
+#endif
 {
 	id _delegate;
 	NSArray* _mediaTypes;
@@ -71,6 +83,7 @@
 @property (retain) NSString* oldMediaType;
 
 - (void) loadControllers;
+- (IMBObjectViewController*) objectViewControllerForMediaType:(NSString*)inMediaType;
 - (IBAction) showWindow:(id)inSender;
 - (IBAction) hideWindow:(id)inSender;
 

@@ -103,7 +103,7 @@
 		
 		//	we save the iMB node in the Flickr request for use in
 		//	flickrAPIRequest:didCompleteWithResponse: ...
-		request.sessionInfo = self;
+		request.sessionInfo = self.identifier;
 	}
 	return request;
 }
@@ -160,7 +160,13 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+@interface IMBFlickrParser ()
+- (NSString*) identifierWithMethod: (NSString*) method argument: (NSString*) argument;
+@end
+
 #pragma mark -
+
+//----------------------------------------------------------------------------------------------------------------------
 
 @implementation IMBFlickrParser
 
@@ -179,6 +185,25 @@
 }
 
 
+#pragma mark
+#pragma mark Actions
+
+- (IBAction) openFlickrPage: (id) sender {
+	if (![sender isKindOfClass:[NSMenuItem class]]) return;
+	
+	id obj = [sender representedObject];
+	if ([obj isKindOfClass:[IMBObject class]]) {
+		IMBObject* imbObject = (IMBObject*) obj;
+		NSURL* webPage = [[imbObject metadata] objectForKey:@"webPageURL"];
+		[[NSWorkspace threadSafeWorkspace] openURL:webPage];
+	} else if ([obj isKindOfClass:[IMBNode class]]) {
+		
+	} else {
+		NSLog (@"Can't handle this kind of object.");
+	}
+}
+
+
 #pragma mark 
 #pragma mark Flickr Handling
 
@@ -188,6 +213,7 @@
 	for (NSDictionary* photoDict in photos) {
 		NSURL* thumbnailURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
 		NSURL* imageURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrLargeSize];
+		NSURL* webPageURL = [_flickrContext photoWebPageURLFromDictionary:photoDict];
 		
 		// We will need to get the URL of the original photo (or the largest possible)
 		// Or, perhaps, we may want to have a callback to the application for what size of photo it would like
@@ -197,7 +223,8 @@
 		obj.name = [photoDict objectForKey:@"title"];
 		obj.imageRepresentation = thumbnailURL;
 		obj.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
-		obj.value = imageURL;		
+		obj.metadata = [NSDictionary dictionaryWithObject:webPageURL forKey:@"webPageURL"];
+		obj.value = imageURL;
 		[objects addObject:obj];
 		[obj release];
 	}
@@ -209,10 +236,12 @@
   didCompleteWithResponse: (NSDictionary*) inResponseDictionary {
 	
 	//	get the node we associated with the request in flickrRequestWithContext: ...
-	IMBNode* node = inRequest.sessionInfo;
+	NSString* nodeIdentifier = inRequest.sessionInfo;
+	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
+	IMBNode* node = [libController nodeWithIdentifier:nodeIdentifier];
 	
 	#ifdef VERBOSE
-		NSLog (@"Flickr request completed for: %@", node.name);
+		NSLog (@"Flickr request completed for node: %@", nodeIdentifier);
 	#endif
 	
 	//	save Flickr response in our iMB node for later population of the browser...
@@ -221,7 +250,6 @@
 	[response release];
 	
 	//	force reloading of the node holding the Flickr images...
-	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
 	[libController reloadNode:node];	
 }
 
@@ -309,16 +337,29 @@
 }
 
 
+- (IMBNode*) createInterestingPhotosNodeForRoot: (IMBNode*) root {
+	IMBNode* node = [self createGenericFlickrNodeForRoot:root];
+	node.icon = [self smartFolderIcon];
+	node.identifier = [self identifierWithMethod:@"interestingness" argument:@"30"];
+	node.mediaSource = node.identifier;
+	node.name = NSLocalizedString (@"Most Interesting", @"Flickr parser standard node name.");
+	
+	[node setFlickrMethod:@"flickr.interestingness.getList"
+				arguments:[NSDictionary dictionaryWithObjectsAndKeys:@"30", @"per_page", nil]];
+	
+	return node;
+}
+
+
 - (IMBNode*) createRecentPhotosNodeForRoot: (IMBNode*) root {
 	IMBNode* node = [self createGenericFlickrNodeForRoot:root];
-	node.mediaSource = @"recent-100";
 	node.icon = [self smartFolderIcon];
-	node.identifier = node.mediaSource;
-	node.name = @"Recent 100 Images";
+	node.identifier = [self identifierWithMethod:@"recent" argument:@"30"];
+	node.mediaSource = node.identifier;
+	node.name = NSLocalizedString (@"Recent", @"Flickr parser standard node name.");
 	
-//	[node setFlickrMethod:@"flickr.photos.getRecent"
-	[node setFlickrMethod:@"flickr.interestingness.getList"
-				arguments:[NSDictionary dictionaryWithObjectsAndKeys:@"100", @"per_page", nil]];
+	[node setFlickrMethod:@"flickr.photos.getRecent"
+				arguments:[NSDictionary dictionaryWithObjectsAndKeys:@"30", @"per_page", nil]];
 	
 	return node;
 }
@@ -329,9 +370,9 @@
 							root: (IMBNode*) root {
 	
 	IMBNode* node = [self createGenericFlickrNodeForRoot:root];
-	node.mediaSource = [NSString stringWithFormat:@"search:%@", text];
 	node.icon = [self smartFolderIcon];
-	node.identifier = node.mediaSource;
+	node.identifier = [self identifierWithMethod:@"search" argument:text];
+	node.mediaSource = node.identifier;
 	node.name = title;
 	
 	[node setFlickrMethod:@"flickr.photos.search"
@@ -348,8 +389,8 @@
 						  root: (IMBNode*) root {
 	
 	IMBNode* node = [self createGenericFlickrNodeForRoot:root];
-	node.mediaSource = [NSString stringWithFormat:@"taged:%@", tags];
-	node.identifier = node.mediaSource;
+	node.identifier = [self identifierWithMethod:@"tag" argument:tags];
+	node.mediaSource = node.identifier;
 	node.name = title;
 	node.icon = [self smartFolderIcon];
 	
@@ -388,6 +429,12 @@
 }
 
 
+- (NSString*) identifierWithMethod: (NSString*) method argument: (NSString*) argument {
+	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", method, argument];
+	return [self identifierForPath:albumPath];
+}
+
+
 - (IMBNode*) nodeWithOldNode: (const IMBNode*) inOldNode 
 					 options: (IMBOptions) inOptions 
 					   error: (NSError**) outError {
@@ -418,6 +465,7 @@
 		//	populate root node...
 		inNode.subNodes = [NSArray arrayWithObjects:
 						   [self createRecentPhotosNodeForRoot:inNode],
+						   [self createInterestingPhotosNodeForRoot:inNode],
 						   [self createNodeForTags:@"macintosh, apple"
 											 title:@"Tagged 'Macintosh' & 'Apple'"
 											  root:inNode], 
@@ -448,6 +496,18 @@
 		
 	if (outError) *outError = error;
 	return error == nil;
+}
+
+
+- (void) willShowContextMenu: (NSMenu*) inMenu forObject: (IMBObject*) inObject {
+	//	'Open Flickr Page'...
+	NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Open Flickr Page", @"Flickr parser context menu title.") 
+															 action:@selector(openFlickrPage:) 
+													  keyEquivalent:@""];
+	[showWebPageItem setTarget:self];
+	[showWebPageItem setRepresentedObject:inObject];
+	[inMenu addItem:showWebPageItem];
+	[showWebPageItem release];
 }
 
 
