@@ -1032,7 +1032,7 @@ static NSString* kSelectionKey = @"selection";
 	
 	// Then the parser can add custom menu items...
 	
-	if ([inNode.parser respondsToSelector:@selector(addMenuItemsToContextMenu:forNode:)])
+	if ([inNode.parser respondsToSelector:@selector(willShowContextMenu:forNode:)])
 	{
 		[inNode.parser willShowContextMenu:menu forNode:inNode];
 	}

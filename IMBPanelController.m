@@ -205,6 +205,22 @@ static IMBPanelController* sSharedPanelController = nil;
 }
 
 
+// Walk through the array and retrieve the correct controller...
+
+- (IMBObjectViewController*) objectViewControllerForMediaType:(NSString*)inMediaType
+{
+	for (IMBObjectViewController* controller in self.viewControllers)
+	{
+		if ([controller.mediaType isEqualToString:inMediaType])
+		{
+			return controller;
+		}
+	}
+	
+	return nil;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -370,16 +386,24 @@ static IMBPanelController* sSharedPanelController = nil;
 		[_loadedLibraries setObject:newMediaType forKey:newMediaType];
 	}
 	
+	// Notify the controllers...
+
+	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
+	[oldController willHideView];
+
+	IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
+	[newController willShowView];
+		
 	// Notify the delegate...
 
 	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:willHidePanelForMediaType:)])
 	{
-		return [_delegate controller:self willHidePanelForMediaType:_oldMediaType];
+		[_delegate controller:self willHidePanelForMediaType:_oldMediaType];
 	}
 
 	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:willShowPanelForMediaType:)])
 	{
-		return [_delegate controller:self willShowPanelForMediaType:newMediaType];
+		[_delegate controller:self willShowPanelForMediaType:newMediaType];
 	}
 }
 
@@ -390,14 +414,24 @@ static IMBPanelController* sSharedPanelController = nil;
 {
 	NSString* newMediaType = inTabViewItem.identifier;
 	
+	// Notify the controllers...
+
+	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
+	[oldController didHideView];
+
+	IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
+	[newController didShowView];
+
+	// Notify the delegate...
+
 	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:didHidePanelForMediaType:)])
 	{
-		return [_delegate controller:self didHidePanelForMediaType:_oldMediaType];
+		[_delegate controller:self didHidePanelForMediaType:_oldMediaType];
 	}
 
 	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:didShowPanelForMediaType:)])
 	{
-		return [_delegate controller:self didShowPanelForMediaType:newMediaType];
+		[_delegate controller:self didShowPanelForMediaType:newMediaType];
 	}
 }
 

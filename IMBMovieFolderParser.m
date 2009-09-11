@@ -75,11 +75,41 @@
 }
 
 
-// Return metadata specific to audio files...
+// Return metadata specific to movie files...
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
-	return nil;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
+	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inPath);
+	
+	if (item)
+	{
+		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
+		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
+		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
+
+		if (seconds)
+		{
+			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
+			CFRelease(seconds);
+		}
+
+		if (width)
+		{
+			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
+			CFRelease(width);
+		}
+		
+		if (height)
+		{
+			[metadata setObject:(NSNumber*)width forKey:@"height"]; 
+			CFRelease(height);
+		}
+		
+		CFRelease(item);
+	}
+	
+	return metadata;
 }
 
 

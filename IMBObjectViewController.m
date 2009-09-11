@@ -368,9 +368,8 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 {
 	[ibListView setTarget:self];
 	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
-
-    [ibListView setDraggingSourceOperationMask:(NSDragOperationCopy|NSDragOperationGeneric) forLocal:YES];
-    [ibListView setDraggingSourceOperationMask:(NSDragOperationCopy|NSDragOperationGeneric) forLocal:NO];
+    [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+    [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
 
 
@@ -378,9 +377,35 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 {
 	[ibComboView setTarget:self];
 	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
+    [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+    [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
+}
 
-    [ibComboView setDraggingSourceOperationMask:(NSDragOperationCopy|NSDragOperationGeneric) forLocal:YES];
-    [ibComboView setDraggingSourceOperationMask:(NSDragOperationCopy|NSDragOperationGeneric) forLocal:NO];
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) willShowView
+{
+	// To be overridden by subclass...
+}
+
+
+- (void) didShowView
+{
+	// To be overridden by subclass...
+}
+
+
+- (void) willHideView
+{
+	// To be overridden by subclass...
+}
+
+
+- (void) didHideView
+{
+	// To be overridden by subclass...
 }
 
 
@@ -541,6 +566,18 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	else if ([[inObject value] isKindOfClass:[NSURL class]])
 	{
 		title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.download",
+			nil,IMBBundle(),
+			@"Download",
+			@"Menu item in context menu of IMBObjectViewController");
+			
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(download:) keyEquivalent:@""];
+		[item setRepresentedObject:[inObject value]];
+		[item setTarget:self];
+		[menu addItem:item];
+		[item release];
+
+		title = NSLocalizedStringWithDefaultValue(
 			@"IMBObjectViewController.menuItem.openInBrowser",
 			nil,IMBBundle(),
 			@"Open in Browser",
@@ -572,7 +609,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	IMBNode* selectedNode = [_nodeViewController selectedNode];
 	IMBParser* parser = selectedNode.parser;
 	
-	if ([parser respondsToSelector:@selector(addMenuItemsToContextMenu:forObject:)])
+	if ([parser respondsToSelector:@selector(willShowContextMenu:forObject:)])
 	{
 		[parser willShowContextMenu:menu forObject:inObject];
 	}
@@ -594,6 +631,18 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 {
 	NSString* path = (NSString*)[inSender representedObject];
 	[[NSWorkspace threadSafeWorkspace] openFile:path];
+}
+
+
+- (IBAction) download:(id)inSender
+{
+	NSURL* url = (NSURL*)[inSender representedObject];
+	IMBNode* selectedNode = [_nodeViewController selectedNode];
+	IMBParser* parser = selectedNode.parser;
+	
+	NSArray* objects = [ibObjectArrayController selectedObjects];
+	IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+	[promise startLoadingWithDelegate:self finishSelector:nil];
 }
 
 

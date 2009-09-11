@@ -71,7 +71,7 @@
 					<object class="NSTextField" id="912974408">
 						<reference key="NSNextResponder" ref="818174058"/>
 						<int key="NSvFlags">290</int>
-						<string key="NSFrame">{{135, 10}, {138, 14}}</string>
+						<string key="NSFrame">{{154, 10}, {119, 14}}</string>
 						<reference key="NSSuperview" ref="818174058"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="5543292">
@@ -176,7 +176,7 @@
 					<object class="NSSegmentedControl" id="188104951">
 						<reference key="NSNextResponder" ref="818174058"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{12, 8}, {48, 19}}</string>
+						<string key="NSFrame">{{7, 8}, {70, 19}}</string>
 						<reference key="NSSuperview" ref="818174058"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSegmentedCell" key="NSCell" id="902407341">
@@ -187,10 +187,10 @@
 							<object class="NSMutableArray" key="NSSegmentImages">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSSegmentItem">
-									<double key="NSSegmentItemWidth">23</double>
+									<double key="NSSegmentItemWidth">22</double>
 									<object class="NSCustomResource" key="NSSegmentItemImage">
 										<string key="NSClassName">NSImage</string>
-										<string key="NSResourceName">icon-view</string>
+										<string key="NSResourceName">NSIconViewTemplate</string>
 									</object>
 									<string key="NSSegmentItemLabel"/>
 									<bool key="NSSegmentItemSelected">YES</bool>
@@ -200,11 +200,20 @@
 									<double key="NSSegmentItemWidth">22</double>
 									<object class="NSCustomResource" key="NSSegmentItemImage">
 										<string key="NSClassName">NSImage</string>
-										<string key="NSResourceName">list-view</string>
+										<string key="NSResourceName">NSListViewTemplate</string>
 									</object>
 									<string key="NSSegmentItemLabel"/>
 									<int key="NSSegmentItemTag">1</int>
 									<int key="NSSegmentItemImageScaling">2</int>
+								</object>
+								<object class="NSSegmentItem">
+									<double key="NSSegmentItemWidth">22</double>
+									<object class="NSCustomResource" key="NSSegmentItemImage">
+										<string key="NSClassName">NSImage</string>
+										<string key="NSResourceName">IMBComboViewTemplate</string>
+									</object>
+									<int key="NSSegmentItemTag">2</int>
+									<int key="NSSegmentItemImageScaling">0</int>
 								</object>
 							</object>
 							<int key="NSSegmentStyle">2</int>
@@ -213,7 +222,7 @@
 					<object class="NSSlider" id="749769895">
 						<reference key="NSNextResponder" ref="818174058"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{68, 10}, {62, 15}}</string>
+						<string key="NSFrame">{{85, 10}, {64, 15}}</string>
 						<reference key="NSSuperview" ref="818174058"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSliderCell" key="NSCell" id="815568712">
@@ -983,22 +992,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">selectedIndex: viewType</string>
-						<reference key="source" ref="188104951"/>
-						<reference key="destination" ref="1021"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="188104951"/>
-							<reference key="NSDestination" ref="1021"/>
-							<string key="NSLabel">selectedIndex: viewType</string>
-							<string key="NSBinding">selectedIndex</string>
-							<string key="NSKeyPath">viewType</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">623</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: objectCountString</string>
 						<reference key="source" ref="912974408"/>
 						<reference key="destination" ref="1021"/>
@@ -1197,6 +1190,35 @@
 						<reference key="destination" ref="796568742"/>
 					</object>
 					<int key="connectionID">658</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">selectedTag: viewType</string>
+						<reference key="source" ref="188104951"/>
+						<reference key="destination" ref="1021"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="188104951"/>
+							<reference key="NSDestination" ref="1021"/>
+							<string key="NSLabel">selectedTag: viewType</string>
+							<string key="NSBinding">selectedTag</string>
+							<string key="NSKeyPath">viewType</string>
+							<object class="NSDictionary" key="NSOptions">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSArray" key="dict.sortedKeys">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>NSAllowsEditingMultipleValuesSelection</string>
+									<string>NSConditionallySetsEnabled</string>
+								</object>
+								<object class="NSMutableArray" key="dict.values">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<boolean value="NO"/>
+									<boolean value="NO"/>
+								</object>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">661</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1511,6 +1533,7 @@
 					<string>518.IBSegmentedControlTracker.RoundRobinState</string>
 					<string>518.IBSegmentedControlTracker.WasGrowing</string>
 					<string>519.IBPluginDependency</string>
+					<string>519.IBSegmentedControlInspectorSelectedSegmentMetadataKey</string>
 					<string>544.IBPluginDependency</string>
 					<string>545.IBPluginDependency</string>
 					<string>565.IBEditorWindowLastContentRect</string>
@@ -1555,6 +1578,7 @@
 					<integer value="1"/>
 					<integer value="0"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="2"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{604, 253}, {408, 509}}</string>
@@ -1603,7 +1627,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">658</int>
+			<int key="maxID">661</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

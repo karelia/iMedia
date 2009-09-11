@@ -149,6 +149,11 @@ typedef NSUInteger kIMBObjectViewType;
 @property (retain) NSString* objectCountFormatPlural;
 @property (readonly) NSString* objectCountString;
 
+- (void) willShowView;
+- (void) didShowView;
+- (void) willHideView;
+- (void) didHideView;
+
 // Context menu support...
 
 - (NSMenu*) menuForObject:(IMBObject*)inObject;
