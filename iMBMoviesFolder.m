@@ -122,7 +122,7 @@
 			// This is a QuickTime 7.2 API which you don't get in Tiger.
 			BOOL useUTIs = [QTMovie respondsToSelector:@selector(movieTypesWithOptions:)];
 
-			NSArray* movieTypes = useUTIs ? [QTMovie movieTypesWithOptions:QTIncludeAllTypes] : [QTMovie movieFileTypes:QTIncludeAllTypes];
+			NSArray* movieTypes = useUTIs ? [QTMovie movieTypesWithOptions:QTIncludeCommonTypes] : [QTMovie movieFileTypes:QTIncludeCommonTypes];
 			NSEnumerator* e = [movieTypes objectEnumerator];
 			NSString* utiOrType;
 			

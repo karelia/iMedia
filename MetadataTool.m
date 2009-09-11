@@ -165,7 +165,7 @@ int main (int argc, const char * argv[])
     
     NSApplicationLoad();
     
-    NSString *serverIdentifier = [NSString stringWithCString:argv[1]];
+    NSString *serverIdentifier = [NSString stringWithCString:argv[1] encoding:NSUTF8StringEncoding];
     
     int parentProcessIdentifier = atoi(argv[2]);
     

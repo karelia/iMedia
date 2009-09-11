@@ -104,7 +104,7 @@
 		else if ([name isEqualToString:@"Podcasts"])
 			return @"itunes-icon-podcasts";
 	}
-	else
+	else if (_version < 9)
 	{
 		if ([name isEqualToString:@"Library"])
 			return @"itunes-icon-music";
@@ -116,6 +116,23 @@
 			return @"itunes-icon-podcasts7";
 		else if ([name isEqualToString:@"Audiobooks"])
 			return @"itunes-icon-audiobooks";
+	}
+	else
+	{
+		if ([name isEqualToString:@"Library"])
+			return @"iTunes9-icon-01";
+		else if ([name isEqualToString:@"Party Shuffle"])
+			return @"iTunes9-icon-18";
+		else if ([name isEqualToString:@"Purchased Music"])
+			return @"iTunes9-icon-07";
+		else if ([name isEqualToString:@"Podcasts"])
+			return @"iTunes9-icon-04";
+		else if ([name isEqualToString:@"Audiobooks"])
+			return @"iTunes9-icon-06";
+		else if ([name isEqualToString:@"Folder"])
+			return @"iTunes9-icon-19";
+		
+		return @"iTunes9-icon-21";
 	}
 	
 	return @"MBiTunesPlaylist";
@@ -232,7 +249,8 @@
 							{
 								node = [[[iMBLibraryNode alloc] init] autorelease];
 								[node setName:[playlist objectForKey:@"Name"]];
-								[node setIconName:@"itunes-icon-folder7"];
+								if (_version >= 9) [node setIconName:@"iTunes9-icon-19"];
+								else [node setIconName:@"itunes-icon-folder7"];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
 								
@@ -269,7 +287,8 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								if (_version >= 7) [node setIconName:@"itunes-icon-playlist-smart7"];
+								if (_version >= 9) [node setIconName:@"iTunes9-icon-20"];
+								else if (_version >= 7) [node setIconName:@"itunes-icon-playlist-smart7"];
 								else [node setIconName:@"itunes-icon-playlist-smart"];
 								
 								[self populateNode:node withTracks:tracks fromPlaylist:playlist];
@@ -292,6 +311,7 @@
 							if ([playlist objectForKey:@"Master"] == nil &&
 								[playlist objectForKey:@"Music"] == nil &&
 								[playlist objectForKey:@"Podcasts"] == nil &&
+								[playlist objectForKey:@"iTunesU"] == nil &&
 								[playlist objectForKey:@"Audiobooks"] == nil &&
 								[playlist objectForKey:@"Purchased Music"] == nil &&
 								[playlist objectForKey:@"Party Shuffle"] == nil &&
@@ -305,7 +325,8 @@
 								[node setName:[playlist objectForKey:@"Name"]];
 								[node setIdentifier:[playlist objectForKey:@"Name"]];
 								[node setParserClassName:NSStringFromClass([self class])];
-								if (_version >= 7) [node setIconName:@"itunes-icon-playlist-normal7"];
+								if (_version >= 9) [node setIconName:@"iTunes9-icon-21"];
+								else if (_version >= 7) [node setIconName:@"itunes-icon-playlist-normal7"];
 								else [node setIconName:@"itunes-icon-playlist-normal"];
 								
 								[self populateNode:node withTracks:tracks fromPlaylist:playlist];
@@ -358,9 +379,44 @@
 		
 		#if RECURSIVE_PARSEDATABASE
 	
+		// Create standard nodes for iTunes 9 and later...
+		
+		if (_version >= 9)
+		{
+			name = LocalizedStringInIMedia(@"Music", @"Library as titled in iTunes source list");
+			icon = @"iTunes9-icon-01";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Music" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInIMedia(@"Podcasts", @"Library as titled in iTunes source list");
+			icon = @"iTunes9-icon-04";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Podcasts" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInIMedia(@"iTunesU", @"iTunesU as titled in iTunes source list");
+			icon = @"iTunes9-icon-30";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"iTunesU" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInIMedia(@"Audiobooks", @"Library as titled in iTunes source list");
+			icon = @"iTunes9-icon-06";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Audiobooks" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInIMedia(@"Purchased", @"Library as titled in iTunes source list");
+			icon = @"iTunes9-icon-07";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Purchased Music" name:name iconName:icon];
+			if (node) [root addItem:node];
+			
+			name = LocalizedStringInIMedia(@"Party Shuffle", @"Library as titled in iTunes source list");
+			icon = @"iTunes9-icon-18";
+			node = [self parseDatabase:musicLibrary forPlaylistWithKey:@"Party Shuffle" name:name iconName:icon];
+			if (node) [root addItem:node];
+		}
+		
 		// Create standard nodes for iTunes 7 and later...
 		
-		if (_version >= 7)
+		else if (_version >= 7)
 		{
 			name = LocalizedStringInIMedia(@"Music", @"Library as titled in iTunes source list");
 			icon = @"itunes-icon-music";

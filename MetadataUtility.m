@@ -202,7 +202,7 @@ static MetadataUtility *theMetadataUtility = nil;
 {
     MDItemRef item = MDItemCreate(kCFAllocatorDefault, (CFStringRef)file);
     
-    NSDictionary *attributes = NULL;
+    NSDictionary *attributes = nil;
     
     if ( item != NULL )
     {
@@ -232,14 +232,18 @@ static MetadataUtility *theMetadataUtility = nil;
         // all calls to metadata tool must come from the same thread. so send our message off to our
         // MetadataUtility thread!
         
-        id proxy = [NSConnection rootProxyForConnectionWithRegisteredName:@"MetadataUtility" host:nil];
-        
-        [proxy setProtocolForProxy:@protocol(MetadataUtilityProtocol)];
-        
-        NSDictionary *attributes = [proxy getMetadataForFileThroughConnection:file];
-        
-        return attributes;
-    }
+		@try
+		{
+			id proxy = [NSConnection rootProxyForConnectionWithRegisteredName:@"MetadataUtility" host:nil];
+			[proxy setProtocolForProxy:@protocol(MetadataUtilityProtocol)];
+			attributes = [proxy getMetadataForFileThroughConnection:file];
+			return attributes;
+ 		}
+		@catch (NSException * e)
+		{
+			NSLog(@"%s exception=%@",__FUNCTION__,[e description]);
+		}
+	}
     else
     {
         // nothing else has worked. ask the main thread to read the metadata.
@@ -256,6 +260,8 @@ static MetadataUtility *theMetadataUtility = nil;
         
         return nil;
     }
+	
+	return nil;
 }
 
 @end
