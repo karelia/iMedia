@@ -111,6 +111,8 @@ static NSString* kSelectionKey = @"selection";
 @synthesize nodeOutlineView = ibNodeOutlineView;
 @synthesize nodePopupButton = ibNodePopupButton;
 @synthesize objectContainerView = ibObjectContainerView;
+@synthesize standardObjectView = _standardObjectView;
+@synthesize customObjectView = _customObjectView;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -224,6 +226,8 @@ static NSString* kSelectionKey = @"selection";
 	IMBRelease(_libraryController);
 	IMBRelease(_selectedNodeIdentifier);
 	IMBRelease(_expandedNodeIdentifiers);
+	IMBRelease(_standardObjectView);
+	IMBRelease(_customObjectView);
 	
 	[super dealloc];
 }
@@ -511,6 +515,10 @@ static NSString* kSelectionKey = @"selection";
 			self.selectedNodeIdentifier = node.identifier;
 		}
 		
+		// If the node has a custom object view, then install it now...
+		
+		[self installCustomObjectView:[node customObjectView]];
+		
 		// If a completely different parser was selected, then notify the previous parser, that it is most
 		// likely no longer needed any can get rid of its cached data...
 		
@@ -759,7 +767,10 @@ static NSString* kSelectionKey = @"selection";
 		{
 			NSIndexPath* indexPath = inNode.indexPath;
 			[ibNodeTreeController setSelectionIndexPath:indexPath];
-			[self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
+			
+			// Not redundant! Needed if selection doesn't change due to previous line!
+			[self.libraryController populateNode:inNode]; 
+			[self installCustomObjectView:[inNode customObjectView]];
 		}
 	}	
 	else
@@ -1076,6 +1087,69 @@ static NSString* kSelectionKey = @"selection";
 	}
 	
 	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Object Views
+
+
+// Install the standard object view and remember it for later...
+
+- (void) installStandardObjectView:(NSView*)inObjectView
+{
+	NSView* containerView = [self objectContainerView];
+	[inObjectView setFrame:[containerView bounds]];
+	[containerView addSubview:inObjectView];
+	self.standardObjectView = inObjectView;
+}
+
+
+// Install a custom object view (and replace an old custom view or the standard view)...
+
+- (void) installCustomObjectView:(NSView*)inObjectView
+{
+	NSView* objectView = nil;
+	
+	// We want a custom view...
+	
+	if (inObjectView)
+	{
+		// so get hide the stadard view (but keep it retained for later)...
+		
+		[_standardObjectView removeFromSuperview];
+
+		// and use the new custom view...
+		
+		if (_customObjectView != inObjectView)
+		{
+			[_customObjectView removeFromSuperview];
+			self.customObjectView = inObjectView;
+			objectView = inObjectView;
+		}
+	}
+	
+	// We want the standard view, so get rid of an existing custom view...
+	
+	else
+	{
+		[_customObjectView removeFromSuperview];
+		self.customObjectView = nil;
+		objectView = self.standardObjectView;
+	}
+	
+	// Finally install the chosen view...
+	
+	if (objectView)
+	{
+		NSView* containerView = [self objectContainerView];
+		[objectView setFrame:containerView.bounds];
+		[objectView setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+		[containerView addSubview:objectView];
+	}
 }
 
 

@@ -415,7 +415,7 @@
 	rootNode.parser = self;
 	rootNode.leaf = NO;
 	rootNode.groupType = kIMBGroupTypeInternet;
-
+	
 	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
 	rootNode.subNodes = nil;
@@ -424,6 +424,24 @@
 	//	TODO: ???
 	rootNode.watcherType = kIMBWatcherTypeFirstCustom;
 	rootNode.watchedPath = (NSString*) rootNode.mediaSource;
+	
+	// The root node has a custom view that we are loading from a nib file
+	
+	NSView* customObjectView = nil;
+	NSArray* topLevelObjects = nil;
+	NSNib* nib = [[NSNib alloc] initWithNibNamed:@"IMBFlickrParser" bundle:[NSBundle bundleForClass:[self class]]];
+	[nib instantiateNibWithOwner:self topLevelObjects:&topLevelObjects];
+	
+	for (id topLevelObject in topLevelObjects)
+	{
+		if ([topLevelObject isKindOfClass:[NSView class]])
+		{
+			customObjectView = topLevelObject;
+			break;
+		}
+	}
+
+	rootNode.customObjectView = customObjectView;
 	
 	return rootNode;
 }
@@ -529,6 +547,20 @@
 	return [[(IMBObjectPromise*)[IMBRemoteObjectPromise alloc] initWithObjects:inObjects] autorelease];
 }
 
+
+#pragma mark 
+#pragma mark Actions
+
+- (IBAction) newSearch:(id)inSender
+{
+	NSBeep();
+}
+
+
+- (IBAction) deleteSearch:(id)inSender
+{
+	NSBeep();
+}
 
 #pragma mark 
 #pragma mark Properties

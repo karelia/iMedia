@@ -109,6 +109,10 @@
 @synthesize badgeTarget = _badgeTarget;
 @synthesize badgeSelector = _badgeSelector;
 
+// Custom object view...
+
+@synthesize customObjectView = _customObjectView;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -130,6 +134,8 @@
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
+		
+		self.customObjectView = nil;
 	}
 	
 	return self;
@@ -162,6 +168,8 @@
 	copy.badgeTypeMouseover = self.badgeTypeMouseover;
 	copy.badgeTarget = self.badgeTarget;
 	copy.badgeSelector = self.badgeSelector;
+	
+	copy.customObjectView = self.customObjectView;
 	
 	// Create a shallow copy of objects array...
 	
@@ -202,6 +210,7 @@
 	IMBRelease(_parser);
 	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
+	IMBRelease(_customObjectView);
 	
 	[super dealloc];
 }

@@ -238,13 +238,11 @@ static IMBPanelController* sSharedPanelController = nil;
 		NSString* mediaType = nodeViewController.mediaType;
 
 		NSView* nodeView = [nodeViewController view];
-		NSView* containerView = [nodeViewController objectContainerView];
-		NSView* objectView = [objectViewController view];
-		
 		[nodeView setFrame:[ibTabView bounds]];
-		[objectView setFrame:[containerView bounds]];
-		[containerView addSubview:objectView];
 
+		NSView* objectView = [objectViewController view];
+		[nodeViewController installStandardObjectView:objectView];
+		
 		NSTabViewItem* item = [[NSTabViewItem alloc] initWithIdentifier:mediaType];
 		[item setLabel:mediaType];
 		[item setView:nodeView];

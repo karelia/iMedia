@@ -93,6 +93,8 @@
 	IMBBadgeType _badgeTypeMouseover;
 	id _badgeTarget;
 	SEL _badgeSelector;
+
+	NSView* _customObjectView;
 }
 
 // Primary properties for a node:
@@ -148,6 +150,13 @@
 @property (assign) IMBBadgeType badgeTypeMouseover;
 @property (retain) id badgeTarget;
 @property (assign) SEL badgeSelector;
+
+// Nodes that do not contain any objects can return a custom object view, which will replace the standard
+// object views (icon,list,combo). For most nodes this will not be needed so returning nil is fine. Some 
+// nodes that do contain objects may still opt to use a custom view because the standard views do not
+// suffice. E.g. iPhoto events may be such a case...
+
+@property (retain) NSView* customObjectView;
 
 // Helper methods
 

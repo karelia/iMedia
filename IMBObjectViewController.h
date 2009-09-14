@@ -114,6 +114,7 @@ typedef NSUInteger kIMBObjectViewType;
 	
 	NSString* _objectCountFormatSingular;
 	NSString* _objectCountFormatPlural;
+	BOOL _isDragging;
 }
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
@@ -123,6 +124,7 @@ typedef NSUInteger kIMBObjectViewType;
 @property (retain) IMBLibraryController* libraryController;
 @property (retain) IMBNodeViewController* nodeViewController;
 @property (readonly) NSString* mediaType;
+@property (readonly) IMBNode* currentNode;
 
 // Objects (media files)...
 
