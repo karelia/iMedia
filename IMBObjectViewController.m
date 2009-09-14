@@ -264,10 +264,12 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 }
 
 
-- (void) _reloadIconView
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IMBNode*) currentNode
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
-	[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	return [_nodeViewController selectedNode];
 }
 
 
@@ -342,12 +344,6 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 #pragma mark 
 #pragma mark User Interface
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
 
 
 // Subclasses can override these methods to configure or customize look & feel of the various object views...
@@ -454,8 +450,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	_iconSize = inIconSize;
 	
 	NSSize size = [ibIconView cellSize];
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	IMBParser* parser = selectedNode.parser;
+	IMBParser* parser = self.currentNode.parser;
 	
 	if ([parser respondsToSelector:@selector(objectViewDidChangeIconSize:)])
 	{
@@ -478,7 +473,19 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (void) _reloadIconView
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
+	[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
+#pragma mark Context Menu
+ 
 
 - (NSMenu*) menuForObject:(IMBObject*)inObject
 {
@@ -606,8 +613,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 	// Give parser a chance to add menu items...
 	
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	IMBParser* parser = selectedNode.parser;
+	IMBParser* parser = self.currentNode.parser;
 	
 	if ([parser respondsToSelector:@selector(willShowContextMenu:forObject:)])
 	{
@@ -636,10 +642,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (IBAction) download:(id)inSender
 {
-	NSURL* url = (NSURL*)[inSender representedObject];
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	IMBParser* parser = selectedNode.parser;
-	
+	IMBParser* parser = self.currentNode.parser;
 	NSArray* objects = [ibObjectArrayController selectedObjects];
 	IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 	[promise startLoadingWithDelegate:self finishSelector:nil];
@@ -680,170 +683,6 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 
 #pragma mark 
-#pragma mark IKImageBrowserDelegate
- 
-
-- (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
-{
-
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// First give the delegate a chance to handle the double click. It it chooses not to, then we will 
-// handle it ourself by simply opening the files (with their default app)...
-
-- (void) imageBrowser:(IKImageBrowserView*)inView cellWasDoubleClickedAtIndex:(NSUInteger)inIndex
-{
-	IMBLibraryController* controller = self.libraryController;
-	id delegate = controller.delegate;
-	BOOL didHandleEvent = NO;
-	
-	if (delegate)
-	{
-		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
-		{
-			IMBNode* node = [_nodeViewController selectedNode];
-			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
-		}
-	}
-	
-	if (!didHandleEvent)
-	{
-		[self openSelectedObjects:inView];
-	}	
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) imageBrowser:(IKImageBrowserView*)inView backgroundWasRightClickedWithEvent:(NSEvent*)inEvent
-{
-	NSMenu* menu = [self menuForObject:nil];
-	[NSMenu popUpContextMenu:menu withEvent:inEvent forView:inView];
-}
-
-
-- (void) imageBrowser:(IKImageBrowserView*)inView cellWasRightClickedAtIndex:(NSUInteger)inIndex withEvent:(NSEvent*)inEvent
-{
-	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
-	NSMenu* menu = [self menuForObject:object];
-	[NSMenu popUpContextMenu:menu withEvent:inEvent forView:inView];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
-// start loading the objects in the promise and iterate over the resulting files...
-
-- (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
-{
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
-
-	if (selectedNode)
-	{
-		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
-
-		IMBParser* parser = selectedNode.parser;
-		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
-		
-		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType,nil] owner:self];
-		[inPasteboard setData:data forType:kIMBObjectPromiseType];
-		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
-		
-		return objects.count;
-	}
-	
-	return 0;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark NSTableViewDelegate
- 
-
-- (BOOL) tableView:(NSTableView*)inTableView shouldEditTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
-{
-	return NO;
-}
-
-
-- (IBAction) tableViewWasDoubleClicked:(id)inSender
-{
-	IMBLibraryController* controller = self.libraryController;
-	id delegate = controller.delegate;
-	BOOL didHandleEvent = NO;
-	
-	if (delegate)
-	{
-		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
-		{
-			IMBNode* node = [_nodeViewController selectedNode];
-			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
-		}
-	}
-	
-	if (!didHandleEvent)
-	{
-		[self openSelectedObjects:inSender];
-	}	
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
-// start loading the objects in the promise and iterate over the resulting files...
-
-- (BOOL) tableView:(NSTableView*)inTableView writeRowsWithIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard 
-{
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
-
-	if (selectedNode)
-	{
-		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
-
-		IMBParser* parser = selectedNode.parser;
-		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
-		
-		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType,nil] owner:self];
-		[inPasteboard setData:data forType:kIMBObjectPromiseType];
-		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
-		
-		return YES;
-	}
-	
-	return NO;
-}
-
-
-// For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
-// the IMBObjectPromise for the client and block it until all objects are loaded...
-
-- (NSArray*) tableView:(NSTableView*)inTableView namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination forDraggedRowsWithIndexes:(NSIndexSet*)inIndexes
-{
-	[self _downloadSelectedObjectsToDestination:inDropDestination];
-	return [self _namesOfPromisedFiles];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
 #pragma mark Opening
  
 
@@ -851,9 +690,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (IBAction) openSelectedObjects:(id)inSender
 {
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
+	IMBNode* node = self.currentNode;
 	NSArray* objects = [ibObjectArrayController selectedObjects];
-	[self openObjects:objects inSelectedNode:selectedNode];
+	[self openObjects:objects inSelectedNode:node];
 }
 
 
@@ -898,122 +737,6 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	{
 		[NSApp presentError:inError];
 	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Dragging
- 
-
-// For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
-// the IMBObjectPromise for the client and block it until all objects are loaded...
-
-- (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
-{
-	[self _downloadSelectedObjectsToDestination:inDropDestination];
-	return [self _namesOfPromisedFiles];
-}
-
-
-// Even dumber are apps that do not support NSFilesPromisePboardType, but only know about NSFilenamesPboardType.
-// In this case we'll download to the temp folder and block synchronously until the download has completed...
-
-- (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
-{
-    if ([inType isEqualToString:NSFilenamesPboardType])
-	{
-		NSData* data = [inPasteboard dataForType:kIMBObjectPromiseType];
-		IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-
-		promise.downloadFolderPath = NSTemporaryDirectory();
-		[promise startLoadingWithDelegate:self finishSelector:nil];
-		[promise waitUntilDone];
-		
-		[inPasteboard setPropertyList:promise.localFiles forType:NSFilenamesPboardType];
-    }
-}
-
-
-- (void) _downloadSelectedObjectsToDestination:(NSURL*)inDestination
-{
-	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	NSArray* objects = [ibObjectArrayController selectedObjects];
-	
-	if (selectedNode)
-	{
-		IMBParser* parser = selectedNode.parser;
-		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-		promise.downloadFolderPath = [inDestination path];
-		
-		[promise startLoadingWithDelegate:self finishSelector:nil];
-	}
-}
-
-
-- (NSArray*) _namesOfPromisedFiles
-{
-	NSArray* objects = [ibObjectArrayController selectedObjects];
-	NSMutableArray* names = [NSMutableArray array];
-	
-	for (IMBObject* object in objects)
-	{
-		NSString* path = nil;
-		
-		if ([object.value isKindOfClass:[NSString class]])
-			path = (NSString*)object.value;
-		else if ([object.value isKindOfClass:[NSURL class]])	
-			path = [(NSURL*)object.value path];
-		
-		if (path) [names addObject:[path lastPathComponent]];
-	}
-	
-	return names;
-}
-
-
-- (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
-{
-	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
-
-	NSString* title = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.progress.title",
-		nil,IMBBundle(),
-		@"Downloading Media Files",
-		@"Window title of progress panel of IMBObjectViewController");
-
-	NSString* message = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.progress.message.preparing",
-		nil,IMBBundle(),
-		@"Preparing…",
-		@"Text message in progress panel of IMBObjectViewController");
-
-	[controller window];
-	[controller setTitle:title];
-	[controller setMessage:message];
-	[controller.progressBar startAnimation:nil];
-	[controller setCancelTarget:inObjectPromise];
-	[controller setCancelAction:@selector(cancel:)];
-	[controller.cancelButton setEnabled:NO];
-	[controller.window makeKeyAndOrderFront:nil];
-	
-	self.progressWindowController = controller;
-}
-
-
-- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise
-{
-	[self.progressWindowController setProgress:inFraction];
-	[self.progressWindowController setMessage:@""];
-	[self.progressWindowController.cancelButton setEnabled:YES];
-}
-
-
-- (void) cleanupProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
-{
-	self.progressWindowController = nil;
 }
 
 
@@ -1123,6 +846,294 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 //	
 //	return NO;
 //}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Dragging
+ 
+
+- (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
+{
+	_isDragging = NO;
+}
+
+
+// For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
+// the IMBObjectPromise for the client and block it until all objects are loaded...
+
+- (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
+{
+	[self _downloadSelectedObjectsToDestination:inDropDestination];
+	return [self _namesOfPromisedFiles];
+}
+
+
+// Even dumber are apps that do not support NSFilesPromisePboardType, but only know about NSFilenamesPboardType.
+// In this case we'll download to the temp folder and block synchronously until the download has completed...
+
+- (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
+{
+    if (/*_isDragging == NO &&*/ [inType isEqualToString:NSFilenamesPboardType])
+	{
+		NSData* data = [inPasteboard dataForType:kIMBObjectPromiseType];
+		IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+
+		promise.downloadFolderPath = NSTemporaryDirectory();
+		[promise startLoadingWithDelegate:self finishSelector:nil];
+		[promise waitUntilDone];
+		
+		[inPasteboard setPropertyList:promise.localFiles forType:NSFilenamesPboardType];
+    }
+}
+
+
+- (void) _downloadSelectedObjectsToDestination:(NSURL*)inDestination
+{
+	IMBNode* node = self.currentNode;
+	
+	if (node)
+	{
+		IMBParser* parser = node.parser;
+		NSArray* objects = [ibObjectArrayController selectedObjects];
+		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+		promise.downloadFolderPath = [inDestination path];
+		
+		[promise startLoadingWithDelegate:self finishSelector:nil];
+	}
+}
+
+
+- (NSArray*) _namesOfPromisedFiles
+{
+	NSArray* objects = [ibObjectArrayController selectedObjects];
+	NSMutableArray* names = [NSMutableArray array];
+	
+	for (IMBObject* object in objects)
+	{
+		NSString* path = nil;
+		
+		if ([object.value isKindOfClass:[NSString class]])
+			path = (NSString*)object.value;
+		else if ([object.value isKindOfClass:[NSURL class]])	
+			path = [(NSURL*)object.value path];
+		
+		if (path) [names addObject:[path lastPathComponent]];
+	}
+	
+	return names;
+}
+
+
+- (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
+{
+	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
+
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBObjectViewController.progress.title",
+		nil,IMBBundle(),
+		@"Downloading Media Files",
+		@"Window title of progress panel of IMBObjectViewController");
+
+	NSString* message = NSLocalizedStringWithDefaultValue(
+		@"IMBObjectViewController.progress.message.preparing",
+		nil,IMBBundle(),
+		@"Preparing…",
+		@"Text message in progress panel of IMBObjectViewController");
+
+	[controller window];
+	[controller setTitle:title];
+	[controller setMessage:message];
+	[controller.progressBar startAnimation:nil];
+	[controller setCancelTarget:inObjectPromise];
+	[controller setCancelAction:@selector(cancel:)];
+	[controller.cancelButton setEnabled:NO];
+	[controller.window makeKeyAndOrderFront:nil];
+	
+	self.progressWindowController = controller;
+}
+
+
+- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise
+{
+	[self.progressWindowController setProgress:inFraction];
+	[self.progressWindowController setMessage:@""];
+	[self.progressWindowController.cancelButton setEnabled:YES];
+}
+
+
+- (void) cleanupProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
+{
+	self.progressWindowController = nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark IKImageBrowserDelegate
+ 
+
+- (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
+{
+
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// First give the delegate a chance to handle the double click. It it chooses not to, then we will 
+// handle it ourself by simply opening the files (with their default app)...
+
+- (void) imageBrowser:(IKImageBrowserView*)inView cellWasDoubleClickedAtIndex:(NSUInteger)inIndex
+{
+	IMBLibraryController* controller = self.libraryController;
+	id delegate = controller.delegate;
+	BOOL didHandleEvent = NO;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
+		{
+			IMBNode* node = self.currentNode;
+			NSArray* objects = [ibObjectArrayController selectedObjects];
+			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
+		}
+	}
+	
+	if (!didHandleEvent)
+	{
+		[self openSelectedObjects:inView];
+	}	
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) imageBrowser:(IKImageBrowserView*)inView backgroundWasRightClickedWithEvent:(NSEvent*)inEvent
+{
+	NSMenu* menu = [self menuForObject:nil];
+	[NSMenu popUpContextMenu:menu withEvent:inEvent forView:inView];
+}
+
+
+- (void) imageBrowser:(IKImageBrowserView*)inView cellWasRightClickedAtIndex:(NSUInteger)inIndex withEvent:(NSEvent*)inEvent
+{
+	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+	NSMenu* menu = [self menuForObject:object];
+	[NSMenu popUpContextMenu:menu withEvent:inEvent forView:inView];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
+// start loading the objects in the promise and iterate over the resulting files...
+
+- (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
+{
+	IMBNode* node = self.currentNode;
+
+	if (node)
+	{
+		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
+
+		IMBParser* parser = node.parser;
+		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
+		
+		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,/*NSFilesPromisePboardType,*/NSFilenamesPboardType,nil] owner:self];
+		[inPasteboard setData:data forType:kIMBObjectPromiseType];
+//		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
+		
+		_isDragging = YES;
+		return objects.count;
+	}
+	
+	return 0;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark NSTableViewDelegate
+ 
+
+- (BOOL) tableView:(NSTableView*)inTableView shouldEditTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
+{
+	return NO;
+}
+
+
+- (IBAction) tableViewWasDoubleClicked:(id)inSender
+{
+	IMBLibraryController* controller = self.libraryController;
+	id delegate = controller.delegate;
+	BOOL didHandleEvent = NO;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
+		{
+			IMBNode* node = self.currentNode;
+			NSArray* objects = [ibObjectArrayController selectedObjects];
+			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
+		}
+	}
+	
+	if (!didHandleEvent)
+	{
+		[self openSelectedObjects:inSender];
+	}	
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
+// start loading the objects in the promise and iterate over the resulting files...
+
+- (BOOL) tableView:(NSTableView*)inTableView writeRowsWithIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard 
+{
+	IMBNode* node = self.currentNode;
+
+	if (node)
+	{
+		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
+
+		IMBParser* parser = node.parser;
+		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
+		
+		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,/*NSFilesPromisePboardType,*/NSFilenamesPboardType,nil] owner:self];
+		[inPasteboard setData:data forType:kIMBObjectPromiseType];
+//		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
+		
+		_isDragging = YES;
+		return YES;
+	}
+	
+	return NO;
+}
+
+
+// For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
+// the IMBObjectPromise for the client and block it until all objects are loaded...
+
+- (NSArray*) tableView:(NSTableView*)inTableView namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination forDraggedRowsWithIndexes:(NSIndexSet*)inIndexes
+{
+	[self _downloadSelectedObjectsToDestination:inDropDestination];
+	return [self _namesOfPromisedFiles];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

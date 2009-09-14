@@ -94,6 +94,9 @@
 ///	The shared secret given to you by Flickr. Must be set to use this parser.
 @property (copy) NSString* flickrSharedSecret;
 
+- (IBAction) newSearch:(id)inSender;
+- (IBAction) deleteSearch:(id)inSender;
+
 @end
 
 

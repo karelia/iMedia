@@ -93,6 +93,8 @@
 	IBOutlet IMBOutlineView* ibNodeOutlineView;
 	IBOutlet NSPopUpButton* ibNodePopupButton;
 	IBOutlet NSView* ibObjectContainerView;
+	NSView* _standardObjectView;
+	NSView* _customObjectView;
 }
 
 + (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
@@ -108,6 +110,8 @@
 @property (readonly) IMBOutlineView* nodeOutlineView;
 @property (readonly) NSPopUpButton* nodePopupButton;
 @property (readonly) NSView* objectContainerView;
+@property (retain) NSView* standardObjectView;
+@property (retain) NSView* customObjectView;
 
 @property (retain) NSString* selectedNodeIdentifier;
 @property (retain) NSMutableArray* expandedNodeIdentifiers;
@@ -132,6 +136,11 @@
 
 - (BOOL) canRemoveNode;
 - (IBAction) removeNode:(id)inSender;
+
+// Object Views...
+
+- (void) installStandardObjectView:(NSView*)inObjectView;
+- (void) installCustomObjectView:(NSView*)inObjectView;
 
 @end
 

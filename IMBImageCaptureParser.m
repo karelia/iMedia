@@ -263,6 +263,7 @@
         // NSData * data  = (NSData*)*(pb.thumbnailData);		
         image = [[NSImage alloc] initWithData:data];
 		[image setScalesWhenResized:YES];
+		[image setSize:NSMakeSize(16.0,16.0)];
 		[data release];
 		NSLog( @"Received Thumbnail %@", self );
     }
