@@ -235,6 +235,7 @@
 		object.value = [[anItem valueForKey:@"icao"] stringValue];
 		object.name = [anItem valueForKey:@"ifil"];
 		object.metadata = anItem;
+		object.parser = self;
 		[objectArray addObject:object];
 		
 		[object release];

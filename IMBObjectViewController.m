@@ -977,15 +977,6 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 #pragma mark IKImageBrowserDelegate
  
 
-- (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
-{
-
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // First give the delegate a chance to handle the double click. It it chooses not to, then we will 
 // handle it ourself by simply opening the files (with their default app)...
 
@@ -1014,6 +1005,9 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+// Since IKImageBrowserView doesn't support context menus out of the box, we need to display them manually in 
+// the following two delegate methods. Why couldn't Apple take care of this?
 
 - (void) imageBrowser:(IKImageBrowserView*)inView backgroundWasRightClickedWithEvent:(NSEvent*)inEvent
 {
@@ -1067,11 +1061,34 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 #pragma mark NSTableViewDelegate
  
 
+// If the object for the cell that we are about to display doesn't have any metadata yet, then load it lazily...
+
+- (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
+{
+	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
+
+	if (object.metadata == nil)
+	{
+		[object.parser loadMetadataForObject:object];
+	}	
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// We do not allow any editing in the list or combo view...
+
 - (BOOL) tableView:(NSTableView*)inTableView shouldEditTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
 	return NO;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Doubleclicking a row opens the selected items. This may trigger a download if the user selected remote objects...
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {

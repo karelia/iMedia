@@ -96,6 +96,24 @@
 }
 	
 
+// Toggle panel visibility...
+
+- (IBAction) togglePanel:(id)inSender
+{
+	IMBPanelController* controller = [IMBPanelController sharedPanelController];
+	NSWindow* window = controller.window;
+	
+	if (window.isVisible)
+	{
+		[controller hideWindow:inSender];
+	}
+	else
+	{
+		[controller showWindow:inSender];
+	}
+}
+
+
 // Save window frame to prefs...
 
 - (void) applicationWillTerminate:(NSNotification*)inNotification
