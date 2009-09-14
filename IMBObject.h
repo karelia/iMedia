@@ -47,6 +47,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class IMBParser;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // This object encapsulates information about a single media item (e.g. image file or audio file). The value 
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
 
@@ -55,12 +63,14 @@
 	id _value;												
 	NSString* _name;
 	NSDictionary* _metadata;
+	IMBParser* _parser;
 }
 
 @property (retain) id value;								// Path or URL
 @property (retain) NSString* name;
 @property (retain) NSDictionary* metadata;
 @property (readonly) NSImage* icon;
+@property (retain) IMBParser* parser;
 
 - (BOOL) isEqual:(IMBObject*)inObject;						// Considered equal if value is equal
 

@@ -606,7 +606,8 @@
 					
 					NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:trackDict];
 					object.metadata = metadata;
-
+					object.parser = self;
+					
 					double duration = [[trackDict objectForKey:@"Total Time"] doubleValue] / 1000.0;
 					[metadata setObject:[NSNumber numberWithDouble:duration] forKey:@"duration"]; 
 					

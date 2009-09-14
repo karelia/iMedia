@@ -225,6 +225,7 @@
 		obj.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
 		obj.metadata = [NSDictionary dictionaryWithObject:webPageURL forKey:@"webPageURL"];
 		obj.value = imageURL;
+		obj.parser = self;
 		[objects addObject:obj];
 		[obj release];
 	}

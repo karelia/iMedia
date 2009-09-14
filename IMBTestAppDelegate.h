@@ -36,6 +36,7 @@
 
 @property (retain) IMBNodeViewController* nodeViewController;
 @property (retain) IMBObjectViewController* objectViewController;
+- (IBAction) togglePanel:(id)inSender;
 
 @end
 

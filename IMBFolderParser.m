@@ -209,10 +209,11 @@
 					IMBVisualObject* object = [[IMBVisualObject alloc] init];
 					object.value = (id)path;
 					object.name = file;
-					object.metadata = [self metadataForFileAtPath:path];
 					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 					object.imageRepresentation = path;
-				
+					object.metadata = nil; // will be loaded lazily (on demand when needed)
+					object.parser = self;
+
 					[objects addObject:object];
 					[object release];
 				}
@@ -241,9 +242,11 @@
 			object.value = (id)subnode;
 			object.path = (id)folder;
 			object.name = name;
-			object.metadata = nil;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:folder];
+			object.metadata = nil;
+			object.parser = self;
+
 			[objects addObject:object];
 			[object release];
 		}
@@ -294,6 +297,21 @@
 }
 
 	
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	NSLog(@"%s",__FUNCTION__);
+	
+	if (![inObject isKindOfClass:[IMBNodeObject class]])
+	{
+		NSString* path = (NSString*) inObject.value;
+		inObject.metadata = [self metadataForFileAtPath:path];
+	}
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

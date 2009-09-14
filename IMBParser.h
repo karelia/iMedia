@@ -125,6 +125,10 @@
 - (void) willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
 - (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
 
+// Called when metadata for an object needs to be loaded lazily...
+
+- (void) loadMetadataForObject:(IMBObject*)inObject;
+
 @end
 
 

@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="565"/>
+			<integer value="595"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -251,7 +251,7 @@
 							<object class="NSTabViewItem" id="710976510">
 								<string key="NSIdentifier">1</string>
 								<object class="NSView" key="NSView" id="828354452">
-									<reference key="NSNextResponder" ref="646749311"/>
+									<nil key="NSNextResponder"/>
 									<int key="NSvFlags">274</int>
 									<object class="NSMutableArray" key="NSSubviews">
 										<bool key="EncodedWithXMLCoder">YES</bool>
@@ -480,7 +480,6 @@
 										</object>
 									</object>
 									<string key="NSFrameSize">{408, 474}</string>
-									<reference key="NSSuperview" ref="646749311"/>
 								</object>
 								<string key="NSLabel">Tab</string>
 								<reference key="NSColor" ref="849578898"/>
@@ -660,7 +659,7 @@
 							<object class="NSTabViewItem" id="805172313">
 								<string key="NSIdentifier">Item 2</string>
 								<object class="NSView" key="NSView" id="26106343">
-									<nil key="NSNextResponder"/>
+									<reference key="NSNextResponder" ref="646749311"/>
 									<int key="NSvFlags">256</int>
 									<object class="NSMutableArray" key="NSSubviews">
 										<bool key="EncodedWithXMLCoder">YES</bool>
@@ -770,19 +769,20 @@
 										</object>
 									</object>
 									<string key="NSFrameSize">{408, 474}</string>
+									<reference key="NSSuperview" ref="646749311"/>
 								</object>
 								<string key="NSLabel">Item 2</string>
 								<reference key="NSColor" ref="849578898"/>
 								<reference key="NSTabView" ref="646749311"/>
 							</object>
 						</object>
-						<reference key="NSSelectedTabViewItem" ref="710976510"/>
+						<reference key="NSSelectedTabViewItem" ref="805172313"/>
 						<reference key="NSFont" ref="404275500"/>
 						<int key="NSTvFlags">6</int>
 						<bool key="NSAllowTruncatedLabels">YES</bool>
 						<object class="NSMutableArray" key="NSSubviews">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="828354452"/>
+							<reference ref="26106343"/>
 						</object>
 					</object>
 				</object>
@@ -1215,6 +1215,14 @@
 					</object>
 					<int key="connectionID">668</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="95588040"/>
+						<reference key="destination" ref="1021"/>
+					</object>
+					<int key="connectionID">669</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1628,7 +1636,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">668</int>
+			<int key="maxID">669</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

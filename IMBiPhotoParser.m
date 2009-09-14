@@ -505,6 +505,7 @@
 					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
 					object.metadata = imageDict;
+					object.parser = self;
 				}
 				
 				[pool2 release];

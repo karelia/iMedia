@@ -50,6 +50,8 @@
 #pragma mark HEADERS
 
 #import "IMBObjectArrayController.h"
+#import "IMBObject.h"
+#import "IMBParser.h"
 #import "IMBCommon.h"
 
 
@@ -195,12 +197,22 @@ const NSString* kSearchStringContext = @"searchString";
 		
 		NSMutableArray* matchedObjects = [NSMutableArray arrayWithCapacity:[inObjects count]];
 		NSString* lowerCaseSearchString = [_searchString lowercaseString];
-		id object,proxy;	
 		
-		for (object in inObjects)
+		for (IMBObject* object in inObjects)
 		{
 			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-			proxy = hasProxyForObject ? [_delegate proxyForObject:object] : object;
+
+			// For searching to work properly we should load object metadata if it isn't available yet...
+
+			if (searching && object.metadata == nil)
+			{
+				[object.parser loadMetadataForObject:object];
+			}
+
+			// Give the delegate a chance to enhance an object or totally replace it with a proxy object.
+			// This way object can be made more powerful or customized...
+			
+			id proxy = hasProxyForObject ? [_delegate proxyForObject:object] : object;
 			
 			// If the object has just been created, add it unconditionally...
 			
@@ -210,11 +222,11 @@ const NSString* kSearchStringContext = @"searchString";
 				_newObject = nil;
 			}
 			
-			// Search all properties in the array. Please note that we need to check for the existance 
-			// of a property (value!=nil) BEFORE checking rangeOfString: or a nil value will provide 
-			// us with a positive match. This would yield way to many false results...
+			// Search all properties in the array. Please note that we need to check for the existance of a property 
+			// (value!=nil) BEFORE checking rangeOfString: or a nil value will provide us with a positive match. 
+			// This would yield way to many false results...
 			
-			/*else*/ if (searching)
+			else if (searching)
 			{
 				NSString* value;
 				

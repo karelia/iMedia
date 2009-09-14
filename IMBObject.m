@@ -50,6 +50,7 @@
 #pragma mark HEADERS
 
 #import "IMBObject.h"
+#import "IMBParser.h"
 #import "IMBCommon.h"
 #import <Quartz/Quartz.h>
 
@@ -64,6 +65,7 @@
 @synthesize value = _value;
 @synthesize name = _name;
 @synthesize metadata = _metadata;
+@synthesize parser = _parser;
 
 
 - (id) initWithCoder:(NSCoder*)inCoder
@@ -102,6 +104,7 @@
 	IMBRelease(_value);
 	IMBRelease(_name);
 	IMBRelease(_metadata);
+	IMBRelease(_parser);
 	[super dealloc];
 }
 
@@ -203,6 +206,7 @@
 	return _value;
 }
 
+
 // The name of the object will be used as the title in IKIMageBrowserView...
 
 - (NSString*) imageTitle
@@ -211,6 +215,20 @@
 }
 
 
+// When this method is called we assume that the object is about to be displayed. So this could be a 
+// possible hook for lazily loading metadata...
+
+- (id) imageRepresentation
+{
+	if (_metadata == nil && _parser != nil)
+	{
+		[_parser loadMetadataForObject:self];
+	}	
+	
+	return [[_imageRepresentation retain] autorelease];
+}
+
+	
 @end
 
 
