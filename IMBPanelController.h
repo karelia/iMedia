@@ -70,7 +70,7 @@
 	NSString* _oldMediaType;
 	
 	IBOutlet NSTabView* ibTabView;
-	IBOutlet NSToolbar* ibToolbar;
+	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
 }
 
 + (IMBPanelController*) sharedPanelController;

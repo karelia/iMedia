@@ -101,6 +101,11 @@
 		
 		CFRelease(item);
 	}
+	else
+	{
+//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager defaultManager] fileExistsAtPath:inPath]);
+	}
+
 	
 	return metadata;
 }

@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10A432</string>
+		<string key="IBDocument.SystemVersion">10B504</string>
 		<string key="IBDocument.InterfaceBuilderVersion">732</string>
-		<string key="IBDocument.AppKitVersion">1038</string>
+		<string key="IBDocument.AppKitVersion">1038.2</string>
 		<string key="IBDocument.HIToolboxVersion">437.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -90,7 +90,7 @@
 								<string key="NSColorName">controlColor</string>
 								<object class="NSColor" key="NSColor" id="127779954">
 									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MC42NjY2NjY2ODY1AA</bytes>
+									<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
 								</object>
 							</object>
 							<object class="NSColor" key="NSTextColor" id="902106797">
@@ -443,7 +443,6 @@
 													</object>
 													<string key="NSFrame">{{1, 1}, {406, 472}}</string>
 													<reference key="NSSuperview" ref="115261702"/>
-													<reference key="NSNextKeyView" ref="3005548"/>
 													<reference key="NSDocView" ref="3005548"/>
 													<reference key="NSBGColor" ref="849578898"/>
 													<int key="NScvFlags">6</int>
@@ -471,7 +470,6 @@
 											</object>
 											<string key="NSFrameSize">{408, 474}</string>
 											<reference key="NSSuperview" ref="828354452"/>
-											<reference key="NSNextKeyView" ref="522777816"/>
 											<int key="NSsFlags">530</int>
 											<reference key="NSVScroller" ref="145715537"/>
 											<reference key="NSHScroller" ref="723965994"/>
@@ -1236,6 +1234,14 @@
 					</object>
 					<int key="connectionID">663</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ibSegments</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="188104951"/>
+					</object>
+					<int key="connectionID">664</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1594,7 +1600,7 @@
 					<integer value="1"/>
 					<integer value="0"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="2"/>
+					<integer value="0"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{604, 253}, {408, 509}}</string>
@@ -1643,7 +1649,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">663</int>
+			<int key="maxID">664</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1705,6 +1711,7 @@
 							<string>ibIconView</string>
 							<string>ibListView</string>
 							<string>ibObjectArrayController</string>
+							<string>ibSegments</string>
 							<string>ibTabView</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -1713,6 +1720,7 @@
 							<string>IKImageBrowserView</string>
 							<string>NSTableView</string>
 							<string>IMBObjectArrayController</string>
+							<string>NSSegmentedControl</string>
 							<string>NSTabView</string>
 						</object>
 					</object>
