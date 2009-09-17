@@ -218,6 +218,10 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	[self _configureIconView];
 	[self _configureListView];
 	[self _configureComboView];
+	
+	// Fix the last segment image, the combo view, which should be the combo view
+	[[ibSegments imageForSegment:([ibSegments segmentCount]-1)] setTemplate:YES];	// Just naming it with a '*Template' image is not enough!
+
 }
 
 

@@ -411,7 +411,7 @@ static IMBPanelController* sSharedPanelController = nil;
 - (void) tabView:(NSTabView*)inTabView didSelectTabViewItem:(NSTabViewItem*)inTabViewItem
 {
 	NSString* newMediaType = inTabViewItem.identifier;
-	
+	[ibToolbar setSelectedItemIdentifier:newMediaType];
 	// Notify the controllers...
 
 	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];

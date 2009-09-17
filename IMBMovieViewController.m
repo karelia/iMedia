@@ -69,7 +69,7 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	
+
 	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
 		@"name",
 		nil];

@@ -108,6 +108,7 @@ typedef NSUInteger kIMBObjectViewType;
 	IBOutlet IKImageBrowserView* ibIconView;
 	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
+	IBOutlet NSSegmentedControl *ibSegments;
 	
 	NSUInteger _viewType;
 	double _iconSize;

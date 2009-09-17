@@ -46,6 +46,7 @@
 #import "NSImage+iMedia.h"
 #import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "IMBNode.h"
 
 @implementation NSImage (iMedia)
 
@@ -64,7 +65,7 @@
 	
 	if (image==nil && imageInOurBundle!=nil)
 	{
-		NSBundle *ourBundle = [NSBundle bundleForClass:[self class]];
+		NSBundle *ourBundle = [NSBundle bundleForClass:[IMBNode class]];		// iMedia bundle
 		NSString *pathToImage = [ourBundle pathForResource:[imageInOurBundle stringByDeletingPathExtension] ofType:[imageInOurBundle pathExtension]];
 		image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
 	}
@@ -134,8 +135,7 @@
 	
 	if (sGenericFolderIcon == nil)
 	{
-		NSString *path = [[NSBundle bundleForClass:[self class]] pathForImageResource:@"folder"];
-		sGenericFolderIcon = [[NSImage alloc] initWithContentsOfFile:path];
+		sGenericFolderIcon = [NSImage imageNamed:@"folder"];	// NSImageNameFolder in 10.6 and up... does it work in 10.5 ?
 	}
 	
 	return sGenericFolderIcon;
