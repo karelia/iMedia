@@ -28,6 +28,9 @@
 		CEF695E8106434FE005D7E72 /* iMBFireFoxParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DE106434FE005D7E72 /* iMBFireFoxParser.h */; };
 		CEF695E9106434FE005D7E72 /* iMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */; };
 		CEF6960010643A25005D7E72 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF695FF10643A25005D7E72 /* WebKit.framework */; };
+		CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */; };
+		CEF6970810643D60005D7E72 /* IMBLinkViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6970610643D60005D7E72 /* IMBLinkViewController.h */; };
+		CEF6970910643D60005D7E72 /* IMBLinkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6970710643D60005D7E72 /* IMBLinkViewController.m */; };
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
 		D049EF5510346C1C003CC49C /* IMBNodeCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D049EF5310346C1C003CC49C /* IMBNodeCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049EF5610346C1C003CC49C /* IMBNodeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D049EF5410346C1C003CC49C /* IMBNodeCell.m */; };
@@ -272,6 +275,9 @@
 		CEF695DE106434FE005D7E72 /* iMBFireFoxParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBFireFoxParser.h; sourceTree = "<group>"; };
 		CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBFireFoxParser.m; sourceTree = "<group>"; };
 		CEF695FF10643A25005D7E72 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBLinkView.xib; sourceTree = "<group>"; };
+		CEF6970610643D60005D7E72 /* IMBLinkViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLinkViewController.h; sourceTree = "<group>"; };
+		CEF6970710643D60005D7E72 /* IMBLinkViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLinkViewController.m; sourceTree = "<group>"; };
 		D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = IMBComboViewTemplate.pdf; sourceTree = "<group>"; };
 		D049EF5310346C1C003CC49C /* IMBNodeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeCell.h; sourceTree = "<group>"; };
 		D049EF5410346C1C003CC49C /* IMBNodeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeCell.m; sourceTree = "<group>"; };
@@ -717,6 +723,8 @@
 				D08070C210442CE100891137 /* IMBAudioViewController.m */,
 				D08070BD10442CD700891137 /* IMBMovieViewController.h */,
 				D08070BE10442CD700891137 /* IMBMovieViewController.m */,
+				CEF6970610643D60005D7E72 /* IMBLinkViewController.h */,
+				CEF6970710643D60005D7E72 /* IMBLinkViewController.m */,
 				D0E96D1A104410BD0015979F /* IMBPanelController.h */,
 				D0E96D1B104410BD0015979F /* IMBPanelController.m */,
 				D052B0931053B0F700988F53 /* IMBProgressWindowController.h */,
@@ -752,6 +760,7 @@
 				D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */,
 				D0C2DAA110240C0B001B1198 /* IMBImageView.xib */,
 				D08070C710442DAE00891137 /* IMBAudioView.xib */,
+				CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */,
 				D08070C910442DC800891137 /* IMBMovieView.xib */,
 				D052B0C01053B4AB00988F53 /* IMBProgress.xib */,
 				D08070E910442F0500891137 /* IMBPanel.xib */,
@@ -939,6 +948,7 @@
 				CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */,
 				CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */,
 				CEF695E8106434FE005D7E72 /* iMBFireFoxParser.h in Headers */,
+				CEF6970810643D60005D7E72 /* IMBLinkViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1089,6 +1099,7 @@
 				D0941A94105E24DD0092B2F1 /* iTunes9-icon-32.png in Resources */,
 				D0941ACE105E2C310092B2F1 /* IMBFlickrParser.xib in Resources */,
 				CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */,
+				CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1160,6 +1171,7 @@
 				CEF695E4106434FE005D7E72 /* iMBXBELParser.m in Sources */,
 				CEF695E7106434FE005D7E72 /* iMBOmniWebParser.m in Sources */,
 				CEF695E9106434FE005D7E72 /* iMBFireFoxParser.m in Sources */,
+				CEF6970910643D60005D7E72 /* IMBLinkViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
