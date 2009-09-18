@@ -133,6 +133,8 @@
 	NSString* _mediaSource;
 	NSString* _mediaType;
 	BOOL _custom;
+	NSString *_database;	// optional, for single-library database files to parse and watch
+
 }
 
 // Helper methods...

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
-		CE0E0C81104C72A200EE6B09 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E0C80104C72A200EE6B09 /* Security.framework */; };
 		CEF686B51062D0BD005D7E72 /* IMBComboTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */; };
 		CEF686B61062D0BD005D7E72 /* IMBComboTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */; };
 		CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B81062D18F005D7E72 /* IMBComboTextCell.h */; };
@@ -17,6 +16,18 @@
 		CEF687191062DAF0005D7E72 /* IMBDynamicTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF687171062DAF0005D7E72 /* IMBDynamicTableView.h */; };
 		CEF6871A1062DAF0005D7E72 /* IMBDynamicTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */; };
 		CEF69569106421CB005D7E72 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF69568106421CA005D7E72 /* QuickLook.framework */; };
+		CEF695C91064341C005D7E72 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E0C80104C72A200EE6B09 /* Security.framework */; };
+		CEF695E0106434FE005D7E72 /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D6106434FD005D7E72 /* WebIconDatabase.h */; };
+		CEF695E1106434FE005D7E72 /* iMBSafariBookmarkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D7106434FD005D7E72 /* iMBSafariBookmarkParser.h */; };
+		CEF695E2106434FE005D7E72 /* iMBSafariBookmarkParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695D8106434FD005D7E72 /* iMBSafariBookmarkParser.m */; };
+		CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D9106434FD005D7E72 /* iMBXBELParser.h */; };
+		CEF695E4106434FE005D7E72 /* iMBXBELParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DA106434FE005D7E72 /* iMBXBELParser.m */; };
+		CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */ = {isa = PBXBuildFile; fileRef = CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */; };
+		CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DC106434FE005D7E72 /* iMBOmniWebParser.h */; };
+		CEF695E7106434FE005D7E72 /* iMBOmniWebParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DD106434FE005D7E72 /* iMBOmniWebParser.m */; };
+		CEF695E8106434FE005D7E72 /* iMBFireFoxParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DE106434FE005D7E72 /* iMBFireFoxParser.h */; };
+		CEF695E9106434FE005D7E72 /* iMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */; };
+		CEF6960010643A25005D7E72 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF695FF10643A25005D7E72 /* WebKit.framework */; };
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
 		D049EF5510346C1C003CC49C /* IMBNodeCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D049EF5310346C1C003CC49C /* IMBNodeCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049EF5610346C1C003CC49C /* IMBNodeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D049EF5410346C1C003CC49C /* IMBNodeCell.m */; };
@@ -249,7 +260,18 @@
 		CEF686B91062D18F005D7E72 /* IMBComboTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBComboTextCell.m; sourceTree = "<group>"; };
 		CEF687171062DAF0005D7E72 /* IMBDynamicTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBDynamicTableView.h; sourceTree = "<group>"; };
 		CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBDynamicTableView.m; sourceTree = "<group>"; };
-		CEF69568106421CA005D7E72 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = QuickLook.framework; sourceTree = "<group>"; };
+		CEF69568106421CA005D7E72 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = /System/Library/Frameworks/QuickLook.framework; sourceTree = "<absolute>"; };
+		CEF695D6106434FD005D7E72 /* WebIconDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebIconDatabase.h; sourceTree = "<group>"; };
+		CEF695D7106434FD005D7E72 /* iMBSafariBookmarkParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBSafariBookmarkParser.h; sourceTree = "<group>"; };
+		CEF695D8106434FD005D7E72 /* iMBSafariBookmarkParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBSafariBookmarkParser.m; sourceTree = "<group>"; };
+		CEF695D9106434FD005D7E72 /* iMBXBELParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBXBELParser.h; sourceTree = "<group>"; };
+		CEF695DA106434FE005D7E72 /* iMBXBELParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBXBELParser.m; sourceTree = "<group>"; };
+		CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = OmniwebBookmarksToXBEL.xslt; sourceTree = "<group>"; };
+		CEF695DC106434FE005D7E72 /* iMBOmniWebParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBOmniWebParser.h; sourceTree = "<group>"; };
+		CEF695DD106434FE005D7E72 /* iMBOmniWebParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBOmniWebParser.m; sourceTree = "<group>"; };
+		CEF695DE106434FE005D7E72 /* iMBFireFoxParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBFireFoxParser.h; sourceTree = "<group>"; };
+		CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBFireFoxParser.m; sourceTree = "<group>"; };
+		CEF695FF10643A25005D7E72 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = IMBComboViewTemplate.pdf; sourceTree = "<group>"; };
 		D049EF5310346C1C003CC49C /* IMBNodeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeCell.h; sourceTree = "<group>"; };
 		D049EF5410346C1C003CC49C /* IMBNodeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeCell.m; sourceTree = "<group>"; };
@@ -442,6 +464,7 @@
 				D0993295101124EE00C527B7 /* libcrypto.dylib in Frameworks */,
 				D0BE03151047C540009AE844 /* ObjectiveFlickr.framework in Frameworks */,
 				CEF69569106421CB005D7E72 /* QuickLook.framework in Frameworks */,
+				CEF6960010643A25005D7E72 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -451,7 +474,7 @@
 			files = (
 				D09933AF1011B2CD00C527B7 /* Cocoa.framework in Frameworks */,
 				D099335C1011B28500C527B7 /* iMedia.framework in Frameworks */,
-				CE0E0C81104C72A200EE6B09 /* Security.framework in Frameworks */,
+				CEF695C91064341C005D7E72 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -476,11 +499,12 @@
 				D099334E1011B22600C527B7 /* Test Application */,
 				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
 				034768DFFF38A50411DB9C8B /* Products */,
+				CE0E0C80104C72A200EE6B09 /* Security.framework */,
 				D05A94A4102EB14A005DF9CE /* ICADevices.framework */,
 				D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */,
 				D0CA93E6104917A400725DA3 /* QTKit.framework */,
-				CE0E0C80104C72A200EE6B09 /* Security.framework */,
 				CEF69568106421CA005D7E72 /* QuickLook.framework */,
+				CEF695FF10643A25005D7E72 /* WebKit.framework */,
 			);
 			name = iMedia;
 			sourceTree = "<group>";
@@ -528,6 +552,78 @@
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
 			);
 			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		CEF695D21064347B005D7E72 /* iTunes icons */ = {
+			isa = PBXGroup;
+			children = (
+				D0CA94B91049455B00725DA3 /* itunes-icon-audiobooks.png */,
+				D0CA94BA1049455B00725DA3 /* itunes-icon-folder7.png */,
+				D0CA94BB1049455B00725DA3 /* itunes-icon-library.png */,
+				D0CA94BC1049455B00725DA3 /* itunes-icon-movies.png */,
+				D0CA94BD1049455B00725DA3 /* itunes-icon-music.png */,
+				D0CA94BE1049455B00725DA3 /* itunes-icon-partyshuffle.png */,
+				D0CA94BF1049455B00725DA3 /* itunes-icon-partyshuffle7.png */,
+				D0CA94C01049455B00725DA3 /* itunes-icon-playlist-normal.png */,
+				D0CA94C11049455B00725DA3 /* itunes-icon-playlist-normal7.png */,
+				D0CA94C21049455B00725DA3 /* itunes-icon-playlist-purchased.png */,
+				D0CA94C31049455B00725DA3 /* itunes-icon-playlist-smart.png */,
+				D0CA94C41049455B00725DA3 /* itunes-icon-playlist-smart7.png */,
+				D0CA94C51049455B00725DA3 /* itunes-icon-podcasts.png */,
+				D0CA94C61049455B00725DA3 /* itunes-icon-podcasts7.png */,
+				D0CA94C71049455B00725DA3 /* itunes-icon-purchased7.png */,
+				D0CA94C81049455B00725DA3 /* itunes-icon-tvshows.png */,
+				D0941A55105E24DD0092B2F1 /* iTunes9-icon-01.png */,
+				D0941A56105E24DD0092B2F1 /* iTunes9-icon-02.png */,
+				D0941A57105E24DD0092B2F1 /* iTunes9-icon-03.png */,
+				D0941A58105E24DD0092B2F1 /* iTunes9-icon-04.png */,
+				D0941A59105E24DD0092B2F1 /* iTunes9-icon-05.png */,
+				D0941A5A105E24DD0092B2F1 /* iTunes9-icon-06.png */,
+				D0941A5B105E24DD0092B2F1 /* iTunes9-icon-07.png */,
+				D0941A5C105E24DD0092B2F1 /* iTunes9-icon-08.png */,
+				D0941A5D105E24DD0092B2F1 /* iTunes9-icon-09.png */,
+				D0941A5E105E24DD0092B2F1 /* iTunes9-icon-10.png */,
+				D0941A5F105E24DD0092B2F1 /* iTunes9-icon-11.png */,
+				D0941A60105E24DD0092B2F1 /* iTunes9-icon-12.png */,
+				D0941A61105E24DD0092B2F1 /* iTunes9-icon-13.png */,
+				D0941A62105E24DD0092B2F1 /* iTunes9-icon-14.png */,
+				D0941A63105E24DD0092B2F1 /* iTunes9-icon-15.png */,
+				D0941A64105E24DD0092B2F1 /* iTunes9-icon-16.png */,
+				D0941A65105E24DD0092B2F1 /* iTunes9-icon-17.png */,
+				D0941A66105E24DD0092B2F1 /* iTunes9-icon-18.png */,
+				D0941A67105E24DD0092B2F1 /* iTunes9-icon-19.png */,
+				D0941A68105E24DD0092B2F1 /* iTunes9-icon-20.png */,
+				D0941A69105E24DD0092B2F1 /* iTunes9-icon-21.png */,
+				D0941A6A105E24DD0092B2F1 /* iTunes9-icon-22.png */,
+				D0941A6B105E24DD0092B2F1 /* iTunes9-icon-23.png */,
+				D0941A6C105E24DD0092B2F1 /* iTunes9-icon-24.png */,
+				D0941A6D105E24DD0092B2F1 /* iTunes9-icon-25.png */,
+				D0941A6E105E24DD0092B2F1 /* iTunes9-icon-26.png */,
+				D0941A6F105E24DD0092B2F1 /* iTunes9-icon-27.png */,
+				D0941A70105E24DD0092B2F1 /* iTunes9-icon-28.png */,
+				D0941A71105E24DD0092B2F1 /* iTunes9-icon-29.png */,
+				D0941A72105E24DD0092B2F1 /* iTunes9-icon-30.png */,
+				D0941A73105E24DD0092B2F1 /* iTunes9-icon-31.png */,
+				D0941A74105E24DD0092B2F1 /* iTunes9-icon-32.png */,
+			);
+			name = "iTunes icons";
+			sourceTree = "<group>";
+		};
+		CEF695D5106434DB005D7E72 /* Links */ = {
+			isa = PBXGroup;
+			children = (
+				CEF695D6106434FD005D7E72 /* WebIconDatabase.h */,
+				CEF695D7106434FD005D7E72 /* iMBSafariBookmarkParser.h */,
+				CEF695D8106434FD005D7E72 /* iMBSafariBookmarkParser.m */,
+				CEF695D9106434FD005D7E72 /* iMBXBELParser.h */,
+				CEF695DA106434FE005D7E72 /* iMBXBELParser.m */,
+				CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */,
+				CEF695DC106434FE005D7E72 /* iMBOmniWebParser.h */,
+				CEF695DD106434FE005D7E72 /* iMBOmniWebParser.m */,
+				CEF695DE106434FE005D7E72 /* iMBFireFoxParser.h */,
+				CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */,
+			);
+			name = Links;
 			sourceTree = "<group>";
 		};
 		D004A9CB104D890B005DBB2B /* BXQuickLookController */ = {
@@ -674,6 +770,7 @@
 				D09933491011AE6B00C527B7 /* Image */,
 				D0B6FAA21043227A00280DDC /* Audio */,
 				D0B6FAA31043228C00280DDC /* Movie */,
+				CEF695D5106434DB005D7E72 /* Links */,
 			);
 			name = Parsers;
 			sourceTree = "<group>";
@@ -749,54 +846,7 @@
 				D0B6FABA1043243800280DDC /* IMBAudioFolderParser.m */,
 				D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */,
 				D0CA9426104932CD00725DA3 /* IMBiTunesParser.m */,
-				D0CA94B91049455B00725DA3 /* itunes-icon-audiobooks.png */,
-				D0CA94BA1049455B00725DA3 /* itunes-icon-folder7.png */,
-				D0CA94BB1049455B00725DA3 /* itunes-icon-library.png */,
-				D0CA94BC1049455B00725DA3 /* itunes-icon-movies.png */,
-				D0CA94BD1049455B00725DA3 /* itunes-icon-music.png */,
-				D0CA94BE1049455B00725DA3 /* itunes-icon-partyshuffle.png */,
-				D0CA94BF1049455B00725DA3 /* itunes-icon-partyshuffle7.png */,
-				D0CA94C01049455B00725DA3 /* itunes-icon-playlist-normal.png */,
-				D0CA94C11049455B00725DA3 /* itunes-icon-playlist-normal7.png */,
-				D0CA94C21049455B00725DA3 /* itunes-icon-playlist-purchased.png */,
-				D0CA94C31049455B00725DA3 /* itunes-icon-playlist-smart.png */,
-				D0CA94C41049455B00725DA3 /* itunes-icon-playlist-smart7.png */,
-				D0CA94C51049455B00725DA3 /* itunes-icon-podcasts.png */,
-				D0CA94C61049455B00725DA3 /* itunes-icon-podcasts7.png */,
-				D0CA94C71049455B00725DA3 /* itunes-icon-purchased7.png */,
-				D0CA94C81049455B00725DA3 /* itunes-icon-tvshows.png */,
-				D0941A55105E24DD0092B2F1 /* iTunes9-icon-01.png */,
-				D0941A56105E24DD0092B2F1 /* iTunes9-icon-02.png */,
-				D0941A57105E24DD0092B2F1 /* iTunes9-icon-03.png */,
-				D0941A58105E24DD0092B2F1 /* iTunes9-icon-04.png */,
-				D0941A59105E24DD0092B2F1 /* iTunes9-icon-05.png */,
-				D0941A5A105E24DD0092B2F1 /* iTunes9-icon-06.png */,
-				D0941A5B105E24DD0092B2F1 /* iTunes9-icon-07.png */,
-				D0941A5C105E24DD0092B2F1 /* iTunes9-icon-08.png */,
-				D0941A5D105E24DD0092B2F1 /* iTunes9-icon-09.png */,
-				D0941A5E105E24DD0092B2F1 /* iTunes9-icon-10.png */,
-				D0941A5F105E24DD0092B2F1 /* iTunes9-icon-11.png */,
-				D0941A60105E24DD0092B2F1 /* iTunes9-icon-12.png */,
-				D0941A61105E24DD0092B2F1 /* iTunes9-icon-13.png */,
-				D0941A62105E24DD0092B2F1 /* iTunes9-icon-14.png */,
-				D0941A63105E24DD0092B2F1 /* iTunes9-icon-15.png */,
-				D0941A64105E24DD0092B2F1 /* iTunes9-icon-16.png */,
-				D0941A65105E24DD0092B2F1 /* iTunes9-icon-17.png */,
-				D0941A66105E24DD0092B2F1 /* iTunes9-icon-18.png */,
-				D0941A67105E24DD0092B2F1 /* iTunes9-icon-19.png */,
-				D0941A68105E24DD0092B2F1 /* iTunes9-icon-20.png */,
-				D0941A69105E24DD0092B2F1 /* iTunes9-icon-21.png */,
-				D0941A6A105E24DD0092B2F1 /* iTunes9-icon-22.png */,
-				D0941A6B105E24DD0092B2F1 /* iTunes9-icon-23.png */,
-				D0941A6C105E24DD0092B2F1 /* iTunes9-icon-24.png */,
-				D0941A6D105E24DD0092B2F1 /* iTunes9-icon-25.png */,
-				D0941A6E105E24DD0092B2F1 /* iTunes9-icon-26.png */,
-				D0941A6F105E24DD0092B2F1 /* iTunes9-icon-27.png */,
-				D0941A70105E24DD0092B2F1 /* iTunes9-icon-28.png */,
-				D0941A71105E24DD0092B2F1 /* iTunes9-icon-29.png */,
-				D0941A72105E24DD0092B2F1 /* iTunes9-icon-30.png */,
-				D0941A73105E24DD0092B2F1 /* iTunes9-icon-31.png */,
-				D0941A74105E24DD0092B2F1 /* iTunes9-icon-32.png */,
+				CEF695D21064347B005D7E72 /* iTunes icons */,
 			);
 			name = Audio;
 			sourceTree = "<group>";
@@ -884,6 +934,11 @@
 				CEF686B51062D0BD005D7E72 /* IMBComboTableView.h in Headers */,
 				CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */,
 				CEF687191062DAF0005D7E72 /* IMBDynamicTableView.h in Headers */,
+				CEF695E0106434FE005D7E72 /* WebIconDatabase.h in Headers */,
+				CEF695E1106434FE005D7E72 /* iMBSafariBookmarkParser.h in Headers */,
+				CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */,
+				CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */,
+				CEF695E8106434FE005D7E72 /* iMBFireFoxParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1033,6 +1088,7 @@
 				D0941A93105E24DD0092B2F1 /* iTunes9-icon-31.png in Resources */,
 				D0941A94105E24DD0092B2F1 /* iTunes9-icon-32.png in Resources */,
 				D0941ACE105E2C310092B2F1 /* IMBFlickrParser.xib in Resources */,
+				CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1100,6 +1156,10 @@
 				CEF686B61062D0BD005D7E72 /* IMBComboTableView.m in Sources */,
 				CEF686BB1062D18F005D7E72 /* IMBComboTextCell.m in Sources */,
 				CEF6871A1062DAF0005D7E72 /* IMBDynamicTableView.m in Sources */,
+				CEF695E2106434FE005D7E72 /* iMBSafariBookmarkParser.m in Sources */,
+				CEF695E4106434FE005D7E72 /* iMBXBELParser.m in Sources */,
+				CEF695E7106434FE005D7E72 /* iMBOmniWebParser.m in Sources */,
+				CEF695E9106434FE005D7E72 /* iMBFireFoxParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

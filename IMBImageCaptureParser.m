@@ -143,7 +143,12 @@
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForICAObject:self.mediaSource];
 	
-	NSString* name = NSLocalizedString( @"Devices", @"Caption for Image Capture Root node" );
+	NSString* name = NSLocalizedStringWithDefaultValue(
+													   @"Devices",
+													   nil,IMBBundle(),
+													   @"Devices",
+													   @"Caption for Image Capture Root node");
+	
 	if (showsGroupNodes) name = [name uppercaseString];
 	newNode.name = name;
 	
