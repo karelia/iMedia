@@ -117,3 +117,13 @@
 @end
 
 //----------------------------------------------------------------------------------------------------------------------
+
+@interface IMBThumbnailOperation : NSOperation
+{
+	IMBVisualObject *_visualObject;
+}
+- (id) initWithVisualObject:(IMBVisualObject *)aVisualObject;
+
+@property (retain) IMBVisualObject *visualObject;
+@end
+

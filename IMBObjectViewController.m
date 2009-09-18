@@ -1117,7 +1117,8 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 #pragma mark 
 #pragma mark IMBDynamicTableViewDelegate
 
-// We pre-load the images in batches. We could easily use this as a point to stop loading rows that are no longer visible and don't have the images fully loaded. We use this as an entry point to start/stop watching the image for the visible items to see when it changes.
+// We pre-load the images in batches.
+
 - (void)dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows
 {
 	NSLog(@"%s",__FUNCTION__);
@@ -1129,7 +1130,23 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 		{
             [imageEntity removeObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage];
 			
-			NSLog(@"Need to remove load from queue %@", [IMBOperationQueue sharedQueue]);
+			NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
+			if ([ops count] > 0)
+			{
+				NSEnumerator *e = [ops objectEnumerator];
+				IMBThumbnailOperation *op = nil;
+				
+				while(( op = [e nextObject] ))
+				{
+					IMBObject *entity = [op visualObject];
+					if (entity == imageEntity)
+					{
+						NSLog(@"Lowering priority of load of %@", entity.name);
+						[op setQueuePriority:NSOperationQueuePriorityVeryLow];		// re-prioritize lower
+						break;
+					}
+				}
+			}
         }
     }
     // Now, observe things that are newly visible and kick off a request to load the image
@@ -1139,7 +1156,42 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	{
         if ([imageEntity isKindOfClass:[IMBVisualObject class]])
 		{
-            [(IMBVisualObject *)imageEntity queueThumbnailImageLoad];
+			if (nil == [((IMBVisualObject *)imageEntity) thumbnailImage])
+			{
+				// Check if it is already queued -- if it's there already, bump up priority.
+				
+				NSOperation *foundOperation = nil;
+				
+				NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
+				if ([ops count] > 0)
+				{
+					NSEnumerator *e = [ops objectEnumerator];
+					IMBThumbnailOperation *op = nil;
+					
+					while(( op = [e nextObject] ))
+					{
+						IMBObject *entity = [op visualObject];
+						if (entity == imageEntity)
+						{
+							foundOperation = op;
+							break;
+						}
+					}
+				}
+				
+				if (foundOperation)
+				{
+					NSLog(@"Raising priority of load of %@", imageEntity.name);
+					[foundOperation setQueuePriority:NSOperationQueuePriorityNormal];		// re-prioritize back to normal
+				}
+				else
+				{
+					NSLog(@"Queueing load of %@", imageEntity.name);
+					[(IMBVisualObject *)imageEntity queueThumbnailImageLoad];
+				}
+			}
+			
+			// Add observer always to balance
             [imageEntity addObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage options:0 context:tableView];
         }
     }
