@@ -10,6 +10,12 @@
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		CE0E0C81104C72A200EE6B09 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E0C80104C72A200EE6B09 /* Security.framework */; };
+		CEF686B51062D0BD005D7E72 /* IMBComboTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */; };
+		CEF686B61062D0BD005D7E72 /* IMBComboTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */; };
+		CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B81062D18F005D7E72 /* IMBComboTextCell.h */; };
+		CEF686BB1062D18F005D7E72 /* IMBComboTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF686B91062D18F005D7E72 /* IMBComboTextCell.m */; };
+		CEF687191062DAF0005D7E72 /* IMBDynamicTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF687171062DAF0005D7E72 /* IMBDynamicTableView.h */; };
+		CEF6871A1062DAF0005D7E72 /* IMBDynamicTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */; };
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
 		D049EF5510346C1C003CC49C /* IMBNodeCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D049EF5310346C1C003CC49C /* IMBNodeCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049EF5610346C1C003CC49C /* IMBNodeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D049EF5410346C1C003CC49C /* IMBNodeCell.m */; };
@@ -236,6 +242,12 @@
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* iMedia.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iMedia.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE0E0C80104C72A200EE6B09 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
+		CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBComboTableView.h; sourceTree = "<group>"; };
+		CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBComboTableView.m; sourceTree = "<group>"; };
+		CEF686B81062D18F005D7E72 /* IMBComboTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBComboTextCell.h; sourceTree = "<group>"; };
+		CEF686B91062D18F005D7E72 /* IMBComboTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBComboTextCell.m; sourceTree = "<group>"; };
+		CEF687171062DAF0005D7E72 /* IMBDynamicTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBDynamicTableView.h; sourceTree = "<group>"; };
+		CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBDynamicTableView.m; sourceTree = "<group>"; };
 		D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = IMBComboViewTemplate.pdf; sourceTree = "<group>"; };
 		D049EF5310346C1C003CC49C /* IMBNodeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeCell.h; sourceTree = "<group>"; };
 		D049EF5410346C1C003CC49C /* IMBNodeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeCell.m; sourceTree = "<group>"; };
@@ -620,6 +632,12 @@
 				D0993930101236AB00C527B7 /* IMBOutlineView.m */,
 				D0BE0A8A104802A7009AE844 /* IMBTableView.h */,
 				D0BE0A8B104802A7009AE844 /* IMBTableView.m */,
+				CEF687171062DAF0005D7E72 /* IMBDynamicTableView.h */,
+				CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */,
+				CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */,
+				CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */,
+				CEF686B81062D18F005D7E72 /* IMBComboTextCell.h */,
+				CEF686B91062D18F005D7E72 /* IMBComboTextCell.m */,
 				D049EF5310346C1C003CC49C /* IMBNodeCell.h */,
 				D049EF5410346C1C003CC49C /* IMBNodeCell.m */,
 				D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */,
@@ -859,6 +877,9 @@
 				D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */,
 				D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */,
 				D09FD77F105586BC00E328C7 /* IMBImageBrowserView.h in Headers */,
+				CEF686B51062D0BD005D7E72 /* IMBComboTableView.h in Headers */,
+				CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */,
+				CEF687191062DAF0005D7E72 /* IMBDynamicTableView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1072,6 +1093,9 @@
 				D052AFD310538B7B00988F53 /* IMBURLDownloadOperation.m in Sources */,
 				D052B0961053B0F700988F53 /* IMBProgressWindowController.m in Sources */,
 				D09FD780105586BC00E328C7 /* IMBImageBrowserView.m in Sources */,
+				CEF686B61062D0BD005D7E72 /* IMBComboTableView.m in Sources */,
+				CEF686BB1062D18F005D7E72 /* IMBComboTextCell.m in Sources */,
+				CEF6871A1062DAF0005D7E72 /* IMBDynamicTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1157,6 +1181,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;

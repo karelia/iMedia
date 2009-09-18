@@ -52,6 +52,7 @@
 #import "IMBObject.h"
 #import "IMBParser.h"
 #import "IMBCommon.h"
+#import "IMBOperationQueue.h"
 #import <Quartz/Quartz.h>
 
 
@@ -66,7 +67,6 @@
 @synthesize name = _name;
 @synthesize metadata = _metadata;
 @synthesize parser = _parser;
-
 
 - (id) initWithCoder:(NSCoder*)inCoder
 {
@@ -142,17 +142,176 @@
 
 @end
 
+#pragma mark 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+@interface IMBThumbnailOperation : NSOperation
+{
+	IMBVisualObject *_visualObject;
+}
+- (id) initWithVisualObject:(IMBVisualObject *)aVisualObject;
+
+@property (retain) IMBVisualObject *visualObject;
+@end
+
+@implementation IMBThumbnailOperation
+
+@synthesize visualObject = _visualObject;
+
+- (void) dealloc
+{
+	IMBRelease(_visualObject);
+	[super dealloc];
+}
+
+- (id) initWithVisualObject:(IMBVisualObject *)aVisualObject;
+{
+	self = [super init];
+	if ( self != nil )
+	{
+		self.visualObject = aVisualObject;
+	}
+	return self;
+}
+
+// TODO: FIX
+#define MAX_THUMBNAIL_SIZE 256
+
+- (void) main
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	
+	IMBVisualObject *visualObject = self.visualObject;
+	NSString *imageRepresentationType = visualObject.imageRepresentationType;
+	id imageRepresentation = visualObject.imageRepresentation;
+	NSImage *image = nil;		// This should be filled in below according to the data type.  Autoreleased.
+	CGImageSourceRef source = nil;	// This may be set instead, which means we finish the job.
+	
+	     if ([imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType])
+	{
+		// path
+		NSURL *url = [NSURL fileURLWithPath:imageRepresentation];
+		source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
+
+		image = [[[NSImage alloc] initWithContentsOfFile:imageRepresentation] autorelease];
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
+	{
+		// URL
+		// Almost all sample code passes in a null options parameter but I'm playing it safe; we want to cache
+		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+								 (id)kCFBooleanTrue, (id)kCGImageSourceShouldCache,
+								 NULL];
+		source = CGImageSourceCreateWithURL((CFURLRef)imageRepresentation, (CFDictionaryRef)options);
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
+	{
+		image = imageRepresentation;		// scale to thumbnail, though?
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+	{
+		// CGImageRef
+		// Actually maybe I should try to get the thumbnail first
+		
+		NSBitmapImageRep *bitmap = [[[NSBitmapImageRep alloc] initWithCGImage:(CGImageRef)imageRepresentation] autorelease];
+        image = [[[NSImage alloc] initWithSize:[bitmap size]] autorelease];
+        [image addRepresentation:bitmap];
+		
+		
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserCGImageSourceRepresentationType])
+	{
+		// CGImageSourceRef
+		source = (CGImageSourceRef)imageRepresentation;
+		
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSDataRepresentationType])
+	{
+		// NSData
+		source = CGImageSourceCreateWithData((CFDataRef)imageRepresentation, NULL);
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSBitmapImageRepresentationType])
+	{
+		// NSBitmapImageRep
+        image = [[[NSImage alloc] initWithSize:[imageRepresentation size]] autorelease];
+        [image addRepresentation:imageRepresentation];
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
+	{
+		// QTMovie	.... to do.  This will be a bit tricky; we need to use that helper process.
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+	{
+		// NSString or NSURL
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserIconRefPathRepresentationType])
+	{
+		// NSString of iconRef
+	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserIconRefRepresentationType])
+	{
+		// IconRef
+		image = [[[NSImage alloc] initWithIconRef:(IconRef)imageRepresentation] autorelease];
+	}
+	/* These are the types that we DON'T SUPPORT at this time:
+		IKImageBrowserQCCompositionRepresentationType
+		IKImageBrowserQCCompositionPathRepresentationType
+		IKImageBrowserQuickLookPathRepresentationType
+	 	
+	 */
+	if (source)		// did the above get us a CGImageSource? If so we'll create the NSImage now.
+	{
+		NSDictionary* thumbOpts = [NSDictionary dictionaryWithObjectsAndKeys:
+								   (id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailWithTransform,
+								   (id)kCFBooleanFalse, (id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+								   (id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
+								   [NSNumber numberWithInteger:MAX_THUMBNAIL_SIZE], (id)kCGImageSourceThumbnailMaxPixelSize, 
+								   nil];
+		
+		CGImageRef theCGImage = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)thumbOpts);
+		if (theCGImage)
+		{
+			NSBitmapImageRep *bitmap = [[[NSBitmapImageRep alloc] initWithCGImage:theCGImage] autorelease];
+			image = [[[NSImage alloc] initWithSize:[bitmap size]] autorelease];
+			[image addRepresentation:bitmap];
+			CGImageRelease(theCGImage);
+		}
+		CFRelease(source);
+	}
+	
+	// At this point, we should have an NSImage that we are ready to go set as the thumbnail.
+	// (Do we want to do something about versions the way IKImageBrowser View works?)
+
+	if (image != nil) {
+		// We synchronize access to the image/imageLoading pair of variables
+		@synchronized (visualObject) {
+			visualObject.imageLoading = NO;
+			visualObject.thumbnailImage = image;	// this will set off KVO
+		}
+	}
+
+	[pool release];
+}
+
+@end
+
 
 #pragma mark 
+
+@interface IMBVisualObject()
+
+// Private read/write access to the thumbnailImage
+
+@end
 
 @implementation IMBVisualObject
 
 @synthesize imageRepresentation = _imageRepresentation;
 @synthesize imageRepresentationType = _imageRepresentationType;
 @synthesize imageVersion = _imageVersion;
+@synthesize thumbnailImage  = _thumbnailImage ;
+@synthesize imageLoading = _imageLoading;
 
 
 - (id) initWithCoder:(NSCoder*)inCoder
@@ -228,7 +387,22 @@
 	return [[_imageRepresentation retain] autorelease];
 }
 
-	
+
+- (void)loadImage {
+    @synchronized (self) {
+        if (self.thumbnailImage == nil && !self.imageLoading) {
+            self.imageLoading = YES;
+
+			IMBThumbnailOperation* operation = [[IMBThumbnailOperation alloc] initWithVisualObject:self];
+
+			[[IMBOperationQueue sharedQueue] addOperation:operation];			
+        }
+    }
+}
+
+
+
+
 @end
 
 
@@ -293,6 +467,7 @@
 {
 	return [NSString stringWithFormat:@"%@ path=%@", [super description], self.path];
 }
+
 
 @end
 

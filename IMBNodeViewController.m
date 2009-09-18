@@ -554,6 +554,7 @@ static NSString* kSelectionKey = @"selection";
 */
 //----------------------------------------------------------------------------------------------------------------------
 
+// Note: According to WWDC Session 110, this is called a LOT so it's not good for delayed loading...
 
 - (void) outlineView:(NSOutlineView*)inOutlineView willDisplayCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inTableColumn item:(id)inItem
 {	

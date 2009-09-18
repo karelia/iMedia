@@ -64,6 +64,9 @@
 #import "IMBQuickLookController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "IMBDynamicTableView.h"
+#import "IMBComboTextCell.h"
+#import "IMBObject.h"
 #import <Quartz/Quartz.h>
 
 
@@ -75,6 +78,7 @@
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKey = @"arrangedObjects.imageRepresentation";
 static NSString* kObjectCountStringKey = @"objectCountString";
+NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -237,6 +241,14 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
 	
+	for (IMBObject *imageEntity in _observedVisibleItems) {
+        if ([imageEntity isKindOfClass:[IMBVisualObject class]]) {
+            [imageEntity removeObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage];
+        }
+    }
+    IMBRelease(_observedVisibleItems);
+	
+	
 	[super dealloc];
 }
 
@@ -246,9 +258,16 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 - (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
 {
+	if (inKeyPath == IMBObjectPropertyNamedThumbnailImage) {
+        // Find the row and reload it.
+        // Note that KVO notifications may be sent from a background thread (in this case, we know they will be)
+        // We should only update the UI on the main thread, and in addition, we use NSRunLoopCommonModes to make sure the UI updates when a modal window is up.
+        [self performSelectorOnMainThread:@selector(_reloadRowForEntity:) withObject:inObject waitUntilDone:NO modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+    }
+	
 	// If the array itself has changed then display the new object count...
 	
-	if (inContext == (void*)kArrangedObjectsKey)
+	else if (inContext == (void*)kArrangedObjectsKey)
 	{
 //		[self _reloadIconView];
 		[self willChangeValueForKey:kObjectCountStringKey];
@@ -1066,6 +1085,7 @@ static NSString* kObjectCountStringKey = @"objectCountString";
  
 
 // If the object for the cell that we are about to display doesn't have any metadata yet, then load it lazily...
+// Note: According to WWDC Session 110, this is called a LOT so it's not good for delayed loading...
 
 - (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
@@ -1074,7 +1094,33 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 	if (object.metadata == nil)
 	{
 		[object.parser loadMetadataForObject:object];
-	}	
+	}
+	
+	if ([inCell isKindOfClass:[IMBComboTextCell class]])
+	{
+		NSImage *image = nil;		// for now
+		
+		// Will the source item always be IMBVisualObject ?
+		IMBObject *entity = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
+		if ([entity isKindOfClass:[IMBVisualObject class]])
+		{
+			IMBVisualObject *visualEntity = (IMBVisualObject *)entity;
+			if (visualEntity.thumbnailImage )
+			{
+				image = visualEntity.thumbnailImage;
+			}
+		}
+		else
+		{
+			NSLog(@"%s - not an IMBVisualObject entity",__FUNCTION__);
+		}
+		IMBComboTextCell *imageTextCell = (IMBComboTextCell *)inCell;
+		imageTextCell.image = image;
+	}
+	else
+	{
+		NSLog(@"%s - not an IMBComboTextCell cell",__FUNCTION__);
+	}
 }
 
 
@@ -1158,6 +1204,90 @@ static NSString* kObjectCountStringKey = @"objectCountString";
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark 
+#pragma mark IMBDynamicTableViewDelegate
+
+
+// We pre-load the images in batches. We could easily use this as a point to stop loading rows that are no longer visible and don't have the images fully loaded. We use this as an entry point to start/stop watching the image for the visible items to see when it changes.
+- (void)dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows {
+	NSLog(@"%s",__FUNCTION__);
+
+ // First, stop observing all prior things
+    for (IMBObject *imageEntity in _observedVisibleItems) {
+        if ([imageEntity isKindOfClass:[IMBVisualObject class]]) {
+            [imageEntity removeObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage];
+        }
+    }
+    // Now, observe things that are newly visible and kick off a request to load the image
+    [_observedVisibleItems release];
+    _observedVisibleItems = [[[ibObjectArrayController arrangedObjects] subarrayWithRange:newVisibleRows] retain];
+    for (IMBObject *imageEntity in _observedVisibleItems) {
+        if ([imageEntity isKindOfClass:[IMBVisualObject class]]) {
+            [(IMBVisualObject *)imageEntity loadImage];
+            [imageEntity addObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage options:0 context:NULL];
+        }
+    }
+}
+
+- (NSView *)dynamicTableView:(IMBDynamicTableView *)tableView viewForRow:(NSInteger)row {
+		NSLog(@"%s",__FUNCTION__);
+
+    // Return a spinner for rows that are loading
+    NSProgressIndicator *result = nil;
+
+	IMBObject* entity = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
+
+	if ([entity isKindOfClass:[IMBVisualObject class]])
+	{
+		IMBVisualObject *visualEntity = (IMBVisualObject *)entity;
+
+		if (visualEntity.thumbnailImage == nil) {
+			NSRect cellFrame = [tableView frameOfCellAtColumn:0 row:row];
+			
+			// FIXME:  this puts a spinning indicator on the cell assuming it's the combo cell.  Maybe check cell type first.
+			
+			
+			IMBComboTextCell *imageCell = (IMBComboTextCell *)[tableView preparedCellAtColumn:0 row:row];
+			NSRect imageFrame = [imageCell imageRectForBounds:cellFrame];
+			result = [[[NSProgressIndicator alloc] initWithFrame:imageFrame] autorelease];
+			[result setIndeterminate:YES];
+			[result setStyle:NSProgressIndicatorSpinningStyle];
+			[result setControlSize:NSRegularControlSize];        
+			[result sizeToFit];
+			[result startAnimation:nil];
+			NSRect progressFrame = [result frame];
+			// Center it in the image frame
+			progressFrame.origin.x = NSMinX(imageFrame) + floor((NSWidth(imageFrame) - NSWidth(progressFrame)) / 2.0);
+			progressFrame.origin.y = NSMinY(imageFrame) + floor((NSHeight(imageFrame) - NSHeight(progressFrame)) / 2.0);
+			[result setFrame:progressFrame];
+		}
+	}
+    return result;
+}
+
+- (void)_reloadRowForEntity:(id)object {
+	NSLog(@"%s",__FUNCTION__);
+/*
+    NSInteger row = [_tableContents indexOfObject:object];
+    if (row != NSNotFound) {
+        [_tableViewMain reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+        // Animate if that item is selected and we now have an image for it
+        if ([_tableViewMain selectedRow] == row) {
+            [self _animateImageFromRow:row];
+        }
+    }
+*/
+}
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+
 
 
 @end
