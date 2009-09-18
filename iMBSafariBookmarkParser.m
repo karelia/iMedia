@@ -49,6 +49,7 @@
 #import "WebIconDatabase.h"
 #import "NSImage+iMedia.h"
 #import "IMBParserController.h"
+#import "IMBNode.h"
 
 @implementation iMBSafariBookmarkParser
 
@@ -67,10 +68,11 @@
 	[pool release];
 }
 
-- (id)init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super initWithContentsOfFile:[NSString stringWithFormat:@"%@/Library/Safari/Bookmarks.plist", NSHomeDirectory()]])
+	if (self = [super initWithMediaType:inMediaType])
 	{
+		self.mediaSource = [NSString stringWithFormat:@"%@/Library/Safari/Bookmarks.plist", NSHomeDirectory()];
 		mySafariFaviconCache = [[NSMutableDictionary dictionary] retain];
 	}
 	return self;
@@ -85,7 +87,7 @@
 - (IMBNode *)recursivelyParseItem:(NSDictionary *)item
 {
 	IMBNode *parsed = [[[IMBNode alloc] init] autorelease];
-	[parsed setParserClassName:NSStringFromClass([self class])];
+///	[parsed setParserClassName:NSStringFromClass([self class])];
 //	[parsed setWatchedPath:_database];
 	NSArray *collectionArray = [item objectForKey:@"Children"];		// default group of children, if this is a collection
 	
@@ -192,8 +194,8 @@
 													   @"Safari application name")];
 	[library setIconName:@"com.apple.Safari"];
 	[library setIdentifier:@"Safari"];
-	[library setParserClassName:NSStringFromClass([self class])];
-	[library setWatchedPath:_database];
+///	[library setParserClassName:NSStringFromClass([self class])];
+///	[library setWatchedPath:_database];
 	
 	NSEnumerator *groupEnum = [[xml objectForKey:@"Children"] objectEnumerator];
 	NSDictionary *cur;

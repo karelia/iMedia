@@ -156,7 +156,6 @@
 		}
 		else
 		{
-			[self play:inSender];
 			return;
 		}
 		

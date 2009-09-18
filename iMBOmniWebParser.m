@@ -60,12 +60,13 @@
 	[pool release];
 }
 
-- (id)init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	NSArray *appSupport = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory,NSUserDomainMask,YES);
-	if (self = [super initWithContentsOfFile:[[appSupport objectAtIndex:0] stringByAppendingPathComponent:@"OmniWeb 5/Bookmarks.html"]])
+	if (self = [super initWithMediaType:inMediaType])
 	{
-		
+		NSArray *appSupport = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory,NSUserDomainMask,YES);
+
+		self.mediaSource = [[appSupport objectAtIndex:0] stringByAppendingPathComponent:@"OmniWeb 5/Bookmarks.html"];
 	}
 	return self;
 }
@@ -95,8 +96,8 @@
 														   @"OmniWeb application name")];
 		[library setIconName:@"com.omnigroup.OmniWeb5"];
         [library setIdentifier:@"OmniWeb"];
-        [library setParserClassName:NSStringFromClass([self class])];
-		[library setWatchedPath:_database];
+///        [library setParserClassName:NSStringFromClass([self class])];
+///		[library setWatchedPath:_database];
 		
 		iMBXBELParser *parser = [[iMBXBELParser alloc] init];
 		[parser parseWithXMLDocument:xml node:library];
