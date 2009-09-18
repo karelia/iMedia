@@ -1230,6 +1230,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
     }
 }
 
+/*
 - (NSView *)dynamicTableView:(IMBDynamicTableView *)tableView viewForRow:(NSInteger)row {
 		NSLog(@"%s",__FUNCTION__);
 
@@ -1265,6 +1266,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	}
     return result;
 }
+ */
 
 - (void)_reloadRowForEntity:(id)object {
 	NSLog(@"%s",__FUNCTION__);
