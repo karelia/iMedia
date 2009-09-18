@@ -129,7 +129,6 @@
 	{
 		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
 	}
-	
 	return self;
 }
 

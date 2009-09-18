@@ -62,48 +62,48 @@
 	[pool release];
 }
 
-- (id)init
+- (id) initWithMediaType:(NSString*)inMediaType
 {
-	// Get the paths of ~/Library/Application Support/Firefox/profiles.ini
-    NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-    NSString *bookmarksPath = nil;
-    NSString *profilesPath = [[libraryPaths objectAtIndex:0] stringByAppendingPathComponent:@"/Firefox/profiles.ini"];
-    
-    NSFileManager *fileMgr = [NSFileManager defaultManager];
-    if ([fileMgr fileExistsAtPath:profilesPath]) 
+	if (self = [super initWithMediaType:inMediaType])
 	{
-        // Parse profiles.ini
-		NSString *profiles;
-		profiles = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:profilesPath] encoding:NSUTF8StringEncoding];
-		[profiles autorelease];
+		// Get the paths of ~/Library/Application Support/Firefox/profiles.ini
+		NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+		NSString *bookmarksPath = nil;
+		NSString *profilesPath = [[libraryPaths objectAtIndex:0] stringByAppendingPathComponent:@"/Firefox/profiles.ini"];
 		
-		NSScanner *scanner;
-		NSString *profilePath = nil;
-		scanner = [NSScanner scannerWithString:profiles];
-		
-		while (![scanner isAtEnd]) {
-			NSString *token;
-			if ([scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] 
-										intoString:&token])
-			{
-				if ([token hasPrefix:@"Path="]) {
-					// Remove 'Path='
-					profilePath = [token substringFromIndex:5];
-					break;
+		NSFileManager *fileMgr = [NSFileManager defaultManager];
+		if ([fileMgr fileExistsAtPath:profilesPath]) 
+		{
+			// Parse profiles.ini
+			NSString *profiles;
+			profiles = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:profilesPath] encoding:NSUTF8StringEncoding];
+			[profiles autorelease];
+			
+			NSScanner *scanner;
+			NSString *profilePath = nil;
+			scanner = [NSScanner scannerWithString:profiles];
+			
+			while (![scanner isAtEnd]) {
+				NSString *token;
+				if ([scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] 
+											intoString:&token])
+				{
+					if ([token hasPrefix:@"Path="]) {
+						// Remove 'Path='
+						profilePath = [token substringFromIndex:5];
+						break;
+					}
 				}
+				
+				[scanner scanCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] intoString:nil];
 			}
 			
-			[scanner scanCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] intoString:nil];
+			// Get bookmarks path
+			bookmarksPath = [[profilesPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:profilePath];
+			bookmarksPath = [bookmarksPath stringByAppendingPathComponent:@"bookmarks.html"];
 		}
 		
-		// Get bookmarks path
-		bookmarksPath = [[profilesPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:profilePath];
-		bookmarksPath = [bookmarksPath stringByAppendingPathComponent:@"bookmarks.html"];
-    }
-	
-	if (self = [super initWithContentsOfFile:bookmarksPath])
-	{
-		
+		self.mediaSource = bookmarksPath;
 	}
 	return self;
 }
@@ -153,8 +153,8 @@
 														@"FireFox application name")];
 		[root setIconName:@"org.mozilla.firefox"];
         [root setIdentifier:@"Firefox"];
-        [root setParserClassName:NSStringFromClass([self class])];
-		[root setWatchedPath:_database];
+///        [root setParserClassName:NSStringFromClass([self class])];
+///		[root setWatchedPath:_database];
 		
 		// Remove unneccessary tags
 		static NSArray* _tags = nil;

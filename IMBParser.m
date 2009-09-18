@@ -91,7 +91,6 @@
 {
 	IMBRelease(_mediaSource);
 	IMBRelease(_mediaType);
-	IMBRelease(_database);
 	[super dealloc];
 }
 
