@@ -57,7 +57,7 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[IMBParserController registerParser:[self class] forMediaType:@"links"];
+	[IMBParserController registerParserClass:self forMediaType:@"links"];
 	
 	[pool release];
 }

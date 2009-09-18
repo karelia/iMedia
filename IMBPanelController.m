@@ -54,6 +54,8 @@
 #import "IMBImageViewController.h"
 #import "IMBAudioViewController.h"
 #import "IMBMovieViewController.h"
+#import "IMBLinkViewController.h"
+
 #import "IMBConfig.h"
 #import "IMBCommon.h"
 #import "NSWorkspace+iMedia.h"
@@ -180,6 +182,11 @@ static IMBPanelController* sSharedPanelController = nil;
 		{
 			objectViewController = [IMBMovieViewController viewControllerForLibraryController:libraryController];
 		}
+		else if ([mediaType isEqualToString:kIMBMediaTypeLink])
+		{
+			objectViewController = [IMBLinkViewController viewControllerForLibraryController:libraryController];
+		}
+#warning TODO : it would be better not to 'hard-wire' the media types here.  How about discovering everything that is loaded?
 		
 		// Store the object view controller in an array. Note that the node view controller is attached to the
 		// object view controller, so we do not need to store it separately...

@@ -43,67 +43,23 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+//----------------------------------------------------------------------------------------------------------------------
 
-#import "iMBOmniWebParser.h"
-#import "IMBNode.h"
-#import "IMBParserController.h"
-#import "iMBXBELParser.h"
+#pragma mark HEADERS
 
-@implementation iMBOmniWebParser
+#import "IMBObjectViewController.h"
 
-+ (void)load
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	[IMBParserController registerParserClass:self forMediaType:@"links"];
-	
-	[pool release];
-}
+//----------------------------------------------------------------------------------------------------------------------
 
-- (id)init
-{
-	NSArray *appSupport = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory,NSUserDomainMask,YES);
-	if (self = [super initWithContentsOfFile:[[appSupport objectAtIndex:0] stringByAppendingPathComponent:@"OmniWeb 5/Bookmarks.html"]])
-	{
-		
-	}
-	return self;
-}
+#pragma mark CLASSES
 
-- (IMBNode *)parseDatabase
-{
-	NSBundle *bndl = [NSBundle bundleForClass:[self class]];
-	NSURL *docURL = [NSURL fileURLWithPath:[self databasePath]];
-	NSURL *xsltURL = [NSURL fileURLWithPath:[bndl pathForResource:@"OmniwebBookmarksToXBEL" ofType:@"xslt"]];
-	NSError *err;
-	NSXMLDocument *xml = [[[NSXMLDocument alloc] initWithContentsOfURL:docURL
-															  options:NSXMLDocumentTidyHTML
-																error:&err] autorelease];
-	xml = [xml objectByApplyingXSLTAtURL:xsltURL
-							   arguments:nil
-								   error:&err];
-	//NSLog(@"%@", [xml XMLStringWithOptions:NSXMLNodePrettyPrint]);
-	IMBNode *library = nil;
-	
-	if (xml)
-	{
-		library = [[IMBNode alloc] init];
-		[library setName:NSLocalizedStringWithDefaultValue(
-														   @"OmniWeb",
-														   nil,IMBBundle(),
-														   @"OmniWeb",
-														   @"OmniWeb application name")];
-		[library setIconName:@"com.omnigroup.OmniWeb5"];
-        [library setIdentifier:@"OmniWeb"];
-        [library setParserClassName:NSStringFromClass([self class])];
-		[library setWatchedPath:_database];
-		
-		iMBXBELParser *parser = [[iMBXBELParser alloc] init];
-		[parser parseWithXMLDocument:xml node:library];
-		[parser release];
-	}
+//----------------------------------------------------------------------------------------------------------------------
 
-	return [library autorelease];
-}
+#pragma mark 
+
+@interface IMBLinkViewController : IMBObjectViewController
 
 @end
+
+//----------------------------------------------------------------------------------------------------------------------
+

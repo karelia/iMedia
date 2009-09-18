@@ -45,7 +45,12 @@
 
 #import "IMBDynamicTableView.h"
 
-@interface IMBDynamicTableView(ATPrivate)
+@interface NSTableView()
+// Define this so we can call through to super, for when we are running Snow Leopard
+- (void)reloadDataForRowIndexes:(NSIndexSet *)rowIndexes columnIndexes:(NSIndexSet *)columnIndexes;
+@end
+
+@interface IMBDynamicTableView()
 
 - (void)_removeCachedViewForRow:(NSInteger)row;
 - (void)_removeCachedViewsInIndexSet:(NSIndexSet *)rowIndexes;
@@ -205,21 +210,25 @@
 #endif
 
 - (void)reloadDataForRowIndexes:(NSIndexSet *)rowIndexes columnIndexes:(NSIndexSet *)columnIndexes
-
 {
-	// NSLog(@"%s",__FUNCTION__);
-	
 	[self _removeCachedViewsInIndexSet:rowIndexes];
 	
 	if (floor(NSAppKitVersionNumber) > floor(NSAppKitVersionNumber10_5))
-		
 	{
 		[super reloadDataForRowIndexes:rowIndexes columnIndexes:columnIndexes];
 	}
 	else
-		
 	{
-		// TODO: LEOPARD implementation
+		// LEOPARD implementation.  Ignore the columns; mark the whole row dirty.
+		NSRect dirtyRect = NSZeroRect;
+		NSUInteger currentIndex = [rowIndexes firstIndex];
+		while (currentIndex != NSNotFound)
+		{
+			NSRect rowDirtyRect = [self rectOfRow:currentIndex];
+			dirtyRect = NSUnionRect(dirtyRect, rowDirtyRect);
+			currentIndex = [rowIndexes indexGreaterThanIndex:currentIndex];
+		}
+		[self setNeedsDisplayInRect:dirtyRect];
 	}
 }
 
