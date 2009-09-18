@@ -109,7 +109,7 @@ extern NSString *const IMBObjectPropertyNamedThumbnailImage;
 	NSString* _objectCountFormatPlural;
 	BOOL _isDragging;
 	
-	NSMutableArray *_observedVisibleItems;
+	NSMutableSet *_observedVisibleItems;
 
 }
 

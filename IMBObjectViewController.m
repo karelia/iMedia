@@ -207,7 +207,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	
 	// Fix the last segment image, the combo view, which should be the combo view
 	[[ibSegments imageForSegment:([ibSegments segmentCount]-1)] setTemplate:YES];	// Just naming it with a '*Template' image is not enough!
-	
 }
 
 - (void) dealloc
@@ -1121,27 +1120,41 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 
 - (void)dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows
 {
-	NSLog(@"%s",__FUNCTION__);
+	// NSLog(@"%s",__FUNCTION__);
 	
-	// First, stop observing all prior things
-    for (IMBObject *imageEntity in _observedVisibleItems)
+	NSArray *newVisibleItems = [[ibObjectArrayController arrangedObjects] subarrayWithRange:newVisibleRows];
+	NSMutableSet *newVisibleItemsSetRetained = [[NSMutableSet alloc] initWithArray:newVisibleItems];
+	
+	NSMutableSet *itemsNoLongerVisible	= [NSMutableSet set];
+	NSMutableSet *itemsNewlyVisible		= [NSMutableSet set];
+	
+	[itemsNewlyVisible setSet:newVisibleItemsSetRetained];
+	[itemsNewlyVisible minusSet:_observedVisibleItems];
+	
+	[itemsNoLongerVisible setSet:_observedVisibleItems];
+	[itemsNoLongerVisible minusSet:newVisibleItemsSetRetained];
+
+//	NSLog(@"old Rows: %@", ([_observedVisibleItems count] ? [_observedVisibleItems description] : @"--"));
+//	NSLog(@"new rows: %@", ([newVisibleItems count] ? [newVisibleItems description] : @"--"));
+//	NSLog(@"Newly visible: %@", ([itemsNewlyVisible count] ? [itemsNewlyVisible description] : @"--"));
+//	NSLog(@"Now NOT visbl: %@", ([itemsNoLongerVisible count] ? [itemsNoLongerVisible description] : @"--"));
+	
+	// With items going away, stop observing  and lower their queue priority if they are still queued
+    for (IMBObject *imageEntity in itemsNoLongerVisible)
 	{
         if ([imageEntity isKindOfClass:[IMBVisualObject class]])
 		{
             [imageEntity removeObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage];
 			
 			NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
-			if ([ops count] > 0)
+			for (IMBThumbnailOperation *op in ops)
 			{
-				NSEnumerator *e = [ops objectEnumerator];
-				IMBThumbnailOperation *op = nil;
-				
-				while(( op = [e nextObject] ))
+				if ([op isKindOfClass:[IMBThumbnailOperation class]])
 				{
 					IMBObject *entity = [op visualObject];
 					if (entity == imageEntity)
 					{
-						NSLog(@"Lowering priority of load of %@", entity.name);
+						//NSLog(@"Lowering priority of load of %@", entity.name);
 						[op setQueuePriority:NSOperationQueuePriorityVeryLow];		// re-prioritize lower
 						break;
 					}
@@ -1149,10 +1162,9 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 			}
         }
     }
-    // Now, observe things that are newly visible and kick off a request to load the image
-    [_observedVisibleItems release];
-    _observedVisibleItems = [[[ibObjectArrayController arrangedObjects] subarrayWithRange:newVisibleRows] retain];
-    for (IMBObject *imageEntity in _observedVisibleItems)
+    // With newly visible items, observe them and kick off a request to load the image
+	
+    for (IMBObject *imageEntity in itemsNewlyVisible)
 	{
         if ([imageEntity isKindOfClass:[IMBVisualObject class]])
 		{
@@ -1163,12 +1175,9 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 				NSOperation *foundOperation = nil;
 				
 				NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
-				if ([ops count] > 0)
+				for (IMBThumbnailOperation *op in ops)
 				{
-					NSEnumerator *e = [ops objectEnumerator];
-					IMBThumbnailOperation *op = nil;
-					
-					while(( op = [e nextObject] ))
+					if ([op isKindOfClass:[IMBThumbnailOperation class]])
 					{
 						IMBObject *entity = [op visualObject];
 						if (entity == imageEntity)
@@ -1181,12 +1190,12 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 				
 				if (foundOperation)
 				{
-					NSLog(@"Raising priority of load of %@", imageEntity.name);
+					//NSLog(@"Raising priority of load of %@", imageEntity.name);
 					[foundOperation setQueuePriority:NSOperationQueuePriorityNormal];		// re-prioritize back to normal
 				}
 				else
 				{
-					NSLog(@"Queueing load of %@", imageEntity.name);
+					//NSLog(@"Queueing load of %@", imageEntity.name);
 					[(IMBVisualObject *)imageEntity queueThumbnailImageLoad];
 				}
 			}
@@ -1195,6 +1204,11 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
             [imageEntity addObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage options:0 context:tableView];
         }
     }
+	
+	// Finally cache our old visible items set
+	[_observedVisibleItems release];
+    _observedVisibleItems = newVisibleItemsSetRetained;
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------

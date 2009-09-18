@@ -284,7 +284,7 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	NSLog(@"%s",__FUNCTION__);
+	// NSLog(@"%s",__FUNCTION__);
 	
 	if (![inObject isKindOfClass:[IMBNodeObject class]])
 	{
