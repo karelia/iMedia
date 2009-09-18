@@ -43,16 +43,12 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //  ©2009 Peter Baumgartner. All rights reserved.
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @interface IMBTimecodeTransformer : NSValueTransformer
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------

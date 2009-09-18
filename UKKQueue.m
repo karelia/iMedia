@@ -135,10 +135,7 @@
 	subscriptionFlags = fflags;
 }
 
-
 @end
-
-
 
 // -----------------------------------------------------------------------------
 //  Private stuff:
@@ -168,14 +165,12 @@
 
 @end
 
-
 // -----------------------------------------------------------------------------
 //  Globals:
 // -----------------------------------------------------------------------------
 
 static UKKQueueCentral	*	gUKKQueueSharedQueueSingleton = nil;
 static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which we send notifications so they get put in the main thread.
-
 
 @implementation UKKQueueCentral
 
@@ -216,7 +211,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	return self;
 }
 
-
 // -----------------------------------------------------------------------------
 //	* DESTRUCTOR:
 //		Releases the kqueue again.
@@ -239,7 +233,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	[super dealloc];
 }
 
-
 // -----------------------------------------------------------------------------
 //	removeAllPaths:
 //		Stop listening for changes to all paths. This removes all
@@ -257,7 +250,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 		[watchedFiles removeAllObjects];
 	}
 }
-
 
 // -----------------------------------------------------------------------------
 //	queueFD:
@@ -277,7 +269,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 {
 	[self addPath: path notifyingAbout: UKKQueueNotifyDefault];
 }
-
 
 -(void) addPath: (NSString*)path notifyingAbout: (u_int)fflags
 {
@@ -327,7 +318,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
    
    return nil;
 }
-
 
 // -----------------------------------------------------------------------------
 //	removePath:
@@ -379,7 +369,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	
 	return mutStr;
 }
-
 
 // -----------------------------------------------------------------------------
 //	watcherThread:
@@ -465,7 +454,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	#endif
 }
 
-
 // -----------------------------------------------------------------------------
 //	postNotification:forFile:
 //		This is the main bottleneck for posting notifications. If you don't want
@@ -495,7 +483,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 
 @end
 
-
 @implementation UKKQueue
 
 // -----------------------------------------------------------------------------
@@ -523,7 +510,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
     return gUKKQueueSharedQueueSingleton;
 }
 
-
 -(id)	init
 {
 	if(( self = [super init] ))
@@ -550,14 +536,12 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	return self;
 }
 
-
 -(void)	finalize
 {
 	[self removeAllPaths];
 	
 	[super finalize];
 }
-
 
 -(void) dealloc
 {
@@ -589,7 +573,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	[super dealloc];
 }
 
-
 -(NSInteger)		queueFD
 {
 	return [[UKKQueue sharedFileWatcher] queueFD];	// We're all one big, happy family now.
@@ -610,7 +593,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	[self addPath: path notifyingAbout: UKKQueueNotifyDefault];
 }
 
-
 // -----------------------------------------------------------------------------
 //	addPath:notfyingAbout:
 //		Tell this queue to listen for the specified notifications sent for
@@ -627,7 +609,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	[watchedFiles setObject: entry forKey: path];
 }
 
-
 -(void)	removePath: (NSString*)fpath
 {
 	UKKQueuePathEntry*		entry = [watchedFiles objectForKey: fpath];
@@ -638,30 +619,25 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	}
 }
 
-
 -(id)	delegate
 {
     return delegate;
 }
-
 
 -(void)	setDelegate: (id)newDelegate
 {
 	delegate = newDelegate;
 }
 
-
 -(BOOL)	alwaysNotify
 {
 	return alwaysNotify;
 }
 
-
 -(void)	setAlwaysNotify: (BOOL)state
 {
 	alwaysNotify = state;
 }
-
 
 -(void)	removeAllPaths
 {
@@ -675,7 +651,6 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 
 	[watchedFiles removeAllObjects];	// Empty the list now we don't have any subscriptions anymore.
 }
-
 
 -(void)	fileChangeNotification: (NSNotification*)notif
 {
@@ -692,5 +667,4 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 }
 
 @end
-
 

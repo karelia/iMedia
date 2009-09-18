@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark ABSTRACT
 
@@ -59,17 +57,13 @@
 // methods in this controller. Use reloadNode:, expandNode:, or selectNode: to update a node (or node tree) in a 
 // background operation...
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
 #import "IMBCommon.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CONSTANTS
 
@@ -77,9 +71,7 @@ extern NSString* kIMBNodesWillReloadNotification;
 extern NSString* kIMBNodesWillChangeNotification;
 extern NSString* kIMBNodesDidChangeNotification;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CLASSES
 
@@ -89,12 +81,9 @@ extern NSString* kIMBNodesDidChangeNotification;
 @class IMBKQueue;
 @class IMBFSEventsWatcher;
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 @interface IMBLibraryController : NSObject
 {
@@ -152,12 +141,9 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 @protocol IMBLibraryControllerDelegate
 
@@ -187,7 +173,6 @@ extern NSString* kIMBNodesDidChangeNotification;
 - (BOOL) controller:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -54,17 +52,13 @@
 #import "IMBCommon.h"
 #import "NSWorkspace+iMedia.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
 @implementation IMBImageViewController
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) awakeFromNib
 {
@@ -75,30 +69,24 @@
 		nil];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (NSString*) mediaType
 {
 	return kIMBMediaTypeImage;
 }
 
-
 + (NSString*) nibName
 {
 	return @"IMBImageView";
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (NSImage*) icon
 {
 	return [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iPhoto"];
 }
-
 
 - (NSString*) displayName
 {
@@ -109,9 +97,7 @@
 		@"mediaType display name");
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (NSString*) objectCountFormatSingular
 {
@@ -122,7 +108,6 @@
 		@"Format string for object count in singluar");
 }
 
-
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
@@ -132,9 +117,7 @@
 		@"Format string for object count in plural");
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end
 

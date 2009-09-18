@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -59,9 +57,7 @@
 #import "NSWorkspace+iMedia.h"
 #import <QTKit/QTKit.h>
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -69,9 +65,7 @@
 
 @synthesize playingAudio = _playingAudio;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) awakeFromNib
 {
@@ -84,37 +78,30 @@
 		nil];
 }
 
-
 - (void) dealloc
 {
 	IMBRelease(_playingAudio);
 	[super dealloc];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (NSString*) mediaType
 {
 	return kIMBMediaTypeAudio;
 }
 
-
 + (NSString*) nibName
 {
 	return @"IMBAudioView";
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (NSImage*) icon
 {
 	return [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
 }
-
 
 - (NSString*) displayName
 {
@@ -125,9 +112,7 @@
 		@"mediaType display name");
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (NSString*) objectCountFormatSingular
 {
@@ -138,7 +123,6 @@
 		@"Format string for object count in singluar");
 }
 
-
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
@@ -148,9 +132,7 @@
 		@"Format string for object count in plural");
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) willHideView
 {
@@ -158,9 +140,7 @@
 	self.playingAudio = nil;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark NSTableViewDelegate
@@ -194,7 +174,6 @@
 	}
 }
 
-
 // If we already has some audio playing, then play the new song if the selection changes...
 
 - (void) tableViewSelectionDidChange:(NSNotification*)inNotification
@@ -209,9 +188,7 @@
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (IBAction) play:(id)inSender
 {
@@ -231,7 +208,6 @@
 		[self playAudioObject:object];
 	}
 }
-
 
 - (void) playAudioObject:(IMBObject*)inObject
 {
@@ -261,9 +237,7 @@
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end
 

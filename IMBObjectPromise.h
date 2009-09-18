@@ -43,17 +43,13 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CONSTANTS
 	
 extern NSString* kIMBObjectPromiseType;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -62,7 +58,6 @@ extern NSString* kIMBObjectPromiseType;
 // server or a camera device. In these cases we only have lores thumbnails available. To access the hires data, we
 // first need to start an asynchronous download operation. To be as lazy as possible, IMBObjectPromise encapsulates
 // this access. The frameworks hands the promise to the client app, which can then trigger a download as desired...
-
 
 @interface IMBObjectPromise : NSObject <NSCopying,NSCoding>
 {
@@ -113,9 +108,7 @@ extern NSString* kIMBObjectPromiseType;
 		
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -134,9 +127,7 @@ extern NSString* kIMBObjectPromiseType;
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -147,9 +138,7 @@ extern NSString* kIMBObjectPromiseType;
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -167,6 +156,5 @@ extern NSString* kIMBObjectPromiseType;
 - (IBAction) cancel:(id)inSender;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------

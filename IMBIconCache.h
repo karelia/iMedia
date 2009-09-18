@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark TYPEDEFS
 
@@ -59,7 +57,6 @@ typedef struct _IMBIconTypeMappingEntry
 } 
 IMBIconTypeMappingEntry;
 
-
 typedef struct _IMBIconTypeMapping
 {
 	unsigned int fCount;
@@ -68,12 +65,9 @@ typedef struct _IMBIconTypeMapping
 } 
 IMBIconTypeMapping;
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 @interface IMBIconCache : NSObject
 {
@@ -84,7 +78,6 @@ IMBIconTypeMapping;
 - (NSImage*) iconForType:(NSString*)inType fromBundleID:(NSString*)inBundleID withMappingTable:(const IMBIconTypeMapping*)inMappingTable;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

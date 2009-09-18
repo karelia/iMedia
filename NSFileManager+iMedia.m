@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -41,8 +41,7 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
-
+ */
 
 #import "NSFileManager+iMedia.h"
 
@@ -59,7 +58,7 @@
 + (NSFileManager *)threadSafeManager
 {
 	NSFileManager*	instance = nil;
-
+	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	// Tiger and earlier...
 	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4)
@@ -68,15 +67,15 @@
 	}
 	else
 #endif
-
-	// Leopard and later...
+		
+		// Leopard and later...
 	{
 		static NSString* sMutex = @"threadSafeFileManagerMutex";
-
+		
 		@synchronized(sMutex)
 		{
 			static NSMutableDictionary* sPerThreadInstances = nil;
-
+			
 			if (sPerThreadInstances == nil)
 			{
 				sPerThreadInstances = [[NSMutableDictionary alloc] init];
@@ -92,7 +91,7 @@
 			}	 
 		}
 	}
-
+	
 	return instance;	
 }
 
@@ -103,7 +102,7 @@
 		NSString*		thePath = @"";
 		NSEnumerator*	enumerator = [[path pathComponents] objectEnumerator];
 		NSString*		component;
-
+		
 		while ((component = [enumerator nextObject]) != nil)
 		{
 			NSError* eatError = nil;
@@ -122,7 +121,7 @@
 	{
 		[NSException raise:@"iMediaException" format:@"createDirectoryPath:attributes: path not absolute:%@", path];
 	}
-
+	
 	return [[NSFileManager defaultManager] fileExistsAtPath:path];
 }
 
@@ -130,7 +129,7 @@
 {
 	LSItemInfoRecord	itemInfo;
 	NSURL*				pathURL = [NSURL fileURLWithPath:path];
-
+	
 	return ((LSCopyItemInfoForURL((CFURLRef)pathURL, kLSRequestBasicFlagsOnly, &itemInfo) == noErr) &&
 			(itemInfo.flags & kLSItemInfoIsInvisible));
 }
@@ -140,36 +139,36 @@
 // see http://developer.apple.com/documentation/Cocoa/Conceptual/LowLevelFileMgmt/Tasks/ResolvingAliases.html
 - (NSString *)pathResolved:(NSString *)path
 {
-    NSString *resolvedPath = NULL;
-    
-    CFURLRef url = CFURLCreateWithFileSystemPath(NULL /*allocator*/, (CFStringRef)path, kCFURLPOSIXPathStyle, NO /*isDirectory*/);
-    if (url != NULL)
-    {
-        FSRef fsRef;
-        if (CFURLGetFSRef(url, &fsRef))
-        {
-            Boolean targetIsFolder, wasAliased;
-            if (FSResolveAliasFile (&fsRef, true /*resolveAliasChains*/, 
-                                    &targetIsFolder, &wasAliased) == noErr && wasAliased)
-            {
-                CFURLRef resolvedUrl = CFURLCreateFromFSRef(NULL, &fsRef);
-                if (resolvedUrl != NULL)
-                {
-                    resolvedPath = NSMakeCollectable(
-                    CFURLCopyFileSystemPath(resolvedUrl,
-                                            kCFURLPOSIXPathStyle));
-                    CFRelease(resolvedUrl);
-                    resolvedPath = [resolvedPath autorelease];
-                }
-            }
-        }
-        CFRelease(url);
-    }
-    
-    if ( resolvedPath == NULL )
-        resolvedPath = [[path copy] autorelease];
-    
-    return resolvedPath;
+	NSString *resolvedPath = NULL;
+	
+	CFURLRef url = CFURLCreateWithFileSystemPath(NULL /*allocator*/, (CFStringRef)path, kCFURLPOSIXPathStyle, NO /*isDirectory*/);
+	if (url != NULL)
+	{
+		FSRef fsRef;
+		if (CFURLGetFSRef(url, &fsRef))
+		{
+			Boolean targetIsFolder, wasAliased;
+			if (FSResolveAliasFile (&fsRef, true /*resolveAliasChains*/, 
+									&targetIsFolder, &wasAliased) == noErr && wasAliased)
+			{
+				CFURLRef resolvedUrl = CFURLCreateFromFSRef(NULL, &fsRef);
+				if (resolvedUrl != NULL)
+				{
+					resolvedPath = NSMakeCollectable(
+													 CFURLCopyFileSystemPath(resolvedUrl,
+																			 kCFURLPOSIXPathStyle));
+					CFRelease(resolvedUrl);
+					resolvedPath = [resolvedPath autorelease];
+				}
+			}
+		}
+		CFRelease(url);
+	}
+	
+	if ( resolvedPath == NULL )
+		resolvedPath = [[path copy] autorelease];
+	
+	return resolvedPath;
 }
 
 @end

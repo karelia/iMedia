@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -58,9 +56,7 @@
 #import "NSFileManager+iMedia.h"
 #import <Quartz/Quartz.h>
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -75,9 +71,7 @@
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -88,9 +82,7 @@
 @synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -101,9 +93,7 @@
 	[pool release];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Check if iPhoto is installed...
 
@@ -112,15 +102,12 @@
 	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iPhoto"];
 }
 
-
 + (BOOL) isInstalled
 {
 	return [self iPhotoPath] != nil;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Look at the iApps preferences file and find all iPhoto libraries. Create a parser instance for each libary...
 
@@ -151,9 +138,7 @@
 	return parserInstances;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
@@ -168,7 +153,6 @@
 	return self;
 }
 
-
 - (void) dealloc
 {
 	IMBRelease(_appPath);
@@ -177,13 +161,10 @@
 	[super dealloc];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Parser Methods
-
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
@@ -262,9 +243,7 @@
 	return node;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // The supplied node is a private copy which may be modified here in the background operation. Parse the 
 // iPhoto XML file and create subnodes as needed...
@@ -282,9 +261,7 @@
 	return error == nil;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // When the parser is deselected, then get rid of the cached plist data. It will be loaded into memory lazily 
 // once it is needed again...
@@ -294,13 +271,10 @@
 	self.plist = nil;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Helper Methods
-
 
 // Load the XML file into a plist lazily (on demand). If we notice that an existing cached plist is out-of-date 
 // we get rid of it and load it anew...
@@ -326,9 +300,7 @@
 	return _plist;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBiPhotoParser://AlbumId/17"...
 
@@ -338,9 +310,7 @@
 	return [self identifierForPath:albumPath];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Exclude some album types...
 
@@ -352,9 +322,7 @@
 	return YES;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (NSImage*) iconForAlbumType:(NSString*)inAlbumType
 {
@@ -393,18 +361,14 @@
 	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (BOOL) isLeafAlbumType:(NSString*)inType
 {
 	return ![inType isEqualToString:@"Folder"];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
 {
@@ -456,9 +420,7 @@
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) populateNode:(IMBNode*)inNode 
 		 albums:(NSArray*)inAlbums 
@@ -522,8 +484,6 @@
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end

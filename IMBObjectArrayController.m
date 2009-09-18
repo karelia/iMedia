@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -54,17 +52,13 @@
 #import "IMBParser.h"
 #import "IMBCommon.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CONSTANTS
 
 const NSString* kSearchStringContext = @"searchString";
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -74,9 +68,7 @@ const NSString* kSearchStringContext = @"searchString";
 @synthesize searchableProperties = _searchableProperties;
 @synthesize searchString = _searchString;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (id) init
 {
@@ -88,12 +80,10 @@ const NSString* kSearchStringContext = @"searchString";
 	return self; 
 }
 
-
 - (void) awakeFromNib
 {
 	[self addObserver:self forKeyPath:@"searchString" options:0 context:(void*)kSearchStringContext];
 }
-
 
 - (void) dealloc
 {
@@ -103,18 +93,14 @@ const NSString* kSearchStringContext = @"searchString";
 	[super dealloc];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 - (IBAction) search:(id)inSender
 {
 	[self setSearchString:[inSender stringValue]];
 }
-
 
 - (IBAction) resetSearch:(id)inSender
 {
@@ -124,7 +110,6 @@ const NSString* kSearchStringContext = @"searchString";
 		[self search:ibSearchField];
 	}	
 }
-
 
 - (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
 {
@@ -139,9 +124,7 @@ const NSString* kSearchStringContext = @"searchString";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Set default values, and keep reference to new object -- see arrangeObjects:
 
@@ -156,7 +139,6 @@ const NSString* kSearchStringContext = @"searchString";
 
     return _newObject;
 }
-
 
 - (NSArray*) arrangeObjects:(NSArray*)inObjects
 {
@@ -253,8 +235,6 @@ const NSString* kSearchStringContext = @"searchString";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end

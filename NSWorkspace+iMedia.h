@@ -43,7 +43,6 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 #import <Cocoa/Cocoa.h>
 
 @interface NSWorkspace (iMediaExtensions)

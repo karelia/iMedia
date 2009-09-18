@@ -5,6 +5,7 @@
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
+ The new architecture for version 2.0 was developed by Peter Baumgartner.
  Contributions have also been made by Matt Gough, Martin Wennerberg and others
  as indicated in source files.
  
@@ -42,14 +43,11 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // This is a wrapper header that renames Uli's UK classes to have the prefix IMB. That way we can use these 
 // classes without running into runtime conflicts with other UK classes being loaded by the runtime from 
 // other bundles. The preprocessor technique was suggested by Uli himself...
-
 
 #define UKFileWatcher									IMBFileWatcher 
 #define UKFileWatcherDelegate							IMBFileWatcherDelegate 
@@ -68,8 +66,5 @@
 #define UKFileWatcherLinkCountChangeNotification		IMBFileWatcherLinkCountChangeNotification 
 #define UKFileWatcherAccessRevocationNotification		IMBFileWatcherAccessRevocationNotification 
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
-
 

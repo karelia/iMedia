@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark ABSTRACT
 
@@ -61,9 +59,7 @@
 // controller coordinates between the views and the IMBLibraryController. Essentially IMBLibraryController is a 
 // backend controller, while IMBNodeViewController is a frontend controller.
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CLASSES
 
@@ -73,12 +69,9 @@
 @class IMBParser;
 @class IMBNode;
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 @interface IMBNodeViewController : NSViewController
 {
@@ -143,7 +136,6 @@
 - (void) installCustomObjectView:(NSView*)inObjectView;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

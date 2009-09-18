@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -54,18 +52,14 @@
 #import "IMBConfig.h"
 #import "IMBCommon.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark GLOBLAS
 
 static IMBParserController* sSharedParserController = nil;
 static NSMutableDictionary* sRegisteredParserClasses = nil;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark
 
@@ -73,14 +67,11 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 @synthesize delegate = _delegate;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Creates a singleton instance of the controller. Please note that at app launch the first method (with the delegate)
 // should be used to instantiate the controller. After that the second accessor (without delegate) can be used to 
 // retrieve the singleton instance...
-
 
 + (IMBParserController*) sharedParserControllerWithDelegate:(id)inDelegate
 {
@@ -88,7 +79,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	controller.delegate = inDelegate;
 	return controller;
 }
-
 
 + (IMBParserController*) sharedParserController
 {
@@ -103,9 +93,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	return sSharedParserController;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // This method should be called from the +load method of each parser class. This lets the IMBParserController 
 // know about the existence of a parser class, but it doesn't load the parser yet. Known parser classes are 
@@ -126,7 +114,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		[pool release];
 	}
 }
-
 
 // This method can be used in rare circumstances to remove a parser from the list of known parsers. 
 // Please note that this must be called before -loadParsers to have any effect...
@@ -149,7 +136,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		[pool release];
 	}
 }
-
 
 // Returns a set of all registered parser classes for the specified media type...
 
@@ -177,12 +163,9 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	return nil;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark
-
 
 - (id) init
 {
@@ -200,7 +183,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	return self;
 }
 
-
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -208,13 +190,10 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	[super dealloc];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark
 #pragma mark Loading & Unloading
-
 
 // This method first loads the registered parsers and then appends the custom parser that are stored in the prefs... 
 
@@ -273,9 +252,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	[self loadCustomParsersFromPreferences];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Unload all parsers that are already loaded...
 
@@ -300,9 +277,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Adds the specified parser to the list of loaded parsers. Please note that this will fail if either the parser
 // is already in the list (we do not want duplicates) or if the delegate denied the loading. The resulting list
@@ -354,9 +329,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	return shouldLoad;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Removes a custom parser from the list of loaded parsers. The resulting list is immediately saved to the prefs...
 
@@ -382,9 +355,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	return NO;	
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Create a list containing information about all loaded custom parsers. This list is stored in the prefs...
 
@@ -419,9 +390,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Restore the custom parser instances from the list which was stored in the prefs. The flag _loadingCustomParsers
 // is used to skip the saveCustomParsersToPreferences method call when calling addCustomParser:forMediaType: which
@@ -451,9 +420,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	_loadingCustomParsers = NO;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Returns an array of loaded parsers for the specified mediaType. Creates the array lazily if it doesn't exist...
 
@@ -481,16 +448,12 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	return parsers;							
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark
 #pragma mark Degbugging
 
-
 // Logs the list of registered parser classes. Please note that these classes may not have been instantiated yet...
-
 
 - (void) logRegisteredParsers
 {
@@ -514,10 +477,8 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	NSLog(@"%s\n\n%@\n",__FUNCTION__,text);
 }
 
-
 // Logs the list of loaded parsers. This list may differ from the registered classes (because the delegate denied
 // loading or custom parsers have been added)...
-
 
 - (void) logLoadedParsers
 {
@@ -541,9 +502,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	NSLog(@"%s\n\n%@\n",__FUNCTION__,text);
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end
 

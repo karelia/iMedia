@@ -43,33 +43,25 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
 #import "IMBFolderParser.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 // This parser scans any folder for movie files...
 
 @interface IMBMovieFolderParser : IMBFolderParser
 @end
 
-
 // This subclass looks only in "~/Movies"...
 
 @interface IMBMoviesFolderParser : IMBMovieFolderParser
 @end
-
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

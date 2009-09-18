@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -41,13 +41,12 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-
+ 
  This file was authored by Dan Wood and Terrence Talbot. 
  
  NOTE: THESE METHODS ARE SIMILAR OR IDENTICAL TO METHODS IN SANDVOX.
  PLEASE BE SURE TO "SYNC" THEM UP IF ANY FIXES ARE MADE HERE.
-*/
-
+ */
 
 #import "NSString+iMedia.h"
 #include <openssl/bio.h>
@@ -64,24 +63,24 @@
 + (NSString *)UTIForFileAtPath:(NSString *)anAbsolutePath
 {
 	NSString *result = nil;
-    FSRef fileRef;
-    Boolean isDirectory;
+	FSRef fileRef;
+	Boolean isDirectory;
 	
-    if (FSPathMakeRef((const UInt8 *)[anAbsolutePath fileSystemRepresentation], &fileRef, &isDirectory) == noErr)
-    {
-        // get the content type (UTI) of this file
+	if (FSPathMakeRef((const UInt8 *)[anAbsolutePath fileSystemRepresentation], &fileRef, &isDirectory) == noErr)
+	{
+		// get the content type (UTI) of this file
 		CFStringRef uti = NULL;
 		if (LSCopyItemAttribute(&fileRef, kLSRolesViewer, kLSItemContentType, (CFTypeRef*)&uti)==noErr)
 		{
-//			result = [[((NSString *)uti) retain] autorelease];	// I want an autoreleased copy of this.
-
+			//			result = [[((NSString *)uti) retain] autorelease];	// I want an autoreleased copy of this.
+			
 			if (uti)											// PB 06/18/08: fixes a memory leak
 			{
 				result = [NSString stringWithString:(NSString*)uti];
 				CFRelease(uti);
 			}
 		}
-    }
+	}
 	
 	// check extension if we can't find the actual file
 	if (nil == result)
@@ -107,12 +106,12 @@
 			result = nil;		// reject a dynamic type if it tries that.
 		}
 	}
-    
+	
 	if (nil == result)	// not found, figure out if it's a directory or not
 	{
 		NSFileManager *fm = [NSFileManager defaultManager];
 		BOOL isDirectory;
-        if ( [fm fileExistsAtPath:anAbsolutePath isDirectory:&isDirectory] )
+		if ( [fm fileExistsAtPath:anAbsolutePath isDirectory:&isDirectory] )
 		{
 			result = isDirectory ? (NSString *)kUTTypeDirectory : (NSString *)kUTTypeData;
 		}
@@ -135,10 +134,10 @@
 	else
 	{
 		UTI = [NSMakeCollectable(UTTypeCreatePreferredIdentifierForTag(
-																 kUTTagClassFilenameExtension,
-																 (CFStringRef)anExtension,
-																 NULL
-																 )) autorelease];
+																	   kUTTagClassFilenameExtension,
+																	   (CFStringRef)anExtension,
+																	   NULL
+																	   )) autorelease];
 	}
 	
 	// If we don't find it, add an entry to the info.plist of the APP,
@@ -146,7 +145,7 @@
 	// http://developer.apple.com/documentation/Carbon/Conceptual/understanding_utis/understand_utis_conc/chapter_2_section_4.html
 	// A good starting point for informal ones is:
 	// http://www.huw.id.au/code/fileTypeIDs.html
-    
+	
 	return UTI;
 }
 
@@ -154,10 +153,10 @@
 
 {
 	return [NSMakeCollectable(UTTypeCreatePreferredIdentifierForTag(
-															 kUTTagClassOSType,
-															 (CFStringRef)aFileType,
-															 NULL
-															 )) autorelease];	
+																	kUTTagClassOSType,
+																	(CFStringRef)aFileType,
+																	NULL
+																	)) autorelease];	
 }
 
 // See list here:
@@ -167,7 +166,6 @@
 {
 	return UTTypeConformsTo((CFStringRef)aUTI, (CFStringRef)aConformsToUTI);
 }
-
 
 @end
 
@@ -187,34 +185,33 @@
 	return result;
 }
 
-
 - (NSData *) decodeBase64;
 {
-    return [self decodeBase64WithNewlines: YES];
+	return [self decodeBase64WithNewlines: YES];
 }
 
 - (NSData *) decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
 {
-    // Create a memory buffer containing Base64 encoded string data
+	// Create a memory buffer containing Base64 encoded string data
 	const char *UTF8String = [self UTF8String];
-    BIO * mem = BIO_new_mem_buf((void *)UTF8String, strlen(UTF8String));
-    
-    // Push a Base64 filter so that reading from the buffer decodes it
-    BIO * b64 = BIO_new(BIO_f_base64());
-    if (!encodedWithNewlines)
-        BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
-    mem = BIO_push(b64, mem);
-    
-    // Decode into an NSMutableData
-    NSMutableData * data = [NSMutableData data];
-    char inbuf[512];
-    NSInteger inlen;
-    while ((inlen = BIO_read(mem, inbuf, sizeof(inbuf))) > 0)
-        [data appendBytes: inbuf length: inlen];
-    
-    // Clean up and go home
-    BIO_free_all(mem);
-    return data;
+	BIO * mem = BIO_new_mem_buf((void *)UTF8String, strlen(UTF8String));
+	
+	// Push a Base64 filter so that reading from the buffer decodes it
+	BIO * b64 = BIO_new(BIO_f_base64());
+	if (!encodedWithNewlines)
+		BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+	mem = BIO_push(b64, mem);
+	
+	// Decode into an NSMutableData
+	NSMutableData * data = [NSMutableData data];
+	char inbuf[512];
+	NSInteger inlen;
+	while ((inlen = BIO_read(mem, inbuf, sizeof(inbuf))) > 0)
+		[data appendBytes: inbuf length: inlen];
+	
+	// Clean up and go home
+	BIO_free_all(mem);
+	return data;
 }
 
 + (id)uuid
@@ -245,7 +242,6 @@
 	return [NSString stringWithCharacters:blackStars length:aRating];
 }
 
-
 //  FinderCompare.m
 //  Created by Pablo Gomez Basanta on 23/7/05.
 //
@@ -261,7 +257,7 @@
 	SInt32 compareResult;
 	
 	CFIndex lhsLen = [self length];;
-    CFIndex rhsLen = [aString length];
+	CFIndex rhsLen = [aString length];
 	
 	UniChar *lhsBuf = malloc(lhsLen * sizeof(UniChar));
 	UniChar *rhsBuf = malloc(rhsLen * sizeof(UniChar));
@@ -276,9 +272,6 @@
 	
 	return (CFComparisonResult) compareResult;
 }
-
-
-
 
 @end
 

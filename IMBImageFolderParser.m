@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -53,14 +51,11 @@
 #import "IMBParserController.h"
 #import "IMBCommon.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
 @implementation IMBImageFolderParser
-
 
 // Restrict this parser to image files...
 
@@ -73,7 +68,6 @@
 	
 	return self;
 }
-
 
 // Return metadata specific to image files...
 
@@ -110,17 +104,13 @@
 	return metadata;
 }
 
-
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
 @implementation IMBPicturesFolderParser
-
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -130,7 +120,6 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
-
 
 // Set the folder path to ~/Pictures...
 
@@ -146,14 +135,11 @@
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
 @implementation IMBDesktopPicturesFolderParser
-
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -163,7 +149,6 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
-
 
 // Set the folder path to /Library/Desktop Pictures...
 
@@ -179,14 +164,11 @@
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
 @implementation IMBUserPicturesFolderParser
-
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -196,7 +178,6 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
-
 
 // Set the folder path to /Library/User Pictures...
 
@@ -212,14 +193,11 @@
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
 @implementation IMBiChatIconsFolderParser
-
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -229,7 +207,6 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[pool release];
 }
-
 
 // Set the folder path to /Library/Application Support/Apple/iChat Icons...
 
@@ -244,6 +221,5 @@
 }
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------

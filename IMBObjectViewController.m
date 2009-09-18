@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -67,11 +65,10 @@
 #import "IMBDynamicTableView.h"
 #import "IMBComboTextCell.h"
 #import "IMBObject.h"
+#import "IMBOperationQueue.h"
 #import <Quartz/Quartz.h>
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CONSTANTS
 
@@ -80,9 +77,7 @@ static NSString* kImageRepresentationKey = @"arrangedObjects.imageRepresentation
 static NSString* kObjectCountStringKey = @"objectCountString";
 NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -105,9 +100,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -128,51 +121,44 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (NSBundle*) bundle
 {
 	return [NSBundle bundleForClass:[self class]];
 }
 
-
 + (NSString*) mediaType
 {
 	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
-
+	
 	return nil;
 }
-
 
 + (NSString*) nibName
 {
 	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
-
+	
 	return nil;
 }
-
 
 + (NSString*) objectCountFormatSingular
 {
 	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
-
+	
 	return nil;
 }
-
 
 + (NSString*) objectCountFormatPlural
 {
 	NSLog(@"%s Please use a custom subclass of IMBObjectViewController...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
-
+	
 	return nil;
 }
-
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
 {
@@ -182,12 +168,9 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	return controller;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 - (id) initWithNibName:(NSString*)inNibName bundle:(NSBundle*)inBundle
 {
@@ -200,17 +183,16 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	return self;
 }
 
-
 - (void) awakeFromNib
 {
 	// We need to save preferences before the app quits...
 	
 	[[NSNotificationCenter defaultCenter] 
-		addObserver:self 
-		selector:@selector(_saveStateToPreferences) 
-		name:NSApplicationWillTerminateNotification 
-		object:nil];
-
+	 addObserver:self 
+	 selector:@selector(_saveStateToPreferences) 
+	 name:NSApplicationWillTerminateNotification 
+	 object:nil];
+	
 	// Observe changes to object array...
 	
 	[ibObjectArrayController retain];
@@ -225,24 +207,25 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	
 	// Fix the last segment image, the combo view, which should be the combo view
 	[[ibSegments imageForSegment:([ibSegments segmentCount]-1)] setTemplate:YES];	// Just naming it with a '*Template' image is not enough!
-
+	
 }
-
 
 - (void) dealloc
 {
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKey];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
-
+	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	IMBRelease(_libraryController);
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
 	
-	for (IMBObject *imageEntity in _observedVisibleItems) {
-        if ([imageEntity isKindOfClass:[IMBVisualObject class]]) {
+	for (IMBObject *imageEntity in _observedVisibleItems)
+	{
+        if ([imageEntity isKindOfClass:[IMBVisualObject class]])
+		{
             [imageEntity removeObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage];
         }
     }
@@ -252,24 +235,29 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[super dealloc];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
 {
-	if (inKeyPath == IMBObjectPropertyNamedThumbnailImage) {
+	if (inKeyPath == IMBObjectPropertyNamedThumbnailImage)
+	{
         // Find the row and reload it.
         // Note that KVO notifications may be sent from a background thread (in this case, we know they will be)
         // We should only update the UI on the main thread, and in addition, we use NSRunLoopCommonModes to make sure the UI updates when a modal window is up.
-        [self performSelectorOnMainThread:@selector(_reloadRowForEntity:) withObject:inObject waitUntilDone:NO modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		IMBDynamicTableView *affectedTableView = (IMBDynamicTableView *)inContext;
+		NSInteger row = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inObject];
+		if (NSNotFound != row)
+		{
+			[affectedTableView performSelectorOnMainThread:@selector(_reloadRow:) withObject:[NSNumber numberWithInt:row] waitUntilDone:NO modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		}
+		
     }
 	
 	// If the array itself has changed then display the new object count...
 	
 	else if (inContext == (void*)kArrangedObjectsKey)
 	{
-//		[self _reloadIconView];
+		//		[self _reloadIconView];
 		[self willChangeValueForKey:kObjectCountStringKey];
 		[self didChangeValueForKey:kObjectCountStringKey];
 	}
@@ -286,48 +274,39 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (IMBNode*) currentNode
 {
 	return [_nodeViewController selectedNode];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Persistence 
-
 
 - (void) setLibraryController:(IMBLibraryController*)inLibraryController
 {
 	id old = _libraryController;
 	_libraryController = [inLibraryController retain];
 	[old release];
-
+	
 	[self _loadStateFromPreferences];
 }
-
 
 - (NSString*) mediaType
 {
 	return self.libraryController.mediaType;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (NSMutableDictionary*) _preferences
 {
 	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
 	return [NSMutableDictionary dictionaryWithDictionary:[classDict objectForKey:self.mediaType]];
 }
-
 
 - (void) _setPreferences:(NSMutableDictionary*)inDict
 {
@@ -336,19 +315,17 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[IMBConfig setPrefs:classDict forClass:self.class];
 }
 
-
 - (void) _saveStateToPreferences
 {
-//	NSIndexSet* selectionIndexes = [ibObjectArrayController selectionIndexes];
-//	NSData* selectionData = [NSKeyedArchiver archivedDataWithRootObject:selectionIndexes];
+	//	NSIndexSet* selectionIndexes = [ibObjectArrayController selectionIndexes];
+	//	NSData* selectionData = [NSKeyedArchiver archivedDataWithRootObject:selectionIndexes];
 	
 	NSMutableDictionary* stateDict = [self _preferences];
 	[stateDict setObject:[NSNumber numberWithUnsignedInteger:self.viewType] forKey:@"viewType"];
 	[stateDict setObject:[NSNumber numberWithDouble:self.iconSize] forKey:@"iconSize"];
-//	[stateDict setObject:selectionData forKey:@"selectionData"];
+	//	[stateDict setObject:selectionData forKey:@"selectionData"];
 	[self _setPreferences:stateDict];
 }
-
 
 - (void) _loadStateFromPreferences
 {
@@ -356,18 +333,15 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntValue];
 	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
 	
-//	NSData* selectionData = [stateDict objectForKey:@"selectionData"];
-//	NSIndexSet* selectionIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:selectionData];
-//	[ibObjectArrayController setSelectionIndexes:selectionIndexes];
+	//	NSData* selectionData = [stateDict objectForKey:@"selectionData"];
+	//	NSIndexSet* selectionIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:selectionData];
+	//	[ibObjectArrayController setSelectionIndexes:selectionIndexes];
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
 #pragma mark User Interface
-
 
 // Subclasses can override these methods to configure or customize look & feel of the various object views...
 
@@ -382,7 +356,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	}
 }
 
-
 - (void) _configureListView
 {
 	[ibListView setTarget:self];
@@ -390,7 +363,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
     [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
     [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
-
 
 - (void) _configureComboView
 {
@@ -400,51 +372,41 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
     [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) willShowView
 {
 	// To be overridden by subclass...
 }
 
-
 - (void) didShowView
 {
 	// To be overridden by subclass...
 }
-
 
 - (void) willHideView
 {
 	// To be overridden by subclass...
 }
 
-
 - (void) didHideView
 {
 	// To be overridden by subclass...
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (NSImage*) icon
 {
 	return nil;	// Must be overridden by subclass
 }
 
-
 - (NSString*) displayName
 {
 	return nil;	// Must be overridden by subclass
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Availability of the icon size slide depends on the view type (e.g. not available in list view...
 
@@ -455,15 +417,12 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[self didChangeValueForKey:@"canUseIconSize"];
 }
 
-
 - (BOOL) canUseIconSize
 {
 	return self.viewType != kIMBObjectViewTypeList;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // When the icon size changes, get the current cell size in the IKImageBrowserView and notify the parser.
 // This may be helpfull for the parser so that it can supply larger thumbnails...
@@ -481,9 +440,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (NSString*) objectCountString
 {
@@ -492,9 +449,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	return [NSString stringWithFormat:format,count];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) _reloadIconView
 {
@@ -502,13 +457,10 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Context Menu
- 
 
 - (NSMenu*) menuForObject:(IMBObject*)inObject
 {
@@ -517,17 +469,17 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"contextMenu"] autorelease];
 	NSMenuItem* item = nil;
 	NSString* title = nil;
-
+	
 	// For node objects (folders) provide a menu item to drill down the hierarchy...
 	
 	if ([inObject isKindOfClass:[IMBNodeObject class]])
 	{
 		title = NSLocalizedStringWithDefaultValue(
-			@"IMBObjectViewController.menuItem.open",
-			nil,IMBBundle(),
-			@"Open",
-			@"Menu item in context menu of IMBObjectViewController");
-			
+												  @"IMBObjectViewController.menuItem.open",
+												  nil,IMBBundle(),
+												  @"Open",
+												  @"Menu item in context menu of IMBObjectViewController");
+		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openSubNode:) keyEquivalent:@""];
 		[item setRepresentedObject:[inObject value]];
 		[item setTarget:self];
@@ -540,22 +492,22 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	if ([[inObject value] isKindOfClass:[NSString class]])
 	{
 		NSString* path = (NSString*)[inObject value];
-
+		
 		if ([[NSFileManager threadSafeManager] fileExistsAtPath:path])
 		{
 			NSString* appPath = nil;
 			NSString* type = nil;
 			BOOL found = [[NSWorkspace threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type];
-
+			
 			// Open with <application>...
 			
 			if (found)
 			{
 				title = NSLocalizedStringWithDefaultValue(
-					@"IMBObjectViewController.menuItem.openInApp",
-					nil,IMBBundle(),
-					@"Open in %@",
-					@"Menu item in context menu of IMBObjectViewController");
+														  @"IMBObjectViewController.menuItem.openInApp",
+														  nil,IMBBundle(),
+														  @"Open in %@",
+														  @"Menu item in context menu of IMBObjectViewController");
 				
 				NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
 				title = [NSString stringWithFormat:title,appName];	
@@ -563,26 +515,26 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 			else
 			{
 				title = NSLocalizedStringWithDefaultValue(
-					@"IMBObjectViewController.menuItem.openWithFinder",
-					nil,IMBBundle(),
-					@"Open with Finder",
-					@"Menu item in context menu of IMBObjectViewController");
+														  @"IMBObjectViewController.menuItem.openWithFinder",
+														  nil,IMBBundle(),
+														  @"Open with Finder",
+														  @"Menu item in context menu of IMBObjectViewController");
 			}
-				
+			
 			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInApp:) keyEquivalent:@""];
 			[item setRepresentedObject:path];
 			[item setTarget:self];
 			[menu addItem:item];
 			[item release];
-
+			
 			// Reveal in Finder...
 			
 			title = NSLocalizedStringWithDefaultValue(
-				@"IMBObjectViewController.menuItem.revealInFinder",
-				nil,IMBBundle(),
-				@"Reveal in Finder",
-				@"Menu item in context menu of IMBObjectViewController");
-				
+													  @"IMBObjectViewController.menuItem.revealInFinder",
+													  nil,IMBBundle(),
+													  @"Reveal in Finder",
+													  @"Menu item in context menu of IMBObjectViewController");
+			
 			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
 			[item setRepresentedObject:path];
 			[item setTarget:self];
@@ -596,23 +548,23 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	else if ([[inObject value] isKindOfClass:[NSURL class]])
 	{
 		title = NSLocalizedStringWithDefaultValue(
-			@"IMBObjectViewController.menuItem.download",
-			nil,IMBBundle(),
-			@"Download",
-			@"Menu item in context menu of IMBObjectViewController");
-			
+												  @"IMBObjectViewController.menuItem.download",
+												  nil,IMBBundle(),
+												  @"Download",
+												  @"Menu item in context menu of IMBObjectViewController");
+		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(download:) keyEquivalent:@""];
 		[item setRepresentedObject:[inObject value]];
 		[item setTarget:self];
 		[menu addItem:item];
 		[item release];
-
+		
 		title = NSLocalizedStringWithDefaultValue(
-			@"IMBObjectViewController.menuItem.openInBrowser",
-			nil,IMBBundle(),
-			@"Open in Browser",
-			@"Menu item in context menu of IMBObjectViewController");
-			
+												  @"IMBObjectViewController.menuItem.openInBrowser",
+												  nil,IMBBundle(),
+												  @"Open in Browser",
+												  @"Menu item in context menu of IMBObjectViewController");
+		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInBrowser:) keyEquivalent:@""];
 		[item setRepresentedObject:[inObject value]];
 		[item setTarget:self];
@@ -620,20 +572,20 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 		[item release];
 	}
 	
-//	// QuickLook...
-//	
-//	title = NSLocalizedStringWithDefaultValue(
-//		@"IMBObjectViewController.menuItem.quickLook",
-//		nil,IMBBundle(),
-//		@"Quicklook",
-//		@"Menu item in context menu of IMBObjectViewController");
-//		
-//	item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
-//	[item setRepresentedObject:inObject];
-//	[item setTarget:self];
-//	[menu addItem:item];
-//	[item release];
-
+	//	// QuickLook...
+	//	
+	//	title = NSLocalizedStringWithDefaultValue(
+	//		@"IMBObjectViewController.menuItem.quickLook",
+	//		nil,IMBBundle(),
+	//		@"Quicklook",
+	//		@"Menu item in context menu of IMBObjectViewController");
+	//		
+	//	item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
+	//	[item setRepresentedObject:inObject];
+	//	[item setTarget:self];
+	//	[menu addItem:item];
+	//	[item release];
+	
 	// Give parser a chance to add menu items...
 	
 	IMBParser* parser = self.currentNode.parser;
@@ -655,13 +607,11 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	return menu;
 }
 
-
 - (IBAction) openInApp:(id)inSender
 {
 	NSString* path = (NSString*)[inSender representedObject];
 	[[NSWorkspace threadSafeWorkspace] openFile:path];
 }
-
 
 - (IBAction) download:(id)inSender
 {
@@ -671,13 +621,11 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[promise startLoadingWithDelegate:self finishSelector:nil];
 }
 
-
 - (IBAction) openInBrowser:(id)inSender
 {
 	NSURL* url = (NSURL*)[inSender representedObject];
 	[[NSWorkspace threadSafeWorkspace] openURL:url];
 }
-
 
 - (IBAction) revealInFinder:(id)inSender
 {
@@ -686,7 +634,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[[NSWorkspace threadSafeWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
 }
 
-
 - (IBAction) openSubNode:(id)inSender
 {
 	IMBNode* node = (IMBNode*)[inSender representedObject];
@@ -694,20 +641,16 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[_nodeViewController selectNode:node];
 }
 
-
 //- (IBAction) quicklook:(id)inSender
 //{
 //	[[IMBQuickLookController sharedController] setDataSource:self];
 //	[[IMBQuickLookController sharedController] toggle:nil];
 //}
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Opening
- 
 
 // Open the selected objects...
 
@@ -717,7 +660,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	NSArray* objects = [ibObjectArrayController selectedObjects];
 	[self openObjects:objects inSelectedNode:node];
 }
-
 
 // Open the specified objects...
 
@@ -733,11 +675,11 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 		[_nodeViewController expandSelectedNode];
 		[_nodeViewController selectNode:subnode];
 	}
-		
+	
 	// Double-clicking opens the files (with the default app). Please note that IMBObjects are first passed through an 
 	// IMBObjectPromise (which is returned by the parser), because the files may not yet be available locally. In this
 	// case the promise object loads them asynchronously and calls _openLocalFiles: once the download has finsihed...
-		
+	
 	else if (inSelectedNode)
 	{
 		IMBParser* parser = inSelectedNode.parser;
@@ -745,7 +687,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalFiles:withError:)];
 	}
 }
-
 
 - (void) _openLocalFiles:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
 {
@@ -762,13 +703,10 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark QuickLook
- 
 
 //- (NSURL*) _urlForObject:(IMBObject*)inObject
 //{
@@ -870,19 +808,15 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 //	return NO;
 //}
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Dragging
- 
 
 - (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
 {
 	_isDragging = NO;
 }
-
 
 // For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
 // the IMBObjectPromise for the client and block it until all objects are loaded...
@@ -893,7 +827,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	return [self _namesOfPromisedFiles];
 }
 
-
 // Even dumber are apps that do not support NSFilesPromisePboardType, but only know about NSFilenamesPboardType.
 // In this case we'll download to the temp folder and block synchronously until the download has completed...
 
@@ -903,7 +836,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	{
 		NSData* data = [inPasteboard dataForType:kIMBObjectPromiseType];
 		IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-
+		
 		promise.downloadFolderPath = NSTemporaryDirectory();
 		[promise startLoadingWithDelegate:self finishSelector:nil];
 		[promise waitUntilDone];
@@ -911,7 +844,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 		[inPasteboard setPropertyList:promise.localFiles forType:NSFilenamesPboardType];
     }
 }
-
 
 - (void) _downloadSelectedObjectsToDestination:(NSURL*)inDestination
 {
@@ -927,7 +859,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 		[promise startLoadingWithDelegate:self finishSelector:nil];
 	}
 }
-
 
 - (NSArray*) _namesOfPromisedFiles
 {
@@ -949,23 +880,22 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	return names;
 }
 
-
 - (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
 	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
-
+	
 	NSString* title = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.progress.title",
-		nil,IMBBundle(),
-		@"Downloading Media Files",
-		@"Window title of progress panel of IMBObjectViewController");
-
+														@"IMBObjectViewController.progress.title",
+														nil,IMBBundle(),
+														@"Downloading Media Files",
+														@"Window title of progress panel of IMBObjectViewController");
+	
 	NSString* message = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.progress.message.preparing",
-		nil,IMBBundle(),
-		@"Preparing…",
-		@"Text message in progress panel of IMBObjectViewController");
-
+														  @"IMBObjectViewController.progress.message.preparing",
+														  nil,IMBBundle(),
+														  @"Preparing…",
+														  @"Text message in progress panel of IMBObjectViewController");
+	
 	[controller window];
 	[controller setTitle:title];
 	[controller setMessage:message];
@@ -978,7 +908,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	self.progressWindowController = controller;
 }
 
-
 - (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
 	[self.progressWindowController setProgress:inFraction];
@@ -986,19 +915,15 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[self.progressWindowController.cancelButton setEnabled:YES];
 }
 
-
 - (void) cleanupProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
 {
 	self.progressWindowController = nil;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark IKImageBrowserDelegate
- 
 
 // First give the delegate a chance to handle the double click. It it chooses not to, then we will 
 // handle it ourself by simply opening the files (with their default app)...
@@ -1025,9 +950,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	}	
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Since IKImageBrowserView doesn't support context menus out of the box, we need to display them manually in 
 // the following two delegate methods. Why couldn't Apple take care of this?
@@ -1038,7 +961,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[NSMenu popUpContextMenu:menu withEvent:inEvent forView:inView];
 }
 
-
 - (void) imageBrowser:(IKImageBrowserView*)inView cellWasRightClickedAtIndex:(NSUInteger)inIndex withEvent:(NSEvent*)inEvent
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
@@ -1046,9 +968,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	[NSMenu popUpContextMenu:menu withEvent:inEvent forView:inView];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
 // start loading the objects in the promise and iterate over the resulting files...
@@ -1056,18 +976,18 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 - (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
 	IMBNode* node = self.currentNode;
-
+	
 	if (node)
 	{
 		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
-
+		
 		IMBParser* parser = node.parser;
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
 		
 		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,/*NSFilesPromisePboardType,*/NSFilenamesPboardType,nil] owner:self];
 		[inPasteboard setData:data forType:kIMBObjectPromiseType];
-//		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
+		//		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
 		
 		_isDragging = YES;
 		return objects.count;
@@ -1076,13 +996,10 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	return 0;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark NSTableViewDelegate
- 
 
 // If the object for the cell that we are about to display doesn't have any metadata yet, then load it lazily...
 // Note: According to WWDC Session 110, this is called a LOT so it's not good for delayed loading...
@@ -1090,7 +1007,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 - (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
-
+	
 	if (object.metadata == nil)
 	{
 		[object.parser loadMetadataForObject:object];
@@ -1123,9 +1040,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // We do not allow any editing in the list or combo view...
 
@@ -1134,9 +1049,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	return NO;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Doubleclicking a row opens the selected items. This may trigger a download if the user selected remote objects...
 
@@ -1162,9 +1075,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	}	
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
 // start loading the objects in the promise and iterate over the resulting files...
@@ -1172,18 +1083,18 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 - (BOOL) tableView:(NSTableView*)inTableView writeRowsWithIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard 
 {
 	IMBNode* node = self.currentNode;
-
+	
 	if (node)
 	{
 		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
-
+		
 		IMBParser* parser = node.parser;
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
 		
 		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,/*NSFilesPromisePboardType,*/NSFilenamesPboardType,nil] owner:self];
 		[inPasteboard setData:data forType:kIMBObjectPromiseType];
-//		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
+		//		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
 		
 		_isDragging = YES;
 		return YES;
@@ -1191,7 +1102,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	
 	return NO;
 }
-
 
 // For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
 // the IMBObjectPromise for the client and block it until all objects are loaded...
@@ -1202,95 +1112,40 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	return [self _namesOfPromisedFiles];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark 
 #pragma mark IMBDynamicTableViewDelegate
 
-
 // We pre-load the images in batches. We could easily use this as a point to stop loading rows that are no longer visible and don't have the images fully loaded. We use this as an entry point to start/stop watching the image for the visible items to see when it changes.
-- (void)dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows {
+- (void)dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows
+{
 	NSLog(@"%s",__FUNCTION__);
-
- // First, stop observing all prior things
-    for (IMBObject *imageEntity in _observedVisibleItems) {
-        if ([imageEntity isKindOfClass:[IMBVisualObject class]]) {
+	
+	// First, stop observing all prior things
+    for (IMBObject *imageEntity in _observedVisibleItems)
+	{
+        if ([imageEntity isKindOfClass:[IMBVisualObject class]])
+		{
             [imageEntity removeObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage];
+			
+			NSLog(@"Need to remove load from queue %@", [IMBOperationQueue sharedQueue]);
         }
     }
     // Now, observe things that are newly visible and kick off a request to load the image
     [_observedVisibleItems release];
     _observedVisibleItems = [[[ibObjectArrayController arrangedObjects] subarrayWithRange:newVisibleRows] retain];
-    for (IMBObject *imageEntity in _observedVisibleItems) {
-        if ([imageEntity isKindOfClass:[IMBVisualObject class]]) {
-            [(IMBVisualObject *)imageEntity loadImage];
-            [imageEntity addObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage options:0 context:NULL];
-        }
-    }
-}
-
-/*
-- (NSView *)dynamicTableView:(IMBDynamicTableView *)tableView viewForRow:(NSInteger)row {
-		NSLog(@"%s",__FUNCTION__);
-
-    // Return a spinner for rows that are loading
-    NSProgressIndicator *result = nil;
-
-	IMBObject* entity = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
-
-	if ([entity isKindOfClass:[IMBVisualObject class]])
+    for (IMBObject *imageEntity in _observedVisibleItems)
 	{
-		IMBVisualObject *visualEntity = (IMBVisualObject *)entity;
-
-		if (visualEntity.thumbnailImage == nil) {
-			NSRect cellFrame = [tableView frameOfCellAtColumn:0 row:row];
-			
-			// FIXME:  this puts a spinning indicator on the cell assuming it's the combo cell.  Maybe check cell type first.
-			
-			
-			IMBComboTextCell *imageCell = (IMBComboTextCell *)[tableView preparedCellAtColumn:0 row:row];
-			NSRect imageFrame = [imageCell imageRectForBounds:cellFrame];
-			result = [[[NSProgressIndicator alloc] initWithFrame:imageFrame] autorelease];
-			[result setIndeterminate:YES];
-			[result setStyle:NSProgressIndicatorSpinningStyle];
-			[result setControlSize:NSRegularControlSize];        
-			[result sizeToFit];
-			[result startAnimation:nil];
-			NSRect progressFrame = [result frame];
-			// Center it in the image frame
-			progressFrame.origin.x = NSMinX(imageFrame) + floor((NSWidth(imageFrame) - NSWidth(progressFrame)) / 2.0);
-			progressFrame.origin.y = NSMinY(imageFrame) + floor((NSHeight(imageFrame) - NSHeight(progressFrame)) / 2.0);
-			[result setFrame:progressFrame];
-		}
-	}
-    return result;
-}
- */
-
-- (void)_reloadRowForEntity:(id)object {
-	NSLog(@"%s",__FUNCTION__);
-/*
-    NSInteger row = [_tableContents indexOfObject:object];
-    if (row != NSNotFound) {
-        [_tableViewMain reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
-        // Animate if that item is selected and we now have an image for it
-        if ([_tableViewMain selectedRow] == row) {
-            [self _animateImageFromRow:row];
+        if ([imageEntity isKindOfClass:[IMBVisualObject class]])
+		{
+            [(IMBVisualObject *)imageEntity queueThumbnailImageLoad];
+            [imageEntity addObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage options:0 context:tableView];
         }
     }
-*/
 }
-
-
-
-
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-
-
 
 @end
 

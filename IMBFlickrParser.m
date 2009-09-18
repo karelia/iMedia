@@ -61,12 +61,9 @@
 #import "IMBParserController.h"
 #import "NSWorkspace+iMedia.h"
 
-
-
 #define VERBOSE
 
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @interface IMBNode (FlickrParserAdditions)
 
@@ -81,9 +78,7 @@
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 //	Some additions to the iMB node useful for Flickr handling:
 @implementation IMBNode (FlickrParserAdditions)
@@ -91,7 +86,6 @@
 - (void) clearResponse {
 	[(NSMutableDictionary*)self.attributes removeObjectForKey:@"flickrResponse"];
 }
-
 
 - (OFFlickrAPIRequest*) flickrRequestWithContext: (OFFlickrAPIContext*) context {
 	OFFlickrAPIRequest* request = [self.attributes objectForKey:@"flickrRequest"];
@@ -108,21 +102,17 @@
 	return request;
 }
 
-
 - (NSDictionary*) flickrResponse {
 	return [self.attributes objectForKey:@"flickrResponse"];
 }
-
 
 - (BOOL) hasFlickrRequest {
 	return [self.attributes objectForKey:@"flickrRequest"] != nil;
 }
 
-
 - (BOOL) hasFlickrResponse {
 	return [self.attributes objectForKey:@"flickrResponse"] != nil;
 }
-
 
 - (void) setFlickrMethod: (NSString*) method
 			   arguments: (NSDictionary*) arguments {
@@ -131,11 +121,9 @@
 	[(NSMutableDictionary*)self.attributes setObject:arguments forKey:@"flickrArguments"];
 }
 
-
 - (void) setFlickrResponse: (NSDictionary*) response {
 	[(NSMutableDictionary*)self.attributes setObject:response forKey:@"flickrResponse"];
 }
-
 
 - (void) startFlickrRequestWithContext: (OFFlickrAPIContext*) context
 							  delegate: (id) delegate {
@@ -156,8 +144,6 @@
 
 @end
 
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 @interface IMBFlickrParser ()
@@ -176,14 +162,12 @@
 	[pool release];
 }
 
-
 - (void) dealloc {
 	IMBRelease (_flickrAPIKey);
 	IMBRelease (_flickrContext);
 	IMBRelease (_flickrSharedSecret);
 	[super dealloc];
 }
-
 
 #pragma mark
 #pragma mark Actions
@@ -202,7 +186,6 @@
 		NSLog (@"Can't handle this kind of object.");
 	}
 }
-
 
 #pragma mark 
 #pragma mark Flickr Handling
@@ -232,7 +215,6 @@
 	return objects;
 }
 
-
 - (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
   didCompleteWithResponse: (NSDictionary*) inResponseDictionary {
 	
@@ -254,7 +236,6 @@
 	[libController reloadNode:node];	
 }
 
-
 - (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
 		 didFailWithError: (NSError*) inError {
 	
@@ -262,11 +243,9 @@
 	//	TODO: Error Handling
 }
 
-
 - (void) startFlickrRequestForNode: (IMBNode*) node {
 	[node startFlickrRequestWithContext:_flickrContext delegate:self];
 }
-
 
 #pragma mark 
 #pragma mark Parser Methods
@@ -307,7 +286,6 @@
 }
 /// ... JUST TEMP TO PLEASE THE EYE
 
-
 - (NSImage*) smartFolderIcon {
 	NSBundle* coreTypes = [NSBundle	bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
 	NSString* path = [coreTypes pathForResource:@"SmartFolderIcon.icns" ofType:nil];
@@ -337,7 +315,6 @@
 	return node;
 }
 
-
 - (IMBNode*) createInterestingPhotosNodeForRoot: (IMBNode*) root {
 	IMBNode* node = [self createGenericFlickrNodeForRoot:root];
 	node.icon = [self smartFolderIcon];
@@ -351,7 +328,6 @@
 	return node;
 }
 
-
 - (IMBNode*) createRecentPhotosNodeForRoot: (IMBNode*) root {
 	IMBNode* node = [self createGenericFlickrNodeForRoot:root];
 	node.icon = [self smartFolderIcon];
@@ -364,7 +340,6 @@
 	
 	return node;
 }
-
 
 - (IMBNode*) createNodeForSearch: (NSString*) text
 						   title: (NSString*) title
@@ -384,7 +359,6 @@
 	return node;
 }
 
-
 - (IMBNode*) createNodeForTags: (NSString*) tags
 						 title: (NSString*) title
 						  root: (IMBNode*) root {
@@ -403,7 +377,6 @@
 	
 	return node;
 }
-
 
 ///	Create an empty "Flickr" root node.
 - (IMBNode*) createRootNode {
@@ -447,12 +420,10 @@
 	return rootNode;
 }
 
-
 - (NSString*) identifierWithMethod: (NSString*) method argument: (NSString*) argument {
 	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", method, argument];
 	return [self identifierForPath:albumPath];
 }
-
 
 - (IMBNode*) nodeWithOldNode: (const IMBNode*) inOldNode 
 					 options: (IMBOptions) inOptions 
@@ -473,7 +444,6 @@
 	
 	return updatedNode;
 }
-
 
 // The supplied node is a private copy which may be modified here in the background operation. Parse the 
 // iPhoto XML file and create subnodes as needed...
@@ -517,7 +487,6 @@
 	return error == nil;
 }
 
-
 - (void) willShowContextMenu: (NSMenu*) inMenu forObject: (IMBObject*) inObject {
 	//	'Open Flickr Page'...
 	NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Open Flickr Page", @"Flickr parser context menu title.") 
@@ -528,7 +497,6 @@
 	[inMenu addItem:showWebPageItem];
 	[showWebPageItem release];
 }
-
 
 - (void) willUseParser {
 	[super willUseParser];
@@ -541,13 +509,11 @@
 	}	
 }
 
-
 // For Flickr we need a remote promise that downloads the files off the internet
 - (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects
 {
 	return [[(IMBObjectPromise*)[IMBRemoteObjectPromise alloc] initWithObjects:inObjects] autorelease];
 }
-
 
 #pragma mark 
 #pragma mark Actions
@@ -556,7 +522,6 @@
 {
 	NSBeep();
 }
-
 
 - (IBAction) deleteSearch:(id)inSender
 {

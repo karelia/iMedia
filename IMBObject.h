@@ -43,17 +43,13 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CLASSES
 
 @class IMBParser;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // This object encapsulates information about a single media item (e.g. image file or audio file). The value 
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
@@ -76,9 +72,7 @@
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // This subclass can be used for image or movie files, i.e. items that need a visual representation and are
 // displayed with IKIMageBrowserView... 
@@ -88,15 +82,14 @@
 	id _imageRepresentation;								
 	NSString* _imageRepresentationType;		
 	NSUInteger _imageVersion;
-	// Cache the CGImageRef? __strong CGImageRef _thumbnailImage ;
 	NSImage *_thumbnailImage ;
     BOOL _imageLoading;
 }
 
-- (void)loadImage;			// Load the image (for dynamic table view)
+- (void)queueThumbnailImageLoad;			// Load the image (for dynamic table view)
 
 @property (readonly) NSString* imageUID;
-@property (retain) id imageRepresentation;					///< NSString, NSURL, NSImage, CIImage, or CGImageRef
+@property (retain) id imageRepresentation;					///< NSString, NSURL, NSImage, or CGImageRef
 @property (retain) NSString* imageRepresentationType;		///< See IKImageBrowserItem for possible values
 @property (readonly) NSString* imageTitle;
 @property (assign) NSUInteger imageVersion;
@@ -108,9 +101,7 @@
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // This subclass is used to represent nodes in the object views (examples are folder and events). The reason we 
 // have these hybrid objects is to have a double clickable item in the object views, which can be used to drill
@@ -124,6 +115,5 @@
 @property (retain) NSString* path;	
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------

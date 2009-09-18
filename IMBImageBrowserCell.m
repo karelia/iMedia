@@ -43,18 +43,14 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
 #import "IMBImageBrowserCell.h"
 #import "IMBObject.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @interface IKImageBrowserCell ()
 
@@ -66,7 +62,6 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
 
 @implementation IMBImageBrowserCell
@@ -74,9 +69,7 @@
 @synthesize imbShouldDrawOutline = _imbShouldDrawOutline;
 @synthesize imbShouldDrawShadow = _imbShouldDrawShadow;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (id) init
 {
@@ -89,9 +82,7 @@
 	return self;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Disable outline and shadow drawing for folders (IMBNodeObject)...
 
@@ -106,9 +97,7 @@
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) drawShadow
 {
@@ -118,7 +107,6 @@
 	}
 }
 
-
 - (void) drawImageOutline
 {
 	if (_imbShouldDrawOutline)
@@ -126,7 +114,6 @@
 		[super drawImageOutline];	
 	}	
 }
-
 
 - (void) sizeDidChange
 {	
@@ -148,9 +135,7 @@
 	[super sizeDidChange];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end
 

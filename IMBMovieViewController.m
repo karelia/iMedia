@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -54,17 +52,13 @@
 #import "IMBCommon.h"
 #import "NSWorkspace+iMedia.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
 @implementation IMBMovieViewController
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) awakeFromNib
 {
@@ -75,24 +69,19 @@
 		nil];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (NSString*) mediaType
 {
 	return kIMBMediaTypeMovie;
 }
 
-
 + (NSString*) nibName
 {
 	return @"IMBMovieView";
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (NSImage*) icon
 {
@@ -100,7 +89,6 @@
 	NSString* path = [coreTypes pathForResource:@"ToolbarMovieFolderIcon.icns" ofType:nil];
 	return [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
 }
-
 
 - (NSString*) displayName
 {
@@ -111,9 +99,7 @@
 		@"mediaType display name");
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (NSString*) objectCountFormatSingular
 {
@@ -124,7 +110,6 @@
 		@"Format string for object count in singluar");
 }
 
-
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
@@ -134,9 +119,7 @@
 		@"Format string for object count in plural");
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end
 

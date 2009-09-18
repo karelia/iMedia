@@ -23,7 +23,6 @@
 
 #import "UKMainThreadProxy.h"
 
-
 @implementation UKMainThreadProxy
 
 -(id)	initWithTarget: (id)targ
@@ -38,12 +37,10 @@
 	return self;
 }
 
-
 -(void)	setWaitForCompletion: (BOOL)state
 {
 	waitForCompletion = state;
 }
-
 
 // -----------------------------------------------------------------------------
 //	Introspection overrides:
@@ -55,7 +52,6 @@
 	
 	return( does || [target respondsToSelector: itemAction] );
 }
-
 
 -(id)	performSelector: (SEL)itemAction
 {
@@ -72,7 +68,6 @@
 	
 	return nil;
 }
-
 
 -(id)	performSelector: (SEL)itemAction withObject: (id)obj
 {
@@ -121,7 +116,6 @@
         [self doesNotRecognizeSelector: itemAction];
 }
 
-
 // -----------------------------------------------------------------------------
 //	Safety net:
 // -----------------------------------------------------------------------------
@@ -137,7 +131,6 @@
 }
 
 @end
-
 
 // -----------------------------------------------------------------------------
 //	Shorthand notation for getting a main thread proxy:

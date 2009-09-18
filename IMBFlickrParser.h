@@ -46,9 +46,7 @@
 //  Created by Christoph Priebe on 2009-08-24.
 //  Copyright 2009 Christoph Priebe. All rights reserved.
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 //	System
 #import <Cocoa/Cocoa.h>
@@ -59,9 +57,7 @@
 //	iMedia
 #import "IMBParser.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 /**
  *	iMedia parser to read public Flickr images.
@@ -80,7 +76,6 @@
  *	@since   iMedia 2.0
  */
 
-
 @interface IMBFlickrParser: IMBParser <OFFlickrAPIRequestDelegate> {
 	@private
 	NSString* _flickrAPIKey;
@@ -98,7 +93,6 @@
 - (IBAction) deleteSearch:(id)inSender;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

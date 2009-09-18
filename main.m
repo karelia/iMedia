@@ -5,6 +5,7 @@
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
+ The new architecture for version 2.0 was developed by Peter Baumgartner.
  Contributions have also been made by Matt Gough, Martin Wennerberg and others
  as indicated in source files.
  
@@ -28,7 +29,7 @@
 	below, and the aforementioned copyright notice, or b) the aforementioned
 	copyright notice and a link to karelia.com/imedia.
  
-	Neither the name o f Karelia Software, nor Sandvox, nor the names of
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
 	contributors to iMedia Browser may be used to endorse or promote products
 	derived from the Software without prior and express written permission from
 	Karelia Software or individual contributors, as appropriate.

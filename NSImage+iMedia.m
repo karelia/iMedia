@@ -5,6 +5,7 @@
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
+ The new architecture for version 2.0 was developed by Peter Baumgartner.
  Contributions have also been made by Matt Gough, Martin Wennerberg and others
  as indicated in source files.
  
@@ -41,7 +42,6 @@
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
-
 
 #import "NSImage+iMedia.h"
 #import "NSString+iMedia.h"

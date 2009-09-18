@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CONSTANTS
 
@@ -57,7 +55,5 @@ NSString* kIMBMediaTypeMovie = @"movie";
 NSString* kIMBMediaTypeLink = @"link";
 NSString* kIMBMediaTypeContact = @"contact";
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
