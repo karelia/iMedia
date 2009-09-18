@@ -52,6 +52,7 @@
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
 #import <Quartz/Quartz.h>
+#import <QuickLook/QuickLook.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -157,8 +158,8 @@
 	return self;
 }
 
-// TODO: FIX
-#define MAX_THUMBNAIL_SIZE 256
+// TODO: make variable?
+#define MAX_THUMBNAIL_SIZE 128
 
 - (void) main
 {
@@ -168,15 +169,14 @@
 	NSString *imageRepresentationType = visualObject.imageRepresentationType;
 	id imageRepresentation = visualObject.imageRepresentation;
 	NSImage *image = nil;		// This should be filled in below according to the data type.  Autoreleased.
-	CGImageSourceRef source = nil;	// This may be set instead, which means we finish the job.
+	CGImageRef retainedCGImage = nil;		// This may be set instead (retained), which means we finish the job.
+	CGImageSourceRef retainedSource = nil;	// This may be set instead (retained), which means we finish the job.
 	
 	if ([imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType])
 	{
 		// path
 		NSURL *url = [NSURL fileURLWithPath:imageRepresentation];
-		source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
-		
-		image = [[[NSImage alloc] initWithContentsOfFile:imageRepresentation] autorelease];
+		retainedSource = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
 	}
 	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
 	{
@@ -185,7 +185,7 @@
 		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
 								 (id)kCFBooleanTrue, (id)kCGImageSourceShouldCache,
 								 NULL];
-		source = CGImageSourceCreateWithURL((CFURLRef)imageRepresentation, (CFDictionaryRef)options);
+		retainedSource = CGImageSourceCreateWithURL((CFURLRef)imageRepresentation, (CFDictionaryRef)options);
 	}
 	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
 	{
@@ -195,23 +195,20 @@
 	{
 		// CGImageRef
 		// Actually maybe I should try to get the thumbnail first
-		
-		NSBitmapImageRep *bitmap = [[[NSBitmapImageRep alloc] initWithCGImage:(CGImageRef)imageRepresentation] autorelease];
-        image = [[[NSImage alloc] initWithSize:[bitmap size]] autorelease];
-        [image addRepresentation:bitmap];
-		
-		
+		retainedCGImage = (CGImageRef)imageRepresentation;
+		CGImageRetain(retainedCGImage);	// retain this since we are treating that as a temporary image, below.
 	}
 	else if ([imageRepresentationType isEqualToString:IKImageBrowserCGImageSourceRepresentationType])
 	{
 		// CGImageSourceRef
-		source = (CGImageSourceRef)imageRepresentation;
+		retainedSource = (CGImageSourceRef)imageRepresentation;
+		CFRetain(retainedSource);	// retain this since we are treating that as a temporary source, below.
 		
 	}
 	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSDataRepresentationType])
 	{
 		// NSData
-		source = CGImageSourceCreateWithData((CFDataRef)imageRepresentation, NULL);
+		retainedSource = CGImageSourceCreateWithData((CFDataRef)imageRepresentation, NULL);
 	}
 	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSBitmapImageRepresentationType])
 	{
@@ -236,13 +233,21 @@
 		// IconRef
 		image = [[[NSImage alloc] initWithIconRef:(IconRef)imageRepresentation] autorelease];
 	}
+	else if ([imageRepresentationType isEqualToString:IKImageBrowserQuickLookPathRepresentationType])
+	{
+		// QuickLook file path or URL
+		NSURL *url = [imageRepresentation isKindOfClass:[NSURL class]]
+			? imageRepresentation
+			: [NSURL fileURLWithPath:imageRepresentation];
+		retainedCGImage = QLThumbnailImageCreate(kCFAllocatorDefault, (CFURLRef)url, 
+				CGSizeMake(MAX_THUMBNAIL_SIZE, MAX_THUMBNAIL_SIZE), NULL);
+	}
 	/* These are the types that we DON'T SUPPORT at this time:
 	 IKImageBrowserQCCompositionRepresentationType
 	 IKImageBrowserQCCompositionPathRepresentationType
-	 IKImageBrowserQuickLookPathRepresentationType
-	 
 	 */
-	if (source)		// did the above get us a CGImageSource? If so we'll create the NSImage now.
+	
+	if (retainedSource)		// did the above get us a CGImageSource? If so we'll create the NSImage now.
 	{
 		NSDictionary* thumbOpts = [NSDictionary dictionaryWithObjectsAndKeys:
 								   (id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailWithTransform,
@@ -251,15 +256,19 @@
 								   [NSNumber numberWithInteger:MAX_THUMBNAIL_SIZE], (id)kCGImageSourceThumbnailMaxPixelSize, 
 								   nil];
 		
-		CGImageRef theCGImage = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)thumbOpts);
-		if (theCGImage)
-		{
-			NSBitmapImageRep *bitmap = [[[NSBitmapImageRep alloc] initWithCGImage:theCGImage] autorelease];
-			image = [[[NSImage alloc] initWithSize:[bitmap size]] autorelease];
-			[image addRepresentation:bitmap];
-			CGImageRelease(theCGImage);
-		}
-		CFRelease(source);
+		retainedCGImage = CGImageSourceCreateThumbnailAtIndex(retainedSource, 0, (CFDictionaryRef)thumbOpts);
+		CFRelease(retainedSource);
+	}
+	
+	// Now if we have a CGImageRef, make the NSImage from that.
+	
+	if (retainedCGImage)
+	{
+		NSBitmapImageRep *bitmap = [[[NSBitmapImageRep alloc] initWithCGImage:retainedCGImage] autorelease];
+        image = [[[NSImage alloc] initWithSize:[bitmap size]] autorelease];
+        [image addRepresentation:bitmap];
+		
+		CGImageRelease(retainedCGImage);
 	}
 	
 #ifdef DEBUG
@@ -332,8 +341,7 @@
 
 - (NSString *)description
 {
-	return self.name;		// TEMP
-	// return [NSString stringWithFormat:@"%@ imageRepresentation=%@ imageRepresentationType=%@ imageVersion=%d", [super description], self.imageRepresentation, self.imageRepresentationType, self.imageVersion];
+	return [NSString stringWithFormat:@"%@ imageRepresentation=%@ imageRepresentationType=%@ imageVersion=%d", [super description], self.imageRepresentation, self.imageRepresentationType, self.imageVersion];
 }
 
 // Use the path or URL as the unique identifier...

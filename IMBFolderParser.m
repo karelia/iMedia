@@ -197,7 +197,17 @@
 					IMBVisualObject* object = [[IMBVisualObject alloc] init];
 					object.value = (id)path;
 					object.name = file;
-					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+					
+					// If the file is an image, then we will get the image directly.  Otherwise
+					// We will use QuickLook, e.g. to get image out of an audio file.
+					if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeImage])
+					{
+						object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+					}
+					else
+					{
+						object.imageRepresentationType = IKImageBrowserQuickLookPathRepresentationType;
+					}
 					object.imageRepresentation = path;
 					object.metadata = nil; // will be loaded lazily (on demand when needed)
 					object.parser = self;

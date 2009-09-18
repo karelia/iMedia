@@ -16,6 +16,7 @@
 		CEF686BB1062D18F005D7E72 /* IMBComboTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF686B91062D18F005D7E72 /* IMBComboTextCell.m */; };
 		CEF687191062DAF0005D7E72 /* IMBDynamicTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF687171062DAF0005D7E72 /* IMBDynamicTableView.h */; };
 		CEF6871A1062DAF0005D7E72 /* IMBDynamicTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */; };
+		CEF69569106421CB005D7E72 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF69568106421CA005D7E72 /* QuickLook.framework */; };
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
 		D049EF5510346C1C003CC49C /* IMBNodeCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D049EF5310346C1C003CC49C /* IMBNodeCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049EF5610346C1C003CC49C /* IMBNodeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D049EF5410346C1C003CC49C /* IMBNodeCell.m */; };
@@ -248,6 +249,7 @@
 		CEF686B91062D18F005D7E72 /* IMBComboTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBComboTextCell.m; sourceTree = "<group>"; };
 		CEF687171062DAF0005D7E72 /* IMBDynamicTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBDynamicTableView.h; sourceTree = "<group>"; };
 		CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBDynamicTableView.m; sourceTree = "<group>"; };
+		CEF69568106421CA005D7E72 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = QuickLook.framework; sourceTree = "<group>"; };
 		D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = IMBComboViewTemplate.pdf; sourceTree = "<group>"; };
 		D049EF5310346C1C003CC49C /* IMBNodeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeCell.h; sourceTree = "<group>"; };
 		D049EF5410346C1C003CC49C /* IMBNodeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeCell.m; sourceTree = "<group>"; };
@@ -439,6 +441,7 @@
 				D0CA93E7104917A400725DA3 /* QTKit.framework in Frameworks */,
 				D0993295101124EE00C527B7 /* libcrypto.dylib in Frameworks */,
 				D0BE03151047C540009AE844 /* ObjectiveFlickr.framework in Frameworks */,
+				CEF69569106421CB005D7E72 /* QuickLook.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -477,6 +480,7 @@
 				D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */,
 				D0CA93E6104917A400725DA3 /* QTKit.framework */,
 				CE0E0C80104C72A200EE6B09 /* Security.framework */,
+				CEF69568106421CA005D7E72 /* QuickLook.framework */,
 			);
 			name = iMedia;
 			sourceTree = "<group>";
@@ -1142,6 +1146,10 @@
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				FRAMEWORK_VERSION = A;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1163,6 +1171,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				FRAMEWORK_VERSION = A;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1232,6 +1244,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				FRAMEWORK_VERSION = A;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
