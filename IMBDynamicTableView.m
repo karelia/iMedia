@@ -207,7 +207,7 @@
 - (void)reloadDataForRowIndexes:(NSIndexSet *)rowIndexes columnIndexes:(NSIndexSet *)columnIndexes
 
 {
-	NSLog(@"%s",__FUNCTION__);
+	// NSLog(@"%s",__FUNCTION__);
 	
 	[self _removeCachedViewsInIndexSet:rowIndexes];
 	
@@ -236,7 +236,7 @@
 // Method called after KVO detects a change, to reload the table row.
 - (void)_reloadRow:(NSNumber *)aRowNumber
 {
-	NSLog(@"%s",__FUNCTION__);
+	// NSLog(@"%s",__FUNCTION__);
 	
 	NSInteger row = [aRowNumber intValue];
 	if (row != NSNotFound)

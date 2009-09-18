@@ -90,7 +90,7 @@ static IMBOperationQueue* sSharedQueue = nil;
 			
 			sSharedQueue.maxConcurrentOperationCount = kMaxConcurrentOperationCount;
 #ifdef DEBUG
-			sSharedQueue.maxConcurrentOperationCount = 1;
+//			sSharedQueue.maxConcurrentOperationCount = 1;
 #endif
 		}
 	}

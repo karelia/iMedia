@@ -263,7 +263,7 @@
 	}
 	
 #ifdef DEBUG
-	sleep(3);		// load slowly so we can test properties
+//	sleep(3);		// load slowly so we can test properties
 #endif
 	// At this point, we should have an NSImage that we are ready to go set as the thumbnail.
 	// (Do we want to do something about versions the way IKImageBrowser View works?)
@@ -275,6 +275,7 @@
 		{
 			visualObject.imageLoading = NO;
 			visualObject.thumbnailImage = image;	// this will set off KVO on IMBObjectPropertyNamedThumbnailImage
+			//NSLog(@"Finished loading %@", visualObject);
 		}
 	}
 	
@@ -331,7 +332,8 @@
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"%@ imageRepresentation=%@ imageRepresentationType=%@ imageVersion=%d", [super description], self.imageRepresentation, self.imageRepresentationType, self.imageVersion];
+	return self.name;		// TEMP
+	// return [NSString stringWithFormat:@"%@ imageRepresentation=%@ imageRepresentationType=%@ imageVersion=%d", [super description], self.imageRepresentation, self.imageRepresentationType, self.imageVersion];
 }
 
 // Use the path or URL as the unique identifier...
