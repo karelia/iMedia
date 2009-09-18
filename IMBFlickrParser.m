@@ -320,7 +320,11 @@
 	node.icon = [self smartFolderIcon];
 	node.identifier = [self identifierWithMethod:@"interestingness" argument:@"30"];
 	node.mediaSource = node.identifier;
-	node.name = NSLocalizedString (@"Most Interesting", @"Flickr parser standard node name.");
+	node.name = NSLocalizedStringWithDefaultValue(
+												  @"Most Interesting",
+												  nil,IMBBundle(),
+												  @"Most Interesting",
+												  @"Flickr parser standard node name");
 	
 	[node setFlickrMethod:@"flickr.interestingness.getList"
 				arguments:[NSDictionary dictionaryWithObjectsAndKeys:@"30", @"per_page", nil]];
@@ -333,7 +337,11 @@
 	node.icon = [self smartFolderIcon];
 	node.identifier = [self identifierWithMethod:@"recent" argument:@"30"];
 	node.mediaSource = node.identifier;
-	node.name = NSLocalizedString (@"Recent", @"Flickr parser standard node name.");
+	node.name = NSLocalizedStringWithDefaultValue(
+												  @"Recent",
+												  nil,IMBBundle(),
+												  @"Recent",
+												  @"Flickr parser standard node name");
 	
 	[node setFlickrMethod:@"flickr.photos.getRecent"
 				arguments:[NSDictionary dictionaryWithObjectsAndKeys:@"30", @"per_page", nil]];
@@ -489,7 +497,11 @@
 
 - (void) willShowContextMenu: (NSMenu*) inMenu forObject: (IMBObject*) inObject {
 	//	'Open Flickr Page'...
-	NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Open Flickr Page", @"Flickr parser context menu title.") 
+	NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(
+																									  @"Open Flickr Page",
+																									  nil,IMBBundle(),
+																									  @"Open Flickr Page",
+																									  @"Flickr parser context menu title")
 															 action:@selector(openFlickrPage:) 
 													  keyEquivalent:@""];
 	[showWebPageItem setTarget:self];
