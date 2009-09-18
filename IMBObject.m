@@ -137,15 +137,6 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-@interface IMBThumbnailOperation : NSOperation
-{
-	IMBVisualObject *_visualObject;
-}
-- (id) initWithVisualObject:(IMBVisualObject *)aVisualObject;
-
-@property (retain) IMBVisualObject *visualObject;
-@end
-
 @implementation IMBThumbnailOperation
 
 @synthesize visualObject = _visualObject;
@@ -271,6 +262,9 @@
 		CFRelease(source);
 	}
 	
+#ifdef DEBUG
+	sleep(3);		// load slowly so we can test properties
+#endif
 	// At this point, we should have an NSImage that we are ready to go set as the thumbnail.
 	// (Do we want to do something about versions the way IKImageBrowser View works?)
 	
