@@ -43,50 +43,40 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
 #import "IMBFolderParser.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 // This parser scans any folder for image files...
 
 @interface IMBImageFolderParser : IMBFolderParser
 @end
 
-
 // This subclass looks only in "~/Pictures"...
 
 @interface IMBPicturesFolderParser : IMBImageFolderParser
 @end
-
 
 // This subclass looks only in "/Library/Desktop Pictures"...
 
 @interface IMBDesktopPicturesFolderParser : IMBImageFolderParser
 @end
 
-
 // This subclass looks only in "/Library/User Pictures"...
 
 @interface IMBUserPicturesFolderParser : IMBImageFolderParser
 @end
 
-
 // This subclass looks only in "/Library/Application Support/Apple/iChat Icons"...
 
 @interface IMBiChatIconsFolderParser : IMBImageFolderParser
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

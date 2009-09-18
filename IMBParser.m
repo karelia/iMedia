@@ -43,18 +43,14 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
 #import "IMBParser.h"
 #import "IMBObjectPromise.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -64,9 +60,7 @@
 @synthesize mediaType = _mediaType;
 @synthesize custom = _custom;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // The default implementation just returns a single parser instance. Subclasses like iPhoto, Aperture, or Lightroom
 // may opt to return multiple instances (preconfigured with correct mediaSource) if multiple libraries are detected...
@@ -79,9 +73,7 @@
 	return parserInstances;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
@@ -95,7 +87,6 @@
 	return self;
 }
 
-
 - (void) dealloc
 {
 	IMBRelease(_mediaSource);
@@ -103,9 +94,7 @@
 	[super dealloc];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // The following two methods must be overridden by subclasses...
 
@@ -114,12 +103,10 @@
 	return nil;
 }
 
-
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	return NO;
 }
-
 
 // This method can be overridden by subclasses if the default promise is not useful...
 
@@ -128,9 +115,7 @@
 	return [[(IMBObjectPromise*)[IMBLocalObjectPromise alloc] initWithObjects:inObjects] autorelease];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Optional methods do nothing in the base class and can be overridden in subclasses, e.g. to update  
 // or get rid of cached data...
@@ -140,21 +125,17 @@
 
 }
 
-
 - (void) didDeselectParser
 {
 
 }
-
 
 - (void) watchedPathDidChange:(NSString*)inWatchedPath
 {
 
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (NSString*) identifierForPath:(NSString*)inPath
 {
@@ -162,17 +143,13 @@
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
 	// to be overridden by subclasses...
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end

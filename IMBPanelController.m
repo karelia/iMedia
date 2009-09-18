@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -60,17 +58,13 @@
 #import "IMBCommon.h"
 #import "NSWorkspace+iMedia.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark GLOBALS
 
 static IMBPanelController* sSharedPanelController = nil;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -82,9 +76,7 @@ static IMBPanelController* sSharedPanelController = nil;
 @synthesize loadedLibraries = _loadedLibraries;
 @synthesize oldMediaType = _oldMediaType;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -102,7 +94,6 @@ static IMBPanelController* sSharedPanelController = nil;
 	return sSharedPanelController;
 }
 
-
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes
 {
 	if (sSharedPanelController == nil)
@@ -117,9 +108,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	return sSharedPanelController;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (id) init
 {
@@ -138,7 +127,6 @@ static IMBPanelController* sSharedPanelController = nil;
 	return self;
 }
 
-
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -151,12 +139,9 @@ static IMBPanelController* sSharedPanelController = nil;
 	[super dealloc];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 - (void) loadControllers
 {
@@ -204,7 +189,6 @@ static IMBPanelController* sSharedPanelController = nil;
 	}
 }
 
-
 // Walk through the array and retrieve the correct controller...
 
 - (IMBObjectViewController*) objectViewControllerForMediaType:(NSString*)inMediaType
@@ -220,9 +204,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	return nil;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) windowDidLoad
 {
@@ -259,9 +241,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	if (mediaType) [ibTabView selectTabViewItemWithIdentifier:mediaType];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // We need to save preferences before tha app quits...
 		
@@ -274,28 +254,22 @@ static IMBPanelController* sSharedPanelController = nil;
 	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (IBAction) showWindow:(id)inSender
 {
 	[self.window makeKeyAndOrderFront:nil];
 }
 
-
 - (IBAction) hideWindow:(id)inSender
 {
 	[self.window orderOut:nil];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark NSToolbarDelegate
-
 
 - (NSArray*) toolbarAllowedItemIdentifiers:(NSToolbar*)inToolbar
 {
@@ -311,7 +285,6 @@ static IMBPanelController* sSharedPanelController = nil;
 {
 	return self.mediaTypes;
 }
-
 
 - (NSToolbarItem*) toolbar:(NSToolbar*)inToolbar itemForItemIdentifier:(NSString*)inIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
@@ -338,20 +311,16 @@ static IMBPanelController* sSharedPanelController = nil;
 	return item;
 }
 
-
 - (IBAction) selectTabViewItemWithIdentifier:(id)inSender
 {
 	NSToolbarItem* item = (NSToolbarItem*)inSender;
 	return [ibTabView selectTabViewItemWithIdentifier:item.itemIdentifier];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark NSTabViewDelegate
-
 
 // Ask the delegate whether we are allowed to switch to another media type...
 
@@ -366,7 +335,6 @@ static IMBPanelController* sSharedPanelController = nil;
 	
 	return YES;
 }
-
 
 // We are about to switch tabs...
 
@@ -405,7 +373,6 @@ static IMBPanelController* sSharedPanelController = nil;
 	}
 }
 
-
 // Notify the delegate that we did switch...
 
 - (void) tabView:(NSTabView*)inTabView didSelectTabViewItem:(NSTabViewItem*)inTabViewItem
@@ -433,9 +400,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end
 

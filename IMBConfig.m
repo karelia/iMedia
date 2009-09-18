@@ -43,17 +43,13 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
 #import "IMBConfig.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CONSTANTS
 
@@ -61,20 +57,15 @@ static NSString* sIMBPrefsKeyFormat = @"iMedia2_%@";
 static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
 static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark
 
 @implementation IMBConfig
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 // Low level accessors for preferences values...
-
 
 + (void) registerDefaultPrefsValue:(id)inValue forKey:(NSString*)inKey
 {
@@ -83,13 +74,11 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
-
 + (void) setPrefsValue:(id)inValue forKey:(NSString*)inKey
 {
 	NSString* key = [NSString stringWithFormat:sIMBPrefsKeyFormat,inKey];
 	[[NSUserDefaults standardUserDefaults] setObject:inValue forKey:key];
 }
-
 
 + (id) prefsValueForKey:(NSString*)inKey
 {
@@ -97,9 +86,7 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 	return [[NSUserDefaults standardUserDefaults] objectForKey:key];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Store the specified dictionary in the iMedia section of the preferences under its class name...
 
@@ -108,14 +95,12 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 	[self registerDefaultPrefsValue:inClassDict forKey:NSStringFromClass(inClass)];
 }
 
-
 // Store the specified dictionary in the iMedia section of the preferences under its class name...
 
 + (void) setPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass
 {
 	[self setPrefsValue:inClassDict forKey:NSStringFromClass(inClass)];
 }
-
 
 // Return a mutable copy of the class specific preference dictionary. If it doesn't exist yet, then return an
 // empty dictionary...
@@ -125,9 +110,7 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 	return [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:NSStringFromClass(inClass)]];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (void) registerDefaultValues
 {
@@ -139,39 +122,31 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 	[self registerDefaultPrefsValue:path forKey:sIMBDownloadFolderPathKey];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (void) setShowsGroupNodes:(BOOL)inState
 {
 	[self setPrefsValue:[NSNumber numberWithBool:inState] forKey:sIMBShowsGroupNodesKey];
 }
 
-
 + (BOOL) showsGroupNodes
 {
 	return [[self prefsValueForKey:sIMBShowsGroupNodesKey] boolValue];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (void) setDownloadFolderPath:(NSString*)inPath
 {
 	[self setPrefsValue:inPath forKey:sIMBDownloadFolderPathKey];
 }
 
-
 + (NSString*) downloadFolderPath
 {
 	return [self prefsValueForKey:sIMBDownloadFolderPathKey];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end
  

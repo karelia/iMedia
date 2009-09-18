@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -57,9 +55,7 @@
 #import "NSString+iMedia.h"
 #import <Quartz/Quartz.h>
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -67,9 +63,7 @@
 
 @synthesize fileUTI = _fileUTI;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
@@ -81,20 +75,16 @@
 	return self;
 }
 
-
 - (void) dealloc
 {
 	IMBRelease(_fileUTI);
 	[super dealloc];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Parser Methods
-
 
 // If we were not suplied an old node, then we will just create an empty root node. If on the other hand we were
 // given a node, then we will try to recreate the same node as faithfully as possible. That means is should be 
@@ -153,9 +143,7 @@
 	return newNode;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // The supplied node is a private copy which may be modified here in the background operation. Scan the folder
 // for folder or for files that match our desired UTI and create an IMBObject for each file that qualifies...
@@ -258,20 +246,16 @@
 	return error == nil;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Helpers
-
 
 - (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI
 {
 	NSString* uti = [NSString UTIForFileAtPath:inPath];
 	return (BOOL) UTTypeConformsTo((CFStringRef)uti,(CFStringRef)inRequiredUTI);
 }
-
 
 - (NSImage*) iconForPath:(NSString*)inPath
 {
@@ -289,7 +273,6 @@
 	return nil;
 }
 
-
 + (NSString*) identifierForPath:(NSString*)inPath
 {
 	NSString* parserClassName = NSStringFromClass([self class]);
@@ -298,7 +281,6 @@
 
 	
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
@@ -311,8 +293,6 @@
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end

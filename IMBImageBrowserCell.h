@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -55,9 +53,7 @@
 #import "IMBImageKit.h"
 #endif
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // This subclass is used to customize the drawing for some items in the IKImageBrowserView. While we do want  
 // outlines and shadows for most items (e.g. images or movies), we absolutely do not want them for folders. 
@@ -78,6 +74,5 @@
 @property BOOL imbShouldDrawShadow;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------

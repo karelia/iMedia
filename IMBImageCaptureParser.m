@@ -46,9 +46,7 @@
 //  Created by Thomas Engelmeier on 25.07.09.
 //  Copyright 2009 Thomas Engelmeier. All rights reserved.
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #import "IMBImageCaptureParser.h"
 #import "IMBParserController.h"
@@ -59,9 +57,7 @@
 #import <Carbon/Carbon.h>
 #import <Quartz/Quartz.h>
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @interface IMBImageCaptureParser (internal)
 - (void) installNotification;
@@ -71,9 +67,7 @@
 - (void) _handleNotification:(NSString *) aNotification withDictionary:(NSDictionary *) aDictionary;
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // class to proxy thumbnails that get lazily downloaded 
 @interface MTPVisualObject: IMBVisualObject
@@ -86,9 +80,7 @@
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @implementation IMBImageCaptureParser
 
@@ -191,9 +183,7 @@
 	return newNode;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (BOOL) _isAppropriateICAType:(uint32_t) inType
 {
@@ -346,7 +336,6 @@
 	
 }
 
-
 // Scan the our folder for subfolders and add a subnode for each one we find...
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
@@ -491,7 +480,6 @@ static void HandleICANotification(CFStringRef notificationType, CFDictionaryRef 
     }
 }
 
-
 // ———————————————————————————————————————————————————————————————————————————
 // - handleNotification:
 // ———————————————————————————————————————————————————————————————————————————
@@ -531,7 +519,6 @@ static void HandleICANotification(CFStringRef notificationType, CFDictionaryRef 
  //    [self updateFiles];
 }
 @end 
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 static void MyThumbnailCallback (ICAHeader* pbHeader)
@@ -593,7 +580,6 @@ static void MyThumbnailCallback (ICAHeader* pbHeader)
     // ... error handling ...
 }
 
-
 - (NSImage *) imageRepresentation
 {
 	if ( !_imageRepresentation && !self.isLoading  ) {
@@ -607,6 +593,5 @@ static void MyThumbnailCallback (ICAHeader* pbHeader)
 {
 	return _imageRepresentationType;
 }
-
 
 @end

@@ -7,16 +7,13 @@ If you want to avoid the warnings for undefined methods, you need to
 include <BXServices/QLPreviewPanel.h> yourself.
 */
 
-
 #define QLPreviewPanelClass NSClassFromString(@"QLPreviewPanel")
-
 
 @interface NSPanel (QLPreviewPanel_Common)
 // the only methods common to both leopard and snow leopard
 + (id)sharedPreviewPanel;
 - (void)setDelegate:(id)delegate;
 @end
-
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
 
@@ -30,20 +27,16 @@ include <BXServices/QLPreviewPanel.h> yourself.
 - (void)endPreviewPanelControl:(id)panel;
 @end
 
-
 @interface NSObject (QLPreviewPanelDataSource)
 - (NSInteger)numberOfPreviewItemsInPreviewPanel:(id)panel;
 - (id)previewPanel:(id)panel previewItemAtIndex:(NSInteger)index;
 @end
-
 
 @interface NSObject (QLPreviewPanelDelegate)
 - (BOOL)previewPanel:(id)panel handleEvent:(NSEvent *)event;
 - (NSRect)previewPanel:(id)panel sourceFrameOnScreenForPreviewItem:(id)item;
 - (id)previewPanel:(id)panel transitionImageForPreviewItem:(id)item contentRect:(NSRect *)contentRect;
 @end
-
-
 
 @interface NSPanel (QLPreviewPanel_SnowLeopard)
 // some of these are defined as properties, but are included here as methods

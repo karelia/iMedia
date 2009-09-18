@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -60,15 +58,12 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark CONSTANTS
 
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kSelectionKey = @"selection";
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -94,9 +89,7 @@ static NSString* kSelectionKey = @"selection";
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 
@@ -114,9 +107,7 @@ static NSString* kSelectionKey = @"selection";
 @synthesize standardObjectView = _standardObjectView;
 @synthesize customObjectView = _customObjectView;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Set default preferences to make sure that group nodes are initially expanded and the user sees all root nodes...
 
@@ -145,21 +136,17 @@ static NSString* kSelectionKey = @"selection";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 + (NSBundle*) bundle
 {
 	return [NSBundle bundleForClass:[self class]];
 }
 
-
 + (NSString*) nibName
 {
 	return @"IMBLibraryView";
 }
-
 
 + (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
 {
@@ -169,9 +156,7 @@ static NSString* kSelectionKey = @"selection";
 	return controller;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (id) initWithNibName:(NSString*)inNibName bundle:(NSBundle*)inBundle
 {
@@ -184,7 +169,6 @@ static NSString* kSelectionKey = @"selection";
 	
 	return self;
 }
-
 
 - (void) awakeFromNib
 {
@@ -213,7 +197,6 @@ static NSString* kSelectionKey = @"selection";
 	[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
 }
 
-
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -232,12 +215,9 @@ static NSString* kSelectionKey = @"selection";
 	[super dealloc];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 - (void) setLibraryController:(IMBLibraryController*)inLibraryController
 {
@@ -251,12 +231,10 @@ static NSString* kSelectionKey = @"selection";
 	[self _loadStateFromPreferences];
 }
 
-
 - (NSString*) mediaType
 {
 	return self.libraryController.mediaType;
 }
-
 
 - (void) _startObservingLibraryController
 {
@@ -273,7 +251,6 @@ static NSString* kSelectionKey = @"selection";
 		object:_libraryController];
 }
 
-
 - (void) _stopObservingLibraryController
 {
 	[[NSNotificationCenter defaultCenter] 
@@ -287,12 +264,9 @@ static NSString* kSelectionKey = @"selection";
 		object:_libraryController];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 - (NSMutableDictionary*) _preferences
 {
@@ -300,14 +274,12 @@ static NSString* kSelectionKey = @"selection";
 	return [NSMutableDictionary dictionaryWithDictionary:[classDict objectForKey:self.mediaType]];
 }
 
-
 - (void) _setPreferences:(NSMutableDictionary*)inDict
 {
 	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
 	if (inDict) [classDict setObject:inDict forKey:self.mediaType];
 	[IMBConfig setPrefs:classDict forClass:self.class];
 }
-
 
 - (void) _saveStateToPreferences
 {
@@ -329,7 +301,6 @@ static NSString* kSelectionKey = @"selection";
 	[self _setPreferences:stateDict];
 }
 
-
 - (void) _loadStateFromPreferences
 {
 	NSMutableDictionary* stateDict = [self _preferences];
@@ -341,13 +312,10 @@ static NSString* kSelectionKey = @"selection";
 	if (splitviewPosition > 0.0) [ibSplitView setPosition:splitviewPosition ofDividerAtIndex:0];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark NSSplitView Delegate
-
 
 // Store the current divider position in the preferences. Since there is no getter for the current position we
 // cannot do it a quit time and have to store it here in the delegate method...
@@ -368,7 +336,6 @@ static NSString* kSelectionKey = @"selection";
 
 	return inPosition;
 }
-
 
 // When resising the splitview, then make sure that only the bottom part (object view) gets resized, and 
 // that the IMBOutlineView is not affected...
@@ -394,7 +361,6 @@ static NSString* kSelectionKey = @"selection";
     [bottomView setFrame:bottomFrame];
 }
 
-
 // When the splitview moved up so far that the IMBOutlineView gets too small, then hide the outline and show 
 // the popup instead...
 
@@ -407,13 +373,10 @@ static NSString* kSelectionKey = @"selection";
 	[ibNodePopupButton setHidden:!collapsed];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark NSOutlineView Delegate
-
 
 // If the user is  expanding an item in the IMBOutlineView then ask the delegate of the library controller if 
 // we are allowed to expand the node. If expansion was not triggered by a user event, but by the controllers
@@ -437,7 +400,6 @@ static NSString* kSelectionKey = @"selection";
 	return shouldExpand;
 }
 
-
 // Expanding was allowed, so instruct the library controller to add subnodes to the node if necessary...
 
 - (void) outlineViewItemWillExpand:(NSNotification*)inNotification
@@ -446,7 +408,6 @@ static NSString* kSelectionKey = @"selection";
 	IMBNode* node = [item representedObject];
 	[self.libraryController populateNode:node];
 }
-
 
 // When nodes were expanded or collapsed, then store the current state of the user interface...
 
@@ -468,9 +429,7 @@ static NSString* kSelectionKey = @"selection";
 	[self _setExpandedNodeIdentifiers];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Ask the library delegate if we may change the selection...
 
@@ -496,7 +455,6 @@ static NSString* kSelectionKey = @"selection";
 	
 	return shouldSelect;	
 }
-
 
 // If the selection just changed due to a direct user event (clicking), then instruct the library controller 
 // to populate the node (if necessary) and remember the identifier of the selected node...
@@ -539,7 +497,6 @@ static NSString* kSelectionKey = @"selection";
 
     When each row (identified by the item) is being drawn, this method will first be called with a nil tableColumn. At this time, you can return a cell that will be used to draw the entire row, acting like a group. If you do return a cell for the 'nil' tableColumn, be prepared to have the other corresponding datasource and delegate methods to be called with a 'nil' tableColumn value. If don't return a cell, the method will be called once for each tableColumn in the tableView, as usual.
 
-
 - (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item;
 {
 	NSCell *result = nil;
@@ -565,9 +522,7 @@ static NSString* kSelectionKey = @"selection";
 	[cell setBadgeType:node.badgeTypeNormal];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 -(BOOL) outlineView:(NSOutlineView*)inOutlineView isGroupItem:(id)inItem
 {
@@ -575,9 +530,7 @@ static NSString* kSelectionKey = @"selection";
 	return node.isGroup;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Check if we have any folder paths in the dragging pasteboard...
 
@@ -599,7 +552,6 @@ static NSString* kSelectionKey = @"selection";
 
 	return NSDragOperationNone;
 }
-
 
 // For each folder path that was dropped onto the outline view create a new custom parser. Then reload the library...
  
@@ -624,13 +576,10 @@ static NSString* kSelectionKey = @"selection";
 	return YES;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Saving & Restoring State
-
 
 // Get the identifiers of all currently expanded nodes. The result is a flat array, which is needed in the method
 // _restoreUserInterfaceState to try to restore the state of the user interface...
@@ -655,7 +604,6 @@ static NSString* kSelectionKey = @"selection";
 	return expandedNodeIdentifiers;
 }
 
-
 // Get IMBNode at specified table row...
 
 - (IMBNode*) _nodeAtRow:(NSInteger)inRow
@@ -665,9 +613,7 @@ static NSString* kSelectionKey = @"selection";
 	return node;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Called in response to a IMBNodesWillChangeNotification notification. Set a flag that helps us to do the right 
 // thing in the IMBOutlineView delegate methods. If nodes are currently being replaced, then we will allow any 
@@ -678,9 +624,7 @@ static NSString* kSelectionKey = @"selection";
 
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Called in response to a IMBNodesDidChangeNotification notification. Restore expanded state from the saved info.
 // We now have new node instances, but we can use the identifiers to locate the correct ones. First expand nodes
@@ -748,9 +692,7 @@ static NSString* kSelectionKey = @"selection";
 	_isRestoringState = NO;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Selecting a node requires two parts. First the node needs to be selected in the NSTreeController. This will
 // be directly reflected in the selection of the NSOutlineView and the NSPopUpButton. The second part is that
@@ -780,7 +722,6 @@ static NSString* kSelectionKey = @"selection";
 	}
 }
 
-
 // Return the selected node. Here we assume that the NSTreeController was configured to only allow single
 // selection or no selection...
 
@@ -796,9 +737,7 @@ static NSString* kSelectionKey = @"selection";
 	return nil;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) expandSelectedNode
 {
@@ -818,13 +757,10 @@ static NSString* kSelectionKey = @"selection";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Popup Menu
-
 
 - (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
 {
@@ -842,7 +778,6 @@ static NSString* kSelectionKey = @"selection";
 	}
 }
 
-
 // Rebuild the popup menu and. Please note that the popup menu does not currently use bindings...
 
 - (void) _updatePopupMenu
@@ -855,13 +790,11 @@ static NSString* kSelectionKey = @"selection";
 	[ibNodePopupButton setMenu:menu];
 }
 
-
 - (void) __updatePopupMenu
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_updatePopupMenu) object:nil];
 	[self performSelector:@selector(_updatePopupMenu) withObject:nil afterDelay:0.0];
 }
-
 
 // This action is only called by a direct user event from the popup menu...
 
@@ -871,7 +804,6 @@ static NSString* kSelectionKey = @"selection";
 	IMBNode* node = [self.libraryController nodeWithIdentifier:identifier];
 	[self selectNode:node];
 }
-
 
 // Make sure that the selected item of the popup menu matches the selected node in the outline view...
 
@@ -891,20 +823,16 @@ static NSString* kSelectionKey = @"selection";
 	}
 }
 
-
 - (void) __syncPopupMenuSelection
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_syncPopupMenuSelection) object:nil];
 	[self performSelector:@selector(_syncPopupMenuSelection) withObject:nil afterDelay:0.0];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Actions
-
 
 // We can always add a custom node (folder) is we clicked on the background or if the folders group node is selected...
 
@@ -913,7 +841,6 @@ static NSString* kSelectionKey = @"selection";
 	IMBNode* node = [self selectedNode];
 	return node == nil || node.isGroup && node.groupType == kIMBGroupTypeFolder;
 }
-
 
 // Choose a folder...
 	
@@ -927,7 +854,6 @@ static NSString* kSelectionKey = @"selection";
 	NSWindow* window = [ibSplitView window];
 	[panel beginSheetForDirectory:nil file:nil types:nil modalForWindow:window modalDelegate:self didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:) contextInfo:NULL];
 }
-
 
 // Add a root node for this each folder and the reload the library...
 	
@@ -946,9 +872,7 @@ static NSString* kSelectionKey = @"selection";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Custom root nodes that are not currently being loaded can be removed...
 
@@ -958,16 +882,13 @@ static NSString* kSelectionKey = @"selection";
 	return node.isRootNode && node.parser.isCustom && !node.isLoading;
 }
 
-
 - (IBAction) removeNode:(id)inSender
 {
 	IMBNode* node = [self selectedNode];
 	[self.libraryController removeCustomRootNode:node];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // A node can be reloaded if it is not already being loaded, expanded, or populated in a background operation...
 
@@ -977,20 +898,16 @@ static NSString* kSelectionKey = @"selection";
 	return node!=nil && !node.isGroup && !node.isLoading;
 }
 
-
 - (IBAction) reloadNode:(id)inSender
 {
 	IMBNode* node = [self selectedNode];
 	[self.libraryController reloadNode:node];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Context Menu
-
 
 - (NSMenu*) menuForNode:(IMBNode*)inNode
 {
@@ -1061,9 +978,7 @@ static NSString* kSelectionKey = @"selection";
 	return menu;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (BOOL) validateMenuItem:(NSMenuItem*)inMenuItem
 {
@@ -1090,13 +1005,10 @@ static NSString* kSelectionKey = @"selection";
 	return NO;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark 
 #pragma mark Object Views
-
 
 // Install the standard object view and remember it for later...
 
@@ -1107,7 +1019,6 @@ static NSString* kSelectionKey = @"selection";
 	[containerView addSubview:inObjectView];
 	self.standardObjectView = inObjectView;
 }
-
 
 // Install a custom object view (and replace an old custom view or the standard view)...
 
@@ -1153,9 +1064,7 @@ static NSString* kSelectionKey = @"selection";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 @end
 

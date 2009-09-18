@@ -43,12 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 @interface IMBProgressWindowController : NSWindowController
 {
@@ -70,7 +67,6 @@
 - (void) setCancelAction:(SEL)inAction;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

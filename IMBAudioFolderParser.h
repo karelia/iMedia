@@ -43,50 +43,40 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
 #import "IMBFolderParser.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 // This parser scans any folder for audio files...
 
 @interface IMBAudioFolderParser : IMBFolderParser
 @end
 
-
 // This subclass looks only in "~/Music"...
 
 @interface IMBMusicFolderParser : IMBAudioFolderParser
 @end
-
 
 // This subclass looks only in "/Library/Audio/Apple Loops/Apple/iLife Sound Effects"...
 
 @interface IMBiLifeSoundEffectsFolderParser : IMBAudioFolderParser
 @end
 
-
 // This subclass looks only in "iMovie.app/Contents/Resources/Sound Effects"...
 
 @interface IMBiMovieSoundEffectsFolderParser : IMBAudioFolderParser
 @end
 
-
 // This subclass looks only in "~/Library/Sounds"...
 
 @interface IMBLibrarySoundsFolderParser : IMBAudioFolderParser
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

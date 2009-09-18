@@ -20,7 +20,6 @@
 #import "UKFNSubscribeFileWatcher.h"
 #import <Carbon/Carbon.h>
 
-
 // -----------------------------------------------------------------------------
 //  Private stuff:
 // -----------------------------------------------------------------------------
@@ -31,13 +30,11 @@
 
 @end
 
-
 // -----------------------------------------------------------------------------
 //  Prototypes:
 // -----------------------------------------------------------------------------
 
 void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon, FNSubscriptionRef subscription);
-
 
 @implementation UKFNSubscribeFileWatcher
 
@@ -59,7 +56,6 @@ void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon
     return sSharedFileWatcher;
 }
 
-
 // -----------------------------------------------------------------------------
 //  * CONSTRUCTOR:
 // -----------------------------------------------------------------------------
@@ -76,7 +72,6 @@ void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon
     return self;
 }
 
-
 // -----------------------------------------------------------------------------
 //  * DESTRUCTOR:
 // -----------------------------------------------------------------------------
@@ -92,7 +87,6 @@ void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon
 	
     [super dealloc];
 }
-
 
 -(void) finalize
 {
@@ -132,7 +126,6 @@ void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon
 	}
 }
 
-
 // -----------------------------------------------------------------------------
 //  removePath:
 //		Stop watching the object at the specified path.
@@ -160,7 +153,6 @@ void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon
 	}
 }
 
-
 // -----------------------------------------------------------------------------
 //  delegate:
 //		Accessor for file watcher delegate.
@@ -171,7 +163,6 @@ void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon
     return delegate;
 }
 
-
 // -----------------------------------------------------------------------------
 //  setDelegate:
 //		Mutator for file watcher delegate.
@@ -181,7 +172,6 @@ void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon
 {
     delegate = newDelegate;
 }
-
 
 -(void)	removeAllPaths
 {
@@ -234,8 +224,6 @@ void    UKFileSubscriptionProc(FNMessage message, OptionBits flags, void *refcon
 }
 
 @end
-
-
 
 // -----------------------------------------------------------------------------
 //  UKFileSubscriptionProc:

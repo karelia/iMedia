@@ -43,12 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark CONSTANTS
-
 
 // Options to control behavior of the framework...
 
@@ -58,7 +55,6 @@ enum
 	kIMBOptionForceRecursiveLoading = 1
 };
 typedef NSUInteger IMBOptions;
-
 
 // File watcher type for an IMBNode...
 
@@ -70,7 +66,6 @@ enum
 	kIMBWatcherTypeFirstCustom = 1000
 };
 typedef NSUInteger IMBWatcherType;
-
 
 // Badge type for IMBNode. A corresponding icon will be displayed in the cell...
 
@@ -84,7 +79,6 @@ enum
 	kIMBBadgeTypeOffline
 };
 typedef NSUInteger IMBBadgeType;
-
 
 // Media types...
 
@@ -107,9 +101,7 @@ enum
 };
 typedef NSUInteger IMBGroupType;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark MACROS
 
@@ -121,7 +113,5 @@ typedef NSUInteger IMBGroupType;
 #define IMBBundle() [NSBundle bundleForClass:NSClassFromString(@"IMBConfig")]
 #endif
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 

@@ -4,14 +4,11 @@
  *     class-dump is Copyright (C) 1997-1998, 2000-2001, 2004-2007 by Steve Nygard.
  */
 
-
 // ATTENTION 
 // This header was generated with ClassDumper on 10.5 but was edited  
 // heavily to make it compile on both 10.5 and 10.6 development systems...
 
-
 @class IKMipmapImage;
-
 
 @interface IKImageCell : NSObject
 {
@@ -58,7 +55,6 @@
 - (id)dataSourcePath;
 
 @end
-
 
 @interface IKImageBrowserCell : IKImageCell
 {

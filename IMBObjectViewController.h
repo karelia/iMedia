@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark ABSTRACT
 
@@ -62,9 +60,7 @@
 // ATTENTION: This is an abstract base class. Do not use an instance of this class, but use a specific subclass
 // like IMBPhotosViewController or IMBMusicViewController instead...
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CONSTANTS
 
@@ -77,9 +73,7 @@ enum
 typedef NSUInteger kIMBObjectViewType;
 extern NSString *const IMBObjectPropertyNamedThumbnailImage;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CLASSES
 
@@ -91,12 +85,9 @@ extern NSString *const IMBObjectPropertyNamedThumbnailImage;
 @class IMBObject;
 @class IMBNode;
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 @interface IMBObjectViewController : NSViewController
 {
@@ -172,7 +163,6 @@ extern NSString *const IMBObjectPropertyNamedThumbnailImage;
 //- (IBAction) quicklook:(id)inSender;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

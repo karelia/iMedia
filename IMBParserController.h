@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark ABSTRACT
 
@@ -54,20 +52,15 @@
 // developers the chance to implmenent parsers for web based services, Spotlight, Image Capture etc. Just before the
 // app quits the parsers are unloaded, at which time they can clean up...
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CLASSES
 
 @class IMBParser;
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 @interface IMBParserController : NSObject
 {
@@ -115,12 +108,9 @@
 
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
-
 #pragma mark 
-
 
 @protocol IMBParserControllerDelegate
 
@@ -135,7 +125,6 @@
 - (void) controller:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

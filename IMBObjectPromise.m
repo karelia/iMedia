@@ -43,9 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark HEADERS
 
@@ -60,17 +58,13 @@
 #import "IMBURLDownloadOperation.h"
 #import "NSFileManager+iMedia.h"
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark CONSTANTS
 	
 NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark
 
@@ -80,9 +74,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 - (void) _loadObject:(IMBObject*)inObject;
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark
 
@@ -95,9 +87,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 @synthesize delegate = _delegate;
 @synthesize finishSelector = _finishSelector;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (id) initWithObjects:(NSArray*)inObjects
 {
@@ -117,7 +107,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	return self;
 }
 
-
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if (self = [super init])
@@ -136,12 +125,10 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	return self;
 }
 
-
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[inCoder encodeObject:self.objects forKey:@"objects"];
 }
-
 
 - (id) copyWithZone:(NSZone*)inZone
 {
@@ -157,7 +144,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	return copy;
 }
 
-
 - (void) dealloc
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -171,9 +157,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	[super dealloc];
 } 
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Count the eligible objects in the array...
 
@@ -188,7 +172,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}
 }
 
-
 // Load all eligible objects in the array...
 
 - (void) _loadObjects:(NSArray*)inObjects
@@ -202,14 +185,12 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}
 }
 
-
 // Load the specified object...
 
 - (void) _loadObject:(IMBObject*)inObject
 {
 	// To be overridden by subclass...
 }
-
 
 // Notify the delegate that loading is done...
 
@@ -235,9 +216,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Start loading the objects...
 
@@ -248,7 +227,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	[self _countObjects:self.objects];
 	[self _loadObjects:self.objects];
 }
-
 
 // Spin a runloop (blocking the caller) until all objects are available...
 
@@ -266,28 +244,22 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}
 }
 
-
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // A promise for local files doesn't really have to do any work since no loading is required. It simply copies
 // the path (value) into our localFiles array...
 
-
 #pragma mark
 
 @implementation IMBLocalObjectPromise
-
 
 - (void) _loadObjects:(NSArray*)inObjects
 {
 	[super _loadObjects:inObjects];
 	[self _didFinish];
 }
-
 
 - (void) _loadObject:(IMBObject*)inObject
 {
@@ -341,12 +313,9 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}
 }
 
-
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark
 
@@ -354,9 +323,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 @synthesize downloadOperations = _downloadOperations;
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (id) initWithObjects:(NSArray*)inObjects
 {
@@ -370,7 +337,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	return self;
 }
 
-
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if (self = [super initWithCoder:inCoder])
@@ -383,16 +349,13 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	return self;
 }
 
-
 - (void) dealloc
 {
 	IMBRelease(_downloadOperations);
 	[super dealloc];
 } 
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Tell delegate to prepare the progress UI (must be done in main thread)...
 
@@ -418,7 +381,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}
 }
 
-
 // Tell delegate to display the current progress (must be done in main thread)...
 
 - (void) _displayProgress:(double)inFraction
@@ -435,12 +397,10 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}
 }
 
-
 - (void) __displayProgress:(NSNumber*)inFraction
 {
 	[_delegate displayProgress:[inFraction doubleValue] forObjectPromise:self];
 }
-
 
 // Tell delegate to remove the progress UI (must be done in main thread)...
 
@@ -466,9 +426,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // Load all objects...
 
@@ -514,9 +472,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 - (IBAction) cancel:(id)inSender
 {
@@ -549,9 +505,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	[self release];
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 // We received some data, so display the current progress...
 
@@ -567,7 +521,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	double fraction = (double)_currentBytes / (double)_totalBytes;
 	[self _displayProgress:fraction];
 }
-
 
 // A download has finished. Store the path to the downloaded file. Once all downloads are complete, we can hide 
 // the progress UI, Notify the delegate and release self...
@@ -590,7 +543,6 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		[self release];
 	}	  
 }
-
 
 // If an error has occured in one of the downloads, then store the error instead of the file path, but everything 
 // else is the same as in the previous method...
@@ -615,10 +567,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	}	  
 }
 
-
 @end
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 

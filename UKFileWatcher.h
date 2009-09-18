@@ -49,7 +49,6 @@
 
 @end
 
-
 // Notifications this sends:
 /*  object			= the file watcher object
 	userInfo.path	= file path watched

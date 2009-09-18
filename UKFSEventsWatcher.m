@@ -18,7 +18,6 @@
 #import "UKFSEventsWatcher.h"
 #import <CoreServices/CoreServices.h>
 
-
 // -----------------------------------------------------------------------------
 //  FSEventCallback
 //		Private callback that is called by the FSEvents framework
@@ -57,7 +56,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 	}
 }
 
-
 @implementation UKFSEventsWatcher
 
 // -----------------------------------------------------------------------------
@@ -81,7 +79,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
     return sSharedFileWatcher;
 }
 
-
 // -----------------------------------------------------------------------------
 //  * CONSTRUCTOR:
 // -----------------------------------------------------------------------------
@@ -97,7 +94,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 	
     return self;
 }
-
 
 // -----------------------------------------------------------------------------
 //  * DESTRUCTOR:
@@ -116,7 +112,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
     [super finalize];
 }
 
-
 // -----------------------------------------------------------------------------
 //  setLatency:
 //		Time that must pass before events are being sent.
@@ -126,7 +121,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 {
 	latency = inLatency;
 }
-
 
 // -----------------------------------------------------------------------------
 //  latency
@@ -138,7 +132,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 	return latency;
 }
 
-
 // -----------------------------------------------------------------------------
 //  setFSEventStreamCreateFlags:
 //		See FSEvents.h for meaning of these flags.
@@ -148,7 +141,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 {
 	flags = inFlags;
 }
-
 
 // -----------------------------------------------------------------------------
 //  fsEventStreamCreateFlags
@@ -160,7 +152,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 	return flags;
 }
 
-
 // -----------------------------------------------------------------------------
 //  setDelegate:
 //		Mutator for file watcher delegate.
@@ -171,7 +162,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
     delegate = newDelegate;
 }
 
-
 // -----------------------------------------------------------------------------
 //  delegate:
 //		Accessor for file watcher delegate.
@@ -181,7 +171,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 {
     return delegate;
 }
-
 
 // -----------------------------------------------------------------------------
 //  parentFolderForFilePath:
@@ -202,7 +191,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 	
 	return inPath;		
 }
-
 
 // -----------------------------------------------------------------------------
 //  addPath:
@@ -239,7 +227,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 	}
 }
 
-
 // -----------------------------------------------------------------------------
 //  removePath:
 //		Stop watching the folder at the specified path.
@@ -268,7 +255,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 	}
 }
 
-
 // -----------------------------------------------------------------------------
 //  removeAllPaths:
 //		Stop watching all known folders.
@@ -284,7 +270,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 		[self removePath:path];
 	}
 }
-
 
 @end
 
