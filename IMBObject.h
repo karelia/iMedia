@@ -87,14 +87,24 @@
 {
 	id _imageRepresentation;								
 	NSString* _imageRepresentationType;		
-	NSUInteger _imageVersion;				
+	NSUInteger _imageVersion;
+	// Cache the CGImageRef? __strong CGImageRef _thumbnailImage ;
+	NSImage *_thumbnailImage ;
+    BOOL _imageLoading;
 }
+
+- (void)loadImage;			// Load the image (for dynamic table view)
 
 @property (readonly) NSString* imageUID;
 @property (retain) id imageRepresentation;					///< NSString, NSURL, NSImage, CIImage, or CGImageRef
 @property (retain) NSString* imageRepresentationType;		///< See IKImageBrowserItem for possible values
 @property (readonly) NSString* imageTitle;
 @property (assign) NSUInteger imageVersion;
+@property (readwrite, retain) NSImage *thumbnailImage ;				// for dynamic table view, not IK browser view
+																	// Property:  IMBObjectPropertyNamedThumbnailImage
+
+// A nil image isn't loaded (or couldn't be loaded). An image that is in the process of loading has imageLoading set to YES
+@property (readwrite) BOOL imageLoading;
 
 @end
 

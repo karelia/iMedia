@@ -98,7 +98,11 @@ static IMBOperationQueue* sSharedQueue = nil;
 		if (sSharedQueue == nil)
 		{
 			sSharedQueue = [[IMBOperationQueue alloc] init];
+			
 			sSharedQueue.maxConcurrentOperationCount = kMaxConcurrentOperationCount;
+#ifdef DEBUG
+			sSharedQueue.maxConcurrentOperationCount = 1;
+#endif
 		}
 	}
 	

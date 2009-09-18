@@ -75,6 +75,7 @@ enum
 	kIMBObjectViewTypeCombo,
 };
 typedef NSUInteger kIMBObjectViewType;
+extern NSString *const IMBObjectPropertyNamedThumbnailImage;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,6 +117,9 @@ typedef NSUInteger kIMBObjectViewType;
 	NSString* _objectCountFormatSingular;
 	NSString* _objectCountFormatPlural;
 	BOOL _isDragging;
+	
+	NSMutableArray *_observedVisibleItems;
+
 }
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
