@@ -139,6 +139,8 @@
     return result;
 }
 
+// NOT USED ....
+
 - (NSRect)_subtitleFrameForInteriorFrame:(NSRect)frame
 {		// THIS WILL HAVE TO BE COMPLETELY REDONE SINCE IT RELIED ON FILL COLOR
     NSRect result = frame;
