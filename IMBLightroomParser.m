@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -53,7 +55,9 @@
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -61,7 +65,9 @@
 //
 //@end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -71,7 +77,9 @@
 @synthesize plist = _plist;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -82,7 +90,9 @@
 //	[pool release];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Check if Lightroom is installed...
 
@@ -96,7 +106,9 @@
 	return [self lightroomPath] != nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Factory method for the parser instances. Create one instance per library and configure it...
 
@@ -113,7 +125,9 @@
 	return nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
@@ -126,6 +140,7 @@
 	return self;
 }
 
+
 - (void) dealloc
 {
 	IMBRelease(_appPath);
@@ -134,7 +149,9 @@
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Parser Methods
@@ -207,7 +224,9 @@
 	return rootNode;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // The supplied node is a private copy which may be modified here in the background operation. Parse the 
 // iPhoto XML file and create subnodes as needed...
@@ -225,7 +244,9 @@
 	return error == nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // When the parser is deselected, then get rid of the cached plist data. It will be loaded into memory lazily 
 // once it is needed again...
@@ -235,7 +256,9 @@
 	self.plist = nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Helper Methods
@@ -252,7 +275,9 @@
 	return _plist;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 //- (void) addSubNodesToNode:(IMBNode*)inParentNode
 //		 listOfAlbums:(NSArray*)inListOfAlbums
@@ -305,7 +330,9 @@
 //	}
 //}
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 //- (void) populateNode:(IMBNode*)inNode
 //		 listOfAlbums:(NSArray*)inListOfAlbums
@@ -363,7 +390,9 @@
 //	}
 //}
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 //- (NSImage*) iconForAlbumType:(NSString*)inAlbumType
 //{
@@ -402,6 +431,8 @@
 //	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
 //}
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

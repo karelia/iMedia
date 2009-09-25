@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -60,13 +62,18 @@
 #import "IMBCommon.h"
 #import "NSWorkspace+iMedia.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark GLOBALS
 
 static IMBPanelController* sSharedPanelController = nil;
+static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
+
 
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -78,7 +85,32 @@ static IMBPanelController* sSharedPanelController = nil;
 @synthesize loadedLibraries = _loadedLibraries;
 @synthesize oldMediaType = _oldMediaType;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Register the view controller class...
+
++ (void) registerViewControllerClass:(Class)inViewControllerClass forMediaType:(NSString*)inMediaType
+{
+	@synchronized ([self class])
+	{
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		
+		if (sRegisteredViewControllerClasses == nil)
+		{
+			sRegisteredViewControllerClasses = [[NSMutableDictionary alloc] init];
+		}
+		
+		[sRegisteredViewControllerClasses setObject:inViewControllerClass forKey:inMediaType];
+		
+		[pool release];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -96,6 +128,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	return sSharedPanelController;
 }
 
+
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes
 {
 	if (sSharedPanelController == nil)
@@ -110,7 +143,9 @@ static IMBPanelController* sSharedPanelController = nil;
 	return sSharedPanelController;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) init
 {
@@ -129,6 +164,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	return self;
 }
 
+
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -141,7 +177,9 @@ static IMBPanelController* sSharedPanelController = nil;
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -164,37 +202,24 @@ static IMBPanelController* sSharedPanelController = nil;
 		libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
 		[libraryController setDelegate:self.delegate];
 
-		// Create the node view controllers for each media type...
+		// Create the view controllers for each media type...
 		
 		nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
+		
+		Class ovc = [sRegisteredViewControllerClasses objectForKey:mediaType];
+		objectViewController = (IMBObjectViewController*) [ovc viewControllerForLibraryController:libraryController];
 
-		// Create the object view controllers for each media type...
+		// Store the object view controller in an array. Note that the node view controller is attached 
+		// to the object view controller, so we do not need to store it separately...
 		
-		if ([mediaType isEqualToString:kIMBMediaTypeImage])
+		if (objectViewController)
 		{
-			objectViewController = [IMBImageViewController viewControllerForLibraryController:libraryController];
+			objectViewController.nodeViewController = nodeViewController;
+			[self.viewControllers addObject:objectViewController];
 		}
-		else if ([mediaType isEqualToString:kIMBMediaTypeAudio])
-		{
-			objectViewController = [IMBAudioViewController viewControllerForLibraryController:libraryController];
-		}
-		else if ([mediaType isEqualToString:kIMBMediaTypeMovie])
-		{
-			objectViewController = [IMBMovieViewController viewControllerForLibraryController:libraryController];
-		}
-		else if ([mediaType isEqualToString:kIMBMediaTypeLink])
-		{
-			objectViewController = [IMBLinkViewController viewControllerForLibraryController:libraryController];
-		}
-#warning TODO : it would be better not to 'hard-wire' the media types here.  How about discovering everything that is loaded?
-		
-		// Store the object view controller in an array. Note that the node view controller is attached to the
-		// object view controller, so we do not need to store it separately...
-		
-		objectViewController.nodeViewController = nodeViewController;
-		[self.viewControllers addObject:objectViewController];
 	}
 }
+
 
 // Walk through the array and retrieve the correct controller...
 
@@ -211,7 +236,9 @@ static IMBPanelController* sSharedPanelController = nil;
 	return nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) windowDidLoad
 {
@@ -248,7 +275,9 @@ static IMBPanelController* sSharedPanelController = nil;
 	if (mediaType) [ibTabView selectTabViewItemWithIdentifier:mediaType];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // We need to save preferences before tha app quits...
 		
@@ -261,7 +290,9 @@ static IMBPanelController* sSharedPanelController = nil;
 	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (IBAction) showWindow:(id)inSender
 {
@@ -273,25 +304,31 @@ static IMBPanelController* sSharedPanelController = nil;
 	[self.window orderOut:nil];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark NSToolbarDelegate
+
 
 - (NSArray*) toolbarAllowedItemIdentifiers:(NSToolbar*)inToolbar
 {
 	return self.mediaTypes;
 }
 
+
 - (NSArray*) toolbarDefaultItemIdentifiers:(NSToolbar*)inToolbar
 {
 	return self.mediaTypes;
 }
 
+
 - (NSArray*) toolbarSelectableItemIdentifiers:(NSToolbar*)inToolbar
 {
 	return self.mediaTypes;
 }
+
 
 - (NSToolbarItem*) toolbar:(NSToolbar*)inToolbar itemForItemIdentifier:(NSString*)inIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
@@ -318,16 +355,20 @@ static IMBPanelController* sSharedPanelController = nil;
 	return item;
 }
 
+
 - (IBAction) selectTabViewItemWithIdentifier:(id)inSender
 {
 	NSToolbarItem* item = (NSToolbarItem*)inSender;
 	return [ibTabView selectTabViewItemWithIdentifier:item.itemIdentifier];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark NSTabViewDelegate
+
 
 // Ask the delegate whether we are allowed to switch to another media type...
 
@@ -342,6 +383,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	
 	return YES;
 }
+
 
 // We are about to switch tabs...
 
@@ -380,6 +422,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	}
 }
 
+
 // Notify the delegate that we did switch...
 
 - (void) tabView:(NSTabView*)inTabView didSelectTabViewItem:(NSTabViewItem*)inTabViewItem
@@ -407,7 +450,9 @@ static IMBPanelController* sSharedPanelController = nil;
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 

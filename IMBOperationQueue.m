@@ -43,13 +43,17 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
 #import "IMBOperationQueue.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark CONSTANTS
 
@@ -61,19 +65,25 @@
  
 const NSInteger kMaxConcurrentOperationCount = 4;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark GLOBALS
 
 static IMBOperationQueue* sSharedQueue = nil;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 
 @implementation IMBOperationQueue
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Creates a shared operation queue that can be accessed from anywhere in the iMedia.framework. Any operations that
 // are added to this queue are executed in background threads. For this reason these operations should never modify
@@ -88,17 +98,20 @@ static IMBOperationQueue* sSharedQueue = nil;
 		{
 			sSharedQueue = [[IMBOperationQueue alloc] init];
 			
-			sSharedQueue.maxConcurrentOperationCount = kMaxConcurrentOperationCount;
-#ifdef DEBUG
+			#ifdef DEBUG
 			sSharedQueue.maxConcurrentOperationCount = 1;
-#endif
+			#else
+			sSharedQueue.maxConcurrentOperationCount = kMaxConcurrentOperationCount;
+			#endif
 		}
 	}
 	
 	return sSharedQueue;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Suspend or resume the execution of background operations. This may be useful for some application to suppress high
 // CPU load at certain times...
@@ -108,11 +121,14 @@ static IMBOperationQueue* sSharedQueue = nil;
 	[self setSuspended:YES];
 }
 
+
 - (void) resume
 {
 	[self setSuspended:NO];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

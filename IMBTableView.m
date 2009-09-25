@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -52,13 +54,16 @@
 #import "IMBObject.h"
 #import "IMBQuickLookController.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark
 
 @implementation IMBTableView
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) initWithFrame:(NSRect)inFrame
 {
@@ -70,6 +75,7 @@
 	return self;
 }
 
+
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if (self = [super initWithCoder:inCoder])
@@ -80,12 +86,15 @@
 	return self;
 }
 
+
 - (void) dealloc
 {
     [super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Ask the IMBNodeViewController (which is our delegate) to return a context menu for the clicked node. If  
 // the user clicked on the background node is nil...
@@ -111,6 +120,7 @@
 			
 //----------------------------------------------------------------------------------------------------------------------
 
+
 //- (void) keyDown:(NSEvent*)inEvent
 //{
 //	int key = [[inEvent characters] characterAtIndex:0];
@@ -126,7 +136,9 @@
 //	}
 //}
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 //- (BOOL) acceptsPreviewPanelControl:(id)inPanel
 //{
@@ -144,6 +156,7 @@
 //{
 //	[[IMBQuickLookController sharedController] endPreviewPanelControl:inPanel];
 //}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

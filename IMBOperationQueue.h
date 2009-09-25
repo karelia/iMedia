@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // This shared operation queue is used throughout the framework to get background work done. Simply add operations
 // to the shared queue. Please note that data model objects that are owned by controllers in the main thread are
@@ -57,5 +59,6 @@
 - (void) resume;
 
 @end
+
 
 //----------------------------------------------------------------------------------------------------------------------

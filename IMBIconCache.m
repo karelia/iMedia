@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -51,17 +53,23 @@
 #import "IMBCommon.h"
 #import "NSImage+iMedia.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 static IMBIconCache* sSharedIconCache;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
 @implementation IMBIconCache
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 + (IMBIconCache*) sharedIconCache
 {
@@ -76,6 +84,7 @@ static IMBIconCache* sSharedIconCache;
 	return sSharedIconCache;
 }
 
+
 - (id) init
 {
 	if (self = [super init])
@@ -86,13 +95,16 @@ static IMBIconCache* sSharedIconCache;
 	return self;
 }
 
+
 - (void) dealloc
 {
 	IMBRelease(_iconCache);
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (NSImage*) __loadIconForType:(NSString*)name fromBundleID:(NSString*)bundleID withMappingTable:(const IMBIconTypeMapping*)mappingTable
 {
@@ -137,7 +149,9 @@ static IMBIconCache* sSharedIconCache;
 	return nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (NSImage*) iconForType:(NSString*)inType fromBundleID:(NSString*)inBundleID withMappingTable:(const IMBIconTypeMapping*)inMappingTable
 {
@@ -169,6 +183,8 @@ static IMBIconCache* sSharedIconCache;
 	return image;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

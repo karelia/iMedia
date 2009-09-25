@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -53,7 +55,9 @@
 #import "IMBNode.h"
 #import "IMBTextFieldCell.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 
@@ -62,7 +66,9 @@
 @synthesize draggingPrompt = _draggingPrompt;
 @synthesize textCell = _textCell;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) initWithFrame:(NSRect)inFrame
 {
@@ -74,6 +80,7 @@
 	return self;
 }
 
+
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if (self = [super initWithCoder:inCoder])
@@ -83,6 +90,7 @@
 	
 	return self;
 }
+
 
 - (void) awakeFromNib
 {
@@ -116,6 +124,7 @@
 		object:nil];
 }
 
+
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -127,7 +136,9 @@
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Calculate the frame rect for progress indicator wheels...
 
@@ -144,12 +155,15 @@
 	return badgeRect;	
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) _redraw
 {
 	[self setNeedsDisplay:YES];
 }
+
 
 - (void) viewWillDraw
 {
@@ -206,7 +220,9 @@
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) drawRect:(NSRect)inRect	
 {
@@ -235,7 +251,9 @@
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Ask the IMBNodeViewController (which is our delegate) to return a context menu for the clicked node. If  
 // the user clicked on the background node is nil...
@@ -257,8 +275,9 @@
 	[controller selectNode:node];
 	return [controller menuForNode:node];
 }
-
 			
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -52,13 +54,17 @@
 #import "IMBParser.h"
 #import "IMBCommon.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark CONSTANTS
 
 const NSString* kSearchStringContext = @"searchString";
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -68,7 +74,9 @@ const NSString* kSearchStringContext = @"searchString";
 @synthesize searchableProperties = _searchableProperties;
 @synthesize searchString = _searchString;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) init
 {
@@ -80,10 +88,12 @@ const NSString* kSearchStringContext = @"searchString";
 	return self; 
 }
 
+
 - (void) awakeFromNib
 {
 	[self addObserver:self forKeyPath:@"searchString" options:0 context:(void*)kSearchStringContext];
 }
+
 
 - (void) dealloc
 {
@@ -93,14 +103,18 @@ const NSString* kSearchStringContext = @"searchString";
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
+
 #pragma mark 
+
 
 - (IBAction) search:(id)inSender
 {
 	[self setSearchString:[inSender stringValue]];
 }
+
 
 - (IBAction) resetSearch:(id)inSender
 {
@@ -110,6 +124,7 @@ const NSString* kSearchStringContext = @"searchString";
 		[self search:ibSearchField];
 	}	
 }
+
 
 - (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
 {
@@ -124,7 +139,9 @@ const NSString* kSearchStringContext = @"searchString";
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Set default values, and keep reference to new object -- see arrangeObjects:
 
@@ -139,6 +156,7 @@ const NSString* kSearchStringContext = @"searchString";
 
     return _newObject;
 }
+
 
 - (NSArray*) arrangeObjects:(NSArray*)inObjects
 {
@@ -184,7 +202,8 @@ const NSString* kSearchStringContext = @"searchString";
 		{
 			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-			// For searching to work properly we should load object metadata if it isn't available yet...
+			// For searching to work properly we should load object metadata if it isn't available yet,
+			// because the search might require keypaths like @"metadata.*"...
 
 			if (searching && object.metadata == nil)
 			{
@@ -192,7 +211,7 @@ const NSString* kSearchStringContext = @"searchString";
 			}
 
 			// Give the delegate a chance to enhance an object or totally replace it with a proxy object.
-			// This way object can be made more powerful or customized...
+			// This way an object can be customized or made more rich...
 			
 			id proxy = hasProxyForObject ? [_delegate proxyForObject:object] : object;
 			
@@ -235,6 +254,8 @@ const NSString* kSearchStringContext = @"searchString";
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

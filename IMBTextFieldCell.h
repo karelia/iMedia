@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 typedef enum
 {
@@ -53,7 +55,9 @@ typedef enum
 } 
 IMBTextAlignment;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @interface IMBTextFieldCell : NSTextFieldCell
 {
@@ -63,6 +67,7 @@ IMBTextAlignment;
 @property (assign) IMBTextAlignment verticalAlignment;
 
 @end
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
