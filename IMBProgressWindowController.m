@@ -43,13 +43,17 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
 #import "IMBProgressWindowController.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -59,7 +63,9 @@
 @synthesize textField = ibTextField;
 @synthesize cancelButton = ibCancelButton;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -67,6 +73,7 @@
 {
 	return @"IMBProgress";
 }
+
 
 - (void) awakeFromNib
 {
@@ -78,12 +85,15 @@
 	[ibProgressBar startAnimation:nil];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) setTitle:(NSString*)inTitle
 {
 	[ibTitleField setStringValue:inTitle];
 }
+
 
 - (void) setProgress:(double)inFraction
 {
@@ -91,24 +101,30 @@
 	[ibProgressBar setIndeterminate:NO];
 }
 
+
 - (void) setMessage:(NSString*)inMessage
 {
 	[ibMessageField setStringValue:inMessage];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) setCancelTarget:(id)inTarget
 {
 	[ibCancelButton setTarget:inTarget];
 }
 
+
 - (void) setCancelAction:(SEL)inAction
 {
 	[ibCancelButton setAction:inAction];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 

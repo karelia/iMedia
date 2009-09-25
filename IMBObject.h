@@ -43,13 +43,17 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark CLASSES
 
 @class IMBParser;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // This object encapsulates information about a single media item (e.g. image file or audio file). The value 
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
@@ -72,7 +76,9 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // This subclass can be used for image or movie files, i.e. items that need a visual representation and are
 // displayed with IKIMageBrowserView... 
@@ -101,7 +107,9 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // This subclass is used to represent nodes in the object views (examples are folder and events). The reason we 
 // have these hybrid objects is to have a double clickable item in the object views, which can be used to drill
@@ -116,14 +124,17 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @interface IMBThumbnailOperation : NSOperation
 {
 	IMBVisualObject *_visualObject;
 }
-- (id) initWithVisualObject:(IMBVisualObject *)aVisualObject;
 
 @property (retain) IMBVisualObject *visualObject;
+- (id) initWithVisualObject:(IMBVisualObject *)aVisualObject;
+
 @end
 

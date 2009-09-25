@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -60,14 +62,18 @@
 #import "IMBAudioFolderParser.h"
 #import "IMBMovieFolderParser.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark CLASSES
 
 @class IMBParser;
 @class IMBNode;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark CONSTANTS
 
@@ -75,13 +81,17 @@ NSString* kIMBNodesWillReloadNotification = @"IMBNodesWillReloadNotification";
 NSString* kIMBNodesWillChangeNotification = @"IMBNodesWillChangeNotification";
 NSString* kIMBNodesDidChangeNotification = @"IMBNodesDidChangeNotification";
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark GLOBALS
 
 static NSMutableDictionary* sLibraryControllers = nil;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -111,7 +121,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @interface IMBPopulateNodeOperation : IMBLibraryOperation
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Private controller methods...
 
@@ -126,7 +138,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -181,7 +195,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Create a new node here in this background operation. When done, pass back the result to the libraryController 
 // in the main thread...
@@ -207,7 +223,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Tell the parser to popuplate the node in this background operation. When done, pass back the result to the 
 // libraryController in the main thread...
@@ -233,7 +251,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -247,7 +267,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @synthesize watcherFSEvents = _watcherFSEvents;
 @synthesize isReplacingNode = _isReplacingNode;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Create a singleton instance per media type and store it in a global dictionary so that we can access it by type...
 
@@ -275,7 +297,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return controller;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
@@ -300,6 +324,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return self;
 }
 
+
 - (void) dealloc
 {
 	IMBRelease(_mediaType);
@@ -313,7 +338,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Creating Nodes
@@ -359,7 +386,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // If the delegate allows reloading, then create a background operation that causes the parser to create a new node. 
 // Please note that this method causes the node (and all its subnodes) to be replaced at a later time in the main 
@@ -398,7 +427,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}	
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Check if the desired group node is already present. If yes return it, otherwise create and add it...
 
@@ -474,7 +505,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return groupNode;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // This method is called on the main thread as a result of any IMBLibraryOperation. We are given both the old  
 // and the new node. Replace the old with the new node. The node we are given here can be a root node or a node
@@ -602,7 +635,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // This method is called on the main thread as a result of IMBCreateNodesOperation...
 
@@ -617,7 +652,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	inNode.badgeTypeNormal = kIMBBadgeTypeNone;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // This method is called on the main thread incase an error has occurred in an IMBLibraryOperation...
 
@@ -626,7 +663,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[NSApp presentError:inError];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Populating Nodes
@@ -666,6 +705,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}	
 }
 
+
 // Called back in the main thread as a result of IMBExpandNodeOperation...
 
 - (void) _didPopulateNode:(IMBNode*)inNode
@@ -679,7 +719,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	inNode.badgeTypeNormal = kIMBBadgeTypeNone;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark File Watching
@@ -716,6 +758,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 }
 
+
 // Pass the message on to the main thread...
 
 - (void) _coalescedUKKQueueCallback
@@ -734,6 +777,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[_watcherLock unlock];
 }	
 
+
 - (void) _coalescedFSEventsCallback
 {
 	BOOL isMainThread = [NSThread isMainThread];
@@ -750,12 +794,14 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[_watcherLock unlock];
 }	
 
+
 // Now look for all nodes that are interested in that path and reload them...
 
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath
 {
 	[self _reloadNodesWithWatchedPath:inPath nodes:self.rootNodes];
 }	
+
 
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes
 {
@@ -781,10 +827,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Custom Nodes
+
 
 - (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath
 {
@@ -822,6 +871,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return parser;
 }
 
+
 // If we were given a root node with a custom parser, then this node is eligible for removal. Remove the parser
 // from the registered list and reload everything. After that the node will be gone...
 
@@ -837,7 +887,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return NO;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Nodes Accessors
@@ -857,7 +909,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Find the node with the specified identifier...
 	
@@ -881,6 +935,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return nil;
 }
 
+
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier
 {
 	if (inIdentifier)
@@ -891,7 +946,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) logNodes
 {
@@ -908,10 +965,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	NSLog(@"%s\n\n%@\n",__FUNCTION__,text);
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Popup Menu
+
 
 - (void) _recursivelyAddItemsToMenu:(NSMenu*)inMenu 
 		 withNode:(IMBNode*)inNode 
@@ -957,6 +1017,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 }
+
 
 - (NSMenu*) menuWithSelector:(SEL)inSelector target:(id)inTarget addSeparators:(BOOL)inAddSeparator
 {
@@ -1014,7 +1075,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	return [menu autorelease];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 

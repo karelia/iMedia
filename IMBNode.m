@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -53,7 +55,9 @@
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 
@@ -61,7 +65,9 @@
 - (void) _recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray*)inIndexArray;
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 
@@ -107,7 +113,9 @@
 
 @synthesize customObjectView = _customObjectView;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) init
 {
@@ -133,9 +141,10 @@
 	return self;
 }
 
+
 - (id) copyWithZone:(NSZone*)inZone
 {
-	IMBNode* copy = [[IMBNode allocWithZone:inZone] init];
+	IMBNode* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.mediaSource = self.mediaSource;
 	copy.identifier = self.identifier;
@@ -189,6 +198,7 @@
 	return copy;
 }
 
+
 - (void) dealloc
 {
 	IMBRelease(_identifier);
@@ -205,10 +215,13 @@
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 #pragma mark Accessors
+
 
 // Node accessors. Use these for bindings the NSTreeController...
 
@@ -222,17 +235,21 @@
 	return self;
 }
 
+
 - (NSUInteger) countOfSubNodes
 {
 	return [_subNodes count];
 }
+
 
 - (IMBNode*) objectInSubNodesAtIndex:(NSUInteger)inIndex
 {
 	return [_subNodes objectAtIndex:inIndex];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Shallow object accessors. Use these for binding the NSArrayController. This only returns the objects that are
 // contained directly by this node, but not those contained by any subnodes...
@@ -247,6 +264,7 @@
 	return 0;	
 }
 
+
 - (IMBObject*) objectInShallowObjectsAtIndex:(NSUInteger)inIndex
 {
 	if (_objects)
@@ -257,7 +275,9 @@
 	return nil;	
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Recursive object accessors. Use these for binding the NSArrayController. Please note that these accessors use
 // a depth-first algorithm, hoping that most media libraries like iPhoto, iTunes, Aperture, etc do the same thing.
@@ -277,6 +297,7 @@
 	
 	return count;
 }
+
 
 - (IMBObject*) objectInRecursiveObjectsAtIndex:(NSUInteger)inIndex
 {
@@ -306,7 +327,9 @@
 	return nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // The bindableObjects property is used to bind the contentArray of IMBObjectArrayController. In this property 
 // the node can select whether it wants to display shallow or deep (recursive) objects...
@@ -323,6 +346,7 @@
 	}
 }
 
+
 - (IMBObject*) objectInBindableObjectsAtIndex:(NSUInteger)inIndex
 {
 	if (self.wantsRecursiveObjects)
@@ -335,7 +359,9 @@
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 #pragma mark Helpers
@@ -360,7 +386,9 @@
 	return [self.name finderCompare:inNode.name];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Check if this node or one of its ancestors is current loading in the background. In this case it will be 
 // replaced shortly and is not considered to be eligible for a new background operation...
@@ -372,7 +400,9 @@
 	return NO;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Returns the path to this node as a NSIndexSet. Useful for working with NSTreeController and NSOutlineView...
 
@@ -402,6 +432,7 @@
 	
 	return nil;
 }
+
 
 // This helper method creates an array of numbers containing the indexes to this node...
 
@@ -457,7 +488,9 @@
 	[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:NSNotFound]];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // A node is considered a root node if it really is a root node (nil parent) or if it is indented by one under 
 // a group node...
@@ -467,6 +500,7 @@
 	return self.parentNode == nil || self.parentNode.isGroup;
 }
 
+
 // A node is pouplated if the subnodes and objects arrays are present. Please note that these arrays may still
 // be empty (this is also consider to be pouplated)...
 
@@ -474,6 +508,7 @@
 {
 	return self.subNodes != nil && self.objects !=nil;
 }
+
 
 // Look in our node tree for a node with the specified identifier...
 
@@ -493,7 +528,9 @@
 	return nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 #pragma mark Debugging
@@ -532,6 +569,8 @@
 	return description;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

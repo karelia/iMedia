@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // This is a wrapper header that renames Uli's UK classes to have the prefix IMB. That way we can use these 
 // classes without running into runtime conflicts with other UK classes being loaded by the runtime from 
@@ -65,5 +67,6 @@
 #undef UKFileWatcherSizeIncreaseNotification
 #undef UKFileWatcherLinkCountChangeNotification
 #undef UKFileWatcherAccessRevocationNotification 
+
 
 //----------------------------------------------------------------------------------------------------------------------

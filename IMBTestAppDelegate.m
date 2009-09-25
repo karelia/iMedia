@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -51,7 +53,9 @@
 #import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark CONSTANTS
 
@@ -60,7 +64,9 @@
 #define LOG_POPULATE_NODE 0
 #define CUSTOM_USER_INTERFACE 0
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -69,7 +75,9 @@
 @synthesize nodeViewController = _nodeViewController;
 @synthesize objectViewController = _objectViewController;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) awakeFromNib
 {
@@ -142,6 +150,7 @@
 	}
 }
 
+
 // Save window frame to prefs...
 
 - (void) applicationWillTerminate:(NSNotification*)inNotification
@@ -160,7 +169,9 @@
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark IMBParserController Delegate
@@ -183,12 +194,14 @@
 	return YES;
 }
 
+
 - (void) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
 {
 	#if LOG_PARSERS
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
 	#endif
 }
+
 
 - (void) controller:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
@@ -272,6 +285,7 @@
 	}		// end IMBFlickrParser code
 }
 
+
 - (void) controller:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
 	#if LOG_PARSERS
@@ -279,10 +293,13 @@
 	#endif
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark IMBLibraryController Delegate
+
 
 - (BOOL) controller:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
 {
@@ -293,12 +310,14 @@
 	return YES;
 }
 
+
 - (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
 {
 	#if LOG_CREATE_NODE
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
 	#endif
 }
+
 
 - (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
 {
@@ -307,7 +326,9 @@
 	#endif
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (BOOL) controller:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
 {
@@ -318,12 +339,14 @@
 	return YES;
 }
 
+
 - (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode
 {
 	#if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
 }
+
 
 - (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode
 {
@@ -332,6 +355,8 @@
 	#endif
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

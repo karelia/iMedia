@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -56,7 +58,9 @@
 #import "NSFileManager+iMedia.h"
 #import <Quartz/Quartz.h>
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -72,7 +76,9 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -84,7 +90,9 @@
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize version = _version;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -95,7 +103,9 @@
 	[pool release];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Check if iTunes is installed...
 
@@ -104,12 +114,15 @@
 	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iTunes"];
 }
 
+
 + (BOOL) isInstalled
 {
 	return [self iTunesPath] != nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Look at the iApps preferences file and find all iPhoto libraries. Create a parser instance for each libary...
 
@@ -140,7 +153,9 @@
 	return parserInstances;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
@@ -155,6 +170,7 @@
 	return self;
 }
 
+
 - (void) dealloc
 {
 	IMBRelease(_appPath);
@@ -163,7 +179,9 @@
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Parser Methods
@@ -245,7 +263,9 @@
 	return node;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // The supplied node is a private copy which may be modified here in the background operation. Parse the 
 // iPhoto XML file and create subnodes as needed...
@@ -263,7 +283,9 @@
 	return error == nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // When the parser is deselected, then get rid of the cached plist data. It will be loaded into memory lazily 
 // once it is needed again...
@@ -273,7 +295,9 @@
 	self.plist = nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Helper Methods
@@ -303,7 +327,9 @@
 	return _plist;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBiPhotoParser://AlbumId/17"...
 
@@ -313,7 +339,9 @@
 	return [self identifierForPath:path];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Exclude some playlist types...
 
@@ -343,7 +371,9 @@
 	return YES;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Everything except folders is a leaf node...
 
@@ -352,7 +382,9 @@
 	return [inPlaylistDict objectForKey:@"Folder"] == nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (NSImage*) iconForPlaylist:(NSDictionary*)inPlaylistDict
 {
@@ -448,7 +480,9 @@
 	return nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) addSubNodesToNode:(IMBNode*)inParentNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
@@ -498,7 +532,9 @@
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
@@ -588,7 +624,9 @@
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // A track is eligible if it has a name, a url, and if it is not a movie file...
 
@@ -602,6 +640,8 @@
 	return YES;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

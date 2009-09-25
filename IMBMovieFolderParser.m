@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -51,11 +53,14 @@
 #import "IMBParserController.h"
 #import "IMBCommon.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
 @implementation IMBMovieFolderParser
+
 
 // Restrict this parser to image files...
 
@@ -68,6 +73,7 @@
 	
 	return self;
 }
+
 
 // Return metadata specific to movie files...
 
@@ -112,11 +118,14 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
 @implementation IMBMoviesFolderParser
+
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -126,6 +135,7 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
 	[pool release];
 }
+
 
 // Set the folder path to the ~/Pictures...
 
@@ -139,6 +149,8 @@
 	return self;
 }
 
+
 @end
+
 
 //----------------------------------------------------------------------------------------------------------------------

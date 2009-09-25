@@ -43,22 +43,35 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
 #import "IMBMovieViewController.h"
 #import "IMBObjectArrayController.h"
+#import "IMBPanelController.h"
 #import "IMBCommon.h"
 #import "NSWorkspace+iMedia.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
 @implementation IMBMovieViewController
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) load
+{
+	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeMovie];
+}
+
 
 - (void) awakeFromNib
 {
@@ -69,7 +82,9 @@
 		nil];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 + (NSString*) mediaType
 {
@@ -81,7 +96,9 @@
 	return @"IMBMovieView";
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (NSImage*) icon
 {
@@ -99,7 +116,9 @@
 		@"mediaType display name");
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 + (NSString*) objectCountFormatSingular
 {
@@ -119,7 +138,9 @@
 		@"Format string for object count in plural");
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 

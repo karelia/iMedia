@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -51,14 +53,18 @@
 #import "NSFileManager+iMedia.h"
 #import "IMBCommon.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 
 @interface IMBURLDownloadOperation ()
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 
@@ -74,7 +80,9 @@
 @synthesize bytesDone = _bytesDone;
 @synthesize finished = _finished;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) initWithURL:(NSURL*)inURL delegate:(id)inDelegate;
 {
@@ -87,6 +95,7 @@
 	return self;
 }
 
+
 - (void) dealloc
 {
 	IMBRelease(_remoteURL);
@@ -98,7 +107,9 @@
 	[super dealloc];
 } 
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Get the size (in bytes) of a remote file on the internet. This method is synchronous. This may be a problem
 // if we are downloading a lot of files at once. TODO: investigate how we can make this asynchronous, without
@@ -118,7 +129,9 @@
 	return _bytesTotal;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // Create a NSURLDownload, start it and spin the runloop until we are done. Since we are in a background thread
 // we can block without problems...
@@ -148,6 +161,7 @@
 	[pool release];
 }
 
+
 - (void) cancel
 {
 	[self.download cancel];
@@ -163,7 +177,9 @@
 	self.finished = YES;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // The file was created (possibly with a modified filename (to make it unique). Store the filename...
 
@@ -173,6 +189,7 @@
 	self.localPath = inPath;
 }
 
+
 // We received some data. Display the progress...
 
 - (void) download:(NSURLDownload*)inDownload didReceiveDataOfLength:(NSUInteger)inLength
@@ -181,6 +198,7 @@
 	_bytesDone += (long long)inLength;
 	[_delegate didReceiveData:self];
 }
+
 
 // We are done. Notify the delegate (IMBRemoteObjectPromise) so that it can hide the progress...
 
@@ -193,6 +211,7 @@
 	self.download = nil;
 }
 
+
 - (void) download:(NSURLDownload*)inDownload didFailWithError:(NSError*)inError
 {
 	self.error = inError;
@@ -202,6 +221,8 @@
 	self.download = nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

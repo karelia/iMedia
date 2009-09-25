@@ -43,20 +43,25 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
 #import "IMBLinkViewController.h"
 #import "IMBNodeViewController.h"
 #import "IMBObjectArrayController.h"
+#import "IMBPanelController.h"
 #import "IMBCommon.h"
 #import "IMBObject.h"
 #import "IMBNode.h"
 #import "IMBFolderParser.h"
 #import "NSWorkspace+iMedia.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -64,6 +69,13 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) load
+{
+	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeLink];
+}
+
 
 - (void) awakeFromNib
 {
@@ -76,12 +88,15 @@
 		nil];
 }
 
+
 - (void) dealloc
 {
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 + (NSString*) mediaType
 {
@@ -93,7 +108,9 @@
 	return @"IMBLinkView";
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (NSImage*) icon
 {
@@ -109,7 +126,9 @@
 		@"mediaType display name");
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 + (NSString*) objectCountFormatSingular
 {
@@ -130,7 +149,9 @@
 }
 
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark NSTableViewDelegate
@@ -163,16 +184,17 @@
 	}
 }
 
+
 // If we already has some Link playing, then play the new song if the selection changes...
 
 - (void) tableViewSelectionDidChange:(NSNotification*)inNotification
 {
+
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-
 
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 

@@ -43,13 +43,17 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
 #import "IMBFolderParser.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -58,10 +62,12 @@
 @interface IMBMovieFolderParser : IMBFolderParser
 @end
 
+
 // This subclass looks only in "~/Movies"...
 
 @interface IMBMoviesFolderParser : IMBMovieFolderParser
 @end
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

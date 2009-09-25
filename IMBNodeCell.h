@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @interface IMBNodeCell : NSTextFieldCell
 {
@@ -59,5 +61,6 @@
 - (NSRect) badgeRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped;
 
 @end
+
 
 //----------------------------------------------------------------------------------------------------------------------

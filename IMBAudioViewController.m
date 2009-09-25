@@ -43,13 +43,16 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
 #import "IMBAudioViewController.h"
 #import "IMBNodeViewController.h"
 #import "IMBObjectArrayController.h"
+#import "IMBPanelController.h"
 #import "IMBCommon.h"
 #import "IMBObject.h"
 #import "IMBNode.h"
@@ -57,7 +60,9 @@
 #import "NSWorkspace+iMedia.h"
 #import <QTKit/QTKit.h>
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -65,7 +70,15 @@
 
 @synthesize playingAudio = _playingAudio;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) load
+{
+	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeAudio];
+}
+
 
 - (void) awakeFromNib
 {
@@ -78,13 +91,16 @@
 		nil];
 }
 
+
 - (void) dealloc
 {
 	IMBRelease(_playingAudio);
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 + (NSString*) mediaType
 {
@@ -96,7 +112,9 @@
 	return @"IMBAudioView";
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (NSImage*) icon
 {
@@ -112,7 +130,9 @@
 		@"mediaType display name");
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 + (NSString*) objectCountFormatSingular
 {
@@ -132,7 +152,9 @@
 		@"Format string for object count in plural");
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) willHideView
 {
@@ -140,7 +162,9 @@
 	self.playingAudio = nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark NSTableViewDelegate
@@ -188,7 +212,9 @@
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (IBAction) play:(id)inSender
 {
@@ -208,6 +234,7 @@
 		[self playAudioObject:object];
 	}
 }
+
 
 - (void) playAudioObject:(IMBObject*)inObject
 {
@@ -237,7 +264,9 @@
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 

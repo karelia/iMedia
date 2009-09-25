@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
  */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -54,7 +56,9 @@
 #import <Quartz/Quartz.h>
 #import <QuickLook/QuickLook.h>
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -136,7 +140,185 @@
 
 #pragma mark 
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBVisualObject
+
+@synthesize imageRepresentation = _imageRepresentation;
+@synthesize imageRepresentationType = _imageRepresentationType;
+@synthesize imageVersion = _imageVersion;
+@synthesize thumbnailImage  = _thumbnailImage ;
+@synthesize imageLoading = _imageLoading;
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		self.imageRepresentation = [inCoder decodeObjectForKey:@"imageRepresentation"];
+		self.imageRepresentationType = [inCoder decodeObjectForKey:@"imageRepresentationType"];
+		self.imageVersion = [inCoder decodeIntegerForKey:@"imageVersion"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	[inCoder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
+	[inCoder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
+	[inCoder encodeInteger:self.imageVersion forKey:@"imageVersion"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBVisualObject* copy = (IMBVisualObject*)[super copyWithZone:inZone];
+	copy.imageRepresentation = self.imageRepresentation;
+	copy.imageRepresentationType = self.imageRepresentationType;
+	copy.imageVersion = self.imageVersion;
+	return copy;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_imageRepresentation);
+	IMBRelease(_imageRepresentationType);
+	[super dealloc];
+}
+
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"%@ imageRepresentation=%@ imageRepresentationType=%@ imageVersion=%d", [super description], self.imageRepresentation, self.imageRepresentationType, self.imageVersion];
+}
+
+
+// Use the path or URL as the unique identifier...
+
+- (NSString*) imageUID
+{
+	return _value;
+}
+
+
+// The name of the object will be used as the title in IKIMageBrowserView...
+
+- (NSString*) imageTitle
+{
+	return _name;
+}
+
+
+// When this method is called we assume that the object is about to be displayed. So this could be a 
+// possible hook for lazily loading metadata...
+
+- (id) imageRepresentation
+{
+	if (_metadata == nil && _parser != nil)
+	{
+		[_parser loadMetadataForObject:self];
+	}	
+	
+	return [[_imageRepresentation retain] autorelease];
+}
+
+
+- (void)queueThumbnailImageLoad
+{
+    @synchronized (self)
+	{
+        if (self.thumbnailImage == nil && !self.imageLoading)
+		{
+            self.imageLoading = YES;
+			
+			IMBThumbnailOperation* operation = [[IMBThumbnailOperation alloc] initWithVisualObject:self];
+			
+			[[IMBOperationQueue sharedQueue] addOperation:operation];			
+        }
+    }
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+// Override to show a folder icon instead of a generic file icon...
+
+@implementation IMBNodeObject
+
+@synthesize path = _path;
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		self.path = [inCoder decodeObjectForKey:@"path"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	[inCoder encodeObject:self.path forKey:@"path"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBNodeObject* copy = (IMBNodeObject*) [super copyWithZone:inZone];
+	copy.path = self.path;
+	return copy;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_path);
+	[super dealloc];
+}
+
+
+- (NSString*) imageUID
+{
+	return _path;
+}
+
+
+- (NSImage*) icon
+{
+	return [[NSWorkspace sharedWorkspace] iconForFile:self.path];
+}
+
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"%@ path=%@", [super description], self.path];
+}
+
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 
 @implementation IMBThumbnailOperation
 
@@ -293,155 +475,5 @@
 
 @end
 
-#pragma mark 
-
-@implementation IMBVisualObject
-
-@synthesize imageRepresentation = _imageRepresentation;
-@synthesize imageRepresentationType = _imageRepresentationType;
-@synthesize imageVersion = _imageVersion;
-@synthesize thumbnailImage  = _thumbnailImage ;
-@synthesize imageLoading = _imageLoading;
-
-- (id) initWithCoder:(NSCoder*)inCoder
-{
-	if (self = [super initWithCoder:inCoder])
-	{
-		self.imageRepresentation = [inCoder decodeObjectForKey:@"imageRepresentation"];
-		self.imageRepresentationType = [inCoder decodeObjectForKey:@"imageRepresentationType"];
-		self.imageVersion = [inCoder decodeIntegerForKey:@"imageVersion"];
-	}
-	
-	return self;
-}
-
-- (void) encodeWithCoder:(NSCoder*)inCoder
-{
-	[super encodeWithCoder:inCoder];
-	[inCoder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
-	[inCoder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
-	[inCoder encodeInteger:self.imageVersion forKey:@"imageVersion"];
-}
-
-- (id) copyWithZone:(NSZone*)inZone
-{
-	IMBVisualObject* copy = (IMBVisualObject*)[super copyWithZone:inZone];
-	copy.imageRepresentation = self.imageRepresentation;
-	copy.imageRepresentationType = self.imageRepresentationType;
-	copy.imageVersion = self.imageVersion;
-	return copy;
-}
-
-- (void) dealloc
-{
-	IMBRelease(_imageRepresentation);
-	IMBRelease(_imageRepresentationType);
-	[super dealloc];
-}
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"%@ imageRepresentation=%@ imageRepresentationType=%@ imageVersion=%d", [super description], self.imageRepresentation, self.imageRepresentationType, self.imageVersion];
-}
-
-// Use the path or URL as the unique identifier...
-
-- (NSString*) imageUID
-{
-	return _value;
-}
-
-// The name of the object will be used as the title in IKIMageBrowserView...
-
-- (NSString*) imageTitle
-{
-	return _name;
-}
-
-// When this method is called we assume that the object is about to be displayed. So this could be a 
-// possible hook for lazily loading metadata...
-
-- (id) imageRepresentation
-{
-	if (_metadata == nil && _parser != nil)
-	{
-		[_parser loadMetadataForObject:self];
-	}	
-	
-	return [[_imageRepresentation retain] autorelease];
-}
-
-- (void)queueThumbnailImageLoad
-{
-    @synchronized (self)
-	{
-        if (self.thumbnailImage == nil && !self.imageLoading)
-		{
-            self.imageLoading = YES;
-			
-			IMBThumbnailOperation* operation = [[IMBThumbnailOperation alloc] initWithVisualObject:self];
-			
-			[[IMBOperationQueue sharedQueue] addOperation:operation];			
-        }
-    }
-}
-
-@end
-
-//----------------------------------------------------------------------------------------------------------------------
-
-#pragma mark 
-
-// Override to show a folder icon instead of a generic file icon...
-
-@implementation IMBNodeObject
-
-@synthesize path = _path;
-
-- (id) initWithCoder:(NSCoder*)inCoder
-{
-	if (self = [super initWithCoder:inCoder])
-	{
-		self.path = [inCoder decodeObjectForKey:@"path"];
-	}
-	
-	return self;
-}
-
-- (void) encodeWithCoder:(NSCoder*)inCoder
-{
-	[super encodeWithCoder:inCoder];
-	[inCoder encodeObject:self.path forKey:@"path"];
-}
-
-- (id) copyWithZone:(NSZone*)inZone
-{
-	IMBNodeObject* copy = (IMBNodeObject*) [super copyWithZone:inZone];
-	copy.path = self.path;
-	return copy;
-}
-
-- (void) dealloc
-{
-	IMBRelease(_path);
-	[super dealloc];
-}
-
-- (NSString*) imageUID
-{
-	return _path;
-}
-
-- (NSImage*) icon
-{
-	return [[NSWorkspace sharedWorkspace] iconForFile:self.path];
-}
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"%@ path=%@", [super description], self.path];
-}
-
-@end
 
 //----------------------------------------------------------------------------------------------------------------------

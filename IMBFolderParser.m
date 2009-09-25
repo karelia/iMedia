@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -55,7 +57,9 @@
 #import "NSString+iMedia.h"
 #import <Quartz/Quartz.h>
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -63,7 +67,9 @@
 
 @synthesize fileUTI = _fileUTI;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
@@ -81,7 +87,9 @@
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Parser Methods
@@ -143,7 +151,9 @@
 	return newNode;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // The supplied node is a private copy which may be modified here in the background operation. Scan the folder
 // for folder or for files that match our desired UTI and create an IMBObject for each file that qualifies...
@@ -198,16 +208,22 @@
 					object.value = (id)path;
 					object.name = file;
 					
-					// If the file is an image, then we will get the image directly.  Otherwise
-					// We will use QuickLook, e.g. to get image out of an audio file.
+					// If the file is an image, then we will get the image directly. Otherwise
+					// We will use QuickLook, e.g. to get image out of an audio file...
+					
 					if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeImage])
 					{
 						object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+					}
+					else if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeMovie])
+					{
+						object.imageRepresentationType = IKImageBrowserQTMoviePathRepresentationType;
 					}
 					else
 					{
 						object.imageRepresentationType = IKImageBrowserQuickLookPathRepresentationType;
 					}
+					
 					object.imageRepresentation = path;
 					object.metadata = nil; // will be loaded lazily (on demand when needed)
 					object.parser = self;
@@ -256,16 +272,20 @@
 	return error == nil;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Helpers
+
 
 - (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI
 {
 	NSString* uti = [NSString UTIForFileAtPath:inPath];
 	return (BOOL) UTTypeConformsTo((CFStringRef)uti,(CFStringRef)inRequiredUTI);
 }
+
 
 - (NSImage*) iconForPath:(NSString*)inPath
 {
@@ -283,14 +303,16 @@
 	return nil;
 }
 
+
 + (NSString*) identifierForPath:(NSString*)inPath
 {
 	NSString* parserClassName = NSStringFromClass([self class]);
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
 }
-
 	
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
@@ -303,6 +325,8 @@
 	}
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

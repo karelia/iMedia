@@ -43,20 +43,24 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark CLASSES
 	
 @class IMBObjectViewController;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5
-	@interface IMBPanelController : NSWindowController <NSTabViewDelegate>
+@interface IMBPanelController : NSWindowController <NSTabViewDelegate>
 #else
-	@interface IMBPanelController : NSWindowController
+@interface IMBPanelController : NSWindowController
 #endif
 {
 	id _delegate;
@@ -68,6 +72,8 @@
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
 }
+
++ (void) registerViewControllerClass:(Class)inViewControllerClass forMediaType:(NSString*)inMediaType;
 
 + (IMBPanelController*) sharedPanelController;
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
@@ -85,7 +91,9 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -101,5 +109,7 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 

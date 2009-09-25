@@ -43,11 +43,17 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark HEADERS
 
 #import "IMBTextFieldCell.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -56,7 +62,9 @@
 - (void) drawAtBottomOfCellWithFrame:(NSRect)inFrame inView:(NSView*)inView;
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 
@@ -64,7 +72,9 @@
 
 @synthesize verticalAlignment = _verticalAlignment;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) initTextCell:(NSString*)inSString
 {
@@ -76,6 +86,7 @@
 	return self;
 }
 
+
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if (self = [super initWithCoder:inCoder])
@@ -86,7 +97,9 @@
 	return self;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark
 
@@ -110,6 +123,7 @@
 	}
 }
 
+
 - (void) drawVerticallyCenteredWithFrame:(NSRect)inFrame inView:(NSView*)inView
 {
 	NSSize textSize = [self cellSizeForBounds:inFrame];
@@ -118,6 +132,7 @@
 	
 	[super drawWithFrame:centeredFrame inView:inView];
 }
+
 
 - (void)drawAtBottomOfCellWithFrame:(NSRect)inFrame inView:(NSView*)inView
 {
@@ -134,6 +149,8 @@
 	[super drawWithFrame:bottomFrame inView:inView];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

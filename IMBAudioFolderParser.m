@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
@@ -51,7 +53,9 @@
 #import "IMBParserController.h"
 #import "IMBCommon.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -68,6 +72,7 @@
 	
 	return self;
 }
+
 
 // Return metadata specific to audio files...
 
@@ -113,7 +118,9 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -127,6 +134,7 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
 	[pool release];
 }
+
 
 // Set the folder path to ~/Music...
 
@@ -142,11 +150,14 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
 @implementation IMBiLifeSoundEffectsFolderParser
+
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -156,6 +167,7 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
 	[pool release];
 }
+
 
 // Set the folder path to /Library/Audio/Apple Loops/Apple/iLife Sound Effects...
 
@@ -171,17 +183,21 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
 @implementation IMBiMovieSoundEffectsFolderParser
+
 
 + (id) folderPath
 {
 	NSString* path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
 	return [path stringByAppendingPathComponent:@"/Contents/Resources/Sound Effects"];
 }
+
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -191,6 +207,7 @@
 	if ([self folderPath]) [IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
 	[pool release];
 }
+
 
 // Set the folder path to iMovie.app/Contents/Resources/Sound Effects...
 
@@ -206,11 +223,14 @@
 
 @end
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
 @implementation IMBLibrarySoundsFolderParser
+
 
 // Register this parser, so that it gets automatically loaded...
 
@@ -220,6 +240,7 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
 	[pool release];
 }
+
 
 // Set the folder path to ~/Library/Sounds...
 

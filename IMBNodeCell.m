@@ -43,14 +43,18 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark HEADERS
 
 #import "IMBNodeCell.h"
 #import "IMBNode.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark CONSTANTS
 
@@ -61,7 +65,9 @@
 #define kTextOriginYOffset	1
 #define kTextHeightAdjust	4
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -70,7 +76,9 @@
 @synthesize image = _image;
 @synthesize badgeType = _badgeType;
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) init
 {
@@ -82,6 +90,7 @@
 	return self;
 }
 
+
 - (id) copyWithZone:(NSZone*)inZone
 {
     IMBNodeCell* cell = (IMBNodeCell*) [super copyWithZone:inZone];
@@ -90,15 +99,19 @@
     return cell;
 }
 
+
 - (void) dealloc
 {
 	IMBRelease(_image);
     [super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
+
 #pragma mark 
+
 
 - (NSRect) imageRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
 {	
@@ -115,6 +128,7 @@
 
 	return imageRect;
 }
+
 
 - (NSRect) titleRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
 {	
@@ -139,6 +153,7 @@
 	return titleRect;
 }
 
+
 - (NSRect) badgeRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
 {	
 	NSRect badgeRect = inBounds;
@@ -155,14 +170,18 @@
 	return badgeRect;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (BOOL) isGroupCell
 {
     return (self.image == nil && self.title.length > 0);
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (NSSize) cellSize
 {
@@ -171,11 +190,12 @@
     return cellSize;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
-//----------------------------------------------------------------------------------------------------------------------
 
 - (void) drawWithFrame:(NSRect)inFrame inView:(NSView*)inControlView
 {
@@ -215,7 +235,9 @@
 //	[badge compositeToPoint:badgeRect.origin operation:NSCompositeSourceOver fraction:0.5];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) editWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate event:(NSEvent*)inEvent
 {
@@ -223,7 +245,9 @@
 	[super editWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate event:inEvent];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) selectWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate start:(NSInteger)inStart length:(NSInteger)inLength
 {
@@ -231,7 +255,9 @@
 	[super selectWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate start:inStart length:inLength];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 // In 10.5, we need you to implement this method for blocking drag and drop of a given cell. So NSCell hit testing 
 // will determine if a row can be dragged or not. NSTableView calls this cell method when starting a drag, if the 
@@ -254,7 +280,9 @@
 	return result;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 
