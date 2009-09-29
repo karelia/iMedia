@@ -19,14 +19,10 @@
 		CEF695C91064341C005D7E72 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E0C80104C72A200EE6B09 /* Security.framework */; };
 		CEF695E0106434FE005D7E72 /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D6106434FD005D7E72 /* WebIconDatabase.h */; };
 		CEF695E1106434FE005D7E72 /* IMBSafariBookmarkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D7106434FD005D7E72 /* IMBSafariBookmarkParser.h */; };
-		CEF695E2106434FE005D7E72 /* IMBSafariBookmarkParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695D8106434FD005D7E72 /* IMBSafariBookmarkParser.m */; };
 		CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D9106434FD005D7E72 /* iMBXBELParser.h */; };
-		CEF695E4106434FE005D7E72 /* iMBXBELParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DA106434FE005D7E72 /* iMBXBELParser.m */; };
 		CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */ = {isa = PBXBuildFile; fileRef = CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */; };
 		CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DC106434FE005D7E72 /* iMBOmniWebParser.h */; };
-		CEF695E7106434FE005D7E72 /* iMBOmniWebParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DD106434FE005D7E72 /* iMBOmniWebParser.m */; };
 		CEF695E8106434FE005D7E72 /* iMBFireFoxParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DE106434FE005D7E72 /* iMBFireFoxParser.h */; };
-		CEF695E9106434FE005D7E72 /* iMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */; };
 		CEF6960010643A25005D7E72 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF695FF10643A25005D7E72 /* WebKit.framework */; };
 		CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */; };
 		CEF6970810643D60005D7E72 /* IMBLinkViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6970610643D60005D7E72 /* IMBLinkViewController.h */; };
@@ -1188,10 +1184,6 @@
 				CEF686B61062D0BD005D7E72 /* IMBComboTableView.m in Sources */,
 				CEF686BB1062D18F005D7E72 /* IMBComboTextCell.m in Sources */,
 				CEF6871A1062DAF0005D7E72 /* IMBDynamicTableView.m in Sources */,
-				CEF695E2106434FE005D7E72 /* IMBSafariBookmarkParser.m in Sources */,
-				CEF695E4106434FE005D7E72 /* iMBXBELParser.m in Sources */,
-				CEF695E7106434FE005D7E72 /* iMBOmniWebParser.m in Sources */,
-				CEF695E9106434FE005D7E72 /* iMBFireFoxParser.m in Sources */,
 				CEF6970910643D60005D7E72 /* IMBLinkViewController.m in Sources */,
 				D010384D10714CB3007C88D7 /* IMBNodeObject.m in Sources */,
 				D010388C107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.m in Sources */,
