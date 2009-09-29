@@ -374,7 +374,7 @@
 //					[objects addObject:object];
 //					[object release];
 //
-//					object.value = (id)imagePath;
+//					object.location = (id)imagePath;
 //					object.name = caption;
 //					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 //					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;

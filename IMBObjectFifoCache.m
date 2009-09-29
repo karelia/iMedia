@@ -17,22 +17,22 @@
  without limitation the rights to use, copy, modify, merge, publish,
  distribute, sublicense, and/or sell copies of the Software, and to permit
  persons to whom the Software is furnished to do so, subject to the following
- conditions: 
+ conditions:
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -41,7 +41,7 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -49,20 +49,18 @@
 
 #pragma mark HEADERS
 
-#import "IMBImageBrowserCell.h"
-#import "IMBNodeObject.h"
+#import "IMBObjectFifoCache.h"
+#import "IMBObject.h"
+#import "IMBCommon.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IKImageBrowserCell ()
+#pragma mark GLOBALS
 
-- (void) setDataSource:(id)inDataSource;
-- (void) drawShadow;
-- (void) drawImageOutline;
-
-@end
+static NSUInteger sCacheSize = 512;
+static NSMutableArray* sObjectCache = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,83 +68,83 @@
 
 #pragma mark 
 
-@implementation IMBImageBrowserCell
-
-@synthesize imbShouldDrawOutline = _imbShouldDrawOutline;
-@synthesize imbShouldDrawShadow = _imbShouldDrawShadow;
+@implementation IMBObjectFifoCache
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) init
++ (void) setSize:(NSUInteger)inSize
 {
-	if (self = [super init])
-	{
-		_imbShouldDrawOutline = YES;
-		_imbShouldDrawShadow = YES;
-	}
-	
-	return self;
+	sCacheSize = inSize;
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Disable outline and shadow drawing for folders (IMBNodeObject)...
-
-- (void) setDataSource:(id)inDataSource
++ (NSUInteger) size
 {
-	[super setDataSource:inDataSource];
-	
-	if ([inDataSource isKindOfClass:[IMBNodeObject class]])
-	{
-		_imbShouldDrawOutline = NO;
-		_imbShouldDrawShadow = NO;
-	}
+	return sCacheSize;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) drawShadow
+// Keep removing the oldest objects (lowest indexes) until the array no longer exceeds the cache size...
+
++ (void) _removeOldestObjects
 {
-	if (_imbShouldDrawShadow)
+	if (sObjectCache != nil)
 	{
-		[super drawShadow];	
+		while ([sObjectCache count] > sCacheSize)
+		{
+			IMBObject* object = [sObjectCache objectAtIndex:0];
+			[object unload];
+			[sObjectCache removeObjectAtIndex:0];
+		}
 	}
 }
 
 
-- (void) drawImageOutline
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Add a new object to the end of the array. If we now exceed the cache size, then bump the oldest  
+// objects off the cache...
+
++ (void) addObject:(IMBObject*)inObject
 {
-	if (_imbShouldDrawOutline)
+	if (sObjectCache == nil)
 	{
-		[super drawImageOutline];	
-	}	
+		sObjectCache = [[NSMutableArray alloc] initWithCapacity:sCacheSize];
+	}
+	
+	[sObjectCache addObject:inObject];
+	[self _removeOldestObjects];
 }
 
 
-- (void) sizeDidChange
-{	
-#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5
-#else
-	CGFloat points = 0;
-	CGFloat width = [self size].width;
-	
-	if (width < 50) points = 9;
-	else if (width < 60) points = 10;
-	else if (width < 70) points = 11;
-	else if (width < 80) points = 12;
-	else points = 13;
+// Remove the given object from the cache. Please note that it may be in the cache multiple times. All 
+// occurences are removed...
 
-	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont fontWithName:@"Lucida Grande" size:points] forKey:NSFontAttributeName];
-	[[self parent] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
-#endif
-	
-	[super sizeDidChange];
++ (void) removeObject:(IMBObject*)inObject
+{
+	if (sObjectCache != nil)
+	{
+		while ([sObjectCache indexOfObject:inObject])
+		{
+			[inObject unload];
+			[sObjectCache removeObject:inObject];
+		}
+	}
+}
+
+
+// Remove all objects from the cache...
+
++ (void) removeAllObjects
+{
+	[sObjectCache makeObjectsPerformSelector:@selector(unload)];
+	IMBRelease(sObjectCache);
 }
 
 
@@ -154,4 +152,3 @@
 
 
 @end
-

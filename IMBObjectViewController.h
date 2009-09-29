@@ -75,7 +75,9 @@ enum
 	kIMBObjectViewTypeCombo,
 };
 typedef NSUInteger kIMBObjectViewType;
-extern NSString *const IMBObjectPropertyNamedThumbnailImage;
+
+
+extern NSString* const kIMBObjectImageRepresentationProperty;
 
 
 //----------------------------------------------------------------------------------------------------------------------

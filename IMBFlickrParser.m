@@ -202,13 +202,13 @@
 		// Or, perhaps, we may want to have a callback to the application for what size of photo it would like
 		// to receive.  (There's no point in getting larger size than the application will need.)
 		
-		IMBVisualObject* obj = [[IMBVisualObject alloc] init];
+		IMBObject* obj = [[IMBObject alloc] init];
+		obj.location = imageURL;
 		obj.name = [photoDict objectForKey:@"title"];
+		obj.metadata = [NSDictionary dictionaryWithObject:webPageURL forKey:@"webPageURL"];
+		obj.parser = self;
 		obj.imageRepresentation = thumbnailURL;
 		obj.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
-		obj.metadata = [NSDictionary dictionaryWithObject:webPageURL forKey:@"webPageURL"];
-		obj.value = imageURL;
-		obj.parser = self;
 		[objects addObject:obj];
 		[obj release];
 	}

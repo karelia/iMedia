@@ -575,7 +575,7 @@
 					
 					// Create an object...
 					
-					IMBVisualObject* object = [[IMBVisualObject alloc] init];
+					IMBObject* object = [[IMBObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
@@ -584,7 +584,7 @@
 					if (isFileURL)
 					{
 						object.name = name;
-						object.value = (id)path;
+						object.location = (id)path;
 						object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 						object.imageRepresentation = path;
 					}
@@ -594,7 +594,7 @@
 					else
 					{
 						object.name = name;
-						object.value = (id)url;
+						object.location = (id)url;
 						object.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
 						object.imageRepresentation = url;
 					}

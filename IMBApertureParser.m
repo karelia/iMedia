@@ -506,11 +506,11 @@
 					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [imageDict objectForKey:@"Caption"];
 	
-					IMBVisualObject* object = [[IMBVisualObject alloc] init];
+					IMBObject* object = [[IMBObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
-					object.value = (id)imagePath;
+					object.location = (id)imagePath;
 					object.name = caption;
 					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
