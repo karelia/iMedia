@@ -51,8 +51,9 @@
 
 #import "IMBObjectPromise.h"
 #import "IMBCommon.h"
-#import "IMBObject.h"
 #import "IMBNode.h"
+#import "IMBObject.h"
+#import "IMBNOdeObject.h"
 #import "IMBParser.h"
 #import "IMBConfig.h"
 #import "IMBOperationQueue.h"
@@ -290,16 +291,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	// Get the path...
 	
-	NSString* path = nil;
-	
-	if ([inObject.value isKindOfClass:[NSString class]])
-	{
-		path = (NSString*)[inObject value];
-	}
-	else if ([inObject.value isKindOfClass:[NSURL class]])
-	{
-		path = [(NSURL*)inObject.value path];
-	}
+	NSString* path = [inObject path];
 	
 	// Check if the file at this path exists. If yes then add the path to the array...
 	

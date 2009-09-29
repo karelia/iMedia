@@ -53,8 +53,16 @@
 #import "IMBParser.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
-#import <Quartz/Quartz.h>
-#import <QuickLook/QuickLook.h>
+#import "IMBObjectThumbnailLoadOperation.h"
+#import "IMBObjectFifoCache.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
+
+#define MAX_THUMBNAIL_SIZE 128
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,104 +72,47 @@
 
 @implementation IMBObject
 
-@synthesize value = _value;
+@synthesize location = _location;
 @synthesize name = _name;
 @synthesize metadata = _metadata;
 @synthesize parser = _parser;
+@synthesize index = _index;
 
-- (id) initWithCoder:(NSCoder*)inCoder
-{
-	if (self = [super init])
-	{
-		self.value = [inCoder decodeObjectForKey:@"value"];
-		self.name = [inCoder decodeObjectForKey:@"name"];
-		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
-	}
-	
-	return self;
-}
-
-- (void) encodeWithCoder:(NSCoder*)inCoder
-{
-	[inCoder encodeObject:self.value forKey:@"value"];
-	[inCoder encodeObject:self.name forKey:@"name"];
-	[inCoder encodeObject:self.metadata forKey:@"metadata"];
-}
-
-- (id) copyWithZone:(NSZone*)inZone
-{
-	IMBObject* copy = [[IMBObject allocWithZone:inZone] init];
-	copy.value = self.value;
-	copy.name = self.name;
-	copy.metadata = self.metadata;
-	return copy;
-}
-
-- (void) dealloc
-{
-	IMBRelease(_value);
-	IMBRelease(_name);
-	IMBRelease(_metadata);
-	IMBRelease(_parser);
-	[super dealloc];
-}
-
-// Return a small generic icon for this file. Is the icon cached by NSWorkspace, or should be provide some 
-// caching ourself?
-
-- (NSImage*) icon
-{
-	NSString* path = nil;
-	
-	if ([_value isKindOfClass:[NSURL class]])
-		path = [(NSURL*)_value path];
-	else if ([_value isKindOfClass:[NSString class]])
-		path = (NSString*)_value;
-	
-	NSString* extension = [path pathExtension];
-	if (extension==nil || [extension length]==0) extension = @"jpg";
-	
-	return [[NSWorkspace sharedWorkspace] iconForFileType:extension];
-}
-
-// Objects are equal if their value (paths or urls) are equal...
-
-- (BOOL) isEqual:(IMBObject*)inObject
-{
-	return [self.value isEqual:inObject.value];
-}
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"%@ name=%@ value=%@ metadata=%p", [super description], self.name, self.value, self.metadata];
-}
-
-@end
-
-#pragma mark 
+@synthesize imageLocation = _imageLocation;
+@synthesize imageRepresentation = _imageRepresentation;
+@synthesize imageRepresentationType = _imageRepresentationType;
+@synthesize imageVersion = _imageVersion;
+@synthesize isLoading = _isLoading;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-@implementation IMBVisualObject
-
-@synthesize imageRepresentation = _imageRepresentation;
-@synthesize imageRepresentationType = _imageRepresentationType;
-@synthesize imageVersion = _imageVersion;
-@synthesize thumbnailImage  = _thumbnailImage ;
-@synthesize imageLoading = _imageLoading;
+- (id) init
+{
+	if (self = [super init])
+	{
+		self.index = NSNotFound;
+	}
+	
+	return self;
+}
 
 
 - (id) initWithCoder:(NSCoder*)inCoder
 {
-	if (self = [super initWithCoder:inCoder])
+	if (self = [super init])
 	{
+		self.location = [inCoder decodeObjectForKey:@"location"];
+		self.name = [inCoder decodeObjectForKey:@"name"];
+		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
+		self.index = [inCoder decodeIntegerForKey:@"index"];
+		self.imageLocation = [inCoder decodeObjectForKey:@"imageLocation"];
 		self.imageRepresentation = [inCoder decodeObjectForKey:@"imageRepresentation"];
 		self.imageRepresentationType = [inCoder decodeObjectForKey:@"imageRepresentationType"];
 		self.imageVersion = [inCoder decodeIntegerForKey:@"imageVersion"];
+
+//		self.parser = [inCoder decodeObjectForKey:@"parser"];
 	}
 	
 	return self;
@@ -170,7 +121,11 @@
 
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
-	[super encodeWithCoder:inCoder];
+	[inCoder encodeObject:self.location forKey:@"location"];
+	[inCoder encodeObject:self.name forKey:@"name"];
+	[inCoder encodeObject:self.metadata forKey:@"metadata"];
+	[inCoder encodeInteger:self.index forKey:@"index"];
+	[inCoder encodeObject:self.imageLocation forKey:@"imageLocation"];
 	[inCoder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
 	[inCoder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
 	[inCoder encodeInteger:self.imageVersion forKey:@"imageVersion"];
@@ -179,33 +134,47 @@
 
 - (id) copyWithZone:(NSZone*)inZone
 {
-	IMBVisualObject* copy = (IMBVisualObject*)[super copyWithZone:inZone];
+	IMBObject* copy = [[IMBObject allocWithZone:inZone] init];
+	
+	copy.location = self.location;
+	copy.name = self.name;
+	copy.metadata = self.metadata;
+	copy.index = self.index;
+	copy.imageLocation = self.imageLocation;
 	copy.imageRepresentation = self.imageRepresentation;
 	copy.imageRepresentationType = self.imageRepresentationType;
 	copy.imageVersion = self.imageVersion;
+	
 	return copy;
 }
 
 
 - (void) dealloc
 {
+	IMBRelease(_location);
+	IMBRelease(_name);
+	IMBRelease(_metadata);
+	IMBRelease(_parser);
+	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
+
 	[super dealloc];
 }
 
 
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"%@ imageRepresentation=%@ imageRepresentationType=%@ imageVersion=%d", [super description], self.imageRepresentation, self.imageRepresentationType, self.imageVersion];
-}
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark IKImageBrowserItem Protocol
 
 
 // Use the path or URL as the unique identifier...
 
 - (NSString*) imageUID
 {
-	return _value;
+	return _location;
 }
 
 
@@ -218,10 +187,15 @@
 
 
 // When this method is called we assume that the object is about to be displayed. So this could be a 
-// possible hook for lazily loading metadata...
+// possible hook for lazily loading thumbnail and metadata...
 
 - (id) imageRepresentation
 {
+	if (_imageRepresentation == nil)
+	{
+		[self load];
+	}
+	
 	if (_metadata == nil && _parser != nil)
 	{
 		[_parser loadMetadataForObject:self];
@@ -231,249 +205,141 @@
 }
 
 
-- (void)queueThumbnailImageLoad
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Asynchronous Loading
+
+
+// If the image representation isn't available yet, then trigger an asynchronous loading operation...
+
+- (void) load
 {
-    @synchronized (self)
+	if (_imageRepresentation==nil && _isLoading==NO)
 	{
-        if (self.thumbnailImage == nil && !self.imageLoading)
-		{
-            self.imageLoading = YES;
-			
-			IMBThumbnailOperation* operation = [[IMBThumbnailOperation alloc] initWithVisualObject:self];
-			
-			[[IMBOperationQueue sharedQueue] addOperation:operation];			
-        }
-    }
+		self.isLoading = YES;
+		
+		IMBObjectThumbnailLoadOperation* operation = [[IMBObjectThumbnailLoadOperation alloc] initWithObject:self];
+		[[IMBOperationQueue sharedQueue] addOperation:operation];			
+	}
 }
 
-@end
+
+// Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out of the   
+// cache and are thus unloaded...
+
+- (void) setImageRepresentation:(id)inImageRepresentation
+{
+	id old = _imageRepresentation;
+	_imageRepresentation = [inImageRepresentation retain];
+	[old release];
+	
+	self.imageVersion = _imageVersion + 1;
+	self.isLoading = NO;
+	
+	if (inImageRepresentation)
+	{
+		[IMBObjectFifoCache addObject:self];
+		NSLog(@"%s = %p",__FUNCTION__,inImageRepresentation);
+	}
+}
+
+
+// Unload the imageRepresentation to save some memory...
+
+- (void) unload
+{
+   self.imageRepresentation = nil;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
-
-// Override to show a folder icon instead of a generic file icon...
-
-@implementation IMBNodeObject
-
-@synthesize path = _path;
+#pragma mark Helpers
 
 
-- (id) initWithCoder:(NSCoder*)inCoder
+// Objects are equal if their value (paths or urls) are equal...
+
+- (BOOL) isEqual:(IMBObject*)inObject
 {
-	if (self = [super initWithCoder:inCoder])
+	return [self.location isEqual:inObject.location];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Convert location to path...
+
+- (NSString*) path
+{
+	NSString* path = nil;
+	
+	if ([_location isKindOfClass:[NSURL class]])
 	{
-		self.path = [inCoder decodeObjectForKey:@"path"];
+		path = [(NSURL*)_location path];
+	}
+	else if ([_location isKindOfClass:[NSString class]])
+	{
+		path = (NSString*)_location;
 	}
 	
-	return self;
+	return path;
 }
 
 
-- (void) encodeWithCoder:(NSCoder*)inCoder
+// Convert location to url...
+
+- (NSURL*) url
 {
-	[super encodeWithCoder:inCoder];
-	[inCoder encodeObject:self.path forKey:@"path"];
+	NSURL* url = nil;
+	
+	if ([_location isKindOfClass:[NSURL class]])
+	{
+		url = (NSURL*)_location;
+	}
+	else if ([_location isKindOfClass:[NSString class]])
+	{
+		url = [NSURL fileURLWithPath:(NSString*)_location];
+	}
+	
+	return url;
 }
 
 
-- (id) copyWithZone:(NSZone*)inZone
-{
-	IMBNodeObject* copy = (IMBNodeObject*) [super copyWithZone:inZone];
-	copy.path = self.path;
-	return copy;
-}
+//----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) dealloc
-{
-	IMBRelease(_path);
-	[super dealloc];
-}
-
-
-- (NSString*) imageUID
-{
-	return _path;
-}
-
+// Return a small generic icon for this file. Is the icon cached by NSWorkspace, or should be provide some 
+// caching ourself?
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace sharedWorkspace] iconForFile:self.path];
+	NSString* path = [self path];
+	NSString* extension = [path pathExtension];
+	if (extension==nil || [extension length]==0) extension = @"jpg";
+	
+	return [[NSWorkspace sharedWorkspace] iconForFileType:extension];
 }
-
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"%@ path=%@", [super description], self.path];
-}
-
-
-@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-@implementation IMBThumbnailOperation
-
-@synthesize visualObject = _visualObject;
-
-- (void) dealloc
+- (NSString*) description
 {
-	IMBRelease(_visualObject);
-	[super dealloc];
+	return [NSString stringWithFormat:@"IMBObject\n\tlocation = %@\n\tname = %@\n\tmetadata = %p", 
+	
+		self.location, 
+		self.name, 
+		self.metadata];
 }
-
-- (id) initWithVisualObject:(IMBVisualObject *)aVisualObject;
-{
-	self = [super init];
-	if ( self != nil )
-	{
-		self.visualObject = aVisualObject;
-	}
-	return self;
-}
-
-// TODO: make variable?
-#define MAX_THUMBNAIL_SIZE 128
-
-- (void) main
-{
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	
-	IMBVisualObject *visualObject = self.visualObject;
-	NSString *imageRepresentationType = visualObject.imageRepresentationType;
-	id imageRepresentation = visualObject.imageRepresentation;
-	NSImage *image = nil;		// This should be filled in below according to the data type.  Autoreleased.
-	CGImageRef retainedCGImage = nil;		// This may be set instead (retained), which means we finish the job.
-	CGImageSourceRef retainedSource = nil;	// This may be set instead (retained), which means we finish the job.
-	
-	if ([imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType])
-	{
-		// path
-		NSURL *url = [NSURL fileURLWithPath:imageRepresentation];
-		retainedSource = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
-	{
-		// URL
-		// Almost all sample code passes in a null options parameter but I'm playing it safe; we want to cache
-		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-								 (id)kCFBooleanTrue, (id)kCGImageSourceShouldCache,
-								 NULL];
-		retainedSource = CGImageSourceCreateWithURL((CFURLRef)imageRepresentation, (CFDictionaryRef)options);
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
-	{
-		image = imageRepresentation;		// scale to thumbnail, though?
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
-	{
-		// CGImageRef
-		// Actually maybe I should try to get the thumbnail first
-		retainedCGImage = (CGImageRef)imageRepresentation;
-		CGImageRetain(retainedCGImage);	// retain this since we are treating that as a temporary image, below.
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserCGImageSourceRepresentationType])
-	{
-		// CGImageSourceRef
-		retainedSource = (CGImageSourceRef)imageRepresentation;
-		CFRetain(retainedSource);	// retain this since we are treating that as a temporary source, below.
-		
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSDataRepresentationType])
-	{
-		// NSData
-		retainedSource = CGImageSourceCreateWithData((CFDataRef)imageRepresentation, NULL);
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserNSBitmapImageRepresentationType])
-	{
-		// NSBitmapImageRep
-        image = [[[NSImage alloc] initWithSize:[imageRepresentation size]] autorelease];
-        [image addRepresentation:imageRepresentation];
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
-	{
-		// QTMovie	.... to do.  This will be a bit tricky; we need to use that helper process.
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
-	{
-		// NSString or NSURL
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserIconRefPathRepresentationType])
-	{
-		// NSString of iconRef
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserIconRefRepresentationType])
-	{
-		// IconRef
-		image = [[[NSImage alloc] initWithIconRef:(IconRef)imageRepresentation] autorelease];
-	}
-	else if ([imageRepresentationType isEqualToString:IKImageBrowserQuickLookPathRepresentationType])
-	{
-		// QuickLook file path or URL
-		NSURL *url = [imageRepresentation isKindOfClass:[NSURL class]]
-			? imageRepresentation
-			: [NSURL fileURLWithPath:imageRepresentation];
-		retainedCGImage = QLThumbnailImageCreate(kCFAllocatorDefault, (CFURLRef)url, 
-				CGSizeMake(MAX_THUMBNAIL_SIZE, MAX_THUMBNAIL_SIZE), NULL);
-	}
-	/* These are the types that we DON'T SUPPORT at this time:
-	 IKImageBrowserQCCompositionRepresentationType
-	 IKImageBrowserQCCompositionPathRepresentationType
-	 */
-	
-	if (retainedSource)		// did the above get us a CGImageSource? If so we'll create the NSImage now.
-	{
-		NSDictionary* thumbOpts = [NSDictionary dictionaryWithObjectsAndKeys:
-								   (id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailWithTransform,
-								   (id)kCFBooleanFalse, (id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
-								   (id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
-								   [NSNumber numberWithInteger:MAX_THUMBNAIL_SIZE], (id)kCGImageSourceThumbnailMaxPixelSize, 
-								   nil];
-		
-		retainedCGImage = CGImageSourceCreateThumbnailAtIndex(retainedSource, 0, (CFDictionaryRef)thumbOpts);
-		CFRelease(retainedSource);
-	}
-	
-	// Now if we have a CGImageRef, make the NSImage from that.
-	
-	if (retainedCGImage)
-	{
-		NSBitmapImageRep *bitmap = [[[NSBitmapImageRep alloc] initWithCGImage:retainedCGImage] autorelease];
-        image = [[[NSImage alloc] initWithSize:[bitmap size]] autorelease];
-        [image addRepresentation:bitmap];
-		
-		CGImageRelease(retainedCGImage);
-	}
-	
-#ifdef DEBUG
-//	sleep(3);		// load slowly so we can test properties
-#endif
-	// At this point, we should have an NSImage that we are ready to go set as the thumbnail.
-	// (Do we want to do something about versions the way IKImageBrowser View works?)
-	
-	if (image != nil)
-	{
-		// We synchronize access to the image/imageLoading pair of variables
-		@synchronized (visualObject)
-		{
-			visualObject.imageLoading = NO;
-			visualObject.thumbnailImage = image;	// this will set off KVO on IMBObjectPropertyNamedThumbnailImage
-			//NSLog(@"Finished loading %@", visualObject);
-		}
-	}
-	
-	[pool release];
-}
-
-@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+@end

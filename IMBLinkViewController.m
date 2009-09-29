@@ -54,8 +54,9 @@
 #import "IMBObjectArrayController.h"
 #import "IMBPanelController.h"
 #import "IMBCommon.h"
-#import "IMBObject.h"
 #import "IMBNode.h"
+#import "IMBObject.h"
+#import "IMBNodeObject.h"
 #import "IMBFolderParser.h"
 #import "NSWorkspace+iMedia.h"
 
@@ -171,7 +172,7 @@
 
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
-			IMBNode* node = (IMBNode*)object.value;
+			IMBNode* node = (IMBNode*)object.location;
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:node];
 		}

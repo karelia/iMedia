@@ -52,6 +52,7 @@
 #import "IMBFolderParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBNodeObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSString+iMedia.h"
@@ -164,7 +165,7 @@
 	NSString* folder = inNode.mediaSource;
 	NSArray* files = [[NSFileManager threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
 	NSAutoreleasePool* pool = nil;
-	NSInteger i = 0;
+	NSInteger index = 0;
 	
 	if (error == nil)
 	{
@@ -180,12 +181,11 @@
 	
 		for (NSString* file in files)
 		{
-			if (i%32 == 0)
+			if (index%32 == 0)
 			{
 				IMBRelease(pool);
 				pool = [[NSAutoreleasePool alloc] init];
 			}
-			i++;
 			
 			// Hidden file system items (e.g. ".thumbnails") will be skipped...
 			
@@ -204,29 +204,31 @@
 				
 				else if ([self fileAtPath:path conformsToUTI:_fileUTI])
 				{
-					IMBVisualObject* object = [[IMBVisualObject alloc] init];
-					object.value = (id)path;
+					IMBObject* object = [[IMBObject alloc] init];
+					object.location = (id)path;
 					object.name = file;
+					object.parser = self;
+					object.index = index++;
 					
 					// If the file is an image, then we will get the image directly. Otherwise
 					// We will use QuickLook, e.g. to get image out of an audio file...
 					
 					if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeImage])
 					{
-						object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+						object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; //IKImageBrowserPathRepresentationType;
 					}
 					else if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeMovie])
 					{
-						object.imageRepresentationType = IKImageBrowserQTMoviePathRepresentationType;
+						object.imageRepresentationType = IKImageBrowserQTMovieRepresentationType; //IKImageBrowserQTMoviePathRepresentationType;
 					}
 					else
 					{
-						object.imageRepresentationType = IKImageBrowserQuickLookPathRepresentationType;
+						object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; //IKImageBrowserQuickLookPathRepresentationType;
 					}
 					
-					object.imageRepresentation = path;
-					object.metadata = nil; // will be loaded lazily (on demand when needed)
-					object.parser = self;
+					
+					object.imageRepresentation = nil;		// will be loaded lazily 
+					object.metadata = nil;					// (on demand when needed)
 
 					[objects addObject:object];
 					[object release];
@@ -238,6 +240,12 @@
 				
 		for (NSString* folder in folders)
 		{
+			if (index%32 == 0)
+			{
+				IMBRelease(pool);
+				pool = [[NSAutoreleasePool alloc] init];
+			}
+			
 			NSString* name = [[NSFileManager threadSafeManager] displayNameAtPath:folder];
 			
 			IMBNode* subnode = [[IMBNode alloc] init];
@@ -253,13 +261,15 @@
 			[subnode release];
 
 			IMBNodeObject* object = [[IMBNodeObject alloc] init];
-			object.value = (id)subnode;
-			object.path = (id)folder;
+			object.location = (id)subnode;
+//			object.path = (id)folder;
 			object.name = name;
-			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:folder];
 			object.metadata = nil;
 			object.parser = self;
+			object.index = index++;
+			object.imageLocation = (id)folder;
+			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:folder];
 
 			[objects addObject:object];
 			[object release];
@@ -320,8 +330,7 @@
 	
 	if (![inObject isKindOfClass:[IMBNodeObject class]])
 	{
-		NSString* path = (NSString*) inObject.value;
-		inObject.metadata = [self metadataForFileAtPath:path];
+		inObject.metadata = [self metadataForFileAtPath:inObject.path];
 	}
 }
 

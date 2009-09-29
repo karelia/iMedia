@@ -70,11 +70,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 // class to proxy thumbnails that get lazily downloaded 
-@interface MTPVisualObject: IMBVisualObject
+@interface MTPVisualObject: IMBObject
 {
-	BOOL _isLoading;
+//	BOOL _isLoading;
 }
-@property (readwrite, assign) BOOL isLoading;
+//@property (readwrite, assign) BOOL isLoading;
 
 - (void) gotThumbnailCallback: (ICACopyObjectThumbnailPB*)pbPtr;
 
@@ -226,8 +226,8 @@
 	uint32_t type = [[anItem valueForKey:@"file"] intValue];
 	if( [self _isAppropriateICAType:type] )
 	{
-		IMBObject* object = [MTPVisualObject new];
-		object.value = [[anItem valueForKey:@"icao"] stringValue];
+		MTPVisualObject* object = [MTPVisualObject new];
+		object.location = [[anItem valueForKey:@"icao"] stringValue];
 		object.name = [anItem valueForKey:@"ifil"];
 		object.metadata = anItem;
 		object.parser = self;
@@ -535,7 +535,7 @@ static void MyThumbnailCallback (ICAHeader* pbHeader)
 }
  
 @implementation MTPVisualObject
-@synthesize isLoading = _isLoading;
+//@synthesize isLoading = _isLoading;
 
 - (id) init
 {
@@ -576,7 +576,7 @@ static void MyThumbnailCallback (ICAHeader* pbHeader)
     pb.header.refcon   = (unsigned long) self;
     pb.thumbnailFormat = kICAThumbnailFormatJPEG;
     // use the ICAObject out of the mDeviceDictionary
-    pb.object          = (ICAObject)[self.value integerValue];
+    pb.object          = (ICAObject)[self.location integerValue];
     
     // asynchronous call - callback proc will get called when call completes
     /*err =*/ ICACopyObjectThumbnail(&pb, MyThumbnailCallback);

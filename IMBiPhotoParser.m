@@ -300,6 +300,7 @@
 #pragma mark 
 #pragma mark Helper Methods
 
+
 // Load the XML file into a plist lazily (on demand). If we notice that an existing cached plist is out-of-date 
 // we get rid of it and load it anew...
 
@@ -472,6 +473,8 @@
 	// Look for the correct album in the iPhoto XML plist. Once we find it, populate the node with IMBVisualObjects
 	// for each image in this album...
 	
+	NSUInteger index = 0;
+	
 	for (NSDictionary* albumDict in inAlbums)
 	{
 		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
@@ -494,16 +497,21 @@
 					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [imageDict objectForKey:@"Caption"];
 	
-					IMBVisualObject* object = [[IMBVisualObject alloc] init];
+					IMBObject* object = [[IMBObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
-					object.value = (id)imagePath;
+					object.location = (id)imagePath;
 					object.name = caption;
-					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
-					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
 					object.metadata = imageDict;
 					object.parser = self;
+					object.index = index++;
+					
+//					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+//					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
+					object.imageLocation = (id)thumbPath;
+					object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+					object.imageRepresentation = nil;
 				}
 				
 				[pool2 release];

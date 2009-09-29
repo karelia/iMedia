@@ -56,6 +56,7 @@
 #import "IMBCommon.h"
 #import "IMBObject.h"
 #import "IMBNode.h"
+#import "IMBNodeObject.h"
 #import "IMBFolderParser.h"
 #import "NSWorkspace+iMedia.h"
 #import <QTKit/QTKit.h>
@@ -184,7 +185,7 @@
 
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
-			IMBNode* node = (IMBNode*)object.value;
+			IMBNode* node = (IMBNode*)object.location;
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:node];
 		}
@@ -241,18 +242,8 @@
 	// Create a QTMovie for the selected item...
 	
 	NSError* error = nil;
-	QTMovie* movie = nil;
-	
-	if ([inObject.value isKindOfClass:[NSString class]])
-	{
-		NSString* path = (NSString*)[inObject value];
-		movie = [QTMovie movieWithFile:path error:&error];
-	}
-	else if ([inObject.value isKindOfClass:[NSURL class]])
-	{
-		NSURL* url = (NSURL*)[inObject value];
-		movie = [QTMovie movieWithURL:url error:&error];
-	}
+	NSURL* url = [inObject url];
+	QTMovie* movie = [QTMovie movieWithURL:url error:&error];
 	
 	// Start playing it...
 	

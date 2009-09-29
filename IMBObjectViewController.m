@@ -58,6 +58,7 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBNodeObject.h"
 #import "IMBObjectPromise.h"
 #import "IMBImageBrowserCell.h"
 #import "IMBProgressWindowController.h"
@@ -68,6 +69,7 @@
 #import "IMBComboTextCell.h"
 #import "IMBObject.h"
 #import "IMBOperationQueue.h"
+#import "IMBObjectThumbnailLoadOperation.h"
 #import <Quartz/Quartz.h>
 
 
@@ -77,9 +79,10 @@
 #pragma mark CONSTANTS
 
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
-static NSString* kImageRepresentationKey = @"arrangedObjects.imageRepresentation";
+static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
 static NSString* kObjectCountStringKey = @"objectCountString";
-NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
+
+NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -100,6 +103,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 - (void) _saveStateToPreferences;
 - (void) _loadStateFromPreferences;
 - (void) _reloadIconView;
+- (void) _reloadComboView;
 
 - (void) _downloadSelectedObjectsToDestination:(NSURL*)inDestination;
 - (NSArray*) _namesOfPromisedFiles;
@@ -215,7 +219,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	
 	[ibObjectArrayController retain];
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
-	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKey options:0 context:(void*)kImageRepresentationKey];
+	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
 	
 	// Configure the object views...
 	
@@ -237,7 +241,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 
 - (void) dealloc
 {
-	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKey];
+	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
 	
@@ -247,11 +251,11 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
 	
-	for (IMBObject *imageEntity in _observedVisibleItems)
+	for (IMBObject* object in _observedVisibleItems)
 	{
-        if ([imageEntity isKindOfClass:[IMBVisualObject class]])
+        if ([object isKindOfClass:[IMBObject class]])
 		{
-            [imageEntity removeObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage];
+            [object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
         }
     }
     IMBRelease(_observedVisibleItems);
@@ -266,7 +270,25 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 
 - (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
 {
-	if (inKeyPath == IMBObjectPropertyNamedThumbnailImage)
+	// If the array itself has changed then display the new object count...
+	
+	if (inContext == (void*)kArrangedObjectsKey)
+	{
+		//		[self _reloadIconView];
+		[self willChangeValueForKey:kObjectCountStringKey];
+		[self didChangeValueForKey:kObjectCountStringKey];
+	}
+	
+	// If single thumbnails have changed (due to asynchronous loading) then trigger a reload of the IKIMageBrowserView...
+	
+	else if (inContext == (void*)kImageRepresentationKeyPath)
+	{
+//		id object = [inChange objectForKey:NSKeyValueChangeNewKey];
+//		NSLog(@"%s %@",__FUNCTION__,inChange);
+		[self _reloadIconView];
+		[self _reloadComboView];
+	}
+	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty])
 	{
         // Find the row and reload it.
         // Note that KVO notifications may be sent from a background thread (in this case, we know they will be)
@@ -280,21 +302,6 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 		
     }
 	
-	// If the array itself has changed then display the new object count...
-	
-	else if (inContext == (void*)kArrangedObjectsKey)
-	{
-		//		[self _reloadIconView];
-		[self willChangeValueForKey:kObjectCountStringKey];
-		[self didChangeValueForKey:kObjectCountStringKey];
-	}
-	
-	// If single thumbnails have changed (due to asynchronous loading) then trigger a reload of the IKIMageBrowserView...
-	
-	else if (inContext == (void*)kImageRepresentationKey)
-	{
-		[self _reloadIconView];
-	}
 	else
 	{
 		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
@@ -513,6 +520,13 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 }
 
 
+- (void) _reloadComboView
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView selector:@selector(reloadData) object:nil];
+	[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -538,7 +552,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 												  @"Menu item in context menu of IMBObjectViewController");
 		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openSubNode:) keyEquivalent:@""];
-		[item setRepresentedObject:[inObject value]];
+		[item setRepresentedObject:[inObject location]];
 		[item setTarget:self];
 		[menu addItem:item];
 		[item release];
@@ -737,7 +751,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	
 	if ([firstObject isKindOfClass:[IMBNodeObject class]])
 	{
-		IMBNode* subnode = (IMBNode*)firstObject.value;
+		IMBNode* subnode = (IMBNode*)firstObject.location;
 		[_nodeViewController expandSelectedNode];
 		[_nodeViewController selectNode:subnode];
 	}
@@ -779,17 +793,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 
 //- (NSURL*) _urlForObject:(IMBObject*)inObject
 //{
-//	if ([inObject.value isKindOfClass:[NSURL class]])
-//	{
-//		return (NSURL*) inObject.value;
-//	}
-//	else if ([inObject.value isKindOfClass:[NSString class]])
-//	{
-//		NSString* path = (NSString*) inObject.value;
-//		return [NSURL fileURLWithPath:path];
-//	}
-//	
-//	return nil;
+//	return [inObject url];
 //}
 //
 //
@@ -943,13 +947,7 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	
 	for (IMBObject* object in objects)
 	{
-		NSString* path = nil;
-		
-		if ([object.value isKindOfClass:[NSString class]])
-			path = (NSString*)object.value;
-		else if ([object.value isKindOfClass:[NSURL class]])	
-			path = [(NSURL*)object.value path];
-		
+		NSString* path = [object path];
 		if (path) [names addObject:[path lastPathComponent]];
 	}
 	
@@ -1103,24 +1101,8 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 	
 	if ([inCell isKindOfClass:[IMBComboTextCell class]])
 	{
-		NSImage *image = nil;		// for now
-		
-		// Will the source item always be IMBVisualObject ?
-		IMBObject *entity = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
-		if ([entity isKindOfClass:[IMBVisualObject class]])
-		{
-			IMBVisualObject *visualEntity = (IMBVisualObject *)entity;
-			if (visualEntity.thumbnailImage )
-			{
-				image = visualEntity.thumbnailImage;
-			}
-		}
-		else
-		{
-			NSLog(@"%s - not an IMBVisualObject entity",__FUNCTION__);
-		}
-		IMBComboTextCell *imageTextCell = (IMBComboTextCell *)inCell;
-		imageTextCell.image = image;
+		IMBComboTextCell* cell = (IMBComboTextCell*)inCell;
+		cell.image = object.imageRepresentation;
 	}
 	else
 	{
@@ -1238,75 +1220,70 @@ NSString *const IMBObjectPropertyNamedThumbnailImage = @"thumbnailImage";
 //	NSLog(@"Now NOT visbl: %@", ([itemsNoLongerVisible count] ? [itemsNoLongerVisible description] : @"--"));
 	
 	// With items going away, stop observing  and lower their queue priority if they are still queued
-    for (IMBObject *imageEntity in itemsNoLongerVisible)
+	
+    for (IMBObject* object in itemsNoLongerVisible)
 	{
-        if ([imageEntity isKindOfClass:[IMBVisualObject class]])
+		[object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
+		
+		NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
+		for (IMBObjectThumbnailLoadOperation* op in ops)
 		{
-            [imageEntity removeObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage];
+			if ([op isKindOfClass:[IMBObjectThumbnailLoadOperation class]])
+			{
+				IMBObject* loadingObject = [op object];
+				if (loadingObject == object)
+				{
+					//NSLog(@"Lowering priority of load of %@", entity.name);
+					[op setQueuePriority:NSOperationQueuePriorityVeryLow];		// re-prioritize lower
+					break;
+				}
+			}
+		}
+    }
+	
+    // With newly visible items, observe them and kick off a request to load the image
+	
+    for (IMBObject* object in itemsNewlyVisible)
+	{
+		if (nil == [object imageRepresentation])
+		{
+			// Check if it is already queued -- if it's there already, bump up priority.
+			
+			NSOperation *foundOperation = nil;
 			
 			NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
-			for (IMBThumbnailOperation *op in ops)
+			for (IMBObjectThumbnailLoadOperation* op in ops)
 			{
-				if ([op isKindOfClass:[IMBThumbnailOperation class]])
+				if ([op isKindOfClass:[IMBObjectThumbnailLoadOperation class]])
 				{
-					IMBObject *entity = [op visualObject];
-					if (entity == imageEntity)
+					IMBObject *loadingObject = [op object];
+					if (loadingObject == object)
 					{
-						//NSLog(@"Lowering priority of load of %@", entity.name);
-						[op setQueuePriority:NSOperationQueuePriorityVeryLow];		// re-prioritize lower
+						foundOperation = op;
 						break;
 					}
 				}
 			}
-        }
-    }
-    // With newly visible items, observe them and kick off a request to load the image
-	
-    for (IMBObject *imageEntity in itemsNewlyVisible)
-	{
-        if ([imageEntity isKindOfClass:[IMBVisualObject class]])
-		{
-			if (nil == [((IMBVisualObject *)imageEntity) thumbnailImage])
-			{
-				// Check if it is already queued -- if it's there already, bump up priority.
-				
-				NSOperation *foundOperation = nil;
-				
-				NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
-				for (IMBThumbnailOperation *op in ops)
-				{
-					if ([op isKindOfClass:[IMBThumbnailOperation class]])
-					{
-						IMBObject *entity = [op visualObject];
-						if (entity == imageEntity)
-						{
-							foundOperation = op;
-							break;
-						}
-					}
-				}
-				
-				if (foundOperation)
-				{
-					//NSLog(@"Raising priority of load of %@", imageEntity.name);
-					[foundOperation setQueuePriority:NSOperationQueuePriorityNormal];		// re-prioritize back to normal
-				}
-				else
-				{
-					//NSLog(@"Queueing load of %@", imageEntity.name);
-					[(IMBVisualObject *)imageEntity queueThumbnailImageLoad];
-				}
-			}
 			
-			// Add observer always to balance
-            [imageEntity addObserver:self forKeyPath:IMBObjectPropertyNamedThumbnailImage options:0 context:tableView];
-        }
-    }
+			if (foundOperation)
+			{
+				//NSLog(@"Raising priority of load of %@", imageEntity.name);
+				[foundOperation setQueuePriority:NSOperationQueuePriorityNormal];		// re-prioritize back to normal
+			}
+			else
+			{
+				//NSLog(@"Queueing load of %@", imageEntity.name);
+				[object load];
+			}
+		}
+		
+		// Add observer always to balance
+		[object addObserver:self forKeyPath:kIMBObjectImageRepresentationProperty options:0 context:(void*)ibComboView];
+     }
 	
 	// Finally cache our old visible items set
 	[_observedVisibleItems release];
     _observedVisibleItems = newVisibleItemsSetRetained;
-
 }
 
 
