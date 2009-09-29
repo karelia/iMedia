@@ -397,6 +397,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) reloadNode:(IMBNode*)inNode
 {
+	[self reloadNode:inNode parser:inNode.parser];
+}
+
+
+- (void) reloadNode:(IMBNode*)inNode parser:(IMBParser*)inParser
+{
 	BOOL shouldCreateNode = _isReplacingNode==NO;
 
 	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldCreateNodeWithParser:)])
@@ -418,7 +424,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		IMBCreateNodeOperation* operation = [[IMBCreateNodeOperation alloc] init];
 		operation.libraryController = self;
-		operation.parser = inNode.parser;
+		operation.parser = inParser;
 		operation.options = self.options;
 		operation.oldNode = inNode;
 		
@@ -905,7 +911,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			return node;
 		}
 	}
-
+	
 	return nil;
 }
 
