@@ -67,6 +67,8 @@
 + (void) removeObject:(IMBObject*)inObject;
 + (void) removeAllObjects;
 
++ (NSUInteger) count;
+
 @end
 
 
