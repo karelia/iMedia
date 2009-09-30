@@ -18,7 +18,6 @@
 		CEF69569106421CB005D7E72 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF69568106421CA005D7E72 /* QuickLook.framework */; };
 		CEF695C91064341C005D7E72 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E0C80104C72A200EE6B09 /* Security.framework */; };
 		CEF695E0106434FE005D7E72 /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D6106434FD005D7E72 /* WebIconDatabase.h */; };
-		CEF695E1106434FE005D7E72 /* IMBSafariBookmarkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D7106434FD005D7E72 /* IMBSafariBookmarkParser.h */; };
 		CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D9106434FD005D7E72 /* iMBXBELParser.h */; };
 		CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */ = {isa = PBXBuildFile; fileRef = CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */; };
 		CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DC106434FE005D7E72 /* iMBOmniWebParser.h */; };
@@ -267,8 +266,6 @@
 		CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBDynamicTableView.m; sourceTree = "<group>"; };
 		CEF69568106421CA005D7E72 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = /System/Library/Frameworks/QuickLook.framework; sourceTree = "<absolute>"; };
 		CEF695D6106434FD005D7E72 /* WebIconDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebIconDatabase.h; sourceTree = "<group>"; };
-		CEF695D7106434FD005D7E72 /* IMBSafariBookmarkParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBSafariBookmarkParser.h; sourceTree = "<group>"; };
-		CEF695D8106434FD005D7E72 /* IMBSafariBookmarkParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBSafariBookmarkParser.m; sourceTree = "<group>"; };
 		CEF695D9106434FD005D7E72 /* iMBXBELParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBXBELParser.h; sourceTree = "<group>"; };
 		CEF695DA106434FE005D7E72 /* iMBXBELParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBXBELParser.m; sourceTree = "<group>"; };
 		CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = OmniwebBookmarksToXBEL.xslt; sourceTree = "<group>"; };
@@ -627,8 +624,6 @@
 			isa = PBXGroup;
 			children = (
 				CEF695D6106434FD005D7E72 /* WebIconDatabase.h */,
-				CEF695D7106434FD005D7E72 /* IMBSafariBookmarkParser.h */,
-				CEF695D8106434FD005D7E72 /* IMBSafariBookmarkParser.m */,
 				CEF695D9106434FD005D7E72 /* iMBXBELParser.h */,
 				CEF695DA106434FE005D7E72 /* iMBXBELParser.m */,
 				CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */,
@@ -958,7 +953,6 @@
 				CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */,
 				CEF687191062DAF0005D7E72 /* IMBDynamicTableView.h in Headers */,
 				CEF695E0106434FE005D7E72 /* WebIconDatabase.h in Headers */,
-				CEF695E1106434FE005D7E72 /* IMBSafariBookmarkParser.h in Headers */,
 				CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */,
 				CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */,
 				CEF695E8106434FE005D7E72 /* iMBFireFoxParser.h in Headers */,
