@@ -241,7 +241,8 @@
 	if (inImageRepresentation)
 	{
 		[IMBObjectFifoCache addObject:self];
-		NSLog(@"%s = %p",__FUNCTION__,inImageRepresentation);
+		NSUInteger n = [IMBObjectFifoCache count];
+		NSLog(@"%s = %p (%d)",__FUNCTION__,inImageRepresentation,(int)n);
 	}
 }
 

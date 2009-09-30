@@ -151,4 +151,20 @@ static NSMutableArray* sObjectCache = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Returns the current count of object in the cache...
+
++ (NSUInteger) count
+{
+	if (sObjectCache)
+	{
+		return [sObjectCache count];
+	}
+	
+	return 0;	
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @end
