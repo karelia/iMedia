@@ -193,6 +193,8 @@
 - (NSArray*) extractPhotosFromFlickrResponse: (NSDictionary*) response {
 	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
+	NSUInteger index = 0;
+
 	for (NSDictionary* photoDict in photos) {
 		NSURL* thumbnailURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
 		NSURL* imageURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrLargeSize];
@@ -207,8 +209,10 @@
 		obj.name = [photoDict objectForKey:@"title"];
 		obj.metadata = [NSDictionary dictionaryWithObject:webPageURL forKey:@"webPageURL"];
 		obj.parser = self;
-		obj.imageRepresentation = thumbnailURL;
-		obj.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
+		obj.index = index++;
+		obj.imageLocation = (id)thumbnailURL;
+		obj.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+		obj.imageRepresentation = nil;
 		[objects addObject:obj];
 		[obj release];
 	}

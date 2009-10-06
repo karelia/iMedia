@@ -348,6 +348,8 @@
 //	// Look for the correct album in the iPhoto XML plist. Once we find it, populate the node with IMBVisualObjects
 //	// for each image in this album...
 //	
+//	NSUInteger index = 0;
+//
 //	for (NSDictionary* albumDict in inListOfAlbums)
 //	{
 //		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
@@ -376,9 +378,14 @@
 //
 //					object.location = (id)imagePath;
 //					object.name = caption;
-//					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
-//					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
 //					object.metadata = imageDict;
+//					object.parser = self;
+//					object.index = index++;
+//
+//					object.imageLocation = (thumbPath!=nil) ? thumbPath : imagePath;
+//					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+//					object.imageRepresentation = nil;
+//
 //				}
 //				
 //				[pool2 release];

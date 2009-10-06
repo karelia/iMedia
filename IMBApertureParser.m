@@ -68,6 +68,7 @@
 
 - (NSDictionary*) plist;
 - (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId;
+- (NSString*) rootNodeIdentifier;
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
 - (BOOL) isLeafAlbumType:(NSString*)inType;
 - (NSImage*) iconForAlbumType:(NSString*)inType;
@@ -203,7 +204,7 @@
 	{
 		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
-		node.identifier = [self identifierForPath:@"/AlbumId/1"];
+		node.identifier = [self rootNodeIdentifier];
 		node.name = @"Aperture";
 		node.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
 		node.groupType = kIMBGroupTypeLibrary;
@@ -328,12 +329,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBApertureParser://AlbumId/17"...
+// Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBApertureParser://Sample/17"...
 
 - (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId
 {
-	NSString* albumPath = [NSString stringWithFormat:@"/AlbumId/%@",inAlbumId];
+	NSString* path = (NSString*) self.mediaSource;
+	NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@",libraryName,inAlbumId];
 	return [self identifierForPath:albumPath];
+}
+
+
+- (NSString*) rootNodeIdentifier
+{
+	return [self identifierWithAlbumId:[NSNumber numberWithInt:1]];
 }
 
 
@@ -484,6 +493,8 @@
 	// Look for the correct album in the Aperture XML plist. Once we find it, populate the node with IMBVisualObjects
 	// for each image in this album...
 	
+	NSUInteger index = 0;
+
 	for (NSDictionary* albumDict in inAlbums)
 	{
 		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
@@ -512,10 +523,13 @@
 
 					object.location = (id)imagePath;
 					object.name = caption;
-					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
-					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
 					object.metadata = imageDict;
 					object.parser = self;
+					object.index = index++;
+
+					object.imageLocation = (thumbPath!=nil) ? thumbPath : imagePath;
+					object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+					object.imageRepresentation = nil;
 				}
 				
 				[pool2 release];

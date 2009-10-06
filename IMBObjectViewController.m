@@ -560,9 +560,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	// Check if the object is a local file. If yes add appropriate standard menu items...
 	
-	if ([[inObject value] isKindOfClass:[NSString class]])
+	if ([[inObject location] isKindOfClass:[NSString class]])
 	{
-		NSString* path = (NSString*)[inObject value];
+		NSString* path = [inObject path];
 		
 		if ([[NSFileManager threadSafeManager] fileExistsAtPath:path])
 		{
@@ -616,7 +616,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	// URL object can be opened in a web browser...
 	
-	else if ([[inObject value] isKindOfClass:[NSURL class]])
+	else if ([[inObject location] isKindOfClass:[NSURL class]])
 	{
 		title = NSLocalizedStringWithDefaultValue(
 												  @"IMBObjectViewController.menuItem.download",
@@ -625,7 +625,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 												  @"Menu item in context menu of IMBObjectViewController");
 		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(download:) keyEquivalent:@""];
-		[item setRepresentedObject:[inObject value]];
+		[item setRepresentedObject:[inObject location]];
 		[item setTarget:self];
 		[menu addItem:item];
 		[item release];
@@ -637,7 +637,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 												  @"Menu item in context menu of IMBObjectViewController");
 		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInBrowser:) keyEquivalent:@""];
-		[item setRepresentedObject:[inObject value]];
+		[item setRepresentedObject:[inObject location]];
 		[item setTarget:self];
 		[menu addItem:item];
 		[item release];

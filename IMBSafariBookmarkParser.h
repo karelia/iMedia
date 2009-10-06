@@ -44,66 +44,12 @@
 */
 
 
-//----------------------------------------------------------------------------------------------------------------------
+#import <Cocoa/Cocoa.h>
+#import "IMBParser.h"
 
-
-#pragma mark CLASSES
-
-@class IMBParser;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// IMBObject encapsulates information about a single media item (e.g. image file or audio file). The location 
-// property uniquely identifies the item. In the case of files it could be a path or NSURL...
-
-@interface IMBObject : NSObject <NSCopying,NSCoding>
+@interface IMBSafariBookmarkParser : IMBParser 
 {
-	id _location;												
-	NSString* _name;
-	NSDictionary* _metadata;
-	IMBParser* _parser;
-	NSUInteger _index;
-	
-	id _imageRepresentation;								
-	NSString* _imageRepresentationType;		
-	NSUInteger _imageVersion;
-    BOOL _isLoading;
-	id _imageLocation;
+	NSMutableDictionary *mySafariFaviconCache;
 }
 
-// Primary properties...
-
-@property (retain) id location;								// Path, URL, or other location info
-@property (retain) NSString* name;							// Display name for user interface
-@property (readonly) NSImage* icon;							// Small icon to be displayed in list view
-@property (retain) NSDictionary* metadata;					// Optional metadata
-@property (retain) IMBParser* parser;						// Parser that created this object
-@property (assign) NSUInteger index;						// Index of object in the array (optional)
-
-// Helpers...
-
-- (BOOL) isEqual:(IMBObject*)inObject;						// Considered equal if location is equal
-- (NSString*) path;											// Convert location to path
-- (NSURL*) url;												// Convert location to url
-
-// Derived Properties. See IKImageBrowserItem for documentation...
-
-@property (retain) id imageLocation;						// Optional url or path if different from location (e.g. lores thumbnail)
-@property (readonly) NSString* imageUID;
-@property (retain) id imageRepresentation;	
-@property (retain) NSString* imageRepresentationType;
-@property (readonly) NSString* imageTitle;
-@property (assign) NSUInteger imageVersion;
-
-// Asynchronous loading of thumbnails...
-																	
-- (void) load;	
-- (void) unload;	
-@property (assign) BOOL isLoading;
-
 @end
-
-
-//----------------------------------------------------------------------------------------------------------------------
