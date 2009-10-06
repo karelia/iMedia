@@ -402,6 +402,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		[ibIconView performSelector:@selector(setCellClass:) withObject:[IMBImageBrowserCell class]];
 	}
+	
+	[ibIconView setAnimates:NO];
 }
 
 

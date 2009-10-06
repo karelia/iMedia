@@ -158,13 +158,32 @@
 	if (inURL)
 	{
 		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+		   inURL,QTMovieURLAttribute,
+		   [NSNumber numberWithBool:YES],QTMovieOpenAsyncOKAttribute,
+//		   [NSNumber numberWithBool:YES],@"QTMovieOpenForPlaybackAttribute", // constant is not available with 10.5.sdk!
 		   nil];
-		   
+
 		NSError* error = nil;   
 		movie = [QTMovie movieWithAttributes:attributes error:&error];
 	}
 
 	return movie;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Loading movies must be done on the main thread (as many components are not threadsafe). Alas, this blocks 
+// the main runloop, but what are we to do...
+
+- (void) loadMovieRepresentation:(NSDictionary*)inInfo
+{
+	NSURL* url = (NSURL*)[inInfo objectForKey:@"url"];
+	IMBObject* object = (IMBObject*)[inInfo objectForKey:@"object"];
+
+	QTMovie* movie = [self movieForURL:url];
+	[object setImageRepresentation:movie];
 }
 
 
@@ -273,8 +292,15 @@
 	
 	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		QTMovie* movie = [self movieForURL:url];
-		imageRepresentation = movie;
+		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:url,@"url",object,@"object",nil];
+
+		[self	performSelectorOnMainThread:@selector(loadMovieRepresentation:) 
+				withObject:info 
+				waitUntilDone:NO 
+				modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+
+//		QTMovie* movie = [self movieForURL:url];
+//		imageRepresentation = movie;
 	}
 //	else if ([type isEqualToString:IKImageBrowserIconRefRepresentationType])
 //	{
@@ -339,11 +365,14 @@
 	
 	// Return the result to the main thread...
 	
-	[object	performSelectorOnMainThread:@selector(setImageRepresentation:) 
-			withObject:imageRepresentation 
-			waitUntilDone:NO 
-			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-
+	if (imageRepresentation)
+	{
+		[object	performSelectorOnMainThread:@selector(setImageRepresentation:) 
+				withObject:imageRepresentation 
+				waitUntilDone:NO 
+				modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+	
 	[pool release];
 }
 
