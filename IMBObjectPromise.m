@@ -274,7 +274,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 
 // A promise for local files doesn't really have to do any work since no loading is required. It simply copies
-// the path (value) into our localFiles array...
+// the path (location) into our localFiles array...
 
 #pragma mark
 
@@ -477,7 +477,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	{
 		if (![object isKindOfClass:[IMBNodeObject class]])
 		{
-			NSURL* url = (NSURL*)[object value];
+			NSURL* url = [object url];
 			IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
 			op.downloadFolderPath = self.downloadFolderPath;
 			[self.downloadOperations addObject:op];

@@ -262,7 +262,7 @@
 #pragma mark Helpers
 
 
-// Objects are equal if their value (paths or urls) are equal...
+// Objects are equal if their locations (paths or urls) are equal...
 
 - (BOOL) isEqual:(IMBObject*)inObject
 {

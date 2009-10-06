@@ -224,6 +224,8 @@
 - (void) _addICAObject:(NSDictionary *) anItem toArray:(NSMutableArray *) objectArray
 {	
 	uint32_t type = [[anItem valueForKey:@"file"] intValue];
+	NSUInteger index = 0;
+
 	if( [self _isAppropriateICAType:type] )
 	{
 		MTPVisualObject* object = [MTPVisualObject new];
@@ -231,6 +233,8 @@
 		object.name = [anItem valueForKey:@"ifil"];
 		object.metadata = anItem;
 		object.parser = self;
+		object.index = index++;
+
 		[objectArray addObject:object];
 		
 		[object release];

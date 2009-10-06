@@ -213,6 +213,7 @@
 	}
 	else if ([type isEqualToString:IKImageBrowserQuickLookPathRepresentationType])
 	{
+		imageRepresentation = path;	
 //		// QuickLook file path or URL
 //		NSURL *url = [imageRepresentation isKindOfClass:[NSURL class]]
 //			? imageRepresentation

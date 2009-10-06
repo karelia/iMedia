@@ -556,6 +556,7 @@
 		if ([inNode.identifier isEqualToString:playlistIdentifier])
 		{
 			NSArray* trackKeys = [playlistDict objectForKey:@"Playlist Items"];
+			NSUInteger index = 0;
 
 			for (NSDictionary* trackID in trackKeys)
 			{
@@ -579,32 +580,25 @@
 					[objects addObject:object];
 					[object release];
 
-					// For local files path is preferred (as we gain automatic support for some context menu items)...
-					
-					if (isFileURL)
-					{
-						object.name = name;
-						object.location = (id)path;
-						object.imageRepresentationType = IKImageBrowserPathRepresentationType;
-						object.imageRepresentation = path;
-					}
-					
+					// For local files path is preferred (as we gain automatic support for some context menu items).
 					// For remote files we'll use a URL (less context menu support)...
 					
-					else
-					{
-						object.name = name;
-						object.location = (id)url;
-						object.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
-						object.imageRepresentation = url;
-					}
+					if (isFileURL) object.location = (id)path;
+					else object.location = (id)url;
 					
+					object.name = name;
+					object.parser = self;
+					object.index = index++;
+					
+					object.imageLocation = path;
+					object.imageRepresentationType = IKImageBrowserQuickLookPathRepresentationType;
+					object.imageRepresentation = nil;
+
 					// Add metadata and convert the duration property to seconds. Also note that the original
 					// key "Total Time" is not bindings compatible as it contains a space...
 					
 					NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:trackDict];
 					object.metadata = metadata;
-					object.parser = self;
 					
 					double duration = [[trackDict objectForKey:@"Total Time"] doubleValue] / 1000.0;
 					[metadata setObject:[NSNumber numberWithDouble:duration] forKey:@"duration"]; 
