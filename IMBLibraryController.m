@@ -603,7 +603,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	// Hide empty group nodes that do not have any subnodes...
 	
-	if (NO)
+	if (YES)
 	{
 		NSInteger n =  self.rootNodes.count;
 		for (NSInteger i=n-1; i>=0; i--)

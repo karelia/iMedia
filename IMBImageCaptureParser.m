@@ -167,6 +167,7 @@
 	newNode.watcherType = kIMBWatcherTypeFirstCustom;
 	newNode.watchedPath = path;
 	
+	[self populateNode:newNode options:0 error:nil];
 	return newNode;
 }
 
@@ -499,7 +500,8 @@ static void HandleICANotification(CFStringRef notificationType, CFDictionaryRef 
 	id objectID = nil;
 	// for those hardcoded string constants, probably a == comparison instead of a full isEqualTo: would be sufficient
 	// trigger node change notifications:
-	if( [aNotification isEqualTo:(NSString *)kICANotificationTypeDeviceAdded] ||
+	if( // [aNotification isEqualTo:(NSString *)kICANotificationTypeDeviceConnectionProgress] ||
+	    [aNotification isEqualTo:(NSString *)kICANotificationTypeDeviceAdded] ||
 	    [aNotification isEqualTo:(NSString *)kICANotificationTypeDeviceRemoved] )
 	{ // the device list object changed..
 		objectID = [aDictionary valueForKey:(NSString *)kICANotificationDeviceListICAObjectKey];
@@ -520,9 +522,12 @@ static void HandleICANotification(CFStringRef notificationType, CFDictionaryRef 
 		IMBLibraryController *libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
 		
 		// trigger change notification
-		IMBNode *changedNode = [libController nodeWithIdentifier:identifier];
-		if( changedNode )
-			[libController reloadNode:changedNode];
+		/// IMBNode *changedNode = [libController nodeWithIdentifier:identifier];
+		/// if( changedNode )
+		/// 	[libController reloadNode:changedNode];
+		
+		IMBNode *rootNode = [libController rootNodeForParser:self];
+		[libController reloadNode:rootNode parser:self];
 	}
  
  //    [self updateFiles];
