@@ -197,6 +197,37 @@ const NSString* kSearchStringContext = @"searchString";
 		
 		NSMutableArray* matchedObjects = [NSMutableArray arrayWithCapacity:[inObjects count]];
 		NSString* lowerCaseSearchString = [_searchString lowercaseString];
+/*
+		// Let's try to use Spotlight to help us if at all possible.  It will be a lot faster on large data sets.
+		// The trick is to figure out how to combine what the person searches for and the other constraints that we
+		// want the parser object to impose, e.g. restricting to a certain folder, a certain UTI, or matching to some kind of
+		// database query.  Anyhow, I'll bang out some ideas here and then we can talk about getting it merged together.
+		// Also, we need to specify what properties we are matching against.
+		
+		// I think that maybe what we can do is to match the hits it returns against the items we are displaying, so that
+		// you never can find *more* than what is in the list.
+		
+		// from PhotoSearch sample code
+
+		NSMetaDataQuery     *query = [[NSMetadataQuery alloc] init];
+		// We want the items in the query to automatically be sorted by the file system name; this way, we don't have to do any special sorting
+		[query setSortDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:(id)kMDItemFSName ascending:YES] autorelease]]];
+		[query setPredicate:searchPredicate];
+		// Use KVO to watch the results of the query
+		[query addObserver:self forKeyPath:@"results" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+		[query setDelegate:self];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(queryNote:) name:nil object:query];
+		
+		[query startQuery];
+		
+		
+		//For images, put in the predicate: kMDItemContentTypeTree = 'public.image'
+		
+		//We would be matching on kMDItemKeywords
+		
+		//we would want to use -[NSMetaDataQuery setSearchScopes:] with the path of the folder we are searching for
+*/			
+		
 		
 		for (IMBObject* object in inObjects)
 		{
