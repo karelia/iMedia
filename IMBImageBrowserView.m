@@ -74,4 +74,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Disable background loading. This is an undocumented internal method. It was suggested to override this method 
+// by a developer on StackOverflow.com. otool -oV reveals that this method is available on 10.5 and 10.6, but
+// we do not yet know whether the behavior is the same...
+
+- (BOOL) _shouldProcessLongTasks
+{
+	return NO;
+}
+
+			
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @end
