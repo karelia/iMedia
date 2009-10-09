@@ -1105,6 +1105,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		IMBComboTextCell* cell = (IMBComboTextCell*)inCell;
 		cell.image = object.imageRepresentation;
+#warning THIS COULD BE ANY THING!
 	}
 	else
 	{
@@ -1199,6 +1200,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #pragma mark IMBDynamicTableViewDelegate
 
 // We pre-load the images in batches.
+
+// Assumes that we only have one client table view.  If we were to add another IMBDynamicTableView client, we would need to
+// deal with this architecture a bit since we have ivars here about which rows are visible.
+
 
 - (void)dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows
 {
