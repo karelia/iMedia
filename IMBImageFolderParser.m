@@ -102,7 +102,7 @@
 	}
 	else
 	{
-//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager defaultManager] fileExistsAtPath:inPath]);
+//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager threadSafeManager] fileExistsAtPath:inPath]);
 	}
 
 	

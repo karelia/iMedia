@@ -124,7 +124,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Look at the iApps preferences file and find all iPhoto libraries. Create a parser instance for each libary...
+// Look at the iApps preferences file and find all iTunes libraries. Create a parser instance for each libary...
 
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
@@ -268,7 +268,7 @@
 
 
 // The supplied node is a private copy which may be modified here in the background operation. Parse the 
-// iPhoto XML file and create subnodes as needed...
+// iTunes XML file and create subnodes as needed...
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
@@ -591,8 +591,8 @@
 					object.index = index++;
 					
 					object.imageLocation = path;
-					object.imageRepresentationType = IKImageBrowserQuickLookPathRepresentationType;
-					object.imageRepresentation = nil;
+					object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; 
+					object.imageRepresentation = nil;	// will be loaded lazily when needed
 
 					// Add metadata and convert the duration property to seconds. Also note that the original
 					// key "Total Time" is not bindings compatible as it contains a space...
