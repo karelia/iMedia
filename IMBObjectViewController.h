@@ -178,3 +178,23 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
+@protocol IMBObjectViewControllerDelegate
+
+@optional
+
+// If the delegate implements this method, then it can reequest a custom cell for the IKImageBrowserView...
+
+- (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController;
+
+// With this method the delegate can return a custom drag image for a drags starting from the IKImageBrowserView...
+
+- (NSImage*) draggedImageForController:(IMBObjectViewController*)inController draggedObjects:(NSArray*)inObjects;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
