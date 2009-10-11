@@ -329,16 +329,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBApertureParser://Sample/17"...
+// Create an unique identifier from the library path and the AlbumID that is stored in the XML file. 
+// An example is "IMBApertureParser://123/Sample/17"...
 
 - (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId
 {
 	NSString* path = (NSString*) self.mediaSource;
 	NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
-	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@",libraryName,inAlbumId];
+	NSString* albumPath = [NSString stringWithFormat:@"/%i/%@/%@",[path hash],libraryName,inAlbumId];
 	return [self identifierForPath:albumPath];
 }
 
+
+// The root node always has the hardcoded AlbumID 1...
 
 - (NSString*) rootNodeIdentifier
 {
