@@ -538,6 +538,13 @@
 
 - (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
+	// Select the correct imageRepresentationType for our mediaType...
+	
+	NSString* imageRepresentationType = 
+		[self.mediaType isEqualToString:kIMBMediaTypeAudio] ?
+		IKImageBrowserNSImageRepresentationType :
+		IKImageBrowserQTMovieRepresentationType;
+		
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
@@ -591,7 +598,7 @@
 					object.index = index++;
 					
 					object.imageLocation = path;
-					object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; 
+					object.imageRepresentationType = imageRepresentationType; 
 					object.imageRepresentation = nil;	// will be loaded lazily when needed
 
 					// Add metadata and convert the duration property to seconds. Also note that the original
