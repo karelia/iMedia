@@ -53,6 +53,7 @@
 #import "IMBObject.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
+#import "NSString+iMedia.h"
 
 #import <Quartz/Quartz.h>
 #import <QTKit/QTKit.h>
@@ -174,6 +175,41 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Quicklook methods to create images from non-image files...
+
+- (CGImageRef) quicklookCGImageForURL:(NSURL*)inURL
+{
+	CGSize size = CGSizeMake(128,128);
+	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)inURL,size,NULL);
+	return (CGImageRef) [NSMakeCollectable(image) autorelease];
+}
+
+
+- (NSImage*) quicklookNSImageForURL:(NSURL*)inURL
+{
+	NSImage* nsimage = nil;
+	CGImageRef cgimage = [self quicklookCGImageForURL:inURL];
+
+	if (cgimage)
+	{
+		NSSize size = NSZeroSize;
+		size.width = CGImageGetWidth(cgimage);
+		size.height = CGImageGetWidth(cgimage);
+
+		nsimage = [[[NSImage alloc] initWithSize:size] autorelease];
+
+		NSBitmapImageRep* rep = [[NSBitmapImageRep alloc] initWithCGImage:cgimage];
+		[nsimage addRepresentation:rep];		
+		[rep release];
+	}
+	
+	return nsimage;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Loading movies must be done on the main thread (as many components are not threadsafe). Alas, this blocks 
 // the main runloop, but what are we to do...
 
@@ -199,7 +235,7 @@
 	NSString* type = object.imageRepresentationType;
 	NSString* path = nil;
 	NSURL* url = nil;
-
+	
 	// Get path/url location of our object...
 	
 	id location = object.imageLocation;
@@ -215,6 +251,10 @@
 		url = (NSURL*)location;
 		path = [url path];
 	}
+	
+	// Get the uti for out object...
+	
+	NSString* uti = [NSString UTIForFileAtPath:path];
 	
 	// Path...
 	
@@ -233,12 +273,6 @@
 	else if ([type isEqualToString:IKImageBrowserQuickLookPathRepresentationType])
 	{
 		imageRepresentation = path;	
-//		// QuickLook file path or URL
-//		NSURL *url = [imageRepresentation isKindOfClass:[NSURL class]]
-//			? imageRepresentation
-//			: [NSURL fileURLWithPath:imageRepresentation];
-//		retainedCGImage = QLThumbnailImageCreate(kCFAllocatorDefault, (CFURLRef)url, 
-//				CGSizeMake(MAX_THUMBNAIL_SIZE, MAX_THUMBNAIL_SIZE), NULL);
 	}
 	
 	// URL...
@@ -252,15 +286,28 @@
 	
 	else if ([type isEqualToString:IKImageBrowserNSImageRepresentationType])
 	{
-		imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
+		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+		{
+			imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
+		}
+		else
+		{
+			imageRepresentation = [self quicklookNSImageForURL:url];
+		}	
 	}
 	
 	// CGImage...
 	
 	else if ([type isEqualToString:IKImageBrowserCGImageRepresentationType])
 	{
-		CGImageRef image = [self imageForURL:url];
-		imageRepresentation = (id)image;
+		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+		{
+			imageRepresentation = (id)[self imageForURL:url];
+		}
+		else
+		{
+			imageRepresentation = (id)[self quicklookCGImageForURL:url];
+		}
 	}
 	
 	// CGImageSourceRef...
@@ -283,9 +330,16 @@
 	
 	else if ([type isEqualToString:IKImageBrowserNSBitmapImageRepresentationType])
 	{
-		CGImageRef image = [self imageForURL:url];
-		NSBitmapImageRep* bitmap = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
-		imageRepresentation = bitmap;
+		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+		{
+			CGImageRef image = [self imageForURL:url];
+			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
+		}
+		else
+		{
+			CGImageRef image = [self quicklookCGImageForURL:url];
+			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
+		}
 	}
 	
 	// QTMovie...
@@ -298,71 +352,8 @@
 				withObject:info 
 				waitUntilDone:NO 
 				modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-
-//		QTMovie* movie = [self movieForURL:url];
-//		imageRepresentation = movie;
 	}
-//	else if ([type isEqualToString:IKImageBrowserIconRefRepresentationType])
-//	{
-//		IconRef icon 
-//		// IconRef
-//		image = [[[NSImage alloc] initWithIconRef:(IconRef)imageRepresentation] autorelease];
-//	}
-//	else if ([type isEqualToString:IKImageBrowserQuickLookPathRepresentationType])
-//	{
-//		// QuickLook file path or URL
-//		NSURL *url = [imageRepresentation isKindOfClass:[NSURL class]]
-//			? imageRepresentation
-//			: [NSURL fileURLWithPath:imageRepresentation];
-//		retainedCGImage = QLThumbnailImageCreate(kCFAllocatorDefault, (CFURLRef)url, 
-//				CGSizeMake(MAX_THUMBNAIL_SIZE, MAX_THUMBNAIL_SIZE), NULL);
-//	}
-	/* These are the types that we DON'T SUPPORT at this time:
-	 IKImageBrowserQCCompositionRepresentationType
-	 IKImageBrowserQCCompositionPathRepresentationType
-	 */
-	
-//	if (retainedSource)		// did the above get us a CGImageSource? If so we'll create the NSImage now.
-//	{
-//		NSDictionary* thumbOpts = [NSDictionary dictionaryWithObjectsAndKeys:
-//								   (id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailWithTransform,
-//								   (id)kCFBooleanFalse, (id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
-//								   (id)kCFBooleanTrue, (id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
-//								   [NSNumber numberWithInteger:MAX_THUMBNAIL_SIZE], (id)kCGImageSourceThumbnailMaxPixelSize, 
-//								   nil];
-//		
-//		retainedCGImage = CGImageSourceCreateThumbnailAtIndex(retainedSource, 0, (CFDictionaryRef)thumbOpts);
-//		CFRelease(retainedSource);
-//	}
-	
-//	// Now if we have a CGImageRef, make the NSImage from that.
-//	
-//	if (retainedCGImage)
-//	{
-//		NSBitmapImageRep *bitmap = [[[NSBitmapImageRep alloc] initWithCGImage:retainedCGImage] autorelease];
-//        image = [[[NSImage alloc] initWithSize:[bitmap size]] autorelease];
-//        [image addRepresentation:bitmap];
-//		
-//		CGImageRelease(retainedCGImage);
-//	}
-//	
-//#ifdef DEBUG
-////	sleep(3);		// load slowly so we can test properties
-//#endif
-//	// At this point, we should have an NSImage that we are ready to go set as the thumbnail.
-//	// (Do we want to do something about versions the way IKImageBrowser View works?)
-//	
-//	if (image != nil)
-//	{
-//		// We synchronize access to the image/imageLoading pair of variables
-//		@synchronized (object)
-//		{
-//			object.isLoading = NO;
-//			object.thumbnail = image;	// this will set off KVO on IMBObjectPropertyNamedThumbnailImage
-//			//NSLog(@"Finished loading %@", visualObject);
-//		}
-//	}
-	
+
 	// Return the result to the main thread...
 	
 	if (imageRepresentation)
