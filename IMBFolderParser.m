@@ -106,6 +106,16 @@
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
 	path = [path stringByStandardizingPath];
 	
+	// Check if the folder exists. If not then do not return a node...
+	
+	BOOL exists,directory;
+	exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&directory];
+	
+	if (!exists || !directory) 
+	{
+		return nil;
+	}	
+
 	// Create an empty root node (unpopulated and without subnodes)...
 	
 	IMBNode* newNode = [[[IMBNode alloc] init] autorelease];
@@ -210,25 +220,22 @@
 					object.parser = self;
 					object.index = index++;
 					
-					// If the file is an image, then we will get the image directly. Otherwise
-					// We will use QuickLook, e.g. to get image out of an audio file...
+					// If the file is movie, then we want a movie representation. For all other file types
+					// we will just use an image representation. NSImage for now, but we'll switch to CGImage
+					// once the IMBComboTextCell supports CGImageRefs...
 					
-					if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeImage])
+					if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeMovie])
 					{
-						object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; //IKImageBrowserPathRepresentationType;
-					}
-					else if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeMovie])
-					{
-						object.imageRepresentationType = IKImageBrowserQTMovieRepresentationType; //IKImageBrowserQTMoviePathRepresentationType;
+						object.imageRepresentationType = IKImageBrowserQTMovieRepresentationType; 
 					}
 					else
 					{
-						object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; //IKImageBrowserQuickLookPathRepresentationType;
+						object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; 
 					}
 					
-					
-					object.imageRepresentation = nil;		// will be loaded lazily 
-					object.metadata = nil;					// (on demand when needed)
+					object.imageLocation = path;
+					object.imageRepresentation = nil;		// will be loaded lazily when needed
+					object.metadata = nil;					// will be loaded lazily when needed
 
 					[objects addObject:object];
 					[object release];
@@ -306,10 +313,10 @@
 }
 	
 
+// To be overridden by subclass...
+	
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
-	// To be overridden by subclass...
-	
 	return nil;
 }
 
