@@ -56,6 +56,9 @@
 
 
 @interface IMBImageBrowserView : IKImageBrowserView
+{
+	Class _cellClass;
+}
 
 @end
 

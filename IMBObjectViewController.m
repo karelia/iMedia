@@ -321,6 +321,15 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (id) delegate
+{
+	return self.libraryController.delegate;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 #pragma mark Persistence 
 
@@ -395,15 +404,15 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) _configureIconView
 {
-	// Make the IKImageBrowserView use our custom cell class. Please note that we check for the existence 
-	// of the base class first, as it is un undocumented internal class on 10.5. In 10.6 it is always there...
-	
-	if ([ibIconView respondsToSelector:@selector(setCellClass:)] && NSClassFromString(@"IKImageBrowserCell"))
-	{
-		[ibIconView performSelector:@selector(setCellClass:) withObject:[IMBImageBrowserCell class]];
-	}
-	
-	[ibIconView setAnimates:NO];
+//	// Make the IKImageBrowserView use our custom cell class. Please note that we check for the existence 
+//	// of the base class first, as it is un undocumented internal class on 10.5. In 10.6 it is always there...
+//	
+//	if ([ibIconView respondsToSelector:@selector(setCellClass:)] && NSClassFromString(@"IKImageBrowserCell"))
+//	{
+//		[ibIconView performSelector:@selector(setCellClass:) withObject:[IMBImageBrowserCell class]];
+//	}
+//	
+//	[ibIconView setAnimates:NO];
 }
 
 
@@ -670,7 +679,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	// Give delegate a chance to add custom menu items...
 	
-	id delegate = self.libraryController.delegate;
+	id delegate = self.delegate;
 	
 	if (delegate!=nil && [delegate respondsToSelector:@selector(controller:willShowContextMenu:forObject:)])
 	{
@@ -962,16 +971,16 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
 	
 	NSString* title = NSLocalizedStringWithDefaultValue(
-														@"IMBObjectViewController.progress.title",
-														nil,IMBBundle(),
-														@"Downloading Media Files",
-														@"Window title of progress panel of IMBObjectViewController");
+		@"IMBObjectViewController.progress.title",
+		nil,IMBBundle(),
+		@"Downloading Media Files",
+		@"Window title of progress panel of IMBObjectViewController");
 	
 	NSString* message = NSLocalizedStringWithDefaultValue(
-														  @"IMBObjectViewController.progress.message.preparing",
-														  nil,IMBBundle(),
-														  @"Preparing…",
-														  @"Text message in progress panel of IMBObjectViewController");
+		@"IMBObjectViewController.progress.message.preparing",
+		nil,IMBBundle(),
+		@"Preparing…",
+		@"Text message in progress panel of IMBObjectViewController");
 	
 	[controller window];
 	[controller setTitle:title];
@@ -1012,7 +1021,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) imageBrowser:(IKImageBrowserView*)inView cellWasDoubleClickedAtIndex:(NSUInteger)inIndex
 {
 	IMBLibraryController* controller = self.libraryController;
-	id delegate = controller.delegate;
+	id delegate = self.delegate;
 	BOOL didHandleEvent = NO;
 	
 	if (delegate)
@@ -1080,6 +1089,46 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	}
 	
 	return 0;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// If the IKImageBrowserView asked for a custom cell class, then pass on the request to the library's delegate. 
+// That way the application is given a chance to customize the look of the browser...
+
+- (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController
+{
+	id delegate = self.delegate;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(imageBrowserCellClassForController:)])
+		{
+			return [delegate imageBrowserCellClassForController:self];
+		}
+	}
+	
+	return nil;
+}
+
+
+// With this method the delegate can return a custom drag image for a drags starting from the IKImageBrowserView...
+
+- (NSImage*) draggedImageForController:(IMBObjectViewController*)inController draggedObjects:(NSArray*)inObjects
+{
+	id delegate = self.delegate;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(draggedImageForController:draggedObjects:)])
+		{
+			return [delegate draggedImageForController:self draggedObjects:inObjects];
+		}
+	}
+	
+	return nil;
 }
 
 

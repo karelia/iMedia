@@ -50,6 +50,18 @@
 #pragma mark HEADERS
 
 #import "IMBImageBrowserView.h"
+#import "IMBImageBrowserCell.h"
+#import "IMBObjectViewController.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Declare internal methods of superclass to shut up the compiler...
+
+@interface IKImageBrowserView ()
+- (NSImage*) draggedImage;
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,6 +75,74 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// If the IKImageBrowserView asked for a custom cell class, then pass on the request to the library's delegate. 
+// That way the application is given a chance to customize the look of the browser...
+
+- (Class) _cellClass
+{
+	Class cellClass = nil;
+	id delegate = self.delegate;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(imageBrowserCellClassForController:)])
+		{
+			cellClass =  [delegate imageBrowserCellClassForController:nil];
+		}
+	}
+	
+	// Please note that we check for the existence of the base class before creating the subclass, 
+	// as the baseclass is an undocumented internal class on 10.5. In 10.6 it is always there...
+	
+	if (cellClass == nil)
+	{
+		if (NSClassFromString(@"IKImageBrowserCell") != nil)
+		{
+			cellClass = [IMBImageBrowserCell class];
+		}
+	}
+	
+	return [IMBImageBrowserCell class];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Make the browser use our own custom cell class...
+
+- (void) awakeFromNib
+{
+	_cellClass = [self _cellClass];
+	
+	if ([self respondsToSelector:@selector(setCellClass:)])
+	{
+		[self performSelector:@selector(setCellClass:) withObject:_cellClass];
+	}
+
+//	[self setConstrainsToOriginalSize:YES];
+//	[self setValue:attributes forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];	
+//	[self setCellSize:NSMakeSize(44.0,22.0)];
+//	[self setIntercellSpacing:NSMakeSize(8.0,12.0)];
+//	[self setAnimates:NO];
+//	[self setWantsLayer:NO];
+
+//	NSColor* selectionColor = [NSColor selectedTextBackgroundColor];
+//	[self setValue:selectionColor forKey:IKImageBrowserSelectionColorKey];
+}
+
+
+// This method is for 10.6 only. Create and return a cell. Please note that we must not autorelease here!
+
+- (IKImageBrowserCell*) newCellForRepresentedItem:(id)inCell
+{
+	return [[_cellClass alloc] init];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // This makes sure that dragging to external applications works...
 
 - (NSDragOperation) draggingSourceOperationMaskForLocal:(BOOL)inLocal
@@ -70,7 +150,33 @@
 	return NSDragOperationCopy;
 }
 
+
+// When creating the drag image first give the delegate of our controller a chance to create a custom drag image.
+// If it declines, then simply return the default drag image created by Apple. Please note that we supply nil 
+// arguments to the delegate method here. These will be filled in by the controller...
 			
+- (NSImage*) draggedImage
+{
+	NSImage* image = nil;
+	id delegate = self.delegate;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(draggedImageForController:draggedObjects:)])
+		{
+			image =  [delegate draggedImageForController:nil draggedObjects:nil];
+		}
+	}
+
+	if (image == nil)
+	{
+		image = [super draggedImage];
+	}
+	
+	return image;
+}
+
+		
 //----------------------------------------------------------------------------------------------------------------------
 
 
