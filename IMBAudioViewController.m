@@ -226,12 +226,13 @@
 	
 	// Start playing what the new selection...
 	
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	NSIndexSet* rows = [ibListView selectedRowIndexes];
 	NSUInteger row = [rows firstIndex];
 		
-	if (row != NSNotFound)
+	if (row != NSNotFound && row < [objects count])
 	{
-		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
+		IMBObject* object = (IMBObject*) [objects objectAtIndex:row];
 		[self playAudioObject:object];
 	}
 }
@@ -239,11 +240,21 @@
 
 - (void) playAudioObject:(IMBObject*)inObject
 {
+	// GarageBand files require special attention as the "playable" file resides inside the document package...
+	
+	NSString* path = [inObject path];
+
+	if ([[[path pathExtension] lowercaseString] isEqualToString:@"band"])
+	{
+		NSString* output = [path stringByAppendingPathComponent:@"Output/Output.aif"];
+		BOOL exists = [[NSFileManager threadSafeManager] fileExistsAtPath:output];
+		if (exists) path = output;
+	}
+
 	// Create a QTMovie for the selected item...
 	
 	NSError* error = nil;
-	NSURL* url = [inObject url];
-	QTMovie* movie = [QTMovie movieWithURL:url error:&error];
+	QTMovie* movie = [QTMovie movieWithFile:path error:&error];
 	
 	// Start playing it...
 	
