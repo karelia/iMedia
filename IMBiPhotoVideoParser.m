@@ -49,8 +49,14 @@
 
 #pragma mark HEADERS
 
-#import "IMBiTunesVideoParser.h"
+#import "IMBiPhotoVideoParser.h"
 #import "IMBParserController.h"
+#import "IMBNode.h"
+#import "IMBObject.h"
+//#import "IMBIconCache.h"
+//#import "NSWorkspace+iMedia.h"
+//#import "NSFileManager+iMedia.h"
+#import <Quartz/Quartz.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,7 +64,7 @@
 
 #pragma mark 
 
-@implementation IMBiTunesVideoParser
+@implementation IMBiPhotoVideoParser
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,40 +83,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Exclude some playlist types...
+// This media type is specific to iPhoto and is not to be confused with kIMBMediaTypeImage...
 
-- (BOOL) shoudlUsePlaylist:(NSDictionary*)inPlaylistDict
+- (NSString*) iPhotoMediaType
 {
-	if (inPlaylistDict == nil) return NO;
-	
-	NSNumber* visible = [inPlaylistDict objectForKey:@"Visible"];
-	if (visible!=nil && [visible boolValue]==NO) return NO;
-	
-	if ([[inPlaylistDict objectForKey:@"Distinguished Kind"] intValue]==26) return NO;	// Genius
-	
-	if ([self.mediaType isEqualToString:kIMBMediaTypeMovie])
-	{
-		if ([inPlaylistDict objectForKey:@"Movies"]) return YES;
-		if ([inPlaylistDict objectForKey:@"TV Shows"]) return YES;
-	}
-	
-	return NO;
+	return @"Movie";
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// A track is eligible if it has a name, a url, and if it is a video file...
+// This parser wants QTMovie thumbnails...
 
-- (BOOL) shouldUseTrack:(NSDictionary*)inTrackDict
+- (NSString*) requestedImageRepresentationType
 {
-	if (inTrackDict == nil) return NO;
-	if ([inTrackDict objectForKey:@"Name"] == nil) return NO;
-	if ([[inTrackDict objectForKey:@"Location"] length] == 0) return NO;
-	if ([[inTrackDict objectForKey:@"Has Video"] boolValue] == 0) return NO;
-	
-	return YES;
+	return IKImageBrowserQTMovieRepresentationType;
+}
+
+
+// Use the path of the hires file to get to the QTMovie...
+
+- (NSString*) imageLocationForObject:(NSDictionary*)inObjectDict
+{
+	return [inObjectDict objectForKey:@"ImagePath"];
 }
 
 

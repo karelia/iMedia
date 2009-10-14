@@ -49,8 +49,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBiTunesVideoParser.h"
-#import "IMBParserController.h"
+#import "IMBiPhotoParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,63 +57,10 @@
 
 #pragma mark 
 
-@implementation IMBiTunesVideoParser
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Register this parser, so that it gets automatically loaded...
-
-+ (void) load
-{
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
-	[pool release];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Exclude some playlist types...
-
-- (BOOL) shoudlUsePlaylist:(NSDictionary*)inPlaylistDict
-{
-	if (inPlaylistDict == nil) return NO;
-	
-	NSNumber* visible = [inPlaylistDict objectForKey:@"Visible"];
-	if (visible!=nil && [visible boolValue]==NO) return NO;
-	
-	if ([[inPlaylistDict objectForKey:@"Distinguished Kind"] intValue]==26) return NO;	// Genius
-	
-	if ([self.mediaType isEqualToString:kIMBMediaTypeMovie])
-	{
-		if ([inPlaylistDict objectForKey:@"Movies"]) return YES;
-		if ([inPlaylistDict objectForKey:@"TV Shows"]) return YES;
-	}
-	
-	return NO;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// A track is eligible if it has a name, a url, and if it is a video file...
-
-- (BOOL) shouldUseTrack:(NSDictionary*)inTrackDict
-{
-	if (inTrackDict == nil) return NO;
-	if ([inTrackDict objectForKey:@"Name"] == nil) return NO;
-	if ([[inTrackDict objectForKey:@"Location"] length] == 0) return NO;
-	if ([[inTrackDict objectForKey:@"Has Video"] boolValue] == 0) return NO;
-	
-	return YES;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+@interface IMBiPhotoVideoParser: IMBiPhotoParser
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
