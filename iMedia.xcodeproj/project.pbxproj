@@ -208,6 +208,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		CEC0F91C10852AF8002CE02E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 6A8666480F9593B200325E1C /* ObjectiveFlickr (framework) */;
+			remoteInfo = "ObjectiveFlickr (framework)";
+		};
 		D07BF167104C423B00B6C87D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
@@ -992,6 +999,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				CEC0F91D10852AF8002CE02E /* PBXTargetDependency */,
 			);
 			name = iMedia;
 			productInstallPath = "$(HOME)/Library/Frameworks";
@@ -1213,6 +1221,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		CEC0F91D10852AF8002CE02E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "ObjectiveFlickr (framework)";
+			targetProxy = CEC0F91C10852AF8002CE02E /* PBXContainerItemProxy */;
+		};
 		D07BF168104C423B00B6C87D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "ObjectiveFlickr (framework)";
