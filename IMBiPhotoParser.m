@@ -67,11 +67,14 @@
 @interface IMBiPhotoParser ()
 
 - (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId;
+- (NSString*) iPhotoMediaType;
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
+- (BOOL) shouldUseAlbum:(NSDictionary*)inAlbumDict images:(NSDictionary*)inImages;
+- (BOOL) shouldUseObject:(NSDictionary*)inObjectDict;
 - (NSImage*) iconForAlbumType:(NSString*)inAlbumType;
 - (BOOL) isLeafAlbumType:(NSString*)inAlbumType;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
-- (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages iPhotoMediaType:(NSString*)iPhotoMediaType;
+- (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
 
 @end
 
@@ -275,7 +278,7 @@
 	NSArray* albums = [self.plist objectForKey:@"List of Albums"];
 	NSDictionary* images = [self.plist objectForKey:@"Master Image List"];
 	[self addSubNodesToNode:inNode albums:albums images:images]; 
-	[self populateNode:inNode albums:albums images:images iPhotoMediaType:@"Image"]; 
+	[self populateNode:inNode albums:albums images:images]; 
 
 	if (outError) *outError = error;
 	return error == nil;
@@ -329,6 +332,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This media type is specific to iPhoto and is not to be confused with kIMBMediaTypeImage...
+
+- (NSString*) iPhotoMediaType
+{
+	return @"Image";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBiPhotoParser://AlbumId/17"...
 
 - (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId
@@ -349,6 +363,52 @@
 	if ([inAlbumType isEqualToString:@"Slideshow"]) return NO;
 	if ([inAlbumType isEqualToString:@"Book"]) return NO;
 	return YES;
+}
+
+
+// Check if the supplied album contains media files of correct media type. If we find a single one, then the 
+// album qualifies as a new node. If however we do not find any media files of the desired type, then the 
+// album will not show up as a node...
+
+- (BOOL) shouldUseAlbum:(NSDictionary*)inAlbumDict images:(NSDictionary*)inImages
+{
+	NSArray* imageKeys = [inAlbumDict objectForKey:@"KeyList"];
+
+	for (NSString* key in imageKeys)
+	{
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		NSDictionary* imageDict = [inImages objectForKey:key];
+		
+		if ([self shouldUseObject:imageDict])
+		{
+				return YES;
+		}
+		
+		[pool release];
+	}
+	
+	return NO;
+}
+
+
+// Check if a media file qualifies for this parser...
+
+- (BOOL) shouldUseObject:(NSDictionary*)inObjectDict
+{
+	NSString* iPhotoMediaType = [self iPhotoMediaType];
+	
+	if (inObjectDict)
+	{
+		NSString* mediaType = [inObjectDict objectForKey:@"MediaType"];
+		if (mediaType == nil) mediaType = @"Image";
+		
+		if ([mediaType isEqualToString:iPhotoMediaType])
+		{
+			return YES;
+		}
+	}
+	
+	return NO;
 }
 
 
@@ -425,7 +485,9 @@
 		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
 		NSString* parentIdentifier = parentId ? [self identifierWithAlbumId:parentId] : [self identifierForPath:@"/"];
 		
-		if ([self shouldUseAlbumType:albumType] && [inParentNode.identifier isEqualToString:parentIdentifier])
+		if ([self shouldUseAlbumType:albumType] && 
+			[inParentNode.identifier isEqualToString:parentIdentifier] && 
+			[self shouldUseAlbum:albumDict images:inImages])
 		{
 			// Create node for this album...
 			
@@ -459,10 +521,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This parser wants image thumbnails...
+
+- (NSString*) requestedImageRepresentationType
+{
+	return IKImageBrowserNSImageRepresentationType;
+}
+
+
+// Use the path of the smal thumbnail file to create this image...
+
+- (NSString*) imageLocationForObject:(NSDictionary*)inObjectDict
+{
+	return [inObjectDict objectForKey:@"ThumbPath"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void) populateNode:(IMBNode*)inNode 
 		 albums:(NSArray*)inAlbums 
 		 images:(NSDictionary*)inImages
-		 iPhotoMediaType:(NSString*)iPhotoMediaType	// this mediaType is special to iPhoto, not the same as IMB mediaType!
 {
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
@@ -489,39 +569,26 @@
 			{
 				NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
 				NSDictionary* imageDict = [inImages objectForKey:key];
-				NSString* mediaType = [imageDict objectForKey:@"MediaType"];
-			
-				if (imageDict!=nil && ([mediaType isEqualToString:iPhotoMediaType] || mediaType==nil))
+				
+				if ([self shouldUseObject:imageDict])
 				{
-					NSString* imagePath = [imageDict objectForKey:@"ImagePath"];
-					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
-					NSString* caption   = [imageDict objectForKey:@"Caption"];
-	
 					IMBObject* object = [[IMBObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
-					object.location = (id)imagePath;
-					object.name = caption;
+					object.location = (id)[imageDict objectForKey:@"ImagePath"];
+					object.name = [imageDict objectForKey:@"Caption"];
 					object.metadata = imageDict;
 					object.parser = self;
 					object.index = index++;
 					
-//					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
-//					object.imageRepresentation = (thumbPath!=nil) ? thumbPath : imagePath;
-					object.imageLocation = (id)thumbPath;
-					object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+					object.imageLocation = [self imageLocationForObject:imageDict];
+					object.imageRepresentationType = [self requestedImageRepresentationType];
 					object.imageRepresentation = nil;
 				}
 				
 				[pool2 release];
 			}
-			
-//			// If this is the "Photos" node, then assign the same object array to the parent node (iPhoto),
-//			// so that selecting the parent node also displays all images...
-//			
-//			NSNumber* master = [albumDict objectForKey:@"Master"];
-//			if ([master boolValue]) inNode.parentNode.objects = inNode.objects;
 		}
 		
 		[pool1 release];
