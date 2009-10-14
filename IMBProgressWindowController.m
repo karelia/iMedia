@@ -60,7 +60,7 @@
 @implementation IMBProgressWindowController
 
 @synthesize progressBar = ibProgressBar;
-@synthesize textField = ibTextField;
+@synthesize textField = ibTitleField;
 @synthesize cancelButton = ibCancelButton;
 
 
