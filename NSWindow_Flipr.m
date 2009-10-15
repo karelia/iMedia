@@ -135,8 +135,8 @@
 		NSView* view = [[initialWindow contentView] superview];
 		flp = [view bounds];
 		NSBitmapImageRep* bitmap = [view bitmapImageRepForCachingDisplayInRect:flp];
-		CIImage* initialImage = [[CIImage alloc] initWithBitmapImageRep:bitmap];
 		[view cacheDisplayInRect:flp toBitmapImageRep:bitmap];
+		CIImage* initialImage = [[CIImage alloc] initWithBitmapImageRep:bitmap];
 		if (reflection)
 		{
 			CIImage *im = initialImage;

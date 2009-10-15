@@ -69,6 +69,9 @@ extern void QTSetProcessProperty(UInt32 type, UInt32 creator, size_t size, uint8
 
 - (BOOL)iMediaBrowser:(iMediaBrowser *)browser willLoadBrowser:(NSString *)browserClassname
 {
+	// Uncomment these if you want the window (and the "back") to be visible when the app is not active
+	//[[browser window] setHidesOnDeactivate:NO];
+	//[[browser infoWindow] setHidesOnDeactivate:NO];
 	return YES;
 }
 
