@@ -505,7 +505,11 @@ static animationData* currentAnimation = NULL;
 			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 			NSDisableScreenUpdates();
 // This does the actual movement.
-			[sv RB___trackMouseEvent:theEvent from:point withBase:base inDivider:actDivider];
+			if (actDivider < NSNotFound)
+			{
+				// Check first -- may have changed in event handling
+				[sv RB___trackMouseEvent:theEvent from:point withBase:base inDivider:actDivider];
+			}
 			if ([sv mustAdjust]) {
 // If something changed, we clear fractions and redisplay.
 				[sv RB___setMustClearFractions];
