@@ -52,6 +52,7 @@
 #import "IMBImageBrowserView.h"
 #import "IMBImageBrowserCell.h"
 #import "IMBObjectViewController.h"
+#import "IMBObjectFifoCache.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -186,7 +187,10 @@
 
 - (BOOL) _shouldProcessLongTasks
 {
-	return NO;
+	// If there still is plenty of space left in the cache we can allow some background loading, but do not
+	// fill it up all the way. Try to leave some space for when it is needed...
+	
+	return [IMBObjectFifoCache count] < [IMBObjectFifoCache size]-64;
 }
 
 			
