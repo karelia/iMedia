@@ -52,8 +52,22 @@
 #import "IMBLightroomParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
+#import "IMBObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
+#import "FMDatabase.h"
+#import "FMResultSet.h"
+#import <Quartz/Quartz.h>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark GLOBALS
+
+static NSArray* sSupportedUTIs = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,9 +75,31 @@
 
 #pragma mark 
 
-//@interface IMBLightroomParser ()
-//
-//@end
+@interface IMBLightroomParser ()
+
++ (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
+- (NSString*) libraryName;
+- (FMDatabase*) libraryDatabase;
+
+- (NSString*) rootNodeIdentifier;
+- (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
+- (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
+//- (NSNumber*) idLocalFromIdentifier:(NSString*)inIdentifier;
+- (BOOL) isFolderNode:(IMBNode*)inNode;
+- (BOOL) isCollectionNode:(IMBNode*)inNode;
+
+- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
+- (void) populateSubnodesForRootFoldersNode:(IMBNode*)inFoldersNode;
+- (void) populateSubnodesForFolderNode:(IMBNode*)inParentNode;
+- (void) populateObjectsForNode:(IMBNode*)inNode;
+
+- (NSArray*) supportedUTIs;
+- (BOOL) canOpenImageFileAtPath:(NSString*)inPath;
+
+//- (IMBNode*) parseFoldersForRoot:(IMBNode*)inRootNode;
+//- (IMBNode*) nodeWithPath:(NSString*)inPath inDictionary:(NSMutableDictionary*)inDictionary;
+//- (IMBNode*) nodeWithIdLocal:(NSNumber*)inIdLocal inDictionary:(NSMutableDictionary*)inDictionary;
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,8 +110,8 @@
 @implementation IMBLightroomParser
 
 @synthesize appPath = _appPath;
-@synthesize plist = _plist;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
+@synthesize database = _database;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,9 +121,9 @@
 
 + (void) load
 {
-//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-//	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-//	[pool release];
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
+	[pool release];
 }
 
 
@@ -101,9 +137,78 @@
 	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
 }
 
+
 + (BOOL) isInstalled
 {
 	return [self lightroomPath] != nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Return an array to Lightroom library files...
+
++ (NSArray*) libraryPaths
+{
+	NSMutableArray* libraryPaths = [NSMutableArray array];
+    
+	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom2");
+	
+	if (recentLibrariesList)
+	{
+        [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
+        CFRelease(recentLibrariesList);
+	}
+
+    if ([libraryPaths count] == 0)
+	{
+		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom2");
+		
+		if (activeLibraryPath)
+		{
+			CFRelease(activeLibraryPath);
+		}
+    }
+    
+	return libraryPaths;
+}
+
+
+// Helper method that converts simgle string into an array of paths...
+
++ (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths
+{
+    NSCharacterSet* newlineCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"\n\r"];
+    NSScanner* scanner = [NSScanner scannerWithString:inRecentLibrariesList];
+    
+    NSString* path = @"";
+	
+    while (![scanner isAtEnd])
+    {
+        NSString* token;
+        if ([scanner scanUpToCharactersFromSet:newlineCharacterSet intoString:&token])
+        {
+            NSString* string = [token stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            
+            if (([string length] == 0) || 
+                [string isEqualTo:@"recentLibraries = {"] || 
+                [string isEqualTo:@"}"])
+            {
+                continue;
+            }
+            
+            path = [path stringByAppendingString:string];
+            
+            if ([path hasSuffix:@"\","])
+            {
+                [inLibraryPaths addObject:[path substringWithRange:NSMakeRange(1, [path length] - 3)]];
+                path = @"";
+            }
+        }
+        
+        [scanner scanCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] intoString:nil];
+    }
 }
 
 
@@ -114,15 +219,23 @@
 
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
+	NSMutableArray* parserInstances = [NSMutableArray array];
+
 	if ([self isInstalled])
 	{
-		IMBLightroomParser* parser = [[IMBLightroomParser alloc] initWithMediaType:inMediaType];
-		NSArray* parserInstances = [NSArray arrayWithObject:parser];
-		[parser release];
-		return parserInstances;
+		NSArray* libraryPaths = [self libraryPaths];
+		
+		for (NSString* libraryPath in libraryPaths)
+		{
+			IMBLightroomParser* parser = [[IMBLightroomParser alloc] initWithMediaType:inMediaType];
+			parser.mediaSource = libraryPath;
+			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
+			[parserInstances addObject:parser];
+			[parser release];
+		}
 	}
 	
-	return nil;
+	return parserInstances;
 }
 
 
@@ -134,7 +247,10 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.appPath = [[self class] lightroomPath];
-		self.plist = nil;
+		_database = nil;
+		_isDatabaseOpen = NO;
+
+		[self supportedUTIs];	// Init early and in the main thread!
 	}
 	
 	return self;
@@ -144,8 +260,7 @@
 - (void) dealloc
 {
 	IMBRelease(_appPath);
-	IMBRelease(_plist);
-	
+	IMBRelease(_database);
 	[super dealloc];
 }
 
@@ -159,6 +274,7 @@
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
+	IMBNode* node = nil;
 	
 	// Oops no path, can't create a root node. This is bad...
 	
@@ -169,76 +285,96 @@
 	
 	// Create an empty root node (without subnodes, but with empty objects array)...
 	
-	IMBNode* rootNode = [[[IMBNode alloc] init] autorelease];
-	rootNode.parentNode = inOldNode.parentNode;
-	rootNode.mediaSource = self.mediaSource;
-	rootNode.identifier = [self identifierForPath:@"/"];
-	rootNode.name = @"Lightroom";
-	rootNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
-	rootNode.parser = self;
-	rootNode.leaf = NO;
-	rootNode.groupType = kIMBGroupTypeLibrary;
-	rootNode.subNodes = [NSMutableArray array];	// JUST TEMP
-	rootNode.objects = [NSMutableArray array];	// JUST TEMP
-
+	if (inOldNode == nil)
+	{
+		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		[icon setScalesWhenResized:YES];
+		[icon setSize:NSMakeSize(16.0,16.0)];
+		
+		node = [[[IMBNode alloc] init] autorelease];
+		node.parentNode = inOldNode.parentNode;
+		node.mediaSource = self.mediaSource;
+		node.identifier = [self rootNodeIdentifier];
+		node.name = @"Lightroom";
+		node.icon = icon;
+		node.parser = self;
+		node.leaf = NO;
+		node.groupType = kIMBGroupTypeLibrary;
+		node.objects = [NSMutableArray array];
+	}
+	
 	if (self.shouldDisplayLibraryName)
 	{
-		NSString* path = (NSString*)rootNode.mediaSource;
-		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
-		rootNode.name = [NSString stringWithFormat:@"%@ (%@)",rootNode.name,name];
+		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,[self libraryName]];
 	}
 
-	IMBNode* subNode = [[[IMBNode alloc] init] autorelease];
-	subNode.parentNode = rootNode;
-	subNode.mediaSource = self.mediaSource;
-	subNode.identifier = [self identifierForPath:@"/temp"];
-	subNode.name = @"coming soon...";
-	subNode.parser = self;
-	subNode.leaf = YES;
-	subNode.subNodes = [NSMutableArray array];	// JUST TEMP
-	subNode.objects = [NSMutableArray array];	// JUST TEMP
-
-	[(NSMutableArray*)rootNode.subNodes addObject:subNode];
+	// Watch the root node. Whenever something in Lightroom changes, we have to replace the
+	// WHOLE node tree, as we have no way of finding out WHAT has changed in Lightroom...
 	
-	// Watch the root node via UKKQueue. Whenever something in iPhoto changes, we have to replace the
-	// WHOLE node tree, as we have no way of finding WHAT has changed in iPhoto...
-	
-	if (rootNode.parentNode == nil)
+	if (node.parentNode == nil)
 	{
-		rootNode.watcherType = kIMBWatcherTypeKQueue;
-		rootNode.watchedPath = (NSString*)rootNode.mediaSource;
+		node.watcherType = kIMBWatcherTypeFSEvent;
+		node.watchedPath = (NSString*)self.mediaSource;
 	}
 	else
 	{
-		rootNode.watcherType = kIMBWatcherTypeNone;
+		node.watcherType = kIMBWatcherTypeNone;
 	}
 	
 	// If the old node was populated, then also populate the new node...
 	
 	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
 	{
-		[self populateNode:rootNode options:inOptions error:&error];
+		[self populateNode:node options:inOptions error:&error];
 	}
 	
 	if (outError) *outError = error;
-	return rootNode;
+	return node;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// The supplied node is a private copy which may be modified here in the background operation. Parse the 
-// iPhoto XML file and create subnodes as needed...
+// The supplied node is a private copy which may be modified here in the background operation...
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
+
+	// Create subnodes for the root node as needed...
 	
-//	NSArray* listOfAlbums = [self.plist objectForKey:@"List of Albums"];
-//	NSDictionary* listOfImages = [self.plist objectForKey:@"Master Image List"];
-//	[self addSubNodesToNode:inNode listOfAlbums:listOfAlbums listOfImages:listOfImages]; 
-//	[self populateNode:inNode listOfAlbums:listOfAlbums listOfImages:listOfImages iPhotoMediaType:@"Image"]; 
+	if ([inNode isRootNode])
+	{
+		[self populateSubnodesForRootNode:inNode];
+	}
+
+	// Create subnodes for the Folders node as needed...
+	
+	else if ([self isFolderNode:inNode])
+	{
+		NSString* rootFoldersIdentifier = [self identifierWithFolderId:[NSNumber numberWithInt:-1]];
+		
+		if ([inNode.identifier isEqualToString:rootFoldersIdentifier])
+		{
+			[self populateSubnodesForRootFoldersNode:inNode];
+		}
+		else
+		{
+			[self populateSubnodesForFolderNode:inNode];
+		}
+	}
+
+	// Create subnodes for the Collections node as needed...
+	
+	else
+	{
+
+	}
+	
+	// Populate the node with objects...
+	
+	[self populateObjectsForNode:inNode];
 
 	if (outError) *outError = error;
 	return error == nil;
@@ -248,12 +384,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// When the parser is deselected, then get rid of the cached plist data. It will be loaded into memory lazily 
-// once it is needed again...
+// When the parser is deselected, then get rid of the cached data. In our case we can close the database...
 
 - (void) didDeselectParser
 {
-	self.plist = nil;
+	[self closeDatabase];
 }
 
 
@@ -261,182 +396,395 @@
 
 
 #pragma mark 
-#pragma mark Helper Methods
+#pragma mark Database Access
 
-// Load the XML file into a plist lazily (on demand)...
 
-- (NSDictionary*) plist
+// Returns the name of the libary...
+
+- (NSString*) libraryName
 {
-	if (_plist == nil)
+	NSString* path = (NSString*)self.mediaSource;
+	NSString* name = [[path lastPathComponent] stringByDeletingPathExtension];
+	return name;
+}
+	
+	
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Return a database object for our library...
+	
+- (FMDatabase*) libraryDatabase
+{
+	NSString* databasePath = (NSString*)self.mediaSource;
+	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
+	return database;
+}
+
+
+// If the database isn't open yet, then open it now...
+
+- (BOOL) openDatabase
+{
+	if (self.database == nil)
 	{
-		self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
+		self.database = [self libraryDatabase];
 	}
 	
-	return _plist;
+	if (!_isDatabaseOpen)
+	{
+		_isDatabaseOpen = [self.database open];
+	}
+		
+	return _isDatabaseOpen;
+}
+
+
+// Close the database and release it...
+
+- (void) closeDatabase
+{
+	if (_isDatabaseOpen)
+	{
+		[self.database close];
+	}
+	
+	self.database = nil;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (void) addSubNodesToNode:(IMBNode*)inParentNode
-//		 listOfAlbums:(NSArray*)inListOfAlbums
-//		 listOfImages:(NSDictionary*)inListOfImages
-//{
-//	// Create the subNodes array on demand  - even if turns out to be empty after exiting this method, because
-//	// without creating an array we would cause an endless loop...
-//	
-//	NSMutableArray* subNodes = (NSMutableArray*) inParentNode.subNodes;
-//	if (subNodes == nil) inParentNode.subNodes = subNodes = [NSMutableArray array];
-//
-//	// Now parse the iPhoto XML plist and look for albums whose parent matches our parent node. We are only
-//	// going to add subnodes that are direct children of inParentNode...
-//	
-//	for (NSDictionary* albumDict in inListOfAlbums)
-//	{
-//		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-//		
-//		NSString* albumType = [albumDict objectForKey:@"Album Type"];
-//		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
-//		NSString* parentIdentifier = parentId ? [self identifierWithAlbumId:parentId] : [self identifierForPath:@"/"];
-//		
-//		if ([self allowAlbumType:albumType] && [inParentNode.identifier isEqualToString:parentIdentifier])
-//		{
-//			// Create node for this album...
-//			
-//			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
-//			
-//			albumNode.mediaSource = self.mediaSource;
-//			albumNode.name = [albumDict objectForKey:@"AlbumName"];
-//			albumNode.icon = [self iconForAlbumType:albumType];
-//			albumNode.parser = self;
-//			albumNode.leaf = ![albumType isEqualToString:@"Folder"];
-//
-//			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
-//			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
-//			// for backwards compatibility...
-//			
-//			NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
-//			if (albumId == nil) albumId = [NSNumber numberWithInt:_fakeAlbumID++]; 
-//			albumNode.identifier = [self identifierWithAlbumId:albumId];
-//
-//			// Add the new album node to its parent (inRootNode)...
-//			
-//			[subNodes addObject:albumNode];
-//			albumNode.parentNode = inParentNode;
-//		}
-//		
-//		[pool release];
-//	}
-//}
+// List of all supported file types...
+
+- (NSArray*) supportedUTIs
+{
+	if (sSupportedUTIs == nil)
+	{
+		sSupportedUTIs = (NSArray*) CGImageSourceCopyTypeIdentifiers();
+	}	
+	
+	return sSupportedUTIs;
+}
+
+	
+// Check if we can open this image file...
+
+- (BOOL) canOpenImageFileAtPath:(NSString*)inPath
+{
+	NSString* uti = [NSString UTIForFileAtPath:inPath];
+	NSArray* supportedUTIs = [self supportedUTIs];
+
+	for (NSString* supportedUTI in supportedUTIs)
+	{
+		if (UTTypeConformsTo((CFStringRef)uti,(CFStringRef)supportedUTI)) return YES;
+	}
+	
+	return NO;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (void) populateNode:(IMBNode*)inNode
-//		 listOfAlbums:(NSArray*)inListOfAlbums
-//		 listOfImages:(NSDictionary*)inListOfImages
-//		 iPhotoMediaType:(NSString*)iPhotoMediaType	// this mediaType is special to iPhoto, not the same as IMB mediaType!
+#pragma mark 
+#pragma mark Node Identifiers
+
+
+// The root node always has the hardcoded idLocal 0...
+
+- (NSString*) rootNodeIdentifier
+{
+	NSString* libraryPath = (NSString*) self.mediaSource;
+	NSString* libraryName = [self libraryName];
+	NSString* path = [NSString stringWithFormat:@"/%@(%i)",libraryName,[libraryPath hash]];
+	return [self identifierForPath:path];
+}
+
+
+// Create an unique identifier from the idLocal. An example is "IMBLightroomParser://Peter(123)/folder/17"...
+
+- (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal
+{
+	NSString* libraryPath = (NSString*) self.mediaSource;
+	NSString* libraryName = [self libraryName];
+	NSString* path = [NSString stringWithFormat:@"/%@(%i)/folder/%@",libraryName,[libraryPath hash],inIdLocal];
+	return [self identifierForPath:path];
+}
+
+
+- (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal
+{
+	NSString* libraryPath = (NSString*) self.mediaSource;
+	NSString* libraryName = [self libraryName];
+	NSString* path = [NSString stringWithFormat:@"/%@(%i)/collection/%@",libraryName,[libraryPath hash],inIdLocal];
+	return [self identifierForPath:path];
+}
+
+
+// Return the idLocal from the identifier...
+
+//- (NSNumber*) idLocalFromIdentifier:(NSString*)inIdentifier
 //{
-//	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
-//	// without creating an array we would cause an endless loop...
-//	
-//	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
-//	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
-//
-//	// Look for the correct album in the iPhoto XML plist. Once we find it, populate the node with IMBVisualObjects
-//	// for each image in this album...
-//	
-//	NSUInteger index = 0;
-//
-//	for (NSDictionary* albumDict in inListOfAlbums)
-//	{
-//		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
-//		NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
-//		NSString* albumIdentifier = albumId ? [self identifierWithAlbumId:albumId] : [self identifierForPath:@"/"];
-//		
-//		if ([inNode.identifier isEqualToString:albumIdentifier])
-//		{
-//			NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
-//
-//			for (NSString* key in imageKeys)
-//			{
-//				NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
-//				NSDictionary* imageDict = [inListOfImages objectForKey:key];
-//				NSString* mediaType = [imageDict objectForKey:@"MediaType"];
-//			
-//				if (imageDict!=nil && ([mediaType isEqualToString:iPhotoMediaType] || mediaType==nil))
-//				{
-//					NSString* imagePath = [imageDict objectForKey:@"ImagePath"];
-//					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
-//					NSString* caption   = [imageDict objectForKey:@"Caption"];
-//	
-//					IMBVisualObject* object = [[IMBVisualObject alloc] init];
-//					[objects addObject:object];
-//					[object release];
-//
-//					object.location = (id)imagePath;
-//					object.name = caption;
-//					object.metadata = imageDict;
-//					object.parser = self;
-//					object.index = index++;
-//
-//					object.imageLocation = (thumbPath!=nil) ? thumbPath : imagePath;
-//					object.imageRepresentationType = IKImageBrowserPathRepresentationType;
-//					object.imageRepresentation = nil;
-//
-//				}
-//				
-//				[pool2 release];
-//			}
-//			
-//		}
-//		
-//		[pool1 release];
-//	}
+//	NSArray* components = [inIdentifier componentsSeparatedByString:@"/"];
+//	NSString* idString = [components lastObject];
+//	NSInteger value = [idString integerValue];
+//	return [NSNumber numberWithInteger:value];
 //}
+
+
+// Node types...
+
+
+- (BOOL) isFolderNode:(IMBNode*)inNode
+{
+	NSString* identifier = inNode.identifier;
+	return [identifier rangeOfString:@"/folder"].location != NSNotFound;
+}
+
+
+- (BOOL) isCollectionNode:(IMBNode*)inNode
+{
+	NSString* identifier = inNode.identifier;
+	return [identifier rangeOfString:@"/collection"].location != NSNotFound;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (NSImage*) iconForAlbumType:(NSString*)inAlbumType
-//{
-//	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
-//	{
-//		// iPhoto 7
-//		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
-//		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
-//		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
-//		{@"Event",					@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-//		{@"Events",					@"sl-icon-small_events.tiff",			@"folder",	nil,				nil},
-//		{@"Folder",					@"sl-icon-small_folder.tiff",			@"folder",	nil,				nil},
-//		{@"Photocasts",				@"sl-icon-small_subscriptions.tiff",	@"folder",	nil,				nil},
-//		{@"Photos",					@"sl-icon-small_library.tiff",			@"folder",	nil,				nil},
-//		{@"Published",				@"sl-icon-small_publishedAlbum.tiff",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
-//		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil},
-//		{@"Roll",					@"sl-icon-small_roll.tiff",				@"folder",	nil,				nil},
-//		{@"Selected Event Album",	@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-//		{@"Shelf",					@"sl-icon_flag.tiff",					@"folder",	nil,				nil},
-//		{@"Slideshow",				@"sl-icon-small_slideshow.tiff",		@"folder",	nil,				nil},
-//		{@"Smart",					@"sl-icon-small_smartAlbum.tiff",		@"folder",	nil,				nil},
-//		{@"Special Month",			@"sl-icon-small_cal.tiff",				@"folder",	nil,				nil},
-//		{@"Special Roll",			@"sl-icon_lastImport.tiff",				@"folder",	nil,				nil},
-//		{@"Subscribed",				@"sl-icon-small_subscribedAlbum.tiff",	@"folder",	nil,				nil},
-//	};
-//
-//	static const IMBIconTypeMapping kIconTypeMapping =
-//	{
-//		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
-//		kIconTypeMappingEntries,
-//		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil}	// fallback image
-//	};
-//
-//	NSString* type = inAlbumType;
-//	if (type == nil) type = @"Photos";
-//	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
-//}
+- (NSDictionary*) attributesWithId:(NSNumber*)inIdLocal path:(NSString*)inPath
+{
+	return [NSDictionary dictionaryWithObjectsAndKeys:inIdLocal,@"id_local",inPath,@"path",nil];
+}
+
+
+- (NSNumber*) idLocalFromAttributes:(NSDictionary*)inAttributes
+{
+	return [inAttributes objectForKey:@"id_local"];
+}
+
+
+- (NSString*) pathFromAttributes:(NSDictionary*)inAttributes
+{
+	return [inAttributes objectForKey:@"path"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Creating Subnodes
+
+
+- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
+{
+	if (inRootNode.subNodes == nil) inRootNode.subNodes = [NSMutableArray array];
+
+	// Add a Folders node to the root node...
+	
+	NSNumber* id_local = [NSNumber numberWithInt:-1];
+
+	NSString* foldersName = NSLocalizedStringWithDefaultValue(
+		@"IMBLightroomParser.foldersName",
+		nil,IMBBundle(),
+		@"Folders",
+		@"Name of Folders node in IMBLightroomParser");
+	
+	IMBNode* foldersNode = [[[IMBNode alloc] init] autorelease];
+	foldersNode.parentNode = inRootNode;
+	foldersNode.mediaSource = self.mediaSource;
+	foldersNode.identifier = [self identifierWithFolderId:id_local];
+	foldersNode.name = foldersName;
+	foldersNode.icon = [NSImage genericFolderIcon];
+	foldersNode.parser = self;
+	foldersNode.attributes = [self attributesWithId:id_local path:nil];
+	foldersNode.leaf = NO;
+	
+	[(NSMutableArray*)inRootNode.subNodes addObject:foldersNode];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) populateSubnodesForRootFoldersNode:(IMBNode*)inFoldersNode
+{
+	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
+	
+	if (inFoldersNode.subNodes == nil) inFoldersNode.subNodes = [NSMutableArray array];
+
+	// Query the database for the root folders and create a node for each one we find...
+		
+	if ([self openDatabase])
+	{
+		NSString* query = @"SELECT id_local,absolutePath,name FROM AgLibraryRootFolder ORDER BY name ASC";
+		FMResultSet* results = [self.database executeQuery:query];
+		
+		while ([results next])
+		{
+			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+			NSNumber* id_local = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
+			NSString* path = [results stringForColumn:@"absolutePath"];
+			NSString* name = [results stringForColumn:@"name"];
+			
+			if (name == nil)
+			{
+				name= NSLocalizedStringWithDefaultValue(
+					@"IMBLightroomParser.Unnamed",
+					nil,IMBBundle(),
+					@"Unnamed",
+					@"Name of unnamed folder node in IMBLightroomParser");
+			}
+
+			IMBNode* node = [[[IMBNode alloc] init] autorelease];
+			node.parentNode = inFoldersNode;
+			node.identifier = [self identifierWithFolderId:id_local];
+			node.name = name;
+			node.icon = [NSImage genericFolderIcon];
+			node.parser = self;
+			node.mediaSource = self.mediaSource;
+			node.attributes = [self attributesWithId:id_local path:path];
+			node.leaf = NO;
+			
+			[(NSMutableArray*)inFoldersNode.subNodes addObject:node];
+
+			[pool release];
+		}
+		
+		[results close];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) populateSubnodesForFolderNode:(IMBNode*)inParentNode
+{
+	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
+	
+	if (inParentNode.subNodes == nil) inParentNode.subNodes = [NSMutableArray array];
+
+	// Query the database for subfolder and add a node for each one we find...
+	
+	if ([self openDatabase])
+	{
+		NSNumber* parentIdLocal = [self idLocalFromAttributes:inParentNode.attributes];
+		NSString* parentPath = [self pathFromAttributes:inParentNode.attributes];
+		
+		NSString* query = @"SELECT id_local, pathFromRoot FROM AgLibraryFolder WHERE rootFolder=? ORDER BY robustRepresentation ASC";
+		FMResultSet* results = [self.database executeQuery:query,parentIdLocal];
+		
+		while ([results next])
+		{
+			NSNumber* id_local = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
+			NSString* pathFromRoot = [results stringForColumn:@"pathFromRoot"];
+			if ([pathFromRoot hasSuffix:@"/"]) pathFromRoot = [pathFromRoot substringToIndex:pathFromRoot.length-1];
+			NSString* name = [pathFromRoot lastPathComponent];
+			NSString* path = [parentPath stringByAppendingPathComponent:name];
+			
+			if ([pathFromRoot length] > 0)
+			{
+				IMBNode* node = [[[IMBNode alloc] init] autorelease];
+				node.parentNode = inParentNode;
+				node.identifier = [self identifierWithFolderId:id_local];
+				node.name = name;
+				node.icon = [NSImage genericFolderIcon];
+				node.parser = self;
+				node.mediaSource = self.mediaSource;
+				node.attributes = [self attributesWithId:id_local path:path];
+				node.leaf = NO;
+				
+				[(NSMutableArray*)inParentNode.subNodes addObject:node];
+			}
+			
+			// This part is funky: apparently Lightroom keeps and "invisible" subfolder for each "real" folder, 
+			// which contains the images. In this case pathFromRoot is an empty string. Since we do not want to 
+			// show this this invisble subfolder, we "transfer" the image from the insvisible folder to the real
+			// folder by fixing the id_local of the real folder (inParentNode)...
+			
+			else
+			{
+				inParentNode.attributes = [self attributesWithId:id_local path:parentPath];
+			}
+		}
+		
+		[results close];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) populateObjectsForNode:(IMBNode*)inNode
+{
+	NSString* folderPath = [self pathFromAttributes:inNode.attributes];
+
+	// Add object array, even if nothing is found in database, so that we do not cause endless loop...
+	
+	if (inNode.objects == nil) inNode.objects = [NSMutableArray array];
+
+	// Query the database for image files for the specified node. Add an IMBObject for each one we find...
+	
+	if ([self openDatabase])
+	{
+		NSMutableString* query = [NSMutableString string];
+		
+		[query appendString:@" SELECT alf.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
+		[query appendString:@" FROM AgLibraryFile alf"];
+		[query appendString:@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"];
+		[query appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
+		[query appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
+		[query appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
+		[query appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+		[query appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
+		[query appendString:@" WHERE "];
+		[query appendString:@" alf.folder = ?"];
+		[query appendString:@" ORDER BY ai.captureTime ASC"];
+		
+		NSNumber* id_local = [self idLocalFromAttributes:inNode.attributes];
+		FMResultSet* results = [self.database executeQuery:query, @"AgCaptionTagKind",id_local];
+		NSUInteger index = 0;
+		
+		while ([results next])
+		{
+			NSString* filename = [results stringForColumn:@"idx_filename"];
+			NSString* caption = [results stringForColumn:@"captionName"];
+			NSString* path = [folderPath stringByAppendingPathComponent:filename];
+//			NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
+//			NSString* uti = [NSString UTIForFileAtPath:path];
+
+			if ([self canOpenImageFileAtPath:path])
+			{
+//				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
+//				[metadata setObject:path forKey:@"path"];
+//				if (caption) [metadata setObject:caption forKey:@"caption"];
+//				else if (filename) [metadata setObject:filename forKey:@"caption"];
+//				if (pyramidPath) [metadata setObject:pyramidPath forKey:@"PyramidPath"];
+			
+				IMBObject* object = [[IMBObject alloc] init];
+				[(NSMutableArray*)inNode.objects addObject:object];
+				[object release];
+
+				object.location = (id)path;
+				object.name = caption;
+//				object.metadata = metadata;
+				object.parser = self;
+				object.index = index++;
+
+				object.imageLocation = path;
+				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+				object.imageRepresentation = nil;
+			}
+		}
+								
+		[results close];
+	}
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

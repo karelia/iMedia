@@ -55,18 +55,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class FMDatabase;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 @interface IMBLightroomParser : IMBParser
 {
 	NSString* _appPath;
-	NSDictionary* _plist;
 	BOOL _shouldDisplayLibraryName;
+	FMDatabase* _database;
+	BOOL _isDatabaseOpen;
 }
 
 @property (retain) NSString* appPath;
-@property (retain) NSDictionary* plist;
 @property (assign) BOOL shouldDisplayLibraryName;
+@property (retain) FMDatabase* database;
+
+- (BOOL) openDatabase;
+- (void) closeDatabase;
 
 @end
 
