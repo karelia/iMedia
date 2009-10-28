@@ -44,12 +44,31 @@
 */
 
 
-#import <Cocoa/Cocoa.h>
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark HEADERS
+
 #import "IMBParser.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @interface IMBSafariBookmarkParser : IMBParser 
 {
-	NSMutableDictionary *mySafariFaviconCache;
+	NSString* _appPath;
+	NSDictionary* _plist;
+	NSDate* _modificationDate;
+	NSMutableDictionary* _safariFaviconCache;
 }
 
+@property (retain) NSString* appPath;
+@property (retain) NSDictionary* plist;
+@property (retain) NSDate* modificationDate;
+@property (retain) NSMutableDictionary* safariFaviconCache;
+
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
