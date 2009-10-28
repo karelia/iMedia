@@ -516,7 +516,7 @@ static void HandleICANotification(CFStringRef notificationType, CFDictionaryRef 
 	
 	if( objectID )
 	{
-		NSString *identifier = [self identifierForICAObject:objectID];
+//		NSString *identifier = [self identifierForICAObject:objectID];
 		
 		// find it in the node tree
 		IMBLibraryController *libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
