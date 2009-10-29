@@ -48,167 +48,304 @@
  
  */
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark HEADERS
+
 #import "IMBComboTextCell.h"
 #import "IMBComboTableView.h"
+#import "IMBCommon.h"
+#import <Quartz/Quartz.h>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
 
 #define IMAGE_INSET 8.0
-#define ASPECT_RATIO 1.6
+#define ASPECT_RATIO 1.5
 #define TITLE_HEIGHT 17.0
-#define INSET_FROM_IMAGE_TO_TEXT 4.0
+#define INSET_FROM_IMAGE_TO_TEXT 8.0
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 
 @implementation IMBComboTextCell
 
-- (id)copyWithZone:(NSZone *)zone
+@synthesize imageRepresentation = _imageRepresentation;
+@synthesize imageRepresentationType = _imageRepresentationType;
+@synthesize title = _title;
+@synthesize titleTextAttributes = _titleTextAttributes;
+@synthesize subtitle = _subtitle;
+@synthesize subtitleTextAttributes = _subtitleTextAttributes;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Set default text style for title and subtitle...
+
+- (void) initTextAttributes
 {
-    IMBComboTextCell *result = [super copyWithZone:zone];
-    if (result != nil)
-	{
-        // Retain or copy all our ivars
-        result->_imageCell = [_imageCell copyWithZone:zone];
-    }
-    return result;
+	NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
+	[paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
+
+	self.titleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
+		[NSColor blackColor],NSForegroundColorAttributeName,
+		[NSFont systemFontOfSize:13.0],NSFontAttributeName,
+		paragraphStyle,NSParagraphStyleAttributeName,
+		nil] autorelease];
+	
+	self.subtitleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
+		[NSColor grayColor],NSForegroundColorAttributeName,
+		[NSFont systemFontOfSize:11.0],NSFontAttributeName,
+		paragraphStyle,NSParagraphStyleAttributeName,
+		nil] autorelease];
 }
 
-- (void)dealloc
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) initTextCell:(NSString*)inString
 {
-    [_imageCell release];
+	if (self = [super initTextCell:inString])
+	{
+		[self initTextAttributes];
+	}
+	
+	return self;
+}
+
+
+- (id) initImageCell:(NSImage*)inImage
+{
+	if (self = [super initImageCell:inImage])
+	{
+		[self initTextAttributes];
+	}
+	
+	return self;
+}
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		[self initTextAttributes];
+	}
+	
+	return self;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_imageRepresentation);
+	IMBRelease(_imageRepresentationType);
+	IMBRelease(_title);
+	IMBRelease(_titleTextAttributes);
+	IMBRelease(_subtitle);
+	IMBRelease(_subtitleTextAttributes);
+	
     [super dealloc];
 }
 
-@dynamic image;
 
-- (NSImage *)image
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) copyWithZone:(NSZone*)inZone
 {
-    return _imageCell.image;
-}
-
-- (void)setImage:(NSImage *)image
-{
-    if (_imageCell == nil)
-	{
-        _imageCell = [[NSImageCell alloc] init];
-        [_imageCell setControlView:self.controlView];
-        [_imageCell setBackgroundStyle:self.backgroundStyle];
-    }
-    _imageCell.image = image;
-}
-
-- (void)setControlView:(NSView *)controlView
-{
-    [super setControlView:controlView];
-    [_imageCell setControlView:controlView];
-}
-
-- (void)setBackgroundStyle:(NSBackgroundStyle)style
-{
-    [super setBackgroundStyle:style];
-    [_imageCell setBackgroundStyle:style];
-}
-
-- (NSRect)_imageFrameForInteriorFrame:(NSRect)frame
-{
-    NSRect result = frame;
-    // Inset the top
-    result.origin.y += IMAGE_INSET;
-    result.size.height -= 2*IMAGE_INSET;
-    // Inset the left
-    result.origin.x += IMAGE_INSET;
-    // Make the width match the aspect ratio based on the height
-    result.size.width = ceil(result.size.height * ASPECT_RATIO);
-    return result;
-}
-
-- (NSRect)imageRectForBounds:(NSRect)frame
-{
-    // We would apply any inset that here that drawWithFrame did before calling drawInteriorWithFrame:. It does none, so we don't do anything.
-    return [self _imageFrameForInteriorFrame:frame];
-}
-
-- (NSRect)_titleFrameForInteriorFrame:(NSRect)frame
-{
-    NSRect imageFrame = [self _imageFrameForInteriorFrame:frame];
-    NSRect result = frame;
-    // Move our inset to the left of the image frame
-    result.origin.x = NSMaxX(imageFrame) + INSET_FROM_IMAGE_TO_TEXT;
-    // Go as wide as we can
-    result.size.width = NSMaxX(frame) - NSMinX(result);
-    // Move the title above the Y centerline of the image. 
-    NSSize naturalSize = [super cellSize];
-    result.origin.y = floor(NSMidY(imageFrame) - naturalSize.height - INSET_FROM_IMAGE_TO_TEXT);
-    result.size.height = naturalSize.height;
-    return result;
-}
-
-// NOT USED ....
-
-- (NSRect)_subtitleFrameForInteriorFrame:(NSRect)frame
-{		// THIS WILL HAVE TO BE COMPLETELY REDONE SINCE IT RELIED ON FILL COLOR
-    NSRect result = frame;
-    result.origin.x = NSMaxX(frame) + INSET_FROM_IMAGE_TO_TEXT;
-    result.size.width = NSMaxX(frame) - NSMinX(result);    
-    return result;    
-}
-
-- (void)drawInteriorWithFrame:(NSRect)frame inView:(NSView *)controlView
-{
-    if (_imageCell)
-	{
-        NSRect imageFrame = [self _imageFrameForInteriorFrame:frame];
-        [_imageCell drawWithFrame:imageFrame inView:controlView];
-    }
-    
-    
-    NSRect titleFrame = [self _titleFrameForInteriorFrame:frame];
-    [super drawInteriorWithFrame:titleFrame inView:controlView];
-}
-
-- (NSUInteger)hitTestForEvent:(NSEvent *)event inRect:(NSRect)frame ofView:(NSView *)controlView
-{
-    NSPoint point = [controlView convertPoint:[event locationInWindow] fromView:nil];
+    IMBComboTextCell* result = [super copyWithZone:inZone];
 	
-    // Delegate hit testing to other cells
-    if (_imageCell)
+	result.imageRepresentation = self.imageRepresentation;
+ 	result.imageRepresentationType = self.imageRepresentationType;
+	result.title = self.title;
+	result.subtitle = self.subtitle;
+	result.titleTextAttributes = self.titleTextAttributes;
+	result.subtitleTextAttributes = self.subtitleTextAttributes;
+
+    return result;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Layout
+
+
+- (NSRect) titleRectForBounds:(NSRect)inBounds
+{
+    NSRect imageRect = [self imageRectForBounds:inBounds];
+	
+    NSRect rect = NSInsetRect(inBounds,IMAGE_INSET,IMAGE_INSET);
+    rect.origin.x = NSMaxX(imageRect) + INSET_FROM_IMAGE_TO_TEXT;
+    rect.size.width = NSMaxX(inBounds) - INSET_FROM_IMAGE_TO_TEXT;
+    rect.size.height = TITLE_HEIGHT;
+    return rect;
+}
+
+
+- (NSRect) subtitleRectForBounds:(NSRect)inBounds
+{
+	NSRect rect = [self titleRectForBounds:inBounds];
+	rect.origin.y = NSMaxY(rect);
+	rect.size.height = NSHeight(inBounds) - IMAGE_INSET - TITLE_HEIGHT - IMAGE_INSET;
+    return rect;
+}
+
+
+- (NSRect) imageRectForBounds:(NSRect)inBounds
+{
+    NSRect rect = NSInsetRect(inBounds,IMAGE_INSET,IMAGE_INSET);
+    rect.size.width = round(rect.size.height * ASPECT_RATIO);
+    return rect;
+}
+
+
+- (NSRect) imageRectForFrame:(NSRect)inImageFrame imageWidth:(CGFloat)inWidth imageHeight:(CGFloat)inHeight
+{
+	CGFloat fx		 = inImageFrame.size.width / inWidth;
+	CGFloat fy		 = inImageFrame.size.height / inHeight;
+	CGFloat f		 = MIN(fx,fy);
+	
+	CGFloat x0		 = NSMidX(inImageFrame);
+	CGFloat y0		 = NSMidY(inImageFrame);
+	CGFloat width	 = f * inWidth;
+	CGFloat height	 = f * inHeight;
+	
+	NSRect rect;
+	rect.origin.x	 = round(x0 - 0.5*width);
+	rect.origin.y	 = round(y0 - 0.5*height);
+	rect.size.width  = round(width);
+	rect.size.height = round(height);
+	
+	return rect;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Drawing
+
+
+// Draw a CGImageRef into the specified rect, keeping the aspect ratio of the image intact. The image will have 
+// to scaled to fit into the rect. Please note that we have to temporarily modify the CTM because the tableview
+// is flipped...
+
+- (void) _drawImage:(CGImageRef)inImage withFrame:(NSRect)inImageRect
+{
+	CGFloat width = CGImageGetWidth(inImage);
+	CGFloat height = CGImageGetHeight(inImage);
+	NSRect rect = [self imageRectForFrame:inImageRect imageWidth:width imageHeight:height];
+	
+	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
+	CGContextSaveGState(context);
+	CGContextScaleCTM(context,1.0,-1.0);
+	CGContextTranslateCTM(context,0.0,-2.0*rect.origin.y-NSHeight(rect));
+	CGContextDrawImage(context,NSRectToCGRect(rect),inImage);
+	CGContextRestoreGState(context);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) drawInteriorWithFrame:(NSRect)inCellFrame inView:(NSView*)inView
+{
+	// Get cell layout...
+	
+	NSRect imageRect = [self imageRectForBounds:inCellFrame];
+	NSRect titleRect = [self titleRectForBounds:inCellFrame];
+	NSRect subtitleRect = [self subtitleRectForBounds:inCellFrame];
+	
+	// If the image hasn't been loaded yet, then draw a placeholder frame...
+	
+	if (self.imageRepresentation == nil)
 	{
-        NSRect imageFrame = [self _imageFrameForInteriorFrame:frame];
-        if (NSPointInRect(point, imageFrame))
+		NSBezierPath* path = [NSBezierPath bezierPathWithRoundedRect:imageRect xRadius:8.0 yRadius:8.0];
+		[[NSColor colorWithCalibratedWhite:0.0 alpha:0.05] set];
+		[path fill];
+		
+		CGFloat dashes[2] = {8.0,4.0};
+		[[NSColor colorWithCalibratedWhite:0.0 alpha:0.15] set];
+		[path setLineWidth:2.0];
+		[path setLineDash:dashes count:2 phase:0.0];
+		[path stroke];
+	}
+	
+	// Draw the thumbnail image (NSImage)...
+	
+	else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
+	{
+		NSImage* image = (NSImage*) self.imageRepresentation;
+		[image setFlipped:YES];
+
+		CGFloat width = image.size.width;
+		CGFloat height = image.size.height;
+		NSRect rect = [self imageRectForFrame:imageRect imageWidth:width imageHeight:height];
+
+		[image drawInRect:rect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+	}
+	
+	// Draw the thumbnail image (CGImage)...
+	
+	else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+	{
+		CGImageRef image = (CGImageRef) self.imageRepresentation;
+		[self _drawImage:image withFrame:imageRect];
+	}
+	
+	// Draw the thumbnail image (NSData)...
+	
+	else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSDataRepresentationType])
+	{
+		NSData* data = (NSData*) self.imageRepresentation;
+		CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)data,NULL);
+		
+		if (source)
 		{
-            return [_imageCell hitTestForEvent:event inRect:imageFrame ofView:controlView];
-        }
-    }
+			CGImageRef image = CGImageSourceCreateImageAtIndex(source,0,NULL);
+			[self _drawImage:image withFrame:imageRect];
+			CGImageRelease(image);
+			CFRelease(source);
+		}	
+	}
 	
-    
-    NSRect titleFrame = [self _titleFrameForInteriorFrame:frame];
-    if (NSPointInRect(point, titleFrame))
+	// Unsupported imageRepresentation...
+	
+	else
 	{
-        return [super hitTestForEvent:event inRect:titleFrame ofView:controlView];
-    }
-    
-    return NSCellHitNone;
-}
+		NSLog(@"%s: %@ is not supported by this cell class...",__FUNCTION__,_imageRepresentationType);
+	}
 
-- (void)editWithFrame:(NSRect)aRect inView:(NSView *)controlView editor:(NSText *)textObj delegate:(id)anObject event:(NSEvent *)theEvent
-{
-    aRect = [self _titleFrameForInteriorFrame:aRect];
-    [super editWithFrame:aRect inView:controlView editor:textObj delegate:anObject event:theEvent];
-}
-
-- (void)selectWithFrame:(NSRect)aRect inView:(NSView *)controlView editor:(NSText *)textObj delegate:(id)anObject start:(NSInteger)selStart length:(NSInteger)selLength
-{
-    aRect = [self _titleFrameForInteriorFrame:aRect];
-    [super selectWithFrame:aRect inView:controlView editor:textObj delegate:anObject start:selStart length:selLength];
-}
-
-+ (BOOL)prefersTrackingUntilMouseUp
-{
-    // We want to have trackMouse:inRect:ofView:untilMouseUp: always track until the mouse is up
-    return YES;
-}
-
-- (BOOL)trackMouse:(NSEvent *)theEvent inRect:(NSRect)frame ofView:(NSView *)controlView untilMouseUp:(BOOL)flag
-{
-    BOOL result = NO;
+	// Draw the title and subtitle...
 	
-    return result;
+	if (_title)
+	{
+		[_title drawInRect:titleRect withAttributes:_titleTextAttributes];
+	}
+	
+	if (_subtitle)
+	{
+		[_subtitle drawInRect:subtitleRect withAttributes:_subtitleTextAttributes];
+	}	
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @end

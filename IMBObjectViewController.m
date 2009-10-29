@@ -1138,6 +1138,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #pragma mark 
 #pragma mark NSTableViewDelegate
 
+
 // If the object for the cell that we are about to display doesn't have any metadata yet, then load it lazily...
 // Note: According to WWDC Session 110, this is called a LOT so it's not good for delayed loading...
 
@@ -1153,8 +1154,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	if ([inCell isKindOfClass:[IMBComboTextCell class]])
 	{
 		IMBComboTextCell* cell = (IMBComboTextCell*)inCell;
-		cell.image = object.imageRepresentation;
-#warning THIS COULD BE ANY THING!
+		cell.imageRepresentation = object.imageRepresentation;
+		cell.imageRepresentationType = object.imageRepresentationType;
+		cell.title = object.name;
+		cell.subtitle = object.metadataDescription;
 	}
 	else
 	{

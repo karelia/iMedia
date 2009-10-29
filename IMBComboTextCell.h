@@ -43,15 +43,31 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-#import <Cocoa/Cocoa.h>
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @interface IMBComboTextCell : NSTextFieldCell
 {
-@private
-    // Our cell delegates some drawing and other operations to subcells
-    NSImageCell *_imageCell;
+	id _imageRepresentation;								
+	NSString* _imageRepresentationType;		
+	NSString* _title;
+	NSString* _subtitle;
+	
+	NSDictionary* _titleTextAttributes;
+	NSDictionary* _subtitleTextAttributes;
 }
 
-@property(retain) NSImage *image;
+@property (retain) id imageRepresentation;	
+@property (retain) NSString* imageRepresentationType;
+
+@property (retain) NSString* title;
+@property (copy) NSDictionary* titleTextAttributes;
+
+@property (retain) NSString* subtitle;
+@property (copy) NSDictionary* subtitleTextAttributes;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
