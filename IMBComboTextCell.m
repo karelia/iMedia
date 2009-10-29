@@ -167,6 +167,17 @@
 {
     IMBComboTextCell* result = [super copyWithZone:inZone];
 	
+	// Because copyWithZone may use NSCopyObject, we need to implicitly ZERO out our retained subclass fields 
+	// in order to prevent them being over-released by the accessor methods that get implicitly called below. 
+	// Notice the use of the C-struct style -> avoids using an accessor and blots out the value completely. 
+	// This is appropriate because NSCopyObject, if called, has blithely copied the bits over without retaining...
+	
+	result->_imageRepresentation = nil;
+	result->_title = nil;
+	result->_subtitle = nil;
+	result->_titleTextAttributes = nil;
+	result->_subtitleTextAttributes = nil;
+	
 	result.imageRepresentation = self.imageRepresentation;
  	result.imageRepresentationType = self.imageRepresentationType;
 	result.title = self.title;
