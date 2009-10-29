@@ -55,11 +55,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class IMBTimecodeTransformer;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 // This parser scans any folder for audio files...
 
 @interface IMBAudioFolderParser : IMBFolderParser
+{
+	IMBTimecodeTransformer* _timecodeTransformer;
+}
+
+@property (retain) IMBTimecodeTransformer* timecodeTransformer;
+
 @end
 
 // This subclass looks only in "~/Music"...

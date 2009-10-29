@@ -75,6 +75,7 @@
 - (BOOL) isLeafAlbumType:(NSString*)inAlbumType;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
 - (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 @end
 
@@ -525,7 +526,7 @@
 
 - (NSString*) requestedImageRepresentationType
 {
-	return IKImageBrowserNSImageRepresentationType;
+	return IKImageBrowserCGImageRepresentationType;
 }
 
 
@@ -579,6 +580,7 @@
 					object.location = (id)[imageDict objectForKey:@"ImagePath"];
 					object.name = [imageDict objectForKey:@"Caption"];
 					object.metadata = imageDict;
+					object.metadataDescription = [self metadataDescriptionForMetadata:imageDict];
 					object.parser = self;
 					object.index = index++;
 					
@@ -593,6 +595,15 @@
 		
 		[pool1 release];
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return @"Some iPhoto info about this image,\nEven more info,\nBlah blah blah…";
 }
 
 

@@ -63,6 +63,7 @@
 	id _location;												
 	NSString* _name;
 	NSDictionary* _metadata;
+	NSString* _metadataDescription;
 	IMBParser* _parser;
 	NSUInteger _index;
 	
@@ -79,6 +80,7 @@
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
 @property (retain) NSDictionary* metadata;					// Optional metadata
+@property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)
 @property (retain) IMBParser* parser;						// Parser that created this object
 @property (assign) NSUInteger index;						// Index of object in the array (optional)
 

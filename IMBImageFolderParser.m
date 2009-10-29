@@ -105,9 +105,32 @@
 //		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager threadSafeManager] fileExistsAtPath:inPath]);
 	}
 
-	
 	return metadata;
 }
+
+
+// Convert metadata into human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString* description = @"";
+	NSNumber* width = [inMetadata objectForKey:@"width"];
+	NSNumber* height = [inMetadata objectForKey:@"height"];
+	
+	if (width != nil && height != nil)
+	{
+		NSString* pixels = NSLocalizedStringWithDefaultValue(
+				@"Pixels",
+				nil,IMBBundle(),
+				@"Pixels",
+				@"Name of Pixel unit (plural)");
+		
+		description = [description stringByAppendingFormat:@"%@x%@ %@\n",width,height,pixels];
+	}
+	
+	return description;
+}
+
 
 @end
 

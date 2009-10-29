@@ -75,6 +75,7 @@
 @synthesize location = _location;
 @synthesize name = _name;
 @synthesize metadata = _metadata;
+@synthesize metadataDescription = _metadataDescription;
 @synthesize parser = _parser;
 @synthesize index = _index;
 
@@ -106,11 +107,12 @@
 		self.location = [inCoder decodeObjectForKey:@"location"];
 		self.name = [inCoder decodeObjectForKey:@"name"];
 		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
+		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
 		self.index = [inCoder decodeIntegerForKey:@"index"];
-		self.imageLocation = [inCoder decodeObjectForKey:@"imageLocation"];
-		self.imageRepresentation = [inCoder decodeObjectForKey:@"imageRepresentation"];
-		self.imageRepresentationType = [inCoder decodeObjectForKey:@"imageRepresentationType"];
-		self.imageVersion = [inCoder decodeIntegerForKey:@"imageVersion"];
+//		self.imageLocation = [inCoder decodeObjectForKey:@"imageLocation"];
+//		self.imageRepresentation = [inCoder decodeObjectForKey:@"imageRepresentation"];
+//		self.imageRepresentationType = [inCoder decodeObjectForKey:@"imageRepresentationType"];
+//		self.imageVersion = [inCoder decodeIntegerForKey:@"imageVersion"];
 
 //		self.parser = [inCoder decodeObjectForKey:@"parser"];
 	}
@@ -124,11 +126,12 @@
 	[inCoder encodeObject:self.location forKey:@"location"];
 	[inCoder encodeObject:self.name forKey:@"name"];
 	[inCoder encodeObject:self.metadata forKey:@"metadata"];
+	[inCoder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
 	[inCoder encodeInteger:self.index forKey:@"index"];
-	[inCoder encodeObject:self.imageLocation forKey:@"imageLocation"];
-	[inCoder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
-	[inCoder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
-	[inCoder encodeInteger:self.imageVersion forKey:@"imageVersion"];
+//	[inCoder encodeObject:self.imageLocation forKey:@"imageLocation"];
+//	[inCoder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
+//	[inCoder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
+//	[inCoder encodeInteger:self.imageVersion forKey:@"imageVersion"];
 }
 
 
@@ -139,6 +142,7 @@
 	copy.location = self.location;
 	copy.name = self.name;
 	copy.metadata = self.metadata;
+	copy.metadataDescription = self.metadataDescription;
 	copy.index = self.index;
 	copy.imageLocation = self.imageLocation;
 	copy.imageRepresentation = self.imageRepresentation;
@@ -154,6 +158,7 @@
 	IMBRelease(_location);
 	IMBRelease(_name);
 	IMBRelease(_metadata);
+	IMBRelease(_metadataDescription);
 	IMBRelease(_parser);
 	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);

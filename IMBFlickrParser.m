@@ -211,7 +211,7 @@
 		obj.parser = self;
 		obj.index = index++;
 		obj.imageLocation = (id)thumbnailURL;
-		obj.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+		obj.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 		obj.imageRepresentation = nil;
 		[objects addObject:obj];
 		[obj release];

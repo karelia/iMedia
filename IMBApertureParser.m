@@ -74,6 +74,7 @@
 - (NSImage*) iconForAlbumType:(NSString*)inType;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
 - (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 @end
 
@@ -527,11 +528,12 @@
 					object.location = (id)imagePath;
 					object.name = caption;
 					object.metadata = imageDict;
+					object.metadataDescription = [self metadataDescriptionForMetadata:imageDict];
 					object.parser = self;
 					object.index = index++;
 
 					object.imageLocation = (thumbPath!=nil) ? thumbPath : imagePath;
-					object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+					object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 					object.imageRepresentation = nil;
 				}
 				
@@ -541,6 +543,32 @@
 		
 		[pool1 release];
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Convert metadata into human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString* description = @"";
+	NSNumber* width = [inMetadata objectForKey:@"width"];
+	NSNumber* height = [inMetadata objectForKey:@"height"];
+	
+	if (width != nil && height != nil)
+	{
+		NSString* pixels = NSLocalizedStringWithDefaultValue(
+				@"Pixels",
+				nil,IMBBundle(),
+				@"Pixels",
+				@"Name of Pixel unit (plural)");
+		
+		description = [description stringByAppendingFormat:@"%@x%@ %@\n",width,height,pixels];
+	}
+	
+	return description;
 }
 
 
