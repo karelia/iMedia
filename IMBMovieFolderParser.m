@@ -51,6 +51,7 @@
 
 #import "IMBMovieFolderParser.h"
 #import "IMBParserController.h"
+#import "IMBTimecodeTransformer.h"
 #import "IMBCommon.h"
 
 
@@ -61,6 +62,11 @@
 
 @implementation IMBMovieFolderParser
 
+@synthesize timecodeTransformer = _timecodeTransformer;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Restrict this parser to image files...
 
@@ -69,10 +75,21 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.fileUTI = (NSString*)kUTTypeMovie; 
+		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
 	}
 	
 	return self;
 }
+
+
+- (void) dealloc
+{
+	IMBRelease(_timecodeTransformer);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Return metadata specific to movie files...
@@ -102,7 +119,7 @@
 		
 		if (height)
 		{
-			[metadata setObject:(NSNumber*)width forKey:@"height"]; 
+			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
 			CFRelease(height);
 		}
 		
@@ -115,6 +132,46 @@
 	
 	return metadata;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Convert metadata into human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString* description = @"";
+	NSNumber* duration = [inMetadata objectForKey:@"duration"];
+	NSNumber* width = [inMetadata objectForKey:@"width"];
+	NSNumber* height = [inMetadata objectForKey:@"height"];
+	
+	if (width != nil && height != nil)
+	{
+		NSString* size = NSLocalizedStringWithDefaultValue(
+				@"Size",
+				nil,IMBBundle(),
+				@"Size",
+				@"Size label in metadata description");
+		
+		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
+	}
+	
+	if (duration)
+	{
+		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
+
+		NSString* durationString = [_timecodeTransformer transformedValue:duration];
+		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+	}
+	
+	return description;
+}
+
 
 @end
 

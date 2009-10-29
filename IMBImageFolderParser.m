@@ -119,13 +119,13 @@
 	
 	if (width != nil && height != nil)
 	{
-		NSString* pixels = NSLocalizedStringWithDefaultValue(
-				@"Pixels",
+		NSString* size = NSLocalizedStringWithDefaultValue(
+				@"Size",
 				nil,IMBBundle(),
-				@"Pixels",
-				@"Name of Pixel unit (plural)");
+				@"Size",
+				@"Size label in metadata description");
 		
-		description = [description stringByAppendingFormat:@"%@x%@ %@\n",width,height,pixels];
+		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
 	}
 	
 	return description;
