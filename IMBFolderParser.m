@@ -221,8 +221,7 @@
 					object.index = index++;
 					
 					// If the file is movie, then we want a movie representation. For all other file types
-					// we will just use an image representation. NSImage for now, but we'll switch to CGImage
-					// once the IMBComboTextCell supports CGImageRefs...
+					// we will just use an image representation...
 					
 					if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeMovie])
 					{
@@ -230,7 +229,7 @@
 					}
 					else
 					{
-						object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; 
+						object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
 					}
 					
 					object.imageLocation = path;
@@ -321,6 +320,14 @@
 }
 
 
+// To be overridden by subclass...
+	
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return nil;
+}
+
+
 + (NSString*) identifierForPath:(NSString*)inPath
 {
 	NSString* parserClassName = NSStringFromClass([self class]);
@@ -333,11 +340,10 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	// NSLog(@"%s",__FUNCTION__);
-	
 	if (![inObject isKindOfClass:[IMBNodeObject class]])
 	{
 		inObject.metadata = [self metadataForFileAtPath:inObject.path];
+		inObject.metadataDescription = [self metadataDescriptionForMetadata:inObject.metadata];
 	}
 }
 

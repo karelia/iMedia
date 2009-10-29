@@ -51,6 +51,7 @@
 
 #import "IMBAudioFolderParser.h"
 #import "IMBParserController.h"
+#import "IMBTimecodeTransformer.h"
 #import "IMBCommon.h"
 
 
@@ -61,17 +62,34 @@
 
 @implementation IMBAudioFolderParser
 
-// Restrict this parser to image files...
+@synthesize timecodeTransformer = _timecodeTransformer;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Restrict this parser to audio files...
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.fileUTI = (NSString*)kUTTypeAudio; 
+		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
 	}
 	
 	return self;
 }
+
+
+- (void) dealloc
+{
+	IMBRelease(_timecodeTransformer);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Return metadata specific to audio files...
@@ -115,6 +133,57 @@
 	
 	return metadata;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Convert metadata into human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString* description = @"";
+	NSNumber* duration = [inMetadata objectForKey:@"duration"];
+	NSString* artist = [inMetadata objectForKey:@"artist"];
+	NSString* album = [inMetadata objectForKey:@"album"];
+	
+	if (artist)
+	{
+		NSString* artistLabel = NSLocalizedStringWithDefaultValue(
+			@"Artist",
+			nil,IMBBundle(),
+			@"Artist",
+			@"Artist label in metadataDescription");
+
+		description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+	}
+	
+	if (album)
+	{
+		NSString* albumLabel = NSLocalizedStringWithDefaultValue(
+			@"Album",
+			nil,IMBBundle(),
+			@"Album",
+			@"Album label in metadataDescription");
+
+		description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+	}
+	
+	if (duration)
+	{
+		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
+
+		NSString* durationString = [_timecodeTransformer transformedValue:duration];
+		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+	}
+	
+	return description;
+}
+
 
 @end
 

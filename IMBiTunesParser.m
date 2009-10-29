@@ -56,6 +56,7 @@
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "IMBTimecodeTransformer.h"
 #import <Quartz/Quartz.h>
 
 
@@ -73,6 +74,7 @@
 - (NSImage*) iconForPlaylist:(NSDictionary*)inPlaylistDict;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks;
 - (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks;
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 @end
 
@@ -89,6 +91,7 @@
 @synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize version = _version;
+@synthesize timecodeTransformer = _timecodeTransformer;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,6 +168,7 @@
 		self.plist = nil;
 		self.modificationDate = nil;
 		self.version = 0;
+		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
 	}
 	
 	return self;
@@ -176,6 +180,7 @@
 	IMBRelease(_appPath);
 	IMBRelease(_plist);
 	IMBRelease(_modificationDate);
+	IMBRelease(_timecodeTransformer);
 	[super dealloc];
 }
 
@@ -542,7 +547,7 @@
 	
 	NSString* imageRepresentationType = 
 		[self.mediaType isEqualToString:kIMBMediaTypeAudio] ?
-		IKImageBrowserNSImageRepresentationType :
+		IKImageBrowserCGImageRepresentationType :
 		IKImageBrowserQTMovieRepresentationType;
 		
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
@@ -615,6 +620,8 @@
 					
 					NSString* album = [trackDict objectForKey:@"Album"];
 					if (album) [metadata setObject:album forKey:@"album"]; 
+					
+					object.metadataDescription = [self metadataDescriptionForMetadata:metadata];
 				}
 				
 				[pool2 release];
@@ -623,6 +630,53 @@
 		
 		[pool1 release];
 	}
+}
+
+
+// Convert metadata into human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString* description = @"";
+	NSNumber* duration = [inMetadata objectForKey:@"duration"];
+	NSString* artist = [inMetadata objectForKey:@"artist"];
+	NSString* album = [inMetadata objectForKey:@"album"];
+	
+	if (artist)
+	{
+		NSString* artistLabel = NSLocalizedStringWithDefaultValue(
+			@"Artist",
+			nil,IMBBundle(),
+			@"Artist",
+			@"Artist label in metadataDescription");
+
+		description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+	}
+	
+	if (album)
+	{
+		NSString* albumLabel = NSLocalizedStringWithDefaultValue(
+			@"Album",
+			nil,IMBBundle(),
+			@"Album",
+			@"Album label in metadataDescription");
+
+		description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+	}
+	
+	if (duration)
+	{
+		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
+
+		NSString* durationString = [_timecodeTransformer transformedValue:duration];
+		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+	}
+	
+	return description;
 }
 
 

@@ -69,6 +69,7 @@
 - (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI;
 - (NSImage*) iconForPath:(NSString*)inPath;
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 + (NSString*) identifierForPath:(NSString*)inPath;
 
 @end

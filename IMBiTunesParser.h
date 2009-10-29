@@ -55,6 +55,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class IMBTimecodeTransformer;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 @interface IMBiTunesParser : IMBParser
@@ -64,6 +72,7 @@
 	NSDate* _modificationDate;
 	BOOL _shouldDisplayLibraryName;
 	NSInteger _version;
+	IMBTimecodeTransformer* _timecodeTransformer;
 }
 
 @property (retain) NSString* appPath;
@@ -71,6 +80,7 @@
 @property (retain) NSDate* modificationDate;
 @property (assign) BOOL shouldDisplayLibraryName;
 @property (assign) NSInteger version;
+@property (retain) IMBTimecodeTransformer* timecodeTransformer;
 
 @end
 
