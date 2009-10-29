@@ -58,6 +58,7 @@
 #import "IMBComboTableView.h"
 #import "IMBCommon.h"
 #import <Quartz/Quartz.h>
+#import <QTKit/QTKit.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -290,7 +291,7 @@
 	
 	else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
 	{
-		NSImage* image = (NSImage*) self.imageRepresentation;
+		NSImage* image = (NSImage*) _imageRepresentation;
 		[image setFlipped:YES];
 
 		CGFloat width = image.size.width;
@@ -304,7 +305,7 @@
 	
 	else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
 	{
-		CGImageRef image = (CGImageRef) self.imageRepresentation;
+		CGImageRef image = (CGImageRef) _imageRepresentation;
 		[self _drawImage:image withFrame:imageRect];
 	}
 	
@@ -312,7 +313,7 @@
 	
 	else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSDataRepresentationType])
 	{
-		NSData* data = (NSData*) self.imageRepresentation;
+		NSData* data = (NSData*) _imageRepresentation;
 		CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)data,NULL);
 		
 		if (source)
@@ -322,6 +323,29 @@
 			CGImageRelease(image);
 			CFRelease(source);
 		}	
+	}
+	
+	// Draw the thumbnail image (QTMovie)...
+	
+	else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
+	{
+		QTMovie* movie = (QTMovie*) _imageRepresentation;
+//		NSImage* image = movie.posterImage;
+//		CGFloat width = image.size.width;
+//		CGFloat height = image.size.height;
+//		NSRect rect = [self imageRectForFrame:imageRect imageWidth:width imageHeight:height];
+//
+//		[image drawInRect:rect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+		
+		NSError* error = nil;
+		QTTime duration = movie.duration;
+		double tv = duration.timeValue;
+		double ts = duration.timeScale;
+		QTTime time = QTMakeTimeWithTimeInterval(0.5 * tv/ts);
+		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,nil];
+			
+		CGImageRef image = (CGImageRef) [movie frameImageAtTime:time withAttributes:attributes error:&error];
+		[self _drawImage:image withFrame:imageRect];
 	}
 	
 	// Unsupported imageRepresentation...
