@@ -495,7 +495,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 
 // When the icon size changes, get the current cell size in the IKImageBrowserView and notify the parser.
-// This may be helpfull for the parser so that it can supply larger thumbnails...
+// This may be helpful for the parser so that it can supply larger thumbnails...
 
 - (void) setIconSize:(double)inIconSize
 {
@@ -508,6 +508,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		[parser objectViewDidChangeIconSize:size];
 	}
+
+	CGFloat height = 60.0 + 80.0 * _iconSize;
+	[ibComboView setRowHeight:height];
 }
 
 
