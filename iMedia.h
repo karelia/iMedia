@@ -59,6 +59,7 @@
 #import <iMedia/IMBNode.h>
 #import <iMedia/IMBObject.h>
 #import <iMedia/IMBObjectPromise.h>
+#import <iMedia/IMBFlickrNode.h>
 
 // Parsers...
 
