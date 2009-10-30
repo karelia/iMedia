@@ -46,93 +46,75 @@
 //  Created by Christoph Priebe on 2009-08-24.
 //  Copyright 2009 Christoph Priebe. All rights reserved.
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
-
-//	System
-#import <Cocoa/Cocoa.h>
-
-//	Objective Flickr
-#import <ObjectiveFlickr/ObjectiveFlickr.h>
 
 //	iMedia
-#import "IMBNode.h"
-#import "IMBParser.h"
+#import "IMBCommon.h"
+#import "IMBFlickrQueryEditor.h"
+#import "IMBFlickrNode.h"
+#import "IMBFlickrParser.h"
+
 
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-@class IMBFlickrQueryEditor;
+@implementation IMBFlickrQueryEditor
 
-/**
- *	iMedia parser to read public Flickr images.
- *	
- *	You need to supply your own Flickr API key and shared secret to use this 
- *	parser. Apply for key and secret at: http://flickr.com/services/api/keys/apply
- *
- *	Set the API key and shared secret in the IMBParserController delegate method
- *	controller:didLoadParser:forMediaType: See the iMedia Test Application for 
- *	an example.
- *
- *
- *	@date 2009-08-24 Start implementing this class (cp).
- *
- *	@author  Christoph Priebe (cp)
- *	@since   iMedia 2.0
- */
-@interface IMBFlickrParser: IMBParser <OFFlickrAPIRequestDelegate> {
-	@private
-	NSMutableArray* _customQueries;
-	id _delegate;
-	IMBFlickrQueryEditor* _editor;
-	NSString* _flickrAPIKey;
-	OFFlickrAPIContext* _flickrContext;
-	NSString* _flickrSharedSecret;
++ (IMBFlickrQueryEditor*) flickrQueryEditorForParser: (IMBFlickrParser*) parser {
+	IMBFlickrQueryEditor* editor = [[IMBFlickrQueryEditor alloc] init];
+	editor.parser = parser;
+	return editor;
 }
 
+
+- (id) init {
+    self = [super init];
+    if (self != nil) {
+        if (![NSBundle loadNibNamed:@"IMBFlickrQueryEditor" owner:self]) {
+            NSAssert (false, @"Can't load 'IMBFlickrQueryEditor' nib.");
+        }		
+    }
+    return self;
+}
+
+
+- (void) dealloc {
+	_parser = nil;
+	[super dealloc];
+}
+
+
+#pragma mark
 #pragma mark Actions
 
-- (IBAction) editQueries: (id) inSender;
+- (IBAction) add: (id) sender {
+	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
+	[dict setObject:@"Title" forKey:IMBFlickrNodePrefKey_Title];
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodePrefKey_Method];
+	[dict setObject:@"Steve Jobs" forKey:IMBFlickrNodePrefKey_Query];	
+	[_queriesController addObject:dict];
+	[_title becomeFirstResponder];
+}
 
 
+- (IBAction) cancel: (id) sender {
+	[self.parser loadCustomQueries];
+	[self.window orderOut:sender];
+}
+
+
+- (IBAction) ok: (id) sender {
+	[_queriesController commitEditing];
+	[self.parser saveCustomQueries];
+	[self.parser reloadCustomQueries];
+	[self.window orderOut:sender];
+}
+
+
+#pragma mark
 #pragma mark Properties
 
-@property (retain) NSMutableArray* customQueries;
-
-@property (assign) id delegate;
-
-///	The API key given to you by Flickr. Must be set to use this parser.
-@property (copy) NSString* flickrAPIKey;
-
-///	The shared secret given to you by Flickr. Must be set to use this parser.
-@property (copy) NSString* flickrSharedSecret;
-
-
-#pragma mark Query Persistence
-
-- (void) loadCustomQueries;
-
-- (void) reloadCustomQueries;
-
-- (void) saveCustomQueries;
+@synthesize parser = _parser;
 
 @end
-
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-#pragma mark 
-
-@protocol IMBFlickrParserDelegate
-
-@optional
-
-- (NSArray*) flickrParserSetupDefaultQueries: (IMBFlickrParser*) IMBFlickrParser;
-
-@end
-
-//----------------------------------------------------------------------------------------------------------------------
-

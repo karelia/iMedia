@@ -218,8 +218,10 @@
 		// If you already have an API key, you will find it here:  http://www.flickr.com/services/api/keys/
 		
 		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
-
+		flickrParser.delegate = self;
+		
 		// For your actual app, you would put in the hard-wired strings here.
+		
 		flickrParser.flickrAPIKey = nil;
 		flickrParser.flickrSharedSecret = nil;
 		
@@ -227,6 +229,7 @@
 		//
 		// To put in a key into your keychain, create a new keychain item in Keychain Access.
 		// Give it the name of "flickr_api" with the key as the account name, and the secret as the password.
+		
 		SecKeychainItemRef item = nil;
 		OSStatus theStatus = noErr;
 		char *buffer;
@@ -260,13 +263,11 @@
 				
 				theStatus = SecKeychainItemCopyContent (item, NULL, &list, NULL, NULL);
 				
-				// make it clear that this is the beginning of a new
-				// keychain item
+				// make it clear that this is the beginning of a new keychain item
+				
 				if (theStatus == noErr)
 				{
 					flickrParser.flickrAPIKey = [[[NSString alloc] initWithBytes:attributes[0].data length:attributes[0].length encoding:NSUTF8StringEncoding] autorelease];
-					
-				NSLog(@"Flickr credentials: %@ %@", flickrParser.flickrAPIKey, flickrParser.flickrSharedSecret);
 					SecKeychainItemFreeContent (&list, NULL);
 				}
 				else NSLog(@"%@ unable to fetch 'flickr_api' account from keychain: status %d", NSStringFromSelector(_cmd), theStatus);
@@ -352,6 +353,41 @@
 	#if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
 	#endif
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark IMBFlickrParser Delegate
+
+- (NSArray*) flickrParserSetupDefaultQueries:(IMBFlickrParser*)inFlickrParser
+{
+	NSMutableArray* defaultNodes = [NSMutableArray array];
+	
+	//	tag search for 'macintosh' and 'apple'...
+	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
+	[dict setObject:@"Tagged 'Macintosh' & 'Apple'" forKey:IMBFlickrNodePrefKey_Title];
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodePrefKey_Method];
+	[dict setObject:@"macintosh, apple" forKey:IMBFlickrNodePrefKey_Query];
+	[defaultNodes addObject:dict];
+	
+	//	tag search for 'iphone' and 'screenshot'...
+	dict = [NSMutableDictionary dictionary];
+	[dict setObject:@"Tagged 'iPhone' & 'Screenshot'" forKey:IMBFlickrNodePrefKey_Title];
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodePrefKey_Method];
+	[dict setObject:@"iphone, screenshot" forKey:IMBFlickrNodePrefKey_Query];
+	[defaultNodes addObject:dict];
+	
+	//	text search for 'tree'...
+	dict = [NSMutableDictionary dictionary];
+	[dict setObject:@"Search for 'Tree'" forKey:IMBFlickrNodePrefKey_Title];
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodePrefKey_Method];
+	[dict setObject:@"tree" forKey:IMBFlickrNodePrefKey_Query];
+	[defaultNodes addObject:dict];
+	
+	return defaultNodes;
 }
 
 

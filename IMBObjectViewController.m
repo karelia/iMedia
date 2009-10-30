@@ -386,7 +386,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	NSMutableDictionary* stateDict = [self _preferences];
 	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntValue];
-	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
+	self.iconSize = 0.15; //[[stateDict objectForKey:@"iconSize"] doubleValue];
 	
 	//	NSData* selectionData = [stateDict objectForKey:@"selectionData"];
 	//	NSIndexSet* selectionIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:selectionData];

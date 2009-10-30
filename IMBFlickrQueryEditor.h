@@ -53,86 +53,44 @@
 //	System
 #import <Cocoa/Cocoa.h>
 
-//	Objective Flickr
-#import <ObjectiveFlickr/ObjectiveFlickr.h>
-
-//	iMedia
-#import "IMBNode.h"
-#import "IMBParser.h"
-
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-@class IMBFlickrQueryEditor;
+@class IMBFlickrParser;
 
 /**
- *	iMedia parser to read public Flickr images.
- *	
- *	You need to supply your own Flickr API key and shared secret to use this 
- *	parser. Apply for key and secret at: http://flickr.com/services/api/keys/apply
- *
- *	Set the API key and shared secret in the IMBParserController delegate method
- *	controller:didLoadParser:forMediaType: See the iMedia Test Application for 
- *	an example.
+ *	...
  *
  *
- *	@date 2009-08-24 Start implementing this class (cp).
+ *	@date 2009-09-21 Start implementing this class (cp).
  *
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBFlickrParser: IMBParser <OFFlickrAPIRequestDelegate> {
+@interface IMBFlickrQueryEditor: NSWindowController {
 	@private
-	NSMutableArray* _customQueries;
-	id _delegate;
-	IMBFlickrQueryEditor* _editor;
-	NSString* _flickrAPIKey;
-	OFFlickrAPIContext* _flickrContext;
-	NSString* _flickrSharedSecret;
+	IBOutlet NSArrayController* _queriesController;
+	IBOutlet NSTextField* _title;
+	IMBFlickrParser* _parser;
 }
+
+#pragma mark Construction
+
++ (IMBFlickrQueryEditor*) flickrQueryEditorForParser: (IMBFlickrParser*) parser;
+
 
 #pragma mark Actions
 
-- (IBAction) editQueries: (id) inSender;
+- (IBAction) add: (id) sender;
+
+- (IBAction) cancel: (id) inSender;
+
+- (IBAction) ok: (id) inSender;
 
 
 #pragma mark Properties
 
-@property (retain) NSMutableArray* customQueries;
-
-@property (assign) id delegate;
-
-///	The API key given to you by Flickr. Must be set to use this parser.
-@property (copy) NSString* flickrAPIKey;
-
-///	The shared secret given to you by Flickr. Must be set to use this parser.
-@property (copy) NSString* flickrSharedSecret;
-
-
-#pragma mark Query Persistence
-
-- (void) loadCustomQueries;
-
-- (void) reloadCustomQueries;
-
-- (void) saveCustomQueries;
+@property (assign) IMBFlickrParser* parser;
 
 @end
-
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-#pragma mark 
-
-@protocol IMBFlickrParserDelegate
-
-@optional
-
-- (NSArray*) flickrParserSetupDefaultQueries: (IMBFlickrParser*) IMBFlickrParser;
-
-@end
-
-//----------------------------------------------------------------------------------------------------------------------
-

@@ -46,93 +46,83 @@
 //  Created by Christoph Priebe on 2009-08-24.
 //  Copyright 2009 Christoph Priebe. All rights reserved.
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
-
-//	System
-#import <Cocoa/Cocoa.h>
 
 //	Objective Flickr
 #import <ObjectiveFlickr/ObjectiveFlickr.h>
 
 //	iMedia
-#import "IMBNode.h"
-#import "IMBParser.h"
-
-
+#import <iMedia/IMBNode.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 
-@class IMBFlickrQueryEditor;
+
+
+@class IMBParser;
+
+extern NSString* const IMBFlickrNodePrefKey_Arguments;
+extern NSString* const IMBFlickrNodePrefKey_Method;
+extern NSString* const IMBFlickrNodePrefKey_Query;
+extern NSString* const IMBFlickrNodePrefKey_Title;
+
+typedef enum NSUInteger {
+	IMBFlickrNodeMethod_TextSearch = 0,
+	IMBFlickrNodeMethod_TagSearch,
+	IMBFlickrNodeMethod_Recent,
+	IMBFlickrNodeMethod_MostInteresting
+} IMBFlickrNodeMethod;
 
 /**
- *	iMedia parser to read public Flickr images.
- *	
- *	You need to supply your own Flickr API key and shared secret to use this 
- *	parser. Apply for key and secret at: http://flickr.com/services/api/keys/apply
+ *	Flickr parser custom node.
  *
- *	Set the API key and shared secret in the IMBParserController delegate method
- *	controller:didLoadParser:forMediaType: See the iMedia Test Application for 
- *	an example.
- *
- *
- *	@date 2009-08-24 Start implementing this class (cp).
+ *	@date 2009-09-21 Start implementing this class (cp).
  *
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBFlickrParser: IMBParser <OFFlickrAPIRequestDelegate> {
+@interface IMBFlickrNode: IMBNode {
 	@private
-	NSMutableArray* _customQueries;
-	id _delegate;
-	IMBFlickrQueryEditor* _editor;
-	NSString* _flickrAPIKey;
-	OFFlickrAPIContext* _flickrContext;
-	NSString* _flickrSharedSecret;
+	BOOL _customNode;
 }
 
-#pragma mark Actions
+#pragma mark Construction
 
-- (IBAction) editQueries: (id) inSender;
++ (IMBFlickrNode*) flickrNodeForInterestingPhotosForRoot: (IMBFlickrNode*) root
+												  parser: (IMBParser*) parser;
+
++ (IMBFlickrNode*) flickrNodeForRecentPhotosForRoot: (IMBFlickrNode*) root
+											 parser: (IMBParser*) parser;
+
++ (IMBFlickrNode*) flickrNodeForRoot: (IMBFlickrNode*) root
+							   title: (NSString*) title
+						  identifier: (NSString*) identifier
+							  method: (NSString*) method 
+						   arguments: (NSDictionary*) arguments
+							  parser: (IMBParser*) parser;
+
++ (IMBFlickrNode*) flickrNodeFromDict: (NSDictionary*) dict 
+							 rootNode: (IMBFlickrNode*) root
+							   parser: (IMBParser*) parser;
 
 
+#pragma mark Flickr Handling
+
+- (void) clearResponse;
+- (NSDictionary*) flickrResponse;
+- (BOOL) hasFlickrRequest;
+- (BOOL) hasFlickrResponse;
+- (void) setFlickrMethod: (NSString*) method arguments: (NSDictionary*) arguments;
+- (void) setFlickrResponse: (NSDictionary*) response;
+- (void) startFlickrRequestWithContext: (OFFlickrAPIContext*) context delegate: (id) delegate;
+
+
+#pragma mark Persistence
+
+- (NSDictionary*) preferencesDictRepresentation;
+
+	
 #pragma mark Properties
 
-@property (retain) NSMutableArray* customQueries;
-
-@property (assign) id delegate;
-
-///	The API key given to you by Flickr. Must be set to use this parser.
-@property (copy) NSString* flickrAPIKey;
-
-///	The shared secret given to you by Flickr. Must be set to use this parser.
-@property (copy) NSString* flickrSharedSecret;
-
-
-#pragma mark Query Persistence
-
-- (void) loadCustomQueries;
-
-- (void) reloadCustomQueries;
-
-- (void) saveCustomQueries;
+@property (assign, getter=isCustomNode) BOOL customNode;
 
 @end
-
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-#pragma mark 
-
-@protocol IMBFlickrParserDelegate
-
-@optional
-
-- (NSArray*) flickrParserSetupDefaultQueries: (IMBFlickrParser*) IMBFlickrParser;
-
-@end
-
-//----------------------------------------------------------------------------------------------------------------------
-
