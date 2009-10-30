@@ -56,7 +56,29 @@
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
 #import <Quartz/Quartz.h>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This subclass adds the addition apertureMetadata property, which stores the metadata coming from the XML file. 
+// it will later be augmented (lazily) by metadata read from the file itself (which is a fairly slow process).
+// That is why that step is only done lazily...
+
+
+@implementation IMBApertureObject
+
+@synthesize apertureMetadata = _apertureMetadata;
+
+- (void) dealloc
+{
+	IMBRelease(_apertureMetadata);
+	[super dealloc];
+}
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -520,15 +542,18 @@
 					NSString* imagePath = [imageDict objectForKey:@"ImagePath"];
 					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [imageDict objectForKey:@"Caption"];
-	
-					IMBObject* object = [[IMBObject alloc] init];
+					NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:imageDict];
+					[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:imagePath]];
+
+					IMBApertureObject* object = [[IMBApertureObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
 					object.location = (id)imagePath;
 					object.name = caption;
-					object.metadata = imageDict;
-					object.metadataDescription = [self metadataDescriptionForMetadata:imageDict];
+					object.apertureMetadata = imageDict; // This metadata was in the XML file and is available immediately
+					object.metadata = nil;				 // Build lazily when needed (takes longer)
+					object.metadataDescription = nil;	 // Build lazily when needed (takes longer)
 					object.parser = self;
 					object.index = index++;
 
@@ -549,26 +574,37 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
+// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
+// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
+// Please note that this method may be called on a background thread...
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	IMBApertureObject* object = (IMBApertureObject*)inObject;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.apertureMetadata];
+	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
+}
+
+
 // Convert metadata into human readable string...
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
-	NSNumber* width = [inMetadata objectForKey:@"width"];
-	NSNumber* height = [inMetadata objectForKey:@"height"];
-	
-	if (width != nil && height != nil)
-	{
-		NSString* size = NSLocalizedStringWithDefaultValue(
-				@"Size",
-				nil,IMBBundle(),
-				@"Size",
-				@"Size label in metadata description");
-		
-		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
-	}
-	
-	return description;
+	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 

@@ -56,7 +56,29 @@
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
 #import <Quartz/Quartz.h>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This subclass adds the addition iPhotoMetadata property, which stores the metadata coming form the XML file. 
+// it will later be augmented (lazily) by metadata read from the file itself (which is a fairly slow process).
+// That is why that step is only done lazily...
+
+
+@implementation IMBiPhotoObject
+
+@synthesize iPhotoMetadata = _iPhotoMetadata;
+
+- (void) dealloc
+{
+	IMBRelease(_iPhotoMetadata);
+	[super dealloc];
+}
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,6 +113,7 @@
 @synthesize plist = _plist;
 @synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
+@synthesize dateFormatter = _dateFormatter;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -167,6 +190,9 @@
 		self.plist = nil;
 		self.modificationDate = nil;
 		_fakeAlbumID = 0;
+		
+		self.dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+		self.dateFormatter.dateStyle = NSDateFormatterShortStyle;
 	}
 	
 	return self;
@@ -178,6 +204,7 @@
 	IMBRelease(_appPath);
 	IMBRelease(_plist);
 	IMBRelease(_modificationDate);
+	IMBRelease(_dateFormatter);
 	[super dealloc];
 }
 
@@ -573,14 +600,18 @@
 				
 				if ([self shouldUseObject:imageDict])
 				{
-					IMBObject* object = [[IMBObject alloc] init];
+					NSString* path = [imageDict objectForKey:@"ImagePath"];
+					NSString* name = [imageDict objectForKey:@"Caption"];
+					
+					IMBiPhotoObject* object = [[IMBiPhotoObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
-					object.location = (id)[imageDict objectForKey:@"ImagePath"];
-					object.name = [imageDict objectForKey:@"Caption"];
-					object.metadata = imageDict;
-					object.metadataDescription = [self metadataDescriptionForMetadata:imageDict];
+					object.location = (id)path;
+					object.name = name;
+					object.iPhotoMetadata = imageDict;	// This metadata was in the XML file and is available immediately
+					object.metadata = nil;				// Build lazily when needed (takes longer)
+					object.metadataDescription = nil;	// Build lazily when needed (takes longer)
 					object.parser = self;
 					object.index = index++;
 					
@@ -601,9 +632,35 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Loaded lazily when actually needed for display. Here we combine the metadata we got from the iPhoto XML file
+// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
+// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
+// Please note that this method may be called on a background thread...
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	IMBiPhotoObject* object = (IMBiPhotoObject*)inObject;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.iPhotoMetadata];
+	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
+}
+
+
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	return @"Some iPhoto info about this image,\nEven more info,\nBlah blah blah…";
+	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 

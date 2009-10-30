@@ -56,6 +56,7 @@
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "IMBTimecodeTransformer.h"
 #import <Quartz/Quartz.h>
 
 
@@ -75,6 +76,8 @@
 #pragma mark 
 
 @implementation IMBGarageBandParser
+
+@synthesize timecodeTransformer = _timecodeTransformer;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -143,6 +146,7 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.fileUTI = @"com.apple.garageband.project"; 
+		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
 	}
 	
 	return self;
@@ -151,6 +155,7 @@
 
 - (void) dealloc
 {
+	IMBRelease(_timecodeTransformer);
 	[super dealloc];
 }
 
@@ -203,23 +208,6 @@
 	if (outError) *outError = error;
 	return node;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// The supplied node is a private copy which may be modified here in the background operation. Parse the 
-// iPhoto XML file and create subnodes as needed...
-
-//- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
-//{
-//	NSError* error = nil;
-//	
-//
-//
-//	if (outError) *outError = error;
-//	return error == nil;
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -311,46 +299,73 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Return metadata specific to audio files...
+// Return metadata specific to GarageBand files...
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inPath); 
+	NSString* path = [inPath stringByAppendingPathComponent:@"Output/metadata.plist"];
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithContentsOfFile:path];
 	
-	if (item)
+	if (metadata)
 	{
-		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
-		CFArrayRef authors = MDItemCopyAttribute(item,kMDItemAuthors);
-		CFStringRef album = MDItemCopyAttribute(item,kMDItemAlbum);
+		NSNumber* duration = [metadata objectForKey:@"com_apple_garageband_metadata_songDuration"];
+		[metadata setObject:duration forKey:@"duration"];
 
-		if (seconds)
-		{
-			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
-			CFRelease(seconds);
-		}
-		
-		if (authors)
-		{
-			NSArray* artists = (NSArray*)authors;
-			if (artists.count > 0)[metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
-			CFRelease(authors);
-		}
-		
-		if (album)
-		{
-			[metadata setObject:(NSString*)album forKey:@"album"]; 
-			CFRelease(album);
-		}
-		
-		CFRelease(item);
-	}
-	else
-	{
-//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager threadSafeManager] fileExistsAtPath:inPath]);
+		NSString* artist = [metadata objectForKey:@"com_apple_garageband_metadata_artistName"];
+		[metadata setObject:artist forKey:@"artist"];
+
+		NSString* album = [metadata objectForKey:@"com_apple_garageband_metadata_albumName"];
+		[metadata setObject:album forKey:@"album"];
 	}
 	
 	return metadata;
+}
+
+
+// Convert metadata into human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString* description = @"";
+	NSNumber* duration = [inMetadata objectForKey:@"duration"];
+	NSString* artist = [inMetadata objectForKey:@"artist"];
+	NSString* album = [inMetadata objectForKey:@"album"];
+	
+	if (artist)
+	{
+		NSString* artistLabel = NSLocalizedStringWithDefaultValue(
+			@"Artist",
+			nil,IMBBundle(),
+			@"Artist",
+			@"Artist label in metadataDescription");
+
+		description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+	}
+	
+	if (album)
+	{
+		NSString* albumLabel = NSLocalizedStringWithDefaultValue(
+			@"Album",
+			nil,IMBBundle(),
+			@"Album",
+			@"Album label in metadataDescription");
+
+		description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+	}
+	
+	if (duration)
+	{
+		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
+
+		NSString* durationString = [_timecodeTransformer transformedValue:duration];
+		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+	}
+	
+	return description;
 }
 
 

@@ -201,11 +201,6 @@
 		[self load];
 	}
 	
-	if (_metadata == nil && _parser != nil)
-	{
-		[_parser loadMetadataForObject:self];
-	}	
-	
 	return [[_imageRepresentation retain] autorelease];
 }
 
@@ -246,8 +241,8 @@
 	if (inImageRepresentation)
 	{
 		[IMBObjectFifoCache addObject:self];
-		NSUInteger n = [IMBObjectFifoCache count];
-		NSLog(@"%s = %p (%d)",__FUNCTION__,inImageRepresentation,(int)n);
+//		NSUInteger n = [IMBObjectFifoCache count];
+//		NSLog(@"%s = %p (%d)",__FUNCTION__,inImageRepresentation,(int)n);
 	}
 }
 

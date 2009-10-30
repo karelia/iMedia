@@ -50,6 +50,20 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
+#import "IMBObject.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@interface IMBiPhotoObject : IMBObject
+{
+	NSDictionary* _iPhotoMetadata;
+}
+
+@property (retain) NSDictionary* iPhotoMetadata;
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,12 +78,14 @@
 	NSDate* _modificationDate;
 	BOOL _shouldDisplayLibraryName;
 	int _fakeAlbumID;					// for iPhoto2 compatibility
+	NSDateFormatter* _dateFormatter;
 }
 
 @property (retain) NSString* appPath;
 @property (retain) NSDictionary* plist;
 @property (retain) NSDate* modificationDate;
 @property (assign) BOOL shouldDisplayLibraryName;
+@property (retain) NSDateFormatter* dateFormatter;
 
 @end
 

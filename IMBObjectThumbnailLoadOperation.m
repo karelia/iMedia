@@ -51,6 +51,8 @@
 
 #import "IMBObjectThumbnailLoadOperation.h"
 #import "IMBObject.h"
+#import "IMBParser.h"
+#import "IMBMovieObject.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
 #import "NSString+iMedia.h"
@@ -215,11 +217,31 @@
 
 - (void) loadMovieRepresentation:(NSDictionary*)inInfo
 {
+	// Load the QTMovie object...
+	
 	NSURL* url = (NSURL*)[inInfo objectForKey:@"url"];
 	IMBObject* object = (IMBObject*)[inInfo objectForKey:@"object"];
 
 	QTMovie* movie = [self movieForURL:url];
 	[object setImageRepresentation:movie];
+	
+	// Set a better poster time...
+	
+	QTTime d = movie.duration;
+	double duration = (double)d.timeValue / (double)d.timeScale;
+	double posterTime = 0.5 * duration;
+	[movie setAttribute:[NSNumber numberWithDouble:posterTime] forKey:QTMoviePosterTimeAttribute];
+	
+	// Load and cache the poster frame...
+	
+	if ([object isKindOfClass:[IMBMovieObject class]])
+	{
+		NSError* error = nil;
+		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,nil];
+		QTTime t = QTMakeTimeWithTimeInterval(posterTime);
+		CGImageRef image = (CGImageRef) [movie frameImageAtTime:t withAttributes:attributes error:&error];
+		[(IMBMovieObject*)object setPosterFrame:image];
+	}
 }
 
 
@@ -364,6 +386,18 @@
 				modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	
+	// Load metadata if is hasn't been loaded yet...
+	
+	if (object.metadata == nil)
+	{
+//		[object.parser	performSelectorOnMainThread:@selector(loadMetadataForObject:) 
+//				withObject:object 
+//				waitUntilDone:NO 
+//				modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+
+		[object.parser loadMetadataForObject:object];
+	}
+
 	[pool release];
 }
 

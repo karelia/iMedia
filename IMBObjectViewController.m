@@ -58,6 +58,7 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBMovieObject.h"
 #import "IMBNodeObject.h"
 #import "IMBObjectPromise.h"
 #import "IMBImageBrowserCell.h"
@@ -1146,18 +1147,29 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
 	
-	if (object.metadata == nil)
-	{
-		[object.parser loadMetadataForObject:object];
-	}
+//	if (object.metadata == nil)
+//	{
+//		[object.parser loadMetadataForObject:object];
+//	}
 	
 	if ([inCell isKindOfClass:[IMBComboTextCell class]])
 	{
 		IMBComboTextCell* cell = (IMBComboTextCell*)inCell;
-		cell.imageRepresentation = object.imageRepresentation;
-		cell.imageRepresentationType = object.imageRepresentationType;
-		cell.title = object.name;
-		cell.subtitle = object.metadataDescription;
+		
+		if ([object isKindOfClass:[IMBMovieObject class]])
+		{
+			cell.imageRepresentation = (id) [(IMBMovieObject*)object posterFrame];
+			cell.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+			cell.title = object.name;
+			cell.subtitle = object.metadataDescription;
+		}
+		else
+		{
+			cell.imageRepresentation = object.imageRepresentation;
+			cell.imageRepresentationType = object.imageRepresentationType;
+			cell.title = object.name;
+			cell.subtitle = object.metadataDescription;
+		}
 	}
 	else
 	{
