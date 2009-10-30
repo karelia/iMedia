@@ -772,25 +772,32 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	}
 	
 	// Double-clicking opens the files (with the default app). Please note that IMBObjects are first passed through an 
-	// IMBObjectPromise (which is returned by the parser), because the files may not yet be available locally. In this
-	// case the promise object loads them asynchronously and calls _openLocalFiles: once the download has finsihed...
+	// IMBObjectPromise (which is returned by the parser), because the resources to be opened may not yet be available.
+	// In this case the promise object loads them asynchronously and calls _openLocalURLs: once the load has finished...
 	
 	else if (inSelectedNode)
 	{
 		IMBParser* parser = inSelectedNode.parser;
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:inObjects];
-		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalFiles:withError:)];
+		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalURLs:withError:)];
 	}
 }
 
-
-- (void) _openLocalFiles:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
+// "Local" means that for whatever the object represents, opening it now requires no network or 
+// other time-intensive procedure to obtain the usable object content. The term "local" is slightly
+// misleading when it comes to IMBObjects that refer strictly to a web link, where "opening" them 
+// just means loading them in a browser.
+- (void) _openLocalURLs:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
 {
 	if (inError == nil)
 	{
-		for (NSString* path in inObjectPromise.localFiles)
+		for (NSURL* url in inObjectPromise.localURLs)
 		{
-			[[NSWorkspace threadSafeWorkspace] openFile:path];
+			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
+			if ([url isKindOfClass:[NSURL class]])
+			{
+				[[NSWorkspace threadSafeWorkspace] openURL:url];
+			}
 		}
 	}
 	else
@@ -933,8 +940,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		promise.downloadFolderPath = NSTemporaryDirectory();
 		[promise startLoadingWithDelegate:self finishSelector:nil];
 		[promise waitUntilDone];
-		
-		[inPasteboard setPropertyList:promise.localFiles forType:NSFilenamesPboardType];
+
+		// Every URL will be able to provide a path, we'll leave it to the destination to decide
+		// whether it can make any use of it or not.
+		[inPasteboard setPropertyList:[promise.localURLs valueForKey:@"path"] forType:NSFilenamesPboardType];
     }
 }
 
