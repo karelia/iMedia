@@ -91,7 +91,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 @synthesize objects = _objects;
 @synthesize downloadFolderPath = _downloadFolderPath;
-@synthesize localFiles = _localFiles;
+@synthesize localURLs = _localURLs;
 @synthesize error = _error;
 @synthesize delegate = _delegate;
 @synthesize finishSelector = _finishSelector;
@@ -106,7 +106,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	{
 		self.objects = inObjects;
 		self.downloadFolderPath = [IMBConfig downloadFolderPath];
-		self.localFiles = [NSMutableArray arrayWithCapacity:inObjects.count];
+		self.localURLs = [NSMutableArray arrayWithCapacity:inObjects.count];
 		self.error = nil;
 		self.delegate = nil;
 		self.finishSelector = NULL;
@@ -125,7 +125,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
 		self.downloadFolderPath = [IMBConfig downloadFolderPath];
-		self.localFiles = [NSMutableArray arrayWithCapacity:self.objects.count];
+		self.localURLs = [NSMutableArray arrayWithCapacity:self.objects.count];
 		self.delegate = nil;
 		self.finishSelector = NULL;
 		self.error = nil;
@@ -150,7 +150,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	
 	copy.objects = self.objects;
 	copy.downloadFolderPath = self.downloadFolderPath;
-	copy.localFiles = self.localFiles;
+	copy.localURLs = self.localURLs;
 	copy.error = self.error;
 	copy.delegate = self.delegate;
 	copy.finishSelector = self.finishSelector;
@@ -165,7 +165,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	
 	IMBRelease(_objects);
 	IMBRelease(_downloadFolderPath);
-	IMBRelease(_localFiles);
+	IMBRelease(_localURLs);
 	IMBRelease(_delegate);
 	IMBRelease(_error);
 	
@@ -273,8 +273,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// A promise for local files doesn't really have to do any work since no loading is required. It simply copies
-// the path (location) into our localFiles array...
+// A promise for local objects doesn't really have to do any work since no loading is required. It simply copies
+// the URL for the location into our localURLs array...
 
 #pragma mark
 
@@ -291,29 +291,28 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	// Get the path...
 	
-	NSString* path = [inObject path];
+	NSURL* localURL = [inObject url];
 	
-	// Check if the file at this path exists. If yes then add the path to the array...
-	
-	if (path)
+	// For file URLs, only add if the file at the path exists.
+	if ([localURL isFileURL])
 	{
 		BOOL exists,directory;
-		exists = [[NSFileManager threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
+		exists = [[NSFileManager threadSafeManager] fileExistsAtPath:[localURL path] isDirectory:&directory];
 		
-		if (exists && !directory)
+		if (!exists || directory)
 		{
-			[self.localFiles addObject:path];
-			_objectCountLoaded++;
-		}
-		else 
-		{
-			path = nil;
+			localURL = nil;
 		}
 	}
-	
-	// If not then add an error instead...
-	
-	if (path == nil)
+
+	// If we have a valid URL, add it to our array...
+	// If we were not able to construct a suitable URL, then issue an error instead...		
+	if (localURL != nil)
+	{	
+		[self.localURLs addObject:localURL];
+		_objectCountLoaded++;
+	}
+	else
 	{
 		NSString* format = NSLocalizedStringWithDefaultValue(
 			@"IMBLocalObjectPromise.error",
@@ -325,7 +324,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
 		NSError* error = [NSError errorWithDomain:@"com.karelia.imedia" code:fnfErr userInfo:info];
 		
-		[self.localFiles addObject:error];
+		[self.localURLs addObject:error];
 		_objectCountLoaded++;
 	}
 }
@@ -519,10 +518,13 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	
 	NSFileManager* mgr = [NSFileManager threadSafeManager];
 	
-	for (NSString* path in self.localFiles)
+	for (NSURL* url in self.localURLs)
 	{
-		NSError* error = nil;
-		[mgr removeItemAtPath:path error:&error];
+		if ([url isFileURL])
+		{
+			NSError* error = nil;
+			[mgr removeItemAtPath:[url path] error:&error];
+		}
 	}
 	
 	// Cleanup...
@@ -557,12 +559,12 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 }
 
 
-// A download has finished. Store the path to the downloaded file. Once all downloads are complete, we can hide 
+// A download has finished. Store the URL to the downloaded file. Once all downloads are complete, we can hide 
 // the progress UI, Notify the delegate and release self...
 
 - (void) didFinish:(IMBURLDownloadOperation*)inOperation
 {
-	[self.localFiles addObject:inOperation.localPath];
+	[[self localURLs] addObject:[NSURL fileURLWithPath:inOperation.localPath]];
 	_objectCountLoaded++;
 	
 	if (_objectCountLoaded >= _objectCountTotal)
@@ -585,7 +587,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) didReceiveError:(IMBURLDownloadOperation*)inOperation
 {
-	[self.localFiles addObject:inOperation.error];
+	[self.localURLs addObject:inOperation.error];
 	self.error = inOperation.error;
 	_objectCountLoaded++;
 

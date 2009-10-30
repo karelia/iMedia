@@ -67,7 +67,7 @@ extern NSString* kIMBObjectPromiseType;
 {
 	NSArray* _objects; 
 	NSString* _downloadFolderPath;
-	NSMutableArray* _localFiles;
+	NSMutableArray* _localURLs;
 	NSError* _error;
 	
 	double _objectCountTotal;
@@ -85,9 +85,13 @@ extern NSString* kIMBObjectPromiseType;
 
 @property (retain) NSString* downloadFolderPath;
 
-/// Array of paths (may contain NSNull objects in case of failure)
+/// Array of URLs referencing a local copy of a file, or in the case of e.g. link objects,
+/// the URL to the web resource itself. Generally speaking these URLs are suitable for,
+/// passing to NSWorkspace's openURL: method.
+///
+/// NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
 
-@property (retain) NSMutableArray* localFiles;	
+@property (retain) NSMutableArray* localURLs; 
 
 /// Retained due to asynchronous nature of the promise
 
