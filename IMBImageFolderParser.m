@@ -51,6 +51,7 @@
 
 #import "IMBImageFolderParser.h"
 #import "IMBParserController.h"
+#import "NSImage+iMedia.h"
 #import "IMBCommon.h"
 
 
@@ -78,34 +79,7 @@
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inPath);
-	
-	if (item)
-	{
-		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
-		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
-
-		if (width)
-		{
-			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
-			CFRelease(width);
-		}
-		
-		if (height)
-		{
-			[metadata setObject:(NSNumber*)width forKey:@"height"]; 
-			CFRelease(height);
-		}
-		
-		CFRelease(item);
-	}
-	else
-	{
-//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager threadSafeManager] fileExistsAtPath:inPath]);
-	}
-
-	return metadata;
+	return [NSImage metadataFromImageAtPath:inPath];
 }
 
 
@@ -113,22 +87,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
-	NSNumber* width = [inMetadata objectForKey:@"width"];
-	NSNumber* height = [inMetadata objectForKey:@"height"];
-	
-	if (width != nil && height != nil)
-	{
-		NSString* size = NSLocalizedStringWithDefaultValue(
-				@"Size",
-				nil,IMBBundle(),
-				@"Size",
-				@"Size label in metadata description");
-		
-		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
-	}
-	
-	return description;
+	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 

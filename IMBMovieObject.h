@@ -43,19 +43,28 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-#import <Cocoa/Cocoa.h>
 
-@interface NSImage (iMedia)
+//----------------------------------------------------------------------------------------------------------------------
 
-// Try to load an image out of the bundle for another application and if not found fallback to one of our own.
-+ (NSImage *)imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle;
 
-+ (NSImage *)imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime;
+#pragma mark HEADERS
 
-// Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
-+ (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
-+ (NSString*) imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+#import "IMBObject.h"
 
-+ (NSImage *)genericFolderIcon;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This subclass adds the capability to cache the poster frame of a movie... 
+
+@interface IMBMovieObject : IMBObject
+{
+	CGImageRef _posterFrame;
+}
+
+@property (assign) CGImageRef posterFrame;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------

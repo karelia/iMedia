@@ -50,6 +50,20 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
+#import "IMBObject.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@interface IMBApertureObject : IMBObject
+{
+	NSDictionary* _apertureMetadata;
+}
+
+@property (retain) NSDictionary* apertureMetadata;
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------

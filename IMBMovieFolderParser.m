@@ -52,7 +52,9 @@
 #import "IMBMovieFolderParser.h"
 #import "IMBParserController.h"
 #import "IMBTimecodeTransformer.h"
+#import "IMBMovieObject.h"
 #import "IMBCommon.h"
+#import <Quartz/Quartz.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,6 +88,26 @@
 {
 	IMBRelease(_timecodeTransformer);
 	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex
+{
+	IMBObject* object = [[[IMBMovieObject alloc] init] autorelease];
+	object.location = (id)inPath;
+	object.name = inName;
+	object.parser = self;
+	object.index = inIndex;
+	
+	object.imageRepresentationType = IKImageBrowserQTMovieRepresentationType; 
+	object.imageLocation = inPath;
+	object.imageRepresentation = nil;		// will be loaded lazily when needed
+	object.metadata = nil;					// will be loaded lazily when needed
+	
+	return object;
 }
 
 
@@ -132,9 +154,6 @@
 	
 	return metadata;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 // Convert metadata into human readable string...

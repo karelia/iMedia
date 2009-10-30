@@ -73,6 +73,27 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This subclass adds the addition apertureMetadata property, which stores the metadata coming from the database. 
+// it will later be augmented (lazily) by metadata read from the file itself (which is a fairly slow process).
+// That is why that step is only done lazily...
+
+
+@implementation IMBLightroomObject
+
+@synthesize lightroomMetadata = _lightroomMetadata;
+
+- (void) dealloc
+{
+	IMBRelease(_lightroomMetadata);
+	[super dealloc];
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 @interface IMBLightroomParser ()
@@ -689,18 +710,18 @@ static NSArray* sSupportedUTIs = nil;
 		{
 			NSString* filename = [results stringForColumn:@"idx_filename"];
 			NSString* caption = [results stringForColumn:@"captionName"];
-//			NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
+			NSString* name = caption!= nil ? caption : filename;
+			NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
 			NSString* path = [folderPath stringByAppendingPathComponent:filename];
 
 			if ([self canOpenImageFileAtPath:path])
 			{
-//				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-//				[metadata setObject:path forKey:@"path"];
-//				if (caption) [metadata setObject:caption forKey:@"caption"];
-//				else if (filename) [metadata setObject:filename forKey:@"caption"];
-//				if (pyramidPath) [metadata setObject:pyramidPath forKey:@"PyramidPath"];
-			
-				IMBObject* object = [self objectWithPath:path name:caption metadata:nil index:index++];
+				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
+				[metadata setObject:path forKey:@"path"];
+				if (name) [metadata setObject:name forKey:@"name"];
+				if (pyramidPath) [metadata setObject:pyramidPath forKey:@"PyramidPath"];
+				
+				IMBObject* object = [self objectWithPath:path name:name metadata:metadata index:index++];
 				[(NSMutableArray*)inNode.objects addObject:object];
 			}
 		}
@@ -753,18 +774,18 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* pathFromRoot = [results stringForColumn:@"pathFromRoot"];
 			NSString* filename = [results stringForColumn:@"idx_filename"];
 			NSString* caption = [results stringForColumn:@"captionName"];
-//			NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
+			NSString* name = caption!= nil ? caption : filename;
+			NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
 			NSString* path = [[rootPath stringByAppendingString:pathFromRoot] stringByAppendingString:filename];
 
 			if ([self canOpenImageFileAtPath:path])
 			{
-//				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-//				[metadata setObject:path forKey:@"path"];
-//				if (caption) [metadata setObject:caption forKey:@"caption"];
-//				else if (filename) [metadata setObject:filename forKey:@"caption"];
-//				if (pyramidPath) [metadata setObject:pyramidPath forKey:@"PyramidPath"];
+				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
+				[metadata setObject:path forKey:@"path"];
+				if (name) [metadata setObject:name forKey:@"name"];
+				if (pyramidPath) [metadata setObject:pyramidPath forKey:@"PyramidPath"];
 			
-				IMBObject* object = [self objectWithPath:path name:caption metadata:nil index:index++];
+				IMBObject* object = [self objectWithPath:path name:name metadata:metadata index:index++];
 				[(NSMutableArray*)inNode.objects addObject:object];
 			}
 		}
@@ -813,12 +834,13 @@ static NSArray* sSupportedUTIs = nil;
 
 - (IMBObject*) objectWithPath:(NSString*)inPath name:(NSString*)inName metadata:(NSDictionary*)inMetadata index:(NSUInteger)inIndex
 {
-	IMBObject* object = [[[IMBObject alloc] init] autorelease];
+	IMBLightroomObject* object = [[[IMBLightroomObject alloc] init] autorelease];
 
 	object.location = (id)inPath;
 	object.name = inName;
-	object.metadata = inMetadata;
-	object.metadataDescription = [self metadataDescriptionForMetadata:inMetadata];
+	object.lightroomMetadata = inMetadata;	// This metadata was in the XML file and is available immediately
+	object.metadata = nil;					// Build lazily when needed (takes longer)
+	object.metadataDescription = nil;		// Build lazily when needed (takes longer)
 	object.parser = self;
 	object.index = inIndex;
 	object.imageLocation = inPath;
@@ -829,26 +851,37 @@ static NSArray* sSupportedUTIs = nil;
 }
 
 
+// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Lightroom database
+// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
+// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
+// Please note that this method may be called on a background thread...
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	IMBLightroomObject* object = (IMBLightroomObject*)inObject;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.lightroomMetadata];
+	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
+}
+
+
 // Convert metadata into human readable string...
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
-	NSNumber* width = [inMetadata objectForKey:@"width"];
-	NSNumber* height = [inMetadata objectForKey:@"height"];
-	
-	if (width != nil && height != nil)
-	{
-		NSString* size = NSLocalizedStringWithDefaultValue(
-				@"Size",
-				nil,IMBBundle(),
-				@"Size",
-				@"Size label in metadata description");
-		
-		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
-	}
-	
-	return description;
+	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 

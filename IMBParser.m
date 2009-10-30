@@ -162,9 +162,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	// to be overridden by subclasses...
+	// to be overridden by subclasses. This method may be called on a background thread, so subclasses need to
+	// takes appropriate safety measures...
 }
 
 

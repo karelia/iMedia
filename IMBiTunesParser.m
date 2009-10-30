@@ -641,29 +641,60 @@
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
+	NSString* kind = [inMetadata objectForKey:@"Kind"];
+	NSNumber* width = [inMetadata objectForKey:@"Video Width"];
+	NSNumber* height = [inMetadata objectForKey:@"Video Height"];
+	NSNumber* hasVideo = [inMetadata objectForKey:@"Has Video"];
 	
-	if (artist)
+	if (hasVideo)
 	{
-		NSString* artistLabel = NSLocalizedStringWithDefaultValue(
-			@"Artist",
-			nil,IMBBundle(),
-			@"Artist",
-			@"Artist label in metadataDescription");
+		if (kind)
+		{
+			NSString* typeLabel = NSLocalizedStringWithDefaultValue(
+				@"Type",
+				nil,IMBBundle(),
+				@"Type",
+				@"Type label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+			description = [description stringByAppendingFormat:@"%@: %@\n",typeLabel,kind];
+		}
+		
+		if (width != nil && height != nil)
+		{
+			NSString* size = NSLocalizedStringWithDefaultValue(
+					@"Size",
+					nil,IMBBundle(),
+					@"Size",
+					@"Size label in metadata description");
+			
+			description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
+		}
 	}
-	
-	if (album)
+	else
 	{
-		NSString* albumLabel = NSLocalizedStringWithDefaultValue(
-			@"Album",
-			nil,IMBBundle(),
-			@"Album",
-			@"Album label in metadataDescription");
+		if (artist)
+		{
+			NSString* artistLabel = NSLocalizedStringWithDefaultValue(
+				@"Artist",
+				nil,IMBBundle(),
+				@"Artist",
+				@"Artist label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+			description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+		}
+		
+		if (album)
+		{
+			NSString* albumLabel = NSLocalizedStringWithDefaultValue(
+				@"Album",
+				nil,IMBBundle(),
+				@"Album",
+				@"Album label in metadataDescription");
+
+			description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+		}
 	}
-	
+
 	if (duration)
 	{
 		NSString* durationLabel = NSLocalizedStringWithDefaultValue(

@@ -92,14 +92,20 @@
 	if (source)
 	{
 		CFDictionaryRef propsCF = CGImageSourceCopyPropertiesAtIndex(source,  0,  NULL );
-		NSDictionary *props = (NSDictionary *)propsCF;
-		if (props)
+		if (propsCF)
 		{
+			NSDictionary *props = (NSDictionary *)propsCF;
 			NSMutableDictionary *md = [NSMutableDictionary dictionary];
-			NSNumber *width = [NSNumber numberWithFloat:[[props objectForKey:(NSString *)kCGImagePropertyPixelWidth] floatValue]];
-			NSNumber *height= [NSNumber numberWithFloat:[[props objectForKey:(NSString *)kCGImagePropertyPixelHeight] floatValue]];
+			NSNumber *width = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelWidth];
+			NSNumber *height= (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelHeight];
+			NSNumber *depth = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyDepth];
+			NSString *model = [props objectForKey:(NSString *)kCGImagePropertyColorModel];
+			NSString *filetype = [[aPath pathExtension] uppercaseString];
 			if (width) [md setObject:width forKey:@"width"];
 			if (height) [md setObject:height forKey:@"height"];
+			if (depth) [md setObject:depth forKey:@"depth"];
+			if (model) [md setObject:model forKey:@"model"];
+			if (filetype) [md setObject:filetype forKey:@"filetype"];
 			NSDictionary *exif = [props objectForKey:(NSString *)kCGImagePropertyExifDictionary];
 			if ( nil != exif )
 			{
@@ -114,13 +120,67 @@
 					}
 				}
 			}
-			CFRelease(props);
 			result = [NSDictionary dictionaryWithDictionary:md];
+			CFRelease(propsCF);
 		}
 		CFRelease(source);
 	}
-	return [NSDictionary dictionaryWithDictionary:result];
+	return result;
 }
+
+
++ (NSString*) imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString* description = @"";
+	NSNumber* width = [inMetadata objectForKey:@"width"];
+	NSNumber* height = [inMetadata objectForKey:@"height"];
+	NSNumber* depth = [inMetadata objectForKey:@"depth"];
+	NSNumber* model = [inMetadata objectForKey:@"model"];
+	NSString* type = [inMetadata objectForKey:@"ImageType"];
+	NSString* filetype = [inMetadata objectForKey:@"filetype"];
+	NSString* date = [inMetadata objectForKey:@"dateTimeLocalized"];
+	
+	if (width != nil && height != nil)
+	{
+		NSString* size = NSLocalizedStringWithDefaultValue(
+				@"Size",
+				nil,IMBBundle(),
+				@"Size",
+				@"Size label in metadata description");
+		
+		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
+	}
+	
+	if (depth != nil || model != nil || type != nil)
+	{
+		NSString* typeLabel = NSLocalizedStringWithDefaultValue(
+				@"Type",
+				nil,IMBBundle(),
+				@"Type",
+				@"Type label in metadata description");
+		
+		description = [description stringByAppendingFormat:@"%@: ",typeLabel];
+		if (depth) description = [description stringByAppendingFormat:@"%@bit ",depth];
+		if (model) description = [description stringByAppendingFormat:@"%@ ",model];
+		if (type) description = [description stringByAppendingFormat:@"%@",type];
+		else if (filetype) description = [description stringByAppendingFormat:@"%@",filetype];
+		description = [description stringByAppendingFormat:@"\n"];
+	}
+	
+	if (date != nil)
+	{
+		NSString* dateLabel = NSLocalizedStringWithDefaultValue(
+				@"Date",
+				nil,IMBBundle(),
+				@"Date",
+				@"Date label in metadata description");
+		
+		description = [description stringByAppendingFormat:@"%@: %@\n",dateLabel,date];
+	}
+	
+	return description;
+}
+
 
 + (NSImage *)genericFolderIcon
 {

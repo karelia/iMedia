@@ -50,6 +50,7 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,6 +59,19 @@
 #pragma mark CLASSES
 
 @class FMDatabase;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@interface IMBLightroomObject : IMBObject
+{
+	NSDictionary* _lightroomMetadata;
+}
+
+@property (retain) NSDictionary* lightroomMetadata;
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------

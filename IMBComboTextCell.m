@@ -341,12 +341,6 @@
 	else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
 		QTMovie* movie = (QTMovie*) _imageRepresentation;
-//		NSImage* image = movie.posterImage;
-//		CGFloat width = image.size.width;
-//		CGFloat height = image.size.height;
-//		NSRect rect = [self imageRectForFrame:imageRect imageWidth:width imageHeight:height];
-//
-//		[image drawInRect:rect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 		
 		NSError* error = nil;
 		QTTime duration = movie.duration;

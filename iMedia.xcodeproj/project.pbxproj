@@ -35,6 +35,8 @@
 		D02D175A1081CF3B00142E8A /* IMBGarageBandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */; };
 		D02D175B1081CF3B00142E8A /* IMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */; };
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
+		D032CB7A109A2F4A00D84782 /* IMBMovieObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D032CB78109A2F4A00D84782 /* IMBMovieObject.h */; };
+		D032CB7B109A2F4A00D84782 /* IMBMovieObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D032CB79109A2F4A00D84782 /* IMBMovieObject.m */; };
 		D03C2840108265C300BD55CF /* IMBiPhotoVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */; };
 		D03C2841108265C300BD55CF /* IMBiPhotoVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */; };
 		D0403B5110918C03000F0AE1 /* IMBSafariBookmarkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0403B4F10918C03000F0AE1 /* IMBSafariBookmarkParser.h */; };
@@ -309,6 +311,8 @@
 		D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBGarageBandParser.h; sourceTree = "<group>"; };
 		D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBGarageBandParser.m; sourceTree = "<group>"; };
 		D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = IMBComboViewTemplate.pdf; sourceTree = "<group>"; };
+		D032CB78109A2F4A00D84782 /* IMBMovieObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieObject.h; sourceTree = "<group>"; };
+		D032CB79109A2F4A00D84782 /* IMBMovieObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieObject.m; sourceTree = "<group>"; };
 		D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoVideoParser.h; sourceTree = "<group>"; };
 		D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoVideoParser.m; sourceTree = "<group>"; };
 		D0403B4F10918C03000F0AE1 /* IMBSafariBookmarkParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBSafariBookmarkParser.h; sourceTree = "<group>"; };
@@ -743,6 +747,8 @@
 				D09930B81010F6C100C527B7 /* IMBNode.m */,
 				D09930B91010F6C100C527B7 /* IMBObject.h */,
 				D09930BA1010F6C100C527B7 /* IMBObject.m */,
+				D032CB78109A2F4A00D84782 /* IMBMovieObject.h */,
+				D032CB79109A2F4A00D84782 /* IMBMovieObject.m */,
 				D010384A10714CB3007C88D7 /* IMBNodeObject.h */,
 				D010384B10714CB3007C88D7 /* IMBNodeObject.m */,
 				D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */,
@@ -1031,6 +1037,7 @@
 				D0F2DB9B1098262D004280C1 /* FMDatabase.h in Headers */,
 				D0F2DB9D1098262D004280C1 /* FMDatabaseAdditions.h in Headers */,
 				D0F2DBA01098262D004280C1 /* FMResultSet.h in Headers */,
+				D032CB7A109A2F4A00D84782 /* IMBMovieObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1262,6 +1269,7 @@
 				D0F2DB9E1098262D004280C1 /* FMDatabaseAdditions.m in Sources */,
 				D0F2DB9F1098262D004280C1 /* fmdb.m in Sources */,
 				D0F2DBA11098262D004280C1 /* FMResultSet.m in Sources */,
+				D032CB7B109A2F4A00D84782 /* IMBMovieObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

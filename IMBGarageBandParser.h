@@ -55,9 +55,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class IMBTimecodeTransformer;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 @interface IMBGarageBandParser : IMBFolderParser
+{
+	IMBTimecodeTransformer* _timecodeTransformer;
+}
+
+@property (retain) IMBTimecodeTransformer* timecodeTransformer;
 
 @end
 

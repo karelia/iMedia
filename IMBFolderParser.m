@@ -214,30 +214,8 @@
 				
 				else if ([self fileAtPath:path conformsToUTI:_fileUTI])
 				{
-					IMBObject* object = [[IMBObject alloc] init];
-					object.location = (id)path;
-					object.name = file;
-					object.parser = self;
-					object.index = index++;
-					
-					// If the file is movie, then we want a movie representation. For all other file types
-					// we will just use an image representation...
-					
-					if ([self fileAtPath:path conformsToUTI:(NSString *)kUTTypeMovie])
-					{
-						object.imageRepresentationType = IKImageBrowserQTMovieRepresentationType; 
-					}
-					else
-					{
-						object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
-					}
-					
-					object.imageLocation = path;
-					object.imageRepresentation = nil;		// will be loaded lazily when needed
-					object.metadata = nil;					// will be loaded lazily when needed
-
+					IMBObject* object = [self objectForPath:path name:file index:index++];
 					[objects addObject:object];
-					[object release];
 				}
 			}
 		}
@@ -268,7 +246,6 @@
 
 			IMBNodeObject* object = [[IMBNodeObject alloc] init];
 			object.location = (id)subnode;
-//			object.path = (id)folder;
 			object.name = name;
 			object.metadata = nil;
 			object.parser = self;
@@ -338,12 +315,44 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex
+{
+	IMBObject* object = [[[IMBObject alloc] init] autorelease];
+	object.location = (id)inPath;
+	object.name = inName;
+	object.parser = self;
+	object.index = inIndex;
+	
+	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
+	object.imageLocation = inPath;
+	object.imageRepresentation = nil;		// will be loaded lazily when needed
+	object.metadata = nil;					// will be loaded lazily when needed
+	
+	return object;
+}
+
+
+// Loaded lazily when actually needed for display. This method may be called on a background thread, 
+// so setters should only be called to the main thread...
+
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
 	if (![inObject isKindOfClass:[IMBNodeObject class]])
 	{
-		inObject.metadata = [self metadataForFileAtPath:inObject.path];
-		inObject.metadataDescription = [self metadataDescriptionForMetadata:inObject.metadata];
+		NSDictionary* metadata = [self metadataForFileAtPath:inObject.path];
+		NSString* description = [self metadataDescriptionForMetadata:metadata];
+		
+		if ([NSThread isMainThread])
+		{
+			inObject.metadata = metadata;
+			inObject.metadataDescription = description;
+		}
+		else
+		{
+			NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+			[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+			[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+		}
 	}
 }
 

@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -41,7 +41,7 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
+#import "IMBMovieObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,24 +57,30 @@
 
 #pragma mark 
 
-// This parser class creates nodes for a folder and populates it with files that conform to the specified uti...
- 
-@interface IMBFolderParser : IMBParser
-{
-	NSString* _fileUTI;
-}
+@implementation IMBMovieObject
 
-@property (retain) NSString* fileUTI;
-
-- (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI;
-- (NSImage*) iconForPath:(NSString*)inPath;
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
-+ (NSString*) identifierForPath:(NSString*)inPath;
-- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
-
-@end
+@synthesize posterFrame = _posterFrame;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+- (void) setPosterFrame:(CGImageRef)inPosterFrame
+{
+	CGImageRef old = _posterFrame;
+	_posterFrame = CGImageRetain(inPosterFrame);
+	CGImageRelease(old);
+}
+
+
+- (void) dealloc
+{
+	if (_posterFrame) CGImageRelease(_posterFrame);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end
