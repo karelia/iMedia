@@ -71,7 +71,17 @@
 	QTMovie* _playingAudio;
 }
 
-- (IBAction) play:(id)inSender;
+// This is not currently invoked directly from any control's action, but 
+// conceptually it is an action method, so I'm leaving it an IBAction.
+- (IBAction) startPlayingSelection:(id)inSender;
+
+// This artificial property is actually hooked conceptually to whether the 
+// QTMovie _playingAudio is nil or not. The status isPlaying is tied to the 
+// _playButton wiht bindings, causing it to show lit up or not depending. As
+// a toggle button, the play button will set isPlaying to YES or NO, depending.
+- (BOOL) isPlaying;
+- (void) setIsPlaying:(BOOL)shouldPlay;
+
 - (void) playAudioObject:(IMBObject*)inObject;
 @property (retain) QTMovie* playingAudio;
 

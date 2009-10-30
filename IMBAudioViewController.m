@@ -192,7 +192,7 @@
 		}
 		else
 		{
-			[self play:inSender];
+			[self startPlayingSelection:inSender];
 			return;
 		}
 		
@@ -206,7 +206,7 @@
 {
 	if (self.playingAudio.rate > 0.0)
 	{
-		[self play:nil];
+		[self startPlayingSelection:nil];
 	}
 	else
 	{
@@ -217,25 +217,46 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+- (BOOL) isPlaying
+{
+	return (self.playingAudio != nil);
+}
 
-- (IBAction) play:(id)inSender
+- (void) setIsPlaying:(BOOL)shouldPlay
+{
+	if ([self isPlaying] != shouldPlay)
+	{
+		if (shouldPlay)
+		{
+			// starts playing with the current selection
+			NSArray* objects = [ibObjectArrayController arrangedObjects];
+			NSIndexSet* rows = [ibListView selectedRowIndexes];
+			NSUInteger row = [rows firstIndex];
+				
+			if (row != NSNotFound && row < [objects count])
+			{
+				IMBObject* object = (IMBObject*) [objects objectAtIndex:row];
+				
+				// Sets self.playingAudio 
+				[self playAudioObject:object];
+			}
+		}
+		else
+		{
+			[self.playingAudio stop];
+			self.playingAudio = nil;		
+		}
+	}
+}
+
+// Invoked e.g. when double-clicking on a specific song file
+- (IBAction) startPlayingSelection:(id)inSender
 {
 	// First stop any audio that may currently be playing...
+	[self setIsPlaying:NO];
 	
-	[self.playingAudio stop];
-	self.playingAudio = nil;
-	
-	// Start playing what the new selection...
-	
-	NSArray* objects = [ibObjectArrayController arrangedObjects];
-	NSIndexSet* rows = [ibListView selectedRowIndexes];
-	NSUInteger row = [rows firstIndex];
-		
-	if (row != NSNotFound && row < [objects count])
-	{
-		IMBObject* object = (IMBObject*) [objects objectAtIndex:row];
-		[self playAudioObject:object];
-	}
+	// Start playing whatever the current selection is...
+	[self setIsPlaying:YES];
 }
 
 
