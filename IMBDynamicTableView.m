@@ -44,6 +44,7 @@
  */
 
 #import "IMBDynamicTableView.h"
+#import "IMBCommon.h"
 
 @interface NSTableView()
 // Define this so we can call through to super, for when we are running Snow Leopard
@@ -205,15 +206,12 @@
 }
 
 // Snow Leopard Only, so we implement our own if we're not running snow leopard.
-#ifndef NSAppKitVersionNumber10_5
-#define NSAppKitVersionNumber10_5 949
-#endif
 
 - (void)reloadDataForRowIndexes:(NSIndexSet *)rowIndexes columnIndexes:(NSIndexSet *)columnIndexes
 {
 	[self _removeCachedViewsInIndexSet:rowIndexes];
 	
-	if (floor(NSAppKitVersionNumber) > floor(NSAppKitVersionNumber10_5))
+	if (IMBIsSnowLeopardOrGreater())
 	{
 		[super reloadDataForRowIndexes:rowIndexes columnIndexes:columnIndexes];
 	}

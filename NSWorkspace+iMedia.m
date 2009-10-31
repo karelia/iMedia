@@ -47,47 +47,31 @@
 
 #import "NSWorkspace+iMedia.h"
 
-#ifndef NSAppKitVersionNumber10_4
-#define NSAppKitVersionNumber10_4 824
-#endif
-
 @implementation NSWorkspace (iMediaExtensions)
 
 + (NSWorkspace *)threadSafeWorkspace
 {
 	NSWorkspace*	instance = nil;
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	// Tiger and earlier...
-	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4)
-	{
-		instance = [NSWorkspace sharedWorkspace];
-	}
-	else
-#endif
+	static NSString* sMutex = @"threadSafeWorkspaceMutex";
 
-	// Leopard and later...
+	@synchronized(sMutex)
 	{
-		static NSString* sMutex = @"threadSafeWorkspaceMutex";
+		static NSMutableDictionary* sPerThreadInstances = nil;
 
-		@synchronized(sMutex)
+		if (sPerThreadInstances == nil)
 		{
-			static NSMutableDictionary* sPerThreadInstances = nil;
-	
-			if (sPerThreadInstances == nil)
-			{
-				sPerThreadInstances =[[NSMutableDictionary alloc] init];
-			}
-			
-			NSString *threadID = [NSString stringWithFormat:@"%p",[NSThread currentThread]];
-
-			instance = [sPerThreadInstances objectForKey:threadID];
-			if (instance == nil)
-			{
-				instance = [[[NSWorkspace alloc] init] autorelease];
-				[sPerThreadInstances setObject:instance forKey:threadID];
-			}	 
+			sPerThreadInstances =[[NSMutableDictionary alloc] init];
 		}
+		
+		NSString *threadID = [NSString stringWithFormat:@"%p",[NSThread currentThread]];
+
+		instance = [sPerThreadInstances objectForKey:threadID];
+		if (instance == nil)
+		{
+			instance = [[[NSWorkspace alloc] init] autorelease];
+			[sPerThreadInstances setObject:instance forKey:threadID];
+		}	 
 	}
 
 	return instance;	

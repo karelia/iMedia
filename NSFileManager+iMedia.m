@@ -45,10 +45,6 @@
 
 #import "NSFileManager+iMedia.h"
 
-#ifndef NSAppKitVersionNumber10_4
-#define NSAppKitVersionNumber10_4 824
-#endif
-
 #ifndef NSMakeCollectable
 #define NSMakeCollectable(x) (id)(x)
 #endif
@@ -58,40 +54,28 @@
 + (NSFileManager *)threadSafeManager
 {
 	NSFileManager*	instance = nil;
+		
+	static NSString* sMutex = @"threadSafeFileManagerMutex";
 	
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	// Tiger and earlier...
-	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4)
+	@synchronized(sMutex)
 	{
-		instance = [NSFileManager defaultManager];
-	}
-	else
-#endif
+		static NSMutableDictionary* sPerThreadInstances = nil;
 		
-		// Leopard and later...
-	{
-		static NSString* sMutex = @"threadSafeFileManagerMutex";
-		
-		@synchronized(sMutex)
+		if (sPerThreadInstances == nil)
 		{
-			static NSMutableDictionary* sPerThreadInstances = nil;
-			
-			if (sPerThreadInstances == nil)
-			{
-				sPerThreadInstances = [[NSMutableDictionary alloc] init];
-			}
-			
-			NSString *threadID = [NSString stringWithFormat:@"%p",[NSThread currentThread]];
-			instance = [sPerThreadInstances objectForKey:threadID];
-			
-			if (instance == nil)
-			{
-				instance = [[[NSFileManager alloc] init] autorelease];
-				[sPerThreadInstances setObject:instance forKey:threadID];
-			}	 
+			sPerThreadInstances = [[NSMutableDictionary alloc] init];
 		}
+		
+		NSString *threadID = [NSString stringWithFormat:@"%p",[NSThread currentThread]];
+		instance = [sPerThreadInstances objectForKey:threadID];
+		
+		if (instance == nil)
+		{
+			instance = [[[NSFileManager alloc] init] autorelease];
+			[sPerThreadInstances setObject:instance forKey:threadID];
+		}	 
 	}
-	
+
 	return instance;	
 }
 

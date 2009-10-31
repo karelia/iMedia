@@ -117,5 +117,15 @@ typedef NSUInteger IMBGroupType;
 #define IMBBundle() [NSBundle bundleForClass:NSClassFromString(@"IMBConfig")]
 #endif
 
+// Version checks in a centralized location for easy safe-adoption of features conditional on running OS version
+
+#ifndef NSAppKitVersionNumber10_5
+#define NSAppKitVersionNumber10_6 1000	// NOTE(jalkut): I don't think this is exactly right, my 10.6.1 system reports 1038.1,
+										// but it's "good enough" in that it's higher than 10.5's version of 949.x,
+										// and it was the constant already in use in the source code.
+										// (I'm guessing it was a pre-GM Snow Leopard version number)
+#endif
+
+#define IMBIsSnowLeopardOrGreater()	(NSAppKitVersionNumber >= NSAppKitVersionNumber10_6)
 
 //----------------------------------------------------------------------------------------------------------------------

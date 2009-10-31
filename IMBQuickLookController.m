@@ -46,8 +46,6 @@
 #import "IMBQuickLookController.h"
 #import "QLPreviewPanel.h"
 
-#define NSAppKitVersionNumber_SnowLeopard (1000.0)
-
 #pragma mark Localization 
 
 #define SERVICE_BUNDLE [NSBundle bundleWithIdentifier:@"com.boinx.BXServices"]
@@ -96,7 +94,7 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	{
 		_available = [[NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
 	}
-	if (_available && QLPreviewPanelClass != Nil && NSAppKitVersionNumber < NSAppKitVersionNumber_SnowLeopard)
+	if (_available && QLPreviewPanelClass != Nil && (IMBIsSnowLeopardOrGreater() == NO))
 	{
 		[[[QLPreviewPanelClass sharedPreviewPanel] windowController] setDelegate:self];
 	}
@@ -143,7 +141,7 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 		_URLs = [[dataSource URLsForQuickLookController:self] retain];
 		[old release];
 		
-		if (NSAppKitVersionNumber >= NSAppKitVersionNumber_SnowLeopard)
+		if (IMBIsSnowLeopardOrGreater())
 		{
 			[panel reloadData];
 		}
@@ -191,7 +189,7 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	
 	if ([self isOpen])
 	{
-		if (NSAppKitVersionNumber >= NSAppKitVersionNumber_SnowLeopard)
+		if (IMBIsSnowLeopardOrGreater())
 			[panel close];
 		else
 			[panel closeWithEffect:2];
@@ -199,7 +197,7 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	}
 	else if ([self canOpen])
 	{
-		if (NSAppKitVersionNumber >= NSAppKitVersionNumber_SnowLeopard)
+		if (IMBIsSnowLeopardOrGreater())
 			[panel makeKeyAndOrderFront:nil];
 		else
 			[panel makeKeyAndOrderFrontWithEffect:2];
