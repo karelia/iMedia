@@ -479,11 +479,35 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 }
 
 
+// Returns all loaded parsers...
+
+- (NSMutableArray*) loadedParsers
+{
+	NSMutableArray* parsers = nil;
+	
+	@synchronized(self)
+	{
+		if (_loadedParsers)
+		{
+			parsers = [NSMutableArray array];
+			
+			for (NSString* mediaType in _loadedParsers)
+			{	
+				NSArray* parsersForMediaType = [_loadedParsers objectForKey:mediaType];
+				[parsers addObjectsFromArray:parsersForMediaType];
+			}
+		}
+	}
+		
+	return parsers;							
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark
-#pragma mark Degbugging
+#pragma mark Debugging
 
 
 // Logs the list of registered parser classes. Please note that these classes may not have been instantiated yet...
