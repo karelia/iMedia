@@ -102,10 +102,11 @@
 - (void) saveCustomParsersToPreferences;
 - (void) loadCustomParsersFromPreferences;
 
-// Returns an array of loaded parser. This combines the regular parsers (which were instantiated by loadParsers)
+// Returns an array of loaded parsers. This combines the regular parsers (which were instantiated by loadParsers)
 // with the custom parsers (which were instantiated by the user or by loadCustomParsersFromPreferences)...
 
 - (NSMutableArray*) loadedParsersForMediaType:(NSString*)inMediaType; 
+- (NSMutableArray*) loadedParsers;
 
 // Debugging support...
 
