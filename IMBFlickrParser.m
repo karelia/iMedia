@@ -132,12 +132,7 @@
 	if (![sender isKindOfClass:[NSMenuItem class]]) return;
 	
 	id obj = [sender representedObject];
-	if ([obj isKindOfClass:[NSString class]]) {
-		NSString* identifier = (NSString*) obj;
-		
-		IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
-		IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:identifier];
-		
+	if ([obj isKindOfClass:[NSString class]]) {				
 		if (_customQueries.count > 0) {
 			[_customQueries removeLastObject];
 		}
