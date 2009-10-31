@@ -1078,12 +1078,17 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+//
 // Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
 // start loading the objects in the promise and iterate over the resulting files...
+//
+// This method is used for both imageBrowser:writeItemsAtIndexes:toPasteboard: and tableView:writeRowsWithIndexes:toPasteboard:
+//
 
-- (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
+- (NSUInteger) writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
 	IMBNode* node = self.currentNode;
+	NSUInteger itemsWritten = 0;
 	
 	if (node)
 	{
@@ -1092,16 +1097,25 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		IMBParser* parser = node.parser;
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
-		
-		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,/*NSFilesPromisePboardType,*/NSFilenamesPboardType,nil] owner:self];
+
+		// We declare NSFilenamesPboardType , but only bother providing for it in the callback pasteboard:provideDataForType:
+		// We always set our primary pasteboard type, the object promises.
+		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil] owner:self];
 		[inPasteboard setData:data forType:kIMBObjectPromiseType];
-		//		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
+				
+		// Ideally we should be able to provide NSFilesPromisePboardType as well, but we haven't figured it out yet
+		// [inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
 		
 		_isDragging = YES;
-		return objects.count;
+		itemsWritten = objects.count;
 	}
 	
-	return 0;
+	return itemsWritten;	
+}
+
+- (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
+{
+	return [self writeItemsAtIndexes:inIndexes toPasteboard:inPasteboard];
 }
 
 
@@ -1237,25 +1251,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (BOOL) tableView:(NSTableView*)inTableView writeRowsWithIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard 
 {
-	IMBNode* node = self.currentNode;
-	
-	if (node)
-	{
-		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
-		
-		IMBParser* parser = node.parser;
-		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:promise];
-		
-		[inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBObjectPromiseType,/*NSFilesPromisePboardType,*/NSFilenamesPboardType,nil] owner:self];
-		[inPasteboard setData:data forType:kIMBObjectPromiseType];
-		//		[inPasteboard setPropertyList:[NSArray arrayWithObject:@"jpg"] forType:NSFilesPromisePboardType];
-		
-		_isDragging = YES;
-		return YES;
-	}
-	
-	return NO;
+	return ([self writeItemsAtIndexes:inIndexes toPasteboard:inPasteboard] > 0);
 }
 
 
