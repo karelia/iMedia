@@ -138,7 +138,7 @@
 
 }
 
-- (void) didDeselectParser
+- (void) didStopUsingParser
 {
 
 }

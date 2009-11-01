@@ -79,8 +79,7 @@
 
 @property (retain) NSString* mediaSource;
 
-// The mediaType can be @"photos",@"music",@"movies",etc. IMBCommon.h contains constants for the type.
-// The subType is used for sorting and can be @"library",@"device",@"folder",@"custom"...
+// The mediaType can be @"image",@"audio",@"movie",etc. IMBCommon.h contains constants for the type...
 
 @property (retain) NSString* mediaType;
 @property (getter=isCustom) BOOL custom;
@@ -106,7 +105,7 @@
 
 // Called after a node was deselected. The parser can release its cached data (if present)...
 
-- (void) didDeselectParser;
+- (void) didStopUsingParser;
 
 // Called when a file watcher fires and it concerns a parser. Also gives a parser a chance to update any cached data...
 
@@ -119,7 +118,7 @@
 - (void) objectViewDidChangeIconSize:(NSSize)inSize;
 
 // Called when the user right-clicks on a node in the IMBOutlineView. Here the parser has a chance to add custom
-// menu items of its own, that go beyond the funtionality of the standard items added by teh controllers...
+// menu items of its own, that go beyond the functionality of the standard items added by the controllers...
 
 - (void) willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
 - (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
