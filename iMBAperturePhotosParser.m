@@ -72,6 +72,13 @@
 //#define SHOW_TOP_LEVEL_APERTURE_KNOT
 
 
+@interface iMBAperturePhotosParser (Private)
+
++ (NSString*)pathForVolumeNamed:(NSString *)name;
+
+@end
+
+
 @implementation iMBAperturePhotosParser
 
 + (void)load
@@ -358,22 +365,20 @@
 			NSString *apFile = [localPath stringByAppendingPathExtension:@"apfile"];
 			NSDictionary *apDict = [NSDictionary dictionaryWithContentsOfFile:apFile];
 			NSString *imagePath = [apDict objectForKey:@"imagePath"];
-			NSDictionary *volumeInfo = [apDict objectForKey:@"volumeInfo"];
-			NSString *volumeName = [volumeInfo objectForKey:@"volumeName"];
 			
-			if (volumeName != nil) {
-				imagePath = [[@"/Volumes" stringByAppendingPathComponent:volumeName] stringByAppendingPathComponent:imagePath];
-			}
-			else {
-				imagePath = [@"/" stringByAppendingString:imagePath];
-			}
-
-			if ([fileManager fileExistsAtPath:imagePath]) {
-				masterPath = imagePath;
+			if (imagePath != nil) {
+				NSDictionary *volumeInfo = [apDict objectForKey:@"volumeInfo"];
+				NSString *volumeName = [volumeInfo objectForKey:@"volumeName"];
+				NSString *volumePath = [iMBAperturePhotosParser pathForVolumeNamed:volumeName];
+				NSString *fullPath = [volumePath stringByAppendingPathComponent:imagePath];
+				
+				if ([fileManager fileExistsAtPath:fullPath]) {
+					masterPath = fullPath;
+				}
 			}
 		}
 	}
-		
+	
 	if (masterPath == nil) { // The master file is a referenced external file	
 		NSRange range = [previewPath rangeOfString:@".aplibrary/"];
 		NSString *libraryPath = [previewPath substringToIndex:(range.location + range.length)];
@@ -394,16 +399,16 @@
 			}
 			
 			[fileUUIDResult close];		
-
+			
 			if (fileUUID != nil) {
 				FMResultSet *imagePathResult = [database executeQuery:@"SELECT zimagepath FROM zrkfile WHERE zuuid = ?", fileUUID];
-			
+				
 				if ([imagePathResult next]) {
 					imagePath =[imagePathResult stringForColumn:@"zimagepath"];
 				}
 				
 				[imagePathResult close];		
-
+				
 				FMResultSet *fileVolumeUUIDResult = [database executeQuery:@"SELECT zfilevolumeuuid FROM zrkfile WHERE zuuid = ?", fileUUID];
 				
 				if ([fileVolumeUUIDResult next]) {
@@ -411,14 +416,14 @@
 				}
 				
 				[fileVolumeUUIDResult close];		
-			
+				
 				if (fileVolumeUUID != nil) {
 					FMResultSet *volumeNameResult = [database executeQuery:@"SELECT zname FROM zrkvolume WHERE zuuid = ?", fileVolumeUUID];
-						
+					
 					if ([volumeNameResult next]) {
 						volumeName = [volumeNameResult stringForColumn:@"zname"];
 					}
-
+					
 					[volumeNameResult close];		
 				}
 			}
@@ -439,7 +444,7 @@
 				if ([imagePathResult next]) {
 					imagePath = [imagePathResult stringForColumn:@"zimagepath"];
 				}
-
+				
 				[imagePathResult close];
 				
 				if (imagePath != nil) {
@@ -468,17 +473,11 @@
 			}
 			
 			if (imagePath != nil) {
-				if (volumeName == nil) {
-					volumeName = @"/";
-				}
-				else if (![volumeName hasPrefix:@"/Volumes/"]) {
-					volumeName = [@"/Volumes/" stringByAppendingPathComponent:volumeName];
-				}
+				NSString *volumePath = [iMBAperturePhotosParser pathForVolumeNamed:volumeName];
+				NSString *fullPath = [volumePath stringByAppendingPathComponent:imagePath];
 				
-				imagePath = [volumeName stringByAppendingPathComponent:imagePath];
-				
-				if ([fileManager fileExistsAtPath:imagePath]) {
-					masterPath = imagePath;
+				if ([fileManager fileExistsAtPath:fullPath]) {
+					masterPath = fullPath;
 				}
 			}
 			
@@ -496,6 +495,27 @@
 	}
 	
 	return record;
+}
+
++ (NSString*)pathForVolumeNamed:(NSString *)name
+{
+	if (name != nil) {
+		HFSUniStr255 volumeName;
+		FSRef volumeFSRef;
+		unsigned int volumeIndex = 1;
+		
+		while (FSGetVolumeInfo(kFSInvalidVolumeRefNum, volumeIndex++, NULL, kFSVolInfoNone, NULL, &volumeName, &volumeFSRef) == noErr) {
+			if ([[NSString stringWithCharacters:volumeName.unicode length:volumeName.length] isEqualToString:name]) {
+				NSURL *url = [(NSURL *)CFURLCreateFromFSRef(NULL, &volumeFSRef) autorelease];
+				
+				return [url path];
+			}
+		}
+		
+		return [@"/Volumes" stringByAppendingPathComponent:name];
+	}
+	
+	return @"/";
 }
 
 @end
