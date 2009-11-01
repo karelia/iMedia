@@ -49,6 +49,7 @@
 
 #pragma mark CONSTANTS
 
+
 // Options to control behavior of the framework...
 
 enum
@@ -57,6 +58,7 @@ enum
 	kIMBOptionForceRecursiveLoading = 1
 };
 typedef NSUInteger IMBOptions;
+
 
 // File watcher type for an IMBNode...
 
@@ -68,6 +70,7 @@ enum
 	kIMBWatcherTypeFirstCustom = 1000
 };
 typedef NSUInteger IMBWatcherType;
+
 
 // Badge type for IMBNode. A corresponding icon will be displayed in the cell...
 
@@ -82,6 +85,7 @@ enum
 };
 typedef NSUInteger IMBBadgeType;
 
+
 // Media types...
 
 extern NSString* kIMBMediaTypeImage;
@@ -89,6 +93,7 @@ extern NSString* kIMBMediaTypeAudio;
 extern NSString* kIMBMediaTypeMovie;
 extern NSString* kIMBMediaTypeLink;
 extern NSString* kIMBMediaTypeContact;
+
 
 // Group types...
 
@@ -104,6 +109,11 @@ enum
 typedef NSUInteger IMBGroupType;
 
 
+// Common error codes...
+
+#define kIMBErrorDomain @"com.karelia.imedia"
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -117,9 +127,10 @@ typedef NSUInteger IMBGroupType;
 #define IMBBundle() [NSBundle bundleForClass:NSClassFromString(@"IMBConfig")]
 #endif
 
+
 // Version checks in a centralized location for easy safe-adoption of features conditional on running OS version
 
-#ifndef NSAppKitVersionNumber10_5
+#ifndef NSAppKitVersionNumber10_6
 #define NSAppKitVersionNumber10_6 1000	// NOTE(jalkut): I don't think this is exactly right, my 10.6.1 system reports 1038.1,
 										// but it's "good enough" in that it's higher than 10.5's version of 949.x,
 										// and it was the constant already in use in the source code.
@@ -127,5 +138,6 @@ typedef NSUInteger IMBGroupType;
 #endif
 
 #define IMBIsSnowLeopardOrGreater()	(NSAppKitVersionNumber >= NSAppKitVersionNumber10_6)
+
 
 //----------------------------------------------------------------------------------------------------------------------
