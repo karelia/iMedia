@@ -266,7 +266,7 @@
 	{
 		NSDictionary* plist = [self plist];
 		[self populateNode:inNode plist:plist];
-		[self didDeselectParser];
+		[self didStopUsingParser];
 	}
 
 	if (outError) *outError = error;
@@ -280,7 +280,7 @@
 // When the parser is deselected, then get rid of the cached plist data. It will be loaded into memory lazily 
 // once it is needed again...
 
-- (void) didDeselectParser
+- (void) didStopUsingParser
 {
 	self.plist = nil;
 }

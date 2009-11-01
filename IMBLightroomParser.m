@@ -253,7 +253,7 @@ static NSArray* sSupportedUTIs = nil;
 		
 		for (NSString* libraryPath in libraryPaths)
 		{
-			IMBLightroomParser* parser = [[IMBLightroomParser alloc] initWithMediaType:inMediaType];
+			IMBLightroomParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = libraryPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			[parserInstances addObject:parser];
@@ -411,7 +411,7 @@ static NSArray* sSupportedUTIs = nil;
 
 // When the parser is deselected, then get rid of cached data. In our case we can close the database...
 
-- (void) didDeselectParser
+- (void) didStopUsingParser
 {
 	[self closeDatabase];
 }

@@ -526,7 +526,7 @@ static NSString* kSelectionKey = @"selection";
 		
 		if (self.selectedParser != node.parser)
 		{
-			[self.selectedParser didDeselectParser];
+			[self.selectedParser didStopUsingParser];
 			self.selectedParser = node.parser;
 		}
 	}

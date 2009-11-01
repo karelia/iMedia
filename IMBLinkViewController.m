@@ -157,7 +157,7 @@
 #pragma mark 
 #pragma mark NSTableViewDelegate
  
-
+/*
 // Upon doubleclick start playing the selection...
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
@@ -192,7 +192,7 @@
 {
 
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
