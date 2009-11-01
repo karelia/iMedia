@@ -293,7 +293,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	
 	NSURL* localURL = [inObject url];
 	
-	// For file URLs, only add if the file at the path exists.
+	// For file URLs, only add if the file at the path exists...
+	
 	if ([localURL isFileURL])
 	{
 		BOOL exists,directory;
@@ -305,8 +306,9 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		}
 	}
 
-	// If we have a valid URL, add it to our array...
-	// If we were not able to construct a suitable URL, then issue an error instead...		
+	// If we have a valid URL, add it to our array. If we were not able to construct a suitable URL, 
+	// then issue an error instead...		
+	
 	if (localURL != nil)
 	{	
 		[self.localURLs addObject:localURL];
@@ -322,7 +324,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		
 		NSString* description = [NSString stringWithFormat:format,inObject.name];
 		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
-		NSError* error = [NSError errorWithDomain:@"com.karelia.imedia" code:fnfErr userInfo:info];
+		NSError* error = [NSError errorWithDomain:kIMBErrorDomain code:fnfErr userInfo:info];
 		
 		[self.localURLs addObject:error];
 		_objectCountLoaded++;
