@@ -55,6 +55,9 @@ extern NSString* kIMBObjectPromiseType;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+@class IMBObject;
+
+
 #pragma mark 
 
 // An IMBObjectPromise is a abstraction that is sitting between the iMedia framework and the client application. 
@@ -65,9 +68,9 @@ extern NSString* kIMBObjectPromiseType;
 
 @interface IMBObjectPromise : NSObject <NSCopying,NSCoding>
 {
-	NSArray* _objects; 
+	NSMutableDictionary* _objectsToLocalURLs;
+
 	NSString* _downloadFolderPath;
-	NSMutableArray* _localURLs;
 	NSError* _error;
 	
 	double _objectCountTotal;
@@ -77,9 +80,9 @@ extern NSString* kIMBObjectPromiseType;
 	SEL _finishSelector;
 }
 
-/// Array of IMBObjects
+/// Array of IMBObjects that was supplied in the init method
 
-@property (retain) NSArray* objects;
+@property (retain,readonly) NSArray* objects;
 
 /// Optional download folder (only needed for remote files that need to be downloaded)
 
@@ -91,7 +94,7 @@ extern NSString* kIMBObjectPromiseType;
 ///
 /// NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
 
-@property (retain) NSMutableArray* localURLs; 
+@property (retain,readonly) NSArray* localURLs; 
 
 /// Retained due to asynchronous nature of the promise
 
@@ -114,6 +117,10 @@ extern NSString* kIMBObjectPromiseType;
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
 - (void) waitUntilDone;
 		
+/// After loading is done, you can ask for a local URL specifically by the object you're interested in
+
+- (NSURL*) localURLForObject:(IMBObject*)inObject;
+
 @end
 
 

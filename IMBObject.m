@@ -269,6 +269,10 @@
 	return [self.location isEqual:inObject.location];
 }
 
+- (NSUInteger) hash
+{
+	return [self.location hash];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

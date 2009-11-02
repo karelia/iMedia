@@ -67,7 +67,7 @@
 
 #pragma mark CONSTANTS
 	
-NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
+NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,6 +79,9 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 - (void) _countObjects:(NSArray*)inObjects;
 - (void) _loadObjects:(NSArray*)inObjects;
 - (void) _loadObject:(IMBObject*)inObject;
+
+@property (retain) NSMutableDictionary* objectsToLocalURLs;
+
 @end
 
 
@@ -89,9 +92,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 @implementation IMBObjectPromise
 
-@synthesize objects = _objects;
+@synthesize objectsToLocalURLs = _objectsToLocalURLs;
 @synthesize downloadFolderPath = _downloadFolderPath;
-@synthesize localURLs = _localURLs;
 @synthesize error = _error;
 @synthesize delegate = _delegate;
 @synthesize finishSelector = _finishSelector;
@@ -104,9 +106,15 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	if (self = [super init])
 	{
-		self.objects = inObjects;
+		self.objectsToLocalURLs = [NSMutableDictionary dictionaryWithCapacity:inObjects.count];
+
+		// Start our mapping with all null objects (need to fulfill these promises)
+		for (IMBObject* thisObject in inObjects)
+		{
+			[self.objectsToLocalURLs setObject:[NSNull null] forKey:thisObject];
+		}
+		
 		self.downloadFolderPath = [IMBConfig downloadFolderPath];
-		self.localURLs = [NSMutableArray arrayWithCapacity:inObjects.count];
 		self.error = nil;
 		self.delegate = nil;
 		self.finishSelector = NULL;
@@ -123,9 +131,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	if (self = [super init])
 	{
-		self.objects = [inCoder decodeObjectForKey:@"objects"];
+		self.objectsToLocalURLs = [inCoder decodeObjectForKey:@"objectsToLocalURLs"];
 		self.downloadFolderPath = [IMBConfig downloadFolderPath];
-		self.localURLs = [NSMutableArray arrayWithCapacity:self.objects.count];
 		self.delegate = nil;
 		self.finishSelector = NULL;
 		self.error = nil;
@@ -140,7 +147,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
-	[inCoder encodeObject:self.objects forKey:@"objects"];
+	[inCoder encodeObject:self.objectsToLocalURLs forKey:@"objectsToLocalURLs"];
 }
 
 
@@ -148,9 +155,8 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	IMBObjectPromise* copy = [[[self class] allocWithZone:inZone] init];
 	
-	copy.objects = self.objects;
+	copy.objectsToLocalURLs = self.objectsToLocalURLs;
 	copy.downloadFolderPath = self.downloadFolderPath;
-	copy.localURLs = self.localURLs;
 	copy.error = self.error;
 	copy.delegate = self.delegate;
 	copy.finishSelector = self.finishSelector;
@@ -163,14 +169,39 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	
-	IMBRelease(_objects);
+	IMBRelease(_objectsToLocalURLs);
 	IMBRelease(_downloadFolderPath);
-	IMBRelease(_localURLs);
 	IMBRelease(_delegate);
 	IMBRelease(_error);
 	
 	[super dealloc];
 } 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSArray*) objects
+{
+	return [self.objectsToLocalURLs allKeys];
+}
+
+
+- (NSArray*) localURLs
+{
+	return [self.objectsToLocalURLs allValues];
+}
+
+
+- (NSURL*) localURLForObject:(IMBObject*)inObject
+{
+	NSURL* foundURL = [self.objectsToLocalURLs objectForKey:inObject];
+	if ([foundURL isKindOfClass:[NSNull class]])
+	{
+		foundURL = nil;
+	}
+	
+	return foundURL;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -311,7 +342,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 	
 	if (localURL != nil)
 	{	
-		[self.localURLs addObject:localURL];
+		[self.objectsToLocalURLs setObject:localURL forKey:inObject];
 		_objectCountLoaded++;
 	}
 	else
@@ -325,8 +356,9 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		NSString* description = [NSString stringWithFormat:format,inObject.name];
 		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
 		NSError* error = [NSError errorWithDomain:kIMBErrorDomain code:fnfErr userInfo:info];
-		
-		[self.localURLs addObject:error];
+
+		[self.objectsToLocalURLs setObject:error forKey:inObject];
+
 		_objectCountLoaded++;
 	}
 }
@@ -480,6 +512,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 		{
 			NSURL* url = [object url];
 			IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
+			op.delegateReference = object;
 			op.downloadFolderPath = self.downloadFolderPath;
 			[self.downloadOperations addObject:op];
 			[op release];
@@ -566,7 +599,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) didFinish:(IMBURLDownloadOperation*)inOperation
 {
-	[[self localURLs] addObject:[NSURL fileURLWithPath:inOperation.localPath]];
+	[self.objectsToLocalURLs setObject:[NSURL fileURLWithPath:inOperation.localPath] forKey:inOperation.delegateReference];
 	_objectCountLoaded++;
 	
 	if (_objectCountLoaded >= _objectCountTotal)
@@ -589,7 +622,7 @@ NSString* kIMBObjectPromiseType = @"IMBObjectPromiseType";
 
 - (void) didReceiveError:(IMBURLDownloadOperation*)inOperation
 {
-	[self.localURLs addObject:inOperation.error];
+	[self.objectsToLocalURLs setObject:inOperation.error forKey:inOperation.delegateReference];
 	self.error = inOperation.error;
 	_objectCountLoaded++;
 
