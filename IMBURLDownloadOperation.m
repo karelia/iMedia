@@ -71,6 +71,7 @@
 @implementation IMBURLDownloadOperation
 
 @synthesize delegate = _delegate;
+@synthesize delegateReference = _delegateReference;
 @synthesize remoteURL = _remoteURL;
 @synthesize downloadFolderPath = _downloadFolderPath;
 @synthesize localPath = _localPath;
@@ -98,6 +99,7 @@
 
 - (void) dealloc
 {
+	IMBRelease(_delegateReference);
 	IMBRelease(_remoteURL);
 	IMBRelease(_downloadFolderPath);
 	IMBRelease(_localPath);

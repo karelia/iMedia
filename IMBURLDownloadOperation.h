@@ -54,6 +54,7 @@
 @interface IMBURLDownloadOperation : NSOperation
 {
 	id _delegate;
+	id _delegateReference;	
 	NSURL* _remoteURL; 
 	NSString* _downloadFolderPath;
 	NSString* _localPath;
@@ -66,6 +67,7 @@
 }
 
 @property (assign) id delegate;
+@property (retain) id delegateReference;
 @property (retain) NSURL* remoteURL;
 @property (retain) NSString* downloadFolderPath;
 @property (retain) NSString* localPath;

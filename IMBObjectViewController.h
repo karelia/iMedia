@@ -97,9 +97,21 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark SnowLeopard NSPasteboard Declarations
+
+// We have to declare a fake prototype because the 10.6 runtime interrogates our compliance with the protocol,
+// rather that interrogating the presence of the particular method we implement.
+
+#if !defined(MAC_OS_X_VERSION_10_6)
+@protocol NSPasteboardItemDataProvider <NSObject> @end
+#endif
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
-@interface IMBObjectViewController : NSViewController
+@interface IMBObjectViewController : NSViewController <NSPasteboardItemDataProvider>
 {
 	IMBLibraryController* _libraryController;
 	IMBNodeViewController* _nodeViewController;
