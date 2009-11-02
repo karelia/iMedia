@@ -96,6 +96,7 @@
 
 - (void) dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	IMBRelease(_playingAudio);
 	[super dealloc];
 }
@@ -217,10 +218,6 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-- (BOOL) isPlaying
-{
-	return (self.playingAudio != nil);
-}
 
 - (void) setIsPlaying:(BOOL)shouldPlay
 {
@@ -243,19 +240,29 @@
 		}
 		else
 		{
+			[[NSNotificationCenter defaultCenter] removeObserver:self name:QTMovieDidEndNotification object:nil];	
 			[self.playingAudio stop];
-			self.playingAudio = nil;		
+			self.playingAudio = nil;	
 		}
 	}
 }
 
-// Invoked e.g. when double-clicking on a specific song file
+
+- (BOOL) isPlaying
+{
+	return (self.playingAudio != nil);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Invoked e.g. when double-clicking on a specific song file. First stop any audio that may currently be playing.
+// Start playing whatever the current selection is...
+
 - (IBAction) startPlayingSelection:(id)inSender
 {
-	// First stop any audio that may currently be playing...
 	[self setIsPlaying:NO];
-	
-	// Start playing whatever the current selection is...
 	[self setIsPlaying:YES];
 }
 
@@ -278,6 +285,12 @@
 	NSError* error = nil;
 	QTMovie* movie = [QTMovie movieWithFile:path error:&error];
 	
+	[[NSNotificationCenter defaultCenter] 
+		addObserver:self 
+		selector:@selector(_movieDidEnd:) 
+		name:QTMovieDidEndNotification 
+		object:movie];
+
 	// Start playing it...
 	
 	if (error == nil)
@@ -286,6 +299,14 @@
 		[movie play];
 		self.playingAudio = movie;
 	}
+}
+
+
+// When regular playback stops at end of file, reset our state so that highlight disappears on button...
+
+- (void) _movieDidEnd:(NSNotification*)inNotification
+{
+	[self setIsPlaying:NO];
 }
 
 
