@@ -49,19 +49,30 @@
 
 @interface IMBConfig : NSObject
 
+// Low-level accessors for iMedia preferences...
+
 + (void) registerDefaultPrefsValue:(id)inValue forKey:(NSString*)inKey;
 + (void) setPrefsValue:(id)inValue forKey:(NSString*)inKey;
 + (id) prefsValueForKey:(NSString*)inKey;
+
+// Class specific accessors for iMedia preferences (use these methods from iMedia controller classes)...
 
 + (void) registerDefaultPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass;
 + (void) setPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass;
 + (NSMutableDictionary*) prefsForClass:(Class)inClass;
 
-+ (void) registerDefaultValues;
+// Determines whether Group labels are visible in the node view (IMBOutlineView)...
+
 + (void) setShowsGroupNodes:(BOOL)inState;
 + (BOOL) showsGroupNodes;
+
+// Sets path for the download folder for remote IMBObjects (e.g. from Flickr or camera devices)...
+
 + (void) setDownloadFolderPath:(NSString*)inPath;
 + (NSString*) downloadFolderPath;
+
++ (void) registerDefaultValues;
+
 
 @end
 
