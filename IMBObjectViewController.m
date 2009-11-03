@@ -1024,7 +1024,18 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		{
 			// Every URL will be able to provide a path, we'll leave it to the destination to decide
 			// whether it can make any use of it or not.
-			[inPasteboard setPropertyList:[promise.localURLs valueForKey:@"path"] forType:NSFilenamesPboardType];
+			
+			// In case there were NSError objects in the localURLs array, we want to ignore them. So we'll
+			// go through each item and try to get a path out ...
+			NSMutableArray* localPaths = [NSMutableArray arrayWithCapacity:promise.localURLs.count];
+			for (IMBObject* thisObject in promise.localURLs)
+			{
+				if ([thisObject isKindOfClass:[IMBObject class]])
+				{
+					[localPaths addObject:thisObject.path];
+				}
+			}
+			[inPasteboard setPropertyList:localPaths forType:NSFilenamesPboardType];
 		}
 		else if ([inType isEqualToString:NSURLPboardType])
 		{
