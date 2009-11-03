@@ -1354,10 +1354,6 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 			cell.subtitle = object.metadataDescription;
 		}
 	}
-	else
-	{
-		NSLog(@"%s - not an IMBComboTextCell cell",__FUNCTION__);
-	}
 }
 
 
