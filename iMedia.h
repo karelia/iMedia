@@ -67,10 +67,12 @@
 #import <iMedia/IMBFolderParser.h>
 #import <iMedia/IMBImageFolderParser.h>
 #import <iMedia/IMBiPhotoParser.h>
+#import <iMedia/IMBiTunesParser.h>
 #import <iMedia/IMBApertureParser.h>
 #import <iMedia/IMBLightroomParser.h>
 #import <iMedia/IMBImageCaptureParser.h>
 #import <iMedia/IMBFlickrParser.h>
+#import <iMedia/IMBGarageBandParser.h>
 
 // Controllers...
 
