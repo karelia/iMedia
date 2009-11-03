@@ -1167,6 +1167,18 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	[NSMenu popUpContextMenu:menu withEvent:inEvent forView:inView];
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+// Here we sort of mimic the IKImageBrowserDataSource protocol, even though we really don't really
+// implement the protocol, since we use bindings.  But this is for the benefit of
+// -[IMBImageBrowserView mouseDragged:] ... I hope it's OK that we are ignoring the aBrowser parameter.
+
+- (id /*IKImageBrowserItem*/) imageBrowser:(IKImageBrowserView *) aBrowser itemAtIndex:(NSUInteger)index;
+{
+	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:index];
+	return object;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

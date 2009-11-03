@@ -72,6 +72,7 @@
 
 @implementation IMBImageBrowserView
 
+@synthesize itemsInCurrentPromiseDragOperation = _itemsInCurrentPromiseDragOperation;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -195,6 +196,84 @@
 
 			
 //----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark Handling drags to allow for promises
+// This code is baded on code contributed by Fraser Speirs.
+// (Modified to be 10.5-compatible)
+
+- (void)mouseDown:(NSEvent *)theEvent {
+	// If the mouse first goes down on the background, this is a drag-select and
+	// we don't want to handle any mouseDragged events until the mouse comes up again.
+	NSPoint clickPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];
+	_dragSelectInProgress = (indexOfItemUnderClick == NSNotFound);
+	[super mouseDown: theEvent];
+}
+
+- (void)mouseUp:(NSEvent *)theEvent {
+	_dragSelectInProgress = NO;
+	[super mouseUp: theEvent];
+}
+
+- (void)mouseDragged:(NSEvent *)theEvent;
+{
+	// If there's a drag-select in progress, we don't want to know.
+	if(_dragSelectInProgress) {
+		[super mouseDragged: theEvent];
+		return;
+	}
+	
+	// Otherwise, the mouse went down on an image and we should drag it
+	NSPoint dragPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: dragPosition];
+	
+	if(indexOfItemUnderClick == NSNotFound) {
+		[super mouseDragged: theEvent];
+		return;
+	}
+	
+	// Store the selected browser items
+	NSMutableArray *tempItems = [NSMutableArray array];
+	NSIndexSet *selectionIndexes = [self selectionIndexes];
+	NSUInteger currentIndex = [selectionIndexes firstIndex];
+    while (currentIndex != (NSUInteger)NSNotFound)
+    {
+		
+		
+		[tempItems addObject:[self.dataSource imageBrowser:self itemAtIndex:currentIndex]];
+        currentIndex = [selectionIndexes indexGreaterThanIndex: currentIndex];
+    }
+	
+	self.itemsInCurrentPromiseDragOperation = tempItems;
+	
+	
+	dragPosition.x -= 16;
+	dragPosition.y -= 16;
+	
+	NSRect imageLocation;
+	imageLocation.origin = dragPosition;
+	imageLocation.size = NSMakeSize(64, 64);
+	
+	[self dragPromisedFilesOfTypes:[NSArray arrayWithObject:@"jpg"]
+						  fromRect:imageLocation
+							source:self
+						 slideBack:YES
+							 event:theEvent];
+}
+
+- (NSArray *)namesOfPromisedFilesDroppedAtDestination:(NSURL *)dropDestination;
+{
+	NSMutableArray *fileNames = [NSMutableArray array];
+	
+	for (id obj in self.itemsInCurrentPromiseDragOperation)
+	{
+		NSLog(@"Promise: %@", obj);
+	}
+	
+	self.itemsInCurrentPromiseDragOperation = nil;
+	return fileNames;
+}
+
 
 
 @end
