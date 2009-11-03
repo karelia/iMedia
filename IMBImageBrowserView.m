@@ -194,7 +194,13 @@
 	return [IMBObjectFifoCache count] < [IMBObjectFifoCache size]-64;
 }
 
-			
+
+#ifndef IMB_SUPPORTFILEPROMISES
+#define IMB_SUPPORTFILEPROMISES 0
+#endif
+
+#if IMB_SUPPORTFILEPROMISES
+
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark Handling drags to allow for promises
@@ -274,6 +280,6 @@
 	return fileNames;
 }
 
-
+#endif
 
 @end
