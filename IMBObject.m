@@ -220,7 +220,7 @@
 	{
 		self.isLoading = YES;
 		
-		IMBObjectThumbnailLoadOperation* operation = [[IMBObjectThumbnailLoadOperation alloc] initWithObject:self];
+		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
 		[[IMBOperationQueue sharedQueue] addOperation:operation];			
 	}
 }

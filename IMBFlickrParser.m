@@ -106,7 +106,7 @@
 	if (self.editor) {
 		[self.editor showWindow:self];
 	} else {
-		IMBFlickrQueryEditor* editor = [[IMBFlickrQueryEditor flickrQueryEditorForParser:self] autorelease];
+		IMBFlickrQueryEditor* editor = [IMBFlickrQueryEditor flickrQueryEditorForParser:self];
 		[editor.window center];
 		[editor showWindow:self];
 		self.editor = editor;
@@ -246,7 +246,7 @@
 	// The root node has a custom view that we are loading from a nib file
 	NSView* customObjectView = nil;
 	NSArray* topLevelObjects = nil;
-	NSNib* nib = [[NSNib alloc] initWithNibNamed:@"IMBFlickrParser" bundle:[NSBundle bundleForClass:[self class]]];
+	NSNib* nib = [[[NSNib alloc] initWithNibNamed:@"IMBFlickrParser" bundle:[NSBundle bundleForClass:[self class]]] autorelease];
 	[nib instantiateNibWithOwner:self topLevelObjects:&topLevelObjects];
 
 	for (id topLevelObject in topLevelObjects) {

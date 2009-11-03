@@ -187,6 +187,10 @@
 		UInt32 stringLength;
 		char* buffer;
 		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void*)&buffer,&item);
+		if (err == noErr)
+		{
+			SecKeychainItemFreeContent(NULL, buffer);
+		}
 		return item != nil && err == noErr;
 	}
 	
