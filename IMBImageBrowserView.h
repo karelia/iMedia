@@ -58,7 +58,12 @@
 @interface IMBImageBrowserView : IKImageBrowserView
 {
 	Class _cellClass;
+	
+	NSArray *_itemsInCurrentPromiseDragOperation;
+	BOOL _dragSelectInProgress;
 }
+
+@property(retain) NSArray *itemsInCurrentPromiseDragOperation;
 
 @end
 
