@@ -201,6 +201,7 @@
 
 - (void) dealloc
 {
+	IMBRelease(_mediaSource);
 	IMBRelease(_identifier);
 	IMBRelease(_icon);
 	IMBRelease(_name);

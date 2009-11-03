@@ -401,14 +401,17 @@
 - (BOOL) shouldUseAlbum:(NSDictionary*)inAlbumDict images:(NSDictionary*)inImages
 {
 	NSArray* imageKeys = [inAlbumDict objectForKey:@"KeyList"];
-
+	
 	for (NSString* key in imageKeys)
 	{
+		// NOTE(jalkut): Not sure why the aggressive use of autorelease pools here, but this 
+		// one seems particularly unnecessary. There aren't any allocations ... except for the pool itself!
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		NSDictionary* imageDict = [inImages objectForKey:key];
 		
 		if ([self shouldUseObject:imageDict])
 		{
+				[pool release];
 				return YES;
 		}
 		

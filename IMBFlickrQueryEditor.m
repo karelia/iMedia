@@ -62,7 +62,7 @@
 @implementation IMBFlickrQueryEditor
 
 + (IMBFlickrQueryEditor*) flickrQueryEditorForParser: (IMBFlickrParser*) parser {
-	IMBFlickrQueryEditor* editor = [[IMBFlickrQueryEditor alloc] init];
+	IMBFlickrQueryEditor* editor = [[[IMBFlickrQueryEditor alloc] init] autorelease];
 	editor.parser = parser;
 	return editor;
 }
