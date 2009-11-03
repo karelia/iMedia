@@ -985,7 +985,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 					[promise waitUntilDone];
 
 					NSURL* thisURL = [promise localURLForObject:mappedObject];
-					if (thisURL != nil)
+					if ((thisURL != nil) && ([thisURL isKindOfClass:[NSURL class]]))
 					{
 						// public.url is documented as containing the "bytes of the URL"
 						[inItem setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:inType];
@@ -1028,25 +1028,42 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 			// In case there were NSError objects in the localURLs array, we want to ignore them. So we'll
 			// go through each item and try to get a path out ...
 			NSMutableArray* localPaths = [NSMutableArray arrayWithCapacity:promise.localURLs.count];
-			for (IMBObject* thisObject in promise.localURLs)
+			for (NSURL* thisObject in promise.localURLs)
 			{
-				if ([thisObject isKindOfClass:[IMBObject class]])
+				if ([thisObject isKindOfClass:[NSURL class]])
 				{
 					[localPaths addObject:thisObject.path];
 				}
 			}
 			[inPasteboard setPropertyList:localPaths forType:NSFilenamesPboardType];
 		}
-		else if ([inType isEqualToString:NSURLPboardType])
+		else if (([inType isEqualToString:NSURLPboardType]) ||
+				 ([inType isEqualToString:(NSString*)kUTTypeURL]))
 		{
-			// The best we can do for URL type on 10.5 is to provide the URL for the first item in our list
-			NSURL* thisURL = [promise.localURLs objectAtIndex:0];
-			[thisURL writeToPasteboard:inPasteboard];			
-		}
-		else if ([inType isEqualToString:(NSString*)kUTTypeURL])
-		{
-			NSURL* thisURL = [promise.localURLs objectAtIndex:0];		
-			[inPasteboard setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:(NSString*)kUTTypeURL];		
+			// The best we can do for URL type on 10.5 is to provide the URL for the first item in our list. In case
+			// thereare NSError objects in the list, we'll go through until we find an actual URL, and use that 
+			// as the item for the pasteboard			
+			NSURL* thisURL = nil;
+			for (NSURL* thisObject in promise.localURLs)
+			{
+				if ([thisObject isKindOfClass:[NSURL class]])
+				{
+					thisURL = thisObject;
+					break;
+				}
+			}
+			
+			if (thisURL != nil)
+			{
+				if ([inType isEqualToString:NSURLPboardType])
+				{
+					[thisURL writeToPasteboard:inPasteboard];			
+				}
+				else
+				{
+					[inPasteboard setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:(NSString*)kUTTypeURL];
+				}
+			}
 		}
 	}
 }
