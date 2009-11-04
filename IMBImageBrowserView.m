@@ -72,7 +72,6 @@
 
 @implementation IMBImageBrowserView
 
-@synthesize itemsInCurrentPromiseDragOperation = _itemsInCurrentPromiseDragOperation;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -204,8 +203,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark Handling drags to allow for promises
-// This code is baded on code contributed by Fraser Speirs.
-// (Modified to be 10.5-compatible)
+// This code is based on code contributed by Fraser Speirs.
 
 - (void)mouseDown:(NSEvent *)theEvent {
 	// If the mouse first goes down on the background, this is a drag-select and
@@ -237,49 +235,20 @@
 		[super mouseDragged: theEvent];
 		return;
 	}
-	
-	// Store the selected browser items
-	NSMutableArray *tempItems = [NSMutableArray array];
-	NSIndexSet *selectionIndexes = [self selectionIndexes];
-	NSUInteger currentIndex = [selectionIndexes firstIndex];
-    while (currentIndex != (NSUInteger)NSNotFound)
-    {
 		
-		
-		[tempItems addObject:[self.dataSource imageBrowser:self itemAtIndex:currentIndex]];
-        currentIndex = [selectionIndexes indexGreaterThanIndex: currentIndex];
-    }
-	
-	self.itemsInCurrentPromiseDragOperation = tempItems;
-	
-	
 	dragPosition.x -= 16;
 	dragPosition.y -= 16;
 	
 	NSRect imageLocation;
 	imageLocation.origin = dragPosition;
-	imageLocation.size = NSMakeSize(64, 64);
+	imageLocation.size = NSMakeSize(64, 64);	// should this vary?
 	
-	[self dragPromisedFilesOfTypes:[NSArray arrayWithObject:@"jpg"]
+	[self dragPromisedFilesOfTypes:[NSArray arrayWithObject:@"jpg"]		// should probably get REAL value?
 						  fromRect:imageLocation
-							source:self
+							source:self.delegate		// handle drag messages
 						 slideBack:YES
 							 event:theEvent];
 }
-
-- (NSArray *)namesOfPromisedFilesDroppedAtDestination:(NSURL *)dropDestination;
-{
-	NSMutableArray *fileNames = [NSMutableArray array];
-	
-	for (id obj in self.itemsInCurrentPromiseDragOperation)
-	{
-		NSLog(@"Promise: %@", obj);
-	}
-	
-	self.itemsInCurrentPromiseDragOperation = nil;
-	return fileNames;
-}
-
 #endif
 
 @end

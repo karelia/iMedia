@@ -51,6 +51,7 @@
 
 #import "IMBImageBrowserCell.h"
 #import "IMBNodeObject.h"
+#import "IMBCommon.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -253,14 +254,18 @@
 	}	
 }
 
+// A Private API.  Overriding it to change the font size.  No harm done if this stops working though...
+// Note that we are using two different methods, since the methods under Snow Leopard are different from
+// Leopard.
+// TODO: Test this under leopard.
 
 - (void) sizeDidChange
-{	
-#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5
-#else
+{
 	CGFloat points = 0;
-	CGFloat width = [self size].width;
-	
+
+	CGFloat width = IMBIsSnowLeopardOrGreater()
+		? [self titleFrame].size.width
+		: [((id)self) size].width;
 	if (width < 50) points = 9;
 	else if (width < 60) points = 10;
 	else if (width < 70) points = 11;
@@ -268,10 +273,18 @@
 	else points = 13;
 
 	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont fontWithName:@"Lucida Grande" size:points] forKey:NSFontAttributeName];
-	[[self parent] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
-#endif
-	
-	[super sizeDidChange];
+	if (IMBIsSnowLeopardOrGreater())
+	{
+		[[((id)self) imageBrowserView] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
+	}
+	else
+	{
+		[[((id)self) parent] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
+	}	
+	if ([super respondsToSelector:@selector(sizeDidChange)])
+	{
+		[((id)super) sizeDidChange];
+	}
 }
 
 
