@@ -996,15 +996,6 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	}
 }
 
-// For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
-// the IMBObjectPromise for the client and block it until all objects are loaded...
-
-- (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
-{
-	[self _downloadSelectedObjectsToDestination:inDropDestination];
-	return [self _namesOfPromisedFiles];
-}
-
 
 // Even dumber are apps that do not support NSFilesPromisePboardType, but only know about NSFilenamesPboardType.
 // In this case we'll download to the temp folder and block synchronously until the download has completed...
@@ -1141,6 +1132,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 {
 	self.progressWindowController = nil;
 }
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1353,6 +1345,18 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	}
 	
 	return nil;
+}
+
+// For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
+// the IMBObjectPromise for the client and block it until all objects are loaded...
+
+// THIS VARIATION IS FOR THE DRAG WE INITIATE FROM OUR CUSTOM IKIMAGEBROWSERVIEW SUBCLASS.
+- (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
+{
+	[self _downloadSelectedObjectsToDestination:inDropDestination];
+	NSArray *result = [self _namesOfPromisedFiles];
+	NSLog(@"namesOfPromisedFilesDroppedAtDestination = %@", result);
+	return result;
 }
 
 

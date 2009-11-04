@@ -81,6 +81,11 @@
 
 - (void) awakeFromNib
 {
+	NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d", 
+		  MAC_OS_X_VERSION_MIN_REQUIRED,
+		  MAC_OS_X_VERSION_MAX_ALLOWED);
+		  
+		  
 	[IMBConfig registerDefaultValues];
 	[IMBConfig setShowsGroupNodes:YES];
 	

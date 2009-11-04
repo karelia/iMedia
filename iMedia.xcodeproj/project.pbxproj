@@ -219,7 +219,6 @@
 		D0F2DB9C1098262D004280C1 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = D0F2DB951098262D004280C1 /* FMDatabase.m */; };
 		D0F2DB9D1098262D004280C1 /* FMDatabaseAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = D0F2DB961098262D004280C1 /* FMDatabaseAdditions.h */; };
 		D0F2DB9E1098262D004280C1 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = D0F2DB971098262D004280C1 /* FMDatabaseAdditions.m */; };
-		D0F2DB9F1098262D004280C1 /* fmdb.m in Sources */ = {isa = PBXBuildFile; fileRef = D0F2DB981098262D004280C1 /* fmdb.m */; };
 		D0F2DBA01098262D004280C1 /* FMResultSet.h in Headers */ = {isa = PBXBuildFile; fileRef = D0F2DB991098262D004280C1 /* FMResultSet.h */; };
 		D0F2DBA11098262D004280C1 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = D0F2DB9A1098262D004280C1 /* FMResultSet.m */; };
 		D0F2DBCF1098270F004280C1 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D0F2DBCE1098270F004280C1 /* libsqlite3.dylib */; };
@@ -1297,7 +1296,6 @@
 				D0403B5210918C03000F0AE1 /* IMBSafariBookmarkParser.m in Sources */,
 				D0F2DB9C1098262D004280C1 /* FMDatabase.m in Sources */,
 				D0F2DB9E1098262D004280C1 /* FMDatabaseAdditions.m in Sources */,
-				D0F2DB9F1098262D004280C1 /* fmdb.m in Sources */,
 				D0F2DBA11098262D004280C1 /* FMResultSet.m in Sources */,
 				D032CB7B109A2F4A00D84782 /* IMBMovieObject.m in Sources */,
 				D032CE48109B301100D84782 /* IMBFlickrNode.m in Sources */,
