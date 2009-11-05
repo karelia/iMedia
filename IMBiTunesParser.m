@@ -297,7 +297,10 @@
 
 - (void) didStopUsingParser
 {
-	self.plist = nil;
+	@synchronized(self)
+	{
+		self.plist = nil;
+	}	
 }
 
 
@@ -312,24 +315,30 @@
 
 - (NSDictionary*) plist
 {
+	NSDictionary* plist = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
 	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 	
-	if ([self.modificationDate compare:modificationDate] == NSOrderedAscending)
+	@synchronized(self)
 	{
-		self.plist = nil;
+		if ([self.modificationDate compare:modificationDate] == NSOrderedAscending)
+		{
+			self.plist = nil;
+		}
+		
+		if (_plist == nil)
+		{
+			self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
+			self.modificationDate = modificationDate;
+			self.version = [[self.plist objectForKey:@"Application Version"] intValue];
+		}
+		
+		plist = [[_plist retain] autorelease];
 	}
 	
-	if (_plist == nil)
-	{
-		self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
-		self.modificationDate = modificationDate;
-		self.version = [[self.plist objectForKey:@"Application Version"] intValue];
-	}
-	
-	return _plist;
+	return plist;
 }
 
 

@@ -65,7 +65,7 @@
 
 @interface IMBImageCaptureParser : IMBParser
 {
-
+	NSMutableDictionary *loadingDevices;
 }
 
 @end
