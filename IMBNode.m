@@ -367,6 +367,32 @@
 #pragma mark
 #pragma mark Helpers
 
+
+// Nodes are considered to be equal if their identifier match - even if we are looking at different instances
+// (object pointers). This is necessary as nodes are relatively short-lived objects that are replaced with new
+// instances often - a necessity in our multithreaded environment...
+
+- (BOOL) isEqual:(IMBNode*)inNode
+{
+	NSString* identifier1 = nil;
+	NSString* identifier2 = nil;
+	
+	if ([self respondsToSelector:@selector(identifier)])
+	{
+		identifier1 = self.identifier;
+	}
+
+	if ([inNode respondsToSelector:@selector(identifier)])
+	{
+		identifier2 = inNode.identifier;
+	}
+	
+	return identifier1 != nil && 
+		   identifier2 != nil && 
+		   [identifier1 isEqualToString:identifier2];
+}
+
+
 // Nodes are grouped by type, but within a group nodes are sorted alphabetically. Nodes without a group type
 // are at the end of the list...
 
@@ -527,6 +553,48 @@
 	}
 
 	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Check if self is an ancestor of the specified node. Please note that we are using isEqual: instead of just
+// comparing object pointers because nodes are short lived objects that are replaced often in our multithreaded
+// environment...
+
+- (BOOL) isAncestorOfNode:(IMBNode*)inNode
+{
+	IMBNode* node = inNode.parentNode;
+	
+	while (node)
+	{
+		if ([self isEqual:node]) return YES;
+		node = node.parentNode;
+	}
+	
+	return NO;
+}
+
+
+// Check if self is a descendant of the specified node...
+
+- (BOOL) isDescendantOfNode:(IMBNode*)inNode
+{
+	for (IMBNode* node in inNode.subNodes)
+	{
+		if ([self isEqual:node])
+		{
+			return YES;
+		}
+		else
+		{
+			BOOL found = [self isDescendantOfNode:node];
+			if (found) return YES;
+		}
+	}
+	
+	return NO;
 }
 
 

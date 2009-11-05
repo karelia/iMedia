@@ -160,6 +160,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @synthesize oldNode = _oldNode;
 @synthesize newNode = _newNode;
 
+
 // General purpose method to send back results to controller in the main thread...
 
 - (void) performSelectorOnMainThread:(SEL)inSelector withObject:(id)inObject
@@ -171,6 +172,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];	
 }
 
+
 // Specialized method that bundles old and new node, as well as potential error...
 
 - (void) replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode
@@ -181,6 +183,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	[self performSelectorOnMainThread:@selector(_replaceNode:) withObject:result];
 }
+
 
 // Cleanup...
 
@@ -201,6 +204,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Create a new node here in this background operation. When done, pass back the result to the libraryController 
 // in the main thread...
+	
 	
 @implementation IMBCreateNodeOperation
 
@@ -227,27 +231,47 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Tell the parser to popuplate the node in this background operation. When done, pass back the result to the 
-// libraryController in the main thread...
+// Tell the parser to popuplate the node in this background operation. When done, pass back the result to  
+// the libraryController in the main thread. If nodes are collapsed or deselected in the user interface, a 
+// appropriate notification is sent out. Listen to these notifications and cancel any queued operations
+// that are now obsolete...
+	
 	
 @implementation IMBPopulateNodeOperation
 
+
 - (void) main
 {
-	NSError* error = nil;
-	[_parser willUseParser];
-	[_parser populateNode:self.newNode options:self.options error:&error];
-	
-	if (error == nil)
+	if (self.isCancelled == NO)
 	{
-		[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.newNode];
-		[self replaceNode:self.oldNode withNode:self.newNode];
-	}
-	else
-	{
-		[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
+		NSError* error = nil;
+		[_parser willUseParser];
+		[_parser populateNode:self.newNode options:self.options error:&error];
+		
+		if (error == nil)
+		{
+			[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.newNode];
+			[self replaceNode:self.oldNode withNode:self.newNode];
+		}
+		else
+		{
+			[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
+		}
 	}
 }
+
+
+// When a populating is cancelled we need to revert the node to its original state, so that it can be populated
+// again at a later time. This requires resetting the loading state and the badgeType...
+
+- (void) cancel
+{
+	[super cancel];
+	
+	self.oldNode.loading = NO;
+	self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
+}
+
 
 @end
 
@@ -709,6 +733,29 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[[IMBOperationQueue sharedQueue] addOperation:operation];
 		[operation release];
 	}	
+}
+
+
+// Check all pending operation if there is a populate operation concerning the node in question. If yes, then
+// cancel that one. Please note that this will probably have no effect if the operation is already executing - 
+// i.e. unless the parser class is cancel-aware and exits its inner loop early...
+
+- (void) stopPopulatingNodeWithIdentifier:(NSString*)inNodeIdentifier
+{
+	NSArray* operations = [[IMBOperationQueue sharedQueue] operations];
+	
+	for (NSOperation* operation in operations)
+	{
+		if ([operation isKindOfClass:[IMBPopulateNodeOperation class]])
+		{
+			IMBPopulateNodeOperation* populateOperation = (IMBPopulateNodeOperation*)operation;
+			
+			if ([populateOperation.oldNode.identifier isEqualToString:inNodeIdentifier])
+			{
+				[populateOperation cancel];
+			}
+		}
+	}
 }
 
 

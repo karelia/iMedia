@@ -165,6 +165,9 @@
 - (BOOL) isPopulated;
 - (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier;
 
+- (BOOL) isAncestorOfNode:(IMBNode*)inNode;
+- (BOOL) isDescendantOfNode:(IMBNode*)inNode;
+
 @end
 
 
