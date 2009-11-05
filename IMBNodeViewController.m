@@ -448,7 +448,9 @@ static NSString* kSelectionKey = @"selection";
 }
 
 
-// When nodes were expanded or collapsed, then store the current state of the user interface...
+// When nodes were expanded or collapsed, then store the current state of the user interface. Also cancel any
+// pending populate operation for the nodes that were just collapsed...
+	
 
 - (void) _setExpandedNodeIdentifiers
 {
@@ -468,13 +470,18 @@ static NSString* kSelectionKey = @"selection";
 - (void) outlineViewItemDidCollapse:(NSNotification*)inNotification
 {
 	[self _setExpandedNodeIdentifiers];
+
+	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
+	IMBNode* node = [item representedObject];
+	
+	[self.libraryController stopPopulatingNodeWithIdentifier:node.identifier];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Ask the library delegate if we may change the selection...
+// Ask the library delegate if we may change the selection.
 
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldSelectItem:(id)inItem
 {
@@ -509,25 +516,30 @@ static NSString* kSelectionKey = @"selection";
 	{
 		NSInteger row = [ibNodeOutlineView selectedRow];
 		id item = row>=0 ? [ibNodeOutlineView itemAtRow:row] : nil;
-		IMBNode* node = [item representedObject];
+		IMBNode* newNode = [item representedObject];
 
-		if (node)
-		{
-			[self.libraryController populateNode:node];
-			self.selectedNodeIdentifier = node.identifier;
-		}
+		// Stop loading the old node's contents, assuming we don't need them anymore. Instead populated the
+		// newly selected node...
 		
+		[self.libraryController stopPopulatingNodeWithIdentifier:self.selectedNodeIdentifier];
+
+		if (newNode)
+		{
+			[self.libraryController populateNode:newNode];
+			self.selectedNodeIdentifier = newNode.identifier;
+		}
+
 		// If the node has a custom object view, then install it now...
 		
-		[self installCustomObjectView:[node customObjectView]];
+		[self installCustomObjectView:[newNode customObjectView]];
 		
 		// If a completely different parser was selected, then notify the previous parser, that it is most
 		// likely no longer needed any can get rid of its cached data...
 		
-		if (self.selectedParser != node.parser)
+		if (self.selectedParser != newNode.parser)
 		{
 			[self.selectedParser didStopUsingParser];
-			self.selectedParser = node.parser;
+			self.selectedParser = newNode.parser;
 		}
 	}
 
