@@ -52,33 +52,12 @@
 #import "IMBApertureParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-#import "IMBObject.h"
+#import "IMBEnhancedObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import <Quartz/Quartz.h>
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This subclass adds the addition apertureMetadata property, which stores the metadata coming from the XML file. 
-// it will later be augmented (lazily) by metadata read from the file itself (which is a fairly slow process).
-// That is why that step is only done lazily...
-
-
-@implementation IMBApertureObject
-
-@synthesize apertureMetadata = _apertureMetadata;
-
-- (void) dealloc
-{
-	IMBRelease(_apertureMetadata);
-	[super dealloc];
-}
-
-@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -554,15 +533,15 @@
 					NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:imageDict];
 					[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:imagePath]];
 
-					IMBApertureObject* object = [[IMBApertureObject alloc] init];
+					IMBEnhancedObject* object = [[IMBEnhancedObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
 					object.location = (id)imagePath;
 					object.name = caption;
-					object.apertureMetadata = imageDict; // This metadata was in the XML file and is available immediately
-					object.metadata = nil;				 // Build lazily when needed (takes longer)
-					object.metadataDescription = nil;	 // Build lazily when needed (takes longer)
+					object.preliminaryMetadata = imageDict; // This metadata from the XML file is available immediately
+					object.metadata = nil;					// Build lazily when needed (takes longer)
+					object.metadataDescription = nil;		// Build lazily when needed (takes longer)
 					object.parser = self;
 					object.index = index++;
 
@@ -590,8 +569,8 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	IMBApertureObject* object = (IMBApertureObject*)inObject;
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.apertureMetadata];
+	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
 	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 

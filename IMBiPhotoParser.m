@@ -52,33 +52,12 @@
 #import "IMBiPhotoParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-#import "IMBObject.h"
+#import "IMBEnhancedObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import <Quartz/Quartz.h>
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This subclass adds the addition iPhotoMetadata property, which stores the metadata coming form the XML file. 
-// it will later be augmented (lazily) by metadata read from the file itself (which is a fairly slow process).
-// That is why that step is only done lazily...
-
-
-@implementation IMBiPhotoObject
-
-@synthesize iPhotoMetadata = _iPhotoMetadata;
-
-- (void) dealloc
-{
-	IMBRelease(_iPhotoMetadata);
-	[super dealloc];
-}
-
-@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -609,15 +588,15 @@
 					NSString* path = [imageDict objectForKey:@"ImagePath"];
 					NSString* name = [imageDict objectForKey:@"Caption"];
 					
-					IMBiPhotoObject* object = [[IMBiPhotoObject alloc] init];
+					IMBEnhancedObject* object = [[IMBEnhancedObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
 					object.location = (id)path;
 					object.name = name;
-					object.iPhotoMetadata = imageDict;	// This metadata was in the XML file and is available immediately
-					object.metadata = nil;				// Build lazily when needed (takes longer)
-					object.metadataDescription = nil;	// Build lazily when needed (takes longer)
+					object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
+					object.metadata = nil;					// Build lazily when needed (takes longer)
+					object.metadataDescription = nil;		// Build lazily when needed (takes longer)
 					object.parser = self;
 					object.index = index++;
 					
@@ -645,8 +624,8 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	IMBiPhotoObject* object = (IMBiPhotoObject*)inObject;
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.iPhotoMetadata];
+	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
 	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
