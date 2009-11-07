@@ -64,6 +64,7 @@
 - (void) drawImageOutline;
 - (NSRect) usedRectInCellFrame:(NSRect)inFrame;
 - (NSRect) imageContainerFrame;
+- (IKImageBrowserView*) imageBrowserView;	// To shut up the compiler when using 10.5.sdk
 
 @end
 
