@@ -137,7 +137,7 @@
 
 - (id) copyWithZone:(NSZone*)inZone
 {
-	IMBObject* copy = [[IMBObject allocWithZone:inZone] init];
+	IMBObject* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.location = self.location;
 	copy.name = self.name;

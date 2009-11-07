@@ -88,6 +88,36 @@ static NSArray* sSupportedUTIs = nil;
 @synthesize lightroomMetadata = _lightroomMetadata;
 @synthesize absolutePyramidPath = _absolutePyramidPath;
 
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]) != nil) {
+		self.lightroomMetadata = [inCoder decodeObjectForKey:@"lightroomMetadata"];
+		self.absolutePyramidPath = [inCoder decodeObjectForKey:@"absolutePyramidPath"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeObject:self.lightroomMetadata forKey:@"lightroomMetadata"];
+	[inCoder encodeObject:self.absolutePyramidPath forKey:@"absolutePyramidPath"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBLightroomObject* copy = [super copyWithZone:inZone];
+	
+	copy.lightroomMetadata = self.lightroomMetadata;
+	copy.absolutePyramidPath = self.absolutePyramidPath;
+	
+	return copy;
+}
+
 - (void) dealloc
 {
 	IMBRelease(_lightroomMetadata);
