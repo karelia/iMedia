@@ -69,13 +69,11 @@ extern NSString* kIMBObjectPromiseType;
 @interface IMBObjectPromise : NSObject <NSCopying,NSCoding>
 {
 	NSMutableDictionary* _objectsToLocalURLs;
-
 	NSString* _downloadFolderPath;
 	NSError* _error;
 	
 	double _objectCountTotal;
 	double _objectCountLoaded;
-	
 	id _delegate;
 	SEL _finishSelector;
 }
@@ -175,6 +173,29 @@ extern NSString* kIMBObjectPromiseType;
 
 @property (retain) NSMutableArray* downloadOperations;
 - (IBAction) cancel:(id)inSender;
+
+// hooks required for IMBMTPObjectPromise 
+- (void) loadObjects:(NSArray*)inObjects;
+
+- (void) prepareProgress;
+- (void) displayProgress:(double)inFraction;
+- (void) cleanupProgress;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+// This subclass is used for pyramid files that need to be split. The split file is saved to the local file system,
+// where it can then be accessed by the delegate... 
+
+@interface IMBPyramidObjectPromise : IMBLocalObjectPromise
+{
+
+}
 
 @end
 
