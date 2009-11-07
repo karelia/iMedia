@@ -55,7 +55,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This subclass is used to represent nodes in the object views (examples are folder and events). The reason we 
+// This subclass is used to represent nodes in the object views (examples are folders and events). The reason we 
 // have these hybrid objects is to have a double clickable item in the object views, which can be used to drill
 // down the hierarchy... 
 

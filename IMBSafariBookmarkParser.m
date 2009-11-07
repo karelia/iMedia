@@ -414,9 +414,7 @@
 	if ([type isEqualToString:@"WebBookmarkTypeList"])
 	{
 		NSString* title = [inPlist objectForKey:@"Title"];
-		NSImage* icon = [NSImage genericFolderIcon];
-		[icon setScalesWhenResized:YES];
-		[icon setSize:NSMakeSize(16.0,16.0)];
+		NSImage* icon = [NSImage sharedGenericFolderIcon];
 
 		subnode = [[[IMBNode alloc] init] autorelease];
 		subnode.mediaSource = self.mediaSource;
