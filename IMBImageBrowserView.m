@@ -121,7 +121,7 @@
 		[self performSelector:@selector(setCellClass:) withObject:_cellClass];
 	}
 
-//	[self setConstrainsToOriginalSize:YES];
+	[self setConstrainsToOriginalSize:NO];
 //	[self setValue:attributes forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];	
 //	[self setCellSize:NSMakeSize(44.0,22.0)];
 //	[self setIntercellSpacing:NSMakeSize(8.0,12.0)];
