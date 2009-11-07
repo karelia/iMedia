@@ -49,7 +49,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBObject.h"
+#import "IMBEnhancedObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,7 +57,7 @@
 
 // This subclass adds the capability to cache the poster frame of a movie... 
 
-@interface IMBMovieObject : IMBObject
+@interface IMBMovieObject : IMBEnhancedObject
 {
 	CGImageRef _posterFrame;
 }

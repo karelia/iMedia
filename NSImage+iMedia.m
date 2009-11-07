@@ -182,7 +182,7 @@
 }
 
 
-+ (NSImage *)genericFolderIcon
++ (NSImage *) sharedGenericFolderIcon
 {
 	static NSImage *sGenericFolderIcon = nil;
 	
@@ -200,6 +200,13 @@
 	
 	return sGenericFolderIcon;
 }
+
+
++ (NSImage *) genericFolderIcon
+{
+	return [[[self sharedGenericFolderIcon] copy] autorelease];
+}
+
 
 @end
 

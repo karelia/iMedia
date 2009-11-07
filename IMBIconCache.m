@@ -175,7 +175,7 @@ static IMBIconCache* sSharedIconCache;
 			{
 				image = [self __loadIconForType:inType fromBundleID:inBundleID withMappingTable:inMappingTable];
 				if (image) [bundleCache setObject:image forKey:inType];
-				else image = [NSImage genericFolderIcon];
+				else image = [NSImage sharedGenericFolderIcon];
 			}
 		}
 	}
