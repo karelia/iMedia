@@ -52,4 +52,8 @@
 - (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
 - (NSString *)pathResolved:(NSString *)path;
 
+- (NSString*)temporaryFile:(NSString*)name;
+- (NSString*)temporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
+- (NSString*)temporaryPathWithinDirectory:(NSString*)directoryPath;
+
 @end

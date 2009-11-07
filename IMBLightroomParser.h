@@ -67,9 +67,11 @@
 @interface IMBLightroomObject : IMBObject
 {
 	NSDictionary* _lightroomMetadata;
+	NSString* _absolutePyramidPath;
 }
 
 @property (retain) NSDictionary* lightroomMetadata;
+@property (retain) NSString* absolutePyramidPath;
 
 @end
 
@@ -82,17 +84,15 @@
 @interface IMBLightroomParser : IMBParser
 {
 	NSString* _appPath;
+	NSString* _dataPath;
 	BOOL _shouldDisplayLibraryName;
 	FMDatabase* _database;
-	BOOL _isDatabaseOpen;
 }
 
 @property (retain) NSString* appPath;
+@property (retain) NSString* dataPath;
 @property (assign) BOOL shouldDisplayLibraryName;
 @property (retain) FMDatabase* database;
-
-- (BOOL) openDatabase;
-- (void) closeDatabase;
 
 @end
 

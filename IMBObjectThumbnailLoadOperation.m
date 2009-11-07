@@ -56,6 +56,7 @@
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
 #import "NSString+iMedia.h"
+#import "NSData+SKExtensions.h"
 
 #import <Quartz/Quartz.h>
 #import <QTKit/QTKit.h>
@@ -126,6 +127,42 @@
 }
 
 	
+// Returns an autoreleased image for the given pyramid path...
+
+- (CGImageRef) imageForPyramidPath:(NSString*)inPyramidPath
+{
+	CGImageRef image = NULL;
+	
+	if (inPyramidPath) {
+		NSData* data = [NSData dataWithContentsOfMappedFile:inPyramidPath];
+		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
+		NSUInteger index = [data indexOfBytes:pattern length:3];
+		
+		// Should we cache that index?
+		if (index != NSNotFound) {
+			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
+			CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
+			
+			if (source) {
+				NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
+										 (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
+										 [NSNumber numberWithInteger:MAX_THUMBNAIL_SIZE],(id)kCGImageSourceThumbnailMaxPixelSize, 
+										 nil];
+				
+				image = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)options);
+				CFRelease(source);
+			}
+				
+			[NSMakeCollectable(image) autorelease];
+		}
+	}
+	
+	return image;
+}	
+
+
 // Returns an autoreleased image for the given url...
 
 - (CGImageRef) imageForURL:(NSURL*)inURL
@@ -325,6 +362,10 @@
 		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
 		{
 			imageRepresentation = (id)[self imageForURL:url];
+		}
+		else if ([path hasSuffix:@".lr-preview.noindex"])
+		{
+			imageRepresentation = (id)[self imageForPyramidPath:path];
 		}
 		else
 		{
