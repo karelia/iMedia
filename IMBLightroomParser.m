@@ -49,17 +49,22 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroomParser.h"
-#import "IMBParserController.h"
-#import "IMBNode.h"
-#import "IMBObject.h"
-#import "IMBIconCache.h"
-#import "NSWorkspace+iMedia.h"
-#import "NSImage+iMedia.h"
-#import "NSString+iMedia.h"
+#import <Quartz/Quartz.h>
+
 #import "FMDatabase.h"
 #import "FMResultSet.h"
-#import <Quartz/Quartz.h>
+#import "IMBLightroomParser.h"
+#import "IMBIconCache.h"
+#import "IMBNode.h"
+#import "IMBNodeObject.h"
+#import "IMBObject.h"
+#import "IMBObjectPromise.h"
+#import "IMBParserController.h"
+#import "NSData+SKExtensions.h"
+#import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -81,10 +86,12 @@ static NSArray* sSupportedUTIs = nil;
 @implementation IMBLightroomObject
 
 @synthesize lightroomMetadata = _lightroomMetadata;
+@synthesize absolutePyramidPath = _absolutePyramidPath;
 
 - (void) dealloc
 {
 	IMBRelease(_lightroomMetadata);
+	IMBRelease(_absolutePyramidPath);
 	[super dealloc];
 }
 
@@ -112,7 +119,11 @@ static NSArray* sSupportedUTIs = nil;
 - (NSImage*) folderIcon;
 - (NSArray*) supportedUTIs;
 - (BOOL) canOpenImageFileAtPath:(NSString*)inPath;
-- (IMBObject*) objectWithPath:(NSString*)inPath name:(NSString*)inName metadata:(NSDictionary*)inMetadata index:(NSUInteger)inIndex;
+- (IMBObject*) objectWithPath:(NSString*)inPath
+						 name:(NSString*)inName
+					 metadata:(NSDictionary*)inMetadata
+				  pyramidPath:(NSString*)inPyramidPath
+						index:(NSUInteger)inIndex;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 - (NSString*) rootNodeIdentifier;
@@ -121,9 +132,15 @@ static NSArray* sSupportedUTIs = nil;
 - (BOOL) isFolderNode:(IMBNode*)inNode;
 - (BOOL) isCollectionNode:(IMBNode*)inNode;
 
-- (NSDictionary*) attributesWithId:(NSNumber*)inIdLocal path:(NSString*)inPath;
+- (NSDictionary*) attributesWithRootFolder:(NSNumber*)inRootFolder
+								   idLocal:(NSNumber*)inIdLocal
+								  rootPath:(NSString*)inRootPath
+							  pathFromRoot:(NSString*)inPathFromRoot;
+- (NSNumber*) rootFolderFromAttributes:(NSDictionary*)inAttributes;
 - (NSNumber*) idLocalFromAttributes:(NSDictionary*)inAttributes;
-- (NSString*) pathFromAttributes:(NSDictionary*)inAttributes;
+- (NSString*) rootPathFromAttributes:(NSDictionary*)inAttributes;
+- (NSString*) pathFromRootFromAttributes:(NSDictionary*)inAttributes;
+- (NSString*) absolutePathFromAttributes:(NSDictionary*)inAttributes;
 
 @end
 
@@ -136,6 +153,7 @@ static NSArray* sSupportedUTIs = nil;
 @implementation IMBLightroomParser
 
 @synthesize appPath = _appPath;
+@synthesize dataPath = _dataPath;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize database = _database;
 
@@ -253,9 +271,21 @@ static NSArray* sSupportedUTIs = nil;
 		
 		for (NSString* libraryPath in libraryPaths)
 		{
+			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
+								   stringByAppendingString:@" Previews"]
+								  stringByAppendingPathExtension:@"lrdata"];
+			NSFileManager* fileManager = [NSFileManager threadSafeManager];
+			
+			BOOL isDirectory;
+			if (!([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory)) {
+				dataPath = nil;
+			}
+			
 			IMBLightroomParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = libraryPath;
+			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
+			
 			[parserInstances addObject:parser];
 			[parser release];
 		}
@@ -274,7 +304,6 @@ static NSArray* sSupportedUTIs = nil;
 	{
 		self.appPath = [[self class] lightroomPath];
 		_database = nil;
-		_isDatabaseOpen = NO;
 
 		[self supportedUTIs];	// Init early and in the main thread!
 	}
@@ -413,7 +442,9 @@ static NSArray* sSupportedUTIs = nil;
 
 - (void) didStopUsingParser
 {
-	[self closeDatabase];
+	@synchronized (self) {
+		self.database = nil;
+	}
 }
 
 
@@ -448,7 +479,7 @@ static NSArray* sSupportedUTIs = nil;
 	foldersNode.name = foldersName;
 	foldersNode.icon = [self folderIcon];
 	foldersNode.parser = self;
-	foldersNode.attributes = [self attributesWithId:id_local path:nil];
+//	foldersNode.attributes = [self attributesWithId:id_local path:nil];
 	foldersNode.leaf = NO;
 	
 	[(NSMutableArray*)inRootNode.subNodes addObject:foldersNode];
@@ -463,31 +494,38 @@ static NSArray* sSupportedUTIs = nil;
 
 
 // This method creates the immediate subnodes of the "Folders" node. The Lightroom database seems to call them
-// root folders, however I find this nomenclature to be a bit misleading. Each import usually creates one of 
-// these folders with the capture date as the folder name...
+// root folders. Each import usually creates one of these folders with the capture date as the folder name...
 
 - (void) populateSubnodesForRootFoldersNode:(IMBNode*)inFoldersNode
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	if (inFoldersNode.subNodes == nil) inFoldersNode.subNodes = [NSMutableArray array];
-
+	if (inFoldersNode.subNodes == nil) {
+		inFoldersNode.subNodes = [NSMutableArray array];
+	}
+	
+	if (inFoldersNode.objects == nil) {
+		inFoldersNode.objects = [NSMutableArray array];
+	}
+	
 	// Query the database for the root folders and create a node for each one we find...
-		
-	if ([self openDatabase])
-	{
-		NSString* query = @"SELECT id_local,absolutePath,name FROM AgLibraryRootFolder ORDER BY name ASC";
+	
+	FMDatabase *database = self.database;
+	
+	if (database != nil) {
+		NSString* query =	@" SELECT id_local, absolutePath, name"
+							@" FROM AgLibraryRootFolder"
+							@" ORDER BY name ASC";
 		FMResultSet* results = [self.database executeQuery:query];
+		NSInteger index = 0;
 		
-		while ([results next])
-		{
+		while ([results next]) {
 			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 			NSNumber* id_local = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
 			NSString* path = [results stringForColumn:@"absolutePath"];
 			NSString* name = [results stringForColumn:@"name"];
 			
-			if (name == nil)
-			{
+			if (name == nil) {
 				name = NSLocalizedStringWithDefaultValue(
 					@"IMBLightroomParser.Unnamed",
 					nil,IMBBundle(),
@@ -497,16 +535,31 @@ static NSArray* sSupportedUTIs = nil;
 
 			IMBNode* node = [[[IMBNode alloc] init] autorelease];
 			node.parentNode = inFoldersNode;
-			node.identifier = [self identifierWithFolderId:id_local];
 			node.name = name;
 			node.icon = [self folderIcon];
 			node.parser = self;
 			node.mediaSource = self.mediaSource;
-			node.attributes = [self attributesWithId:id_local path:path];
+			node.identifier = [self identifierWithFolderId:id_local];
+			node.attributes = [self attributesWithRootFolder:id_local
+													 idLocal:nil
+													rootPath:path
+												pathFromRoot:nil];
 			node.leaf = NO;
 			
 			[(NSMutableArray*)inFoldersNode.subNodes addObject:node];
 
+			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+			object.location = (id)node;
+			object.name = name;
+			object.metadata = nil;
+			object.parser = self;
+			object.index = index++;
+			object.imageLocation = (id)self.mediaSource;
+			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+			
+			[(NSMutableArray*)inFoldersNode.objects addObject:object];
+			
 			[pool release];
 		}
 		
@@ -525,50 +578,88 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	if (inParentNode.subNodes == nil) inParentNode.subNodes = [NSMutableArray array];
-
+	if (inParentNode.subNodes == nil) {
+		inParentNode.subNodes = [NSMutableArray array];
+	}
+	
+	if (inParentNode.objects == nil) {
+		inParentNode.objects = [NSMutableArray array];
+	}
+	
 	// Query the database for subfolder and add a node for each one we find...
 	
-	if ([self openDatabase])
-	{
-		NSNumber* parentIdLocal = [self idLocalFromAttributes:inParentNode.attributes];
-		NSString* parentPath = [self pathFromAttributes:inParentNode.attributes];
+	FMDatabase *database = self.database;
+	
+	if (database != nil) {
+		NSDictionary* attributes = inParentNode.attributes;
+		NSString* parentPathFromRoot = [self pathFromRootFromAttributes:attributes];	
+		NSNumber* parentRootFolder = [self rootFolderFromAttributes:attributes];
+		NSString* parentRootPath = [self rootPathFromAttributes:inParentNode.attributes];
+		NSString* query =	@" SELECT id_local, pathFromRoot"
+							@" FROM AgLibraryFolder"
+							@" WHERE rootFolder = ?"
+							@" AND pathFromRoot LIKE ?"
+							@" AND NOT (pathFromRoot LIKE ?)"
+							@" ORDER BY pathFromRoot, robustRepresentation ASC";
+
+		NSString *pathFromRootAccept = nil;
+		NSString *pathFromRootReject = nil;
 		
-		NSString* query = @"SELECT id_local, pathFromRoot FROM AgLibraryFolder WHERE rootFolder=? ORDER BY robustRepresentation ASC";
-		FMResultSet* results = [self.database executeQuery:query,parentIdLocal];
+		if ([parentPathFromRoot length] > 0) {
+			pathFromRootAccept = [NSString stringWithFormat:@"%@/%%/", parentPathFromRoot];
+			pathFromRootReject = [NSString stringWithFormat:@"%@/%%/%%/", parentPathFromRoot];
+		}
+		else {
+			pathFromRootAccept = @"%/";
+			pathFromRootReject = @"%/%/";
+		}
 		
-		while ([results next])
-		{
+		FMResultSet* results = [self.database executeQuery:query, parentRootFolder, pathFromRootAccept, pathFromRootReject];
+		NSInteger index = 0;
+		
+		while ([results next]) {
 			NSNumber* id_local = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
 			NSString* pathFromRoot = [results stringForColumn:@"pathFromRoot"];
-			if ([pathFromRoot hasSuffix:@"/"]) pathFromRoot = [pathFromRoot substringToIndex:pathFromRoot.length-1];
-			NSString* name = [pathFromRoot lastPathComponent];
-			NSString* path = [parentPath stringByAppendingPathComponent:name];
 			
-			if ([pathFromRoot length] > 0)
-			{
-				IMBNode* node = [[[IMBNode alloc] init] autorelease];
+			if ([pathFromRoot hasSuffix:@"/"]) {
+				pathFromRoot = [pathFromRoot substringToIndex:(pathFromRoot.length - 1)];
+			}
+			
+			IMBNode *node = nil;
+			
+			if ([pathFromRoot length] > 0) {
+				node = [[[IMBNode alloc] init] autorelease];
+
 				node.parentNode = inParentNode;
-				node.identifier = [self identifierWithFolderId:id_local];
-				node.name = name;
 				node.icon = [self folderIcon];
 				node.parser = self;
 				node.mediaSource = self.mediaSource;
-				node.attributes = [self attributesWithId:id_local path:path];
+				node.name = [pathFromRoot lastPathComponent];
 				node.leaf = NO;
-				
+
 				[(NSMutableArray*)inParentNode.subNodes addObject:node];
 			}
-			
-			// This part is funky: apparently Lightroom keeps and "invisible" subfolder for each "real" folder, 
-			// which contains the images. In this case pathFromRoot is an empty string. Since we do not want to 
-			// show this this invisble subfolder, we "transfer" the image from the insvisible folder to the real
-			// folder by fixing the id_local of the real folder (inParentNode)...
-			
-			else
-			{
-				inParentNode.attributes = [self attributesWithId:id_local path:parentPath];
+			else {
+				node = inParentNode;
 			}
+			
+			node.identifier = [self identifierWithFolderId:id_local];
+			node.attributes = [self attributesWithRootFolder:parentRootFolder
+													 idLocal:id_local
+													rootPath:parentRootPath
+												pathFromRoot:pathFromRoot];
+			
+			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+			object.location = (id)node;
+			object.name = node.name;
+			object.metadata = nil;
+			object.parser = self;
+			object.index = index++;
+			object.imageLocation = (id)self.mediaSource;
+			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+			object.imageRepresentation = [self folderIcon];
+			
+			[(NSMutableArray*)inParentNode.objects addObject:object];
 		}
 		
 		[results close];
@@ -588,17 +679,33 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add an empty subnodes array, to avoid endless loop, even if the following query returns no results...
 	
-	if (inParentNode.subNodes == nil) inParentNode.subNodes = [NSMutableArray array];
-
+	if (inParentNode.subNodes == nil) {
+		inParentNode.subNodes = [NSMutableArray array];
+	}
+	
+	if (inParentNode.objects == nil) {
+		inParentNode.objects = [NSMutableArray array];
+	}
+	
+	
 	// Now query the database for subnodes to the specified parent node...
 	
-	if ([self openDatabase])
-	{
-		NSString* query = @"SELECT id_local,parent,kindName,name FROM AgLibraryTag WHERE kindName = ?";
-		FMResultSet* results = [self.database executeQuery:query,@"AgCollectionTagKind"];
+	FMDatabase *database = self.database;
+	
+	if (database != nil) {
+		NSString* query =	@" SELECT alt.id_local, alt.parent, alt.kindName, alt.name"
+							@" FROM AgLibraryTag alt"
+							@" WHERE kindName = 'AgCollectionTagKind'"
+							@" AND NOT EXISTS ("
+							@"	SELECT alc.id_local"
+							@"	FROM AgLibraryContent alc"
+							@"	WHERE alt.id_local = alc.containingTag"
+							@"	AND alc.owningModule = 'ag.library.smart_collection')";
 		
-		while ([results next])
-		{
+		FMResultSet* results = [self.database executeQuery:query];
+		NSInteger index = 0;
+
+		while ([results next]) {
 			// Get properties for next collection. Also substitute missing names...
 			
 			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]]; 
@@ -641,10 +748,25 @@ static NSArray* sSupportedUTIs = nil;
 				node.icon = [self folderIcon];
 				node.parser = self;
 				node.mediaSource = self.mediaSource;
-				node.attributes = [self attributesWithId:idLocal path:nil];
+				node.attributes = [self attributesWithRootFolder:nil
+														 idLocal:idLocal
+														rootPath:nil
+													pathFromRoot:nil];
 				node.leaf = NO;
 				
 				[(NSMutableArray*)inParentNode.subNodes addObject:node];
+
+				IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+				object.location = (id)node;
+				object.name = node.name;
+				object.metadata = nil;
+				object.parser = self;
+				object.index = index++;
+				object.imageLocation = (id)self.mediaSource;
+				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+				object.imageRepresentation = [self folderIcon];
+				
+				[(NSMutableArray*)inParentNode.objects addObject:object];
 			}
 		}
 		
@@ -681,52 +803,76 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add object array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	if (inNode.objects == nil) inNode.objects = [NSMutableArray array];
-
+	if (inNode.objects == nil) {
+		inNode.objects = [NSMutableArray array];
+	}
+	
 	// Query the database for image files for the specified node. Add an IMBObject for each one we find...
 	
-	if ([self openDatabase])
-	{
-		NSMutableString* query = [NSMutableString string];
+	FMDatabase *database = self.database;
+	
+	if (database != nil) {
+		NSMutableArray* objects = [NSMutableArray array];
+		NSString* query =	@" SELECT alf.idx_filename, captionName, apcp.relativeDataPath pyramidPath"
+							@" FROM AgLibraryFile alf"
+							@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
+							@" LEFT JOIN"
+							@"		(SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"
+							@" 		 FROM AgLibraryTagImage altiCaption"
+							@" 		 INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
+							@" 		 WHERE altiCaption.tagKind = 'AgCaptionTagKind'"
+							@"		)"
+							@"		ON ai.id_local = captionImage"
+							@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
+							@" WHERE alf.folder = ?"
+							@" ORDER BY ai.captureTime ASC";
 		
-		[query appendString:@" SELECT alf.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
-		[query appendString:@" FROM AgLibraryFile alf"];
-		[query appendString:@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"];
-		[query appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
-		[query appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
-		[query appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-		[query appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
-		[query appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
-		[query appendString:@" WHERE "];
-		[query appendString:@" alf.folder = ?"];
-		[query appendString:@" ORDER BY ai.captureTime ASC"];
-		
-		NSString* folderPath = [self pathFromAttributes:inNode.attributes];
-		NSNumber* id_local = [self idLocalFromAttributes:inNode.attributes];
-		FMResultSet* results = [self.database executeQuery:query, @"AgCaptionTagKind",id_local];
+		NSDictionary* attributes = inNode.attributes;
+		NSString* folderPath = [self absolutePathFromAttributes:attributes];
+		NSNumber* id_local = [self idLocalFromAttributes:attributes];
+		FMResultSet* results = [self.database executeQuery:query, id_local];
 		NSUInteger index = 0;
-		
-		while ([results next])
-		{
+				
+		while ([results next]) {
 			NSString* filename = [results stringForColumn:@"idx_filename"];
 			NSString* caption = [results stringForColumn:@"captionName"];
 			NSString* name = caption!= nil ? caption : filename;
 			NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
 			NSString* path = [folderPath stringByAppendingPathComponent:filename];
 
-			if ([self canOpenImageFileAtPath:path])
-			{
+			if ([self canOpenImageFileAtPath:path]) {
 				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-				[metadata setObject:path forKey:@"path"];
-				if (name) [metadata setObject:name forKey:@"name"];
-				if (pyramidPath) [metadata setObject:pyramidPath forKey:@"PyramidPath"];
 				
-				IMBObject* object = [self objectWithPath:path name:name metadata:metadata index:index++];
-				[(NSMutableArray*)inNode.objects addObject:object];
+				[metadata setObject:path forKey:@"path"];
+				
+				if (name) {
+					[metadata setObject:name forKey:@"name"];
+				}
+				
+				NSString *absolutePyramidPath = nil;
+				
+				if (pyramidPath) {
+					[metadata setObject:pyramidPath forKey:@"PyramidPath"];
+					
+					if (self.dataPath != nil) {
+						absolutePyramidPath = [self.dataPath stringByAppendingPathComponent:pyramidPath];
+					}
+				}
+				
+				IMBObject* object = [self objectWithPath:path
+													name:name
+												metadata:metadata
+											 pyramidPath:absolutePyramidPath
+												   index:index++];
+				
+				[objects addObject:object];
 			}
 		}
-								
+		
 		[results close];
+		
+		[objects addObjectsFromArray:inNode.objects];
+		[(NSMutableArray*)inNode.objects setArray:objects];
 	}
 }
 
@@ -741,35 +887,36 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add object array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	if (inNode.objects == nil) inNode.objects = [NSMutableArray array];
-
+	if (inNode.objects == nil) {
+		inNode.objects = [NSMutableArray array];
+	}
+	
 	// Query the database for image files for the specified node. Add an IMBObject for each one we find...
 	
-	if ([self openDatabase])
-	{
-		NSMutableString* query = [NSMutableString string];
-		
-		[query appendString:@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
-		[query appendString:@" FROM AgLibraryFile aif"];
-		[query appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
-		[query appendString:@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"];
-		[query appendString:@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"];
-		[query appendString:@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"];
-		[query appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
-		[query appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
-		[query appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-		[query appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
-		[query appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
-		[query appendString:@" WHERE "];
-		[query appendString:@" alti.tag = ?"];
-		[query appendString:@" ORDER BY ai.captureTime ASC"];
+	FMDatabase *database = self.database;
+	
+	if (database != nil) {
+		NSString* query =	@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, captionName, apcp.relativeDataPath pyramidPath"
+							@" FROM AgLibraryFile aif"
+							@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
+							@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
+							@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
+							@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"
+							@" LEFT JOIN"
+							@"		(SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"
+							@"		FROM AgLibraryTagImage altiCaption"
+							@"		INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
+							@"		WHERE altiCaption.tagKind = 'AgCaptionTagKind')"
+							@"	ON ai.id_local = captionImage"
+							@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
+							@" WHERE alti.tag = ?"
+							@" ORDER BY ai.captureTime ASC";
 		
 		NSNumber* id_local = [self idLocalFromAttributes:inNode.attributes];
-		FMResultSet* results = [self.database executeQuery:query, @"AgCaptionTagKind",id_local];
+		FMResultSet* results = [self.database executeQuery:query, id_local];
 		NSUInteger index = 0;
 		
-		while ([results next])
-		{
+		while ([results next]) {
 			NSString* rootPath = [results stringForColumn:@"absolutePath"];
 			NSString* pathFromRoot = [results stringForColumn:@"pathFromRoot"];
 			NSString* filename = [results stringForColumn:@"idx_filename"];
@@ -778,14 +925,30 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
 			NSString* path = [[rootPath stringByAppendingString:pathFromRoot] stringByAppendingString:filename];
 
-			if ([self canOpenImageFileAtPath:path])
-			{
+			if ([self canOpenImageFileAtPath:path]) {
 				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
+				
 				[metadata setObject:path forKey:@"path"];
-				if (name) [metadata setObject:name forKey:@"name"];
-				if (pyramidPath) [metadata setObject:pyramidPath forKey:@"PyramidPath"];
-			
-				IMBObject* object = [self objectWithPath:path name:name metadata:metadata index:index++];
+				
+				if (name) {
+					[metadata setObject:name forKey:@"name"];
+				}
+				
+				NSString *absolutePyramidPath = nil;
+				
+				if (pyramidPath) {
+					[metadata setObject:pyramidPath forKey:@"PyramidPath"];
+					
+					if (self.dataPath != nil) {
+						absolutePyramidPath = [self.dataPath stringByAppendingPathComponent:pyramidPath];
+					}
+				}
+				
+				IMBObject* object = [self objectWithPath:path
+													name:name
+												metadata:metadata
+											 pyramidPath:absolutePyramidPath
+												   index:index++];
 				[(NSMutableArray*)inNode.objects addObject:object];
 			}
 		}
@@ -832,7 +995,11 @@ static NSArray* sSupportedUTIs = nil;
 
 // Create a new IMBObject with the specified properties...
 
-- (IMBObject*) objectWithPath:(NSString*)inPath name:(NSString*)inName metadata:(NSDictionary*)inMetadata index:(NSUInteger)inIndex
+- (IMBObject*) objectWithPath:(NSString*)inPath
+						 name:(NSString*)inName
+					 metadata:(NSDictionary*)inMetadata
+				  pyramidPath:(NSString*)inPyramidPath
+						index:(NSUInteger)inIndex
 {
 	IMBLightroomObject* object = [[[IMBLightroomObject alloc] init] autorelease];
 
@@ -843,9 +1010,10 @@ static NSArray* sSupportedUTIs = nil;
 	object.metadataDescription = nil;		// Build lazily when needed (takes longer)
 	object.parser = self;
 	object.index = inIndex;
-	object.imageLocation = inPath;
+	object.imageLocation = inPyramidPath;
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 	object.imageRepresentation = nil;
+	object.absolutePyramidPath = inPyramidPath;
 	
 	return object;
 }
@@ -908,38 +1076,25 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSString* databasePath = (NSString*)self.mediaSource;
 	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
+	
+	[database setLogsErrors:YES];
+	
 	return database;
 }
 
-
-// If the database isn't open yet, then open it now...
-
-- (BOOL) openDatabase
+- (FMDatabase*)database
 {
-	if (self.database == nil)
-	{
-		self.database = [self libraryDatabase];
+	@synchronized (self) {
+		if (_database == nil) {
+			FMDatabase* database = [self libraryDatabase];
+			
+			if ([database open]) {
+				_database = [database retain];
+			}
+		}
 	}
 	
-	if (!_isDatabaseOpen)
-	{
-		_isDatabaseOpen = [self.database open];
-	}
-		
-	return _isDatabaseOpen;
-}
-
-
-// Close the database and release it...
-
-- (void) closeDatabase
-{
-	if (_isDatabaseOpen)
-	{
-		[self.database close];
-	}
-	
-	self.database = nil;
+	return [[_database retain] autorelease];
 }
 
 
@@ -1005,25 +1160,60 @@ static NSArray* sSupportedUTIs = nil;
 // because these the SQL query needs to know which images to look up in the database...
 
 
-- (NSDictionary*) attributesWithId:(NSNumber*)inIdLocal path:(NSString*)inPath
+- (NSDictionary*) attributesWithRootFolder:(NSNumber*)inRootFolder
+								   idLocal:(NSNumber*)inIdLocal
+								  rootPath:(NSString*)inRootPath
+							  pathFromRoot:(NSString*)inPathFromRoot
 {
-	return [NSDictionary dictionaryWithObjectsAndKeys:inIdLocal,@"id_local",inPath,@"path",nil];
+	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:4];
+	
+	[dictionary setValue:inRootFolder forKey:@"rootFolder"];
+	[dictionary setValue:inRootPath forKey:@"rootPath"];
+	[dictionary setValue:inIdLocal forKey:@"id_local"];
+	[dictionary setValue:inPathFromRoot forKey:@"pathFromRoot"];
+	
+	return dictionary;
 }
 
+- (NSNumber*) rootFolderFromAttributes:(NSDictionary*)inAttributes
+{
+	return [inAttributes objectForKey:@"rootFolder"];
+}
 
 - (NSNumber*) idLocalFromAttributes:(NSDictionary*)inAttributes
 {
 	return [inAttributes objectForKey:@"id_local"];
 }
 
-
-- (NSString*) pathFromAttributes:(NSDictionary*)inAttributes
+- (NSString*) rootPathFromAttributes:(NSDictionary*)inAttributes
 {
-	return [inAttributes objectForKey:@"path"];
+	return [inAttributes objectForKey:@"rootPath"];
+}
+
+- (NSString*) pathFromRootFromAttributes:(NSDictionary*)inAttributes
+{
+	return [inAttributes objectForKey:@"pathFromRoot"];
+}
+
+- (NSString*) absolutePathFromAttributes:(NSDictionary*)inAttributes
+{
+	NSString *rootPath = [self rootPathFromAttributes:inAttributes];
+	NSString *pathFromRoot = [self pathFromRootFromAttributes:inAttributes];
+	
+	if ([pathFromRoot length] > 0) {
+		return [rootPath stringByAppendingPathComponent:pathFromRoot];
+	}
+	
+	return rootPath;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// For Lightroom we need a promise that splits the pyramid file
+- (IMBObjectPromise*) objectPromiseWithObjects: (NSArray*) inObjects
+{
+	return [[(IMBObjectPromise*)[IMBPyramidObjectPromise alloc] initWithObjects:inObjects] autorelease];
+}
 
 @end

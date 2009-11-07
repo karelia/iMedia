@@ -155,4 +155,39 @@
 	return resolvedPath;
 }
 
+- (NSString*)temporaryFile:(NSString*)name
+{
+	NSString *processName = [[NSProcessInfo processInfo] processName];
+	NSString *directoryName = [NSString stringWithFormat:@"%@_iMediaTemporary", processName];
+	NSString *directoryPath = [NSTemporaryDirectory() stringByAppendingPathComponent:directoryName];
+	
+	[self createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:NULL];
+	
+    return [self temporaryFile:name withinDirectory:directoryPath];
+}
+
+- (NSString*)temporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath
+{
+	NSString *temporaryPath = [self temporaryPathWithinDirectory:directoryPath];
+	
+	if ([name length] > 0) {
+		[self createDirectoryAtPath:temporaryPath withIntermediateDirectories:YES attributes:nil error:NULL];
+		
+		return [temporaryPath stringByAppendingPathComponent:name];
+	}
+	
+	return temporaryPath;
+}
+
+- (NSString*)temporaryPathWithinDirectory:(NSString*)directoryPath
+{
+    char template[13];
+    
+	strlcpy(template, "XXXXXXXXXXXX", 13 );
+    
+	char *tmpName = mktemp(template);
+    
+	return [directoryPath stringByAppendingPathComponent:[NSString stringWithUTF8String:tmpName]];
+}
+
 @end
