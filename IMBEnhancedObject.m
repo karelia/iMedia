@@ -49,29 +49,31 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
+#import "IMBEnhancedObject.h"
+#import "IMBCommon.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+// This subclass adds the addition preliminaryMetadata property, which stores the metadata coming from an XML 
+// file or a database being parsed. Usually this metadata comes for "free" when parsing the database, whereas 
+// other metadata that we may still want is expensive to create. For this reason we will only do this work  
+// lazily (on demand). When the full metadata is requested, then the preliminaryMetadata is combined with the 
+// additional info and stored in the metadata property...
 
-@interface IMBApertureParser : IMBParser
+
+@implementation IMBEnhancedObject
+
+@synthesize preliminaryMetadata = _preliminaryMetadata;
+
+- (void) dealloc
 {
-	NSString* _appPath;
-	NSDictionary* _plist;
-	NSDate* _modificationDate;
-	BOOL _shouldDisplayLibraryName;
+	IMBRelease(_preliminaryMetadata);
+	[super dealloc];
 }
-
-@property (retain) NSString* appPath;
-@property (retain) NSDictionary* plist;
-@property (retain) NSDate* modificationDate;
-@property (assign) BOOL shouldDisplayLibraryName;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-

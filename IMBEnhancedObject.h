@@ -49,29 +49,20 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-@interface IMBApertureParser : IMBParser
+@interface IMBEnhancedObject : IMBObject
 {
-	NSString* _appPath;
-	NSDictionary* _plist;
-	NSDate* _modificationDate;
-	BOOL _shouldDisplayLibraryName;
+	NSDictionary* _preliminaryMetadata;
 }
 
-@property (retain) NSString* appPath;
-@property (retain) NSDictionary* plist;
-@property (retain) NSDate* modificationDate;
-@property (assign) BOOL shouldDisplayLibraryName;
+@property (retain) NSDictionary* preliminaryMetadata;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-

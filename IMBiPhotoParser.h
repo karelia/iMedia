@@ -50,20 +50,6 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
-#import "IMBObject.h"
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-@interface IMBiPhotoObject : IMBObject
-{
-	NSDictionary* _iPhotoMetadata;
-}
-
-@property (retain) NSDictionary* iPhotoMetadata;
-
-@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
