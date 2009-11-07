@@ -46,6 +46,13 @@
 //  Created by Thomas Engelmeier on 25.07.09.
 //  Copyright 2009 Thomas Engelmeier. All rights reserved.
 
+// Known bugs: 
+// When the first camera is attached, the device node gets added twice
+// The generic folder Icon does not scale correctly until the tableview cell is touched 
+// Drag and Drop: Files are copied multiple times
+// Drag and Drop: Download destination is in /var/tmp/..
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 #import "IMBImageCaptureParser.h"
@@ -57,32 +64,77 @@
 #import "IMBNodeObject.h"
 #import "IMBObjectPromise.h"
 #import "IMBOperationQueue.h"
+#import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
 #import <Carbon/Carbon.h>
 #import <Quartz/Quartz.h>
 
 //----------------------------------------------------------------------------------------------------------------------
+// Internal classes:
 
-@interface  IMBMTPObjectPromise : IMBRemoteObjectPromise
+// Purpose: protocol to keep the user informed of download progress
+@class IMBMTPDownloadOperation;
+@protocol IMBMTPDownloadOperationDelegate 
+- (void) operationDidDownloadFile:(IMBMTPDownloadOperation*)inOperation;
+- (void) operationDidFinish:(IMBMTPDownloadOperation*)inOperation;
+- (void) operation:(IMBMTPDownloadOperation*)inOperation didReceiveError:(NSError *) anError;
+@end
+
+// Purpose: Gets created from drag'n drop. Triggers copying of files to a local destination 
+@interface  IMBMTPObjectPromise : IMBRemoteObjectPromise<IMBMTPDownloadOperationDelegate>
 { 
 	long long _bytesTotal;
-	long long _bytesDone;
-	
+	long long _bytesDone;	
 }
 @property (assign,readonly) long long bytesTotal;
 @property (assign,readonly) long long bytesDone;
-
-- (id) initWithObjects:(NSArray *)inObjects;
 @end
 
+// Purpose: Copy a bunch of files 
+
+@interface  IMBMTPDownloadOperation : NSOperation
+{ 
+	// input parameters
+	id delegate;
+	NSArray  *_objectsToLoad;
+	NSString *_downloadFolderPath;
+	
+	// changed during operation
+	NSMutableArray  *_receivedFilePaths;
+	long long _receivedBytes;
+}
+@property (assign)				id<IMBMTPDownloadOperationDelegate> delegate;
+@property (copy)				NSArray *objectsToLoad;
+@property (copy)				NSString *downloadFolderPath; 
+@property (retain)				NSMutableArray *receivedFilePaths;
+
+@property (assign)				long long receivedBytes;
+@property (assign, readonly)	long long totalBytes;
+
+@end
+
+// Purpose: proxy thumbnails that get lazily downloaded 
+@interface MTPVisualObject: IMBObject
+{
+}
+- (void) _gotThumbnailCallback: (ICACopyObjectThumbnailPB*)pbPtr;
+@end
+
+//----------------------------------------------------------------------------------------------------------------------
+
 @interface IMBImageCaptureParser (internal)
-- (void) installNotification;
-- (void) uninstallNotification;
+- (void) _installNotification;
+- (void) _uninstallNotification;
 - (BOOL) _isAppropriateICAType:(uint32_t) inType;
 - (BOOL) _addICATree:(NSArray *)subItems toNode:(IMBNode *)inNode;
+- (void) _addICAObject:(NSDictionary *) anItem toObjectArray:(NSMutableArray *) objectArray;
 - (void) _gotICANotification:(NSString *) aNotification withDictionary:(NSDictionary *) aDictionary;
 - (IMBNode *) _nodeForDevicelist;
 - (IMBNode *) _nodeForDevice:(NSDictionary *) anDevice;
 - (IMBNode *) _nodeForTempDevice:(NSDictionary *) anDevice;
+- (NSString *) _identifierForICAObject:(id) anObjectID;
+- (NSImage *) _getThumbnailSync:(id) anObject;
+
 @end
 
 #ifdef __DEBUGGING__
@@ -91,20 +143,10 @@
 #define DEBUGLOG( fmt, ... ) {}
 #endif
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-// class to proxy thumbnails that get lazily downloaded 
-@interface MTPVisualObject: IMBObject
-{
-}
-- (void) _gotThumbnailCallback: (ICACopyObjectThumbnailPB*)pbPtr;
-
-@end
-
 //----------------------------------------------------------------------------------------------------------------------
 
 @implementation IMBImageCaptureParser
+@synthesize loadingDevices = _loadingDevices;
 
 + (void) load
 {
@@ -120,16 +162,16 @@
 {
 	self = [super initWithMediaType:anType];
 	if (self != nil) {		
-		loadingDevices = [NSMutableDictionary new];
-		
 		// we prepopulate the root mediasource with the ICA ID of the list of cameras
 		ICAGetDeviceListPB deviceListPB;
 		memset( &deviceListPB, 0, sizeof( ICAGetDeviceListPB ));		
 		OSStatus err = ICAGetDeviceList((ICAGetDeviceListPB *)&deviceListPB, NULL);
 		if( err == noErr )
 		{
+			self.loadingDevices = [NSMutableDictionary dictionary];
 			self.mediaSource = [[NSNumber numberWithInt:deviceListPB.object] stringValue];
-			[self installNotification];
+			
+			[self _installNotification];
 		}
 	}
 	return self;
@@ -137,8 +179,9 @@
 
 - (void) dealloc
 {
-	[self uninstallNotification];
-	[loadingDevices release];
+	[self _uninstallNotification];
+	
+	self.loadingDevices = nil;
 	self.mediaSource = nil;
 	[super dealloc];
 }
@@ -147,16 +190,6 @@
 {
 	IMBMTPObjectPromise *promise = [[IMBMTPObjectPromise alloc] initWithObjects:inObjects];
 	return [promise autorelease];
-}
-
-- (NSString *) identifierForICAObject:(id) anObjectID
-{
-	NSString* parserClassName = NSStringFromClass([self class]);
-	if( ![anObjectID isKindOfClass:[NSString class]] )
-		anObjectID = [anObjectID stringValue];
-	NSString *path = [anObjectID stringByStandardizingPath];
-	
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,path];	
 }
 	  
 // copy a given node
@@ -183,88 +216,102 @@
 	return newNode;
 }
 
+// Scan the given node "folder" for subfolders and add a subnode for each one we find...
 
-//----------------------------------------------------------------------------------------------------------------------
-
-- (BOOL) _isAppropriateICAType:(uint32_t) inType
+- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
-	BOOL isOurType = NO;
-	switch( inType )
-	{
-/* 		case kICADevice:
-		case kICADeviceCamera:
-		case kICADeviceScanner:
-		case kICADeviceMFP:
-		case kICADevicePhone:
-		case kICADevicePDA:
-		case kICADeviceOther:
-		case kICAList:	
-		case kICADirectory: 
-		case kICAFile: 
-		case kICAFileFirmware:
-		case kICAFileOther:
- */ 
-		case kICAFileImage:
-			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeImage];
-			break;
-		case kICAFileMovie:
-			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeMovie];
-			break;
-		case kICAFileAudio:
-			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeAudio];
-			break;
-	}
-	return isOurType;
-}
-
-- (void) _addICAObject:(NSDictionary *) anItem toArray:(NSMutableArray *) objectArray
-{	
-	uint32_t type = [[anItem valueForKey:@"file"] intValue];
-	NSUInteger index = 0;
-
-	if( [self _isAppropriateICAType:type] )
-	{
-		MTPVisualObject* object = [MTPVisualObject new];
-		object.location = [[anItem valueForKey:@"icao"] stringValue];
-		object.name = [anItem valueForKey:@"ifil"];
-		object.metadata = anItem;
-		object.parser = self;
-		object.index = index++;
-
-		[objectArray addObject:object];
+	DEBUGLOG( @"%s\n inNode %@",__PRETTY_FUNCTION__, inNode );
+	
+	NSError* error = nil;
+	
+	if( !inNode.objects ||
+	   !inNode.subNodes )
+	{ // only populate if empty
 		
-		[object release];
+		ICAObject object = [inNode.mediaSource intValue];
+		
+		ICACopyObjectPropertyDictionaryPB copyObjectsPB; 
+		memset( &copyObjectsPB, 0, sizeof(ICACopyObjectPropertyDictionaryPB));
+		
+		NSDictionary *propertiesDict = NULL;
+		copyObjectsPB.object = object;
+		copyObjectsPB.theDict = (CFDictionaryRef *) &propertiesDict; 
+		OSStatus err = ICACopyObjectPropertyDictionary(&copyObjectsPB, NULL);
+		
+		if (err == noErr && noErr == copyObjectsPB.header.err )
+		{ 
+			// DEBUGLOG( @"%@", propertiesDict );
+			NSArray *devices = [propertiesDict valueForKey:(NSString *)kICADevicesArrayKey];
+			if( devices ) 
+				[self _addICADeviceList:devices toNode:inNode];
+			else 
+				[self _addICATree:[(NSDictionary *)propertiesDict valueForKey:@"tree"] toNode:inNode];
+			
+			CFRelease( propertiesDict );
+		}	
+	}
+	
+	if (outError) *outError = error;
+	return error == nil;
+}
+
+- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
+{
+	DEBUGLOG( @"%s: old %@",__PRETTY_FUNCTION__, inOldNode );
+	
+	NSError* error = nil;
+	
+	// note: if inOldNode is nil, this represents the device list root object
+	IMBNode* newNode = nil;
+	
+	if( inOldNode )
+	{
+		newNode = [[self nodeCopy:inOldNode] autorelease];
+		// already done in copyNode:
+		// if ( [inOldNode.subNodes count] || [inOldNode.objects count]  )
+		// { 	// If the old node had subnodes, then look for subnodes in the new node...
+		// 	[self populateNode:newNode options:inOptions error:&error];
+		// }
+	}
+	else
+		newNode = [self _nodeForDevicelist];
+	
+	if (outError) *outError = error;
+	return newNode;
+}
+
+#pragma mark -
+#pragma mark Internal handling
+#pragma mark Populate nodes with data returned from ICA:
+
+- (void) _addICADeviceList:(NSArray *) devices toNode:(IMBNode *)inNode
+{
+	// we retrieved a device list
+	NSMutableArray *subnodes = [NSMutableArray array];
+	NSMutableArray *deviceIdentifiers = [NSMutableArray array];
+	
+	for( NSDictionary *anDevice in devices )
+	{
+		[deviceIdentifiers addObject:[anDevice valueForKey:@"icao"]];
+		
+		IMBNode* deviceNode = [self _nodeForDevice:anDevice];
+		[subnodes addObject:deviceNode];
+		deviceNode.parentNode = inNode;
+	}
+	
+	inNode.subNodes = subnodes;
+	inNode.objects = [NSArray array]; // prevent endless loop
+	
+	// now add any unlisted devices with an placeholder node
+	NSArray *loadingIdentifiers = [self.loadingDevices allKeys];
+	for( id anKey in loadingIdentifiers )
+	{
+		if( ![deviceIdentifiers containsObject:anKey] )
+		{
+			[subnodes addObject:[self _nodeForTempDevice:[self.loadingDevices objectForKey:anKey]]];
+		}
 	}
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-- (NSImage *) _getThumbnailSync:(id) anObject
-{
-	NSImage *image = NULL;
-	NSData *data = NULL;
-    ICACopyObjectThumbnailPB    pb = { 0  };
-    
-    pb.header.refcon   = 0L; // (unsigned long) self;
-    pb.thumbnailFormat = kICAThumbnailFormatTIFF; // gives transparency
-    // use the ICAObject out of the mDeviceDictionary
-    pb.object          = [anObject intValue];
-	pb.thumbnailData   = (CFDataRef*) &data;
-    
-    // asynchronous call - callback proc will get called when call completes
-    /*err =*/ ICACopyObjectThumbnail( &pb, NULL );
-	if (noErr == pb.header.err)
-    {
-        // got the thumbnail data, now create an image...
-        // NSData * data  = (NSData*)*(pb.thumbnailData);		
-        image = [[NSImage alloc] initWithData:data];
-		[image setScalesWhenResized:YES];
-		[image setSize:NSMakeSize(16.0,16.0)];
-		[data release];
-		DEBUGLOG( @"%s -> %@", __PRETTY_FUNCTION__, self );
-    }
-	return [image autorelease];
-}
-
 // recursive creation of subtree nodes 
 // R: object had children
 
@@ -288,19 +335,18 @@
 				
 				IMBNode* subnode = [IMBNode new];
 				subnode.parentNode = inNode;
-				
 				subnode.mediaSource = imageCaptureID;
-				subnode.identifier = [self identifierForICAObject:imageCaptureID];
+				subnode.identifier = [self _identifierForICAObject:imageCaptureID];
 				subnode.name = name;
-				// test implementation:
-				if( [anItem valueForKey:@"thuP"] )
-					subnode.icon = [self _getThumbnailSync:imageCaptureID];
-				if( !subnode.icon )
-					subnode.icon = [[NSWorkspace sharedWorkspace] iconForFileType:@"'fldr'"];
-				// subnode.icon = [anItem valueForKey:(NSString *)kICAThumbnailPropertyKey];
 				subnode.parser = self;
 				subnode.attributes = anItem;	
 				
+				// retrieve the thumbnail. Fallback is the generic folder icon 
+				if( [anItem valueForKey:@"thuP"] )
+					subnode.icon = [self _getThumbnailSync:imageCaptureID];
+				if( !subnode.icon ) 
+					subnode.icon = [NSImage sharedGenericFolderIcon];
+					// subnode.icon = [[NSWorkspace sharedWorkspace] iconForFileType:@"'fldr'"];
 				
 				BOOL hasSubnodes = [self _addICATree:[anItem valueForKey:@"tree"] toNode:subnode];
 				subnode.leaf = !hasSubnodes;
@@ -314,7 +360,7 @@
 				// TE: On my Lumix, nameless containers are basically an logical group of related media. 
 				// i.e. Movie plus poster image
 				
-				// options would be: 
+				// options are: 
 				// a.) synthesize an name from the top level object
 				// b.) strip the top level object and use the UTI filter to insert it in the current node
 				// As iMedia is using a filtered rep, option b makes more sense
@@ -323,16 +369,17 @@
 				NSMutableArray *tmpObjects = [NSMutableArray array];
 				
 				for( NSDictionary *tmpObject in subObjects )
-					[self _addICAObject:tmpObject toArray:tmpObjects];
-				// tbd: test if really only one object remained
-				// tbd2: test if an problem occurs with later handled removal notificatons
-				[objects addObjectsFromArray:tmpObjects];
+					[self _addICAObject:tmpObject toObjectArray:tmpObjects];
 				
+				// TODO: test if really only one object remained
+				// TODO: test if an problem occurs with later handled removal notificatons
+				[objects addObjectsFromArray:tmpObjects];
 			}
 
 		}
-		else {
-			[self _addICAObject:anItem toArray:objects];			
+		else 
+		{
+			[self _addICAObject:anItem toObjectArray:objects];			
 		}
 		
 	}
@@ -342,73 +389,27 @@
 	
 }
 
-// Scan the our folder for subfolders and add a subnode for each one we find...
-
-- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
-{
-	DEBUGLOG( @"%s\n inNode %@",__PRETTY_FUNCTION__, inNode );
-
-	NSError* error = nil;
+- (void) _addICAObject:(NSDictionary *) anItem toObjectArray:(NSMutableArray *) objectArray
+{	
+	uint32_t type = [[anItem valueForKey:@"file"] intValue];
+	NSUInteger index = 0;
 	
-	if( !inNode.objects ||
-		!inNode.subNodes )
-	{ // only populate if empty
+	if( [self _isAppropriateICAType:type] )
+	{
+		MTPVisualObject* object = [MTPVisualObject new];
+		object.location = [[anItem valueForKey:@"icao"] stringValue];
+		object.name = [anItem valueForKey:@"ifil"];
+		object.metadata = anItem;
+		object.parser = self;
+		object.index = index++;
 		
-		ICAObject object = [inNode.mediaSource intValue];
-
-		ICACopyObjectPropertyDictionaryPB copyObjectsPB; 
-		memset( &copyObjectsPB, 0, sizeof(ICACopyObjectPropertyDictionaryPB));
-
-		NSDictionary *propertiesDict = NULL;
-		copyObjectsPB.object = object;
-		copyObjectsPB.theDict = (CFDictionaryRef *) &propertiesDict; 
-		OSStatus err = ICACopyObjectPropertyDictionary(&copyObjectsPB, NULL);
-		 
-		if (err == noErr && noErr == copyObjectsPB.header.err )
-		{ 
-			NSLog( @"%@", propertiesDict );
-
-			NSArray *devices = [propertiesDict valueForKey:(NSString *)kICADevicesArrayKey];
-			if( devices ) // we retrieved a device list
-			{
-				NSMutableArray *subnodes = [NSMutableArray array];
-				NSMutableArray *deviceIdentifiers = [NSMutableArray array];
-				
-				// we handled the root node. populate subnodes
-				for( NSDictionary *anDevice in devices )
-				{
-					[deviceIdentifiers addObject:[anDevice valueForKey:@"icao"]];
-
-					IMBNode* subnode = [self _nodeForDevice:anDevice];
-					subnode.parentNode = inNode;
-					[subnodes addObject:subnode];
-				}
-
-				inNode.subNodes = subnodes;
-				inNode.objects = [NSArray array]; // prevent endless loop
-				
-				// now add any unlisted devices with an placeholder node
-				NSArray *loadingIdentifiers = [loadingDevices allKeys];
-				for( id anKey in loadingIdentifiers )
-				{
-					if( ![deviceIdentifiers containsObject:anKey] )
-					{
-						[subnodes addObject:[self _nodeForTempDevice:[loadingDevices objectForKey:anKey]]];
-					}
-				}
-				
-			}
-			else 
-				[self _addICATree:[(NSDictionary *)propertiesDict valueForKey:@"tree"] toNode:inNode];
-				
-			CFRelease( propertiesDict );
-		}	
+		[objectArray addObject:object];
+		
+		[object release];
 	}
-	
-	if (outError) *outError = error;
-	return error == nil;
 }
 
+#pragma mark Create nodes prepared for different use cases:
 // populate the node for the device list
 
 - (IMBNode *) _nodeForDevicelist
@@ -430,7 +431,7 @@
 	
 	// newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
-	newNode.identifier = [self identifierForICAObject:self.mediaSource];
+	newNode.identifier = [self _identifierForICAObject:self.mediaSource];
 	
 	newNode.name = showsGroupNodes ? [name uppercaseString] : name;
 	newNode.parser = self;
@@ -500,32 +501,69 @@
 	return [subnode autorelease];
 }
 
-- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
-{
-	DEBUGLOG( @"%s: old %@",__PRETTY_FUNCTION__, inOldNode );
 
-	NSError* error = nil;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+- (NSString *) _identifierForICAObject:(id) anObjectID
+{
+	NSString* parserClassName = NSStringFromClass([self class]);
+	if( ![anObjectID isKindOfClass:[NSString class]] )
+		anObjectID = [anObjectID stringValue];
+	NSString *path = [anObjectID stringByStandardizingPath];
 	
-	// note: if inOldNode is nil, this represents the device list root object
-	IMBNode* newNode = nil;
-	
-	if( inOldNode )
-	{
-		newNode = [[self nodeCopy:inOldNode] autorelease];
-		// already done in copyNode:
-		// if ( [inOldNode.subNodes count] || [inOldNode.objects count]  )
-		// { 	// If the old node had subnodes, then look for subnodes in the new node...
-		// 	[self populateNode:newNode options:inOptions error:&error];
-		// }
-	}
-	else
-		newNode = [self _nodeForDevicelist];
-	
-	if (outError) *outError = error;
-	return newNode;
+	return [NSString stringWithFormat:@"%@:/%@",parserClassName,path];	
 }
 
-#pragma mark Image Capture
+- (BOOL) _isAppropriateICAType:(uint32_t) inType
+{
+	BOOL isOurType = NO;
+	switch( inType )
+	{
+			//		case kICAList:	
+			//		case kICADirectory: 
+			//		case kICAFile: 
+			//		case kICAFileFirmware:
+			//		case kICAFileOther: 
+			
+		case kICAFileImage:
+			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeImage];
+			break;
+		case kICAFileMovie:
+			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeMovie];
+			break;
+		case kICAFileAudio:
+			isOurType = [self.mediaType isEqualTo:kIMBMediaTypeAudio];
+			break;
+	}
+	return isOurType;
+}
+
+- (NSImage *) _getThumbnailSync:(id) anObject
+{
+	NSImage *image = NULL;
+	NSData *data = NULL;
+    ICACopyObjectThumbnailPB    pb = { 0  };
+    
+    pb.header.refcon   = 0L; 
+    pb.thumbnailFormat = kICAThumbnailFormatTIFF; // gives transparency
+    pb.object          = [anObject intValue];
+	pb.thumbnailData   = (CFDataRef*) &data;
+    
+    /*err =*/ ICACopyObjectThumbnail( &pb, NULL );
+	if (noErr == pb.header.err)
+    {
+        // got the thumbnail data, now create an image...
+		image = [[NSImage alloc] initWithData:data];
+		[image setScalesWhenResized:YES];
+		[image setSize:NSMakeSize(16.0,16.0)];
+		[data release];
+		DEBUGLOG( @"%s -> %@", __PRETTY_FUNCTION__, self );
+    }
+	return [image autorelease];
+}
+
+#pragma mark Image Capture Notification Handling:
 
 // watching:
 static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRef notificationDictionary)
@@ -537,9 +575,9 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
 // ———————————————————————————————————————————————————————————————————————————
 // - installNotification:
 // ———————————————————————————————————————————————————————————————————————————
-- (void)installNotification
+- (void)_installNotification
 {
-	assert( sizeof(id) <= sizeof(unsigned long)); // make sure we can store self in the refcon
+	NSAssert( sizeof(id) <= sizeof(unsigned long), @"Need enough space to stope an pointer in the ImageCapture Refcon" ); 
     ICARegisterForEventNotificationPB pb;
     OSErr	err;
 	
@@ -548,30 +586,24 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
     pb.objectOfInterest  = 0;	// all objects
     pb.eventsOfInterest	 = (CFArrayRef)[NSArray arrayWithObjects:
 							// object level:
-							///	kICANotificationTypeObjectAdded,  // when the device is connected, first a flood of those notifications arrives
+							///	kICANotificationTypeObjectAdded, => when the device is connected, first a flood of those notifications arrives
 								(NSString *) kICANotificationTypeObjectRemoved, 
 								(NSString *) kICANotificationTypeObjectInfoChanged,
 							// memory card level:
 								(NSString *) kICANotificationTypeStoreAdded,
 								(NSString *) kICANotificationTypeStoreRemoved,
-								// kICANotificationTypeStoreFull,
-								// kICANotificationTypeStoreInfoChanged,
 							// device level:
 								(NSString *) kICANotificationTypeDeviceAdded, // issued after all object info is retrieved
 								(NSString *) kICANotificationTypeDeviceRemoved,  // issued immediately when the device goes off
 								(NSString *) kICANotificationTypeDeviceInfoChanged, // issued when another driver takes over 
 								(NSString *) kICANotificationTypeDeviceWasReset, 
-							//	kICANotificationTypeDevicePropertyChanged, 
 // the following two constants are tagged as appearing from 10.5 on in the 10.6
 // but in reality they appear in the 10.6 SDK 										
 //								(NSString *) kICANotificationTypeDeviceStatusInfo, 
 //								(NSString *) kICANotificationTypeDeviceStatusError,
-							// kICANotificationTypeCaptureComplete,
-							// kICANotificationTypeRequestObjectTransfer, 
-							// kICANotificationTypeTransactionCanceled, 
+							
 								(NSString *) kICANotificationTypeUnreportedStatus, 
-							// kICANotificationTypeProprietary,
-								(NSString *) kICANotificationTypeDeviceConnectionProgress, // useful for setting up a badge? 
+								(NSString *) kICANotificationTypeDeviceConnectionProgress, 
 							nil];
 							
 							
@@ -584,7 +616,7 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
     }
 }
 
-- (void) uninstallNotification
+- (void) _uninstallNotification
 {
 	ICARegisterForEventNotificationPB pb;
     OSErr	err;
@@ -610,43 +642,42 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
 	DEBUGLOG( @"%s: %@",__PRETTY_FUNCTION__, aNotification );
 	DEBUGLOG( @"%@", aDictionary );
 	id objectID = nil;
+	
 	// for those hardcoded string constants, probably a == comparison instead of a full isEqualTo: would be sufficient
+	
 	// trigger node change notifications:
 	
 	if( [aNotification isEqualTo:(NSString *)kICANotificationTypeDeviceConnectionProgress] ||
 		[aNotification isEqualTo:(NSString *)kICANotificationTypeDeviceAdded] ||
 	    [aNotification isEqualTo:(NSString *)kICANotificationTypeDeviceRemoved] )
-	{ // the device list object changed..
+	{ 
+		// reload the whole device list:
 		objectID = [aDictionary valueForKey:(NSString *)kICANotificationDeviceListICAObjectKey];
 	}	
 
-	// it might be a good idea to lock the dictionary access here	
-	// it seems the 100% read notification arrives directly AFTER the device added notification 
+	
 	if( [aNotification isEqualTo:(NSString *)kICANotificationTypeDeviceConnectionProgress] )
-	{ 
-		/* keys set: 
-		 ICAContentCatalogPercentCompletedKey,			 
-		 ICANotificationDeviceICAObjectKey == ICANotificationICAObjectKey,
-		 ICANotificationDeviceListICAObjectKey
-		 */ 
-		
-		@synchronized( loadingDevices ) 
+	{ 		
+		@synchronized( _loadingDevices ) 
 		{
+			// it seems the 100% read notification arrives directly AFTER the device added notification.
+			// prevent overriding the newly added device:
+			
 			id percentCompleted = [aDictionary valueForKey:(NSString *) kICANotificationPercentDownloadedKey];
-			if( [percentCompleted intValue] < 100 )
+			if( [percentCompleted intValue] < 100 ) 
 			{
+				// from some point ICAUserdefinedName is also set. reload the node contents?
 				id deviceID = [aDictionary objectForKey:(NSString *)kICANotificationDeviceICAObjectKey];
-			// from some point ICAUserdefinedName is also set. reload?
 				NSDictionary *deviceDict = 
 					[NSDictionary dictionaryWithObjectsAndKeys:
 						percentCompleted, kICANotificationPercentDownloadedKey,
 						deviceID, @"icao",
 					 nil];
-				[loadingDevices setObject:deviceDict forKey:deviceID];
+				[_loadingDevices setObject:deviceDict forKey:deviceID];
 			}
 			else 
 			{
-				[loadingDevices setObject:nil forKey:objectID];
+				[_loadingDevices setObject:nil forKey:objectID];
 			}
 		}  // end  lock
 	}
@@ -654,14 +685,14 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
 	if( !objectID && 
 	    [aNotification isEqualTo:(NSString *)kICANotificationTypeStoreAdded] || 
 	    [aNotification isEqualTo:(NSString *)kICANotificationTypeStoreRemoved] )
-	{ // Reload the device:
+	{ 
+		// Reload the device
+		// TODO: test with devices with two card slots
 		objectID =  [aDictionary valueForKey:(NSString *)kICANotificationDeviceICAObjectKey];
 	} 
 	
 	if( objectID )
 	{
-//		NSString *identifier = [self identifierForICAObject:objectID];
-		
 		// find it in the node tree
 		IMBLibraryController *libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
 		
@@ -671,6 +702,9 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
  
 }
 @end 
+
+/******************************** Visuals objects for the browser *******************************/
+#pragma mark -
 
 @implementation MTPVisualObject
 
@@ -694,7 +728,6 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	return self;
 }
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 - (void) _gotThumbnailCallback: (ICACopyObjectThumbnailPB*)pbPtr
 {
@@ -703,26 +736,22 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
     {
         // got the thumbnail data, now create an image...
         NSData * data  = (NSData*)*(pbPtr->thumbnailData);		
-        // NSImage* image = [[NSImage alloc] initWithData: data];
+ 		self.imageRepresentation = data;
+		[data release];
 		
-		self.imageRepresentation = data;
 		self.imageVersion = self.imageVersion + 1;
 		
-        // [image release];
-        [data release];
 		DEBUGLOG( @"Received Thumbnail %@", self );
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
 - (void) _getThumbnail
 {
 	self.isLoading = YES;
-    ICACopyObjectThumbnailPB    pb = { };
+    ICACopyObjectThumbnailPB    pb = { 0 };
     
     pb.header.refcon   = (unsigned long) self;
     pb.thumbnailFormat = kICAThumbnailFormatJPEG;
-    // use the ICAObject out of the mDeviceDictionary
     pb.object          = (ICAObject)[self.location integerValue];
     
     ICACopyObjectThumbnail(&pb, ICAThumbnailCallback );
@@ -730,6 +759,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	DEBUGLOG( @"Loading Thumbnail %@", self );
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
 - (NSImage *) imageRepresentation
 {
 	if ( !_imageRepresentation && !self.isLoading  ) {
@@ -746,46 +776,33 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 
 @end
 
+/***************************** Drag and drop support ***********************************/
+
 #pragma mark -
-//------------------------------
-
-@interface  IMBMTPDownloadOperation : NSOperation
-{ 
-	NSString *downloadFolderPath;
-	NSString *receivedFilePath;
-	ICAObject objectID;
-	long long fileSize;
-	id delegate;
-}
-@property (nonatomic, assign, readonly) ICAObject objectID;
-@property (nonatomic, assign, readonly) id delegate;
-@property (nonatomic, assign) long long fileSize;
-
-@property (nonatomic, copy)		NSString *downloadFolderPath; 
-@property (nonatomic, copy)		NSString *receivedFilePath;
-@end
 
 @implementation IMBMTPDownloadOperation
-@synthesize delegate;
-@synthesize fileSize; 
-@synthesize objectID;
-@synthesize downloadFolderPath;
-@synthesize receivedFilePath;
+@synthesize delegate = _delegate;
+@synthesize objectsToLoad =		_objectsToLoad;
+@synthesize downloadFolderPath = _downloadFolderPath;
+@synthesize receivedBytes =		_receivedBytes;
+@synthesize receivedFilePaths = _receivedFilePaths;
 
-- (id) initWithObject:(IMBObject *) anObject delegate:(id) aDelegate
+- (id) initWithObjectArray:(NSArray *) anArray delegate:(id<IMBMTPDownloadOperationDelegate>) aDelegate
 {
 	self = [super init];
 	if (self != nil) {
-		objectID = [anObject.location intValue];
-		// NSLog( @"File metadata: %@", anObject.metadata );
-		fileSize = [[anObject.metadata valueForKey:@"isiz"] longLongValue];
-		delegate = aDelegate;
+		self.delegate = aDelegate;
+		self.objectsToLoad = anArray;
+		self.receivedFilePaths = [NSMutableArray arrayWithCapacity:[anArray count]];
 	}
 	return self;
 }
 
 - (void) dealloc 
 {
+	self.objectsToLoad = nil;
+	self.downloadFolderPath = nil;
+	self.receivedFilePaths = nil;
 	[super dealloc];
 }
 
@@ -793,77 +810,86 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
-/*	NSString* downloadFolderPath = self.downloadFolderPath;
-	NSString* filename = [[self.remoteURL path] lastPathComponent];
-	NSString* localFilePath = [downloadFolderPath stringByAppendingPathComponent:filename]; */ 
+	FSRef downloadFolder, fileFSRef; 
+	ICADownloadFilePB pb = { 0 };
 	
-	NSLog( @"Downloading file %x", objectID );
-	
-	do // prepare for multiple files
+	if( !CFURLGetFSRef ( (CFURLRef)[NSURL fileURLWithPath:self.downloadFolderPath], &downloadFolder ) ) 
 	{
-		
-		FSRef downloadFolder, fileFSRef; 
-		if( CFURLGetFSRef ( (CFURLRef)[NSURL fileURLWithPath:self.downloadFolderPath], &downloadFolder ) )
-			; // we have an destination 
-		else {
-			return ; // error. No place to download. return 
-		}
-		
-		ICADownloadFilePB pb = { 0 };
-		pb.header.refcon   = (unsigned long) self;
+		NSLog( @"IMBMTPDownloadOperation: Can not download without dastination folder" );
+		return;
+	}
+	
+	for( IMBObject *anObject in self.objectsToLoad )
+	{
+		if( [anObject isKindOfClass:[IMBNodeObject class]] )
+			 continue;
+			 
+		if( [self isCancelled] )
+			 break;
+			 
 		OSStatus err;
+		pb.header.refcon   = 0L; // not necessary - sync version;
+
+		pb.object			= [anObject.location intValue];
+		pb.dirFSRef			= &downloadFolder;		// FSRef of destination directiory
+		pb.fileType			= pb.fileCreator = 0;	// not used any more
+		pb.rotationAngle	= 0;					// Rotation angle in steps of 90 degress.
+		pb.fileFSRef		= &fileFSRef;			// we want to know where the file ends up
 		
-		pb.object          = objectID;
-		pb.dirFSRef		   = &downloadFolder; //  FSRef of destination directiory
-		pb.fileType = pb.fileCreator = 0; // not used any more
-		pb.rotationAngle = 0; //  Rotation angle in steps of 90 degress.
-		pb.fileFSRef = &fileFSRef; // don't care where the file ends up
+		DEBUGLOG( @"Downloading file %x", pb.object );
 	
 		err = ICADownloadFile(&pb, nil);
 		if( !err ) 
 		{
-			if( [delegate respondsToSelector:@selector( operationDidFinish: )] )
-				[(id)delegate operationDidFinish:self];
+			NSURL *fileURL = (NSURL *)CFURLCreateFromFSRef( kCFAllocatorDefault, &fileFSRef );
+			if( fileURL )
+			{
+				[self.receivedFilePaths addObject:[fileURL path]];
+				[fileURL release];
+			}
+			
+			self.receivedBytes += [[anObject.metadata valueForKey:@"isiz"] longLongValue];
+			
+			if( [(id)self.delegate respondsToSelector:@selector( operationDidDownloadFile: )] )
+				[self.delegate operationDidDownloadFile:self];
+			
+			DEBUGLOG( @"Did download file %x to %@", pb.object, [self.receivedFilePaths lastObject] );
 		}
 		
 		if( err )
 		{
-			if( [delegate respondsToSelector:@selector( operation:didReceiveError: )])
-				[(id)delegate operation:self didReceiveError:[NSError errorWithDomain:NSOSStatusErrorDomain code:err userInfo:nil]];
+			DEBUGLOG( @"Failed to download file %x: Error %i", pb.object, err );
+
+			if( [(id)self.delegate respondsToSelector:@selector( operation:didReceiveError: )])
+				[self.delegate operation:self didReceiveError:[NSError errorWithDomain:NSOSStatusErrorDomain code:err userInfo:nil]];
 		}
-		
-		NSURL *fileURL = (NSURL *)CFURLCreateFromFSRef( kCFAllocatorDefault, &fileFSRef );
-		self.receivedFilePath = [fileURL path];
-		[fileURL release];
-		
-		NSLog( @"Did download file %x to %@ (error:%i)", objectID, self.receivedFilePath, err );
-	}while( 0 );
+	}
+	
+	if( [(id)self.delegate respondsToSelector:@selector( operationDidFinish: )] )
+		[self.delegate operationDidFinish:self];
 	
 	[pool release];
 }
 
-- (long long) bytesDone 
+- (long long) totalBytes 
 {
-	return 0LL;
-}
-
-- (NSString *) localPath 
-{
-	return nil;
+	long long resultSize = 0LL;
+	for( IMBObject *anObject in self.objectsToLoad )
+		resultSize += [[anObject.metadata valueForKey:@"isiz"] longLongValue];
+	return resultSize;
 }
 
 @end
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#pragma mark - 
-// FIXME: relies on private methods of IMBRemoteObjectPromise
+#pragma mark -
 
 @implementation IMBMTPObjectPromise
 @synthesize bytesTotal = _bytesTotal;
 @synthesize bytesDone = _bytesDone;
 
-- (void) _loadObjects:(NSArray*)inObjects
+- (void) loadObjects:(NSArray*)inObjects
 {	
 	// Retain self until all download operations have finished. We are going to release self in the   
 	// didFinish: and didReceiveError: delegate messages...
@@ -872,37 +898,20 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	
 	// Show the progress, which is indeterminate for now as we do not know the file sizes yet...
 	
-	[self _prepareProgress];
+	[self prepareProgress];
 	
-	// Create all download operations...
-	
-	for (IMBObject* object in inObjects)
-	{
-		if (![object isKindOfClass:[IMBNodeObject class]])
-		{
-			// id objectID = [(IMBObject *)object location];
-			IMBMTPDownloadOperation* op = [[IMBMTPDownloadOperation alloc] initWithObject:object delegate:self];
-			op.downloadFolderPath = self.downloadFolderPath;
-			[self.downloadOperations addObject:op];
-			[op release];
-		}
-	}
+	// Create ONE download operations...
+
+	IMBMTPDownloadOperation* op = [[IMBMTPDownloadOperation alloc] initWithObjectArray:inObjects delegate:self];
+	op.downloadFolderPath = self.downloadFolderPath;
+	[self.downloadOperations addObject:op]; 
 	
 	// Get combined file sizes so that the progress bar can be configured...
 	
-	_totalBytes = 0;
-	
-	for (IMBMTPDownloadOperation* op in self.downloadOperations)
-	{
-		_totalBytes += [op fileSize];
-	}
+	_totalBytes = [op totalBytes];
 	
 	// Start downloading...
-	
-	for (IMBMTPDownloadOperation* op in self.downloadOperations)
-	{
-		[[IMBOperationQueue sharedQueue] addOperation:op];
-	}
+	[[IMBOperationQueue sharedQueue] addOperation:op];
 }
 
 
@@ -911,59 +920,44 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 
 - (IBAction) cancel:(id)inSender
 {
+	NSArray *receivedFiles = nil;
 	// Cancel outstanding operations...
-	
 	for (IMBMTPDownloadOperation* op in self.downloadOperations)
 	{
 		[op cancel];
+		receivedFiles = op.receivedFilePaths; // We have only one operation ;-)
 	}
-	
+
 	// Trash any files that we already have...
 	
 	NSFileManager* mgr = [NSFileManager threadSafeManager];
-	
-	/*	
-	 for (NSURL* url in self.localURLs)
-	 {
-		 if ([url isFileURL])
-		 {
-			 NSError* error = nil;
-			 [mgr removeItemAtPath:[url path] error:&error];
-		 }
-	 }
-	 */ 
+	for (NSString *path in receivedFiles)
+	{
+		NSError* error = nil;
+		[mgr removeItemAtPath:path error:&error];
+	}
 	
 	// Cleanup...
 	
-	[self _cleanupProgress];
+	[self cleanupProgress];
 	
 	[self performSelectorOnMainThread:@selector(_didFinish) 
 						   withObject:nil 
 						waitUntilDone:YES 
 								modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-	
 	[self release];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// We received some data, so display the current progress...
-/* 
-- (void) operationDidReceiveData:(IMBMTPDownloadOperation*)inOperation
+// We received some data, so display the current progress... 
+- (void) operationDidDownloadFile:(IMBMTPDownloadOperation*)inOperation
 {
-	_currentBytes = 0;
-	
-	for (IMBMTPDownloadOperation* op in self.downloadOperations)
-	{
-		_currentBytes += [op bytesDone];
-	}
-	
-	double fraction = (double)_currentBytes / (double)_totalBytes;
-	[self _displayProgress:fraction];
+	double fraction = (double)inOperation.receivedBytes / (double)_totalBytes;
+	[self displayProgress:fraction];
 }
-*/ 
+ 
 
 // A download has finished. Store the path to the downloaded file. Once all downloads are complete, we can hide 
 // the progress UI, Notify the delegate and release self...
@@ -976,7 +970,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
 		NSLog(@"%s",__FUNCTION__);
-		[self _cleanupProgress];
+		[self cleanupProgress];
 		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 							   withObject:nil 
@@ -1000,7 +994,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
 		NSLog(@"%s",__FUNCTION__);
-		[self _cleanupProgress];
+		[self cleanupProgress];
 		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 							   withObject:nil 

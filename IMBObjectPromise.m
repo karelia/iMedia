@@ -60,6 +60,8 @@
 #import "IMBLibraryController.h"
 #import "IMBURLDownloadOperation.h"
 #import "NSFileManager+iMedia.h"
+#import "IMBLightroomParser.h"
+#import "NSData+SKExtensions.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,7 +79,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 @interface IMBObjectPromise ()
 - (void) _countObjects:(NSArray*)inObjects;
-- (void) _loadObjects:(NSArray*)inObjects;
+- (void) loadObjects:(NSArray*)inObjects;
 - (void) _loadObject:(IMBObject*)inObject;
 
 @property (retain) NSMutableDictionary* objectsToLocalURLs;
@@ -223,7 +225,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 // Load all eligible objects in the array...
 
-- (void) _loadObjects:(NSArray*)inObjects
+- (void) loadObjects:(NSArray*)inObjects
 {
 	for (IMBObject* object in inObjects)
 	{
@@ -278,7 +280,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	self.delegate = inDelegate;
 	self.finishSelector = inSelector;
 	[self _countObjects:self.objects];
-	[self _loadObjects:self.objects];
+	[self loadObjects:self.objects];
 }
 
 
@@ -311,9 +313,9 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 @implementation IMBLocalObjectPromise
 
-- (void) _loadObjects:(NSArray*)inObjects
+- (void) loadObjects:(NSArray*)inObjects
 {
-	[super _loadObjects:inObjects];
+	[super loadObjects:inObjects];
 	[self _didFinish];
 }
 
@@ -417,7 +419,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 // Tell delegate to prepare the progress UI (must be done in main thread)...
 
-- (void) _prepareProgress
+- (void) prepareProgress
 {
 	if (_delegate)
 	{
@@ -442,7 +444,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 // Tell delegate to display the current progress (must be done in main thread)...
 
-- (void) _displayProgress:(double)inFraction
+- (void) displayProgress:(double)inFraction
 {
 	if (_delegate)
 	{
@@ -465,7 +467,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 // Tell delegate to remove the progress UI (must be done in main thread)...
 
-- (void) _cleanupProgress
+- (void) cleanupProgress
 {
 	if (_delegate)
 	{
@@ -493,7 +495,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 // Load all objects...
 
-- (void) _loadObjects:(NSArray*)inObjects
+- (void) loadObjects:(NSArray*)inObjects
 {	
 	// Retain self until all download operations have finished. We are going to release self in the   
 	// didFinish: and didReceiveError: delegate messages...
@@ -502,7 +504,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	
 	// Show the progress, which is indeterminate for now as we do not know the file sizes yet...
 	
-	[self _prepareProgress];
+	[self prepareProgress];
 
 	// Create all download operations...
 	
@@ -564,7 +566,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	
 	// Cleanup...
 	
-	[self _cleanupProgress];
+	[self cleanupProgress];
 		
 	[self performSelectorOnMainThread:@selector(_didFinish) 
 		withObject:nil 
@@ -590,7 +592,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	}
 	
 	double fraction = (double)_currentBytes / (double)_totalBytes;
-	[self _displayProgress:fraction];
+	[self displayProgress:fraction];
 }
 
 
@@ -605,7 +607,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
 		NSLog(@"%s",__FUNCTION__);
-		[self _cleanupProgress];
+		[self cleanupProgress];
 		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 			withObject:nil 
@@ -629,7 +631,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
 		NSLog(@"%s",__FUNCTION__);
-		[self _cleanupProgress];
+		[self cleanupProgress];
 		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 			withObject:nil 
@@ -646,3 +648,58 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This subclass is used for pyramid files that need to be split. The split file is saved to the local file system,
+// where it can then be accessed by the delegate... 
+
+#pragma mark
+
+@implementation IMBPyramidObjectPromise
+
+- (void) loadObjects:(NSArray*)inObjects
+{
+	[super loadObjects:inObjects];
+	[self _didFinish];
+}
+
+
+- (void) _loadObject:(IMBObject*)inObject
+{
+	NSString* absolutePyramidPath = nil;
+	NSString* imagePath = nil;
+	
+	if ([inObject isKindOfClass:[IMBLightroomObject class]]) {
+		absolutePyramidPath = [(IMBLightroomObject*)inObject absolutePyramidPath];
+	}
+	
+	if (absolutePyramidPath != nil) {
+		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
+		NSUInteger index = [data lastIndexOfBytes:pattern length:3];
+		
+		// Should we cache that index?
+		if (index != NSNotFound) {
+			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
+			NSString* fileName = [(NSString*)inObject.location lastPathComponent];
+			NSString* jpegPath = [[NSFileManager threadSafeManager] temporaryFile:fileName];
+			BOOL success = [jpegData writeToFile:jpegPath atomically:YES];
+			
+			if (success) {
+				imagePath = jpegPath;
+			}
+		}
+	}
+	
+	if (imagePath != nil) {
+		NSURL* url = [NSURL fileURLWithPath:imagePath];
+		[self.objectsToLocalURLs setObject:url forKey:inObject];
+		_objectCountLoaded++;
+	}
+	else {
+		[super _loadObject:inObject];
+	}
+}	
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
