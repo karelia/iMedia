@@ -322,7 +322,7 @@
 	{
 		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:url,@"url",inObject,@"object",nil];
 
-		[self	performSelectorOnMainThread:@selector(loadMovieRepresentation:) 
+		[self	performSelectorOnMainThread:@selector(_loadMovieRepresentation:) 
 				withObject:info 
 				waitUntilDone:NO 
 				modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
