@@ -117,15 +117,19 @@
 
 - (void) objectViewDidChangeIconSize:(NSSize)inSize;
 
+// Called when the tumbnail for an object needs to be loaded lazily. This method will be called on a background thread...
+
+- (void) loadThumbnailForObject:(IMBObject*)inObject;
+
+// Called when metadata for an object needs to be loaded lazily. This method may be called on a background thread...
+
+- (void) loadMetadataForObject:(IMBObject*)inObject;
+
 // Called when the user right-clicks on a node in the IMBOutlineView. Here the parser has a chance to add custom
 // menu items of its own, that go beyond the functionality of the standard items added by the controllers...
 
 - (void) willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
 - (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
-
-// Called when metadata for an object needs to be loaded lazily. This method may be called on a background thread...
-
-- (void) loadMetadataForObject:(IMBObject*)inObject;
 
 @end
 
@@ -143,11 +147,9 @@
 
 }
 
-// Helper methods...
-
 - (id) initWithMediaType:(NSString*)inMediaType;
 - (NSString*) identifierForPath:(NSString*)inPath;
-	
+
 @end
 
 

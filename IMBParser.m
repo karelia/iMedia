@@ -50,7 +50,32 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
+#import "IMBObject.h"
+#import "IMBMovieObject.h"
 #import "IMBObjectPromise.h"
+#import "NSString+iMedia.h"
+#import "NSData+SKExtensions.h"
+#import <Quartz/Quartz.h>
+#import <QTKit/QTKit.h>
+#import <QuickLook/QuickLook.h>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@interface IMBParser ()
+
+- (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL;
+- (CGImageRef) _imageForURL:(NSURL*)inURL;
+- (CGImageRef) _quicklookCGImageForURL:(NSURL*)inURL;
+- (NSImage*) _quicklookNSImageForURL:(NSURL*)inURL;
+- (void) _loadMovieRepresentation:(NSDictionary*)inInfo;
+- (QTMovie*) _movieForURL:(NSURL*)inURL;
+- (CGImageRef) _imageForPyramidPath:(NSString*)inPyramidPath;
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,6 +92,8 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark 
 
 // The default implementation just returns a single parser instance. Subclasses like iPhoto, Aperture, or Lightroom
 // may opt to return multiple instances (preconfigured with correct mediaSource) if multiple libraries are detected...
@@ -107,6 +134,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
 // The following two methods must be overridden by subclasses...
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
@@ -119,18 +148,10 @@
 	return NO;
 }
 
-// This method can be overridden by subclasses if the default promise is not useful...
-
-- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects
-{
-	return [[(IMBObjectPromise*)[IMBLocalObjectPromise alloc] initWithObjects:inObjects] autorelease];
-}
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Optional methods do nothing in the base class and can be overridden in subclasses, e.g. to update  
+// Optional methods that do nothing in the base class and can be overridden in subclasses, e.g. to update  
 // or get rid of cached data...
 
 - (void) willUseParser
@@ -152,6 +173,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This helper method can be used by subclasses to construct identifiers of form "classname://path/to/node"...
+ 
 - (NSString*) identifierForPath:(NSString*)inPath
 {
 	NSString* parserClassName = NSStringFromClass([self class]);
@@ -162,12 +185,354 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This method can be overridden by subclasses if the default promise is not useful...
+
+- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects
+{
+	return [[(IMBObjectPromise*)[IMBLocalObjectPromise alloc] initWithObjects:inObjects] autorelease];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+
+- (void) loadThumbnailForObject:(IMBObject*)inObject
+{
+	id imageRepresentation = nil;
+	NSString* type = inObject.imageRepresentationType;
+	NSString* path = nil;
+	NSURL* url = nil;
+	
+	// Get path/url location of our object...
+	
+	id location = inObject.imageLocation;
+	if (location == nil) location = inObject.location;
+
+	if ([location isKindOfClass:[NSString class]])
+	{
+		path = (NSString*)location;
+		url = [NSURL fileURLWithPath:path];
+	}	
+	else if ([location isKindOfClass:[NSURL class]])
+	{
+		url = (NSURL*)location;
+		path = [url path];
+	}
+	
+	// Get the uti for out object...
+	
+	NSString* uti = [NSString UTIForFileAtPath:path];
+	
+	// Path...
+	
+	if ([type isEqualToString:IKImageBrowserPathRepresentationType])
+	{
+		imageRepresentation = path;	
+	}
+	else if ([type isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+	{
+		imageRepresentation = path;	
+	}
+	else if ([type isEqualToString:IKImageBrowserIconRefPathRepresentationType])
+	{
+		imageRepresentation = path;	
+	}
+	else if ([type isEqualToString:IKImageBrowserQuickLookPathRepresentationType])
+	{
+		imageRepresentation = path;	
+	}
+	
+	// URL...
+	
+	else if ([type isEqualToString:IKImageBrowserNSURLRepresentationType])
+	{
+		imageRepresentation = url;	
+	}
+	
+	// NSImage...
+	
+	else if ([type isEqualToString:IKImageBrowserNSImageRepresentationType])
+	{
+		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+		{
+			imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
+		}
+		else
+		{
+			imageRepresentation = [self _quicklookNSImageForURL:url];
+		}	
+	}
+	
+	// CGImage...
+	
+	else if ([type isEqualToString:IKImageBrowserCGImageRepresentationType])
+	{
+		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+		{
+			imageRepresentation = (id)[self _imageForURL:url];
+		}
+		else if ([path hasSuffix:@".lr-preview.noindex"])
+		{
+			imageRepresentation = (id)[self _imageForPyramidPath:path];
+		}
+		else
+		{
+			imageRepresentation = (id)[self _quicklookCGImageForURL:url];
+		}
+	}
+	
+	// CGImageSourceRef...
+	
+	else if ([type isEqualToString:IKImageBrowserCGImageSourceRepresentationType])
+	{
+		CGImageSourceRef source = [self _imageSourceForURL:url];
+		imageRepresentation = (id)source;
+	}
+	
+	// NSData...
+	
+	else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
+	{
+		NSData* data = [NSData dataWithContentsOfURL:url];
+		imageRepresentation = data;
+	}
+	
+	// NSBitmapImageRep...
+	
+	else if ([type isEqualToString:IKImageBrowserNSBitmapImageRepresentationType])
+	{
+		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+		{
+			CGImageRef image = [self _imageForURL:url];
+			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
+		}
+		else
+		{
+			CGImageRef image = [self _quicklookCGImageForURL:url];
+			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
+		}
+	}
+	
+	// QTMovie...
+	
+	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
+	{
+		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:url,@"url",inObject,@"object",nil];
+
+		[self	performSelectorOnMainThread:@selector(loadMovieRepresentation:) 
+				withObject:info 
+				waitUntilDone:NO 
+				modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+
+	// Return the result to the main thread...
+	
+	if (imageRepresentation)
+	{
+		[inObject 
+			performSelectorOnMainThread:@selector(setImageRepresentation:) 
+			withObject:imageRepresentation 
+			waitUntilDone:NO 
+			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
 	// to be overridden by subclasses. This method may be called on a background thread, so subclasses need to
-	// takes appropriate safety measures...
+	// take appropriate safety measures...
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Helpers
+
+
+// Returns an autoreleased source for the given url...
+
+- (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL
+{
+	CGImageSourceRef source = NULL;
+	
+	if (inURL)
+	{
+		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+		   nil];
+
+		source = CGImageSourceCreateWithURL((CFURLRef)inURL,(CFDictionaryRef)options);
+		[NSMakeCollectable(source) autorelease];
+	}
+	
+	return source;
+}
+
+	
+// Returns an autoreleased image for the given url...
+
+- (CGImageRef) _imageForURL:(NSURL*)inURL
+{
+	CGImageRef image = NULL;
+	
+	if (inURL)
+	{
+		CGImageSourceRef source = [self _imageSourceForURL:inURL];
+
+		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+		   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
+		   (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+		   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
+		   [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
+		   nil];
+		
+		image = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
+		[NSMakeCollectable(image) autorelease];
+	}
+	
+	return image;
+}	
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Quicklook methods to create images from non-image files...
+
+- (CGImageRef) _quicklookCGImageForURL:(NSURL*)inURL
+{
+	CGSize size = CGSizeMake(128,128);
+	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)inURL,size,NULL);
+	return (CGImageRef) [NSMakeCollectable(image) autorelease];
+}
+
+
+- (NSImage*) _quicklookNSImageForURL:(NSURL*)inURL
+{
+	NSImage* nsimage = nil;
+	CGImageRef cgimage = [self _quicklookCGImageForURL:inURL];
+
+	if (cgimage)
+	{
+		NSSize size = NSZeroSize;
+		size.width = CGImageGetWidth(cgimage);
+		size.height = CGImageGetWidth(cgimage);
+
+		nsimage = [[[NSImage alloc] initWithSize:size] autorelease];
+
+		NSBitmapImageRep* rep = [[NSBitmapImageRep alloc] initWithCGImage:cgimage];
+		[nsimage addRepresentation:rep];		
+		[rep release];
+	}
+	
+	return nsimage;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Loading movies must be done on the main thread (as many components are not threadsafe). Alas, this blocks 
+// the main runloop, but what are we to do...
+
+- (void) _loadMovieRepresentation:(NSDictionary*)inInfo
+{
+	// Load the QTMovie object...
+	
+	NSURL* url = (NSURL*)[inInfo objectForKey:@"url"];
+	IMBObject* object = (IMBObject*)[inInfo objectForKey:@"object"];
+
+	QTMovie* movie = [self _movieForURL:url];
+	[object setImageRepresentation:movie];
+	
+	// Set a better poster time...
+	
+	QTTime d = movie.duration;
+	double duration = (double)d.timeValue / (double)d.timeScale;
+	double posterTime = 0.5 * duration;
+	[movie setAttribute:[NSNumber numberWithDouble:posterTime] forKey:QTMoviePosterTimeAttribute];
+	
+	// Load and cache the poster frame...
+	
+	if ([object isKindOfClass:[IMBMovieObject class]])
+	{
+		NSError* error = nil;
+		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,nil];
+		QTTime t = QTMakeTimeWithTimeInterval(posterTime);
+		CGImageRef image = (CGImageRef) [movie frameImageAtTime:t withAttributes:attributes error:&error];
+		[(IMBMovieObject*)object setPosterFrame:image];
+	}
+}
+
+
+// Returns an autoreleased movie for the given url...
+// TODO: this will be a bit tricky; we need to use that helper process.
+
+- (QTMovie*) _movieForURL:(NSURL*)inURL
+{
+	QTMovie* movie = NULL;
+	
+	if (inURL)
+	{
+		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+		   inURL,QTMovieURLAttribute,
+		   [NSNumber numberWithBool:YES],QTMovieOpenAsyncOKAttribute,
+//		   [NSNumber numberWithBool:YES],@"QTMovieOpenForPlaybackAttribute", // constant is not available with 10.5.sdk!
+		   nil];
+
+		NSError* error = nil;   
+		movie = [QTMovie movieWithAttributes:attributes error:&error];
+	}
+
+	return movie;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Returns an autoreleased image for the given pyramid path...
+
+- (CGImageRef) _imageForPyramidPath:(NSString*)inPyramidPath
+{
+	CGImageRef image = NULL;
+	
+	if (inPyramidPath) {
+		NSData* data = [NSData dataWithContentsOfMappedFile:inPyramidPath];
+		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
+		NSUInteger index = [data indexOfBytes:pattern length:3];
+		
+		// Should we cache that index?
+		if (index != NSNotFound) {
+			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
+			CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
+			
+			if (source) {
+				NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
+										 (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
+										 [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
+										 nil];
+				
+				image = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)options);
+				CFRelease(source);
+			}
+				
+			[NSMakeCollectable(image) autorelease];
+		}
+	}
+	
+	return image;
+}	
 
 
 //----------------------------------------------------------------------------------------------------------------------

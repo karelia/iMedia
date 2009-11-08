@@ -109,6 +109,13 @@ enum
 typedef NSUInteger IMBGroupType;
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// User Interface constants...
+
+#define kIMBMaxThumbnailSize 128
+
 // Common error codes...
 
 #define kIMBErrorDomain @"com.karelia.imedia"
