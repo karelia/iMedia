@@ -57,6 +57,7 @@
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
 #import <Quartz/Quartz.h>
 
 
@@ -310,6 +311,96 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// To speed up thumbnail loading we will not use the generic method of the superclass. Instead we provide an
+// implementation here, that uses specific knowledge about iPhoto to load thumbnails as quickly as possible...
+
+- (void) loadThumbnailForObject:(IMBObject*)inObject
+{
+	// Get path of our object...
+	
+	NSString* type = inObject.imageRepresentationType;
+	NSString* path = (NSString*) inObject.imageLocation;
+	if (path == nil) path = (NSString*) inObject.location;
+
+	// For images we provide an optimized loading code...
+	
+	NSURL* url = [NSURL fileURLWithPath:path];
+	NSString* uti = [NSString UTIForFileAtPath:path];
+	
+	if ([type isEqualToString:IKImageBrowserCGImageRepresentationType])
+	{
+		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+		{
+			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
+
+			if (source)
+			{
+				CGImageRef image = CGImageSourceCreateImageAtIndex(source,0,NULL);
+				
+				if (image)
+				{
+					[inObject 
+						performSelectorOnMainThread:@selector(setImageRepresentation:) 
+						withObject:(id)image
+						waitUntilDone:NO 
+						modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+
+					CGImageRelease(image);
+				}
+				
+				CFRelease(source);
+			}
+
+		}
+	}
+	
+	// QTMovies are loaded with the generic code in the superclass...
+	
+	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
+	{
+		[super loadThumbnailForObject:inObject];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Loaded lazily when actually needed for display. Here we combine the metadata we got from the iPhoto XML file
+// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
+// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
+// Please note that this method may be called on a background thread...
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
+	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
+}
+
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 #pragma mark Helper Methods
 
@@ -542,7 +633,7 @@
 }
 
 
-// Use the path of the smal thumbnail file to create this image...
+// Use the path of the small thumbnail file to create this image...
 
 - (NSString*) imageLocationForObject:(NSDictionary*)inObjectDict
 {
@@ -611,41 +702,6 @@
 		
 		[pool1 release];
 	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Loaded lazily when actually needed for display. Here we combine the metadata we got from the iPhoto XML file
-// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
-// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
-// Please note that this method may be called on a background thread...
-
-- (void) loadMetadataForObject:(IMBObject*)inObject
-{
-	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-
-	if ([NSThread isMainThread])
-	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
-	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-	}
-}
-
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 
