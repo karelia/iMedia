@@ -57,20 +57,15 @@
 
 #pragma mark 
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5
-@interface IMBPanelController : NSWindowController <NSTabViewDelegate>
-#else
 @interface IMBPanelController : NSWindowController
-#endif
 {
+	IBOutlet NSTabView* ibTabView;
+	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
 	id _delegate;
 	NSArray* _mediaTypes;
 	NSMutableArray* _viewControllers;
 	NSMutableDictionary* _loadedLibraries;
 	NSString* _oldMediaType;
-	
-	IBOutlet NSTabView* ibTabView;
-	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
 }
 
 + (void) registerViewControllerClass:(Class)inViewControllerClass forMediaType:(NSString*)inMediaType;
