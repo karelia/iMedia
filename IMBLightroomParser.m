@@ -172,6 +172,8 @@ static NSArray* sSupportedUTIs = nil;
 - (NSString*) pathFromRootFromAttributes:(NSDictionary*)inAttributes;
 - (NSString*) absolutePathFromAttributes:(NSDictionary*)inAttributes;
 
+- (CGImageRef) _imageForPyramidPath:(NSString*)inPyramidPath;
+
 @end
 
 
@@ -1047,6 +1049,76 @@ static NSArray* sSupportedUTIs = nil;
 	
 	return object;
 }
+
+- (void) loadThumbnailForObject:(IMBObject*)inObject
+{	
+	// Get path/url location of our object...
+	
+	id location = inObject.imageLocation;
+	
+	if (location == nil) {
+		location = inObject.location;
+	}
+	
+	id imageRepresentation = nil;
+	NSString* path = [(NSURL*)location path];
+	
+	if ([path hasSuffix:@".lr-preview.noindex"]) {
+		imageRepresentation = (id)[self _imageForPyramidPath:path];
+	}
+	
+	// Return the result to the main thread...
+	
+	if (imageRepresentation) {
+		[inObject 
+		 performSelectorOnMainThread:@selector(setImageRepresentation:) 
+		 withObject:imageRepresentation 
+		 waitUntilDone:NO 
+		 modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+	else {
+		[super loadThumbnailForObject:inObject];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Returns an autoreleased image for the given pyramid path...
+
+- (CGImageRef) _imageForPyramidPath:(NSString*)inPyramidPath
+{
+	CGImageRef image = NULL;
+	
+	if (inPyramidPath) {
+		NSData* data = [NSData dataWithContentsOfMappedFile:inPyramidPath];
+		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
+		NSUInteger index = [data indexOfBytes:pattern length:3];
+		
+		// Should we cache that index?
+		if (index != NSNotFound) {
+			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
+			CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
+			
+			if (source) {
+				NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
+										 (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
+										 [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
+										 nil];
+				
+				image = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)options);
+				CFRelease(source);
+			}
+			
+			[NSMakeCollectable(image) autorelease];
+		}
+	}
+	
+	return image;
+}	
 
 
 // Loaded lazily when actually needed for display. Here we combine the metadata we got from the Lightroom database

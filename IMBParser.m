@@ -73,7 +73,6 @@
 - (NSImage*) _quicklookNSImageForURL:(NSURL*)inURL;
 - (void) _loadMovieRepresentation:(NSDictionary*)inInfo;
 - (QTMovie*) _movieForURL:(NSURL*)inURL;
-- (CGImageRef) _imageForPyramidPath:(NSString*)inPyramidPath;
 
 @end
 
@@ -273,10 +272,6 @@
 		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
 		{
 			imageRepresentation = (id)[self _imageForURL:url];
-		}
-		else if ([path hasSuffix:@".lr-preview.noindex"])
-		{
-			imageRepresentation = (id)[self _imageForPyramidPath:path];
 		}
 		else
 		{
@@ -494,45 +489,6 @@
 
 	return movie;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Returns an autoreleased image for the given pyramid path...
-
-- (CGImageRef) _imageForPyramidPath:(NSString*)inPyramidPath
-{
-	CGImageRef image = NULL;
-	
-	if (inPyramidPath) {
-		NSData* data = [NSData dataWithContentsOfMappedFile:inPyramidPath];
-		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
-		NSUInteger index = [data indexOfBytes:pattern length:3];
-		
-		// Should we cache that index?
-		if (index != NSNotFound) {
-			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
-			CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
-			
-			if (source) {
-				NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
-										 (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
-										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
-										 [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
-										 nil];
-				
-				image = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)options);
-				CFRelease(source);
-			}
-				
-			[NSMakeCollectable(image) autorelease];
-		}
-	}
-	
-	return image;
-}	
 
 
 //----------------------------------------------------------------------------------------------------------------------
