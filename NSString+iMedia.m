@@ -185,6 +185,12 @@
 	return result;
 }
 
+// For compatibility with NSURL as in [(NSURL*)stringOrURL path]
+- (NSString *)path
+{
+	return [self pathForURLString];
+}
+
 - (NSData *) decodeBase64;
 {
 	return [self decodeBase64WithNewlines: YES];
