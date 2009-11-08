@@ -274,9 +274,10 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
+	NSDictionary* plist = self.plist;
+	NSArray* albums = [plist objectForKey:@"List of Albums"];
+	NSDictionary* images = [plist objectForKey:@"Master Image List"];
 	
-	NSArray* albums = [self.plist objectForKey:@"List of Albums"];
-	NSDictionary* images = [self.plist objectForKey:@"Master Image List"];
 	[self addSubNodesToNode:inNode albums:albums images:images]; 
 	[self populateNode:inNode albums:albums images:images]; 
 
@@ -297,6 +298,20 @@
 	{
 		self.plist = nil;
 	}	
+}
+
+
+// When the XML file has changed then get rid of our cached plist...
+
+- (void) watchedPathDidChange:(NSString*)inWatchedPath
+{
+	if ([inWatchedPath isEqual:self.mediaSource])
+	{
+		@synchronized(self)
+		{
+			self.plist = nil;
+		}	
+	}
 }
 
 

@@ -469,7 +469,6 @@
 
 
 // Returns an autoreleased movie for the given url...
-// TODO: this will be a bit tricky; we need to use that helper process.
 
 - (QTMovie*) _movieForURL:(NSURL*)inURL
 {
