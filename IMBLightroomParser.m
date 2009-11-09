@@ -54,6 +54,7 @@
 #import "FMDatabase.h"
 #import "FMResultSet.h"
 #import "IMBLightroomParser.h"
+#import "IMBLightroom1Parser.h"
 #import "IMBLightroom2Parser.h"
 #import "IMBIconCache.h"
 #import "IMBNode.h"
@@ -262,6 +263,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
 
+	[parserInstances addObjectsFromArray:[IMBLightroom1Parser concreteParserInstancesForMediaType:inMediaType]];
 	[parserInstances addObjectsFromArray:[IMBLightroom2Parser concreteParserInstancesForMediaType:inMediaType]];
 		
 	return parserInstances;
@@ -439,31 +441,9 @@ static NSArray* sSupportedUTIs = nil;
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	if (inRootNode.subNodes == nil) inRootNode.subNodes = [NSMutableArray array];
-
-	// Add the Folders node...
-	
-	NSNumber* id_local = [NSNumber numberWithInt:-1];
-
-	NSString* foldersName = NSLocalizedStringWithDefaultValue(
-		@"IMBLightroomParser.foldersName",
-		nil,IMBBundle(),
-		@"Folders",
-		@"Name of Folders node in IMBLightroomParser");
-	
-	IMBNode* foldersNode = [[[IMBNode alloc] init] autorelease];
-	foldersNode.parentNode = inRootNode;
-	foldersNode.mediaSource = self.mediaSource;
-	foldersNode.identifier = [self identifierWithFolderId:id_local];
-	foldersNode.name = foldersName;
-	foldersNode.icon = [self folderIcon];
-	foldersNode.parser = self;
-//	foldersNode.attributes = [self attributesWithId:id_local path:nil];
-	foldersNode.leaf = NO;
-	
-	[(NSMutableArray*)inRootNode.subNodes addObject:foldersNode];
-	
-	// Add the Collections node...
+	if (inRootNode.subNodes == nil) {
+		inRootNode.subNodes = [NSMutableArray array];
+	}
 	
 	[self populateSubnodesForCollectionNode:inRootNode];
 }
@@ -868,36 +848,20 @@ static NSArray* sSupportedUTIs = nil;
 	FMDatabase *database = self.database;
 	
 	if (database != nil) {
-		NSString* query =	@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, aif.id_local, ai.fileHeight, ai.fileWidth, captionName"
-							@" FROM AgLibraryFile aif"
-							@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
-							@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
-							@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
-							@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"
-							@" LEFT JOIN"
-							@"		(SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"
-							@"		FROM AgLibraryTagImage altiCaption"
-							@"		INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
-							@"		WHERE altiCaption.tagKind = 'AgCaptionTagKind')"
-							@"	ON ai.id_local = captionImage"
-							@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
-							@" WHERE alti.tag = ?"
-							@" ORDER BY ai.captureTime ASC";
-		
+		NSString* query = [self collectionContentsQuery];
 		NSNumber* collectionId = [self idLocalFromAttributes:inNode.attributes];
 		FMResultSet* results = [self.database executeQuery:query, collectionId];
 		NSUInteger index = 0;
 		
 		while ([results next]) {
-			NSString* rootPath = [results stringForColumn:@"absolutePath"];
-			NSString* pathFromRoot = [results stringForColumn:@"pathFromRoot"];
+			NSString* absolutePath = [results stringForColumn:@"absolutePath"];
 			NSString* filename = [results stringForColumn:@"idx_filename"];
 			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
 			NSNumber* fileHeight = [NSNumber numberWithDouble:[results doubleForColumn:@"fileHeight"]];
 			NSNumber* fileWidth = [NSNumber numberWithDouble:[results doubleForColumn:@"fileWidth"]];
 			NSString* caption = [results stringForColumn:@"captionName"];
 			NSString* name = caption!= nil ? caption : filename;
-			NSString* path = [[rootPath stringByAppendingString:pathFromRoot] stringByAppendingString:filename];
+			NSString* path = [absolutePath stringByAppendingString:filename];
 
 			if ([self canOpenImageFileAtPath:path]) {
 				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];

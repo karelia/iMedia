@@ -49,14 +49,13 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom2Parser.h"
+#import "IMBLightroom1Parser.h"
 
-#import "IMBNode.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 
 
-@implementation IMBLightroom2Parser
+@implementation IMBLightroom1Parser
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -65,7 +64,7 @@
 
 + (NSString*) lightroomPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
+	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom"];
 }
 
 
@@ -75,7 +74,8 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom2");
+	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
+																(CFStringRef)@"com.adobe.Lightroom");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -83,7 +83,8 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom2");
+		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
+																		(CFStringRef)@"com.adobe.Lightroom");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);
@@ -111,7 +112,7 @@
 				dataPath = nil;
 			}
 			
-			IMBLightroom2Parser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+			IMBLightroom1Parser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = libraryPath;
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
@@ -124,58 +125,16 @@
 	return parserInstances;
 }
 
-
-// This method creates the immediate subnodes of the "Lightroom" root node. The two subnodes are "Folders"  
-// and "Collections"...
-
-- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
-{
-	if (inRootNode.subNodes == nil) {
-		inRootNode.subNodes = [NSMutableArray array];
-	}
-	
-	// Add the Folders node...
-	
-	NSNumber* id_local = [NSNumber numberWithInt:-1];
-	
-	NSString* foldersName = NSLocalizedStringWithDefaultValue(
-															  @"IMBLightroomParser.foldersName",
-															  nil,IMBBundle(),
-															  @"Folders",
-															  @"Name of Folders node in IMBLightroomParser");
-	
-	IMBNode* foldersNode = [[[IMBNode alloc] init] autorelease];
-	foldersNode.parentNode = inRootNode;
-	foldersNode.mediaSource = self.mediaSource;
-	foldersNode.identifier = [self identifierWithFolderId:id_local];
-	foldersNode.name = foldersName;
-	foldersNode.icon = [self folderIcon];
-	foldersNode.parser = self;
-	//	foldersNode.attributes = [self attributesWithId:id_local path:nil];
-	foldersNode.leaf = NO;
-	
-	[(NSMutableArray*)inRootNode.subNodes addObject:foldersNode];
-	
-	// Add the Collections node...
-	
-	[super populateSubnodesForRootNode:inRootNode];
-}
-
 - (NSString*) collectionContentsQuery
 {
-	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-						@"			aif.idx_filename, aif.id_local, ai.fileHeight, ai.fileWidth, captionName"
-						@" FROM AgLibraryFile aif"
+	NSString* query =	@" SELECT aif.absolutePath, aif.idx_filename, aif.id_local, ai.fileHeight, ai.fileWidth, captionName"
+						@" FROM Adobe_imageFiles aif"
 						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
-						@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
-						@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
 						@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"
-						@" LEFT JOIN"
-						@"		(SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"
-						@"		FROM AgLibraryTagImage altiCaption"
-						@"		INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
-						@"		WHERE altiCaption.tagKind = 'AgCaptionTagKind')"
-						@"	ON ai.id_local = captionImage"
+						@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"
+						@" 		   FROM AgLibraryTagImage altiCaption"
+						@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
+						@" 		   WHERE altiCaption.tagKind = 'AgCaptionTagKind') ON ai.id_local = captionImage"
 						@" WHERE alti.tag = ?"
 						@" ORDER BY ai.captureTime ASC";
 	
