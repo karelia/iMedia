@@ -54,6 +54,7 @@
 #import "FMDatabase.h"
 #import "FMResultSet.h"
 #import "IMBLightroomParser.h"
+#import "IMBLightroom2Parser.h"
 #import "IMBIconCache.h"
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
@@ -86,11 +87,13 @@ static NSArray* sSupportedUTIs = nil;
 @implementation IMBLightroomObject
 
 @synthesize lightroomMetadata = _lightroomMetadata;
+@synthesize absolutePyramidPath = _absolutePyramidPath;
 
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if ((self = [super initWithCoder:inCoder]) != nil) {
 		self.lightroomMetadata = [inCoder decodeObjectForKey:@"lightroomMetadata"];
+		self.absolutePyramidPath = [inCoder decodeObjectForKey:@"absolutePyramidPath"];
 	}
 	
 	return self;
@@ -102,6 +105,7 @@ static NSArray* sSupportedUTIs = nil;
 	[super encodeWithCoder:inCoder];
 	
 	[inCoder encodeObject:self.lightroomMetadata forKey:@"lightroomMetadata"];
+	[inCoder encodeObject:self.absolutePyramidPath forKey:@"absolutePyramidPath"];
 }
 
 
@@ -110,13 +114,26 @@ static NSArray* sSupportedUTIs = nil;
 	IMBLightroomObject* copy = [super copyWithZone:inZone];
 	
 	copy.lightroomMetadata = self.lightroomMetadata;
+	copy.absolutePyramidPath = self.absolutePyramidPath;
 	
 	return copy;
+}
+
+- (NSString*)absolutePyramidPath
+{
+	if (_absolutePyramidPath == nil) {
+		IMBLightroomParser* parser = (IMBLightroomParser*)self.parser;
+		
+		_absolutePyramidPath = [[parser absolutePyramidPathForObject:self] copy];
+	}
+	
+	return _absolutePyramidPath;
 }
 
 - (void) dealloc
 {
 	IMBRelease(_lightroomMetadata);
+	IMBRelease(_absolutePyramidPath);
 	[super dealloc];
 }
 
@@ -199,51 +216,6 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Check if Lightroom is installed...
-
-+ (NSString*) lightroomPath
-{
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
-}
-
-
-+ (BOOL) isInstalled
-{
-	return [self lightroomPath] != nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Return an array to Lightroom library files...
-
-+ (NSArray*) libraryPaths
-{
-	NSMutableArray* libraryPaths = [NSMutableArray array];
-    
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom2");
-	
-	if (recentLibrariesList)
-	{
-        [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
-        CFRelease(recentLibrariesList);
-	}
-
-    if ([libraryPaths count] == 0)
-	{
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom2");
-		
-		if (activeLibraryPath)
-		{
-			CFRelease(activeLibraryPath);
-		}
-    }
-    
-	return libraryPaths;
-}
-
-
 // Helper method that converts simgle string into an array of paths...
 
 + (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths
@@ -290,35 +262,15 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
 
-	if ([self isInstalled])
-	{
-		NSArray* libraryPaths = [self libraryPaths];
+	[parserInstances addObjectsFromArray:[IMBLightroom2Parser concreteParserInstancesForMediaType:inMediaType]];
 		
-		for (NSString* libraryPath in libraryPaths)
-		{
-			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
-								   stringByAppendingString:@" Previews"]
-								  stringByAppendingPathExtension:@"lrdata"];
-			NSFileManager* fileManager = [NSFileManager threadSafeManager];
-			
-			BOOL isDirectory;
-			if (!([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory)) {
-				dataPath = nil;
-			}
-			
-			IMBLightroomParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-			parser.mediaSource = libraryPath;
-			parser.dataPath = dataPath;
-			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
-			
-			[parserInstances addObject:parser];
-			[parser release];
-		}
-	}
-	
 	return parserInstances;
 }
 
++ (BOOL) isInstalled
+{
+	return [self lightroomPath] != nil;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -368,7 +320,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (inOldNode == nil)
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 		
@@ -916,7 +868,7 @@ static NSArray* sSupportedUTIs = nil;
 	FMDatabase *database = self.database;
 	
 	if (database != nil) {
-		NSString* query =	@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, alf.id_local, ai.fileHeight, ai.fileWidth, captionName"
+		NSString* query =	@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, aif.id_local, ai.fileHeight, ai.fileWidth, captionName"
 							@" FROM AgLibraryFile aif"
 							@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
 							@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
@@ -1066,18 +1018,23 @@ static NSArray* sSupportedUTIs = nil;
 				double dataOffset = [results doubleForColumn:@"dataOffset"];
 				double dataLength = [results doubleForColumn:@"dataLength"];
 				NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
-				NSString* absolutePyramidPath = [self.dataPath stringByAppendingPathComponent:pyramidPath];
-				NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
-				NSData* jpegData = [data subdataWithRange:NSMakeRange(dataOffset, dataLength)];
-				CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
 				
-				if (source != NULL) {
-					imageRepresentation = (id)CGImageSourceCreateImageAtIndex(source, 0, NULL);
+				if (pyramidPath != nil) {
+					NSString* absolutePyramidPath = [self.dataPath stringByAppendingPathComponent:pyramidPath];
+					NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+					NSData* jpegData = [data subdataWithRange:NSMakeRange(dataOffset, dataLength)];
+					CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
 					
-					CFRelease(source);
+					if (source != NULL) {
+						imageRepresentation = (id)CGImageSourceCreateImageAtIndex(source, 0, NULL);
+						
+						CFRelease(source);
+					}
+					
+					[NSMakeCollectable(imageRepresentation) autorelease];
+					
+					lightroomObject.absolutePyramidPath = absolutePyramidPath;
 				}
-				
-				[NSMakeCollectable(imageRepresentation) autorelease];
 			}
 			
 			[results close];
@@ -1098,43 +1055,38 @@ static NSArray* sSupportedUTIs = nil;
 	}
 }
 
-
-// Returns an autoreleased image for the given pyramid path...
-
-/*
-- (CGImageRef) _imageForPyramidPath:(NSString*)inPyramidPath
+- (NSString*) absolutePyramidPathForObject:(IMBLightroomObject*)inObject
 {
-	CGImageRef image = NULL;
+	NSString* absolutePyramidPath = nil;
+	FMDatabase *database = [self thumbnailDatabase];
 	
-	if (inPyramidPath) {
-		NSData* data = [NSData dataWithContentsOfMappedFile:inPyramidPath];
-		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
-		NSUInteger index = [data lastIndexOfBytes:pattern length:3];
+	if (database != nil) {
+		NSDictionary* metadata = [inObject lightroomMetadata];
+		NSNumber* idLocal = [metadata objectForKey:@"idLocal"];
 		
-		// Should we cache that index?
-		if (index != NSNotFound) {
-			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
-			CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
+		@synchronized (database) {
+			NSString* query =	@" SELECT apcp.relativeDataPath pyramidPath"
+								@" FROM Adobe_images ai"
+								@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
+								@" WHERE ai.rootFile = ?"
+								@" LIMIT 1";
 			
-			if (source) {
-				NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
-										 (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
-										 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
-										 [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
-										 nil];
+			FMResultSet* results = [self.database executeQuery:query, idLocal];
+			
+			if ([results next]) {
+				NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
 				
-				image = CGImageSourceCreateThumbnailAtIndex(source, 0, (CFDictionaryRef)options);
-				CFRelease(source);
+				if (pyramidPath != nil) {
+					absolutePyramidPath = [self.dataPath stringByAppendingPathComponent:pyramidPath];
+				}
 			}
 			
-			[NSMakeCollectable(image) autorelease];
+			[results close];
 		}
 	}
 	
-	return image;
+	return absolutePyramidPath;
 }
-*/
 
 
 //----------------------------------------------------------------------------------------------------------------------
