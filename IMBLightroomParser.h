@@ -102,6 +102,14 @@
 
 - (NSString*) absolutePyramidPathForObject:(IMBLightroomObject*)inObject;
 
+- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
+
+- (NSString*) rootNodeIdentifier;
+- (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
+- (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
+
+- (NSImage*) folderIcon;
+
 @end
 
 
@@ -109,6 +117,8 @@
 
 + (NSString*) lightroomPath;
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
+
+- (NSString*) collectionContentsQuery;
 
 @end
 
