@@ -67,9 +67,11 @@
 @interface IMBLightroomObject : IMBObject
 {
 	NSDictionary* _lightroomMetadata;
+	NSString* _absolutePyramidPath;
 }
 
 @property (retain) NSDictionary* lightroomMetadata;
+@property (retain) NSString* absolutePyramidPath;
 
 @end
 
@@ -95,8 +97,20 @@
 @property (retain) FMDatabase* database;
 @property (retain) FMDatabase* thumbnailDatabase;
 
++ (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
++ (BOOL) isInstalled;
+
+- (NSString*) absolutePyramidPathForObject:(IMBLightroomObject*)inObject;
+
 @end
 
+
+@interface IMBLightroomParser (Abstract)
+
++ (NSString*) lightroomPath;
++ (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
+
+@end
 
 //----------------------------------------------------------------------------------------------------------------------
 
