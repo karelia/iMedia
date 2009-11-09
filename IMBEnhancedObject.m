@@ -67,6 +67,33 @@
 
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]) != nil) {
+		self.preliminaryMetadata = [inCoder decodeObjectForKey:@"preliminaryMetadata"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBEnhancedObject* copy = [super copyWithZone:inZone];
+	
+	copy.preliminaryMetadata = self.preliminaryMetadata;
+	
+	return copy;
+}
+
 - (void) dealloc
 {
 	IMBRelease(_preliminaryMetadata);
