@@ -95,7 +95,7 @@
 @interface  IMBMTPDownloadOperation : NSOperation
 { 
 	// input parameters
-	id delegate;
+	id _delegate;
 	NSArray  *_objectsToLoad;
 	NSString *_downloadFolderPath;
 	
@@ -134,7 +134,7 @@
 - (IMBNode *) _nodeForTempDevice:(NSDictionary *) anDevice;
 - (NSString *) _identifierForICAObject:(id) anObjectID;
 - (NSImage *) _getThumbnailSync:(id) anObject;
-
+- (void) _addICADeviceList:(NSArray *) devices toNode:(IMBNode *)inNode;
 @end
 
 #ifdef __DEBUGGING__
@@ -188,7 +188,7 @@
 
 - (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects 
 {
-	IMBMTPObjectPromise *promise = [[IMBMTPObjectPromise alloc] initWithObjects:inObjects];
+	IMBMTPObjectPromise *promise = [((IMBMTPObjectPromise *)[IMBMTPObjectPromise alloc]) initWithObjects:inObjects];
 	return [promise autorelease];
 }
 	  

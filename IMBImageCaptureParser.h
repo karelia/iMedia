@@ -66,10 +66,8 @@
 @interface IMBImageCaptureParser : IMBParser
 {
 	NSMutableDictionary *_loadingDevices;
-	id _delegate;
 }
 @property (nonatomic, retain) NSMutableDictionary *loadingDevices;
-@property (assign) id _delegate;
 
 @end
 
