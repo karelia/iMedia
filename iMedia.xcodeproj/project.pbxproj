@@ -131,7 +131,6 @@
 		D0941A92105E24DD0092B2F1 /* iTunes9-icon-30.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A72105E24DD0092B2F1 /* iTunes9-icon-30.png */; };
 		D0941A93105E24DD0092B2F1 /* iTunes9-icon-31.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A73105E24DD0092B2F1 /* iTunes9-icon-31.png */; };
 		D0941A94105E24DD0092B2F1 /* iTunes9-icon-32.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A74105E24DD0092B2F1 /* iTunes9-icon-32.png */; };
-		D0941ACE105E2C310092B2F1 /* IMBFlickrParser.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0941ACD105E2C310092B2F1 /* IMBFlickrParser.xib */; };
 		D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B41010F6C100C527B7 /* IMBCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09930C51010F6C100C527B7 /* IMBLibraryController.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B51010F6C100C527B7 /* IMBLibraryController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09930C61010F6C100C527B7 /* IMBLibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930B61010F6C100C527B7 /* IMBLibraryController.m */; };
@@ -424,7 +423,6 @@
 		D0941A72105E24DD0092B2F1 /* iTunes9-icon-30.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-30.png"; sourceTree = "<group>"; };
 		D0941A73105E24DD0092B2F1 /* iTunes9-icon-31.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-31.png"; sourceTree = "<group>"; };
 		D0941A74105E24DD0092B2F1 /* iTunes9-icon-32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-32.png"; sourceTree = "<group>"; };
-		D0941ACD105E2C310092B2F1 /* IMBFlickrParser.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBFlickrParser.xib; sourceTree = "<group>"; };
 		D09930B41010F6C100C527B7 /* IMBCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBCommon.h; sourceTree = "<group>"; };
 		D09930B51010F6C100C527B7 /* IMBLibraryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLibraryController.h; sourceTree = "<group>"; };
 		D09930B61010F6C100C527B7 /* IMBLibraryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLibraryController.m; sourceTree = "<group>"; };
@@ -737,7 +735,6 @@
 			children = (
 				D0B779631047B65D00D12548 /* IMBFlickrParser.h */,
 				D062B0F71047B75100CA9B56 /* IMBFlickrParser.m */,
-				D0941ACD105E2C310092B2F1 /* IMBFlickrParser.xib */,
 				D032CE44109B301100D84782 /* IMBFlickrQueryEditor.h */,
 				D032CE45109B301100D84782 /* IMBFlickrQueryEditor.m */,
 				D032CE46109B301100D84782 /* IMBFlickrQueryEditor.xib */,
@@ -1250,7 +1247,6 @@
 				D0941A92105E24DD0092B2F1 /* iTunes9-icon-30.png in Resources */,
 				D0941A93105E24DD0092B2F1 /* iTunes9-icon-31.png in Resources */,
 				D0941A94105E24DD0092B2F1 /* iTunes9-icon-32.png in Resources */,
-				D0941ACE105E2C310092B2F1 /* IMBFlickrParser.xib in Resources */,
 				CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */,
 				CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */,
 				D032CE41109B2F2200D84782 /* Flickr.png in Resources */,

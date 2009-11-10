@@ -60,18 +60,18 @@
 @class IMBFlickrParser;
 
 /**
- *	...
- *
+ *	Flickr query editor view. You can add, remove and edit Flickr queries using
+ *	this editor.
  *
  *	@date 2009-09-21 Start implementing this class (cp).
  *
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBFlickrQueryEditor: NSWindowController {
+@interface IMBFlickrQueryEditor: NSViewController {
 	@private
 	IBOutlet NSArrayController* _queriesController;
-	IBOutlet NSTextField* _title;
+	IBOutlet NSTextField* _queryTitle;
 	IMBFlickrParser* _parser;
 }
 
@@ -84,9 +84,7 @@
 
 - (IBAction) add: (id) sender;
 
-- (IBAction) cancel: (id) inSender;
-
-- (IBAction) ok: (id) inSender;
+- (IBAction) apply: (id) inSender;
 
 
 #pragma mark Properties
