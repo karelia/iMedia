@@ -49,11 +49,12 @@
 
 #pragma mark HEADERS
 
+#import "IMBLightroomParser.h"
+
 #import <Quartz/Quartz.h>
 
 #import "FMDatabase.h"
 #import "FMResultSet.h"
-#import "IMBLightroomParser.h"
 #import "IMBLightroom1Parser.h"
 #import "IMBLightroom2Parser.h"
 #import "IMBLightroom3Parser.h"
@@ -63,6 +64,7 @@
 #import "IMBObject.h"
 #import "IMBObjectPromise.h"
 #import "IMBParserController.h"
+#import "IMBPyramidObjectPromise.h"
 #import "NSData+SKExtensions.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
@@ -768,6 +770,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
 			NSNumber* fileHeight = [NSNumber numberWithDouble:[results doubleForColumn:@"fileHeight"]];
 			NSNumber* fileWidth = [NSNumber numberWithDouble:[results doubleForColumn:@"fileWidth"]];
+			NSString* orientation = [results stringForColumn:@"orientation"];
 			NSString* caption = [results stringForColumn:@"caption"];
 			NSString* name = caption!= nil ? caption : filename;
 			NSString* path = [folderPath stringByAppendingPathComponent:filename];
@@ -775,11 +778,13 @@ static NSArray* sSupportedUTIs = nil;
 			if ([self canOpenImageFileAtPath:path]) {
 				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
 				
+				[metadata setObject:path forKey:@"MasterPath"];
 				[metadata setObject:idLocal forKey:@"idLocal"];
 				[metadata setObject:path forKey:@"path"];
 				[metadata setObject:fileHeight forKey:@"height"];
 				[metadata setObject:fileWidth forKey:@"width"];
-			
+				[metadata setObject:orientation forKey:@"orientation"];
+
 				if (name) {
 					[metadata setObject:name forKey:@"name"];
 				}
@@ -831,6 +836,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
 			NSNumber* fileHeight = [NSNumber numberWithDouble:[results doubleForColumn:@"fileHeight"]];
 			NSNumber* fileWidth = [NSNumber numberWithDouble:[results doubleForColumn:@"fileWidth"]];
+			NSString* orientation = [results stringForColumn:@"orientation"];
 			NSString* caption = [results stringForColumn:@"caption"];
 			NSString* name = caption!= nil ? caption : filename;
 			NSString* path = [absolutePath stringByAppendingString:filename];
@@ -838,10 +844,12 @@ static NSArray* sSupportedUTIs = nil;
 			if ([self canOpenImageFileAtPath:path]) {
 				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
 				
+				[metadata setObject:path forKey:@"MasterPath"];
 				[metadata setObject:idLocal forKey:@"idLocal"];
 				[metadata setObject:path forKey:@"path"];
 				[metadata setObject:fileHeight forKey:@"height"];
 				[metadata setObject:fileWidth forKey:@"width"];
+				[metadata setObject:orientation forKey:@"orientation"];
 				
 				if (name) {
 					[metadata setObject:name forKey:@"name"];

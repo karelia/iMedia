@@ -185,19 +185,3 @@ extern NSString* kIMBObjectPromiseType;
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-// This subclass is used for pyramid files that need to be split. The split file is saved to the local file system,
-// where it can then be accessed by the delegate... 
-
-@interface IMBPyramidObjectPromise : IMBLocalObjectPromise
-{
-
-}
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
