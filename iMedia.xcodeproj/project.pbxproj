@@ -13,6 +13,8 @@
 		8FC2559A10A851C500F19642 /* IMBLightroom2Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC2559710A851C500F19642 /* IMBLightroom2Parser.m */; };
 		8FC2561010A8706000F19642 /* IMBLightroom1Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FC2560E10A8706000F19642 /* IMBLightroom1Parser.h */; };
 		8FC2561110A8706000F19642 /* IMBLightroom1Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC2560F10A8706000F19642 /* IMBLightroom1Parser.m */; };
+		8FFCBFD010A8CD9C00377C33 /* IMBLightroom3Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */; };
+		8FFCBFD110A8CD9C00377C33 /* IMBLightroom3Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */; };
 		CEF686B51062D0BD005D7E72 /* IMBComboTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF686B61062D0BD005D7E72 /* IMBComboTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */; };
 		CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B81062D18F005D7E72 /* IMBComboTextCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -298,6 +300,8 @@
 		8FC2559710A851C500F19642 /* IMBLightroom2Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom2Parser.m; sourceTree = "<group>"; };
 		8FC2560E10A8706000F19642 /* IMBLightroom1Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom1Parser.h; sourceTree = "<group>"; };
 		8FC2560F10A8706000F19642 /* IMBLightroom1Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom1Parser.m; sourceTree = "<group>"; };
+		8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom3Parser.h; sourceTree = "<group>"; };
+		8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom3Parser.m; sourceTree = "<group>"; };
 		CE0E0C80104C72A200EE6B09 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBComboTableView.h; sourceTree = "<group>"; };
 		CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBComboTableView.m; sourceTree = "<group>"; };
@@ -726,6 +730,8 @@
 				8FC2560F10A8706000F19642 /* IMBLightroom1Parser.m */,
 				8FC2559610A851C500F19642 /* IMBLightroom2Parser.h */,
 				8FC2559710A851C500F19642 /* IMBLightroom2Parser.m */,
+				8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */,
+				8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */,
 			);
 			name = Lightroom;
 			sourceTree = "<group>";
@@ -1098,6 +1104,7 @@
 				D02E542610A5650600B205BD /* IMBEnhancedObject.h in Headers */,
 				8FC2559910A851C500F19642 /* IMBLightroom2Parser.h in Headers */,
 				8FC2561010A8706000F19642 /* IMBLightroom1Parser.h in Headers */,
+				8FFCBFD010A8CD9C00377C33 /* IMBLightroom3Parser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1336,6 +1343,7 @@
 				D02E542710A5650600B205BD /* IMBEnhancedObject.m in Sources */,
 				8FC2559A10A851C500F19642 /* IMBLightroom2Parser.m in Sources */,
 				8FC2561110A8706000F19642 /* IMBLightroom1Parser.m in Sources */,
+				8FFCBFD110A8CD9C00377C33 /* IMBLightroom3Parser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

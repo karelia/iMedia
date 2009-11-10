@@ -679,8 +679,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		// Should we cache that index?
 		if (index != NSNotFound) {
 			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
-			NSString* fileName = [(NSString*)inObject.location lastPathComponent];
-			NSString* jpegPath = [[NSFileManager threadSafeManager] temporaryFile:fileName];
+			NSString* fileName = [[(NSString*)inObject.location lastPathComponent] stringByDeletingPathExtension];
+			NSString* jpegPath = [[[NSFileManager threadSafeManager] temporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
 			BOOL success = [jpegData writeToFile:jpegPath atomically:YES];
 			
 			if (success) {

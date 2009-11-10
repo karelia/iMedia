@@ -49,7 +49,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom2Parser.h"
+#import "IMBLightroom3Parser.h"
 
 #import <Quartz/Quartz.h>
 
@@ -60,7 +60,7 @@
 #import "NSWorkspace+iMedia.h"
 
 
-@implementation IMBLightroom2Parser
+@implementation IMBLightroom3Parser
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@
 
 + (NSString*) lightroomPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
+	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom3Beta"];
 }
 
 
@@ -79,7 +79,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom2");
+	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3Beta");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -87,7 +87,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom2");
+		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3Beta");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);
@@ -115,7 +115,7 @@
 				dataPath = nil;
 			}
 			
-			IMBLightroom2Parser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+			IMBLightroom3Parser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = libraryPath;
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
@@ -136,6 +136,10 @@
 {
 	if (inRootNode.subNodes == nil) {
 		inRootNode.subNodes = [NSMutableArray array];
+	}
+	
+	if (inRootNode.objects == nil) {
+		inRootNode.objects = [NSMutableArray array];
 	}
 	
 	// Add the Folders node...
@@ -159,7 +163,7 @@
 	foldersNode.leaf = NO;
 	
 	[(NSMutableArray*)inRootNode.subNodes addObject:foldersNode];
-	
+
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
 	foldersObject.location = (id)foldersNode;
 	foldersObject.name = foldersNode.name;
@@ -172,9 +176,38 @@
 	
 	[(NSMutableArray*)inRootNode.objects addObject:foldersObject];
 
+	
 	// Add the Collections node...
 	
-	[super populateSubnodesForRootNode:inRootNode];
+	NSString* collectionsName = NSLocalizedStringWithDefaultValue(
+																  @"IMBLightroomParser.collectionsName",
+																  nil,IMBBundle(),
+																  @"Collections",
+																  @"Name of Collections node in IMBLightroomParser");
+	
+	IMBNode* collectionsNode = [[[IMBNode alloc] init] autorelease];
+	collectionsNode.parentNode = inRootNode;
+	collectionsNode.identifier = [self identifierWithCollectionId:0];
+	collectionsNode.name = collectionsName;
+	collectionsNode.icon = [self folderIcon];
+	collectionsNode.parser = self;
+	collectionsNode.leaf = NO;
+	
+	[(NSMutableArray*)inRootNode.subNodes addObject:collectionsNode];
+	
+	IMBNodeObject* collectionsObject = [[[IMBNodeObject alloc] init] autorelease];
+	collectionsObject.location = (id)collectionsNode;
+	collectionsObject.name = collectionsNode.name;
+	collectionsObject.metadata = nil;
+	collectionsObject.parser = self;
+	collectionsObject.index = 1;
+	collectionsObject.imageLocation = (id)self.mediaSource;
+	collectionsObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+	collectionsObject.imageRepresentation = [self folderIcon];
+	
+	[(NSMutableArray*)inRootNode.objects addObject:collectionsObject];
+	
+	[super populateSubnodesForRootNode:collectionsNode];
 }
 
 
@@ -202,30 +235,21 @@
 
 - (NSString*) rootCollectionNodesQuery
 {
-	NSString* query =	@" SELECT alt.id_local, alt.parent, alt.name"
-						@" FROM AgLibraryTag alt"
-						@" WHERE kindName = 'AgCollectionTagKind'"
-						@" AND alt.parent IS NULL"
-						@" AND NOT EXISTS ("
-						@"	SELECT alc.id_local"
-						@"	FROM AgLibraryContent alc"
-						@"	WHERE alt.id_local = alc.containingTag"
-						@"	AND alc.owningModule = 'ag.library.smart_collection')";
+	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name"
+						@" FROM AgLibraryCollection alc"
+						@" WHERE creationId = 'com.adobe.ag.library.collection'"
+						@" AND alc.parent IS NULL";
 	
 	return query;
 }
 
+
 - (NSString*) collectionNodesQuery
 {
-	NSString* query =	@" SELECT alt.id_local, alt.parent, alt.name"
-						@" FROM AgLibraryTag alt"
-						@" WHERE kindName = 'AgCollectionTagKind'"
-						@" AND alt.parent = ?"
-						@" AND NOT EXISTS ("
-						@"	SELECT alc.id_local"
-						@"	FROM AgLibraryContent alc"
-						@"	WHERE alt.id_local = alc.containingTag"
-						@"	AND alc.owningModule = 'ag.library.smart_collection')";
+	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name"
+						@" FROM AgLibraryCollection alc"
+						@" WHERE creationId = 'com.adobe.ag.library.collection'"
+						@" AND alc.parent = ?";
 	
 	return query;
 }
@@ -233,16 +257,10 @@
 
 - (NSString*) folderObjectsQuery
 {
-	NSString* query =	@" SELECT alf.idx_filename, alf.id_local, ai.fileHeight, ai.fileWidth, caption"
+	NSString* query =	@" SELECT alf.idx_filename, alf.id_local, ai.fileHeight, ai.fileWidth, iptc.caption"
 						@" FROM AgLibraryFile alf"
 						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
-						@" LEFT JOIN"
-						@"		(SELECT altiCaption.image captionImage, altCaption.name caption, altiCaption.tag, altCaption.id_local"
-						@" 		 FROM AgLibraryTagImage altiCaption"
-						@" 		 INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
-						@" 		 WHERE altiCaption.tagKind = 'AgCaptionTagKind'"
-						@"		)"
-						@"		ON ai.id_local = captionImage"
+						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
 						@" WHERE alf.folder = ?"
 						@" ORDER BY ai.captureTime ASC";
 	
@@ -252,19 +270,14 @@
 - (NSString*) collectionObjectsQuery
 {
 	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-						@"			aif.idx_filename, aif.id_local, ai.fileHeight, ai.fileWidth, caption"
+						@"			aif.idx_filename, aif.id_local, ai.fileHeight, ai.fileWidth, iptc.caption"
 						@" FROM AgLibraryFile aif"
 						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
 						@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
 						@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
-						@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"
-						@" LEFT JOIN"
-						@"		(SELECT altiCaption.image captionImage, altCaption.name caption, altiCaption.tag, altCaption.id_local"
-						@"		FROM AgLibraryTagImage altiCaption"
-						@"		INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
-						@"		WHERE altiCaption.tagKind = 'AgCaptionTagKind')"
-						@"	ON ai.id_local = captionImage"
-						@" WHERE alti.tag = ?"
+						@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"
+						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+						@" WHERE alci.collection = ?"
 						@" ORDER BY ai.captureTime ASC";
 	
 	return query;
