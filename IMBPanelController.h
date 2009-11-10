@@ -72,6 +72,7 @@
 
 + (IMBPanelController*) sharedPanelController;
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
++ (IMBPanelController*) sharedPanelControllerWithoutLoading;
 
 @property (assign) id delegate;
 @property (retain) NSArray* mediaTypes;

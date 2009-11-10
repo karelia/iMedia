@@ -114,6 +114,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 #pragma mark 
 
+// Convenience method for loading/initializing the shared panel controller with default media types and no delegate
 + (IMBPanelController*) sharedPanelController
 {
 	if (sSharedPanelController == nil)
@@ -128,7 +129,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	return sSharedPanelController;
 }
 
-
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes
 {
 	if (sSharedPanelController == nil)
@@ -142,6 +142,14 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 	return sSharedPanelController;
 }
+
+// Returns the shared panel controller, or nil if it is not loaded.  Useful for closing the panel if it's open.
+
++ (IMBPanelController*) sharedPanelControllerWithoutLoading
+{
+	return sSharedPanelController;
+}
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
