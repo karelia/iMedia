@@ -941,14 +941,19 @@ static NSArray* sSupportedUTIs = nil;
 	return object;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) objectViewDidChangeIconSize:(NSSize)inSize
 {
-	_thumbnailSize = inSize;
-	
-	[self invalidateThumbnails];
+	if (_thumbnailSize.width<inSize.width || _thumbnailSize.height<inSize.height)
+	{
+		_thumbnailSize = inSize;
+		[self invalidateThumbnails];
+	}	
 }
+
 
 - (void) loadThumbnailForObject:(IMBObject*)inObject
 {	

@@ -957,6 +957,16 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			return node;
 		}
+		else if (node.isGroup)
+		{
+			for (IMBNode* subnode in node.subNodes)
+			{
+				if (subnode.parser == inParser)
+				{
+					return subnode;
+				}
+			}	
+		}
 	}
 	
 	return nil;

@@ -50,9 +50,11 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
+#import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBMovieObject.h"
 #import "IMBObjectPromise.h"
+#import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
 #import "NSData+SKExtensions.h"
 #import <Quartz/Quartz.h>
@@ -343,6 +345,34 @@
 {
 	// to be overridden by subclasses. This method may be called on a background thread, so subclasses need to
 	// take appropriate safety measures...
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Invalidate the thumbnails for all object in this node tree. That way thumbnails are forced to be re-generated...
+
+- (void) invalidateThumbnailsForNode:(IMBNode*)inNode
+{
+	for (IMBNode* node in inNode.subNodes)
+	{
+		[self invalidateThumbnailsForNode:node];
+	}
+	
+	for (IMBObject* object in inNode.objects)
+	{
+		object.needsImageRepresentation = YES;
+		object.imageVersion = object.imageVersion + 1;
+	}
+}
+
+
+- (void) invalidateThumbnails
+{
+	IMBLibraryController* controller = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
+	IMBNode* rootNode = [controller rootNodeForParser:self];
+	[self invalidateThumbnailsForNode:rootNode];
 }
 
 

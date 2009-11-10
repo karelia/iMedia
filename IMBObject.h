@@ -69,6 +69,7 @@
 	
 	id _imageRepresentation;								
 	NSString* _imageRepresentationType;		
+	BOOL _needsImageRepresentation;
 	NSUInteger _imageVersion;
     BOOL _isLoading;
 	id _imageLocation;
@@ -95,6 +96,7 @@
 @property (retain) id imageLocation;						// Optional url or path if different from location (e.g. lores thumbnail)
 @property (readonly) NSString* imageUID;
 @property (retain) id imageRepresentation;	
+@property (assign) BOOL needsImageRepresentation;
 @property (retain) NSString* imageRepresentationType;
 @property (readonly) NSString* imageTitle;
 @property (assign) NSUInteger imageVersion;
