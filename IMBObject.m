@@ -72,8 +72,9 @@
 @synthesize index = _index;
 
 @synthesize imageLocation = _imageLocation;
-@synthesize imageRepresentation = _imageRepresentation;
+//@synthesize imageRepresentation = _imageRepresentation;
 @synthesize imageRepresentationType = _imageRepresentationType;
+@synthesize needsImageRepresentation = _needsImageRepresentation;
 @synthesize imageVersion = _imageVersion;
 @synthesize isLoading = _isLoading;
 
@@ -86,6 +87,7 @@
 	if (self = [super init])
 	{
 		self.index = NSNotFound;
+		self.needsImageRepresentation = YES;
 	}
 	
 	return self;
@@ -101,6 +103,7 @@
 		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
 		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
 		self.index = [inCoder decodeIntegerForKey:@"index"];
+		self.needsImageRepresentation = YES;
 //		self.imageLocation = [inCoder decodeObjectForKey:@"imageLocation"];
 //		self.imageRepresentation = [inCoder decodeObjectForKey:@"imageRepresentation"];
 //		self.imageRepresentationType = [inCoder decodeObjectForKey:@"imageRepresentationType"];
@@ -188,12 +191,17 @@
 
 - (id) imageRepresentation
 {
-	if (_imageRepresentation == nil)
+	if (self.needsImageRepresentation)
 	{
 		[self load];
 	}
 	
 	return [[_imageRepresentation retain] autorelease];
+}
+
+- (BOOL) needsImageRepresentation
+{
+	return _needsImageRepresentation || (_imageRepresentation == nil);
 }
 
 
@@ -208,7 +216,7 @@
 
 - (void) load
 {
-	if (_imageRepresentation==nil && _isLoading==NO)
+	if (self.needsImageRepresentation && _isLoading==NO)
 	{
 		self.isLoading = YES;
 		
@@ -235,6 +243,8 @@
 		[IMBObjectFifoCache addObject:self];
 //		NSUInteger n = [IMBObjectFifoCache count];
 //		NSLog(@"%s = %p (%d)",__FUNCTION__,inImageRepresentation,(int)n);
+
+		self.needsImageRepresentation = NO;
 	}
 }
 
