@@ -94,7 +94,9 @@
 
 #pragma mark Actions
 
-- (IBAction) editQueries: (id) inSender;
+- (IBAction) openFlickrPage: (id) sender;
+
+- (IBAction) removeNode: (id) sender;
 
 
 #pragma mark Properties

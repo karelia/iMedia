@@ -102,18 +102,6 @@
 #pragma mark
 #pragma mark Actions
 
-- (IBAction) editQueries: (id) inSender {
-	if (self.editor) {
-		[self.editor showWindow:self];
-	} else {
-		IMBFlickrQueryEditor* editor = [IMBFlickrQueryEditor flickrQueryEditorForParser:self];
-		[editor.window center];
-		[editor showWindow:self];
-		self.editor = editor;
-	}
-}
-
-
 - (IBAction) openFlickrPage: (id) sender {
 	if (![sender isKindOfClass:[NSMenuItem class]]) return;
 	
@@ -138,7 +126,6 @@
 		}
 		[self saveCustomQueries];
 		[self reloadCustomQueries];
-		
 	} else {
 		NSLog (@"Can't handle this kind of node.");
 	}
@@ -243,20 +230,9 @@
 	rootNode.watcherType = kIMBWatcherTypeFirstCustom;
 	rootNode.watchedPath = (NSString*) rootNode.mediaSource;
 	
-	// The root node has a custom view that we are loading from a nib file
-	NSView* customObjectView = nil;
-	NSArray* topLevelObjects = nil;
-	NSNib* nib = [[[NSNib alloc] initWithNibNamed:@"IMBFlickrParser" bundle:[NSBundle bundleForClass:[self class]]] autorelease];
-	[nib instantiateNibWithOwner:self topLevelObjects:&topLevelObjects];
-
-	for (id topLevelObject in topLevelObjects) {
-		if ([topLevelObject isKindOfClass:[NSView class]]) {
-			customObjectView = topLevelObject;
-			break;
-		}
-	}
-
-	rootNode.customObjectView = customObjectView;
+	// The root node has a custom view that we are loading from a nib file...
+	self.editor = [IMBFlickrQueryEditor flickrQueryEditorForParser:self];
+	rootNode.customObjectView = self.editor.view;
 	
 	return rootNode;
 }

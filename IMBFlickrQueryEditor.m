@@ -61,6 +61,9 @@
 
 @implementation IMBFlickrQueryEditor
 
+NSString* const IMBFlickrQueryEditor_QueryChanged = @"IMBFlickrQueryEditor_QueryChanged";
+
+
 + (IMBFlickrQueryEditor*) flickrQueryEditorForParser: (IMBFlickrParser*) parser {
 	IMBFlickrQueryEditor* editor = [[[IMBFlickrQueryEditor alloc] init] autorelease];
 	editor.parser = parser;
@@ -68,20 +71,44 @@
 }
 
 
-- (id) init {
-    self = [super init];
+- (id) init  {
+    self = [super initWithNibName:@"IMBFlickrQueryEditor" bundle:IMBBundle ()];
     if (self != nil) {
-        if (![NSBundle loadNibNamed:@"IMBFlickrQueryEditor" owner:self]) {
-            NSAssert (false, @"Can't load 'IMBFlickrQueryEditor' nib.");
-        }		
     }
     return self;
 }
 
 
 - (void) dealloc {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(apply:) object:self];
+
 	_parser = nil;
 	[super dealloc];
+}
+
+
+- (void) awakeFromNib {
+	[super awakeFromNib];
+	
+	NSAssert (_queriesController != nil, @"Can't find '_queriesController'.");
+	NSAssert (_queryTitle != nil, @"Can't find '_queryTitle'.");
+	
+	[_queriesController addObserver:self forKeyPath:@"selection.title" options:0 context:IMBFlickrQueryEditor_QueryChanged];
+	[_queriesController addObserver:self forKeyPath:@"selection.query" options:0 context:IMBFlickrQueryEditor_QueryChanged];
+	[_queriesController addObserver:self forKeyPath:@"selection.method" options:0 context:IMBFlickrQueryEditor_QueryChanged];
+}
+
+
+#pragma mark 
+#pragma mark Notifications & Observing
+
+- (void) observeValueForKeyPath: (NSString*) keyPath ofObject: (id) object change: (NSDictionary*) change context: (void*) context {
+	if (context == IMBFlickrQueryEditor_QueryChanged) {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(apply:) object:self];
+		[self performSelector:@selector(apply:) withObject:self afterDelay:2.0f inModes:[NSArray arrayWithObject:(NSString*)kCFRunLoopCommonModes]];
+	} else {
+		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+	}
 }
 
 
@@ -94,21 +121,12 @@
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodePrefKey_Method];
 	[dict setObject:@"Steve Jobs" forKey:IMBFlickrNodePrefKey_Query];	
 	[_queriesController addObject:dict];
-	[_title becomeFirstResponder];
 }
 
 
-- (IBAction) cancel: (id) sender {
-	[self.parser loadCustomQueries];
-	[self.window orderOut:sender];
-}
-
-
-- (IBAction) ok: (id) sender {
-	[_queriesController commitEditing];
+- (IBAction) apply: (id) sender {
 	[self.parser saveCustomQueries];
 	[self.parser reloadCustomQueries];
-	[self.window orderOut:sender];
 }
 
 
