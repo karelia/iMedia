@@ -56,6 +56,7 @@
 #import "IMBLightroomParser.h"
 #import "IMBLightroom1Parser.h"
 #import "IMBLightroom2Parser.h"
+#import "IMBLightroom3Parser.h"
 #import "IMBIconCache.h"
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
@@ -260,6 +261,7 @@ static NSArray* sSupportedUTIs = nil;
 
 	[parserInstances addObjectsFromArray:[IMBLightroom1Parser concreteParserInstancesForMediaType:inMediaType]];
 	[parserInstances addObjectsFromArray:[IMBLightroom2Parser concreteParserInstancesForMediaType:inMediaType]];
+	[parserInstances addObjectsFromArray:[IMBLightroom3Parser concreteParserInstancesForMediaType:inMediaType]];
 		
 	return parserInstances;
 }
@@ -467,9 +469,7 @@ static NSArray* sSupportedUTIs = nil;
 	FMDatabase *database = self.database;
 	
 	if (database != nil) {
-		NSString* query =	@" SELECT id_local, absolutePath, name"
-							@" FROM AgLibraryRootFolder"
-							@" ORDER BY name ASC";
+		NSString* query = [self rootFolderQuery];
 		FMResultSet* results = [self.database executeQuery:query];
 		NSInteger index = 0;
 		
@@ -549,15 +549,9 @@ static NSArray* sSupportedUTIs = nil;
 		NSString* parentPathFromRoot = [self pathFromRootFromAttributes:attributes];	
 		NSNumber* parentRootFolder = [self rootFolderFromAttributes:attributes];
 		NSString* parentRootPath = [self rootPathFromAttributes:inParentNode.attributes];
-		NSString* query =	@" SELECT id_local, pathFromRoot"
-							@" FROM AgLibraryFolder"
-							@" WHERE rootFolder = ?"
-							@" AND pathFromRoot LIKE ?"
-							@" AND NOT (pathFromRoot LIKE ?)"
-							@" ORDER BY pathFromRoot, robustRepresentation ASC";
-
-		NSString *pathFromRootAccept = nil;
-		NSString *pathFromRootReject = nil;
+		NSString* query = [self folderNodesQuery];
+		NSString* pathFromRootAccept = nil;
+		NSString* pathFromRootReject = nil;
 		
 		if ([parentPathFromRoot length] > 0) {
 			pathFromRootAccept = [NSString stringWithFormat:@"%@/%%/", parentPathFromRoot];
@@ -647,16 +641,20 @@ static NSArray* sSupportedUTIs = nil;
 	FMDatabase *database = self.database;
 	
 	if (database != nil) {
-		NSString* query =	@" SELECT alt.id_local, alt.parent, alt.kindName, alt.name"
-							@" FROM AgLibraryTag alt"
-							@" WHERE kindName = 'AgCollectionTagKind'"
-							@" AND NOT EXISTS ("
-							@"	SELECT alc.id_local"
-							@"	FROM AgLibraryContent alc"
-							@"	WHERE alt.id_local = alc.containingTag"
-							@"	AND alc.owningModule = 'ag.library.smart_collection')";
+		NSDictionary* attributes = inParentNode.attributes;
+		NSNumber* collectionId = [self idLocalFromAttributes:attributes];
+		NSString* query = nil;
+		FMResultSet* results = nil;
 		
-		FMResultSet* results = [self.database executeQuery:query];
+		if ([collectionId longValue] == 0) {
+			query = [self rootCollectionNodesQuery];
+			results = [self.database executeQuery:query];
+		}
+		else {
+			query = [self collectionNodesQuery];
+			results = [self.database executeQuery:query, collectionId];
+		}
+		
 		NSInteger index = 0;
 
 		while ([results next]) {
@@ -686,42 +684,32 @@ static NSArray* sSupportedUTIs = nil;
 				}
 			}
 			
-			// Does it have the correct parent? If yes then add a new subnode ...
+			IMBNode* node = [[[IMBNode alloc] init] autorelease];
+			node.parentNode = inParentNode;
+			node.identifier = [self identifierWithCollectionId:idLocal];
+			node.name = name;
+			node.icon = [self folderIcon];
+			node.parser = self;
+			node.mediaSource = self.mediaSource;
+			node.attributes = [self attributesWithRootFolder:nil
+													 idLocal:idLocal
+													rootPath:nil
+												pathFromRoot:nil];
+			node.leaf = NO;
 			
-			NSString* parentIdentifier = 
-				[idParentLocal intValue] == 0 ?
-				[self rootNodeIdentifier] :
-				[self identifierWithCollectionId:idParentLocal];
-				
-			if ([inParentNode.identifier isEqualToString:parentIdentifier])
-			{
-				IMBNode* node = [[[IMBNode alloc] init] autorelease];
-				node.parentNode = inParentNode;
-				node.identifier = [self identifierWithCollectionId:idLocal];
-				node.name = name;
-				node.icon = [self folderIcon];
-				node.parser = self;
-				node.mediaSource = self.mediaSource;
-				node.attributes = [self attributesWithRootFolder:nil
-														 idLocal:idLocal
-														rootPath:nil
-													pathFromRoot:nil];
-				node.leaf = NO;
-				
-				[(NSMutableArray*)inParentNode.subNodes addObject:node];
-
-				IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-				object.location = (id)node;
-				object.name = node.name;
-				object.metadata = nil;
-				object.parser = self;
-				object.index = index++;
-				object.imageLocation = (id)self.mediaSource;
-				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-				object.imageRepresentation = [self folderIcon];
-				
-				[(NSMutableArray*)inParentNode.objects addObject:object];
-			}
+			[(NSMutableArray*)inParentNode.subNodes addObject:node];
+			
+			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+			object.location = (id)node;
+			object.name = node.name;
+			object.metadata = nil;
+			object.parser = self;
+			object.index = index++;
+			object.imageLocation = (id)self.mediaSource;
+			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+			object.imageRepresentation = [self folderIcon];
+			
+			[(NSMutableArray*)inParentNode.objects addObject:object];
 		}
 		
 		[results close];
@@ -767,18 +755,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (database != nil) {
 		NSMutableArray* objects = [NSMutableArray array];
-		NSString* query =	@" SELECT alf.idx_filename, alf.id_local, ai.fileHeight, ai.fileWidth, captionName"
-							@" FROM AgLibraryFile alf"
-							@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
-							@" LEFT JOIN"
-							@"		(SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"
-							@" 		 FROM AgLibraryTagImage altiCaption"
-							@" 		 INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
-							@" 		 WHERE altiCaption.tagKind = 'AgCaptionTagKind'"
-							@"		)"
-							@"		ON ai.id_local = captionImage"
-							@" WHERE alf.folder = ?"
-							@" ORDER BY ai.captureTime ASC";
+		NSString* query = [self folderObjectsQuery];
 		
 		NSDictionary* attributes = inNode.attributes;
 		NSString* folderPath = [self absolutePathFromAttributes:attributes];
@@ -791,7 +768,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
 			NSNumber* fileHeight = [NSNumber numberWithDouble:[results doubleForColumn:@"fileHeight"]];
 			NSNumber* fileWidth = [NSNumber numberWithDouble:[results doubleForColumn:@"fileWidth"]];
-			NSString* caption = [results stringForColumn:@"captionName"];
+			NSString* caption = [results stringForColumn:@"caption"];
 			NSString* name = caption!= nil ? caption : filename;
 			NSString* path = [folderPath stringByAppendingPathComponent:filename];
 
@@ -843,7 +820,7 @@ static NSArray* sSupportedUTIs = nil;
 	FMDatabase *database = self.database;
 	
 	if (database != nil) {
-		NSString* query = [self collectionContentsQuery];
+		NSString* query = [self collectionObjectsQuery];
 		NSNumber* collectionId = [self idLocalFromAttributes:inNode.attributes];
 		FMResultSet* results = [self.database executeQuery:query, collectionId];
 		NSUInteger index = 0;
@@ -854,7 +831,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
 			NSNumber* fileHeight = [NSNumber numberWithDouble:[results doubleForColumn:@"fileHeight"]];
 			NSNumber* fileWidth = [NSNumber numberWithDouble:[results doubleForColumn:@"fileWidth"]];
-			NSString* caption = [results stringForColumn:@"captionName"];
+			NSString* caption = [results stringForColumn:@"caption"];
 			NSString* name = caption!= nil ? caption : filename;
 			NSString* path = [absolutePath stringByAppendingString:filename];
 

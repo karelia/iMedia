@@ -116,7 +116,14 @@
 + (NSString*) lightroomPath;
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
 
-- (NSString*) collectionContentsQuery;
+- (NSString*) rootFolderQuery;
+- (NSString*) folderNodesQuery;
+
+- (NSString*) rootCollectionNodesQuery;
+- (NSString*) collectionNodesQuery;
+
+- (NSString*) folderObjectsQuery;
+- (NSString*) collectionObjectsQuery;
 
 @end
 

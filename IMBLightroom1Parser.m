@@ -125,13 +125,83 @@
 	return parserInstances;
 }
 
-- (NSString*) collectionContentsQuery
+- (NSString*) rootFolderQuery
 {
-	NSString* query =	@" SELECT aif.absolutePath, aif.idx_filename, aif.id_local, ai.fileHeight, ai.fileWidth, captionName"
+	NSString* query =	@" SELECT id_local, absolutePath, name"
+						@" FROM AgLibraryRootFolder"
+						@" ORDER BY name ASC";
+	
+	return query;
+}
+
+- (NSString*) folderNodesQuery
+{
+	NSString* query =	@" SELECT id_local, pathFromRoot"
+						@" FROM AgLibraryFolder"
+						@" WHERE rootFolder = ?"
+						@" AND pathFromRoot LIKE ?"
+						@" AND NOT (pathFromRoot LIKE ?)"
+						@" ORDER BY pathFromRoot, robustRepresentation ASC";
+	
+	
+	return query;
+}
+
+- (NSString*) rootCollectionNodesQuery
+{
+	NSString* query =	@" SELECT alt.id_local, alt.parent, alt.name"
+						@" FROM AgLibraryTag alt"
+						@" WHERE kindName = 'AgCollectionTagKind'"
+						@" AND alt.parent IS NULL"
+						@" AND NOT EXISTS ("
+						@"	SELECT alc.id_local"
+						@"	FROM AgLibraryContent alc"
+						@"	WHERE alt.id_local = alc.containingTag"
+						@"	AND alc.owningModule = 'ag.library.smart_collection')";
+	
+	return query;
+}
+
+- (NSString*) collectionNodesQuery
+{
+	NSString* query =	@" SELECT alt.id_local, alt.parent, alt.name"
+						@" FROM AgLibraryTag alt"
+						@" WHERE kindName = 'AgCollectionTagKind'"
+						@" AND alt.parent = ?"
+						@" AND NOT EXISTS ("
+						@"	SELECT alc.id_local"
+						@"	FROM AgLibraryContent alc"
+						@"	WHERE alt.id_local = alc.containingTag"
+						@"	AND alc.owningModule = 'ag.library.smart_collection')";
+	
+	return query;
+}
+
+- (NSString*) folderObjectsQuery
+{
+	NSString* query =	@" SELECT alf.idx_filename, alf.id_local, ai.fileHeight, ai.fileWidth, caption"
+						@" FROM AgLibraryFile alf"
+						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
+						@" LEFT JOIN"
+						@"		(SELECT altiCaption.image captionImage, altCaption.name caption, altiCaption.tag, altCaption.id_local"
+						@" 		 FROM AgLibraryTagImage altiCaption"
+						@" 		 INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
+						@" 		 WHERE altiCaption.tagKind = 'AgCaptionTagKind'"
+						@"		)"
+						@"		ON ai.id_local = captionImage"
+						@" WHERE alf.folder = ?"
+						@" ORDER BY ai.captureTime ASC";
+	
+	return query;
+}
+
+- (NSString*) collectionObjectsQuery
+{
+	NSString* query =	@" SELECT aif.absolutePath, aif.idx_filename, aif.id_local, ai.fileHeight, ai.fileWidth, caption"
 						@" FROM Adobe_imageFiles aif"
 						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
 						@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"
-						@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"
+						@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name caption, altiCaption.tag, altCaption.id_local"
 						@" 		   FROM AgLibraryTagImage altiCaption"
 						@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"
 						@" 		   WHERE altiCaption.tagKind = 'AgCaptionTagKind') ON ai.id_local = captionImage"
