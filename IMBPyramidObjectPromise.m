@@ -84,10 +84,14 @@
 - (void) _loadObject:(IMBObject*)inObject
 {
 	NSString* absolutePyramidPath = nil;
+	NSString* orientation = nil;
 	NSString* imagePath = nil;
 	
 	if ([inObject isKindOfClass:[IMBLightroomObject class]]) {
-		absolutePyramidPath = [(IMBLightroomObject*)inObject absolutePyramidPath];
+		IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
+		
+		absolutePyramidPath = [lightroomObject absolutePyramidPath];
+		orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];
 	}
 	
 	if (absolutePyramidPath != nil) {
@@ -97,10 +101,52 @@
 		
 		// Should we cache that index?
 		if (index != NSNotFound) {
+			BOOL success = NO;
 			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
 			NSString* fileName = [[(NSString*)inObject.location lastPathComponent] stringByDeletingPathExtension];
 			NSString* jpegPath = [[[NSFileManager threadSafeManager] temporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
-			BOOL success = [jpegData writeToFile:jpegPath atomically:YES];
+			
+			if ((orientation == nil) || [orientation isEqual:@"AB"]) {
+				success = [jpegData writeToFile:jpegPath atomically:YES];
+			}
+			else {
+				CGImageSourceRef jpegSource = CGImageSourceCreateWithData((CFDataRef)jpegData, NULL);
+				
+				if (jpegSource != NULL) {
+					CGImageRef jpegImage = CGImageSourceCreateImageAtIndex(jpegSource, 0, NULL);
+
+					if (jpegImage != NULL) {
+						NSURL* fileURL = [NSURL fileURLWithPath:jpegPath];
+						CGImageDestinationRef destination = CGImageDestinationCreateWithURL((CFURLRef)fileURL, (CFStringRef)@"public.jpeg", 1, nil);
+						
+						if (destination != NULL) {
+							NSInteger orientationProperty = 2;
+
+							if ([orientation isEqual:@"BC"]) {
+								orientationProperty = 6;
+							}
+							else if ([orientation isEqual:@"CD"]) {
+								orientationProperty = 4;
+							}
+							else if ([orientation isEqual:@"DA"]) {
+								orientationProperty = 8;
+							}
+							
+							NSDictionary* metadata = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:orientationProperty]
+																				 forKey:((NSString*)kCGImagePropertyOrientation)];
+							CGImageDestinationAddImage(destination, jpegImage, (CFDictionaryRef)metadata);
+					
+							success = CGImageDestinationFinalize(destination);
+					
+							CFRelease(destination);
+						}
+				
+						CGImageRelease(jpegImage);
+					}
+					
+					CFRelease(jpegSource);
+				}
+			}
 			
 			if (success) {
 				imagePath = jpegPath;
