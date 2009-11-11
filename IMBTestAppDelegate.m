@@ -377,23 +377,23 @@
 	
 	//	tag search for 'macintosh' and 'apple'...
 	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
-	[dict setObject:@"Tagged 'Macintosh' & 'Apple'" forKey:IMBFlickrNodePrefKey_Title];
-	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodePrefKey_Method];
-	[dict setObject:@"macintosh, apple" forKey:IMBFlickrNodePrefKey_Query];
+	[dict setObject:@"Tagged 'Macintosh' & 'Apple'" forKey:IMBFlickrNodeProperty_Title];
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodeProperty_Method];
+	[dict setObject:@"macintosh, apple" forKey:IMBFlickrNodeProperty_Query];
 	[defaultNodes addObject:dict];
 	
 	//	tag search for 'iphone' and 'screenshot'...
 	dict = [NSMutableDictionary dictionary];
-	[dict setObject:@"Tagged 'iPhone' & 'Screenshot'" forKey:IMBFlickrNodePrefKey_Title];
-	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodePrefKey_Method];
-	[dict setObject:@"iphone, screenshot" forKey:IMBFlickrNodePrefKey_Query];
+	[dict setObject:@"Tagged 'iPhone' & 'Screenshot'" forKey:IMBFlickrNodeProperty_Title];
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodeProperty_Method];
+	[dict setObject:@"iphone, screenshot" forKey:IMBFlickrNodeProperty_Query];
 	[defaultNodes addObject:dict];
 	
 	//	text search for 'tree'...
 	dict = [NSMutableDictionary dictionary];
-	[dict setObject:@"Search for 'Tree'" forKey:IMBFlickrNodePrefKey_Title];
-	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodePrefKey_Method];
-	[dict setObject:@"tree" forKey:IMBFlickrNodePrefKey_Query];
+	[dict setObject:@"Search for 'Tree'" forKey:IMBFlickrNodeProperty_Title];
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodeProperty_Method];
+	[dict setObject:@"tree" forKey:IMBFlickrNodeProperty_Query];
 	[defaultNodes addObject:dict];
 	
 	return defaultNodes;

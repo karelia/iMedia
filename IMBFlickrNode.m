@@ -59,7 +59,7 @@
 @interface IMBFlickrNode ()
 - (OFFlickrAPIRequest*) flickrRequestWithContext: (OFFlickrAPIContext*) context;
 //	Utilities:
-+ (NSDictionary*) argumentsForMethod: (NSInteger) method query: (NSString*) query;
+- (NSDictionary*) argumentsForFlickrCall;
 + (NSImage*) coreTypeIconNamed: (NSString*) name;
 + (NSString*) flickrMethodForMethodCode: (NSInteger) code;
 + (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query;
@@ -72,30 +72,46 @@
 //	Some additions to the iMB node useful for Flickr handling:
 @implementation IMBFlickrNode
 
-NSString* const IMBFlickrNodePrefKey_Arguments = @"arguments";
-NSString* const IMBFlickrNodePrefKey_Method = @"method";
-NSString* const IMBFlickrNodePrefKey_Query = @"query";
-NSString* const IMBFlickrNodePrefKey_Title = @"title";
+NSString* const IMBFlickrNodeProperty_License = @"license";
+NSString* const IMBFlickrNodeProperty_Method = @"method";
+NSString* const IMBFlickrNodeProperty_Query = @"query";
+NSString* const IMBFlickrNodeProperty_SortOrder = @"sortOrder";
+NSString* const IMBFlickrNodeProperty_Title = @"title";
 
 
 #pragma mark
 #pragma mark Construction
 
+- (id) init {
+	if (self = [super init]) {
+		self.license = IMBFlickrNodeLicense_CreativeCommons;
+		self.method = IMBFlickrNodeMethod_TextSearch;
+		self.sortOrder = IMBFlickrNodeSortOrder_InterestingnessDesc;
+	}
+	return self;
+}
+
+
 - (id) copyWithZone: (NSZone*) inZone {
 	IMBFlickrNode* copy = [super copyWithZone:inZone];
 	copy.customNode = self.customNode;
+	copy.license = self.license;
+	copy.method = self.method;
+	copy.query = self.query;
+	copy.sortOrder = self.sortOrder;
 	return copy;
 }
 	
 
-+ (IMBFlickrNode*) createGenericFlickrNodeForRoot: (IMBFlickrNode*) root
-										   parser: (IMBParser*) parser {
++ (IMBFlickrNode*) genericFlickrNodeForRoot: (IMBFlickrNode*) root
+									 parser: (IMBParser*) parser {
 	
 	IMBFlickrNode* node = [[[IMBFlickrNode alloc] init] autorelease];
+	node.attributes = [NSMutableDictionary dictionary];
+	node.leaf = YES;
 	node.parentNode = root;
 	node.parser = parser;
-	node.leaf = YES;
-	node.attributes = [NSMutableDictionary dictionary];
+	
 	
 	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
@@ -113,15 +129,12 @@ NSString* const IMBFlickrNodePrefKey_Title = @"title";
 + (IMBFlickrNode*) flickrNodeForInterestingPhotosForRoot: (IMBFlickrNode*) root
 												  parser: (IMBParser*) parser {
 	
-	IMBFlickrNode* node = [self createGenericFlickrNodeForRoot:root parser:parser];
+	IMBFlickrNode* node = [self genericFlickrNodeForRoot:root parser:parser];
 	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
 	node.identifier = [self identifierWithMethod:IMBFlickrNodeMethod_MostInteresting query:@"30"];
 	node.mediaSource = node.identifier;
-	node.name = NSLocalizedString (@"Most Interesting", @"Flickr parser standard node name.");
-	
-	[node setFlickrMethod:@"flickr.interestingness.getList"
-				arguments:[NSDictionary dictionaryWithObjectsAndKeys:@"30", @"per_page", nil]];
-	
+	node.method = IMBFlickrNodeMethod_MostInteresting;
+	node.name = NSLocalizedString (@"Most Interesting", @"Flickr parser standard node name.");	
 	return node;
 }
 
@@ -129,24 +142,17 @@ NSString* const IMBFlickrNodePrefKey_Title = @"title";
 + (IMBFlickrNode*) flickrNodeForRecentPhotosForRoot: (IMBFlickrNode*) root
 											 parser: (IMBParser*) parser {
 	
-	IMBFlickrNode* node = [self createGenericFlickrNodeForRoot:root parser:parser];
+	IMBFlickrNode* node = [self genericFlickrNodeForRoot:root parser:parser];
 	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
 	node.identifier = [self identifierWithMethod:IMBFlickrNodeMethod_Recent query:@"30"];
 	node.mediaSource = node.identifier;
+	node.method = IMBFlickrNodeMethod_Recent;	
 	node.name = NSLocalizedString (@"Recent", @"Flickr parser standard node name.");
-	
-	[node setFlickrMethod:@"flickr.photos.getRecent"
-				arguments:[NSDictionary dictionaryWithObjectsAndKeys:@"30", @"per_page", nil]];
-	
 	return node;
 }
 
 
 + (IMBFlickrNode*) flickrNodeForRoot: (IMBFlickrNode*) root
-							   title: (NSString*) title
-						  identifier: (NSString*) identifier
-							  method: (NSString*) method 
-						   arguments: (NSDictionary*) arguments
 							  parser: (IMBParser*) parser {
 
 	//	iMB general...
@@ -165,13 +171,6 @@ NSString* const IMBFlickrNodePrefKey_Title = @"title";
 	node.badgeTarget = self;
 	node.badgeSelector = @selector (reloadNode:);
 	
-	//	Flickr stuff...
-	node.identifier = identifier;
-	node.mediaSource = node.identifier;
-	node.name = title;
-	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
-	[node setFlickrMethod:method arguments:arguments];
-	
 	return node;
 }
 
@@ -183,29 +182,35 @@ NSString* const IMBFlickrNodePrefKey_Title = @"title";
 	if (!dict) return nil;
 	
 	//	extract node data from preferences dictionary...
-	NSInteger method = [[dict objectForKey:IMBFlickrNodePrefKey_Method] intValue];
-	NSString* query = [dict objectForKey:IMBFlickrNodePrefKey_Query];
-	NSString* title = [dict objectForKey:IMBFlickrNodePrefKey_Title];
+	NSInteger method = [[dict objectForKey:IMBFlickrNodeProperty_Method] intValue];
+	NSString* query = [dict objectForKey:IMBFlickrNodeProperty_Query];
+	NSString* title = [dict objectForKey:IMBFlickrNodeProperty_Title];
 	
 	if (!query || !title) {
 		NSLog (@"Invalid Flickr parser user node dictionary.");
 		return nil;
 	}
 	
-	NSDictionary* arguments = [IMBFlickrNode argumentsForMethod:method query:query];
-	NSString* flickrMethod = [IMBFlickrNode flickrMethodForMethodCode:method];
-	NSString* identifier = [IMBFlickrNode identifierWithMethod:method query:query];
-	IMBFlickrNode* node = [IMBFlickrNode flickrNodeForRoot:root
-													 title:title
-												identifier:identifier
-													method:flickrMethod
-												 arguments:arguments
-													parser:parser];
-	
+	//	Flickr stuff...
+	IMBFlickrNode* node = [IMBFlickrNode flickrNodeForRoot:root parser:parser];
 	node.customNode = YES;
+	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
+	node.identifier = [IMBFlickrNode identifierWithMethod:method query:query];
+	node.license = [[dict objectForKey:IMBFlickrNodeProperty_License] intValue];
+	node.mediaSource = node.identifier;
+	node.method = method;
+	node.name = title;
+	node.query = query;
+	node.sortOrder = [[dict objectForKey:IMBFlickrNodeProperty_SortOrder] intValue];
+	
 	return node;
 }
 
+
+- (void) dealloc {
+	IMBRelease (_query);
+	[super dealloc];
+}
 
 
 #pragma mark
@@ -266,9 +271,10 @@ NSString* const IMBFlickrNodePrefKey_Title = @"title";
 	OFFlickrAPIRequest* request = [self flickrRequestWithContext:context];
 	if (![request isRunning]) {			
 		[request setDelegate:delegate];	
-		
-		NSString* method = [self.attributes objectForKey:@"flickrMethod"];
-		NSDictionary* arguments = [self.attributes objectForKey:@"flickrArguments"];
+
+		//	compose and start Flickr request...
+		NSString* method = [IMBFlickrNode flickrMethodForMethodCode:self.method];
+		NSDictionary* arguments = [self argumentsForFlickrCall];
 		[request callAPIMethodWithGET:method arguments:arguments];
 		
 		#ifdef VERBOSE
@@ -279,41 +285,79 @@ NSString* const IMBFlickrNodePrefKey_Title = @"title";
 
 
 #pragma mark
-#pragma mark Persistence
-
-- (NSDictionary*) preferencesDictRepresentation {
-	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
-	
-	[dict setObject:self.name forKey:IMBFlickrNodePrefKey_Title];
-	
-	//	NSDictionary* 
-	return dict;
-}
-
-
-#pragma mark
 #pragma mark Properties
 
 @synthesize customNode = _customNode;
+@synthesize license = _license;
+@synthesize method = _method;
+@synthesize query = _query;
+@synthesize sortOrder = _sortOrder;
 
 
 #pragma mark
 #pragma mark Utilities
 
-+ (NSDictionary*) argumentsForMethod: (NSInteger) method query: (NSString*) query {
+///	License kinds and ids as found under 
+///	http://www.flickr.com/services/api/flickr.photos.licenses.getInfo.html
+typedef enum {
+	IMBFlickrNodeFlickrLicenseID_Undefined = 0,
+	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialShareAlike = 1,
+	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercial = 2,
+	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialNoDerivs = 3,
+	IMBFlickrNodeFlickrLicenseID_AttributionShareAlike = 5,
+	IMBFlickrNodeFlickrLicenseID_Attribution = 4,
+	IMBFlickrNodeFlickrLicenseID_AttributionNoDerivs = 6,
+	IMBFlickrNodeFlickrLicenseID_NoKnownCopyrightRestrictions = 7
+} IMBFlickrNodeFlickrLicenseID;
+
+///	Make the properties of the receiver into a dictionary with keys and values
+///	that can be directly passed to the Flick method call.
+///	Have a look at http://www.flickr.com/services/api/flickr.photos.search.html
+///	for details and arguments of a search query.
+- (NSDictionary*) argumentsForFlickrCall {
 	NSMutableDictionary* arguments = [NSMutableDictionary dictionary];
 	
 	//	build query arguments based on method...
-	if (query) {
-		if (method == IMBFlickrNodeMethod_TagSearch) {
-			[arguments setObject:query forKey:@"tags"];
+	if (self.query) {
+		if (self.method == IMBFlickrNodeMethod_TagSearch) {
+			[arguments setObject:self.query forKey:@"tags"];
 			[arguments setObject:@"all" forKey:@"tag_mode"];
-		} else if (method == IMBFlickrNodeMethod_TextSearch) {
-			[arguments setObject:query forKey:@"text"];
+		} else if (self.method == IMBFlickrNodeMethod_TextSearch) {
+			[arguments setObject:self.query forKey:@"text"];
 		}
 	}
 	
-	//	some arguments always needed...
+	//	translate our user kinds into Flickr license kind ids...
+	if (self.license == IMBFlickrNodeLicense_CreativeCommons) {
+		[arguments setObject:[NSString stringWithFormat:@"%d", IMBFlickrNodeFlickrLicenseID_Attribution] forKey:@"license"];
+	} else if (self.license == IMBFlickrNodeLicense_DerivativeWorks) {
+		[arguments setObject:[NSString stringWithFormat:@"%d", self.license] forKey:@"license"];
+	} else if (self.license == IMBFlickrNodeLicense_CommercialUse) {
+		[arguments setObject:[NSString stringWithFormat:@"%d", IMBFlickrNodeFlickrLicenseID_NoKnownCopyrightRestrictions] forKey:@"license"];
+	}
+	
+	//	determine sort order...
+	NSString* sortOrder = nil;
+	if (self.sortOrder == IMBFlickrNodeSortOrder_DatePostedDesc) {
+		sortOrder = @"date-posted-desc";
+	} else if (self.sortOrder == IMBFlickrNodeSortOrder_DatePostedAsc) {
+		sortOrder = @"date-posted-asc";		
+	} else if (self.sortOrder == IMBFlickrNodeSortOrder_DateTakenAsc) {
+		sortOrder = @"date-taken-asc";		
+	} else if (self.sortOrder == IMBFlickrNodeSortOrder_DateTakenDesc) {
+		sortOrder = @"date-taken-desc";		
+	} else if (self.sortOrder == IMBFlickrNodeSortOrder_InterestingnessDesc) {
+		sortOrder = @"interestingness-desc";		
+	} else if (self.sortOrder == IMBFlickrNodeSortOrder_InterestingnessAsc) {
+		sortOrder = @"interestingness-asc";		
+	} else if (self.sortOrder == IMBFlickrNodeSortOrder_Relevance) {
+		sortOrder = @"relevance";		
+	}
+	if (sortOrder) {
+		[arguments setObject:sortOrder forKey:@"sort"];
+	}
+	
+	//	limit the search to a specific number of items...
 	[arguments setObject:@"30" forKey:@"per_page"];
 	
 	return arguments;

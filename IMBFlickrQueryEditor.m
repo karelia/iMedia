@@ -93,9 +93,11 @@ NSString* const IMBFlickrQueryEditor_QueryChanged = @"IMBFlickrQueryEditor_Query
 	NSAssert (_queriesController != nil, @"Can't find '_queriesController'.");
 	NSAssert (_queryTitle != nil, @"Can't find '_queryTitle'.");
 	
-	[_queriesController addObserver:self forKeyPath:@"selection.title" options:0 context:IMBFlickrQueryEditor_QueryChanged];
-	[_queriesController addObserver:self forKeyPath:@"selection.query" options:0 context:IMBFlickrQueryEditor_QueryChanged];
-	[_queriesController addObserver:self forKeyPath:@"selection.method" options:0 context:IMBFlickrQueryEditor_QueryChanged];
+	[_queriesController addObserver:self forKeyPath:[@"selection." stringByAppendingString:IMBFlickrNodeProperty_License] options:0 context:IMBFlickrQueryEditor_QueryChanged];
+	[_queriesController addObserver:self forKeyPath:[@"selection." stringByAppendingString:IMBFlickrNodeProperty_Method] options:0 context:IMBFlickrQueryEditor_QueryChanged];
+	[_queriesController addObserver:self forKeyPath:[@"selection." stringByAppendingString:IMBFlickrNodeProperty_Query] options:0 context:IMBFlickrQueryEditor_QueryChanged];
+	[_queriesController addObserver:self forKeyPath:[@"selection." stringByAppendingString:IMBFlickrNodeProperty_Title] options:0 context:IMBFlickrQueryEditor_QueryChanged];
+	[_queriesController addObserver:self forKeyPath:[@"selection." stringByAppendingString:IMBFlickrNodeProperty_SortOrder] options:0 context:IMBFlickrQueryEditor_QueryChanged];
 }
 
 
@@ -117,9 +119,11 @@ NSString* const IMBFlickrQueryEditor_QueryChanged = @"IMBFlickrQueryEditor_Query
 
 - (IBAction) add: (id) sender {
 	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
-	[dict setObject:@"Title" forKey:IMBFlickrNodePrefKey_Title];
-	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodePrefKey_Method];
-	[dict setObject:@"Steve Jobs" forKey:IMBFlickrNodePrefKey_Query];	
+	[dict setObject:@"New Search" forKey:IMBFlickrNodeProperty_Title];
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeLicense_CreativeCommons] forKey:IMBFlickrNodeProperty_License];
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodeProperty_Method];
+	[dict setObject:@"Steve Jobs" forKey:IMBFlickrNodeProperty_Query];	
+	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeSortOrder_InterestingnessDesc] forKey:IMBFlickrNodeProperty_SortOrder];
 	[_queriesController addObject:dict];
 }
 

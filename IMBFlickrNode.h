@@ -60,17 +60,36 @@
 
 @class IMBParser;
 
-extern NSString* const IMBFlickrNodePrefKey_Arguments;
-extern NSString* const IMBFlickrNodePrefKey_Method;
-extern NSString* const IMBFlickrNodePrefKey_Query;
-extern NSString* const IMBFlickrNodePrefKey_Title;
+extern NSString* const IMBFlickrNodeProperty_License;
+extern NSString* const IMBFlickrNodeProperty_Method;
+extern NSString* const IMBFlickrNodeProperty_Query;
+extern NSString* const IMBFlickrNodeProperty_SortOrder;
+extern NSString* const IMBFlickrNodeProperty_Title;
 
-typedef enum NSUInteger {
+typedef enum {
 	IMBFlickrNodeMethod_TextSearch = 0,
 	IMBFlickrNodeMethod_TagSearch,
 	IMBFlickrNodeMethod_Recent,
 	IMBFlickrNodeMethod_MostInteresting
 } IMBFlickrNodeMethod;
+
+typedef enum {
+	IMBFlickrNodeLicense_Undefined = 0,
+	IMBFlickrNodeLicense_CreativeCommons,
+	IMBFlickrNodeLicense_DerivativeWorks,
+	IMBFlickrNodeLicense_CommercialUse
+} IMBFlickrNodeLicense;
+
+typedef enum {
+	IMBFlickrNodeSortOrder_Undefined = 0,
+	IMBFlickrNodeSortOrder_DatePostedDesc,
+	IMBFlickrNodeSortOrder_DatePostedAsc,
+	IMBFlickrNodeSortOrder_DateTakenDesc,
+	IMBFlickrNodeSortOrder_DateTakenAsc,
+	IMBFlickrNodeSortOrder_InterestingnessDesc,
+	IMBFlickrNodeSortOrder_InterestingnessAsc,
+	IMBFlickrNodeSortOrder_Relevance
+} IMBFlickrNodeSortOrder;
 
 /**
  *	Flickr parser custom node.
@@ -83,6 +102,10 @@ typedef enum NSUInteger {
 @interface IMBFlickrNode: IMBNode {
 	@private
 	BOOL _customNode;
+	IMBFlickrNodeLicense _license;
+	IMBFlickrNodeMethod _method;
+	NSString* _query;
+	IMBFlickrNodeSortOrder _sortOrder;
 }
 
 #pragma mark Construction
@@ -94,10 +117,6 @@ typedef enum NSUInteger {
 											 parser: (IMBParser*) parser;
 
 + (IMBFlickrNode*) flickrNodeForRoot: (IMBFlickrNode*) root
-							   title: (NSString*) title
-						  identifier: (NSString*) identifier
-							  method: (NSString*) method 
-						   arguments: (NSDictionary*) arguments
 							  parser: (IMBParser*) parser;
 
 + (IMBFlickrNode*) flickrNodeFromDict: (NSDictionary*) dict 
@@ -115,14 +134,13 @@ typedef enum NSUInteger {
 - (void) setFlickrResponse: (NSDictionary*) response;
 - (void) startFlickrRequestWithContext: (OFFlickrAPIContext*) context delegate: (id) delegate;
 
-
-#pragma mark Persistence
-
-- (NSDictionary*) preferencesDictRepresentation;
-
 	
 #pragma mark Properties
 
 @property (assign, getter=isCustomNode) BOOL customNode;
+@property (assign) IMBFlickrNodeLicense license;
+@property (assign) IMBFlickrNodeMethod method;
+@property (copy) NSString* query;
+@property (assign) IMBFlickrNodeSortOrder sortOrder;
 
 @end
