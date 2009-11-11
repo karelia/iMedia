@@ -404,7 +404,7 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 
 - (void) reloadCustomQueries {
 	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
-	IMBFlickrNode* root =  (IMBFlickrNode*) [libController nodeWithIdentifier:[self identifierForPath:@"/"]];
+	IMBFlickrNode* root = (IMBFlickrNode*) [libController nodeWithIdentifier:[self identifierForPath:@"/"]];
 	[libController reloadNode:root];	
 }
 
