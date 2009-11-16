@@ -157,7 +157,6 @@ static NSArray* sSupportedUTIs = nil;
 - (void) populateObjectsForFolderNode:(IMBNode*)inNode;
 - (void) populateObjectsForCollectionNode:(IMBNode*)inNode;
 
-- (NSImage*) folderIcon;
 - (NSArray*) supportedUTIs;
 - (BOOL) canOpenImageFileAtPath:(NSString*)inPath;
 - (IMBObject*) objectWithPath:(NSString*)inPath
@@ -594,10 +593,14 @@ static NSArray* sSupportedUTIs = nil;
 			}
 			
 			node.identifier = [self identifierWithFolderId:id_local];
-			node.attributes = [self attributesWithRootFolder:parentRootFolder
-													 idLocal:id_local
-													rootPath:parentRootPath
-												pathFromRoot:pathFromRoot];
+
+			NSDictionary* attributes = [self attributesWithRootFolder:parentRootFolder
+															  idLocal:id_local
+															 rootPath:parentRootPath
+														 pathFromRoot:pathFromRoot];
+			node.attributes = attributes;
+			
+			NSString* path = [self absolutePathFromAttributes:attributes];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
 			object.location = (id)node;
@@ -607,7 +610,7 @@ static NSArray* sSupportedUTIs = nil;
 			object.index = index++;
 			object.imageLocation = (id)self.mediaSource;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [self folderIcon];
+			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
 			
 			[(NSMutableArray*)inParentNode.objects addObject:object];
 		}
@@ -690,7 +693,7 @@ static NSArray* sSupportedUTIs = nil;
 			node.parentNode = inParentNode;
 			node.identifier = [self identifierWithCollectionId:idLocal];
 			node.name = name;
-			node.icon = [self folderIcon];
+			node.icon = [self collectionIcon];
 			node.parser = self;
 			node.mediaSource = self.mediaSource;
 			node.attributes = [self attributesWithRootFolder:nil
@@ -709,7 +712,7 @@ static NSArray* sSupportedUTIs = nil;
 			object.index = index++;
 			object.imageLocation = (id)self.mediaSource;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [self folderIcon];
+			object.imageRepresentation = [self largeFolderIcon];
 			
 			[(NSMutableArray*)inParentNode.objects addObject:object];
 		}
@@ -722,15 +725,32 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Returns a 16x16 folder icon...
-
-- (NSImage*) folderIcon
+- (NSImage*) largeFolderIcon
 {
 	NSImage* icon = [NSImage genericFolderIcon];
+	
 	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(16.0,16.0)];
+	[icon setSize:NSMakeSize(64.0, 64.0)];
+	
 	return icon;
 }
+
+// Returns 16x16 icons...
+//
+//- (NSImage*) folderIcon
+//{
+//	return [NSImage sharedGenericFolderIcon];
+//}
+//
+//- (NSImage*) groupIcon;
+//{
+//	return [NSImage sharedGenericFolderIcon];
+//}
+//
+//- (NSImage*) collectionIcon;
+//{
+//	return [NSImage sharedGenericFolderIcon];
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
