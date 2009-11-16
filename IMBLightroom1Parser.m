@@ -52,6 +52,7 @@
 #import "IMBLightroom1Parser.h"
 
 #import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 
 
@@ -209,6 +210,39 @@
 						@" ORDER BY ai.captureTime ASC";
 	
 	return query;
+}
+
+- (NSImage*) folderIcon
+{
+	static NSImage* folderIcon = nil;
+	
+	if (folderIcon == nil) {
+		folderIcon = [[NSImage sharedGenericFolderIcon] copy];
+	}
+	
+	return folderIcon;
+}
+
+- (NSImage*) groupIcon;
+{
+	static NSImage* groupIcon = nil;
+	
+	if (groupIcon == nil) {
+		groupIcon = [[NSImage sharedGenericFolderIcon] copy];
+	}
+	
+	return groupIcon;
+}
+
+- (NSImage*) collectionIcon;
+{
+	static NSImage* collectionIcon = nil;
+	
+	if (collectionIcon == nil) {
+		collectionIcon = [[NSImage sharedGenericFolderIcon] copy];
+	}
+	
+	return collectionIcon;
 }
 
 @end

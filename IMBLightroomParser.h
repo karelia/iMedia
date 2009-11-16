@@ -106,7 +106,7 @@
 - (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
 - (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
 
-- (NSImage*) folderIcon;
+- (NSImage*) largeFolderIcon;
 
 @end
 
@@ -124,6 +124,10 @@
 
 - (NSString*) folderObjectsQuery;
 - (NSString*) collectionObjectsQuery;
+
+- (NSImage*) folderIcon;
+- (NSImage*) groupIcon;
+- (NSImage*) collectionIcon;
 
 @end
 

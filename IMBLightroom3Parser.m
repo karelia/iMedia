@@ -57,6 +57,7 @@
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
 #import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 
 
@@ -172,7 +173,7 @@
 	foldersObject.index = 0;
 	foldersObject.imageLocation = (id)self.mediaSource;
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-	foldersObject.imageRepresentation = [self folderIcon];
+	foldersObject.imageRepresentation = [self largeFolderIcon];
 	
 	[(NSMutableArray*)inRootNode.objects addObject:foldersObject];
 
@@ -189,7 +190,7 @@
 	collectionsNode.parentNode = inRootNode;
 	collectionsNode.identifier = [self identifierWithCollectionId:0];
 	collectionsNode.name = collectionsName;
-	collectionsNode.icon = [self folderIcon];
+	collectionsNode.icon = [self groupIcon];
 	collectionsNode.parser = self;
 	collectionsNode.leaf = NO;
 	
@@ -203,7 +204,7 @@
 	collectionsObject.index = 1;
 	collectionsObject.imageLocation = (id)self.mediaSource;
 	collectionsObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-	collectionsObject.imageRepresentation = [self folderIcon];
+	collectionsObject.imageRepresentation = [self largeFolderIcon];
 	
 	[(NSMutableArray*)inRootNode.objects addObject:collectionsObject];
 	
@@ -281,6 +282,69 @@
 						@" ORDER BY ai.captureTime ASC";
 	
 	return query;
+}
+
+- (NSImage*) folderIcon
+{
+	static NSImage* folderIcon = nil;
+	
+	if (folderIcon == nil) {
+		NSString* pathToOtherApp = [[self class] lightroomPath];
+		NSString* pathToModule = [pathToOtherApp stringByAppendingPathComponent:@"Contents/Frameworks/Library.lrmodule"];
+		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
+		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"icon_folder.png"];
+		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
+		
+		if (image == nil) {
+			image = [NSImage sharedGenericFolderIcon];
+		}
+		
+		folderIcon = [image copy];
+	}
+	
+	return folderIcon;
+}
+
+- (NSImage*) groupIcon;
+{
+	static NSImage* groupIcon = nil;
+	
+	if (groupIcon == nil) {
+		NSString* pathToOtherApp = [[self class] lightroomPath];
+		NSString* pathToModule = [pathToOtherApp stringByAppendingPathComponent:@"Contents/Frameworks/Library.lrmodule"];
+		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
+		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"groupCreation.png"];
+		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
+		
+		if (image == nil) {
+			image = [NSImage sharedGenericFolderIcon];
+		}
+		
+		groupIcon = [image copy];
+	}
+	
+	return groupIcon;
+}
+
+- (NSImage*) collectionIcon;
+{
+	static NSImage* collectionIcon = nil;
+	
+	if (collectionIcon == nil) {
+		NSString* pathToOtherApp = [[self class] lightroomPath];
+		NSString* pathToModule = [pathToOtherApp stringByAppendingPathComponent:@"Contents/Frameworks/Library.lrmodule"];
+		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
+		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"collectionCreation.png"];
+		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
+	
+		if (image == nil) {
+			image = [NSImage sharedGenericFolderIcon];
+		}
+	
+		collectionIcon = [image copy];
+	}
+
+	return collectionIcon;
 }
 
 @end
