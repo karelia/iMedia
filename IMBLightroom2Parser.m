@@ -57,6 +57,7 @@
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
 #import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 
 
