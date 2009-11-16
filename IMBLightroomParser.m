@@ -668,6 +668,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]]; 
 			NSNumber* idParentLocal = [NSNumber numberWithLong:[results longForColumn:@"parent"]];
 			NSString* name = [results stringForColumn:@"name"];
+			BOOL isGroup = NO;
 			
 			if (name == nil)
 			{
@@ -678,6 +679,7 @@ static NSArray* sSupportedUTIs = nil;
 															 nil,IMBBundle(),
 															 @"Collections",
 															 @"Name of Collections node in IMBLightroomParser");
+					isGroup = YES;
 				}
 				else
 				{
@@ -693,7 +695,7 @@ static NSArray* sSupportedUTIs = nil;
 			node.parentNode = inParentNode;
 			node.identifier = [self identifierWithCollectionId:idLocal];
 			node.name = name;
-			node.icon = [self collectionIcon];
+			node.icon = isGroup ? [self groupIcon] : [self collectionIcon];
 			node.parser = self;
 			node.mediaSource = self.mediaSource;
 			node.attributes = [self attributesWithRootFolder:nil
@@ -734,23 +736,6 @@ static NSArray* sSupportedUTIs = nil;
 	
 	return icon;
 }
-
-// Returns 16x16 icons...
-//
-//- (NSImage*) folderIcon
-//{
-//	return [NSImage sharedGenericFolderIcon];
-//}
-//
-//- (NSImage*) groupIcon;
-//{
-//	return [NSImage sharedGenericFolderIcon];
-//}
-//
-//- (NSImage*) collectionIcon;
-//{
-//	return [NSImage sharedGenericFolderIcon];
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
