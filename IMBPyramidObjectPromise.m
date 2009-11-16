@@ -83,18 +83,31 @@
 
 - (void) _loadObject:(IMBObject*)inObject
 {
-	NSString* absolutePyramidPath = nil;
-	NSString* orientation = nil;
-	NSString* imagePath = nil;
+	NSURL* imageURL = nil;
 	
 	if ([inObject isKindOfClass:[IMBLightroomObject class]]) {
 		IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 		
-		absolutePyramidPath = [lightroomObject absolutePyramidPath];
-		orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];
+		imageURL = [IMBPyramidObjectPromise urlForObject:lightroomObject];
+
 	}
 	
+	if (imageURL != nil) {
+		[self.objectsToLocalURLs setObject:imageURL forKey:inObject];
+		_objectCountLoaded++;
+	}
+	else {
+		[super _loadObject:inObject];
+	}
+}	
+
++ (NSURL*)urlForObject:(IMBLightroomObject*)lightroomObject
+{
+	NSString* imagePath = nil;
+	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];;
+	
 	if (absolutePyramidPath != nil) {
+		NSString* orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];;
 		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
 		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
 		NSUInteger index = [data lastIndexOfBytes:pattern length:3];
@@ -103,7 +116,7 @@
 		if (index != NSNotFound) {
 			BOOL success = NO;
 			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
-			NSString* fileName = [[(NSString*)inObject.location lastPathComponent] stringByDeletingPathExtension];
+			NSString* fileName = [[(NSString*)lightroomObject.location lastPathComponent] stringByDeletingPathExtension];
 			NSString* jpegPath = [[[NSFileManager threadSafeManager] temporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
 			
 			if ((orientation == nil) || [orientation isEqual:@"AB"]) {
@@ -114,14 +127,14 @@
 				
 				if (jpegSource != NULL) {
 					CGImageRef jpegImage = CGImageSourceCreateImageAtIndex(jpegSource, 0, NULL);
-
+					
 					if (jpegImage != NULL) {
 						NSURL* fileURL = [NSURL fileURLWithPath:jpegPath];
 						CGImageDestinationRef destination = CGImageDestinationCreateWithURL((CFURLRef)fileURL, (CFStringRef)@"public.jpeg", 1, nil);
 						
 						if (destination != NULL) {
 							NSInteger orientationProperty = 2;
-
+							
 							if ([orientation isEqual:@"BC"]) {
 								orientationProperty = 6;
 							}
@@ -135,12 +148,12 @@
 							NSDictionary* metadata = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:orientationProperty]
 																				 forKey:((NSString*)kCGImagePropertyOrientation)];
 							CGImageDestinationAddImage(destination, jpegImage, (CFDictionaryRef)metadata);
-					
+							
 							success = CGImageDestinationFinalize(destination);
-					
+							
 							CFRelease(destination);
 						}
-				
+						
 						CGImageRelease(jpegImage);
 					}
 					
@@ -155,13 +168,9 @@
 	}
 	
 	if (imagePath != nil) {
-		NSURL* url = [NSURL fileURLWithPath:imagePath];
-		[self.objectsToLocalURLs setObject:url forKey:inObject];
-		_objectCountLoaded++;
+		return [NSURL fileURLWithPath:imagePath];
 	}
-	else {
-		[super _loadObject:inObject];
-	}
-}	
-
+	
+	return nil;
+}
 @end

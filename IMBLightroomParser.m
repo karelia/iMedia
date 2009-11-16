@@ -1378,4 +1378,81 @@ static NSArray* sSupportedUTIs = nil;
 	return [[(IMBObjectPromise*)[IMBPyramidObjectPromise alloc] initWithObjects:inObjects] autorelease];
 }
 
+- (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject
+{
+	if (![inObject isKindOfClass:[IMBLightroomObject class]]) {
+		return;
+	}
+	
+	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
+	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
+	
+	if ([[NSFileManager threadSafeManager] fileExistsAtPath:absolutePyramidPath]) {
+		NSMenuItem* revealPyramidItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Reveal Preview Pyramid in Finder",
+																							 @"Reveal Preview Pyramid in Finder") 
+																   action:@selector(revealPyramid:) 
+															keyEquivalent:@""];
+		[revealPyramidItem setTarget:self];
+		[revealPyramidItem setRepresentedObject:inObject];
+		
+		[inMenu addItem:revealPyramidItem];
+		[revealPyramidItem release];
+	}
+	
+	NSString* path = [inObject path];
+
+	if ([[NSFileManager threadSafeManager] fileExistsAtPath:path]) {
+		NSString* title = nil;
+		
+		NSString* appPath = nil;
+		NSString* type = nil;
+		BOOL found = [[NSWorkspace threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type];
+	
+		if (found) {
+			title = NSLocalizedStringWithDefaultValue(
+													  @"IMBObjectViewController.menuItem.openPreview",
+													  nil,IMBBundle(),
+													  @"Create Preview and open in %@",
+													  @"Menu item in context menu of IMBLightroomParser");
+		
+			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+			title = [NSString stringWithFormat:title,appName];	
+		}
+		else {
+			title = NSLocalizedStringWithDefaultValue(
+													  @"IMBObjectViewController.menuItem.openPreviewWithFinder",
+													  nil,IMBBundle(),
+													  @"Create Preview and open with Finder",
+													  @"Menu item in context menu of IMBLightroomParser");
+		}
+	
+		NSMenuItem* openPreviewItem = [[NSMenuItem alloc] initWithTitle:title 
+																 action:@selector(openPreview:) 
+														  keyEquivalent:@""];
+	
+		[openPreviewItem setTarget:self];
+		[openPreviewItem setRepresentedObject:inObject];
+	
+		[inMenu addItem:openPreviewItem];
+		[openPreviewItem release];
+	}
+}
+
+- (void)revealPyramid:(id)sender
+{
+	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)[sender representedObject];
+	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
+	NSString* folder = [absolutePyramidPath stringByDeletingLastPathComponent];
+	
+	[[NSWorkspace threadSafeWorkspace] selectFile:absolutePyramidPath inFileViewerRootedAtPath:folder];
+}
+
+- (void)openPreview:(id)sender
+{
+	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)[sender representedObject];
+	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
+	
+	[[NSWorkspace threadSafeWorkspace] openURL:url];
+}
+
 @end

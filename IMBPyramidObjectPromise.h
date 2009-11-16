@@ -51,6 +51,7 @@
 
 #import "IMBObjectPromise.h"
 
+@class IMBLightroomObject;
 
 // This subclass is used for pyramid files that need to be split. The split file is saved to the local file system,
 // where it can then be accessed by the delegate... 
@@ -59,5 +60,7 @@
 {
 
 }
+
++ (NSURL*)urlForObject:(IMBLightroomObject*)lightroomObject;
 
 @end
