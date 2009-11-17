@@ -56,7 +56,9 @@
 + (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
 + (NSString*) imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
-+ (NSImage *) sharedGenericFolderIcon;	// Shared instance - can only have one size!
-+ (NSImage *) genericFolderIcon;		// Copied instance - can have any size
++ (NSImage *) sharedGenericFolderIcon;						// Shared instance - can only have one size!
++ (NSImage *) genericFolderIcon;							// Copied instance - can have any size
+	
+- (NSImage *) imageCroppedToRect:(NSRect)inCropRect;		// new instance
 
 @end

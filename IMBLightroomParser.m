@@ -734,9 +734,8 @@ static NSArray* sSupportedUTIs = nil;
 - (NSImage*) largeFolderIcon
 {
 	NSImage* icon = [NSImage genericFolderIcon];
-	
 	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(64.0, 64.0)];
+	[icon setSize:NSMakeSize(64.0,64.0)];
 	
 	return icon;
 }

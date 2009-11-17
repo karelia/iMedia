@@ -197,18 +197,19 @@
 	
 	if (inOldNode == nil)
 	{
+		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		[icon setScalesWhenResized:YES];
+		[icon setSize:NSMakeSize(16.0,16.0)];
+
 		node.parentNode = nil;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];
 		node.name = @"Safari";
-		node.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
+		node.icon = icon;
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
 		node.parser = self;
 		node.objects = [NSMutableArray array];
-		
-		[node.icon setScalesWhenResized:YES];
-		[node.icon setSize:NSMakeSize(16.0,16.0)];
 	}
 	
 	// Or an subnode...

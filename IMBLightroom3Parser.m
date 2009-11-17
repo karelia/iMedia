@@ -294,6 +294,7 @@
 		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"icon_folder.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
+		image = [image imageCroppedToRect:NSMakeRect(2,1,19,16)];
 		
 		if (image == nil) {
 			image = [NSImage sharedGenericFolderIcon];
@@ -315,6 +316,7 @@
 		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"groupCreation.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
+		image = [image imageCroppedToRect:NSMakeRect(2,2,19,16)];
 		
 		if (image == nil) {
 			image = [NSImage sharedGenericFolderIcon];
@@ -336,6 +338,7 @@
 		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"collectionCreation.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
+		image = [image imageCroppedToRect:NSMakeRect(1,1,19,16)];
 	
 		if (image == nil) {
 			image = [NSImage sharedGenericFolderIcon];

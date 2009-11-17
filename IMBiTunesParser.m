@@ -208,17 +208,18 @@
 	
 	if (inOldNode == nil)
 	{
+		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		[icon setScalesWhenResized:YES];
+		[icon setSize:NSMakeSize(16.0,16.0)];
+
 		node.parentNode = nil;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];
 		node.name = @"iTunes";
-		node.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
+		node.icon = icon;
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
 		node.parser = self;
-		
-		[node.icon setScalesWhenResized:YES];
-		[node.icon setSize:NSMakeSize(16.0,16.0)];
 	}
 	
 	// Or an subnode...
