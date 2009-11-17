@@ -560,6 +560,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	IMBNode* oldNode = [inOldAndNewNode objectForKey:@"oldNode"];
 	IMBNode* newNode = [inOldAndNewNode objectForKey:@"newNode"];
 
+//	if (oldNode == nil && newNode != nil)	// Workaround for special behavior of IMBImageCaptureParser, which replaces root 
+//	{					// nodes several times as devices get hotplugged...
+//		IMBNode* node = [self nodeWithIdentifier:newNode.identifier];
+//		if (node) oldNode = node;
+//	}
+
 	if (oldNode!=nil && newNode!=nil && oldNode.parentNode!=oldNode.parentNode)
 	{
 		NSLog(@"%s Error parent of oldNode and newNode must be the same...",__FUNCTION__);
@@ -1050,8 +1056,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		if (name == nil) name = @"";
 
 		NSImage* icon = inNode.icon;
-		[icon setScalesWhenResized:YES];
-		[icon setSize:NSMakeSize(16,16)];
+//		[icon setScalesWhenResized:YES];
+//		[icon setSize:NSMakeSize(16,16)];
 		
 		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:nil keyEquivalent:@""];
 
@@ -1114,7 +1120,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			if (name == nil) name = @"";
 			
 			NSImage* icon = node.icon;
-			[icon setSize:NSMakeSize(16,16)];
+//			[icon setSize:NSMakeSize(16,16)];
 
 			NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:inSelector keyEquivalent:@""];
 			[item setImage:icon];

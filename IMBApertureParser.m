@@ -204,17 +204,18 @@
 	
 	if (inOldNode == nil)
 	{
+		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		[icon setScalesWhenResized:YES];
+		[icon setSize:NSMakeSize(16.0,16.0)];
+
 		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self rootNodeIdentifier];
 		node.name = @"Aperture";
-		node.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
+		node.icon = icon;
 		node.groupType = kIMBGroupTypeLibrary;
 		node.parser = self;
 		node.leaf = NO;
-		
-		[node.icon setScalesWhenResized:YES];
-		[node.icon setSize:NSMakeSize(16.0,16.0)];
 	}
 	
 	// Or a subnode...
