@@ -169,7 +169,7 @@
 	foldersObject.index = 0;
 	foldersObject.imageLocation = (id)self.mediaSource;
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-	foldersObject.imageRepresentation = [self folderIcon];
+	foldersObject.imageRepresentation = [self largeFolderIcon];
 	
 	[(NSMutableArray*)inRootNode.objects addObject:foldersObject];
 

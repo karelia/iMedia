@@ -307,15 +307,8 @@ static NSArray* sSupportedUTIs = nil;
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
-	IMBNode* node = nil;
-	
-	// Oops no path, can't create a root node. This is bad...
-	
-	//	if (self.mediaSource == nil)
-	//	{
-	//		return nil;
-	//	}
-	
+	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+
 	// Create an empty root node (without subnodes, but with empty objects array)...
 	
 	if (inOldNode == nil)
@@ -324,7 +317,6 @@ static NSArray* sSupportedUTIs = nil;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 		
-		node = [[[IMBNode alloc] init] autorelease];
 		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self rootNodeIdentifier];
@@ -334,6 +326,18 @@ static NSArray* sSupportedUTIs = nil;
 		node.leaf = NO;
 		node.groupType = kIMBGroupTypeLibrary;
 		node.objects = [NSMutableArray array];
+	}
+	else
+	{
+		node.parentNode = inOldNode.parentNode;
+		node.mediaSource = self.mediaSource;
+		node.identifier = inOldNode.identifier;
+		node.name = inOldNode.name;
+		node.icon = inOldNode.icon;
+		node.parser = self;
+		node.leaf = inOldNode.leaf;
+		node.groupType = inOldNode.groupType;
+		node.attributes = [[inOldNode.attributes copy] autorelease];
 	}
 	
 	if (self.shouldDisplayLibraryName)
