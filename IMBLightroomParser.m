@@ -1085,7 +1085,7 @@ static NSArray* sSupportedUTIs = nil;
 		if (imageRepresentation) {
 			NSString *orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];
 			
-			if ((orientation == nil) || (![orientation isEqual:@"AB"])) {
+			if (!((orientation == nil) || [orientation isEqual:@"AB"])) {
 				NSInteger orientationProperty = 2;
 				
 				if ([orientation isEqual:@"BC"]) {
@@ -1096,6 +1096,15 @@ static NSArray* sSupportedUTIs = nil;
 				}
 				else if ([orientation isEqual:@"DA"]) {
 					orientationProperty = 8;
+				}
+				else if ([orientation isEqual:@"CB"]) {
+					orientationProperty = 5;
+				}
+				else if ([orientation isEqual:@"DC"]) {
+					orientationProperty = 3;
+				}
+				else if ([orientation isEqual:@"AD"]) {
+					orientationProperty = 7;
 				}
 				
 				imageRepresentation = [self imageRotated:imageRepresentation forOrientation:orientationProperty];

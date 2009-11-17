@@ -144,6 +144,15 @@
 							else if ([orientation isEqual:@"DA"]) {
 								orientationProperty = 8;
 							}
+							else if ([orientation isEqual:@"CB"]) {
+								orientationProperty = 5;
+							}
+							else if ([orientation isEqual:@"DC"]) {
+								orientationProperty = 3;
+							}
+							else if ([orientation isEqual:@"AD"]) {
+								orientationProperty = 7;
+							}
 							
 							NSDictionary* metadata = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:orientationProperty]
 																				 forKey:((NSString*)kCGImagePropertyOrientation)];
