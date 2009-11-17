@@ -234,7 +234,7 @@
 
 - (NSString*) folderObjectsQuery
 {
-	NSString* query =	@" SELECT alf.idx_filename, alf.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, caption"
+	NSString* query =	@" SELECT alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, caption"
 						@" FROM AgLibraryFile alf"
 						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
 						@" LEFT JOIN"
@@ -253,7 +253,7 @@
 - (NSString*) collectionObjectsQuery
 {
 	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-						@"			aif.idx_filename, aif.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, caption"
+						@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, caption"
 						@" FROM AgLibraryFile aif"
 						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
 						@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"

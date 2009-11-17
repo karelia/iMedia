@@ -1047,7 +1047,7 @@ static NSArray* sSupportedUTIs = nil;
 								@" FROM Adobe_images ai"
 								@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
 								@" INNER JOIN Adobe_previewCachePyramidLevels pcpl ON pcpl.pyramid = apcp.id_local"
-								@" WHERE ai.rootFile = ?"
+								@" WHERE ai.id_local = ?"
 								@" AND pcpl.height >= ?"
 								@" AND pcpl.width >= ?"
 								@" ORDER BY pcpl.height, pcpl.width ASC"
@@ -1055,7 +1055,7 @@ static NSArray* sSupportedUTIs = nil;
 			
 			FMResultSet* results = [self.database executeQuery:query, idLocal, targetWidth, targetHeight];
 			
-			if ([results next]) {
+			if ([results next]) {				
 				dataOffset = [results doubleForColumn:@"dataOffset"];
 				dataLength = [results doubleForColumn:@"dataLength"];
 				pyramidPath = [results stringForColumn:@"pyramidPath"];
@@ -1139,7 +1139,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* query =	@" SELECT apcp.relativeDataPath pyramidPath"
 								@" FROM Adobe_images ai"
 								@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
-								@" WHERE ai.rootFile = ?"
+								@" WHERE ai.id_local = ?"
 								@" LIMIT 1";
 			
 			FMResultSet* results = [self.database executeQuery:query, idLocal];
