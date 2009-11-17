@@ -340,7 +340,7 @@ static NSArray* sSupportedUTIs = nil;
 		node.attributes = [[inOldNode.attributes copy] autorelease];
 	}
 	
-	if (self.shouldDisplayLibraryName)
+	if (node.isRootNode && self.shouldDisplayLibraryName)
 	{
 		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,[self libraryName]];
 	}
