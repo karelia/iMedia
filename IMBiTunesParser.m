@@ -285,6 +285,17 @@
 	[self addSubNodesToNode:inNode playlists:playlists tracks:tracks]; 
 	[self populateNode:inNode playlists:playlists tracks:tracks]; 
 
+	// If we are populating the root nodes, then also populate the "Music" node (first subnode) and mirror its
+	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,
+	// which is implemented here, to achieve the desired "feel" in the browser...
+	
+	if (inNode.isRootNode)
+	{
+		IMBNode* musicNode = [inNode.subNodes objectAtIndex:0];
+		[self populateNode:musicNode options:inOptions error:outError];
+		inNode.objects = musicNode.objects;
+	}
+	
 	if (outError) *outError = error;
 	return error == nil;
 }

@@ -1052,12 +1052,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		// Create a menu item with the node name...
 		
+		NSImage* icon = inNode.icon;
 		NSString* name = inNode.name;
 		if (name == nil) name = @"";
-
-		NSImage* icon = inNode.icon;
-//		[icon setScalesWhenResized:YES];
-//		[icon setSize:NSMakeSize(16,16)];
 		
 		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:nil keyEquivalent:@""];
 
@@ -1116,12 +1113,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		else
 		{
+			NSImage* icon = node.icon;
 			NSString* name = [node name];
 			if (name == nil) name = @"";
 			
-			NSImage* icon = node.icon;
-//			[icon setSize:NSMakeSize(16,16)];
-
 			NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:inSelector keyEquivalent:@""];
 			[item setImage:icon];
 			[item setRepresentedObject:node.identifier];

@@ -159,6 +159,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// The Audio panel doesn't have an icon view...
+
+- (void) setViewType:(NSUInteger)inViewType
+{
+	if (inViewType < 1) inViewType = 1;
+	if (inViewType > 2) inViewType = 2;
+	[super setViewType:inViewType];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Stop playing audio as we are leaving this panel...
+
 - (void) willHideView
 {
 	[self.playingAudio stop];

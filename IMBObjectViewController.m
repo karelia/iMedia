@@ -244,10 +244,10 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	// We need to save preferences before the app quits...
 	
 	[[NSNotificationCenter defaultCenter] 
-	 addObserver:self 
-	 selector:@selector(_saveStateToPreferences) 
-	 name:NSApplicationWillTerminateNotification 
-	 object:nil];
+		 addObserver:self 
+		 selector:@selector(_saveStateToPreferences) 
+		 name:NSApplicationWillTerminateNotification 
+		 object:nil];
 	
 	// Observe changes to object array...
 	
@@ -292,9 +292,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
             [object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
         }
     }
+	
     IMBRelease(_observedVisibleItems);
-	
-	
+
 	[super dealloc];
 }
 
@@ -518,6 +518,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	[self didChangeValueForKey:@"canUseIconSize"];
 }
 
+
 - (BOOL) canUseIconSize
 {
 	return self.viewType != kIMBObjectViewTypeList;
@@ -541,6 +542,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	{
 		[parser objectViewDidChangeIconSize:size];
 	}
+
+	[ibIconView setNeedsDisplay:YES];
+	[ibComboView setNeedsDisplay:YES];
 
 	CGFloat height = 60.0 + 80.0 * _iconSize;
 	[ibComboView setRowHeight:height];
