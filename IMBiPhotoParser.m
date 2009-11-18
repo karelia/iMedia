@@ -290,6 +290,17 @@
 	[self addSubNodesToNode:inNode albums:albums images:images]; 
 	[self populateNode:inNode albums:albums images:images]; 
 
+	// If we are populating the root nodes, then also populate the "Photos" node (first subnode) and mirror its
+	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,
+	// which is implemented here, to achieve the desired "feel" in the browser...
+	
+	if (inNode.isRootNode)
+	{
+		IMBNode* photosNode = [inNode.subNodes objectAtIndex:0];
+		[self populateNode:photosNode options:inOptions error:outError];
+		inNode.objects = photosNode.objects;
+	}
+	
 	if (outError) *outError = error;
 	return error == nil;
 }
