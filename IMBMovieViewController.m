@@ -107,6 +107,7 @@
 	return [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
 }
 
+
 - (NSString*) displayName
 {
 	return NSLocalizedStringWithDefaultValue(
@@ -128,6 +129,7 @@
 		@"%d movie",
 		@"Format string for object count in singluar");
 }
+
 
 + (NSString*) objectCountFormatPlural
 {
