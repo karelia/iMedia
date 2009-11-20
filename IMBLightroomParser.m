@@ -1004,7 +1004,7 @@ static NSArray* sSupportedUTIs = nil;
 			break;
 	}
 	
-	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+	CGColorSpaceRef colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
 	CGContextRef context = CGBitmapContextCreate(NULL,
 												 (orientationProperty < 5) ? w : h,
 												 (orientationProperty < 5) ? h : w,
