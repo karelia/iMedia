@@ -54,10 +54,8 @@
 + (NSFileManager *)threadSafeManager
 {
 	NSFileManager*	instance = nil;
-		
-	static NSString* sMutex = @"threadSafeFileManagerMutex";
 	
-	@synchronized(sMutex)
+	@synchronized([self class])
 	{
 		static NSMutableDictionary* sPerThreadInstances = nil;
 		
@@ -91,11 +89,11 @@
 		{
 			NSError* eatError = nil;
 			thePath = [thePath stringByAppendingPathComponent:component];
-			if (![[NSFileManager defaultManager] fileExistsAtPath:thePath] &&
-				![[NSFileManager defaultManager] createDirectoryAtPath:thePath 
-										   withIntermediateDirectories:YES
-															attributes:attributes
-																 error:&eatError])
+			if (![self fileExistsAtPath:thePath] &&
+				![self createDirectoryAtPath:thePath 
+				 withIntermediateDirectories:YES
+								  attributes:attributes
+									   error:&eatError])
 			{
 				[NSException raise:@"iMediaException" format:@"createDirectory:attributes: failed at path: %@", path];
 			}
@@ -181,13 +179,15 @@
 
 - (NSString*)temporaryPathWithinDirectory:(NSString*)directoryPath
 {
-    char template[13];
+	NSString *tempFileTemplate = [directoryPath stringByAppendingPathComponent:@"XXXXXXXXXXXX"];
+	const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
+	char *tempFileNameCString = (char *)malloc(strlen(tempFileTemplateCString) + 1);
+	
+	strcpy(tempFileNameCString, tempFileTemplateCString);
+
+	char *tmpName = mktemp(tempFileNameCString);
     
-	strlcpy(template, "XXXXXXXXXXXX", 13 );
-    
-	char *tmpName = mktemp(template);
-    
-	return [directoryPath stringByAppendingPathComponent:[NSString stringWithUTF8String:tmpName]];
+	return [NSString stringWithUTF8String:tmpName];
 }
 
 @end
