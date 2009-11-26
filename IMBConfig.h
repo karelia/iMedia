@@ -71,6 +71,16 @@
 + (void) setDownloadFolderPath:(NSString*)inPath;
 + (NSString*) downloadFolderPath;
 
+// Path for external editor and viewer apps... 
+
++ (void) setViewerApp:(NSString*)inAppPath forMediaType:(NSString*)inMediaType;
++ (NSString*) viewerAppForMediaType:(NSString*)inMediaType;
+
++ (void) setEditorApp:(NSString*)inAppPath forMediaType:(NSString*)inMediaType;
++ (NSString*) editorAppForMediaType:(NSString*)inMediaType;
+
+// Set default prefs values...
+
 + (void) registerDefaultValues;
 
 

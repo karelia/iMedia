@@ -621,16 +621,19 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"contextMenu"] autorelease];
 	NSMenuItem* item = nil;
 	NSString* title = nil;
+	NSString* appPath = nil;;
+	NSString* appName = nil;;
+	NSString* type = nil;
 	
 	// For node objects (folders) provide a menu item to drill down the hierarchy...
 	
 	if ([inObject isKindOfClass:[IMBNodeObject class]])
 	{
 		title = NSLocalizedStringWithDefaultValue(
-												  @"IMBObjectViewController.menuItem.open",
-												  nil,IMBBundle(),
-												  @"Open",
-												  @"Menu item in context menu of IMBObjectViewController");
+			@"IMBObjectViewController.menuItem.open",
+			nil,IMBBundle(),
+			@"Open",
+			@"Menu item in context menu of IMBObjectViewController");
 		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openSubNode:) keyEquivalent:@""];
 		[item setRepresentedObject:[inObject location]];
@@ -647,45 +650,71 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		
 		if ([[NSFileManager threadSafeManager] fileExistsAtPath:path])
 		{
-			NSString* appPath = nil;
-			NSString* type = nil;
-			BOOL found = [[NSWorkspace threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type];
+			// Open with editor app...
 			
-			// Open with <application>...
-			
-			if (found)
+			if (appPath = [IMBConfig editorAppForMediaType:self.mediaType])
 			{
 				title = NSLocalizedStringWithDefaultValue(
-														  @"IMBObjectViewController.menuItem.openInApp",
-														  nil,IMBBundle(),
-														  @"Open in %@",
-														  @"Menu item in context menu of IMBObjectViewController");
+					@"IMBObjectViewController.menuItem.openInApp",
+					nil,IMBBundle(),
+					@"Open in %@",
+					@"Menu item in context menu of IMBObjectViewController");
 				
-				NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+				appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
 				title = [NSString stringWithFormat:title,appName];	
-			}
-			else
-			{
-				title = NSLocalizedStringWithDefaultValue(
-														  @"IMBObjectViewController.menuItem.openWithFinder",
-														  nil,IMBBundle(),
-														  @"Open with Finder",
-														  @"Menu item in context menu of IMBObjectViewController");
+
+				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInEditorApp:) keyEquivalent:@""];
+				[item setRepresentedObject:path];
+				[item setTarget:self];
+				[menu addItem:item];
+				[item release];
 			}
 			
-			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInApp:) keyEquivalent:@""];
-			[item setRepresentedObject:path];
-			[item setTarget:self];
-			[menu addItem:item];
-			[item release];
+			// Open with viewer app...
+			
+			if (appPath = [IMBConfig viewerAppForMediaType:self.mediaType])
+			{
+				title = NSLocalizedStringWithDefaultValue(
+					@"IMBObjectViewController.menuItem.openInApp",
+					nil,IMBBundle(),
+					@"Open in %@",
+					@"Menu item in context menu of IMBObjectViewController");
+				
+				appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+				title = [NSString stringWithFormat:title,appName];	
+
+				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInViewerApp:) keyEquivalent:@""];
+				[item setRepresentedObject:path];
+				[item setTarget:self];
+				[menu addItem:item];
+				[item release];
+			}
+			
+			// Open with default app determined by OS...
+			
+			else if ([[NSWorkspace threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type])
+			{
+				title = NSLocalizedStringWithDefaultValue(
+					@"IMBObjectViewController.menuItem.openWithFinder",
+					nil,IMBBundle(),
+					@"Open with Finder",
+					@"Menu item in context menu of IMBObjectViewController");
+
+				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInApp:) keyEquivalent:@""];
+				[item setRepresentedObject:path];
+				[item setTarget:self];
+				[menu addItem:item];
+				[item release];
+			}
+			
 			
 			// Reveal in Finder...
 			
 			title = NSLocalizedStringWithDefaultValue(
-													  @"IMBObjectViewController.menuItem.revealInFinder",
-													  nil,IMBBundle(),
-													  @"Reveal in Finder",
-													  @"Menu item in context menu of IMBObjectViewController");
+				@"IMBObjectViewController.menuItem.revealInFinder",
+				nil,IMBBundle(),
+				@"Reveal in Finder",
+				@"Menu item in context menu of IMBObjectViewController");
 			
 			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
 			[item setRepresentedObject:path];
@@ -700,10 +729,10 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	else if ([[inObject location] isKindOfClass:[NSURL class]])
 	{
 		title = NSLocalizedStringWithDefaultValue(
-												  @"IMBObjectViewController.menuItem.download",
-												  nil,IMBBundle(),
-												  @"Download",
-												  @"Menu item in context menu of IMBObjectViewController");
+			@"IMBObjectViewController.menuItem.download",
+			nil,IMBBundle(),
+			@"Download",
+			@"Menu item in context menu of IMBObjectViewController");
 		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(download:) keyEquivalent:@""];
 		[item setRepresentedObject:[inObject location]];
@@ -712,10 +741,10 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		[item release];
 		
 		title = NSLocalizedStringWithDefaultValue(
-												  @"IMBObjectViewController.menuItem.openInBrowser",
-												  nil,IMBBundle(),
-												  @"Open in Browser",
-												  @"Menu item in context menu of IMBObjectViewController");
+			@"IMBObjectViewController.menuItem.openInBrowser",
+			nil,IMBBundle(),
+			@"Open in Browser",
+			@"Menu item in context menu of IMBObjectViewController");
 		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInBrowser:) keyEquivalent:@""];
 		[item setRepresentedObject:[inObject location]];
@@ -757,6 +786,22 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	}
 	
 	return menu;
+}
+
+
+- (IBAction) openInEditorApp:(id)inSender
+{
+	NSString* app = [IMBConfig editorAppForMediaType:self.mediaType];
+	NSString* path = (NSString*)[inSender representedObject];
+	[[NSWorkspace threadSafeWorkspace] openFile:path withApplication:app];
+}
+
+
+- (IBAction) openInViewerApp:(id)inSender
+{
+	NSString* app = [IMBConfig viewerAppForMediaType:self.mediaType];
+	NSString* path = (NSString*)[inSender representedObject];
+	[[NSWorkspace threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 

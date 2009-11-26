@@ -50,6 +50,8 @@
 #pragma mark HEADERS
 
 #import "IMBConfig.h"
+#import "IMBCommon.h"
+#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,6 +62,8 @@
 static NSString* sIMBPrefsKeyFormat = @"iMedia2_%@";
 static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
 static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
+static NSString* sIMBViewerAppPathsKey = @"viewerAppPaths";
+static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -128,19 +132,7 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-+ (void) registerDefaultValues
-{
-	NSString* path = [NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"];
-	NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,NSUserDomainMask,YES);
-	if ([paths count] > 0) path = [paths objectAtIndex:0];
-	
-	[self registerDefaultPrefsValue:[NSNumber numberWithBool:YES] forKey:sIMBShowsGroupNodesKey];
-	[self registerDefaultPrefsValue:path forKey:sIMBDownloadFolderPathKey];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+// Determines whether the group nodes (LIBRARIES, FOLDERS, INTERNET, DEVICES) are visible in the outline view...
 
 + (void) setShowsGroupNodes:(BOOL)inState
 {
@@ -157,6 +149,8 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Sets the path to the download folder. Default is ~/Downloads...
+
 + (void) setDownloadFolderPath:(NSString*)inPath
 {
 	[self setPrefsValue:inPath forKey:sIMBDownloadFolderPathKey];
@@ -166,6 +160,80 @@ static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 + (NSString*) downloadFolderPath
 {
 	return [self prefsValueForKey:sIMBDownloadFolderPathKey];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Path to an external viewer app. Defaults to Preview for images and QuickTime Player for audio/video content...
+
++ (void) setViewerApp:(NSString*)inAppPath forMediaType:(NSString*)inMediaType
+{
+	NSMutableDictionary* viewerAppPaths = [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:sIMBViewerAppPathsKey]];
+	[viewerAppPaths setObject:inAppPath forKey:inMediaType];
+	[self setPrefsValue:viewerAppPaths forKey:sIMBViewerAppPathsKey];
+}
+
+
++ (NSString*) viewerAppForMediaType:(NSString*)inMediaType
+{
+	NSDictionary* viewerAppPaths = [self prefsValueForKey:sIMBViewerAppPathsKey];
+	return [viewerAppPaths objectForKey:inMediaType];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Path to an external editor app. May not be available for all media types...
+
++ (void) setEditorApp:(NSString*)inAppPath forMediaType:(NSString*)inMediaType
+{
+	NSMutableDictionary* editorAppPaths = [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:sIMBEditorAppPathsKey]];
+	[editorAppPaths setObject:inAppPath forKey:inMediaType];
+	[self setPrefsValue:editorAppPaths forKey:sIMBEditorAppPathsKey];
+}
+
+
++ (NSString*) editorAppForMediaType:(NSString*)inMediaType
+{
+	NSDictionary* editorAppPaths = [self prefsValueForKey:sIMBEditorAppPathsKey];
+	return [editorAppPaths objectForKey:inMediaType];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Set default preferences values...
+
++ (void) registerDefaultValues
+{
+	NSString* path = [NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"];
+	NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,NSUserDomainMask,YES);
+	if ([paths count] > 0) path = [paths objectAtIndex:0];
+	
+	[self registerDefaultPrefsValue:[NSNumber numberWithBool:YES] forKey:sIMBShowsGroupNodesKey];
+	[self registerDefaultPrefsValue:path forKey:sIMBDownloadFolderPathKey];
+
+	NSString* preview = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Preview"];
+	NSString* qtplayerx = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.QuickTimePlayerX"];
+	NSString* safari = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
+	NSString* addressbook = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.AddressBook"];
+	NSString* photoshop = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Photoshop"];
+
+	NSMutableDictionary* viewerAppPaths = [NSMutableDictionary dictionary];
+	if (preview) [viewerAppPaths setObject:preview forKey:kIMBMediaTypeImage];
+	if (qtplayerx) [viewerAppPaths setObject:qtplayerx forKey:kIMBMediaTypeAudio];
+	if (qtplayerx) [viewerAppPaths setObject:qtplayerx forKey:kIMBMediaTypeMovie];
+	if (safari) [viewerAppPaths setObject:safari forKey:kIMBMediaTypeLink];
+	if (addressbook) [viewerAppPaths setObject:addressbook forKey:kIMBMediaTypeContact];
+	[self registerDefaultPrefsValue:viewerAppPaths forKey:sIMBViewerAppPathsKey];
+
+	NSMutableDictionary* editorAppPaths = [NSMutableDictionary dictionary];
+	if (photoshop) [editorAppPaths setObject:photoshop forKey:kIMBMediaTypeImage];
+	[self registerDefaultPrefsValue:editorAppPaths forKey:sIMBEditorAppPathsKey];
 }
 
 
