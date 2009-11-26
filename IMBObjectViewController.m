@@ -528,11 +528,23 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// When the icon size changes, get the current cell size in the IKImageBrowserView and notify the parser.
-// This may be helpful for the parser so that it can supply larger thumbnails...
-
 - (void) setIconSize:(double)inIconSize
 {
+	// Get the row that seems most important in the combo view. Its either the selected row or the middle visible row...
+	
+	NSRange visibleRows = [ibComboView rowsInRect:[ibComboView visibleRect]];
+	NSUInteger anchorRow = visibleRows.location + visibleRows.length/2;
+	
+	NSIndexSet* selection = [ibObjectArrayController selectionIndexes];
+	
+	if (selection) 
+	{
+		NSUInteger selectedRow = [selection firstIndex];
+		if (selectedRow != NSNotFound) anchorRow = selectedRow;
+	}
+	
+	// Change the cell size of the icon view. Also notify the parser so it can update thumbnails if necessary...
+	
 	_iconSize = inIconSize;
 	
 	NSSize size = [ibIconView cellSize];
@@ -543,11 +555,28 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		[parser objectViewDidChangeIconSize:size];
 	}
 
+	// Update the views. The row height of the combo view needs to be adjusted accordingly...
+	
 	[ibIconView setNeedsDisplay:YES];
 	[ibComboView setNeedsDisplay:YES];
 
-	CGFloat height = 60.0 + 80.0 * _iconSize;
+	CGFloat height = 60.0 + 100.0 * _iconSize;
 	[ibComboView setRowHeight:height];
+	
+	// Scroll the combo view so that it appears to be anchored at the same image as before...
+	
+	NSRect cellFrame = [ibComboView frameOfCellAtColumn:0 row:anchorRow];
+	NSRect viewFrame = [ibComboView  frame];
+	NSRect superviewFrame = [[ibComboView superview] frame];
+	
+	CGFloat y = NSMidY(cellFrame) - 0.5 * NSHeight(superviewFrame);
+	CGFloat ymax = NSHeight(viewFrame) - NSHeight(superviewFrame);
+	if (y < 0.0) y = 0.0;
+	if (y > ymax) y = ymax;
+	
+	NSClipView* clipview = (NSClipView*)[ibComboView superview];
+	[clipview scrollToPoint:NSMakePoint(0.0,y)];
+	[[ibComboView enclosingScrollView] reflectScrolledClipView:clipview];
 }
 
 
