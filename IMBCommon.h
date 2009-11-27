@@ -145,6 +145,6 @@ typedef NSUInteger IMBGroupType;
 #endif
 
 #define IMBIsSnowLeopardOrGreater()	(NSAppKitVersionNumber >= NSAppKitVersionNumber10_6)
-
+#define IMB_SNOW_LEOPARD_OR_NEWER_SDK defined(MAC_OS_X_VERSION_10_6)
 
 //----------------------------------------------------------------------------------------------------------------------

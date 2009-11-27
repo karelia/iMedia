@@ -140,23 +140,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (BOOL) acceptsPreviewPanelControl:(id)inPanel
-//{
-//	return YES;
-//}
-//
-//
-//- (void) beginPreviewPanelControl:(id)inPanel
-//{
-//	[[IMBQuickLookController sharedController] beginPreviewPanelControl:inPanel];
-//}
-//
-//
-//- (void) endPreviewPanelControl:(id)inPanel
-//{
-//	[[IMBQuickLookController sharedController] endPreviewPanelControl:inPanel];
-//}
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
 
+- (BOOL) acceptsPreviewPanelControl:(QLPreviewPanel*)inPanel
+{
+	return YES;
+}
+
+
+- (void) beginPreviewPanelControl:(QLPreviewPanel*)inPanel
+{
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+	
+    controller.previewPanel = inPanel;
+    inPanel.delegate = controller;
+    inPanel.dataSource = controller;
+}
+
+
+- (void) endPreviewPanelControl:(QLPreviewPanel*)inPanel
+{
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+    controller.previewPanel = nil;
+}
+
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -47,6 +47,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark HEADERS
+
+#import "IMBCommon.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark CLASSES
 	
 @class IMBObjectViewController;
@@ -58,6 +66,9 @@
 #pragma mark 
 
 @interface IMBPanelController : NSWindowController
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+<NSTabViewDelegate>
+#endif
 {
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView

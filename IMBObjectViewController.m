@@ -63,7 +63,7 @@
 #import "IMBObjectPromise.h"
 #import "IMBImageBrowserCell.h"
 #import "IMBProgressWindowController.h"
-#import "IMBQuickLookController.h"
+//#import "IMBQuickLookController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBDynamicTableView.h"
@@ -71,7 +71,6 @@
 #import "IMBObject.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
-#import <Quartz/Quartz.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -166,6 +165,10 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
+
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+@synthesize previewPanel = _previewPanel;
+#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -285,6 +288,11 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
 	
+	#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+	IMBRelease(_previewPanel);
+	#endif
+
+	
 	for (IMBObject* object in _observedVisibleItems)
 	{
         if ([object isKindOfClass:[IMBObject class]])
@@ -294,7 +302,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
     }
 	
     IMBRelease(_observedVisibleItems);
-
+	
 	[super dealloc];
 }
 
@@ -782,21 +790,20 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 			[item release];
 		}
 	}
-
 	
-	//	// QuickLook...
-	//	
-	//	title = NSLocalizedStringWithDefaultValue(
-	//		@"IMBObjectViewController.menuItem.quickLook",
-	//		nil,IMBBundle(),
-	//		@"Quicklook",
-	//		@"Menu item in context menu of IMBObjectViewController");
-	//		
-	//	item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
-	//	[item setRepresentedObject:inObject];
-	//	[item setTarget:self];
-	//	[menu addItem:item];
-	//	[item release];
+	// QuickLook...
+	
+	title = NSLocalizedStringWithDefaultValue(
+		@"IMBObjectViewController.menuItem.quickLook",
+		nil,IMBBundle(),
+		@"Quicklook",
+		@"Menu item in context menu of IMBObjectViewController");
+		
+	item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
+	[item setRepresentedObject:inObject];
+	[item setTarget:self];
+	[menu addItem:item];
+	[item release];
 	
 	// Give parser a chance to add menu items...
 	
@@ -890,13 +897,6 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 }
 
 
-//- (IBAction) quicklook:(id)inSender
-//{
-//	[[IMBQuickLookController sharedController] setDataSource:self];
-//	[[IMBQuickLookController sharedController] toggle:nil];
-//}
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -963,103 +963,6 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		[NSApp presentError:inError];
 	}
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark QuickLook
-
-//- (NSURL*) _urlForObject:(IMBObject*)inObject
-//{
-//	return [inObject url];
-//}
-//
-//
-//- (NSArray*) URLsForQuickLookController:(IMBQuickLookController*)inController
-//{
-//	NSMutableArray* urls = [NSMutableArray array];
-//	
-//	for (IMBObject* object in ibObjectArrayController.selectedObjects)
-//	{
-//		NSURL* url = [self _urlForObject:object];
-//		if (url) [urls addObject:url];
-//	}
-//	
-//	return urls;
-//}
-//
-//
-//- (NSRect) quickLookController:(IMBQuickLookController*)inController frameForURL:(NSURL*)inURL
-//{
-//	NSRect frame = NSZeroRect;
-//	NSView* srcView = nil;
-//	
-//	for (IMBObject* object in ibObjectArrayController.selectedObjects)
-//	{
-// 		NSURL* url = [self _urlForObject:object];
-//		
-//		if ([url isEqual:inURL])
-//		{
-//			NSInteger index = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:object];
-//
-//			if (index != NSNotFound)
-//			{
-//				if (_viewType == kIMBObjectViewTypeIcon)
-//				{
-//					frame = [ibIconView itemFrameAtIndex:index];
-//					srcView = ibIconView;
-//				}	
-//				else if (_viewType == kIMBObjectViewTypeList)
-//				{
-//					frame = [ibListView frameOfCellAtColumn:0 row:index];
-//					srcView = ibListView;
-//				}	
-//				else if (_viewType == kIMBObjectViewTypeCombo)
-//				{
-//					frame = [ibComboView frameOfCellAtColumn:0 row:index];
-//					srcView = ibComboView;
-//				}	
-//			}
-//
-//			frame = [srcView convertRectToBase:frame];
-//			frame.origin = [srcView.window convertBaseToScreen:frame.origin];
-//		}
-//	}
-//
-//NSLog(@"%s frame=%@",__FUNCTION__,NSStringFromRect(frame));
-//	return frame;
-//}
-//
-//
-//- (BOOL) quickLookController:(IMBQuickLookController*)inController handleEvent:(NSEvent*)inEvent
-//{
-//	NSString* characters = [inEvent charactersIgnoringModifiers];
-//	unichar c = ([characters length] > 0) ? [characters characterAtIndex:0] : 0;
-//	NSView* srcView = nil;
-//	
-//	switch (c)
-//	{
-//		case NSLeftArrowFunctionKey:
-//		case NSRightArrowFunctionKey:
-//		case NSUpArrowFunctionKey:
-//		case NSDownArrowFunctionKey:
-//		
-//			if (_viewType == kIMBObjectViewTypeIcon)
-//				srcView = ibIconView;
-//			else if (_viewType == kIMBObjectViewTypeList)
-//				srcView = ibListView;
-//			else if (_viewType == kIMBObjectViewTypeCombo)
-//				srcView = ibComboView;
-//
-//			[srcView keyDown:inEvent];
-//			[inController update:nil];
-//			return YES;
-//	}
-//	
-//	return NO;
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1265,6 +1168,19 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 #pragma mark 
 #pragma mark IKImageBrowserDelegate
+
+
+- (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
+{
+	#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+	if (IMBIsSnowLeopardOrGreater())
+	{
+		[[QLPreviewPanel sharedPreviewPanel] reloadData];
+		[[QLPreviewPanel sharedPreviewPanel] refreshCurrentPreviewItem];
+	}
+	#endif
+}
+
 
 // First give the delegate a chance to handle the double click. It it chooses not to, then we will 
 // handle it ourself by simply opening the files (with their default app)...
@@ -1686,6 +1602,137 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	[_observedVisibleItems release];
     _observedVisibleItems = newVisibleItemsSetRetained;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark QuickLook
+
+
+// Toggle the visibilty of the Quicklook panel...
+
+- (IBAction) quicklook:(id)inSender
+{
+	#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+	if (IMBIsSnowLeopardOrGreater())
+	{
+		if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+		{
+			[[QLPreviewPanel sharedPreviewPanel] orderOut:nil];
+		} 
+		else
+		{
+			[[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFront:nil];
+		}
+	}
+	#endif
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Quicklook datasource methods...
+
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+
+- (NSInteger) numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel*)inPanel
+{
+	return ibObjectArrayController.selectedObjects.count;
+}
+
+
+- (id <QLPreviewItem>) previewPanel:(QLPreviewPanel*)inPanel previewItemAtIndex:(NSInteger)inIndex
+{
+	return [ibObjectArrayController.selectedObjects objectAtIndex:inIndex];
+}
+
+#endif
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Quicklook delegate methods...
+
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+
+- (BOOL) previewPanel:(QLPreviewPanel*)inPanel handleEvent:(NSEvent *)inEvent
+{
+	NSString* characters = [inEvent charactersIgnoringModifiers];
+	unichar character = ([characters length] > 0) ? [characters characterAtIndex:0] : 0;
+	NSView* view = nil;
+	
+	switch (character)
+	{
+		case NSLeftArrowFunctionKey:
+		case NSRightArrowFunctionKey:
+		case NSUpArrowFunctionKey:
+		case NSDownArrowFunctionKey:
+		
+			if (_viewType == kIMBObjectViewTypeIcon)
+				view = ibIconView;
+			else if (_viewType == kIMBObjectViewTypeList)
+				view = ibListView;
+			else if (_viewType == kIMBObjectViewTypeCombo)
+				view = ibComboView;
+
+			if (view)
+			{
+				[view keyDown:inEvent];
+				return YES;
+			}	
+	}
+	
+	return NO;
+}
+
+#endif
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+
+- (NSRect) previewPanel:(QLPreviewPanel*)inPanel sourceFrameOnScreenForPreviewItem:(id <QLPreviewItem>)inItem
+{
+	NSInteger index = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inItem];
+	NSRect frame = NSZeroRect;
+	NSView* view = nil;
+	
+	if (index != NSNotFound)
+	{
+		if (_viewType == kIMBObjectViewTypeIcon)
+		{
+			frame = [ibIconView itemFrameAtIndex:index];
+			view = ibIconView;
+		}	
+		else if (_viewType == kIMBObjectViewTypeList)
+		{
+			frame = [ibListView frameOfCellAtColumn:0 row:index];
+			view = ibListView;
+		}	
+		else if (_viewType == kIMBObjectViewTypeCombo)
+		{
+			frame = [ibComboView frameOfCellAtColumn:0 row:index];
+			view = ibComboView;
+		}	
+	}
+
+	if (view)
+	{
+		frame = [view convertRectToBase:frame];
+		frame.origin = [view.window convertBaseToScreen:frame.origin];
+	}
+
+	NSLog(@"%s frame=%@",__FUNCTION__,NSStringFromRect(frame));
+	return frame;
+}
+
+#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
