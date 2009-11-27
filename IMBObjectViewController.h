@@ -66,6 +66,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark HEADERS
+
+#import "IMBCommon.h"
+#import <Quartz/Quartz.h>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark CONSTANTS
 
 enum
@@ -89,9 +98,9 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @class IMBNodeViewController;
 @class IMBObjectArrayController;
 @class IMBProgressWindowController;
-@class IKImageBrowserView;
 @class IMBObject;
 @class IMBNode;
+@class IKImageBrowserView;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,12 +115,18 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @protocol NSPasteboardItemDataProvider <NSObject> @end
 #endif
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
 
-@interface IMBObjectViewController : NSViewController <NSPasteboardItemDataProvider>
+@interface IMBObjectViewController : NSViewController 
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+<NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
+#else
+<NSPasteboardItemDataProvider>
+#endif
 {
 	IMBLibraryController* _libraryController;
 	IMBNodeViewController* _nodeViewController;
@@ -123,7 +138,10 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
 	IBOutlet NSSegmentedControl *ibSegments;
-	
+	#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+	QLPreviewPanel* _previewPanel;
+	#endif
+ 	
 	NSUInteger _viewType;
 	double _iconSize;
 	
@@ -155,6 +173,9 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @property (readonly) IKImageBrowserView* iconView;
 @property (readonly) NSTableView* listView;
 @property (readonly) NSTableView* comboView;
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+@property (retain) QLPreviewPanel* previewPanel;
+#endif
 
 @property (assign) NSUInteger viewType;
 @property (assign) double iconSize;
@@ -182,7 +203,7 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 
 - (IBAction) openSelectedObjects:(id)inSender;
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode;
-//- (IBAction) quicklook:(id)inSender;
+- (IBAction) quicklook:(id)inSender;
 
 @end
 

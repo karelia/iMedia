@@ -1,78 +1,38 @@
-/*
- iMedia Browser Framework <http://karelia.com/imedia/>
- 
- Copyright (c) 2005-2009 by Karelia Software et al.
- 
- iMedia Browser is based on code originally developed by Jason Terhorst,
- further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
- The new architecture for version 2.0 was developed by Peter Baumgartner.
- Contributions have also been made by Matt Gough, Martin Wennerberg and others
- as indicated in source files.
- 
- The iMedia Browser Framework is licensed under the following terms:
- 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in all or substantial portions of the Software without restriction, including
- without limitation the rights to use, copy, modify, merge, publish,
- distribute, sublicense, and/or sell copies of the Software, and to permit
- persons to whom the Software is furnished to do so, subject to the following
- conditions:
- 
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
- 
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
- 
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
- 
- Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
- "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
- LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
- AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
- SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
-
 #import "IMBQuickLookController.h"
 #import "QLPreviewPanel.h"
 
-#pragma mark Localization 
+#define NSAppKitVersionNumber_SnowLeopard (1000.0)
 
-#define SERVICE_BUNDLE [NSBundle bundleWithIdentifier:@"com.boinx.BXServices"]
 
-static inline NSString * LocMenuItemCloseQuickLookPanel()
-{
-	return NSLocalizedStringWithDefaultValue(
-											 @"MenuItemCloseQuickLookPanel",
-											 @"BXServices",
-											 SERVICE_BUNDLE,
-											 @"Close Quick Look",
-											 nil);
-}
+//#pragma mark Localization
+//
+//#define SERVICE_BUNDLE [NSBundle bundleWithIdentifier:@"com.boinx.BXServices"]
+//
+//static inline NSString * LocMenuItemCloseQuickLookPanel()
+//{
+//	return NSLocalizedStringWithDefaultValue(
+//											 @"MenuItemCloseQuickLookPanel",
+//											 @"BXServices",
+//											 SERVICE_BUNDLE,
+//											 @"Close Quick Look",
+//											 nil);
+//}
+//
+//static inline NSString * LocMenuItemOpenQuickLookPanel()
+//{
+//	return NSLocalizedStringWithDefaultValue(
+//											 @"MenuItemOpenQuickLookPanel",
+//											 @"BXServices",
+//											 SERVICE_BUNDLE,
+//											 @"Open Quick Look",
+//											 nil);
+//}
 
-static inline NSString * LocMenuItemOpenQuickLookPanel()
-{
-	return NSLocalizedStringWithDefaultValue(
-											 @"MenuItemOpenQuickLookPanel",
-											 @"BXServices",
-											 SERVICE_BUNDLE,
-											 @"Open Quick Look",
-											 nil);
-}
 
 @interface IMBQuickLookController ()
 - (BOOL)_handleKeyDownEvent:(NSEvent *)inEvent;
 @end
+
 
 @implementation IMBQuickLookController
 
@@ -94,7 +54,10 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	{
 		_available = [[NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/QuickLookUI.framework"] load];
 	}
-	if (_available && QLPreviewPanelClass != Nil && (IMBIsSnowLeopardOrGreater() == NO))
+	
+	Class previewPanelClass = QLPreviewPanelClass;
+	
+	if (_available && QLPreviewPanelClass != Nil /*&& NSAppKitVersionNumber < NSAppKitVersionNumber_SnowLeopard*/)
 	{
 		[[[QLPreviewPanelClass sharedPreviewPanel] windowController] setDelegate:self];
 	}
@@ -102,6 +65,11 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	{
 		NSLog(@"Could not load QuickLookUI.framework.");
 	}
+	
+	id nextResponder = [NSApp nextResponder];
+	[NSApp setNextResponder:self];
+	[self setNextResponder:nextResponder];
+	
 	return self;
 }
 
@@ -141,7 +109,7 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 		_URLs = [[dataSource URLsForQuickLookController:self] retain];
 		[old release];
 		
-		if (IMBIsSnowLeopardOrGreater())
+		if (NSAppKitVersionNumber >= NSAppKitVersionNumber_SnowLeopard)
 		{
 			[panel reloadData];
 		}
@@ -189,7 +157,7 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	
 	if ([self isOpen])
 	{
-		if (IMBIsSnowLeopardOrGreater())
+		if (NSAppKitVersionNumber >= NSAppKitVersionNumber_SnowLeopard)
 			[panel close];
 		else
 			[panel closeWithEffect:2];
@@ -197,7 +165,7 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	}
 	else if ([self canOpen])
 	{
-		if (IMBIsSnowLeopardOrGreater())
+		if (NSAppKitVersionNumber >= NSAppKitVersionNumber_SnowLeopard)
 			[panel makeKeyAndOrderFront:nil];
 		else
 			[panel makeKeyAndOrderFrontWithEffect:2];
@@ -222,24 +190,14 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 
 - (void)beginPreviewPanelControl:(id)panel
 {
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
-	[(QLPreviewPanel *)panel setDataSource:self];
-	[(QLPreviewPanel *)panel setDelegate:self];
-#else
-	[(NSPanel *)panel setDataSource:self];
-	[(NSPanel *)panel setDelegate:self];
-#endif
+	[panel setDataSource:self];
+	[panel setDelegate:self];
 }
 
 - (void)endPreviewPanelControl:(id)panel
 {
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
-	[(QLPreviewPanel *)panel setDataSource:nil];
-	[(QLPreviewPanel *)panel setDelegate:nil];
-#else
-	[(NSPanel *)panel setDataSource:nil];
-	[(NSPanel *)panel setDelegate:nil];
-#endif
+	[panel setDataSource:nil];
+	[panel setDelegate:nil];
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewPanel:(id)panel
@@ -275,6 +233,7 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	return [self previewPanel:panel frameForURL:item];
 }
 
+
 #pragma mark
 #pragma mark Preview Panel Delegate Methods
 
@@ -293,6 +252,7 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 //		previewPanel:transitionImageForURL:frame:
 //		previewPanel:willLoadPreviewForDocumentURL:
 //		previewPanel:willLoadPreviewForURL:
+
 
 - (NSRect)previewPanel:(NSPanel *)inPanel frameForURL:(NSURL *)inURL
 {
@@ -322,15 +282,11 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	and if there are multiple URLs in the array, it also doesn't tell us about left and right
 	arrow keys, although we do get the corresponding key up event.
 */
-- (BOOL)previewPanel:(id)panel shouldHandleEvent:(NSEvent *)event
+- (BOOL)previewPanel:(NSPanel *)panel shouldHandleEvent:(NSEvent *)event
 {
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
-	return ![self previewPanel:(QLPreviewPanel *)panel handleEvent:event];
-#else
-	return ![self previewPanel:(NSPanel *)panel handleEvent:event];
-#endif
-
+	return ![self previewPanel:panel handleEvent:event];
 }
+
 
 - (BOOL)_handleKeyDownEvent:(NSEvent *)inEvent
 {
@@ -374,21 +330,23 @@ static inline NSString * LocMenuItemOpenQuickLookPanel()
 	return keyWasHandled;
 }
 
+
 - (BOOL)handleKeyDownEvent:(NSEvent *)inEvent
 {
 	return [self _handleKeyDownEvent:inEvent];
 }
 
+
 - (BOOL)validateQuickLookMenuItem:(NSMenuItem *)inMenuItem;
 {
 	if ([self isOpen])
 	{
-		[inMenuItem setTitle:LocMenuItemCloseQuickLookPanel()];
+//		[inMenuItem setTitle:LocMenuItemCloseQuickLookPanel()];
 		return YES;
 	}
 	else if ([self canOpen])
 	{
-		[inMenuItem setTitle:LocMenuItemOpenQuickLookPanel()];
+//		[inMenuItem setTitle:LocMenuItemOpenQuickLookPanel()];
 		return YES;
 	}
 	return NO;

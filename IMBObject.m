@@ -211,6 +211,25 @@
 
 
 #pragma mark 
+#pragma mark QLPreviewItem Protocol 
+
+
+- (NSURL*) previewItemURL
+{
+	return self.url;
+}
+
+
+- (NSString*) previewItemTitle
+{
+	return self.name;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 #pragma mark Asynchronous Loading
 
 

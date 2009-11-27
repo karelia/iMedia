@@ -47,6 +47,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark HEADERS
+
+#import <Quartz/Quartz.h>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark CLASSES
 
 @class IMBParser;
@@ -58,7 +66,12 @@
 // IMBObject encapsulates information about a single media item (e.g. image file or audio file). The location 
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
 
-@interface IMBObject : NSObject <NSCopying,NSCoding>
+@interface IMBObject : NSObject
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+<NSCopying,NSCoding,QLPreviewItem>
+#else
+<NSCopying,NSCoding>
+#endif
 {
 	id _location;												
 	NSString* _name;

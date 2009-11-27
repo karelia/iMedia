@@ -53,6 +53,7 @@
 #import "IMBImageBrowserCell.h"
 #import "IMBObjectViewController.h"
 #import "IMBObjectFifoCache.h"
+#import "IMBQuickLookController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -250,5 +251,59 @@
 							 event:theEvent];
 }
 #endif
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Quicklook 
+
+
+- (void) keyDown:(NSEvent*)inEvent
+{
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+    NSString* key = [inEvent charactersIgnoringModifiers];
+	
+    if([key isEqual:@" "])
+	{
+        [controller quicklook:self];
+    } 
+	else
+	{
+        [super keyDown:inEvent];
+    }
+}
+
+
+#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+
+- (BOOL) acceptsPreviewPanelControl:(QLPreviewPanel*)inPanel
+{
+	return YES;
+}
+
+
+- (void) beginPreviewPanelControl:(QLPreviewPanel*)inPanel
+{
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+	
+    controller.previewPanel = inPanel;
+    inPanel.delegate = controller;
+    inPanel.dataSource = controller;
+}
+
+
+- (void) endPreviewPanelControl:(QLPreviewPanel*)inPanel
+{
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+    controller.previewPanel = nil;
+}
+
+#endif
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @end
