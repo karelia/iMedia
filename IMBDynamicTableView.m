@@ -211,7 +211,7 @@
 {
 	[self _removeCachedViewsInIndexSet:rowIndexes];
 	
-	if (IMBIsSnowLeopardOrGreater())
+	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		[super reloadDataForRowIndexes:rowIndexes columnIndexes:columnIndexes];
 	}

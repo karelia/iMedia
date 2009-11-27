@@ -140,7 +140,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (BOOL) acceptsPreviewPanelControl:(QLPreviewPanel*)inPanel
 {

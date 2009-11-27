@@ -144,7 +144,7 @@ typedef NSUInteger IMBGroupType;
 										// (I'm guessing it was a pre-GM Snow Leopard version number)
 #endif
 
-#define IMBIsSnowLeopardOrGreater()	(NSAppKitVersionNumber >= NSAppKitVersionNumber10_6)
-#define IMB_SNOW_LEOPARD_OR_NEWER_SDK defined(MAC_OS_X_VERSION_10_6)
+#define IMBRunningOnSnowLeopardOrNewer()	(NSAppKitVersionNumber >= NSAppKitVersionNumber10_6)
+#define IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK  defined(MAC_OS_X_VERSION_10_6)
 
 //----------------------------------------------------------------------------------------------------------------------

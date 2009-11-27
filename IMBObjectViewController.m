@@ -166,7 +166,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
 
-#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 @synthesize previewPanel = _previewPanel;
 #endif
 
@@ -288,7 +288,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
 	
-	#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	IMBRelease(_previewPanel);
 	#endif
 
@@ -793,17 +793,22 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	
 	// QuickLook...
 	
-	title = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.menuItem.quickLook",
-		nil,IMBBundle(),
-		@"Quicklook",
-		@"Menu item in context menu of IMBObjectViewController");
-		
-	item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
-	[item setRepresentedObject:inObject];
-	[item setTarget:self];
-	[menu addItem:item];
-	[item release];
+	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.quickLook",
+			nil,IMBBundle(),
+			@"Quicklook",
+			@"Menu item in context menu of IMBObjectViewController");
+			
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
+		[item setRepresentedObject:inObject];
+		[item setTarget:self];
+		[menu addItem:item];
+		[item release];
+	}
+	#endif
 	
 	// Give parser a chance to add menu items...
 	
@@ -1172,8 +1177,8 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
 {
-	#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
-	if (IMBIsSnowLeopardOrGreater())
+	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		[[QLPreviewPanel sharedPreviewPanel] reloadData];
 		[[QLPreviewPanel sharedPreviewPanel] refreshCurrentPreviewItem];
@@ -1278,7 +1283,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 			// URLs lazily we have to set an array of NSPasteboardItem on the pasteboard, with each item 
 			// set to callback to us as data provider.
 			//
-			if (IMBIsSnowLeopardOrGreater())
+			if (IMBRunningOnSnowLeopardOrNewer())
 			{				
 				(void) [inPasteboard clearContents];
 				NSMutableArray* itemArray = [NSMutableArray arrayWithCapacity:[inIndexes count]];
@@ -1615,8 +1620,8 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (IBAction) quicklook:(id)inSender
 {
-	#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
-	if (IMBIsSnowLeopardOrGreater())
+	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
 		{
@@ -1636,7 +1641,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 // Quicklook datasource methods...
 
-#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (NSInteger) numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel*)inPanel
 {
@@ -1657,7 +1662,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 // Quicklook delegate methods...
 
-#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (BOOL) previewPanel:(QLPreviewPanel*)inPanel handleEvent:(NSEvent *)inEvent
 {
@@ -1695,7 +1700,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (NSRect) previewPanel:(QLPreviewPanel*)inPanel sourceFrameOnScreenForPreviewItem:(id <QLPreviewItem>)inItem
 {

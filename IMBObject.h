@@ -67,7 +67,7 @@
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
 
 @interface IMBObject : NSObject
-#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 <NSCopying,NSCoding,QLPreviewItem>
 #else
 <NSCopying,NSCoding>
