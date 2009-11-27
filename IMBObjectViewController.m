@@ -642,116 +642,147 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		[item release];
 	}
 	
-	// Check if the object is a local file. If yes add appropriate standard menu items...
-	
-	if ([[inObject location] isKindOfClass:[NSString class]])
-	{
-		NSString* path = [inObject path];
+	// For local file object (path or url) add menu items to open the file (in editor and/or viewer apps)...
 		
-		if ([[NSFileManager threadSafeManager] fileExistsAtPath:path])
+	else
+	{
+		id location = [inObject location];
+		NSURL* url = (NSURL*)location;
+		BOOL localFile = [location isKindOfClass:[NSString class]] || [location isKindOfClass:[NSURL class]] && [url isFileURL];
+		
+		if (localFile)
 		{
-			// Open with editor app...
+			NSString* path = [inObject path];
 			
-			if (appPath = [IMBConfig editorAppForMediaType:self.mediaType])
+			if ([[NSFileManager threadSafeManager] fileExistsAtPath:path])
 			{
+				// Open with source app. Commented out for now as apps like iPhoto do not seem to be able to open
+				// and display images within its own libary. All it does is display a cryptic error message...
+				
+//				if ([inObject.parser respondsToSelector:@selector(appPath)])
+//				{
+//					if (appPath = [inObject.parser performSelector:@selector(appPath)])
+//					{
+//						title = NSLocalizedStringWithDefaultValue(
+//							@"IMBObjectViewController.menuItem.openInApp",
+//							nil,IMBBundle(),
+//							@"Open in %@",
+//							@"Menu item in context menu of IMBObjectViewController");
+//						
+//						appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+//						title = [NSString stringWithFormat:title,appName];	
+//
+//						item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInSourceApp:) keyEquivalent:@""];
+//						[item setRepresentedObject:inObject];
+//						[item setTarget:self];
+//						[menu addItem:item];
+//						[item release];
+//					}
+//				}
+				
+				// Open with editor app...
+				
+				if (appPath = [IMBConfig editorAppForMediaType:self.mediaType])
+				{
+					title = NSLocalizedStringWithDefaultValue(
+						@"IMBObjectViewController.menuItem.openInApp",
+						nil,IMBBundle(),
+						@"Open in %@",
+						@"Menu item in context menu of IMBObjectViewController");
+					
+					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+					title = [NSString stringWithFormat:title,appName];	
+
+					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInEditorApp:) keyEquivalent:@""];
+					[item setRepresentedObject:path];
+					[item setTarget:self];
+					[menu addItem:item];
+					[item release];
+				}
+				
+				// Open with viewer app...
+				
+				if (appPath = [IMBConfig viewerAppForMediaType:self.mediaType])
+				{
+					title = NSLocalizedStringWithDefaultValue(
+						@"IMBObjectViewController.menuItem.openInApp",
+						nil,IMBBundle(),
+						@"Open in %@",
+						@"Menu item in context menu of IMBObjectViewController");
+					
+					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+					title = [NSString stringWithFormat:title,appName];	
+
+					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInViewerApp:) keyEquivalent:@""];
+					[item setRepresentedObject:path];
+					[item setTarget:self];
+					[menu addItem:item];
+					[item release];
+				}
+				
+				// Open with default app determined by OS...
+				
+				else if ([[NSWorkspace threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type])
+				{
+					title = NSLocalizedStringWithDefaultValue(
+						@"IMBObjectViewController.menuItem.openWithFinder",
+						nil,IMBBundle(),
+						@"Open with Finder",
+						@"Menu item in context menu of IMBObjectViewController");
+
+					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInApp:) keyEquivalent:@""];
+					[item setRepresentedObject:path];
+					[item setTarget:self];
+					[menu addItem:item];
+					[item release];
+				}
+				
+				// Reveal in Finder...
+				
 				title = NSLocalizedStringWithDefaultValue(
-					@"IMBObjectViewController.menuItem.openInApp",
+					@"IMBObjectViewController.menuItem.revealInFinder",
 					nil,IMBBundle(),
-					@"Open in %@",
+					@"Reveal in Finder",
 					@"Menu item in context menu of IMBObjectViewController");
 				
-				appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
-				title = [NSString stringWithFormat:title,appName];	
-
-				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInEditorApp:) keyEquivalent:@""];
+				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
 				[item setRepresentedObject:path];
 				[item setTarget:self];
 				[menu addItem:item];
 				[item release];
 			}
-			
-			// Open with viewer app...
-			
-			if (appPath = [IMBConfig viewerAppForMediaType:self.mediaType])
-			{
-				title = NSLocalizedStringWithDefaultValue(
-					@"IMBObjectViewController.menuItem.openInApp",
-					nil,IMBBundle(),
-					@"Open in %@",
-					@"Menu item in context menu of IMBObjectViewController");
-				
-				appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
-				title = [NSString stringWithFormat:title,appName];	
-
-				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInViewerApp:) keyEquivalent:@""];
-				[item setRepresentedObject:path];
-				[item setTarget:self];
-				[menu addItem:item];
-				[item release];
-			}
-			
-			// Open with default app determined by OS...
-			
-			else if ([[NSWorkspace threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type])
-			{
-				title = NSLocalizedStringWithDefaultValue(
-					@"IMBObjectViewController.menuItem.openWithFinder",
-					nil,IMBBundle(),
-					@"Open with Finder",
-					@"Menu item in context menu of IMBObjectViewController");
-
-				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInApp:) keyEquivalent:@""];
-				[item setRepresentedObject:path];
-				[item setTarget:self];
-				[menu addItem:item];
-				[item release];
-			}
-			
-			
-			// Reveal in Finder...
-			
+		}
+		
+		// Remote URL object can be downloaded or opened in a web browser...
+		
+		else if ([[inObject location] isKindOfClass:[NSURL class]])
+		{
 			title = NSLocalizedStringWithDefaultValue(
-				@"IMBObjectViewController.menuItem.revealInFinder",
+				@"IMBObjectViewController.menuItem.download",
 				nil,IMBBundle(),
-				@"Reveal in Finder",
+				@"Download",
 				@"Menu item in context menu of IMBObjectViewController");
 			
-			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
-			[item setRepresentedObject:path];
+			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(download:) keyEquivalent:@""];
+			[item setRepresentedObject:[inObject location]];
+			[item setTarget:self];
+			[menu addItem:item];
+			[item release];
+			
+			title = NSLocalizedStringWithDefaultValue(
+				@"IMBObjectViewController.menuItem.openInBrowser",
+				nil,IMBBundle(),
+				@"Open in Browser",
+				@"Menu item in context menu of IMBObjectViewController");
+			
+			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInBrowser:) keyEquivalent:@""];
+			[item setRepresentedObject:[inObject location]];
 			[item setTarget:self];
 			[menu addItem:item];
 			[item release];
 		}
 	}
-	
-	// URL object can be opened in a web browser...
-	
-	else if ([[inObject location] isKindOfClass:[NSURL class]])
-	{
-		title = NSLocalizedStringWithDefaultValue(
-			@"IMBObjectViewController.menuItem.download",
-			nil,IMBBundle(),
-			@"Download",
-			@"Menu item in context menu of IMBObjectViewController");
-		
-		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(download:) keyEquivalent:@""];
-		[item setRepresentedObject:[inObject location]];
-		[item setTarget:self];
-		[menu addItem:item];
-		[item release];
-		
-		title = NSLocalizedStringWithDefaultValue(
-			@"IMBObjectViewController.menuItem.openInBrowser",
-			nil,IMBBundle(),
-			@"Open in Browser",
-			@"Menu item in context menu of IMBObjectViewController");
-		
-		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInBrowser:) keyEquivalent:@""];
-		[item setRepresentedObject:[inObject location]];
-		[item setTarget:self];
-		[menu addItem:item];
-		[item release];
-	}
+
 	
 	//	// QuickLook...
 	//	
@@ -786,6 +817,21 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	}
 	
 	return menu;
+}
+
+
+- (IBAction) openInSourceApp:(id)inSender
+{
+	IMBObject* object = (IMBObject*) [inSender representedObject];
+	NSString* path = [object path];
+	NSString* app = nil;
+	
+	if ([object.parser respondsToSelector:@selector(appPath)])
+	{
+		app = [object.parser performSelector:@selector(appPath)];
+	}
+	
+	[[NSWorkspace threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 
@@ -894,10 +940,11 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	}
 }
 
-// "Local" means that for whatever the object represents, opening it now requires no network or 
-// other time-intensive procedure to obtain the usable object content. The term "local" is slightly
-// misleading when it comes to IMBObjects that refer strictly to a web link, where "opening" them 
-// just means loading them in a browser.
+
+// "Local" means that for whatever the object represents, opening it now requires no network or other time-intensive 
+// procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to IMBObjects 
+// that refer strictly to a web link, where "opening" them just means loading them in a browser...
+
 - (void) _openLocalURLs:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
 {
 	if (inError == nil)
