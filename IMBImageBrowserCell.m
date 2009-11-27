@@ -298,7 +298,7 @@
 {
 	CGFloat points = 0;
 
-	CGFloat width = IMBIsSnowLeopardOrGreater()
+	CGFloat width = IMBRunningOnSnowLeopardOrNewer()
 		? [self titleFrame].size.width
 		: [((id)self) size].width;
 	if (width < 50) points = 9;
@@ -308,7 +308,7 @@
 	else points = 13;
 
 	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont fontWithName:@"Lucida Grande" size:points] forKey:NSFontAttributeName];
-	if (IMBIsSnowLeopardOrGreater())
+	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		[[((id)self) imageBrowserView] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
 	}

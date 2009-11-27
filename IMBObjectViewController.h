@@ -122,7 +122,7 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 #pragma mark 
 
 @interface IMBObjectViewController : NSViewController 
-#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 <NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 #else
 <NSPasteboardItemDataProvider>
@@ -138,7 +138,7 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
 	IBOutlet NSSegmentedControl *ibSegments;
-	#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	QLPreviewPanel* _previewPanel;
 	#endif
  	
@@ -173,7 +173,7 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @property (readonly) IKImageBrowserView* iconView;
 @property (readonly) NSTableView* listView;
 @property (readonly) NSTableView* comboView;
-#if IMB_SNOW_LEOPARD_OR_NEWER_SDK
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 @property (retain) QLPreviewPanel* previewPanel;
 #endif
 
