@@ -70,9 +70,9 @@
 @synthesize metadataDescription = _metadataDescription;
 @synthesize parser = _parser;
 @synthesize index = _index;
+@synthesize shouldDrawAdornments = _shouldDrawAdornments;
 
 @synthesize imageLocation = _imageLocation;
-//@synthesize imageRepresentation = _imageRepresentation;
 @synthesize imageRepresentationType = _imageRepresentationType;
 @synthesize needsImageRepresentation = _needsImageRepresentation;
 @synthesize imageVersion = _imageVersion;
@@ -87,6 +87,7 @@
 	if (self = [super init])
 	{
 		self.index = NSNotFound;
+		self.shouldDrawAdornments = YES;
 		self.needsImageRepresentation = YES;
 	}
 	
@@ -103,13 +104,8 @@
 		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
 		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
 		self.index = [inCoder decodeIntegerForKey:@"index"];
+		self.shouldDrawAdornments = [inCoder decodeBoolForKey:@"shouldDrawAdornments"];
 		self.needsImageRepresentation = YES;
-//		self.imageLocation = [inCoder decodeObjectForKey:@"imageLocation"];
-//		self.imageRepresentation = [inCoder decodeObjectForKey:@"imageRepresentation"];
-//		self.imageRepresentationType = [inCoder decodeObjectForKey:@"imageRepresentationType"];
-//		self.imageVersion = [inCoder decodeIntegerForKey:@"imageVersion"];
-
-//		self.parser = [inCoder decodeObjectForKey:@"parser"];
 	}
 	
 	return self;
@@ -123,10 +119,7 @@
 	[inCoder encodeObject:self.metadata forKey:@"metadata"];
 	[inCoder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
 	[inCoder encodeInteger:self.index forKey:@"index"];
-//	[inCoder encodeObject:self.imageLocation forKey:@"imageLocation"];
-//	[inCoder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
-//	[inCoder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
-//	[inCoder encodeInteger:self.imageVersion forKey:@"imageVersion"];
+	[inCoder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
 }
 
 
@@ -138,10 +131,14 @@
 	copy.name = self.name;
 	copy.metadata = self.metadata;
 	copy.metadataDescription = self.metadataDescription;
+	copy.parser = self.parser;
 	copy.index = self.index;
+	copy.shouldDrawAdornments = self.shouldDrawAdornments;
+
 	copy.imageLocation = self.imageLocation;
 	copy.imageRepresentation = self.imageRepresentation;
 	copy.imageRepresentationType = self.imageRepresentationType;
+	copy.needsImageRepresentation = self.needsImageRepresentation;
 	copy.imageVersion = self.imageVersion;
 	
 	return copy;
@@ -174,6 +171,11 @@
 
 - (NSString*) imageUID
 {
+	if (_imageLocation)
+	{
+		return _imageLocation;
+	}
+		
 	return _location;
 }
 

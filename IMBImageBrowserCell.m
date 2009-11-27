@@ -50,7 +50,8 @@
 #pragma mark HEADERS
 
 #import "IMBImageBrowserCell.h"
-#import "IMBNodeObject.h"
+#import "IMBObject.h"
+#import "IMBNode.h"
 #import "IMBCommon.h"
 
 
@@ -104,10 +105,11 @@
 {
 	[super setDataSource:inDataSource];
 	
-	if ([inDataSource isKindOfClass:[IMBNodeObject class]])
+	if ([inDataSource isKindOfClass:[IMBObject class]])
 	{
-		_imbShouldDrawOutline = NO;
-		_imbShouldDrawShadow = NO;
+		IMBObject* object = (IMBObject*)inDataSource;
+		_imbShouldDrawOutline = object.shouldDrawAdornments;
+		_imbShouldDrawShadow = object.shouldDrawAdornments;
 	}
 }
 
@@ -238,6 +240,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Drawing outlines and shadows should be suppress in some cases (e.g. for IMBNodeObjects which are displayed 
+// as non-rectangular folder icons)...
+
 - (void) drawShadow
 {
 	if (_imbShouldDrawShadow)
@@ -254,6 +259,35 @@
 		[super drawImageOutline];	
 	}	
 }
+
+
+// Draw the image itself. In the case of an IMBNodeObject (which is represented as a large folder icon)
+// we should draw a small badge icon on top of the large folder icon. This si used to distinguish various 
+// kinds of subnodes visually (e.g. iPhoto events, albums, etc)...
+
+//- (void) drawImage:(id)inImage
+//{
+//	[super drawImage:inImage];
+//	
+//	id datasource = self.dataSource;
+//	
+//	if ([datasource isKindOfClass:[IMBNodeObject class]])
+//	{
+//		IMBNode* node = (IMBNode*) datasource;
+//		NSImage* icon = node.icon;
+//		NSRect frame = [self imageFrame];
+//		CGFloat x0 = 20; //NSMidX(frame);
+//		CGFloat y0 = 20; //NSMidY(frame);
+//		CGFloat dx = 16.0;
+//		CGFloat dy = 16.0;
+//		frame = NSMakeRect(x0-0.5*dx,y0-0.5*dy,dx,dy);
+//		[icon drawInRect:frame fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+//	}
+//}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // A Private API.  Overriding it to change the font size.  No harm done if this stops working though...
 // Note that we are using two different methods, since the methods under Snow Leopard are different from

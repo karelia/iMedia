@@ -71,8 +71,9 @@
 	NSString* _imageRepresentationType;		
 	BOOL _needsImageRepresentation;
 	NSUInteger _imageVersion;
-    BOOL _isLoading;
 	id _imageLocation;
+    BOOL _isLoading;
+    BOOL _shouldDrawAdornments;
 }
 
 // Primary properties...
@@ -84,6 +85,7 @@
 @property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)
 @property (retain) IMBParser* parser;						// Parser that created this object
 @property (assign) NSUInteger index;						// Index of object in the array (optional)
+@property (assign) BOOL shouldDrawAdornments;				// YES if border/shadow should be drawn
 
 // Helpers...
 
