@@ -68,6 +68,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// IMBNodeObject are represented in the user interface as folder icons. Since these are prerendered and 
+// do not have a rectangular shape, we do not want to draw a broder and shadow around it...
+
+- (id) init
+{
+	if (self = [super init])
+	{
+		self.shouldDrawAdornments = NO;
+	}
+	
+	return self;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Since a string is required here we return the identifier of a node instead for the node itself...
 
 - (NSString*) imageUID
