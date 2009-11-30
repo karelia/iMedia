@@ -58,6 +58,7 @@
 
 #import "FMDatabase.h"
 #import "FMResultSet.h"
+#import "IMBConfig.h"
 #import "IMBLightroom1Parser.h"
 #import "IMBLightroom2Parser.h"
 #import "IMBLightroom3Parser.h"
@@ -66,6 +67,7 @@
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
 #import "IMBObjectPromise.h"
+#import "IMBOrderedDictionary.h"
 #import "IMBParserController.h"
 #import "IMBPyramidObjectPromise.h"
 #import "NSData+SKExtensions.h"
@@ -1360,12 +1362,87 @@ static NSArray* sSupportedUTIs = nil;
 		return;
 	}
 	
+	for (NSMenuItem* menuItem in [inMenu itemArray]) {
+		SEL action = [menuItem action];
+		
+		if (action == @selector(openInEditorApp:)) {
+			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
+																	  @"IMBObjectViewController.menuItem.openInApp.Lightroom",
+																	  nil,IMBBundle(),
+																	  @"Open Master in %@",
+																	  @"Menu item in context menu of IMBObjectViewController");
+			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig editorAppForMediaType:self.mediaType]];
+			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
+			
+			[menuItem setTitle:title];
+		}
+		else if (action == @selector(openInViewerApp:)) {
+			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
+																	  @"IMBObjectViewController.menuItem.openInApp.Lightroom",
+																	  nil,IMBBundle(),
+																	  @"Open Master in %@",
+																	  @"Menu item in context menu of IMBObjectViewController");
+			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig viewerAppForMediaType:self.mediaType]];
+			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
+			
+			[menuItem setTitle:title];
+		}
+		else if (action == @selector(openInApp:)) {
+			NSString* title = NSLocalizedStringWithDefaultValue(
+																@"IMBObjectViewController.menuItem.openWithFinder.Lightroom",
+																nil,IMBBundle(),
+																@"Open Master with Finder",
+																@"Menu item in context menu of IMBObjectViewController");
+			
+			[menuItem setTitle:title];
+		}
+		else if (action == @selector(revealInFinder:)) {
+			NSString* title = NSLocalizedStringWithDefaultValue(
+																@"IMBObjectViewController.menuItem.revealInFinder.Lightroom",
+																nil,IMBBundle(),
+																@"Reveal Master in Finder",
+																@"Menu item in context menu of IMBObjectViewController");
+			
+			[menuItem setTitle:title];
+		}
+	}
+	
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
+	NSString* path = [inObject path];
+	
+	if ([[NSFileManager threadSafeManager] fileExistsAtPath:path]) {
+		IMBOrderedDictionary *applications = [IMBOrderedDictionary orderedDictionaryWithCapacity:2];
+		
+		[applications setObject:@"openPreviewInEditorApp:" forKey:[IMBConfig editorAppForMediaType:self.mediaType]];
+		[applications setObject:@"openPreviewInViewerApp:" forKey:[IMBConfig viewerAppForMediaType:self.mediaType]];
+
+		for (NSString* appPath in [applications allKeys]) {
+			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
+																	  @"IMBObjectViewController.menuItem.openPreviewInApp.Lightroom",
+																	  nil,IMBBundle(),
+																	  @"Save and Open Processed Image in %@",
+																	  @"Menu item in context menu of IMBLightroomParser");
+			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
+
+			NSString* selector = [applications objectForKey:appPath];
+			NSMenuItem* openPreviewItem = [[NSMenuItem alloc] initWithTitle:title 
+																	 action:NSSelectorFromString(selector) 
+															  keyEquivalent:@""];
+			
+			[openPreviewItem setTarget:self];
+			[openPreviewItem setRepresentedObject:inObject];
+			
+			[inMenu addItem:openPreviewItem];
+			[openPreviewItem release];
+		}
+	}
+
 	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
 	
 	if ([[NSFileManager threadSafeManager] fileExistsAtPath:absolutePyramidPath]) {
-		NSMenuItem* revealPyramidItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Reveal Preview Pyramid in Finder",
-																							 @"Reveal Preview Pyramid in Finder") 
+		NSMenuItem* revealPyramidItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Reveal Pyramid in Finder",
+																							 @"Reveal Pyramid in Finder") 
 																   action:@selector(revealPyramid:) 
 															keyEquivalent:@""];
 		[revealPyramidItem setTarget:self];
@@ -1373,44 +1450,6 @@ static NSArray* sSupportedUTIs = nil;
 		
 		[inMenu addItem:revealPyramidItem];
 		[revealPyramidItem release];
-	}
-	
-	NSString* path = [inObject path];
-
-	if ([[NSFileManager threadSafeManager] fileExistsAtPath:path]) {
-		NSString* title = nil;
-		
-		NSString* appPath = nil;
-		NSString* type = nil;
-		BOOL found = [[NSWorkspace threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type];
-	
-		if (found) {
-			title = NSLocalizedStringWithDefaultValue(
-													  @"IMBObjectViewController.menuItem.openPreview",
-													  nil,IMBBundle(),
-													  @"Create Preview and open in %@",
-													  @"Menu item in context menu of IMBLightroomParser");
-		
-			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
-			title = [NSString stringWithFormat:title,appName];	
-		}
-		else {
-			title = NSLocalizedStringWithDefaultValue(
-													  @"IMBObjectViewController.menuItem.openPreviewWithFinder",
-													  nil,IMBBundle(),
-													  @"Create Preview and open with Finder",
-													  @"Menu item in context menu of IMBLightroomParser");
-		}
-	
-		NSMenuItem* openPreviewItem = [[NSMenuItem alloc] initWithTitle:title 
-																 action:@selector(openPreview:) 
-														  keyEquivalent:@""];
-	
-		[openPreviewItem setTarget:self];
-		[openPreviewItem setRepresentedObject:inObject];
-	
-		[inMenu addItem:openPreviewItem];
-		[openPreviewItem release];
 	}
 }
 
@@ -1423,12 +1462,30 @@ static NSArray* sSupportedUTIs = nil;
 	[[NSWorkspace threadSafeWorkspace] selectFile:absolutePyramidPath inFileViewerRootedAtPath:folder];
 }
 
-- (void)openPreview:(id)sender
+- (void)openPreviewInApp:(id)sender
 {
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)[sender representedObject];
 	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
 	
 	[[NSWorkspace threadSafeWorkspace] openURL:url];
+}
+
+- (void)openPreviewInEditorApp:(id)sender
+{
+	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)[sender representedObject];
+	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
+	NSString* app = [IMBConfig editorAppForMediaType:self.mediaType];
+	
+	[[NSWorkspace threadSafeWorkspace] openFile:[url path] withApplication:app];
+}
+
+- (void)openPreviewInViewerApp:(id)sender
+{
+	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)[sender representedObject];
+	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
+	NSString* app = [IMBConfig viewerAppForMediaType:self.mediaType];
+	
+	[[NSWorkspace threadSafeWorkspace] openFile:[url path] withApplication:app];
 }
 
 @end
