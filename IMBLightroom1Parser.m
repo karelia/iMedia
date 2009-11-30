@@ -187,9 +187,11 @@
 
 - (NSString*) folderObjectsQuery
 {
-	NSString* query =	@" SELECT alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, caption"
+	NSString* query =	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation"
+						@"			caption, apcp.relativeDataPath pyramidPath"
 						@" FROM AgLibraryFile alf"
 						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
+						@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
 						@" LEFT JOIN"
 						@"		(SELECT altiCaption.image captionImage, altCaption.name caption, altiCaption.tag, altCaption.id_local"
 						@" 		 FROM AgLibraryTagImage altiCaption"
@@ -205,9 +207,11 @@
 
 - (NSString*) collectionObjectsQuery
 {
-	NSString* query =	@" SELECT aif.absolutePath, aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, caption"
+	NSString* query =	@" SELECT	aif.absolutePath, aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+						@"			caption, apcp.relativeDataPath pyramidPath"
 						@" FROM Adobe_imageFiles aif"
 						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
+						@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
 						@" INNER JOIN AgLibraryTagImage alti ON ai.id_local = alti.image"
 						@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name caption, altiCaption.tag, altCaption.id_local"
 						@" 		   FROM AgLibraryTagImage altiCaption"

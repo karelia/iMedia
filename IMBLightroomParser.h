@@ -101,8 +101,6 @@
 + (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
 + (BOOL) isInstalled;
 
-- (NSString*) absolutePyramidPathForObject:(IMBLightroomObject*)inObject;
-
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
 
 - (NSString*) rootNodeIdentifier;
