@@ -64,7 +64,6 @@
 	if ((self = [super init]) != nil) {
 		_dictionary = [[NSMutableDictionary alloc] initWithCapacity:inCapacity];
 		_array = [[NSMutableArray alloc] initWithCapacity:inCapacity];
-		_array = [[NSMutableArray alloc] initWithCapacity:inCapacity];
 	}
 	
 	return self;
