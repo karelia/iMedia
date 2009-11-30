@@ -1407,8 +1407,10 @@ static NSArray* sSupportedUTIs = nil;
 		}
 	}
 	
+	[inMenu addItem:[NSMenuItem separatorItem]];
+
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
-	NSString* path = [inObject path];
+	NSString* path = [lightroomObject path];
 	
 	if ([[NSFileManager threadSafeManager] fileExistsAtPath:path]) {
 		IMBOrderedDictionary *applications = [IMBOrderedDictionary orderedDictionaryWithCapacity:2];
@@ -1420,7 +1422,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
 																	  @"IMBObjectViewController.menuItem.openPreviewInApp.Lightroom",
 																	  nil,IMBBundle(),
-																	  @"Save and Open Processed Image in %@",
+																	  @"Open Processed Image in %@",
 																	  @"Menu item in context menu of IMBLightroomParser");
 			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
@@ -1436,20 +1438,6 @@ static NSArray* sSupportedUTIs = nil;
 			[inMenu addItem:openPreviewItem];
 			[openPreviewItem release];
 		}
-	}
-
-	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
-	
-	if ([[NSFileManager threadSafeManager] fileExistsAtPath:absolutePyramidPath]) {
-		NSMenuItem* revealPyramidItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Reveal Pyramid in Finder",
-																							 @"Reveal Pyramid in Finder") 
-																   action:@selector(revealPyramid:) 
-															keyEquivalent:@""];
-		[revealPyramidItem setTarget:self];
-		[revealPyramidItem setRepresentedObject:inObject];
-		
-		[inMenu addItem:revealPyramidItem];
-		[revealPyramidItem release];
 	}
 }
 
