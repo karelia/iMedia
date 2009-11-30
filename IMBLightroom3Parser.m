@@ -261,9 +261,11 @@
 
 - (NSString*) folderObjectsQuery
 {
-	NSString* query =	@" SELECT alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, iptc.caption"
+	NSString* query =	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+						@"			iptc.caption, apcp.relativeDataPath pyramidPath"
 						@" FROM AgLibraryFile alf"
 						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
+						@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
 						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
 						@" WHERE alf.folder = ?"
 						@" ORDER BY ai.captureTime ASC";
@@ -274,9 +276,11 @@
 - (NSString*) collectionObjectsQuery
 {
 	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-						@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, iptc.caption"
+						@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+						@"			iptc.caption, apcp.relativeDataPath pyramidPath"
 						@" FROM AgLibraryFile aif"
 						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
+						@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
 						@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
 						@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
 						@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"

@@ -104,14 +104,12 @@ static NSArray* sSupportedUTIs = nil;
 	return self;
 }
 
-
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[super encodeWithCoder:inCoder];
 	
 	[inCoder encodeObject:self.absolutePyramidPath forKey:@"absolutePyramidPath"];
 }
-
 
 - (id) copyWithZone:(NSZone*)inZone
 {
@@ -122,21 +120,26 @@ static NSArray* sSupportedUTIs = nil;
 	return copy;
 }
 
-- (NSString*)absolutePyramidPath
-{
-	if (_absolutePyramidPath == nil) {
-		IMBLightroomParser* parser = (IMBLightroomParser*)self.parser;
-		
-		_absolutePyramidPath = [[parser absolutePyramidPathForObject:self] copy];
-	}
-	
-	return _absolutePyramidPath;
-}
-
 - (void) dealloc
 {
 	IMBRelease(_absolutePyramidPath);
+	
 	[super dealloc];
+}
+
+
+#pragma mark 
+#pragma mark IKImageBrowserItem Protocol
+
+// Use the path or URL as the unique identifier...
+
+- (NSString*) imageUID
+{
+	if (_absolutePyramidPath != nil) {
+		return _absolutePyramidPath;
+	}
+	
+	return [super imageUID];
 }
 
 @end
@@ -164,6 +167,7 @@ static NSArray* sSupportedUTIs = nil;
 - (BOOL) canOpenImageFileAtPath:(NSString*)inPath;
 - (IMBObject*) objectWithPath:(NSString*)inPath
 						 name:(NSString*)inName
+				  pyramidPath:(NSString*)inPyramidPath
 					 metadata:(NSDictionary*)inMetadata
 						index:(NSUInteger)inIndex;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
@@ -783,6 +787,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSNumber* fileWidth = [NSNumber numberWithDouble:[results doubleForColumn:@"fileWidth"]];
 			NSString* orientation = [results stringForColumn:@"orientation"];
 			NSString* caption = [results stringForColumn:@"caption"];
+			NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
 			NSString* name = caption!= nil ? caption : filename;
 			NSString* path = [folderPath stringByAppendingPathComponent:filename];
 			
@@ -802,6 +807,7 @@ static NSArray* sSupportedUTIs = nil;
 				
 				IMBObject* object = [self objectWithPath:path
 													name:name
+											 pyramidPath:pyramidPath
 												metadata:metadata
 												   index:index++];
 				
@@ -849,6 +855,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSNumber* fileWidth = [NSNumber numberWithDouble:[results doubleForColumn:@"fileWidth"]];
 			NSString* orientation = [results stringForColumn:@"orientation"];
 			NSString* caption = [results stringForColumn:@"caption"];
+			NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
 			NSString* name = caption!= nil ? caption : filename;
 			NSString* path = [absolutePath stringByAppendingString:filename];
 			
@@ -868,6 +875,7 @@ static NSArray* sSupportedUTIs = nil;
 				
 				IMBObject* object = [self objectWithPath:path
 													name:name
+											 pyramidPath:pyramidPath
 												metadata:metadata
 												   index:index++];
 				[(NSMutableArray*)inNode.objects addObject:object];
@@ -918,11 +926,14 @@ static NSArray* sSupportedUTIs = nil;
 
 - (IMBObject*) objectWithPath:(NSString*)inPath
 						 name:(NSString*)inName
+				  pyramidPath:(NSString*)inPyramidPath
 					 metadata:(NSDictionary*)inMetadata
 						index:(NSUInteger)inIndex
 {
 	IMBLightroomObject* object = [[[IMBLightroomObject alloc] init] autorelease];
-	
+	NSString* absolutePyramidPath = [self.dataPath stringByAppendingPathComponent:inPyramidPath];
+
+	object.absolutePyramidPath = absolutePyramidPath;
 	object.location = (id)inPath;
 	object.name = inName;
 	object.preliminaryMetadata = inMetadata;	// This metadata was in the XML file and is available immediately
@@ -1081,8 +1092,6 @@ static NSArray* sSupportedUTIs = nil;
 			}
 			
 			[NSMakeCollectable(imageRepresentation) autorelease];
-			
-			lightroomObject.absolutePyramidPath = absolutePyramidPath;
 		}
 		
 		if (imageRepresentation) {
@@ -1127,39 +1136,6 @@ static NSArray* sSupportedUTIs = nil;
 	else {
 		[super loadThumbnailForObject:inObject];
 	}
-}
-
-- (NSString*) absolutePyramidPathForObject:(IMBLightroomObject*)inObject
-{
-	NSString* absolutePyramidPath = nil;
-	FMDatabase *database = [self thumbnailDatabase];
-	
-	if (database != nil) {
-		NSDictionary* metadata = [inObject preliminaryMetadata];
-		NSNumber* idLocal = [metadata objectForKey:@"idLocal"];
-		
-		@synchronized (database) {
-			NSString* query =	@" SELECT apcp.relativeDataPath pyramidPath"
-								@" FROM Adobe_images ai"
-								@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
-								@" WHERE ai.id_local = ?"
-								@" LIMIT 1";
-			
-			FMResultSet* results = [self.database executeQuery:query, idLocal];
-			
-			if ([results next]) {
-				NSString* pyramidPath = [results stringForColumn:@"pyramidPath"];
-				
-				if (pyramidPath != nil) {
-					absolutePyramidPath = [self.dataPath stringByAppendingPathComponent:pyramidPath];
-				}
-			}
-			
-			[results close];
-		}
-	}
-	
-	return absolutePyramidPath;
 }
 
 
