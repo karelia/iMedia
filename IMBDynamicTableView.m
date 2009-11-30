@@ -43,6 +43,10 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
  */
 
+
+// Author: Dan Wood
+
+
 #import "IMBDynamicTableView.h"
 #import "IMBCommon.h"
 

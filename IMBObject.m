@@ -44,6 +44,9 @@
  */
 
 
+// Author: Peter Baumgartner
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -359,8 +362,8 @@
 
 - (NSString*) description
 {
-	return [NSString stringWithFormat:@"IMBObject\n\tlocation = %@\n\tname = %@\n\tmetadata = %p", 
-	
+	return [NSString stringWithFormat:@"%@\n\tlocation = %@\n\tname = %@\n\tmetadata = %p", 
+		NSStringFromClass([self class]),
 		self.location, 
 		self.name, 
 		self.metadata];

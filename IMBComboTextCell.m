@@ -43,10 +43,8 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
  */
 
-/*
- File: IMBComboTextCell.m
- 
- */
+
+// Author: Dan Wood, Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------

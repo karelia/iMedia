@@ -44,6 +44,9 @@
 */
 
 
+// Author: Unknown
+
+
 #import "iMBOmniWebParser.h"
 #import "IMBNode.h"
 #import "IMBParserController.h"

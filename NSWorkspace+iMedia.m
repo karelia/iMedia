@@ -43,7 +43,9 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-//  This file was authored by Jason Jobe.
+
+// Author: Jason Jobe
+
 
 #import "NSWorkspace+iMedia.h"
 

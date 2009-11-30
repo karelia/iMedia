@@ -1,3 +1,6 @@
+// Author: Boinx Software
+
+
 #import "IMBQuickLookController.h"
 #import "QLPreviewPanel.h"
 

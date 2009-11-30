@@ -43,8 +43,8 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-//  Created by Thomas Engelmeier on 25.07.09.
-//  Copyright 2009 Thomas Engelmeier. All rights reserved.
+
+// Author: Thomas Engelmeier
 
 // Known bugs: 
 // When the first camera is attached, the device node gets added twice
