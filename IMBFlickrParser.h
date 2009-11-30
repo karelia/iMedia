@@ -43,8 +43,8 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-//  Created by Christoph Priebe on 2009-08-24.
-//  Copyright 2009 Christoph Priebe. All rights reserved.
+
+// Author: Christoph Priebe
 
 
 //----------------------------------------------------------------------------------------------------------------------

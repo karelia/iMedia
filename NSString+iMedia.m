@@ -48,6 +48,10 @@
  PLEASE BE SURE TO "SYNC" THEM UP IF ANY FIXES ARE MADE HERE.
  */
 
+
+// Author: Unknown
+
+
 #import "NSString+iMedia.h"
 #include <openssl/bio.h>
 #include <openssl/evp.h>

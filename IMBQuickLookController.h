@@ -1,3 +1,6 @@
+// Author: Boinx Software
+
+
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 

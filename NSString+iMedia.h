@@ -43,6 +43,10 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+
+// Author: Unknown
+
+
 #import <Cocoa/Cocoa.h>
 
 @interface NSObject ( NSString_UTI )

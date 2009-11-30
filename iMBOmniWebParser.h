@@ -44,6 +44,9 @@
 */
 
 
+// Author: Unknown
+
+
 #import <Cocoa/Cocoa.h>
 #import "IMBParser.h"
 

@@ -31,6 +31,10 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+// Author: Unknown
+
+
 #import "NSData+SKExtensions.h"
 
 @implementation NSData (SKExtensions)

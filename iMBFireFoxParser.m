@@ -44,6 +44,9 @@
 */
 
 
+// Author: Unknown
+
+
 #import "iMBFireFoxParser.h"
 #import <WebKit/WebKit.h>
 #import "IMBNode.h"
