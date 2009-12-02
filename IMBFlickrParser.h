@@ -53,9 +53,6 @@
 //	System
 #import <Cocoa/Cocoa.h>
 
-//	Objective Flickr
-#import <ObjectiveFlickr/ObjectiveFlickr.h>
-
 //	iMedia
 #import "IMBNode.h"
 #import "IMBParser.h"
@@ -82,7 +79,7 @@
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBFlickrParser: IMBParser <OFFlickrAPIRequestDelegate> {
+@interface IMBFlickrParser: IMBParser {
 	@private
 	NSMutableArray* _customQueries;
 	id _delegate;
@@ -93,6 +90,8 @@
 }
 
 #pragma mark Actions
+
+- (IBAction) loadMoreImages: (id) sender;
 
 - (IBAction) openFlickrPage: (id) sender;
 

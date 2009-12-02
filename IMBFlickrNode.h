@@ -100,11 +100,12 @@ typedef enum {
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBFlickrNode: IMBNode {
+@interface IMBFlickrNode: IMBNode <OFFlickrAPIRequestDelegate> {
 	@private
 	BOOL _customNode;
 	IMBFlickrNodeLicense _license;
 	IMBFlickrNodeMethod _method;
+	NSInteger _page;
 	NSString* _query;
 	IMBFlickrNodeSortOrder _sortOrder;
 }
@@ -128,12 +129,11 @@ typedef enum {
 #pragma mark Flickr Handling
 
 - (void) clearResponse;
-- (NSDictionary*) flickrResponse;
-- (BOOL) hasFlickrRequest;
-- (BOOL) hasFlickrResponse;
-- (void) setFlickrMethod: (NSString*) method arguments: (NSDictionary*) arguments;
-- (void) setFlickrResponse: (NSDictionary*) response;
-- (void) startFlickrRequestWithContext: (OFFlickrAPIContext*) context delegate: (id) delegate;
+- (BOOL) hasRequest;
+- (BOOL) hasResponse;
+- (void) processResponse;
+- (void) startLoadRequestWithContext: (OFFlickrAPIContext*) context;
+- (void) startLoadMoreRequestWithContext: (OFFlickrAPIContext*) context;
 
 	
 #pragma mark Properties
@@ -141,6 +141,7 @@ typedef enum {
 @property (assign, getter=isCustomNode) BOOL customNode;
 @property (assign) IMBFlickrNodeLicense license;
 @property (assign) IMBFlickrNodeMethod method;
+@property (assign) NSInteger page;
 @property (copy) NSString* query;
 @property (assign) IMBFlickrNodeSortOrder sortOrder;
 
