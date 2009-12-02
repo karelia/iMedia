@@ -54,7 +54,6 @@
 #import "IMBFlickrParser.h"
 #import "IMBObject.h"
 #import "IMBLibraryController.h"
-#import "IMBLoadMoreObject.h"
 #import "NSString+iMedia.h"
 
 
