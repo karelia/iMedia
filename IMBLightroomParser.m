@@ -1369,7 +1369,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
 																	  @"IMBObjectViewController.menuItem.openInApp.Lightroom",
 																	  nil,IMBBundle(),
-																	  @"Open Master in %@",
+																	  @"Open Master Image in %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
 			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig editorAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
@@ -1380,7 +1380,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
 																	  @"IMBObjectViewController.menuItem.openInApp.Lightroom",
 																	  nil,IMBBundle(),
-																	  @"Open Master in %@",
+																	  @"Open Master Image in %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
 			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig viewerAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
@@ -1391,7 +1391,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* title = NSLocalizedStringWithDefaultValue(
 																@"IMBObjectViewController.menuItem.openWithFinder.Lightroom",
 																nil,IMBBundle(),
-																@"Open Master with Finder",
+																@"Open Master Image with Finder",
 																@"Menu item in context menu of IMBObjectViewController");
 			
 			[menuItem setTitle:title];
@@ -1400,7 +1400,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* title = NSLocalizedStringWithDefaultValue(
 																@"IMBObjectViewController.menuItem.revealInFinder.Lightroom",
 																nil,IMBBundle(),
-																@"Reveal Master in Finder",
+																@"Reveal Master Image in Finder",
 																@"Menu item in context menu of IMBObjectViewController");
 			
 			[menuItem setTitle:title];
