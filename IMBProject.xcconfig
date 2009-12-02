@@ -1,0 +1,20 @@
+// To override the build settings supplied in these build config files, copy the xcconfig files to a location 
+// outside the working copy and modify the settings to your liking. Then add the following source tree to your
+// Xcode prefs:
+//
+//		iMediaConfig		iMediaConfig		/path/to/modified/xcconfig/files
+//
+// You may have to relaunch XCode and clean you project to build with the new settings. Please verify that Xcode
+// is now referencing your own set of xcconfig files.
+
+
+ARCHS = $(ARCHS_STANDARD_32_64_BIT)
+SDKROOT = macosx10.6
+MACOSX_DEPLOYMENT_TARGET = 10.5
+PREBINDING = NO
+
+GCC_VERSION = 4.2
+GCC_ENABLE_OBJC_GC = unsupported
+GCC_C_LANGUAGE_STANDARD = c99
+GCC_WARN_ABOUT_RETURN_TYPE = YES
+GCC_WARN_UNUSED_VARIABLE = YES
