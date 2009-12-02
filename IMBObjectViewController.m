@@ -169,9 +169,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
 
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-@synthesize previewPanel = _previewPanel;
-#endif
+//#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+//@synthesize previewPanel = _previewPanel;
+//#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -281,6 +281,17 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) dealloc
 {
+	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
+		if (panel.delegate == (id)self) panel.delegate = nil;
+		if (panel.dataSource == (id)self) panel.dataSource = nil;
+	}
+	
+	#endif
+	
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
@@ -291,9 +302,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
 	
-	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-	IMBRelease(_previewPanel);
-	#endif
+//	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+//	IMBRelease(_previewPanel);
+//	#endif
 
 	
 	for (IMBObject* object in _observedVisibleItems)
@@ -561,9 +572,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	NSSize size = [ibIconView cellSize];
 	IMBParser* parser = self.currentNode.parser;
 	
-	if ([parser respondsToSelector:@selector(objectViewDidChangeIconSize:)])
+	if ([parser respondsToSelector:@selector(didChangeIconSize:objectView:)])
 	{
-		[parser objectViewDidChangeIconSize:size];
+		[parser didChangeIconSize:size objectView:ibIconView];
 	}
 
 	// Update the views. The row height of the combo view needs to be adjusted accordingly...
@@ -1181,11 +1192,17 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 - (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
 {
 	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
-		[[QLPreviewPanel sharedPreviewPanel] reloadData];
-		[[QLPreviewPanel sharedPreviewPanel] refreshCurrentPreviewItem];
+		QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
+		if (panel.dataSource == (id)self)
+		{
+			[panel reloadData];
+			[panel refreshCurrentPreviewItem];
+		}
 	}
+	
 	#endif
 }
 
@@ -1626,9 +1643,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
-		if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+ 		if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
 		{
-			[[QLPreviewPanel sharedPreviewPanel] orderOut:nil];
+			[[QLPreviewPanel sharedPreviewPanel] close]; //]orderOut:nil];
 		} 
 		else
 		{
@@ -1669,32 +1686,56 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (BOOL) previewPanel:(QLPreviewPanel*)inPanel handleEvent:(NSEvent *)inEvent
 {
-	NSString* characters = [inEvent charactersIgnoringModifiers];
-	unichar character = ([characters length] > 0) ? [characters characterAtIndex:0] : 0;
 	NSView* view = nil;
-	
-	switch (character)
-	{
-		case NSLeftArrowFunctionKey:
-		case NSRightArrowFunctionKey:
-		case NSUpArrowFunctionKey:
-		case NSDownArrowFunctionKey:
-		
-			if (_viewType == kIMBObjectViewTypeIcon)
-				view = ibIconView;
-			else if (_viewType == kIMBObjectViewTypeList)
-				view = ibListView;
-			else if (_viewType == kIMBObjectViewTypeCombo)
-				view = ibComboView;
+	if (_viewType == kIMBObjectViewTypeIcon)
+		view = ibIconView;
+	else if (_viewType == kIMBObjectViewTypeList)
+		view = ibListView;
+	else if (_viewType == kIMBObjectViewTypeCombo)
+		view = ibComboView;
 
-			if (view)
-			{
-				[view keyDown:inEvent];
-				return YES;
-			}	
+	if ([inEvent type] == NSKeyDown)
+	{
+		[view keyDown:inEvent];
+		return YES;
+	}
+	else if ([inEvent type] == NSKeyUp)
+	{
+		[view keyUp:inEvent];
+		return YES;
 	}
 	
 	return NO;
+	
+
+
+
+//	NSString* characters = [inEvent charactersIgnoringModifiers];
+//	unichar character = ([characters length] > 0) ? [characters characterAtIndex:0] : 0;
+//	NSView* view = nil;
+//	
+//	switch (character)
+//	{
+//		case NSLeftArrowFunctionKey:
+//		case NSRightArrowFunctionKey:
+//		case NSUpArrowFunctionKey:
+//		case NSDownArrowFunctionKey:
+//		
+//			if (_viewType == kIMBObjectViewTypeIcon)
+//				view = ibIconView;
+//			else if (_viewType == kIMBObjectViewTypeList)
+//				view = ibListView;
+//			else if (_viewType == kIMBObjectViewTypeCombo)
+//				view = ibComboView;
+//
+//			if (view)
+//			{
+//				[view keyDown:inEvent];
+//				return YES;
+//			}	
+//	}
+//	
+//	return NO;
 }
 
 #endif

@@ -109,13 +109,22 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark SnowLeopard NSPasteboard Declarations
+#pragma mark PROTOCOLS
 
-// We have to declare a fake prototype because the 10.6 runtime interrogates our compliance with the protocol,
+// We have to declare a fake prototypes because the 10.6 runtime interrogates our compliance with the protocol,
 // rather that interrogating the presence of the particular method we implement.
 
-#if !defined(MAC_OS_X_VERSION_10_6)
-@protocol NSPasteboardItemDataProvider <NSObject> @end
+#if ! IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+
+@protocol NSPasteboardItemDataProvider <NSObject> 
+@end
+
+@protocol QLPreviewPanelDelegate <NSObject> 
+@end
+
+@protocol QLPreviewPanelDataSource <NSObject> 
+@end
+
 #endif
 
 
@@ -124,12 +133,13 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 
 #pragma mark 
 
-@interface IMBObjectViewController : NSViewController 
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-<NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
-#else
-<NSPasteboardItemDataProvider>
-#endif
+
+@interface IMBObjectViewController : NSViewController <NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
+//#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+//<NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
+//#else
+//<NSPasteboardItemDataProvider>
+//#endif
 {
 	IMBLibraryController* _libraryController;
 	IMBNodeViewController* _nodeViewController;
@@ -141,9 +151,9 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
 	IBOutlet NSSegmentedControl *ibSegments;
-	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-	QLPreviewPanel* _previewPanel;
-	#endif
+//	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+//	QLPreviewPanel* _previewPanel;
+//	#endif
  	
 	NSUInteger _viewType;
 	double _iconSize;
@@ -176,9 +186,9 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @property (readonly) IKImageBrowserView* iconView;
 @property (readonly) NSTableView* listView;
 @property (readonly) NSTableView* comboView;
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-@property (retain) QLPreviewPanel* previewPanel;
-#endif
+//#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+//@property (retain) QLPreviewPanel* previewPanel;
+//#endif
 
 @property (assign) NSUInteger viewType;
 @property (assign) double iconSize;
