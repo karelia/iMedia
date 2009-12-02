@@ -66,8 +66,6 @@
 
 
 
-#define VERBOSE
-
 //----------------------------------------------------------------------------------------------------------------------
 
 @interface IMBFlickrParser ()
@@ -103,6 +101,27 @@
 #pragma mark
 #pragma mark Actions
 
+- (IBAction) editNode: (id) sender {
+	NSLog (@"edit node...");
+}
+
+
+- (IBAction) loadMoreImages: (id) sender {
+	if (![sender isKindOfClass:[NSMenuItem class]]) return;
+	
+	id obj = [sender representedObject];
+	if ([obj isKindOfClass:[NSString class]]) {
+		NSString* nodeIdentifier = obj;
+		IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
+		IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
+		
+		[node startLoadMoreRequestWithContext:_flickrContext];
+	} else {
+		NSLog (@"Can't handle this kind of node.");
+	}
+}
+
+
 - (IBAction) openFlickrPage: (id) sender {
 	if (![sender isKindOfClass:[NSMenuItem class]]) return;
 	
@@ -130,74 +149,6 @@
 	} else {
 		NSLog (@"Can't handle this kind of node.");
 	}
-}
-
-
-#pragma mark 
-#pragma mark Flickr Handling
-
-- (NSArray*) extractPhotosFromFlickrResponse: (NSDictionary*) response {
-	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
-	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
-	for (NSDictionary* photoDict in photos) {
-		NSURL* thumbnailURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
-		NSURL* imageURL = [_flickrContext photoSourceURLFromDictionary:photoDict size:OFFlickrLargeSize];
-		NSURL* webPageURL = [_flickrContext photoWebPageURLFromDictionary:photoDict];
-		
-		// We will need to get the URL of the original photo (or the largest possible)
-		// Or, perhaps, we may want to have a callback to the application for what size of photo it would like
-		// to receive.  (There's no point in getting larger size than the application will need.)
-		
-		IMBObject* obj = [[IMBObject alloc] init];
-		
-		obj.location = imageURL;
-		obj.name = [photoDict objectForKey:@"title"];
-		obj.metadata = [NSDictionary dictionaryWithObject:webPageURL forKey:@"webPageURL"];
-		obj.parser = self;
-		
-		obj.imageLocation = thumbnailURL;
-		obj.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
-		obj.imageRepresentation = nil;	// Build lazily when needed
-		
-		[objects addObject:obj];
-		[obj release];
-	}
-	return objects;
-}
-
-
-- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
-  didCompleteWithResponse: (NSDictionary*) inResponseDictionary {
-	
-	//	get the node we associated with the request in flickrRequestWithContext: ...
-	NSString* nodeIdentifier = inRequest.sessionInfo;
-	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
-	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
-	
-	#ifdef VERBOSE
-		NSLog (@"Flickr request completed for node: %@", nodeIdentifier);
-	#endif
-	
-	//	save Flickr response in our iMB node for later population of the browser...
-	NSDictionary* response = [inResponseDictionary copy];
-	[node setFlickrResponse:response];
-	[response release];
-	
-	//	force reloading of the node holding the Flickr images...
-	[libController reloadNode:node];	
-}
-
-
-- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
-		 didFailWithError: (NSError*) inError {
-	
-	NSLog (@"flickrAPIRequest:didFailWithError: %@", inError);	
-	//	TODO: Error Handling
-}
-
-
-- (void) startFlickrRequestForNode: (IMBFlickrNode*) node {
-	[node startFlickrRequestWithContext:_flickrContext delegate:self];
 }
 
 
@@ -251,7 +202,7 @@
 	
 	// If the old node was populated, then also populate the new node...
 	IMBFlickrNode* inOldFlickrNode = (IMBFlickrNode*) inOldNode;
-	if ([inOldFlickrNode hasFlickrRequest] || inOldFlickrNode.subNodes.count > 0 || inOldFlickrNode.objects.count > 0) {
+	if ([inOldFlickrNode hasRequest] || inOldFlickrNode.subNodes.count > 0 || inOldFlickrNode.objects.count > 0) {
 		[self populateNode:updatedNode options:inOptions error:&error];
 	}
 	
@@ -276,8 +227,8 @@
 		inFlickrNode.objects = [NSArray array];
 	} else {
 		//	populate nodes with Flickr contents...
-		if ([inFlickrNode hasFlickrResponse]) {
-			inFlickrNode.objects = [self extractPhotosFromFlickrResponse:[inFlickrNode flickrResponse]];
+		if ([inFlickrNode hasResponse]) {
+			[inFlickrNode processResponse];
 			[inFlickrNode clearResponse];
 		} else {
 			//	keep the 'populateNode:' loop quiet until we got our data...
@@ -287,7 +238,7 @@
 			}
 			
 			//	the network access needs to be started on the main thread...
-			[self performSelectorOnMainThread:@selector(startFlickrRequestForNode:) withObject:inFlickrNode waitUntilDone:NO];
+			[inFlickrNode startLoadRequestWithContext:_flickrContext];
 		}
 	}
 		
@@ -300,12 +251,41 @@
 	if (![inNode isKindOfClass:[IMBFlickrNode class]]) return;
 	
 	IMBFlickrNode* flickrNode = (IMBFlickrNode*) inNode;
-	if (!flickrNode.isCustomNode) return;
+	
+	//	'Load More'...
+	NSString* title = NSLocalizedString (@"Load More", @"Flickr parser node context menu title.");
+	title = [NSString stringWithFormat:title, flickrNode.name];
+	NSMenuItem* loadMoreItem = [[NSMenuItem alloc] initWithTitle:title
+														  action:@selector(loadMoreImages:) 
+												   keyEquivalent:@""];
+	[loadMoreItem setTarget:self];
+	[loadMoreItem setRepresentedObject:flickrNode.identifier];
+	[inMenu addItem:loadMoreItem];
+	[loadMoreItem release];
+
+	
+	//	you can edit the custom nodes only...
+	if (!flickrNode.isCustomNode) return;	
+	
+	[inMenu addItem:[NSMenuItem separatorItem]];
+
+	//	'Edit'...
+	title = NSLocalizedString (@"Edit '%@'", @"Flickr parser node context menu title.");
+	title = [NSString stringWithFormat:title, flickrNode.name];
+	NSMenuItem* editNodeItem = [[NSMenuItem alloc] initWithTitle:title
+														action:@selector(editNode:) 
+												 keyEquivalent:@""];
+	[editNodeItem setTarget:self];
+	[editNodeItem setRepresentedObject:flickrNode.identifier];
+	[inMenu addItem:editNodeItem];
+	[editNodeItem release];
 	
 	//	'Remove'...
-	NSMenuItem* removeNode = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Remove Custom Query", @"Flickr parser node context menu title.") 
-															 action:@selector(removeNode:) 
-													  keyEquivalent:@""];
+	title = NSLocalizedString (@"Remove '%@'", @"Flickr parser node context menu title.");
+	title = [NSString stringWithFormat:title, flickrNode.name];
+	NSMenuItem* removeNode = [[NSMenuItem alloc] initWithTitle:title
+														action:@selector(removeNode:) 
+												 keyEquivalent:@""];
 	[removeNode setTarget:self];
 	[removeNode setRepresentedObject:flickrNode.identifier];
 	[inMenu addItem:removeNode];

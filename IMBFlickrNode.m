@@ -52,13 +52,42 @@
 //	iMedia
 #import "IMBFlickrNode.h"
 #import "IMBFlickrParser.h"
+#import "IMBObject.h"
+#import "IMBLibraryController.h"
+#import "IMBLoadMoreObject.h"
+#import "NSString+iMedia.h"
 
 
+
+#define VERBOSE
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//	We need this category to make the Flickr request block on the current thread
+//	and don't use the current thread's run loop. As discussed with Lukhnos D. Liu.
+@interface OFFlickrAPIRequest (private)
+- (void) setShouldWaitUntilDone: (BOOL) wait;
+@end
+
+@implementation OFFlickrAPIRequest (private)
+
+- (void) setShouldWaitUntilDone: (BOOL) wait {
+	[HTTPRequest setShouldWaitUntilDone:wait];
+}
+
+@end
+
+#pragma mark -
 
 //----------------------------------------------------------------------------------------------------------------------
 
 @interface IMBFlickrNode ()
+//	Flickr Handling:
 - (OFFlickrAPIRequest*) flickrRequestWithContext: (OFFlickrAPIContext*) context;
+- (void) setFlickrMethod: (NSString*) method arguments: (NSDictionary*) arguments;
+//	Properties:
+- (NSDictionary*) flickrResponse;
+- (void) setFlickrResponse: (NSDictionary*) response;
 //	Utilities:
 - (NSDictionary*) argumentsForFlickrCall;
 + (NSImage*) coreTypeIconNamed: (NSString*) name;
@@ -99,6 +128,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	copy.license = self.license;
 	copy.method = self.method;
 	copy.query = self.query;
+	copy.page = self.page;
 	copy.sortOrder = self.sortOrder;
 	return copy;
 }
@@ -136,6 +166,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	node.mediaSource = node.identifier;
 	node.method = IMBFlickrNodeMethod_MostInteresting;
 	node.name = NSLocalizedString (@"Most Interesting", @"Flickr parser standard node name.");	
+	node.sortOrder = IMBFlickrNodeSortOrder_DatePostedDesc;
 	return node;
 }
 
@@ -149,6 +180,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	node.mediaSource = node.identifier;
 	node.method = IMBFlickrNodeMethod_Recent;	
 	node.name = NSLocalizedString (@"Recent", @"Flickr parser standard node name.");
+	node.sortOrder = IMBFlickrNodeSortOrder_DatePostedDesc;
 	return node;
 }
 
@@ -209,8 +241,44 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 
 
 - (void) dealloc {
+	OFFlickrAPIRequest* request = [self.attributes objectForKey:@"flickrRequest"];
+	[request cancel];
+	
 	IMBRelease (_query);
 	[super dealloc];
+}
+
+
+#pragma mark 
+#pragma mark Flickr Handling
+
+- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
+  didCompleteWithResponse: (NSDictionary*) inResponseDictionary {
+	
+	//	get the node we associated with the request in flickrRequestWithContext: ...
+	NSString* nodeIdentifier = inRequest.sessionInfo;
+	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.parser.mediaType];
+	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
+	
+	#ifdef VERBOSE
+		NSLog (@"Flickr request completed for node: %@", nodeIdentifier);
+	#endif
+	
+	//	save Flickr response in our iMB node for later population of the browser...
+	NSDictionary* response = [inResponseDictionary copy];
+	[node setFlickrResponse:response];
+	[response release];
+	
+	//	force reloading of the node holding the Flickr images...
+	[libController reloadNode:node];	
+}
+
+
+- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
+		 didFailWithError: (NSError*) inError {
+	
+	NSLog (@"flickrAPIRequest:didFailWithError: %@", inError);	
+	//	TODO: Error Handling
 }
 
 
@@ -222,12 +290,46 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 }
 
 
+- (NSArray*) extractPhotosFromFlickrResponse: (NSDictionary*) response {
+	OFFlickrAPIRequest* flickrRequest = [self.attributes objectForKey:@"flickrRequest"];
+
+	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
+	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
+	for (NSDictionary* photoDict in photos) {
+		NSURL* thumbnailURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
+		NSURL* imageURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrLargeSize];
+		NSURL* webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
+		
+		// We will need to get the URL of the original photo (or the largest possible)
+		// Or, perhaps, we may want to have a callback to the application for what size of photo it would like
+		// to receive.  (There's no point in getting larger size than the application will need.)
+		
+		IMBObject* obj = [[IMBObject alloc] init];
+		
+		obj.location = imageURL;
+		obj.name = [photoDict objectForKey:@"title"];
+		obj.metadata = [NSDictionary dictionaryWithObject:webPageURL forKey:@"webPageURL"];
+		obj.parser = self.parser;
+		
+		obj.imageLocation = thumbnailURL;
+		obj.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+		obj.imageRepresentation = nil;	// Build lazily when needed
+		
+		[objects addObject:obj];
+		[obj release];
+	}
+	return objects;
+}
+
+
 - (OFFlickrAPIRequest*) flickrRequestWithContext: (OFFlickrAPIContext*) context {
 	OFFlickrAPIRequest* request = [self.attributes objectForKey:@"flickrRequest"];
 	if (!request) {
 		//	create a Flickr request for the given iMB node...
 		request = [[OFFlickrAPIRequest alloc] initWithAPIContext:context];
 		[(NSMutableDictionary*)self.attributes setObject:request forKey:@"flickrRequest"];
+		request.requestTimeoutInterval = 60.0f;
+//		[request setShouldWaitUntilDone:YES];
 		[request release];
 		
 		//	we save the iMB node in the Flickr request for use in
@@ -243,13 +345,28 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 }
 
 
-- (BOOL) hasFlickrRequest {
+- (BOOL) hasRequest {
 	return [self.attributes objectForKey:@"flickrRequest"] != nil;
 }
 
 
-- (BOOL) hasFlickrResponse {
+- (BOOL) hasResponse {
 	return [self.attributes objectForKey:@"flickrResponse"] != nil;
+}
+
+
+- (void) processResponse {	
+	NSArray* oldImages = self.objects;
+	
+	//	are we handling a 'load more'...
+	if (self.page > 0 && oldImages.count > 0) {
+		NSMutableArray* newImages = [[self extractPhotosFromFlickrResponse:[self flickrResponse]] mutableCopy];
+		[newImages removeObjectsInArray:oldImages]; //	ensure that we have no doubles
+		self.objects = [oldImages arrayByAddingObjectsFromArray:newImages];
+		[newImages release];
+	} else {
+		self.objects = [self extractPhotosFromFlickrResponse:[self flickrResponse]];
+	}
 }
 
 
@@ -266,12 +383,10 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 }
 
 
-- (void) startFlickrRequestWithContext: (OFFlickrAPIContext*) context
-							  delegate: (id) delegate {
-	
+- (void) startFlickrRequestWithContext_onMainThread: (OFFlickrAPIContext*) context {
 	OFFlickrAPIRequest* request = [self flickrRequestWithContext:context];
 	if (![request isRunning]) {			
-		[request setDelegate:delegate];	
+		[request setDelegate:self];	
 
 		//	compose and start Flickr request...
 		NSString* method = [IMBFlickrNode flickrMethodForMethodCode:self.method];
@@ -285,12 +400,24 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 }
 
 
+- (void) startLoadRequestWithContext: (OFFlickrAPIContext*) context {
+	[self performSelectorOnMainThread:@selector(startFlickrRequestWithContext_onMainThread:) withObject:context waitUntilDone:NO];
+}
+
+
+- (void) startLoadMoreRequestWithContext: (OFFlickrAPIContext*) context {
+	self.page = self.page + 1;
+	[self performSelectorOnMainThread:@selector(startFlickrRequestWithContext_onMainThread:) withObject:context waitUntilDone:NO];
+}
+
+
 #pragma mark
 #pragma mark Properties
 
 @synthesize customNode = _customNode;
 @synthesize license = _license;
 @synthesize method = _method;
+@synthesize page = _page;
 @synthesize query = _query;
 @synthesize sortOrder = _sortOrder;
 
@@ -360,6 +487,10 @@ typedef enum {
 	
 	//	limit the search to a specific number of items...
 	[arguments setObject:@"30" forKey:@"per_page"];
+
+	//	load the specified page...
+	NSString* page = [NSString stringWithFormat:@"%d", self.page + 1];
+	[arguments setObject:page forKey:@"page"];
 	
 	return arguments;
 }
@@ -396,6 +527,12 @@ typedef enum {
 ///	and create something like:
 ///	  IMBFlickrParser://12345678-12345-12345-12345678
 + (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query {
+#if 0
+	//	EXPERIMENTAL...
+	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
+	return [NSString stringWithFormat:@"%@:/%@", parserClassName, [NSString uuid]];
+	//	...EXPERIMENTAL
+#else
 	NSString* flickrMethod = [self flickrMethodForMethodCode:method];
 	if (method == IMBFlickrNodeMethod_TagSearch) {
 		flickrMethod = [flickrMethod stringByAppendingString:@"/tag"];
@@ -409,6 +546,7 @@ typedef enum {
 	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", flickrMethod, query];
 	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
 	return [NSString stringWithFormat:@"%@:/%@", parserClassName, albumPath];
+#endif
 }
 
 @end
