@@ -290,8 +290,6 @@
 - (void) beginPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
 	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
-	
-    controller.previewPanel = inPanel;
     inPanel.delegate = controller;
     inPanel.dataSource = controller;
 }
@@ -299,8 +297,8 @@
 
 - (void) endPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
-	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
-    controller.previewPanel = nil;
+    inPanel.delegate = nil;
+    inPanel.dataSource = nil;
 }
 
 #endif

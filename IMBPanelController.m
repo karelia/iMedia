@@ -465,5 +465,67 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+#pragma mark QuickLook
+
+
+- (void) keyDown:(NSEvent*)inEvent
+{
+    NSString* key = [inEvent charactersIgnoringModifiers];
+	
+    if([key isEqual:@" "])
+	{
+		NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
+		IMBObjectViewController* controller = [self objectViewControllerForMediaType:mediaType];
+        [controller quicklook:self];
+    } 
+	else
+	{
+        [super keyDown:inEvent];
+		
+		#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+		QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
+		[panel updateController];
+		
+		if ([panel currentController] != nil)
+		{
+			[panel reloadData];
+		}
+		#endif
+
+
+    }
+}
+
+
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+
+- (BOOL) acceptsPreviewPanelControl:(QLPreviewPanel*)inPanel
+{
+	return YES;
+}
+
+
+- (void) beginPreviewPanelControl:(QLPreviewPanel*)inPanel
+{
+	NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
+	IMBObjectViewController* controller = [self objectViewControllerForMediaType:mediaType];
+    inPanel.delegate = controller;
+    inPanel.dataSource = controller;
+}
+
+
+- (void) endPreviewPanelControl:(QLPreviewPanel*)inPanel
+{
+    inPanel.delegate = nil;
+    inPanel.dataSource = nil;
+}
+
+#endif
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @end
 

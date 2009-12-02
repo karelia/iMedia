@@ -92,7 +92,7 @@
 
 - (void) dealloc
 {
-    [super dealloc];
+   [super dealloc];
 }
 
 
@@ -143,6 +143,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (void) keyDown:(NSEvent*)inEvent
+{
+    NSString* key = [inEvent charactersIgnoringModifiers];
+	
+    if([key isEqual:@" "])
+	{
+		IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+        [controller quicklook:self];
+    } 
+	else
+	{
+        [super keyDown:inEvent];
+    }
+}
+
+
 #if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (BOOL) acceptsPreviewPanelControl:(QLPreviewPanel*)inPanel
@@ -154,8 +170,6 @@
 - (void) beginPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
 	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
-	
-    controller.previewPanel = inPanel;
     inPanel.delegate = controller;
     inPanel.dataSource = controller;
 }
@@ -163,8 +177,8 @@
 
 - (void) endPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
-	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
-    controller.previewPanel = nil;
+    inPanel.delegate = nil;
+    inPanel.dataSource = nil;
 }
 
 #endif

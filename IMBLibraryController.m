@@ -563,11 +563,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	IMBNode* oldNode = [inOldAndNewNode objectForKey:@"oldNode"];
 	IMBNode* newNode = [inOldAndNewNode objectForKey:@"newNode"];
 
-//	if (oldNode == nil && newNode != nil)	// Workaround for special behavior of IMBImageCaptureParser, which replaces root 
-//	{					// nodes several times as devices get hotplugged...
-//		IMBNode* node = [self nodeWithIdentifier:newNode.identifier];
-//		if (node) oldNode = node;
-//	}
+	if (oldNode == nil && newNode != nil)	// Workaround for special behavior of IMBImageCaptureParser, which replaces root 
+	{					// nodes several times as devices get hotplugged...
+		IMBNode* node = [self nodeWithIdentifier:newNode.identifier];
+		if (node) oldNode = node;
+	}
 
 	if (oldNode!=nil && newNode!=nil && oldNode.parentNode!=oldNode.parentNode)
 	{
@@ -634,7 +634,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 	
-	// Hide empty group nodes that do not have any subnodes...
+	// Hide empty group nodes that do not have any subnodes We not using fast enumeration here because
+	// we may need to mutable the array. Iteration backwards avoids index adjustment problems as we 
+	// remove nodes...
 	
 	if (YES)
 	{
