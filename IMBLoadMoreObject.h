@@ -49,102 +49,25 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-//	Objective Flickr
-#import <ObjectiveFlickr/ObjectiveFlickr.h>
-
 //	iMedia
-#import <iMedia/IMBNode.h>
+#import <iMedia/IMBObject.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-
-@class IMBLoadMoreObject;
-@class IMBParser;
-
-extern NSString* const IMBFlickrNodeProperty_License;
-extern NSString* const IMBFlickrNodeProperty_Method;
-extern NSString* const IMBFlickrNodeProperty_Query;
-extern NSString* const IMBFlickrNodeProperty_SortOrder;
-extern NSString* const IMBFlickrNodeProperty_Title;
-
-typedef enum {
-	IMBFlickrNodeMethod_TextSearch = 0,
-	IMBFlickrNodeMethod_TagSearch,
-	IMBFlickrNodeMethod_Recent,
-	IMBFlickrNodeMethod_MostInteresting
-} IMBFlickrNodeMethod;
-
-typedef enum {
-	IMBFlickrNodeLicense_Undefined = 0,
-	IMBFlickrNodeLicense_CreativeCommons,
-	IMBFlickrNodeLicense_DerivativeWorks,
-	IMBFlickrNodeLicense_CommercialUse
-} IMBFlickrNodeLicense;
-
-typedef enum {
-	IMBFlickrNodeSortOrder_Undefined = 0,
-	IMBFlickrNodeSortOrder_DatePostedDesc,
-	IMBFlickrNodeSortOrder_DatePostedAsc,
-	IMBFlickrNodeSortOrder_DateTakenDesc,
-	IMBFlickrNodeSortOrder_DateTakenAsc,
-	IMBFlickrNodeSortOrder_InterestingnessDesc,
-	IMBFlickrNodeSortOrder_InterestingnessAsc,
-	IMBFlickrNodeSortOrder_Relevance
-} IMBFlickrNodeSortOrder;
-
 /**
- *	Flickr parser custom node.
+ *	.
  *
- *	@date 2009-09-21 Start implementing this class (cp).
+ *	@date 2009-11-30 Start implementing this class (cp).
  *
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBFlickrNode: IMBNode <OFFlickrAPIRequestDelegate> {
+@interface IMBLoadMoreObject: IMBObject {
 	@private
-	BOOL _customNode;
-	IMBFlickrNodeLicense _license;
-	IMBFlickrNodeMethod _method;
-	NSInteger _page;
-	NSString* _query;
-	IMBFlickrNodeSortOrder _sortOrder;
-	IMBLoadMoreObject* _loadMoreObject;
+	NSString* _nodeIdentifier;
 }
 
-#pragma mark Construction
-
-+ (IMBFlickrNode*) flickrNodeForInterestingPhotosForRoot: (IMBFlickrNode*) root
-												  parser: (IMBParser*) parser;
-
-+ (IMBFlickrNode*) flickrNodeForRecentPhotosForRoot: (IMBFlickrNode*) root
-											 parser: (IMBParser*) parser;
-
-+ (IMBFlickrNode*) flickrNodeForRoot: (IMBFlickrNode*) root
-							  parser: (IMBParser*) parser;
-
-+ (IMBFlickrNode*) flickrNodeFromDict: (NSDictionary*) dict 
-							 rootNode: (IMBFlickrNode*) root
-							   parser: (IMBParser*) parser;
-
-
-#pragma mark Flickr Handling
-
-- (void) clearResponse;
-- (BOOL) hasRequest;
-- (BOOL) hasResponse;
-- (void) processResponse;
-- (void) startLoadRequestWithContext: (OFFlickrAPIContext*) context;
-- (void) startLoadMoreRequestWithContext: (OFFlickrAPIContext*) context;
-
-	
-#pragma mark Properties
-
-@property (assign, getter=isCustomNode) BOOL customNode;
-@property (assign) IMBFlickrNodeLicense license;
-@property (assign) IMBFlickrNodeMethod method;
-@property (assign) NSInteger page;
-@property (copy) NSString* query;
-@property (assign) IMBFlickrNodeSortOrder sortOrder;
+@property (assign) NSString* nodeIdentifier;
 
 @end

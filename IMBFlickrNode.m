@@ -54,6 +54,7 @@
 #import "IMBFlickrParser.h"
 #import "IMBObject.h"
 #import "IMBLibraryController.h"
+#import "IMBLoadMoreObject.h"
 #import "NSString+iMedia.h"
 
 
@@ -116,6 +117,8 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 		self.license = IMBFlickrNodeLicense_CreativeCommons;
 		self.method = IMBFlickrNodeMethod_TextSearch;
 		self.sortOrder = IMBFlickrNodeSortOrder_InterestingnessDesc;
+		
+		_loadMoreObject = [[IMBLoadMoreObject alloc] init];
 	}
 	return self;
 }
@@ -243,6 +246,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	OFFlickrAPIRequest* request = [self.attributes objectForKey:@"flickrRequest"];
 	[request cancel];
 	
+	IMBRelease (_loadMoreObject);
 	IMBRelease (_query);
 	[super dealloc];
 }
@@ -355,17 +359,33 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 
 
 - (void) processResponse {	
-	NSArray* oldImages = self.objects;
-	
-	//	are we handling a 'load more'...
-	if (self.page > 0 && oldImages.count > 0) {
-		NSMutableArray* newImages = [[self extractPhotosFromFlickrResponse:[self flickrResponse]] mutableCopy];
-		[newImages removeObjectsInArray:oldImages]; //	ensure that we have no doubles
-		self.objects = [oldImages arrayByAddingObjectsFromArray:newImages];
-		[newImages release];
-	} else {
-		self.objects = [self extractPhotosFromFlickrResponse:[self flickrResponse]];
+	//	TODO: Instead of inserting the "load more" object at the end of the
+	//	array, we should probably associate a sort descriptor with the image view.
+	NSMutableArray* oldImages = [self.objects mutableCopy];
+	IMBLoadMoreObject* loadMoreObject = nil;
+	for (id object in oldImages) {
+		if ([object isKindOfClass:[IMBLoadMoreObject class]]) {
+			loadMoreObject = object;
+			break;
+		}
 	}
+	if (loadMoreObject) {		
+		[oldImages removeObject:loadMoreObject];
+	}
+	
+	NSMutableArray* newImages = [[self extractPhotosFromFlickrResponse:[self flickrResponse]] mutableCopy];
+	[newImages removeObjectsInArray:oldImages]; //	ensure that we have no doubles
+	
+	[newImages insertObjects:oldImages atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, oldImages.count)]];
+	
+	_loadMoreObject.parser = self.parser;
+	_loadMoreObject.nodeIdentifier = self.identifier;
+	[newImages addObject:_loadMoreObject];
+
+	self.objects = newImages;
+	
+	[newImages release];
+	[oldImages release];
 }
 
 

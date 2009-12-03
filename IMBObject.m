@@ -204,6 +204,13 @@
 	return [[_imageRepresentation retain] autorelease];
 }
 
+
+- (BOOL) isSelectable 
+{
+	return YES;
+}
+
+
 - (BOOL) needsImageRepresentation
 {
 	return _needsImageRepresentation || (_imageRepresentation == nil);

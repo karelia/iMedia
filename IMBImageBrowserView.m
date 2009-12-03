@@ -54,8 +54,10 @@
 
 #import "IMBImageBrowserView.h"
 #import "IMBImageBrowserCell.h"
+#import "IMBObject.h"
 #import "IMBObjectViewController.h"
 #import "IMBObjectFifoCache.h"
+#import "IMBParser.h"
 #import "IMBQuickLookController.h"
 
 
@@ -215,6 +217,22 @@
 	NSPoint clickPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];
 	_dragSelectInProgress = (indexOfItemUnderClick == NSNotFound);
+
+	if (indexOfItemUnderClick != NSNotFound &&
+		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
+	{
+		IMBObject* object = [self.dataSource imageBrowser:self itemAtIndex:indexOfItemUnderClick];
+		if (object && !object.isSelectable)
+		{
+			IMBParser* parser = object.parser;	
+			if ([parser respondsToSelector:@selector(didClickObject:objectView:)])
+			{
+				[parser didClickObject:object objectView:self];
+			}
+			return;
+		}
+	}
+
 	[super mouseDown: theEvent];
 }
 
@@ -253,6 +271,30 @@
 						 slideBack:YES
 							 event:theEvent];
 }
+
+#else
+
+- (void)mouseDown:(NSEvent *)theEvent {
+	NSPoint clickPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];	
+	if (indexOfItemUnderClick != NSNotFound &&
+		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
+	{
+		IMBObject* object = [self.dataSource imageBrowser:self itemAtIndex:indexOfItemUnderClick];
+		if (object && !object.isSelectable)
+		{
+			IMBParser* parser = object.parser;	
+			if ([parser respondsToSelector:@selector(didClickObject:objectView:)])
+			{
+				[parser didClickObject:object objectView:self];
+			}
+			return;
+		}
+	}
+	
+	[super mouseDown:theEvent];
+}
+
 #endif
 
 

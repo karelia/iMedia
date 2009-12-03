@@ -59,6 +59,7 @@
 #import "IMBFlickrQueryEditor.h"
 #import "IMBIconCache.h"
 #import "IMBLibraryController.h"
+#import "IMBLoadMoreObject.h"
 #import "IMBObject.h"
 #import "IMBObjectPromise.h"
 #import "IMBParserController.h"
@@ -107,11 +108,20 @@
 
 
 - (IBAction) loadMoreImages: (id) sender {
-	if (![sender isKindOfClass:[NSMenuItem class]]) return;
 	
-	id obj = [sender representedObject];
-	if ([obj isKindOfClass:[NSString class]]) {
-		NSString* nodeIdentifier = obj;
+	NSString* nodeIdentifier = nil;
+	if ([sender isKindOfClass:[IMBLoadMoreObject class]]) {
+		nodeIdentifier = [sender nodeIdentifier];
+	}
+
+	if (!nodeIdentifier && [sender isKindOfClass:[NSMenuItem class]]) {
+		id obj = [sender representedObject];
+		if ([obj isKindOfClass:[NSString class]]) {
+			nodeIdentifier = obj;		
+		}
+	}
+	
+	if (nodeIdentifier) {
 		IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
 		IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
 		
@@ -187,6 +197,13 @@
 	rootNode.customObjectView = self.editor.view;
 	
 	return rootNode;
+}
+
+
+- (void) didClickObject: (IMBObject*) inObject objectView: (NSView*) inView {
+	if ([inObject isKindOfClass:[IMBLoadMoreObject class]]) {
+		[self loadMoreImages:inObject];		
+	}
 }
 
 
