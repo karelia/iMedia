@@ -44,89 +44,49 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Christoph Priebe
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+//	iMedia
+#import "IMBCommon.h"
+#import "IMBLoadMoreObject.h"
 
-#pragma mark HEADERS
-
-#import <Quartz/Quartz.h>
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark CLASSES
-
-@class IMBParser;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+@implementation IMBLoadMoreObject
 
-// IMBObject encapsulates information about a single media item (e.g. image file or audio file). The location 
-// property uniquely identifies the item. In the case of files it could be a path or NSURL...
+- (id) init {
+	if (self = [super init]) {
+		self.name = NSLocalizedString (@"Load More", @"'Load More' button title.");
 
-@interface IMBObject : NSObject
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-<NSCopying,NSCoding,QLPreviewItem>
-#else
-<NSCopying,NSCoding>
-#endif
-{
-	id _location;												
-	NSString* _name;
-	NSDictionary* _metadata;
-	NSString* _metadataDescription;
-	IMBParser* _parser;
-	NSUInteger _index;
-	
-	id _imageRepresentation;								
-	NSString* _imageRepresentationType;		
-	BOOL _needsImageRepresentation;
-	NSUInteger _imageVersion;
-	id _imageLocation;
-    BOOL _isLoading;
-    BOOL _shouldDrawAdornments;
+		NSString* path = [IMBBundle() pathForResource:@"Flickr.png" ofType:nil];
+		NSURL* url = [NSURL fileURLWithPath:path];
+		self.imageLocation = url;
+		self.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+		self.imageRepresentation = [[NSImage alloc] initWithContentsOfFile:path];
+	}	
+	return self;
 }
 
-// Primary properties...
 
-@property (retain) id location;								// Path, URL, or other location info
-@property (retain) NSString* name;							// Display name for user interface
-@property (readonly) NSImage* icon;							// Small icon to be displayed in list view
-@property (retain) NSDictionary* metadata;					// Optional metadata
-@property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)
-@property (retain) IMBParser* parser;						// Parser that created this object
-@property (assign) NSUInteger index;						// Index of object in the array (optional)
-@property (assign) BOOL shouldDrawAdornments;				// YES if border/shadow should be drawn
+- (void) dealloc {
+	IMBRelease (_nodeIdentifier);
+	[super dealloc];
+}
 
-// Helpers...
 
-- (BOOL) isEqual:(IMBObject*)inObject;						// Considered equal if location is equal
-- (NSString*) path;											// Convert location to path
-- (NSURL*) url;												// Convert location to url
+#pragma mark
+#pragma mark Proeprties
 
-// Derived Properties. See IKImageBrowserItem for documentation...
+@synthesize nodeIdentifier = _nodeIdentifier;
 
-@property (retain) id imageLocation;						// Optional url or path if different from location (e.g. lores thumbnail)
-@property (readonly) NSString* imageUID;
-@property (retain) id imageRepresentation;	
-@property (readonly) BOOL isSelectable;
-@property (assign) BOOL needsImageRepresentation;
-@property (retain) NSString* imageRepresentationType;
-@property (readonly) NSString* imageTitle;
-@property (assign) NSUInteger imageVersion;
 
-// Asynchronous loading of thumbnails...
-																	
-- (void) load;	
-- (void) unload;	
-@property (assign) BOOL isLoading;
+- (BOOL) isSelectable {
+	return NO;
+}
 
 @end
-
-
-//----------------------------------------------------------------------------------------------------------------------
