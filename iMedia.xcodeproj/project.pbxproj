@@ -377,7 +377,7 @@
 		D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageCaptureParser.m; sourceTree = "<group>"; };
 		D05A94A4102EB14A005DF9CE /* ICADevices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICADevices.framework; path = System/Library/Frameworks/ICADevices.framework; sourceTree = SDKROOT; };
 		D062B0F71047B75100CA9B56 /* IMBFlickrParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrParser.m; sourceTree = "<group>"; };
-		D0760AC210C5027100F2119C /* IMBProject.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBProject.xcconfig; sourceTree = iMediaConfig; };
+		D0760AC210C5027100F2119C /* IMBProject.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBProject.xcconfig; sourceTree = SOURCE_ROOT; };
 		D08070BD10442CD700891137 /* IMBMovieViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieViewController.h; sourceTree = "<group>"; };
 		D08070BE10442CD700891137 /* IMBMovieViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieViewController.m; sourceTree = "<group>"; };
 		D08070C110442CE100891137 /* IMBAudioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAudioViewController.h; sourceTree = "<group>"; };
@@ -529,9 +529,9 @@
 		D0CA961410498F7C00725DA3 /* IMBTimecodeTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTimecodeTransformer.m; sourceTree = "<group>"; };
 		D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoParser.h; sourceTree = "<group>"; };
 		D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoParser.m; sourceTree = "<group>"; };
-		D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBTargetDebug.xcconfig; sourceTree = iMediaConfig; };
-		D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBTargetRelease.xcconfig; sourceTree = iMediaConfig; };
-		D0CF005510C50908009EC68F /* IMBTargetTest.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBTargetTest.xcconfig; sourceTree = iMediaConfig; };
+		D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBTargetDebug.xcconfig; sourceTree = SOURCE_ROOT; };
+		D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBTargetRelease.xcconfig; sourceTree = SOURCE_ROOT; };
+		D0CF005510C50908009EC68F /* IMBTargetTest.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBTargetTest.xcconfig; sourceTree = SOURCE_ROOT; };
 		D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroomParser.h; sourceTree = "<group>"; };
 		D0D635E91035B4C500FF8631 /* IMBLightroomParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroomParser.m; sourceTree = "<group>"; };
 		D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBApertureParser.h; sourceTree = "<group>"; };
