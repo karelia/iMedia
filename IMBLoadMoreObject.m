@@ -63,11 +63,14 @@
 	if (self = [super init]) {
 		self.name = NSLocalizedString (@"Load More", @"'Load More' button title.");
 
-		NSString* path = [IMBBundle() pathForResource:@"Flickr.png" ofType:nil];
+		NSString* path = [IMBBundle() pathForResource:@"load-more-normal.pdf" ofType:nil];
 		NSURL* url = [NSURL fileURLWithPath:path];
+		NSImage* image = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+		
+		self.shouldDrawAdornments = NO;
 		self.imageLocation = url;
 		self.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-		self.imageRepresentation = [[NSImage alloc] initWithContentsOfFile:path];
+		self.imageRepresentation = image;
 	}	
 	return self;
 }

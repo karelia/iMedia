@@ -42,6 +42,8 @@
 		D010388C107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D010388A107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.m */; };
 		D01038E41071E111007C88D7 /* IMBObjectFifoCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D01038E21071E111007C88D7 /* IMBObjectFifoCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D01038E51071E111007C88D7 /* IMBObjectFifoCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D01038E31071E111007C88D7 /* IMBObjectFifoCache.m */; };
+		D023460610CA5E2C00E14112 /* load-more-normal.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D023460410CA5E2C00E14112 /* load-more-normal.pdf */; };
+		D023460710CA5E2C00E14112 /* load-more-pressed.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D023460510CA5E2C00E14112 /* load-more-pressed.pdf */; };
 		D02D175A1081CF3B00142E8A /* IMBGarageBandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D02D175B1081CF3B00142E8A /* IMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */; };
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
@@ -343,6 +345,8 @@
 		D010388A107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectThumbnailLoadOperation.m; sourceTree = "<group>"; };
 		D01038E21071E111007C88D7 /* IMBObjectFifoCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectFifoCache.h; sourceTree = "<group>"; };
 		D01038E31071E111007C88D7 /* IMBObjectFifoCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectFifoCache.m; sourceTree = "<group>"; };
+		D023460410CA5E2C00E14112 /* load-more-normal.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "load-more-normal.pdf"; sourceTree = "<group>"; };
+		D023460510CA5E2C00E14112 /* load-more-pressed.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "load-more-pressed.pdf"; sourceTree = "<group>"; };
 		D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBGarageBandParser.h; sourceTree = "<group>"; };
 		D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBGarageBandParser.m; sourceTree = "<group>"; };
 		D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = IMBComboViewTemplate.pdf; sourceTree = "<group>"; };
@@ -777,6 +781,8 @@
 				D032CE43109B301100D84782 /* IMBFlickrNode.m */,
 				FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */,
 				FCD9ABB310C677FF0092F441 /* IMBLoadMoreObject.m */,
+				D023460410CA5E2C00E14112 /* load-more-normal.pdf */,
+				D023460510CA5E2C00E14112 /* load-more-pressed.pdf */,
 				D032CE40109B2F2200D84782 /* Flickr.png */,
 			);
 			name = Flickr;
@@ -1296,6 +1302,8 @@
 				D0CF005610C50908009EC68F /* IMBTargetDebug.xcconfig in Resources */,
 				D0CF005710C50908009EC68F /* IMBTargetRelease.xcconfig in Resources */,
 				D0CF005810C50908009EC68F /* IMBTargetTest.xcconfig in Resources */,
+				D023460610CA5E2C00E14112 /* load-more-normal.pdf in Resources */,
+				D023460710CA5E2C00E14112 /* load-more-pressed.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
