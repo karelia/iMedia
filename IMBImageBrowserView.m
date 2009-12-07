@@ -218,20 +218,20 @@
 	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];
 	_dragSelectInProgress = (indexOfItemUnderClick == NSNotFound);
 
-	if (indexOfItemUnderClick != NSNotFound &&
-		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
-	{
-		IMBObject* object = [self.dataSource imageBrowser:self itemAtIndex:indexOfItemUnderClick];
-		if (object && !object.isSelectable)
-		{
-			IMBParser* parser = object.parser;	
-			if ([parser respondsToSelector:@selector(didClickObject:objectView:)])
-			{
-				[parser didClickObject:object objectView:self];
-			}
-			return;
-		}
-	}
+//	if (indexOfItemUnderClick != NSNotFound &&
+//		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
+//	{
+//		IMBObject* object = [self.dataSource imageBrowser:self itemAtIndex:indexOfItemUnderClick];
+//		if (object && !object.isSelectable)
+//		{
+//			IMBParser* parser = object.parser;	
+//			if ([parser respondsToSelector:@selector(didClickObject:objectView:)])
+//			{
+//				[parser didClickObject:object objectView:self];
+//			}
+//			return;
+//		}
+//	}
 
 	[super mouseDown: theEvent];
 }
@@ -275,22 +275,22 @@
 #else
 
 - (void)mouseDown:(NSEvent *)theEvent {
-	NSPoint clickPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];	
-	if (indexOfItemUnderClick != NSNotFound &&
-		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
-	{
-		IMBObject* object = [self.dataSource imageBrowser:self itemAtIndex:indexOfItemUnderClick];
-		if (object && !object.isSelectable)
-		{
-			IMBParser* parser = object.parser;	
-			if ([parser respondsToSelector:@selector(didClickObject:objectView:)])
-			{
-				[parser didClickObject:object objectView:self];
-			}
-			return;
-		}
-	}
+//	NSPoint clickPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+//	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];	
+//	if (indexOfItemUnderClick != NSNotFound &&
+//		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
+//	{
+//		IMBObject* object = [self.dataSource imageBrowser:self itemAtIndex:indexOfItemUnderClick];
+//		if (object && !object.isSelectable)
+//		{
+//			IMBParser* parser = object.parser;	
+//			if ([parser respondsToSelector:@selector(didClickObject:objectView:)])
+//			{
+//				[parser didClickObject:object objectView:self];
+//			}
+//			return;
+//		}
+//	}
 	
 	[super mouseDown:theEvent];
 }

@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2009 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -41,7 +41,7 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
- */
+*/
 
 
 // Author: Peter Baumgartner
@@ -52,55 +52,48 @@
 
 #pragma mark HEADERS
 
-#import "IMBNodeObject.h"
-#import "IMBNode.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-@implementation IMBNodeObject
-
-
-//----------------------------------------------------------------------------------------------------------------------
+// This subclass is used to represent clickable buttons in the object views. This button is not selectable, draggable,
+// and it cannot be used to open a media object - as is does not represent a media object (image, audio or movie file).
+// Instead it can be used to trigger an action... 
 
 
-// IMBNodeObject are represented in the user interface as folder icons. Since these are prerendered and 
-// do not have a rectangular shape, we do not want to draw a broder and shadow around it...
-
-- (id) init
+@interface IMBButtonObject : IMBObject
 {
-	if (self = [super init])
-	{
-		self.shouldDrawAdornments = NO;
-	}
+	id _representedObject;
+	id _target;
+	SEL _clickAction;
+	SEL _doubleClickAction;
 	
-	return self;
+	id _normalImage;
+	id _highlightedImage;
 }
 
+// Properties for configuring the behavior of the button...
 
-//----------------------------------------------------------------------------------------------------------------------
+@property (retain) id representedObject;
+@property (retain) id target;
+@property (assign) SEL clickAction;
+@property (assign) SEL doubleClickAction;
 
+// Optional properties for configuring the look of the button. If missing, imageRepresentation will not be modified...
 
-// Since a string is required here we return the identifier of a node instead for the node itself...
+@property (retain) id normalImage;
+@property (retain) id highlightedImage;
 
-- (NSString*) imageUID
-{
-	return [(IMBNode*)_location identifier];
-}
+- (void) setImageRepresentationForState:(BOOL)inHighlighted;
 
+// Send preconfigured actions...
 
-// Override to show a folder icon instead of a generic file icon...
-
-- (NSImage*) icon
-{
-	return [[NSWorkspace sharedWorkspace] iconForFile:_imageLocation];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+- (void) sendClickAction;
+- (void) sendDoubleClickAction;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------

@@ -52,8 +52,8 @@
 
 #pragma mark HEADERS
 
-#import "IMBNodeObject.h"
-#import "IMBNode.h"
+#import "IMBButtonObject.h"
+#import "IMBCommon.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,19 +61,30 @@
 
 #pragma mark 
 
-@implementation IMBNodeObject
+@implementation IMBButtonObject
+
+@synthesize representedObject = _representedObject;
+@synthesize target = _target;
+@synthesize clickAction = _clickAction;
+@synthesize doubleClickAction = _doubleClickAction;
+@synthesize normalImage = _normalImage;
+@synthesize highlightedImage = _highlightedImage;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// IMBNodeObject are represented in the user interface as folder icons. Since these are prerendered and 
-// do not have a rectangular shape, we do not want to draw a broder and shadow around it...
-
 - (id) init
 {
 	if (self = [super init])
 	{
+		_representedObject = nil;
+		_target = nil;
+		_clickAction = NULL;
+		_doubleClickAction = NULL;
+		_normalImage = nil;
+		_highlightedImage = nil;
+
 		self.shouldDrawAdornments = NO;
 	}
 	
@@ -81,22 +92,79 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Since a string is required here we return the identifier of a node instead for the node itself...
-
-- (NSString*) imageUID
+- (void) dealloc
 {
-	return [(IMBNode*)_location identifier];
+	IMBRelease(_representedObject);
+	IMBRelease(_target);
+	IMBRelease(_normalImage);
+	IMBRelease(_highlightedImage);
+
+	[super dealloc];
 }
 
 
-// Override to show a folder icon instead of a generic file icon...
+//----------------------------------------------------------------------------------------------------------------------
 
-- (NSImage*) icon
+
+// Buttons are not selectable...
+
+- (BOOL) isSelectable 
 {
-	return [[NSWorkspace sharedWorkspace] iconForFile:_imageLocation];
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// If we have custom images for the normal and hilghted state, then update imageRepresentation with the appropriate
+// one depdending on state. If we do not have any custom images, then do not touch imageRepresentation...
+
+
+- (void) setImageRepresentationForState:(BOOL)inHighlighted
+{
+	if (inHighlighted)
+	{
+		if (_highlightedImage)
+		{
+			self.imageRepresentation = _highlightedImage;
+			self.imageVersion = self.imageVersion + 1;
+		}
+	}
+	else
+	{
+		if (_normalImage)
+		{
+			self.imageRepresentation = _normalImage;
+			self.imageVersion = self.imageVersion + 1;
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Send the preconfigured actions. The object is self (IMBButtonObject), so the action can access all properties,
+// like representedObject and location to customize the behavior of the action...
+
+
+- (void) sendClickAction
+{
+	if (_target != nil && _clickAction != NULL)
+	{
+		[_target performSelector:_clickAction withObject:self];
+	}	
+}
+
+
+- (void) sendDoubleClickAction
+{
+	if (_target != nil && _doubleClickAction != NULL)
+	{
+		[_target performSelector:_doubleClickAction withObject:self];
+	}	
+
 }
 
 

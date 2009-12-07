@@ -56,7 +56,7 @@
 #import "IMBCommon.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBNOdeObject.h"
+#import "IMBButtonObject.h"
 #import "IMBParser.h"
 #import "IMBConfig.h"
 #import "IMBOperationQueue.h"
@@ -218,7 +218,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	for (IMBObject* object in inObjects)
 	{
-		if (![object isKindOfClass:[IMBNodeObject class]])
+		if (![object isKindOfClass:[IMBButtonObject class]])
 		{
 			_objectCountTotal++;
 		}
@@ -232,7 +232,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	for (IMBObject* object in inObjects)
 	{
-		if (![object isKindOfClass:[IMBNodeObject class]])
+		if (![object isKindOfClass:[IMBButtonObject class]])
 		{
 			[self _loadObject:object];
 		}
@@ -513,7 +513,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	
 	for (IMBObject* object in inObjects)
 	{
-		if (![object isKindOfClass:[IMBNodeObject class]])
+		if (![object isKindOfClass:[IMBButtonObject class]])
 		{
 			NSURL* url = [object url];
 			IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
