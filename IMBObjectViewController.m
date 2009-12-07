@@ -936,22 +936,11 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode
 {
-	IMBObject* firstObject = [inObjects count]>0 ? [inObjects objectAtIndex:0] : nil;
-	
-	// If this is a single IMBNodeObject, then expand the currently selected node and select the appropriate subnode...
-	
-	if ([firstObject isKindOfClass:[IMBNodeObject class]])
-	{
-		IMBNode* subnode = (IMBNode*)firstObject.location;
-		[_nodeViewController expandSelectedNode];
-		[_nodeViewController selectNode:subnode];
-	}
-	
 	// Double-clicking opens the files (with the default app). Please note that IMBObjects are first passed through an 
 	// IMBObjectPromise (which is returned by the parser), because the resources to be opened may not yet be available.
 	// In this case the promise object loads them asynchronously and calls _openLocalURLs: once the load has finished...
 	
-	else if (inSelectedNode)
+	if (inSelectedNode)
 	{
 		IMBParser* parser = inSelectedNode.parser;
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:inObjects];
@@ -1226,9 +1215,21 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		}
 	}
 	
-	if (!didHandleEvent)
+	if (!didHandleEvent && inIndex != NSNotFound)
 	{
-		[self openSelectedObjects:inView];
+		NSArray* objects = [ibObjectArrayController arrangedObjects];
+		IMBObject* object = [objects objectAtIndex:inIndex];
+		
+		if ([object isKindOfClass:[IMBNodeObject class]])
+		{
+			IMBNode* subnode = (IMBNode*)object.location;
+			[_nodeViewController expandSelectedNode];
+			[_nodeViewController selectNode:subnode];
+		}
+		else
+		{
+			[self openSelectedObjects:inView];
+		}	
 	}	
 }
 
@@ -1481,7 +1482,8 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Doubleclicking a row opens the selected items. This may trigger a download if the user selected remote objects...
+// Doubleclicking a row opens the selected items. This may trigger a download if the user selected remote objects.
+// First give the delefate a chance to handle the double click...
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
@@ -1501,7 +1503,20 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	
 	if (!didHandleEvent)
 	{
-		[self openSelectedObjects:inSender];
+		NSArray* objects = [ibObjectArrayController arrangedObjects];
+		NSUInteger row = [(NSTableView*)inSender clickedRow];
+		IMBObject* object = [objects objectAtIndex:row];
+		
+		if ([object isKindOfClass:[IMBNodeObject class]])
+		{
+			IMBNode* subnode = (IMBNode*)object.location;
+			[_nodeViewController expandSelectedNode];
+			[_nodeViewController selectNode:subnode];
+		}
+		else
+		{
+			[self openSelectedObjects:inSender];
+		}	
 	}	
 }
 

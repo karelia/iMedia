@@ -102,7 +102,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Disable outline and shadow drawing for folders (IMBNodeObject)...
+// Disable outline and shadow drawing for certion objects...
 
 - (void) setDataSource:(id)inDataSource
 {

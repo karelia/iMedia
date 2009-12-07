@@ -177,15 +177,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) didClickObject:(IMBObject*)inObject objectView:(NSView*)inView
-{
-	// Default implementation does nothing. Override to provide custom behavior...
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // This helper method can be used by subclasses to construct identifiers of form "classname://path/to/node"...
  
 - (NSString*) identifierForPath:(NSString*)inPath

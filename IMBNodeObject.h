@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBEnhancedObject.h"
+#import "IMBButtonObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@
 // have these hybrid objects is to have a double clickable item in the object views, which can be used to drill
 // down the hierarchy... 
 
-@interface IMBNodeObject : IMBEnhancedObject
+@interface IMBNodeObject : IMBButtonObject
 
 @end
 

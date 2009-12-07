@@ -120,11 +120,6 @@
 
 - (void) didChangeIconSize:(NSSize)inSize objectView:(NSView*)inView;
 
-// Sent to parser when an object is clicked in the UI. Parser can override and do special stuff. Default implemenation
-// does nothing...
-
-- (void) didClickObject:(IMBObject*)inObject objectView:(NSView*)inView;
-
 // Called when the tumbnail for an object needs to be loaded lazily. This method will be called on a background thread...
 
 - (void) loadThumbnailForObject:(IMBObject*)inObject;

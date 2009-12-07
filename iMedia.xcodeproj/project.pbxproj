@@ -184,6 +184,8 @@
 		D0993932101236AB00C527B7 /* IMBOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993930101236AB00C527B7 /* IMBOutlineView.m */; };
 		D09FD77F105586BC00E328C7 /* IMBImageBrowserView.h in Headers */ = {isa = PBXBuildFile; fileRef = D09FD77D105586BC00E328C7 /* IMBImageBrowserView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09FD780105586BC00E328C7 /* IMBImageBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = D09FD77E105586BC00E328C7 /* IMBImageBrowserView.m */; };
+		D0AD4C9F10CCF36F00204318 /* IMBButtonObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */; };
+		D0AD4CA010CCF36F00204318 /* IMBButtonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */; };
 		D0B6FA6B1042F3D800280DDC /* IMBImageKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D0B6FABB1043243800280DDC /* IMBAudioFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FAB91043243800280DDC /* IMBAudioFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0B6FABC1043243800280DDC /* IMBAudioFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0B6FABA1043243800280DDC /* IMBAudioFolderParser.m */; };
@@ -491,6 +493,8 @@
 		D0993930101236AB00C527B7 /* IMBOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBOutlineView.m; sourceTree = "<group>"; };
 		D09FD77D105586BC00E328C7 /* IMBImageBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageBrowserView.h; sourceTree = "<group>"; };
 		D09FD77E105586BC00E328C7 /* IMBImageBrowserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageBrowserView.m; sourceTree = "<group>"; };
+		D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBButtonObject.h; sourceTree = "<group>"; };
+		D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBButtonObject.m; sourceTree = "<group>"; };
 		D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageKit.h; sourceTree = "<group>"; };
 		D0B6FAB91043243800280DDC /* IMBAudioFolderParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAudioFolderParser.h; sourceTree = "<group>"; };
 		D0B6FABA1043243800280DDC /* IMBAudioFolderParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAudioFolderParser.m; sourceTree = "<group>"; };
@@ -845,6 +849,8 @@
 				D09930BA1010F6C100C527B7 /* IMBObject.m */,
 				D02E542410A5650600B205BD /* IMBEnhancedObject.h */,
 				D02E542510A5650600B205BD /* IMBEnhancedObject.m */,
+				D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */,
+				D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */,
 				D032CB78109A2F4A00D84782 /* IMBMovieObject.h */,
 				D032CB79109A2F4A00D84782 /* IMBMovieObject.m */,
 				D010384A10714CB3007C88D7 /* IMBNodeObject.h */,
@@ -1145,6 +1151,7 @@
 				8F93177E10A9FC53002CDB19 /* IMBPyramidObjectPromise.h in Headers */,
 				8F47B39110C416050013ED25 /* IMBOrderedDictionary.h in Headers */,
 				FCD9ABB410C677FF0092F441 /* IMBLoadMoreObject.h in Headers */,
+				D0AD4C9F10CCF36F00204318 /* IMBButtonObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1394,6 +1401,7 @@
 				8F93177F10A9FC53002CDB19 /* IMBPyramidObjectPromise.m in Sources */,
 				8F47B39210C416050013ED25 /* IMBOrderedDictionary.m in Sources */,
 				FCD9ABB510C677FF0092F441 /* IMBLoadMoreObject.m in Sources */,
+				D0AD4CA010CCF36F00204318 /* IMBButtonObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
