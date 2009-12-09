@@ -257,8 +257,11 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[ibToolbar setSizeMode:NSToolbarSizeModeSmall];
 	[ibToolbar setAllowsUserCustomization:NO];
 	
-	// Create a tab for each controller and install the subviews in it...
-		
+	// Create a tab for each controller and install the subviews in it.
+	// We query each node controller for its minimum size so we can be sure
+	// to constrain our panel's minimum to suit the most restrictive controller.
+	NSSize largestMinimumSize = NSMakeSize(0,0);
+	
 	for (IMBObjectViewController* objectViewController in self.viewControllers)
 	{
 		IMBNodeViewController* nodeViewController = objectViewController.nodeViewController;
@@ -266,7 +269,17 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 		NSView* nodeView = [nodeViewController view];
 		[nodeView setFrame:[ibTabView bounds]];
-
+		
+		NSSize thisNodeViewMinimumSize = [nodeViewController minimumViewSize];
+		if (thisNodeViewMinimumSize.height > largestMinimumSize.height)
+		{
+			largestMinimumSize.height = thisNodeViewMinimumSize.height;
+		}
+		if (thisNodeViewMinimumSize.width > largestMinimumSize.width)
+		{
+			largestMinimumSize.width = thisNodeViewMinimumSize.width;
+		}
+		
 		NSView* objectView = [objectViewController view];
 		[nodeViewController installStandardObjectView:objectView];
 		
@@ -278,6 +291,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	}
 		
 	// Restore window size and selected tab...
+	[self.window setContentMinSize:largestMinimumSize];
 	
 	NSString* frame = [IMBConfig prefsValueForKey:@"windowFrame"];
 	if (frame) [self.window setFrame:NSRectFromString(frame) display:YES animate:NO];

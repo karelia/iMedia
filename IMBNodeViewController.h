@@ -144,6 +144,20 @@
 - (void) installStandardObjectView:(NSView*)inObjectView;
 - (void) installCustomObjectView:(NSView*)inObjectView;
 
+// Presentation constraints 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Presentation constraints
+
+// Clients should take care to ensure that we are not resized to anything smaller
+// than this, or it will yield a clumsy and unusable UI.  Note that because this
+// relies on the size of the loaded split view's divider, you should not call until
+// the view has actually been loaded.
+
+- (NSSize) minimumViewSize;
+
 @end
 
 
