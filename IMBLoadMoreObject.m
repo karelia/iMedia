@@ -73,12 +73,12 @@
 		NSString* highlightedImagePath = [IMBBundle() pathForResource:@"load-more-pressed.pdf" ofType:nil];
 		NSImage* highlightedImage = [[[NSImage alloc] initWithContentsOfFile:highlightedImagePath] autorelease];
 
-		self.shouldDrawAdornments = NO;
 		self.imageLocation = [NSURL fileURLWithPath:normalImagePath];
 		self.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 		self.imageRepresentation = normalImage;
 		self.normalImage = normalImage;
 		self.highlightedImage = highlightedImage;
+		self.shouldDrawAdornments = NO;
 	}	
 	return self;
 }
