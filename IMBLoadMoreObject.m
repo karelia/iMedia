@@ -61,16 +61,24 @@
 
 - (id) init {
 	if (self = [super init]) {
-		self.name = NSLocalizedString (@"Load More", @"'Load More' button title.");
+		self.name = NSLocalizedStringWithDefaultValue(
+			@"IMBLoadMoreObject.loadmore.title",
+			nil,IMBBundle(),
+			@"Load More",
+			@"Button title in Flickr parser");
 
-		NSString* path = [IMBBundle() pathForResource:@"load-more-normal.pdf" ofType:nil];
-		NSURL* url = [NSURL fileURLWithPath:path];
-		NSImage* image = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+		NSString* normalImagePath = [IMBBundle() pathForResource:@"load-more-normal.pdf" ofType:nil];
+		NSImage* normalImage = [[[NSImage alloc] initWithContentsOfFile:normalImagePath] autorelease];
 		
+		NSString* highlightedImagePath = [IMBBundle() pathForResource:@"load-more-pressed.pdf" ofType:nil];
+		NSImage* highlightedImage = [[[NSImage alloc] initWithContentsOfFile:highlightedImagePath] autorelease];
+
 		self.shouldDrawAdornments = NO;
-		self.imageLocation = url;
+		self.imageLocation = [NSURL fileURLWithPath:normalImagePath];
 		self.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-		self.imageRepresentation = image;
+		self.imageRepresentation = normalImage;
+		self.normalImage = normalImage;
+		self.highlightedImage = highlightedImage;
 	}	
 	return self;
 }

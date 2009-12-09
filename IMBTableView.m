@@ -54,15 +54,32 @@
 
 #import "IMBTableView.h"
 #import "IMBObjectViewController.h"
-#import "IMBObject.h"
+#import "IMBButtonObject.h"
 #import "IMBQuickLookController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark CONSTANTS
+
+enum IMBMouseOperation
+{
+	kMouseOperationNone,
+	kMouseOperationButtonClick
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark
 
 @implementation IMBTableView
+
+@synthesize mouseOperation = _mouseOperation;
+@synthesize clickedObjectIndex = _clickedObjectIndex;
+@synthesize clickedObject = _clickedObject;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +89,9 @@
 {
 	if (self = [super initWithFrame:inFrame])
 	{
-
+		_mouseOperation = kMouseOperationNone;
+		_clickedObjectIndex = NSNotFound;
+		_clickedObject = nil;
 	}
 	
 	return self;
@@ -83,7 +102,9 @@
 {
 	if (self = [super initWithCoder:inCoder])
 	{
-
+		_mouseOperation = kMouseOperationNone;
+		_clickedObjectIndex = NSNotFound;
+		_clickedObject = nil;
 	}
 	
 	return self;
@@ -92,7 +113,96 @@
 
 - (void) dealloc
 {
+	IMBRelease(_clickedObject);
    [super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) mouseDown:(NSEvent*)inEvent
+{
+	// Find the clicked object...
+	
+	_clickedObjectIndex = [self clickedRow];	
+	
+	if (_clickedObjectIndex != NSNotFound && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)])
+	{
+		NSCell* cell = [self preparedCellAtColumn:0 row:_clickedObjectIndex];
+		self.clickedObject = [cell objectValue];
+	}
+	
+	// If it was a button, then handle the click...
+	
+	if ([_clickedObject isKindOfClass:[IMBButtonObject class]])
+	{
+		_mouseOperation = kMouseOperationButtonClick;
+		[(IMBButtonObject*)_clickedObject setImageRepresentationForState:YES];
+		[self setNeedsDisplayInRect:[self rectOfRow:_clickedObjectIndex]];
+	}
+	
+	// In case of a normal object start selecting or dragging...
+	
+	else
+	{
+		_mouseOperation = kMouseOperationNone;
+	}
+
+	[super mouseDown:inEvent];
+}
+
+
+- (void) mouseDragged:(NSEvent*)inEvent;
+{
+	// If a button was clicked then track that button and highlight it when inside...
+	
+	if (_mouseOperation == kMouseOperationButtonClick)
+	{
+		NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
+		BOOL highlighted = [self rowAtPoint: mouse] == _clickedObjectIndex;
+		[(IMBButtonObject*)_clickedObject setImageRepresentationForState:highlighted];
+		[self setNeedsDisplayInRect:[self rectOfRow:_clickedObjectIndex]];
+	}
+	
+	// Let the superclass handle other events...
+	
+	else
+	{
+		[super mouseDragged:inEvent];
+	}
+}
+
+
+- (void) mouseUp:(NSEvent*)inEvent
+{
+	// If a button was clicked the perform the click action and remove the highlight...
+	
+	if (_mouseOperation == kMouseOperationButtonClick)
+	{
+		NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
+		NSInteger objectIndex = [self rowAtPoint:mouse];
+
+		if (objectIndex == _clickedObjectIndex)
+		{
+			[(IMBButtonObject*)_clickedObject sendClickAction];
+		}
+			
+		[(IMBButtonObject*)_clickedObject setImageRepresentationForState:NO];
+		[self setNeedsDisplayInRect:[self rectOfRow:_clickedObjectIndex]];
+	}
+	
+	// Let the superclass handle other events...
+	
+	else
+	{
+		[super mouseUp:inEvent];
+	}
+
+	// Cleanup...
+	
+	_mouseOperation = kMouseOperationNone;
+	self.clickedObject = nil;
 }
 
 
@@ -121,25 +231,6 @@
 }
 
 			
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (void) keyDown:(NSEvent*)inEvent
-//{
-//	int key = [[inEvent characters] characterAtIndex:0];
-//
-//	if (key == ' ')
-//	{
-//		IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
-//		[objectViewController quicklook:self];
-//	}
-//	else
-//	{
-//		[super keyDown:(NSEvent*)inEvent];
-//	}
-//}
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -185,5 +276,6 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @end

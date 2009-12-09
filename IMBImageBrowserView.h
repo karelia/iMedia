@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner, Dan Wood
+// Author: Peter Baumgartner, Dan Wood, Daniel Jalkut
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,12 +58,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class IMBObject;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @interface IMBImageBrowserView : IKImageBrowserView
 {
 	Class _cellClass;
-	
 	BOOL _dragSelectInProgress;
+	NSInteger _mouseOperation;
+	NSInteger _clickedObjectIndex;
+	IMBObject* _clickedObject;
 }
+
+@property (assign) NSInteger mouseOperation;
+@property (assign) NSInteger clickedObjectIndex;
+@property (retain) IMBObject* clickedObject;
 
 @end
 

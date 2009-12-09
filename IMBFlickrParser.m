@@ -312,13 +312,17 @@
 
 - (void) willShowContextMenu: (NSMenu*) inMenu forObject: (IMBObject*) inObject {
 	//	'Open Flickr Page'...
-	NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Open Flickr Page", @"Flickr parser context menu title.") 
-															 action:@selector(openFlickrPage:) 
-													  keyEquivalent:@""];
-	[showWebPageItem setTarget:self];
-	[showWebPageItem setRepresentedObject:inObject];
-	[inMenu addItem:showWebPageItem];
-	[showWebPageItem release];
+	
+	if ([inObject isSelectable])
+	{
+		NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Open Flickr Page", @"Flickr parser context menu title.") 
+																 action:@selector(openFlickrPage:) 
+														  keyEquivalent:@""];
+		[showWebPageItem setTarget:self];
+		[showWebPageItem setRepresentedObject:inObject];
+		[inMenu addItem:showWebPageItem];
+		[showWebPageItem release];
+	}
 }
 
 
