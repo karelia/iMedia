@@ -70,6 +70,10 @@
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kSelectionKey = @"selection";
 
+static const double kMinimumNodeViewWidth = 300.0;
+
+static const double kMinimumLibraryViewHeight = 36.0;
+static const double kMinimumObjectViewHeight = 144.0;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -344,6 +348,17 @@ static NSString* kSelectionKey = @"selection";
 	if (splitviewPosition > 0.0) [ibSplitView setPosition:splitviewPosition ofDividerAtIndex:0];
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Presentation constraints
+
+- (NSSize) minimumViewSize
+{
+	CGFloat minimumHeight = kMinimumLibraryViewHeight + kMinimumObjectViewHeight + [ibSplitView dividerThickness];
+	return NSMakeSize(kMinimumNodeViewWidth, minimumHeight);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -357,10 +372,14 @@ static NSString* kSelectionKey = @"selection";
 
 - (CGFloat) splitView:(NSSplitView*)inSplitView constrainSplitPosition:(CGFloat)inPosition ofSubviewAt:(NSInteger)inIndex
 {
+	// This constrains the bottom edge of the top section (the library view) so
+	// that it is guaranteed to be tall enough to accomodate its minimal popup-based 
+	// chooser, and so that the bottom section (the object view) is tall enough to 
+	// accommodate a reasonable row of items at a reasonable zoom level.
 	if (inIndex == 0)
 	{
-		double minPos = 36.0;
-		double maxPos = inSplitView.frame.size.height - 144.0;
+		double minPos = kMinimumLibraryViewHeight;
+		double maxPos = inSplitView.frame.size.height - kMinimumObjectViewHeight;
 		inPosition = MAX(inPosition,minPos);
 		inPosition = MIN(inPosition,maxPos);
 	}
@@ -374,7 +393,8 @@ static NSString* kSelectionKey = @"selection";
 
 
 // When resising the splitview, then make sure that only the bottom part (object view) gets resized, and 
-// that the IMBOutlineView is not affected...
+// that the IMBOutlineView is not affected... UNLESS the bottom has already been resized to its minimum 
+// size.
 
 - (void) splitView:(NSSplitView*)inSplitView resizeSubviewsWithOldSize:(NSSize)inOldSize
 {
@@ -392,6 +412,16 @@ static NSString* kSelectionKey = @"selection";
     bottomFrame.size.height = newFrame.size.height - topFrame.size.height - dividerThickness;
     bottomFrame.size.width = newFrame.size.width;          
     bottomFrame.origin.y = topFrame.size.height + dividerThickness; 
+ 
+	// If the bottom view is squeezed to its minimum, then we have to resort to shrinking the top.
+	// If our client heeded our minimumViewSize then we can't have been resized to a size that 
+	// causes BOTH our top and bottom views to be shrunk beyond their minimums.
+	if (bottomFrame.size.height < kMinimumObjectViewHeight)
+	{
+		CGFloat bottomOverflow = kMinimumObjectViewHeight - bottomFrame.size.height;
+		bottomFrame.size.height = kMinimumObjectViewHeight;
+		topFrame.size.height -= bottomOverflow;
+	}
  
 	[topView setFrame:topFrame];
     [bottomView setFrame:bottomFrame];

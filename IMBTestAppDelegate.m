@@ -117,7 +117,8 @@
 
 	[nodeView setFrame:[ibWindow.contentView bounds]];
 	[ibWindow setContentView:nodeView];
-
+	[ibWindow setContentMinSize:[self.nodeViewController minimumViewSize]];
+	
 	// Restore window size...
 	
 	NSString* frame = [IMBConfig prefsValueForKey:@"windowFrame"];
