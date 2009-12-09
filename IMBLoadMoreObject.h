@@ -56,7 +56,7 @@
 
 
 /**
- *	.
+ *	A button object forming the 'load more' button.
  *
  *	@date 2009-11-30 Start implementing this class (cp).
  *

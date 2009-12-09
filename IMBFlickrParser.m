@@ -95,6 +95,7 @@
 	IMBRelease (_flickrAPIKey);
 	IMBRelease (_flickrContext);
 	IMBRelease (_flickrSharedSecret);
+	IMBRelease (_loadMoreButton);
 	[super dealloc];
 }
 
@@ -337,6 +338,14 @@
 		
 		[self loadCustomQueries];
 	}	
+
+	//	lazy initialize the 'load more' button...
+	if (_loadMoreButton == nil) {
+		_loadMoreButton = [[IMBLoadMoreObject alloc] init];
+		_loadMoreButton.clickAction = @selector (loadMoreImages:);
+		_loadMoreButton.parser = self;
+		_loadMoreButton.target = self;
+	}
 }
 
 
@@ -354,6 +363,11 @@
 @synthesize editor = _editor;
 @synthesize flickrAPIKey = _flickrAPIKey;
 @synthesize flickrSharedSecret = _flickrSharedSecret;
+
+
+- (IMBLoadMoreObject*) loadMoreButton {
+	return _loadMoreButton;
+}
 
 
 #pragma mark 

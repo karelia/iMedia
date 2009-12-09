@@ -62,6 +62,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 @class IMBFlickrQueryEditor;
+@class IMBLoadMoreObject;
 
 /**
  *	iMedia parser to read public Flickr images.
@@ -87,6 +88,7 @@
 	NSString* _flickrAPIKey;
 	OFFlickrAPIContext* _flickrContext;
 	NSString* _flickrSharedSecret;
+	IMBLoadMoreObject* _loadMoreButton;
 }
 
 #pragma mark Actions
@@ -109,6 +111,9 @@
 
 ///	The shared secret given to you by Flickr. Must be set to use this parser.
 @property (copy) NSString* flickrSharedSecret;
+
+///	A button object holding the 'load more' button.
+@property (readonly) IMBLoadMoreObject* loadMoreButton;
 
 
 #pragma mark Query Persistence

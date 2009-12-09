@@ -116,9 +116,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	if (self = [super init]) {
 		self.license = IMBFlickrNodeLicense_CreativeCommons;
 		self.method = IMBFlickrNodeMethod_TextSearch;
-		self.sortOrder = IMBFlickrNodeSortOrder_InterestingnessDesc;
-		
-		_loadMoreObject = [[IMBLoadMoreObject alloc] init];
+		self.sortOrder = IMBFlickrNodeSortOrder_InterestingnessDesc;		
 	}
 	return self;
 }
@@ -246,7 +244,6 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	OFFlickrAPIRequest* request = [self.attributes objectForKey:@"flickrRequest"];
 	[request cancel];
 	
-	IMBRelease (_loadMoreObject);
 	IMBRelease (_query);
 	[super dealloc];
 }
@@ -378,9 +375,10 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	
 	[newImages insertObjects:oldImages atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, oldImages.count)]];
 	
-	_loadMoreObject.parser = self.parser;
-	_loadMoreObject.nodeIdentifier = self.identifier;
-	[newImages addObject:_loadMoreObject];
+	//	add 'load more' button...
+	IMBLoadMoreObject* loadMoreButton = ((IMBFlickrParser*) self.parser).loadMoreButton;
+	loadMoreButton.nodeIdentifier = self.identifier;
+	[newImages addObject:loadMoreButton];
 
 	self.objects = newImages;
 	

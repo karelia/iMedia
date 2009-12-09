@@ -59,7 +59,6 @@
 
 
 
-@class IMBLoadMoreObject;
 @class IMBParser;
 
 extern NSString* const IMBFlickrNodeProperty_License;
@@ -109,7 +108,6 @@ typedef enum {
 	NSInteger _page;
 	NSString* _query;
 	IMBFlickrNodeSortOrder _sortOrder;
-	IMBLoadMoreObject* _loadMoreObject;
 }
 
 #pragma mark Construction
