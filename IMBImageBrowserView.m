@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner, Dan Wood
+// Author: Peter Baumgartner, Dan Wood, Daniel Jalkut
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,10 +55,24 @@
 #import "IMBImageBrowserView.h"
 #import "IMBImageBrowserCell.h"
 #import "IMBObject.h"
+#import "IMBButtonObject.h"
 #import "IMBObjectViewController.h"
 #import "IMBObjectFifoCache.h"
 #import "IMBParser.h"
 #import "IMBQuickLookController.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
+
+enum IMBMouseOperation
+{
+	kMouseOperationNone,
+	kMouseOperationButtonClick,
+	kMouseOperationDragSelection
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,6 +91,33 @@
 #pragma mark
 
 @implementation IMBImageBrowserView
+
+@synthesize mouseOperation = _mouseOperation;
+@synthesize clickedObjectIndex = _clickedObjectIndex;
+@synthesize clickedObject = _clickedObject;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) init
+{
+	if (self = [super init])
+	{
+		_mouseOperation = kMouseOperationNone;
+		_clickedObjectIndex = NSNotFound;
+		_clickedObject = nil;
+	}
+	
+	return self;
+}
+
+
+- (void) dealloc
+{	
+	IMBRelease(_clickedObject);
+	[super dealloc];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -200,24 +241,26 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
 #ifndef IMB_SUPPORTFILEPROMISES
 #define IMB_SUPPORTFILEPROMISES 0
 #endif
 
 #if IMB_SUPPORTFILEPROMISES
 
-//----------------------------------------------------------------------------------------------------------------------
-
 #pragma mark Handling drags to allow for promises
 // This code is based on code contributed by Fraser Speirs.
 
-- (void)mouseDown:(NSEvent *)theEvent {
+- (void)mouseDown:(NSEvent *)theEvent
+{
 	// If the mouse first goes down on the background, this is a drag-select and
 	// we don't want to handle any mouseDragged events until the mouse comes up again.
 	NSPoint clickPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];
 	_dragSelectInProgress = (indexOfItemUnderClick == NSNotFound);
-
+	_mouseOperation = kMouseOperationNone;
+	
 //	if (indexOfItemUnderClick != NSNotFound &&
 //		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
 //	{
@@ -236,10 +279,6 @@
 	[super mouseDown: theEvent];
 }
 
-- (void)mouseUp:(NSEvent *)theEvent {
-	_dragSelectInProgress = NO;
-	[super mouseUp: theEvent];
-}
 
 - (void)mouseDragged:(NSEvent *)theEvent;
 {
@@ -272,28 +311,105 @@
 							 event:theEvent];
 }
 
+
+- (void)mouseUp:(NSEvent *)theEvent
+{
+	_dragSelectInProgress = NO;
+	[super mouseUp: theEvent];
+}
+
 #else
 
-- (void)mouseDown:(NSEvent *)theEvent {
-//	NSPoint clickPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-//	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];	
-//	if (indexOfItemUnderClick != NSNotFound &&
-//		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
-//	{
-//		IMBObject* object = [self.dataSource imageBrowser:self itemAtIndex:indexOfItemUnderClick];
-//		if (object && !object.isSelectable)
-//		{
-//			IMBParser* parser = object.parser;	
-//			if ([parser respondsToSelector:@selector(didClickObject:objectView:)])
-//			{
-//				[parser didClickObject:object objectView:self];
-//			}
-//			return;
-//		}
-//	}
+
+- (void) mouseDown:(NSEvent*)inEvent
+{
+	// Find the clicked object...
 	
-	[super mouseDown:theEvent];
+	NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
+	_clickedObjectIndex = [self indexOfItemAtPoint:mouse];	
+	
+	if (_clickedObjectIndex != NSNotFound && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)])
+	{
+		self.clickedObject = [self.dataSource imageBrowser:self itemAtIndex:_clickedObjectIndex];
+	}
+	
+	// If it was a button, then handle the click...
+	
+	if ([_clickedObject isKindOfClass:[IMBButtonObject class]])
+	{
+		_mouseOperation = kMouseOperationButtonClick;
+		[(IMBButtonObject*)_clickedObject setImageRepresentationForState:YES];
+		[self setNeedsDisplayInRect:[self itemFrameAtIndex:_clickedObjectIndex]];
+	}
+	
+	// In case of a normal object start dragging or selection...
+	
+	else if (_clickedObject != nil && _clickedObject.isSelectable)
+	{	
+		_mouseOperation = kMouseOperationDragSelection;
+	}
+	else
+	{
+		_mouseOperation = kMouseOperationNone;
+	}
+
+	[super mouseDown:inEvent];
 }
+
+
+- (void) mouseDragged:(NSEvent*)inEvent;
+{
+	// If a button was clicked then track that button and highlight it when inside...
+	
+	if (_mouseOperation == kMouseOperationButtonClick)
+	{
+		NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
+		BOOL highlighted = [self indexOfItemAtPoint: mouse] == _clickedObjectIndex;
+		[(IMBButtonObject*)_clickedObject setImageRepresentationForState:highlighted];
+		[self setNeedsDisplayInRect:[self itemFrameAtIndex:_clickedObjectIndex]];
+	}
+	
+	// Let the superclass handle other events...
+	
+	else
+	{
+		[super mouseDragged:inEvent];
+	}
+}
+
+
+- (void) mouseUp:(NSEvent*)inEvent
+{
+	// If a button was clicked the perform the click action and remove the highlight...
+	
+	if (_mouseOperation == kMouseOperationButtonClick)
+	{
+		NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
+		NSInteger objectIndex = [self indexOfItemAtPoint: mouse];
+
+		if (objectIndex == _clickedObjectIndex)
+		{
+			[(IMBButtonObject*)_clickedObject sendClickAction];
+		}
+			
+		[(IMBButtonObject*)_clickedObject setImageRepresentationForState:NO];
+		[self setNeedsDisplayInRect:[self itemFrameAtIndex:_clickedObjectIndex]];
+	}
+	
+	// Let the superclass handle other events...
+	
+	else
+	{
+		[super mouseUp:inEvent];
+	}
+
+	// Cleanup...
+	
+	_mouseOperation = kMouseOperationNone;
+	_dragSelectInProgress = NO;
+	self.clickedObject = nil;
+}
+
 
 #endif
 

@@ -50,7 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //	iMedia
-#import <iMedia/IMBObject.h>
+#import <iMedia/IMBButtonObject.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBLoadMoreObject: IMBObject {
+@interface IMBLoadMoreObject: IMBButtonObject {
 	@private
 	NSString* _nodeIdentifier;
 }

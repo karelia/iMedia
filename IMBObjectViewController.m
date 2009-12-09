@@ -807,22 +807,25 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	
 	// QuickLook...
 	
-	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-	if (IMBRunningOnSnowLeopardOrNewer())
+	if ([inObject isSelectable])
 	{
-		title = NSLocalizedStringWithDefaultValue(
-			@"IMBObjectViewController.menuItem.quickLook",
-			nil,IMBBundle(),
-			@"Quicklook",
-			@"Menu item in context menu of IMBObjectViewController");
-			
-		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
-		[item setRepresentedObject:inObject];
-		[item setTarget:self];
-		[menu addItem:item];
-		[item release];
+		#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+		if (IMBRunningOnSnowLeopardOrNewer())
+		{
+			title = NSLocalizedStringWithDefaultValue(
+				@"IMBObjectViewController.menuItem.quickLook",
+				nil,IMBBundle(),
+				@"Quicklook",
+				@"Menu item in context menu of IMBObjectViewController");
+				
+			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
+			[item setRepresentedObject:inObject];
+			[item setTarget:self];
+			[menu addItem:item];
+			[item release];
+		}
+		#endif
 	}
-	#endif
 	
 	// Give parser a chance to add menu items...
 	
@@ -1226,6 +1229,10 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];
 		}
+		else if ([object isKindOfClass:[IMBButtonObject class]])
+		{
+			[(IMBButtonObject*)object sendDoubleClickAction];
+		}
 		else
 		{
 			[self openSelectedObjects:inView];
@@ -1512,6 +1519,10 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 			IMBNode* subnode = (IMBNode*)object.location;
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];
+		}
+		else if ([object isKindOfClass:[IMBButtonObject class]])
+		{
+			[(IMBButtonObject*)object sendDoubleClickAction];
 		}
 		else
 		{

@@ -50,7 +50,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class IMBObject;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @interface IMBTableView : NSTableView
+{
+	NSInteger _mouseOperation;
+	NSInteger _clickedObjectIndex;
+	IMBObject* _clickedObject;
+}
+
+@property (assign) NSInteger mouseOperation;
+@property (assign) NSInteger clickedObjectIndex;
+@property (retain) IMBObject* clickedObject;
 
 @end
 
