@@ -1531,84 +1531,6 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (NSCell*) tableView:(NSTableView*)inTableView dataCellForTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
-//{
-//	NSArray* objects = [ibObjectArrayController arrangedObjects];
-//	IMBObject* object = [objects objectAtIndex:inRow];
-//	
-//	if ([object isKindOfClass:[IMBButtonObject class]])
-//	{
-//		NSButtonCell* button = [[[NSButtonCell alloc] initImageCell:object.imageRepresentation] autorelease];
-//		[button setImageScaling:NSImageScaleProportionallyDown];
-////		[button setTransparent:YES];
-//		return button;
-//	}
-//	
-//	return [inTableColumn dataCellForRow:inRow];
-//}
-
-
-// Doubleclicking a row opens the selected items. This may trigger a download if the user selected remote objects.
-// First give the delefate a chance to handle the double click...
-
-- (IBAction) tableViewWasDoubleClicked:(id)inSender
-{
-	IMBLibraryController* controller = self.libraryController;
-	id delegate = controller.delegate;
-	BOOL didHandleEvent = NO;
-	
-	if (delegate)
-	{
-		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
-		{
-			IMBNode* node = self.currentNode;
-			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
-		}
-	}
-	
-	if (!didHandleEvent)
-	{
-		NSArray* objects = [ibObjectArrayController arrangedObjects];
-		NSUInteger row = [(NSTableView*)inSender clickedRow];
-		IMBObject* object = row!=NSNotFound ? [objects objectAtIndex:row] : nil;
-		
-		if ([object isKindOfClass:[IMBNodeObject class]])
-		{
-			IMBNode* subnode = (IMBNode*)object.location;
-			[_nodeViewController expandSelectedNode];
-			[_nodeViewController selectNode:subnode];
-		}
-		else if ([object isKindOfClass:[IMBButtonObject class]])
-		{
-			[(IMBButtonObject*)object sendDoubleClickAction];
-		}
-		else
-		{
-			[self openSelectedObjects:inSender];
-		}	
-	}	
-}
-
-
-// Handle single clicks for IMBButtonObjects...
-
-- (IBAction) tableViewWasClicked:(id)inSender
-{
-	NSUInteger row = [(NSTableView*)inSender clickedRow];
-	NSArray* objects = [ibObjectArrayController arrangedObjects];
-	IMBObject* object = row!=NSNotFound ? [objects objectAtIndex:row] : nil;
-		
-	if ([object isKindOfClass:[IMBButtonObject class]])
-	{
-		[(IMBButtonObject*)object sendClickAction];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
 // start loading the objects in the promise and iterate over the resulting files...
 
@@ -1631,13 +1553,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-#pragma mark IMBDynamicTableViewDelegate
-
-// We pre-load the images in batches.
-
-// Assumes that we only have one client table view.  If we were to add another IMBDynamicTableView client, we would need to
-// deal with this architecture a bit since we have ivars here about which rows are visible.
+// We pre-load the images in batches. Assumes that we only have one client table view.  If we were to add another 
+// IMBDynamicTableView client, we would need to deal with this architecture a bit since we have ivars here about 
+// which rows are visible.
 
 
 - (void)dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows
@@ -1726,6 +1644,67 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	// Finally cache our old visible items set
 	[_observedVisibleItems release];
     _observedVisibleItems = newVisibleItemsSetRetained;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Doubleclicking a row opens the selected items. This may trigger a download if the user selected remote objects.
+// First give the delefate a chance to handle the double click...
+
+- (IBAction) tableViewWasDoubleClicked:(id)inSender
+{
+	IMBLibraryController* controller = self.libraryController;
+	id delegate = controller.delegate;
+	BOOL didHandleEvent = NO;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
+		{
+			IMBNode* node = self.currentNode;
+			NSArray* objects = [ibObjectArrayController selectedObjects];
+			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
+		}
+	}
+	
+	if (!didHandleEvent)
+	{
+		NSArray* objects = [ibObjectArrayController arrangedObjects];
+		NSUInteger row = [(NSTableView*)inSender clickedRow];
+		IMBObject* object = row!=NSNotFound ? [objects objectAtIndex:row] : nil;
+		
+		if ([object isKindOfClass:[IMBNodeObject class]])
+		{
+			IMBNode* subnode = (IMBNode*)object.location;
+			[_nodeViewController expandSelectedNode];
+			[_nodeViewController selectNode:subnode];
+		}
+		else if ([object isKindOfClass:[IMBButtonObject class]])
+		{
+			[(IMBButtonObject*)object sendDoubleClickAction];
+		}
+		else
+		{
+			[self openSelectedObjects:inSender];
+		}	
+	}	
+}
+
+
+// Handle single clicks for IMBButtonObjects...
+
+- (IBAction) tableViewWasClicked:(id)inSender
+{
+	NSUInteger row = [(NSTableView*)inSender clickedRow];
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	IMBObject* object = row!=NSNotFound ? [objects objectAtIndex:row] : nil;
+		
+	if ([object isKindOfClass:[IMBButtonObject class]])
+	{
+		[(IMBButtonObject*)object sendClickAction];
+	}
 }
 
 
