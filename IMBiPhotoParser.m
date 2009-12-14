@@ -297,7 +297,7 @@
 	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,
 	// which is implemented here, to achieve the desired "feel" in the browser...
 	
-	if (inNode.isRootNode)
+	if (inNode.isRootNode && [inNode.subNodes count]>0)
 	{
 		IMBNode* photosNode = [inNode.subNodes objectAtIndex:0];
 		[self populateNode:photosNode options:inOptions error:outError];
