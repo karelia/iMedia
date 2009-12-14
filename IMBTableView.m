@@ -127,9 +127,11 @@ enum IMBMouseOperation
 	
 	_clickedObjectIndex = [self clickedRow];	
 	
-	if (_clickedObjectIndex != NSNotFound && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)])
+	if (_clickedObjectIndex != NSNotFound)
 	{
-		NSCell* cell = [self preparedCellAtColumn:0 row:_clickedObjectIndex];
+		NSTableColumn* column = [[self tableColumns] objectAtIndex:0];
+		NSCell* cell = [column dataCellForRow:_clickedObjectIndex];
+//		NSCell* cell = [self preparedCellAtColumn:0 row:_clickedObjectIndex];
 		self.clickedObject = [cell objectValue];
 	}
 	
@@ -147,9 +149,8 @@ enum IMBMouseOperation
 	else
 	{
 		_mouseOperation = kMouseOperationNone;
+		[super mouseDown:inEvent];
 	}
-
-	[super mouseDown:inEvent];
 }
 
 

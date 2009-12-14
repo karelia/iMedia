@@ -475,7 +475,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 - (void) _configureListView
 {
 	[ibListView setTarget:self];
+	[ibListView setAction:@selector(tableViewWasClicked:)];
 	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
+	
     [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
     [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
@@ -484,7 +486,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 - (void) _configureComboView
 {
 	[ibComboView setTarget:self];
+	[ibComboView setAction:@selector(tableViewWasClicked:)];
 	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
+	
     [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
     [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
@@ -1276,12 +1280,30 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 //----------------------------------------------------------------------------------------------------------------------
 
-//
+
+- (NSIndexSet*) filteredDraggingIndexes:(NSIndexSet*)inIndexes
+{
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	
+	NSMutableIndexSet* indexes = [NSMutableIndexSet indexSet];
+	NSUInteger index = [inIndexes firstIndex];
+	
+	while (index != NSNotFound)
+	{
+		IMBObject* object = [objects objectAtIndex:index];
+		if ([object isSelectable]) [indexes addIndex:index];
+		index = [inIndexes indexGreaterThanIndex:index];
+	}
+	
+	return indexes;
+}
+
+
 // Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
 // start loading the objects in the promise and iterate over the resulting files...
 //
 // This method is used for both imageBrowser:writeItemsAtIndexes:toPasteboard: and tableView:writeRowsWithIndexes:toPasteboard:
-//
+
 
 - (NSUInteger) writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
@@ -1290,7 +1312,9 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	
 	if (node)
 	{
-		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:inIndexes];
+		NSIndexSet* indexes = [self filteredDraggingIndexes:inIndexes]; 
+		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes];
+		
 		if ([objects count] > 0)
 		{
 			IMBParser* parser = node.parser;
@@ -1486,7 +1510,42 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 }
 
 
+// Check whether a particular row is selectable...
+
+- (BOOL) tableView:(NSTableView*)inTableView shouldSelectRow:(NSInteger)inRow
+{
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	IMBObject* object = [objects objectAtIndex:inRow];
+	return [object isSelectable];
+}
+
+
+//- (BOOL) tableView:(NSTableView*)inTableView shouldTrackCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inColumn row:(NSInteger)inRow
+//{
+//	NSArray* objects = [ibObjectArrayController arrangedObjects];
+//	IMBObject* object = [objects objectAtIndex:inRow];
+//	return [object isSelectable];
+//}
+
+
 //----------------------------------------------------------------------------------------------------------------------
+
+
+//- (NSCell*) tableView:(NSTableView*)inTableView dataCellForTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
+//{
+//	NSArray* objects = [ibObjectArrayController arrangedObjects];
+//	IMBObject* object = [objects objectAtIndex:inRow];
+//	
+//	if ([object isKindOfClass:[IMBButtonObject class]])
+//	{
+//		NSButtonCell* button = [[[NSButtonCell alloc] initImageCell:object.imageRepresentation] autorelease];
+//		[button setImageScaling:NSImageScaleProportionallyDown];
+////		[button setTransparent:YES];
+//		return button;
+//	}
+//	
+//	return [inTableColumn dataCellForRow:inRow];
+//}
 
 
 // Doubleclicking a row opens the selected items. This may trigger a download if the user selected remote objects.
@@ -1512,7 +1571,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	{
 		NSArray* objects = [ibObjectArrayController arrangedObjects];
 		NSUInteger row = [(NSTableView*)inSender clickedRow];
-		IMBObject* object = [objects objectAtIndex:row];
+		IMBObject* object = row!=NSNotFound ? [objects objectAtIndex:row] : nil;
 		
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
@@ -1529,6 +1588,21 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 			[self openSelectedObjects:inSender];
 		}	
 	}	
+}
+
+
+// Handle single clicks for IMBButtonObjects...
+
+- (IBAction) tableViewWasClicked:(id)inSender
+{
+	NSUInteger row = [(NSTableView*)inSender clickedRow];
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	IMBObject* object = row!=NSNotFound ? [objects objectAtIndex:row] : nil;
+		
+	if ([object isKindOfClass:[IMBButtonObject class]])
+	{
+		[(IMBButtonObject*)object sendClickAction];
+	}
 }
 
 
