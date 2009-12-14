@@ -155,6 +155,10 @@
 	{
 		[_target performSelector:_clickAction withObject:self];
 	}	
+	else
+	{
+		NSBeep();
+	}
 }
 
 
@@ -164,7 +168,28 @@
 	{
 		[_target performSelector:_doubleClickAction withObject:self];
 	}	
+	else
+	{
+		NSBeep();
+	}
+}
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Return the button image as the small icon...
+
+- (NSImage*) icon
+{
+	id imageRepresentation = self.imageRepresentation;
+	
+	if ([imageRepresentation isKindOfClass:[NSImage class]])
+	{
+		return (NSImage*)imageRepresentation;
+	}
+	
+	return [super icon];
 }
 
 
