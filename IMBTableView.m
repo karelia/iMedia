@@ -125,14 +125,20 @@ enum IMBMouseOperation
 {
 	// Find the clicked object...
 	
-	_clickedObjectIndex = [self clickedRow];	
-	
+	NSPoint mouse = [self convertPoint:[inEvent locationInWindow] toView:nil];
+    _clickedObjectIndex = [self rowAtPoint:mouse];
+
 	if (_clickedObjectIndex != NSNotFound)
 	{
-		NSTableColumn* column = [[self tableColumns] objectAtIndex:0];
-		NSCell* cell = [column dataCellForRow:_clickedObjectIndex];
-//		NSCell* cell = [self preparedCellAtColumn:0 row:_clickedObjectIndex];
-		self.clickedObject = [cell objectValue];
+		NSArrayController* arrayController = nil;
+		if ([self.delegate respondsToSelector:@selector(objectArrayController)])
+		{
+			arrayController = [self.delegate performSelector:@selector(objectArrayController)];
+		}
+		if (arrayController)
+		{
+			self.clickedObject = [arrayController.arrangedObjects objectAtIndex:_clickedObjectIndex];
+		}
 	}
 	
 	// If it was a button, then handle the click...
