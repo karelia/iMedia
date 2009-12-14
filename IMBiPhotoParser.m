@@ -455,7 +455,12 @@
 		
 		if (_plist == nil)
 		{
-			self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
+			NSDictionary* dict = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
+			if (!dict || dict.count == 0) {
+				//	If there is an AlbumData.xml file, there should be something inside!
+				NSLog (@"The iPhoto AlbumData.xml file seams to be empty. This is an unhealthy condition!");
+			}
+			self.plist = dict;
 			self.modificationDate = modificationDate;
 		}
 		
