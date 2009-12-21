@@ -169,6 +169,30 @@
 		NSURL* url = [NSURL URLWithString:cur];
 		[root setWatchedPath:[url path]];
 		NSDictionary *db = [NSDictionary dictionaryWithContentsOfURL:url];
+		
+			
+		// WORKAROUND
+		if (!db || 0 == db.count)	// unable to read. possibly due to unencoded '&'.  rdar://7469235
+		{
+			NSData *data = [NSData dataWithContentsOfURL:url];
+			
+			NSString *eString = nil;
+			NSError *e = nil;
+			NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
+																options:NSXMLDocumentTidyXML error:&e];
+			db = [NSPropertyListSerialization
+					propertyListFromData:[xmlDoc XMLData]
+					mutabilityOption:NSPropertyListImmutable
+					format:NULL errorDescription:&eString];
+		}			
+		
+		if (!db || 0 == db.count)
+		{
+			//	If there is an AlbumData.xml file, there should be something inside!
+			NSLog (@"The iPhoto AlbumData.xml file seams to be empty. This is an unhealthy condition!");
+		}
+		
+		
 		if (db) {
 			[library addEntriesFromDictionary:db];
 		}
