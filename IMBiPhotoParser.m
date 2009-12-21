@@ -456,7 +456,24 @@
 		if (_plist == nil)
 		{
 			NSDictionary* dict = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
-			if (!dict || dict.count == 0) {
+			
+			// WORKAROUND
+			if (!dict || 0 == dict.count)	// unable to read. possibly due to unencoded '&'.  rdar://7469235
+			{
+				NSData *data = [NSData dataWithContentsOfFile:(NSString*)self.mediaSource];
+				
+				NSString *eString = nil;
+				NSError *e = nil;
+				NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
+																	options:NSXMLDocumentTidyXML error:&e];
+				dict = [NSPropertyListSerialization
+						propertyListFromData:[xmlDoc XMLData]
+						mutabilityOption:NSPropertyListImmutable
+						format:NULL errorDescription:&eString];
+			}			
+			
+			if (!dict || 0 == dict.count)
+			{
 				//	If there is an AlbumData.xml file, there should be something inside!
 				NSLog (@"The iPhoto AlbumData.xml file seams to be empty. This is an unhealthy condition!");
 			}
