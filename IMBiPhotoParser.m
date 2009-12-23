@@ -464,12 +464,13 @@
 				
 				NSString *eString = nil;
 				NSError *e = nil;
-				NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
-																	options:NSXMLDocumentTidyXML error:&e];
+				NSXMLDocument *xmlDoc = [[[NSXMLDocument alloc] initWithData:data
+																	options:NSXMLDocumentTidyXML error:&e] autorelease];
 				dict = [NSPropertyListSerialization
 						propertyListFromData:[xmlDoc XMLData]
 						mutabilityOption:NSPropertyListImmutable
 						format:NULL errorDescription:&eString];
+				// When we start targetting 10.6, we should use propertyListWithData:options:format:error:
 			}			
 			
 			if (!dict || 0 == dict.count)
