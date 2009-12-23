@@ -178,8 +178,8 @@
 			
 			NSString *eString = nil;
 			NSError *e = nil;
-			NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
-																options:NSXMLDocumentTidyXML error:&e];
+			NSXMLDocument *xmlDoc = [[[NSXMLDocument alloc] initWithData:data
+																options:NSXMLDocumentTidyXML error:&e] autorelease];
 			db = [NSPropertyListSerialization
 					propertyListFromData:[xmlDoc XMLData]
 					mutabilityOption:NSPropertyListImmutable
