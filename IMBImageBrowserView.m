@@ -150,7 +150,7 @@ enum IMBMouseOperation
 		}
 	}
 	
-	return [IMBImageBrowserCell class];
+	return cellClass;
 }
 
 
