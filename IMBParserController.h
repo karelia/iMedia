@@ -94,6 +94,12 @@
 - (void) loadParsers; 
 - (void) unloadParsers; 
 
+// Add/remove parser instances dynamically. These methods are useful for parsers that mimic dynamically appearing
+// content, e.g. connected devices (cameras, network volumes, etc)...
+
+- (BOOL) addDynamicParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
+- (BOOL) removeDynamicParser:(IMBParser*)inParser;
+
 // Add/remove custom parsers. This is usually used for folder based parsers that are dragged into the outline view.
 // Please note that this method should be called after loadRegisteredParsers...
 

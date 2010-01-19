@@ -305,10 +305,9 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 
 // Adds the specified parser to the list of loaded parsers. Please note that this will fail if either the parser
-// is already in the list (we do not want duplicates) or if the delegate denied the loading. The resulting list
-// is immediately saved to the prefs...
+// is already in the list (we do not want duplicates) or if the delegate denied the loading...
 
-- (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
+- (BOOL) addDynamicParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
 	// Ask the delegate if we are allow to load the parser...
 	
@@ -340,34 +339,27 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 			[_delegate controller:self willLoadParser:[inParser class] forMediaType:inMediaType];
 		}
 
-		inParser.custom = YES;
 		[parsers addObject:inParser];
 
 		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didLoadParser:forMediaType:)])
 		{
 			[_delegate controller:self didLoadParser:inParser forMediaType:inMediaType];
 		}
-		
-		[self saveCustomParsersToPreferences];
 	}	
 	
 	return shouldLoad;
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+// Removes a parser instance from the list of loaded parsers...
 
-
-// Removes a custom parser from the list of loaded parsers. The resulting list is immediately saved to the prefs...
-
-- (BOOL) removeCustomParser:(IMBParser*)inParser
+- (BOOL) removeDynamicParser:(IMBParser*)inParser
 {
 	NSString* mediaType = inParser.mediaType;
 	NSMutableArray* parsers = [self loadedParsersForMediaType:mediaType];
 	BOOL exists = [parsers indexOfObjectIdenticalTo:inParser] != NSNotFound;
-	BOOL custom = inParser.isCustom;
 	
-	if (exists && custom) 
+	if (exists) 
 	{
 		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willUnloadParser:forMediaType:)])
 		{
@@ -375,11 +367,112 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		}
 		
 		[parsers removeObject:inParser];
-		[self saveCustomParsersToPreferences];
 		return YES;
 	}	
 	
 	return NO;	
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Adds the parser as a custom parser to the list of loaded parsers and saves the resulting list to the prefs...
+
+- (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
+{
+	BOOL didAdd = [self addDynamicParser:inParser forMediaType:inMediaType];
+	
+	if (didAdd)
+	{
+		inParser.custom = YES;
+		[self saveCustomParsersToPreferences];
+	}
+	
+	return didAdd;
+	
+//	// Ask the delegate if we are allow to load the parser...
+//	
+//	BOOL shouldLoad = YES;
+//	
+//	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldLoadParser:forMediaType:)])
+//	{
+//		shouldLoad = [_delegate controller:self shouldLoadParser:[inParser class] forMediaType:inMediaType];
+//	}
+//
+//	// Check if the parser is already in the list...
+//	
+//	NSMutableArray* parsers = [self loadedParsersForMediaType:inMediaType];
+//	
+//	for (IMBParser* parser in parsers)
+//	{
+//		if ([inParser.mediaSource isEqual:parser.mediaSource] && [inParser.mediaType isEqual:parser.mediaType])
+//		{
+//			shouldLoad = NO;	
+//		}
+//	}
+//	
+//	// If we are allowed to load, then add it to the list and tell the delegate...
+//	
+//	if (shouldLoad)
+//	{
+//		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willLoadParser:forMediaType:)])
+//		{
+//			[_delegate controller:self willLoadParser:[inParser class] forMediaType:inMediaType];
+//		}
+//
+//		inParser.custom = YES;
+//		[parsers addObject:inParser];
+//
+//		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didLoadParser:forMediaType:)])
+//		{
+//			[_delegate controller:self didLoadParser:inParser forMediaType:inMediaType];
+//		}
+//		
+//		[self saveCustomParsersToPreferences];
+//	}	
+//	
+//	return shouldLoad;
+}
+
+
+// Removes a custom parser from the list of loaded parsers and saves the resulting list to the prefs...
+
+- (BOOL) removeCustomParser:(IMBParser*)inParser
+{
+	BOOL didRemove = NO;
+	BOOL isCustom = inParser.isCustom;
+
+	if (isCustom)
+	{
+		didRemove = [self removeDynamicParser:inParser];
+		
+		if (didRemove)
+		{
+			[self saveCustomParsersToPreferences];
+		}
+	}
+	
+	return didRemove;
+
+//	NSString* mediaType = inParser.mediaType;
+//	NSMutableArray* parsers = [self loadedParsersForMediaType:mediaType];
+//	BOOL exists = [parsers indexOfObjectIdenticalTo:inParser] != NSNotFound;
+//	BOOL custom = inParser.isCustom;
+//	
+//	if (exists && custom) 
+//	{
+//		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willUnloadParser:forMediaType:)])
+//		{
+//			[_delegate controller:self willUnloadParser:inParser forMediaType:mediaType];
+//		}
+//		
+//		[parsers removeObject:inParser];
+//		[self saveCustomParsersToPreferences];
+//		return YES;
+//	}	
+//	
+//	return NO;	
 }
 
 
@@ -418,9 +511,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		[IMBConfig setPrefs:prefs forClass:[self class]];
 	}
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 // Restore the custom parser instances from the list which was stored in the prefs. The flag _loadingCustomParsers
