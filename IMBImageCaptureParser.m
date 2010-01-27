@@ -841,7 +841,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 		err = ICADownloadFile(&pb, nil);
 		if( !err ) 
 		{
-			NSURL *fileURL = (NSURL *)CFURLCreateFromFSRef( kCFAllocatorDefault, &fileFSRef );
+			NSURL *fileURL = NSMakeCollectable(CFURLCreateFromFSRef( kCFAllocatorDefault, &fileFSRef ));
 			if( fileURL )
 			{
 				[self.receivedFilePaths addObject:[fileURL path]];
@@ -902,7 +902,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	
 	// Create ONE download operations...
 
-	IMBMTPDownloadOperation* op = [[IMBMTPDownloadOperation alloc] initWithObjectArray:inObjects delegate:self];
+	IMBMTPDownloadOperation* op = [[[IMBMTPDownloadOperation alloc] initWithObjectArray:inObjects delegate:self] autorelease];
 	op.downloadFolderPath = self.downloadFolderPath;
 	[self.downloadOperations addObject:op]; 
 	
