@@ -140,11 +140,10 @@
 				CFURLRef resolvedUrl = CFURLCreateFromFSRef(NULL, &fsRef);
 				if (resolvedUrl != NULL)
 				{
-					resolvedPath = NSMakeCollectable(
-													 CFURLCopyFileSystemPath(resolvedUrl,
-																			 kCFURLPOSIXPathStyle));
+					CFStringRef cfstr = CFURLCopyFileSystemPath(resolvedUrl,
+																kCFURLPOSIXPathStyle);
 					CFRelease(resolvedUrl);
-					resolvedPath = [resolvedPath autorelease];
+					resolvedPath = [NSMakeCollectable(cfstr) autorelease];
 				}
 			}
 		}

@@ -137,11 +137,12 @@
 	}
 	else
 	{
-		UTI = [NSMakeCollectable(UTTypeCreatePreferredIdentifierForTag(
-																	   kUTTagClassFilenameExtension,
-																	   (CFStringRef)anExtension,
-																	   NULL
-																	   )) autorelease];
+		CFStringRef cfstr = UTTypeCreatePreferredIdentifierForTag(
+																kUTTagClassFilenameExtension,
+																(CFStringRef)anExtension,
+																NULL
+																);
+		UTI = [NSMakeCollectable(cfstr) autorelease];
 	}
 	
 	// If we don't find it, add an entry to the info.plist of the APP,
@@ -156,11 +157,12 @@
 + (NSString *)UTIForFileType:(NSString *)aFileType;
 
 {
-	return [NSMakeCollectable(UTTypeCreatePreferredIdentifierForTag(
-																	kUTTagClassOSType,
-																	(CFStringRef)aFileType,
-																	NULL
-																	)) autorelease];	
+	CFStringRef result = UTTypeCreatePreferredIdentifierForTag(
+															   kUTTagClassOSType,
+															   (CFStringRef)aFileType,
+															   NULL
+															   );
+	return [NSMakeCollectable(result) autorelease];	
 }
 
 // See list here:
@@ -229,8 +231,7 @@
 	CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
 	CFStringRef uuidStr = CFUUIDCreateString(kCFAllocatorDefault, uuid);
 	CFRelease(uuid);
-	[NSMakeCollectable(uuidStr) autorelease];
-	return (NSString *)uuidStr;
+	return (NSString *)[NSMakeCollectable(uuidStr) autorelease];
 }
 
 - (NSString *)exifDateToLocalizedDisplayDate
