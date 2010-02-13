@@ -1673,7 +1673,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	{
 		NSArray* objects = [ibObjectArrayController arrangedObjects];
 		NSUInteger row = [(NSTableView*)inSender clickedRow];
-		IMBObject* object = row!=NSNotFound ? [objects objectAtIndex:row] : nil;
+		IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
 		
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
@@ -1699,7 +1699,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 {
 	NSUInteger row = [(NSTableView*)inSender clickedRow];
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
-	IMBObject* object = row!=NSNotFound ? [objects objectAtIndex:row] : nil;
+	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
 		
 	if ([object isKindOfClass:[IMBButtonObject class]])
 	{

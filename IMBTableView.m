@@ -90,7 +90,7 @@ enum IMBMouseOperation
 	if (self = [super initWithFrame:inFrame])
 	{
 		_mouseOperation = kMouseOperationNone;
-		_clickedObjectIndex = NSNotFound;
+		_clickedObjectIndex = -1;
 		_clickedObject = nil;
 	}
 	
@@ -103,7 +103,7 @@ enum IMBMouseOperation
 	if (self = [super initWithCoder:inCoder])
 	{
 		_mouseOperation = kMouseOperationNone;
-		_clickedObjectIndex = NSNotFound;
+		_clickedObjectIndex = -1;
 		_clickedObject = nil;
 	}
 	
@@ -128,7 +128,7 @@ enum IMBMouseOperation
 	NSPoint mouse = [self convertPoint:[inEvent locationInWindow] toView:nil];
     _clickedObjectIndex = [self rowAtPoint:mouse];
 
-	if (_clickedObjectIndex != NSNotFound)
+	if (_clickedObjectIndex != -1)
 	{
 		NSArrayController* arrayController = nil;
 		if ([self.delegate respondsToSelector:@selector(objectArrayController)])
@@ -152,7 +152,7 @@ enum IMBMouseOperation
 	
 	// In case of a normal object start selecting or dragging...
 	
-	else
+	else 
 	{
 		_mouseOperation = kMouseOperationNone;
 		[super mouseDown:inEvent];
