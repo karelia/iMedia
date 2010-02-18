@@ -1503,6 +1503,49 @@
 			};
 			name = Release;
 		};
+		65A60D161123BD1A003B1688 /* Release10.6+ */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
+			buildSettings = {
+				ARCHS = i386;
+				RUN_CLANG_STATIC_ANALYZER = NO;
+			};
+			name = "Release10.6+";
+		};
+		65A60D171123BD1A003B1688 /* Release10.6+ */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "@executable_path/../Frameworks";
+				PRODUCT_NAME = iMedia;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = "Release10.6+";
+		};
+		65A60D181123BD1A003B1688 /* Release10.6+ */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "TestApp-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PRODUCT_NAME = iMedia2;
+			};
+			name = "Release10.6+";
+		};
 		D09930B21010F68B00C527B7 /* Test */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
@@ -1583,6 +1626,7 @@
 			buildConfigurations = (
 				1DEB91AE08733DA50010E9CD /* Debug */,
 				1DEB91AF08733DA50010E9CD /* Release */,
+				65A60D171123BD1A003B1688 /* Release10.6+ */,
 				D09930B31010F68B00C527B7 /* Test */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1593,6 +1637,7 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
+				65A60D161123BD1A003B1688 /* Release10.6+ */,
 				D09930B21010F68B00C527B7 /* Test */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1603,6 +1648,7 @@
 			buildConfigurations = (
 				D09933581011B27000C527B7 /* Debug */,
 				D09933591011B27000C527B7 /* Release */,
+				65A60D181123BD1A003B1688 /* Release10.6+ */,
 				D099335A1011B27000C527B7 /* Test */,
 			);
 			defaultConfigurationIsVisible = 0;
