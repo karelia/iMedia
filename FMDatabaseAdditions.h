@@ -21,4 +21,10 @@
 // That would be a bad idea, because we close out the result set, and then what
 // happens to the data that we just didn't copy?  Who knows, not I.
 
+
+- (BOOL) tableExists:(NSString*)tableName;
+- (FMResultSet*) getSchema;
+- (FMResultSet*) getTableSchema:(NSString*)tableName;
+- (BOOL) columnExists:(NSString*)tableName columnName:(NSString*)columnName;
+
 @end
