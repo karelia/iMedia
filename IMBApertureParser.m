@@ -76,6 +76,8 @@
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
 - (BOOL) isLeafAlbumType:(NSString*)inType;
 - (NSImage*) iconForAlbumType:(NSString*)inType;
+- (NSArray*) keylistForAlbum:(NSDictionary*)inAlbumDict;
+- (BOOL) shouldUseObject:(NSString*)inObjectType;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
 - (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
@@ -94,6 +96,7 @@
 @synthesize plist = _plist;
 @synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
+@synthesize version = _version;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -169,6 +172,7 @@
 		self.appPath = [[self class] aperturePath];
 		self.plist = nil;
 		self.modificationDate = nil;
+		self.version = 0;
 	}
 	
 	return self;
@@ -347,12 +351,24 @@
 		{
 			self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
 			self.modificationDate = modificationDate;
+			self.version = [[_plist objectForKey:@"Application Version"] integerValue];
 		}
 		
 		plist = [[_plist retain] autorelease];
 	}
 	
 	return plist;
+}
+
+
+- (NSInteger) version
+{
+	if (_version == 0)
+	{
+		_version = [[self.plist objectForKey:@"Application Version"] integerValue];
+	}
+	
+	return _version;
 }
 
 
@@ -371,10 +387,42 @@
 }
 
 
-// The root node always has the hardcoded AlbumID 1...
+// In Aperture 2 the root node always has the hardcoded AlbumID 1. In Aperture 3 however we are choosing a
+// different node as root as there always seems to be an (empty) extra node (Album Type 5) inserted between
+// the root and the nodes that we like to see at the first level. So we'll look for this type 5 album and
+// return its id as the root node...
 
 - (NSString*) rootNodeIdentifier
 {
+//	// Aperture 2...
+//	
+//	if (self.version < 3)
+//	{
+//		return [self identifierWithAlbumId:[NSNumber numberWithInt:1]];
+//	}
+//	
+//	// Aperture 3...
+	
+	NSArray* albums = [self.plist objectForKey:@"List of Albums"];
+	NSNumber* albumId = [NSNumber numberWithInt:1];
+	NSString* albumType = nil;
+	
+	for (NSDictionary* albumDict in albums)
+	{
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		albumType = [albumDict objectForKey:@"Album Type"];
+		albumId = [albumDict objectForKey:@"AlbumId"];
+		
+		if ([albumType isEqualToString:@"5"])
+		{
+			return [self identifierWithAlbumId:albumId];
+		}
+
+		[pool release];
+	}
+
+	// Fallback if nothing is found...
+	
 	return [self identifierWithAlbumId:[NSNumber numberWithInt:1]];
 }
 
@@ -382,57 +430,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Exclude some album types...
+// Exclude some album types. Specifically exclude all root albums as the root node has already created
+// been created by the parser during its first invocation...
 
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType
 {
+	if ([inAlbumType isEqualToString:@"5"]) return NO;
+	if ([inAlbumType isEqualToString:@"97"]) return NO;
+	if ([inAlbumType isEqualToString:@"98"]) return NO;
 	if ([inAlbumType isEqualToString:@"99"]) return NO;
-//	if ([inAlbumType isEqualToString:@"98"]) return NO;
 	return YES;
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSImage*) iconForAlbumType:(NSString*)inType
-{
-	// '12' ???
-	// cp: I found icons for a 'smart journal' or a 'smart book' but no menu command to create on.
-	
-	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
-	{
-		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil},	// album
-		{@"2",	@"Project_I_SAlbum.tiff",			@"folder",	nil,	nil},	// smart album
-		{@"3",	@"List_Icons_LibrarySAlbum.tiff",	@"folder",	nil,	nil},	// library **** ... 200X
-		{@"4",	@"Project_I_Project.tiff",			@"folder",	nil,	nil},	// project
-		{@"5",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (top level)
-		{@"6",	@"Project_I_Folder.tiff",			@"folder",	nil,	nil},	// folder
-		{@"7",	@"Project_I_ProjectFolder.tiff",	@"folder",	nil,	nil},	// sub-folder of project
-		{@"8",	@"Project_I_Book.tiff",				@"folder",	nil,	nil},	// book
-		{@"9",	@"Project_I_WebPage.tiff",			@"folder",	nil,	nil},	// web gallery
-		{@"9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
-		{@"10",	@"Project_I_WebJournal.tiff",		@"folder",	nil,	nil},	// web journal
-		{@"11",	@"Project_I_LightTable.tiff",		@"folder",	nil,	nil},	// light table
-		{@"13",	@"Project_I_SWebGallery.tiff",		@"folder",	nil,	nil},	// smart web gallery
-		{@"97",	@"Project_I_Projects.tiff",			@"folder",	nil,	nil},	// library
-		{@"98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
-		{@"99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
-	};
-
-	static const IMBIconTypeMapping kIconTypeMapping =
-	{
-		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
-		kIconTypeMappingEntries,
-		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil}	// fallback image
-	};
-
-	return [[IMBIconCache sharedIconCache] iconForType:inType fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+// Return YES indicated that an album should be a leaf node, i.e. that it does not have a disclosure triangle
+// in the IMBOutlineView...
 
 - (BOOL) isLeafAlbumType:(NSString*)inType
 {
@@ -440,24 +452,191 @@
 	
 	switch (type)
 	{
-		case 1:	 return YES;
-		case 2:	 return YES;
-		case 3:	 return YES;
-		case 4:	 return NO;
-		case 5:	 return NO;
-		case 6:	 return NO;
-		case 7:	 return NO;
-		case 8:	 return YES;
-		case 9:	 return YES;
-		case 10: return YES;
-		case 11: return YES;
-		case 13: return YES;
-		case 97: return NO;
-		case 98: return NO;
-		case 99: return NO;
+		case 1:	 return YES;	// Album
+		case 2:	 return YES;	// Smart album
+		case 3:	 return YES;	// Smart album
+		case 4:	 return NO;		// Project
+		case 5:	 return NO;		// All projects
+		case 6:	 return NO;		// Folder
+		case 7:	 return NO;		// Folder
+		case 8:	 return YES;	// Book
+		case 9:	 return YES;	// Web page
+		case 10: return YES;	// Web journal
+		case 11: return YES;	// Lighttable
+		case 13: return YES;	// Web gallery
+		case 19: return YES;	// Slideshow
+		case 94: return YES;	// Photos
+		case 95: return YES;	// Flagged
+		case 97: return NO;		// Library
+		case 98: return NO;		// Library
+		case 99: return NO;		// Library (holding all images)
 	}
 	
 	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Icons for older Aperture versions...
+
+- (NSImage*) iconForAlbumType2:(NSString*)inType
+{
+	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
+	{
+		{@"v2-1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil},	// album
+		{@"v2-2",	@"Project_I_SAlbum.tiff",			@"folder",	nil,	nil},	// smart album
+		{@"v2-3",	@"List_Icons_LibrarySAlbum.tiff",	@"folder",	nil,	nil},	// library **** ... 200X
+		{@"v2-4",	@"Project_I_Project.tiff",			@"folder",	nil,	nil},	// project
+		{@"v2-5",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (top level)
+		{@"v2-6",	@"Project_I_Folder.tiff",			@"folder",	nil,	nil},	// folder
+		{@"v2-7",	@"Project_I_ProjectFolder.tiff",	@"folder",	nil,	nil},	// sub-folder of project
+		{@"v2-8",	@"Project_I_Book.tiff",				@"folder",	nil,	nil},	// book
+		{@"v2-9",	@"Project_I_WebPage.tiff",			@"folder",	nil,	nil},	// web gallery
+		{@"v2-9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
+		{@"v2-10",	@"Project_I_WebJournal.tiff",		@"folder",	nil,	nil},	// web journal
+		{@"v2-11",	@"Project_I_LightTable.tiff",		@"folder",	nil,	nil},	// light table
+		{@"v2-13",	@"Project_I_SWebGallery.tiff",		@"folder",	nil,	nil},	// smart web gallery
+		{@"v2-97",	@"Project_I_Projects.tiff",			@"folder",	nil,	nil},	// library
+		{@"v2-98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
+		{@"v2-99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
+	};
+
+	static const IMBIconTypeMapping kIconTypeMapping =
+	{
+		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
+		kIconTypeMappingEntries,
+		{@"v2-1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil}	// fallback image
+	};
+
+	// Since icons are different for different versions of Aperture, we are adding the prefix v2- or v3- 
+	// to the album type so that we can store different icons (for each version) in the icon cache...
+
+	NSString* type = [@"v2-" stringByAppendingString:inType];
+	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
+}
+
+
+// New icons for Aperture 3...
+
+- (NSImage*) iconForAlbumType3:(NSString*)inType
+{
+	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
+	{
+		{@"v3-1",	@"SL-album.tiff",					@"folder",	nil,	nil},	// album
+		{@"v3-2",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// smart album
+		{@"v3-3",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// library **** ... 200X
+		{@"v3-4",	@"SL-project.tiff",					@"folder",	nil,	nil},	// project
+		{@"v3-5",	@"SL-allProjects.tiff",				@"folder",	nil,	nil},	// library (top level)
+		{@"v3-6",	@"SL-folder.tiff",					@"folder",	nil,	nil},	// folder
+		{@"v3-7",	@"SL-folder.tiff",					@"folder",	nil,	nil},	// sub-folder of project
+		{@"v3-8",	@"SL-book.tiff",					@"folder",	nil,	nil},	// book
+		{@"v3-9",	@"SL-webpage.tiff",					@"folder",	nil,	nil},	// web gallery
+		{@"v3-9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
+		{@"v3-10",	@"SL-webJournal.tiff",				@"folder",	nil,	nil},	// web journal
+		{@"v3-11",	@"SL-lightTable.tiff",				@"folder",	nil,	nil},	// light table
+		{@"v3-13",	@"sl-icon-small_webGallery.tiff",	@"folder",	nil,	nil},	// smart web gallery
+		{@"v3-19",	@"SL-slideshow.tiff",				@"folder",	nil,	nil},	// slideshow
+		{@"v3-94",	@"SL-photos.tiff",					@"folder",	nil,	nil},	// photos
+		{@"v3-95",	@"SL-flag.tif",						@"folder",	nil,	nil},	// flagged
+		{@"v3-96",	@"SL-smartLibrary.tiff",			@"folder",	nil,	nil},	// library albums
+		{@"v3-97",	@"SL-allProjects.tiff",				@"folder",	nil,	nil},	// library
+		{@"v3-98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
+		{@"v3-99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
+	};
+
+	static const IMBIconTypeMapping kIconTypeMapping =
+	{
+		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
+		kIconTypeMappingEntries,
+		{@"1",	@"SL-album.tiff",					@"folder",	nil,	nil}	// fallback image
+	};
+
+	// Since icons are different for different versions of Aperture, we are adding the prefix v2- or v3- 
+	// to the album type so that we can store different icons (for each version) in the icon cache...
+
+	NSString* type = [@"v3-" stringByAppendingString:inType];
+	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
+}
+
+
+- (NSImage*) iconForAlbumType:(NSString*)inType
+{
+	if (self.version < 3)
+	{
+		return [self iconForAlbumType2:inType];
+	}
+	else
+	{
+		return [self iconForAlbumType3:inType];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// The xml file has a list of albums. Each album contains a KeyList entry (array of images). However this list
+// does not always seem to corresponds with what one sees in the Aperture UI itself. Instead there are albums
+// in the xml that we do not want to display as a node, which do contain the images we need for another node.
+// For this reason we need a mapping mechanism that lets us assign the KeyList of one album to another node.
+// The following two methods provide this mecahism...
+
+- (NSArray*) _keylistForAlbumType:(NSString*)inAlbumType
+{
+	NSArray* albums = [self.plist objectForKey:@"List of Albums"];
+
+	for (NSDictionary* albumDict in albums)
+	{
+		NSString* albumType = [albumDict objectForKey:@"Album Type"];
+		
+		if ([albumType isEqualToString:inAlbumType])
+		{
+			return [albumDict objectForKey:@"KeyList"];
+		}
+	}
+	
+	return nil;
+}
+
+
+- (NSArray*) keylistForAlbum:(NSDictionary*)inAlbumDict
+{
+	NSString* albumType = [inAlbumDict objectForKey:@"Album Type"];
+	
+	// In Aperture 3 map keyList of album 99 to root node and Photos node...
+	
+//	if (self.version == 3)
+//	{
+		if ([albumType isEqualToString:@"98"])			// root node
+		{
+			return [self _keylistForAlbumType:@"99"];
+		}
+		else if ([albumType isEqualToString:@"5"])		// root node
+		{
+			return [self _keylistForAlbumType:@"99"];
+		}
+		else if ([albumType isEqualToString:@"94"])		// Photos node
+		{
+			return [self _keylistForAlbumType:@"99"];
+		}
+//	}
+	
+	// All other album just use their own key list...
+	
+	return [inAlbumDict objectForKey:@"KeyList"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Exclude everything but images...
+
+- (BOOL) shouldUseObject:(NSString*)inObjectType
+{
+	return inObjectType==nil || [inObjectType isEqualToString:@"Image"];
 }
 
 
@@ -536,20 +715,21 @@
 		
 		if ([inNode.identifier isEqualToString:albumIdentifier])
 		{
-			NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
+//			NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
+			NSArray* imageKeys = [self keylistForAlbum:albumDict];
 
 			for (NSString* key in imageKeys)
 			{
 				NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
-				NSDictionary* imageDict = [inImages objectForKey:key];
-				NSString* mediaType = [imageDict objectForKey:@"MediaType"];
+				NSDictionary* objectDict = [inImages objectForKey:key];
+				NSString* mediaType = [objectDict objectForKey:@"MediaType"];
 			
-				if (imageDict!=nil && ([mediaType isEqualToString:@"Image"] || mediaType==nil))
+				if (objectDict!=nil && [self shouldUseObject:mediaType])
 				{
-					NSString* imagePath = [imageDict objectForKey:@"ImagePath"];
-					NSString* thumbPath = [imageDict objectForKey:@"ThumbPath"];
-					NSString* caption   = [imageDict objectForKey:@"Caption"];
-					NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:imageDict];
+					NSString* imagePath = [objectDict objectForKey:@"ImagePath"];
+					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
+					NSString* caption   = [objectDict objectForKey:@"Caption"];
+					NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:objectDict];
 					[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:imagePath]];
 
 					IMBEnhancedObject* object = [[IMBEnhancedObject alloc] init];
@@ -558,9 +738,9 @@
 
 					object.location = (id)imagePath;
 					object.name = caption;
-					object.preliminaryMetadata = imageDict; // This metadata from the XML file is available immediately
-					object.metadata = nil;					// Build lazily when needed (takes longer)
-					object.metadataDescription = nil;		// Build lazily when needed (takes longer)
+					object.preliminaryMetadata = objectDict;	// This metadata from the XML file is available immediately
+					object.metadata = nil;						// Build lazily when needed (takes longer)
+					object.metadataDescription = nil;			// Build lazily when needed (takes longer)
 					object.parser = self;
 					object.index = index++;
 

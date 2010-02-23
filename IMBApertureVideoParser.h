@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
+#import "IMBApertureParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,23 +60,9 @@
 
 #pragma mark 
 
-@interface IMBApertureParser : IMBParser
-{
-	NSString* _appPath;
-	NSDictionary* _plist;
-	NSDate* _modificationDate;
-	BOOL _shouldDisplayLibraryName;
-	NSInteger _version;
-}
-
-@property (retain) NSString* appPath;
-@property (retain) NSDictionary* plist;
-@property (retain) NSDate* modificationDate;
-@property (assign) BOOL shouldDisplayLibraryName;
-@property (assign) NSInteger version;
+@interface IMBApertureVideoParser : IMBApertureParser
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-

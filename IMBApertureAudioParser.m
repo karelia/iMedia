@@ -52,7 +52,9 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
+#import "IMBApertureAudioParser.h"
+#import "IMBParserController.h"
+#import "IMBEnhancedObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,23 +62,75 @@
 
 #pragma mark 
 
-@interface IMBApertureParser : IMBParser
-{
-	NSString* _appPath;
-	NSDictionary* _plist;
-	NSDate* _modificationDate;
-	BOOL _shouldDisplayLibraryName;
-	NSInteger _version;
-}
-
-@property (retain) NSString* appPath;
-@property (retain) NSDictionary* plist;
-@property (retain) NSDate* modificationDate;
-@property (assign) BOOL shouldDisplayLibraryName;
-@property (assign) NSInteger version;
-
-@end
+@implementation IMBApertureAudioParser
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
+	[pool release];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Exclude some album types...
+
+//- (BOOL) shouldUseAlbumType:(NSString*)inAlbumType
+//{
+//	if ([inAlbumType isEqualToString:@"94"]) return NO;
+//	if ([inAlbumType isEqualToString:@"97"]) return NO;
+////	if ([inAlbumType isEqualToString:@"98"]) return NO;
+//	if ([inAlbumType isEqualToString:@"99"]) return NO;
+//	return YES;
+//}
+
+
+// Exclude everything but audio files...
+
+- (BOOL) shouldUseObject:(NSString*)inObjectType
+{
+	return [inObjectType isEqualToString:@"Audio"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
+// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
+// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
+// Please note that this method may be called on a background thread...
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+//	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
+//	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
+//	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+//	NSString* description = [self metadataDescriptionForMetadata:metadata];
+//
+//	if ([NSThread isMainThread])
+//	{
+//		inObject.metadata = metadata;
+//		inObject.metadataDescription = description;
+//	}
+//	else
+//	{
+//		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+//		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+//		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+//	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end
