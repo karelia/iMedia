@@ -469,11 +469,14 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 //	}
 //	
 //	[ibIconView setAnimates:NO];
+	[ibIconView setAllowsMultipleSelection:NO];
 }
 
 
 - (void) _configureListView
 {
+	[ibListView setAllowsMultipleSelection:NO];
+	
 	[ibListView setTarget:self];
 	[ibListView setAction:@selector(tableViewWasClicked:)];
 	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
@@ -485,6 +488,8 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) _configureComboView
 {
+	[ibComboView setAllowsMultipleSelection:NO];
+	
 	[ibComboView setTarget:self];
 	[ibComboView setAction:@selector(tableViewWasClicked:)];
 	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
@@ -1583,7 +1588,11 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	
     for (IMBObject* object in itemsNoLongerVisible)
 	{
+NS_DURING
 		[object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
+NS_HANDLER
+		// NSLog(@"Caught IMBObjectViewController exception trying to remove observer from %@", object);
+NS_ENDHANDLER
 		
 		NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
 		for (IMBObjectThumbnailLoadOperation* op in ops)
