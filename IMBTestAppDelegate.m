@@ -186,6 +186,8 @@
 
 - (BOOL) controller:(IMBParserController*)inController shouldLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
 {
+	return ([NSStringFromClass(inParserClass) isEqualToString:@"IMBApertureParser"]);
+
 	#if LOG_PARSERS
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
 	#endif

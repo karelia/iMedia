@@ -729,8 +729,6 @@
 					NSString* imagePath = [objectDict objectForKey:@"ImagePath"];
 					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [objectDict objectForKey:@"Caption"];
-					NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:objectDict];
-					[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:imagePath]];
 
 					IMBEnhancedObject* object = [[IMBEnhancedObject alloc] init];
 					[objects addObject:object];
