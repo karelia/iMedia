@@ -1856,7 +1856,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		frame.origin = [view.window convertBaseToScreen:frame.origin];
 	}
 
-	NSLog(@"%s frame=%@",__FUNCTION__,NSStringFromRect(frame));
+//	NSLog(@"%s frame=%@",__FUNCTION__,NSStringFromRect(frame));
 	return frame;
 }
 
