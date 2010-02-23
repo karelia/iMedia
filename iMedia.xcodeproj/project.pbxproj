@@ -63,6 +63,10 @@
 		D03C2841108265C300BD55CF /* IMBiPhotoVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */; };
 		D0403B5110918C03000F0AE1 /* IMBSafariBookmarkParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0403B4F10918C03000F0AE1 /* IMBSafariBookmarkParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0403B5210918C03000F0AE1 /* IMBSafariBookmarkParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0403B5010918C03000F0AE1 /* IMBSafariBookmarkParser.m */; };
+		D0467BB0112C220F00C1AA4E /* IMBApertureAudioParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0467BAE112C220F00C1AA4E /* IMBApertureAudioParser.h */; };
+		D0467BB1112C220F00C1AA4E /* IMBApertureAudioParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0467BAF112C220F00C1AA4E /* IMBApertureAudioParser.m */; };
+		D0467BB4112C223600C1AA4E /* IMBApertureVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0467BB2112C223600C1AA4E /* IMBApertureVideoParser.h */; };
+		D0467BB5112C223600C1AA4E /* IMBApertureVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */; };
 		D049EF5510346C1C003CC49C /* IMBNodeCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D049EF5310346C1C003CC49C /* IMBNodeCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049EF5610346C1C003CC49C /* IMBNodeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D049EF5410346C1C003CC49C /* IMBNodeCell.m */; };
 		D049F00A1034993E003CC49C /* NSImage+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0081034993E003CC49C /* NSImage+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -368,6 +372,10 @@
 		D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoVideoParser.m; sourceTree = "<group>"; };
 		D0403B4F10918C03000F0AE1 /* IMBSafariBookmarkParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBSafariBookmarkParser.h; sourceTree = "<group>"; };
 		D0403B5010918C03000F0AE1 /* IMBSafariBookmarkParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBSafariBookmarkParser.m; sourceTree = "<group>"; };
+		D0467BAE112C220F00C1AA4E /* IMBApertureAudioParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBApertureAudioParser.h; sourceTree = "<group>"; };
+		D0467BAF112C220F00C1AA4E /* IMBApertureAudioParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBApertureAudioParser.m; sourceTree = "<group>"; };
+		D0467BB2112C223600C1AA4E /* IMBApertureVideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBApertureVideoParser.h; sourceTree = "<group>"; };
+		D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBApertureVideoParser.m; sourceTree = "<group>"; };
 		D049EF5310346C1C003CC49C /* IMBNodeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeCell.h; sourceTree = "<group>"; };
 		D049EF5410346C1C003CC49C /* IMBNodeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeCell.m; sourceTree = "<group>"; };
 		D049F0081034993E003CC49C /* NSImage+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSImage+iMedia.h"; sourceTree = "<group>"; };
@@ -1019,6 +1027,8 @@
 				D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */,
 				D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */,
 				D0CA9426104932CD00725DA3 /* IMBiTunesParser.m */,
+				D0467BAE112C220F00C1AA4E /* IMBApertureAudioParser.h */,
+				D0467BAF112C220F00C1AA4E /* IMBApertureAudioParser.m */,
 				CEF695D21064347B005D7E72 /* iTunes icons */,
 			);
 			name = Audio;
@@ -1033,6 +1043,8 @@
 				D0FC9517108213A800973FEE /* IMBiTunesVideoParser.m */,
 				D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */,
 				D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */,
+				D0467BB2112C223600C1AA4E /* IMBApertureVideoParser.h */,
+				D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */,
 			);
 			name = Movie;
 			sourceTree = "<group>";
@@ -1152,6 +1164,8 @@
 				8F47B39110C416050013ED25 /* IMBOrderedDictionary.h in Headers */,
 				FCD9ABB410C677FF0092F441 /* IMBLoadMoreObject.h in Headers */,
 				D0AD4C9F10CCF36F00204318 /* IMBButtonObject.h in Headers */,
+				D0467BB0112C220F00C1AA4E /* IMBApertureAudioParser.h in Headers */,
+				D0467BB4112C223600C1AA4E /* IMBApertureVideoParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1402,6 +1416,8 @@
 				8F47B39210C416050013ED25 /* IMBOrderedDictionary.m in Sources */,
 				FCD9ABB510C677FF0092F441 /* IMBLoadMoreObject.m in Sources */,
 				D0AD4CA010CCF36F00204318 /* IMBButtonObject.m in Sources */,
+				D0467BB1112C220F00C1AA4E /* IMBApertureAudioParser.m in Sources */,
+				D0467BB5112C223600C1AA4E /* IMBApertureVideoParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
