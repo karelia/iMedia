@@ -236,13 +236,28 @@
 
 - (NSString *)exifDateToLocalizedDisplayDate
 {
-	NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
-	[formatter setDateFormat:@"yyyy':'MM':'dd kk':'mm':'ss"];
-	NSDate *date = [formatter dateFromString:self];
-	[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-	[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
-	[formatter setTimeStyle:NSDateFormatterShortStyle];	// no seconds
+	static NSDateFormatter *parser = nil;
+	
+	if (parser == nil) {
+		parser = [[NSDateFormatter alloc] init];
+		
+		[parser setDateFormat:@"yyyy':'MM':'dd kk':'mm':'ss"];
+	}
+
+	NSDate *date = [parser dateFromString:self];
+	
+	static NSDateFormatter *formatter = nil;
+	
+	if (formatter == nil) {
+		formatter = [[NSDateFormatter alloc] init];
+		
+		[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+		[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
+		[formatter setTimeStyle:NSDateFormatterShortStyle];	// no seconds
+	}
+	
 	NSString *result = [formatter stringFromDate:date];
+	
 	return result;
 }
 

@@ -117,11 +117,7 @@
 				// format from EXIF -- we could convert to a date and make more localized....
 				if (nil != dateTime)
 				{
-					NSString *displayDate = [dateTime exifDateToLocalizedDisplayDate];
-					if (displayDate)
-					{
-						[md setObject:displayDate forKey:@"dateTimeLocalized"];
-					}
+					[md setObject:dateTime forKey:@"dateTime"];
 				}
 			}
 			result = [NSDictionary dictionaryWithDictionary:md];
@@ -142,7 +138,7 @@
 	NSNumber* model = [inMetadata objectForKey:@"model"];
 	NSString* type = [inMetadata objectForKey:@"ImageType"];
 	NSString* filetype = [inMetadata objectForKey:@"filetype"];
-	NSString* date = [inMetadata objectForKey:@"dateTimeLocalized"];
+	NSString* dateTime = [inMetadata objectForKey:@"dateTime"];
 	
 	if (width != nil && height != nil)
 	{
@@ -171,7 +167,7 @@
 		description = [description stringByAppendingFormat:@"\n"];
 	}
 	
-	if (date != nil)
+	if (dateTime != nil)
 	{
 		NSString* dateLabel = NSLocalizedStringWithDefaultValue(
 				@"Date",
@@ -179,7 +175,7 @@
 				@"Date",
 				@"Date label in metadata description");
 		
-		description = [description stringByAppendingFormat:@"%@: %@\n",dateLabel,date];
+		description = [description stringByAppendingFormat:@"%@: %@\n",dateLabel,[dateTime exifDateToLocalizedDisplayDate]];
 	}
 	
 	return description;
