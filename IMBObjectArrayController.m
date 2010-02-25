@@ -160,7 +160,6 @@ const NSString* kSearchStringContext = @"searchString";
     return _newObject;
 }
 
-
 - (NSArray*) arrangeObjects:(NSArray*)inObjects
 {
 	BOOL hasProxyForObject = _delegate && [_delegate respondsToSelector:@selector(proxyForObject:)];
@@ -264,12 +263,35 @@ const NSString* kSearchStringContext = @"searchString";
 			else if (searching)
 			{
 				NSString* value;
+				BOOL foundMatch = NO;
 				
 				for (NSString* key in _searchableProperties)
 				{
-					value = [[object valueForKeyPath:key] lowercaseString];
+					value = [object valueForKeyPath:key];
+
+					if (value != nil)
+					{
+						if ([value isKindOfClass:[NSString class]])
+						{
+							NSString* thisString = [(NSString*)value lowercaseString];
+							foundMatch = [thisString rangeOfString:lowerCaseSearchString].location != NSNotFound;
+						}
+						else
+						{
+							// We don't test for implementation of the search filtering method, because 
+							// runtime querying for every object could be expensive. The previous contract was
+							// that metadata values had to be NSString. The new contract is that metadata 
+							// values have to either be NSString or else implement this filter message.
+							//
+							// NOTE also that if the client has a custom metadata type. we won't even make assumptions
+							// about whether they want the lowercase string or not, we'll just let them dictate
+							// the entire matching policy based on the user's input string.
+							
+							foundMatch = [value matchesSearchFilterString:_searchString];
+						}
+					}
 					
-					if (value!=nil && [value rangeOfString:lowerCaseSearchString].location!=NSNotFound)
+					if (foundMatch)
 					{
 						[matchedObjects addObject:proxy];
 						break;
