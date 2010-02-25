@@ -420,6 +420,7 @@ static const double kMinimumObjectViewHeight = 144.0;
 	{
 		CGFloat bottomOverflow = kMinimumObjectViewHeight - bottomFrame.size.height;
 		bottomFrame.size.height = kMinimumObjectViewHeight;
+		bottomFrame.origin.y -= bottomOverflow;
 		topFrame.size.height -= bottomOverflow;
 	}
  
