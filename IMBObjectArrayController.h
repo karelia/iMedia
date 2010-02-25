@@ -82,3 +82,15 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Objects encountered in searchableProperties, if not NSString, must 
+// implement this method to facilitate search filtering.
+
+@interface NSObject (IMBOBjectArrayControllerFiltering)
+
+- (BOOL) matchesSearchFilterString:(NSString*)searchString;
+
+@end
+
+//----------------------------------------------------------------------------------------------------------------------
