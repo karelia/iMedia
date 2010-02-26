@@ -75,6 +75,8 @@
 @interface iMBAperturePhotosParser (Private)
 
 + (NSString*)pathForVolumeNamed:(NSString *)name;
++ (NSString*)pathForVolumeUUID:(NSString *)uuid;
++ (NSString*)cloneDatabase:(NSString*)databasePath;
 
 @end
 
@@ -159,7 +161,7 @@
 - (void)parseOneDatabaseWithPath:(NSString *)databasePath intoLibraryNode:(iMBLibraryNode *)root
 {
 	[root fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
-	
+
     NSDictionary *library = [NSDictionary dictionaryWithContentsOfFile:databasePath];
 	
 	NSDictionary *imageRecords = [library objectForKey:@"Master Image List"];
@@ -350,138 +352,219 @@
 	NSString *previewPath = [record valueForKey:@"ImagePath"];
 	NSString *basePath = [[previewPath stringByDeletingLastPathComponent] stringByDeletingLastPathComponent];
 	
-	// Look for the master within the library
-	NSString *infoPath = [[basePath stringByAppendingPathComponent:@"OriginalVersionInfo"] stringByAppendingPathExtension:@"apversion"];
-    NSDictionary *infoDict = [NSDictionary dictionaryWithContentsOfFile:infoPath];
-	NSString *masterName = [infoDict objectForKey:@"fileName"];
+	NSRange range = [previewPath rangeOfString:@".aplibrary/"];
+	NSString *libraryPath = [previewPath substringToIndex:(range.location + range.length)];
+	NSString *databasePath = [[libraryPath stringByAppendingPathComponent:@"Database"] stringByAppendingPathComponent:@"Library.apdb"];
 	
-	if (masterName != nil) {
-		NSString *localPath = [basePath stringByAppendingPathComponent:masterName];
-		
-		if ([fileManager fileExistsAtPath:localPath]) {
-			masterPath = localPath;
-		}
-		else {
-			NSString *apFile = [localPath stringByAppendingPathExtension:@"apfile"];
-			NSDictionary *apDict = [NSDictionary dictionaryWithContentsOfFile:apFile];
-			NSString *imagePath = [apDict objectForKey:@"imagePath"];
-			
-			if (imagePath != nil) {
-				NSDictionary *volumeInfo = [apDict objectForKey:@"volumeInfo"];
-				NSString *volumeName = [volumeInfo objectForKey:@"volumeName"];
-				NSString *volumePath = [iMBAperturePhotosParser pathForVolumeNamed:volumeName];
-				NSString *fullPath = [volumePath stringByAppendingPathComponent:imagePath];
-				
-				if ([fileManager fileExistsAtPath:fullPath]) {
-					masterPath = fullPath;
-				}
-			}
-		}
-	}
-	
-	if (masterPath == nil) { // The master file is a referenced external file	
-		NSRange range = [previewPath rangeOfString:@".aplibrary/"];
-		NSString *libraryPath = [previewPath substringToIndex:(range.location + range.length)];
-		NSString *databasePath = [[libraryPath stringByAppendingPathComponent:@"Aperture.aplib"] stringByAppendingPathComponent:@"Library.apdb"];
-		FMDatabase *database = [FMDatabase databaseWithPath:databasePath];
+	if ([fileManager fileExistsAtPath:databasePath]) {
+		// We are looking at Aperture 3
+		NSString *readOnlyDatabasePath = [iMBAperturePhotosParser cloneDatabase:databasePath];
+		FMDatabase *database = [FMDatabase databaseWithPath:readOnlyDatabasePath];
 		
 		if ([database open]) {
-			NSString *fileUUID = nil;
+			NSString *masterUUID = nil;
 			NSString *imagePath = nil;
 			NSString *fileVolumeUUID = nil;
-			NSString *volumeName = nil;
+			NSString *diskUUID = nil;
 			
 			NSString *versionUUID = [record valueForKey:@"VersionUUID"];
-			FMResultSet *fileUUIDResult = [database executeQuery:@"SELECT zfileuuid FROM zrkversion WHERE zuuid = ?", versionUUID];
+			FMResultSet *masterUUIDResult =
+				[database executeQuery:@"SELECT masterUuid, rawMasterUuid, nonRawMasterUuid FROM rkversion WHERE uuid = ?", versionUUID];
 			
-			if ([fileUUIDResult next]) {
-				fileUUID = [fileUUIDResult stringForColumn:@"zfileuuid"];
+			if ([masterUUIDResult next]) {
+				masterUUID = [masterUUIDResult stringForColumn:@"rawMasterUuid"];
+				
+				if (masterUUID  == nil) {
+					masterUUID = [masterUUIDResult stringForColumn:@"nonRawMasterUuid"];
+
+					if (masterUUID  == nil) {
+						masterUUID = [masterUUIDResult stringForColumn:@"masterUuid"];
+					}
+				}
 			}
 			
-			[fileUUIDResult close];		
+			[masterUUIDResult close];		
 			
-			if (fileUUID != nil) {
-				FMResultSet *imagePathResult = [database executeQuery:@"SELECT zimagepath FROM zrkfile WHERE zuuid = ?", fileUUID];
+			if (masterUUID != nil) {
+				FMResultSet *imagePathResult = [database executeQuery:@"SELECT fileVolumeUuid, imagePath FROM rkmaster WHERE uuid = ?", masterUUID];
 				
 				if ([imagePathResult next]) {
-					imagePath =[imagePathResult stringForColumn:@"zimagepath"];
+					imagePath =[imagePathResult stringForColumn:@"imagePath"];
+					fileVolumeUUID =[imagePathResult stringForColumn:@"fileVolumeUuid"];
 				}
 				
 				[imagePathResult close];		
 				
-				FMResultSet *fileVolumeUUIDResult = [database executeQuery:@"SELECT zfilevolumeuuid FROM zrkfile WHERE zuuid = ?", fileUUID];
-				
-				if ([fileVolumeUUIDResult next]) {
-					fileVolumeUUID =[fileVolumeUUIDResult stringForColumn:@"zfilevolumeuuid"];
-				}
-				
-				[fileVolumeUUIDResult close];		
-				
 				if (fileVolumeUUID != nil) {
-					FMResultSet *volumeNameResult = [database executeQuery:@"SELECT zname FROM zrkvolume WHERE zuuid = ?", fileVolumeUUID];
+					FMResultSet *diskUUIDResult = [database executeQuery:@"SELECT diskUuid FROM rkvolume WHERE uuid = ?", fileVolumeUUID];
 					
-					if ([volumeNameResult next]) {
-						volumeName = [volumeNameResult stringForColumn:@"zname"];
+					if ([diskUUIDResult next]) {
+						diskUUID = [diskUUIDResult stringForColumn:@"diskUuid"];
 					}
 					
-					[volumeNameResult close];		
+					[diskUUIDResult close];		
 				}
 			}
-			else { // We may be looking at a pre-2.0 library
-				NSMutableString *imagePathQuery = [NSMutableString string];
-				
-				[imagePathQuery appendString:@"SELECT zimagepath FROM zrkfile"];
-				[imagePathQuery appendString:@" WHERE z_pk = ("];
-				[imagePathQuery appendString:@"    SELECT zoriginalfile FROM zrkmaster"];
-				[imagePathQuery appendString:@"     WHERE z_pk = ("];
-				[imagePathQuery appendString:@"        SELECT zmaster FROM zrkversion"];
-				[imagePathQuery appendString:@"         WHERE zuuid = ?"];
-				[imagePathQuery appendString:@"      )"];
-				[imagePathQuery appendString:@" )"];
-				
-				FMResultSet *imagePathResult = [database executeQuery:imagePathQuery, versionUUID];
-				
-				if ([imagePathResult next]) {
-					imagePath = [imagePathResult stringForColumn:@"zimagepath"];
-				}
-				
-				[imagePathResult close];
-				
-				if (imagePath != nil) {
-					NSMutableString *volumeNameQuery = [NSMutableString string];
-					
-					[volumeNameQuery appendString:@"SELECT zname FROM zrkvolume"];
-					[volumeNameQuery appendString:@" WHERE z_pk = ("];
-					[volumeNameQuery appendString:@"    SELECT zfilevolume FROM zrkfile"];
-					[volumeNameQuery appendString:@"     WHERE z_pk = ("];
-					[volumeNameQuery appendString:@"        SELECT zoriginalfile FROM zrkmaster"];
-					[volumeNameQuery appendString:@"         WHERE z_pk = ("];
-					[volumeNameQuery appendString:@"            SELECT zmaster FROM zrkversion"];
-					[volumeNameQuery appendString:@"             WHERE zuuid = ?"];
-					[volumeNameQuery appendString:@"         )"];
-					[volumeNameQuery appendString:@"     )"];
-					[volumeNameQuery appendString:@" )"];
-					
-					FMResultSet *volumeNameResult = [database executeQuery:volumeNameQuery, versionUUID];
-					
-					if ([volumeNameResult next]) {
-						volumeName  =[volumeNameResult stringForColumn:@"zname"];
-					}
-					
-					[volumeNameResult close];		
-				}
-			}
-			
+
 			if (imagePath != nil) {
-				NSString *volumePath = [iMBAperturePhotosParser pathForVolumeNamed:volumeName];
-				NSString *fullPath = [volumePath stringByAppendingPathComponent:imagePath];
-				
-				if ([fileManager fileExistsAtPath:fullPath]) {
-					masterPath = fullPath;
+				if (fileVolumeUUID != nil) {
+					if (diskUUID != nil) {
+						NSString *volumePath = [iMBAperturePhotosParser pathForVolumeUUID:diskUUID];
+						NSString *fullPath = [volumePath stringByAppendingPathComponent:imagePath];
+						
+						if ([fileManager fileExistsAtPath:fullPath]) {
+							masterPath = fullPath;
+						}
+					}
+				}
+				else {
+					NSString *mastersPath = [libraryPath stringByAppendingPathComponent:@"Masters"];
+					NSString *fullPath = [mastersPath stringByAppendingPathComponent:imagePath];
+					
+					if ([fileManager fileExistsAtPath:fullPath]) {
+						masterPath = fullPath;
+					}					
 				}
 			}
 			
 			[database close];
+		}		
+	}
+	else {
+		// Aperture 2 or prior
+		// Look for the master within the library
+		NSString *infoPath = [[basePath stringByAppendingPathComponent:@"OriginalVersionInfo"] stringByAppendingPathExtension:@"apversion"];
+		NSDictionary *infoDict = [NSDictionary dictionaryWithContentsOfFile:infoPath];
+		NSString *masterName = [infoDict objectForKey:@"fileName"];
+		
+		if (masterName != nil) {
+			NSString *localPath = [basePath stringByAppendingPathComponent:masterName];
+			
+			if ([fileManager fileExistsAtPath:localPath]) {
+				masterPath = localPath;
+			}
+			else {
+				NSString *apFile = [localPath stringByAppendingPathExtension:@"apfile"];
+				NSDictionary *apDict = [NSDictionary dictionaryWithContentsOfFile:apFile];
+				NSString *imagePath = [apDict objectForKey:@"imagePath"];
+				
+				if (imagePath != nil) {
+					NSDictionary *volumeInfo = [apDict objectForKey:@"volumeInfo"];
+					NSString *volumeName = [volumeInfo objectForKey:@"volumeName"];
+					NSString *volumePath = [iMBAperturePhotosParser pathForVolumeNamed:volumeName];
+					NSString *fullPath = [volumePath stringByAppendingPathComponent:imagePath];
+					
+					if ([fileManager fileExistsAtPath:fullPath]) {
+						masterPath = fullPath;
+					}
+				}
+			}
+		}
+		
+		if (masterPath == nil) { // The master file is a referenced external file	
+			NSRange range = [previewPath rangeOfString:@".aplibrary/"];
+			NSString *libraryPath = [previewPath substringToIndex:(range.location + range.length)];
+			NSString *databasePath = [[libraryPath stringByAppendingPathComponent:@"Aperture.aplib"] stringByAppendingPathComponent:@"Library.apdb"];
+			FMDatabase *database = [FMDatabase databaseWithPath:databasePath];
+			
+			if ([database open]) {
+				NSString *fileUUID = nil;
+				NSString *imagePath = nil;
+				NSString *fileVolumeUUID = nil;
+				NSString *volumeName = nil;
+				
+				NSString *versionUUID = [record valueForKey:@"VersionUUID"];
+				FMResultSet *fileUUIDResult = [database executeQuery:@"SELECT zfileuuid FROM zrkversion WHERE zuuid = ?", versionUUID];
+				
+				if ([fileUUIDResult next]) {
+					fileUUID = [fileUUIDResult stringForColumn:@"zfileuuid"];
+				}
+				
+				[fileUUIDResult close];		
+				
+				if (fileUUID != nil) {
+					FMResultSet *imagePathResult = [database executeQuery:@"SELECT zimagepath FROM zrkfile WHERE zuuid = ?", fileUUID];
+					
+					if ([imagePathResult next]) {
+						imagePath =[imagePathResult stringForColumn:@"zimagepath"];
+					}
+					
+					[imagePathResult close];		
+					
+					FMResultSet *fileVolumeUUIDResult = [database executeQuery:@"SELECT zfilevolumeuuid FROM zrkfile WHERE zuuid = ?", fileUUID];
+					
+					if ([fileVolumeUUIDResult next]) {
+						fileVolumeUUID =[fileVolumeUUIDResult stringForColumn:@"zfilevolumeuuid"];
+					}
+					
+					[fileVolumeUUIDResult close];		
+					
+					if (fileVolumeUUID != nil) {
+						FMResultSet *volumeNameResult = [database executeQuery:@"SELECT zname FROM zrkvolume WHERE zuuid = ?", fileVolumeUUID];
+						
+						if ([volumeNameResult next]) {
+							volumeName = [volumeNameResult stringForColumn:@"zname"];
+						}
+						
+						[volumeNameResult close];		
+					}
+				}
+				else { // We may be looking at a pre-2.0 library
+					NSMutableString *imagePathQuery = [NSMutableString string];
+					
+					[imagePathQuery appendString:@"SELECT zimagepath FROM zrkfile"];
+					[imagePathQuery appendString:@" WHERE z_pk = ("];
+					[imagePathQuery appendString:@"    SELECT zoriginalfile FROM zrkmaster"];
+					[imagePathQuery appendString:@"     WHERE z_pk = ("];
+					[imagePathQuery appendString:@"        SELECT zmaster FROM zrkversion"];
+					[imagePathQuery appendString:@"         WHERE zuuid = ?"];
+					[imagePathQuery appendString:@"      )"];
+					[imagePathQuery appendString:@" )"];
+					
+					FMResultSet *imagePathResult = [database executeQuery:imagePathQuery, versionUUID];
+					
+					if ([imagePathResult next]) {
+						imagePath = [imagePathResult stringForColumn:@"zimagepath"];
+					}
+					
+					[imagePathResult close];
+					
+					if (imagePath != nil) {
+						NSMutableString *volumeNameQuery = [NSMutableString string];
+						
+						[volumeNameQuery appendString:@"SELECT zname FROM zrkvolume"];
+						[volumeNameQuery appendString:@" WHERE z_pk = ("];
+						[volumeNameQuery appendString:@"    SELECT zfilevolume FROM zrkfile"];
+						[volumeNameQuery appendString:@"     WHERE z_pk = ("];
+						[volumeNameQuery appendString:@"        SELECT zoriginalfile FROM zrkmaster"];
+						[volumeNameQuery appendString:@"         WHERE z_pk = ("];
+						[volumeNameQuery appendString:@"            SELECT zmaster FROM zrkversion"];
+						[volumeNameQuery appendString:@"             WHERE zuuid = ?"];
+						[volumeNameQuery appendString:@"         )"];
+						[volumeNameQuery appendString:@"     )"];
+						[volumeNameQuery appendString:@" )"];
+						
+						FMResultSet *volumeNameResult = [database executeQuery:volumeNameQuery, versionUUID];
+						
+						if ([volumeNameResult next]) {
+							volumeName  =[volumeNameResult stringForColumn:@"zname"];
+						}
+						
+						[volumeNameResult close];		
+					}
+				}
+				
+				if (imagePath != nil) {
+					NSString *volumePath = [iMBAperturePhotosParser pathForVolumeNamed:volumeName];
+					NSString *fullPath = [volumePath stringByAppendingPathComponent:imagePath];
+					
+					if ([fileManager fileExistsAtPath:fullPath]) {
+						masterPath = fullPath;
+					}
+				}
+				
+				[database close];
+			}
 		}
 	}
 	
@@ -516,6 +599,109 @@
 	}
 	
 	return @"/";
+}
+
+
++ (NSString*)pathForVolumeUUID:(NSString *)uuid
+{
+	if (uuid != nil) {
+		NSString *path = @"/usr/sbin/diskutil";
+
+		NSMutableArray *arguments = [NSMutableArray array];
+		
+		[arguments addObject:@"info"];
+		[arguments addObject:@"-plist"];
+		[arguments addObject:uuid];
+		
+		NSTask *task = [[NSTask alloc] init];
+		
+		[task setLaunchPath:path];	
+		[task setArguments:arguments];
+		
+		NSPipe *outputPipe = [NSPipe pipe];
+		NSPipe *errorPipe = [NSPipe pipe];
+		
+		[task setStandardOutput:outputPipe];
+		[task setStandardError:errorPipe];
+		
+		NSFileHandle *outputFileHandle = [outputPipe fileHandleForReading];
+		NSFileHandle *errorFileHandle = [errorPipe fileHandleForReading];
+		
+		@try {
+			[task launch];
+			[task waitUntilExit];
+		}
+		@catch (NSException *localException) {
+			NSLog(@"Caught %@: %@", [localException name], [localException reason]);
+
+			return nil;
+		}
+		
+		NSData *outputData = [outputFileHandle readDataToEndOfFile];
+		NSData *errorData = [errorFileHandle readDataToEndOfFile];
+		NSString *result = nil;
+		
+		if ((errorData != nil) && [errorData length]) {
+			NSLog(@"Got error message: %@",  [[[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding] autorelease]);
+		}
+		
+		if ([task terminationStatus] == noErr) {
+			if ((outputData != nil) && [outputData length]) {
+				result = [[[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding] autorelease];
+			}
+		}
+		
+		[outputFileHandle closeFile];
+		[errorFileHandle closeFile];
+		
+		[task release];
+		
+		if (result != nil) {
+			NSDictionary *volumeInfo = [result propertyList];
+			NSString *mountPoint = [volumeInfo objectForKey:@"MountPoint"];
+			
+			return mountPoint;
+		}
+	}
+	
+	return nil;
+}
+
++ (NSString*)cloneDatabase:(NSString*)databasePath
+{
+	// BEGIN ugly hack to work around Aperture locking its database
+
+	NSString *basePath = [databasePath stringByDeletingPathExtension];	
+	NSString *pathExtension = [databasePath pathExtension];	
+	NSString *readOnlyDatabasePath = [[NSString stringWithFormat:@"%@-readOnly", basePath] stringByAppendingPathExtension:pathExtension];
+
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+	BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
+	
+	if ([fileManager fileExistsAtPath:readOnlyDatabasePath]) {
+		NSDictionary *attributesOfCopy = [fileManager fileAttributesAtPath:readOnlyDatabasePath traverseLink:YES];
+		NSDate *modDateOfCopy = [attributesOfCopy fileModificationDate];
+		
+		NSDictionary *attributesOfOrig = [fileManager fileAttributesAtPath:databasePath traverseLink:YES];
+		NSDate *modDateOfOrig = [attributesOfOrig fileModificationDate];
+		
+		if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy]) {
+			needToCopyFile = NO;
+		}
+	}
+	
+	if (needToCopyFile) {
+		(void) [fileManager removeFileAtPath:readOnlyDatabasePath handler:nil];
+		BOOL copied = [fileManager copyPath:databasePath toPath:readOnlyDatabasePath handler:nil];
+		
+		if (!copied) {
+			NSLog(@"Unable to copy database file at %@", databasePath);
+		}
+	}
+	
+	// END ugly hack
+	
+	return readOnlyDatabasePath;
 }
 
 @end
