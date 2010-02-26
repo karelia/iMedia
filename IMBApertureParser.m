@@ -394,14 +394,14 @@
 
 - (NSString*) rootNodeIdentifier
 {
-//	// Aperture 2...
-//	
-//	if (self.version < 3)
-//	{
-//		return [self identifierWithAlbumId:[NSNumber numberWithInt:1]];
-//	}
-//	
-//	// Aperture 3...
+	// Aperture 2...
+	
+	if (self.version < 3)
+	{
+		return [self identifierWithAlbumId:[NSNumber numberWithInt:1]];
+	}
+	
+	// Aperture 3...
 	
 	NSArray* albums = [self.plist objectForKey:@"List of Albums"];
 	NSNumber* albumId = [NSNumber numberWithInt:1];
@@ -435,7 +435,7 @@
 
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType
 {
-	if ([inAlbumType isEqualToString:@"5"]) return NO;
+	if ([inAlbumType isEqualToString:@"5"]) return (self.version < 3);
 	if ([inAlbumType isEqualToString:@"97"]) return NO;
 	if ([inAlbumType isEqualToString:@"98"]) return NO;
 	if ([inAlbumType isEqualToString:@"99"]) return NO;
