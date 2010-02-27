@@ -175,7 +175,7 @@
 				@"Date",
 				@"Date label in metadata description");
 		
-		description = [description stringByAppendingFormat:@"%@: %@\n",dateLabel,[dateTime exifDateToLocalizedDisplayDate]];
+		description = [description stringByAppendingFormat:@"%@: %@\n",dateLabel,dateTime];
 	}
 	
 	return description;
