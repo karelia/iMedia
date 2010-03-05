@@ -101,39 +101,84 @@
 }
 
 
-- (NSImage*) iconForType:(NSString*)name 
+- (NSImage*) iconForType2:(NSString*)inType 
 {
 	// '12' ???
 	// cp: I found icons for a 'smart journal' or a 'smart book' but no menu command to create on.
 	
 	static const SiMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
-		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil},	// album
-		{@"2",	@"Project_I_SAlbum.tiff",			@"folder",	nil,	nil},	// smart album
-		{@"3",	@"List_Icons_LibrarySAlbum.tiff",	@"folder",	nil,	nil},	// library **** ... 200X
-		{@"4",	@"Project_I_Project.tiff",			@"folder",	nil,	nil},	// project
-		{@"5",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (top level)
-		{@"6",	@"Project_I_Folder.tiff",			@"folder",	nil,	nil},	// folder
-		{@"7",	@"Project_I_ProjectFolder.tiff",	@"folder",	nil,	nil},	// sub-folder of project
-		{@"8",	@"Project_I_Book.tiff",				@"folder",	nil,	nil},	// book
-		{@"9",	@"Project_I_WebPage.tiff",			@"folder",	nil,	nil},	// web gallery
-		{@"9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
-		{@"10",	@"Project_I_WebJournal.tiff",		@"folder",	nil,	nil},	// web journal
-		{@"11",	@"Project_I_LightTable.tiff",		@"folder",	nil,	nil},	// light table
-		{@"13",	@"Project_I_SWebGallery.tiff",		@"folder",	nil,	nil},	// smart web gallery
-		{@"97",	@"Project_I_Projects.tiff",			@"folder",	nil,	nil},	// library
-		{@"98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
-		{@"99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
+		{@"v2-1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil},	// album
+		{@"v2-2",	@"Project_I_SAlbum.tiff",			@"folder",	nil,	nil},	// smart album
+		{@"v2-3",	@"List_Icons_LibrarySAlbum.tiff",	@"folder",	nil,	nil},	// library **** ... 200X
+		{@"v2-4",	@"Project_I_Project.tiff",			@"folder",	nil,	nil},	// project
+		{@"v2-5",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (top level)
+		{@"v2-6",	@"Project_I_Folder.tiff",			@"folder",	nil,	nil},	// folder
+		{@"v2-7",	@"Project_I_ProjectFolder.tiff",	@"folder",	nil,	nil},	// sub-folder of project
+		{@"v2-8",	@"Project_I_Book.tiff",				@"folder",	nil,	nil},	// book
+		{@"v2-9",	@"Project_I_WebPage.tiff",			@"folder",	nil,	nil},	// web gallery
+		{@"v2-9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
+		{@"v2-10",	@"Project_I_WebJournal.tiff",		@"folder",	nil,	nil},	// web journal
+		{@"v2-11",	@"Project_I_LightTable.tiff",		@"folder",	nil,	nil},	// light table
+		{@"v2-13",	@"Project_I_SWebGallery.tiff",		@"folder",	nil,	nil},	// smart web gallery
+		{@"v2-97",	@"Project_I_Projects.tiff",			@"folder",	nil,	nil},	// library
+		{@"v2-98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
+		{@"v2-99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
 	};
-
+	
 	static const SiMBIconTypeMapping kIconTypeMapping =
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
-		{@"1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil}	// fallback image
+		{@"v2-1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil}	// fallback image
 	};
+	
+	// Since icons are different for different versions of Aperture, we are adding the prefix v2- or v3- 
+	// to the album type so that we can store different icons (for each version) in the icon cache...
+	
+	NSString* type = [@"v2-" stringByAppendingString:inType];
 
-	return [self iconForType:name fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
+	return [self iconForType:type fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
+}
+
+- (NSImage*) iconForType3:(NSString*)inType 
+{
+	static const SiMBIconTypeMappingEntry kIconTypeMappingEntries[] =
+	{
+		{@"v3-1",	@"SL-album.tiff",					@"folder",	nil,	nil},	// album
+		{@"v3-2",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// smart album
+		{@"v3-3",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// library **** ... 200X
+		{@"v3-4",	@"SL-project.tiff",					@"folder",	nil,	nil},	// project
+		{@"v3-5",	@"SL-allProjects.tiff",				@"folder",	nil,	nil},	// library (top level)
+		{@"v3-6",	@"SL-folder.tiff",					@"folder",	nil,	nil},	// folder
+		{@"v3-7",	@"SL-folder.tiff",					@"folder",	nil,	nil},	// sub-folder of project
+		{@"v3-8",	@"SL-book.tiff",					@"folder",	nil,	nil},	// book
+		{@"v3-9",	@"SL-webpage.tiff",					@"folder",	nil,	nil},	// web gallery
+		{@"v3-9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
+		{@"v3-10",	@"SL-webJournal.tiff",				@"folder",	nil,	nil},	// web journal
+		{@"v3-11",	@"SL-lightTable.tiff",				@"folder",	nil,	nil},	// light table
+		{@"v3-13",	@"sl-icon-small_webGallery.tiff",	@"folder",	nil,	nil},	// smart web gallery
+		{@"v3-19",	@"SL-slideshow.tiff",				@"folder",	nil,	nil},	// slideshow
+		{@"v3-94",	@"SL-photos.tiff",					@"folder",	nil,	nil},	// photos
+		{@"v3-95",	@"SL-flag.tif",						@"folder",	nil,	nil},	// flagged
+		{@"v3-96",	@"SL-smartLibrary.tiff",			@"folder",	nil,	nil},	// library albums
+		{@"v3-97",	@"SL-allProjects.tiff",				@"folder",	nil,	nil},	// library
+		{@"v3-98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
+	};
+	
+	static const SiMBIconTypeMapping kIconTypeMapping =
+	{
+		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
+		kIconTypeMappingEntries,
+		{@"1",	@"SL-album.tiff",					@"folder",	nil,	nil}	// fallback image
+	};
+	
+	// Since icons are different for different versions of Aperture, we are adding the prefix v2- or v3- 
+	// to the album type so that we can store different icons (for each version) in the icon cache...
+	
+	NSString* type = [@"v3-" stringByAppendingString:inType];
+
+	return [self iconForType:type fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
 }
 
 - (iMBLibraryNode *)nodeWithAlbumID:(NSNumber *)aid withRoot:(iMBLibraryNode *)root
@@ -163,7 +208,9 @@
 	[root fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 
     NSDictionary *library = [NSDictionary dictionaryWithContentsOfFile:databasePath];
-	
+	NSString *versionString = [library objectForKey:@"Application Version"];
+	int versionInteger = [versionString intValue];
+
 	NSDictionary *imageRecords = [library objectForKey:@"Master Image List"];
 	
 	//	cp: No keywords in Aperture XML.
@@ -180,15 +227,26 @@
 	while (albumRec = [albumEnum nextObject])
 	{
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+		NSString *albumType = [albumRec objectForKey:@"Album Type"];
+		BOOL skipAlbum = NO;
 		
 		//	'99': library knot holding all images, not just the "top of the stack" images
 		#ifndef SHOW_ALL_IMAGES_FOLDER
-		if ([[albumRec objectForKey:@"Album Type"] isEqualToString:@"99"])
-		{
+		skipAlbum = skipAlbum || [albumType isEqualToString:@"99"];
+		#endif
+		
+		if (versionInteger == 3) {
+			skipAlbum = skipAlbum || [albumType isEqualToString:@"5"];
+			skipAlbum = skipAlbum || [albumType isEqualToString:@"94"];
+			skipAlbum = skipAlbum || [albumType isEqualToString:@"97"];
+			skipAlbum = skipAlbum || [albumType isEqualToString:@"98"];
+			skipAlbum = skipAlbum || [albumType isEqualToString:@"99"];
+		}
+		
+		if (skipAlbum) {
 			[pool release];
 			continue;
 		}	
-		#endif
 		
 		iMBLibraryNode *lib = [[[iMBLibraryNode alloc] init] autorelease];
 		[lib setName:[albumRec objectForKey:@"AlbumName"]];
@@ -196,7 +254,15 @@
         [lib setParserClassName:NSStringFromClass([self class])];
 		[lib setWatchedPath:myDatabase];
 //		[lib setIcon:[self iconForType:[albumRec objectForKey:@"Album Type"]]];
-		NSImage* icon = [self iconForType:[albumRec objectForKey:@"Album Type"]];
+		NSImage* icon = nil;
+		
+		if (versionInteger == 3) {
+			icon = [self iconForType3:[albumRec objectForKey:@"Album Type"]];
+		}
+		else {
+			icon = [self iconForType2:[albumRec objectForKey:@"Album Type"]];
+		}
+		
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(36.0,36.0)];
 		[lib setIcon:icon];
@@ -282,6 +348,13 @@
 		{
 			NSNumber* parentId = [albumRec objectForKey:@"Parent"];
 			iMBLibraryNode *parent = root;
+			
+			if (versionInteger == 3) {
+				if ([parentId intValue] == 3) {
+					parentId = [NSNumber numberWithInt:1];
+				}
+			}
+			
 			#ifndef SHOW_TOP_LEVEL_APERTURE_KNOT
 				if ([parentId intValue] != 1) {
 					parent = [self nodeWithAlbumID:parentId withRoot:root];
