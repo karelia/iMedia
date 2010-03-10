@@ -43,10 +43,16 @@
 */
 
 #import <Cocoa/Cocoa.h>
+#import "iMBAbstractParser.h"
 
-#import "iMBApertureAbstractParser.h"
 
+@interface iMBApertureAbstractParser : iMBAbstractParser
 
-@interface iMBAperturePhotosParser : iMBApertureAbstractParser <iMBEnhanceParser>
+- (id)init;
+
+- (BOOL)proceedForVersion:(int)versionInteger;
+- (BOOL)shouldSkipAlbumType:(NSString*)albumType forVersion:(int)versionInteger;
+- (BOOL)shouldSkipMediaType:(NSString*)mediaType forVersion:(int)versionInteger;
+- (BOOL)wantsPreviewMediaType:(NSString*)mediaType forVersion:(int)versionInteger;
 
 @end

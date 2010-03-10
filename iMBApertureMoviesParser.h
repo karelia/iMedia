@@ -47,6 +47,6 @@
 #import "iMBApertureAbstractParser.h"
 
 
-@interface iMBAperturePhotosParser : iMBApertureAbstractParser <iMBEnhanceParser>
+@interface iMBApertureMoviesParser : iMBApertureAbstractParser
 
 @end

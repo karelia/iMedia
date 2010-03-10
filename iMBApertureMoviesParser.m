@@ -42,11 +42,71 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-#import <Cocoa/Cocoa.h>
 
-#import "iMBApertureAbstractParser.h"
+#import "iMBApertureMoviesParser.h"
+
+#import "iMediaConfiguration.h"
 
 
-@interface iMBAperturePhotosParser : iMBApertureAbstractParser <iMBEnhanceParser>
+@interface iMBApertureMoviesParser (Private)
+
+
+@end
+
+
+@implementation iMBApertureMoviesParser
+
+
++ (void)load
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	[iMediaConfiguration registerParser:[self class] forMediaType:@"movies"];
+	
+    [pool release];
+}
+
+- (id)init
+{
+	if (self = [super init])
+	{
+	}
+	return self;
+}
+
+- (BOOL)proceedForVersion:(int)versionInteger
+{
+	return (versionInteger >= 3);
+}
+
+- (BOOL)shouldSkipAlbumType:(NSString*)albumType forVersion:(int)versionInteger
+{
+	BOOL skipAlbum = NO;
+	
+	//	'99': library knot holding all images, not just the "top of the stack" images
+#ifndef SHOW_ALL_IMAGES_FOLDER
+	skipAlbum = skipAlbum || [albumType isEqualToString:@"99"];
+#endif
+	
+	if (versionInteger == 3) {
+		skipAlbum = skipAlbum || [albumType isEqualToString:@"5"];
+		skipAlbum = skipAlbum || [albumType isEqualToString:@"94"];
+		skipAlbum = skipAlbum || [albumType isEqualToString:@"97"];
+		skipAlbum = skipAlbum || [albumType isEqualToString:@"98"];
+	}
+	
+	return skipAlbum;
+}
+
+- (BOOL)shouldSkipMediaType:(NSString*)mediaType forVersion:(int)versionInteger
+{
+	return (![@"Movie" isEqualToString:mediaType]);
+}
+
+- (BOOL)wantsPreviewMediaType:(NSString*)mediaType forVersion:(int)versionInteger
+{	
+	return YES;
+}
+
 
 @end
