@@ -361,10 +361,10 @@
 			[root fromThreadAddItem:lib];
 		}
 
-        // set the "Images" key AFTER lib has been added into the library node tree.
+        // set the "Images"/"Movies" key AFTER lib has been added into the library node tree.
         // this allows the "Images" change to be propagated up the tree so that the
         // outline view gets displayed properly.
-        [lib fromThreadSetAttribute:newPhotolist forKey:@"Images"];
+        [lib fromThreadSetAttribute:newPhotolist forKey:[[self class] attributeKey]];
 		[pool release];
     }
 }
@@ -435,6 +435,13 @@
 	NSAssert(false, @"This method needs to be overridden in a subclass of iMBApertureAbstractParser");
 	
 	return NO;
+}
+
++ (NSString*)attributeKey
+{
+	NSAssert(false, @"This method needs to be overridden in a subclass of iMBApertureAbstractParser");
+
+	return @"Images";
 }
 
 @end

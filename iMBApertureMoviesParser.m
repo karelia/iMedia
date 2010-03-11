@@ -108,5 +108,9 @@
 	return YES;
 }
 
++ (NSString*)attributeKey
+{
+	return @"Movies";
+}
 
 @end

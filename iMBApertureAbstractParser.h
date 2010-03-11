@@ -55,4 +55,6 @@
 - (BOOL)shouldSkipMediaType:(NSString*)mediaType forVersion:(int)versionInteger;
 - (BOOL)wantsPreviewMediaType:(NSString*)mediaType forVersion:(int)versionInteger;
 
++ (NSString*)attributeKey;
+
 @end

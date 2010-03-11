@@ -135,6 +135,11 @@
 	return NO;
 }
 
++ (NSString*)attributeKey
+{
+	return @"Images";
+}
+
 + (NSDictionary*)enhancedRecordForRecord:(NSDictionary*)record
 {
 	NSFileManager *fileManager = [NSFileManager defaultManager];
