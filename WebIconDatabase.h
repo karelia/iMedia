@@ -27,9 +27,6 @@
  */
 
 
-// Author: Unknown
-
-
 #import <Cocoa/Cocoa.h>
 
 // Sent whenever a site icon has changed. The object of the notification is the icon database.

@@ -623,13 +623,6 @@
 				D099334E1011B22600C527B7 /* Test Application */,
 				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
 				034768DFFF38A50411DB9C8B /* Products */,
-				CE0E0C80104C72A200EE6B09 /* Security.framework */,
-				D05A94A4102EB14A005DF9CE /* ICADevices.framework */,
-				D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */,
-				D0CA93E6104917A400725DA3 /* QTKit.framework */,
-				CEF69568106421CA005D7E72 /* QuickLook.framework */,
-				CEF695FF10643A25005D7E72 /* WebKit.framework */,
-				D0F2DBCE1098270F004280C1 /* libsqlite3.dylib */,
 			);
 			name = iMedia;
 			sourceTree = "<group>";
@@ -666,6 +659,11 @@
 				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
 				D09930FC1010FF9700C527B7 /* Quartz.framework */,
 				D0993294101124EE00C527B7 /* libcrypto.dylib */,
+				D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */,
+				D0CA93E6104917A400725DA3 /* QTKit.framework */,
+				CEF69568106421CA005D7E72 /* QuickLook.framework */,
+				CEF695FF10643A25005D7E72 /* WebKit.framework */,
+				D0F2DBCE1098270F004280C1 /* libsqlite3.dylib */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -676,6 +674,8 @@
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
 				D2F7E79907B2D74100F64583 /* CoreData.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
+				CE0E0C80104C72A200EE6B09 /* Security.framework */,
+				D05A94A4102EB14A005DF9CE /* ICADevices.framework */,
 			);
 			name = "Other Frameworks";
 			sourceTree = "<group>";
@@ -803,6 +803,8 @@
 		D08E8B5A1019C8EF005D8614 /* Third Party */ = {
 			isa = PBXGroup;
 			children = (
+				D02E53C610A5563500B205BD /* NSData+SKExtensions.h */,
+				D02E53C710A5563500B205BD /* NSData+SKExtensions.m */,
 				D004A9CB104D890B005DBB2B /* BXQuickLookController */,
 				D08E8D8B1019EBFB005D8614 /* IMBFileWatcher */,
 				D08E8B5C1019C900005D8614 /* UKFileWatcher */,
@@ -983,8 +985,6 @@
 				D099326810111DCB00C527B7 /* NSString+iMedia.m */,
 				D049F0081034993E003CC49C /* NSImage+iMedia.h */,
 				D049F0091034993E003CC49C /* NSImage+iMedia.m */,
-				D02E53C610A5563500B205BD /* NSData+SKExtensions.h */,
-				D02E53C710A5563500B205BD /* NSData+SKExtensions.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
