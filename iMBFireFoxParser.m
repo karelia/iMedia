@@ -44,13 +44,15 @@
 */
 
 
-// Author: Unknown
+// Author: Dan Wood
 
 
 #import "iMBFireFoxParser.h"
 #import <WebKit/WebKit.h>
 #import "IMBNode.h"
 #import "IMBParserController.h"
+#import "FMDatabase.h"
+#import "FMResultSet.h"
 
 // Some of this code is used from the Shiira Project - BSD Licensed
 
@@ -65,50 +67,114 @@
 	[pool release];
 }
 
+- (NSString *)__firefoxBookmarkPath;
+{
+	NSString *result = nil;
+	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+	NSString *path = [libraryPaths objectAtIndex:0];
+	
+	NSFileManager *fm = [NSFileManager defaultManager];
+	
+	NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
+	NSString *profilesPath = [firefoxPath stringByAppendingPathComponent:@"Profiles"];
+	BOOL isDir;
+	if ([fm fileExistsAtPath:profilesPath isDirectory:&isDir] && isDir)
+	{
+		NSDirectoryEnumerator *e = [fm enumeratorAtPath:profilesPath];
+		[e skipDescendents];
+		NSString *filename = nil;
+		while ( filename = [e nextObject] )
+		{
+			if ( ![filename hasPrefix:@"."] )
+			{
+				NSString *profilePath = [profilesPath stringByAppendingPathComponent:filename];
+				NSString *bookmarkPath = [profilePath stringByAppendingPathComponent:@"places.sqlite"];
+				if ([fm fileExistsAtPath:bookmarkPath isDirectory:&isDir] && !isDir)
+				{
+					result = bookmarkPath;	// just stop on the first profile we find.  Should be good enough!
+					break;
+				}
+			}
+		}
+	}
+	return result;
+}
+
 - (id) initWithMediaType:(NSString*)inMediaType
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		// Get the paths of ~/Library/Application Support/Firefox/profiles.ini
-		NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-		NSString *bookmarksPath = nil;
-		NSString *profilesPath = [[libraryPaths objectAtIndex:0] stringByAppendingPathComponent:@"/Firefox/profiles.ini"];
-		
-		NSFileManager *fileMgr = [NSFileManager defaultManager];
-		if ([fileMgr fileExistsAtPath:profilesPath]) 
+		NSString *bookmarkPath = [self __firefoxBookmarkPath];
+		NSFileManager *fm = [NSFileManager defaultManager];	// File manager, not flying meat!
+		if (bookmarkPath && [fm fileExistsAtPath:bookmarkPath] && [fm isReadableFileAtPath:bookmarkPath])
 		{
-			// Parse profiles.ini
-			NSString *profiles;
-			profiles = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:profilesPath] encoding:NSUTF8StringEncoding];
-			[profiles autorelease];
+			NSString *query = @"select id,title from moz_bookmarks where type=2";
+			NSString *newPath = nil;	// copy destination if we have to copy the file
 			
-			NSScanner *scanner;
-			NSString *profilePath = nil;
-			scanner = [NSScanner scannerWithString:profiles];
+			FMDatabase *database = [FMDatabase databaseWithPath:bookmarkPath];
 			
-			while (![scanner isAtEnd]) {
-				NSString *token;
-				if ([scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] 
-											intoString:&token])
+			if ([database openWithFlags: SQLITE_OPEN_READONLY])
+			{
+				[database setBusyRetryTimeout:10];
+				
+				FMResultSet *rs = [database executeQuery:query];
+				if (!rs)
 				{
-					if ([token hasPrefix:@"Path="]) {
-						// Remove 'Path='
-						profilePath = [token substringFromIndex:5];
-						break;
+					// null result set means we couldn't open it ... it's probably busy.
+					// The stupid workaround is to make a copy of the sqlite file, and check there!
+					// However just in case the source file has not changed, we'll check modification dates.
+					//
+					newPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"places.sqlite"];
+					BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
+					if ([fm fileExistsAtPath:newPath])
+					{
+						NSError *error = nil;
+						NSDictionary *attr = [fm attributesOfItemAtPath:newPath error:&error];
+						NSDate *modDateOfCopy = [attr fileModificationDate];
+						attr = [fm attributesOfItemAtPath:bookmarkPath error:&error];
+						NSDate *modDateOfOrig = [attr fileModificationDate];
+						if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy])
+						{
+							needToCopyFile = NO;
+						}
+					}
+					if (needToCopyFile)
+					{
+						NSError *error = nil;
+						(void) [fm removeItemAtPath:newPath error:nil];
+						BOOL copied = [fm copyItemAtPath:bookmarkPath toPath:newPath error:&error];
+						if (!copied)
+						{
+							NSLog(@"Unable to copy Firefox bookmarks.");
+						}
+					}
+					// Now to try again!
+					[database close];	// close the old one
+					database = [FMDatabase databaseWithPath:newPath];
+					if ([database openWithFlags: SQLITE_OPEN_READONLY])
+					{
+						[database setBusyRetryTimeout:10];
+						rs = [database executeQuery:query];
 					}
 				}
 				
-				[scanner scanCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] intoString:nil];
+				while ([rs next])
+				{
+					NSString *theID = [rs stringForColumn:@"id"];
+					NSString *theTitle = [rs stringForColumn:@"title"];
+					NSLog(@"%@ %@", theID, theTitle);
+				}
+				// DON'T DELETE -- SO NEXT TIME THROUGH WE CAN OPEN COPY IF IT'S STILL AROUND.
+				//			if (newPath)
+				//			{
+				//				(void) [fm removeFileAtPath:newPath handler:nil];
+				//			}
+				[rs close];
+				[database close];
 			}
-			
-			// Get bookmarks path
-			bookmarksPath = [[profilesPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:profilePath];
-			bookmarksPath = [bookmarksPath stringByAppendingPathComponent:@"bookmarks.html"];
 		}
-		
-		self.mediaSource = bookmarksPath;
 	}
-	return self;
+return self;
 }
 
 - (NSString*)_removeTags:(NSArray*)tags fromHtml:(NSString*)html

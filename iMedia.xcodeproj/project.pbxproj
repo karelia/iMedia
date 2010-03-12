@@ -19,6 +19,7 @@
 		8FC2561110A8706000F19642 /* IMBLightroom1Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC2560F10A8706000F19642 /* IMBLightroom1Parser.m */; };
 		8FFCBFD010A8CD9C00377C33 /* IMBLightroom3Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FFCBFD110A8CD9C00377C33 /* IMBLightroom3Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */; };
+		CE69CDC41149D0B50016E5E0 /* iMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */; };
 		CEF686B51062D0BD005D7E72 /* IMBComboTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF686B61062D0BD005D7E72 /* IMBComboTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */; };
 		CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B81062D18F005D7E72 /* IMBComboTextCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -31,7 +32,6 @@
 		CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D9106434FD005D7E72 /* iMBXBELParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */ = {isa = PBXBuildFile; fileRef = CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */; };
 		CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DC106434FE005D7E72 /* iMBOmniWebParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CEF695E8106434FE005D7E72 /* iMBFireFoxParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DE106434FE005D7E72 /* iMBFireFoxParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF6960010643A25005D7E72 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF695FF10643A25005D7E72 /* WebKit.framework */; };
 		CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */; };
 		CEF6970810643D60005D7E72 /* IMBLinkViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6970610643D60005D7E72 /* IMBLinkViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1140,7 +1140,6 @@
 				CEF695E0106434FE005D7E72 /* WebIconDatabase.h in Headers */,
 				CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */,
 				CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */,
-				CEF695E8106434FE005D7E72 /* iMBFireFoxParser.h in Headers */,
 				CEF6970810643D60005D7E72 /* IMBLinkViewController.h in Headers */,
 				D010384C10714CB3007C88D7 /* IMBNodeObject.h in Headers */,
 				D010388B107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h in Headers */,
@@ -1418,6 +1417,7 @@
 				D0AD4CA010CCF36F00204318 /* IMBButtonObject.m in Sources */,
 				D0467BB1112C220F00C1AA4E /* IMBApertureAudioParser.m in Sources */,
 				D0467BB5112C223600C1AA4E /* IMBApertureVideoParser.m in Sources */,
+				CE69CDC41149D0B50016E5E0 /* iMBFireFoxParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
