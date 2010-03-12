@@ -178,12 +178,20 @@
 			
 			NSString *eString = nil;
 			NSError *e = nil;
-			NSXMLDocument *xmlDoc = [[[NSXMLDocument alloc] initWithData:data
-																options:NSXMLDocumentTidyXML error:&e] autorelease];
-			db = [NSPropertyListSerialization
-					propertyListFromData:[xmlDoc XMLData]
-					mutabilityOption:NSPropertyListImmutable
-					format:NULL errorDescription:&eString];
+			@try
+			{
+				NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
+																	 options:NSXMLDocumentTidyXML error:&e];
+				db = [NSPropertyListSerialization
+					  propertyListFromData:[xmlDoc XMLData]
+					  mutabilityOption:NSPropertyListImmutable
+					  format:NULL errorDescription:&eString];
+				[xmlDoc release];
+			}
+			@catch(NSException *e)
+			{
+				NSLog(@"%s %@", __FUNCTION__, e);
+			}
 		}			
 		
 		if (!db || 0 == db.count)
