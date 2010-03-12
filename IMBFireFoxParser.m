@@ -47,7 +47,7 @@
 // Author: Dan Wood
 
 
-#import "iMBFireFoxParser.h"
+#import "IMBFireFoxParser.h"
 #import <WebKit/WebKit.h>
 #import "IMBNode.h"
 #import "IMBParserController.h"
@@ -55,11 +55,11 @@
 #import "FMResultSet.h"
 #import "NSWorkspace+iMedia.h"
 
-@interface iMBFireFoxParser ()
+@interface IMBFireFoxParser ()
 + (NSString *)firefoxBookmarkPath;
 @end
 
-@implementation iMBFireFoxParser
+@implementation IMBFireFoxParser
 
 @synthesize databasePath = _databasePath;
 @synthesize appPath = _appPath;
@@ -98,7 +98,7 @@
 	NSFileManager *fm = [NSFileManager defaultManager];	// File manager, not flying meat!
 	if ([self isInstalled] && bookmarkPath && [fm fileExistsAtPath:bookmarkPath] && [fm isReadableFileAtPath:bookmarkPath])
 	{
-		iMBFireFoxParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+		IMBFireFoxParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 		parser.databasePath = bookmarkPath;
 		parser.appPath = [self firefoxPath];
 		[parserInstances addObject:parser];

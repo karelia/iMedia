@@ -47,12 +47,12 @@
 // Author: Unknown
 
 
-#import "iMBOmniWebParser.h"
+#import "IMBOmniWebParser.h"
 #import "IMBNode.h"
 #import "IMBParserController.h"
-#import "iMBXBELParser.h"
+#import "IMBXBELParser.h"
 
-@implementation iMBOmniWebParser
+@implementation IMBOmniWebParser
 
 + (void)load
 {
@@ -102,7 +102,7 @@
 ///        [library setParserClassName:NSStringFromClass([self class])];
 ///		[library setWatchedPath:_database];
 		
-		iMBXBELParser *parser = [[iMBXBELParser alloc] init];
+		IMBXBELParser *parser = [[IMBXBELParser alloc] init];
 		[parser parseWithXMLDocument:xml node:library];
 		[parser release];
 	}
