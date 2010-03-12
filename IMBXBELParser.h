@@ -51,7 +51,7 @@
 
 @class IMBNode;
 
-@interface iMBXBELParser : NSObject 
+@interface IMBXBELParser : NSObject 
 {
 
 }

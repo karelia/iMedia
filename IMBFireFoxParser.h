@@ -52,7 +52,7 @@
 
 @class WebView, IMBNode;
 
-@interface iMBFireFoxParser : IMBParser 
+@interface IMBFireFoxParser : IMBParser 
 {
 	NSString *_appPath;
 	NSString *_databasePath;

@@ -19,7 +19,7 @@
 		8FC2561110A8706000F19642 /* IMBLightroom1Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC2560F10A8706000F19642 /* IMBLightroom1Parser.m */; };
 		8FFCBFD010A8CD9C00377C33 /* IMBLightroom3Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FFCBFD110A8CD9C00377C33 /* IMBLightroom3Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */; };
-		CE69CDC41149D0B50016E5E0 /* iMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */; };
+		CE69CDC41149D0B50016E5E0 /* IMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */; };
 		CEF686B51062D0BD005D7E72 /* IMBComboTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF686B61062D0BD005D7E72 /* IMBComboTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */; };
 		CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B81062D18F005D7E72 /* IMBComboTextCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -29,9 +29,9 @@
 		CEF69569106421CB005D7E72 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF69568106421CA005D7E72 /* QuickLook.framework */; };
 		CEF695C91064341C005D7E72 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE0E0C80104C72A200EE6B09 /* Security.framework */; };
 		CEF695E0106434FE005D7E72 /* WebIconDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D6106434FD005D7E72 /* WebIconDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D9106434FD005D7E72 /* iMBXBELParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CEF695E3106434FE005D7E72 /* IMBXBELParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695D9106434FD005D7E72 /* IMBXBELParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */ = {isa = PBXBuildFile; fileRef = CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */; };
-		CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DC106434FE005D7E72 /* iMBOmniWebParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CEF695E6106434FE005D7E72 /* IMBOmniWebParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF695DC106434FE005D7E72 /* IMBOmniWebParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF6960010643A25005D7E72 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF695FF10643A25005D7E72 /* WebKit.framework */; };
 		CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */; };
 		CEF6970810643D60005D7E72 /* IMBLinkViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6970610643D60005D7E72 /* IMBLinkViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -334,13 +334,13 @@
 		CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBDynamicTableView.m; sourceTree = "<group>"; };
 		CEF69568106421CA005D7E72 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = /System/Library/Frameworks/QuickLook.framework; sourceTree = "<absolute>"; };
 		CEF695D6106434FD005D7E72 /* WebIconDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebIconDatabase.h; sourceTree = "<group>"; };
-		CEF695D9106434FD005D7E72 /* iMBXBELParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBXBELParser.h; sourceTree = "<group>"; };
-		CEF695DA106434FE005D7E72 /* iMBXBELParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBXBELParser.m; sourceTree = "<group>"; };
+		CEF695D9106434FD005D7E72 /* IMBXBELParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBXBELParser.h; sourceTree = "<group>"; };
+		CEF695DA106434FE005D7E72 /* IMBXBELParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBXBELParser.m; sourceTree = "<group>"; };
 		CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = OmniwebBookmarksToXBEL.xslt; sourceTree = "<group>"; };
-		CEF695DC106434FE005D7E72 /* iMBOmniWebParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBOmniWebParser.h; sourceTree = "<group>"; };
-		CEF695DD106434FE005D7E72 /* iMBOmniWebParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBOmniWebParser.m; sourceTree = "<group>"; };
-		CEF695DE106434FE005D7E72 /* iMBFireFoxParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMBFireFoxParser.h; sourceTree = "<group>"; };
-		CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iMBFireFoxParser.m; sourceTree = "<group>"; };
+		CEF695DC106434FE005D7E72 /* IMBOmniWebParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBOmniWebParser.h; sourceTree = "<group>"; };
+		CEF695DD106434FE005D7E72 /* IMBOmniWebParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBOmniWebParser.m; sourceTree = "<group>"; };
+		CEF695DE106434FE005D7E72 /* IMBFireFoxParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFireFoxParser.h; sourceTree = "<group>"; };
+		CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFireFoxParser.m; sourceTree = "<group>"; };
 		CEF695FF10643A25005D7E72 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBLinkView.xib; sourceTree = "<group>"; };
 		CEF6970610643D60005D7E72 /* IMBLinkViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLinkViewController.h; sourceTree = "<group>"; };
@@ -741,13 +741,13 @@
 				D0403B4F10918C03000F0AE1 /* IMBSafariBookmarkParser.h */,
 				D0403B5010918C03000F0AE1 /* IMBSafariBookmarkParser.m */,
 				CEF695D6106434FD005D7E72 /* WebIconDatabase.h */,
-				CEF695D9106434FD005D7E72 /* iMBXBELParser.h */,
-				CEF695DA106434FE005D7E72 /* iMBXBELParser.m */,
+				CEF695D9106434FD005D7E72 /* IMBXBELParser.h */,
+				CEF695DA106434FE005D7E72 /* IMBXBELParser.m */,
 				CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */,
-				CEF695DC106434FE005D7E72 /* iMBOmniWebParser.h */,
-				CEF695DD106434FE005D7E72 /* iMBOmniWebParser.m */,
-				CEF695DE106434FE005D7E72 /* iMBFireFoxParser.h */,
-				CEF695DF106434FE005D7E72 /* iMBFireFoxParser.m */,
+				CEF695DC106434FE005D7E72 /* IMBOmniWebParser.h */,
+				CEF695DD106434FE005D7E72 /* IMBOmniWebParser.m */,
+				CEF695DE106434FE005D7E72 /* IMBFireFoxParser.h */,
+				CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */,
 			);
 			name = Links;
 			sourceTree = "<group>";
@@ -1138,8 +1138,8 @@
 				CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */,
 				CEF687191062DAF0005D7E72 /* IMBDynamicTableView.h in Headers */,
 				CEF695E0106434FE005D7E72 /* WebIconDatabase.h in Headers */,
-				CEF695E3106434FE005D7E72 /* iMBXBELParser.h in Headers */,
-				CEF695E6106434FE005D7E72 /* iMBOmniWebParser.h in Headers */,
+				CEF695E3106434FE005D7E72 /* IMBXBELParser.h in Headers */,
+				CEF695E6106434FE005D7E72 /* IMBOmniWebParser.h in Headers */,
 				CEF6970810643D60005D7E72 /* IMBLinkViewController.h in Headers */,
 				D010384C10714CB3007C88D7 /* IMBNodeObject.h in Headers */,
 				D010388B107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h in Headers */,
@@ -1417,7 +1417,7 @@
 				D0AD4CA010CCF36F00204318 /* IMBButtonObject.m in Sources */,
 				D0467BB1112C220F00C1AA4E /* IMBApertureAudioParser.m in Sources */,
 				D0467BB5112C223600C1AA4E /* IMBApertureVideoParser.m in Sources */,
-				CE69CDC41149D0B50016E5E0 /* iMBFireFoxParser.m in Sources */,
+				CE69CDC41149D0B50016E5E0 /* IMBFireFoxParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

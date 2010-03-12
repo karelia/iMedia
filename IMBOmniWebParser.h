@@ -50,7 +50,7 @@
 #import <Cocoa/Cocoa.h>
 #import "IMBParser.h"
 
-@interface iMBOmniWebParser : IMBParser 
+@interface IMBOmniWebParser : IMBParser 
 {
 
 }
