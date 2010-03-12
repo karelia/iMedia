@@ -198,7 +198,7 @@
 	
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	
-	if (inOldNode == nil)
+	if (inOldNode == nil)		// implicit command to create the empty root node
 	{
 		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
@@ -212,10 +212,10 @@
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
 		node.parser = self;
-		node.objects = [NSMutableArray array];
+		node.objects = [NSMutableArray array];	// Note that we don't set subnodes, which means node not populated yet.
 	}
 	
-	// Or an subnode...
+	// Or an subnode...  Creates a clone of an old node
 	
 	else
 	{

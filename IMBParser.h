@@ -120,7 +120,7 @@
 
 - (void) didChangeIconSize:(NSSize)inSize objectView:(NSView*)inView;
 
-// Called when the tumbnail for an object needs to be loaded lazily. This method will be called on a background thread...
+// Called when the thumbnail for an object needs to be loaded lazily. This method will be called on a background thread...
 
 - (void) loadThumbnailForObject:(IMBObject*)inObject;
 

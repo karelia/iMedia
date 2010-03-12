@@ -53,10 +53,18 @@
 #import "IMBParserController.h"
 #import "FMDatabase.h"
 #import "FMResultSet.h"
+#import "NSWorkspace+iMedia.h"
 
-// Some of this code is used from the Shiira Project - BSD Licensed
+@interface iMBFireFoxParser ()
++ (NSString *)firefoxBookmarkPath;
+@end
 
 @implementation iMBFireFoxParser
+
+@synthesize databasePath = _databasePath;
+@synthesize appPath = _appPath;
+@synthesize initialized = _initialized;
+
 
 + (void)load
 {
@@ -67,7 +75,40 @@
 	[pool release];
 }
 
-- (NSString *)__firefoxBookmarkPath;
++ (NSString*) firefoxPath
+{
+	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"org.mozilla.firefox"];
+}
+
++ (BOOL) isInstalled
+{
+	return [self firefoxPath] != nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+		
+// Create a single parser instance for Firefox bookmarks (if found)
+
++ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
+{
+	NSMutableArray* parserInstances = [NSMutableArray array];
+	
+	NSString *bookmarkPath = [self firefoxBookmarkPath];
+	NSFileManager *fm = [NSFileManager defaultManager];	// File manager, not flying meat!
+	if ([self isInstalled] && bookmarkPath && [fm fileExistsAtPath:bookmarkPath] && [fm isReadableFileAtPath:bookmarkPath])
+	{
+		iMBFireFoxParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+		parser.databasePath = bookmarkPath;
+		parser.appPath = [self firefoxPath];
+		[parserInstances addObject:parser];
+		[parser release];
+	}
+	return parserInstances;
+}
+
+
++ (NSString *)firefoxBookmarkPath;
 {
 	NSString *result = nil;
 	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
@@ -100,148 +141,149 @@
 	return result;
 }
 
-- (id) initWithMediaType:(NSString*)inMediaType
+
+- (void)dealloc
 {
-	if (self = [super initWithMediaType:inMediaType])
+	IMBRelease(_appPath);
+	IMBRelease(_databasePath);
+	[super dealloc];
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark 
+
+// The following two methods must be overridden by subclasses...
+
+- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
+{
+	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	if (nil == inOldNode)	// create the initial node
 	{
-		NSString *bookmarkPath = [self __firefoxBookmarkPath];
-		NSFileManager *fm = [NSFileManager defaultManager];	// File manager, not flying meat!
-		if (bookmarkPath && [fm fileExistsAtPath:bookmarkPath] && [fm isReadableFileAtPath:bookmarkPath])
+		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		[icon setScalesWhenResized:YES];
+		[icon setSize:NSMakeSize(16.0,16.0)];
+		
+		node.parentNode = nil;
+		node.name = @"Firefox";
+		node.icon = icon;
+		node.groupType = kIMBGroupTypeLibrary;
+		node.leaf = NO;
+		node.parser = self;
+		node.mediaSource = self.mediaSource;
+		node.identifier = [self identifierForPath:@"/"];
+		node.parser = self;
+		node.objects = [NSMutableArray array];
+		// node.subnodes = ;
+	}
+	
+	
+	
+	// Watch the root node. Whenever something in Lightroom changes, we have to replace the
+	// WHOLE node tree, as we have no way of finding out WHAT has changed in Lightroom...
+	
+	if (node.isRootNode)
+	{
+		node.watcherType = kIMBWatcherTypeFSEvent;
+		node.watchedPath = self.databasePath;
+	}
+	
+	return node;
+}
+
+- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+{
+	return NO;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Optional methods that do nothing in the base class and can be overridden in subclasses, e.g. to update  
+// or get rid of cached data...
+
+- (void) willUseParser
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+
+	// Just load all the bookmarks in the tree -- this is not going to be that memory-intensive.
+	NSString *query = @"select id,title from moz_bookmarks where type=2";
+	NSString *newPath = nil;	// copy destination if we have to copy the file
+
+	FMDatabase *database = [FMDatabase databaseWithPath:self.databasePath];
+
+	if ([database openWithFlags: SQLITE_OPEN_READONLY])
+	{
+		[database setBusyRetryTimeout:10];
+		
+		FMResultSet *rs = [database executeQuery:query];
+		if (!rs)
 		{
-			NSString *query = @"select id,title from moz_bookmarks where type=2";
-			NSString *newPath = nil;	// copy destination if we have to copy the file
-			
-			FMDatabase *database = [FMDatabase databaseWithPath:bookmarkPath];
-			
+			// null result set means we couldn't open it ... it's probably busy.
+			// The stupid workaround is to make a copy of the sqlite file, and check there!
+			// However just in case the source file has not changed, we'll check modification dates.
+			//
+			newPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"places.sqlite"];
+			BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
+			if ([fm fileExistsAtPath:newPath])
+			{
+				NSError *error = nil;
+				NSDictionary *attr = [fm attributesOfItemAtPath:newPath error:&error];
+				NSDate *modDateOfCopy = [attr fileModificationDate];
+				attr = [fm attributesOfItemAtPath:self.databasePath error:&error];
+				NSDate *modDateOfOrig = [attr fileModificationDate];
+				if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy])
+				{
+					needToCopyFile = NO;
+				}
+			}
+			if (needToCopyFile)
+			{
+				NSError *error = nil;
+				(void) [fm removeItemAtPath:newPath error:nil];
+				BOOL copied = [fm copyItemAtPath:self.databasePath toPath:newPath error:&error];
+				if (!copied)
+				{
+					NSLog(@"Unable to copy Firefox bookmarks.");
+				}
+			}
+			// Now to try again!
+			[database close];	// close the old one
+			database = [FMDatabase databaseWithPath:newPath];
 			if ([database openWithFlags: SQLITE_OPEN_READONLY])
 			{
 				[database setBusyRetryTimeout:10];
-				
-				FMResultSet *rs = [database executeQuery:query];
-				if (!rs)
-				{
-					// null result set means we couldn't open it ... it's probably busy.
-					// The stupid workaround is to make a copy of the sqlite file, and check there!
-					// However just in case the source file has not changed, we'll check modification dates.
-					//
-					newPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"places.sqlite"];
-					BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
-					if ([fm fileExistsAtPath:newPath])
-					{
-						NSError *error = nil;
-						NSDictionary *attr = [fm attributesOfItemAtPath:newPath error:&error];
-						NSDate *modDateOfCopy = [attr fileModificationDate];
-						attr = [fm attributesOfItemAtPath:bookmarkPath error:&error];
-						NSDate *modDateOfOrig = [attr fileModificationDate];
-						if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy])
-						{
-							needToCopyFile = NO;
-						}
-					}
-					if (needToCopyFile)
-					{
-						NSError *error = nil;
-						(void) [fm removeItemAtPath:newPath error:nil];
-						BOOL copied = [fm copyItemAtPath:bookmarkPath toPath:newPath error:&error];
-						if (!copied)
-						{
-							NSLog(@"Unable to copy Firefox bookmarks.");
-						}
-					}
-					// Now to try again!
-					[database close];	// close the old one
-					database = [FMDatabase databaseWithPath:newPath];
-					if ([database openWithFlags: SQLITE_OPEN_READONLY])
-					{
-						[database setBusyRetryTimeout:10];
-						rs = [database executeQuery:query];
-					}
-				}
-				
-				while ([rs next])
-				{
-					NSString *theID = [rs stringForColumn:@"id"];
-					NSString *theTitle = [rs stringForColumn:@"title"];
-					NSLog(@"%@ %@", theID, theTitle);
-				}
-				// DON'T DELETE -- SO NEXT TIME THROUGH WE CAN OPEN COPY IF IT'S STILL AROUND.
-				//			if (newPath)
-				//			{
-				//				(void) [fm removeFileAtPath:newPath handler:nil];
-				//			}
-				[rs close];
-				[database close];
+				rs = [database executeQuery:query];
 			}
 		}
-	}
-return self;
-}
-
-- (NSString*)_removeTags:(NSArray*)tags fromHtml:(NSString*)html
-{
-    NSMutableString*    buffer;
-    buffer = [NSMutableString string];
-    
-    NSScanner*  scanner;
-    scanner = [NSScanner scannerWithString:html];
-    [scanner setCharactersToBeSkipped:nil];
-    while (![scanner isAtEnd]) {
-        // Scan '<'
-        NSString*   token;
-        if ([scanner scanUpToString:@"<" intoString:&token]) {
-            [buffer appendString:token];
-        }
-        
-        // Scan '>'
-        NSString*   tag;
-        if ([scanner scanUpToString:@">" intoString:&tag]) {
-            // Append tag if it is not contained in tags
-            tag = [tag stringByAppendingString:@">"];
-            if (![tags containsObject:tag]) {
-                [buffer appendString:tag];
-            }
-            [scanner scanString:@">" intoString:nil];
-        }
-    }
-    
-    return buffer;
-}
-
-- (IMBNode *)parseDatabase
-{
-	NSString *bookmarksPath = [self databasePath];
-	IMBNode *root = nil;
-	
-	if (bookmarksPath)
-	{
-		root = [[IMBNode alloc] init];
-		[root setName:NSLocalizedStringWithDefaultValue(
-														@"FireFox",
-														nil,IMBBundle(),
-														@"FireFox",
-														@"FireFox application name")];
-		[root setIconName:@"org.mozilla.firefox"];
-        [root setIdentifier:@"Firefox"];
-///        [root setParserClassName:NSStringFromClass([self class])];
-///		[root setWatchedPath:_database];
 		
-		// Remove unneccessary tags
-		static NSArray* _tags = nil;
-		if (!_tags) {
-			_tags = [[NSArray arrayWithObjects:@"<p>", @"<P>", @"<dd>", @"<DD>", @"<hr>", @"<HR>", nil] retain];
+		while ([rs next])
+		{
+			NSString *theID = [rs stringForColumn:@"id"];
+			NSString *theTitle = [rs stringForColumn:@"title"];
+			NSLog(@"%@ %@", theID, theTitle);
 		}
-		
-		NSString *html = [[[NSString alloc] initWithData:[NSData dataWithContentsOfFile:bookmarksPath] encoding:NSUTF8StringEncoding] autorelease];
-		html = [self _removeTags:_tags fromHtml:html];
-//unused		NSError *err;
-//unused		NSXMLDocument *xml = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:bookmarksPath]
-//																  options:NSXMLDocumentTidyHTML
-//																	error:&err];
-//		NSLog(@"%@: %@", NSStringFromSelector(_cmd), [xml XMLStringWithOptions:NSXMLNodePrettyPrint]);
+		// DON'T DELETE -- SO NEXT TIME THROUGH WE CAN OPEN COPY IF IT'S STILL AROUND.
+		//			if (newPath)
+		//			{
+		//				(void) [fm removeFileAtPath:newPath handler:nil];
+		//			}
+		[rs close];
+		[database close];
 	}
-    
-	return [root autorelease];
 }
+
+- (void) didStopUsingParser
+{
+	
+}
+
+- (void) watchedPathDidChange:(NSString*)inWatchedPath
+{
+	
+}
+
+
 
 @end
 

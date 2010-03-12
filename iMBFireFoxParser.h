@@ -44,7 +44,7 @@
 */
 
 
-// Author: Unknown
+// Author: Dan Wood
 
 
 #import <Cocoa/Cocoa.h>
@@ -54,7 +54,13 @@
 
 @interface iMBFireFoxParser : IMBParser 
 {
-	
+	NSString *_appPath;
+	NSString *_databasePath;
+	BOOL _initialized;		// true when we've actually verified that we can open the file
 }
+
+@property (copy) NSString *databasePath;
+@property (copy) NSString *appPath;
+@property (assign, getter=isInitialized) BOOL initialized;
 
 @end
