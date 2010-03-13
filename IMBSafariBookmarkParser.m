@@ -391,6 +391,42 @@
 		
 		if (subnode)
 		{
+			if ([inNode isRootNode])
+			{
+				NSImage *newImage = nil;
+				if ([subnode.name isEqualToString:@"BookmarksMenu"])
+				{
+					// Localize and get special icon
+					subnode.name = NSLocalizedStringWithDefaultValue(
+							  @"Safari.BookmarksMenu",
+							  nil,IMBBundle(),
+							  @"Bookmarks Menu",
+							  @"top-level bookmark name");
+					newImage = [NSImage imageResourceNamed:@"tiny_menu.tiff"
+										   fromApplication:@"com.apple.Safari"
+												fallbackTo:nil];
+					
+				}
+				else if ([subnode.name isEqualToString:@"BookmarksBar"])
+				{
+					// Localize and get special icon
+					subnode.name = NSLocalizedStringWithDefaultValue(
+							  @"Safari.BookmarksBar",
+							  nil,IMBBundle(),
+							  @"Bookmarks Bar",
+							  @"top-level bookmark name");
+					
+					newImage = [NSImage imageResourceNamed:@"FavoritesBar.tif"
+										   fromApplication:@"com.apple.Safari"
+												fallbackTo:nil];
+				}
+				if (newImage)
+				{
+					subnode.icon = newImage;
+				}
+				
+			}
+			
 			subnode.parentNode = inNode;
 			[self populateNode:subnode plist:childPlist];
 			[(NSMutableArray*)inNode.subNodes addObject:subnode];
