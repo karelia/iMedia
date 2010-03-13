@@ -45,7 +45,9 @@
 
 
 // Author: Dan Wood
-
+// Documentation on firefox bookmarks:
+// https://developer.mozilla.org/en/The_Places_database
+// http://www.forensicswiki.org/index.php?title=Mozilla_Firefox_3_History_File_Format
 
 #import "IMBFireFoxParser.h"
 #import <WebKit/WebKit.h>
@@ -59,6 +61,7 @@
 
 @interface IMBFireFoxParser ()
 + (NSString *)firefoxBookmarkPath;
+- (BOOL)openDatabase;
 @end
 
 @implementation IMBFireFoxParser
@@ -317,22 +320,26 @@
 	while ([rs next])
 	{		
 		int theID = [rs intForColumn:@"id"];
-		IMBNode* node = [[[IMBNode alloc] init] autorelease];
-//		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
-//		[icon setScalesWhenResized:YES];
-//		[icon setSize:NSMakeSize(16.0,16.0)];
-		NSImage* icon = [self iconForFolderID:theID];
-		node.icon = icon;
-  		node.parentNode = inNode;
-		node.name = [rs stringForColumn:@"title"];
-		node.attributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:theID] forKey:@"id"];
-
-		node.leaf = NO;
-		node.parser = self;
-		// ??? node.mediaSource = self.mediaSource;
-		// ????? node.identifier = [self identifierForPath:@"/"];
-
-		[subNodes addObject:node];
+		NSString *theName = [rs stringForColumn:@"title"];
+		if (theName && ![theName isEqualToString:@""])	// make sure we have a title; otherwise bogus
+		{
+			IMBNode* node = [[[IMBNode alloc] init] autorelease];
+			//		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+			//		[icon setScalesWhenResized:YES];
+			//		[icon setSize:NSMakeSize(16.0,16.0)];
+			NSImage* icon = [self iconForFolderID:theID];
+			node.icon = icon;
+			node.parentNode = inNode;
+			node.name = theName;
+			node.attributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:theID] forKey:@"id"];
+			
+			node.leaf = NO;
+			node.parser = self;
+			// ??? node.mediaSource = self.mediaSource;
+			// ????? node.identifier = [self identifierForPath:@"/"];
+			
+			[subNodes addObject:node];
+		}
 	}
 	inNode.subNodes = subNodes;
 
@@ -365,9 +372,20 @@
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 			object.imageRepresentation = iconImage;
 		}
-		// What if no icon?
-		
-		
+		else
+		{
+			static NSImage *sGenericIcon = nil;
+			if (!sGenericIcon)
+			{
+				// Get generic icon, and shrink it down to favicon size for consistency.
+				sGenericIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:(NSString *)kUTTypeURL] retain];
+				[sGenericIcon setScalesWhenResized:YES];
+				[sGenericIcon setSize:NSMakeSize(16.0,16.0)];
+			}
+			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+			object.imageRepresentation = sGenericIcon;
+		}
+
 		object.parser = self;
 		
 		[objects addObject:object];
