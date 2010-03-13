@@ -226,9 +226,13 @@
 
 - (NSRect) imageRectForFrame:(NSRect)inImageFrame imageWidth:(CGFloat)inWidth imageHeight:(CGFloat)inHeight
 {
-	CGFloat fx		 = inImageFrame.size.width / inWidth;
-	CGFloat fy		 = inImageFrame.size.height / inHeight;
-	CGFloat f		 = MIN(fx,fy);
+	CGFloat f = 1.0;
+	if (inWidth > inImageFrame.size.width || inHeight > inImageFrame.size.height)
+	{
+		CGFloat fx		 = inImageFrame.size.width / inWidth;
+		CGFloat fy		 = inImageFrame.size.height / inHeight;
+				f		 = MIN(fx,fy);
+	}
 	
 	CGFloat x0		 = NSMidX(inImageFrame);
 	CGFloat y0		 = NSMidY(inImageFrame);
