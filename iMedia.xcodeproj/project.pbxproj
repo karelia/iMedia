@@ -20,6 +20,11 @@
 		8FFCBFD010A8CD9C00377C33 /* IMBLightroom3Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FFCBFD110A8CD9C00377C33 /* IMBLightroom3Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */; };
 		CE69CDC41149D0B50016E5E0 /* IMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */; };
+		CE69E9DD114B05EA0016E5E0 /* firefox_allBookmarks.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */; };
+		CE69E9DE114B05EA0016E5E0 /* firefox_bookmarksMenu.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */; };
+		CE69E9DF114B05EA0016E5E0 /* firefox_bookmarksToolbar.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */; };
+		CE69E9E0114B05EA0016E5E0 /* firefox_unfiledBookmarks.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */; };
+		CE69E9E1114B05EA0016E5E0 /* firefox_tag.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */; };
 		CEF686B51062D0BD005D7E72 /* IMBComboTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF686B61062D0BD005D7E72 /* IMBComboTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */; };
 		CEF686BA1062D18F005D7E72 /* IMBComboTextCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF686B81062D18F005D7E72 /* IMBComboTextCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -326,6 +331,11 @@
 		8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom3Parser.h; sourceTree = "<group>"; };
 		8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom3Parser.m; sourceTree = "<group>"; };
 		CE0E0C80104C72A200EE6B09 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
+		CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_allBookmarks.png; sourceTree = "<group>"; };
+		CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_bookmarksMenu.png; sourceTree = "<group>"; };
+		CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_bookmarksToolbar.png; sourceTree = "<group>"; };
+		CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_unfiledBookmarks.png; sourceTree = "<group>"; };
+		CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_tag.png; sourceTree = "<group>"; };
 		CEF686B31062D0BD005D7E72 /* IMBComboTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBComboTableView.h; sourceTree = "<group>"; };
 		CEF686B41062D0BD005D7E72 /* IMBComboTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBComboTableView.m; sourceTree = "<group>"; };
 		CEF686B81062D18F005D7E72 /* IMBComboTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBComboTextCell.h; sourceTree = "<group>"; };
@@ -748,6 +758,11 @@
 				CEF695DD106434FE005D7E72 /* IMBOmniWebParser.m */,
 				CEF695DE106434FE005D7E72 /* IMBFireFoxParser.h */,
 				CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */,
+				CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */,
+				CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */,
+				CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */,
+				CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */,
+				CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */,
 			);
 			name = Links;
 			sourceTree = "<group>";
@@ -1324,6 +1339,11 @@
 				D0CF005810C50908009EC68F /* IMBTargetTest.xcconfig in Resources */,
 				D023460610CA5E2C00E14112 /* load-more-normal.pdf in Resources */,
 				D023460710CA5E2C00E14112 /* load-more-pressed.pdf in Resources */,
+				CE69E9DD114B05EA0016E5E0 /* firefox_allBookmarks.png in Resources */,
+				CE69E9DE114B05EA0016E5E0 /* firefox_bookmarksMenu.png in Resources */,
+				CE69E9DF114B05EA0016E5E0 /* firefox_bookmarksToolbar.png in Resources */,
+				CE69E9E0114B05EA0016E5E0 /* firefox_unfiledBookmarks.png in Resources */,
+				CE69E9E1114B05EA0016E5E0 /* firefox_tag.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

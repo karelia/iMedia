@@ -54,6 +54,13 @@
 
 @implementation NSImage (iMedia)
 
+// Actually ignore the mime type, but maybe later we can use it as a hint
++ (NSImage *) imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
+{
+	return [[[NSImage alloc] initWithData:aData] autorelease];
+}
+
+
 // Try to load an image out of the bundle for another application and if not found fallback to one of our own.
 + (NSImage *)imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle
 {
