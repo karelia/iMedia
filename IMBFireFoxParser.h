@@ -50,17 +50,19 @@
 #import <Cocoa/Cocoa.h>
 #import "IMBParser.h"
 
-@class WebView, IMBNode;
+@class WebView, IMBNode, FMDatabase;
 
 @interface IMBFireFoxParser : IMBParser 
 {
 	NSString *_appPath;
-	NSString *_databasePath;
-	BOOL _initialized;		// true when we've actually verified that we can open the file
+	NSString *_databasePathOriginal;
+	NSString *_databasePathCurrent;
+	FMDatabase *_database;
 }
 
-@property (copy) NSString *databasePath;
+@property (copy) NSString *databasePathOriginal;
+@property (copy) NSString *databasePathCurrent;
 @property (copy) NSString *appPath;
-@property (assign, getter=isInitialized) BOOL initialized;
+@property (retain) FMDatabase *database;
 
 @end

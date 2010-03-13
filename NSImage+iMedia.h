@@ -65,4 +65,7 @@
 	
 - (NSImage *) imageCroppedToRect:(NSRect)inCropRect;		// new instance
 
++ (NSImage *) imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
+
+
 @end
