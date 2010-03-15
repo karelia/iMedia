@@ -199,7 +199,11 @@
 - (BOOL)openDatabase;
 {
 	BOOL result = NO;
-	if ([self.database openWithFlags: SQLITE_OPEN_READONLY])
+//	if ([self.database openWithFlags: SQLITE_OPEN_READONLY])
+// Getting the build working again ... since I don't use this parser I don't 
+// mind a crude hack of a fix. Will integrate real fix when somebody (Dan?) 
+// fixes it in trunk.
+	if ([self.database open])
 	{
 		[self.database setBusyRetryTimeout:10];
 		result = YES;
