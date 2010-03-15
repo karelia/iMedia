@@ -44,13 +44,16 @@
 */
 
 
-// Author: Dan Wood, Peter Baumgartner
+// Author: Dan Wood, Peter Baumgartner, Mike Abdullah
+
+
+#import "IMBImageItem.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBComboTextCell : NSTextFieldCell
+@interface IMBComboTextCell : NSTextFieldCell <IMBImageItem>
 {
 	id _imageRepresentation;								
 	NSString* _imageRepresentationType;		
@@ -71,6 +74,5 @@
 @property (copy) NSDictionary* subtitleTextAttributes;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
