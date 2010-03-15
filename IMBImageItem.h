@@ -53,6 +53,9 @@ SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 // IKImageBrowserItem is an informal protocol. This is to wrap up the basics of it as a formal protocol for clarity in the framework. Also provide convenience functions and methods for dealing with such items.
 
 
+#import <Quartz/Quartz.h>
+
+
 @protocol IMBImageItem <NSObject>
 - (id)imageRepresentation;
 - (NSString *)imageRepresentationType;
