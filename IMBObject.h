@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import <Quartz/Quartz.h>
+#import "IMBImageItem.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,9 +72,9 @@
 
 @interface IMBObject : NSObject
 #if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-<NSCopying,NSCoding,QLPreviewItem>
+<NSCopying,NSCoding,IMBImageItem,QLPreviewItem>
 #else
-<NSCopying,NSCoding>
+<NSCopying,NSCoding,IMBImageItem>
 #endif
 {
 	id _location;												

@@ -44,7 +44,7 @@
  */
 
 
-// Author: Dan Wood, Peter Baumgartner
+// Author: Dan Wood, Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -317,52 +317,13 @@
 	
 	// Draw the thumbnail image (CGImage)...
 	
-	else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
-	{
-		CGImageRef image = (CGImageRef) _imageRepresentation;
-		[self _drawImage:image withFrame:imageRect];
-	}
-	
-	// Draw the thumbnail image (NSData)...
-	
-	else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSDataRepresentationType])
-	{
-		NSData* data = (NSData*) _imageRepresentation;
-		CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)data,NULL);
-		
-		if (source)
-		{
-			CGImageRef image = CGImageSourceCreateImageAtIndex(source,0,NULL);
-			[self _drawImage:image withFrame:imageRect];
-			CGImageRelease(image);
-			CFRelease(source);
-		}	
-	}
-	
-	// Draw the thumbnail image (QTMovie)...
-	
-	else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
-	{
-		QTMovie* movie = (QTMovie*) _imageRepresentation;
-		
-		NSError* error = nil;
-		QTTime duration = movie.duration;
-		double tv = duration.timeValue;
-		double ts = duration.timeScale;
-		QTTime time = QTMakeTimeWithTimeInterval(0.5 * tv/ts);
-		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,nil];
-			
-		CGImageRef image = (CGImageRef) [movie frameImageAtTime:time withAttributes:attributes error:&error];
-		[self _drawImage:image withFrame:imageRect];
-	}
-	
-	// Unsupported imageRepresentation...
-	
 	else
-	{
-		NSLog(@"%s: %@ is not supported by this cell class...",__FUNCTION__,_imageRepresentationType);
+    {
+		CGImageRef image = IMB_CGImageCreateWithImageItem(self);
+		[self _drawImage:image withFrame:imageRect];
+        CFRelease(image);
 	}
-
+	
 	// Draw the title and subtitle...
 	
 	if (_title)
