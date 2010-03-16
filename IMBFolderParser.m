@@ -247,6 +247,10 @@
 			[subnodes addObject:subnode];
 			[subnode release];
 
+#if 0
+// DCJ - I don't think nodes should show up in the objects list because
+// it is not intuitive to the user to have navigational objects like folders
+// in the object view.
 			IMBNodeObject* object = [[IMBNodeObject alloc] init];
 			object.location = (id)subnode;
 			object.name = name;
@@ -259,6 +263,8 @@
 
 			[objects addObject:object];
 			[object release];
+#endif
+			
 		}
 	}
 	
