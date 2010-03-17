@@ -55,6 +55,46 @@
 #import <QTKit/QTKit.h>
 
 
+@implementation NSImage (IMBImageItem)
+
++ (NSImage *)imageWithIMBImageItem:(id <IMBImageItem>)item;
+{
+    NSImage *result = nil;
+    
+    NSString *type = [item imageRepresentationType];
+    
+    // Already in the right format (CGImage)
+	
+	if ([type isEqualToString:IKImageBrowserNSImageRepresentationType])
+    {
+        result = [item imageRepresentation];
+    }
+    
+    // From URL, path or data
+	
+	else if ([type isEqualToString:IKImageBrowserNSURLRepresentationType])
+    {
+        NSURL *url = [item imageRepresentation];
+        result = [[[NSImage alloc] initWithContentsOfURL:url] autorelease];
+    }
+    else if ([type isEqualToString:IKImageBrowserPathRepresentationType])
+    {
+        NSString *path = [item imageRepresentation];
+        result = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+    }
+    else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
+    {
+        NSData *data = [item imageRepresentation];
+        result = [[[NSImage alloc] initWithData:data] autorelease];
+    }
+    
+    return result;
+}
+
+@end
+
+
+
 CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
 {
     CGImageRef result = NULL;
