@@ -94,6 +94,38 @@
 @end
 
 
+@implementation CIImage (IMBImageItem)
+
++ (CIImage *)imageWithIMBImageItem:(id <IMBImageItem>)item;
+{
+    CIImage *result = nil;
+    
+    NSString *type = [item imageRepresentationType];
+    
+    // From URL, path or data
+	
+	if ([type isEqualToString:IKImageBrowserNSURLRepresentationType])
+    {
+        NSURL *url = [item imageRepresentation];
+        result = [[[CIImage alloc] initWithContentsOfURL:url] autorelease];
+    }
+    else if ([type isEqualToString:IKImageBrowserPathRepresentationType])
+    {
+        NSString *path = [item imageRepresentation];
+        result = [[CIImage alloc] initWithContentsOfFile:[NSURL fileURLWithPath:path]];
+        [result autorelease];
+    }
+    else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
+    {
+        NSData *data = [item imageRepresentation];
+        result = [[[CIImage alloc] initWithData:data] autorelease];
+    }
+    
+    return result;
+}
+
+@end
+
 
 CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
 {
