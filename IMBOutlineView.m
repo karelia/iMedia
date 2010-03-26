@@ -204,21 +204,30 @@
 		NSString* row = [NSString stringWithFormat:@"%d",i];
 		NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 		
-		if (wheel == nil && node != nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)
+		if (node != nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)
 		{
 			NSRect badgeRect = [self badgeRectForRow:i];
-			NSProgressIndicator* wheel = [[NSProgressIndicator alloc] initWithFrame:badgeRect];
-			
-			[wheel setAutoresizingMask:NSViewNotSizable];
-			[wheel setStyle:NSProgressIndicatorSpinningStyle];
-			[wheel setControlSize:NSSmallControlSize];
-			[wheel setUsesThreadedAnimation:YES];
-			[wheel setIndeterminate:YES];
-			
-			[_subviewsInVisibleRows setObject:wheel forKey:row];
-			[self addSubview:wheel];
-			[wheel startAnimation:nil];
-			[wheel release];
+
+			if (wheel == nil)
+			{
+				NSProgressIndicator* wheel = [[NSProgressIndicator alloc] initWithFrame:badgeRect];
+				
+				[wheel setAutoresizingMask:NSViewNotSizable];
+				[wheel setStyle:NSProgressIndicatorSpinningStyle];
+				[wheel setControlSize:NSSmallControlSize];
+				[wheel setUsesThreadedAnimation:YES];
+				[wheel setIndeterminate:YES];
+				
+				[_subviewsInVisibleRows setObject:wheel forKey:row];
+				[self addSubview:wheel];
+				[wheel startAnimation:nil];
+				[wheel release];
+			}
+			else
+			{
+				// Update the frame in case we for instance just showed the scroll bar and require an offset
+				[wheel setFrame:badgeRect];
+			}
 		}
 	}
 }
