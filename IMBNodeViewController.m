@@ -70,11 +70,6 @@
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kSelectionKey = @"selection";
 
-static const double kMinimumNodeViewWidth = 300.0;
-
-static const double kMinimumLibraryViewHeight = 36.0;
-static const double kMinimumObjectViewHeight = 144.0;
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -354,10 +349,25 @@ static const double kMinimumObjectViewHeight = 144.0;
 #pragma mark 
 #pragma mark Presentation constraints
 
+- (CGFloat) minimumNodeViewWidth
+{
+	return 300.0;
+}
+
+- (CGFloat) minimumLibraryViewHeight
+{
+	return 36.0;
+}
+
+- (CGFloat) minimumObjectViewHeight
+{
+	return 144.0;
+}
+
 - (NSSize) minimumViewSize
 {
-	CGFloat minimumHeight = kMinimumLibraryViewHeight + kMinimumObjectViewHeight + [ibSplitView dividerThickness];
-	return NSMakeSize(kMinimumNodeViewWidth, minimumHeight);
+	CGFloat minimumHeight = [self minimumLibraryViewHeight] + [self minimumObjectViewHeight] + [ibSplitView dividerThickness];
+	return NSMakeSize([self minimumNodeViewWidth], minimumHeight);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -378,8 +388,8 @@ static const double kMinimumObjectViewHeight = 144.0;
 	// accommodate a reasonable row of items at a reasonable zoom level.
 	if (inIndex == 0)
 	{
-		double minPos = kMinimumLibraryViewHeight;
-		double maxPos = inSplitView.frame.size.height - kMinimumObjectViewHeight;
+		double minPos = [self minimumLibraryViewHeight];
+		double maxPos = inSplitView.frame.size.height - [self minimumObjectViewHeight];
 		inPosition = MAX(inPosition,minPos);
 		inPosition = MIN(inPosition,maxPos);
 	}
@@ -416,10 +426,10 @@ static const double kMinimumObjectViewHeight = 144.0;
 	// If the bottom view is squeezed to its minimum, then we have to resort to shrinking the top.
 	// If our client heeded our minimumViewSize then we can't have been resized to a size that 
 	// causes BOTH our top and bottom views to be shrunk beyond their minimums.
-	if (bottomFrame.size.height < kMinimumObjectViewHeight)
+	if (bottomFrame.size.height < [self minimumObjectViewHeight])
 	{
-		CGFloat bottomOverflow = kMinimumObjectViewHeight - bottomFrame.size.height;
-		bottomFrame.size.height = kMinimumObjectViewHeight;
+		CGFloat bottomOverflow = [self minimumObjectViewHeight] - bottomFrame.size.height;
+		bottomFrame.size.height = [self minimumObjectViewHeight];
 		bottomFrame.origin.y -= bottomOverflow;
 		topFrame.size.height -= bottomOverflow;
 	}
