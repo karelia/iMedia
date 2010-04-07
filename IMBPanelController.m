@@ -146,12 +146,11 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	return sSharedPanelController;
 }
 
-// Returns the shared panel controller, or nil if it is not loaded.  Useful for closing the panel if it's open.
-
-+ (IMBPanelController*) sharedPanelControllerWithoutLoading
++ (BOOL) isSharedPanelControllerLoaded;
 {
-	return sSharedPanelController;
+    return sSharedPanelController != nil;
 }
+
 
 
 
