@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@
 
 + (IMBPanelController*) sharedPanelController;
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
-+ (IMBPanelController*) sharedPanelControllerWithoutLoading;
++ (BOOL) isSharedPanelControllerLoaded;
 
 @property (assign) id delegate;
 @property (retain) NSArray* mediaTypes;
