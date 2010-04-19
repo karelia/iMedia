@@ -56,9 +56,6 @@
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 
-#ifndef NSMakeCollectable
-#define NSMakeCollectable(x) (id)(x)
-#endif
 
 @implementation NSString ( UTI )
 

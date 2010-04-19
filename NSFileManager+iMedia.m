@@ -49,9 +49,6 @@
 
 #import "NSFileManager+iMedia.h"
 
-#ifndef NSMakeCollectable
-#define NSMakeCollectable(x) (id)(x)
-#endif
 
 @implementation NSFileManager (iMedia)
 
