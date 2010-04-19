@@ -1153,7 +1153,10 @@ static NSArray* sSupportedUTIs = nil;
 {
 	IMBLightroomObject* object = (IMBLightroomObject*)inObject;
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+	
+	// DISABLING see note in IMBApertureParser.m 
+	// [metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 	
 	if ([NSThread isMainThread])

@@ -768,7 +768,12 @@
 {
 	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+
+	// DISABLING because the performance impact is too great. 
+	// This method gets called more often than the comment above implies. E.g. when a search is active
+	// it is called for EVERY candidate file.
+	//[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
 	if ([NSThread isMainThread])
