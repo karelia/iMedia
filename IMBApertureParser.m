@@ -404,14 +404,12 @@
 	// Aperture 3...
 	
 	NSArray* albums = [self.plist objectForKey:@"List of Albums"];
-	NSNumber* albumId = [NSNumber numberWithInt:1];
-	NSString* albumType = nil;
 	
 	for (NSDictionary* albumDict in albums)
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		albumType = [albumDict objectForKey:@"Album Type"];
-		albumId = [albumDict objectForKey:@"AlbumId"];
+		NSString* albumType = [albumDict objectForKey:@"Album Type"];
+		NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
 		
 		if ([albumType isEqualToString:@"5"])
 		{
