@@ -1191,6 +1191,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
 {
+	NSLog(@"%s",__FUNCTION__);
 	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	
 	if (IMBRunningOnSnowLeopardOrNewer())
