@@ -114,7 +114,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 
 - (id) init {
 	if (self = [super init]) {
-		self.license = IMBFlickrNodeLicense_CreativeCommons;
+		self.license = IMBFlickrNodeLicense_Undefined;
 		self.method = IMBFlickrNodeMethod_TextSearch;
 		self.sortOrder = IMBFlickrNodeSortOrder_InterestingnessDesc;		
 	}

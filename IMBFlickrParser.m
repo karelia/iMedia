@@ -358,7 +358,7 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	return nil;
+	return;
 }
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata

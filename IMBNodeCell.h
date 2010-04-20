@@ -53,10 +53,12 @@
 @interface IMBNodeCell : NSTextFieldCell
 {
 	NSImage* _image;
+	NSImage* _extraImage;
 	NSUInteger _badgeType;
 }
 
 @property (retain) NSImage* image;
+@property (retain) NSImage* extraImage;
 @property (assign) NSUInteger badgeType;
 
 - (NSRect) imageRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped;
