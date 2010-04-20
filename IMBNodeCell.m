@@ -77,6 +77,7 @@
 @implementation IMBNodeCell
 
 @synthesize image = _image;
+@synthesize extraImage = _extraImage;
 @synthesize badgeType = _badgeType;
 
 
@@ -98,7 +99,8 @@
 {
     IMBNodeCell* cell = (IMBNodeCell*) [super copyWithZone:inZone];
     cell->_image = [_image retain];
-    cell->_badgeType = _badgeType;
+	cell->_extraImage = [_extraImage retain];
+	cell->_badgeType = _badgeType;
     return cell;
 }
 
@@ -106,7 +108,8 @@
 - (void) dealloc
 {
 	IMBRelease(_image);
-    [super dealloc];
+ 	IMBRelease(_extraImage);
+   [super dealloc];
 }
 
 
@@ -213,6 +216,11 @@
 
 		NSRect titleRect = [self titleRectForBounds:inFrame flipped:isFlipped];
 		[super drawWithFrame:titleRect inView:inControlView];
+		if (_extraImage)	// show it at the right edge of the text area
+		{
+			NSPoint pointForExtraImage = NSMakePoint(NSMaxX(titleRect)-16.0, NSMinY(imageRect));
+			[_extraImage compositeToPoint:pointForExtraImage operation:NSCompositeSourceOver];
+		}
  
    }
 	
