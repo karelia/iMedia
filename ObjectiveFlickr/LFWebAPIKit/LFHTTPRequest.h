@@ -50,14 +50,14 @@ extern NSString *const LFHTTPRequestPOSTMethod;
     NSString *_contentType;
 
     NSDictionary *_requestHeader;
-    
+
     NSMutableData *_receivedData;
     NSString *_receivedContentType;
-    
+
     CFReadStreamRef _readStream;
     NSTimer *_receivedDataTracker;
     NSTimeInterval _lastReceivedDataUpdateTime;
-    
+
     NSTimer *_requestMessageBodyTracker;
     NSTimeInterval _lastSentDataUpdateTime;
 #if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
@@ -74,10 +74,11 @@ extern NSString *const LFHTTPRequestPOSTMethod;
 
     void *_readBuffer;
     size_t _readBufferSize;
-    
+
     id _sessionInfo;
-    
+
     BOOL _shouldWaitUntilDone;
+	NSMessagePort *_synchronousMessagePort;
 }
 
 - (id)init;
@@ -107,6 +108,7 @@ extern NSString *const LFHTTPRequestPOSTMethod;
 - (NSString *)contentType;
 - (void)setContentType:(NSString *)contentType;
 - (NSData *)receivedData;
+- (NSString *)receivedContentType;
 #if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
 - (NSUInteger)expectedDataLength;
 #else
@@ -128,6 +130,7 @@ extern NSString *const LFHTTPRequestPOSTMethod;
 @property (assign) id delegate;
 @property (retain) id sessionInfo;
 @property (assign) BOOL shouldWaitUntilDone;
+@property (readonly) BOOL isRunning;
 #endif
 @end
 
