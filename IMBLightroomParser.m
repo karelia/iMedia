@@ -1415,8 +1415,11 @@ static NSArray* sSupportedUTIs = nil;
 	if ([[NSFileManager threadSafeManager] fileExistsAtPath:path]) {
 		IMBOrderedDictionary *applications = [IMBOrderedDictionary orderedDictionaryWithCapacity:2];
 		
-		[applications setObject:@"openPreviewInEditorApp:" forKey:[IMBConfig editorAppForMediaType:self.mediaType]];
-		[applications setObject:@"openPreviewInViewerApp:" forKey:[IMBConfig viewerAppForMediaType:self.mediaType]];
+		NSString* editorAppKey = [IMBConfig editorAppForMediaType:self.mediaType];
+		if (editorAppKey != nil) [applications setObject:@"openPreviewInEditorApp:" forKey:editorAppKey];
+		
+		NSString* viewerAppKey = [IMBConfig viewerAppForMediaType:self.mediaType];
+		if (viewerAppKey != nil) [applications setObject:@"openPreviewInViewerApp:" forKey:viewerAppKey];
 
 		for (NSString* appPath in [applications allKeys]) {
 			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
