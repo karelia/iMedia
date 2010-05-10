@@ -57,10 +57,6 @@
 #import "IMBLoadMoreObject.h"
 #import "NSString+iMedia.h"
 
-
-
-#define VERBOSE
-
 //----------------------------------------------------------------------------------------------------------------------
 
 //	We need this category to make the Flickr request block on the current thread
