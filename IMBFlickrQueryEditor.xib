@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10C540</string>
+		<string key="IBDocument.SystemVersion">10D573</string>
 		<string key="IBDocument.InterfaceBuilderVersion">740</string>
-		<string key="IBDocument.AppKitVersion">1038.25</string>
-		<string key="IBDocument.HIToolboxVersion">458.00</string>
+		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">740</string>
@@ -200,9 +200,9 @@
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
 							<int key="NSPeriodicInterval">75</int>
-							<object class="NSMenuItem" key="NSMenuItem" id="513210645">
+							<object class="NSMenuItem" key="NSMenuItem" id="584836687">
 								<reference key="NSMenu" ref="377634357"/>
-								<string key="NSTitle">Any</string>
+								<string key="NSTitle">Commercial Use</string>
 								<string key="NSKeyEquiv"/>
 								<int key="NSKeyEquivModMask">1048576</int>
 								<int key="NSMnemonicLoc">2147483647</int>
@@ -210,6 +210,7 @@
 								<reference key="NSOnImage" ref="445966687"/>
 								<reference key="NSMixedImage" ref="528422078"/>
 								<string key="NSAction">_popUpItemAction:</string>
+								<int key="NSTag">3</int>
 								<reference key="NSTarget" ref="960019481"/>
 							</object>
 							<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -217,7 +218,17 @@
 								<string key="NSTitle">OtherViews</string>
 								<object class="NSMutableArray" key="NSMenuItems">
 									<bool key="EncodedWithXMLCoder">YES</bool>
-									<reference ref="513210645"/>
+									<object class="NSMenuItem" id="513210645">
+										<reference key="NSMenu" ref="377634357"/>
+										<string key="NSTitle">Any</string>
+										<string key="NSKeyEquiv"/>
+										<int key="NSKeyEquivModMask">1048576</int>
+										<int key="NSMnemonicLoc">2147483647</int>
+										<reference key="NSOnImage" ref="445966687"/>
+										<reference key="NSMixedImage" ref="528422078"/>
+										<string key="NSAction">_popUpItemAction:</string>
+										<reference key="NSTarget" ref="960019481"/>
+									</object>
 									<object class="NSMenuItem" id="1051255482">
 										<reference key="NSMenu" ref="377634357"/>
 										<string key="NSTitle">Creative Commons</string>
@@ -227,6 +238,7 @@
 										<reference key="NSOnImage" ref="445966687"/>
 										<reference key="NSMixedImage" ref="528422078"/>
 										<string key="NSAction">_popUpItemAction:</string>
+										<int key="NSTag">1</int>
 										<reference key="NSTarget" ref="960019481"/>
 									</object>
 									<object class="NSMenuItem" id="155132932">
@@ -238,22 +250,14 @@
 										<reference key="NSOnImage" ref="445966687"/>
 										<reference key="NSMixedImage" ref="528422078"/>
 										<string key="NSAction">_popUpItemAction:</string>
+										<int key="NSTag">2</int>
 										<reference key="NSTarget" ref="960019481"/>
 									</object>
-									<object class="NSMenuItem" id="584836687">
-										<reference key="NSMenu" ref="377634357"/>
-										<string key="NSTitle">Commercial Use</string>
-										<string key="NSKeyEquiv"/>
-										<int key="NSKeyEquivModMask">1048576</int>
-										<int key="NSMnemonicLoc">2147483647</int>
-										<reference key="NSOnImage" ref="445966687"/>
-										<reference key="NSMixedImage" ref="528422078"/>
-										<string key="NSAction">_popUpItemAction:</string>
-										<reference key="NSTarget" ref="960019481"/>
-									</object>
+									<reference ref="584836687"/>
 								</object>
 								<reference key="NSMenuFont" ref="1071634256"/>
 							</object>
+							<int key="NSSelectedIndex">3</int>
 							<int key="NSPreferredEdge">1</int>
 							<bool key="NSUsesItemFromMenu">YES</bool>
 							<bool key="NSAltersState">YES</bool>
@@ -767,6 +771,14 @@
 					</object>
 					<int key="connectionID">168</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_licensePopup</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="894740359"/>
+					</object>
+					<int key="connectionID">170</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1204,7 +1216,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{648, 488}, {208, 83}}</string>
+					<string>{{648, 499}, {208, 83}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1261,7 +1273,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">169</int>
+			<int key="maxID">170</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1286,11 +1298,13 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>_licensePopup</string>
 							<string>_queriesController</string>
 							<string>_queryTitle</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSPopUpButton</string>
 							<string>NSArrayController</string>
 							<string>NSTextField</string>
 						</object>
@@ -1298,6 +1312,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">IMBFlickrQueryEditor.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">IMBObjectArrayController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

@@ -72,6 +72,7 @@
 	@private
 	IBOutlet NSArrayController* _queriesController;
 	IBOutlet NSTextField* _queryTitle;
+	IBOutlet NSPopUpButton *_licensePopup;
 	IMBFlickrParser* _parser;
 }
 

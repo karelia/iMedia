@@ -57,7 +57,6 @@
 
 
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
 @implementation IMBFlickrQueryEditor
@@ -90,6 +89,21 @@ NSString* const IMBFlickrQueryEditor_QueryChanged = @"IMBFlickrQueryEditor_Query
 
 - (void) awakeFromNib {
 	[super awakeFromNib];
+	
+	NSImage *noImage = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:@"any" ofType:@"pdf"]] autorelease];
+	NSImage *ccImage = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:@"CC" ofType:@"pdf"]] autorelease];
+	NSImage *reImage = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:@"remix" ofType:@"pdf"]] autorelease];
+	NSImage *coImage = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:@"commercial" ofType:@"pdf"]] autorelease];
+
+	[noImage setScalesWhenResized:YES];	[noImage setSize:NSMakeSize(16.0,16.0)];
+	[ccImage setScalesWhenResized:YES];	[ccImage setSize:NSMakeSize(16.0,16.0)];
+	[reImage setScalesWhenResized:YES];	[reImage setSize:NSMakeSize(16.0,16.0)];
+	[coImage setScalesWhenResized:YES];	[coImage setSize:NSMakeSize(16.0,16.0)];
+	
+	[[_licensePopup itemAtIndex:[_licensePopup indexOfItemWithTag:0]] setImage:noImage];
+	[[_licensePopup itemAtIndex:[_licensePopup indexOfItemWithTag:1]] setImage:ccImage];
+	[[_licensePopup itemAtIndex:[_licensePopup indexOfItemWithTag:2]] setImage:reImage];
+	[[_licensePopup itemAtIndex:[_licensePopup indexOfItemWithTag:3]] setImage:coImage];
 	
 	NSAssert (_queriesController != nil, @"Can't find '_queriesController'.");
 	NSAssert (_queryTitle != nil, @"Can't find '_queryTitle'.");

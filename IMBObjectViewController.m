@@ -1020,23 +1020,27 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		if (indexString != nil)
 		{
 			UInt32 itemIndex = [indexString integerValue];
-			IMBObject* mappedObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:itemIndex];
-			if (mappedObject != nil)
+			NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
+			if ([arrangedObjects count])
 			{
-				// Use our promise object to load the content
-				NSData* data = [inItem dataForType:kIMBObjectPromiseType];
-				IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-				if (promise != nil)
+				IMBObject* mappedObject = [arrangedObjects objectAtIndex:itemIndex];
+				if (mappedObject != nil)
 				{
-					promise.downloadFolderPath = NSTemporaryDirectory();
-					[promise startLoadingWithDelegate:self finishSelector:nil];
-					[promise waitUntilDone];
-
-					NSURL* thisURL = [promise localURLForObject:mappedObject];
-					if ((thisURL != nil) && ([thisURL isKindOfClass:[NSURL class]]))
+					// Use our promise object to load the content
+					NSData* data = [inItem dataForType:kIMBObjectPromiseType];
+					IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+					if (promise != nil)
 					{
-						// public.url is documented as containing the "bytes of the URL"
-						[inItem setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:inType];
+						promise.downloadFolderPath = NSTemporaryDirectory();
+						[promise startLoadingWithDelegate:self finishSelector:nil];
+						[promise waitUntilDone];
+						
+						NSURL* thisURL = [promise localURLForObject:mappedObject];
+						if ((thisURL != nil) && ([thisURL isKindOfClass:[NSURL class]]))
+						{
+							// public.url is documented as containing the "bytes of the URL"
+							[inItem setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:inType];
+						}
 					}
 				}
 			}
@@ -1192,6 +1196,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
 {
+	NSLog(@"%s",__FUNCTION__);
 	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	
 	if (IMBRunningOnSnowLeopardOrNewer())

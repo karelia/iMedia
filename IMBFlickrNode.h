@@ -71,7 +71,8 @@ typedef enum {
 	IMBFlickrNodeMethod_TextSearch = 0,
 	IMBFlickrNodeMethod_TagSearch,
 	IMBFlickrNodeMethod_Recent,
-	IMBFlickrNodeMethod_MostInteresting
+	IMBFlickrNodeMethod_MostInteresting,
+	IMBFlickrNodeMethod_GetInfo
 } IMBFlickrNodeMethod;
 
 typedef enum {

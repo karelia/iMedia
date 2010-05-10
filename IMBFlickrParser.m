@@ -354,6 +354,17 @@
 	return [[(IMBObjectPromise*)[IMBRemoteObjectPromise alloc] initWithObjects:inObjects] autorelease];
 }
 
+// Convert metadata into human readable string...
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	return;
+}
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return nil;
+}
 
 #pragma mark 
 #pragma mark Properties

@@ -60,6 +60,7 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBNodeCell.h"
+#import "IMBFlickrNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -622,6 +623,30 @@ static NSString* kSelectionKey = @"selection";
 
 	[cell setImage:node.icon];
 	[cell setBadgeType:node.badgeTypeNormal];
+	
+	if ([node respondsToSelector:@selector(license)])
+	{
+		IMBFlickrNodeLicense license = [((IMBFlickrNode *)node) license];
+		if (license > IMBFlickrNodeLicense_CommercialUse) license = IMBFlickrNodeLicense_CommercialUse;
+		NSArray *names = [NSArray arrayWithObjects:@"any", @"CC", @"remix", @"commercial", nil];
+		NSString *fileName = [names objectAtIndex:license];
+		
+		if (license)
+		{
+			NSImage *image = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:fileName ofType:@"pdf"]] autorelease];
+			[image setScalesWhenResized:YES];
+			[image setSize:NSMakeSize(16.0,16.0)];
+			[cell setExtraImage:image];
+		}
+		else
+		{
+			[cell setExtraImage:nil];
+		}
+	}
+	else
+	{
+		[cell setExtraImage:nil];
+	}
 }
 
 

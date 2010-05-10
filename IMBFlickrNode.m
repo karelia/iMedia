@@ -114,7 +114,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 
 - (id) init {
 	if (self = [super init]) {
-		self.license = IMBFlickrNodeLicense_CreativeCommons;
+		self.license = IMBFlickrNodeLicense_Undefined;
 		self.method = IMBFlickrNodeMethod_TextSearch;
 		self.sortOrder = IMBFlickrNodeSortOrder_InterestingnessDesc;		
 	}
@@ -530,6 +530,8 @@ typedef enum {
 		return @"flickr.photos.getRecent";
 	} else if (code == IMBFlickrNodeMethod_MostInteresting) {
 		return @"flickr.interestingness.getList";
+	} else if (code == IMBFlickrNodeMethod_GetInfo) {
+		return @"flickr.photos.getInfo";
 	}
 	NSLog (@"Can't find Flickr method for method code.");
 	return nil;
@@ -558,7 +560,7 @@ typedef enum {
 	} else if (method == IMBFlickrNodeMethod_Recent) {
 		flickrMethod = [flickrMethod stringByAppendingString:@"/recent"];
 	} else if (method == IMBFlickrNodeMethod_MostInteresting) {
-		flickrMethod = [flickrMethod stringByAppendingString:@"/intersting"];		
+		flickrMethod = [flickrMethod stringByAppendingString:@"/intersting"];		// Should this be interesting?
 	}
 	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", flickrMethod, query];
 	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
