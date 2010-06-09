@@ -56,12 +56,20 @@
 
 #import <Quartz/Quartz.h>
 
+#import "FMDatabase.h"
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+
+
+@interface IMBLightroom3Parser ()
+
++ (NSString*)cloneDatabase:(NSString*)databasePath;
+
+@end
 
 
 @implementation IMBLightroom3Parser
@@ -73,7 +81,7 @@
 
 + (NSString*) lightroomPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom3Beta"];
+	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom3"];
 }
 
 
@@ -83,7 +91,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3Beta");
+	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -91,7 +99,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3Beta");
+		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);
@@ -262,10 +270,9 @@
 - (NSString*) folderObjectsQuery
 {
 	NSString* query =	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
-						@"			iptc.caption, apcp.relativeDataPath pyramidPath"
+						@"			iptc.caption"
 						@" FROM AgLibraryFile alf"
 						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
-						@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
 						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
 						@" WHERE alf.folder = ?"
 						@" ORDER BY ai.captureTime ASC";
@@ -277,10 +284,9 @@
 {
 	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
 						@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
-						@"			iptc.caption, apcp.relativeDataPath pyramidPath"
+						@"			iptc.caption"
 						@" FROM AgLibraryFile aif"
 						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
-						@" INNER JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"
 						@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
 						@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
 						@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"
@@ -355,6 +361,54 @@
 	}
 
 	return collectionIcon;
+}
+
+- (FMDatabase*) libraryDatabase
+{
+	NSString* databasePath = (NSString*)self.mediaSource;
+	NSString* readOnlyDatabasePath = [[self class] cloneDatabase:databasePath];
+	FMDatabase* database = [FMDatabase databaseWithPath:readOnlyDatabasePath];
+	
+	[database setLogsErrors:YES];
+	
+	return database;
+}
+
++ (NSString*)cloneDatabase:(NSString*)databasePath
+{
+	// BEGIN ugly hack to work around Lightroom locking its database
+	
+	NSString *basePath = [databasePath stringByDeletingPathExtension];	
+	NSString *pathExtension = [databasePath pathExtension];	
+	NSString *readOnlyDatabasePath = [[NSString stringWithFormat:@"%@-readOnly", basePath] stringByAppendingPathExtension:pathExtension];
+	
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+	BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
+	
+	if ([fileManager fileExistsAtPath:readOnlyDatabasePath]) {
+		NSDictionary *attributesOfCopy = [fileManager fileAttributesAtPath:readOnlyDatabasePath traverseLink:YES];
+		NSDate *modDateOfCopy = [attributesOfCopy fileModificationDate];
+		
+		NSDictionary *attributesOfOrig = [fileManager fileAttributesAtPath:databasePath traverseLink:YES];
+		NSDate *modDateOfOrig = [attributesOfOrig fileModificationDate];
+		
+		if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy]) {
+			needToCopyFile = NO;
+		}
+	}
+	
+	if (needToCopyFile) {
+		(void) [fileManager removeFileAtPath:readOnlyDatabasePath handler:nil];
+		BOOL copied = [fileManager copyPath:databasePath toPath:readOnlyDatabasePath handler:nil];
+		
+		if (!copied) {
+			NSLog(@"Unable to copy database file at %@", databasePath);
+		}
+	}
+	
+	// END ugly hack
+	
+	return readOnlyDatabasePath;
 }
 
 @end
