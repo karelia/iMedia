@@ -62,6 +62,7 @@
 #import "IMBLightroom1Parser.h"
 #import "IMBLightroom2Parser.h"
 #import "IMBLightroom3Parser.h"
+#import "IMBLightroom3VideoParser.h"
 #import "IMBIconCache.h"
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
@@ -215,6 +216,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
 	[pool release];
 }
 
@@ -273,7 +275,10 @@ static NSArray* sSupportedUTIs = nil;
 		[parserInstances addObjectsFromArray:[IMBLightroom2Parser concreteParserInstancesForMediaType:inMediaType]];
 		[parserInstances addObjectsFromArray:[IMBLightroom3Parser concreteParserInstancesForMediaType:inMediaType]];
 	}
-	
+	else if ([kIMBMediaTypeMovie isEqualTo:inMediaType]) {
+		[parserInstances addObjectsFromArray:[IMBLightroom3VideoParser concreteParserInstancesForMediaType:inMediaType]];
+	}
+			  
 	return parserInstances;
 }
 
