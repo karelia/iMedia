@@ -15,6 +15,8 @@
 		8F47B39210C416050013ED25 /* IMBOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F47B39010C416050013ED25 /* IMBOrderedDictionary.m */; };
 		8F93177E10A9FC53002CDB19 /* IMBPyramidObjectPromise.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F93177C10A9FC53002CDB19 /* IMBPyramidObjectPromise.h */; };
 		8F93177F10A9FC53002CDB19 /* IMBPyramidObjectPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F93177D10A9FC53002CDB19 /* IMBPyramidObjectPromise.m */; };
+		8FC2089D11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */; };
+		8FC2089E11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC2089C11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m */; };
 		8FC2559910A851C500F19642 /* IMBLightroom2Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FC2559610A851C500F19642 /* IMBLightroom2Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FC2559A10A851C500F19642 /* IMBLightroom2Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC2559710A851C500F19642 /* IMBLightroom2Parser.m */; };
 		8FC2561010A8706000F19642 /* IMBLightroom1Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FC2560E10A8706000F19642 /* IMBLightroom1Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -336,6 +338,8 @@
 		8F47B39010C416050013ED25 /* IMBOrderedDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBOrderedDictionary.m; sourceTree = "<group>"; };
 		8F93177C10A9FC53002CDB19 /* IMBPyramidObjectPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPyramidObjectPromise.h; sourceTree = "<group>"; };
 		8F93177D10A9FC53002CDB19 /* IMBPyramidObjectPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPyramidObjectPromise.m; sourceTree = "<group>"; };
+		8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom3VideoParser.h; sourceTree = "<group>"; };
+		8FC2089C11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom3VideoParser.m; sourceTree = "<group>"; };
 		8FC2559610A851C500F19642 /* IMBLightroom2Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom2Parser.h; sourceTree = "<group>"; };
 		8FC2559710A851C500F19642 /* IMBLightroom2Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom2Parser.m; sourceTree = "<group>"; };
 		8FC2560E10A8706000F19642 /* IMBLightroom1Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom1Parser.h; sourceTree = "<group>"; };
@@ -1090,6 +1094,8 @@
 				D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */,
 				D0467BB2112C223600C1AA4E /* IMBApertureVideoParser.h */,
 				D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */,
+				8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */,
+				8FC2089C11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m */,
 			);
 			name = Movie;
 			sourceTree = "<group>";
@@ -1211,6 +1217,7 @@
 				D0467BB0112C220F00C1AA4E /* IMBApertureAudioParser.h in Headers */,
 				D0467BB4112C223600C1AA4E /* IMBApertureVideoParser.h in Headers */,
 				274DF618114EF0B200AC8C03 /* IMBImageItem.h in Headers */,
+				8FC2089D11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1478,6 +1485,7 @@
 				D0467BB5112C223600C1AA4E /* IMBApertureVideoParser.m in Sources */,
 				CE69CDC41149D0B50016E5E0 /* IMBFireFoxParser.m in Sources */,
 				274DF619114EF0B200AC8C03 /* IMBImageItem.m in Sources */,
+				8FC2089E11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
