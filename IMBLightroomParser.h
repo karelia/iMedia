@@ -109,6 +109,12 @@
 
 - (NSImage*) largeFolderIcon;
 
+- (FMDatabase*) libraryDatabase;
+- (FMDatabase*) previewsDatabase;
+
+- (NSString*)pyramidPathForImage:(NSNumber*)idLocal;
+- (NSData*)previewDataForObject:(IMBObject*)inObject;
+
 @end
 
 

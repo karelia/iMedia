@@ -60,6 +60,7 @@
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
+#import "NSData+SKExtensions.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
@@ -239,7 +240,7 @@
 						@" WHERE rootFolder = ?"
 						@" AND pathFromRoot LIKE ?"
 						@" AND NOT (pathFromRoot LIKE ?)"
-						@" ORDER BY pathFromRoot, robustRepresentation ASC";
+						@" ORDER BY pathFromRoot ASC";
 	
 	
 	return query;
@@ -275,6 +276,7 @@
 						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
 						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
 						@" WHERE alf.folder = ?"
+						@" AND ai.fileFormat <> 'VIDEO'"
 						@" ORDER BY ai.captureTime ASC";
 	
 	return query;
@@ -292,6 +294,7 @@
 						@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"
 						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
 						@" WHERE alci.collection = ?"
+						@" AND ai.fileFormat <> 'VIDEO'"
 						@" ORDER BY ai.captureTime ASC";
 	
 	return query;
@@ -363,11 +366,78 @@
 	return collectionIcon;
 }
 
+- (NSString*)pyramidPathForImage:(NSNumber*)idLocal
+{
+	FMDatabase *database = [self thumbnailDatabase];
+	NSString *uuid = nil;
+	NSString *digest = nil;
+	
+	if (database != nil) {		
+		NSString* query =	@" SELECT ice.uuid, ice.digest"
+							@" FROM ImageCacheEntry ice"
+							@" WHERE ice.imageId = ?"
+							@" ORDER BY ice.uuid ASC"
+							@" LIMIT 1";
+		
+		FMResultSet* results = [database executeQuery:query, idLocal];
+		
+		if ([results next]) {				
+			uuid = [results stringForColumn:@"uuid"];
+			digest = [results stringForColumn:@"digest"];
+		}
+		
+		[results close];
+	}
+	
+	if ((uuid != nil) && (digest != nil)) {
+		NSString* prefixOne = [uuid substringToIndex:1];
+		NSString* prefixFour = [uuid substringToIndex:4];
+		NSString* fileName = [[NSString stringWithFormat:@"%@-%@", uuid, digest] stringByAppendingPathExtension:@"lrprev"];
+		
+		return [[prefixOne stringByAppendingPathComponent:prefixFour] stringByAppendingPathComponent:fileName];
+	}
+	
+	return nil;
+}
+
+- (NSData*)previewDataForObject:(IMBObject*)inObject
+{	
+	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
+	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
+	
+	if (absolutePyramidPath != nil) {
+		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
+		NSUInteger index = [data lastIndexOfBytes:pattern length:3];
+		
+		if (index != NSNotFound) {
+			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
+			
+			return jpegData;
+		}
+	}
+	
+	return nil;
+}
+
 - (FMDatabase*) libraryDatabase
 {
 	NSString* databasePath = (NSString*)self.mediaSource;
 	NSString* readOnlyDatabasePath = [[self class] cloneDatabase:databasePath];
 	FMDatabase* database = [FMDatabase databaseWithPath:readOnlyDatabasePath];
+	
+	[database setLogsErrors:YES];
+	
+	return database;
+}
+
+- (FMDatabase*) previewsDatabase
+{
+	NSString* mainDatabasePath = (NSString*)self.mediaSource;
+	NSString* rootPath = [mainDatabasePath stringByDeletingPathExtension];
+	NSString* previewPackagePath = [[NSString stringWithFormat:@"%@ Previews", rootPath] stringByAppendingPathExtension:@"lrdata"];
+	NSString* previewDatabasePath = [[previewPackagePath stringByAppendingPathComponent:@"previews"] stringByAppendingPathExtension:@"db"];
+	FMDatabase* database = [FMDatabase databaseWithPath:previewDatabasePath];
 	
 	[database setLogsErrors:YES];
 	
