@@ -131,6 +131,14 @@
     return sqlite3_errcode([parentDB sqliteHandle]) == SQLITE_ROW;
 }
 
+- (BOOL) hasColumnWithName:(NSString*)columnName {
+    if (!columnNamesSetup) {
+        [self setupColumnNames];
+    }
+    
+    return ([columnNameToIndexMap objectForKey:[columnName lowercaseString]]) != nil;
+}
+
 - (int) columnIndexForName:(NSString*)columnName {
     
     if (!columnNamesSetup) {
