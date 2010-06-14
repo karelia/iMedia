@@ -92,6 +92,8 @@
 						@" WHERE alci.collection = ?"
 						@" AND ai.fileFormat = 'VIDEO'"
 						@" ORDER BY ai.captureTime ASC";
+	
+	return query;
 }
 
 @end
