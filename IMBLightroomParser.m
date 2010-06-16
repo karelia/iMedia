@@ -1466,7 +1466,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSString* path = [lightroomObject path];
 	
 	if ([[NSFileManager threadSafeManager] fileExistsAtPath:path]) {
-		IMBOrderedDictionary *applications = [IMBOrderedDictionary orderedDictionaryWithCapacity:2];
+		IMBMutableOrderedDictionary *applications = [IMBMutableOrderedDictionary orderedDictionaryWithCapacity:2];
 		
 		NSString* editorAppKey = [IMBConfig editorAppForMediaType:self.mediaType];
 		if (editorAppKey != nil) [applications setObject:@"openPreviewInEditorApp:" forKey:editorAppKey];
