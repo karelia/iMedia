@@ -44,7 +44,7 @@
  */
 
 
-// Author: Pierre Bernard
+// Author: Pierre Bernard, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,14 +52,16 @@
 #import "IMBOrderedDictionary.h"
 
 
-@implementation IMBOrderedDictionary
+@implementation IMBMutableOrderedDictionary
 
-+ (IMBOrderedDictionary*)orderedDictionaryWithCapacity:(NSUInteger)inCapacity
+#pragma mark Init & Dealloc
+
++ (IMBMutableOrderedDictionary*)orderedDictionaryWithCapacity:(NSUInteger)inCapacity
 {
 	return [[[[self class] alloc] initWithCapacity:inCapacity] autorelease];
 }
 
-- (IMBOrderedDictionary*)initWithCapacity:(NSUInteger)inCapacity
+- (id)initWithCapacity:(NSUInteger)inCapacity
 {
 	if ((self = [super init]) != nil) {
 		_dictionary = [[NSMutableDictionary alloc] initWithCapacity:inCapacity];
@@ -68,6 +70,33 @@
 	
 	return self;
 }
+
+- (void)dealloc
+{
+	[_dictionary release], _dictionary = nil;
+	[_array release], _array = nil;
+	
+	[super dealloc];
+}
+
+#pragma mark Immutable Primitives
+
+- (NSUInteger)count;
+{
+    return [_array count];
+}
+
+- (id)objectForKey:(id)inKey
+{
+	return [_dictionary objectForKey:inKey];
+}
+
+- (NSEnumerator *)keyEnumerator;
+{
+	return [_array objectEnumerator];
+}
+
+#pragma mark Mutable Primitives
 
 - (void)setObject:(id)inObject forKey:(id)inKey
 {
@@ -88,24 +117,6 @@
 		[_dictionary removeObjectForKey:inKey];
 		[_array removeObject:object];
 	}
-}
-
-- (id)objectForKey:(id)inKey
-{
-	return [_dictionary objectForKey:inKey];
-}
-
-- (NSArray*)allKeys
-{
-	return [[_array copy] autorelease];
-}
-
-- (void)dealloc
-{
-	[_dictionary release], _dictionary = nil;
-	[_array release], _array = nil;
-	
-	[super dealloc];
 }
 
 @end
