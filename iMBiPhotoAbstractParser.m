@@ -172,7 +172,7 @@
 		
 			
 		// WORKAROUND
-		if (!db || 0 == db.count)	// unable to read. possibly due to unencoded '&'.  rdar://7469235
+		if (!db || 0 == [db count])	// unable to read. possibly due to unencoded '&'.  rdar://7469235
 		{
 			NSData *data = [NSData dataWithContentsOfURL:url];
 			
@@ -194,7 +194,7 @@
 			}
 		}			
 		
-		if (!db || 0 == db.count)
+		if (!db || 0 == [db count])
 		{
 			//	If there is an AlbumData.xml file, there should be something inside!
 			NSLog (@"The iPhoto AlbumData.xml file seams to be empty. This is an unhealthy condition!");
