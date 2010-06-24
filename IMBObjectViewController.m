@@ -315,7 +315,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	{
 		[[NSNotificationCenter defaultCenter]
 			addObserver:self 
-			selector:@selector(cleanup) 
+			selector:@selector(cleanupBindings) 
 			name:NSWindowWillCloseNotification 
 			object:inWindow];
 	}
@@ -340,9 +340,8 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
 }
 
-// Performs necessary cleanup before a window is closed
 
-- (void) cleanup	
+- (void) cleanupBindings	
 {
 	// Stop observing the array...
 	
