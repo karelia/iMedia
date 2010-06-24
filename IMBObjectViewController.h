@@ -167,9 +167,8 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 }
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
-
 - (void) prepareForWindow:(NSWindow*)inWindow;	
-- (void) cleanup;								
+- (void) cleanupBindings;								
 
 // Library...
 
