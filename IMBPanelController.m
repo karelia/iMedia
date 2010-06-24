@@ -118,6 +118,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 #pragma mark 
 
 // Convenience method for loading/initializing the shared panel controller with default media types and no delegate
+
 + (IMBPanelController*) sharedPanelController
 {
 	if (sSharedPanelController == nil)
@@ -131,6 +132,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	
 	return sSharedPanelController;
 }
+
 
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes
 {
@@ -146,12 +148,19 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	return sSharedPanelController;
 }
 
+
 + (BOOL) isSharedPanelControllerLoaded;
 {
     return sSharedPanelController != nil;
 }
 
 
++ (void) cleanupSharedPanelController
+{
+	[sSharedPanelController saveStateToPreferences];
+	[sSharedPanelController.window close];
+	IMBRelease(sSharedPanelController);
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -256,9 +265,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[ibToolbar setSizeMode:NSToolbarSizeModeSmall];
 	[ibToolbar setAllowsUserCustomization:NO];
 	
-	// Create a tab for each controller and install the subviews in it.
-	// We query each node controller for its minimum size so we can be sure
-	// to constrain our panel's minimum to suit the most restrictive controller.
+	// Create a tab for each controller and install the subviews in it. We query each node controller for its 
+	// minimum size so we can be sure to constrain our panel's minimum to suit the most restrictive controller...
+	
 	NSSize largestMinimumSize = NSMakeSize(0,0);
 	
 	for (IMBObjectViewController* objectViewController in self.viewControllers)
@@ -269,6 +278,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		NSView* nodeView = [nodeViewController view];
 		[nodeView setFrame:[ibTabView bounds]];
 		
+		// Query each node controller for its minimum size so we can be sure to constrain our panel's minimum to 
+		// suit the most restrictive controller...
+
 		NSSize thisNodeViewMinimumSize = [nodeViewController minimumViewSize];
 		if (thisNodeViewMinimumSize.height > largestMinimumSize.height)
 		{
@@ -279,6 +291,8 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 			largestMinimumSize.width = thisNodeViewMinimumSize.width;
 		}
 		
+		// Install the views in the window hierarchy...
+		
 		NSView* objectView = [objectViewController view];
 		[nodeViewController installStandardObjectView:objectView];
 		
@@ -287,16 +301,19 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		[item setView:nodeView];
 		[ibTabView addTabViewItem:item];
 		[item release];
+		
+		// Prepare the bindings of views and controllers. This will essentially register for the windowWillClose
+		// notification, which in turn will cause all bindings to be torn down BEFORE the window is closed and
+		// all top level objects are released. That way we can avoid exceptions due to a random dealloc order...
+		
+		[objectViewController prepareForWindow:self.window];
+
 	}
 		
 	// Restore window size and selected tab...
-	[self.window setContentMinSize:largestMinimumSize];
 	
-	NSString* frame = [IMBConfig prefsValueForKey:@"windowFrame"];
-	if (frame) [self.window setFrame:NSRectFromString(frame) display:YES animate:NO];
-
-	NSString* mediaType = [IMBConfig prefsValueForKey:@"selectedMediaType"];
-	if (mediaType) [ibTabView selectTabViewItemWithIdentifier:mediaType];
+	[self.window setContentMinSize:largestMinimumSize];
+	[self restoreStateFromPreferences];
 }
 
 
@@ -307,11 +324,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		
 - (void) applicationWillTerminate:(NSNotification*)inNotification
 {
-	NSString* frame = NSStringFromRect(self.window.frame);
-	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
-	
-	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
-	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
+	[self saveStateToPreferences];
 }
 
 
@@ -326,6 +339,29 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 - (IBAction) hideWindow:(id)inSender
 {
 	[self.window orderOut:nil];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) saveStateToPreferences
+{
+	NSString* frame = NSStringFromRect(self.window.frame);
+	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
+	
+	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
+	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
+}
+
+
+- (void) restoreStateFromPreferences
+{
+	NSString* frame = [IMBConfig prefsValueForKey:@"windowFrame"];
+	if (frame) [self.window setFrame:NSRectFromString(frame) display:YES animate:NO];
+
+	NSString* mediaType = [IMBConfig prefsValueForKey:@"selectedMediaType"];
+	if (mediaType) [ibTabView selectTabViewItemWithIdentifier:mediaType];
 }
 
 
