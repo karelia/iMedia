@@ -871,6 +871,10 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* name = caption!= nil ? caption : filename;
 			NSString* path = [absolutePath stringByAppendingString:filename];
 			
+			if (pyramidPath == nil) {
+				pyramidPath = [self pyramidPathForImage:idLocal];
+			}
+			
 			if ([self canOpenImageFileAtPath:path]) {
 				NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
 				

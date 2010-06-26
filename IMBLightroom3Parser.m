@@ -70,6 +70,8 @@
 
 + (NSString*)cloneDatabase:(NSString*)databasePath;
 
+- (NSNumber*) databaseVersion;
+
 @end
 
 
@@ -128,19 +130,55 @@
 				dataPath = nil;
 			}
 			
-			IMBLightroom3Parser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+			IMBLightroom3Parser* parser = [[[[self class] alloc] initWithMediaType:inMediaType] autorelease];
 			parser.mediaSource = libraryPath;
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			
+			// Check database version
+			
+			NSNumber *databaseVersion = [parser databaseVersion];
+			
+			if (databaseVersion != nil) {
+				long databaseVersionLong = [databaseVersion longValue];
+				
+				if (databaseVersionLong < 300025) {
+					continue;
+				}
+				else if (databaseVersionLong >= 400000) {
+					continue;
+				}
+			}
+			
 			[parserInstances addObject:parser];
-			[parser release];
 		}
 	}
 	
 	return parserInstances;
 }
 
+- (NSNumber*) databaseVersion
+{
+	FMDatabase *database = [self database];
+	NSNumber *databaseVersion = nil;
+	
+	if (database != nil) {		
+		NSString* query =	@" SELECT value"
+							@" FROM Adobe_variablesTable avt"
+							@" WHERE avt.name = ?"
+							@" LIMIT 1";
+		
+		FMResultSet* results = [database executeQuery:query, @"Adobe_DBVersion"];
+		
+		if ([results next]) {				
+			databaseVersion = [NSNumber numberWithLong:[results longForColumn:@"value"]];
+		}
+		
+		[results close];
+	}
+	
+	return databaseVersion;
+}
 
 // This method creates the immediate subnodes of the "Lightroom" root node. The two subnodes are "Folders"  
 // and "Collections"...
@@ -368,15 +406,17 @@
 
 - (NSString*)pyramidPathForImage:(NSNumber*)idLocal
 {
-	FMDatabase *database = [self thumbnailDatabase];
+	FMDatabase *database = [self database];
 	NSString *uuid = nil;
 	NSString *digest = nil;
 	
-	if (database != nil) {		
-		NSString* query =	@" SELECT ice.uuid, ice.digest"
-							@" FROM ImageCacheEntry ice"
-							@" WHERE ice.imageId = ?"
-							@" ORDER BY ice.uuid ASC"
+	if (database != nil) {	
+		NSString* query =	@" SELECT alf.id_global uuid, ids.digest"
+							@" FROM Adobe_imageDevelopSettings ids"
+							@" INNER JOIN Adobe_images ai ON ai.id_local = ids.image"
+							@" INNER JOIN AgLibraryFile alf on alf.id_local = ai.rootFile"
+							@" WHERE ids.image = ?"
+							@" ORDER BY alf.id_global ASC"
 							@" LIMIT 1";
 		
 		FMResultSet* results = [database executeQuery:query, idLocal];
@@ -388,7 +428,7 @@
 		
 		[results close];
 	}
-	
+		
 	if ((uuid != nil) && (digest != nil)) {
 		NSString* prefixOne = [uuid substringToIndex:1];
 		NSString* prefixFour = [uuid substringToIndex:4];
@@ -407,12 +447,33 @@
 	
 	if (absolutePyramidPath != nil) {
 		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
-		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
-		NSUInteger index = [data lastIndexOfBytes:pattern length:3];
+		
+//		'AgHg'					-- a magic marker
+//		header length			-- 2 bytes, big endian includes marker and length
+//		version					-- 1 byte, zero for now
+//		kind					-- 1 bytes, 0 == string, 1 == blob
+//		data length				-- 8 bytes, big endian
+//		data padding length		-- 8 bytes, big endian
+//		name					-- zero terminated
+//		< padding for rest of header >
+//		< data >
+//		< data padding >
+		
+		const char pattern[4] = { 0x41, 0x67, 0x48, 0x67 };
+		NSUInteger index = [data lastIndexOfBytes:pattern length:4];
 		
 		if (index != NSNotFound) {
-			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
+			unsigned short headerLengthValue; // size 2
+			unsigned long long dataLengthValue; // size 8
 			
+			[data getBytes:&headerLengthValue range:NSMakeRange(index + 4, 2)];
+			[data getBytes:&dataLengthValue range:NSMakeRange(index + 4 + 2 + 1 + 1, 8)];
+
+			headerLengthValue = NSSwapBigShortToHost(headerLengthValue);
+			dataLengthValue = NSSwapBigLongLongToHost(dataLengthValue);
+
+			NSData* jpegData = [data subdataWithRange:NSMakeRange(headerLengthValue + index, dataLengthValue)];
+
 			return jpegData;
 		}
 	}
