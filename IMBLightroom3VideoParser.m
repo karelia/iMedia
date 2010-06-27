@@ -44,25 +44,56 @@
  */
 
 
-// Author: Pierre Bernard, Mike Abdullah
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#import <Cocoa/Cocoa.h>
+
+#pragma mark HEADERS
+
+#import "IMBLightroom3VideoParser.h"
+#import "IMBParserController.h"
+#import "IMBEnhancedObject.h"
 
 
-@interface IMBMutableOrderedDictionary : NSDictionary
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBLightroom3VideoParser
+
+- (NSString*) folderObjectsQuery
 {
-	NSMutableDictionary*		_dictionary;
-	NSMutableArray*				_array;
+	NSString* query =	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+						@"			iptc.caption"
+						@" FROM AgLibraryFile alf"
+						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
+						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+						@" WHERE alf.folder = ?"
+						@" AND ai.fileFormat = 'VIDEO'"
+						@" ORDER BY ai.captureTime ASC";
+	
+	return query;
 }
 
-+ (IMBMutableOrderedDictionary*)orderedDictionaryWithCapacity:(NSUInteger)inCapacity;
-
-- (id)initWithCapacity:(NSUInteger)inCapacity;
-
-- (void)setObject:(id)inObject forKey:(id)inKey;
-- (void)removeObjectForKey:(id)inKey;
+- (NSString*) collectionObjectsQuery
+{
+	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
+						@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+						@"			iptc.caption"
+						@" FROM AgLibraryFile aif"
+						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
+						@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
+						@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
+						@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"
+						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+						@" WHERE alci.collection = ?"
+						@" AND ai.fileFormat = 'VIDEO'"
+						@" ORDER BY ai.captureTime ASC";
+	
+	return query;
+}
 
 @end

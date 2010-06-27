@@ -29,6 +29,7 @@
 - (BOOL) next;
 - (BOOL) hasAnotherRow;
 
+- (BOOL) hasColumnWithName:(NSString*)columnName;
 - (int) columnIndexForName:(NSString*)columnName;
 - (NSString*) columnNameForIndex:(int)columnIdx;
 

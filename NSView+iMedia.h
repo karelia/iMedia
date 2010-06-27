@@ -44,99 +44,18 @@
 */
 
 
-// Author: Pierre Bernard
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
+@interface NSView (iMedia)
 
-#import "IMBParser.h"
-#import "IMBEnhancedObject.h"
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark CLASSES
-
-@class FMDatabase;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-@interface IMBLightroomObject : IMBEnhancedObject
-{
-	NSString* _absolutePyramidPath;
-}
-
-@property (retain) NSString* absolutePyramidPath;
+- (void) unbindViewHierarchy;
++ (void) unbindViewHierarchy:(NSView*)inRootView;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBLightroomParser : IMBParser
-{
-	NSString* _appPath;
-	NSString* _dataPath;
-	BOOL _shouldDisplayLibraryName;
-	FMDatabase* _database;
-	NSSize _thumbnailSize;
-	FMDatabase* _thumbnailDatabase;
-}
-
-@property (retain) NSString* appPath;
-@property (retain) NSString* dataPath;
-@property (assign) BOOL shouldDisplayLibraryName;
-@property (retain) FMDatabase* database;
-@property (retain) FMDatabase* thumbnailDatabase;
-
-+ (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
-+ (BOOL) isInstalled;
-
-- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
-
-- (NSString*) rootNodeIdentifier;
-- (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
-- (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
-
-- (NSImage*) largeFolderIcon;
-
-- (FMDatabase*) libraryDatabase;
-- (FMDatabase*) previewsDatabase;
-
-- (NSString*)pyramidPathForImage:(NSNumber*)idLocal;
-- (NSData*)previewDataForObject:(IMBObject*)inObject;
-
-@end
-
-
-@interface IMBLightroomParser (Abstract)
-
-+ (NSString*) lightroomPath;
-+ (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
-
-- (NSString*) rootFolderQuery;
-- (NSString*) folderNodesQuery;
-
-- (NSString*) rootCollectionNodesQuery;
-- (NSString*) collectionNodesQuery;
-
-- (NSString*) folderObjectsQuery;
-- (NSString*) collectionObjectsQuery;
-
-- (NSImage*) folderIcon;
-- (NSImage*) groupIcon;
-- (NSImage*) collectionIcon;
-
-@end
-
-//----------------------------------------------------------------------------------------------------------------------
-

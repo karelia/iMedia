@@ -44,25 +44,25 @@
  */
 
 
-// Author: Pierre Bernard, Mike Abdullah
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#import <Cocoa/Cocoa.h>
+
+#pragma mark HEADERS
+
+#import "IMBLightroom3Parser.h"
 
 
-@interface IMBMutableOrderedDictionary : NSDictionary
-{
-	NSMutableDictionary*		_dictionary;
-	NSMutableArray*				_array;
-}
+//----------------------------------------------------------------------------------------------------------------------
 
-+ (IMBMutableOrderedDictionary*)orderedDictionaryWithCapacity:(NSUInteger)inCapacity;
 
-- (id)initWithCapacity:(NSUInteger)inCapacity;
+#pragma mark 
 
-- (void)setObject:(id)inObject forKey:(id)inKey;
-- (void)removeObjectForKey:(id)inKey;
+@interface IMBLightroom3VideoParser : IMBLightroom3Parser
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------

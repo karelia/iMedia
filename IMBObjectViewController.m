@@ -69,6 +69,7 @@
 //#import "IMBQuickLookController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSView+iMedia.h"
 #import "IMBDynamicTableView.h"
 #import "IMBComboTextCell.h"
 #import "IMBObject.h"
@@ -247,20 +248,6 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) awakeFromNib
 {
-	// We need to save preferences before the app quits...
-	
-	[[NSNotificationCenter defaultCenter] 
-		 addObserver:self 
-		 selector:@selector(_saveStateToPreferences) 
-		 name:NSApplicationWillTerminateNotification 
-		 object:nil];
-	
-	// Observe changes to object array...
-	
-	[ibObjectArrayController retain];
-	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
-	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
-	
 	// Configure the object views...
 	
 	[self _configureIconView];
@@ -281,6 +268,8 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
 	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	
 	if (IMBRunningOnSnowLeopardOrNewer())
@@ -292,20 +281,13 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	
 	#endif
 	
-	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
-	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
-	[ibObjectArrayController release];
-	
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
-	IMBRelease(_libraryController);
-	IMBRelease(_nodeViewController);
-	IMBRelease(_progressWindowController);
-	
 //	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 //	IMBRelease(_previewPanel);
 //	#endif
 
+	IMBRelease(_libraryController);
+	IMBRelease(_nodeViewController);
+	IMBRelease(_progressWindowController);
 	
 	for (IMBObject* object in _observedVisibleItems)
 	{
@@ -318,6 +300,65 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
     IMBRelease(_observedVisibleItems);
 	
 	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) prepareForWindow:(NSWindow*)inWindow
+{
+	// Register for NSWindowWillCloseNotification. That will help us to cleanup bindings before top level objects
+	// are released...
+	
+	if (inWindow)
+	{
+		[[NSNotificationCenter defaultCenter]
+			addObserver:self 
+			selector:@selector(cleanupBindings) 
+			name:NSWindowWillCloseNotification 
+			object:inWindow];
+	}
+	else
+	{
+		NSLog(@"%s inWindow is nil...",__FUNCTION__);
+		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"inWindow is nil" userInfo:nil] raise];
+	}
+
+	// We need to save preferences before the app quits...
+	
+	[[NSNotificationCenter defaultCenter] 
+		 addObserver:self 
+		 selector:@selector(_saveStateToPreferences) 
+		 name:NSApplicationWillTerminateNotification 
+		 object:nil];
+	
+	// Observe changes to object array...
+	
+	[ibObjectArrayController retain];
+	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
+	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
+}
+
+
+- (void) cleanupBindings	
+{
+	// Stop observing the array...
+	
+	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
+	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
+	[ibObjectArrayController release];
+
+	// Tear down bindings *before* the window is closed. This avoids exceptions due to random deallocation order of 
+	// top level objects in the nib file. Please note that we are unbinding ibIconView, ibListView, and ibComboView
+	// seperately in addition to self.view. This is necessary because NSTabView seems to be doing some kind of 
+	// optimization where the views of invisible tabs are not really part of the window view hierarchy. However the 
+	// view subtrees exist and do have bindings to the IMBObjectArrayController - which need to be torn down as well...
+	
+	[ibIconView unbindViewHierarchy];
+	[ibListView unbindViewHierarchy];
+	[ibComboView unbindViewHierarchy];
+	[self.view unbindViewHierarchy];
 }
 
 
@@ -346,18 +387,22 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	}
 	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty])
 	{
-        // Find the row and reload it.
-        // Note that KVO notifications may be sent from a background thread (in this case, we know they will be)
-        // We should only update the UI on the main thread, and in addition, we use NSRunLoopCommonModes to make sure the UI updates when a modal window is up.
+        // Find the row and reload it. Note that KVO notifications may be sent from a background thread (in this 
+		// case, we know they will be) We should only update the UI on the main thread, and in addition, we use 
+		// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
+		
 		IMBDynamicTableView *affectedTableView = (IMBDynamicTableView *)inContext;
 		NSInteger row = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inObject];
+		
 		if (NSNotFound != row)
 		{
-			[affectedTableView performSelectorOnMainThread:@selector(_reloadRow:) withObject:[NSNumber numberWithInt:row] waitUntilDone:NO modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+			[affectedTableView 
+				performSelectorOnMainThread:@selector(_reloadRow:) 
+				withObject:[NSNumber numberWithInt:row] 
+				waitUntilDone:NO modes:[NSArray 
+				arrayWithObject:NSRunLoopCommonModes]];
 		}
-		
     }
-	
 	else
 	{
 		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
@@ -426,13 +471,14 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) _saveStateToPreferences
 {
-	//	NSIndexSet* selectionIndexes = [ibObjectArrayController selectionIndexes];
-	//	NSData* selectionData = [NSKeyedArchiver archivedDataWithRootObject:selectionIndexes];
+	NSIndexSet* selectionIndexes = [ibObjectArrayController selectionIndexes];
+	NSData* selectionData = [NSKeyedArchiver archivedDataWithRootObject:selectionIndexes];
 	
 	NSMutableDictionary* stateDict = [self _preferences];
 	[stateDict setObject:[NSNumber numberWithUnsignedInteger:self.viewType] forKey:@"viewType"];
 	[stateDict setObject:[NSNumber numberWithDouble:self.iconSize] forKey:@"iconSize"];
-	//	[stateDict setObject:selectionData forKey:@"selectionData"];
+	[stateDict setObject:selectionData forKey:@"selectionData"];
+	
 	[self _setPreferences:stateDict];
 }
 
@@ -441,7 +487,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 {
 	NSMutableDictionary* stateDict = [self _preferences];
 	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntValue];
-	self.iconSize = 0.15; //[[stateDict objectForKey:@"iconSize"] doubleValue];
+	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
 	
 	//	NSData* selectionData = [stateDict objectForKey:@"selectionData"];
 	//	NSIndexSet* selectionIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:selectionData];

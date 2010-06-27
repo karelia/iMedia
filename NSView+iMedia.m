@@ -44,7 +44,7 @@
 */
 
 
-// Author: Pierre Bernard
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,91 +52,53 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
-#import "IMBEnhancedObject.h"
+#import "NSView+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark CLASSES
-
-@class FMDatabase;
+@implementation NSView (iMedia)
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBLightroomObject : IMBEnhancedObject
+// The following method can be used to unbind all values in a view hierarchy. This may be helpful when tearing
+// down windows, and views are bounds to controller objects. Since deallocation order is not guarranteed, it
+// is often the best strategy to remove all bindings before closing a window or document...
+
+- (void) unbindViewHierarchy
 {
-	NSString* _absolutePyramidPath;
+	[NSView unbindViewHierarchy:self];
 }
 
-@property (retain) NSString* absolutePyramidPath;
 
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBLightroomParser : IMBParser
++ (void) unbindViewHierarchy:(NSView*)inRootView
 {
-	NSString* _appPath;
-	NSString* _dataPath;
-	BOOL _shouldDisplayLibraryName;
-	FMDatabase* _database;
-	NSSize _thumbnailSize;
-	FMDatabase* _thumbnailDatabase;
+	// First completely unbind this view...
+	
+	NSArray* bindings = [inRootView exposedBindings];
+	
+	for (NSString* key in bindings)
+	{
+		// NSLog(@"%s - %@ - %@",__FUNCTION__,NSStringFromClass([inRootView class]),key);
+		[inRootView unbind:key];
+	}
+	
+	// Then do the same for all subviews (recursively)...
+	
+	NSArray* subviews = inRootView.subviews;
+	
+	for (NSView* subview in subviews)
+	{
+		[NSView unbindViewHierarchy:subview];
+	}
 }
 
-@property (retain) NSString* appPath;
-@property (retain) NSString* dataPath;
-@property (assign) BOOL shouldDisplayLibraryName;
-@property (retain) FMDatabase* database;
-@property (retain) FMDatabase* thumbnailDatabase;
-
-+ (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
-+ (BOOL) isInstalled;
-
-- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
-
-- (NSString*) rootNodeIdentifier;
-- (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
-- (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
-
-- (NSImage*) largeFolderIcon;
-
-- (FMDatabase*) libraryDatabase;
-- (FMDatabase*) previewsDatabase;
-
-- (NSString*)pyramidPathForImage:(NSNumber*)idLocal;
-- (NSData*)previewDataForObject:(IMBObject*)inObject;
-
-@end
-
-
-@interface IMBLightroomParser (Abstract)
-
-+ (NSString*) lightroomPath;
-+ (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
-
-- (NSString*) rootFolderQuery;
-- (NSString*) folderNodesQuery;
-
-- (NSString*) rootCollectionNodesQuery;
-- (NSString*) collectionNodesQuery;
-
-- (NSString*) folderObjectsQuery;
-- (NSString*) collectionObjectsQuery;
-
-- (NSImage*) folderIcon;
-- (NSImage*) groupIcon;
-- (NSImage*) collectionIcon;
-
-@end
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+@end
 

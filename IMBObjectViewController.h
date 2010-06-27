@@ -167,6 +167,8 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 }
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
+- (void) prepareForWindow:(NSWindow*)inWindow;	
+- (void) cleanupBindings;								
 
 // Library...
 
@@ -205,6 +207,7 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 
 - (void) willShowView;
 - (void) didShowView;
+
 - (void) willHideView;
 - (void) didHideView;
 
