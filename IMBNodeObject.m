@@ -84,6 +84,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Buttons are not selectable...
+
+- (BOOL) isSelectable 
+{
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Since a string is required here we return the identifier of a node instead for the node itself...
 
 - (NSString*) imageUID
