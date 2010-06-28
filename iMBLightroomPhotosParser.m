@@ -60,11 +60,12 @@
 - (iMBLibraryNode *)parseOneDatabaseWithPath:(NSString*)path intoLibraryNode:(iMBLibraryNode *)root version:(int)lightroom_version;
 - (iMBLibraryNode *)parseAllImagesForRoot:(iMBLibraryNode*)root version:(int)lightroom_version;
 - (iMBLibraryNode *)parseCollectionsForRoot:(iMBLibraryNode*)root version:(int)lightroom_version;
-- (iMBLibraryNode*)parseFoldersForRoot:(iMBLibraryNode*)root;
+- (iMBLibraryNode*)parseFoldersForRoot:(iMBLibraryNode*)root version:(int)lightroom_version;
 
 - (iMBLibraryNode*)nodeWithLocalID:(NSNumber*)idLocal inDictionary:(NSMutableDictionary*)dictionary;
 - (iMBLibraryNode*)nodeWithPath:(NSString*)path inDictionary:(NSMutableDictionary*)dictionary;
 
++ (NSArray *)libraryPathsV3;
 + (NSArray *)libraryPathsV2;
 + (NSArray *)libraryPathsV1;
 + (void)parseRecentLibrariesList:(NSString *)recentLibrariesList into:(NSMutableArray *)libraryFilePaths;
@@ -129,6 +130,24 @@
     NSEnumerator *enumerator;
 	NSString *currentPath;
     
+	NSArray *libraryPathsV3 = [iMBLightroomPhotosParser libraryPathsV3];
+	enumerator = [libraryPathsV3 objectEnumerator];
+	while ((currentPath = [enumerator nextObject]) != nil)
+    {
+		NSString *name = LocalizedStringInIMedia(@"Lightroom 3", @"Lightroom");
+        if ([libraryPathsV3 count] > 1)
+            name = [name stringByAppendingFormat:@" (%@)", [[currentPath stringByDeletingLastPathComponent] lastPathComponent]];
+        NSString *iconName = @"com.adobe.Lightroom3:";
+        iMBLibraryNode *libraryNode = [self parseDatabaseInThread:currentPath gate:gate name:name iconName:iconName icon:NULL];
+        [libraryNode setAttribute:[NSNumber numberWithInt:3] forKey:@"LightroomVersion"];
+        if (libraryNode != NULL)
+        {
+			[libraryNode setWatchedPath:currentPath];
+			[libraryNode setPrioritySortOrder:3];
+            [libraryNodes addObject:libraryNode];
+        }
+    }
+	
     NSArray *libraryPathsV2 = [iMBLightroomPhotosParser libraryPathsV2];
 	enumerator = [libraryPathsV2 objectEnumerator];
 	while ((currentPath = [enumerator nextObject]) != nil)
@@ -142,7 +161,7 @@
         if (libraryNode != NULL)
         {
 			[libraryNode setWatchedPath:currentPath];
-			[libraryNode setPrioritySortOrder:1];
+			[libraryNode setPrioritySortOrder:2];
             [libraryNodes addObject:libraryNode];
         }
     }
@@ -164,7 +183,7 @@
             [libraryNodes addObject:libraryNode];
         }
     }
-
+	
     return libraryNodes;
 }
 
@@ -256,8 +275,8 @@
 		[root fromThreadSetFilterDuplicateKey:@"ImagePath" forAttributeKey:@"Images"];
 		
 		@try {
-			if (lightroom_version == 2) {
-				[self parseFoldersForRoot:root];
+			if (lightroom_version >= 2) {
+				[self parseFoldersForRoot:root version:lightroom_version];
 			}
 			else {
 				[self parseAllImagesForRoot:root version:lightroom_version];
@@ -283,14 +302,25 @@
 	FMDatabase *database = [FMDatabase databaseWithPath:path];
 	
 	if ([database open]) {
-		NSMutableString *collectionQuery = [NSMutableString stringWithString:@"SELECT id_local, parent, kindName, name"];
+		NSString* collectionQuery = nil;
 		
-		[collectionQuery appendString:@" FROM "];
-		[collectionQuery appendString:@"AgLibraryTag"];
-		[collectionQuery appendString:@" WHERE "];
-		[collectionQuery appendString:@"kindName = ?"];
-		
-		FMResultSet *rsCollections = [database executeQuery:collectionQuery, @"AgCollectionTagKind"];
+		if (lightroom_version < 3) {
+			collectionQuery = 	@" SELECT alt.id_local, alt.parent, alt.name"
+								@" FROM AgLibraryTag alt"
+								@" WHERE kindName = 'AgCollectionTagKind'"
+								@" AND NOT EXISTS ("
+								@"	SELECT alc.id_local"
+								@"	FROM AgLibraryContent alc"
+								@"	WHERE alt.id_local = alc.containingTag"
+								@"	AND alc.owningModule = 'ag.library.smart_collection')";
+		}
+		else {
+			collectionQuery =	@" SELECT alc.id_local, alc.parent, alc.name"
+								@" FROM AgLibraryCollection alc"
+								@" WHERE creationId = 'com.adobe.ag.library.collection'";
+		}
+
+		FMResultSet *rsCollections = [database executeQuery:collectionQuery];
 		
 		while ([rsCollections next]) {
 			NSNumber *idLocal = [NSNumber numberWithLong:[rsCollections longForColumn:@"id_local"]]; 
@@ -347,14 +377,15 @@
                     [imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
                     [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
                     [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-                    [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+                    [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = 'AgCollectionTagKind') ON ai.id_local = captionImage"];
                     [imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
                     [imageQuery appendString:@" WHERE "];
                     [imageQuery appendString:@" alti.tag = ?"];
 					[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
                }
                 else if (lightroom_version == 2) {
-                    [imageQuery appendString:@" SELECT arf.absolutePath, alf.pathFromRoot, aif.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
+                    [imageQuery appendString:@" SELECT	arf.absolutePath, alf.pathFromRoot, aif.idx_filename,"];
+					[imageQuery appendString:@"			captionName, apcp.relativeDataPath pyramidPath"];
                     [imageQuery appendString:@" FROM AgLibraryFile aif"];
                     [imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
                     [imageQuery appendString:@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"];
@@ -363,14 +394,30 @@
                     [imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
                     [imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
                     [imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-                    [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+                    [imageQuery appendString:@" 		   WHERE altiCaption.tagKind = 'AgCollectionTagKind') ON ai.id_local = captionImage"];
                     [imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
                     [imageQuery appendString:@" WHERE "];
                     [imageQuery appendString:@" alti.tag = ?"];
                     [imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
                 }
-				
-				FMResultSet *rsImages = [localDatabase executeQuery:imageQuery, @"AgCaptionTagKind", idLocal];
+                else if (lightroom_version == 3) {
+					[imageQuery appendString:@" SELECT	arf.absolutePath, alf.pathFromRoot, aif.idx_filename,"];
+                    [imageQuery appendString:@"			ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"];
+					[imageQuery appendString:@"			iptc.caption captionName,"];
+					[imageQuery appendString:@"			aif.id_global uuid, ids.digest"];
+					[imageQuery appendString:@" FROM AgLibraryFile aif"];
+					[imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
+					[imageQuery appendString:@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"];
+					[imageQuery appendString:@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"];
+					[imageQuery appendString:@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"];
+					[imageQuery appendString:@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"];
+					[imageQuery appendString:@" LEFT JOIN Adobe_imageDevelopSettings ids on ids.image = ai.id_local"];
+					[imageQuery appendString:@" WHERE alci.collection = ?"];
+					[imageQuery appendString:@" AND ai.fileFormat <> 'VIDEO'"];
+					[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
+                }
+
+				FMResultSet *rsImages = [localDatabase executeQuery:imageQuery, idLocal];
 				
 				while ([rsImages next]) {
                     NSString *absolutePath = nil;
@@ -378,7 +425,7 @@
                     if (lightroom_version == 1) {
                         absolutePath = [rsImages stringForColumn:@"absolutePath"];
                     }
-                    else if (lightroom_version == 2) {
+                    else {
                         NSString *absoluteRootPath = [rsImages stringForColumn:@"absolutePath"];
                         NSString *pathFromRoot = [rsImages stringForColumn:@"pathFromRoot"];
                         NSString *filename = [rsImages stringForColumn:@"idx_filename"];
@@ -405,10 +452,27 @@
 							[imageRecord setObject:fileName forKey:@"Caption"];
 						}
 						
-						NSString *pyramidPath = [rsImages stringForColumn:@"pyramidPath"];
+						if (lightroom_version < 3) {
+							NSString *pyramidPath = [rsImages stringForColumn:@"pyramidPath"];
 
-						if (pyramidPath != nil) {
-							[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+							if (pyramidPath != nil) {
+								[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+							}
+						}
+						else {
+							NSString *uuid = [rsImages stringForColumn:@"uuid"];
+							NSString *digest = [rsImages stringForColumn:@"digest"];
+
+							if ((uuid != nil) && (digest != nil)) {
+								NSString *prefixOne = [uuid substringToIndex:1];
+								NSString *prefixFour = [uuid substringToIndex:4];
+								NSString *fileName = [[NSString stringWithFormat:@"%@-%@", uuid, digest] stringByAppendingPathExtension:@"lrprev"];
+								NSString *pyramidPath =[[prefixOne stringByAppendingPathComponent:prefixFour] stringByAppendingPathComponent:fileName];
+						
+								if (pyramidPath != nil) {
+									[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+								}
+							}
 						}
 
                         [images addObject:imageRecord];
@@ -446,7 +510,7 @@
 	return node;
 }
 
-- (iMBLibraryNode*)parseFoldersForRoot:(iMBLibraryNode*)root
+- (iMBLibraryNode*)parseFoldersForRoot:(iMBLibraryNode*)root version:(int)lightroom_version 
 {
 	NSAutoreleasePool *outerPool = [[NSAutoreleasePool alloc] init];
 	NSString *path = [root attributeForKey:@"path"];
@@ -510,7 +574,7 @@
 				[foldersQuery appendString:@" FROM "];
 				[foldersQuery appendString:@"AgLibraryFolder"];
 				[foldersQuery appendString:@" WHERE rootFolder = ?"];
-				[foldersQuery appendString:@" ORDER BY robustRepresentation ASC"];
+				[foldersQuery appendString:@" ORDER BY pathFromRoot ASC"];
 				
 				FMResultSet *rsFolders = [rootFolderDatabase executeQuery:foldersQuery, rootFolderID];
 				
@@ -561,19 +625,33 @@
 						NSMutableArray *images = [NSMutableArray array];				
 						NSMutableString *imageQuery = [NSMutableString string];
 						
-						[imageQuery appendString:@" SELECT alf.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
-						[imageQuery appendString:@" FROM AgLibraryFile alf"];
-						[imageQuery appendString:@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"];
-						[imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
-						[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
-						[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-						[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
-						[imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
-						[imageQuery appendString:@" WHERE "];
-						[imageQuery appendString:@" alf.folder = ?"];
-						[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
+						if (lightroom_version < 3) {
+							[imageQuery appendString:@" SELECT alf.idx_filename, captionName, apcp.relativeDataPath pyramidPath"];
+							[imageQuery appendString:@" FROM AgLibraryFile alf"];
+							[imageQuery appendString:@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"];
+							[imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
+							[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
+							[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
+							[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = 'AgCaptionTagKind') ON ai.id_local = captionImage"];
+							[imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
+							[imageQuery appendString:@" WHERE "];
+							[imageQuery appendString:@" alf.folder = ?"];
+							[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
+							}
+						else {
+							[imageQuery appendString:@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"];
+							[imageQuery appendString:@"			iptc.caption captionName,"];
+							[imageQuery appendString:@"			alf.id_global uuid, ids.digest"];
+							[imageQuery appendString:@" FROM AgLibraryFile alf"];
+							[imageQuery appendString:@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"];
+							[imageQuery appendString:@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"];
+							[imageQuery appendString:@" LEFT JOIN Adobe_imageDevelopSettings ids on ids.image = ai.id_local"];
+							[imageQuery appendString:@" WHERE alf.folder = ?"];
+							[imageQuery appendString:@" AND ai.fileFormat <> 'VIDEO'"];
+							[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
+						}
 						
-						FMResultSet *rsImages = [localDatabase executeQuery:imageQuery, @"AgCaptionTagKind", folderID];
+						FMResultSet *rsImages = [localDatabase executeQuery:imageQuery, folderID];
 						
 						while ([rsImages next]) {
 							NSString *filename = [rsImages stringForColumn:@"idx_filename"];
@@ -594,10 +672,27 @@
 									[imageRecord setObject:filename forKey:@"Caption"];
 								}
 								
-								NSString *pyramidPath = [rsImages stringForColumn:@"pyramidPath"];
-								
-								if (pyramidPath != nil) {
-									[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+								if (lightroom_version < 3) {
+									NSString *pyramidPath = [rsImages stringForColumn:@"pyramidPath"];
+									
+									if (pyramidPath != nil) {
+										[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+									}
+								}
+								else {
+									NSString *uuid = [rsImages stringForColumn:@"uuid"];
+									NSString *digest = [rsImages stringForColumn:@"digest"];
+									
+									if ((uuid != nil) && (digest != nil)) {
+										NSString *prefixOne = [uuid substringToIndex:1];
+										NSString *prefixFour = [uuid substringToIndex:4];
+										NSString *fileName = [[NSString stringWithFormat:@"%@-%@", uuid, digest] stringByAppendingPathExtension:@"lrprev"];
+										NSString *pyramidPath =[[prefixOne stringByAppendingPathComponent:prefixFour] stringByAppendingPathComponent:fileName];
+										
+										if (pyramidPath != nil) {
+											[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+										}
+									}
 								}
 								
 								[images addObject:imageRecord];
@@ -673,7 +768,7 @@
 			[imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
 			[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
 			[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-			[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+			[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = 'AgCaptionTagKind') ON ai.id_local = captionImage"];
 			[imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
 			[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
         }
@@ -687,12 +782,31 @@
 			[imageQuery appendString:@" LEFT JOIN (SELECT altiCaption.image captionImage, altCaption.name captionName, altiCaption.tag, altCaption.id_local"];
 			[imageQuery appendString:@" 		   FROM AgLibraryTagImage altiCaption"];
 			[imageQuery appendString:@" 		   INNER JOIN AgLibraryTag altCaption ON altiCaption.tag = altCaption.id_local"];
-			[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = ?) ON ai.id_local = captionImage"];
+			[imageQuery appendString:@" 		   WHERE altiCaption.tagKind = 'AgCaptionTagKind') ON ai.id_local = captionImage"];
 			[imageQuery appendString:@" LEFT JOIN Adobe_previewCachePyramids apcp ON apcp.id_local = ai.pyramidIDCache"];
 			[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
 		}
 		
-		FMResultSet *rsImages = [database executeQuery:imageQuery, @"AgCaptionTagKind"];
+        else if (lightroom_version == 3)
+        {
+			[imageQuery appendString:@" SELECT	arf.absolutePath, alf.pathFromRoot, aif.idx_filename,"];
+			[imageQuery appendString:@"			ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"];
+			[imageQuery appendString:@"			iptc.caption captionName,"];
+			[imageQuery appendString:@"			aif.id_global uuid, ids.digest"];
+			[imageQuery appendString:@" FROM AgLibraryFile aif"];
+			[imageQuery appendString:@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"];
+			[imageQuery appendString:@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"];
+			[imageQuery appendString:@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"];
+			[imageQuery appendString:@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"];
+			[imageQuery appendString:@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"];
+			[imageQuery appendString:@" LEFT JOIN Adobe_imageDevelopSettings ids on ids.image = ai.id_local"];
+			[imageQuery appendString:@" AND ai.fileFormat <> 'VIDEO'"];
+			[imageQuery appendString:@" ORDER BY ai.captureTime ASC"];
+		}
+		
+		[database setLogsErrors:YES];
+		
+		FMResultSet *rsImages = [database executeQuery:imageQuery];
 
 		while ([rsImages next]) {
 			NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
@@ -728,12 +842,29 @@
 					[imageRecord setObject:fileName forKey:@"Caption"];
 				}
 				
-				NSString *pyramidPath = [rsImages stringForColumn:@"pyramidPath"];
-								
-				if (pyramidPath != nil) {
-					[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+				if (lightroom_version < 3) {
+					NSString *pyramidPath = [rsImages stringForColumn:@"pyramidPath"];
+					
+					if (pyramidPath != nil) {
+						[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+					}
 				}
-
+				else {
+					NSString *uuid = [rsImages stringForColumn:@"uuid"];
+					NSString *digest = [rsImages stringForColumn:@"digest"];
+					
+					if ((uuid != nil) && (digest != nil)) {
+						NSString *prefixOne = [uuid substringToIndex:1];
+						NSString *prefixFour = [uuid substringToIndex:4];
+						NSString *fileName = [[NSString stringWithFormat:@"%@-%@", uuid, digest] stringByAppendingPathExtension:@"lrprev"];
+						NSString *pyramidPath =[[prefixOne stringByAppendingPathComponent:prefixFour] stringByAppendingPathComponent:fileName];
+						
+						if (pyramidPath != nil) {
+							[imageRecord setObject:pyramidPath forKey:@"PyramidPath"];
+						}
+					}
+				}
+				
 				[images addObject:imageRecord];
 			}
 			[innerPool release];
@@ -783,6 +914,31 @@
     }
 }
 
++ (NSArray*)libraryPathsV3
+{
+	NSMutableArray *libraryFilePaths = [NSMutableArray array];
+    
+	CFStringRef recentLibrariesList20 = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",
+                                                                  (CFStringRef)@"com.adobe.Lightroom3");
+	
+	if (recentLibrariesList20 != nil) {
+        [iMBLightroomPhotosParser parseRecentLibrariesList:(NSString*)recentLibrariesList20 into:libraryFilePaths];
+        CFRelease(recentLibrariesList20);
+	}
+	
+    if ([libraryFilePaths count] == 0) {
+		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",
+																		(CFStringRef)@"com.adobe.Lightroom3");
+		
+		if (activeLibraryPath != nil) {
+			
+			CFRelease(activeLibraryPath);
+		}
+    }
+    
+	return libraryFilePaths;
+}
+
 + (NSArray*)libraryPathsV2
 {
 	NSMutableArray *libraryFilePaths = [NSMutableArray array];
@@ -794,7 +950,7 @@
         [iMBLightroomPhotosParser parseRecentLibrariesList:(NSString*)recentLibrariesList20 into:libraryFilePaths];
         CFRelease(recentLibrariesList20);
 	}
-
+	
     if ([libraryFilePaths count] == 0) {
 		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",
 																		(CFStringRef)@"com.adobe.Lightroom2");
