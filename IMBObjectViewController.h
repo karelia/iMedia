@@ -163,12 +163,9 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	BOOL _isDragging;
 	
 	NSMutableSet *_observedVisibleItems;
-
 }
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
-- (void) prepareForWindow:(NSWindow*)inWindow;	
-- (void) cleanupBindings;								
 
 // Library...
 
@@ -196,6 +193,8 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @property (assign) double iconSize;
 @property (readonly) BOOL canUseIconSize;
 
+- (void) unbindViews;	
+
 // User Interface...
  
 - (NSImage*) icon;
@@ -210,6 +209,11 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 
 - (void) willHideView;
 - (void) didHideView;
+
+// Saving/Restoring state...
+
+- (void) restoreState;	
+- (void) saveState;	
 
 // Context menu support...
 
