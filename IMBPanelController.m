@@ -158,7 +158,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 + (void) cleanupSharedPanelController
 {
 	[sSharedPanelController saveStateToPreferences];
-	[sSharedPanelController.window close];
+//	[sSharedPanelController.window close];
 	IMBRelease(sSharedPanelController);
 }
 
@@ -306,10 +306,18 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		// notification, which in turn will cause all bindings to be torn down BEFORE the window is closed and
 		// all top level objects are released. That way we can avoid exceptions due to a random dealloc order...
 		
-		[objectViewController prepareForWindow:self.window];
-
+		[nodeViewController restoreState];
+		[objectViewController restoreState];
 	}
 		
+	// When the window is about to close, we need to unbind all views to avoid retain cycles or exceptions...
+	
+	[[NSNotificationCenter defaultCenter]
+		addObserver:self 
+		selector:@selector(windowWillClose:) 
+		name:NSWindowWillCloseNotification 
+		object:self.window];
+
 	// Restore window size and selected tab...
 	
 	[self.window setContentMinSize:largestMinimumSize];
@@ -318,6 +326,20 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Unbind all views, so that retain cycles or exceptions (due to deallocating controllers that are still being 
+// observed) are avoided...
+
+- (void) windowWillClose:(NSNotification*)inNotification
+{
+	for (IMBObjectViewController* objectViewController in self.viewControllers)
+	{
+		[objectViewController unbindViews];
+	}
+	
+	[IMBPanelController cleanupSharedPanelController];
+}
 
 
 // We need to save preferences before tha app quits...

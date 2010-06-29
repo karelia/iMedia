@@ -96,6 +96,11 @@ static NSString* kSelectionKey = @"selection";
 - (void) _syncPopupMenuSelection;
 - (void) __syncPopupMenuSelection;
 
+- (CGFloat) minimumNodeViewWidth;
+- (CGFloat) minimumLibraryViewHeight;
+- (CGFloat) minimumObjectViewHeight;
+- (NSSize) minimumViewSize;
+
 @end
 
 
@@ -215,6 +220,11 @@ static NSString* kSelectionKey = @"selection";
 	// Register the the outline view as a dragging destination...
 	
 	[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+	
+	// Build the initial contents of the node popup...
+	
+	[ibNodePopupButton removeAllItems];
+	[self __updatePopupMenu];
 }
 
 
@@ -344,32 +354,6 @@ static NSString* kSelectionKey = @"selection";
 	if (splitviewPosition > 0.0) [ibSplitView setPosition:splitviewPosition ofDividerAtIndex:0];
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Presentation constraints
-
-- (CGFloat) minimumNodeViewWidth
-{
-	return 300.0;
-}
-
-- (CGFloat) minimumLibraryViewHeight
-{
-	return 36.0;
-}
-
-- (CGFloat) minimumObjectViewHeight
-{
-	return 144.0;
-}
-
-- (NSSize) minimumViewSize
-{
-	CGFloat minimumHeight = [self minimumLibraryViewHeight] + [self minimumObjectViewHeight] + [ibSplitView dividerThickness];
-	return NSMakeSize([self minimumNodeViewWidth], minimumHeight);
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1233,6 +1217,65 @@ static NSString* kSelectionKey = @"selection";
 		[objectView setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
 		[containerView addSubview:objectView];
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Presentation constraints
+
+
+- (CGFloat) minimumNodeViewWidth
+{
+	return 300.0;
+}
+
+
+- (CGFloat) minimumLibraryViewHeight
+{
+	return 36.0;
+}
+
+
+- (CGFloat) minimumObjectViewHeight
+{
+	return 144.0;
+}
+
+
+- (NSSize) minimumViewSize
+{
+	CGFloat minimumHeight = [self minimumLibraryViewHeight] + [self minimumObjectViewHeight] + [ibSplitView dividerThickness];
+	return NSMakeSize([self minimumNodeViewWidth], minimumHeight);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Saving/Restoring state...
+
+
+// This method can be called by document based apps to setup the inital state of the UI. 
+// It is necessary to fake a _nodesDidChange event in the absence of real changes, or
+// the UI won't be populated with the current content of our data model...
+
+- (void) restoreState
+{
+	[self _loadStateFromPreferences];
+	[self _nodesDidChange];
+}
+
+
+// Called when the window is about to be closed. At this time the controllers are still
+// alive and can save their state to the prefs...
+
+- (void) saveState
+{
+	[self _saveStateToPreferences];
 }
 
 
