@@ -152,6 +152,7 @@
 	else
 	{
 		newNode.watcherType = kIMBWatcherTypeNone;
+		newNode.watchedPath = inOldNode.watchedPath;
 	}
 	
 	// If the old node was populated, then also populate the new node...
@@ -242,6 +243,8 @@
 			subnode.name = name;
 			subnode.icon = [self iconForPath:folder]; //[[NSWorkspace threadSafeWorkspace] iconForFile:folder];
 			subnode.parser = self;
+			subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
+			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibrarController _reloadNodesWithWatchedPath:
 			subnode.leaf = NO;
 			subnode.includedInPopup = NO;
 			[subnodes addObject:subnode];
