@@ -151,7 +151,6 @@
 		if (window.isVisible)
 		{
 			[controller hideWindow:inSender];
-//			[IMBPanelController cleanupSharedPanelController];
 		}
 		else
 		{
