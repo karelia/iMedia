@@ -115,6 +115,7 @@ enum IMBMouseOperation
 
 - (void) dealloc
 {	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	IMBRelease(_clickedObject);
 	[super dealloc];
 }

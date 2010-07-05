@@ -300,6 +300,12 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
+	// Cancel any scheduled messages...
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView];
+	[NSObject cancelPreviousPerformRequestsWithTarget:ibListView];
+	[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView];
+
 	// Stop observing the array...
 	
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
