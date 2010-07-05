@@ -359,7 +359,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		[self didChangeValueForKey:kObjectCountStringKey];
 	}
 	
-	// If single thumbnails have changed (due to asynchronous loading) then trigger a reload of the IKIMageBrowserView...
+	// If single thumbnails have changed (due to asynchronous loading) then trigger a reload of the IKImageBrowserView...
 	
 	else if (inContext == (void*)kImageRepresentationKeyPath)
 	{
@@ -651,22 +651,31 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) _reloadIconView
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
-	[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	if ([ibIconView.window isVisible])
+	{
+		[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
+		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
 }
 
 
 - (void) _reloadListView
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:ibListView selector:@selector(reloadData) object:nil];
-	[ibListView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	if ([ibListView.window isVisible])
+	{
+		[NSObject cancelPreviousPerformRequestsWithTarget:ibListView selector:@selector(reloadData) object:nil];
+		[ibListView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
 }
 
 
 - (void) _reloadComboView
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView selector:@selector(reloadData) object:nil];
-	[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	if ([ibListView.window isVisible])
+	{
+		[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView selector:@selector(reloadData) object:nil];
+		[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
 }
 
 
