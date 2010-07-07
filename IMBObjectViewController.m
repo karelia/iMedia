@@ -66,7 +66,6 @@
 #import "IMBObjectPromise.h"
 #import "IMBImageBrowserCell.h"
 #import "IMBProgressWindowController.h"
-//#import "IMBQuickLookController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSView+iMedia.h"
@@ -75,6 +74,7 @@
 #import "IMBObject.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
+#import "IMBQLPreviewPanel.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,10 +85,43 @@
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
 static NSString* kObjectCountStringKey = @"objectCountString";
+static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
 NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
-static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// While we're building with a pre-10.6 SDK, we need to declare some 10.6 pasteboard stuff that we'll use 
+// conditionally if we detect we are running on 10.6 or later.
+
+#if !defined(MAC_OS_X_VERSION_10_6)
+
+#pragma mark 
+
+@interface NSPasteboard (IMBObjectViewControllerSnowLeopard)
+
+- (NSInteger)clearContents;
+- (BOOL)writeObjects:(NSArray *)objects;
+
+@end
+
+@class NSPasteboardItem;
+
+#pragma mark 
+
+@interface NSObject (IMBObjectViewControllerSnowLeopard)
+
+- (BOOL)setDataProvider:(id /*<NSPasteboardItemDataProvider>*/)dataProvider forTypes:(NSArray *)types;
+- (BOOL)setString:(NSString *)string forType:(NSString *)type;
+- (NSString *)stringForType:(NSString *)type;
+- (NSData *)dataForType:(NSString *)type;
+
+@end
+
+#endif
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -120,38 +153,6 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark SnowLeopard NSPasteboard Declarations
-
-// While we're building with a pre-10.6 SDK, we need to declare some 10.6 pasteboard stuff
-// that we'll use conditionally if we detect we are running on 10.6 or later.
-
-#if !defined(MAC_OS_X_VERSION_10_6)
-
-@interface NSPasteboard (IMBObjectViewControllerSnowLeopard)
-
-- (NSInteger)clearContents;
-- (BOOL)writeObjects:(NSArray *)objects;
-
-@end
-
-@class NSPasteboardItem;
-
-// Methods we expect to find on NSPasteboardItem, a completely new class in 10.6
-@interface NSObject (IMBObjectViewControllerSnowLeopard)
-
-- (BOOL)setDataProvider:(id /*<NSPasteboardItemDataProvider>*/)dataProvider forTypes:(NSArray *)types;
-- (BOOL)setString:(NSString *)string forType:(NSString *)type;
-- (NSString *)stringForType:(NSString *)type;
-- (NSData *)dataForType:(NSString *)type;
-
-@end
-
-#endif
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark 
 
 @implementation IMBObjectViewController
@@ -170,10 +171,6 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
-
-//#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-//@synthesize previewPanel = _previewPanel;
-//#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -306,27 +303,24 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	[NSObject cancelPreviousPerformRequestsWithTarget:ibListView];
 	[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView];
 
+	// remove ourself from the QuiclLook preview panel...
+	
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		Class panelClass = NSClassFromString(@"QLPreviewPanel");
+		QLPreviewPanel* panel = [panelClass sharedPreviewPanel];
+		if (panel.delegate == (id)self) panel.delegate = nil;
+		if (panel.dataSource == (id)self) panel.dataSource = nil;
+	}
+	
 	// Stop observing the array...
 	
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
 
-	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	// Other cleanup...
 	
-	if (IMBRunningOnSnowLeopardOrNewer())
-	{
-		QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
-		if (panel.delegate == (id)self) panel.delegate = nil;
-		if (panel.dataSource == (id)self) panel.dataSource = nil;
-	}
-	
-	#endif
-	
-//	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-//	IMBRelease(_previewPanel);
-//	#endif
-
 	IMBRelease(_libraryController);
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
@@ -877,7 +871,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	
 	if ([inObject isSelectable])
 	{
-		#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+//		#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 		if (IMBRunningOnSnowLeopardOrNewer())
 		{
 			title = NSLocalizedStringWithDefaultValue(
@@ -892,7 +886,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 			[menu addItem:item];
 			[item release];
 		}
-		#endif
+//		#endif
 	}
 	
 	// Give parser a chance to add menu items...
@@ -1255,21 +1249,17 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
 {
-//	NSLog(@"%s",__FUNCTION__);
-	
-	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-	
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
-		QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
+		Class panelClass = NSClassFromString(@"QLPreviewPanel");
+		QLPreviewPanel* panel = [panelClass sharedPreviewPanel];
+		
 		if (panel.dataSource == (id)self)
 		{
 			[panel reloadData];
 			[panel refreshCurrentPreviewItem];
 		}
 	}
-	
-	#endif
 }
 
 
@@ -1792,19 +1782,21 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 - (IBAction) quicklook:(id)inSender
 {
-	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
- 		if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
+		Class panelClass = NSClassFromString(@"QLPreviewPanel");
+
+ 		if ([panelClass sharedPreviewPanelExists] && [[panelClass sharedPreviewPanel] isVisible])
 		{
-			[[QLPreviewPanel sharedPreviewPanel] close]; //]orderOut:nil];
+			[[panelClass sharedPreviewPanel] orderOut:nil];
 		} 
 		else
 		{
-			[[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFront:nil];
+			QLPreviewPanel* panel = [panelClass sharedPreviewPanel];
+			[panel makeKeyAndOrderFront:nil];
+			[ibTabView.window makeKeyWindow];	// Important to make key event handling work correctly!
 		}
 	}
-	#endif
 }
 
 
@@ -1812,8 +1804,6 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 
 
 // Quicklook datasource methods...
-
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (NSInteger) numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel*)inPanel
 {
@@ -1826,19 +1816,16 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	return [ibObjectArrayController.selectedObjects objectAtIndex:inIndex];
 }
 
-#endif
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Quicklook delegate methods...
 
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-
 - (BOOL) previewPanel:(QLPreviewPanel*)inPanel handleEvent:(NSEvent *)inEvent
 {
 	NSView* view = nil;
+	
 	if (_viewType == kIMBObjectViewTypeIcon)
 		view = ibIconView;
 	else if (_viewType == kIMBObjectViewTypeList)
@@ -1858,49 +1845,18 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 	}
 	
 	return NO;
-	
-
-//	NSString* characters = [inEvent charactersIgnoringModifiers];
-//	unichar character = ([characters length] > 0) ? [characters characterAtIndex:0] : 0;
-//	NSView* view = nil;
-//	
-//	switch (character)
-//	{
-//		case NSLeftArrowFunctionKey:
-//		case NSRightArrowFunctionKey:
-//		case NSUpArrowFunctionKey:
-//		case NSDownArrowFunctionKey:
-//		
-//			if (_viewType == kIMBObjectViewTypeIcon)
-//				view = ibIconView;
-//			else if (_viewType == kIMBObjectViewTypeList)
-//				view = ibListView;
-//			else if (_viewType == kIMBObjectViewTypeCombo)
-//				view = ibComboView;
-//
-//			if (view)
-//			{
-//				[view keyDown:inEvent];
-//				return YES;
-//			}	
-//	}
-//	
-//	return NO;
 }
-
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (NSRect) previewPanel:(QLPreviewPanel*)inPanel sourceFrameOnScreenForPreviewItem:(id <QLPreviewItem>)inItem
 {
 	NSInteger index = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inItem];
 	NSRect frame = NSZeroRect;
 	NSView* view = nil;
+	NSCell* cell = nil;
 	
 	if (index != NSNotFound)
 	{
@@ -1912,11 +1868,15 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		else if (_viewType == kIMBObjectViewTypeList)
 		{
 			frame = [ibListView frameOfCellAtColumn:0 row:index];
+			cell = [[[ibListView tableColumns] objectAtIndex:0] dataCellForRow:index];
+			frame = [cell imageRectForBounds:frame];
 			view = ibListView;
 		}	
 		else if (_viewType == kIMBObjectViewTypeCombo)
 		{
 			frame = [ibComboView frameOfCellAtColumn:0 row:index];
+			cell = [[[ibComboView tableColumns] objectAtIndex:0] dataCellForRow:index];
+			frame = [cell imageRectForBounds:frame];
 			view = ibComboView;
 		}	
 	}
@@ -1927,11 +1887,8 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 		frame.origin = [view.window convertBaseToScreen:frame.origin];
 	}
 
-//	NSLog(@"%s frame=%@",__FUNCTION__,NSStringFromRect(frame));
 	return frame;
 }
-
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
