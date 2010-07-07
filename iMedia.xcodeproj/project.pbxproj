@@ -132,6 +132,7 @@
 		D08E8D851019EB4D005D8614 /* IMBMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D831019EB4D005D8614 /* IMBMainThreadProxy.m */; };
 		D08E8D861019EB4D005D8614 /* IMBMainThreadProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8D841019EB4D005D8614 /* IMBMainThreadProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08E8FB7101A0F0D005D8614 /* iMedia.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D08F82B411E4A1C1006E618E /* IMBQLPreviewPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0941A75105E24DD0092B2F1 /* iTunes9-icon-01.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A55105E24DD0092B2F1 /* iTunes9-icon-01.png */; };
 		D0941A76105E24DD0092B2F1 /* iTunes9-icon-02.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A56105E24DD0092B2F1 /* iTunes9-icon-02.png */; };
 		D0941A77105E24DD0092B2F1 /* iTunes9-icon-03.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A57105E24DD0092B2F1 /* iTunes9-icon-03.png */; };
@@ -1213,6 +1214,7 @@
 				274DF618114EF0B200AC8C03 /* IMBImageItem.h in Headers */,
 				8FC2089D11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h in Headers */,
 				D0363E7C11D3787800E0579F /* NSView+iMedia.h in Headers */,
+				D08F82B411E4A1C1006E618E /* IMBQLPreviewPanel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

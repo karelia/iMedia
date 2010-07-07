@@ -492,6 +492,11 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //	}
 //	
 //	[ibIconView setAnimates:NO];
+
+//	if ([ibIconView respondsToSelector:@selector(setIntercellSpacing:)])
+//	{
+//		[ibIconView setIntercellSpacing:NSMakeSize(4.0,4.0)];
+//	}
 }
 
 
@@ -682,7 +687,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) restoreState
 {
-
+	[self _loadStateFromPreferences];
 }
 
 
