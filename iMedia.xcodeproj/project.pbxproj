@@ -463,6 +463,7 @@
 		D08E8D801019EB09005D8614 /* IMBFSEventsWatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFSEventsWatcher.m; sourceTree = "<group>"; };
 		D08E8D831019EB4D005D8614 /* IMBMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMainThreadProxy.m; sourceTree = "<group>"; };
 		D08E8D841019EB4D005D8614 /* IMBMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMainThreadProxy.h; sourceTree = "<group>"; };
+		D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBQLPreviewPanel.h; sourceTree = "<group>"; };
 		D0941A55105E24DD0092B2F1 /* iTunes9-icon-01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-01.png"; sourceTree = "<group>"; };
 		D0941A56105E24DD0092B2F1 /* iTunes9-icon-02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-02.png"; sourceTree = "<group>"; };
 		D0941A57105E24DD0092B2F1 /* iTunes9-icon-03.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-03.png"; sourceTree = "<group>"; };
@@ -549,9 +550,6 @@
 		D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveFlickr.xcodeproj; path = ObjectiveFlickr/ObjectiveFlickr.xcodeproj; sourceTree = "<group>"; };
 		D0B779631047B65D00D12548 /* IMBFlickrParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrParser.h; sourceTree = "<group>"; };
 		D0B87F21103D998D00C48C6F /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.h; sourceTree = "<group>"; };
-		D0B91931104D8709009218A5 /* IMBQuickLookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBQuickLookController.h; sourceTree = "<group>"; };
-		D0B91932104D8709009218A5 /* IMBQuickLookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBQuickLookController.m; sourceTree = "<group>"; };
-		D0B91935104D870F009218A5 /* QLPreviewPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QLPreviewPanel.h; sourceTree = "<group>"; };
 		D0BE0A8A104802A7009AE844 /* IMBTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTableView.h; sourceTree = "<group>"; };
 		D0BE0A8B104802A7009AE844 /* IMBTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTableView.m; sourceTree = "<group>"; };
 		D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageBrowserCell.h; sourceTree = "<group>"; };
@@ -796,16 +794,6 @@
 			name = Links;
 			sourceTree = "<group>";
 		};
-		D004A9CB104D890B005DBB2B /* BXQuickLookController */ = {
-			isa = PBXGroup;
-			children = (
-				D0B91931104D8709009218A5 /* IMBQuickLookController.h */,
-				D0B91932104D8709009218A5 /* IMBQuickLookController.m */,
-				D0B91935104D870F009218A5 /* QLPreviewPanel.h */,
-			);
-			name = BXQuickLookController;
-			sourceTree = "<group>";
-		};
 		D02E53C510A5558800B205BD /* Lightroom */ = {
 			isa = PBXGroup;
 			children = (
@@ -856,7 +844,6 @@
 			children = (
 				D02E53C610A5563500B205BD /* NSData+SKExtensions.h */,
 				D02E53C710A5563500B205BD /* NSData+SKExtensions.m */,
-				D004A9CB104D890B005DBB2B /* BXQuickLookController */,
 				D08E8D8B1019EBFB005D8614 /* IMBFileWatcher */,
 				D08E8B5C1019C900005D8614 /* UKFileWatcher */,
 				D0F2DB91109825D3004280C1 /* FMDatabase */,
@@ -1023,6 +1010,7 @@
 				D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */,
 				274DF616114EF0B200AC8C03 /* IMBImageItem.h */,
 				274DF617114EF0B200AC8C03 /* IMBImageItem.m */,
+				D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -1588,6 +1576,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				ONLY_ACTIVE_ARCH = YES;
 				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = macosx10.5;
 			};
 			name = Debug;
 		};
@@ -1596,6 +1585,7 @@
 			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
 			buildSettings = {
 				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = macosx10.5;
 			};
 			name = Release;
 		};
@@ -1604,6 +1594,7 @@
 			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
 			buildSettings = {
 				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = macosx10.5;
 			};
 			name = Test;
 		};

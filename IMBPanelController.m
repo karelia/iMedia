@@ -63,6 +63,7 @@
 
 #import "IMBConfig.h"
 #import "IMBCommon.h"
+#import "IMBQLPreviewPanel.h"
 #import "NSWorkspace+iMedia.h"
 
 
@@ -529,23 +530,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	else
 	{
         [super keyDown:inEvent];
-		
-		#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-		QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
-		[panel updateController];
-		
-		if ([panel currentController] != nil)
-		{
-			[panel reloadData];
-		}
-		#endif
-
-
     }
 }
 
-
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (BOOL) acceptsPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
@@ -567,8 +554,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
     inPanel.delegate = nil;
     inPanel.dataSource = nil;
 }
-
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
