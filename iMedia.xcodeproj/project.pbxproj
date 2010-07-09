@@ -210,7 +210,7 @@
 		D09FD780105586BC00E328C7 /* IMBImageBrowserView.m in Sources */ = {isa = PBXBuildFile; fileRef = D09FD77E105586BC00E328C7 /* IMBImageBrowserView.m */; };
 		D0AD4C9F10CCF36F00204318 /* IMBButtonObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */; };
 		D0AD4CA010CCF36F00204318 /* IMBButtonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */; };
-		D0B6FA6B1042F3D800280DDC /* IMBImageKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		D0B6FA6B1042F3D800280DDC /* IMBImageKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0B6FABB1043243800280DDC /* IMBAudioFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FAB91043243800280DDC /* IMBAudioFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0B6FABC1043243800280DDC /* IMBAudioFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0B6FABA1043243800280DDC /* IMBAudioFolderParser.m */; };
 		D0B6FABF1043246800280DDC /* IMBMovieFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FABD1043246800280DDC /* IMBMovieFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -962,7 +962,6 @@
 				D049EF5410346C1C003CC49C /* IMBNodeCell.m */,
 				D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */,
 				D08C5C9D104862540068FF07 /* IMBTextFieldCell.m */,
-				D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */,
 				D09FD77D105586BC00E328C7 /* IMBImageBrowserView.h */,
 				D09FD77E105586BC00E328C7 /* IMBImageBrowserView.m */,
 				D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */,
@@ -1012,6 +1011,7 @@
 				274DF616114EF0B200AC8C03 /* IMBImageItem.h */,
 				274DF617114EF0B200AC8C03 /* IMBImageItem.m */,
 				D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */,
+				D0B6FA6A1042F3D800280DDC /* IMBImageKit.h */,
 			);
 			name = Common;
 			sourceTree = "<group>";
