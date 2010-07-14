@@ -74,4 +74,6 @@
 
 - (NSComparisonResult)finderCompare:(NSString *)aString;
 
+- (NSString *)resolvedPath;
+
 @end
