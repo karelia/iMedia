@@ -58,6 +58,8 @@
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
 #import "IMBObjectFifoCache.h"
+#import "NSString+iMedia.h"
+#import "NSFileManager+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -345,6 +347,58 @@
 	}
 	
 	return url;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (BOOL) isLocalFile
+{
+	if ([_location isKindOfClass:[NSURL class]])
+	{
+		return [(NSURL*)_location isFileURL];
+	}
+	else if ([_location isKindOfClass:[NSString class]])
+	{
+		NSString* path = (NSString*)_location;
+		return [[NSFileManager threadSafeManager] fileExistsAtPath:path];
+	}
+	
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Since an object may or may not point to a local file we have to assume that we are dealing with a remote file. 
+// For this reason we may have to use the file extension to guess the uti of the object. Obviously this can fail 
+// if we do not have an extension, or if we are not dealing with files or urls at all, e.g. with image capture 
+// objects...
+
+- (NSString*) uti
+{
+	NSString* uti = nil;
+	NSString* path = [self path];
+	NSString* extension = [path pathExtension];
+		
+	if ([self isLocalFile])
+	{
+		uti = [NSString UTIForFileAtPath:path];
+	}
+	else if (extension != nil)
+	{
+		uti = [NSString UTIForFilenameExtension:extension];
+	}
+
+	if (uti != nil && [NSString UTI:uti conformsToUTI:(NSString*)kUTTypeAliasFile])
+	{
+		path = [path resolvedPath];
+		uti = [NSString UTIForFileAtPath:path];
+	}
+	
+	return uti;
 }
 
 
