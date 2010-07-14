@@ -464,24 +464,26 @@
 			if (!dict || 0 == dict.count)	// unable to read. possibly due to unencoded '&'.  rdar://7469235
 			{
 				NSData *data = [NSData dataWithContentsOfFile:(NSString*)self.mediaSource];
-				
-				NSString *eString = nil;
-				NSError *e = nil;
-				@try
-				{
-					NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
-																		options:NSXMLDocumentTidyXML error:&e];
-					dict = [NSPropertyListSerialization
-						  propertyListFromData:[xmlDoc XMLData]
-						  mutabilityOption:NSPropertyListImmutable
-						  format:NULL errorDescription:&eString];
-					[xmlDoc release];
-				}
-				@catch(NSException *e)
-				{
-					NSLog(@"%s %@", __FUNCTION__, e);
-				}
-				// When we start targetting 10.6, we should use propertyListWithData:options:format:error:
+				if (data)
+                {
+                    NSString *eString = nil;
+                    NSError *e = nil;
+                    @try
+                    {
+                        NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
+                                                                            options:NSXMLDocumentTidyXML error:&e];
+                        dict = [NSPropertyListSerialization
+                              propertyListFromData:[xmlDoc XMLData]
+                              mutabilityOption:NSPropertyListImmutable
+                              format:NULL errorDescription:&eString];
+                        [xmlDoc release];
+                    }
+                    @catch(NSException *e)
+                    {
+                        NSLog(@"%s %@", __FUNCTION__, e);
+                    }
+                    // When we start targetting 10.6, we should use propertyListWithData:options:format:error:
+                }
 			}			
 			
 			if (!dict || 0 == dict.count)

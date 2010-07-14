@@ -64,6 +64,7 @@
 #import "IMBImageFolderParser.h"
 #import "IMBAudioFolderParser.h"
 #import "IMBMovieFolderParser.h"
+#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -139,6 +140,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _coalescedFSEventsCallback;
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
+- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume;
 @end
 
 
@@ -336,6 +338,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		self.rootNodes = [NSMutableArray array];
 		self.options = kIMBOptionNone;
 		
+		// Initialize file system watching...
+		
 		self.watcherUKKQueue = [[[IMBKQueue alloc] init] autorelease];
 		self.watcherUKKQueue.delegate = self;
 		
@@ -346,6 +350,21 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		_watcherLock = [[NSRecursiveLock alloc] init];
 		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
 		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
+		
+		// When volume are unmounted we would like to be notified so that we can disable file watching for 
+		// those paths...
+		
+		[[[NSWorkspace threadSafeWorkspace] notificationCenter]
+			addObserver:self 
+			selector:@selector(_willUnmountVolume:)
+			name:NSWorkspaceWillUnmountNotification 
+			object:nil];
+			
+		[[[NSWorkspace threadSafeWorkspace] notificationCenter]
+			addObserver:self 
+			selector:@selector(_didMountVolume:)
+			name:NSWorkspaceDidMountNotification 
+			object:nil];
 	}
 	
 	return self;
@@ -354,6 +373,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) dealloc
 {
+	[[[NSWorkspace threadSafeWorkspace] notificationCenter] removeObserver:self];
+
 	IMBRelease(_mediaType);
 	IMBRelease(_rootNodes);
 	IMBRelease(_watcherUKKQueue);
@@ -889,6 +910,51 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			[self _reloadNodesWithWatchedPath:inPath nodes:node.subNodes];
 		}
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// When unmounting a volume, we need to stop the file watcher, or unmounting will fail. In this case we have to walk
+// throughte node tree and check which nodes are affected. These nodes are removed from the tree. This will also
+// take care of removing the offending file watcher...
+
+
+- (void) _willUnmountVolume:(NSNotification*)inNotification 
+{
+	NSString* volume = [[inNotification userInfo] objectForKey:@"NSDevicePath"];
+	[self _unmountNodes: self.rootNodes onVolume:volume];
+}
+
+
+- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume 
+{
+	for (IMBNode* node in inNodes)
+	{
+		NSString* path = node.watchedPath;
+		IMBWatcherType type =  node.watcherType;
+		
+		if ((type == kIMBWatcherTypeKQueue || type == kIMBWatcherTypeFSEvent) && [path hasPrefix:inVolume])
+		{
+			NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:node,@"oldNode",nil];
+			[self _replaceNode:info];
+		}
+		else
+		{
+			[self _unmountNodes:node.subNodes onVolume:inVolume];
+		}
+	}
+}
+
+
+// When a new volume is mounted, we have to assume that it contains a folder or library that we are interested in.
+// Currently we are simply reloading everything, but in the future we could possibly be more intelligent about it 
+// and reload just those nodes that are required and keep everything else intact...
+
+- (void) _didMountVolume:(NSNotification*)inNotification 
+{
+	[self reload];
 }
 
 

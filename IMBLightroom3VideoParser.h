@@ -52,8 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBNodeObject.h"
-#import "IMBNode.h"
+#import "IMBLightroom3Parser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,57 +60,9 @@
 
 #pragma mark 
 
-@implementation IMBNodeObject
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// IMBNodeObject are represented in the user interface as folder icons. Since these are prerendered and 
-// do not have a rectangular shape, we do not want to draw a broder and shadow around it...
-
-- (id) init
-{
-	if (self = [super init])
-	{
-		self.shouldDrawAdornments = NO;
-	}
-	
-	return self;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Buttons are not selectable...
-
-- (BOOL) isSelectable 
-{
-	return NO;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Since a string is required here we return the identifier of a node instead for the node itself...
-
-- (NSString*) imageUID
-{
-	return [(IMBNode*)_location identifier];
-}
-
-
-// Override to show a folder icon instead of a generic file icon...
-
-- (NSImage*) icon
-{
-	return [[NSWorkspace sharedWorkspace] iconForFile:_imageLocation];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+@interface IMBLightroom3VideoParser : IMBLightroom3Parser
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------

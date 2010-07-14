@@ -63,6 +63,7 @@
 
 #import "IMBConfig.h"
 #import "IMBCommon.h"
+#import "IMBQLPreviewPanel.h"
 #import "NSWorkspace+iMedia.h"
 
 
@@ -118,6 +119,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 #pragma mark 
 
 // Convenience method for loading/initializing the shared panel controller with default media types and no delegate
+
 + (IMBPanelController*) sharedPanelController
 {
 	if (sSharedPanelController == nil)
@@ -131,6 +133,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	
 	return sSharedPanelController;
 }
+
 
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes
 {
@@ -146,12 +149,19 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	return sSharedPanelController;
 }
 
+
 + (BOOL) isSharedPanelControllerLoaded;
 {
     return sSharedPanelController != nil;
 }
 
 
++ (void) cleanupSharedPanelController
+{
+	[sSharedPanelController saveStateToPreferences];
+//	[sSharedPanelController.window close];
+	IMBRelease(sSharedPanelController);
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -256,9 +266,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[ibToolbar setSizeMode:NSToolbarSizeModeSmall];
 	[ibToolbar setAllowsUserCustomization:NO];
 	
-	// Create a tab for each controller and install the subviews in it.
-	// We query each node controller for its minimum size so we can be sure
-	// to constrain our panel's minimum to suit the most restrictive controller.
+	// Create a tab for each controller and install the subviews in it. We query each node controller for its 
+	// minimum size so we can be sure to constrain our panel's minimum to suit the most restrictive controller...
+	
 	NSSize largestMinimumSize = NSMakeSize(0,0);
 	
 	for (IMBObjectViewController* objectViewController in self.viewControllers)
@@ -269,6 +279,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		NSView* nodeView = [nodeViewController view];
 		[nodeView setFrame:[ibTabView bounds]];
 		
+		// Query each node controller for its minimum size so we can be sure to constrain our panel's minimum to 
+		// suit the most restrictive controller...
+
 		NSSize thisNodeViewMinimumSize = [nodeViewController minimumViewSize];
 		if (thisNodeViewMinimumSize.height > largestMinimumSize.height)
 		{
@@ -279,6 +292,8 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 			largestMinimumSize.width = thisNodeViewMinimumSize.width;
 		}
 		
+		// Install the views in the window hierarchy...
+		
 		NSView* objectView = [objectViewController view];
 		[nodeViewController installStandardObjectView:objectView];
 		
@@ -287,16 +302,17 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		[item setView:nodeView];
 		[ibTabView addTabViewItem:item];
 		[item release];
+		
+		// Now that the view hierarchy is established, restore any previously known state...
+		
+		[nodeViewController restoreState];
+		[objectViewController restoreState];
 	}
 		
 	// Restore window size and selected tab...
-	[self.window setContentMinSize:largestMinimumSize];
 	
-	NSString* frame = [IMBConfig prefsValueForKey:@"windowFrame"];
-	if (frame) [self.window setFrame:NSRectFromString(frame) display:YES animate:NO];
-
-	NSString* mediaType = [IMBConfig prefsValueForKey:@"selectedMediaType"];
-	if (mediaType) [ibTabView selectTabViewItemWithIdentifier:mediaType];
+	[self.window setContentMinSize:largestMinimumSize];
+	[self restoreStateFromPreferences];
 }
 
 
@@ -307,11 +323,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		
 - (void) applicationWillTerminate:(NSNotification*)inNotification
 {
-	NSString* frame = NSStringFromRect(self.window.frame);
-	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
-	
-	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
-	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
+	[self saveStateToPreferences];
 }
 
 
@@ -326,6 +338,29 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 - (IBAction) hideWindow:(id)inSender
 {
 	[self.window orderOut:nil];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) saveStateToPreferences
+{
+	NSString* frame = NSStringFromRect(self.window.frame);
+	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
+	
+	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
+	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
+}
+
+
+- (void) restoreStateFromPreferences
+{
+	NSString* frame = [IMBConfig prefsValueForKey:@"windowFrame"];
+	if (frame) [self.window setFrame:NSRectFromString(frame) display:YES animate:NO];
+
+	NSString* mediaType = [IMBConfig prefsValueForKey:@"selectedMediaType"];
+	if (mediaType) [ibTabView selectTabViewItemWithIdentifier:mediaType];
 }
 
 
@@ -495,23 +530,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	else
 	{
         [super keyDown:inEvent];
-		
-		#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-		QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
-		[panel updateController];
-		
-		if ([panel currentController] != nil)
-		{
-			[panel reloadData];
-		}
-		#endif
-
-
     }
 }
 
-
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (BOOL) acceptsPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
@@ -533,8 +554,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
     inPanel.delegate = nil;
     inPanel.dataSource = nil;
 }
-
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------

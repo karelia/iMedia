@@ -54,7 +54,7 @@
 
 // This singleton class loads all registered parsers and keeps instances around for the duration of the app lifetime.
 // A parser is thus an extremely long-lived object, which can store state and talk to asynchronous APIs. This gives
-// developers the chance to implmenent parsers for web based services, Spotlight, Image Capture etc. Just before the
+// developers the chance to implemenent parsers for web based services, Spotlight, Image Capture etc. Just before the
 // app quits the parsers are unloaded, at which time they can clean up...
 
 
@@ -101,7 +101,7 @@
 - (BOOL) removeDynamicParser:(IMBParser*)inParser;
 
 // Add/remove custom parsers. This is usually used for folder based parsers that are dragged into the outline view.
-// Please note that this method should be called after loadRegisteredParsers...
+// Please note that this method should be called after loadParsers...
 
 - (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
 - (BOOL) removeCustomParser:(IMBParser*)inParser;

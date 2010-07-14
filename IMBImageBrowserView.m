@@ -59,7 +59,7 @@
 #import "IMBObjectViewController.h"
 #import "IMBObjectFifoCache.h"
 #import "IMBParser.h"
-#import "IMBQuickLookController.h"
+#import "IMBQLPreviewPanel.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -115,6 +115,7 @@ enum IMBMouseOperation
 
 - (void) dealloc
 {	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	IMBRelease(_clickedObject);
 	[super dealloc];
 }
@@ -437,8 +438,6 @@ enum IMBMouseOperation
 }
 
 
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-
 - (BOOL) acceptsPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
 	return YES;
@@ -458,8 +457,6 @@ enum IMBMouseOperation
     inPanel.delegate = nil;
     inPanel.dataSource = nil;
 }
-
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------

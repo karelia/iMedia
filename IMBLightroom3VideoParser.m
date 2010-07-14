@@ -52,8 +52,9 @@
 
 #pragma mark HEADERS
 
-#import "IMBNodeObject.h"
-#import "IMBNode.h"
+#import "IMBLightroom3VideoParser.h"
+#import "IMBParserController.h"
+#import "IMBEnhancedObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,57 +62,38 @@
 
 #pragma mark 
 
-@implementation IMBNodeObject
+@implementation IMBLightroom3VideoParser
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// IMBNodeObject are represented in the user interface as folder icons. Since these are prerendered and 
-// do not have a rectangular shape, we do not want to draw a broder and shadow around it...
-
-- (id) init
+- (NSString*) folderObjectsQuery
 {
-	if (self = [super init])
-	{
-		self.shouldDrawAdornments = NO;
-	}
+	NSString* query =	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+						@"			iptc.caption"
+						@" FROM AgLibraryFile alf"
+						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
+						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+						@" WHERE alf.folder = ?"
+						@" AND ai.fileFormat = 'VIDEO'"
+						@" ORDER BY ai.captureTime ASC";
 	
-	return self;
+	return query;
 }
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Buttons are not selectable...
-
-- (BOOL) isSelectable 
+- (NSString*) collectionObjectsQuery
 {
-	return NO;
+	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
+						@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+						@"			iptc.caption"
+						@" FROM AgLibraryFile aif"
+						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
+						@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
+						@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
+						@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"
+						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+						@" WHERE alci.collection = ?"
+						@" AND ai.fileFormat = 'VIDEO'"
+						@" ORDER BY ai.captureTime ASC";
+	
+	return query;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Since a string is required here we return the identifier of a node instead for the node itself...
-
-- (NSString*) imageUID
-{
-	return [(IMBNode*)_location identifier];
-}
-
-
-// Override to show a folder icon instead of a generic file icon...
-
-- (NSImage*) icon
-{
-	return [[NSWorkspace sharedWorkspace] iconForFile:_imageLocation];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
 
 @end

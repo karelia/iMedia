@@ -72,6 +72,7 @@
 #pragma mark HEADERS
 
 #import "IMBCommon.h"
+#import "IMBQLPreviewPanel.h"
 #import <Quartz/Quartz.h>
 
 
@@ -151,9 +152,6 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
 	IBOutlet NSSegmentedControl *ibSegments;
-//	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-//	QLPreviewPanel* _previewPanel;
-//	#endif
  	
 	NSUInteger _viewType;
 	double _iconSize;
@@ -163,7 +161,6 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	BOOL _isDragging;
 	
 	NSMutableSet *_observedVisibleItems;
-
 }
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
@@ -186,13 +183,12 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @property (readonly) IKImageBrowserView* iconView;
 @property (readonly) NSTableView* listView;
 @property (readonly) NSTableView* comboView;
-//#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-//@property (retain) QLPreviewPanel* previewPanel;
-//#endif
 
 @property (assign) NSUInteger viewType;
 @property (assign) double iconSize;
 @property (readonly) BOOL canUseIconSize;
+
+- (void) unbindViews;	
 
 // User Interface...
  
@@ -205,8 +201,14 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 
 - (void) willShowView;
 - (void) didShowView;
+
 - (void) willHideView;
 - (void) didHideView;
+
+// Saving/Restoring state...
+
+- (void) restoreState;	
+- (void) saveState;	
 
 // Context menu support...
 

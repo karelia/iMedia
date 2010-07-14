@@ -133,9 +133,7 @@
 	
 	// Just open the standard iMedia panel...
 	
-	NSArray* mediaTypes = [NSArray arrayWithObjects:kIMBMediaTypeImage,kIMBMediaTypeAudio,kIMBMediaTypeMovie,kIMBMediaTypeLink,nil];
-	IMBPanelController* panelController = [IMBPanelController sharedPanelControllerWithDelegate:self mediaTypes:mediaTypes];
-	[panelController showWindow:nil];
+	[self togglePanel:nil];
 	
 	#endif
 }
@@ -145,21 +143,30 @@
 
 - (IBAction) togglePanel:(id)inSender
 {
-	IMBPanelController* controller = [IMBPanelController sharedPanelController];
-	NSWindow* window = controller.window;
-	
-	if (window.isVisible)
+	if ([IMBPanelController isSharedPanelControllerLoaded])
 	{
-		[controller hideWindow:inSender];
+		IMBPanelController* controller = [IMBPanelController sharedPanelController];
+		NSWindow* window = controller.window;
+	
+		if (window.isVisible)
+		{
+			[controller hideWindow:inSender];
+		}
+		else
+		{
+			[controller showWindow:inSender];
+		}
 	}
 	else
 	{
-		[controller showWindow:inSender];
+		NSArray* mediaTypes = [NSArray arrayWithObjects:kIMBMediaTypeImage,kIMBMediaTypeAudio,kIMBMediaTypeMovie,kIMBMediaTypeLink,nil];
+		IMBPanelController* panelController = [IMBPanelController sharedPanelControllerWithDelegate:self mediaTypes:mediaTypes];
+		[panelController showWindow:nil];
 	}
 }
 
 
-// Save window frame to prefs...
+// Perform cleanup and save window frame to prefs...
 
 - (void) applicationWillTerminate:(NSNotification*)inNotification
 {
@@ -195,7 +202,7 @@
 		SecKeychainItemRef item = nil;
 		UInt32 stringLength;
 		char* buffer;
-		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void*)&buffer,&item);
+		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
 		if (err == noErr)
 		{
 			SecKeychainItemFreeContent(NULL, buffer);
@@ -254,7 +261,7 @@
 												   0,
 												   nil,
 												   &stringLength,
-												   (void *)&buffer,
+												   (void**)&buffer,
 												   &item);
 		
 		if (noErr == theStatus)

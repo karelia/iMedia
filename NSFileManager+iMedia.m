@@ -181,13 +181,21 @@
 {
 	NSString *tempFileTemplate = [directoryPath stringByAppendingPathComponent:@"XXXXXXXXXXXX"];
 	const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
-	char *tempFileNameCString = (char *)malloc(strlen(tempFileTemplateCString) + 1);
+	NSString* tempFilePath = nil;
 	
-	strcpy(tempFileNameCString, tempFileTemplateCString);
+	char *tempFileNameCString = (char *)malloc(strlen(tempFileTemplateCString) + 1);
+	if (tempFileNameCString != NULL)
+	{
+		strcpy(tempFileNameCString, tempFileTemplateCString);
 
-	char *tmpName = mktemp(tempFileNameCString);
-    
-	return [NSString stringWithUTF8String:tmpName];
+		char *tmpName = mktemp(tempFileNameCString);
+		
+		tempFilePath = [NSString stringWithUTF8String:tmpName];	
+		
+		free(tempFileNameCString);
+	}
+	
+	return tempFilePath;
 }
 
 @end

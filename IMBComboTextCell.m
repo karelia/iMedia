@@ -256,9 +256,18 @@
 #pragma mark Drawing
 
 
+// Please note that we have to temporarily modify the CTM because the tableview
+// is flipped... You should restore the gstate afterwards
+- (void) willDrawImageInRect:(NSRect)rect context:(CGContextRef)context;
+{
+	CGContextSaveGState(context);
+	CGContextScaleCTM(context,1.0,-1.0);
+	CGContextTranslateCTM(context,0.0,-2.0*rect.origin.y-NSHeight(rect));
+}
+
+
 // Draw a CGImageRef into the specified rect, keeping the aspect ratio of the image intact. The image will have 
-// to scaled to fit into the rect. Please note that we have to temporarily modify the CTM because the tableview
-// is flipped...
+// to be scaled to fit into the rect. 
 
 - (void) _drawImage:(CGImageRef)inImage withFrame:(NSRect)inImageRect
 {
@@ -266,10 +275,8 @@
 	CGFloat height = CGImageGetHeight(inImage);
 	NSRect rect = [self imageRectForFrame:inImageRect imageWidth:width imageHeight:height];
 	
-	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
-	CGContextSaveGState(context);
-	CGContextScaleCTM(context,1.0,-1.0);
-	CGContextTranslateCTM(context,0.0,-2.0*rect.origin.y-NSHeight(rect));
+    CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
+    [self willDrawImageInRect:rect context:context];
 	CGContextDrawImage(context,NSRectToCGRect(rect),inImage);
 	CGContextRestoreGState(context);
 }
@@ -301,28 +308,34 @@
 		[path stroke];
 	}
 	
-	// Draw the thumbnail image (NSImage)...
-	
-	else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
-	{
-		NSImage* image = (NSImage*) _imageRepresentation;
-		[image setFlipped:YES];
-
-		CGFloat width = image.size.width;
-		CGFloat height = image.size.height;
-		NSRect rect = [self imageRectForFrame:imageRect imageWidth:width imageHeight:height];
-
-		[image drawInRect:rect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-	}
-	
-	// Draw the thumbnail image (CGImage)...
-	
 	else
     {
-		CGImageRef image = IMB_CGImageCreateWithImageItem(self);
-		[self _drawImage:image withFrame:imageRect];
-        CFRelease(image);
-	}
+        // Draw the thumbnail image (NSImage)...
+        
+        if ([_imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
+        {
+            NSImage* image = (NSImage*) _imageRepresentation;
+            
+            CGFloat width = image.size.width;
+            CGFloat height = image.size.height;
+            NSRect rect = [self imageRectForFrame:imageRect imageWidth:width imageHeight:height];
+            
+            CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
+            [self willDrawImageInRect:rect context:context];
+            [image drawInRect:rect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+            CGContextRestoreGState(context);
+        }
+        
+        // Draw the thumbnail image (CGImage)...
+        
+        else
+        {
+            CGImageRef image = IMB_CGImageCreateWithImageItem(self);
+            [self _drawImage:image withFrame:imageRect];
+            CFRelease(image);
+        }
+    }
+    
 	
 	// Draw the title and subtitle...
 	

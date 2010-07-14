@@ -44,7 +44,7 @@
  */
 
 
-// Author: Pierre Bernard
+// Author: Pierre Bernard, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,21 +52,17 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface IMBOrderedDictionary : NSObject
+@interface IMBMutableOrderedDictionary : NSDictionary
 {
 	NSMutableDictionary*		_dictionary;
 	NSMutableArray*				_array;
 }
 
-+ (IMBOrderedDictionary*)orderedDictionaryWithCapacity:(NSUInteger)inCapacity;
++ (IMBMutableOrderedDictionary*)orderedDictionaryWithCapacity:(NSUInteger)inCapacity;
 
-- (IMBOrderedDictionary*)initWithCapacity:(NSUInteger)inCapacity;
+- (id)initWithCapacity:(NSUInteger)inCapacity;
 
 - (void)setObject:(id)inObject forKey:(id)inKey;
 - (void)removeObjectForKey:(id)inKey;
-
-- (id)objectForKey:(id)inKey;
-
-- (NSArray*)allKeys;
 
 @end

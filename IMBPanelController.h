@@ -68,9 +68,10 @@
 
 #pragma mark 
 
-@interface IMBPanelController : NSWindowController
 #if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-<NSTabViewDelegate>
+@interface IMBPanelController : NSWindowController <NSTabViewDelegate>
+#else
+@interface IMBPanelController : NSWindowController
 #endif
 {
 	IBOutlet NSTabView* ibTabView;
@@ -87,6 +88,7 @@
 + (IMBPanelController*) sharedPanelController;
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
 + (BOOL) isSharedPanelControllerLoaded;
++ (void) cleanupSharedPanelController;
 
 @property (assign) id delegate;
 @property (retain) NSArray* mediaTypes;
@@ -98,6 +100,9 @@
 - (IMBObjectViewController*) objectViewControllerForMediaType:(NSString*)inMediaType;
 - (IBAction) showWindow:(id)inSender;
 - (IBAction) hideWindow:(id)inSender;
+
+- (void) saveStateToPreferences;
+- (void) restoreStateFromPreferences;
 
 @end
 
