@@ -560,10 +560,13 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	
 	for (NSURL* url in self.localURLs)
 	{
-		if ([url isFileURL])
+		if ([url isKindOfClass:[NSURL class]])
 		{
-			NSError* error = nil;
-			[mgr removeItemAtPath:[url path] error:&error];
+			if ([url isFileURL])
+			{
+				NSError* error = nil;
+				[mgr removeItemAtPath:[url path] error:&error];
+			}
 		}
 	}
 	
@@ -609,7 +612,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
-		NSLog(@"%s",__FUNCTION__);
+//		NSLog(@"%s",__FUNCTION__);
 		[self cleanupProgress];
 		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
@@ -633,7 +636,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
-		NSLog(@"%s",__FUNCTION__);
+//		NSLog(@"%s",__FUNCTION__);
 		[self cleanupProgress];
 		
 		[self performSelectorOnMainThread:@selector(_didFinish) 

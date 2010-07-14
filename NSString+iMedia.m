@@ -53,6 +53,7 @@
 
 
 #import "NSString+iMedia.h"
+#import "NSFileManager+iMedia.h"
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 
@@ -110,7 +111,7 @@
 	
 	if (nil == result)	// not found, figure out if it's a directory or not
 	{
-		NSFileManager *fm = [NSFileManager defaultManager];
+		NSFileManager *fm = [NSFileManager threadSafeManager];
 		BOOL isDirectory;
 		if ( [fm fileExistsAtPath:anAbsolutePath isDirectory:&isDirectory] )
 		{
@@ -295,6 +296,38 @@
 	
 	return (CFComparisonResult) compareResult;
 }
+
+- (NSString *)resolvedPath
+{
+	NSString* path = self;
+	OSStatus err = noErr;
+	FSRef ref;
+	UInt8 buffer[PATH_MAX+1];	
+	
+	if (err == noErr)
+	{
+		err = FSPathMakeRef((const UInt8 *)[path UTF8String],&ref,NULL);
+	}
+	
+	if (err == noErr)
+	{
+		Boolean isFolder,wasAliased;
+		err = FSResolveAliasFile(&ref,true,&isFolder,&wasAliased);
+	}
+	
+	if (err == noErr)
+	{
+		err = FSRefMakePath(&ref,buffer,PATH_MAX);
+	}
+	
+	if (err == noErr)
+	{
+		path = [NSString stringWithUTF8String:(const char*)buffer];
+	}
+	
+	return path;	
+}
+
 
 @end
 

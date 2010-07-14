@@ -109,6 +109,8 @@
 - (BOOL) isEqual:(IMBObject*)inObject;						// Considered equal if location is equal
 - (NSString*) path;											// Convert location to path
 - (NSURL*) url;												// Convert location to url
+- (BOOL) isLocalFile;										// Is this object a local file
+- (NSString*) uti;											// Returns type of file if possible
 
 // Derived Properties. See IKImageBrowserItem for documentation...
 

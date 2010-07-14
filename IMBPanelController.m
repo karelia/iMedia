@@ -63,6 +63,7 @@
 
 #import "IMBConfig.h"
 #import "IMBCommon.h"
+#import "IMBQLPreviewPanel.h"
 #import "NSWorkspace+iMedia.h"
 
 
@@ -302,22 +303,12 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		[ibTabView addTabViewItem:item];
 		[item release];
 		
-		// Prepare the bindings of views and controllers. This will essentially register for the windowWillClose
-		// notification, which in turn will cause all bindings to be torn down BEFORE the window is closed and
-		// all top level objects are released. That way we can avoid exceptions due to a random dealloc order...
+		// Now that the view hierarchy is established, restore any previously known state...
 		
 		[nodeViewController restoreState];
 		[objectViewController restoreState];
 	}
 		
-	// When the window is about to close, we need to unbind all views to avoid retain cycles or exceptions...
-	
-	[[NSNotificationCenter defaultCenter]
-		addObserver:self 
-		selector:@selector(windowWillClose:) 
-		name:NSWindowWillCloseNotification 
-		object:self.window];
-
 	// Restore window size and selected tab...
 	
 	[self.window setContentMinSize:largestMinimumSize];
@@ -326,20 +317,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-// Unbind all views, so that retain cycles or exceptions (due to deallocating controllers that are still being 
-// observed) are avoided...
-
-- (void) windowWillClose:(NSNotification*)inNotification
-{
-	for (IMBObjectViewController* objectViewController in self.viewControllers)
-	{
-		[objectViewController unbindViews];
-	}
-	
-	[IMBPanelController cleanupSharedPanelController];
-}
 
 
 // We need to save preferences before tha app quits...
@@ -553,23 +530,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	else
 	{
         [super keyDown:inEvent];
-		
-		#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-		QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
-		[panel updateController];
-		
-		if ([panel currentController] != nil)
-		{
-			[panel reloadData];
-		}
-		#endif
-
-
     }
 }
 
-
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 
 - (BOOL) acceptsPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
@@ -591,8 +554,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
     inPanel.delegate = nil;
     inPanel.dataSource = nil;
 }
-
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------

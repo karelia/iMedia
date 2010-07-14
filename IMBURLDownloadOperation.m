@@ -190,7 +190,7 @@
 
 - (void) download:(NSURLDownload*)inDownload didCreateDestination:(NSString*)inPath
 {
-	NSLog(@"%s inPath=%@",__FUNCTION__,inPath);
+//	NSLog(@"%s inPath=%@",__FUNCTION__,inPath);
 	self.localPath = inPath;
 }
 
@@ -199,7 +199,7 @@
 
 - (void) download:(NSURLDownload*)inDownload didReceiveDataOfLength:(NSUInteger)inLength
 {	
-	NSLog(@"%s inLength=%d",__FUNCTION__,(int)inLength);
+//	NSLog(@"%s inLength=%d",__FUNCTION__,(int)inLength);
 	_bytesDone += (long long)inLength;
 	[_delegate didReceiveData:self];
 }
