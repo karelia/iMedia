@@ -95,10 +95,10 @@ NSString* const IMBFlickrQueryEditor_QueryChanged = @"IMBFlickrQueryEditor_Query
 	NSImage *reImage = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:@"remix" ofType:@"pdf"]] autorelease];
 	NSImage *coImage = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:@"commercial" ofType:@"pdf"]] autorelease];
 
-	[noImage setScalesWhenResized:YES];	[noImage setSize:NSMakeSize(16.0,16.0)];
-	[ccImage setScalesWhenResized:YES];	[ccImage setSize:NSMakeSize(16.0,16.0)];
-	[reImage setScalesWhenResized:YES];	[reImage setSize:NSMakeSize(16.0,16.0)];
-	[coImage setScalesWhenResized:YES];	[coImage setSize:NSMakeSize(16.0,16.0)];
+	[noImage setScalesWhenResized:YES];	[noImage setSize:NSMakeSize(12.0,12.0)];
+	[ccImage setScalesWhenResized:YES];	[ccImage setSize:NSMakeSize(12.0,12.0)];
+	[reImage setScalesWhenResized:YES];	[reImage setSize:NSMakeSize(12.0,12.0)];
+	[coImage setScalesWhenResized:YES];	[coImage setSize:NSMakeSize(12.0,12.0)];
 	
 	[[_licensePopup itemAtIndex:[_licensePopup indexOfItemWithTag:0]] setImage:noImage];
 	[[_licensePopup itemAtIndex:[_licensePopup indexOfItemWithTag:1]] setImage:ccImage];
