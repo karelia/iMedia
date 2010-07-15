@@ -419,6 +419,11 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	//	setup default user nodes...
 	if (!nodes && _delegate && [_delegate respondsToSelector:@selector(flickrParserSetupDefaultQueries:)]) {
 		nodes = [_delegate flickrParserSetupDefaultQueries:self];
+		
+	if (nodes == nil){
+		nodes = [NSArray array];
+	}
+		
 #if 0
 		[prefs setObject:nodes forKey:IMBFlickrParserPrefKey_CustomQueries];
 		[IMBConfig setPrefs:prefs forClass:[self class]];
