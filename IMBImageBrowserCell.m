@@ -296,6 +296,17 @@
 
 - (void) sizeDidChange
 {
+	if ([super respondsToSelector:@selector(sizeDidChange)])
+	{
+		[((id)super) sizeDidChange];
+	}
+	
+	[self adjustToCellSize];
+}
+
+
+- (void) adjustToCellSize
+{
 	CGFloat points = 0;
 	CGFloat width = [((id)self) size].width;
 	if (width < 60) points = 9;
@@ -312,11 +323,6 @@
 	{
 		[[((id)self) parent] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
 	}	
-	
-	if ([super respondsToSelector:@selector(sizeDidChange)])
-	{
-		[((id)super) sizeDidChange];
-	}
 }
 
 

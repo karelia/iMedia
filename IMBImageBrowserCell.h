@@ -80,6 +80,8 @@
 @property BOOL imbShouldDrawOutline;
 @property BOOL imbShouldDrawShadow;
 
+- (void) adjustToCellSize;
+
 @end
 
 
