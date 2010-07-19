@@ -351,6 +351,19 @@
 }
 
 
+//- (NSColor*) highlightColorWithFrame:(NSRect)inFrame inView:(NSView*)inView
+//{
+//	NSColor* color = [super highlightColorWithFrame:inFrame inView:inView];
+//	
+//	if ([inView respondsToSelector:@selector(highlightColor)])
+//	{
+//		color = [(IMBTableView*)inView highlightColor];
+//	}
+//	
+//	return color;
+//}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
