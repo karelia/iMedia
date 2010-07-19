@@ -89,6 +89,9 @@
 
 #import <iMedia/IMBOutlineView.h>
 #import <iMedia/IMBNodeCell.h>
+#import <iMedia/IMBTableView.h>
+#import <iMedia/IMBComboTableView.h>
+#import <iMedia/IMBImageBrowserView.h>
 
 // Categories...
 
