@@ -388,11 +388,23 @@ enum IMBMouseOperation
 	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
     inPanel.delegate = controller;
     inPanel.dataSource = controller;
+	
+	if ([controller respondsToSelector:@selector(beginPreviewPanelControl:)])
+	{
+		[controller performSelector:@selector(beginPreviewPanelControl:) withObject:inPanel];
+	}
 }
 
 
 - (void) endPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+	
+	if ([controller respondsToSelector:@selector(endPreviewPanelControl:)])
+	{
+		[controller performSelector:@selector(endPreviewPanelControl:) withObject:inPanel];
+	}
+	
     inPanel.delegate = nil;
     inPanel.dataSource = nil;
 }

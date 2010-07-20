@@ -463,7 +463,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) _loadStateFromPreferences
 {
 	NSMutableDictionary* stateDict = [self _preferences];
-	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntValue];
+	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntegerValue];
 	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
 	
 	//	NSData* selectionData = [stateDict objectForKey:@"selectionData"];
