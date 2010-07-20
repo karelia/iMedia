@@ -645,6 +645,9 @@
 					NSString* album = [trackDict objectForKey:@"Album"];
 					if (album) [metadata setObject:album forKey:@"album"]; 
 					
+					NSString* genre = [trackDict objectForKey:@"Genre"];
+					if (genre) [metadata setObject:genre forKey:@"genre"]; 
+
 					object.metadataDescription = [self metadataDescriptionForMetadata:metadata];
 				}
 				
