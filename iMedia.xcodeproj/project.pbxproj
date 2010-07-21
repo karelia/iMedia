@@ -251,6 +251,10 @@
 		D0CA961610498F7C00725DA3 /* IMBTimecodeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CA961410498F7C00725DA3 /* IMBTimecodeTransformer.m */; };
 		D0CD1E54101A452A000FA505 /* IMBiPhotoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */; };
+		D0CE6E1D11F6FA09005EE5B4 /* IMBMetadataTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E1B11F6FA09005EE5B4 /* IMBMetadataTransformer.h */; };
+		D0CE6E1E11F6FA09005EE5B4 /* IMBMetadataTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CE6E1C11F6FA09005EE5B4 /* IMBMetadataTransformer.m */; };
+		D0CE6E4311F6FD54005EE5B4 /* NSDictionary+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E4111F6FD54005EE5B4 /* NSDictionary+iMedia.h */; };
+		D0CE6E4411F6FD54005EE5B4 /* NSDictionary+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CE6E4211F6FD54005EE5B4 /* NSDictionary+iMedia.m */; };
 		D0CF005610C50908009EC68F /* IMBTargetDebug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */; };
 		D0CF005710C50908009EC68F /* IMBTargetRelease.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */; };
 		D0CF005810C50908009EC68F /* IMBTargetTest.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D0CF005510C50908009EC68F /* IMBTargetTest.xcconfig */; };
@@ -584,6 +588,10 @@
 		D0CA961410498F7C00725DA3 /* IMBTimecodeTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTimecodeTransformer.m; sourceTree = "<group>"; };
 		D0CD1E52101A452A000FA505 /* IMBiPhotoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoParser.h; sourceTree = "<group>"; };
 		D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoParser.m; sourceTree = "<group>"; };
+		D0CE6E1B11F6FA09005EE5B4 /* IMBMetadataTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMetadataTransformer.h; sourceTree = "<group>"; };
+		D0CE6E1C11F6FA09005EE5B4 /* IMBMetadataTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMetadataTransformer.m; sourceTree = "<group>"; };
+		D0CE6E4111F6FD54005EE5B4 /* NSDictionary+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+iMedia.h"; sourceTree = "<group>"; };
+		D0CE6E4211F6FD54005EE5B4 /* NSDictionary+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+iMedia.m"; sourceTree = "<group>"; };
 		D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBTargetDebug.xcconfig; sourceTree = SOURCE_ROOT; };
 		D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBTargetRelease.xcconfig; sourceTree = SOURCE_ROOT; };
 		D0CF005510C50908009EC68F /* IMBTargetTest.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBTargetTest.xcconfig; sourceTree = SOURCE_ROOT; };
@@ -968,6 +976,8 @@
 				D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */,
 				D0CA961310498F7C00725DA3 /* IMBTimecodeTransformer.h */,
 				D0CA961410498F7C00725DA3 /* IMBTimecodeTransformer.m */,
+				D0CE6E1B11F6FA09005EE5B4 /* IMBMetadataTransformer.h */,
+				D0CE6E1C11F6FA09005EE5B4 /* IMBMetadataTransformer.m */,
 				D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */,
 				D0C2DAA110240C0B001B1198 /* IMBImageView.xib */,
 				D08070C710442DAE00891137 /* IMBAudioView.xib */,
@@ -1025,6 +1035,8 @@
 				D099324610111A2900C527B7 /* NSWorkspace+iMedia.m */,
 				D099326910111DCB00C527B7 /* NSString+iMedia.h */,
 				D099326810111DCB00C527B7 /* NSString+iMedia.m */,
+				D0CE6E4111F6FD54005EE5B4 /* NSDictionary+iMedia.h */,
+				D0CE6E4211F6FD54005EE5B4 /* NSDictionary+iMedia.m */,
 				D049F0081034993E003CC49C /* NSImage+iMedia.h */,
 				D049F0091034993E003CC49C /* NSImage+iMedia.m */,
 				D0363E7A11D3787800E0579F /* NSView+iMedia.h */,
@@ -1215,6 +1227,8 @@
 				8FC2089D11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h in Headers */,
 				D0363E7C11D3787800E0579F /* NSView+iMedia.h in Headers */,
 				D08F82B411E4A1C1006E618E /* IMBQLPreviewPanel.h in Headers */,
+				D0CE6E1D11F6FA09005EE5B4 /* IMBMetadataTransformer.h in Headers */,
+				D0CE6E4311F6FD54005EE5B4 /* NSDictionary+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1484,6 +1498,8 @@
 				274DF619114EF0B200AC8C03 /* IMBImageItem.m in Sources */,
 				8FC2089E11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m in Sources */,
 				D0363E7D11D3787800E0579F /* NSView+iMedia.m in Sources */,
+				D0CE6E1E11F6FA09005EE5B4 /* IMBMetadataTransformer.m in Sources */,
+				D0CE6E4411F6FD54005EE5B4 /* NSDictionary+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
