@@ -52,15 +52,16 @@
 
 #pragma mark HEADERS
 	
-#import "IMBTimecodeTransformer.h"
+#import "IMBMetadataTransformer.h"
 	
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark
 
-@implementation IMBTimecodeTransformer
+@implementation IMBMetadataTransformer
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +72,7 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	IMBTimecodeTransformer* transformer = [[IMBTimecodeTransformer alloc] init];
+	IMBMetadataTransformer* transformer = [[IMBMetadataTransformer alloc] init];
 	[NSValueTransformer setValueTransformer:transformer forName:NSStringFromClass(self)];
 	[transformer release];
 	[pool release];
@@ -89,7 +90,7 @@
 
 + (BOOL) allowsReverseTransformation
 {
-	return YES;
+	return NO;
 }
 		
 
@@ -104,23 +105,13 @@
 	
 	if (inValue)
 	{
-		if ([inValue respondsToSelector:@selector(doubleValue)]) 
+		if ([inValue isKindOfClass:[NSDictionary class]]) 
 		{
-			double t = [inValue doubleValue];
-			NSInteger T = (NSInteger) t;
-			
-			NSInteger HH = T / 3600;
-			NSInteger MM = (T / 60) % 60;
-			NSInteger SS = T % 60;
-			
-			if (HH > 0)
-			{
-				result = [NSString stringWithFormat:@"%d:%d:%02d",HH,MM,SS];
-			}	
-			else
-			{
-				result = [NSString stringWithFormat:@"%d:%02d",MM,SS];
-			}	
+			NSDictionary* metadata = (NSDictionary*)inValue;
+			NSNumber* width = [metadata objectForKey:@"width"];
+			NSNumber* height = [metadata objectForKey:@"height"];
+
+			result = [NSString stringWithFormat:@"%d x %d",[width integerValue],[height integerValue]];
 		}
 	}
 	
@@ -130,27 +121,27 @@
 
 // Convert from NSString to NSNumber...
 
-- (id) reverseTransformedValue:(id)inValue
-{
-	double t = 0.0;
-	
-	if (inValue != nil && [inValue isKindOfClass:[NSString class]])
-	{
-		NSArray* parts = [(NSString*)inValue componentsSeparatedByString:@":"];
-		NSInteger n = [parts count];
-		double multiplier = 1.0;
-		
-		for (NSInteger i=n-1; i>=0; i--)
-		{
-			NSString* string = [parts objectAtIndex:i];
-			double value = [string doubleValue];
-			t += value * multiplier;
-			multiplier *= 60.0;
-		}
-	}
-	
-	return [NSNumber numberWithDouble:t];
-}
+//- (id) reverseTransformedValue:(id)inValue
+//{
+//	double t = 0.0;
+//	
+//	if (inValue != nil && [inValue isKindOfClass:[NSString class]])
+//	{
+//		NSArray* parts = [(NSString*)inValue componentsSeparatedByString:@":"];
+//		NSInteger n = [parts count];
+//		double multiplier = 1.0;
+//		
+//		for (NSInteger i=n-1; i>=0; i--)
+//		{
+//			NSString* string = [parts objectAtIndex:i];
+//			double value = [string doubleValue];
+//			t += value * multiplier;
+//			multiplier *= 60.0;
+//		}
+//	}
+//	
+//	return [NSNumber numberWithDouble:t];
+//}
 	
 
 //----------------------------------------------------------------------------------------------------------------------
