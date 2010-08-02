@@ -203,7 +203,7 @@
 #pragma mark 
 
 
-- (void) loadThumbnailForObject:(IMBObject*)inObject
+- (id) loadThumbnailForObject:(IMBObject*)inObject
 {
 	id imageRepresentation = nil;
 	NSString* type = inObject.imageRepresentationType;
@@ -338,6 +338,8 @@
 			waitUntilDone:NO 
 			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
+	
+	return imageRepresentation;
 }
 
 

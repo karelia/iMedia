@@ -1127,7 +1127,7 @@ static NSArray* sSupportedUTIs = nil;
 }
 
 
-- (void) loadThumbnailForObject:(IMBObject*)inObject
+- (id) loadThumbnailForObject:(IMBObject*)inObject
 {	
 	CGImageRef imageRepresentation = nil;
 	NSData *jpegData = [self previewDataForObject:inObject];
@@ -1183,8 +1183,10 @@ static NSArray* sSupportedUTIs = nil;
 										modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	else {
-		[super loadThumbnailForObject:inObject];
+		imageRepresentation = (CGImageRef) [super loadThumbnailForObject:inObject];
 	}
+	
+	return (id) imageRepresentation;
 }
 	
 

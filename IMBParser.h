@@ -122,7 +122,7 @@
 
 // Called when the thumbnail for an object needs to be loaded lazily. This method will be called on a background thread...
 
-- (void) loadThumbnailForObject:(IMBObject*)inObject;
+- (id) loadThumbnailForObject:(IMBObject*)inObject;
 
 // Called when metadata for an object needs to be loaded lazily. This method may be called on a background thread...
 
