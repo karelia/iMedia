@@ -529,11 +529,12 @@
 	}
 	
 	if (needToCopyFile) {
-		(void) [fileManager removeFileAtPath:readOnlyDatabasePath handler:nil];
-		BOOL copied = [fileManager copyPath:databasePath toPath:readOnlyDatabasePath handler:nil];
+		NSError* error;
+		(void) [fileManager removeItemAtPath:readOnlyDatabasePath error:&error];
+		BOOL copied = [fileManager copyItemAtPath:databasePath toPath:readOnlyDatabasePath error:&error];
 		
 		if (!copied) {
-			NSLog(@"Unable to copy database file at %@", databasePath);
+			NSLog (@"Unable to copy database file at %@: %@", databasePath, error.localizedDescription);
 		}
 	}
 	
