@@ -84,6 +84,7 @@
 
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
+static NSString* kPosterFrameKeyPath = @"arrangedObjects.posterFrame";
 static NSString* kObjectCountStringKey = @"objectCountString";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
@@ -267,6 +268,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibObjectArrayController retain];
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
+	[ibObjectArrayController addObserver:self forKeyPath:kPosterFrameKeyPath options:NSKeyValueObservingOptionNew context:(void*)kPosterFrameKeyPath];
 
 	// We need to save preferences before the app quits...
 	
@@ -315,6 +317,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	// Stop observing the array...
 	
+	[ibObjectArrayController removeObserver:self forKeyPath:kPosterFrameKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
@@ -360,6 +363,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //		id object = [inChange objectForKey:NSKeyValueChangeNewKey];
 //		NSLog(@"%s %@",__FUNCTION__,inChange);
 		[self _reloadIconView];
+		[self _reloadComboView];
+	}
+	else if (inContext == (void*)kPosterFrameKeyPath)
+	{
 		[self _reloadComboView];
 	}
 	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty])
@@ -670,7 +677,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) _reloadComboView
 {
-	if ([ibListView.window isVisible])
+	if ([ibComboView.window isVisible])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView selector:@selector(reloadData) object:nil];
 		[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];

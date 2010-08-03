@@ -565,6 +565,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (Class) objectClass
+{
+	return [IMBEnhancedObject class];
+}
+
+
 - (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
 	// Select the correct imageRepresentationType for our mediaType...
@@ -577,6 +583,7 @@
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
+	Class objectClass = [self objectClass];
 	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
 	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
 
@@ -612,7 +619,7 @@
 					
 					// Create an object...
 					
-					IMBEnhancedObject* object = [[IMBEnhancedObject alloc] init];
+					IMBEnhancedObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 

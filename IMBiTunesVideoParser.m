@@ -54,6 +54,7 @@
 
 #import "IMBiTunesVideoParser.h"
 #import "IMBParserController.h"
+#import "IMBMovieObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -114,6 +115,15 @@
 	if ([[inTrackDict objectForKey:@"Has Video"] boolValue] == 0) return NO;
 	
 	return YES;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (Class) objectClass
+{
+	return [IMBMovieObject class];
 }
 
 

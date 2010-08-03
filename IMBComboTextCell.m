@@ -328,6 +328,14 @@
         
         // Draw the thumbnail image (CGImage)...
         
+        else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+        {
+			CGImageRef image = (CGImageRef) _imageRepresentation;
+            [self _drawImage:image withFrame:imageRect];
+         }
+		
+        // Draw the thumbnail image (other representations)...
+        
         else
         {
             CGImageRef image = IMB_CGImageCreateWithImageItem(self);
@@ -335,8 +343,7 @@
             CFRelease(image);
         }
     }
-    
-	
+    	
 	// Draw the title and subtitle...
 	
 	if (_title)
@@ -349,19 +356,6 @@
 		[_subtitle drawInRect:subtitleRect withAttributes:_subtitleTextAttributes];
 	}	
 }
-
-
-//- (NSColor*) highlightColorWithFrame:(NSRect)inFrame inView:(NSView*)inView
-//{
-//	NSColor* color = [super highlightColorWithFrame:inFrame inView:inView];
-//	
-//	if ([inView respondsToSelector:@selector(highlightColor)])
-//	{
-//		color = [(IMBTableView*)inView highlightColor];
-//	}
-//	
-//	return color;
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
