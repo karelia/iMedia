@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBMovieObject.h"
+#import <QTKit/QTKit.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +63,28 @@
 
 @implementation IMBMovieObject
 
-@synthesize posterFrame = _posterFrame;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Helper method to extract thumbnail frame from a movie...
+
+- (CGImageRef) _posterFrameWithMovie:(QTMovie*)inMovie
+{
+	NSError* error = nil;
+	QTTime duration = inMovie.duration;
+	double tv = duration.timeValue;
+	double ts = duration.timeScale;
+	QTTime time = QTMakeTimeWithTimeInterval(0.5 * tv/ts);
+	NSSize size = NSMakeSize(256.0,256.0);
+	
+	NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+		QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,
+		[NSValue valueWithSize:size],QTMovieFrameImageSize,
+		nil];
+	
+	return (CGImageRef) [inMovie frameImageAtTime:time withAttributes:attributes error:&error];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -73,6 +95,54 @@
 	CGImageRef old = _posterFrame;
 	_posterFrame = CGImageRetain(inPosterFrame);
 	CGImageRelease(old);
+}
+
+
+// The getter loads the image lazily (if it's not available). Please note that the unload method gets rid of it 
+// again as the IMBObjectFifoCache clears out the oldest items...
+
+- (CGImageRef) posterFrame
+{
+	NSError* error = nil;
+	QTMovie* movie = nil;
+	
+	if (_posterFrame == NULL && _imageRepresentation != nil)
+	{
+		if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
+		{
+			movie = (QTMovie*)_imageRepresentation;
+			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
+		}
+		else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType] ||
+				 [_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+		{
+			NSString* path = (NSString*)_imageRepresentation;
+			movie = [QTMovie movieWithFile:path error:&error];
+			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
+		}
+		else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
+		{
+			NSURL* url = (NSURL*)_imageRepresentation;
+			movie = [QTMovie movieWithURL:url error:&error];
+			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
+		}
+		else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+		{
+			self.posterFrame = (CGImageRef)_imageRepresentation;
+		}
+	}
+	
+	return _posterFrame;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) unload
+{
+	[super unload];
+	self.posterFrame = NULL;
 }
 
 
