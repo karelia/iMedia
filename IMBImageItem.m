@@ -112,7 +112,7 @@
     else if ([type isEqualToString:IKImageBrowserPathRepresentationType])
     {
         NSString *path = [item imageRepresentation];
-        result = [[CIImage alloc] initWithContentsOfFile:[NSURL fileURLWithPath:path]];
+        result = [[CIImage alloc] initWithContentsOfURL:[NSURL fileURLWithPath:path]];
         [result autorelease];
     }
     else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
