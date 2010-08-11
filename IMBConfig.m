@@ -174,7 +174,7 @@ static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 + (void) setViewerApp:(NSString*)inAppPath forMediaType:(NSString*)inMediaType
 {
 	NSMutableDictionary* viewerAppPaths = [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:sIMBViewerAppPathsKey]];
-	[viewerAppPaths setObject:inAppPath forKey:inMediaType];
+	if (inAppPath) [viewerAppPaths setObject:inAppPath forKey:inMediaType];
 	[self setPrefsValue:viewerAppPaths forKey:sIMBViewerAppPathsKey];
 }
 
@@ -194,7 +194,7 @@ static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 + (void) setEditorApp:(NSString*)inAppPath forMediaType:(NSString*)inMediaType
 {
 	NSMutableDictionary* editorAppPaths = [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:sIMBEditorAppPathsKey]];
-	[editorAppPaths setObject:inAppPath forKey:inMediaType];
+	if (inAppPath) [editorAppPaths setObject:inAppPath forKey:inMediaType];
 	[self setPrefsValue:editorAppPaths forKey:sIMBEditorAppPathsKey];
 }
 
