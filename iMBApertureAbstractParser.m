@@ -302,6 +302,7 @@
 			}
 			
  			[imageRecord setObject:key forKey:@"VersionUUID"];
+ 			[imageRecord setObject:versionString forKey:@"Application Version"];
 
 			[newPhotolist addObject:imageRecord];
 			
