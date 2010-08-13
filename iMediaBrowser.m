@@ -879,38 +879,35 @@ static NSMutableArray *_browserClasses = nil;
 	NSArray *nodes = [node valueForKey:@"items"];
 	int nCount = [nodes count];
 	
-	if (nCount == 0) {
-		NSArray *images = [node valueForKey:@"Images"];
-		int iCount = [images count];
-		int i = 0;
+	NSArray *images = [node valueForKey:@"Images"];
+	int iCount = [images count];
+	int i = 0;
+	
+	for (i = 0; i < iCount; i++) {
+		NSDictionary *record = [images objectAtIndex:i];
+		NSString *imagePath = [record valueForKey:@"ImagePath"];
 		
-		for (i = 0; i < iCount; i++) {
-			NSDictionary *record = [images objectAtIndex:i];
-			NSString *imagePath = [record valueForKey:@"ImagePath"];
+		if ([path isEqual:imagePath]) {
+			NSMutableDictionary *mutableRecord = [NSMutableDictionary dictionaryWithDictionary:record];
 			
-			if ([path isEqual:imagePath]) {
-				NSMutableDictionary *mutableRecord = [NSMutableDictionary dictionaryWithDictionary:record];
-				
-				[mutableRecord setObject:[node parserClassName] forKey:@"PaserClassName"];
-				[mutableRecord setObject:[node recursiveIdentifier] forKey:@"NodeIdentifier"];
-				
-				return mutableRecord;
-			}
-		}
-	}
-	else {
-		int n = 0;
-		
-		for (n = 0; n < nCount; n++) {
-			iMBLibraryNode *node = [nodes objectAtIndex:n];
-			NSDictionary *record = [self recordForPath:path inNode:node];
+			[mutableRecord setObject:[node parserClassName] forKey:@"PaserClassName"];
+			[mutableRecord setObject:[node recursiveIdentifier] forKey:@"NodeIdentifier"];
 			
-			if (record != nil) {
-				return record;
-			}
+			return mutableRecord;
 		}
 	}
 	
+	int n = 0;
+	
+	for (n = 0; n < nCount; n++) {
+		iMBLibraryNode *node = [nodes objectAtIndex:n];
+		NSDictionary *record = [self recordForPath:path inNode:node];
+		
+		if (record != nil) {
+			return record;
+		}
+	}
+
 	return nil;
 }
 
