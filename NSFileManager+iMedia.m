@@ -48,6 +48,7 @@
 
 
 #import "NSFileManager+iMedia.h"
+#import "NSString+iMedia.h"
 
 
 @implementation NSFileManager (iMedia)
@@ -177,6 +178,7 @@
 	return temporaryPath;
 }
 
+
 - (NSString*)temporaryPathWithinDirectory:(NSString*)directoryPath
 {
 	NSString *tempFileTemplate = [directoryPath stringByAppendingPathComponent:@"XXXXXXXXXXXX"];
@@ -197,5 +199,109 @@
 	
 	return tempFilePath;
 }
+
+
+- (NSString*) volumeNameAtPath:(NSString*)inPath
+{
+	NSString* path = [inPath stringByStandardizingPath];
+	NSArray* components = [path pathComponents];
+
+	if (![path hasPrefix:@"/Volumes/"])
+	{
+		return [self displayNameAtPath:@"/"];
+	}
+	else if ([components count] > 2)
+	{
+		NSString* volumeName = [components objectAtIndex:2];
+		NSMutableArray* parts = [NSMutableArray arrayWithArray:[volumeName componentsSeparatedByString:@" "]];
+		NSString* number = [parts lastObject];
+		
+		if ([number intValue] > 0)
+		{
+			[parts removeLastObject];
+			volumeName = [parts componentsJoinedByString:@" "];
+		}
+
+		return volumeName;
+	}
+
+	return nil;
+}
+
+
+- (NSString*) relativePathToVolumeAtPath:(NSString*)inPath
+{
+	NSString* path = [inPath stringByStandardizingPath];
+
+	if ([path hasPrefix:@"/Volumes/"])
+	{
+		NSArray* components = [path pathComponents];
+		
+		NSMutableArray* relComponents = [NSMutableArray arrayWithArray:components];
+		[relComponents removeObjectAtIndex:0];
+		[relComponents removeObjectAtIndex:0];
+		[relComponents removeObjectAtIndex:0];
+		
+		path = [NSString pathWithComponents:relComponents];
+	}
+	else if ([path hasPrefix:@"/"])
+	{
+		path = [path substringFromIndex:1];
+	}
+
+	return path;
+}
+
+
+- (BOOL) fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged
+{
+	BOOL exists = NO;
+	BOOL wasChanged = NO;
+	
+	if (ioPath)
+	{
+		NSString* path = [*ioPath stringByStandardizingPath];
+		
+		if ([self fileExistsAtPath:path])
+		{
+			exists = YES;
+		}
+		else
+		{
+			if ([path hasPrefix:@"/Volumes/"])
+			{
+				NSString* volName = [self volumeNameAtPath:path];
+				NSString* relPath = [self relativePathToVolumeAtPath:path];
+				NSString* newPath;
+				
+				if (!exists)
+				{
+					newPath = [[NSString stringWithFormat:@"/Volumes/%@",volName] stringByAppendingPathComponent:relPath];
+					exists = [self fileExistsAtPath:newPath];
+				}
+				
+				for (NSInteger i=1; i<=10; i++)
+				{
+					if (!exists)
+					{
+						newPath = [[NSString stringWithFormat:@"/Volumes/%@ %i",volName,i] stringByAppendingPathComponent:relPath];
+						exists = [self fileExistsAtPath:newPath];
+						if (exists) break;
+					}
+				}
+				
+				if (exists && ![newPath isEqualToString:path])
+				{
+					*ioPath = newPath;
+					wasChanged = YES;
+				}
+			}
+		}
+	}
+	
+	if (outWasChanged) *outWasChanged = wasChanged;
+	return exists;
+}
+
 
 @end
