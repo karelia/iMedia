@@ -60,4 +60,8 @@
 - (NSString*)temporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
 - (NSString*)temporaryPathWithinDirectory:(NSString*)directoryPath;
 
+- (NSString*) volumeNameAtPath:(NSString*)inPath;
+- (NSString*) relativePathToVolumeAtPath:(NSString*)inPath;
+- (BOOL) fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
+
 @end

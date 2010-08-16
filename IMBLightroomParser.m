@@ -251,7 +251,12 @@ static NSArray* sSupportedUTIs = nil;
             
             if ([path hasSuffix:@"\","])
             {
-                [inLibraryPaths addObject:[path substringWithRange:NSMakeRange(1, [path length] - 3)]];
+				path = [path substringWithRange:NSMakeRange(1, [path length] - 3)];
+ 
+				BOOL exists,changed;
+				exists = [[NSFileManager defaultManager] fileExistsAtPath:&path wasChanged:&changed];
+				if (exists) [inLibraryPaths addObject:path];
+				
                 path = @"";
             }
         }
