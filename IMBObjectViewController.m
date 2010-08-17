@@ -760,9 +760,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //					if (appPath = [inObject.parser performSelector:@selector(appPath)])
 //					{
 //						title = NSLocalizedStringWithDefaultValue(
-//							@"IMBObjectViewController.menuItem.openInApp",
+//							@"IMBObjectViewController.menuItem.openWithApp",
 //							nil,IMBBundle(),
-//							@"Open in %@",
+//							@"Open With %@",
 //							@"Menu item in context menu of IMBObjectViewController");
 //						
 //						appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
@@ -781,9 +781,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				if (appPath = [IMBConfig editorAppForMediaType:self.mediaType])
 				{
 					title = NSLocalizedStringWithDefaultValue(
-						@"IMBObjectViewController.menuItem.openInApp",
+						@"IMBObjectViewController.menuItem.openWithApp",
 						nil,IMBBundle(),
-						@"Open in %@",
+						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
 					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
@@ -801,9 +801,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				if (appPath = [IMBConfig viewerAppForMediaType:self.mediaType])
 				{
 					title = NSLocalizedStringWithDefaultValue(
-						@"IMBObjectViewController.menuItem.openInApp",
+						@"IMBObjectViewController.menuItem.openWithApp",
 						nil,IMBBundle(),
-						@"Open in %@",
+						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
 					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
@@ -868,7 +868,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			title = NSLocalizedStringWithDefaultValue(
 				@"IMBObjectViewController.menuItem.openInBrowser",
 				nil,IMBBundle(),
-				@"Open in Browser",
+				@"Open With Browser",
 				@"Menu item in context menu of IMBObjectViewController");
 			
 			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInBrowser:) keyEquivalent:@""];
@@ -889,7 +889,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			title = NSLocalizedStringWithDefaultValue(
 				@"IMBObjectViewController.menuItem.quickLook",
 				nil,IMBBundle(),
-				@"Quicklook",
+				@"Quick Look",
 				@"Menu item in context menu of IMBObjectViewController");
 				
 			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];

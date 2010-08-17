@@ -1431,9 +1431,9 @@ static NSArray* sSupportedUTIs = nil;
 		
 		if (action == @selector(openInEditorApp:)) {
 			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
-																	  @"IMBObjectViewController.menuItem.openInApp.Lightroom",
+																	  @"IMBObjectViewController.menuItem.openWithApp.Lightroom",
 																	  nil,IMBBundle(),
-																	  @"Open Master Image in %@",
+																	  @"Open Master Image With %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
 			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig editorAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
@@ -1442,9 +1442,9 @@ static NSArray* sSupportedUTIs = nil;
 		}
 		else if (action == @selector(openInViewerApp:)) {
 			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
-																	  @"IMBObjectViewController.menuItem.openInApp.Lightroom",
+																	  @"IMBObjectViewController.menuItem.openWithApp.Lightroom",
 																	  nil,IMBBundle(),
-																	  @"Open Master Image in %@",
+																	  @"Open Master Image With %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
 			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig viewerAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
