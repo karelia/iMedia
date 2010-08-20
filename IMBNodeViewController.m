@@ -216,11 +216,7 @@ static NSString* kSelectionKey = @"selection";
 	NSTableColumn* column = [[ibNodeOutlineView tableColumns] objectAtIndex:0];
 	IMBNodeCell* cell = [[[IMBNodeCell alloc] init] autorelease];	
 	[column setDataCell:cell];	
-	
-	// Register the the outline view as a dragging destination...
-	
-	[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
-	
+		
 	// Build the initial contents of the node popup...
 	
 	[ibNodePopupButton removeAllItems];
@@ -262,6 +258,29 @@ static NSString* kSelectionKey = @"selection";
 	
 	[self _startObservingLibraryController];
 	[self _loadStateFromPreferences];
+	
+	// Register the the outline view as a dragging destination if we want to accept new folders
+	if ([[_libraryController delegate] respondsToSelector:@selector(allowsFolderDropForMediaType:)]) {
+		// This method returns a BOOL, and seeing as the delegate doesn't have a protocol and we don't
+		// have one to cast to, we can't use performSelector.., so will use an invocation.
+		BOOL allowsDrop;
+		NSString *mediaType = _libraryController.mediaType;
+		NSMethodSignature *methodSignature = [[_libraryController delegate] methodSignatureForSelector:@selector(allowsFolderDropForMediaType:)]; 
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+		[invocation setSelector:@selector(allowsFolderDropForMediaType:)];
+		[invocation setArgument:&mediaType atIndex:2]; // First actual arg
+		
+		[invocation invokeWithTarget:[_libraryController delegate]];
+		
+		[invocation getReturnValue:&allowsDrop];
+		
+		if (allowsDrop) {
+			[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+		}
+	} else {
+		[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+	}
+	
 }
 
 

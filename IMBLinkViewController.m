@@ -153,6 +153,16 @@
 
 
 
+// The Links panel doesn't have an icon view...
+
+- (void) setViewType:(NSUInteger)inViewType
+{
+	if (inViewType < 1) inViewType = 1;
+	if (inViewType > 2) inViewType = 2;
+	[super setViewType:inViewType];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
