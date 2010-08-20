@@ -239,6 +239,12 @@ static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 	[self registerDefaultPrefsValue:editorAppPaths forKey:sIMBEditorAppPathsKey];
 }
 
++ (void)load		// register default values automatically
+{
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	[self registerDefaultValues];
+	[pool release];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

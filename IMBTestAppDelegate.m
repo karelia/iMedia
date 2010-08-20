@@ -89,7 +89,6 @@
 		  MAC_OS_X_VERSION_MAX_ALLOWED);
 		  
 		  
-	[IMBConfig registerDefaultValues];
 	[IMBConfig setShowsGroupNodes:YES];
 	
 	#if CUSTOM_USER_INTERFACE
