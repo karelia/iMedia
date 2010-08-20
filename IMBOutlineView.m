@@ -242,24 +242,25 @@
 	
 	[super drawRect:inRect];
 	
-	// Then draw the prompt string at the bottom...
-	
-	const CGFloat MARGIN_BELOW = 15.0;
-	const CGFloat FADE_AREA = 35.0;
-	CGFloat viewHeight = self.bounds.size.height;
-	CGFloat dataHeight = self.rowHeight * self.numberOfRows;	
-	
-	if (dataHeight+MARGIN_BELOW <= viewHeight)
-	{
-		CGFloat fadeHeight = MIN(viewHeight-dataHeight,MARGIN_BELOW+FADE_AREA) - MARGIN_BELOW;
-		CGFloat alpha = (float)fadeHeight / FADE_AREA;
-
-		NSTextFieldCell* textCell = self.textCell;
-		[textCell setTextColor:[NSColor colorWithCalibratedWhite:0.66667 alpha:alpha]];
-		[textCell setStringValue:self.draggingPrompt];
+	// Then draw the prompt string at the bottom if required...
+	if ([[self registeredDraggedTypes] containsObject:NSFilenamesPboardType]) {
+		const CGFloat MARGIN_BELOW = 15.0;
+		const CGFloat FADE_AREA = 35.0;
+		CGFloat viewHeight = self.bounds.size.height;
+		CGFloat dataHeight = self.rowHeight * self.numberOfRows;	
 		
-		NSRect textRect = NSInsetRect([self visibleRect], 12.0, 12.0);
-		[textCell drawWithFrame:textRect inView:self];
+		if (dataHeight+MARGIN_BELOW <= viewHeight)
+		{
+			CGFloat fadeHeight = MIN(viewHeight-dataHeight,MARGIN_BELOW+FADE_AREA) - MARGIN_BELOW;
+			CGFloat alpha = (float)fadeHeight / FADE_AREA;
+			
+			NSTextFieldCell* textCell = self.textCell;
+			[textCell setTextColor:[NSColor colorWithCalibratedWhite:0.66667 alpha:alpha]];
+			[textCell setStringValue:self.draggingPrompt];
+			
+			NSRect textRect = NSInsetRect([self visibleRect], 12.0, 12.0);
+			[textCell drawWithFrame:textRect inView:self];
+		}
 	}
 }
 

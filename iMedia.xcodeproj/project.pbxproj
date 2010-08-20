@@ -613,6 +613,8 @@
 		D0FC9516108213A800973FEE /* IMBiTunesVideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiTunesVideoParser.h; sourceTree = "<group>"; };
 		D0FC9517108213A800973FEE /* IMBiTunesVideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiTunesVideoParser.m; sourceTree = "<group>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		F331802411E6D25D00BDABC2 /* IMBPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPanel.h; sourceTree = "<group>"; };
+		F331802511E6D25D00BDABC2 /* IMBPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPanel.m; sourceTree = "<group>"; };
 		FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLoadMoreObject.h; sourceTree = "<group>"; };
 		FCD9ABB310C677FF0092F441 /* IMBLoadMoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLoadMoreObject.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -956,6 +958,8 @@
 		D09930F31010FD6400C527B7 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F331802411E6D25D00BDABC2 /* IMBPanel.h */,
+				F331802511E6D25D00BDABC2 /* IMBPanel.m */,
 				D099392F101236AB00C527B7 /* IMBOutlineView.h */,
 				D0993930101236AB00C527B7 /* IMBOutlineView.m */,
 				D0BE0A8A104802A7009AE844 /* IMBTableView.h */,
