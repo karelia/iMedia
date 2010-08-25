@@ -410,6 +410,8 @@
 		D023460410CA5E2C00E14112 /* load-more-normal.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "load-more-normal.pdf"; sourceTree = "<group>"; };
 		D023460510CA5E2C00E14112 /* load-more-pressed.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "load-more-pressed.pdf"; sourceTree = "<group>"; };
 		D02CD4CC1224F78E00C773A2 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
+		D02CD5C71225138400C773A2 /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
+		D02CD5C81225138800C773A2 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBGarageBandParser.h; sourceTree = "<group>"; };
 		D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBGarageBandParser.m; sourceTree = "<group>"; };
 		D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = IMBComboViewTemplate.pdf; sourceTree = "<group>"; };
@@ -1584,6 +1586,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				D02CD4CC1224F78E00C773A2 /* English */,
+				D02CD5C71225138400C773A2 /* German */,
+				D02CD5C81225138800C773A2 /* French */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
