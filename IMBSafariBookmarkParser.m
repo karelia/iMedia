@@ -398,7 +398,7 @@
 				{
 					// Localize and get special icon
 					subnode.name = NSLocalizedStringWithDefaultValue(
-							  @"Safari.BookmarksMenu",
+							  @"IMBSafariBookmarkParser.bookmarksMenu",
 							  nil,IMBBundle(),
 							  @"Bookmarks Menu",
 							  @"top-level bookmark name");
@@ -411,7 +411,7 @@
 				{
 					// Localize and get special icon
 					subnode.name = NSLocalizedStringWithDefaultValue(
-							  @"Safari.BookmarksBar",
+							  @"IMBSafariBookmarkParser.bookmarksBar",
 							  nil,IMBBundle(),
 							  @"Bookmarks Bar",
 							  @"top-level bookmark name");

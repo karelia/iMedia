@@ -106,7 +106,7 @@ NSString* const IMBFlickrQueryEditor_QueryChanged = @"IMBFlickrQueryEditor_Query
 	[[_licensePopup itemAtIndex:[_licensePopup indexOfItemWithTag:3]] setImage:coImage];
 	
 	NSAssert (_queriesController != nil, @"Can't find '_queriesController'.");
-	NSAssert (_queryTitle != nil, @"Can't find '_queryTitle'.");
+//	NSAssert (_queryTitle != nil, @"Can't find '_queryTitle'.");
 	
 	[_queriesController addObserver:self forKeyPath:[@"selection." stringByAppendingString:IMBFlickrNodeProperty_License] options:0 context:IMBFlickrQueryEditor_QueryChanged];
 	[_queriesController addObserver:self forKeyPath:[@"selection." stringByAppendingString:IMBFlickrNodeProperty_Method] options:0 context:IMBFlickrQueryEditor_QueryChanged];
@@ -133,13 +133,21 @@ NSString* const IMBFlickrQueryEditor_QueryChanged = @"IMBFlickrQueryEditor_Query
 #pragma mark Actions
 
 - (IBAction) add: (id) sender {
+	NSString* defaultSearchString = NSLocalizedStringWithDefaultValue(
+		@"IMBFlickrParser.defaultSearchString",
+		nil,IMBBundle(),
+		@"Sunset",
+		@"Default search string for newly added Flickr query");
+			
 	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
-	[dict setObject:@"New Search" forKey:IMBFlickrNodeProperty_Title];
+	[dict setObject:defaultSearchString forKey:IMBFlickrNodeProperty_Title];
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeLicense_CreativeCommons] forKey:IMBFlickrNodeProperty_License];
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodeProperty_Method];
-	[dict setObject:@"Steve Jobs" forKey:IMBFlickrNodeProperty_Query];	
+	[dict setObject:defaultSearchString forKey:IMBFlickrNodeProperty_Query];	
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeSortOrder_InterestingnessDesc] forKey:IMBFlickrNodeProperty_SortOrder];
 	[_queriesController addObject:dict];
+	
+	[IMBFlickrNode sendSelectNodeNotificationForDict:dict];
 }
 
 

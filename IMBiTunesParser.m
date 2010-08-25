@@ -699,7 +699,7 @@
 					@"Size",
 					nil,IMBBundle(),
 					@"Size",
-					@"Size label in metadata description");
+					@"Size label in metadataDescription");
 			
 			description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
 		}

@@ -62,7 +62,7 @@
 - (id) init {
 	if (self = [super init]) {
 		self.name = NSLocalizedStringWithDefaultValue(
-			@"IMBLoadMoreObject.loadmore.title",
+			@"IMBFlickrParser.loadmore.title",
 			nil,IMBBundle(),
 			@"Load More",
 			@"Button title in Flickr parser");

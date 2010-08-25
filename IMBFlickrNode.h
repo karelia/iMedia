@@ -126,6 +126,8 @@ typedef enum {
 							 rootNode: (IMBFlickrNode*) root
 							   parser: (IMBParser*) parser;
 
++ (void) sendSelectNodeNotificationForDict:(NSDictionary*) dict;
+
 
 #pragma mark Flickr Handling
 

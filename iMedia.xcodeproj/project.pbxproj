@@ -6,6 +6,20 @@
 	objectVersion = 45;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		D02CD49E1224F22400C773A2 /* genstrings */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = D02CD4A91224F24200C773A2 /* Build configuration list for PBXAggregateTarget "genstrings" */;
+			buildPhases = (
+				D02CD49D1224F22400C773A2 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = genstrings;
+			productName = genstrings;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		274DF618114EF0B200AC8C03 /* IMBImageItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 274DF616114EF0B200AC8C03 /* IMBImageItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		274DF619114EF0B200AC8C03 /* IMBImageItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 274DF617114EF0B200AC8C03 /* IMBImageItem.m */; };
@@ -61,6 +75,7 @@
 		D01038E51071E111007C88D7 /* IMBObjectFifoCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D01038E31071E111007C88D7 /* IMBObjectFifoCache.m */; };
 		D023460610CA5E2C00E14112 /* load-more-normal.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D023460410CA5E2C00E14112 /* load-more-normal.pdf */; };
 		D023460710CA5E2C00E14112 /* load-more-pressed.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D023460510CA5E2C00E14112 /* load-more-pressed.pdf */; };
+		D02CD4CD1224F78E00C773A2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D02CD4CB1224F78E00C773A2 /* Localizable.strings */; };
 		D02D175A1081CF3B00142E8A /* IMBGarageBandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D02D175B1081CF3B00142E8A /* IMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */; };
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
@@ -394,6 +409,7 @@
 		D01038E31071E111007C88D7 /* IMBObjectFifoCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectFifoCache.m; sourceTree = "<group>"; };
 		D023460410CA5E2C00E14112 /* load-more-normal.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "load-more-normal.pdf"; sourceTree = "<group>"; };
 		D023460510CA5E2C00E14112 /* load-more-pressed.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "load-more-pressed.pdf"; sourceTree = "<group>"; };
+		D02CD4CC1224F78E00C773A2 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBGarageBandParser.h; sourceTree = "<group>"; };
 		D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBGarageBandParser.m; sourceTree = "<group>"; };
 		D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = IMBComboViewTemplate.pdf; sourceTree = "<group>"; };
@@ -690,6 +706,7 @@
 				D0B87F21103D998D00C48C6F /* iMedia.h */,
 				8DC2EF5A0486A6940098B216 /* Info.plist */,
 				089C1666FE841158C02AAC07 /* InfoPlist.strings */,
+				D02CD4CB1224F78E00C773A2 /* Localizable.strings */,
 				D09930F51010FDF700C527B7 /* Common */,
 				D09930F11010FD5000C527B7 /* Model */,
 				D09930F41010FD9900C527B7 /* Parsers */,
@@ -1300,6 +1317,7 @@
 			targets = (
 				8DC2EF4F0486A6940098B216 /* iMedia */,
 				D09933541011B26E00C527B7 /* iMedia2 Tester */,
+				D02CD49E1224F22400C773A2 /* genstrings */,
 			);
 		};
 /* End PBXProject section */
@@ -1405,6 +1423,7 @@
 				CEF653A1117E5C29003FF1A5 /* remix.pdf in Resources */,
 				CEF653A2117E5C29003FF1A5 /* sharealike.pdf in Resources */,
 				CEF65426117E64FD003FF1A5 /* any.pdf in Resources */,
+				D02CD4CD1224F78E00C773A2 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1418,6 +1437,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D02CD49D1224F22400C773A2 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here\n\nrm -fv ./English.lproj/Localizable.strings\n\ngenstrings *.c -u -a -o ./English.lproj/ \ngenstrings *.cp -u -a -o ./English.lproj/\ngenstrings *.m -u -a -o ./English.lproj/\ngenstrings *.mm -u -a -o ./English.lproj/\n\nexit 0";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8DC2EF540486A6940098B216 /* Sources */ = {
@@ -1545,6 +1580,14 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
+		D02CD4CB1224F78E00C773A2 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D02CD4CC1224F78E00C773A2 /* English */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -1610,6 +1653,34 @@
 				SDKROOT = macosx10.5;
 			};
 			name = Release;
+		};
+		D02CD49F1224F22400C773A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = genstrings;
+			};
+			name = Debug;
+		};
+		D02CD4A01224F22400C773A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = genstrings;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		D02CD4A11224F22400C773A2 /* Test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = genstrings;
+			};
+			name = Test;
 		};
 		D09930B21010F68B00C527B7 /* Test */ = {
 			isa = XCBuildConfiguration;
@@ -1703,6 +1774,16 @@
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
 				D09930B21010F68B00C527B7 /* Test */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D02CD4A91224F24200C773A2 /* Build configuration list for PBXAggregateTarget "genstrings" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D02CD49F1224F22400C773A2 /* Debug */,
+				D02CD4A01224F22400C773A2 /* Release */,
+				D02CD4A11224F22400C773A2 /* Test */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

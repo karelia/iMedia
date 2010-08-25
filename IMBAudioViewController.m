@@ -130,7 +130,7 @@
 - (NSString*) displayName
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"AudioDisplayName",
+		@"IMBAudioViewController.displayName",
 		nil,IMBBundle(),
 		@"Audio",
 		@"mediaType display name");
@@ -143,7 +143,7 @@
 + (NSString*) objectCountFormatSingular
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"AudioCountFormatSingular",
+		@"IMBAudioViewController.countFormatSingular",
 		nil,IMBBundle(),
 		@"%d song",
 		@"Format string for object count in singluar");
@@ -152,7 +152,7 @@
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"AudioCountFormatPlural",
+		@"IMBAudioViewController.countFormatPlural",
 		nil,IMBBundle(),
 		@"%d songs",
 		@"Format string for object count in plural");
