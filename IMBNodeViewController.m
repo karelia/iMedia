@@ -71,6 +71,10 @@
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kSelectionKey = @"selection";
 
+static NSString* kIMBRevealNodeWithIdentifierNotification = @"IMBRevealNodeWithIdentifierNotification";
+static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithIdentifierNotification";
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -205,6 +209,18 @@ static NSString* kSelectionKey = @"selection";
 		name:NSApplicationWillTerminateNotification 
 		object:nil];
 	
+	[[NSNotificationCenter defaultCenter] 
+		addObserver:self 
+		selector:@selector(_revealNodeWithIdentifier:) 
+		name:kIMBRevealNodeWithIdentifierNotification 
+		object:nil];
+
+	[[NSNotificationCenter defaultCenter] 
+		addObserver:self 
+		selector:@selector(_selectNodeWithIdentifier:) 
+		name:kIMBSelectNodeWithIdentifierNotification 
+		object:nil];
+
 	// Observe changes to the libary node tree...
 	
 	[ibNodeTreeController retain];
@@ -1295,6 +1311,101 @@ static NSString* kSelectionKey = @"selection";
 - (void) saveState
 {
 	[self _saveStateToPreferences];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+		
+// Send a notification so that all IMBNodeViewController will reveal the node with the given identifier...
+
++ (void) revealNodeWithIdentifier:(NSString*)inIdentifier
+{
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName:kIMBRevealNodeWithIdentifierNotification 
+		object:inIdentifier];
+}
+
+
+- (NSInteger) _revealNode:(IMBNode*)inNode
+{
+	// Recursively expand and reveal the parent node, so that we can be sure that inNode is visible and can be 
+	// revealed too...
+	
+	IMBNode* parentNode = [inNode parentNode];
+	
+	if (parentNode)
+	{
+		[self _revealNode:parentNode];
+	}
+	
+	// Now find the row of our node. Expand it and return it row number...
+	
+	NSInteger n = [ibNodeOutlineView numberOfRows];
+		
+	for (NSInteger i=0; i<n; i++)
+	{
+		IMBNode* node = [self _nodeAtRow:i];
+		
+		if (node == inNode)
+		{
+			[ibNodeOutlineView expandItem:[ibNodeOutlineView itemAtRow:i]];
+			return i;
+		}
+	}
+	
+	return NSNotFound;
+}
+
+
+- (void) _revealNodeWithIdentifier:(NSNotification*)inNotification
+{
+	NSString* identifier = (NSString*) [inNotification object];
+	
+	if (identifier)
+	{
+		IMBNode* node = [_libraryController nodeWithIdentifier:identifier];
+		NSInteger i = [self _revealNode:node];
+		if (i != NSNotFound) [ibNodeOutlineView scrollRowToVisible:i];
+		[self _setExpandedNodeIdentifiers];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Send a notification so that all IMBNodeViewController will select the node with the given identifier...
+
++ (void) selectNodeWithIdentifier:(NSString*)inIdentifier
+{
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName:kIMBSelectNodeWithIdentifierNotification 
+		object:inIdentifier];
+}
+
+
+// If the given node already exists, then select it immediately. If not, then we assume it will exist shortly
+// (i.e. that it is currently being generated asynchronously). So we need to store its identifier so that it
+// will selected once available...
+
+- (void) _selectNodeWithIdentifier:(NSNotification*)inNotification
+{
+	NSString* identifier = (NSString*) [inNotification object];
+	
+	if (identifier)
+	{
+		[self expandSelectedNode];
+		
+		IMBNode* node = [_libraryController nodeWithIdentifier:identifier];
+		
+		if (node)
+		{
+			[self selectNode:node];
+		}
+		
+		self.selectedNodeIdentifier = identifier;
+	}
 }
 
 

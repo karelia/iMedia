@@ -56,6 +56,8 @@
 #import "IMBLibraryController.h"
 #import "IMBLoadMoreObject.h"
 #import "NSString+iMedia.h"
+#import "IMBNodeViewController.h"
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -161,7 +163,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	node.identifier = [self identifierWithMethod:IMBFlickrNodeMethod_MostInteresting query:@"30"];
 	node.mediaSource = node.identifier;
 	node.method = IMBFlickrNodeMethod_MostInteresting;
-	node.name = NSLocalizedString (@"Most Interesting", @"Flickr parser standard node name.");	
+	node.name = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.node.mostinteresting",nil,IMBBundle(),@"Most Interesting",@"Flickr parser standard node name.");	
 	node.sortOrder = IMBFlickrNodeSortOrder_DatePostedDesc;
 	return node;
 }
@@ -175,7 +177,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	node.identifier = [self identifierWithMethod:IMBFlickrNodeMethod_Recent query:@"30"];
 	node.mediaSource = node.identifier;
 	node.method = IMBFlickrNodeMethod_Recent;	
-	node.name = NSLocalizedString (@"Recent", @"Flickr parser standard node name.");
+	node.name = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.node.recent",nil,IMBBundle(),@"Recent",@"Flickr parser standard node name.");
 	node.sortOrder = IMBFlickrNodeSortOrder_DatePostedDesc;
 	return node;
 }
@@ -213,7 +215,7 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	//	extract node data from preferences dictionary...
 	NSInteger method = [[dict objectForKey:IMBFlickrNodeProperty_Method] intValue];
 	NSString* query = [dict objectForKey:IMBFlickrNodeProperty_Query];
-	NSString* title = [dict objectForKey:IMBFlickrNodeProperty_Title];
+	NSString* title = query; //[dict objectForKey:IMBFlickrNodeProperty_Title];
 	
 	if (!query || !title) {
 		NSLog (@"Invalid Flickr parser user node dictionary.");
@@ -231,8 +233,20 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	node.name = title;
 	node.query = query;
 	node.sortOrder = [[dict objectForKey:IMBFlickrNodeProperty_SortOrder] intValue];
-	
+
 	return node;
+}
+
+
++ (void) sendSelectNodeNotificationForDict:(NSDictionary*) dict {
+	
+	if (dict) {
+		NSInteger method = [[dict objectForKey:IMBFlickrNodeProperty_Method] intValue];
+		NSString* query = [dict objectForKey:IMBFlickrNodeProperty_Query];
+		NSString* identifier = [IMBFlickrNode identifierWithMethod:method query:query];
+		
+		[IMBNodeViewController revealNodeWithIdentifier:identifier];
+	}
 }
 
 

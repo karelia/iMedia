@@ -150,6 +150,11 @@
 - (void) restoreState;	
 - (void) saveState;	
 
+// These methods work via notification and affect all instances of IMBNodeViewController...
+
++ (void) revealNodeWithIdentifier:(NSString*)inIdentifier;
++ (void) selectNodeWithIdentifier:(NSString*)inIdentifier;
+
 @end
 
 

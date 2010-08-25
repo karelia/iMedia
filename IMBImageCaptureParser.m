@@ -420,7 +420,7 @@
 	
 	NSString* path = [self.mediaSource stringByStandardizingPath];
 	NSString* name = NSLocalizedStringWithDefaultValue(
-													   @"Devices",
+													   @"IMBImageCaptureParser.Devices",
 													   nil,IMBBundle(),
 													   @"Devices",
 													   @"Caption for Image Capture Root node");
@@ -488,7 +488,7 @@
 	subnode.mediaSource = [anDevice valueForKey:@"icao"];
 	
 	subnode.identifier = [NSString stringWithFormat:@"%@:/%@",parserClassName,subnode.mediaSource];
-	NSString *name = NSLocalizedString( @"Loading...", @"Caption for loading camera" );
+	NSString *name = NSLocalizedStringWithDefaultValue(@"IMBImageCaptureParser.loading",nil,IMBBundle(),@"Loading…",@"Caption for loading camera");
 	subnode.name = name;
 	//	subnode.icon = [self _getThumbnailSync:subnode.mediaSource]; 
 	subnode.parser = self;

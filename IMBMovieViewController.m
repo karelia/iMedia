@@ -114,7 +114,7 @@
 - (NSString*) displayName
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"MoviesDisplayName",
+		@"IMBMovieViewController.displayName",
 		nil,IMBBundle(),
 		@"Movies",
 		@"mediaType display name");
@@ -127,7 +127,7 @@
 + (NSString*) objectCountFormatSingular
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"MovieCountFormatSingular",
+		@"IMBMovieViewController.countFormatSingular",
 		nil,IMBBundle(),
 		@"%d movie",
 		@"Format string for object count in singluar");
@@ -137,7 +137,7 @@
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"MovieCountFormatPlural",
+		@"IMBMovieViewController.countFormatPlural",
 		nil,IMBBundle(),
 		@"%d movies",
 		@"Format string for object count in plural");

@@ -111,7 +111,7 @@
 - (NSString*) displayName
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"ImagesDisplayName",
+		@"IMBImageViewController.displayName",
 		nil,IMBBundle(),
 		@"Images",
 		@"mediaType display name");
@@ -124,7 +124,7 @@
 + (NSString*) objectCountFormatSingular
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"ImageCountFormatSingular",
+		@"IMBImageViewController.countFormatSingular",
 		nil,IMBBundle(),
 		@"%d image",
 		@"Format string for object count in singluar");
@@ -134,7 +134,7 @@
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"ImageCountFormatPlural",
+		@"IMBImageViewController.countFormatPlural",
 		nil,IMBBundle(),
 		@"%d images",
 		@"Format string for object count in plural");

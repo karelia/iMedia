@@ -93,7 +93,7 @@
 	{
 		library = [[IMBNode alloc] init];
 		[library setName:NSLocalizedStringWithDefaultValue(
-														   @"OmniWeb",
+														   @"IMBOmniWebParser.name",
 														   nil,IMBBundle(),
 														   @"OmniWeb",
 														   @"OmniWeb application name")];
