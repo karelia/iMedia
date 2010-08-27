@@ -44,52 +44,52 @@
 */
 
 
-// Author: Christoph Priebe
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-//	System
-#import <Cocoa/Cocoa.h>
-
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 @class IMBFlickrParser;
+@class IMBFlickrNode;
 
-/**
- *	Flickr query editor view. You can add, remove and edit Flickr queries using
- *	this editor.
- *
- *	@date 2009-09-21 Start implementing this class (cp).
- *
- *	@author  Christoph Priebe (cp)
- *	@since   iMedia 2.0
- */
-@interface IMBFlickrQueryEditor: NSViewController {
-	@private
-	IBOutlet NSArrayController* _queriesController;
-//	IBOutlet NSTextField* _queryTitle;
-	IBOutlet NSPopUpButton *_licensePopup;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@interface IMBFlickrHeaderViewController : NSViewController
+{
 	IMBFlickrParser* _parser;
+	IMBFlickrNode* _owningNode;
+	NSMutableDictionary* _queryParams;
+	SEL _queryAction;
+	SEL _buttonAction;
+	NSString* _buttonTitle;
+	
+	IBOutlet NSTextField* _queryField;
+	IBOutlet NSPopUpButton* _optionsPopup;
+	IBOutlet NSButton* _button;
 }
 
-#pragma mark Construction
-
-+ (IMBFlickrQueryEditor*) flickrQueryEditorForParser: (IMBFlickrParser*) parser;
-
-
-#pragma mark Actions
-
-- (IBAction) add: (id) sender;
-
-- (IBAction) apply: (id) inSender;
-
-
-#pragma mark Properties
++ (IMBFlickrHeaderViewController*) headerViewControllerWithParser:(IMBFlickrParser*)inParser owningNode:(IMBFlickrNode*)inNode;
 
 @property (assign) IMBFlickrParser* parser;
+@property (assign) IMBFlickrNode* owningNode;
+@property (retain) NSMutableDictionary* queryParams;
+@property (assign) SEL queryAction;
+@property (assign) SEL buttonAction;
+@property (retain) NSString* buttonTitle;
+
+- (IBAction) addQuery:(id)inSender;
+- (IBAction) editQuery:(id)inSender;
+- (IBAction) removeQuery:(id)inSender;
+
+- (IBAction) setSearchType:(id)inSender;
+- (IBAction) setLicense:(id)inSender;
+- (IBAction) setSortOrder:(id)inSender;
+- (IBAction) disabledAction:(id)inSender;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------

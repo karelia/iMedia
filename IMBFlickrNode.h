@@ -65,7 +65,9 @@ extern NSString* const IMBFlickrNodeProperty_License;
 extern NSString* const IMBFlickrNodeProperty_Method;
 extern NSString* const IMBFlickrNodeProperty_Query;
 extern NSString* const IMBFlickrNodeProperty_SortOrder;
-extern NSString* const IMBFlickrNodeProperty_Title;
+extern NSString* const IMBFlickrNodeProperty_UUID;
+
+//extern NSString* const IMBFlickrNodeProperty_Title;
 
 typedef enum {
 	IMBFlickrNodeMethod_TextSearch = 0,

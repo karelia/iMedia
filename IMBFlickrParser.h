@@ -63,7 +63,7 @@
 
 @class IMBFlickrQueryEditor;
 @class IMBLoadMoreObject;
-
+@class OFFlickrAPIContext;
 /**
  *	iMedia parser to read public Flickr images.
  *	
@@ -80,6 +80,7 @@
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
+ 
 @interface IMBFlickrParser: IMBParser {
 	@private
 	NSMutableArray* _customQueries;
@@ -118,11 +119,12 @@
 
 #pragma mark Query Persistence
 
+- (void) addCustomQuery:(NSDictionary*)inQueryParams;
+- (void) removeCustomQuery:(NSDictionary*)inQueryParams;
+
 - (void) loadCustomQueries;
-
-- (void) reloadCustomQueries;
-
 - (void) saveCustomQueries;
+- (void) reloadCustomQueries;
 
 @end
 
