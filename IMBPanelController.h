@@ -68,11 +68,21 @@
 
 #pragma mark 
 
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-@interface IMBPanelController : NSWindowController <NSTabViewDelegate>
-#else
-@interface IMBPanelController : NSWindowController
+// We have to declare a fake prototypes because the 10.6 runtime interrogates our compliance with the protocol,
+// rather that interrogating the presence of the particular method we implement...
+
+#if ! IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+@protocol NSTabViewDelegate <NSObject> 
+@end
 #endif
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBPanelController : NSWindowController <NSTabViewDelegate>
 {
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView

@@ -56,7 +56,8 @@
 #import "IMBConfig.h"
 #import "IMBFlickrNode.h"
 #import "IMBFlickrParser.h"
-#import "IMBFlickrQueryEditor.h"
+//#import "IMBFlickrQueryEditor.h"
+#import "IMBFlickrHeaderViewController.h"
 #import "IMBIconCache.h"
 #import "IMBLibraryController.h"
 #import "IMBLoadMoreObject.h"
@@ -194,8 +195,16 @@
 	rootNode.watchedPath = (NSString*) rootNode.mediaSource;
 	
 	// The root node has a custom view that we are loading from a nib file...
-	self.editor = [IMBFlickrQueryEditor flickrQueryEditorForParser:self];
-	rootNode.customObjectView = self.editor.view;
+//	self.editor = [IMBFlickrQueryEditor flickrQueryEditorForParser:self];
+//	rootNode.customObjectView = self.editor.view;
+
+	IMBFlickrHeaderViewController* viewController = [IMBFlickrHeaderViewController headerViewControllerWithParser:self owningNode:rootNode];
+	viewController.queryAction = @selector(addQuery:);
+	viewController.buttonAction = @selector(addQuery:);
+	viewController.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.add",nil,IMBBundle(),@"Add",@"Button title in Flickr Options");
+
+	rootNode.customHeaderViewController = viewController;
+	rootNode.shouldDisplayObjectView = NO;
 	
 	return rootNode;
 }
@@ -271,7 +280,7 @@
 	IMBFlickrNode* flickrNode = (IMBFlickrNode*) inNode;
 	
 	//	'Load More'...
-	NSString* title = NSLocalizedString (@"Load More", @"Flickr parser node context menu title.");
+	NSString* title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.loadmore",nil,IMBBundle(),@"Load More",@"Flickr parser node context menu title.");
 	title = [NSString stringWithFormat:title, flickrNode.name];
 	NSMenuItem* loadMoreItem = [[NSMenuItem alloc] initWithTitle:title
 														  action:@selector(loadMoreImages:) 
@@ -288,7 +297,7 @@
 	[inMenu addItem:[NSMenuItem separatorItem]];
 
 	//	'Edit'...
-	title = NSLocalizedString (@"Edit '%@'", @"Flickr parser node context menu title.");
+	title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.edit",nil,IMBBundle(),@"Edit",@"Flickr parser node context menu title.");
 	title = [NSString stringWithFormat:title, flickrNode.name];
 	NSMenuItem* editNodeItem = [[NSMenuItem alloc] initWithTitle:title
 														action:@selector(editNode:) 
@@ -299,7 +308,7 @@
 	[editNodeItem release];
 	
 	//	'Remove'...
-	title = NSLocalizedString (@"Remove '%@'", @"Flickr parser node context menu title.");
+	title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.remove",nil,IMBBundle(),@"Remove '%@'",@"Flickr parser node context menu title.");
 	title = [NSString stringWithFormat:title, flickrNode.name];
 	NSMenuItem* removeNode = [[NSMenuItem alloc] initWithTitle:title
 														action:@selector(removeNode:) 
@@ -316,7 +325,8 @@
 	
 	if ([inObject isSelectable])
 	{
-		NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString (@"Open Flickr Page", @"Flickr parser context menu title.") 
+		NSString* title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.openflickrpage",nil,IMBBundle(),@"Open Flickr Page",@"Flickr parser node context menu title.");
+		NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:title 
 																 action:@selector(openFlickrPage:) 
 														  keyEquivalent:@""];
 		[showWebPageItem setTarget:self];
@@ -400,13 +410,27 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 #if 0		
 	//	fallback to defaults, if no user nodes available...
 	if (customNodes.count == 0) {
-		NSLog (@"No usefull user bodes available. Fallback to defaults.");
+		NSLog (@"No useful user nodes available. Fallback to defaults.");
 		nodes = nil;
 		goto setupDefaults;
 	}
 #endif
 	
 	return customNodes;	
+}
+
+
+- (void) addCustomQuery:(NSDictionary*)inQueryParams {
+	if (inQueryParams){
+		[self.customQueries addObject:inQueryParams];
+	}
+}
+
+
+- (void) removeCustomQuery:(NSDictionary*)inQueryParams {
+	if (inQueryParams){
+		[self.customQueries removeObject:inQueryParams];
+	}
 }
 
 
@@ -419,6 +443,11 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	//	setup default user nodes...
 	if (!nodes && _delegate && [_delegate respondsToSelector:@selector(flickrParserSetupDefaultQueries:)]) {
 		nodes = [_delegate flickrParserSetupDefaultQueries:self];
+		
+	if (nodes == nil){
+		nodes = [NSArray array];
+	}
+		
 #if 0
 		[prefs setObject:nodes forKey:IMBFlickrParserPrefKey_CustomQueries];
 		[IMBConfig setPrefs:prefs forClass:[self class]];
@@ -441,5 +470,6 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	[prefs setObject:self.customQueries forKey:IMBFlickrParserPrefKey_CustomQueries];
 	[IMBConfig setPrefs:prefs forClass:[self class]];
 }
+
 
 @end

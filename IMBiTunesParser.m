@@ -55,7 +55,7 @@
 #import "IMBiTunesParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-#import "IMBObject.h"
+#import "IMBEnhancedObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
@@ -565,6 +565,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (Class) objectClass
+{
+	return [IMBEnhancedObject class];
+}
+
+
 - (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
 	// Select the correct imageRepresentationType for our mediaType...
@@ -577,6 +583,7 @@
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
+	Class objectClass = [self objectClass];
 	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
 	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
 
@@ -612,7 +619,7 @@
 					
 					// Create an object...
 					
-					IMBObject* object = [[IMBObject alloc] init];
+					IMBEnhancedObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 
@@ -645,6 +652,9 @@
 					NSString* album = [trackDict objectForKey:@"Album"];
 					if (album) [metadata setObject:album forKey:@"album"]; 
 					
+					NSString* genre = [trackDict objectForKey:@"Genre"];
+					if (genre) [metadata setObject:genre forKey:@"genre"]; 
+
 					object.metadataDescription = [self metadataDescriptionForMetadata:metadata];
 				}
 				
@@ -689,7 +699,7 @@
 					@"Size",
 					nil,IMBBundle(),
 					@"Size",
-					@"Size label in metadata description");
+					@"Size label in metadataDescription");
 			
 			description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
 		}

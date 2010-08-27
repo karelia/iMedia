@@ -41,6 +41,11 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
+ 
+ This file was authored by Dan Wood and Terrence Talbot. 
+ 
+ NOTE: THESE METHODS ARE SIMILAR OR IDENTICAL TO METHODS IN SANDVOX.
+ PLEASE BE SURE TO "SYNC" THEM UP IF ANY FIXES ARE MADE HERE.
  */
 
 
@@ -52,104 +57,36 @@
 
 #pragma mark HEADERS
 
-#import "IMBMovieObject.h"
-#import <QTKit/QTKit.h>
+#import "NSDictionary+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark
 
-@implementation IMBMovieObject
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Helper method to extract thumbnail frame from a movie...
-
-- (CGImageRef) _posterFrameWithMovie:(QTMovie*)inMovie
-{
-	NSError* error = nil;
-	QTTime duration = inMovie.duration;
-	double tv = duration.timeValue;
-	double ts = duration.timeScale;
-	QTTime time = QTMakeTimeWithTimeInterval(0.5 * tv/ts);
-	NSSize size = NSMakeSize(256.0,256.0);
-	
-	NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-		QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,
-		[NSValue valueWithSize:size],QTMovieFrameImageSize,
-		nil];
-	
-	return (CGImageRef) [inMovie frameImageAtTime:time withAttributes:attributes error:&error];
-}
+@implementation NSDictionary (iMedia)
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) setPosterFrame:(CGImageRef)inPosterFrame
+// This method is useful for sorting images by image size, provided that the metadata dictionary contains  
+// width and height values...
+
+- (NSComparisonResult) metadataSizeCompare:(NSDictionary*)inDictionary
 {
-	CGImageRef old = _posterFrame;
-	_posterFrame = CGImageRetain(inPosterFrame);
-	CGImageRelease(old);
-}
+	NSInteger w1 = [[self objectForKey:@"width"] integerValue];
+	NSInteger h1 = [[self objectForKey:@"height"] integerValue];
+	NSInteger s1 = w1 * h1;
 
-
-// The getter loads the image lazily (if it's not available). Please note that the unload method gets rid of it 
-// again as the IMBObjectFifoCache clears out the oldest items...
-
-- (CGImageRef) posterFrame
-{
-	NSError* error = nil;
-	QTMovie* movie = nil;
+	NSInteger w2 = [[inDictionary objectForKey:@"width"] integerValue];
+	NSInteger h2 = [[inDictionary objectForKey:@"height"] integerValue];
+	NSInteger s2 = w2 * h2;
 	
-	if (_posterFrame == NULL && _imageRepresentation != nil)
-	{
-		if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
-		{
-			movie = (QTMovie*)_imageRepresentation;
-			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
-		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType] ||
-				 [_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
-		{
-			NSString* path = (NSString*)_imageRepresentation;
-			movie = [QTMovie movieWithFile:path error:&error];
-			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
-		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
-		{
-			NSURL* url = (NSURL*)_imageRepresentation;
-			movie = [QTMovie movieWithURL:url error:&error];
-			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
-		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
-		{
-			self.posterFrame = (CGImageRef)_imageRepresentation;
-		}
-	}
-	
-	return _posterFrame;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) unload
-{
-	[super unload];
-	self.posterFrame = NULL;
-}
-
-
-- (void) dealloc
-{
-	if (_posterFrame) CGImageRelease(_posterFrame);
-	[super dealloc];
+	if (s1 == s2) return NSOrderedSame;
+	else if (s1 < s2) return NSOrderedAscending;
+	else return NSOrderedDescending;
 }
 
 
@@ -157,3 +94,4 @@
 
 
 @end
+

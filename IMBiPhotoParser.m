@@ -344,8 +344,10 @@
 // To speed up thumbnail loading we will not use the generic method of the superclass. Instead we provide an
 // implementation here, that uses specific knowledge about iPhoto to load thumbnails as quickly as possible...
 
-- (void) loadThumbnailForObject:(IMBObject*)inObject
+- (id) loadThumbnailForObject:(IMBObject*)inObject
 {
+	id imageRepresentation = nil;
+
 	// Get path of our object...
 	
 	NSString* type = inObject.imageRepresentationType;
@@ -369,6 +371,7 @@
 				
 				if (image)
 				{
+					imageRepresentation = (id) image;
 					[inObject 
 						performSelectorOnMainThread:@selector(setImageRepresentation:) 
 						withObject:(id)image
@@ -388,8 +391,10 @@
 	
 	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		[super loadThumbnailForObject:inObject];
+		imageRepresentation = [super loadThumbnailForObject:inObject];
 	}
+	
+	return imageRepresentation;
 }
 
 

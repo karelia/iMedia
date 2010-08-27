@@ -201,7 +201,7 @@
     NSRect rect = NSInsetRect(inBounds,IMAGE_INSET,IMAGE_INSET);
     rect.origin.x = NSMaxX(imageRect) + INSET_FROM_IMAGE_TO_TEXT;
     rect.origin.y -= 2.0;
-    rect.size.width = NSMaxX(inBounds) - INSET_FROM_IMAGE_TO_TEXT;
+    rect.size.width = NSMaxX(inBounds) - INSET_FROM_IMAGE_TO_TEXT - NSWidth(imageRect) - IMAGE_INSET;
     rect.size.height = TITLE_HEIGHT;
     return rect;
 }
@@ -328,6 +328,14 @@
         
         // Draw the thumbnail image (CGImage)...
         
+        else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+        {
+			CGImageRef image = (CGImageRef) _imageRepresentation;
+            [self _drawImage:image withFrame:imageRect];
+         }
+		
+        // Draw the thumbnail image (other representations)...
+        
         else
         {
             CGImageRef image = IMB_CGImageCreateWithImageItem(self);
@@ -335,8 +343,7 @@
             CFRelease(image);
         }
     }
-    
-	
+    	
 	// Draw the title and subtitle...
 	
 	if (_title)

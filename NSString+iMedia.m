@@ -232,32 +232,59 @@
 	return (NSString *)[NSMakeCollectable(uuidStr) autorelease];
 }
 
+//- (NSString *)exifDateToLocalizedDisplayDate
+//{
+//	static NSDateFormatter *parser = nil;
+//	static NSDateFormatter *formatter = nil;
+//	static NSString* sMutex = @"com.karelia.NSString+iMedia";
+//	
+//	@synchronized(sMutex)
+//	{
+//		if (parser == nil)
+//		{
+//			parser = [[NSDateFormatter alloc] init];
+//			[parser setDateFormat:@"yyyy':'MM':'dd kk':'mm':'ss"];
+//		}
+//		
+//		if (formatter == nil)
+//		{
+//			formatter = [[NSDateFormatter alloc] init];
+//			[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+//			[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
+//			[formatter setTimeStyle:NSDateFormatterShortStyle];	// no seconds
+//		}
+//	}
+//	
+//	NSDate *date = [parser dateFromString:self];
+//	NSString *result = [formatter stringFromDate:date];
+//	
+//	return result;
+//}
+
+// PB 23/07/2010: Commented out the above version of this method and replaced it with the un-optimized version
+// below, to avoid multiple crashes in the Release and Test builds. Both use an NSOperationQueue with multiple
+// cores, which caused the above method to fail badly, despite the fact that I tried to safeguard it with the 
+// @synchronized directive...
+
 - (NSString *)exifDateToLocalizedDisplayDate
 {
-	static NSDateFormatter *parser = nil;
+	NSDateFormatter *parser = [[NSDateFormatter alloc] init];
+	[parser setDateFormat:@"yyyy':'MM':'dd kk':'mm':'ss"];
 	
-	if (parser == nil) {
-		parser = [[NSDateFormatter alloc] init];
-		
-		[parser setDateFormat:@"yyyy':'MM':'dd kk':'mm':'ss"];
-	}
+	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+	[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+	[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
+	[formatter setTimeStyle:NSDateFormatterShortStyle];	// no seconds
 
 	NSDate *date = [parser dateFromString:self];
-	
-	static NSDateFormatter *formatter = nil;
-	
-	if (formatter == nil) {
-		formatter = [[NSDateFormatter alloc] init];
-		
-		[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-		[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
-		[formatter setTimeStyle:NSDateFormatterShortStyle];	// no seconds
-	}
-	
 	NSString *result = [formatter stringFromDate:date];
+
+	[formatter release];
+	[parser release];
 	
 	return result;
 }
+
 
 + (NSString *)stringFromStarRating:(NSUInteger)aRating;
 {

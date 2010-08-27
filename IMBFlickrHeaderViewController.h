@@ -50,73 +50,46 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
-
-#import "NSView+iMedia.h"
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-@implementation NSView (iMedia)
+@class IMBFlickrParser;
+@class IMBFlickrNode;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This method removes all subviews from a view...
-
-- (void) removeAllSubviews
+@interface IMBFlickrHeaderViewController : NSViewController
 {
-	NSArray* subviews = [self.subviews copy];
+	IMBFlickrParser* _parser;
+	IMBFlickrNode* _owningNode;
+	NSMutableDictionary* _queryParams;
+	SEL _queryAction;
+	SEL _buttonAction;
+	NSString* _buttonTitle;
 	
-	for (NSView* view in subviews)
-	{
-		[view removeFromSuperview];
-	}
-	
-	[subviews release];
+	IBOutlet NSTextField* _queryField;
+	IBOutlet NSPopUpButton* _optionsPopup;
+	IBOutlet NSButton* _button;
 }
 
++ (IMBFlickrHeaderViewController*) headerViewControllerWithParser:(IMBFlickrParser*)inParser owningNode:(IMBFlickrNode*)inNode;
 
-//----------------------------------------------------------------------------------------------------------------------
+@property (assign) IMBFlickrParser* parser;
+@property (assign) IMBFlickrNode* owningNode;
+@property (retain) NSMutableDictionary* queryParams;
+@property (assign) SEL queryAction;
+@property (assign) SEL buttonAction;
+@property (retain) NSString* buttonTitle;
 
+- (IBAction) addQuery:(id)inSender;
+- (IBAction) editQuery:(id)inSender;
+- (IBAction) removeQuery:(id)inSender;
 
-// The following method can be used to unbind all values in a view hierarchy. This may be helpful when tearing
-// down windows, and views are bounds to controller objects. Since deallocation order is not guarranteed, it
-// is often the best strategy to remove all bindings before closing a window or document...
-
-- (void) unbindViewHierarchy
-{
-	[NSView unbindViewHierarchy:self];
-}
-
-
-+ (void) unbindViewHierarchy:(NSView*)inRootView
-{
-	// First completely unbind this view...
-	
-	NSArray* bindings = [inRootView exposedBindings];
-	
-	for (NSString* key in bindings)
-	{
-		// NSLog(@"%s - %@ - %@",__FUNCTION__,NSStringFromClass([inRootView class]),key);
-		[inRootView unbind:key];
-	}
-	
-	// Then do the same for all subviews (recursively)...
-	
-	NSArray* subviews = inRootView.subviews;
-	
-	for (NSView* subview in subviews)
-	{
-		[NSView unbindViewHierarchy:subview];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+- (IBAction) setSearchType:(id)inSender;
+- (IBAction) setLicense:(id)inSender;
+- (IBAction) setSortOrder:(id)inSender;
+- (IBAction) disabledAction:(id)inSender;
 
 @end
 
+
+//----------------------------------------------------------------------------------------------------------------------

@@ -61,6 +61,7 @@
 #import "IMBNode.h"
 #import "IMBNodeCell.h"
 #import "IMBFlickrNode.h"
+#import "NSView+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,6 +71,10 @@
 
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kSelectionKey = @"selection";
+
+static NSString* kIMBRevealNodeWithIdentifierNotification = @"IMBRevealNodeWithIdentifierNotification";
+static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithIdentifierNotification";
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -119,7 +124,9 @@ static NSString* kSelectionKey = @"selection";
 
 @synthesize nodeOutlineView = ibNodeOutlineView;
 @synthesize nodePopupButton = ibNodePopupButton;
+@synthesize objectHeaderView = ibObjectHeaderView;
 @synthesize objectContainerView = ibObjectContainerView;
+@synthesize objectFooterView = ibObjectFooterView;
 @synthesize standardObjectView = _standardObjectView;
 @synthesize customObjectView = _customObjectView;
 
@@ -205,6 +212,18 @@ static NSString* kSelectionKey = @"selection";
 		name:NSApplicationWillTerminateNotification 
 		object:nil];
 	
+	[[NSNotificationCenter defaultCenter] 
+		addObserver:self 
+		selector:@selector(_revealNodeWithIdentifier:) 
+		name:kIMBRevealNodeWithIdentifierNotification 
+		object:nil];
+
+	[[NSNotificationCenter defaultCenter] 
+		addObserver:self 
+		selector:@selector(_selectNodeWithIdentifier:) 
+		name:kIMBSelectNodeWithIdentifierNotification 
+		object:nil];
+
 	// Observe changes to the libary node tree...
 	
 	[ibNodeTreeController retain];
@@ -216,11 +235,7 @@ static NSString* kSelectionKey = @"selection";
 	NSTableColumn* column = [[ibNodeOutlineView tableColumns] objectAtIndex:0];
 	IMBNodeCell* cell = [[[IMBNodeCell alloc] init] autorelease];	
 	[column setDataCell:cell];	
-	
-	// Register the the outline view as a dragging destination...
-	
-	[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
-	
+		
 	// Build the initial contents of the node popup...
 	
 	[ibNodePopupButton removeAllItems];
@@ -262,6 +277,29 @@ static NSString* kSelectionKey = @"selection";
 	
 	[self _startObservingLibraryController];
 	[self _loadStateFromPreferences];
+	
+	// Register the the outline view as a dragging destination if we want to accept new folders
+	if ([[_libraryController delegate] respondsToSelector:@selector(allowsFolderDropForMediaType:)]) {
+		// This method returns a BOOL, and seeing as the delegate doesn't have a protocol and we don't
+		// have one to cast to, we can't use performSelector.., so will use an invocation.
+		BOOL allowsDrop;
+		NSString *mediaType = _libraryController.mediaType;
+		NSMethodSignature *methodSignature = [[_libraryController delegate] methodSignatureForSelector:@selector(allowsFolderDropForMediaType:)]; 
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+		[invocation setSelector:@selector(allowsFolderDropForMediaType:)];
+		[invocation setArgument:&mediaType atIndex:2]; // First actual arg
+		
+		[invocation invokeWithTarget:[_libraryController delegate]];
+		
+		[invocation getReturnValue:&allowsDrop];
+		
+		if (allowsDrop) {
+			[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+		}
+	} else {
+		[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+	}
+	
 }
 
 
@@ -560,7 +598,8 @@ static NSString* kSelectionKey = @"selection";
 
 		// If the node has a custom object view, then install it now...
 		
-		[self installCustomObjectView:[newNode customObjectView]];
+//		[self installCustomObjectView:[newNode customObjectView]];
+		[self installObjectViewForNode:newNode];
 		
 		// If a completely different parser was selected, then notify the previous parser, that it is most
 		// likely no longer needed any can get rid of its cached data...
@@ -794,6 +833,7 @@ static NSString* kSelectionKey = @"selection";
 	// Restore the selected node. Walk through all visible nodes. If we find the correct one then select it...
 	
 	rows = [ibNodeOutlineView numberOfRows];
+	BOOL found = NO;
 	
 	for (i=0; i<rows; i++)
 	{
@@ -803,7 +843,15 @@ static NSString* kSelectionKey = @"selection";
 		if ([identifier isEqualToString:self.selectedNodeIdentifier])
 		{
 			[self selectNode:node];
+			found = YES;
+			break;
 		}
+	}
+	
+	if (!found)
+	{
+		[self selectNode:nil];
+		[self installObjectViewForNode:nil];
 	}
 	
 	// Rebuild the popup menu manually. Please note that the popup menu does not currently use bindings...
@@ -839,7 +887,8 @@ static NSString* kSelectionKey = @"selection";
 			
 			// Not redundant! Needed if selection doesn't change due to previous line!
 			[self.libraryController populateNode:inNode]; 
-			[self installCustomObjectView:[inNode customObjectView]];
+//			[self installCustomObjectView:[inNode customObjectView]];
+			[self installObjectViewForNode:inNode];
 		}
 	}	
 	else
@@ -1164,58 +1213,96 @@ static NSString* kSelectionKey = @"selection";
 #pragma mark Object Views
 
 
-// Install the standard object view and remember it for later...
-
-- (void) installStandardObjectView:(NSView*)inObjectView
+- (void) installObjectViewForNode:(IMBNode*)inNode
 {
-	NSView* containerView = [self objectContainerView];
-	[inObjectView setFrame:[containerView bounds]];
-	[containerView addSubview:inObjectView];
-	self.standardObjectView = inObjectView;
-}
-
-
-// Install a custom object view (and replace an old custom view or the standard view)...
-
-- (void) installCustomObjectView:(NSView*)inObjectView
-{
+	NSViewController* headerViewController = [inNode customHeaderViewController];
+	NSViewController* objectViewController = [inNode customObjectViewController];
+	NSViewController* footerViewController = [inNode customFooterViewController];
+	
+	NSView* headerView = nil;
 	NSView* objectView = nil;
+	NSView* footerView = nil;
 	
-	// We want a custom view...
+	CGFloat totalHeight = ibObjectContainerView.superview.frame.size.height;
+	CGFloat headerHeight = 0.0;
+	CGFloat footerHeight = 0.0;
 	
-	if (inObjectView)
+	// First remove all currently installed object views...
+	
+	[ibObjectHeaderView removeAllSubviews];
+	[ibObjectContainerView removeAllSubviews];
+	[ibObjectFooterView removeAllSubviews];
+	
+	// Install optional header view...
+	
+	if (headerViewController != nil)
 	{
-		// so get hide the stadard view (but keep it retained for later)...
-		
-		[_standardObjectView removeFromSuperview];
+		headerView = [headerViewController view];
+		headerHeight = headerView.frame.size.height;
+	}
 
-		// and use the new custom view...
-		
-		if (_customObjectView != inObjectView)
-		{
-			[_customObjectView removeFromSuperview];
-			self.customObjectView = inObjectView;
-			objectView = inObjectView;
-		}
+	NSRect headerFrame = ibObjectHeaderView.frame;
+	headerFrame.origin.y = NSMaxY(headerFrame) - headerHeight;
+	headerFrame.size.height = headerHeight;
+	ibObjectHeaderView.frame = headerFrame;
+
+	if (headerView)
+	{		
+		[headerView setFrameSize:headerFrame.size];
+		[ibObjectHeaderView addSubview:headerView];
+	}
+			
+	// Install optional footer view...
+	
+	if (footerViewController != nil)
+	{
+		NSView* footerView = [footerViewController view];
+		footerHeight = footerView.frame.size.height;
 	}
 	
-	// We want the standard view, so get rid of an existing custom view...
+	NSRect footerFrame = ibObjectFooterView.frame;
+	footerFrame.origin.y = NSMaxY(footerFrame) - footerHeight;
+	footerFrame.size.height = footerHeight;
+	ibObjectFooterView.frame = footerFrame;
+
+	if (footerView)
+	{
+		[footerView setFrameSize:footerFrame.size];
+		[footerView addSubview:footerView];
+	}
+
+	// Finally install the object view itself (unless told not to)...
 	
+	BOOL shouldDisplayObjectView = YES;
+	if (inNode) shouldDisplayObjectView = inNode.shouldDisplayObjectView;
+	
+	if (shouldDisplayObjectView)
+	{
+		if (objectViewController != nil)
+		{
+			objectView = [objectViewController view];
+		}
+		else
+		{
+			objectView = self.standardObjectView;
+		}
+			
+		NSRect objectFrame = ibObjectContainerView.frame;
+		objectFrame.size.height = totalHeight - headerHeight - footerHeight;
+		objectFrame.origin.y = footerHeight;
+		ibObjectContainerView.frame = objectFrame;
+
+		if (objectView)
+		{
+			[objectView setFrame:[ibObjectContainerView bounds]];
+			[ibObjectContainerView addSubview:objectView];
+		}
+		
+		[ibObjectContainerView setHidden:NO];
+	}
 	else
 	{
-		[_customObjectView removeFromSuperview];
-		self.customObjectView = nil;
-		objectView = self.standardObjectView;
-	}
-	
-	// Finally install the chosen view...
-	
-	if (objectView)
-	{
-		NSView* containerView = [self objectContainerView];
-		[objectView setFrame:containerView.bounds];
-		[objectView setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
-		[containerView addSubview:objectView];
+		[ibObjectContainerView setHidden:YES];
 	}
 }
 
@@ -1276,6 +1363,101 @@ static NSString* kSelectionKey = @"selection";
 - (void) saveState
 {
 	[self _saveStateToPreferences];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+		
+// Send a notification so that all IMBNodeViewController will reveal the node with the given identifier...
+
++ (void) revealNodeWithIdentifier:(NSString*)inIdentifier
+{
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName:kIMBRevealNodeWithIdentifierNotification 
+		object:inIdentifier];
+}
+
+
+- (NSInteger) _revealNode:(IMBNode*)inNode
+{
+	// Recursively expand and reveal the parent node, so that we can be sure that inNode is visible and can be 
+	// revealed too...
+	
+	IMBNode* parentNode = [inNode parentNode];
+	
+	if (parentNode)
+	{
+		[self _revealNode:parentNode];
+	}
+	
+	// Now find the row of our node. Expand it and return it row number...
+	
+	NSInteger n = [ibNodeOutlineView numberOfRows];
+		
+	for (NSInteger i=0; i<n; i++)
+	{
+		IMBNode* node = [self _nodeAtRow:i];
+		
+		if (node == inNode)
+		{
+			[ibNodeOutlineView expandItem:[ibNodeOutlineView itemAtRow:i]];
+			return i;
+		}
+	}
+	
+	return NSNotFound;
+}
+
+
+- (void) _revealNodeWithIdentifier:(NSNotification*)inNotification
+{
+	NSString* identifier = (NSString*) [inNotification object];
+	
+	if (identifier)
+	{
+		IMBNode* node = [_libraryController nodeWithIdentifier:identifier];
+		NSInteger i = [self _revealNode:node];
+		if (i != NSNotFound) [ibNodeOutlineView scrollRowToVisible:i];
+		[self _setExpandedNodeIdentifiers];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Send a notification so that all IMBNodeViewController will select the node with the given identifier...
+
++ (void) selectNodeWithIdentifier:(NSString*)inIdentifier
+{
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName:kIMBSelectNodeWithIdentifierNotification 
+		object:inIdentifier];
+}
+
+
+// If the given node already exists, then select it immediately. If not, then we assume it will exist shortly
+// (i.e. that it is currently being generated asynchronously). So we need to store its identifier so that it
+// will selected once available...
+
+- (void) _selectNodeWithIdentifier:(NSNotification*)inNotification
+{
+	NSString* identifier = (NSString*) [inNotification object];
+	
+	if (identifier)
+	{
+		[self expandSelectedNode];
+		
+		IMBNode* node = [_libraryController nodeWithIdentifier:identifier];
+		
+		if (node)
+		{
+			[self selectNode:node];
+		}
+		
+		self.selectedNodeIdentifier = identifier;
+	}
 }
 
 

@@ -44,79 +44,27 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Gideon King
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
-
-#import "NSView+iMedia.h"
+#import "IMBPanel.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@implementation NSView (iMedia)
+@implementation IMBPanel
 
+// This is required to work around a bug in Apple's frameworks where if you close a window with  
+// an IKImageBrowserViewon it and there are selected images, then it gives an error message: 
+// "kCGErrorInvalidConnection: CGSGetSurfaceBounds: Invalid connection"
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This method removes all subviews from a view...
-
-- (void) removeAllSubviews
+- (void) close
 {
-	NSArray* subviews = [self.subviews copy];
-	
-	for (NSView* view in subviews)
-	{
-		[view removeFromSuperview];
-	}
-	
-	[subviews release];
+	[self orderOut:self];
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// The following method can be used to unbind all values in a view hierarchy. This may be helpful when tearing
-// down windows, and views are bounds to controller objects. Since deallocation order is not guarranteed, it
-// is often the best strategy to remove all bindings before closing a window or document...
-
-- (void) unbindViewHierarchy
-{
-	[NSView unbindViewHierarchy:self];
-}
-
-
-+ (void) unbindViewHierarchy:(NSView*)inRootView
-{
-	// First completely unbind this view...
-	
-	NSArray* bindings = [inRootView exposedBindings];
-	
-	for (NSString* key in bindings)
-	{
-		// NSLog(@"%s - %@ - %@",__FUNCTION__,NSStringFromClass([inRootView class]),key);
-		[inRootView unbind:key];
-	}
-	
-	// Then do the same for all subviews (recursively)...
-	
-	NSArray* subviews = inRootView.subviews;
-	
-	for (NSView* subview in subviews)
-	{
-		[NSView unbindViewHierarchy:subview];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
 
 @end
-

@@ -73,6 +73,14 @@ enum IMBMouseOperation
 //----------------------------------------------------------------------------------------------------------------------
 
 
+@interface NSTableView (ShutUpTheCompiler)
+- (NSColor*) _highlightColorForCell:(NSCell*)inCell;
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark
 
 @implementation IMBTableView
@@ -80,6 +88,11 @@ enum IMBMouseOperation
 @synthesize mouseOperation = _mouseOperation;
 @synthesize clickedObjectIndex = _clickedObjectIndex;
 @synthesize clickedObject = _clickedObject;
+
+@synthesize customBackgroundColors = _customBackgroundColors;
+@synthesize customHighlightColor = _customHighlightColor;
+@synthesize customTextColor = _customTextColor;
+@synthesize customHighlightedTextColor = _customHighlightedTextColor;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -115,11 +128,113 @@ enum IMBMouseOperation
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	IMBRelease(_clickedObject);
+	IMBRelease(_customBackgroundColors);
+	IMBRelease(_customHighlightColor);
+	IMBRelease(_customTextColor);
+	IMBRelease(_customHighlightedTextColor);
 	[super dealloc];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Drawing
+
+
+// This is a private internal method. If it no longer going to be called, there's no harm in proving an override...
+
+- (NSColor*) _highlightColorForCell:(NSCell*)inCell
+{
+	NSColor* color = nil;
+	
+	if ([self respondsToSelector:@selector(_highlightColorForCell:)])
+	{
+		color = [super _highlightColorForCell:inCell];
+	}
+
+	if (_customHighlightColor != nil) 
+	{
+		color = self.customHighlightColor; 
+	}
+	
+	return color;
+}
+
+
+// If we have custom background colors, then draw the alternating row background ourself, otherwise let the 
+// superclass draw Apple's default white & light blue rows...
+
+- (void) drawBackgroundInClipRect:(NSRect)inClipRect
+{
+	if (_customBackgroundColors != nil)
+	{
+		NSUInteger n = [_customBackgroundColors count];
+		NSUInteger i = 0;
+
+		CGFloat height = self.rowHeight + self.intercellSpacing.height;
+		NSRect clipRect = [self bounds];
+		NSRect drawRect = clipRect;
+		drawRect.origin = NSZeroPoint;
+		drawRect.size.height = height;
+		
+		[[self backgroundColor] set];
+		NSRectFillUsingOperation(inClipRect,NSCompositeSourceOver);
+		
+		while ((NSMinY(drawRect) <= NSHeight(clipRect)))
+		{
+			if (NSIntersectsRect(drawRect,clipRect))
+			{
+				[[_customBackgroundColors objectAtIndex:i%n] set];
+				NSRectFillUsingOperation(drawRect,NSCompositeSourceOver);
+			}
+			
+			drawRect.origin.y += height;
+			i++;
+		}
+	} 
+	else
+	{
+		[super drawBackgroundInClipRect:inClipRect];
+	}
+}
+
+
+// If we are using custom background and highlight colors, we may have to adjust the text colors accordingly,
+// to make sure that text is always clearly readable...
+
+- (NSCell*) preparedCellAtColumn:(NSInteger)inColumn row:(NSInteger)inRow
+{
+	NSCell* cell = [super preparedCellAtColumn:inColumn row:inRow];
+	
+	if ([cell isKindOfClass:[NSTextFieldCell class]])
+	{
+		if ([cell isHighlighted])
+		{
+			if (_customHighlightedTextColor != nil)
+			{
+				[(NSTextFieldCell*)cell setTextColor:_customHighlightedTextColor];
+			}
+		}
+		else
+		{
+			if (_customTextColor != nil)
+			{
+				[(NSTextFieldCell*)cell setTextColor:_customTextColor];
+			}
+		}
+	}
+	
+	return cell;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Event Handling
 
 
 - (void) mouseDown:(NSEvent*)inEvent
@@ -242,6 +357,10 @@ enum IMBMouseOperation
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark
+#pragma mark Quicklook
+
+
 - (void) keyDown:(NSEvent*)inEvent
 {
     NSString* key = [inEvent charactersIgnoringModifiers];
@@ -269,11 +388,23 @@ enum IMBMouseOperation
 	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
     inPanel.delegate = controller;
     inPanel.dataSource = controller;
+	
+	if ([controller respondsToSelector:@selector(beginPreviewPanelControl:)])
+	{
+		[controller performSelector:@selector(beginPreviewPanelControl:) withObject:inPanel];
+	}
 }
 
 
 - (void) endPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+	
+	if ([controller respondsToSelector:@selector(endPreviewPanelControl:)])
+	{
+		[controller performSelector:@selector(endPreviewPanelControl:) withObject:inPanel];
+	}
+	
     inPanel.delegate = nil;
     inPanel.dataSource = nil;
 }

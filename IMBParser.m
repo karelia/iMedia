@@ -203,7 +203,7 @@
 #pragma mark 
 
 
-- (void) loadThumbnailForObject:(IMBObject*)inObject
+- (id) loadThumbnailForObject:(IMBObject*)inObject
 {
 	id imageRepresentation = nil;
 	NSString* type = inObject.imageRepresentationType;
@@ -338,6 +338,8 @@
 			waitUntilDone:NO 
 			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
+	
+	return imageRepresentation;
 }
 
 
@@ -437,7 +439,7 @@
 
 - (CGImageRef) _quicklookCGImageForURL:(NSURL*)inURL
 {
-	CGSize size = CGSizeMake(128,128);
+	CGSize size = CGSizeMake(256.0,256.0);
 	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)inURL,size,NULL);
 	return (CGImageRef) [NSMakeCollectable(image) autorelease];
 }
@@ -492,11 +494,19 @@
 	
 	if ([object isKindOfClass:[IMBMovieObject class]])
 	{
-		NSError* error = nil;
-		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,nil];
-		QTTime t = QTMakeTimeWithTimeInterval(posterTime);
-		CGImageRef image = (CGImageRef) [movie frameImageAtTime:t withAttributes:attributes error:&error];
+		CGImageRef image = [self _quicklookCGImageForURL:url];
 		[(IMBMovieObject*)object setPosterFrame:image];
+
+//		QTTime t = QTMakeTimeWithTimeInterval(posterTime);
+//		NSSize size = NSMakeSize(256.0,256.0);
+//		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+//			QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,
+//			[NSValue valueWithSize:size],QTMovieFrameImageSize,
+//			nil];
+//			
+//		NSError* error = nil;
+//		CGImageRef image = (CGImageRef) [movie frameImageAtTime:t withAttributes:attributes error:&error];
+//		[(IMBMovieObject*)object setPosterFrame:image];
 	}
 }
 

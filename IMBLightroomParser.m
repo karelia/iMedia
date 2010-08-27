@@ -251,7 +251,12 @@ static NSArray* sSupportedUTIs = nil;
             
             if ([path hasSuffix:@"\","])
             {
-                [inLibraryPaths addObject:[path substringWithRange:NSMakeRange(1, [path length] - 3)]];
+				path = [path substringWithRange:NSMakeRange(1, [path length] - 3)];
+ 
+				BOOL exists,changed;
+				exists = [[NSFileManager defaultManager] fileExistsAtPath:&path wasChanged:&changed];
+				if (exists) [inLibraryPaths addObject:path];
+				
                 path = @"";
             }
         }
@@ -1127,7 +1132,7 @@ static NSArray* sSupportedUTIs = nil;
 }
 
 
-- (void) loadThumbnailForObject:(IMBObject*)inObject
+- (id) loadThumbnailForObject:(IMBObject*)inObject
 {	
 	CGImageRef imageRepresentation = nil;
 	NSData *jpegData = [self previewDataForObject:inObject];
@@ -1183,8 +1188,10 @@ static NSArray* sSupportedUTIs = nil;
 										modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	else {
-		[super loadThumbnailForObject:inObject];
+		imageRepresentation = (CGImageRef) [super loadThumbnailForObject:inObject];
 	}
+	
+	return (id) imageRepresentation;
 }
 	
 
@@ -1427,9 +1434,9 @@ static NSArray* sSupportedUTIs = nil;
 		
 		if (action == @selector(openInEditorApp:)) {
 			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
-																	  @"IMBObjectViewController.menuItem.openInApp.Lightroom",
+																	  @"IMBObjectViewController.menuItem.openWithApp.Lightroom",
 																	  nil,IMBBundle(),
-																	  @"Open Master Image in %@",
+																	  @"Open Master Image With %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
 			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig editorAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
@@ -1438,9 +1445,9 @@ static NSArray* sSupportedUTIs = nil;
 		}
 		else if (action == @selector(openInViewerApp:)) {
 			NSString* titleFormat = NSLocalizedStringWithDefaultValue(
-																	  @"IMBObjectViewController.menuItem.openInApp.Lightroom",
+																	  @"IMBObjectViewController.menuItem.openWithApp.Lightroom",
 																	  nil,IMBBundle(),
-																	  @"Open Master Image in %@",
+																	  @"Open Master Image With %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
 			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig viewerAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	

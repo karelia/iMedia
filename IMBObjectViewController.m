@@ -84,6 +84,7 @@
 
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
+static NSString* kPosterFrameKeyPath = @"arrangedObjects.posterFrame";
 static NSString* kObjectCountStringKey = @"objectCountString";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
@@ -267,6 +268,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibObjectArrayController retain];
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
+	[ibObjectArrayController addObserver:self forKeyPath:kPosterFrameKeyPath options:NSKeyValueObservingOptionNew context:(void*)kPosterFrameKeyPath];
 
 	// We need to save preferences before the app quits...
 	
@@ -315,6 +317,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	// Stop observing the array...
 	
+	[ibObjectArrayController removeObserver:self forKeyPath:kPosterFrameKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
@@ -360,6 +363,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //		id object = [inChange objectForKey:NSKeyValueChangeNewKey];
 //		NSLog(@"%s %@",__FUNCTION__,inChange);
 		[self _reloadIconView];
+		[self _reloadComboView];
+	}
+	else if (inContext == (void*)kPosterFrameKeyPath)
+	{
 		[self _reloadComboView];
 	}
 	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty])
@@ -463,7 +470,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) _loadStateFromPreferences
 {
 	NSMutableDictionary* stateDict = [self _preferences];
-	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntValue];
+	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntegerValue];
 	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
 	
 	//	NSData* selectionData = [stateDict objectForKey:@"selectionData"];
@@ -676,7 +683,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) _reloadComboView
 {
-	if ([ibListView.window isVisible])
+	if ([ibComboView.window isVisible])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView selector:@selector(reloadData) object:nil];
 		[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
@@ -759,9 +766,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //					if (appPath = [inObject.parser performSelector:@selector(appPath)])
 //					{
 //						title = NSLocalizedStringWithDefaultValue(
-//							@"IMBObjectViewController.menuItem.openInApp",
+//							@"IMBObjectViewController.menuItem.openWithApp",
 //							nil,IMBBundle(),
-//							@"Open in %@",
+//							@"Open With %@",
 //							@"Menu item in context menu of IMBObjectViewController");
 //						
 //						appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
@@ -780,9 +787,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				if (appPath = [IMBConfig editorAppForMediaType:self.mediaType])
 				{
 					title = NSLocalizedStringWithDefaultValue(
-						@"IMBObjectViewController.menuItem.openInApp",
+						@"IMBObjectViewController.menuItem.openWithApp",
 						nil,IMBBundle(),
-						@"Open in %@",
+						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
 					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
@@ -800,9 +807,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				if (appPath = [IMBConfig viewerAppForMediaType:self.mediaType])
 				{
 					title = NSLocalizedStringWithDefaultValue(
-						@"IMBObjectViewController.menuItem.openInApp",
+						@"IMBObjectViewController.menuItem.openWithApp",
 						nil,IMBBundle(),
-						@"Open in %@",
+						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
 					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
@@ -867,7 +874,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			title = NSLocalizedStringWithDefaultValue(
 				@"IMBObjectViewController.menuItem.openInBrowser",
 				nil,IMBBundle(),
-				@"Open in Browser",
+				@"Open With Browser",
 				@"Menu item in context menu of IMBObjectViewController");
 			
 			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInBrowser:) keyEquivalent:@""];
@@ -888,7 +895,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			title = NSLocalizedStringWithDefaultValue(
 				@"IMBObjectViewController.menuItem.quickLook",
 				nil,IMBBundle(),
-				@"Quicklook",
+				@"Quick Look",
 				@"Menu item in context menu of IMBObjectViewController");
 				
 			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];

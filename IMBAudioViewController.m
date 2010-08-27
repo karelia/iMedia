@@ -130,7 +130,7 @@
 - (NSString*) displayName
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"AudioDisplayName",
+		@"IMBAudioViewController.displayName",
 		nil,IMBBundle(),
 		@"Audio",
 		@"mediaType display name");
@@ -143,7 +143,7 @@
 + (NSString*) objectCountFormatSingular
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"AudioCountFormatSingular",
+		@"IMBAudioViewController.countFormatSingular",
 		nil,IMBBundle(),
 		@"%d song",
 		@"Format string for object count in singluar");
@@ -152,7 +152,7 @@
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"AudioCountFormatPlural",
+		@"IMBAudioViewController.countFormatPlural",
 		nil,IMBBundle(),
 		@"%d songs",
 		@"Format string for object count in plural");
@@ -191,31 +191,23 @@
 #pragma mark NSTableViewDelegate
  
 
-// Upon doubleclick start playing the selection...
+// Upon doubleclick start playing the selection (or opens a folder in case of IMBNodeObject)...
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
-//	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	NSIndexSet* rows = [ibListView selectedRowIndexes];
-	NSUInteger row = [rows firstIndex];
-		
-	while (row != NSNotFound)
-	{
-		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
+	NSInteger row = [(NSTableView*)inSender clickedRow];
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
 
-		if ([object isKindOfClass:[IMBNodeObject class]])
-		{
-			IMBNode* node = (IMBNode*)object.location;
-			[_nodeViewController expandSelectedNode];
-			[_nodeViewController selectNode:node];
-		}
-		else
-		{
-			[self startPlayingSelection:inSender];
-			return;
-		}
-		
-		row = [rows indexGreaterThanIndex:row];
+	if ([object isKindOfClass:[IMBNodeObject class]])
+	{
+		IMBNode* node = (IMBNode*)object.location;
+		[_nodeViewController expandSelectedNode];
+		[_nodeViewController selectNode:node];
+	}
+	else
+	{
+		[self startPlayingSelection:inSender];
 	}
 }
 

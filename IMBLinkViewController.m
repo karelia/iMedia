@@ -123,7 +123,7 @@
 - (NSString*) displayName
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"LinkDisplayName",
+		@"IMBLinkViewController.displayName",
 		nil,IMBBundle(),
 		@"Links",
 		@"mediaType display name");
@@ -136,7 +136,7 @@
 + (NSString*) objectCountFormatSingular
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"LinkCountFormatSingular",
+		@"IMBLinkViewController.countFormatSingular",
 		nil,IMBBundle(),
 		@"%d URL",
 		@"Format string for object count in singluar");
@@ -145,12 +145,22 @@
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"LinkCountFormatPlural",
+		@"IMBLinkViewController.countFormatPlural",
 		nil,IMBBundle(),
 		@"%d URLs",
 		@"Format string for object count in plural");
 }
 
+
+
+// The Links panel doesn't have an icon view...
+
+- (void) setViewType:(NSUInteger)inViewType
+{
+	if (inViewType < 1) inViewType = 1;
+	if (inViewType > 2) inViewType = 2;
+	[super setViewType:inViewType];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

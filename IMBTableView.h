@@ -63,11 +63,22 @@
 	NSInteger _mouseOperation;
 	NSInteger _clickedObjectIndex;
 	IMBObject* _clickedObject;
-}
+	
+	NSArray* _customBackgroundColors;
+	NSColor* _customHighlightColor;
+	NSColor* _customTextColor;
+	NSColor* _customHighlightedTextColor;
+}	
+
 
 @property (assign) NSInteger mouseOperation;
 @property (assign) NSInteger clickedObjectIndex;
 @property (retain) IMBObject* clickedObject;
+
+@property (retain) NSArray* customBackgroundColors;
+@property (retain) NSColor* customHighlightColor;
+@property (retain) NSColor* customTextColor;
+@property (retain) NSColor* customHighlightedTextColor;
 
 @end
 

@@ -153,7 +153,7 @@
 				@"Size",
 				nil,IMBBundle(),
 				@"Size",
-				@"Size label in metadata description");
+				@"Size label in metadataDescription");
 		
 		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
 	}
@@ -164,7 +164,7 @@
 				@"Type",
 				nil,IMBBundle(),
 				@"Type",
-				@"Type label in metadata description");
+				@"Type label in metadataDescription");
 		
 		description = [description stringByAppendingFormat:@"%@: ",typeLabel];
 		if (depth) description = [description stringByAppendingFormat:@"%@bit ",depth];
@@ -180,7 +180,7 @@
 				@"Date",
 				nil,IMBBundle(),
 				@"Date",
-				@"Date label in metadata description");
+				@"Date label in metadataDescription");
 		
 		description = [description stringByAppendingFormat:@"%@: %@\n",dateLabel,dateTime];
 	}

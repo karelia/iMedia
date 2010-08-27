@@ -692,11 +692,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (Class) objectClass
+{
+	return [IMBEnhancedObject class];
+}
+
+
 - (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
 {
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
+	Class objectClass = [self objectClass];
 	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
 	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
 
@@ -728,7 +735,7 @@
 					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [objectDict objectForKey:@"Caption"];
 
-					IMBEnhancedObject* object = [[IMBEnhancedObject alloc] init];
+					IMBEnhancedObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 

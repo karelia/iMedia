@@ -114,7 +114,10 @@
 
 // Custom object view...
 
-@synthesize customObjectView = _customObjectView;
+@synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
+@synthesize customHeaderViewController = _customHeaderViewController;
+@synthesize customObjectViewController = _customObjectViewController;
+@synthesize customFooterViewController = _customFooterViewController;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -138,7 +141,10 @@
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
 		
-		self.customObjectView = nil;
+		self.shouldDisplayObjectView = YES;
+		self.customHeaderViewController = nil;
+		self.customObjectViewController = nil;
+		self.customFooterViewController = nil;
 	}
 	
 	return self;
@@ -172,7 +178,10 @@
 	copy.badgeTarget = self.badgeTarget;
 	copy.badgeSelector = self.badgeSelector;
 	
-	copy.customObjectView = self.customObjectView;
+	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
+	copy.customHeaderViewController = self.customHeaderViewController;
+	copy.customObjectViewController = self.customObjectViewController;
+	copy.customFooterViewController = self.customFooterViewController;
 	
 	// Create a shallow copy of objects array...
 	
@@ -214,7 +223,9 @@
 	IMBRelease(_parser);
 	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
-	IMBRelease(_customObjectView);
+	IMBRelease(_customHeaderViewController);
+	IMBRelease(_customObjectViewController);
+	IMBRelease(_customFooterViewController);
 	
 	[super dealloc];
 }
@@ -283,8 +294,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Recursive object accessors. Use these for binding the NSArrayController. Please note that these accessors use
-// a depth-first algorithm, hoping that most media libraries like iPhoto, iTunes, Aperture, etc do the same thing.
+// Recursive object accessors. Please note that these accessors use a depth-first algorithm, hoping that most media 
+// libraries like iPhoto, iTunes, Aperture, etc do the same thing.
 
 // The expensive filtering of duplicate objects that was done in iMedia 1.x has been eliminated as it has caused 
 // substantial performance problems. It is now the responsibility of the parser classes to ensure that parent nodes

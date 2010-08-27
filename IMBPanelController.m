@@ -295,8 +295,10 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		// Install the views in the window hierarchy...
 		
 		NSView* objectView = [objectViewController view];
-		[nodeViewController installStandardObjectView:objectView];
-		
+//		[nodeViewController installStandardObjectView:objectView];
+		nodeViewController.standardObjectView = objectView;
+		[nodeViewController installObjectViewForNode:nil];
+
 		NSTabViewItem* item = [[NSTabViewItem alloc] initWithIdentifier:mediaType];
 		[item setLabel:mediaType];
 		[item setView:nodeView];

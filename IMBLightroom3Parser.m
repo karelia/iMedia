@@ -515,12 +515,17 @@
 	
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 	BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
+	NSError* error;
 	
 	if ([fileManager fileExistsAtPath:readOnlyDatabasePath]) {
-		NSDictionary *attributesOfCopy = [fileManager fileAttributesAtPath:readOnlyDatabasePath traverseLink:YES];
+		error = nil;
+		NSDictionary *attributesOfCopy = [fileManager attributesOfItemAtPath:readOnlyDatabasePath error:&error];
+		if (error) (@"Unable to fetch attributes from %@: %@", readOnlyDatabasePath, error.localizedDescription);
 		NSDate *modDateOfCopy = [attributesOfCopy fileModificationDate];
 		
-		NSDictionary *attributesOfOrig = [fileManager fileAttributesAtPath:databasePath traverseLink:YES];
+		error = nil;
+		NSDictionary *attributesOfOrig = [fileManager attributesOfItemAtPath:databasePath error:&error];
+		if (error) (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
 		NSDate *modDateOfOrig = [attributesOfOrig fileModificationDate];
 		
 		if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy]) {
@@ -529,11 +534,11 @@
 	}
 	
 	if (needToCopyFile) {
-		(void) [fileManager removeFileAtPath:readOnlyDatabasePath handler:nil];
-		BOOL copied = [fileManager copyPath:databasePath toPath:readOnlyDatabasePath handler:nil];
+		(void) [fileManager removeItemAtPath:readOnlyDatabasePath error:&error];
+		BOOL copied = [fileManager copyItemAtPath:databasePath toPath:readOnlyDatabasePath error:&error];
 		
 		if (!copied) {
-			NSLog(@"Unable to copy database file at %@", databasePath);
+			NSLog (@"Unable to copy database file at %@: %@", databasePath, error.localizedDescription);
 		}
 	}
 	

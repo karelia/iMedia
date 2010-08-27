@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBTextFieldCell.h"
+#import "IMBTableView.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -150,6 +151,19 @@
 	
 	NSRect bottomFrame = NSMakeRect(inFrame.origin.x,y,inFrame.size.width,textSize.height);
 	[super drawWithFrame:bottomFrame inView:inView];
+}
+
+
+- (NSColor*) highlightColorWithFrame:(NSRect)inFrame inView:(NSView*)inView
+{
+	NSColor* color = [super highlightColorWithFrame:inFrame inView:inView];
+	
+	if ([inView respondsToSelector:@selector(customHighlightColor)])
+	{
+		color = [(IMBTableView*)inView customHighlightColor];
+	}
+	
+	return color;
 }
 
 
