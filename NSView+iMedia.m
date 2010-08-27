@@ -64,6 +64,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This method removes all subviews from a view...
+
+- (void) removeAllSubviews
+{
+	NSArray* subviews = [self.subviews copy];
+	
+	for (NSView* view in subviews)
+	{
+		[view removeFromSuperview];
+	}
+	
+	[subviews release];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // The following method can be used to unbind all values in a view hierarchy. This may be helpful when tearing
 // down windows, and views are bounds to controller objects. Since deallocation order is not guarranteed, it
 // is often the best strategy to remove all bindings before closing a window or document...
