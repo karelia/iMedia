@@ -67,6 +67,11 @@
 		CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */; };
 		CEF6970810643D60005D7E72 /* IMBLinkViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6970610643D60005D7E72 /* IMBLinkViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF6970910643D60005D7E72 /* IMBLinkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6970710643D60005D7E72 /* IMBLinkViewController.m */; };
+		D00D0AA912258E4A000924AE /* IMBFlickrHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */; };
+		D00D0AAA12258E4A000924AE /* IMBFlickrHeaderViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */; };
+		D00D0AAB12258E4A000924AE /* IMBFlickrHeaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D00D0AA812258E4A000924AE /* IMBFlickrHeaderViewController.m */; };
+		D00D0D261226A803000924AE /* IMBPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = F331802511E6D25D00BDABC2 /* IMBPanel.m */; };
+		D00D0D271226A813000924AE /* IMBPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = F331802411E6D25D00BDABC2 /* IMBPanel.h */; };
 		D010384C10714CB3007C88D7 /* IMBNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D010384A10714CB3007C88D7 /* IMBNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D010384D10714CB3007C88D7 /* IMBNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D010384B10714CB3007C88D7 /* IMBNodeObject.m */; };
 		D010388B107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D0103889107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -88,9 +93,6 @@
 		D032CE41109B2F2200D84782 /* Flickr.png in Resources */ = {isa = PBXBuildFile; fileRef = D032CE40109B2F2200D84782 /* Flickr.png */; };
 		D032CE47109B301100D84782 /* IMBFlickrNode.h in Headers */ = {isa = PBXBuildFile; fileRef = D032CE42109B301100D84782 /* IMBFlickrNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D032CE48109B301100D84782 /* IMBFlickrNode.m in Sources */ = {isa = PBXBuildFile; fileRef = D032CE43109B301100D84782 /* IMBFlickrNode.m */; };
-		D032CE49109B301100D84782 /* IMBFlickrQueryEditor.h in Headers */ = {isa = PBXBuildFile; fileRef = D032CE44109B301100D84782 /* IMBFlickrQueryEditor.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D032CE4A109B301100D84782 /* IMBFlickrQueryEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = D032CE45109B301100D84782 /* IMBFlickrQueryEditor.m */; };
-		D032CE4B109B301100D84782 /* IMBFlickrQueryEditor.xib in Resources */ = {isa = PBXBuildFile; fileRef = D032CE46109B301100D84782 /* IMBFlickrQueryEditor.xib */; };
 		D0363E7C11D3787800E0579F /* NSView+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0363E7A11D3787800E0579F /* NSView+iMedia.h */; };
 		D0363E7D11D3787800E0579F /* NSView+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D0363E7B11D3787800E0579F /* NSView+iMedia.m */; };
 		D03C2840108265C300BD55CF /* IMBiPhotoVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -401,6 +403,9 @@
 		CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBLinkView.xib; sourceTree = "<group>"; };
 		CEF6970610643D60005D7E72 /* IMBLinkViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLinkViewController.h; sourceTree = "<group>"; };
 		CEF6970710643D60005D7E72 /* IMBLinkViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLinkViewController.m; sourceTree = "<group>"; };
+		D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBFlickrHeaderView.xib; sourceTree = "<group>"; };
+		D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrHeaderViewController.h; sourceTree = "<group>"; };
+		D00D0AA812258E4A000924AE /* IMBFlickrHeaderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrHeaderViewController.m; sourceTree = "<group>"; };
 		D010384A10714CB3007C88D7 /* IMBNodeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeObject.h; sourceTree = "<group>"; };
 		D010384B10714CB3007C88D7 /* IMBNodeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeObject.m; sourceTree = "<group>"; };
 		D0103889107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectThumbnailLoadOperation.h; sourceTree = "<group>"; };
@@ -424,9 +429,6 @@
 		D032CE40109B2F2200D84782 /* Flickr.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Flickr.png; sourceTree = "<group>"; };
 		D032CE42109B301100D84782 /* IMBFlickrNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrNode.h; sourceTree = "<group>"; };
 		D032CE43109B301100D84782 /* IMBFlickrNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrNode.m; sourceTree = "<group>"; };
-		D032CE44109B301100D84782 /* IMBFlickrQueryEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrQueryEditor.h; sourceTree = "<group>"; };
-		D032CE45109B301100D84782 /* IMBFlickrQueryEditor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrQueryEditor.m; sourceTree = "<group>"; };
-		D032CE46109B301100D84782 /* IMBFlickrQueryEditor.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBFlickrQueryEditor.xib; sourceTree = "<group>"; };
 		D0363E7A11D3787800E0579F /* NSView+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+iMedia.h"; sourceTree = "<group>"; };
 		D0363E7B11D3787800E0579F /* NSView+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+iMedia.m"; sourceTree = "<group>"; };
 		D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoVideoParser.h; sourceTree = "<group>"; };
@@ -848,13 +850,13 @@
 			children = (
 				D0B779631047B65D00D12548 /* IMBFlickrParser.h */,
 				D062B0F71047B75100CA9B56 /* IMBFlickrParser.m */,
-				D032CE44109B301100D84782 /* IMBFlickrQueryEditor.h */,
-				D032CE45109B301100D84782 /* IMBFlickrQueryEditor.m */,
-				D032CE46109B301100D84782 /* IMBFlickrQueryEditor.xib */,
 				D032CE42109B301100D84782 /* IMBFlickrNode.h */,
 				D032CE43109B301100D84782 /* IMBFlickrNode.m */,
 				FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */,
 				FCD9ABB310C677FF0092F441 /* IMBLoadMoreObject.m */,
+				D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */,
+				D00D0AA812258E4A000924AE /* IMBFlickrHeaderViewController.m */,
+				D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */,
 				D023460410CA5E2C00E14112 /* load-more-normal.pdf */,
 				D023460510CA5E2C00E14112 /* load-more-pressed.pdf */,
 				D032CE40109B2F2200D84782 /* Flickr.png */,
@@ -1234,7 +1236,6 @@
 				D0F2DBA01098262D004280C1 /* FMResultSet.h in Headers */,
 				D032CB7A109A2F4A00D84782 /* IMBMovieObject.h in Headers */,
 				D032CE47109B301100D84782 /* IMBFlickrNode.h in Headers */,
-				D032CE49109B301100D84782 /* IMBFlickrQueryEditor.h in Headers */,
 				D02E53C810A5563500B205BD /* NSData+SKExtensions.h in Headers */,
 				D02E542610A5650600B205BD /* IMBEnhancedObject.h in Headers */,
 				8FC2559910A851C500F19642 /* IMBLightroom2Parser.h in Headers */,
@@ -1252,6 +1253,8 @@
 				D08F82B411E4A1C1006E618E /* IMBQLPreviewPanel.h in Headers */,
 				D0CE6E1D11F6FA09005EE5B4 /* IMBMetadataTransformer.h in Headers */,
 				D0CE6E4311F6FD54005EE5B4 /* NSDictionary+iMedia.h in Headers */,
+				D00D0AAA12258E4A000924AE /* IMBFlickrHeaderViewController.h in Headers */,
+				D00D0D271226A813000924AE /* IMBPanel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1405,7 +1408,6 @@
 				CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */,
 				CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */,
 				D032CE41109B2F2200D84782 /* Flickr.png in Resources */,
-				D032CE4B109B301100D84782 /* IMBFlickrQueryEditor.xib in Resources */,
 				D0760AC310C5027100F2119C /* IMBProject.xcconfig in Resources */,
 				D0CF005610C50908009EC68F /* IMBTargetDebug.xcconfig in Resources */,
 				D0CF005710C50908009EC68F /* IMBTargetRelease.xcconfig in Resources */,
@@ -1426,6 +1428,7 @@
 				CEF653A2117E5C29003FF1A5 /* sharealike.pdf in Resources */,
 				CEF65426117E64FD003FF1A5 /* any.pdf in Resources */,
 				D02CD4CD1224F78E00C773A2 /* Localizable.strings in Resources */,
+				D00D0AA912258E4A000924AE /* IMBFlickrHeaderView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1523,7 +1526,6 @@
 				D0F2DBA11098262D004280C1 /* FMResultSet.m in Sources */,
 				D032CB7B109A2F4A00D84782 /* IMBMovieObject.m in Sources */,
 				D032CE48109B301100D84782 /* IMBFlickrNode.m in Sources */,
-				D032CE4A109B301100D84782 /* IMBFlickrQueryEditor.m in Sources */,
 				D02E53C910A5563500B205BD /* NSData+SKExtensions.m in Sources */,
 				D02E542710A5650600B205BD /* IMBEnhancedObject.m in Sources */,
 				8FC2559A10A851C500F19642 /* IMBLightroom2Parser.m in Sources */,
@@ -1541,6 +1543,8 @@
 				D0363E7D11D3787800E0579F /* NSView+iMedia.m in Sources */,
 				D0CE6E1E11F6FA09005EE5B4 /* IMBMetadataTransformer.m in Sources */,
 				D0CE6E4411F6FD54005EE5B4 /* NSDictionary+iMedia.m in Sources */,
+				D00D0AAB12258E4A000924AE /* IMBFlickrHeaderViewController.m in Sources */,
+				D00D0D261226A803000924AE /* IMBPanel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

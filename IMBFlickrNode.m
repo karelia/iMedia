@@ -57,6 +57,7 @@
 #import "IMBLoadMoreObject.h"
 #import "NSString+iMedia.h"
 #import "IMBNodeViewController.h"
+#import "IMBFlickrHeaderViewController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,6 +92,7 @@
 + (NSImage*) coreTypeIconNamed: (NSString*) name;
 + (NSString*) flickrMethodForMethodCode: (NSInteger) code;
 + (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query;
++ (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
 @end
 
 #pragma mark -
@@ -104,7 +106,8 @@ NSString* const IMBFlickrNodeProperty_License = @"license";
 NSString* const IMBFlickrNodeProperty_Method = @"method";
 NSString* const IMBFlickrNodeProperty_Query = @"query";
 NSString* const IMBFlickrNodeProperty_SortOrder = @"sortOrder";
-NSString* const IMBFlickrNodeProperty_Title = @"title";
+NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
+//NSString* const IMBFlickrNodeProperty_Title = @"title";
 
 
 #pragma mark
@@ -226,13 +229,20 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 	IMBFlickrNode* node = [IMBFlickrNode flickrNodeForRoot:root parser:parser];
 	node.customNode = YES;
 	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
-	node.identifier = [IMBFlickrNode identifierWithMethod:method query:query];
+//	node.identifier = [IMBFlickrNode identifierWithMethod:method query:query];
+	node.identifier = [IMBFlickrNode identifierWithQueryParams:dict];
 	node.license = [[dict objectForKey:IMBFlickrNodeProperty_License] intValue];
 	node.mediaSource = node.identifier;
 	node.method = method;
 	node.name = title;
 	node.query = query;
 	node.sortOrder = [[dict objectForKey:IMBFlickrNodeProperty_SortOrder] intValue];
+	
+	IMBFlickrHeaderViewController* viewController = [IMBFlickrHeaderViewController headerViewControllerWithParser:(IMBFlickrParser*)parser owningNode:node];
+	viewController.queryParams = (NSMutableDictionary*)dict;
+	viewController.buttonAction = @selector(removeQuery:);
+	viewController.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.remove",nil,IMBBundle(),@"Remove",@"Button title in Flickr Options");
+	node.customHeaderViewController = viewController;
 
 	return node;
 }
@@ -241,11 +251,12 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 + (void) sendSelectNodeNotificationForDict:(NSDictionary*) dict {
 	
 	if (dict) {
-		NSInteger method = [[dict objectForKey:IMBFlickrNodeProperty_Method] intValue];
-		NSString* query = [dict objectForKey:IMBFlickrNodeProperty_Query];
-		NSString* identifier = [IMBFlickrNode identifierWithMethod:method query:query];
-		
-		[IMBNodeViewController revealNodeWithIdentifier:identifier];
+//		NSInteger method = [[dict objectForKey:IMBFlickrNodeProperty_Method] intValue];
+//		NSString* query = [dict objectForKey:IMBFlickrNodeProperty_Query];
+//		NSString* identifier = [IMBFlickrNode identifierWithMethod:method query:query];
+
+		NSString* identifier = [IMBFlickrNode identifierWithQueryParams:dict];
+		[IMBNodeViewController selectNodeWithIdentifier:identifier];
 	}
 }
 
@@ -253,6 +264,8 @@ NSString* const IMBFlickrNodeProperty_Title = @"title";
 - (void) dealloc {
 	OFFlickrAPIRequest* request = [self.attributes objectForKey:@"flickrRequest"];
 	[request cancel];
+	
+	[(IMBFlickrHeaderViewController*)self.customHeaderViewController setOwningNode:nil];
 	
 	IMBRelease (_query);
 	[super dealloc];
@@ -576,6 +589,13 @@ typedef enum {
 	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
 	return [NSString stringWithFormat:@"%@:/%@", parserClassName, albumPath];
 #endif
+}
+
++ (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams {
+	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
+	NSString* uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
+	if (uuid == nil) uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_Query];
+	return [NSString stringWithFormat:@"%@:/%@",parserClassName,uuid];
 }
 
 @end

@@ -56,7 +56,8 @@
 #import "IMBConfig.h"
 #import "IMBFlickrNode.h"
 #import "IMBFlickrParser.h"
-#import "IMBFlickrQueryEditor.h"
+//#import "IMBFlickrQueryEditor.h"
+#import "IMBFlickrHeaderViewController.h"
 #import "IMBIconCache.h"
 #import "IMBLibraryController.h"
 #import "IMBLoadMoreObject.h"
@@ -194,8 +195,16 @@
 	rootNode.watchedPath = (NSString*) rootNode.mediaSource;
 	
 	// The root node has a custom view that we are loading from a nib file...
-	self.editor = [IMBFlickrQueryEditor flickrQueryEditorForParser:self];
-	rootNode.customObjectView = self.editor.view;
+//	self.editor = [IMBFlickrQueryEditor flickrQueryEditorForParser:self];
+//	rootNode.customObjectView = self.editor.view;
+
+	IMBFlickrHeaderViewController* viewController = [IMBFlickrHeaderViewController headerViewControllerWithParser:self owningNode:rootNode];
+	viewController.queryAction = @selector(addQuery:);
+	viewController.buttonAction = @selector(addQuery:);
+	viewController.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.add",nil,IMBBundle(),@"Add",@"Button title in Flickr Options");
+
+	rootNode.customHeaderViewController = viewController;
+	rootNode.shouldDisplayObjectView = NO;
 	
 	return rootNode;
 }
@@ -411,6 +420,20 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 }
 
 
+- (void) addCustomQuery:(NSDictionary*)inQueryParams {
+	if (inQueryParams){
+		[self.customQueries addObject:inQueryParams];
+	}
+}
+
+
+- (void) removeCustomQuery:(NSDictionary*)inQueryParams {
+	if (inQueryParams){
+		[self.customQueries removeObject:inQueryParams];
+	}
+}
+
+
 - (void) loadCustomQueries {
 	NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
 	
@@ -447,5 +470,6 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	[prefs setObject:self.customQueries forKey:IMBFlickrParserPrefKey_CustomQueries];
 	[IMBConfig setPrefs:prefs forClass:[self class]];
 }
+
 
 @end
