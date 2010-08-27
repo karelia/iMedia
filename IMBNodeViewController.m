@@ -61,6 +61,7 @@
 #import "IMBNode.h"
 #import "IMBNodeCell.h"
 #import "IMBFlickrNode.h"
+#import "NSView+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -123,7 +124,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 @synthesize nodeOutlineView = ibNodeOutlineView;
 @synthesize nodePopupButton = ibNodePopupButton;
+@synthesize objectHeaderView = ibObjectHeaderView;
 @synthesize objectContainerView = ibObjectContainerView;
+@synthesize objectFooterView = ibObjectFooterView;
 @synthesize standardObjectView = _standardObjectView;
 @synthesize customObjectView = _customObjectView;
 
@@ -595,7 +598,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 		// If the node has a custom object view, then install it now...
 		
-		[self installCustomObjectView:[newNode customObjectView]];
+//		[self installCustomObjectView:[newNode customObjectView]];
+		[self installObjectViewForNode:newNode];
 		
 		// If a completely different parser was selected, then notify the previous parser, that it is most
 		// likely no longer needed any can get rid of its cached data...
@@ -829,6 +833,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	// Restore the selected node. Walk through all visible nodes. If we find the correct one then select it...
 	
 	rows = [ibNodeOutlineView numberOfRows];
+	BOOL found = NO;
 	
 	for (i=0; i<rows; i++)
 	{
@@ -838,7 +843,15 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		if ([identifier isEqualToString:self.selectedNodeIdentifier])
 		{
 			[self selectNode:node];
+			found = YES;
+			break;
 		}
+	}
+	
+	if (!found)
+	{
+		[self selectNode:nil];
+		[self installObjectViewForNode:nil];
 	}
 	
 	// Rebuild the popup menu manually. Please note that the popup menu does not currently use bindings...
@@ -874,7 +887,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 			
 			// Not redundant! Needed if selection doesn't change due to previous line!
 			[self.libraryController populateNode:inNode]; 
-			[self installCustomObjectView:[inNode customObjectView]];
+//			[self installCustomObjectView:[inNode customObjectView]];
+			[self installObjectViewForNode:inNode];
 		}
 	}	
 	else
@@ -1199,58 +1213,96 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 #pragma mark Object Views
 
 
-// Install the standard object view and remember it for later...
-
-- (void) installStandardObjectView:(NSView*)inObjectView
+- (void) installObjectViewForNode:(IMBNode*)inNode
 {
-	NSView* containerView = [self objectContainerView];
-	[inObjectView setFrame:[containerView bounds]];
-	[containerView addSubview:inObjectView];
-	self.standardObjectView = inObjectView;
-}
-
-
-// Install a custom object view (and replace an old custom view or the standard view)...
-
-- (void) installCustomObjectView:(NSView*)inObjectView
-{
+	NSViewController* headerViewController = [inNode customHeaderViewController];
+	NSViewController* objectViewController = [inNode customObjectViewController];
+	NSViewController* footerViewController = [inNode customFooterViewController];
+	
+	NSView* headerView = nil;
 	NSView* objectView = nil;
+	NSView* footerView = nil;
 	
-	// We want a custom view...
+	CGFloat totalHeight = ibObjectContainerView.superview.frame.size.height;
+	CGFloat headerHeight = 0.0;
+	CGFloat footerHeight = 0.0;
 	
-	if (inObjectView)
+	// First remove all currently installed object views...
+	
+	[ibObjectHeaderView removeAllSubviews];
+	[ibObjectContainerView removeAllSubviews];
+	[ibObjectFooterView removeAllSubviews];
+	
+	// Install optional header view...
+	
+	if (headerViewController != nil)
 	{
-		// so get hide the stadard view (but keep it retained for later)...
-		
-		[_standardObjectView removeFromSuperview];
+		headerView = [headerViewController view];
+		headerHeight = headerView.frame.size.height;
+	}
 
-		// and use the new custom view...
-		
-		if (_customObjectView != inObjectView)
-		{
-			[_customObjectView removeFromSuperview];
-			self.customObjectView = inObjectView;
-			objectView = inObjectView;
-		}
+	NSRect headerFrame = ibObjectHeaderView.frame;
+	headerFrame.origin.y = NSMaxY(headerFrame) - headerHeight;
+	headerFrame.size.height = headerHeight;
+	ibObjectHeaderView.frame = headerFrame;
+
+	if (headerView)
+	{		
+		[headerView setFrameSize:headerFrame.size];
+		[ibObjectHeaderView addSubview:headerView];
+	}
+			
+	// Install optional footer view...
+	
+	if (footerViewController != nil)
+	{
+		NSView* footerView = [footerViewController view];
+		footerHeight = footerView.frame.size.height;
 	}
 	
-	// We want the standard view, so get rid of an existing custom view...
+	NSRect footerFrame = ibObjectFooterView.frame;
+	footerFrame.origin.y = NSMaxY(footerFrame) - footerHeight;
+	footerFrame.size.height = footerHeight;
+	ibObjectFooterView.frame = footerFrame;
+
+	if (footerView)
+	{
+		[footerView setFrameSize:footerFrame.size];
+		[footerView addSubview:footerView];
+	}
+
+	// Finally install the object view itself (unless told not to)...
 	
+	BOOL shouldDisplayObjectView = YES;
+	if (inNode) shouldDisplayObjectView = inNode.shouldDisplayObjectView;
+	
+	if (shouldDisplayObjectView)
+	{
+		if (objectViewController != nil)
+		{
+			objectView = [objectViewController view];
+		}
+		else
+		{
+			objectView = self.standardObjectView;
+		}
+			
+		NSRect objectFrame = ibObjectContainerView.frame;
+		objectFrame.size.height = totalHeight - headerHeight - footerHeight;
+		objectFrame.origin.y = footerHeight;
+		ibObjectContainerView.frame = objectFrame;
+
+		if (objectView)
+		{
+			[objectView setFrame:[ibObjectContainerView bounds]];
+			[ibObjectContainerView addSubview:objectView];
+		}
+		
+		[ibObjectContainerView setHidden:NO];
+	}
 	else
 	{
-		[_customObjectView removeFromSuperview];
-		self.customObjectView = nil;
-		objectView = self.standardObjectView;
-	}
-	
-	// Finally install the chosen view...
-	
-	if (objectView)
-	{
-		NSView* containerView = [self objectContainerView];
-		[objectView setFrame:containerView.bounds];
-		[objectView setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
-		[containerView addSubview:objectView];
+		[ibObjectContainerView setHidden:YES];
 	}
 }
 
