@@ -52,6 +52,7 @@
 
 @interface NSView (iMedia)
 
+- (void) removeAllSubviews;
 - (void) unbindViewHierarchy;
 + (void) unbindViewHierarchy:(NSView*)inRootView;
 
