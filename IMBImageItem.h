@@ -54,6 +54,7 @@ SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 
 
 #import <Quartz/Quartz.h>
+#import <QTKit/QTKit.h>
 
 
 @protocol IMBImageItem <NSObject>
@@ -69,6 +70,11 @@ SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 
 @interface CIImage (IMBImageItem)
 + (CIImage *)imageWithIMBImageItem:(id <IMBImageItem>)item;
+@end
+
+
+@interface QTMovie (IMBImageItem)
++ (QTMovie *)movieWithIMBImageItem:(id <IMBImageItem>)item;
 @end
 
 
