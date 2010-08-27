@@ -94,7 +94,9 @@
 	IBOutlet IMBNodeTreeController* ibNodeTreeController;
 	IBOutlet IMBOutlineView* ibNodeOutlineView;
 	IBOutlet NSPopUpButton* ibNodePopupButton;
+	IBOutlet NSView* ibObjectHeaderView;
 	IBOutlet NSView* ibObjectContainerView;
+	IBOutlet NSView* ibObjectFooterView;
 	NSView* _standardObjectView;
 	NSView* _customObjectView;
 }
@@ -111,7 +113,9 @@
 @property (readonly) IMBNodeTreeController* nodeTreeController;
 @property (readonly) IMBOutlineView* nodeOutlineView;
 @property (readonly) NSPopUpButton* nodePopupButton;
+@property (readonly) NSView* objectHeaderView;
 @property (readonly) NSView* objectContainerView;
+@property (readonly) NSView* objectFooterView;
 @property (retain) NSView* standardObjectView;
 @property (retain) NSView* customObjectView;
 
@@ -140,8 +144,7 @@
 
 // Object Views...
 
-- (void) installStandardObjectView:(NSView*)inObjectView;
-- (void) installCustomObjectView:(NSView*)inObjectView;
+- (void) installObjectViewForNode:(IMBNode*)inNode;
 
 - (NSSize) minimumViewSize;
 

@@ -96,7 +96,10 @@
 	id _badgeTarget;
 	SEL _badgeSelector;
 
-	NSView* _customObjectView;
+	BOOL _shouldDisplayObjectView;
+	NSViewController* _customHeaderViewController;
+	NSViewController* _customObjectViewController;
+	NSViewController* _customFooterViewController;
 }
 
 // Primary properties for a node:
@@ -158,7 +161,10 @@
 // nodes that do contain objects may still opt to use a custom view because the standard views do not
 // suffice. E.g. iPhoto events may be such a case...
 
-@property (retain) NSView* customObjectView;
+@property (assign) BOOL shouldDisplayObjectView;	
+@property (retain) NSViewController* customHeaderViewController;	
+@property (retain) NSViewController* customObjectViewController;	
+@property (retain) NSViewController* customFooterViewController;	
 
 // Helper methods
 
