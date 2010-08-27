@@ -205,3 +205,23 @@ CGImageSourceRef IMB_CGImageSourceCreateWithImageItem(id <IMBImageItem> item, CF
     return result;
 }
 
+CGSize IMBImageItemGetSize(id <IMBImageItem> item)
+{
+    CGSize result = CGSizeZero;
+    
+	CIImage *image = [CIImage imageWithIMBImageItem:item];
+    if (image)
+    {
+        result = [image extent].size;
+    }
+    else
+    {
+        NSImage *image = [NSImage imageWithIMBImageItem:item];
+        if (image)
+        {
+            result = NSSizeToCGSize([image size]);
+        }
+	}
+    
+    return result;
+}

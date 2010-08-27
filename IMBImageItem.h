@@ -75,3 +75,5 @@ SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 extern CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item);
 
 extern CGImageSourceRef IMB_CGImageSourceCreateWithImageItem(id <IMBImageItem> item, CFDictionaryRef options);
+
+extern CGSize IMBImageItemGetSize(id <IMBImageItem> item);
