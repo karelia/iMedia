@@ -119,8 +119,6 @@
 		D05A9493102EB022005DF9CE /* IMBImageCaptureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D05A9494102EB022005DF9CE /* IMBImageCaptureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */; };
 		D062B0F81047B75100CA9B56 /* IMBFlickrParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D062B0F71047B75100CA9B56 /* IMBFlickrParser.m */; };
-		D0760AC310C5027100F2119C /* IMBProject.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D0760AC210C5027100F2119C /* IMBProject.xcconfig */; };
-		D0760AC410C5027100F2119C /* IMBProject.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D0760AC210C5027100F2119C /* IMBProject.xcconfig */; };
 		D07BF171104C426000B6C87D /* ObjectiveFlickr.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D0CEC48C1047BF7A00FA2A31 /* ObjectiveFlickr.framework */; };
 		D08070BF10442CD700891137 /* IMBMovieViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070BD10442CD700891137 /* IMBMovieViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08070C010442CD700891137 /* IMBMovieViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D08070BE10442CD700891137 /* IMBMovieViewController.m */; };
@@ -272,9 +270,6 @@
 		D0CE6E1E11F6FA09005EE5B4 /* IMBMetadataTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CE6E1C11F6FA09005EE5B4 /* IMBMetadataTransformer.m */; };
 		D0CE6E4311F6FD54005EE5B4 /* NSDictionary+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E4111F6FD54005EE5B4 /* NSDictionary+iMedia.h */; };
 		D0CE6E4411F6FD54005EE5B4 /* NSDictionary+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CE6E4211F6FD54005EE5B4 /* NSDictionary+iMedia.m */; };
-		D0CF005610C50908009EC68F /* IMBTargetDebug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */; };
-		D0CF005710C50908009EC68F /* IMBTargetRelease.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */; };
-		D0CF005810C50908009EC68F /* IMBTargetTest.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D0CF005510C50908009EC68F /* IMBTargetTest.xcconfig */; };
 		D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0D635ED1035B4C500FF8631 /* IMBLightroomParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D635E91035B4C500FF8631 /* IMBLightroomParser.m */; };
 		D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1408,10 +1403,6 @@
 				CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */,
 				CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */,
 				D032CE41109B2F2200D84782 /* Flickr.png in Resources */,
-				D0760AC310C5027100F2119C /* IMBProject.xcconfig in Resources */,
-				D0CF005610C50908009EC68F /* IMBTargetDebug.xcconfig in Resources */,
-				D0CF005710C50908009EC68F /* IMBTargetRelease.xcconfig in Resources */,
-				D0CF005810C50908009EC68F /* IMBTargetTest.xcconfig in Resources */,
 				D023460610CA5E2C00E14112 /* load-more-normal.pdf in Resources */,
 				D023460710CA5E2C00E14112 /* load-more-pressed.pdf in Resources */,
 				CE69E9DD114B05EA0016E5E0 /* firefox_allBookmarks.png in Resources */,
@@ -1437,7 +1428,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D09933B71011B3CE00C527B7 /* IMBTestApp.xib in Resources */,
-				D0760AC410C5027100F2119C /* IMBProject.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
