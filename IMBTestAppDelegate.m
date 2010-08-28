@@ -112,7 +112,7 @@
 	self.objectViewController = [IMBImageViewController viewControllerForLibraryController:libraryController];
 	self.objectViewController.nodeViewController = self.nodeViewController;
 	NSView* objectView = self.objectViewController.view;
-	[self.nodeViewController installStandardObjectView:objectView];
+	self.nodeViewController.standardObjectView = objectView;
 
 	[nodeView setFrame:[ibWindow.contentView bounds]];
 	[ibWindow setContentView:nodeView];
