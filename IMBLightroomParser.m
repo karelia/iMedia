@@ -126,7 +126,7 @@ static NSArray* sSupportedUTIs = nil;
 - (void) dealloc
 {
 	IMBRelease(_absolutePyramidPath);
-	
+
 	[super dealloc];
 }
 
@@ -203,9 +203,8 @@ static NSArray* sSupportedUTIs = nil;
 @synthesize appPath = _appPath;
 @synthesize dataPath = _dataPath;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
-@synthesize database = _database;
-@synthesize thumbnailDatabase = _thumbnailDatabase;
-
+@synthesize databases = _databases;
+@synthesize thumbnailDatabases = _thumbnailDatabases;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -300,7 +299,8 @@ static NSArray* sSupportedUTIs = nil;
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.appPath = [[self class] lightroomPath];
-		_database = nil;
+		_databases = [[NSMutableDictionary alloc] init];
+		_thumbnailDatabases = [[NSMutableDictionary alloc] init];		
 		_thumbnailSize = NSZeroSize;
 		
 		[self supportedUTIs];	// Init early and in the main thread!
@@ -313,7 +313,8 @@ static NSArray* sSupportedUTIs = nil;
 - (void) dealloc
 {
 	IMBRelease(_appPath);
-	IMBRelease(_database);
+	IMBRelease(_databases);
+	IMBRelease(_thumbnailDatabases);
 	[super dealloc];
 }
 
@@ -445,8 +446,8 @@ static NSArray* sSupportedUTIs = nil;
 - (void) didStopUsingParser
 {
 	@synchronized (self) {
-		self.database = nil;
-		self.thumbnailDatabase = nil;
+		self.databases = nil;
+		self.thumbnailDatabases = nil;
 	}
 }
 
@@ -1274,36 +1275,43 @@ static NSArray* sSupportedUTIs = nil;
 	return database;
 }
 
+// NOTE: We return a separate FMDatabase instance per thread. This seems to 
+// eliminate some funky SQLite behavior that was observed when separate threads 
+// try to interact with the same connection from different threads.
+
 - (FMDatabase*)database
 {
+	FMDatabase* foundDatabase = nil;
 	@synchronized (self) {
-		if (_database == nil) {
-			FMDatabase* database = [self libraryDatabase];
+		foundDatabase = [_databases objectForKey:[NSValue valueWithPointer:[NSThread currentThread]]];
+		if (foundDatabase == nil) {
+			foundDatabase = [self libraryDatabase];
 			
-			if ([database open]) {
-				_database = [database retain];
+			if ([foundDatabase open]) {
+				[_databases setObject:foundDatabase forKey:[NSValue valueWithPointer:[NSThread currentThread]]];
 			}
 		}
 	}
 	
-	return [[_database retain] autorelease];
+	return foundDatabase;
 }
 
 - (FMDatabase*)thumbnailDatabase
 {
+	FMDatabase* foundDatabase = nil;
 	@synchronized (self) {
-		if (_thumbnailDatabase == nil) {
-			FMDatabase* database = [self previewsDatabase];
+		foundDatabase = [_thumbnailDatabases objectForKey:[NSValue valueWithPointer:[NSThread currentThread]]];
+		if (foundDatabase == nil) {
+			foundDatabase = [self previewsDatabase];
 			
-			if ([database open]) {
-				_thumbnailDatabase = [database retain];
+			if ([foundDatabase open]) {
+				[_thumbnailDatabases setObject:foundDatabase forKey:[NSValue valueWithPointer:[NSThread currentThread]]];
 			}
 		}
 	}
 	
-	return [[_thumbnailDatabase retain] autorelease];
+	return foundDatabase;
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 

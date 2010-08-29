@@ -87,16 +87,22 @@
 	NSString* _appPath;
 	NSString* _dataPath;
 	BOOL _shouldDisplayLibraryName;
-	FMDatabase* _database;
+
+	// We keep a separate FMDatabase instance for each thread that we are invoked from.
+	// SQLite is basically threadsafe, but I have seen issues when using the same database
+	// instance across multiple threads, and we can't predict which thread we will be called on.
+	NSMutableDictionary* _databases;
+	NSMutableDictionary* _thumbnailDatabases;
 	NSSize _thumbnailSize;
-	FMDatabase* _thumbnailDatabase;
 }
 
 @property (retain) NSString* appPath;
 @property (retain) NSString* dataPath;
 @property (assign) BOOL shouldDisplayLibraryName;
-@property (retain) FMDatabase* database;
-@property (retain) FMDatabase* thumbnailDatabase;
+@property (nonatomic, retain) NSMutableDictionary *databases;
+@property (nonatomic, retain) NSMutableDictionary *thumbnailDatabases;
+@property (retain,readonly) FMDatabase* database;
+@property (retain,readonly) FMDatabase* thumbnailDatabase;
 
 + (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
 + (BOOL) isInstalled;
@@ -109,6 +115,12 @@
 
 - (NSImage*) largeFolderIcon;
 
+// Returns a cached FMDatabase for the current thread
+- (FMDatabase*) database;
+- (FMDatabase*) thumbnailDatabase;
+
+// Unconditionally creates an autoreleased FMDatabase instance. Used 
+// by the above caching accessors to instantiate as needed per-thread.
 - (FMDatabase*) libraryDatabase;
 - (FMDatabase*) previewsDatabase;
 
