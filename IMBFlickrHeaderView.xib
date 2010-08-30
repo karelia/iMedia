@@ -46,7 +46,7 @@
 					<object class="NSButton" id="578654495">
 						<reference key="NSNextResponder" ref="306076665"/>
 						<int key="NSvFlags">265</int>
-						<string key="NSFrame">{{268, 10}, {96, 19}}</string>
+						<string key="NSFrame">{{268, 11}, {96, 19}}</string>
 						<reference key="NSSuperview" ref="306076665"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="567316205">
@@ -70,7 +70,7 @@
 					<object class="NSSearchField" id="144465269">
 						<reference key="NSNextResponder" ref="306076665"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{12, 11}, {211, 19}}</string>
+						<string key="NSFrame">{{12, 11}, {219, 19}}</string>
 						<reference key="NSSuperview" ref="306076665"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSearchFieldCell" key="NSCell" id="588943363">
@@ -153,16 +153,16 @@
 					<object class="NSPopUpButton" id="181140191">
 						<reference key="NSNextResponder" ref="306076665"/>
 						<int key="NSvFlags">265</int>
-						<string key="NSFrame">{{228, 8}, {23, 22}}</string>
+						<string key="NSFrame">{{236, 9}, {23, 22}}</string>
 						<reference key="NSSuperview" ref="306076665"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="321061846">
 							<int key="NSCellFlags">-2076049856</int>
-							<int key="NSCellFlags2">133120</int>
+							<int key="NSCellFlags2">134350848</int>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="181140191"/>
-							<int key="NSButtonFlags">-2034614017</int>
-							<int key="NSButtonFlags2">129</int>
+							<int key="NSButtonFlags">-2035138305</int>
+							<int key="NSButtonFlags2">1</int>
 							<object class="NSFont" key="NSAlternateImage">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">11</double>
@@ -172,29 +172,29 @@
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
 							<int key="NSPeriodicInterval">75</int>
-							<object class="NSMenuItem" key="NSMenuItem" id="531566142">
-								<reference key="NSMenu" ref="418411736"/>
-								<bool key="NSIsDisabled">YES</bool>
-								<string key="NSTitle">&lt;Do not localize&gt;</string>
-								<string key="NSKeyEquiv"/>
-								<int key="NSMnemonicLoc">2147483647</int>
-								<object class="NSCustomResource" key="NSOnImage">
-									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">NSMenuCheckmark</string>
-								</object>
-								<object class="NSCustomResource" key="NSMixedImage">
-									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">NSMenuMixedState</string>
-								</object>
-								<string key="NSAction">_popUpItemAction:</string>
-								<reference key="NSTarget" ref="321061846"/>
-							</object>
+							<nil key="NSMenuItem"/>
 							<bool key="NSMenuItemRespectAlignment">YES</bool>
 							<object class="NSMenu" key="NSMenu" id="418411736">
 								<string key="NSTitle">OtherViews</string>
 								<object class="NSMutableArray" key="NSMenuItems">
 									<bool key="EncodedWithXMLCoder">YES</bool>
-									<reference ref="531566142"/>
+									<object class="NSMenuItem" id="531566142">
+										<reference key="NSMenu" ref="418411736"/>
+										<bool key="NSIsDisabled">YES</bool>
+										<string key="NSTitle">&lt;Do not localize&gt;</string>
+										<string key="NSKeyEquiv"/>
+										<int key="NSMnemonicLoc">2147483647</int>
+										<object class="NSCustomResource" key="NSOnImage">
+											<string key="NSClassName">NSImage</string>
+											<string key="NSResourceName">NSMenuCheckmark</string>
+										</object>
+										<object class="NSCustomResource" key="NSMixedImage">
+											<string key="NSClassName">NSImage</string>
+											<string key="NSResourceName">NSMenuMixedState</string>
+										</object>
+										<string key="NSAction">_popUpItemAction:</string>
+										<reference key="NSTarget" ref="321061846"/>
+									</object>
 								</object>
 								<object class="NSFont" key="NSMenuFont">
 									<string key="NSName">LucidaGrande</string>
@@ -202,6 +202,7 @@
 									<int key="NSfFlags">1044</int>
 								</object>
 							</object>
+							<int key="NSSelectedIndex">-1</int>
 							<int key="NSPreferredEdge">1</int>
 							<bool key="NSUsesItemFromMenu">YES</bool>
 							<bool key="NSAltersState">YES</bool>
