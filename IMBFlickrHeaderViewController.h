@@ -66,8 +66,7 @@
 	SEL _buttonAction;
 	NSString* _buttonTitle;
 	
-	IBOutlet NSTextField* _queryField;
-	IBOutlet NSPopUpButton* _optionsPopup;
+	IBOutlet NSSearchField* _queryField;
 	IBOutlet NSButton* _button;
 }
 
