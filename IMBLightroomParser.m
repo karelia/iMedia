@@ -1428,7 +1428,7 @@ static NSArray* sSupportedUTIs = nil;
 // For Lightroom we need a promise that splits the pyramid file
 - (IMBObjectPromise*) objectPromiseWithObjects: (NSArray*) inObjects
 {
-	return [[(IMBObjectPromise*)[IMBPyramidObjectPromise alloc] initWithObjects:inObjects] autorelease];
+	return [[(IMBObjectPromise*)[IMBPyramidObjectPromise alloc] initWithArrayOfObjects:inObjects] autorelease];
 }
 
 - (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject

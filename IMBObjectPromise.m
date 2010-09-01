@@ -107,7 +107,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) initWithObjects:(NSArray*)inObjects
+- (id) initWithArrayOfObjects:(NSArray*)inObjects
 {
 	if (self = [super init])
 	{
@@ -384,9 +384,9 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) initWithObjects:(NSArray*)inObjects
+- (id) initWithArrayOfObjects:(NSArray*)inObjects
 {
-	if (self = [super initWithObjects:inObjects])
+	if (self = [super initWithArrayOfObjects:inObjects])
 	{
 		self.downloadOperations = [NSMutableArray array];
 		_totalBytes = 0;
