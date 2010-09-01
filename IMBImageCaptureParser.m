@@ -188,7 +188,7 @@
 
 - (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects 
 {
-	IMBMTPObjectPromise *promise = [((IMBMTPObjectPromise *)[IMBMTPObjectPromise alloc]) initWithObjects:inObjects];
+	IMBMTPObjectPromise *promise = [((IMBMTPObjectPromise *)[IMBMTPObjectPromise alloc]) initWithArrayOfObjects:inObjects];
 	return [promise autorelease];
 }
 	  
@@ -787,7 +787,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 @synthesize receivedBytes =		_receivedBytes;
 @synthesize receivedFilePaths = _receivedFilePaths;
 
-- (id) initWithObjectArray:(NSArray *) anArray delegate:(id<IMBMTPDownloadOperationDelegate>) aDelegate
+- (id) initWithArrayOfObjects:(NSArray *) anArray delegate:(id<IMBMTPDownloadOperationDelegate>) aDelegate
 {
 	self = [super init];
 	if (self != nil) {
@@ -902,7 +902,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	
 	// Create ONE download operations...
 
-	IMBMTPDownloadOperation* op = [[[IMBMTPDownloadOperation alloc] initWithObjectArray:inObjects delegate:self] autorelease];
+	IMBMTPDownloadOperation* op = [[[IMBMTPDownloadOperation alloc] initWithArrayOfObjects:inObjects delegate:self] autorelease];
 	op.downloadFolderPath = self.downloadFolderPath;
 	[self.downloadOperations addObject:op]; 
 	

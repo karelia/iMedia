@@ -111,7 +111,7 @@ extern NSString* kIMBObjectPromiseType;
 
 /// Create a promise with an array of objects
 
-- (id) initWithObjects:(NSArray*)inObjects;
+- (id) initWithArrayOfObjects:(NSArray*)inObjects;
 
 /// Clients can start loading objects asynchronously. Once the finish selector is called the loading is done and local files can be retrieved.
 
