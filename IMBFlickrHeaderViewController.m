@@ -114,8 +114,7 @@
 
 	NSMenuItem* item = nil;
 	NSString* title = nil;
-	NSMenu* menu  = [_optionsPopup menu];
-	[_optionsPopup removeAllItems];
+	NSMenu* menu  = [[[NSMenu alloc] initWithTitle:@""] autorelease];
 	
 	title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.searchIn",nil,IMBBundle(),@"Search in",@"Menu item in Flickr options popup");
 	item = [[NSMenuItem alloc] initWithTitle:title action:@selector(disabledAction:) keyEquivalent:@""];
@@ -175,7 +174,6 @@
 	[menu addItem:item];
 	[item release];
 
-	
 	[menu addItem:[NSMenuItem separatorItem]];
 	
 	title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.chooseBy",nil,IMBBundle(),@"Choose by",@"Menu item in Flickr options popup");
@@ -213,6 +211,9 @@
 	[menu addItem:item];
 	[item release];
 
+	NSSearchFieldCell* cell = (NSSearchFieldCell*) [_queryField cell];
+	[cell setSearchMenuTemplate:menu];
+	
 	// Configure the button...
 	
 	[_button setTitle:_buttonTitle];
