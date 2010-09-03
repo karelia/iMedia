@@ -23,6 +23,10 @@
 /* Begin PBXBuildFile section */
 		274DF618114EF0B200AC8C03 /* IMBImageItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 274DF616114EF0B200AC8C03 /* IMBImageItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		274DF619114EF0B200AC8C03 /* IMBImageItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 274DF617114EF0B200AC8C03 /* IMBImageItem.m */; };
+		655954021230ADC000548BC0 /* IMBFlickrParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B779631047B65D00D12548 /* IMBFlickrParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		655954031230ADC100548BC0 /* IMBFlickrNode.h in Headers */ = {isa = PBXBuildFile; fileRef = D032CE42109B301100D84782 /* IMBFlickrNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		655954041230ADC200548BC0 /* IMBLoadMoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */; };
+		655954051230ADCD00548BC0 /* IMBFlickrHeaderViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */; };
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		8F47B39110C416050013ED25 /* IMBOrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */; };
@@ -1323,6 +1327,10 @@
 				D0CE6E1D11F6FA09005EE5B4 /* IMBMetadataTransformer.h in Headers */,
 				D0CE6E4311F6FD54005EE5B4 /* NSDictionary+iMedia.h in Headers */,
 				D00D0D271226A813000924AE /* IMBPanel.h in Headers */,
+				655954021230ADC000548BC0 /* IMBFlickrParser.h in Headers */,
+				655954031230ADC100548BC0 /* IMBFlickrNode.h in Headers */,
+				655954041230ADC200548BC0 /* IMBLoadMoreObject.h in Headers */,
+				655954051230ADCD00548BC0 /* IMBFlickrHeaderViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
