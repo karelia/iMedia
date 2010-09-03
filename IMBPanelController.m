@@ -295,7 +295,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		// Install the views in the window hierarchy...
 		
 		NSView* objectView = [objectViewController view];
-//		[nodeViewController installStandardObjectView:objectView];
 		nodeViewController.standardObjectView = objectView;
 		[nodeViewController installObjectViewForNode:nil];
 

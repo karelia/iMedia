@@ -469,7 +469,7 @@
 		else 
 			filename =  @"itunes-icon-playlist-normal7.png";
 	}
-	else 
+	else if (_version < 10)
 	{
 		if ([inPlaylistDict objectForKey:@"master"])
 			filename =  @"iTunes9-icon-01.png";
@@ -497,6 +497,35 @@
 			filename =  @"iTunes9-icon-20.png";
 		else 
 			filename =  @"iTunes9-icon-21.png";
+	}
+	else 
+	{
+		if ([inPlaylistDict objectForKey:@"master"])
+			filename =  @"iTunes10-icon-01.png";
+		else if ([inPlaylistDict objectForKey:@"Library"])
+			filename =  @"iTunes10-icon-01.png";
+		else if ([inPlaylistDict objectForKey:@"Music"])
+			filename =  @"iTunes10-icon-01.png";
+		else if ([inPlaylistDict objectForKey:@"Movies"])
+			filename =  @"iTunes10-icon-02.png";
+		else if ([inPlaylistDict objectForKey:@"TV Shows"])
+			filename =  @"iTunes10-icon-03.png";
+		else if ([inPlaylistDict objectForKey:@"Podcasts"])
+			filename =  @"iTunes10-icon-04.png";
+		else if ([inPlaylistDict objectForKey:@"Audiobooks"])
+			filename =  @"iTunes10-icon-06.png";
+		else if ([inPlaylistDict objectForKey:@"iTunesU"])
+			filename =  @"iTunes10-icon-30.png";
+		else if ([inPlaylistDict objectForKey:@"Purchased Music"])
+			filename =  @"iTunes10-icon-07.png";
+		else if ([inPlaylistDict objectForKey:@"Party Shuffle"])
+			filename =  @"iTunes10-icon-18.png";
+		else if ([inPlaylistDict objectForKey:@"Folder"])
+			filename =  @"iTunes10-icon-19.png";
+		else if ([inPlaylistDict objectForKey:@"Smart Info"])
+			filename =  @"iTunes10-icon-20.png";
+		else 
+			filename =  @"iTunes10-icon-21.png";
 	}
 	
 	if (filename)

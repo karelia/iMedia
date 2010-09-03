@@ -113,6 +113,7 @@
 	self.objectViewController.nodeViewController = self.nodeViewController;
 	NSView* objectView = self.objectViewController.view;
 	self.nodeViewController.standardObjectView = objectView;
+//	[self.nodeViewController installObjectViewForNode:nil];
 
 	[nodeView setFrame:[ibWindow.contentView bounds]];
 	[ibWindow setContentView:nodeView];
