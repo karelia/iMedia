@@ -188,7 +188,7 @@
 
 - (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects 
 {
-	IMBMTPObjectPromise *promise = [((IMBMTPObjectPromise *)[IMBMTPObjectPromise alloc]) initWithArrayOfObjects:inObjects];
+	IMBMTPObjectPromise *promise = [([IMBMTPObjectPromise alloc]) initWithIMBObjects:inObjects];
 	return [promise autorelease];
 }
 	  
