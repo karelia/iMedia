@@ -361,7 +361,7 @@
 
 // For Flickr we need a remote promise that downloads the files off the internet
 - (IMBObjectPromise*) objectPromiseWithObjects: (NSArray*) inObjects {
-	return [[[IMBRemoteObjectPromise alloc] initWithArrayOfObjects:inObjects] autorelease];
+	return [[[IMBRemoteObjectPromise alloc] initWithIMBObjects:inObjects] autorelease];
 }
 
 // Convert metadata into human readable string...
