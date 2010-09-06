@@ -85,8 +85,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 - (void) _loadObject:(IMBObject*)inObject;
 - (void) _didFinish;
 
-@property (retain) NSMutableDictionary* objectsToLocalURLs;
-
 @end
 
 
@@ -258,7 +256,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		{
 			if ([NSThread isMainThread])
 			{
-				[_delegate performSelector:_finishSelector withObject:self withObject:self.error];
+				[_delegate performSelector:_finishSelector withObject:self];
 			}
 			else
 			{
