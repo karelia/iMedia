@@ -155,4 +155,3 @@ extern NSString *const LFHTTPRequestPOSTMethod;
 - (void)httpRequest:(LFHTTPRequest *)request writeReceivedBytes:(void *)bytes size:(unsigned int)blockSize expectedTotal:(unsigned int)total;
 #endif
 @end
-
