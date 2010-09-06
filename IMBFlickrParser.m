@@ -347,6 +347,12 @@
 		_flickrContext = [[OFFlickrAPIContext alloc] initWithAPIKey:self.flickrAPIKey sharedSecret:self.flickrSharedSecret];
 		
 		[self loadCustomQueries];
+		
+		// setup desired size to get, from delegate
+		if (_delegate && [_delegate respondsToSelector:@selector(flickrParserDesiredSize)]) {
+			self.desiredSize = [_delegate flickrParserDesiredSize];
+		}
+			
 	}	
 
 	//	lazy initialize the 'load more' button...
@@ -384,6 +390,7 @@
 @synthesize editor = _editor;
 @synthesize flickrAPIKey = _flickrAPIKey;
 @synthesize flickrSharedSecret = _flickrSharedSecret;
+@synthesize desiredSize = _desiredSize;
 
 
 - (IMBLoadMoreObject*) loadMoreButton {
@@ -447,7 +454,7 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	if (nodes == nil){
 		nodes = [NSArray array];
 	}
-		
+	
 #if 0
 		[prefs setObject:nodes forKey:IMBFlickrParserPrefKey_CustomQueries];
 		[IMBConfig setPrefs:prefs forClass:[self class]];
