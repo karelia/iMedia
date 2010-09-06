@@ -109,6 +109,8 @@ extern NSString* kIMBObjectPromiseType;
 	
 @property (retain) NSError* error;				
 
+@property (retain) NSMutableDictionary* objectsToLocalURLs;
+
 /// Create a promise with an array of objects
 
 - (id) initWithIMBObjects:(NSArray*)inObjects;

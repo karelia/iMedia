@@ -1097,7 +1097,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					if (promise != nil)
 					{
 						promise.downloadFolderPath = NSTemporaryDirectory();
-						[promise startLoadingWithDelegate:self finishSelector:nil];
+						[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
 						[promise waitUntilDone];
 						
 						NSURL* thisURL = [promise localURLForObject:mappedObject];

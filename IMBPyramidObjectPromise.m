@@ -66,8 +66,6 @@
 - (void) _loadObject:(IMBObject*)inObject;
 - (void) _didFinish;
 
-@property (retain) NSMutableDictionary* objectsToLocalURLs;
-
 @end
 
 // This subclass is used for pyramid files that need to be split. The split file is saved to the local file system,
