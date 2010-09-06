@@ -195,7 +195,8 @@
 				// Write back, replacing the original URL with the one with the new metadata
 				NSError *error = nil;
 				success = [data writeToURL:localURL options:NSAtomicWrite error:&error];
-				// Ignore error; atomic write should mean that original is not lost.
+				// atomic write should mean that original is not lost.
+				if (!success) NSLog(@"couldn't modify file, %@", [error localizedDescription]);
 			}
 			CFRelease(dest);
 			CFRelease(source);
