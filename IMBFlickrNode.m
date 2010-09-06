@@ -346,6 +346,8 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		{
 			// build up URL programatically 
 			imageURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:flickrSize];
+			NSLog(@"No original available : %@", [photoDict objectForKey:@"title"]);
+			thumbnailURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForImageResource:@"Flickr"]];
 		}
 		
 		NSURL *webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
@@ -355,20 +357,25 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		obj.location = imageURL;
 		obj.name = [photoDict objectForKey:@"title"];
 		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
-										
-		[metadata setObject:webPageURL forKey:@"webPageURL"];
 		
-		NSString *can_download = [photoDict objectForKey:@"can_download"];
-		NSString *desc = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
-		NSString *license = [photoDict objectForKey:@"license"];
-		NSString *ownerName = [photoDict objectForKey:@"ownername"];
-		NSString *photoID = [photoDict objectForKey:@"id"];
+		// A lot of the metadata comes from the "extras" key we request
+		[metadata addEntriesFromDictionary:photoDict];		// give metaData the whole thing!
+		
+		[metadata setObject:webPageURL forKey:@"webPageURL"];
 
-		if (nil != can_download)	[metadata setObject:can_download forKey:@"can_download"];
+		// But give it a better 'description' without the nested item
+		NSString *desc = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
 		if (nil != desc)			[metadata setObject:desc forKey:@"descriptionHTML"];
-		if (nil != license)			[metadata setObject:license forKey:@"license"];
-		if (nil != ownerName)		[metadata setObject:ownerName forKey:@"ownerName"];
-		if (nil != photoID)			[metadata setObject:photoID forKey:@"id"];
+
+//		NSString *can_download = [photoDict objectForKey:@"can_download"];
+//		NSString *license = [photoDict objectForKey:@"license"];
+//		NSString *ownerName = [photoDict objectForKey:@"ownername"];
+//		NSString *photoID = [photoDict objectForKey:@"id"];
+//
+//		if (nil != can_download)	[metadata setObject:can_download forKey:@"can_download"];
+//		if (nil != license)			[metadata setObject:license forKey:@"license"];
+//		if (nil != ownerName)		[metadata setObject:ownerName forKey:@"ownerName"];
+//		if (nil != photoID)			[metadata setObject:photoID forKey:@"id"];
 
 		obj.metadata = [NSDictionary dictionaryWithDictionary:metadata];
 						 
@@ -573,7 +580,8 @@ typedef enum {
 	[arguments setObject:@"photos" forKey:@"media"];
 
 	// Extra metadata needed
-	[arguments setObject:@"owner_name,license,description,original_format,url_o,usage" forKey:@"extras"];
+	// http://www.flickr.com/services/api/flickr.photos.search.html
+	[arguments setObject:@"owner_name,license,description,original_format,url_o,usage,o_dims" forKey:@"extras"];
 	// Useful keys we can get from this:
 	// description -> array with ...
 	// original_format -> originalformat, orignalsecret
