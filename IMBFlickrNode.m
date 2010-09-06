@@ -51,8 +51,8 @@
 
 //	iMedia
 #import "IMBFlickrNode.h"
+#import "IMBFlickrObject.h"
 #import "IMBFlickrParser.h"
-#import "IMBObject.h"
 #import "IMBLibraryController.h"
 #import "IMBLoadMoreObject.h"
 #import "NSString+iMedia.h"
@@ -327,7 +327,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		// Or, perhaps, we may want to have a callback to the application for what size of photo it would like
 		// to receive.  (There's no point in getting larger size than the application will need.)
 		
-		IMBObject* obj = [[IMBObject alloc] init];
+		IMBFlickrObject* obj = [[IMBFlickrObject alloc] init];
 		
 		obj.location = imageURL;
 		obj.name = [photoDict objectForKey:@"title"];
