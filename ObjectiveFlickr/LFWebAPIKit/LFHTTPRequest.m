@@ -408,7 +408,7 @@ void LFHRReadStreamClientCallBack(CFReadStreamRef stream, CFStreamEventType even
 @implementation LFHTTPRequest
 - (id)init
 {
-    if (self = [super init]) {
+    if ((self = [super init])) {
         _timeoutInterval = LFHTTPRequestDefaultTimeoutInterval;
 
         _receivedData = [NSMutableData new];
@@ -477,7 +477,7 @@ void LFHRReadStreamClientCallBack(CFReadStreamRef stream, CFStreamEventType even
 
     NSEnumerator *dictEnumerator = [headerDictionary keyEnumerator];
     id key;
-    while (key = [dictEnumerator nextObject]) {
+    while ((key = [dictEnumerator nextObject])) {
         CFHTTPMessageSetHeaderFieldValue(request, (CFStringRef)[key description], (CFStringRef)[headerDictionary objectForKey:key]);
     }
 
@@ -502,15 +502,11 @@ void LFHRReadStreamClientCallBack(CFReadStreamRef stream, CFStreamEventType even
     CFReadStreamSetProperty(tmpReadStream, kCFStreamPropertyHTTPShouldAutoredirect, kCFBooleanTrue);
 
     // apply current proxy settings
-    #if !TARGET_OS_IPHONE
-        CFDictionaryRef proxyDict = SCDynamicStoreCopyProxies(NULL); // kCFNetworkProxiesHTTPProxy
-    #else
-        #if TARGET_IPHONE_SIMULATOR
-            CFDictionaryRef proxyDict = (CFDictionaryRef)[[NSDictionary alloc] init];
-        #else
-            CFDictionaryRef proxyDict = CFNetworkCopySystemProxySettings();
-        #endif
-    #endif
+	#if !TARGET_OS_IPHONE
+		CFDictionaryRef proxyDict = SCDynamicStoreCopyProxies(NULL); // kCFNetworkProxiesHTTPProxy
+	#else
+		CFDictionaryRef proxyDict = CFNetworkCopySystemProxySettings();
+	#endif	
 
     if (proxyDict) {
         CFReadStreamSetProperty(tmpReadStream, kCFStreamPropertyHTTPProxy, proxyDict);
