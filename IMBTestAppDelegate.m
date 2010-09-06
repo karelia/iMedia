@@ -410,6 +410,10 @@
 	return defaultNodes;
 }
 
+- (FlickrSizeSpecifier)flickrParserDesiredSize;
+{
+	return FlickrSizeSpecifierOriginal;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
