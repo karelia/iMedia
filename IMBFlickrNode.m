@@ -89,7 +89,6 @@
 - (void) setFlickrResponse: (NSDictionary*) response;
 //	Utilities:
 - (NSDictionary*) argumentsForFlickrCall;
-+ (NSImage*) coreTypeIconNamed: (NSString*) name;
 + (NSString*) flickrMethodForMethodCode: (NSInteger) code;
 + (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query;
 + (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
@@ -162,7 +161,9 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 												  parser: (IMBParser*) parser {
 	
 	IMBFlickrNode* node = [self genericFlickrNodeForRoot:root parser:parser];
-	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
+	node.icon = [NSImage imageNamed:NSImageNameFolderSmart];
+	[node.icon setScalesWhenResized:YES];
+	[node.icon setSize:NSMakeSize(16.0, 16.0)];
 	node.identifier = [self identifierWithMethod:IMBFlickrNodeMethod_MostInteresting query:@"30"];
 	node.mediaSource = node.identifier;
 	node.method = IMBFlickrNodeMethod_MostInteresting;
@@ -176,7 +177,9 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 											 parser: (IMBParser*) parser {
 	
 	IMBFlickrNode* node = [self genericFlickrNodeForRoot:root parser:parser];
-	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
+	node.icon = [NSImage imageNamed:NSImageNameFolderSmart];
+	[node.icon setScalesWhenResized:YES];
+	[node.icon setSize:NSMakeSize(16.0, 16.0)];
 	node.identifier = [self identifierWithMethod:IMBFlickrNodeMethod_Recent query:@"30"];
 	node.mediaSource = node.identifier;
 	node.method = IMBFlickrNodeMethod_Recent;	
@@ -228,7 +231,10 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	//	Flickr stuff...
 	IMBFlickrNode* node = [IMBFlickrNode flickrNodeForRoot:root parser:parser];
 	node.customNode = YES;
-	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
+	node.icon = [NSImage imageNamed:NSImageNameFolderSmart];
+	[node.icon setScalesWhenResized:YES];
+	[node.icon setSize:NSMakeSize(16.0, 16.0)];
+
 //	node.identifier = [IMBFlickrNode identifierWithMethod:method query:query];
 	node.identifier = [IMBFlickrNode identifierWithQueryParams:dict];
 	node.license = [[dict objectForKey:IMBFlickrNodeProperty_License] intValue];
@@ -312,26 +318,59 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	[(NSMutableDictionary*)self.attributes removeObjectForKey:@"flickrResponse"];
 }
 
+// What about original size?
+
+- (NSString *)flickrSizeFromFlickrSizeSpecifier:(FlickrSizeSpecifier)flickrSizeSpecifier
+{
+	NSAssert(flickrSizeSpecifier >= FlickrSizeSpecifierOriginal && flickrSizeSpecifier <= FlickrSizeSpecifierLarge, @"Illegal size for flickr");
+	NSString *sizeLookup[] = { @"o", OFFlickrSmallSize, OFFlickrMediumSize, OFFlickrLargeSize };
+		// Note: medium is nil, so we can't put in a dictionary.  Original not specified in objective-flickr
+	return sizeLookup[flickrSizeSpecifier];
+}
 
 - (NSArray*) extractPhotosFromFlickrResponse: (NSDictionary*) response {
 	OFFlickrAPIRequest* flickrRequest = [self.attributes objectForKey:@"flickrRequest"];
 
+	IMBFlickrParser *parser = (IMBFlickrParser *)self.parser;
+	NSString *flickrSize = [self flickrSizeFromFlickrSizeSpecifier:parser.desiredSize];
 	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
 	for (NSDictionary* photoDict in photos) {
 		NSURL* thumbnailURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
-		NSURL* imageURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrLargeSize];
+		NSURL* imageURL = nil;
+		if (FlickrSizeSpecifierOriginal == parser.desiredSize && nil != [photoDict objectForKey:@"url_o"])
+		{
+			imageURL = [photoDict objectForKey:@"url_o"];
+		}
+		else
+		{
+			// build up URL programatically 
+			imageURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:flickrSize];
+		}
+		
 		NSURL* webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
-		
-		// We will need to get the URL of the original photo (or the largest possible)
-		// Or, perhaps, we may want to have a callback to the application for what size of photo it would like
-		// to receive.  (There's no point in getting larger size than the application will need.)
-		
+				
 		IMBFlickrObject* obj = [[IMBFlickrObject alloc] init];
 		
 		obj.location = imageURL;
 		obj.name = [photoDict objectForKey:@"title"];
-		obj.metadata = [NSDictionary dictionaryWithObject:webPageURL forKey:@"webPageURL"];
+		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
+										
+		[metadata setObject:webPageURL forKey:@"webPageURL"];
+		NSString *desc = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
+		NSString *can_download = [photoDict objectForKey:@"can_download"];
+		NSString *latitude  = [photoDict objectForKey:@"latitude"];
+		NSString *longitude = [photoDict objectForKey:@"longitude"];
+		NSString *accuracy  = [photoDict objectForKey:@"accuracy"];
+		
+		if (nil != desc)			[metadata setObject:desc forKey:@"descriptionHTML"];
+		if (nil != can_download)	[metadata setObject:can_download forKey:@"can_download"];
+		if (nil != latitude)		[metadata setObject:latitude forKey:@"latitude"];
+		if (nil != longitude)		[metadata setObject:longitude forKey:@"longitude"];
+		if (nil != accuracy)		[metadata setObject:accuracy forKey:@"accuracy"];
+
+		obj.metadata = [NSDictionary dictionaryWithDictionary:metadata];
+						 
 		obj.parser = self.parser;
 		
 		obj.imageLocation = thumbnailURL;
@@ -527,22 +566,25 @@ typedef enum {
 	
 	//	limit the search to a specific number of items...
 	[arguments setObject:@"30" forKey:@"per_page"];
+	
+	// We are only doing photos.  Maybe later we want to do videos?
+	[arguments setObject:@"photos" forKey:@"media"];
 
+	// Extra metadata needed
+	[arguments setObject:@"description,original_format,geo,url_o,usage" forKey:@"extras"];
+	// Useful keys we can get from this:
+	// description -> array with ...
+	// license ->
+	// original_format -> originalformat, orignalsecret
+	// geo -> latitude, longitude
+	// url_o -> url_o
+	// usage: can_download (& others)
+	
 	//	load the specified page...
 	NSString* page = [NSString stringWithFormat:@"%d", self.page + 1];
 	[arguments setObject:page forKey:@"page"];
 	
 	return arguments;
-}
-
-
-+ (NSImage*) coreTypeIconNamed: (NSString*) name {
-	NSBundle* coreTypes = [NSBundle	bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
-	NSString* path = [coreTypes pathForResource:name ofType:nil];
-	NSImage* icon = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize (16.0,16.0)];
-	return icon;
 }
 
 
