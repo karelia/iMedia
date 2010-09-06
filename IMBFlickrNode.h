@@ -150,4 +150,10 @@ typedef enum {
 @property (copy) NSString* query;
 @property (assign) IMBFlickrNodeSortOrder sortOrder;
 
+#pragma mark Utilities
+
++ (NSString *)base58EncodedValue:(long long)num;
++ (NSString *)descriptionOfLicense:(int)aLicenseNumber;
+
+
 @end

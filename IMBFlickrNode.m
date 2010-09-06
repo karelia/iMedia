@@ -340,7 +340,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		NSURL* imageURL = nil;
 		if (FlickrSizeSpecifierOriginal == parser.desiredSize && nil != [photoDict objectForKey:@"url_o"])
 		{
-			imageURL = [photoDict objectForKey:@"url_o"];
+			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_o"]];
 		}
 		else
 		{
@@ -348,7 +348,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 			imageURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:flickrSize];
 		}
 		
-		NSURL* webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
+		NSURL *webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
 				
 		IMBFlickrObject* obj = [[IMBFlickrObject alloc] init];
 		
@@ -357,17 +357,18 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
 										
 		[metadata setObject:webPageURL forKey:@"webPageURL"];
-		NSString *desc = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
-		NSString *can_download = [photoDict objectForKey:@"can_download"];
-		NSString *latitude  = [photoDict objectForKey:@"latitude"];
-		NSString *longitude = [photoDict objectForKey:@"longitude"];
-		NSString *accuracy  = [photoDict objectForKey:@"accuracy"];
 		
-		if (nil != desc)			[metadata setObject:desc forKey:@"descriptionHTML"];
+		NSString *can_download = [photoDict objectForKey:@"can_download"];
+		NSString *desc = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
+		NSString *license = [photoDict objectForKey:@"license"];
+		NSString *ownerName = [photoDict objectForKey:@"ownername"];
+		NSString *photoID = [photoDict objectForKey:@"id"];
+
 		if (nil != can_download)	[metadata setObject:can_download forKey:@"can_download"];
-		if (nil != latitude)		[metadata setObject:latitude forKey:@"latitude"];
-		if (nil != longitude)		[metadata setObject:longitude forKey:@"longitude"];
-		if (nil != accuracy)		[metadata setObject:accuracy forKey:@"accuracy"];
+		if (nil != desc)			[metadata setObject:desc forKey:@"descriptionHTML"];
+		if (nil != license)			[metadata setObject:license forKey:@"license"];
+		if (nil != ownerName)		[metadata setObject:ownerName forKey:@"ownerName"];
+		if (nil != photoID)			[metadata setObject:photoID forKey:@"id"];
 
 		obj.metadata = [NSDictionary dictionaryWithDictionary:metadata];
 						 
@@ -511,11 +512,12 @@ typedef enum {
 	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialShareAlike = 1,
 	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercial = 2,
 	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialNoDerivs = 3,
-	IMBFlickrNodeFlickrLicenseID_AttributionShareAlike = 5,
 	IMBFlickrNodeFlickrLicenseID_Attribution = 4,
+	IMBFlickrNodeFlickrLicenseID_AttributionShareAlike = 5,
 	IMBFlickrNodeFlickrLicenseID_AttributionNoDerivs = 6,
 	IMBFlickrNodeFlickrLicenseID_NoKnownCopyrightRestrictions = 7
 } IMBFlickrNodeFlickrLicenseID;
+
 
 ///	Make the properties of the receiver into a dictionary with keys and values
 ///	that can be directly passed to the Flick method call.
@@ -571,12 +573,10 @@ typedef enum {
 	[arguments setObject:@"photos" forKey:@"media"];
 
 	// Extra metadata needed
-	[arguments setObject:@"description,original_format,geo,url_o,usage" forKey:@"extras"];
+	[arguments setObject:@"owner_name,license,description,original_format,url_o,usage" forKey:@"extras"];
 	// Useful keys we can get from this:
 	// description -> array with ...
-	// license ->
 	// original_format -> originalformat, orignalsecret
-	// geo -> latitude, longitude
 	// url_o -> url_o
 	// usage: can_download (& others)
 	
@@ -638,6 +638,60 @@ typedef enum {
 	NSString* uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
 	if (uuid == nil) uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_Query];
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,uuid];
+}
+
+#pragma mark -
+#pragma mark Utilities
+								  
+// From http://gist.github.com/101674
+
++ (NSString *)base58EncodedValue:(long long)num {
+  NSString *alphabet = @"123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+  int baseCount = [alphabet length];
+  NSString *encoded = @"";
+  while(num >= baseCount) {
+	  double div = num/baseCount;
+	  long long mod = (num - (baseCount * (long long)div));
+	  NSString *alphabetChar = [alphabet substringWithRange: NSMakeRange(mod, 1)];
+	  encoded = [NSString stringWithFormat: @"%@%@", alphabetChar, encoded];
+	  num = (long long)div;
+  }
+  
+  if(num) {
+	  encoded = [NSString stringWithFormat: @"%@%@", [alphabet substringWithRange: NSMakeRange(num, 1)], encoded];
+  }
+  return encoded;
+}
+								  
++ (NSString *)descriptionOfLicense:(int)aLicenseNumber
+{
+	NSString *result = nil;
+	switch(aLicenseNumber)
+	{
+		case IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialShareAlike:
+			result = @"Attribution-NonCommercial-ShareAlike License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_AttributionNonCommercial:
+			result = @"Attribution-NonCommercial License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialNoDerivs:
+			result = @"Attribution-NonCommercial-NoDerivs License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_Attribution:
+			result = @"Attribution License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_AttributionShareAlike:
+			result = @"Attribution-ShareAlike License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_AttributionNoDerivs:
+			result = @"Attribution-NoDerivs License";
+			break;
+	}
+	if (result)
+	{
+		result = [@"Creative Commons: " stringByAppendingString:result];
+	}
+	return result;
 }
 
 @end
