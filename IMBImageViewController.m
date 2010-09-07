@@ -166,7 +166,7 @@
 						[IMBFlickrNode base58EncodedValue:[[metadata objectForKey:@"id"] longLongValue]]]];
 
 			NSString *licenseDescription = [IMBFlickrNode descriptionOfLicense:[[metadata objectForKey:@"license"] intValue]];
-			NSString *credit = [metadata objectForKey:@"ownerName"];
+			NSString *credit = [metadata objectForKey:@"ownername"];
 
 			NSMutableData *data = [NSMutableData data];
 			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)localURL, NULL);

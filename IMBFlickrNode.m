@@ -332,25 +332,64 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	OFFlickrAPIRequest* flickrRequest = [self.attributes objectForKey:@"flickrRequest"];
 
 	IMBFlickrParser *parser = (IMBFlickrParser *)self.parser;
-	NSString *flickrSize = [self flickrSizeFromFlickrSizeSpecifier:parser.desiredSize];
 	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
 	for (NSDictionary* photoDict in photos) {
 		NSURL* thumbnailURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
 		NSURL* imageURL = nil;
-		if (FlickrSizeSpecifierOriginal == parser.desiredSize && nil != [photoDict objectForKey:@"url_o"])
+		NSURL *webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
+
+		FlickrSizeSpecifier size = parser.desiredSize;
+		if (!imageURL && FlickrSizeSpecifierOriginal == size)
 		{
-			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_o"]];
+			if ([photoDict objectForKey:@"url_o"])
+			{
+				imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_o"]];
+			}
+			else
+			{
+				size = FlickrSizeSpecifierLarge;		// downgrade to requesting large if no original
+			}
 		}
-		else
+		if (!imageURL && FlickrSizeSpecifierLarge == size)
 		{
-			// build up URL programatically 
-			imageURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:flickrSize];
-			NSLog(@"No original available : %@", [photoDict objectForKey:@"title"]);
-			thumbnailURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForImageResource:@"Flickr"]];
+			if ([photoDict objectForKey:@"url_l"])
+			{
+				imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_l"]];
+			}
+			else
+			{
+				size = FlickrSizeSpecifierMedium;		// downgrade to requesting medium if no large
+			}
+		}
+
+		if (!imageURL && FlickrSizeSpecifierMedium == size)
+		{
+			if ([photoDict objectForKey:@"url_m"])
+			{
+				imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_m"]];
+			}
+			else
+			{
+				size = FlickrSizeSpecifierSmall;		// downgrade to requesting medium if no large
+			}
 		}
 		
-		NSURL *webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
+		if (!imageURL && FlickrSizeSpecifierSmall == size)
+		{
+			if ([photoDict objectForKey:@"url_s"])
+			{
+				imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_s"]];
+			}
+		}
+		
+		// Fallback.  Really we should have it by now! But search for Edward & Bella Icon has no medium size!
+		if (!imageURL)
+		{
+			// build up URL programatically 
+			NSString *flickrSize = [self flickrSizeFromFlickrSizeSpecifier:size];
+			imageURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:flickrSize];
+		}
 				
 		IMBFlickrObject* obj = [[IMBFlickrObject alloc] init];
 		
@@ -374,7 +413,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 //
 //		if (nil != can_download)	[metadata setObject:can_download forKey:@"can_download"];
 //		if (nil != license)			[metadata setObject:license forKey:@"license"];
-//		if (nil != ownerName)		[metadata setObject:ownerName forKey:@"ownerName"];
+//		if (nil != ownerName)		[metadata setObject:ownerName forKey:@"ownername"];
 //		if (nil != photoID)			[metadata setObject:photoID forKey:@"id"];
 
 		obj.metadata = [NSDictionary dictionaryWithDictionary:metadata];
@@ -581,12 +620,13 @@ typedef enum {
 
 	// Extra metadata needed
 	// http://www.flickr.com/services/api/flickr.photos.search.html
-	[arguments setObject:@"owner_name,license,description,original_format,url_o,usage,o_dims" forKey:@"extras"];
+	[arguments setObject:@"owner_name,license,description,original_format,url_o,url_l,url_m,url_s,searurl_usage,o_dims" forKey:@"extras"];
 	// Useful keys we can get from this:
 	// description -> array with ...
 	// original_format -> originalformat, orignalsecret
-	// url_o -> url_o
+	// url_o,l, m, s ... URL to get the various sizes.  (url_l is not really documented, but works if needed.)
 	// usage: can_download (& others)
+	// Example of a photo that can't be downloaded: THE DECEIVING title.
 	
 	//	load the specified page...
 	NSString* page = [NSString stringWithFormat:@"%d", self.page + 1];
