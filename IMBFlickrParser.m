@@ -364,7 +364,7 @@
 - (void) willShowContextMenu: (NSMenu*) inMenu forObject: (IMBObject*) inObject {
 	//	'Open Flickr Page'...
 	NSString *title = nil;
-	NSString *item = nil;
+	NSMenuItem *item = nil;
 	
 	if ([inObject isSelectable])
 	{
