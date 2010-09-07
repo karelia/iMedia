@@ -66,6 +66,8 @@
 @implementation IMBApertureHeaderViewController
 
 @synthesize owningNode = _owningNode;
+@synthesize headerTitle = _headerTitle;
+@synthesize headerMessage = _headerMessage;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -100,16 +102,16 @@
 		
 	// Localize...
 	
-//	NSMenuItem* item = nil;
-//	NSString* title = nil;
-//	NSMenu* menu  = [[[NSMenu alloc] initWithTitle:@""] autorelease];
-//	
-//	title = NSLocalizedStringWithDefaultValue(@"IMBApertureParser.menu.searchIn",nil,IMBBundle(),@"Search in",@"Menu item in Aperture options popup");
-//	item = [[NSMenuItem alloc] initWithTitle:title action:@selector(disabledAction:) keyEquivalent:@""];
-//	item.target = self;
-//	item.tag = 0;
-//	[menu addItem:item];
-//	[item release];
+	self.headerTitle.stringValue = NSLocalizedStringWithDefaultValue(@"IMBApertureParser.header.placeholderTitle",
+																	 nil,
+																	 IMBBundle(),
+																	 @"Please enable preview sharing",
+																	 @"Title in the Aperture header view");
+	self.headerMessage.stringValue = NSLocalizedStringWithDefaultValue(@"IMBApertureParser.header.placeholderMessage",
+																	   nil,
+																	   IMBBundle(),
+																	   @"Go to Aperture Preferences > Preview > Share Previews with iLife and iWork.\nSet it to \"Always\".",
+																	   @"Message in the Aperture header view");
 }
 
 
@@ -126,3 +128,4 @@
 
 
 @end
+
