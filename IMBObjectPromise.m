@@ -114,7 +114,10 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		// Start our mapping with all null objects (need to fulfill these promises)
 		for (IMBObject* thisObject in inObjects)
 		{
-			[self.objectsToLocalURLs setObject:[NSNull null] forKey:thisObject];
+			if (thisObject.location)	// only do objects that have a URL
+			{
+				[self.objectsToLocalURLs setObject:[NSNull null] forKey:thisObject];
+			}
 		}
 		
 		self.downloadFolderPath = [IMBConfig downloadFolderPath];
