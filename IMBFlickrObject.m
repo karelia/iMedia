@@ -68,20 +68,31 @@
 // implementation that simply synchronously downloads the thumbnail and stores it in a local file in the temp  
 // items folder. We don't even do a cleanup (hopefully the OS will take care of that ;-)...
 
+// Is there even a way to do a asynchronous QuickLook preview load?  I don't see any methods for notification when
+// something is loaded.
+// Maybe some hints here:  QuickLookDownloader sample code from Apple, along with http://development.christopherdrum.com/blog/?p=109
+
 - (NSURL*) previewItemURL
 {
-//	return self.imageLocation;		// Doesn't seem to work!
-	
-	NSURL* origURL = self.imageLocation;
-	NSData* data = [NSData dataWithContentsOfURL:origURL];
-	
-	NSString* folder = NSTemporaryDirectory();
-	NSString* filename = [[origURL path] lastPathComponent];
-	NSString* path = [folder stringByAppendingPathComponent:filename];
-	NSURL* url = [NSURL fileURLWithPath:path];
-	[data writeToURL:url atomically:NO];
-	
-	return url;
+	NSURL* result = nil;
+	NSURL *quickLookURL = [self.metadata objectForKey:@"quickLookURL"];
+	if (quickLookURL)
+	{
+		NSData* data = [NSData dataWithContentsOfURL:quickLookURL];
+		
+		NSString* folder = [NSTemporaryDirectory() stringByAppendingPathComponent:@"iMedia-QuickLook"];
+		[[NSFileManager defaultManager] createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:nil];
+		NSString* filename = [[quickLookURL path] lastPathComponent];
+		NSString* path = [folder stringByAppendingPathComponent:filename];
+		result = [NSURL fileURLWithPath:path];
+		[data writeToURL:result atomically:NO];
+	}
+	return result;
+}
+
+- (NSString *)previewItemTitle
+{
+	return self.name;
 }
 
 
