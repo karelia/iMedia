@@ -409,6 +409,7 @@
 		[self loadCustomQueries];
 		
 		// setup desired size to get, from delegate
+		self.desiredSize = FlickrSizeSpecifierLarge;	// default size
 		if (_delegate && [_delegate respondsToSelector:@selector(flickrParserDesiredSize)]) {
 			self.desiredSize = [_delegate flickrParserDesiredSize];
 		}
