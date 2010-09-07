@@ -57,13 +57,18 @@
 @interface IMBApertureHeaderViewController : NSViewController
 {
 	IMBNode* _owningNode;
+	NSTextField *_headerTitle;
+	NSTextField *_headerMessage;
 }
 
 + (IMBApertureHeaderViewController*) headerViewControllerWithNode:(IMBNode*)inNode;
 
 @property (assign) IMBNode* owningNode;
+@property (nonatomic, retain) IBOutlet NSTextField *headerTitle;
+@property (nonatomic, retain) IBOutlet NSTextField *headerMessage;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
