@@ -397,7 +397,8 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		IMBFlickrObject* obj = [[IMBFlickrObject alloc] init];
 		
 		// Only store a location if we are allowed to download
-		if ([[photoDict objectForKey:@"can_download"] boolValue])
+		BOOL canDownload = [[photoDict objectForKey:@"can_download"] boolValue];
+		if (canDownload)
 		{
 			obj.location = [self imageURLForDesiredSize:parser.desiredSize fromPhotoDict:photoDict context:flickrRequest.context];
 		}
@@ -631,7 +632,7 @@ typedef enum {
 
 	// Extra metadata needed
 	// http://www.flickr.com/services/api/flickr.photos.search.html
-	[arguments setObject:@"owner_name,license,description,original_format,url_o,url_l,url_m,url_s,searurl_usage,o_dims" forKey:@"extras"];
+	[arguments setObject:@"owner_name,license,description,original_format,url_o,url_l,url_m,url_s,usage,o_dims" forKey:@"extras"];
 	// Useful keys we can get from this:
 	// description -> array with ...
 	// original_format -> originalformat, orignalsecret
