@@ -98,7 +98,7 @@
 
 - (BOOL) isSelectable 
 {
-	return [[self.metadata objectForKey:@"can_download"] boolValue];
+	return [super isSelectable]; // [[self.metadata objectForKey:@"can_download"] boolValue];
 }
 
 //----------------------------------------------------------------------------------------------------------------------
