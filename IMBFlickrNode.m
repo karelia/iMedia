@@ -328,6 +328,64 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	return sizeLookup[flickrSizeSpecifier];
 }
 
+- (NSURL *)imageURLForDesiredSize:(FlickrSizeSpecifier)size fromPhotoDict:(NSDictionary *)photoDict context:(OFFlickrAPIContext*) context;
+{
+	NSURL* imageURL = nil;
+	if (!imageURL && FlickrSizeSpecifierOriginal == size)
+	{
+		if ([photoDict objectForKey:@"url_o"])
+		{
+			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_o"]];
+		}
+		else
+		{
+			size = FlickrSizeSpecifierLarge;		// downgrade to requesting large if no original
+		}
+	}
+	if (!imageURL && FlickrSizeSpecifierLarge == size)
+	{
+		if ([photoDict objectForKey:@"url_l"])
+		{
+			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_l"]];
+		}
+		else
+		{
+			size = FlickrSizeSpecifierMedium;		// downgrade to requesting medium if no large
+		}
+	}
+	
+	if (!imageURL && FlickrSizeSpecifierMedium == size)
+	{
+		if ([photoDict objectForKey:@"url_m"])
+		{
+			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_m"]];
+		}
+		else
+		{
+			size = FlickrSizeSpecifierSmall;		// downgrade to requesting medium if no large
+		}
+	}
+	
+	if (!imageURL && FlickrSizeSpecifierSmall == size)
+	{
+		if ([photoDict objectForKey:@"url_s"])
+		{
+			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_s"]];
+		}
+	}
+	
+	// Fallback.  Really we should have it by now! But search for Edward & Bella Icon has no medium size!
+	if (!imageURL)
+	{
+		// build up URL programatically 
+		NSString *flickrSize = [self flickrSizeFromFlickrSizeSpecifier:size];
+		imageURL = [context photoSourceURLFromDictionary:photoDict size:flickrSize];
+	}
+	return imageURL;	
+}
+
+
+
 - (NSArray*) extractPhotosFromFlickrResponse: (NSDictionary*) response {
 	OFFlickrAPIRequest* flickrRequest = [self.attributes objectForKey:@"flickrRequest"];
 
@@ -335,72 +393,24 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
 	for (NSDictionary* photoDict in photos) {
-		NSURL* thumbnailURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
-		NSURL* imageURL = nil;
-		NSURL *webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
 
-		FlickrSizeSpecifier size = parser.desiredSize;
-		if (!imageURL && FlickrSizeSpecifierOriginal == size)
-		{
-			if ([photoDict objectForKey:@"url_o"])
-			{
-				imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_o"]];
-			}
-			else
-			{
-				size = FlickrSizeSpecifierLarge;		// downgrade to requesting large if no original
-			}
-		}
-		if (!imageURL && FlickrSizeSpecifierLarge == size)
-		{
-			if ([photoDict objectForKey:@"url_l"])
-			{
-				imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_l"]];
-			}
-			else
-			{
-				size = FlickrSizeSpecifierMedium;		// downgrade to requesting medium if no large
-			}
-		}
-
-		if (!imageURL && FlickrSizeSpecifierMedium == size)
-		{
-			if ([photoDict objectForKey:@"url_m"])
-			{
-				imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_m"]];
-			}
-			else
-			{
-				size = FlickrSizeSpecifierSmall;		// downgrade to requesting medium if no large
-			}
-		}
-		
-		if (!imageURL && FlickrSizeSpecifierSmall == size)
-		{
-			if ([photoDict objectForKey:@"url_s"])
-			{
-				imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_s"]];
-			}
-		}
-		
-		// Fallback.  Really we should have it by now! But search for Edward & Bella Icon has no medium size!
-		if (!imageURL)
-		{
-			// build up URL programatically 
-			NSString *flickrSize = [self flickrSizeFromFlickrSizeSpecifier:size];
-			imageURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:flickrSize];
-		}
-				
 		IMBFlickrObject* obj = [[IMBFlickrObject alloc] init];
 		
-		obj.location = imageURL;
+		// Only store a location if we are allowed to download
+		if ([[photoDict objectForKey:@"can_download"] boolValue])
+		{
+			obj.location = [self imageURLForDesiredSize:parser.desiredSize fromPhotoDict:photoDict context:flickrRequest.context];
+		}
 		obj.name = [photoDict objectForKey:@"title"];
-		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
 		
 		// A lot of the metadata comes from the "extras" key we request
+		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
 		[metadata addEntriesFromDictionary:photoDict];		// give metaData the whole thing!
-		
+		NSURL *webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
 		[metadata setObject:webPageURL forKey:@"webPageURL"];
+		
+		NSURL *quickLookURL = [self imageURLForDesiredSize:FlickrSizeSpecifierMedium fromPhotoDict:photoDict context:flickrRequest.context];
+		[metadata setObject:quickLookURL forKey:@"quickLookURL"];
 
 		// But give it a better 'description' without the nested item
 		NSString *desc = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
@@ -420,6 +430,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 						 
 		obj.parser = self.parser;
 		
+		NSURL* thumbnailURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
 		obj.imageLocation = thumbnailURL;
 		obj.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 		obj.imageRepresentation = nil;	// Build lazily when needed
