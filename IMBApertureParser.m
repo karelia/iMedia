@@ -53,6 +53,8 @@
 #pragma mark HEADERS
 
 #import "IMBApertureParser.h"
+
+#import "IMBApertureHeaderViewController.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBEnhancedObject.h"
@@ -92,6 +94,7 @@
 
 @implementation IMBApertureParser
 
+@synthesize placeholderParser = _placeholderParser;
 @synthesize appPath = _appPath;
 @synthesize plist = _plist;
 @synthesize modificationDate = _modificationDate;
@@ -156,6 +159,25 @@
 		}
 		
 		if (apertureLibraries) CFRelease(apertureLibraries);
+		
+		if ([parserInstances count] == 0) {
+			NSArray *keys = [NSArray arrayWithObjects:@"RKXMLExportManagerMode", @"LibraryPath", nil];
+			NSDictionary *preferences = (NSDictionary*) CFPreferencesCopyMultiple((CFArrayRef)keys, 
+																				   (CFStringRef)@"com.apple.Aperture", 
+																				   kCFPreferencesCurrentUser, 
+																				   kCFPreferencesAnyHost);
+			NSString *exportManagerMode = [preferences objectForKey:[keys objectAtIndex:0]];
+			NSString *libraryPath = [preferences objectForKey:[keys objectAtIndex:1]];
+			
+			if ((libraryPath != nil) && ([@"RKXMLExportManagerExportNeverKey" isEqual:exportManagerMode])) {
+				IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+				parser.placeholderParser = YES;
+				parser.mediaSource = libraryPath;
+				parser.shouldDisplayLibraryName = NO;
+				[parserInstances addObject:parser];
+				[parser release];
+			}
+		}
 	}
 	
 	return parserInstances;
@@ -215,14 +237,28 @@
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 
-		node.parentNode = inOldNode.parentNode;
-		node.mediaSource = self.mediaSource;
-		node.identifier = [self rootNodeIdentifier];
-		node.name = @"Aperture";
-		node.icon = icon;
-		node.groupType = kIMBGroupTypeLibrary;
-		node.parser = self;
-		node.leaf = NO;
+		if (self.placeholderParser) {
+			node.parentNode = inOldNode.parentNode;
+			node.mediaSource = self.mediaSource;
+			node.identifier = [self rootNodeIdentifier];
+			node.name = @"Aperture";
+			node.icon = icon;
+			node.groupType = kIMBGroupTypeLibrary;
+			node.parser = self;
+			node.leaf = YES;
+			node.shouldDisplayObjectView = NO;
+			node.customHeaderViewController = [IMBApertureHeaderViewController headerViewControllerWithNode:node];
+		}
+		else {
+			node.parentNode = inOldNode.parentNode;
+			node.mediaSource = self.mediaSource;
+			node.identifier = [self rootNodeIdentifier];
+			node.name = @"Aperture";
+			node.icon = icon;
+			node.groupType = kIMBGroupTypeLibrary;
+			node.parser = self;
+			node.leaf = NO;			
+		}
 	}
 	
 	// Or a subnode...
