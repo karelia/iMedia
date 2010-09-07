@@ -1094,7 +1094,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					// Use our promise object to load the content
 					NSData* data = [inItem dataForType:kIMBObjectPromiseType];
 					IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-					if (promise != nil)
+					if (promise != nil && [promise.objects count] > 0)
 					{
 						promise.downloadFolderPath = NSTemporaryDirectory();
 						[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
