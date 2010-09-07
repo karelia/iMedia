@@ -514,11 +514,14 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		if (![object isKindOfClass:[IMBButtonObject class]])
 		{
 			NSURL* url = [object url];
-			IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
-			op.delegateReference = object;
-			op.downloadFolderPath = self.downloadFolderPath;
-			[self.downloadOperations addObject:op];
-			[op release];
+			if (url)	// if unable to download, URL will be nil
+			{
+				IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
+				op.delegateReference = object;
+				op.downloadFolderPath = self.downloadFolderPath;
+				[self.downloadOperations addObject:op];
+				[op release];
+			}
 		}
 	}
 
