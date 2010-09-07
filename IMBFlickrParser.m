@@ -147,6 +147,47 @@
 	}
 }
 
+- (IBAction) copyFlickrPageURL: (id) sender {
+	if (![sender isKindOfClass:[NSMenuItem class]]) return;
+	
+	id obj = [sender representedObject];
+	if ([obj isKindOfClass:[IMBObject class]]) {
+		IMBObject* imbObject = (IMBObject*) obj;
+		NSURL* webPage = [[imbObject metadata] objectForKey:@"webPageURL"];
+
+		NSPasteboard *pb = [NSPasteboard generalPasteboard];
+		NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+		[pb declareTypes:types owner:self];
+		[pb setString:[webPage absoluteString] forType:NSStringPboardType];
+	
+	} else {
+		NSLog (@"Can't handle this kind of object.");
+	}
+}
+
+- (IBAction) copyAttribution: (id) sender {
+	if (![sender isKindOfClass:[NSMenuItem class]]) return;
+	
+	id obj = [sender representedObject];
+	if ([obj isKindOfClass:[IMBObject class]]) {
+		IMBObject* imbObject = (IMBObject*) obj;
+		
+		NSURL *shortWebPageURL = [NSURL URLWithString:[@"http://flic.kr/p/" stringByAppendingString:
+													   [IMBFlickrNode base58EncodedValue:[[[imbObject metadata] objectForKey:@"id"] longLongValue]]]];
+		NSString *credit = [[obj metadata] objectForKey:@"ownername"];
+		NSString *format = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.format.attribution",nil,IMBBundle(),@"Photo by %@ - %@",@"Format string for attribution credit; flickr user followed by short URL");
+		NSString *attribution = [NSString stringWithFormat:format, credit, [shortWebPageURL absoluteString]];
+		
+		NSPasteboard *pb = [NSPasteboard generalPasteboard];
+		NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+		[pb declareTypes:types owner:self];
+		[pb setString:attribution forType:NSStringPboardType];
+
+	} else {
+		NSLog (@"Can't handle this kind of object.");
+	}
+}
+
 
 - (IBAction) removeNode: (id) sender {
 	if (![sender isKindOfClass:[NSMenuItem class]]) return;
@@ -322,17 +363,36 @@
 
 - (void) willShowContextMenu: (NSMenu*) inMenu forObject: (IMBObject*) inObject {
 	//	'Open Flickr Page'...
+	NSString *title = nil;
+	NSString *item = nil;
 	
 	if ([inObject isSelectable])
 	{
-		NSString* title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.openflickrpage",nil,IMBBundle(),@"Open Flickr Page",@"Flickr parser node context menu title.");
-		NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:title 
-																 action:@selector(openFlickrPage:) 
-														  keyEquivalent:@""];
-		[showWebPageItem setTarget:self];
-		[showWebPageItem setRepresentedObject:inObject];
-		[inMenu addItem:showWebPageItem];
-		[showWebPageItem release];
+		title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.openflickrpage",nil,IMBBundle(),@"Open Flickr Page",@"Flickr parser node context menu title.");
+		item = [[[NSMenuItem alloc] initWithTitle:title 
+										   action:@selector(openFlickrPage:) 
+									keyEquivalent:@""] autorelease];
+		[item setTarget:self];
+		[item setRepresentedObject:inObject];
+		[inMenu addItem:item];
+
+		
+		title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.copyFlickrURL",nil,IMBBundle(),@"Copy Flickr Page URL",@"Flickr parser node context menu title.");
+		item = [[[NSMenuItem alloc] initWithTitle:title 
+										   action:@selector(copyFlickrPageURL:) 
+									keyEquivalent:@""] autorelease];
+		[item setTarget:self];
+		[item setRepresentedObject:inObject];
+		[inMenu addItem:item];
+
+
+		title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.copyAttribution",nil,IMBBundle(),@"Copy Attribution",@"Flickr parser node context menu title.");
+		item = [[[NSMenuItem alloc] initWithTitle:title 
+										   action:@selector(copyAttribution:) 
+									keyEquivalent:@""] autorelease];
+		[item setTarget:self];
+		[item setRepresentedObject:inObject];
+		[inMenu addItem:item];
 	}
 }
 
