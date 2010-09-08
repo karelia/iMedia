@@ -336,7 +336,7 @@
 			node.leaf = NO;
 			node.parser = self;
 			// ??? node.mediaSource = self.mediaSource;
-			// ????? node.identifier = [self identifierForPath:@"/"];
+			node.identifier = [self identifierForPath:[NSString stringWithFormat:@"/%d/%@",theID, theName]];
 			
 			[subNodes addObject:node];
 		}
