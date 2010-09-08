@@ -88,6 +88,9 @@ static NSString* kPosterFrameKeyPath = @"arrangedObjects.posterFrame";
 static NSString* kObjectCountStringKey = @"objectCountString";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
+NSString* kIMBPublicTitlePasteboardType = @"com.karelia.imedia.title";
+NSString* kIMBPublicMetaDataPasteboardType = @"com.karelia.imedia.metadata";
+
 NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 
@@ -1455,6 +1458,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						
 						[thisItem setDataProvider:self forTypes:whichTypes];
 						[thisItem setString:[NSString stringWithFormat:@"%d", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
+						[thisItem setString:thisObject.name forType:kIMBPublicTitlePasteboardType];
+						[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetaDataPasteboardType];
 						[thisItem setData:promiseData forType:kIMBObjectPromiseType];
 						[itemArray addObject:thisItem];
 					}
@@ -1809,7 +1814,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #pragma mark QuickLook
 
 
-// Toggle the visibilty of the Quicklook panel...
+// Toggle the visibility of the Quicklook panel...
 
 - (IBAction) quicklook:(id)inSender
 {
