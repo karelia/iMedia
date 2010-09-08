@@ -103,8 +103,6 @@
 
 - (void) awakeFromNib
 {
-	[super awakeFromNib];
-	
 	// Configure the search field...
 	
 	[_queryField setAction:_queryAction];
