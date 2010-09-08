@@ -412,7 +412,7 @@
 
 - (FlickrSizeSpecifier)flickrParserDesiredSize;
 {
-	return FlickrSizeSpecifierOriginal;
+	return FlickrSizeSpecifierSmall; // FlickrSizeSpecifierOriginal;
 }
 
 @end
