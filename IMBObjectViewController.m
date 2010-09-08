@@ -1094,6 +1094,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					// Use our promise object to load the content
 					NSData* data = [inItem dataForType:kIMBObjectPromiseType];
 					IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+					
+					// Make sure we got a promise, AND check that there are actually some items to download,
+					// before we actually try to start downloading.
 					if (promise != nil && [promise.objects count] > 0)
 					{
 						promise.downloadFolderPath = NSTemporaryDirectory();
@@ -1114,6 +1117,16 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
+// 10.5 API.
+// Gets called by ClearContents... and ... ?
+
+- (void)pasteboardFinishedWithDataProvider:(NSPasteboard *)pasteboard
+{
+	NSLog(@"%s", __FUNCTION__);		// Do we want to do anything here? Clear out drag pasteboard contents?
+}
+
+
+// 10.5 API:
 // Even dumber are apps that do not support NSFilesPromisePboardType, but only know about NSFilenamesPboardType.
 // In this case we'll download to the temp folder and block synchronously until the download has completed...
 
@@ -1394,6 +1407,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		{
 			IMBParser* parser = node.parser;
 
+			// Promise data for all of the objects being dragged. (In 10.6, each index will be extracted one-by-one.)
 			IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 			NSData* promiseData = [NSKeyedArchiver archivedDataWithRootObject:promise];
 
@@ -1422,6 +1436,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					IMBObject* thisObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
 					if (thisObject != nil)
 					{
+						// Allocate class indirectly since we compiling against the 10.5 SDK, not the 10.6
 						NSPasteboardItem* thisItem = [[[NSClassFromString(@"NSPasteboardItem") alloc] init] autorelease];
 						
 						// We need to be declare kUTTypeFileURL in order to get file drags to work as expected to e.g. the Finder,
@@ -1429,7 +1444,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						// in the objects themself, but for now to get things working let's consult a method on ourselves that subclasses
 						// can override if they don't create file URLs.
 						NSArray* whichTypes = nil;
-						if ([self writesLocalFilesToPasteboard])
+						if ([self writesLocalFilesToPasteboard])	// are we putting references to the files on the pasteboard?
 						{
 							whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,(NSString*)kUTTypeFileURL,nil];
 						}
@@ -1447,7 +1462,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					thisIndex = [inIndexes indexGreaterThanIndex:thisIndex];
 				}
 				
-				[inPasteboard writeObjects:itemArray];				
+				[inPasteboard writeObjects:itemArray];			// write array of NSPasteboardItems.
 			}
 			else
 			{
@@ -1474,6 +1489,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	return itemsWritten;	
 }
+
+// IKImageBrowserDataSource method. Calls down to our support method used by combo view and browser view.
 
 - (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
