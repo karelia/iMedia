@@ -363,6 +363,7 @@
 	{
 		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
 		{
+			NSAssert(url, @"Nil image source URL");
 			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
 
 			if (source)

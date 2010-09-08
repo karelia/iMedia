@@ -238,11 +238,13 @@ CGImageSourceRef IMB_CGImageSourceCreateWithImageItem(id <IMBImageItem> item, CF
     if ([type isEqualToString:IKImageBrowserNSURLRepresentationType])
     {
         NSURL *url = [item imageRepresentation];
+		NSCAssert((id)url, @"Nil image source URL");
         result = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
     }
     else if ([type isEqualToString:IKImageBrowserPathRepresentationType])
     {
         NSString *path = [item imageRepresentation];
+		NSCAssert((id)path, @"Nil image source URL");
         result = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
     }
     else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
