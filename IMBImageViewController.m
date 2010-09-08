@@ -169,6 +169,7 @@
 			NSString *credit = [metadata objectForKey:@"ownername"];
 
 			NSMutableData *data = [NSMutableData data];
+			NSAssert(localURL, @"Nil image source URL");
 			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)localURL, NULL);
 			CGImageDestinationRef dest = CGImageDestinationCreateWithData((CFMutableDataRef)data,
 																				 (CFStringRef)@"public.jpeg", 1, NULL);

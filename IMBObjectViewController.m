@@ -1118,7 +1118,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 
 // 10.5 API.
-// Gets called by ClearContents... and ... ?
+// Gets called by ClearContents and declareTypes:owner: and ... ?
 
 - (void)pasteboardFinishedWithDataProvider:(NSPasteboard *)pasteboard
 {

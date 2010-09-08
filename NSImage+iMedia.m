@@ -99,6 +99,7 @@
 	NSDictionary *result = nil;
 	CGImageSourceRef source = nil;
 	NSURL *url = [NSURL fileURLWithPath:aPath];
+	NSAssert(url, @"Nil image source URL");
 	source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
 	if (source)
 	{
