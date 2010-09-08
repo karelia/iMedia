@@ -1224,7 +1224,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		@"Preparing…",
 		@"Text message in progress panel of IMBObjectViewController");
 	
-	[controller window];
+	// Make sure the window is at a higher window level than our view's window, so it doesn't get hidden
+	[[controller window] setLevel:[[[self view] window] level] + 1];
+	
 	[controller setTitle:title];
 	[controller setMessage:message];
 	[controller.progressBar startAnimation:nil];
