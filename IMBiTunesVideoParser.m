@@ -113,6 +113,7 @@
 	if ([inTrackDict objectForKey:@"Name"] == nil) return NO;
 	if ([[inTrackDict objectForKey:@"Location"] length] == 0) return NO;
 	if ([[inTrackDict objectForKey:@"Has Video"] boolValue] == 0) return NO;
+	if ([[inTrackDict objectForKey:@"Protected"] boolValue] == 1) return NO;	
 	
 	return YES;
 }
