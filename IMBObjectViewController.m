@@ -516,7 +516,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibListView setAction:@selector(tableViewWasClicked:)];
 	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
 	
-    [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+    [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];	// I think this was to work around a bug
     [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
 
@@ -527,7 +527,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibComboView setAction:@selector(tableViewWasClicked:)];
 	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
 	
-    [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+    [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];	// I think this was to work around a bug
     [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
 
@@ -1427,7 +1427,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			// URLs lazily we have to set an array of NSPasteboardItem on the pasteboard, with each item 
 			// set to callback to us as data provider.
 			//
-			if (IMBRunningOnSnowLeopardOrNewer())
+			if (NO && IMBRunningOnSnowLeopardOrNewer())
 			{				
 				(void) [inPasteboard clearContents];
 				NSMutableArray* itemArray = [NSMutableArray arrayWithCapacity:[inIndexes count]];
@@ -1476,7 +1476,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
 				if ([self writesLocalFilesToPasteboard])
 				{
-					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,NSURLPboardType,nil];
+					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil];	// NSURLPboardType
+					// Used to be:  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
+
 				}
 				else
 				{
