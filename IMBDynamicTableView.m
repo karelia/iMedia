@@ -257,4 +257,10 @@
 	
 }
 
+// Make external drags work
+- (NSDragOperation) draggingSourceOperationMaskForLocal:(BOOL)inLocal
+{
+	return NSDragOperationCopy;
+}
+
 @end
