@@ -70,6 +70,7 @@
 @interface IMBTestAppDelegate : NSObject
 {
 	IBOutlet NSWindow* ibWindow;
+	IBOutlet NSWindow* ibDragDestinationWindow;
 	IBOutlet IMBNodeViewController* _nodeViewController;
 	IBOutlet IMBObjectViewController* _objectViewController;
 }
@@ -77,6 +78,7 @@
 @property (retain) IMBNodeViewController* nodeViewController;
 @property (retain) IMBObjectViewController* objectViewController;
 - (IBAction) togglePanel:(id)inSender;
+- (IBAction) toggleDragDestinationWindow:(id)inSender;
 
 @end
 
