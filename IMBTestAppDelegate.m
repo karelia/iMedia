@@ -166,6 +166,19 @@
 }
 
 
+- (IBAction) toggleDragDestinationWindow:(id)inSender
+{
+	if (ibDragDestinationWindow.isVisible)
+	{
+		[ibDragDestinationWindow orderOut:inSender];
+	}
+	else
+	{
+		[ibDragDestinationWindow makeKeyAndOrderFront:inSender];
+	}
+}
+
+
 // Perform cleanup and save window frame to prefs...
 
 - (void) applicationWillTerminate:(NSNotification*)inNotification
