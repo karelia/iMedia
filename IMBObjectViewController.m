@@ -1132,9 +1132,12 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 // 10.5 API:
 // Even dumber are apps that do not support NSFilesPromisePboardType, but only know about NSFilenamesPboardType.
 // In this case we'll download to the temp folder and block synchronously until the download has completed...
+//
+// This requires there to be an iMBObjectPromise on the pasteboard; we use that to extract the other information requested.
 
 - (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
 {
+	NSLog(@"%s:%@", __FUNCTION__, inType);
 	NSData* data = [inPasteboard dataForType:kIMBObjectPromiseType];
 	IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
 	
@@ -1162,7 +1165,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			[inPasteboard setPropertyList:localPaths forType:NSFilenamesPboardType];
 		}
 		else if (([inType isEqualToString:NSURLPboardType]) ||
-				 ([inType isEqualToString:(NSString*)kUTTypeURL]))
+				 ([inType isEqualToString:(NSString*)kUTTypeURL]
+				 || 
+				 [inType isEqualToString:@"CorePasteboardFlavorType 0x6675726C"]))
 		{
 			// The best we can do for URL type on 10.5 is to provide the URL for the first item in our list. In case
 			// thereare NSError objects in the list, we'll go through until we find an actual URL, and use that 
@@ -1185,7 +1190,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				}
 				else
 				{
-					[inPasteboard setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:(NSString*)kUTTypeURL];
+					[inPasteboard setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:inType];
 				}
 			}
 		}
@@ -1471,13 +1476,24 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			}
 			else
 			{
+
 				// On 10.5, we vend the object promise as well as promises for filenames and a URL.
 				// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
 				// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
 				if ([self writesLocalFilesToPasteboard])
 				{
-					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil];	// NSURLPboardType
-					// Used to be:  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
+					// Try declaring promise AFTER the other types
+					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType, 
+									 
+									 // Hack for making the Finder recognize the drag.  Declare and support 'furl' request.
+									 // http://lists.apple.com/archives/cocoa-dev/2001/Sep/msg01430.html
+									 @"CorePasteboardFlavorType 0x6675726C",	// 'furl'
+									 // This sort of works ... ok for one URL but not for 1 item selected.
+									 // When we let the 'furl' get populated automatically, PasteboardPeeker says there are two items in there!
+									 // How do we get to that item index? Hmm....
+									 
+									 nil]; 
+					// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
 
 				}
 				else
@@ -1487,6 +1503,21 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				
 				[inPasteboard declareTypes:declaredTypes owner:self];
 				[inPasteboard setData:promiseData forType:kIMBObjectPromiseType];
+				
+				
+				
+				// OVERT DATA INSERTION-- WHAT I WANT TO AVOID SINCE IT'S SYNCHRONOUS
+//				
+//				NSMutableArray *fileList = [NSMutableArray arrayWithCapacity:[inIndexes count]];
+//				
+//				for (IMBObject *object in objects) {
+//					NSString *path = [object path];
+//					
+//					if (path != nil) {
+//						[fileList addObject:path];
+//					}
+//				}
+//				[inPasteboard setPropertyList:fileList forType:NSFilenamesPboardType];
 			}
 			
 			_isDragging = YES;
