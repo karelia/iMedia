@@ -245,84 +245,6 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef IMB_SUPPORTFILEPROMISES
-#define IMB_SUPPORTFILEPROMISES 0
-#endif
-
-#if IMB_SUPPORTFILEPROMISES
-
-#pragma mark Handling drags to allow for promises
-// This code is based on code contributed by Fraser Speirs.
-
-- (void)mouseDown:(NSEvent *)theEvent
-{
-	// If the mouse first goes down on the background, this is a drag-select and
-	// we don't want to handle any mouseDragged events until the mouse comes up again.
-	NSPoint clickPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];
-	_dragSelectInProgress = (indexOfItemUnderClick == NSNotFound);
-	_mouseOperation = kMouseOperationNone;
-	
-//	if (indexOfItemUnderClick != NSNotFound &&
-//		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
-//	{
-//		IMBObject* object = [self.dataSource imageBrowser:self itemAtIndex:indexOfItemUnderClick];
-//		if (object && !object.isSelectable)
-//		{
-//			IMBParser* parser = object.parser;	
-//			if ([parser respondsToSelector:@selector(didClickObject:objectView:)])
-//			{
-//				[parser didClickObject:object objectView:self];
-//			}
-//			return;
-//		}
-//	}
-
-	[super mouseDown: theEvent];
-}
-
-
-- (void)mouseDragged:(NSEvent *)theEvent;
-{
-	// If there's a drag-select in progress, we don't want to know.
-	if(_dragSelectInProgress) {
-		[super mouseDragged: theEvent];
-		return;
-	}
-	
-	// Otherwise, the mouse went down on an image and we should drag it
-	NSPoint dragPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: dragPosition];
-	
-	if(indexOfItemUnderClick == NSNotFound) {
-		[super mouseDragged: theEvent];
-		return;
-	}
-		
-	dragPosition.x -= 16;
-	dragPosition.y -= 16;
-	
-	NSRect imageLocation;
-	imageLocation.origin = dragPosition;
-	imageLocation.size = NSMakeSize(64, 64);	// should this vary?
-	
-	[self dragPromisedFilesOfTypes:[NSArray arrayWithObject:@"jpg"]		// should probably get REAL value?
-						  fromRect:imageLocation
-							source:self.delegate		// handle drag messages
-						 slideBack:YES
-							 event:theEvent];
-}
-
-
-- (void)mouseUp:(NSEvent *)theEvent
-{
-	_dragSelectInProgress = NO;
-	[super mouseUp: theEvent];
-}
-
-#else
-
-
 - (void) mouseDown:(NSEvent*)inEvent
 {
 	// Find the clicked object...
@@ -412,13 +334,19 @@ enum IMBMouseOperation
 	self.clickedObject = nil;
 }
 
-
-#endif
-
 #pragma mark
 #pragma mark Dragging Promise Support
 
-/* This uses a technique from Karl Adam.
+- (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
+{
+	return [self.delegate namesOfPromisedFilesDroppedAtDestination:inDropDestination];
+}
+
+- (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
+{
+	NSLog(@"- (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType");
+}
+/* This uses a technique from the Karl Adam.
 	http://www.cocoabuilder.com/archive/cocoa/123786-nsfilepromisepboardtype.html
  */
 
@@ -427,18 +355,14 @@ enum IMBMouseOperation
 	   pasteboard:(NSPasteboard *)pboard source:(id)sourceObject
 		slideBack:(BOOL)slideBack
 {
-	// FINALLY!!
-	// Okay HFS File promises work through a bit of black magic,
-	// I have h4x0red into it without revealing too much of its workings here
-	// I should edit this later to maintain whatever other info was on the pboard
 	if ( [[pboard types] containsObject:NSFilesPromisePboardType] ) {
 		NSArray *promisedTypes = [[pboard
 								   propertyListForType:NSFilesPromisePboardType] retain];;
 		
 		id aFSource = [[[NSClassFromString(@"NSFilePromiseDragSource")
 											   alloc] initWithSource:sourceObject] autorelease];
-		[pboard declareTypes:[NSArray
-							  arrayWithObjects:NSFilesPromisePboardType,
+		[pboard addTypes:[NSArray
+							  arrayWithObjects:
 							  @"CorePasteboardFlavorType 0x70686673",	// 'phfs'
 							  @"CorePasteboardFlavorType 0x66737350",	// 'fssP'
 							  @"NSPromiseContentsPboardType", nil] owner:aFSource];
@@ -446,10 +370,10 @@ enum IMBMouseOperation
 		// Construct the HFS Flavor for the Finder to use on Drop
 		PromiseHFSFlavor aFlavor;
 		memset( &aFlavor, 0, sizeof(aFlavor) );
-		if ( [promisedTypes containsObject:@"'fold'"] ) aFlavor.fileType = 'fold';
+		if ( [promisedTypes containsObject:@"'fold'"] ) aFlavor.fileType = kDragPseudoFileTypeDirectory;
 		aFlavor.fileCreator = '\?\?\?\?';
 		aFlavor.promisedFlavor = 'fssP';
-		NSData *flavorData = [NSData dataWithBytes:&aFlavor length:14];
+		NSData *flavorData = [NSData dataWithBytes:&aFlavor length:sizeof(aFlavor)];
 		[pboard setPropertyList:promisedTypes forType:NSFilesPromisePboardType];
 		[pboard setData:flavorData forType:@"CorePasteboardFlavorType 0x70686673"];
 		
@@ -458,10 +382,11 @@ enum IMBMouseOperation
 	}
 	
 #if 1
-	NSLog( @"data from CFPBTypes: %@, %@, %@",
+	NSLog( @"data from CFPBTypes: %@  %@  %@ : %@",
 		  [pboard dataForType:@"CorePasteboardFlavorType 0x70686673"],
 		  [pboard dataForType:@"CorePasteboardFlavorType 0x66737350"],
-		  NSStringFromClass( [[pboard dataForType:@"NSPromiseContentsPboardType"] class] ) );
+		  NSStringFromClass( [[pboard dataForType:@"NSPromiseContentsPboardType"] class]),
+							  [pboard dataForType:@"NSPromiseContentsPboardType"] );
 #endif
 	
 	[super dragImage:anImage at:imageLoc offset:mouseOffset

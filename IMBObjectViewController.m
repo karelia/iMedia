@@ -1481,6 +1481,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				// On 10.5, we vend the object promise as well as promises for filenames and a URL.
 				// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
 				// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
+				NSMutableArray *fileTypes = [NSMutableArray array];
 				if ([self writesLocalFilesToPasteboard])
 				{
 					// Try declaring promise AFTER the other types
@@ -1496,7 +1497,6 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 									 nil]; 
 					// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
 
-					NSMutableArray *fileTypes = [NSMutableArray array];
 					NSUInteger thisIndex = [indexes firstIndex];
 					while (thisIndex != NSNotFound)
 					{
@@ -1508,7 +1508,6 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						
 						thisIndex = [indexes indexGreaterThanIndex:thisIndex];
 					}
-					[inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
 				}
 				else
 				{
@@ -1517,7 +1516,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				
 				[inPasteboard declareTypes:declaredTypes owner:self];
 				[inPasteboard setData:promiseData forType:kIMBObjectPromiseType];
-				
+				if ([fileTypes count])
+				{
+					[inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
+				}
 			}
 			
 			_isDragging = YES;
