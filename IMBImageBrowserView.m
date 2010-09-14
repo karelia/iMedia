@@ -414,6 +414,57 @@ enum IMBMouseOperation
 
 #endif
 
+#pragma mark
+#pragma mark Dragging Promise Support 
+
+- (void)dragImage:(NSImage *)anImage at:(NSPoint)imageLoc
+		   offset:(NSSize)mouseOffset event:(NSEvent *)theEvent
+	   pasteboard:(NSPasteboard *)pboard source:(id)sourceObject
+		slideBack:(BOOL)slideBack
+{
+	// From Karl Adam:
+	// FINALLY!!
+	// Okay HFS File promises work through a bit of black magic,
+	// I have h4x0red into it without revealing too much of its workings here
+	// I should edit this later to maintain whatever other info was on the pboard
+	if ( [[pboard types] containsObject:NSFilesPromisePboardType] ) {
+		NSArray *promisedTypes = [[pboard
+								   propertyListForType:NSFilesPromisePboardType] retain];;
+		
+		id aFSource = [[[NSClassFromString(@"NSFilePromiseDragSource")
+											   alloc] initWithSource:sourceObject] autorelease];
+		[pboard declareTypes:[NSArray
+							  arrayWithObjects:NSFilesPromisePboardType,
+							  @"CorePasteboardFlavorType 0x70686673",	// 'phfs'
+							  @"CorePasteboardFlavorType 0x66737350",	// 'fssP'
+							  @"NSPromiseContentsPboardType", nil] owner:aFSource];
+		
+		// Construct the HFS Flavor for the Finder to use on Drop
+		PromiseHFSFlavor aFlavor;
+		memset( &aFlavor, 0, sizeof(aFlavor) );
+		if ( [promisedTypes containsObject:@"'fold'"] ) aFlavor.fileType = 'fold';
+		aFlavor.fileCreator = '\?\?\?\?';
+		aFlavor.promisedFlavor = 'fssP';
+		NSData *flavorData = [NSData dataWithBytes:&aFlavor length:14];
+		[pboard setPropertyList:promisedTypes forType:NSFilesPromisePboardType];
+		[pboard setData:flavorData forType:@"CorePasteboardFlavorType 0x70686673"];
+		
+		// Cleanup
+		[promisedTypes release];
+	}
+	
+#if 1
+	NSLog( @"data from CFPBTypes: %@, %@, %@",
+		  [pboard dataForType:@"CorePasteboardFlavorType 0x70686673"],
+		  [pboard dataForType:@"CorePasteboardFlavorType 0x66737350"],
+		  NSStringFromClass( [[pboard dataForType:@"NSPromiseContentsPboardType"] class] ) );
+#endif
+	
+	[super dragImage:anImage at:imageLoc offset:mouseOffset
+			   event:theEvent pasteboard:pboard source:sourceObject
+		   slideBack:slideBack];
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
