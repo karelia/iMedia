@@ -342,58 +342,17 @@ enum IMBMouseOperation
 	return [self.delegate namesOfPromisedFilesDroppedAtDestination:inDropDestination];
 }
 
+- (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
+{
+	NSLog(@"- (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation");
+	[self.delegate draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
+}
+
+
 - (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
 {
 	NSLog(@"- (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType");
 }
-/* This uses a technique from the Karl Adam.
-	http://www.cocoabuilder.com/archive/cocoa/123786-nsfilepromisepboardtype.html
- */
-
-- (void)dragImage:(NSImage *)anImage at:(NSPoint)imageLoc
-		   offset:(NSSize)mouseOffset event:(NSEvent *)theEvent
-	   pasteboard:(NSPasteboard *)pboard source:(id)sourceObject
-		slideBack:(BOOL)slideBack
-{
-	if ( [[pboard types] containsObject:NSFilesPromisePboardType] ) {
-		NSArray *promisedTypes = [[pboard
-								   propertyListForType:NSFilesPromisePboardType] retain];;
-		
-		id aFSource = [[[NSClassFromString(@"NSFilePromiseDragSource")
-											   alloc] initWithSource:sourceObject] autorelease];
-		[pboard addTypes:[NSArray
-							  arrayWithObjects:
-							  @"CorePasteboardFlavorType 0x70686673",	// 'phfs'
-							  @"CorePasteboardFlavorType 0x66737350",	// 'fssP'
-							  @"NSPromiseContentsPboardType", nil] owner:aFSource];
-		
-		// Construct the HFS Flavor for the Finder to use on Drop
-		PromiseHFSFlavor aFlavor;
-		memset( &aFlavor, 0, sizeof(aFlavor) );
-		if ( [promisedTypes containsObject:@"'fold'"] ) aFlavor.fileType = kDragPseudoFileTypeDirectory;
-		aFlavor.fileCreator = '\?\?\?\?';
-		aFlavor.promisedFlavor = 'fssP';
-		NSData *flavorData = [NSData dataWithBytes:&aFlavor length:sizeof(aFlavor)];
-		[pboard setPropertyList:promisedTypes forType:NSFilesPromisePboardType];
-		[pboard setData:flavorData forType:@"CorePasteboardFlavorType 0x70686673"];
-		
-		// Cleanup
-		[promisedTypes release];
-	}
-	
-#if 1
-	NSLog( @"data from CFPBTypes: %@  %@  %@ : %@",
-		  [pboard dataForType:@"CorePasteboardFlavorType 0x70686673"],
-		  [pboard dataForType:@"CorePasteboardFlavorType 0x66737350"],
-		  NSStringFromClass( [[pboard dataForType:@"NSPromiseContentsPboardType"] class]),
-							  [pboard dataForType:@"NSPromiseContentsPboardType"] );
-#endif
-	
-	[super dragImage:anImage at:imageLoc offset:mouseOffset
-			   event:theEvent pasteboard:pboard source:sourceObject
-		   slideBack:slideBack];
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
