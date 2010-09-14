@@ -75,6 +75,7 @@
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
 #import "IMBQLPreviewPanel.h"
+#import <Carbon/Carbon.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1376,6 +1377,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// Filter the dragged indexes to only include the selectable (and thus draggable) ones.
 
 - (NSIndexSet*) filteredDraggingIndexes:(NSIndexSet*)inIndexes
 {
@@ -1435,10 +1437,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			if (NO && IMBRunningOnSnowLeopardOrNewer())
 			{				
 				(void) [inPasteboard clearContents];
-				NSMutableArray* itemArray = [NSMutableArray arrayWithCapacity:[inIndexes count]];
+				NSMutableArray* itemArray = [NSMutableArray arrayWithCapacity:[indexes count]];
 				
 				// Create an array of NSPasteboardItem, each with a promise to fulfill data in the provider callback
-				NSUInteger thisIndex = [inIndexes firstIndex];
+				NSUInteger thisIndex = [indexes firstIndex];
 				while (thisIndex != NSNotFound)
 				{
 					IMBObject* thisObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
@@ -1469,25 +1471,24 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						[itemArray addObject:thisItem];
 					}
 					
-					thisIndex = [inIndexes indexGreaterThanIndex:thisIndex];
+					thisIndex = [indexes indexGreaterThanIndex:thisIndex];
 				}
 				
 				[inPasteboard writeObjects:itemArray];			// write array of NSPasteboardItems.
 			}
 			else
 			{
-
 				// On 10.5, we vend the object promise as well as promises for filenames and a URL.
 				// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
 				// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
 				if ([self writesLocalFilesToPasteboard])
 				{
 					// Try declaring promise AFTER the other types
-					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType, 
+					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType, 
 									 
 									 // Hack for making the Finder recognize the drag.  Declare and support 'furl' request.
 									 // http://lists.apple.com/archives/cocoa-dev/2001/Sep/msg01430.html
-									 @"CorePasteboardFlavorType 0x6675726C",	// 'furl'
+									 // @"CorePasteboardFlavorType 0x6675726C",	// 'furl'
 									 // This sort of works ... ok for one URL but not for 1 item selected.
 									 // When we let the 'furl' get populated automatically, PasteboardPeeker says there are two items in there!
 									 // How do we get to that item index? Hmm....
@@ -1495,6 +1496,19 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 									 nil]; 
 					// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
 
+					NSMutableArray *fileTypes = [NSMutableArray array];
+					NSUInteger thisIndex = [indexes firstIndex];
+					while (thisIndex != NSNotFound)
+					{
+						id object = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
+						NSString *path = [object path];
+						NSString *type = [path pathExtension];
+						if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
+						[fileTypes addObject:type];
+						
+						thisIndex = [indexes indexGreaterThanIndex:thisIndex];
+					}
+					[inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
 				}
 				else
 				{
@@ -1504,20 +1518,6 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				[inPasteboard declareTypes:declaredTypes owner:self];
 				[inPasteboard setData:promiseData forType:kIMBObjectPromiseType];
 				
-				
-				
-				// OVERT DATA INSERTION-- WHAT I WANT TO AVOID SINCE IT'S SYNCHRONOUS
-//				
-//				NSMutableArray *fileList = [NSMutableArray arrayWithCapacity:[inIndexes count]];
-//				
-//				for (IMBObject *object in objects) {
-//					NSString *path = [object path];
-//					
-//					if (path != nil) {
-//						[fileList addObject:path];
-//					}
-//				}
-//				[inPasteboard setPropertyList:fileList forType:NSFilenamesPboardType];
 			}
 			
 			_isDragging = YES;

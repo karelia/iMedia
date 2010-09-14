@@ -185,7 +185,7 @@
 }
 
 
-// The name of the object will be used as the title in IKIMageBrowserView...
+// The name of the object will be used as the title in IKImageBrowserView...
 
 - (NSString*) imageTitle
 {
