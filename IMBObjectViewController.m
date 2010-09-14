@@ -177,6 +177,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
 
+@synthesize dropDestinationURL = _dropDestinationURL;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -331,6 +332,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBRelease(_libraryController);
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
+	IMBRelease(_dropDestinationURL);
 	
 	for (IMBObject* object in _observedVisibleItems)
 	{
@@ -1070,8 +1072,13 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	return YES;
 }
 
+// Finish promise
 - (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
 {
+	NSLog(@"%s",__FUNCTION__);
+	// Resolve any promise
+	[self _downloadSelectedObjectsToDestination:self.dropDestinationURL];
+
 	_isDragging = NO;
 }
 
@@ -1585,11 +1592,12 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
 {
-	[self _downloadSelectedObjectsToDestination:inDropDestination];
+	self.dropDestinationURL = inDropDestination;		// remember so that when drag is finished
 	NSArray *result = [self _namesOfPromisedFiles];
 	NSLog(@"namesOfPromisedFilesDroppedAtDestination = %@", result);
 	return result;
 }
+// The drag will finish at draggedImage:endedAt:operation:
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1679,7 +1687,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (NSArray*) tableView:(NSTableView*)inTableView namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination forDraggedRowsWithIndexes:(NSIndexSet*)inIndexes
 {
-	[self _downloadSelectedObjectsToDestination:inDropDestination];
+	self.dropDestinationURL = inDropDestination;
 	return [self _namesOfPromisedFiles];
 }
 
