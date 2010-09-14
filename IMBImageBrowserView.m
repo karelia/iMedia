@@ -348,12 +348,6 @@ enum IMBMouseOperation
 	[self.delegate draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
 }
 
-
-- (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
-{
-	NSLog(@"- (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType");
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
