@@ -46,6 +46,7 @@
 
 // Author: Peter Baumgartner
 
+// Note: Maybe we could put something like CorePasteboardFlavorType 0x6974756E on the pasteboard for metadata?
 
 //----------------------------------------------------------------------------------------------------------------------
 
