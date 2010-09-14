@@ -536,7 +536,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				
 				NSString *downloadFolderPath = self.downloadFolderPath;
 				if (!downloadFolderPath) downloadFolderPath = NSTemporaryDirectory();	// force downloading into temporary directory
-				op.downloadFolderPath = self.downloadFolderPath;
+				op.downloadFolderPath = downloadFolderPath;
 				
 				[self.downloadOperations addObject:op];
 				[op release];
