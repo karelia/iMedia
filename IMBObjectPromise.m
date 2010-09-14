@@ -350,6 +350,18 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	{	
 		[self.objectsToLocalURLs setObject:localURL forKey:inObject];
 		_objectCountLoaded++;
+		
+		if (self.downloadFolderPath)
+		{
+			// Now, copy this to the download folder path ... ?
+			NSString *fullPath = [self.downloadFolderPath stringByAppendingPathComponent:[[localURL path] lastPathComponent]];
+			NSError *err = nil;
+			[[NSFileManager defaultManager] copyItemAtPath:[localURL path] toPath:fullPath error:&err];
+			if (err)
+			{
+				NSLog(@"%@", err);
+			}
+		}
 	}
 	else
 	{
@@ -521,7 +533,11 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 			{
 				IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
 				op.delegateReference = object;
+				
+				NSString *downloadFolderPath = self.downloadFolderPath;
+				if (!downloadFolderPath) downloadFolderPath = NSTemporaryDirectory();	// force downloading into temporary directory
 				op.downloadFolderPath = self.downloadFolderPath;
+				
 				[self.downloadOperations addObject:op];
 				[op release];
 			}

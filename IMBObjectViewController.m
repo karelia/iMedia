@@ -1110,7 +1110,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					// before we actually try to start downloading.
 					if (promise != nil && [promise.objects count] > 0)
 					{
-						promise.downloadFolderPath = NSTemporaryDirectory();
+						promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
 						[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
 						[promise waitUntilDone];
 						
@@ -1145,11 +1145,11 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
 {
-	NSLog(@"%s:%@", __FUNCTION__, inType);
+	// NSLog(@"%s:%@", __FUNCTION__, inType);
 	NSData* data = [inPasteboard dataForType:kIMBObjectPromiseType];
 	IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
 	
-	promise.downloadFolderPath = NSTemporaryDirectory();
+	promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
 	[promise startLoadingWithDelegate:self finishSelector:nil];
 	[promise waitUntilDone];
 	
