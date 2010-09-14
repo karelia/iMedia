@@ -60,6 +60,7 @@
 #import "IMBObjectFifoCache.h"
 #import "IMBParser.h"
 #import "IMBQLPreviewPanel.h"
+#import <Carbon/Carbon.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -415,14 +416,17 @@ enum IMBMouseOperation
 #endif
 
 #pragma mark
-#pragma mark Dragging Promise Support 
+#pragma mark Dragging Promise Support
+
+/* This uses a technique from Karl Adam.
+	http://www.cocoabuilder.com/archive/cocoa/123786-nsfilepromisepboardtype.html
+ */
 
 - (void)dragImage:(NSImage *)anImage at:(NSPoint)imageLoc
 		   offset:(NSSize)mouseOffset event:(NSEvent *)theEvent
 	   pasteboard:(NSPasteboard *)pboard source:(id)sourceObject
 		slideBack:(BOOL)slideBack
 {
-	// From Karl Adam:
 	// FINALLY!!
 	// Okay HFS File promises work through a bit of black magic,
 	// I have h4x0red into it without revealing too much of its workings here
