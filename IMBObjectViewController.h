@@ -161,6 +161,8 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	BOOL _isDragging;
 	
 	NSMutableSet *_observedVisibleItems;
+	
+	NSURL *_dropDestinationURL;
 }
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
@@ -187,6 +189,8 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @property (assign) NSUInteger viewType;
 @property (assign) double iconSize;
 @property (readonly) BOOL canUseIconSize;
+
+@property (retain) NSURL *dropDestinationURL;
 
 - (void) unbindViews;	
 
