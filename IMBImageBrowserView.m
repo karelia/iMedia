@@ -345,7 +345,7 @@ enum IMBMouseOperation
 
 - (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
 {
-	NSLog(@"- (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation");
+	// NSLog(@"- (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation");
 	[self.delegate draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
 }
 
