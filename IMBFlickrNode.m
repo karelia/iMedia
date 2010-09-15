@@ -625,7 +625,11 @@ typedef enum {
 	}
 	
 	//	limit the search to a specific number of items...
+#ifdef DEBUG
+	[arguments setObject:@"5" forKey:@"per_page"];
+#else
 	[arguments setObject:@"30" forKey:@"per_page"];
+#endif
 	
 	// We are only doing photos.  Maybe later we want to do videos?
 	[arguments setObject:@"photos" forKey:@"media"];
