@@ -160,47 +160,50 @@
 		if ([promiseObject isKindOfClass:[IMBFlickrObject class]])
 		{
 			NSURL *localURL = [objectsToLocalURLs objectForKey:promiseObject];
-			NSDictionary *metadata = [((IMBFlickrObject *)promiseObject) metadata];
-			
-			NSURL *shortWebPageURL = [NSURL URLWithString:[@"http://flic.kr/p/" stringByAppendingString:
-						[IMBFlickrNode base58EncodedValue:[[metadata objectForKey:@"id"] longLongValue]]]];
-
-			NSString *licenseDescription = [IMBFlickrNode descriptionOfLicense:[[metadata objectForKey:@"license"] intValue]];
-			NSString *credit = [metadata objectForKey:@"ownername"];
-
-			NSMutableData *data = [NSMutableData data];
-			NSAssert(localURL, @"Nil image source URL");
-			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)localURL, NULL);
-			CGImageDestinationRef dest = CGImageDestinationCreateWithData((CFMutableDataRef)data,
-																				 (CFStringRef)@"public.jpeg", 1, NULL);
-
-			NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
-			if (!appName) appName = [[NSProcessInfo processInfo] processName];
-			NSString *appSource = NSNotFound != [appName rangeOfString:@"iMedia"].location
+			if ([localURL isKindOfClass:[NSURL class]])	// check -- it may actually be NSError
+			{
+				NSDictionary *metadata = [((IMBFlickrObject *)promiseObject) metadata];
+				
+				NSURL *shortWebPageURL = [NSURL URLWithString:[@"http://flic.kr/p/" stringByAppendingString:
+															   [IMBFlickrNode base58EncodedValue:[[metadata objectForKey:@"id"] longLongValue]]]];
+				
+				NSString *licenseDescription = [IMBFlickrNode descriptionOfLicense:[[metadata objectForKey:@"license"] intValue]];
+				NSString *credit = [metadata objectForKey:@"ownername"];
+				
+				NSMutableData *data = [NSMutableData data];
+				NSAssert(localURL, @"Nil image source URL");
+				CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)localURL, NULL);
+				CGImageDestinationRef dest = CGImageDestinationCreateWithData((CFMutableDataRef)data,
+																			  (CFStringRef)@"public.jpeg", 1, NULL);
+				
+				NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+				if (!appName) appName = [[NSProcessInfo processInfo] processName];
+				NSString *appSource = NSNotFound != [appName rangeOfString:@"iMedia"].location
 				? appName
 				: [NSString stringWithFormat:@"%@, iMedia Browser", appName];
-
-			NSString *creatorAndURL = [NSString stringWithFormat:@"%@ - %@", credit, [shortWebPageURL absoluteString]];
-			NSDictionary *IPTCProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-				creatorAndURL, kCGImagePropertyIPTCSource,
-											licenseDescription, @"UsageTerms", // kCGImagePropertyIPTCRightsUsageTerms not in 10.5 headers
-										 appSource, kCGImagePropertyIPTCOriginatingProgram,
-										 nil];
-			NSDictionary *properties = [NSDictionary dictionaryWithObject:IPTCProperties forKey:(NSString *)kCGImagePropertyIPTCDictionary];
-			
-			CGImageDestinationAddImageFromSource (dest, source, 0, (CFDictionaryRef) properties);
-
-			BOOL success = CGImageDestinationFinalize(dest); // write metadata into the data object
-			if(success)
-			{
-				// Write back, replacing the original URL with the one with the new metadata
-				NSError *error = nil;
-				success = [data writeToURL:localURL options:NSAtomicWrite error:&error];
-				// atomic write should mean that original is not lost.
-				if (!success) NSLog(@"couldn't modify file, %@", [error localizedDescription]);
+				
+				NSString *creatorAndURL = [NSString stringWithFormat:@"%@ - %@", credit, [shortWebPageURL absoluteString]];
+				NSDictionary *IPTCProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+												creatorAndURL, kCGImagePropertyIPTCSource,
+												licenseDescription, @"UsageTerms", // kCGImagePropertyIPTCRightsUsageTerms not in 10.5 headers
+												appSource, kCGImagePropertyIPTCOriginatingProgram,
+												nil];
+				NSDictionary *properties = [NSDictionary dictionaryWithObject:IPTCProperties forKey:(NSString *)kCGImagePropertyIPTCDictionary];
+				
+				CGImageDestinationAddImageFromSource (dest, source, 0, (CFDictionaryRef) properties);
+				
+				BOOL success = CGImageDestinationFinalize(dest); // write metadata into the data object
+				if(success)
+				{
+					// Write back, replacing the original URL with the one with the new metadata
+					NSError *error = nil;
+					success = [data writeToURL:localURL options:NSAtomicWrite error:&error];
+					// atomic write should mean that original is not lost.
+					if (!success) NSLog(@"couldn't modify file, %@", [error localizedDescription]);
+				}
+				CFRelease(dest);
+				CFRelease(source);
 			}
-			CFRelease(dest);
-			CFRelease(source);
 		}
 	}
 }
