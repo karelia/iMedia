@@ -371,6 +371,21 @@
 	
 	if ([inObject isSelectable])
 	{
+		if (![[[inObject metadata] objectForKey:@"can_download"] boolValue])
+		{
+			// This will replace the Download / Open With Browser that is usually shown
+			title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.downloadingNotPermitted",nil,IMBBundle(),@"Downloading Not Permitted",@"Context menu item title to warn of not being downloadable");
+			item = [[[NSMenuItem alloc] initWithTitle:title 
+											   action:nil 
+										keyEquivalent:@""] autorelease];
+			[item setTarget:self];
+			[item setRepresentedObject:inObject];
+			[inMenu insertItem:item atIndex:0];
+			[inMenu insertItem:[NSMenuItem separatorItem] atIndex:1];
+			
+		}
+		
+		
 		title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.openflickrpage",nil,IMBBundle(),@"Open Flickr Page",@"Flickr parser node context menu title.");
 		item = [[[NSMenuItem alloc] initWithTitle:title 
 										   action:@selector(openFlickrPage:) 
