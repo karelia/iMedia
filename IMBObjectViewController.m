@@ -1267,7 +1267,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[controller.progressBar startAnimation:nil];
 	[controller setCancelTarget:inObjectPromise];
 	[controller setCancelAction:@selector(cancel:)];
-	[controller.cancelButton setEnabled:NO];
+	[controller.cancelButton setEnabled:YES];
 	[controller.window makeKeyAndOrderFront:nil];
 	
 	self.progressWindowController = controller;
