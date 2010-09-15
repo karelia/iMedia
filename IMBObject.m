@@ -76,6 +76,7 @@
 @synthesize parser = _parser;
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
+@synthesize shouldDisableTitle = _shouldDisableTitle;
 
 @synthesize imageLocation = _imageLocation;
 @synthesize imageRepresentationType = _imageRepresentationType;
@@ -94,6 +95,7 @@
 		self.index = NSNotFound;
 		self.shouldDrawAdornments = YES;
 		self.needsImageRepresentation = YES;
+		self.shouldDisableTitle = NO;
 	}
 	
 	return self;
@@ -110,6 +112,7 @@
 		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
 		self.index = [inCoder decodeIntegerForKey:@"index"];
 		self.shouldDrawAdornments = [inCoder decodeBoolForKey:@"shouldDrawAdornments"];
+		self.shouldDisableTitle = [inCoder decodeBoolForKey:@"shouldDisableTitle"];
 		self.needsImageRepresentation = YES;
 	}
 	
@@ -125,6 +128,7 @@
 	[inCoder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
 	[inCoder encodeInteger:self.index forKey:@"index"];
 	[inCoder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
+	[inCoder encodeBool:self.shouldDisableTitle forKey:@"shouldDisableTitle"];
 }
 
 
@@ -139,6 +143,7 @@
 	copy.parser = self.parser;
 	copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
+	copy.shouldDisableTitle = self.shouldDisableTitle;
 
 	copy.imageLocation = self.imageLocation;
 	copy.imageRepresentation = self.imageRepresentation;

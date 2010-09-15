@@ -75,6 +75,7 @@
 	if (self = [super init])
 	{
 		self.shouldDrawAdornments = NO;
+		self.shouldDisableTitle = NO;
 	}
 	
 	return self;

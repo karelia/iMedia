@@ -82,6 +82,7 @@
 
 @synthesize imbShouldDrawOutline = _imbShouldDrawOutline;
 @synthesize imbShouldDrawShadow = _imbShouldDrawShadow;
+@synthesize imbShouldDisableTitle = _imbShouldDisableTitle;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,6 +94,7 @@
 	{
 		_imbShouldDrawOutline = YES;
 		_imbShouldDrawShadow = YES;
+		_imbShouldDisableTitle = NO;
 	}
 	
 	return self;
@@ -113,6 +115,7 @@
 		IMBObject* object = (IMBObject*)inDataSource;
 		_imbShouldDrawOutline = object.shouldDrawAdornments;
 		_imbShouldDrawShadow = object.shouldDrawAdornments;
+		_imbShouldDisableTitle = object.shouldDisableTitle;
 	}
 }
 
@@ -292,20 +295,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// A Private API.  Overriding it to change the font size.  No harm done if this stops working though...
-
-- (void) sizeDidChange
-{
-	if ([super respondsToSelector:@selector(sizeDidChange)])
-	{
-		[((id)super) sizeDidChange];
-	}
-	
-	[self adjustToCellSize];
-}
-
-
-- (void) adjustToCellSize
+- (CGFloat)pointSize
 {
 	CGFloat points = 0;
 	CGFloat width = [((id)self) size].width;
@@ -313,16 +303,40 @@
 	else if (width < 70) points = 10;
 	else points = 11;
 
-	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont fontWithName:@"Lucida Grande" size:points] forKey:NSFontAttributeName];
+	return points;
+}
+
+// Is there any smarter way to do this?
+
+- (void) drawTitle;
+{
+	CGFloat points = [self pointSize];	// we need to get the whole font thing since we have to set the whole attributes
+	
+	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize:points] forKey:NSFontAttributeName];
+	NSMutableDictionary *attributes2 = [NSMutableDictionary dictionaryWithDictionary:attributes];
+	
+	// Now set the title color
+	
+	if (_imbShouldDisableTitle)
+	{
+		[attributes setObject:[NSColor grayColor]   forKey:NSForegroundColorAttributeName];
+		[attributes2 setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
+	}
+
 	
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
-		[[((id)self) imageBrowserView] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[((id)self) imageBrowserView] setValue:attributes  forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[((id)self) imageBrowserView] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
 	}
 	else
 	{
-		[[((id)self) parent] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[((id)self) parent] setValue:attributes  forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[((id)self) parent] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
 	}	
+
+	
+	[super drawTitle];
 }
 
 

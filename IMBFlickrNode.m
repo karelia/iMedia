@@ -402,6 +402,8 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		{
 			obj.location = [self imageURLForDesiredSize:parser.desiredSize fromPhotoDict:photoDict context:flickrRequest.context];
 		}
+		obj.shouldDisableTitle = !canDownload;
+
 		obj.name = [photoDict objectForKey:@"title"];
 		
 		// A lot of the metadata comes from the "extras" key we request

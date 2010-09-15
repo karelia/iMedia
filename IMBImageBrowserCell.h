@@ -75,12 +75,12 @@
 {
 	BOOL _imbShouldDrawOutline;
 	BOOL _imbShouldDrawShadow;
+	BOOL _imbShouldDisableTitle;
 }
 
 @property BOOL imbShouldDrawOutline;
 @property BOOL imbShouldDrawShadow;
-
-- (void) adjustToCellSize;
+@property BOOL imbShouldDisableTitle;
 
 @end
 

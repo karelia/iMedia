@@ -86,6 +86,7 @@
 		_highlightedImage = nil;
 
 		self.shouldDrawAdornments = NO;
+		self.shouldDisableTitle = NO;
 	}
 	
 	return self;
