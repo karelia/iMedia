@@ -1075,7 +1075,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 // Finish promise
 - (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
 {
-	NSLog(@"%s",__FUNCTION__);
+	//NSLog(@"%s",__FUNCTION__);
 	if (self.dropDestinationURL)		// is this finishing a promise drag?  This is when we want to load it.
 	{
 		// Resolve any promise
@@ -1137,7 +1137,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void)pasteboardFinishedWithDataProvider:(NSPasteboard *)pasteboard
 {
-	NSLog(@"%s", __FUNCTION__);		// Do we want to do anything here? Clear out drag pasteboard contents?
+	// NSLog(@"%s", __FUNCTION__);		// Do we want to do anything here? Clear out drag pasteboard contents?
 }
 
 
@@ -1433,7 +1433,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			// Promise data for all of the objects being dragged. (In 10.6, each index will be extracted one-by-one.)
 			IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 			NSData* promiseData = [NSKeyedArchiver archivedDataWithRootObject:promise];
-
+			
 			NSArray* declaredTypes = nil;
 			
 			// We currently use a mix of 10.5 and 10.6 style pasteboard behaviors.
@@ -1538,7 +1538,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			_isDragging = YES;
 			itemsWritten = objects.count;
 		}
-	}
+		}
 	
 	return itemsWritten;	
 }
