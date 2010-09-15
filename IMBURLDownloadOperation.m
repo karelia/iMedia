@@ -149,7 +149,17 @@
 	NSString* filename = [[self.remoteURL path] lastPathComponent];
 	NSString* localFilePath = [downloadFolderPath stringByAppendingPathComponent:filename];
 
-	NSURLRequest* request = [NSURLRequest requestWithURL:self.remoteURL];
+	NSURLRequestCachePolicy policy = NSURLRequestUseProtocolCachePolicy;
+	
+	// EXPERIMENTAL -- shouldn't it be able to return a cached version?  I'm surprised dragging is failing if we force it to use
+	// a cached version.  It makes me wonder if the image is getting cached properly.
+    unsigned eventModifierFlags = [[NSApp currentEvent] modifierFlags];
+    if ((eventModifierFlags & NSShiftKeyMask))
+    {
+		NSLog(@" URL to download; it should be coming from our cache! %@", self.remoteURL);
+		policy = NSURLRequestReturnCacheDataDontLoad;
+	}
+	NSURLRequest* request = [NSURLRequest requestWithURL:self.remoteURL cachePolicy:policy timeoutInterval:60.0];
 	NSURLDownload* download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 	[download setDestination:localFilePath allowOverwrite:NO];
 	[download setDeletesFileUponFailure:YES];
