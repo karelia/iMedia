@@ -91,6 +91,7 @@
 	id _imageLocation;
     BOOL _isLoading;
     BOOL _shouldDrawAdornments;
+	BOOL _shouldDisableTitle;
 }
 
 // Primary properties...
@@ -103,6 +104,7 @@
 @property (retain) IMBParser* parser;						// Parser that created this object
 @property (assign) NSUInteger index;						// Index of object in the array (optional)
 @property (assign) BOOL shouldDrawAdornments;				// YES if border/shadow should be drawn
+@property (assign) BOOL shouldDisableTitle;					// YES if title should be shown as disabled (e.g. not draggable)
 
 // Helpers...
 
