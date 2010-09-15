@@ -1432,113 +1432,116 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 			// Promise data for all of the objects being dragged. (In 10.6, each index will be extracted one-by-one.)
 			IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-			NSData* promiseData = [NSKeyedArchiver archivedDataWithRootObject:promise];
-			
-			NSArray* declaredTypes = nil;
-			
-			// We currently use a mix of 10.5 and 10.6 style pasteboard behaviors.
-			//
-			// 10.6 affords us the opportunity to write multiple items on the pasteboard at once, 
-			// which is ideal especially when we are writing URLs, for which there was no sanctioned 
-			// method of writing multiple to the pasteboard in 10.5.
-			//
-			// Because the 10.6 method of providing a list of filenames is also provide a list of URLs,
-			// it means we can fill both cases in 10.6 by simply providing URLs. But in order to promise
-			// URLs lazily we have to set an array of NSPasteboardItem on the pasteboard, with each item 
-			// set to callback to us as data provider.
-			//
-			if (NO && IMBRunningOnSnowLeopardOrNewer())
-			{				
-				(void) [inPasteboard clearContents];
-				NSMutableArray* itemArray = [NSMutableArray arrayWithCapacity:[indexes count]];
-				
-				// Create an array of NSPasteboardItem, each with a promise to fulfill data in the provider callback
-				NSUInteger thisIndex = [indexes firstIndex];
-				while (thisIndex != NSNotFound)
-				{
-					IMBObject* thisObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
-					if (thisObject != nil)
-					{
-						// Allocate class indirectly since we compiling against the 10.5 SDK, not the 10.6
-						NSPasteboardItem* thisItem = [[[NSClassFromString(@"NSPasteboardItem") alloc] init] autorelease];
-						
-						// We need to be declare kUTTypeFileURL in order to get file drags to work as expected to e.g. the Finder,
-						// but we have to be careful not to declare kUTTypeFileURL for e.g. bookmark URLs. We might want to put this 
-						// in the objects themself, but for now to get things working let's consult a method on ourselves that subclasses
-						// can override if they don't create file URLs.
-						NSArray* whichTypes = nil;
-						if ([self writesLocalFilesToPasteboard])	// are we putting references to the files on the pasteboard?
-						{
-							whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,(NSString*)kUTTypeFileURL,nil];
-						}
-						else
-						{
-							whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,nil];
-						}
-						
-						[thisItem setDataProvider:self forTypes:whichTypes];
-						[thisItem setString:[NSString stringWithFormat:@"%d", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
-						[thisItem setString:thisObject.name forType:kIMBPublicTitlePasteboardType];
-						[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetaDataPasteboardType];
-						[thisItem setData:promiseData forType:kIMBObjectPromiseType];
-						[itemArray addObject:thisItem];
-					}
-					
-					thisIndex = [indexes indexGreaterThanIndex:thisIndex];
-				}
-				
-				[inPasteboard writeObjects:itemArray];			// write array of NSPasteboardItems.
-			}
-			else
+			if ([promise.objects count] > 0)	// if not downloadable, these won't appear in objects list
 			{
-				// On 10.5, we vend the object promise as well as promises for filenames and a URL.
-				// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
-				// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
-				NSMutableArray *fileTypes = [NSMutableArray array];
-				if ([self writesLocalFilesToPasteboard])
-				{
-					// Try declaring promise AFTER the other types
-					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType, 
-									 
-									 // Hack for making the Finder recognize the drag.  Declare and support 'furl' request.
-									 // http://lists.apple.com/archives/cocoa-dev/2001/Sep/msg01430.html
-									 // @"CorePasteboardFlavorType 0x6675726C",	// 'furl'
-									 // This sort of works ... ok for one URL but not for 1 item selected.
-									 // When we let the 'furl' get populated automatically, PasteboardPeeker says there are two items in there!
-									 // How do we get to that item index? Hmm....
-									 
-									 nil]; 
-					// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
-
+				NSData* promiseData = [NSKeyedArchiver archivedDataWithRootObject:promise];
+				
+				NSArray* declaredTypes = nil;
+				
+				// We currently use a mix of 10.5 and 10.6 style pasteboard behaviors.
+				//
+				// 10.6 affords us the opportunity to write multiple items on the pasteboard at once, 
+				// which is ideal especially when we are writing URLs, for which there was no sanctioned 
+				// method of writing multiple to the pasteboard in 10.5.
+				//
+				// Because the 10.6 method of providing a list of filenames is also provide a list of URLs,
+				// it means we can fill both cases in 10.6 by simply providing URLs. But in order to promise
+				// URLs lazily we have to set an array of NSPasteboardItem on the pasteboard, with each item 
+				// set to callback to us as data provider.
+				//
+				if (NO && IMBRunningOnSnowLeopardOrNewer())
+				{				
+					(void) [inPasteboard clearContents];
+					NSMutableArray* itemArray = [NSMutableArray arrayWithCapacity:[indexes count]];
+					
+					// Create an array of NSPasteboardItem, each with a promise to fulfill data in the provider callback
 					NSUInteger thisIndex = [indexes firstIndex];
 					while (thisIndex != NSNotFound)
 					{
-						id object = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
-						NSString *path = [object path];
-						NSString *type = [path pathExtension];
-						if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
-						[fileTypes addObject:type];
+						IMBObject* thisObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
+						if (thisObject != nil)
+						{
+							// Allocate class indirectly since we compiling against the 10.5 SDK, not the 10.6
+							NSPasteboardItem* thisItem = [[[NSClassFromString(@"NSPasteboardItem") alloc] init] autorelease];
+							
+							// We need to be declare kUTTypeFileURL in order to get file drags to work as expected to e.g. the Finder,
+							// but we have to be careful not to declare kUTTypeFileURL for e.g. bookmark URLs. We might want to put this 
+							// in the objects themself, but for now to get things working let's consult a method on ourselves that subclasses
+							// can override if they don't create file URLs.
+							NSArray* whichTypes = nil;
+							if ([self writesLocalFilesToPasteboard])	// are we putting references to the files on the pasteboard?
+							{
+								whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,(NSString*)kUTTypeFileURL,nil];
+							}
+							else
+							{
+								whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,nil];
+							}
+							
+							[thisItem setDataProvider:self forTypes:whichTypes];
+							[thisItem setString:[NSString stringWithFormat:@"%d", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
+							[thisItem setString:thisObject.name forType:kIMBPublicTitlePasteboardType];
+							[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetaDataPasteboardType];
+							[thisItem setData:promiseData forType:kIMBObjectPromiseType];
+							[itemArray addObject:thisItem];
+						}
 						
 						thisIndex = [indexes indexGreaterThanIndex:thisIndex];
 					}
+					
+					[inPasteboard writeObjects:itemArray];			// write array of NSPasteboardItems.
 				}
 				else
 				{
-					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSURLPboardType,kUTTypeURL,nil];
+					// On 10.5, we vend the object promise as well as promises for filenames and a URL.
+					// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
+					// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
+					NSMutableArray *fileTypes = [NSMutableArray array];
+					if ([self writesLocalFilesToPasteboard])
+					{
+						// Try declaring promise AFTER the other types
+						declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType, 
+										 
+										 // Hack for making the Finder recognize the drag.  Declare and support 'furl' request.
+										 // http://lists.apple.com/archives/cocoa-dev/2001/Sep/msg01430.html
+										 // @"CorePasteboardFlavorType 0x6675726C",	// 'furl'
+										 // This sort of works ... ok for one URL but not for 1 item selected.
+										 // When we let the 'furl' get populated automatically, PasteboardPeeker says there are two items in there!
+										 // How do we get to that item index? Hmm....
+										 
+										 nil]; 
+						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
+						
+						NSUInteger thisIndex = [indexes firstIndex];
+						while (thisIndex != NSNotFound)
+						{
+							id object = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
+							NSString *path = [object path];
+							NSString *type = [path pathExtension];
+							if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
+							[fileTypes addObject:type];
+							
+							thisIndex = [indexes indexGreaterThanIndex:thisIndex];
+						}
+					}
+					else
+					{
+						declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSURLPboardType,kUTTypeURL,nil];
+					}
+					
+					[inPasteboard declareTypes:declaredTypes owner:self];
+					[inPasteboard setData:promiseData forType:kIMBObjectPromiseType];
+					if ([fileTypes count])
+					{
+						[inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
+					}
 				}
 				
-				[inPasteboard declareTypes:declaredTypes owner:self];
-				[inPasteboard setData:promiseData forType:kIMBObjectPromiseType];
-				if ([fileTypes count])
-				{
-					[inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
-				}
+				_isDragging = YES;
+				itemsWritten = objects.count;
 			}
-			
-			_isDragging = YES;
-			itemsWritten = objects.count;
 		}
-		}
+	}
 	
 	return itemsWritten;	
 }
