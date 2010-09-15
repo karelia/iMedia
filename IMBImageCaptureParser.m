@@ -137,7 +137,9 @@
 - (void) _addICADeviceList:(NSArray *) devices toNode:(IMBNode *)inNode;
 @end
 
-#ifdef __DEBUGGING__
+// Hmm, is this an internal symbol?
+//#ifdef __DEBUGGING__
+#if 0
 #define DEBUGLOG( fmt, ... ) NSLog( fmt, __VA_ARGS__ )
 #else
 #define DEBUGLOG( fmt, ... ) {}
@@ -612,7 +614,7 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
     err = ICARegisterForEventNotification(&pb, NULL);
     if (noErr == err) 
     {
-        NSLog(@"ICA notification callback registered");
+        DEBUGLOG(@"@", @"ICA notification callback registered");
     }
 }
 
