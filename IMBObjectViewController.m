@@ -1076,8 +1076,12 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
 {
 	NSLog(@"%s",__FUNCTION__);
-	// Resolve any promise
-	[self _downloadSelectedObjectsToDestination:self.dropDestinationURL];
+	if (self.dropDestinationURL)		// is this finishing a promise drag?  This is when we want to load it.
+	{
+		// Resolve any promise
+		[self _downloadSelectedObjectsToDestination:self.dropDestinationURL];
+		self.dropDestinationURL = nil;
+	}
 
 	_isDragging = NO;
 }
@@ -1236,6 +1240,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	return names;
 }
 
+
+// SpeedLimit http://mschrag.github.com/ is a good way to debug this....
 
 - (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
 {

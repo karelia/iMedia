@@ -46,6 +46,9 @@
 
 // Author: Christoph Priebe
 
+// SpeedLimit http://mschrag.github.com/ is a good way to debug this....
+// farm1.static.flickr.com, farm2.static.flickr.com, farm3.static.flickr.com, farm4.static.flickr.com, farm5.static.flickr.com 
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
