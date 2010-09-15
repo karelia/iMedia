@@ -972,7 +972,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBParser* parser = self.currentNode.parser;
 	NSArray* objects = [ibObjectArrayController selectedObjects];
 	IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-	[promise startLoadingWithDelegate:self finishSelector:nil];
+	[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
 }
 
 
@@ -1154,7 +1154,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
 	
 	promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
-	[promise startLoadingWithDelegate:self finishSelector:nil];
+	[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
 	[promise waitUntilDone];
 	
 	if ([promise.localURLs count] > 0)
@@ -1221,7 +1221,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		promise.downloadFolderPath = [inDestination path];
 		
-		[promise startLoadingWithDelegate:self finishSelector:nil];
+		[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
 	}
 }
 
