@@ -309,6 +309,11 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	NSLog(@"%s",__FUNCTION__);
 }
 
+// This is invoked when cancelling a double-click
+- (void) recoveryAttempter
+{
+	NSLog(@"%s",__FUNCTION__);
+}
 @end
 
 
