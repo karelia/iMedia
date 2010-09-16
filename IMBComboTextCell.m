@@ -83,7 +83,7 @@
 @synthesize titleTextAttributes = _titleTextAttributes;
 @synthesize subtitle = _subtitle;
 @synthesize subtitleTextAttributes = _subtitleTextAttributes;
-
+@synthesize isDisabledFromDragging = _isDisabledFromDragging;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -182,6 +182,8 @@
 	result.subtitle = self.subtitle;
 	result.titleTextAttributes = self.titleTextAttributes;
 	result.subtitleTextAttributes = self.subtitleTextAttributes;
+	
+	result.isDisabledFromDragging = self.isDisabledFromDragging;
 
     return result;
 }
