@@ -166,6 +166,8 @@
 																				   (CFStringRef)@"com.apple.Aperture", 
 																				   kCFPreferencesCurrentUser, 
 																				   kCFPreferencesAnyHost);
+			preferences = [NSMakeCollectable(preferences) autorelease];	
+
 			NSString *exportManagerMode = [preferences objectForKey:[keys objectAtIndex:0]];
 			NSString *libraryPath = [preferences objectForKey:[keys objectAtIndex:1]];
 			
