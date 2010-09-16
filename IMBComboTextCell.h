@@ -59,6 +59,7 @@
 	NSString* _imageRepresentationType;		
 	NSString* _title;
 	NSString* _subtitle;
+	BOOL _isDisabledFromDragging;
 	
 	NSDictionary* _titleTextAttributes;
 	NSDictionary* _subtitleTextAttributes;
@@ -72,6 +73,8 @@
 
 @property (retain) NSString* subtitle;
 @property (copy) NSDictionary* subtitleTextAttributes;
+
+@property (assign, setter=setDisabledFromDragging:) BOOL isDisabledFromDragging;
 
 @end
 
