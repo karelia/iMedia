@@ -76,6 +76,8 @@
 #import "IMBObjectThumbnailLoadOperation.h"
 #import "IMBQLPreviewPanel.h"
 #import <Carbon/Carbon.h>
+#import "IMBFlickrObject.h"
+#import "IMBFlickrNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -972,7 +974,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBParser* parser = self.currentNode.parser;
 	NSArray* objects = [ibObjectArrayController selectedObjects];
 	IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-	[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
+	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 }
 
 
@@ -1027,7 +1029,77 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		IMBParser* parser = inSelectedNode.parser;
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:inObjects];
-		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalURLs:withError:)];
+		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalURLs:)];
+	}
+}
+
+#pragma mark
+#pragma mark Post-download action
+
+// Post process.  We use this to embed metadata after the download.
+//
+// This is really set up for Flickr images, though we may want to generatlize it some day.
+
+- (void) _postProcessDownload:(IMBObjectPromise *)promise;
+{
+	if ([promise isKindOfClass:[NSError class]])	// overloaded... error object
+	{
+		[NSApp presentError:(NSError *)promise];
+	}
+	else
+	{
+		NSDictionary *objectsToLocalURLs = [promise objectsToLocalURLs];
+		for (NSDictionary *promiseObject in objectsToLocalURLs)
+		{
+			if ([promiseObject isKindOfClass:[IMBFlickrObject class]])
+			{
+				NSURL *localURL = [objectsToLocalURLs objectForKey:promiseObject];
+				if ([localURL isKindOfClass:[NSURL class]])	// check -- it may actually be NSError
+				{
+					NSDictionary *metadata = [((IMBFlickrObject *)promiseObject) metadata];
+					
+					NSURL *shortWebPageURL = [NSURL URLWithString:[@"http://flic.kr/p/" stringByAppendingString:
+																   [IMBFlickrNode base58EncodedValue:[[metadata objectForKey:@"id"] longLongValue]]]];
+					
+					NSString *licenseDescription = [IMBFlickrNode descriptionOfLicense:[[metadata objectForKey:@"license"] intValue]];
+					NSString *credit = [metadata objectForKey:@"ownername"];
+					
+					NSMutableData *data = [NSMutableData data];
+					NSAssert(localURL, @"Nil image source URL");
+					CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)localURL, NULL);
+					CGImageDestinationRef dest = CGImageDestinationCreateWithData((CFMutableDataRef)data,
+																				  (CFStringRef)@"public.jpeg", 1, NULL);
+					
+					NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+					if (!appName) appName = [[NSProcessInfo processInfo] processName];
+					NSString *appSource = NSNotFound != [appName rangeOfString:@"iMedia"].location
+					? appName
+					: [NSString stringWithFormat:@"%@, iMedia Browser", appName];
+					
+					NSString *creatorAndURL = [NSString stringWithFormat:@"%@ - %@", credit, [shortWebPageURL absoluteString]];
+					NSDictionary *IPTCProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+													creatorAndURL, kCGImagePropertyIPTCSource,
+													licenseDescription, @"UsageTerms", // kCGImagePropertyIPTCRightsUsageTerms not in 10.5 headers
+													appSource, kCGImagePropertyIPTCOriginatingProgram,
+													nil];
+					NSDictionary *properties = [NSDictionary dictionaryWithObject:IPTCProperties forKey:(NSString *)kCGImagePropertyIPTCDictionary];
+					
+					CGImageDestinationAddImageFromSource (dest, source, 0, (CFDictionaryRef) properties);
+					
+					BOOL success = CGImageDestinationFinalize(dest); // write metadata into the data object
+					if(success)
+					{
+						// Write back, replacing the original URL with the one with the new metadata
+						NSError *error = nil;
+						success = [data writeToURL:localURL options:NSAtomicWrite error:&error];
+						// atomic write should mean that original is not lost.
+						if (!success) NSLog(@"couldn't modify file, %@", [error localizedDescription]);
+					}
+					CFRelease(dest);
+					CFRelease(source);
+				}
+			}
+		}
 	}
 }
 
@@ -1036,10 +1108,15 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 // procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to IMBObjects 
 // that refer strictly to a web link, where "opening" them just means loading them in a browser...
 
-- (void) _openLocalURLs:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
+- (void) _openLocalURLs:(IMBObjectPromise*)inObjectPromise
 {
-	if (inError == nil)
+	if ([inObjectPromise isKindOfClass:[NSError class]])	// overloaded... error object
 	{
+		[NSApp presentError:(NSError *)inObjectPromise];
+	}
+	else
+	{
+		[self _postProcessDownload:inObjectPromise];		// first do our post-processing
 		for (NSURL* url in inObjectPromise.localURLs)
 		{
 			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
@@ -1048,10 +1125,6 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				[[NSWorkspace threadSafeWorkspace] openURL:url];
 			}
 		}
-	}
-	else
-	{
-		[NSApp presentError:inError];
 	}
 }
 
@@ -1115,7 +1188,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					if (promise != nil && [promise.objects count] > 0)
 					{
 						promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
-						[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
+						[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 						[promise waitUntilDone];
 						
 						NSURL* thisURL = [promise localURLForObject:mappedObject];
@@ -1154,7 +1227,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
 	
 	promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
-	[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
+	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 	[promise waitUntilDone];
 	
 	if ([promise.localURLs count] > 0)
@@ -1221,7 +1294,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		promise.downloadFolderPath = [inDestination path];
 		
-		[promise startLoadingWithDelegate:self finishSelector:@selector(postProcessDownload:)];
+		[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 	}
 }
 
@@ -1497,17 +1570,16 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
 					// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
 					NSMutableArray *fileTypes = [NSMutableArray array];
+					NSMutableArray *titles = [NSMutableArray array];
+					NSMutableArray *metadatas = [NSMutableArray array];
+					
 					if ([self writesLocalFilesToPasteboard])
 					{
 						// Try declaring promise AFTER the other types
 						declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType, 
 										 
-										 // Hack for making the Finder recognize the drag.  Declare and support 'furl' request.
-										 // http://lists.apple.com/archives/cocoa-dev/2001/Sep/msg01430.html
-										 // @"CorePasteboardFlavorType 0x6675726C",	// 'furl'
-										 // This sort of works ... ok for one URL but not for 1 item selected.
-										 // When we let the 'furl' get populated automatically, PasteboardPeeker says there are two items in there!
-										 // How do we get to that item index? Hmm....
+										 // Also our own special metadata types that clients can make use of
+										 kIMBPublicTitlePasteboardType, kIMBPublicMetaDataPasteboardType,
 										 
 										 nil]; 
 						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
@@ -1515,11 +1587,14 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						NSUInteger thisIndex = [indexes firstIndex];
 						while (thisIndex != NSNotFound)
 						{
-							id object = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
+							IMBObject *object = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
 							NSString *path = [object path];
 							NSString *type = [path pathExtension];
 							if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
+							
 							[fileTypes addObject:type];
+							[titles addObject:object.name];
+							[metadatas addObject:object.metadata];
 							
 							thisIndex = [indexes indexGreaterThanIndex:thisIndex];
 						}
@@ -1533,7 +1608,13 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					[inPasteboard setData:promiseData forType:kIMBObjectPromiseType];
 					if ([fileTypes count])
 					{
-						[inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
+						BOOL wasSet = NO;
+						wasSet = [inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
+						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", NSFilesPromisePboardType, fileTypes);
+						wasSet = [inPasteboard setPropertyList:titles forType:kIMBPublicTitlePasteboardType];
+						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitlePasteboardType, titles);
+						wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetaDataPasteboardType];
+						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetaDataPasteboardType, metadatas);
 					}
 				}
 				
