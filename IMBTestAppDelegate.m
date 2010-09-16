@@ -284,13 +284,12 @@
 				// now get the 'account'
 				
 				SecKeychainAttribute attributes[8];
-				SecKeychainAttribute attr;
 				SecKeychainAttributeList list;
 				
 				attributes[0].tag = kSecAccountItemAttr;
 				list.count = 1;
 				list.attr = attributes;
-				attr = list.attr[0];
+				//SecKeychainAttribute attr = list.attr[0];
 				
 				theStatus = SecKeychainItemCopyContent (item, NULL, &list, NULL, NULL);
 				
