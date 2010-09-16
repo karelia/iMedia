@@ -41,6 +41,7 @@
 		8FCA067B1236860A009072AE /* warning.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FCA067A1236860A009072AE /* warning.png */; };
 		8FFCBFD010A8CD9C00377C33 /* IMBLightroom3Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FFCBFD110A8CD9C00377C33 /* IMBLightroom3Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */; };
+		CE28E51C124192A800B00F3D /* IMBDisableTitleToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */; };
 		CE69CDC41149D0B50016E5E0 /* IMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */; };
 		CE69E9DD114B05EA0016E5E0 /* firefox_allBookmarks.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */; };
 		CE69E9DE114B05EA0016E5E0 /* firefox_bookmarksMenu.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */; };
@@ -408,6 +409,8 @@
 		8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom3Parser.h; sourceTree = "<group>"; };
 		8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom3Parser.m; sourceTree = "<group>"; };
 		CE0E0C80104C72A200EE6B09 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
+		CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBDisableTitleToColorTransformer.h; sourceTree = "<group>"; };
+		CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBDisableTitleToColorTransformer.m; sourceTree = "<group>"; };
 		CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_allBookmarks.png; sourceTree = "<group>"; };
 		CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_bookmarksMenu.png; sourceTree = "<group>"; };
 		CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_bookmarksToolbar.png; sourceTree = "<group>"; };
@@ -1121,6 +1124,8 @@
 				D0CA961410498F7C00725DA3 /* IMBTimecodeTransformer.m */,
 				D0CE6E1B11F6FA09005EE5B4 /* IMBMetadataTransformer.h */,
 				D0CE6E1C11F6FA09005EE5B4 /* IMBMetadataTransformer.m */,
+				CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */,
+				CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */,
 				D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */,
 				D0C2DAA110240C0B001B1198 /* IMBImageView.xib */,
 				D08070C710442DAE00891137 /* IMBAudioView.xib */,
@@ -1710,6 +1715,7 @@
 			files = (
 				D09933B31011B32B00C527B7 /* IMBTestAppDelegate.m in Sources */,
 				D09934341011B63600C527B7 /* main.m in Sources */,
+				CE28E51C124192A800B00F3D /* IMBDisableTitleToColorTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
