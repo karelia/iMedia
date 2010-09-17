@@ -95,14 +95,17 @@
 	NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
 	[paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
 
+	NSColor* titleColor = [self textColor];
+	NSColor* metadataColor = [[self textColor] colorWithAlphaComponent:0.4];
+	
 	self.titleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-		[NSColor blackColor],NSForegroundColorAttributeName,
+		titleColor,NSForegroundColorAttributeName,
 		[NSFont systemFontOfSize:13.0],NSFontAttributeName,
 		paragraphStyle,NSParagraphStyleAttributeName,
 		nil] autorelease];
 	
 	self.subtitleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-		[NSColor grayColor],NSForegroundColorAttributeName,
+		metadataColor,NSForegroundColorAttributeName,
 		[NSFont systemFontOfSize:11.0],NSFontAttributeName,
 		paragraphStyle,NSParagraphStyleAttributeName,
 		nil] autorelease];
@@ -347,6 +350,8 @@
     }
     	
 	// Draw the title and subtitle...
+	
+	[self initTextAttributes];
 	
 	if (_title)
 	{

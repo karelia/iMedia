@@ -49,7 +49,21 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark HEADERS
+
 #import "IMBDisableTitleToColorTransformer.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark GLOBALS
+
+static NSColor* sTextColor;
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 @implementation IMBDisableTitleToColorTransformer
@@ -67,6 +81,8 @@
 	[NSValueTransformer setValueTransformer:transformer forName:NSStringFromClass(self)];
 	[transformer release];
 	[pool release];
+	
+	[self setTextColor:[NSColor blackColor]];
 }
 
 
@@ -99,12 +115,30 @@
 		if ([inValue isKindOfClass:[NSNumber class]]) 
 		{
 			BOOL value = [inValue boolValue];
-			result = value ? [NSColor grayColor] : [NSColor blackColor];
+//			result = value ? [NSColor grayColor] : [NSColor blackColor];
+			result = value ? [sTextColor colorWithAlphaComponent:0.4] : sTextColor;
 		}
 	}
 	
 	return result;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Store the base text color...
+
++ (void) setTextColor:(NSColor*)inColor
+{
+	NSColor* old = sTextColor;
+	sTextColor = [inColor retain];
+	[old release];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 
