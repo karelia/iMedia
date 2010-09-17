@@ -243,9 +243,11 @@
 	[super drawRect:inRect];
 	
 	// Then draw the prompt string at the bottom if required...
-	if ([[self registeredDraggedTypes] containsObject:NSFilenamesPboardType]) {
-		const CGFloat MARGIN_BELOW = 15.0;
-		const CGFloat FADE_AREA = 35.0;
+	
+	if ([[self registeredDraggedTypes] containsObject:NSFilenamesPboardType])
+	{
+		const CGFloat MARGIN_BELOW = 20.0;
+		const CGFloat FADE_AREA = 20.0;
 		CGFloat viewHeight = self.bounds.size.height;
 		CGFloat dataHeight = self.rowHeight * self.numberOfRows;	
 		
@@ -258,7 +260,7 @@
 			[textCell setTextColor:[NSColor colorWithCalibratedWhite:0.66667 alpha:alpha]];
 			[textCell setStringValue:self.draggingPrompt];
 			
-			NSRect textRect = NSInsetRect([self visibleRect], 12.0, 12.0);
+			NSRect textRect = NSInsetRect([self visibleRect],12.0,8.0);
 			[textCell drawWithFrame:textRect inView:self];
 		}
 	}
