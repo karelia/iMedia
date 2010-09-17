@@ -56,4 +56,6 @@
 
 }
 
++ (void) setTextColor:(NSColor*)inColor;
+
 @end
