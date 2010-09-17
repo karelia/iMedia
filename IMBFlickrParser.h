@@ -58,11 +58,12 @@
 #import "IMBParser.h"
 
 typedef enum { 
-	FlickrSizeSpecifierOriginal = 0,
-	FlickrSizeSpecifierSmall,		// 240 longest
-	FlickrSizeSpecifierMedium,		// 500 longest
-	FlickrSizeSpecifierLarge		// 1024 longest	
-} FlickrSizeSpecifier;
+	kIMBFlickrSizeSpecifierOriginal = 0,
+	kIMBFlickrSizeSpecifierSmall,		// 240 longest
+	kIMBFlickrSizeSpecifierMedium,		// 500 longest
+	kIMBFlickrSizeSpecifierLarge		// 1024 longest	
+} 
+IMBFlickrSizeSpecifier;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,7 +90,7 @@ typedef enum {
  
 @interface IMBFlickrParser: IMBParser {
 	@private
-	FlickrSizeSpecifier _desiredSize;
+	IMBFlickrSizeSpecifier _desiredSize;
 	NSMutableArray* _customQueries;
 	id _delegate;
 	IMBFlickrQueryEditor* _editor;
@@ -110,7 +111,7 @@ typedef enum {
 
 #pragma mark Properties
 
-@property (assign) FlickrSizeSpecifier desiredSize;
+@property (assign) IMBFlickrSizeSpecifier desiredSize;
 
 @property (retain) NSMutableArray* customQueries;
 
@@ -148,7 +149,7 @@ typedef enum {
 @optional
 
 - (NSArray*) flickrParserSetupDefaultQueries: (IMBFlickrParser*) IMBFlickrParser;
-- (FlickrSizeSpecifier)flickrParserDesiredSize;
+- (IMBFlickrSizeSpecifier) flickrParserDesiredSize;
 
 @end
 
