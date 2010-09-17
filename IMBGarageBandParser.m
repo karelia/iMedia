@@ -257,7 +257,7 @@
 	
 	NSString* demoSongsPath = [IMBGarageBandParser demoSongsPath];
 
-	if ([[NSFileManager defaultManager] fileExistsAtPath:demoSongsPath])
+	if ([[NSFileManager threadSafeManager] fileExistsAtPath:demoSongsPath])
 	{
 		IMBNode* demo = [[[IMBNode alloc] init] autorelease];
 		demo.parentNode = root;
@@ -278,7 +278,7 @@
 	
 	NSString* userSongsPath = [IMBGarageBandParser userSongsPath];
 
-	if ([[NSFileManager defaultManager] fileExistsAtPath:userSongsPath])
+	if ([[NSFileManager threadSafeManager] fileExistsAtPath:userSongsPath])
 	{
 		IMBNode* user = [[[IMBNode alloc] init] autorelease];
 		user.parentNode = root;

@@ -513,7 +513,7 @@
 	NSString *pathExtension = [databasePath pathExtension];	
 	NSString *readOnlyDatabasePath = [[NSString stringWithFormat:@"%@-readOnly", basePath] stringByAppendingPathExtension:pathExtension];
 	
-	NSFileManager *fileManager = [NSFileManager defaultManager];
+	NSFileManager *fileManager = [NSFileManager threadSafeManager];
 	BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
 	NSError* error;
 	

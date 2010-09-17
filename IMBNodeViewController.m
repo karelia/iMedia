@@ -695,7 +695,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	for (NSString* path in paths)
 	{
-		exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&directory];
+		exists = [[NSFileManager threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
 		
 		if (exists && directory)
 		{
@@ -717,7 +717,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	for (NSString* path in paths)
 	{
-		exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&directory];
+		exists = [[NSFileManager threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
 		
 		if (exists && directory)
 		{

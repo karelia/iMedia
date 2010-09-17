@@ -60,6 +60,8 @@
 - (NSString*)uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
 - (NSString*)uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath;
 
+- (NSString*)sharedTemporaryFolder:(NSString*)dirName;
+
 - (NSString*) volumeNameAtPath:(NSString*)inPath;
 - (NSString*) relativePathToVolumeAtPath:(NSString*)inPath;
 - (BOOL) fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
