@@ -58,17 +58,17 @@
 //	iMedia
 #import "IMBConfig.h"
 #import "IMBFlickrNode.h"
+#import "IMBFlickrObject.h"
 #import "IMBFlickrParser.h"
 //#import "IMBFlickrQueryEditor.h"
 #import "IMBFlickrHeaderViewController.h"
 #import "IMBIconCache.h"
 #import "IMBLibraryController.h"
 #import "IMBLoadMoreObject.h"
-#import "IMBObject.h"
 #import "IMBObjectPromise.h"
 #import "IMBParserController.h"
 #import "NSWorkspace+iMedia.h"
-
+#import "NSImage+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,6 +77,7 @@
 @property (retain) IMBFlickrQueryEditor* editor;
 //	Query Persistence:
 - (NSArray*) instantiateCustomQueriesWithRoot: (IMBFlickrNode*) root;
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 @end
 
 #pragma mark -
@@ -453,12 +454,58 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	return;
+	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
+	NSDictionary* metadata = object.preliminaryMetadata;
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
 }
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	return nil;
+	BOOL canDownload = [[inMetadata objectForKey:@"can_download"] boolValue];
+	NSString* ownername = [inMetadata objectForKey:@"ownername"];
+	NSString* info = [NSImage imageMetadataDescriptionForMetadata:inMetadata];
+	
+	NSString* description = @"";
+	
+	if (!canDownload)
+	{
+		description = [description stringByAppendingFormat:@"%@\n",
+			NSLocalizedStringWithDefaultValue(
+			@"IMBFlickrParser.menu.downloadingNotPermitted",
+			nil,IMBBundle(),
+			@"Downloading Not Permitted",
+			@"Context menu item title to warn of not being downloadable")];
+	}
+	
+	if (ownername)
+	{
+		NSString* artist = NSLocalizedStringWithDefaultValue(
+			@"Artist",
+			nil,IMBBundle(),
+			@"Artist",
+			@"Artist label in metadataDescription");
+
+		description = [description stringByAppendingFormat:@"%@: %@\n",artist,ownername];
+	}
+	
+	if (info)
+	{
+		description = [description stringByAppendingFormat:@"%@\n",info];
+	}
+	
+	return description;
 }
 
 #pragma mark 
