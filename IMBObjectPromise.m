@@ -541,15 +541,24 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 			NSURL* url = [object url];
 			if (url)	// if unable to download, URL will be nil
 			{
-				IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
-				op.delegateReference = object;
-				
 				NSString *downloadFolderPath = self.downloadFolderPath;
 				if (!downloadFolderPath)
 				{
 					downloadFolderPath = [[NSFileManager threadSafeManager] sharedTemporaryFolder:@"downloads"];
 					// force downloading into temporary directory
 				}
+				
+				NSString *filename = [[url path] lastPathComponent];
+				NSString *localPath = [downloadFolderPath stringByAppendingPathComponent:filename];
+				if ([[NSFileManager threadSafeManager] fileExistsAtPath:localPath])
+				{
+					NSLog(@"We SHOULD be using file that already exists at %@", localPath);
+					
+					// TODO -- don't do the download operation!
+				}
+
+				IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
+				op.delegateReference = object;				
 				op.downloadFolderPath = downloadFolderPath;
 				
 				[self.downloadOperations addObject:op];

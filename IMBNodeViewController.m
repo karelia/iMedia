@@ -62,6 +62,7 @@
 #import "IMBNodeCell.h"
 #import "IMBFlickrNode.h"
 #import "NSView+iMedia.h"
+#import "NSFileManager+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------

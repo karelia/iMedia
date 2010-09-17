@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBFlickrObject.h"
+#import "NSFileManager+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
