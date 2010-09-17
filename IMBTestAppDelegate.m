@@ -420,9 +420,9 @@
 	return defaultNodes;
 }
 
-- (FlickrSizeSpecifier)flickrParserDesiredSize;
+- (IMBFlickrSizeSpecifier)flickrParserDesiredSize;
 {
-	return FlickrSizeSpecifierSmall; // FlickrSizeSpecifierOriginal;
+	return kIMBFlickrSizeSpecifierLarge;
 }
 
 @end

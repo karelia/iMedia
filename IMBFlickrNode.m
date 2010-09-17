@@ -320,18 +320,18 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 
 // What about original size?
 
-- (NSString *)flickrSizeFromFlickrSizeSpecifier:(FlickrSizeSpecifier)flickrSizeSpecifier
+- (NSString *)flickrSizeFromFlickrSizeSpecifier:(IMBFlickrSizeSpecifier)flickrSizeSpecifier
 {
-	NSAssert(flickrSizeSpecifier >= FlickrSizeSpecifierOriginal && flickrSizeSpecifier <= FlickrSizeSpecifierLarge, @"Illegal size for flickr");
+	NSAssert(flickrSizeSpecifier >= kIMBFlickrSizeSpecifierOriginal && flickrSizeSpecifier <= kIMBFlickrSizeSpecifierLarge, @"Illegal size for flickr");
 	NSString *sizeLookup[] = { @"o", OFFlickrSmallSize, OFFlickrMediumSize, OFFlickrLargeSize };
 		// Note: medium is nil, so we can't put in a dictionary.  Original not specified in objective-flickr
 	return sizeLookup[flickrSizeSpecifier];
 }
 
-- (NSURL *)imageURLForDesiredSize:(FlickrSizeSpecifier)size fromPhotoDict:(NSDictionary *)photoDict context:(OFFlickrAPIContext*) context;
+- (NSURL *)imageURLForDesiredSize:(IMBFlickrSizeSpecifier)size fromPhotoDict:(NSDictionary *)photoDict context:(OFFlickrAPIContext*) context;
 {
 	NSURL* imageURL = nil;
-	if (!imageURL && FlickrSizeSpecifierOriginal == size)
+	if (!imageURL && kIMBFlickrSizeSpecifierOriginal == size)
 	{
 		if ([photoDict objectForKey:@"url_o"])
 		{
@@ -339,10 +339,10 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		}
 		else
 		{
-			size = FlickrSizeSpecifierLarge;		// downgrade to requesting large if no original
+			size = kIMBFlickrSizeSpecifierLarge;		// downgrade to requesting large if no original
 		}
 	}
-	if (!imageURL && FlickrSizeSpecifierLarge == size)
+	if (!imageURL && kIMBFlickrSizeSpecifierLarge == size)
 	{
 		if ([photoDict objectForKey:@"url_l"])
 		{
@@ -350,11 +350,11 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		}
 		else
 		{
-			size = FlickrSizeSpecifierMedium;		// downgrade to requesting medium if no large
+			size = kIMBFlickrSizeSpecifierMedium;		// downgrade to requesting medium if no large
 		}
 	}
 	
-	if (!imageURL && FlickrSizeSpecifierMedium == size)
+	if (!imageURL && kIMBFlickrSizeSpecifierMedium == size)
 	{
 		if ([photoDict objectForKey:@"url_m"])
 		{
@@ -362,11 +362,11 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		}
 		else
 		{
-			size = FlickrSizeSpecifierSmall;		// downgrade to requesting medium if no large
+			size = kIMBFlickrSizeSpecifierSmall;		// downgrade to requesting medium if no large
 		}
 	}
 	
-	if (!imageURL && FlickrSizeSpecifierSmall == size)
+	if (!imageURL && kIMBFlickrSizeSpecifierSmall == size)
 	{
 		if ([photoDict objectForKey:@"url_s"])
 		{
@@ -412,7 +412,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		NSURL *webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
 		[metadata setObject:webPageURL forKey:@"webPageURL"];
 		
-		NSURL *quickLookURL = [self imageURLForDesiredSize:FlickrSizeSpecifierMedium fromPhotoDict:photoDict context:flickrRequest.context];
+		NSURL *quickLookURL = [self imageURLForDesiredSize:kIMBFlickrSizeSpecifierMedium fromPhotoDict:photoDict context:flickrRequest.context];
 		[metadata setObject:quickLookURL forKey:@"quickLookURL"];
 
 		// But give it a better 'description' without the nested item
