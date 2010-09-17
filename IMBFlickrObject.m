@@ -69,26 +69,51 @@
 // items folder. We don't even do a cleanup (hopefully the OS will take care of that ;-)...
 
 // Is there even a way to do a asynchronous QuickLook preview load?  I don't see any methods for notification when
-// something is loaded.
-// Maybe some hints here:  QuickLookDownloader sample code from Apple, along with http://development.christopherdrum.com/blog/?p=109
+// something is loaded. Maybe some hints here: QuickLookDownloader sample code from Apple, along with 
+// http://development.christopherdrum.com/blog/?p=109
+
 
 - (NSURL*) previewItemURL
 {
-	NSURL* result = nil;
-	NSURL *quickLookURL = [self.metadata objectForKey:@"quickLookURL"];
+//	NSLog (@"%s",__FUNCTION__);
+	NSURL* quickLookURL = [self.metadata objectForKey:@"quickLookURL"];
+	NSURL* previewItemURL = nil;
+	
 	if (quickLookURL)
 	{
-		NSData* data = [NSData dataWithContentsOfURL:quickLookURL];
+		// The is our temp download folder...
 		
 		NSString* folder = [NSTemporaryDirectory() stringByAppendingPathComponent:@"iMedia-QuickLook"];
 		[[NSFileManager defaultManager] createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:nil];
+
+		// Build a path for the download file...
+		
 		NSString* filename = [[quickLookURL path] lastPathComponent];
 		NSString* path = [folder stringByAppendingPathComponent:filename];
-		result = [NSURL fileURLWithPath:path];
-		[data writeToURL:result atomically:NO];
+		
+		// If the file is already there, then use it...
+		
+		if ([[NSFileManager defaultManager] fileExistsAtPath:path])
+		{
+			previewItemURL = [NSURL fileURLWithPath:path];
+		}
+
+		// If not, then download it...
+	
+		else
+		{
+			NSData* data = [NSData dataWithContentsOfURL:quickLookURL];
+			previewItemURL = [NSURL fileURLWithPath:path];
+			[data writeToURL:previewItemURL atomically:NO];
+		}
 	}
-	return result;
+	
+	return previewItemURL;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 - (NSString *)previewItemTitle
 {
@@ -100,6 +125,7 @@
 {
 	return [super isSelectable]; // [[self.metadata objectForKey:@"can_download"] boolValue];
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
