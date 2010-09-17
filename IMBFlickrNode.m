@@ -419,17 +419,27 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		NSString *desc = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
 		if (nil != desc)			[metadata setObject:desc forKey:@"descriptionHTML"];
 
-//		NSString *can_download = [photoDict objectForKey:@"can_download"];
-//		NSString *license = [photoDict objectForKey:@"license"];
-//		NSString *ownerName = [photoDict objectForKey:@"ownername"];
-//		NSString *photoID = [photoDict objectForKey:@"id"];
-//
-//		if (nil != can_download)	[metadata setObject:can_download forKey:@"can_download"];
-//		if (nil != license)			[metadata setObject:license forKey:@"license"];
-//		if (nil != ownerName)		[metadata setObject:ownerName forKey:@"ownername"];
-//		if (nil != photoID)			[metadata setObject:photoID forKey:@"id"];
+		NSString *can_download = [photoDict objectForKey:@"can_download"];
+		NSString *license = [photoDict objectForKey:@"license"];
+		NSString *ownerName = [photoDict objectForKey:@"ownername"];
+		NSString *photoID = [photoDict objectForKey:@"id"];
+		id width = [metadata objectForKey:@"width_o"];
+		if (width == nil) width = [metadata objectForKey:@"width_l"];
+		if (width == nil) width = [metadata objectForKey:@"width_m"];
+		if (width == nil) width = [metadata objectForKey:@"width_s"];
+		id height = [metadata objectForKey:@"height_o"];
+		if (height == nil) height = [metadata objectForKey:@"height_l"];
+		if (height == nil) height = [metadata objectForKey:@"height_m"];
+		if (height == nil) height = [metadata objectForKey:@"height_s"];
+		
+		if (nil != can_download)	[metadata setObject:can_download forKey:@"can_download"];
+		if (nil != license)			[metadata setObject:license forKey:@"license"];
+		if (nil != ownerName)		[metadata setObject:ownerName forKey:@"ownername"];
+		if (nil != photoID)			[metadata setObject:photoID forKey:@"id"];
+		if (nil != width)			[metadata setObject:width forKey:@"width"];
+		if (nil != height)			[metadata setObject:height forKey:@"height"];
 
-		obj.metadata = [NSDictionary dictionaryWithDictionary:metadata];
+		obj.preliminaryMetadata = [NSDictionary dictionaryWithDictionary:metadata];
 						 
 		obj.parser = self.parser;
 		
