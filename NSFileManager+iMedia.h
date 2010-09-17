@@ -56,9 +56,9 @@
 - (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
 - (NSString *)pathResolved:(NSString *)path;
 
-- (NSString*)temporaryFile:(NSString*)name;
-- (NSString*)temporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
-- (NSString*)temporaryPathWithinDirectory:(NSString*)directoryPath;
+- (NSString*)uniqueTemporaryFile:(NSString*)name;
+- (NSString*)uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
+- (NSString*)uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath;
 
 - (NSString*) volumeNameAtPath:(NSString*)inPath;
 - (NSString*) relativePathToVolumeAtPath:(NSString*)inPath;

@@ -154,7 +154,7 @@
 	return resolvedPath;
 }
 
-- (NSString*)temporaryFile:(NSString*)name
+- (NSString*)uniqueTemporaryFile:(NSString*)name
 {
 	NSString *processName = [[NSProcessInfo processInfo] processName];
 	NSString *directoryName = [NSString stringWithFormat:@"%@_iMediaTemporary", processName];
@@ -162,12 +162,12 @@
 	
 	[self createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:NULL];
 	
-    return [self temporaryFile:name withinDirectory:directoryPath];
+    return [self uniqueTemporaryFile:name withinDirectory:directoryPath];
 }
 
-- (NSString*)temporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath
+- (NSString*)uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath
 {
-	NSString *temporaryPath = [self temporaryPathWithinDirectory:directoryPath];
+	NSString *temporaryPath = [self uniqueTemporaryPathWithinDirectory:directoryPath];
 	
 	if ([name length] > 0) {
 		[self createDirectoryAtPath:temporaryPath withIntermediateDirectories:YES attributes:nil error:NULL];
@@ -178,8 +178,10 @@
 	return temporaryPath;
 }
 
+// Creates a new, unique path (for a directory or a file), so don't use this if you want to match up
+// with an existing downloaded file!
 
-- (NSString*)temporaryPathWithinDirectory:(NSString*)directoryPath
+- (NSString*)uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath
 {
 	NSString *tempFileTemplate = [directoryPath stringByAppendingPathComponent:@"XXXXXXXXXXXX"];
 	const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
