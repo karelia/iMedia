@@ -366,7 +366,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 			// Now, copy this to the download folder path ... ?
 			NSString *fullPath = [self.downloadFolderPath stringByAppendingPathComponent:[[localURL path] lastPathComponent]];
 			NSError *err = nil;
-			[[NSFileManager defaultManager] copyItemAtPath:[localURL path] toPath:fullPath error:&err];
+			[[NSFileManager threadSafeManager] copyItemAtPath:[localURL path] toPath:fullPath error:&err];
 			if (err)
 			{
 				NSLog(@"%@", err);
@@ -545,7 +545,11 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				op.delegateReference = object;
 				
 				NSString *downloadFolderPath = self.downloadFolderPath;
-				if (!downloadFolderPath) downloadFolderPath = NSTemporaryDirectory();	// force downloading into temporary directory
+				if (!downloadFolderPath)
+				{
+					downloadFolderPath = [[NSFileManager threadSafeManager] sharedTemporaryFolder:@"downloads"];
+					// force downloading into temporary directory
+				}
 				op.downloadFolderPath = downloadFolderPath;
 				
 				[self.downloadOperations addObject:op];

@@ -99,7 +99,7 @@
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	
 	NSString *bookmarkPath = [self firefoxBookmarkPath];
-	NSFileManager *fm = [NSFileManager defaultManager];	// File manager, not flying meat!
+	NSFileManager *fm = [NSFileManager threadSafeManager];	// File manager, not flying meat!
 	if ([self isInstalled] && bookmarkPath && [fm fileExistsAtPath:bookmarkPath] && [fm isReadableFileAtPath:bookmarkPath])
 	{
 		IMBFireFoxParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
@@ -119,7 +119,7 @@
 	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
 	NSString *path = [libraryPaths objectAtIndex:0];
 	
-	NSFileManager *fm = [NSFileManager defaultManager];
+	NSFileManager *fm = [NSFileManager threadSafeManager];
 	
 	NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
 	NSString *profilesPath = [firefoxPath stringByAppendingPathComponent:@"Profiles"];
@@ -148,14 +148,14 @@
 
 - (void) copyDatabase;		// try to copy the database and store in copy.
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
+	NSFileManager *fm = [NSFileManager threadSafeManager];
 	NSString *newPath = nil;	// copy destination if we have to copy the file
 	
 	// null result set means we couldn't open it ... it's probably busy.
 	// The stupid workaround is to make a copy of the sqlite file, and check there!
 	// However just in case the source file has not changed, we'll check modification dates.
 	//
-	newPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"places.sqlite"];
+	newPath = [[[NSFileManager threadSafeManager] sharedTemporaryFolder:@"firefox"] stringByAppendingPathComponent:@"places.sqlite"];
 	if (![newPath isEqualToString:self.databasePathCurrent])	// if we are trying to open the copy, don't allow that.
 	{
 		BOOL needToCopyFile = YES;		// probably we will need to copy but let's check

@@ -106,7 +106,7 @@
 		[NSException raise:@"iMediaException" format:@"createDirectoryPath:attributes: path not absolute:%@", path];
 	}
 	
-	return [[NSFileManager defaultManager] fileExistsAtPath:path];
+	return [self fileExistsAtPath:path];
 }
 
 - (BOOL)isPathHidden:(NSString *)path
@@ -152,6 +152,20 @@
 		resolvedPath = [[path copy] autorelease];
 	
 	return resolvedPath;
+}
+
+// Return (creating if necessary) a path to the shared iMedia temporary directory.
+// If you pass in a subfolder name, that will be created and appended.
+
+- (NSString*)sharedTemporaryFolder:(NSString*)dirName;
+{
+	NSString *directoryPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"iMedia"];
+	if (dirName && ![dirName isEqualToString:@""])
+	{
+		directoryPath = [directoryPath stringByAppendingPathComponent:dirName];
+	}
+	[self createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:NULL];
+    return directoryPath;
 }
 
 - (NSString*)uniqueTemporaryFile:(NSString*)name

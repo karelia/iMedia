@@ -112,7 +112,7 @@
 	// Check if the folder exists. If not then do not return a node...
 	
 	BOOL exists,directory;
-	exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&directory];
+	exists = [[NSFileManager threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
 	
 	if (!exists || !directory) 
 	{
