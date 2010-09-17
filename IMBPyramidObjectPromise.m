@@ -118,7 +118,7 @@
 			BOOL success = NO;
 			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
 			NSString* fileName = [[(NSString*)lightroomObject.location lastPathComponent] stringByDeletingPathExtension];
-			NSString* jpegPath = [[[NSFileManager threadSafeManager] temporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
+			NSString* jpegPath = [[[NSFileManager threadSafeManager] uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
 			
 			if ((orientation == nil) || [orientation isEqual:@"AB"]) {
 				success = [jpegData writeToFile:jpegPath atomically:YES];
