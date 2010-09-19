@@ -294,6 +294,10 @@
    self.imageRepresentation = nil;
 }
 
+- (void)postProcessLocalURL:(NSURL *)localURL;
+{
+	// For overriding by subclass
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -128,8 +128,10 @@
 // Asynchronous loading of thumbnails...
 																	
 - (void) load;	
-- (void) unload;	
+- (void) unload;
 @property (assign) BOOL isLoading;
+
+- (void)postProcessLocalURL:(NSURL *)localURL;
 
 @end
 
