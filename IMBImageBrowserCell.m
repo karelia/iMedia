@@ -315,11 +315,16 @@
 	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize:points] forKey:NSFontAttributeName];
 	NSMutableDictionary *attributes2 = [NSMutableDictionary dictionaryWithDictionary:attributes];
 	
-	// Now set the title color
+	// Now set the title color.  Try to match what we see in table views. 
+	// Enabled: Black, white if Selected; Disabled: gray; still gray when selected.
 	
 	if (_imbShouldDisableTitle)
 	{
-		[attributes setObject:[NSColor grayColor]   forKey:NSForegroundColorAttributeName];
+		[attributes setObject:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4]   forKey:NSForegroundColorAttributeName];
+		[attributes2 setObject:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4] forKey:NSForegroundColorAttributeName];
+	}
+	else
+	{
 		[attributes2 setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
 	}
 
