@@ -648,9 +648,9 @@ typedef enum {
 
 	// Extra metadata needed
 	// http://www.flickr.com/services/api/flickr.photos.search.html
-	[arguments setObject:@"owner_name,license,description,original_format,url_o,url_l,url_m,url_s,usage,o_dims" forKey:@"extras"];
+	[arguments setObject:@"description,license,owner_name,original_format,geo,tags,o_dims,url_o,url_l,url_m,url_s,usage" forKey:@"extras"];
 	// Useful keys we can get from this:
-	// description -> array with ...
+	// description -> array with ... description
 	// original_format -> originalformat, orignalsecret
 	// url_o,l, m, s ... URL to get the various sizes.  (url_l is not really documented, but works if needed.)
 	// usage: can_download (& others)

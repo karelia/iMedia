@@ -91,8 +91,8 @@ static NSString* kPosterFrameKeyPath = @"arrangedObjects.posterFrame";
 static NSString* kObjectCountStringKey = @"objectCountString";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
-NSString* kIMBPublicTitlePasteboardType = @"com.karelia.imedia.title";
-NSString* kIMBPublicMetaDataPasteboardType = @"com.karelia.imedia.metadata";
+NSString* kIMBPublicTitleListPasteboardType = @"imedia.title";
+NSString* kIMBPublicMetadataListPasteboardType = @"imedia.metadata";
 
 NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
@@ -1512,8 +1512,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 							
 							[thisItem setDataProvider:self forTypes:whichTypes];
 							[thisItem setString:[NSString stringWithFormat:@"%d", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
-							[thisItem setString:thisObject.name forType:kIMBPublicTitlePasteboardType];
-							[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetaDataPasteboardType];
+							[thisItem setString:thisObject.name forType:kIMBPublicTitleListPasteboardType];
+							[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetadataListPasteboardType];
 							[thisItem setData:promiseData forType:kIMBObjectPromiseType];
 							[itemArray addObject:thisItem];
 						}
@@ -1538,7 +1538,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType, 
 										 
 										 // Also our own special metadata types that clients can make use of
-										 kIMBPublicTitlePasteboardType, kIMBPublicMetaDataPasteboardType,
+										 kIMBPublicTitleListPasteboardType, kIMBPublicMetadataListPasteboardType,
 										 
 										 nil]; 
 						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
@@ -1570,10 +1570,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						BOOL wasSet = NO;
 						wasSet = [inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
 						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", NSFilesPromisePboardType, fileTypes);
-						wasSet = [inPasteboard setPropertyList:titles forType:kIMBPublicTitlePasteboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitlePasteboardType, titles);
-						wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetaDataPasteboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetaDataPasteboardType, metadatas);
+						wasSet = [inPasteboard setPropertyList:titles forType:kIMBPublicTitleListPasteboardType];
+						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitleListPasteboardType, titles);
+						wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetadataListPasteboardType];
+						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetadataListPasteboardType, metadatas);
 					}
 				}
 				
