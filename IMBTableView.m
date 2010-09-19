@@ -270,6 +270,12 @@ enum IMBMouseOperation
 	
 	else 
 	{
+		// Indicate what object was clicked upon so that dragging can happen to the clicked object,
+		// which is not necessarily the same row as one of the selection row(s).
+//		IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
+//		[objectViewController setClickedObject:self.clickedObject];
+//		[objectViewController setClickedObjectIndex:self.clickedObjectIndex];
+		
 		_mouseOperation = kMouseOperationNone;
 		[super mouseDown:inEvent];
 	}
@@ -344,7 +350,8 @@ enum IMBMouseOperation
 	
 	IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
 
-	if (i>=0 && i<n)
+	// Change the selection to the clicked row so that contextual menu matches properly.
+	if (i>=0 && i<n && [objectViewController respondsToSelector:@selector(objectArrayController)])
 	{
 		object = [[objectViewController.objectArrayController arrangedObjects] objectAtIndex:i];
 		[objectViewController.objectArrayController setSelectionIndex:i];
