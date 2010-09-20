@@ -57,15 +57,6 @@
 #import "IMBNode.h"
 #import "IMBParser.h"
 
-typedef enum { 
-	kIMBFlickrSizeSpecifierOriginal = 0,
-	kIMBFlickrSizeSpecifierSmall,		// 240 longest
-	kIMBFlickrSizeSpecifierMedium,		// 500 longest
-	kIMBFlickrSizeSpecifierLarge		// 1024 longest	
-} 
-IMBFlickrSizeSpecifier;
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 @class IMBFlickrQueryEditor;
@@ -149,7 +140,6 @@ IMBFlickrSizeSpecifier;
 @optional
 
 - (NSArray*) flickrParserSetupDefaultQueries: (IMBFlickrParser*) IMBFlickrParser;
-- (IMBFlickrSizeSpecifier) flickrParserDesiredSize;
 
 @end
 

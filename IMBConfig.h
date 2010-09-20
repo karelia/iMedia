@@ -74,6 +74,11 @@
 + (void) setDownloadFolderPath:(NSString*)inPath;
 + (NSString*) downloadFolderPath;
 
+// Flickr downloaded size preference
+
++ (void) setFlickrDownloadSize:(IMBFlickrSizeSpecifier)inFlickrSize;
++ (IMBFlickrSizeSpecifier) flickrDownloadSize;
+
 // Path for external editor and viewer apps... 
 
 + (void) setViewerApp:(NSString*)inAppPath forMediaType:(NSString*)inMediaType;

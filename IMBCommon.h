@@ -151,3 +151,13 @@ typedef NSUInteger IMBGroupType;
 #define IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK  defined(MAC_OS_X_VERSION_10_6)
 
 //----------------------------------------------------------------------------------------------------------------------
+
+// Flickr sizes
+
+typedef enum { 
+	kIMBFlickrSizeSpecifierOriginal = 0,
+	kIMBFlickrSizeSpecifierSmall,		// 240 longest
+	kIMBFlickrSizeSpecifierMedium,		// 500 longest
+	kIMBFlickrSizeSpecifierLarge		// 1024 longest	
+} 
+IMBFlickrSizeSpecifier;

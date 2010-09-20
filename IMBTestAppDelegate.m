@@ -420,11 +420,6 @@
 	return defaultNodes;
 }
 
-- (IMBFlickrSizeSpecifier)flickrParserDesiredSize;
-{
-	return kIMBFlickrSizeSpecifierLarge;
-}
-
 @end
 
 //----------------------------------------------------------------------------------------------------------------------
