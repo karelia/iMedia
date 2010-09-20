@@ -112,18 +112,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	{
 		self.objects = inObjects;
 		self.objectsToLocalURLs = [NSMutableDictionary dictionaryWithCapacity:inObjects.count];
-
-		// This mapping dictionary will contain URLs to local files when we are done, but for now it will 
-		// be initialized with NSNull values...
-		
-		for (IMBObject* object in inObjects)
-		{
-			if (object.location)
-			{
-				[self.objectsToLocalURLs setObject:[NSNull null] forKey:object];
-			}
-		}
-		
 		self.downloadFolderPath = [IMBConfig downloadFolderPath];
 		self.error = nil;
 		self.delegate = nil;
@@ -131,6 +119,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 		_objectCountTotal = 0;
 		_objectCountLoaded = 0;
+		_wasCanceled = NO;
 	}
 	
 	return self;
@@ -194,15 +183,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (NSArray*) objects
-//{
-//	return [self.objectsToLocalURLs allKeys];
-//}
-
-
 - (NSArray*) localURLs
 {
-//	return [self.objectsToLocalURLs allValues];
 	NSMutableArray* localURLs = [NSMutableArray array];
 	
 	for (IMBObject* object in _objects)
@@ -223,7 +205,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	NSURL* url = [self.objectsToLocalURLs objectForKey:inObject];
 	
-	if ([url isKindOfClass:[NSURL class]])
+	if (url != nil && [url isKindOfClass:[NSURL class]])
 	{
 		return url;
 	}
@@ -326,16 +308,28 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	}
 }
 
+
 - (IBAction) cancel:(id)inSender
 {
 	NSLog(@"%s",__FUNCTION__);
+	_wasCanceled = YES;
 }
 
+
+- (BOOL) wasCanceled
+{
+	return _wasCanceled;
+}
+
+
 // This is invoked when cancelling a double-click
+
 - (void) recoveryAttempter
 {
 	NSLog(@"%s",__FUNCTION__);
 }
+
+
 @end
 
 
@@ -612,6 +606,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 - (IBAction) cancel:(id)inSender
 {
+	_wasCanceled = YES;
+	
 	// Cancel outstanding operations...
 	
 	for (IMBURLDownloadOperation* op in self.downloadOperations)

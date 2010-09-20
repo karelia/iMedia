@@ -80,6 +80,7 @@ extern NSString* kIMBObjectPromiseType;
 	double _objectCountLoaded;
 	id _delegate;
 	SEL _finishSelector;
+	BOOL _wasCanceled;
 }
 
 /// Array of IMBObjects that was supplied in the init method
@@ -120,7 +121,8 @@ extern NSString* kIMBObjectPromiseType;
 
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
 - (void) waitUntilDone;
-		
+- (BOOL) wasCanceled;
+
 /// After loading is done, you can ask for a local URL specifically by the object you're interested in
 
 - (NSURL*) localURLForObject:(IMBObject*)inObject;
