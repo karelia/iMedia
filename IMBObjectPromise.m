@@ -225,7 +225,11 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	{
 		if (![object isKindOfClass:[IMBButtonObject class]])
 		{
-			_objectCountTotal++;
+			NSURL* url = [object url];
+			if (url)	// if unable to download, URL will be nil
+			{
+				_objectCountTotal++;
+			}
 		}
 	}
 }
@@ -539,16 +543,12 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 - (void) loadObjects:(NSArray*)inObjects
 {	
+	BOOL started = NO;	// set to YES when we found a URL to download, and we started the progress
+	// Create all download operations...
+	
 	// Retain self until all download operations have finished. We are going to release self in the   
 	// didFinish: and didReceiveError: delegate messages...
-	
 	[self retain];
-	
-	// Show the progress, which is indeterminate for now as we do not know the file sizes yet...
-	
-	[self prepareProgress];
-
-	// Create all download operations...
 	
 	for (IMBObject* object in inObjects)
 	{
@@ -566,16 +566,31 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				
 				NSString *filename = [[url path] lastPathComponent];
 				NSString *localPath = [downloadFolderPath stringByAppendingPathComponent:filename];
-				if ([[NSFileManager threadSafeManager] fileExistsAtPath:localPath])
-				{
-					NSLog(@"We SHOULD be using file that already exists at %@", localPath);
-					
-					// TODO -- don't do the download operation!
-				}
 
 				IMBURLDownloadOperation* op = [[IMBURLDownloadOperation alloc] initWithURL:url delegate:self];
 				op.delegateReference = object;				
 				op.downloadFolderPath = downloadFolderPath;
+				
+				// Force not using a cached version if the option key was held down.
+				unsigned eventModifierFlags = [[NSApp currentEvent] modifierFlags];				
+				if ([[NSFileManager threadSafeManager] fileExistsAtPath:localPath]
+					&& 0 == (eventModifierFlags & NSAlternateKeyMask))
+				{
+					NSLog(@"We SHOULD be using file that already exists at %@", localPath);
+					op.localPath = localPath;	// Indicate already-ready local path, meaning that no download needs to actually happen
+				}
+				else
+				{
+					// This will be a real download.  Make sure we have the progress window showing now.
+					if (!started)
+					{
+						// Show the progress, which is indeterminate for now as we do not know the file sizes yet...
+						[self prepareProgress];
+						
+						started = YES;
+					}
+					
+				}
 				
 				[self.downloadOperations addObject:op];
 				[op release];
