@@ -1188,7 +1188,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
 	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 	[promise waitUntilDone];
-	
+
 	if ([promise.localURLs count] > 0)
 	{
 		if (/*_isDragging == NO &&*/ [inType isEqualToString:NSFilenamesPboardType])

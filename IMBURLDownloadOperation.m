@@ -145,33 +145,32 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-	NSString* downloadFolderPath = self.downloadFolderPath;
-	NSString* filename = [[self.remoteURL path] lastPathComponent];
-	NSString* localFilePath = [downloadFolderPath stringByAppendingPathComponent:filename];
-
-	NSURLRequestCachePolicy policy = NSURLRequestUseProtocolCachePolicy;
-	
-	// EXPERIMENTAL -- shouldn't it be able to return a cached version?  I'm surprised dragging is failing if we force it to use
-	// a cached version.  It makes me wonder if the image is getting cached properly.
-    unsigned eventModifierFlags = [[NSApp currentEvent] modifierFlags];
-    if ((eventModifierFlags & NSShiftKeyMask))
-    {
-		NSLog(@" URL to download; it should be coming from our cache! %@", self.remoteURL);
-		policy = NSURLRequestReturnCacheDataDontLoad;
-	}
-	NSURLRequest* request = [NSURLRequest requestWithURL:self.remoteURL cachePolicy:policy timeoutInterval:60.0];
-	NSURLDownload* download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
-	[download setDestination:localFilePath allowOverwrite:NO];
-	[download setDeletesFileUponFailure:YES];
-
-	self.download = download;
-	[download release];
-	
-	do 
+	if (!self.localPath)	// only do the actual download if we don't already have a local path.
 	{
-		CFRunLoopRunInMode(kCFRunLoopDefaultMode,1.0,false);
+		NSString* downloadFolderPath = self.downloadFolderPath;
+		NSString* filename = [[self.remoteURL path] lastPathComponent];
+		NSString* localFilePath = [downloadFolderPath stringByAppendingPathComponent:filename];
+		
+		NSURLRequestCachePolicy policy = NSURLRequestUseProtocolCachePolicy;
+		
+		NSURLRequest* request = [NSURLRequest requestWithURL:self.remoteURL cachePolicy:policy timeoutInterval:10.0];
+		NSURLDownload* download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+		[download setDestination:localFilePath allowOverwrite:NO];
+		[download setDeletesFileUponFailure:YES];
+		
+		self.download = download;
+		[download release];
+		
+		do 
+		{
+			CFRunLoopRunInMode(kCFRunLoopDefaultMode,1.0,false);
+		}
+		while (_finished == NO);
 	}
-	while (_finished == NO);
+	else
+	{
+		[self downloadDidFinish:nil];	// notify owner that the download (which never started) is finished.
+	}
 	
 	[pool release];
 }
