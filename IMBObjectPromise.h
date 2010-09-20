@@ -71,6 +71,7 @@ extern NSString* kIMBObjectPromiseType;
 
 @interface IMBObjectPromise : NSObject <NSCopying,NSCoding>
 {
+	NSArray* _objects;
 	NSMutableDictionary* _objectsToLocalURLs;
 	NSString* _downloadFolderPath;
 	NSError* _error;
@@ -83,7 +84,7 @@ extern NSString* kIMBObjectPromiseType;
 
 /// Array of IMBObjects that was supplied in the init method
 
-@property (retain,readonly) NSArray* objects;
+@property (retain) NSArray* objects;
 
 /// Optional download folder (only needed for remote files that need to be downloaded)
 

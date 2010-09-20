@@ -95,6 +95,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 @implementation IMBObjectPromise
 
+@synthesize objects = _objects;
 @synthesize objectsToLocalURLs = _objectsToLocalURLs;
 @synthesize downloadFolderPath = _downloadFolderPath;
 @synthesize error = _error;
@@ -109,14 +110,17 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	if (self = [super init])
 	{
+		self.objects = inObjects;
 		self.objectsToLocalURLs = [NSMutableDictionary dictionaryWithCapacity:inObjects.count];
 
-		// Start our mapping with all null objects (need to fulfill these promises)
-		for (IMBObject* thisObject in inObjects)
+		// This mapping dictionary will contain URLs to local files when we are done, but for now it will 
+		// be initialized with NSNull values...
+		
+		for (IMBObject* object in inObjects)
 		{
-			if (thisObject.location)	// only do objects that have a URL
+			if (object.location)
 			{
-				[self.objectsToLocalURLs setObject:[NSNull null] forKey:thisObject];
+				[self.objectsToLocalURLs setObject:[NSNull null] forKey:object];
 			}
 		}
 		
@@ -137,6 +141,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	if (self = [super init])
 	{
+		self.objects = [inCoder decodeObjectForKey:@"objects"];
 		self.objectsToLocalURLs = [inCoder decodeObjectForKey:@"objectsToLocalURLs"];
 		self.downloadFolderPath = [IMBConfig downloadFolderPath];
 		self.delegate = nil;
@@ -153,6 +158,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
+	[inCoder encodeObject:self.objects forKey:@"objects"];
 	[inCoder encodeObject:self.objectsToLocalURLs forKey:@"objectsToLocalURLs"];
 }
 
@@ -161,6 +167,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	IMBObjectPromise* copy = [[[self class] allocWithZone:inZone] init];
 	
+	copy.objects = self.objects;
 	copy.objectsToLocalURLs = self.objectsToLocalURLs;
 	copy.downloadFolderPath = self.downloadFolderPath;
 	copy.error = self.error;
@@ -175,6 +182,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	
+	IMBRelease(_objects);
 	IMBRelease(_objectsToLocalURLs);
 	IMBRelease(_downloadFolderPath);
 	IMBRelease(_delegate);
@@ -186,27 +194,41 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSArray*) objects
-{
-	return [self.objectsToLocalURLs allKeys];
-}
+//- (NSArray*) objects
+//{
+//	return [self.objectsToLocalURLs allKeys];
+//}
 
 
 - (NSArray*) localURLs
 {
-	return [self.objectsToLocalURLs allValues];
+//	return [self.objectsToLocalURLs allValues];
+	NSMutableArray* localURLs = [NSMutableArray array];
+	
+	for (IMBObject* object in _objects)
+	{
+		NSURL* url = [self localURLForObject:object];
+		
+		if (url)
+		{
+			[localURLs addObject:url];
+		}
+	}
+	
+	return localURLs;
 }
 
 
 - (NSURL*) localURLForObject:(IMBObject*)inObject
 {
-	NSURL* foundURL = [self.objectsToLocalURLs objectForKey:inObject];
-	if ([foundURL isKindOfClass:[NSNull class]])
+	NSURL* url = [self.objectsToLocalURLs objectForKey:inObject];
+	
+	if ([url isKindOfClass:[NSURL class]])
 	{
-		foundURL = nil;
+		return url;
 	}
 	
-	return foundURL;
+	return nil;
 }
 
 
