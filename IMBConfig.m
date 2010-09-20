@@ -67,6 +67,7 @@ static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
 static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 static NSString* sIMBViewerAppPathsKey = @"viewerAppPaths";
 static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
+static NSString* sIMBFlickrDownloadSizeKey = @"flickrDownloadSize";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,6 +166,19 @@ static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 	return [self prefsValueForKey:sIMBDownloadFolderPathKey];
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) setFlickrDownloadSize:(IMBFlickrSizeSpecifier)inFlickrSize;
+{
+	[self setPrefsValue:[NSNumber numberWithInt:inFlickrSize] forKey:sIMBFlickrDownloadSizeKey];
+}
+
+
++ (IMBFlickrSizeSpecifier) flickrDownloadSize
+{
+	return [[self prefsValueForKey:sIMBFlickrDownloadSizeKey] intValue];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -219,6 +233,7 @@ static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 	
 	[self registerDefaultPrefsValue:[NSNumber numberWithBool:YES] forKey:sIMBShowsGroupNodesKey];
 	[self registerDefaultPrefsValue:path forKey:sIMBDownloadFolderPathKey];
+	[self registerDefaultPrefsValue:[NSNumber numberWithInt:kIMBFlickrSizeSpecifierLarge] forKey:sIMBFlickrDownloadSizeKey];
 
 	NSString* preview = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Preview"];
 	NSString* qtplayerx = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.QuickTimePlayerX"];

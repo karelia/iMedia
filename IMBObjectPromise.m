@@ -576,7 +576,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				if ([[NSFileManager threadSafeManager] fileExistsAtPath:localPath]
 					&& 0 == (eventModifierFlags & NSAlternateKeyMask))
 				{
-					NSLog(@"We SHOULD be using file that already exists at %@", localPath);
 					op.localPath = localPath;	// Indicate already-ready local path, meaning that no download needs to actually happen
 				}
 				else

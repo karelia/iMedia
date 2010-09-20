@@ -69,6 +69,7 @@
 #import "IMBParserController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "IMBConfig.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -428,11 +429,7 @@
 		[self loadCustomQueries];
 		
 		// setup desired size to get, from delegate
-		self.desiredSize = kIMBFlickrSizeSpecifierLarge;	// default size
-		if (_delegate && [_delegate respondsToSelector:@selector(flickrParserDesiredSize)]) {
-			self.desiredSize = [_delegate flickrParserDesiredSize];
-		}
-			
+		self.desiredSize = [IMBConfig flickrDownloadSize];
 	}	
 
 	//	lazy initialize the 'load more' button...
