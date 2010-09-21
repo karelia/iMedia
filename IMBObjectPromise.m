@@ -582,20 +582,18 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				downloadOp.delegateReference = object;				
 				downloadOp.downloadFolderPath = downloadFolderPath;
 				
-				[self.getSizeOperations addObject:getSizeOp];
-				[self.downloadOperations addObject:downloadOp];
-
-				// Force not using a cached version if the option key was held down...
+				// If we already have a local file, and the option key is not down, then use the local file...
 				
 				unsigned eventModifierFlags = [[NSApp currentEvent] modifierFlags];				
 				if ([[NSFileManager threadSafeManager] fileExistsAtPath:localPath]
 					&& 0 == (eventModifierFlags & NSAlternateKeyMask))
 				{
-					downloadOp.localPath = localPath;	// Indicate already-ready local path, meaning that no download needs to actually happen
-
 					NSError *err = nil;
 					NSDictionary *fileAttributes = [[NSFileManager threadSafeManager] attributesOfItemAtPath:localPath error:&err];
 					getSizeOp.bytesTotal = [fileAttributes fileSize];		// This will prevent the HEAD request from being needed.
+
+					downloadOp.localPath = localPath;	// Indicate already-ready local path, meaning that no download needs to actually happen
+					[self didFinish:downloadOp];
 				}
 				
 				// This will be a real download.  Make sure we have the progress window showing now.
@@ -604,6 +602,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				else
 				{
 					needsDownloading = YES;
+					[self.getSizeOperations addObject:getSizeOp];
+					[self.downloadOperations addObject:downloadOp];
 				}
 			}
 		}
