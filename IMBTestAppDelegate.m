@@ -202,13 +202,13 @@
 #pragma mark 
 #pragma mark IMBParserController Delegate
 
-- (BOOL) controller:(IMBParserController*)inController shouldLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
+- (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString *)parserClassname forMediaType:(NSString*)inMediaType
 {
 #if LOG_PARSERS
-	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
+	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,parserClassname,inMediaType);
 #endif
 	
-	if ([NSStringFromClass(inParserClass) isEqualToString:@"IMBFlickrParser"])
+	if ([parserClassname isEqualToString:@"IMBFlickrParser"])
 	{
 		SecKeychainItemRef item = nil;
 		UInt32 stringLength;
@@ -225,7 +225,7 @@
 }
 
 
-- (void) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
+- (void) parserController:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
 {
 #if LOG_PARSERS
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
@@ -233,7 +233,7 @@
 }
 
 
-- (void) controller:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
+- (void) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
 #if LOG_PARSERS
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
@@ -245,7 +245,8 @@
 		// on supporting flickr in iMedia on a commmercial app, you will have to apply for a commercial
 		// API key at least 30 days before shipping)
 		
-#warning Supply your own Flickr API key and shared secret, or apply for key and secret at: http://flickr.com/services/api/keys/apply
+		// Supply your own Flickr API key and shared secret, or apply for key and secret at:
+		// http://flickr.com/services/api/keys/apply
 		// If you already have an API key, you will find it here:  http://www.flickr.com/services/api/keys/
 		
 		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
@@ -316,7 +317,7 @@
 }
 
 
-- (void) controller:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
+- (void) parserController:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
 #if LOG_PARSERS
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
@@ -331,7 +332,7 @@
 #pragma mark IMBLibraryController Delegate
 
 
-- (BOOL) controller:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
+- (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
 {
 #if LOG_CREATE_NODE
 	NSLog(@"%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
@@ -341,7 +342,7 @@
 }
 
 
-- (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
+- (void) libraryController:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
 {
 #if LOG_CREATE_NODE
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
@@ -349,7 +350,7 @@
 }
 
 
-- (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
+- (void) libraryController:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
 {
 #if LOG_CREATE_NODE
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
@@ -360,7 +361,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (BOOL) controller:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
+- (BOOL) libraryController:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
 {
 #if LOG_POPULATE_NODE
 	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
@@ -370,7 +371,7 @@
 }
 
 
-- (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode
+- (void) libraryController:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode
 {
 #if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
@@ -378,7 +379,7 @@
 }
 
 
-- (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode
+- (void) libraryController:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode
 {
 #if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);

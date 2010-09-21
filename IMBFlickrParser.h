@@ -69,7 +69,7 @@
  *	parser. Apply for key and secret at: http://flickr.com/services/api/keys/apply
  *
  *	Set the API key and shared secret in the IMBParserController delegate method
- *	controller:didLoadParser:forMediaType: See the iMedia Test Application for 
+ *	parserController:didLoadParser:forMediaType: See the iMedia Test Application for 
  *	an example.
  *
  *

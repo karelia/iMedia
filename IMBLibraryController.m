@@ -410,16 +410,16 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		BOOL shouldCreateNode = YES;
 
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldCreateNodeWithParser:)])
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:shouldCreateNodeWithParser:)])
 		{
-			shouldCreateNode = [_delegate controller:self shouldCreateNodeWithParser:parser];
+			shouldCreateNode = [_delegate libraryController:self shouldCreateNodeWithParser:parser];
 		}
 		
 		if (shouldCreateNode)
 		{
-			if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willCreateNodeWithParser:)])
+			if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willCreateNodeWithParser:)])
 			{
-				[_delegate controller:self willCreateNodeWithParser:parser];
+				[_delegate libraryController:self willCreateNodeWithParser:parser];
 			}
 
 			IMBCreateNodeOperation* operation = [[IMBCreateNodeOperation alloc] init];
@@ -453,18 +453,18 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	BOOL shouldCreateNode = _isReplacingNode==NO;
 
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldCreateNodeWithParser:)])
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:shouldCreateNodeWithParser:)])
 	{
-		shouldCreateNode = [_delegate controller:self shouldCreateNodeWithParser:inNode.parser];
+		shouldCreateNode = [_delegate libraryController:self shouldCreateNodeWithParser:inNode.parser];
 	}
 	
 	if (shouldCreateNode)
 	{
 		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
 
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willCreateNodeWithParser:)])
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willCreateNodeWithParser:)])
 		{
-			[_delegate controller:self willCreateNodeWithParser:inNode.parser];
+			[_delegate libraryController:self willCreateNodeWithParser:inNode.parser];
 		}
 
 		inNode.loading = YES;
@@ -705,9 +705,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _didCreateNode:(IMBNode*)inNode
 {
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didCreateNode:withParser:)])
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:didCreateNode:withParser:)])
 	{
-		[_delegate controller:self didCreateNode:inNode withParser:inNode.parser];
+		[_delegate libraryController:self didCreateNode:inNode withParser:inNode.parser];
 	}
 	
 	inNode.loading = NO;
@@ -747,9 +747,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	if (shouldPopulateNode)
 	{
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willPopulateNode:)])
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willPopulateNode:)])
 		{
-			[_delegate controller:self willPopulateNode:inNode];
+			[_delegate libraryController:self willPopulateNode:inNode];
 		}
 
 		inNode.loading = YES;
@@ -795,9 +795,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _didPopulateNode:(IMBNode*)inNode
 {
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didPopulateNode:)])
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:didPopulateNode:)])
 	{
-		[_delegate controller:self didPopulateNode:inNode];
+		[_delegate libraryController:self didPopulateNode:inNode];
 	}
 
 	inNode.loading = NO;

@@ -495,10 +495,10 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	{
 		id delegate = self.libraryController.delegate;
 		
-		if ([delegate respondsToSelector:@selector(controller:shouldPopulateNode:)])
+		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
 		{
 			IMBNode* node = [inItem representedObject];
-			shouldExpand = [delegate controller:self.libraryController shouldPopulateNode:node];
+			shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
 		}
 	}
 	
@@ -560,9 +560,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		IMBNode* node = [inItem representedObject];
 		id delegate = self.libraryController.delegate;
 		
-		if ([delegate respondsToSelector:@selector(controller:shouldPopulateNode:)])
+		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
 		{
-			shouldSelect = [delegate controller:self.libraryController shouldPopulateNode:node];
+			shouldSelect = [delegate libraryController:self.libraryController shouldPopulateNode:node];
 		}
 		
 		if (node.isGroup)
@@ -1169,9 +1169,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	id delegate = self.libraryController.delegate;
 	
-	if (delegate!=nil && [delegate respondsToSelector:@selector(controller:willShowContextMenu:forNode:)])
+	if (delegate!=nil && [delegate respondsToSelector:@selector(libraryController:willShowContextMenu:forNode:)])
 	{
-		[delegate controller:self.libraryController willShowContextMenu:menu forNode:inNode];
+		[delegate libraryController:self.libraryController willShowContextMenu:menu forNode:inNode];
 	}
 	
 	return menu;

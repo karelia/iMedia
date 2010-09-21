@@ -436,9 +436,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 {
 	NSString* mediaType = inTabViewItem.identifier;
 	
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:shouldShowPanelForMediaType:)])
+	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:shouldShowPanelForMediaType:)])
 	{
-		return [_delegate controller:self shouldShowPanelForMediaType:mediaType];
+		return [_delegate panelController:self shouldShowPanelForMediaType:mediaType];
 	}
 	
 	return YES;
@@ -471,14 +471,14 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		
 	// Notify the delegate...
 
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:willHidePanelForMediaType:)])
+	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willHidePanelForMediaType:)])
 	{
-		[_delegate controller:self willHidePanelForMediaType:_oldMediaType];
+		[_delegate panelController:self willHidePanelForMediaType:_oldMediaType];
 	}
 
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:willShowPanelForMediaType:)])
+	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willShowPanelForMediaType:)])
 	{
-		[_delegate controller:self willShowPanelForMediaType:newMediaType];
+		[_delegate panelController:self willShowPanelForMediaType:newMediaType];
 	}
 }
 
@@ -499,14 +499,14 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 	// Notify the delegate...
 
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:didHidePanelForMediaType:)])
+	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didHidePanelForMediaType:)])
 	{
-		[_delegate controller:self didHidePanelForMediaType:_oldMediaType];
+		[_delegate panelController:self didHidePanelForMediaType:_oldMediaType];
 	}
 
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(controller:didShowPanelForMediaType:)])
+	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didShowPanelForMediaType:)])
 	{
-		[_delegate controller:self didShowPanelForMediaType:newMediaType];
+		[_delegate panelController:self didShowPanelForMediaType:newMediaType];
 	}
 }
 
