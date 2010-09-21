@@ -1894,22 +1894,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (IBAction) tableViewWasClicked:(id)inSender
 {
-	// Make sure we aren't just doing a mouseup over the Load More button
-	if (0 == [inSender mouseOperation])
-	{
-		NSUInteger row = [(NSTableView*)inSender clickedRow];
-		NSArray* objects = [ibObjectArrayController arrangedObjects];
-		IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
-		
-		if ([object isKindOfClass:[IMBButtonObject class]])
-		{
-			[(IMBButtonObject*)object sendClickAction];
-		}
-	}
-	else
-	{
-		NSLog(@"ignoring mouseup on load more since it started outside");
-	}
+	// No-op; clicking is handled with more detail from the mouse operations.
 }
 
 
