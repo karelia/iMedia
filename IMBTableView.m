@@ -272,15 +272,17 @@ enum IMBMouseOperation
 	{
 		// Indicate what object was clicked upon so that dragging can happen to the clicked object,
 		// which is not necessarily the same row as one of the selection row(s).
-//		IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
-//		[objectViewController setClickedObject:self.clickedObject];
-//		[objectViewController setClickedObjectIndex:self.clickedObjectIndex];
+		IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
+		[objectViewController setClickedObject:self.clickedObject];
+		[objectViewController setClickedObjectIndex:self.clickedObjectIndex];
 		
-		_mouseOperation = kMouseOperationNone;
 		[super mouseDown:inEvent];
+		_mouseOperation = kMouseOperationNone;
 	}
 }
 
+// Careful -- this only works in special cases; see
+// http://www.cocoabuilder.com/archive/cocoa/234849-mousedragged-with-nstableview.html
 
 - (void) mouseDragged:(NSEvent*)inEvent;
 {
@@ -298,7 +300,11 @@ enum IMBMouseOperation
 	
 	else
 	{
-		[super mouseDragged:inEvent];
+		if (nil != [_clickedObject url])
+		{
+			[super mouseDragged:inEvent];
+		}
+		// Ignore drag if we don't have a draggable object
 	}
 }
 
