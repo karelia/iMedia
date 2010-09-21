@@ -50,6 +50,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark HEADERS
+	
+#import "IMBURLDownloadOperation.h"
+#import "IMBURLGetSizeOperation.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark CONSTANTS
 	
 extern NSString* kIMBObjectPromiseType;
@@ -166,8 +175,6 @@ extern NSString* kIMBObjectPromiseType;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#import "IMBURLDownloadOperation.h"
-#import "IMBURLGetSizeOperation.h"
 
 #pragma mark 
 
@@ -176,18 +183,17 @@ extern NSString* kIMBObjectPromiseType;
 
 @interface IMBRemoteObjectPromise : IMBObjectPromise <IMBURLDownloadDelegate, IMBURLGetSizeDelegate>
 {
-	NSMutableArray* _downloadOperations;
 	NSMutableArray* _getSizeOperations;
+	NSMutableArray* _downloadOperations;
 	long long _totalBytes;
 	long long _currentBytes;
 }
 
-@property (retain) NSMutableArray* downloadOperations;
 @property (retain) NSMutableArray* getSizeOperations;
-- (IBAction) cancel:(id)inSender;
+@property (retain) NSMutableArray* downloadOperations;
 
-// hooks required for IMBMTPObjectPromise 
 - (void) loadObjects:(NSArray*)inObjects;
+- (IBAction) cancel:(id)inSender;
 
 - (void) prepareProgress;
 - (void) displayProgress:(double)inFraction;

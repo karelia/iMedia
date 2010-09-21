@@ -1168,10 +1168,10 @@
 				D09930BD1010F6C100C527B7 /* IMBOperationQueue.m */,
 				D049F0401034A86B003CC49C /* IMBIconCache.h */,
 				D049F0411034A86B003CC49C /* IMBIconCache.m */,
-				D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */,
-				D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */,
 				CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */,
 				CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */,
+				D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */,
+				D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */,
 				274DF616114EF0B200AC8C03 /* IMBImageItem.h */,
 				274DF617114EF0B200AC8C03 /* IMBImageItem.m */,
 				D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */,
@@ -1439,6 +1439,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "iMedia" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,

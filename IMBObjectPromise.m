@@ -433,8 +433,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	if (self = [super initWithIMBObjects:inObjects])
 	{
-		self.downloadOperations = [NSMutableArray array];
 		self.getSizeOperations = [NSMutableArray array];
+		self.downloadOperations = [NSMutableArray array];
 		_totalBytes = 0;
 		_currentBytes = 0;
 	}
@@ -447,8 +447,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	if (self = [super initWithCoder:inCoder])
 	{
-		self.downloadOperations = [NSMutableArray array];
 		self.getSizeOperations = [NSMutableArray array];
+		self.downloadOperations = [NSMutableArray array];
 		_totalBytes = 0;
 		_currentBytes = 0;
 	}
@@ -459,8 +459,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 - (void) dealloc
 {
-	IMBRelease(_downloadOperations);
 	IMBRelease(_getSizeOperations);
+	IMBRelease(_downloadOperations);
 	[super dealloc];
 } 
 
@@ -548,36 +548,45 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 - (void) loadObjects:(NSArray*)inObjects
 {	
-	BOOL started = NO;	// set to YES when we found a URL to download, and we started the progress
-	// Create all download operations...
+	BOOL needsDownloading = NO;		// set to YES when we found a URL to download, and we started the progress
 	
 	// Retain self until all download operations have finished. We are going to release self in the   
 	// didFinish: and didReceiveError: delegate messages...
+	
 	[self retain];
 	
+	// Create all download operations...
+
 	for (IMBObject* object in inObjects)
 	{
 		if (![object isKindOfClass:[IMBButtonObject class]])
 		{
 			NSURL* url = [object url];
+			
 			if (url)	// if unable to download, URL will be nil
 			{
-				NSString *downloadFolderPath = self.downloadFolderPath;
-				if (!downloadFolderPath)
+				// If we don't have a download folder yet, then use temporary directory...
+				
+				NSString* downloadFolderPath = self.downloadFolderPath;
+				
+				if (downloadFolderPath == nil)
 				{
 					downloadFolderPath = [[NSFileManager threadSafeManager] sharedTemporaryFolder:@"downloads"];
-					// force downloading into temporary directory
 				}
 				
-				NSString *filename = [[url path] lastPathComponent];
-				NSString *localPath = [downloadFolderPath stringByAppendingPathComponent:filename];
+				NSString* filename = [[url path] lastPathComponent];
+				NSString* localPath = [downloadFolderPath stringByAppendingPathComponent:filename];
 
-				IMBURLDownloadOperation* downloadOp = [[[IMBURLDownloadOperation alloc] initWithURL:url delegate:self] autorelease];
 				IMBURLGetSizeOperation* getSizeOp = [[[IMBURLGetSizeOperation alloc] initWithURL:url delegate:self] autorelease];
+				IMBURLDownloadOperation* downloadOp = [[[IMBURLDownloadOperation alloc] initWithURL:url delegate:self] autorelease];
 				downloadOp.delegateReference = object;				
 				downloadOp.downloadFolderPath = downloadFolderPath;
 				
-				// Force not using a cached version if the option key was held down.
+				[self.getSizeOperations addObject:getSizeOp];
+				[self.downloadOperations addObject:downloadOp];
+
+				// Force not using a cached version if the option key was held down...
+				
 				unsigned eventModifierFlags = [[NSApp currentEvent] modifierFlags];				
 				if ([[NSFileManager threadSafeManager] fileExistsAtPath:localPath]
 					&& 0 == (eventModifierFlags & NSAlternateKeyMask))
@@ -588,56 +597,64 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 					NSDictionary *fileAttributes = [[NSFileManager threadSafeManager] attributesOfItemAtPath:localPath error:&err];
 					getSizeOp.bytesTotal = [fileAttributes fileSize];		// This will prevent the HEAD request from being needed.
 				}
+				
+				// This will be a real download.  Make sure we have the progress window showing now.
+				// Show the progress, which is indeterminate for now as we do not know the file sizes yet...
+				
 				else
 				{
-					// This will be a real download.  Make sure we have the progress window showing now.
-					if (!started)
-					{
-						// Show the progress, which is indeterminate for now as we do not know the file sizes yet...
-						[self prepareProgress];
-						
-						started = YES;
-					}
-					
+					needsDownloading = YES;
 				}
-				
-				[self.downloadOperations addObject:downloadOp];
-				[self.getSizeOperations addObject:getSizeOp];
-				[downloadOp release];
 			}
 		}
 	}
 
 	// TO DO: COME UP WITH A DIFFERENT PLAN WHEN THERE IS EXACTLY ONE FILE TO DOWNLOAD, AND WHEN THERE IS MORE THAN, SAY, 4 OR 5 (to count files, not bytes)
-	_totalBytes = 0;
-	NSInvocationOperation *gotSizesOperation = [[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(gotSizes:) object:nil] autorelease];
 
-	// Make the got-sizes operation dependent on all of the get-sizes operatons, and then make the download operations
-	// each dependent on got-sizes.
+	if (needsDownloading)
+	{
+		NSInvocationOperation* startDownloadOp = [[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(startDownload:) object:nil] autorelease];
+
+		// Make the got-sizes operation dependent on all of the get-sizes operatons, and then make the download operations
+		// each dependent on got-sizes.
+		
+		for (IMBURLGetSizeOperation* getSizeOp in self.getSizeOperations)
+		{
+			[startDownloadOp addDependency:getSizeOp];	// startDownloadOp is dependent on each getSize
+			[[IMBOperationQueue sharedQueue] addOperation:getSizeOp];
+		}
+		
+		[[IMBOperationQueue sharedQueue] addOperation:startDownloadOp];
+
+		// Start downloading once we have the size of each and every single file to be downloaded...
+		
+		for (IMBURLDownloadOperation* downloadOp in self.downloadOperations)
+		{
+			[downloadOp addDependency:startDownloadOp];	
+			[[IMBOperationQueue sharedQueue] addOperation:downloadOp];
+		}
+	}
+}
+
+
+- (void) startDownload:(id)unused
+{
+//	NSLog(@"%s",__FUNCTION__);
+
+	// Add the the total number of bytes to be downloaded...
 	
+	_totalBytes = 0;
+
 	for (IMBURLGetSizeOperation* getSizeOp in self.getSizeOperations)
 	{
-		[gotSizesOperation addDependency:getSizeOp];	// gotSizes is dependent on each getSize
-		[[IMBOperationQueue sharedQueue] addOperation:getSizeOp];
+		_totalBytes += getSizeOp.bytesTotal;
 	}
 	
-
-	// Start downloading...
+	// Switch progress from indeterminate to linear...
 	
-	for (IMBURLDownloadOperation* downloadOp in self.downloadOperations)
-	{
-		[downloadOp addDependency:gotSizesOperation];	// each download op can't start until the sizes are totalled up.
-		[[IMBOperationQueue sharedQueue] addOperation:downloadOp];
-
-	}
+	[self displayProgress:0.0];
 }
 
-- (void)gotSizes:(id)unused
-{
-	// Called when all of the sizes are calculated
-	//  Can this just be a no-op, or should I do something like change the status?
-	NSLog(@"All sized calculated.  Now I think we can start really downloading.");
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -647,6 +664,11 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	_wasCanceled = YES;
 	
 	// Cancel outstanding operations...
+	
+	for (IMBURLGetSizeOperation* op in self.getSizeOperations)
+	{
+		[op cancel];
+	}
 	
 	for (IMBURLDownloadOperation* op in self.downloadOperations)
 	{
