@@ -73,7 +73,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) initWithURL:(NSURL*)inURL delegate:(id <IMBURLGetSizeDelegate>)inDelegate;
+- (id) initWithURL:(NSURL*)inURL delegate:(id <IMBURLGetSizeDelegate>)inDelegate
 {
 	if (self = [super init])
 	{
@@ -94,7 +94,6 @@
 } 
 
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -103,9 +102,9 @@
 
 - (void) main
 {
-	NSLog(@"Starting %@", self);
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	
+//	NSLog(@"%s Starting %@",__FUNCTION__,self);
+
 	if (0 == self.bytesTotal)	// only do the actual check if we don't already have a (local) size
 	{
 		NSURLRequestCachePolicy policy = NSURLRequestUseProtocolCachePolicy;
@@ -125,8 +124,8 @@
 		[self downloadDidFinish:nil];	// notify owner that the download (which never started) is finished.
 	}
 	
+//	NSLog(@"%s Ending %@",__FUNCTION__,self);
 	[pool release];
-	NSLog(@"Ending %@", self);
 }
 
 
@@ -140,24 +139,30 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) connection:(NSURLConnection*)inConnection didReceiveResponse:(NSURLResponse*)inResponse
+{
+	_bytesTotal += [inResponse expectedContentLength];
+}
+
+
+- (void) connectionDidFinishLoading:(NSURLConnection*)inConnection
+{
+	[_delegate didGetBytesTotal:_bytesTotal];
+	_finished = YES;
+}
+
+
+- (void) connection:(NSURLConnection*)inConnection didFailWithError:(NSError*)inError
+{
+	[_delegate didGetBytesTotal:_bytesTotal];
+	_finished = YES;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
-{
-	_bytesTotal += [response expectedContentLength];
-}
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection;
-{
-	[_delegate didGetBytesTotal:_bytesTotal];
-	_finished = YES;
-}
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
-{
-	[_delegate didGetBytesTotal:_bytesTotal];
-	_finished = YES;
-}
 
 
 @end
