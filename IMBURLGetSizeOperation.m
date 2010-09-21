@@ -73,7 +73,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) initWithURL:(NSURL*)inURL delegate:(id <IMBURLGetSizeDelegate>)inDelegate
+- (id) initWithURL:(NSURL*)inURL delegate:(id)inDelegate
 {
 	if (self = [super init])
 	{
@@ -150,14 +150,12 @@
 
 - (void) connectionDidFinishLoading:(NSURLConnection*)inConnection
 {
-	[_delegate didGetBytesTotal:_bytesTotal];
 	_finished = YES;
 }
 
 
 - (void) connection:(NSURLConnection*)inConnection didFailWithError:(NSError*)inError
 {
-	[_delegate didGetBytesTotal:_bytesTotal];
 	_finished = YES;
 }
 
