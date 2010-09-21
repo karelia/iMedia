@@ -1582,6 +1582,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitleListPasteboardType, titles);
 						wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetadataListPasteboardType];
 						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetadataListPasteboardType, metadatas);
+#ifdef DEBUG
+NSLog(@"Titles on pasteboard: %@", titles);
+NSLog(@"MetaData on pasteboard: %@", metadatas);
+#endif
 					}
 				}
 				
