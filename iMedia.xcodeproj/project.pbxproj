@@ -41,7 +41,7 @@
 		8FCA067B1236860A009072AE /* warning.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FCA067A1236860A009072AE /* warning.png */; };
 		8FFCBFD010A8CD9C00377C33 /* IMBLightroom3Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FFCBFD110A8CD9C00377C33 /* IMBLightroom3Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */; };
-		CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */; };
+		CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE09F304124823020094EC48 /* IMBURLGetSizeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */; };
 		CE28E51C124192A800B00F3D /* IMBDisableTitleToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */; };
 		CE69CDC41149D0B50016E5E0 /* IMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */; };
