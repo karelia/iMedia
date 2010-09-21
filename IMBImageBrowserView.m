@@ -298,7 +298,12 @@ enum IMBMouseOperation
 	else
 	{
 		[self.delegate setDropDestinationURL:nil];		// initialize to nil so we know drag has just started
-		[super mouseDragged:inEvent];
+		
+		if (nil != [_clickedObject url])
+		{
+			[super mouseDragged:inEvent];
+		}
+		// Ignore drag if we don't have a draggable object
 	}
 }
 
