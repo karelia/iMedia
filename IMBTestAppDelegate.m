@@ -55,6 +55,7 @@
 #import "IMBTestAppDelegate.h"
 #import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
+#import <objc/runtime.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,6 +71,29 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+@interface NSObject(extra)
+- (BOOL)loggingRespondsToSelector:(SEL)aSelector;
+@end
+
+@implementation NSObject(extra)
+
++ (void)load;
+{
+    NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
+		
+	NSLog(@"Switching in!");
+	method_exchangeImplementations(class_getInstanceMethod(self, @selector(respondsToSelector:)), class_getInstanceMethod(self, @selector(loggingRespondsToSelector:)));
+    [autoreleasePool release];
+}
+
+
+- (BOOL)loggingRespondsToSelector:(SEL)aSelector;
+{
+	NSLog(@"-[%@ respondsToSelector:%@", [[self class] description], NSStringFromSelector(aSelector));
+	return [self loggingRespondsToSelector:aSelector];
+}
+
+@end
 
 #pragma mark 
 
