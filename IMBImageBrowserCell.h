@@ -82,6 +82,8 @@
 @property BOOL imbShouldDrawShadow;
 @property BOOL imbShouldDisableTitle;
 
+- (void) setTitleColors;
+
 @end
 
 
