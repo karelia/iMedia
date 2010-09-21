@@ -1676,16 +1676,14 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		{
 			cell.imageRepresentation = (id) [(IMBMovieObject*)object posterFrame];
 			cell.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
-			cell.title = object.name;
-			cell.subtitle = object.metadataDescription;
 		}
 		else
 		{
 			cell.imageRepresentation = object.imageRepresentation;
 			cell.imageRepresentationType = object.imageRepresentationType;
-			cell.title = object.name;
-			cell.subtitle = object.metadataDescription;
 		}
+		cell.title = object.imageTitle;
+		cell.subtitle = object.metadataDescription;
 	}
 }
 

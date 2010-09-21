@@ -190,11 +190,20 @@
 }
 
 
-// The name of the object will be used as the title in IKImageBrowserView...
+// The name of the object will be used as the title in IKImageBrowserView and tables.
 
 - (NSString*) imageTitle
 {
-	return _name;
+	NSString *name = self.name;
+	if (!name || [name isEqualToString:@""])
+	{
+		name = NSLocalizedStringWithDefaultValue(
+												 @"IMBObject.untitled",
+												 nil,IMBBundle(),
+												 @"untitled",
+												 @"placeholder for untitled image");
+	}
+	return name;
 }
 
 
