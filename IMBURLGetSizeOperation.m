@@ -121,7 +121,7 @@
 	}
 	else
 	{
-		[self downloadDidFinish:nil];	// notify owner that the download (which never started) is finished.
+		[self connectionDidFinishLoading:nil];	// notify owner that the download (which never started) is finished.
 	}
 	
 //	NSLog(@"%s Ending %@",__FUNCTION__,self);

@@ -613,6 +613,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 	if (needsDownloading)
 	{
+		[self prepareProgress];
+		
 		NSInvocationOperation* startDownloadOp = [[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(startDownload:) object:nil] autorelease];
 
 		// Make the got-sizes operation dependent on all of the get-sizes operatons, and then make the download operations
