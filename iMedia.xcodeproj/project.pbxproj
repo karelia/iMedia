@@ -768,7 +768,6 @@
 				D099334E1011B22600C527B7 /* Test Application */,
 				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
 				034768DFFF38A50411DB9C8B /* Products */,
-				CEF65425117E64FA003FF1A5 /* any.pdf */,
 			);
 			name = iMedia;
 			sourceTree = "<group>";
@@ -992,6 +991,7 @@
 				CEF65399117E5C28003FF1A5 /* noncommercial.pdf */,
 				CEF6539A117E5C28003FF1A5 /* remix.pdf */,
 				CEF6539B117E5C28003FF1A5 /* sharealike.pdf */,
+				CEF65425117E64FA003FF1A5 /* any.pdf */,
 			);
 			name = Flickr;
 			sourceTree = "<group>";

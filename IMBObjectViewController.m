@@ -928,9 +928,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	id delegate = self.delegate;
 	
-	if (delegate!=nil && [delegate respondsToSelector:@selector(controller:willShowContextMenu:forObject:)])
+	if (delegate!=nil && [delegate respondsToSelector:@selector(libraryController:willShowContextMenu:forObject:)])
 	{
-		[delegate controller:self.libraryController willShowContextMenu:menu forObject:inObject];
+		[delegate libraryController:self.libraryController willShowContextMenu:menu forObject:inObject];
 	}
 	
 	return menu;
@@ -1363,11 +1363,11 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	if (delegate)
 	{
-		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
+		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
 		{
 			IMBNode* node = self.currentNode;
 			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
+			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
 		}
 	}
 	
@@ -1865,11 +1865,11 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 	
 	if (delegate)
 	{
-		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
+		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
 		{
 			IMBNode* node = self.currentNode;
 			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
+			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
 		}
 	}
 	

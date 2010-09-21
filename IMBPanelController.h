@@ -119,11 +119,11 @@
 
 @optional
 
-- (BOOL) controller:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
+- (BOOL) panelController:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
+- (void) panelController:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
+- (void) panelController:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
+- (void) panelController:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
+- (void) panelController:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
 
 @end
 
