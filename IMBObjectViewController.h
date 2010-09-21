@@ -164,6 +164,8 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	
 	NSURL *_dropDestinationURL;
 	
+	NSIndexSet *_draggedIndexes;	// save the index set of what is dragged (from a table view) for NSFilesPromisePboardType
+	
 	// For table views, to know which one was actually clicked upon for dragging
 	NSInteger _clickedObjectIndex;
 	IMBObject* _clickedObject;
@@ -199,6 +201,7 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 
 @property (assign) NSInteger clickedObjectIndex;
 @property (retain) IMBObject* clickedObject;
+@property (retain) NSIndexSet *draggedIndexes;
 
 - (void) unbindViews;	
 
