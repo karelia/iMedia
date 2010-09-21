@@ -295,7 +295,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (CGFloat)pointSize
+- (CGFloat) pointSize
 {
 	CGFloat points = 0;
 	CGFloat width = [((id)self) size].width;
@@ -306,41 +306,46 @@
 	return points;
 }
 
+
 // Is there any smarter way to do this?
 
-- (void) drawTitle;
+- (void) setTitleColors
 {
 	CGFloat points = [self pointSize];	// we need to get the whole font thing since we have to set the whole attributes
 	
-	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize:points] forKey:NSFontAttributeName];
-	NSMutableDictionary *attributes2 = [NSMutableDictionary dictionaryWithDictionary:attributes];
+	NSMutableDictionary *attributes1 = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize:points] forKey:NSFontAttributeName];
+	NSMutableDictionary *attributes2 = [NSMutableDictionary dictionaryWithDictionary:attributes1];
 	
 	// Now set the title color.  Try to match what we see in table views. 
-	// Enabled: Black, white if Selected; Disabled: gray; still gray when selected.
+	// Enabled: Black, white if Selected; Disabled: grayed out.
 	
 	if (_imbShouldDisableTitle)
 	{
-		[attributes setObject:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4]   forKey:NSForegroundColorAttributeName];
-		[attributes2 setObject:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4] forKey:NSForegroundColorAttributeName];
+		[attributes1 setObject:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4] forKey:NSForegroundColorAttributeName];
+		[attributes2 setObject:[NSColor colorWithCalibratedWhite:1.0 alpha:0.5] forKey:NSForegroundColorAttributeName];
 	}
 	else
 	{
+		[attributes1 setObject:[NSColor blackColor] forKey:NSForegroundColorAttributeName];
 		[attributes2 setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
 	}
 
-	
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
-		[[((id)self) imageBrowserView] setValue:attributes  forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[((id)self) imageBrowserView] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
 		[[((id)self) imageBrowserView] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
 	}
 	else
 	{
-		[[((id)self) parent] setValue:attributes  forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[((id)self) parent] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
 		[[((id)self) parent] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
 	}	
+}
 
-	
+
+- (void) drawTitle
+{
+	[self setTitleColors];
 	[super drawTitle];
 }
 
