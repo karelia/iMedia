@@ -100,4 +100,9 @@
 	return NO;
 }
 
+- (NSDictionary *)preliminaryMetadata;
+{
+	return nil;	// placeholder so that filter field on flickr will worko
+}
+
 @end

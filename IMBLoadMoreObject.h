@@ -68,6 +68,8 @@
 	NSString* _nodeIdentifier;
 }
 
+- (NSDictionary *)preliminaryMetadata;	// return empty
+
 @property (assign) NSString* nodeIdentifier;
 
 @end

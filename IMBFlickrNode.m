@@ -638,7 +638,7 @@ typedef enum {
 	
 	//	limit the search to a specific number of items...
 #ifdef DEBUG
-	[arguments setObject:@"5" forKey:@"per_page"];
+	[arguments setObject:@"30" forKey:@"per_page"];
 #else
 	[arguments setObject:@"30" forKey:@"per_page"];
 #endif
