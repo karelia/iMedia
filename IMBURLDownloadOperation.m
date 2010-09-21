@@ -156,7 +156,7 @@
 		
 		NSURLRequestCachePolicy policy = NSURLRequestUseProtocolCachePolicy;
 		
-		NSURLRequest* request = [NSURLRequest requestWithURL:self.remoteURL cachePolicy:policy timeoutInterval:10.0];
+		NSURLRequest* request = [NSURLRequest requestWithURL:self.remoteURL cachePolicy:policy timeoutInterval:90.0];
 		NSURLDownload* download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 		[download setDestination:localFilePath allowOverwrite:NO];
 		[download setDeletesFileUponFailure:YES];

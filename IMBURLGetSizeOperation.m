@@ -108,7 +108,7 @@
 	if (0 == self.bytesTotal)	// only do the actual check if we don't already have a (local) size
 	{
 		NSURLRequestCachePolicy policy = NSURLRequestUseProtocolCachePolicy;
-		NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:self.remoteURL cachePolicy:policy timeoutInterval:10.0];
+		NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:self.remoteURL cachePolicy:policy timeoutInterval:15.0];
 		[request setHTTPMethod:@"HEAD"];
 		
 		self.connection = [NSURLConnection connectionWithRequest:request delegate:self];
