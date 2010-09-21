@@ -181,6 +181,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 @synthesize dropDestinationURL = _dropDestinationURL;
 
+@synthesize clickedObjectIndex = _clickedObjectIndex;
+@synthesize clickedObject = _clickedObject;
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -335,7 +338,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
 	IMBRelease(_dropDestinationURL);
-	
+	IMBRelease(_clickedObject);
+
 	for (IMBObject* object in _observedVisibleItems)
 	{
         if ([object isKindOfClass:[IMBObject class]])
@@ -1720,12 +1724,16 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
+// Encapsulate all dragged objects iny a promise, archive it and put it on the pasteboard. The client can then
 // start loading the objects in the promise and iterate over the resulting files...
 
 - (BOOL) tableView:(NSTableView*)inTableView writeRowsWithIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard 
 {
-	return ([self writeItemsAtIndexes:inIndexes toPasteboard:inPasteboard] > 0);
+	if (nil == [_clickedObject url])
+	{
+		return NO;	// don't allow drag if we clicked on a disabled object
+	}
+ 	return ([self writeItemsAtIndexes:inIndexes toPasteboard:inPasteboard] > 0);
 }
 
 
@@ -1886,13 +1894,21 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (IBAction) tableViewWasClicked:(id)inSender
 {
-	NSUInteger row = [(NSTableView*)inSender clickedRow];
-	NSArray* objects = [ibObjectArrayController arrangedObjects];
-	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
-		
-	if ([object isKindOfClass:[IMBButtonObject class]])
+	// Make sure we aren't just doing a mouseup over the Load More button
+	if (0 == [inSender mouseOperation])
 	{
-		[(IMBButtonObject*)object sendClickAction];
+		NSUInteger row = [(NSTableView*)inSender clickedRow];
+		NSArray* objects = [ibObjectArrayController arrangedObjects];
+		IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
+		
+		if ([object isKindOfClass:[IMBButtonObject class]])
+		{
+			[(IMBButtonObject*)object sendClickAction];
+		}
+	}
+	else
+	{
+		NSLog(@"ignoring mouseup on load more since it started outside");
 	}
 }
 

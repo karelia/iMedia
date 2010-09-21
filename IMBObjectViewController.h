@@ -163,6 +163,11 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	NSMutableSet *_observedVisibleItems;
 	
 	NSURL *_dropDestinationURL;
+	
+	// For table views, to know which one was actually clicked upon for dragging
+	NSInteger _clickedObjectIndex;
+	IMBObject* _clickedObject;
+
 }
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
@@ -191,6 +196,9 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @property (readonly) BOOL canUseIconSize;
 
 @property (retain) NSURL *dropDestinationURL;
+
+@property (assign) NSInteger clickedObjectIndex;
+@property (retain) IMBObject* clickedObject;
 
 - (void) unbindViews;	
 

@@ -277,6 +277,11 @@ enum IMBMouseOperation
 		_mouseOperation = kMouseOperationNone;
 	}
 
+	// For parity with TableView; not really needed since selection is changed anyhow
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+	[controller setClickedObject:self.clickedObject];
+	[controller setClickedObjectIndex:self.clickedObjectIndex];
+
 	[super mouseDown:inEvent];
 }
 
