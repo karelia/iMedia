@@ -166,20 +166,24 @@ extern NSString* kIMBObjectPromiseType;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#import "IMBURLDownloadOperation.h"
+#import "IMBURLGetSizeOperation.h"
 
 #pragma mark 
 
 // This subclass is used for remote object files that can be downloaded from a network. NSURLDownload is used to
 // pull the object files off the network onto the local file system, where it can then be accessed by the delegate... 
 
-@interface IMBRemoteObjectPromise : IMBObjectPromise
+@interface IMBRemoteObjectPromise : IMBObjectPromise <IMBURLDownloadDelegate, IMBURLGetSizeDelegate>
 {
 	NSMutableArray* _downloadOperations;
+	NSMutableArray* _getSizeOperations;
 	long long _totalBytes;
 	long long _currentBytes;
 }
 
 @property (retain) NSMutableArray* downloadOperations;
+@property (retain) NSMutableArray* getSizeOperations;
 - (IBAction) cancel:(id)inSender;
 
 // hooks required for IMBMTPObjectPromise 

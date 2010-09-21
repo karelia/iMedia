@@ -88,7 +88,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) initWithURL:(NSURL*)inURL delegate:(id)inDelegate;
+- (id) initWithURL:(NSURL*)inURL delegate:(id <IMBURLDownloadDelegate>)inDelegate;
 {
 	if (self = [super init])
 	{
