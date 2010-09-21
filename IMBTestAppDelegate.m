@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -41,7 +41,7 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
 // Author: Peter Baumgartner, Dan Wood, Christoph Priebe
@@ -55,7 +55,6 @@
 #import "IMBTestAppDelegate.h"
 #import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
-#import <objc/runtime.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,29 +70,6 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-@interface NSObject(extra)
-- (BOOL)loggingRespondsToSelector:(SEL)aSelector;
-@end
-
-@implementation NSObject(extra)
-
-+ (void)load;
-{
-    NSAutoreleasePool *autoreleasePool = [[NSAutoreleasePool alloc] init];
-		
-	NSLog(@"Switching in!");
-	method_exchangeImplementations(class_getInstanceMethod(self, @selector(respondsToSelector:)), class_getInstanceMethod(self, @selector(loggingRespondsToSelector:)));
-    [autoreleasePool release];
-}
-
-
-- (BOOL)loggingRespondsToSelector:(SEL)aSelector;
-{
-	NSLog(@"-[%@ respondsToSelector:%@", [[self class] description], NSStringFromSelector(aSelector));
-	return [self loggingRespondsToSelector:aSelector];
-}
-
-@end
 
 #pragma mark 
 
@@ -109,11 +85,11 @@
 - (void) awakeFromNib
 {
 	// NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d",   MAC_OS_X_VERSION_MIN_REQUIRED, MAC_OS_X_VERSION_MAX_ALLOWED);
-		  
-		  
+	
+	
 	[IMBConfig setShowsGroupNodes:YES];
 	
-	#if CUSTOM_USER_INTERFACE
+#if CUSTOM_USER_INTERFACE
 	
 	// Load parsers...
 	
@@ -135,8 +111,8 @@
 	self.objectViewController.nodeViewController = self.nodeViewController;
 	NSView* objectView = self.objectViewController.view;
 	self.nodeViewController.standardObjectView = objectView;
-//	[self.nodeViewController installObjectViewForNode:nil];
-
+	//	[self.nodeViewController installObjectViewForNode:nil];
+	
 	[nodeView setFrame:[ibWindow.contentView bounds]];
 	[ibWindow setContentView:nodeView];
 	[ibWindow setContentMinSize:[self.nodeViewController minimumViewSize]];
@@ -151,15 +127,15 @@
 	[libraryController reload];
 	[ibWindow makeKeyAndOrderFront:nil];
 	
-	#else
+#else
 	
 	// Just open the standard iMedia panel...
 	
 	[self togglePanel:nil];
 	
-	#endif
+#endif
 }
-	
+
 
 // Toggle panel visibility...
 
@@ -169,7 +145,7 @@
 	{
 		IMBPanelController* controller = [IMBPanelController sharedPanelController];
 		NSWindow* window = controller.window;
-	
+		
 		if (window.isVisible)
 		{
 			[controller hideWindow:inSender];
@@ -208,7 +184,7 @@
 	NSString* frame = NSStringFromRect(ibWindow.frame);
 	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
 }
-	
+
 
 // Cleanup...
 
@@ -228,9 +204,9 @@
 
 - (BOOL) controller:(IMBParserController*)inController shouldLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
 {
-	#if LOG_PARSERS
+#if LOG_PARSERS
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
-	#endif
+#endif
 	
 	if ([NSStringFromClass(inParserClass) isEqualToString:@"IMBFlickrParser"])
 	{
@@ -251,25 +227,25 @@
 
 - (void) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
 {
-	#if LOG_PARSERS
+#if LOG_PARSERS
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
-	#endif
+#endif
 }
 
 
 - (void) controller:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
-	#if LOG_PARSERS
+#if LOG_PARSERS
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
-	#endif
-
+#endif
+	
 	if ([inParser isKindOfClass:[IMBFlickrParser class]])
 	{
 		// To test this, get your own API key from flickr (noncommercial at first, but you are planning
 		// on supporting flickr in iMedia on a commmercial app, you will have to apply for a commercial
 		// API key at least 30 days before shipping)
 		
-		#warning Supply your own Flickr API key and shared secret, or apply for key and secret at: http://flickr.com/services/api/keys/apply
+#warning Supply your own Flickr API key and shared secret, or apply for key and secret at: http://flickr.com/services/api/keys/apply
 		// If you already have an API key, you will find it here:  http://www.flickr.com/services/api/keys/
 		
 		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
@@ -342,9 +318,9 @@
 
 - (void) controller:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
-	#if LOG_PARSERS
+#if LOG_PARSERS
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
-	#endif
+#endif
 }
 
 
@@ -357,27 +333,27 @@
 
 - (BOOL) controller:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
 {
-	#if LOG_CREATE_NODE
+#if LOG_CREATE_NODE
 	NSLog(@"%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
-	#endif
-
+#endif
+	
 	return YES;
 }
 
 
 - (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
 {
-	#if LOG_CREATE_NODE
+#if LOG_CREATE_NODE
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
-	#endif
+#endif
 }
 
 
 - (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
 {
-	#if LOG_CREATE_NODE
+#if LOG_CREATE_NODE
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
-	#endif
+#endif
 }
 
 
@@ -386,27 +362,27 @@
 
 - (BOOL) controller:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
 {
-	#if LOG_POPULATE_NODE
+#if LOG_POPULATE_NODE
 	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
-	#endif
-
+#endif
+	
 	return YES;
 }
 
 
 - (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode
 {
-	#if LOG_POPULATE_NODE
+#if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
-	#endif
+#endif
 }
 
 
 - (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode
 {
-	#if LOG_POPULATE_NODE
+#if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
-	#endif
+#endif
 }
 
 
@@ -422,21 +398,21 @@
 	
 	//	tag search for 'macintosh' and 'apple'...
 	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
-//	[dict setObject:@"Tagged 'Macintosh' & 'Apple'" forKey:IMBFlickrNodeProperty_Title];
+	//	[dict setObject:@"Tagged 'Macintosh' & 'Apple'" forKey:IMBFlickrNodeProperty_Title];
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodeProperty_Method];
 	[dict setObject:@"macintosh, apple" forKey:IMBFlickrNodeProperty_Query];
 	[defaultNodes addObject:dict];
 	
 	//	tag search for 'iphone' and 'screenshot'...
 	dict = [NSMutableDictionary dictionary];
-//	[dict setObject:@"Tagged 'iPhone' & 'Screenshot'" forKey:IMBFlickrNodeProperty_Title];
+	//	[dict setObject:@"Tagged 'iPhone' & 'Screenshot'" forKey:IMBFlickrNodeProperty_Title];
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodeProperty_Method];
 	[dict setObject:@"iphone, screenshot" forKey:IMBFlickrNodeProperty_Query];
 	[defaultNodes addObject:dict];
 	
 	//	text search for 'tree'...
 	dict = [NSMutableDictionary dictionary];
-//	[dict setObject:@"Search for 'Tree'" forKey:IMBFlickrNodeProperty_Title];
+	//	[dict setObject:@"Search for 'Tree'" forKey:IMBFlickrNodeProperty_Title];
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodeProperty_Method];
 	[dict setObject:@"tree" forKey:IMBFlickrNodeProperty_Query];
 	[defaultNodes addObject:dict];
