@@ -204,40 +204,35 @@
 
 - (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString *)parserClassname forMediaType:(NSString*)inMediaType
 {
+	BOOL result = YES;
 #if LOG_PARSERS
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,parserClassname,inMediaType);
 #endif
 	
-	if ([parserClassname isEqualToString:@"IMBFlickrParser"])
-	{
-		SecKeychainItemRef item = nil;
-		UInt32 stringLength;
-		char* buffer;
-		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
-		if (err == noErr)
-		{
-			SecKeychainItemFreeContent(NULL, buffer);
-		}
-		return item != nil && err == noErr;
-	}
-	
-	return YES;
+//	if ([parserClassname isEqualToString:@"IMBFlickrParser"])
+//	{
+//		// Quick check keychain.  Detailed fetching is below in "didLoadParser" though.
+//		SecKeychainItemRef item = nil;
+//		UInt32 stringLength;
+//		char* buffer;
+//		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
+//		if (err == noErr)
+//		{
+//			SecKeychainItemFreeContent(NULL, buffer);
+//		}
+//		result = (item != nil && err == noErr);
+//	}
+	return result;
 }
 
 
-- (void) parserController:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
-{
-#if LOG_PARSERS
-	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
-#endif
-}
-
-
-- (void) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
+- (BOOL) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
 #if LOG_PARSERS
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
 #endif
+	
+	BOOL loaded = YES;
 	
 	if ([inParser isKindOfClass:[IMBFlickrParser class]])
 	{
@@ -263,20 +258,10 @@
 		// Give it the name of "flickr_api" with the key as the account name, and the secret as the password.
 		
 		SecKeychainItemRef item = nil;
-		OSStatus theStatus = noErr;
-		char *buffer;
 		UInt32 stringLength;
-		
-		theStatus = SecKeychainFindGenericPassword(NULL,
-												   10,	// length of name
-												   "flickr_api",
-												   0,
-												   nil,
-												   &stringLength,
-												   (void**)&buffer,
-												   &item);
-		
-		if (noErr == theStatus)
+		char* buffer;
+		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
+		if (noErr == err)
 		{
 			if (stringLength > 0)
 			{
@@ -292,28 +277,30 @@
 				list.attr = attributes;
 				//SecKeychainAttribute attr = list.attr[0];
 				
-				theStatus = SecKeychainItemCopyContent (item, NULL, &list, NULL, NULL);
+				err = SecKeychainItemCopyContent (item, NULL, &list, NULL, NULL);
 				
 				// make it clear that this is the beginning of a new keychain item
 				
-				if (theStatus == noErr)
+				if (err == noErr)
 				{
 					flickrParser.flickrAPIKey = [[[NSString alloc] initWithBytes:attributes[0].data length:attributes[0].length encoding:NSUTF8StringEncoding] autorelease];
 					SecKeychainItemFreeContent (&list, NULL);
 				}
-				else NSLog(@"%@ unable to fetch 'flickr_api' account from keychain: status %d", NSStringFromSelector(_cmd), theStatus);
+				else NSLog(@"%s unable to fetch 'flickr_api' account from keychain: status %d", __FUNCTION__, err);
 			}
 			else
 			{
-				NSLog(@"%@ Empty password for 'flickr_api' account in keychain: status %d", NSStringFromSelector(_cmd), theStatus);
+				NSLog(@"%s Empty password for 'flickr_api' account in keychain: status %d", __FUNCTION__, err);
 			}
 			SecKeychainItemFreeContent(NULL, buffer);
 		}
 		else
 		{
-			NSLog(@"%@ Couldn't find 'flickr_api' account in keychain: status %d", NSStringFromSelector(_cmd), theStatus);
+			NSLog(@"%s Couldn't find 'flickr_api' account in keychain: status %d", __FUNCTION__, err);
+			loaded = NO;
 		}
 	}		// end IMBFlickrParser code
+	return loaded;
 }
 
 

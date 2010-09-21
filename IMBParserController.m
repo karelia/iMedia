@@ -216,6 +216,13 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 #pragma mark
 #pragma mark Loading & Unloading
 
+- (void)unloadParser:(IMBParser *)parser forMediaType:(NSString *)mediaType;
+{
+	NSMutableArray* parsers = [_loadedParsers objectForKey:mediaType];
+	[parsers removeObjectIdenticalTo:parser];
+}
+
+
 // This method first loads the registered parsers and then appends the custom parser that are stored in the prefs... 
 
 - (void) loadParsers
@@ -247,11 +254,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 				
 				if (shouldLoad)
 				{
-					if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:willLoadParser:forMediaType:)])
-					{
-						[_delegate parserController:self willLoadParser:parserClass forMediaType:mediaType];
-					}
-
 					NSMutableArray* parsers = [self loadedParsersForMediaType:mediaType];
 					NSArray* parserInstances = [parserClass parserInstancesForMediaType:mediaType];
 					if (parserInstances) [parsers addObjectsFromArray:parserInstances];
@@ -260,7 +262,11 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 					{
 						for (IMBParser* parser in parserInstances) 
 						{
-							[_delegate parserController:self didLoadParser:parser forMediaType:mediaType];
+							BOOL loaded = [_delegate parserController:self didLoadParser:parser forMediaType:mediaType];
+							if (!loaded)
+							{
+								[self unloadParser:parser forMediaType:mediaType];
+							}
 						}
 					}
 				}
@@ -334,16 +340,15 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	
 	if (shouldLoad)
 	{
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:willLoadParser:forMediaType:)])
-		{
-			[_delegate parserController:self willLoadParser:[inParser class] forMediaType:inMediaType];
-		}
-
 		[parsers addObject:inParser];
 
 		if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:didLoadParser:forMediaType:)])
 		{
-			[_delegate parserController:self didLoadParser:inParser forMediaType:inMediaType];
+			BOOL loaded = [_delegate parserController:self didLoadParser:inParser forMediaType:inMediaType];
+			if (!loaded)
+			{
+				[parsers removeLastObject];
+			}
 		}
 	}	
 	
@@ -390,49 +395,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	}
 	
 	return didAdd;
-	
-//	// Ask the delegate if we are allow to load the parser...
-//	
-//	BOOL shouldLoad = YES;
-//	
-//	if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:shouldLoadParser:forMediaType:)])
-//	{
-//		shouldLoad = [_delegate parserController:self shouldLoadParser:[inParser class] forMediaType:inMediaType];
-//	}
-//
-//	// Check if the parser is already in the list...
-//	
-//	NSMutableArray* parsers = [self loadedParsersForMediaType:inMediaType];
-//	
-//	for (IMBParser* parser in parsers)
-//	{
-//		if ([inParser.mediaSource isEqual:parser.mediaSource] && [inParser.mediaType isEqual:parser.mediaType])
-//		{
-//			shouldLoad = NO;	
-//		}
-//	}
-//	
-//	// If we are allowed to load, then add it to the list and tell the delegate...
-//	
-//	if (shouldLoad)
-//	{
-//		if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:willLoadParser:forMediaType:)])
-//		{
-//			[_delegate parserController:self willLoadParser:[inParser class] forMediaType:inMediaType];
-//		}
-//
-//		inParser.custom = YES;
-//		[parsers addObject:inParser];
-//
-//		if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:didLoadParser:forMediaType:)])
-//		{
-//			[_delegate parserController:self didLoadParser:inParser forMediaType:inMediaType];
-//		}
-//		
-//		[self saveCustomParsersToPreferences];
-//	}	
-//	
-//	return shouldLoad;
 }
 
 
