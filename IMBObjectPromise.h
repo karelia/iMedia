@@ -186,6 +186,9 @@ extern NSString* kIMBObjectPromiseType;
 	NSMutableArray* _getSizeOperations;
 	NSMutableArray* _downloadOperations;
 	long long _totalBytes;
+	int _downloadFileTotal;
+	int _downloadFileLoaded;	// different from _objectCountLoaded, _objectCountTotal; this is downloads only
+
 }
 
 @property (retain) NSMutableArray* getSizeOperations;

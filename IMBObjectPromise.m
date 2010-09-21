@@ -436,6 +436,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		self.getSizeOperations = [NSMutableArray array];
 		self.downloadOperations = [NSMutableArray array];
 		_totalBytes = 0;
+		_downloadFileTotal = 0;
+		_downloadFileLoaded = 0;
 	}
 	
 	return self;
@@ -449,6 +451,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		self.getSizeOperations = [NSMutableArray array];
 		self.downloadOperations = [NSMutableArray array];
 		_totalBytes = 0;
+		_downloadFileTotal = 0;
+		_downloadFileLoaded = 0;
 	}
 	
 	return self;
@@ -567,7 +571,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 - (void) loadObjects:(NSArray*)inObjects
 {	
-	int totalFiles = 0;	// We will be counting number of files below
+	_downloadFileTotal = 0;	// We will be counting number of files below
 	
 	// Retain self until all download operations have finished. We are going to release self in the   
 	// didFinish: and didReceiveError: delegate messages...
@@ -616,7 +620,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				
 				else
 				{
-					totalFiles++;
+					_downloadFileTotal++;
 					[self.getSizeOperations addObject:getSizeOp];
 					[self.downloadOperations addObject:downloadOp];
 				}
@@ -624,18 +628,18 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		}
 	}
 
-	if (totalFiles > 0)
+	if (_downloadFileTotal > 0)
 	{
 		[self prepareProgress];
 		
 		const int kNumberOfFilesToCountFilesInsteadOfBytes = 8;
 		
-		if (1 == totalFiles)	// 1 file: Don't do a GetSize operation, just start downloading; get size when response is there
+		if (1 == _downloadFileTotal)	// 1 file: Don't do a GetSize operation, just start downloading; get size when response is there
 		{
 			[self.getSizeOperations removeAllObjects];
 			[self startDownload];
 		}
-		else if (totalFiles >= kNumberOfFilesToCountFilesInsteadOfBytes)	// Lots of files. Progress in FILES, not bytes
+		else if (_downloadFileTotal >= kNumberOfFilesToCountFilesInsteadOfBytes)	// Lots of files. Progress in FILES, not bytes
 		{
 			[self.getSizeOperations removeAllObjects];
 			[self startDownload];
@@ -657,8 +661,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		}
 	}
 }
-
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -712,7 +714,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 - (void) didGetLength:(long long)inExpectedLength;
 {
-	if (0 == _totalBytes && 1 == _objectCountTotal)	// If we didn't have a length before, set the expected length and start the progress
+	if (0 == _totalBytes && 1 == _downloadFileTotal)	// If we didn't have a length before, set the expected length and start the progress
 	{
 		_totalBytes = inExpectedLength;
 		[self displayProgress:0.0];
@@ -744,9 +746,19 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 - (void) didFinish:(IMBURLDownloadOperation*)inOperation
 {
 	[self.objectsToLocalURLs setObject:[NSURL fileURLWithPath:inOperation.localPath] forKey:inOperation.delegateReference];
-	_objectCountLoaded++;
+	_objectCountLoaded++;	// for check on all promises
 	
-	if (_objectCountLoaded >= _objectCountTotal)
+	if ([inOperation bytesDone] > 0)	// Is this a real download?
+	{
+		_downloadFileLoaded++;
+		if (0 == _totalBytes)	// Possibly display per-file progress
+		{
+			double fraction = (double)_downloadFileLoaded / (double)_downloadFileTotal;
+			[self displayProgress:fraction];
+		}
+	}
+	
+	if (_objectCountLoaded >= _objectCountTotal)		// Totally done?
 	{
 		[self cleanupProgress];
 		
@@ -756,11 +768,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 
 		[self release];
-	}
-	else if (0 == _totalBytes)	// display per-file progress
-	{
-		double fraction = (double)_objectCountLoaded / (double)_objectCountTotal;
-		[self displayProgress:fraction];
 	}
 }
 
@@ -772,7 +779,8 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	[self.objectsToLocalURLs setObject:inOperation.error forKey:inOperation.delegateReference];
 	self.error = inOperation.error;
-	_objectCountLoaded++;
+	_objectCountLoaded++;	// for check on all promises
+	_downloadFileLoaded++;	// for checking on actual downloads
 
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
