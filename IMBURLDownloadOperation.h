@@ -95,6 +95,7 @@
 - (void) didReceiveData:(IMBURLDownloadOperation*)inOperation;
 - (void) didFinish:(IMBURLDownloadOperation*)inOperation;
 - (void) didReceiveError:(IMBURLDownloadOperation*)inOperation;
+- (void) didGetLength:(long long)inExpectedLength;
 
 @end
 

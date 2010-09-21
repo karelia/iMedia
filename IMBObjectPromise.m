@@ -436,7 +436,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		self.getSizeOperations = [NSMutableArray array];
 		self.downloadOperations = [NSMutableArray array];
 		_totalBytes = 0;
-		_currentBytes = 0;
 	}
 	
 	return self;
@@ -450,7 +449,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		self.getSizeOperations = [NSMutableArray array];
 		self.downloadOperations = [NSMutableArray array];
 		_totalBytes = 0;
-		_currentBytes = 0;
 	}
 	
 	return self;
@@ -543,12 +541,33 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 //----------------------------------------------------------------------------------------------------------------------
 
+- (void) startDownload;
+{
+	// Add the the total number of bytes to be downloaded...
+	_totalBytes = 0;
+	for (IMBURLGetSizeOperation* getSizeOp in self.getSizeOperations)
+	{
+		_totalBytes += getSizeOp.bytesTotal;
+	}
+	
+	// Start downloading once we have the size of each and every single file to be downloaded...
+	
+	for (IMBURLDownloadOperation* downloadOp in self.downloadOperations)
+	{
+		[[IMBOperationQueue sharedQueue] addOperation:downloadOp];
+	}
+	
+	// Switch progress from indeterminate to linear...
+	
+	[self displayProgress:0.0];
+}
+
 
 // Load all objects...
 
 - (void) loadObjects:(NSArray*)inObjects
 {	
-	BOOL needsDownloading = NO;		// set to YES when we found a URL to download, and we started the progress
+	int totalFiles = 0;	// We will be counting number of files below
 	
 	// Retain self until all download operations have finished. We are going to release self in the   
 	// didFinish: and didReceiveError: delegate messages...
@@ -588,10 +607,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				if ([[NSFileManager threadSafeManager] fileExistsAtPath:localPath]
 					&& 0 == (eventModifierFlags & NSAlternateKeyMask))
 				{
-					NSError *err = nil;
-					NSDictionary *fileAttributes = [[NSFileManager threadSafeManager] attributesOfItemAtPath:localPath error:&err];
-					getSizeOp.bytesTotal = [fileAttributes fileSize];		// This will prevent the HEAD request from being needed.
-
 					downloadOp.localPath = localPath;	// Indicate already-ready local path, meaning that no download needs to actually happen
 					[self didFinish:downloadOp];
 				}
@@ -601,7 +616,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				
 				else
 				{
-					needsDownloading = YES;
+					totalFiles++;
 					[self.getSizeOperations addObject:getSizeOp];
 					[self.downloadOperations addObject:downloadOp];
 				}
@@ -609,53 +624,40 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 		}
 	}
 
-	// TO DO: COME UP WITH A DIFFERENT PLAN WHEN THERE IS EXACTLY ONE FILE TO DOWNLOAD, AND WHEN THERE IS MORE THAN, SAY, 4 OR 5 (to count files, not bytes)
-
-	if (needsDownloading)
+	if (totalFiles > 0)
 	{
 		[self prepareProgress];
 		
-		NSInvocationOperation* startDownloadOp = [[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(startDownload:) object:nil] autorelease];
-
-		// Make the got-sizes operation dependent on all of the get-sizes operatons, and then make the download operations
-		// each dependent on got-sizes.
+		const int kNumberOfFilesToCountFilesInsteadOfBytes = 8;
 		
-		for (IMBURLGetSizeOperation* getSizeOp in self.getSizeOperations)
+		if (1 == totalFiles)	// 1 file: Don't do a GetSize operation, just start downloading; get size when response is there
 		{
-			[startDownloadOp addDependency:getSizeOp];	// startDownloadOp is dependent on each getSize
-			[[IMBOperationQueue sharedQueue] addOperation:getSizeOp];
+			[self.getSizeOperations removeAllObjects];
+			[self startDownload];
 		}
-		
-		[[IMBOperationQueue sharedQueue] addOperation:startDownloadOp];
-
-		// Start downloading once we have the size of each and every single file to be downloaded...
-		
-		for (IMBURLDownloadOperation* downloadOp in self.downloadOperations)
+		else if (totalFiles >= kNumberOfFilesToCountFilesInsteadOfBytes)	// Lots of files. Progress in FILES, not bytes
 		{
-			[downloadOp addDependency:startDownloadOp];	
-			[[IMBOperationQueue sharedQueue] addOperation:downloadOp];
+			[self.getSizeOperations removeAllObjects];
+			[self startDownload];
+		}
+		else	// A few files. We pre-count bytes, then download with progress showing # bytes downloaded
+		{
+			NSInvocationOperation* startDownloadOp = [[[NSInvocationOperation alloc] initWithTarget:self selector:@selector(startDownload) object:nil] autorelease];
+			
+			// Make the got-sizes operation dependent on all of the get-sizes operatons, and then make the download operations
+			// each dependent on got-sizes.
+			
+			for (IMBURLGetSizeOperation* getSizeOp in self.getSizeOperations)
+			{
+				[startDownloadOp addDependency:getSizeOp];	// startDownloadOp is dependent on each getSize
+				[[IMBOperationQueue sharedQueue] addOperation:getSizeOp];
+			}
+			
+			[[IMBOperationQueue sharedQueue] addOperation:startDownloadOp];
 		}
 	}
 }
 
-
-- (void) startDownload:(id)unused
-{
-//	NSLog(@"%s",__FUNCTION__);
-
-	// Add the the total number of bytes to be downloaded...
-	
-	_totalBytes = 0;
-
-	for (IMBURLGetSizeOperation* getSizeOp in self.getSizeOperations)
-	{
-		_totalBytes += getSizeOp.bytesTotal;
-	}
-	
-	// Switch progress from indeterminate to linear...
-	
-	[self displayProgress:0.0];
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -708,20 +710,31 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 //----------------------------------------------------------------------------------------------------------------------
 
+- (void) didGetLength:(long long)inExpectedLength;
+{
+	if (0 == _totalBytes && 1 == _objectCountTotal)	// If we didn't have a length before, set the expected length and start the progress
+	{
+		_totalBytes = inExpectedLength;
+		[self displayProgress:0.0];
+	}
+}
 
 // We received some data, so display the current progress...
 
 - (void) didReceiveData:(IMBURLDownloadOperation*)inOperation
 {
-	_currentBytes = 0;
-
-	for (IMBURLDownloadOperation* op in self.downloadOperations)
+	if (_totalBytes > 0)
 	{
-		_currentBytes += [op bytesDone];
+		// Get currrent count of bytes
+		long long currentBytes = 0;
+		for (IMBURLDownloadOperation* op in self.downloadOperations)
+		{
+			currentBytes += [op bytesDone];
+		}
+		
+		double fraction = (double)currentBytes / (double)_totalBytes;
+		[self displayProgress:fraction];
 	}
-	
-	double fraction = (double)_currentBytes / (double)_totalBytes;
-	[self displayProgress:fraction];
 }
 
 
@@ -735,7 +748,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
-//		NSLog(@"%s",__FUNCTION__);
 		[self cleanupProgress];
 		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
@@ -744,7 +756,12 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 
 		[self release];
-	}	  
+	}
+	else if (0 == _totalBytes)	// display per-file progress
+	{
+		double fraction = (double)_objectCountLoaded / (double)_objectCountTotal;
+		[self displayProgress:fraction];
+	}
 }
 
 
@@ -759,7 +776,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
-//		NSLog(@"%s",__FUNCTION__);
 		[self cleanupProgress];
 		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
@@ -769,11 +785,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 			
 		[self release];
 	}	  
-}
-
-- (void) didGetBytesTotal:(long long)inBytesTotal;
-{
-	_totalBytes += inBytesTotal;
 }
 
 @end

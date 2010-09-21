@@ -200,6 +200,11 @@
 
 // The file was created (possibly with a modified filename (to make it unique). Store the filename...
 
+- (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)inResponse
+{
+	[_delegate didGetLength:[inResponse expectedContentLength]];
+}
+
 - (void) download:(NSURLDownload*)inDownload didCreateDestination:(NSString*)inPath
 {
 //	NSLog(@"%s inPath=%@",__FUNCTION__,inPath);
