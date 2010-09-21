@@ -316,7 +316,6 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 - (IBAction) cancel:(id)inSender
 {
-	NSLog(@"%s",__FUNCTION__);
 	_wasCanceled = YES;
 }
 

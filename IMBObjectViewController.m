@@ -151,7 +151,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) _reloadListView;
 - (void) _reloadComboView;
 
-- (void) _downloadSelectedObjectsToDestination:(NSURL*)inDestination;
+- (void) _downloadDraggedObjectsToDestination:(NSURL*)inDestination;
 - (NSArray*) _namesOfPromisedFiles;
 
 @end
@@ -183,6 +183,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 @synthesize clickedObjectIndex = _clickedObjectIndex;
 @synthesize clickedObject = _clickedObject;
+@synthesize draggedIndexes = _draggedIndexes;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -339,6 +340,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBRelease(_progressWindowController);
 	IMBRelease(_dropDestinationURL);
 	IMBRelease(_clickedObject);
+	IMBRelease(_draggedIndexes);
 
 	for (IMBObject* object in _observedVisibleItems)
 	{
@@ -1108,14 +1110,14 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	return YES;
 }
 
-// Finish promise
+// Finish promise, from "dumb" applications that handle NSFilesPromisePboardType
+
 - (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
 {
-	//NSLog(@"%s",__FUNCTION__);
 	if (self.dropDestinationURL)		// is this finishing a promise drag?  This is when we want to load it.
 	{
 		// Resolve any promise
-		[self _downloadSelectedObjectsToDestination:self.dropDestinationURL];
+		[self _downloadDraggedObjectsToDestination:self.dropDestinationURL];
 		self.dropDestinationURL = nil;
 	}
 
@@ -1246,14 +1248,15 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
-- (void) _downloadSelectedObjectsToDestination:(NSURL*)inDestination
+- (void) _downloadDraggedObjectsToDestination:(NSURL*)inDestination
 {
 	IMBNode* node = self.currentNode;
 	
 	if (node)
 	{
 		IMBParser* parser = node.parser;
-		NSArray* objects = [ibObjectArrayController selectedObjects];
+		NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
+		NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];
 		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
 		promise.downloadFolderPath = [inDestination path];
 		
@@ -1264,7 +1267,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (NSArray*) _namesOfPromisedFiles
 {
-	NSArray* objects = [ibObjectArrayController selectedObjects];
+	NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
+	NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];
 	NSMutableArray* names = [NSMutableArray array];
 	
 	for (IMBObject* object in objects)
@@ -1645,9 +1649,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
 {
+	self.draggedIndexes = [ibObjectArrayController selectionIndexes];
 	self.dropDestinationURL = inDropDestination;		// remember so that when drag is finished
 	NSArray *result = [self _namesOfPromisedFiles];
-	NSLog(@"namesOfPromisedFilesDroppedAtDestination = %@", result);
 	return result;
 }
 // The drag will finish at draggedImage:endedAt:operation:
@@ -1742,6 +1746,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (NSArray*) tableView:(NSTableView*)inTableView namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination forDraggedRowsWithIndexes:(NSIndexSet*)inIndexes
 {
+	self.draggedIndexes = inIndexes;
 	self.dropDestinationURL = inDropDestination;
 	return [self _namesOfPromisedFiles];
 }
@@ -1757,8 +1762,6 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows
 {
-	// NSLog(@"%s",__FUNCTION__);
-	
 	NSArray *newVisibleItems = [[ibObjectArrayController arrangedObjects] subarrayWithRange:newVisibleRows];
 	NSMutableSet *newVisibleItemsSetRetained = [[NSMutableSet alloc] initWithArray:newVisibleItems];
 	

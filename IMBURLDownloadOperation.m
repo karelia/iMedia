@@ -116,30 +116,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Get the size (in bytes) of a remote file on the internet. This method is synchronous. This may be a problem
-// if we are downloading a lot of files at once. TODO: investigate how we can make this asynchronous, without
-// changing the user experience of the progress bar...
-
-- (long long) getSize
-{
-	NSLog(@"%s WARNING: This method is deprecated. Do not call it anymore!",__FUNCTION__);
-	
-	NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:self.remoteURL];
-	[request setHTTPMethod:@"HEAD"];
-	
-	NSError* error = nil;
-	NSURLResponse* response = nil;
-	[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-	
-	_bytesTotal = 0;
-	if (response != nil && error == nil) _bytesTotal = [response expectedContentLength];
-	return _bytesTotal;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Create a NSURLDownload, start it and spin the runloop until we are done. Since we are in a background thread
 // we can block without problems...
 

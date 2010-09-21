@@ -82,7 +82,6 @@
 @property (assign,getter=isFinished) BOOL finished;
 		
 - (id) initWithURL:(NSURL*)inURL delegate:(id)inDelegate;
-- (long long) getSize;
 
 @end
 
