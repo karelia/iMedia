@@ -61,10 +61,6 @@
 	{
 		NSLog(@"Whoops, we're on main thread. %@", [[NSThread currentThread] name]);
 	}
-	else
-	{
-		NSLog(@"Good, NOT on main thread. %@", [[NSThread currentThread] name]);
-	}
 	CGSize size = CGSizeMake(256.0,256.0);
 	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)self,size,NULL);
 	return (CGImageRef) [NSMakeCollectable(image) autorelease];
