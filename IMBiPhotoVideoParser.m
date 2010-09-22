@@ -56,6 +56,7 @@
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBMovieObject.h"
 //#import "IMBIconCache.h"
 //#import "NSWorkspace+iMedia.h"
 //#import "NSFileManager+iMedia.h"
@@ -91,6 +92,14 @@
 - (NSString*) iPhotoMediaType
 {
 	return @"Movie";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (Class) objectClass
+{
+	return [IMBMovieObject class];
 }
 
 
