@@ -44,6 +44,8 @@
 		CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE09F304124823020094EC48 /* IMBURLGetSizeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */; };
 		CE28E51C124192A800B00F3D /* IMBDisableTitleToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */; };
+		CE3EC9A2124AAC0700D8435B /* NSURL+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE3EC9A3124AAC0700D8435B /* NSURL+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */; };
 		CE69CDC41149D0B50016E5E0 /* IMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */; };
 		CE69E9DD114B05EA0016E5E0 /* firefox_allBookmarks.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */; };
 		CE69E9DE114B05EA0016E5E0 /* firefox_bookmarksMenu.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */; };
@@ -415,6 +417,8 @@
 		CE0E0C80104C72A200EE6B09 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBDisableTitleToColorTransformer.h; sourceTree = "<group>"; };
 		CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBDisableTitleToColorTransformer.m; sourceTree = "<group>"; };
+		CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+iMedia.h"; sourceTree = "<group>"; };
+		CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+iMedia.m"; sourceTree = "<group>"; };
 		CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_allBookmarks.png; sourceTree = "<group>"; };
 		CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_bookmarksMenu.png; sourceTree = "<group>"; };
 		CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_bookmarksToolbar.png; sourceTree = "<group>"; };
@@ -1195,6 +1199,8 @@
 				D049F0091034993E003CC49C /* NSImage+iMedia.m */,
 				D0363E7A11D3787800E0579F /* NSView+iMedia.h */,
 				D0363E7B11D3787800E0579F /* NSView+iMedia.m */,
+				CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */,
+				CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -1386,6 +1392,7 @@
 				D04083C81235490F005375FC /* IMBFlickrObject.h in Headers */,
 				8FCA064212368388009072AE /* IMBApertureHeaderViewController.h in Headers */,
 				CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */,
+				CE3EC9A2124AAC0700D8435B /* NSURL+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1714,6 +1721,7 @@
 				D04083C91235490F005375FC /* IMBFlickrObject.m in Sources */,
 				8FCA064312368388009072AE /* IMBApertureHeaderViewController.m in Sources */,
 				CE09F304124823020094EC48 /* IMBURLGetSizeOperation.m in Sources */,
+				CE3EC9A3124AAC0700D8435B /* NSURL+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

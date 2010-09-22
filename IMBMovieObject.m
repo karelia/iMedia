@@ -53,8 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBMovieObject.h"
-#import <QTKit/QTKit.h>
-#import <QuickLook/QuickLook.h>
+#import "NSURL+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,19 +63,6 @@
 
 @implementation IMBMovieObject
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Helper method to extract thumbnail frame from a movie...
-
-- (CGImageRef) _posterFrameAtURL:(NSURL *)inMovieURL;
-{
-
-
-
-
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,12 +92,12 @@
 				 [_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
 		{
 			NSString* path = (NSString*)_imageRepresentation;
-			self.posterFrame = (CGImageRef) [self _posterFrameAtURL:[NSURL fileURLWithPath:path]];
+			self.posterFrame = [[NSURL fileURLWithPath:path] quicklookCGImage];
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
 		{
 			NSURL* url = (NSURL*)_imageRepresentation;
-			self.posterFrame = (CGImageRef) [self _posterFrameAtURL:url];
+			self.posterFrame = [url quicklookCGImage];
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
 		{

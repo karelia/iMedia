@@ -62,8 +62,7 @@
 #import "NSData+SKExtensions.h"
 #import <Quartz/Quartz.h>
 #import <QTKit/QTKit.h>
-#import <QuickLook/QuickLook.h>
-
+#import "NSURL+iMedia.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +73,6 @@
 
 - (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL;
 - (CGImageRef) _imageForURL:(NSURL*)inURL;
-- (CGImageRef) _quicklookCGImageForURL:(NSURL*)inURL;
-- (NSImage*) _quicklookNSImageForURL:(NSURL*)inURL;
 
 @end
 
@@ -264,7 +261,7 @@
 		}
 		else
 		{
-			imageRepresentation = [self _quicklookNSImageForURL:url];
+			imageRepresentation = [url quicklookNSImage];
 		}	
 	}
 	
@@ -278,7 +275,7 @@
 		}
 		else
 		{
-			imageRepresentation = (id)[self _quicklookCGImageForURL:url];
+			imageRepresentation = (id)[url quicklookCGImage];
 		}
 	}
 	
@@ -309,15 +306,14 @@
 		}
 		else
 		{
-			CGImageRef image = [self _quicklookCGImageForURL:url];
+			CGImageRef image = [url quicklookCGImage];
 			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
 		}
 	}
 		
 	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		// Should make use of URL and get quicklook ...we have url and inObject
-		NSLog(@"IKImageBrowserQTMovieRepresentationType");
+		imageRepresentation = (id)[url quicklookCGImage];
 	}
 
 	// Return the result to the main thread...
@@ -428,45 +424,6 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// Quicklook methods to create images from non-image files...
-
-- (CGImageRef) _quicklookCGImageForURL:(NSURL*)inURL
-{
-	if ([NSThread isMainThread])
-	{
-		NSLog(@"Whoops, we're on main thread. %@", [NSThread description]);
-	}
-	else
-	{
-		NSLog(@"Good, NOT on main thread. %@", [NSThread description]);
-	}
-	CGSize size = CGSizeMake(256.0,256.0);
-	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)inURL,size,NULL);
-	return (CGImageRef) [NSMakeCollectable(image) autorelease];
-}
-
-
-- (NSImage*) _quicklookNSImageForURL:(NSURL*)inURL
-{
-	NSImage* nsimage = nil;
-	CGImageRef cgimage = [self _quicklookCGImageForURL:inURL];
-
-	if (cgimage)
-	{
-		NSSize size = NSZeroSize;
-		size.width = CGImageGetWidth(cgimage);
-		size.height = CGImageGetWidth(cgimage);
-
-		nsimage = [[[NSImage alloc] initWithSize:size] autorelease];
-
-		NSBitmapImageRep* rep = [[NSBitmapImageRep alloc] initWithCGImage:cgimage];
-		[nsimage addRepresentation:rep];		
-		[rep release];
-	}
-	
-	return nsimage;
-}
 
 
 
