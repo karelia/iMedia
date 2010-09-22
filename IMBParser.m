@@ -313,7 +313,7 @@
 		
 	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		imageRepresentation = (id)[url quicklookCGImage];
+		imageRepresentation = url; // (id)[url quicklookCGImage];
 	}
 
 	// Return the result to the main thread...

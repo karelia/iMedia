@@ -333,12 +333,16 @@
         
         // Draw the thumbnail image (CGImage)...
         
-        else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType]
-				 || [_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])	// QTMovie, we got quicklook...
+        else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
         {
 			CGImageRef image = (CGImageRef) _imageRepresentation;
             [self _drawImage:image withFrame:imageRect];
-         }
+        }
+		else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])	// QTMovie, we got quicklook...
+        {
+			CGImageRef image = (CGImageRef) _imageRepresentation;
+            [self _drawImage:image withFrame:imageRect];
+		}
 		
         // Draw the thumbnail image (other representations)...
         

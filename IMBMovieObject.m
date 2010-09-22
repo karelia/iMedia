@@ -85,8 +85,8 @@
 	{
 		if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
 		{
-			// I have forced this to be CGImageRef ... ?
-			self.posterFrame = (CGImageRef) _imageRepresentation;
+			NSURL* url = (NSURL*)_imageRepresentation;
+			self.posterFrame = [url quicklookCGImage];
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType])
 		{
