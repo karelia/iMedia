@@ -96,9 +96,6 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// This parser wants QTMovie thumbnails...
-
 - (NSString*) requestedImageRepresentationType
 {
 	return IKImageBrowserQTMovieRepresentationType;

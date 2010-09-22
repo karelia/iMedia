@@ -54,6 +54,7 @@
 
 #import "IMBMovieObject.h"
 #import <QTKit/QTKit.h>
+#import <QuickLook/QuickLook.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,21 +70,12 @@
 
 // Helper method to extract thumbnail frame from a movie...
 
-- (CGImageRef) _posterFrameWithMovie:(QTMovie*)inMovie
+- (CGImageRef) _posterFrameAtURL:(NSURL *)inMovieURL;
 {
-	NSError* error = nil;
-	QTTime duration = inMovie.duration;
-	double tv = duration.timeValue;
-	double ts = duration.timeScale;
-	QTTime time = QTMakeTimeWithTimeInterval(0.5 * tv/ts);
-	NSSize size = NSMakeSize(256.0,256.0);
-	
-	NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-		QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,
-		[NSValue valueWithSize:size],QTMovieFrameImageSize,
-		nil];
-	
-	return (CGImageRef) [inMovie frameImageAtTime:time withAttributes:attributes error:&error];
+
+
+
+
 }
 
 
@@ -102,29 +94,24 @@
 // again as the IMBObjectFifoCache clears out the oldest items...
 
 - (CGImageRef) posterFrame
-{
-	NSError* error = nil;
-	QTMovie* movie = nil;
-	
+{	
 	if (_posterFrame == NULL && _imageRepresentation != nil)
 	{
 		if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
 		{
-			movie = (QTMovie*)_imageRepresentation;
-			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
+			// A URL or path
+			NSLog(@"Really don't want to try to make a poster frame from a QTMovie since that may take a while.");
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType] ||
 				 [_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
 		{
 			NSString* path = (NSString*)_imageRepresentation;
-			movie = [QTMovie movieWithFile:path error:&error];
-			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
+			self.posterFrame = (CGImageRef) [self _posterFrameAtURL:[NSURL fileURLWithPath:path]];
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
 		{
 			NSURL* url = (NSURL*)_imageRepresentation;
-			movie = [QTMovie movieWithURL:url error:&error];
-			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
+			self.posterFrame = (CGImageRef) [self _posterFrameAtURL:url];
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
 		{

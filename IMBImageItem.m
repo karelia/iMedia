@@ -132,57 +132,6 @@
 #pragma mark -
 
 
-@implementation QTMovie (IMBImageItem)
-
-+ (QTMovie *)movieWithIMBImageItem:(id <IMBImageItem>)item;
-{
-    QTMovie *result = nil;
-	NSError *error = nil;	// not really going to be using loading error; e.g. unloadable but valid FLV
-    
-    NSString *type = [item imageRepresentationType];
-    
-    // Already in the right format (QTMovie)
-	if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
-    {
-        result = [item imageRepresentation];
-    }
-	else if ([type isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
-    {
-        id urlString = [item imageRepresentation];
-		if ([urlString isKindOfClass:[NSString class]])
-		{
-			urlString = [NSURL fileURLWithPath:urlString];
-		}
-		result = [[[QTMovie alloc] initWithURL:urlString error:&error] autorelease]; 
-    }
-	
-    
-    // From URL, path or data
-	
-	else if ([type isEqualToString:IKImageBrowserNSURLRepresentationType])
-    {
-        NSURL *url = [item imageRepresentation];
-        result = [[[QTMovie alloc] initWithURL:url error:&error] autorelease];
-    }
-    else if ([type isEqualToString:IKImageBrowserPathRepresentationType])
-    {
-        NSString *path = [item imageRepresentation];
-        result = [QTMovie movieWithFile:path error:&error];
-    }
-    else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
-    {
-        NSData *data = [item imageRepresentation];
-        result = [QTMovie movieWithData:data error:&error];
-    }
-    return result;
-}
-
-@end
-
-
-#pragma mark -
-
-
 CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
 {
     CGImageRef result = NULL;
@@ -196,22 +145,12 @@ CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
         result = (CGImageRef)[item imageRepresentation];
         CGImageRetain(result);
     }
-    
-    // Grab from movie (QTMovie)
-    
+        
     else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		QTMovie* movie = [item imageRepresentation];
-		
-		NSError* error = nil;
-		QTTime duration = movie.duration;
-		double tv = duration.timeValue;
-		double ts = duration.timeScale;
-		QTTime time = QTMakeTimeWithTimeInterval(0.5 * tv/ts);
-		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,nil];
-        
-		result = (CGImageRef) [movie frameImageAtTime:time withAttributes:attributes error:&error];
-		CGImageRetain(result);
+		// A URL or path
+
+		NSLog(@"Really don't want to try to make a thumbnail from a QTMovie since that may take a while.");
 	}
 	
     // Draw the thumbnail image (CGImageSource-compatible)...
