@@ -85,11 +85,10 @@
 	{
 		if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
 		{
-			// A URL or path
-			NSLog(@"Really don't want to try to make a poster frame from a QTMovie since that may take a while.");
+			// I have forced this to be CGImageRef ... ?
+			self.posterFrame = (CGImageRef) _imageRepresentation;
 		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType] ||
-				 [_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+		else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType])
 		{
 			NSString* path = (NSString*)_imageRepresentation;
 			self.posterFrame = [[NSURL fileURLWithPath:path] quicklookCGImage];

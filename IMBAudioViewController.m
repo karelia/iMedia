@@ -183,6 +183,11 @@
 	self.playingAudio = nil;
 }
 
+- (IBAction) quicklook:(id)inSender
+{
+	[self setIsPlaying:NO];
+	[super quicklook:inSender];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
