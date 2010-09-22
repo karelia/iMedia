@@ -161,6 +161,10 @@
 	return parserInstances;
 }
 
+- (Class) objectClass
+{
+	return [IMBEnhancedObject class];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -727,6 +731,7 @@
 	// for each image in this album...
 	
 	NSUInteger index = 0;
+	Class objectClass = [self objectClass];
 	
 	for (NSDictionary* albumDict in inAlbums)
 	{
@@ -747,8 +752,12 @@
 				{
 					NSString* path = [imageDict objectForKey:@"ImagePath"];
 					NSString* name = [imageDict objectForKey:@"Caption"];
+					if ([name isEqualToString:@""])
+					{
+						name = [[path lastPathComponent] stringByDeletingPathExtension];	// fallback to filename
+					}
 					
-					IMBEnhancedObject* object = [[IMBEnhancedObject alloc] init];
+					IMBEnhancedObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 
