@@ -76,8 +76,6 @@
 - (CGImageRef) _imageForURL:(NSURL*)inURL;
 - (CGImageRef) _quicklookCGImageForURL:(NSURL*)inURL;
 - (NSImage*) _quicklookNSImageForURL:(NSURL*)inURL;
-- (void) _loadMovieRepresentation:(NSDictionary*)inInfo;
-- (QTMovie*) _movieForURL:(NSURL*)inURL;
 
 @end
 
@@ -315,17 +313,11 @@
 			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
 		}
 	}
-	
-	// QTMovie...
-	
+		
 	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:url,@"url",inObject,@"object",nil];
-
-		[self	performSelectorOnMainThread:@selector(_loadMovieRepresentation:) 
-				withObject:info 
-				waitUntilDone:NO 
-				modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		// Should make use of URL and get quicklook ...we have url and inObject
+		NSLog(@"IKImageBrowserQTMovieRepresentationType");
 	}
 
 	// Return the result to the main thread...
@@ -441,6 +433,14 @@
 
 - (CGImageRef) _quicklookCGImageForURL:(NSURL*)inURL
 {
+	if ([NSThread isMainThread])
+	{
+		NSLog(@"Whoops, we're on main thread. %@", [NSThread description]);
+	}
+	else
+	{
+		NSLog(@"Good, NOT on main thread. %@", [NSThread description]);
+	}
 	CGSize size = CGSizeMake(256.0,256.0);
 	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)inURL,size,NULL);
 	return (CGImageRef) [NSMakeCollectable(image) autorelease];
@@ -468,71 +468,6 @@
 	return nsimage;
 }
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Loading movies must be done on the main thread (as many components are not threadsafe). Alas, this blocks 
-// the main runloop, but what are we to do...
-
-- (void) _loadMovieRepresentation:(NSDictionary*)inInfo
-{
-	// Load the QTMovie object...
-	
-	NSURL* url = (NSURL*)[inInfo objectForKey:@"url"];
-	IMBObject* object = (IMBObject*)[inInfo objectForKey:@"object"];
-
-	QTMovie* movie = [self _movieForURL:url];
-	[object setImageRepresentation:movie];
-	
-	// Set a better poster time...
-	
-	QTTime d = movie.duration;
-	double duration = (double)d.timeValue / (double)d.timeScale;
-	double posterTime = 0.5 * duration;
-	[movie setAttribute:[NSNumber numberWithDouble:posterTime] forKey:QTMoviePosterTimeAttribute];
-	
-	// Load and cache the poster frame...
-	
-	if ([object isKindOfClass:[IMBMovieObject class]])
-	{
-		CGImageRef image = [self _quicklookCGImageForURL:url];
-		[(IMBMovieObject*)object setPosterFrame:image];
-
-//		QTTime t = QTMakeTimeWithTimeInterval(posterTime);
-//		NSSize size = NSMakeSize(256.0,256.0);
-//		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-//			QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,
-//			[NSValue valueWithSize:size],QTMovieFrameImageSize,
-//			nil];
-//			
-//		NSError* error = nil;
-//		CGImageRef image = (CGImageRef) [movie frameImageAtTime:t withAttributes:attributes error:&error];
-//		[(IMBMovieObject*)object setPosterFrame:image];
-	}
-}
-
-
-// Returns an autoreleased movie for the given url...
-
-- (QTMovie*) _movieForURL:(NSURL*)inURL
-{
-	QTMovie* movie = NULL;
-	
-	if (inURL)
-	{
-		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-		   inURL,QTMovieURLAttribute,
-		   [NSNumber numberWithBool:YES],QTMovieOpenAsyncOKAttribute,
-//		   [NSNumber numberWithBool:YES],@"QTMovieOpenForPlaybackAttribute", // constant is not available with 10.5.sdk!
-		   nil];
-
-		NSError* error = nil;   
-		movie = [QTMovie movieWithAttributes:attributes error:&error];
-	}
-
-	return movie;
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------
