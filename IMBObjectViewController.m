@@ -1414,6 +1414,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[NSMenu popUpContextMenu:menu withEvent:inEvent forView:inView];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -1421,9 +1422,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 // implement the protocol, since we use bindings.  But this is for the benefit of
 // -[IMBImageBrowserView mouseDragged:] ... I hope it's OK that we are ignoring the aBrowser parameter.
 
-- (id /*IKImageBrowserItem*/) imageBrowser:(IKImageBrowserView *) aBrowser itemAtIndex:(NSUInteger)index;
+- (id /*IKImageBrowserItem*/) imageBrowser:(IKImageBrowserView*)inView itemAtIndex:(NSUInteger)inIndex
 {
-	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:index];
+	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
 	return object;
 }
 
