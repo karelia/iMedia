@@ -57,10 +57,12 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBMovieObject.h"
+#import "NSString+iMedia.h"
 //#import "IMBIconCache.h"
 //#import "NSWorkspace+iMedia.h"
 //#import "NSFileManager+iMedia.h"
 #import <Quartz/Quartz.h>
+#import "IMBTimecodeTransformer.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,6 +72,7 @@
 
 @implementation IMBiPhotoVideoParser
 
+@synthesize timecodeTransformer = _timecodeTransformer;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -83,6 +86,21 @@
 	[pool release];
 }
 
+- (void)dealloc
+{
+	IMBRelease(_timecodeTransformer);
+	[super dealloc];
+}
+
+- (id) initWithMediaType:(NSString*)inMediaType
+{
+	if (self = [super initWithMediaType:inMediaType])
+	{
+		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
+	}
+	
+	return self;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -117,6 +135,118 @@
 {
 	return [inObjectDict objectForKey:@"ImagePath"];
 }
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString *comments = [inMetadata objectForKey:@"Comment"];
+	NSString *type = [inMetadata objectForKey:@"ImageType"];		// like MooV
+	NSString *UTI = [NSString UTIForFileType:type];
+	NSString *kind = [NSString descriptionForUTI:UTI];
+	// NSString *dateTimeInterval = [inMetadata objectForKey:@"DateAsTimerInterval"];
+		
+	NSString *thumbPath  = [inMetadata objectForKey:@"ThumbPath"];		// can use this instead of quicklook
+	
+	NSString *description = @"";
+	NSString* typeLabel = NSLocalizedStringWithDefaultValue(
+															@"Type",
+															nil,IMBBundle(),
+															@"Type",
+															@"Type label in metadataDescription");
+	
+	description = [description stringByAppendingFormat:@"%@: %@\n",typeLabel,kind];
+	
+	NSString *width = [inMetadata objectForKey:@"width"];
+	NSString *height = [inMetadata objectForKey:@"height"];
+	NSString *duration = [inMetadata objectForKey:@"duration"];
+
+	if (width != nil && height != nil)
+	{
+		NSString* size = NSLocalizedStringWithDefaultValue(
+														   @"Size",
+														   nil,IMBBundle(),
+														   @"Size",
+														   @"Size label in metadataDescription");
+		
+		description = [description stringByAppendingFormat:@"%@: %@×%@\n",size,width,height];
+	}
+	
+	if (duration)
+	{
+		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
+																	@"Time",
+																	nil,IMBBundle(),
+																	@"Time",
+																	@"Time label in metadataDescription");
+		
+		NSString* durationString = [_timecodeTransformer transformedValue:duration];
+		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+	}
+	
+	if (comments && ![comments isEqualToString:@""])
+	{
+		NSString* commentsLabel = NSLocalizedStringWithDefaultValue(
+																	@"Comments",
+																	nil,IMBBundle(),
+																	@"Comments",
+																	@"Comments label in metadataDescription");
+		
+		description = [description stringByAppendingFormat:@"%@: %@\n",commentsLabel,comments];
+	}
+	
+	return description;
+}
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
+	[metadata setObject:inObject.location forKey:@"path"];
+
+	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inObject.location);
+	
+	if (item)
+	{
+		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
+		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
+		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
+		
+		if (seconds)
+		{
+			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
+			CFRelease(seconds);
+		}
+		
+		if (width)
+		{
+			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
+			CFRelease(width);
+		}
+		
+		if (height)
+		{
+			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
+			CFRelease(height);
+		}
+		
+		CFRelease(item);
+	}
+	
+	
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+	
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
+}
+
 
 
 //----------------------------------------------------------------------------------------------------------------------

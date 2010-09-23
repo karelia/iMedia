@@ -60,7 +60,14 @@
 
 #pragma mark 
 
+@class IMBTimecodeTransformer;
+
 @interface IMBiPhotoVideoParser: IMBiPhotoParser
+{
+	IMBTimecodeTransformer* _timecodeTransformer;
+}
+
+@property (retain) IMBTimecodeTransformer* timecodeTransformer;
 
 @end
 

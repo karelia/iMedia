@@ -52,6 +52,7 @@
 @interface NSObject ( NSString_UTI )
 
 + (NSString *)UTIForFileType:(NSString *)aFileType;
++ (NSString *)descriptionForUTI:(NSString *)aUTI;
 + (NSString *)UTIForFilenameExtension:(NSString *)anExtension;
 + (NSString *)UTIForFileAtPath:(NSString *)anAbsolutePath;
 + (BOOL) UTI:(NSString *)aUTI conformsToUTI:(NSString *)aConformsToUTI;

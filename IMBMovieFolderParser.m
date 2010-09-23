@@ -58,6 +58,7 @@
 #import "IMBMovieObject.h"
 #import "IMBCommon.h"
 #import <Quartz/Quartz.h>
+#import "NSString+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -126,10 +127,14 @@
 	
 	if (item)
 	{
+		[metadata setObject:inPath forKey:@"path"];
 		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
 		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
 		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
+		CFStringRef comments = MDItemCopyAttribute(item,kMDItemFinderComment);
 
+		
+		
 		if (seconds)
 		{
 			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
@@ -146,6 +151,12 @@
 		{
 			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
 			CFRelease(height);
+		}
+	
+		if (comments)
+		{
+			[metadata setObject:(NSString*)comments forKey:@"comments"]; 
+			CFRelease(comments);
 		}
 		
 		CFRelease(item);
@@ -167,6 +178,19 @@
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSNumber* width = [inMetadata objectForKey:@"width"];
 	NSNumber* height = [inMetadata objectForKey:@"height"];
+	NSString *path = [inMetadata objectForKey:@"path"];
+	NSString *comments = [inMetadata objectForKey:@"comments"];
+
+	NSString *UTI = [NSString UTIForFileAtPath:path];
+	NSString *kind = [NSString descriptionForUTI:UTI];
+
+	NSString* typeLabel = NSLocalizedStringWithDefaultValue(
+															@"Type",
+															nil,IMBBundle(),
+															@"Type",
+															@"Type label in metadataDescription");
+	
+	description = [description stringByAppendingFormat:@"%@: %@\n",typeLabel,kind];
 	
 	if (width != nil && height != nil)
 	{
@@ -176,7 +200,7 @@
 				@"Size",
 				@"Size label in metadataDescription");
 		
-		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
+		description = [description stringByAppendingFormat:@"%@: %@×%@\n",size,width,height];
 	}
 	
 	if (duration)
@@ -189,6 +213,17 @@
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
 		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+	}
+
+	if (comments && ![comments isEqualToString:@""])
+	{
+		NSString* commentsLabel = NSLocalizedStringWithDefaultValue(
+																	@"Comments",
+																	nil,IMBBundle(),
+																	@"Comments",
+																	@"Comments label in metadataDescription");
+		
+		description = [description stringByAppendingFormat:@"%@: %@\n",commentsLabel,comments];
 	}
 	
 	return description;
