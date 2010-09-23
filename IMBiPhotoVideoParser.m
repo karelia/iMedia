@@ -146,15 +146,15 @@
 		
 	NSString *thumbPath  = [inMetadata objectForKey:@"ThumbPath"];		// can use this instead of quicklook
 	
-	NSString *description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSString* typeLabel = NSLocalizedStringWithDefaultValue(
 															@"Type",
 															nil,IMBBundle(),
 															@"Type",
 															@"Type label in metadataDescription");
 	
-	if (description.length > 0) description = [description stringByAppendingFormat:@"\n"];
-	description = [description stringByAppendingFormat:@"%@: %@",typeLabel,kind];
+	if (description.length > 0) [description appendNewline];
+	[description appendFormat:@"%@: %@",typeLabel,kind];
 	
 	NSString *width = [inMetadata objectForKey:@"width"];
 	NSString *height = [inMetadata objectForKey:@"height"];
@@ -168,8 +168,8 @@
 														   @"Size",
 														   @"Size label in metadataDescription");
 		
-		if (description.length > 0) description = [description stringByAppendingFormat:@"\n"];
-		description = [description stringByAppendingFormat:@"%@: %@×%@",size,width,height];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@×%@",size,width,height];
 	}
 	
 	if (duration)
@@ -181,8 +181,8 @@
 																	@"Time label in metadataDescription");
 		
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) description = [description stringByAppendingFormat:@"\n"];
-		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 	
 	if (comment && ![comment isEqualToString:@""])
@@ -193,8 +193,8 @@
 																	@"Comment",
 																	@"Comment label in metadataDescription");
 		
-		if (description.length > 0) description = [description stringByAppendingFormat:@"\n"];
-		description = [description stringByAppendingFormat:@"%@: %@",commentLabel,comment];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;

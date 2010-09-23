@@ -361,18 +361,6 @@
 	return path;	
 }
 
-
-- (NSString*) stringByAppendingNewline
-{
-	if (self.length > 0) 
-	{
-		return [self stringByAppendingString:@"\n"];
-	}
-	
-	return self;
-}
-
-
 @end
 
 @implementation NSMutableString (iMedia)

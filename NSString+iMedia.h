@@ -77,8 +77,6 @@
 
 - (NSString *)resolvedPath;
 
-- (NSString*) stringByAppendingNewline;
-
 @end
 
 @interface NSMutableString (iMedia)

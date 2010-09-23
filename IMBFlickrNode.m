@@ -714,7 +714,7 @@ typedef enum {
 	} else if (method == IMBFlickrNodeMethod_Recent) {
 		flickrMethod = [flickrMethod stringByAppendingString:@"/recent"];
 	} else if (method == IMBFlickrNodeMethod_MostInteresting) {
-		flickrMethod = [flickrMethod stringByAppendingString:@"/intersting"];		// Should this be interesting?
+		flickrMethod = [flickrMethod stringByAppendingString:@"/interesting"];
 	}
 	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", flickrMethod, query];
 	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);

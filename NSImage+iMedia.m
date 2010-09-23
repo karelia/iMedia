@@ -141,7 +141,7 @@
 
 + (NSString*) imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSNumber* width = [inMetadata objectForKey:@"width"];
 	NSNumber* height = [inMetadata objectForKey:@"height"];
 	NSNumber* depth = [inMetadata objectForKey:@"depth"];
@@ -149,7 +149,8 @@
 	NSString* type = [inMetadata objectForKey:@"ImageType"];
 	NSString* filetype = [inMetadata objectForKey:@"filetype"];
 	NSString* dateTime = [inMetadata objectForKey:@"dateTime"];
-	
+	NSString* path = [inMetadata objectForKey:@"path"];
+
 	if (width != nil && height != nil)
 	{
 		NSString* size = NSLocalizedStringWithDefaultValue(
@@ -158,8 +159,8 @@
 				@"Size",
 				@"Size label in metadataDescription");
 		
-//		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@×%@",size,width,height];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@×%@",size,width,height];
 	}
 	
 	if (depth != nil || model != nil || type != nil)
@@ -170,12 +171,39 @@
 				@"Type",
 				@"Type label in metadataDescription");
 		
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: ",typeLabel];
-		if (depth) description = [description stringByAppendingFormat:@"%@bit ",depth];
-		if (model) description = [description stringByAppendingFormat:@"%@ ",model];
-		if (type) description = [description stringByAppendingFormat:@"%@",type];
-		else if (filetype) description = [description stringByAppendingFormat:@"%@",filetype];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: ",typeLabel];
+		if (depth) [description appendFormat:@"%@bit ",depth];
+		if (model) [description appendFormat:@"%@ ",model];
+		
+		
+		if (type)
+		{
+			NSString *UTI = [NSString UTIForFileType:type];
+			NSString *descUTI = [NSString descriptionForUTI:UTI];
+			if (descUTI)
+			{
+				[description appendFormat:@"%@",descUTI];
+			}
+		}
+		else if (path)
+		{
+			NSString *UTI = [NSString UTIForFileAtPath:path];
+			NSString *descUTI = [NSString descriptionForUTI:UTI];
+			if (descUTI)
+			{
+				[description appendFormat:@"%@",descUTI];
+			}
+		}
+		else if (filetype)
+		{
+			NSString *UTI = [NSString UTIForFilenameExtension:filetype];
+			NSString *descUTI = [NSString descriptionForUTI:UTI];
+			if (descUTI)
+			{
+				[description appendFormat:@"%@",descUTI];
+			}
+		}
 	}
 	
 	if (dateTime != nil)
@@ -186,8 +214,8 @@
 				@"Date",
 				@"Date label in metadataDescription");
 		
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",dateLabel,[dateTime exifDateToLocalizedDisplayDate]];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",dateLabel,[dateTime exifDateToLocalizedDisplayDate]];
 	}
 	
 	return description;

@@ -705,7 +705,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
@@ -725,8 +725,8 @@
 				@"Type",
 				@"Type label in metadataDescription");
 
-			description = [description stringByAppendingNewline];
-			description = [description stringByAppendingFormat:@"%@: %@",typeLabel,kind];
+			if (description.length > 0) [description appendNewline];
+			[description appendFormat:@"%@: %@",typeLabel,kind];
 		}
 		
 		if (width != nil && height != nil)
@@ -737,8 +737,8 @@
 					@"Size",
 					@"Size label in metadataDescription");
 			
-			description = [description stringByAppendingNewline];
-			description = [description stringByAppendingFormat:@"%@: %@×%@",size,width,height];
+			if (description.length > 0) [description appendNewline];
+			[description appendFormat:@"%@: %@×%@",size,width,height];
 		}
 	}
 	else
@@ -751,8 +751,8 @@
 				@"Artist",
 				@"Artist label in metadataDescription");
 
-			description = [description stringByAppendingNewline];
-			description = [description stringByAppendingFormat:@"%@: %@",artistLabel,artist];
+			if (description.length > 0) [description appendNewline];
+			[description appendFormat:@"%@: %@",artistLabel,artist];
 		}
 		
 		if (album)
@@ -763,8 +763,8 @@
 				@"Album",
 				@"Album label in metadataDescription");
 
-			description = [description stringByAppendingNewline];
-			description = [description stringByAppendingFormat:@"%@: %@",albumLabel,album];
+			if (description.length > 0) [description appendNewline];
+			[description appendFormat:@"%@: %@",albumLabel,album];
 		}
 	}
 
@@ -777,8 +777,8 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 
 	if (comment)
@@ -789,8 +789,8 @@
 																	@"Comment",
 																	@"Comment label in metadataDescription");
 		
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",commentLabel,comment];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;

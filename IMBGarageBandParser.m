@@ -332,7 +332,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
@@ -345,8 +345,8 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",artistLabel,artist];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",artistLabel,artist];
 	}
 	
 	if (album)
@@ -357,8 +357,8 @@
 			@"Album",
 			@"Album label in metadataDescription");
 
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",albumLabel,album];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",albumLabel,album];
 	}
 	
 	if (duration)
@@ -370,8 +370,8 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 	
 	return description;

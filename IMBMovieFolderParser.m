@@ -174,7 +174,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSNumber* width = [inMetadata objectForKey:@"width"];
 	NSNumber* height = [inMetadata objectForKey:@"height"];
@@ -192,8 +192,8 @@
 			@"Type",
 			@"Type label in metadataDescription");
 		
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",typeLabel,kind];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",typeLabel,kind];
 	}
 	
 	if (width != nil && height != nil)
@@ -204,8 +204,8 @@
 				@"Size",
 				@"Size label in metadataDescription");
 		
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@×%@",size,width,height];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@×%@",size,width,height];
 	}
 	
 	if (duration)
@@ -217,8 +217,8 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 
 	if (comment && ![comment isEqualToString:@""])
@@ -229,8 +229,8 @@
 																	@"Comment",
 																	@"Comment label in metadataDescription");
 		
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",commentLabel,comment];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;
