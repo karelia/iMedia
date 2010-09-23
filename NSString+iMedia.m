@@ -362,5 +362,16 @@
 }
 
 
+- (NSString*) stringByAppendingNewline
+{
+	if (self.length > 0) 
+	{
+		return [self stringByAppendingString:@"\n"];
+	}
+	
+	return self;
+}
+	
+
 @end
 

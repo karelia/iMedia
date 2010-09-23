@@ -77,4 +77,6 @@
 
 - (NSString *)resolvedPath;
 
+- (NSString*) stringByAppendingNewline;
+
 @end
