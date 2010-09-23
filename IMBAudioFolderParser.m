@@ -104,6 +104,7 @@
 	
 	if (item)
 	{
+		[metadata setObject:inPath forKey:@"path"];
 		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
 		CFArrayRef authors = MDItemCopyAttribute(item,kMDItemAuthors);
 		CFStringRef album = MDItemCopyAttribute(item,kMDItemAlbum);

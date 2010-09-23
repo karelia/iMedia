@@ -118,6 +118,8 @@
 			if (depth) [md setObject:depth forKey:@"depth"];
 			if (model) [md setObject:model forKey:@"model"];
 			if (filetype) [md setObject:filetype forKey:@"filetype"];
+			[md setObject:aPath forKey:@"path"];
+
 			NSDictionary *exif = [props objectForKey:(NSString *)kCGImagePropertyExifDictionary];
 			if ( nil != exif )
 			{
@@ -156,7 +158,7 @@
 				@"Size",
 				@"Size label in metadataDescription");
 		
-		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
+		description = [description stringByAppendingFormat:@"%@: %@×%@\n",size,width,height];
 	}
 	
 	if (depth != nil || model != nil || type != nil)

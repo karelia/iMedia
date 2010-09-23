@@ -311,6 +311,8 @@
 	
 	if (metadata)
 	{
+		[metadata setObject:inPath forKey:@"path"];
+
 		NSNumber* duration = [metadata objectForKey:@"com_apple_garageband_metadata_songDuration"];
 		[metadata setObject:duration forKey:@"duration"];
 

@@ -152,6 +152,12 @@
 	return UTI;
 }
 
++ (NSString *)descriptionForUTI:(NSString *)aUTI;
+{
+	CFStringRef result = UTTypeCopyDescription((CFStringRef)aUTI);
+	return [NSMakeCollectable(result) autorelease];	
+}
+
 + (NSString *)UTIForFileType:(NSString *)aFileType;
 
 {
