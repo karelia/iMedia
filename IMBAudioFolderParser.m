@@ -165,7 +165,8 @@
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
-	
+	NSString* comment = [inMetadata objectForKey:@"comment"];
+
 	if (artist)
 	{
 		NSString* artistLabel = NSLocalizedStringWithDefaultValue(
@@ -202,8 +203,18 @@
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
-	
-#warning need Finder Comments
+
+	if (comment && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																   @"Comment",
+																   nil,IMBBundle(),
+																   @"Comment",
+																   @"Comment label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
+	}
 	
 	return description;
 }
