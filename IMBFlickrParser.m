@@ -69,6 +69,7 @@
 #import "IMBParserController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
 #import "IMBConfig.h"
 
 
@@ -478,7 +479,8 @@
 	
 	if (!canDownload)
 	{
-		description = [description stringByAppendingFormat:@"%@\n",
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@",
 			NSLocalizedStringWithDefaultValue(
 			@"IMBFlickrParser.menu.downloadingNotPermitted",
 			nil,IMBBundle(),
@@ -494,12 +496,14 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",artist,ownername];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",artist,ownername];
 	}
 	
 	if (info)
 	{
-		description = [description stringByAppendingFormat:@"%@\n",info];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@",info];
 	}
 	
 	return description;

@@ -69,6 +69,7 @@
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSView+iMedia.h"
+#import "NSString+iMedia.h"
 #import "IMBDynamicTableView.h"
 #import "IMBComboTextCell.h"
 #import "IMBObject.h"
@@ -1676,10 +1677,10 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
 	
-//	if (object.metadata == nil)
-//	{
-//		[object.parser loadMetadataForObject:object];
-//	}
+	if (object.metadata == nil)
+	{
+		[object.parser loadMetadataForObject:object];
+	}
 	
 	if ([inCell isKindOfClass:[IMBComboTextCell class]])
 	{
@@ -1733,6 +1734,36 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Provide a tooltip for the row...
+
+- (NSString*) tableView:(NSTableView*)inTableView toolTipForCell:(NSCell*)inCell rect:(NSRectPointer)inRect tableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow mouseLocation:(NSPoint)inMouseLocation
+{
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	IMBObject* object = [objects objectAtIndex:inRow];
+	NSString* name = [object name];
+	NSString* description = [object metadataDescription];
+	
+	NSString* tooltip = @"";
+	
+	if (name)
+	{
+		tooltip = [tooltip stringByAppendingNewline];
+		tooltip = [tooltip stringByAppendingFormat:@"%@",name];
+	}
+	
+	if (description)
+	{
+		tooltip = [tooltip stringByAppendingNewline];
+		tooltip = [tooltip stringByAppendingFormat:@"%@",description];
+	}
+	
+	return tooltip;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Encapsulate all dragged objects iny a promise, archive it and put it on the pasteboard. The client can then
 // start loading the objects in the promise and iterate over the resulting files...
 
@@ -1742,6 +1773,7 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 	{
 		return NO;	// don't allow drag if we clicked on a disabled object
 	}
+	
  	return ([self writeItemsAtIndexes:inIndexes toPasteboard:inPasteboard] > 0);
 }
 

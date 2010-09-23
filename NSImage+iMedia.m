@@ -158,7 +158,8 @@
 				@"Size",
 				@"Size label in metadataDescription");
 		
-		description = [description stringByAppendingFormat:@"%@: %@×%@\n",size,width,height];
+//		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@×%@",size,width,height];
 	}
 	
 	if (depth != nil || model != nil || type != nil)
@@ -169,12 +170,12 @@
 				@"Type",
 				@"Type label in metadataDescription");
 		
+		description = [description stringByAppendingNewline];
 		description = [description stringByAppendingFormat:@"%@: ",typeLabel];
 		if (depth) description = [description stringByAppendingFormat:@"%@bit ",depth];
 		if (model) description = [description stringByAppendingFormat:@"%@ ",model];
 		if (type) description = [description stringByAppendingFormat:@"%@",type];
 		else if (filetype) description = [description stringByAppendingFormat:@"%@",filetype];
-		description = [description stringByAppendingFormat:@"\n"];
 	}
 	
 	if (dateTime != nil)
@@ -185,7 +186,8 @@
 				@"Date",
 				@"Date label in metadataDescription");
 		
-		description = [description stringByAppendingFormat:@"%@: %@\n",dateLabel,[dateTime exifDateToLocalizedDisplayDate]];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",dateLabel,[dateTime exifDateToLocalizedDisplayDate]];
 	}
 	
 	return description;

@@ -56,6 +56,7 @@
 #import "IMBParserController.h"
 #import "IMBTimecodeTransformer.h"
 #import "IMBCommon.h"
+#import "NSString+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -114,11 +115,17 @@
 			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
 			CFRelease(seconds);
 		}
-		
+		else
+		{
+			NSSound* sound = [[NSSound alloc] initWithContentsOfFile:inPath byReference:YES];
+			[metadata setObject:[NSNumber numberWithDouble:sound.duration] forKey:@"duration"]; 
+			[sound release];
+		}
+
 		if (authors)
 		{
 			NSArray* artists = (NSArray*)authors;
-			if (artists.count > 0)[metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
+			if (artists.count > 0) [metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
 			CFRelease(authors);
 		}
 		
@@ -159,7 +166,8 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",artistLabel,artist];
 	}
 	
 	if (album)
@@ -170,7 +178,8 @@
 			@"Album",
 			@"Album label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",albumLabel,album];
 	}
 	
 	if (duration)
@@ -182,7 +191,8 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
 	}
 	
 	return description;
