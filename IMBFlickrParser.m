@@ -473,7 +473,6 @@
 {
 	BOOL canDownload = [[inMetadata objectForKey:@"can_download"] boolValue];
 	NSString* ownername = [inMetadata objectForKey:@"ownername"];
-	NSString* comment = [inMetadata objectForKey:@"descriptionText"];
 	NSString* tags = [inMetadata objectForKey:@"tags"];
 
 	NSString* info = [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
@@ -494,10 +493,10 @@
 	if (ownername && ![ownername isEqualToString:@""])
 	{
 		NSString* artist = NSLocalizedStringWithDefaultValue(
-			@"Artist",
+			@"Owner",
 			nil,IMBBundle(),
-			@"Artist",
-			@"Artist label in metadataDescription");
+			@"Owner",
+			@"Owner (for flickr photographs) label in metadataDescription");
 
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",artist,ownername];
@@ -508,19 +507,7 @@
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@",info];
 	}
-	
-	if (comment && ![comment isEqualToString:@""])
-	{
-		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
-																	@"Comment",
-																	nil,IMBBundle(),
-																	@"Comment",
-																	@"Comment label in metadataDescription");
 		
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",commentLabel,comment];
-	}
-	
 	if (tags && ![tags isEqualToString:@""])
 	{
 		NSString* tagsLabel = NSLocalizedStringWithDefaultValue(

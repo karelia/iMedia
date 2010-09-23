@@ -1747,13 +1747,13 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 	
 	if (name)
 	{
-		[tooltip imb_appendNewline];
+		if (tooltip.length > 0) [tooltip imb_appendNewline];
 		[tooltip appendFormat:@"%@",name];
 	}
 	
 	if (description)
 	{
-		[tooltip imb_appendNewline];
+		if (tooltip.length > 0) [tooltip imb_appendNewline];
 		[tooltip appendFormat:@"%@",description];
 	}
 	
