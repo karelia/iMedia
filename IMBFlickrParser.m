@@ -478,12 +478,12 @@
 
 	NSString* info = [NSImage imageMetadataDescriptionForMetadata:inMetadata];
 	
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	
 	if (!canDownload)
 	{
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@",
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@",
 			NSLocalizedStringWithDefaultValue(
 			@"IMBFlickrParser.menu.downloadingNotPermitted",
 			nil,IMBBundle(),
@@ -499,14 +499,14 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",artist,ownername];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",artist,ownername];
 	}
 	
 	if (info)
 	{
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@",info];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@",info];
 	}
 	
 	if (comment && ![comment isEqualToString:@""])
@@ -517,8 +517,8 @@
 																	@"Comment",
 																	@"Comment label in metadataDescription");
 		
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",commentLabel,comment];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	if (tags && ![tags isEqualToString:@""])
@@ -529,8 +529,8 @@
 																	@"Tags",
 																	@"Tags (Flickr term for keywords) label in metadataDescription");
 		
-		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",tagsLabel,tags];
+		if (description.length > 0) [description appendNewline];
+		[description appendFormat:@"%@: %@",tagsLabel,tags];
 	}
 	
 	return description;

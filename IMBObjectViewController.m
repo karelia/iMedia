@@ -1743,18 +1743,18 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 	NSString* name = [object name];
 	NSString* description = [object metadataDescription];
 	
-	NSString* tooltip = @"";
+	NSMutableString* tooltip = [NSMutableString string];
 	
 	if (name)
 	{
-		tooltip = [tooltip stringByAppendingNewline];
-		tooltip = [tooltip stringByAppendingFormat:@"%@",name];
+		[tooltip appendNewline];
+		[tooltip appendFormat:@"%@",name];
 	}
 	
 	if (description)
 	{
-		tooltip = [tooltip stringByAppendingNewline];
-		tooltip = [tooltip stringByAppendingFormat:@"%@",description];
+		[tooltip appendNewline];
+		[tooltip appendFormat:@"%@",description];
 	}
 	
 	return tooltip;
