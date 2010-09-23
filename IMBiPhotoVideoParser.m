@@ -147,38 +147,27 @@
 	NSString *thumbPath  = [inMetadata objectForKey:@"ThumbPath"];		// can use this instead of quicklook
 	
 	NSMutableString* description = [NSMutableString string];
-	NSString* typeLabel = NSLocalizedStringWithDefaultValue(
-															@"Type",
-															nil,IMBBundle(),
-															@"Type",
-															@"Type label in metadataDescription");
 	
 	if (description.length > 0) [description imb_appendNewline];
-	[description appendFormat:@"%@: %@",typeLabel,kind];
+	[description appendString:kind];
 	
 	NSString *width = [inMetadata objectForKey:@"width"];
 	NSString *height = [inMetadata objectForKey:@"height"];
 	NSString *duration = [inMetadata objectForKey:@"duration"];
 
 	if (width != nil && height != nil)
-	{
-		NSString* size = NSLocalizedStringWithDefaultValue(
-														   @"Size",
-														   nil,IMBBundle(),
-														   @"Size",
-														   @"Size label in metadataDescription");
-		
+	{		
 		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@×%@",size,width,height];
+		[description appendFormat:@"%@×%@",width,height];
 	}
 	
 	if (duration)
 	{
 		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
-																	@"Time",
-																	nil,IMBBundle(),
-																	@"Time",
-																	@"Time label in metadataDescription");
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
 		
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
 		if (description.length > 0) [description imb_appendNewline];
@@ -188,10 +177,10 @@
 	if (comment && ![comment isEqualToString:@""])
 	{
 		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
-																	@"Comment",
-																	nil,IMBBundle(),
-																	@"Comment",
-																	@"Comment label in metadataDescription");
+			@"Comment",
+			nil,IMBBundle(),
+			@"Comment",
+			@"Comment label in metadataDescription");
 		
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",commentLabel,comment];

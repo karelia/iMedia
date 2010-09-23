@@ -186,26 +186,14 @@
 
 	if (kind)
 	{
-		NSString* typeLabel = NSLocalizedStringWithDefaultValue(
-			@"Type",
-			nil,IMBBundle(),
-			@"Type",
-			@"Type label in metadataDescription");
-		
 		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",typeLabel,kind];
+		[description appendString:kind];
 	}
 	
 	if (width != nil && height != nil)
 	{
-		NSString* size = NSLocalizedStringWithDefaultValue(
-				@"Size",
-				nil,IMBBundle(),
-				@"Size",
-				@"Size label in metadataDescription");
-		
 		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@×%@",size,width,height];
+		[description appendFormat:@"%@×%@",width,height];
 	}
 	
 	if (duration)
