@@ -80,3 +80,10 @@
 - (NSString*) stringByAppendingNewline;
 
 @end
+
+@interface NSMutableString (iMedia)
+
+- (void)appendNewline;
+
+@end
+

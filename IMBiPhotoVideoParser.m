@@ -138,7 +138,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString *comments = [inMetadata objectForKey:@"Comment"];
+	NSString *comment = [inMetadata objectForKey:@"Comment"];
 	NSString *type = [inMetadata objectForKey:@"ImageType"];		// like MooV
 	NSString *UTI = [NSString UTIForFileType:type];
 	NSString *kind = [NSString descriptionForUTI:UTI];
@@ -185,16 +185,16 @@
 		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
 	}
 	
-	if (comments && ![comments isEqualToString:@""])
+	if (comment && ![comment isEqualToString:@""])
 	{
-		NSString* commentsLabel = NSLocalizedStringWithDefaultValue(
-																	@"Comments",
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																	@"Comment",
 																	nil,IMBBundle(),
-																	@"Comments",
-																	@"Comments label in metadataDescription");
+																	@"Comment",
+																	@"Comment label in metadataDescription");
 		
 		if (description.length > 0) description = [description stringByAppendingFormat:@"\n"];
-		description = [description stringByAppendingFormat:@"%@: %@",commentsLabel,comments];
+		description = [description stringByAppendingFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;

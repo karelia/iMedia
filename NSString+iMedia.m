@@ -371,7 +371,15 @@
 	
 	return self;
 }
-	
+
 
 @end
 
+@implementation NSMutableString (iMedia)
+
+- (void)appendNewline;
+{
+	[self appendString:@"\n"];
+}
+
+@end

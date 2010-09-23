@@ -454,7 +454,7 @@
 {
 	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
 	NSDictionary* metadata = object.preliminaryMetadata;
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
+	NSString* description = metadata ? [self metadataDescriptionForMetadata:metadata] : @"";
 
 	if ([NSThread isMainThread])
 	{
@@ -473,6 +473,9 @@
 {
 	BOOL canDownload = [[inMetadata objectForKey:@"can_download"] boolValue];
 	NSString* ownername = [inMetadata objectForKey:@"ownername"];
+	NSString* comment = [inMetadata objectForKey:@"descriptionText"];
+	NSString* tags = [inMetadata objectForKey:@"tags"];
+
 	NSString* info = [NSImage imageMetadataDescriptionForMetadata:inMetadata];
 	
 	NSString* description = @"";
@@ -488,7 +491,7 @@
 			@"Context menu item title to warn of not being downloadable")];
 	}
 	
-	if (ownername)
+	if (ownername && ![ownername isEqualToString:@""])
 	{
 		NSString* artist = NSLocalizedStringWithDefaultValue(
 			@"Artist",
@@ -504,6 +507,30 @@
 	{
 		description = [description stringByAppendingNewline];
 		description = [description stringByAppendingFormat:@"%@",info];
+	}
+	
+	if (comment && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																	@"Comment",
+																	nil,IMBBundle(),
+																	@"Comment",
+																	@"Comment label in metadataDescription");
+		
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",commentLabel,comment];
+	}
+	
+	if (tags && ![tags isEqualToString:@""])
+	{
+		NSString* tagsLabel = NSLocalizedStringWithDefaultValue(
+																	@"Tags",
+																	nil,IMBBundle(),
+																	@"Tags",
+																	@"Tags (Flickr term for keywords) label in metadataDescription");
+		
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",tagsLabel,tags];
 	}
 	
 	return description;

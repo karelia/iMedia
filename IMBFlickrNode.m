@@ -416,8 +416,21 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		[metadata setObject:quickLookURL forKey:@"quickLookURL"];
 
 		// But give it a better 'description' without the nested item
-		NSString *desc = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
-		if (nil != desc)			[metadata setObject:desc forKey:@"descriptionHTML"];
+		NSString *descHTML = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
+		if (descHTML)
+		{
+			NSData *HTMLData = [descHTML dataUsingEncoding:NSUTF8StringEncoding];
+			NSDictionary *options = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:NSUTF8StringEncoding] forKey:NSCharacterEncodingDocumentOption];
+			NSAttributedString *descAttributed = [[[NSAttributedString alloc] initWithHTML:HTMLData options:options documentAttributes:nil] autorelease];
+			if (descAttributed)
+			{
+				NSString *desc = [descAttributed string];
+				if (nil != desc)			[metadata setObject:desc forKey:@"descriptionText"];
+			}
+#ifdef DEBUG
+			else NSLog(@"Unable to make attributed string out of %@", descHTML);
+#endif
+		}
 
 		NSString *can_download = [photoDict objectForKey:@"can_download"];
 		NSString *license = [photoDict objectForKey:@"license"];

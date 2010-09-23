@@ -57,10 +57,10 @@
 
 - (CGImageRef) quicklookCGImage;
 {
-//	if ([NSThread isMainThread])
-//	{
-//		NSLog(@"Whoops, we're on main thread. %@", [[NSThread currentThread] name]);
-//	}
+	if ([NSThread isMainThread])
+	{
+		NSLog(@"%s is being called on main thread. We probably want to re-do this for background thread", __FUNCTION__);
+	}
 	CGSize size = CGSizeMake(256.0,256.0);
 	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)self,size,NULL);
 	return (CGImageRef) [NSMakeCollectable(image) autorelease];
