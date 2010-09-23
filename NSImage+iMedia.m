@@ -164,20 +164,14 @@
 	NSString* dateTime = [inMetadata objectForKey:@"dateTime"];
 	NSString* path = [inMetadata objectForKey:@"path"];
 	NSString* comment = [inMetadata objectForKey:@"comment"];
+	
+	if (!comment) comment = [inMetadata objectForKey:@"Comment"];	// uppercase from iPhoto
 
 	if (depth != nil || model != nil || type != nil)
-	{
-		NSString* typeLabel = NSLocalizedStringWithDefaultValue(
-				@"Type",
-				nil,IMBBundle(),
-				@"Type",
-				@"Type label in metadataDescription");
-		
+	{		
 		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: ",typeLabel];
-		if (depth) [description appendFormat:@"%@bit ",depth];
+		if (depth) [description appendFormat:@"%@-bit ",depth];		// TODO: LOCALIZE
 		if (model) [description appendFormat:@"%@ ",model];
-		
 		
 		if (type)
 		{
@@ -210,26 +204,14 @@
 
 	if (width != nil && height != nil)
 	{
-		NSString* size = NSLocalizedStringWithDefaultValue(
-														   @"Size",
-														   nil,IMBBundle(),
-														   @"Size",
-														   @"Size label in metadataDescription");
-		
 		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@×%@",size,width,height];
+		[description appendFormat:@"%@×%@",width,height];
 	}
 		
 	if (dateTime != nil)
 	{
-		NSString* dateLabel = NSLocalizedStringWithDefaultValue(
-				@"Date",
-				nil,IMBBundle(),
-				@"Date",
-				@"Date label in metadataDescription");
-		
 		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",dateLabel,[dateTime imb_exifDateToLocalizedDisplayDate]];
+		[description appendString:[dateTime imb_exifDateToLocalizedDisplayDate]];
 	}
 
 	if (comment && ![comment isEqualToString:@""])
