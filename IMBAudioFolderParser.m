@@ -57,6 +57,7 @@
 #import "IMBTimecodeTransformer.h"
 #import "IMBCommon.h"
 #import "NSString+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------

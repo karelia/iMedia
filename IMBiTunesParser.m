@@ -686,8 +686,8 @@
 					NSString* genre = [trackDict objectForKey:@"Genre"];
 					if (genre) [metadata setObject:genre forKey:@"genre"]; 
 
-					NSString* comments = [trackDict objectForKey:@"Comments"];
-					if (comments) [metadata setObject:comments forKey:@"comments"]; 
+					NSString* comment = [trackDict objectForKey:@"Comment"];
+					if (comment) [metadata setObject:comment forKey:@"comment"]; 
 					
 					object.metadataDescription = [self metadataDescriptionForMetadata:metadata];
 				}
@@ -709,7 +709,7 @@
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
-	NSString* comments = [inMetadata objectForKey:@"comments"];
+	NSString* comment = [inMetadata objectForKey:@"comment"];
 	NSString* kind = [inMetadata objectForKey:@"Kind"];
 	NSNumber* width = [inMetadata objectForKey:@"Video Width"];
 	NSNumber* height = [inMetadata objectForKey:@"Video Height"];
@@ -781,16 +781,16 @@
 		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
 	}
 
-	if (comments)
+	if (comment)
 	{
-		NSString* commentsLabel = NSLocalizedStringWithDefaultValue(
-																	@"Comments",
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																	@"Comment",
 																	nil,IMBBundle(),
-																	@"Comments",
-																	@"Comments label in metadataDescription");
+																	@"Comment",
+																	@"Comment label in metadataDescription");
 		
 		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",commentsLabel,comments];
+		description = [description stringByAppendingFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;

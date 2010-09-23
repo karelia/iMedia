@@ -131,7 +131,7 @@
 		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
 		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
 		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
-		CFStringRef comments = MDItemCopyAttribute(item,kMDItemFinderComment);
+		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
 
 		
 		
@@ -153,10 +153,10 @@
 			CFRelease(height);
 		}
 	
-		if (comments)
+		if (comment)
 		{
-			[metadata setObject:(NSString*)comments forKey:@"comments"]; 
-			CFRelease(comments);
+			[metadata setObject:(NSString*)comment forKey:@"comment"]; 
+			CFRelease(comment);
 		}
 		
 		CFRelease(item);
@@ -179,7 +179,7 @@
 	NSNumber* width = [inMetadata objectForKey:@"width"];
 	NSNumber* height = [inMetadata objectForKey:@"height"];
 	NSString *path = [inMetadata objectForKey:@"path"];
-	NSString *comments = [inMetadata objectForKey:@"comments"];
+	NSString *comment = [inMetadata objectForKey:@"comment"];
 
 	NSString *UTI = [NSString UTIForFileAtPath:path];
 	NSString *kind = [NSString descriptionForUTI:UTI];
@@ -221,16 +221,16 @@
 		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
 	}
 
-	if (comments && ![comments isEqualToString:@""])
+	if (comment && ![comment isEqualToString:@""])
 	{
-		NSString* commentsLabel = NSLocalizedStringWithDefaultValue(
-																	@"Comments",
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																	@"Comment",
 																	nil,IMBBundle(),
-																	@"Comments",
-																	@"Comments label in metadataDescription");
+																	@"Comment",
+																	@"Comment label in metadataDescription");
 		
 		description = [description stringByAppendingNewline];
-		description = [description stringByAppendingFormat:@"%@: %@",commentsLabel,comments];
+		description = [description stringByAppendingFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;

@@ -68,6 +68,7 @@
 #import "NSImage+iMedia.h"
 #import <Carbon/Carbon.h>
 #import <Quartz/Quartz.h>
+#import "NSWorkspace+iMedia.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 // Internal classes:
