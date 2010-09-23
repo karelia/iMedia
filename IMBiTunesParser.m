@@ -686,7 +686,7 @@
 					if (genre) [metadata setObject:genre forKey:@"genre"]; 
 
 					NSString* comments = [trackDict objectForKey:@"Comments"];
-					if (comments) [metadata setObject:artist forKey:@"comments"]; 
+					if (comments) [metadata setObject:comments forKey:@"comments"]; 
 					
 					object.metadataDescription = [self metadataDescriptionForMetadata:metadata];
 				}
