@@ -143,9 +143,7 @@
 	NSString *UTI = [NSString imb_UTIForFileType:type];
 	NSString *kind = [NSString imb_descriptionForUTI:UTI];
 	// NSString *dateTimeInterval = [inMetadata objectForKey:@"DateAsTimerInterval"];
-		
-	NSString *thumbPath  = [inMetadata objectForKey:@"ThumbPath"];		// can use this instead of quicklook
-	
+
 	NSMutableString* description = [NSMutableString string];
 	
 	if (description.length > 0) [description imb_appendNewline];

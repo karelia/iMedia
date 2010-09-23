@@ -72,8 +72,9 @@ SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 + (CIImage *)imageWithIMBImageItem:(id <IMBImageItem>)item;
 @end
 
-
-
+@interface QTMovie (IMBImageItem)
++ (QTMovie *)movieWithIMBImageItem:(id <IMBImageItem>)item;
+@end
 
 extern CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item);
 

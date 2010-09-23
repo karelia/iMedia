@@ -129,7 +129,63 @@
 @end
 
 
+
 #pragma mark -
+
+@implementation QTMovie (IMBImageItem)
+
+
+// Not directly used in iMedia anymore, but PLEASE KEEP THIS HERE for client applications to use
+// since it's of general utility.
+
++ (QTMovie *)movieWithIMBImageItem:(id <IMBImageItem>)item;
+{
+    QTMovie *result = nil;
+	NSError *error = nil;	// not really going to be using loading error; e.g. unloadable but valid FLV
+    
+    NSString *type = [item imageRepresentationType];
+    
+    // Already in the right format (QTMovie)
+	if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
+    {
+        result = [item imageRepresentation];
+    }
+	else if ([type isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+    {
+        id urlString = [item imageRepresentation];
+		if ([urlString isKindOfClass:[NSString class]])
+		{
+			urlString = [NSURL fileURLWithPath:urlString];
+		}
+		result = [[[QTMovie alloc] initWithURL:urlString error:&error] autorelease]; 
+    }
+	
+    
+    // From URL, path or data
+	
+	else if ([type isEqualToString:IKImageBrowserNSURLRepresentationType])
+    {
+        NSURL *url = [item imageRepresentation];
+        result = [[[QTMovie alloc] initWithURL:url error:&error] autorelease];
+    }
+    else if ([type isEqualToString:IKImageBrowserPathRepresentationType])
+    {
+        NSString *path = [item imageRepresentation];
+        result = [QTMovie movieWithFile:path error:&error];
+    }
+    else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
+    {
+        NSData *data = [item imageRepresentation];
+        result = [QTMovie movieWithData:data error:&error];
+    }
+    return result;
+}
+
+@end
+
+
+#pragma mark -
+
 
 
 CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
