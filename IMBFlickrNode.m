@@ -425,7 +425,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 			if (descAttributed)
 			{
 				NSString *desc = [descAttributed string];
-				if (nil != desc)			[metadata setObject:desc forKey:@"descriptionText"];
+				if (nil != desc) [metadata setObject:desc forKey:@"comment"];
 			}
 #ifdef DEBUG
 			else NSLog(@"Unable to make attributed string out of %@", descHTML);

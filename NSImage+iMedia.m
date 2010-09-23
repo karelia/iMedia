@@ -96,7 +96,7 @@
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
 + (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath;
 {
-	NSDictionary *result = nil;
+	NSMutableDictionary *md = [NSMutableDictionary dictionary];
 	CGImageSourceRef source = nil;
 	NSURL *url = [NSURL fileURLWithPath:aPath];
 	NSAssert(url, @"Nil image source URL");
@@ -107,7 +107,6 @@
 		if (propsCF)
 		{
 			NSDictionary *props = (NSDictionary *)propsCF;
-			NSMutableDictionary *md = [NSMutableDictionary dictionary];
 			NSNumber *width = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelWidth];
 			NSNumber *height= (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelHeight];
 			NSNumber *depth = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyDepth];
@@ -130,11 +129,25 @@
 					[md setObject:dateTime forKey:@"dateTime"];
 				}
 			}
-			result = [NSDictionary dictionaryWithDictionary:md];
 			CFRelease(propsCF);
 		}
 		CFRelease(source);
 	}
+	
+	MDItemRef item = MDItemCreate(NULL,(CFStringRef)aPath);
+	
+	if (item)
+	{
+		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
+		if (comment)
+		{
+			[md setObject:(NSString*)comment forKey:@"comment"]; 
+			CFRelease(comment);
+		}
+		CFRelease(item);
+	}
+		
+	NSDictionary *result = [NSDictionary dictionaryWithDictionary:md];
 	return result;
 }
 
@@ -150,6 +163,7 @@
 	NSString* filetype = [inMetadata objectForKey:@"filetype"];
 	NSString* dateTime = [inMetadata objectForKey:@"dateTime"];
 	NSString* path = [inMetadata objectForKey:@"path"];
+	NSString* comment = [inMetadata objectForKey:@"comment"];
 
 	if (depth != nil || model != nil || type != nil)
 	{
@@ -216,6 +230,18 @@
 		
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",dateLabel,[dateTime imb_exifDateToLocalizedDisplayDate]];
+	}
+
+	if (comment && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																   @"Comment",
+																   nil,IMBBundle(),
+																   @"Comment",
+																   @"Comment label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;

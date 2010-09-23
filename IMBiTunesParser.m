@@ -709,7 +709,7 @@
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
-	NSString* comment = [inMetadata objectForKey:@"comment"];
+	NSString* comment = [inMetadata objectForKey:@"Comments"];
 	NSString* kind = [inMetadata objectForKey:@"Kind"];
 	NSNumber* width = [inMetadata objectForKey:@"Video Width"];
 	NSNumber* height = [inMetadata objectForKey:@"Video Height"];
@@ -719,6 +719,9 @@
 	{
 		if (kind)
 		{
+			// Note: This "kind" will be a bit different from others, since it comes from dictionary.
+			// Thus we see "QuickTime movie file" rather than "QuickTime Movie" from other parsers,
+			// which gets the UTI description from the file.
 			NSString* typeLabel = NSLocalizedStringWithDefaultValue(
 				@"Type",
 				nil,IMBBundle(),

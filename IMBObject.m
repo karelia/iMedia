@@ -73,7 +73,6 @@
 @synthesize location = _location;
 @synthesize name = _name;
 @synthesize metadata = _metadata;
-@synthesize metadataDescription = _metadataDescription;
 @synthesize parser = _parser;
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
@@ -85,6 +84,32 @@
 @synthesize imageVersion = _imageVersion;
 @synthesize isLoading = _isLoading;
 
+@synthesize metadataDescription = _metadataDescription;
+/*
+ DISCUSSION: METADATA DESCRIPTION
+ 
+ Metadata descripton is built up on a per-parser basis; see imb_imageMetadataDescriptionForMetadata
+ and metadataDescriptionForMetadata for most implementations.
+ 
+ When an attribute is available and appropriate, it is shown; otherwise it is not shown.
+ We don't show a "Label: " for the attribute if its context is obvious.
+ 
+ In order to be consistent, this is the expected order that items are shown.  If we wanted to change
+ this, we would have to change a bunch of code.
+ 
+ No-Download indicator (Flickr)
+ Owner (Flickr)
+ Type (Images except for Flickr, Video, not Audio)
+ Artist (Audio)
+ Album (Audio)
+ Width x Height (Image, Video)
+ Duration (Audio, Video)
+ Date -- NOTE -- THERE ARE PROBABLY SOME PARSERS WHERE I STILL NEED TO INCLUDE THIS
+ Comment (when available; file-based parsers should get from Finder comments)
+ Tags (Flickr) --  CAN WE GET THESE FOR IPHOTO, OTHERS TOO?
+ 
+ Maybe add License for Flickr, perhaps others from EXIF data?
+ */
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -110,6 +110,7 @@
 		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
 		CFArrayRef authors = MDItemCopyAttribute(item,kMDItemAuthors);
 		CFStringRef album = MDItemCopyAttribute(item,kMDItemAlbum);
+		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
 
 		if (seconds)
 		{
@@ -134,6 +135,12 @@
 		{
 			[metadata setObject:(NSString*)album forKey:@"album"]; 
 			CFRelease(album);
+		}
+
+		if (comment)
+		{
+			[metadata setObject:(NSString*)comment forKey:@"comment"]; 
+			CFRelease(comment);
 		}
 		
 		CFRelease(item);
@@ -195,6 +202,8 @@
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
+	
+#warning need Finder Comments
 	
 	return description;
 }
