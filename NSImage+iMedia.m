@@ -200,7 +200,7 @@
 	
 	if (sGenericFolderIcon == nil)
 	{
-		sGenericFolderIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
+		sGenericFolderIcon = [[[NSWorkspace threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
 		[sGenericFolderIcon setScalesWhenResized:YES];
 		[sGenericFolderIcon setSize:NSMakeSize(16,16)];
 	}

@@ -379,7 +379,7 @@
 			if (!sGenericIcon)
 			{
 				// Get generic icon, and shrink it down to favicon size for consistency.
-				sGenericIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:(NSString *)kUTTypeURL] retain];
+				sGenericIcon = [[[NSWorkspace threadSafeWorkspace] iconForFileType:(NSString *)kUTTypeURL] retain];
 				[sGenericIcon setScalesWhenResized:YES];
 				[sGenericIcon setSize:NSMakeSize(16.0,16.0)];
 			}

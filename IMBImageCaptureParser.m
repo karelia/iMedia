@@ -348,7 +348,7 @@
 					subnode.icon = [self _getThumbnailSync:imageCaptureID];
 				if( !subnode.icon ) 
 					subnode.icon = [NSImage sharedGenericFolderIcon];
-					// subnode.icon = [[NSWorkspace sharedWorkspace] iconForFileType:@"'fldr'"];
+					// subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFileType:@"'fldr'"];
 				
 				BOOL hasSubnodes = [self _addICATree:[anItem valueForKey:@"tree"] toNode:subnode];
 				subnode.leaf = !hasSubnodes;
@@ -440,7 +440,7 @@
 	newNode.leaf = NO;
 	
 	if( !showsGroupNodes ) 
-		newNode.icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Image Capture.app"];
+		newNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:@"/Applications/Image Capture.app"];
 	
 	newNode.group = showsGroupNodes;
 	newNode.groupType = kIMBGroupTypeNone;
