@@ -137,7 +137,7 @@
 // Called once on main thread early in app lifetime, when all parsers are registered and loaded. 
 // Return NO to suppress loading a particular parser...
 
-- (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString *)parserClassname forMediaType:(NSString*)inMediaType;
+- (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString*)inParserClassName forMediaType:(NSString*)inMediaType;
 - (BOOL) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
 - (void) parserController:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
 
