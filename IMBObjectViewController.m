@@ -300,10 +300,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// optimization where the views of invisible tabs are not really part of the window view hierarchy. However the 
 	// view subtrees exist and do have bindings to the IMBObjectArrayController - which need to be torn down as well...
 	
-	[ibIconView unbindViewHierarchy];
-	[ibListView unbindViewHierarchy];
-	[ibComboView unbindViewHierarchy];
-	[self.view unbindViewHierarchy];
+	[ibIconView imb_unbindViewHierarchy];
+	[ibListView imb_unbindViewHierarchy];
+	[ibComboView imb_unbindViewHierarchy];
+	[self.view imb_unbindViewHierarchy];
 }
 
 
@@ -765,7 +765,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		{
 			NSString* path = [inObject path];
 			
-			if ([[NSFileManager threadSafeManager] fileExistsAtPath:path])
+			if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
 			{
 				// Open with source app. Commented out for now as apps like iPhoto do not seem to be able to open
 				// and display images within its own libary. All it does is display a cryptic error message...
@@ -780,7 +780,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //							@"Open With %@",
 //							@"Menu item in context menu of IMBObjectViewController");
 //						
-//						appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+//						appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
 //						title = [NSString stringWithFormat:title,appName];	
 //
 //						item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInSourceApp:) keyEquivalent:@""];
@@ -801,7 +801,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
-					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+					appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
 					title = [NSString stringWithFormat:title,appName];	
 
 					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInEditorApp:) keyEquivalent:@""];
@@ -821,7 +821,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
-					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+					appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
 					title = [NSString stringWithFormat:title,appName];	
 
 					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInViewerApp:) keyEquivalent:@""];
@@ -833,7 +833,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				
 				// Open with default app determined by OS...
 				
-				else if ([[NSWorkspace threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type])
+				else if ([[NSWorkspace imb_threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type])
 				{
 					title = NSLocalizedStringWithDefaultValue(
 						@"IMBObjectViewController.menuItem.openWithFinder",
@@ -949,7 +949,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		app = [object.parser performSelector:@selector(appPath)];
 	}
 	
-	[[NSWorkspace threadSafeWorkspace] openFile:path withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 
@@ -957,7 +957,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	NSString* app = [IMBConfig editorAppForMediaType:self.mediaType];
 	NSString* path = (NSString*)[inSender representedObject];
-	[[NSWorkspace threadSafeWorkspace] openFile:path withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 
@@ -965,14 +965,14 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	NSString* app = [IMBConfig viewerAppForMediaType:self.mediaType];
 	NSString* path = (NSString*)[inSender representedObject];
-	[[NSWorkspace threadSafeWorkspace] openFile:path withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 
 - (IBAction) openInApp:(id)inSender
 {
 	NSString* path = (NSString*)[inSender representedObject];
-	[[NSWorkspace threadSafeWorkspace] openFile:path];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:path];
 }
 
 
@@ -988,7 +988,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (IBAction) openInBrowser:(id)inSender
 {
 	NSURL* url = (NSURL*)[inSender representedObject];
-	[[NSWorkspace threadSafeWorkspace] openURL:url];
+	[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
 }
 
 
@@ -996,7 +996,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	NSString* path = (NSString*)[inSender representedObject];
 	NSString* folder = [path stringByDeletingLastPathComponent];
-	[[NSWorkspace threadSafeWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
+	[[NSWorkspace imb_threadSafeWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
 }
 
 
@@ -1088,7 +1088,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
 			if ([url isKindOfClass:[NSURL class]])
 			{
-				[[NSWorkspace threadSafeWorkspace] openURL:url];
+				[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
 			}
 		}
 	}
@@ -1747,23 +1747,17 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 	
 	if (name)
 	{
-		[tooltip appendNewline];
+		[tooltip imb_appendNewline];
 		[tooltip appendFormat:@"%@",name];
 	}
 	
 	if (description)
 	{
-		[tooltip appendNewline];
+		[tooltip imb_appendNewline];
 		[tooltip appendFormat:@"%@",description];
 	}
 	
 	return tooltip;
-}
-
-
-- (BOOL) tableView:(NSTableView*)inTableView shouldShowCellExpansionForTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
-{
-	return NO;
 }
 
 

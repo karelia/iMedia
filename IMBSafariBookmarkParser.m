@@ -117,7 +117,7 @@
 
 + (NSString*) safariPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
 }
 
 
@@ -137,7 +137,7 @@
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	NSString* path = [@"~/Library/Safari/Bookmarks.plist" stringByStandardizingPath];
 
-	if ([self isInstalled] && [[NSFileManager threadSafeManager] fileExistsAtPath:path])
+	if ([self isInstalled] && [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
 	{
 		IMBSafariBookmarkParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 		parser.mediaSource = path;
@@ -200,7 +200,7 @@
 	
 	if (inOldNode == nil)		// implicit command to create the empty root node
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 
@@ -308,7 +308,7 @@
 	NSDictionary* plist = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
-	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 	
 	@synchronized(self)
@@ -402,7 +402,7 @@
 							  nil,IMBBundle(),
 							  @"Bookmarks Menu",
 							  @"top-level bookmark name");
-					newImage = [NSImage imageResourceNamed:@"tiny_menu.tiff"
+					newImage = [NSImage imb_imageResourceNamed:@"tiny_menu.tiff"
 										   fromApplication:@"com.apple.Safari"
 												fallbackTo:nil];
 					
@@ -416,7 +416,7 @@
 							  @"Bookmarks Bar",
 							  @"top-level bookmark name");
 					
-					newImage = [NSImage imageResourceNamed:@"FavoritesBar.tif"
+					newImage = [NSImage imb_imageResourceNamed:@"FavoritesBar.tif"
 										   fromApplication:@"com.apple.Safari"
 												fallbackTo:nil];
 				}
@@ -454,7 +454,7 @@
 	if ([type isEqualToString:@"WebBookmarkTypeList"])
 	{
 		NSString* title = [inPlist objectForKey:@"Title"];
-		NSImage* icon = [NSImage sharedGenericFolderIcon];
+		NSImage* icon = [NSImage imb_sharedGenericFolderIcon];
 
 		subnode = [[[IMBNode alloc] init] autorelease];
 		subnode.mediaSource = self.mediaSource;

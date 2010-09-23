@@ -112,7 +112,7 @@
 	// Check if the folder exists. If not then do not return a node...
 	
 	BOOL exists,directory;
-	exists = [[NSFileManager threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
+	exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
 	
 	if (!exists || !directory) 
 	{
@@ -126,7 +126,7 @@
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForPath:path]; 
-	newNode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
+	newNode.name = [[NSFileManager imb_threadSafeManager] displayNameAtPath:path];
 	newNode.icon = [self iconForPath:path];
 	newNode.parser = self;
 	newNode.leaf = NO;
@@ -177,7 +177,7 @@
 {
 	NSError* error = nil;
 	NSString* folder = inNode.mediaSource;
-	NSArray* files = [[NSFileManager threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
+	NSArray* files = [[NSFileManager imb_threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	
@@ -209,14 +209,14 @@
 				
 				// For folders will be handled later. Just remember it for now...
 				
-				if ([self fileAtPath:path conformsToUTI:(NSString*)kUTTypeFolder])
+				if ([self fileAtPath:path conformToimb_doesUTI:(NSString*)kUTTypeFolder])
 				{
 					[folders addObject:path];
 				}
 				
 				// Create an IMBVisualObject for each qualifying file...
 				
-				else if ([self fileAtPath:path conformsToUTI:_fileUTI])
+				else if ([self fileAtPath:path conformToimb_doesUTI:_fileUTI])
 				{
 					IMBObject* object = [self objectForPath:path name:file index:index++];
 					[objects addObject:object];
@@ -234,14 +234,14 @@
 				pool = [[NSAutoreleasePool alloc] init];
 			}
 			
-			NSString* name = [[NSFileManager threadSafeManager] displayNameAtPath:folder];
+			NSString* name = [[NSFileManager imb_threadSafeManager] displayNameAtPath:folder];
 			
 			IMBNode* subnode = [[IMBNode alloc] init];
 			subnode.parentNode = inNode;
 			subnode.mediaSource = folder;
 			subnode.identifier = [[self class] identifierForPath:folder];
 			subnode.name = name;
-			subnode.icon = [self iconForPath:folder]; //[[NSWorkspace threadSafeWorkspace] iconForFile:folder];
+			subnode.icon = [self iconForPath:folder]; //[[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
 			subnode.parser = self;
 			subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibrarController _reloadNodesWithWatchedPath:
@@ -258,7 +258,7 @@
 			object.index = index++;
 			object.imageLocation = (id)folder;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:folder];
+			object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
 
 			[objects addObject:object];
 			[object release];
@@ -279,16 +279,16 @@
 #pragma mark Helpers
 
 
-- (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI
+- (BOOL) fileAtPath:(NSString*)inPath conformToimb_doesUTI:(NSString*)inRequiredUTI
 {
-	NSString* uti = [NSString UTIForFileAtPath:inPath];
+	NSString* uti = [NSString imb_UTIForFileAtPath:inPath];
 	return (BOOL) UTTypeConformsTo((CFStringRef)uti,(CFStringRef)inRequiredUTI);
 }
 
 
 - (NSImage*) iconForPath:(NSString*)inPath
 {
-	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:inPath];
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:inPath];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16,16)];
 	return icon;

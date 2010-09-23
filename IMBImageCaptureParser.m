@@ -348,8 +348,8 @@
 				if( [anItem valueForKey:@"thuP"] )
 					subnode.icon = [self _getThumbnailSync:imageCaptureID];
 				if( !subnode.icon ) 
-					subnode.icon = [NSImage sharedGenericFolderIcon];
-					// subnode.icon = [[NSWorkspace threadSafeWorkspace] iconForFileType:@"'fldr'"];
+					subnode.icon = [NSImage imb_sharedGenericFolderIcon];
+					// subnode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:@"'fldr'"];
 				
 				BOOL hasSubnodes = [self _addICATree:[anItem valueForKey:@"tree"] toNode:subnode];
 				subnode.leaf = !hasSubnodes;
@@ -441,7 +441,7 @@
 	newNode.leaf = NO;
 	
 	if( !showsGroupNodes ) 
-		newNode.icon = [[NSWorkspace threadSafeWorkspace] iconForFile:@"/Applications/Image Capture.app"];
+		newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:@"/Applications/Image Capture.app"];
 	
 	newNode.group = showsGroupNodes;
 	newNode.groupType = kIMBGroupTypeNone;
@@ -933,7 +933,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 
 	// Trash any files that we already have...
 	
-	NSFileManager* mgr = [NSFileManager threadSafeManager];
+	NSFileManager* mgr = [NSFileManager imb_threadSafeManager];
 	for (NSString *path in receivedFiles)
 	{
 		NSError* error = nil;

@@ -66,7 +66,7 @@
 
 // This method removes all subviews from a view...
 
-- (void) removeAllSubviews
+- (void) imb_removeAllSubviews
 {
 	NSArray* subviews = [self.subviews copy];
 	
@@ -86,13 +86,13 @@
 // down windows, and views are bounds to controller objects. Since deallocation order is not guarranteed, it
 // is often the best strategy to remove all bindings before closing a window or document...
 
-- (void) unbindViewHierarchy
+- (void) imb_unbindViewHierarchy
 {
-	[NSView unbindViewHierarchy:self];
+	[NSView imb_unbindViewHierarchy:self];
 }
 
 
-+ (void) unbindViewHierarchy:(NSView*)inRootView
++ (void) imb_unbindViewHierarchy:(NSView*)inRootView
 {
 	// First completely unbind this view...
 	
@@ -110,7 +110,7 @@
 	
 	for (NSView* subview in subviews)
 	{
-		[NSView unbindViewHierarchy:subview];
+		[NSView imb_unbindViewHierarchy:subview];
 	}
 }
 

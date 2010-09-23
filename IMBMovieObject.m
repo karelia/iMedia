@@ -86,17 +86,17 @@
 		if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
 		{
 			NSURL* url = (NSURL*)_imageRepresentation;
-			self.posterFrame = [url quicklookCGImage];
+			self.posterFrame = [url imb_quicklookCGImage	];
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType])
 		{
 			NSString* path = (NSString*)_imageRepresentation;
-			self.posterFrame = [[NSURL fileURLWithPath:path] quicklookCGImage];
+			self.posterFrame = [[NSURL fileURLWithPath:path] imb_quicklookCGImage	];
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
 		{
 			NSURL* url = (NSURL*)_imageRepresentation;
-			self.posterFrame = [url quicklookCGImage];
+			self.posterFrame = [url imb_quicklookCGImage	];
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
 		{

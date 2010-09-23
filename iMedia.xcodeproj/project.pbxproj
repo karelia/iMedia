@@ -311,8 +311,6 @@
 		D0CD1E55101A452A000FA505 /* IMBiPhotoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CD1E53101A452A000FA505 /* IMBiPhotoParser.m */; };
 		D0CE6E1D11F6FA09005EE5B4 /* IMBMetadataTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E1B11F6FA09005EE5B4 /* IMBMetadataTransformer.h */; };
 		D0CE6E1E11F6FA09005EE5B4 /* IMBMetadataTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CE6E1C11F6FA09005EE5B4 /* IMBMetadataTransformer.m */; };
-		D0CE6E4311F6FD54005EE5B4 /* NSDictionary+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E4111F6FD54005EE5B4 /* NSDictionary+iMedia.h */; };
-		D0CE6E4411F6FD54005EE5B4 /* NSDictionary+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CE6E4211F6FD54005EE5B4 /* NSDictionary+iMedia.m */; };
 		D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0D635ED1035B4C500FF8631 /* IMBLightroomParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D635E91035B4C500FF8631 /* IMBLightroomParser.m */; };
 		D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1386,7 +1384,6 @@
 				D0363E7C11D3787800E0579F /* NSView+iMedia.h in Headers */,
 				D08F82B411E4A1C1006E618E /* IMBQLPreviewPanel.h in Headers */,
 				D0CE6E1D11F6FA09005EE5B4 /* IMBMetadataTransformer.h in Headers */,
-				D0CE6E4311F6FD54005EE5B4 /* NSDictionary+iMedia.h in Headers */,
 				D00D0AAA12258E4A000924AE /* IMBFlickrHeaderViewController.h in Headers */,
 				D00D0D271226A813000924AE /* IMBPanel.h in Headers */,
 				D04083C81235490F005375FC /* IMBFlickrObject.h in Headers */,
@@ -1715,7 +1712,6 @@
 				8FC2089E11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m in Sources */,
 				D0363E7D11D3787800E0579F /* NSView+iMedia.m in Sources */,
 				D0CE6E1E11F6FA09005EE5B4 /* IMBMetadataTransformer.m in Sources */,
-				D0CE6E4411F6FD54005EE5B4 /* NSDictionary+iMedia.m in Sources */,
 				D00D0AAB12258E4A000924AE /* IMBFlickrHeaderViewController.m in Sources */,
 				D00D0D261226A803000924AE /* IMBPanel.m in Sources */,
 				D04083C91235490F005375FC /* IMBFlickrObject.m in Sources */,

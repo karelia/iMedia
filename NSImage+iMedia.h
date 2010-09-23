@@ -52,20 +52,20 @@
 @interface NSImage (iMedia)
 
 // Try to load an image out of the bundle for another application and if not found fallback to one of our own.
-+ (NSImage *)imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle;
++ (NSImage *)imb_imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle;
 
-+ (NSImage *)imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime;
++ (NSImage *)imb_imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime;
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
-+ (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
-+ (NSString*) imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
++ (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath;
++ (NSString*) imb_imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
-+ (NSImage *) sharedGenericFolderIcon;						// Shared instance - can only have one size!
-+ (NSImage *) genericFolderIcon;							// Copied instance - can have any size
++ (NSImage *) imb_sharedGenericFolderIcon;						// Shared instance - can only have one size!
++ (NSImage *) imb_genericFolderIcon;							// Copied instance - can have any size
 	
-- (NSImage *) imageCroppedToRect:(NSRect)inCropRect;		// new instance
+- (NSImage *) imb_imageCroppedToRect:(NSRect)inCropRect;		// new instance
 
-+ (NSImage *) imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
++ (NSImage *) imb_imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
 
 
 @end

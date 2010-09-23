@@ -354,13 +354,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		// When volume are unmounted we would like to be notified so that we can disable file watching for 
 		// those paths...
 		
-		[[[NSWorkspace threadSafeWorkspace] notificationCenter]
+		[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter]
 			addObserver:self 
 			selector:@selector(_willUnmountVolume:)
 			name:NSWorkspaceWillUnmountNotification 
 			object:nil];
 			
-		[[[NSWorkspace threadSafeWorkspace] notificationCenter]
+		[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter]
 			addObserver:self 
 			selector:@selector(_didMountVolume:)
 			name:NSWorkspaceDidMountNotification 
@@ -373,7 +373,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) dealloc
 {
-	[[[NSWorkspace threadSafeWorkspace] notificationCenter] removeObserver:self];
+	[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter] removeObserver:self];
 
 	IMBRelease(_mediaType);
 	IMBRelease(_rootNodes);

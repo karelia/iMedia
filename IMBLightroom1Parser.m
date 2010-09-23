@@ -72,7 +72,7 @@
 
 + (NSString*) lightroomPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom"];
 }
 
 
@@ -113,7 +113,7 @@
 			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
 								   stringByAppendingString:@" Previews"]
 								  stringByAppendingPathExtension:@"lrdata"];
-			NSFileManager* fileManager = [NSFileManager threadSafeManager];
+			NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
 			
 			BOOL isDirectory;
 			if (!([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory)) {
@@ -228,7 +228,7 @@
 	static NSImage* folderIcon = nil;
 	
 	if (folderIcon == nil) {
-		folderIcon = [[NSImage sharedGenericFolderIcon] copy];
+		folderIcon = [[NSImage imb_sharedGenericFolderIcon] copy];
 	}
 	
 	return folderIcon;
@@ -239,7 +239,7 @@
 	static NSImage* groupIcon = nil;
 	
 	if (groupIcon == nil) {
-		groupIcon = [[NSImage sharedGenericFolderIcon] copy];
+		groupIcon = [[NSImage imb_sharedGenericFolderIcon] copy];
 	}
 	
 	return groupIcon;
@@ -250,7 +250,7 @@
 	static NSImage* collectionIcon = nil;
 	
 	if (collectionIcon == nil) {
-		collectionIcon = [[NSImage sharedGenericFolderIcon] copy];
+		collectionIcon = [[NSImage imb_sharedGenericFolderIcon] copy];
 	}
 	
 	return collectionIcon;

@@ -124,7 +124,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
+	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
 }
 
 - (NSString*) displayName
@@ -291,7 +291,7 @@
 	if ([[[path pathExtension] lowercaseString] isEqualToString:@"band"])
 	{
 		NSString* output = [path stringByAppendingPathComponent:@"Output/Output.aif"];
-		BOOL exists = [[NSFileManager threadSafeManager] fileExistsAtPath:output];
+		BOOL exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:output];
 		if (exists) path = output;
 	}
 

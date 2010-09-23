@@ -119,7 +119,7 @@
 
 + (NSString*) iPhotoPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iPhoto"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iPhoto"];
 }
 
 
@@ -219,7 +219,7 @@
 	
 	if (inOldNode == nil)
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 		
@@ -361,7 +361,7 @@
 	// For images we provide an optimized loading code...
 	
 	NSURL* url = [NSURL fileURLWithPath:path];
-	NSString* uti = [NSString UTIForFileAtPath:path];
+	NSString* uti = [NSString imb_UTIForFileAtPath:path];
 	
 	if ([type isEqualToString:IKImageBrowserCGImageRepresentationType])
 	{
@@ -415,7 +415,7 @@
 {
 	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path]];
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
 	if ([NSThread isMainThread])
@@ -434,7 +434,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 
@@ -453,7 +453,7 @@
 	NSDictionary* plist = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
-	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 		
 	@synchronized(self)

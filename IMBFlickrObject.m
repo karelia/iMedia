@@ -84,7 +84,7 @@
 	{
 		// The is our temp download folder...
 		
-		NSString* folder = [[NSFileManager threadSafeManager] sharedTemporaryFolder:@"quicklook"];
+		NSString* folder = [[NSFileManager imb_threadSafeManager] imb_sharedTemporaryFolder:@"quicklook"];
 
 		// Build a path for the download file...
 		
@@ -93,7 +93,7 @@
 		
 		// If the file is already there, then use it...
 		
-		if ([[NSFileManager threadSafeManager] fileExistsAtPath:path])
+		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
 		{
 			previewItemURL = [NSURL fileURLWithPath:path];
 		}

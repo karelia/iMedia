@@ -163,7 +163,7 @@
 	}
 	else
 	{
-//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager threadSafeManager] fileExistsAtPath:inPath]);
+//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
 	}
 	
 	return metadata;
@@ -181,8 +181,8 @@
 	NSString *path = [inMetadata objectForKey:@"path"];
 	NSString *comment = [inMetadata objectForKey:@"comment"];
 
-	NSString *UTI = [NSString UTIForFileAtPath:path];
-	NSString *kind = [NSString descriptionForUTI:UTI];
+	NSString *UTI = [NSString imb_UTIForFileAtPath:path];
+	NSString *kind = [NSString imb_descriptionForUTI:UTI];
 
 	if (kind)
 	{
@@ -192,7 +192,7 @@
 			@"Type",
 			@"Type label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",typeLabel,kind];
 	}
 	
@@ -204,7 +204,7 @@
 				@"Size",
 				@"Size label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@×%@",size,width,height];
 	}
 	
@@ -217,7 +217,7 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 
@@ -229,7 +229,7 @@
 																	@"Comment",
 																	@"Comment label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	

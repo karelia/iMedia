@@ -104,7 +104,7 @@
 
 + (NSString*) garageBandPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.GarageBand"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.GarageBand"];
 }
 
 
@@ -223,7 +223,7 @@
 
 - (IMBNode*) _unpopulatedRootNodes
 {
-	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:[IMBGarageBandParser garageBandPath]];
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:[IMBGarageBandParser garageBandPath]];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16.0,16.0)];
 	
@@ -258,7 +258,7 @@
 	
 	NSString* demoSongsPath = [IMBGarageBandParser demoSongsPath];
 
-	if ([[NSFileManager threadSafeManager] fileExistsAtPath:demoSongsPath])
+	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath])
 	{
 		IMBNode* demo = [[[IMBNode alloc] init] autorelease];
 		demo.parentNode = root;
@@ -279,7 +279,7 @@
 	
 	NSString* userSongsPath = [IMBGarageBandParser userSongsPath];
 
-	if ([[NSFileManager threadSafeManager] fileExistsAtPath:userSongsPath])
+	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath])
 	{
 		IMBNode* user = [[[IMBNode alloc] init] autorelease];
 		user.parentNode = root;
@@ -345,7 +345,7 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",artistLabel,artist];
 	}
 	
@@ -357,7 +357,7 @@
 			@"Album",
 			@"Album label in metadataDescription");
 
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",albumLabel,album];
 	}
 	
@@ -370,7 +370,7 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 	

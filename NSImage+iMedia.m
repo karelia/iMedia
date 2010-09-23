@@ -55,16 +55,16 @@
 @implementation NSImage (iMedia)
 
 // Actually ignore the mime type, but maybe later we can use it as a hint
-+ (NSImage *) imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
++ (NSImage *) imb_imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
 {
 	return [[[NSImage alloc] initWithData:aData] autorelease];
 }
 
 
 // Try to load an image out of the bundle for another application and if not found fallback to one of our own.
-+ (NSImage *)imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle
++ (NSImage *)imb_imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle
 {
-	NSString *pathToOtherApp = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:bundleID];
+	NSString *pathToOtherApp = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:bundleID];
 	NSImage *image = nil;
 	
 	if (pathToOtherApp)
@@ -83,18 +83,18 @@
 	return [image autorelease];
 }
 
-+ (NSImage *)imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime
++ (NSImage *)imb_imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime
 {
 	//need to strip the mime bit - data:image/x-icon;base64,
 	NSRange r = [base64WithMime rangeOfString:@"data:image/x-icon;base64,"];
 	NSString *base64 = [base64WithMime substringFromIndex:NSMaxRange(r)];
-	NSData *decoded = [base64 decodeBase64];
+	NSData *decoded = [base64 imb_decodeBase64];
 	NSImage *img = [[NSImage alloc] initWithData:decoded];
 	return [img autorelease];
 }
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
-+ (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
++ (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath;
 {
 	NSDictionary *result = nil;
 	CGImageSourceRef source = nil;
@@ -139,7 +139,7 @@
 }
 
 
-+ (NSString*) imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
++ (NSString*) imb_imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
 	NSMutableString* description = [NSMutableString string];
 	NSNumber* width = [inMetadata objectForKey:@"width"];
@@ -151,18 +151,6 @@
 	NSString* dateTime = [inMetadata objectForKey:@"dateTime"];
 	NSString* path = [inMetadata objectForKey:@"path"];
 
-	if (width != nil && height != nil)
-	{
-		NSString* size = NSLocalizedStringWithDefaultValue(
-				@"Size",
-				nil,IMBBundle(),
-				@"Size",
-				@"Size label in metadataDescription");
-		
-		if (description.length > 0) [description appendNewline];
-		[description appendFormat:@"%@: %@×%@",size,width,height];
-	}
-	
 	if (depth != nil || model != nil || type != nil)
 	{
 		NSString* typeLabel = NSLocalizedStringWithDefaultValue(
@@ -171,7 +159,7 @@
 				@"Type",
 				@"Type label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: ",typeLabel];
 		if (depth) [description appendFormat:@"%@bit ",depth];
 		if (model) [description appendFormat:@"%@ ",model];
@@ -179,8 +167,8 @@
 		
 		if (type)
 		{
-			NSString *UTI = [NSString UTIForFileType:type];
-			NSString *descUTI = [NSString descriptionForUTI:UTI];
+			NSString *UTI = [NSString imb_UTIForFileType:type];
+			NSString *descUTI = [NSString imb_descriptionForUTI:UTI];
 			if (descUTI)
 			{
 				[description appendFormat:@"%@",descUTI];
@@ -188,8 +176,8 @@
 		}
 		else if (path)
 		{
-			NSString *UTI = [NSString UTIForFileAtPath:path];
-			NSString *descUTI = [NSString descriptionForUTI:UTI];
+			NSString *UTI = [NSString imb_UTIForFileAtPath:path];
+			NSString *descUTI = [NSString imb_descriptionForUTI:UTI];
 			if (descUTI)
 			{
 				[description appendFormat:@"%@",descUTI];
@@ -197,15 +185,27 @@
 		}
 		else if (filetype)
 		{
-			NSString *UTI = [NSString UTIForFilenameExtension:filetype];
-			NSString *descUTI = [NSString descriptionForUTI:UTI];
+			NSString *UTI = [NSString imb_UTIForFilenameExtension:filetype];
+			NSString *descUTI = [NSString imb_descriptionForUTI:UTI];
 			if (descUTI)
 			{
 				[description appendFormat:@"%@",descUTI];
 			}
 		}
 	}
-	
+
+	if (width != nil && height != nil)
+	{
+		NSString* size = NSLocalizedStringWithDefaultValue(
+														   @"Size",
+														   nil,IMBBundle(),
+														   @"Size",
+														   @"Size label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@×%@",size,width,height];
+	}
+		
 	if (dateTime != nil)
 	{
 		NSString* dateLabel = NSLocalizedStringWithDefaultValue(
@@ -214,21 +214,21 @@
 				@"Date",
 				@"Date label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
-		[description appendFormat:@"%@: %@",dateLabel,[dateTime exifDateToLocalizedDisplayDate]];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",dateLabel,[dateTime imb_exifDateToLocalizedDisplayDate]];
 	}
 	
 	return description;
 }
 
 
-+ (NSImage *) sharedGenericFolderIcon
++ (NSImage *) imb_sharedGenericFolderIcon
 {
 	static NSImage *sGenericFolderIcon = nil;
 	
 	if (sGenericFolderIcon == nil)
 	{
-		sGenericFolderIcon = [[[NSWorkspace threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
+		sGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
 		[sGenericFolderIcon setScalesWhenResized:YES];
 		[sGenericFolderIcon setSize:NSMakeSize(16,16)];
 	}
@@ -242,13 +242,13 @@
 }
 
 
-+ (NSImage *) genericFolderIcon
++ (NSImage *) imb_genericFolderIcon
 {
-	return [[[self sharedGenericFolderIcon] copy] autorelease];
+	return [[[self imb_sharedGenericFolderIcon] copy] autorelease];
 }
 
 
-- (NSImage *) imageCroppedToRect:(NSRect)inCropRect
+- (NSImage *) imb_imageCroppedToRect:(NSRect)inCropRect
 {
 	NSRect dstRect = NSZeroRect;
 	dstRect.size = self.size;

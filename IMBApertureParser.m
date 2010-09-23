@@ -122,7 +122,7 @@
 
 + (NSString*) aperturePath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Aperture"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Aperture"];
 }
 
 
@@ -235,7 +235,7 @@
 	
 	if (inOldNode == nil)
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 
@@ -375,7 +375,7 @@
 	NSDictionary* plist = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
-	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 	
 	@synchronized(self)
@@ -811,7 +811,7 @@
 {
 	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path]];
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
 	if ([NSThread isMainThread])
@@ -832,7 +832,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 

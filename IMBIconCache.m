@@ -124,7 +124,7 @@ static IMBIconCache* sSharedIconCache;
 			if ([name isEqualToString:entry->fIconType])
 			{
 				// first try to find the specified image in the application bundle associated with the parser
-				NSImage* image = [NSImage imageResourceNamed:entry->fApplicationIconName
+				NSImage* image = [NSImage imb_imageResourceNamed:entry->fApplicationIconName
 											 fromApplication:bundleID
 												  fallbackTo:entry->fFallbackIconName];
 
@@ -144,7 +144,7 @@ static IMBIconCache* sSharedIconCache;
 		}
 
 		// if no type-specific image was found, use the fallback image
-		return [NSImage imageResourceNamed:mappingTable->fUnknownTypeEntry.fApplicationIconName
+		return [NSImage imb_imageResourceNamed:mappingTable->fUnknownTypeEntry.fApplicationIconName
 						   fromApplication:bundleID
 								fallbackTo:mappingTable->fUnknownTypeEntry.fFallbackIconName];
 	}
@@ -178,7 +178,7 @@ static IMBIconCache* sSharedIconCache;
 			{
 				image = [self __loadIconForType:inType fromBundleID:inBundleID withMappingTable:inMappingTable];
 				if (image) [bundleCache setObject:image forKey:inType];
-				else image = [NSImage sharedGenericFolderIcon];
+				else image = [NSImage imb_sharedGenericFolderIcon];
 			}
 		}
 	}

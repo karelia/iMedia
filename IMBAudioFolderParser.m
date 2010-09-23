@@ -140,7 +140,7 @@
 	}
 	else
 	{
-//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager threadSafeManager] fileExistsAtPath:inPath]);
+//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
 	}
 	
 	return metadata;
@@ -167,7 +167,7 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",artistLabel,artist];
 	}
 	
@@ -179,7 +179,7 @@
 			@"Album",
 			@"Album label in metadataDescription");
 
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",albumLabel,album];
 	}
 	
@@ -192,7 +192,7 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 	
@@ -278,7 +278,7 @@
 
 + (id) folderPath
 {
-	NSString* path = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
+	NSString* path = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
 	return [path stringByAppendingPathComponent:@"/Contents/Resources/Sound Effects"];
 }
 

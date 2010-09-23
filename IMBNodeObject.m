@@ -109,7 +109,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace threadSafeWorkspace] iconForFile:_imageLocation];
+	return [[NSWorkspace imb_threadSafeWorkspace] iconForFile:_imageLocation];
 }
 
 

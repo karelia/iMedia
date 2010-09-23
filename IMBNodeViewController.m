@@ -696,7 +696,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	for (NSString* path in paths)
 	{
-		exists = [[NSFileManager threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
+		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
 		
 		if (exists && directory)
 		{
@@ -718,7 +718,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	for (NSString* path in paths)
 	{
-		exists = [[NSFileManager threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
+		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
 		
 		if (exists && directory)
 		{
@@ -1230,9 +1230,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	// First remove all currently installed object views...
 	
-	[ibObjectHeaderView removeAllSubviews];
-	[ibObjectContainerView removeAllSubviews];
-	[ibObjectFooterView removeAllSubviews];
+	[ibObjectHeaderView imb_removeAllSubviews];
+	[ibObjectContainerView imb_removeAllSubviews];
+	[ibObjectFooterView imb_removeAllSubviews];
 	
 	// Install optional header view...
 	

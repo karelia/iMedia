@@ -55,7 +55,7 @@
 // Quicklook methods to create images from non-image files...
 // (Should be called on a background thread.)
 
-- (CGImageRef) quicklookCGImage;
+- (CGImageRef) imb_quicklookCGImage	;
 {
 	if ([NSThread isMainThread])
 	{
@@ -67,10 +67,10 @@
 }
 
 
-- (NSImage*) quicklookNSImage;
+- (NSImage*) imb_quicklookNSImage;
 {
 	NSImage* nsimage = nil;
-	CGImageRef cgimage = [self quicklookCGImage];
+	CGImageRef cgimage = [self imb_quicklookCGImage	];
 	
 	if (cgimage)
 	{

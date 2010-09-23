@@ -53,7 +53,7 @@
 
 @implementation NSFileManager (iMedia)
 
-+ (NSFileManager *)threadSafeManager
++ (NSFileManager *)imb_threadSafeManager
 {
 	NSFileManager*	instance = nil;
 	
@@ -79,7 +79,7 @@
 	return instance;	
 }
 
-- (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes
+- (BOOL)imb_createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes
 {
 	if ([path isAbsolutePath])
 	{
@@ -103,13 +103,13 @@
 	}
 	else
 	{
-		[NSException raise:@"iMediaException" format:@"createDirectoryPath:attributes: path not absolute:%@", path];
+		[NSException raise:@"iMediaException" format:@"imb_createDirectoryPath:attributes: path not absolute:%@", path];
 	}
 	
 	return [self fileExistsAtPath:path];
 }
 
-- (BOOL)isPathHidden:(NSString *)path
+- (BOOL)imb_isPathHidden:(NSString *)path
 {
 	LSItemInfoRecord	itemInfo;
 	NSURL*				pathURL = [NSURL fileURLWithPath:path];
@@ -121,7 +121,7 @@
 // Will resolve an alias into a path.. this code was taken from
 // see http://cocoa.karelia.com/Foundation_Categories/
 // see http://developer.apple.com/documentation/Cocoa/Conceptual/LowLevelFileMgmt/Tasks/ResolvingAliases.html
-- (NSString *)pathResolved:(NSString *)path
+- (NSString *)imb_pathResolved:(NSString *)path
 {
 	NSString *resolvedPath = NULL;
 	
@@ -157,7 +157,7 @@
 // Return (creating if necessary) a path to the shared iMedia temporary directory.
 // If you pass in a subfolder name, that will be created and appended.
 
-- (NSString*)sharedTemporaryFolder:(NSString*)dirName;
+- (NSString*)imb_sharedTemporaryFolder:(NSString*)dirName;
 {
 	NSString *directoryPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"iMedia"];
 	if (dirName && ![dirName isEqualToString:@""])
@@ -168,7 +168,7 @@
     return directoryPath;
 }
 
-- (NSString*)uniqueTemporaryFile:(NSString*)name
+- (NSString*)imb_uniqueTemporaryFile:(NSString*)name
 {
 	NSString *processName = [[NSProcessInfo processInfo] processName];
 	NSString *directoryName = [NSString stringWithFormat:@"%@_iMediaTemporary", processName];
@@ -176,12 +176,12 @@
 	
 	[self createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:NULL];
 	
-    return [self uniqueTemporaryFile:name withinDirectory:directoryPath];
+    return [self imb_uniqueTemporaryFile:name withinDirectory:directoryPath];
 }
 
-- (NSString*)uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath
+- (NSString*)imb_uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath
 {
-	NSString *temporaryPath = [self uniqueTemporaryPathWithinDirectory:directoryPath];
+	NSString *temporaryPath = [self imb_uniqueTemporaryPathWithinDirectory:directoryPath];
 	
 	if ([name length] > 0) {
 		[self createDirectoryAtPath:temporaryPath withIntermediateDirectories:YES attributes:nil error:NULL];
@@ -195,7 +195,7 @@
 // Creates a new, unique path (for a directory or a file), so don't use this if you want to match up
 // with an existing downloaded file!
 
-- (NSString*)uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath
+- (NSString*)imb_uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath
 {
 	NSString *tempFileTemplate = [directoryPath stringByAppendingPathComponent:@"XXXXXXXXXXXX"];
 	const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
@@ -217,7 +217,7 @@
 }
 
 
-- (NSString*) volumeNameAtPath:(NSString*)inPath
+- (NSString*) imb_volumeNameAtPath:(NSString*)inPath
 {
 	NSString* path = [inPath stringByStandardizingPath];
 	NSArray* components = [path pathComponents];
@@ -245,7 +245,7 @@
 }
 
 
-- (NSString*) relativePathToVolumeAtPath:(NSString*)inPath
+- (NSString*) imb_relativePathToVolumeAtPath:(NSString*)inPath
 {
 	NSString* path = [inPath stringByStandardizingPath];
 
@@ -269,7 +269,7 @@
 }
 
 
-- (BOOL) fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged
+- (BOOL) imb_fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged
 {
 	BOOL exists = NO;
 	BOOL wasChanged = NO;
@@ -286,8 +286,8 @@
 		{
 			if ([path hasPrefix:@"/Volumes/"])
 			{
-				NSString* volName = [self volumeNameAtPath:path];
-				NSString* relPath = [self relativePathToVolumeAtPath:path];
+				NSString* volName = [self imb_volumeNameAtPath:path];
+				NSString* relPath = [self imb_relativePathToVolumeAtPath:path];
 				NSString* newPath;
 				
 				if (!exists)

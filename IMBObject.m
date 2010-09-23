@@ -381,7 +381,7 @@
 	else if ([_location isKindOfClass:[NSString class]])
 	{
 		NSString* path = (NSString*)_location;
-		return [[NSFileManager threadSafeManager] fileExistsAtPath:path];
+		return [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path];
 	}
 	
 	return NO;
@@ -404,17 +404,17 @@
 		
 	if ([self isLocalFile])
 	{
-		uti = [NSString UTIForFileAtPath:path];
+		uti = [NSString imb_UTIForFileAtPath:path];
 	}
 	else if (extension != nil)
 	{
-		uti = [NSString UTIForFilenameExtension:extension];
+		uti = [NSString imb_UTIForFilenameExtension:extension];
 	}
 
-	if (uti != nil && [NSString UTI:uti conformsToUTI:(NSString*)kUTTypeAliasFile])
+	if (uti != nil && [NSString imb_doesUTI:uti conformToimb_doesUTI:(NSString*)kUTTypeAliasFile])
 	{
-		path = [path resolvedPath];
-		uti = [NSString UTIForFileAtPath:path];
+		path = [path imb_resolvedPath];
+		uti = [NSString imb_UTIForFileAtPath:path];
 	}
 	
 	return uti;
@@ -433,7 +433,7 @@
 	NSString* extension = [path pathExtension];
 	if (extension==nil || [extension length]==0) extension = @"jpg";
 	
-	return [[NSWorkspace threadSafeWorkspace] iconForFileType:extension];
+	return [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:extension];
 }
 
 

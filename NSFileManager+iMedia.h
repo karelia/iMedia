@@ -51,19 +51,19 @@
 
 @interface NSFileManager (iMedia)
 
-+ (NSFileManager *)threadSafeManager;
-- (BOOL)isPathHidden:(NSString *)path;
-- (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
-- (NSString *)pathResolved:(NSString *)path;
++ (NSFileManager *)imb_threadSafeManager;
+- (BOOL)imb_isPathHidden:(NSString *)path;
+- (BOOL)imb_createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
+- (NSString *)imb_pathResolved:(NSString *)path;
 
-- (NSString*)uniqueTemporaryFile:(NSString*)name;
-- (NSString*)uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
-- (NSString*)uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath;
+- (NSString*)imb_uniqueTemporaryFile:(NSString*)name;
+- (NSString*)imb_uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
+- (NSString*)imb_uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath;
 
-- (NSString*)sharedTemporaryFolder:(NSString*)dirName;
+- (NSString*)imb_sharedTemporaryFolder:(NSString*)dirName;
 
-- (NSString*) volumeNameAtPath:(NSString*)inPath;
-- (NSString*) relativePathToVolumeAtPath:(NSString*)inPath;
-- (BOOL) fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
+- (NSString*) imb_volumeNameAtPath:(NSString*)inPath;
+- (NSString*) imb_relativePathToVolumeAtPath:(NSString*)inPath;
+- (BOOL) imb_fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
 
 @end
