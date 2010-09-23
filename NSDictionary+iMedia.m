@@ -63,6 +63,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+*** NOT ACTUALLY USED -- WE CAN DELETE ****
+
+
 #pragma mark
 
 @implementation NSDictionary (iMedia)
@@ -74,7 +77,7 @@
 // This method is useful for sorting images by image size, provided that the metadata dictionary contains  
 // width and height values...
 
-- (NSComparisonResult) metadataSizeCompare:(NSDictionary*)inDictionary
+- (NSComparisonResult) imb_metadataSizeCompare:(NSDictionary*)inDictionary
 {
 	NSInteger w1 = [[self objectForKey:@"width"] integerValue];
 	NSInteger h1 = [[self objectForKey:@"height"] integerValue];

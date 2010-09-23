@@ -235,11 +235,11 @@ static NSString* sIMBFlickrDownloadSizeKey = @"flickrDownloadSize";
 	[self registerDefaultPrefsValue:path forKey:sIMBDownloadFolderPathKey];
 	[self registerDefaultPrefsValue:[NSNumber numberWithInt:kIMBFlickrSizeSpecifierLarge] forKey:sIMBFlickrDownloadSizeKey];
 
-	NSString* preview = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Preview"];
-	NSString* qtplayerx = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.QuickTimePlayerX"];
-	NSString* safari = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
-	NSString* addressbook = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.AddressBook"];
-	NSString* photoshop = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Photoshop"];
+	NSString* preview = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Preview"];
+	NSString* qtplayerx = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.QuickTimePlayerX"];
+	NSString* safari = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
+	NSString* addressbook = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.AddressBook"];
+	NSString* photoshop = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Photoshop"];
 
 	NSMutableDictionary* viewerAppPaths = [NSMutableDictionary dictionary];
 	if (preview) [viewerAppPaths setObject:preview forKey:kIMBMediaTypeImage];

@@ -47,9 +47,11 @@
 // Author: Peter Baumgartner
 
 
+*** NOT ACTUALLY USED -- WE CAN DELETE ****
+
 
 @interface NSDictionary (iMedia)
 
-- (NSComparisonResult) metadataSizeCompare:(NSDictionary*)inDictionary;
+- (NSComparisonResult) imb_metadataSizeCompare:(NSDictionary*)inDictionary;
 
 @end

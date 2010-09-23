@@ -51,7 +51,7 @@
 
 @interface NSURL (imedia)
 
-- (CGImageRef) quicklookCGImage;
-- (NSImage*) quicklookNSImage;
+- (CGImageRef) imb_quicklookCGImage;
+- (NSImage*) imb_quicklookNSImage;
 
 @end

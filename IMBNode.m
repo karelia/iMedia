@@ -424,7 +424,7 @@
 		return NSOrderedAscending;
 	}
 	
-	return [self.name finderCompare:inNode.name];
+	return [self.name imb_finderCompare:inNode.name];
 }
 
 

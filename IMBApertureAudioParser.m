@@ -113,7 +113,7 @@
 {
 //	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
 //	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-//	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+//	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path]];
 //	NSString* description = [self metadataDescriptionForMetadata:metadata];
 //
 //	if ([NSThread isMainThread])

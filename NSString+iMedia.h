@@ -51,37 +51,37 @@
 
 @interface NSObject ( NSString_UTI )
 
-+ (NSString *)UTIForFileType:(NSString *)aFileType;
-+ (NSString *)descriptionForUTI:(NSString *)aUTI;
-+ (NSString *)UTIForFilenameExtension:(NSString *)anExtension;
-+ (NSString *)UTIForFileAtPath:(NSString *)anAbsolutePath;
-+ (BOOL) UTI:(NSString *)aUTI conformsToUTI:(NSString *)aConformsToUTI;
++ (NSString *)imb_UTIForFileType:(NSString *)aFileType;
++ (NSString *)imb_descriptionForUTI:(NSString *)aUTI;
++ (NSString *)imb_UTIForFilenameExtension:(NSString *)anExtension;
++ (NSString *)imb_UTIForFileAtPath:(NSString *)anAbsolutePath;
++ (BOOL) imb_doesUTI:(NSString *)aUTI conformToimb_doesUTI:(NSString *)aConformsToUTI;
 
 @end
 
 @interface NSString ( iMedia )
 
-- (NSString *)pathForURLString;
-- (NSString *)path;
+- (NSString *)imb_pathForURLString;
+- (NSString *)imb_path;
 
-- (NSData *) decodeBase64;
-- (NSData *) decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
+- (NSData *) imb_decodeBase64;
+- (NSData *) imb_decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
 
 + (id)uuid;
 
-- (NSString *)exifDateToLocalizedDisplayDate;
+- (NSString *)imb_exifDateToLocalizedDisplayDate;
 
-+ (NSString *)stringFromStarRating:(NSUInteger)aRating;
++ (NSString *)imb_stringFromStarRating:(NSUInteger)aRating;
 
-- (NSComparisonResult)finderCompare:(NSString *)aString;
+- (NSComparisonResult)imb_finderCompare:(NSString *)aString;
 
-- (NSString *)resolvedPath;
+- (NSString *)imb_resolvedPath;
 
 @end
 
 @interface NSMutableString (iMedia)
 
-- (void)appendNewline;
+- (void)imb_appendNewline;
 
 @end
 

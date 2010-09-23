@@ -57,7 +57,7 @@
 - (IMBNode *)recursivelyParseFolder:(NSXMLElement *)folder
 {
 	IMBNode *node = [[IMBNode alloc] init];
-	[node setIcon:[NSImage genericFolderIcon]];
+	[node setIcon:[NSImage imb_genericFolderIcon]];
 	[node setName:[[[folder elementsForName:@"title"] objectAtIndex:0] stringValue]];
 	[node setIdentifier:[node name]];
 ///	[node setParserClassName:NSStringFromClass([self class])];

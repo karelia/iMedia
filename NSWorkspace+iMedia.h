@@ -51,8 +51,8 @@
 
 @interface NSWorkspace (iMediaExtensions)
 
-+ (NSWorkspace *)threadSafeWorkspace;
-- (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID;
-- (NSImage *)iconForFile:(NSString *)path size:(NSSize)size;
++ (NSWorkspace *)imb_threadSafeWorkspace;
+- (NSImage *)imb_iconForAppWithBundleIdentifier:(NSString *)bundleID;
+- (NSImage *)imb_iconForFile:(NSString *)path size:(NSSize)size;
 
 @end

@@ -253,7 +253,7 @@ static NSArray* sSupportedUTIs = nil;
 				path = [path substringWithRange:NSMakeRange(1, [path length] - 3)];
  
 				BOOL exists,changed;
-				exists = [[NSFileManager threadSafeManager] fileExistsAtPath:&path wasChanged:&changed];
+				exists = [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
 				if (exists) [inLibraryPaths addObject:path];
 				
                 path = @"";
@@ -334,7 +334,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (inOldNode == nil)
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 		
@@ -536,7 +536,7 @@ static NSArray* sSupportedUTIs = nil;
 			object.index = index++;
 			object.imageLocation = (id)self.mediaSource;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+			object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 			
 			[(NSMutableArray*)inFoldersNode.objects addObject:object];
 			
@@ -635,7 +635,7 @@ static NSArray* sSupportedUTIs = nil;
 			object.index = index++;
 			object.imageLocation = (id)self.mediaSource;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+			object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 			
 			[(NSMutableArray*)inParentNode.objects addObject:object];
 		}
@@ -754,7 +754,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (NSImage*) largeFolderIcon
 {
-	NSImage* icon = [NSImage genericFolderIcon];
+	NSImage* icon = [NSImage imb_genericFolderIcon];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(64.0,64.0)];
 	
@@ -916,7 +916,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (BOOL) canOpenImageFileAtPath:(NSString*)inPath
 {
-	NSString* uti = [NSString UTIForFileAtPath:inPath];
+	NSString* uti = [NSString imb_UTIForFileAtPath:inPath];
 	NSArray* supportedUTIs = [self supportedUTIs];
 	
 	for (NSString* supportedUTI in supportedUTIs)
@@ -1210,7 +1210,7 @@ static NSArray* sSupportedUTIs = nil;
 	{
 		IMBLightroomObject* object = (IMBLightroomObject*)inObject;
 		NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-		[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path]];
 		NSString* description = [self metadataDescriptionForMetadata:metadata];
 		
 		if ([NSThread isMainThread])
@@ -1232,7 +1232,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 
@@ -1446,7 +1446,7 @@ static NSArray* sSupportedUTIs = nil;
 																	  nil,IMBBundle(),
 																	  @"Open Master Image With %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
-			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig editorAppForMediaType:self.mediaType]];
+			NSString* appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:[IMBConfig editorAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
 			
 			[menuItem setTitle:title];
@@ -1457,7 +1457,7 @@ static NSArray* sSupportedUTIs = nil;
 																	  nil,IMBBundle(),
 																	  @"Open Master Image With %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
-			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig viewerAppForMediaType:self.mediaType]];
+			NSString* appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:[IMBConfig viewerAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
 			
 			[menuItem setTitle:title];
@@ -1487,7 +1487,7 @@ static NSArray* sSupportedUTIs = nil;
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 	NSString* path = [lightroomObject path];
 	
-	if ([[NSFileManager threadSafeManager] fileExistsAtPath:path]) {
+	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path]) {
 		IMBMutableOrderedDictionary *applications = [IMBMutableOrderedDictionary orderedDictionaryWithCapacity:2];
 		
 		NSString* editorAppKey = [IMBConfig editorAppForMediaType:self.mediaType];
@@ -1502,7 +1502,7 @@ static NSArray* sSupportedUTIs = nil;
 																	  nil,IMBBundle(),
 																	  @"Open Processed Image in %@",
 																	  @"Menu item in context menu of IMBLightroomParser");
-			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+			NSString* appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
 
 			NSString* selector = [applications objectForKey:appPath];
@@ -1525,7 +1525,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
 	NSString* folder = [absolutePyramidPath stringByDeletingLastPathComponent];
 	
-	[[NSWorkspace threadSafeWorkspace] selectFile:absolutePyramidPath inFileViewerRootedAtPath:folder];
+	[[NSWorkspace imb_threadSafeWorkspace] selectFile:absolutePyramidPath inFileViewerRootedAtPath:folder];
 }
 
 - (void)openPreviewInApp:(id)sender
@@ -1533,7 +1533,7 @@ static NSArray* sSupportedUTIs = nil;
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)[sender representedObject];
 	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
 	
-	[[NSWorkspace threadSafeWorkspace] openURL:url];
+	[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
 }
 
 - (void)openPreviewInEditorApp:(id)sender
@@ -1542,7 +1542,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
 	NSString* app = [IMBConfig editorAppForMediaType:self.mediaType];
 	
-	[[NSWorkspace threadSafeWorkspace] openFile:[url path] withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:[url path] withApplication:app];
 }
 
 - (void)openPreviewInViewerApp:(id)sender
@@ -1551,7 +1551,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
 	NSString* app = [IMBConfig viewerAppForMediaType:self.mediaType];
 	
-	[[NSWorkspace threadSafeWorkspace] openFile:[url path] withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:[url path] withApplication:app];
 }
 
 @end

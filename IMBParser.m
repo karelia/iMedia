@@ -223,7 +223,7 @@
 	
 	// Get the uti for out object...
 	
-	NSString* uti = [NSString UTIForFileAtPath:path];
+	NSString* uti = [NSString imb_UTIForFileAtPath:path];
 	
 	// Path...
 	
@@ -261,7 +261,7 @@
 		}
 		else
 		{
-			imageRepresentation = [url quicklookNSImage];
+			imageRepresentation = [url imb_quicklookNSImage];
 		}	
 	}
 	
@@ -275,7 +275,7 @@
 		}
 		else
 		{
-			imageRepresentation = (id)[url quicklookCGImage];
+			imageRepresentation = (id)[url imb_quicklookCGImage	];
 		}
 	}
 	
@@ -306,14 +306,14 @@
 		}
 		else
 		{
-			CGImageRef image = [url quicklookCGImage];
+			CGImageRef image = [url imb_quicklookCGImage	];
 			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
 		}
 	}
 		
 	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		imageRepresentation = url; // (id)[url quicklookCGImage];
+		imageRepresentation = url; // (id)[url imb_quicklookCGImage	];
 	}
 
 	// Return the result to the main thread...

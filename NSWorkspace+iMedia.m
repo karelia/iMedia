@@ -51,7 +51,7 @@
 
 @implementation NSWorkspace (iMediaExtensions)
 
-+ (NSWorkspace *)threadSafeWorkspace
++ (NSWorkspace *)imb_threadSafeWorkspace
 {
 	NSWorkspace*	instance = nil;
 
@@ -79,7 +79,7 @@
 	return instance;	
 }
 	
-- (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID
+- (NSImage *)imb_iconForAppWithBundleIdentifier:(NSString *)bundleID
 {
 	NSString *path = [self absolutePathForAppBundleWithIdentifier:bundleID];
 	if (nil == path)
@@ -89,7 +89,7 @@
 	return [self iconForFile:path];
 }
 
-- (NSImage *)iconForFile:(NSString *)path size:(NSSize)size
+- (NSImage *)imb_iconForFile:(NSString *)path size:(NSSize)size
 {
 	NSImage *icon = [self iconForFile:path];
 	[icon setScalesWhenResized:YES];

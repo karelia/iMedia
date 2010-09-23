@@ -73,7 +73,7 @@
 
 + (NSString*) lightroomPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
 }
 
 
@@ -112,7 +112,7 @@
 			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
 								   stringByAppendingString:@" Previews"]
 								  stringByAppendingPathExtension:@"lrdata"];
-			NSFileManager* fileManager = [NSFileManager threadSafeManager];
+			NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
 			
 			BOOL isDirectory;
 			if (!([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory)) {
@@ -287,10 +287,10 @@
 		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"icon_folder.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
-		image = [image imageCroppedToRect:NSMakeRect(2,1,19,16)];
+		image = [image imb_imageCroppedToRect:NSMakeRect(2,1,19,16)];
 		
 		if (image == nil) {
-			image = [NSImage sharedGenericFolderIcon];
+			image = [NSImage imb_sharedGenericFolderIcon];
 		}
 		
 		folderIcon = [image copy];
@@ -309,10 +309,10 @@
 		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"groupCreation.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
-		image = [image imageCroppedToRect:NSMakeRect(2,2,19,16)];
+		image = [image imb_imageCroppedToRect:NSMakeRect(2,2,19,16)];
 		
 		if (image == nil) {
-			image = [NSImage sharedGenericFolderIcon];
+			image = [NSImage imb_sharedGenericFolderIcon];
 		}
 		
 		groupIcon = [image copy];
@@ -331,10 +331,10 @@
 		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"collectionCreation.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
-		image = [image imageCroppedToRect:NSMakeRect(1,1,19,16)];
+		image = [image imb_imageCroppedToRect:NSMakeRect(1,1,19,16)];
 		
 		if (image == nil) {
-			image = [NSImage sharedGenericFolderIcon];
+			image = [NSImage imb_sharedGenericFolderIcon];
 		}
 		
 		collectionIcon = [image copy];

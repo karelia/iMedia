@@ -82,7 +82,7 @@
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
-	return [NSImage metadataFromImageAtPath:inPath];
+	return [NSImage imb_metadataFromImageAtPath:inPath];
 }
 
 
@@ -90,7 +90,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 

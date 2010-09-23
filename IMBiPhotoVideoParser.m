@@ -140,8 +140,8 @@
 {
 	NSString *comment = [inMetadata objectForKey:@"Comment"];
 	NSString *type = [inMetadata objectForKey:@"ImageType"];		// like MooV
-	NSString *UTI = [NSString UTIForFileType:type];
-	NSString *kind = [NSString descriptionForUTI:UTI];
+	NSString *UTI = [NSString imb_UTIForFileType:type];
+	NSString *kind = [NSString imb_descriptionForUTI:UTI];
 	// NSString *dateTimeInterval = [inMetadata objectForKey:@"DateAsTimerInterval"];
 		
 	NSString *thumbPath  = [inMetadata objectForKey:@"ThumbPath"];		// can use this instead of quicklook
@@ -153,7 +153,7 @@
 															@"Type",
 															@"Type label in metadataDescription");
 	
-	if (description.length > 0) [description appendNewline];
+	if (description.length > 0) [description imb_appendNewline];
 	[description appendFormat:@"%@: %@",typeLabel,kind];
 	
 	NSString *width = [inMetadata objectForKey:@"width"];
@@ -168,7 +168,7 @@
 														   @"Size",
 														   @"Size label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@×%@",size,width,height];
 	}
 	
@@ -181,7 +181,7 @@
 																	@"Time label in metadataDescription");
 		
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 	
@@ -193,7 +193,7 @@
 																	@"Comment",
 																	@"Comment label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	

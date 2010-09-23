@@ -147,7 +147,7 @@
 	if ([obj isKindOfClass:[IMBObject class]]) {
 		IMBObject* imbObject = (IMBObject*) obj;
 		NSURL* webPage = [[imbObject metadata] objectForKey:@"webPageURL"];
-		[[NSWorkspace threadSafeWorkspace] openURL:webPage];
+		[[NSWorkspace imb_threadSafeWorkspace] openURL:webPage];
 	} else {
 		NSLog (@"Can't handle this kind of object.");
 	}
@@ -476,13 +476,13 @@
 	NSString* comment = [inMetadata objectForKey:@"descriptionText"];
 	NSString* tags = [inMetadata objectForKey:@"tags"];
 
-	NSString* info = [NSImage imageMetadataDescriptionForMetadata:inMetadata];
+	NSString* info = [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 	
 	NSMutableString* description = [NSMutableString string];
 	
 	if (!canDownload)
 	{
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@",
 			NSLocalizedStringWithDefaultValue(
 			@"IMBFlickrParser.menu.downloadingNotPermitted",
@@ -499,13 +499,13 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",artist,ownername];
 	}
 	
 	if (info)
 	{
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@",info];
 	}
 	
@@ -517,7 +517,7 @@
 																	@"Comment",
 																	@"Comment label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
@@ -529,7 +529,7 @@
 																	@"Tags",
 																	@"Tags (Flickr term for keywords) label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",tagsLabel,tags];
 	}
 	

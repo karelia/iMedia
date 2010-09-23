@@ -365,7 +365,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	if ([localURL isFileURL])
 	{
 		BOOL exists,directory;
-		exists = [[NSFileManager threadSafeManager] fileExistsAtPath:[localURL path] isDirectory:&directory];
+		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:[localURL path] isDirectory:&directory];
 		
 		if (!exists || directory)
 		{
@@ -386,7 +386,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 			// Now, copy this to the download folder path ... ?
 			NSString *fullPath = [self.downloadFolderPath stringByAppendingPathComponent:[[localURL path] lastPathComponent]];
 			NSError *err = nil;
-			[[NSFileManager threadSafeManager] copyItemAtPath:[localURL path] toPath:fullPath error:&err];
+			[[NSFileManager imb_threadSafeManager] copyItemAtPath:[localURL path] toPath:fullPath error:&err];
 			if (err)
 			{
 				NSLog(@"%@", err);
@@ -593,7 +593,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				
 				if (downloadFolderPath == nil)
 				{
-					downloadFolderPath = [[NSFileManager threadSafeManager] sharedTemporaryFolder:@"downloads"];
+					downloadFolderPath = [[NSFileManager imb_threadSafeManager] imb_sharedTemporaryFolder:@"downloads"];
 				}
 				
 				NSString* filename = [[url path] lastPathComponent];
@@ -607,7 +607,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 				// If we already have a local file, and the option key is not down, then use the local file...
 				
 				unsigned eventModifierFlags = [[NSApp currentEvent] modifierFlags];				
-				if ([[NSFileManager threadSafeManager] fileExistsAtPath:localPath]
+				if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:localPath]
 					&& 0 == (eventModifierFlags & NSAlternateKeyMask))
 				{
 					downloadOp.localPath = localPath;	// Indicate already-ready local path, meaning that no download needs to actually happen
@@ -682,7 +682,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	
 	// Trash any files that we already have...
 	
-	NSFileManager* mgr = [NSFileManager threadSafeManager];
+	NSFileManager* mgr = [NSFileManager imb_threadSafeManager];
 	
 	for (NSURL* url in self.localURLs)
 	{

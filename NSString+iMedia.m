@@ -62,7 +62,7 @@
 
 //  convert to UTI
 
-+ (NSString *)UTIForFileAtPath:(NSString *)anAbsolutePath
++ (NSString *)imb_UTIForFileAtPath:(NSString *)anAbsolutePath
 {
 	NSString *result = nil;
 	FSRef fileRef;
@@ -90,7 +90,7 @@
 		NSString *extension = [anAbsolutePath pathExtension];
 		if ( (nil != extension) && ![extension isEqualToString:@""] )
 		{
-			result = [self UTIForFilenameExtension:extension];
+			result = [self imb_UTIForFilenameExtension:extension];
 		}
 	}
 	
@@ -102,7 +102,7 @@
 		{
 			fileType = [fileType substringWithRange:NSMakeRange(1,4)];
 		}
-		result = [self UTIForFileType:fileType];
+		result = [self imb_UTIForFileType:fileType];
 		if ([result hasPrefix:@"dyn."])
 		{
 			result = nil;		// reject a dynamic type if it tries that.
@@ -111,7 +111,7 @@
 	
 	if (nil == result)	// not found, figure out if it's a directory or not
 	{
-		NSFileManager *fm = [NSFileManager threadSafeManager];
+		NSFileManager *fm = [NSFileManager imb_threadSafeManager];
 		BOOL isDirectory;
 		if ( [fm fileExistsAtPath:anAbsolutePath isDirectory:&isDirectory] )
 		{
@@ -124,7 +124,7 @@
 	return result;
 }
 
-+ (NSString *)UTIForFilenameExtension:(NSString *)anExtension
++ (NSString *)imb_UTIForFilenameExtension:(NSString *)anExtension
 {
 	NSString *UTI = nil;
 	
@@ -152,13 +152,13 @@
 	return UTI;
 }
 
-+ (NSString *)descriptionForUTI:(NSString *)aUTI;
++ (NSString *)imb_descriptionForUTI:(NSString *)aUTI;
 {
 	CFStringRef result = UTTypeCopyDescription((CFStringRef)aUTI);
 	return [NSMakeCollectable(result) autorelease];	
 }
 
-+ (NSString *)UTIForFileType:(NSString *)aFileType;
++ (NSString *)imb_UTIForFileType:(NSString *)aFileType;
 
 {
 	CFStringRef result = UTTypeCreatePreferredIdentifierForTag(
@@ -172,7 +172,7 @@
 // See list here:
 // http://developer.apple.com/documentation/Carbon/Conceptual/understanding_utis/utilist/chapter_4_section_1.html
 
-+ (BOOL) UTI:(NSString *)aUTI conformsToUTI:(NSString *)aConformsToUTI
++ (BOOL) imb_doesUTI:(NSString *)aUTI conformToimb_doesUTI:(NSString *)aConformsToUTI
 {
 	return UTTypeConformsTo((CFStringRef)aUTI, (CFStringRef)aConformsToUTI);
 }
@@ -184,7 +184,7 @@
 @implementation NSString ( iMedia )
 
 // Convert a file:// URL (as a string) to just its path
-- (NSString *)pathForURLString;
+- (NSString *)imb_pathForURLString;
 {
 	NSString *result = self;
 	if ([self hasPrefix:@"file://"])
@@ -196,17 +196,17 @@
 }
 
 // For compatibility with NSURL as in [(NSURL*)stringOrURL path]
-- (NSString *)path
+- (NSString *)imb_path
 {
-	return [self pathForURLString];
+	return [self imb_pathForURLString];
 }
 
-- (NSData *) decodeBase64;
+- (NSData *) imb_decodeBase64;
 {
-	return [self decodeBase64WithNewlines: YES];
+	return [self imb_decodeBase64WithNewlines: YES];
 }
 
-- (NSData *) decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
+- (NSData *) imb_decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
 {
 	// Create a memory buffer containing Base64 encoded string data
 	const char *UTF8String = [self UTF8String];
@@ -238,7 +238,7 @@
 	return (NSString *)[NSMakeCollectable(uuidStr) autorelease];
 }
 
-//- (NSString *)exifDateToLocalizedDisplayDate
+//- (NSString *)imb_exifDateToLocalizedDisplayDate
 //{
 //	static NSDateFormatter *parser = nil;
 //	static NSDateFormatter *formatter = nil;
@@ -272,7 +272,7 @@
 // cores, which caused the above method to fail badly, despite the fact that I tried to safeguard it with the 
 // @synchronized directive...
 
-- (NSString *)exifDateToLocalizedDisplayDate
+- (NSString *)imb_exifDateToLocalizedDisplayDate
 {
 	NSDateFormatter *parser = [[NSDateFormatter alloc] init];
 	[parser setDateFormat:@"yyyy':'MM':'dd kk':'mm':'ss"];
@@ -292,7 +292,7 @@
 }
 
 
-+ (NSString *)stringFromStarRating:(NSUInteger)aRating;
++ (NSString *)imb_stringFromStarRating:(NSUInteger)aRating;
 {
 	static unichar blackStars[] = { 0x2605, 0x2605, 0x2605, 0x2605, 0x2605 };
 	aRating = MIN((NSUInteger)5,aRating);	// make sure not above 5
@@ -309,7 +309,7 @@
 //  http://developer.apple.com/qa/qa2004/qa1159.html
 //
 
-- (NSComparisonResult)finderCompare:(NSString *)aString
+- (NSComparisonResult)imb_finderCompare:(NSString *)aString
 {
 	SInt32 compareResult;
 	
@@ -330,7 +330,7 @@
 	return (CFComparisonResult) compareResult;
 }
 
-- (NSString *)resolvedPath
+- (NSString *)imb_resolvedPath
 {
 	NSString* path = self;
 	OSStatus err = noErr;
@@ -365,7 +365,7 @@
 
 @implementation NSMutableString (iMedia)
 
-- (void)appendNewline;
+- (void)imb_appendNewline;
 {
 	[self appendString:@"\n"];
 }

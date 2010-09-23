@@ -119,7 +119,7 @@
 
 + (NSString*) iTunesPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iTunes"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iTunes"];
 }
 
 
@@ -213,7 +213,7 @@
 	
 	if (inOldNode == nil)
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 
@@ -335,7 +335,7 @@
 	NSDictionary* plist = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
-	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 	
 	@synchronized(self)
@@ -725,7 +725,7 @@
 				@"Type",
 				@"Type label in metadataDescription");
 
-			if (description.length > 0) [description appendNewline];
+			if (description.length > 0) [description imb_appendNewline];
 			[description appendFormat:@"%@: %@",typeLabel,kind];
 		}
 		
@@ -737,7 +737,7 @@
 					@"Size",
 					@"Size label in metadataDescription");
 			
-			if (description.length > 0) [description appendNewline];
+			if (description.length > 0) [description imb_appendNewline];
 			[description appendFormat:@"%@: %@×%@",size,width,height];
 		}
 	}
@@ -751,7 +751,7 @@
 				@"Artist",
 				@"Artist label in metadataDescription");
 
-			if (description.length > 0) [description appendNewline];
+			if (description.length > 0) [description imb_appendNewline];
 			[description appendFormat:@"%@: %@",artistLabel,artist];
 		}
 		
@@ -763,7 +763,7 @@
 				@"Album",
 				@"Album label in metadataDescription");
 
-			if (description.length > 0) [description appendNewline];
+			if (description.length > 0) [description imb_appendNewline];
 			[description appendFormat:@"%@: %@",albumLabel,album];
 		}
 	}
@@ -777,7 +777,7 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 
@@ -789,7 +789,7 @@
 																	@"Comment",
 																	@"Comment label in metadataDescription");
 		
-		if (description.length > 0) [description appendNewline];
+		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
