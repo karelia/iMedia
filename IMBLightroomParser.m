@@ -1206,21 +1206,24 @@ static NSArray* sSupportedUTIs = nil;
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	IMBLightroomObject* object = (IMBLightroomObject*)inObject;
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-	[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-	
-	if ([NSThread isMainThread])
+	if ([inObject isKindOfClass:[IMBLightroomObject class]])
 	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
-	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+		IMBLightroomObject* object = (IMBLightroomObject*)inObject;
+		NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
+		[metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+		NSString* description = [self metadataDescriptionForMetadata:metadata];
+		
+		if ([NSThread isMainThread])
+		{
+			inObject.metadata = metadata;
+			inObject.metadataDescription = description;
+		}
+		else
+		{
+			NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+			[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+			[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+		}
 	}
 }
 
