@@ -153,7 +153,8 @@
 															@"Type",
 															@"Type label in metadataDescription");
 	
-	description = [description stringByAppendingFormat:@"%@: %@\n",typeLabel,kind];
+	if (description.length > 0) description = [description stringByAppendingFormat:@"\n"];
+	description = [description stringByAppendingFormat:@"%@: %@",typeLabel,kind];
 	
 	NSString *width = [inMetadata objectForKey:@"width"];
 	NSString *height = [inMetadata objectForKey:@"height"];
@@ -167,7 +168,8 @@
 														   @"Size",
 														   @"Size label in metadataDescription");
 		
-		description = [description stringByAppendingFormat:@"%@: %@×%@\n",size,width,height];
+		if (description.length > 0) description = [description stringByAppendingFormat:@"\n"];
+		description = [description stringByAppendingFormat:@"%@: %@×%@",size,width,height];
 	}
 	
 	if (duration)
@@ -179,7 +181,8 @@
 																	@"Time label in metadataDescription");
 		
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+		if (description.length > 0) description = [description stringByAppendingFormat:@"\n"];
+		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
 	}
 	
 	if (comments && ![comments isEqualToString:@""])
@@ -190,7 +193,8 @@
 																	@"Comments",
 																	@"Comments label in metadataDescription");
 		
-		description = [description stringByAppendingFormat:@"%@: %@\n",commentsLabel,comments];
+		if (description.length > 0) description = [description stringByAppendingFormat:@"\n"];
+		description = [description stringByAppendingFormat:@"%@: %@",commentsLabel,comments];
 	}
 	
 	return description;

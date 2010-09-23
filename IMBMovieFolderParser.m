@@ -184,13 +184,17 @@
 	NSString *UTI = [NSString UTIForFileAtPath:path];
 	NSString *kind = [NSString descriptionForUTI:UTI];
 
-	NSString* typeLabel = NSLocalizedStringWithDefaultValue(
-															@"Type",
-															nil,IMBBundle(),
-															@"Type",
-															@"Type label in metadataDescription");
-	
-	description = [description stringByAppendingFormat:@"%@: %@\n",typeLabel,kind];
+	if (kind)
+	{
+		NSString* typeLabel = NSLocalizedStringWithDefaultValue(
+			@"Type",
+			nil,IMBBundle(),
+			@"Type",
+			@"Type label in metadataDescription");
+		
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",typeLabel,kind];
+	}
 	
 	if (width != nil && height != nil)
 	{
@@ -200,7 +204,8 @@
 				@"Size",
 				@"Size label in metadataDescription");
 		
-		description = [description stringByAppendingFormat:@"%@: %@×%@\n",size,width,height];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@×%@",size,width,height];
 	}
 	
 	if (duration)
@@ -212,7 +217,8 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
 	}
 
 	if (comments && ![comments isEqualToString:@""])
@@ -223,7 +229,8 @@
 																	@"Comments",
 																	@"Comments label in metadataDescription");
 		
-		description = [description stringByAppendingFormat:@"%@: %@\n",commentsLabel,comments];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",commentsLabel,comments];
 	}
 	
 	return description;

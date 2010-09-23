@@ -57,6 +57,7 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBIconCache.h"
+#import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBTimecodeTransformer.h"
@@ -344,7 +345,8 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",artistLabel,artist];
 	}
 	
 	if (album)
@@ -355,7 +357,8 @@
 			@"Album",
 			@"Album label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",albumLabel,album];
 	}
 	
 	if (duration)
@@ -367,7 +370,8 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+		description = [description stringByAppendingNewline];
+		description = [description stringByAppendingFormat:@"%@: %@",durationLabel,durationString];
 	}
 	
 	return description;
