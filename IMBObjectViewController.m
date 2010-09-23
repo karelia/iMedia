@@ -1761,6 +1761,12 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 }
 
 
+- (BOOL) tableView:(NSTableView*)inTableView shouldShowCellExpansionForTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
+{
+	return NO;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
