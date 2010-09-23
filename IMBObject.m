@@ -432,7 +432,7 @@
 	NSString* extension = [path pathExtension];
 	if (extension==nil || [extension length]==0) extension = @"jpg";
 	
-	return [[NSWorkspace sharedWorkspace] iconForFileType:extension];
+	return [[NSWorkspace threadSafeWorkspace] iconForFileType:extension];
 }
 
 

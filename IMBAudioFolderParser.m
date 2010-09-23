@@ -277,7 +277,7 @@
 
 + (id) folderPath
 {
-	NSString* path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
+	NSString* path = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
 	return [path stringByAppendingPathComponent:@"/Contents/Resources/Sound Effects"];
 }
 

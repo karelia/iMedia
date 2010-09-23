@@ -99,6 +99,9 @@
 #import <iMedia/NSWorkspace+iMedia.h>
 #import <iMedia/NSString+iMedia.h>
 #import <iMedia/NSImage+iMedia.h>
+//#import <iMedia/NSDictionary+iMedia.h>
+//#import <iMedia/NSView+iMedia.h>
+#import <iMedia/NSURL+iMedia.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
