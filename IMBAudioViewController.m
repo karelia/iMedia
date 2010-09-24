@@ -145,7 +145,7 @@
 	return NSLocalizedStringWithDefaultValue(
 		@"IMBAudioViewController.countFormatSingular",
 		nil,IMBBundle(),
-		@"%d song",
+		@"%d track",
 		@"Format string for object count in singluar");
 }
 
@@ -154,7 +154,7 @@
 	return NSLocalizedStringWithDefaultValue(
 		@"IMBAudioViewController.countFormatPlural",
 		nil,IMBBundle(),
-		@"%d songs",
+		@"%d tracks",
 		@"Format string for object count in plural");
 }
 
