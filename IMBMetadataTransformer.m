@@ -111,7 +111,7 @@
 			NSNumber* width = [metadata objectForKey:@"width"];
 			NSNumber* height = [metadata objectForKey:@"height"];
 
-			result = [NSString stringWithFormat:@"%d x %d",[width integerValue],[height integerValue]];
+			result = [NSString stringWithFormat:@"%d×%d",[width integerValue],[height integerValue]];
 		}
 	}
 	
