@@ -151,6 +151,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) _reloadIconView;
 - (void) _reloadListView;
 - (void) _reloadComboView;
+- (void) _updateTooltips;
 
 - (void) _downloadDraggedObjectsToDestination:(NSURL*)inDestination;
 - (NSArray*) _namesOfPromisedFiles;
@@ -366,17 +367,15 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	if (inContext == (void*)kArrangedObjectsKey)
 	{
-		//		[self _reloadIconView];
 		[self willChangeValueForKey:kObjectCountStringKey];
 		[self didChangeValueForKey:kObjectCountStringKey];
+//		[self _updateTooltips];
 	}
 	
 	// If single thumbnails have changed (due to asynchronous loading) then trigger a reload of the IKImageBrowserView...
 	
 	else if (inContext == (void*)kImageRepresentationKeyPath)
 	{
-//		id object = [inChange objectForKey:NSKeyValueChangeNewKey];
-//		NSLog(@"%s %@",__FUNCTION__,inChange);
 		[self _reloadIconView];
 		[self _reloadComboView];
 	}
@@ -384,12 +383,13 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		[self _reloadComboView];
 	}
+	
+	// Find the row and reload it. Note that KVO notifications may be sent from a background thread (in this 
+	// case, we know they will be) We should only update the UI on the main thread, and in addition, we use 
+	// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
+		
 	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty])
 	{
-        // Find the row and reload it. Note that KVO notifications may be sent from a background thread (in this 
-		// case, we know they will be) We should only update the UI on the main thread, and in addition, we use 
-		// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
-		
 		IMBDynamicTableView *affectedTableView = (IMBDynamicTableView *)inContext;
 		NSInteger row = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inObject];
 		
@@ -653,6 +653,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	NSClipView* clipview = (NSClipView*)[ibComboView superview];
 	[clipview scrollToPoint:NSMakePoint(0.0,y)];
 	[[ibComboView enclosingScrollView] reflectScrolledClipView:clipview];
+	
+	// Tooltips in the icon view need to be rebuilt...
+	
+	[self _updateTooltips];
 }
 
 
@@ -676,6 +680,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
 		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[self _updateTooltips];
 	}
 }
 
@@ -696,6 +701,31 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView selector:@selector(reloadData) object:nil];
 		[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) _updateTooltips
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(__updateTooltips) object:nil];
+	[self performSelector:@selector(__updateTooltips) withObject:nil afterDelay:0.1];
+}
+	
+	
+- (void) __updateTooltips
+{
+	[ibIconView removeAllToolTips];
+	
+	NSArray* objects = ibObjectArrayController.arrangedObjects;
+	NSInteger i = 0;
+	
+	for (IMBObject* object in objects)
+	{
+		NSRect rect = [ibIconView itemFrameAtIndex:i++];
+		[ibIconView addToolTipRect:rect owner:object userData:NULL];
 	}
 }
 
@@ -1740,24 +1770,31 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 {
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	IMBObject* object = [objects objectAtIndex:inRow];
-	NSString* name = [object name];
-	NSString* description = [object metadataDescription];
-	
-	NSMutableString* tooltip = [NSMutableString string];
-	
-	if (name)
-	{
-		if (tooltip.length > 0) [tooltip imb_appendNewline];
-		[tooltip appendFormat:@"%@",name];
-	}
-	
-	if (description)
-	{
-		if (tooltip.length > 0) [tooltip imb_appendNewline];
-		[tooltip appendFormat:@"%@",description];
-	}
-	
-	return tooltip;
+	return [object tooltipString];
+//	NSString* name = [object name];
+//	NSString* description = [object metadataDescription];
+//	
+//	NSMutableString* tooltip = [NSMutableString string];
+//	
+//	if (name)
+//	{
+//		if (tooltip.length > 0) [tooltip imb_appendNewline];
+//		[tooltip appendFormat:@"%@",name];
+//	}
+//	
+//	if (description)
+//	{
+//		if (tooltip.length > 0) [tooltip imb_appendNewline];
+//		[tooltip appendFormat:@"%@",description];
+//	}
+//	
+//	return tooltip;
+}
+
+
+- (BOOL) tableView:(NSTableView*)inTableView shouldShowCellExpansionForTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
+{
+	return NO;
 }
 
 
