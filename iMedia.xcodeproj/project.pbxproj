@@ -51,6 +51,8 @@
 		CE69E9DF114B05EA0016E5E0 /* firefox_bookmarksToolbar.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */; };
 		CE69E9E0114B05EA0016E5E0 /* firefox_unfiledBookmarks.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */; };
 		CE69E9E1114B05EA0016E5E0 /* firefox_tag.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */; };
+		CE6B664C124D440A00E44811 /* IMBDisableTitleToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */; };
+		CE6B664D124D440C00E44811 /* IMBDisableTitleToColorTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */; };
 		CEF6539C117E5C29003FF1A5 /* Attribute.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65395117E5C28003FF1A5 /* Attribute.pdf */; };
 		CEF6539D117E5C29003FF1A5 /* CC.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65396117E5C28003FF1A5 /* CC.pdf */; };
 		CEF6539E117E5C29003FF1A5 /* commercial.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65397117E5C28003FF1A5 /* commercial.pdf */; };
@@ -1392,6 +1394,7 @@
 				CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */,
 				CE3EC9A2124AAC0700D8435B /* NSURL+iMedia.h in Headers */,
 				D0129A2A124C97A600EBEB45 /* NSDictionary+iMedia.h in Headers */,
+				CE6B664D124D440C00E44811 /* IMBDisableTitleToColorTransformer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1721,6 +1724,7 @@
 				CE09F304124823020094EC48 /* IMBURLGetSizeOperation.m in Sources */,
 				CE3EC9A3124AAC0700D8435B /* NSURL+iMedia.m in Sources */,
 				D0129A29124C97A200EBEB45 /* NSDictionary+iMedia.m in Sources */,
+				CE6B664C124D440A00E44811 /* IMBDisableTitleToColorTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
