@@ -275,7 +275,7 @@
 		}
 		else
 		{
-			imageRepresentation = (id)[url imb_quicklookCGImage	];
+			imageRepresentation = (id)[url imb_quicklookCGImage];
 		}
 	}
 	
@@ -306,13 +306,16 @@
 		}
 		else
 		{
-			CGImageRef image = [url imb_quicklookCGImage	];
+			CGImageRef image = [url imb_quicklookCGImage];
 			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
 		}
 	}
-		
+	
+	// QTMovie...
+	
 	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
+		#warning THIS SEEMS TO WORK BUT IS HIGHLY INCONSISTENT !!!
 		imageRepresentation = url; // (id)[url imb_quicklookCGImage	];
 	}
 
