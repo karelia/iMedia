@@ -685,8 +685,8 @@
 						<reference key="NSSuperview" ref="818174058"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="5543292">
-							<int key="NSCellFlags">68288064</int>
-							<int key="NSCellFlags2">138544128</int>
+							<int key="NSCellFlags">67239488</int>
+							<int key="NSCellFlags2">138545152</int>
 							<string key="NSContents">Object Count</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="912974408"/>
