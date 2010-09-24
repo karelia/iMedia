@@ -73,6 +73,8 @@
 
 // This method is useful for sorting images by image size, provided that the metadata dictionary contains  
 // width and height values...
+//
+// This method is invoked by bindings in IMBImageView.xib
 
 - (NSComparisonResult) imb_metadataSizeCompare:(NSDictionary*)inDictionary
 {
