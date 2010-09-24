@@ -552,15 +552,18 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// To be overridden by subclass...
 }
 
+
 - (void) didShowView
 {
 	// To be overridden by subclass...
 }
 
+
 - (void) willHideView
 {
 	// To be overridden by subclass...
 }
+
 
 - (void) didHideView
 {
@@ -575,6 +578,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	return nil;	// Must be overridden by subclass
 }
+
 
 - (NSString*) displayName
 {

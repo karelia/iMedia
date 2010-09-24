@@ -147,5 +147,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (void) willHideView
+{
+	NSWindow* window = [ibIconView window];
+	id firstResponder = [window firstResponder];
+	if (ibIconView == firstResponder)
+	{
+		[window makeFirstResponder:nil];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @end
 
