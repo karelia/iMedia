@@ -165,13 +165,8 @@
 	NSString* path = [inMetadata objectForKey:@"path"];
 	NSString* comment = [inMetadata objectForKey:@"comment"];
 	if (comment == nil) comment = [inMetadata objectForKey:@"Comment"];	// uppercase from iPhoto
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 
-	if (width != nil && height != nil)
-	{
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@×%@",width,height];
-	}
-		
 	if ((width != nil && height != nil) || depth != nil || model != nil || type != nil)
 	{		
 		if (description.length > 0) [description imb_appendNewline];
@@ -208,13 +203,19 @@
 		}
 	}
 
+	if (width != nil && height != nil)
+	{
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@×%@",width,height];
+	}
+	
 	if (dateTime != nil)
 	{
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendString:[dateTime imb_exifDateToLocalizedDisplayDate]];
 	}
 
-	if (comment != nil && comment.length > 1)
+	if (comment != nil && ![comment isEqualToString:@""])
 	{
 		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
 																   @"Comment",
