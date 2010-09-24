@@ -128,6 +128,12 @@
 }
 
 
+- (NSString*) requestedImageRepresentationType
+{
+	return IKImageBrowserQTMoviePathRepresentationType; //IKImageBrowserQTMovieRepresentationType;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

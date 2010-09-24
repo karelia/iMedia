@@ -90,7 +90,7 @@ enum
 typedef NSUInteger kIMBObjectViewType;
 
 
-extern NSString* const kIMBObjectImageRepresentationProperty;
+extern NSString* kIMBObjectImageRepresentationProperty;
 
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -53,7 +53,26 @@
 #pragma mark HEADERS
 
 #import "IMBMovieObject.h"
+#import "IMBOperationQueue.h"
 #import "NSURL+iMedia.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
+
+NSString* kIMBPosterFrameProperty = @"posterFrame";
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBMovieObject ()
+- (CGImageRef) renderPosterFrame;
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,47 +83,97 @@
 @implementation IMBMovieObject
 
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Setter retains the CGImage...
+
 - (void) setPosterFrame:(CGImageRef)inPosterFrame
 {
+	[self willChangeValueForKey:kIMBPosterFrameProperty];
+	
 	CGImageRef old = _posterFrame;
 	_posterFrame = CGImageRetain(inPosterFrame);
 	CGImageRelease(old);
+	
+	[self didChangeValueForKey:kIMBPosterFrameProperty];
 }
 
 
-// The getter loads the image lazily (if it's not available). Please note that the unload method gets rid of it 
-// again as the IMBObjectFifoCache clears out the oldest items...
+// The getter loads the poster frame image lazily (if it's not available). Since we are using Quicklook to render 
+// the image, and Quicklook doesn't like being called on the main thread, we'll defer this to a background operation.
+// Please note that the unload method gets rid of the poster frame image again as the IMBObjectFifoCache clears out 
+// the oldest items...
 
 - (CGImageRef) posterFrame
 {	
-	if (_posterFrame == NULL && _imageRepresentation != nil)
+	if (_posterFrame == NULL /*&& _imageRepresentation != nil*/)
 	{
-		if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
+		if ([NSThread isMainThread])
 		{
-			NSURL* url = (NSURL*)_imageRepresentation;
-			self.posterFrame = [url imb_quicklookCGImage	];
+			NSInvocationOperation* op = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_renderPosterFrame) object:nil];
+			[[IMBOperationQueue sharedQueue] addOperation:op];
+			[op release];
 		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType])
+		else
 		{
-			NSString* path = (NSString*)_imageRepresentation;
-			self.posterFrame = [[NSURL fileURLWithPath:path] imb_quicklookCGImage	];
-		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
-		{
-			NSURL* url = (NSURL*)_imageRepresentation;
-			self.posterFrame = [url imb_quicklookCGImage	];
-		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
-		{
-			self.posterFrame = (CGImageRef)_imageRepresentation;
+			self.posterFrame = [self renderPosterFrame];
 		}
 	}
 	
 	return _posterFrame;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Render the image on a background thread and set the result back on the main thread...
+
+- (void) _renderPosterFrame
+{
+	CGImageRef image = [self renderPosterFrame];
+	[self performSelectorOnMainThread:@selector(_setPosterFrame:) withObject:(id)image waitUntilDone:NO];
+}
+
+
+// Use Quicklook to render the poster frame. Please note that Quicklook wants to be called on a background thread...
+
+- (CGImageRef) renderPosterFrame
+{	
+	CGImageRef posterFrame = NULL;
+	NSURL* url = (NSURL*)_imageRepresentation;
+	NSString* path = (NSString*)_imageRepresentation;
+	
+	if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
+	{
+		posterFrame = [url imb_quicklookCGImage];
+	}
+	else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+	{
+		if ([_imageRepresentation isKindOfClass:[NSString class]]) url = [NSURL fileURLWithPath:path];
+		posterFrame = [url imb_quicklookCGImage];
+	}
+	else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType])
+	{
+		posterFrame = [[NSURL fileURLWithPath:path] imb_quicklookCGImage];
+	}
+	else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
+	{
+		posterFrame = [url imb_quicklookCGImage];
+	}
+	else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+	{
+		posterFrame = (CGImageRef)_imageRepresentation;
+	}
+	
+	return posterFrame;
+}
+
+
+- (void) _setPosterFrame:(id)inImage
+{
+	self.posterFrame = (CGImageRef)inImage;
 }
 
 

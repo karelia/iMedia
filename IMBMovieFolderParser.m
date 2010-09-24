@@ -106,7 +106,7 @@
 	object.parser = self;
 	object.index = inIndex;
 	
-	object.imageRepresentationType = IKImageBrowserQTMovieRepresentationType; 
+	object.imageRepresentationType = IKImageBrowserQTMoviePathRepresentationType; 
 	object.imageLocation = inPath;
 	object.imageRepresentation = nil;		// will be loaded lazily when needed
 	object.metadata = nil;					// will be loaded lazily when needed
@@ -133,8 +133,6 @@
 		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
 		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
 
-		
-		
 		if (seconds)
 		{
 			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
