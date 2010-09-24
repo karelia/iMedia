@@ -94,7 +94,7 @@
 }
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
-+ (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath;
++ (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath checkSpotlightComments:(BOOL)aCheckSpotlight;
 {
 	NSMutableDictionary *md = [NSMutableDictionary dictionary];
 	CGImageSourceRef source = nil;
@@ -134,17 +134,20 @@
 		CFRelease(source);
 	}
 	
-	MDItemRef item = MDItemCreate(NULL,(CFStringRef)aPath);
-	
-	if (item)
+	if (aCheckSpotlight)	// done from folder parsers, but not library-based items like iPhoto
 	{
-		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
-		if (comment)
+		MDItemRef item = MDItemCreate(NULL,(CFStringRef)aPath);
+		
+		if (item)
 		{
-			[md setObject:(NSString*)comment forKey:@"comment"]; 
-			CFRelease(comment);
+			CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
+			if (comment)
+			{
+				[md setObject:(NSString*)comment forKey:@"comment"]; 
+				CFRelease(comment);
+			}
+			CFRelease(item);
 		}
-		CFRelease(item);
 	}
 		
 	NSDictionary *result = [NSDictionary dictionaryWithDictionary:md];
@@ -211,8 +214,12 @@
 	
 	if (dateTime != nil)
 	{
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendString:[dateTime imb_exifDateToLocalizedDisplayDate]];
+		NSString *dateTimeDesc = [dateTime imb_exifDateToLocalizedDisplayDate];
+		if (dateTimeDesc)
+		{
+			if (description.length > 0) [description imb_appendNewline];
+			[description appendString:dateTimeDesc];
+		}
 	}
 
 	if (comment != nil && ![comment isEqualToString:@""])
