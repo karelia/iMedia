@@ -478,4 +478,36 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (NSString*) tooltipString
+{
+	NSString* name = [self name];
+	NSString* description = [self metadataDescription];
+	
+	NSMutableString* tooltip = [NSMutableString string];
+	
+	if (name)
+	{
+		if (tooltip.length > 0) [tooltip imb_appendNewline];
+		[tooltip appendFormat:@"%@",name];
+	}
+	
+	if (description)
+	{
+		if (tooltip.length > 0) [tooltip imb_appendNewline];
+		[tooltip appendFormat:@"%@",description];
+	}
+	
+	return tooltip;
+}
+
+
+- (NSString*) view:(NSView*)inView stringForToolTip:(NSToolTipTag)inTag point:(NSPoint)inPoint userData:(void*)inUserData
+{
+	return [self tooltipString];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @end

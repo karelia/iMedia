@@ -113,6 +113,7 @@
 - (NSURL*) url;												// Convert location to url
 - (BOOL) isLocalFile;										// Is this object a local file
 - (NSString*) uti;											// Returns type of file if possible
+- (NSString*) tooltipString;
 
 // Derived Properties. See IKImageBrowserItem for documentation...
 

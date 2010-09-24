@@ -164,12 +164,18 @@
 	NSString* dateTime = [inMetadata objectForKey:@"dateTime"];
 	NSString* path = [inMetadata objectForKey:@"path"];
 	NSString* comment = [inMetadata objectForKey:@"comment"];
-	
-	if (!comment) comment = [inMetadata objectForKey:@"Comment"];	// uppercase from iPhoto
+	if (comment == nil) comment = [inMetadata objectForKey:@"Comment"];	// uppercase from iPhoto
 
-	if (depth != nil || model != nil || type != nil)
+	if (width != nil && height != nil)
+	{
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@×%@",width,height];
+	}
+		
+	if ((width != nil && height != nil) || depth != nil || model != nil || type != nil)
 	{		
 		if (description.length > 0) [description imb_appendNewline];
+		
 		if (depth) [description appendFormat:@"%@-bit ",depth];		// TODO: LOCALIZE
 		if (model) [description appendFormat:@"%@ ",model];
 		
@@ -202,19 +208,13 @@
 		}
 	}
 
-	if (width != nil && height != nil)
-	{
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@×%@",width,height];
-	}
-		
 	if (dateTime != nil)
 	{
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendString:[dateTime imb_exifDateToLocalizedDisplayDate]];
 	}
 
-	if (comment && ![comment isEqualToString:@""])
+	if (comment != nil && comment.length > 1)
 	{
 		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
 																   @"Comment",
