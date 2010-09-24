@@ -57,7 +57,7 @@
 + (NSImage *)imb_imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime;
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
-+ (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath;
++ (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath checkSpotlightComments:(BOOL)aCheckSpotlight;
 + (NSString*) imb_imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 + (NSImage *) imb_sharedGenericFolderIcon;						// Shared instance - can only have one size!

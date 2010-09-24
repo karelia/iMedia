@@ -82,7 +82,7 @@
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
-	return [NSImage imb_metadataFromImageAtPath:inPath];
+	return [NSImage imb_metadataFromImageAtPath:inPath checkSpotlightComments:YES];
 }
 
 

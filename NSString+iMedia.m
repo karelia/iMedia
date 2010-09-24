@@ -272,6 +272,8 @@
 // cores, which caused the above method to fail badly, despite the fact that I tried to safeguard it with the 
 // @synchronized directive...
 
+// Note: This below may return nil, if it can't be parsed, e.g. "0000:00:00 00:00:00"
+
 - (NSString *)imb_exifDateToLocalizedDisplayDate
 {
 	NSDateFormatter *parser = [[NSDateFormatter alloc] init];
