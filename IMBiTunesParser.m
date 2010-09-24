@@ -602,14 +602,17 @@
 }
 
 
+- (NSString*) requestedImageRepresentationType
+{
+	return IKImageBrowserCGImageRepresentationType;
+}
+
+
 - (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
 	// Select the correct imageRepresentationType for our mediaType...
 	
-	NSString* imageRepresentationType = 
-		[self.mediaType isEqualToString:kIMBMediaTypeAudio] ?
-		IKImageBrowserCGImageRepresentationType :
-		IKImageBrowserQTMovieRepresentationType;
+	NSString* imageRepresentationType = [self requestedImageRepresentationType];
 		
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...

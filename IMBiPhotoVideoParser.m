@@ -123,9 +123,10 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 - (NSString*) requestedImageRepresentationType
 {
-	return IKImageBrowserQTMovieRepresentationType;
+	return IKImageBrowserQTMoviePathRepresentationType; //IKImageBrowserQTMovieRepresentationType;
 }
 
 

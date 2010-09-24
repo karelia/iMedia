@@ -95,7 +95,7 @@ static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbob
 NSString* kIMBPublicTitleListPasteboardType = @"imedia.title";
 NSString* kIMBPublicMetadataListPasteboardType = @"imedia.metadata";
 
-NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
+NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -349,6 +349,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
         if ([object isKindOfClass:[IMBObject class]])
 		{
             [object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
+            [object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
         }
     }
 	
@@ -369,28 +370,32 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		[self willChangeValueForKey:kObjectCountStringKey];
 		[self didChangeValueForKey:kObjectCountStringKey];
-//		[self _updateTooltips];
 	}
 	
 	// If single thumbnails have changed (due to asynchronous loading) then trigger a reload of the IKImageBrowserView...
 	
 	else if (inContext == (void*)kImageRepresentationKeyPath)
 	{
-		[self _reloadIconView];
-		[self _reloadComboView];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadIconView) object:nil];
+		[self performSelector:@selector(_reloadIconView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
+		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	else if (inContext == (void*)kPosterFrameKeyPath)
 	{
-		[self _reloadComboView];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
+		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	
 	// Find the row and reload it. Note that KVO notifications may be sent from a background thread (in this 
 	// case, we know they will be) We should only update the UI on the main thread, and in addition, we use 
 	// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
 		
-	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty])
+	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty] ||
+			 [inKeyPath isEqualToString:kIMBPosterFrameProperty])
 	{
-		IMBDynamicTableView *affectedTableView = (IMBDynamicTableView *)inContext;
+		IMBDynamicTableView* affectedTableView = (IMBDynamicTableView*)inContext;
 		NSInteger row = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inObject];
 		
 		if (NSNotFound != row)
@@ -683,7 +688,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	if ([ibIconView.window isVisible])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
-		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 		[self _updateTooltips];
 	}
 }
@@ -694,7 +699,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	if ([ibListView.window isVisible])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibListView selector:@selector(reloadData) object:nil];
-		[ibListView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[ibListView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 }
 
@@ -704,7 +709,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	if ([ibComboView.window isVisible])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView selector:@selector(reloadData) object:nil];
-		[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 }
 
@@ -1618,10 +1623,11 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitleListPasteboardType, titles);
 						wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetadataListPasteboardType];
 						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetadataListPasteboardType, metadatas);
-#ifdef DEBUG
-NSLog(@"Titles on pasteboard: %@", titles);
-NSLog(@"MetaData on pasteboard: %@", metadatas);
-#endif
+
+//						#ifdef DEBUG
+//						NSLog(@"Titles on pasteboard: %@", titles);
+//						NSLog(@"MetaData on pasteboard: %@", metadatas);
+//						#endif
 					}
 				}
 				
@@ -1862,6 +1868,7 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
     for (IMBObject* object in itemsNoLongerVisible)
 	{
 		[object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
+		[object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
 		
 		NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
 		for (IMBObjectThumbnailLoadOperation* op in ops)
@@ -1917,6 +1924,7 @@ NSLog(@"MetaData on pasteboard: %@", metadatas);
 		
 		// Add observer always to balance
 		[object addObserver:self forKeyPath:kIMBObjectImageRepresentationProperty options:0 context:(void*)ibComboView];
+		[object addObserver:self forKeyPath:kIMBPosterFrameProperty options:0 context:(void*)ibComboView];
      }
 	
 	// Finally cache our old visible items set
