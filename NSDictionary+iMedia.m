@@ -63,9 +63,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-*** NOT ACTUALLY USED -- WE CAN DELETE ****
-
-
 #pragma mark
 
 @implementation NSDictionary (iMedia)
