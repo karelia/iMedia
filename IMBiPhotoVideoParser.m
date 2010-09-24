@@ -140,6 +140,7 @@
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
 	NSString *comment = [inMetadata objectForKey:@"Comment"];
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	NSString *type = [inMetadata objectForKey:@"ImageType"];		// like MooV
 	NSString *UTI = [NSString imb_UTIForFileType:type];
 	NSString *kind = [NSString imb_descriptionForUTI:UTI];

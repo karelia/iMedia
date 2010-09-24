@@ -713,6 +713,7 @@
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
 	NSString* comment = [inMetadata objectForKey:@"Comments"];
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	NSString* kind = [inMetadata objectForKey:@"Kind"];
 	NSNumber* width = [inMetadata objectForKey:@"Video Width"];
 	NSNumber* height = [inMetadata objectForKey:@"Video Height"];
@@ -775,7 +776,7 @@
 		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 
-	if (comment)
+	if (comment && ![comment isEqualToString:@""])
 	{
 		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
 																	@"Comment",

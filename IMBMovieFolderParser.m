@@ -178,6 +178,7 @@
 	NSNumber* height = [inMetadata objectForKey:@"height"];
 	NSString *path = [inMetadata objectForKey:@"path"];
 	NSString *comment = [inMetadata objectForKey:@"comment"];
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 
 	NSString *UTI = [NSString imb_UTIForFileAtPath:path];
 	NSString *kind = [NSString imb_descriptionForUTI:UTI];
