@@ -394,7 +394,7 @@
 	
 	// QTMovies are loaded with the generic code in the superclass...
 	
-	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
+	else if ([type isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
 	{
 		imageRepresentation = [super loadThumbnailForObject:inObject];
 	}

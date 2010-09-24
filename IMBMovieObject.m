@@ -147,7 +147,7 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 	
 	if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		posterFrame = [url imb_quicklookCGImage];
+		NSLog(@"WHAT TO DO?  renderPosterFrame IKImageBrowserQTMovieRepresentationType, _imageRepresentation = %@", _imageRepresentation);
 	}
 	else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
 	{

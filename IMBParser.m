@@ -315,8 +315,7 @@
 	
 	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		#warning THIS SEEMS TO WORK BUT IS HIGHLY INCONSISTENT !!!
-		imageRepresentation = url; // (id)[url imb_quicklookCGImage	];
+		NSLog(@"loadThumbnailForObject: what do to with IKImageBrowserQTMovieRepresentationType");
 	}
 
 	// Return the result to the main thread...

@@ -204,9 +204,14 @@ CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
         
     else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		// A URL or path
-
+		// An actual movie ... hopefully we don't encounter this
 		NSLog(@"Really don't want to try to make a thumbnail from a QTMovie since that may take a while.");
+	}
+	else if ([type isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+	{
+		// A URL or path
+		
+		NSLog(@"What do we do with IKImageBrowserQTMoviePathRepresentationType?");
 	}
 	
     // Draw the thumbnail image (CGImageSource-compatible)...

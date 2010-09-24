@@ -340,6 +340,10 @@
         }
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])	// QTMovie, we got quicklook...
         {
+			NSLog(@"WHAT TO DO? IKImageBrowserQTMovieRepresentationType, _imageRepresentation = %@", _imageRepresentation);
+		}
+		else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+        {
 			CGImageRef image = (CGImageRef) _imageRepresentation;
             [self _drawImage:image withFrame:imageRect];
 		}
