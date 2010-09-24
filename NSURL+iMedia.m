@@ -55,19 +55,20 @@
 // Quicklook methods to create images from non-image files...
 // (Should be called on a background thread.)
 
-- (CGImageRef) imb_quicklookCGImage	;
+- (CGImageRef) imb_quicklookCGImage
 {
 	if ([NSThread isMainThread])
 	{
 		NSLog(@"%s is being called on main thread. We probably want to re-do this for background thread", __FUNCTION__);
 	}
+	
 	CGSize size = CGSizeMake(256.0,256.0);
 	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)self,size,NULL);
 	return (CGImageRef) [NSMakeCollectable(image) autorelease];
 }
 
 
-- (NSImage*) imb_quicklookNSImage;
+- (NSImage*) imb_quicklookNSImage
 {
 	NSImage* nsimage = nil;
 	CGImageRef cgimage = [self imb_quicklookCGImage	];
