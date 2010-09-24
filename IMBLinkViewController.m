@@ -162,6 +162,10 @@
 	[super setViewType:inViewType];
 }
 
+- (IBAction) quicklook:(id)inSender
+{
+	// Don't try to do quicklook for links
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
