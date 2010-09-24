@@ -348,6 +348,9 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
         if ([object isKindOfClass:[IMBObject class]])
 		{
+#ifdef DEBUG
+			NSLog(@"dealloc REMOVE ['%@' removeObs…:4kp:imageRep…", [object name]);
+#endif
             [object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
             [object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
         }
@@ -1867,6 +1870,11 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
     for (IMBObject* object in itemsNoLongerVisible)
 	{
+#warning ... This line got me a repeated error:
+		// Cannot remove an observer <IMBMovieViewController 0xXXXXXXXX> for the key path "imageRepresentation" from <IMBMovieObject 0xXXXXXXXX> because it is not registered as an observer.
+#ifdef DEBUG
+		NSLog(@"changedVis…:… REMOVE ['%@' removeObs…:4kp:imageRep…", [object name]);
+#endif
 		[object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
 		[object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
 		
@@ -1923,6 +1931,10 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		}
 		
 		// Add observer always to balance
+		
+#ifdef DEBUG
+		NSLog(@"changedVis…:… _ADD__ ['%@' addObs…:4kp:imageRep…", [object name]);
+#endif
 		[object addObserver:self forKeyPath:kIMBObjectImageRepresentationProperty options:0 context:(void*)ibComboView];
 		[object addObserver:self forKeyPath:kIMBPosterFrameProperty options:0 context:(void*)ibComboView];
      }
