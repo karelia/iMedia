@@ -43,7 +43,6 @@
 		8FFCBFD110A8CD9C00377C33 /* IMBLightroom3Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */; };
 		CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE09F304124823020094EC48 /* IMBURLGetSizeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */; };
-		CE28E51C124192A800B00F3D /* IMBDisableTitleToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */; };
 		CE3EC9A2124AAC0700D8435B /* NSURL+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE3EC9A3124AAC0700D8435B /* NSURL+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */; };
 		CE69CDC41149D0B50016E5E0 /* IMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */; };
@@ -1446,7 +1445,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "iMedia" */;
 			compatibilityVersion = "Xcode 3.1";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -1732,7 +1730,6 @@
 			files = (
 				D09933B31011B32B00C527B7 /* IMBTestAppDelegate.m in Sources */,
 				D09934341011B63600C527B7 /* main.m in Sources */,
-				CE28E51C124192A800B00F3D /* IMBDisableTitleToColorTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
