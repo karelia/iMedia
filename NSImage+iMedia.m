@@ -280,5 +280,45 @@
 }
 
 
+// returns nil if no bitmap associated.
+
+- (NSBitmapImageRep *) imb_firstBitmap	
+{
+	NSBitmapImageRep *result = nil;
+	NSArray *reps = [self representations];
+    
+	for (NSImageRep *theRep in reps )
+	{
+		if ([theRep isKindOfClass:[NSBitmapImageRep class]])
+		{
+			result = (NSBitmapImageRep *)theRep;
+			break;
+		}
+	}
+	return result;
+}
+
+
+// returns bitmap, or creates one.
+
+- (NSBitmapImageRep *) imb_bitmap	
+{
+	NSBitmapImageRep *result = [self imb_firstBitmap];
+    
+	if (nil == result)	
+	{
+		NSInteger width, height;
+		NSSize sz = [self size];
+		width = sz.width;
+		height = sz.height;
+		[self lockFocus];
+		result = [[[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0.0, 0.0, (CGFloat)width, (CGFloat)height)] autorelease];
+		[self unlockFocus];
+	}
+	
+	return result;
+}
+
+
 @end
 

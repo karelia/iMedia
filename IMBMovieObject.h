@@ -71,6 +71,7 @@ extern NSString* kIMBPosterFrameProperty;
 @interface IMBMovieObject : IMBEnhancedObject
 {
 	CGImageRef _posterFrame;
+	BOOL _didRequestPosterFrame;
 }
 
 @property (assign) CGImageRef posterFrame;

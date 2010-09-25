@@ -55,6 +55,8 @@
 #import "IMBMovieObject.h"
 #import "IMBOperationQueue.h"
 #import "NSURL+iMedia.h"
+#import "NSImage+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +73,7 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 #pragma mark 
 
 @interface IMBMovieObject ()
-- (CGImageRef) renderPosterFrame;
+- (CGImageRef) _renderPosterFrame;
 @end
 
 
@@ -81,6 +83,28 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 #pragma mark 
 
 @implementation IMBMovieObject
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) init
+{
+	if (self = [super init])
+	{
+		_posterFrame = NULL;
+		_didRequestPosterFrame = NO;
+	}
+	
+	return self;
+}
+
+
+- (void) dealloc
+{
+	if (_posterFrame) CGImageRelease(_posterFrame);
+	[super dealloc];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,18 +131,23 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 
 - (CGImageRef) posterFrame
 {	
-	if (_posterFrame == NULL /*&& _imageRepresentation != nil*/)
+	if (_posterFrame == NULL)
 	{
-		if ([NSThread isMainThread])
+		if (_didRequestPosterFrame == NO)
 		{
-			NSInvocationOperation* op = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(_renderPosterFrame) object:nil];
-			[[IMBOperationQueue sharedQueue] addOperation:op];
-			[op release];
-		}
-		else
-		{
-			self.posterFrame = [self renderPosterFrame];
-		}
+			_didRequestPosterFrame = YES;
+
+			if ([NSThread isMainThread])
+			{
+				NSInvocationOperation* op = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(renderPosterFrame) object:nil];
+				[[IMBOperationQueue sharedQueue] addOperation:op];
+				[op release];
+			}
+			else
+			{
+				self.posterFrame = [self _renderPosterFrame];
+			}
+		}	
 	}
 	
 	return _posterFrame;
@@ -130,46 +159,52 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 
 // Render the image on a background thread and set the result back on the main thread...
 
-- (void) _renderPosterFrame
+- (void) renderPosterFrame
 {
-	CGImageRef image = [self renderPosterFrame];
+	CGImageRef image = [self _renderPosterFrame];
 	[self performSelectorOnMainThread:@selector(_setPosterFrame:) withObject:(id)image waitUntilDone:NO];
 }
 
 
-// Use Quicklook to render the poster frame. Please note that Quicklook wants to be called on a background thread...
+// Use Quicklook to render the poster frame. Please note that Quicklook wants to be called on a background thread.
+// If Quicklook fail to generate an image (either not supported or corrupt file), then we will simply try to get
+// an icon image from the Finder as a fallback...
 
-- (CGImageRef) renderPosterFrame
+- (CGImageRef) _renderPosterFrame
 {	
-	CGImageRef posterFrame = NULL;
-	NSURL* url = (NSURL*)_imageRepresentation;
-	NSString* path = (NSString*)_imageRepresentation;
+	NSString* path = nil;
+	NSURL* url = nil;
 	
-	if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
+	if ([_location isKindOfClass:[NSString class]])
 	{
-		NSLog(@"WHAT TO DO?  renderPosterFrame IKImageBrowserQTMovieRepresentationType, _imageRepresentation = %@", _imageRepresentation);
+		path = (NSString*)_location;
+		url = [NSURL fileURLWithPath:path];
 	}
-	else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+	else if ([_location isKindOfClass:[NSURL class]])
 	{
-		if ([_imageRepresentation isKindOfClass:[NSString class]]) url = [NSURL fileURLWithPath:path];
-		posterFrame = [url imb_quicklookCGImage];
+		url = (NSURL*)_location;
+		path = [url path];
 	}
-	else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType])
+	
+	CGImageRef posterFrame = [url imb_quicklookCGImage];
+	
+	if (posterFrame == NULL)
 	{
-		posterFrame = [[NSURL fileURLWithPath:path] imb_quicklookCGImage];
-	}
-	else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
-	{
-		posterFrame = [url imb_quicklookCGImage];
-	}
-	else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
-	{
-		posterFrame = (CGImageRef)_imageRepresentation;
+		NSLog(@"%s Failed to create QuickLook image for file %@. Using generic file icon instead...",__FUNCTION__,self.name);
+		
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:[path pathExtension]];
+		[icon setSize:NSMakeSize(256.0,256.0)];
+		NSBitmapImageRep* rep = [icon imb_bitmap];
+		posterFrame = [rep CGImage];
+		
+		_shouldDrawAdornments = NO;
 	}
 	
 	return posterFrame;
 }
 
+
+// The setter is called on the main tread, so that KVO works correctly...
 
 - (void) _setPosterFrame:(id)inImage
 {
@@ -180,17 +215,11 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// As object are flushed from the cache
 - (void) unload
 {
 	[super unload];
 	self.posterFrame = NULL;
-}
-
-
-- (void) dealloc
-{
-	if (_posterFrame) CGImageRelease(_posterFrame);
-	[super dealloc];
 }
 
 

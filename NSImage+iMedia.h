@@ -67,5 +67,8 @@
 
 + (NSImage *) imb_imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
 
+// Create a NSBitmapImageRep from NSImage
+- (NSBitmapImageRep *) imb_firstBitmap;	
+- (NSBitmapImageRep *) imb_bitmap;	
 
 @end
