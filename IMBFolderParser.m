@@ -366,4 +366,39 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Add a 'Reveal in Finder' command to the context menu...
+
+- (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject
+{
+	if ([inObject isKindOfClass:[IMBNodeObject class]])
+	{
+		NSString* title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.revealInFinder",
+			nil,IMBBundle(),
+			@"Reveal in Finder",
+			@"Menu item in context menu of IMBObjectViewController");
+		
+		IMBNode* node = (IMBNode*) [inObject location];
+		NSString* path = (NSString*) [node mediaSource];
+		
+		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
+		[item setRepresentedObject:path];
+		[item setTarget:self];
+		[inMenu addItem:item];
+		[item release];
+	}
+}
+
+
+- (IBAction) revealInFinder:(id)inSender
+{
+	NSString* path = (NSString*)[inSender representedObject];
+	NSString* folder = [path stringByDeletingLastPathComponent];
+	[[NSWorkspace imb_threadSafeWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @end
