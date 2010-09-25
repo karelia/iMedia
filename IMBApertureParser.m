@@ -150,6 +150,8 @@
 		{
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
+			BOOL exists,changed;
+			exists = [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
 
 			IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = path;
