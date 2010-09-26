@@ -334,11 +334,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IBAction) showWindow:(id)inSender
-{
-	[self.window makeKeyAndOrderFront:nil];
-}
-
 - (IBAction) hideWindow:(id)inSender
 {
 	[self.window orderOut:nil];
