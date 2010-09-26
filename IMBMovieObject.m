@@ -93,7 +93,7 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 	if (self = [super init])
 	{
 		_posterFrame = NULL;
-		_didRequestPosterFrame = NO;
+		_isLoadingPosterFrame = NO;
 	}
 	
 	return self;
@@ -133,9 +133,9 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 {	
 	if (_posterFrame == NULL)
 	{
-		if (_didRequestPosterFrame == NO)
+		if (_isLoadingPosterFrame == NO)
 		{
-			_didRequestPosterFrame = YES;
+			_isLoadingPosterFrame = YES;
 
 			if ([NSThread isMainThread])
 			{
@@ -209,6 +209,7 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 - (void) _setPosterFrame:(id)inImage
 {
 	self.posterFrame = (CGImageRef)inImage;
+	_isLoadingPosterFrame = NO;
 }
 
 
