@@ -262,6 +262,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 - (void) windowDidLoad
 {
+    // There's generally no need for the media browser to be key window
+    [(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded:YES];
+    
 	[ibTabView setDelegate:self];
 	[ibToolbar setSizeMode:NSToolbarSizeModeSmall];
 	[ibToolbar setAllowsUserCustomization:NO];
