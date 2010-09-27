@@ -55,7 +55,7 @@
 #import "IMBiPhotoParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-#import "IMBEnhancedObject.h"
+#import "IMBObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
@@ -163,10 +163,12 @@
 	return parserInstances;
 }
 
+
 - (Class) objectClass
 {
-	return [IMBEnhancedObject class];
+	return [IMBObject class];
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -415,9 +417,8 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path checkSpotlightComments:NO]];
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
 	if ([NSThread isMainThread])
@@ -759,7 +760,7 @@
 						name = [[path lastPathComponent] stringByDeletingPathExtension];	// fallback to filename
 					}
 					
-					IMBEnhancedObject* object = [[objectClass alloc] init];
+					IMBObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 

@@ -79,6 +79,7 @@
 {
 	id _location;												
 	NSString* _name;
+	NSDictionary* _preliminaryMetadata;
 	NSDictionary* _metadata;
 	NSString* _metadataDescription;
 	IMBParser* _parser;
@@ -99,7 +100,8 @@
 @property (retain) id location;								// Path, URL, or other location info
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
-@property (retain) NSDictionary* metadata;					// Optional metadata
+@property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
+@property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
 @property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)
 @property (retain) IMBParser* parser;						// Parser that created this object
 @property (assign) NSUInteger index;						// Index of object in the array (optional)

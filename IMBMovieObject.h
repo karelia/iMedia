@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBEnhancedObject.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ extern NSString* kIMBPosterFrameProperty;
 
 // This subclass adds the capability to cache the poster frame of a movie... 
 
-@interface IMBMovieObject : IMBEnhancedObject
+@interface IMBMovieObject : IMBObject
 {
 	CGImageRef _posterFrame;
 	BOOL _isLoadingPosterFrame;

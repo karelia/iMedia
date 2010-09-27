@@ -54,7 +54,7 @@
 
 #import "IMBApertureAudioParser.h"
 #import "IMBParserController.h"
-#import "IMBEnhancedObject.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------

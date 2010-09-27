@@ -191,8 +191,7 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
 	[metadata setObject:inObject.location forKey:@"path"];
 
 	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inObject.location);

@@ -452,8 +452,7 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
-	NSDictionary* metadata = object.preliminaryMetadata;
+	NSDictionary* metadata = inObject.preliminaryMetadata;
 	NSString* description = metadata ? [self metadataDescriptionForMetadata:metadata] : @"";
 
 	if ([NSThread isMainThread])
