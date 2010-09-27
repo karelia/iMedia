@@ -57,7 +57,7 @@
 #import "IMBApertureHeaderViewController.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-#import "IMBEnhancedObject.h"
+#import "IMBObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
@@ -734,7 +734,7 @@
 
 - (Class) objectClass
 {
-	return [IMBEnhancedObject class];
+	return [IMBObject class];
 }
 
 
@@ -775,7 +775,7 @@
 					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [objectDict objectForKey:@"Caption"];
 
-					IMBEnhancedObject* object = [[objectClass alloc] init];
+					IMBObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 
@@ -811,9 +811,8 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path checkSpotlightComments:NO]];
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
 	if ([NSThread isMainThread])

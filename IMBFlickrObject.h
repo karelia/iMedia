@@ -52,13 +52,13 @@
 
 #pragma mark HEADERS
 
-#import <iMedia/IMBEnhancedObject.h>
+#import <iMedia/IMBObject.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBFlickrObject : IMBEnhancedObject
+@interface IMBFlickrObject : IMBObject
 
 @end
 

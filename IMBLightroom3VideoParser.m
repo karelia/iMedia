@@ -54,7 +54,7 @@
 
 #import "IMBLightroom3VideoParser.h"
 #import "IMBParserController.h"
-#import "IMBEnhancedObject.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------

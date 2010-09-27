@@ -53,7 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
-#import "IMBEnhancedObject.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBLightroomObject : IMBEnhancedObject
+@interface IMBLightroomObject : IMBObject
 {
 	NSString* _absolutePyramidPath;
 }

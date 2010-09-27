@@ -72,6 +72,7 @@
 
 @synthesize location = _location;
 @synthesize name = _name;
+@synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
 @synthesize parser = _parser;
 @synthesize index = _index;
@@ -134,6 +135,7 @@
 	{
 		self.location = [inCoder decodeObjectForKey:@"location"];
 		self.name = [inCoder decodeObjectForKey:@"name"];
+		self.preliminaryMetadata = [inCoder decodeObjectForKey:@"preliminaryMetadata"];
 		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
 		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
 		self.index = [inCoder decodeIntegerForKey:@"index"];
@@ -150,6 +152,7 @@
 {
 	[inCoder encodeObject:self.location forKey:@"location"];
 	[inCoder encodeObject:self.name forKey:@"name"];
+	[inCoder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
 	[inCoder encodeObject:self.metadata forKey:@"metadata"];
 	[inCoder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
 	[inCoder encodeInteger:self.index forKey:@"index"];
@@ -164,6 +167,7 @@
 	
 	copy.location = self.location;
 	copy.name = self.name;
+	copy.preliminaryMetadata = self.preliminaryMetadata;
 	copy.metadata = self.metadata;
 	copy.metadataDescription = self.metadataDescription;
 	copy.parser = self.parser;
@@ -185,6 +189,7 @@
 {
 	IMBRelease(_location);
 	IMBRelease(_name);
+	IMBRelease(_preliminaryMetadata);
 	IMBRelease(_metadata);
 	IMBRelease(_metadataDescription);
 	IMBRelease(_parser);

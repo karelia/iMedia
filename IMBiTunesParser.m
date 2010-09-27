@@ -56,7 +56,7 @@
 #import "IMBiTunesParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-#import "IMBEnhancedObject.h"
+#import "IMBObject.h"
 #import "IMBIconCache.h"
 #import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
@@ -600,7 +600,7 @@
 
 - (Class) objectClass
 {
-	return [IMBEnhancedObject class];
+	return [IMBObject class];
 }
 
 
@@ -655,7 +655,7 @@
 					
 					// Create an object...
 					
-					IMBEnhancedObject* object = [[objectClass alloc] init];
+					IMBObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 
