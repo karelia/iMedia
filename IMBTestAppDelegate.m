@@ -86,8 +86,8 @@
 {
 	// NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d",   MAC_OS_X_VERSION_MIN_REQUIRED, MAC_OS_X_VERSION_MAX_ALLOWED);
 	
-	
 	[IMBConfig setShowsGroupNodes:YES];
+	[IMBConfig setUseGlobalViewType:YES];
 	
 #if CUSTOM_USER_INTERFACE
 	
