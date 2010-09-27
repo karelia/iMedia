@@ -101,7 +101,6 @@
 
 - (void) loadControllers;
 - (IMBObjectViewController*) objectViewControllerForMediaType:(NSString*)inMediaType;
-- (IBAction) showWindow:(id)inSender;
 - (IBAction) hideWindow:(id)inSender;
 
 - (void) saveStateToPreferences;
