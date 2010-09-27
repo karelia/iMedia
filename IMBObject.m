@@ -253,6 +253,12 @@
 }
 
 
+- (BOOL) isDraggable
+{
+	return YES;
+}
+
+
 - (BOOL) needsImageRepresentation
 {
 	return _needsImageRepresentation || (_imageRepresentation == nil);

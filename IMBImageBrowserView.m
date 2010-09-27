@@ -306,7 +306,7 @@ enum IMBMouseOperation
 	{
 		[self.delegate setDropDestinationURL:nil];		// initialize to nil so we know drag has just started
 		
-		if ([_clickedObject url] != nil)
+		if ([_clickedObject isDraggable])
 		{
 			[super mouseDragged:inEvent];
 			return;

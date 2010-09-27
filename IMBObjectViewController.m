@@ -1850,12 +1850,12 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (BOOL) tableView:(NSTableView*)inTableView writeRowsWithIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard 
 {
-	if (nil == [_clickedObject url])
+	if ([_clickedObject isDraggable])
 	{
-		return NO;	// don't allow drag if we clicked on a disabled object
+		return ([self writeItemsAtIndexes:inIndexes toPasteboard:inPasteboard] > 0);
 	}
 	
- 	return ([self writeItemsAtIndexes:inIndexes toPasteboard:inPasteboard] > 0);
+	return NO;
 }
 
 

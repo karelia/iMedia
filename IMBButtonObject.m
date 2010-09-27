@@ -107,9 +107,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Buttons are not selectable...
+// Buttons are not selectable or draggable...
 
 - (BOOL) isSelectable 
+{
+	return NO;
+}
+
+
+- (BOOL) isDraggable
 {
 	return NO;
 }
