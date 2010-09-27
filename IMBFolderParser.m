@@ -105,6 +105,7 @@
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
+	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
 	NSError* error = nil;
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
 	path = [path stringByStandardizingPath];
@@ -112,7 +113,7 @@
 	// Check if the folder exists. If not then do not return a node...
 	
 	BOOL exists,directory;
-	exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
+	exists = [fm fileExistsAtPath:path isDirectory:&directory];
 	
 	if (!exists || !directory) 
 	{
@@ -126,7 +127,7 @@
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForPath:path]; 
-	newNode.name = [[NSFileManager imb_threadSafeManager] displayNameAtPath:path];
+	newNode.name = [fm displayNameAtPath:path];
 	newNode.icon = [self iconForPath:path];
 	newNode.parser = self;
 	newNode.leaf = NO;
@@ -175,9 +176,10 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
+	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
 	NSError* error = nil;
 	NSString* folder = inNode.mediaSource;
-	NSArray* files = [[NSFileManager imb_threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
+	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	
@@ -208,15 +210,15 @@
 				NSString* path = [folder stringByAppendingPathComponent:file];
 				
 				// For folders will be handled later. Just remember it for now...
-				
-				if ([self fileAtPath:path conformToimb_doesUTI:(NSString*)kUTTypeFolder])
+				BOOL isDir = NO;
+				if ([fm fileExistsAtPath:path isDirectory:&isDir] && isDir) 
 				{
 					[folders addObject:path];
 				}
 				
 				// Create an IMBVisualObject for each qualifying file...
 				
-				else if ([self fileAtPath:path conformToimb_doesUTI:_fileUTI])
+				else if ([self fileAtPath:path conformsToUTI:_fileUTI])
 				{
 					IMBObject* object = [self objectForPath:path name:file index:index++];
 					[objects addObject:object];
@@ -234,7 +236,7 @@
 				pool = [[NSAutoreleasePool alloc] init];
 			}
 			
-			NSString* name = [[NSFileManager imb_threadSafeManager] displayNameAtPath:folder];
+			NSString* name = [fm displayNameAtPath:folder];
 			
 			IMBNode* subnode = [[IMBNode alloc] init];
 			subnode.parentNode = inNode;
@@ -244,8 +246,33 @@
 			subnode.icon = [self iconForPath:folder]; //[[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
 			subnode.parser = self;
 			subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
-			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibrarController _reloadNodesWithWatchedPath:
-			subnode.leaf = NO;
+			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
+			
+			// Should this folder be a leaf or not?  We are going to have to scan into the directory
+		
+			NSError* error = nil;
+			NSArray *folderContents = [fm contentsOfDirectoryAtPath:folder error:&error];	// When we go 10.6 only, use better APIs.
+			BOOL hasSubDir = NO;
+			int fileCounter = 0;	// bail if this is a really full folder
+			if (folderContents)
+			{
+				for (NSString *isThisADirectory in folderContents)
+				{
+					fileCounter++;
+					NSString *subPath = [folder stringByAppendingPathComponent:isThisADirectory];
+					// Would it be faster to use attributesOfItemAtPath:error: ????
+					if ([fm fileExistsAtPath:subPath isDirectory:&hasSubDir] && hasSubDir)
+					{
+						break;	// Yes, found a subdir, so we want a disclosure triangle on this
+					}
+					else if (fileCounter > 100)
+					{
+						hasSubDir = YES;	// just in case, assume there is a subfolder there
+						break;
+					}
+				}
+			}
+			subnode.leaf = !hasSubDir;	// if it doesn't have a subdirectory, treat it as a leaf
 			subnode.includedInPopup = NO;
 			[subnodes addObject:subnode];
 			[subnode release];
@@ -279,7 +306,7 @@
 #pragma mark Helpers
 
 
-- (BOOL) fileAtPath:(NSString*)inPath conformToimb_doesUTI:(NSString*)inRequiredUTI
+- (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI
 {
 	NSString* uti = [NSString imb_UTIForFileAtPath:inPath];
 	return (BOOL) UTTypeConformsTo((CFStringRef)uti,(CFStringRef)inRequiredUTI);
