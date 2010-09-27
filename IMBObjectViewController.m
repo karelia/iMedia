@@ -558,6 +558,9 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) willShowView
 {
 	// To be overridden by subclass...
+	
+	[self willChangeValueForKey:@"viewType"];
+	[self didChangeValueForKey:@"viewType"];
 }
 
 
@@ -597,15 +600,30 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Availability of the icon size slide depends on the view type (e.g. not available in list view...
+// Depending of the IMBConfig setting useGlobalViewType, the controller either uses a global state, or each
+// controller keeps its own state. It is up to the application developer to choose a behavior...
 
 - (void) setViewType:(NSUInteger)inViewType
 {
 	[self willChangeValueForKey:@"canUseIconSize"];
 	_viewType = inViewType;
+	[IMBConfig setPrefsValue:[NSNumber numberWithUnsignedInteger:inViewType] forKey:@"globalViewType"];
 	[self didChangeValueForKey:@"canUseIconSize"];
 }
 
+
+- (NSUInteger) viewType
+{
+	if ([IMBConfig useGlobalViewType])
+	{
+		return [[IMBConfig prefsValueForKey:@"globalViewType"] unsignedIntegerValue];
+	}
+	
+	return _viewType;
+}
+
+
+// Availability of the icon size slide depends on the view type (e.g. not available in list view)...
 
 - (BOOL) canUseIconSize
 {
@@ -634,6 +652,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// Change the cell size of the icon view. Also notify the parser so it can update thumbnails if necessary...
 	
 	_iconSize = inIconSize;
+	[IMBConfig setPrefsValue:[NSNumber numberWithDouble:inIconSize] forKey:@"globalIconSize"];
 	
 	NSSize size = [ibIconView cellSize];
 	IMBParser* parser = self.currentNode.parser;
@@ -669,6 +688,17 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// Tooltips in the icon view need to be rebuilt...
 	
 	[self _updateTooltips];
+}
+
+
+- (double) iconSize
+{
+	if ([IMBConfig useGlobalViewType])
+	{
+		return [[IMBConfig prefsValueForKey:@"globalIconSize"] doubleValue];
+	}
+	
+	return _iconSize;
 }
 
 
@@ -1739,6 +1769,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			cell.imageRepresentation = object.imageRepresentation;
 			cell.imageRepresentationType = object.imageRepresentationType;
 		}
+		
 		cell.title = object.imageTitle;
 		cell.subtitle = object.metadataDescription;
 	}
@@ -1935,6 +1966,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #ifdef DEBUG
 		NSLog(@"changedVis…:… _ADD__ ['%@' addObs…:%p 4kp:imageRep…", [object name], self);
 #endif
+
 		[object addObserver:self forKeyPath:kIMBObjectImageRepresentationProperty options:0 context:(void*)ibComboView];
 		[object addObserver:self forKeyPath:kIMBPosterFrameProperty options:0 context:(void*)ibComboView];
      }
