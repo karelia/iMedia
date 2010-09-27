@@ -115,6 +115,7 @@
 		BOOL isDirectory;
 		if ( [fm fileExistsAtPath:anAbsolutePath isDirectory:&isDirectory] )
 		{
+			// TODO: Really should use -[NSWorkspace isFilePackageAtPath:] to possibly return either kUTTypePackage or kUTTypeFolder
 			result = isDirectory ? (NSString *)kUTTypeDirectory : (NSString *)kUTTypeData;
 		}
 	}
@@ -172,7 +173,7 @@
 // See list here:
 // http://developer.apple.com/documentation/Carbon/Conceptual/understanding_utis/utilist/chapter_4_section_1.html
 
-+ (BOOL) imb_doesUTI:(NSString *)aUTI conformToimb_doesUTI:(NSString *)aConformsToUTI
++ (BOOL) imb_doesUTI:(NSString *)aUTI conformsToUTI:(NSString *)aConformsToUTI
 {
 	return UTTypeConformsTo((CFStringRef)aUTI, (CFStringRef)aConformsToUTI);
 }

@@ -139,7 +139,8 @@
                     if (view != nil)
 					{
                         [self addSubview:view];
-                    } else
+                    }
+					else
 					{
                         // Use null as a place holder so we don't call the delegate again until the row is relaoded
                         view = [NSNull null]; 

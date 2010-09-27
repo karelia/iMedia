@@ -447,7 +447,7 @@
 		uti = [NSString imb_UTIForFilenameExtension:extension];
 	}
 
-	if (uti != nil && [NSString imb_doesUTI:uti conformToimb_doesUTI:(NSString*)kUTTypeAliasFile])
+	if (uti != nil && [NSString imb_doesUTI:uti conformsToUTI:(NSString*)kUTTypeAliasFile])
 	{
 		path = [path imb_resolvedPath];
 		uti = [NSString imb_UTIForFileAtPath:path];
