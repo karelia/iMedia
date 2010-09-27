@@ -127,6 +127,14 @@
 }
 
 
+// This object can be dragged (downloaded) if we have a URL...
+
+- (BOOL) isDraggable
+{
+	return [self url] != nil;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark -

@@ -121,6 +121,7 @@
 @property (readonly) NSString* imageUID;
 @property (retain) id imageRepresentation;	
 @property (readonly) BOOL isSelectable;
+@property (readonly) BOOL isDraggable;
 @property (assign) BOOL needsImageRepresentation;
 @property (retain) NSString* imageRepresentationType;
 @property (readonly) NSString* imageTitle;
