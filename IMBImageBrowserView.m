@@ -245,6 +245,7 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 - (void) mouseDown:(NSEvent*)inEvent
 {
 	// Find the clicked object...
@@ -298,17 +299,25 @@ enum IMBMouseOperation
 		[self setNeedsDisplayInRect:[self itemFrameAtIndex:_clickedObjectIndex]];
 	}
 	
+	// If the user clicked on an object, then this will start a drag. Ignore the drag if the object is 
+	// not supposed to be draggable...
+	
+	else if (_clickedObject)
+	{
+		[self.delegate setDropDestinationURL:nil];		// initialize to nil so we know drag has just started
+		
+		if ([_clickedObject url] != nil)
+		{
+			[super mouseDragged:inEvent];
+			return;
+		}
+	}
+	
 	// Let the superclass handle other events...
 	
 	else
 	{
-		[self.delegate setDropDestinationURL:nil];		// initialize to nil so we know drag has just started
-		
-		if (nil != [_clickedObject url])
-		{
-			[super mouseDragged:inEvent];
-		}
-		// Ignore drag if we don't have a draggable object
+		[super mouseDragged:inEvent];
 	}
 }
 
@@ -345,18 +354,25 @@ enum IMBMouseOperation
 	self.clickedObject = nil;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark
 #pragma mark Dragging Promise Support
+
 
 - (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
 {
 	return [self.delegate namesOfPromisedFilesDroppedAtDestination:inDropDestination];
 }
 
+
 - (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
 {
 	[self.delegate draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

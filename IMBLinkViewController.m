@@ -162,10 +162,24 @@
 	[super setViewType:inViewType];
 }
 
+
+- (NSUInteger) viewType
+{
+	NSUInteger viewType = [super viewType];
+	if (viewType < 1) viewType = 1;
+	if (viewType > 2) viewType = 2;
+	return viewType;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (IBAction) quicklook:(id)inSender
 {
 	// Don't try to do quicklook for links
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

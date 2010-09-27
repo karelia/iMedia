@@ -69,6 +69,11 @@
 + (void) setShowsGroupNodes:(BOOL)inState;
 + (BOOL) showsGroupNodes;
 
+// Determines whether all mediaType share the same viewType state, or whether each keeps its own state...
+
++ (void) setUseGlobalViewType:(BOOL)inGlobalViewType;
++ (BOOL) useGlobalViewType;
+
 // Sets path for the download folder for remote IMBObjects (e.g. from Flickr or camera devices)...
 
 + (void) setDownloadFolderPath:(NSString*)inPath;

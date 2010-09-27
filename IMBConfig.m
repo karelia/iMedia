@@ -64,10 +64,13 @@
 
 static NSString* sIMBPrefsKeyFormat = @"iMedia2_%@";
 static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
+//static NSString* sIMBUseGlobalViewTypeKey = @"useGlobalViewType";
 static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 static NSString* sIMBViewerAppPathsKey = @"viewerAppPaths";
 static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 static NSString* sIMBFlickrDownloadSizeKey = @"flickrDownloadSize";
+
+static BOOL sUseGlobalViewType = NO;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -147,6 +150,21 @@ static NSString* sIMBFlickrDownloadSizeKey = @"flickrDownloadSize";
 + (BOOL) showsGroupNodes
 {
 	return [[self prefsValueForKey:sIMBShowsGroupNodesKey] boolValue];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) setUseGlobalViewType:(BOOL)inState
+{
+	sUseGlobalViewType = inState;
+}
+
+
++ (BOOL) useGlobalViewType
+{
+	return sUseGlobalViewType;
 }
 
 
