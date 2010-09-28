@@ -142,6 +142,11 @@
 		inRootNode.subNodes = [NSMutableArray array];
 	}
 	
+	if (inRootNode.objects == nil) {
+		inRootNode.objects = [NSMutableArray array];
+		inRootNode.displayedObjectCount = 0;
+	}
+	
 	// Add the Folders node...
 	
 	NSNumber* id_local = [NSNumber numberWithInt:-1];

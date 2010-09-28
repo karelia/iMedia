@@ -346,8 +346,6 @@ static NSArray* sSupportedUTIs = nil;
 		node.parser = self;
 		node.leaf = NO;
 		node.groupType = kIMBGroupTypeLibrary;
-		node.objects = [NSMutableArray array];
-		node.displayedObjectCount = 0;
 	}
 	else
 	{
@@ -465,10 +463,6 @@ static NSArray* sSupportedUTIs = nil;
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	if (inRootNode.subNodes == nil) {
-		inRootNode.subNodes = [NSMutableArray array];
-	}
-	
 	[self populateSubnodesForCollectionNode:inRootNode];
 }
 

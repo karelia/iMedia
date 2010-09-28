@@ -191,6 +191,7 @@
 	
 	if (inRootNode.objects == nil) {
 		inRootNode.objects = [NSMutableArray array];
+		inRootNode.displayedObjectCount = 0;
 	}
 	
 	// Add the Folders node...
