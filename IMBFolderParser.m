@@ -417,6 +417,24 @@
 }
 
 
+- (void) willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode
+{
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBObjectViewController.menuItem.revealInFinder",
+		nil,IMBBundle(),
+		@"Reveal in Finder",
+		@"Menu item in context menu of IMBObjectViewController");
+	
+	NSString* path = (NSString*) [inNode mediaSource];
+	
+	NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
+	[item setRepresentedObject:path];
+	[item setTarget:self];
+	[inMenu addItem:item];
+	[item release];
+}
+
+
 - (IBAction) revealInFinder:(id)inSender
 {
 	NSString* path = (NSString*)[inSender representedObject];
