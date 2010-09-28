@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBObject.h"
+#import "IMBObjectPromise.h"
 #import "IMBParser.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
@@ -344,6 +345,53 @@
 {
 	// For overriding by subclass
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Pasteboard Writing
+
+
+// For when we target 10.6, IMBObjects should really implement NSPasteboardWriting as it's a near perfect fit. Until then, its methods are still highly useful for support...
+
+- (NSArray *)writableTypesForPasteboard:(NSPasteboard *)pasteboard;
+{
+    // Try declaring promise AFTER the other types
+    return [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,
+            ([self isLocalFile] ? kUTTypeFileURL : kUTTypeURL), 
+                     
+                     // Also our own special metadata types that clients can make use of
+            //kIMBPublicTitleListPasteboardType, kIMBPublicMetadataListPasteboardType,
+                     
+                     nil]; 
+    // Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
+    
+    
+}
+
+- (id)pasteboardPropertyListForType:(NSString *)type;
+{
+    if ([type isEqualToString:(NSString *)kUTTypeURL] ||
+        [type isEqualToString:(NSString *)kUTTypeFileURL] ||
+        [type isEqualToString:NSURLPboardType] ||
+        [type isEqualToString:@"CorePasteboardFlavorType 0x6675726C"])
+    {
+        return [[self url] absoluteString];
+    }
+    else if ([type isEqualToString:NSFilenamesPboardType])
+    {
+        return [NSArray arrayWithObject:[self path]];
+    }
+    
+    return nil;
+}
+
+/*  This ought to be implemented at some point
+- (NSPasteboardWritingOptions)writingOptionsForType:(NSString *)type pasteboard:(NSPasteboard *)pasteboard;
+{
+    
+}*/
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -72,7 +72,7 @@
 
 @interface IMBObject : NSObject
 #if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-<NSCopying,NSCoding,IMBImageItem,QLPreviewItem>
+<NSCopying,NSCoding,IMBImageItem,QLPreviewItem,NSPasteboardWriting>
 #else
 <NSCopying,NSCoding,IMBImageItem>
 #endif
