@@ -107,6 +107,17 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (IMBObjectPromise *)objectPromiseFromPasteboard:(NSPasteboard *)pasteboard;
+{
+    IMBObjectPromise *result = nil;
+    if ([[pasteboard types] containsObject:kIMBObjectPromiseType])
+    {
+        NSData *data = [pasteboard dataForType:kIMBObjectPromiseType];
+        if (data) result = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    }
+    return result;
+}
+
 - (id) initWithIMBObjects:(NSArray*)inObjects
 {
 	if (self = [super init])

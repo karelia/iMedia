@@ -122,6 +122,8 @@ extern NSString* kIMBObjectPromiseType;
 
 @property (retain) NSMutableDictionary* objectsToLocalURLs;
 
++ (IMBObjectPromise *)objectPromiseFromPasteboard:(NSPasteboard *)pasteboard;
+
 /// Create a promise with an array of objects
 
 - (id) initWithIMBObjects:(NSArray*)inObjects;
