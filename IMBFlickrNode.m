@@ -392,6 +392,8 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	IMBFlickrParser *parser = (IMBFlickrParser *)self.parser;
 	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
+	self.displayedObjectCount = 0;
+	
 	for (NSDictionary* photoDict in photos) {
 
 		IMBFlickrObject* obj = [[IMBFlickrObject alloc] init];
@@ -463,7 +465,9 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		
 		[objects addObject:obj];
 		[obj release];
+		self.displayedObjectCount++;
 	}
+	
 	return objects;
 }
 

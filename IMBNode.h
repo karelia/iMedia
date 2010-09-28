@@ -79,6 +79,7 @@
 	NSUInteger _groupType;
 	NSArray* _objects;
 	NSArray* _subNodes;
+	NSInteger _displayedObjectCount;
 	
 	IMBNode* _parentNode;	// not retained!
 	BOOL _group;
@@ -133,6 +134,14 @@
 
 - (NSUInteger) countOfBindableObjects;
 - (IMBObject*) objectInBindableObjectsAtIndex:(NSUInteger)inIndex;
+
+// This property can be used by parsers if the real object count differs from what the NSArrayController sees. 
+// An example would be a folder based parser. If a folder contains 3 images and 3 subfolders, then 6 objects 
+// are reported by the NSArrayController, but we really only want 3 image displayed in the user interface.
+// If property is left at the uninitialized value of -1, then countOfBindableObjects is used as is. If a parser
+// chooses to write a non negative value into this property, then this number is displayed instead...
+ 
+@property (assign) NSInteger displayedObjectCount;
 
 // State information about a node...
 
