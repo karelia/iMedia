@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,6 +92,14 @@ extern NSString* kIMBObjectPromiseType;
 	BOOL _wasCanceled;
 }
 
+
+#pragma mark Creating an Object Promise
++ (IMBObjectPromise *)objectPromiseFromPasteboard:(NSPasteboard *)pasteboard;
+- (id) initWithIMBObjects:(NSArray*)inObjects;
+
+
+#pragma mark 
+
 /// Array of IMBObjects that was supplied in the init method
 
 @property (retain) NSArray* objects;
@@ -121,12 +129,6 @@ extern NSString* kIMBObjectPromiseType;
 @property (retain) NSError* error;				
 
 @property (retain) NSMutableDictionary* objectsToLocalURLs;
-
-+ (IMBObjectPromise *)objectPromiseFromPasteboard:(NSPasteboard *)pasteboard;
-
-/// Create a promise with an array of objects
-
-- (id) initWithIMBObjects:(NSArray*)inObjects;
 
 /// Clients can start loading objects asynchronously. Once the finish selector is called the loading is done and local files can be retrieved.
 
