@@ -192,7 +192,9 @@
 		NSMutableArray* objects = [[NSMutableArray alloc] initWithCapacity:files.count];
 		inNode.objects = objects;
 		[objects release];
-
+		
+		inNode.displayedObjectCount = 0;
+		
 		NSMutableArray* folders = [NSMutableArray array];
 	
 		for (NSString* file in files)
@@ -222,6 +224,7 @@
 				{
 					IMBObject* object = [self objectForPath:path name:file index:index++];
 					[objects addObject:object];
+					inNode.displayedObjectCount++;
 				}
 			}
 		}

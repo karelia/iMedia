@@ -705,9 +705,16 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Return the oject count for the currently selected node. Please note that we ask the node first. Only if the 
+// count is missing, we ask the NSArrayController. This way we can react to custom situations, like 3 images and 3 
+// subfolders being reported as "3 images" instead of "6 images"...
+
 - (NSString*) objectCountString
 {
-	NSUInteger count = [[ibObjectArrayController arrangedObjects] count];
+	IMBNode* node = [self currentNode];
+	NSUInteger count = node.displayedObjectCount;
+	if (count < 0) count = [[ibObjectArrayController arrangedObjects] count];
+	
 	NSString* format = count==1 ? self.objectCountFormatSingular : self.objectCountFormatPlural;
 	return [NSString stringWithFormat:format,count];
 }

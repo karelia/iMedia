@@ -98,6 +98,7 @@
 @synthesize loading = _loading;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 @synthesize includedInPopup = _includedInPopup;
+@synthesize displayedObjectCount = _displayedObjectCount;
 
 // Support for live watching...
 
@@ -133,6 +134,7 @@
 		self.loading = NO;
 		self.wantsRecursiveObjects = NO;
 		self.includedInPopup = YES;
+		self.displayedObjectCount = -1;
 		
 		self.objects = nil;
 		self.subNodes = nil;
@@ -167,6 +169,7 @@
 	copy.loading = self.loading;
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 	copy.includedInPopup = self.includedInPopup;
+	copy.displayedObjectCount = self.displayedObjectCount;
 	
 	copy.parentNode = self.parentNode;
 	copy.parser = self.parser;
@@ -187,7 +190,7 @@
 	
 	if (self.objects) copy.objects = [NSMutableArray arrayWithArray:self.objects];
 	else copy.objects = nil;
-
+	
 	// Create a deep copy of the subnodes. This is essential to make background operations completely threadsafe...
 	
 	if (self.subNodes)
