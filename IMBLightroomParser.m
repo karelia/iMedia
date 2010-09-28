@@ -347,6 +347,7 @@ static NSArray* sSupportedUTIs = nil;
 		node.leaf = NO;
 		node.groupType = kIMBGroupTypeLibrary;
 		node.objects = [NSMutableArray array];
+		node.displayedObjectCount = 0;
 	}
 	else
 	{
@@ -488,6 +489,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (inFoldersNode.objects == nil) {
 		inFoldersNode.objects = [NSMutableArray array];
+		inFoldersNode.displayedObjectCount = 0;
 	}
 	
 	// Query the database for the root folders and create a node for each one we find...
@@ -564,6 +566,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (inParentNode.objects == nil) {
 		inParentNode.objects = [NSMutableArray array];
+		inParentNode.displayedObjectCount = 0;
 	}
 	
 	// Query the database for subfolder and add a node for each one we find...
@@ -663,6 +666,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (inParentNode.objects == nil) {
 		inParentNode.objects = [NSMutableArray array];
+		inParentNode.displayedObjectCount = 0;
 	}
 	
 	
@@ -778,6 +782,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (inNode.objects == nil) {
 		inNode.objects = [NSMutableArray array];
+		inNode.displayedObjectCount = 0;
 	}
 	
 	// Query the database for image files for the specified node. Add an IMBObject for each one we find...
@@ -830,6 +835,7 @@ static NSArray* sSupportedUTIs = nil;
 												   index:index++];
 				
 				[objects addObject:object];
+				inNode.displayedObjectCount++;
 			}
 		}
 		
@@ -853,6 +859,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (inNode.objects == nil) {
 		inNode.objects = [NSMutableArray array];
+		inNode.displayedObjectCount = 0;
 	}
 	
 	// Query the database for image files for the specified node. Add an IMBObject for each one we find...
@@ -901,6 +908,7 @@ static NSArray* sSupportedUTIs = nil;
 												metadata:metadata
 												   index:index++];
 				[(NSMutableArray*)inNode.objects addObject:object];
+				inNode.displayedObjectCount++;
 			}
 		}
 		
