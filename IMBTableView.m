@@ -300,7 +300,7 @@ enum IMBMouseOperation
 	
 	else
 	{
-		if (nil != [_clickedObject url])
+		if (nil != [_clickedObject URL])
 		{
 			[super mouseDragged:inEvent];
 		}

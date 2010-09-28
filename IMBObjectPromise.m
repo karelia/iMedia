@@ -226,7 +226,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	{
 		if (![object isKindOfClass:[IMBButtonObject class]])
 		{
-			NSURL* url = [object url];
+			NSURL* url = [object URL];
 			if (url)	// if unable to download, URL will be nil
 			{
 				_objectCountTotal++;
@@ -358,7 +358,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 {
 	// Get the path...
 	
-	NSURL* localURL = [inObject url];
+	NSURL* localURL = [inObject URL];
 	
 	// For file URLs, only add if the file at the path exists...
 	
@@ -583,7 +583,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	{
 		if (![object isKindOfClass:[IMBButtonObject class]])
 		{
-			NSURL* url = [object url];
+			NSURL* url = [object URL];
 			
 			if (url)	// if unable to download, URL will be nil
 			{
