@@ -97,7 +97,7 @@ extern NSString* kIMBObjectPromiseType;
 @property (retain) NSArray* objects;
 
 /// Optional download folder (only needed for remote files that need to be downloaded)
-
+/// Defaults to tmp folder?
 @property (retain) NSString* downloadFolderPath;
 
 /// Array of URLs referencing a local copy of a file, or in the case of e.g. link objects,

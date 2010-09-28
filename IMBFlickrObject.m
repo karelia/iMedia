@@ -131,7 +131,7 @@
 
 - (BOOL) isDraggable
 {
-	return [self url] != nil;
+	return [self URL] != nil;
 }
 
 

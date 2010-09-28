@@ -280,7 +280,7 @@
 
 - (NSURL*) previewItemURL
 {
-	return self.url;
+	return self.URL;
 }
 
 
@@ -377,7 +377,7 @@
         [type isEqualToString:NSURLPboardType] ||
         [type isEqualToString:@"CorePasteboardFlavorType 0x6675726C"])
     {
-        return [[self url] absoluteString];
+        return [[self URL] absoluteString];
     }
     else if ([type isEqualToString:NSFilenamesPboardType])
     {
@@ -436,7 +436,7 @@
 
 // Convert location to url...
 
-- (NSURL*) url
+- (NSURL*) URL
 {
 	NSURL* url = nil;
 	
@@ -480,7 +480,7 @@
 // if we do not have an extension, or if we are not dealing with files or urls at all, e.g. with image capture 
 // objects...
 
-- (NSString*) uti
+- (NSString*) type
 {
 	NSString* uti = nil;
 	NSString* path = [self path];
