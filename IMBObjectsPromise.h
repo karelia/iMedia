@@ -95,9 +95,29 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 
 #pragma mark Creating an Object Promise
-+ (IMBObjectsPromise *)promiseFromPasteboard:(NSPasteboard *)pasteboard;
-+ (IMBObjectsPromise *)promiseWithLocalIMBObjects:(NSArray *)objects;
++ (IMBObjectsPromise *) promiseFromPasteboard:(NSPasteboard *)pasteboard;
++ (IMBObjectsPromise *) promiseWithLocalIMBObjects:(NSArray *)objects;
 - (id) initWithIMBObjects:(NSArray*)inObjects;
+
+
+#pragma mark Fulfilling the Promise
+
+- (void) start;
+
+/// Clients can start loading objects asynchronously. Once the finish selector is called the loading is done and local files can be retrieved.
+/// finishSelector should be a method with signature - (void) didFinish:(IMBObjectsPromise*)inObjectPromise withError:(NSError*)inError
+
+- (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
+
+/// Retained due to asynchronous nature of the promise
+
+@property (retain) NSObject <IMBObjectsPromiseDelegate> *delegate;			
+
+- (void) waitUntilFinished;
+
+
+#pragma mark Getting the Promise Status
+- (BOOL) isCancelled;
 
 
 #pragma mark 
@@ -118,23 +138,11 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 @property (retain,readonly) NSArray* fileURLs; 
 
-/// Retained due to asynchronous nature of the promise
-
-@property (retain) NSObject <IMBObjectsPromiseDelegate> *delegate;			
-
 /// Contains error in case of failure	
 	
 @property (retain) NSError* error;				
 
 @property (retain) NSMutableDictionary* objectsToLocalURLs;
-
-/// Clients can start loading objects asynchronously. Once the finish selector is called the loading is done and local files can be retrieved.
-/// finishSelector should be a method with signature - (void) didFinish:(IMBObjectsPromise*)inObjectPromise withError:(NSError*)inError
-
-- (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
-- (void) start;
-- (void) waitUntilFinished;
-- (BOOL) isCancelled;
 
 /// After loading is done, you can ask for a local URL specifically by the object you're interested in
 
