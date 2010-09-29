@@ -571,6 +571,13 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	}
 }
 
+- (void) _didFinish
+{
+    [self cleanupProgress];
+    
+	[super _didFinish];
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -728,8 +735,6 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	// Cleanup...
 	
-	[self cleanupProgress];
-		
 	[self performSelectorOnMainThread:@selector(_didFinish) 
 		withObject:nil 
 		waitUntilDone:YES 
@@ -789,8 +794,6 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	if (_objectCountLoaded >= _objectCountTotal)		// Totally done?
 	{
-		[self cleanupProgress];
-		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 			withObject:nil 
 			waitUntilDone:YES 
@@ -813,8 +816,6 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
-		[self cleanupProgress];
-		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 			withObject:nil 
 			waitUntilDone:YES 

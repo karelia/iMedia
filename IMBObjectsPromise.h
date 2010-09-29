@@ -73,11 +73,11 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 #pragma mark 
 
-// An IMBObjectsPromise is a abstraction that is sitting between the iMedia framework and the client application. 
+// IMBObjectsPromise is an abstraction that sits between the iMedia framework and a client application. 
 // Objects from some parsers reside on the local file system, but objects from other parser may reside on a remote 
-// server or a camera device. In these cases we only have lores thumbnails available. To access the hires data, we
+// server or a camera device. In these cases we only have lo-res thumbnails available. To access the hi-res data, we
 // first need to start an asynchronous download operation. To be as lazy as possible, IMBObjectsPromise encapsulates
-// this access. The frameworks hands the promise to the client app, which can then trigger a download as desired...
+// this access. The framework hands the promise to the client app, which can then trigger a download as desired...
 
 @interface IMBObjectsPromise : NSObject <NSCopying,NSCoding>
 {
