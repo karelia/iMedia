@@ -118,9 +118,10 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 #pragma mark Getting the Promise Status
 - (BOOL) isCancelled;
+@property (retain) NSError* error;  /// Contains error in case of failure	
 
 
-#pragma mark 
+#pragma mark Getting Attributes
 
 /// Array of IMBObjects that was supplied in the init method
 
@@ -137,10 +138,6 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 /// NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
 
 @property (retain,readonly) NSArray* fileURLs; 
-
-/// Contains error in case of failure	
-	
-@property (retain) NSError* error;				
 
 @property (retain) NSMutableDictionary* objectsToLocalURLs;
 
