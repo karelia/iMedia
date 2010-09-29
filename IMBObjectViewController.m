@@ -1366,7 +1366,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 // SpeedLimit http://mschrag.github.com/ is a good way to debug this....
 
-- (void) prepareProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise
+- (void) objectsPromiseShowProgress:(IMBObjectsPromise*)inObjectPromise
 {
 	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
 	
@@ -1397,7 +1397,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
-- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectsPromise*)inObjectPromise
+- (void) objectsPromise:(IMBObjectsPromise*)inObjectPromise didProgress:(double)inFraction;
 {
 	[self.progressWindowController setProgress:inFraction];
 	[self.progressWindowController setMessage:@""];
@@ -1405,7 +1405,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
-- (void) cleanupProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise
+- (void) objectsPromiseDidFinish:(IMBObjectsPromise*)inObjectPromise
 {
 	self.progressWindowController = nil;
 }

@@ -159,9 +159,9 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 @optional
 
-- (void) prepareProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise;
-- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectsPromise*)inObjectPromise;
-- (void) cleanupProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise;
+- (void) objectsPromiseShowProgress:(IMBObjectsPromise*)inObjectPromise;
+- (void) objectsPromise:(IMBObjectsPromise*)inObjectPromise didProgress:(double)inFraction;
+- (void) objectsPromiseDidFinish:(IMBObjectsPromise*)inObjectPromise;
 
 @end
 
