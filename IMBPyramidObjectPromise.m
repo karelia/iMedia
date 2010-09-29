@@ -94,7 +94,7 @@
 	}
 	
 	if (imageURL != nil) {
-		[self.objectsToLocalURLs setObject:imageURL forKey:inObject];
+		[self.fileURLsByIMBObject setObject:imageURL forKey:inObject];
 		_objectCountLoaded++;
 	}
 	else {

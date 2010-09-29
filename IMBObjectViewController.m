@@ -1134,7 +1134,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	}
 	else
 	{
-		NSDictionary *objectsToLocalURLs = [promise objectsToLocalURLs];
+		NSDictionary *objectsToLocalURLs = [promise fileURLsByIMBObject];
 		for (IMBObject *promiseObject in objectsToLocalURLs)
 		{
 			NSAssert([promiseObject isKindOfClass:[IMBObject class]], @"promise object must be IMBObject");
