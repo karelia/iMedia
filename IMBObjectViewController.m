@@ -1162,7 +1162,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	else
 	{
 		[self _postProcessDownload:inObjectPromise];		// first do our post-processing
-		for (NSURL* url in inObjectPromise.localURLs)
+		for (NSURL* url in inObjectPromise.fileURLs)
 		{
 			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
 			if ([url isKindOfClass:[NSURL class]])
@@ -1273,7 +1273,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 	[promise waitUntilDone];
 
-	if ([promise.localURLs count] > 0)
+	if ([promise.fileURLs count] > 0)
 	{
 		if (/*_isDragging == NO &&*/ [inType isEqualToString:NSFilenamesPboardType])
 		{
@@ -1282,8 +1282,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			
 			// In case there were NSError objects in the localURLs array, we want to ignore them. So we'll
 			// go through each item and try to get a path out ...
-			NSMutableArray* localPaths = [NSMutableArray arrayWithCapacity:promise.localURLs.count];
-			for (NSURL* thisObject in promise.localURLs)
+			NSMutableArray* localPaths = [NSMutableArray arrayWithCapacity:promise.fileURLs.count];
+			for (NSURL* thisObject in promise.fileURLs)
 			{
 				if ([thisObject isKindOfClass:[NSURL class]])
 				{
@@ -1301,7 +1301,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			// thereare NSError objects in the list, we'll go through until we find an actual URL, and use that 
 			// as the item for the pasteboard			
 			NSURL* thisURL = nil;
-			for (NSURL* thisObject in promise.localURLs)
+			for (NSURL* thisObject in promise.fileURLs)
 			{
 				if ([thisObject isKindOfClass:[NSURL class]])
 				{
