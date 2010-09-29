@@ -116,7 +116,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 ///
 /// NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
 
-@property (retain,readonly) NSArray* localURLs; 
+@property (retain,readonly) NSArray* fileURLs; 
 
 /// Retained due to asynchronous nature of the promise
 
