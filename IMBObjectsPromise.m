@@ -213,7 +213,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSArray*) localURLs
+- (NSArray*) fileURLs
 {
 	NSMutableArray* localURLs = [NSMutableArray array];
 	
@@ -713,7 +713,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	NSFileManager* mgr = [NSFileManager imb_threadSafeManager];
 	
-	for (NSURL* url in self.localURLs)
+	for (NSURL* url in self.fileURLs)
 	{
 		if ([url isKindOfClass:[NSURL class]])
 		{
