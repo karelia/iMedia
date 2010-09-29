@@ -63,7 +63,7 @@
 #import "IMBObject.h"
 #import "IMBMovieObject.h"
 #import "IMBNodeObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBImageBrowserCell.h"
 #import "IMBProgressWindowController.h"
 #import "NSWorkspace+iMedia.h"
@@ -1059,7 +1059,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	IMBParser* parser = self.currentNode.parser;
 	NSArray* objects = [ibObjectArrayController selectedObjects];
-	IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+	IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
 	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 }
 
@@ -1108,13 +1108,13 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode
 {
 	// Double-clicking opens the files (with the default app). Please note that IMBObjects are first passed through an 
-	// IMBObjectPromise (which is returned by the parser), because the resources to be opened may not yet be available.
+	// IMBObjectsPromise (which is returned by the parser), because the resources to be opened may not yet be available.
 	// In this case the promise object loads them asynchronously and calls _openLocalURLs: once the load has finished...
 	
 	if (inSelectedNode)
 	{
 		IMBParser* parser = inSelectedNode.parser;
-		IMBObjectPromise* promise = [parser objectPromiseWithObjects:inObjects];
+		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
 		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalURLs:)];
 	}
 }
@@ -1126,7 +1126,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //
 // This is really set up for Flickr images, though we may want to generatlize it some day.
 
-- (void) _postProcessDownload:(IMBObjectPromise *)promise;
+- (void) _postProcessDownload:(IMBObjectsPromise *)promise;
 {
 	if ([promise isKindOfClass:[NSError class]])	// overloaded... error object
 	{
@@ -1153,7 +1153,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 // procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to IMBObjects 
 // that refer strictly to a web link, where "opening" them just means loading them in a browser...
 
-- (void) _openLocalURLs:(IMBObjectPromise*)inObjectPromise
+- (void) _openLocalURLs:(IMBObjectsPromise*)inObjectPromise
 {
 	if ([inObjectPromise isKindOfClass:[NSError class]])	// overloaded... error object
 	{
@@ -1225,7 +1225,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				if (mappedObject != nil)
 				{
 					// Use our promise object to load the content
-					IMBObjectPromise* promise = [IMBObjectPromise promiseFromPasteboard:inPasteboard];
+					IMBObjectsPromise* promise = [IMBObjectsPromise promiseFromPasteboard:inPasteboard];
 					
 					// Make sure we got a promise, AND check that there are actually some items to download,
 					// before we actually try to start downloading.
@@ -1267,7 +1267,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
 {
 	// NSLog(@"%s:%@", __FUNCTION__, inType);
-	IMBObjectPromise* promise = [IMBObjectPromise promiseFromPasteboard:inPasteboard];
+	IMBObjectsPromise* promise = [IMBObjectsPromise promiseFromPasteboard:inPasteboard];
     
 	promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
 	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
@@ -1335,7 +1335,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		IMBParser* parser = node.parser;
 		NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
 		NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];
-		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
 		promise.downloadFolderPath = [inDestination path];
 		
 		[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
@@ -1361,7 +1361,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 // SpeedLimit http://mschrag.github.com/ is a good way to debug this....
 
-- (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
+- (void) prepareProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise
 {
 	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
 	
@@ -1392,7 +1392,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
-- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise
+- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectsPromise*)inObjectPromise
 {
 	[self.progressWindowController setProgress:inFraction];
 	[self.progressWindowController setMessage:@""];
@@ -1400,7 +1400,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
-- (void) cleanupProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
+- (void) cleanupProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise
 {
 	self.progressWindowController = nil;
 }
@@ -1550,7 +1550,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			IMBParser* parser = node.parser;
 
 			// Promise data for all of the objects being dragged. (In 10.6, each index will be extracted one-by-one.)
-			IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
+			IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
 			if ([promise.objects count] > 0)	// if not downloadable, these won't appear in objects list
 			{
 				NSData* promiseData = [NSKeyedArchiver archivedDataWithRootObject:promise];
@@ -1601,7 +1601,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 							[thisItem setString:[NSString stringWithFormat:@"%d", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
 							[thisItem setString:thisObject.name forType:kIMBPublicTitleListPasteboardType];
 							[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetadataListPasteboardType];
-							[thisItem setData:promiseData forType:kIMBObjectPromiseType];
+							[thisItem setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];
 							[itemArray addObject:thisItem];
 						}
 						
@@ -1622,13 +1622,13 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					if ([self writesLocalFilesToPasteboard])
 					{
 						// Try declaring promise AFTER the other types
-						declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,NSFilenamesPboardType, 
+						declaredTypes = [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilesPromisePboardType,NSFilenamesPboardType, 
 										 
 										 // Also our own special metadata types that clients can make use of
 										 kIMBPublicTitleListPasteboardType, kIMBPublicMetadataListPasteboardType,
 										 
 										 nil]; 
-						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
+						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilenamesPboardType,nil]
 						
 						NSUInteger thisIndex = [indexes firstIndex];
 						while (thisIndex != NSNotFound)
@@ -1647,11 +1647,11 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					}
 					else
 					{
-						declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSURLPboardType,kUTTypeURL,nil];
+						declaredTypes = [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSURLPboardType,kUTTypeURL,nil];
 					}
 					
 					[inPasteboard declareTypes:declaredTypes owner:self];
-					[inPasteboard setData:promiseData forType:kIMBObjectPromiseType];
+					[inPasteboard setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];
 					if ([fileTypes count])
 					{
 						BOOL wasSet = NO;
@@ -1727,7 +1727,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 
 // For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
-// the IMBObjectPromise for the client and block it until all objects are loaded...
+// the IMBObjectsPromise for the client and block it until all objects are loaded...
 
 // THIS VARIATION IS FOR THE DRAG WE INITIATE FROM OUR CUSTOM IKIMAGEBROWSERVIEW SUBCLASS.
 
@@ -1865,7 +1865,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 
 // For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
-// the IMBObjectPromise for the client and block it until all objects are loaded...
+// the IMBObjectsPromise for the client and block it until all objects are loaded...
 
 - (NSArray*) tableView:(NSTableView*)inTableView namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination forDraggedRowsWithIndexes:(NSIndexSet*)inIndexes
 {

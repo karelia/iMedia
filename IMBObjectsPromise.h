@@ -61,7 +61,7 @@
 
 #pragma mark CONSTANTS
 	
-extern NSString* kIMBObjectPromiseType;
+extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,13 +72,13 @@ extern NSString* kIMBObjectPromiseType;
 
 #pragma mark 
 
-// An IMBObjectPromise is a abstraction that is sitting between the iMedia framework and the client application. 
+// An IMBObjectsPromise is a abstraction that is sitting between the iMedia framework and the client application. 
 // Objects from some parsers reside on the local file system, but objects from other parser may reside on a remote 
 // server or a camera device. In these cases we only have lores thumbnails available. To access the hires data, we
-// first need to start an asynchronous download operation. To be as lazy as possible, IMBObjectPromise encapsulates
+// first need to start an asynchronous download operation. To be as lazy as possible, IMBObjectsPromise encapsulates
 // this access. The frameworks hands the promise to the client app, which can then trigger a download as desired...
 
-@interface IMBObjectPromise : NSObject <NSCopying,NSCoding>
+@interface IMBObjectsPromise : NSObject <NSCopying,NSCoding>
 {
 	NSArray* _objects;
 	NSMutableDictionary* _objectsToLocalURLs;
@@ -94,7 +94,7 @@ extern NSString* kIMBObjectPromiseType;
 
 
 #pragma mark Creating an Object Promise
-+ (IMBObjectPromise *)promiseFromPasteboard:(NSPasteboard *)pasteboard;
++ (IMBObjectsPromise *)promiseFromPasteboard:(NSPasteboard *)pasteboard;
 - (id) initWithIMBObjects:(NSArray*)inObjects;
 
 
@@ -120,7 +120,7 @@ extern NSString* kIMBObjectPromiseType;
 
 @property (retain) id delegate;			
 
-/// Method with signature - (void) didFinish:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
+/// Method with signature - (void) didFinish:(IMBObjectsPromise*)inObjectPromise withError:(NSError*)inError
 
 @property (assign) SEL finishSelector;	
 
@@ -153,13 +153,13 @@ extern NSString* kIMBObjectPromiseType;
 // or form a camera device). Accessing local files on the hard disk on the other is instantaneous and does not 
 // require showing a progres bar...
 
-@protocol IMBObjectPromiseDelegate
+@protocol IMBObjectsPromiseDelegate
 
 @optional
 
-- (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise;
-- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise;
-- (void) cleanupProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise;
+- (void) prepareProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise;
+- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectsPromise*)inObjectPromise;
+- (void) cleanupProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise;
 
 @end
 
@@ -172,7 +172,7 @@ extern NSString* kIMBObjectPromiseType;
 // This subclass is used for local object files that can be returned immediately. In this case a promise isn't 
 // really necessary, but to make the architecture more consistent, this abstraction is used nonetheless... 
 
-@interface IMBLocalObjectPromise : IMBObjectPromise
+@interface IMBLocalObjectsPromise : IMBObjectsPromise
 
 @end
 
@@ -185,7 +185,7 @@ extern NSString* kIMBObjectPromiseType;
 // This subclass is used for remote object files that can be downloaded from a network. NSURLDownload is used to
 // pull the object files off the network onto the local file system, where it can then be accessed by the delegate... 
 
-@interface IMBRemoteObjectPromise : IMBObjectPromise <IMBURLDownloadDelegate>
+@interface IMBRemoteObjectsPromise : IMBObjectsPromise <IMBURLDownloadDelegate>
 {
 	NSMutableArray* _getSizeOperations;
 	NSMutableArray* _downloadOperations;

@@ -198,7 +198,7 @@
 }
 
 
-// We are done. Notify the delegate (IMBRemoteObjectPromise) so that it can hide the progress...
+// We are done. Notify the delegate (IMBRemoteObjectsPromise) so that it can hide the progress...
 
 - (void) downloadDidFinish:(NSURLDownload*)inDownload
 {

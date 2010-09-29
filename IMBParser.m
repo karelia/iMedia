@@ -56,7 +56,7 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBMovieObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
 #import "NSData+SKExtensions.h"
@@ -186,9 +186,9 @@
 
 // This method can be overridden by subclasses if the default promise is not useful...
 
-- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects
+- (IMBObjectsPromise*) objectPromiseWithObjects:(NSArray*)inObjects
 {
-	return [[[IMBLocalObjectPromise alloc] initWithIMBObjects:inObjects] autorelease];
+	return [[[IMBLocalObjectsPromise alloc] initWithIMBObjects:inObjects] autorelease];
 }
 
 

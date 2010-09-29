@@ -121,8 +121,8 @@
 		D049F00B1034993E003CC49C /* NSImage+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D049F0091034993E003CC49C /* NSImage+iMedia.m */; };
 		D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0401034A86B003CC49C /* IMBIconCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D049F0411034A86B003CC49C /* IMBIconCache.m */; };
-		D04FFEBB103BE81600104EB8 /* IMBObjectPromise.h in Headers */ = {isa = PBXBuildFile; fileRef = D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D04FFEBC103BE81600104EB8 /* IMBObjectPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */; };
+		D04FFEBB103BE81600104EB8 /* IMBObjectsPromise.h in Headers */ = {isa = PBXBuildFile; fileRef = D04FFEB9103BE81600104EB8 /* IMBObjectsPromise.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D04FFEBC103BE81600104EB8 /* IMBObjectsPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */; };
 		D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052AFD310538B7B00988F53 /* IMBURLDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */; };
 		D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D052B0931053B0F700988F53 /* IMBProgressWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -492,8 +492,8 @@
 		D049F0091034993E003CC49C /* NSImage+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSImage+iMedia.m"; sourceTree = "<group>"; };
 		D049F0401034A86B003CC49C /* IMBIconCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBIconCache.h; sourceTree = "<group>"; };
 		D049F0411034A86B003CC49C /* IMBIconCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBIconCache.m; sourceTree = "<group>"; };
-		D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectPromise.h; sourceTree = "<group>"; };
-		D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectPromise.m; sourceTree = "<group>"; };
+		D04FFEB9103BE81600104EB8 /* IMBObjectsPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectsPromise.h; sourceTree = "<group>"; };
+		D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectsPromise.m; sourceTree = "<group>"; };
 		D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBURLDownloadOperation.h; sourceTree = "<group>"; };
 		D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBURLDownloadOperation.m; sourceTree = "<group>"; };
 		D052B0931053B0F700988F53 /* IMBProgressWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBProgressWindowController.h; sourceTree = "<group>"; };
@@ -1059,8 +1059,8 @@
 				D032CB79109A2F4A00D84782 /* IMBMovieObject.m */,
 				D010384A10714CB3007C88D7 /* IMBNodeObject.h */,
 				D010384B10714CB3007C88D7 /* IMBNodeObject.m */,
-				D04FFEB9103BE81600104EB8 /* IMBObjectPromise.h */,
-				D04FFEBA103BE81600104EB8 /* IMBObjectPromise.m */,
+				D04FFEB9103BE81600104EB8 /* IMBObjectsPromise.h */,
+				D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */,
 				D0103889107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h */,
 				D010388A107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.m */,
 				D01038E21071E111007C88D7 /* IMBObjectFifoCache.h */,
@@ -1330,7 +1330,7 @@
 				D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */,
 				D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */,
 				D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */,
-				D04FFEBB103BE81600104EB8 /* IMBObjectPromise.h in Headers */,
+				D04FFEBB103BE81600104EB8 /* IMBObjectsPromise.h in Headers */,
 				D0BF8C69103F32700014B3B7 /* IMBImageBrowserCell.h in Headers */,
 				D0B6FA6B1042F3D800280DDC /* IMBImageKit.h in Headers */,
 				D0B6FABB1043243800280DDC /* IMBAudioFolderParser.h in Headers */,
@@ -1441,7 +1441,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "iMedia" */;
 			compatibilityVersion = "Xcode 3.1";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -1664,7 +1663,7 @@
 				D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */,
 				D0D635ED1035B4C500FF8631 /* IMBLightroomParser.m in Sources */,
 				D0D635EF1035B4C500FF8631 /* IMBApertureParser.m in Sources */,
-				D04FFEBC103BE81600104EB8 /* IMBObjectPromise.m in Sources */,
+				D04FFEBC103BE81600104EB8 /* IMBObjectsPromise.m in Sources */,
 				D0BF8C6A103F32700014B3B7 /* IMBImageBrowserCell.m in Sources */,
 				D0B6FABC1043243800280DDC /* IMBAudioFolderParser.m in Sources */,
 				D0B6FAC01043246800280DDC /* IMBMovieFolderParser.m in Sources */,

@@ -56,7 +56,7 @@
 #import "IMBObjectArrayController.h"
 #import "IMBPanelController.h"
 #import "IMBCommon.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "NSWorkspace+iMedia.h"
 
 //----------------------------------------------------------------------------------------------------------------------

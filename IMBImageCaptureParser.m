@@ -62,7 +62,7 @@
 #import "IMBConfig.h"
 #import "IMBLibraryController.h"
 #import "IMBNodeObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBOperationQueue.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
@@ -82,7 +82,7 @@
 @end
 
 // Purpose: Gets created from drag'n drop. Triggers copying of files to a local destination 
-@interface  IMBMTPObjectPromise : IMBRemoteObjectPromise<IMBMTPDownloadOperationDelegate>
+@interface  IMBMTPObjectPromise : IMBRemoteObjectsPromise<IMBMTPDownloadOperationDelegate>
 { 
 	long long _bytesTotal;
 	long long _bytesDone;	
@@ -189,7 +189,7 @@
 	[super dealloc];
 }
 
-- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects 
+- (IMBObjectsPromise*) objectPromiseWithObjects:(NSArray*)inObjects 
 {
 	IMBMTPObjectPromise *promise = [([IMBMTPObjectPromise alloc]) initWithIMBObjects:inObjects];
 	return [promise autorelease];

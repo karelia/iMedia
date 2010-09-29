@@ -52,7 +52,7 @@
 
 #pragma mark 
 
-// This helper class is being used by IMBRemoteObjectPromise. Not for general use...
+// This helper class is being used by IMBRemoteObjectsPromise. Not for general use...
 
 @interface IMBURLDownloadOperation : NSOperation
 {
