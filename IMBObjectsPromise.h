@@ -122,10 +122,6 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 @property (retain) NSObject <IMBObjectsPromiseDelegate> *delegate;			
 
-/// Method with signature - (void) didFinish:(IMBObjectsPromise*)inObjectPromise withError:(NSError*)inError
-
-@property (assign) SEL finishSelector;	
-
 /// Contains error in case of failure	
 	
 @property (retain) NSError* error;				
@@ -133,6 +129,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 @property (retain) NSMutableDictionary* objectsToLocalURLs;
 
 /// Clients can start loading objects asynchronously. Once the finish selector is called the loading is done and local files can be retrieved.
+/// finishSelector should be a method with signature - (void) didFinish:(IMBObjectsPromise*)inObjectPromise withError:(NSError*)inError
 
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
 - (void) waitUntilDone;
