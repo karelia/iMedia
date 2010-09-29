@@ -133,7 +133,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
 - (void) waitUntilFinished;
-- (BOOL) wasCanceled;
+- (BOOL) isCancelled;
 
 /// After loading is done, you can ask for a local URL specifically by the object you're interested in
 

@@ -350,7 +350,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 }
 
 
-- (BOOL) wasCanceled
+- (BOOL) isCancelled
 {
 	return _wasCanceled;
 }
