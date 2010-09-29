@@ -509,16 +509,16 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 {
 	if (_delegate)
 	{
-		if ([_delegate respondsToSelector:@selector(prepareProgressForObjectPromise:)])
+		if ([_delegate respondsToSelector:@selector(objectsPromiseShowProgress:)])
 		{
 			if ([NSThread isMainThread])
 			{
-				[_delegate performSelector:@selector(prepareProgressForObjectPromise:) withObject:self];
+				[_delegate performSelector:@selector(objectsPromiseShowProgress:) withObject:self];
 			}
 			else
 			{
 				[_delegate 
-					performSelectorOnMainThread:@selector(prepareProgressForObjectPromise:) 
+					performSelectorOnMainThread:@selector(objectsPromiseShowProgress:) 
 					withObject:self 
 					waitUntilDone:NO 
 					modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
@@ -534,7 +534,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 {
 	if (_delegate)
 	{
-		if ([_delegate respondsToSelector:@selector(displayProgress:forObjectPromise:)])
+		if ([_delegate respondsToSelector:@selector(objectsPromise:didProgress:)])
 		{
 			[self performSelectorOnMainThread:@selector(__displayProgress:) 
 				  withObject:[NSNumber numberWithDouble:inFraction] 
@@ -547,7 +547,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (void) __displayProgress:(NSNumber*)inFraction
 {
-	[_delegate displayProgress:[inFraction doubleValue] forObjectPromise:self];
+	[_delegate objectsPromise:self didProgress:[inFraction doubleValue]];
 }
 
 
@@ -557,16 +557,16 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 {
 	if (_delegate)
 	{
-		if ([_delegate respondsToSelector:@selector(cleanupProgressForObjectPromise:)])
+		if ([_delegate respondsToSelector:@selector(objectsPromiseDidFinish:)])
 		{
 			if ([NSThread isMainThread])
 			{
-				[_delegate performSelector:@selector(cleanupProgressForObjectPromise:) withObject:self];
+				[_delegate performSelector:@selector(objectsPromiseDidFinish:) withObject:self];
 			}
 			else
 			{
 				[_delegate 
-					performSelectorOnMainThread:@selector(cleanupProgressForObjectPromise:) 
+					performSelectorOnMainThread:@selector(objectsPromiseDidFinish:) 
 					withObject:self 
 					waitUntilDone:NO 
 					modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
