@@ -1225,7 +1225,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				if (mappedObject != nil)
 				{
 					// Use our promise object to load the content
-					IMBObjectPromise* promise = [IMBObjectPromise objectPromiseFromPasteboard:inPasteboard];
+					IMBObjectPromise* promise = [IMBObjectPromise promiseFromPasteboard:inPasteboard];
 					
 					// Make sure we got a promise, AND check that there are actually some items to download,
 					// before we actually try to start downloading.
@@ -1267,7 +1267,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
 {
 	// NSLog(@"%s:%@", __FUNCTION__, inType);
-	IMBObjectPromise* promise = [IMBObjectPromise objectPromiseFromPasteboard:inPasteboard];
+	IMBObjectPromise* promise = [IMBObjectPromise promiseFromPasteboard:inPasteboard];
     
 	promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
 	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];

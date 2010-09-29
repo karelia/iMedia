@@ -94,7 +94,7 @@ extern NSString* kIMBObjectPromiseType;
 
 
 #pragma mark Creating an Object Promise
-+ (IMBObjectPromise *)objectPromiseFromPasteboard:(NSPasteboard *)pasteboard;
++ (IMBObjectPromise *)promiseFromPasteboard:(NSPasteboard *)pasteboard;
 - (id) initWithIMBObjects:(NSArray*)inObjects;
 
 

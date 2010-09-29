@@ -107,7 +107,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-+ (IMBObjectPromise *)objectPromiseFromPasteboard:(NSPasteboard *)pasteboard;
++ (IMBObjectPromise *)promiseFromPasteboard:(NSPasteboard *)pasteboard;
 {
     IMBObjectPromise *result = nil;
     if ([[pasteboard types] containsObject:kIMBObjectPromiseType])
