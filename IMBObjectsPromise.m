@@ -329,7 +329,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 // Spin a runloop (blocking the caller) until all objects are available...
 
-- (void) waitUntilDone
+- (void) waitUntilFinished
 {
 	while (_objectCountLoaded < _objectCountTotal)
 	{

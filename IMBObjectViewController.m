@@ -1233,7 +1233,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					{
 						promise.destinationDirectoryPath = nil;	// only download (to temporary directory) if needed.
 						[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
-						[promise waitUntilDone];
+						[promise waitUntilFinished];
 						
 						NSURL* thisURL = [promise localURLForObject:mappedObject];
 						if ((thisURL != nil) && ([thisURL isKindOfClass:[NSURL class]]))
@@ -1271,7 +1271,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
     
 	promise.destinationDirectoryPath = nil;	// only download (to temporary directory) if needed.
 	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
-	[promise waitUntilDone];
+	[promise waitUntilFinished];
 
 	if ([promise.fileURLs count] > 0)
 	{
