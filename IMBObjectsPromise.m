@@ -322,10 +322,15 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 {
 	self.delegate = inDelegate;
 	self.finishSelector = inSelector;
+    [self start];
+}
+
+
+- (void) start;
+{
 	[self _countObjects:self.objects];
 	[self loadObjects:self.objects];
 }
-
 
 // Spin a runloop (blocking the caller) until all objects are available...
 
