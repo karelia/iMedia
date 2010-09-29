@@ -68,6 +68,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 
 @class IMBObject;
+@protocol IMBObjectsPromiseDelegate;
 
 
 #pragma mark 
@@ -87,7 +88,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 	
 	int _objectCountTotal;
 	int _objectCountLoaded;
-	id _delegate;
+	NSObject <IMBObjectsPromiseDelegate> *_delegate;
 	SEL _finishSelector;
 	BOOL _wasCanceled;
 }
@@ -119,7 +120,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 /// Retained due to asynchronous nature of the promise
 
-@property (retain) id delegate;			
+@property (retain) NSObject <IMBObjectsPromiseDelegate> *delegate;			
 
 /// Method with signature - (void) didFinish:(IMBObjectsPromise*)inObjectPromise withError:(NSError*)inError
 
