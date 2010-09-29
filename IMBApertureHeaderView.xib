@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">10F569</string>
-		<string key="IBDocument.InterfaceBuilderVersion">788</string>
+		<string key="IBDocument.InterfaceBuilderVersion">804</string>
 		<string key="IBDocument.AppKitVersion">1038.29</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">788</string>
+			<string key="NS.object.0">804</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -52,7 +52,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="516172136">
 							<int key="NSCellFlags">68288064</int>
 							<int key="NSCellFlags2">272630784</int>
-							<string key="NSContents">Please enable preview sharing</string>
+							<string key="NSContents"/>
 							<object class="NSFont" key="NSSupport">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">13</double>
@@ -94,7 +94,7 @@
 								<string>NeXT TIFF v4.0 pasteboard type</string>
 							</object>
 						</object>
-						<string key="NSFrame">{{20, 104}, {28, 28}}</string>
+						<string key="NSFrame">{{20, 104}, {32, 32}}</string>
 						<reference key="NSSuperview" ref="306076665"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSImageCell" key="NSCell" id="513951657">
@@ -120,8 +120,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="646657784">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string type="base64-UTF8" key="NSContents">R28gdG8gQXBlcnR1cmUgUHJlZmVyZW5jZXMgPiBQcmV2aWV3ID4gU2hhcmUgUHJldmlld3Mgd2l0aCBp
-TGlmZSBhbmQgaVdvcmsuClNldCBpdCB0byAiQWx3YXlzIi4</string>
+							<string key="NSContents"/>
 							<object class="NSFont" key="NSSupport">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">13</double>
@@ -266,6 +265,7 @@ TGlmZSBhbmQgaVdvcmsuClNldCBpdCB0byAiQWx3YXlzIi4</string>
 					<string>224.IBPluginDependency</string>
 					<string>77.IBEditorWindowLastContentRect</string>
 					<string>77.IBPluginDependency</string>
+					<string>77.IBViewEditorWindowController.showingLayoutRectangles</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -280,6 +280,7 @@ TGlmZSBhbmQgaVdvcmsuClNldCBpdCB0byAiQWx3YXlzIi4</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{174, 63}, {302, 152}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -996,7 +997,7 @@ TGlmZSBhbmQgaVdvcmsuClNldCBpdCB0byAiQWx3YXlzIi4</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
 			<string key="NS.key.0">warning</string>
-			<string key="NS.object.0">{28, 26}</string>
+			<string key="NS.object.0">{64, 64}</string>
 		</object>
 	</data>
 </archive>
