@@ -132,7 +132,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 /// finishSelector should be a method with signature - (void) didFinish:(IMBObjectsPromise*)inObjectPromise withError:(NSError*)inError
 
 - (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
-- (void) waitUntilDone;
+- (void) waitUntilFinished;
 - (BOOL) wasCanceled;
 
 /// After loading is done, you can ask for a local URL specifically by the object you're interested in
