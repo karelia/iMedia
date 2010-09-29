@@ -60,7 +60,7 @@
 
 
 // TODO: should subclassed methods be public?
-@interface IMBObjectPromise ()
+@interface IMBObjectsPromise ()
 - (void) _countObjects:(NSArray*)inObjects;
 - (void) loadObjects:(NSArray*)inObjects;
 - (void) _loadObject:(IMBObject*)inObject;

@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBCommon.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
@@ -72,7 +72,7 @@
 
 #pragma mark CONSTANTS
 	
-NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
+NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.IMBObjectPromiseType";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 #pragma mark
 
-@interface IMBObjectPromise ()
+@interface IMBObjectsPromise ()
 - (void) _countObjects:(NSArray*)inObjects;
 - (void) loadObjects:(NSArray*)inObjects;
 - (void) _loadObject:(IMBObject*)inObject;
@@ -94,7 +94,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 #pragma mark
 
-@implementation IMBObjectPromise
+@implementation IMBObjectsPromise
 
 @synthesize objects = _objects;
 @synthesize objectsToLocalURLs = _objectsToLocalURLs;
@@ -107,12 +107,12 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-+ (IMBObjectPromise *)promiseFromPasteboard:(NSPasteboard *)pasteboard;
++ (IMBObjectsPromise *)promiseFromPasteboard:(NSPasteboard *)pasteboard;
 {
-    IMBObjectPromise *result = nil;
-    if ([[pasteboard types] containsObject:kIMBObjectPromiseType])
+    IMBObjectsPromise *result = nil;
+    if ([[pasteboard types] containsObject:kIMBPasteboardTypeObjectsPromise])
     {
-        NSData *data = [pasteboard dataForType:kIMBObjectPromiseType];
+        NSData *data = [pasteboard dataForType:kIMBPasteboardTypeObjectsPromise];
         if (data) result = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     }
     return result;
@@ -166,7 +166,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 - (id) copyWithZone:(NSZone*)inZone
 {
-	IMBObjectPromise* copy = [[[self class] allocWithZone:inZone] init];
+	IMBObjectsPromise* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.objects = self.objects;
 	copy.objectsToLocalURLs = self.objectsToLocalURLs;
@@ -356,7 +356,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 #pragma mark
 
-@implementation IMBLocalObjectPromise
+@implementation IMBLocalObjectsPromise
 
 - (void) loadObjects:(NSArray*)inObjects
 {
@@ -407,7 +407,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 	else
 	{
 		NSString* format = NSLocalizedStringWithDefaultValue(
-			@"IMBLocalObjectPromise.error",
+			@"IMBLocalObjectsPromise.error",
 			nil,IMBBundle(),
 			@"The media file %@ could not be loaded (file not found)",
 			@"Error when loading a object file synchronously has failed.");
@@ -430,7 +430,7 @@ NSString* kIMBObjectPromiseType = @"com.karelia.imedia.IMBObjectPromiseType";
 
 #pragma mark
 
-@implementation IMBRemoteObjectPromise
+@implementation IMBRemoteObjectsPromise
 
 @synthesize downloadOperations = _downloadOperations;
 @synthesize getSizeOperations = _getSizeOperations;

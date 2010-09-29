@@ -52,14 +52,14 @@
 
 #pragma mark HEADERS
 
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 
 @class IMBLightroomObject;
 
 // This subclass is used for pyramid files that need to be split. The split file is saved to the local file system,
 // where it can then be accessed by the delegate... 
 
-@interface IMBPyramidObjectPromise : IMBObjectPromise
+@interface IMBPyramidObjectPromise : IMBObjectsPromise
 {
 
 }

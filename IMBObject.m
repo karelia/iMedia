@@ -53,7 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBParser.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
@@ -358,14 +358,14 @@
 - (NSArray *)writableTypesForPasteboard:(NSPasteboard *)pasteboard;
 {
     // Try declaring promise AFTER the other types
-    return [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilesPromisePboardType,
+    return [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilesPromisePboardType,
             ([self isLocalFile] ? kUTTypeFileURL : kUTTypeURL), 
                      
                      // Also our own special metadata types that clients can make use of
             //kIMBPublicTitleListPasteboardType, kIMBPublicMetadataListPasteboardType,
                      
                      nil]; 
-    // Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,nil]
+    // Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilenamesPboardType,nil]
     
     
 }

@@ -67,7 +67,7 @@
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBOrderedDictionary.h"
 #import "IMBParserController.h"
 #import "IMBPyramidObjectPromise.h"
@@ -1428,7 +1428,7 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 // For Lightroom we need a promise that splits the pyramid file
-- (IMBObjectPromise*) objectPromiseWithObjects: (NSArray*) inObjects
+- (IMBObjectsPromise*) objectPromiseWithObjects: (NSArray*) inObjects
 {
 	return [[[IMBPyramidObjectPromise alloc] initWithIMBObjects:inObjects] autorelease];
 }

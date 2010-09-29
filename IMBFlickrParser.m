@@ -65,7 +65,7 @@
 #import "IMBIconCache.h"
 #import "IMBLibraryController.h"
 #import "IMBLoadMoreObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBParserController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
@@ -444,8 +444,8 @@
 
 
 // For Flickr we need a remote promise that downloads the files off the internet
-- (IMBObjectPromise*) objectPromiseWithObjects: (NSArray*) inObjects {
-	return [[[IMBRemoteObjectPromise alloc] initWithIMBObjects:inObjects] autorelease];
+- (IMBObjectsPromise*) objectPromiseWithObjects: (NSArray*) inObjects {
+	return [[[IMBRemoteObjectsPromise alloc] initWithIMBObjects:inObjects] autorelease];
 }
 
 // Convert metadata into human readable string...

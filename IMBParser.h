@@ -60,7 +60,7 @@
 
 @class IMBNode;
 @class IMBObject;
-@class IMBObjectPromise;
+@class IMBObjectsPromise;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,9 +95,9 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError;
 
 // Returns a promise object that is appropriate for a given parser type. The default implemenation simply returns
-// an IMBLocalObjectPromise. Parsers that require something else must override this method...
+// an IMBLocalObjectsPromise. Parsers that require something else must override this method...
 
-- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects;
+- (IMBObjectsPromise*) objectPromiseWithObjects:(NSArray*)inObjects;
 
 @optional
 
