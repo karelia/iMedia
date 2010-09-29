@@ -104,14 +104,11 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 - (void) start;
 
-/// Clients can start loading objects asynchronously. Once the finish selector is called the loading is done and local files can be retrieved.
-/// finishSelector should be a method with signature - (void) didFinish:(IMBObjectsPromise*)inObjectPromise withError:(NSError*)inError
-
-- (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector;	
-
 /// Retained due to asynchronous nature of the promise
+@property (retain) NSObject <IMBObjectsPromiseDelegate> *delegate;	
 
-@property (retain) NSObject <IMBObjectsPromiseDelegate> *delegate;			
+/// Special case until we have blocks support so you can run a custom method upon completion
+- (void) setDelegate:(NSObject <IMBObjectsPromiseDelegate> *)delegate completionSelector:(SEL)selector;
 
 - (void) waitUntilFinished;
 

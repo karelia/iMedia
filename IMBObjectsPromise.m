@@ -318,11 +318,10 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 // Start loading the objects...
 
-- (void) startLoadingWithDelegate:(id)inDelegate finishSelector:(SEL)inSelector
+- (void) setDelegate:(NSObject <IMBObjectsPromiseDelegate> *)delegate completionSelector:(SEL)selector;
 {
-	self.delegate = inDelegate;
-	self.finishSelector = inSelector;
-    [self start];
+	self.delegate = delegate;
+	self.finishSelector = selector;
 }
 
 
