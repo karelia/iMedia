@@ -72,7 +72,7 @@
 
 #pragma mark CONSTANTS
 	
-NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.IMBObjectPromiseType";
+NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.objects-promise";
 
 
 //----------------------------------------------------------------------------------------------------------------------
