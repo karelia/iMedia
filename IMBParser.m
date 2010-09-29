@@ -188,7 +188,7 @@
 
 - (IMBObjectsPromise*) objectPromiseWithObjects:(NSArray*)inObjects
 {
-	return [[[IMBLocalObjectsPromise alloc] initWithIMBObjects:inObjects] autorelease];
+	return [IMBObjectsPromise promiseWithLocalIMBObjects:inObjects];
 }
 
 
