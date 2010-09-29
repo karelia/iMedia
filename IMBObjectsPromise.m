@@ -80,6 +80,19 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 #pragma mark
 
+// This subclass is used for local object files that can be returned immediately. In this case a promise isn't 
+// really necessary, but to make the architecture more consistent, this abstraction is used nonetheless... 
+
+@interface IMBLocalObjectsPromise : IMBObjectsPromise
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
 @interface IMBObjectsPromise ()
 - (void) _countObjects:(NSArray*)inObjects;
 - (void) loadObjects:(NSArray*)inObjects;
@@ -116,6 +129,11 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
         if (data) result = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     }
     return result;
+}
+
++ (IMBObjectsPromise *)promiseWithLocalIMBObjects:(NSArray *)objects;
+{
+    return [[[IMBLocalObjectsPromise alloc] initWithIMBObjects:objects] autorelease];
 }
 
 - (id) initWithIMBObjects:(NSArray*)inObjects

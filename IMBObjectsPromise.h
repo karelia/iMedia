@@ -95,6 +95,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 #pragma mark Creating an Object Promise
 + (IMBObjectsPromise *)promiseFromPasteboard:(NSPasteboard *)pasteboard;
++ (IMBObjectsPromise *)promiseWithLocalIMBObjects:(NSArray *)objects;
 - (id) initWithIMBObjects:(NSArray*)inObjects;
 
 
@@ -160,19 +161,6 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 - (void) prepareProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise;
 - (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectsPromise*)inObjectPromise;
 - (void) cleanupProgressForObjectPromise:(IMBObjectsPromise*)inObjectPromise;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-// This subclass is used for local object files that can be returned immediately. In this case a promise isn't 
-// really necessary, but to make the architecture more consistent, this abstraction is used nonetheless... 
-
-@interface IMBLocalObjectsPromise : IMBObjectsPromise
 
 @end
 
