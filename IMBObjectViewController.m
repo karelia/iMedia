@@ -1060,7 +1060,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBParser* parser = self.currentNode.parser;
 	NSArray* objects = [ibObjectArrayController selectedObjects];
 	IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
-	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
+	[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+    [promise start];
 }
 
 
@@ -1115,7 +1116,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		IMBParser* parser = inSelectedNode.parser;
 		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
-		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalURLs:)];
+		[promise setDelegate:self completionSelector:@selector(_openLocalURLs:)];
+        [promise start];
 	}
 }
 
@@ -1232,7 +1234,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					if (promise != nil && [promise.objects count] > 0)
 					{
 						promise.destinationDirectoryPath = nil;	// only download (to temporary directory) if needed.
-						[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
+						[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+                        [promise start];
 						[promise waitUntilFinished];
 						
 						NSURL* thisURL = [promise localURLForObject:mappedObject];
@@ -1270,7 +1273,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	IMBObjectsPromise* promise = [IMBObjectsPromise promiseFromPasteboard:inPasteboard];
     
 	promise.destinationDirectoryPath = nil;	// only download (to temporary directory) if needed.
-	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
+	[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+    [promise start];
 	[promise waitUntilFinished];
 
 	if ([promise.fileURLs count] > 0)
@@ -1338,7 +1342,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
 		promise.destinationDirectoryPath = [inDestination path];
 		
-		[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
+		[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+        [promise start];
 	}
 }
 
