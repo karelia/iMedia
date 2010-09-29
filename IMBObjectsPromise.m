@@ -111,7 +111,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 @implementation IMBObjectsPromise
 
 @synthesize objects = _objects;
-@synthesize objectsToLocalURLs = _objectsToLocalURLs;
+@synthesize fileURLsByIMBObject = _objectsToLocalURLs;
 @synthesize destinationDirectoryPath = _downloadFolderPath;
 @synthesize error = _error;
 @synthesize delegate = _delegate;
@@ -142,7 +142,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	if (self = [super init])
 	{
 		self.objects = inObjects;
-		self.objectsToLocalURLs = [NSMutableDictionary dictionaryWithCapacity:inObjects.count];
+		self.fileURLsByIMBObject = [NSMutableDictionary dictionaryWithCapacity:inObjects.count];
 		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.error = nil;
 		self.delegate = nil;
@@ -162,7 +162,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	if (self = [super init])
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
-		self.objectsToLocalURLs = [inCoder decodeObjectForKey:@"objectsToLocalURLs"];
+		self.fileURLsByIMBObject = [inCoder decodeObjectForKey:@"objectsToLocalURLs"];
 		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.delegate = nil;
 		self.finishSelector = NULL;
@@ -179,7 +179,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[inCoder encodeObject:self.objects forKey:@"objects"];
-	[inCoder encodeObject:self.objectsToLocalURLs forKey:@"objectsToLocalURLs"];
+	[inCoder encodeObject:self.fileURLsByIMBObject forKey:@"objectsToLocalURLs"];
 }
 
 
@@ -188,7 +188,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	IMBObjectsPromise* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.objects = self.objects;
-	copy.objectsToLocalURLs = self.objectsToLocalURLs;
+	copy.fileURLsByIMBObject = self.fileURLsByIMBObject;
 	copy.destinationDirectoryPath = self.destinationDirectoryPath;
 	copy.error = self.error;
 	copy.delegate = self.delegate;
@@ -234,7 +234,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (NSURL*) localURLForObject:(IMBObject*)inObject
 {
-	NSURL* url = [self.objectsToLocalURLs objectForKey:inObject];
+	NSURL* url = [self.fileURLsByIMBObject objectForKey:inObject];
 	
 	if (url != nil && [url isKindOfClass:[NSURL class]])
 	{
@@ -413,7 +413,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	if (localURL != nil)
 	{	
-		[self.objectsToLocalURLs setObject:localURL forKey:inObject];
+		[self.fileURLsByIMBObject setObject:localURL forKey:inObject];
 		_objectCountLoaded++;
 		
 		if (self.destinationDirectoryPath)
@@ -440,7 +440,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
 		NSError* error = [NSError errorWithDomain:kIMBErrorDomain code:fnfErr userInfo:info];
 
-		[self.objectsToLocalURLs setObject:error forKey:inObject];
+		[self.fileURLsByIMBObject setObject:error forKey:inObject];
 
 		_objectCountLoaded++;
 	}
@@ -784,7 +784,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (void) didFinish:(IMBURLDownloadOperation*)inOperation
 {
-	[self.objectsToLocalURLs setObject:[NSURL fileURLWithPath:inOperation.localPath] forKey:inOperation.delegateReference];
+	[self.fileURLsByIMBObject setObject:[NSURL fileURLWithPath:inOperation.localPath] forKey:inOperation.delegateReference];
 	_objectCountLoaded++;	// for check on all promises
 	
 	if ([inOperation bytesDone] > 0)	// Is this a real download?
@@ -814,7 +814,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (void) didReceiveError:(IMBURLDownloadOperation*)inOperation
 {
-	[self.objectsToLocalURLs setObject:inOperation.error forKey:inOperation.delegateReference];
+	[self.fileURLsByIMBObject setObject:inOperation.error forKey:inOperation.delegateReference];
 	self.error = inOperation.error;
 	_objectCountLoaded++;	// for check on all promises
 	_downloadFileLoaded++;	// for checking on actual downloads

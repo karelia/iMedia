@@ -139,7 +139,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 @property (retain,readonly) NSArray* fileURLs; 
 
-@property (retain) NSMutableDictionary* objectsToLocalURLs;
+@property (retain) NSMutableDictionary* fileURLsByIMBObject;
 
 /// After loading is done, you can ask for a local URL specifically by the object you're interested in
 
