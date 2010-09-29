@@ -111,7 +111,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 @synthesize objects = _objects;
 @synthesize objectsToLocalURLs = _objectsToLocalURLs;
-@synthesize downloadFolderPath = _downloadFolderPath;
+@synthesize destinationDirectoryPath = _downloadFolderPath;
 @synthesize error = _error;
 @synthesize delegate = _delegate;
 @synthesize finishSelector = _finishSelector;
@@ -142,7 +142,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	{
 		self.objects = inObjects;
 		self.objectsToLocalURLs = [NSMutableDictionary dictionaryWithCapacity:inObjects.count];
-		self.downloadFolderPath = [IMBConfig downloadFolderPath];
+		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.error = nil;
 		self.delegate = nil;
 		self.finishSelector = NULL;
@@ -162,7 +162,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
 		self.objectsToLocalURLs = [inCoder decodeObjectForKey:@"objectsToLocalURLs"];
-		self.downloadFolderPath = [IMBConfig downloadFolderPath];
+		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.delegate = nil;
 		self.finishSelector = NULL;
 		self.error = nil;
@@ -188,7 +188,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	copy.objects = self.objects;
 	copy.objectsToLocalURLs = self.objectsToLocalURLs;
-	copy.downloadFolderPath = self.downloadFolderPath;
+	copy.destinationDirectoryPath = self.destinationDirectoryPath;
 	copy.error = self.error;
 	copy.delegate = self.delegate;
 	copy.finishSelector = self.finishSelector;
@@ -410,10 +410,10 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 		[self.objectsToLocalURLs setObject:localURL forKey:inObject];
 		_objectCountLoaded++;
 		
-		if (self.downloadFolderPath)
+		if (self.destinationDirectoryPath)
 		{
 			// Now, copy this to the download folder path ... ?
-			NSString *fullPath = [self.downloadFolderPath stringByAppendingPathComponent:[[localURL path] lastPathComponent]];
+			NSString *fullPath = [self.destinationDirectoryPath stringByAppendingPathComponent:[[localURL path] lastPathComponent]];
 			NSError *err = nil;
 			[[NSFileManager imb_threadSafeManager] copyItemAtPath:[localURL path] toPath:fullPath error:&err];
 			if (err)
@@ -618,7 +618,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 			{
 				// If we don't have a download folder yet, then use temporary directory...
 				
-				NSString* downloadFolderPath = self.downloadFolderPath;
+				NSString* downloadFolderPath = self.destinationDirectoryPath;
 				
 				if (downloadFolderPath == nil)
 				{

@@ -906,7 +906,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	// Create ONE download operations...
 
 	IMBMTPDownloadOperation* op = [[[IMBMTPDownloadOperation alloc] initWithArrayOfObjects:inObjects delegate:self] autorelease];
-	op.downloadFolderPath = self.downloadFolderPath;
+	op.downloadFolderPath = self.destinationDirectoryPath;
 	[self.downloadOperations addObject:op]; 
 	
 	// Get combined file sizes so that the progress bar can be configured...

@@ -1231,7 +1231,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					// before we actually try to start downloading.
 					if (promise != nil && [promise.objects count] > 0)
 					{
-						promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
+						promise.destinationDirectoryPath = nil;	// only download (to temporary directory) if needed.
 						[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 						[promise waitUntilDone];
 						
@@ -1269,7 +1269,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// NSLog(@"%s:%@", __FUNCTION__, inType);
 	IMBObjectsPromise* promise = [IMBObjectsPromise promiseFromPasteboard:inPasteboard];
     
-	promise.downloadFolderPath = nil;	// only download (to temporary directory) if needed.
+	promise.destinationDirectoryPath = nil;	// only download (to temporary directory) if needed.
 	[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 	[promise waitUntilDone];
 
@@ -1336,7 +1336,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
 		NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];
 		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
-		promise.downloadFolderPath = [inDestination path];
+		promise.destinationDirectoryPath = [inDestination path];
 		
 		[promise startLoadingWithDelegate:self finishSelector:@selector(_postProcessDownload:)];
 	}
