@@ -526,11 +526,14 @@
 
 - (NSString*) description
 {
-	return [NSString stringWithFormat:@"%@\n\tlocation = %@\n\tname = %@\n\tmetadata = %p", 
-		NSStringFromClass([self class]),
-		self.location, 
-		self.name, 
-		self.metadata];
+	return [NSString stringWithFormat:@"%@ %@",
+			[super description],
+			// NSStringFromClass([self class]),
+		self.location
+			// ,
+		//self.name, 
+		//self.metadata
+			];
 }
 
 
