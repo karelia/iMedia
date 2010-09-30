@@ -713,6 +713,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
  
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView acceptDrop:(id<NSDraggingInfo>)inInfo item:(id)inItem childIndex:(NSInteger)inIndex
 {
+	BOOL result = NO;
     NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
 	BOOL exists,directory;
 	
@@ -722,14 +723,18 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		
 		if (exists && directory)
 		{
-			IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
-			self.selectedNodeIdentifier = [parser identifierForPath:path];
+			if (![IMBConfig isLibraryPath:path])
+			{
+				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+				self.selectedNodeIdentifier = [parser identifierForPath:path];
+				result = YES;
+			}
 		}	
 	}		
 	
 	[inOutlineView.window makeFirstResponder:inOutlineView];
 	[self.libraryController reload];
-	return YES;
+	return result;
 }
 
 
