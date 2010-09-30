@@ -526,24 +526,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (void) prepareProgress
 {
-	if (_delegate)
-	{
-		if ([_delegate respondsToSelector:@selector(objectsPromiseShowProgress:)])
-		{
-			if ([NSThread isMainThread])
-			{
-				[_delegate performSelector:@selector(objectsPromiseShowProgress:) withObject:self];
-			}
-			else
-			{
-				[_delegate 
-					performSelectorOnMainThread:@selector(objectsPromiseShowProgress:) 
-					withObject:self 
-					waitUntilDone:NO 
-					modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-			}		
-		}
-	}
+	[self displayProgress:0.0];
 }
 
 
