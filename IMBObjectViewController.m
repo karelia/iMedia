@@ -1825,24 +1825,6 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	IMBObject* object = [objects objectAtIndex:inRow];
 	return [object tooltipString];
-//	NSString* name = [object name];
-//	NSString* description = [object metadataDescription];
-//	
-//	NSMutableString* tooltip = [NSMutableString string];
-//	
-//	if (name)
-//	{
-//		if (tooltip.length > 0) [tooltip imb_appendNewline];
-//		[tooltip appendFormat:@"%@",name];
-//	}
-//	
-//	if (description)
-//	{
-//		if (tooltip.length > 0) [tooltip imb_appendNewline];
-//		[tooltip appendFormat:@"%@",description];
-//	}
-//	
-//	return tooltip;
 }
 
 
