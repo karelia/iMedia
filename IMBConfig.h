@@ -92,6 +92,12 @@
 + (void) setEditorApp:(NSString*)inAppPath forMediaType:(NSString*)inMediaType;
 + (NSString*) editorAppForMediaType:(NSString*)inMediaType;
 
+// Library Paths
+
++ (void)registerLibraryPath:(NSString *)aPath;
++ (BOOL) isLibraryPath:(NSString *)aPath;
+
+
 // Set default prefs values...
 
 + (void) registerDefaultValues;

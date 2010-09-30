@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBFolderParser.h"
+#import "IMBConfig.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBNodeObject.h"
@@ -215,7 +216,15 @@
 				BOOL isDir = NO;
 				if ([fm fileExistsAtPath:path isDirectory:&isDir] && isDir) 
 				{
-					[folders addObject:path];
+					if (![IMBConfig isLibraryPath:path])
+					{
+						[folders addObject:path];
+					}
+					else
+					{
+						// NSLog(@"IGNORING LIBRARY PATH: %@", path);
+					}
+
 				}
 				
 				// Create an IMBVisualObject for each qualifying file...
