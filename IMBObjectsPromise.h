@@ -192,7 +192,6 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 - (void) prepareProgress;
 - (void) displayProgress:(double)inFraction;
-- (void) cleanupProgress;
 
 @end
 

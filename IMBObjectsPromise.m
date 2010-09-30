@@ -294,7 +294,23 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 {
 	if (_delegate != nil)
 	{
-		if ([_delegate respondsToSelector:_finishSelector]) 
+		if ([_delegate respondsToSelector:@selector(objectsPromiseDidFinish:)])
+		{
+			if ([NSThread isMainThread])
+			{
+				[_delegate performSelector:@selector(objectsPromiseDidFinish:) withObject:self];
+			}
+			else
+			{
+				[_delegate 
+                 performSelectorOnMainThread:@selector(objectsPromiseDidFinish:) 
+                 withObject:self 
+                 waitUntilDone:NO 
+                 modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+			}		
+		}
+        
+        if ([_delegate respondsToSelector:_finishSelector]) 
 		{
 			if ([NSThread isMainThread])
 			{
@@ -551,38 +567,6 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) __displayProgress:(NSNumber*)inFraction
 {
 	[_delegate objectsPromise:self didProgress:[inFraction doubleValue]];
-}
-
-
-// Tell delegate to remove the progress UI (must be done in main thread)...
-
-- (void) cleanupProgress
-{
-	if (_delegate)
-	{
-		if ([_delegate respondsToSelector:@selector(objectsPromiseDidFinish:)])
-		{
-			if ([NSThread isMainThread])
-			{
-				[_delegate performSelector:@selector(objectsPromiseDidFinish:) withObject:self];
-			}
-			else
-			{
-				[_delegate 
-					performSelectorOnMainThread:@selector(objectsPromiseDidFinish:) 
-					withObject:self 
-					waitUntilDone:NO 
-					modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-			}		
-		}
-	}
-}
-
-- (void) _didFinish
-{
-    [self cleanupProgress];
-    
-	[super _didFinish];
 }
 
 

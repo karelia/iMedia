@@ -942,8 +942,6 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	
 	// Cleanup...
 	
-	[self cleanupProgress];
-	
 	[self performSelectorOnMainThread:@selector(_didFinish) 
 						   withObject:nil 
 						waitUntilDone:YES 
@@ -973,8 +971,6 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
 		NSLog(@"%s",__FUNCTION__);
-		[self cleanupProgress];
-		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 							   withObject:nil 
 							waitUntilDone:YES 
@@ -997,8 +993,6 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
 		NSLog(@"%s",__FUNCTION__);
-		[self cleanupProgress];
-		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 							   withObject:nil 
 							waitUntilDone:YES 
