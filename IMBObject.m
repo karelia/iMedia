@@ -246,6 +246,7 @@
 {
 	if (self.needsImageRepresentation)
 	{
+		// we may have logging down in this method of IMBObject
 		[self load];
 	}
 	
@@ -304,6 +305,7 @@
 	if (self.needsImageRepresentation && _isLoading==NO)
 	{
 		self.isLoading = YES;
+		// NSLog(@"Queueing load of %@", self.name);
 		
 		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
 		[[IMBOperationQueue sharedQueue] addOperation:operation];			

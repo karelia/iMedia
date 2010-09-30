@@ -1925,7 +1925,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				IMBObject* loadingObject = [op object];
 				if (loadingObject == object)
 				{
-					//NSLog(@"Lowering priority of load of %@", entity.name);
+					//NSLog(@"Lowering priority of load of %@", loadingObject.name);
 					[op setQueuePriority:NSOperationQueuePriorityVeryLow];		// re-prioritize lower
 					break;
 				}
@@ -1937,11 +1937,11 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
     for (IMBObject* object in itemsNewlyVisible)
 	{
-		if (nil == [object imageRepresentation])
+		if ([object needsImageRepresentation])	// don't auto-load just by asking for imageRepresentation
 		{
 			// Check if it is already queued -- if it's there already, bump up priority.
 			
-			NSOperation *foundOperation = nil;
+			IMBObjectThumbnailLoadOperation *foundOperation = nil;
 			
 			NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
 			for (IMBObjectThumbnailLoadOperation* op in ops)
@@ -1959,13 +1959,13 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			
 			if (foundOperation)
 			{
-				//NSLog(@"Raising priority of load of %@", imageEntity.name);
+				IMBObject *loadingObject = [foundOperation object];
+				//NSLog(@"Raising priority of load of %@", loadingObject.name);
 				[foundOperation setQueuePriority:NSOperationQueuePriorityNormal];		// re-prioritize back to normal
 			}
 			else
 			{
-				//NSLog(@"Queueing load of %@", imageEntity.name);
-				[object load];
+				[object load];	// make sure we load it, though it probably got loaded above
 			}
 		}
 		
