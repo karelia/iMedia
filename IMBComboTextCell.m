@@ -282,6 +282,7 @@
 	
     CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
     [self willDrawImageInRect:rect context:context];
+	CGContextSetInterpolationQuality(context, kCGInterpolationHigh);	// artwork is pretty bad if you don't set this.
 	CGContextDrawImage(context,NSRectToCGRect(rect),inImage);
 	CGContextRestoreGState(context);
 }
