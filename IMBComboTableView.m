@@ -65,6 +65,11 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+- (BOOL)wantsThumbnails;
+{
+	return YES;
+}
+
 
 // If we are using custom background and highlight colors, we may have to adjust the text colors accordingly,
 // to make sure that text is always clearly readable...

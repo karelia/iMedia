@@ -1872,6 +1872,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows
 {
+	BOOL wantsThumbnails = [tableView wantsThumbnails];
+	
 	NSArray *newVisibleItems = [[ibObjectArrayController arrangedObjects] subarrayWithRange:newVisibleRows];
 	NSMutableSet *newVisibleItemsSetRetained = [[NSMutableSet alloc] initWithArray:newVisibleItems];
 	
@@ -1919,9 +1921,10 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
     for (IMBObject* object in itemsNewlyVisible)
 	{
-		if ([object needsImageRepresentation])	// don't auto-load just by asking for imageRepresentation
+		if ((wantsThumbnails && [object needsImageRepresentation])		// don't auto-load just by asking for imageRepresentation
+			|| (nil == object.metadata))
 		{
-			// Check if it is already queued -- if it's there already, bump up priority.
+			// Check if it is already queued -- if it's there already, bump up priority & adjust operation flag
 			
 			IMBObjectThumbnailLoadOperation *foundOperation = nil;
 			
@@ -1941,13 +1944,26 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			
 			if (foundOperation)
 			{
-				IMBObject *loadingObject = [foundOperation object];
-				//NSLog(@"Raising priority of load of %@", loadingObject.name);
+				//NSLog(@"Raising priority of load of %@", [foundOperation object].name);
+				
+				NSUInteger operationMask = kIMBLoadMetadata;
+				if (wantsThumbnails)
+				{
+					operationMask |= kIMBLoadThumbnail;
+				}
+				foundOperation.options |= operationMask;		// make sure we have the appropriate loading option set
 				[foundOperation setQueuePriority:NSOperationQueuePriorityNormal];		// re-prioritize back to normal
 			}
 			else
 			{
-				[object load];	// make sure we load it, though it probably got loaded above
+				if (wantsThumbnails)
+				{
+					[object loadThumbnail];	// make sure we load it, though it probably got loaded above
+				}
+				else
+				{
+					[object loadMetadata];
+				}
 			}
 		}
 		

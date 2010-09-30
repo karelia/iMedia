@@ -79,6 +79,11 @@
     [super dealloc];
 }
 
+- (BOOL)wantsThumbnails;
+{
+	return NO;		// subclass can override.
+}
+
 - (void)_ensureVisibleRowsIsCreated
 {
     if (_viewsInVisibleRows == nil)

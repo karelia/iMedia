@@ -65,7 +65,7 @@
 @implementation IMBObjectThumbnailLoadOperation
 
 @synthesize object = _object;
-
+@synthesize options = _options;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -100,16 +100,25 @@
 	
 	IMBObject* object = self.object;
 	IMBParser* parser = object.parser;
-	[parser loadThumbnailForObject:object];
+	
+	if (self.options & kIMBLoadThumbnail)
+	{
+		//NSLog(@"Loading thumbnail for %@", object.name);
+		[parser loadThumbnailForObject:object];
+
+	}
 	
 	// Load metadata if is hasn't been loaded yet. This part is only done once, as the metadata is almost certain 
 	// to remain the same throughout a session...
 	
-	if (object.metadata == nil)
+	if (self.options & kIMBLoadMetadata)
 	{
-		[object.parser loadMetadataForObject:object];
+		// NSLog(@"May load metadata for %@", object.name);
+		if (object.metadata == nil)
+		{
+			[object.parser loadMetadataForObject:object];
+		}
 	}
-
 	[pool release];
 }
 
