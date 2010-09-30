@@ -54,6 +54,10 @@
 
 @class IMBObject;
 
+enum {
+	kIMBLoadMetadata = 1UL << 0,
+	kIMBLoadThumbnail = 1UL << 1,
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -61,9 +65,12 @@
 @interface IMBObjectThumbnailLoadOperation : NSOperation
 {
 	IMBObject* _object;
+	NSUInteger _options;
 }
 
 @property (retain) IMBObject* object;
+@property (assign) NSUInteger options;
+
 - (id) initWithObject:(IMBObject*)inObject;
 
 @end

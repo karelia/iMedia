@@ -734,7 +734,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 // ---------------------------------------------------------------------------------------------------------------------
 - (void) _gotThumbnailCallback: (ICACopyObjectThumbnailPB*)pbPtr
 {
-	self.isLoading = NO;
+	self.isLoadingThumbnail = NO;
     if (noErr == pbPtr->header.err)
     {
         // got the thumbnail data, now create an image...
@@ -750,7 +750,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 
 - (void) _getThumbnail
 {
-	self.isLoading = YES;
+	self.isLoadingThumbnail = YES;
     ICACopyObjectThumbnailPB    pb = { 0 };
     
     pb.header.refcon   = (unsigned long) self;
@@ -765,7 +765,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 // ---------------------------------------------------------------------------------------------------------------------
 - (NSImage *) imageRepresentation
 {
-	if ( !_imageRepresentation && !self.isLoading  ) {
+	if ( !_imageRepresentation && !self.isLoadingThumbnail  ) {
 		[self _getThumbnail];
 	}
 	return _imageRepresentation;

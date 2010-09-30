@@ -101,7 +101,7 @@ static NSMutableArray* sObjectCache = nil;
 		while ([sObjectCache count] > sCacheSize)
 		{
 			IMBObject* object = [sObjectCache objectAtIndex:0];
-			[object unload];
+			[object unloadThumbnail];
 			[sObjectCache removeObjectAtIndex:0];
 		}
 	}
@@ -135,7 +135,7 @@ static NSMutableArray* sObjectCache = nil;
 	{
 		while ([sObjectCache indexOfObject:inObject])
 		{
-			[inObject unload];
+			[inObject unloadThumbnail];
 			[sObjectCache removeObject:inObject];
 		}
 	}
@@ -146,7 +146,7 @@ static NSMutableArray* sObjectCache = nil;
 
 + (void) removeAllObjects
 {
-	[sObjectCache makeObjectsPerformSelector:@selector(unload)];
+	[sObjectCache makeObjectsPerformSelector:@selector(unloadThumbnail)];
 	IMBRelease(sObjectCache);
 }
 

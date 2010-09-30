@@ -90,7 +90,7 @@
 	BOOL _needsImageRepresentation;
 	NSUInteger _imageVersion;
 	id _imageLocation;
-    BOOL _isLoading;
+    BOOL _isLoadingThumbnail;
     BOOL _shouldDrawAdornments;
 	BOOL _shouldDisableTitle;
 }
@@ -130,9 +130,9 @@
 
 // Asynchronous loading of thumbnails...
 																	
-- (void) load;	
-- (void) unload;
-@property (assign) BOOL isLoading;
+- (void) loadThumbnail;	
+- (void) unloadThumbnail;
+@property (assign) BOOL isLoadingThumbnail;
 
 - (void)postProcessLocalURL:(NSURL *)localURL;
 

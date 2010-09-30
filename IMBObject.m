@@ -84,7 +84,7 @@
 @synthesize imageRepresentationType = _imageRepresentationType;
 @synthesize needsImageRepresentation = _needsImageRepresentation;
 @synthesize imageVersion = _imageVersion;
-@synthesize isLoading = _isLoading;
+@synthesize isLoadingThumbnail = _isLoadingThumbnail;
 
 @synthesize metadataDescription = _metadataDescription;
 /*
@@ -247,7 +247,7 @@
 	if (self.needsImageRepresentation)
 	{
 		// we may have logging down in this method of IMBObject
-		[self load];
+		[self loadThumbnail];
 	}
 	
 	return [[_imageRepresentation retain] autorelease];
@@ -266,7 +266,7 @@
 }
 
 
-- (BOOL) needsImageRepresentation
+- (BOOL) needsImageRepresentation	// Override simple accessor - also return YES if no actual image rep data.
 {
 	return _needsImageRepresentation || (_imageRepresentation == nil);
 }
@@ -300,14 +300,27 @@
 
 // If the image representation isn't available yet, then trigger an asynchronous loading operation...
 
-- (void) load
+- (void) loadMetadata
 {
-	if (self.needsImageRepresentation && _isLoading==NO)
+	if (!self.metadata)
 	{
-		self.isLoading = YES;
+		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
+		operation.options = kIMBLoadMetadata;
+		
+		[[IMBOperationQueue sharedQueue] addOperation:operation];			
+		
+	}
+}
+- (void) loadThumbnail
+{
+	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
+	{
+		self.isLoadingThumbnail = YES;
 		// NSLog(@"Queueing load of %@", self.name);
 		
 		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
+		operation.options = kIMBLoadMetadata | kIMBLoadThumbnail;		// get metadata if needed also.
+		
 		[[IMBOperationQueue sharedQueue] addOperation:operation];			
 	}
 }
@@ -323,7 +336,7 @@
 	[old release];
 	
 	self.imageVersion = _imageVersion + 1;
-	self.isLoading = NO;
+	self.isLoadingThumbnail = NO;
 	
 	if (inImageRepresentation)
 	{
@@ -338,7 +351,7 @@
 
 // Unload the imageRepresentation to save some memory...
 
-- (void) unload
+- (void) unloadThumbnail
 {
    self.imageRepresentation = nil;
 }

@@ -65,6 +65,8 @@
 	
 }
 
+- (BOOL)wantsThumbnails;
+
 @property(assign) id <IMBDynamicTableViewDelegate> delegate;
 
 @end

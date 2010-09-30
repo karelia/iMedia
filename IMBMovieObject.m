@@ -126,7 +126,7 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 
 // The getter loads the poster frame image lazily (if it's not available). Since we are using Quicklook to render 
 // the image, and Quicklook doesn't like being called on the main thread, we'll defer this to a background operation.
-// Please note that the unload method gets rid of the poster frame image again as the IMBObjectFifoCache clears out 
+// Please note that the unloadThumbnail method gets rid of the poster frame image again as the IMBObjectFifoCache clears out 
 // the oldest items...
 
 - (CGImageRef) posterFrame
@@ -217,9 +217,9 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 
 
 // As object are flushed from the cache
-- (void) unload
+- (void) unloadThumbnail
 {
-	[super unload];
+	[super unloadThumbnail];
 	self.posterFrame = NULL;
 }
 
