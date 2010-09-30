@@ -221,8 +221,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (error == nil)
 	{
-		[self performSelectorOnMainThread:@selector(_didCreateNode:) withObject:newNode];
 		[self replaceNode:self.oldNode withNode:newNode];
+		[self performSelectorOnMainThread:@selector(_didCreateNode:) withObject:newNode];
 	}
 	else
 	{
@@ -255,8 +255,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		if (error == nil)
 		{
-			[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.newNode];
 			[self replaceNode:self.oldNode withNode:self.newNode];
+			[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.newNode];
 		}
 		else
 		{
