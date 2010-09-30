@@ -135,7 +135,11 @@
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
-	NSString* path = [@"~/Library/Safari/Bookmarks.plist" stringByStandardizingPath];
+	
+	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+	NSString *libraryPath = [libraryPaths objectAtIndex:0];
+
+	NSString* path = [libraryPath stringByAppendingPathComponent:@"Safari/Bookmarks.plist"];
 
 	if ([self isInstalled] && [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
 	{
