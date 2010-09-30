@@ -152,6 +152,7 @@
 
 - (id) initWithMediaType:(NSString*)inMediaType;
 - (NSString*) identifierForPath:(NSString*)inPath;
++ (NSString*) identifierForPath:(NSString*)inPath;
 - (void) invalidateThumbnails;
 
 @end

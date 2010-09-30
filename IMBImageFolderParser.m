@@ -56,6 +56,7 @@
 #import "IMBParserController.h"
 #import "NSImage+iMedia.h"
 #import "IMBCommon.h"
+#import "IMBNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -124,6 +125,12 @@
 		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
 	}
 	return self;
+}
+
+- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+{
+	inNode.displayPriority = 1;
+	return [super populateNode:inNode options:inOptions error:outError];
 }
 
 @end

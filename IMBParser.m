@@ -180,6 +180,11 @@
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
 }
 
++ (NSString*) identifierForPath:(NSString*)inPath
+{
+	NSString* parserClassName = NSStringFromClass(self);
+	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

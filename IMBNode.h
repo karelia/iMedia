@@ -80,6 +80,7 @@
 	NSArray* _objects;
 	NSArray* _subNodes;
 	NSInteger _displayedObjectCount;
+	NSUInteger _displayPriority;
 	
 	IMBNode* _parentNode;	// not retained!
 	BOOL _group;
@@ -111,6 +112,7 @@
 @property (retain) NSImage* icon;					// 16x16 icon for user interface
 @property (retain) NSDictionary* attributes;		// Optional metadata about the node
 @property (assign) NSUInteger groupType;			// Used for grouping root level nodes
+@property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
 
 // Node tree accessors. If the subNodes property is nil, that doesn't mean that there are no subNodes - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 

@@ -71,7 +71,6 @@
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
-+ (NSString*) identifierForPath:(NSString*)inPath;
 - (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
 
 @end

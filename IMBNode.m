@@ -83,6 +83,7 @@
 @synthesize name = _name;
 @synthesize icon = _icon;
 @synthesize groupType = _groupType;
+@synthesize displayPriority = _displayPriority;
 @synthesize attributes = _attributes;
 @synthesize objects = _objects;
 
@@ -129,6 +130,7 @@
 	if (self = [super init])
 	{
 		self.groupType = kIMBGroupTypeNone;
+		self.displayPriority = 5;					// middle of the pack, default
 		self.group = NO;
 		self.leaf = NO;
 		self.loading = NO;
@@ -163,6 +165,7 @@
 	copy.icon = self.icon;
 	copy.attributes = self.attributes;
 	copy.groupType = self.groupType;
+	copy.displayPriority = self.displayPriority;
 	
 	copy.group = self.group;
 	copy.leaf = self.leaf;
@@ -410,13 +413,17 @@
 }
 
 
-// Nodes are grouped by type, but within a group nodes are sorted alphabetically. Nodes without a group type
-// are at the end of the list...
+// Nodes are grouped by type, but within a group nodes are sorted first by priority (1=top, 9=last),
+// then alphabetically.  (The default value is 5.  The idea is to be able to push things UP or DOWN.)
+// Nodes without a group type are at the end of the list...
 
 - (NSComparisonResult) compare:(IMBNode*)inNode
 {
+	NSLog(@"Compare %@ with %@", self.name, inNode.name);
 	NSUInteger selfGroupType = self.groupType;
+	NSUInteger selfDisplayPriority = self.displayPriority;
 	NSUInteger otherGroupType = inNode.groupType;
+	NSUInteger otherDisplayPriority = inNode.displayPriority;
 
 	if (selfGroupType > otherGroupType)
 	{
@@ -427,6 +434,15 @@
 		return NSOrderedAscending;
 	}
 	
+	if (selfDisplayPriority > otherDisplayPriority)
+	{
+		return NSOrderedDescending;
+	}
+	else if (selfDisplayPriority < otherDisplayPriority)
+	{
+		return NSOrderedAscending;
+	}
+		
 	return [self.name imb_finderCompare:inNode.name];
 }
 
