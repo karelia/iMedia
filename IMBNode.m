@@ -419,7 +419,6 @@
 
 - (NSComparisonResult) compare:(IMBNode*)inNode
 {
-	NSLog(@"Compare %@ with %@", self.name, inNode.name);
 	NSUInteger selfGroupType = self.groupType;
 	NSUInteger selfDisplayPriority = self.displayPriority;
 	NSUInteger otherGroupType = inNode.groupType;
