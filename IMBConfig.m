@@ -245,7 +245,7 @@ static BOOL sUseGlobalViewType = NO;
 
 + (void) registerDefaultValues
 {
-	NSString* path = [NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"];
+	NSString* path = [NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"];	// brute force fallback
 	NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,NSUserDomainMask,YES);
 	if ([paths count] > 0) path = [paths objectAtIndex:0];
 	

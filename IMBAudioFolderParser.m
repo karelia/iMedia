@@ -353,7 +353,10 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [@"~/Library/Sounds" stringByStandardizingPath];
+		NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+		NSString *libraryPath = [libraryPaths objectAtIndex:0];
+
+		self.mediaSource = [libraryPath stringByAppendingPathComponent:@"Sounds"];
 	}
 	
 	return self;
