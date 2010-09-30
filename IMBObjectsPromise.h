@@ -150,18 +150,16 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 #pragma mark 
 
-// These delegate methods should be used by the client application to display a progress panel or sheet. They
-// are only called if necessary, i.e. if a lengthy loading operation is needed (e.g. downloads from the internet 
-// or form a camera device). Accessing local files on the hard disk on the other is instantaneous and does not 
-// require showing a progres bar...
+//  These delegate methods can be used by a client application to display a progress panel/sheet.
+//  Somewhat like NSURLConnectionDelegate:
+//
+//      An -objectsPromiseDidFinish: message is always sent
+//      Multiple -objectsPromise:didProgress: messages may be sent, but you will receive none if the promise fulfils quickly (i.e. promises local files only).
 
 @protocol IMBObjectsPromiseDelegate
-
 @optional
-
 - (void) objectsPromise:(IMBObjectsPromise*)inObjectPromise didProgress:(double)inFraction;
 - (void) objectsPromiseDidFinish:(IMBObjectsPromise*)inObjectPromise;
-
 @end
 
 
