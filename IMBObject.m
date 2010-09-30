@@ -393,24 +393,6 @@
     
 }*/
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Helpers
-
-
-// Objects are equal if their locations (paths or urls) are equal...
-
-- (BOOL) isEqual:(IMBObject*)inObject
-{
-	return [self.location isEqual:inObject.location];
-}
-
-- (NSUInteger) hash
-{
-	return [self.location hash];
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 
