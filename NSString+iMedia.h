@@ -56,6 +56,7 @@
 + (NSString *)imb_UTIForFilenameExtension:(NSString *)anExtension;
 + (NSString *)imb_UTIForFileAtPath:(NSString *)anAbsolutePath;
 + (BOOL) imb_doesUTI:(NSString *)aUTI conformsToUTI:(NSString *)aConformsToUTI;
++ (BOOL) imb_doesFileAtPath:(NSString*)inPath conformToUTI:(NSString*)inRequiredUTI;
 
 @end
 

@@ -129,7 +129,9 @@
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForPath:path]; 
 	newNode.name = [fm displayNameAtPath:path];
-	newNode.icon = [self iconForPath:path];
+	newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
+	[newNode.icon setScalesWhenResized:YES];
+	[newNode.icon setSize:NSMakeSize(16,16)];
 	newNode.parser = self;
 	newNode.leaf = NO;
 	
@@ -229,7 +231,7 @@
 				
 				// Create an IMBVisualObject for each qualifying file...
 				
-				else if ([self fileAtPath:path conformsToUTI:_fileUTI])
+				else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
 				{
 					IMBObject* object = [self objectForPath:path name:file index:index++];
 					[objects addObject:object];
@@ -255,7 +257,9 @@
 			subnode.mediaSource = folder;
 			subnode.identifier = [[self class] identifierForPath:folder];
 			subnode.name = name;
-			subnode.icon = [self iconForPath:folder]; //[[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+			subnode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+			[subnode.icon setScalesWhenResized:YES];
+			[subnode.icon setSize:NSMakeSize(16,16)];
 			subnode.parser = self;
 			subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
@@ -316,23 +320,6 @@
 
 #pragma mark 
 #pragma mark Helpers
-
-
-- (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI
-{
-	NSString* uti = [NSString imb_UTIForFileAtPath:inPath];
-	return (BOOL) UTTypeConformsTo((CFStringRef)uti,(CFStringRef)inRequiredUTI);
-}
-
-
-- (NSImage*) iconForPath:(NSString*)inPath
-{
-	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:inPath];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(16,16)];
-	return icon;
-}
-	
 
 // To be overridden by subclass...
 	
