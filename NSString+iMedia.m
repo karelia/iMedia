@@ -178,6 +178,12 @@
 	return UTTypeConformsTo((CFStringRef)aUTI, (CFStringRef)aConformsToUTI);
 }
 
++ (BOOL) imb_doesFileAtPath:(NSString*)inPath conformToUTI:(NSString*)inRequiredUTI;
+{
+	NSString* uti = [NSString imb_UTIForFileAtPath:inPath];
+	return (BOOL) UTTypeConformsTo((CFStringRef)uti,(CFStringRef)inRequiredUTI);
+}
+
 @end
 
 // This is from cocoadev.com -- public domain

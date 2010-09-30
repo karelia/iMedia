@@ -265,7 +265,9 @@
 		demo.parentNode = root;
 		demo.mediaSource = demoSongsPath;
 		demo.identifier = [self identifierForPath:demoSongsPath];
-		demo.icon = [self iconForPath:demoSongsPath];
+		demo.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:demoSongsPath];
+		[demo.icon setScalesWhenResized:YES];
+		[demo.icon setSize:NSMakeSize(16,16)];
 		demo.name = demoSongsName;
 		demo.groupType = kIMBGroupTypeNone;
 		demo.leaf = YES;
@@ -286,7 +288,10 @@
 		user.parentNode = root;
 		user.mediaSource = userSongsPath;
 		user.identifier = [self identifierForPath:userSongsPath];
-		user.icon = [self iconForPath:userSongsPath];
+		user.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:userSongsPath];
+		[user.icon setScalesWhenResized:YES];
+		[user.icon setSize:NSMakeSize(16,16)];
+
 		user.name = userSongsName;
 		user.groupType = kIMBGroupTypeNone;
 		user.leaf = YES;
@@ -294,7 +299,7 @@
 		user.watcherType = kIMBWatcherTypeFSEvent;
 		user.watchedPath = userSongsPath;
 		
-		[IMBConfig addLibraryPath:userSongsPath];
+		[IMBConfig registerLibraryPath:userSongsPath];
 
 		[(NSMutableArray*)root.subNodes addObject:user];
 	}
