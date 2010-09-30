@@ -337,17 +337,10 @@
 }
 
 
-+ (NSString*) identifierForPath:(NSString*)inPath
-{
-	NSString* parserClassName = NSStringFromClass([self class]);
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
-}
-	
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex
+- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
 {
 	IMBObject* object = [[[IMBObject alloc] init] autorelease];
 	object.location = (id)inPath;

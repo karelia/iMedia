@@ -58,6 +58,7 @@
 #import "IMBCommon.h"
 #import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "IMBNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -251,6 +252,12 @@
 	}
 	
 	return self;
+}
+
+- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+{
+	inNode.displayPriority = 1;	// Force this node to show up at the top of the list
+	return [super populateNode:inNode options:inOptions error:outError];
 }
 
 @end
