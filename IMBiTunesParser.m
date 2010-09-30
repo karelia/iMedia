@@ -54,6 +54,7 @@
 #pragma mark HEADERS
 
 #import "IMBiTunesParser.h"
+#import "IMBConfig.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
@@ -149,6 +150,9 @@
 			NSString* path = [url path];
 			BOOL exists,changed;
 			exists = [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
+
+			NSString *libraryPath = [path stringByDeletingLastPathComponent];	// folder containing .xml file
+			[IMBConfig registerLibraryPath:libraryPath];
 
 			IMBiTunesParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = path;

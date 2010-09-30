@@ -261,4 +261,36 @@
 @end
 
 
+@implementation IMBPhotoBoothMoviesFolderParser
+
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
+	[pool release];
+}
+
+
+// Set the folder path to the ~/Pictures...
+
+- (id) initWithMediaType:(NSString*)inMediaType
+{
+	if (self = [super initWithMediaType:inMediaType])
+	{
+		self.mediaSource = [[NSHomeDirectory()
+							 stringByAppendingPathComponent:@"Pictures"]
+								stringByAppendingPathComponent:@"Photo Booth"];
+
+	}
+	
+	return self;
+}
+
+
+@end
+
+
 //----------------------------------------------------------------------------------------------------------------------

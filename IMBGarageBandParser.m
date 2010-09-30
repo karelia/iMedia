@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBGarageBandParser.h"
+#import "IMBConfig.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
@@ -292,6 +293,8 @@
 		user.parser = self;
 		user.watcherType = kIMBWatcherTypeFSEvent;
 		user.watchedPath = userSongsPath;
+		
+		[IMBConfig addLibraryPath:userSongsPath];
 
 		[(NSMutableArray*)root.subNodes addObject:user];
 	}

@@ -86,6 +86,14 @@
 
 @end
 
+// Photo booth takes movies
+
+@interface IMBPhotoBoothMoviesFolderParser : IMBMovieFolderParser
+
+@end
+
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

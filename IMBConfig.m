@@ -281,6 +281,35 @@ static BOOL sUseGlobalViewType = NO;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/*
+	Library paths.  Each parser should register any path of a library that it uses, so that other parser
+	(e.g. folder parser, spotlight parser, etc.) can exclude that path from showing up in the source list.
+ 
+ */
+
+static NSMutableSet *sLibraryPaths = nil;
+
++ (void)registerLibraryPath:(NSString *)aPath
+{
+	if (nil == sLibraryPaths)
+	{
+		sLibraryPaths = [NSMutableSet new];
+	}
+	[sLibraryPaths addObject:aPath];
+}
+
++ (BOOL) isLibraryPath:(NSString *)aPath
+{
+	return [sLibraryPaths containsObject:aPath];
+}
+
+// Future: We may need a method that loops through the library paths and asks if the given
+// path is a subpath of any of these paths.
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 
 @end
  
