@@ -390,6 +390,12 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 {
     // "Overload" errors make my skin crawl, but this is in for compat. right now
     [_objectsToURLsMap setValue:(URL ? URL : error) forKey:object.location];
+    
+    // Tell the object it downloaded
+    if (URL)
+    {
+        [object postProcessLocalURL:URL];
+    }
 }
 
 @end
