@@ -1104,14 +1104,14 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
-// Open the specified objects...
+// Open the specified objects. Double-clicking opens the files (with the default app). Please note that 
+// IMBObjects are first passed through an IMBObjectsPromise (which is returned by the parser), because 
+// the resources to be opened may not yet be available. In this case the promise object loads them 
+// asynchronously and calls _openLocalURLs: once the load has finished...
+	
 
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode
 {
-	// Double-clicking opens the files (with the default app). Please note that IMBObjects are first passed through an 
-	// IMBObjectsPromise (which is returned by the parser), because the resources to be opened may not yet be available.
-	// In this case the promise object loads them asynchronously and calls _openLocalURLs: once the load has finished...
-	
 	if (inSelectedNode)
 	{
 		IMBParser* parser = inSelectedNode.parser;
@@ -1121,49 +1121,62 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	}
 }
 
+
 #pragma mark
 #pragma mark Post-download action
 
-// Post process.  We use this to embed metadata after the download.
-//
-// This is really set up for Flickr images, though we may want to generatlize it some day.
 
-- (void) _postProcessDownload:(IMBObjectsPromise *)promise;
+// Post process.  We use this to embed metadata after the download. This is really set up for Flickr images, 
+// though we may want to generalize it some day. Make sure it's really a URL, not an overloaded NSError...
+
+- (void) _postProcessDownload:(IMBObjectsPromise*)inObjectsPromise
 {
-	if ([promise isKindOfClass:[NSError class]])	// overloaded... error object
+	if ([inObjectsPromise isKindOfClass:[NSError class]])	// overloaded... error object
 	{
-		[NSApp presentError:(NSError *)promise];
+		[NSApp presentError:(NSError*)inObjectsPromise];
 	}
 	else
 	{
-		NSDictionary *objectsToLocalURLs = [promise fileURLsByIMBObject];
-		for (IMBObject *promiseObject in objectsToLocalURLs)
+		NSDictionary* objectsToURLsMap = [inObjectsPromise objectsToURLsMap];
+		
+		for (id location in objectsToURLsMap)
 		{
-			NSAssert([promiseObject isKindOfClass:[IMBObject class]], @"promise object must be IMBObject");
-			NSURL *localURL = [objectsToLocalURLs objectForKey:promiseObject];
+			IMBObject* object = nil;
+			
+			for (IMBObject* obj in inObjectsPromise.objects)
+			{
+				if ([location isEqual:obj.location])
+				{
+					object = obj;
+					break;
+				}
+			}
+			
+			NSURL* localURL = [objectsToURLsMap objectForKey:location];
+
 			if ([localURL isKindOfClass:[NSURL class]])
-			 {
-				 // Make sure it's really a URL, not an overloaded NSError
-				 [promiseObject postProcessLocalURL:localURL];
-			 }
+			{
+				[object postProcessLocalURL:localURL];
+			}
 		}
 	}
 }
 
 
-// "Local" means that for whatever the object represents, opening it now requires no network or other time-intensive 
-// procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to IMBObjects 
-// that refer strictly to a web link, where "opening" them just means loading them in a browser...
+// "Local" means that for whatever the object represents, opening it now requires no network or other time-intensive
+// procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to
+// IMBObjects that refer strictly to a web link, where "opening" them just means loading them in a browser...
 
 - (void) _openLocalURLs:(IMBObjectsPromise*)inObjectPromise
 {
 	if ([inObjectPromise isKindOfClass:[NSError class]])	// overloaded... error object
 	{
-		[NSApp presentError:(NSError *)inObjectPromise];
+		[NSApp presentError:(NSError*)inObjectPromise];
 	}
 	else
 	{
 		[self _postProcessDownload:inObjectPromise];		// first do our post-processing
+		
 		for (NSURL* url in inObjectPromise.fileURLs)
 		{
 			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
@@ -1183,9 +1196,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #pragma mark Dragging
 
 
-//
 // By default all object view controllers manage objects which correspond to local file URLs when dragged or copied to pasteboard.
-//
 
 - (BOOL) writesLocalFilesToPasteboard
 {

@@ -140,7 +140,7 @@
 #pragma mark -
 #pragma mark Post-processing
 
-- (void)postProcessLocalURL:(NSURL *)localURL;
+- (void) postProcessLocalURL:(NSURL*)localURL
 {
 	NSDictionary *metadata = [self metadata];
 	

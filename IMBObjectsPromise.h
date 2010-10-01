@@ -82,8 +82,8 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 @interface IMBObjectsPromise : NSObject <NSCopying,NSCoding>
 {
 	NSArray* _objects;
-	NSMutableDictionary* _objectsToLocalURLs;
-	NSString* _downloadFolderPath;
+	NSMutableDictionary* _objectsToURLsMap;
+	NSString* _destinationDirectoryPath;
 	NSError* _error;
 	
 	int _objectCountTotal;
@@ -95,6 +95,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 
 #pragma mark Creating an Object Promise
+
 + (IMBObjectsPromise *) promiseFromPasteboard:(NSPasteboard *)pasteboard;
 + (IMBObjectsPromise *) promiseWithLocalIMBObjects:(NSArray *)objects;
 - (id) initWithIMBObjects:(NSArray*)inObjects;
@@ -104,39 +105,41 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 - (void) start;
 
-/// Retained due to asynchronous nature of the promise
+// Retained due to asynchronous nature of the promise
+
 @property (retain) NSObject <IMBObjectsPromiseDelegate> *delegate;	
 
-/// Special case until we have blocks support so you can run a custom method upon completion
-- (void) setDelegate:(NSObject <IMBObjectsPromiseDelegate> *)delegate completionSelector:(SEL)selector;
+// Special case until we have blocks support so you can run a custom method upon completion
 
+- (void) setDelegate:(NSObject <IMBObjectsPromiseDelegate> *)delegate completionSelector:(SEL)selector;
 - (void) waitUntilFinished;
 
 
 #pragma mark Getting the Promise Status
+
 - (BOOL) isCancelled;
 @property (retain) NSError* error;  /// Contains error in case of failure	
 
 
 #pragma mark Getting Attributes
 
-/// Array of IMBObjects that was supplied in the init method
+// Array of IMBObjects that was supplied in the init method
 
 @property (retain) NSArray* objects;
 
-/// Optional download folder (only needed for remote files that need to be downloaded)
-/// Should be preset to a reasonable default
+// Optional download folder (only needed for remote files that need to be downloaded)
+// Should be preset to a reasonable default
+
 @property (retain) NSString* destinationDirectoryPath;
 
-/// Array of URLs referencing a local copy of a file, or in the case of e.g. link objects,
-/// the URL to the web resource itself. Generally speaking these URLs are suitable for,
-/// passing to NSWorkspace's openURL: method.
-///
-/// NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
+// Array of URLs referencing a local copy of a file, or in the case of e.g. link objects,
+// the URL to the web resource itself. Generally speaking these URLs are suitable for,
+// passing to NSWorkspace's openURL: method.
+//
+// NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
 
 @property (retain,readonly) NSArray* fileURLs; 
-
-@property (retain) NSMutableDictionary* fileURLsByIMBObject;
+@property (retain) NSMutableDictionary* objectsToURLsMap;
 
 /// After loading is done, you can ask for a local URL specifically by the object you're interested in
 
@@ -150,16 +153,17 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 #pragma mark 
 
-//  These delegate methods can be used by a client application to display a progress panel/sheet.
-//  Somewhat like NSURLConnectionDelegate:
-//
-//      An -objectsPromiseDidFinish: message is always sent
-//      Multiple -objectsPromise:didProgress: messages may be sent, but you will receive none if the promise fulfils quickly (i.e. promises local files only).
+// These delegate methods can be used by a client application to display a progress panel/sheet.   
+// Somewhat like NSURLConnectionDelegate: An -objectsPromiseDidFinish: message is always sent  
+// Multiple-objectsPromise:didProgress: messages may be sent, but you will receive none if the 
+// promise fulfils quickly (i.e. promises local files only)...
 
 @protocol IMBObjectsPromiseDelegate
 @optional
+
 - (void) objectsPromise:(IMBObjectsPromise*)inObjectPromise didProgress:(double)inFraction;
 - (void) objectsPromiseDidFinish:(IMBObjectsPromise*)inObjectPromise;
+
 @end
 
 
@@ -168,8 +172,9 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 #pragma mark 
 
-// This subclass is used for remote object files that can be downloaded from a network. NSURLDownload is used to
-// pull the object files off the network onto the local file system, where it can then be accessed by the delegate... 
+// This subclass is used for remote object files that can be downloaded from a network. NSURLDownload 
+// is used to pull the object files off the network onto the local file system, where it can then be 
+// accessed by the delegate... 
 
 @interface IMBRemoteObjectsPromise : IMBObjectsPromise <IMBURLDownloadDelegate>
 {

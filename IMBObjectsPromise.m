@@ -111,8 +111,8 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 @implementation IMBObjectsPromise
 
 @synthesize objects = _objects;
-@synthesize fileURLsByIMBObject = _objectsToLocalURLs;
-@synthesize destinationDirectoryPath = _downloadFolderPath;
+@synthesize objectsToURLsMap = _objectsToURLsMap;
+@synthesize destinationDirectoryPath = _destinationDirectoryPath;
 @synthesize error = _error;
 @synthesize delegate = _delegate;
 @synthesize finishSelector = _finishSelector;
@@ -142,7 +142,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	if (self = [super init])
 	{
 		self.objects = inObjects;
-		self.fileURLsByIMBObject = [NSMutableDictionary dictionaryWithCapacity:inObjects.count];
+		self.objectsToURLsMap = [NSMutableDictionary dictionaryWithCapacity:inObjects.count];
 		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.error = nil;
 		self.delegate = nil;
@@ -162,7 +162,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	if (self = [super init])
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
-		self.fileURLsByIMBObject = [inCoder decodeObjectForKey:@"objectsToLocalURLs"];
+		self.objectsToURLsMap = [inCoder decodeObjectForKey:@"objectsToURLsMap"];
 		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.delegate = nil;
 		self.finishSelector = NULL;
@@ -179,7 +179,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[inCoder encodeObject:self.objects forKey:@"objects"];
-	[inCoder encodeObject:self.fileURLsByIMBObject forKey:@"objectsToLocalURLs"];
+	[inCoder encodeObject:self.objectsToURLsMap forKey:@"objectsToURLsMap"];
 }
 
 
@@ -188,7 +188,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	IMBObjectsPromise* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.objects = self.objects;
-	copy.fileURLsByIMBObject = self.fileURLsByIMBObject;
+	copy.objectsToURLsMap = self.objectsToURLsMap;
 	copy.destinationDirectoryPath = self.destinationDirectoryPath;
 	copy.error = self.error;
 	copy.delegate = self.delegate;
@@ -203,8 +203,8 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	
 	IMBRelease(_objects);
-	IMBRelease(_objectsToLocalURLs);
-	IMBRelease(_downloadFolderPath);
+	IMBRelease(_objectsToURLsMap);
+	IMBRelease(_destinationDirectoryPath);
 	IMBRelease(_delegate);
 	IMBRelease(_error);
 	
@@ -234,7 +234,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (NSURL*) localURLForObject:(IMBObject*)inObject
 {
-	NSURL* url = [self.fileURLsByIMBObject objectForKey:inObject];
+	NSURL* url = [self.objectsToURLsMap objectForKey:inObject.location];
 	
 	if (url != nil && [url isKindOfClass:[NSURL class]])
 	{
@@ -431,19 +431,17 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	if (localURL != nil)
 	{	
-		[self.fileURLsByIMBObject setObject:localURL forKey:inObject];
+		[_objectsToURLsMap setObject:localURL forKey:inObject.location];
 		_objectCountLoaded++;
 		
+		// Now, copy this to the download folder path ... ?
+
 		if (self.destinationDirectoryPath)
 		{
-			// Now, copy this to the download folder path ... ?
-			NSString *fullPath = [self.destinationDirectoryPath stringByAppendingPathComponent:[[localURL path] lastPathComponent]];
-			NSError *err = nil;
-			[[NSFileManager imb_threadSafeManager] copyItemAtPath:[localURL path] toPath:fullPath error:&err];
-			if (err)
-			{
-				NSLog(@"%@", err);
-			}
+			NSString* fullPath = [self.destinationDirectoryPath stringByAppendingPathComponent:[[localURL path] lastPathComponent]];
+			NSError* error = nil;
+			[[NSFileManager imb_threadSafeManager] copyItemAtPath:[localURL path] toPath:fullPath error:&error];
+			if (error) NSLog(@"%@",error);
 		}
 	}
 	else
@@ -458,8 +456,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
 		NSError* error = [NSError errorWithDomain:kIMBErrorDomain code:fnfErr userInfo:info];
 
-		[self.fileURLsByIMBObject setObject:error forKey:inObject];
-
+		[_objectsToURLsMap setObject:error forKey:inObject.location];
 		_objectCountLoaded++;
 	}
 }
@@ -753,7 +750,8 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (void) didFinish:(IMBURLDownloadOperation*)inOperation
 {
-	[self.fileURLsByIMBObject setObject:[NSURL fileURLWithPath:inOperation.localPath] forKey:inOperation.delegateReference];
+	IMBObject* object = (IMBObject*) inOperation.delegateReference;
+	[self.objectsToURLsMap setObject:[NSURL fileURLWithPath:inOperation.localPath] forKey:object.location];
 	_objectCountLoaded++;	// for check on all promises
 	
 	if ([inOperation bytesDone] > 0)	// Is this a real download?
@@ -783,7 +781,9 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (void) didReceiveError:(IMBURLDownloadOperation*)inOperation
 {
-	[self.fileURLsByIMBObject setObject:inOperation.error forKey:inOperation.delegateReference];
+	IMBObject* object = (IMBObject*) inOperation.delegateReference;
+	[self.objectsToURLsMap setObject:inOperation.error forKey:object.location];
+	
 	self.error = inOperation.error;
 	_objectCountLoaded++;	// for check on all promises
 	_downloadFileLoaded++;	// for checking on actual downloads

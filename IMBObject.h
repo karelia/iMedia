@@ -135,7 +135,7 @@
 - (void) loadMetadata;
 @property (assign) BOOL isLoadingThumbnail;
 
-- (void)postProcessLocalURL:(NSURL *)localURL;
+- (void) postProcessLocalURL:(NSURL*)localURL;
 
 @end
 
