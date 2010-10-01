@@ -160,6 +160,8 @@
 		NSArray* mediaTypes = [NSArray arrayWithObjects:kIMBMediaTypeImage,kIMBMediaTypeAudio,kIMBMediaTypeMovie,kIMBMediaTypeLink,nil];
 		IMBPanelController* panelController = [IMBPanelController sharedPanelControllerWithDelegate:self mediaTypes:mediaTypes];
 		[panelController showWindow:nil];
+		[panelController.window makeKeyAndOrderFront:nil];		// Test app, and stand-alone app, would want this to become key.
+
 	}
 }
 
