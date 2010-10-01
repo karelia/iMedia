@@ -756,7 +756,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) didFinish:(IMBURLDownloadOperation*)inOperation
 {
 	IMBObject* object = (IMBObject*) inOperation.delegateReference;
-	[self.objectsToURLsMap setObject:[NSURL fileURLWithPath:inOperation.localPath] forKey:object.location];
+	[self setFileURL:[NSURL fileURLWithPath:inOperation.localPath] error:nil forObject:object];
 	_objectCountLoaded++;	// for check on all promises
 	
 	if ([inOperation bytesDone] > 0)	// Is this a real download?
@@ -787,7 +787,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) didReceiveError:(IMBURLDownloadOperation*)inOperation
 {
 	IMBObject* object = (IMBObject*) inOperation.delegateReference;
-	[self.objectsToURLsMap setObject:inOperation.error forKey:object.location];
+	[self setFileURL:nil error:inOperation.error forObject:object];
 	
 	self.error = inOperation.error;
 	_objectCountLoaded++;	// for check on all promises

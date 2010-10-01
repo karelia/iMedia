@@ -141,7 +141,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 // NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
 
 @property (retain,readonly) NSArray* fileURLs; 
-@property (retain) NSMutableDictionary* objectsToURLsMap;
+@property (retain) NSDictionary* objectsToURLsMap;
 
 /// After loading is done, you can ask for a local URL specifically by the object you're interested in
 
