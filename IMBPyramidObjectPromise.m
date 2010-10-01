@@ -94,7 +94,7 @@
 	}
 	
 	if (imageURL != nil) {
-		[self.fileURLsByIMBObject setObject:imageURL forKey:inObject];
+		[self.objectsToURLsMap setObject:imageURL forKey:inObject.location];
 		_objectCountLoaded++;
 	}
 	else {
