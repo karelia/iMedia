@@ -65,9 +65,11 @@
 @interface IMBFolderParser : IMBParser
 {
 	NSString* _fileUTI;
+	NSUInteger _displayPriority;
 }
 
 @property (retain) NSString* fileUTI;
+@property (assign) NSUInteger displayPriority;
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;

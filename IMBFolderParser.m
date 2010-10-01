@@ -71,7 +71,7 @@
 @implementation IMBFolderParser
 
 @synthesize fileUTI = _fileUTI;
-
+@synthesize displayPriority = _displayPriority;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -81,6 +81,7 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.fileUTI = nil;
+		self.displayPriority = 5;	// default middle-of-the-pack priority
 	}
 	
 	return self;
@@ -127,7 +128,8 @@
 	
 	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
-	newNode.identifier = [self identifierForPath:path]; 
+	newNode.identifier = [self identifierForPath:path];
+	newNode.displayPriority = self.displayPriority;			// get node's display priority from the folder parser
 	newNode.name = [fm displayNameAtPath:path];
 	newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 	[newNode.icon setScalesWhenResized:YES];

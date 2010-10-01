@@ -123,15 +123,11 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
+		self.displayPriority = 1;
 	}
 	return self;
 }
 
-- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
-{
-	inNode.displayPriority = 1;
-	return [super populateNode:inNode options:inOptions error:outError];
-}
 
 @end
 

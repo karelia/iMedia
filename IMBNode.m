@@ -124,6 +124,13 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+- (void)setName:(NSString *)inName
+{
+	[inName retain];
+	[_name release];
+	_name = inName;
+	NSLog(@"setName:%@", inName);
+}
 
 - (id) init
 {
