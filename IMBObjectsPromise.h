@@ -169,6 +169,15 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 @optional
 
 - (void) objectsPromise:(IMBObjectsPromise*)inObjectPromise didProgress:(double)inFraction;
+
+- (void) objectsPromise:(IMBObjectsPromise*)promise
+                 object:(IMBObject *)object
+  didFinishLoadingAtURL:(NSURL *)fileURL;
+
+- (void) objectsPromise:(IMBObjectsPromise*)promise
+                 object:(IMBObject *)object
+didFailLoadingWithError:(NSError *)error;
+
 - (void) objectsPromiseDidFinish:(IMBObjectsPromise*)inObjectPromise;
 
 @end

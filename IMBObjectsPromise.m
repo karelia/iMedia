@@ -395,6 +395,18 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
     if (URL)
     {
         [object postProcessLocalURL:URL];
+        
+        if ([self.delegate respondsToSelector:@selector(objectsPromise:object:didFinishLoadingAtURL:)])
+        {
+            [self.delegate objectsPromise:self object:object didFinishLoadingAtURL:URL];
+        }
+    }
+    else
+    {
+        if ([self.delegate respondsToSelector:@selector(objectsPromise:object:didFailLoadingWithError:)])
+        {
+            [self.delegate objectsPromise:self object:object didFailLoadingWithError:error];
+        }
     }
 }
 
