@@ -2044,6 +2044,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (IBAction) tableViewWasClicked:(id)inSender
 {
 	// No-op; clicking is handled with more detail from the mouse operations.
+	// However we want to make sure our window becomes key with a click.
+	[[inSender window] makeKeyWindow];
 }
 
 
