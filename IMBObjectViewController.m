@@ -1377,39 +1377,38 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 // SpeedLimit http://mschrag.github.com/ is a good way to debug this....
 
-- (void) objectsPromiseShowProgress:(IMBObjectsPromise*)inObjectPromise
-{
-	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
-	
-	NSString* title = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.progress.title",
-		nil,IMBBundle(),
-		@"Downloading Media Files",
-		@"Window title of progress panel of IMBObjectViewController");
-	
-	NSString* message = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.progress.message.preparing",
-		nil,IMBBundle(),
-		@"Preparing…",
-		@"Text message in progress panel of IMBObjectViewController");
-	
-	// Make sure the window is at a higher window level than our view's window, so it doesn't get hidden
-	[[controller window] setLevel:[[[self view] window] level] + 1];
-	
-	[controller setTitle:title];
-	[controller setMessage:message];
-	[controller.progressBar startAnimation:nil];
-	[controller setCancelTarget:inObjectPromise];
-	[controller setCancelAction:@selector(cancel:)];
-	[controller.cancelButton setEnabled:YES];
-	[controller.window makeKeyAndOrderFront:nil];
-	
-	self.progressWindowController = controller;
-}
-
-
 - (void) objectsPromise:(IMBObjectsPromise*)inObjectPromise didProgress:(double)inFraction;
 {
+    if (!self.progressWindowController)
+    {
+        IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
+        
+        NSString* title = NSLocalizedStringWithDefaultValue(
+                                                            @"IMBObjectViewController.progress.title",
+                                                            nil,IMBBundle(),
+                                                            @"Downloading Media Files",
+                                                            @"Window title of progress panel of IMBObjectViewController");
+        
+        NSString* message = NSLocalizedStringWithDefaultValue(
+                                                              @"IMBObjectViewController.progress.message.preparing",
+                                                              nil,IMBBundle(),
+                                                              @"Preparing…",
+                                                              @"Text message in progress panel of IMBObjectViewController");
+        
+        // Make sure the window is at a higher window level than our view's window, so it doesn't get hidden
+        [[controller window] setLevel:[[[self view] window] level] + 1];
+        
+        [controller setTitle:title];
+        [controller setMessage:message];
+        [controller.progressBar startAnimation:nil];
+        [controller setCancelTarget:inObjectPromise];
+        [controller setCancelAction:@selector(cancel:)];
+        [controller.cancelButton setEnabled:YES];
+        [controller.window makeKeyAndOrderFront:nil];
+        
+        self.progressWindowController = controller;
+    }
+    
 	[self.progressWindowController setProgress:inFraction];
 	[self.progressWindowController setMessage:@""];
 	[self.progressWindowController.cancelButton setEnabled:YES];
