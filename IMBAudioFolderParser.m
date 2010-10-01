@@ -249,15 +249,10 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Music"];
+		self.displayPriority = 1;
 	}
 	
 	return self;
-}
-
-- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
-{
-	inNode.displayPriority = 1;	// Force this node to show up at the top of the list
-	return [super populateNode:inNode options:inOptions error:outError];
 }
 
 @end
