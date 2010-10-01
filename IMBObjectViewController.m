@@ -1126,39 +1126,13 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #pragma mark Post-download action
 
 
-// Post process.  We use this to embed metadata after the download. This is really set up for Flickr images, 
-// though we may want to generalize it some day. Make sure it's really a URL, not an overloaded NSError...
+// Post process.
 
 - (void) _postProcessDownload:(IMBObjectsPromise*)inObjectsPromise
 {
 	if ([inObjectsPromise isKindOfClass:[NSError class]])	// overloaded... error object
 	{
 		[NSApp presentError:(NSError*)inObjectsPromise];
-	}
-	else
-	{
-		NSDictionary* objectsToURLsMap = [inObjectsPromise objectsToURLsMap];
-		
-		for (id location in objectsToURLsMap)
-		{
-			IMBObject* object = nil;
-			
-			for (IMBObject* obj in inObjectsPromise.objects)
-			{
-				if ([location isEqual:obj.location])
-				{
-					object = obj;
-					break;
-				}
-			}
-			
-			NSURL* localURL = [objectsToURLsMap objectForKey:location];
-
-			if ([localURL isKindOfClass:[NSURL class]])
-			{
-				[object postProcessLocalURL:localURL];
-			}
-		}
 	}
 }
 
