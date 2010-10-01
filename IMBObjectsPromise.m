@@ -382,7 +382,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 // This is invoked when cancelling a double-click
 
 - (void) recoveryAttempter
-{
+{ 
 	NSLog(@"%s",__FUNCTION__);
 }
 
@@ -391,7 +391,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
     // "Overload" errors make my skin crawl, but this is in for compat. right now
     [_objectsToURLsMap setValue:(URL ? URL : error) forKey:object.location];
     
-    // Tell the object it downloaded
+    // Post process.  We use this to embed metadata after the download. This is only really used by Flickr images right now
     if (URL)
     {
         [object postProcessLocalURL:URL];
