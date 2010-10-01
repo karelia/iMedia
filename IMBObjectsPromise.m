@@ -386,6 +386,11 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	NSLog(@"%s",__FUNCTION__);
 }
 
+- (void)setFileURL:(NSURL *)URL error:(NSError *)error forObject:(IMBObject *)object;
+{
+    // "Overload" errors make my skin crawl, but this is in for compat. right now
+    [_objectsToURLsMap setValue:(URL ? URL : error) forKey:object.location];
+}
 
 @end
 
@@ -431,7 +436,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	if (localURL != nil)
 	{	
-		[_objectsToURLsMap setObject:localURL forKey:inObject.location];
+        [self setFileURL:localURL error:nil forObject:inObject];
 		_objectCountLoaded++;
 		
 		// Now, copy this to the download folder path ... ?
@@ -456,7 +461,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
 		NSError* error = [NSError errorWithDomain:kIMBErrorDomain code:fnfErr userInfo:info];
 
-		[_objectsToURLsMap setObject:error forKey:inObject.location];
+        [self setFileURL:nil error:error forObject:inObject];
 		_objectCountLoaded++;
 	}
 }
