@@ -79,6 +79,7 @@
 #import <Carbon/Carbon.h>
 #import "IMBFlickrObject.h"
 #import "IMBFlickrNode.h"
+#import "NSFileManager+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,7 +155,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) _updateTooltips;
 
 - (void) _downloadDraggedObjectsToDestination:(NSURL*)inDestination;
-- (NSArray*) _namesOfPromisedFiles;
+- (NSArray*) _namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination;
 
 @end
 
@@ -1332,17 +1333,27 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	}
 }
 
-
-- (NSArray*) _namesOfPromisedFiles
+- (NSArray*) _namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
 {
+	NSFileManager *fileManager = [NSFileManager imb_threadSafeManager];
+	NSString *dropDestPath = [inDropDestination path];
 	NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
 	NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];
 	NSMutableArray* names = [NSMutableArray array];
 	
 	for (IMBObject* object in objects)
 	{
-		NSString* path = [object path];
-		if (path) [names addObject:[path lastPathComponent]];
+		NSString *path = [object path];
+		if (path)
+		{
+			NSString* name = [[object path] lastPathComponent];
+			NSString *base = [name stringByDeletingPathExtension];
+			NSString *ext = [name pathExtension];
+			NSString *newPath = [fileManager imb_generateUniqueFileNameAtPath:dropDestPath base:base extension:ext];
+			name = [newPath lastPathComponent];
+			
+			[names addObject:name];
+		}
 	}
 	
 	return names;
@@ -1724,7 +1735,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	self.draggedIndexes = [ibObjectArrayController selectionIndexes];
 	self.dropDestinationURL = inDropDestination;		// remember so that when drag is finished
-	NSArray *result = [self _namesOfPromisedFiles];
+	NSArray *result = [self _namesOfPromisedFilesDroppedAtDestination:inDropDestination];
 	return result;
 }
 // The drag will finish at draggedImage:endedAt:operation:
@@ -1842,7 +1853,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	self.draggedIndexes = inIndexes;
 	self.dropDestinationURL = inDropDestination;
-	return [self _namesOfPromisedFiles];
+	return [self _namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination];
 }
 
 
