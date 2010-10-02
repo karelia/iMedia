@@ -628,6 +628,19 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 				}
 				
 				NSString* filename = [[url path] lastPathComponent];
+				
+				// Determine local path .... We should probably have stored this in _namesOfPromisedFilesDroppedAtDestination
+				// so that we know what to do.  With an explicit drag to the finder, we probably want to make a copy using
+				// this technique -- but for double-clicking, we probably just want to re-open if it is downloaded already.
+				// 
+				// So ... this remains not-quite-finished. :-)
+				/*
+				 NSString* name = [[object path] lastPathComponent];
+				 NSString *base = [name stringByDeletingPathExtension];
+				 NSString *ext = [name pathExtension];
+				 NSString *newPath = [fileManager imb_generateUniqueFileNameAtPath:dropDestPath base:base extension:ext];
+				 name = [newPath lastPathComponent];
+				*/
 				NSString* localPath = [downloadFolderPath stringByAppendingPathComponent:filename];
 
 				IMBURLGetSizeOperation* getSizeOp = [[[IMBURLGetSizeOperation alloc] initWithURL:url delegate:self] autorelease];

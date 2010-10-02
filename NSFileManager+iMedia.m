@@ -319,5 +319,20 @@
 	return exists;
 }
 
+// Based on Sample code DragNDropOutlineView:AppController.m
+- (NSString *) imb_generateUniqueFileNameAtPath:(NSString *)path base:(NSString *)basename extension:(NSString *)extension;
+{
+	NSString *filename = [NSString stringWithFormat:@"%@.%@", basename, extension];
+    NSString *result = [path stringByAppendingPathComponent:filename];
+    NSInteger i = 1;
+    while ([self fileExistsAtPath:result]) {
+        filename = [NSString stringWithFormat:@"%@ %ld.%@", basename, (long)i, extension];
+        result = [path stringByAppendingPathComponent:filename];
+        i++;
+    }    
+    return result;
+}
+
+
 
 @end
