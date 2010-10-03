@@ -82,9 +82,6 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 @interface IMBObjectsPromise : NSObject <NSCopying,NSCoding>
 {
 	NSArray* _objects;
-  @private
-	NSMutableDictionary* _objectsToURLsMap;
-  @public
 	NSString* _destinationDirectoryPath;
 	NSError* _error;
 	
@@ -141,7 +138,6 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 // NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
 
 @property (retain,readonly) NSArray* fileURLs; 
-@property (retain) NSDictionary* objectsToURLsMap;
 
 /// After loading is done, you can ask for a local URL specifically by the object you're interested in
 
