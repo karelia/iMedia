@@ -100,6 +100,8 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) _didFinish;
 @property (assign) SEL finishSelector;
 
+@property (retain) NSDictionary* objectsToURLsMap;
+
 @end
 
 
