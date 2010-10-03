@@ -82,6 +82,9 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 @interface IMBObjectsPromise : NSObject <NSCopying,NSCoding>
 {
 	NSArray* _objects;
+  @private
+	NSMutableDictionary* _objectsToURLsMap;
+  @public
 	NSString* _destinationDirectoryPath;
 	NSError* _error;
 	
