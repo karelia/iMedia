@@ -60,6 +60,7 @@
 		CEAF1F2F125A7DE4001C3EBB /* NSWindow_Flipr.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAF1F2D125A7DE4001C3EBB /* NSWindow_Flipr.h */; };
 		CEAF1F3B125A80D4001C3EBB /* IMBHoverButton.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAF1F39125A80D4001C3EBB /* IMBHoverButton.h */; };
 		CEAF1F3C125A80D4001C3EBB /* IMBHoverButton.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAF1F3A125A80D4001C3EBB /* IMBHoverButton.m */; };
+		CEAF1FE5125A8B6A001C3EBB /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1FE4125A8B6A001C3EBB /* Credits.html */; };
 		CEF6539C117E5C29003FF1A5 /* Attribute.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65395117E5C28003FF1A5 /* Attribute.pdf */; };
 		CEF6539D117E5C29003FF1A5 /* CC.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65396117E5C28003FF1A5 /* CC.pdf */; };
 		CEF6539E117E5C29003FF1A5 /* commercial.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65397117E5C28003FF1A5 /* commercial.pdf */; };
@@ -437,6 +438,7 @@
 		CEAF1F2D125A7DE4001C3EBB /* NSWindow_Flipr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSWindow_Flipr.h; sourceTree = "<group>"; };
 		CEAF1F39125A80D4001C3EBB /* IMBHoverButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBHoverButton.h; sourceTree = "<group>"; };
 		CEAF1F3A125A80D4001C3EBB /* IMBHoverButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBHoverButton.m; sourceTree = "<group>"; };
+		CEAF1FE4125A8B6A001C3EBB /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
 		CEF65395117E5C28003FF1A5 /* Attribute.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = Attribute.pdf; path = CC/Attribute.pdf; sourceTree = "<group>"; };
 		CEF65396117E5C28003FF1A5 /* CC.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = CC.pdf; path = CC/CC.pdf; sourceTree = "<group>"; };
 		CEF65397117E5C28003FF1A5 /* commercial.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = commercial.pdf; path = CC/commercial.pdf; sourceTree = "<group>"; };
@@ -858,6 +860,7 @@
 		CEAF1F13125A7D8C001C3EBB /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				CEAF1FE4125A8B6A001C3EBB /* Credits.html */,
 				CEAF1F22125A7DBF001C3EBB /* iMedia.tiff */,
 				CEAF1F23125A7DBF001C3EBB /* i.tiff */,
 				CEAF1F24125A7DBF001C3EBB /* i2.tiff */,
@@ -1642,6 +1645,7 @@
 				CEAF1F25125A7DBF001C3EBB /* iMedia.tiff in Resources */,
 				CEAF1F26125A7DBF001C3EBB /* i.tiff in Resources */,
 				CEAF1F27125A7DBF001C3EBB /* i2.tiff in Resources */,
+				CEAF1FE5125A8B6A001C3EBB /* Credits.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
