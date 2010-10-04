@@ -289,7 +289,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[ibToolbarPrompt setStringValue:NSLocalizedStringWithDefaultValue(
 																   @"IMB.option.toolbar", nil,IMBBundle(),
 																   @"Toolbar:", @"back of window")];
-	[ibShowTitles setTitlefun, thanks:NSLocalizedStringWithDefaultValue(
+	[ibShowTitles setTitle:NSLocalizedStringWithDefaultValue(
 																	  @"IMB.option.showTitles", nil,IMBBundle(),
 																	  @"Show Titles", @"back of window checkbox")];
 	[ibSmallSize setTitle:NSLocalizedStringWithDefaultValue(
