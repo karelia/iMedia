@@ -416,14 +416,74 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[scrollView setDrawsBackground:NO];
 	[[scrollView contentView] setCopiesOnScroll:NO];
 	
-	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"Info" ofType:@"html"];
+	NSAttributedString *attr = nil;
+	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"Credits" ofType:@"html"];
 	
 	NSData *htmlContents = [NSData dataWithContentsOfFile:path];
-	NSAttributedString *attr = [[[NSAttributedString alloc] initWithHTML:htmlContents documentAttributes:nil] autorelease];
-	if (!attr)
+	if (htmlContents)
+	{
+		NSMutableString *htmlString = [[[NSMutableString alloc] initWithData:htmlContents encoding:NSUTF8StringEncoding] autorelease];
+		
+		NSString* imediaDescription = NSLocalizedStringWithDefaultValue(
+			@"IMB.introduction",
+			nil,IMBBundle(),
+			@"An extensible component to allow browsing of multiple media types.",
+			@"HTML style text shown on credits for iMedia");
+		
+		NSString* availableLink = NSLocalizedStringWithDefaultValue(
+			@"IMB.availableLink",
+			nil,IMBBundle(),
+			@"Available at <a href='http://karelia.com/imedia/'>karelia.com/imedia</a>",
+			@"HTML markup to show link to iMedia home page");
+	
+		NSString* credits = NSLocalizedStringWithDefaultValue(
+			@"IMB.credits",
+			nil,IMBBundle(),
+			@"Credits:",
+			@"HTML style text shown on credits for iMedia, introducting who wrote the software");
+	
+		NSString* localization = NSLocalizedStringWithDefaultValue(
+			@"IMB.localization",
+			nil,IMBBundle(),
+			@"Localization:",
+			@"HTML style text shown on credits for iMedia, to introduct who did localization");
+	
+		NSString* licenseIntro = NSLocalizedStringWithDefaultValue(
+			@"IMB.licenseIntro",
+			nil,IMBBundle(),
+			@"The iMedia Browser Framework is licensed under the following terms:",
+			@"HTML style text shown on credits for iMedia");
+		
+		// Localize some stuff.  Note that we're working in HTML here so watch for & < >
+		[htmlString replaceOccurrencesOfString:@"{IMB.introduction}"
+									withString:imediaDescription
+									   options:0
+										 range:NSMakeRange(0,[htmlString length])];
+		[htmlString replaceOccurrencesOfString:@"{IMB.availableLink}"
+									withString:availableLink
+									   options:0
+										 range:NSMakeRange(0,[htmlString length])];
+		[htmlString replaceOccurrencesOfString:@"{IMB.credits}"
+									withString:credits
+									   options:0
+										 range:NSMakeRange(0,[htmlString length])];
+		[htmlString replaceOccurrencesOfString:@"{IMB.localization}"
+									withString:localization
+									   options:0
+										 range:NSMakeRange(0,[htmlString length])];
+		[htmlString replaceOccurrencesOfString:@"{IMB.licenseIntro}"
+									withString:licenseIntro
+									   options:0
+										 range:NSMakeRange(0,[htmlString length])];
+		
+		NSData *backToData = [htmlString dataUsingEncoding:NSUTF8StringEncoding];
+		attr = [[[NSAttributedString alloc] initWithHTML:backToData documentAttributes:nil] autorelease];
+	}
+	else
 	{
 		attr = [[[NSAttributedString alloc] initWithString:@"Unable to load Info"] autorelease];
 	}
+
 	[[ibInfoTextView textStorage] setAttributedString:attr];
 	
 	// set up cursors in text
