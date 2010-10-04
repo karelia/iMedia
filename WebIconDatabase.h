@@ -26,7 +26,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #import <Cocoa/Cocoa.h>
 
 // Sent whenever a site icon has changed. The object of the notification is the icon database.
@@ -53,7 +52,6 @@ extern NSSize WebIconLargeSize;  // 128 x 128
         - icon update notification
         
         Uses:
-        - WebIconLoader to cache icon images
         - UI elements to retrieve icons that represent site URLs.
         - Save icons to disk for later use.
  
@@ -67,6 +65,7 @@ extern NSSize WebIconLargeSize;  // 128 x 128
 
 @private
     WebIconDatabasePrivate *_private;
+    BOOL _isClosing;
 }
 
 
@@ -107,6 +106,7 @@ extern NSSize WebIconLargeSize;  // 128 x 128
     @param size
 */
 - (NSImage *)defaultIconWithSize:(NSSize)size;
+- (NSImage *)defaultIconForURL:(NSString *)URL withSize:(NSSize)size;
 
 /*!
     @method retainIconForURL:
@@ -128,7 +128,7 @@ extern NSSize WebIconLargeSize;  // 128 x 128
     delayDatabaseCleanUp increments an internal counter that when 0 begins the database clean-up.
     The counter equals 0 at initialization.
 */
-- (void)delayDatabaseCleanup;
++ (void)delayDatabaseCleanup;
 
 /*!
     @method allowDatabaseCleanup:
@@ -136,6 +136,11 @@ extern NSSize WebIconLargeSize;  // 128 x 128
     allowDatabaseCleanup decrements an internal counter that when 0 begins the database clean-up.
     The counter equals 0 at initialization.
 */
-- (void)allowDatabaseCleanup;
++ (void)allowDatabaseCleanup;
+
+- (void)setDelegate:(id)delegate;
+- (id)delegate;
 
 @end
+
+
