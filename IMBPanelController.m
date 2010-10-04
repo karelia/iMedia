@@ -282,6 +282,32 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[ibToolbar setAllowsUserCustomization:NO];
 	
 	[self setupInfoWindow];
+	
+	[ibGridPrompt setStringValue:NSLocalizedStringWithDefaultValue(
+																   @"IMB.option.gridPrompt", nil,IMBBundle(),
+																   @"Photo Grids:", @"back of window")];
+	[ibToolbarPrompt setStringValue:NSLocalizedStringWithDefaultValue(
+																   @"IMB.option.toolbar", nil,IMBBundle(),
+																   @"Toolbar:", @"back of window")];
+	[ibShowTitles setTitlefun, thanks:NSLocalizedStringWithDefaultValue(
+																	  @"IMB.option.showTitles", nil,IMBBundle(),
+																	  @"Show Titles", @"back of window checkbox")];
+	[ibSmallSize setTitle:NSLocalizedStringWithDefaultValue(
+																   @"IMB.option.smallSize", nil,IMBBundle(),
+																   @"Small size", @"back of window checkbox")];
+	
+	[[ibToolbarPopup itemAtIndex:0]
+	 setTitle:NSLocalizedStringWithDefaultValue(
+												@"IMB.option.toolbarSize.iconAndText", nil,IMBBundle(),
+												@"Icon & Text", @"back of window toolbar popup menu item")];
+	[[ibToolbarPopup itemAtIndex:1]
+	 setTitle:NSLocalizedStringWithDefaultValue(
+												@"IMB.option.toolbarSize.iconOnly", nil,IMBBundle(),
+												@"Icon Only", @"back of window toolbar popup menu item")];
+	[[ibToolbarPopup itemAtIndex:2]
+	 setTitle:NSLocalizedStringWithDefaultValue(
+												@"IMB.option.toolbarSize.textOnly", nil,IMBBundle(),
+												@"Text Only", @"back of window toolbar popup menu item")];
 
 	// Create a tab for each controller and install the subviews in it. We query each node controller for its 
 	// minimum size so we can be sure to constrain our panel's minimum to suit the most restrictive controller...

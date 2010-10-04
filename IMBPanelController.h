@@ -81,11 +81,18 @@
 
 @interface IMBPanelController : NSWindowController <NSTabViewDelegate>
 {
-	IBOutlet NSTabView* ibTabView;
-	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
-	IBOutlet NSWindow*	ibInfoWindow;
-	IBOutlet NSTextView*ibInfoTextView;
+	IBOutlet NSTabView*		ibTabView;
+	IBOutlet NSToolbar*		ibToolbar;		// should track the ibTabView
+	IBOutlet NSWindow*		ibInfoWindow;
+	IBOutlet NSTextView*	ibInfoTextView;
 	IBOutlet IMBBackgroundImageView *ibBackgroundImageView;
+	
+	// Items that we will localize from code so we don't need multiple nibs
+	IBOutlet NSTextField	*ibGridPrompt;
+	IBOutlet NSTextField	*ibToolbarPrompt;
+	IBOutlet NSButton		*ibShowTitles;
+	IBOutlet NSPopUpButton	*ibToolbarPopup;
+	IBOutlet NSButton		*ibSmallSize;
 
 	id _delegate;
 	NSArray* _mediaTypes;
