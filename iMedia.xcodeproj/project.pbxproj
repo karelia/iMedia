@@ -53,6 +53,13 @@
 		CE69E9E1114B05EA0016E5E0 /* firefox_tag.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */; };
 		CE6B664C124D440A00E44811 /* IMBDisableTitleToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */; };
 		CE6B664D124D440C00E44811 /* IMBDisableTitleToColorTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */; };
+		CEAF1F25125A7DBF001C3EBB /* iMedia.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1F22125A7DBF001C3EBB /* iMedia.tiff */; };
+		CEAF1F26125A7DBF001C3EBB /* i.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1F23125A7DBF001C3EBB /* i.tiff */; };
+		CEAF1F27125A7DBF001C3EBB /* i2.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1F24125A7DBF001C3EBB /* i2.tiff */; };
+		CEAF1F2E125A7DE4001C3EBB /* NSWindow_Flipr.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAF1F2C125A7DE4001C3EBB /* NSWindow_Flipr.m */; };
+		CEAF1F2F125A7DE4001C3EBB /* NSWindow_Flipr.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAF1F2D125A7DE4001C3EBB /* NSWindow_Flipr.h */; };
+		CEAF1F3B125A80D4001C3EBB /* IMBHoverButton.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAF1F39125A80D4001C3EBB /* IMBHoverButton.h */; };
+		CEAF1F3C125A80D4001C3EBB /* IMBHoverButton.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAF1F3A125A80D4001C3EBB /* IMBHoverButton.m */; };
 		CEF6539C117E5C29003FF1A5 /* Attribute.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65395117E5C28003FF1A5 /* Attribute.pdf */; };
 		CEF6539D117E5C29003FF1A5 /* CC.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65396117E5C28003FF1A5 /* CC.pdf */; };
 		CEF6539E117E5C29003FF1A5 /* commercial.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65397117E5C28003FF1A5 /* commercial.pdf */; };
@@ -423,6 +430,13 @@
 		CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_bookmarksToolbar.png; sourceTree = "<group>"; };
 		CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_unfiledBookmarks.png; sourceTree = "<group>"; };
 		CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_tag.png; sourceTree = "<group>"; };
+		CEAF1F22125A7DBF001C3EBB /* iMedia.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = iMedia.tiff; sourceTree = "<group>"; };
+		CEAF1F23125A7DBF001C3EBB /* i.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = i.tiff; sourceTree = "<group>"; };
+		CEAF1F24125A7DBF001C3EBB /* i2.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = i2.tiff; sourceTree = "<group>"; };
+		CEAF1F2C125A7DE4001C3EBB /* NSWindow_Flipr.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSWindow_Flipr.m; sourceTree = "<group>"; };
+		CEAF1F2D125A7DE4001C3EBB /* NSWindow_Flipr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSWindow_Flipr.h; sourceTree = "<group>"; };
+		CEAF1F39125A80D4001C3EBB /* IMBHoverButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBHoverButton.h; sourceTree = "<group>"; };
+		CEAF1F3A125A80D4001C3EBB /* IMBHoverButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBHoverButton.m; sourceTree = "<group>"; };
 		CEF65395117E5C28003FF1A5 /* Attribute.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = Attribute.pdf; path = CC/Attribute.pdf; sourceTree = "<group>"; };
 		CEF65396117E5C28003FF1A5 /* CC.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = CC.pdf; path = CC/CC.pdf; sourceTree = "<group>"; };
 		CEF65397117E5C28003FF1A5 /* commercial.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = commercial.pdf; path = CC/commercial.pdf; sourceTree = "<group>"; };
@@ -796,6 +810,7 @@
 				D09930F31010FD6400C527B7 /* Views */,
 				D099323410111A1600C527B7 /* Categories */,
 				D08E8B5A1019C8EF005D8614 /* Third Party */,
+				CEAF1F13125A7D8C001C3EBB /* Resources */,
 			);
 			name = Framework;
 			sourceTree = SOURCE_ROOT;
@@ -838,6 +853,25 @@
 				CE6524C11253AF47003A9AA0 /* warning.tiff */,
 			);
 			name = Aperture;
+			sourceTree = "<group>";
+		};
+		CEAF1F13125A7D8C001C3EBB /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CEAF1F22125A7DBF001C3EBB /* iMedia.tiff */,
+				CEAF1F23125A7DBF001C3EBB /* i.tiff */,
+				CEAF1F24125A7DBF001C3EBB /* i2.tiff */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		CEAF1F2A125A7DDA001C3EBB /* Flipr */ = {
+			isa = PBXGroup;
+			children = (
+				CEAF1F2C125A7DE4001C3EBB /* NSWindow_Flipr.m */,
+				CEAF1F2D125A7DE4001C3EBB /* NSWindow_Flipr.h */,
+			);
+			name = Flipr;
 			sourceTree = "<group>";
 		};
 		CEF695D21064347B005D7E72 /* iTunes icons */ = {
@@ -1000,6 +1034,7 @@
 		D08E8B5A1019C8EF005D8614 /* Third Party */ = {
 			isa = PBXGroup;
 			children = (
+				CEAF1F2A125A7DDA001C3EBB /* Flipr */,
 				D02E53C610A5563500B205BD /* NSData+SKExtensions.h */,
 				D02E53C710A5563500B205BD /* NSData+SKExtensions.m */,
 				D08E8D8B1019EBFB005D8614 /* IMBFileWatcher */,
@@ -1137,6 +1172,8 @@
 				D052B0C01053B4AB00988F53 /* IMBProgress.xib */,
 				D08070E910442F0500891137 /* IMBPanel.xib */,
 				D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */,
+				CEAF1F39125A80D4001C3EBB /* IMBHoverButton.h */,
+				CEAF1F3A125A80D4001C3EBB /* IMBHoverButton.m */,
 			);
 			name = Views;
 			sourceTree = SOURCE_ROOT;
@@ -1388,6 +1425,8 @@
 				CE3EC9A2124AAC0700D8435B /* NSURL+iMedia.h in Headers */,
 				D0129A2A124C97A600EBEB45 /* NSDictionary+iMedia.h in Headers */,
 				CE6B664D124D440C00E44811 /* IMBDisableTitleToColorTransformer.h in Headers */,
+				CEAF1F2F125A7DE4001C3EBB /* NSWindow_Flipr.h in Headers */,
+				CEAF1F3B125A80D4001C3EBB /* IMBHoverButton.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1600,6 +1639,9 @@
 				D094A6FC122F813A0011084C /* iTunes10-icon-32.png in Resources */,
 				8FCA063E12368342009072AE /* IMBApertureHeaderView.xib in Resources */,
 				CE6524C21253AF47003A9AA0 /* warning.tiff in Resources */,
+				CEAF1F25125A7DBF001C3EBB /* iMedia.tiff in Resources */,
+				CEAF1F26125A7DBF001C3EBB /* i.tiff in Resources */,
+				CEAF1F27125A7DBF001C3EBB /* i2.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1719,6 +1761,8 @@
 				CE3EC9A3124AAC0700D8435B /* NSURL+iMedia.m in Sources */,
 				D0129A29124C97A200EBEB45 /* NSDictionary+iMedia.m in Sources */,
 				CE6B664C124D440A00E44811 /* IMBDisableTitleToColorTransformer.m in Sources */,
+				CEAF1F2E125A7DE4001C3EBB /* NSWindow_Flipr.m in Sources */,
+				CEAF1F3C125A80D4001C3EBB /* IMBHoverButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -60,6 +60,8 @@
 #import "IMBAudioViewController.h"
 #import "IMBMovieViewController.h"
 #import "IMBLinkViewController.h"
+#import "IMBHoverButton.h"
+#import "NSWindow_Flipr.h"
 
 #import "IMBConfig.h"
 #import "IMBCommon.h"
@@ -78,8 +80,17 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+@implementation IMBBackgroundImageView
+- (BOOL) isOpaque { return YES; }
+@end
+
+
 
 #pragma mark 
+
+@interface IMBPanelController ()
+- (void)setupInfoWindow;
+@end
 
 @implementation IMBPanelController
 
@@ -128,6 +139,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 			kIMBMediaTypeImage,
 			kIMBMediaTypeAudio,
 			kIMBMediaTypeMovie,
+			kIMBMediaTypeLink,
 			nil]];
 	}
 	
@@ -269,6 +281,8 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[ibToolbar setSizeMode:NSToolbarSizeModeSmall];
 	[ibToolbar setAllowsUserCustomization:NO];
 	
+	[self setupInfoWindow];
+
 	// Create a tab for each controller and install the subviews in it. We query each node controller for its 
 	// minimum size so we can be sure to constrain our panel's minimum to suit the most restrictive controller...
 	
@@ -362,6 +376,100 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	if (mediaType) [ibTabView selectTabViewItemWithIdentifier:mediaType];
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Info Window
+
+- (void)setupInfoWindow 
+{
+	// set up special button
+	NSButton *but = [[self window] standardWindowButton:NSWindowCloseButton];
+	NSView *container = [but superview];
+	float containerWidth = [container frame].size.width;
+	NSRect frame = [but frame];
+	NSButton *iButton = [[[IMBHoverButton alloc] initWithFrame:NSMakeRect(frame.origin.x + containerWidth - 11 - 11,frame.origin.y+2,11,11)] autorelease];
+	[iButton setAutoresizingMask:NSViewMinYMargin|NSViewMinXMargin];
+	
+	[iButton setAction:@selector(info:)];
+	[iButton setTarget:self];
+	[container addSubview:iButton];
+	
+	// Now do another button on the flip-side
+	but = [ibInfoWindow standardWindowButton:NSWindowCloseButton];
+	container = [but superview];
+	containerWidth = [container frame].size.width;
+	frame = [but frame];
+	iButton = [[[IMBHoverButton alloc] initWithFrame:NSMakeRect(frame.origin.x + containerWidth - 11 - 11,frame.origin.y+2,11,11)] autorelease];
+	[iButton setAutoresizingMask:NSViewMinYMargin|NSViewMinXMargin];
+	
+	[iButton setAction:@selector(flipBack:)];
+	[iButton setTarget:self];
+	[container addSubview:iButton];
+	
+	// get flipping window ready
+	[NSWindow flippingWindow];
+	[ibInfoTextView setDrawsBackground:NO];
+	//[ibInfoTextView setTextContainerInset:NSMakeSize(2,2)];
+	NSScrollView *scrollView = [ibInfoTextView enclosingScrollView];
+	[scrollView setDrawsBackground:NO];
+	[[scrollView contentView] setCopiesOnScroll:NO];
+	
+	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"Info" ofType:@"html"];
+	
+	NSData *htmlContents = [NSData dataWithContentsOfFile:path];
+	NSAttributedString *attr = [[[NSAttributedString alloc] initWithHTML:htmlContents documentAttributes:nil] autorelease];
+	if (!attr)
+	{
+		attr = [[[NSAttributedString alloc] initWithString:@"Unable to load Info"] autorelease];
+	}
+	[[ibInfoTextView textStorage] setAttributedString:attr];
+	
+	// set up cursors in text
+	NSEnumerator* attrRuns = [[[ibInfoTextView textStorage] attributeRuns] objectEnumerator];
+	NSTextStorage* run;
+	while ((run = [attrRuns nextObject])) {
+		if ([run attribute:NSLinkAttributeName atIndex:0 effectiveRange:NULL]) {
+			[run addAttribute:NSCursorAttributeName value:[NSCursor pointingHandCursor] range:NSMakeRange(0,[run length])];
+		}
+	};
+}
+
+- (IBAction)showWindow:(id)sender;
+{
+	// If we are actually showing the back of the window, flip to the front.
+	if ([ibInfoWindow isVisible])
+	{
+		[self flipBack:sender];
+	}
+	else
+	{
+		[super showWindow:sender];
+	}
+}
+
+- (BOOL)infoWindowIsVisible
+{
+	return [ibInfoWindow isVisible];
+}
+
+- (NSWindow *)infoWindow;
+{
+	return ibInfoWindow;
+}
+
+- (IBAction) info:(id)sender
+{
+	[ibInfoWindow setFrame:[[self window] frame] display:NO];
+	[[self window] flipToShowWindow:ibInfoWindow forward:YES reflectInto:ibBackgroundImageView];
+}
+
+- (IBAction) flipBack:(id)sender
+{
+	[[self window] setFrame:[ibInfoWindow frame] display:NO];	// not really needed unless window is resized
+	[ibInfoWindow flipToShowWindow:[self window] forward:NO reflectInto:nil];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

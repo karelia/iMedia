@@ -65,20 +65,28 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+@interface IMBBackgroundImageView : NSImageView
+
+@end
+
 
 //----------------------------------------------------------------------------------------------------------------------
+
+#if ! IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+@protocol NSTabViewDelegate <NSObject> @end
+#endif
 
 
 #pragma mark 
 
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 @interface IMBPanelController : NSWindowController <NSTabViewDelegate>
-#else
-@interface IMBPanelController : NSWindowController
-#endif
 {
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
+	IBOutlet NSWindow*	ibInfoWindow;
+	IBOutlet NSTextView*ibInfoTextView;
+	IBOutlet IMBBackgroundImageView *ibBackgroundImageView;
+
 	id _delegate;
 	NSArray* _mediaTypes;
 	NSMutableArray* _viewControllers;
@@ -105,6 +113,9 @@
 
 - (void) saveStateToPreferences;
 - (void) restoreStateFromPreferences;
+
+- (IBAction) info:(id)sender;
+- (IBAction) flipBack:(id)sender;
 
 @end
 
