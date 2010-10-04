@@ -101,6 +101,10 @@
 
 @optional
 
+// Called just after notifying the app delegate; gives parser a chance to decide not to be used.
+
+- (BOOL)canBeUsed;
+
 // Called in various situations just before a parser is going to be used. Can be used to prepare the instance 
 // or update cached data...
 
