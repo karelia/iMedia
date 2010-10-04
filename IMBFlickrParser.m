@@ -106,6 +106,15 @@
 	[super dealloc];
 }
 
+- (BOOL)canBeUsed;
+{
+	BOOL result = (self.flickrAPIKey && ![self.flickrAPIKey isEqualToString:@""]
+			&& self.flickrSharedSecret && ![self.flickrSharedSecret isEqualToString:@""]);
+	// If these aren't available (provided by app delegate parserController:didLoadParser:forMediaType:)
+	// then this parser can't be used, so it will be unloaded.
+	return result;
+}
+
 
 #pragma mark
 #pragma mark Actions

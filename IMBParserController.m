@@ -263,7 +263,12 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 						for (IMBParser* parser in parserInstances) 
 						{
 							BOOL loaded = [_delegate parserController:self didLoadParser:parser forMediaType:mediaType];
-							if (!loaded)
+							if (loaded)
+							{
+								// Make sure that the parser has what it needs to proceed. E.g. Flickr will unload if no API key.
+								loaded = [parser canBeUsed];
+							}
+							if (!loaded)	// now, if either app delegate, or the parser itself says NO, then unload this.
 							{
 								[self unloadParser:parser forMediaType:mediaType];
 							}

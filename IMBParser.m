@@ -153,6 +153,11 @@
 // Optional methods that do nothing in the base class and can be overridden in subclasses, e.g. to update  
 // or get rid of cached data...
 
+- (BOOL)canBeUsed;
+{
+	return YES;
+}
+
 - (void) willUseParser
 {
 
