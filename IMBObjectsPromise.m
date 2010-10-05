@@ -391,7 +391,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void)setFileURL:(NSURL *)URL error:(NSError *)error forObject:(IMBObject *)object;
 {
     // "Overload" errors make my skin crawl, but this is in for compat. right now
-    [_objectsToURLsMap setValue:(URL ? URL : error) forKey:object.location];
+    [_objectsToURLsMap setValue:(URL ? (id)URL : (id)error) forKey:object.location];
     
     // Post process.  We use this to embed metadata after the download. This is only really used by Flickr images right now
     if (URL)
