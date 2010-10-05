@@ -390,8 +390,14 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	
 	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
 	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
-}
 
+	int sizeMode = 	[ibToolbar sizeMode];
+	BOOL isSmall = (sizeMode == NSToolbarSizeModeSmall);
+	[IMBConfig setPrefsValue:[NSNumber numberWithBool:isSmall] forKey:@"toolbarIsSmall"];
+	
+	NSToolbarDisplayMode displayMode = [ibToolbar displayMode];
+	[IMBConfig setPrefsValue:[NSNumber numberWithInt:displayMode] forKey:@"toolbarDisplayMode"];
+}
 
 - (void) restoreStateFromPreferences
 {
@@ -400,6 +406,16 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 	NSString* mediaType = [IMBConfig prefsValueForKey:@"selectedMediaType"];
 	if (mediaType) [ibTabView selectTabViewItemWithIdentifier:mediaType];
+
+	NSString* toolbarDisplayMode = [IMBConfig prefsValueForKey:@"toolbarDisplayMode"];
+	if (toolbarDisplayMode) [ibToolbar setDisplayMode:[toolbarDisplayMode intValue]];
+
+	NSString* toolbarIsSmall = [IMBConfig prefsValueForKey:@"toolbarIsSmall"];
+	if (toolbarIsSmall)
+	{
+		int sizeMode = (toolbarIsSmall ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
+		[ibToolbar setSizeMode:sizeMode];
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -555,6 +571,37 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 {
 	[[self window] setFrame:[ibInfoWindow frame] display:NO];	// not really needed unless window is resized
 	[ibInfoWindow flipToShowWindow:[self window] forward:NO reflectInto:nil];
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark NSToolbarDelegate
+
+- (int) toolbarDisplayMode
+{
+	
+	int displayMode = [ibToolbar displayMode];
+	if (0 == displayMode) displayMode = NSToolbarDisplayModeIconAndLabel;
+	return displayMode;
+}
+- (void) setToolbarDisplayMode:(int)aMode
+{
+	[ibToolbar setDisplayMode:aMode];
+}
+
+- (BOOL)toolbarIsSmall
+{
+	int sizeMode = 	[ibToolbar sizeMode];
+	if (0 == sizeMode) sizeMode = NSToolbarSizeModeSmall;
+	return (sizeMode == NSToolbarSizeModeSmall);
+}
+
+- (void) setToolbarIsSmall:(BOOL)aFlag
+{
+	int sizeMode = (aFlag ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
+	[ibToolbar setSizeMode:sizeMode];
 }
 
 //----------------------------------------------------------------------------------------------------------------------
