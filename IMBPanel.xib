@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="574"/>
+			<integer value="577"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -759,6 +759,54 @@
 					</object>
 					<int key="connectionID">603</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: prefersFilenamesInPhotoBasedBrowsers</string>
+						<reference key="source" ref="436262907"/>
+						<reference key="destination" ref="1021"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="436262907"/>
+							<reference key="NSDestination" ref="1021"/>
+							<string key="NSLabel">value: prefersFilenamesInPhotoBasedBrowsers</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">prefersFilenamesInPhotoBasedBrowsers</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">604</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">selectedTag: toolbarDisplayMode</string>
+						<reference key="source" ref="735040733"/>
+						<reference key="destination" ref="1021"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="735040733"/>
+							<reference key="NSDestination" ref="1021"/>
+							<string key="NSLabel">selectedTag: toolbarDisplayMode</string>
+							<string key="NSBinding">selectedTag</string>
+							<string key="NSKeyPath">toolbarDisplayMode</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">605</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: toolbarIsSmall</string>
+						<reference key="source" ref="1048884866"/>
+						<reference key="destination" ref="1021"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="1048884866"/>
+							<reference key="NSDestination" ref="1021"/>
+							<string key="NSLabel">value: toolbarIsSmall</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">toolbarIsSmall</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">606</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1139,9 +1187,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{79, 692}, {310, 425}}</string>
+					<string>{{234, 289}, {310, 425}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{79, 692}, {310, 425}}</string>
+					<string>{{234, 289}, {310, 425}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{213, 113}</string>
@@ -1205,7 +1253,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">603</int>
+			<int key="maxID">606</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
