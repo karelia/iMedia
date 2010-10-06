@@ -120,6 +120,7 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 
 - (IBAction) info:(id)sender;
 - (IBAction) flipBack:(id)sender;
+- (BOOL)infoWindowIsVisible;
 
 @end
 
