@@ -55,6 +55,8 @@
 #import "IMBCommon.h"
 
 
+extern NSString* kIMBImageBrowserShowTitlesNotification;
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

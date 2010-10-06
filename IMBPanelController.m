@@ -68,6 +68,8 @@
 #import "IMBQLPreviewPanel.h"
 #import "NSWorkspace+iMedia.h"
 
+NSString* kIMBImageBrowserShowTitlesNotification = @"IMBImageBrowserShowTitlesNotification";
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -278,7 +280,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
     [(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded:YES];
     
 	[ibTabView setDelegate:self];
-	[ibToolbar setSizeMode:NSToolbarSizeModeSmall];
 	[ibToolbar setAllowsUserCustomization:NO];
 	
 	[self setupInfoWindow];
@@ -411,11 +412,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	if (toolbarDisplayMode) [ibToolbar setDisplayMode:[toolbarDisplayMode intValue]];
 
 	NSString* toolbarIsSmall = [IMBConfig prefsValueForKey:@"toolbarIsSmall"];
-	if (toolbarIsSmall)
-	{
-		int sizeMode = (toolbarIsSmall ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
-		[ibToolbar setSizeMode:sizeMode];
-	}
+	BOOL small = (nil == toolbarIsSmall) ? NO : [toolbarIsSmall boolValue];
+	int sizeMode = (small ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
+	[ibToolbar setSizeMode:sizeMode];
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -424,7 +423,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 #pragma mark 
 #pragma mark Info Window
 
-- (void)setupInfoWindow 
+- (void)setupInfoWindow
 {
 	// set up special button
 	NSButton *but = [[self window] standardWindowButton:NSWindowCloseButton];
@@ -581,7 +580,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 - (int) toolbarDisplayMode
 {
-	
 	int displayMode = [ibToolbar displayMode];
 	if (0 == displayMode) displayMode = NSToolbarDisplayModeIconAndLabel;
 	return displayMode;
@@ -594,7 +592,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 - (BOOL)toolbarIsSmall
 {
 	int sizeMode = 	[ibToolbar sizeMode];
-	if (0 == sizeMode) sizeMode = NSToolbarSizeModeSmall;
+	if (0 == sizeMode) sizeMode = NSToolbarSizeModeRegular;
 	return (sizeMode == NSToolbarSizeModeSmall);
 }
 
@@ -603,6 +601,25 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	int sizeMode = (aFlag ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
 	[ibToolbar setSizeMode:sizeMode];
 }
+
+- (BOOL)prefersFilenamesInPhotoBasedBrowsers
+{
+	NSString* filenames = [IMBConfig prefsValueForKey:@"prefersFilenamesInPhotoBasedBrowsers"];
+	BOOL flag = (nil == filenames) ? YES : [filenames boolValue];
+	return flag;
+}
+
+- (void) setPrefersFilenamesInPhotoBasedBrowsers:(BOOL)aFlag
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBImageBrowserShowTitlesNotification object:
+	 [NSNumber numberWithBool:aFlag]];
+
+	[IMBConfig setPrefsValue:[NSNumber numberWithBool:aFlag] forKey:@"prefersFilenamesInPhotoBasedBrowsers"];
+}
+
+
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

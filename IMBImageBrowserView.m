@@ -61,7 +61,8 @@
 #import "IMBParser.h"
 #import "IMBQLPreviewPanel.h"
 #import <Carbon/Carbon.h>
-
+#import "IMBPanelController.h"
+#import "IMBConfig.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -100,27 +101,62 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-- (id) init
+- (void) _init	// support method shared by both
 {
-	if (self = [super init])
-	{
-		_mouseOperation = kMouseOperationNone;
-		_clickedObjectIndex = NSNotFound;
-		_clickedObject = nil;
-	}
+	_mouseOperation = kMouseOperationNone;
+	_clickedObjectIndex = NSNotFound;
+	_clickedObject = nil;
 	
+	[[NSNotificationCenter defaultCenter]				// Unload parsers before we quit, so that custom have 
+	 addObserver:self								// a chance to clean up (e.g. remove callbacks, etc...)
+	 selector:@selector(showTitlesStateChanged:) 
+	 name:kIMBImageBrowserShowTitlesNotification 
+	 object:nil];
+
+	// Set up initial value
+	NSString* filenames = [IMBConfig prefsValueForKey:@"prefersFilenamesInPhotoBasedBrowsers"];
+	BOOL showTitle = (nil == filenames) ? YES : [filenames boolValue];
+	int mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
+	[self setCellsStyleMask: mask];
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder;
+{
+	if (self = [super initWithCoder:aDecoder])
+	{
+		[self _init];
+	}
+	return self;
+}
+
+
+- (id) initWithFrame:(NSRect) frame;
+{
+	if (self = [super initWithFrame:frame])
+	{
+		[self _init];
+	}
 	return self;
 }
 
 
 - (void) dealloc
 {	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	IMBRelease(_clickedObject);
 	[super dealloc];
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+- (void) showTitlesStateChanged:(NSNotification *)aNotification
+{
+	id obj = [aNotification object];
+	BOOL showTitle = [obj boolValue];
+	int mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
+	[self setCellsStyleMask: mask];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
