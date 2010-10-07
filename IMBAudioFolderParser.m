@@ -290,6 +290,36 @@
 
 @end
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBAppleLoopsForGarageBandFolderParser
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
+	[pool release];
+}
+
+
+// Set the folder path to /Library/Audio/Apple Loops/Apple/iLife Sound Effects...
+
+- (id) initWithMediaType:(NSString*)inMediaType
+{
+	if (self = [super initWithMediaType:inMediaType])
+	{
+		self.mediaSource = @"/Library/Audio/Apple Loops/Apple/Apple Loops for GarageBand";
+	}
+	
+	return self;
+}
+
+@end
 
 //----------------------------------------------------------------------------------------------------------------------
 
