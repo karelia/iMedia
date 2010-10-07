@@ -81,10 +81,10 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 @interface IMBObjectsPromise : NSObject <NSCopying,NSCoding>
 {
-	NSArray* _objects;
   @private
-	NSMutableDictionary* _objectsToURLsMap;
-  @public
+	NSArray* _objects;
+	NSMutableDictionary* _objectsByURL;
+  @protected
 	NSString* _destinationDirectoryPath;
 	NSError* _error;
 	
@@ -139,12 +139,10 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 // passing to NSWorkspace's openURL: method.
 //
 // NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
+/// After loading is done, you can ask for the object that corresponds to a URL for more info
 
-@property (retain,readonly) NSArray* fileURLs; 
-
-/// After loading is done, you can ask for a local URL specifically by the object you're interested in
-
-- (NSURL*) localURLForObject:(IMBObject*)inObject;
+@property (retain,readonly) NSArray* fileURLs;
+- (IMBObject *)objectForFileURL:(NSURL *)inURL;
 
 
 #pragma mark Subclass Support

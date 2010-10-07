@@ -100,8 +100,6 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) _didFinish;
 @property (assign) SEL finishSelector;
 
-@property (retain) NSDictionary* objectsToURLsMap;
-
 @end
 
 
@@ -113,7 +111,6 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 @implementation IMBObjectsPromise
 
 @synthesize objects = _objects;
-@synthesize objectsToURLsMap = _objectsToURLsMap;
 @synthesize destinationDirectoryPath = _destinationDirectoryPath;
 @synthesize error = _error;
 @synthesize delegate = _delegate;
@@ -144,7 +141,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	if (self = [super init])
 	{
 		self.objects = inObjects;
-		self.objectsToURLsMap = [NSMutableDictionary dictionaryWithCapacity:inObjects.count];
+		_objectsByURL = [[NSMutableDictionary alloc] initWithCapacity:inObjects.count];
 		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.error = nil;
 		self.delegate = nil;
@@ -164,7 +161,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	if (self = [super init])
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
-		self.objectsToURLsMap = [inCoder decodeObjectForKey:@"objectsToURLsMap"];
+		_objectsByURL = [[inCoder decodeObjectForKey:@"objectsByURL"] mutableCopy];
 		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.delegate = nil;
 		self.finishSelector = NULL;
@@ -181,7 +178,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[inCoder encodeObject:self.objects forKey:@"objects"];
-	[inCoder encodeObject:self.objectsToURLsMap forKey:@"objectsToURLsMap"];
+	[inCoder encodeObject:_objectsByURL forKey:@"objectsByURL"];
 }
 
 
@@ -190,7 +187,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	IMBObjectsPromise* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.objects = self.objects;
-	copy.objectsToURLsMap = self.objectsToURLsMap;
+	copy->_objectsByURL = [_objectsByURL mutableCopy];
 	copy.destinationDirectoryPath = self.destinationDirectoryPath;
 	copy.error = self.error;
 	copy.delegate = self.delegate;
@@ -205,7 +202,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	
 	IMBRelease(_objects);
-	IMBRelease(_objectsToURLsMap);
+	IMBRelease(_objectsByURL);
 	IMBRelease(_destinationDirectoryPath);
 	IMBRelease(_delegate);
 	IMBRelease(_error);
@@ -218,32 +215,13 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (NSArray*) fileURLs
 {
-	NSMutableArray* localURLs = [NSMutableArray array];
-	
-	for (IMBObject* object in _objects)
-	{
-		NSURL* url = [self localURLForObject:object];
-		
-		if (url)
-		{
-			[localURLs addObject:url];
-		}
-	}
-	
-	return localURLs;
+	return [_objectsByURL allKeys];
 }
 
 
-- (NSURL*) localURLForObject:(IMBObject*)inObject
+- (IMBObject *)objectForFileURL:(NSURL *)inObject;
 {
-	NSURL* url = [self.objectsToURLsMap objectForKey:inObject.location];
-	
-	if (url != nil && [url isKindOfClass:[NSURL class]])
-	{
-		return url;
-	}
-	
-	return nil;
+	return [_objectsByURL objectForKey:inObject];
 }
 
 
@@ -391,7 +369,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void)setFileURL:(NSURL *)URL error:(NSError *)error forObject:(IMBObject *)object;
 {
     // "Overload" errors make my skin crawl, but this is in for compat. right now
-    [_objectsToURLsMap setValue:(URL ? (id)URL : (id)error) forKey:object.location];
+    [_objectsByURL setObject:object forKey:(URL ? (id)URL : (id)error)];
     
     // Post process.  We use this to embed metadata after the download. This is only really used by Flickr images right now
     if (URL)
