@@ -89,6 +89,11 @@
 @interface IMBiLifeSoundEffectsFolderParser : IMBAudioFolderParser
 @end
 
+// This subclass looks only in "/Library/Audio/Apple Loops/Apple/Apple Loops for GarageBand"...
+
+@interface IMBAppleLoopsForGarageBandFolderParser : IMBAudioFolderParser
+@end
+
 // This subclass looks only in "iMovie.app/Contents/Resources/Sound Effects"...
 
 @interface IMBiMovieSoundEffectsFolderParser : IMBAudioFolderParser
