@@ -94,8 +94,8 @@
             
             if ([parentDB busyRetryTimeout] && (numberOfRetries++ > [parentDB busyRetryTimeout])) {
                 
-                NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [parentDB databasePath]);
-                NSLog(@"Database busy");
+                //NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [parentDB databasePath]);
+                //NSLog(@"Database busy");
                 break;
             }
         }
