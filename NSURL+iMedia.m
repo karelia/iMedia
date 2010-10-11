@@ -48,6 +48,7 @@
 
 
 #import "NSURL+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 #import <QuickLook/QuickLook.h>
 
 @implementation NSURL (imedia)
@@ -55,7 +56,7 @@
 // Quicklook methods to create images from non-image files...
 // (Should be called on a background thread.)
 
-- (CGImageRef) imb_quicklookCGImage
+- (CGImageRef) imb_quicklookCGImageIfAvailable
 {
 	if ([NSThread isMainThread])
 	{
@@ -67,11 +68,35 @@
 	return (CGImageRef) [NSMakeCollectable(image) autorelease];
 }
 
+- (CGImageRef) imb_quicklookCGImage
+{
+	CGImageRef result = [self imb_quicklookCGImageIfAvailable];
+	if (!result)
+	{
+		// In 10.5, we often get a nil
+		NSString *path = [self path];
+		NSImage *icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];	// Don't worry about size
+		// Now get this into a CGImageRef.  Not the most efficient implementation, though.
+		NSData * imageData = [icon TIFFRepresentation];
+		CGImageRef imageRef;
+		if(imageData)
+		{
+			CGImageSourceRef imageSource = 
+			CGImageSourceCreateWithData((CFDataRef)imageData,  NULL);
+			
+			imageRef = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
+			imageRef = (CGImageRef) [NSMakeCollectable(imageRef) autorelease];
+		}
+		return imageRef;
+	}
+	return result;
+}
+
 
 - (NSImage*) imb_quicklookNSImage
 {
 	NSImage* nsimage = nil;
-	CGImageRef cgimage = [self imb_quicklookCGImage	];
+	CGImageRef cgimage = [self imb_quicklookCGImageIfAvailable];
 	
 	if (cgimage)
 	{
@@ -85,7 +110,12 @@
 		[nsimage addRepresentation:rep];		
 		[rep release];
 	}
-	
+	else
+	{
+		// In 10.5, we often get a nil
+		NSString *path = [self path];
+		nsimage = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];	// Don't worry about size
+	}
 	return nsimage;
 }
 

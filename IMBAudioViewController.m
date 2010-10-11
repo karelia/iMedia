@@ -194,8 +194,15 @@
 
 - (IBAction) quicklook:(id)inSender
 {
-	[self setIsPlaying:NO];
-	[super quicklook:inSender];
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		[self setIsPlaying:NO];
+		[super quicklook:inSender];
+	}
+	else	// Don't quicklook on 10.5 .. instead, play the current selection.
+	{
+		[self startPlayingSelection:inSender];
+	}
 }
 
 //----------------------------------------------------------------------------------------------------------------------

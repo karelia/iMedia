@@ -319,7 +319,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[NSObject cancelPreviousPerformRequestsWithTarget:ibListView];
 	[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView];
 
-	// remove ourself from the QuiclLook preview panel...
+	// remove ourself from the QuickLook preview panel...
 	
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
