@@ -758,6 +758,10 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Please note that providing tooltips is WAY too expensive on 10.5 (possibly due to different internal 
+// implementation of IKImageBrowserView). For this reason we disable tooltips on 10.5...
+
+
 - (void) _updateTooltips
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(__updateTooltips) object:nil];
@@ -767,15 +771,18 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 - (void) __updateTooltips
 {
-	[ibIconView removeAllToolTips];
-	
-	NSArray* objects = ibObjectArrayController.arrangedObjects;
-	NSInteger i = 0;
-	
-	for (IMBObject* object in objects)
+	if (IMBRunningOnSnowLeopardOrNewer())
 	{
-		NSRect rect = [ibIconView itemFrameAtIndex:i++];
-		[ibIconView addToolTipRect:rect owner:object userData:NULL];
+		[ibIconView removeAllToolTips];
+		
+		NSArray* objects = ibObjectArrayController.arrangedObjects;
+		NSInteger i = 0;
+		
+		for (IMBObject* object in objects)
+		{
+			NSRect rect = [ibIconView itemFrameAtIndex:i++];
+			[ibIconView addToolTipRect:rect owner:object userData:NULL];
+		}
 	}
 }
 
