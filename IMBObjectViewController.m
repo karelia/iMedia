@@ -1644,10 +1644,13 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 							NSString *path = [object path];
 							NSString *type = [path pathExtension];
 							if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
-							
-							[fileTypes addObject:type];
-							[titles addObject:object.name];
-							[metadatas addObject:object.metadata];
+							if (!object.metadata || !object.name)
+							{
+								// Keep all 3 items in sync, so the arrays are of the same length.
+								[fileTypes addObject:type];
+								[titles addObject:object.name];
+								[metadatas addObject:object.metadata];								
+							}
 							
 							thisIndex = [indexes indexGreaterThanIndex:thisIndex];
 						}
