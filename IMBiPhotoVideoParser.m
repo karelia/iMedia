@@ -141,60 +141,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) loadMetadataForObject:(IMBObject*)inObject
-{
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
-	[metadata setObject:inObject.location forKey:@"path"];
-
-	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inObject.location);
-	
-	if (item)
-	{
-		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
-		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
-		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
-		
-		if (seconds)
-		{
-			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
-			CFRelease(seconds);
-		}
-		
-		if (width)
-		{
-			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
-			CFRelease(width);
-		}
-		
-		if (height)
-		{
-			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
-			CFRelease(height);
-		}
-		
-		CFRelease(item);
-	}
-	
-	
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-	
-	if ([NSThread isMainThread])
-	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
-	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
 	NSString* comment = [inMetadata objectForKey:@"Comment"];
@@ -248,6 +194,60 @@
 	}
 	
 	return description;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	[metadata setObject:inObject.location forKey:@"path"];
+
+	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inObject.location);
+	
+	if (item)
+	{
+		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
+		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
+		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
+		
+		if (seconds)
+		{
+			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
+			CFRelease(seconds);
+		}
+		
+		if (width)
+		{
+			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
+			CFRelease(width);
+		}
+		
+		if (height)
+		{
+			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
+			CFRelease(height);
+		}
+		
+		CFRelease(item);
+	}
+	
+	
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+	
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
 }
 
 
