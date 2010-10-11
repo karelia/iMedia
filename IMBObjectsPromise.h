@@ -142,7 +142,8 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 /// After loading is done, you can ask for the object that corresponds to a URL for more info
 
 @property (retain,readonly) NSArray* fileURLs;
-- (IMBObject *)objectForFileURL:(NSURL *)inURL;
+- (IMBObject*) objectForFileURL:(NSURL*)inURL;
+- (NSURL*) fileURLForObject:(IMBObject*)inObject;
 
 
 #pragma mark Subclass Support
