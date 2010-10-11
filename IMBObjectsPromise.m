@@ -219,9 +219,28 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 }
 
 
-- (IMBObject *)objectForFileURL:(NSURL *)inObject;
+- (IMBObject*) objectForFileURL:(NSURL*)inObject
 {
 	return [_objectsByURL objectForKey:inObject];
+}
+
+
+- (NSURL*) fileURLForObject:(IMBObject*)inObject
+{
+	for (NSURL* url in self.fileURLs)
+	{
+		if ([url isKindOfClass:[NSURL class]])
+		{
+			IMBObject* object = [self objectForFileURL:url];
+			
+			if (object == inObject)
+			{
+				return url;
+			}
+		}	
+	}
+	
+	return nil;
 }
 
 

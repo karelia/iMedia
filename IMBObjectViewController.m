@@ -1224,7 +1224,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
                         [promise start];
 						[promise waitUntilFinished];
 						
-						NSURL* thisURL = [promise localURLForObject:mappedObject];
+						NSURL* thisURL = [promise fileURLForObject:mappedObject];
 						if ((thisURL != nil) && ([thisURL isKindOfClass:[NSURL class]]))
 						{
 							// public.url is documented as containing the "bytes of the URL"
