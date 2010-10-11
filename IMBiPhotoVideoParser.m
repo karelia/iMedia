@@ -137,57 +137,9 @@
 	return [inObjectDict objectForKey:@"ImagePath"];
 }
 
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	NSString *comment = [inMetadata objectForKey:@"Comment"];
-	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	NSString *type = [inMetadata objectForKey:@"ImageType"];		// like MooV
-	NSString *UTI = [NSString imb_UTIForFileType:type];
-	NSString *kind = [NSString imb_descriptionForUTI:UTI];
-	// NSString *dateTimeInterval = [inMetadata objectForKey:@"DateAsTimerInterval"];
 
-	NSMutableString* description = [NSMutableString string];
-	
-	if (description.length > 0) [description imb_appendNewline];
-	[description appendString:kind];
-	
-	NSString *width = [inMetadata objectForKey:@"width"];
-	NSString *height = [inMetadata objectForKey:@"height"];
-	NSString *duration = [inMetadata objectForKey:@"duration"];
+//----------------------------------------------------------------------------------------------------------------------
 
-	if (width != nil && height != nil)
-	{		
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@×%@",width,height];
-	}
-	
-	if (duration)
-	{
-		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
-			@"Time",
-			nil,IMBBundle(),
-			@"Time",
-			@"Time label in metadataDescription");
-		
-		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",durationLabel,durationString];
-	}
-	
-	if (comment && ![comment isEqualToString:@""])
-	{
-		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
-			@"Comment",
-			nil,IMBBundle(),
-			@"Comment",
-			@"Comment label in metadataDescription");
-		
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",commentLabel,comment];
-	}
-	
-	return description;
-}
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
@@ -239,6 +191,64 @@
 	}
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString* comment = [inMetadata objectForKey:@"Comment"];
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	NSString* width = [inMetadata objectForKey:@"width"];
+	NSString* height = [inMetadata objectForKey:@"height"];
+	NSString* duration = [inMetadata objectForKey:@"duration"];
+	NSString* type = [inMetadata objectForKey:@"ImageType"];		// like MooV
+	NSString* UTI = [NSString imb_UTIForFileType:type];
+	NSString* kind = [NSString imb_descriptionForUTI:UTI];
+	
+	// NSString *dateTimeInterval = [inMetadata objectForKey:@"DateAsTimerInterval"];
+
+	NSMutableString* description = [NSMutableString string];
+	
+	if (kind)
+	{
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendString:kind];
+	}
+	
+	if (width != nil && height != nil)
+	{		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@×%@",width,height];
+	}
+	
+	if (duration)
+	{
+		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
+		
+		NSString* durationString = [_timecodeTransformer transformedValue:duration];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
+	}
+	
+	if (comment && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+			@"Comment",
+			nil,IMBBundle(),
+			@"Comment",
+			@"Comment label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
+	}
+	
+	return description;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
