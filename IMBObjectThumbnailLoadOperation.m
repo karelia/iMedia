@@ -119,7 +119,7 @@
 			[object.parser loadMetadataForObject:object];
 		}
 	}
-	[pool release];
+	[pool drain];
 }
 
 

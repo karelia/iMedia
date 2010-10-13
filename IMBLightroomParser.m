@@ -216,7 +216,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -536,7 +536,7 @@ static NSArray* sSupportedUTIs = nil;
 			
 			[(NSMutableArray*)inFoldersNode.objects addObject:object];
 			
-			[pool release];
+			[pool drain];
 		}
 		
 		[results close];
@@ -990,7 +990,7 @@ static NSArray* sSupportedUTIs = nil;
 	CGFloat w = CGImageGetWidth(imgRef);
 	CGFloat h = CGImageGetHeight(imgRef);
 	
-	CGAffineTransform transform;
+	CGAffineTransform transform = {0};
 	
 	switch (orientationProperty) {
 		case 1:

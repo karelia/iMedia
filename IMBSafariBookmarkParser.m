@@ -106,7 +106,7 @@
 	
 	[WebIconDatabase performSelectorOnMainThread:@selector(sharedIconDatabase) withObject:nil waitUntilDone:YES];
 
-	[pool release];
+	[pool drain];
 }
 
 

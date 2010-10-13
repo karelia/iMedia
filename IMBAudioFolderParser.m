@@ -238,7 +238,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -272,7 +272,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -303,7 +303,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -342,7 +342,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	if ([self folderPath]) [IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -375,7 +375,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 

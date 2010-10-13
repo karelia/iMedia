@@ -276,7 +276,7 @@ static BOOL sUseGlobalViewType = NO;
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	[self registerDefaultValues];
-	[pool release];
+	[pool drain];
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -77,7 +77,7 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeLink];
-	[pool release];
+	[pool drain];
 }
 
 + (NSString*) firefoxPath

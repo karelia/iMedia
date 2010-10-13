@@ -125,7 +125,7 @@
 	}
 	
 //	NSLog(@"%s Ending %@",__FUNCTION__,self);
-	[pool release];
+	[pool drain];
 }
 
 

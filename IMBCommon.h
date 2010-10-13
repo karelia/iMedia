@@ -133,6 +133,10 @@ typedef NSUInteger IMBGroupType;
 #define IMBRelease(object) if (object) {[object release]; object=nil;}
 #endif
 
+#ifndef IMBDrain
+#define IMBDrain(pool) if (pool) {[pool drain]; pool=nil;}
+#endif
+
 #ifndef IMBBundle
 #define IMBBundle() [NSBundle bundleForClass:NSClassFromString(@"IMBConfig")]
 #endif

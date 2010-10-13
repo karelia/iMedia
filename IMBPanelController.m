@@ -121,7 +121,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		
 		[sRegisteredViewControllerClasses setObject:inViewControllerClass forKey:inMediaType];
 		
-		[pool release];
+		[pool drain];
 	}
 }
 

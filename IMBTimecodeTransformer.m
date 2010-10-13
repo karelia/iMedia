@@ -74,7 +74,7 @@
 	IMBTimecodeTransformer* transformer = [[IMBTimecodeTransformer alloc] init];
 	[NSValueTransformer setValueTransformer:transformer forName:NSStringFromClass(self)];
 	[transformer release];
-	[pool release];
+	[pool drain];
 }
 
 
