@@ -74,7 +74,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
-	[pool release];
+	[pool drain];
 }
 
 

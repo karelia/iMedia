@@ -206,7 +206,7 @@
 		{
 			if (index%32 == 0)
 			{
-				IMBRelease(pool);
+				IMBDrain(pool);
 				pool = [[NSAutoreleasePool alloc] init];
 			}
 			
@@ -248,7 +248,7 @@
 		{
 			if (index%32 == 0)
 			{
-				IMBRelease(pool);
+				IMBDrain(pool);
 				pool = [[NSAutoreleasePool alloc] init];
 			}
 			
@@ -310,7 +310,7 @@
 		}
 	}
 	
-	IMBRelease(pool);
+	IMBDrain(pool);
 					
 	if (outError) *outError = error;
 	return error == nil;

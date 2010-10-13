@@ -78,14 +78,18 @@
 		NSImage *icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];	// Don't worry about size
 		// Now get this into a CGImageRef.  Not the most efficient implementation, though.
 		NSData * imageData = [icon TIFFRepresentation];
-		CGImageRef imageRef;
+		CGImageRef imageRef = nil;
 		if(imageData)
 		{
 			CGImageSourceRef imageSource = 
 			CGImageSourceCreateWithData((CFDataRef)imageData,  NULL);
-			
-			imageRef = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
-			imageRef = (CGImageRef) [NSMakeCollectable(imageRef) autorelease];
+			if (imageSource)
+			{
+				imageRef = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
+				imageRef = (CGImageRef) [NSMakeCollectable(imageRef) autorelease];
+
+				CFRelease(imageSource);
+			}
 		}
 		return imageRef;
 	}

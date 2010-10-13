@@ -303,7 +303,7 @@ const NSString* kSearchStringContext = @"searchString";
 				[matchedObjects addObject:proxy];
 			}
 				
-			[pool release];
+			[pool drain];
 		}
 		
 		return [super arrangeObjects:matchedObjects];

@@ -60,7 +60,7 @@
 	
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeLink];
 	
-	[pool release];
+	[pool drain];
 }
 
 - (id) initWithMediaType:(NSString*)inMediaType

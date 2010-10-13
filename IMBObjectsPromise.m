@@ -361,7 +361,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 			runMode:NSModalPanelRunLoopMode 
 			beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
 			
-		[pool release];
+		[pool drain];
 	}
 }
 

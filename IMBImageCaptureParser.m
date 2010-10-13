@@ -155,7 +155,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-	[pool release];
+	[pool drain];
 }
 
 #pragma mark 
@@ -404,7 +404,7 @@
 		object.name = [anItem valueForKey:@"ifil"];
 		object.metadata = anItem;
 		object.parser = self;
-		object.index = index++;
+		object.index = index+1;
 		
 		[objectArray addObject:object];
 		
@@ -871,7 +871,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	if( [(id)self.delegate respondsToSelector:@selector( operationDidFinish: )] )
 		[self.delegate operationDidFinish:self];
 	
-	[pool release];
+	[pool drain];
 }
 
 - (long long) totalBytes 

@@ -109,7 +109,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -148,8 +148,8 @@
 		{
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
-			BOOL exists,changed;
-			exists = [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
+			BOOL changed;
+			(void) [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
 
 			NSString *libraryPath = [path stringByDeletingLastPathComponent];	// folder containing .xml file
 			[IMBConfig registerLibraryPath:libraryPath];
@@ -594,7 +594,7 @@
 			playlistNode.parentNode = inParentNode;
 		}
 		
-		[pool release];
+		[pool drain];
 	}
 }
 
@@ -701,11 +701,11 @@
 					object.metadataDescription = [self metadataDescriptionForMetadata:metadata];
 				}
 				
-				[pool2 release];
+				[pool2 drain];
 			}
 		}
 		
-		[pool1 release];
+		[pool1 drain];
 	}
 }
 

@@ -125,7 +125,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 			[parserClasses addObject:inParserClass];
 		}
 		
-		[pool release];
+		[pool drain];
 	}
 }
 
@@ -148,7 +148,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 			}
 		}
 		
-		[pool release];
+		[pool drain];
 	}
 }
 

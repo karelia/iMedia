@@ -79,7 +79,7 @@ static NSColor* sTextColor;
 	IMBDisableTitleToColorTransformer* transformer = [[IMBDisableTitleToColorTransformer alloc] init];
 	[NSValueTransformer setValueTransformer:transformer forName:NSStringFromClass(self)];
 	[transformer release];
-	[pool release];
+	[pool drain];
 	
 	[self setTextColor:[NSColor blackColor]];
 }

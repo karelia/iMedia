@@ -151,7 +151,7 @@
 		[self downloadDidFinish:nil];	// notify owner that the download (which never started) is finished.
 	}
 	
-	[pool release];
+	[pool drain];
 }
 
 

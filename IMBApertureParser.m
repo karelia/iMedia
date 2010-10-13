@@ -111,7 +111,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -150,8 +150,8 @@
 		{
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
-			BOOL exists,changed;
-			exists = [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
+			BOOL changed;
+			(void) [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
 
 			IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = path;
@@ -456,7 +456,7 @@
 			return [self identifierWithAlbumId:albumId];
 		}
 
-		[pool release];
+		[pool drain];
 	}
 
 	// Fallback if nothing is found...
@@ -724,7 +724,7 @@
 			albumNode.parentNode = inParentNode;
 		}
 		
-		[pool release];
+		[pool drain];
 	}
 }
 
@@ -792,11 +792,11 @@
 					object.imageRepresentation = nil;
 				}
 				
-				[pool2 release];
+				[pool2 drain];
 			}
 		}
 		
-		[pool1 release];
+		[pool1 drain];
 	}
 }
 
