@@ -68,6 +68,14 @@
 
 @end
 
+
+@interface IMBPyramidObjectPromise ()
+
++ (NSURL*)placeholderImageUrl;
+
+@end
+
+
 // This subclass is used for pyramid files that need to be split. The split file is saved to the local file system,
 // where it can then be accessed by the delegate... 
 
@@ -109,7 +117,13 @@
 	
 	if (absolutePyramidPath != nil) {
 		NSString* orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];;
-		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+		NSData* data = nil; //[NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+		
+		if (data == nil) {
+			// We have a path, but there was no file at that path
+			return [self placeholderImageUrl];
+		}
+		
 		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
 		NSUInteger index = [data lastIndexOfBytes:pattern length:3];
 		
@@ -183,4 +197,83 @@
 	
 	return nil;
 }
+
++ (NSURL*)placeholderImageUrl
+{
+	static NSURL *placeholderImageUrl = nil;
+	
+	if (placeholderImageUrl != nil) {
+		NSString *placeholderImagePath = [placeholderImageUrl path];
+		NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+
+		if ([fm isReadableFileAtPath:placeholderImagePath]) {
+			return placeholderImageUrl;
+		}
+	}
+	
+	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	NSString *jpegPath = [[fm imb_uniqueTemporaryFile:@"LightroomPlaceholder"] stringByAppendingPathExtension:@"jpg"];
+	NSSize imageSize = NSMakeSize(640.0, 480.0);
+	NSRect imageBounds =  NSMakeRect(0.0, 0.0, imageSize.width, imageSize.height);
+	
+	NSBitmapImageRep *bitmapImage = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
+																			 pixelsWide:imageSize.width 
+																			 pixelsHigh:imageSize.height 
+																		  bitsPerSample:8 
+																		samplesPerPixel:4 
+																			   hasAlpha:YES 
+																			   isPlanar:NO
+																		 colorSpaceName:NSCalibratedRGBColorSpace 
+																			bytesPerRow:0 
+																		   bitsPerPixel:0] autorelease];
+	
+	[NSGraphicsContext saveGraphicsState];
+
+	NSGraphicsContext *nsContext = [NSGraphicsContext graphicsContextWithBitmapImageRep:bitmapImage];
+	
+	[NSGraphicsContext setCurrentContext:nsContext];
+
+	[[NSColor lightGrayColor] set];
+	
+	NSRectFill(imageBounds);
+	
+	NSString *message = NSLocalizedStringWithDefaultValue(@"IMB.IMBPyramidObjectPromise.PlaceholderMessage",
+														  nil,
+														  IMBBundle(),
+														  @"Image not found.\nPlease instruct Lightroom to generate previews",
+														  @"Message to export when Pyramid file is missing");
+	NSShadow *shadow = shadow = [[[NSShadow alloc] init] autorelease];
+	
+	[shadow setShadowColor:[NSColor blackColor]];
+	[shadow setShadowOffset:NSMakeSize(0, -1)];
+	[shadow setShadowBlurRadius:0.0f];
+	
+	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+								[NSFont boldSystemFontOfSize:24.0f], NSFontAttributeName, 
+								[NSColor whiteColor], NSForegroundColorAttributeName, 
+								shadow, NSShadowAttributeName, 
+								nil] ;
+	NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:message attributes:attributes];
+	
+	[attributedString drawInRect:NSInsetRect(imageBounds, 20.0, 20.0)];
+	
+	[NSGraphicsContext restoreGraphicsState];
+
+	NSData *data = [bitmapImage representationUsingType:NSJPEGFileType properties:nil];
+	NSURL *url = [NSURL fileURLWithPath:jpegPath];
+	BOOL status = [data writeToURL:url atomically:YES];
+	
+	
+  	if (status == NO) {
+		NSLog(@"%s Failed to write %@", __FUNCTION__, jpegPath);
+		
+		return nil;
+	}
+	
+	[placeholderImageUrl release];
+	placeholderImageUrl = [url retain];
+	
+	return url;
+}
+
 @end
