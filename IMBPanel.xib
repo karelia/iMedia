@@ -12,7 +12,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="577"/>
+			<integer value="558"/>
+			<integer value="572"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -38,7 +39,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{18, 274}, {408, 853}}</string>
 				<int key="NSWTFlags">-461896704</int>
-				<string key="NSWindowTitle"/>
+				<string key="NSWindowTitle">Media</string>
 				<string key="NSWindowClass">IMBPanel</string>
 				<object class="NSToolbar" key="NSViewClass" id="816740796">
 					<object class="NSMutableString" key="NSToolbarIdentifier">
@@ -254,7 +255,7 @@
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<string key="NSWindowContentMinSize">{256, 0}</string>
 				<object class="NSView" key="NSWindowView" id="962602319">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -277,6 +278,7 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{408, 853}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMinSize">{256, 35}</string>
@@ -287,7 +289,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{511, 356}, {310, 425}}</string>
 				<int key="NSWTFlags">-260571136</int>
-				<string key="NSWindowTitle">About iMedia</string>
+				<string key="NSWindowTitle">About iMedia Browser</string>
 				<object class="NSMutableString" key="NSWindowClass">
 					<characters key="NS.bytes">NSPanel</characters>
 				</object>
