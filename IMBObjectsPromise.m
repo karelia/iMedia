@@ -215,7 +215,15 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (NSArray*) fileURLs
 {
-    NSArray *result = [_URLsByObject objectsForKeys:[self objects] notFoundMarker:[NSNull null]];
+    NSArray *objects = [self objects];
+    NSMutableArray *result = [NSMutableArray arrayWithCapacity:[objects count]];
+    
+    for (IMBObject *anObject in objects)
+    {
+        NSURL *URL = [self fileURLForObject:anObject];
+        if (URL) [result addObject:URL];
+    }
+    
     return result;
 }
 
@@ -370,14 +378,14 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void)setFileURL:(NSURL *)URL error:(NSError *)error forObject:(IMBObject *)object;
 {
     // Drop down to CF to avoid copying keys
-    // "Overload" errors make my skin crawl, but this is in for compat. right now
-    CFDictionarySetValue((CFMutableDictionaryRef)_URLsByObject,
-                         object,
-                         (URL ? (id)URL : (id)error));
-    
-    // Post process.  We use this to embed metadata after the download. This is only really used by Flickr images right now
     if (URL)
     {
+        CFDictionarySetValue((CFMutableDictionaryRef)_URLsByObject,
+                             object,
+                             (URL ? (id)URL : (id)error));
+        
+        
+        // Post process.  We use this to embed metadata after the download. This is only really used by Flickr images right now
         [object postProcessLocalURL:URL];
         
         if ([self.delegate respondsToSelector:@selector(objectsPromise:object:didFinishLoadingAtURL:)])
@@ -712,16 +720,14 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	NSFileManager* mgr = [NSFileManager imb_threadSafeManager];
 	
+    // TODO: This would run faster if iterated _URLsByObject directly since would skip objects that hadn't loaded
 	for (NSURL* url in self.fileURLs)
 	{
-		if ([url isKindOfClass:[NSURL class]])
-		{
-			if ([url isFileURL])
-			{
-				NSError* error = nil;
-				[mgr removeItemAtPath:[url path] error:&error];
-			}
-		}
+		if ([url isFileURL])
+        {
+            NSError* error = nil;
+            [mgr removeItemAtPath:[url path] error:&error];
+        }
 	}
 	
 	// Cleanup...
