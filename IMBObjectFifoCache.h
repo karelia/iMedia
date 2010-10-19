@@ -58,10 +58,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// IMBObjectFifoCache implements a cache of limited size that automatically unloads the thumbnails of oldest 
-// objects in the cache, so that we do not consume to much memory and start swapping...
+// IMBObjectFifoCache implements a cache of limited size that automatically unloads the thumbnails of  
+// oldest objects in the cache, so that we do not consume to much memory and start swapping...
 
 @interface IMBObjectFifoCache : NSObject
+{
+	NSMutableArray* _objects;
+}
 
 + (void) setSize:(NSUInteger)inSize;	
 + (NSUInteger) size;
