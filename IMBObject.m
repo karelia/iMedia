@@ -340,11 +340,11 @@
 	
 	if (inImageRepresentation)
 	{
+		self.needsImageRepresentation = NO;
 		[IMBObjectFifoCache addObject:self];
+		
 //		NSUInteger n = [IMBObjectFifoCache count];
 //		NSLog(@"%s = %p (%d)",__FUNCTION__,inImageRepresentation,(int)n);
-
-		self.needsImageRepresentation = NO;
 	}
 }
 
