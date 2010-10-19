@@ -83,7 +83,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 {
   @private
 	NSArray* _objects;
-	NSMutableDictionary* _objectsByURL;
+	NSMutableDictionary* _URLsByObject;
   @protected
 	NSString* _destinationDirectoryPath;
 	NSError* _error;
@@ -135,14 +135,14 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 @property (retain) NSString* destinationDirectoryPath;
 
 // Array of URLs referencing a local copy of a file, or in the case of e.g. link objects,
-// the URL to the web resource itself. Generally speaking these URLs are suitable for,
-// passing to NSWorkspace's openURL: method.
+// the URL to the web resource itself. Generally speaking, these URLs are suitable for
+// passing to NSWorkspace's openURL: method. The order of the array matches the order -objects, but may be shorter if the object does not have a URL yet.
 //
 // NOTE: In the case of an error this array may also contain NSError objects explaining the failure.
 /// After loading is done, you can ask for the object that corresponds to a URL for more info
 
 @property (retain,readonly) NSArray* fileURLs;
-- (IMBObject*) objectForFileURL:(NSURL*)inURL;
+
 - (NSURL*) fileURLForObject:(IMBObject*)inObject;
 
 
