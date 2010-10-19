@@ -234,6 +234,28 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 }
 
 
+- (IMBObject *)objectForFileURL:(NSURL *)URL;
+{
+    // Comparing URLs doesn't normally match file:///… and file://localhost/… as being equal, so for file URLs, cache the path and compare that instead
+    NSString *localPath = ([URL isFileURL] ? [URL path] : nil);
+    
+    for (IMBObject *anObject in [self objects])
+    {
+        NSURL *aURL = [self fileURLForObject:anObject];
+        if (localPath)
+        {
+            if ([aURL isFileURL] && [[aURL path] isEqualToString:localPath]) return anObject;
+        }
+        else
+        {
+            if ([URL isEqual:aURL]) return anObject;
+        }
+    }
+    
+    return nil;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

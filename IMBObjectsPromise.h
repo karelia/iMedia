@@ -144,6 +144,10 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 - (NSURL*) fileURLForObject:(IMBObject*)inObject;
 
+// Currently quite slow, avoid if you can as we may remove it in the future!
+
+- (IMBObject *)objectForFileURL:(NSURL *)URL;
+
 
 #pragma mark Subclass Support
 - (void)setFileURL:(NSURL *)URL error:(NSError *)error forObject:(IMBObject *)object;
