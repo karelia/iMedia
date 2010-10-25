@@ -355,7 +355,7 @@
 		{
 			self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
 			self.modificationDate = modificationDate;
-			self.version = [[self.plist objectForKey:@"Application Version"] intValue];
+			self.version = [[_plist objectForKey:@"Application Version"] intValue];
 		}
 		
 		plist = [[_plist retain] autorelease];
