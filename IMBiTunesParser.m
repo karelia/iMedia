@@ -290,9 +290,10 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
+	NSDictionary* plist = self.plist;
+	NSArray* playlists = [plist objectForKey:@"Playlists"];
+	NSDictionary* tracks = [plist objectForKey:@"Tracks"];
 	
-	NSArray* playlists = [self.plist objectForKey:@"Playlists"];
-	NSDictionary* tracks = [self.plist objectForKey:@"Tracks"];
 	[self addSubNodesToNode:inNode playlists:playlists tracks:tracks]; 
 	[self populateNode:inNode playlists:playlists tracks:tracks]; 
 
