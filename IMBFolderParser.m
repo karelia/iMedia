@@ -181,7 +181,8 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
-	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	NSFileManager* fm = [NSFileManager imb_threadSafeManager];
+	NSWorkspace* ws = [NSWorkspace imb_threadSafeWorkspace];
 	NSError* error = nil;
 	NSString* folder = inNode.mediaSource;
 	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];
@@ -253,60 +254,64 @@
 			}
 			
 			NSString* name = [fm displayNameAtPath:folder];
+			BOOL isPackage = [ws isFilePackageAtPath:folder];
 			
-			IMBNode* subnode = [[IMBNode alloc] init];
-			subnode.parentNode = inNode;
-			subnode.mediaSource = folder;
-			subnode.identifier = [[self class] identifierForPath:folder];
-			subnode.name = name;
-			subnode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
-			[subnode.icon setScalesWhenResized:YES];
-			[subnode.icon setSize:NSMakeSize(16,16)];
-			subnode.parser = self;
-			subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
-			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
-			
-			// Should this folder be a leaf or not?  We are going to have to scan into the directory
-		
-			NSError* error = nil;
-			NSArray *folderContents = [fm contentsOfDirectoryAtPath:folder error:&error];	// When we go 10.6 only, use better APIs.
-			BOOL hasSubDir = NO;
-			int fileCounter = 0;	// bail if this is a really full folder
-			if (folderContents)
+			if (!isPackage)
 			{
-				for (NSString *isThisADirectory in folderContents)
+				IMBNode* subnode = [[IMBNode alloc] init];
+				subnode.parentNode = inNode;
+				subnode.mediaSource = folder;
+				subnode.identifier = [[self class] identifierForPath:folder];
+				subnode.name = name;
+				subnode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+				[subnode.icon setScalesWhenResized:YES];
+				[subnode.icon setSize:NSMakeSize(16,16)];
+				subnode.parser = self;
+				subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
+				subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
+				
+				// Should this folder be a leaf or not?  We are going to have to scan into the directory
+			
+				NSError* error = nil;
+				NSArray *folderContents = [fm contentsOfDirectoryAtPath:folder error:&error];	// When we go 10.6 only, use better APIs.
+				BOOL hasSubDir = NO;
+				int fileCounter = 0;	// bail if this is a really full folder
+				if (folderContents)
 				{
-					fileCounter++;
-					NSString *subPath = [folder stringByAppendingPathComponent:isThisADirectory];
-					// Would it be faster to use attributesOfItemAtPath:error: ????
-					if ([fm fileExistsAtPath:subPath isDirectory:&hasSubDir] && hasSubDir)
+					for (NSString *isThisADirectory in folderContents)
 					{
-						break;	// Yes, found a subdir, so we want a disclosure triangle on this
-					}
-					else if (fileCounter > 100)
-					{
-						hasSubDir = YES;	// just in case, assume there is a subfolder there
-						break;
+						fileCounter++;
+						NSString *subPath = [folder stringByAppendingPathComponent:isThisADirectory];
+						// Would it be faster to use attributesOfItemAtPath:error: ????
+						if ([fm fileExistsAtPath:subPath isDirectory:&hasSubDir] && hasSubDir)
+						{
+							break;	// Yes, found a subdir, so we want a disclosure triangle on this
+						}
+						else if (fileCounter > 100)
+						{
+							hasSubDir = YES;	// just in case, assume there is a subfolder there
+							break;
+						}
 					}
 				}
+				subnode.leaf = !hasSubDir;	// if it doesn't have a subdirectory, treat it as a leaf
+				subnode.includedInPopup = NO;
+				[subnodes addObject:subnode];
+				[subnode release];
+
+				IMBNodeObject* object = [[IMBNodeObject alloc] init];
+				object.location = (id)subnode;
+				object.name = name;
+				object.metadata = nil;
+				object.parser = self;
+				object.index = index++;
+				object.imageLocation = (id)folder;
+				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+				object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+
+				[objects addObject:object];
+				[object release];
 			}
-			subnode.leaf = !hasSubDir;	// if it doesn't have a subdirectory, treat it as a leaf
-			subnode.includedInPopup = NO;
-			[subnodes addObject:subnode];
-			[subnode release];
-
-			IMBNodeObject* object = [[IMBNodeObject alloc] init];
-			object.location = (id)subnode;
-			object.name = name;
-			object.metadata = nil;
-			object.parser = self;
-			object.index = index++;
-			object.imageLocation = (id)folder;
-			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
-
-			[objects addObject:object];
-			[object release];
 		}
 	}
 	
