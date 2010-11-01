@@ -104,6 +104,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @interface IMBLibraryOperation : NSOperation
 {
+  @private
 	IMBLibraryController* _libraryController;
 	IMBParser* _parser;
 	IMBOptions _options;
@@ -216,8 +217,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) main
 {
 	NSError* error = nil;
-	[_parser willUseParser];
-	IMBNode* newNode = [_parser nodeWithOldNode:self.oldNode options:self.options error:&error];
+    
+    // This was using _paser ivar directly before with indication given as to it being necessary, so I'm switching to the proper accessor to see if it fixes my crash - Mike Abdullah
+    IMBParser *parser = [self parser];
+	[parser willUseParser];
+	IMBNode* newNode = [parser nodeWithOldNode:self.oldNode options:self.options error:&error];
 	
 	if (error == nil)
 	{
@@ -250,8 +254,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (self.isCancelled == NO)
 	{
 		NSError* error = nil;
-		[_parser willUseParser];
-		[_parser populateNode:self.newNode options:self.options error:&error];
+        
+		// This was using _paser ivar directly before with indication given as to it being necessary, so I'm switching to the proper accessor to see if it fixes my crash - Mike Abdullah
+        IMBParser *parser = [self parser];
+        [parser willUseParser];
+		[parser populateNode:self.newNode options:self.options error:&error];
 		
 		if (error == nil)
 		{
