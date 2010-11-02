@@ -185,9 +185,11 @@
 	NSWorkspace* ws = [NSWorkspace imb_threadSafeWorkspace];
 	NSError* error = nil;
 	NSString* folder = inNode.mediaSource;
-	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
+	
+	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];
+	files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
 	
 	if (error == nil)
 	{
