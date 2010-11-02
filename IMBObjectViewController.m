@@ -1575,6 +1575,10 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				// URLs lazily we have to set an array of NSPasteboardItem on the pasteboard, with each item 
 				// set to callback to us as data provider.
 				//
+				//
+				//  NOTE: FOR NOW, WE ARE SHORT-CIRCUITING THIS BRANCH, AND NOT DOING ANY 10.6 PASTEBOARD WORK.
+				//  WE MAY WANT TO REVISIT THIS WHEN WE HAVE A 10.6-ONLY API.
+				//
 				if (NO && IMBRunningOnSnowLeopardOrNewer())
 				{				
 					(void) [inPasteboard clearContents];
@@ -1644,7 +1648,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 							NSString *path = [object path];
 							NSString *type = [path pathExtension];
 							if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
-							if (!object.metadata || !object.name)
+							if (object.metadata && object.name)
 							{
 								// Keep all 3 items in sync, so the arrays are of the same length.
 								[fileTypes addObject:type];
