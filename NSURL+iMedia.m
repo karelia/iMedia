@@ -63,7 +63,7 @@
 		NSLog(@"%s is being called on main thread. We probably want to re-do this for background thread", __FUNCTION__);
 	}
 	
-	CGSize size = CGSizeMake(256.0,256.0);
+	CGSize size = CGSizeMake(kIMBMaxThumbnailSize,kIMBMaxThumbnailSize);
 	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)self,size,NULL);
 	return (CGImageRef) [NSMakeCollectable(image) autorelease];
 }
