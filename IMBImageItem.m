@@ -230,6 +230,7 @@ CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
 	return result;
 }
 
+// Returns a retained object, follows 'create' rule.
 CGImageSourceRef IMB_CGImageSourceCreateWithImageItem(id <IMBImageItem> item, CFDictionaryRef options)
 {
     CGImageSourceRef result = NULL;
@@ -251,7 +252,27 @@ CGImageSourceRef IMB_CGImageSourceCreateWithImageItem(id <IMBImageItem> item, CF
     {
         NSData *data = [item imageRepresentation];
         result = CGImageSourceCreateWithData((CFDataRef)data,NULL);
-    }	
+    }
+	
+	// Note: We can't respond to IKImageBrowserQuickLookPathRepresentationType because this
+	// function is supposed to return CGImageSourceRef, NOT CGImageRef
+	else if ([type isEqualToString:IKImageBrowserQuickLookPathRepresentationType])
+	{
+		id rep = [item imageRepresentation];
+		// TODO: Run this on background thread and cache result
+		CFURLRef url = (CFURLRef)([rep isKindOfClass:[NSString class]] ? [NSURL fileURLWithPath:rep] : rep);
+		
+		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+								 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
+								 (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+								 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
+								 [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
+								 nil];
+		result = CGImageSourceCreateWithURL(url, (CFDictionaryRef)options);
+		// Will this work?
+		// Will it be equivalent to the QL method?
+		// CGImageRef im = QLThumbnailImageCreate(NULL, url, CGSizeMake(kIMBMaxThumbnailSize, kIMBMaxThumbnailSize), NULL);
+	}
     
     // Unsupported imageRepresentation...
     

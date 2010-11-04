@@ -193,7 +193,7 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 		NSLog(@"%s Failed to create QuickLook image for file %@. Using generic file icon instead...",__FUNCTION__,self.name);
 		
 		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:[path pathExtension]];
-		[icon setSize:NSMakeSize(256.0,256.0)];
+		[icon setSize:NSMakeSize(kIMBMaxThumbnailSize,kIMBMaxThumbnailSize)];
 		NSBitmapImageRep* rep = [icon imb_bitmap];
 		posterFrame = [rep CGImage];
 		

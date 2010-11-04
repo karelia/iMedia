@@ -117,7 +117,7 @@ typedef NSUInteger IMBGroupType;
 
 // User Interface constants...
 
-#define kIMBMaxThumbnailSize 128
+#define kIMBMaxThumbnailSize 256.0
 
 // Common error codes...
 
