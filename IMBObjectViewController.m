@@ -154,6 +154,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) _reloadComboView;
 - (void) _updateTooltips;
 
+- (BOOL) writesLocalFilesToPasteboard;
 - (void) _downloadDraggedObjectsToDestination:(NSURL*)inDestination;
 - (NSArray*) _namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination;
 
@@ -1162,9 +1163,20 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		for (NSURL* url in inObjectPromise.fileURLs)
 		{
 			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
+			
 			if ([url isKindOfClass:[NSURL class]])
 			{
-				[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+				NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
+				if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
+
+				if ([self writesLocalFilesToPasteboard] && appPath != nil)
+				{
+					[[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+				}
+				else
+				{
+					[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+				}
 			}
 		}
 	}
