@@ -155,9 +155,9 @@ typedef NSUInteger IMBGroupType;
 // is defined and non-zero, to prevent this redundant definition of the same protocol.
 
 #if IMB_HOST_APP_DECLARES_DUMMY_PROTOCOLS
-#define IMB_SHOULD_DECLARE_DUMMY_PROTOCOLS 0
+#define IMB_SHOULD_DECLARE_DUMMY_SNOW_LEOPARD_PROTOCOLS 0
 #else
-#define IMB_SHOULD_DECLARE_DUMMY_PROTOCOLS	!IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+#define IMB_SHOULD_DECLARE_DUMMY_SNOW_LEOPARD_PROTOCOLS	!IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 #endif
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -66,13 +66,10 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#if IMB_SHOULD_DECLARE_DUMMY_PROTOCOLS
 
 @protocol QLPreviewItem;
 @protocol QLPreviewPanelDataSource;
 @protocol QLPreviewPanelDelegate;
-
-#endif
 
 @interface QLPreviewPanel : NSPanel
 //{
@@ -207,7 +204,6 @@
 
 @end
 
-#if IMB_SHOULD_DECLARE_DUMMY_PROTOCOLS
 
 /*!
  * @abstract The QLPreviewPanelDataSource protocol declares the methods that the Preview Panel uses to access the contents of its data source object.
@@ -268,8 +264,6 @@
 - (id)previewPanel:(QLPreviewPanel *)panel transitionImageForPreviewItem:(id <QLPreviewItem>)item contentRect:(NSRect *)contentRect;
 
 @end
-
-#endif
 
 #endif
 

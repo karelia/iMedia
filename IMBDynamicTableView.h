@@ -69,10 +69,11 @@
 
 @end
 
-#if IMB_SHOULD_DECLARE_DUMMY_PROTOCOLS
-
+// If you are getting duplicate protocol declaration warnings because you already declare dummy
+// compatibility protocols in your host application, just make sure IMB_HOST_APP_DECLARES_DUMMY_PROTOCOLS
+// is defined and non-zero, to prevent this redundant definition of the same protocol.
+#if IMB_SHOULD_DECLARE_DUMMY_SNOW_LEOPARD_PROTOCOLS
 @protocol NSTableViewDelegate <NSObject> @end
-
 #endif
 
 // We declare some extra protocol messages to let the delegate know when the visible rows are changing.
