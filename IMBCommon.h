@@ -150,4 +150,14 @@ typedef NSUInteger IMBGroupType;
 #define IMBRunningOnSnowLeopardOrNewer()	(NSAppKitVersionNumber >= NSAppKitVersionNumber10_6)
 #define IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK  defined(MAC_OS_X_VERSION_10_6)
 
+// If you are getting duplicate protocol declaration warnings because you already declare dummy
+// compatibility protocols in your host application, just make sure IMB_HOST_APP_DECLARES_DUMMY_PROTOCOLS
+// is defined and non-zero, to prevent this redundant definition of the same protocol.
+
+#if IMB_HOST_APP_DECLARES_DUMMY_PROTOCOLS
+#define IMB_SHOULD_DECLARE_DUMMY_SNOW_LEOPARD_PROTOCOLS 0
+#else
+#define IMB_SHOULD_DECLARE_DUMMY_SNOW_LEOPARD_PROTOCOLS	!IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+#endif
+
 //----------------------------------------------------------------------------------------------------------------------
