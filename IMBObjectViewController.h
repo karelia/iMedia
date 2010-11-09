@@ -115,7 +115,7 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 // We have to declare a fake prototypes because the 10.6 runtime interrogates our compliance with the protocol,
 // rather that interrogating the presence of the particular method we implement.
 
-#if IMB_SHOULD_DECLARE_DUMMY_SNOW_LEOPARD_PROTOCOLS
+#if IMB_SHOULD_DECLARE_DUMMY_PROTOCOLS
 
 @protocol NSPasteboardItemDataProvider <NSObject> 
 @end
@@ -127,7 +127,6 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @end
 
 #endif
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
