@@ -68,21 +68,7 @@
 
 #pragma mark 
 
-// We have to declare a fake prototypes because the 10.6 runtime interrogates our compliance with the protocol,
-// rather that interrogating the presence of the particular method we implement...
-
-#if ! IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-@protocol NSTabViewDelegate <NSObject> 
-@end
-#endif
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBPanelController : NSWindowController <NSTabViewDelegate>
+@interface IMBPanelController : NSWindowController
 {
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
@@ -133,6 +119,15 @@
 - (void) controller:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
 
 @end
+
+
+// By declaring as a category, we:
+//  A)  Don't export an NSTabViewDelegate to host applications (thereby perhaps introducing warnings)
+//  B)  Keep IB able to parse the file
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+@interface IMBPanelController (NSTabViewDelegate) <NSTabViewDelegate>
+@end
+#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
