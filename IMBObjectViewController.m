@@ -176,9 +176,30 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 @synthesize viewType = _viewType;
 @synthesize tabView = ibTabView;
 @synthesize iconView = ibIconView;
-@synthesize listView = ibListView;
-@synthesize comboView = ibComboView;
 @synthesize iconSize = _iconSize;
+
+@synthesize listView = ibListView;
+- (void)setListView:(NSTableView *)listView;
+{
+    // Don't want dangling pointers
+    [ibListView setDataSource:nil];
+    [ibListView setDelegate:nil];
+    
+    [listView retain];
+    [ibListView release]; ibListView = listView;
+}
+
+@synthesize comboView = ibComboView;
+- (void)setComboView:(NSTableView *)comboView;
+{
+    // Don't want dangling pointers
+    [ibComboView setDataSource:nil];
+    [ibComboView setDelegate:nil];
+    
+    [comboView retain];
+    [ibComboView release]; ibComboView = comboView;
+}
+
 
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
@@ -336,6 +357,11 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
+    
+    // Tear down table views...
+    
+    [self setListView:nil];
+    [self setComboView:nil];
 
 	// Other cleanup...
 	
