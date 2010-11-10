@@ -150,10 +150,11 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet IKImageBrowserView* ibIconView;
-	IBOutlet NSTableView* ibListView;
-	IBOutlet NSTableView* ibComboView;
 	IBOutlet NSSegmentedControl *ibSegments;
- 	
+  @private
+ 	NSTableView* ibListView;
+	NSTableView* ibComboView;
+	
 	NSUInteger _viewType;
 	double _iconSize;
 	
@@ -191,8 +192,8 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 @property (readonly) NSTabView* tabView;
 @property (readonly) IKImageBrowserView* iconView;
-@property (readonly) NSTableView* listView;
-@property (readonly) NSTableView* comboView;
+@property (readonly) IBOutlet NSTableView* listView;
+@property (readonly) IBOutlet NSTableView* comboView;
 
 @property (assign) NSUInteger viewType;
 @property (assign) double iconSize;

@@ -258,7 +258,7 @@
 		{
 			// starts playing with the current selection
 			NSArray* objects = [ibObjectArrayController arrangedObjects];
-			NSIndexSet* rows = [ibListView selectedRowIndexes];
+			NSIndexSet* rows = [[self listView] selectedRowIndexes];
 			NSUInteger row = [rows firstIndex];
 				
 			if (row != NSNotFound && row < [objects count])
