@@ -242,7 +242,7 @@
 														  IMBBundle(),
 														  @"Image not found.\nPlease instruct Lightroom to generate previews",
 														  @"Message to export when Pyramid file is missing");
-	NSShadow *shadow = shadow = [[[NSShadow alloc] init] autorelease];
+	NSShadow *shadow = [[[NSShadow alloc] init] autorelease];
 	
 	[shadow setShadowColor:[NSColor blackColor]];
 	[shadow setShadowOffset:NSMakeSize(0, -1)];
@@ -253,7 +253,7 @@
 								[NSColor whiteColor], NSForegroundColorAttributeName, 
 								shadow, NSShadowAttributeName, 
 								nil] ;
-	NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:message attributes:attributes];
+	NSAttributedString *attributedString = [[[NSAttributedString alloc] initWithString:message attributes:attributes] autorelease];
 	
 	[attributedString drawInRect:NSInsetRect(imageBounds, 20.0, 20.0)];
 	
