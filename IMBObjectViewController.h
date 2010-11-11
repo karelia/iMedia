@@ -154,7 +154,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
   @private
  	NSTableView* ibListView;
 	NSTableView* ibComboView;
-	
+  @protected
 	NSUInteger _viewType;
 	double _iconSize;
 	
