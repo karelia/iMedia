@@ -69,6 +69,7 @@
 - (NSRect) usedRectInCellFrame:(NSRect)inFrame;
 - (NSRect) imageContainerFrame;
 - (IKImageBrowserView*) imageBrowserView;	// To shut up the compiler when using 10.5.sdk
+- (void) drawTitle;							// To shut up the compiler when using 10.6.sdk
 
 @end
 
@@ -224,27 +225,6 @@
 	[self setTitleColors];
 	[super drawTitle];
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (BOOL) wantsRollover
-//{
-//	return [super wantsRollover];
-//}
-//
-//
-//- (void) mouseEntered:(NSEvent*)inEvent
-//{
-//	[super mouseEntered:(NSEvent*)inEvent];
-//}
-//
-//
-//- (void) mouseExited:(NSEvent*)inEvent
-//{
-//	[super mouseExited:(NSEvent*)inEvent];
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------

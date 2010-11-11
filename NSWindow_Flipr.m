@@ -46,7 +46,7 @@
 	if ([self isAnimating]&&(progress<0.99)) {
 /// Update the window unless we're nearly at the end. No sense duplicating the final window.
 // We can be sure the delegate responds to display.
-		[[self delegate] display];
+		[(NSView*)[self delegate] display];
 	}
 }
 
@@ -54,7 +54,7 @@
 
 // This is the flipping window's content view.
 
-@interface FliprView : NSView {
+@interface FliprView : NSView <NSAnimationDelegate> {
 	NSRect originalRect;			// this rect covers the initial and final windows.
 	NSWindow* initialWindow;
 	NSWindow* finalWindow;
