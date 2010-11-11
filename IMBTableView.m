@@ -241,7 +241,7 @@ enum IMBMouseOperation
 {
 	// Find the clicked object...
 	
-	NSPoint mouse = [self convertPoint:[inEvent locationInWindow] toView:nil];
+	NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
     _clickedObjectIndex = [self rowAtPoint:mouse];
 
 	if (_clickedObjectIndex != -1)
@@ -280,6 +280,7 @@ enum IMBMouseOperation
 		[super mouseDown:inEvent];
 	}
 }
+
 
 // Careful -- this only works in special cases; see
 // http://www.cocoabuilder.com/archive/cocoa/234849-mousedragged-with-nstableview.html
@@ -342,7 +343,8 @@ enum IMBMouseOperation
 
 - (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
 {
-	[self.delegate draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+	[controller draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
 }
 
 
