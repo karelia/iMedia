@@ -90,7 +90,6 @@ enum
 };
 typedef NSUInteger kIMBObjectViewType;
 
-
 extern NSString* kIMBObjectImageRepresentationProperty;
 
 
@@ -106,28 +105,6 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 @class IMBObject;
 @class IMBNode;
 @class IKImageBrowserView;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark PROTOCOLS
-
-// We have to declare a fake prototypes because the 10.6 runtime interrogates our compliance with the protocol,
-// rather that interrogating the presence of the particular method we implement.
-
-#if ! IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-
-@protocol NSPasteboardItemDataProvider <NSObject> 
-@end
-
-@protocol QLPreviewPanelDelegate <NSObject> 
-@end
-
-@protocol QLPreviewPanelDataSource <NSObject> 
-@end
-
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
