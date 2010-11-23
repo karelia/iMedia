@@ -265,14 +265,22 @@
 	
 	else if ([type isEqualToString:IKImageBrowserNSImageRepresentationType])
 	{
-		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+		// If this is the type, we should already have an image representation, so let's try NOT 
+		// doing this code that was here before.
+		// So just leave the imageRepresentation here nil so it doesn't get set.
+		if (!inObject.imageRepresentation)
 		{
-			imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
+			NSLog(@"##### %p Warning; IKImageBrowserNSImageRepresentationType with a nil imageRepresentation", inObject);
 		}
-		else
-		{
-			imageRepresentation = [url imb_quicklookNSImage];
-		}	
+		
+//		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+//		{
+//			imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
+//		}
+//		else
+//		{
+//			imageRepresentation = [url imb_quicklookNSImage];
+//		}	
 	}
 	
 	// CGImage...
