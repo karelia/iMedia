@@ -63,6 +63,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "WebIconDatabase.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -517,11 +518,21 @@
 	if (IKImageBrowserNSImageRepresentationType == self.imageRepresentationType)
 	{
 		result = self.imageRepresentation;
-	}
+		}
 	else
 	{
-		NSLog(@"imageRepresentationType = %@", self.imageRepresentationType);
-		if ([self isLocalFile])
+		if ([[[self location] description] hasPrefix:@"javascript:"])	// special icon for JavaScript bookmarklets
+		{
+			static NSImage *sJavaScriptIcon = nil;
+			if (!sJavaScriptIcon)
+			{
+				NSBundle* ourBundle = [NSBundle bundleForClass:[self class]];
+				NSString* pathToImage = [ourBundle pathForResource:@"js" ofType:@"tiff"];
+				sJavaScriptIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+			}
+			result = sJavaScriptIcon;
+		}
+		else if ([self isLocalFile])
 		{
 			NSString* path = [self path];
 			NSString* extension = [path pathExtension];
@@ -536,7 +547,12 @@
 		}
 		else
 		{
-			NSLog(@"We should already have icon from URL");
+			// This should work for Safari bookmarks, but not for firefox ones (so they shouldn't be dumpable)
+			result = [[WebIconDatabase sharedIconDatabase] 
+					iconForURL:[self.URL absoluteString]
+					withSize:NSMakeSize(16,16)
+					cache:YES];
+			NSLog(@"%@ icon = %p", [self.URL absoluteString], result);
 		}
 	}
 	return result;

@@ -487,34 +487,20 @@
 		NSString* title = [uri objectForKey:@"title"];
 		NSString* urlString = [inPlist objectForKey:@"URLString"];
 		NSURL* url = [NSURL URLWithString:urlString];
-		
+				
 		object = [[[IMBObject alloc] init] autorelease];
-		object.location = (id)url;
-		object.name = title;
-		object.parser = self;
-		
-		NSImage* icon = nil;
-		if ([url.scheme isEqualToString:@"javascript"])
+		if (url)
 		{
-			static NSImage *sJavaScriptIcon = nil;
-			if (!sJavaScriptIcon)
-			{
-				NSBundle* ourBundle = [NSBundle bundleForClass:[IMBNode class]];
-				NSString* pathToImage = [ourBundle pathForResource:@"js" ofType:@"tiff"];
-				sJavaScriptIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
-			}
-			icon = sJavaScriptIcon;
+			object.location = (id)url;
+			object.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
 		}
 		else
 		{
-			icon = [[WebIconDatabase sharedIconDatabase] 
-					iconForURL:urlString
-					withSize:NSMakeSize(16,16)
-					cache:YES];
+			object.location = urlString;	// url may not have been formed from string
+			object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 		}
-					
-		object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-		object.imageRepresentation = icon;
+		object.name = title;
+		object.parser = self;
 	}
 	
 	return object;
