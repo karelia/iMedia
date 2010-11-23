@@ -186,43 +186,26 @@
 
 #pragma mark 
 #pragma mark NSTableViewDelegate
- 
-/*
-// Upon doubleclick start playing the selection...
 
+#warning enable this when Dan figures out the Safari/Firefox IMBNodeObject problems.
+/*
+ 
+ DISABLE
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
-//	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	NSIndexSet* rows = [ibListView selectedRowIndexes];
-	NSUInteger row = [rows firstIndex];
-		
-	while (row != NSNotFound)
+	NSInteger row = [(NSTableView*)inSender clickedRow];
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
+	
+	if ([object isKindOfClass:[IMBNodeObject class]])
 	{
-		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
-
-		if ([object isKindOfClass:[IMBNodeObject class]])
-		{
-			IMBNode* node = (IMBNode*)object.location;
-			[_nodeViewController expandSelectedNode];
-			[_nodeViewController selectNode:node];
-		}
-		else
-		{
-			return;
-		}
-		
-		row = [rows indexGreaterThanIndex:row];
+		IMBNode* node = (IMBNode*)object.location;
+		[_nodeViewController expandSelectedNode];
+		[_nodeViewController selectNode:node];
 	}
 }
-
-
-// If we already has some Link playing, then play the new song if the selection changes...
-
-- (void) tableViewSelectionDidChange:(NSNotification*)inNotification
-{
-
-}
 */
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
