@@ -55,6 +55,7 @@
 #import "IMBNodeObject.h"
 #import "IMBNode.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSImage+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,11 +112,11 @@
 }
 
 
-// Override to show a folder icon instead of a generic file icon...
+// Override to show a folder icon ALWAYS instead of a generic file icon...
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace imb_threadSafeWorkspace] iconForFile:_imageLocation];
+	return [NSImage imb_sharedGenericFolderIcon];
 }
 
 
