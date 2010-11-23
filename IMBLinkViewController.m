@@ -153,12 +153,12 @@
 
 
 
-// The Links panel doesn't have an icon view...
+// The Links panel doesn't have an icon view... Or Combo View
 
 - (void) setViewType:(NSUInteger)inViewType
 {
 	if (inViewType < 1) inViewType = 1;
-	if (inViewType > 2) inViewType = 2;
+	if (inViewType > 1) inViewType = 1;
 	[super setViewType:inViewType];
 }
 
@@ -167,7 +167,7 @@
 {
 	NSUInteger viewType = [super viewType];
 	if (viewType < 1) viewType = 1;
-	if (viewType > 2) viewType = 2;
+	if (viewType > 1) viewType = 1;
 	return viewType;
 }
 
