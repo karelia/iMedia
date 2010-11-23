@@ -565,8 +565,17 @@
 			result = [[WebIconDatabase sharedIconDatabase] 
 					iconForURL:[self.URL absoluteString]
 					withSize:NSMakeSize(16,16)
-					cache:YES];
-			// Note: This is not ever returning a unique favicon.  Why?
+					cache:YES];	// Strangely, cache isn't even used in the webkit implementation
+			
+			/*
+			 We are never getting anything other than the default globe for remote URLs.
+			 We know that iconForURL: is getting past the enabled check becuase it does return a file URL.
+			 So either iconForPageURL or webGetNSImage is failing in this source code of webkit.
+			 
+			 if (Image* image = iconDatabase()->iconForPageURL(URL, IntSize(size)))
+				if (NSImage *icon = webGetNSImage(image, size))
+					return icon;
+			*/
 			
 			// NSLog(@"%p icon for %@", result, [self.URL absoluteString]);
 		}
