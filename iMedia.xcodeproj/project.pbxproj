@@ -1933,6 +1933,7 @@
 		};
 		D09933581011B27000C527B7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "TestApp-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -1948,6 +1949,7 @@
 		};
 		D09933591011B27000C527B7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "TestApp-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -1963,6 +1965,7 @@
 		};
 		D099335A1011B27000C527B7 /* Test */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005510C50908009EC68F /* IMBTargetTest.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = "TestApp-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
