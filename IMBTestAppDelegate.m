@@ -78,6 +78,26 @@
 @synthesize nodeViewController = _nodeViewController;
 @synthesize objectViewController = _objectViewController;
 
++ (void)initialize
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	NSMutableDictionary *defaultDefaults
+	= [NSMutableDictionary dictionaryWithObjectsAndKeys:
+
+	   [NSNumber numberWithBool:YES], @"WebIconDatabaseEnabled",
+	   
+	   nil];
+	NSUserDefaultsController *controller = [NSUserDefaultsController sharedUserDefaultsController];
+	NSUserDefaults *defaults = [controller defaults];
+	
+	[defaults registerDefaults:defaultDefaults];
+	[controller setInitialValues:defaultDefaults];
+	
+	
+	[pool release];
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
