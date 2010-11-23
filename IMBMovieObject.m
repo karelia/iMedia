@@ -219,10 +219,12 @@ NSString* kIMBPosterFrameProperty = @"posterFrame";
 // As object are flushed from the cache
 - (BOOL) unloadThumbnail
 {
-	if ([super unloadThumbnail])
+	BOOL result = [super unloadThumbnail];
+	if (result)
 	{
 		self.posterFrame = NULL;
 	}
+	return result;
 }
 
 
