@@ -131,7 +131,7 @@
 // Asynchronous loading of thumbnails...
 																	
 - (void) loadThumbnail;	
-- (void) unloadThumbnail;
+- (BOOL) unloadThumbnail;
 - (void) loadMetadata;
 @property (assign) BOOL isLoadingThumbnail;
 
