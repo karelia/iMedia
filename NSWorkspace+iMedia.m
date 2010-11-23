@@ -91,6 +91,7 @@
 
 - (NSImage *)imb_iconForFile:(NSString *)path size:(NSSize)size
 {
+	NSAssert(path, @"path should not be nil");
 	NSImage *icon = [self iconForFile:path];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:size];

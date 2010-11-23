@@ -257,6 +257,20 @@
 	return sGenericFolderIcon;
 }
 
++ (NSImage *) imb_sharedGenericFileIcon
+{
+	static NSImage *sGenericFileIcon = nil;
+	
+	if (sGenericFileIcon == nil)
+	{
+		sGenericFileIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericDocumentIcon)] retain];
+		[sGenericFileIcon setScalesWhenResized:YES];
+		[sGenericFileIcon setSize:NSMakeSize(16,16)];
+	}
+
+	return sGenericFileIcon;
+}
+
 
 + (NSImage *) imb_genericFolderIcon
 {

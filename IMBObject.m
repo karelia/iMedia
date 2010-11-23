@@ -62,6 +62,7 @@
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSImage+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -512,11 +513,33 @@
 
 - (NSImage*) icon
 {
-	NSString* path = [self path];
-	NSString* extension = [path pathExtension];
-	if (extension==nil || [extension length]==0) extension = @"jpg";
-	
-	return [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:extension];
+	NSImage *result = nil;
+	if (IKImageBrowserNSImageRepresentationType == self.imageRepresentationType)
+	{
+		result = self.imageRepresentation;
+	}
+	else
+	{
+		NSLog(@"imageRepresentationType = %@", self.imageRepresentationType);
+		if ([self isLocalFile])
+		{
+			NSString* path = [self path];
+			NSString* extension = [path pathExtension];
+			if (extension==nil || [extension length]==0)
+			{
+				result = [NSImage imb_sharedGenericFileIcon];
+			}
+			else
+			{
+				result = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:extension];
+			}
+		}
+		else
+		{
+			NSLog(@"We should already have icon from URL");
+		}
+	}
+	return result;
 }
 
 

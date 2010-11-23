@@ -42,6 +42,7 @@
 		8FFCBFD110A8CD9C00377C33 /* IMBLightroom3Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */; };
 		CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE09F304124823020094EC48 /* IMBURLGetSizeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */; };
+		CE1AED33129C475200694472 /* js.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE1AED32129C475200694472 /* js.tiff */; };
 		CE3EC9A2124AAC0700D8435B /* NSURL+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE3EC9A3124AAC0700D8435B /* NSURL+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */; };
 		CE6524C21253AF47003A9AA0 /* warning.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE6524C11253AF47003A9AA0 /* warning.tiff */; };
@@ -421,6 +422,7 @@
 		CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBURLGetSizeOperation.h; sourceTree = "<group>"; };
 		CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBURLGetSizeOperation.m; sourceTree = "<group>"; };
 		CE0E0C80104C72A200EE6B09 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
+		CE1AED32129C475200694472 /* js.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = js.tiff; sourceTree = "<group>"; };
 		CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBDisableTitleToColorTransformer.h; sourceTree = "<group>"; };
 		CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBDisableTitleToColorTransformer.m; sourceTree = "<group>"; };
 		CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+iMedia.h"; sourceTree = "<group>"; };
@@ -982,6 +984,7 @@
 				CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */,
 				CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */,
 				CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */,
+				CE1AED32129C475200694472 /* js.tiff */,
 			);
 			name = Links;
 			sourceTree = "<group>";
@@ -1646,6 +1649,7 @@
 				CEAF1F26125A7DBF001C3EBB /* i.tiff in Resources */,
 				CEAF1F27125A7DBF001C3EBB /* i2.tiff in Resources */,
 				CEAF1FE5125A8B6A001C3EBB /* Credits.html in Resources */,
+				CE1AED33129C475200694472 /* js.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

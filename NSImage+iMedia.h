@@ -60,6 +60,7 @@
 + (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath checkSpotlightComments:(BOOL)aCheckSpotlight;
 + (NSString*) imb_imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
++ (NSImage *) imb_sharedGenericFileIcon;						// Shared instance - can only have one size!
 + (NSImage *) imb_sharedGenericFolderIcon;						// Shared instance - can only have one size!
 + (NSImage *) imb_genericFolderIcon;							// Copied instance - can have any size
 	

@@ -492,11 +492,26 @@
 		object.location = (id)url;
 		object.name = title;
 		object.parser = self;
-
-		NSImage* icon = [[WebIconDatabase sharedIconDatabase] 
-			iconForURL:urlString
-			withSize:NSMakeSize(16,16)
-			cache:YES];
+		
+		NSImage* icon = nil;
+		if ([url.scheme isEqualToString:@"javascript"])
+		{
+			static NSImage *sJavaScriptIcon = nil;
+			if (!sJavaScriptIcon)
+			{
+				NSBundle* ourBundle = [NSBundle bundleForClass:[IMBNode class]];
+				NSString* pathToImage = [ourBundle pathForResource:@"js" ofType:@"tiff"];
+				sJavaScriptIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+			}
+			icon = sJavaScriptIcon;
+		}
+		else
+		{
+			icon = [[WebIconDatabase sharedIconDatabase] 
+					iconForURL:urlString
+					withSize:NSMakeSize(16,16)
+					cache:YES];
+		}
 					
 		object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 		object.imageRepresentation = icon;
