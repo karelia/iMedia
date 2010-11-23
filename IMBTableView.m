@@ -142,8 +142,9 @@ enum IMBMouseOperation
 #pragma mark
 #pragma mark Drawing
 
-
+#ifndef MAS
 // This is a private internal method. If it no longer going to be called, there's no harm in proving an override...
+// It might be possible to actually define this (but not call superclass) if we want to force a custom color.
 
 - (NSColor*) _highlightColorForCell:(NSCell*)inCell
 {
@@ -161,6 +162,7 @@ enum IMBMouseOperation
 	
 	return color;
 }
+#endif
 
 
 // If we have custom background colors, then draw the alternating row background ourself, otherwise let the 
