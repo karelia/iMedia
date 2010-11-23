@@ -351,11 +351,33 @@
 }
 
 
-// Unload the imageRepresentation to save some memory...
+// Unload the imageRepresentation to save some memory, if it's something that can be rebuilt.
 
-- (void) unloadThumbnail
+- (BOOL) unloadThumbnail
 {
-   self.imageRepresentation = nil;
+	BOOL unloaded = NO;
+	
+	static NSSet *sTypesThatCanBeUnloaded = nil;
+	if (!sTypesThatCanBeUnloaded)
+	{
+		sTypesThatCanBeUnloaded = [[NSSet alloc] initWithObjects:
+			IKImageBrowserPathRepresentationType,				/* NSString */
+			IKImageBrowserNSURLRepresentationType,				/* NSURL */
+			IKImageBrowserQTMoviePathRepresentationType,		/* NSString or NSURL */
+			IKImageBrowserQCCompositionPathRepresentationType,	/* NSString or NSURL */
+			IKImageBrowserQuickLookPathRepresentationType,		/* NSString or NSURL*/
+			IKImageBrowserIconRefPathRepresentationType,		/* NSString */
+								   nil];
+	}
+
+	
+	
+	if ([sTypesThatCanBeUnloaded containsObject:self.imageRepresentationType])
+	{
+		self.imageRepresentation = nil;
+		unloaded = YES;
+	}
+	return unloaded;
 }
 
 
@@ -518,7 +540,7 @@
 	if (IKImageBrowserNSImageRepresentationType == self.imageRepresentationType)
 	{
 		result = self.imageRepresentation;
-		}
+	}
 	else
 	{
 		if ([[[self location] description] hasPrefix:@"javascript:"])	// special icon for JavaScript bookmarklets
@@ -534,16 +556,8 @@
 		}
 		else if ([self isLocalFile])
 		{
-			NSString* path = [self path];
-			NSString* extension = [path pathExtension];
-			if (extension==nil || [extension length]==0)
-			{
-				result = [NSImage imb_sharedGenericFileIcon];
-			}
-			else
-			{
-				result = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:extension];
-			}
+			NSString *type = [self type];
+			result = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:type];
 		}
 		else
 		{
@@ -552,7 +566,9 @@
 					iconForURL:[self.URL absoluteString]
 					withSize:NSMakeSize(16,16)
 					cache:YES];
-			NSLog(@"%@ icon = %p", [self.URL absoluteString], result);
+			// Note: This is not ever returning a unique favicon.  Why?
+			
+			// NSLog(@"%p icon for %@", result, [self.URL absoluteString]);
 		}
 	}
 	return result;

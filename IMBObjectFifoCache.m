@@ -141,7 +141,7 @@ static IMBObjectFifoCache* sSharedCache = nil;
 		while ([_objects count] > sCacheSize)
 		{
 			IMBObject* object = [_objects objectAtIndex:0];
-			[object unloadThumbnail];
+			(void) [object unloadThumbnail];
 			[_objects removeObjectAtIndex:0];
 		}
 	}
@@ -195,7 +195,7 @@ static IMBObjectFifoCache* sSharedCache = nil;
 	{
 		while ([_objects indexOfObject:inObject])
 		{
-			[inObject unloadThumbnail];
+			(void) [inObject unloadThumbnail];
 			[_objects removeObject:inObject];
 		}
 	}
