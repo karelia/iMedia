@@ -188,23 +188,10 @@
 #pragma mark NSTableViewDelegate
 
 #warning enable this when Dan figures out the Safari/Firefox IMBNodeObject problems.
-/*
  
- DISABLE
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
-	NSInteger row = [(NSTableView*)inSender clickedRow];
-	NSArray* objects = [ibObjectArrayController arrangedObjects];
-	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
-	
-	if ([object isKindOfClass:[IMBNodeObject class]])
-	{
-		IMBNode* node = (IMBNode*)object.location;
-		[_nodeViewController expandSelectedNode];
-		[_nodeViewController selectNode:node];
-	}
 }
-*/
 
 
 //----------------------------------------------------------------------------------------------------------------------

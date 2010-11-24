@@ -59,6 +59,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "IMBNodeObject.h"
 #import "WebIconDatabase.h"
 #import <WebKit/WebKit.h>
 #import <Quartz/Quartz.h>
@@ -501,6 +502,22 @@
 		}
 		object.name = title;
 		object.parser = self;
+	}
+	else if ([type isEqualToString:@"WebBookmarkTypeList"])
+	{
+		IMBNode* subnode = [self subnodeForPlist:inPlist];
+		subnode.includedInPopup = NO;
+
+		NSString* title = [inPlist objectForKey:@"Title"];		// Capitalized for list, lowercase for leaves?
+
+		object = [[[IMBNodeObject alloc] init] autorelease];
+		object.name = title;
+		object.parser = self;
+		object.location = (id)subnode;
+		
+#warning THIS IS NOT RIGHT.  WHEN I DOUBLE-CLICK, IT DOESN'T JUST TUNNEL DOWN INTO THAT LEVEL. WHY?
+		// Note: Need to remove blocking implemention of tableViewWasDoubleClicked for link view controller.
+	
 	}
 	
 	return object;
