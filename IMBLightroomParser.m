@@ -313,6 +313,7 @@ static NSArray* sSupportedUTIs = nil;
 - (void) dealloc
 {
 	IMBRelease(_appPath);
+	IMBRelease(_dataPath);
 	IMBRelease(_databases);
 	IMBRelease(_thumbnailDatabases);
 	[super dealloc];
