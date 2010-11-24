@@ -247,8 +247,6 @@
 	return result;
 }
 
-#pragma mark 
-
 // The following two methods must be overridden by subclasses...
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
@@ -320,6 +318,12 @@
 	
 	while ([rs next])
 	{		
+//		NSLog(@"%@>%@ '%@' %@", 
+//			  parentIDNumber,
+//			  [rs stringForColumn:@"id"],
+//			  [rs stringForColumn:@"title"],
+//			  @"type=2");
+
 		int theID = [rs intForColumn:@"id"];
 		NSString *theName = [rs stringForColumn:@"title"];
 		if (theName && ![theName isEqualToString:@""])	// make sure we have a title; otherwise bogus
@@ -349,7 +353,7 @@
 	// Now get the bookmarks (type 1)
 	while (self.database && !rs)	// keep trying until we get result set (or database is invalid)
 	{
-		NSString *query = @"select b.parent, b.id, b.title, p.url, f.mime_type, f.data from moz_bookmarks b, moz_places p left outer join moz_favicons f on p.favicon_id=f.id where p.id=b.fk and b.parent=? order by b.position;";
+		NSString *query = @"select b.parent, b.id, b.title, b.type, p.url, f.mime_type, f.data from moz_bookmarks b, moz_places p left outer join moz_favicons f on p.favicon_id=f.id where p.id=b.fk and b.parent=? order by b.position;";
 		rs = [self.database executeQuery:query, parentIDNumber];
 		if (!rs)
 		{
@@ -360,6 +364,13 @@
 	while ([rs next])
 	{		
 		IMBObject *object = [[[IMBObject alloc] init] autorelease];
+		
+//		NSLog(@"%@>%@ '%@' %@", 
+//			  [rs stringForColumn:@"parent"],
+//			  [rs stringForColumn:@"id"],
+//			  [rs stringForColumn:@"title"],
+//			  [rs stringForColumn:@"type"]);
+
 		
 		object.name = [rs stringForColumn:@"title"];
 		object.location = [NSURL URLWithString:[rs stringForColumn:@"url"]];
