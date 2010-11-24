@@ -222,9 +222,7 @@
 
 	if ([object isKindOfClass:[IMBNodeObject class]])
 	{
-		IMBNode* node = (IMBNode*)object.location;
-		[_nodeViewController expandSelectedNode];
-		[_nodeViewController selectNode:node];
+		[super tableViewWasDoubleClicked:inSender];		// handled in superclass
 	}
 	else
 	{
