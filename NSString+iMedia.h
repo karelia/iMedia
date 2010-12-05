@@ -65,8 +65,10 @@
 - (NSString *)imb_pathForURLString;
 - (NSString *)imb_path;
 
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
 - (NSData *) imb_decodeBase64;
 - (NSData *) imb_decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
+#endif
 
 + (id)uuid;
 

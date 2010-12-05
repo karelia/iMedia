@@ -261,7 +261,6 @@
 		D099326B10111DCB00C527B7 /* NSString+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D099326910111DCB00C527B7 /* NSString+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09932911011227100C527B7 /* IMBImageFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D099328F1011227100C527B7 /* IMBImageFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09932921011227100C527B7 /* IMBImageFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D09932901011227100C527B7 /* IMBImageFolderParser.m */; };
-		D0993295101124EE00C527B7 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D0993294101124EE00C527B7 /* libcrypto.dylib */; };
 		D0993304101197D100C527B7 /* IMBNodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993302101197D100C527B7 /* IMBNodeViewController.m */; };
 		D0993305101197D100C527B7 /* IMBNodeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0993303101197D100C527B7 /* IMBNodeViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D099330C10119D8200C527B7 /* IMBNodeTreeController.h in Headers */ = {isa = PBXBuildFile; fileRef = D099330B10119D8200C527B7 /* IMBNodeTreeController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -745,7 +744,6 @@
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
 				D09930FD1010FF9700C527B7 /* Quartz.framework in Frameworks */,
 				D0CA93E7104917A400725DA3 /* QTKit.framework in Frameworks */,
-				D0993295101124EE00C527B7 /* libcrypto.dylib in Frameworks */,
 				D0BE03151047C540009AE844 /* ObjectiveFlickr.framework in Frameworks */,
 				CEF69569106421CB005D7E72 /* QuickLook.framework in Frameworks */,
 				CEF6960010643A25005D7E72 /* WebKit.framework in Frameworks */,
@@ -824,7 +822,6 @@
 			children = (
 				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
 				D09930FC1010FF9700C527B7 /* Quartz.framework */,
-				D0993294101124EE00C527B7 /* libcrypto.dylib */,
 				D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */,
 				D0CA93E6104917A400725DA3 /* QTKit.framework */,
 				CEF69568106421CA005D7E72 /* QuickLook.framework */,
@@ -837,6 +834,7 @@
 		1058C7B2FEA5585E11CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D0993294101124EE00C527B7 /* libcrypto.dylib */,
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
 				D2F7E79907B2D74100F64583 /* CoreData.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,

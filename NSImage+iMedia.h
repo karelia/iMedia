@@ -54,7 +54,9 @@
 // Try to load an image out of the bundle for another application and if not found fallback to one of our own.
 + (NSImage *)imb_imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle;
 
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
 + (NSImage *)imb_imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime;
+#endif
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
 + (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath checkSpotlightComments:(BOOL)aCheckSpotlight;
