@@ -83,6 +83,7 @@
 	return [image autorelease];
 }
 
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
 + (NSImage *)imb_imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime
 {
 	//need to strip the mime bit - data:image/x-icon;base64,
@@ -92,6 +93,7 @@
 	NSImage *img = [[NSImage alloc] initWithData:decoded];
 	return [img autorelease];
 }
+#endif
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
 + (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath checkSpotlightComments:(BOOL)aCheckSpotlight;

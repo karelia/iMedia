@@ -208,6 +208,7 @@
 	return [self imb_pathForURLString];
 }
 
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
 - (NSData *) imb_decodeBase64;
 {
 	return [self imb_decodeBase64WithNewlines: YES];
@@ -236,6 +237,7 @@
 	BIO_free_all(mem);
 	return data;
 }
+#endif
 
 + (id)uuid
 {
