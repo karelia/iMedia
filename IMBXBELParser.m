@@ -81,9 +81,18 @@
 		[link setObject:[[cur attributeForName:@"href"] stringValue] forKey:@"URL"];
 		[link setObject:[[[cur elementsForName:@"title"] objectAtIndex:0] stringValue] forKey:@"Name"];
 		
-		NSImage *icon = [[WebIconDatabase sharedIconDatabase] iconForURL:[link objectForKey:@"URL"]
-																withSize:NSMakeSize(16,16)
-																   cache:YES];
+		static NSImage *sURLIcon = nil;
+		if (!sURLIcon)
+		{
+			NSBundle* ourBundle = [NSBundle bundleForClass:[self class]];
+			NSString* pathToImage = [ourBundle pathForResource:@"url_icon" ofType:@"tiff"];
+			sURLIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+		}
+		NSImage *icon = sURLIcon;
+		// WebIconDatabase is not app-store friendly, and it doesn't actually work!
+//		NSImage *icon = [[WebIconDatabase sharedIconDatabase] iconForURL:[link objectForKey:@"URL"]
+//																withSize:NSMakeSize(16,16)
+//																   cache:YES];
 		[link setObject:icon forKey:@"Icon"];
 		id nameWithIcon = [NSAttributedString attributedStringWithName:[link objectForKey:@"Name"] image:icon];
 		[link setObject:nameWithIcon forKey:@"NameWithIcon"];

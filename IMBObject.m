@@ -536,6 +536,19 @@
 
 - (NSImage*) icon
 {
+	static NSImage *sJavaScriptIcon = nil;
+	static NSImage *sURLIcon = nil;
+	
+	if (!sJavaScriptIcon)
+	{
+		NSBundle* ourBundle = [NSBundle bundleForClass:[self class]];
+		NSString* pathToImage = [ourBundle pathForResource:@"js" ofType:@"tiff"];
+		sJavaScriptIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+		
+		pathToImage = [ourBundle pathForResource:@"url_icon" ofType:@"tiff"];
+		sURLIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+	}
+
 	NSImage *result = nil;
 	if (IKImageBrowserNSImageRepresentationType == self.imageRepresentationType)
 	{
@@ -545,13 +558,6 @@
 	{
 		if ([[[self location] description] hasPrefix:@"javascript:"])	// special icon for JavaScript bookmarklets
 		{
-			static NSImage *sJavaScriptIcon = nil;
-			if (!sJavaScriptIcon)
-			{
-				NSBundle* ourBundle = [NSBundle bundleForClass:[self class]];
-				NSString* pathToImage = [ourBundle pathForResource:@"js" ofType:@"tiff"];
-				sJavaScriptIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
-			}
 			result = sJavaScriptIcon;
 		}
 		else if ([self isLocalFile])
@@ -561,11 +567,12 @@
 		}
 		else
 		{
-			// This should work for Safari bookmarks, but not for firefox ones (so they shouldn't be dumpable)
-			result = [[WebIconDatabase sharedIconDatabase] 
-					iconForURL:[self.URL absoluteString]
-					withSize:NSMakeSize(16,16)
-					cache:YES];	// Strangely, cache isn't even used in the webkit implementation
+			result = sURLIcon;
+			// WebIconDatabase is not app-store friendly, and it doesn't actually work!
+//			result = [[WebIconDatabase sharedIconDatabase] 
+//					iconForURL:[self.URL absoluteString]
+//					withSize:NSMakeSize(16,16)
+//					cache:YES];	// Strangely, cache isn't even used in the webkit implementation
 			
 			/*
 			 We are never getting anything other than the default globe for remote URLs.

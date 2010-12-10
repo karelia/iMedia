@@ -86,6 +86,7 @@
 		CEF696FE10643CF4005D7E72 /* IMBLinkView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */; };
 		CEF6970810643D60005D7E72 /* IMBLinkViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6970610643D60005D7E72 /* IMBLinkViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF6970910643D60005D7E72 /* IMBLinkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6970710643D60005D7E72 /* IMBLinkViewController.m */; };
+		CEF7A22412B1B71800DBE412 /* url_icon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEF7A22312B1B71800DBE412 /* url_icon.tiff */; };
 		D00D0AA912258E4A000924AE /* IMBFlickrHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */; };
 		D00D0AAA12258E4A000924AE /* IMBFlickrHeaderViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */; };
 		D00D0AAB12258E4A000924AE /* IMBFlickrHeaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D00D0AA812258E4A000924AE /* IMBFlickrHeaderViewController.m */; };
@@ -467,6 +468,7 @@
 		CEF696FD10643CF4005D7E72 /* IMBLinkView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBLinkView.xib; sourceTree = "<group>"; };
 		CEF6970610643D60005D7E72 /* IMBLinkViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLinkViewController.h; sourceTree = "<group>"; };
 		CEF6970710643D60005D7E72 /* IMBLinkViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLinkViewController.m; sourceTree = "<group>"; };
+		CEF7A22312B1B71800DBE412 /* url_icon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = url_icon.tiff; sourceTree = "<group>"; };
 		D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBFlickrHeaderView.xib; sourceTree = "<group>"; };
 		D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrHeaderViewController.h; sourceTree = "<group>"; };
 		D00D0AA812258E4A000924AE /* IMBFlickrHeaderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrHeaderViewController.m; sourceTree = "<group>"; };
@@ -983,6 +985,7 @@
 				CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */,
 				CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */,
 				CE1AED32129C475200694472 /* js.tiff */,
+				CEF7A22312B1B71800DBE412 /* url_icon.tiff */,
 			);
 			name = Links;
 			sourceTree = "<group>";
@@ -1648,6 +1651,7 @@
 				CEAF1F27125A7DBF001C3EBB /* i2.tiff in Resources */,
 				CEAF1FE5125A8B6A001C3EBB /* Credits.html in Resources */,
 				CE1AED33129C475200694472 /* js.tiff in Resources */,
+				CEF7A22412B1B71800DBE412 /* url_icon.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
