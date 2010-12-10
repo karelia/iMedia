@@ -104,8 +104,8 @@
 
 	// Force the WebIconDatabase to be created on main thread - some webkit versions seem to complain when 
 	// it's not the case...
-	
-	[WebIconDatabase performSelectorOnMainThread:@selector(sharedIconDatabase) withObject:nil waitUntilDone:YES];
+	// NOT Enabled for now... Doesn't work, and makes App Store reject us.
+	// [WebIconDatabase performSelectorOnMainThread:@selector(sharedIconDatabase) withObject:nil waitUntilDone:YES];
 
 	[pool drain];
 }

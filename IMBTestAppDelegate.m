@@ -85,7 +85,7 @@
 	NSMutableDictionary *defaultDefaults
 	= [NSMutableDictionary dictionaryWithObjectsAndKeys:
 
-	   [NSNumber numberWithBool:YES], @"WebIconDatabaseEnabled",
+//	   [NSNumber numberWithBool:YES], @"WebIconDatabaseEnabled",
 	   
 	   nil];
 	NSUserDefaultsController *controller = [NSUserDefaultsController sharedUserDefaultsController];
