@@ -684,6 +684,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 }
 
 
+#pragma mark NSOutlineViewDataSource
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
