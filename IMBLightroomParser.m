@@ -585,7 +585,7 @@ static NSArray* sSupportedUTIs = nil;
 			pathFromRootAccept = @"%/";
 			pathFromRootReject = @"%/%/";
 		}
-		
+				
 		FMResultSet* results = [database executeQuery:query, parentRootFolder, pathFromRootAccept, pathFromRootReject];
 		NSInteger index = 0;
 		
@@ -635,7 +635,13 @@ static NSArray* sSupportedUTIs = nil;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 			object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 			
-			[(NSMutableArray*)inParentNode.objects addObject:object];
+			IMBNode *parentNode = inParentNode;
+			
+			if (parentNode == node) {
+				parentNode = parentNode.parentNode;
+			}
+			
+			[(NSMutableArray*)parentNode.objects addObject:object];
 		}
 		
 		[results close];

@@ -277,8 +277,7 @@
 	NSString* query =	@" SELECT id_local, pathFromRoot"
 						@" FROM AgLibraryFolder"
 						@" WHERE rootFolder = ?"
-						@" AND pathFromRoot LIKE ?"
-						@" AND NOT (pathFromRoot LIKE ?)"
+						@" AND (pathFromRoot IS NULL OR pathFromRoot = '' OR (pathFromRoot LIKE ? AND NOT (pathFromRoot LIKE ?)))"
 						@" ORDER BY pathFromRoot ASC";
 	
 	
