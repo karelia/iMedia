@@ -843,6 +843,52 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 }
 
+- (BOOL) nodePath:(NSString*)testAncestor isAncestorOfNodePath:(NSString*)testDescendent
+{
+	// Make sure we're working with completely canonical paths
+	NSString* canonicalAncestor = [[testAncestor stringByResolvingSymlinksInPath] stringByStandardizingPath];
+	NSString* canonicalDescendent = [[testDescendent stringByResolvingSymlinksInPath] stringByStandardizingPath];
+	
+	// A path is an ancestor of a given path if it is not identical but shares a prefix
+	BOOL isAncestor = ([canonicalDescendent hasPrefix:canonicalAncestor] && ([canonicalDescendent isEqualToString:canonicalAncestor] == NO));
+	
+	return isAncestor;
+}
+
+- (BOOL) nodePathIsTopmost:(NSString*)testPath forChildPathsInArray:(NSArray*)baseArray
+{
+	// Assume it's topmost unless we find an ancestor
+	BOOL isTopmost = YES;
+	
+	// IF it's a root node just bail now, it's "top-most" for our purposes
+	if ([_rootNodes containsObject:testPath] == NO)
+	{
+		for (NSString* thisPath in baseArray)
+		{
+			if ([self nodePath:thisPath isAncestorOfNodePath:testPath])
+			{
+				isTopmost = NO;
+			}
+		}
+	}
+	
+	return isTopmost;
+}
+
+- (NSArray*) nodePathsExcludingRedundantChildren:(NSArray*)baseArray
+{
+	NSMutableArray* uniquePaths = [NSMutableArray array];
+	
+	for (NSString* thisPath in baseArray)
+	{
+		if ([self nodePathIsTopmost:thisPath forChildPathsInArray:baseArray])
+		{
+			[uniquePaths addObject:thisPath];
+		}
+	}
+	
+	return uniquePaths;
+}
 
 // Pass the message on to the main thread...
 
@@ -851,8 +897,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	BOOL isMainThread = [NSThread isMainThread];
 	
 	[_watcherLock lock];
-	
-	for (NSString* path in _watcherUKKQueuePaths)
+
+	// Work around an issue where reloading the nodes in the wrong order could cause zombie crashes,
+	// because e.g. a childNode would reference a just-recylced parentNode. When we reload a node, it
+	// implicitly reloads the child nodes, so don't bother including redundant children of a parent node.
+	// This will hopefully reduce the number of crashes we see coming in until a more permanent fix is 
+	// devised (Peter Baumgartner is working on something).
+	NSArray* uniqueNodePaths = [self nodePathsExcludingRedundantChildren:_watcherUKKQueuePaths];
+
+	for (NSString* path in uniqueNodePaths)
 	{
 		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
 		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
@@ -868,8 +921,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	BOOL isMainThread = [NSThread isMainThread];
 	
 	[_watcherLock lock];
-	
-	for (NSString* path in _watcherFSEventsPaths)
+
+	// Work around an issue where reloading the nodes in the wrong order could cause zombie crashes,
+	// because e.g. a childNode would reference a just-recylced parentNode. When we reload a node, it
+	// implicitly reloads the child nodes, so don't bother including redundant children of a parent node.
+	// This will hopefully reduce the number of crashes we see coming in until a more permanent fix is 
+	// devised (Peter Baumgartner is working on something).
+	NSArray* uniqueNodePaths = [self nodePathsExcludingRedundantChildren:_watcherFSEventsPaths];
+
+	for (NSString* path in uniqueNodePaths)
 	{
 		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
 		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
