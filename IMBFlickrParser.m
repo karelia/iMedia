@@ -232,7 +232,6 @@
 
 	//	create root node...
 	IMBFlickrNode* rootNode = [[[IMBFlickrNode alloc] init] autorelease];
-	rootNode.parentNode = nil;
 	rootNode.mediaSource = nil;
 	rootNode.identifier = [self identifierForPath:@"/"];
 	rootNode.name = @"Flickr";

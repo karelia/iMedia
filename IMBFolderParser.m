@@ -126,7 +126,6 @@
 	
 	IMBNode* newNode = [[[IMBNode alloc] init] autorelease];
 	
-	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForPath:path];
 	newNode.displayPriority = self.displayPriority;			// get node's display priority from the folder parser
@@ -256,7 +255,6 @@
 			if (!isPackage)
 			{
 				IMBNode* subnode = [[IMBNode alloc] init];
-				subnode.parentNode = inNode;
 				subnode.mediaSource = folder;
 				subnode.identifier = [[self class] identifierForPath:folder];
 				subnode.name = name;

@@ -181,13 +181,20 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Specialized method that bundles old and new node, as well as potential error...
 
-- (void) replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode
+- (void) doReplacement;
 {
-	NSMutableDictionary* result = [NSMutableDictionary dictionary];
-	if (inNewNode) [result setObject:inNewNode forKey:@"newNode"];
-	if (inOldNode) [result setObject:inOldNode forKey:@"oldNode"];
-
-	[self performSelectorOnMainThread:@selector(_replaceNode:) withObject:result];
+    if ([NSThread isMainThread])
+    {
+        [self.libraryController _replaceNode:self.oldNode withNode:self.newNode];
+    }
+    else
+    {
+        [self 
+         performSelectorOnMainThread:_cmd
+         withObject:nil 
+         waitUntilDone:NO 
+         modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+    }
 }
 
 
@@ -218,15 +225,16 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	NSError* error = nil;
     
-    // This was using _paser ivar directly before with indication given as to it being necessary, so I'm switching to the proper accessor to see if it fixes my crash - Mike Abdullah
+    // This was using _parser ivar directly before with indication given as to it being necessary, so I'm switching to the proper accessor to see if it fixes my crash - Mike Abdullah
     IMBParser *parser = [self parser];
 	[parser willUseParser];
 	IMBNode* newNode = [parser nodeWithOldNode:self.oldNode options:self.options error:&error];
+    self.newNode = newNode;
 	
 	if (error == nil)
 	{
 		[self performSelectorOnMainThread:@selector(_didCreateNode:) withObject:newNode];
-		[self replaceNode:self.oldNode withNode:newNode];
+		[self doReplacement];
 	}
 	else
 	{
@@ -263,7 +271,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		if (error == nil)
 		{
 			[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.newNode];
-			[self replaceNode:self.oldNode withNode:self.newNode];
+			[self doReplacement];
 		}
 		else
 		{
@@ -510,7 +518,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	IMBNode* groupNode = [[[IMBNode alloc] init] autorelease];
 	groupNode.group = YES;
 	groupNode.leaf = NO;
-	groupNode.parentNode = nil;
 	groupNode.parser = nil;
 	groupNode.subNodes = [NSMutableArray array];
 	groupNode.objects = [NSMutableArray array];
@@ -692,7 +699,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
         if (newNode)
         {
             if (index == NSNotFound) index = nodes.count;
-            newNode.parentNode = parentNode;
             [nodes insertObject:newNode atIndex:index];
             
             if (watchedPath = newNode.watchedPath)

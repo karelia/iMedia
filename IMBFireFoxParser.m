@@ -258,7 +258,6 @@
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 		
-		node.parentNode = nil;
 		node.name = @"Firefox";
 		node.icon = icon;
 		node.groupType = kIMBGroupTypeLibrary;
@@ -334,7 +333,6 @@
 			//		[icon setSize:NSMakeSize(16.0,16.0)];
 			NSImage* icon = [self iconForFolderID:theID];
 			node.icon = icon;
-			node.parentNode = inNode;
 			node.name = theName;
 			node.attributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:theID] forKey:@"id"];
 			

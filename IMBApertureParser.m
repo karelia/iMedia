@@ -242,7 +242,6 @@
 		[icon setSize:NSMakeSize(16.0,16.0)];
 
 		if (self.placeholderParser) {
-			node.parentNode = inOldNode.parentNode;
 			node.mediaSource = self.mediaSource;
 			node.identifier = [self rootNodeIdentifier];
 			node.name = @"Aperture";
@@ -254,7 +253,6 @@
 			node.customHeaderViewController = [IMBApertureHeaderViewController headerViewControllerWithNode:node];
 		}
 		else {
-			node.parentNode = inOldNode.parentNode;
 			node.mediaSource = self.mediaSource;
 			node.identifier = [self rootNodeIdentifier];
 			node.name = @"Aperture";
@@ -269,7 +267,6 @@
 	
 	else
 	{
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -720,7 +717,6 @@
 			// Add the new album node to its parent (inRootNode)...
 			
 			[subNodes addObject:albumNode];
-			albumNode.parentNode = inParentNode;
 		}
 		
 		[pool drain];

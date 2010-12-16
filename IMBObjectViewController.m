@@ -1264,6 +1264,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						if ((thisURL != nil) && ([thisURL isKindOfClass:[NSURL class]]))
 						{
 							// public.url is documented as containing the "bytes of the URL"
+                            // When they say "bytes", docs might mean the result of CFURLCreateData(). Mike
 							[inItem setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:inType];
 						}
 					}

@@ -190,7 +190,6 @@
 	{
 		node = [[[IMBNode alloc] init] autorelease];
 		
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -245,7 +244,6 @@
 	NSMutableArray* subNodes = [NSMutableArray array];
 	
 	IMBNode* root = [[[IMBNode alloc] init] autorelease];
-	root.parentNode = nil;
 	root.mediaSource = nil;
 	root.identifier = [self identifierForPath:@"/"];
 	root.icon = icon;
@@ -263,7 +261,6 @@
 	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath])
 	{
 		IMBNode* demo = [[[IMBNode alloc] init] autorelease];
-		demo.parentNode = root;
 		demo.mediaSource = demoSongsPath;
 		demo.identifier = [self identifierForPath:demoSongsPath];
 		demo.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:demoSongsPath];
@@ -286,7 +283,6 @@
 	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath])
 	{
 		IMBNode* user = [[[IMBNode alloc] init] autorelease];
-		user.parentNode = root;
 		user.mediaSource = userSongsPath;
 		user.identifier = [self identifierForPath:userSongsPath];
 		user.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:userSongsPath];

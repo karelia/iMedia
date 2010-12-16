@@ -260,6 +260,7 @@ CGImageSourceRef IMB_CGImageSourceCreateWithImageItem(id <IMBImageItem> item, CF
 	{
 		id rep = [item imageRepresentation];
 		// TODO: Run this on background thread and cache result
+        // Really, it's caller's responsibility to do both of those
 		CFURLRef url = (CFURLRef)([rep isKindOfClass:[NSString class]] ? [NSURL fileURLWithPath:rep] : rep);
 		
 		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:

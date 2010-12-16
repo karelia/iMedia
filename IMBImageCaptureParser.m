@@ -201,7 +201,6 @@
 {		
 	IMBNode* newNode = [[IMBNode alloc] init];
 	
-	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = inOldNode.mediaSource;
 	newNode.identifier = inOldNode.identifier; 
 	newNode.name = inOldNode.name;
@@ -299,7 +298,6 @@
 		
 		IMBNode* deviceNode = [self _nodeForDevice:anDevice];
 		[subnodes addObject:deviceNode];
-		deviceNode.parentNode = inNode;
 	}
 	
 	inNode.subNodes = subnodes;
@@ -337,7 +335,6 @@
 				NSString *imageCaptureID = [anItem valueForKey:@"icao"];
 				
 				IMBNode* subnode = [IMBNode new];
-				subnode.parentNode = inNode;
 				subnode.mediaSource = imageCaptureID;
 				subnode.identifier = [self _identifierForICAObject:imageCaptureID];
 				subnode.name = name;
@@ -432,7 +429,6 @@
 	
 	IMBNode* newNode = [[IMBNode alloc] init];
 	
-	// newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
 	newNode.identifier = [self _identifierForICAObject:self.mediaSource];
 	

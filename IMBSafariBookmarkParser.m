@@ -209,7 +209,6 @@
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 
-		node.parentNode = nil;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];
 		node.name = @"Safari";
@@ -224,7 +223,6 @@
 	
 	else
 	{
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -425,7 +423,6 @@
 				
 			}
 			
-			subnode.parentNode = inNode;
 			[self populateNode:subnode plist:childPlist];
 			[subNodes addObject:subnode];
 		}	

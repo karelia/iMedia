@@ -242,7 +242,6 @@
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 		
-		node.parentNode = nil;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];
 		node.name = @"iPhoto";
@@ -256,7 +255,6 @@
 	
 	else
 	{
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -863,7 +861,6 @@
 			// Add the new album node to its parent (inRootNode)...
 			
 			[subNodes addObject:albumNode];
-			albumNode.parentNode = inParentNode;
 		}
 		
 		[pool drain];
