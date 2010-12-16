@@ -118,7 +118,7 @@
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
 // subNodes is an empty array, then there really aren't any subnodes.
 
-@property (retain) NSArray* subNodes;				
+@property (copy) NSArray* subNodes;				
 @property (assign) IMBNode* parentNode;
 @property (readonly) IMBNode* rootNode;
 

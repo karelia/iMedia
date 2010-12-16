@@ -377,15 +377,8 @@
 
 - (void) populateNode:(IMBNode*)inNode plist:(NSDictionary*)inPlist
 {
-	if (inNode.subNodes == nil)
-	{
-		inNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inNode.objects == nil)
-	{
-		inNode.objects = [NSMutableArray array];
-	}
+	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* objects = [NSMutableArray array];
 	
 	NSArray* childrenPlist = [inPlist objectForKey:@"Children"];
 	NSUInteger index = 0;
@@ -434,7 +427,7 @@
 			
 			subnode.parentNode = inNode;
 			[self populateNode:subnode plist:childPlist];
-			[(NSMutableArray*)inNode.subNodes addObject:subnode];
+			[subNodes addObject:subnode];
 		}	
 		
 		IMBObject* object = [self objectForPlist:childPlist];
@@ -442,9 +435,12 @@
 		if (object)
 		{
 			object.index = index++;
-			[(NSMutableArray*)inNode.objects addObject:object];
+			[objects addObject:object];
 		}
 	}
+	
+	inNode.subNodes = subNodes;
+	inNode.objects = objects;
 }
 
 

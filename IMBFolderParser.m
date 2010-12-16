@@ -193,13 +193,8 @@
 	
 	if (error == nil)
 	{
-		NSMutableArray* subnodes = [[NSMutableArray alloc] init];
-		inNode.subNodes = subnodes;
-		[subnodes release];
-		
-		NSMutableArray* objects = [[NSMutableArray alloc] initWithCapacity:files.count];
-		inNode.objects = objects;
-		[objects release];
+		NSMutableArray* subnodes = [NSMutableArray array];
+		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:files.count];
 		
 		inNode.displayedObjectCount = 0;
 		
@@ -315,6 +310,9 @@
 				[object release];
 			}
 		}
+		
+		inNode.subNodes = subnodes;
+		inNode.objects = objects;
 	}
 	
 	IMBDrain(pool);
