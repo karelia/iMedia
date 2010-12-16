@@ -617,123 +617,127 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	// Tell IMBUserInterfaceController that we are going to modify the data model...
 	
 	_isReplacingNode = YES;
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillChangeNotification object:self];
-	
-	// Find out where we are supposed to replace the old with the new node. We have three different cases:
-	//   1) Both old and new node are supplied, so we need to replace. 
-	//   2) Only old node is supplied, so it needs to be removed. 
-	//   3) Only new node is supplied so it needs to be inserted.
-	// We also have to distinguish between root of the tree and somewhere in the middle of the tree. Things 
-	// are further complicated by the "group nodes" which are created dynamically in this method...
-	
-	if (oldNode)
-	{
-		parentNode = oldNode.parentNode;
-		
-		if (parentNode)
-		{
-			nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
-			shouldSortNodes = parentNode.isGroup;
-		}
-		else
-		{
-			parentNode = [self _groupNodeForNewNode:oldNode];
-			nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
-			shouldSortNodes = YES;
-		}
-	}
-	else if (newNode)
-	{
-		parentNode = newNode.parentNode;
+	@try                    // so _isReplacing node can't be left in inconsistant state
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillChangeNotification object:self];
+        
+        // Find out where we are supposed to replace the old with the new node. We have three different cases:
+        //   1) Both old and new node are supplied, so we need to replace. 
+        //   2) Only old node is supplied, so it needs to be removed. 
+        //   3) Only new node is supplied so it needs to be inserted.
+        // We also have to distinguish between root of the tree and somewhere in the middle of the tree. Things 
+        // are further complicated by the "group nodes" which are created dynamically in this method...
+        
+        if (oldNode)
+        {
+            parentNode = oldNode.parentNode;
+            
+            if (parentNode)
+            {
+                nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
+                shouldSortNodes = parentNode.isGroup;
+            }
+            else
+            {
+                parentNode = [self _groupNodeForNewNode:oldNode];
+                nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
+                shouldSortNodes = YES;
+            }
+        }
+        else if (newNode)
+        {
+            parentNode = newNode.parentNode;
 
-		if (parentNode)
-		{
-			nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
-			shouldSortNodes = parentNode.isGroup;
-		}
-		else
-		{
-			parentNode = [self _groupNodeForNewNode:newNode];
-			nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
-			shouldSortNodes = YES;
-		}
-	}
+            if (parentNode)
+            {
+                nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
+                shouldSortNodes = parentNode.isGroup;
+            }
+            else
+            {
+                parentNode = [self _groupNodeForNewNode:newNode];
+                nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
+                shouldSortNodes = YES;
+            }
+        }
 
-	// Remove the old node from the correct place (but remember its index). Also unregister from file watching...
-	
-	NSUInteger index = NSNotFound;
-	NSString* watchedPath = nil;
-	
-	if (oldNode)
-	{
-		if (watchedPath = oldNode.watchedPath)
-		{
-			if (oldNode.watcherType == kIMBWatcherTypeKQueue)
-				[self.watcherUKKQueue removePath:watchedPath];
-			else if (oldNode.watcherType == kIMBWatcherTypeFSEvent)
-				[self.watcherFSEvents removePath:watchedPath];
-		}
-			
-		index = [nodes indexOfObjectIdenticalTo:oldNode];
-		[nodes removeObjectIdenticalTo:oldNode];
-	}
-	
-	// Insert the new node at the same index. Optionally register the node for file watching...
-		
-	if (newNode)
-	{
-		if (index == NSNotFound) index = nodes.count;
-		newNode.parentNode = parentNode;
-		[nodes insertObject:newNode atIndex:index];
-		
-		if (watchedPath = newNode.watchedPath)
-		{
-			if (newNode.watcherType == kIMBWatcherTypeKQueue)
-				[self.watcherUKKQueue addPath:watchedPath];
-			else if (newNode.watcherType == kIMBWatcherTypeFSEvent)
-				[self.watcherFSEvents addPath:watchedPath];
-		}
-	}
-	
-	// Sort the nodes so that they always appear in the same (stable) order...
+        // Remove the old node from the correct place (but remember its index). Also unregister from file watching...
+        
+        NSUInteger index = NSNotFound;
+        NSString* watchedPath = nil;
+        
+        if (oldNode)
+        {
+            if (watchedPath = oldNode.watchedPath)
+            {
+                if (oldNode.watcherType == kIMBWatcherTypeKQueue)
+                    [self.watcherUKKQueue removePath:watchedPath];
+                else if (oldNode.watcherType == kIMBWatcherTypeFSEvent)
+                    [self.watcherFSEvents removePath:watchedPath];
+            }
+                
+            index = [nodes indexOfObjectIdenticalTo:oldNode];
+            [nodes removeObjectIdenticalTo:oldNode];
+        }
+        
+        // Insert the new node at the same index. Optionally register the node for file watching...
+            
+        if (newNode)
+        {
+            if (index == NSNotFound) index = nodes.count;
+            newNode.parentNode = parentNode;
+            [nodes insertObject:newNode atIndex:index];
+            
+            if (watchedPath = newNode.watchedPath)
+            {
+                if (newNode.watcherType == kIMBWatcherTypeKQueue)
+                    [self.watcherUKKQueue addPath:watchedPath];
+                else if (newNode.watcherType == kIMBWatcherTypeFSEvent)
+                    [self.watcherFSEvents addPath:watchedPath];
+            }
+        }
+        
+        // Sort the nodes so that they always appear in the same (stable) order...
 
-	if (shouldSortNodes)
-	{
-		[nodes sortUsingSelector:@selector(compare:)];
-	}
-	
-	// Do an "atomic" replace of the changed nodes array, thus only causing a single KVO notification...
+        if (shouldSortNodes)
+        {
+            [nodes sortUsingSelector:@selector(compare:)];
+        }
+        
+        // Do an "atomic" replace of the changed nodes array, thus only causing a single KVO notification...
 
-	[parentNode setSubNodes:nodes];
+        [parentNode setSubNodes:nodes];
 
-	// Hide empty group nodes that do not have any subnodes We not using fast enumeration here because
-	// we may need to mutate the array. Iteration backwards avoids index adjustment problems as we 
-	// remove nodes...
-	
-	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:self.rootNodes];
-	NSUInteger n = [rootNodes count];
-	
-	for (NSInteger i=n-1; i>=0; i--)
-	{
-		IMBNode* node = [rootNodes objectAtIndex:i];
-		
-		if (node.isGroup && node.subNodes.count==0)
-		{
-			[rootNodes removeObjectIdenticalTo:node];
-		}
-	}
+        // Hide empty group nodes that do not have any subnodes We not using fast enumeration here because
+        // we may need to mutate the array. Iteration backwards avoids index adjustment problems as we 
+        // remove nodes...
+        
+        NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:self.rootNodes];
+        NSUInteger n = [rootNodes count];
+        
+        for (NSInteger i=n-1; i>=0; i--)
+        {
+            IMBNode* node = [rootNodes objectAtIndex:i];
+            
+            if (node.isGroup && node.subNodes.count==0)
+            {
+                [rootNodes removeObjectIdenticalTo:node];
+            }
+        }
 
-	NSUInteger m = [rootNodes count];
-	
-	if (n != m)
-	{
-		[self setRootNodes:rootNodes];
+        NSUInteger m = [rootNodes count];
+        
+        if (n != m)
+        {
+            [self setRootNodes:rootNodes];
+        }
 	}
-	
-	// We are now done...
-	
-	_isReplacingNode = NO;
+    @catch (NSException *exception)
+    {
+        // We are now done...
+        _isReplacingNode = NO;
+        @throw exception;
+    }
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
 }
