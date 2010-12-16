@@ -252,7 +252,7 @@
 	root.leaf = NO;
 	root.parser = self;
 	root.watcherType = kIMBWatcherTypeNone;
-	root.subNodes = [NSMutableArray array];
+	root.subNodes = [NSArray array];
 	root.objects = [NSMutableArray array];	// the root node doesn't have any objects so we can populate it already!
 	
 	// Add unpopulated subnode for demo songs...
@@ -275,7 +275,7 @@
 		demo.watcherType = kIMBWatcherTypeFSEvent;
 		demo.watchedPath = demoSongsPath;
 
-		[(NSMutableArray*)root.subNodes addObject:demo];
+		[[root mutableArrayValueForKey:@"subNodes"] addObject:demo];
 	}
 	
 	// Add unpopulated subnode for user songs...
@@ -301,7 +301,7 @@
 		
 		[IMBConfig registerLibraryPath:userSongsPath];
 
-		[(NSMutableArray*)root.subNodes addObject:user];
+		[[root mutableArrayValueForKey:@"subNodes"] addObject:user];
 	}
 
 	return root;
