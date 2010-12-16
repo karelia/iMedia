@@ -135,7 +135,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @interface IMBLibraryController ()
 - (void) _didCreateNode:(IMBNode*)inNode;
 - (void) _didPopulateNode:(IMBNode*)inNode;
-- (void) _replaceNode:(NSDictionary*)inOldAndNewNode;
+- (void) _replaceNode:(IMBNode *)oldNode withNode:(IMBNode *)newNode;
 - (void) _presentError:(NSError*)inError;
 - (void) _coalescedUKKQueueCallback;
 - (void) _coalescedFSEventsCallback;
@@ -584,6 +584,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	IMBNode* oldNode = [inOldAndNewNode objectForKey:@"oldNode"];
 	IMBNode* newNode = [inOldAndNewNode objectForKey:@"newNode"];
+    
+    [self _replaceNode:oldNode withNode:newNode];
+}
+
+- (void) _replaceNode:(IMBNode *)oldNode withNode:(IMBNode *)newNode;
+{
 	if (oldNode == nil && newNode == nil) return;
 
 	IMBNode* parentNode = nil;
