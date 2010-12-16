@@ -392,6 +392,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This helper method makes sure that the new node tree is pre-populated as deep as the old one was. Obviously
+// this is a recursive method that descends into the tree as far as necessary to recreate the state...
+
+- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions
+{
+	NSError* error = nil;
+	
+	if (inOldNode.isPopulated)
+	{
+		[self populateNode:inNewNode options:inOptions error:&error];
+		
+		for (IMBNode* oldSubNode in inOldNode.subNodes)
+		{
+			NSString* identifier = oldSubNode.identifier;
+			IMBNode* newSubNode = [inNewNode subNodeWithIdentifier:identifier];
+			[self populateNewNode:newSubNode likeOldNode:oldSubNode options:inOptions];
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark
 #pragma mark Helpers
 

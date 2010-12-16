@@ -163,9 +163,9 @@
 	
 	// If the old node was populated, then also populate the new node...
 	
-	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
+	if (inOldNode.isPopulated)
 	{
-		[self populateNode:newNode options:inOptions error:&error];
+		[self populateNewNode:newNode likeOldNode:inOldNode options:inOptions];
 	}
 
 	if (outError) *outError = error;

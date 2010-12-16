@@ -157,7 +157,9 @@
 - (id) initWithMediaType:(NSString*)inMediaType;
 - (NSString*) identifierForPath:(NSString*)inPath;
 + (NSString*) identifierForPath:(NSString*)inPath;
+
 - (void) invalidateThumbnails;
+- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions;
 
 @end
 
