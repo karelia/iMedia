@@ -617,10 +617,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	// Tell IMBUserInterfaceController that we are going to modify the data model...
 	
 	_isReplacingNode = YES;
-	@try                    // so _isReplacing node can't be left in inconsistant state
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillChangeNotification object:self];
+        	
+	@try      
     {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillChangeNotification object:self];
-        
         // Find out where we are supposed to replace the old with the new node. We have three different cases:
         //   1) Both old and new node are supplied, so we need to replace. 
         //   2) Only old node is supplied, so it needs to be removed. 
@@ -732,13 +733,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
             [self setRootNodes:rootNodes];
         }
 	}
+	
+	// We are now done...
+
     @finally
     {
-        // We are now done...
         _isReplacingNode = NO;
-    }
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
+ 	
+		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
+   }
 }
 
 
