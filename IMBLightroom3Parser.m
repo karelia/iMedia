@@ -209,7 +209,7 @@
 	//	foldersNode.attributes = [self attributesWithId:id_local path:nil];
 	foldersNode.leaf = NO;
 	
-	[(NSMutableArray*)inRootNode.subNodes addObject:foldersNode];
+	[[inRootNode mutableArrayValueForKey:@"subNodes"] addObject:foldersNode];
 
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
 	foldersObject.location = (id)foldersNode;
