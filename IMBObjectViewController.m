@@ -667,14 +667,24 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// Get the row that seems most important in the combo view. Its either the selected row or the middle visible row...
 	
 	NSRange visibleRows = [ibComboView rowsInRect:[ibComboView visibleRect]];
-	NSUInteger anchorRow = visibleRows.location + visibleRows.length/2;
+	NSUInteger firstVisibleRow = visibleRows.location;
+	NSUInteger lastVisibleRow = visibleRows.location + visibleRows.length;
+	NSUInteger anchorRow = (firstVisibleRow + lastVisibleRow) / 2;
 	
 	NSIndexSet* selection = [ibObjectArrayController selectionIndexes];
 	
 	if (selection) 
 	{
-		NSUInteger selectedRow = [selection firstIndex];
-		if (selectedRow != NSNotFound) anchorRow = selectedRow;
+		NSUInteger firstSelectedRow = [selection firstIndex];
+		NSUInteger lastSelectedRow = [selection lastIndex];
+
+		if (firstSelectedRow != NSNotFound &&
+			lastSelectedRow != NSNotFound &&
+			firstSelectedRow >= firstVisibleRow && 
+			lastSelectedRow <= lastVisibleRow)
+		{
+			anchorRow = (firstSelectedRow + lastSelectedRow) / 2;;
+		}	
 	}
 	
 	// Change the cell size of the icon view. Also notify the parser so it can update thumbnails if necessary...
