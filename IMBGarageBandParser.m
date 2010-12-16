@@ -242,6 +242,8 @@
 	
 	// Create Garageband root node...
 	
+	NSMutableArray* subNodes = [NSMutableArray array];
+	
 	IMBNode* root = [[[IMBNode alloc] init] autorelease];
 	root.parentNode = nil;
 	root.mediaSource = nil;
@@ -252,7 +254,6 @@
 	root.leaf = NO;
 	root.parser = self;
 	root.watcherType = kIMBWatcherTypeNone;
-	root.subNodes = [NSArray array];
 	root.objects = [NSMutableArray array];	// the root node doesn't have any objects so we can populate it already!
 	
 	// Add unpopulated subnode for demo songs...
@@ -275,7 +276,7 @@
 		demo.watcherType = kIMBWatcherTypeFSEvent;
 		demo.watchedPath = demoSongsPath;
 
-		[[root mutableArrayValueForKey:@"subNodes"] addObject:demo];
+		[subNodes addObject:demo];
 	}
 	
 	// Add unpopulated subnode for user songs...
@@ -301,8 +302,10 @@
 		
 		[IMBConfig registerLibraryPath:userSongsPath];
 
-		[[root mutableArrayValueForKey:@"subNodes"] addObject:user];
+		[subNodes addObject:user];
 	}
+	
+	root.subNodes = subNodes;
 
 	return root;
 }
