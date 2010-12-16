@@ -185,14 +185,9 @@
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	if (inRootNode.subNodes == nil) {
-		inRootNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inRootNode.objects == nil) {
-		inRootNode.objects = [NSMutableArray array];
-		inRootNode.displayedObjectCount = 0;
-	}
+	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* objects = [NSMutableArray array];
+	inRootNode.displayedObjectCount = 0;
 	
 	// Add the Folders node...
 	
@@ -226,7 +221,7 @@
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 	foldersObject.imageRepresentation = [self largeFolderIcon];
 	
-	[(NSMutableArray*)inRootNode.objects addObject:foldersObject];
+	[objects addObject:foldersObject];
 
 	
 	// Add the Collections node...
@@ -245,7 +240,7 @@
 	collectionsNode.parser = self;
 	collectionsNode.leaf = NO;
 	
-	[(NSMutableArray*)inRootNode.subNodes addObject:collectionsNode];
+	[subNodes addObject:collectionsNode];
 	
 	IMBNodeObject* collectionsObject = [[[IMBNodeObject alloc] init] autorelease];
 	collectionsObject.location = (id)collectionsNode;
@@ -257,8 +252,11 @@
 	collectionsObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 	collectionsObject.imageRepresentation = [self largeFolderIcon];
 	
-	[(NSMutableArray*)inRootNode.objects addObject:collectionsObject];
+	[objects addObject:collectionsObject];
 	
+	inRootNode.subNodes = subNodes;
+	inRootNode.objects = objects;
+
 	[super populateSubnodesForRootNode:collectionsNode];
 }
 

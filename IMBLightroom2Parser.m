@@ -138,14 +138,9 @@
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	if (inRootNode.subNodes == nil) {
-		inRootNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inRootNode.objects == nil) {
-		inRootNode.objects = [NSMutableArray array];
-		inRootNode.displayedObjectCount = 0;
-	}
+	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* objects = [NSMutableArray array];
+	inRootNode.displayedObjectCount = 0;
 	
 	// Add the Folders node...
 	
@@ -167,7 +162,7 @@
 	//	foldersNode.attributes = [self attributesWithId:id_local path:nil];
 	foldersNode.leaf = NO;
 	
-	[(NSMutableArray*)inRootNode.subNodes addObject:foldersNode];
+	[subNodes addObject:foldersNode];
 	
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
 	foldersObject.location = (id)foldersNode;
@@ -179,8 +174,11 @@
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 	foldersObject.imageRepresentation = [self largeFolderIcon];
 	
-	[(NSMutableArray*)inRootNode.objects addObject:foldersObject];
+	[objects addObject:foldersObject];
 
+	inRootNode.subNodes = subNodes;
+	inRootNode.objects = objects;
+	
 	// Add the Collections node...
 	
 	[super populateSubnodesForRootNode:inRootNode];

@@ -478,14 +478,9 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	if (inFoldersNode.subNodes == nil) {
-		inFoldersNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inFoldersNode.objects == nil) {
-		inFoldersNode.objects = [NSMutableArray array];
-		inFoldersNode.displayedObjectCount = 0;
-	}
+	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* objects = [NSMutableArray array];
+	inFoldersNode.displayedObjectCount = 0;
 	
 	// Query the database for the root folders and create a node for each one we find...
 	
@@ -523,7 +518,7 @@ static NSArray* sSupportedUTIs = nil;
 												pathFromRoot:nil];
 			node.leaf = NO;
 			
-			[(NSMutableArray*)inFoldersNode.subNodes addObject:node];
+			[subNodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
 			object.location = (id)node;
@@ -535,13 +530,16 @@ static NSArray* sSupportedUTIs = nil;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 			object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 			
-			[(NSMutableArray*)inFoldersNode.objects addObject:object];
+			[objects addObject:object];
 			
 			[pool drain];
 		}
 		
 		[results close];
 	}
+	
+	inFoldersNode.subNodes = subNodes;
+	inFoldersNode.objects = objects;
 }
 
 
@@ -555,14 +553,9 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	if (inParentNode.subNodes == nil) {
-		inParentNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inParentNode.objects == nil) {
-		inParentNode.objects = [NSMutableArray array];
-		inParentNode.displayedObjectCount = 0;
-	}
+	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* objects = [NSMutableArray array];
+	inParentNode.displayedObjectCount = 0;
 	
 	// Query the database for subfolder and add a node for each one we find...
 	
@@ -611,7 +604,7 @@ static NSArray* sSupportedUTIs = nil;
 
 			node.identifier = [self identifierWithFolderId:id_local];
 				
-				[(NSMutableArray*)inParentNode.subNodes addObject:node];
+				[subNodes addObject:node];
 			}
 			else {
 				node = inParentNode;
@@ -642,11 +635,14 @@ static NSArray* sSupportedUTIs = nil;
 				parentNode = parentNode.parentNode;
 			}
 			
-			[(NSMutableArray*)parentNode.objects addObject:object];
+			[objects addObject:object];
 		}
 		
 		[results close];
 	}
+	
+	inParentNode.subNodes = subNodes;
+	inParentNode.objects = objects;
 }
 
 
@@ -662,15 +658,9 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add an empty subnodes array, to avoid endless loop, even if the following query returns no results...
 	
-	if (inParentNode.subNodes == nil) {
-		inParentNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inParentNode.objects == nil) {
-		inParentNode.objects = [NSMutableArray array];
-		inParentNode.displayedObjectCount = 0;
-	}
-	
+	NSMutableArray* subNodes = [NSMutableArray arrayWithArray:inParentNode.subNodes];
+	NSMutableArray* objects = [NSMutableArray arrayWithArray:inParentNode.objects];
+	inParentNode.displayedObjectCount = 0;
 	
 	// Now query the database for subnodes to the specified parent node...
 	
@@ -735,7 +725,7 @@ static NSArray* sSupportedUTIs = nil;
 												pathFromRoot:nil];
 			node.leaf = NO;
 			
-			[(NSMutableArray*)inParentNode.subNodes addObject:node];
+			[subNodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
 			object.location = (id)node;
@@ -747,11 +737,14 @@ static NSArray* sSupportedUTIs = nil;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 			object.imageRepresentation = [self largeFolderIcon];
 			
-			[(NSMutableArray*)inParentNode.objects addObject:object];
+			[objects addObject:object];
 		}
 		
 		[results close];
 	}
+	
+	inParentNode.subNodes = subNodes;
+	inParentNode.objects = objects;
 }
 
 

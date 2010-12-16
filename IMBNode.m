@@ -197,15 +197,17 @@
 	
 	if (self.subNodes)
 	{
-		copy.subNodes = [NSMutableArray arrayWithCapacity:self.subNodes.count];
+		NSMutableArray* subNodes = [NSMutableArray arrayWithCapacity:self.subNodes.count];
 
 		for (IMBNode* subnode in self.subNodes)
 		{
 			IMBNode* copiedSubnode = [subnode copy];
 			copiedSubnode.parentNode = copy;
-			[(NSMutableArray*)copy.subNodes addObject:copiedSubnode];
+			[subNodes addObject:copiedSubnode];
 			[copiedSubnode release];
 		}
+		
+		copy.subNodes = subNodes;
 	}
 	else 
 	{
