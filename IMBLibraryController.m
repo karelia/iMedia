@@ -558,10 +558,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	groupNode.parser = inNewNode.parser;	// Important to make lookup in -[IMBNode indexPath] work correctly!
 
-	[self willChangeValueForKey:@"rootNodes"];
-	[_rootNodes addObject:groupNode];
-	[_rootNodes sortUsingSelector:@selector(compare:)];
-	[self didChangeValueForKey:@"rootNodes"];
+	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:_rootNodes];
+	[rootNodes addObject:groupNode];
+	[rootNodes sortUsingSelector:@selector(compare:)];
+	self.rootNodes = rootNodes;
+	
+//	[self willChangeValueForKey:@"rootNodes"];
+//	[_rootNodes addObject:groupNode];
+//	[_rootNodes sortUsingSelector:@selector(compare:)];
+//	[self didChangeValueForKey:@"rootNodes"];
 
 	return groupNode;
 }
@@ -577,60 +582,88 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _replaceNode:(NSDictionary*)inOldAndNewNode
 {
-	NSString* watchedPath = nil;
-	
-	_isReplacingNode = YES;
-	
-	// Tell IMBUserInterfaceController that we are going to modify the data model...
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillChangeNotification object:self];
-	
-	// If we were given both old and new nodes, then the parentNode must be the same. If not log an error. 
-	// Maybe we should also throw an exception because this is a programmer error...
-	
 	IMBNode* oldNode = [inOldAndNewNode objectForKey:@"oldNode"];
 	IMBNode* newNode = [inOldAndNewNode objectForKey:@"newNode"];
+	if (oldNode == nil && newNode == nil) return;
 
-	if (oldNode == nil && newNode != nil)	// Workaround for special behavior of IMBImageCaptureParser, which replaces root 
-	{					// nodes several times as devices get hotplugged...
+	IMBNode* parentNode = nil;
+	NSMutableArray* nodes = nil;
+	BOOL shouldSortNodes = NO;
+		
+	// If we were given both old and new nodes, then the parentNode and identifiers must be the same. 
+	// If not log an error and throw an exception because this is a programmer error...
+	
+	if (oldNode != nil && newNode != nil && oldNode.parentNode != oldNode.parentNode)
+	{
+		NSLog(@"%s Error: parent of oldNode and newNode must be the same...",__FUNCTION__);
+		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must be the same" userInfo:nil] raise];
+	}
+	
+	if (oldNode != nil && newNode != nil && ! [oldNode.identifier isEqual:newNode.identifier])
+	{
+		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
+		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must have same identifiers" userInfo:nil] raise];
+	}
+	
+	// Workaround for special behavior of IMBImageCaptureParser, which replaces root nodes several times  
+	// as devices get hotplugged. We should probably remove this once IMBImageCaptureParser gets rewritten...
+	
+	if (oldNode == nil && newNode != nil)	 
+	{										
 		IMBNode* node = [self nodeWithIdentifier:newNode.identifier];
 		if (node) oldNode = node;
 	}
 
-	if (oldNode!=nil && newNode!=nil && oldNode.parentNode!=oldNode.parentNode)
-	{
-		NSLog(@"%s Error parent of oldNode and newNode must be the same...",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error parent of oldNode and newNode must be the same" userInfo:nil] raise];
-	}
+	// Tell IMBUserInterfaceController that we are going to modify the data model...
 	
-	// The parentNode property of the node tells us where we are supposed to replace the old with the 
-	// new node. If parentNode is nil then we are going to use the root level array...
-
-	IMBNode* parent = nil;
-	if (newNode) parent = newNode.parentNode;
-	else if (oldNode) parent = oldNode.parentNode;
+	_isReplacingNode = YES;
 	
-	if ([IMBConfig showsGroupNodes])
+	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillChangeNotification object:self];
+	
+	// Find out where we are supposed to replace the old with the new node. We have three different cases:
+	//   1) Both old and new node are supplied, so we need to replace. 
+	//   2) Only old node is supplied, so it needs to be removed. 
+	//   3) Only new node is supplied so it needs to be inserted.
+	// We also have to distinguish between root of the tree and somewhere in the middle of the tree. Things 
+	// are further complicated by the "group nodes" which are created dynamically in this method...
+	
+	if (oldNode)
 	{
-		IMBNode* groupNode = [self _groupNodeForNewNode:newNode];
-
-		if (parent==nil && groupNode!=nil)
+		parentNode = oldNode.parentNode;
+		
+		if (parentNode)
 		{
-			parent = groupNode;
-			newNode.parentNode = groupNode;
+			nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
+			shouldSortNodes = parentNode.isGroup;
+		}
+		else
+		{
+			parentNode = [self _groupNodeForNewNode:oldNode];
+			nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
+			shouldSortNodes = YES;
 		}
 	}
-	
-	NSMutableArray* siblings = nil;
-	if (parent) siblings = [parent mutableArrayValueForKey:@"subNodes"];
-	else siblings = [self mutableArrayValueForKey:@"rootNodes"];
+	else if (newNode)
+	{
+		parentNode = newNode.parentNode;
+
+		if (parentNode)
+		{
+			nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
+			shouldSortNodes = parentNode.isGroup;
+		}
+		else
+		{
+			parentNode = [self _groupNodeForNewNode:newNode];
+			nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
+			shouldSortNodes = YES;
+		}
+	}
 
 	// Remove the old node from the correct place (but remember its index). Also unregister from file watching...
 	
-	if (parent) [parent willChangeValueForKey:@"subNodes"];
-	else [self willChangeValueForKey:@"rootNodes"];
-
 	NSUInteger index = NSNotFound;
+	NSString* watchedPath = nil;
 	
 	if (oldNode)
 	{
@@ -642,16 +675,17 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				[self.watcherFSEvents removePath:watchedPath];
 		}
 			
-		index = [siblings indexOfObjectIdenticalTo:oldNode];
-		[siblings removeObjectIdenticalTo:oldNode];
+		index = [nodes indexOfObjectIdenticalTo:oldNode];
+		[nodes removeObjectIdenticalTo:oldNode];
 	}
 	
-	// Insert the new node in the same location. Optionally register the node for file watching...
+	// Insert the new node at the same index. Optionally register the node for file watching...
 		
 	if (newNode)
 	{
-		if (index == NSNotFound) index = siblings.count;
-		[siblings insertObject:newNode atIndex:index];
+		if (index == NSNotFound) index = nodes.count;
+		newNode.parentNode = parentNode;
+		[nodes insertObject:newNode atIndex:index];
 		
 		if (watchedPath = newNode.watchedPath)
 		{
@@ -662,43 +696,43 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 	
+	// Sort the nodes so that they always appear in the same (stable) order...
+
+	if (shouldSortNodes)
+	{
+		[nodes sortUsingSelector:@selector(compare:)];
+	}
+	
+	// Do an "atomic" replace of the changed nodes array, thus only causing a single KVO notification...
+
+	[parentNode setSubNodes:nodes];
+
 	// Hide empty group nodes that do not have any subnodes We not using fast enumeration here because
-	// we may need to mutable the array. Iteration backwards avoids index adjustment problems as we 
+	// we may need to mutate the array. Iteration backwards avoids index adjustment problems as we 
 	// remove nodes...
 	
-	if (YES)
+	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:self.rootNodes];
+	NSUInteger n = [rootNodes count];
+	
+	for (NSInteger i=n-1; i>=0; i--)
 	{
-		NSInteger n =  self.rootNodes.count;
-		for (NSInteger i=n-1; i>=0; i--)
+		IMBNode* node = [rootNodes objectAtIndex:i];
+		
+		if (node.isGroup && node.subNodes.count==0)
 		{
-			IMBNode* node = [self.rootNodes objectAtIndex:i];
-			
-			if (node.isGroup && node.subNodes.count==0)
-			{
-				[self.rootNodes removeObjectIdenticalTo:node];
-			}
+			[rootNodes removeObjectIdenticalTo:node];
 		}
 	}
+
+	NSUInteger m = [rootNodes count];
 	
-	// Sort the root nodes and first level of group nodes...
-	
-	if (newNode.parentNode == nil)
+	if (n != m)
 	{
-		[self.rootNodes sortUsingSelector:@selector(compare:)];
-	}
-	
-	for (IMBNode* node in self.rootNodes)
-	{
-		if (node.isGroup)
-		{
-			[(NSMutableArray*)node.subNodes sortUsingSelector:@selector(compare:)];
-		}
+		[self setRootNodes:rootNodes];
 	}
 	
 	// We are now done...
 	
-	if (parent) [parent didChangeValueForKey:@"subNodes"];
-	else [self didChangeValueForKey:@"rootNodes"];
 	_isReplacingNode = NO;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
@@ -825,6 +859,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath
 {
+//	NSLog(@"%s path=%@",__FUNCTION__,inPath);
+	
 	if ([inNotificationName isEqualToString:IMBFileWatcherWriteNotification])
 	{
 		if (inWatcher == _watcherUKKQueue)
@@ -848,6 +884,49 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 		}
 	}
+}
+
+
+// Given an array of paths, filter out all paths that are subpaths of others in the array.
+// In other words only return the unique roots of a bunch of file system paths...
+
++ (NSArray*) _rootPathsForPaths:(NSArray*)inAllPaths
+{
+	NSMutableArray* rootPaths = [NSMutableArray array];
+	
+	for (NSString* newPath in inAllPaths)
+	{
+		// First eliminate any existing rootPaths that are subpaths of a new path...
+		
+		NSUInteger n = [rootPaths count];
+		
+		for (NSUInteger i=n-1; i>=0; i--)
+		{
+			NSString* rootPath = [rootPaths objectAtIndex:i];
+			
+			if ([rootPath hasPrefix:newPath])
+			{
+				[rootPaths removeObjectAtIndex:i];
+			}
+		}
+		
+		// Add a new path if it is not a subpath (or equal) of another existing path...
+		
+		BOOL shouldAdd = YES;
+
+		for (NSString* rootPath in rootPaths)
+		{
+			if ([newPath hasPrefix:rootPath])
+			{
+				shouldAdd = NO;
+				break;
+			}
+		}
+		
+		if (shouldAdd) [rootPaths addObject:newPath];
+	}
+	
+	return (NSArray*) rootPaths;
 }
 
 
