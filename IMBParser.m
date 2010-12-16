@@ -450,16 +450,19 @@
 	{
 		CGImageSourceRef source = [self _imageSourceForURL:inURL];
 
-		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-		   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
-		   (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
-		   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
-		   [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
-		   nil];
-		
-		NSAssert(source, @"Nil image source in _imageForURL:");
-		image = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
-		[NSMakeCollectable(image) autorelease];
+		if (source)
+		{
+			NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+			   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
+			   (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+			   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
+			   [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
+			   nil];
+			
+			NSAssert(source, @"Nil image source in _imageForURL:");
+			image = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
+			[NSMakeCollectable(image) autorelease];
+		}
 	}
 	
 	return image;
