@@ -200,7 +200,6 @@
 															  @"Name of Folders node in IMBLightroomParser");
 	
 	IMBNode* foldersNode = [[[IMBNode alloc] init] autorelease];
-	foldersNode.parentNode = inRootNode;
 	foldersNode.mediaSource = self.mediaSource;
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
 	foldersNode.name = foldersName;
@@ -233,7 +232,6 @@
 																  @"Name of Collections node in IMBLightroomParser");
 	
 	IMBNode* collectionsNode = [[[IMBNode alloc] init] autorelease];
-	collectionsNode.parentNode = inRootNode;
 	collectionsNode.identifier = [self identifierWithCollectionId:0];
 	collectionsNode.name = collectionsName;
 	collectionsNode.icon = [self groupIcon];

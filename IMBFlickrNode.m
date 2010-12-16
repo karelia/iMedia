@@ -140,7 +140,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	IMBFlickrNode* node = [[[IMBFlickrNode alloc] init] autorelease];
 	node.attributes = [NSMutableDictionary dictionary];
 	node.leaf = YES;
-	node.parentNode = root;
+	//node.parentNode = root;
 	node.parser = parser;
 	
 	
@@ -194,7 +194,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 
 	//	iMB general...
 	IMBFlickrNode* node = [[[IMBFlickrNode alloc] init] autorelease];
-	node.parentNode = root;
+	//node.parentNode = root;
 	node.parser = parser;
 	node.leaf = YES;	
 	node.attributes = [NSMutableDictionary dictionary];

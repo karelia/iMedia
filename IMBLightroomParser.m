@@ -339,7 +339,6 @@ static NSArray* sSupportedUTIs = nil;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 		
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self rootNodeIdentifier];
 		node.name = @"Lightroom";
@@ -350,7 +349,6 @@ static NSArray* sSupportedUTIs = nil;
 	}
 	else
 	{
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -506,7 +504,6 @@ static NSArray* sSupportedUTIs = nil;
 			}
 			
 			IMBNode* node = [[[IMBNode alloc] init] autorelease];
-			node.parentNode = inFoldersNode;
 			node.name = name;
 			node.icon = [self folderIcon];
 			node.parser = self;
@@ -595,7 +592,6 @@ static NSArray* sSupportedUTIs = nil;
 			if ([pathFromRoot length] > 0) {
 				node = [[[IMBNode alloc] init] autorelease];
 				
-				node.parentNode = inParentNode;
 				node.icon = [self folderIcon];
 				node.parser = self;
 				node.mediaSource = self.mediaSource;
@@ -713,7 +709,6 @@ static NSArray* sSupportedUTIs = nil;
 			}
 			
 			IMBNode* node = [[[IMBNode alloc] init] autorelease];
-			node.parentNode = inParentNode;
 			node.identifier = [self identifierWithCollectionId:idLocal];
 			node.name = name;
 			node.icon = isGroup ? [self groupIcon] : [self collectionIcon];

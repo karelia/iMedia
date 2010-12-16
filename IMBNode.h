@@ -119,7 +119,7 @@
 // subNodes is an empty array, then there really aren't any subnodes.
 
 @property (copy) NSArray* subNodes;				
-@property (assign) IMBNode* parentNode;
+@property (assign, readonly) IMBNode* parentNode;
 @property (readonly) IMBNode* rootNode;
 
 // Object accessors. If the objects property is nil, that doesn't mean that there are no objects - instead it

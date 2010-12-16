@@ -65,6 +65,7 @@
 #pragma mark
 
 @interface IMBNode ()
+@property (assign, readwrite) IMBNode* parentNode;
 - (void) _recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray*)inIndexArray;
 @end
 
@@ -86,11 +87,6 @@
 @synthesize displayPriority = _displayPriority;
 @synthesize attributes = _attributes;
 @synthesize objects = _objects;
-
-// Accessors for navigating up or down the node tree...
-
-@synthesize subNodes = _subNodes;
-@synthesize parentNode = _parentNode;
 
 // State information...
 
@@ -173,7 +169,6 @@
 	copy.includedInPopup = self.includedInPopup;
 	copy.displayedObjectCount = self.displayedObjectCount;
 	
-	copy.parentNode = self.parentNode;
 	copy.parser = self.parser;
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -202,7 +197,6 @@
 		for (IMBNode* subnode in self.subNodes)
 		{
 			IMBNode* copiedSubnode = [subnode copy];
-			copiedSubnode.parentNode = copy;
 			[subNodes addObject:copiedSubnode];
 			[copiedSubnode release];
 		}
@@ -220,13 +214,16 @@
 
 - (void) dealloc
 {
+    // Sub-nodes have a weak reference to self, so break that
+    [self setSubNodes:nil];
+    IMBRelease(_subNodes);
+	
 	IMBRelease(_mediaSource);
 	IMBRelease(_identifier);
 	IMBRelease(_icon);
 	IMBRelease(_name);
 	IMBRelease(_attributes);
 	IMBRelease(_objects);
-	IMBRelease(_subNodes);
 	IMBRelease(_parser);
 	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
@@ -243,6 +240,21 @@
 
 #pragma mark
 #pragma mark Accessors
+
+// Accessors for navigating up or down the node tree...
+
+@synthesize subNodes = _subNodes;
+- (void)setSubNodes:(NSArray *)nodes;
+{
+    [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
+    
+    nodes = [nodes copy];
+    [_subNodes release]; _subNodes = nodes;
+    
+    [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
+}
+
+@synthesize parentNode = _parentNode;
 
 
 // Node accessors. Use these for bindings the NSTreeController...
