@@ -381,9 +381,9 @@ static NSArray* sSupportedUTIs = nil;
 	
 	// If the old node was populated, then also populate the new node...
 	
-	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
+	if (inOldNode.isPopulated)
 	{
-		[self populateNode:node options:inOptions error:&error];
+		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
 	}
 	
 	if (outError) *outError = error;
@@ -608,6 +608,8 @@ static NSArray* sSupportedUTIs = nil;
 				node.mediaSource = self.mediaSource;
 				node.name = [pathFromRoot lastPathComponent];
 				node.leaf = NO;
+
+			node.identifier = [self identifierWithFolderId:id_local];
 				
 				[(NSMutableArray*)inParentNode.subNodes addObject:node];
 			}
@@ -615,7 +617,6 @@ static NSArray* sSupportedUTIs = nil;
 				node = inParentNode;
 			}
 			
-			node.identifier = [self identifierWithFolderId:id_local];
 
 			NSDictionary* attributes = [self attributesWithRootFolder:parentRootFolder
 															  idLocal:id_local

@@ -284,11 +284,17 @@
 	IMBFlickrNode* updatedNode = [[inOldNode copy] autorelease];
 	
 	// If the old node was populated, then also populate the new node...
-	IMBFlickrNode* inOldFlickrNode = (IMBFlickrNode*) inOldNode;
-	if ([inOldFlickrNode hasRequest] || inOldFlickrNode.subNodes.count > 0 || inOldFlickrNode.objects.count > 0) {
-		[self populateNode:updatedNode options:inOptions error:&error];
-	}
 	
+	IMBFlickrNode* inOldFlickrNode = (IMBFlickrNode*) inOldNode;
+//	if ([inOldFlickrNode hasRequest] || inOldFlickrNode.subNodes.count > 0 || inOldFlickrNode.objects.count > 0) {
+//		[self populateNode:updatedNode options:inOptions error:&error];
+//	}
+	
+	if ([inOldFlickrNode hasRequest] || inOldNode.isPopulated)
+	{
+		[self populateNewNode:updatedNode likeOldNode:inOldNode options:inOptions];
+	}
+
 	if (outError) *outError = error;
 	
 	return updatedNode;
