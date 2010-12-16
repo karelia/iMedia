@@ -269,19 +269,22 @@
 				
 				// Should this folder be a leaf or not?  We are going to have to scan into the directory
 			
-				NSError* error = nil;
-				NSArray *folderContents = [fm contentsOfDirectoryAtPath:folder error:&error];	// When we go 10.6 only, use better APIs.
+				NSArray* folderContents = [fm contentsOfDirectoryAtPath:folder error:&error];	// When we go 10.6 only, use better APIs.
 				BOOL hasSubDir = NO;
 				int fileCounter = 0;	// bail if this is a really full folder
+				
 				if (folderContents)
 				{
 					for (NSString *isThisADirectory in folderContents)
 					{
+						NSString* path = [folder stringByAppendingPathComponent:isThisADirectory];
+						[fm fileExistsAtPath:path isDirectory:&hasSubDir];
 						fileCounter++;
-						NSString *subPath = [folder stringByAppendingPathComponent:isThisADirectory];
+						
 						// Would it be faster to use attributesOfItemAtPath:error: ????
-						if ([fm fileExistsAtPath:subPath isDirectory:&hasSubDir] && hasSubDir)
+						if (hasSubDir)
 						{
+							hasSubDir = YES;
 							break;	// Yes, found a subdir, so we want a disclosure triangle on this
 						}
 						else if (fileCounter > 100)
@@ -313,6 +316,7 @@
 		
 		inNode.subNodes = subnodes;
 		inNode.objects = objects;
+		inNode.leaf = [subnodes count] == 0;
 	}
 	
 	IMBDrain(pool);
