@@ -732,11 +732,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
             [self setRootNodes:rootNodes];
         }
 	}
-    @catch (NSException *exception)
+    @finally
     {
         // We are now done...
         _isReplacingNode = NO;
-        @throw exception;
     }
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
