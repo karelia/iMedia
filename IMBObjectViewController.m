@@ -176,39 +176,17 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 @synthesize viewType = _viewType;
 @synthesize tabView = ibTabView;
 @synthesize iconView = ibIconView;
-@synthesize iconSize = _iconSize;
-
 @synthesize listView = ibListView;
-- (void)setListView:(NSTableView *)listView;
-{
-    // Don't want dangling pointers
-    [ibListView setDataSource:nil];
-    [ibListView setDelegate:nil];
-    
-    [listView retain];
-    [ibListView release]; ibListView = listView;
-}
-
 @synthesize comboView = ibComboView;
-- (void)setComboView:(NSTableView *)comboView;
-{
-    // Don't want dangling pointers
-    [ibComboView setDataSource:nil];
-    [ibComboView setDelegate:nil];
-    
-    [comboView retain];
-    [ibComboView release]; ibComboView = comboView;
-}
-
+@synthesize iconSize = _iconSize;
 
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
-
 @synthesize dropDestinationURL = _dropDestinationURL;
-
 @synthesize clickedObjectIndex = _clickedObjectIndex;
 @synthesize clickedObject = _clickedObject;
 @synthesize draggedIndexes = _draggedIndexes;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -316,6 +294,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
+// Do not remove this method. It isn't called directly by the framework, but is called by host applications. 
+
 - (void) unbindViews	
 {
 	// Tear down bindings *before* the window is closed. This avoids exceptions due to random deallocation order of 
@@ -328,6 +308,14 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibListView imb_unbindViewHierarchy];
 	[ibComboView imb_unbindViewHierarchy];
 	[self.view imb_unbindViewHierarchy];
+	
+    // Clear datasource and delegate, just in case views live longer than this controller...
+    
+	[ibListView setDataSource:nil];
+    [ibListView setDelegate:nil];
+	
+    [ibComboView setDataSource:nil];
+    [ibComboView setDelegate:nil];
 }
 
 
@@ -341,7 +329,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[NSObject cancelPreviousPerformRequestsWithTarget:ibListView];
 	[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView];
 
-	// remove ourself from the QuickLook preview panel...
+	// Remove ourself from the QuickLook preview panel...
 	
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
@@ -358,11 +346,6 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
     
-    // Tear down table views...
-    
-    [self setListView:nil];
-    [self setComboView:nil];
-
 	// Other cleanup...
 	
 	IMBRelease(_libraryController);
@@ -376,9 +359,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
         if ([object isKindOfClass:[IMBObject class]])
 		{
-#ifdef DEBUG
 //			NSLog(@"dealloc REMOVE [%p:%@'%@' removeObs…:%p 4kp:imageRep…", object,[object class],[object name], self);
-#endif
             [object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
             [object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
         }
