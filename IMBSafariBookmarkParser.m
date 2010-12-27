@@ -60,7 +60,6 @@
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "IMBNodeObject.h"
-#import "WebIconDatabase.h"
 #import <WebKit/WebKit.h>
 #import <Quartz/Quartz.h>
 
