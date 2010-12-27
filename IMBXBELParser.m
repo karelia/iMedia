@@ -49,7 +49,6 @@
 
 #import "IMBXBELParser.h"
 #import "IMBNode.h"
-#import "WebIconDatabase.h"
 #import "NSImage+iMedia.h"
 
 @implementation IMBXBELParser

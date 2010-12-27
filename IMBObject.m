@@ -63,7 +63,6 @@
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
-#import "WebIconDatabase.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
