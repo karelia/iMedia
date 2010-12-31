@@ -71,6 +71,7 @@
 #import "NSImage+iMedia.h"
 #import "NSString+iMedia.h"
 #import "IMBConfig.h"
+#import "IMBNodeObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -312,7 +313,27 @@
 								  [IMBFlickrNode flickrNodeForRecentPhotosForRoot:inFlickrNode parser:self],
 								  [IMBFlickrNode flickrNodeForInterestingPhotosForRoot:inFlickrNode parser:self], nil];
 		inFlickrNode.subNodes = [standardNodes arrayByAddingObjectsFromArray:[self instantiateCustomQueriesWithRoot:inFlickrNode]];
-		inFlickrNode.objects = [NSArray array];
+		
+		// Put the queries into the objects, so that selecting top-level node will show queries as smart folders
+		NSUInteger index = 0;
+		NSMutableArray *objects = [NSMutableArray array];
+		for (IMBFlickrNode *node in inFlickrNode.subNodes)
+		{
+			IMBNodeObject* object = [[IMBNodeObject alloc] init];
+			object.location = (id)node;
+			object.name = node.name;
+			object.metadata = nil;
+			object.parser = self;
+			object.index = index++;
+			object.imageLocation = nil;
+			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+			object.imageRepresentation = [NSImage imageNamed:NSImageNameFolderSmart];
+
+			[objects addObject:object];
+			[object release];
+		}
+		
+		inFlickrNode.objects = objects;
 	} else {
 		//	populate nodes with Flickr contents...
 		if ([inFlickrNode hasResponse]) {
