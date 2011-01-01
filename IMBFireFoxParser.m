@@ -59,6 +59,7 @@
 #import "IMBObject.h"
 #import "NSImage+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "IMBNodeObject.h"
 
 @interface IMBFireFoxParser ()
 + (NSString *)firefoxBookmarkPath;
@@ -325,6 +326,7 @@
 
 		int theID = [rs intForColumn:@"id"];
 		NSString *theName = [rs stringForColumn:@"title"];
+		NSUInteger index = 0;
 		if (theName && ![theName isEqualToString:@""])	// make sure we have a title; otherwise bogus
 		{
 			IMBNode* node = [[[IMBNode alloc] init] autorelease];
@@ -342,12 +344,28 @@
 			node.identifier = [self identifierForPath:[NSString stringWithFormat:@"/%d/%@",theID, theName]];
 			
 			[subNodes addObject:node];
+			
+			// Top level node?  Make sub-objects show up for these subnodes as well.
+			if ([parentIDNumber intValue] == 1)
+			{
+				IMBObject *object = [[[IMBNodeObject alloc] init] autorelease];
+				object.name = theName;
+				object.parser = self;
+				object.location = (id)node;
+				
+				object.index = index++;
+				object.imageLocation = nil;
+				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+				object.imageRepresentation = icon;
+				
+				[objects addObject:object];
+			}
 		}
 	}
 	inNode.subNodes = subNodes;
 
 	[rs close]; rs = nil;
-	
+		
 	// Now get the bookmarks (type 1)
 	while (self.database && !rs)	// keep trying until we get result set (or database is invalid)
 	{
