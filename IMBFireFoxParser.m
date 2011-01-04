@@ -342,7 +342,7 @@
 			node.parser = self;
 			// ??? node.mediaSource = self.mediaSource;
 			node.identifier = [self identifierForPath:[NSString stringWithFormat:@"/%d/%@",theID, theName]];
-			
+			NSLog(@"identifier = %@", node.identifier);
 			[subNodes addObject:node];
 			
 			// Top level node?  Make sub-objects show up for these subnodes as well.
