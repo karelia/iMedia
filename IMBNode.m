@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -185,8 +185,14 @@
 	
 	// Create a shallow copy of objects array...
 	
-	if (self.objects) copy.objects = [NSMutableArray arrayWithArray:self.objects];
-	else copy.objects = nil;
+	if (self.objects)
+    {
+        copy.objects = [NSMutableArray arrayWithArray:self.objects];
+    }
+	else
+    {
+        copy.objects = nil;
+    }
 	
 	// Create a deep copy of the subnodes. This is essential to make background operations completely threadsafe...
 	
