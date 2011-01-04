@@ -622,10 +622,10 @@
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
-	Class objectClass = [self objectClass];
-	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
-	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
+	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
 
+	Class objectClass = [self objectClass];
+    
 	// Look for the correct playlist in the iTunes XML plist. Once we find it, populate the node with IMBVisualObjects
 	// for each song in this playlist...
 	
@@ -706,6 +706,9 @@
 		
 		[pool1 drain];
 	}
+    
+    inNode.objects = objects;
+    [objects release];
 }
 
 
