@@ -187,12 +187,6 @@
 #pragma mark 
 #pragma mark NSTableViewDelegate
 
-#warning enable this when Dan figures out the Safari/Firefox IMBNodeObject problems.
- 
-- (IBAction) tableViewWasDoubleClicked:(id)inSender
-{
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
