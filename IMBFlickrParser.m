@@ -260,7 +260,6 @@
 	viewController.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.add",nil,IMBBundle(),@"Add",@"Button title in Flickr Options");
 
 	rootNode.customHeaderViewController = viewController;
-	rootNode.shouldDisplayObjectView = NO;
 	
 	return rootNode;
 }
@@ -327,7 +326,26 @@
 			object.index = index++;
 			object.imageLocation = nil;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [NSImage imageNamed:NSImageNameFolderSmart];
+			
+			static NSImage *sSmartFolderImage = nil;
+			if (!sSmartFolderImage)
+			{
+				// Get high-resolution version of smart folder icon directly from CoreTypes
+				NSBundle* coreTypes = [NSBundle	bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
+				if (coreTypes)
+				{
+					NSString* smartPath = [coreTypes pathForResource:@"SmartFolderIcon.icns" ofType:nil];
+					if (smartPath)
+					{
+						sSmartFolderImage = [[NSImage alloc] initWithContentsOfFile:smartPath];
+					}
+				}
+				if (!sSmartFolderImage)
+				{
+					sSmartFolderImage = [[NSImage imageNamed:NSImageNameFolderSmart] retain];		// fall-back low-resolution version :-(
+				}
+			}
+			object.imageRepresentation = sSmartFolderImage;
 
 			[objects addObject:object];
 			[object release];
