@@ -771,7 +771,7 @@ static NSArray* sSupportedUTIs = nil;
 	// Add object array, even if nothing is found in database, so that we do not cause endless loop...
 	
 	if (inNode.objects == nil) {
-		inNode.objects = [NSMutableArray array];
+		inNode.objects = [NSArray array];
 		inNode.displayedObjectCount = 0;
 	}
 	
@@ -832,7 +832,7 @@ static NSArray* sSupportedUTIs = nil;
 		[results close];
 		
 		[objects addObjectsFromArray:inNode.objects];
-		[(NSMutableArray*)inNode.objects setArray:objects];
+		inNode.objects = objects;
 	}
 }
 
