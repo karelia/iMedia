@@ -82,6 +82,18 @@
 @synthesize mediaSource = _mediaSource;
 @synthesize identifier = _identifier;
 @synthesize name = _name;
+
+- (void) setName:(NSString *)aName
+{
+	[_name release];
+	_name = [aName copy];
+	NSLog(@"setName: %@", aName);
+	if ([aName isEqualToString:@"Firefox"])
+	{
+		NSLog(@"set name to Firefox");
+	}
+}
+
 @synthesize icon = _icon;
 @synthesize groupType = _groupType;
 @synthesize displayPriority = _displayPriority;
@@ -153,7 +165,8 @@
 - (id) copyWithZone:(NSZone*)inZone
 {
 	IMBNode* copy = [[[self class] allocWithZone:inZone] init];
-	
+	NSLog(@"copy %@ %p -> %p", self.name, self, copy);
+
 	copy.mediaSource = self.mediaSource;
 	copy.identifier = self.identifier;
 	copy.name = self.name;
