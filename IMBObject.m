@@ -616,13 +616,13 @@
 	
 	NSMutableString* tooltip = [NSMutableString string];
 	
-	if (name)
+	if (name && ![name isEqualToString:@""])
 	{
 		if (tooltip.length > 0) [tooltip imb_appendNewline];
 		[tooltip appendFormat:@"%@",name];
 	}
 	
-	if (description)
+	if (description && ![description isEqualToString:@""])
 	{
 		if (tooltip.length > 0) [tooltip imb_appendNewline];
 		[tooltip appendFormat:@"%@",description];
