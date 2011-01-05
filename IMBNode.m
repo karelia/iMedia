@@ -426,9 +426,11 @@
 		identifier2 = inNode.identifier;
 	}
 	
-	return identifier1 != nil && 
-		   identifier2 != nil && 
-		   [identifier1 isEqualToString:identifier2];
+	BOOL result = identifier1 != nil && 
+		identifier2 != nil && 
+		[identifier1 isEqualToString:identifier2];
+	NSLog(@"%@, %@ isEqual? %d", identifier1, identifier2, result);
+	return result;
 }
 
 
@@ -590,16 +592,17 @@
 
 // Look in our node tree for a node with the specified identifier...
 
-- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier
+- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentifier
 {
-	if ([self.identifier isEqualToString:inIdentfier])
+	NSLog(@"subNodeWithIdentifier: %@", inIdentifier);
+	if ([self.identifier isEqualToString:inIdentifier])
 	{
 		return self;
 	}
 	
 	for (IMBNode* subnode in self.subNodes)
 	{
-		IMBNode* found = [subnode subNodeWithIdentifier:inIdentfier];
+		IMBNode* found = [subnode subNodeWithIdentifier:inIdentifier];
 		if (found) return found;
 	}
 

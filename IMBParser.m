@@ -182,13 +182,17 @@
 - (NSString*) identifierForPath:(NSString*)inPath
 {
 	NSString* parserClassName = NSStringFromClass([self class]);
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+	NSString *result = [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+	NSLog(@"-identifierForPath:%@ = %@", inPath, result);
+	return result;
 }
 
 + (NSString*) identifierForPath:(NSString*)inPath
 {
 	NSString* parserClassName = NSStringFromClass(self);
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+	NSString *result = [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+	NSLog(@"+identifierForPath:%@ = %@", inPath, result);
+	return result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

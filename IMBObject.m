@@ -63,6 +63,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "IMBSmartFolderNodeObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -558,6 +559,10 @@
 		if ([[[self location] description] hasPrefix:@"javascript:"])	// special icon for JavaScript bookmarklets
 		{
 			result = sJavaScriptIcon;
+		}
+		else if ([[[self location] description] hasPrefix:@"place:"])	// special icon for Firefox bookmarklets, so they match look
+		{
+			result = [IMBSmartFolderNodeObject icon];
 		}
 		else if ([self isLocalFile])
 		{
