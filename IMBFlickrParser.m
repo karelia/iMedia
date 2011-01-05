@@ -72,7 +72,7 @@
 #import "NSString+iMedia.h"
 #import "IMBConfig.h"
 #import "IMBNodeObject.h"
-
+#import "IMBSmartFolderNodeObject.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -318,7 +318,7 @@
 		NSMutableArray *objects = [NSMutableArray array];
 		for (IMBFlickrNode *node in inFlickrNode.subNodes)
 		{
-			IMBNodeObject* object = [[IMBNodeObject alloc] init];
+			IMBSmartFolderNodeObject* object = [[IMBSmartFolderNodeObject alloc] init];
 			object.location = (id)node;
 			object.name = node.name;
 			object.metadata = nil;
@@ -327,25 +327,7 @@
 			object.imageLocation = nil;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 			
-			static NSImage *sSmartFolderImage = nil;
-			if (!sSmartFolderImage)
-			{
-				// Get high-resolution version of smart folder icon directly from CoreTypes
-				NSBundle* coreTypes = [NSBundle	bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
-				if (coreTypes)
-				{
-					NSString* smartPath = [coreTypes pathForResource:@"SmartFolderIcon.icns" ofType:nil];
-					if (smartPath)
-					{
-						sSmartFolderImage = [[NSImage alloc] initWithContentsOfFile:smartPath];
-					}
-				}
-				if (!sSmartFolderImage)
-				{
-					sSmartFolderImage = [[NSImage imageNamed:NSImageNameFolderSmart] retain];		// fall-back low-resolution version :-(
-				}
-			}
-			object.imageRepresentation = sSmartFolderImage;
+			object.imageRepresentation = [IMBSmartFolderNodeObject icon];
 
 			[objects addObject:object];
 			[object release];
