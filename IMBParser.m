@@ -184,6 +184,10 @@
 	NSString* parserClassName = NSStringFromClass([self class]);
 	NSString *result = [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
 	NSLog(@"-identifierForPath:%@ = %@", inPath, result);
+	if ([inPath isEqualToString:@"IMBFireFoxParser://"])
+	{
+		NSLog(@"identifierForPath:IMBFireFoxParser://");
+	}
 	return result;
 }
 
@@ -192,6 +196,10 @@
 	NSString* parserClassName = NSStringFromClass(self);
 	NSString *result = [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
 	NSLog(@"+identifierForPath:%@ = %@", inPath, result);
+	if ([inPath isEqualToString:@"IMBFireFoxParser://"])
+	{
+		NSLog(@"identifierForPath:IMBFireFoxParser://");
+	}
 	return result;
 }
 

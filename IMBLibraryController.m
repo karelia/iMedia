@@ -524,6 +524,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (groupType == kIMBGroupTypeLibrary)
 	{
+		NSLog(@"kIMBGroupTypeLibrary %@", inNewNode);
 		groupNode.groupType = kIMBGroupTypeLibrary;
 		groupNode.identifier = @"group://LIBRARIES";
 		groupNode.name =  NSLocalizedStringWithDefaultValue(
@@ -1161,6 +1162,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 - (IMBNode*) _nodeWithIdentifier:(NSString*)inIdentifier inParentNode:(IMBNode*)inParentNode
 {
+	if ([inIdentifier isEqualToString:@"IMBFireFoxParser://"])
+	{
+		NSLog(@"_nodeWithIdentifier:IMBFireFoxParser://");
+	}
 	NSArray* nodes = inParentNode ? inParentNode.subNodes : self.rootNodes;
 	
 	for (IMBNode* node in nodes)

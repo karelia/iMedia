@@ -252,6 +252,7 @@
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
+	NSLog(@"IMBFirefoxParser nodeWithOldNode : %@", inOldNode);
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	if (nil == inOldNode)	// create the initial node
 	{

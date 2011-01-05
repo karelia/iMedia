@@ -257,11 +257,24 @@
     nodes = [nodes copy];
     [_subNodes release]; _subNodes = nodes;
     
+	if ([self.name isEqualToString:@"LIBRARIES"])
+	{
+		NSLog(@"setParentNode to %@", self);
+	}
     [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
 }
 
 @synthesize parentNode = _parentNode;
 
+- (void) setParentNode:(IMBNode*)aNode;
+{
+	NSLog(@"setParentNode: %@/%p ->  %@", [self name],self, [aNode name]);
+	if (!aNode)
+	{
+		NSLog(@"null");
+	}
+	_parentNode = aNode;
+}
 
 // Node accessors. Use these for bindings the NSTreeController...
 
@@ -507,6 +520,8 @@
 		
 		NSIndexPath* path = [NSIndexPath indexPathWithIndexes:indexes length:n];
 		free(indexes);
+		
+		NSLog(@"indexPath for %p '%@' = %@", self, self.name, path);
 		return path;
 	}
 	
@@ -564,7 +579,7 @@
 	}
 	
 	// Oops, we shouldn't be here...
-	
+	NSLog(@"Unable to find '%@' in the source list", self.name);
 	[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:NSNotFound]];
 }
 
@@ -595,6 +610,10 @@
 - (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentifier
 {
 	NSLog(@"subNodeWithIdentifier: %@", inIdentifier);
+	if ([inIdentifier isEqualToString:@"IMBFireFoxParser://"])
+	{
+		NSLog(@"subNodeWithIdentifier:IMBFireFoxParser://");
+	}
 	if ([self.identifier isEqualToString:inIdentifier])
 	{
 		return self;
