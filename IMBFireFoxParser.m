@@ -266,6 +266,7 @@
 		node.parser = self;
 		// ??? node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];
+		NSLog(@"nodeWithOldNode, identifier = %@", node.identifier);
 		node.attributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:1] forKey:@"id"];
 		
 		self.database = [FMDatabase databaseWithPath:self.databasePathCurrent];
@@ -280,6 +281,17 @@
 		}
 	
 		self.database = nil;	// close the database
+	}
+	else
+	{
+		node.mediaSource = self.mediaSource;
+		node.identifier = inOldNode.identifier;
+		node.name = inOldNode.name;
+		node.icon = inOldNode.icon;
+		node.parser = self;
+		node.leaf = inOldNode.leaf;
+		node.groupType = inOldNode.groupType;
+		node.attributes = [[inOldNode.attributes copy] autorelease];
 	}
 	
 	// Watch the root node. Whenever something in Lightroom changes, we have to replace the
@@ -342,11 +354,11 @@
 			node.parser = self;
 			// ??? node.mediaSource = self.mediaSource;
 			node.identifier = [self identifierForPath:[NSString stringWithFormat:@"/%d/%@",theID, theName]];
-			NSLog(@"identifier = %@", node.identifier);
+			NSLog(@"populateNode, identifier = %@", node.identifier);
 			[subNodes addObject:node];
 			
 			// Top level node?  Make sub-objects show up for these subnodes as well.
-			if ([parentIDNumber intValue] == 1)
+			// if ([parentIDNumber intValue] == 1)
 			{
 				IMBObject *object = [[[IMBNodeObject alloc] init] autorelease];
 				object.name = theName;
