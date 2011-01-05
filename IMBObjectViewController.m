@@ -1401,7 +1401,9 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) objectsPromise:(IMBObjectsPromise*)inObjectPromise didProgress:(double)inFraction;
 {
-    if (!self.progressWindowController)
+	IMBProgressWindowController *progressWindowController = [self progressWindowController];
+
+    if (!progressWindowController)
     {
         IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
         
@@ -1428,17 +1430,18 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
         [controller.cancelButton setEnabled:YES];
         [controller.window makeKeyAndOrderFront:nil];
         
-        self.progressWindowController = controller;
+        progressWindowController = self.progressWindowController = controller;
     }
     
-	[self.progressWindowController setProgress:inFraction];
-	[self.progressWindowController setMessage:@""];
-	[self.progressWindowController.cancelButton setEnabled:YES];
+	[progressWindowController setProgress:inFraction];
+	[progressWindowController setMessage:@""];
+	[progressWindowController.cancelButton setEnabled:YES];
 }
 
 
 - (void) objectsPromiseDidFinish:(IMBObjectsPromise*)inObjectPromise
 {
+	[[self.progressWindowController window] orderOut:nil];
 	self.progressWindowController = nil;
 }
 
