@@ -54,6 +54,8 @@
 		CE69E9E1114B05EA0016E5E0 /* firefox_tag.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */; };
 		CE6B664C124D440A00E44811 /* IMBDisableTitleToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */; };
 		CE6B664D124D440C00E44811 /* IMBDisableTitleToColorTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */; };
+		CEA8A04B12D3EC70008CD7CB /* IMBSmartFolderNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA8A04912D3EC70008CD7CB /* IMBSmartFolderNodeObject.h */; };
+		CEA8A04C12D3EC70008CD7CB /* IMBSmartFolderNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA8A04A12D3EC70008CD7CB /* IMBSmartFolderNodeObject.m */; };
 		CEAF1F25125A7DBF001C3EBB /* iMedia.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1F22125A7DBF001C3EBB /* iMedia.tiff */; };
 		CEAF1F26125A7DBF001C3EBB /* i.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1F23125A7DBF001C3EBB /* i.tiff */; };
 		CEAF1F27125A7DBF001C3EBB /* i2.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1F24125A7DBF001C3EBB /* i2.tiff */; };
@@ -432,6 +434,8 @@
 		CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_bookmarksToolbar.png; sourceTree = "<group>"; };
 		CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_unfiledBookmarks.png; sourceTree = "<group>"; };
 		CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_tag.png; sourceTree = "<group>"; };
+		CEA8A04912D3EC70008CD7CB /* IMBSmartFolderNodeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBSmartFolderNodeObject.h; sourceTree = "<group>"; };
+		CEA8A04A12D3EC70008CD7CB /* IMBSmartFolderNodeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBSmartFolderNodeObject.m; sourceTree = "<group>"; };
 		CEAF1F22125A7DBF001C3EBB /* iMedia.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = iMedia.tiff; sourceTree = "<group>"; };
 		CEAF1F23125A7DBF001C3EBB /* i.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = i.tiff; sourceTree = "<group>"; };
 		CEAF1F24125A7DBF001C3EBB /* i2.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = i2.tiff; sourceTree = "<group>"; };
@@ -1098,6 +1102,8 @@
 				D032CB79109A2F4A00D84782 /* IMBMovieObject.m */,
 				D010384A10714CB3007C88D7 /* IMBNodeObject.h */,
 				D010384B10714CB3007C88D7 /* IMBNodeObject.m */,
+				CEA8A04912D3EC70008CD7CB /* IMBSmartFolderNodeObject.h */,
+				CEA8A04A12D3EC70008CD7CB /* IMBSmartFolderNodeObject.m */,
 				D04FFEB9103BE81600104EB8 /* IMBObjectsPromise.h */,
 				D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */,
 				D0103889107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h */,
@@ -1430,6 +1436,7 @@
 				CE6B664D124D440C00E44811 /* IMBDisableTitleToColorTransformer.h in Headers */,
 				CEAF1F2F125A7DE4001C3EBB /* NSWindow_Flipr.h in Headers */,
 				CEAF1F3B125A80D4001C3EBB /* IMBHoverButton.h in Headers */,
+				CEA8A04B12D3EC70008CD7CB /* IMBSmartFolderNodeObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1769,6 +1776,7 @@
 				CE6B664C124D440A00E44811 /* IMBDisableTitleToColorTransformer.m in Sources */,
 				CEAF1F2E125A7DE4001C3EBB /* NSWindow_Flipr.m in Sources */,
 				CEAF1F3C125A80D4001C3EBB /* IMBHoverButton.m in Sources */,
+				CEA8A04C12D3EC70008CD7CB /* IMBSmartFolderNodeObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
