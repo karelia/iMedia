@@ -592,11 +592,6 @@
 
 - (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentifier
 {
-	NSLog(@"subNodeWithIdentifier: %@", inIdentifier);
-	if ([inIdentifier isEqualToString:@"IMBFireFoxParser://"])
-	{
-		NSLog(@"subNodeWithIdentifier:IMBFireFoxParser://");
-	}
 	if ([self.identifier isEqualToString:inIdentifier])
 	{
 		return self;
