@@ -1497,6 +1497,9 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
 			IMBNode* subnode = (IMBNode*)object.location;
+			NSString* identifier = subnode.identifier;
+			subnode = [self.libraryController nodeWithIdentifier:identifier];
+
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];
 		}
@@ -2056,6 +2059,9 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
 			IMBNode* subnode = (IMBNode*)object.location;
+			NSString* identifier = subnode.identifier;
+			subnode = [self.libraryController nodeWithIdentifier:identifier];
+			
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];
 		}

@@ -135,6 +135,7 @@
 
 #pragma mark 
 
+
 // The following two methods must be overridden by subclasses...
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
@@ -142,10 +143,12 @@
 	return nil;
 }
 
+
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	return NO;
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -158,15 +161,18 @@
 	return YES;
 }
 
+
 - (void) willUseParser
 {
 
 }
 
+
 - (void) didStopUsingParser
 {
 
 }
+
 
 - (void) watchedPathDidChange:(NSString*)inWatchedPath
 {
@@ -182,26 +188,17 @@
 - (NSString*) identifierForPath:(NSString*)inPath
 {
 	NSString* parserClassName = NSStringFromClass([self class]);
-	NSString *result = [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
-	NSLog(@"-identifierForPath:%@ = %@", inPath, result);
-	if ([inPath isEqualToString:@"IMBFireFoxParser://"])
-	{
-		NSLog(@"identifierForPath:IMBFireFoxParser://");
-	}
-	return result;
+	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
 }
+
 
 + (NSString*) identifierForPath:(NSString*)inPath
 {
 	NSString* parserClassName = NSStringFromClass(self);
-	NSString *result = [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
-	NSLog(@"+identifierForPath:%@ = %@", inPath, result);
-	if ([inPath isEqualToString:@"IMBFireFoxParser://"])
-	{
-		NSLog(@"identifierForPath:IMBFireFoxParser://");
-	}
-	return result;
+	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

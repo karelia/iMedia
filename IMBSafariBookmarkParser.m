@@ -506,10 +506,6 @@
 		object.name = title;
 		object.parser = self;
 		object.location = (id)subnode;
-		
-#warning THIS IS NOT RIGHT.  WHEN I DOUBLE-CLICK, IT DOESN'T JUST TUNNEL DOWN INTO THAT LEVEL. WHY?
-		// Note: Need to remove blocking implemention of tableViewWasDoubleClicked for link view controller.
-	
 	}
 	
 	return object;
