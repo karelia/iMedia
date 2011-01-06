@@ -59,7 +59,7 @@
 #import "IMBCommon.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBNodeObject.h"
+//#import "IMBNodeObject.h"
 #import "IMBFolderParser.h"
 #import "NSWorkspace+iMedia.h"
 

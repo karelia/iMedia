@@ -252,8 +252,8 @@
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
-	NSLog(@"IMBFirefoxParser nodeWithOldNode : %@", inOldNode);
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	
 	if (nil == inOldNode)	// create the initial node
 	{
 		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
@@ -267,7 +267,6 @@
 		node.parser = self;
 		// ??? node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];
-		NSLog(@"nodeWithOldNode, identifier = %@", node.identifier);
 		node.attributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:1] forKey:@"id"];
 		
 		self.database = [FMDatabase databaseWithPath:self.databasePathCurrent];
@@ -306,6 +305,8 @@
 	
 	return node;
 }
+
+
 // Just load all the bookmarks in the tree -- this is not going to be that memory-intensive.
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
@@ -355,7 +356,6 @@
 			node.parser = self;
 			// ??? node.mediaSource = self.mediaSource;
 			node.identifier = [self identifierForPath:[NSString stringWithFormat:@"/%d/%@",theID, theName]];
-			NSLog(@"populateNode, identifier = %@", node.identifier);
 			[subNodes addObject:node];
 			
 			// Top level node?  Make sub-objects show up for these subnodes as well.

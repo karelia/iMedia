@@ -82,23 +82,13 @@
 @synthesize mediaSource = _mediaSource;
 @synthesize identifier = _identifier;
 @synthesize name = _name;
-
-- (void) setName:(NSString *)aName
-{
-	[_name release];
-	_name = [aName copy];
-	NSLog(@"setName: %@", aName);
-	if ([aName isEqualToString:@"Firefox"])
-	{
-		NSLog(@"set name to Firefox");
-	}
-}
-
 @synthesize icon = _icon;
 @synthesize groupType = _groupType;
 @synthesize displayPriority = _displayPriority;
 @synthesize attributes = _attributes;
 @synthesize objects = _objects;
+@synthesize subNodes = _subNodes;
+@synthesize parentNode = _parentNode;
 
 // State information...
 
@@ -165,7 +155,6 @@
 - (id) copyWithZone:(NSZone*)inZone
 {
 	IMBNode* copy = [[[self class] allocWithZone:inZone] init];
-	NSLog(@"copy %@ %p -> %p", self.name, self, copy);
 
 	copy.mediaSource = self.mediaSource;
 	copy.identifier = self.identifier;
@@ -233,9 +222,7 @@
 
 - (void) dealloc
 {
-    // Sub-nodes have a weak reference to self, so break that
-    [self setSubNodes:nil];
-    IMBRelease(_subNodes);
+    [self setSubNodes:nil];		// Sub-nodes have a weak reference to self, so break that
 	
 	IMBRelease(_mediaSource);
 	IMBRelease(_identifier);
@@ -243,6 +230,7 @@
 	IMBRelease(_name);
 	IMBRelease(_attributes);
 	IMBRelease(_objects);
+	IMBRelease(_subNodes);
 	IMBRelease(_parser);
 	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
@@ -262,32 +250,17 @@
 
 // Accessors for navigating up or down the node tree...
 
-@synthesize subNodes = _subNodes;
-- (void)setSubNodes:(NSArray *)nodes;
+- (void) setSubNodes:(NSArray*)inNodes
 {
     [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
     
-    nodes = [nodes copy];
-    [_subNodes release]; _subNodes = nodes;
+	NSArray* nodes = [inNodes copy];
+    [_subNodes release]; 
+	_subNodes = nodes;
     
-	if ([self.name isEqualToString:@"LIBRARIES"])
-	{
-		NSLog(@"setParentNode to %@", self);
-	}
     [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
 }
 
-@synthesize parentNode = _parentNode;
-
-- (void) setParentNode:(IMBNode*)aNode;
-{
-	NSLog(@"setParentNode: %@/%p ->  %@", [self name],self, [aNode name]);
-	if (!aNode)
-	{
-		NSLog(@"null");
-	}
-	_parentNode = aNode;
-}
 
 // Node accessors. Use these for bindings the NSTreeController...
 
@@ -452,11 +425,9 @@
 		identifier2 = inNode.identifier;
 	}
 	
-	BOOL result = identifier1 != nil && 
+	return identifier1 != nil && 
 		identifier2 != nil && 
 		[identifier1 isEqualToString:identifier2];
-	NSLog(@"%@, %@ isEqual? %d", identifier1, identifier2, result);
-	return result;
 }
 
 
@@ -534,7 +505,6 @@
 		NSIndexPath* path = [NSIndexPath indexPathWithIndexes:indexes length:n];
 		free(indexes);
 		
-		NSLog(@"indexPath for %p '%@' = %@", self, self.name, path);
 		return path;
 	}
 	

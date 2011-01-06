@@ -524,7 +524,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	if (groupType == kIMBGroupTypeLibrary)
 	{
-		NSLog(@"kIMBGroupTypeLibrary %@", inNewNode);
 		groupNode.groupType = kIMBGroupTypeLibrary;
 		groupNode.identifier = @"group://LIBRARIES";
 		groupNode.name =  NSLocalizedStringWithDefaultValue(
@@ -596,7 +595,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
     [self _replaceNode:oldNode withNode:newNode];
 }
 
-- (void) _replaceNode:(IMBNode *)oldNode withNode:(IMBNode *)newNode;
+
+- (void) _replaceNode:(IMBNode *)oldNode withNode:(IMBNode *)newNode
 {
 	if (oldNode == nil && newNode == nil) return;
 
@@ -607,7 +607,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	// If we were given both old and new nodes, then the parentNode and identifiers must be the same. 
 	// If not log an error and throw an exception because this is a programmer error...
 	
-	if (oldNode != nil && newNode != nil && oldNode.parentNode != oldNode.parentNode)
+	if (oldNode != nil && newNode != nil && oldNode.parentNode != newNode.parentNode && newNode.parentNode != nil)
 	{
 		NSLog(@"%s Error: parent of oldNode and newNode must be the same...",__FUNCTION__);
 		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must be the same" userInfo:nil] raise];
@@ -1162,10 +1162,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 - (IMBNode*) _nodeWithIdentifier:(NSString*)inIdentifier inParentNode:(IMBNode*)inParentNode
 {
-	if ([inIdentifier isEqualToString:@"IMBFireFoxParser://"])
-	{
-		NSLog(@"_nodeWithIdentifier:IMBFireFoxParser://");
-	}
 	NSArray* nodes = inParentNode ? inParentNode.subNodes : self.rootNodes;
 	
 	for (IMBNode* node in nodes)
