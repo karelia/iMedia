@@ -108,6 +108,24 @@
 // Badge icons...
 
 @synthesize badgeTypeNormal = _badgeTypeNormal;
+
+- (void) setBadgeTypeNormal:(IMBBadgeType)badgeType;
+{
+	NSArray *strings = [NSArray arrayWithObjects:
+						@"kIMBBadgeTypeNone",
+						@"kIMBBadgeTypeLoading",
+						@"kIMBBadgeTypeReload",
+						@"kIMBBadgeTypeStop",
+						@"kIMBBadgeTypeEject",
+						@"kIMBBadgeTypeOffline", nil];
+	
+	if ([self.identifier isEqualToString:@"IMBFlickrParser://flickr.photos.getRecent/recent/30"])
+	{
+		NSLog(@"%p %@ setBadgeTypeNormal:%@", self, self.identifier, [strings objectAtIndex:badgeType]);
+	}
+	_badgeTypeNormal = badgeType;
+}
+
 @synthesize badgeTypeMouseover = _badgeTypeMouseover;
 @synthesize badgeTarget = _badgeTarget;
 @synthesize badgeSelector = _badgeSelector;
