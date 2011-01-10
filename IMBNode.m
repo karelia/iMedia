@@ -189,7 +189,7 @@
 	copy.includedInPopup = self.includedInPopup;
 	copy.displayedObjectCount = self.displayedObjectCount;
 	
-//	copy.parentNode = self.parentNode;
+	copy.parentNode = self.parentNode;
 	copy.parser = self.parser;
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
