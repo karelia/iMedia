@@ -247,7 +247,7 @@
 	
 	// If we have more than one library then append the library name to the root node...
 	
-	if (node.isRootNode && self.shouldDisplayLibraryName)
+	if (node.isTopLevelNode && self.shouldDisplayLibraryName)
 	{
 		NSString* path = (NSString*)node.mediaSource;
 		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
@@ -257,7 +257,7 @@
 	// Watch the XML file. Whenever something in iPhoto changes, we have to replace the WHOLE tree from  
 	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
 	
-	if (node.isRootNode)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
@@ -299,7 +299,7 @@
 	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,
 	// which is implemented here, to achieve the desired "feel" in the browser...
 	
-	if (inNode.isRootNode)
+	if (inNode.isTopLevelNode)
 	{
 		IMBNode* musicNode = [inNode.subNodes objectAtIndex:0];
 		[self populateNode:musicNode options:inOptions error:outError];

@@ -359,7 +359,7 @@ static NSArray* sSupportedUTIs = nil;
 		node.attributes = [[inOldNode.attributes copy] autorelease];
 	}
 	
-	if (node.isRootNode && self.shouldDisplayLibraryName)
+	if (node.isTopLevelNode && self.shouldDisplayLibraryName)
 	{
 		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,[self libraryName]];
 	}
@@ -400,7 +400,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	// Create subnodes for the root node as needed...
 	
-	if ([inNode isRootNode])
+	if ([inNode isTopLevelNode])
 	{
 		[self populateSubnodesForRootNode:inNode];
 	}

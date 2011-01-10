@@ -1083,7 +1083,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (BOOL) canRemoveNode
 {
 	IMBNode* node = [self selectedNode];
-	return node.isRootNode && node.parser.isCustom && !node.isLoading;
+	return node.isTopLevelNode && node.parser.isCustom && !node.isLoading;
 }
 
 

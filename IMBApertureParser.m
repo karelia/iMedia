@@ -278,7 +278,7 @@
 	
 	// If we have more than one library then append the library name to the root node...
 	
-	if (node.isRootNode && self.shouldDisplayLibraryName)
+	if (node.isTopLevelNode && self.shouldDisplayLibraryName)
 	{
 		NSString* path = (NSString*)node.mediaSource;
 		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
@@ -288,7 +288,7 @@
 	// Watch the XML file. Whenever something in Aperture changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding WHAT has changed inside the library...
 	
-	if (node.isRootNode)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
