@@ -130,7 +130,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 // Node accessors (must only be called on the main thread)...
 
 @property (retain) NSMutableArray* rootNodes;			
-- (IMBNode*) rootNodeForParser:(IMBParser*)inParser;
+- (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser;
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 
 // Loading...

@@ -120,7 +120,7 @@
 
 @property (copy) NSArray* subNodes;				
 @property (assign, readonly) IMBNode* parentNode;
-@property (readonly) IMBNode* rootNode;
+@property (readonly) IMBNode* topLevelNode;
 
 // Object accessors. If the objects property is nil, that doesn't mean that there are no objects - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
@@ -181,7 +181,7 @@
 
 - (NSIndexPath*) indexPath;
 - (NSComparisonResult) compare:(IMBNode*)inNode;
-- (BOOL) isRootNode;
+- (BOOL) isTopLevelNode;
 - (BOOL) isPopulated;
 - (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier;
 

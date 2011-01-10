@@ -109,22 +109,22 @@
 
 @synthesize badgeTypeNormal = _badgeTypeNormal;
 
-- (void) setBadgeTypeNormal:(IMBBadgeType)badgeType;
-{
-	NSArray *strings = [NSArray arrayWithObjects:
-						@"kIMBBadgeTypeNone",
-						@"kIMBBadgeTypeLoading",
-						@"kIMBBadgeTypeReload",
-						@"kIMBBadgeTypeStop",
-						@"kIMBBadgeTypeEject",
-						@"kIMBBadgeTypeOffline", nil];
-	
-	if ([self.identifier isEqualToString:@"IMBFlickrParser://flickr.photos.getRecent/recent/30"])
-	{
-		NSLog(@"%p %@ setBadgeTypeNormal:%@", self, self.identifier, [strings objectAtIndex:badgeType]);
-	}
-	_badgeTypeNormal = badgeType;
-}
+//- (void) setBadgeTypeNormal:(IMBBadgeType)badgeType;
+//{
+//	NSArray *strings = [NSArray arrayWithObjects:
+//						@"kIMBBadgeTypeNone",
+//						@"kIMBBadgeTypeLoading",
+//						@"kIMBBadgeTypeReload",
+//						@"kIMBBadgeTypeStop",
+//						@"kIMBBadgeTypeEject",
+//						@"kIMBBadgeTypeOffline", nil];
+//	
+//	if ([self.identifier isEqualToString:@"IMBFlickrParser://flickr.photos.getRecent/recent/30"])
+//	{
+//		NSLog(@"%p %@ setBadgeTypeNormal:%@", self, self.identifier, [strings objectAtIndex:badgeType]);
+//	}
+//	_badgeTypeNormal = badgeType;
+//}
 
 @synthesize badgeTypeMouseover = _badgeTypeMouseover;
 @synthesize badgeTarget = _badgeTarget;
@@ -189,6 +189,7 @@
 	copy.includedInPopup = self.includedInPopup;
 	copy.displayedObjectCount = self.displayedObjectCount;
 	
+//	copy.parentNode = self.parentNode;
 	copy.parser = self.parser;
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -282,11 +283,14 @@
 
 // Node accessors. Use these for bindings the NSTreeController...
 
-- (IMBNode*) rootNode
+- (IMBNode*) topLevelNode
 {
 	if (_parentNode)
 	{
-		return [_parentNode rootNode];
+		if (!_parentNode.isGroup)
+		{
+			return [_parentNode topLevelNode];
+		}
 	}
 		
 	return self;
@@ -591,7 +595,7 @@
 // A node is considered a root node if it really is a root node (nil parent) or if it is indented by one under 
 // a group node...
 
-- (BOOL) isRootNode
+- (BOOL) isTopLevelNode
 {
 	return self.parentNode == nil || self.parentNode.isGroup;
 }

@@ -393,7 +393,7 @@
 - (void) invalidateThumbnails
 {
 	IMBLibraryController* controller = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
-	IMBNode* rootNode = [controller rootNodeForParser:self];
+	IMBNode* rootNode = [controller topLevelNodeForParser:self];
 	[self invalidateThumbnailsForNode:rootNode];
 }
 

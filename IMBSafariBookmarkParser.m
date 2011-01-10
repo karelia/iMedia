@@ -234,7 +234,7 @@
 	// Watch the XML file. Whenever something in Safari changes, we have to replace the WHOLE tree   
 	// from the root node down, as we have no way of finding WHAT has changed in Safari...
 	
-	if (node.isRootNode)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
@@ -268,7 +268,7 @@
 {
 	NSError* error = nil;
 	
-	if (inNode.isRootNode)
+	if (inNode.isTopLevelNode)
 	{
 		NSDictionary* plist = [self plist];
 		[self populateNode:inNode plist:plist];
@@ -386,7 +386,7 @@
 		
 		if (subnode)
 		{
-			if ([inNode isRootNode])
+			if ([inNode isTopLevelNode])
 			{
 				NSImage *newImage = nil;
 				if ([subnode.name isEqualToString:@"BookmarksMenu"])

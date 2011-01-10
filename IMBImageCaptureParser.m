@@ -695,7 +695,7 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
 		// find it in the node tree
 		IMBLibraryController *libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
 		
-		IMBNode *rootNode = [libController rootNodeForParser:self];
+		IMBNode *rootNode = [libController topLevelNodeForParser:self];
 		[libController reloadNode:rootNode parser:self];
 	}
  

@@ -136,7 +136,7 @@
 	newNode.parser = self;
 	newNode.leaf = NO;
 	
-	if (newNode.isRootNode)
+	if (newNode.isTopLevelNode)
 	{
 		newNode.groupType = kIMBGroupTypeFolder;
 		newNode.includedInPopup = YES;
@@ -149,7 +149,7 @@
 	
 	// Enable FSEvents based file watching for root nodes...
 	
-	if (newNode.isRootNode)
+	if (newNode.isTopLevelNode)
 	{
 		newNode.watcherType = kIMBWatcherTypeFSEvent;
 		newNode.watchedPath = path;

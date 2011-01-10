@@ -745,6 +745,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
         {
             [self setRootNodes:rootNodes];
         }
+		
+		// Since setSubNodes: is a copy setter we need to get a pointer to the new instance before turning
+		// off the loading state...
+		
+		IMBNode* node = [self nodeWithIdentifier:newNode.identifier];
+		node.loading = NO;
+		node.badgeTypeNormal = kIMBBadgeTypeNone;
 	}
 	
 	// We are now done...
@@ -1112,7 +1119,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (BOOL) removeCustomRootNode:(IMBNode*)inNode
 {
-	if (inNode.isRootNode && inNode.parser.isCustom && !inNode.isLoading)
+	if (inNode.isTopLevelNode && inNode.parser.isCustom && !inNode.isLoading)
 	{
 		[[IMBParserController sharedParserController] removeCustomParser:inNode.parser];
 		[self reload];
@@ -1131,7 +1138,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Returns the root node for the specified parser...
 
-- (IMBNode*) rootNodeForParser:(IMBParser*)inParser
+- (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser
 {
 	for (IMBNode* node in self.rootNodes)
 	{

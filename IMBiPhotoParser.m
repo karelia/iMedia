@@ -267,7 +267,7 @@
 	
 	// If we have more than one library then append the library name to the root node...
 	
-	if (node.isRootNode && self.shouldDisplayLibraryName)
+	if (node.isTopLevelNode && self.shouldDisplayLibraryName)
 	{
 		NSString* path = (NSString*)node.mediaSource;
 		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
@@ -277,7 +277,7 @@
 	// Watch the XML file. Whenever something in iPhoto changes, we have to replace the WHOLE tree from  
 	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
 	
-	if (node.isRootNode)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
@@ -660,7 +660,7 @@
 	
 	IMBNode* eventsNode= nil;
 	
-	if (inNode.isRootNode && [inNode.subNodes count]>0) {
+	if (inNode.isTopLevelNode && [inNode.subNodes count]>0) {
 		
 		NSNumber* eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
 		NSString* eventsIdWithAlbumId = [self identifierWithAlbumId:eventsId];
