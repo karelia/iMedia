@@ -239,6 +239,7 @@
 	rootNode.icon = icon;
 	rootNode.parser = self;
 	rootNode.leaf = NO;
+	rootNode.isTopLevelNode = YES;
 	rootNode.groupType = kIMBGroupTypeInternet;
 	
 	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 

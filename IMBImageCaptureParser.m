@@ -435,6 +435,7 @@
 	newNode.name = showsGroupNodes ? [name uppercaseString] : name;
 	newNode.parser = self;
 	newNode.leaf = NO;
+	newNode.isTopLevelNode = YES;
 	
 	if( !showsGroupNodes ) 
 		newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:@"/Applications/Image Capture.app"];

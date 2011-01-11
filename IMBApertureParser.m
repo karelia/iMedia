@@ -249,6 +249,7 @@
 			node.groupType = kIMBGroupTypeLibrary;
 			node.parser = self;
 			node.leaf = YES;
+			node.isTopLevelNode = YES;
 			node.shouldDisplayObjectView = NO;
 			node.customHeaderViewController = [IMBApertureHeaderViewController headerViewControllerWithNode:node];
 		}
@@ -260,6 +261,7 @@
 			node.groupType = kIMBGroupTypeLibrary;
 			node.parser = self;
 			node.leaf = NO;			
+			node.isTopLevelNode = YES;
 		}
 	}
 	

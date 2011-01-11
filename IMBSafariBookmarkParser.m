@@ -214,6 +214,7 @@
 		node.icon = icon;
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
+		node.isTopLevelNode = YES;
 		node.parser = self;
 		node.objects = [NSMutableArray array];	// Note that we don't set subnodes, which means node not populated yet.
 	}

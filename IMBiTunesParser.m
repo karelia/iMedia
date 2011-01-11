@@ -230,6 +230,7 @@
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
 		node.parser = self;
+		node.isTopLevelNode = YES;
 	}
 	
 	// Or an subnode...
