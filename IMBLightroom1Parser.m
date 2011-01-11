@@ -147,7 +147,7 @@
 	NSString* query =	@" SELECT id_local, pathFromRoot"
 						@" FROM AgLibraryFolder"
 						@" WHERE rootFolder = ?"
-						@" AND (pathFromRoot IS NULL OR pathFromRoot = '' OR (pathFromRoot LIKE ? AND NOT (pathFromRoot LIKE ?)))"
+						@" AND (pathFromRoot LIKE ? AND NOT (pathFromRoot LIKE ?))"
 						@" ORDER BY pathFromRoot, robustRepresentation ASC";
 	
 	
@@ -198,7 +198,11 @@
 						@" 		 WHERE altiCaption.tagKind = 'AgCaptionTagKind'"
 						@"		)"
 						@"		ON ai.id_local = captionImage"
-						@" WHERE alf.folder = ?"
+						@" WHERE alf.folder in ( "
+						@"		SELECT id_local"
+						@"		FROM AgLibraryFolder"
+						@"		WHERE id_local = ? OR (rootFolder = ? AND (pathFromRoot IS NULL OR pathFromRoot = ''))"
+						@" )"
 						@" ORDER BY ai.captureTime ASC";
 	
 	return query;

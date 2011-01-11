@@ -511,7 +511,7 @@ static NSArray* sSupportedUTIs = nil;
 			node.mediaSource = self.mediaSource;
 			node.identifier = [self identifierWithFolderId:id_local];
 			node.attributes = [self attributesWithRootFolder:id_local
-													 idLocal:nil
+													 idLocal:id_local
 													rootPath:path
 												pathFromRoot:nil];
 			node.leaf = NO;
@@ -599,36 +599,31 @@ static NSArray* sSupportedUTIs = nil;
 				node.name = [pathFromRoot lastPathComponent];
 				node.leaf = NO;
 
-			node.identifier = [self identifierWithFolderId:id_local];
+				node.identifier = [self identifierWithFolderId:id_local];
 				
 				[subNodes addObject:node];
-			}
-			else {
-				node = inParentNode;
-			}
 			
+				NSDictionary* attributes = [self attributesWithRootFolder:parentRootFolder
+																  idLocal:id_local
+																 rootPath:parentRootPath
+															 pathFromRoot:pathFromRoot];
+				node.attributes = attributes;
+				
+				NSString* path = [self absolutePathFromAttributes:attributes];
+				
+				IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+				object.location = (id)node;
+				object.name = node.name;
+				object.metadata = nil;
+				object.parser = self;
+				object.index = index++;
+				object.imageLocation = (id)self.mediaSource;
+				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+				object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 
-			NSDictionary* attributes = [self attributesWithRootFolder:parentRootFolder
-															  idLocal:id_local
-															 rootPath:parentRootPath
-														 pathFromRoot:pathFromRoot];
-			node.attributes = attributes;
-			
-			NSString* path = [self absolutePathFromAttributes:attributes];
-			
-			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-			object.location = (id)node;
-			object.name = node.name;
-			object.metadata = nil;
-			object.parser = self;
-			object.index = index++;
-			object.imageLocation = (id)self.mediaSource;
-			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
-
-			[objects addObject:object];
+				[objects addObject:object];
+			}
 		}
-		
 		[results close];
 	}
 	
@@ -781,7 +776,7 @@ static NSArray* sSupportedUTIs = nil;
 		NSDictionary* attributes = inNode.attributes;
 		NSString* folderPath = [self absolutePathFromAttributes:attributes];
 		NSNumber* folderId = [self idLocalFromAttributes:attributes];
-		FMResultSet* results = [database executeQuery:query, folderId];
+		FMResultSet* results = [database executeQuery:query, folderId, folderId];
 		NSUInteger index = 0;
 		
 		while ([results next]) {
