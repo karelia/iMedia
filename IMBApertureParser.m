@@ -240,28 +240,24 @@
 		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
+		
+		node.mediaSource = self.mediaSource;
+		node.identifier = [self rootNodeIdentifier];
+		node.name = @"Aperture";
+		node.icon = icon;
+		node.parser = self;
+		node.isTopLevelNode = YES;
+		node.groupType = kIMBGroupTypeLibrary;
 
-		if (self.placeholderParser) {
-			node.mediaSource = self.mediaSource;
-			node.identifier = [self rootNodeIdentifier];
-			node.name = @"Aperture";
-			node.icon = icon;
-			node.groupType = kIMBGroupTypeLibrary;
-			node.parser = self;
+		if (self.placeholderParser)
+		{
 			node.leaf = YES;
-			node.isTopLevelNode = YES;
 			node.shouldDisplayObjectView = NO;
 			node.customHeaderViewController = [IMBApertureHeaderViewController headerViewControllerWithNode:node];
 		}
-		else {
-			node.mediaSource = self.mediaSource;
-			node.identifier = [self rootNodeIdentifier];
-			node.name = @"Aperture";
-			node.icon = icon;
-			node.groupType = kIMBGroupTypeLibrary;
-			node.parser = self;
+		else
+		{
 			node.leaf = NO;			
-			node.isTopLevelNode = YES;
 		}
 	}
 	
