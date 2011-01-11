@@ -108,8 +108,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	IMBLibraryController* _libraryController;
 	IMBParser* _parser;
 	IMBOptions _options;
-	IMBNode* _oldNode;						
-	IMBNode* _newNode;						
+	IMBNode* _oldNode;		
+	IMBNode* _newNode;
+	NSString* _parentNodeIdentifier;
 }
 
 @property (retain) IMBLibraryController* libraryController;
@@ -117,11 +118,14 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @property (assign) IMBOptions options;
 @property (retain) IMBNode* oldNode;	
 @property (copy) IMBNode* newNode;		// Copied so that background operation can modify the node
+@property (copy) NSString* parentNodeIdentifier;		
 
 @end
+
 
 @interface IMBCreateNodeOperation : IMBLibraryOperation
 @end
+
 
 @interface IMBPopulateNodeOperation : IMBLibraryOperation
 @end
@@ -135,7 +139,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @interface IMBLibraryController ()
 - (void) _didCreateNode:(IMBNode*)inNode;
 - (void) _didPopulateNode:(IMBNode*)inNode;
-- (void) _replaceNode:(IMBNode *)oldNode withNode:(IMBNode *)newNode;
+- (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
 - (void) _presentError:(NSError*)inError;
 - (void) _coalescedUKKQueueCallback;
 - (void) _coalescedFSEventsCallback;
@@ -165,6 +169,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @synthesize options = _options;
 @synthesize oldNode = _oldNode;
 @synthesize newNode = _newNode;
+@synthesize parentNodeIdentifier = _parentNodeIdentifier;
 
 
 // General purpose method to send back results to controller in the main thread...
@@ -181,19 +186,22 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Specialized method that bundles old and new node, as well as potential error...
 
-- (void) doReplacement;
+- (void) doReplacement
 {
     if ([NSThread isMainThread])
     {
-        [self.libraryController _replaceNode:self.oldNode withNode:self.newNode];
+        [self.libraryController 
+			_replaceNode:self.oldNode 
+			withNode:self.newNode 
+			parentNodeIdentifier:self.parentNodeIdentifier];
     }
     else
     {
-        [self 
-         performSelectorOnMainThread:_cmd
-         withObject:nil 
-         waitUntilDone:NO 
-         modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[self 
+			performSelectorOnMainThread:_cmd
+			withObject:nil 
+			waitUntilDone:NO 
+			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
     }
 }
 
@@ -206,6 +214,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	IMBRelease(_parser);
 	IMBRelease(_oldNode);
 	IMBRelease(_newNode);
+	IMBRelease(_parentNodeIdentifier);
+	
 	[super dealloc];
 }
 
@@ -442,6 +452,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			operation.parser = parser;
 			operation.options = self.options;
 			operation.oldNode = nil;
+			operation.parentNodeIdentifier = nil;
 			
 			[[IMBOperationQueue sharedQueue] addOperation:operation];
 			[operation release];
@@ -490,6 +501,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		operation.parser = inParser;
 		operation.options = self.options;
 		operation.oldNode = inNode;
+		operation.parentNodeIdentifier = inNode.parentNode.identifier;
 		
 		[[IMBOperationQueue sharedQueue] addOperation:operation];
 		[operation release];
@@ -569,11 +581,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[rootNodes addObject:groupNode];
 	[rootNodes sortUsingSelector:@selector(compare:)];
 	self.rootNodes = rootNodes;
-	
-//	[self willChangeValueForKey:@"rootNodes"];
-//	[_rootNodes addObject:groupNode];
-//	[_rootNodes sortUsingSelector:@selector(compare:)];
-//	[self didChangeValueForKey:@"rootNodes"];
 
 	return groupNode;
 }
@@ -591,29 +598,26 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	IMBNode* oldNode = [inOldAndNewNode objectForKey:@"oldNode"];
 	IMBNode* newNode = [inOldAndNewNode objectForKey:@"newNode"];
-    
-    [self _replaceNode:oldNode withNode:newNode];
+    NSString* parentNodeIdentifier = [inOldAndNewNode objectForKey:@"parentNodeIdentifier"];
+	
+    [self _replaceNode:oldNode withNode:newNode parentNodeIdentifier:parentNodeIdentifier];
 }
 
 
-- (void) _replaceNode:(IMBNode *)oldNode withNode:(IMBNode *)newNode
+- (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier
 {
-	if (oldNode == nil && newNode == nil) return;
+	if (inOldNode == nil && inNewNode == nil) return;
 
-	IMBNode* parentNode = nil;
-	NSMutableArray* nodes = nil;
-	BOOL shouldSortNodes = NO;
-		
 	// If we were given both old and new nodes, then the parentNode and identifiers must be the same. 
 	// If not log an error and throw an exception because this is a programmer error...
 	
-	if (oldNode != nil && newNode != nil && oldNode.parentNode != newNode.parentNode && newNode.parentNode != nil)
-	{
-		NSLog(@"%s Error: parent of oldNode and newNode must be the same...",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must be the same" userInfo:nil] raise];
-	}
+//	if (oldNode != nil && newNode != nil && oldNode.parentNode != newNode.parentNode && newNode.parentNode != nil)
+//	{
+//		NSLog(@"%s Error: parent of oldNode and newNode must be the same...",__FUNCTION__);
+//		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must be the same" userInfo:nil] raise];
+//	}
 	
-	if (oldNode != nil && newNode != nil && ! [oldNode.identifier isEqual:newNode.identifier])
+	if (inOldNode != nil && inNewNode != nil && ! [inOldNode.identifier isEqual:inNewNode.identifier])
 	{
 		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
 		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must have same identifiers" userInfo:nil] raise];
@@ -622,10 +626,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	// Workaround for special behavior of IMBImageCaptureParser, which replaces root nodes several times  
 	// as devices get hotplugged. We should probably remove this once IMBImageCaptureParser gets rewritten...
 	
-	if (oldNode == nil && newNode != nil)	 
+	if (inOldNode == nil && inNewNode != nil)	 
 	{										
-		IMBNode* node = [self nodeWithIdentifier:newNode.identifier];
-		if (node) oldNode = node;
+		IMBNode* node = [self nodeWithIdentifier:inNewNode.identifier];
+		if (node) inOldNode = node;
 	}
 
 	// Tell IMBUserInterfaceController that we are going to modify the data model...
@@ -643,70 +647,55 @@ static NSMutableDictionary* sLibraryControllers = nil;
         // We also have to distinguish between root of the tree and somewhere in the middle of the tree. Things 
         // are further complicated by the "group nodes" which are created dynamically in this method...
         
-        if (oldNode)
-        {
-            parentNode = oldNode.parentNode;
-            
-            if (parentNode)
-            {
-                nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
-                shouldSortNodes = parentNode.isGroup;
-            }
-            else
-            {
-                parentNode = [self _groupNodeForNewNode:oldNode];
-                nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
-                shouldSortNodes = YES;
-            }
-        }
-        else if (newNode)
-        {
-            parentNode = newNode.parentNode;
-
-            if (parentNode)
-            {
-                nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
-                shouldSortNodes = parentNode.isGroup;
-            }
-            else
-            {
-                parentNode = [self _groupNodeForNewNode:newNode];
-                nodes = [NSMutableArray arrayWithArray:parentNode.subNodes];
-                shouldSortNodes = YES;
-            }
-        }
-
+		IMBNode* parentNode = [self nodeWithIdentifier:inParentNodeIdentifier];
+		BOOL shouldSortNodes = parentNode.isGroup;
+		
+		if (parentNode == nil)
+		{
+			if ([IMBConfig showsGroupNodes])
+			{
+				if (inOldNode) parentNode = [self _groupNodeForNewNode:inOldNode];
+				else if (inNewNode) parentNode = [self _groupNodeForNewNode:inNewNode];
+			}
+			
+			shouldSortNodes = YES;
+		}
+		
+		NSMutableArray* nodes = parentNode!=nil ?
+			[NSMutableArray arrayWithArray:parentNode.subNodes] :
+			[NSMutableArray arrayWithArray:self.rootNodes];
+			
         // Remove the old node from the correct place (but remember its index). Also unregister from file watching...
         
         NSUInteger index = NSNotFound;
         NSString* watchedPath = nil;
         
-        if (oldNode)
+        if (inOldNode)
         {
-            if (watchedPath = oldNode.watchedPath)
+            if (watchedPath = inOldNode.watchedPath)
             {
-                if (oldNode.watcherType == kIMBWatcherTypeKQueue)
+                if (inOldNode.watcherType == kIMBWatcherTypeKQueue)
                     [self.watcherUKKQueue removePath:watchedPath];
-                else if (oldNode.watcherType == kIMBWatcherTypeFSEvent)
+                else if (inOldNode.watcherType == kIMBWatcherTypeFSEvent)
                     [self.watcherFSEvents removePath:watchedPath];
             }
                 
-            index = [nodes indexOfObjectIdenticalTo:oldNode];
-            [nodes removeObjectIdenticalTo:oldNode];
+            index = [nodes indexOfObjectIdenticalTo:inOldNode];
+            [nodes removeObjectIdenticalTo:inOldNode];
         }
         
         // Insert the new node at the same index. Optionally register the node for file watching...
             
-        if (newNode)
+        if (inNewNode)
         {
             if (index == NSNotFound) index = nodes.count;
-            [nodes insertObject:newNode atIndex:index];
+            [nodes insertObject:inNewNode atIndex:index];
             
-            if (watchedPath = newNode.watchedPath)
+            if (watchedPath = inNewNode.watchedPath)
             {
-                if (newNode.watcherType == kIMBWatcherTypeKQueue)
+                if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
                     [self.watcherUKKQueue addPath:watchedPath];
-                else if (newNode.watcherType == kIMBWatcherTypeFSEvent)
+                else if (inNewNode.watcherType == kIMBWatcherTypeFSEvent)
                     [self.watcherFSEvents addPath:watchedPath];
             }
         }
@@ -720,9 +709,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
         
         // Do an "atomic" replace of the changed nodes array, thus only causing a single KVO notification...
 
-        [parentNode setSubNodes:nodes];
-
-        // Hide empty group nodes that do not have any subnodes We not using fast enumeration here because
+		if (parentNode) [parentNode setSubNodes:nodes];
+		else [self setRootNodes:nodes];
+			
+        // Hide empty group nodes that do not have any subnodes We are not using fast enumeration here because
         // we may need to mutate the array. Iteration backwards avoids index adjustment problems as we 
         // remove nodes...
         
@@ -749,7 +739,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		// Since setSubNodes: is a copy setter we need to get a pointer to the new instance before turning
 		// off the loading state...
 		
-		IMBNode* node = [self nodeWithIdentifier:newNode.identifier];
+		IMBNode* node = [self nodeWithIdentifier:inNewNode.identifier];
 		node.loading = NO;
 		node.badgeTypeNormal = kIMBBadgeTypeNone;
 	}
@@ -828,6 +818,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		operation.options = self.options;
 		operation.oldNode = inNode;
 		operation.newNode = inNode;		// This will automatically create a copy!
+		operation.parentNodeIdentifier = inNode.parentNode.identifier;
 		
 		[[IMBOperationQueue sharedQueue] addOperation:operation];
 		[operation release];
