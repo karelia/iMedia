@@ -273,7 +273,7 @@
 	NSString* query =	@" SELECT id_local, pathFromRoot"
 						@" FROM AgLibraryFolder"
 						@" WHERE rootFolder = ?"
-						@" AND (pathFromRoot IS NULL OR pathFromRoot = '' OR (pathFromRoot LIKE ? AND NOT (pathFromRoot LIKE ?)))"
+						@" AND (pathFromRoot LIKE ? AND NOT (pathFromRoot LIKE ?))"
 						@" ORDER BY pathFromRoot ASC";
 	
 	
@@ -309,7 +309,11 @@
 						@" FROM AgLibraryFile alf"
 						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
 						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
-						@" WHERE alf.folder = ?"
+						@" WHERE alf.folder in ( "
+						@"		SELECT id_local"
+						@"		FROM AgLibraryFolder"
+						@"		WHERE id_local = ? OR (rootFolder = ? AND (pathFromRoot IS NULL OR pathFromRoot = ''))"
+						@" )"
 						@" AND ai.fileFormat <> 'VIDEO'"
 						@" ORDER BY ai.captureTime ASC";
 	
