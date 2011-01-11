@@ -209,6 +209,7 @@
 	newNode.leaf = inOldNode.leaf;
 	newNode.group = inOldNode.group;
 	newNode.groupType = kIMBGroupTypeNone;
+	newNode.isTopLevelNode = inOldNode.isTopLevelNode;
 	
 	// Enable ICA Event watching for all nodes...
 	newNode.watcherType = kIMBWatcherTypeFirstCustom;
