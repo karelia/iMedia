@@ -114,39 +114,45 @@
 	return parserInstances;
 }
 
-
 + (NSString *)firefoxBookmarkPath;
 {
 	NSString *result = nil;
-	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-	NSString *path = [libraryPaths objectAtIndex:0];
+	NSArray *libraryPaths1 = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
+	NSArray *libraryPaths2 = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
 	
+	NSMutableArray *libraryPaths = [NSMutableArray arrayWithArray:libraryPaths1];
+	[libraryPaths addObjectsFromArray:libraryPaths2];
+
 	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
-	
-	NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
-	NSString *profilesPath = [firefoxPath stringByAppendingPathComponent:@"Profiles"];
-	BOOL isDir;
-	if ([fm fileExistsAtPath:profilesPath isDirectory:&isDir] && isDir)
+	for (NSString *path in libraryPaths)
 	{
-		NSDirectoryEnumerator *e = [fm enumeratorAtPath:profilesPath];
-		[e skipDescendents];
-		NSString *filename = nil;
-		while ( filename = [e nextObject] )
+		NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
+		NSString *profilesPath = [firefoxPath stringByAppendingPathComponent:@"Profiles"];
+		BOOL isDir;
+		if ([fm fileExistsAtPath:profilesPath isDirectory:&isDir] && isDir)
 		{
-			if ( ![filename hasPrefix:@"."] )
+			NSDirectoryEnumerator *e = [fm enumeratorAtPath:profilesPath];
+			[e skipDescendents];
+			NSString *filename = nil;
+			while ( filename = [e nextObject] )
 			{
-				NSString *profilePath = [profilesPath stringByAppendingPathComponent:filename];
-				NSString *bookmarkPath = [profilePath stringByAppendingPathComponent:@"places.sqlite"];
-				if ([fm fileExistsAtPath:bookmarkPath isDirectory:&isDir] && !isDir)
+				if ( ![filename hasPrefix:@"."] )
 				{
-					result = bookmarkPath;	// just stop on the first profile we find.  Should be good enough!
-					break;
+					NSString *profilePath = [profilesPath stringByAppendingPathComponent:filename];
+					NSString *bookmarkPath = [profilePath stringByAppendingPathComponent:@"places.sqlite"];
+					if ([fm fileExistsAtPath:bookmarkPath isDirectory:&isDir] && !isDir)
+					{
+						result = bookmarkPath;	// just stop on the first profile we find.  Should be good enough!
+						return result;
+					}
 				}
 			}
 		}
 	}
 	return result;
 }
+
+
 
 - (void) copyDatabase;		// try to copy the database and store in copy.
 {
