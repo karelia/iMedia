@@ -89,6 +89,7 @@
 @synthesize objects = _objects;
 @synthesize subNodes = _subNodes;
 @synthesize parentNode = _parentNode;
+@synthesize isTopLevelNode = _isTopLevelNode;
 
 // State information...
 
@@ -155,6 +156,7 @@
 		
 		self.objects = nil;
 		self.subNodes = nil;
+		self.isTopLevelNode = NO;
 		
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
@@ -189,7 +191,8 @@
 	copy.includedInPopup = self.includedInPopup;
 	copy.displayedObjectCount = self.displayedObjectCount;
 	
-	copy.parentNode = self.parentNode;
+//	copy.parentNode = self.parentNode;			// Removed to avoid potentially dangling pointers (parentNode in not retained!)
+	copy.isTopLevelNode = self.isTopLevelNode;
 	copy.parser = self.parser;
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -281,8 +284,6 @@
 }
 
 
-// Node accessors. Use these for bindings the NSTreeController...
-
 - (IMBNode*) topLevelNode
 {
 	if (_parentNode)
@@ -296,6 +297,8 @@
 	return self;
 }
 
+
+// Node accessors. Use these for bindings the NSTreeController...
 
 - (NSUInteger) countOfSubNodes
 {
@@ -584,21 +587,13 @@
 	}
 	
 	// Oops, we shouldn't be here...
+	
 	NSLog(@"Unable to find '%@' in the source list", self.name);
 	[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:NSNotFound]];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-// A node is considered a root node if it really is a root node (nil parent) or if it is indented by one under 
-// a group node...
-
-- (BOOL) isTopLevelNode
-{
-	return self.parentNode == nil || self.parentNode.isGroup;
-}
 
 
 // A node is pouplated if the subnodes and objects arrays are present. Please note that these arrays may still

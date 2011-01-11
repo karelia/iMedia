@@ -83,6 +83,7 @@
 	NSUInteger _displayPriority;
 	
 	IMBNode* _parentNode;	// not retained!
+	BOOL _isTopLevelNode;
 	BOOL _group;
 	BOOL _leaf;
 	BOOL _loading;
@@ -119,8 +120,9 @@
 // subNodes is an empty array, then there really aren't any subnodes.
 
 @property (copy) NSArray* subNodes;				
-@property (assign, readonly) IMBNode* parentNode;
+@property (assign,readonly) IMBNode* parentNode;
 @property (readonly) IMBNode* topLevelNode;
+@property (assign) BOOL isTopLevelNode;
 
 // Object accessors. If the objects property is nil, that doesn't mean that there are no objects - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
@@ -181,7 +183,6 @@
 
 - (NSIndexPath*) indexPath;
 - (NSComparisonResult) compare:(IMBNode*)inNode;
-- (BOOL) isTopLevelNode;
 - (BOOL) isPopulated;
 - (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier;
 

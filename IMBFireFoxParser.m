@@ -264,6 +264,7 @@
 		node.icon = icon;
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
+		node.isTopLevelNode = YES;
 		node.parser = self;
 		// ??? node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];

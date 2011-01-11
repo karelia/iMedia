@@ -345,6 +345,7 @@ static NSArray* sSupportedUTIs = nil;
 		node.icon = icon;
 		node.parser = self;
 		node.leaf = NO;
+		node.isTopLevelNode = YES;
 		node.groupType = kIMBGroupTypeLibrary;
 	}
 	else
@@ -624,13 +625,7 @@ static NSArray* sSupportedUTIs = nil;
 			object.imageLocation = (id)self.mediaSource;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 			object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
-			
-			IMBNode *parentNode = inParentNode;
-			
-			if (parentNode == node) {
-				parentNode = parentNode.parentNode;
-			}
-			
+
 			[objects addObject:object];
 		}
 		

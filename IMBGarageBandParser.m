@@ -250,6 +250,7 @@
 	root.name = @"GarageBand";
 	root.groupType = kIMBGroupTypeLibrary;
 	root.leaf = NO;
+	root.isTopLevelNode = YES;
 	root.parser = self;
 	root.watcherType = kIMBWatcherTypeNone;
 	root.objects = [NSMutableArray array];	// the root node doesn't have any objects so we can populate it already!
