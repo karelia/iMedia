@@ -368,7 +368,7 @@ static NSArray* sSupportedUTIs = nil;
 	// Watch the root node. Whenever something in Lightroom changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding out WHAT has changed in Lightroom...
 	
-	if (node.parentNode == nil)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = (NSString*)self.mediaSource;
