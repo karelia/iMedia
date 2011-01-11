@@ -230,10 +230,11 @@
 #if LOG_PARSERS
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,parserClassname,inMediaType);
 #endif
-//	if (![parserClassname isEqualToString:@"IMBFireFoxParser"])
-//	{
-//		return NO;
-//	}
+
+	if ([parserClassname isEqualToString:@"IMBImageCaptureParser"])
+	{
+		return NO;
+	}
 	
 //	if ([parserClassname isEqualToString:@"IMBFlickrParser"])
 //	{
