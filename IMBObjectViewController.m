@@ -271,10 +271,44 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// NSSegmentedControl are templates, so that they get correctly inverted when a segment is highlighted...
 	
 	NSInteger n = [ibSegments segmentCount];
-	
+	NSSegmentedCell *cell = [ibSegments cell];
+	NSArray *segmentChildren = [NSAccessibilityUnignoredDescendant(ibSegments) accessibilityAttributeValue: NSAccessibilityChildrenAttribute];
+
 	for (NSInteger i=0; i<n; i++)
 	{
 		[[ibSegments imageForSegment:i] setTemplate:YES];
+		NSInteger tag = [cell tagForSegment:i];
+		NSString *axDesc = nil;
+		switch (tag)
+		{
+			case kIMBObjectViewTypeIcon:
+				axDesc = NSLocalizedStringWithDefaultValue(
+														   @"IMBObjectViewController.segment.grid",
+														   nil,IMBBundle(),
+														   @"Grid",
+														   @"segmented cell accessibilility description");
+				break;
+			case kIMBObjectViewTypeList:
+				axDesc = NSLocalizedStringWithDefaultValue(
+														   @"IMBObjectViewController.segment.list",
+														   nil,IMBBundle(),
+														   @"List",
+														   @"segmented cell accessibilility description");
+				break;
+				
+			case kIMBObjectViewTypeCombo:
+				axDesc = NSLocalizedStringWithDefaultValue(
+														   @"IMBObjectViewController.segment.combo",
+														   nil,IMBBundle(),
+														   @"Combination",
+														   @"segmented cell accessibilility description");
+				break;
+			default:
+				axDesc = @"";
+				break;
+				
+		}
+		[[segmentChildren objectAtIndex:i] accessibilitySetOverrideValue:axDesc forAttribute:NSAccessibilityDescriptionAttribute];
 	}
 	
 	// Observe changes to object array...
