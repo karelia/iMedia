@@ -325,8 +325,7 @@
 	
 	NSArray* subNodes = inNode.subNodes;
 	
-	if ([inNode.identifier isEqualToString:[self identifierForPath:@"/"]] &&    // the "Photos" node
-        [subNodes count] > 0)
+	if (inNode.isTopLevelNode && [subNodes count] > 0)
 	{
 		IMBNode* eventsNode = [self eventsNodeInNode:inNode];
 		
