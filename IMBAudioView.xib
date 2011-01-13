@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J537</string>
+		<string key="IBDocument.SystemVersion">10J567</string>
 		<string key="IBDocument.InterfaceBuilderVersion">823</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">462.00</string>
@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="686"/>
+			<integer value="565"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -599,7 +599,6 @@
 											<reference key="NSHScroller" ref="751089058"/>
 											<reference key="NSContentView" ref="261767761"/>
 											<reference key="NSHeaderClipView" ref="371238080"/>
-											<reference key="NSCornerView" ref="43222197"/>
 											<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 										</object>
 									</object>
@@ -1735,6 +1734,7 @@
 					<string>658.IBSegmentedControlTracker.WasGrowing</string>
 					<string>659.IBPluginDependency</string>
 					<string>659.IBSegmentedControlInspectorSelectedSegmentMetadataKey</string>
+					<string>678.IBAttributePlaceholdersKey</string>
 					<string>678.IBPluginDependency</string>
 					<string>679.IBPluginDependency</string>
 					<string>686.IBPluginDependency</string>
@@ -1783,6 +1783,14 @@
 					<integer value="0"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="0"/>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">AccessibilityDescription</string>
+						<object class="IBAccessibilityAttribute" key="NS.object.0">
+							<string key="name">AccessibilityDescription</string>
+							<reference key="object" ref="972754095"/>
+							<string key="accessibilityValue">Play</string>
+						</object>
+					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
