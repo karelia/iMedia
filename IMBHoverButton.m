@@ -67,6 +67,11 @@
 		NSImage *im2 = [[[NSImage alloc] initWithContentsOfFile:p2] autorelease];
 		[self setImage:im];
 		[self setAlternateImage:im2];
+		[theCell accessibilitySetOverrideValue:NSLocalizedStringWithDefaultValue(
+																		@"IMB.window.infoButton", nil,IMBBundle(),
+																		@"iMedia Info", @"description of button to flip to back of window")
+                                        forAttribute:(NSString *)kAXTitleAttribute];
+
 		
 		[theCell setImageDimsWhenDisabled:YES];
 	}
