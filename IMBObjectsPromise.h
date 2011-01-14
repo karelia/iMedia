@@ -127,7 +127,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 
 // Array of IMBObjects that was supplied in the init method
 
-@property (retain) NSArray* objects;
+@property (copy, readonly) NSArray* objects;
 
 // Optional download folder (only needed for remote files that need to be downloaded)
 // Should be preset to a reasonable default
