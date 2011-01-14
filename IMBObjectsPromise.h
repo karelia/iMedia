@@ -120,7 +120,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 #pragma mark Getting the Promise Status
 
 - (BOOL) isCancelled;
-@property (retain) NSError* error;  /// Contains error in case of failure	
+@property (copy) NSError* error;  /// Contains error in case of failure	
 
 
 #pragma mark Getting Attributes
