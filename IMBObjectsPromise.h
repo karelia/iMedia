@@ -132,7 +132,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 // Optional download folder (only needed for remote files that need to be downloaded)
 // Should be preset to a reasonable default
 
-@property (retain) NSString* destinationDirectoryPath;
+@property (copy) NSString* destinationDirectoryPath;
 
 // Array of URLs referencing a local copy of a file, or in the case of e.g. link objects,
 // the URL to the web resource itself. Generally speaking, these URLs are suitable for
