@@ -94,10 +94,14 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 #pragma mark 
 
 @interface IMBObjectsPromise ()
+
+@property (copy, readwrite) NSArray* objects;
+
 - (void) _countObjects:(NSArray*)inObjects;
 - (void) loadObjects:(NSArray*)inObjects;
 - (void) _loadObject:(IMBObject*)inObject;
 - (void) _didFinish;
+
 @property (assign) SEL finishSelector;
 
 @end
