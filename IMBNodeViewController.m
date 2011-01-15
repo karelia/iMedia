@@ -139,27 +139,25 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 + (void) initialize
 {
-	if (self == [IMBNodeViewController class])
-	{   
-		NSArray* expandedNodeIdentifiers = [NSArray arrayWithObjects:
-			@"group://LIBRARIES",
-			@"group://FOLDERS",
-			@"group://SEARCHES",
-			@"group://INTERNET",
-			nil];
+	NSArray* expandedNodeIdentifiers = [NSArray arrayWithObjects:
+		@"group://LIBRARIES",
+		@"group://FOLDERS",
+		@"group://SEARCHES",
+		@"group://INTERNET",
+		@"group://DEVICES",
+		nil];
 
-		NSMutableDictionary* stateDict = [NSMutableDictionary dictionary];
-		[stateDict setObject:expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
+	NSMutableDictionary* stateDict = [NSMutableDictionary dictionary];
+	[stateDict setObject:expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
 
-		NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeImage];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeAudio];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeMovie];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeLink];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeContact];
+	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeImage];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeAudio];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeMovie];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeLink];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeContact];
 
-		[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
-	}
+	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
 }
 
 
