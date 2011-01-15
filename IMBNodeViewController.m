@@ -840,7 +840,11 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		}
 	}
 	
-	// Restore the selected node. Walk through all visible nodes. If we find the correct one then select it...
+	// Restore the selected node. Walk through all visible nodes. If we find the correct one then select it.
+	// Please note the special case where we do not have a selection yet. In this case we use the first available
+	// node (that is not a group) to make sure that the user sees something immediately...
+	
+	NSString* selectedNodeIdentifier = self.selectedNodeIdentifier;
 	
 	rows = [ibNodeOutlineView numberOfRows];
 	BOOL found = NO;
@@ -850,7 +854,12 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		node = [self _nodeAtRow:i];
 		identifier = node.identifier;
 		
-		if ([identifier isEqualToString:self.selectedNodeIdentifier])
+		if (selectedNodeIdentifier == nil && node.isGroup == NO)
+		{
+			selectedNodeIdentifier = identifier;
+		}
+	
+		if ([identifier isEqualToString:selectedNodeIdentifier])
 		{
 			[self selectNode:node];
 			found = YES;
