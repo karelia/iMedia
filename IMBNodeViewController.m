@@ -139,6 +139,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 + (void) initialize
 {
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
 	NSArray* expandedNodeIdentifiers = [NSArray arrayWithObjects:
 		@"group://LIBRARIES",
 		@"group://FOLDERS",
@@ -158,6 +160,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	[classDict setObject:stateDict forKey:kIMBMediaTypeContact];
 
 	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	
+	[pool release];
 }
 
 

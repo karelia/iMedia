@@ -57,6 +57,7 @@
 #import "IMBObjectArrayController.h"
 #import "IMBPanelController.h"
 #import "IMBCommon.h"
+#import "IMBConfig.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 //#import "IMBNodeObject.h"
@@ -78,6 +79,16 @@
 + (void) load
 {
 	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeLink];
+}
+
+
++ (void) initialize
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
+	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeList] forKey:@"viewType"];
+	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	[pool release];
 }
 
 
