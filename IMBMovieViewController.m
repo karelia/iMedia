@@ -149,12 +149,10 @@
 
 - (void) willHideView
 {
-	NSWindow* window = [ibIconView window];
-	id firstResponder = [window firstResponder];
-	if (ibIconView == firstResponder)
-	{
-		[window makeFirstResponder:nil];
-	}
+	// Pretty nasty hack to make any movie that is currently playing inline stop. So far
+	// I couldn't find anything else that worked, so we'll have to use this for now...
+	
+	[ibIconView mouseDown:nil];			
 }
 
 
