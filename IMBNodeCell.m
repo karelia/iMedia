@@ -89,6 +89,7 @@
 	if (self = [super init])
 	{
 		[self setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+		[self setTruncatesLastVisibleLine:YES];
 	}
 	
 	return self;
