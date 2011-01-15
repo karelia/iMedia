@@ -82,6 +82,7 @@
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
 	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeIcon] forKey:@"viewType"];
+	[classDict setObject:[NSNumber numberWithDouble:0.5] forKey:@"iconSize"];
 	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
 	[pool release];
 }
