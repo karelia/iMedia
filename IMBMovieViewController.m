@@ -56,6 +56,7 @@
 #import "IMBObjectArrayController.h"
 #import "IMBPanelController.h"
 #import "IMBCommon.h"
+#import "IMBConfig.h"
 #import "NSWorkspace+iMedia.h"
 
 
@@ -73,6 +74,16 @@
 + (void) load
 {
 	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeMovie];
+}
+
+
++ (void) initialize
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
+	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeIcon] forKey:@"viewType"];
+	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	[pool release];
 }
 
 
