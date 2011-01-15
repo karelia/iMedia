@@ -506,16 +506,18 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (NSMutableDictionary*) _preferences
 {
-	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
-	return [NSMutableDictionary dictionaryWithDictionary:[classDict objectForKey:self.mediaType]];
+	return [IMBConfig prefsForClass:self.class];
+//	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+//	return [NSMutableDictionary dictionaryWithDictionary:[classDict objectForKey:self.mediaType]];
 }
 
 
 - (void) _setPreferences:(NSMutableDictionary*)inDict
 {
-	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
-	[classDict setObject:inDict forKey:self.mediaType];
-	[IMBConfig setPrefs:classDict forClass:self.class];
+	[IMBConfig setPrefs:inDict forClass:self.class];
+//	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+//	[classDict setObject:inDict forKey:self.mediaType];
+//	[IMBConfig setPrefs:classDict forClass:self.class];
 }
 
 
