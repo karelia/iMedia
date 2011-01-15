@@ -192,6 +192,7 @@
 	self.playingAudio = nil;
 }
 
+
 - (IBAction) quicklook:(id)inSender
 {
 	if (IMBRunningOnSnowLeopardOrNewer())
@@ -204,6 +205,7 @@
 		[self startPlayingSelection:inSender];
 	}
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
