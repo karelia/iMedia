@@ -75,6 +75,12 @@
 
 #define EVENTS_NODE_ID UINT_MAX-4811	// Very, very unlikely this not to be unique throughout library
 
+// We are not a 100 % sure whether event ids and album ids are from the same id space.
+// Since we use both kinds of ids in the same tree we introduce id space identifiers to the rescue.
+
+#define EVENTS_ID_SPACE @"EventId"
+#define ALBUMS_ID_SPACE @"AlbumId"
+
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark 
@@ -83,7 +89,8 @@
 
 - (void) addEventsToAlbumsInLibrary:(NSMutableDictionary*)dict;
 - (IMBNode*) eventsNodeInNode:(IMBNode*) inNode;
-- (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId;
+- (NSString*) idSpaceForAlbumType:(NSString*) inAlbumType;
+- (NSString*) identifierForId:(NSNumber*) inId inSpace:(NSString*) inIdSpace;
 - (NSString*) iPhotoMediaType;
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
 - (BOOL) shouldUseAlbum:(NSDictionary*)inAlbumDict images:(NSDictionary*)inImages;
@@ -663,7 +670,7 @@
 	if (inNode.isTopLevelNode && [inNode.subNodes count]>0) {
 		
 		NSNumber* eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
-		NSString* eventsIdWithAlbumId = [self identifierWithAlbumId:eventsId];
+		NSString* eventsIdWithAlbumId = [self identifierForId:eventsId inSpace:EVENTS_ID_SPACE];
 		
 		// We should find the events node at index 0 but this logic is more bullet proof.
 		
@@ -693,12 +700,26 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// Use different id spaces for entries in "List of Albums" and "List of Rolls" (events):
+// Returns events id space for album types "Event" and "Events".
+// Otherwise returns albums id space.
+// Use preproc defines in this file to compare against.
+
+- (NSString*) idSpaceForAlbumType:(NSString*) inAlbumType
+{
+	if ([inAlbumType isEqualToString:@"Event"] || [inAlbumType isEqualToString:@"Events"]) {
+		return EVENTS_ID_SPACE;
+	}
+	return ALBUMS_ID_SPACE;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 
 // Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBiPhotoParser://AlbumId/17"...
 
-- (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId
+- (NSString*) identifierForId:(NSNumber*) inId inSpace:(NSString*) inIdSpace
 {
-	NSString* albumPath = [NSString stringWithFormat:@"/AlbumId/%@",inAlbumId];
+	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", inIdSpace, inId];
 	return [self identifierForPath:albumPath];
 }
 
@@ -830,7 +851,9 @@
 		NSString* albumType = [albumDict objectForKey:@"Album Type"];
 		NSString* albumName = [albumDict objectForKey:@"AlbumName"];
 		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
-		NSString* parentIdentifier = parentId ? [self identifierWithAlbumId:parentId] : [self identifierForPath:@"/"];
+		NSString* albumIdSpace = [self idSpaceForAlbumType:albumType];
+		// parent always from same id space
+		NSString* parentIdentifier = parentId ? [self identifierForId:parentId inSpace:albumIdSpace] : [self identifierForPath:@"/"];
 		
 		if ([self shouldUseAlbumType:albumType] && 
 			[inParentNode.identifier isEqualToString:parentIdentifier] && 
@@ -857,7 +880,7 @@
 			
 			NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
 			if (albumId == nil) albumId = [NSNumber numberWithInt:_fakeAlbumID++]; 
-			albumNode.identifier = [self identifierWithAlbumId:albumId];
+			albumNode.identifier = [self identifierForId:albumId inSpace:albumIdSpace];
 
 			// Add the new album node to its parent (inRootNode)...
 			
