@@ -499,7 +499,7 @@
 
 - (NSDictionary*) plist
 {
-	NSDictionary* plist = nil;
+	NSDictionary* result = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
 	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
@@ -558,17 +558,19 @@
 			// Since this parser confines itself to deal with the "List of Albums" only
 			// we add an events node to the album list to incorporate events in the browser.
 			// This is why we need a mutable library dictionary.
-						
-			[self addEventsToAlbumsInLibrary:dict];
+			if (dict)
+			{
+				[self addEventsToAlbumsInLibrary:dict];
+			}
 			
 			self.plist = dict;
 			self.modificationDate = modificationDate;
 		}
 		
-		plist = [[_plist retain] autorelease];
+		result = [[_plist retain] autorelease];
 	}
 	
-	return plist;
+	return result;
 }
 
 
