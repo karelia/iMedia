@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -130,7 +130,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 // Node accessors (must only be called on the main thread)...
 
 @property (retain) NSMutableArray* rootNodes;			
-- (IMBNode*) rootNodeForParser:(IMBParser*)inParser;
+- (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser;
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 
 // Loading...
@@ -169,25 +169,25 @@ extern NSString* kIMBNodesDidChangeNotification;
 // The following delegate methods are called multiple times during the app lifetime. Return NO from the  
 // should methods to suppress an operation. The delegate methods are called on the main thread... 
 
-- (BOOL) controller:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser;
-- (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser;
-- (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser;
+- (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser;
+- (void) libraryController:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser;
+- (void) libraryController:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser;
 
-- (BOOL) controller:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode;
-- (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode;
-- (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode;
+- (BOOL) libraryController:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode;
+- (void) libraryController:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode;
+- (void) libraryController:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode;
 
 // Called when the user right clicks a node or object. These methods give the delegate a chance to add 
 // custom menu items to the exisiting context menu...
 
-- (void) controller:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
-- (void) controller:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
+- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
+- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
 
 // Called when the user double clicks selected object in one of the object views. If the delegate chooses to
 // handle the event iteself it must return YES. If NO is returned, the framework will invoke the default event
 // handling behavior (downloading the files to standard loaction and opening in default app)...
 
-- (BOOL) controller:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
+- (BOOL) libraryController:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
 
 @end
 

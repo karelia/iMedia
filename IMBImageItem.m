@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -129,10 +129,14 @@
 @end
 
 
+
 #pragma mark -
 
-
 @implementation QTMovie (IMBImageItem)
+
+
+// Not directly used in iMedia anymore, but PLEASE KEEP THIS HERE for client applications to use
+// since it's of general utility.
 
 + (QTMovie *)movieWithIMBImageItem:(id <IMBImageItem>)item;
 {
@@ -183,6 +187,7 @@
 #pragma mark -
 
 
+
 CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
 {
     CGImageRef result = NULL;
@@ -196,22 +201,17 @@ CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
         result = (CGImageRef)[item imageRepresentation];
         CGImageRetain(result);
     }
-    
-    // Grab from movie (QTMovie)
-    
+        
     else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		QTMovie* movie = [item imageRepresentation];
+		// An actual movie ... hopefully we don't encounter this
+		NSLog(@"Really don't want to try to make a thumbnail from a QTMovie since that may take a while.");
+	}
+	else if ([type isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+	{
+		// A URL or path
 		
-		NSError* error = nil;
-		QTTime duration = movie.duration;
-		double tv = duration.timeValue;
-		double ts = duration.timeScale;
-		QTTime time = QTMakeTimeWithTimeInterval(0.5 * tv/ts);
-		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,nil];
-        
-		result = (CGImageRef) [movie frameImageAtTime:time withAttributes:attributes error:&error];
-		CGImageRetain(result);
+		NSLog(@"What do we do with IKImageBrowserQTMoviePathRepresentationType?");
 	}
 	
     // Draw the thumbnail image (CGImageSource-compatible)...
@@ -230,6 +230,7 @@ CGImageRef IMB_CGImageCreateWithImageItem(id <IMBImageItem> item)
 	return result;
 }
 
+// Returns a retained object, follows 'create' rule.
 CGImageSourceRef IMB_CGImageSourceCreateWithImageItem(id <IMBImageItem> item, CFDictionaryRef options)
 {
     CGImageSourceRef result = NULL;
@@ -238,18 +239,41 @@ CGImageSourceRef IMB_CGImageSourceCreateWithImageItem(id <IMBImageItem> item, CF
     if ([type isEqualToString:IKImageBrowserNSURLRepresentationType])
     {
         NSURL *url = [item imageRepresentation];
+		NSCAssert((id)url, @"Nil image source URL");
         result = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
     }
     else if ([type isEqualToString:IKImageBrowserPathRepresentationType])
     {
         NSString *path = [item imageRepresentation];
+		NSCAssert((id)path, @"Nil image source URL");
         result = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
     }
     else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
     {
         NSData *data = [item imageRepresentation];
         result = CGImageSourceCreateWithData((CFDataRef)data,NULL);
-    }	
+    }
+	
+	// Note: We can't respond to IKImageBrowserQuickLookPathRepresentationType because this
+	// function is supposed to return CGImageSourceRef, NOT CGImageRef
+	else if ([type isEqualToString:IKImageBrowserQuickLookPathRepresentationType])
+	{
+		id rep = [item imageRepresentation];
+		// TODO: Run this on background thread and cache result
+        // Really, it's caller's responsibility to do both of those
+		CFURLRef url = (CFURLRef)([rep isKindOfClass:[NSString class]] ? [NSURL fileURLWithPath:rep] : rep);
+		
+		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+								 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
+								 (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+								 (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
+								 [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
+								 nil];
+		result = CGImageSourceCreateWithURL(url, (CFDictionaryRef)options);
+		// Will this work?
+		// Will it be equivalent to the QL method?
+		// CGImageRef im = QLThumbnailImageCreate(NULL, url, CGSizeMake(kIMBMaxThumbnailSize, kIMBMaxThumbnailSize), NULL);
+	}
     
     // Unsupported imageRepresentation...
     

@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -57,8 +57,6 @@
 #import "IMBNode.h"
 #import "IMBParser.h"
 
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 @class IMBFlickrQueryEditor;
@@ -71,7 +69,7 @@
  *	parser. Apply for key and secret at: http://flickr.com/services/api/keys/apply
  *
  *	Set the API key and shared secret in the IMBParserController delegate method
- *	controller:didLoadParser:forMediaType: See the iMedia Test Application for 
+ *	parserController:didLoadParser:forMediaType: See the iMedia Test Application for 
  *	an example.
  *
  *
@@ -83,6 +81,7 @@
  
 @interface IMBFlickrParser: IMBParser {
 	@private
+	IMBFlickrSizeSpecifier _desiredSize;
 	NSMutableArray* _customQueries;
 	id _delegate;
 	IMBFlickrQueryEditor* _editor;
@@ -102,6 +101,8 @@
 
 
 #pragma mark Properties
+
+@property (assign) IMBFlickrSizeSpecifier desiredSize;
 
 @property (retain) NSMutableArray* customQueries;
 

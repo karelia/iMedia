@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -51,8 +51,8 @@
 
 //	iMedia
 #import "IMBFlickrNode.h"
+#import "IMBFlickrObject.h"
 #import "IMBFlickrParser.h"
-#import "IMBObject.h"
 #import "IMBLibraryController.h"
 #import "IMBLoadMoreObject.h"
 #import "NSString+iMedia.h"
@@ -89,7 +89,6 @@
 - (void) setFlickrResponse: (NSDictionary*) response;
 //	Utilities:
 - (NSDictionary*) argumentsForFlickrCall;
-+ (NSImage*) coreTypeIconNamed: (NSString*) name;
 + (NSString*) flickrMethodForMethodCode: (NSInteger) code;
 + (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query;
 + (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
@@ -141,7 +140,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	IMBFlickrNode* node = [[[IMBFlickrNode alloc] init] autorelease];
 	node.attributes = [NSMutableDictionary dictionary];
 	node.leaf = YES;
-	node.parentNode = root;
+	//node.parentNode = root;
 	node.parser = parser;
 	
 	
@@ -162,7 +161,9 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 												  parser: (IMBParser*) parser {
 	
 	IMBFlickrNode* node = [self genericFlickrNodeForRoot:root parser:parser];
-	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
+	node.icon = [NSImage imageNamed:NSImageNameFolderSmart];
+	[node.icon setScalesWhenResized:YES];
+	[node.icon setSize:NSMakeSize(16.0, 16.0)];
 	node.identifier = [self identifierWithMethod:IMBFlickrNodeMethod_MostInteresting query:@"30"];
 	node.mediaSource = node.identifier;
 	node.method = IMBFlickrNodeMethod_MostInteresting;
@@ -176,7 +177,9 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 											 parser: (IMBParser*) parser {
 	
 	IMBFlickrNode* node = [self genericFlickrNodeForRoot:root parser:parser];
-	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
+	node.icon = [NSImage imageNamed:NSImageNameFolderSmart];
+	[node.icon setScalesWhenResized:YES];
+	[node.icon setSize:NSMakeSize(16.0, 16.0)];
 	node.identifier = [self identifierWithMethod:IMBFlickrNodeMethod_Recent query:@"30"];
 	node.mediaSource = node.identifier;
 	node.method = IMBFlickrNodeMethod_Recent;	
@@ -191,7 +194,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 
 	//	iMB general...
 	IMBFlickrNode* node = [[[IMBFlickrNode alloc] init] autorelease];
-	node.parentNode = root;
+	//node.parentNode = root;
 	node.parser = parser;
 	node.leaf = YES;	
 	node.attributes = [NSMutableDictionary dictionary];
@@ -228,7 +231,10 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	//	Flickr stuff...
 	IMBFlickrNode* node = [IMBFlickrNode flickrNodeForRoot:root parser:parser];
 	node.customNode = YES;
-	node.icon = [IMBFlickrNode coreTypeIconNamed:@"SmartFolderIcon.icns"];
+	node.icon = [NSImage imageNamed:NSImageNameFolderSmart];
+	[node.icon setScalesWhenResized:YES];
+	[node.icon setSize:NSMakeSize(16.0, 16.0)];
+
 //	node.identifier = [IMBFlickrNode identifierWithMethod:method query:query];
 	node.identifier = [IMBFlickrNode identifierWithQueryParams:dict];
 	node.license = [[dict objectForKey:IMBFlickrNodeProperty_License] intValue];
@@ -312,35 +318,156 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	[(NSMutableDictionary*)self.attributes removeObjectForKey:@"flickrResponse"];
 }
 
+// What about original size?
+
+- (NSString *)flickrSizeFromFlickrSizeSpecifier:(IMBFlickrSizeSpecifier)flickrSizeSpecifier
+{
+	NSAssert(flickrSizeSpecifier >= kIMBFlickrSizeSpecifierOriginal && flickrSizeSpecifier <= kIMBFlickrSizeSpecifierLarge, @"Illegal size for flickr");
+	NSString *sizeLookup[] = { @"o", OFFlickrSmallSize, OFFlickrMediumSize, OFFlickrLargeSize };
+		// Note: medium is nil, so we can't put in a dictionary.  Original not specified in objective-flickr
+	return sizeLookup[flickrSizeSpecifier];
+}
+
+- (NSURL *)imageURLForDesiredSize:(IMBFlickrSizeSpecifier)size fromPhotoDict:(NSDictionary *)photoDict context:(OFFlickrAPIContext*) context;
+{
+	NSURL* imageURL = nil;
+	if (!imageURL && kIMBFlickrSizeSpecifierOriginal == size)
+	{
+		if ([photoDict objectForKey:@"url_o"])
+		{
+			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_o"]];
+		}
+		else
+		{
+			size = kIMBFlickrSizeSpecifierLarge;		// downgrade to requesting large if no original
+		}
+	}
+	if (!imageURL && kIMBFlickrSizeSpecifierLarge == size)
+	{
+		if ([photoDict objectForKey:@"url_l"])
+		{
+			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_l"]];
+		}
+		else
+		{
+			size = kIMBFlickrSizeSpecifierMedium;		// downgrade to requesting medium if no large
+		}
+	}
+	
+	if (!imageURL && kIMBFlickrSizeSpecifierMedium == size)
+	{
+		if ([photoDict objectForKey:@"url_m"])
+		{
+			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_m"]];
+		}
+		else
+		{
+			size = kIMBFlickrSizeSpecifierSmall;		// downgrade to requesting medium if no large
+		}
+	}
+	
+	if (!imageURL && kIMBFlickrSizeSpecifierSmall == size)
+	{
+		if ([photoDict objectForKey:@"url_s"])
+		{
+			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_s"]];
+		}
+	}
+	
+	// Fallback.  Really we should have it by now! But search for Edward & Bella Icon has no medium size!
+	if (!imageURL)
+	{
+		// build up URL programatically 
+		NSString *flickrSize = [self flickrSizeFromFlickrSizeSpecifier:size];
+		imageURL = [context photoSourceURLFromDictionary:photoDict size:flickrSize];
+	}
+	return imageURL;	
+}
+
+
 
 - (NSArray*) extractPhotosFromFlickrResponse: (NSDictionary*) response {
 	OFFlickrAPIRequest* flickrRequest = [self.attributes objectForKey:@"flickrRequest"];
 
+	IMBFlickrParser *parser = (IMBFlickrParser *)self.parser;
 	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
+	self.displayedObjectCount = 0;
+	
 	for (NSDictionary* photoDict in photos) {
-		NSURL* thumbnailURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
-		NSURL* imageURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrLargeSize];
-		NSURL* webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
+
+		IMBFlickrObject* obj = [[IMBFlickrObject alloc] init];
 		
-		// We will need to get the URL of the original photo (or the largest possible)
-		// Or, perhaps, we may want to have a callback to the application for what size of photo it would like
-		// to receive.  (There's no point in getting larger size than the application will need.)
-		
-		IMBObject* obj = [[IMBObject alloc] init];
-		
-		obj.location = imageURL;
+		// Only store a location if we are allowed to download
+		BOOL canDownload = [[photoDict objectForKey:@"can_download"] boolValue];
+		if (canDownload)
+		{
+			obj.location = [self imageURLForDesiredSize:parser.desiredSize fromPhotoDict:photoDict context:flickrRequest.context];
+		}
+		obj.shouldDisableTitle = !canDownload;
+
 		obj.name = [photoDict objectForKey:@"title"];
-		obj.metadata = [NSDictionary dictionaryWithObject:webPageURL forKey:@"webPageURL"];
+		
+		// A lot of the metadata comes from the "extras" key we request
+		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
+		[metadata addEntriesFromDictionary:photoDict];		// give metaData the whole thing!
+		NSURL *webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
+		[metadata setObject:webPageURL forKey:@"webPageURL"];
+		
+		NSURL *quickLookURL = [self imageURLForDesiredSize:kIMBFlickrSizeSpecifierMedium fromPhotoDict:photoDict context:flickrRequest.context];
+		[metadata setObject:quickLookURL forKey:@"quickLookURL"];
+
+		// But give it a better 'description' without the nested item
+		NSString *descHTML = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
+		if (descHTML)
+		{
+			NSData *HTMLData = [descHTML dataUsingEncoding:NSUTF8StringEncoding];
+			NSDictionary *options = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:NSUTF8StringEncoding] forKey:NSCharacterEncodingDocumentOption];
+			NSAttributedString *descAttributed = [[[NSAttributedString alloc] initWithHTML:HTMLData options:options documentAttributes:nil] autorelease];
+			if (descAttributed)
+			{
+				NSString *desc = [descAttributed string];
+				if (nil != desc) [metadata setObject:desc forKey:@"comment"];
+			}
+#ifdef DEBUG
+			else NSLog(@"Unable to make attributed string out of %@", descHTML);
+#endif
+		}
+
+		NSString *can_download = [photoDict objectForKey:@"can_download"];
+		NSString *license = [photoDict objectForKey:@"license"];
+		NSString *ownerName = [photoDict objectForKey:@"ownername"];
+		NSString *photoID = [photoDict objectForKey:@"id"];
+		id width = [metadata objectForKey:@"width_o"];
+		if (width == nil) width = [metadata objectForKey:@"width_l"];
+		if (width == nil) width = [metadata objectForKey:@"width_m"];
+		if (width == nil) width = [metadata objectForKey:@"width_s"];
+		id height = [metadata objectForKey:@"height_o"];
+		if (height == nil) height = [metadata objectForKey:@"height_l"];
+		if (height == nil) height = [metadata objectForKey:@"height_m"];
+		if (height == nil) height = [metadata objectForKey:@"height_s"];
+		
+		if (nil != can_download)	[metadata setObject:can_download forKey:@"can_download"];
+		if (nil != license)			[metadata setObject:license forKey:@"license"];
+		if (nil != ownerName)		[metadata setObject:ownerName forKey:@"ownername"];
+		if (nil != photoID)			[metadata setObject:photoID forKey:@"id"];
+		if (nil != width)			[metadata setObject:width forKey:@"width"];
+		if (nil != height)			[metadata setObject:height forKey:@"height"];
+
+		obj.preliminaryMetadata = [NSDictionary dictionaryWithDictionary:metadata];
+						 
 		obj.parser = self.parser;
 		
+		NSURL* thumbnailURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
 		obj.imageLocation = thumbnailURL;
 		obj.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 		obj.imageRepresentation = nil;	// Build lazily when needed
 		
 		[objects addObject:obj];
 		[obj release];
+		self.displayedObjectCount++;
 	}
+	
 	return objects;
 }
 
@@ -472,11 +599,12 @@ typedef enum {
 	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialShareAlike = 1,
 	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercial = 2,
 	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialNoDerivs = 3,
-	IMBFlickrNodeFlickrLicenseID_AttributionShareAlike = 5,
 	IMBFlickrNodeFlickrLicenseID_Attribution = 4,
+	IMBFlickrNodeFlickrLicenseID_AttributionShareAlike = 5,
 	IMBFlickrNodeFlickrLicenseID_AttributionNoDerivs = 6,
 	IMBFlickrNodeFlickrLicenseID_NoKnownCopyrightRestrictions = 7
 } IMBFlickrNodeFlickrLicenseID;
+
 
 ///	Make the properties of the receiver into a dictionary with keys and values
 ///	that can be directly passed to the Flick method call.
@@ -526,23 +654,30 @@ typedef enum {
 	}
 	
 	//	limit the search to a specific number of items...
+#ifdef DEBUG
 	[arguments setObject:@"30" forKey:@"per_page"];
+#else
+	[arguments setObject:@"30" forKey:@"per_page"];
+#endif
+	
+	// We are only doing photos.  Maybe later we want to do videos?
+	[arguments setObject:@"photos" forKey:@"media"];
 
+	// Extra metadata needed
+	// http://www.flickr.com/services/api/flickr.photos.search.html
+	[arguments setObject:@"description,license,owner_name,original_format,geo,tags,o_dims,url_o,url_l,url_m,url_s,usage" forKey:@"extras"];
+	// Useful keys we can get from this:
+	// description -> array with ... description
+	// original_format -> originalformat, orignalsecret
+	// url_o,l, m, s ... URL to get the various sizes.  (url_l is not really documented, but works if needed.)
+	// usage: can_download (& others)
+	// Example of a photo that can't be downloaded: THE DECEIVING title.
+	
 	//	load the specified page...
 	NSString* page = [NSString stringWithFormat:@"%d", self.page + 1];
 	[arguments setObject:page forKey:@"page"];
 	
 	return arguments;
-}
-
-
-+ (NSImage*) coreTypeIconNamed: (NSString*) name {
-	NSBundle* coreTypes = [NSBundle	bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
-	NSString* path = [coreTypes pathForResource:name ofType:nil];
-	NSImage* icon = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize (16.0,16.0)];
-	return icon;
 }
 
 
@@ -583,7 +718,7 @@ typedef enum {
 	} else if (method == IMBFlickrNodeMethod_Recent) {
 		flickrMethod = [flickrMethod stringByAppendingString:@"/recent"];
 	} else if (method == IMBFlickrNodeMethod_MostInteresting) {
-		flickrMethod = [flickrMethod stringByAppendingString:@"/intersting"];		// Should this be interesting?
+		flickrMethod = [flickrMethod stringByAppendingString:@"/interesting"];
 	}
 	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", flickrMethod, query];
 	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
@@ -596,6 +731,60 @@ typedef enum {
 	NSString* uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
 	if (uuid == nil) uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_Query];
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,uuid];
+}
+
+#pragma mark -
+#pragma mark Utilities
+								  
+// From http://gist.github.com/101674
+
++ (NSString *)base58EncodedValue:(long long)num {
+  NSString *alphabet = @"123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+  int baseCount = [alphabet length];
+  NSString *encoded = @"";
+  while(num >= baseCount) {
+	  double div = num/baseCount;
+	  long long mod = (num - (baseCount * (long long)div));
+	  NSString *alphabetChar = [alphabet substringWithRange: NSMakeRange(mod, 1)];
+	  encoded = [NSString stringWithFormat: @"%@%@", alphabetChar, encoded];
+	  num = (long long)div;
+  }
+  
+  if(num) {
+	  encoded = [NSString stringWithFormat: @"%@%@", [alphabet substringWithRange: NSMakeRange(num, 1)], encoded];
+  }
+  return encoded;
+}
+								  
++ (NSString *)descriptionOfLicense:(int)aLicenseNumber
+{
+	NSString *result = nil;
+	switch(aLicenseNumber)
+	{
+		case IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialShareAlike:
+			result = @"Attribution-NonCommercial-ShareAlike License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_AttributionNonCommercial:
+			result = @"Attribution-NonCommercial License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialNoDerivs:
+			result = @"Attribution-NonCommercial-NoDerivs License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_Attribution:
+			result = @"Attribution License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_AttributionShareAlike:
+			result = @"Attribution-ShareAlike License";
+			break;
+		case IMBFlickrNodeFlickrLicenseID_AttributionNoDerivs:
+			result = @"Attribution-NoDerivs License";
+			break;
+	}
+	if (result)
+	{
+		result = [@"Creative Commons: " stringByAppendingString:result];
+	}
+	return result;
 }
 
 @end

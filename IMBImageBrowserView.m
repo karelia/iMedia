@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -60,7 +60,9 @@
 #import "IMBObjectFifoCache.h"
 #import "IMBParser.h"
 #import "IMBQLPreviewPanel.h"
-
+#import <Carbon/Carbon.h>
+#import "IMBPanelController.h"
+#import "IMBConfig.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -99,27 +101,62 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-- (id) init
+- (void) _init	// support method shared by both
 {
-	if (self = [super init])
-	{
-		_mouseOperation = kMouseOperationNone;
-		_clickedObjectIndex = NSNotFound;
-		_clickedObject = nil;
-	}
+	_mouseOperation = kMouseOperationNone;
+	_clickedObjectIndex = NSNotFound;
+	_clickedObject = nil;
 	
+	[[NSNotificationCenter defaultCenter]				// Unload parsers before we quit, so that custom have 
+	 addObserver:self								// a chance to clean up (e.g. remove callbacks, etc...)
+	 selector:@selector(showTitlesStateChanged:) 
+	 name:kIMBImageBrowserShowTitlesNotification 
+	 object:nil];
+
+	// Set up initial value
+	NSString* filenames = [IMBConfig prefsValueForKey:@"prefersFilenamesInPhotoBasedBrowsers"];
+	BOOL showTitle = (nil == filenames) ? YES : [filenames boolValue];
+	int mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
+	[self setCellsStyleMask: mask];
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder;
+{
+	if (self = [super initWithCoder:aDecoder])
+	{
+		[self _init];
+	}
+	return self;
+}
+
+
+- (id) initWithFrame:(NSRect) frame;
+{
+	if (self = [super initWithFrame:frame])
+	{
+		[self _init];
+	}
 	return self;
 }
 
 
 - (void) dealloc
 {	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	IMBRelease(_clickedObject);
 	[super dealloc];
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+- (void) showTitlesStateChanged:(NSNotification *)aNotification
+{
+	id obj = [aNotification object];
+	BOOL showTitle = [obj boolValue];
+	int mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
+	[self setCellsStyleMask: mask];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -244,83 +281,6 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef IMB_SUPPORTFILEPROMISES
-#define IMB_SUPPORTFILEPROMISES 0
-#endif
-
-#if IMB_SUPPORTFILEPROMISES
-
-#pragma mark Handling drags to allow for promises
-// This code is based on code contributed by Fraser Speirs.
-
-- (void)mouseDown:(NSEvent *)theEvent
-{
-	// If the mouse first goes down on the background, this is a drag-select and
-	// we don't want to handle any mouseDragged events until the mouse comes up again.
-	NSPoint clickPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: clickPosition];
-	_dragSelectInProgress = (indexOfItemUnderClick == NSNotFound);
-	_mouseOperation = kMouseOperationNone;
-	
-//	if (indexOfItemUnderClick != NSNotFound &&
-//		self.dataSource && [self.dataSource respondsToSelector:@selector(imageBrowser:itemAtIndex:)]) 
-//	{
-//		IMBObject* object = [self.dataSource imageBrowser:self itemAtIndex:indexOfItemUnderClick];
-//		if (object && !object.isSelectable)
-//		{
-//			IMBParser* parser = object.parser;	
-//			if ([parser respondsToSelector:@selector(didClickObject:objectView:)])
-//			{
-//				[parser didClickObject:object objectView:self];
-//			}
-//			return;
-//		}
-//	}
-
-	[super mouseDown: theEvent];
-}
-
-
-- (void)mouseDragged:(NSEvent *)theEvent;
-{
-	// If there's a drag-select in progress, we don't want to know.
-	if(_dragSelectInProgress) {
-		[super mouseDragged: theEvent];
-		return;
-	}
-	
-	// Otherwise, the mouse went down on an image and we should drag it
-	NSPoint dragPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	NSInteger indexOfItemUnderClick = [self indexOfItemAtPoint: dragPosition];
-	
-	if(indexOfItemUnderClick == NSNotFound) {
-		[super mouseDragged: theEvent];
-		return;
-	}
-		
-	dragPosition.x -= 16;
-	dragPosition.y -= 16;
-	
-	NSRect imageLocation;
-	imageLocation.origin = dragPosition;
-	imageLocation.size = NSMakeSize(64, 64);	// should this vary?
-	
-	[self dragPromisedFilesOfTypes:[NSArray arrayWithObject:@"jpg"]		// should probably get REAL value?
-						  fromRect:imageLocation
-							source:self.delegate		// handle drag messages
-						 slideBack:YES
-							 event:theEvent];
-}
-
-
-- (void)mouseUp:(NSEvent *)theEvent
-{
-	_dragSelectInProgress = NO;
-	[super mouseUp: theEvent];
-}
-
-#else
-
 
 - (void) mouseDown:(NSEvent*)inEvent
 {
@@ -354,6 +314,11 @@ enum IMBMouseOperation
 		_mouseOperation = kMouseOperationNone;
 	}
 
+	// For parity with TableView; not really needed since selection is changed anyhow
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+	[controller setClickedObject:self.clickedObject];
+	[controller setClickedObjectIndex:self.clickedObjectIndex];
+
 	[super mouseDown:inEvent];
 }
 
@@ -368,6 +333,20 @@ enum IMBMouseOperation
 		BOOL highlighted = [self indexOfItemAtPoint: mouse] == _clickedObjectIndex;
 		[(IMBButtonObject*)_clickedObject setImageRepresentationForState:highlighted];
 		[self setNeedsDisplayInRect:[self itemFrameAtIndex:_clickedObjectIndex]];
+	}
+	
+	// If the user clicked on an object, then this will start a drag. Ignore the drag if the object is 
+	// not supposed to be draggable...
+	
+	else if (_clickedObject)
+	{
+		[self.delegate setDropDestinationURL:nil];		// initialize to nil so we know drag has just started
+		
+		if ([_clickedObject isDraggable])
+		{
+			[super mouseDragged:inEvent];
+			return;
+		}
 	}
 	
 	// Let the superclass handle other events...
@@ -412,7 +391,23 @@ enum IMBMouseOperation
 }
 
 
-#endif
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Dragging Promise Support
+
+
+- (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
+{
+	return [self.delegate namesOfPromisedFilesDroppedAtDestination:inDropDestination];
+}
+
+
+- (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
+{
+	[self.delegate draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -53,9 +53,11 @@
 #pragma mark HEADERS
 
 #import "IMBApertureParser.h"
+
+#import "IMBApertureHeaderViewController.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-#import "IMBEnhancedObject.h"
+#import "IMBObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
@@ -92,6 +94,7 @@
 
 @implementation IMBApertureParser
 
+@synthesize placeholderParser = _placeholderParser;
 @synthesize appPath = _appPath;
 @synthesize plist = _plist;
 @synthesize modificationDate = _modificationDate;
@@ -108,7 +111,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -119,7 +122,7 @@
 
 + (NSString*) aperturePath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Aperture"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Aperture"];
 }
 
 
@@ -147,6 +150,8 @@
 		{
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
+			BOOL changed;
+			(void) [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
 
 			IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = path;
@@ -156,6 +161,27 @@
 		}
 		
 		if (apertureLibraries) CFRelease(apertureLibraries);
+		
+		if ([parserInstances count] == 0) {
+			NSArray *keys = [NSArray arrayWithObjects:@"RKXMLExportManagerMode", @"LibraryPath", nil];
+			NSDictionary *preferences = (NSDictionary*) CFPreferencesCopyMultiple((CFArrayRef)keys, 
+																				   (CFStringRef)@"com.apple.Aperture", 
+																				   kCFPreferencesCurrentUser, 
+																				   kCFPreferencesAnyHost);
+			preferences = [NSMakeCollectable(preferences) autorelease];	
+
+			NSString *exportManagerMode = [preferences objectForKey:[keys objectAtIndex:0]];
+			NSString *libraryPath = [preferences objectForKey:[keys objectAtIndex:1]];
+			
+			if ((libraryPath != nil) && ([@"RKXMLExportManagerExportNeverKey" isEqual:exportManagerMode])) {
+				IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+				parser.placeholderParser = YES;
+				parser.mediaSource = libraryPath;
+				parser.shouldDisplayLibraryName = NO;
+				[parserInstances addObject:parser];
+				[parser release];
+			}
+		}
 	}
 	
 	return parserInstances;
@@ -211,25 +237,34 @@
 	
 	if (inOldNode == nil)
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
-
-		node.parentNode = inOldNode.parentNode;
+		
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self rootNodeIdentifier];
 		node.name = @"Aperture";
 		node.icon = icon;
-		node.groupType = kIMBGroupTypeLibrary;
 		node.parser = self;
-		node.leaf = NO;
+		node.isTopLevelNode = YES;
+		node.groupType = kIMBGroupTypeLibrary;
+
+		if (self.placeholderParser)
+		{
+			node.leaf = YES;
+			node.shouldDisplayObjectView = NO;
+			node.customHeaderViewController = [IMBApertureHeaderViewController headerViewControllerWithNode:node];
+		}
+		else
+		{
+			node.leaf = NO;			
+		}
 	}
 	
 	// Or a subnode...
 	
 	else
 	{
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -241,7 +276,7 @@
 	
 	// If we have more than one library then append the library name to the root node...
 	
-	if (node.isRootNode && self.shouldDisplayLibraryName)
+	if (node.isTopLevelNode && self.shouldDisplayLibraryName)
 	{
 		NSString* path = (NSString*)node.mediaSource;
 		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
@@ -251,7 +286,7 @@
 	// Watch the XML file. Whenever something in Aperture changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding WHAT has changed inside the library...
 	
-	if (node.isRootNode)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
@@ -265,7 +300,7 @@
 	
 	if (inOldNode.isPopulated)
 	{
-		[self populateNode:node options:inOptions error:&error];
+		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
 	}
 	
 	if (outError) *outError = error;
@@ -337,7 +372,7 @@
 	NSDictionary* plist = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
-	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 	
 	@synchronized(self)
@@ -416,7 +451,7 @@
 			return [self identifierWithAlbumId:albumId];
 		}
 
-		[pool release];
+		[pool drain];
 	}
 
 	// Fallback if nothing is found...
@@ -646,8 +681,7 @@
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subNodes = (NSMutableArray*) inParentNode.subNodes;
-	if (subNodes == nil) inParentNode.subNodes = subNodes = [NSMutableArray array];
+	NSMutableArray* subNodes = [NSMutableArray array];
 
 	// Now parse the Aperture XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
@@ -681,11 +715,12 @@
 			// Add the new album node to its parent (inRootNode)...
 			
 			[subNodes addObject:albumNode];
-			albumNode.parentNode = inParentNode;
 		}
 		
-		[pool release];
+		[pool drain];
 	}
+	
+	inParentNode.subNodes = subNodes;
 }
 
 
@@ -694,7 +729,7 @@
 
 - (Class) objectClass
 {
-	return [IMBEnhancedObject class];
+	return [IMBObject class];
 }
 
 
@@ -703,14 +738,13 @@
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
-	Class objectClass = [self objectClass];
-	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
-	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
+	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
 
 	// Look for the correct album in the Aperture XML plist. Once we find it, populate the node with IMBVisualObjects
 	// for each image in this album...
 	
-	NSUInteger index = 0;
+	Class objectClass = [self objectClass];
+    NSUInteger index = 0;
 
 	for (NSDictionary* albumDict in inAlbums)
 	{
@@ -735,7 +769,7 @@
 					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [objectDict objectForKey:@"Caption"];
 
-					IMBEnhancedObject* object = [[objectClass alloc] init];
+					IMBObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 
@@ -752,12 +786,15 @@
 					object.imageRepresentation = nil;
 				}
 				
-				[pool2 release];
+				[pool2 drain];
 			}
 		}
 		
-		[pool1 release];
+		[pool1 drain];
 	}
+    
+    inNode.objects = objects;
+    [objects release];
 }
 
 
@@ -771,8 +808,7 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
 
 	// DISABLING because the performance impact is too great. 
 	// This method gets called more often than the comment above implies. E.g. when a search is active
@@ -799,7 +835,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 

@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -69,6 +69,7 @@
 - (NSRect) usedRectInCellFrame:(NSRect)inFrame;
 - (NSRect) imageContainerFrame;
 - (IKImageBrowserView*) imageBrowserView;	// To shut up the compiler when using 10.5.sdk
+- (void) drawTitle;							// To shut up the compiler when using 10.6.sdk
 
 @end
 
@@ -82,6 +83,7 @@
 
 @synthesize imbShouldDrawOutline = _imbShouldDrawOutline;
 @synthesize imbShouldDrawShadow = _imbShouldDrawShadow;
+@synthesize imbShouldDisableTitle = _imbShouldDisableTitle;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,6 +95,7 @@
 	{
 		_imbShouldDrawOutline = YES;
 		_imbShouldDrawShadow = YES;
+		_imbShouldDisableTitle = NO;
 	}
 	
 	return self;
@@ -113,132 +116,9 @@
 		IMBObject* object = (IMBObject*)inDataSource;
 		_imbShouldDrawOutline = object.shouldDrawAdornments;
 		_imbShouldDrawShadow = object.shouldDrawAdornments;
+		_imbShouldDisableTitle = object.shouldDisableTitle;
 	}
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-/*
-- (NSRect) frame
-{
-	NSRect frame = [super frame];
-	NSLog(@"frame = %@",NSStringFromRect(frame));
-
-	CGFloat top = NSMinY(frame);
-	frame.size.height = 0.5 * frame.size.width;
-	frame.origin.y = top - frame.size.height;
-
-	return frame;
-}
-
-
-//- (NSRect) imageBorderFrame
-//{
-//	NSRect frame = [super imageBorderFrame];
-//	return frame;
-//}
-//
-//
-//- (NSRect) imageFrame
-//{
-//	NSRect frame = [super imageFrame];
-//	return frame;
-//}
-
-
-- (NSRect) imageContainerFrame
-{
-	NSRect frame = [super frame];
-//	CGFloat top = NSMinY(frame);
-//	frame.size.height = 0.75 * frame.size.width;
-//	frame.origin.y = top - frame.size.height;
-	
-//	//make the image container 15 pixels up
-//	container.origin.y += 15;
-//	container.size.height -= 15;
-	
-	NSLog(@"imageContainerFrame = %@",NSStringFromRect(frame));
-	return frame;
-}
-
-//- (NSRect) imageContainerFrame
-//{
-//	NSRect frame = [super imageContainerFrame];
-//	NSLog(@"imageContainerFrame = %@",NSStringFromRect(frame));
-//	return frame;
-//}
-
-
-- (NSRect) titleFrame
-{
-	NSRect frame = [super imageBorderFrame];
-	frame.origin.y = NSMinY(frame) - 17.0;
-	frame.size.height = 17.0;
-	return frame;
-}
-
-
-//- (NSRect) imageFrameForCellFrame:(NSRect)inFrame
-//{
-//	NSRect frame = [super imageFrameForCellFrame:inFrame];
-//	return frame;
-//}
-
-
-//- (NSRect) imageFrameForImageContainerFrame:(NSRect)inFrame
-//{
-////	NSRect frame = [super imageFrameForCellFrame:inFrame];
-//	return inFrame;
-//}
-
-
-//- (NSRect) usedRectInCellFrame:(NSRect)inFrame
-//{
-//	NSRect rect = [super usedRectInCellFrame:inFrame];
-//	return rect;
-//}
-//
-//- (NSRect) selectionFrame
-//{
-//	return [self frame];
-//	NSRect frame = [super selectionFrame];
-//	return frame;
-////	NSRect frame = [self frame];
-////	return NSInsetRect(frame,-0.0,-0.0);
-//}
-
-
-//- (NSRect) titleFrame
-//{
-//	NSRect frame = [self frame];
-//	frame.size.height = 16.0;
-//	return frame;
-//}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (void) drawSelection
-//{
-//	[[NSColor yellowColor] set];
-//	NSRectFillUsingOperation([self selectionFrame],NSCompositeSourceOver);
-////	[super drawSelection];	
-//}
-
-
-//- (void) drawSelectionOnTitle
-//{
-//	[super drawTitle];	
-//}
-//
-//
-//- (void) drawTitle
-//{
-//	[super drawTitle];	
-//}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -292,20 +172,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// A Private API.  Overriding it to change the font size.  No harm done if this stops working though...
-
-- (void) sizeDidChange
-{
-	if ([super respondsToSelector:@selector(sizeDidChange)])
-	{
-		[((id)super) sizeDidChange];
-	}
-	
-	[self adjustToCellSize];
-}
-
-
-- (void) adjustToCellSize
+- (CGFloat) pointSize
 {
 	CGFloat points = 0;
 	CGFloat width = [((id)self) size].width;
@@ -313,38 +180,51 @@
 	else if (width < 70) points = 10;
 	else points = 11;
 
-	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:[NSFont fontWithName:@"Lucida Grande" size:points] forKey:NSFontAttributeName];
+	return points;
+}
+
+
+// Is there any smarter way to do this?
+
+- (void) setTitleColors
+{
+	CGFloat points = [self pointSize];	// we need to get the whole font thing since we have to set the whole attributes
 	
-	if (IMBRunningOnSnowLeopardOrNewer())
+	NSMutableDictionary *attributes1 = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize:points] forKey:NSFontAttributeName];
+	NSMutableDictionary *attributes2 = [NSMutableDictionary dictionaryWithDictionary:attributes1];
+	
+	// Now set the title color.  Try to match what we see in table views. 
+	// Enabled: Black, white if Selected; Disabled: grayed out.
+	
+	if (_imbShouldDisableTitle)
 	{
-		[[((id)self) imageBrowserView] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
+		[attributes1 setObject:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4] forKey:NSForegroundColorAttributeName];
+		[attributes2 setObject:[NSColor colorWithCalibratedWhite:1.0 alpha:0.5] forKey:NSForegroundColorAttributeName];
 	}
 	else
 	{
-		[[((id)self) parent] setValue:attributes forKey:IKImageBrowserCellsTitleAttributesKey];
+		[attributes1 setObject:[NSColor blackColor] forKey:NSForegroundColorAttributeName];
+		[attributes2 setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
+	}
+
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		[[((id)self) imageBrowserView] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[((id)self) imageBrowserView] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
+	}
+	else
+	{
+		[[((id)self) parent] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[((id)self) parent] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
 	}	
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (BOOL) wantsRollover
-//{
-//	return [super wantsRollover];
-//}
-//
-//
-//- (void) mouseEntered:(NSEvent*)inEvent
-//{
-//	[super mouseEntered:(NSEvent*)inEvent];
-//}
-//
-//
-//- (void) mouseExited:(NSEvent*)inEvent
-//{
-//	[super mouseExited:(NSEvent*)inEvent];
-//}
+- (void) drawTitle
+{
+	[self setTitleColors];
+	[super drawTitle];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

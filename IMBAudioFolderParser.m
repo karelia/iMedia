@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -56,6 +56,9 @@
 #import "IMBParserController.h"
 #import "IMBTimecodeTransformer.h"
 #import "IMBCommon.h"
+#import "NSString+iMedia.h"
+#import "NSWorkspace+iMedia.h"
+#import "IMBNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -104,20 +107,28 @@
 	
 	if (item)
 	{
+		[metadata setObject:inPath forKey:@"path"];
 		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
 		CFArrayRef authors = MDItemCopyAttribute(item,kMDItemAuthors);
 		CFStringRef album = MDItemCopyAttribute(item,kMDItemAlbum);
+		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
 
 		if (seconds)
 		{
 			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
 			CFRelease(seconds);
 		}
-		
+		else
+		{
+			NSSound* sound = [[NSSound alloc] initWithContentsOfFile:inPath byReference:YES];
+			[metadata setObject:[NSNumber numberWithDouble:sound.duration] forKey:@"duration"]; 
+			[sound release];
+		}
+
 		if (authors)
 		{
 			NSArray* artists = (NSArray*)authors;
-			if (artists.count > 0)[metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
+			if (artists.count > 0) [metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
 			CFRelease(authors);
 		}
 		
@@ -126,12 +137,18 @@
 			[metadata setObject:(NSString*)album forKey:@"album"]; 
 			CFRelease(album);
 		}
+
+		if (comment)
+		{
+			[metadata setObject:(NSString*)comment forKey:@"comment"]; 
+			CFRelease(comment);
+		}
 		
 		CFRelease(item);
 	}
 	else
 	{
-//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager threadSafeManager] fileExistsAtPath:inPath]);
+//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
 	}
 	
 	return metadata;
@@ -145,11 +162,13 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
-	
+	NSString* comment = [inMetadata objectForKey:@"comment"];
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
 	if (artist)
 	{
 		NSString* artistLabel = NSLocalizedStringWithDefaultValue(
@@ -158,7 +177,8 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",artistLabel,artist];
 	}
 	
 	if (album)
@@ -169,7 +189,8 @@
 			@"Album",
 			@"Album label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",albumLabel,album];
 	}
 	
 	if (duration)
@@ -181,7 +202,20 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
+	}
+
+	if (comment && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																   @"Comment",
+																   nil,IMBBundle(),
+																   @"Comment",
+																   @"Comment label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;
@@ -204,7 +238,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -215,6 +249,7 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Music"];
+		self.displayPriority = 1;
 	}
 	
 	return self;
@@ -237,7 +272,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -255,6 +290,36 @@
 
 @end
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBAppleLoopsForGarageBandFolderParser
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
+	[pool drain];
+}
+
+
+// Set the folder path to /Library/Audio/Apple Loops/Apple/iLife Sound Effects...
+
+- (id) initWithMediaType:(NSString*)inMediaType
+{
+	if (self = [super initWithMediaType:inMediaType])
+	{
+		self.mediaSource = @"/Library/Audio/Apple Loops/Apple/Apple Loops for GarageBand";
+	}
+	
+	return self;
+}
+
+@end
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -266,7 +331,7 @@
 
 + (id) folderPath
 {
-	NSString* path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
+	NSString* path = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
 	return [path stringByAppendingPathComponent:@"/Contents/Resources/Sound Effects"];
 }
 
@@ -277,7 +342,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	if ([self folderPath]) [IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -310,7 +375,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -320,7 +385,10 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [@"~/Library/Sounds" stringByStandardizingPath];
+		NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+		NSString *libraryPath = [libraryPaths objectAtIndex:0];
+
+		self.mediaSource = [libraryPath stringByAppendingPathComponent:@"Sounds"];
 	}
 	
 	return self;

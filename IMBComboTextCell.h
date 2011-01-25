@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -59,6 +59,7 @@
 	NSString* _imageRepresentationType;		
 	NSString* _title;
 	NSString* _subtitle;
+	BOOL _isDisabledFromDragging;
 	
 	NSDictionary* _titleTextAttributes;
 	NSDictionary* _subtitleTextAttributes;
@@ -72,6 +73,8 @@
 
 @property (retain) NSString* subtitle;
 @property (copy) NSDictionary* subtitleTextAttributes;
+
+@property (assign, setter=setDisabledFromDragging:) BOOL isDisabledFromDragging;
 
 @end
 

@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -63,7 +63,7 @@
 #pragma mark GLOBALS
 
 static NSUInteger sCacheSize = 512;
-static NSMutableArray* sObjectCache = nil;
+static IMBObjectFifoCache* sSharedCache = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,17 +92,57 @@ static NSMutableArray* sObjectCache = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (IMBObjectFifoCache*) threadSafeSharedCache
+{
+	if (sSharedCache == nil)
+	{
+		@synchronized(self)
+		{
+			if (sSharedCache == nil)
+			{
+				sSharedCache = [[IMBObjectFifoCache alloc] init];
+			}
+		}
+	}
+	
+	return sSharedCache;
+}
+
+
+- (id) init
+{
+	if (self = [super init])
+	{
+		_objects = [[NSMutableArray alloc] initWithCapacity:sCacheSize];
+	}
+	
+	return self;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_objects);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
 // Keep removing the oldest objects (lowest indexes) until the array no longer exceeds the cache size...
 
-+ (void) _removeOldestObjects
+- (void) _removeOldestObjects
 {
-	if (sObjectCache != nil)
+	if (_objects != nil)
 	{
-		while ([sObjectCache count] > sCacheSize)
+		while ([_objects count] > sCacheSize)
 		{
-			IMBObject* object = [sObjectCache objectAtIndex:0];
-			[object unload];
-			[sObjectCache removeObjectAtIndex:0];
+			IMBObject* object = [_objects objectAtIndex:0];
+			(void) [object unloadThumbnail];
+			[_objects removeObjectAtIndex:0];
 		}
 	}
 }
@@ -114,56 +154,115 @@ static NSMutableArray* sObjectCache = nil;
 // Add a new object to the end of the array. If we now exceed the cache size, then bump the oldest  
 // objects off the cache...
 
+
+- (void) _addObject:(IMBObject*)inObject
+{
+	[_objects addObject:inObject];
+	[self _removeOldestObjects];
+	
+//	NSLog(@"%s count = %d",__FUNCTION__,(int)[_objects count]);
+}
+
+
 + (void) addObject:(IMBObject*)inObject
 {
-	if (sObjectCache == nil)
-	{
-		sObjectCache = [[NSMutableArray alloc] initWithCapacity:sCacheSize];
+	if ([NSThread isMainThread])
+	{							
+		[[self threadSafeSharedCache] _addObject:inObject];
 	}
-	
-	[sObjectCache addObject:inObject];
-	[self _removeOldestObjects];
-}
-
-
-// Remove the given object from the cache. Please note that it may be in the cache multiple times. All 
-// occurences are removed...
-
-+ (void) removeObject:(IMBObject*)inObject
-{
-	if (sObjectCache != nil)
+	else
 	{
-		while ([sObjectCache indexOfObject:inObject])
-		{
-			[inObject unload];
-			[sObjectCache removeObject:inObject];
-		}
+		[[self threadSafeSharedCache] 
+			performSelectorOnMainThread:@selector(_addObject:) 
+			withObject:inObject 
+			waitUntilDone:NO 
+			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
-}
-
-
-// Remove all objects from the cache...
-
-+ (void) removeAllObjects
-{
-	[sObjectCache makeObjectsPerformSelector:@selector(unload)];
-	IMBRelease(sObjectCache);
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Returns the current count of object in the cache...
+#pragma mark 
+
+// Remove the given object from the cache. Please note that it may be in the cache multiple times. All 
+// occurences are removed...
+
+- (void) _removeObject:(IMBObject*)inObject
+{
+	if (_objects != nil)
+	{
+		while ([_objects indexOfObject:inObject])
+		{
+			(void) [inObject unloadThumbnail];
+			[_objects removeObject:inObject];
+		}
+	}
+}
+
+
++ (void) removeObject:(IMBObject*)inObject
+{
+	if ([NSThread isMainThread])
+	{							
+		[[self threadSafeSharedCache] _removeObject:inObject];
+	}
+	else
+	{
+		[[self threadSafeSharedCache] 
+			performSelectorOnMainThread:@selector(_removeObject:) 
+			withObject:inObject 
+			waitUntilDone:NO 
+			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Remove all objects from the cache...
+
+- (void) _removeAllObjects
+{
+	[_objects makeObjectsPerformSelector:@selector(unloadThumbnail)];
+}
+
+
++ (void) removeAllObjects
+{
+	if ([NSThread isMainThread])
+	{							
+		[[self threadSafeSharedCache] _removeAllObjects];
+	}
+	else
+	{
+		[[self threadSafeSharedCache] 
+			performSelectorOnMainThread:@selector(_removeAllObjects) 
+			withObject:nil 
+			waitUntilDone:NO 
+			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+// Returns the current count of objects in the cache...
+
+- (NSUInteger) _count
+{
+	return [_objects count];
+}
+
 
 + (NSUInteger) count
 {
-	if (sObjectCache)
-	{
-		return [sObjectCache count];
-	}
-	
-	return 0;	
+	return [[self threadSafeSharedCache] _count];
 }
 
 

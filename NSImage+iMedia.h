@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -52,20 +52,26 @@
 @interface NSImage (iMedia)
 
 // Try to load an image out of the bundle for another application and if not found fallback to one of our own.
-+ (NSImage *)imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle;
++ (NSImage *)imb_imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle;
 
-+ (NSImage *)imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime;
+#if defined MAC_OS_X_VERSION_10_6 && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
++ (NSImage *)imb_imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime;
+#endif
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
-+ (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
-+ (NSString*) imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
++ (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath checkSpotlightComments:(BOOL)aCheckSpotlight;
++ (NSString*) imb_imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
-+ (NSImage *) sharedGenericFolderIcon;						// Shared instance - can only have one size!
-+ (NSImage *) genericFolderIcon;							// Copied instance - can have any size
++ (NSImage *) imb_sharedGenericFileIcon;						// Shared instance - can only have one size!
++ (NSImage *) imb_sharedGenericFolderIcon;						// Shared instance - can only have one size!
++ (NSImage *) imb_genericFolderIcon;							// Copied instance - can have any size
 	
-- (NSImage *) imageCroppedToRect:(NSRect)inCropRect;		// new instance
+- (NSImage *) imb_imageCroppedToRect:(NSRect)inCropRect;		// new instance
 
-+ (NSImage *) imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
++ (NSImage *) imb_imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
 
+// Create a NSBitmapImageRep from NSImage
+- (NSBitmapImageRep *) imb_firstBitmap;	
+- (NSBitmapImageRep *) imb_bitmap;	
 
 @end

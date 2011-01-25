@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -59,7 +59,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
-#import "WebIconDatabase.h"
+#import "IMBNodeObject.h"
 #import <WebKit/WebKit.h>
 #import <Quartz/Quartz.h>
 
@@ -103,10 +103,10 @@
 
 	// Force the WebIconDatabase to be created on main thread - some webkit versions seem to complain when 
 	// it's not the case...
-	
-	[WebIconDatabase performSelectorOnMainThread:@selector(sharedIconDatabase) withObject:nil waitUntilDone:YES];
+	// NOT Enabled for now... Doesn't work, and makes App Store reject us.
+	// [WebIconDatabase performSelectorOnMainThread:@selector(sharedIconDatabase) withObject:nil waitUntilDone:YES];
 
-	[pool release];
+	[pool drain];
 }
 
 
@@ -117,7 +117,7 @@
 
 + (NSString*) safariPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
 }
 
 
@@ -135,9 +135,13 @@
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
-	NSString* path = [@"~/Library/Safari/Bookmarks.plist" stringByStandardizingPath];
+	
+	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+	NSString *libraryPath = [libraryPaths objectAtIndex:0];
 
-	if ([self isInstalled] && [[NSFileManager threadSafeManager] fileExistsAtPath:path])
+	NSString* path = [libraryPath stringByAppendingPathComponent:@"Safari/Bookmarks.plist"];
+
+	if ([self isInstalled] && [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
 	{
 		IMBSafariBookmarkParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 		parser.mediaSource = path;
@@ -200,17 +204,17 @@
 	
 	if (inOldNode == nil)		// implicit command to create the empty root node
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 
-		node.parentNode = nil;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];
 		node.name = @"Safari";
 		node.icon = icon;
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
+		node.isTopLevelNode = YES;
 		node.parser = self;
 		node.objects = [NSMutableArray array];	// Note that we don't set subnodes, which means node not populated yet.
 	}
@@ -219,7 +223,6 @@
 	
 	else
 	{
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -232,7 +235,7 @@
 	// Watch the XML file. Whenever something in Safari changes, we have to replace the WHOLE tree   
 	// from the root node down, as we have no way of finding WHAT has changed in Safari...
 	
-	if (node.isRootNode)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
@@ -246,7 +249,7 @@
 	
 	if (inOldNode.isPopulated)
 	{
-		[self populateNode:node options:inOptions error:&error];
+		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
 	}
 	
 	if (outError) *outError = error;
@@ -266,7 +269,7 @@
 {
 	NSError* error = nil;
 	
-	if (inNode.isRootNode)
+	if (inNode.isTopLevelNode)
 	{
 		NSDictionary* plist = [self plist];
 		[self populateNode:inNode plist:plist];
@@ -308,7 +311,7 @@
 	NSDictionary* plist = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
-	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 	
 	@synchronized(self)
@@ -372,15 +375,8 @@
 
 - (void) populateNode:(IMBNode*)inNode plist:(NSDictionary*)inPlist
 {
-	if (inNode.subNodes == nil)
-	{
-		inNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inNode.objects == nil)
-	{
-		inNode.objects = [NSMutableArray array];
-	}
+	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* objects = [NSMutableArray array];
 	
 	NSArray* childrenPlist = [inPlist objectForKey:@"Children"];
 	NSUInteger index = 0;
@@ -391,7 +387,7 @@
 		
 		if (subnode)
 		{
-			if ([inNode isRootNode])
+			if ([inNode isTopLevelNode])
 			{
 				NSImage *newImage = nil;
 				if ([subnode.name isEqualToString:@"BookmarksMenu"])
@@ -402,7 +398,7 @@
 							  nil,IMBBundle(),
 							  @"Bookmarks Menu",
 							  @"top-level bookmark name");
-					newImage = [NSImage imageResourceNamed:@"tiny_menu.tiff"
+					newImage = [NSImage imb_imageResourceNamed:@"tiny_menu.tiff"
 										   fromApplication:@"com.apple.Safari"
 												fallbackTo:nil];
 					
@@ -416,7 +412,7 @@
 							  @"Bookmarks Bar",
 							  @"top-level bookmark name");
 					
-					newImage = [NSImage imageResourceNamed:@"FavoritesBar.tif"
+					newImage = [NSImage imb_imageResourceNamed:@"FavoritesBar.tif"
 										   fromApplication:@"com.apple.Safari"
 												fallbackTo:nil];
 				}
@@ -427,9 +423,8 @@
 				
 			}
 			
-			subnode.parentNode = inNode;
 			[self populateNode:subnode plist:childPlist];
-			[(NSMutableArray*)inNode.subNodes addObject:subnode];
+			[subNodes addObject:subnode];
 		}	
 		
 		IMBObject* object = [self objectForPlist:childPlist];
@@ -437,9 +432,12 @@
 		if (object)
 		{
 			object.index = index++;
-			[(NSMutableArray*)inNode.objects addObject:object];
+			[objects addObject:object];
 		}
 	}
+	
+	inNode.subNodes = subNodes;
+	inNode.objects = objects;
 }
 
 
@@ -454,7 +452,7 @@
 	if ([type isEqualToString:@"WebBookmarkTypeList"])
 	{
 		NSString* title = [inPlist objectForKey:@"Title"];
-		NSImage* icon = [NSImage sharedGenericFolderIcon];
+		NSImage* icon = [NSImage imb_sharedGenericFolderIcon];
 
 		subnode = [[[IMBNode alloc] init] autorelease];
 		subnode.mediaSource = self.mediaSource;
@@ -483,19 +481,32 @@
 		NSString* title = [uri objectForKey:@"title"];
 		NSString* urlString = [inPlist objectForKey:@"URLString"];
 		NSURL* url = [NSURL URLWithString:urlString];
-		
+				
 		object = [[[IMBObject alloc] init] autorelease];
-		object.location = (id)url;
+		if (url)
+		{
+			object.location = (id)url;
+			object.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
+		}
+		else
+		{
+			object.location = urlString;	// url may not have been formed from string
+			object.imageRepresentationType = IKImageBrowserPathRepresentationType;
+		}
 		object.name = title;
 		object.parser = self;
+	}
+	else if ([type isEqualToString:@"WebBookmarkTypeList"])
+	{
+		IMBNode* subnode = [self subnodeForPlist:inPlist];
+		subnode.includedInPopup = NO;
 
-		NSImage* icon = [[WebIconDatabase sharedIconDatabase] 
-			iconForURL:urlString
-			withSize:NSMakeSize(16,16)
-			cache:YES];
-					
-		object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-		object.imageRepresentation = icon;
+		NSString* title = [inPlist objectForKey:@"Title"];		// Capitalized for list, lowercase for leaves?
+
+		object = [[[IMBNodeObject alloc] init] autorelease];
+		object.name = title;
+		object.parser = self;
+		object.location = (id)subnode;
 	}
 	
 	return object;

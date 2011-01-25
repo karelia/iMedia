@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -60,15 +60,21 @@
 
 
 // TODO: should subclassed methods be public?
-@interface IMBObjectPromise ()
+@interface IMBObjectsPromise ()
 - (void) _countObjects:(NSArray*)inObjects;
 - (void) loadObjects:(NSArray*)inObjects;
 - (void) _loadObject:(IMBObject*)inObject;
 - (void) _didFinish;
 
-@property (retain) NSMutableDictionary* objectsToLocalURLs;
+@end
+
+
+@interface IMBPyramidObjectPromise ()
+
++ (NSURL*)placeholderImageUrl;
 
 @end
+
 
 // This subclass is used for pyramid files that need to be split. The split file is saved to the local file system,
 // where it can then be accessed by the delegate... 
@@ -96,7 +102,7 @@
 	}
 	
 	if (imageURL != nil) {
-		[self.objectsToLocalURLs setObject:imageURL forKey:inObject];
+		[self setFileURL:imageURL error:nil forObject:inObject];
 		_objectCountLoaded++;
 	}
 	else {
@@ -111,7 +117,13 @@
 	
 	if (absolutePyramidPath != nil) {
 		NSString* orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];;
-		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+		NSData* data = nil; //[NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+		
+		if (data == nil) {
+			// We have a path, but there was no file at that path
+			return [self placeholderImageUrl];
+		}
+		
 		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
 		NSUInteger index = [data lastIndexOfBytes:pattern length:3];
 		
@@ -120,7 +132,7 @@
 			BOOL success = NO;
 			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
 			NSString* fileName = [[(NSString*)lightroomObject.location lastPathComponent] stringByDeletingPathExtension];
-			NSString* jpegPath = [[[NSFileManager threadSafeManager] temporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
+			NSString* jpegPath = [[[NSFileManager imb_threadSafeManager] imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
 			
 			if ((orientation == nil) || [orientation isEqual:@"AB"]) {
 				success = [jpegData writeToFile:jpegPath atomically:YES];
@@ -185,4 +197,83 @@
 	
 	return nil;
 }
+
++ (NSURL*)placeholderImageUrl
+{
+	static NSURL *placeholderImageUrl = nil;
+	
+	if (placeholderImageUrl != nil) {
+		NSString *placeholderImagePath = [placeholderImageUrl path];
+		NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+
+		if ([fm isReadableFileAtPath:placeholderImagePath]) {
+			return placeholderImageUrl;
+		}
+	}
+	
+	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	NSString *jpegPath = [[fm imb_uniqueTemporaryFile:@"LightroomPlaceholder"] stringByAppendingPathExtension:@"jpg"];
+	NSSize imageSize = NSMakeSize(640.0, 480.0);
+	NSRect imageBounds =  NSMakeRect(0.0, 0.0, imageSize.width, imageSize.height);
+	
+	NSBitmapImageRep *bitmapImage = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
+																			 pixelsWide:imageSize.width 
+																			 pixelsHigh:imageSize.height 
+																		  bitsPerSample:8 
+																		samplesPerPixel:4 
+																			   hasAlpha:YES 
+																			   isPlanar:NO
+																		 colorSpaceName:NSCalibratedRGBColorSpace 
+																			bytesPerRow:0 
+																		   bitsPerPixel:0] autorelease];
+	
+	[NSGraphicsContext saveGraphicsState];
+
+	NSGraphicsContext *nsContext = [NSGraphicsContext graphicsContextWithBitmapImageRep:bitmapImage];
+	
+	[NSGraphicsContext setCurrentContext:nsContext];
+
+	[[NSColor lightGrayColor] set];
+	
+	NSRectFill(imageBounds);
+	
+	NSString *message = NSLocalizedStringWithDefaultValue(@"IMB.IMBPyramidObjectPromise.PlaceholderMessage",
+														  nil,
+														  IMBBundle(),
+														  @"Image not found.\nPlease instruct Lightroom to generate previews",
+														  @"Message to export when Pyramid file is missing");
+	NSShadow *shadow = [[[NSShadow alloc] init] autorelease];
+	
+	[shadow setShadowColor:[NSColor blackColor]];
+	[shadow setShadowOffset:NSMakeSize(0, -1)];
+	[shadow setShadowBlurRadius:0.0f];
+	
+	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+								[NSFont boldSystemFontOfSize:24.0f], NSFontAttributeName, 
+								[NSColor whiteColor], NSForegroundColorAttributeName, 
+								shadow, NSShadowAttributeName, 
+								nil] ;
+	NSAttributedString *attributedString = [[[NSAttributedString alloc] initWithString:message attributes:attributes] autorelease];
+	
+	[attributedString drawInRect:NSInsetRect(imageBounds, 20.0, 20.0)];
+	
+	[NSGraphicsContext restoreGraphicsState];
+
+	NSData *data = [bitmapImage representationUsingType:NSJPEGFileType properties:nil];
+	NSURL *url = [NSURL fileURLWithPath:jpegPath];
+	BOOL status = [data writeToURL:url atomically:YES];
+	
+	
+  	if (status == NO) {
+		NSLog(@"%s Failed to write %@", __FUNCTION__, jpegPath);
+		
+		return nil;
+	}
+	
+	[placeholderImageUrl release];
+	placeholderImageUrl = [url retain];
+	
+	return url;
+}
+
 @end

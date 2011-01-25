@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -53,7 +53,28 @@
 #pragma mark HEADERS
 
 #import "IMBMovieObject.h"
-#import <QTKit/QTKit.h>
+#import "IMBOperationQueue.h"
+#import "NSURL+iMedia.h"
+#import "NSImage+iMedia.h"
+#import "NSWorkspace+iMedia.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
+
+NSString* kIMBPosterFrameProperty = @"posterFrame";
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBMovieObject ()
+- (CGImageRef) _renderPosterFrame;
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,69 +88,66 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Helper method to extract thumbnail frame from a movie...
-
-- (CGImageRef) _posterFrameWithMovie:(QTMovie*)inMovie
+- (id) init
 {
-	NSError* error = nil;
-	QTTime duration = inMovie.duration;
-	double tv = duration.timeValue;
-	double ts = duration.timeScale;
-	QTTime time = QTMakeTimeWithTimeInterval(0.5 * tv/ts);
-	NSSize size = NSMakeSize(256.0,256.0);
+	if (self = [super init])
+	{
+		_posterFrame = NULL;
+		_isLoadingPosterFrame = NO;
+	}
 	
-	NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-		QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,
-		[NSValue valueWithSize:size],QTMovieFrameImageSize,
-		nil];
-	
-	return (CGImageRef) [inMovie frameImageAtTime:time withAttributes:attributes error:&error];
+	return self;
+}
+
+
+- (void) dealloc
+{
+	if (_posterFrame) CGImageRelease(_posterFrame);
+	[super dealloc];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Setter retains the CGImage...
+
 - (void) setPosterFrame:(CGImageRef)inPosterFrame
 {
+	[self willChangeValueForKey:kIMBPosterFrameProperty];
+	
 	CGImageRef old = _posterFrame;
 	_posterFrame = CGImageRetain(inPosterFrame);
 	CGImageRelease(old);
+	
+	[self didChangeValueForKey:kIMBPosterFrameProperty];
 }
 
 
-// The getter loads the image lazily (if it's not available). Please note that the unload method gets rid of it 
-// again as the IMBObjectFifoCache clears out the oldest items...
+// The getter loads the poster frame image lazily (if it's not available). Since we are using Quicklook to render 
+// the image, and Quicklook doesn't like being called on the main thread, we'll defer this to a background operation.
+// Please note that the unloadThumbnail method gets rid of the poster frame image again as the IMBObjectFifoCache clears out 
+// the oldest items...
 
 - (CGImageRef) posterFrame
-{
-	NSError* error = nil;
-	QTMovie* movie = nil;
-	
-	if (_posterFrame == NULL && _imageRepresentation != nil)
+{	
+	if (_posterFrame == NULL)
 	{
-		if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])
+		if (_isLoadingPosterFrame == NO)
 		{
-			movie = (QTMovie*)_imageRepresentation;
-			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
-		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserPathRepresentationType] ||
-				 [_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
-		{
-			NSString* path = (NSString*)_imageRepresentation;
-			movie = [QTMovie movieWithFile:path error:&error];
-			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
-		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserNSURLRepresentationType])
-		{
-			NSURL* url = (NSURL*)_imageRepresentation;
-			movie = [QTMovie movieWithURL:url error:&error];
-			self.posterFrame = (CGImageRef) [self _posterFrameWithMovie:movie];
-		}
-		else if ([_imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
-		{
-			self.posterFrame = (CGImageRef)_imageRepresentation;
-		}
+			_isLoadingPosterFrame = YES;
+
+			if ([NSThread isMainThread])
+			{
+				NSInvocationOperation* op = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(renderPosterFrame) object:nil];
+				[[IMBOperationQueue sharedQueue] addOperation:op];
+				[op release];
+			}
+			else
+			{
+				self.posterFrame = [self _renderPosterFrame];
+			}
+		}	
 	}
 	
 	return _posterFrame;
@@ -139,17 +157,74 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) unload
+// Render the image on a background thread and set the result back on the main thread...
+
+- (void) renderPosterFrame
 {
-	[super unload];
-	self.posterFrame = NULL;
+	CGImageRef image = [self _renderPosterFrame];
+	[self performSelectorOnMainThread:@selector(_setPosterFrame:) withObject:(id)image waitUntilDone:NO];
 }
 
 
-- (void) dealloc
+// Use Quicklook to render the poster frame. Please note that Quicklook wants to be called on a background thread.
+// If Quicklook fail to generate an image (either not supported or corrupt file), then we will simply try to get
+// an icon image from the Finder as a fallback...
+
+- (CGImageRef) _renderPosterFrame
+{	
+	NSString* path = nil;
+	NSURL* url = nil;
+	
+	if ([_location isKindOfClass:[NSString class]])
+	{
+		path = (NSString*)_location;
+		url = [NSURL fileURLWithPath:path];
+	}
+	else if ([_location isKindOfClass:[NSURL class]])
+	{
+		url = (NSURL*)_location;
+		path = [url path];
+	}
+	
+	CGImageRef posterFrame = [url imb_quicklookCGImage];
+	
+	if (posterFrame == NULL)
+	{
+		NSLog(@"%s Failed to create QuickLook image for file %@. Using generic file icon instead...",__FUNCTION__,self.name);
+		
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:[path pathExtension]];
+		[icon setSize:NSMakeSize(kIMBMaxThumbnailSize,kIMBMaxThumbnailSize)];
+		NSBitmapImageRep* rep = [icon imb_bitmap];
+		posterFrame = [rep CGImage];
+		
+		_shouldDrawAdornments = NO;
+	}
+	
+	return posterFrame;
+}
+
+
+// The setter is called on the main tread, so that KVO works correctly...
+
+- (void) _setPosterFrame:(id)inImage
 {
-	if (_posterFrame) CGImageRelease(_posterFrame);
-	[super dealloc];
+	self.posterFrame = (CGImageRef)inImage;
+	_isLoadingPosterFrame = NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// As object are flushed from the cache
+- (BOOL) unloadThumbnail
+{
+	BOOL result = [super unloadThumbnail];
+	if (result)
+	{
+		self.posterFrame = NULL;
+	}
+	return result;
 }
 
 

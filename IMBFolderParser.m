@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBFolderParser.h"
+#import "IMBConfig.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBNodeObject.h"
@@ -70,7 +71,7 @@
 @implementation IMBFolderParser
 
 @synthesize fileUTI = _fileUTI;
-
+@synthesize displayPriority = _displayPriority;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -80,6 +81,7 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.fileUTI = nil;
+		self.displayPriority = 5;	// default middle-of-the-pack priority
 	}
 	
 	return self;
@@ -105,6 +107,7 @@
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
+	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
 	NSError* error = nil;
 	NSString* path = inOldNode ? inOldNode.mediaSource : self.mediaSource;
 	path = [path stringByStandardizingPath];
@@ -112,7 +115,7 @@
 	// Check if the folder exists. If not then do not return a node...
 	
 	BOOL exists,directory;
-	exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&directory];
+	exists = [fm fileExistsAtPath:path isDirectory:&directory];
 	
 	if (!exists || !directory) 
 	{
@@ -123,15 +126,18 @@
 	
 	IMBNode* newNode = [[[IMBNode alloc] init] autorelease];
 	
-	newNode.parentNode = inOldNode.parentNode;
+	if (inOldNode == nil) newNode.isTopLevelNode = YES;
 	newNode.mediaSource = path;
-	newNode.identifier = [self identifierForPath:path]; 
-	newNode.name = [[NSFileManager threadSafeManager] displayNameAtPath:path];
-	newNode.icon = [self iconForPath:path];
+	newNode.identifier = [self identifierForPath:path];
+	newNode.displayPriority = self.displayPriority;			// get node's display priority from the folder parser
+	newNode.name = [fm displayNameAtPath:path];
+	newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
+	[newNode.icon setScalesWhenResized:YES];
+	[newNode.icon setSize:NSMakeSize(16,16)];
 	newNode.parser = self;
 	newNode.leaf = NO;
 	
-	if (newNode.isRootNode)
+	if (newNode.isTopLevelNode)
 	{
 		newNode.groupType = kIMBGroupTypeFolder;
 		newNode.includedInPopup = YES;
@@ -144,7 +150,7 @@
 	
 	// Enable FSEvents based file watching for root nodes...
 	
-	if (newNode.isRootNode)
+	if (newNode.isTopLevelNode)
 	{
 		newNode.watcherType = kIMBWatcherTypeFSEvent;
 		newNode.watchedPath = path;
@@ -157,9 +163,9 @@
 	
 	// If the old node was populated, then also populate the new node...
 	
-	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
+	if (inOldNode.isPopulated)
 	{
-		[self populateNode:newNode options:inOptions error:&error];
+		[self populateNewNode:newNode likeOldNode:inOldNode options:inOptions];
 	}
 
 	if (outError) *outError = error;
@@ -175,29 +181,30 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
+	NSFileManager* fm = [NSFileManager imb_threadSafeManager];
+	NSWorkspace* ws = [NSWorkspace imb_threadSafeWorkspace];
 	NSError* error = nil;
 	NSString* folder = inNode.mediaSource;
-	NSArray* files = [[NSFileManager threadSafeManager] contentsOfDirectoryAtPath:folder error:&error];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	
+	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];
+	files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
+	
 	if (error == nil)
 	{
-		NSMutableArray* subnodes = [[NSMutableArray alloc] init];
-		inNode.subNodes = subnodes;
-		[subnodes release];
+		NSMutableArray* subnodes = [NSMutableArray array];
+		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:files.count];
 		
-		NSMutableArray* objects = [[NSMutableArray alloc] initWithCapacity:files.count];
-		inNode.objects = objects;
-		[objects release];
-
+		inNode.displayedObjectCount = 0;
+		
 		NSMutableArray* folders = [NSMutableArray array];
 	
 		for (NSString* file in files)
 		{
 			if (index%32 == 0)
 			{
-				IMBRelease(pool);
+				IMBDrain(pool);
 				pool = [[NSAutoreleasePool alloc] init];
 			}
 			
@@ -208,18 +215,27 @@
 				NSString* path = [folder stringByAppendingPathComponent:file];
 				
 				// For folders will be handled later. Just remember it for now...
-				
-				if ([self fileAtPath:path conformsToUTI:(NSString*)kUTTypeFolder])
+				BOOL isDir = NO;
+				if ([fm fileExistsAtPath:path isDirectory:&isDir] && isDir) 
 				{
-					[folders addObject:path];
+					if (![IMBConfig isLibraryPath:path])
+					{
+						[folders addObject:path];
+					}
+					else
+					{
+						// NSLog(@"IGNORING LIBRARY PATH: %@", path);
+					}
+
 				}
 				
 				// Create an IMBVisualObject for each qualifying file...
 				
-				else if ([self fileAtPath:path conformsToUTI:_fileUTI])
+				else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
 				{
 					IMBObject* object = [self objectForPath:path name:file index:index++];
 					[objects addObject:object];
+					inNode.displayedObjectCount++;
 				}
 			}
 		}
@@ -230,48 +246,84 @@
 		{
 			if (index%32 == 0)
 			{
-				IMBRelease(pool);
+				IMBDrain(pool);
 				pool = [[NSAutoreleasePool alloc] init];
 			}
 			
-			NSString* name = [[NSFileManager threadSafeManager] displayNameAtPath:folder];
+			NSString* name = [fm displayNameAtPath:folder];
+			BOOL isPackage = [ws isFilePackageAtPath:folder];
 			
-			IMBNode* subnode = [[IMBNode alloc] init];
-			subnode.parentNode = inNode;
-			subnode.mediaSource = folder;
-			subnode.identifier = [[self class] identifierForPath:folder];
-			subnode.name = name;
-			subnode.icon = [self iconForPath:folder]; //[[NSWorkspace threadSafeWorkspace] iconForFile:folder];
-			subnode.parser = self;
-			subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
-			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibrarController _reloadNodesWithWatchedPath:
-			subnode.leaf = NO;
-			subnode.includedInPopup = NO;
-			[subnodes addObject:subnode];
-			[subnode release];
+			if (!isPackage)
+			{
+				IMBNode* subnode = [[IMBNode alloc] init];
+				subnode.mediaSource = folder;
+				subnode.identifier = [[self class] identifierForPath:folder];
+				subnode.name = name;
+				subnode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+				[subnode.icon setScalesWhenResized:YES];
+				[subnode.icon setSize:NSMakeSize(16,16)];
+				subnode.parser = self;
+				subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
+				subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
+				
+				// Should this folder be a leaf or not?  We are going to have to scan into the directory
+			
+				NSArray* folderContents = [fm contentsOfDirectoryAtPath:folder error:&error];	// When we go 10.6 only, use better APIs.
+				BOOL hasSubDir = NO;
+				int fileCounter = 0;	// bail if this is a really full folder
+				
+				if (folderContents)
+				{
+					for (NSString *isThisADirectory in folderContents)
+					{
+						NSString* path = [folder stringByAppendingPathComponent:isThisADirectory];
+						[fm fileExistsAtPath:path isDirectory:&hasSubDir];
+						fileCounter++;
+						
+						// Would it be faster to use attributesOfItemAtPath:error: ????
+						if (hasSubDir)
+						{
+							hasSubDir = YES;
+							break;	// Yes, found a subdir, so we want a disclosure triangle on this
+						}
+						else if (fileCounter > 100)
+						{
+							hasSubDir = YES;	// just in case, assume there is a subfolder there
+							break;
+						}
+					}
+				}
+				subnode.leaf = !hasSubDir;	// if it doesn't have a subdirectory, treat it as a leaf
+				subnode.includedInPopup = NO;
+				[subnodes addObject:subnode];
+				[subnode release];
 
 #if 0
 // DCJ - I don't think nodes should show up in the objects list because
 // it is not intuitive to the user to have navigational objects like folders
 // in the object view.
-			IMBNodeObject* object = [[IMBNodeObject alloc] init];
-			object.location = (id)subnode;
-			object.name = name;
-			object.metadata = nil;
-			object.parser = self;
-			object.index = index++;
-			object.imageLocation = (id)folder;
-			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:folder];
+				IMBNodeObject* object = [[IMBNodeObject alloc] init];
+				object.location = (id)subnode;
+				object.name = name;
+				object.metadata = nil;
+				object.parser = self;
+				object.index = index++;
+				object.imageLocation = (id)folder;
+				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+				object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
 
-			[objects addObject:object];
-			[object release];
+				[objects addObject:object];
+				[object release];
 #endif
-			
+			}
 		}
+		
+		inNode.subNodes = subnodes;
+		inNode.objects = objects;
+		inNode.leaf = [subnodes count] == 0;
 	}
 	
-	IMBRelease(pool);
+	IMBDrain(pool);
 					
 	if (outError) *outError = error;
 	return error == nil;
@@ -283,23 +335,6 @@
 
 #pragma mark 
 #pragma mark Helpers
-
-
-- (BOOL) fileAtPath:(NSString*)inPath conformsToUTI:(NSString*)inRequiredUTI
-{
-	NSString* uti = [NSString UTIForFileAtPath:inPath];
-	return (BOOL) UTTypeConformsTo((CFStringRef)uti,(CFStringRef)inRequiredUTI);
-}
-
-
-- (NSImage*) iconForPath:(NSString*)inPath
-{
-	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:inPath];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(16,16)];
-	return icon;
-}
-	
 
 // To be overridden by subclass...
 	
@@ -317,17 +352,10 @@
 }
 
 
-+ (NSString*) identifierForPath:(NSString*)inPath
-{
-	NSString* parserClassName = NSStringFromClass([self class]);
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
-}
-	
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex
+- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
 {
 	IMBObject* object = [[[IMBObject alloc] init] autorelease];
 	object.location = (id)inPath;
@@ -366,6 +394,59 @@
 			[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
 		}
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Add a 'Reveal in Finder' command to the context menu...
+
+- (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject
+{
+	if ([inObject isKindOfClass:[IMBNodeObject class]])
+	{
+		NSString* title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.revealInFinder",
+			nil,IMBBundle(),
+			@"Reveal in Finder",
+			@"Menu item in context menu of IMBObjectViewController");
+		
+		IMBNode* node = (IMBNode*) [inObject location];
+		NSString* path = (NSString*) [node mediaSource];
+		
+		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
+		[item setRepresentedObject:path];
+		[item setTarget:self];
+		[inMenu addItem:item];
+		[item release];
+	}
+}
+
+
+- (void) willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode
+{
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBObjectViewController.menuItem.revealInFinder",
+		nil,IMBBundle(),
+		@"Reveal in Finder",
+		@"Menu item in context menu of IMBObjectViewController");
+	
+	NSString* path = (NSString*) [inNode mediaSource];
+	
+	NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
+	[item setRepresentedObject:path];
+	[item setTarget:self];
+	[inMenu addItem:item];
+	[item release];
+}
+
+
+- (IBAction) revealInFinder:(id)inSender
+{
+	NSString* path = (NSString*)[inSender representedObject];
+	NSString* folder = [path stringByDeletingLastPathComponent];
+	[[NSWorkspace imb_threadSafeWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
 }
 
 

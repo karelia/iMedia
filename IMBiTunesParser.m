@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -46,6 +46,7 @@
 
 // Author: Peter Baumgartner
 
+// Note: Maybe we could put something like CorePasteboardFlavorType 0x6974756E on the pasteboard for metadata?
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -53,10 +54,12 @@
 #pragma mark HEADERS
 
 #import "IMBiTunesParser.h"
+#import "IMBConfig.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-#import "IMBEnhancedObject.h"
+#import "IMBObject.h"
 #import "IMBIconCache.h"
+#import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBTimecodeTransformer.h"
@@ -106,7 +109,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -117,7 +120,7 @@
 
 + (NSString*) iTunesPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iTunes"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iTunes"];
 }
 
 
@@ -145,6 +148,11 @@
 		{
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
+			BOOL changed;
+			(void) [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
+
+			NSString *libraryPath = [path stringByDeletingLastPathComponent];	// folder containing .xml file
+			[IMBConfig registerLibraryPath:libraryPath];
 
 			IMBiTunesParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = path;
@@ -211,11 +219,10 @@
 	
 	if (inOldNode == nil)
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 
-		node.parentNode = nil;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];
 		node.name = @"iTunes";
@@ -223,13 +230,13 @@
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
 		node.parser = self;
+		node.isTopLevelNode = YES;
 	}
 	
 	// Or an subnode...
 	
 	else
 	{
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -241,7 +248,7 @@
 	
 	// If we have more than one library then append the library name to the root node...
 	
-	if (node.isRootNode && self.shouldDisplayLibraryName)
+	if (node.isTopLevelNode && self.shouldDisplayLibraryName)
 	{
 		NSString* path = (NSString*)node.mediaSource;
 		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
@@ -251,7 +258,7 @@
 	// Watch the XML file. Whenever something in iPhoto changes, we have to replace the WHOLE tree from  
 	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
 	
-	if (node.isRootNode)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
@@ -265,7 +272,7 @@
 	
 	if (inOldNode.isPopulated)
 	{
-		[self populateNode:node options:inOptions error:&error];
+		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
 	}
 	
 	if (outError) *outError = error;
@@ -282,9 +289,10 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
+	NSDictionary* plist = self.plist;
+	NSArray* playlists = [plist objectForKey:@"Playlists"];
+	NSDictionary* tracks = [plist objectForKey:@"Tracks"];
 	
-	NSArray* playlists = [self.plist objectForKey:@"Playlists"];
-	NSDictionary* tracks = [self.plist objectForKey:@"Tracks"];
 	[self addSubNodesToNode:inNode playlists:playlists tracks:tracks]; 
 	[self populateNode:inNode playlists:playlists tracks:tracks]; 
 
@@ -292,7 +300,7 @@
 	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,
 	// which is implemented here, to achieve the desired "feel" in the browser...
 	
-	if (inNode.isRootNode)
+	if (inNode.isTopLevelNode)
 	{
 		IMBNode* musicNode = [inNode.subNodes objectAtIndex:0];
 		[self populateNode:musicNode options:inOptions error:outError];
@@ -333,7 +341,7 @@
 	NSDictionary* plist = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
-	NSDictionary* metadata = [[NSFileManager threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 	
 	@synchronized(self)
@@ -347,7 +355,7 @@
 		{
 			self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
 			self.modificationDate = modificationDate;
-			self.version = [[self.plist objectForKey:@"Application Version"] intValue];
+			self.version = [[_plist objectForKey:@"Application Version"] intValue];
 		}
 		
 		plist = [[_plist retain] autorelease];
@@ -547,8 +555,7 @@
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subNodes = (NSMutableArray*) inParentNode.subNodes;
-	if (subNodes == nil) inParentNode.subNodes = subNodes = [NSMutableArray array];
+	NSMutableArray* subNodes = [NSMutableArray array];
 
 	// Now parse the iTunes XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
@@ -583,11 +590,12 @@
 			// Add the new album node to its parent (inRootNode)...
 			
 			[subNodes addObject:playlistNode];
-			playlistNode.parentNode = inParentNode;
 		}
 		
-		[pool release];
+		[pool drain];
 	}
+	
+	inParentNode.subNodes = subNodes;
 }
 
 
@@ -596,7 +604,13 @@
 
 - (Class) objectClass
 {
-	return [IMBEnhancedObject class];
+	return [IMBObject class];
+}
+
+
+- (NSString*) requestedImageRepresentationType
+{
+	return IKImageBrowserCGImageRepresentationType;
 }
 
 
@@ -604,18 +618,15 @@
 {
 	// Select the correct imageRepresentationType for our mediaType...
 	
-	NSString* imageRepresentationType = 
-		[self.mediaType isEqualToString:kIMBMediaTypeAudio] ?
-		IKImageBrowserCGImageRepresentationType :
-		IKImageBrowserQTMovieRepresentationType;
+	NSString* imageRepresentationType = [self requestedImageRepresentationType];
 		
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
-	Class objectClass = [self objectClass];
-	NSMutableArray* objects = (NSMutableArray*) inNode.objects;
-	if (objects == nil) inNode.objects = objects = [NSMutableArray array];
+	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
 
+	Class objectClass = [self objectClass];
+    
 	// Look for the correct playlist in the iTunes XML plist. Once we find it, populate the node with IMBVisualObjects
 	// for each song in this playlist...
 	
@@ -648,7 +659,7 @@
 					
 					// Create an object...
 					
-					IMBEnhancedObject* object = [[objectClass alloc] init];
+					IMBObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 
@@ -684,15 +695,21 @@
 					NSString* genre = [trackDict objectForKey:@"Genre"];
 					if (genre) [metadata setObject:genre forKey:@"genre"]; 
 
+					NSString* comment = [trackDict objectForKey:@"Comment"];
+					if (comment) [metadata setObject:comment forKey:@"comment"]; 
+					
 					object.metadataDescription = [self metadataDescriptionForMetadata:metadata];
 				}
 				
-				[pool2 release];
+				[pool2 drain];
 			}
 		}
 		
-		[pool1 release];
+		[pool1 drain];
 	}
+    
+    inNode.objects = objects;
+    [objects release];
 }
 
 
@@ -700,10 +717,12 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
+	NSString* comment = [inMetadata objectForKey:@"Comments"];
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	NSString* kind = [inMetadata objectForKey:@"Kind"];
 	NSNumber* width = [inMetadata objectForKey:@"Video Width"];
 	NSNumber* height = [inMetadata objectForKey:@"Video Height"];
@@ -713,24 +732,17 @@
 	{
 		if (kind)
 		{
-			NSString* typeLabel = NSLocalizedStringWithDefaultValue(
-				@"Type",
-				nil,IMBBundle(),
-				@"Type",
-				@"Type label in metadataDescription");
-
-			description = [description stringByAppendingFormat:@"%@: %@\n",typeLabel,kind];
+			// Note: This "kind" will be a bit different from others, since it comes from dictionary.
+			// Thus we see "QuickTime movie file" rather than "QuickTime Movie" from other parsers,
+			// which gets the UTI description from the file.
+			if (description.length > 0) [description imb_appendNewline];
+			[description appendString:kind];
 		}
 		
 		if (width != nil && height != nil)
 		{
-			NSString* size = NSLocalizedStringWithDefaultValue(
-					@"Size",
-					nil,IMBBundle(),
-					@"Size",
-					@"Size label in metadataDescription");
-			
-			description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
+			if (description.length > 0) [description imb_appendNewline];
+			[description appendFormat:@"%@×%@",width,height];
 		}
 	}
 	else
@@ -743,7 +755,8 @@
 				@"Artist",
 				@"Artist label in metadataDescription");
 
-			description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+			if (description.length > 0) [description imb_appendNewline];
+			[description appendFormat:@"%@: %@",artistLabel,artist];
 		}
 		
 		if (album)
@@ -754,7 +767,8 @@
 				@"Album",
 				@"Album label in metadataDescription");
 
-			description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+			if (description.length > 0) [description imb_appendNewline];
+			[description appendFormat:@"%@: %@",albumLabel,album];
 		}
 	}
 
@@ -767,7 +781,20 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
+	}
+
+	if (comment && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																	@"Comment",
+																	nil,IMBBundle(),
+																	@"Comment",
+																	@"Comment label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;

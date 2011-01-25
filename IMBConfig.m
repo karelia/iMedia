@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -64,9 +64,13 @@
 
 static NSString* sIMBPrefsKeyFormat = @"iMedia2_%@";
 static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
+//static NSString* sIMBUseGlobalViewTypeKey = @"useGlobalViewType";
 static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
 static NSString* sIMBViewerAppPathsKey = @"viewerAppPaths";
 static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
+static NSString* sIMBFlickrDownloadSizeKey = @"flickrDownloadSize";
+
+static BOOL sUseGlobalViewType = NO;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -152,6 +156,21 @@ static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (void) setUseGlobalViewType:(BOOL)inState
+{
+	sUseGlobalViewType = inState;
+}
+
+
++ (BOOL) useGlobalViewType
+{
+	return sUseGlobalViewType;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Sets the path to the download folder. Default is ~/Downloads...
 
 + (void) setDownloadFolderPath:(NSString*)inPath
@@ -165,6 +184,19 @@ static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 	return [self prefsValueForKey:sIMBDownloadFolderPathKey];
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) setFlickrDownloadSize:(IMBFlickrSizeSpecifier)inFlickrSize;
+{
+	[self setPrefsValue:[NSNumber numberWithInt:inFlickrSize] forKey:sIMBFlickrDownloadSizeKey];
+}
+
+
++ (IMBFlickrSizeSpecifier) flickrDownloadSize
+{
+	return [[self prefsValueForKey:sIMBFlickrDownloadSizeKey] intValue];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -213,18 +245,19 @@ static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 
 + (void) registerDefaultValues
 {
-	NSString* path = [NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"];
+	NSString* path = [NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"];	// brute force fallback
 	NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,NSUserDomainMask,YES);
 	if ([paths count] > 0) path = [paths objectAtIndex:0];
 	
 	[self registerDefaultPrefsValue:[NSNumber numberWithBool:YES] forKey:sIMBShowsGroupNodesKey];
 	[self registerDefaultPrefsValue:path forKey:sIMBDownloadFolderPathKey];
+	[self registerDefaultPrefsValue:[NSNumber numberWithInt:kIMBFlickrSizeSpecifierLarge] forKey:sIMBFlickrDownloadSizeKey];
 
-	NSString* preview = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Preview"];
-	NSString* qtplayerx = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.QuickTimePlayerX"];
-	NSString* safari = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
-	NSString* addressbook = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.AddressBook"];
-	NSString* photoshop = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Photoshop"];
+	NSString* preview = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Preview"];
+	NSString* qtplayerx = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.QuickTimePlayerX"];
+	NSString* safari = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
+	NSString* addressbook = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.AddressBook"];
+	NSString* photoshop = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Photoshop"];
 
 	NSMutableDictionary* viewerAppPaths = [NSMutableDictionary dictionary];
 	if (preview) [viewerAppPaths setObject:preview forKey:kIMBMediaTypeImage];
@@ -243,10 +276,39 @@ static NSString* sIMBEditorAppPathsKey = @"editorAppPaths";
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	[self registerDefaultValues];
-	[pool release];
+	[pool drain];
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+
+/*
+	Library paths.  Each parser should register any path of a library that it uses, so that other parser
+	(e.g. folder parser, spotlight parser, etc.) can exclude that path from showing up in the source list.
+ 
+ */
+
+static NSMutableSet *sLibraryPaths = nil;
+
++ (void)registerLibraryPath:(NSString *)aPath
+{
+	if (nil == sLibraryPaths)
+	{
+		sLibraryPaths = [NSMutableSet new];
+	}
+	[sLibraryPaths addObject:aPath];
+}
+
++ (BOOL) isLibraryPath:(NSString *)aPath
+{
+	return [sLibraryPaths containsObject:aPath];
+}
+
+// Future: We may need a method that loops through the library paths and asks if the given
+// path is a subpath of any of these paths.
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 
 @end

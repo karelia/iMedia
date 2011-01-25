@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -78,20 +78,38 @@
 @synthesize nodeViewController = _nodeViewController;
 @synthesize objectViewController = _objectViewController;
 
++ (void)initialize
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	NSMutableDictionary *defaultDefaults
+	= [NSMutableDictionary dictionaryWithObjectsAndKeys:
+
+//	   [NSNumber numberWithBool:YES], @"WebIconDatabaseEnabled",
+	   
+	   nil];
+	NSUserDefaultsController *controller = [NSUserDefaultsController sharedUserDefaultsController];
+	NSUserDefaults *defaults = [controller defaults];
+	
+	[defaults registerDefaults:defaultDefaults];
+	[controller setInitialValues:defaultDefaults];
+	
+	
+	[pool release];
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 - (void) awakeFromNib
 {
-	NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d", 
-		  MAC_OS_X_VERSION_MIN_REQUIRED,
-		  MAC_OS_X_VERSION_MAX_ALLOWED);
-		  
-		  
-	[IMBConfig setShowsGroupNodes:YES];
+	// NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d",   MAC_OS_X_VERSION_MIN_REQUIRED, MAC_OS_X_VERSION_MAX_ALLOWED);
 	
-	#if CUSTOM_USER_INTERFACE
+	[IMBConfig setShowsGroupNodes:YES];
+	[IMBConfig setUseGlobalViewType:YES];
+	
+#if CUSTOM_USER_INTERFACE
 	
 	// Load parsers...
 	
@@ -113,8 +131,8 @@
 	self.objectViewController.nodeViewController = self.nodeViewController;
 	NSView* objectView = self.objectViewController.view;
 	self.nodeViewController.standardObjectView = objectView;
-//	[self.nodeViewController installObjectViewForNode:nil];
-
+	//	[self.nodeViewController installObjectViewForNode:nil];
+	
 	[nodeView setFrame:[ibWindow.contentView bounds]];
 	[ibWindow setContentView:nodeView];
 	[ibWindow setContentMinSize:[self.nodeViewController minimumViewSize]];
@@ -129,15 +147,15 @@
 	[libraryController reload];
 	[ibWindow makeKeyAndOrderFront:nil];
 	
-	#else
+#else
 	
 	// Just open the standard iMedia panel...
 	
 	[self togglePanel:nil];
 	
-	#endif
+#endif
 }
-	
+
 
 // Toggle panel visibility...
 
@@ -147,7 +165,7 @@
 	{
 		IMBPanelController* controller = [IMBPanelController sharedPanelController];
 		NSWindow* window = controller.window;
-	
+		
 		if (window.isVisible)
 		{
 			[controller hideWindow:inSender];
@@ -162,6 +180,21 @@
 		NSArray* mediaTypes = [NSArray arrayWithObjects:kIMBMediaTypeImage,kIMBMediaTypeAudio,kIMBMediaTypeMovie,kIMBMediaTypeLink,nil];
 		IMBPanelController* panelController = [IMBPanelController sharedPanelControllerWithDelegate:self mediaTypes:mediaTypes];
 		[panelController showWindow:nil];
+		[panelController.window makeKeyAndOrderFront:nil];		// Test app, and stand-alone app, would want this to become key.
+
+	}
+}
+
+
+- (IBAction) toggleDragDestinationWindow:(id)inSender
+{
+	if (ibDragDestinationWindow.isVisible)
+	{
+		[ibDragDestinationWindow orderOut:inSender];
+	}
+	else
+	{
+		[ibDragDestinationWindow makeKeyAndOrderFront:inSender];
 	}
 }
 
@@ -173,7 +206,7 @@
 	NSString* frame = NSStringFromRect(ibWindow.frame);
 	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
 }
-	
+
 
 // Cleanup...
 
@@ -191,50 +224,51 @@
 #pragma mark 
 #pragma mark IMBParserController Delegate
 
-- (BOOL) controller:(IMBParserController*)inController shouldLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
+- (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString *)parserClassname forMediaType:(NSString*)inMediaType
 {
-	#if LOG_PARSERS
-	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
-	#endif
-	
-	if ([NSStringFromClass(inParserClass) isEqualToString:@"IMBFlickrParser"])
+	BOOL result = YES;
+#if LOG_PARSERS
+	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,parserClassname,inMediaType);
+#endif
+
+	if ([parserClassname isEqualToString:@"IMBImageCaptureParser"])
 	{
-		SecKeychainItemRef item = nil;
-		UInt32 stringLength;
-		char* buffer;
-		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
-		if (err == noErr)
-		{
-			SecKeychainItemFreeContent(NULL, buffer);
-		}
-		return item != nil && err == noErr;
+		return NO;
 	}
 	
-	return YES;
+//	if ([parserClassname isEqualToString:@"IMBFlickrParser"])
+//	{
+//		// Quick check keychain.  Detailed fetching is below in "didLoadParser" though.
+//		SecKeychainItemRef item = nil;
+//		UInt32 stringLength;
+//		char* buffer;
+//		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
+//		if (err == noErr)
+//		{
+//			SecKeychainItemFreeContent(NULL, buffer);
+//		}
+//		result = (item != nil && err == noErr);
+//	}
+	return result;
 }
 
 
-- (void) controller:(IMBParserController*)inController willLoadParser:(Class)inParserClass forMediaType:(NSString*)inMediaType
+- (BOOL) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
-	#if LOG_PARSERS
-	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParserClass),inMediaType);
-	#endif
-}
-
-
-- (void) controller:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
-{
-	#if LOG_PARSERS
+#if LOG_PARSERS
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
-	#endif
-
+#endif
+	
+	BOOL loaded = YES;
+	
 	if ([inParser isKindOfClass:[IMBFlickrParser class]])
 	{
 		// To test this, get your own API key from flickr (noncommercial at first, but you are planning
 		// on supporting flickr in iMedia on a commmercial app, you will have to apply for a commercial
 		// API key at least 30 days before shipping)
 		
-		#warning Supply your own Flickr API key and shared secret, or apply for key and secret at: http://flickr.com/services/api/keys/apply
+		// Supply your own Flickr API key and shared secret, or apply for key and secret at:
+		// http://flickr.com/services/api/keys/apply
 		// If you already have an API key, you will find it here:  http://www.flickr.com/services/api/keys/
 		
 		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
@@ -251,20 +285,10 @@
 		// Give it the name of "flickr_api" with the key as the account name, and the secret as the password.
 		
 		SecKeychainItemRef item = nil;
-		OSStatus theStatus = noErr;
-		char *buffer;
 		UInt32 stringLength;
-		
-		theStatus = SecKeychainFindGenericPassword(NULL,
-												   10,	// length of name
-												   "flickr_api",
-												   0,
-												   nil,
-												   &stringLength,
-												   (void**)&buffer,
-												   &item);
-		
-		if (noErr == theStatus)
+		char* buffer;
+		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
+		if (noErr == err)
 		{
 			if (stringLength > 0)
 			{
@@ -273,44 +297,45 @@
 				// now get the 'account'
 				
 				SecKeychainAttribute attributes[8];
-				SecKeychainAttribute attr;
 				SecKeychainAttributeList list;
 				
 				attributes[0].tag = kSecAccountItemAttr;
 				list.count = 1;
 				list.attr = attributes;
-				attr = list.attr[0];
+				//SecKeychainAttribute attr = list.attr[0];
 				
-				theStatus = SecKeychainItemCopyContent (item, NULL, &list, NULL, NULL);
+				err = SecKeychainItemCopyContent (item, NULL, &list, NULL, NULL);
 				
 				// make it clear that this is the beginning of a new keychain item
 				
-				if (theStatus == noErr)
+				if (err == noErr)
 				{
 					flickrParser.flickrAPIKey = [[[NSString alloc] initWithBytes:attributes[0].data length:attributes[0].length encoding:NSUTF8StringEncoding] autorelease];
 					SecKeychainItemFreeContent (&list, NULL);
 				}
-				else NSLog(@"%@ unable to fetch 'flickr_api' account from keychain: status %d", NSStringFromSelector(_cmd), theStatus);
+				else NSLog(@"%s unable to fetch 'flickr_api' account from keychain: status %d", __FUNCTION__, err);
 			}
 			else
 			{
-				NSLog(@"%@ Empty password for 'flickr_api' account in keychain: status %d", NSStringFromSelector(_cmd), theStatus);
+				NSLog(@"%s Empty password for 'flickr_api' account in keychain: status %d", __FUNCTION__, err);
 			}
 			SecKeychainItemFreeContent(NULL, buffer);
 		}
 		else
 		{
-			NSLog(@"%@ Couldn't find 'flickr_api' account in keychain: status %d", NSStringFromSelector(_cmd), theStatus);
+			NSLog(@"%s Couldn't find 'flickr_api' account in keychain: status %d", __FUNCTION__, err);
+			loaded = NO;
 		}
 	}		// end IMBFlickrParser code
+	return loaded;
 }
 
 
-- (void) controller:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
+- (void) parserController:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
-	#if LOG_PARSERS
+#if LOG_PARSERS
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
-	#endif
+#endif
 }
 
 
@@ -321,58 +346,58 @@
 #pragma mark IMBLibraryController Delegate
 
 
-- (BOOL) controller:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
+- (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
 {
-	#if LOG_CREATE_NODE
+#if LOG_CREATE_NODE
 	NSLog(@"%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
-	#endif
-
+#endif
+	
 	return YES;
 }
 
 
-- (void) controller:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
+- (void) libraryController:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
 {
-	#if LOG_CREATE_NODE
+#if LOG_CREATE_NODE
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
-	#endif
+#endif
 }
 
 
-- (void) controller:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
+- (void) libraryController:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
 {
-	#if LOG_CREATE_NODE
+#if LOG_CREATE_NODE
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
-	#endif
+#endif
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (BOOL) controller:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
+- (BOOL) libraryController:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
 {
-	#if LOG_POPULATE_NODE
+#if LOG_POPULATE_NODE
 	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
-	#endif
-
+#endif
+	
 	return YES;
 }
 
 
-- (void) controller:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode
+- (void) libraryController:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode
 {
-	#if LOG_POPULATE_NODE
+#if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
-	#endif
+#endif
 }
 
 
-- (void) controller:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode
+- (void) libraryController:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode
 {
-	#if LOG_POPULATE_NODE
+#if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
-	#endif
+#endif
 }
 
 
@@ -388,21 +413,21 @@
 	
 	//	tag search for 'macintosh' and 'apple'...
 	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
-//	[dict setObject:@"Tagged 'Macintosh' & 'Apple'" forKey:IMBFlickrNodeProperty_Title];
+	//	[dict setObject:@"Tagged 'Macintosh' & 'Apple'" forKey:IMBFlickrNodeProperty_Title];
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodeProperty_Method];
 	[dict setObject:@"macintosh, apple" forKey:IMBFlickrNodeProperty_Query];
 	[defaultNodes addObject:dict];
 	
 	//	tag search for 'iphone' and 'screenshot'...
 	dict = [NSMutableDictionary dictionary];
-//	[dict setObject:@"Tagged 'iPhone' & 'Screenshot'" forKey:IMBFlickrNodeProperty_Title];
+	//	[dict setObject:@"Tagged 'iPhone' & 'Screenshot'" forKey:IMBFlickrNodeProperty_Title];
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TagSearch] forKey:IMBFlickrNodeProperty_Method];
 	[dict setObject:@"iphone, screenshot" forKey:IMBFlickrNodeProperty_Query];
 	[defaultNodes addObject:dict];
 	
 	//	text search for 'tree'...
 	dict = [NSMutableDictionary dictionary];
-//	[dict setObject:@"Search for 'Tree'" forKey:IMBFlickrNodeProperty_Title];
+	//	[dict setObject:@"Search for 'Tree'" forKey:IMBFlickrNodeProperty_Title];
 	[dict setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodeProperty_Method];
 	[dict setObject:@"tree" forKey:IMBFlickrNodeProperty_Query];
 	[defaultNodes addObject:dict];
@@ -410,8 +435,100 @@
 	return defaultNodes;
 }
 
+@end
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#pragma mark -
+#pragma mark Debugging Convenience
+
+#ifdef DEBUG
+
+/*!	Override debugDescription so it's easier to use the debugger.  Not compiled for non-debug versions.
+ */
+@implementation NSDictionary ( OverrideDebug )
+
+- (NSString *)debugDescription
+{
+	return [self description];
+}
 
 @end
+
+@implementation NSArray ( OverrideDebug )
+
+- (NSString *)debugDescription
+{
+	if ([self count] > 20)
+	{
+		NSArray *subArray = [self subarrayWithRange:NSMakeRange(0,20)];
+		return [NSString stringWithFormat:@"%@ [... %d items]", [subArray description], [self count]];
+	}
+	else
+	{
+		return [self description];
+	}
+}
+
+@end
+
+@implementation NSSet ( OverrideDebug )
+
+- (NSString *)debugDescription
+{
+	return [self description];
+}
+
+@end
+
+@implementation NSData ( description )
+
+- (NSString *)description
+{
+	unsigned char *bytes = (unsigned char *)[self bytes];
+	unsigned length = [self length];
+	NSMutableString *buf = [NSMutableString stringWithFormat:@"NSData %d bytes:\n", length];
+	int i, j;
+	
+	for ( i = 0 ; i < length ; i += 16 )
+	{
+		if (i > 1024)		// don't print too much!
+		{
+			[buf appendString:@"\n...\n"];
+			break;
+		}
+		for ( j = 0 ; j < 16 ; j++ )
+		{
+			int offset = i+j;
+			if (offset < length)
+			{
+				[buf appendFormat:@"%02X ",bytes[offset]];
+			}
+			else
+			{
+				[buf appendFormat:@"   "];
+			}
+		}
+		[buf appendString:@"| "];
+		for ( j = 0 ; j < 16 ; j++ )
+		{
+			int offset = i+j;
+			if (offset < length)
+			{
+				unsigned char theChar = bytes[offset];
+				if (theChar < 32 || theChar > 127)
+				{
+					theChar ='.';
+				}
+				[buf appendFormat:@"%c", theChar];
+			}
+		}
+		[buf appendString:@"\n"];
+	}
+	[buf deleteCharactersInRange:NSMakeRange([buf length]-1, 1)];
+	return buf;
+}
+
+@end
+
+#endif

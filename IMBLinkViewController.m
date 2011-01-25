@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -57,9 +57,10 @@
 #import "IMBObjectArrayController.h"
 #import "IMBPanelController.h"
 #import "IMBCommon.h"
+#import "IMBConfig.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBNodeObject.h"
+//#import "IMBNodeObject.h"
 #import "IMBFolderParser.h"
 #import "NSWorkspace+iMedia.h"
 
@@ -78,6 +79,17 @@
 + (void) load
 {
 	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeLink];
+}
+
+
++ (void) initialize
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
+	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeList] forKey:@"viewType"];
+	[classDict setObject:[NSNumber numberWithDouble:0.5] forKey:@"iconSize"];
+	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	[pool release];
 }
 
 
@@ -117,7 +129,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:@"com.apple.Safari"];
+	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.Safari"];
 }
 
 - (NSString*) displayName
@@ -153,13 +165,31 @@
 
 
 
-// The Links panel doesn't have an icon view...
+// The Links panel doesn't have an icon view... Or Combo View
 
 - (void) setViewType:(NSUInteger)inViewType
 {
 	if (inViewType < 1) inViewType = 1;
-	if (inViewType > 2) inViewType = 2;
+	if (inViewType > 1) inViewType = 1;
 	[super setViewType:inViewType];
+}
+
+
+- (NSUInteger) viewType
+{
+	NSUInteger viewType = [super viewType];
+	if (viewType < 1) viewType = 1;
+	if (viewType > 1) viewType = 1;
+	return viewType;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IBAction) quicklook:(id)inSender
+{
+	// Don't try to do quicklook for links
 }
 
 
@@ -168,43 +198,7 @@
 
 #pragma mark 
 #pragma mark NSTableViewDelegate
- 
-/*
-// Upon doubleclick start playing the selection...
 
-- (IBAction) tableViewWasDoubleClicked:(id)inSender
-{
-//	IMBNode* selectedNode = [_nodeViewController selectedNode];
-	NSIndexSet* rows = [ibListView selectedRowIndexes];
-	NSUInteger row = [rows firstIndex];
-		
-	while (row != NSNotFound)
-	{
-		IMBObject* object = (IMBObject*) [[ibObjectArrayController arrangedObjects] objectAtIndex:row];
-
-		if ([object isKindOfClass:[IMBNodeObject class]])
-		{
-			IMBNode* node = (IMBNode*)object.location;
-			[_nodeViewController expandSelectedNode];
-			[_nodeViewController selectNode:node];
-		}
-		else
-		{
-			return;
-		}
-		
-		row = [rows indexGreaterThanIndex:row];
-	}
-}
-
-
-// If we already has some Link playing, then play the new song if the selection changes...
-
-- (void) tableViewSelectionDidChange:(NSNotification*)inNotification
-{
-
-}
-*/
 
 //----------------------------------------------------------------------------------------------------------------------
 

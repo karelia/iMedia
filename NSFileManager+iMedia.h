@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -51,17 +51,20 @@
 
 @interface NSFileManager (iMedia)
 
-+ (NSFileManager *)threadSafeManager;
-- (BOOL)isPathHidden:(NSString *)path;
-- (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
-- (NSString *)pathResolved:(NSString *)path;
++ (NSFileManager *)imb_threadSafeManager;
+- (BOOL)imb_isPathHidden:(NSString *)path;
+- (BOOL)imb_createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
+- (NSString *)imb_pathResolved:(NSString *)path;
 
-- (NSString*)temporaryFile:(NSString*)name;
-- (NSString*)temporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
-- (NSString*)temporaryPathWithinDirectory:(NSString*)directoryPath;
+- (NSString*)imb_uniqueTemporaryFile:(NSString*)name;
+- (NSString*)imb_uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
+- (NSString*)imb_uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath;
 
-- (NSString*) volumeNameAtPath:(NSString*)inPath;
-- (NSString*) relativePathToVolumeAtPath:(NSString*)inPath;
-- (BOOL) fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
+- (NSString*)imb_sharedTemporaryFolder:(NSString*)dirName;
+
+- (NSString*) imb_volumeNameAtPath:(NSString*)inPath;
+- (NSString*) imb_relativePathToVolumeAtPath:(NSString*)inPath;
+- (BOOL) imb_fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
+- (NSString *) imb_generateUniqueFileNameAtPath:(NSString *)path base:(NSString *)basename extension:(NSString *)extension;
 
 @end

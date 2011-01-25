@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -79,8 +79,11 @@
 	NSUInteger _groupType;
 	NSArray* _objects;
 	NSArray* _subNodes;
+	NSInteger _displayedObjectCount;
+	NSUInteger _displayPriority;
 	
 	IMBNode* _parentNode;	// not retained!
+	BOOL _isTopLevelNode;
 	BOOL _group;
 	BOOL _leaf;
 	BOOL _loading;
@@ -110,14 +113,16 @@
 @property (retain) NSImage* icon;					// 16x16 icon for user interface
 @property (retain) NSDictionary* attributes;		// Optional metadata about the node
 @property (assign) NSUInteger groupType;			// Used for grouping root level nodes
+@property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
 
 // Node tree accessors. If the subNodes property is nil, that doesn't mean that there are no subNodes - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
 // subNodes is an empty array, then there really aren't any subnodes.
 
-@property (retain) NSArray* subNodes;				
-@property (assign) IMBNode* parentNode;
-@property (readonly) IMBNode* rootNode;
+@property (copy) NSArray* subNodes;				
+@property (assign,readonly) IMBNode* parentNode;
+@property (readonly) IMBNode* topLevelNode;
+@property (assign) BOOL isTopLevelNode;
 
 // Object accessors. If the objects property is nil, that doesn't mean that there are no objects - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
@@ -133,6 +138,14 @@
 
 - (NSUInteger) countOfBindableObjects;
 - (IMBObject*) objectInBindableObjectsAtIndex:(NSUInteger)inIndex;
+
+// This property can be used by parsers if the real object count differs from what the NSArrayController sees. 
+// An example would be a folder based parser. If a folder contains 3 images and 3 subfolders, then 6 objects 
+// are reported by the NSArrayController, but we really only want 3 image displayed in the user interface.
+// If property is left at the uninitialized value of -1, then countOfBindableObjects is used as is. If a parser
+// chooses to write a non negative value into this property, then this number is displayed instead...
+ 
+@property (assign) NSInteger displayedObjectCount;
 
 // State information about a node...
 
@@ -170,7 +183,6 @@
 
 - (NSIndexPath*) indexPath;
 - (NSComparisonResult) compare:(IMBNode*)inNode;
-- (BOOL) isRootNode;
 - (BOOL) isPopulated;
 - (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier;
 

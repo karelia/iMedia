@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -63,18 +63,23 @@
 #import "IMBObject.h"
 #import "IMBMovieObject.h"
 #import "IMBNodeObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBImageBrowserCell.h"
 #import "IMBProgressWindowController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSView+iMedia.h"
+#import "NSString+iMedia.h"
 #import "IMBDynamicTableView.h"
 #import "IMBComboTextCell.h"
 #import "IMBObject.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
 #import "IMBQLPreviewPanel.h"
+#import <Carbon/Carbon.h>
+#import "IMBFlickrObject.h"
+#import "IMBFlickrNode.h"
+#import "NSFileManager+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,7 +93,10 @@ static NSString* kPosterFrameKeyPath = @"arrangedObjects.posterFrame";
 static NSString* kObjectCountStringKey = @"objectCountString";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
-NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
+NSString* kIMBPublicTitleListPasteboardType = @"imedia.title";
+NSString* kIMBPublicMetadataListPasteboardType = @"imedia.metadata";
+
+NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -144,9 +152,11 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) _reloadIconView;
 - (void) _reloadListView;
 - (void) _reloadComboView;
+- (void) _updateTooltips;
 
-- (void) _downloadSelectedObjectsToDestination:(NSURL*)inDestination;
-- (NSArray*) _namesOfPromisedFiles;
+- (BOOL) writesLocalFilesToPasteboard;
+- (void) _downloadDraggedObjectsToDestination:(NSURL*)inDestination;
+- (NSArray*) _namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination;
 
 @end
 
@@ -172,6 +182,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
+@synthesize dropDestinationURL = _dropDestinationURL;
+@synthesize clickedObjectIndex = _clickedObjectIndex;
+@synthesize clickedObject = _clickedObject;
+@synthesize draggedIndexes = _draggedIndexes;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -257,10 +271,44 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// NSSegmentedControl are templates, so that they get correctly inverted when a segment is highlighted...
 	
 	NSInteger n = [ibSegments segmentCount];
-	
+	NSSegmentedCell *cell = [ibSegments cell];
+	NSArray *segmentChildren = [NSAccessibilityUnignoredDescendant(ibSegments) accessibilityAttributeValue: NSAccessibilityChildrenAttribute];
+
 	for (NSInteger i=0; i<n; i++)
 	{
 		[[ibSegments imageForSegment:i] setTemplate:YES];
+		NSInteger tag = [cell tagForSegment:i];
+		NSString *axDesc = nil;
+		switch (tag)
+		{
+			case kIMBObjectViewTypeIcon:
+				axDesc = NSLocalizedStringWithDefaultValue(
+														   @"IMBObjectViewController.segment.grid",
+														   nil,IMBBundle(),
+														   @"Grid",
+														   @"segmented cell accessibilility description");
+				break;
+			case kIMBObjectViewTypeList:
+				axDesc = NSLocalizedStringWithDefaultValue(
+														   @"IMBObjectViewController.segment.list",
+														   nil,IMBBundle(),
+														   @"List",
+														   @"segmented cell accessibilility description");
+				break;
+				
+			case kIMBObjectViewTypeCombo:
+				axDesc = NSLocalizedStringWithDefaultValue(
+														   @"IMBObjectViewController.segment.combo",
+														   nil,IMBBundle(),
+														   @"Combination",
+														   @"segmented cell accessibilility description");
+				break;
+			default:
+				axDesc = @"";
+				break;
+				
+		}
+		[[segmentChildren objectAtIndex:i] accessibilitySetOverrideValue:axDesc forAttribute:NSAccessibilityDescriptionAttribute];
 	}
 	
 	// Observe changes to object array...
@@ -280,6 +328,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
+// Do not remove this method. It isn't called directly by the framework, but is called by host applications. 
+
 - (void) unbindViews	
 {
 	// Tear down bindings *before* the window is closed. This avoids exceptions due to random deallocation order of 
@@ -288,10 +338,18 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// optimization where the views of invisible tabs are not really part of the window view hierarchy. However the 
 	// view subtrees exist and do have bindings to the IMBObjectArrayController - which need to be torn down as well...
 	
-	[ibIconView unbindViewHierarchy];
-	[ibListView unbindViewHierarchy];
-	[ibComboView unbindViewHierarchy];
-	[self.view unbindViewHierarchy];
+	[ibIconView imb_unbindViewHierarchy];
+	[ibListView imb_unbindViewHierarchy];
+	[ibComboView imb_unbindViewHierarchy];
+	[self.view imb_unbindViewHierarchy];
+	
+    // Clear datasource and delegate, just in case views live longer than this controller...
+    
+	[ibListView setDataSource:nil];
+    [ibListView setDelegate:nil];
+	
+    [ibComboView setDataSource:nil];
+    [ibComboView setDelegate:nil];
 }
 
 
@@ -305,7 +363,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[NSObject cancelPreviousPerformRequestsWithTarget:ibListView];
 	[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView];
 
-	// remove ourself from the QuiclLook preview panel...
+	// Remove ourself from the QuickLook preview panel...
 	
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
@@ -321,18 +379,23 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
-
+    
 	// Other cleanup...
 	
 	IMBRelease(_libraryController);
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
-	
+	IMBRelease(_dropDestinationURL);
+	IMBRelease(_clickedObject);
+	IMBRelease(_draggedIndexes);
+
 	for (IMBObject* object in _observedVisibleItems)
 	{
         if ([object isKindOfClass:[IMBObject class]])
 		{
+//			NSLog(@"dealloc REMOVE [%p:%@'%@' removeObs…:%p 4kp:imageRep…", object,[object class],[object name], self);
             [object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
+            [object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
         }
     }
 	
@@ -351,7 +414,6 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	if (inContext == (void*)kArrangedObjectsKey)
 	{
-		//		[self _reloadIconView];
 		[self willChangeValueForKey:kObjectCountStringKey];
 		[self didChangeValueForKey:kObjectCountStringKey];
 	}
@@ -360,22 +422,26 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	else if (inContext == (void*)kImageRepresentationKeyPath)
 	{
-//		id object = [inChange objectForKey:NSKeyValueChangeNewKey];
-//		NSLog(@"%s %@",__FUNCTION__,inChange);
-		[self _reloadIconView];
-		[self _reloadComboView];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadIconView) object:nil];
+		[self performSelector:@selector(_reloadIconView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
+		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	else if (inContext == (void*)kPosterFrameKeyPath)
 	{
-		[self _reloadComboView];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
+		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
-	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty])
-	{
-        // Find the row and reload it. Note that KVO notifications may be sent from a background thread (in this 
-		// case, we know they will be) We should only update the UI on the main thread, and in addition, we use 
-		// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
+	
+	// Find the row and reload it. Note that KVO notifications may be sent from a background thread (in this 
+	// case, we know they will be) We should only update the UI on the main thread, and in addition, we use 
+	// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
 		
-		IMBDynamicTableView *affectedTableView = (IMBDynamicTableView *)inContext;
+	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty] ||
+			 [inKeyPath isEqualToString:kIMBPosterFrameProperty])
+	{
+		IMBDynamicTableView* affectedTableView = (IMBDynamicTableView*)inContext;
 		NSInteger row = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inObject];
 		
 		if (NSNotFound != row)
@@ -440,16 +506,18 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (NSMutableDictionary*) _preferences
 {
-	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
-	return [NSMutableDictionary dictionaryWithDictionary:[classDict objectForKey:self.mediaType]];
+	return [IMBConfig prefsForClass:self.class];
+//	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+//	return [NSMutableDictionary dictionaryWithDictionary:[classDict objectForKey:self.mediaType]];
 }
 
 
 - (void) _setPreferences:(NSMutableDictionary*)inDict
 {
-	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
-	[classDict setObject:inDict forKey:self.mediaType];
-	[IMBConfig setPrefs:classDict forClass:self.class];
+	[IMBConfig setPrefs:inDict forClass:self.class];
+//	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+//	[classDict setObject:inDict forKey:self.mediaType];
+//	[IMBConfig setPrefs:classDict forClass:self.class];
 }
 
 
@@ -517,7 +585,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibListView setAction:@selector(tableViewWasClicked:)];
 	[ibListView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
 	
-    [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+    [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];	// I think this was to work around a bug
     [ibListView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
 
@@ -530,7 +598,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibComboView setAction:@selector(tableViewWasClicked:)];
 	[ibComboView setDoubleAction:@selector(tableViewWasDoubleClicked:)];
 	
-    [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+    [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];	// I think this was to work around a bug
     [ibComboView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
 
@@ -541,17 +609,23 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (void) willShowView
 {
 	// To be overridden by subclass...
+	
+	[self willChangeValueForKey:@"viewType"];
+	[self didChangeValueForKey:@"viewType"];
 }
+
 
 - (void) didShowView
 {
 	// To be overridden by subclass...
 }
 
+
 - (void) willHideView
 {
 	// To be overridden by subclass...
 }
+
 
 - (void) didHideView
 {
@@ -567,6 +641,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	return nil;	// Must be overridden by subclass
 }
 
+
 - (NSString*) displayName
 {
 	return nil;	// Must be overridden by subclass
@@ -576,15 +651,30 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Availability of the icon size slide depends on the view type (e.g. not available in list view...
+// Depending of the IMBConfig setting useGlobalViewType, the controller either uses a global state, or each
+// controller keeps its own state. It is up to the application developer to choose a behavior...
 
 - (void) setViewType:(NSUInteger)inViewType
 {
 	[self willChangeValueForKey:@"canUseIconSize"];
 	_viewType = inViewType;
+	[IMBConfig setPrefsValue:[NSNumber numberWithUnsignedInteger:inViewType] forKey:@"globalViewType"];
 	[self didChangeValueForKey:@"canUseIconSize"];
 }
 
+
+- (NSUInteger) viewType
+{
+	if ([IMBConfig useGlobalViewType])
+	{
+		return [[IMBConfig prefsValueForKey:@"globalViewType"] unsignedIntegerValue];
+	}
+	
+	return _viewType;
+}
+
+
+// Availability of the icon size slide depends on the view type (e.g. not available in list view)...
 
 - (BOOL) canUseIconSize
 {
@@ -600,19 +690,30 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// Get the row that seems most important in the combo view. Its either the selected row or the middle visible row...
 	
 	NSRange visibleRows = [ibComboView rowsInRect:[ibComboView visibleRect]];
-	NSUInteger anchorRow = visibleRows.location + visibleRows.length/2;
+	NSUInteger firstVisibleRow = visibleRows.location;
+	NSUInteger lastVisibleRow = visibleRows.location + visibleRows.length;
+	NSUInteger anchorRow = (firstVisibleRow + lastVisibleRow) / 2;
 	
 	NSIndexSet* selection = [ibObjectArrayController selectionIndexes];
 	
 	if (selection) 
 	{
-		NSUInteger selectedRow = [selection firstIndex];
-		if (selectedRow != NSNotFound) anchorRow = selectedRow;
+		NSUInteger firstSelectedRow = [selection firstIndex];
+		NSUInteger lastSelectedRow = [selection lastIndex];
+
+		if (firstSelectedRow != NSNotFound &&
+			lastSelectedRow != NSNotFound &&
+			firstSelectedRow >= firstVisibleRow && 
+			lastSelectedRow <= lastVisibleRow)
+		{
+			anchorRow = (firstSelectedRow + lastSelectedRow) / 2;;
+		}	
 	}
 	
 	// Change the cell size of the icon view. Also notify the parser so it can update thumbnails if necessary...
 	
 	_iconSize = inIconSize;
+	[IMBConfig setPrefsValue:[NSNumber numberWithDouble:inIconSize] forKey:@"globalIconSize"];
 	
 	NSSize size = [ibIconView cellSize];
 	IMBParser* parser = self.currentNode.parser;
@@ -644,15 +745,37 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	NSClipView* clipview = (NSClipView*)[ibComboView superview];
 	[clipview scrollToPoint:NSMakePoint(0.0,y)];
 	[[ibComboView enclosingScrollView] reflectScrolledClipView:clipview];
+	
+	// Tooltips in the icon view need to be rebuilt...
+	
+	[self _updateTooltips];
+}
+
+
+- (double) iconSize
+{
+	if ([IMBConfig useGlobalViewType])
+	{
+		return [[IMBConfig prefsValueForKey:@"globalIconSize"] doubleValue];
+	}
+	
+	return _iconSize;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Return the oject count for the currently selected node. Please note that we ask the node first. Only if the 
+// count is missing, we ask the NSArrayController. This way we can react to custom situations, like 3 images and 3 
+// subfolders being reported as "3 images" instead of "6 images"...
+
 - (NSString*) objectCountString
 {
-	NSUInteger count = [[ibObjectArrayController arrangedObjects] count];
+	IMBNode* node = [self currentNode];
+	NSInteger count = node.displayedObjectCount;
+	if (count < 0) count = (NSInteger) [[ibObjectArrayController arrangedObjects] count];
+	
 	NSString* format = count==1 ? self.objectCountFormatSingular : self.objectCountFormatPlural;
 	return [NSString stringWithFormat:format,count];
 }
@@ -666,7 +789,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	if ([ibIconView.window isVisible])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
-		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[self _updateTooltips];
 	}
 }
 
@@ -676,7 +800,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	if ([ibListView.window isVisible])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibListView selector:@selector(reloadData) object:nil];
-		[ibListView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[ibListView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 }
 
@@ -686,7 +810,39 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	if ([ibComboView.window isVisible])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView selector:@selector(reloadData) object:nil];
-		[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Please note that providing tooltips is WAY too expensive on 10.5 (possibly due to different internal 
+// implementation of IKImageBrowserView). For this reason we disable tooltips on 10.5...
+
+
+- (void) _updateTooltips
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(__updateTooltips) object:nil];
+	[self performSelector:@selector(__updateTooltips) withObject:nil afterDelay:0.1];
+}
+	
+	
+- (void) __updateTooltips
+{
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		[ibIconView removeAllToolTips];
+		
+		NSArray* objects = ibObjectArrayController.arrangedObjects;
+		NSInteger i = 0;
+		
+		for (IMBObject* object in objects)
+		{
+			NSRect rect = [ibIconView itemFrameAtIndex:i++];
+			[ibIconView addToolTipRect:rect owner:object userData:NULL];
+		}
 	}
 }
 
@@ -756,7 +912,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		{
 			NSString* path = [inObject path];
 			
-			if ([[NSFileManager threadSafeManager] fileExistsAtPath:path])
+			if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
 			{
 				// Open with source app. Commented out for now as apps like iPhoto do not seem to be able to open
 				// and display images within its own libary. All it does is display a cryptic error message...
@@ -771,7 +927,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //							@"Open With %@",
 //							@"Menu item in context menu of IMBObjectViewController");
 //						
-//						appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+//						appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
 //						title = [NSString stringWithFormat:title,appName];	
 //
 //						item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInSourceApp:) keyEquivalent:@""];
@@ -792,7 +948,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
-					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+					appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
 					title = [NSString stringWithFormat:title,appName];	
 
 					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInEditorApp:) keyEquivalent:@""];
@@ -812,7 +968,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
-					appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+					appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
 					title = [NSString stringWithFormat:title,appName];	
 
 					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInViewerApp:) keyEquivalent:@""];
@@ -824,7 +980,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				
 				// Open with default app determined by OS...
 				
-				else if ([[NSWorkspace threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type])
+				else if ([[NSWorkspace imb_threadSafeWorkspace] getInfoForFile:path application:&appPath type:&type])
 				{
 					title = NSLocalizedStringWithDefaultValue(
 						@"IMBObjectViewController.menuItem.openWithFinder",
@@ -920,9 +1076,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	id delegate = self.delegate;
 	
-	if (delegate!=nil && [delegate respondsToSelector:@selector(controller:willShowContextMenu:forObject:)])
+	if (delegate!=nil && [delegate respondsToSelector:@selector(libraryController:willShowContextMenu:forObject:)])
 	{
-		[delegate controller:self.libraryController willShowContextMenu:menu forObject:inObject];
+		[delegate libraryController:self.libraryController willShowContextMenu:menu forObject:inObject];
 	}
 	
 	return menu;
@@ -940,7 +1096,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		app = [object.parser performSelector:@selector(appPath)];
 	}
 	
-	[[NSWorkspace threadSafeWorkspace] openFile:path withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 
@@ -948,7 +1104,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	NSString* app = [IMBConfig editorAppForMediaType:self.mediaType];
 	NSString* path = (NSString*)[inSender representedObject];
-	[[NSWorkspace threadSafeWorkspace] openFile:path withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 
@@ -956,14 +1112,14 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	NSString* app = [IMBConfig viewerAppForMediaType:self.mediaType];
 	NSString* path = (NSString*)[inSender representedObject];
-	[[NSWorkspace threadSafeWorkspace] openFile:path withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 
 - (IBAction) openInApp:(id)inSender
 {
 	NSString* path = (NSString*)[inSender representedObject];
-	[[NSWorkspace threadSafeWorkspace] openFile:path];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:path];
 }
 
 
@@ -971,15 +1127,16 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	IMBParser* parser = self.currentNode.parser;
 	NSArray* objects = [ibObjectArrayController selectedObjects];
-	IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-	[promise startLoadingWithDelegate:self finishSelector:nil];
+	IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
+	[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+    [promise start];
 }
 
 
 - (IBAction) openInBrowser:(id)inSender
 {
 	NSURL* url = (NSURL*)[inSender representedObject];
-	[[NSWorkspace threadSafeWorkspace] openURL:url];
+	[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
 }
 
 
@@ -987,7 +1144,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	NSString* path = (NSString*)[inSender representedObject];
 	NSString* folder = [path stringByDeletingLastPathComponent];
-	[[NSWorkspace threadSafeWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
+	[[NSWorkspace imb_threadSafeWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
 }
 
 
@@ -1015,43 +1172,72 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
-// Open the specified objects...
+// Open the specified objects. Double-clicking opens the files (with the default app). Please note that 
+// IMBObjects are first passed through an IMBObjectsPromise (which is returned by the parser), because 
+// the resources to be opened may not yet be available. In this case the promise object loads them 
+// asynchronously and calls _openLocalURLs: once the load has finished...
+	
 
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode
 {
-	// Double-clicking opens the files (with the default app). Please note that IMBObjects are first passed through an 
-	// IMBObjectPromise (which is returned by the parser), because the resources to be opened may not yet be available.
-	// In this case the promise object loads them asynchronously and calls _openLocalURLs: once the load has finished...
-	
 	if (inSelectedNode)
 	{
 		IMBParser* parser = inSelectedNode.parser;
-		IMBObjectPromise* promise = [parser objectPromiseWithObjects:inObjects];
-		[promise startLoadingWithDelegate:self finishSelector:@selector(_openLocalURLs:withError:)];
+		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
+		[promise setDelegate:self completionSelector:@selector(_openLocalURLs:)];
+        [promise start];
 	}
 }
 
 
-// "Local" means that for whatever the object represents, opening it now requires no network or other time-intensive 
-// procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to IMBObjects 
-// that refer strictly to a web link, where "opening" them just means loading them in a browser...
+#pragma mark
+#pragma mark Post-download action
 
-- (void) _openLocalURLs:(IMBObjectPromise*)inObjectPromise withError:(NSError*)inError
+
+// Post process.
+
+- (void) _postProcessDownload:(IMBObjectsPromise*)inObjectsPromise
 {
-	if (inError == nil)
+	if ([inObjectsPromise isKindOfClass:[NSError class]])	// overloaded... error object
 	{
-		for (NSURL* url in inObjectPromise.localURLs)
-		{
-			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
-			if ([url isKindOfClass:[NSURL class]])
-			{
-				[[NSWorkspace threadSafeWorkspace] openURL:url];
-			}
-		}
+		[NSApp presentError:(NSError*)inObjectsPromise];
+	}
+}
+
+
+// "Local" means that for whatever the object represents, opening it now requires no network or other time-intensive
+// procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to
+// IMBObjects that refer strictly to a web link, where "opening" them just means loading them in a browser...
+
+- (void) _openLocalURLs:(IMBObjectsPromise*)inObjectPromise
+{
+	if ([inObjectPromise isKindOfClass:[NSError class]])	// overloaded... error object
+	{
+		[NSApp presentError:(NSError*)inObjectPromise];
 	}
 	else
 	{
-		[NSApp presentError:inError];
+		[self _postProcessDownload:inObjectPromise];		// first do our post-processing
+		
+		for (NSURL* url in inObjectPromise.fileURLs)
+		{
+			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
+			
+			if ([url isKindOfClass:[NSURL class]])
+			{
+				NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
+				if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
+
+				if ([self writesLocalFilesToPasteboard] && appPath != nil)
+				{
+					[[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+				}
+				else
+				{
+					[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+				}
+			}
+		}
 	}
 }
 
@@ -1063,17 +1249,24 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #pragma mark Dragging
 
 
-//
 // By default all object view controllers manage objects which correspond to local file URLs when dragged or copied to pasteboard.
-//
 
 - (BOOL) writesLocalFilesToPasteboard
 {
 	return YES;
 }
 
+// Finish promise, from "dumb" applications that handle NSFilesPromisePboardType
+
 - (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
 {
+	if (self.dropDestinationURL)		// is this finishing a promise drag?  This is when we want to load it.
+	{
+		// Resolve any promise
+		[self _downloadDraggedObjectsToDestination:self.dropDestinationURL];
+		self.dropDestinationURL = nil;
+	}
+
 	_isDragging = NO;
 }
 
@@ -1098,18 +1291,22 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				if (mappedObject != nil)
 				{
 					// Use our promise object to load the content
-					NSData* data = [inItem dataForType:kIMBObjectPromiseType];
-					IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-					if (promise != nil)
+					IMBObjectsPromise* promise = [IMBObjectsPromise promiseFromPasteboard:inPasteboard];
+					
+					// Make sure we got a promise, AND check that there are actually some items to download,
+					// before we actually try to start downloading.
+					if (promise != nil && [promise.objects count] > 0)
 					{
-						promise.downloadFolderPath = NSTemporaryDirectory();
-						[promise startLoadingWithDelegate:self finishSelector:nil];
-						[promise waitUntilDone];
+						promise.destinationDirectoryPath = nil;	// only download (to temporary directory) if needed.
+						[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+                        [promise start];
+						[promise waitUntilFinished];
 						
-						NSURL* thisURL = [promise localURLForObject:mappedObject];
+						NSURL* thisURL = [promise fileURLForObject:mappedObject];
 						if ((thisURL != nil) && ([thisURL isKindOfClass:[NSURL class]]))
 						{
 							// public.url is documented as containing the "bytes of the URL"
+                            // When they say "bytes", docs might mean the result of CFURLCreateData(). Mike
 							[inItem setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:inType];
 						}
 					}
@@ -1120,19 +1317,32 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
+// 10.5 API.
+// Gets called by ClearContents and declareTypes:owner: and ... ?
+
+- (void)pasteboardFinishedWithDataProvider:(NSPasteboard *)pasteboard
+{
+	// NSLog(@"%s", __FUNCTION__);		// Do we want to do anything here? Clear out drag pasteboard contents?
+}
+
+
+// 10.5 API:
 // Even dumber are apps that do not support NSFilesPromisePboardType, but only know about NSFilenamesPboardType.
 // In this case we'll download to the temp folder and block synchronously until the download has completed...
+//
+// This requires there to be an iMBObjectPromise on the pasteboard; we use that to extract the other information requested.
 
 - (void) pasteboard:(NSPasteboard*)inPasteboard provideDataForType:(NSString*)inType
 {
-	NSData* data = [inPasteboard dataForType:kIMBObjectPromiseType];
-	IMBObjectPromise* promise = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-	
-	promise.downloadFolderPath = NSTemporaryDirectory();
-	[promise startLoadingWithDelegate:self finishSelector:nil];
-	[promise waitUntilDone];
-	
-	if ([promise.localURLs count] > 0)
+	// NSLog(@"%s:%@", __FUNCTION__, inType);
+	IMBObjectsPromise* promise = [IMBObjectsPromise promiseFromPasteboard:inPasteboard];
+    
+	promise.destinationDirectoryPath = nil;	// only download (to temporary directory) if needed.
+	[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+    [promise start];
+	[promise waitUntilFinished];
+
+	if ([promise.fileURLs count] > 0)
 	{
 		if (/*_isDragging == NO &&*/ [inType isEqualToString:NSFilenamesPboardType])
 		{
@@ -1141,8 +1351,8 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			
 			// In case there were NSError objects in the localURLs array, we want to ignore them. So we'll
 			// go through each item and try to get a path out ...
-			NSMutableArray* localPaths = [NSMutableArray arrayWithCapacity:promise.localURLs.count];
-			for (NSURL* thisObject in promise.localURLs)
+			NSMutableArray* localPaths = [NSMutableArray arrayWithCapacity:promise.fileURLs.count];
+			for (NSURL* thisObject in promise.fileURLs)
 			{
 				if ([thisObject isKindOfClass:[NSURL class]])
 				{
@@ -1152,13 +1362,15 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			[inPasteboard setPropertyList:localPaths forType:NSFilenamesPboardType];
 		}
 		else if (([inType isEqualToString:NSURLPboardType]) ||
-				 ([inType isEqualToString:(NSString*)kUTTypeURL]))
+				 ([inType isEqualToString:(NSString*)kUTTypeURL]
+				 || 
+				 [inType isEqualToString:@"CorePasteboardFlavorType 0x6675726C"]))
 		{
 			// The best we can do for URL type on 10.5 is to provide the URL for the first item in our list. In case
 			// thereare NSError objects in the list, we'll go through until we find an actual URL, and use that 
 			// as the item for the pasteboard			
 			NSURL* thisURL = nil;
-			for (NSURL* thisObject in promise.localURLs)
+			for (NSURL* thisObject in promise.fileURLs)
 			{
 				if ([thisObject isKindOfClass:[NSURL class]])
 				{
@@ -1175,7 +1387,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				}
 				else
 				{
-					[inPasteboard setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:(NSString*)kUTTypeURL];
+					[inPasteboard setData:[[thisURL absoluteString] dataUsingEncoding:NSUTF8StringEncoding] forType:inType];
 				}
 			}
 		}
@@ -1183,76 +1395,95 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
-- (void) _downloadSelectedObjectsToDestination:(NSURL*)inDestination
+- (void) _downloadDraggedObjectsToDestination:(NSURL*)inDestination
 {
 	IMBNode* node = self.currentNode;
 	
 	if (node)
 	{
 		IMBParser* parser = node.parser;
-		NSArray* objects = [ibObjectArrayController selectedObjects];
-		IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-		promise.downloadFolderPath = [inDestination path];
+		NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
+		NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];
+		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
+		promise.destinationDirectoryPath = [inDestination path];
 		
-		[promise startLoadingWithDelegate:self finishSelector:nil];
+		[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+        [promise start];
 	}
 }
 
-
-- (NSArray*) _namesOfPromisedFiles
+- (NSArray*) _namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
 {
-	NSArray* objects = [ibObjectArrayController selectedObjects];
+	NSFileManager *fileManager = [NSFileManager imb_threadSafeManager];
+	NSString *dropDestPath = [inDropDestination path];
+	NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
+	NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];
 	NSMutableArray* names = [NSMutableArray array];
 	
 	for (IMBObject* object in objects)
 	{
-		NSString* path = [object path];
-		if (path) [names addObject:[path lastPathComponent]];
+		NSString *path = [object path];
+		if (path)
+		{
+			NSString* name = [[object path] lastPathComponent];
+			NSString *base = [name stringByDeletingPathExtension];
+			NSString *ext = [name pathExtension];
+			NSString *newPath = [fileManager imb_generateUniqueFileNameAtPath:dropDestPath base:base extension:ext];
+			name = [newPath lastPathComponent];
+			
+			[names addObject:name];
+		}
 	}
 	
 	return names;
 }
 
 
-- (void) prepareProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
+// SpeedLimit http://mschrag.github.com/ is a good way to debug this....
+
+- (void) objectsPromise:(IMBObjectsPromise*)inObjectPromise didProgress:(double)inFraction;
 {
-	IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
-	
-	NSString* title = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.progress.title",
-		nil,IMBBundle(),
-		@"Downloading Media Files",
-		@"Window title of progress panel of IMBObjectViewController");
-	
-	NSString* message = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.progress.message.preparing",
-		nil,IMBBundle(),
-		@"Preparing…",
-		@"Text message in progress panel of IMBObjectViewController");
-	
-	[controller window];
-	[controller setTitle:title];
-	[controller setMessage:message];
-	[controller.progressBar startAnimation:nil];
-	[controller setCancelTarget:inObjectPromise];
-	[controller setCancelAction:@selector(cancel:)];
-	[controller.cancelButton setEnabled:NO];
-	[controller.window makeKeyAndOrderFront:nil];
-	
-	self.progressWindowController = controller;
+	IMBProgressWindowController *progressWindowController = [self progressWindowController];
+
+    if (!progressWindowController)
+    {
+        IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
+        
+        NSString* title = NSLocalizedStringWithDefaultValue(
+                                                            @"IMBObjectViewController.progress.title",
+                                                            nil,IMBBundle(),
+                                                            @"Downloading Media Files",
+                                                            @"Window title of progress panel of IMBObjectViewController");
+        
+        NSString* message = NSLocalizedStringWithDefaultValue(
+                                                              @"IMBObjectViewController.progress.message.preparing",
+                                                              nil,IMBBundle(),
+                                                              @"Preparing…",
+                                                              @"Text message in progress panel of IMBObjectViewController");
+        
+        // Make sure the window is at a higher window level than our view's window, so it doesn't get hidden
+        [[controller window] setLevel:[[[self view] window] level] + 1];
+        
+        [controller setTitle:title];
+        [controller setMessage:message];
+        [controller.progressBar startAnimation:nil];
+        [controller setCancelTarget:inObjectPromise];
+        [controller setCancelAction:@selector(cancel:)];
+        [controller.cancelButton setEnabled:YES];
+        [controller.window makeKeyAndOrderFront:nil];
+        
+        progressWindowController = self.progressWindowController = controller;
+    }
+    
+	[progressWindowController setProgress:inFraction];
+	[progressWindowController setMessage:@""];
+	[progressWindowController.cancelButton setEnabled:YES];
 }
 
 
-- (void) displayProgress:(double)inFraction forObjectPromise:(IMBObjectPromise*)inObjectPromise
+- (void) objectsPromiseDidFinish:(IMBObjectsPromise*)inObjectPromise
 {
-	[self.progressWindowController setProgress:inFraction];
-	[self.progressWindowController setMessage:@""];
-	[self.progressWindowController.cancelButton setEnabled:YES];
-}
-
-
-- (void) cleanupProgressForObjectPromise:(IMBObjectPromise*)inObjectPromise
-{
+	[[self.progressWindowController window] orderOut:nil];
 	self.progressWindowController = nil;
 }
 
@@ -1292,11 +1523,11 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	if (delegate)
 	{
-		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
+		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
 		{
 			IMBNode* node = self.currentNode;
 			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
+			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
 		}
 	}
 	
@@ -1308,6 +1539,9 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
 			IMBNode* subnode = (IMBNode*)object.location;
+			NSString* identifier = subnode.identifier;
+			subnode = [self.libraryController nodeWithIdentifier:identifier];
+
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];
 		}
@@ -1343,6 +1577,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[NSMenu popUpContextMenu:menu withEvent:inEvent forView:inView];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -1350,15 +1585,16 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 // implement the protocol, since we use bindings.  But this is for the benefit of
 // -[IMBImageBrowserView mouseDragged:] ... I hope it's OK that we are ignoring the aBrowser parameter.
 
-- (id /*IKImageBrowserItem*/) imageBrowser:(IKImageBrowserView *) aBrowser itemAtIndex:(NSUInteger)index;
+- (id /*IKImageBrowserItem*/) imageBrowser:(IKImageBrowserView*)inView itemAtIndex:(NSUInteger)inIndex
 {
-	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:index];
+	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
 	return object;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// Filter the dragged indexes to only include the selectable (and thus draggable) ones.
 
 - (NSIndexSet*) filteredDraggingIndexes:(NSIndexSet*)inIndexes
 {
@@ -1398,86 +1634,143 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		{
 			IMBParser* parser = node.parser;
 
-			IMBObjectPromise* promise = [parser objectPromiseWithObjects:objects];
-			NSData* promiseData = [NSKeyedArchiver archivedDataWithRootObject:promise];
-
-			NSArray* declaredTypes = nil;
-			
-			// We currently use a mix of 10.5 and 10.6 style pasteboard behaviors.
-			//
-			// 10.6 affords us the opportunity to write multiple items on the pasteboard at once, 
-			// which is ideal especially when we are writing URLs, for which there was no sanctioned 
-			// method of writing multiple to the pasteboard in 10.5.
-			//
-			// Because the 10.6 method of providing a list of filenames is also provide a list of URLs,
-			// it means we can fill both cases in 10.6 by simply providing URLs. But in order to promise
-			// URLs lazily we have to set an array of NSPasteboardItem on the pasteboard, with each item 
-			// set to callback to us as data provider.
-			//
-			if (IMBRunningOnSnowLeopardOrNewer())
-			{				
-				(void) [inPasteboard clearContents];
-				NSMutableArray* itemArray = [NSMutableArray arrayWithCapacity:[inIndexes count]];
+			// Promise data for all of the objects being dragged. (In 10.6, each index will be extracted one-by-one.)
+			IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
+			if ([promise.objects count] > 0)	// if not downloadable, these won't appear in objects list
+			{
+				NSData* promiseData = [NSKeyedArchiver archivedDataWithRootObject:promise];
 				
-				// Create an array of NSPasteboardItem, each with a promise to fulfill data in the provider callback
-				NSUInteger thisIndex = [inIndexes firstIndex];
-				while (thisIndex != NSNotFound)
-				{
-					IMBObject* thisObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
-					if (thisObject != nil)
+				NSArray* declaredTypes = nil;
+				
+				// We currently use a mix of 10.5 and 10.6 style pasteboard behaviors.
+				//
+				// 10.6 affords us the opportunity to write multiple items on the pasteboard at once, 
+				// which is ideal especially when we are writing URLs, for which there was no sanctioned 
+				// method of writing multiple to the pasteboard in 10.5.
+				//
+				// Because the 10.6 method of providing a list of filenames is also provide a list of URLs,
+				// it means we can fill both cases in 10.6 by simply providing URLs. But in order to promise
+				// URLs lazily we have to set an array of NSPasteboardItem on the pasteboard, with each item 
+				// set to callback to us as data provider.
+				//
+				//
+				//  NOTE: FOR NOW, WE ARE SHORT-CIRCUITING THIS BRANCH, AND NOT DOING ANY 10.6 PASTEBOARD WORK.
+				//  WE MAY WANT TO REVISIT THIS WHEN WE HAVE A 10.6-ONLY API.
+				//
+				if (NO && IMBRunningOnSnowLeopardOrNewer())
+				{				
+					(void) [inPasteboard clearContents];
+					NSMutableArray* itemArray = [NSMutableArray arrayWithCapacity:[indexes count]];
+					
+					// Create an array of NSPasteboardItem, each with a promise to fulfill data in the provider callback
+					NSUInteger thisIndex = [indexes firstIndex];
+					while (thisIndex != NSNotFound)
 					{
-						NSPasteboardItem* thisItem = [[[NSClassFromString(@"NSPasteboardItem") alloc] init] autorelease];
-						
-						// We need to be declare kUTTypeFileURL in order to get file drags to work as expected to e.g. the Finder,
-						// but we have to be careful not to declare kUTTypeFileURL for e.g. bookmark URLs. We might want to put this 
-						// in the objects themself, but for now to get things working let's consult a method on ourselves that subclasses
-						// can override if they don't create file URLs.
-						NSArray* whichTypes = nil;
-						if ([self writesLocalFilesToPasteboard])
+						IMBObject* thisObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
+						if (thisObject != nil)
 						{
-							whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,(NSString*)kUTTypeFileURL,nil];
-						}
-						else
-						{
-							whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,nil];
+							// Allocate class indirectly since we compiling against the 10.5 SDK, not the 10.6
+							NSPasteboardItem* thisItem = [[[NSClassFromString(@"NSPasteboardItem") alloc] init] autorelease];
+							
+							// We need to be declare kUTTypeFileURL in order to get file drags to work as expected to e.g. the Finder,
+							// but we have to be careful not to declare kUTTypeFileURL for e.g. bookmark URLs. We might want to put this 
+							// in the objects themself, but for now to get things working let's consult a method on ourselves that subclasses
+							// can override if they don't create file URLs.
+							NSArray* whichTypes = nil;
+							if ([self writesLocalFilesToPasteboard])	// are we putting references to the files on the pasteboard?
+							{
+								whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,(NSString*)kUTTypeFileURL,nil];
+							}
+							else
+							{
+								whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,nil];
+							}
+							
+							[thisItem setDataProvider:self forTypes:whichTypes];
+							[thisItem setString:[NSString stringWithFormat:@"%d", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
+							[thisItem setString:thisObject.name forType:kIMBPublicTitleListPasteboardType];
+							[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetadataListPasteboardType];
+							[thisItem setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];
+							[itemArray addObject:thisItem];
 						}
 						
-						[thisItem setDataProvider:self forTypes:whichTypes];
-						[thisItem setString:[NSString stringWithFormat:@"%d", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
-						[thisItem setData:promiseData forType:kIMBObjectPromiseType];
-						[itemArray addObject:thisItem];
+						thisIndex = [indexes indexGreaterThanIndex:thisIndex];
 					}
 					
-					thisIndex = [inIndexes indexGreaterThanIndex:thisIndex];
-				}
-				
-				[inPasteboard writeObjects:itemArray];				
-			}
-			else
-			{
-				// On 10.5, we vend the object promise as well as promises for filenames and a URL.
-				// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
-				// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
-				if ([self writesLocalFilesToPasteboard])
-				{
-					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSFilenamesPboardType,NSURLPboardType,nil];
+					[inPasteboard writeObjects:itemArray];			// write array of NSPasteboardItems.
 				}
 				else
 				{
-					declaredTypes = [NSArray arrayWithObjects:kIMBObjectPromiseType,NSURLPboardType,kUTTypeURL,nil];
+					// On 10.5, we vend the object promise as well as promises for filenames and a URL.
+					// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
+					// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
+					NSMutableArray *fileTypes = [NSMutableArray array];
+					NSMutableArray *titles = [NSMutableArray array];
+					NSMutableArray *metadatas = [NSMutableArray array];
+					
+					if ([self writesLocalFilesToPasteboard])
+					{
+						// Try declaring promise AFTER the other types
+						declaredTypes = [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilesPromisePboardType,NSFilenamesPboardType, 
+										 
+										 // Also our own special metadata types that clients can make use of
+										 kIMBPublicTitleListPasteboardType, kIMBPublicMetadataListPasteboardType,
+										 
+										 nil]; 
+						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilenamesPboardType,nil]
+						
+						NSUInteger thisIndex = [indexes firstIndex];
+						while (thisIndex != NSNotFound)
+						{
+							IMBObject *object = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
+							NSString *path = [object path];
+							NSString *type = [path pathExtension];
+							if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
+							if (object.metadata && object.name)
+							{
+								// Keep all 3 items in sync, so the arrays are of the same length.
+								[fileTypes addObject:type];
+								[titles addObject:object.name];
+								[metadatas addObject:object.metadata];								
+							}
+							
+							thisIndex = [indexes indexGreaterThanIndex:thisIndex];
+						}
+					}
+					else
+					{
+						declaredTypes = [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSURLPboardType,kUTTypeURL,nil];
+					}
+					
+					[inPasteboard declareTypes:declaredTypes owner:self];
+					[inPasteboard setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];
+					if ([fileTypes count])
+					{
+						BOOL wasSet = NO;
+						wasSet = [inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
+						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", NSFilesPromisePboardType, fileTypes);
+						wasSet = [inPasteboard setPropertyList:titles forType:kIMBPublicTitleListPasteboardType];
+						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitleListPasteboardType, titles);
+						wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetadataListPasteboardType];
+						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetadataListPasteboardType, metadatas);
+
+//						#ifdef DEBUG
+//						NSLog(@"Titles on pasteboard: %@", titles);
+//						NSLog(@"MetaData on pasteboard: %@", metadatas);
+//						#endif
+					}
 				}
 				
-				[inPasteboard declareTypes:declaredTypes owner:self];
-				[inPasteboard setData:promiseData forType:kIMBObjectPromiseType];
+				_isDragging = YES;
+				itemsWritten = objects.count;
 			}
-			
-			_isDragging = YES;
-			itemsWritten = objects.count;
 		}
 	}
 	
 	return itemsWritten;	
 }
+
+// IKImageBrowserDataSource method. Calls down to our support method used by combo view and browser view.
 
 - (NSUInteger) imageBrowser:(IKImageBrowserView*)inView writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
@@ -1526,17 +1819,18 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 
 // For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
-// the IMBObjectPromise for the client and block it until all objects are loaded...
+// the IMBObjectsPromise for the client and block it until all objects are loaded...
 
 // THIS VARIATION IS FOR THE DRAG WE INITIATE FROM OUR CUSTOM IKIMAGEBROWSERVIEW SUBCLASS.
 
 - (NSArray*) namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination
 {
-	[self _downloadSelectedObjectsToDestination:inDropDestination];
-	NSArray *result = [self _namesOfPromisedFiles];
-	NSLog(@"namesOfPromisedFilesDroppedAtDestination = %@", result);
+	self.draggedIndexes = [ibObjectArrayController selectionIndexes];
+	self.dropDestinationURL = inDropDestination;		// remember so that when drag is finished
+	NSArray *result = [self _namesOfPromisedFilesDroppedAtDestination:inDropDestination];
 	return result;
 }
+// The drag will finish at draggedImage:endedAt:operation:
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1553,10 +1847,10 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
 	
-//	if (object.metadata == nil)
-//	{
-//		[object.parser loadMetadataForObject:object];
-//	}
+	if (object.metadata == nil)
+	{
+		[object.parser loadMetadataForObject:object];
+	}
 	
 	if ([inCell isKindOfClass:[IMBComboTextCell class]])
 	{
@@ -1566,16 +1860,15 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		{
 			cell.imageRepresentation = (id) [(IMBMovieObject*)object posterFrame];
 			cell.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
-			cell.title = object.name;
-			cell.subtitle = object.metadataDescription;
 		}
 		else
 		{
 			cell.imageRepresentation = object.imageRepresentation;
 			cell.imageRepresentationType = object.imageRepresentationType;
-			cell.title = object.name;
-			cell.subtitle = object.metadataDescription;
 		}
+		
+		cell.title = object.imageTitle;
+		cell.subtitle = object.metadataDescription;
 	}
 }
 
@@ -1612,22 +1905,47 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
+// Provide a tooltip for the row...
+
+- (NSString*) tableView:(NSTableView*)inTableView toolTipForCell:(NSCell*)inCell rect:(NSRectPointer)inRect tableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow mouseLocation:(NSPoint)inMouseLocation
+{
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	IMBObject* object = [objects objectAtIndex:inRow];
+	return [object tooltipString];
+}
+
+
+- (BOOL) tableView:(NSTableView*)inTableView shouldShowCellExpansionForTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
+{
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Encapsulate all dragged objects iny a promise, archive it and put it on the pasteboard. The client can then
 // start loading the objects in the promise and iterate over the resulting files...
 
 - (BOOL) tableView:(NSTableView*)inTableView writeRowsWithIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard 
 {
-	return ([self writeItemsAtIndexes:inIndexes toPasteboard:inPasteboard] > 0);
+	if ([_clickedObject isDraggable])
+	{
+		return ([self writeItemsAtIndexes:inIndexes toPasteboard:inPasteboard] > 0);
+	}
+	
+	return NO;
 }
 
 
 // For dumb applications we have the Cocoa NSFilesPromisePboardType as a fallback. In this case we'll handle 
-// the IMBObjectPromise for the client and block it until all objects are loaded...
+// the IMBObjectsPromise for the client and block it until all objects are loaded...
 
 - (NSArray*) tableView:(NSTableView*)inTableView namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination forDraggedRowsWithIndexes:(NSIndexSet*)inIndexes
 {
-	[self _downloadSelectedObjectsToDestination:inDropDestination];
-	return [self _namesOfPromisedFiles];
+	self.draggedIndexes = inIndexes;
+	self.dropDestinationURL = inDropDestination;
+	return [self _namesOfPromisedFilesDroppedAtDestination:(NSURL*)inDropDestination];
 }
 
 
@@ -1641,7 +1959,7 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows
 {
-	// NSLog(@"%s",__FUNCTION__);
+	BOOL wantsThumbnails = [tableView wantsThumbnails];
 	
 	NSArray *newVisibleItems = [[ibObjectArrayController arrangedObjects] subarrayWithRange:newVisibleRows];
 	NSMutableSet *newVisibleItemsSetRetained = [[NSMutableSet alloc] initWithArray:newVisibleItems];
@@ -1664,8 +1982,12 @@ NSString *const kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
     for (IMBObject* object in itemsNoLongerVisible)
 	{
+#ifdef DEBUG
+//		NSLog(@"changedVis…:… REMOVE [%p:%@'%@' removeObs…:%p 4kp:imageRep…", object,[object class],[object name], self);
+#endif
 NS_DURING
 		[object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
+		[object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
 NS_HANDLER
 		// NSLog(@"Caught IMBObjectViewController exception trying to remove observer from %@", object);
 NS_ENDHANDLER
@@ -1678,7 +2000,7 @@ NS_ENDHANDLER
 				IMBObject* loadingObject = [op object];
 				if (loadingObject == object)
 				{
-					//NSLog(@"Lowering priority of load of %@", entity.name);
+					//NSLog(@"Lowering priority of load of %@", loadingObject.name);
 					[op setQueuePriority:NSOperationQueuePriorityVeryLow];		// re-prioritize lower
 					break;
 				}
@@ -1690,11 +2012,12 @@ NS_ENDHANDLER
 	
     for (IMBObject* object in itemsNewlyVisible)
 	{
-		if (nil == [object imageRepresentation])
+		if ((wantsThumbnails && [object needsImageRepresentation])		// don't auto-load just by asking for imageRepresentation
+			|| (nil == object.metadata))
 		{
-			// Check if it is already queued -- if it's there already, bump up priority.
+			// Check if it is already queued -- if it's there already, bump up priority & adjust operation flag
 			
-			NSOperation *foundOperation = nil;
+			IMBObjectThumbnailLoadOperation *foundOperation = nil;
 			
 			NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
 			for (IMBObjectThumbnailLoadOperation* op in ops)
@@ -1712,18 +2035,37 @@ NS_ENDHANDLER
 			
 			if (foundOperation)
 			{
-				//NSLog(@"Raising priority of load of %@", imageEntity.name);
+				//NSLog(@"Raising priority of load of %@", [foundOperation object].name);
+				
+				NSUInteger operationMask = kIMBLoadMetadata;
+				if (wantsThumbnails)
+				{
+					operationMask |= kIMBLoadThumbnail;
+				}
+				foundOperation.options |= operationMask;		// make sure we have the appropriate loading option set
 				[foundOperation setQueuePriority:NSOperationQueuePriorityNormal];		// re-prioritize back to normal
 			}
 			else
 			{
-				//NSLog(@"Queueing load of %@", imageEntity.name);
-				[object load];
+				if (wantsThumbnails)
+				{
+					[object loadThumbnail];	// make sure we load it, though it probably got loaded above
+				}
+				else
+				{
+					[object loadMetadata];
+				}
 			}
 		}
 		
 		// Add observer always to balance
+		
+#ifdef DEBUG
+//		NSLog(@"changedVis…:… _ADD__ [%p:%@'%@' addObs…:%p 4kp:imageRep…", object, [object class],[object name], self);
+#endif
+
 		[object addObserver:self forKeyPath:kIMBObjectImageRepresentationProperty options:0 context:(void*)ibComboView];
+		[object addObserver:self forKeyPath:kIMBPosterFrameProperty options:0 context:(void*)ibComboView];
      }
 	
 	// Finally cache our old visible items set
@@ -1746,11 +2088,11 @@ NS_ENDHANDLER
 	
 	if (delegate)
 	{
-		if ([delegate respondsToSelector:@selector(controller:didDoubleClickSelectedObjects:inNode:)])
+		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
 		{
 			IMBNode* node = self.currentNode;
 			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate controller:controller didDoubleClickSelectedObjects:objects inNode:node];
+			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
 		}
 	}
 	
@@ -1763,6 +2105,9 @@ NS_ENDHANDLER
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
 			IMBNode* subnode = (IMBNode*)object.location;
+			NSString* identifier = subnode.identifier;
+			subnode = [self.libraryController nodeWithIdentifier:identifier];
+			
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];
 		}
@@ -1782,14 +2127,9 @@ NS_ENDHANDLER
 
 - (IBAction) tableViewWasClicked:(id)inSender
 {
-	NSUInteger row = [(NSTableView*)inSender clickedRow];
-	NSArray* objects = [ibObjectArrayController arrangedObjects];
-	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
-		
-	if ([object isKindOfClass:[IMBButtonObject class]])
-	{
-		[(IMBButtonObject*)object sendClickAction];
-	}
+	// No-op; clicking is handled with more detail from the mouse operations.
+	// However we want to make sure our window becomes key with a click.
+	[[inSender window] makeKeyWindow];
 }
 
 
@@ -1800,7 +2140,7 @@ NS_ENDHANDLER
 #pragma mark QuickLook
 
 
-// Toggle the visibilty of the Quicklook panel...
+// Toggle the visibility of the Quicklook panel...
 
 - (IBAction) quicklook:(id)inSender
 {

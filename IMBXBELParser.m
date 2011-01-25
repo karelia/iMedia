@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -49,7 +49,6 @@
 
 #import "IMBXBELParser.h"
 #import "IMBNode.h"
-#import "WebIconDatabase.h"
 #import "NSImage+iMedia.h"
 
 @implementation IMBXBELParser
@@ -57,7 +56,7 @@
 - (IMBNode *)recursivelyParseFolder:(NSXMLElement *)folder
 {
 	IMBNode *node = [[IMBNode alloc] init];
-	[node setIcon:[NSImage genericFolderIcon]];
+	[node setIcon:[NSImage imb_genericFolderIcon]];
 	[node setName:[[[folder elementsForName:@"title"] objectAtIndex:0] stringValue]];
 	[node setIdentifier:[node name]];
 ///	[node setParserClassName:NSStringFromClass([self class])];
@@ -81,9 +80,18 @@
 		[link setObject:[[cur attributeForName:@"href"] stringValue] forKey:@"URL"];
 		[link setObject:[[[cur elementsForName:@"title"] objectAtIndex:0] stringValue] forKey:@"Name"];
 		
-		NSImage *icon = [[WebIconDatabase sharedIconDatabase] iconForURL:[link objectForKey:@"URL"]
-																withSize:NSMakeSize(16,16)
-																   cache:YES];
+		static NSImage *sURLIcon = nil;
+		if (!sURLIcon)
+		{
+			NSBundle* ourBundle = [NSBundle bundleForClass:[self class]];
+			NSString* pathToImage = [ourBundle pathForResource:@"url_icon" ofType:@"tiff"];
+			sURLIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+		}
+		NSImage *icon = sURLIcon;
+		// WebIconDatabase is not app-store friendly, and it doesn't actually work!
+//		NSImage *icon = [[WebIconDatabase sharedIconDatabase] iconForURL:[link objectForKey:@"URL"]
+//																withSize:NSMakeSize(16,16)
+//																   cache:YES];
 		[link setObject:icon forKey:@"Icon"];
 		id nameWithIcon = [NSAttributedString attributedStringWithName:[link objectForKey:@"Name"] image:icon];
 		[link setObject:nameWithIcon forKey:@"NameWithIcon"];

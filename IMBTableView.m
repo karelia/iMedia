@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -142,8 +142,9 @@ enum IMBMouseOperation
 #pragma mark
 #pragma mark Drawing
 
-
+#ifndef MAS
 // This is a private internal method. If it no longer going to be called, there's no harm in proving an override...
+// It might be possible to actually define this (but not call superclass) if we want to force a custom color.
 
 - (NSColor*) _highlightColorForCell:(NSCell*)inCell
 {
@@ -161,6 +162,7 @@ enum IMBMouseOperation
 	
 	return color;
 }
+#endif
 
 
 // If we have custom background colors, then draw the alternating row background ourself, otherwise let the 
@@ -241,7 +243,7 @@ enum IMBMouseOperation
 {
 	// Find the clicked object...
 	
-	NSPoint mouse = [self convertPoint:[inEvent locationInWindow] toView:nil];
+	NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
     _clickedObjectIndex = [self rowAtPoint:mouse];
 
 	if (_clickedObjectIndex != -1)
@@ -270,11 +272,20 @@ enum IMBMouseOperation
 	
 	else 
 	{
+		// Indicate what object was clicked upon so that dragging can happen to the clicked object,
+		// which is not necessarily the same row as one of the selection row(s).
+		IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
+		[objectViewController setClickedObject:self.clickedObject];
+		[objectViewController setClickedObjectIndex:self.clickedObjectIndex];
+		
 		_mouseOperation = kMouseOperationNone;
 		[super mouseDown:inEvent];
 	}
 }
 
+
+// Careful -- this only works in special cases; see
+// http://www.cocoabuilder.com/archive/cocoa/234849-mousedragged-with-nstableview.html
 
 - (void) mouseDragged:(NSEvent*)inEvent;
 {
@@ -292,7 +303,11 @@ enum IMBMouseOperation
 	
 	else
 	{
-		[super mouseDragged:inEvent];
+		if (nil != [_clickedObject URL])
+		{
+			[super mouseDragged:inEvent];
+		}
+		// Ignore drag if we don't have a draggable object
 	}
 }
 
@@ -328,6 +343,12 @@ enum IMBMouseOperation
 	self.clickedObject = nil;
 }
 
+- (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
+{
+	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
+	[controller draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -344,7 +365,8 @@ enum IMBMouseOperation
 	
 	IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
 
-	if (i>=0 && i<n)
+	// Change the selection to the clicked row so that contextual menu matches properly.
+	if (i>=0 && i<n && [objectViewController respondsToSelector:@selector(objectArrayController)])
 	{
 		object = [[objectViewController.objectArrayController arrangedObjects] objectAtIndex:i];
 		[objectViewController.objectArrayController setSelectionIndex:i];

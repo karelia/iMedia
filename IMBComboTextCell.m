@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -83,7 +83,7 @@
 @synthesize titleTextAttributes = _titleTextAttributes;
 @synthesize subtitle = _subtitle;
 @synthesize subtitleTextAttributes = _subtitleTextAttributes;
-
+@synthesize isDisabledFromDragging = _isDisabledFromDragging;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -95,14 +95,17 @@
 	NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
 	[paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
 
+	NSColor* titleColor = [self textColor];
+	NSColor* metadataColor = [[self textColor] colorWithAlphaComponent:0.4];
+	
 	self.titleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-		[NSColor blackColor],NSForegroundColorAttributeName,
+		titleColor,NSForegroundColorAttributeName,
 		[NSFont systemFontOfSize:13.0],NSFontAttributeName,
 		paragraphStyle,NSParagraphStyleAttributeName,
 		nil] autorelease];
 	
 	self.subtitleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-		[NSColor grayColor],NSForegroundColorAttributeName,
+		metadataColor,NSForegroundColorAttributeName,
 		[NSFont systemFontOfSize:11.0],NSFontAttributeName,
 		paragraphStyle,NSParagraphStyleAttributeName,
 		nil] autorelease];
@@ -182,6 +185,8 @@
 	result.subtitle = self.subtitle;
 	result.titleTextAttributes = self.titleTextAttributes;
 	result.subtitleTextAttributes = self.subtitleTextAttributes;
+	
+	result.isDisabledFromDragging = self.isDisabledFromDragging;
 
     return result;
 }
@@ -277,6 +282,7 @@
 	
     CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
     [self willDrawImageInRect:rect context:context];
+	CGContextSetInterpolationQuality(context, kCGInterpolationHigh);	// artwork is pretty bad if you don't set this.
 	CGContextDrawImage(context,NSRectToCGRect(rect),inImage);
 	CGContextRestoreGState(context);
 }
@@ -332,7 +338,16 @@
         {
 			CGImageRef image = (CGImageRef) _imageRepresentation;
             [self _drawImage:image withFrame:imageRect];
-         }
+        }
+		else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMovieRepresentationType])	// QTMovie, we got quicklook...
+        {
+			NSLog(@"WHAT TO DO? IKImageBrowserQTMovieRepresentationType, _imageRepresentation = %@", _imageRepresentation);
+		}
+		else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
+        {
+			CGImageRef image = (CGImageRef) _imageRepresentation;
+            [self _drawImage:image withFrame:imageRect];
+		}
 		
         // Draw the thumbnail image (other representations)...
         
@@ -345,6 +360,8 @@
     }
     	
 	// Draw the title and subtitle...
+	
+	[self initTextAttributes];
 	
 	if (_title)
 	{

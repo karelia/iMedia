@@ -442,7 +442,7 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 			NSLog(@"Error in UKKQueue watcherThread: %@",localException);
 		NS_ENDHANDLER
 		
-		[pool release];
+		[pool drain];
     }
     
 	// Close our kqueue's file descriptor:

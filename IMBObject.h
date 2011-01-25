@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -72,13 +72,14 @@
 
 @interface IMBObject : NSObject
 #if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-<NSCopying,NSCoding,IMBImageItem,QLPreviewItem>
+<NSCopying,NSCoding,IMBImageItem,QLPreviewItem,NSPasteboardWriting>
 #else
 <NSCopying,NSCoding,IMBImageItem>
 #endif
 {
 	id _location;												
 	NSString* _name;
+	NSDictionary* _preliminaryMetadata;
 	NSDictionary* _metadata;
 	NSString* _metadataDescription;
 	IMBParser* _parser;
@@ -89,8 +90,9 @@
 	BOOL _needsImageRepresentation;
 	NSUInteger _imageVersion;
 	id _imageLocation;
-    BOOL _isLoading;
+    BOOL _isLoadingThumbnail;
     BOOL _shouldDrawAdornments;
+	BOOL _shouldDisableTitle;
 }
 
 // Primary properties...
@@ -98,19 +100,21 @@
 @property (retain) id location;								// Path, URL, or other location info
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
-@property (retain) NSDictionary* metadata;					// Optional metadata
+@property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
+@property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
 @property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)
 @property (retain) IMBParser* parser;						// Parser that created this object
 @property (assign) NSUInteger index;						// Index of object in the array (optional)
 @property (assign) BOOL shouldDrawAdornments;				// YES if border/shadow should be drawn
+@property (assign) BOOL shouldDisableTitle;					// YES if title should be shown as disabled (e.g. not draggable)
 
 // Helpers...
 
-- (BOOL) isEqual:(IMBObject*)inObject;						// Considered equal if location is equal
 - (NSString*) path;											// Convert location to path
-- (NSURL*) url;												// Convert location to url
+- (NSURL*) URL;												// Convert location to url
 - (BOOL) isLocalFile;										// Is this object a local file
-- (NSString*) uti;											// Returns type of file if possible
+- (NSString*) type;											// Returns type of file if possible
+- (NSString*) tooltipString;
 
 // Derived Properties. See IKImageBrowserItem for documentation...
 
@@ -118,6 +122,7 @@
 @property (readonly) NSString* imageUID;
 @property (retain) id imageRepresentation;	
 @property (readonly) BOOL isSelectable;
+@property (readonly) BOOL isDraggable;
 @property (assign) BOOL needsImageRepresentation;
 @property (retain) NSString* imageRepresentationType;
 @property (readonly) NSString* imageTitle;
@@ -125,9 +130,12 @@
 
 // Asynchronous loading of thumbnails...
 																	
-- (void) load;	
-- (void) unload;	
-@property (assign) BOOL isLoading;
+- (void) loadThumbnail;	
+- (BOOL) unloadThumbnail;
+- (void) loadMetadata;
+@property (assign) BOOL isLoadingThumbnail;
+
+- (void) postProcessLocalURL:(NSURL*)localURL;
 
 @end
 

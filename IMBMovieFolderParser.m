@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -58,6 +58,8 @@
 #import "IMBMovieObject.h"
 #import "IMBCommon.h"
 #import <Quartz/Quartz.h>
+#import "NSString+iMedia.h"
+#import "IMBNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -105,7 +107,7 @@
 	object.parser = self;
 	object.index = inIndex;
 	
-	object.imageRepresentationType = IKImageBrowserQTMovieRepresentationType; 
+	object.imageRepresentationType = IKImageBrowserQTMoviePathRepresentationType; 
 	object.imageLocation = inPath;
 	object.imageRepresentation = nil;		// will be loaded lazily when needed
 	object.metadata = nil;					// will be loaded lazily when needed
@@ -126,9 +128,11 @@
 	
 	if (item)
 	{
+		[metadata setObject:inPath forKey:@"path"];
 		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
 		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
 		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
+		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
 
 		if (seconds)
 		{
@@ -147,12 +151,18 @@
 			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
 			CFRelease(height);
 		}
+	
+		if (comment)
+		{
+			[metadata setObject:(NSString*)comment forKey:@"comment"]; 
+			CFRelease(comment);
+		}
 		
 		CFRelease(item);
 	}
 	else
 	{
-//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager defaultManager] fileExistsAtPath:inPath]);
+//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
 	}
 	
 	return metadata;
@@ -163,20 +173,27 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSNumber* width = [inMetadata objectForKey:@"width"];
 	NSNumber* height = [inMetadata objectForKey:@"height"];
+	NSString *path = [inMetadata objectForKey:@"path"];
+	NSString *comment = [inMetadata objectForKey:@"comment"];
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+	NSString *UTI = [NSString imb_UTIForFileAtPath:path];
+	NSString *kind = [NSString imb_descriptionForUTI:UTI];
+
+	if (kind)
+	{
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendString:kind];
+	}
 	
 	if (width != nil && height != nil)
 	{
-		NSString* size = NSLocalizedStringWithDefaultValue(
-				@"Size",
-				nil,IMBBundle(),
-				@"Size",
-				@"Size label in metadataDescription");
-		
-		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@×%@",width,height];
 	}
 	
 	if (duration)
@@ -188,7 +205,20 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
+	}
+
+	if (comment && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																	@"Comment",
+																	nil,IMBBundle(),
+																	@"Comment",
+																	@"Comment label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;
@@ -212,7 +242,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -223,6 +253,38 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Movies"];
+		self.displayPriority = 1;
+	}
+	
+	return self;
+}
+
+@end
+
+
+@implementation IMBPhotoBoothMoviesFolderParser
+
+
+// Register this parser, so that it gets automatically loaded...
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
+	[pool drain];
+}
+
+
+// Set the folder path to the ~/Pictures...
+
+- (id) initWithMediaType:(NSString*)inMediaType
+{
+	if (self = [super initWithMediaType:inMediaType])
+	{
+		self.mediaSource = [[NSHomeDirectory()
+							 stringByAppendingPathComponent:@"Pictures"]
+								stringByAppendingPathComponent:@"Photo Booth"];
+
 	}
 	
 	return self;

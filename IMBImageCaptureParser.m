@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -62,12 +62,13 @@
 #import "IMBConfig.h"
 #import "IMBLibraryController.h"
 #import "IMBNodeObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBOperationQueue.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import <Carbon/Carbon.h>
 #import <Quartz/Quartz.h>
+#import "NSWorkspace+iMedia.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 // Internal classes:
@@ -81,7 +82,7 @@
 @end
 
 // Purpose: Gets created from drag'n drop. Triggers copying of files to a local destination 
-@interface  IMBMTPObjectPromise : IMBRemoteObjectPromise<IMBMTPDownloadOperationDelegate>
+@interface  IMBMTPObjectPromise : IMBRemoteObjectsPromise<IMBMTPDownloadOperationDelegate>
 { 
 	long long _bytesTotal;
 	long long _bytesDone;	
@@ -137,7 +138,9 @@
 - (void) _addICADeviceList:(NSArray *) devices toNode:(IMBNode *)inNode;
 @end
 
-#ifdef __DEBUGGING__
+// Hmm, is this an internal symbol?
+//#ifdef __DEBUGGING__
+#if 0
 #define DEBUGLOG( fmt, ... ) NSLog( fmt, __VA_ARGS__ )
 #else
 #define DEBUGLOG( fmt, ... ) {}
@@ -152,7 +155,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-	[pool release];
+	[pool drain];
 }
 
 #pragma mark 
@@ -186,9 +189,9 @@
 	[super dealloc];
 }
 
-- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects 
+- (IMBObjectsPromise*) objectPromiseWithObjects:(NSArray*)inObjects 
 {
-	IMBMTPObjectPromise *promise = [((IMBMTPObjectPromise *)[IMBMTPObjectPromise alloc]) initWithArrayOfObjects:inObjects];
+	IMBMTPObjectPromise *promise = [([IMBMTPObjectPromise alloc]) initWithIMBObjects:inObjects];
 	return [promise autorelease];
 }
 	  
@@ -198,7 +201,6 @@
 {		
 	IMBNode* newNode = [[IMBNode alloc] init];
 	
-	newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = inOldNode.mediaSource;
 	newNode.identifier = inOldNode.identifier; 
 	newNode.name = inOldNode.name;
@@ -207,6 +209,7 @@
 	newNode.leaf = inOldNode.leaf;
 	newNode.group = inOldNode.group;
 	newNode.groupType = kIMBGroupTypeNone;
+	newNode.isTopLevelNode = inOldNode.isTopLevelNode;
 	
 	// Enable ICA Event watching for all nodes...
 	newNode.watcherType = kIMBWatcherTypeFirstCustom;
@@ -296,7 +299,6 @@
 		
 		IMBNode* deviceNode = [self _nodeForDevice:anDevice];
 		[subnodes addObject:deviceNode];
-		deviceNode.parentNode = inNode;
 	}
 	
 	inNode.subNodes = subnodes;
@@ -334,7 +336,6 @@
 				NSString *imageCaptureID = [anItem valueForKey:@"icao"];
 				
 				IMBNode* subnode = [IMBNode new];
-				subnode.parentNode = inNode;
 				subnode.mediaSource = imageCaptureID;
 				subnode.identifier = [self _identifierForICAObject:imageCaptureID];
 				subnode.name = name;
@@ -345,8 +346,8 @@
 				if( [anItem valueForKey:@"thuP"] )
 					subnode.icon = [self _getThumbnailSync:imageCaptureID];
 				if( !subnode.icon ) 
-					subnode.icon = [NSImage sharedGenericFolderIcon];
-					// subnode.icon = [[NSWorkspace sharedWorkspace] iconForFileType:@"'fldr'"];
+					subnode.icon = [NSImage imb_sharedGenericFolderIcon];
+					// subnode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:@"'fldr'"];
 				
 				BOOL hasSubnodes = [self _addICATree:[anItem valueForKey:@"tree"] toNode:subnode];
 				subnode.leaf = !hasSubnodes;
@@ -401,7 +402,7 @@
 		object.name = [anItem valueForKey:@"ifil"];
 		object.metadata = anItem;
 		object.parser = self;
-		object.index = index++;
+		object.index = index+1;
 		
 		[objectArray addObject:object];
 		
@@ -429,16 +430,16 @@
 	
 	IMBNode* newNode = [[IMBNode alloc] init];
 	
-	// newNode.parentNode = inOldNode.parentNode;
 	newNode.mediaSource = path;
 	newNode.identifier = [self _identifierForICAObject:self.mediaSource];
 	
 	newNode.name = showsGroupNodes ? [name uppercaseString] : name;
 	newNode.parser = self;
 	newNode.leaf = NO;
+	newNode.isTopLevelNode = YES;
 	
 	if( !showsGroupNodes ) 
-		newNode.icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Image Capture.app"];
+		newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:@"/Applications/Image Capture.app"];
 	
 	newNode.group = showsGroupNodes;
 	newNode.groupType = kIMBGroupTypeNone;
@@ -612,7 +613,7 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
     err = ICARegisterForEventNotification(&pb, NULL);
     if (noErr == err) 
     {
-        NSLog(@"ICA notification callback registered");
+        DEBUGLOG(@"@", @"ICA notification callback registered");
     }
 }
 
@@ -696,7 +697,7 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
 		// find it in the node tree
 		IMBLibraryController *libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
 		
-		IMBNode *rootNode = [libController rootNodeForParser:self];
+		IMBNode *rootNode = [libController topLevelNodeForParser:self];
 		[libController reloadNode:rootNode parser:self];
 	}
  
@@ -731,7 +732,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 // ---------------------------------------------------------------------------------------------------------------------
 - (void) _gotThumbnailCallback: (ICACopyObjectThumbnailPB*)pbPtr
 {
-	self.isLoading = NO;
+	self.isLoadingThumbnail = NO;
     if (noErr == pbPtr->header.err)
     {
         // got the thumbnail data, now create an image...
@@ -747,7 +748,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 
 - (void) _getThumbnail
 {
-	self.isLoading = YES;
+	self.isLoadingThumbnail = YES;
     ICACopyObjectThumbnailPB    pb = { 0 };
     
     pb.header.refcon   = (unsigned long) self;
@@ -762,7 +763,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 // ---------------------------------------------------------------------------------------------------------------------
 - (NSImage *) imageRepresentation
 {
-	if ( !_imageRepresentation && !self.isLoading  ) {
+	if ( !_imageRepresentation && !self.isLoadingThumbnail  ) {
 		[self _getThumbnail];
 	}
 	return _imageRepresentation;
@@ -868,7 +869,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	if( [(id)self.delegate respondsToSelector:@selector( operationDidFinish: )] )
 		[self.delegate operationDidFinish:self];
 	
-	[pool release];
+	[pool drain];
 }
 
 - (long long) totalBytes 
@@ -903,7 +904,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	// Create ONE download operations...
 
 	IMBMTPDownloadOperation* op = [[[IMBMTPDownloadOperation alloc] initWithArrayOfObjects:inObjects delegate:self] autorelease];
-	op.downloadFolderPath = self.downloadFolderPath;
+	op.downloadFolderPath = self.destinationDirectoryPath;
 	[self.downloadOperations addObject:op]; 
 	
 	// Get combined file sizes so that the progress bar can be configured...
@@ -930,7 +931,7 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 
 	// Trash any files that we already have...
 	
-	NSFileManager* mgr = [NSFileManager threadSafeManager];
+	NSFileManager* mgr = [NSFileManager imb_threadSafeManager];
 	for (NSString *path in receivedFiles)
 	{
 		NSError* error = nil;
@@ -938,8 +939,6 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	}
 	
 	// Cleanup...
-	
-	[self cleanupProgress];
 	
 	[self performSelectorOnMainThread:@selector(_didFinish) 
 						   withObject:nil 
@@ -970,8 +969,6 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
 		NSLog(@"%s",__FUNCTION__);
-		[self cleanupProgress];
-		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 							   withObject:nil 
 							waitUntilDone:YES 
@@ -994,8 +991,6 @@ static void ICAThumbnailCallback (ICAHeader* pbHeader)
 	if (_objectCountLoaded >= _objectCountTotal)
 	{
 		NSLog(@"%s",__FUNCTION__);
-		[self cleanupProgress];
-		
 		[self performSelectorOnMainThread:@selector(_didFinish) 
 							   withObject:nil 
 							waitUntilDone:YES 

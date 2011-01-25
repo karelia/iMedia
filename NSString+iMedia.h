@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -51,29 +51,40 @@
 
 @interface NSObject ( NSString_UTI )
 
-+ (NSString *)UTIForFileType:(NSString *)aFileType;
-+ (NSString *)UTIForFilenameExtension:(NSString *)anExtension;
-+ (NSString *)UTIForFileAtPath:(NSString *)anAbsolutePath;
-+ (BOOL) UTI:(NSString *)aUTI conformsToUTI:(NSString *)aConformsToUTI;
++ (NSString *)imb_UTIForFileType:(NSString *)aFileType;
++ (NSString *)imb_descriptionForUTI:(NSString *)aUTI;
++ (NSString *)imb_UTIForFilenameExtension:(NSString *)anExtension;
++ (NSString *)imb_UTIForFileAtPath:(NSString *)anAbsolutePath;
++ (BOOL) imb_doesUTI:(NSString *)aUTI conformsToUTI:(NSString *)aConformsToUTI;
++ (BOOL) imb_doesFileAtPath:(NSString*)inPath conformToUTI:(NSString*)inRequiredUTI;
 
 @end
 
 @interface NSString ( iMedia )
 
-- (NSString *)pathForURLString;
-- (NSString *)path;
+- (NSString *)imb_pathForURLString;
+- (NSString *)imb_path;
 
-- (NSData *) decodeBase64;
-- (NSData *) decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
+#if defined MAC_OS_X_VERSION_10_6 && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
+- (NSData *) imb_decodeBase64;
+- (NSData *) imb_decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
+#endif
 
 + (id)uuid;
 
-- (NSString *)exifDateToLocalizedDisplayDate;
+- (NSString *)imb_exifDateToLocalizedDisplayDate;
 
-+ (NSString *)stringFromStarRating:(NSUInteger)aRating;
++ (NSString *)imb_stringFromStarRating:(NSUInteger)aRating;
 
-- (NSComparisonResult)finderCompare:(NSString *)aString;
+- (NSComparisonResult)imb_finderCompare:(NSString *)aString;
 
-- (NSString *)resolvedPath;
+- (NSString *)imb_resolvedPath;
 
 @end
+
+@interface NSMutableString (iMedia)
+
+- (void)imb_appendNewline;
+
+@end
+

@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -125,7 +125,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 			[parserClasses addObject:inParserClass];
 		}
 		
-		[pool release];
+		[pool drain];
 	}
 }
 
@@ -148,7 +148,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 			}
 		}
 		
-		[pool release];
+		[pool drain];
 	}
 }
 
@@ -216,6 +216,13 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 #pragma mark
 #pragma mark Loading & Unloading
 
+- (void)unloadParser:(IMBParser *)parser forMediaType:(NSString *)mediaType;
+{
+	NSMutableArray* parsers = [_loadedParsers objectForKey:mediaType];
+	[parsers removeObjectIdenticalTo:parser];
+}
+
+
 // This method first loads the registered parsers and then appends the custom parser that are stored in the prefs... 
 
 - (void) loadParsers
@@ -238,29 +245,33 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 				
 				BOOL shouldLoad = YES;
 				
-				if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldLoadParser:forMediaType:)])
+				if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:shouldLoadParser:forMediaType:)])
 				{
-					shouldLoad = [_delegate controller:self shouldLoadParser:parserClass forMediaType:mediaType];
+					shouldLoad = [_delegate parserController:self shouldLoadParser:NSStringFromClass(parserClass) forMediaType:mediaType];
 				}
 				
 				// If yes, then create an instance, store it in _loadedParsers, and tell the delegate...
 				
 				if (shouldLoad)
 				{
-					if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willLoadParser:forMediaType:)])
-					{
-						[_delegate controller:self willLoadParser:parserClass forMediaType:mediaType];
-					}
-
 					NSMutableArray* parsers = [self loadedParsersForMediaType:mediaType];
 					NSArray* parserInstances = [parserClass parserInstancesForMediaType:mediaType];
 					if (parserInstances) [parsers addObjectsFromArray:parserInstances];
 					
-					if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didLoadParser:forMediaType:)])
+					if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:didLoadParser:forMediaType:)])
 					{
 						for (IMBParser* parser in parserInstances) 
 						{
-							[_delegate controller:self didLoadParser:parser forMediaType:mediaType];
+							BOOL loaded = [_delegate parserController:self didLoadParser:parser forMediaType:mediaType];
+							if (loaded)
+							{
+								// Make sure that the parser has what it needs to proceed. E.g. Flickr will unload if no API key.
+								loaded = [parser canBeUsed];
+							}
+							if (!loaded)	// now, if either app delegate, or the parser itself says NO, then unload this.
+							{
+								[self unloadParser:parser forMediaType:mediaType];
+							}
 						}
 					}
 				}
@@ -289,9 +300,9 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 			
 			for (IMBParser* parser in parsers)
 			{
-				if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willUnloadParser:forMediaType:)])
+				if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:willUnloadParser:forMediaType:)])
 				{
-					[_delegate controller:self willUnloadParser:parser forMediaType:mediaType];
+					[_delegate parserController:self willUnloadParser:parser forMediaType:mediaType];
 				}
 			}
 		}
@@ -313,9 +324,9 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	
 	BOOL shouldLoad = YES;
 	
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldLoadParser:forMediaType:)])
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:shouldLoadParser:forMediaType:)])
 	{
-		shouldLoad = [_delegate controller:self shouldLoadParser:[inParser class] forMediaType:inMediaType];
+		shouldLoad = [_delegate parserController:self shouldLoadParser:NSStringFromClass([inParser class]) forMediaType:inMediaType];
 	}
 
 	// Check if the parser is already in the list...
@@ -334,16 +345,15 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	
 	if (shouldLoad)
 	{
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willLoadParser:forMediaType:)])
-		{
-			[_delegate controller:self willLoadParser:[inParser class] forMediaType:inMediaType];
-		}
-
 		[parsers addObject:inParser];
 
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didLoadParser:forMediaType:)])
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:didLoadParser:forMediaType:)])
 		{
-			[_delegate controller:self didLoadParser:inParser forMediaType:inMediaType];
+			BOOL loaded = [_delegate parserController:self didLoadParser:inParser forMediaType:inMediaType];
+			if (!loaded)
+			{
+				[parsers removeLastObject];
+			}
 		}
 	}	
 	
@@ -361,9 +371,9 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	
 	if (exists) 
 	{
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willUnloadParser:forMediaType:)])
+		if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:willUnloadParser:forMediaType:)])
 		{
-			[_delegate controller:self willUnloadParser:inParser forMediaType:mediaType];
+			[_delegate parserController:self willUnloadParser:inParser forMediaType:mediaType];
 		}
 		
 		[parsers removeObject:inParser];
@@ -390,49 +400,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	}
 	
 	return didAdd;
-	
-//	// Ask the delegate if we are allow to load the parser...
-//	
-//	BOOL shouldLoad = YES;
-//	
-//	if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:shouldLoadParser:forMediaType:)])
-//	{
-//		shouldLoad = [_delegate controller:self shouldLoadParser:[inParser class] forMediaType:inMediaType];
-//	}
-//
-//	// Check if the parser is already in the list...
-//	
-//	NSMutableArray* parsers = [self loadedParsersForMediaType:inMediaType];
-//	
-//	for (IMBParser* parser in parsers)
-//	{
-//		if ([inParser.mediaSource isEqual:parser.mediaSource] && [inParser.mediaType isEqual:parser.mediaType])
-//		{
-//			shouldLoad = NO;	
-//		}
-//	}
-//	
-//	// If we are allowed to load, then add it to the list and tell the delegate...
-//	
-//	if (shouldLoad)
-//	{
-//		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willLoadParser:forMediaType:)])
-//		{
-//			[_delegate controller:self willLoadParser:[inParser class] forMediaType:inMediaType];
-//		}
-//
-//		inParser.custom = YES;
-//		[parsers addObject:inParser];
-//
-//		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:didLoadParser:forMediaType:)])
-//		{
-//			[_delegate controller:self didLoadParser:inParser forMediaType:inMediaType];
-//		}
-//		
-//		[self saveCustomParsersToPreferences];
-//	}	
-//	
-//	return shouldLoad;
 }
 
 
@@ -462,9 +429,9 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 //	
 //	if (exists && custom) 
 //	{
-//		if (_delegate != nil && [_delegate respondsToSelector:@selector(controller:willUnloadParser:forMediaType:)])
+//		if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:willUnloadParser:forMediaType:)])
 //		{
-//			[_delegate controller:self willUnloadParser:inParser forMediaType:mediaType];
+//			[_delegate parserController:self willUnloadParser:inParser forMediaType:mediaType];
 //		}
 //		
 //		[parsers removeObject:inParser];

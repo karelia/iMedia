@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,6 +65,7 @@
 #pragma mark
 
 @interface IMBNode ()
+@property (assign, readwrite) IMBNode* parentNode;
 - (void) _recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray*)inIndexArray;
 @end
 
@@ -83,13 +84,12 @@
 @synthesize name = _name;
 @synthesize icon = _icon;
 @synthesize groupType = _groupType;
+@synthesize displayPriority = _displayPriority;
 @synthesize attributes = _attributes;
 @synthesize objects = _objects;
-
-// Accessors for navigating up or down the node tree...
-
 @synthesize subNodes = _subNodes;
 @synthesize parentNode = _parentNode;
+@synthesize isTopLevelNode = _isTopLevelNode;
 
 // State information...
 
@@ -98,6 +98,7 @@
 @synthesize loading = _loading;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 @synthesize includedInPopup = _includedInPopup;
+@synthesize displayedObjectCount = _displayedObjectCount;
 
 // Support for live watching...
 
@@ -108,6 +109,24 @@
 // Badge icons...
 
 @synthesize badgeTypeNormal = _badgeTypeNormal;
+
+//- (void) setBadgeTypeNormal:(IMBBadgeType)badgeType;
+//{
+//	NSArray *strings = [NSArray arrayWithObjects:
+//						@"kIMBBadgeTypeNone",
+//						@"kIMBBadgeTypeLoading",
+//						@"kIMBBadgeTypeReload",
+//						@"kIMBBadgeTypeStop",
+//						@"kIMBBadgeTypeEject",
+//						@"kIMBBadgeTypeOffline", nil];
+//	
+//	if ([self.identifier isEqualToString:@"IMBFlickrParser://flickr.photos.getRecent/recent/30"])
+//	{
+//		NSLog(@"%p %@ setBadgeTypeNormal:%@", self, self.identifier, [strings objectAtIndex:badgeType]);
+//	}
+//	_badgeTypeNormal = badgeType;
+//}
+
 @synthesize badgeTypeMouseover = _badgeTypeMouseover;
 @synthesize badgeTarget = _badgeTarget;
 @synthesize badgeSelector = _badgeSelector;
@@ -122,20 +141,22 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
 - (id) init
 {
 	if (self = [super init])
 	{
 		self.groupType = kIMBGroupTypeNone;
+		self.displayPriority = 5;					// middle of the pack, default
 		self.group = NO;
 		self.leaf = NO;
 		self.loading = NO;
 		self.wantsRecursiveObjects = NO;
 		self.includedInPopup = YES;
+		self.displayedObjectCount = -1;
 		
 		self.objects = nil;
 		self.subNodes = nil;
+		self.isTopLevelNode = NO;
 		
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
@@ -154,21 +175,24 @@
 - (id) copyWithZone:(NSZone*)inZone
 {
 	IMBNode* copy = [[[self class] allocWithZone:inZone] init];
-	
+
 	copy.mediaSource = self.mediaSource;
 	copy.identifier = self.identifier;
 	copy.name = self.name;
 	copy.icon = self.icon;
 	copy.attributes = self.attributes;
 	copy.groupType = self.groupType;
+	copy.displayPriority = self.displayPriority;
 	
 	copy.group = self.group;
 	copy.leaf = self.leaf;
 	copy.loading = self.loading;
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 	copy.includedInPopup = self.includedInPopup;
+	copy.displayedObjectCount = self.displayedObjectCount;
 	
-	copy.parentNode = self.parentNode;
+//	copy.parentNode = self.parentNode;			// Removed to avoid potentially dangling pointers (parentNode in not retained!)
+	copy.isTopLevelNode = self.isTopLevelNode;
 	copy.parser = self.parser;
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -185,22 +209,29 @@
 	
 	// Create a shallow copy of objects array...
 	
-	if (self.objects) copy.objects = [NSMutableArray arrayWithArray:self.objects];
-	else copy.objects = nil;
-
+	if (self.objects)
+    {
+        copy.objects = [NSMutableArray arrayWithArray:self.objects];
+    }
+	else
+    {
+        copy.objects = nil;
+    }
+	
 	// Create a deep copy of the subnodes. This is essential to make background operations completely threadsafe...
 	
 	if (self.subNodes)
 	{
-		copy.subNodes = [NSMutableArray arrayWithCapacity:self.subNodes.count];
+		NSMutableArray* subNodes = [NSMutableArray arrayWithCapacity:self.subNodes.count];
 
 		for (IMBNode* subnode in self.subNodes)
 		{
 			IMBNode* copiedSubnode = [subnode copy];
-			copiedSubnode.parentNode = copy;
-			[(NSMutableArray*)copy.subNodes addObject:copiedSubnode];
+			[subNodes addObject:copiedSubnode];
 			[copiedSubnode release];
 		}
+		
+		copy.subNodes = subNodes;
 	}
 	else 
 	{
@@ -213,6 +244,8 @@
 
 - (void) dealloc
 {
+    [self setSubNodes:nil];		// Sub-nodes have a weak reference to self, so break that
+	
 	IMBRelease(_mediaSource);
 	IMBRelease(_identifier);
 	IMBRelease(_icon);
@@ -237,19 +270,35 @@
 #pragma mark
 #pragma mark Accessors
 
+// Accessors for navigating up or down the node tree...
 
-// Node accessors. Use these for bindings the NSTreeController...
+- (void) setSubNodes:(NSArray*)inNodes
+{
+    [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
+    
+	NSArray* nodes = [inNodes copy];
+    [_subNodes release]; 
+	_subNodes = nodes;
+    
+    [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
+}
 
-- (IMBNode*) rootNode
+
+- (IMBNode*) topLevelNode
 {
 	if (_parentNode)
 	{
-		return [_parentNode rootNode];
+		if (!_parentNode.isGroup)
+		{
+			return [_parentNode topLevelNode];
+		}
 	}
 		
 	return self;
 }
 
+
+// Node accessors. Use these for bindings the NSTreeController...
 
 - (NSUInteger) countOfSubNodes
 {
@@ -402,18 +451,21 @@
 	}
 	
 	return identifier1 != nil && 
-		   identifier2 != nil && 
-		   [identifier1 isEqualToString:identifier2];
+		identifier2 != nil && 
+		[identifier1 isEqualToString:identifier2];
 }
 
 
-// Nodes are grouped by type, but within a group nodes are sorted alphabetically. Nodes without a group type
-// are at the end of the list...
+// Nodes are grouped by type, but within a group nodes are sorted first by priority (1=top, 9=last),
+// then alphabetically.  (The default value is 5.  The idea is to be able to push things UP or DOWN.)
+// Nodes without a group type are at the end of the list...
 
 - (NSComparisonResult) compare:(IMBNode*)inNode
 {
 	NSUInteger selfGroupType = self.groupType;
+	NSUInteger selfDisplayPriority = self.displayPriority;
 	NSUInteger otherGroupType = inNode.groupType;
+	NSUInteger otherDisplayPriority = inNode.displayPriority;
 
 	if (selfGroupType > otherGroupType)
 	{
@@ -424,7 +476,16 @@
 		return NSOrderedAscending;
 	}
 	
-	return [self.name finderCompare:inNode.name];
+	if (selfDisplayPriority > otherDisplayPriority)
+	{
+		return NSOrderedDescending;
+	}
+	else if (selfDisplayPriority < otherDisplayPriority)
+	{
+		return NSOrderedAscending;
+	}
+		
+	return [self.name imb_finderCompare:inNode.name];
 }
 
 
@@ -468,6 +529,7 @@
 		
 		NSIndexPath* path = [NSIndexPath indexPathWithIndexes:indexes length:n];
 		free(indexes);
+		
 		return path;
 	}
 	
@@ -526,20 +588,12 @@
 	
 	// Oops, we shouldn't be here...
 	
+	NSLog(@"Unable to find '%@' in the source list", self.name);
 	[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:NSNotFound]];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-// A node is considered a root node if it really is a root node (nil parent) or if it is indented by one under 
-// a group node...
-
-- (BOOL) isRootNode
-{
-	return self.parentNode == nil || self.parentNode.isGroup;
-}
 
 
 // A node is pouplated if the subnodes and objects arrays are present. Please note that these arrays may still
@@ -553,16 +607,16 @@
 
 // Look in our node tree for a node with the specified identifier...
 
-- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier
+- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentifier
 {
-	if ([self.identifier isEqualToString:inIdentfier])
+	if ([self.identifier isEqualToString:inIdentifier])
 	{
 		return self;
 	}
 	
 	for (IMBNode* subnode in self.subNodes)
 	{
-		IMBNode* found = [subnode subNodeWithIdentifier:inIdentfier];
+		IMBNode* found = [subnode subNodeWithIdentifier:inIdentifier];
 		if (found) return found;
 	}
 

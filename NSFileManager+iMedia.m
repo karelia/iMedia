@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -53,7 +53,7 @@
 
 @implementation NSFileManager (iMedia)
 
-+ (NSFileManager *)threadSafeManager
++ (NSFileManager *)imb_threadSafeManager
 {
 	NSFileManager*	instance = nil;
 	
@@ -79,7 +79,7 @@
 	return instance;	
 }
 
-- (BOOL)createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes
+- (BOOL)imb_createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes
 {
 	if ([path isAbsolutePath])
 	{
@@ -103,13 +103,13 @@
 	}
 	else
 	{
-		[NSException raise:@"iMediaException" format:@"createDirectoryPath:attributes: path not absolute:%@", path];
+		[NSException raise:@"iMediaException" format:@"imb_createDirectoryPath:attributes: path not absolute:%@", path];
 	}
 	
-	return [[NSFileManager defaultManager] fileExistsAtPath:path];
+	return [self fileExistsAtPath:path];
 }
 
-- (BOOL)isPathHidden:(NSString *)path
+- (BOOL)imb_isPathHidden:(NSString *)path
 {
 	LSItemInfoRecord	itemInfo;
 	NSURL*				pathURL = [NSURL fileURLWithPath:path];
@@ -121,7 +121,7 @@
 // Will resolve an alias into a path.. this code was taken from
 // see http://cocoa.karelia.com/Foundation_Categories/
 // see http://developer.apple.com/documentation/Cocoa/Conceptual/LowLevelFileMgmt/Tasks/ResolvingAliases.html
-- (NSString *)pathResolved:(NSString *)path
+- (NSString *)imb_pathResolved:(NSString *)path
 {
 	NSString *resolvedPath = NULL;
 	
@@ -154,7 +154,21 @@
 	return resolvedPath;
 }
 
-- (NSString*)temporaryFile:(NSString*)name
+// Return (creating if necessary) a path to the shared iMedia temporary directory.
+// If you pass in a subfolder name, that will be created and appended.
+
+- (NSString*)imb_sharedTemporaryFolder:(NSString*)dirName;
+{
+	NSString *directoryPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"iMedia"];
+	if (dirName && ![dirName isEqualToString:@""])
+	{
+		directoryPath = [directoryPath stringByAppendingPathComponent:dirName];
+	}
+	[self createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:NULL];
+    return directoryPath;
+}
+
+- (NSString*)imb_uniqueTemporaryFile:(NSString*)name
 {
 	NSString *processName = [[NSProcessInfo processInfo] processName];
 	NSString *directoryName = [NSString stringWithFormat:@"%@_iMediaTemporary", processName];
@@ -162,12 +176,12 @@
 	
 	[self createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:NULL];
 	
-    return [self temporaryFile:name withinDirectory:directoryPath];
+    return [self imb_uniqueTemporaryFile:name withinDirectory:directoryPath];
 }
 
-- (NSString*)temporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath
+- (NSString*)imb_uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath
 {
-	NSString *temporaryPath = [self temporaryPathWithinDirectory:directoryPath];
+	NSString *temporaryPath = [self imb_uniqueTemporaryPathWithinDirectory:directoryPath];
 	
 	if ([name length] > 0) {
 		[self createDirectoryAtPath:temporaryPath withIntermediateDirectories:YES attributes:nil error:NULL];
@@ -178,8 +192,10 @@
 	return temporaryPath;
 }
 
+// Creates a new, unique path (for a directory or a file), so don't use this if you want to match up
+// with an existing downloaded file!
 
-- (NSString*)temporaryPathWithinDirectory:(NSString*)directoryPath
+- (NSString*)imb_uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath
 {
 	NSString *tempFileTemplate = [directoryPath stringByAppendingPathComponent:@"XXXXXXXXXXXX"];
 	const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
@@ -201,7 +217,7 @@
 }
 
 
-- (NSString*) volumeNameAtPath:(NSString*)inPath
+- (NSString*) imb_volumeNameAtPath:(NSString*)inPath
 {
 	NSString* path = [inPath stringByStandardizingPath];
 	NSArray* components = [path pathComponents];
@@ -229,7 +245,7 @@
 }
 
 
-- (NSString*) relativePathToVolumeAtPath:(NSString*)inPath
+- (NSString*) imb_relativePathToVolumeAtPath:(NSString*)inPath
 {
 	NSString* path = [inPath stringByStandardizingPath];
 
@@ -253,7 +269,7 @@
 }
 
 
-- (BOOL) fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged
+- (BOOL) imb_fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged
 {
 	BOOL exists = NO;
 	BOOL wasChanged = NO;
@@ -270,8 +286,8 @@
 		{
 			if ([path hasPrefix:@"/Volumes/"])
 			{
-				NSString* volName = [self volumeNameAtPath:path];
-				NSString* relPath = [self relativePathToVolumeAtPath:path];
+				NSString* volName = [self imb_volumeNameAtPath:path];
+				NSString* relPath = [self imb_relativePathToVolumeAtPath:path];
 				NSString* newPath;
 				
 				if (!exists)
@@ -302,6 +318,21 @@
 	if (outWasChanged) *outWasChanged = wasChanged;
 	return exists;
 }
+
+// Based on Sample code DragNDropOutlineView:AppController.m
+- (NSString *) imb_generateUniqueFileNameAtPath:(NSString *)path base:(NSString *)basename extension:(NSString *)extension;
+{
+	NSString *filename = [NSString stringWithFormat:@"%@.%@", basename, extension];
+    NSString *result = [path stringByAppendingPathComponent:filename];
+    NSInteger i = 1;
+    while ([self fileExistsAtPath:result]) {
+        filename = [NSString stringWithFormat:@"%@ %ld.%@", basename, (long)i, extension];
+        result = [path stringByAppendingPathComponent:filename];
+        i++;
+    }    
+    return result;
+}
+
 
 
 @end

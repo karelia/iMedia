@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -65,7 +65,7 @@
 @implementation IMBObjectThumbnailLoadOperation
 
 @synthesize object = _object;
-
+@synthesize options = _options;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -100,17 +100,26 @@
 	
 	IMBObject* object = self.object;
 	IMBParser* parser = object.parser;
-	[parser loadThumbnailForObject:object];
+	
+	if (self.options & kIMBLoadThumbnail)
+	{
+		//NSLog(@"Loading thumbnail for %@", object.name);
+		[parser loadThumbnailForObject:object];
+
+	}
 	
 	// Load metadata if is hasn't been loaded yet. This part is only done once, as the metadata is almost certain 
 	// to remain the same throughout a session...
 	
-	if (object.metadata == nil)
+	if (self.options & kIMBLoadMetadata)
 	{
-		[object.parser loadMetadataForObject:object];
+		// NSLog(@"May load metadata for %@", object.name);
+		if (object.metadata == nil)
+		{
+			[object.parser loadMetadataForObject:object];
+		}
 	}
-
-	[pool release];
+	[pool drain];
 }
 
 

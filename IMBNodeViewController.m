@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -62,6 +62,7 @@
 #import "IMBNodeCell.h"
 #import "IMBFlickrNode.h"
 #import "NSView+iMedia.h"
+#import "NSFileManager+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -138,27 +139,29 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 + (void) initialize
 {
-	if (self == [IMBNodeViewController class])
-	{   
-		NSArray* expandedNodeIdentifiers = [NSArray arrayWithObjects:
-			@"group://LIBRARIES",
-			@"group://FOLDERS",
-			@"group://SEARCHES",
-			@"group://INTERNET",
-			nil];
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-		NSMutableDictionary* stateDict = [NSMutableDictionary dictionary];
-		[stateDict setObject:expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
+	NSArray* expandedNodeIdentifiers = [NSArray arrayWithObjects:
+		@"group://LIBRARIES",
+		@"group://FOLDERS",
+		@"group://SEARCHES",
+		@"group://INTERNET",
+		@"group://DEVICES",
+		nil];
 
-		NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeImage];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeAudio];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeMovie];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeLink];
-		[classDict setObject:stateDict forKey:kIMBMediaTypeContact];
+	NSMutableDictionary* stateDict = [NSMutableDictionary dictionary];
+	[stateDict setObject:expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
 
-		[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
-	}
+	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeImage];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeAudio];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeMovie];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeLink];
+	[classDict setObject:stateDict forKey:kIMBMediaTypeContact];
+
+	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	
+	[pool release];
 }
 
 
@@ -494,10 +497,10 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	{
 		id delegate = self.libraryController.delegate;
 		
-		if ([delegate respondsToSelector:@selector(controller:shouldPopulateNode:)])
+		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
 		{
 			IMBNode* node = [inItem representedObject];
-			shouldExpand = [delegate controller:self.libraryController shouldPopulateNode:node];
+			shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
 		}
 	}
 	
@@ -559,9 +562,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		IMBNode* node = [inItem representedObject];
 		id delegate = self.libraryController.delegate;
 		
-		if ([delegate respondsToSelector:@selector(controller:shouldPopulateNode:)])
+		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
 		{
-			shouldSelect = [delegate controller:self.libraryController shouldPopulateNode:node];
+			shouldSelect = [delegate libraryController:self.libraryController shouldPopulateNode:node];
 		}
 		
 		if (node.isGroup)
@@ -683,6 +686,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 }
 
 
+#pragma mark NSOutlineViewDataSource
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -695,7 +700,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	for (NSString* path in paths)
 	{
-		exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&directory];
+		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
 		
 		if (exists && directory)
 		{
@@ -712,23 +717,28 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
  
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView acceptDrop:(id<NSDraggingInfo>)inInfo item:(id)inItem childIndex:(NSInteger)inIndex
 {
+	BOOL result = NO;
     NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
 	BOOL exists,directory;
 	
 	for (NSString* path in paths)
 	{
-		exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&directory];
+		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
 		
 		if (exists && directory)
 		{
-			IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
-			self.selectedNodeIdentifier = [parser identifierForPath:path];
+			if (![IMBConfig isLibraryPath:path])
+			{
+				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+				self.selectedNodeIdentifier = [parser identifierForPath:path];
+				result = YES;
+			}
 		}	
 	}		
 	
 	[inOutlineView.window makeFirstResponder:inOutlineView];
 	[self.libraryController reload];
-	return YES;
+	return result;
 }
 
 
@@ -799,6 +809,10 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	IMBNode* node;
 	NSString* identifier;
 	
+	// Update the internal data structures...
+	
+	[ibNodeOutlineView reloadData];
+	
 	// Temporarily disable storing of saved state (we only want that when the user actuall clicks in the UI...
 	
 	_isRestoringState = YES;
@@ -830,7 +844,11 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		}
 	}
 	
-	// Restore the selected node. Walk through all visible nodes. If we find the correct one then select it...
+	// Restore the selected node. Walk through all visible nodes. If we find the correct one then select it.
+	// Please note the special case where we do not have a selection yet. In this case we use the first available
+	// node (that is not a group) to make sure that the user sees something immediately...
+	
+	NSString* selectedNodeIdentifier = self.selectedNodeIdentifier;
 	
 	rows = [ibNodeOutlineView numberOfRows];
 	BOOL found = NO;
@@ -840,7 +858,12 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		node = [self _nodeAtRow:i];
 		identifier = node.identifier;
 		
-		if ([identifier isEqualToString:self.selectedNodeIdentifier])
+		if (selectedNodeIdentifier == nil && node.isGroup == NO)
+		{
+			selectedNodeIdentifier = identifier;
+		}
+	
+		if ([identifier isEqualToString:selectedNodeIdentifier])
 		{
 			[self selectNode:node];
 			found = YES;
@@ -1071,7 +1094,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (BOOL) canRemoveNode
 {
 	IMBNode* node = [self selectedNode];
-	return node.isRootNode && node.parser.isCustom && !node.isLoading;
+	return node.isTopLevelNode && node.parser.isCustom && !node.isLoading;
 }
 
 
@@ -1168,9 +1191,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	id delegate = self.libraryController.delegate;
 	
-	if (delegate!=nil && [delegate respondsToSelector:@selector(controller:willShowContextMenu:forNode:)])
+	if (delegate!=nil && [delegate respondsToSelector:@selector(libraryController:willShowContextMenu:forNode:)])
 	{
-		[delegate controller:self.libraryController willShowContextMenu:menu forNode:inNode];
+		[delegate libraryController:self.libraryController willShowContextMenu:menu forNode:inNode];
 	}
 	
 	return menu;
@@ -1229,9 +1252,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	// First remove all currently installed object views...
 	
-	[ibObjectHeaderView removeAllSubviews];
-	[ibObjectContainerView removeAllSubviews];
-	[ibObjectFooterView removeAllSubviews];
+	[ibObjectHeaderView imb_removeAllSubviews];
+	[ibObjectContainerView imb_removeAllSubviews];
+	[ibObjectFooterView imb_removeAllSubviews];
 	
 	// Install optional header view...
 	

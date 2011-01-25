@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -52,7 +52,7 @@
 
 #pragma mark 
 
-// This helper class is being used by IMBRemoteObjectPromise. Not for general use...
+// This helper class is being used by IMBRemoteObjectsPromise. Not for general use...
 
 @interface IMBURLDownloadOperation : NSOperation
 {
@@ -82,7 +82,6 @@
 @property (assign,getter=isFinished) BOOL finished;
 		
 - (id) initWithURL:(NSURL*)inURL delegate:(id)inDelegate;
-- (long long) getSize;
 
 @end
 
@@ -95,6 +94,7 @@
 - (void) didReceiveData:(IMBURLDownloadOperation*)inOperation;
 - (void) didFinish:(IMBURLDownloadOperation*)inOperation;
 - (void) didReceiveError:(IMBURLDownloadOperation*)inOperation;
+- (void) didGetLength:(long long)inExpectedLength;
 
 @end
 

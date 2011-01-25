@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -149,5 +149,11 @@ typedef enum {
 @property (assign) NSInteger page;
 @property (copy) NSString* query;
 @property (assign) IMBFlickrNodeSortOrder sortOrder;
+
+#pragma mark Utilities
+
++ (NSString *)base58EncodedValue:(long long)num;
++ (NSString *)descriptionOfLicense:(int)aLicenseNumber;
+
 
 @end

@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -57,6 +57,7 @@
 #import "IMBObjectArrayController.h"
 #import "IMBPanelController.h"
 #import "IMBCommon.h"
+#import "IMBConfig.h"
 #import "IMBObject.h"
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
@@ -82,6 +83,17 @@
 + (void) load
 {
 	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeAudio];
+}
+
+
++ (void) initialize
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
+	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeList] forKey:@"viewType"];
+	[classDict setObject:[NSNumber numberWithDouble:0.5] forKey:@"iconSize"];
+	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	[pool release];
 }
 
 
@@ -124,7 +136,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
+	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
 }
 
 - (NSString*) displayName
@@ -145,7 +157,7 @@
 	return NSLocalizedStringWithDefaultValue(
 		@"IMBAudioViewController.countFormatSingular",
 		nil,IMBBundle(),
-		@"%d song",
+		@"%d track",
 		@"Format string for object count in singluar");
 }
 
@@ -154,7 +166,7 @@
 	return NSLocalizedStringWithDefaultValue(
 		@"IMBAudioViewController.countFormatPlural",
 		nil,IMBBundle(),
-		@"%d songs",
+		@"%d tracks",
 		@"Format string for object count in plural");
 }
 
@@ -172,6 +184,15 @@
 }
 
 
+- (NSUInteger) viewType
+{
+	NSUInteger viewType = [super viewType];
+	if (viewType < 1) viewType = 1;
+	if (viewType > 2) viewType = 2;
+	return viewType;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -181,6 +202,20 @@
 {
 	[self.playingAudio stop];
 	self.playingAudio = nil;
+}
+
+
+- (IBAction) quicklook:(id)inSender
+{
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		[self setIsPlaying:NO];
+		[super quicklook:inSender];
+	}
+	else	// Don't quicklook on 10.5 .. instead, play the current selection.
+	{
+		[self startPlayingSelection:inSender];
+	}
 }
 
 
@@ -201,15 +236,14 @@
 
 	if ([object isKindOfClass:[IMBNodeObject class]])
 	{
-		IMBNode* node = (IMBNode*)object.location;
-		[_nodeViewController expandSelectedNode];
-		[_nodeViewController selectNode:node];
+		[super tableViewWasDoubleClicked:inSender];		// handled in superclass
 	}
 	else
 	{
 		[self startPlayingSelection:inSender];
 	}
 }
+
 
 // If we already has some audio playing, then play the new song if the selection changes...
 
@@ -237,7 +271,7 @@
 		{
 			// starts playing with the current selection
 			NSArray* objects = [ibObjectArrayController arrangedObjects];
-			NSIndexSet* rows = [ibListView selectedRowIndexes];
+			NSIndexSet* rows = [[self listView] selectedRowIndexes];
 			NSUInteger row = [rows firstIndex];
 				
 			if (row != NSNotFound && row < [objects count])
@@ -286,7 +320,7 @@
 	if ([[[path pathExtension] lowercaseString] isEqualToString:@"band"])
 	{
 		NSString* output = [path stringByAppendingPathComponent:@"Output/Output.aif"];
-		BOOL exists = [[NSFileManager threadSafeManager] fileExistsAtPath:output];
+		BOOL exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:output];
 		if (exists) path = output;
 	}
 

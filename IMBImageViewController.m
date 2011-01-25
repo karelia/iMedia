@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -56,8 +56,9 @@
 #import "IMBObjectArrayController.h"
 #import "IMBPanelController.h"
 #import "IMBCommon.h"
+#import "IMBConfig.h"
+#import "IMBObjectsPromise.h"
 #import "NSWorkspace+iMedia.h"
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -73,6 +74,17 @@
 + (void) load
 {
 	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeImage];
+}
+
+
++ (void) initialize
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
+	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeIcon] forKey:@"viewType"];
+	[classDict setObject:[NSNumber numberWithDouble:0.5] forKey:@"iconSize"];
+	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	[pool release];
 }
 
 
@@ -105,7 +117,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace threadSafeWorkspace] iconForAppWithBundleIdentifier:@"com.apple.iPhoto"];
+	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iPhoto"];
 }
 
 - (NSString*) displayName

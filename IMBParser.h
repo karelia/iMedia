@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -60,7 +60,7 @@
 
 @class IMBNode;
 @class IMBObject;
-@class IMBObjectPromise;
+@class IMBObjectsPromise;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,11 +95,15 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError;
 
 // Returns a promise object that is appropriate for a given parser type. The default implemenation simply returns
-// an IMBLocalObjectPromise. Parsers that require something else must override this method...
+// an IMBLocalObjectsPromise. Parsers that require something else must override this method...
 
-- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects;
+- (IMBObjectsPromise*) objectPromiseWithObjects:(NSArray*)inObjects;
 
 @optional
+
+// Called just after notifying the app delegate; gives parser a chance to decide not to be used.
+
+- (BOOL)canBeUsed;
 
 // Called in various situations just before a parser is going to be used. Can be used to prepare the instance 
 // or update cached data...
@@ -152,7 +156,10 @@
 
 - (id) initWithMediaType:(NSString*)inMediaType;
 - (NSString*) identifierForPath:(NSString*)inPath;
++ (NSString*) identifierForPath:(NSString*)inPath;
+
 - (void) invalidateThumbnails;
+- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions;
 
 @end
 

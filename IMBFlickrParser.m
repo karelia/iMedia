@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -46,6 +46,9 @@
 
 // Author: Christoph Priebe
 
+// SpeedLimit http://mschrag.github.com/ is a good way to debug this....
+// farm1.static.flickr.com, farm2.static.flickr.com, farm3.static.flickr.com, farm4.static.flickr.com, farm5.static.flickr.com 
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -55,18 +58,21 @@
 //	iMedia
 #import "IMBConfig.h"
 #import "IMBFlickrNode.h"
+#import "IMBFlickrObject.h"
 #import "IMBFlickrParser.h"
 //#import "IMBFlickrQueryEditor.h"
 #import "IMBFlickrHeaderViewController.h"
 #import "IMBIconCache.h"
 #import "IMBLibraryController.h"
 #import "IMBLoadMoreObject.h"
-#import "IMBObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBParserController.h"
 #import "NSWorkspace+iMedia.h"
-
-
+#import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
+#import "IMBConfig.h"
+#import "IMBNodeObject.h"
+#import "IMBSmartFolderNodeObject.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -74,6 +80,7 @@
 @property (retain) IMBFlickrQueryEditor* editor;
 //	Query Persistence:
 - (NSArray*) instantiateCustomQueriesWithRoot: (IMBFlickrNode*) root;
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 @end
 
 #pragma mark -
@@ -85,7 +92,7 @@
 + (void) load {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -98,6 +105,15 @@
 	IMBRelease (_flickrSharedSecret);
 	IMBRelease (_loadMoreButton);
 	[super dealloc];
+}
+
+- (BOOL)canBeUsed;
+{
+	BOOL result = (self.flickrAPIKey && ![self.flickrAPIKey isEqualToString:@""]
+			&& self.flickrSharedSecret && ![self.flickrSharedSecret isEqualToString:@""]);
+	// If these aren't available (provided by app delegate parserController:didLoadParser:forMediaType:)
+	// then this parser can't be used, so it will be unloaded.
+	return result;
 }
 
 
@@ -141,7 +157,48 @@
 	if ([obj isKindOfClass:[IMBObject class]]) {
 		IMBObject* imbObject = (IMBObject*) obj;
 		NSURL* webPage = [[imbObject metadata] objectForKey:@"webPageURL"];
-		[[NSWorkspace threadSafeWorkspace] openURL:webPage];
+		[[NSWorkspace imb_threadSafeWorkspace] openURL:webPage];
+	} else {
+		NSLog (@"Can't handle this kind of object.");
+	}
+}
+
+- (IBAction) copyFlickrPageURL: (id) sender {
+	if (![sender isKindOfClass:[NSMenuItem class]]) return;
+	
+	id obj = [sender representedObject];
+	if ([obj isKindOfClass:[IMBObject class]]) {
+		IMBObject* imbObject = (IMBObject*) obj;
+		NSURL* webPage = [[imbObject metadata] objectForKey:@"webPageURL"];
+
+		NSPasteboard *pb = [NSPasteboard generalPasteboard];
+		NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+		[pb declareTypes:types owner:self];
+		[pb setString:[webPage absoluteString] forType:NSStringPboardType];
+	
+	} else {
+		NSLog (@"Can't handle this kind of object.");
+	}
+}
+
+- (IBAction) copyAttribution: (id) sender {
+	if (![sender isKindOfClass:[NSMenuItem class]]) return;
+	
+	id obj = [sender representedObject];
+	if ([obj isKindOfClass:[IMBObject class]]) {
+		IMBObject* imbObject = (IMBObject*) obj;
+		
+		NSURL *shortWebPageURL = [NSURL URLWithString:[@"http://flic.kr/p/" stringByAppendingString:
+													   [IMBFlickrNode base58EncodedValue:[[[imbObject metadata] objectForKey:@"id"] longLongValue]]]];
+		NSString *credit = [[obj metadata] objectForKey:@"ownername"];
+		NSString *format = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.format.attribution",nil,IMBBundle(),@"Photo by %@ - %@",@"Format string for attribution credit; flickr user followed by short URL");
+		NSString *attribution = [NSString stringWithFormat:format, credit, [shortWebPageURL absoluteString]];
+		
+		NSPasteboard *pb = [NSPasteboard generalPasteboard];
+		NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
+		[pb declareTypes:types owner:self];
+		[pb setString:attribution forType:NSStringPboardType];
+
 	} else {
 		NSLog (@"Can't handle this kind of object.");
 	}
@@ -176,13 +233,13 @@
 
 	//	create root node...
 	IMBFlickrNode* rootNode = [[[IMBFlickrNode alloc] init] autorelease];
-	rootNode.parentNode = nil;
 	rootNode.mediaSource = nil;
 	rootNode.identifier = [self identifierForPath:@"/"];
 	rootNode.name = @"Flickr";
 	rootNode.icon = icon;
 	rootNode.parser = self;
 	rootNode.leaf = NO;
+	rootNode.isTopLevelNode = YES;
 	rootNode.groupType = kIMBGroupTypeInternet;
 	
 	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
@@ -204,7 +261,6 @@
 	viewController.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.add",nil,IMBBundle(),@"Add",@"Button title in Flickr Options");
 
 	rootNode.customHeaderViewController = viewController;
-	rootNode.shouldDisplayObjectView = NO;
 	
 	return rootNode;
 }
@@ -228,11 +284,17 @@
 	IMBFlickrNode* updatedNode = [[inOldNode copy] autorelease];
 	
 	// If the old node was populated, then also populate the new node...
-	IMBFlickrNode* inOldFlickrNode = (IMBFlickrNode*) inOldNode;
-	if ([inOldFlickrNode hasRequest] || inOldFlickrNode.subNodes.count > 0 || inOldFlickrNode.objects.count > 0) {
-		[self populateNode:updatedNode options:inOptions error:&error];
-	}
 	
+	IMBFlickrNode* inOldFlickrNode = (IMBFlickrNode*) inOldNode;
+//	if ([inOldFlickrNode hasRequest] || inOldFlickrNode.subNodes.count > 0 || inOldFlickrNode.objects.count > 0) {
+//		[self populateNode:updatedNode options:inOptions error:&error];
+//	}
+	
+	if ([inOldFlickrNode hasRequest] || inOldNode.isPopulated)
+	{
+		[self populateNewNode:updatedNode likeOldNode:inOldNode options:inOptions];
+	}
+
 	if (outError) *outError = error;
 	
 	return updatedNode;
@@ -251,7 +313,28 @@
 								  [IMBFlickrNode flickrNodeForRecentPhotosForRoot:inFlickrNode parser:self],
 								  [IMBFlickrNode flickrNodeForInterestingPhotosForRoot:inFlickrNode parser:self], nil];
 		inFlickrNode.subNodes = [standardNodes arrayByAddingObjectsFromArray:[self instantiateCustomQueriesWithRoot:inFlickrNode]];
-		inFlickrNode.objects = [NSArray array];
+		
+		// Put the queries into the objects, so that selecting top-level node will show queries as smart folders
+		NSUInteger index = 0;
+		NSMutableArray *objects = [NSMutableArray array];
+		for (IMBFlickrNode *node in inFlickrNode.subNodes)
+		{
+			IMBSmartFolderNodeObject* object = [[IMBSmartFolderNodeObject alloc] init];
+			object.location = (id)node;
+			object.name = node.name;
+			object.metadata = nil;
+			object.parser = self;
+			object.index = index++;
+			object.imageLocation = nil;
+			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+			
+			object.imageRepresentation = [IMBSmartFolderNodeObject icon];
+
+			[objects addObject:object];
+			[object release];
+		}
+		
+		inFlickrNode.objects = objects;
 	} else {
 		//	populate nodes with Flickr contents...
 		if ([inFlickrNode hasResponse]) {
@@ -322,17 +405,51 @@
 
 - (void) willShowContextMenu: (NSMenu*) inMenu forObject: (IMBObject*) inObject {
 	//	'Open Flickr Page'...
+	NSString *title = nil;
+	NSMenuItem *item = nil;
 	
 	if ([inObject isSelectable])
 	{
-		NSString* title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.openflickrpage",nil,IMBBundle(),@"Open Flickr Page",@"Flickr parser node context menu title.");
-		NSMenuItem* showWebPageItem = [[NSMenuItem alloc] initWithTitle:title 
-																 action:@selector(openFlickrPage:) 
-														  keyEquivalent:@""];
-		[showWebPageItem setTarget:self];
-		[showWebPageItem setRepresentedObject:inObject];
-		[inMenu addItem:showWebPageItem];
-		[showWebPageItem release];
+		if (![[[inObject metadata] objectForKey:@"can_download"] boolValue])
+		{
+			// This will replace the Download / Open With Browser that is usually shown
+			title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.downloadingNotPermitted",nil,IMBBundle(),@"Downloading Not Permitted",@"Context menu item title to warn of not being downloadable");
+			item = [[[NSMenuItem alloc] initWithTitle:title 
+											   action:nil 
+										keyEquivalent:@""] autorelease];
+			[item setTarget:self];
+			[item setRepresentedObject:inObject];
+			[inMenu insertItem:item atIndex:0];
+			[inMenu insertItem:[NSMenuItem separatorItem] atIndex:1];
+			
+		}
+		
+		
+		title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.openflickrpage",nil,IMBBundle(),@"Open Flickr Page",@"Flickr parser node context menu title.");
+		item = [[[NSMenuItem alloc] initWithTitle:title 
+										   action:@selector(openFlickrPage:) 
+									keyEquivalent:@""] autorelease];
+		[item setTarget:self];
+		[item setRepresentedObject:inObject];
+		[inMenu addItem:item];
+
+		
+		title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.copyFlickrURL",nil,IMBBundle(),@"Copy Flickr Page URL",@"Flickr parser node context menu title.");
+		item = [[[NSMenuItem alloc] initWithTitle:title 
+										   action:@selector(copyFlickrPageURL:) 
+									keyEquivalent:@""] autorelease];
+		[item setTarget:self];
+		[item setRepresentedObject:inObject];
+		[inMenu addItem:item];
+
+
+		title = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.menu.copyAttribution",nil,IMBBundle(),@"Copy Attribution",@"Flickr parser node context menu title.");
+		item = [[[NSMenuItem alloc] initWithTitle:title 
+										   action:@selector(copyAttribution:) 
+									keyEquivalent:@""] autorelease];
+		[item setTarget:self];
+		[item setRepresentedObject:inObject];
+		[inMenu addItem:item];
 	}
 }
 
@@ -347,6 +464,9 @@
 		_flickrContext = [[OFFlickrAPIContext alloc] initWithAPIKey:self.flickrAPIKey sharedSecret:self.flickrSharedSecret];
 		
 		[self loadCustomQueries];
+		
+		// setup desired size to get, from delegate
+		self.desiredSize = [IMBConfig flickrDownloadSize];
 	}	
 
 	//	lazy initialize the 'load more' button...
@@ -360,20 +480,82 @@
 
 
 // For Flickr we need a remote promise that downloads the files off the internet
-- (IMBObjectPromise*) objectPromiseWithObjects: (NSArray*) inObjects {
-	return [[[IMBRemoteObjectPromise alloc] initWithArrayOfObjects:inObjects] autorelease];
+- (IMBObjectsPromise*) objectPromiseWithObjects: (NSArray*) inObjects {
+	return [[[IMBRemoteObjectsPromise alloc] initWithIMBObjects:inObjects] autorelease];
 }
 
 // Convert metadata into human readable string...
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	return;
+	NSDictionary* metadata = inObject.preliminaryMetadata;
+	NSString* description = metadata ? [self metadataDescriptionForMetadata:metadata] : @"";
+
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
 }
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	return nil;
+	BOOL canDownload = [[inMetadata objectForKey:@"can_download"] boolValue];
+	NSString* ownername = [inMetadata objectForKey:@"ownername"];
+	NSString* tags = [inMetadata objectForKey:@"tags"];
+
+	NSString* info = [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
+	
+	NSMutableString* description = [NSMutableString string];
+	
+	if (!canDownload)
+	{
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@",
+			NSLocalizedStringWithDefaultValue(
+			@"IMBFlickrParser.menu.downloadingNotPermitted",
+			nil,IMBBundle(),
+			@"Downloading Not Permitted",
+			@"Context menu item title to warn of not being downloadable")];
+	}
+	
+	if (ownername && ![ownername isEqualToString:@""])
+	{
+		NSString* artist = NSLocalizedStringWithDefaultValue(
+			@"Owner",
+			nil,IMBBundle(),
+			@"Owner",
+			@"Owner (for flickr photographs) label in metadataDescription");
+
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",artist,ownername];
+	}
+	
+	if (info)
+	{
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@",info];
+	}
+		
+	if (tags && ![tags isEqualToString:@""])
+	{
+		NSString* tagsLabel = NSLocalizedStringWithDefaultValue(
+																	@"Tags",
+																	nil,IMBBundle(),
+																	@"Tags",
+																	@"Tags (Flickr term for keywords) label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",tagsLabel,tags];
+	}
+	
+	return description;
 }
 
 #pragma mark 
@@ -384,6 +566,7 @@
 @synthesize editor = _editor;
 @synthesize flickrAPIKey = _flickrAPIKey;
 @synthesize flickrSharedSecret = _flickrSharedSecret;
+@synthesize desiredSize = _desiredSize;
 
 
 - (IMBLoadMoreObject*) loadMoreButton {
@@ -441,18 +624,11 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	NSArray* nodes = [prefs objectForKey:IMBFlickrParserPrefKey_CustomQueries];
 	
 	//	setup default user nodes...
-	if (!nodes && _delegate && [_delegate respondsToSelector:@selector(flickrParserSetupDefaultQueries:)]) {
+	if (!nodes && _delegate && [_delegate respondsToSelector:@selector(flickrParserSetupDefaultQueries:)])
+	{
 		nodes = [_delegate flickrParserSetupDefaultQueries:self];
-		
-	if (nodes == nil){
-		nodes = [NSArray array];
 	}
-		
-#if 0
-		[prefs setObject:nodes forKey:IMBFlickrParserPrefKey_CustomQueries];
-		[IMBConfig setPrefs:prefs forClass:[self class]];
-#endif
-	}
+	if (nodes == nil) nodes = [NSArray array];
 	
 	self.customQueries = [[nodes mutableCopy] autorelease];
 }

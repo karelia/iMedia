@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -43,8 +43,7 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
-// Author: Peter Baumgartner
+// Author: Dan Wood
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,20 +51,93 @@
 
 #pragma mark HEADERS
 
-#import "IMBObject.h"
+#import "IMBDisableTitleToColorTransformer.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBEnhancedObject : IMBObject
+#pragma mark GLOBALS
+
+static NSColor* sTextColor;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@implementation IMBDisableTitleToColorTransformer
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Register the transformer...
+
++ (void) load
 {
-	NSDictionary* _preliminaryMetadata;
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	IMBDisableTitleToColorTransformer* transformer = [[IMBDisableTitleToColorTransformer alloc] init];
+	[NSValueTransformer setValueTransformer:transformer forName:NSStringFromClass(self)];
+	[transformer release];
+	[pool drain];
+	
+	[self setTextColor:[NSColor blackColor]];
 }
 
-@property (retain) NSDictionary* preliminaryMetadata;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (Class) transformedValueClass
+{
+	return [NSColor class];
+}
+
+
++ (BOOL) allowsReverseTransformation
+{
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Convert from Bool NSNumber to NSColor...
+
+- (id) transformedValue:(id)inValue
+{
+	id result = nil;
+	
+	if (inValue)
+	{
+		if ([inValue isKindOfClass:[NSNumber class]]) 
+		{
+			BOOL value = [inValue boolValue];
+//			result = value ? [NSColor grayColor] : [NSColor blackColor];
+			result = value ? [sTextColor colorWithAlphaComponent:0.4] : sTextColor;
+		}
+	}
+	
+	return result;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Store the base text color...
+
++ (void) setTextColor:(NSColor*)inColor
+{
+	NSColor* old = sTextColor;
+	sTextColor = [inColor retain];
+	[old release];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 
-
-//----------------------------------------------------------------------------------------------------------------------

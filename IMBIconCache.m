@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -124,7 +124,7 @@ static IMBIconCache* sSharedIconCache;
 			if ([name isEqualToString:entry->fIconType])
 			{
 				// first try to find the specified image in the application bundle associated with the parser
-				NSImage* image = [NSImage imageResourceNamed:entry->fApplicationIconName
+				NSImage* image = [NSImage imb_imageResourceNamed:entry->fApplicationIconName
 											 fromApplication:bundleID
 												  fallbackTo:entry->fFallbackIconName];
 
@@ -144,7 +144,7 @@ static IMBIconCache* sSharedIconCache;
 		}
 
 		// if no type-specific image was found, use the fallback image
-		return [NSImage imageResourceNamed:mappingTable->fUnknownTypeEntry.fApplicationIconName
+		return [NSImage imb_imageResourceNamed:mappingTable->fUnknownTypeEntry.fApplicationIconName
 						   fromApplication:bundleID
 								fallbackTo:mappingTable->fUnknownTypeEntry.fFallbackIconName];
 	}
@@ -178,7 +178,7 @@ static IMBIconCache* sSharedIconCache;
 			{
 				image = [self __loadIconForType:inType fromBundleID:inBundleID withMappingTable:inMappingTable];
 				if (image) [bundleCache setObject:image forKey:inType];
-				else image = [NSImage sharedGenericFolderIcon];
+				else image = [NSImage imb_sharedGenericFolderIcon];
 			}
 		}
 	}

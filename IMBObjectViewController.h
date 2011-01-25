@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -73,6 +73,7 @@
 
 #import "IMBCommon.h"
 #import "IMBQLPreviewPanel.h"
+#import "IMBObjectsPromise.h"
 #import <Quartz/Quartz.h>
 
 
@@ -89,8 +90,7 @@ enum
 };
 typedef NSUInteger kIMBObjectViewType;
 
-
-extern NSString* const kIMBObjectImageRepresentationProperty;
+extern NSString* kIMBObjectImageRepresentationProperty;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -110,32 +110,10 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark PROTOCOLS
-
-// We have to declare a fake prototypes because the 10.6 runtime interrogates our compliance with the protocol,
-// rather that interrogating the presence of the particular method we implement.
-
-#if ! IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-
-@protocol NSPasteboardItemDataProvider <NSObject> 
-@end
-
-@protocol QLPreviewPanelDelegate <NSObject> 
-@end
-
-@protocol QLPreviewPanelDataSource <NSObject> 
-@end
-
-#endif
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark 
 
 
-@interface IMBObjectViewController : NSViewController <NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
+@interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate, NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 //#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 //<NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 //#else
@@ -149,10 +127,9 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet IKImageBrowserView* ibIconView;
-	IBOutlet NSTableView* ibListView;
-	IBOutlet NSTableView* ibComboView;
 	IBOutlet NSSegmentedControl *ibSegments;
- 	
+ 	IBOutlet NSTableView* ibListView;
+	IBOutlet NSTableView* ibComboView;
 	NSUInteger _viewType;
 	double _iconSize;
 	
@@ -161,6 +138,15 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 	BOOL _isDragging;
 	
 	NSMutableSet *_observedVisibleItems;
+	
+	NSURL *_dropDestinationURL;
+	
+	NSIndexSet *_draggedIndexes;	// save the index set of what is dragged (from a table view) for NSFilesPromisePboardType
+	
+	// For table views, to know which one was actually clicked upon for dragging
+	NSInteger _clickedObjectIndex;
+	IMBObject* _clickedObject;
+
 }
 
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
@@ -187,6 +173,12 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 @property (assign) NSUInteger viewType;
 @property (assign) double iconSize;
 @property (readonly) BOOL canUseIconSize;
+
+@property (retain) NSURL *dropDestinationURL;
+
+@property (assign) NSInteger clickedObjectIndex;
+@property (retain) IMBObject* clickedObject;
+@property (retain) NSIndexSet *draggedIndexes;
 
 - (void) unbindViews;	
 
@@ -219,6 +211,8 @@ extern NSString* const kIMBObjectImageRepresentationProperty;
 - (IBAction) openSelectedObjects:(id)inSender;
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode;
 - (IBAction) quicklook:(id)inSender;
+
+- (IBAction) tableViewWasDoubleClicked:(id)inSender;
 
 @end
 

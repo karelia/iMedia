@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -69,10 +69,20 @@
 + (void) setShowsGroupNodes:(BOOL)inState;
 + (BOOL) showsGroupNodes;
 
+// Determines whether all mediaType share the same viewType state, or whether each keeps its own state...
+
++ (void) setUseGlobalViewType:(BOOL)inGlobalViewType;
++ (BOOL) useGlobalViewType;
+
 // Sets path for the download folder for remote IMBObjects (e.g. from Flickr or camera devices)...
 
 + (void) setDownloadFolderPath:(NSString*)inPath;
 + (NSString*) downloadFolderPath;
+
+// Flickr downloaded size preference
+
++ (void) setFlickrDownloadSize:(IMBFlickrSizeSpecifier)inFlickrSize;
++ (IMBFlickrSizeSpecifier) flickrDownloadSize;
 
 // Path for external editor and viewer apps... 
 
@@ -81,6 +91,12 @@
 
 + (void) setEditorApp:(NSString*)inAppPath forMediaType:(NSString*)inMediaType;
 + (NSString*) editorAppForMediaType:(NSString*)inMediaType;
+
+// Library Paths
+
++ (void)registerLibraryPath:(NSString *)aPath;
++ (BOOL) isLibraryPath:(NSString *)aPath;
+
 
 // Set default prefs values...
 

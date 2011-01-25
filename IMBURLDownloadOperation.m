@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -88,7 +88,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) initWithURL:(NSURL*)inURL delegate:(id)inDelegate;
+- (id) initWithURL:(NSURL*)inURL delegate:(id <IMBURLDownloadDelegate>)inDelegate;
 {
 	if (self = [super init])
 	{
@@ -116,54 +116,42 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Get the size (in bytes) of a remote file on the internet. This method is synchronous. This may be a problem
-// if we are downloading a lot of files at once. TODO: investigate how we can make this asynchronous, without
-// changing the ueser experience of the progress bar...
-
-- (long long) getSize
-{
-	NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:self.remoteURL];
-	[request setHTTPMethod:@"HEAD"];
-	
-	NSError* error = nil;
-	NSURLResponse* response = nil;
-	[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-	
-	_bytesTotal = 0;
-	if (response != nil && error == nil) _bytesTotal = [response expectedContentLength];
-	return _bytesTotal;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Create a NSURLDownload, start it and spin the runloop until we are done. Since we are in a background thread
 // we can block without problems...
 
 - (void) main
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+//	NSLog(@"%s Starting %@",__FUNCTION__,self);
 
-	NSString* downloadFolderPath = self.downloadFolderPath;
-	NSString* filename = [[self.remoteURL path] lastPathComponent];
-	NSString* localFilePath = [downloadFolderPath stringByAppendingPathComponent:filename];
-
-	NSURLRequest* request = [NSURLRequest requestWithURL:self.remoteURL];
-	NSURLDownload* download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
-	[download setDestination:localFilePath allowOverwrite:NO];
-	[download setDeletesFileUponFailure:YES];
-
-	self.download = download;
-	[download release];
-	
-	do 
+	if (!self.localPath)	// only do the actual download if we don't already have a local path.
 	{
-		CFRunLoopRunInMode(kCFRunLoopDefaultMode,1.0,false);
+		NSString* downloadFolderPath = self.downloadFolderPath;
+		NSString* filename = [[self.remoteURL path] lastPathComponent];
+		NSString* localFilePath = [downloadFolderPath stringByAppendingPathComponent:filename];
+		
+		NSURLRequestCachePolicy policy = NSURLRequestUseProtocolCachePolicy;
+		
+		NSURLRequest* request = [NSURLRequest requestWithURL:self.remoteURL cachePolicy:policy timeoutInterval:90.0];
+		NSURLDownload* download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+		[download setDestination:localFilePath allowOverwrite:NO];
+		[download setDeletesFileUponFailure:YES];
+		
+		self.download = download;
+		[download release];
+		
+		do 
+		{
+			CFRunLoopRunInMode(kCFRunLoopDefaultMode,1.0,false);
+		}
+		while (_finished == NO);
 	}
-	while (_finished == NO);
+	else
+	{
+		[self downloadDidFinish:nil];	// notify owner that the download (which never started) is finished.
+	}
 	
-	[pool release];
+	[pool drain];
 }
 
 
@@ -174,7 +162,7 @@
 	if (self.localPath)
 	{
 		NSError* error = nil;
-		[[NSFileManager threadSafeManager] removeItemAtPath:self.localPath error:&error];
+		[[NSFileManager imb_threadSafeManager] removeItemAtPath:self.localPath error:&error];
 	}
 	
 	self.delegate = nil;
@@ -187,6 +175,11 @@
 
 
 // The file was created (possibly with a modified filename (to make it unique). Store the filename...
+
+- (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)inResponse
+{
+	[_delegate didGetLength:[inResponse expectedContentLength]];
+}
 
 - (void) download:(NSURLDownload*)inDownload didCreateDestination:(NSString*)inPath
 {
@@ -205,7 +198,7 @@
 }
 
 
-// We are done. Notify the delegate (IMBRemoteObjectPromise) so that it can hide the progress...
+// We are done. Notify the delegate (IMBRemoteObjectsPromise) so that it can hide the progress...
 
 - (void) downloadDidFinish:(NSURLDownload*)inDownload
 {

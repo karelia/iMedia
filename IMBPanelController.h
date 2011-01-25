@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -55,6 +55,8 @@
 #import "IMBCommon.h"
 
 
+extern NSString* kIMBImageBrowserShowTitlesNotification;
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -65,13 +67,30 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+@interface IMBBackgroundImageView : NSImageView
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark 
 
 @interface IMBPanelController : NSWindowController
 {
-	IBOutlet NSTabView* ibTabView;
-	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
+	IBOutlet NSTabView*		ibTabView;
+	IBOutlet NSToolbar*		ibToolbar;		// should track the ibTabView
+	IBOutlet NSWindow*		ibInfoWindow;
+	IBOutlet NSTextView*	ibInfoTextView;
+	IBOutlet IMBBackgroundImageView *ibBackgroundImageView;
+	
+	// Items that we will localize from code so we don't need multiple nibs
+	IBOutlet NSTextField	*ibGridPrompt;
+	IBOutlet NSTextField	*ibToolbarPrompt;
+	IBOutlet NSButton		*ibShowTitles;
+	IBOutlet NSPopUpButton	*ibToolbarPopup;
+	IBOutlet NSButton		*ibSmallSize;
+
 	id _delegate;
 	NSArray* _mediaTypes;
 	NSMutableArray* _viewControllers;
@@ -94,13 +113,26 @@
 
 - (void) loadControllers;
 - (IMBObjectViewController*) objectViewControllerForMediaType:(NSString*)inMediaType;
-- (IBAction) showWindow:(id)inSender;
 - (IBAction) hideWindow:(id)inSender;
 
 - (void) saveStateToPreferences;
 - (void) restoreStateFromPreferences;
 
+- (IBAction) info:(id)sender;
+- (IBAction) flipBack:(id)sender;
+- (BOOL)infoWindowIsVisible;
+- (NSWindow *)infoWindow;
+
 @end
+
+
+// By declaring as a category, we:
+//  A)  Don't export an NSTabViewDelegate to host applications (thereby perhaps introducing warnings)
+//  B)  Keep IB able to parse the file
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+@interface IMBPanelController (NSTabViewDelegate) <NSTabViewDelegate>
+@end
+#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,11 +144,11 @@
 
 @optional
 
-- (BOOL) controller:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
-- (void) controller:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
+- (BOOL) panelController:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
+- (void) panelController:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
+- (void) panelController:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
+- (void) panelController:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
+- (void) panelController:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
 
 @end
 

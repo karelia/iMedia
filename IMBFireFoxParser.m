@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -58,6 +58,8 @@
 #import "NSWorkspace+iMedia.h"
 #import "IMBObject.h"
 #import "NSImage+iMedia.h"
+#import "NSFileManager+iMedia.h"
+#import "IMBNodeObject.h"
 
 @interface IMBFireFoxParser ()
 + (NSString *)firefoxBookmarkPath;
@@ -76,12 +78,12 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeLink];
-	[pool release];
+	[pool drain];
 }
 
 + (NSString*) firefoxPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"org.mozilla.firefox"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"org.mozilla.firefox"];
 }
 
 + (BOOL) isInstalled
@@ -99,7 +101,7 @@
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	
 	NSString *bookmarkPath = [self firefoxBookmarkPath];
-	NSFileManager *fm = [NSFileManager defaultManager];	// File manager, not flying meat!
+	NSFileManager *fm = [NSFileManager imb_threadSafeManager];	// File manager, not flying meat!
 	if ([self isInstalled] && bookmarkPath && [fm fileExistsAtPath:bookmarkPath] && [fm isReadableFileAtPath:bookmarkPath])
 	{
 		IMBFireFoxParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
@@ -112,33 +114,37 @@
 	return parserInstances;
 }
 
-
 + (NSString *)firefoxBookmarkPath;
 {
 	NSString *result = nil;
-	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-	NSString *path = [libraryPaths objectAtIndex:0];
+	NSArray *libraryPaths1 = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
+	NSArray *libraryPaths2 = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
 	
-	NSFileManager *fm = [NSFileManager defaultManager];
-	
-	NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
-	NSString *profilesPath = [firefoxPath stringByAppendingPathComponent:@"Profiles"];
-	BOOL isDir;
-	if ([fm fileExistsAtPath:profilesPath isDirectory:&isDir] && isDir)
+	NSMutableArray *libraryPaths = [NSMutableArray arrayWithArray:libraryPaths1];
+	[libraryPaths addObjectsFromArray:libraryPaths2];
+
+	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	for (NSString *path in libraryPaths)
 	{
-		NSDirectoryEnumerator *e = [fm enumeratorAtPath:profilesPath];
-		[e skipDescendents];
-		NSString *filename = nil;
-		while ( filename = [e nextObject] )
+		NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
+		NSString *profilesPath = [firefoxPath stringByAppendingPathComponent:@"Profiles"];
+		BOOL isDir;
+		if ([fm fileExistsAtPath:profilesPath isDirectory:&isDir] && isDir)
 		{
-			if ( ![filename hasPrefix:@"."] )
+			NSDirectoryEnumerator *e = [fm enumeratorAtPath:profilesPath];
+			[e skipDescendents];
+			NSString *filename = nil;
+			while ( filename = [e nextObject] )
 			{
-				NSString *profilePath = [profilesPath stringByAppendingPathComponent:filename];
-				NSString *bookmarkPath = [profilePath stringByAppendingPathComponent:@"places.sqlite"];
-				if ([fm fileExistsAtPath:bookmarkPath isDirectory:&isDir] && !isDir)
+				if ( ![filename hasPrefix:@"."] )
 				{
-					result = bookmarkPath;	// just stop on the first profile we find.  Should be good enough!
-					break;
+					NSString *profilePath = [profilesPath stringByAppendingPathComponent:filename];
+					NSString *bookmarkPath = [profilePath stringByAppendingPathComponent:@"places.sqlite"];
+					if ([fm fileExistsAtPath:bookmarkPath isDirectory:&isDir] && !isDir)
+					{
+						result = bookmarkPath;	// just stop on the first profile we find.  Should be good enough!
+						return result;
+					}
 				}
 			}
 		}
@@ -146,16 +152,18 @@
 	return result;
 }
 
+
+
 - (void) copyDatabase;		// try to copy the database and store in copy.
 {
-	NSFileManager *fm = [NSFileManager defaultManager];
+	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
 	NSString *newPath = nil;	// copy destination if we have to copy the file
 	
 	// null result set means we couldn't open it ... it's probably busy.
 	// The stupid workaround is to make a copy of the sqlite file, and check there!
 	// However just in case the source file has not changed, we'll check modification dates.
 	//
-	newPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"places.sqlite"];
+	newPath = [[[NSFileManager imb_threadSafeManager] imb_sharedTemporaryFolder:@"firefox"] stringByAppendingPathComponent:@"places.sqlite"];
 	if (![newPath isEqualToString:self.databasePathCurrent])	// if we are trying to open the copy, don't allow that.
 	{
 		BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
@@ -241,29 +249,28 @@
 	}
 	else
 	{
-		result = [NSImage sharedGenericFolderIcon];
+		result = [NSImage imb_sharedGenericFolderIcon];
 	}
 	return result;
 }
-
-#pragma mark 
 
 // The following two methods must be overridden by subclasses...
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	
 	if (nil == inOldNode)	// create the initial node
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 		
-		node.parentNode = nil;
 		node.name = @"Firefox";
 		node.icon = icon;
 		node.groupType = kIMBGroupTypeLibrary;
 		node.leaf = NO;
+		node.isTopLevelNode = YES;
 		node.parser = self;
 		// ??? node.mediaSource = self.mediaSource;
 		node.identifier = [self identifierForPath:@"/"];
@@ -282,11 +289,22 @@
 	
 		self.database = nil;	// close the database
 	}
+	else
+	{
+		node.mediaSource = self.mediaSource;
+		node.identifier = inOldNode.identifier;
+		node.name = inOldNode.name;
+		node.icon = inOldNode.icon;
+		node.parser = self;
+		node.leaf = inOldNode.leaf;
+		node.groupType = inOldNode.groupType;
+		node.attributes = [[inOldNode.attributes copy] autorelease];
+	}
 	
 	// Watch the root node. Whenever something in Lightroom changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding out WHAT has changed in Lightroom...
 	
-	if (node.isRootNode)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = self.databasePathOriginal;
@@ -294,6 +312,8 @@
 	
 	return node;
 }
+
+
 // Just load all the bookmarks in the tree -- this is not going to be that memory-intensive.
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
@@ -319,36 +339,57 @@
 	
 	while ([rs next])
 	{		
+//		NSLog(@"%@>%@ '%@' %@", 
+//			  parentIDNumber,
+//			  [rs stringForColumn:@"id"],
+//			  [rs stringForColumn:@"title"],
+//			  @"type=2");
+
 		int theID = [rs intForColumn:@"id"];
 		NSString *theName = [rs stringForColumn:@"title"];
+		NSUInteger index = 0;
 		if (theName && ![theName isEqualToString:@""])	// make sure we have a title; otherwise bogus
 		{
 			IMBNode* node = [[[IMBNode alloc] init] autorelease];
-			//		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];;
+			//		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
 			//		[icon setScalesWhenResized:YES];
 			//		[icon setSize:NSMakeSize(16.0,16.0)];
 			NSImage* icon = [self iconForFolderID:theID];
 			node.icon = icon;
-			node.parentNode = inNode;
 			node.name = theName;
 			node.attributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:theID] forKey:@"id"];
 			
 			node.leaf = NO;
 			node.parser = self;
 			// ??? node.mediaSource = self.mediaSource;
-			// ????? node.identifier = [self identifierForPath:@"/"];
-			
+			node.identifier = [self identifierForPath:[NSString stringWithFormat:@"/%d/%@",theID, theName]];
 			[subNodes addObject:node];
+			
+			// Top level node?  Make sub-objects show up for these subnodes as well.
+			// if ([parentIDNumber intValue] == 1)
+			{
+				IMBObject *object = [[[IMBNodeObject alloc] init] autorelease];
+				object.name = theName;
+				object.parser = self;
+				object.location = (id)node;
+				
+				object.index = index++;
+				object.imageLocation = nil;
+				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+				object.imageRepresentation = icon;
+				
+				[objects addObject:object];
+			}
 		}
 	}
 	inNode.subNodes = subNodes;
 
 	[rs close]; rs = nil;
-	
+		
 	// Now get the bookmarks (type 1)
 	while (self.database && !rs)	// keep trying until we get result set (or database is invalid)
 	{
-		NSString *query = @"select b.parent, b.id, b.title, p.url, f.mime_type, f.data from moz_bookmarks b, moz_places p left outer join moz_favicons f on p.favicon_id=f.id where p.id=b.fk and b.parent=? order by b.position;";
+		NSString *query = @"select b.parent, b.id, b.title, b.type, p.url, f.mime_type, f.data from moz_bookmarks b, moz_places p left outer join moz_favicons f on p.favicon_id=f.id where p.id=b.fk and b.parent=? order by b.position;";
 		rs = [self.database executeQuery:query, parentIDNumber];
 		if (!rs)
 		{
@@ -360,13 +401,20 @@
 	{		
 		IMBObject *object = [[[IMBObject alloc] init] autorelease];
 		
+//		NSLog(@"%@>%@ '%@' %@", 
+//			  [rs stringForColumn:@"parent"],
+//			  [rs stringForColumn:@"id"],
+//			  [rs stringForColumn:@"title"],
+//			  [rs stringForColumn:@"type"]);
+
+		
 		object.name = [rs stringForColumn:@"title"];
 		object.location = [NSURL URLWithString:[rs stringForColumn:@"url"]];
 		
 		NSData *imageData = [rs dataForColumn:@"data"];
 		if (imageData)
 		{
-			NSImage *iconImage = [NSImage imageWithData:imageData mimeType:[rs stringForColumn:@"mime_type"]];
+			NSImage *iconImage = [NSImage imb_imageWithData:imageData mimeType:[rs stringForColumn:@"mime_type"]];
 //			[icon setScalesWhenResized:YES];
 //			[icon setSize:NSMakeSize(16.0,16.0)];
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
@@ -378,7 +426,7 @@
 			if (!sGenericIcon)
 			{
 				// Get generic icon, and shrink it down to favicon size for consistency.
-				sGenericIcon = [[[NSWorkspace sharedWorkspace] iconForFileType:(NSString *)kUTTypeURL] retain];
+				sGenericIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType:(NSString *)kUTTypeURL] retain];
 				[sGenericIcon setScalesWhenResized:YES];
 				[sGenericIcon setSize:NSMakeSize(16.0,16.0)];
 			}

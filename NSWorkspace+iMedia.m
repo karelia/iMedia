@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -51,7 +51,7 @@
 
 @implementation NSWorkspace (iMediaExtensions)
 
-+ (NSWorkspace *)threadSafeWorkspace
++ (NSWorkspace *)imb_threadSafeWorkspace
 {
 	NSWorkspace*	instance = nil;
 
@@ -79,7 +79,7 @@
 	return instance;	
 }
 	
-- (NSImage *)iconForAppWithBundleIdentifier:(NSString *)bundleID
+- (NSImage *)imb_iconForAppWithBundleIdentifier:(NSString *)bundleID
 {
 	NSString *path = [self absolutePathForAppBundleWithIdentifier:bundleID];
 	if (nil == path)
@@ -89,8 +89,9 @@
 	return [self iconForFile:path];
 }
 
-- (NSImage *)iconForFile:(NSString *)path size:(NSSize)size
+- (NSImage *)imb_iconForFile:(NSString *)path size:(NSSize)size
 {
+	NSAssert(path, @"path should not be nil");
 	NSImage *icon = [self iconForFile:path];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:size];

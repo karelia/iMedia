@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -53,10 +53,12 @@
 #pragma mark HEADERS
 
 #import "IMBGarageBandParser.h"
+#import "IMBConfig.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBIconCache.h"
+#import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBTimecodeTransformer.h"
@@ -92,7 +94,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -103,7 +105,7 @@
 
 + (NSString*) garageBandPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.GarageBand"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.GarageBand"];
 }
 
 
@@ -188,7 +190,6 @@
 	{
 		node = [[[IMBNode alloc] init] autorelease];
 		
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -205,7 +206,7 @@
 	
 	if (inOldNode.isPopulated)
 	{
-		[self populateNode:node options:inOptions error:&error];
+		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
 	}
 	
 	if (outError) *outError = error;
@@ -222,7 +223,7 @@
 
 - (IMBNode*) _unpopulatedRootNodes
 {
-	NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:[IMBGarageBandParser garageBandPath]];
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:[IMBGarageBandParser garageBandPath]];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16.0,16.0)];
 	
@@ -240,30 +241,32 @@
 	
 	// Create Garageband root node...
 	
+	NSMutableArray* subNodes = [NSMutableArray array];
+	
 	IMBNode* root = [[[IMBNode alloc] init] autorelease];
-	root.parentNode = nil;
 	root.mediaSource = nil;
 	root.identifier = [self identifierForPath:@"/"];
 	root.icon = icon;
 	root.name = @"GarageBand";
 	root.groupType = kIMBGroupTypeLibrary;
 	root.leaf = NO;
+	root.isTopLevelNode = YES;
 	root.parser = self;
 	root.watcherType = kIMBWatcherTypeNone;
-	root.subNodes = [NSMutableArray array];
 	root.objects = [NSMutableArray array];	// the root node doesn't have any objects so we can populate it already!
 	
 	// Add unpopulated subnode for demo songs...
 	
 	NSString* demoSongsPath = [IMBGarageBandParser demoSongsPath];
 
-	if ([[NSFileManager defaultManager] fileExistsAtPath:demoSongsPath])
+	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath])
 	{
 		IMBNode* demo = [[[IMBNode alloc] init] autorelease];
-		demo.parentNode = root;
 		demo.mediaSource = demoSongsPath;
 		demo.identifier = [self identifierForPath:demoSongsPath];
-		demo.icon = [self iconForPath:demoSongsPath];
+		demo.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:demoSongsPath];
+		[demo.icon setScalesWhenResized:YES];
+		[demo.icon setSize:NSMakeSize(16,16)];
 		demo.name = demoSongsName;
 		demo.groupType = kIMBGroupTypeNone;
 		demo.leaf = YES;
@@ -271,29 +274,35 @@
 		demo.watcherType = kIMBWatcherTypeFSEvent;
 		demo.watchedPath = demoSongsPath;
 
-		[(NSMutableArray*)root.subNodes addObject:demo];
+		[subNodes addObject:demo];
 	}
 	
 	// Add unpopulated subnode for user songs...
 	
 	NSString* userSongsPath = [IMBGarageBandParser userSongsPath];
 
-	if ([[NSFileManager defaultManager] fileExistsAtPath:userSongsPath])
+	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath])
 	{
 		IMBNode* user = [[[IMBNode alloc] init] autorelease];
-		user.parentNode = root;
 		user.mediaSource = userSongsPath;
 		user.identifier = [self identifierForPath:userSongsPath];
-		user.icon = [self iconForPath:userSongsPath];
+		user.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:userSongsPath];
+		[user.icon setScalesWhenResized:YES];
+		[user.icon setSize:NSMakeSize(16,16)];
+
 		user.name = userSongsName;
 		user.groupType = kIMBGroupTypeNone;
 		user.leaf = YES;
 		user.parser = self;
 		user.watcherType = kIMBWatcherTypeFSEvent;
 		user.watchedPath = userSongsPath;
+		
+		[IMBConfig registerLibraryPath:userSongsPath];
 
-		[(NSMutableArray*)root.subNodes addObject:user];
+		[subNodes addObject:user];
 	}
+	
+	root.subNodes = subNodes;
 
 	return root;
 }
@@ -311,6 +320,8 @@
 	
 	if (metadata)
 	{
+		[metadata setObject:inPath forKey:@"path"];
+
 		NSNumber* duration = [metadata objectForKey:@"com_apple_garageband_metadata_songDuration"];
 		[metadata setObject:duration forKey:@"duration"];
 
@@ -329,7 +340,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSNumber* duration = [inMetadata objectForKey:@"duration"];
 	NSString* artist = [inMetadata objectForKey:@"artist"];
 	NSString* album = [inMetadata objectForKey:@"album"];
@@ -342,7 +353,8 @@
 			@"Artist",
 			@"Artist label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",artistLabel,artist];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",artistLabel,artist];
 	}
 	
 	if (album)
@@ -353,7 +365,8 @@
 			@"Album",
 			@"Album label in metadataDescription");
 
-		description = [description stringByAppendingFormat:@"%@: %@\n",albumLabel,album];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",albumLabel,album];
 	}
 	
 	if (duration)
@@ -365,7 +378,8 @@
 			@"Time label in metadataDescription");
 
 		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		description = [description stringByAppendingFormat:@"%@: %@\n",durationLabel,durationString];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
 	}
 	
 	return description;

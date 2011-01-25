@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -67,7 +67,7 @@
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBOrderedDictionary.h"
 #import "IMBParserController.h"
 #import "IMBPyramidObjectPromise.h"
@@ -216,7 +216,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -253,7 +253,7 @@ static NSArray* sSupportedUTIs = nil;
 				path = [path substringWithRange:NSMakeRange(1, [path length] - 3)];
  
 				BOOL exists,changed;
-				exists = [[NSFileManager defaultManager] fileExistsAtPath:&path wasChanged:&changed];
+				exists = [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
 				if (exists) [inLibraryPaths addObject:path];
 				
                 path = @"";
@@ -335,23 +335,21 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (inOldNode == nil)
 	{
-		NSImage* icon = [[NSWorkspace threadSafeWorkspace] iconForFile:self.appPath];
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
 		[icon setScalesWhenResized:YES];
 		[icon setSize:NSMakeSize(16.0,16.0)];
 		
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = [self rootNodeIdentifier];
 		node.name = @"Lightroom";
 		node.icon = icon;
 		node.parser = self;
 		node.leaf = NO;
+		node.isTopLevelNode = YES;
 		node.groupType = kIMBGroupTypeLibrary;
-		node.objects = [NSMutableArray array];
 	}
 	else
 	{
-		node.parentNode = inOldNode.parentNode;
 		node.mediaSource = self.mediaSource;
 		node.identifier = inOldNode.identifier;
 		node.name = inOldNode.name;
@@ -362,7 +360,7 @@ static NSArray* sSupportedUTIs = nil;
 		node.attributes = [[inOldNode.attributes copy] autorelease];
 	}
 	
-	if (node.isRootNode && self.shouldDisplayLibraryName)
+	if (node.isTopLevelNode && self.shouldDisplayLibraryName)
 	{
 		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,[self libraryName]];
 	}
@@ -370,7 +368,7 @@ static NSArray* sSupportedUTIs = nil;
 	// Watch the root node. Whenever something in Lightroom changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding out WHAT has changed in Lightroom...
 	
-	if (node.parentNode == nil)
+	if (node.isTopLevelNode)
 	{
 		node.watcherType = kIMBWatcherTypeFSEvent;
 		node.watchedPath = (NSString*)self.mediaSource;
@@ -382,9 +380,9 @@ static NSArray* sSupportedUTIs = nil;
 	
 	// If the old node was populated, then also populate the new node...
 	
-	if (inOldNode.subNodes.count > 0 || inOldNode.objects.count > 0)
+	if (inOldNode.isPopulated)
 	{
-		[self populateNode:node options:inOptions error:&error];
+		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
 	}
 	
 	if (outError) *outError = error;
@@ -403,7 +401,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	// Create subnodes for the root node as needed...
 	
-	if ([inNode isRootNode])
+	if ([inNode isTopLevelNode])
 	{
 		[self populateSubnodesForRootNode:inNode];
 	}
@@ -465,10 +463,6 @@ static NSArray* sSupportedUTIs = nil;
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	if (inRootNode.subNodes == nil) {
-		inRootNode.subNodes = [NSMutableArray array];
-	}
-	
 	[self populateSubnodesForCollectionNode:inRootNode];
 }
 
@@ -483,13 +477,9 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	if (inFoldersNode.subNodes == nil) {
-		inFoldersNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inFoldersNode.objects == nil) {
-		inFoldersNode.objects = [NSMutableArray array];
-	}
+	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* objects = [NSMutableArray array];
+	inFoldersNode.displayedObjectCount = 0;
 	
 	// Query the database for the root folders and create a node for each one we find...
 	
@@ -515,19 +505,18 @@ static NSArray* sSupportedUTIs = nil;
 			}
 			
 			IMBNode* node = [[[IMBNode alloc] init] autorelease];
-			node.parentNode = inFoldersNode;
 			node.name = name;
 			node.icon = [self folderIcon];
 			node.parser = self;
 			node.mediaSource = self.mediaSource;
 			node.identifier = [self identifierWithFolderId:id_local];
 			node.attributes = [self attributesWithRootFolder:id_local
-													 idLocal:nil
+													 idLocal:id_local
 													rootPath:path
 												pathFromRoot:nil];
 			node.leaf = NO;
 			
-			[(NSMutableArray*)inFoldersNode.subNodes addObject:node];
+			[subNodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
 			object.location = (id)node;
@@ -537,15 +526,18 @@ static NSArray* sSupportedUTIs = nil;
 			object.index = index++;
 			object.imageLocation = (id)self.mediaSource;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
+			object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 			
-			[(NSMutableArray*)inFoldersNode.objects addObject:object];
+			[objects addObject:object];
 			
-			[pool release];
+			[pool drain];
 		}
 		
 		[results close];
 	}
+	
+	inFoldersNode.subNodes = subNodes;
+	inFoldersNode.objects = objects;
 }
 
 
@@ -559,13 +551,9 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	if (inParentNode.subNodes == nil) {
-		inParentNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inParentNode.objects == nil) {
-		inParentNode.objects = [NSMutableArray array];
-	}
+	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* objects = [NSMutableArray array];
+	inParentNode.displayedObjectCount = 0;
 	
 	// Query the database for subfolder and add a node for each one we find...
 	
@@ -588,7 +576,7 @@ static NSArray* sSupportedUTIs = nil;
 			pathFromRootAccept = @"%/";
 			pathFromRootReject = @"%/%/";
 		}
-		
+				
 		FMResultSet* results = [database executeQuery:query, parentRootFolder, pathFromRootAccept, pathFromRootReject];
 		NSInteger index = 0;
 		
@@ -605,44 +593,42 @@ static NSArray* sSupportedUTIs = nil;
 			if ([pathFromRoot length] > 0) {
 				node = [[[IMBNode alloc] init] autorelease];
 				
-				node.parentNode = inParentNode;
 				node.icon = [self folderIcon];
 				node.parser = self;
 				node.mediaSource = self.mediaSource;
 				node.name = [pathFromRoot lastPathComponent];
 				node.leaf = NO;
-				
-				[(NSMutableArray*)inParentNode.subNodes addObject:node];
-			}
-			else {
-				node = inParentNode;
-			}
-			
-			node.identifier = [self identifierWithFolderId:id_local];
 
-			NSDictionary* attributes = [self attributesWithRootFolder:parentRootFolder
-															  idLocal:id_local
-															 rootPath:parentRootPath
-														 pathFromRoot:pathFromRoot];
-			node.attributes = attributes;
+				node.identifier = [self identifierWithFolderId:id_local];
+				
+				[subNodes addObject:node];
 			
-			NSString* path = [self absolutePathFromAttributes:attributes];
-			
-			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-			object.location = (id)node;
-			object.name = node.name;
-			object.metadata = nil;
-			object.parser = self;
-			object.index = index++;
-			object.imageLocation = (id)self.mediaSource;
-			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [[NSWorkspace threadSafeWorkspace] iconForFile:path];
-			
-			[(NSMutableArray*)inParentNode.objects addObject:object];
+				NSDictionary* attributes = [self attributesWithRootFolder:parentRootFolder
+																  idLocal:id_local
+																 rootPath:parentRootPath
+															 pathFromRoot:pathFromRoot];
+				node.attributes = attributes;
+				
+				NSString* path = [self absolutePathFromAttributes:attributes];
+				
+				IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+				object.location = (id)node;
+				object.name = node.name;
+				object.metadata = nil;
+				object.parser = self;
+				object.index = index++;
+				object.imageLocation = (id)self.mediaSource;
+				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+				object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
+
+				[objects addObject:object];
+			}
 		}
-		
 		[results close];
 	}
+	
+	inParentNode.subNodes = subNodes;
+	inParentNode.objects = objects;
 }
 
 
@@ -658,14 +644,9 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add an empty subnodes array, to avoid endless loop, even if the following query returns no results...
 	
-	if (inParentNode.subNodes == nil) {
-		inParentNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inParentNode.objects == nil) {
-		inParentNode.objects = [NSMutableArray array];
-	}
-	
+	NSMutableArray* subNodes = [NSMutableArray arrayWithArray:inParentNode.subNodes];
+	NSMutableArray* objects = [NSMutableArray arrayWithArray:inParentNode.objects];
+	inParentNode.displayedObjectCount = 0;
 	
 	// Now query the database for subnodes to the specified parent node...
 	
@@ -718,7 +699,6 @@ static NSArray* sSupportedUTIs = nil;
 			}
 			
 			IMBNode* node = [[[IMBNode alloc] init] autorelease];
-			node.parentNode = inParentNode;
 			node.identifier = [self identifierWithCollectionId:idLocal];
 			node.name = name;
 			node.icon = isGroup ? [self groupIcon] : [self collectionIcon];
@@ -730,7 +710,7 @@ static NSArray* sSupportedUTIs = nil;
 												pathFromRoot:nil];
 			node.leaf = NO;
 			
-			[(NSMutableArray*)inParentNode.subNodes addObject:node];
+			[subNodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
 			object.location = (id)node;
@@ -742,11 +722,14 @@ static NSArray* sSupportedUTIs = nil;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 			object.imageRepresentation = [self largeFolderIcon];
 			
-			[(NSMutableArray*)inParentNode.objects addObject:object];
+			[objects addObject:object];
 		}
 		
 		[results close];
 	}
+	
+	inParentNode.subNodes = subNodes;
+	inParentNode.objects = objects;
 }
 
 
@@ -755,7 +738,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (NSImage*) largeFolderIcon
 {
-	NSImage* icon = [NSImage genericFolderIcon];
+	NSImage* icon = [NSImage imb_genericFolderIcon];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(64.0,64.0)];
 	
@@ -778,7 +761,8 @@ static NSArray* sSupportedUTIs = nil;
 	// Add object array, even if nothing is found in database, so that we do not cause endless loop...
 	
 	if (inNode.objects == nil) {
-		inNode.objects = [NSMutableArray array];
+		inNode.objects = [NSArray array];
+		inNode.displayedObjectCount = 0;
 	}
 	
 	// Query the database for image files for the specified node. Add an IMBObject for each one we find...
@@ -792,7 +776,7 @@ static NSArray* sSupportedUTIs = nil;
 		NSDictionary* attributes = inNode.attributes;
 		NSString* folderPath = [self absolutePathFromAttributes:attributes];
 		NSNumber* folderId = [self idLocalFromAttributes:attributes];
-		FMResultSet* results = [database executeQuery:query, folderId];
+		FMResultSet* results = [database executeQuery:query, folderId, folderId];
 		NSUInteger index = 0;
 		
 		while ([results next]) {
@@ -831,13 +815,14 @@ static NSArray* sSupportedUTIs = nil;
 												   index:index++];
 				
 				[objects addObject:object];
+				inNode.displayedObjectCount++;
 			}
 		}
 		
 		[results close];
 		
 		[objects addObjectsFromArray:inNode.objects];
-		[(NSMutableArray*)inNode.objects setArray:objects];
+		inNode.objects = objects;
 	}
 }
 
@@ -854,6 +839,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (inNode.objects == nil) {
 		inNode.objects = [NSMutableArray array];
+		inNode.displayedObjectCount = 0;
 	}
 	
 	// Query the database for image files for the specified node. Add an IMBObject for each one we find...
@@ -902,6 +888,7 @@ static NSArray* sSupportedUTIs = nil;
 												metadata:metadata
 												   index:index++];
 				[(NSMutableArray*)inNode.objects addObject:object];
+				inNode.displayedObjectCount++;
 			}
 		}
 		
@@ -917,7 +904,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (BOOL) canOpenImageFileAtPath:(NSString*)inPath
 {
-	NSString* uti = [NSString UTIForFileAtPath:inPath];
+	NSString* uti = [NSString imb_UTIForFileAtPath:inPath];
 	NSArray* supportedUTIs = [self supportedUTIs];
 	
 	for (NSString* supportedUTI in supportedUTIs)
@@ -989,7 +976,7 @@ static NSArray* sSupportedUTIs = nil;
 	CGFloat w = CGImageGetWidth(imgRef);
 	CGFloat h = CGImageGetHeight(imgRef);
 	
-	CGAffineTransform transform;
+	CGAffineTransform transform = {0};
 	
 	switch (orientationProperty) {
 		case 1:
@@ -1207,24 +1194,27 @@ static NSArray* sSupportedUTIs = nil;
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	IMBLightroomObject* object = (IMBLightroomObject*)inObject;
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-	
-	// DISABLING see note in IMBApertureParser.m 
-	// [metadata addEntriesFromDictionary:[NSImage metadataFromImageAtPath:object.path]];
+	if ([inObject isKindOfClass:[IMBLightroomObject class]])
+	{
+		IMBLightroomObject* object = (IMBLightroomObject*)inObject;
+		NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
 
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-	
-	if ([NSThread isMainThread])
-	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
-	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+		// DISABLING see note in IMBApertureParser.m 
+		//[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path checkSpotlightComments:NO]];
+
+		NSString* description = [self metadataDescriptionForMetadata:metadata];
+		
+		if ([NSThread isMainThread])
+		{
+			inObject.metadata = metadata;
+			inObject.metadataDescription = description;
+		}
+		else
+		{
+			NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+			[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+			[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+		}
 	}
 }
 
@@ -1233,7 +1223,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	return [NSImage imageMetadataDescriptionForMetadata:inMetadata];
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 
@@ -1427,9 +1417,9 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 // For Lightroom we need a promise that splits the pyramid file
-- (IMBObjectPromise*) objectPromiseWithObjects: (NSArray*) inObjects
+- (IMBObjectsPromise*) objectPromiseWithObjects: (NSArray*) inObjects
 {
-	return [[(IMBObjectPromise*)[IMBPyramidObjectPromise alloc] initWithArrayOfObjects:inObjects] autorelease];
+	return [[[IMBPyramidObjectPromise alloc] initWithIMBObjects:inObjects] autorelease];
 }
 
 - (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject
@@ -1447,7 +1437,7 @@ static NSArray* sSupportedUTIs = nil;
 																	  nil,IMBBundle(),
 																	  @"Open Master Image With %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
-			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig editorAppForMediaType:self.mediaType]];
+			NSString* appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:[IMBConfig editorAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
 			
 			[menuItem setTitle:title];
@@ -1458,7 +1448,7 @@ static NSArray* sSupportedUTIs = nil;
 																	  nil,IMBBundle(),
 																	  @"Open Master Image With %@",
 																	  @"Menu item in context menu of IMBObjectViewController");
-			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:[IMBConfig viewerAppForMediaType:self.mediaType]];
+			NSString* appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:[IMBConfig viewerAppForMediaType:self.mediaType]];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
 			
 			[menuItem setTitle:title];
@@ -1488,7 +1478,7 @@ static NSArray* sSupportedUTIs = nil;
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 	NSString* path = [lightroomObject path];
 	
-	if ([[NSFileManager threadSafeManager] fileExistsAtPath:path]) {
+	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path]) {
 		IMBMutableOrderedDictionary *applications = [IMBMutableOrderedDictionary orderedDictionaryWithCapacity:2];
 		
 		NSString* editorAppKey = [IMBConfig editorAppForMediaType:self.mediaType];
@@ -1503,7 +1493,7 @@ static NSArray* sSupportedUTIs = nil;
 																	  nil,IMBBundle(),
 																	  @"Open Processed Image in %@",
 																	  @"Menu item in context menu of IMBLightroomParser");
-			NSString* appName = [[NSFileManager threadSafeManager] displayNameAtPath:appPath];
+			NSString* appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
 			NSString* title = [NSString stringWithFormat:titleFormat, appName];	
 
 			NSString* selector = [applications objectForKey:appPath];
@@ -1526,7 +1516,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
 	NSString* folder = [absolutePyramidPath stringByDeletingLastPathComponent];
 	
-	[[NSWorkspace threadSafeWorkspace] selectFile:absolutePyramidPath inFileViewerRootedAtPath:folder];
+	[[NSWorkspace imb_threadSafeWorkspace] selectFile:absolutePyramidPath inFileViewerRootedAtPath:folder];
 }
 
 - (void)openPreviewInApp:(id)sender
@@ -1534,7 +1524,7 @@ static NSArray* sSupportedUTIs = nil;
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)[sender representedObject];
 	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
 	
-	[[NSWorkspace threadSafeWorkspace] openURL:url];
+	[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
 }
 
 - (void)openPreviewInEditorApp:(id)sender
@@ -1543,7 +1533,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
 	NSString* app = [IMBConfig editorAppForMediaType:self.mediaType];
 	
-	[[NSWorkspace threadSafeWorkspace] openFile:[url path] withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:[url path] withApplication:app];
 }
 
 - (void)openPreviewInViewerApp:(id)sender
@@ -1552,7 +1542,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSURL* url = [IMBPyramidObjectPromise urlForObject:lightroomObject];
 	NSString* app = [IMBConfig viewerAppForMediaType:self.mediaType];
 	
-	[[NSWorkspace threadSafeWorkspace] openFile:[url path] withApplication:app];
+	[[NSWorkspace imb_threadSafeWorkspace] openFile:[url path] withApplication:app];
 }
 
 @end

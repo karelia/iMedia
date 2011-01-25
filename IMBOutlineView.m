@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -243,9 +243,11 @@
 	[super drawRect:inRect];
 	
 	// Then draw the prompt string at the bottom if required...
-	if ([[self registeredDraggedTypes] containsObject:NSFilenamesPboardType]) {
-		const CGFloat MARGIN_BELOW = 15.0;
-		const CGFloat FADE_AREA = 35.0;
+	
+	if ([[self registeredDraggedTypes] containsObject:NSFilenamesPboardType])
+	{
+		const CGFloat MARGIN_BELOW = 20.0;
+		const CGFloat FADE_AREA = 20.0;
 		CGFloat viewHeight = self.bounds.size.height;
 		CGFloat dataHeight = self.rowHeight * self.numberOfRows;	
 		
@@ -258,7 +260,7 @@
 			[textCell setTextColor:[NSColor colorWithCalibratedWhite:0.66667 alpha:alpha]];
 			[textCell setStringValue:self.draggingPrompt];
 			
-			NSRect textRect = NSInsetRect([self visibleRect], 12.0, 12.0);
+			NSRect textRect = NSInsetRect([self visibleRect],12.0,8.0);
 			[textCell drawWithFrame:textRect inView:self];
 		}
 	}

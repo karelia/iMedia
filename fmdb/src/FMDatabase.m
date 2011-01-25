@@ -82,8 +82,8 @@
             retry = YES;
             usleep(20);
             if (busyRetryTimeout && (numberOfRetries++ > busyRetryTimeout)) {
-                NSLog(@"%s:%d", __FUNCTION__, __LINE__);
-                NSLog(@"Database busy, unable to close");
+                //NSLog(@"%s:%d", __FUNCTION__, __LINE__);
+                //NSLog(@"Database busy, unable to close");
                 return;
             }
         }
@@ -286,8 +286,8 @@
                 usleep(20);
                 
                 if (busyRetryTimeout && (numberOfRetries++ > busyRetryTimeout)) {
-                    NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
-                    NSLog(@"Database busy");
+                    //NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
+                    //NSLog(@"Database busy");
                     sqlite3_finalize(pStmt);
                     [self setInUse:NO];
                     return nil;
@@ -418,8 +418,8 @@
                 usleep(20);
                 
                 if (busyRetryTimeout && (numberOfRetries++ > busyRetryTimeout)) {
-                    NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
-                    NSLog(@"Database busy");
+                    //NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
+                    //NSLog(@"Database busy");
                     sqlite3_finalize(pStmt);
                     [self setInUse:NO];
                     return NO;
@@ -494,8 +494,8 @@
             usleep(20);
             
             if (busyRetryTimeout && (numberOfRetries++ > busyRetryTimeout)) {
-                NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
-                NSLog(@"Database busy");
+                //NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
+                //NSLog(@"Database busy");
                 retry = NO;
             }
         }

@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
- Redistributions of source code must retain the original terms stated here,
- including this list of conditions, the disclaimer noted below, and the
- following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	Redistributions of source code must retain the original terms stated here,
+	including this list of conditions, the disclaimer noted below, and the
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
- Redistributions in binary form must include, in an end-user-visible manner,
- e.g., About window, Acknowledgments window, or similar, either a) the original
- terms stated here, including this list of conditions, the disclaimer noted
- below, and the aforementioned copyright notice, or b) the aforementioned
- copyright notice and a link to karelia.com/imedia.
+	Redistributions in binary form must include, in an end-user-visible manner,
+	e.g., About window, Acknowledgments window, or similar, either a) the original
+	terms stated here, including this list of conditions, the disclaimer noted
+	below, and the aforementioned copyright notice, or b) the aforementioned
+	copyright notice and a link to karelia.com/imedia.
  
- Neither the name of Karelia Software, nor Sandvox, nor the names of
- contributors to iMedia Browser may be used to endorse or promote products
- derived from the Software without prior and express written permission from
- Karelia Software or individual contributors, as appropriate.
+	Neither the name of Karelia Software, nor Sandvox, nor the names of
+	contributors to iMedia Browser may be used to endorse or promote products
+	derived from the Software without prior and express written permission from
+	Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -84,7 +84,7 @@
 
 + (NSString*) lightroomPath
 {
-	return [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom3"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom3"];
 }
 
 
@@ -123,7 +123,7 @@
 			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
 								   stringByAppendingString:@" Previews"]
 								  stringByAppendingPathExtension:@"lrdata"];
-			NSFileManager* fileManager = [NSFileManager threadSafeManager];
+			NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
 			
 			BOOL isDirectory;
 			if (!([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory)) {
@@ -185,13 +185,9 @@
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	if (inRootNode.subNodes == nil) {
-		inRootNode.subNodes = [NSMutableArray array];
-	}
-	
-	if (inRootNode.objects == nil) {
-		inRootNode.objects = [NSMutableArray array];
-	}
+	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* objects = [NSMutableArray array];
+	inRootNode.displayedObjectCount = 0;
 	
 	// Add the Folders node...
 	
@@ -204,7 +200,6 @@
 															  @"Name of Folders node in IMBLightroomParser");
 	
 	IMBNode* foldersNode = [[[IMBNode alloc] init] autorelease];
-	foldersNode.parentNode = inRootNode;
 	foldersNode.mediaSource = self.mediaSource;
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
 	foldersNode.name = foldersName;
@@ -213,7 +208,7 @@
 	//	foldersNode.attributes = [self attributesWithId:id_local path:nil];
 	foldersNode.leaf = NO;
 	
-	[(NSMutableArray*)inRootNode.subNodes addObject:foldersNode];
+	[subNodes addObject:foldersNode];
 
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
 	foldersObject.location = (id)foldersNode;
@@ -225,7 +220,7 @@
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 	foldersObject.imageRepresentation = [self largeFolderIcon];
 	
-	[(NSMutableArray*)inRootNode.objects addObject:foldersObject];
+	[objects addObject:foldersObject];
 
 	
 	// Add the Collections node...
@@ -237,14 +232,13 @@
 																  @"Name of Collections node in IMBLightroomParser");
 	
 	IMBNode* collectionsNode = [[[IMBNode alloc] init] autorelease];
-	collectionsNode.parentNode = inRootNode;
 	collectionsNode.identifier = [self identifierWithCollectionId:0];
 	collectionsNode.name = collectionsName;
 	collectionsNode.icon = [self groupIcon];
 	collectionsNode.parser = self;
 	collectionsNode.leaf = NO;
 	
-	[(NSMutableArray*)inRootNode.subNodes addObject:collectionsNode];
+	[subNodes addObject:collectionsNode];
 	
 	IMBNodeObject* collectionsObject = [[[IMBNodeObject alloc] init] autorelease];
 	collectionsObject.location = (id)collectionsNode;
@@ -256,8 +250,11 @@
 	collectionsObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 	collectionsObject.imageRepresentation = [self largeFolderIcon];
 	
-	[(NSMutableArray*)inRootNode.objects addObject:collectionsObject];
+	[objects addObject:collectionsObject];
 	
+	inRootNode.subNodes = subNodes;
+	inRootNode.objects = objects;
+
 	[super populateSubnodesForRootNode:collectionsNode];
 }
 
@@ -276,8 +273,7 @@
 	NSString* query =	@" SELECT id_local, pathFromRoot"
 						@" FROM AgLibraryFolder"
 						@" WHERE rootFolder = ?"
-						@" AND pathFromRoot LIKE ?"
-						@" AND NOT (pathFromRoot LIKE ?)"
+						@" AND (pathFromRoot LIKE ? AND NOT (pathFromRoot LIKE ?))"
 						@" ORDER BY pathFromRoot ASC";
 	
 	
@@ -313,7 +309,11 @@
 						@" FROM AgLibraryFile alf"
 						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
 						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
-						@" WHERE alf.folder = ?"
+						@" WHERE alf.folder in ( "
+						@"		SELECT id_local"
+						@"		FROM AgLibraryFolder"
+						@"		WHERE id_local = ? OR (rootFolder = ? AND (pathFromRoot IS NULL OR pathFromRoot = ''))"
+						@" )"
 						@" AND ai.fileFormat <> 'VIDEO'"
 						@" ORDER BY ai.captureTime ASC";
 	
@@ -348,10 +348,10 @@
 		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"icon_folder.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
-		image = [image imageCroppedToRect:NSMakeRect(2,1,19,16)];
+		image = [image imb_imageCroppedToRect:NSMakeRect(2,1,19,16)];
 		
 		if (image == nil) {
-			image = [NSImage sharedGenericFolderIcon];
+			image = [NSImage imb_sharedGenericFolderIcon];
 		}
 		
 		folderIcon = [image copy];
@@ -370,10 +370,10 @@
 		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"groupCreation.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
-		image = [image imageCroppedToRect:NSMakeRect(2,2,19,16)];
+		image = [image imb_imageCroppedToRect:NSMakeRect(2,2,19,16)];
 		
 		if (image == nil) {
-			image = [NSImage sharedGenericFolderIcon];
+			image = [NSImage imb_sharedGenericFolderIcon];
 		}
 		
 		groupIcon = [image copy];
@@ -392,10 +392,10 @@
 		NSString* pathToResources = [pathToModule stringByAppendingPathComponent:@"Contents/Resources"];
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"collectionCreation.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
-		image = [image imageCroppedToRect:NSMakeRect(1,1,19,16)];
+		image = [image imb_imageCroppedToRect:NSMakeRect(1,1,19,16)];
 	
 		if (image == nil) {
-			image = [NSImage sharedGenericFolderIcon];
+			image = [NSImage imb_sharedGenericFolderIcon];
 		}
 	
 		collectionIcon = [image copy];
@@ -513,7 +513,7 @@
 	NSString *pathExtension = [databasePath pathExtension];	
 	NSString *readOnlyDatabasePath = [[NSString stringWithFormat:@"%@-readOnly", basePath] stringByAppendingPathExtension:pathExtension];
 	
-	NSFileManager *fileManager = [NSFileManager defaultManager];
+	NSFileManager *fileManager = [NSFileManager imb_threadSafeManager];
 	BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
 	NSError* error;
 	

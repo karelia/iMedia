@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -55,16 +55,16 @@
 @implementation NSImage (iMedia)
 
 // Actually ignore the mime type, but maybe later we can use it as a hint
-+ (NSImage *) imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
++ (NSImage *) imb_imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
 {
 	return [[[NSImage alloc] initWithData:aData] autorelease];
 }
 
 
 // Try to load an image out of the bundle for another application and if not found fallback to one of our own.
-+ (NSImage *)imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle
++ (NSImage *)imb_imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle
 {
-	NSString *pathToOtherApp = [[NSWorkspace threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:bundleID];
+	NSString *pathToOtherApp = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:bundleID];
 	NSImage *image = nil;
 	
 	if (pathToOtherApp)
@@ -83,22 +83,25 @@
 	return [image autorelease];
 }
 
-+ (NSImage *)imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime
+#if defined MAC_OS_X_VERSION_10_6 && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
++ (NSImage *)imb_imageFromFirefoxEmbeddedIcon:(NSString *)base64WithMime
 {
 	//need to strip the mime bit - data:image/x-icon;base64,
 	NSRange r = [base64WithMime rangeOfString:@"data:image/x-icon;base64,"];
 	NSString *base64 = [base64WithMime substringFromIndex:NSMaxRange(r)];
-	NSData *decoded = [base64 decodeBase64];
+	NSData *decoded = [base64 imb_decodeBase64];
 	NSImage *img = [[NSImage alloc] initWithData:decoded];
 	return [img autorelease];
 }
+#endif
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
-+ (NSDictionary *)metadataFromImageAtPath:(NSString *)aPath;
++ (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath checkSpotlightComments:(BOOL)aCheckSpotlight;
 {
-	NSDictionary *result = nil;
+	NSMutableDictionary *md = [NSMutableDictionary dictionary];
 	CGImageSourceRef source = nil;
 	NSURL *url = [NSURL fileURLWithPath:aPath];
+	NSAssert(url, @"Nil image source URL");
 	source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
 	if (source)
 	{
@@ -106,7 +109,6 @@
 		if (propsCF)
 		{
 			NSDictionary *props = (NSDictionary *)propsCF;
-			NSMutableDictionary *md = [NSMutableDictionary dictionary];
 			NSNumber *width = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelWidth];
 			NSNumber *height= (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelHeight];
 			NSNumber *depth = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyDepth];
@@ -117,6 +119,8 @@
 			if (depth) [md setObject:depth forKey:@"depth"];
 			if (model) [md setObject:model forKey:@"model"];
 			if (filetype) [md setObject:filetype forKey:@"filetype"];
+			[md setObject:aPath forKey:@"path"];
+
 			NSDictionary *exif = [props objectForKey:(NSString *)kCGImagePropertyExifDictionary];
 			if ( nil != exif )
 			{
@@ -127,18 +131,35 @@
 					[md setObject:dateTime forKey:@"dateTime"];
 				}
 			}
-			result = [NSDictionary dictionaryWithDictionary:md];
 			CFRelease(propsCF);
 		}
 		CFRelease(source);
 	}
+	
+	if (aCheckSpotlight)	// done from folder parsers, but not library-based items like iPhoto
+	{
+		MDItemRef item = MDItemCreate(NULL,(CFStringRef)aPath);
+		
+		if (item)
+		{
+			CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
+			if (comment)
+			{
+				[md setObject:(NSString*)comment forKey:@"comment"]; 
+				CFRelease(comment);
+			}
+			CFRelease(item);
+		}
+	}
+		
+	NSDictionary *result = [NSDictionary dictionaryWithDictionary:md];
 	return result;
 }
 
 
-+ (NSString*) imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
++ (NSString*) imb_imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSString* description = @"";
+	NSMutableString* description = [NSMutableString string];
 	NSNumber* width = [inMetadata objectForKey:@"width"];
 	NSNumber* height = [inMetadata objectForKey:@"height"];
 	NSNumber* depth = [inMetadata objectForKey:@"depth"];
@@ -146,56 +167,86 @@
 	NSString* type = [inMetadata objectForKey:@"ImageType"];
 	NSString* filetype = [inMetadata objectForKey:@"filetype"];
 	NSString* dateTime = [inMetadata objectForKey:@"dateTime"];
-	
+	NSString* path = [inMetadata objectForKey:@"path"];
+	NSString* comment = [inMetadata objectForKey:@"comment"];
+	if (comment == nil) comment = [inMetadata objectForKey:@"Comment"];	// uppercase from iPhoto
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+	if ((width != nil && height != nil) || depth != nil || model != nil || type != nil)
+	{		
+		if (description.length > 0) [description imb_appendNewline];
+		
+		if (depth) [description appendFormat:@"%@-bit ",depth];		// TODO: LOCALIZE
+		if (model) [description appendFormat:@"%@ ",model];
+		
+		if (type)
+		{
+			NSString *UTI = [NSString imb_UTIForFileType:type];
+			NSString *descUTI = [NSString imb_descriptionForUTI:UTI];
+			if (descUTI)
+			{
+				[description appendFormat:@"%@",descUTI];
+			}
+		}
+		else if (path)
+		{
+			NSString *UTI = [NSString imb_UTIForFileAtPath:path];
+			NSString *descUTI = [NSString imb_descriptionForUTI:UTI];
+			if (descUTI)
+			{
+				[description appendFormat:@"%@",descUTI];
+			}
+		}
+		else if (filetype)
+		{
+			NSString *UTI = [NSString imb_UTIForFilenameExtension:filetype];
+			NSString *descUTI = [NSString imb_descriptionForUTI:UTI];
+			if (descUTI)
+			{
+				[description appendFormat:@"%@",descUTI];
+			}
+		}
+	}
+
 	if (width != nil && height != nil)
 	{
-		NSString* size = NSLocalizedStringWithDefaultValue(
-				@"Size",
-				nil,IMBBundle(),
-				@"Size",
-				@"Size label in metadataDescription");
-		
-		description = [description stringByAppendingFormat:@"%@: %@x%@\n",size,width,height];
-	}
-	
-	if (depth != nil || model != nil || type != nil)
-	{
-		NSString* typeLabel = NSLocalizedStringWithDefaultValue(
-				@"Type",
-				nil,IMBBundle(),
-				@"Type",
-				@"Type label in metadataDescription");
-		
-		description = [description stringByAppendingFormat:@"%@: ",typeLabel];
-		if (depth) description = [description stringByAppendingFormat:@"%@bit ",depth];
-		if (model) description = [description stringByAppendingFormat:@"%@ ",model];
-		if (type) description = [description stringByAppendingFormat:@"%@",type];
-		else if (filetype) description = [description stringByAppendingFormat:@"%@",filetype];
-		description = [description stringByAppendingFormat:@"\n"];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@×%@",width,height];
 	}
 	
 	if (dateTime != nil)
 	{
-		NSString* dateLabel = NSLocalizedStringWithDefaultValue(
-				@"Date",
-				nil,IMBBundle(),
-				@"Date",
-				@"Date label in metadataDescription");
+		NSString *dateTimeDesc = [dateTime imb_exifDateToLocalizedDisplayDate];
+		if (dateTimeDesc)
+		{
+			if (description.length > 0) [description imb_appendNewline];
+			[description appendString:dateTimeDesc];
+		}
+	}
+
+	if (comment != nil && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+																   @"Comment",
+																   nil,IMBBundle(),
+																   @"Comment",
+																   @"Comment label in metadataDescription");
 		
-		description = [description stringByAppendingFormat:@"%@: %@\n",dateLabel,dateTime];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
 	return description;
 }
 
 
-+ (NSImage *) sharedGenericFolderIcon
++ (NSImage *) imb_sharedGenericFolderIcon
 {
 	static NSImage *sGenericFolderIcon = nil;
 	
 	if (sGenericFolderIcon == nil)
 	{
-		sGenericFolderIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
+		sGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
 		[sGenericFolderIcon setScalesWhenResized:YES];
 		[sGenericFolderIcon setSize:NSMakeSize(16,16)];
 	}
@@ -208,14 +259,28 @@
 	return sGenericFolderIcon;
 }
 
-
-+ (NSImage *) genericFolderIcon
++ (NSImage *) imb_sharedGenericFileIcon
 {
-	return [[[self sharedGenericFolderIcon] copy] autorelease];
+	static NSImage *sGenericFileIcon = nil;
+	
+	if (sGenericFileIcon == nil)
+	{
+		sGenericFileIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericDocumentIcon)] retain];
+		[sGenericFileIcon setScalesWhenResized:YES];
+		[sGenericFileIcon setSize:NSMakeSize(16,16)];
+	}
+
+	return sGenericFileIcon;
 }
 
 
-- (NSImage *) imageCroppedToRect:(NSRect)inCropRect
++ (NSImage *) imb_genericFolderIcon
+{
+	return [[[self imb_sharedGenericFolderIcon] copy] autorelease];
+}
+
+
+- (NSImage *) imb_imageCroppedToRect:(NSRect)inCropRect
 {
 	NSRect dstRect = NSZeroRect;
 	dstRect.size = self.size;
@@ -228,6 +293,46 @@
 	[croppedImage unlockFocus];
 	
 	return croppedImage;
+}
+
+
+// returns nil if no bitmap associated.
+
+- (NSBitmapImageRep *) imb_firstBitmap	
+{
+	NSBitmapImageRep *result = nil;
+	NSArray *reps = [self representations];
+    
+	for (NSImageRep *theRep in reps )
+	{
+		if ([theRep isKindOfClass:[NSBitmapImageRep class]])
+		{
+			result = (NSBitmapImageRep *)theRep;
+			break;
+		}
+	}
+	return result;
+}
+
+
+// returns bitmap, or creates one.
+
+- (NSBitmapImageRep *) imb_bitmap	
+{
+	NSBitmapImageRep *result = [self imb_firstBitmap];
+    
+	if (nil == result)	
+	{
+		NSInteger width, height;
+		NSSize sz = [self size];
+		width = sz.width;
+		height = sz.height;
+		[self lockFocus];
+		result = [[[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0.0, 0.0, (CGFloat)width, (CGFloat)height)] autorelease];
+		[self unlockFocus];
+	}
+	
+	return result;
 }
 
 

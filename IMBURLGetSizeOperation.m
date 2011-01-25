@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -43,67 +43,124 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
-// Author: Peter Baumgartner
-
+// Author: Dan Wood
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark HEADERS
 
-#import "IMBEnhancedObject.h"
+#import "IMBURLGetSizeOperation.h"
+#import "NSFileManager+iMedia.h"
 #import "IMBCommon.h"
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This subclass adds the addition preliminaryMetadata property, which stores the metadata coming from an XML 
-// file or a database being parsed. Usually this metadata comes for "free" when parsing the database, whereas 
-// other metadata that we may still want is expensive to create. For this reason we will only do this work  
-// lazily (on demand). When the full metadata is requested, then the preliminaryMetadata is combined with the 
-// additional info and stored in the metadata property...
+#pragma mark
+
+@implementation IMBURLGetSizeOperation
+
+@synthesize delegate = _delegate;
+@synthesize remoteURL = _remoteURL;
+@synthesize connection = _connection;
+@synthesize bytesTotal = _bytesTotal;
+@synthesize finished = _finished;
 
 
-@implementation IMBEnhancedObject
+//----------------------------------------------------------------------------------------------------------------------
 
-@synthesize preliminaryMetadata = _preliminaryMetadata;
 
-- (id) initWithCoder:(NSCoder*)inCoder
+- (id) initWithURL:(NSURL*)inURL delegate:(id)inDelegate
 {
-	if ((self = [super initWithCoder:inCoder]) != nil) {
-		self.preliminaryMetadata = [inCoder decodeObjectForKey:@"preliminaryMetadata"];
+	if (self = [super init])
+	{
+		self.remoteURL = inURL;
+		self.delegate = inDelegate;
 	}
 	
 	return self;
 }
 
 
-- (void) encodeWithCoder:(NSCoder*)inCoder
-{
-	[super encodeWithCoder:inCoder];
-	
-	[inCoder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
-}
-
-
-- (id) copyWithZone:(NSZone*)inZone
-{
-	IMBEnhancedObject* copy = [super copyWithZone:inZone];
-	
-	copy.preliminaryMetadata = self.preliminaryMetadata;
-	
-	return copy;
-}
-
 - (void) dealloc
 {
-	IMBRelease(_preliminaryMetadata);
+	IMBRelease(_remoteURL);
+	IMBRelease(_connection);
+	
 	[super dealloc];
-}
-
-@end
+} 
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Create a NSURLDownload, start it and spin the runloop until we are done. Since we are in a background thread
+// we can block without problems...
+
+- (void) main
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+//	NSLog(@"%s Starting %@",__FUNCTION__,self);
+
+	if (0 == self.bytesTotal)	// only do the actual check if we don't already have a (local) size
+	{
+		NSURLRequestCachePolicy policy = NSURLRequestUseProtocolCachePolicy;
+		NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:self.remoteURL cachePolicy:policy timeoutInterval:15.0];
+		[request setHTTPMethod:@"HEAD"];
+		
+		self.connection = [NSURLConnection connectionWithRequest:request delegate:self];
+				
+		do 
+		{
+			CFRunLoopRunInMode(kCFRunLoopDefaultMode,1.0,false);
+		}
+		while (!_finished);
+	}
+	else
+	{
+		[self connectionDidFinishLoading:nil];	// notify owner that the download (which never started) is finished.
+	}
+	
+//	NSLog(@"%s Ending %@",__FUNCTION__,self);
+	[pool drain];
+}
+
+
+- (void) cancel
+{
+	[self.connection cancel];
+	
+	self.delegate = nil;
+	self.connection = nil;
+	self.finished = YES;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) connection:(NSURLConnection*)inConnection didReceiveResponse:(NSURLResponse*)inResponse
+{
+	_bytesTotal += [inResponse expectedContentLength];
+}
+
+
+- (void) connectionDidFinishLoading:(NSURLConnection*)inConnection
+{
+	_finished = YES;
+}
+
+
+- (void) connection:(NSURLConnection*)inConnection didFailWithError:(NSError*)inError
+{
+	_finished = YES;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end

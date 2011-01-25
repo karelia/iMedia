@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -117,7 +117,7 @@ typedef NSUInteger IMBGroupType;
 
 // User Interface constants...
 
-#define kIMBMaxThumbnailSize 128
+#define kIMBMaxThumbnailSize 256.0
 
 // Common error codes...
 
@@ -131,6 +131,10 @@ typedef NSUInteger IMBGroupType;
 
 #ifndef IMBRelease
 #define IMBRelease(object) if (object) {[object release]; object=nil;}
+#endif
+
+#ifndef IMBDrain
+#define IMBDrain(pool) if (pool) {[pool drain]; pool=nil;}
 #endif
 
 #ifndef IMBBundle
@@ -150,4 +154,45 @@ typedef NSUInteger IMBGroupType;
 #define IMBRunningOnSnowLeopardOrNewer()	(NSAppKitVersionNumber >= NSAppKitVersionNumber10_6)
 #define IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK  defined(MAC_OS_X_VERSION_10_6)
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// We have to declare a fake prototypes because the 10.6 runtime interrogates our compliance with the protocol,
+// rather that interrogating the presence of the particular method we implement...
+
+#if ! IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+
+@protocol NSPasteboardItemDataProvider <NSObject> 
+@end
+
+@protocol QLPreviewPanelDelegate <NSObject> 
+@end
+
+@protocol QLPreviewPanelDataSource <NSObject> 
+@end
+
+@protocol NSAnimationDelegate <NSObject> 
+@end
+
+#endif
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Flickr sizes
+
+typedef enum { 
+	kIMBFlickrSizeSpecifierOriginal = 0,
+	kIMBFlickrSizeSpecifierSmall,		// 240 longest
+	kIMBFlickrSizeSpecifierMedium,		// 500 longest
+	kIMBFlickrSizeSpecifierLarge		// 1024 longest	
+} 
+IMBFlickrSizeSpecifier;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+

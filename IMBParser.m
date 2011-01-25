@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -56,14 +56,13 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBMovieObject.h"
-#import "IMBObjectPromise.h"
+#import "IMBObjectsPromise.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
 #import "NSData+SKExtensions.h"
 #import <Quartz/Quartz.h>
 #import <QTKit/QTKit.h>
-#import <QuickLook/QuickLook.h>
-
+#import "NSURL+iMedia.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -74,10 +73,6 @@
 
 - (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL;
 - (CGImageRef) _imageForURL:(NSURL*)inURL;
-- (CGImageRef) _quicklookCGImageForURL:(NSURL*)inURL;
-- (NSImage*) _quicklookNSImageForURL:(NSURL*)inURL;
-- (void) _loadMovieRepresentation:(NSDictionary*)inInfo;
-- (QTMovie*) _movieForURL:(NSURL*)inURL;
 
 @end
 
@@ -140,6 +135,7 @@
 
 #pragma mark 
 
+
 // The following two methods must be overridden by subclasses...
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
@@ -147,10 +143,12 @@
 	return nil;
 }
 
+
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	return NO;
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -158,15 +156,23 @@
 // Optional methods that do nothing in the base class and can be overridden in subclasses, e.g. to update  
 // or get rid of cached data...
 
+- (BOOL)canBeUsed;
+{
+	return YES;
+}
+
+
 - (void) willUseParser
 {
 
 }
 
+
 - (void) didStopUsingParser
 {
 
 }
+
 
 - (void) watchedPathDidChange:(NSString*)inWatchedPath
 {
@@ -186,14 +192,22 @@
 }
 
 
++ (NSString*) identifierForPath:(NSString*)inPath
+{
+	NSString* parserClassName = NSStringFromClass(self);
+	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // This method can be overridden by subclasses if the default promise is not useful...
 
-- (IMBObjectPromise*) objectPromiseWithObjects:(NSArray*)inObjects
+- (IMBObjectsPromise*) objectPromiseWithObjects:(NSArray*)inObjects
 {
-	return [[(IMBObjectPromise*)[IMBLocalObjectPromise alloc] initWithArrayOfObjects:inObjects] autorelease];
+	return [IMBObjectsPromise promiseWithLocalIMBObjects:inObjects];
 }
 
 
@@ -228,7 +242,7 @@
 	
 	// Get the uti for out object...
 	
-	NSString* uti = [NSString UTIForFileAtPath:path];
+	NSString* uti = [NSString imb_UTIForFileAtPath:path];
 	
 	// Path...
 	
@@ -260,14 +274,22 @@
 	
 	else if ([type isEqualToString:IKImageBrowserNSImageRepresentationType])
 	{
-		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+		// If this is the type, we should already have an image representation, so let's try NOT 
+		// doing this code that was here before.
+		// So just leave the imageRepresentation here nil so it doesn't get set.
+		if (!inObject.imageRepresentation)
 		{
-			imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
+			NSLog(@"##### %p Warning; IKImageBrowserNSImageRepresentationType with a nil imageRepresentation", inObject);
 		}
-		else
-		{
-			imageRepresentation = [self _quicklookNSImageForURL:url];
-		}	
+		
+//		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+//		{
+//			imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
+//		}
+//		else
+//		{
+//			imageRepresentation = [url imb_quicklookNSImage];
+//		}	
 	}
 	
 	// CGImage...
@@ -280,7 +302,7 @@
 		}
 		else
 		{
-			imageRepresentation = (id)[self _quicklookCGImageForURL:url];
+			imageRepresentation = (id)[url imb_quicklookCGImage];
 		}
 	}
 	
@@ -311,7 +333,7 @@
 		}
 		else
 		{
-			CGImageRef image = [self _quicklookCGImageForURL:url];
+			CGImageRef image = [url imb_quicklookCGImage];
 			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
 		}
 	}
@@ -320,12 +342,7 @@
 	
 	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
 	{
-		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:url,@"url",inObject,@"object",nil];
-
-		[self	performSelectorOnMainThread:@selector(_loadMovieRepresentation:) 
-				withObject:info 
-				waitUntilDone:NO 
-				modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		NSLog(@"loadThumbnailForObject: what do to with IKImageBrowserQTMovieRepresentationType");
 	}
 
 	// Return the result to the main thread...
@@ -376,8 +393,32 @@
 - (void) invalidateThumbnails
 {
 	IMBLibraryController* controller = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
-	IMBNode* rootNode = [controller rootNodeForParser:self];
+	IMBNode* rootNode = [controller topLevelNodeForParser:self];
 	[self invalidateThumbnailsForNode:rootNode];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This helper method makes sure that the new node tree is pre-populated as deep as the old one was. Obviously
+// this is a recursive method that descends into the tree as far as necessary to recreate the state...
+
+- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions
+{
+	NSError* error = nil;
+	
+	if (inOldNode.isPopulated)
+	{
+		[self populateNode:inNewNode options:inOptions error:&error];
+		
+		for (IMBNode* oldSubNode in inOldNode.subNodes)
+		{
+			NSString* identifier = oldSubNode.identifier;
+			IMBNode* newSubNode = [inNewNode subNodeWithIdentifier:identifier];
+			[self populateNewNode:newSubNode likeOldNode:oldSubNode options:inOptions];
+		}
+	}
 }
 
 
@@ -399,6 +440,7 @@
 		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
 		   nil];
 
+		NSAssert(inURL, @"Nil image source URL");
 		source = CGImageSourceCreateWithURL((CFURLRef)inURL,(CFDictionaryRef)options);
 		[NSMakeCollectable(source) autorelease];
 	}
@@ -417,15 +459,19 @@
 	{
 		CGImageSourceRef source = [self _imageSourceForURL:inURL];
 
-		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-		   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
-		   (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
-		   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
-		   [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
-		   nil];
-		
-		image = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
-		[NSMakeCollectable(image) autorelease];
+		if (source)
+		{
+			NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+			   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
+			   (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
+			   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
+			   [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
+			   nil];
+			
+			NSAssert(source, @"Nil image source in _imageForURL:");
+			image = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
+			[NSMakeCollectable(image) autorelease];
+		}
 	}
 	
 	return image;
@@ -435,102 +481,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Quicklook methods to create images from non-image files...
-
-- (CGImageRef) _quicklookCGImageForURL:(NSURL*)inURL
-{
-	CGSize size = CGSizeMake(256.0,256.0);
-	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)inURL,size,NULL);
-	return (CGImageRef) [NSMakeCollectable(image) autorelease];
-}
-
-
-- (NSImage*) _quicklookNSImageForURL:(NSURL*)inURL
-{
-	NSImage* nsimage = nil;
-	CGImageRef cgimage = [self _quicklookCGImageForURL:inURL];
-
-	if (cgimage)
-	{
-		NSSize size = NSZeroSize;
-		size.width = CGImageGetWidth(cgimage);
-		size.height = CGImageGetWidth(cgimage);
-
-		nsimage = [[[NSImage alloc] initWithSize:size] autorelease];
-
-		NSBitmapImageRep* rep = [[NSBitmapImageRep alloc] initWithCGImage:cgimage];
-		[nsimage addRepresentation:rep];		
-		[rep release];
-	}
-	
-	return nsimage;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Loading movies must be done on the main thread (as many components are not threadsafe). Alas, this blocks 
-// the main runloop, but what are we to do...
-
-- (void) _loadMovieRepresentation:(NSDictionary*)inInfo
-{
-	// Load the QTMovie object...
-	
-	NSURL* url = (NSURL*)[inInfo objectForKey:@"url"];
-	IMBObject* object = (IMBObject*)[inInfo objectForKey:@"object"];
-
-	QTMovie* movie = [self _movieForURL:url];
-	[object setImageRepresentation:movie];
-	
-	// Set a better poster time...
-	
-	QTTime d = movie.duration;
-	double duration = (double)d.timeValue / (double)d.timeScale;
-	double posterTime = 0.5 * duration;
-	[movie setAttribute:[NSNumber numberWithDouble:posterTime] forKey:QTMoviePosterTimeAttribute];
-	
-	// Load and cache the poster frame...
-	
-	if ([object isKindOfClass:[IMBMovieObject class]])
-	{
-		CGImageRef image = [self _quicklookCGImageForURL:url];
-		[(IMBMovieObject*)object setPosterFrame:image];
-
-//		QTTime t = QTMakeTimeWithTimeInterval(posterTime);
-//		NSSize size = NSMakeSize(256.0,256.0);
-//		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-//			QTMovieFrameImageTypeCGImageRef,QTMovieFrameImageType,
-//			[NSValue valueWithSize:size],QTMovieFrameImageSize,
-//			nil];
-//			
-//		NSError* error = nil;
-//		CGImageRef image = (CGImageRef) [movie frameImageAtTime:t withAttributes:attributes error:&error];
-//		[(IMBMovieObject*)object setPosterFrame:image];
-	}
-}
-
-
-// Returns an autoreleased movie for the given url...
-
-- (QTMovie*) _movieForURL:(NSURL*)inURL
-{
-	QTMovie* movie = NULL;
-	
-	if (inURL)
-	{
-		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-		   inURL,QTMovieURLAttribute,
-		   [NSNumber numberWithBool:YES],QTMovieOpenAsyncOKAttribute,
-//		   [NSNumber numberWithBool:YES],@"QTMovieOpenForPlaybackAttribute", // constant is not available with 10.5.sdk!
-		   nil];
-
-		NSError* error = nil;   
-		movie = [QTMovie movieWithAttributes:attributes error:&error];
-	}
-
-	return movie;
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------

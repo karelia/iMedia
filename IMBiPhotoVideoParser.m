@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2010 by Karelia Software et al.
+ Copyright (c) 2005-2011 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2010 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -56,10 +56,13 @@
 #import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBMovieObject.h"
+#import "NSString+iMedia.h"
 //#import "IMBIconCache.h"
 //#import "NSWorkspace+iMedia.h"
 //#import "NSFileManager+iMedia.h"
 #import <Quartz/Quartz.h>
+#import "IMBTimecodeTransformer.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,6 +72,7 @@
 
 @implementation IMBiPhotoVideoParser
 
+@synthesize timecodeTransformer = _timecodeTransformer;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -79,9 +83,24 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
-	[pool release];
+	[pool drain];
 }
 
+- (void)dealloc
+{
+	IMBRelease(_timecodeTransformer);
+	[super dealloc];
+}
+
+- (id) initWithMediaType:(NSString*)inMediaType
+{
+	if (self = [super initWithMediaType:inMediaType])
+	{
+		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
+	}
+	
+	return self;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -93,15 +112,21 @@
 	return @"Movie";
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (Class) objectClass
+{
+	return [IMBMovieObject class];
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This parser wants QTMovie thumbnails...
-
 - (NSString*) requestedImageRepresentationType
 {
-	return IKImageBrowserQTMovieRepresentationType;
+	return IKImageBrowserQTMoviePathRepresentationType;
 }
 
 
@@ -110,6 +135,119 @@
 - (NSString*) imageLocationForObject:(NSDictionary*)inObjectDict
 {
 	return [inObjectDict objectForKey:@"ImagePath"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSString* comment = [inMetadata objectForKey:@"Comment"];
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	NSString* width = [inMetadata objectForKey:@"width"];
+	NSString* height = [inMetadata objectForKey:@"height"];
+	NSString* duration = [inMetadata objectForKey:@"duration"];
+	NSString* type = [inMetadata objectForKey:@"ImageType"];		// like MooV
+	NSString* UTI = [NSString imb_UTIForFileType:type];
+	NSString* kind = [NSString imb_descriptionForUTI:UTI];
+	
+	// NSString *dateTimeInterval = [inMetadata objectForKey:@"DateAsTimerInterval"];
+
+	NSMutableString* description = [NSMutableString string];
+	
+	if (kind)
+	{
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendString:kind];
+	}
+	
+	if (width != nil && height != nil)
+	{		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@×%@",width,height];
+	}
+	
+	if (duration)
+	{
+		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
+		
+		NSString* durationString = [_timecodeTransformer transformedValue:duration];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
+	}
+	
+	if (comment && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+			@"Comment",
+			nil,IMBBundle(),
+			@"Comment",
+			@"Comment label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
+	}
+	
+	return description;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	[metadata setObject:inObject.location forKey:@"path"];
+
+	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inObject.location);
+	
+	if (item)
+	{
+		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
+		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
+		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
+		
+		if (seconds)
+		{
+			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
+			CFRelease(seconds);
+		}
+		
+		if (width)
+		{
+			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
+			CFRelease(width);
+		}
+		
+		if (height)
+		{
+			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
+			CFRelease(height);
+		}
+		
+		CFRelease(item);
+	}
+	
+	
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+	
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
 }
 
 
