@@ -277,19 +277,20 @@
 		// If this is the type, we should already have an image representation, so let's try NOT 
 		// doing this code that was here before.
 		// So just leave the imageRepresentation here nil so it doesn't get set.
+		//
+		// NOTE(DCJ): Dan Wood took out the 'lazy loading' of an NSImage style image represation, which 
+		// I depend upon in MarsEdit. Putting it back below
 		if (!inObject.imageRepresentation)
-		{
-			NSLog(@"##### %p Warning; IKImageBrowserNSImageRepresentationType with a nil imageRepresentation", inObject);
+		{		
+			if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
+			{
+				imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
+			}
+			else
+			{
+				imageRepresentation = [url imb_quicklookNSImage];
+			}	
 		}
-		
-//		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
-//		{
-//			imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
-//		}
-//		else
-//		{
-//			imageRepresentation = [url imb_quicklookNSImage];
-//		}	
 	}
 	
 	// CGImage...
