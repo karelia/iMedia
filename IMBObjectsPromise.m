@@ -441,6 +441,22 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 @implementation IMBLocalObjectsPromise
 
+- (id) initWithIMBObjects:(NSArray*)inObjects
+{
+	if (self = [super initWithIMBObjects:inObjects])
+	{
+		// By default, IMBObjectsPromises set this to the Downloads folder. This is 
+		// really inconvenient because IMBLocalObjectsPromise, in _loadObject: below,
+		// takes the presence of this attribute as a cue to perform a literal copy of
+		// the source file, even if it's already local to the disk. The end result is
+		// e.g. when you double-click a local file to open in Photoshop, it makes an
+		// unwanted copy of the file in the Downloads folder.
+		self.destinationDirectoryPath = nil;
+	}
+	
+	return self;
+}
+
 - (void) loadObjects:(NSArray*)inObjects
 {
 	[super loadObjects:inObjects];
