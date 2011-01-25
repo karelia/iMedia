@@ -586,9 +586,7 @@
 		}
 	}
 	
-	// Oops, we shouldn't be here...
-	
-	NSLog(@"Unable to find '%@' in the source list", self.name);
+	// Oops, we shouldn't be here...	
 	[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:NSNotFound]];
 }
 

@@ -153,15 +153,6 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 @end
 
 
-// By declaring as a category, we:
-//  A)  Don't export an NSTabViewDelegate to host applications (thereby perhaps introducing warnings)
-//  B)  Keep IB able to parse the file
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-@interface IMBPanelController (NSTabViewDelegate) <NSTabViewDelegate>
-@end
-#endif
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
