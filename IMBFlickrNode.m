@@ -523,7 +523,9 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	NSMutableArray* newImages = [[self extractPhotosFromFlickrResponse:[self flickrResponse]] mutableCopy];
 	[newImages removeObjectsInArray:oldImages]; //	ensure that we have no doubles
 	
-	[newImages insertObjects:oldImages atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, oldImages.count)]];
+    if ( [oldImages count] ) {
+        [newImages insertObjects:oldImages atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, oldImages.count)]];
+    }
 	
 	//	add 'load more' button...
 	IMBLoadMoreObject* loadMoreButton = ((IMBFlickrParser*) self.parser).loadMoreButton;
