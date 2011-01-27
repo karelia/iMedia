@@ -97,7 +97,11 @@ static BOOL sUseGlobalViewType = NO;
 + (void) setPrefsValue:(id)inValue forKey:(NSString*)inKey
 {
 	NSString* key = [NSString stringWithFormat:sIMBPrefsKeyFormat,inKey];
-	[[NSUserDefaults standardUserDefaults] setObject:inValue forKey:key];
+	
+	if (inValue)
+		[[NSUserDefaults standardUserDefaults] setObject:inValue forKey:key];
+	else
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
 }
 
 
