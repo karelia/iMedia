@@ -53,9 +53,11 @@
 #pragma mark HEADERS
 
 #import "IMBPyramidObjectPromise.h"
-
-#import "IMBLightroomParser.h"
+#import "IMBLightroom1Parser.h"
+#import "IMBLightroom2Parser.h"
+#import "IMBLightroom3Parser.h"
 #import "NSFileManager+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 #import "NSData+SKExtensions.h"
 
 
@@ -71,7 +73,7 @@
 
 @interface IMBPyramidObjectPromise ()
 
-+ (NSURL*)placeholderImageUrl;
++ (NSURL*) placeholderImageUrl;
 
 @end
 
@@ -82,6 +84,13 @@
 #pragma mark
 
 @implementation IMBPyramidObjectPromise
+
+
+- (void) dealloc
+{
+	[super dealloc];
+}
+
 
 - (void) loadObjects:(NSArray*)inObjects
 {
@@ -117,7 +126,7 @@
 	
 	if (absolutePyramidPath != nil) {
 		NSString* orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];;
-		NSData* data = nil; //[NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
 		
 		if (data == nil) {
 			// We have a path, but there was no file at that path
@@ -198,7 +207,7 @@
 	return nil;
 }
 
-+ (NSURL*)placeholderImageUrl
++ (NSURL*) placeholderImageUrl
 {
 	static NSURL *placeholderImageUrl = nil;
 	
@@ -211,51 +220,92 @@
 		}
 	}
 	
+	NSString *message1 = NSLocalizedStringWithDefaultValue(
+		@"IMB.IMBPyramidObjectPromise.PlaceholderMessage1",
+		nil,
+		IMBBundle(),
+		@"Processed image not found.\n",
+		@"Message to export when Pyramid file is missing");
+														  
+	NSString *message2 = NSLocalizedStringWithDefaultValue(
+		@"IMB.IMBPyramidObjectPromise.PlaceholderMessage2",
+		nil,
+		IMBBundle(),
+		@"Please launch Lightroom and select the menu command Library > Previews > Render 1:1 Previews.",
+		@"Message to export when Pyramid file is missing");
+
+	NSMutableParagraphStyle* style = [[[NSMutableParagraphStyle alloc] init] autorelease];
+	[style setAlignment:NSCenterTextAlignment];
+
+	NSDictionary *attributes1 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+		[NSFont boldSystemFontOfSize:24.0],NSFontAttributeName, 
+		[NSColor whiteColor],NSForegroundColorAttributeName,
+		style,NSParagraphStyleAttributeName,
+		nil];
+								
+	NSDictionary *attributes2 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+		[NSFont boldSystemFontOfSize:16.0],NSFontAttributeName, 
+		[NSColor grayColor],NSForegroundColorAttributeName,
+		style,NSParagraphStyleAttributeName,
+		nil];
+
+	NSMutableAttributedString *string = [[[NSMutableAttributedString alloc] 
+		initWithString:message1 
+		attributes:attributes1] 
+		autorelease];
+
+	[string appendAttributedString:[[[NSMutableAttributedString alloc] 
+		initWithString:message2 
+		attributes:attributes2] 
+		autorelease]];
+		
 	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
 	NSString *jpegPath = [[fm imb_uniqueTemporaryFile:@"LightroomPlaceholder"] stringByAppendingPathExtension:@"jpg"];
-	NSSize imageSize = NSMakeSize(640.0, 480.0);
-	NSRect imageBounds =  NSMakeRect(0.0, 0.0, imageSize.width, imageSize.height);
+	NSSize imageSize = NSMakeSize(640.0,480.0);
+	NSRect imageBounds =  NSMakeRect(0.0,0.0,imageSize.width,imageSize.height);
 	
-	NSBitmapImageRep *bitmapImage = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL 
-																			 pixelsWide:imageSize.width 
-																			 pixelsHigh:imageSize.height 
-																		  bitsPerSample:8 
-																		samplesPerPixel:4 
-																			   hasAlpha:YES 
-																			   isPlanar:NO
-																		 colorSpaceName:NSCalibratedRGBColorSpace 
-																			bytesPerRow:0 
-																		   bitsPerPixel:0] autorelease];
+	NSBitmapImageRep *bitmapImage = [[[NSBitmapImageRep alloc] 
+		initWithBitmapDataPlanes:NULL 
+		pixelsWide:imageSize.width 
+		pixelsHigh:imageSize.height 
+		bitsPerSample:8 
+		samplesPerPixel:4 
+		hasAlpha:YES 
+		isPlanar:NO
+		colorSpaceName:NSCalibratedRGBColorSpace 
+		bytesPerRow:0 
+		bitsPerPixel:0] autorelease];
 	
 	[NSGraphicsContext saveGraphicsState];
-
 	NSGraphicsContext *nsContext = [NSGraphicsContext graphicsContextWithBitmapImageRep:bitmapImage];
-	
 	[NSGraphicsContext setCurrentContext:nsContext];
 
-	[[NSColor lightGrayColor] set];
-	
+	[[NSColor colorWithDeviceRed:0.1 green:0.1 blue:0.1 alpha:1.0] set];
 	NSRectFill(imageBounds);
 	
-	NSString *message = NSLocalizedStringWithDefaultValue(@"IMB.IMBPyramidObjectPromise.PlaceholderMessage",
-														  nil,
-														  IMBBundle(),
-														  @"Image not found.\nPlease instruct Lightroom to generate previews",
-														  @"Message to export when Pyramid file is missing");
-	NSShadow *shadow = [[[NSShadow alloc] init] autorelease];
+	NSString* lightroomPath = [IMBLightroom3Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom2Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom1Parser lightroomPath];
+	if (lightroomPath)
+	{
+		NSImage* lightroomIcon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:lightroomPath];
+		if (lightroomIcon)
+		{
+			NSRect lightroomRect = NSMakeRect(256.0,230.0,128.0,128.0);
+			[lightroomIcon drawInRect:lightroomRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+		}	
+	}
 	
-	[shadow setShadowColor:[NSColor blackColor]];
-	[shadow setShadowOffset:NSMakeSize(0, -1)];
-	[shadow setShadowBlurRadius:0.0f];
+	NSString* cautionPath = @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns";
+	NSImage* cautionIcon = [[[NSImage alloc] initWithContentsOfFile:cautionPath] autorelease];
+	if (cautionIcon)
+	{
+		NSRect cautionRect = NSMakeRect(347.0,228.0,64.0,64.0);
+		[cautionIcon drawInRect:cautionRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+	}
 	
-	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-								[NSFont boldSystemFontOfSize:24.0f], NSFontAttributeName, 
-								[NSColor whiteColor], NSForegroundColorAttributeName, 
-								shadow, NSShadowAttributeName, 
-								nil] ;
-	NSAttributedString *attributedString = [[[NSAttributedString alloc] initWithString:message attributes:attributes] autorelease];
-	
-	[attributedString drawInRect:NSInsetRect(imageBounds, 20.0, 20.0)];
+	NSRect stringRect = NSMakeRect(64.0,64.0,512.0,156.0);
+	[string drawInRect:stringRect];
 	
 	[NSGraphicsContext restoreGraphicsState];
 
