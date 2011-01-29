@@ -272,42 +272,53 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	NSInteger n = [ibSegments segmentCount];
 	NSSegmentedCell *cell = [ibSegments cell];
-	NSArray *segmentChildren = [NSAccessibilityUnignoredDescendant(ibSegments) accessibilityAttributeValue: NSAccessibilityChildrenAttribute];
 
 	for (NSInteger i=0; i<n; i++)
 	{
 		[[ibSegments imageForSegment:i] setTemplate:YES];
+	}
+	
+	// Set accessibilility description for each segment...
+	
+	NSArray *segmentChildren = [NSAccessibilityUnignoredDescendant(ibSegments) accessibilityAttributeValue: NSAccessibilityChildrenAttribute];
+
+	for (NSInteger i=0; i<n; i++)
+	{
 		NSInteger tag = [cell tagForSegment:i];
 		NSString *axDesc = nil;
+		
 		switch (tag)
 		{
 			case kIMBObjectViewTypeIcon:
 				axDesc = NSLocalizedStringWithDefaultValue(
-														   @"IMBObjectViewController.segment.grid",
-														   nil,IMBBundle(),
-														   @"Grid",
-														   @"segmented cell accessibilility description");
+					@"IMBObjectViewController.segment.grid",
+					nil,IMBBundle(),
+					@"Grid",
+					@"segmented cell accessibilility description");
 				break;
+				
 			case kIMBObjectViewTypeList:
 				axDesc = NSLocalizedStringWithDefaultValue(
-														   @"IMBObjectViewController.segment.list",
-														   nil,IMBBundle(),
-														   @"List",
-														   @"segmented cell accessibilility description");
+					@"IMBObjectViewController.segment.list",
+					nil,IMBBundle(),
+					@"List",
+					@"segmented cell accessibilility description");
 				break;
 				
 			case kIMBObjectViewTypeCombo:
 				axDesc = NSLocalizedStringWithDefaultValue(
-														   @"IMBObjectViewController.segment.combo",
-														   nil,IMBBundle(),
-														   @"Combination",
-														   @"segmented cell accessibilility description");
+					@"IMBObjectViewController.segment.combo",
+					nil,IMBBundle(),
+					@"Combination",
+					@"segmented cell accessibilility description");
 				break;
+				
 			default:
 				axDesc = @"";
 				break;
 				
 		}
+		
 		[[segmentChildren objectAtIndex:i] accessibilitySetOverrideValue:axDesc forAttribute:NSAccessibilityDescriptionAttribute];
 	}
 	
@@ -1274,7 +1285,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		{
 			UInt32 itemIndex = [indexString integerValue];
 			NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
-			if ([arrangedObjects count])
+			if ([arrangedObjects count] > itemIndex)
 			{
 				IMBObject* mappedObject = [arrangedObjects objectAtIndex:itemIndex];
 				if (mappedObject != nil)
@@ -2160,7 +2171,10 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (id <QLPreviewItem>) previewPanel:(QLPreviewPanel*)inPanel previewItemAtIndex:(NSInteger)inIndex
 {
-	return [ibObjectArrayController.selectedObjects objectAtIndex:inIndex];
+	if (inIndex >= 0 && inIndex < ibObjectArrayController.selectedObjects.count)
+	{
+		return [ibObjectArrayController.selectedObjects objectAtIndex:inIndex];
+	}
 }
 
 

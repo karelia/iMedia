@@ -524,7 +524,7 @@
 		
 		for (NSUInteger i=0; i<n; i++)
 		{
-			indexes[i] = [[indexArray objectAtIndex:i] unsignedIntValue];
+			indexes[i] = [[indexArray objectAtIndex:i] unsignedIntegerValue];
 		}
 		
 		NSIndexPath* path = [NSIndexPath indexPathWithIndexes:indexes length:n];
