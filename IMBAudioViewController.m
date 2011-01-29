@@ -232,15 +232,20 @@
 {
 	NSInteger row = [(NSTableView*)inSender clickedRow];
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
-	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
-
-	if ([object isKindOfClass:[IMBNodeObject class]])
+	NSInteger count = [objects count];
+	
+	if (row>=0 && row<count)
 	{
-		[super tableViewWasDoubleClicked:inSender];		// handled in superclass
-	}
-	else
-	{
-		[self startPlayingSelection:inSender];
+		IMBObject* object = [objects objectAtIndex:row];
+		
+		if ([object isKindOfClass:[IMBNodeObject class]])
+		{
+			[super tableViewWasDoubleClicked:inSender];		// handled in superclass
+		}
+		else
+		{
+			[self startPlayingSelection:inSender];
+		}
 	}
 }
 
