@@ -2175,6 +2175,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		return [ibObjectArrayController.selectedObjects objectAtIndex:inIndex];
 	}
+	
+	return nil;
 }
 
 
