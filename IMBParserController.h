@@ -122,6 +122,9 @@
 - (void) logRegisteredParsers;
 - (void) logLoadedParsers;
 
+// External finding of an active parser
+- (IMBParser *) registeredParserOfClass:(NSString *)className forMediaType:(NSString *)aMediaType;
+
 @end
 
 

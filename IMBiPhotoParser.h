@@ -76,6 +76,8 @@
 @property (assign) BOOL shouldDisplayLibraryName;
 @property (retain) NSDateFormatter* dateFormatter;
 
+- (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs;		// public utility method to help extract keywords from numbers
+
 @end
 
 

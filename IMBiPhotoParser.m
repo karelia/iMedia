@@ -473,6 +473,21 @@
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	NSMutableArray *realKeywords = [NSMutableArray array];
+	
+	NSDictionary *keywordMap = [self.plist objectForKey:@"List of Keywords"];
+
+	//swap the keyword index to names
+	for (NSString *keywordKey in [metadata objectForKey:@"Keywords"])
+	{
+		NSString *actualKeyword = [keywordMap objectForKey:keywordKey];
+		if (actualKeyword)
+		{
+			[realKeywords addObject:actualKeyword];
+		}
+		[metadata setObject:realKeywords forKey:@"iMediaKeywords"];
+	}
+	
 	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
@@ -494,6 +509,24 @@
 {
 	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
+
+
+- (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs
+{
+	NSMutableArray *realKeywords = [NSMutableArray array];
+	NSDictionary *keywordMap = [self.plist objectForKey:@"List of Keywords"];
+	//swap the keyword index to names
+	for (NSString *keywordKey in keywordIDs)
+	{
+		NSString *actualKeyword = [keywordMap objectForKey:keywordKey];
+		if (actualKeyword)
+		{
+			[realKeywords addObject:actualKeyword];
+		}
+	}
+	return realKeywords;
+}
+
 
 
 //----------------------------------------------------------------------------------------------------------------------

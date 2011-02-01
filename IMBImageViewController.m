@@ -94,6 +94,9 @@
 		 
 	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
 		@"name",
+		@"metadata.Comment",
+		@"metadata.ImagePath",
+		@"metadata.iMediaKeywords",
 		nil];
 }
 

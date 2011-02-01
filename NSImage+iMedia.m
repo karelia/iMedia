@@ -159,7 +159,7 @@
 
 + (NSString*) imb_imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSMutableString* description = [NSMutableString string];
+	NSMutableString* metaDesc = [NSMutableString string];
 	NSNumber* width = [inMetadata objectForKey:@"width"];
 	NSNumber* height = [inMetadata objectForKey:@"height"];
 	NSNumber* depth = [inMetadata objectForKey:@"depth"];
@@ -169,15 +169,18 @@
 	NSString* dateTime = [inMetadata objectForKey:@"dateTime"];
 	NSString* path = [inMetadata objectForKey:@"path"];
 	NSString* comment = [inMetadata objectForKey:@"comment"];
+	NSArray* keywords = [inMetadata objectForKey:@"iMediaKeywords"];
+	int rating = [[inMetadata objectForKey:@"Rating"] intValue];
+
 	if (comment == nil) comment = [inMetadata objectForKey:@"Comment"];	// uppercase from iPhoto
 	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 
 	if ((width != nil && height != nil) || depth != nil || model != nil || type != nil)
 	{		
-		if (description.length > 0) [description imb_appendNewline];
+		if (metaDesc.length > 0) [metaDesc imb_appendNewline];
 		
-		if (depth) [description appendFormat:@"%@-bit ",depth];		// TODO: LOCALIZE
-		if (model) [description appendFormat:@"%@ ",model];
+		if (depth) [metaDesc appendFormat:@"%@-bit ",depth];		// TODO: LOCALIZE
+		if (model) [metaDesc appendFormat:@"%@ ",model];
 		
 		if (type)
 		{
@@ -185,7 +188,7 @@
 			NSString *descUTI = [NSString imb_descriptionForUTI:UTI];
 			if (descUTI)
 			{
-				[description appendFormat:@"%@",descUTI];
+				[metaDesc appendFormat:@"%@",descUTI];
 			}
 		}
 		else if (path)
@@ -194,7 +197,7 @@
 			NSString *descUTI = [NSString imb_descriptionForUTI:UTI];
 			if (descUTI)
 			{
-				[description appendFormat:@"%@",descUTI];
+				[metaDesc appendFormat:@"%@",descUTI];
 			}
 		}
 		else if (filetype)
@@ -203,15 +206,15 @@
 			NSString *descUTI = [NSString imb_descriptionForUTI:UTI];
 			if (descUTI)
 			{
-				[description appendFormat:@"%@",descUTI];
+				[metaDesc appendFormat:@"%@",descUTI];
 			}
 		}
 	}
 
 	if (width != nil && height != nil)
 	{
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@×%@",width,height];
+		if (metaDesc.length > 0) [metaDesc imb_appendNewline];
+		[metaDesc appendFormat:@"%@×%@",width,height];
 	}
 	
 	if (dateTime != nil)
@@ -219,9 +222,25 @@
 		NSString *dateTimeDesc = [dateTime imb_exifDateToLocalizedDisplayDate];
 		if (dateTimeDesc)
 		{
-			if (description.length > 0) [description imb_appendNewline];
-			[description appendString:dateTimeDesc];
+			if (metaDesc.length > 0) [metaDesc imb_appendNewline];
+			[metaDesc appendString:dateTimeDesc];
 		}
+	}
+	
+	if (keywords != nil && [keywords count])
+	{
+		[metaDesc imb_appendNewline];
+		for (NSString *keyword in keywords)
+		{
+			[metaDesc appendFormat:@"%@, ", keyword];
+		}
+		[metaDesc deleteCharactersInRange:NSMakeRange([metaDesc length] - 2, 2)];	// remove last comma+space
+	}
+	
+	if (rating > 0)
+	{
+		[metaDesc imb_appendNewline];
+		[metaDesc appendString:[NSString imb_stringFromStarRating:rating]];
 	}
 
 	if (comment != nil && ![comment isEqualToString:@""])
@@ -232,11 +251,11 @@
 																   @"Comment",
 																   @"Comment label in metadataDescription");
 		
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",commentLabel,comment];
+		if (metaDesc.length > 0) [metaDesc imb_appendNewline];
+		[metaDesc appendFormat:@"%@: %@",commentLabel,comment];
 	}
 	
-	return description;
+	return metaDesc;
 }
 
 
