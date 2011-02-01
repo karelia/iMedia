@@ -2185,6 +2185,8 @@ NS_ENDHANDLER
 	{
 		return [ibObjectArrayController.selectedObjects objectAtIndex:inIndex];
 	}
+	
+	return nil;
 }
 
 

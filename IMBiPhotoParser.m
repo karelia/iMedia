@@ -87,10 +87,10 @@
 
 @interface IMBiPhotoParser ()
 
-- (void) addEventsToAlbumsInLibrary:(NSMutableDictionary*)dict;
-- (IMBNode*) eventsNodeInNode:(IMBNode*) inNode;
-- (NSString*) idSpaceForAlbumType:(NSString*) inAlbumType;
-- (NSString*) identifierForId:(NSNumber*) inId inSpace:(NSString*) inIdSpace;
+- (void) addEventsToAlbumsInLibrary:(NSMutableDictionary*)inDict;
+- (IMBNode*) eventsNodeInNode:(IMBNode*)inNode;
+- (NSString*) idSpaceForAlbumType:(NSString*)inAlbumType;
+- (NSString*) identifierForId:(NSNumber*)inId inSpace:(NSString*)inIdSpace;
 - (NSString*) iPhotoMediaType;
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
 - (BOOL) shouldUseAlbum:(NSDictionary*)inAlbumDict images:(NSDictionary*)inImages;
@@ -167,16 +167,18 @@
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
 			BOOL changed;
-			(void) [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
 			
-			NSString *libraryPath = [path stringByDeletingLastPathComponent];	// folder containing .xml file
-			[IMBConfig registerLibraryPath:libraryPath];
+			if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
+			{
+				NSString *libraryPath = [path stringByDeletingLastPathComponent];	// folder containing .xml file
+				[IMBConfig registerLibraryPath:libraryPath];
 
-			IMBiPhotoParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-			parser.mediaSource = path;
-			parser.shouldDisplayLibraryName = libraries.count > 1;
-			[parserInstances addObject:parser];
-			[parser release];
+				IMBiPhotoParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+				parser.mediaSource = path;
+				parser.shouldDisplayLibraryName = libraries.count > 1;
+				[parserInstances addObject:parser];
+				[parser release];
+			}
 		}
 		
 		if (recentLibraries) CFRelease(recentLibraries);
@@ -234,9 +236,16 @@
 	
 	// Oops no path, can't create a root node. This is bad...
 	
-	if (self.mediaSource == nil)
+	NSString* path = (NSString*)self.mediaSource;
+	
+	if (path == nil)
 	{
 		return nil;
+	}
+	
+	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path] == NO)
+	{
+		return NO;
 	}
 	
 	// Create a root node...
@@ -505,74 +514,80 @@
 	NSDictionary* result = nil;
 	NSError* error = nil;
 	NSString* path = (NSString*)self.mediaSource;
-	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
-	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
-		
-	@synchronized(self)
-	{
-		if ([self.modificationDate compare:modificationDate] == NSOrderedAscending)
-		{
-			self.plist = nil;
-		}
-		
-		if (_plist == nil)
-		{
-			// Since we want to add events to the list of albums we will need
-			// to modify the album data dictionary (see further down below)
-			NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
-			
-			// WORKAROUND
-			if (!dict || 0 == dict.count)	// unable to read. possibly due to unencoded '&'.  rdar://7469235
-			{
-				NSData *data = [NSData dataWithContentsOfFile:(NSString*)self.mediaSource];
-				if (data)
-                {
-                    NSString *eString = nil;
-                    NSError *e = nil;
-                    @try
-                    {
-                        NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
-                                                                            options:NSXMLDocumentTidyXML error:&e];
-                        dict = [NSPropertyListSerialization
-                              propertyListFromData:[xmlDoc XMLData]
-                              mutabilityOption:0					// Apple doc: The opt parameter is currently unused and should be set to 0.
-                              format:NULL errorDescription:&eString];
-                        [xmlDoc release];
-						
-						// the assignment to 'dict' in the code above yields
-						// a mutable dictionary as this code snippet would reveal:
-						// Class dictClass = [dict classForCoder];
-						// NSLog(@"Dictionary class: %@", [dictClass description]);
-                    }
-                    @catch(NSException *e)
-                    {
-                        NSLog(@"%s %@", __FUNCTION__, e);
-                    }
-                    // When we start targetting 10.6, we should use propertyListWithData:options:format:error:
-                }
-			}			
-			
-			if (!dict || 0 == dict.count)
-			{
-				//	If there is an AlbumData.xml file, there should be something inside!
-				NSLog (@"The iPhoto AlbumData.xml file seems to be empty. This is an unhealthy condition!");
-			}
-			
-			// Since this parser confines itself to deal with the "List of Albums" only
-			// we add an events node to the album list to incorporate events in the browser.
-			// This is why we need a mutable library dictionary.
-			if (dict)
-			{
-				[self addEventsToAlbumsInLibrary:dict];
-			}
-			
-			self.plist = dict;
-			self.modificationDate = modificationDate;
-		}
-		
-		result = [[_plist retain] autorelease];
-	}
 	
+	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
+	{
+		NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
+		NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
+			
+		@synchronized(self)
+		{
+			if ([self.modificationDate compare:modificationDate] == NSOrderedAscending)
+			{
+				self.plist = nil;
+			}
+			
+			if (_plist == nil)
+			{
+				// Since we want to add events to the list of albums we will need
+				// to modify the album data dictionary (see further down below)
+				NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+				
+				// WORKAROUND
+				if (dict == nil || 0 == dict.count)	// unable to read. possibly due to unencoded '&'.  rdar://7469235
+				{
+					NSData *data = [NSData dataWithContentsOfFile:path];
+					if (data)
+					{
+						NSString *eString = nil;
+						NSError *e = nil;
+						@try
+						{
+							NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
+																				options:NSXMLDocumentTidyXML error:&e];
+							dict = [NSPropertyListSerialization
+								  propertyListFromData:[xmlDoc XMLData]
+								  mutabilityOption:0					// Apple doc: The opt parameter is currently unused and should be set to 0.
+								  format:NULL errorDescription:&eString];
+							[xmlDoc release];
+							
+							// the assignment to 'dict' in the code above yields
+							// a mutable dictionary as this code snippet would reveal:
+							// Class dictClass = [dict classForCoder];
+							// NSLog(@"Dictionary class: %@", [dictClass description]);
+						}
+						@catch(NSException *e)
+						{
+							NSLog(@"%s %@", __FUNCTION__, e);
+						}
+						// When we start targetting 10.6, we should use propertyListWithData:options:format:error:
+					}
+				}			
+				
+				//	If there is an AlbumData.xml file, there should be something inside!
+
+				if (dict == nil || 0 == dict.count)
+				{
+					NSLog (@"The iPhoto AlbumData.xml file seems to be empty. This is an unhealthy condition!");
+				}
+				
+				// Since this parser confines itself to deal with the "List of Albums" only
+				// we add an events node to the album list to incorporate events in the browser.
+				// This is why we need a mutable library dictionary.
+
+				if (dict)
+				{
+					[self addEventsToAlbumsInLibrary:dict];
+				}
+				
+				self.plist = dict;
+				self.modificationDate = modificationDate;
+			}
+			
+			result = [[_plist retain] autorelease];
+		}
+	}
+		
 	return result;
 }
 
@@ -583,84 +598,73 @@
 // in the browser we let events (aka rolls) pose as albums in the album list
 // an let them be children of an 'events' node that we also add to the album list.
 
-- (void) addEventsToAlbumsInLibrary:(NSMutableDictionary*) dict
+- (void) addEventsToAlbumsInLibrary:(NSMutableDictionary*)inDict
 {	
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	
-	// To insert events into the album list we have to re-create it mutable style
-	NSMutableArray *newAlbumList = [[NSMutableArray alloc] init];
-	
-	// 1. We want the events node to be first in the list
-	// Create and append parent object for all events.
-	
-	NSDictionary* events;
-	NSNumber *eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
-	NSString *eventsName = NSLocalizedStringWithDefaultValue(@"IMB.iPhotoParser.events", nil, IMBBundle(), @"Events", @"Events node shown in iPhoto library");
-	
-	@try {
-		NSArray* eventList = [dict objectForKey:@"List of Rolls"];		
-		NSAssert( eventList != nil, @"'List of Rolls' key not found in iPhoto album data property list");
+	NSArray* eventList = [inDict objectForKey:@"List of Rolls"];		
+	NSArray* oldAlbumList = [inDict objectForKey:@"List of Albums"];		
+
+	if (eventList != nil && oldAlbumList != nil && [oldAlbumList count]>0)
+	{
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		
-		NSArray* oldAlbumList = [dict objectForKey:@"List of Albums"];		
-		NSAssert( oldAlbumList != nil, @"'List of Albums' key not found in iPhoto album data property list");
-		NSAssert( [oldAlbumList count] > 0, @"No albums in list of albums");
+		// To insert events into the album list we have to re-create it mutable style
+		NSMutableArray *newAlbumList = [[NSMutableArray alloc] init];
+		
+		// 1. We want the events node to be first in the list
+		// Create and append parent object for all events.
+		
+		NSNumber *eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
+		NSString *eventsName = NSLocalizedStringWithDefaultValue(@"IMB.iPhotoParser.events", nil, IMBBundle(), @"Events", @"Events node shown in iPhoto library");
 		
 		NSDictionary *photosDict = [oldAlbumList objectAtIndex:0];	// Photos node
-		
 		id keyList = [photosDict objectForKey:@"KeyList"];
-		NSAssert( keyList != nil, @"'KeyList' key not found in photos dictionary in iPhoto album data property list");
 		
-		events = [[NSDictionary alloc] initWithObjectsAndKeys:
-				  eventsId,			@"AlbumId",
-				  eventsName,		@"AlbumName",
-				  @"Events",		@"Album Type",
-				  keyList,			@"KeyList", nil];   // populate events with same media objects as photos album
-		
-		[newAlbumList addObject:events];
-		
-		// 2. Append all regular albums. Note that the photos album will now be at index 1 of the list
-		[newAlbumList addObjectsFromArray:oldAlbumList];
-		
-		// 3. Create and append events to album list and make each event behave like a proper album list citizen
-		
-		id rollId, rollName;
-		
-		for	(NSDictionary *eventDict in eventList) {
+		if (keyList != nil)
+		{
+			NSDictionary* events = [[NSDictionary alloc] initWithObjectsAndKeys:
+				eventsId,@"AlbumId",
+				eventsName,@"AlbumName",
+				@"Events",@"Album Type",
+				keyList,@"KeyList", nil];   // populate events with same media objects as photos album
 			
-			rollId   = [eventDict objectForKey:@"RollID"];
-			rollName = [eventDict objectForKey:@"RollName"];
-			keyList  = [eventDict objectForKey:@"KeyList"];
-			NSAssert( rollId != nil, @"'RollID' key not found in event dictionary in iPhoto album data property list");
-			NSAssert( rollName != nil, @"'RollName' key not found in event dictionary in iPhoto album data property list");
-			NSAssert( keyList != nil, @"'KeyList' key not found in event dictionary in iPhoto album data property list");
+			[newAlbumList addObject:events];
+			IMBRelease(events);
 			
+			// 2. Append all regular albums. Note that the photos album will now be at index 1 of the list
+			[newAlbumList addObjectsFromArray:oldAlbumList];
 			
-			NSDictionary *albumDict = [[NSDictionary alloc] initWithObjectsAndKeys:
-									   rollId,		@"AlbumId",
-									   rollName,	@"AlbumName",
-									   @"Event",	@"Album Type",
-									   eventsId,	@"Parent",
-									   keyList,		@"KeyList", nil];
+			// 3. Create and append events to album list and make each event behave like a proper album list citizen
 			
-			[newAlbumList addObject:albumDict];
-			[albumDict release];
+			id rollId, rollName;
+			
+			for	(NSDictionary *eventDict in eventList)
+			{
+				rollId   = [eventDict objectForKey:@"RollID"];
+				rollName = [eventDict objectForKey:@"RollName"];
+				keyList  = [eventDict objectForKey:@"KeyList"];
+				
+				if (rollId != nil && rollName != nil && keyList != nil)
+				{
+					NSDictionary *albumDict = [[NSDictionary alloc] initWithObjectsAndKeys:
+											   rollId,		@"AlbumId",
+											   rollName,	@"AlbumName",
+											   @"Event",	@"Album Type",
+											   eventsId,	@"Parent",
+											   keyList,		@"KeyList", nil];
+					
+					[newAlbumList addObject:albumDict];
+					[albumDict release];
+				}
+			}
+			
+			// Finally, replace the old albums array.
+			[inDict setValue:newAlbumList forKey:@"List of Albums"];
 		}
 		
-		// Finally, replace the old albums array.
-		[dict setValue:newAlbumList forKey:@"List of Albums"];
 		[newAlbumList release];
+		[pool drain];
 	}
-	@catch (NSException * e) {
-		// Some expected key not present in album data property list
-		NSLog(@"%@", [e description]);
-	}
-	@finally {
-		if (events) [events release];
-	}
-	
-	[pool drain];
 }
-
 
 
 //----------------------------------------------------------------------------------------------------------------------
