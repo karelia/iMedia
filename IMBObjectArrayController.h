@@ -89,7 +89,7 @@
 
 @interface NSObject (IMBOBjectArrayControllerFiltering)
 
-- (BOOL) matchesSearchFilterString:(NSString*)searchString;
+- (BOOL) imb_matchesSearchFilterString:(NSString*)searchString;
 
 @end
 

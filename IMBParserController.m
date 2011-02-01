@@ -620,6 +620,27 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	NSLog(@"%s\n\n%@\n",__FUNCTION__,text);
 }
 
+- (IMBParser *) registeredParserOfClass:(NSString *)className forMediaType:(NSString *)aMediaType;
+{
+	id result = nil;
+	Class theClass = NSClassFromString(className);
+	if (theClass)
+	{
+		if (_loadedParsers)
+		{
+			NSArray *parsers = [_loadedParsers objectForKey:aMediaType];
+			for (IMBParser* parser in parsers)
+			{
+				if ([parser isMemberOfClass:theClass])
+				{
+					return parser;
+				}
+			}
+		}
+	}
+	return result;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
