@@ -302,9 +302,12 @@
 	
 	if (inNode.isTopLevelNode)
 	{
-		IMBNode* musicNode = [inNode.subNodes objectAtIndex:0];
-		[self populateNode:musicNode options:inOptions error:outError];
-		inNode.objects = musicNode.objects;
+		if ([inNode.subNodes count] > 0)
+		{
+			IMBNode* musicNode = [inNode.subNodes objectAtIndex:0];
+			[self populateNode:musicNode options:inOptions error:outError];
+			inNode.objects = musicNode.objects;
+		}
 	}
 	
 	if (outError) *outError = error;

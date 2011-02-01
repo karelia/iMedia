@@ -235,9 +235,14 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 	// Set the cell class on the outline view...
 	
-	NSTableColumn* column = [[ibNodeOutlineView tableColumns] objectAtIndex:0];
-	IMBNodeCell* cell = [[[IMBNodeCell alloc] init] autorelease];	
-	[column setDataCell:cell];	
+	NSArray* columns = [ibNodeOutlineView tableColumns];
+	
+	if ([columns count] > 0)
+	{
+		NSTableColumn* column = [[ibNodeOutlineView tableColumns] objectAtIndex:0];
+		IMBNodeCell* cell = [[[IMBNodeCell alloc] init] autorelease];	
+		[column setDataCell:cell];	
+	}
 		
 	// Build the initial contents of the node popup...
 	
@@ -434,34 +439,37 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) splitView:(NSSplitView*)inSplitView resizeSubviewsWithOldSize:(NSSize)inOldSize
 {
-    NSView* topView = [[inSplitView subviews] objectAtIndex:0];  
-    NSView* bottomView = [[inSplitView subviews] objectAtIndex:1];
-    float dividerThickness = [inSplitView dividerThickness]; 
-	
-    NSRect newFrame = [inSplitView frame];   
-	                
-    NSRect topFrame = [topView frame];                    
-	topFrame.size.width = newFrame.size.width;
-   
-    NSRect bottomFrame = [bottomView frame];    
-    bottomFrame.origin = NSMakePoint(0,0);  
-    bottomFrame.size.height = newFrame.size.height - topFrame.size.height - dividerThickness;
-    bottomFrame.size.width = newFrame.size.width;          
-    bottomFrame.origin.y = topFrame.size.height + dividerThickness; 
- 
-	// If the bottom view is squeezed to its minimum, then we have to resort to shrinking the top.
-	// If our client heeded our minimumViewSize then we can't have been resized to a size that 
-	// causes BOTH our top and bottom views to be shrunk beyond their minimums.
-	if (bottomFrame.size.height < [self minimumObjectViewHeight])
+	if ([inSplitView.subviews count] >= 2)
 	{
-		CGFloat bottomOverflow = [self minimumObjectViewHeight] - bottomFrame.size.height;
-		bottomFrame.size.height = [self minimumObjectViewHeight];
-		bottomFrame.origin.y -= bottomOverflow;
-		topFrame.size.height -= bottomOverflow;
+		NSView* topView = [[inSplitView subviews] objectAtIndex:0];  
+		NSView* bottomView = [[inSplitView subviews] objectAtIndex:1];
+		float dividerThickness = [inSplitView dividerThickness]; 
+		
+		NSRect newFrame = [inSplitView frame];   
+						
+		NSRect topFrame = [topView frame];                    
+		topFrame.size.width = newFrame.size.width;
+	   
+		NSRect bottomFrame = [bottomView frame];    
+		bottomFrame.origin = NSMakePoint(0,0);  
+		bottomFrame.size.height = newFrame.size.height - topFrame.size.height - dividerThickness;
+		bottomFrame.size.width = newFrame.size.width;          
+		bottomFrame.origin.y = topFrame.size.height + dividerThickness; 
+	 
+		// If the bottom view is squeezed to its minimum, then we have to resort to shrinking the top.
+		// If our client heeded our minimumViewSize then we can't have been resized to a size that 
+		// causes BOTH our top and bottom views to be shrunk beyond their minimums.
+		if (bottomFrame.size.height < [self minimumObjectViewHeight])
+		{
+			CGFloat bottomOverflow = [self minimumObjectViewHeight] - bottomFrame.size.height;
+			bottomFrame.size.height = [self minimumObjectViewHeight];
+			bottomFrame.origin.y -= bottomOverflow;
+			topFrame.size.height -= bottomOverflow;
+		}
+	 
+		[topView setFrame:topFrame];
+		[bottomView setFrame:bottomFrame];
 	}
- 
-	[topView setFrame:topFrame];
-    [bottomView setFrame:bottomFrame];
 }
 
 
@@ -653,7 +661,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	if ([node respondsToSelector:@selector(license)])
 	{
 		IMBFlickrNodeLicense license = [((IMBFlickrNode *)node) license];
+		if (license < IMBFlickrNodeLicense_Undefined) license = IMBFlickrNodeLicense_Undefined;
 		if (license > IMBFlickrNodeLicense_CommercialUse) license = IMBFlickrNodeLicense_CommercialUse;
+		#warning These should be localised:
 		NSArray *names = [NSArray arrayWithObjects:@"any", @"CC", @"remix", @"commercial", nil];
 		NSString *fileName = [names objectAtIndex:license];
 		
