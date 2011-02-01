@@ -68,6 +68,11 @@
 	FSRef fileRef;
 	Boolean isDirectory;
 	
+	if (anAbsolutePath == nil)
+	{
+		return nil;
+	}
+	
 	if (FSPathMakeRef((const UInt8 *)[anAbsolutePath fileSystemRepresentation], &fileRef, &isDirectory) == noErr)
 	{
 		// get the content type (UTI) of this file
@@ -128,6 +133,11 @@
 + (NSString *)imb_UTIForFilenameExtension:(NSString *)anExtension
 {
 	NSString *UTI = nil;
+	
+	if (anExtension == nil)
+	{
+		return nil;
+	}
 	
 	if ([anExtension isEqualToString:@"m4v"])
 	{
