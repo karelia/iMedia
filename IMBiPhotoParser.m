@@ -245,7 +245,7 @@
 	
 	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path] == NO)
 	{
-		return NO;
+		return nil;
 	}
 	
 	// Create a root node...

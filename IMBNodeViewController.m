@@ -663,7 +663,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		IMBFlickrNodeLicense license = [((IMBFlickrNode *)node) license];
 		if (license < IMBFlickrNodeLicense_Undefined) license = IMBFlickrNodeLicense_Undefined;
 		if (license > IMBFlickrNodeLicense_CommercialUse) license = IMBFlickrNodeLicense_CommercialUse;
-		#warning These should be localised:
+
 		NSArray *names = [NSArray arrayWithObjects:@"any", @"CC", @"remix", @"commercial", nil];
 		NSString *fileName = [names objectAtIndex:license];
 		
