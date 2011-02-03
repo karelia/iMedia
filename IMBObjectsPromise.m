@@ -166,7 +166,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
 		_URLsByObject = [[inCoder decodeObjectForKey:@"URLsByObject"] mutableCopy];
-		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
+		self.destinationDirectoryPath = [inCoder decodeObjectForKey:@"destinationDirectoryPath"];
 		self.delegate = nil;
 		self.finishSelector = NULL;
 		self.error = nil;
@@ -183,6 +183,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 {
 	[inCoder encodeObject:self.objects forKey:@"objects"];
 	[inCoder encodeObject:_URLsByObject forKey:@"URLsByObject"];
+    [inCoder encodeObject:[self destinationDirectoryPath] forKey:@"destinationDirectoryPath"];
 }
 
 
