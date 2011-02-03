@@ -428,6 +428,11 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
     }
 }
 
+- (NSString *)description;
+{
+    return [[super description] stringByAppendingFormat:@" destination: %@", [self destinationDirectoryPath]];
+}
+
 @end
 
 
