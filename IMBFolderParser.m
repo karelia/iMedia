@@ -126,7 +126,11 @@
 	
 	IMBNode* newNode = [[[IMBNode alloc] init] autorelease];
 	
-	if (inOldNode == nil) newNode.isTopLevelNode = YES;
+	if ((inOldNode == nil) || (inOldNode.isTopLevelNode == YES))
+	{
+		newNode.isTopLevelNode = YES;
+	}
+	
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForPath:path];
 	newNode.displayPriority = self.displayPriority;			// get node's display priority from the folder parser
