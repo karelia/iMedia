@@ -49,6 +49,9 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#ifndef FUZZTHREADING
+#define FUZZTHREADING 0
+#endif
 
 #pragma mark HEADERS
 
@@ -390,11 +393,29 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			selector:@selector(_didMountVolume:)
 			name:NSWorkspaceDidMountNotification 
 			object:nil];
+
+#if FUZZTHREADING
+#warning testing thread safety by jamming huge amounts of arbitrary reloads
+		[NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(debuggingForceReload:) userInfo:nil repeats:YES];
+#endif		
 	}
 	
 	return self;
 }
 
+#if FUZZTHREADING
+- (void) debuggingForceReload:(NSTimer*)theTimer
+{
+	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:self.rootNodes];
+	NSUInteger n = [rootNodes count];
+
+	for (NSInteger i=n-1; i>=0; i--)
+	{
+		IMBNode* node = [rootNodes objectAtIndex:i];
+		[self reloadNode:node];
+	}
+}
+#endif
 
 - (void) dealloc
 {
@@ -690,8 +711,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
         {
             if (index == NSNotFound) index = nodes.count;
             [nodes insertObject:inNewNode atIndex:index];
-            
+
+#if FUZZTHREADING
+#warning just testing! what happens if we aggressively refollow watched paths
+#else
             if (watchedPath = inNewNode.watchedPath)
+#endif
             {
                 if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
                     [self.watcherUKKQueue addPath:watchedPath];
