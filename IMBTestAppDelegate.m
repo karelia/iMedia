@@ -260,7 +260,8 @@
 #endif
 	
 	BOOL loaded = YES;
-	
+
+#if 0	
 	if ([inParser isKindOfClass:[IMBFlickrParser class]])
 	{
 		// To test this, get your own API key from flickr (noncommercial at first, but you are planning
@@ -327,6 +328,8 @@
 			loaded = NO;
 		}
 	}		// end IMBFlickrParser code
+#endif
+	
 	return loaded;
 }
 
@@ -406,7 +409,7 @@
 
 #pragma mark
 #pragma mark IMBFlickrParser Delegate
-
+#if 0
 - (NSArray*) flickrParserSetupDefaultQueries:(IMBFlickrParser*)inFlickrParser
 {
 	NSMutableArray* defaultNodes = [NSMutableArray array];
@@ -434,6 +437,7 @@
 	
 	return defaultNodes;
 }
+#endif
 
 @end
 
