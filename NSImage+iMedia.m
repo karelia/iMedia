@@ -98,61 +98,66 @@
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
 + (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath checkSpotlightComments:(BOOL)aCheckSpotlight;
 {
-	NSMutableDictionary *md = [NSMutableDictionary dictionary];
-	CGImageSourceRef source = nil;
+	NSDictionary *result = nil;
 	NSURL *url = [NSURL fileURLWithPath:aPath];
-	NSAssert(url, @"Nil image source URL");
-	source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
-	if (source)
+	
+	if (url)
 	{
-		CFDictionaryRef propsCF = CGImageSourceCopyPropertiesAtIndex(source,  0,  NULL );
-		if (propsCF)
+		CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
+		NSMutableDictionary *md = [NSMutableDictionary dictionary];
+		
+		if (source)
 		{
-			NSDictionary *props = (NSDictionary *)propsCF;
-			NSNumber *width = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelWidth];
-			NSNumber *height= (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelHeight];
-			NSNumber *depth = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyDepth];
-			NSString *model = [props objectForKey:(NSString *)kCGImagePropertyColorModel];
-			NSString *filetype = [[aPath pathExtension] uppercaseString];
-			if (width) [md setObject:width forKey:@"width"];
-			if (height) [md setObject:height forKey:@"height"];
-			if (depth) [md setObject:depth forKey:@"depth"];
-			if (model) [md setObject:model forKey:@"model"];
-			if (filetype) [md setObject:filetype forKey:@"filetype"];
-			[md setObject:aPath forKey:@"path"];
-
-			NSDictionary *exif = [props objectForKey:(NSString *)kCGImagePropertyExifDictionary];
-			if ( nil != exif )
+			CFDictionaryRef propsCF = CGImageSourceCopyPropertiesAtIndex(source,  0,  NULL );
+			if (propsCF)
 			{
-				NSString *dateTime = [exif objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal];
-				// format from EXIF -- we could convert to a date and make more localized....
-				if (nil != dateTime)
+				NSDictionary *props = (NSDictionary *)propsCF;
+				NSNumber *width = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelWidth];
+				NSNumber *height= (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelHeight];
+				NSNumber *depth = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyDepth];
+				NSString *model = [props objectForKey:(NSString *)kCGImagePropertyColorModel];
+				NSString *filetype = [[aPath pathExtension] uppercaseString];
+				if (width) [md setObject:width forKey:@"width"];
+				if (height) [md setObject:height forKey:@"height"];
+				if (depth) [md setObject:depth forKey:@"depth"];
+				if (model) [md setObject:model forKey:@"model"];
+				if (filetype) [md setObject:filetype forKey:@"filetype"];
+				[md setObject:aPath forKey:@"path"];
+
+				NSDictionary *exif = [props objectForKey:(NSString *)kCGImagePropertyExifDictionary];
+				if ( nil != exif )
 				{
-					[md setObject:dateTime forKey:@"dateTime"];
+					NSString *dateTime = [exif objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal];
+					// format from EXIF -- we could convert to a date and make more localized....
+					if (nil != dateTime)
+					{
+						[md setObject:dateTime forKey:@"dateTime"];
+					}
 				}
+				CFRelease(propsCF);
 			}
-			CFRelease(propsCF);
+			CFRelease(source);
 		}
-		CFRelease(source);
+		
+		if (aCheckSpotlight)	// done from folder parsers, but not library-based items like iPhoto
+		{
+			MDItemRef item = MDItemCreate(NULL,(CFStringRef)aPath);
+			
+			if (item)
+			{
+				CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
+				if (comment)
+				{
+					[md setObject:(NSString*)comment forKey:@"comment"]; 
+					CFRelease(comment);
+				}
+				CFRelease(item);
+			}
+		}
+			
+		result = [NSDictionary dictionaryWithDictionary:md];
 	}
 	
-	if (aCheckSpotlight)	// done from folder parsers, but not library-based items like iPhoto
-	{
-		MDItemRef item = MDItemCreate(NULL,(CFStringRef)aPath);
-		
-		if (item)
-		{
-			CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
-			if (comment)
-			{
-				[md setObject:(NSString*)comment forKey:@"comment"]; 
-				CFRelease(comment);
-			}
-			CFRelease(item);
-		}
-	}
-		
-	NSDictionary *result = [NSDictionary dictionaryWithDictionary:md];
 	return result;
 }
 
