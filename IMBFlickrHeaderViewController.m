@@ -64,6 +64,16 @@
 
 #pragma mark
 
+@interface IMBFlickrHeaderViewController ()
+@property (retain) NSMutableDictionary* queryParams;
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
 @implementation IMBFlickrHeaderViewController
 
 @synthesize parser = _parser;
@@ -82,6 +92,7 @@
 	IMBFlickrHeaderViewController* controller = [[[IMBFlickrHeaderViewController alloc] init] autorelease];
 	controller.parser = inParser;
 	controller.owningNode = inNode;
+	controller.queryParams = [inNode.attributes objectForKey:@"query"];
 	return controller;
 }
 

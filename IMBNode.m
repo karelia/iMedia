@@ -109,24 +109,6 @@
 // Badge icons...
 
 @synthesize badgeTypeNormal = _badgeTypeNormal;
-
-//- (void) setBadgeTypeNormal:(IMBBadgeType)badgeType;
-//{
-//	NSArray *strings = [NSArray arrayWithObjects:
-//						@"kIMBBadgeTypeNone",
-//						@"kIMBBadgeTypeLoading",
-//						@"kIMBBadgeTypeReload",
-//						@"kIMBBadgeTypeStop",
-//						@"kIMBBadgeTypeEject",
-//						@"kIMBBadgeTypeOffline", nil];
-//	
-//	if ([self.identifier isEqualToString:@"IMBFlickrParser://flickr.photos.getRecent/recent/30"])
-//	{
-//		NSLog(@"%p %@ setBadgeTypeNormal:%@", self, self.identifier, [strings objectAtIndex:badgeType]);
-//	}
-//	_badgeTypeNormal = badgeType;
-//}
-
 @synthesize badgeTypeMouseover = _badgeTypeMouseover;
 @synthesize badgeTarget = _badgeTarget;
 @synthesize badgeSelector = _badgeSelector;
@@ -134,9 +116,6 @@
 // Custom object view...
 
 @synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
-@synthesize customHeaderViewController = _customHeaderViewController;
-@synthesize customObjectViewController = _customObjectViewController;
-@synthesize customFooterViewController = _customFooterViewController;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -163,9 +142,6 @@
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
 		
 		self.shouldDisplayObjectView = YES;
-		self.customHeaderViewController = nil;
-		self.customObjectViewController = nil;
-		self.customFooterViewController = nil;
 	}
 	
 	return self;
@@ -203,9 +179,6 @@
 	copy.badgeSelector = self.badgeSelector;
 	
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
-	copy.customHeaderViewController = self.customHeaderViewController;
-	copy.customObjectViewController = self.customObjectViewController;
-	copy.customFooterViewController = self.customFooterViewController;
 	
 	// Create a shallow copy of objects array...
 	
@@ -256,9 +229,6 @@
 	IMBRelease(_parser);
 	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
-	IMBRelease(_customHeaderViewController);
-	IMBRelease(_customObjectViewController);
-	IMBRelease(_customFooterViewController);
 	
 	[super dealloc];
 }

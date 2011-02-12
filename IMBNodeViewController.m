@@ -107,6 +107,10 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (CGFloat) minimumObjectViewHeight;
 - (NSSize) minimumViewSize;
 
+- (NSViewController*) _customHeaderViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) _customObjectViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) _customFooterViewControllerForNode:(IMBNode*)inNode;
+
 @end
 
 
@@ -265,6 +269,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	IMBRelease(_expandedNodeIdentifiers);
 	IMBRelease(_standardObjectView);
 	IMBRelease(_customObjectView);
+	IMBRelease(_customHeaderViewControllers);
+	IMBRelease(_customObjectViewControllers);
+	IMBRelease(_customFooterViewControllers);
 	
 	[super dealloc];
 }
@@ -1248,9 +1255,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) installObjectViewForNode:(IMBNode*)inNode
 {
-	NSViewController* headerViewController = [inNode customHeaderViewController];
-	NSViewController* objectViewController = [inNode customObjectViewController];
-	NSViewController* footerViewController = [inNode customFooterViewController];
+	NSViewController* headerViewController = [self _customHeaderViewControllerForNode:inNode];
+	NSViewController* objectViewController = [self _customObjectViewControllerForNode:inNode];
+	NSViewController* footerViewController = [self _customFooterViewControllerForNode:inNode];
 	
 	NSView* headerView = nil;
 	NSView* objectView = nil;
@@ -1337,6 +1344,94 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	{
 		[ibObjectContainerView setHidden:YES];
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// First check if we already have a customViewController for the given node. If not then ask the  
+// parser to create one for us. We will store it here for later use...
+
+
+- (NSViewController*) _customHeaderViewControllerForNode:(IMBNode*)inNode
+{
+	NSViewController* viewController = nil;
+	NSString* identifier = inNode.identifier;
+	
+	if (identifier)
+	{
+		viewController = [_customHeaderViewControllers objectForKey:identifier];
+		
+		if (viewController == nil)
+		{
+			viewController = [inNode.parser customHeaderViewControllerForNode:inNode];
+
+			if (_customHeaderViewControllers == nil && viewController != nil)
+			{
+				_customHeaderViewControllers = [[NSMutableDictionary alloc] init];
+			}
+
+			if (viewController) [_customHeaderViewControllers setObject:viewController forKey:identifier];
+			else [_customHeaderViewControllers removeObjectForKey:identifier];
+		}
+	}
+	
+	return viewController;
+}
+
+
+- (NSViewController*) _customObjectViewControllerForNode:(IMBNode*)inNode
+{
+	NSViewController* viewController = nil;
+	NSString* identifier = inNode.identifier;
+	
+	if (identifier)
+	{
+		viewController = [_customObjectViewControllers objectForKey:identifier];
+	
+		if (viewController == nil)
+		{
+			viewController = [inNode.parser customObjectViewControllerForNode:inNode];
+
+			if (_customObjectViewControllers == nil && viewController != nil)
+			{
+				_customObjectViewControllers = [[NSMutableDictionary alloc] init];
+			}
+
+			if (viewController) [_customObjectViewControllers setObject:viewController forKey:identifier];
+			else [_customObjectViewControllers removeObjectForKey:identifier];
+		}
+	}
+	
+	return viewController;
+}
+
+
+- (NSViewController*) _customFooterViewControllerForNode:(IMBNode*)inNode
+{
+	NSViewController* viewController = nil;
+	NSString* identifier = inNode.identifier;
+	
+	if (identifier)
+	{
+		viewController = [_customFooterViewControllers objectForKey:identifier];
+	
+		if (viewController == nil)
+		{
+			viewController = [inNode.parser customFooterViewControllerForNode:inNode];
+
+			if (_customFooterViewControllers == nil && viewController != nil)
+			{
+				_customFooterViewControllers = [[NSMutableDictionary alloc] init];
+			}
+
+			if (viewController) [_customFooterViewControllers setObject:viewController forKey:identifier];
+			else [_customFooterViewControllers removeObjectForKey:identifier];
+		}
+	}
+	
+	return viewController;
 }
 
 

@@ -99,6 +99,10 @@
 	IBOutlet NSView* ibObjectFooterView;
 	NSView* _standardObjectView;
 	NSView* _customObjectView;
+	
+	NSMutableDictionary* _customHeaderViewControllers;
+	NSMutableDictionary* _customObjectViewControllers;
+	NSMutableDictionary* _customFooterViewControllers;
 }
 
 + (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
@@ -145,7 +149,6 @@
 // Object Views...
 
 - (void) installObjectViewForNode:(IMBNode*)inNode;
-
 - (NSSize) minimumViewSize;
 
 // Saving/Restoring state...

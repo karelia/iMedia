@@ -100,9 +100,6 @@
 	SEL _badgeSelector;
 
 	BOOL _shouldDisplayObjectView;
-	NSViewController* _customHeaderViewController;
-	NSViewController* _customObjectViewController;
-	NSViewController* _customFooterViewController;
 }
 
 // Primary properties for a node:
@@ -169,15 +166,9 @@
 @property (retain) id badgeTarget;
 @property (assign) SEL badgeSelector;
 
-// Nodes that do not contain any objects can return a custom object view, which will replace the standard
-// object views (icon,list,combo). For most nodes this will not be needed so returning nil is fine. Some 
-// nodes that do contain objects may still opt to use a custom view because the standard views do not
-// suffice. E.g. iPhoto events may be such a case...
+// Indicates whether a node wants to display an object view. Default is YES, but can be changed...
 
 @property (assign) BOOL shouldDisplayObjectView;	
-@property (retain) NSViewController* customHeaderViewController;	
-@property (retain) NSViewController* customObjectViewController;	
-@property (retain) NSViewController* customFooterViewController;	
 
 // Helper methods
 
