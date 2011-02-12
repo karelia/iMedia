@@ -475,10 +475,7 @@
 	
 	if (inURL)
 	{
-		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-		   nil];
-
-		NSAssert(inURL, @"Nil image source URL");
+		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:nil];
 		source = CGImageSourceCreateWithURL((CFURLRef)inURL,(CFDictionaryRef)options);
 		[NSMakeCollectable(source) autorelease];
 	}
@@ -506,7 +503,6 @@
 			   [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
 			   nil];
 			
-			NSAssert(source, @"Nil image source in _imageForURL:");
 			image = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
 			[NSMakeCollectable(image) autorelease];
 		}

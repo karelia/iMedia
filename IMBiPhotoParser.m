@@ -426,28 +426,29 @@
 	{
 		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
 		{
-			NSAssert(url, @"Nil image source URL");
-			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
-
-			if (source)
+			if (url)
 			{
-				CGImageRef image = CGImageSourceCreateImageAtIndex(source,0,NULL);
-				
-				if (image)
+				CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
+
+				if (source)
 				{
-					imageRepresentation = (id) image;
-					[inObject 
-						performSelectorOnMainThread:@selector(setImageRepresentation:) 
-						withObject:(id)image
-						waitUntilDone:NO 
-						modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+					CGImageRef image = CGImageSourceCreateImageAtIndex(source,0,NULL);
+					
+					if (image)
+					{
+						imageRepresentation = (id) image;
+						[inObject 
+							performSelectorOnMainThread:@selector(setImageRepresentation:) 
+							withObject:(id)image
+							waitUntilDone:NO 
+							modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 
-					CGImageRelease(image);
+						CGImageRelease(image);
+					}
+					
+					CFRelease(source);
 				}
-				
-				CFRelease(source);
 			}
-
 		}
 	}
 	

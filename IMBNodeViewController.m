@@ -616,7 +616,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 		// If the node has a custom object view, then install it now...
 		
-//		[self installCustomObjectView:[newNode customObjectView]];
 		[self installObjectViewForNode:newNode];
 		
 		// If a completely different parser was selected, then notify the previous parser, that it is most
@@ -634,23 +633,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	[self __syncPopupMenuSelection];
 }
 
-
-/*  Optional - Different cells for each row
-    A different data cell can be returned for any particular tableColumn and item, or a cell that will be used for the entire row (a full width cell). The returned cell should properly implement copyWithZone:, since the cell may be copied by NSTableView. If the tableColumn is non-nil, you should return a cell, and generally you will want to default to returning the result from [tableColumn dataCellForRow:row].
-
-    When each row (identified by the item) is being drawn, this method will first be called with a nil tableColumn. At this time, you can return a cell that will be used to draw the entire row, acting like a group. If you do return a cell for the 'nil' tableColumn, be prepared to have the other corresponding datasource and delegate methods to be called with a 'nil' tableColumn value. If don't return a cell, the method will be called once for each tableColumn in the tableView, as usual.
-
-- (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item;
-{
-	NSCell *result = nil;
-	if (nil != tableColumn)
-	{
-		NSAssert([item isKindOfClass:[NSTreeNode class]], @"item not expected class");
-		return [[[IMBNodeCell alloc] initTextCell:@""] autorelease];
-	}
-	return result;
-}
-*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
