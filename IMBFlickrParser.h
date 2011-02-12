@@ -59,9 +59,9 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-@class IMBFlickrQueryEditor;
 @class IMBLoadMoreObject;
 @class OFFlickrAPIContext;
+
 /**
  *	iMedia parser to read public Flickr images.
  *	
@@ -84,7 +84,6 @@
 	IMBFlickrSizeSpecifier _desiredSize;
 	NSMutableArray* _customQueries;
 	id _delegate;
-	IMBFlickrQueryEditor* _editor;
 	NSString* _flickrAPIKey;
 	OFFlickrAPIContext* _flickrContext;
 	NSString* _flickrSharedSecret;

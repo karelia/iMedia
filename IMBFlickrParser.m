@@ -60,7 +60,6 @@
 #import "IMBFlickrNode.h"
 #import "IMBFlickrObject.h"
 #import "IMBFlickrParser.h"
-//#import "IMBFlickrQueryEditor.h"
 #import "IMBFlickrHeaderViewController.h"
 #import "IMBIconCache.h"
 #import "IMBLibraryController.h"
@@ -77,7 +76,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 @interface IMBFlickrParser ()
-@property (retain) IMBFlickrQueryEditor* editor;
 //	Query Persistence:
 - (NSArray*) instantiateCustomQueriesWithRoot: (IMBFlickrNode*) root;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
@@ -99,7 +97,6 @@
 - (void) dealloc {
 	_delegate = nil;
 	IMBRelease (_customQueries);
-	IMBRelease (_editor);
 	IMBRelease (_flickrAPIKey);
 	IMBRelease (_flickrContext);
 	IMBRelease (_flickrSharedSecret);
@@ -584,7 +581,6 @@
 
 @synthesize customQueries = _customQueries;
 @synthesize delegate = _delegate;
-@synthesize editor = _editor;
 @synthesize flickrAPIKey = _flickrAPIKey;
 @synthesize flickrSharedSecret = _flickrSharedSecret;
 @synthesize desiredSize = _desiredSize;
