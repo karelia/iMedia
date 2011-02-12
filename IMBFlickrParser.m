@@ -250,18 +250,7 @@
 	//	TODO: ???
 	rootNode.watcherType = kIMBWatcherTypeFirstCustom;
 	rootNode.watchedPath = (NSString*) rootNode.mediaSource;
-	
-	// The root node has a custom view that we are loading from a nib file...
-//	self.editor = [IMBFlickrQueryEditor flickrQueryEditorForParser:self];
-//	rootNode.customObjectView = self.editor.view;
-
-	IMBFlickrHeaderViewController* viewController = [IMBFlickrHeaderViewController headerViewControllerWithParser:self owningNode:rootNode];
-	viewController.queryAction = @selector(addQuery:);
-	viewController.buttonAction = @selector(addQuery:);
-	viewController.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.add",nil,IMBBundle(),@"Add",@"Button title in Flickr Options");
-
-	rootNode.customHeaderViewController = viewController;
-	
+		
 	return rootNode;
 }
 
@@ -557,6 +546,38 @@
 	
 	return description;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode
+{
+	IMBFlickrHeaderViewController* controller = nil;
+	
+	// The root node has a custom view that we are loading from a nib file...
+
+	if ([inNode.identifier isEqualToString:[self identifierForPath:@"/"]])
+	{
+		controller = [IMBFlickrHeaderViewController headerViewControllerWithParser:self owningNode:(IMBFlickrNode*)inNode];
+		controller.queryAction = @selector(addQuery:);
+		controller.buttonAction = @selector(addQuery:);
+		controller.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.add",nil,IMBBundle(),@"Add",@"Button title in Flickr Options");
+	}
+	else
+	{
+		controller = [IMBFlickrHeaderViewController headerViewControllerWithParser:self owningNode:(IMBFlickrNode*)inNode];
+		controller.queryAction = @selector(editQuery:);
+		controller.buttonAction = @selector(removeQuery:);
+		controller.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.remove",nil,IMBBundle(),@"Remove",@"Button title in Flickr Options");
+	}
+
+	return controller;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 #pragma mark Properties

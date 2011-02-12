@@ -244,11 +244,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	node.query = query;
 	node.sortOrder = [[dict objectForKey:IMBFlickrNodeProperty_SortOrder] intValue];
 	
-	IMBFlickrHeaderViewController* viewController = [IMBFlickrHeaderViewController headerViewControllerWithParser:(IMBFlickrParser*)parser owningNode:node];
-	viewController.queryParams = (NSMutableDictionary*)dict;
-	viewController.buttonAction = @selector(removeQuery:);
-	viewController.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.remove",nil,IMBBundle(),@"Remove",@"Button title in Flickr Options");
-	node.customHeaderViewController = viewController;
+	[(NSMutableDictionary*)node.attributes setObject:dict forKey:@"query"];
 
 	return node;
 }
@@ -271,7 +267,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	OFFlickrAPIRequest* request = [self.attributes objectForKey:@"flickrRequest"];
 	[request cancel];
 	
-	[(IMBFlickrHeaderViewController*)self.customHeaderViewController setOwningNode:nil];
+//	[(IMBFlickrHeaderViewController*)self.customHeaderViewController setOwningNode:nil];
 	
 	IMBRelease (_query);
 	[super dealloc];

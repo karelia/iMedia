@@ -253,7 +253,6 @@
 		{
 			node.leaf = YES;
 			node.shouldDisplayObjectView = NO;
-			node.customHeaderViewController = [IMBApertureHeaderViewController headerViewControllerWithNode:node];
 		}
 		else
 		{
@@ -355,6 +354,22 @@
 			self.plist = nil;
 		}	
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Placeholder parsers provide their own custom header view...
+
+- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode
+{
+	if (self.placeholderParser)
+	{
+		return [IMBApertureHeaderViewController headerViewControllerWithNode:inNode];
+	}
+	
+	return nil;
 }
 
 

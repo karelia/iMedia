@@ -64,6 +64,7 @@
 #import <QTKit/QTKit.h>
 #import "NSURL+iMedia.h"
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -126,6 +127,7 @@
 {
 	IMBRelease(_mediaSource);
 	IMBRelease(_mediaType);
+
 	[super dealloc];
 }
 
@@ -426,6 +428,42 @@
 
 
 #pragma mark
+#pragma mark Custom Object UI
+
+
+// Controls whether object views should be installed for a given node. Can be overridden by parser subclasses...
+
+- (BOOL) shouldDisplayObjectViewForNode:(IMBNode*)inNode
+{
+	return YES;
+}
+
+
+// If a parser subclass wants custom UI for a specific node, then is should override one of the following methods...
+
+
+- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode
+{
+	return nil;
+}
+
+
+- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode
+{
+	return nil;
+}
+
+
+- (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 #pragma mark Helpers
 
 
@@ -476,11 +514,6 @@
 	
 	return image;
 }	
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 
 
 //----------------------------------------------------------------------------------------------------------------------

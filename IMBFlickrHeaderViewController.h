@@ -74,7 +74,7 @@
 
 @property (assign) IMBFlickrParser* parser;
 @property (assign) IMBFlickrNode* owningNode;
-@property (retain) NSMutableDictionary* queryParams;
+//@property (retain) NSMutableDictionary* queryParams;
 @property (assign) SEL queryAction;
 @property (assign) SEL buttonAction;
 @property (retain) NSString* buttonTitle;

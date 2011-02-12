@@ -151,7 +151,6 @@
 	NSString* _mediaSource;
 	NSString* _mediaType;
 	BOOL _custom;
-
 }
 
 - (id) initWithMediaType:(NSString*)inMediaType;
@@ -161,7 +160,20 @@
 - (void) invalidateThumbnails;
 - (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions;
 
+// Controls whether object views should be installed for a given node...
+
+- (BOOL) shouldDisplayObjectViewForNode:(IMBNode*)inNode;	
+
+// Nodes that do not want the standard object views can use custom user intefaces. The following methods provide  
+// the mechanics of creating custom view controllers Subclasses should override them to return an appropriate  
+// view controller...
+
+- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode;
+
 @end
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
