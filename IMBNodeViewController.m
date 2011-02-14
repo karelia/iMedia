@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBNodeViewController.h"
+#import "IMBObjectViewController.h"
 #import "IMBLibraryController.h"
 #import "IMBNodeTreeController.h"
 #import "IMBOutlineView.h"
@@ -1359,6 +1360,15 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		}
 	}
 	
+	if (viewController)
+	{
+		if ([viewController isKindOfClass:[IMBObjectViewController class]])
+		{	
+			[(IMBObjectViewController*)viewController setNodeViewController:self];
+			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+		}
+	}
+	
 	return viewController;
 }
 
@@ -1386,6 +1396,15 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		}
 	}
 	
+	if (viewController)
+	{
+		if ([viewController isKindOfClass:[IMBObjectViewController class]])
+		{	
+			[(IMBObjectViewController*)viewController setNodeViewController:self];
+			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+		}
+	}
+
 	return viewController;
 }
 
@@ -1413,6 +1432,15 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		}
 	}
 	
+	if (viewController)
+	{
+		if ([viewController isKindOfClass:[IMBObjectViewController class]])
+		{	
+			[(IMBObjectViewController*)viewController setNodeViewController:self];
+			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+		}
+	}
+
 	return viewController;
 }
 
