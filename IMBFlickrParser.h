@@ -53,6 +53,9 @@
 //	System
 #import <Cocoa/Cocoa.h>
 
+//	Objective Flickr
+#import <ObjectiveFlickr/ObjectiveFlickr.h>
+
 //	iMedia
 #import "IMBNode.h"
 #import "IMBParser.h"
@@ -79,11 +82,11 @@
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
- 
-@interface IMBFlickrParser: IMBParser {
+@interface IMBFlickrParser: IMBParser <OFFlickrAPIRequestDelegate> {
 	@private
 	IMBFlickrSizeSpecifier _desiredSize;
 	NSMutableArray* _customQueries;
+	NSMutableDictionary* _flickrRequests;
 	id _delegate;
 	NSString* _flickrAPIKey;
 	OFFlickrAPIContext* _flickrContext;
@@ -98,6 +101,11 @@
 - (IBAction) openFlickrPage: (id) sender;
 
 - (IBAction) removeNode: (id) sender;
+
+
+#pragma mark Flickr Request Handling
+
++ (NSString*) flickrMethodForMethodCode: (NSInteger) code;
 
 
 #pragma mark Properties

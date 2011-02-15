@@ -101,9 +101,10 @@ typedef enum {
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBFlickrNode: IMBNode <OFFlickrAPIRequestDelegate> {
+@interface IMBFlickrNode: IMBNode {
 	@private
 	BOOL _customNode;
+	NSDictionary* _flickrResponse;
 	IMBFlickrNodeLicense _license;
 	IMBFlickrNodeMethod _method;
 	NSInteger _page;
@@ -129,16 +130,18 @@ typedef enum {
 + (void) sendSelectNodeNotificationForDict:(NSDictionary*) dict;
 
 
-#pragma mark Flickr Handling
+#pragma mark Flickr Response Handling
 
-- (void) clearResponse;
-- (BOOL) hasRequest;
-- (BOOL) hasResponse;
-- (void) processResponse;
-- (void) startLoadRequestWithContext: (OFFlickrAPIContext*) context;
-- (void) startLoadMoreRequestWithContext: (OFFlickrAPIContext*) context;
+///	The iMB Flickr parser saves a response of a Flickr request here.
+@property (copy) NSDictionary* flickrResponse;
+@property (readonly) BOOL hasFlickrResponse;
 
-	
+- (void) clearFlickrResponse;
+
+///	Processes the 'flickrResponse' dictionary to fill the node with actual images.
+- (void) processResponseForContext: (OFFlickrAPIContext*) context;
+
+
 #pragma mark Properties
 
 @property (assign, getter=isCustomNode) BOOL customNode;
@@ -151,6 +154,7 @@ typedef enum {
 
 #pragma mark Utilities
 
+- (NSDictionary*) argumentsForFlickrCall;
 + (NSString *)base58EncodedValue:(long long)num;
 + (NSString *)descriptionOfLicense:(int)aLicenseNumber;
 
