@@ -774,7 +774,13 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	IMBNode* node = [self currentNode];
 	NSInteger count = node.displayedObjectCount;
-	if (count < 0) count = (NSInteger) [[ibObjectArrayController arrangedObjects] count];
+	
+	// If the node has an uninitialized count, or if we exist apart from a node view controller,
+	// then consult our array controller directly.
+	if ((count < 0) || (node == nil))
+	{
+		count = (NSInteger) [[ibObjectArrayController arrangedObjects] count];
+	}
 	
 	NSString* format = count==1 ? self.objectCountFormatSingular : self.objectCountFormatPlural;
 	return [NSString stringWithFormat:format,count];
