@@ -59,6 +59,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+@class IMBFlickrNode;
 @class IMBLoadMoreObject;
 @class OFFlickrAPIContext;
 
