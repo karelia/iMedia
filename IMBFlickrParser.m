@@ -250,7 +250,7 @@
 	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
 	
 	//	if the node does not exist any more, there is not much to do...
-	if (!node) return
+	if (!node) return;
 		
 	#ifdef VERBOSE
 		NSLog (@"Flickr request completed for node '%@'.", nodeIdentifier);
