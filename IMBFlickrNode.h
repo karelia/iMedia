@@ -67,8 +67,6 @@ extern NSString* const IMBFlickrNodeProperty_Query;
 extern NSString* const IMBFlickrNodeProperty_SortOrder;
 extern NSString* const IMBFlickrNodeProperty_UUID;
 
-//extern NSString* const IMBFlickrNodeProperty_Title;
-
 typedef enum {
 	IMBFlickrNodeMethod_TextSearch = 0,
 	IMBFlickrNodeMethod_TagSearch,
@@ -150,10 +148,10 @@ typedef enum {
 @property (copy) NSString* query;
 @property (assign) IMBFlickrNodeSortOrder sortOrder;
 
+
 #pragma mark Utilities
 
 + (NSString *)base58EncodedValue:(long long)num;
 + (NSString *)descriptionOfLicense:(int)aLicenseNumber;
-
 
 @end

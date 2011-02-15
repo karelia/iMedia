@@ -113,14 +113,17 @@
 ///	The shared secret given to you by Flickr. Must be set to use this parser.
 @property (copy) NSString* flickrSharedSecret;
 
+///	Returns the root node of the Flickr subtree.
+@property (readonly) IMBFlickrNode* flickrRootNode;
+
 ///	A button object holding the 'load more' button.
 @property (readonly) IMBLoadMoreObject* loadMoreButton;
 
 
 #pragma mark Query Persistence
 
-- (void) addCustomQuery:(NSDictionary*)inQueryParams;
-- (void) removeCustomQuery:(NSDictionary*)inQueryParams;
+- (void) addCustomQuery: (NSDictionary*) inQueryParams;
+- (void) removeCustomQuery: (NSDictionary*) inQueryParams;
 
 - (void) loadCustomQueries;
 - (void) saveCustomQueries;

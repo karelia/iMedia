@@ -77,7 +77,6 @@
 @implementation IMBFlickrHeaderViewController
 
 @synthesize parser = _parser;
-@synthesize owningNode = _owningNode;
 @synthesize queryParams = _queryParams;
 @synthesize queryAction = _queryAction;
 @synthesize buttonAction = _buttonAction;
@@ -87,12 +86,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-+ (IMBFlickrHeaderViewController*) headerViewControllerWithParser:(IMBFlickrParser*)inParser owningNode:(IMBFlickrNode*)inNode
++ (IMBFlickrHeaderViewController*) headerViewControllerWithParser: (IMBFlickrParser*) inParser forNode: (IMBFlickrNode*) inNode
 {
 	IMBFlickrHeaderViewController* controller = [[[IMBFlickrHeaderViewController alloc] init] autorelease];
 	controller.parser = inParser;
-	controller.owningNode = inNode;
-	controller.queryParams = [inNode.attributes objectForKey:@"query"];
+	
+	NSMutableDictionary* queryParams = [NSMutableDictionary dictionary];
+	[queryParams setObject:[NSNumber numberWithInt:inNode.method] forKey:IMBFlickrNodeProperty_Method];
+	[queryParams setObject:[NSNumber numberWithInt:inNode.license] forKey:IMBFlickrNodeProperty_License];
+	[queryParams setObject:[NSNumber numberWithInt:inNode.sortOrder] forKey:IMBFlickrNodeProperty_SortOrder];
+	[queryParams setObject:inNode.identifier forKey:IMBFlickrNodeProperty_UUID];
+	if (inNode.query) {	//	the standard Flickr search ("recent" etc. may have no explicit querey)...
+		[queryParams setObject:inNode.query forKey:IMBFlickrNodeProperty_Query];	
+	}
+	
+	controller.queryParams = queryParams;
+	
 	return controller;
 }
 
@@ -117,7 +126,11 @@
 	// Configure the search field...
 	
 	[_queryField setAction:_queryAction];
-	[_queryField setTarget:self];
+	[_queryField setTarget:self];	
+	NSString* query = [_queryParams objectForKey:IMBFlickrNodeProperty_Query];
+	if (query) {
+		[_queryField setStringValue:query];
+	}
 	
 	// Configure the popup menu...
 
@@ -234,8 +247,8 @@
 - (void) dealloc
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	IMBRelease(_queryParams);
-	IMBRelease(_buttonTitle);
+	IMBRelease (_queryParams);
+	IMBRelease (_buttonTitle);
 	[super dealloc];
 }
 
