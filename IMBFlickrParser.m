@@ -73,9 +73,18 @@
 #import "IMBNodeObject.h"
 #import "IMBSmartFolderNodeObject.h"
 
+
+
+//#define VERBOSE
+
 //----------------------------------------------------------------------------------------------------------------------
 
 @interface IMBFlickrParser ()
+//	Flickr Request Handling:
+- (void) cancelAllPendingFlickrRequests;
+- (BOOL) hasFlickrRequestForNode: (IMBFlickrNode*) node;
+- (void) startLoadRequestForFlickrNode: (IMBFlickrNode*) node;
+- (void) startLoadMoreRequestForFlickrNode: (IMBFlickrNode*) node;
 //	Query Persistence:
 - (NSArray*) instantiateCustomQueriesWithRoot: (IMBFlickrNode*) root;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
@@ -96,10 +105,14 @@
 
 - (void) dealloc {
 	_delegate = nil;
+	
+	[self cancelAllPendingFlickrRequests];
+	
 	IMBRelease (_customQueries);
 	IMBRelease (_flickrAPIKey);
 	IMBRelease (_flickrContext);
 	IMBRelease (_flickrSharedSecret);
+	IMBRelease (_flickrRequests);	
 	IMBRelease (_loadMoreButton);
 	[super dealloc];
 }
@@ -138,7 +151,7 @@
 	if (nodeIdentifier) {
 		IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
 		IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
-		[node startLoadMoreRequestWithContext:_flickrContext];
+		[self startLoadMoreRequestForFlickrNode:node];
 	} else {
 		NSLog (@"Can't handle this kind of node.");
 	}
@@ -219,6 +232,130 @@
 
 
 #pragma mark 
+#pragma mark Flickr Request Handling
+
+- (void) cancelAllPendingFlickrRequests {
+	for (OFFlickrAPIRequest* request in _flickrRequests.allValues) {
+		[request cancel];
+	}
+}
+
+
+- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
+  didCompleteWithResponse: (NSDictionary*) inResponseDictionary {
+	
+	//	get the node we associated with the request in flickrRequestWithContext: ...
+	NSString* nodeIdentifier = inRequest.sessionInfo;
+	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
+	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
+	
+	//	if the node does not exist any more, there is not much to do...
+	if (!node) return
+		
+	#ifdef VERBOSE
+		NSLog (@"Flickr request completed for node '%@'.", nodeIdentifier);
+	#endif
+	
+	//	save Flickr response in our iMB node for later population of the browser...
+	[node setFlickrResponse:inResponseDictionary];
+	
+	//	force reloading of the node holding the Flickr images...
+	[libController reloadNode:node];	
+}
+
+
+- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
+		 didFailWithError: (NSError*) inError {
+	
+	NSLog (@"flickrAPIRequest:didFailWithError: %@", inError);	
+	//	TODO: Error Handling
+}
+
+
++ (NSString*) flickrMethodForMethodCode: (NSInteger) code {
+	if (code == IMBFlickrNodeMethod_TagSearch || code == IMBFlickrNodeMethod_TextSearch) {
+		return @"flickr.photos.search";
+	} else if (code == IMBFlickrNodeMethod_Recent) {
+		return @"flickr.photos.getRecent";
+	} else if (code == IMBFlickrNodeMethod_MostInteresting) {
+		return @"flickr.interestingness.getList";
+	} else if (code == IMBFlickrNodeMethod_GetInfo) {
+		return @"flickr.photos.getInfo";
+	}
+	NSLog (@"Can't find Flickr method for method code.");
+	return nil;
+}
+
+
+- (OFFlickrAPIRequest*) flickrRequestWithNode: (IMBFlickrNode*) node {
+	
+	//	create our dictionary of flickr request lazily... 
+	if (_flickrRequests == nil) {
+		_flickrRequests = [[NSMutableDictionary alloc] init]; 
+	}
+	
+	OFFlickrAPIRequest* request = [_flickrRequests objectForKey:node.identifier];
+	if (!request) {
+		//	create a Flickr request for the given iMB node...
+		request = [[OFFlickrAPIRequest alloc] initWithAPIContext:_flickrContext];
+		[_flickrRequests setObject:request forKey:node.identifier];
+		request.requestTimeoutInterval = 60.0f;
+		//		[request setShouldWaitUntilDone:YES];
+		[request release];
+		
+		//	we save the iMB node in the Flickr request for use in
+		//	flickrAPIRequest:didCompleteWithResponse: ...
+		request.sessionInfo = node.identifier;
+	}
+	return request;
+}
+
+
+- (BOOL) hasFlickrRequestForNode: (IMBFlickrNode*) node {
+	if (!node) return NO;
+	OFFlickrAPIRequest* request = [_flickrRequests objectForKey:node.identifier];
+	return request != nil;
+}
+
+
+- (void) startLoadRequestForFlickrNode: (IMBFlickrNode*) node {
+	[self performSelectorOnMainThread:@selector(startLoadRequestForFlickrNode_onMainThread:) withObject:node waitUntilDone:NO];	
+}
+
+
+- (void) startLoadMoreRequestForFlickrNode: (IMBFlickrNode*) node {
+	node.page = node.page + 1;
+	[self performSelectorOnMainThread:@selector(startLoadRequestForFlickrNode_onMainThread:) withObject:node waitUntilDone:NO];	
+}
+
+
+- (void) startLoadRequestForFlickrNode_onMainThread: (IMBFlickrNode*) node {
+	if (!node) return;
+	
+	OFFlickrAPIRequest* request = [self flickrRequestWithNode:node];
+	if (![request isRunning]) {			
+		[request setDelegate:self];	
+		
+		//	Keep the 'populateNode:' loop quiet until we got our data. Also this will
+		//	ensure that the parser is not called again and again to populate the node.
+		if (node.objects == nil) {
+			node.subNodes = [NSArray array];
+			node.objects = [NSArray array];
+		}
+		
+		//	compose and start Flickr request...
+		NSString* method = [self.class flickrMethodForMethodCode:node.method];
+		NSDictionary* arguments = [node argumentsForFlickrCall];
+		[request callAPIMethodWithGET:method arguments:arguments];
+		
+#ifdef VERBOSE
+		NSLog (@"Start Flickr request for node '%@' method: '%@' and query: '%@'.", node.identifier, method, node.query);
+#endif
+	}	
+}
+
+
+#pragma mark 
 #pragma mark Parser Methods
 
 ///	Create an empty "Flickr" root node.
@@ -244,7 +381,6 @@
 	rootNode.subNodes = nil;
 	rootNode.objects = nil;
 
-	//	TODO: ???
 	rootNode.watcherType = kIMBWatcherTypeFirstCustom;
 	rootNode.watchedPath = (NSString*) rootNode.mediaSource;
 		
@@ -276,7 +412,7 @@
 //		[self populateNode:updatedNode options:inOptions error:&error];
 //	}
 	
-	if ([inOldFlickrNode hasRequest] || inOldNode.isPopulated)
+	if ([self hasFlickrRequestForNode:inOldFlickrNode] || inOldNode.isPopulated)
 	{
 		[self populateNewNode:updatedNode likeOldNode:inOldNode options:inOptions];
 	}
@@ -326,12 +462,12 @@
 		inFlickrNode.objects = objects;
 	} else {
 		//	populate nodes with Flickr contents...
-		if ([inFlickrNode hasResponse]) {
-			[inFlickrNode processResponse];
-			[inFlickrNode clearResponse];
+		if ([inFlickrNode hasFlickrResponse]) {
+			[inFlickrNode processResponseForContext:_flickrContext];
+			[inFlickrNode clearFlickrResponse];
 		} else {			
 			//	the network access needs to be started on the main thread...
-			[inFlickrNode startLoadRequestWithContext:_flickrContext];
+			[self startLoadRequestForFlickrNode:inFlickrNode];
 		}
 	}
 		
