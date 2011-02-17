@@ -712,11 +712,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
             if (index == NSNotFound) index = nodes.count;
             [nodes insertObject:inNewNode atIndex:index];
 
-#if FUZZTHREADING
-#warning just testing! what happens if we aggressively refollow watched paths
-#else
             if (watchedPath = inNewNode.watchedPath)
-#endif
             {
                 if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
                     [self.watcherUKKQueue addPath:watchedPath];
