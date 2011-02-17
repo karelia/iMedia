@@ -158,6 +158,7 @@
 + (NSString*) identifierForPath:(NSString*)inPath;
 
 - (void) invalidateThumbnails;
+- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 - (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions;
 
 // Controls whether object views should be installed for a given node...

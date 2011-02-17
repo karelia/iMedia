@@ -211,7 +211,7 @@
 	[subNodes addObject:foldersNode];
 
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
-	foldersObject.location = (id)foldersNode;
+	foldersObject.representedNodeIdentifier = foldersNode.identifier;
 	foldersObject.name = foldersNode.name;
 	foldersObject.metadata = nil;
 	foldersObject.parser = self;
@@ -241,7 +241,7 @@
 	[subNodes addObject:collectionsNode];
 	
 	IMBNodeObject* collectionsObject = [[[IMBNodeObject alloc] init] autorelease];
-	collectionsObject.location = (id)collectionsNode;
+	collectionsObject.representedNodeIdentifier = collectionsNode.identifier;
 	collectionsObject.name = collectionsNode.name;
 	collectionsObject.metadata = nil;
 	collectionsObject.parser = self;

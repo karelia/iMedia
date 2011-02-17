@@ -607,7 +607,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier
 {
 	if (inOldNode == nil && inNewNode == nil) return;
-
+	
 	// If we were given both old and new nodes, then the parentNode and identifiers must be the same. 
 	// If not log an error and throw an exception because this is a programmer error...
 	

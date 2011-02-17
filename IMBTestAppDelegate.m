@@ -55,6 +55,8 @@
 #import "IMBTestAppDelegate.h"
 #import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
+#import <iMedia/IMBiPhotoEventObjectViewController.h>
+#import "IMBTestiPhotoEventBrowserCell.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -398,6 +400,41 @@
 #if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
 #endif
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController
+{
+	if ([inController isKindOfClass:[IMBiPhotoEventObjectViewController class]])
+	{
+		return [IMBTestiPhotoEventBrowserCell class];
+	}
+	return nil;
+}
+
+
+- (CALayer*) imageBrowserBackgroundLayerForController:(IMBObjectViewController*)inController
+{
+	if ([inController isKindOfClass:[IMBiPhotoEventObjectViewController class]])
+	{
+		NSRect viewFrame = [[inController iconView] frame];
+		NSRect backgroundRect = NSMakeRect(0, 0, viewFrame.size.width, viewFrame.size.height);		
+		CALayer *backgroundLayer = [CALayer layer];
+		backgroundLayer.frame = *(CGRect*) &backgroundRect;
+		
+		CGFloat fillComponents[4] = {0.2, 0.2, 0.2, 1.0};
+		
+		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+		
+		CGColorRef color = CGColorCreate(colorSpace, fillComponents);
+		[backgroundLayer setBackgroundColor:color];
+		
+		return backgroundLayer;
+	}
+	return nil;
 }
 
 

@@ -91,7 +91,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 @class IMBObject;
 @class IMBKQueue;
 @class IMBFSEventsWatcher;
-
+@class IMBObjectViewController;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -188,6 +188,10 @@ extern NSString* kIMBNodesDidChangeNotification;
 // handling behavior (downloading the files to standard loaction and opening in default app)...
 
 - (BOOL) libraryController:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
+
+// Image browser customization support
+- (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController;
+- (CALayer*) imageBrowserBackgroundLayerForController:(IMBObjectViewController*)inController;
 
 @end
 

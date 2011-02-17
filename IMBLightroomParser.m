@@ -519,7 +519,7 @@ static NSArray* sSupportedUTIs = nil;
 			[subNodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-			object.location = (id)node;
+			object.representedNodeIdentifier = node.identifier;
 			object.name = name;
 			object.metadata = nil;
 			object.parser = self;
@@ -612,7 +612,7 @@ static NSArray* sSupportedUTIs = nil;
 				NSString* path = [self absolutePathFromAttributes:attributes];
 				
 				IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-				object.location = (id)node;
+				object.representedNodeIdentifier = node.identifier;
 				object.name = node.name;
 				object.metadata = nil;
 				object.parser = self;
@@ -713,7 +713,7 @@ static NSArray* sSupportedUTIs = nil;
 			[subNodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-			object.location = (id)node;
+			object.representedNodeIdentifier = node.identifier;
 			object.name = node.name;
 			object.metadata = nil;
 			object.parser = self;

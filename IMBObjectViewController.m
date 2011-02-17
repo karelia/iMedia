@@ -141,6 +141,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 @interface IMBObjectViewController ()
 
+- (CALayer*) iconViewBackgroundLayer;
 - (void) _configureIconView;
 - (void) _configureListView;
 - (void) _configureComboView;
@@ -239,6 +240,22 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[controller view];										// Load the view *before* setting the libraryController, 
 	controller.libraryController = inLibraryController;		// so that outlets are set before we load the preferences.
 	return controller;
+}
+
+
+// You may subclass this method to provide a custom image browser background layer.
+// Keep in mind though that a background layer provided by the library's delegate
+// will always overrule this one.
+
++ (CALayer*) iconViewBackgroundLayer
+{
+	return nil;
+}
+
+
++ (float) iconViewReloadDelay
+{
+	return 0.05;	// Delay in seconds
 }
 
 
@@ -434,7 +451,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	else if (inContext == (void*)kImageRepresentationKeyPath)
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadIconView) object:nil];
-		[self performSelector:@selector(_reloadIconView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[self performSelector:@selector(_reloadIconView) withObject:nil afterDelay:[[self class] iconViewReloadDelay] inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
 		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
@@ -560,6 +577,17 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #pragma mark User Interface
 
 
+// The cell class to be used in the image browser view
+// (if not provided by the library controller's delegate).
+// You may overwrite this method in subclasses to provide your own view specific cell class.
+// Cell class must be kind of IKImageBrowserCell class.
+
++ (Class) iconViewCellClass
+{
+	return nil;
+}
+
+
 // Subclasses can override these methods to configure or customize look & feel of the various object views...
 
 - (void) _configureIconView
@@ -578,6 +606,29 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //	{
 //		[ibIconView setIntercellSpacing:NSMakeSize(4.0,4.0)];
 //	}
+
+	if ([ibIconView respondsToSelector:@selector(setBackgroundLayer:)])
+	{
+		[ibIconView setBackgroundLayer:[self iconViewBackgroundLayer]];
+	}
+}
+
+
+// Give the library's delegate a chance to provide a custom background layer (>= 10.6 only)
+
+- (CALayer*) iconViewBackgroundLayer
+{
+	id delegate = self.delegate;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(imageBrowserBackgroundLayerForController:)])
+		{
+			return [delegate imageBrowserBackgroundLayerForController:self];
+		}
+	}
+	
+	return [[self class ] iconViewBackgroundLayer];
 }
 
 
@@ -795,7 +846,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	if ([ibIconView.window isVisible])
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
-		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:[[self class] iconViewReloadDelay] inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 		[self _updateTooltips];
 	}
 }
@@ -1544,9 +1595,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
-			IMBNode* subnode = (IMBNode*)object.location;
-			NSString* identifier = subnode.identifier;
-			subnode = [self.libraryController nodeWithIdentifier:identifier];
+			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
+			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
 
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];
@@ -1802,7 +1852,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		}
 	}
 	
-	return nil;
+	return [[self class ] iconViewCellClass];
 }
 
 
@@ -2106,9 +2156,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
-			IMBNode* subnode = (IMBNode*)object.location;
-			NSString* identifier = subnode.identifier;
-			subnode = [self.libraryController nodeWithIdentifier:identifier];
+			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
+			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
 			
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];

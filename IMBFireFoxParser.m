@@ -371,7 +371,7 @@
 				IMBObject *object = [[[IMBNodeObject alloc] init] autorelease];
 				object.name = theName;
 				object.parser = self;
-				object.location = (id)node;
+				((IMBNodeObject*)object).representedNodeIdentifier = node.identifier;
 				
 				object.index = index++;
 				object.imageLocation = nil;
