@@ -22,13 +22,13 @@
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
 	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
- 
+
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
 	terms stated here, including this list of conditions, the disclaimer noted
 	below, and the aforementioned copyright notice, or b) the aforementioned
 	copyright notice and a link to karelia.com/imedia.
- 
+
 	Neither the name of Karelia Software, nor Sandvox, nor the names of
 	contributors to iMedia Browser may be used to endorse or promote products
 	derived from the Software without prior and express written permission from
@@ -41,10 +41,10 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,8 +55,10 @@
 #import "IMBiPhotoParser.h"
 #import "IMBConfig.h"
 #import "IMBParserController.h"
+#import "IMBiPhotoEventObjectViewController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBiPhotoEventNodeObject.h"
 #import "IMBIconCache.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
@@ -81,6 +83,12 @@
 #define EVENTS_ID_SPACE @"EventId"
 #define ALBUMS_ID_SPACE @"AlbumId"
 
+#pragma mark CONSTANTS
+
+// node object types of interest for skimming
+
+NSString* kIMBiPhotoNodeObjectTypeEvent = @"events";
+NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark 
@@ -88,6 +96,7 @@
 @interface IMBiPhotoParser ()
 
 - (void) addEventsToAlbumsInLibrary:(NSMutableDictionary*)inDict;
+- (BOOL) isEventsNode:(IMBNode*)inNode;
 - (IMBNode*) eventsNodeInNode:(IMBNode*)inNode;
 - (NSString*) idSpaceForAlbumType:(NSString*)inAlbumType;
 - (NSString*) identifierForId:(NSNumber*)inId inSpace:(NSString*)inIdSpace;
@@ -97,8 +106,10 @@
 - (BOOL) shouldUseObject:(NSDictionary*)inObjectDict;
 - (NSImage*) iconForAlbumType:(NSString*)inAlbumType;
 - (BOOL) isLeafAlbumType:(NSString*)inAlbumType;
+- (NSString*) imagePathForImageKey:(NSString*)inImageKey;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
-- (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
+- (void) populateEventsNode:(IMBNode*)inNode withEvents:(NSArray*)inEvents images:(NSDictionary*)inImages;
+- (void) populateAlbumNode:(IMBNode*)inNode images:(NSDictionary*)inImages;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 @end
@@ -156,12 +167,12 @@
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
-
+	
 	if ([self isInstalled])
 	{
 		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
 		NSArray* libraries = (NSArray*)recentLibraries;
-			
+		
 		for (NSString* library in libraries)
 		{
 			NSURL* url = [NSURL URLWithString:library];
@@ -172,7 +183,7 @@
 			{
 				NSString *libraryPath = [path stringByDeletingLastPathComponent];	// folder containing .xml file
 				[IMBConfig registerLibraryPath:libraryPath];
-
+			
 				IMBiPhotoParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 				parser.mediaSource = path;
 				parser.shouldDisplayLibraryName = libraries.count > 1;
@@ -290,7 +301,7 @@
 		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
 		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,name];
 	}
-
+	
 	// Watch the XML file. Whenever something in iPhoto changes, we have to replace the WHOLE tree from  
 	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
 	
@@ -326,18 +337,22 @@
 {
 	NSError* error = nil;
 	NSDictionary* plist = self.plist;
-	NSArray* albums = [plist objectForKey:@"List of Albums"];
 	NSDictionary* images = [plist objectForKey:@"Master Image List"];
 	
-	[self addSubNodesToNode:inNode albums:albums images:images]; 
-	[self populateNode:inNode albums:albums images:images]; 
+	// Population of events node fundamentally different from album node
+	
+	if ([self isEventsNode:inNode]) {
+		NSArray* events = [plist objectForKey:@"List of Rolls"];
+		[self populateEventsNode:inNode withEvents:events images:images];
+	} else {
+		NSArray* albums = [plist objectForKey:@"List of Albums"];
+		[self addSubNodesToNode:inNode albums:albums images:images]; 
+		[self populateAlbumNode:inNode images:images]; 
+	}
 
 	// If we are populating the root nodes, then also populate the "Photos" node (second subnode) and mirror its
 	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,
 	// which is implemented here, to achieve the desired "feel" in the browser...
-	
-	// Also pre-populate events node so that objects can be shared between events node and photos node
-	// (This is assuming that the union of all event objects is just about all objects)
 	
 	NSArray* subNodes = inNode.subNodes;
 	
@@ -349,22 +364,12 @@
 		// depending on where it's located
 		// we find photos node at a different index
 		int photosNodeIndex = eventsNode &&
-							  eventsNode == [subNodes objectAtIndex:0] &&
-							  [subNodes count] > 1 ? 1 : 0;
-
+		eventsNode == [subNodes objectAtIndex:0] &&
+		[subNodes count] > 1 ? 1 : 0;
+		
 		IMBNode* photosNode = [subNodes objectAtIndex:photosNodeIndex];
 		[self populateNode:photosNode options:inOptions error:outError];
 		inNode.objects = photosNode.objects;
-		
-		// Pre-populate events node with the same objects that photos node has
-		
-		if (eventsNode != nil && eventsNode != photosNode)		// which should really be the case
-		{
-			eventsNode.objects = photosNode.objects;
-			
-			// events node is not considered populated if subnodes aren't instantiated yet
-			[self addSubNodesToNode:eventsNode albums:albums images:images];
-		}
 	}
 	
 	if (outError) *outError = error;
@@ -410,13 +415,13 @@
 - (id) loadThumbnailForObject:(IMBObject*)inObject
 {
 	id imageRepresentation = nil;
-
+	
 	// Get path of our object...
 	
 	NSString* type = inObject.imageRepresentationType;
 	NSString* path = (NSString*) inObject.imageLocation;
 	if (path == nil) path = (NSString*) inObject.location;
-
+	
 	// For images we provide an optimized loading code...
 	
 	NSURL* url = [NSURL fileURLWithPath:path];
@@ -426,29 +431,28 @@
 	{
 		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
 		{
-			if (url)
+			NSAssert(url, @"Nil image source URL");
+			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
+			
+			if (source)
 			{
-				CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
-
-				if (source)
+				CGImageRef image = CGImageSourceCreateImageAtIndex(source,0,NULL);
+				
+				if (image)
 				{
-					CGImageRef image = CGImageSourceCreateImageAtIndex(source,0,NULL);
+					imageRepresentation = (id) image;
+					[inObject 
+					 performSelectorOnMainThread:@selector(setImageRepresentation:) 
+					 withObject:(id)image
+					 waitUntilDone:NO 
+					 modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 					
-					if (image)
-					{
-						imageRepresentation = (id) image;
-						[inObject 
-							performSelectorOnMainThread:@selector(setImageRepresentation:) 
-							withObject:(id)image
-							waitUntilDone:NO 
-							modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-
-						CGImageRelease(image);
-					}
-					
-					CFRelease(source);
+					CGImageRelease(image);
 				}
+				
+				CFRelease(source);
 			}
+			
 		}
 	}
 	
@@ -491,7 +495,7 @@
 	
 	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
-
+	
 	if ([NSThread isMainThread])
 	{
 		inObject.metadata = metadata;
@@ -529,9 +533,61 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Custom view controller support
+
+- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode
+{
+	// Use custom view for events
+	
+    if ([self isEventsNode:inNode])
+	{
+		IMBiPhotoEventObjectViewController* controller;
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+								  kIMBiPhotoNodeObjectTypeEvent, @"nodeObjectType", nil];
+		controller = [[[IMBiPhotoEventObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];
+		//NSString* mediaType = kIMBMediaTypeSkimmable;
+		//controller = [[IMBPanelController sharedPanelController] objectViewControllerForMediaType:mediaType];
+		//controller = [IMBEventViewController sharedInstance];
+		return controller;
+	}
+	
+	return [super customObjectViewControllerForNode:inNode];
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark 
+#pragma mark Skimmable object view controller delegate
+
+- (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
+{
+	IMBNode* node = [self nodeWithIdentifier:inNodeObject.representedNodeIdentifier];
+	return [[node.attributes objectForKey:@"KeyList"] count];
+}
+
+
+- (NSString*) imagePathForChildOfNodeObject:(IMBNodeObject*)inNodeObject atIndex:(NSUInteger)inIndex userInfo:(NSDictionary*)inUserInfo
+{
+	IMBNode* node = [self nodeWithIdentifier:inNodeObject.representedNodeIdentifier];
+	NSString* imageKey = [[node.attributes objectForKey:@"KeyList"] objectAtIndex:inIndex];
+	
+	return [self imagePathForImageKey:imageKey];
+}
+
+
+- (NSString*) imagePathForKeyChildOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
+{
+	IMBNode* node = [self nodeWithIdentifier:inNodeObject.representedNodeIdentifier];
+	NSString* imageKey = [node.attributes objectForKey:@"KeyPhotoKey"];
+	
+	return [self imagePathForImageKey:imageKey];
+}
 
 #pragma mark 
 #pragma mark Helper Methods
@@ -623,6 +679,7 @@
 }
 
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 // iPhoto does not include events in the album list. To let events also be shown
@@ -664,34 +721,9 @@
 			// 2. Append all regular albums. Note that the photos album will now be at index 1 of the list
 			[newAlbumList addObjectsFromArray:oldAlbumList];
 			
-			// 3. Create and append events to album list and make each event behave like a proper album list citizen
-			
-			id rollId, rollName;
-			
-			for	(NSDictionary *eventDict in eventList)
-			{
-				rollId   = [eventDict objectForKey:@"RollID"];
-				rollName = [eventDict objectForKey:@"RollName"];
-				keyList  = [eventDict objectForKey:@"KeyList"];
-				
-				if (rollId != nil && rollName != nil && keyList != nil)
-				{
-					NSDictionary *albumDict = [[NSDictionary alloc] initWithObjectsAndKeys:
-											   rollId,		@"AlbumId",
-											   rollName,	@"AlbumName",
-											   @"Event",	@"Album Type",
-											   eventsId,	@"Parent",
-											   keyList,		@"KeyList", nil];
-					
-					[newAlbumList addObject:albumDict];
-					[albumDict release];
-				}
-			}
-			
 			// Finally, replace the old albums array.
 			[inDict setValue:newAlbumList forKey:@"List of Albums"];
 		}
-		
 		[newAlbumList release];
 		[pool drain];
 	}
@@ -700,23 +732,33 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// Returns whether inNode is the events node
+
+- (BOOL) isEventsNode:(IMBNode*)inNode
+{	
+	NSNumber* eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
+	NSString* eventsIdentifier = [self identifierForId:eventsId inSpace:EVENTS_ID_SPACE];
+	
+	return [inNode.identifier isEqualToString:eventsIdentifier];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 // Returns the events node that should be subnode of our root node.
 // Returns nil if there is none.
 
-- (IMBNode*) eventsNodeInNode:(IMBNode*) inNode {
-	
-	IMBNode* eventsNode= nil;
+- (IMBNode*) eventsNodeInNode:(IMBNode*) inNode
+{	
+	IMBNode* eventsNode = nil;
 	
 	if (inNode.isTopLevelNode && [inNode.subNodes count]>0) {
-		
-		NSNumber* eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
-		NSString* eventsIdWithAlbumId = [self identifierForId:eventsId inSpace:EVENTS_ID_SPACE];
 		
 		// We should find the events node at index 0 but this logic is more bullet proof.
 		
 		for (IMBNode* node in inNode.subNodes) {
 			
-			if ([node.identifier isEqualToString:eventsIdWithAlbumId]) {
+			if ([self isEventsNode:node]) {
 				eventsNode = node;
 				break;
 			}
@@ -848,14 +890,14 @@
 		{@"Special Roll",			@"sl-icon_lastImport.tiff",				@"folder",	nil,				nil},
 		{@"Subscribed",				@"sl-icon-small_subscribedAlbum.tiff",	@"folder",	nil,				nil},
 	};
-
+	
 	static const IMBIconTypeMapping kIconTypeMapping =
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
 		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil}	// fallback image
 	};
-
+	
 	NSString* type = inAlbumType;
 	if (type == nil) type = @"Photos";
 	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
@@ -880,7 +922,7 @@
 	// because without creating an array we would cause an endless loop...
 	
 	NSMutableArray* subNodes = [NSMutableArray array];
-
+	
 	// Now parse the iPhoto XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
 	
@@ -913,7 +955,7 @@
 			// so we don't have to loop through the whole album list again to find it.
 			
 			albumNode.attributes = albumDict;
-
+			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
 			// for backwards compatibility...
@@ -921,8 +963,9 @@
 			NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
 			if (albumId == nil) albumId = [NSNumber numberWithInt:_fakeAlbumID++]; 
 			albumNode.identifier = [self identifierForId:albumId inSpace:albumIdSpace];
-
+			
 			// Add the new album node to its parent (inRootNode)...
+			
 			
 			[subNodes addObject:albumNode];
 		}
@@ -953,18 +996,127 @@
 }
 
 
+- (NSString*) imagePathForImageKey:(NSString*)inImageKey
+{
+	NSDictionary* images = [[self plist] objectForKey:@"Master Image List"];
+	NSDictionary* imageDict = [images objectForKey:inImageKey];
+	NSString* imagePath = [self imageLocationForObject:imageDict];
+	
+	return imagePath; 
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) populateNode:(IMBNode*)inNode 
-		 albums:(NSArray*)inAlbums 
-		 images:(NSDictionary*)inImages
+// Create a subnode for each event and a corresponding visual object
+
+- (void) populateEventsNode:(IMBNode*)inNode 
+				 withEvents:(NSArray*)inEvents
+					 images:(NSDictionary*)inImages
+{
+	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
+	// because without creating an array we would cause an endless loop...
+	
+	NSMutableArray* subNodes = [NSMutableArray array];
+	
+	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
+	// without creating an array we would cause an endless loop...
+	
+	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
+	
+	NSUInteger index = 0;
+	
+	// We saved a reference to the album dictionary when this node was created
+	// (ivar 'attributes') and now happily reuse it to save an outer loop (over album list) here.
+	
+	NSString* subNodeType = @"Event";
+	
+	// Events node is populated by key images that represent the whole event
+	
+	NSString* eventKeyPhotoKey = nil;
+	NSString* path = nil;
+	IMBNodeObject* object = nil;
+	
+	for (NSDictionary* subNodeDict in inEvents)
+	{
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+		NSString* subNodeName = [subNodeDict objectForKey:@"RollName"];
+		
+		if ([self shouldUseAlbumType:subNodeType] && 
+			[self shouldUseAlbum:subNodeDict images:inImages])
+		{
+			// Create subnode for this node...
+			
+			IMBNode* subNode = [[[IMBNode alloc] init] autorelease];
+			
+			subNode.leaf = [self isLeafAlbumType:subNodeType];
+			subNode.icon = [self iconForAlbumType:subNodeType];
+			subNode.name = subNodeName;
+			subNode.mediaSource = self.mediaSource;
+			subNode.parser = self;
+			
+			// Keep a ref to the subnode dictionary for later use when we populate this node
+			// so we don't have to loop through the whole album list again to find it.
+			
+			subNode.attributes = subNodeDict;
+			
+			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
+			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
+			// for backwards compatibility...
+			
+			NSNumber* subNodeId = [subNodeDict objectForKey:@"RollID"];
+			if (subNodeId == nil) subNodeId = [NSNumber numberWithInt:_fakeAlbumID++]; 
+			subNode.identifier = [self identifierForId:subNodeId inSpace:EVENTS_ID_SPACE];
+			
+			// Add the new subnode to its parent (inRootNode)...
+
+			[subNodes addObject:subNode];
+			
+			// Now create the visual object and link it to subnode just created
+
+			eventKeyPhotoKey = [subNodeDict objectForKey:@"KeyPhotoKey"];
+			NSDictionary* keyPhotoDict = [inImages objectForKey:eventKeyPhotoKey];
+			
+			path = [keyPhotoDict objectForKey:@"ImagePath"];
+			
+			object = [[IMBiPhotoEventNodeObject alloc] init];
+			[objects addObject:object];
+			[object release];
+			
+			object.representedNodeIdentifier = subNode.identifier;
+			object.location = (id)path;
+			object.name = subNode.name;
+			object.preliminaryMetadata = keyPhotoDict;	// This metadata from the XML file is available immediately
+			object.metadata = nil;					// Build lazily when needed (takes longer)
+			object.metadataDescription = nil;		// Build lazily when needed (takes longer)
+			object.parser = self;
+			object.index = index++;
+			
+			object.imageLocation = [self imageLocationForObject:keyPhotoDict];
+			object.imageRepresentationType = [self requestedImageRepresentationType];
+			object.imageRepresentation = nil;
+		}
+		[pool drain];
+	}	
+	inNode.subNodes = subNodes;
+	inNode.objects = objects;
+	[objects release];
+	
+	NSLog(@"Populated Events node");
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+- (void) populateAlbumNode:(IMBNode*)inNode images:(NSDictionary*)inImages
 {
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
 	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
-
+	
 	// Populate the node with IMBVisualObjects for each image in the album
 	
 	NSUInteger index = 0;
@@ -1009,7 +1161,7 @@
 		
 		[pool drain];
 	}
-    
+	
     inNode.objects = objects;
     [objects release];
 }

@@ -149,6 +149,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 }
 
++ (NSBundle*) bundle;
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
 
 // Library...
@@ -184,8 +185,10 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 // User Interface...
  
++ (Class) iconViewCellClass;
 - (NSImage*) icon;
 - (NSString*) displayName;
++ (CALayer*) iconViewBackgroundLayer;
 
 @property (retain) NSString* objectCountFormatSingular;
 @property (retain) NSString* objectCountFormatPlural;

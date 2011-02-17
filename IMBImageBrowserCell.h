@@ -83,7 +83,7 @@
 @property BOOL imbShouldDisableTitle;
 
 - (void) setTitleColors;
-
+- (CGFloat) pointSize;
 @end
 
 

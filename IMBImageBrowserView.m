@@ -84,6 +84,7 @@ enum IMBMouseOperation
 
 @interface IKImageBrowserView ()
 - (NSImage*) draggedImage;
+- (void) syncTrackingAreaWithViewBounds;
 @end
 
 
@@ -207,6 +208,7 @@ enum IMBMouseOperation
 	}
 
 	[self setConstrainsToOriginalSize:NO];
+	
 //	[self setValue:attributes forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];	
 //	[self setCellSize:NSMakeSize(44.0,22.0)];
 //	[self setIntercellSpacing:NSMakeSize(8.0,12.0)];
@@ -220,7 +222,7 @@ enum IMBMouseOperation
 
 // This method is for 10.6 only. Create and return a cell. Please note that we must not autorelease here!
 
-- (IKImageBrowserCell*) newCellForRepresentedItem:(id)inCell
+- (IKImageBrowserCell*) newCellForRepresentedItem:(id)inItem
 {
 	return [[_cellClass alloc] init];
 }
@@ -390,6 +392,79 @@ enum IMBMouseOperation
 	self.clickedObject = nil;
 }
 
+
+#pragma mark
+#pragma mark Skimming 
+
+// Add tracking area of size of my own bounds (make this view skimmable)
+
+- (void) addTrackingArea
+{
+	NSTrackingAreaOptions trackingOptions = NSTrackingMouseEnteredAndExited |
+	NSTrackingMouseMoved |
+	NSTrackingActiveInActiveApp;
+	
+	NSTrackingArea* trackingArea = [[[NSTrackingArea alloc] initWithRect:[self bounds]
+																 options: trackingOptions
+																   owner:[self delegate]
+																userInfo:nil] autorelease];
+	_trackingArea = trackingArea;
+	[self addTrackingArea:trackingArea];
+	NSLog(@"Created new tracking area for %@", self);	
+}
+
+// 
+
+- (void) enableSkimming
+{
+	// Skimming was enabled before?
+	if (_trackingArea) {
+		[self removeTrackingArea: _trackingArea];
+	}
+	[self addTrackingArea];
+}
+
+// Keep mouse move tracking area in sync with view bounds
+
+- (void) syncTrackingAreaWithViewBounds
+{	
+	if (_trackingArea && !NSEqualRects([_trackingArea rect], [self bounds]))
+	{
+		[self removeTrackingArea: _trackingArea];
+		[self addTrackingArea];
+	}	
+}
+
+// Callback from Cocoa whenever view bounds change
+// (will be called regardless whether this instance has any tracking areas or not)
+
+- (void) updateTrackingAreas
+{
+	//NSLog(@"Tracking areas might need to be recreated for %@", self);
+	
+	[self syncTrackingAreaWithViewBounds];
+}
+
+
+- (NSUInteger) indexOfCellAtPoint:(NSPoint)inPoint
+{	
+	NSIndexSet* visibleItemIndexes = [self visibleItemIndexes];	// >= 10.6
+	IKImageBrowserCell* cell = nil;
+	
+	NSUInteger index = [visibleItemIndexes firstIndex];
+
+	while (index != NSNotFound)
+	{
+		cell = [self cellForItemAtIndex:index];	// >= 10.6
+		
+		if (NSPointInRect(inPoint, cell.imageContainerFrame))
+		{
+			return index;
+		}
+		index = [visibleItemIndexes indexGreaterThanIndex:index];
+	}
+	return NSNotFound;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -303,7 +303,7 @@
 				[subnode release];
 
 				IMBNodeObject* object = [[IMBNodeObject alloc] init];
-				object.location = (id)subnode;
+				object.representedNodeIdentifier = subnode.identifier;
 				object.name = name;
 				object.metadata = nil;
 				object.parser = self;
@@ -411,7 +411,7 @@
 			@"Reveal in Finder",
 			@"Menu item in context menu of IMBObjectViewController");
 		
-		IMBNode* node = (IMBNode*) [inObject location];
+		IMBNode* node = [self nodeWithIdentifier:((IMBNodeObject*)inObject).representedNodeIdentifier];
 		NSString* path = (NSString*) [node mediaSource];
 		
 		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];

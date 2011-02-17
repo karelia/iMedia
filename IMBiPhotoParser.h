@@ -53,6 +53,8 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
+#import "IMBNodeObject.h"
+#import "IMBSkimmableObjectViewController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,7 +62,7 @@
 
 #pragma mark 
 
-@interface IMBiPhotoParser : IMBParser
+@interface IMBiPhotoParser : IMBParser <IMBSkimmableObjectViewControllerDelegate>
 {
 	NSString* _appPath;
 	NSDictionary* _plist;
@@ -78,6 +80,9 @@
 
 - (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs;		// public utility method to help extract keywords from numbers
 
+- (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo;
+- (NSString*) imagePathForChildOfNodeObject:(IMBNodeObject*)inNodeObject atIndex:(NSUInteger)inIndex userInfo:(NSDictionary*)inUserInfo;
+- (NSString*) imagePathForKeyChildOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo;
 @end
 
 

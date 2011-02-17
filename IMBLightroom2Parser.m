@@ -164,7 +164,7 @@
 	[subNodes addObject:foldersNode];
 	
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
-	foldersObject.location = (id)foldersNode;
+	foldersObject.representedNodeIdentifier = foldersNode.identifier;
 	foldersObject.name = foldersNode.name;
 	foldersObject.metadata = nil;
 	foldersObject.parser = self;

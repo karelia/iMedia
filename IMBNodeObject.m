@@ -65,6 +65,8 @@
 
 @implementation IMBNodeObject
 
+@synthesize representedNodeIdentifier = _representedNodeIdentifier;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -108,7 +110,12 @@
 
 - (NSString*) imageUID
 {
-	return [(IMBNode*)_location identifier];
+	NSString* imageUID = [super imageUID];
+	
+	if (imageUID) {
+		return imageUID;
+	}
+	return [self representedNodeIdentifier];
 }
 
 
@@ -120,7 +127,43 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		self.representedNodeIdentifier = [inCoder decodeObjectForKey:@"representedNodeIdentifier"];
+	}
+	
+	return self;
+}
 
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeObject:self.representedNodeIdentifier forKey:@"representedNodeIdentifier"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBNodeObject* copy = [super copyWithZone:inZone];
+	
+	copy.representedNodeIdentifier = self.representedNodeIdentifier;
+	
+	return copy;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_representedNodeIdentifier);
+	
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 @end

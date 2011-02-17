@@ -73,11 +73,17 @@
 	NSInteger _mouseOperation;
 	NSInteger _clickedObjectIndex;
 	IMBObject* _clickedObject;
+	
+	// Skimming 
+	NSTrackingArea* _trackingArea;	// Area where we track mouse move events
 }
 
 @property (assign) NSInteger mouseOperation;
 @property (assign) NSInteger clickedObjectIndex;
 @property (retain) IMBObject* clickedObject;
+
+- (void) enableSkimming;
+- (NSUInteger) indexOfCellAtPoint:(NSPoint)inPoint;
 
 @end
 

@@ -137,6 +137,16 @@
 
 #pragma mark 
 
+// Convenience method
+
+- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier
+{
+	IMBLibraryController* libraryController =
+	[IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
+	
+	return [libraryController nodeWithIdentifier:inIdentifier];
+}
+
 
 // The following two methods must be overridden by subclasses...
 
