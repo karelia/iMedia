@@ -80,6 +80,7 @@
 #import "IMBFlickrObject.h"
 #import "IMBFlickrNode.h"
 #import "NSFileManager+iMedia.h"
+#import "IMBButtonObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
