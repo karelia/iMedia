@@ -51,4 +51,14 @@
 
 - (NSComparisonResult) imb_metadataSizeCompare:(NSDictionary*)inDictionary;
 
++ (NSString*)imb_metadataDescriptionForMovieMetadata:(NSDictionary*)inMetadata;
++ (NSString*)imb_metadataDescriptionForAudioMetadata:(NSDictionary*)inMetadata;
+
+@end
+
+
+@interface NSMutableDictionary (iMedia)
+
+- (void) imb_safeSetObject:(id)inObject forKey:(id)inKey;
+
 @end

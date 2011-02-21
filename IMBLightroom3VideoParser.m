@@ -55,6 +55,19 @@
 #import "IMBLightroom3VideoParser.h"
 #import "IMBParserController.h"
 #import "IMBObject.h"
+#import "NSDictionary+iMedia.h"
+#import "NSURL+iMedia.h"
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBLightroom3VideoParser ()
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,5 +112,47 @@
 	
 	return query;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
+// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
+// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
+// Please note that this method may be called on a background thread...
+
+- (void) loadMetadataForObject:(IMBObject*)inObject
+{
+	NSURL* videoURL = [inObject URL];
+	
+	if (videoURL == nil) {
+		return;
+	}
+	
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	
+	[metadata setObject:[inObject path] forKey:@"path"];
+	[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
+	
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+	
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
+}
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
+}
+
 
 @end

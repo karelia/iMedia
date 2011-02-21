@@ -54,4 +54,7 @@
 - (CGImageRef) imb_quicklookCGImage;
 - (NSImage*) imb_quicklookNSImage;
 
++ (NSDictionary *)imb_metadataFromVideoAtURL:(NSURL*)inURL;
++ (NSDictionary *)imb_metadataFromAudioAtURL:(NSURL*)inURL;
+
 @end

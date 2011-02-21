@@ -89,9 +89,7 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This subclass adds the addition apertureMetadata property, which stores the metadata coming from the database. 
-// it will later be augmented (lazily) by metadata read from the file itself (which is a fairly slow process).
-// That is why that step is only done lazily...
+// This subclass adds the addition absolutePyramidPath property, which stores the path to the pyramid containing image previews. 
 
 
 @implementation IMBLightroomObject
