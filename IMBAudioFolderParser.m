@@ -57,6 +57,7 @@
 #import "IMBTimecodeTransformer.h"
 #import "IMBCommon.h"
 #import "NSString+iMedia.h"
+#import "NSURL+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "IMBNode.h"
 
@@ -102,56 +103,7 @@
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inPath); 
-	
-	if (item)
-	{
-		[metadata setObject:inPath forKey:@"path"];
-		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
-		CFArrayRef authors = MDItemCopyAttribute(item,kMDItemAuthors);
-		CFStringRef album = MDItemCopyAttribute(item,kMDItemAlbum);
-		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
-
-		if (seconds)
-		{
-			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
-			CFRelease(seconds);
-		}
-		else
-		{
-			NSSound* sound = [[NSSound alloc] initWithContentsOfFile:inPath byReference:YES];
-			[metadata setObject:[NSNumber numberWithDouble:sound.duration] forKey:@"duration"]; 
-			[sound release];
-		}
-
-		if (authors)
-		{
-			NSArray* artists = (NSArray*)authors;
-			if (artists.count > 0) [metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
-			CFRelease(authors);
-		}
-		
-		if (album)
-		{
-			[metadata setObject:(NSString*)album forKey:@"album"]; 
-			CFRelease(album);
-		}
-
-		if (comment)
-		{
-			[metadata setObject:(NSString*)comment forKey:@"comment"]; 
-			CFRelease(comment);
-		}
-		
-		CFRelease(item);
-	}
-	else
-	{
-//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
-	}
-	
-	return metadata;
+	return [NSURL imb_metadataFromAudioAtURL:[NSURL fileURLWithPath:inPath]];
 }
 
 

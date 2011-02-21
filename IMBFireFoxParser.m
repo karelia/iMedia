@@ -337,6 +337,8 @@
 		}
 	}
 	
+	NSUInteger index = 0;
+
 	while ([rs next])
 	{		
 //		NSLog(@"%@>%@ '%@' %@", 
@@ -347,7 +349,6 @@
 
 		int theID = [rs intForColumn:@"id"];
 		NSString *theName = [rs stringForColumn:@"title"];
-		NSUInteger index = 0;
 		if (theName && ![theName isEqualToString:@""])	// make sure we have a title; otherwise bogus
 		{
 			IMBNode* node = [[[IMBNode alloc] init] autorelease];
