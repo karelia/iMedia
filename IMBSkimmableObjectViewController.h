@@ -92,6 +92,6 @@
 
 @property(retain, readwrite) id <IMBSkimmableObjectViewControllerDelegate> skimmingDelegate;
 
-- (id) initWithDelegate:(<IMBSkimmableObjectViewControllerDelegate>)inDelegate userInfo:(NSDictionary*)inUserInfo;
+- (id) initWithDelegate:(id <IMBSkimmableObjectViewControllerDelegate>)inDelegate userInfo:(NSDictionary*)inUserInfo;
 
 @end
