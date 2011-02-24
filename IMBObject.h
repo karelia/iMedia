@@ -119,7 +119,7 @@
 // Derived Properties. See IKImageBrowserItem for documentation...
 
 @property (retain) id imageLocation;						// Optional url or path if different from location (e.g. lores thumbnail)
-@property (readonly) NSString* imageUID;
+@property (nonatomic, readonly) NSString* imageUID;
 @property (retain) id imageRepresentation;	
 @property (readonly) BOOL isSelectable;
 @property (readonly) BOOL isDraggable;
