@@ -56,6 +56,7 @@
 #import "IMBConfig.h"
 #import "IMBParserController.h"
 #import "IMBiPhotoEventObjectViewController.h"
+#import "IMBImageViewController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBiPhotoEventNodeObject.h"
@@ -156,6 +157,21 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 + (BOOL) isInstalled
 {
 	return [self iPhotoPath] != nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) objectCountFormatSingular
+{
+	return [IMBImageViewController objectCountFormatSingular];
+}
+
+
++ (NSString*) objectCountFormatPlural
+{
+	return [IMBImageViewController objectCountFormatPlural];
 }
 
 
@@ -493,9 +509,15 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		[metadata setObject:realKeywords forKey:@"iMediaKeywords"];
 	}
 	
-	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
+	// Do not load (key) image specific metadata for node objects
+	// because it doesn't represent the nature of the object well enough.
 	
+	if (![inObject isKindOfClass:[IMBNodeObject class]])
+	{
+		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
+	}
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+
 	if ([NSThread isMainThread])
 	{
 		inObject.metadata = metadata;
@@ -510,8 +532,50 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 }
 
 
+// Events have other metadata than images or movies
+
+- (NSString*) eventMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSMutableString* metaDesc = [NSMutableString string];
+	
+	NSNumber* count = [inMetadata objectForKey:@"PhotoCount"];
+	if (count)
+	{
+		NSString* formatString = [count intValue] > 1 ?
+		[[self class] objectCountFormatPlural] :
+		[[self class] objectCountFormatSingular];
+		
+		[metaDesc appendFormat:formatString, [count intValue]];
+	}
+	
+	NSNumber* dateAsTimerInterval = [inMetadata objectForKey:@"RollDateAsTimerInterval"];
+	if (dateAsTimerInterval)
+	{
+		[metaDesc imb_appendNewline];
+		NSDate* eventDate = [NSDate dateWithTimeIntervalSinceReferenceDate:[dateAsTimerInterval doubleValue]];
+		
+		NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+		[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+		[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
+		
+		[metaDesc appendFormat:@"%@", [formatter stringFromDate:eventDate]];
+		
+		[formatter release];
+	}
+	return metaDesc;
+}
+
+
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
+	// Events have other metadata than images
+	
+	if ([inMetadata objectForKey:@"RollID"])		// Event
+	{
+		return [self eventMetadataDescriptionForMetadata:inMetadata];
+	}
+	
+	// Image
 	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
@@ -545,14 +609,10 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	
     if ([self isEventsNode:inNode])
 	{
-		IMBiPhotoEventObjectViewController* controller;
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 								  kIMBiPhotoNodeObjectTypeEvent, @"nodeObjectType", nil];
-		controller = [[[IMBiPhotoEventObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];
-		//NSString* mediaType = kIMBMediaTypeSkimmable;
-		//controller = [[IMBPanelController sharedPanelController] objectViewControllerForMediaType:mediaType];
-		//controller = [IMBEventViewController sharedInstance];
-		return controller;
+
+		return [[[IMBiPhotoEventObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];;
 	}
 	
 	return [super customObjectViewControllerForNode:inNode];
@@ -567,15 +627,13 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
 {
-	IMBNode* node = [self nodeWithIdentifier:inNodeObject.representedNodeIdentifier];
-	return [[node.attributes objectForKey:@"KeyList"] count];
+	return [[inNodeObject.preliminaryMetadata objectForKey:@"PhotoCount"] integerValue];
 }
 
 
 - (NSString*) imagePathForChildOfNodeObject:(IMBNodeObject*)inNodeObject atIndex:(NSUInteger)inIndex userInfo:(NSDictionary*)inUserInfo
 {
-	IMBNode* node = [self nodeWithIdentifier:inNodeObject.representedNodeIdentifier];
-	NSString* imageKey = [[node.attributes objectForKey:@"KeyList"] objectAtIndex:inIndex];
+	NSString* imageKey = [[inNodeObject.preliminaryMetadata objectForKey:@"KeyList"] objectAtIndex:inIndex];
 	
 	return [self imagePathForImageKey:imageKey];
 }
@@ -583,11 +641,11 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSString*) imagePathForKeyChildOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
 {
-	IMBNode* node = [self nodeWithIdentifier:inNodeObject.representedNodeIdentifier];
-	NSString* imageKey = [node.attributes objectForKey:@"KeyPhotoKey"];
+	NSString* imageKey = [inNodeObject.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
 	
 	return [self imagePathForImageKey:imageKey];
 }
+
 
 #pragma mark 
 #pragma mark Helper Methods
@@ -1006,6 +1064,49 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
+
+
+- (NSDictionary*) childrenInfoForEventNodeObject:(IMBiPhotoEventNodeObject*)inNodeObject
+											node:(IMBNode*)inNode
+										  images:(NSDictionary*)inImages
+{
+	NSMutableArray* relevantImageKeys = [[[NSMutableArray alloc] init] autorelease];
+	
+	// We saved a reference to the album dictionary when this node was created
+	// (ivar 'attributes') and now happily reuse it to save an outer loop (over album list) here.
+	
+	NSDictionary* albumDict = inNode.attributes;	
+	NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
+	
+	for (NSString* key in imageKeys)
+	{
+		NSDictionary* imageDict = [inImages objectForKey:key];
+		
+		if ([self shouldUseObject:imageDict])
+		{
+			[relevantImageKeys addObject:key];
+		}		
+	}
+	
+	// Key image for movies must be movie related:
+	
+	NSString* keyPhotoKey;
+	if ([[self iPhotoMediaType] isEqualToString:@"Movie"] && [relevantImageKeys count] > 0)
+	{
+		keyPhotoKey = [relevantImageKeys objectAtIndex:0];
+	} else {
+		keyPhotoKey = [albumDict objectForKey:@"KeyPhotoKey"];
+	}
+
+	
+    return [NSDictionary dictionaryWithObjectsAndKeys:
+			relevantImageKeys, @"KeyList",
+			[NSNumber numberWithUnsignedInteger:[relevantImageKeys count]], @"PhotoCount", 
+			keyPhotoKey, @"KeyPhotoKey", nil];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -1032,11 +1133,11 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	
 	NSString* subNodeType = @"Event";
 	
-	// Events node is populated by key images that represent the whole event
+	// Events node is populated with node objects that represent events
 	
 	NSString* eventKeyPhotoKey = nil;
 	NSString* path = nil;
-	IMBNodeObject* object = nil;
+	IMBiPhotoEventNodeObject* object = nil;
 	
 	for (NSDictionary* subNodeDict in inEvents)
 	{
@@ -1076,21 +1177,30 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			
 			// Now create the visual object and link it to subnode just created
 
-			eventKeyPhotoKey = [subNodeDict objectForKey:@"KeyPhotoKey"];
-			NSDictionary* keyPhotoDict = [inImages objectForKey:eventKeyPhotoKey];
-			
-			path = [keyPhotoDict objectForKey:@"ImagePath"];
-			
 			object = [[IMBiPhotoEventNodeObject alloc] init];
 			[objects addObject:object];
 			[object release];
 			
+			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary
+			// because movies and images are not jointly displayed in iMedia browser
+			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:subNodeDict];
+			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForEventNodeObject:object
+																						  node:subNode
+																						images:inImages]];
+
+			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
+			object.metadata = nil;								// Build lazily when needed (takes longer)
+			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
+			
+			// Obtain key photo dictionary (key photo is displayed while not skimming)
+			eventKeyPhotoKey = [object.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
+			NSDictionary* keyPhotoDict = [inImages objectForKey:eventKeyPhotoKey];
+			
+			path = [keyPhotoDict objectForKey:@"ImagePath"];
+			
 			object.representedNodeIdentifier = subNode.identifier;
 			object.location = (id)path;
 			object.name = subNode.name;
-			object.preliminaryMetadata = keyPhotoDict;	// This metadata from the XML file is available immediately
-			object.metadata = nil;					// Build lazily when needed (takes longer)
-			object.metadataDescription = nil;		// Build lazily when needed (takes longer)
 			object.parser = self;
 			object.index = index++;
 			
@@ -1103,12 +1213,11 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	inNode.subNodes = subNodes;
 	inNode.objects = objects;
 	[objects release];
-	
-	NSLog(@"Populated Events node");
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
 
 - (void) populateAlbumNode:(IMBNode*)inNode images:(NSDictionary*)inImages
 {

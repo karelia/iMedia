@@ -64,8 +64,27 @@
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSURL+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "IMBSmartFolderNodeObject.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
+
+NSString* kIMBQuickLookImageProperty = @"quickLookImage";
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBObject ()
+- (CGImageRef) _renderQuickLookImage;
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,6 +110,7 @@
 @synthesize isLoadingThumbnail = _isLoadingThumbnail;
 
 @synthesize metadataDescription = _metadataDescription;
+
 /*
  DISCUSSION: METADATA DESCRIPTION
  
@@ -128,6 +148,8 @@
 		self.shouldDrawAdornments = YES;
 		self.needsImageRepresentation = YES;
 		self.shouldDisableTitle = NO;
+		_quickLookImage = NULL;
+		_isLoadingQuickLookImage = NO;
 	}
 	
 	return self;
@@ -201,6 +223,8 @@
 	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
+
+	if (_quickLookImage) CGImageRelease(_quickLookImage);
 
 	[super dealloc];
 }
@@ -314,6 +338,116 @@
 
 
 #pragma mark 
+#pragma mark Generic image support through Quick Look 
+
+
+// Setter retains the CGImage...
+
+- (void) setQuickLookImage:(CGImageRef)inImage
+{
+	[self willChangeValueForKey:kIMBQuickLookImageProperty];
+	
+	CGImageRef old = _quickLookImage;
+	_quickLookImage = CGImageRetain(inImage);
+	CGImageRelease(old);
+	
+	[self didChangeValueForKey:kIMBQuickLookImageProperty];
+}
+
+
+// The getter loads Quick Look image lazily (if it's not available). Since Quicklook doesn't like
+// being called on the main thread, we'll defer this to a background operation.
+// Please note that the unloadThumbnail method gets rid of the Quick Look image again
+// as the IMBObjectFifoCache clears out the oldest items...
+
+- (CGImageRef) quickLookImage
+{	
+	if (_quickLookImage == NULL)
+	{
+		if (_isLoadingQuickLookImage == NO)
+		{
+			_isLoadingQuickLookImage = YES;
+			
+			if ([NSThread isMainThread])
+			{
+				NSInvocationOperation* op = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(renderQuickLookImage) object:nil];
+				[[IMBOperationQueue sharedQueue] addOperation:op];
+				[op release];
+			}
+			else
+			{
+				self.quickLookImage = [self _renderQuickLookImage];
+			}
+		}	
+	}
+	
+	return _quickLookImage;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Render the image on a background thread and set the result back on the main thread...
+
+- (void) renderQuickLookImage
+{
+	CGImageRef image = [self _renderQuickLookImage];
+	[self performSelectorOnMainThread:@selector(_setQuickLookImage:) withObject:(id)image waitUntilDone:NO];
+}
+
+
+// Use Quick Look to render an image. Please note that Quicklook wants to be called on a background thread.
+// If Quicklook fail to generate an image (either not supported or corrupt file), then we will simply try to get
+// an icon image from the Finder as a fallback...
+
+- (CGImageRef) _renderQuickLookImage
+{	
+	NSString* path = nil;
+	NSURL* url = nil;
+	
+	if ([_location isKindOfClass:[NSString class]])
+	{
+		path = (NSString*)_location;
+		url = [NSURL fileURLWithPath:path];
+	}
+	else if ([_location isKindOfClass:[NSURL class]])
+	{
+		url = (NSURL*)_location;
+		path = [url path];
+	}
+	
+	CGImageRef image = [url imb_quicklookCGImage];
+	
+	if (image == NULL)
+	{
+		NSLog(@"%s Failed to create Quick Look image for file %@. Using generic file icon instead...",__FUNCTION__,self.name);
+		
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:[path pathExtension]];
+		[icon setSize:NSMakeSize(kIMBMaxThumbnailSize,kIMBMaxThumbnailSize)];
+		NSBitmapImageRep* rep = [icon imb_bitmap];
+		image = [rep CGImage];
+		
+		_shouldDrawAdornments = NO;
+	}
+	
+	return image;
+}
+
+
+// The setter is called on the main thread, so that KVO works correctly...
+
+- (void) _setQuickLookImage:(id)inImage
+{
+	self.quickLookImage = (CGImageRef)inImage;
+	_isLoadingQuickLookImage = NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 #pragma mark Asynchronous Loading
 
 
@@ -353,7 +487,7 @@
 	id old = _imageRepresentation;
 	_imageRepresentation = [inImageRepresentation retain];
 	[old release];
-	
+
 	self.imageVersion = _imageVersion + 1;
 	self.isLoadingThumbnail = NO;
 	
@@ -392,6 +526,7 @@
 	if ([sTypesThatCanBeUnloaded containsObject:self.imageRepresentationType])
 	{
 		self.imageRepresentation = nil;
+		self.quickLookImage = NULL;
 		unloaded = YES;
 	}
 	return unloaded;

@@ -190,6 +190,9 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 - (NSString*) displayName;
 + (CALayer*) iconViewBackgroundLayer;
 
++ (NSString*) objectCountFormatSingular;
++ (NSString*) objectCountFormatPlural;
+
 @property (retain) NSString* objectCountFormatSingular;
 @property (retain) NSString* objectCountFormatPlural;
 @property (readonly) NSString* objectCountString;
@@ -229,9 +232,13 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 @optional
 
-// If the delegate implements this method, then it can reequest a custom cell for the IKImageBrowserView...
+// If the delegate implements this method, then it can request a custom cell for the IKImageBrowserView...
 
 - (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController;
+
+// If the delegate implements this method, then it can its own backround layer for the IKImageBrowserView...
+
+- (CALayer*) imageBrowserBackgroundLayerForController:(IMBObjectViewController*)inController;
 
 // With this method the delegate can return a custom drag image for a drags starting from the IKImageBrowserView...
 

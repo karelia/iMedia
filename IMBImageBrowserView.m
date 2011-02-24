@@ -398,7 +398,7 @@ enum IMBMouseOperation
 
 // Add tracking area of size of my own bounds (make this view skimmable)
 
-- (void) addTrackingArea
+- (void) updateTrackingArea
 {
 	NSTrackingAreaOptions trackingOptions = NSTrackingMouseEnteredAndExited |
 	NSTrackingMouseMoved |
@@ -408,41 +408,37 @@ enum IMBMouseOperation
 																 options: trackingOptions
 																   owner:[self delegate]
 																userInfo:nil] autorelease];
-	_trackingArea = trackingArea;
-	[self addTrackingArea:trackingArea];
-	NSLog(@"Created new tracking area for %@", self);	
+	if (trackingArea)
+	{
+		if (_trackingArea)
+		{
+			[self removeTrackingArea:_trackingArea];
+		}
+		_trackingArea = trackingArea;
+		[self addTrackingArea:trackingArea];
+		
+		//NSLog(@"Created new tracking area for %@", self);	
+	}
 }
 
-// 
+// Skimming is enabled by simply creating a suitable tracking area for the view
 
 - (void) enableSkimming
 {
-	// Skimming was enabled before?
-	if (_trackingArea) {
-		[self removeTrackingArea: _trackingArea];
-	}
-	[self addTrackingArea];
+	[self updateTrackingArea];
 }
 
-// Keep mouse move tracking area in sync with view bounds
 
-- (void) syncTrackingAreaWithViewBounds
-{	
-	if (_trackingArea && !NSEqualRects([_trackingArea rect], [self bounds]))
-	{
-		[self removeTrackingArea: _trackingArea];
-		[self addTrackingArea];
-	}	
-}
-
-// Callback from Cocoa whenever view bounds change
-// (will be called regardless whether this instance has any tracking areas or not)
+// Keep mouse move tracking area in sync with view bounds.
+// (Callback from Cocoa whenever view bounds change
+// (will be called regardless whether this instance has any tracking areas or not))
 
 - (void) updateTrackingAreas
 {
-	//NSLog(@"Tracking areas might need to be recreated for %@", self);
-	
-	[self syncTrackingAreaWithViewBounds];
+	if (_trackingArea && !NSEqualRects([_trackingArea rect], [self bounds]))
+	{
+		[self updateTrackingArea];
+	}	
 }
 
 

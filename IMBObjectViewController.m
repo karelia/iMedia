@@ -61,7 +61,6 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBMovieObject.h"
 #import "IMBNodeObject.h"
 #import "IMBObjectsPromise.h"
 #import "IMBImageBrowserCell.h"
@@ -90,7 +89,7 @@
 
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
-static NSString* kPosterFrameKeyPath = @"arrangedObjects.posterFrame";
+static NSString* kQuickLookImageKeyPath = @"arrangedObjects.quickLookImage";
 static NSString* kObjectCountStringKey = @"objectCountString";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
@@ -345,7 +344,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibObjectArrayController retain];
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
-	[ibObjectArrayController addObserver:self forKeyPath:kPosterFrameKeyPath options:NSKeyValueObservingOptionNew context:(void*)kPosterFrameKeyPath];
+	[ibObjectArrayController addObserver:self forKeyPath:kQuickLookImageKeyPath options:NSKeyValueObservingOptionNew context:(void*)kQuickLookImageKeyPath];
 
 	// We need to save preferences before the app quits...
 	
@@ -404,7 +403,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	// Stop observing the array...
 	
-	[ibObjectArrayController removeObserver:self forKeyPath:kPosterFrameKeyPath];
+	[ibObjectArrayController removeObserver:self forKeyPath:kQuickLookImageKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
@@ -424,7 +423,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		{
 //			NSLog(@"dealloc REMOVE [%p:%@'%@' removeObs…:%p 4kp:imageRep…", object,[object class],[object name], self);
             [object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
-            [object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
+            [object removeObserver:self forKeyPath:kIMBQuickLookImageProperty];
         }
     }
 	
@@ -457,7 +456,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
 		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
-	else if (inContext == (void*)kPosterFrameKeyPath)
+	else if (inContext == (void*)kQuickLookImageKeyPath)
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
 		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
@@ -468,7 +467,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
 		
 	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty] ||
-			 [inKeyPath isEqualToString:kIMBPosterFrameProperty])
+			 [inKeyPath isEqualToString:kIMBQuickLookImageProperty])
 	{
 		IMBDynamicTableView* affectedTableView = (IMBDynamicTableView*)inContext;
 		NSInteger row = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inObject];
@@ -1913,10 +1912,10 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		IMBComboTextCell* cell = (IMBComboTextCell*)inCell;
 		
-		if ([object isKindOfClass:[IMBMovieObject class]])
+		if (object.imageRepresentationType == IKImageBrowserQTMoviePathRepresentationType)
 		{
-			cell.imageRepresentation = (id) [(IMBMovieObject*)object posterFrame];
 			cell.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+			cell.imageRepresentation = (id) [object quickLookImage];
 		}
 		else
 		{
@@ -2043,7 +2042,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //		NSLog(@"changedVis…:… REMOVE [%p:%@'%@' removeObs…:%p 4kp:imageRep…", object,[object class],[object name], self);
 #endif
 		[object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
-		[object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
+		[object removeObserver:self forKeyPath:kIMBQuickLookImageProperty];
 		
 		NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
 		for (IMBObjectThumbnailLoadOperation* op in ops)
@@ -2118,7 +2117,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #endif
 
 		[object addObserver:self forKeyPath:kIMBObjectImageRepresentationProperty options:0 context:(void*)ibComboView];
-		[object addObserver:self forKeyPath:kIMBPosterFrameProperty options:0 context:(void*)ibComboView];
+		[object addObserver:self forKeyPath:kIMBQuickLookImageProperty options:0 context:(void*)ibComboView];
      }
 	
 	// Finally cache our old visible items set

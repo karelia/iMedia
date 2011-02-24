@@ -54,50 +54,89 @@
 
 @implementation IMBiPhotoEventNodeObject
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Key image and skimmed images of events are processed by Core Graphics before display
+
+- (CGImageRef) newProcessedImageFromImage:(CGImageRef)inImage
+{
+	long imgWidth = CGImageGetWidth(inImage);
+	long imgHeight = CGImageGetHeight(inImage);
+	long squareSize = MIN(imgWidth, imgHeight);
+	
+	CGContextRef bitmapContext = CGBitmapContextCreate(NULL, 
+													   squareSize, 
+													   squareSize,
+													   8, 
+													   4 * squareSize, 
+													   CGImageGetColorSpace(inImage), 
+													   kCGImageAlphaPremultipliedLast);
+	// Fill everything with transparent pixels
+	CGRect bounds = CGContextGetClipBoundingBox(bitmapContext);
+	CGContextClearRect(bitmapContext, bounds);
+	
+	// Set clipping path
+	float cornerRadius = squareSize / 10.0;
+	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithGraphicsPort:bitmapContext flipped:NO]];
+	[[NSBezierPath bezierPathWithRoundedRect:NSRectFromCGRect(bounds) xRadius: cornerRadius yRadius:cornerRadius] addClip];
+	
+	// Move image in context to get desired image area to be in context bounds
+	CGRect imageBounds = CGRectMake((squareSize - imgWidth) / 2.0, 
+									(squareSize - imgHeight) / 2.0, 
+									imgWidth, imgHeight);
+	
+	CGContextDrawImage(bitmapContext, imageBounds, inImage);
+	
+	CGImageRef image = CGBitmapContextCreateImage(bitmapContext);
+	
+	CGContextRelease(bitmapContext);
+	
+	return image;
+}
+
+
+// Set a processed image instead of the image provided
 
 - (void) setImageRepresentation:(id)inObject
 {
 	NSString* type = self.imageRepresentationType;
 
+	CGImageRef image = NULL;
 	if (inObject && [type isEqualToString:IKImageBrowserCGImageRepresentationType])
 	{
-		CGImageRef image = (CGImageRef) inObject;
-		
-		long imgWidth = CGImageGetWidth(image);
-		long imgHeight = CGImageGetHeight(image);
-		long squareSize = MIN(imgWidth, imgHeight);
-		
-		CGContextRef bitmapContext = CGBitmapContextCreate(NULL, 
-														   squareSize, 
-														   squareSize,
-														   8, 
-														   4 * squareSize, 
-														   CGImageGetColorSpace(image), 
-														   kCGImageAlphaPremultipliedLast);
-		// Fill everything with transparent pixels
-		CGRect bounds = CGContextGetClipBoundingBox(bitmapContext);
-		CGContextClearRect(bitmapContext, bounds);
-		
-		// Set clipping path
-		float cornerRadius = squareSize / 10;
-		[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithGraphicsPort:bitmapContext flipped:NO]];
-		[[NSBezierPath bezierPathWithRoundedRect:NSRectFromCGRect(bounds) xRadius: cornerRadius yRadius:cornerRadius] addClip];
-		
-		// Move image in context to get desired image area to be in context bounds
-		CGRect imageBounds = CGRectMake((squareSize - imgWidth) / 2.0, 
-										(squareSize - imgHeight) / 2.0, 
-										imgWidth, imgHeight);
-
-		CGContextDrawImage(bitmapContext, imageBounds, image);
-		
-		inObject = (id)CGBitmapContextCreateImage(bitmapContext);
-		
-		CGContextRelease(bitmapContext);
-		
+		image = [self newProcessedImageFromImage:(CGImageRef)inObject];
+		if (image) inObject = (id) image;
 	}
 	
+//	if (_imageRepresentation) {
+//		NSLog(@"Retain count of old %@: %ld", _imageRepresentation, CFGetRetainCount((CGImageRef)_imageRepresentation));
+//	}
+//	
+//	if (inObject) {
+//		NSLog(@"Retain count of new %@: %ld", inObject, CFGetRetainCount((CGImageRef)inObject));
+//	}
 	[super setImageRepresentation:inObject];
+	
+	if (image) CGImageRelease(image);
+}
+
+
+// Set a processed image instead of the image provided
+
+- (void) setQuickLookImage:(CGImageRef)inImage
+{
+	CGImageRef image = NULL;
+	if (inImage)
+	{
+		image = [self newProcessedImageFromImage:inImage];
+		if (image) inImage = image;
+	}
+	
+	[super setQuickLookImage:inImage];
+	
+	if (image) CGImageRelease(image);
 }
 
 

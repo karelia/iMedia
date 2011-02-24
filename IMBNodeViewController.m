@@ -1391,20 +1391,19 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 				_customObjectViewControllers = [[NSMutableDictionary alloc] init];
 			}
 
-			if (viewController) [_customObjectViewControllers setObject:viewController forKey:identifier];
+			if (viewController)
+			{
+				if ([viewController isKindOfClass:[IMBObjectViewController class]])
+				{	
+					[(IMBObjectViewController*)viewController setNodeViewController:self];
+					[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+				}
+				[_customObjectViewControllers setObject:viewController forKey:identifier];
+			}
 			else [_customObjectViewControllers removeObjectForKey:identifier];
 		}
 	}
 	
-	if (viewController)
-	{
-		if ([viewController isKindOfClass:[IMBObjectViewController class]])
-		{	
-			[(IMBObjectViewController*)viewController setNodeViewController:self];
-			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
-		}
-	}
-
 	return viewController;
 }
 

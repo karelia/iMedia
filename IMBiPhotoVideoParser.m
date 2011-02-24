@@ -54,9 +54,10 @@
 
 #import "IMBiPhotoVideoParser.h"
 #import "IMBParserController.h"
+#import "IMBMovieViewController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBMovieObject.h"
+#import "IMBObject.h"
 #import "NSDictionary+iMedia.h"
 #import "NSString+iMedia.h"
 #import "NSURL+iMedia.h"
@@ -100,6 +101,25 @@
 	[pool drain];
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) objectCountFormatSingular
+{
+	return [IMBMovieViewController objectCountFormatSingular];
+}
+
+
++ (NSString*) objectCountFormatPlural
+{
+	return [IMBMovieViewController objectCountFormatPlural];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void)dealloc
 {
 	IMBRelease(_timecodeTransformer);
@@ -131,7 +151,7 @@
 
 - (Class) objectClass
 {
-	return [IMBMovieObject class];
+	return [IMBObject class];
 }
 
 
@@ -162,10 +182,15 @@
 	if (videoURL == nil) {
 		return;
 	}
-		
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
 	
-	[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
+	// Do not load (key) movie specific metadata for node objects
+	// because it doesn't represent the nature of the object well enough.
+	
+	if (![inObject isKindOfClass:[IMBNodeObject class]])
+	{
+		[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
+	}
 	
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 	
@@ -184,6 +209,14 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
+	// Events have other metadata than images
+	
+	if ([inMetadata objectForKey:@"RollID"])		// Event
+	{
+		return [self eventMetadataDescriptionForMetadata:inMetadata];
+	}
+	
+	// Movie
 	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
 }
 

@@ -189,10 +189,6 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 - (BOOL) libraryController:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
 
-// Image browser customization support
-- (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController;
-- (CALayer*) imageBrowserBackgroundLayerForController:(IMBObjectViewController*)inController;
-
 @end
 
 

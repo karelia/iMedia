@@ -55,7 +55,7 @@
 #import "IMBMovieFolderParser.h"
 #import "IMBParserController.h"
 #import "IMBTimecodeTransformer.h"
-#import "IMBMovieObject.h"
+#import "IMBObject.h"
 #import "IMBCommon.h"
 #import <Quartz/Quartz.h>
 #import "NSDictionary+iMedia.h"
@@ -102,7 +102,7 @@
 
 - (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex
 {
-	IMBObject* object = [[[IMBMovieObject alloc] init] autorelease];
+	IMBObject* object = [[[IMBObject alloc] init] autorelease];
 	object.location = (id)inPath;
 	object.name = inName;
 	object.parser = self;
