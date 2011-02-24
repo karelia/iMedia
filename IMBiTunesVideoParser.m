@@ -54,7 +54,7 @@
 
 #import "IMBiTunesVideoParser.h"
 #import "IMBParserController.h"
-#import "IMBMovieObject.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -124,7 +124,7 @@
 
 - (Class) objectClass
 {
-	return [IMBMovieObject class];
+	return [IMBObject class];
 }
 
 

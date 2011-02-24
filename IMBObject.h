@@ -59,6 +59,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CONSTANTS
+
+extern NSString* kIMBQuickLookImageProperty;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark CLASSES
 
 @class IMBParser;
@@ -93,6 +101,10 @@
     BOOL _isLoadingThumbnail;
     BOOL _shouldDrawAdornments;
 	BOOL _shouldDisableTitle;
+	
+	// Generic image support through Quick Look
+	CGImageRef _quickLookImage;
+	BOOL _isLoadingQuickLookImage;
 }
 
 // Primary properties...
@@ -134,6 +146,8 @@
 - (BOOL) unloadThumbnail;
 - (void) loadMetadata;
 @property (assign) BOOL isLoadingThumbnail;
+- (CGImageRef) quickLookImage;
+- (void) setQuickLookImage:(CGImageRef)inImage;
 
 - (void) postProcessLocalURL:(NSURL*)localURL;
 

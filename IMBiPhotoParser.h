@@ -80,6 +80,8 @@
 
 - (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs;		// public utility method to help extract keywords from numbers
 
+- (NSString*) eventMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+
 - (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo;
 - (NSString*) imagePathForChildOfNodeObject:(IMBNodeObject*)inNodeObject atIndex:(NSUInteger)inIndex userInfo:(NSDictionary*)inUserInfo;
 - (NSString*) imagePathForKeyChildOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo;

@@ -55,7 +55,6 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBMovieObject.h"
 #import "IMBObjectsPromise.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"

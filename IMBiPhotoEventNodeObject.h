@@ -54,7 +54,6 @@
 
 
 @interface IMBiPhotoEventNodeObject : IMBNodeObject {
-
 }
 
 @end

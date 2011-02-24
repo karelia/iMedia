@@ -101,9 +101,9 @@
 + (NSString*) objectCountFormatSingular
 {
 	return NSLocalizedStringWithDefaultValue(
-											 @"IMBEventViewController.countFormatSingular",
+											 @"IMBSkimmableObjectViewController.countFormatSingular",
 											 nil,IMBBundle(),
-											 @"%d event",
+											 @"%d object",
 											 @"Format string for object count in singluar");
 }
 
@@ -111,9 +111,9 @@
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
-											 @"IMBEventViewController.countFormatPlural",
+											 @"IMBSkimmableObjectViewController.countFormatPlural",
 											 nil,IMBBundle(),
-											 @"%d events",
+											 @"%d objects",
 											 @"Format string for object count in plural");
 }
 
@@ -187,17 +187,19 @@
 - (void) mouseEntered:(NSEvent*) inEvent
 {
 	//NSLog(@"Mouse entered View");
+	_previousNodeObjectIndex = NSNotFound;
 }
 
 - (void) mouseExited:(NSEvent*) inEvent
 {
+	_previousNodeObjectIndex = NSNotFound;
 	//NSLog(@"Mouse exited View");
 }
 
 // Start Skimming on the identified item
 - (void) mouseEnteredItemAtIndex:(NSInteger) inIndex
 {
-	NSLog(@"Mouse entered item at index %ld", (long) inIndex);
+	//NSLog(@"Mouse entered item at index %ld", (long) inIndex);
 	_previousImageIndex = NSNotFound;
 }
 
@@ -218,7 +220,7 @@
 		[item setNeedsImageRepresentation:YES];
 		[item loadThumbnail]; // Background thread
 	}
-	NSLog(@"Mouse exited item at index %ld", (long) inIndex);
+	//NSLog(@"Mouse exited item at index %ld", (long) inIndex);
 }
 
 // Load the next thumbnail if mouse was moved sufficiently

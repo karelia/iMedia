@@ -132,9 +132,15 @@
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
 	
 	[metadata setObject:[inURL path] forKey:@"path"];
-
-	MDItemRef item = MDItemCreateWithURL(NULL,(CFURLRef)inURL); 
 	
+	MDItemRef item = NULL;
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		item = MDItemCreateWithURL(NULL,(CFURLRef)inURL); 
+	} else {
+		item = MDItemCreate(NULL, (CFStringRef) [inURL path]);
+	}
+
 //	NSLog(@"%@", [NSMakeCollectable(MDItemCopyAttributeNames(item)) autorelease]);
 	
 	if (item)

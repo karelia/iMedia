@@ -58,23 +58,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark CONSTANTS
-
-extern NSString* kIMBPosterFrameProperty;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This subclass adds the capability to cache the poster frame of a movie... 
+// This subclass is maintained for backward compatability 
 
 @interface IMBMovieObject : IMBObject
 {
-	CGImageRef _posterFrame;
-	BOOL _isLoadingPosterFrame;
 }
-
-@property (assign) CGImageRef posterFrame;
 
 @end
 

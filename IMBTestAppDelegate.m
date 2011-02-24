@@ -406,6 +406,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+#pragma mark IMBObjectViewControllerDelegate
+
+
 - (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController
 {
 	if ([inController isKindOfClass:[IMBiPhotoEventObjectViewController class]])
