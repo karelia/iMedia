@@ -401,28 +401,27 @@
 #pragma mark Helpers
 
 
-// Nodes are considered to be equal if their identifier match - even if we are looking at different instances
+// Nodes are considered to be equal if their identifiers match - even if we are looking at different instances
 // (object pointers). This is necessary as nodes are relatively short-lived objects that are replaced with new
 // instances often - a necessity in our multithreaded environment...
 
-- (BOOL) isEqual:(IMBNode*)inNode
+- (BOOL) isEqual:(id)aNode
 {
-	NSString* identifier1 = nil;
-	NSString* identifier2 = nil;
-	
-	if ([self respondsToSelector:@selector(identifier)])
-	{
-		identifier1 = self.identifier;
-	}
+    if (self == aNode)
+    {
+        return YES; // fast path
+    }
+    else if ([aNode isKindOfClass:[IMBNode class]]) // ImageKit sometimes compares us to strings
+    {
+        return [[self identifier] isEqualToString:[aNode identifier]];
+    }
+    
+    return NO;
+}
 
-	if ([inNode respondsToSelector:@selector(identifier)])
-	{
-		identifier2 = inNode.identifier;
-	}
-	
-	return identifier1 != nil && 
-		identifier2 != nil && 
-		[identifier1 isEqualToString:identifier2];
+- (NSUInteger)hash;
+{
+    return [[self identifier] hash];
 }
 
 
