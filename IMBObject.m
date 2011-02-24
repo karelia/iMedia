@@ -44,7 +44,7 @@
  */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,6 +53,8 @@
 #pragma mark HEADERS
 
 #import "IMBObject.h"
+
+#import "IMBNode.h"
 #import "IMBObjectsPromise.h"
 #import "IMBParser.h"
 #import "IMBCommon.h"
@@ -215,12 +217,27 @@
 
 - (NSString*) imageUID
 {
-	if (_imageLocation)
+    id location = [self imageLocation];
+    if (!location) location = [self location];
+    
+	if ([location isKindOfClass:[NSString class]])
 	{
-		return _imageLocation;
+		return location;
 	}
-		
-	return _location;
+	else if ([location isKindOfClass:[NSURL class]])
+	{
+		return [location path];
+	}
+	else if ([location isKindOfClass:[IMBNode class]])
+    {
+        return [location identifier];
+    }
+    else if ([location isKindOfClass:[NSNumber class]])
+    {
+        return [location description];
+    }
+    
+    return nil;
 }
 
 
