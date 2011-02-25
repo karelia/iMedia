@@ -274,10 +274,14 @@
 		return;
 	
 	NSUInteger hoverIndex;
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		hoverIndex = [(IMBImageBrowserView*) iconView indexOfCellAtPoint:mouse];	// >= 10.6
-	} else {
+	}
+	else
+#endif
+	{
 		hoverIndex = [iconView indexOfItemAtPoint:mouse];
 	}
 
