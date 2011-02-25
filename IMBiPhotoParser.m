@@ -1067,6 +1067,10 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 //---------------------------------------------------------------------------------------------------------------------
 
 
+// Returns a dictionary that contains the "true" KeyList, KeyPhotoKey and PhotoCount values for the provided event node.
+// (The values provided by the according dictionary in .plist are mostly wrong because we separate event children by
+// media types Image and Movie respectively into different views.)
+
 - (NSDictionary*) childrenInfoForEventNodeObject:(IMBiPhotoEventNodeObject*)inNodeObject
 											node:(IMBNode*)inNode
 										  images:(NSDictionary*)inImages
