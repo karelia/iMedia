@@ -232,10 +232,14 @@
 		// Derive child object's index in node object from inPoint's relative position in frame
 		
 		NSRect skimmingFrame;
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 		if (IMBRunningOnSnowLeopardOrNewer())
 		{
 			skimmingFrame = [[[self iconView] cellForItemAtIndex:inIndex] frame];	// >= 10.6
-		} else {
+		}
+		else
+#endif
+		{
 			skimmingFrame = [[self iconView] itemFrameAtIndex:inIndex];
 		}
 

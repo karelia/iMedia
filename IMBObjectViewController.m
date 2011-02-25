@@ -607,10 +607,12 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //		[ibIconView setIntercellSpacing:NSMakeSize(4.0,4.0)];
 //	}
 
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if ([ibIconView respondsToSelector:@selector(setBackgroundLayer:)])
 	{
 		[ibIconView setBackgroundLayer:[self iconViewBackgroundLayer]];
 	}
+#endif
 }
 
 
