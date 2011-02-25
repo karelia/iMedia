@@ -393,6 +393,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 	// Remove ourself from the QuickLook preview panel...
 	
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		Class panelClass = NSClassFromString(@"QLPreviewPanel");
@@ -400,6 +401,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		if (panel.delegate == (id)self) panel.delegate = nil;
 		if (panel.dataSource == (id)self) panel.dataSource = nil;
 	}
+#endif
 	
 	// Stop observing the array...
 	
@@ -890,6 +892,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 - (void) __updateTooltips
 {
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		[ibIconView removeAllToolTips];
@@ -903,6 +906,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			[ibIconView addToolTipRect:rect owner:object userData:NULL];
 		}
 	}
+#endif
 }
 
 
@@ -1104,7 +1108,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	if ([inObject isSelectable])
 	{
-//		#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 		if (IMBRunningOnSnowLeopardOrNewer())
 		{
 			title = NSLocalizedStringWithDefaultValue(
@@ -1119,7 +1123,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			[menu addItem:item];
 			[item release];
 		}
-//		#endif
+#endif
 	}
 	
 	// Give parser a chance to add menu items...
@@ -1557,6 +1561,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
 {
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		Class panelClass = NSClassFromString(@"QLPreviewPanel");
@@ -1568,6 +1573,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			[panel refreshCurrentPreviewItem];
 		}
 	}
+#endif
 }
 
 
@@ -1715,6 +1721,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 				//  NOTE: FOR NOW, WE ARE SHORT-CIRCUITING THIS BRANCH, AND NOT DOING ANY 10.6 PASTEBOARD WORK.
 				//  WE MAY WANT TO REVISIT THIS WHEN WE HAVE A 10.6-ONLY API.
 				//
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 				if (NO && IMBRunningOnSnowLeopardOrNewer())
 				{				
 					(void) [inPasteboard clearContents];
@@ -1758,6 +1765,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 					[inPasteboard writeObjects:itemArray];			// write array of NSPasteboardItems.
 				}
 				else
+#endif
 				{
 					// On 10.5, we vend the object promise as well as promises for filenames and a URL.
 					// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
@@ -2197,6 +2205,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 - (IBAction) quicklook:(id)inSender
 {
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		Class panelClass = NSClassFromString(@"QLPreviewPanel");
@@ -2212,6 +2221,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 			[ibTabView.window makeKeyWindow];	// Important to make key event handling work correctly!
 		}
 	}
+#endif
 }
 
 

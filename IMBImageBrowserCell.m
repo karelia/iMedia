@@ -207,12 +207,14 @@
 		[attributes2 setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
 	}
 
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		[[((id)self) imageBrowserView] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
 		[[((id)self) imageBrowserView] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
 	}
 	else
+#endif
 	{
 		[[((id)self) parent] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
 		[[((id)self) parent] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
