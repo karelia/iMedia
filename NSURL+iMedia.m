@@ -134,10 +134,14 @@
 	[metadata setObject:[inURL path] forKey:@"path"];
 	
 	MDItemRef item = NULL;
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		item = MDItemCreateWithURL(NULL,(CFURLRef)inURL); 
-	} else {
+	}
+	else
+#endif
+	{
 		item = MDItemCreate(NULL, (CFStringRef) [inURL path]);
 	}
 
@@ -187,7 +191,17 @@
 	
 	[metadata setObject:[inURL path] forKey:@"path"];
 	
-	MDItemRef item = MDItemCreateWithURL(NULL,(CFURLRef)inURL); 
+	MDItemRef item = NULL;
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		item = MDItemCreateWithURL(NULL,(CFURLRef)inURL); 
+	}
+	else
+#endif
+	{
+		item = MDItemCreate(NULL, (CFStringRef) [inURL path]);
+	}
 	
 //	NSLog(@"%@", [NSMakeCollectable(MDItemCopyAttributeNames(item)) autorelease]);
 

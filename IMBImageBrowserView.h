@@ -83,7 +83,10 @@
 @property (retain) IMBObject* clickedObject;
 
 - (void) enableSkimming;
+
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 - (NSUInteger) indexOfCellAtPoint:(NSPoint)inPoint;
+#endif
 
 @end
 
