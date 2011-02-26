@@ -221,13 +221,11 @@
 {
 	[self _removeCachedViewsInIndexSet:rowIndexes];
 	
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		[super reloadDataForRowIndexes:rowIndexes columnIndexes:columnIndexes];
 	}
 	else
-#endif
 	{
 		// LEOPARD implementation.  Ignore the columns; mark the whole row dirty.
 		NSRect dirtyRect = NSZeroRect;

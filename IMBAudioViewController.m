@@ -207,14 +207,12 @@
 
 - (IBAction) quicklook:(id)inSender
 {
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		[self setIsPlaying:NO];
 		[super quicklook:inSender];
 	}
 	else	// Don't quicklook on 10.5 .. instead, play the current selection.
-#endif
 	{
 		[self startPlayingSelection:inSender];
 	}
