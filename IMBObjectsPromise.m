@@ -496,16 +496,6 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	{	
         [self setFileURL:localURL error:nil forObject:inObject];
 		_objectCountLoaded++;
-		
-		// Now, copy this to the download folder path ... ?
-
-		if (self.destinationDirectoryPath)
-		{
-			NSString* fullPath = [self.destinationDirectoryPath stringByAppendingPathComponent:[[localURL path] lastPathComponent]];
-			NSError* error = nil;
-			[[NSFileManager imb_threadSafeManager] copyItemAtPath:[localURL path] toPath:fullPath error:&error];
-			if (error) NSLog(@"%@",error);
-		}
 	}
 	else
 	{
