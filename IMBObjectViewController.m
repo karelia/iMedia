@@ -365,7 +365,6 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		if ([theClipView isKindOfClass:[NSClipView class]])
 		{
 			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconViewVisibleItemsChanged:) name:NSViewBoundsDidChangeNotification object:theClipView];
-			didInstallVisibleItemsNote = YES;
 		}
 	}
 
