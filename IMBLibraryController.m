@@ -448,9 +448,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	NSMutableArray* parsers = [[IMBParserController sharedParserController] loadedParsersForMediaType:self.mediaType];
 	
-	[self willChangeValueForKey:@"rootNodes"];
-	[self.rootNodes removeAllObjects];
-	[self didChangeValueForKey:@"rootNodes"];
+//	[self willChangeValueForKey:@"rootNodes"];
+//	[self.rootNodes removeAllObjects];
+//	[self didChangeValueForKey:@"rootNodes"];
 	
 	for (IMBParser* parser in parsers)
 	{
