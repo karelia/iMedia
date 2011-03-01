@@ -847,6 +847,11 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	if ([ibIconView.window isVisible])
 	{
+		// Remove all tool tips before we start the reload, because there is a narrow window during reload when we have
+		// our old tooltips configured and they refer to OLD objects in the icon view. This is a window for crashing 
+		// if the system attempts to communicate with ta tooltip's owner which is being removed from the view.
+		[ibIconView removeAllToolTips];
+		
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
 		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:[[self class] iconViewReloadDelay] inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 		[self _updateTooltips];
