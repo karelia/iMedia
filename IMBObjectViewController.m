@@ -129,6 +129,14 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 @end
 
+// A 10.6+ attribute on IKImageBrowserView, which we use to implement smarter toolTip configuration
+
+@interface IKImageBrowserView (IKImageBrowserViewSnowLeopard)
+
+- (NSIndexSet *)visibleItemIndexes;
+
+@end
+
 #endif
 
 
@@ -329,6 +337,21 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
 	[ibObjectArrayController addObserver:self forKeyPath:kPosterFrameKeyPath options:NSKeyValueObservingOptionNew context:(void*)kPosterFrameKeyPath];
 
+	// For tooltip display, we pay attention to changes in the icon view's scroller clip view, because 
+	// that will naturally indicate a change in visible items (unfortunately IKImageBrowserView's visibleItemIndexes
+	// attribute doesn't seem to be KVO compatible.
+
+	NSScrollView* iconViewScroller = [ibIconView enclosingScrollView];
+	if (iconViewScroller != nil)
+	{
+		NSClipView* theClipView = [iconViewScroller contentView];
+		if ([theClipView isKindOfClass:[NSClipView class]])
+		{
+			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconViewVisibleItemsChanged:) name:NSViewBoundsDidChangeNotification object:theClipView];
+			didInstallVisibleItemsNote = YES;
+		}
+	}
+
 	// We need to save preferences before the app quits...
 	
 	[[NSNotificationCenter defaultCenter] 
@@ -337,7 +360,6 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		 name:NSApplicationWillTerminateNotification 
 		 object:nil];
 }
-
 
 // Do not remove this method. It isn't called directly by the framework, but is called by host applications. 
 
@@ -355,7 +377,9 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[self.view imb_unbindViewHierarchy];
 	
     // Clear datasource and delegate, just in case views live longer than this controller...
-    
+    [ibIconView setDataSource:nil];
+	[ibIconView setDelegate:nil];
+	
 	[ibListView setDataSource:nil];
     [ibListView setDelegate:nil];
 	
@@ -390,9 +414,9 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
-    
+
 	// Other cleanup...
-	
+
 	IMBRelease(_libraryController);
 	IMBRelease(_nodeViewController);
 	IMBRelease(_progressWindowController);
@@ -804,10 +828,12 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		// our old tooltips configured and they refer to OLD objects in the icon view. This is a window for crashing 
 		// if the system attempts to communicate with ta tooltip's owner which is being removed from the view.
 		[ibIconView removeAllToolTips];
-		
+
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
 		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-		[self _updateTooltips];
+
+		// Items loading into the view will cause a change in the scroller's clip view, which will cause the tooltips
+		// to be revised to suit only the current visible items.
 	}
 }
 
@@ -837,32 +863,46 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 // Please note that providing tooltips is WAY too expensive on 10.5 (possibly due to different internal 
 // implementation of IKImageBrowserView). For this reason we disable tooltips on 10.5...
-
+//
+// Following up on the rationale above, in March, 2011, I changed the method for tooltips in 10.6+ to 
+// take advantage of a "visibleItemIndexes" attribute on IKImageBrowserView. This lets us be more conservative
+// in our tooltip configuration and only install tooltips for the visible items. This is great for e.g. photo 
+// collections with thousands of items, but puts the responsibility on any code that changes the visible items
+// to assure that _updateTooltips gets called.
 
 - (void) _updateTooltips
 {
+	// Coalesce tooltip updates into a single call only after activity has relatively ceased
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(__updateTooltips) object:nil];
 	[self performSelector:@selector(__updateTooltips) withObject:nil afterDelay:0.1];
 }
-	
-	
+
 - (void) __updateTooltips
 {
+	// IKImageBrowserView doesn't support "visibleItemIndexes" on < 10.6
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
+		// To update ToolTips we always remove any existing tooltips and update with the new list of visible icon indexes
 		[ibIconView removeAllToolTips];
 		
 		NSArray* objects = ibObjectArrayController.arrangedObjects;
-		NSInteger i = 0;
-		
-		for (IMBObject* object in objects)
+		NSIndexSet* theseIndexes = [ibIconView visibleItemIndexes];
+		NSUInteger currentIndex = [theseIndexes firstIndex];
+		while (currentIndex != NSNotFound)
 		{
-			NSRect rect = [ibIconView itemFrameAtIndex:i++];
-			[ibIconView addToolTipRect:rect owner:object userData:NULL];
+			IMBObject* thisObject = [objects objectAtIndex:currentIndex];
+			NSRect rect = [ibIconView itemFrameAtIndex:currentIndex];
+			[ibIconView addToolTipRect:rect owner:thisObject userData:NULL];
+
+			currentIndex = [theseIndexes indexGreaterThanIndex:currentIndex];
 		}
 	}
 }
 
+- (void) iconViewVisibleItemsChanged:(NSNotification *)notification
+{
+	[self _updateTooltips];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
