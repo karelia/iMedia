@@ -133,6 +133,7 @@
 
 - (void) addCustomQuery: (NSDictionary*) inQueryParams;
 - (void) removeCustomQuery: (NSDictionary*) inQueryParams;
+- (void) updateCustomQuery: (NSDictionary*) inQueryParams;
 
 - (void) loadCustomQueries;
 - (void) saveCustomQueries;
