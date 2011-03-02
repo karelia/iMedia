@@ -257,7 +257,7 @@
 	#endif
 	
 	//	save Flickr response in our iMB node for later population of the browser...
-	[node setFlickrResponse:inResponseDictionary];
+	[node setFlickrResponse:(inResponseDictionary) ? inResponseDictionary : [NSDictionary dictionary]];
 	
 	//	force reloading of the node holding the Flickr images...
 	[libController reloadNode:node];	
@@ -762,27 +762,26 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 
 
 - (void) addCustomQuery: (NSDictionary*) inQueryParams {
-	if (inQueryParams){
-		[self.customQueries addObject:inQueryParams];
-	}
+	if (!inQueryParams) return;
+	[self.customQueries addObject:inQueryParams];
 }
 
 
 - (void) removeCustomQuery: (NSDictionary*) inQueryParams {
-	if (inQueryParams) {
-		NSString* queryIdentifier = [inQueryParams objectForKey:IMBFlickrNodeProperty_Query];
-		
-		NSDictionary* dictToBeRemoved = nil;
-		for (NSDictionary* dict in _customQueries) {
-			NSString* dictIdentifier = [dict objectForKey:IMBFlickrNodeProperty_Query];
-			if ([queryIdentifier isEqualToString:dictIdentifier]) {
-				dictToBeRemoved = dict;
-			}
+	if (!inQueryParams) return;
+
+	NSString* queryIdentifier = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
+	
+	NSDictionary* dictToBeRemoved = nil;
+	for (NSDictionary* dict in _customQueries) {
+		NSString* dictIdentifier = [dict objectForKey:IMBFlickrNodeProperty_UUID];
+		if (dictIdentifier && [queryIdentifier hasSuffix:dictIdentifier]) {
+			dictToBeRemoved = dict;
 		}
-		
-		if (dictToBeRemoved) {
-			[_customQueries removeObject:dictToBeRemoved];			
-		}
+	}
+	
+	if (dictToBeRemoved) {
+		[_customQueries removeObject:dictToBeRemoved];			
 	}
 }
 
@@ -816,5 +815,20 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	[IMBConfig setPrefs:prefs forClass:[self class]];
 }
 
+
+- (void) updateCustomQuery: (NSDictionary*) inQueryParams {
+	if (!inQueryParams) return;
+
+	NSString* queryIdentifier = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
+	NSUInteger count = _customQueries.count;
+	for (NSUInteger index = 0; index < count; index++) {
+		NSDictionary* dict = [_customQueries objectAtIndex:index];
+		NSString* dictIdentifier = [dict objectForKey:IMBFlickrNodeProperty_UUID];
+		if (dictIdentifier && [queryIdentifier hasSuffix:dictIdentifier]) {
+			[_customQueries replaceObjectAtIndex:index withObject:inQueryParams];
+			break;
+		}
+	}
+}
 
 @end

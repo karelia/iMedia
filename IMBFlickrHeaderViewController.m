@@ -281,8 +281,14 @@
 
 - (IBAction) editQuery:(id)inSender
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_updateNodes) object:nil];
-	[self performSelector:@selector(_updateNodes) withObject:nil afterDelay:0.5 inModes:[NSArray arrayWithObject:(NSString*)kCFRunLoopCommonModes]];
+	NSMutableDictionary* queryParams = [self.queryParams mutableCopy];
+	[queryParams setObject:[_queryField stringValue] forKey:IMBFlickrNodeProperty_Query];	
+	[queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodeProperty_Method];
+	[queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeLicense_CreativeCommons] forKey:IMBFlickrNodeProperty_License];
+	[queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeSortOrder_InterestingnessDesc] forKey:IMBFlickrNodeProperty_SortOrder];
+	
+	[_parser updateCustomQuery:queryParams];
+	[self _updateNodes];
 }
 
 
