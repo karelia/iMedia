@@ -288,7 +288,10 @@
 	[queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeSortOrder_InterestingnessDesc] forKey:IMBFlickrNodeProperty_SortOrder];
 	
 	[_parser updateCustomQuery:queryParams];
-	[self _updateNodes];
+	[_parser saveCustomQueries];
+	[_parser reloadCustomQuery:queryParams];
+
+	[IMBFlickrNode sendSelectNodeNotificationForDict:queryParams];
 }
 
 
@@ -297,7 +300,7 @@
 	if (self.queryParams)
 	{
 		[_parser removeCustomQuery:self.queryParams];
-		[self _updateNodes];
+		[_parser saveCustomQueries];
 	}
 }
 

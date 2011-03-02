@@ -186,36 +186,12 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 }
 
 
-+ (IMBFlickrNode*) flickrNodeFromDict: (NSDictionary*) dict 
-							 rootNode: (IMBFlickrNode*) root
-							   parser: (IMBParser*) parser {
++ (IMBFlickrNode*) flickrNodeFromDictionary: (NSDictionary*) dictionary 
+								   rootNode: (IMBFlickrNode*) root
+									 parser: (IMBParser*) parser {
 	
-	if (!dict) return nil;
-	
-	//	extract node data from preferences dictionary...
-	NSInteger method = [[dict objectForKey:IMBFlickrNodeProperty_Method] intValue];
-	NSString* query = [dict objectForKey:IMBFlickrNodeProperty_Query];
-	NSString* title = query;
-	
-	if (!query || !title) {
-		NSLog (@"Invalid Flickr parser user node dictionary.");
-		return nil;
-	}
-	
-	//	Flickr stuff...
 	IMBFlickrNode* node = [IMBFlickrNode flickrNodeForRoot:root parser:parser];
-	node.customNode = YES;
-	node.icon = [NSImage imageNamed:NSImageNameFolderSmart];
-	[node.icon setScalesWhenResized:YES];
-	[node.icon setSize:NSMakeSize(16.0, 16.0)];
-	node.identifier = [IMBFlickrNode identifierWithQueryParams:dict];
-	node.license = [[dict objectForKey:IMBFlickrNodeProperty_License] intValue];
-	node.mediaSource = node.identifier;
-	node.method = method;
-	node.name = title;
-	node.query = query;
-	node.sortOrder = [[dict objectForKey:IMBFlickrNodeProperty_SortOrder] intValue];
-		
+	[node readPropertiesFromDictionary:dictionary];
 	return node;
 }
 
@@ -442,6 +418,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 @synthesize customNode = _customNode;
 @synthesize flickrResponse = _flickrResponse;
 @synthesize license = _license;
+@synthesize markedForDeletion = _markedForDeletion;
 @synthesize method = _method;
 @synthesize page = _page;
 @synthesize query = _query;
@@ -624,6 +601,34 @@ typedef enum {
 	NSString* uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
 	if (uuid == nil) uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_Query];
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,uuid];
+}
+
+
+- (void) readPropertiesFromDictionary: (NSDictionary*) dictionary {
+	if (!dictionary) return;
+	
+	//	extract node data from preferences dictionary...
+	NSInteger method = [[dictionary objectForKey:IMBFlickrNodeProperty_Method] intValue];
+	NSString* query = [dictionary objectForKey:IMBFlickrNodeProperty_Query];
+	NSString* title = query;
+	
+	if (!query || !title) {
+		NSLog (@"Invalid Flickr parser user node dictionary.");
+		return;
+	}
+	
+	//	Flickr stuff...
+	self.customNode = YES;
+	self.icon = [NSImage imageNamed:NSImageNameFolderSmart];
+	[self.icon setScalesWhenResized:YES];
+	[self.icon setSize:NSMakeSize(16.0, 16.0)];
+	self.identifier = [IMBFlickrNode identifierWithQueryParams:dictionary];
+	self.license = [[dictionary objectForKey:IMBFlickrNodeProperty_License] intValue];
+	self.mediaSource = self.identifier;
+	self.method = method;
+	self.name = title;
+	self.query = query;
+	self.sortOrder = [[dictionary objectForKey:IMBFlickrNodeProperty_SortOrder] intValue];
 }
 
 @end

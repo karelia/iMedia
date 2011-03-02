@@ -106,6 +106,7 @@ typedef enum {
 	BOOL _customNode;
 	NSDictionary* _flickrResponse;
 	IMBFlickrNodeLicense _license;
+	BOOL _markedForDeletion;
 	IMBFlickrNodeMethod _method;
 	NSInteger _page;
 	NSString* _query;
@@ -123,9 +124,9 @@ typedef enum {
 + (IMBFlickrNode*) flickrNodeForRoot: (IMBFlickrNode*) root
 							  parser: (IMBParser*) parser;
 
-+ (IMBFlickrNode*) flickrNodeFromDict: (NSDictionary*) dict 
-							 rootNode: (IMBFlickrNode*) root
-							   parser: (IMBParser*) parser;
++ (IMBFlickrNode*) flickrNodeFromDictionary: (NSDictionary*) dictionary 
+								   rootNode: (IMBFlickrNode*) root
+									 parser: (IMBParser*) parser;
 
 + (void) sendSelectNodeNotificationForDict:(NSDictionary*) dict;
 
@@ -146,6 +147,7 @@ typedef enum {
 
 @property (assign, getter=isCustomNode) BOOL customNode;
 @property (assign) IMBFlickrNodeLicense license;
+@property (assign, getter=isMarkedForDeletion) BOOL markedForDeletion;
 @property (assign) IMBFlickrNodeMethod method;
 @property (assign) NSInteger page;
 @property (copy) NSString* query;
@@ -157,5 +159,6 @@ typedef enum {
 - (NSDictionary*) argumentsForFlickrCall;
 + (NSString *)base58EncodedValue:(long long)num;
 + (NSString *)descriptionOfLicense:(int)aLicenseNumber;
+- (void) readPropertiesFromDictionary: (NSDictionary*) dictionary;
 
 @end
