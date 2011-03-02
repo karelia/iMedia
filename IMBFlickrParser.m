@@ -401,19 +401,16 @@
 	
 	if (!inOldNode) return [self createRootNode];
 
+	//	remove a node marked for deletion by returning 'nil'...
+	if (((IMBFlickrNode*)inOldNode).isMarkedForDeletion) return nil;
+	
 	NSError* error = nil;
 	
 	IMBFlickrNode* updatedNode = [[inOldNode copy] autorelease];
 	
 	// If the old node was populated, then also populate the new node...
-	
 	IMBFlickrNode* inOldFlickrNode = (IMBFlickrNode*) inOldNode;
-//	if ([inOldFlickrNode hasRequest] || inOldFlickrNode.subNodes.count > 0 || inOldFlickrNode.objects.count > 0) {
-//		[self populateNode:updatedNode options:inOptions error:&error];
-//	}
-	
-	if ([self hasFlickrRequestForNode:inOldFlickrNode] || inOldNode.isPopulated)
-	{
+	if ([self hasFlickrRequestForNode:inOldFlickrNode] || inOldNode.isPopulated) {
 		[self populateNewNode:updatedNode likeOldNode:inOldNode options:inOptions];
 	}
 
@@ -743,7 +740,7 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	
 	//	create nodes from settings...
 	for (NSDictionary* dict in self.customQueries) {
-		IMBFlickrNode* node = [IMBFlickrNode flickrNodeFromDict:dict rootNode:root parser:self];
+		IMBFlickrNode* node = [IMBFlickrNode flickrNodeFromDictionary:dict rootNode:root parser:self];
 		if (node) {
 			[customNodes addObject:node];
 		}
@@ -770,6 +767,7 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 - (void) removeCustomQuery: (NSDictionary*) inQueryParams {
 	if (!inQueryParams) return;
 
+	//	1) Remove the custom query from our preferences.
 	NSString* queryIdentifier = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
 	
 	NSDictionary* dictToBeRemoved = nil;
@@ -783,6 +781,17 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	if (dictToBeRemoved) {
 		[_customQueries removeObject:dictToBeRemoved];			
 	}
+	
+	
+	//	2) Remove the custom query the Flickr sub-nodes.
+	
+	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
+	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:queryIdentifier];
+	if (!node) return;
+		
+	//	mark for deletion and trigger view update...
+	node.markedForDeletion = YES;
+	[libController reloadNode:node];	
 }
 
 
@@ -807,6 +816,30 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
 	[libController reloadNode:self.flickrRootNode];
 }
+	
+	
+- (void) reloadCustomQuery: (NSDictionary*) inQueryParams {
+	if (!inQueryParams) return;
+	NSString* nodeIdentifier = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
+	if (!nodeIdentifier) return;
+
+	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
+	
+	//	if the node does not exist any more, there is not much to do...
+	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
+	if (!node) return;
+	
+	//	update node with new query data...
+	[node readPropertiesFromDictionary:inQueryParams];
+	
+	//	clean existing results...
+	node.subNodes = nil;
+	node.objects = nil;
+	
+	//	force reloading of the node holding the Flickr images...
+	[libController reloadNode:node];	
+}
+
 
 
 - (void) saveCustomQueries {

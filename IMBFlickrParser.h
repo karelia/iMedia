@@ -138,6 +138,7 @@
 - (void) loadCustomQueries;
 - (void) saveCustomQueries;
 - (void) reloadCustomQueries;
+- (void) reloadCustomQuery: (NSDictionary*) inQueryParams;
 
 @end
 
