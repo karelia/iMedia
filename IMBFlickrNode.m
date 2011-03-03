@@ -66,7 +66,6 @@
 @interface IMBFlickrNode ()
 //	Utilities:
 + (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query;
-+ (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
 @end
 
 #pragma mark -

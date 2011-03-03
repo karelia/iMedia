@@ -72,6 +72,7 @@
 + (IMBFlickrHeaderViewController*) headerViewControllerWithParser: (IMBFlickrParser*) inParser forNode: (IMBFlickrNode*) inNode;
 
 
+@property (readonly) BOOL canEdit;
 @property (assign) IMBFlickrParser* parser;
 @property (assign) SEL queryAction;
 @property (assign) SEL buttonAction;
