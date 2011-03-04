@@ -95,7 +95,6 @@
 
 @synthesize group = _group;
 @synthesize leaf = _leaf;
-@synthesize loading = _loading;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 @synthesize includedInPopup = _includedInPopup;
 @synthesize displayedObjectCount = _displayedObjectCount;
@@ -459,6 +458,19 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Set loading status for self and complete subtree...
+
+- (void) setLoading:(BOOL)inLoading
+{
+	_loading = inLoading;
+	
+	for (IMBNode* subnode in self.subNodes)
+	{
+		subnode.loading = inLoading;
+	}
+}
 
 
 // Check if this node or one of its ancestors is current loading in the background. In this case it will be 
