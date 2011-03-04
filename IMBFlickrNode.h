@@ -106,7 +106,6 @@ typedef enum {
 	BOOL _customNode;
 	NSDictionary* _flickrResponse;
 	IMBFlickrNodeLicense _license;
-	BOOL _markedForDeletion;
 	IMBFlickrNodeMethod _method;
 	NSInteger _page;
 	NSString* _query;
@@ -147,7 +146,6 @@ typedef enum {
 
 @property (assign, getter=isCustomNode) BOOL customNode;
 @property (assign) IMBFlickrNodeLicense license;
-@property (assign, getter=isMarkedForDeletion) BOOL markedForDeletion;
 @property (assign) IMBFlickrNodeMethod method;
 @property (assign) NSInteger page;
 @property (copy) NSString* query;

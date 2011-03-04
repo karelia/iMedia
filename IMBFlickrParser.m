@@ -75,7 +75,7 @@
 
 
 
-#define VERBOSE
+//#define VERBOSE
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -132,11 +132,6 @@
 
 - (IBAction) editNode: (id) sender {
 	NSLog (@"edit node...");
-
-	IMBNode* root = self.flickrRootNode;
-	for (IMBNode* node in root.subNodes) {
-		NSLog (@"'%@' loading: %@", node.name, (node.isLoading) ? @"YES" : @"NO");
-	}
 }
 
 
@@ -406,9 +401,6 @@
 	
 	if (!inOldNode) return [self createRootNode];
 
-	//	remove a node marked for deletion by returning 'nil'...
-	if (((IMBFlickrNode*)inOldNode).isMarkedForDeletion) return nil;
-	
 	NSError* error = nil;
 	
 	IMBFlickrNode* updatedNode = [[inOldNode copy] autorelease];
@@ -435,7 +427,7 @@
 		NSLog (@"Populate node '%@', query '%@'", inFlickrNode.identifier, inFlickrNode.query);
 	#endif
 	
-	if (!inFlickrNode.mediaSource) {
+	if (inFlickrNode.isTopLevelNode) {
 		//	populate root node...
 		NSArray* standardNodes = [NSArray arrayWithObjects:
 								  [IMBFlickrNode flickrNodeForRecentPhotosForRoot:inFlickrNode parser:self],
@@ -448,7 +440,6 @@
 		for (IMBFlickrNode* node in inFlickrNode.subNodes) {
 			IMBSmartFolderNodeObject* object = [[IMBSmartFolderNodeObject alloc] init];
 			object.representedNodeIdentifier = node.identifier;
-			object.location = (id)node;
 			object.name = node.name;
 			object.metadata = nil;
 			object.parser = self;
@@ -789,15 +780,9 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	}
 	
 	
-	//	2) Remove the custom query the Flickr sub-nodes.
-	
+	//	2) Reload root node to show changes.
 	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
-	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:queryIdentifier];
-	if (!node) return;
-		
-	//	mark for deletion and trigger view update...
-	node.markedForDeletion = YES;
-	[libController reloadNode:node];	
+	[libController reloadNode:self.flickrRootNode];	
 }
 
 
@@ -862,7 +847,6 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	NSUInteger count = _customQueries.count;
 	for (NSUInteger index = 0; index < count; index++) {
 		NSDictionary* dict = [_customQueries objectAtIndex:index];
-//		NSString* dictIdentifier = [dict objectForKey:IMBFlickrNodeProperty_UUID];
 		NSString* dictIdentifier = [IMBFlickrNode identifierWithQueryParams:dict];
 		if (dictIdentifier && [queryIdentifier hasSuffix:dictIdentifier]) {
 			[_customQueries replaceObjectAtIndex:index withObject:inQueryParams];
