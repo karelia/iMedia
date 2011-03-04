@@ -137,6 +137,13 @@
 
 - (void) awakeFromNib
 {
+	//	set default data for an 'add' operation...
+	if (self.buttonAction == @selector(addQuery:)) {
+		[_queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodeProperty_Method];
+		[_queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeLicense_CreativeCommons] forKey:IMBFlickrNodeProperty_License];
+		[_queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeSortOrder_InterestingnessDesc] forKey:IMBFlickrNodeProperty_SortOrder];
+	}
+	
 	// Configure the search field...
 	
 	[_queryField setAction:_queryAction];
@@ -274,38 +281,38 @@
 {
 	if (!queryParams) return;
 	
+	//	we can't update a quere that has not yet been added...
+	if (self.buttonAction == @selector(addQuery:)) return;
+	
 	[_parser updateCustomQuery:queryParams];
 	[_parser saveCustomQueries];
+		
 	[_parser reloadCustomQuery:queryParams];
-	
 	[IMBFlickrNode sendSelectNodeNotificationForDict:queryParams];	
 }
 
 
 - (IBAction) addQuery: (id) inSender
 {
-	NSMutableDictionary* queryParams = [NSMutableDictionary dictionary];
-	[queryParams setObject:[_queryField stringValue] forKey:IMBFlickrNodeProperty_Query];	
-	[queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeMethod_TextSearch] forKey:IMBFlickrNodeProperty_Method];
-	[queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeLicense_CreativeCommons] forKey:IMBFlickrNodeProperty_License];
-	[queryParams setObject:[NSNumber numberWithInt:IMBFlickrNodeSortOrder_InterestingnessDesc] forKey:IMBFlickrNodeProperty_SortOrder];
-	[queryParams setObject:[NSString uuid] forKey:IMBFlickrNodeProperty_UUID];
+	//	add query text and UUID...
+	[_queryParams setObject:[_queryField stringValue] forKey:IMBFlickrNodeProperty_Query];	
+	[_queryParams setObject:[NSString uuid] forKey:IMBFlickrNodeProperty_UUID];
 
-	[_parser addCustomQuery:queryParams];
+	//	save custom query to preferences...
+	[_parser addCustomQuery:_queryParams];
 	[_parser saveCustomQueries];
 	
+	//	update ui...
 	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[_parser mediaType]];
 	[libController reloadNode:_parser.flickrRootNode];	
-
-	[IMBFlickrNode sendSelectNodeNotificationForDict:queryParams];
+	[IMBFlickrNode sendSelectNodeNotificationForDict:_queryParams];
 }
 
 
 - (IBAction) editQuery: (id) inSender
 {
-	NSMutableDictionary* queryParams = [[self.queryParams mutableCopy] autorelease];
-	[queryParams setObject:[_queryField stringValue] forKey:IMBFlickrNodeProperty_Query];	
-	[self updateQuery:queryParams];
+	[_queryParams setObject:[_queryField stringValue] forKey:IMBFlickrNodeProperty_Query];	
+	[self updateQuery:_queryParams];
 }
 
 
@@ -322,27 +329,24 @@
 - (IBAction) setSearchType:(id)inSender
 {
 	NSInteger tag = [inSender tag];
-	NSMutableDictionary* queryParams = [[self.queryParams mutableCopy] autorelease];
-	[queryParams setObject:[NSNumber numberWithInteger:tag] forKey:IMBFlickrNodeProperty_Method];
-	[self updateQuery:queryParams];
+	[_queryParams setObject:[NSNumber numberWithInteger:tag] forKey:IMBFlickrNodeProperty_Method];
+	[self updateQuery:_queryParams];
 }
 
 
 - (IBAction) setLicense:(id)inSender
 {
 	NSInteger tag = [inSender tag];
-	NSMutableDictionary* queryParams = [[self.queryParams mutableCopy] autorelease];
-	[queryParams setObject:[NSNumber numberWithInteger:tag] forKey:IMBFlickrNodeProperty_License];
-	[self updateQuery:queryParams];
+	[_queryParams setObject:[NSNumber numberWithInteger:tag] forKey:IMBFlickrNodeProperty_License];
+	[self updateQuery:_queryParams];
 }
 
 
 - (IBAction) setSortOrder:(id)inSender
 {
 	NSInteger tag = [inSender tag];
-	NSMutableDictionary* queryParams = [[self.queryParams mutableCopy] autorelease];
-	[queryParams setObject:[NSNumber numberWithInteger:tag] forKey:IMBFlickrNodeProperty_SortOrder];
-	[self updateQuery:queryParams];
+	[_queryParams setObject:[NSNumber numberWithInteger:tag] forKey:IMBFlickrNodeProperty_SortOrder];
+	[self updateQuery:_queryParams];
 }
 
 
