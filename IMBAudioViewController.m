@@ -106,6 +106,16 @@
 		@"metadata.artist",
 		@"metadata.album",
 		nil];
+										  
+	[[[_tableView tableColumnWithIdentifier:@"name"] headerCell] setStringValue:
+		NSLocalizedStringWithDefaultValue(@"IMBAudioViewController.tableColumn.name", nil,IMBBundle(), @"Name", @"Column title - should be a short word")
+	 ];
+	[[[_tableView tableColumnWithIdentifier:@"artist"] headerCell] setStringValue:
+		NSLocalizedStringWithDefaultValue(@"IMBAudioViewController.tableColumn.artist", nil,IMBBundle(), @"Artist", @"Column title - should be a short word")
+	 ];
+	[[[_tableView tableColumnWithIdentifier:@"duration"] headerCell] setStringValue:
+		NSLocalizedStringWithDefaultValue(@"IMBAudioViewController.tableColumn.time", nil,IMBBundle(), @"Time", @"Column title - should be a short word")
+	 ];
 }
 
 

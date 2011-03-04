@@ -61,6 +61,9 @@
 #pragma mark 
 
 @interface IMBImageViewController : IMBObjectViewController
+{
+	IBOutlet NSTableView *_tableView;
+}
 
 @end
 
