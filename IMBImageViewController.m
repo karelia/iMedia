@@ -98,6 +98,13 @@
 		@"metadata.ImagePath",
 		@"metadata.iMediaKeywords",
 		nil];
+
+	[[[_tableView tableColumnWithIdentifier:@"name"] headerCell] setStringValue:
+	 NSLocalizedStringWithDefaultValue(@"IMBImageViewController.tableColumn.name", nil,IMBBundle(), @"Name", @"Column title - should be a short word")
+	 ];
+	[[[_tableView tableColumnWithIdentifier:@"artist"] headerCell] setStringValue:
+	 NSLocalizedStringWithDefaultValue(@"IMBImageViewController.tableColumn.size", nil,IMBBundle(), @"Size", @"Column title - should be a short word")
+	 ];	
 }
 
 
