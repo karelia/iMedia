@@ -750,6 +750,38 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This identifier string (just like IMBNode.identifier) can be used to uniquely identify an IMBObject. This can
+// be of use to host app developers who needs to cache usage info of media files in some dictionary when implementing
+// the badging delegate API. Simply using the path of a local file may not be reliable in those cases where a file
+// originated from a remote source and first had to be downloaded. For this reason using the identifier as a key
+// is more reliable...
+
+ 
+- (NSString*) identifier
+{
+	NSString* parserName = NSStringFromClass([_parser class]);
+	NSString* location = nil;
+	
+	if ([self.location isKindOfClass:[NSString class]])
+	{
+		location = (NSString*)self.location;
+	}
+	else if ([self.location isKindOfClass:[NSURL class]])
+	{
+		location = [(NSURL*)self.location path];
+	}
+	else
+	{
+		location = [self.location description];
+	}
+
+	return [NSString stringWithFormat:@"%@/%@",parserName,location];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (NSString*) description
 {
 	return [NSString stringWithFormat:@"%@ %@",
