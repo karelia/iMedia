@@ -417,7 +417,6 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 @synthesize customNode = _customNode;
 @synthesize flickrResponse = _flickrResponse;
 @synthesize license = _license;
-@synthesize markedForDeletion = _markedForDeletion;
 @synthesize method = _method;
 @synthesize page = _page;
 @synthesize query = _query;
