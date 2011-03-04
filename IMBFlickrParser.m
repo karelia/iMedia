@@ -75,7 +75,7 @@
 
 
 
-//#define VERBOSE
+#define VERBOSE
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -447,6 +447,7 @@
 		NSMutableArray* objects = [NSMutableArray array];
 		for (IMBFlickrNode* node in inFlickrNode.subNodes) {
 			IMBSmartFolderNodeObject* object = [[IMBSmartFolderNodeObject alloc] init];
+			object.representedNodeIdentifier = node.identifier;
 			object.location = (id)node;
 			object.name = node.name;
 			object.metadata = nil;
@@ -746,12 +747,10 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	//	create nodes from settings...
 	for (NSDictionary* dict in self.customQueries) {
 		//	try to copy all existing nodes...
-		NSString* nodeIdentifier = [IMBFlickrNode identifierWithQueryParams:dict];
-		IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
-		IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
-		node = [[node copy] autorelease];
+		NSString* identifier = [IMBFlickrNode identifierWithQueryParams:dict];
+		IMBFlickrNode* node = (IMBFlickrNode*)[root subNodeWithIdentifier:identifier];
 		
-		//	if node does not exists jet (add operation) create a new one...
+		//	if node does not exists yet (add operation) create a new one...
 		if (!node) {
 			node = [IMBFlickrNode flickrNodeFromDictionary:dict rootNode:root parser:self];
 		} 

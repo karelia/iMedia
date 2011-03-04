@@ -791,7 +791,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // If a node doesn't have any subnodes yet, we need to create the subnodes lazily when this node is expanded.
 // Also ask the delegate whether we are allowed to do so. Create an operation and put it on the queue to
-// execute this job in the background...
+// execute this job in the background.
+
+// Please note the flag _isReplacingNode: It guards us from an unwanted recursion, as are being replaced in 
+// _replaceNode:, the delegate method outlineViewItemWillExpand: is automatically called - i.e. without the 
+// user actually clicking on a diclosure triangle. This seems to be some internal NSOutlineView behavior. 
+// Obviously we need to suppress populating in this case or we'll cause an endless loop...
 
 - (void) populateNode:(IMBNode*)inNode
 {
