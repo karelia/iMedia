@@ -118,6 +118,7 @@
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+
 - (id) initWithNibName:(NSString *)inNibName
 				bundle:(NSBundle *)inBundle
 			  delegate:(id <IMBSkimmableObjectViewControllerDelegate>)inDelegate
@@ -146,9 +147,8 @@
 		
 		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:[[self class]mediaType]];
 		self.libraryController = libraryController;
-		
-		[self view];
 	}
+	
 	return self;
 }
 
