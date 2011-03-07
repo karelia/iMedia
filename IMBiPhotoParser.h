@@ -60,6 +60,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CONSTANTS
+
+extern NSString* kIMBiPhotoNodeObjectTypeEvent;
+extern NSString* kIMBiPhotoNodeObjectTypeFace;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 @interface IMBiPhotoParser : IMBParser <IMBSkimmableObjectViewControllerDelegate>
@@ -80,6 +89,7 @@
 
 - (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs;		// public utility method to help extract keywords from numbers
 
+- (BOOL) isEventsNode:(IMBNode*)inNode;
 - (NSString*) eventMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 - (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo;

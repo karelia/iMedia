@@ -97,7 +97,6 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 @interface IMBiPhotoParser ()
 
 - (void) addEventsToAlbumsInLibrary:(NSMutableDictionary*)inDict;
-- (BOOL) isEventsNode:(IMBNode*)inNode;
 - (IMBNode*) eventsNodeInNode:(IMBNode*)inNode;
 - (NSString*) idSpaceForAlbumType:(NSString*)inAlbumType;
 - (NSString*) identifierForId:(NSNumber*)inId inSpace:(NSString*)inIdSpace;
