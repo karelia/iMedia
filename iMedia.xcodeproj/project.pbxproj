@@ -1901,7 +1901,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
 			buildSettings = {
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -1909,7 +1909,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
 			buildSettings = {
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -1945,7 +1945,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
 			buildSettings = {
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx;
 			};
 			name = Test;
 		};
