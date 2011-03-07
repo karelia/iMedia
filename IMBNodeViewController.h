@@ -167,3 +167,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
+@protocol IMBNodeViewControllerDelegate
+
+@optional
+
+// The delegate can supply its own object view controllers for certain nodes. 
+// If it chooses to do so, this overrides everything else...
+
+- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+

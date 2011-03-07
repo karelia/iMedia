@@ -1341,6 +1341,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 {
 	NSViewController* viewController = nil;
 	NSString* identifier = inNode.identifier;
+	id delegate = self.libraryController.delegate;
 	
 	if (identifier)
 	{
@@ -1348,8 +1349,16 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		
 		if (viewController == nil)
 		{
-			viewController = [inNode.parser customHeaderViewControllerForNode:inNode];
+			if (delegate != nil && [delegate respondsToSelector:@selector(customHeaderViewControllerForNode:)])
+			{
+				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customHeaderViewControllerForNode:inNode];
+			}
 
+			if (viewController == nil)
+			{
+				viewController = [inNode.parser customHeaderViewControllerForNode:inNode];
+			}
+			
 			if (_customHeaderViewControllers == nil && viewController != nil)
 			{
 				_customHeaderViewControllers = [[NSMutableDictionary alloc] init];
@@ -1377,6 +1386,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 {
 	NSViewController* viewController = nil;
 	NSString* identifier = inNode.identifier;
+	id delegate = self.libraryController.delegate;
 	
 	if (identifier)
 	{
@@ -1384,7 +1394,15 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 		if (viewController == nil)
 		{
-			viewController = [inNode.parser customObjectViewControllerForNode:inNode];
+			if (delegate != nil && [delegate respondsToSelector:@selector(customObjectViewControllerForNode:)])
+			{
+				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customObjectViewControllerForNode:inNode];
+			}
+			
+			if (viewController == nil)
+			{
+				viewController = [inNode.parser customObjectViewControllerForNode:inNode];
+			}
 
 			if (_customObjectViewControllers == nil && viewController != nil)
 			{
@@ -1412,6 +1430,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 {
 	NSViewController* viewController = nil;
 	NSString* identifier = inNode.identifier;
+	id delegate = self.libraryController.delegate;
 	
 	if (identifier)
 	{
@@ -1419,7 +1438,15 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 		if (viewController == nil)
 		{
-			viewController = [inNode.parser customFooterViewControllerForNode:inNode];
+			if (delegate != nil && [delegate respondsToSelector:@selector(customFooterViewControllerForNode:)])
+			{
+				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customFooterViewControllerForNode:inNode];
+			}
+			
+			if (viewController == nil)
+			{
+				viewController = [inNode.parser customFooterViewControllerForNode:inNode];
+			}
 
 			if (_customFooterViewControllers == nil && viewController != nil)
 			{
