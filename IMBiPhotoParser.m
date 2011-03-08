@@ -611,7 +611,9 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 								  kIMBiPhotoNodeObjectTypeEvent, @"nodeObjectType", nil];
 
-		return [[[IMBiPhotoEventObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];;
+		NSViewController* viewController = [[[IMBiPhotoEventObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];
+		[viewController view];
+		return viewController;
 	}
 	
 	return [super customObjectViewControllerForNode:inNode];
