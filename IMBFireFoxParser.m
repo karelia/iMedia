@@ -183,7 +183,9 @@
 		{
 			NSError *error = nil;
 			(void) [fm removeItemAtPath:newPath error:nil];
-			BOOL copied = [fm copyItemAtPath:self.databasePathOriginal toPath:newPath error:&error];
+			BOOL copied = (nil != self.databasePathOriginal)
+				&& (nil != newPath)
+				&& [fm copyItemAtPath:self.databasePathOriginal toPath:newPath error:&error];
 			if (!copied)
 			{
 				NSLog(@"Unable to copy Firefox bookmarks.");

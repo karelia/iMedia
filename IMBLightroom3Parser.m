@@ -535,7 +535,9 @@
 	
 	if (needToCopyFile) {
 		(void) [fileManager removeItemAtPath:readOnlyDatabasePath error:&error];
-		BOOL copied = [fileManager copyItemAtPath:databasePath toPath:readOnlyDatabasePath error:&error];
+		BOOL copied = (nil != databasePath)
+					&& (nil != readOnlyDatabasePath)
+					&& [fileManager copyItemAtPath:databasePath toPath:readOnlyDatabasePath error:&error];
 		
 		if (!copied) {
 			NSLog (@"Unable to copy database file at %@: %@", databasePath, error.localizedDescription);
