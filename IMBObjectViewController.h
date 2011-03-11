@@ -228,7 +228,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 #pragma mark 
 
-@protocol IMBObjectViewControllerDelegate
+@protocol IMBObjectViewControllerDelegate <NSObject>
 
 @optional
 
@@ -243,6 +243,14 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 // With this method the delegate can return a custom drag image for a drags starting from the IKImageBrowserView...
 
 - (NSImage*) draggedImageForController:(IMBObjectViewController*)inController draggedObjects:(NSArray*)inObjects;
+
+// With this method the delegate may add setup instructions for selected (sub)views of the controller.
+// The delegate is advised to be conservative with what to instruct as it may violate framework integrity.
+// The following views a currently provided for delegate setup:
+//
+extern NSString* const IMBObjectViewControllerSegmentedControlKey;		/* Segmented control for object view selection */
+
+- (void) objectViewController:(IMBObjectViewController*)inController didLoadViews:(NSDictionary*)inViews;
 
 @end
 

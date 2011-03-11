@@ -98,6 +98,12 @@ NSString* kIMBPublicMetadataListPasteboardType = @"imedia.metadata";
 
 NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
+NSString* kGlobalViewTypeKeyPath = @"globalViewType";
+
+// Keys to be used by delegate
+
+NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl";	/* Segmented control for object view selection */
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -272,6 +278,15 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 #pragma mark 
 
+- (id <IMBObjectViewControllerDelegate>) delegate
+{
+	return self.libraryController.delegate;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (id) initWithNibName:(NSString*)inNibName bundle:(NSBundle*)inBundle
 {
 	if (self = [super initWithNibName:inNibName bundle:inBundle])
@@ -375,6 +390,22 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		 selector:@selector(_saveStateToPreferences) 
 		 name:NSApplicationWillTerminateNotification 
 		 object:nil];
+	
+	// Observe changes by other controllers to global view type preference if we use global view type
+	// so we can change our own view type accordingly
+	
+	if ([IMBConfig useGlobalViewType])
+	{
+		[IMBConfig addObserver:self forKeyPath:kGlobalViewTypeKeyPath options:0 context:(void*)kGlobalViewTypeKeyPath];
+	}
+	
+	// After all has been said and done delegate may do additional setup on selected (sub)views
+	
+	if ([[self delegate] respondsToSelector:@selector(objectViewController:didLoadViews:)])
+	{
+		NSDictionary* views = [NSDictionary dictionaryWithObjectsAndKeys:ibSegments, IMBObjectViewControllerSegmentedControlKey, nil];
+		[[self delegate] objectViewController:self didLoadViews:views];
+	}
 }
 
 // Do not remove this method. It isn't called directly by the framework, but is called by host applications. 
@@ -485,6 +516,17 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	
+	// The globally set view type in preferences was changed - adjust our own view type accordingly.
+	
+	else if (inContext == (void*)kGlobalViewTypeKeyPath && [IMBConfig useGlobalViewType])
+	{
+		// Don't use setViewType: here as it would cause an endless recursion
+		
+		[self willChangeValueForKey:@"viewType"];
+		_viewType = [[IMBConfig globalViewType] unsignedIntegerValue];
+		[self didChangeValueForKey:@"viewType"];
+	}
+	
 	// Find the row and reload it. Note that KVO notifications may be sent from a background thread (in this 
 	// case, we know they will be) We should only update the UI on the main thread, and in addition, we use 
 	// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
@@ -517,15 +559,6 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (IMBNode*) currentNode
 {
 	return [_nodeViewController selectedNode];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) delegate
-{
-	return self.libraryController.delegate;
 }
 
 
@@ -734,18 +767,13 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	[self willChangeValueForKey:@"canUseIconSize"];
 	_viewType = inViewType;
-	[IMBConfig setPrefsValue:[NSNumber numberWithUnsignedInteger:inViewType] forKey:@"globalViewType"];
+	[IMBConfig setGlobalViewType:[NSNumber numberWithUnsignedInteger:inViewType]];
 	[self didChangeValueForKey:@"canUseIconSize"];
 }
 
 
 - (NSUInteger) viewType
 {
-	if ([IMBConfig useGlobalViewType])
-	{
-		return [[IMBConfig prefsValueForKey:@"globalViewType"] unsignedIntegerValue];
-	}
-	
 	return _viewType;
 }
 
