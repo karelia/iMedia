@@ -109,7 +109,7 @@
 	// NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d",   MAC_OS_X_VERSION_MIN_REQUIRED, MAC_OS_X_VERSION_MAX_ALLOWED);
 	
 	[IMBConfig setShowsGroupNodes:YES];
-	[IMBConfig setUseGlobalViewType:YES];
+	[IMBConfig setUseGlobalViewType:NO];
 	
 #if CUSTOM_USER_INTERFACE
 	
@@ -439,6 +439,31 @@
 		return backgroundLayer;
 	}
 	return nil;
+}
+
+
+- (void) objectViewController:(IMBObjectViewController*)inController didLoadViews:(NSDictionary*)inViews
+{
+	// Always show icon view when on events node (and hide view selection control)
+	
+	if ([inController isKindOfClass:[IMBiPhotoEventObjectViewController class]])
+	{
+		// This makes good sense only if we are not in "use global view type" mode
+		
+		if (![IMBConfig useGlobalViewType]) {
+			// Make sure the object view controller's preferences reflect the view type we want to show
+			// (preferences will later be loaded into object)
+			
+			NSMutableDictionary* preferences = [IMBConfig prefsForClass:inController.class];
+			[preferences setObject:[NSNumber numberWithUnsignedInteger:0] forKey:@"viewType"];
+			[IMBConfig setPrefs:preferences forClass:inController.class];
+			
+			// Hide the control
+			
+			NSSegmentedControl* segmentedControl = [inViews objectForKey:IMBObjectViewControllerSegmentedControlKey];
+			[segmentedControl setHidden:YES];
+		}
+	}
 }
 
 

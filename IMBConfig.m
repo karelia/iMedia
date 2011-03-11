@@ -175,6 +175,26 @@ static BOOL sUseGlobalViewType = NO;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Make global view type preference value an observable property
+
++ (void) setGlobalViewType:(NSNumber*)viewType
+{
+	NSString* key = @"globalViewType";
+	[self willChangeValueForKey:key];
+	[self setPrefsValue:viewType forKey:key];
+	[self didChangeValueForKey:key];
+}
+
+
++ (NSNumber*) globalViewType
+{
+	return (NSNumber*) [self prefsValueForKey:@"globalViewType"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Sets the path to the download folder. Default is ~/Downloads...
 
 + (void) setDownloadFolderPath:(NSString*)inPath
