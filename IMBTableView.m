@@ -188,7 +188,7 @@ enum IMBMouseOperation
 		{
 			if (NSIntersectsRect(drawRect,clipRect))
 			{
-				[[_customBackgroundColors objectAtIndex:i%n] set];
+				[(NSColor*)[_customBackgroundColors objectAtIndex:i%n] set];
 				NSRectFillUsingOperation(drawRect,NSCompositeSourceOver);
 			}
 			

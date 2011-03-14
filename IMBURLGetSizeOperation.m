@@ -55,6 +55,17 @@
 #import "IMBCommon.h"
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@interface IMBURLGetSizeOperation ()
+
+- (void) connectionDidFinishLoading:(NSURLConnection*)inConnection;
+
+@end
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -75,7 +86,7 @@
 
 - (id) initWithURL:(NSURL*)inURL delegate:(id)inDelegate
 {
-	if (self = [super init])
+	if ((self = [super init]) != nil)
 	{
 		self.remoteURL = inURL;
 		self.delegate = inDelegate;
