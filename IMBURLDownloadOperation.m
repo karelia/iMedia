@@ -63,6 +63,9 @@
 #pragma mark
 
 @interface IMBURLDownloadOperation ()
+
+- (void) downloadDidFinish:(NSURLDownload*)inDownload;
+
 @end
 
 
