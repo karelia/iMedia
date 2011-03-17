@@ -232,7 +232,7 @@
 																  @"Name of Collections node in IMBLightroomParser");
 	
 	IMBNode* collectionsNode = [[[IMBNode alloc] init] autorelease];
-	collectionsNode.identifier = [self identifierWithCollectionId:0];
+	collectionsNode.identifier = [self identifierWithCollectionId:[NSNumber numberWithLong:0]];
 	collectionsNode.name = collectionsName;
 	collectionsNode.icon = [self groupIcon];
 	collectionsNode.parser = self;
