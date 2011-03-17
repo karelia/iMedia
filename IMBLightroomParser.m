@@ -96,6 +96,14 @@ static NSArray* sSupportedUTIs = nil;
 
 @synthesize absolutePyramidPath = _absolutePyramidPath;
 
+- (id) init
+{
+	if ((self = [super init]) != nil) {
+	}
+	
+	return self;
+}
+
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if ((self = [super initWithCoder:inCoder]) != nil) {
