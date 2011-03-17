@@ -91,6 +91,7 @@ extern NSString* kIMBQuickLookImageProperty;
 	NSDictionary* _metadata;
 	NSString* _metadataDescription;
 	IMBParser* _parser;
+    NSString *_parserClassName;
 	NSUInteger _index;
 	
 	id _imageRepresentation;								
@@ -112,6 +113,7 @@ extern NSString* kIMBQuickLookImageProperty;
 @property (retain) id location;								// Path, URL, or other location info
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
+@property (copy, readonly) NSString* parserClassName;		// Name of the parser class which created this object
 @property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
 @property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
 @property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)

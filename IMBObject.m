@@ -83,6 +83,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 #pragma mark 
 
 @interface IMBObject ()
+
+@property (copy) NSString *parserClassName;
+
 - (CGImageRef) _renderQuickLookImage;
 @end
 
@@ -99,6 +102,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
 @synthesize parser = _parser;
+@synthesize parserClassName = _parserClassName;
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
 @synthesize shouldDisableTitle = _shouldDisableTitle;
@@ -110,6 +114,20 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize isLoadingThumbnail = _isLoadingThumbnail;
 
 @synthesize metadataDescription = _metadataDescription;
+
+- (void)setParser:(IMBParser *)parser
+{
+    if (parser != _parser) {
+        [self willChangeValueForKey:@"parser"];
+        
+        [_parser release];
+        _parser = [parser retain];
+        
+        self.parserClassName = NSStringFromClass([_parser class]);
+        
+        [self didChangeValueForKey:@"parser"];
+    }
+}
 
 /*
  DISCUSSION: METADATA DESCRIPTION
@@ -142,7 +160,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (id) init
 {
-	if (self = [super init])
+	if ((self = [super init]) != nil)
 	{
 		self.index = NSNotFound;
 		self.shouldDrawAdornments = YES;
@@ -158,10 +176,11 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (id) initWithCoder:(NSCoder*)inCoder
 {
-	if (self = [super init])
+	if ((self = [super init]) != nil)
 	{
 		self.location = [inCoder decodeObjectForKey:@"location"];
 		self.name = [inCoder decodeObjectForKey:@"name"];
+		self.parserClassName = [inCoder decodeObjectForKey:@"parserClassName"];
 		self.preliminaryMetadata = [inCoder decodeObjectForKey:@"preliminaryMetadata"];
 		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
 		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
@@ -179,6 +198,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 {
 	[inCoder encodeObject:self.location forKey:@"location"];
 	[inCoder encodeObject:self.name forKey:@"name"];
+	[inCoder encodeObject:self.parserClassName forKey:@"parserClassName"];
 	[inCoder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
 	[inCoder encodeObject:self.metadata forKey:@"metadata"];
 	[inCoder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
@@ -220,6 +240,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	IMBRelease(_metadata);
 	IMBRelease(_metadataDescription);
 	IMBRelease(_parser);
+	IMBRelease(_parserClassName);
 	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
@@ -759,7 +780,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
  
 - (NSString*) identifier
 {
-	NSString* parserName = NSStringFromClass([_parser class]);
+	NSString* parserName = self.parserClassName;
 	NSString* location = nil;
 	
 	if ([self.location isKindOfClass:[NSString class]])
