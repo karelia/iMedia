@@ -186,11 +186,6 @@ static NSArray* sSupportedUTIs = nil;
 - (BOOL) isFolderNode:(IMBNode*)inNode;
 - (BOOL) isCollectionNode:(IMBNode*)inNode;
 
-- (NSDictionary*) attributesWithRootFolder:(NSNumber*)inRootFolder
-								   idLocal:(NSNumber*)inIdLocal
-								  rootPath:(NSString*)inRootPath
-							  pathFromRoot:(NSString*)inPathFromRoot
-                                  nodeType:(IMBLightroomNodeType)inNodeType;
 - (NSNumber*) rootFolderFromAttributes:(NSDictionary*)inAttributes;
 - (NSNumber*) idLocalFromAttributes:(NSDictionary*)inAttributes;
 - (NSString*) rootPathFromAttributes:(NSDictionary*)inAttributes;
@@ -440,6 +435,12 @@ static NSArray* sSupportedUTIs = nil;
 		[self populateObjectsForCollectionNode:inNode];
 	}
 	
+    else
+    {
+    	inNode.subNodes = [NSArray array];
+        inNode.objects = [NSArray array];
+    }
+
 	if (outError) *outError = error;
 	return error == nil;
 }
@@ -1362,23 +1363,6 @@ static NSArray* sSupportedUTIs = nil;
 
 - (BOOL) isFolderNode:(IMBNode*)inNode
 {
-	NSString* identifier = inNode.identifier;
-    NSString* pathPrefix = [self pathPrefixWithType:@"folder"];
-	NSString* identifierPrefix = [self identifierForPath:pathPrefix];
-	return [identifier hasPrefix:identifierPrefix];
-}
-
-
-- (BOOL) isCollectionNode:(IMBNode*)inNode
-{
-	NSString* identifier = inNode.identifier;
-    NSString* pathPrefix = [self pathPrefixWithType:@"collection"];
-	NSString* identifierPrefix = [self identifierForPath:pathPrefix];
-	return [identifier hasPrefix:identifierPrefix];
-}
-/*
- - (BOOL) isFolderNode:(IMBNode*)inNode
-{
     NSDictionary* attributes = inNode.attributes;
     IMBLightroomNodeType nodeType = [self nodeTypeFromAttributes:attributes];
     
@@ -1393,7 +1377,7 @@ static NSArray* sSupportedUTIs = nil;
     
     return (nodeType == IMBLightroomNodeTypeCollection);
 }
-*/
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1408,7 +1392,7 @@ static NSArray* sSupportedUTIs = nil;
 							  pathFromRoot:(NSString*)inPathFromRoot
                                   nodeType:(IMBLightroomNodeType)inNodeType
 {
-	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:4];
+	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:5];
 	
 	[dictionary setValue:inRootFolder forKey:@"rootFolder"];
 	[dictionary setValue:inRootPath forKey:@"rootPath"];
