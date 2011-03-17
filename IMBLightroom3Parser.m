@@ -205,7 +205,11 @@
 	foldersNode.name = foldersName;
 	foldersNode.icon = [self folderIcon];
 	foldersNode.parser = self;
-	//	foldersNode.attributes = [self attributesWithId:id_local path:nil];
+	foldersNode.attributes = [self attributesWithRootFolder:id_local
+                                                    idLocal:id_local
+                                                   rootPath:nil
+                                               pathFromRoot:nil
+                                                   nodeType:IMBLightroomNodeTypeFolder];
 	foldersNode.leaf = NO;
 	
 	[subNodes addObject:foldersNode];

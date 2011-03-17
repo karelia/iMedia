@@ -123,6 +123,12 @@ IMBLightroomNodeType;
 - (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
 - (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
 
+- (NSDictionary*) attributesWithRootFolder:(NSNumber*)inRootFolder
+								   idLocal:(NSNumber*)inIdLocal
+								  rootPath:(NSString*)inRootPath
+							  pathFromRoot:(NSString*)inPathFromRoot
+                                  nodeType:(IMBLightroomNodeType)inNodeType;
+
 - (NSImage*) largeFolderIcon;
 
 // Returns a cached FMDatabase for the current thread
