@@ -200,11 +200,13 @@ enum IMBMouseOperation
 
 - (void) awakeFromNib
 {
-	_cellClass = [self _cellClass];
-	
-	if ([self respondsToSelector:@selector(setCellClass:)])
+	if (IMBRunningOnSnowLeopardOrNewer())
 	{
-		[self performSelector:@selector(setCellClass:) withObject:_cellClass];
+		_cellClass = [self _cellClass];
+		if ([self respondsToSelector:@selector(setCellClass:)])
+		{
+			[self performSelector:@selector(setCellClass:) withObject:_cellClass];
+		}
 	}
 
 	[self setConstrainsToOriginalSize:NO];
@@ -224,7 +226,11 @@ enum IMBMouseOperation
 
 - (IKImageBrowserCell*) newCellForRepresentedItem:(id)inItem
 {
-	return [[_cellClass alloc] init];
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		return [[_cellClass alloc] init];
+	}
+	return [super newCellForRepresentedItem:inItem];
 }
 
 
