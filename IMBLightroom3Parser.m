@@ -524,12 +524,12 @@
 	if ([fileManager fileExistsAtPath:readOnlyDatabasePath]) {
 		error = nil;
 		NSDictionary *attributesOfCopy = [fileManager attributesOfItemAtPath:readOnlyDatabasePath error:&error];
-		if (error) (@"Unable to fetch attributes from %@: %@", readOnlyDatabasePath, error.localizedDescription);
+		if (error) NSLog (@"Unable to fetch attributes from %@: %@", readOnlyDatabasePath, error.localizedDescription);
 		NSDate *modDateOfCopy = [attributesOfCopy fileModificationDate];
 		
 		error = nil;
 		NSDictionary *attributesOfOrig = [fileManager attributesOfItemAtPath:databasePath error:&error];
-		if (error) (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
+		if (error) NSLog (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
 		NSDate *modDateOfOrig = [attributesOfOrig fileModificationDate];
 		
 		if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy]) {
