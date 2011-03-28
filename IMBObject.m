@@ -61,6 +61,7 @@
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
 #import "IMBObjectFifoCache.h"
+#import "IMBParserController.h"
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
@@ -85,6 +86,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @interface IMBObject ()
 
 @property (copy) NSString *parserClassName;
+@property (copy) NSString *parserMediaType;
+@property (copy) NSString *parserMediaSource;
 
 - (CGImageRef) _renderQuickLookImage;
 @end
@@ -103,6 +106,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize metadata = _metadata;
 @synthesize parser = _parser;
 @synthesize parserClassName = _parserClassName;
+@synthesize parserMediaType = _parserMediaType;
+@synthesize parserMediaSource = _parserMediaSource;
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
 @synthesize shouldDisableTitle = _shouldDisableTitle;
@@ -115,6 +120,31 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 @synthesize metadataDescription = _metadataDescription;
 
+- (IMBParser*)parser
+{
+    if (_parser != nil) {
+        return [[_parser retain] autorelease];
+    }
+    
+    NSString *parserMediaType = self.parserMediaType;
+    NSString *parserMediaSource = self.parserMediaSource;
+    
+    if ((parserMediaType == nil) || (parserMediaSource == nil)) {
+        return nil;
+    }
+    
+    IMBParserController *parserController = [IMBParserController sharedParserController];
+    NSArray *loadedParsers = [parserController loadedParsersForMediaType:parserMediaType];
+    
+    for (IMBParser *parser in loadedParsers) {
+        if ([parser.mediaSource isEqualToString:parserMediaSource]) {
+            return parser;
+        }
+    }
+    
+    return nil;
+}
+
 - (void)setParser:(IMBParser *)parser
 {
     if (parser != _parser) {
@@ -124,6 +154,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
         _parser = [parser retain];
         
         self.parserClassName = NSStringFromClass([_parser class]);
+        self.parserMediaType = [_parser mediaType];
+        self.parserMediaSource = [_parser mediaSource];
         
         [self didChangeValueForKey:@"parser"];
     }
@@ -181,6 +213,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 		self.location = [inCoder decodeObjectForKey:@"location"];
 		self.name = [inCoder decodeObjectForKey:@"name"];
 		self.parserClassName = [inCoder decodeObjectForKey:@"parserClassName"];
+		self.parserMediaType = [inCoder decodeObjectForKey:@"parserMediaType"];
+		self.parserMediaSource = [inCoder decodeObjectForKey:@"parserMediaSource"];
 		self.preliminaryMetadata = [inCoder decodeObjectForKey:@"preliminaryMetadata"];
 		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
 		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
@@ -199,6 +233,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	[inCoder encodeObject:self.location forKey:@"location"];
 	[inCoder encodeObject:self.name forKey:@"name"];
 	[inCoder encodeObject:self.parserClassName forKey:@"parserClassName"];
+	[inCoder encodeObject:self.parserMediaSource forKey:@"parserMediaSource"];
+	[inCoder encodeObject:self.parserMediaType forKey:@"parserMediaType"];
 	[inCoder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
 	[inCoder encodeObject:self.metadata forKey:@"metadata"];
 	[inCoder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
@@ -218,7 +254,10 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	copy.metadata = self.metadata;
 	copy.metadataDescription = self.metadataDescription;
 	copy.parser = self.parser;
-	copy.index = self.index;
+    copy.parserClassName = self.parserClassName;
+	copy.parserMediaType = self.parserMediaType;
+	copy.parserMediaSource = self.parserMediaSource;
+    copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
 	copy.shouldDisableTitle = self.shouldDisableTitle;
 
@@ -241,6 +280,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	IMBRelease(_metadataDescription);
 	IMBRelease(_parser);
 	IMBRelease(_parserClassName);
+	IMBRelease(_parserMediaType);
+	IMBRelease(_parserMediaSource);
 	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
