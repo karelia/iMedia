@@ -193,7 +193,7 @@
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super initWithMediaType:inMediaType])
+	if ((self = [super initWithMediaType:inMediaType]) != nil)
 	{
 		self.appPath = [[self class] aperturePath];
 		self.plist = nil;
@@ -783,16 +783,19 @@
 					NSString* imagePath = [objectDict objectForKey:@"ImagePath"];
 					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [objectDict objectForKey:@"Caption"];
-
+                    NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:objectDict];
+                    
+                    [preliminaryMetadata setObject:key forKey:@"VersionUUID"];
+                    
 					IMBObject* object = [[objectClass alloc] init];
 					[objects addObject:object];
 					[object release];
 
 					object.location = (id)imagePath;
 					object.name = caption;
-					object.preliminaryMetadata = objectDict;	// This metadata from the XML file is available immediately
-					object.metadata = nil;						// Build lazily when needed (takes longer)
-					object.metadataDescription = nil;			// Build lazily when needed (takes longer)
+					object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
+					object.metadata = nil;                              // Build lazily when needed (takes longer)
+					object.metadataDescription = nil;                   // Build lazily when needed (takes longer)
 					object.parser = self;
 					object.index = index++;
 
@@ -825,6 +828,7 @@
 {
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
 	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
+    
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
 	if ([NSThread isMainThread])
