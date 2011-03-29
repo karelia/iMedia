@@ -50,7 +50,7 @@
 #import "IMBDynamicTableView.h"
 #import "IMBCommon.h"
 
-@interface NSTableView()
+@interface NSTableView(NotPublicSoThisMightBeAProblemForTheMAS)
 // Define this so we can call through to super, for when we are running Snow Leopard
 - (void)reloadDataForRowIndexes:(NSIndexSet *)rowIndexes columnIndexes:(NSIndexSet *)columnIndexes;
 @end
