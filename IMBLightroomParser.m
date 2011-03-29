@@ -1042,6 +1042,7 @@ static NSArray* sSupportedUTIs = nil;
 			break;
 	}
 	
+	CGImageRef rotatedImage = NULL;
 	CGColorSpaceRef colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
 	CGContextRef context = CGBitmapContextCreate(NULL,
 												 (orientationProperty < 5) ? w : h,
@@ -1050,17 +1051,19 @@ static NSArray* sSupportedUTIs = nil;
 												 0,
 												 colorSpace,
 												 kCGImageAlphaPremultipliedFirst);
-	CGContextSetAllowsAntialiasing(context, FALSE);
-	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
 	CGColorSpaceRelease(colorSpace);
-	
-	CGContextConcatCTM(context, transform);
-	CGContextDrawImage(context, CGRectMake(0, 0, w, h), imgRef);
-	
-	CGImageRef rotatedImage = CGBitmapContextCreateImage(context);
-	
-	CFRelease(context);
-	[NSMakeCollectable(rotatedImage) autorelease];
+												 
+	if (context)
+	{											 
+		CGContextSetAllowsAntialiasing(context, FALSE);
+		CGContextSetInterpolationQuality(context, kCGInterpolationNone);
+		CGContextConcatCTM(context, transform);
+		CGContextDrawImage(context, CGRectMake(0, 0, w, h), imgRef);
+		rotatedImage = CGBitmapContextCreateImage(context);
+		CFRelease(context);
+		
+		[NSMakeCollectable(rotatedImage) autorelease];
+	}
 	
 	return rotatedImage;
 }
