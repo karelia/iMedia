@@ -1,0 +1,279 @@
+/* Album label in metadataDescription */
+"Album" = "Album";
+
+/* Artist label in metadataDescription */
+"Artist" = "Artiest";
+
+/* Comment label in metadataDescription */
+"Comment" = "Commentaar";
+
+/* HTML markup to show link to iMedia home page */
+"IMB.availableLink" = "Beschikbaar bij <a href='http://karelia.com/imedia/'>karelia.com/imedia</a>";
+
+/* HTML style text shown on credits for iMedia, introducting who wrote the software */
+"IMB.credits" = "Erkentelijkheid:";
+
+/* HTML style text shown on credits for iMedia */
+"IMB.introduction" = "Een uitbreidbaar bestandsdeel voor het doorzoeken van diverse mediasoorten.";
+
+/* HTML style text shown on credits for iMedia */
+"IMB.licenseIntro" = "De iMedia Browser Framework wordt in licentie gegeven volgens de volgende voorwaarden";
+
+/* HTML style text shown on credits for iMedia, to introduct who did localization */
+"IMB.localization" = "Lokalisatie:";
+
+/* back of window */
+"IMB.option.gridPrompt" = "Fotorasters:";
+
+/* back of window checkbox */
+"IMB.option.showTitles" = "Laat titels zien";
+
+/* back of window checkbox */
+"IMB.option.smallSize" = "Kleine maat";
+
+/* back of window */
+"IMB.option.toolbar" = "Gereedschapsbalk:";
+
+/* back of window toolbar popup menu item */
+"IMB.option.toolbarSize.iconAndText" = "Icoon & tekst";
+
+/* back of window toolbar popup menu item */
+"IMB.option.toolbarSize.iconOnly" = "Alleen icoon";
+
+/* back of window toolbar popup menu item */
+"IMB.option.toolbarSize.textOnly" = "Alleen tekst";
+
+/* Message in the Aperture header view */
+"IMBApertureParser.header.placeholderMessage" = "Ga naar Aperture preferences > Preview > Share Previews with iLife and iWork.\nStel in op \"Always\".";
+
+/* Title in the Aperture header view */
+"IMBApertureParser.header.placeholderTitle" = "Maak voorvertoning-delen mogelijk" ;
+
+/* Format string for object count in plural */
+"IMBAudioViewController.countFormatPlural" = "%d liedjes";
+
+/* Format string for object count in singular */
+"IMBAudioViewController.countFormatSingular" = "%d lied";
+
+/* mediaType display name */
+"IMBAudioViewController.displayName" = "Audio";
+
+/* Button title in Flickr Options */
+"IMBFlickrParser.button.add" = "Voeg toe";
+
+/* Button title in Flickr Options */
+"IMBFlickrParser.button.remove" = "Verwijder";
+
+/* Format string for attribution credit; flickr user followed by short URL */
+"IMBFlickrParser.format.attribution" = "Foto door %1$@ - %2$@";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.any" = "Iedere";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.chooseBy" = "Kies bij";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.commercialUse" = "Commercieel gebruik";
+
+/* Flickr parser node context menu title. */
+"IMBFlickrParser.menu.copyAttribution" = "Kopieer toeschrijving";
+
+/* Flickr parser node context menu title. */
+"IMBFlickrParser.menu.copyFlickrURL" = "Kopieer Flickr pagina URL";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.creativeCommons" = "Creative Commons";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.datePosted" = "Datum gepost";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.dateTaken" = "Datum genomen";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.derivativeWorks" = "Afgeleid werk";
+
+/* Context menu item title to warn of not being downloadable */
+"IMBFlickrParser.menu.downloadingNotPermitted" = "Downloaden niet toegestaan";
+
+/* Flickr parser node context menu title. */
+"IMBFlickrParser.menu.edit" = "Wijzig";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.interest" = "Interesse";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.license" = "Licentie";
+
+/* Button title in Flickr parser
+   Flickr parser node context menu title. */
+"IMBFlickrParser.menu.loadmore" = "Laad meer";
+
+/* Flickr parser node context menu title. */
+"IMBFlickrParser.menu.openflickrpage" = "Open Flickr pagina";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.relevance" = "Relevantie";
+
+/* Flickr parser node context menu title. */
+"IMBFlickrParser.menu.remove" = "Verwijder '%@'";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.searchIn" = "Zoek in";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.tag" = "Label";
+
+/* Menu item in Flickr options popup */
+"IMBFlickrParser.menu.text" = "Tekst";
+
+/* Flickr parser standard node name. */
+"IMBFlickrParser.node.mostinteresting" = "Meest interessante";
+
+/* Flickr parser standard node name. */
+"IMBFlickrParser.node.recent" = "Recente";
+
+/* Name of node in IMBGarageBandParser */
+"IMBGarageBandParser.demosongs.name" = "Demo liedjes";
+
+/* Name of node in IMBGarageBandParser */
+"IMBGarageBandParser.usersongs.name" = "Mijn composities";
+
+/* Caption for Image Capture Root node */
+"IMBImageCaptureParser.Devices" = "Apparaten";
+
+/* Caption for loading camera */
+"IMBImageCaptureParser.loading" = "Laden…";
+
+/* Format string for object count in plural */
+"IMBImageViewController.countFormatPlural" = "%d afbeeldingen";
+
+/* Format string for object count in singluar */
+"IMBImageViewController.countFormatSingular" = "%d afbeelding";
+
+/* mediaType display name */
+"IMBImageViewController.displayName" = "Afbeeldingen";
+
+/* group node display name */
+"IMBLibraryController.groupnode.folders" = "MAPPEN";
+
+/* group node display name */
+"IMBLibraryController.groupnode.internet" = "INTERNET";
+
+/* group node display name */
+"IMBLibraryController.groupnode.libraries" = "BIBLIOTHEKEN";
+
+/* group node display name */
+"IMBLibraryController.groupnode.searches" = "ZOEKEN";
+
+/* Name of Collections node in IMBLightroomParser */
+"IMBLightroomParser.collectionsName" = "Collecties";
+
+/* Name of Folders node in IMBLightroomParser */
+"IMBLightroomParser.foldersName" = "Mappen";
+
+/* Name of unnamed node in IMBLightroomParser */
+"IMBLightroomParser.Unnamed" = "Naamloos";
+
+/* Format string for object count in plural */
+"IMBLinkViewController.countFormatPlural" = "%d URLs";
+
+/* Format string for object count in singluar */
+"IMBLinkViewController.countFormatSingular" = "%d URL";
+
+/* mediaType display name */
+"IMBLinkViewController.displayName" = "Links";
+
+/* Error when loading a object file synchronously has failed. */
+"IMBLocalObjectsPromise.error" = "Het mediabestand %@ kon niet geladen worden (bestand niet gevonden)";
+
+/* Format string for object count in plural */
+"IMBMovieViewController.countFormatPlural" = "%d films";
+
+/* Format string for object count in singluar */
+"IMBMovieViewController.countFormatSingular" = "%d film";
+
+/* mediaType display name */
+"IMBMovieViewController.displayName" = "Films";
+
+/* Menu item in context menu of outline view */
+"IMBNodeViewController.menuItem.add" = "Voeg toe…";
+
+/* Menu item in context menu of outline view */
+"IMBNodeViewController.menuItem.reload" = "Laad opnieuw";
+
+/* Menu item in context menu of outline view */
+"IMBNodeViewController.menuItem.remove" = "Verwijder";
+
+/* placeholder for untitled image */
+"IMBObject.untitled" = "naamloos";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.download" = "Download";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.open" = "Open";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.openInBrowser" = "Open in browser";
+
+/* Menu item in context menu of IMBLightroomParser */
+"IMBObjectViewController.menuItem.openPreviewInApp.Lightroom" = "Open bewerkte afbeelding in %@";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.openWithApp" = "Open met %@";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.openWithApp.Lightroom" = "Open originele afbeelding met %@";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.openWithFinder" = "Open met Finder";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.openWithFinder.Lightroom" = "Open originele afbeelding met Finder";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.quickLook" = "Geef snel weer";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.revealInFinder" = "Laat in Finder zien";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.revealInFinder.Lightroom" = "Laat originele afbeelding in Finder zien";
+
+/* Text message in progress panel of IMBObjectViewController */
+"IMBObjectViewController.progress.message.preparing" = "Voorbereiden…";
+
+/* Window title of progress panel of IMBObjectViewController */
+"IMBObjectViewController.progress.title" = "Downloaden media bestanden";
+
+/* OmniWeb application name */
+"IMBOmniWebParser.name" = "OmniWeb";
+
+/* String that is displayed in the IMBOutlineView */
+"IMBOutlineView.draggingPrompt" = "Trek aanvullende mappen hier";
+
+/* top-level bookmark name */
+"IMBSafariBookmarkParser.bookmarksBar" = "Bladwijzerbalk";
+
+/* top-level bookmark name */
+"IMBSafariBookmarkParser.bookmarksMenu" = "Bladwijzermenu";
+
+/* Owner (for flickr photographs) label in metadataDescription */
+"Owner" = "Eigenaar";
+
+/* Tags (Flickr term for keywords) label in metadataDescription */
+"Tags" = "Labels";
+
+/* Time label in metadataDescription */
+"Time" = "Tijd";
+
+/* Events node shown in iPhoto library */
+"IMB.iPhotoParser.events" = "Gebeurtenissen";
+
+/* Message to export when Pyramid file is missing */
+"IMB.IMBPyramidObjectPromise.PlaceholderMessage1" = "Bewerkte afbeelding niet gevonden";
+
+/* Message to export when Pyramid file is missing */
+"IMB.IMBPyramidObjectPromise.PlaceholderMessage2" = "\n\nStart Lightroom en selecteer het menu:\nBibliotheek > Voorvertoningen > 1:1 voorvertoningen renderen";
