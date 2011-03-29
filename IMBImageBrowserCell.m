@@ -60,8 +60,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-@interface IKImageBrowserCell ()
+@interface IKImageBrowserCell (NotPublicSoThisMightBeAProblemForTheMAS)
 
 - (void) setDataSource:(id)inDataSource;
 - (void) drawShadow;
@@ -70,9 +69,9 @@
 - (NSRect) imageContainerFrame;
 - (IKImageBrowserView*) imageBrowserView;	// To shut up the compiler when using 10.5.sdk
 - (void) drawTitle;							// To shut up the compiler when using 10.6.sdk
+- (id) parent;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -105,7 +104,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Disable outline and shadow drawing for certion objects...
+// Disable outline and shadow drawing for certain objects...
 
 - (void) setDataSource:(id)inDataSource
 {
@@ -172,7 +171,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (CGFloat) pointSize
+- (CGFloat) imbPointSize
 {
 	CGFloat points = 0;
 	CGFloat width = [((id)self) size].width;
@@ -186,9 +185,9 @@
 
 // Is there any smarter way to do this?
 
-- (void) setTitleColors
+- (void) imbSetTitleColors
 {
-	CGFloat points = [self pointSize];	// we need to get the whole font thing since we have to set the whole attributes
+	CGFloat points = [self imbPointSize];	// we need to get the whole font thing since we have to set the whole attributes
 	
 	NSMutableDictionary *attributes1 = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize:points] forKey:NSFontAttributeName];
 	NSMutableDictionary *attributes2 = [NSMutableDictionary dictionaryWithDictionary:attributes1];
@@ -209,20 +208,20 @@
 
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
-		[[((id)self) imageBrowserView] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
-		[[((id)self) imageBrowserView] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
+		[[self imageBrowserView] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[self imageBrowserView] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
 	}
 	else
 	{
-		[[((id)self) parent] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
-		[[((id)self) parent] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
+		[[self parent] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
+		[[self parent] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
 	}	
 }
 
 
 - (void) drawTitle
 {
-	[self setTitleColors];
+	[self imbSetTitleColors];
 	[super drawTitle];
 }
 

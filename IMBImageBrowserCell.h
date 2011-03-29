@@ -53,10 +53,6 @@
 #pragma mark HEADERS
 
 #import <Quartz/Quartz.h>
-#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5
-#else
-#import "IMBImageKit.h"
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,8 +78,8 @@
 @property BOOL imbShouldDrawShadow;
 @property BOOL imbShouldDisableTitle;
 
-- (void) setTitleColors;
-- (CGFloat) pointSize;
+- (void) imbSetTitleColors;
+- (CGFloat) imbPointSize;
 @end
 
 
