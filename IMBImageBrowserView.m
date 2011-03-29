@@ -79,12 +79,8 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// Declare internal methods of superclass to shut up the compiler...
-
-@interface IKImageBrowserView ()
+@interface IKImageBrowserView (NotPublicSoThisMightBeAProblemForTheMAS)
 - (NSImage*) draggedImage;
-- (void) syncTrackingAreaWithViewBounds;
 @end
 
 

@@ -72,11 +72,9 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-@interface NSTableView (ShutUpTheCompiler)
+@interface NSTableView (NotPublicSoThisMightBeAProblemForTheMAS)
 - (NSColor*) _highlightColorForCell:(NSCell*)inCell;
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
