@@ -196,7 +196,7 @@ enum IMBMouseOperation
 
 - (void) awakeFromNib
 {
-	// if (IMBRunningOnSnowLeopardOrNewer())	//  We don't allow for special cell in Leopard.
+	if (IMBRunningOnSnowLeopardOrNewer())	//  We don't allow for special cell in Leopard.
 	{
 		_cellClass = [self _cellClass];
 		if ([self respondsToSelector:@selector(setCellClass:)])
@@ -222,7 +222,7 @@ enum IMBMouseOperation
 
 - (IKImageBrowserCell*) newCellForRepresentedItem:(id)inItem
 {
-	// if (IMBRunningOnSnowLeopardOrNewer())		//  We don't allow for special cell in Leopard.
+	if (IMBRunningOnSnowLeopardOrNewer())		//  We don't allow for special cell in Leopard.
 	{
 		return [[_cellClass alloc] init];
 	}
