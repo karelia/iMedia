@@ -1806,6 +1806,8 @@
 				);
 				FRAMEWORK_VERSION = A;
 				GCC_ENABLE_OBJC_GC = unsupported;
+				IBC_NOTICES = NO;
+				IBC_WARNINGS = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
