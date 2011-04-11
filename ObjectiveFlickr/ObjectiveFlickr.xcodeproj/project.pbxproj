@@ -23,6 +23,7 @@
 
 /* Begin PBXBuildFile section */
 		248AF9DF0FC82FF300C22A56 /* BridgeSupport in Resources */ = {isa = PBXBuildFile; fileRef = 248AF9DB0FC82FCC00C22A56 /* BridgeSupport */; };
+		652781D01352A674009A880B /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652781CF1352A674009A880B /* CoreServices.framework */; };
 		6A681FE91009F1AB009224E7 /* LFSiteReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A681FE71009F1AB009224E7 /* LFSiteReachability.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6A681FEA1009F1AB009224E7 /* LFSiteReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A681FE81009F1AB009224E7 /* LFSiteReachability.m */; };
 		6A681FEB1009F1AB009224E7 /* LFSiteReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 6A681FE71009F1AB009224E7 /* LFSiteReachability.h */; };
@@ -69,6 +70,7 @@
 
 /* Begin PBXFileReference section */
 		248AF9DB0FC82FCC00C22A56 /* BridgeSupport */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BridgeSupport; sourceTree = "<group>"; };
+		652781CF1352A674009A880B /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		6A681FE71009F1AB009224E7 /* LFSiteReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFSiteReachability.h; sourceTree = "<group>"; };
 		6A681FE81009F1AB009224E7 /* LFSiteReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFSiteReachability.m; sourceTree = "<group>"; };
 		6A8666490F9593B200325E1C /* ObjectiveFlickr.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectiveFlickr.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -93,6 +95,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6A8666A20F95955F00325E1C /* SystemConfiguration.framework in Frameworks */,
+				652781D01352A674009A880B /* CoreServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,6 +126,7 @@
 				248AF9DB0FC82FCC00C22A56 /* BridgeSupport */,
 				6A8666B30F95959E00325E1C /* Linked Frameworks */,
 				6ABF72E70F939BE600B9179E /* Products */,
+				652781CF1352A674009A880B /* CoreServices.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -334,7 +338,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS = (
+					x86_64,
+					i386,
+				);
 				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "ppc i386 ppc64 x86_64";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -355,6 +362,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
+				SDKROOT = macosx10.6;
 				ZERO_LINK = NO;
 			};
 			name = "Release10.6+";
