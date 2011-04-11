@@ -753,6 +753,8 @@
 		FCAA9638134227D700EA1A3A /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLoadMoreObject.h; sourceTree = "<group>"; };
 		FCD9ABB310C677FF0092F441 /* IMBLoadMoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLoadMoreObject.m; sourceTree = "<group>"; };
+		FCEFB408135332360043CBEB /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FCEFB40C135332530043CBEB /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1536,6 +1538,8 @@
 				it,
 				fr,
 				nl,
+				es,
+				ja,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* iMedia */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -1859,6 +1863,8 @@
 				D02CD5C81225138800C773A2 /* fr */,
 				FC32F01F130C47F100966FFD /* it */,
 				FCAA9638134227D700EA1A3A /* nl */,
+				FCEFB408135332360043CBEB /* es */,
+				FCEFB40C135332530043CBEB /* ja */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
