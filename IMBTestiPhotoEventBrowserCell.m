@@ -52,6 +52,17 @@
 #import "IMBTestiPhotoEventBrowserCell.h"
 
 
+#pragma mark -
+
+@interface IKImageBrowserCell (NotPublicSoThisMightBeAProblemForTheMAS)
+
+- (id) parent;
+
+@end
+
+
+#pragma mark -
+
 @implementation IMBTestiPhotoEventBrowserCell
 
 
