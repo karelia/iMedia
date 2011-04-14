@@ -110,13 +110,6 @@
 		if (image) inObject = (id) image;
 	}
 	
-//	if (_imageRepresentation) {
-//		NSLog(@"Retain count of old %@: %ld", _imageRepresentation, CFGetRetainCount((CGImageRef)_imageRepresentation));
-//	}
-//	
-//	if (inObject) {
-//		NSLog(@"Retain count of new %@: %ld", inObject, CFGetRetainCount((CGImageRef)inObject));
-//	}
 	[super setImageRepresentation:inObject];
 	
 	if (image) CGImageRelease(image);
