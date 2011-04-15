@@ -74,7 +74,7 @@
 	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeIcon] forKey:@"viewType"];
 	[classDict setObject:[NSNumber numberWithDouble:0.5] forKey:@"iconSize"];
 	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
-	[pool release];
+	[pool drain];
 }
 
 
@@ -91,7 +91,7 @@
 
 + (float) iconViewReloadDelay
 {
-	return 0.01;	// Delay in seconds. Default delay is decreased for proper skimming user exerience.
+	return 0.00;	// Delay in seconds. Default delay is decreased for proper skimming user exerience.
 }
 
 

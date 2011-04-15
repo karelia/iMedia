@@ -172,6 +172,14 @@
 }
 
 
+// Returns the path to the movie
+
+- (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey
+{
+	return [self imagePathForImageKey:inImageKey];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -209,11 +217,11 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	// Events have other metadata than images
+	// Events, faces have other metadata than images
 	
-	if ([inMetadata objectForKey:@"RollID"])		// Event
+	if ([inMetadata objectForKey:@"PhotoCount"])		// Event, face, ...
 	{
-		return [self eventMetadataDescriptionForMetadata:inMetadata];
+		return [self countableMetadataDescriptionForMetadata:inMetadata];
 	}
 	
 	// Movie

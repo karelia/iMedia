@@ -56,7 +56,10 @@
 #import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
 #import <iMedia/IMBiPhotoEventObjectViewController.h>
+#import <iMedia/IMBFaceObjectViewController.h>
 #import "IMBTestiPhotoEventBrowserCell.h"
+#import "IMBTestFaceBrowserCell.h"
+#import "IMBTestFacesBackgroundLayer.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -416,6 +419,10 @@
 	{
 		return [IMBTestiPhotoEventBrowserCell class];
 	}
+	if ([inController isKindOfClass:[IMBFaceObjectViewController class]])
+	{
+		return [IMBTestFaceBrowserCell class];
+	}
 	return nil;
 }
 
@@ -435,6 +442,15 @@
 		
 		CGColorRef color = CGColorCreate(colorSpace, fillComponents);
 		[backgroundLayer setBackgroundColor:color];
+		
+		return backgroundLayer;
+	}
+	
+	if ([inController isKindOfClass:[IMBFaceObjectViewController class]])
+	{
+		IMBTestFacesBackgroundLayer* backgroundLayer = [[[IMBTestFacesBackgroundLayer alloc] init] autorelease];
+		[[inController iconView] setBackgroundLayer:backgroundLayer];
+		[backgroundLayer setOwner:[inController iconView]];
 		
 		return backgroundLayer;
 	}
@@ -463,6 +479,13 @@
 			NSSegmentedControl* segmentedControl = [inViews objectForKey:IMBObjectViewControllerSegmentedControlKey];
 			[segmentedControl setHidden:YES];
 		}
+	} else if ([inController isKindOfClass:[IMBFaceObjectViewController class]])
+	{
+		IKImageBrowserView* iconView = [inController iconView];
+		
+		// Set some title attributes to mimic iPhoto titles for faces
+
+		[iconView setValue:[IMBTestFaceBrowserCell titleAttributes] forKey:IKImageBrowserCellsTitleAttributesKey];
 	}
 }
 

@@ -52,18 +52,10 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
-#import "IMBNodeObject.h"
-#import "IMBSkimmableObjectViewController.h"
+#import "IMBAppleMediaParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark CONSTANTS
-
-extern NSString* kIMBiPhotoNodeObjectTypeEvent;
-extern NSString* kIMBiPhotoNodeObjectTypeFace;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,30 +63,20 @@ extern NSString* kIMBiPhotoNodeObjectTypeFace;
 
 #pragma mark 
 
-@interface IMBiPhotoParser : IMBParser <IMBSkimmableObjectViewControllerDelegate>
+@interface IMBiPhotoParser : IMBAppleMediaParser
 {
 	NSString* _appPath;
-	NSDictionary* _plist;
-	NSDate* _modificationDate;
 	BOOL _shouldDisplayLibraryName;
 	int _fakeAlbumID;					// for iPhoto2 compatibility
 	NSDateFormatter* _dateFormatter;
 }
 
 @property (retain) NSString* appPath;
-@property (retain) NSDictionary* plist;
-@property (retain) NSDate* modificationDate;
 @property (assign) BOOL shouldDisplayLibraryName;
 @property (retain) NSDateFormatter* dateFormatter;
 
-- (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs;		// public utility method to help extract keywords from numbers
+- (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs; // public utility method to help extract keywords from numbers
 
-- (BOOL) isEventsNode:(IMBNode*)inNode;
-- (NSString*) eventMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
-
-- (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo;
-- (NSString*) imagePathForChildOfNodeObject:(IMBNodeObject*)inNodeObject atIndex:(NSUInteger)inIndex userInfo:(NSDictionary*)inUserInfo;
-- (NSString*) imagePathForKeyChildOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo;
 @end
 
 
