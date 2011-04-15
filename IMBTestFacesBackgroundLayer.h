@@ -17,22 +17,22 @@
  without limitation the rights to use, copy, modify, merge, publish,
  distribute, sublicense, and/or sell copies of the Software, and to permit
  persons to whom the Software is furnished to do so, subject to the following
- conditions:
+ conditions: 
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -41,40 +41,21 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
-// Author: Peter Baumgartner
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark HEADERS
-
-#import "IMBAppleMediaParser.h"
+// Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#import <Quartz/Quartz.h>
+#import <Cocoa/Cocoa.h>
 
-#pragma mark 
 
-@interface IMBApertureParser : IMBAppleMediaParser
-{
-	BOOL _placeholderParser;
-	NSString* _appPath;
-	BOOL _shouldDisplayLibraryName;
-	NSInteger _version;
+@interface IMBTestFacesBackgroundLayer : CALayer {
+	IKImageBrowserView *owner;
 }
-
-@property (assign) BOOL placeholderParser;
-@property (retain) NSString* appPath;
-@property (assign) BOOL shouldDisplayLibraryName;
-@property (assign) NSInteger version;
+@property (assign) IKImageBrowserView *owner;
 
 @end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-

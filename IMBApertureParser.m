@@ -72,8 +72,7 @@
 
 @interface IMBApertureParser ()
 
-- (NSDictionary*) plist;
-- (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId;
+- (NSString*) identifierForId:(NSNumber*) inId inSpace:(NSString*) inIdSpace;
 - (NSString*) rootNodeIdentifier;
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
 - (BOOL) isLeafAlbumType:(NSString*)inType;
@@ -82,7 +81,6 @@
 - (BOOL) shouldUseObject:(NSString*)inObjectType;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
 - (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 @end
 
@@ -96,8 +94,6 @@
 
 @synthesize placeholderParser = _placeholderParser;
 @synthesize appPath = _appPath;
-@synthesize plist = _plist;
-@synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize version = _version;
 
@@ -317,11 +313,18 @@
 {
 	NSError* error = nil;
 	NSDictionary* plist = self.plist;
-	NSArray* albums = [plist objectForKey:@"List of Albums"];
 	NSDictionary* images = [plist objectForKey:@"Master Image List"];
 	
-	[self addSubNodesToNode:inNode albums:albums images:images]; 
-	[self populateNode:inNode albums:albums images:images]; 
+	// Population of events and faces node fundamentally different from album node
+	
+	if ([self isFacesNode:inNode]) {
+		NSDictionary* faces = [plist objectForKey:@"List of Faces"];
+		[self populateFacesNode:inNode withFaces:faces images:images];
+	} else {
+		NSArray* albums = [plist objectForKey:@"List of Albums"];
+		[self addSubNodesToNode:inNode albums:albums images:images]; 
+		[self populateNode:inNode albums:albums images:images]; 
+	}
 
 	if (outError) *outError = error;
 	return error == nil;
@@ -379,36 +382,8 @@
 #pragma mark 
 #pragma mark Helper Methods
 
-// Load the XML file into a plist lazily (on demand). If we notice that an existing cached plist is out-of-date 
-// we get rid of it and load it anew...
 
-- (NSDictionary*) plist
-{
-	NSDictionary* plist = nil;
-	NSError* error = nil;
-	NSString* path = (NSString*)self.mediaSource;
-	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
-	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
-	
-	@synchronized(self)
-	{
-		if ([self.modificationDate compare:modificationDate] == NSOrderedAscending)
-		{
-			self.plist = nil;
-		}
-		
-		if (_plist == nil)
-		{
-			self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
-			self.modificationDate = modificationDate;
-			self.version = [[_plist objectForKey:@"Application Version"] integerValue];
-		}
-		
-		plist = [[_plist retain] autorelease];
-	}
-	
-	return plist;
-}
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (NSInteger) version
@@ -424,16 +399,23 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// Create a unique identifier from the library path and the AlbumID that is stored in the XML file. 
+// An example is "IMBApertureParser://123/Sample/AlbumId/17"...
 
-// Create an unique identifier from the library path and the AlbumID that is stored in the XML file. 
-// An example is "IMBApertureParser://123/Sample/17"...
-
-- (NSString*) identifierWithAlbumId:(NSNumber*)inAlbumId
+- (NSString*) identifierForId:(NSNumber*) inId inSpace:(NSString*) inIdSpace
 {
 	NSString* path = (NSString*) self.mediaSource;
 	NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
-	NSString* albumPath = [NSString stringWithFormat:@"/%i/%@/%@",[path hash],libraryName,inAlbumId];
-	return [self identifierForPath:albumPath];
+	
+	NSString* nodePath = nil;
+	if (inIdSpace)
+	{
+		nodePath = [NSString stringWithFormat:@"/%i/%@/%@/%@",[path hash],libraryName,inIdSpace,inId];
+	} else {
+		nodePath = [NSString stringWithFormat:@"/%i/%@/%@",[path hash],libraryName,inId];
+	}
+	
+	return [self identifierForPath:nodePath];
 }
 
 
@@ -448,7 +430,7 @@
 	
 	if (self.version < 3)
 	{
-		return [self identifierWithAlbumId:[NSNumber numberWithInt:1]];
+		return [self identifierForId:[NSNumber numberWithInt:1] inSpace:nil];
 	}
 	
 	// Aperture 3...
@@ -463,7 +445,7 @@
 		
 		if ([albumType isEqualToString:@"5"])
 		{
-			return [self identifierWithAlbumId:albumId];
+			return [self identifierForId:albumId inSpace:nil];
 		}
 
 		[pool drain];
@@ -471,14 +453,14 @@
 
 	// Fallback if nothing is found...
 	
-	return [self identifierWithAlbumId:[NSNumber numberWithInt:1]];
+	return [self identifierForId:[NSNumber numberWithInt:1] inSpace:nil];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Exclude some album types. Specifically exclude all root albums as the root node has already created
+// Exclude some album types. Specifically exclude all root albums as the root node has already
 // been created by the parser during its first invocation...
 
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType
@@ -491,7 +473,17 @@
 }
 
 
-// Return YES indicated that an album should be a leaf node, i.e. that it does not have a disclosure triangle
+// This method may be used to filter specific albums from the list
+// (e.g. ones that don't have the correct media type).
+// Always returns YES for now.
+
+- (BOOL) shouldUseAlbum:(NSDictionary*)inAlbumDict images:(NSDictionary*)inImages
+{
+	return YES;
+}
+
+
+// Return YES indicating that an album should be a leaf node, i.e. that it does not have a disclosure triangle
 // in the IMBOutlineView...
 
 - (BOOL) isLeafAlbumType:(NSString*)inType
@@ -515,12 +507,23 @@
 		case 19: return YES;	// Slideshow
 		case 94: return YES;	// Photos
 		case 95: return YES;	// Flagged
+		case 96: return NO;		// Smart albums
 		case 97: return NO;		// Library
 		case 98: return NO;		// Library
 		case 99: return NO;		// Library (holding all images)
 	}
 	
-	return NO;
+	return [super isLeafAlbumType:inType];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+// Returns whether the album dictionary provided represents the "photos" album
+
+- (BOOL) isAllPhotosAlbum:(NSDictionary*)inAlbumDict
+{
+	return [[inAlbumDict objectForKey:@"uuid"] isEqualToString:@"allPhotosAlbum"];
 }
 
 
@@ -572,6 +575,7 @@
 {
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
+		{@"v3-Faces",@"sl-icon-small_people.tiff",		@"folder",	nil,	nil},
 		{@"v3-1",	@"SL-album.tiff",					@"folder",	nil,	nil},	// album
 		{@"v3-2",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// smart album
 		{@"v3-3",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// library **** ... 200X
@@ -708,7 +712,12 @@
 		NSString* albumType = [albumDict objectForKey:@"Album Type"];
 		NSString* albumName = [albumDict objectForKey:@"AlbumName"];
 		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
-		NSString* parentIdentifier = parentId ? [self identifierWithAlbumId:parentId] : [self identifierForPath:@"/"];
+		
+		// Root node does not have an id space
+		NSString* parentIdSpace = [inParentNode isTopLevelNode] ? nil : [self idSpaceForAlbumType:albumType];
+		
+		// parent always from same id space for non top-level albums
+		NSString* parentIdentifier = parentId ? [self identifierForId:parentId inSpace:parentIdSpace] : [self identifierForPath:@"/"];
 		
 		if ([self shouldUseAlbumType:albumType] && [inParentNode.identifier isEqualToString:parentIdentifier])
 		{
@@ -722,10 +731,15 @@
 			albumNode.mediaSource = self.mediaSource;
 			albumNode.parser = self;
 
+			// Keep a ref to the album dictionary for later use when we populate this node
+			// so we don't have to loop through the whole album list again to find it.
+			
+			albumNode.attributes = albumDict;
+			
 			// Set the node's identifier. This is needed later to link it to the correct parent node...
 			
 			NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
-			albumNode.identifier = [self identifierWithAlbumId:albumId];
+			albumNode.identifier = [self identifierForId:albumId inSpace:[self idSpaceForAlbumType:albumType]];
 
 			// Add the new album node to its parent (inRootNode)...
 			
@@ -748,6 +762,18 @@
 }
 
 
+// Returns an empty dictionary for now.
+// TODO: Verify whether we need to return some "true" values for "KeyList", "KeyPhotoKey" and "PhotoCount"
+
+- (NSDictionary*) childrenInfoForNode:(IMBNode*)inNode images:(NSDictionary*)inImages
+{
+    return [NSDictionary dictionaryWithObjectsAndKeys:nil];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void) populateNode:(IMBNode*)inNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
 {
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
@@ -761,14 +787,12 @@
 	Class objectClass = [self objectClass];
     NSUInteger index = 0;
 
-	for (NSDictionary* albumDict in inAlbums)
-	{
+	// We saved a reference to the album dictionary when this node was created
+	// (ivar 'attributes') and now happily reuse it to save an outer loop (over album list) here.
+	
+	NSDictionary* albumDict = inNode.attributes;	
+
 		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
-		NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
-		NSString* albumIdentifier = albumId ? [self identifierWithAlbumId:albumId] : [self identifierForPath:@"/"];
-		
-		if ([inNode.identifier isEqualToString:albumIdentifier])
-		{
 //			NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
 			NSArray* imageKeys = [self keylistForAlbum:albumDict];
 
@@ -806,10 +830,8 @@
 				
 				[pool2 drain];
 			}
-		}
 		
 		[pool1 drain];
-	}
     
     inNode.objects = objects;
     [objects release];
@@ -827,7 +849,14 @@
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
-	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
+	
+	// Do not load (key) image specific metadata for node objects
+	// because it doesn't represent the nature of the object well enough.
+	
+	if (![inObject isKindOfClass:[IMBNodeObject class]])
+	{
+		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
+	}
     
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
@@ -842,14 +871,6 @@
 		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
 		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
 	}
-}
-
-
-// Convert metadata into human readable string...
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 

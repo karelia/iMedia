@@ -395,6 +395,38 @@ enum IMBMouseOperation
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Drawing 
+
+// override draw rect and force the background layer to redraw if the view did resize or did scroll 
+
+- (void) drawRect:(NSRect) rect
+{
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		//retrieve the visible area
+		NSRect visibleRect = [self visibleRect];
+		
+		//compare with the visible rect at the previous frame
+		if(!NSEqualRects(visibleRect, _lastVisibleRect)){
+			//we did scroll or resize, redraw the background
+			[[self backgroundLayer] setNeedsDisplay];
+			
+			//update last visible rect
+			_lastVisibleRect = visibleRect;
+		}
+	}
+	
+	[super drawRect:rect];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark
 #pragma mark Skimming 
 

@@ -69,6 +69,7 @@
 @interface IMBImageBrowserView : IKImageBrowserView
 {
 	Class _cellClass;
+	NSRect _lastVisibleRect;			// So we can "scroll" a background image when scrolling
 	BOOL _dragSelectInProgress;
 	NSInteger _mouseOperation;
 	NSInteger _clickedObjectIndex;

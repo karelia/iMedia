@@ -33,6 +33,14 @@
 		3043924B130D1DDC00DD1D34 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E4D4FF130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */; };
+		30F90B2F13584FE700D13233 /* IMBAppleMediaParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B2D13584FE700D13233 /* IMBAppleMediaParser.h */; };
+		30F90B3013584FE700D13233 /* IMBAppleMediaParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B2E13584FE700D13233 /* IMBAppleMediaParser.m */; };
+		30F90B331358501A00D13233 /* IMBFaceObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		30F90B341358501A00D13233 /* IMBFaceObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B321358501A00D13233 /* IMBFaceObjectViewController.m */; };
+		30F90B391358521300D13233 /* IMBTestFaceBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */; };
+		30F90B3A1358521300D13233 /* IMBTestFacesBackgroundLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */; };
+		30F90B3C1358529700D13233 /* cork-background.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F90B3B1358529700D13233 /* cork-background.png */; };
+		30F90B741358589400D13233 /* cork-background.png in Resources */ = {isa = PBXBuildFile; fileRef = 30F90B3B1358529700D13233 /* cork-background.png */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		8F47B39110C416050013ED25 /* IMBOrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */; };
 		8F47B39210C416050013ED25 /* IMBOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F47B39010C416050013ED25 /* IMBOrderedDictionary.m */; };
@@ -417,6 +425,15 @@
 		30439223130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestiPhotoEventBrowserCell.m; sourceTree = "<group>"; };
 		30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoEventNodeObject.h; sourceTree = "<group>"; };
 		30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoEventNodeObject.m; sourceTree = "<group>"; };
+		30F90B2D13584FE700D13233 /* IMBAppleMediaParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAppleMediaParser.h; sourceTree = "<group>"; };
+		30F90B2E13584FE700D13233 /* IMBAppleMediaParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAppleMediaParser.m; sourceTree = "<group>"; };
+		30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFaceObjectViewController.h; sourceTree = "<group>"; };
+		30F90B321358501A00D13233 /* IMBFaceObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFaceObjectViewController.m; sourceTree = "<group>"; };
+		30F90B351358521300D13233 /* IMBTestFaceBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestFaceBrowserCell.h; sourceTree = "<group>"; };
+		30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestFaceBrowserCell.m; sourceTree = "<group>"; };
+		30F90B371358521300D13233 /* IMBTestFacesBackgroundLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestFacesBackgroundLayer.h; sourceTree = "<group>"; };
+		30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestFacesBackgroundLayer.m; sourceTree = "<group>"; };
+		30F90B3B1358529700D13233 /* cork-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cork-background.png"; sourceTree = "<group>"; };
 		32DBCF5E0370ADEE00C91783 /* iMedia.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.pch; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* iMedia.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iMedia.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -875,6 +892,8 @@
 				30394AC712DC665000ACA531 /* IMBSkimmableObjectViewController.m */,
 				3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */,
 				3025E5621306877700706DB2 /* IMBiPhotoEventObjectViewController.m */,
+				30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */,
+				30F90B321358501A00D13233 /* IMBFaceObjectViewController.m */,
 			);
 			name = Skimmable;
 			sourceTree = "<group>";
@@ -895,6 +914,7 @@
 		CEAF1F13125A7D8C001C3EBB /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				30F90B3B1358529700D13233 /* cork-background.png */,
 				CEAF1FE4125A8B6A001C3EBB /* Credits.html */,
 				CEAF1F22125A7DBF001C3EBB /* iMedia.tiff */,
 				CEAF1F23125A7DBF001C3EBB /* i.tiff */,
@@ -1229,6 +1249,8 @@
 				D09930C11010F6C100C527B7 /* IMBParser.m */,
 				D099320C1011158400C527B7 /* IMBFolderParser.h */,
 				D099320D1011158400C527B7 /* IMBFolderParser.m */,
+				30F90B2D13584FE700D13233 /* IMBAppleMediaParser.h */,
+				30F90B2E13584FE700D13233 /* IMBAppleMediaParser.m */,
 				D09933491011AE6B00C527B7 /* Image */,
 				D0B6FAA21043227A00280DDC /* Audio */,
 				D0B6FAA31043228C00280DDC /* Movie */,
@@ -1306,6 +1328,10 @@
 				D09933B61011B3CE00C527B7 /* IMBTestApp.xib */,
 				30439222130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.h */,
 				30439223130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m */,
+				30F90B351358521300D13233 /* IMBTestFaceBrowserCell.h */,
+				30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */,
+				30F90B371358521300D13233 /* IMBTestFacesBackgroundLayer.h */,
+				30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */,
 			);
 			name = "Test Application";
 			sourceTree = "<group>";
@@ -1474,6 +1500,8 @@
 				30394AC812DC665000ACA531 /* IMBSkimmableObjectViewController.h in Headers */,
 				3025E5631306877700706DB2 /* IMBiPhotoEventObjectViewController.h in Headers */,
 				30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */,
+				30F90B2F13584FE700D13233 /* IMBAppleMediaParser.h in Headers */,
+				30F90B331358501A00D13233 /* IMBFaceObjectViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1696,6 +1724,7 @@
 				CEAF1FE5125A8B6A001C3EBB /* Credits.html in Resources */,
 				CE1AED33129C475200694472 /* js.tiff in Resources */,
 				CEF7A22412B1B71800DBE412 /* url_icon.tiff in Resources */,
+				30F90B3C1358529700D13233 /* cork-background.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1704,6 +1733,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D09933B71011B3CE00C527B7 /* IMBTestApp.xib in Resources */,
+				30F90B741358589400D13233 /* cork-background.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1821,6 +1851,8 @@
 				3025E5641306877700706DB2 /* IMBiPhotoEventObjectViewController.m in Sources */,
 				30E4D4FF130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m in Sources */,
 				FC30D0261309777300463E52 /* IMBFlickrParser.m in Sources */,
+				30F90B3013584FE700D13233 /* IMBAppleMediaParser.m in Sources */,
+				30F90B341358501A00D13233 /* IMBFaceObjectViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1831,6 +1863,8 @@
 				D09933B31011B32B00C527B7 /* IMBTestAppDelegate.m in Sources */,
 				D09934341011B63600C527B7 /* main.m in Sources */,
 				30439224130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m in Sources */,
+				30F90B391358521300D13233 /* IMBTestFaceBrowserCell.m in Sources */,
+				30F90B3A1358521300D13233 /* IMBTestFacesBackgroundLayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

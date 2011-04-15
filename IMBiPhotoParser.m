@@ -55,8 +55,6 @@
 #import "IMBiPhotoParser.h"
 #import "IMBConfig.h"
 #import "IMBParserController.h"
-#import "IMBiPhotoEventObjectViewController.h"
-#import "IMBImageViewController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBiPhotoEventNodeObject.h"
@@ -70,47 +68,21 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-// Since we will add an events node to the list of albums we have to create an id for it
-// that is unique throughout this library. The one chosen below is very, very likely to be.
-// Actually checking uniqueness would require us to traverse different arrays and would
-// not necessarily be future proof (e.g. if we'd once add 'faces' to the browser
-// we'd also have to check against faces ids).
-
-#define EVENTS_NODE_ID UINT_MAX-4811	// Very, very unlikely this not to be unique throughout library
-
-// We are not a 100 % sure whether event ids and album ids are from the same id space.
-// Since we use both kinds of ids in the same tree we introduce id space identifiers to the rescue.
-
-#define EVENTS_ID_SPACE @"EventId"
-#define ALBUMS_ID_SPACE @"AlbumId"
-
-#pragma mark CONSTANTS
-
-// node object types of interest for skimming
-
-NSString* kIMBiPhotoNodeObjectTypeEvent = @"events";
-NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
-//----------------------------------------------------------------------------------------------------------------------
-
 #pragma mark 
 
 @interface IMBiPhotoParser ()
 
-- (void) addEventsToAlbumsInLibrary:(NSMutableDictionary*)inDict;
 - (IMBNode*) eventsNodeInNode:(IMBNode*)inNode;
-- (NSString*) idSpaceForAlbumType:(NSString*)inAlbumType;
 - (NSString*) identifierForId:(NSNumber*)inId inSpace:(NSString*)inIdSpace;
 - (NSString*) iPhotoMediaType;
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
 - (BOOL) shouldUseAlbum:(NSDictionary*)inAlbumDict images:(NSDictionary*)inImages;
 - (BOOL) shouldUseObject:(NSDictionary*)inObjectDict;
 - (NSImage*) iconForAlbumType:(NSString*)inAlbumType;
-- (BOOL) isLeafAlbumType:(NSString*)inAlbumType;
-- (NSString*) imagePathForImageKey:(NSString*)inImageKey;
+- (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
 - (void) populateEventsNode:(IMBNode*)inNode withEvents:(NSArray*)inEvents images:(NSDictionary*)inImages;
 - (void) populateAlbumNode:(IMBNode*)inNode images:(NSDictionary*)inImages;
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 @end
 
@@ -123,8 +95,6 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 @implementation IMBiPhotoParser
 
 @synthesize appPath = _appPath;
-@synthesize plist = _plist;
-@synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize dateFormatter = _dateFormatter;
 
@@ -157,24 +127,6 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 {
 	return [self iPhotoPath] != nil;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-+ (NSString*) objectCountFormatSingular
-{
-	return [IMBImageViewController objectCountFormatSingular];
-}
-
-
-+ (NSString*) objectCountFormatPlural
-{
-	return [IMBImageViewController objectCountFormatPlural];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 // Look at the iApps preferences file and find all iPhoto libraries. Create a parser instance for each libary...
@@ -353,36 +305,34 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSError* error = nil;
 	NSDictionary* plist = self.plist;
 	NSDictionary* images = [plist objectForKey:@"Master Image List"];
+	NSArray* albums = [plist objectForKey:@"List of Albums"];
 	
-	// Population of events node fundamentally different from album node
+	// Population of events and faces node fundamentally different from album node
 	
 	if ([self isEventsNode:inNode]) {
 		NSArray* events = [plist objectForKey:@"List of Rolls"];
 		[self populateEventsNode:inNode withEvents:events images:images];
+	} else if ([self isFacesNode:inNode]) {
+		NSDictionary* faces = [plist objectForKey:@"List of Faces"];
+		[self populateFacesNode:inNode withFaces:faces images:images];
 	} else {
-		NSArray* albums = [plist objectForKey:@"List of Albums"];
 		[self addSubNodesToNode:inNode albums:albums images:images]; 
 		[self populateAlbumNode:inNode images:images]; 
 	}
 
-	// If we are populating the root nodes, then also populate the "Photos" node (second subnode) and mirror its
+	// If we are populating the root nodes, then also populate the "Photos" node and mirror its
 	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,
 	// which is implemented here, to achieve the desired "feel" in the browser...
 	
-	NSArray* subNodes = inNode.subNodes;
+	// Will find Photos node at same index in subnodes as in album list
 	
-	if (inNode.isTopLevelNode && [subNodes count] > 0)
+	NSNumber* photosNodeIndex = nil;
+	[self allPhotosAlbumInAlbumList:albums atIndex:&photosNodeIndex];
+	
+	if (inNode.isTopLevelNode && photosNodeIndex)
 	{
-		IMBNode* eventsNode = [self eventsNodeInNode:inNode];
-		
-		// Depending on whether there is an events node or not and
-		// depending on where it's located
-		// we find photos node at a different index
-		int photosNodeIndex = eventsNode &&
-		eventsNode == [subNodes objectAtIndex:0] &&
-		[subNodes count] > 1 ? 1 : 0;
-		
-		IMBNode* photosNode = [subNodes objectAtIndex:photosNodeIndex];
+		NSArray* subNodes = inNode.subNodes;
+		IMBNode* photosNode = [subNodes objectAtIndex:[photosNodeIndex unsignedIntegerValue]];
 		[self populateNode:photosNode options:inOptions error:outError];
 		inNode.objects = photosNode.objects;
 	}
@@ -449,25 +399,27 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			NSAssert(url, @"Nil image source URL");
 			CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
 			
+			CGImageRef image = nil;
 			if (source)
 			{
-				CGImageRef image = CGImageSourceCreateImageAtIndex(source,0,NULL);
-				
-				if (image)
-				{
-					imageRepresentation = (id) image;
-					[inObject 
-					 performSelectorOnMainThread:@selector(setImageRepresentation:) 
-					 withObject:(id)image
-					 waitUntilDone:NO 
-					 modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-					
-					CGImageRelease(image);
-				}
+				image = CGImageSourceCreateImageAtIndex(source,0,NULL);
 				
 				CFRelease(source);
 			}
 			
+			// Always perform set... on main thread regardless of whether we obtained an image or not
+			// to ensure that "isLoadingThumbnail" is reset to NO
+			
+			imageRepresentation = (id) image;
+			[inObject 
+			 performSelectorOnMainThread:@selector(setImageRepresentation:) 
+			 withObject:(id)image
+			 waitUntilDone:NO 
+			 modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+			
+			if (image) {
+				CGImageRelease(image);
+			}
 		}
 	}
 	
@@ -531,54 +483,6 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 }
 
 
-// Events have other metadata than images or movies
-
-- (NSString*) eventMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	NSMutableString* metaDesc = [NSMutableString string];
-	
-	NSNumber* count = [inMetadata objectForKey:@"PhotoCount"];
-	if (count)
-	{
-		NSString* formatString = [count intValue] > 1 ?
-		[[self class] objectCountFormatPlural] :
-		[[self class] objectCountFormatSingular];
-		
-		[metaDesc appendFormat:formatString, [count intValue]];
-	}
-	
-	NSNumber* dateAsTimerInterval = [inMetadata objectForKey:@"RollDateAsTimerInterval"];
-	if (dateAsTimerInterval)
-	{
-		[metaDesc imb_appendNewline];
-		NSDate* eventDate = [NSDate dateWithTimeIntervalSinceReferenceDate:[dateAsTimerInterval doubleValue]];
-		
-		NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-		[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-		[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
-		
-		[metaDesc appendFormat:@"%@", [formatter stringFromDate:eventDate]];
-		
-		[formatter release];
-	}
-	return metaDesc;
-}
-
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	// Events have other metadata than images
-	
-	if ([inMetadata objectForKey:@"RollID"])		// Event
-	{
-		return [self eventMetadataDescriptionForMetadata:inMetadata];
-	}
-	
-	// Image
-	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
-}
-
-
 - (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs
 {
 	NSMutableArray *realKeywords = [NSMutableArray array];
@@ -596,210 +500,8 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Custom view controller support
-
-- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode
-{
-	// Use custom view for events
-	
-    if ([self isEventsNode:inNode])
-	{
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-								  kIMBiPhotoNodeObjectTypeEvent, @"nodeObjectType", nil];
-
-		NSViewController* viewController = [[[IMBiPhotoEventObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];
-		[viewController view];
-		return viewController;
-	}
-	
-	return [super customObjectViewControllerForNode:inNode];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Skimmable object view controller delegate
-
-- (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
-{
-	return [[inNodeObject.preliminaryMetadata objectForKey:@"PhotoCount"] integerValue];
-}
-
-
-- (NSString*) imagePathForChildOfNodeObject:(IMBNodeObject*)inNodeObject atIndex:(NSUInteger)inIndex userInfo:(NSDictionary*)inUserInfo
-{
-	NSString* imageKey = [[inNodeObject.preliminaryMetadata objectForKey:@"KeyList"] objectAtIndex:inIndex];
-	
-	return [self imagePathForImageKey:imageKey];
-}
-
-
-- (NSString*) imagePathForKeyChildOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
-{
-	NSString* imageKey = [inNodeObject.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
-	
-	return [self imagePathForImageKey:imageKey];
-}
-
-
 #pragma mark 
 #pragma mark Helper Methods
-
-
-// Load the XML file into a plist lazily (on demand). If we notice that an existing cached plist is out-of-date 
-// we get rid of it and load it anew...
-
-- (NSDictionary*) plist
-{
-	NSDictionary* result = nil;
-	NSError* error = nil;
-	NSString* path = (NSString*)self.mediaSource;
-	
-	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
-	{
-		NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
-		NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
-			
-		@synchronized(self)
-		{
-			if ([self.modificationDate compare:modificationDate] == NSOrderedAscending)
-			{
-				self.plist = nil;
-			}
-			
-			if (_plist == nil)
-			{
-				// Since we want to add events to the list of albums we will need
-				// to modify the album data dictionary (see further down below)
-				NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithContentsOfFile:path];
-				
-				// WORKAROUND
-				if (dict == nil || 0 == dict.count)	// unable to read. possibly due to unencoded '&'.  rdar://7469235
-				{
-					NSData *data = [NSData dataWithContentsOfFile:path];
-					if (data)
-					{
-						NSString *eString = nil;
-						NSError *e = nil;
-						@try
-						{
-							NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithData:data
-																				options:NSXMLDocumentTidyXML error:&e];
-							dict = [NSPropertyListSerialization
-								  propertyListFromData:[xmlDoc XMLData]
-								  mutabilityOption:0					// Apple doc: The opt parameter is currently unused and should be set to 0.
-								  format:NULL errorDescription:&eString];
-							[xmlDoc release];
-							
-							// the assignment to 'dict' in the code above yields
-							// a mutable dictionary as this code snippet would reveal:
-							// Class dictClass = [dict classForCoder];
-							// NSLog(@"Dictionary class: %@", [dictClass description]);
-						}
-						@catch(NSException *e)
-						{
-							NSLog(@"%s %@", __FUNCTION__, e);
-						}
-						// When we start targetting 10.6, we should use propertyListWithData:options:format:error:
-					}
-				}			
-				
-				//	If there is an AlbumData.xml file, there should be something inside!
-
-				if (dict == nil || 0 == dict.count)
-				{
-					NSLog (@"The iPhoto AlbumData.xml file seems to be empty. This is an unhealthy condition!");
-				}
-				
-				// Since this parser confines itself to deal with the "List of Albums" only
-				// we add an events node to the album list to incorporate events in the browser.
-				// This is why we need a mutable library dictionary.
-
-				if (dict)
-				{
-					[self addEventsToAlbumsInLibrary:dict];
-				}
-				
-				self.plist = dict;
-				self.modificationDate = modificationDate;
-			}
-			
-			result = [[_plist retain] autorelease];
-		}
-	}
-		
-	return result;
-}
-
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-// iPhoto does not include events in the album list. To let events also be shown
-// in the browser we let events (aka rolls) pose as albums in the album list
-// an let them be children of an 'events' node that we also add to the album list.
-
-- (void) addEventsToAlbumsInLibrary:(NSMutableDictionary*)inDict
-{	
-	NSArray* eventList = [inDict objectForKey:@"List of Rolls"];		
-	NSArray* oldAlbumList = [inDict objectForKey:@"List of Albums"];		
-
-	if (eventList != nil && oldAlbumList != nil && [oldAlbumList count]>0)
-	{
-		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		
-		// To insert events into the album list we have to re-create it mutable style
-		NSMutableArray *newAlbumList = [[NSMutableArray alloc] init];
-		
-		// 1. We want the events node to be first in the list
-		// Create and append parent object for all events.
-		
-		NSNumber *eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
-		NSString *eventsName = NSLocalizedStringWithDefaultValue(@"IMB.iPhotoParser.events", nil, IMBBundle(), @"Events", @"Events node shown in iPhoto library");
-		
-		NSDictionary *photosDict = [oldAlbumList objectAtIndex:0];	// Photos node
-		id keyList = [photosDict objectForKey:@"KeyList"];
-		
-		if (keyList != nil)
-		{
-			NSDictionary* events = [[NSDictionary alloc] initWithObjectsAndKeys:
-				eventsId,@"AlbumId",
-				eventsName,@"AlbumName",
-				@"Events",@"Album Type",
-				keyList,@"KeyList", nil];   // populate events with same media objects as photos album
-			
-			[newAlbumList addObject:events];
-			IMBRelease(events);
-			
-			// 2. Append all regular albums. Note that the photos album will now be at index 1 of the list
-			[newAlbumList addObjectsFromArray:oldAlbumList];
-			
-			// Finally, replace the old albums array.
-			[inDict setValue:newAlbumList forKey:@"List of Albums"];
-		}
-		[newAlbumList release];
-		[pool drain];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-// Returns whether inNode is the events node
-
-- (BOOL) isEventsNode:(IMBNode*)inNode
-{	
-	NSNumber* eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
-	NSString* eventsIdentifier = [self identifierForId:eventsId inSpace:EVENTS_ID_SPACE];
-	
-	return [inNode.identifier isEqualToString:eventsIdentifier];
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -841,21 +543,6 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 //----------------------------------------------------------------------------------------------------------------------
 
-// Use different id spaces for entries in "List of Albums" and "List of Rolls" (events):
-// Returns events id space for album types "Event" and "Events".
-// Otherwise returns albums id space.
-// Use preproc defines in this file to compare against.
-
-- (NSString*) idSpaceForAlbumType:(NSString*) inAlbumType
-{
-	if ([inAlbumType isEqualToString:@"Event"] || [inAlbumType isEqualToString:@"Events"]) {
-		return EVENTS_ID_SPACE;
-	}
-	return ALBUMS_ID_SPACE;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
 // Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBiPhotoParser://AlbumId/17"...
 
 - (NSString*) identifierForId:(NSNumber*) inId inSpace:(NSString*) inIdSpace
@@ -885,6 +572,16 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (BOOL) shouldUseAlbum:(NSDictionary*)inAlbumDict images:(NSDictionary*)inImages
 {
+	// Usage of events or faces album is not determined here
+	
+	NSUInteger albumId = [[inAlbumDict objectForKey:@"AlbumId"] unsignedIntegerValue];
+	if (albumId == EVENTS_NODE_ID || albumId == FACES_NODE_ID)
+	{
+		return YES;
+	}
+	
+	// Usage of other albums is determined by media type of key list images
+	
 	NSArray* imageKeys = [inAlbumDict objectForKey:@"KeyList"];
 	
 	for (NSString* key in imageKeys)
@@ -930,6 +627,7 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
 		// iPhoto 7
+		{@"Faces",					@"sl-icon-small_people.tiff",			@"folder",	nil,				nil},
 		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
 		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
 		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
@@ -966,9 +664,9 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (BOOL) isLeafAlbumType:(NSString*)inType
+- (BOOL) isAllPhotosAlbum:(NSDictionary*)inAlbumDict
 {
-	return ![inType isEqualToString:@"Folder"] && ![inType isEqualToString:@"Events"];
+	return [(NSNumber*)[inAlbumDict objectForKey:@"Master"] unsignedIntegerValue] == 1;
 }
 
 
@@ -993,7 +691,7 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		NSString* albumName = [albumDict objectForKey:@"AlbumName"];
 		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
 		NSString* albumIdSpace = [self idSpaceForAlbumType:albumType];
-		// parent always from same id space
+		// parent always from same id space for non top-level albums
 		NSString* parentIdentifier = parentId ? [self identifierForId:parentId inSpace:albumIdSpace] : [self identifierForPath:@"/"];
 		
 		if ([self shouldUseAlbumType:albumType] && 
@@ -1039,76 +737,80 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This parser wants image thumbnails...
+// Returns the path to a thumbnail containing the wanted clipped face in the image provided
 
-- (NSString*) requestedImageRepresentationType
+- (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey
 {
-	return IKImageBrowserCGImageRepresentationType;
-}
-
-
-// Use the path of the small thumbnail file to create this image...
-
-- (NSString*) imageLocationForObject:(NSDictionary*)inObjectDict
-{
-	return [inObjectDict objectForKey:@"ThumbPath"];
-}
-
-
-- (NSString*) imagePathForImageKey:(NSString*)inImageKey
-{
-	NSDictionary* images = [[self plist] objectForKey:@"Master Image List"];
-	NSDictionary* imageDict = [images objectForKey:inImageKey];
-	NSString* imagePath = [self imageLocationForObject:imageDict];
+	NSString* imagePath = [self imagePathForImageKey:inImageKey];
 	
-	return imagePath; 
+	return [NSString stringWithFormat:@"%@_face%@.%@",
+			[imagePath stringByDeletingPathExtension],
+			inFaceIndex,
+			[imagePath pathExtension]];
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
 
 
-// Returns a dictionary that contains the "true" KeyList, KeyPhotoKey and PhotoCount values for the provided event node.
-// (The values provided by the according dictionary in .plist are mostly wrong because we separate event children by
-// media types Image and Movie respectively into different views.)
+// Returns a dictionary that contains the "true" KeyList, KeyPhotoKey and PhotoCount values for the provided node.
+// (The values provided by the according dictionary in .plist are mostly wrong because we separate node children by
+// media types 'Image' and 'Movie' into different views.)
 
-- (NSDictionary*) childrenInfoForEventNodeObject:(IMBiPhotoEventNodeObject*)inNodeObject
-											node:(IMBNode*)inNode
-										  images:(NSDictionary*)inImages
+- (NSDictionary*) childrenInfoForNode:(IMBNode*)inNode images:(NSDictionary*)inImages
 {
-	NSMutableArray* relevantImageKeys = [[[NSMutableArray alloc] init] autorelease];
-	
 	// We saved a reference to the album dictionary when this node was created
-	// (ivar 'attributes') and now happily reuse it to save an outer loop (over album list) here.
-	
+	// (ivar 'attributes') and now happily reuse it here.
 	NSDictionary* albumDict = inNode.attributes;	
-	NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
 	
-	for (NSString* key in imageKeys)
+	// Determine images relevant to this view.
+	// Note that everything regarding 'ImageFaceMetadata' is only relevant
+	// when providing a faces node. Otherwise it will be nil'ed.
+	
+	NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
+	NSMutableArray* relevantImageKeys = [NSMutableArray array];
+	NSArray* imageFaceMetadataList = [albumDict objectForKey:@"ImageFaceMetadataList"];
+	NSMutableArray* relevantImageFaceMetadataList = imageFaceMetadataList ? [NSMutableArray array] : nil;
+	
+	// Loop setup
+	NSString* key = nil;
+	NSDictionary* imageFaceMetadata = nil;
+	NSDictionary* imageDict = nil;
+	
+	for (NSUInteger i = 0; i < [imageKeys count]; i++)
 	{
-		NSDictionary* imageDict = [inImages objectForKey:key];
+		key = [imageKeys objectAtIndex:i];
+		imageFaceMetadata = [imageFaceMetadataList objectAtIndex:i];
+		
+		imageDict = [inImages objectForKey:key];
 		
 		if ([self shouldUseObject:imageDict])
 		{
 			[relevantImageKeys addObject:key];
+			
+			if (imageFaceMetadata) [relevantImageFaceMetadataList addObject:imageFaceMetadata];
 		}		
 	}
 	
-	// Key image for movies must be movie related:
+	// Ensure that key image for movies is movie related:
 	
-	NSString* keyPhotoKey;
+	NSString* keyPhotoKey = nil;
+	NSNumber* keyImageFaceIndex = nil;
+	
 	if ([[self iPhotoMediaType] isEqualToString:@"Movie"] && [relevantImageKeys count] > 0)
 	{
 		keyPhotoKey = [relevantImageKeys objectAtIndex:0];
+		keyImageFaceIndex = [[relevantImageFaceMetadataList objectAtIndex:0] objectForKey:@"face index"];
 	} else {
 		keyPhotoKey = [albumDict objectForKey:@"KeyPhotoKey"];
 	}
 
-	
     return [NSDictionary dictionaryWithObjectsAndKeys:
 			relevantImageKeys, @"KeyList",
 			[NSNumber numberWithUnsignedInteger:[relevantImageKeys count]], @"PhotoCount", 
-			keyPhotoKey, @"KeyPhotoKey", nil];
+			keyPhotoKey, @"KeyPhotoKey",
+			relevantImageFaceMetadataList, @"ImageFaceMetadataList",   // May be nil
+			keyImageFaceIndex, @"key image face index", nil];          // May be nil
 }
 
 
@@ -1163,9 +865,7 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			subNode.mediaSource = self.mediaSource;
 			subNode.parser = self;
 			
-			// Keep a ref to the subnode dictionary for later use when we populate this node
-			// so we don't have to loop through the whole album list again to find it.
-			
+			// Keep a ref to the subnode dictionary for potential later use
 			subNode.attributes = subNodeDict;
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
@@ -1189,9 +889,7 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary
 			// because movies and images are not jointly displayed in iMedia browser
 			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:subNodeDict];
-			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForEventNodeObject:object
-																						  node:subNode
-																						images:inImages]];
+			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subNode images:inImages]];
 
 			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
 			object.metadata = nil;								// Build lazily when needed (takes longer)
@@ -1219,9 +917,6 @@ NSString* kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	inNode.objects = objects;
 	[objects release];
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 - (void) populateAlbumNode:(IMBNode*)inNode images:(NSDictionary*)inImages
