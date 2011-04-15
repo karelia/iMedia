@@ -33,7 +33,7 @@
 		3043924B130D1DDC00DD1D34 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E4D4FF130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */; };
-		30F90B2F13584FE700D13233 /* IMBAppleMediaParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B2D13584FE700D13233 /* IMBAppleMediaParser.h */; };
+		30F90B2F13584FE700D13233 /* IMBAppleMediaParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B2D13584FE700D13233 /* IMBAppleMediaParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30F90B3013584FE700D13233 /* IMBAppleMediaParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B2E13584FE700D13233 /* IMBAppleMediaParser.m */; };
 		30F90B331358501A00D13233 /* IMBFaceObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30F90B341358501A00D13233 /* IMBFaceObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B321358501A00D13233 /* IMBFaceObjectViewController.m */; };
