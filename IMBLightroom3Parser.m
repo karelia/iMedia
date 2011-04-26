@@ -476,8 +476,12 @@
 			headerLengthValue = NSSwapBigShortToHost(headerLengthValue);
 			dataLengthValue = NSSwapBigLongLongToHost(dataLengthValue);
 
-			NSData* jpegData = [data subdataWithRange:NSMakeRange(headerLengthValue + index, dataLengthValue)];
-
+			NSData* jpegData = nil;
+            
+            if ((index + headerLengthValue + dataLengthValue) < [data length]) {
+                [data subdataWithRange:NSMakeRange(index + headerLengthValue, dataLengthValue)];
+            }
+            
 			return jpegData;
 		}
 	}
