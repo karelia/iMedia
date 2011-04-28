@@ -134,7 +134,11 @@
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForPath:path];
 	newNode.displayPriority = self.displayPriority;			// get node's display priority from the folder parser
-	newNode.name = [fm displayNameAtPath:path];
+	
+	NSString *betterName = [fm displayNameAtPath:[path stringByDeletingPathExtension]];
+    betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+	newNode.name = betterName;
+	
 	newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 	[newNode.icon setScalesWhenResized:YES];
 	[newNode.icon setSize:NSMakeSize(16,16)];
