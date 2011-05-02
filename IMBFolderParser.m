@@ -241,7 +241,10 @@
 				
 				else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
 				{
-					IMBObject* object = [self objectForPath:path name:file index:index++];
+					NSString *betterName = [fm displayNameAtPath:[file stringByDeletingPathExtension]];
+					betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+					
+					IMBObject* object = [self objectForPath:path name:betterName index:index++];
 					[objects addObject:object];
 					inNode.displayedObjectCount++;
 				}
