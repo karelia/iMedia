@@ -78,7 +78,7 @@ static CGImageRef backgroundImage()
 	static CGImageRef image = NULL;
 	
 	if(image == NULL)
-		image = createImageWithName(@"cork-background.png");
+		image = createImageWithName(@"cork-background.jpg");
 	
 	return image;
 }
