@@ -94,31 +94,39 @@
 - (void) main
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	
-	// Load the thumbnail. Please note that we will load the thumbnail even if we already have a thumbnail stored
-	// in this object. This is useful if the size has changed and we now need to load a larger thumbnail...
-	
 	IMBObject* object = self.object;
 	IMBParser* parser = object.parser;
 	
-	if (self.options & kIMBLoadThumbnail)
+	@try
 	{
-		//NSLog(@"Loading thumbnail for %@", object.name);
-		[parser loadThumbnailForObject:object];
-
-	}
+		// Load the thumbnail. Please note that we will load the thumbnail even if we already have a thumbnail stored
+		// in this object. This is useful if the size has changed and we now need to load a larger thumbnail...
 	
-	// Load metadata if is hasn't been loaded yet. This part is only done once, as the metadata is almost certain 
-	// to remain the same throughout a session...
-	
-	if (self.options & kIMBLoadMetadata)
-	{
-		// NSLog(@"May load metadata for %@", object.name);
-		if (object.metadata == nil)
+		if (self.options & kIMBLoadThumbnail)
 		{
-			[object.parser loadMetadataForObject:object];
+			//NSLog(@"Loading thumbnail for %@", object.name);
+			[parser loadThumbnailForObject:object];
+
+		}
+		
+		// Load metadata if is hasn't been loaded yet. This part is only done once, as the metadata is almost certain 
+		// to remain the same throughout a session...
+		
+		if (self.options & kIMBLoadMetadata)
+		{
+			// NSLog(@"May load metadata for %@", object.name);
+			if (object.metadata == nil)
+			{
+				[object.parser loadMetadataForObject:object];
+			}
 		}
 	}
+
+	@catch (NSException* inException)
+	{
+		NSLog(@"%s Caught exception:\n\n%@",__FUNCTION__,inException);
+	}
+	
 	[pool drain];
 }
 
