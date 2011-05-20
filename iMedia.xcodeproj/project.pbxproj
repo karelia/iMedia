@@ -455,6 +455,7 @@
 		CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBURLGetSizeOperation.m; sourceTree = "<group>"; };
 		CE0E0C80104C72A200EE6B09 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		CE1AED32129C475200694472 /* js.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = js.tiff; sourceTree = "<group>"; };
+		CE1DE6481386E2E600C3F780 /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt_BR; path = pt_BR.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBDisableTitleToColorTransformer.h; sourceTree = "<group>"; };
 		CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBDisableTitleToColorTransformer.m; sourceTree = "<group>"; };
 		CE394AC11371A1F700EF0D1E /* cork-background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "cork-background.jpg"; sourceTree = "<group>"; };
@@ -1568,6 +1569,7 @@
 				nl,
 				es,
 				ja,
+				pt_BR,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* iMedia */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -1899,6 +1901,7 @@
 				FCAA9638134227D700EA1A3A /* nl */,
 				FCEFB408135332360043CBEB /* es */,
 				FCEFB40C135332530043CBEB /* ja */,
+				CE1DE6481386E2E600C3F780 /* pt_BR */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
