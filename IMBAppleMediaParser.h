@@ -149,6 +149,11 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 
 - (NSString*) imageLocationForObject:(NSDictionary*)inObjectDict;
 
+// Returns the image location for the clipped face in the image represented by inImageKey in the master image list
+// (aka dictionary)
+
+- (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey;
+
 // Returns the image location for the image represented by inImageKey in the master image list (aka dictionary)
 
 - (NSString*) imagePathForImageKey:(NSString*)inImageKey;

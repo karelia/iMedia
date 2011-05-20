@@ -737,16 +737,39 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Returns the path to a thumbnail containing the wanted clipped face in the image provided
+// Returns the path to a thumbnail containing the wanted clipped face in the image provided.
+//
+// There are reports (see issue 252) that ./Data occasionally is not a symbolic link
+// to ./Data.noindex and faces we are looking for are not found in ./Data but ./Data.noindex.
+// To account for this we return the image path including ./Data.noindex if necessary.
 
 - (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey
 {
-	NSString* imagePath = [self imagePathForImageKey:inImageKey];
+	NSString* imagePath = [super imagePathForFaceIndex:inFaceIndex inImageWithKey:inImageKey];
 	
-	return [NSString stringWithFormat:@"%@_face%@.%@",
-			[imagePath stringByDeletingPathExtension],
-			inFaceIndex,
-			[imagePath pathExtension]];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+	
+	// Image path should currently be pointing to image in subdirectory of ./Data (iPhoto 8) or ./Thumbnails (iPhoto 9).
+	
+	if (![fileManager fileExistsAtPath:imagePath]) {
+		
+		// Oops, could not locate face image here. Provide alternate path
+		NSLog(@"Could not find face image at %@", imagePath);
+		
+		NSString* pathPrefix = [[self mediaSource] stringByDeletingLastPathComponent];
+		NSString* replacement = @"/Data.noindex/";
+		NSScanner* aScanner =  [[NSScanner alloc] initWithString:imagePath];
+		
+		if ([aScanner scanString:pathPrefix intoString:nil] &&
+			[aScanner scanString:@"/Data/" intoString:nil] ||
+			[aScanner scanString:@"/Thumbnails/" intoString:nil])
+		{
+			NSString* suffixString = [imagePath substringFromIndex:[aScanner scanLocation]];
+			imagePath = [NSString stringWithFormat:@"%@%@%@", pathPrefix, replacement, suffixString];
+			NSLog(@"Trying %@...", imagePath);
+		}
+	}
+	return imagePath;
 }
 
 
