@@ -289,6 +289,9 @@ CGSize IMBImageItemGetSize(id <IMBImageItem> item)
 {
     CGSize result = CGSizeZero;
     
+    // We're creating an image object to immediately throw away. Potentially quite memory intensive, especially if called in a loop. So make life easier for everybody and use a local pool
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
 	CIImage *image = [CIImage imageWithIMBImageItem:item];
     if (image)
     {
@@ -303,5 +306,6 @@ CGSize IMBImageItemGetSize(id <IMBImageItem> item)
         }
 	}
     
+    [pool release];
     return result;
 }
