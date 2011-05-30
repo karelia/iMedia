@@ -401,7 +401,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 {
 	NSMutableDictionary* stateDict = [self _preferences];
 	
-	self.expandedNodeIdentifiers = [stateDict objectForKey:@"expandedNodeIdentifiers"];
+	self.expandedNodeIdentifiers = [NSMutableArray arrayWithArray:[stateDict objectForKey:@"expandedNodeIdentifiers"]];
 	self.selectedNodeIdentifier = [stateDict objectForKey:@"selectedNodeIdentifier"];
 	
 	float splitviewPosition = [[stateDict objectForKey:@"splitviewPosition"] floatValue];
