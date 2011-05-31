@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBiPhotoParser.h"
+#import "IMBiPhotoObjectPromise.h"
 #import "IMBConfig.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
@@ -177,7 +178,7 @@
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super initWithMediaType:inMediaType])
+	if ((self = [super initWithMediaType:inMediaType]) != nil)
 	{
 		self.appPath = [[self class] iPhotoPath];
 		self.plist = nil;
@@ -437,6 +438,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+/// For iPhoto we need a local promise that handles relative paths to master objects
+- (IMBObjectsPromise*) objectPromiseWithObjects: (NSArray*) inObjects
+{
+	return [[[IMBiPhotoObjectPromise alloc] initWithIMBObjects:inObjects] autorelease];
+}
+
+
 // Loaded lazily when actually needed for display. Here we combine the metadata we got from the iPhoto XML file
 // (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
 // This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
@@ -446,7 +454,7 @@
 {
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
 	NSMutableArray *realKeywords = [NSMutableArray array];
-	
+    
 	NSDictionary *keywordMap = [self.plist objectForKey:@"List of Keywords"];
 
 	//swap the keyword index to names
@@ -467,6 +475,7 @@
 	{
 		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
 	}
+	
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 
 	if ([NSThread isMainThread])

@@ -75,18 +75,6 @@
 NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.objects-promise";
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark
-
-// This subclass is used for local object files that can be returned immediately. In this case a promise isn't 
-// really necessary, but to make the architecture more consistent, this abstraction is used nonetheless... 
-
-@interface IMBLocalObjectsPromise : IMBObjectsPromise
-
-@end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
