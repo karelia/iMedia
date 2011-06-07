@@ -154,9 +154,7 @@
             NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
             [inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
         }
-        
-        NSLog(@"%@", inObject.metadata);
-    }
+	}
     
 	[super _loadObject:inObject];
 }
