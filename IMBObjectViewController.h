@@ -252,6 +252,10 @@ extern NSString* const IMBObjectViewControllerSegmentedControlKey;		/* Segmented
 
 - (void) objectViewController:(IMBObjectViewController*)inController didLoadViews:(NSDictionary*)inViews;
 
+// The delegate may provide a badge image to decorate the image of inObject
+
+- (CGImageRef) badgeForObject:(IMBObject*) inObject objectViewController:(IMBObjectViewController*) inController;
+
 @end
 
 
