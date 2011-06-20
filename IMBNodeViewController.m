@@ -819,14 +819,14 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	IMBNode* node;
 	NSString* identifier;
 	
+	// Temporarily disable storing of saved state (we only want that when the user actuall clicks in the UI...
+
+	_isRestoringState = YES;
+
 	// Update the internal data structures...
 	
 	[ibNodeOutlineView reloadData];
-	
-	// Temporarily disable storing of saved state (we only want that when the user actuall clicks in the UI...
-	
-	_isRestoringState = YES;
-	
+		
 	// Restore the expanded nodes...
 	
 	NSMutableArray* expandedNodeIdentifiers = [NSMutableArray arrayWithArray:self.expandedNodeIdentifiers];
