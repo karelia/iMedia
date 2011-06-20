@@ -549,12 +549,24 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSArray* sortDescriptors = [NSArray arrayWithObject:dateDescriptor];
 	[dateDescriptor release];
 	
+	NSArray* imageFaceMetadataList = nil;
 	for (NSString* faceKey in [facesDict keyEnumerator])
 	{
 		faceDict = [facesDict objectForKey:faceKey];
 		
 		// Sort images related to face by date
-		NSArray* imageFaceMetadataList = [[faceDict objectForKey:@"ImageFaceMetadataList"] sortedArrayUsingDescriptors:sortDescriptors];
+		
+		imageFaceMetadataList = [faceDict objectForKey:@"ImageFaceMetadataList"];
+		if (imageFaceMetadataList)
+		{
+			imageFaceMetadataList = [imageFaceMetadataList sortedArrayUsingDescriptors:sortDescriptors];
+		} else {
+			// Obviously a metadata list has yet not been created for this face.
+			// Given the code further above this really means that this face does not appear
+			// on any image. This should probably not be but there were crash logs indicating just this.
+			// Create an empty metadata list to avoid crash.
+			imageFaceMetadataList = [NSArray array];
+		}
 		[faceDict setObject:imageFaceMetadataList forKey:@"ImageFaceMetadataList"];
 		
 		// Also provide key image key under an event-compatible key
