@@ -70,7 +70,7 @@
 #define LOG_PARSERS 0
 #define LOG_CREATE_NODE 0
 #define LOG_POPULATE_NODE 0
-#define CUSTOM_USER_INTERFACE 1
+#define CUSTOM_USER_INTERFACE 0
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,6 +187,10 @@
 	{
 		NSArray* mediaTypes = [NSArray arrayWithObjects:kIMBMediaTypeImage,kIMBMediaTypeAudio,kIMBMediaTypeMovie,kIMBMediaTypeLink,nil];
 		IMBPanelController* panelController = [IMBPanelController sharedPanelControllerWithDelegate:self mediaTypes:mediaTypes];
+		
+		// Set a handle onto the node view controller (need it later for notifying about badge changes)
+		self.nodeViewController = [(IMBObjectViewController*)[[panelController viewControllers] objectAtIndex:0] nodeViewController];
+		
 		[panelController showWindow:nil];
 		[panelController.window makeKeyAndOrderFront:nil];		// Test app, and stand-alone app, would want this to become key.
 		
@@ -501,7 +505,7 @@
 	{
 		if (!badgeImage)
 		{
-			NSString* imageName = @"badge_checkbox.tiff";
+			NSString* imageName = @"badge_checkbox.png";
 			
 			NSString* path = [[NSBundle mainBundle] pathForResource:[imageName stringByDeletingPathExtension] ofType:[imageName pathExtension]];
 			if(path){
