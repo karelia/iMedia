@@ -1999,9 +1999,9 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 		
 		// Host app delegate may provide badge image here
 		
-		if ([[self delegate] respondsToSelector:@selector(badgeForObject:objectViewController:)])
+		if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
 		{
-			cell.badge = [[self delegate] badgeForObject:object objectViewController:self];
+			cell.badge = [[self delegate] objectViewController:self badgeForObject:object ];
 		}
 		cell.title = object.imageTitle;
 		cell.subtitle = object.metadataDescription;

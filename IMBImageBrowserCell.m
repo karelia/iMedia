@@ -56,6 +56,7 @@
 #import "IMBObject.h"
 #import "IMBNode.h"
 #import "IMBCommon.h"
+#import "IMBObjectViewController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -223,6 +224,162 @@
 {
 	[self imbSetTitleColors];
 	[super drawTitle];
+}
+
+
+//---------------------------------------------------------------------------------
+// layerForType:
+//
+// provides the layers for the given types
+//---------------------------------------------------------------------------------
+- (CALayer *) layerForType:(NSString*) type
+{
+	CGColorRef color;
+	
+	//retrieve some usefull rects
+	NSRect frame = [self frame];
+	NSRect imageFrame = [self imageFrame];
+	NSRect relativeImageFrame = NSMakeRect(imageFrame.origin.x - frame.origin.x, imageFrame.origin.y - frame.origin.y, imageFrame.size.width, imageFrame.size.height);
+	
+	/* place holder layer */
+	if(type == IKImageBrowserCellPlaceHolderLayer){
+		//create a place holder layer
+		CALayer *layer = [CALayer layer];
+		layer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+		
+		CALayer *placeHolderLayer = [CALayer layer];
+		placeHolderLayer.frame = *(CGRect*) &relativeImageFrame;
+		
+		CGFloat fillComponents[4] = {1.0, 1.0, 1.0, 0.3};
+		CGFloat strokeComponents[4] = {1.0, 1.0, 1.0, 0.9};
+		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+		
+		//set a background color
+		color = CGColorCreate(colorSpace, fillComponents);
+		[placeHolderLayer setBackgroundColor:color];
+		CFRelease(color);
+		
+		//set a stroke color
+		color = CGColorCreate(colorSpace, strokeComponents);
+		[placeHolderLayer setBorderColor:color];
+		CFRelease(color);
+		
+		[placeHolderLayer setBorderWidth:2.0];
+		[placeHolderLayer setCornerRadius:10];
+		CFRelease(colorSpace);
+		
+		[layer addSublayer:placeHolderLayer];
+		
+		return layer;
+	}
+	
+	/* foreground layer */
+	if(type == IKImageBrowserCellForegroundLayer){
+		// No foreground layer on place holders
+		if([self cellState] != IKImageStateReady)
+			return nil;
+		
+		// Create a foreground layer that may contain a badge layer
+		// (i.e. add a badge icon if the host app does provide one)
+		
+		CALayer *layer = [CALayer layer];
+		layer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+		
+		IMBObjectViewController* objectViewController = (IMBObjectViewController*) [[self imageBrowserView] delegate];
+		IMBObject* item = (IMBObject*) [self representedItem];
+
+		//		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:[item parserMediaType]];
+		id <IMBObjectViewControllerDelegate> delegate = [objectViewController delegate];
+		
+		if ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
+		{
+			CGImageRef badge = [delegate objectViewController:nil badgeForObject:item];
+			
+			if (badge)
+			{
+				CALayer* badgeLayer = [CALayer layer];
+				[badgeLayer setContents:(id)badge];
+				
+				badgeLayer.frame = CGRectMake(relativeImageFrame.origin.x + relativeImageFrame.size.width - CGImageGetWidth(badge) - 3,
+											  relativeImageFrame.origin.y + 3,
+											  CGImageGetWidth(badge), CGImageGetHeight(badge));
+				[layer addSublayer:badgeLayer];
+			}
+		}
+		return layer;
+	}
+	
+	/* selection layer */
+	if(type == IKImageBrowserCellSelectionLayer){
+		
+		return nil;
+		
+		//create a selection layer
+		CALayer *selectionLayer = [CALayer layer];
+		selectionLayer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+		
+		CGFloat fillComponents[4] = {1.0, 0, 0.5, 0.3};
+		CGFloat strokeComponents[4] = {1.0, 0.0, 0.5, 1.0};
+		
+		//set a background color
+		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+		color = CGColorCreate(colorSpace, fillComponents);
+		[selectionLayer setBackgroundColor:color];
+		CFRelease(color);
+		
+		//set a border color
+		color = CGColorCreate(colorSpace, strokeComponents);
+		[selectionLayer setBorderColor:color];
+		CFRelease(color);
+		
+		[selectionLayer setBorderWidth:2.0];
+		[selectionLayer setCornerRadius:5];
+		
+		return selectionLayer;
+	}
+	
+	/* background layer */
+	if(type == IKImageBrowserCellBackgroundLayer)
+	{
+		//return nil;
+		
+		//no background layer on place holders
+		if([self cellState] != IKImageStateReady)
+			return nil;
+		
+		CALayer *layer = [CALayer layer];
+		layer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
+		
+//		NSRect backgroundRect = NSMakeRect(0, 0, frame.size.width, frame.size.height);		
+//		
+//		CALayer *photoBackgroundLayer = [CALayer layer];
+//		photoBackgroundLayer.frame = *(CGRect*) &backgroundRect;
+//		
+//		CGFloat fillComponents[4] = {0.95, 0.95, 0.95, 1.0};
+//		CGFloat strokeComponents[4] = {0.2, 0.2, 0.2, 0.5};
+//		
+//		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+//		
+//		color = CGColorCreate(colorSpace, fillComponents);
+//		[photoBackgroundLayer setBackgroundColor:color];
+//		CFRelease(color);
+//		
+//		color = CGColorCreate(colorSpace, strokeComponents);
+//		[photoBackgroundLayer setBorderColor:color];
+//		CFRelease(color);
+//		
+//		[photoBackgroundLayer setBorderWidth:5.0];
+//		[photoBackgroundLayer setShadowOpacity:0.5];
+//		[photoBackgroundLayer setCornerRadius:3];
+//		
+//		CFRelease(colorSpace);
+//		
+//		[layer addSublayer:photoBackgroundLayer];
+		
+		return layer;
+	}
+	
+	return nil;
 }
 
 

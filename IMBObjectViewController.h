@@ -105,7 +105,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 @class IMBObject;
 @class IMBNode;
 @class IKImageBrowserView;
-
+@protocol IMBObjectViewControllerDelegate;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -214,6 +214,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 // Helpers...
 
+- (id <IMBObjectViewControllerDelegate>) delegate;
 - (IBAction) openSelectedObjects:(id)inSender;
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode;
 - (IBAction) quicklook:(id)inSender;
@@ -254,7 +255,7 @@ extern NSString* const IMBObjectViewControllerSegmentedControlKey;		/* Segmented
 
 // The delegate may provide a badge image to decorate the image of inObject
 
-- (CGImageRef) badgeForObject:(IMBObject*) inObject objectViewController:(IMBObjectViewController*) inController;
+- (CGImageRef) objectViewController:(IMBObjectViewController*) inController badgeForObject:(IMBObject*) inObject;
 
 @end
 

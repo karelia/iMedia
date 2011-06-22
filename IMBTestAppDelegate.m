@@ -490,7 +490,7 @@
 }
 
 
-- (CGImageRef) badgeForObject:(IMBObject*) inObject objectViewController:(IMBObjectViewController*) inController
+- (CGImageRef) objectViewController:(IMBObjectViewController*) inController badgeForObject:(IMBObject*) inObject
 {
 	CGImageRef badgeImage = NULL;
 	NSString* imageName = @"badge_checkbox.tiff";
