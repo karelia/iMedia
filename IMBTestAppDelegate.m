@@ -70,7 +70,7 @@
 #define LOG_PARSERS 0
 #define LOG_CREATE_NODE 0
 #define LOG_POPULATE_NODE 0
-#define CUSTOM_USER_INTERFACE 0
+#define CUSTOM_USER_INTERFACE 1
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,6 +82,7 @@
 
 @synthesize nodeViewController = _nodeViewController;
 @synthesize objectViewController = _objectViewController;
+@synthesize usedObjects = _usedObjects;
 
 + (void)initialize
 {
@@ -113,6 +114,8 @@
 	
 	[IMBConfig setShowsGroupNodes:YES];
 	[IMBConfig setUseGlobalViewType:NO];
+	
+	self.usedObjects = [NSMutableDictionary dictionary];
 	
 #if CUSTOM_USER_INTERFACE
 	
@@ -433,7 +436,7 @@
 	{
 		NSRect viewFrame = [[inController iconView] frame];
 		NSRect backgroundRect = NSMakeRect(0, 0, viewFrame.size.width, viewFrame.size.height);		
-		CALayer *backgroundLayer = [[CALayer layer] autorelease];
+		CALayer *backgroundLayer = [CALayer layer];
 		backgroundLayer.frame = *(CGRect*) &backgroundRect;
 		
 		CGFloat fillComponents[4] = {0.2, 0.2, 0.2, 1.0};
@@ -492,21 +495,30 @@
 
 - (CGImageRef) objectViewController:(IMBObjectViewController*) inController badgeForObject:(IMBObject*) inObject
 {
-	CGImageRef badgeImage = NULL;
-	NSString* imageName = @"badge_checkbox.tiff";
+	static CGImageRef badgeImage = NULL;
 	
-	NSString* path = [[NSBundle mainBundle] pathForResource:[imageName stringByDeletingPathExtension] ofType:[imageName pathExtension]];
-	if(path){
-		CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
-		
-		if(imageSource)
+	if ([[self usedObjects] valueForKey:[inObject identifier]])
+	{
+		if (!badgeImage)
 		{
-			badgeImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
-			CFRelease(imageSource);
-			[(id) badgeImage autorelease];
+			NSString* imageName = @"badge_checkbox.tiff";
+			
+			NSString* path = [[NSBundle mainBundle] pathForResource:[imageName stringByDeletingPathExtension] ofType:[imageName pathExtension]];
+			if(path){
+				CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
+				
+				if(imageSource)
+				{
+					badgeImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
+					CFRelease(imageSource);
+					[(id) badgeImage autorelease];
+				}
+			}
 		}
+		return badgeImage;
+	} else {
+		return NULL;
 	}
-	return badgeImage;
 }
 
 
@@ -542,6 +554,21 @@
 	[defaultNodes addObject:dict];
 	
 	return defaultNodes;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Dragging Delegate
+
+- (void) concludeDragOperationForObjects:(NSArray*)inObjects
+{
+	for (IMBObject* object in inObjects)
+	{
+		[self.usedObjects setObject:object forKey:[object identifier]];
+	}
+	[self.nodeViewController setObjectContainerViewNeedsDisplay:YES];
 }
 
 @end

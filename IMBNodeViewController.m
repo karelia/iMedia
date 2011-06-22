@@ -1471,6 +1471,12 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 }
 
 
+- (void) setObjectContainerViewNeedsDisplay:(BOOL)flag
+{
+	[ibObjectContainerView setNeedsDisplay:flag];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

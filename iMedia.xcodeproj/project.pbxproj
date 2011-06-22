@@ -23,6 +23,7 @@
 /* Begin PBXBuildFile section */
 		274DF618114EF0B200AC8C03 /* IMBImageItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 274DF616114EF0B200AC8C03 /* IMBImageItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		274DF619114EF0B200AC8C03 /* IMBImageItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 274DF617114EF0B200AC8C03 /* IMBImageItem.m */; };
+		3016783613B1F435000E57D2 /* IMBTestTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3016783513B1F435000E57D2 /* IMBTestTextView.m */; };
 		3025E5631306877700706DB2 /* IMBiPhotoEventObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3025E5641306877700706DB2 /* IMBiPhotoEventObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3025E5621306877700706DB2 /* IMBiPhotoEventObjectViewController.m */; };
 		30394AB612DC64B400ACA531 /* ObjectiveFlickr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30394AB512DC64B400ACA531 /* ObjectiveFlickr.framework */; };
@@ -420,6 +421,8 @@
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		274DF616114EF0B200AC8C03 /* IMBImageItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageItem.h; sourceTree = "<group>"; };
 		274DF617114EF0B200AC8C03 /* IMBImageItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageItem.m; sourceTree = "<group>"; };
+		3016783413B1F435000E57D2 /* IMBTestTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestTextView.h; sourceTree = "<group>"; };
+		3016783513B1F435000E57D2 /* IMBTestTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestTextView.m; sourceTree = "<group>"; };
 		3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoEventObjectViewController.h; sourceTree = "<group>"; };
 		3025E5621306877700706DB2 /* IMBiPhotoEventObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoEventObjectViewController.m; sourceTree = "<group>"; };
 		30394AB512DC64B400ACA531 /* ObjectiveFlickr.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ObjectiveFlickr.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1351,6 +1354,8 @@
 				30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */,
 				30F90B371358521300D13233 /* IMBTestFacesBackgroundLayer.h */,
 				30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */,
+				3016783413B1F435000E57D2 /* IMBTestTextView.h */,
+				3016783513B1F435000E57D2 /* IMBTestTextView.m */,
 			);
 			name = "Test Application";
 			sourceTree = "<group>";
@@ -1889,6 +1894,7 @@
 				30439224130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m in Sources */,
 				30F90B391358521300D13233 /* IMBTestFaceBrowserCell.m in Sources */,
 				30F90B3A1358521300D13233 /* IMBTestFacesBackgroundLayer.m in Sources */,
+				3016783613B1F435000E57D2 /* IMBTestTextView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
