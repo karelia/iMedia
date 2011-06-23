@@ -501,6 +501,12 @@
 {
 	static CGImageRef badgeImage = NULL;
 	
+	// Suppress badges on skimmable objects like events or faces
+	if ([inController isKindOfClass:[IMBSkimmableObjectViewController class]])
+	{
+		return NULL;
+	}
+	
 	if ([[self usedObjects] valueForKey:[inObject identifier]])
 	{
 		if (!badgeImage)

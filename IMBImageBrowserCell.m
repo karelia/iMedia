@@ -288,12 +288,11 @@
 		IMBObjectViewController* objectViewController = (IMBObjectViewController*) [[self imageBrowserView] delegate];
 		IMBObject* item = (IMBObject*) [self representedItem];
 
-		//		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:[item parserMediaType]];
 		id <IMBObjectViewControllerDelegate> delegate = [objectViewController delegate];
 		
 		if ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
 		{
-			CGImageRef badge = [delegate objectViewController:nil badgeForObject:item];
+			CGImageRef badge = [delegate objectViewController:objectViewController badgeForObject:item];
 			
 			if (badge)
 			{

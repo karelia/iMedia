@@ -59,7 +59,7 @@
 	NSString* _imageRepresentationType;		
 	NSString* _title;
 	NSString* _subtitle;
-	CGImageRef _badge;				// An optional badge indicating image usage provided by host application 
+	CGImageRef _badge;				// An optional badge probably provided by host application 
 	BOOL _isDisabledFromDragging;
 	
 	NSDictionary* _titleTextAttributes;

@@ -1997,14 +1997,36 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 			cell.imageRepresentationType = object.imageRepresentationType;
 		}
 		
-		// Host app delegate may provide badge image here
-		
-		if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
-		{
-			cell.badge = [[self delegate] objectViewController:self badgeForObject:object ];
-		}
 		cell.title = object.imageTitle;
 		cell.subtitle = object.metadataDescription;
+	}
+	
+	// Host app delegate may provide badge image here
+	
+	if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
+	{
+		// Combo view cell
+		if ([inCell respondsToSelector:@selector(setBadge:)])
+		{
+			[inCell setBadge:[[self delegate] objectViewController:self badgeForObject:object]];
+		}
+		
+		// List view icon cell
+		if ([inCell isKindOfClass:[NSImageCell class]] &&
+			[(NSString*)[inTableColumn identifier] isEqualToString:@"icon"])
+		{
+			CGImageRef badgeRef = [[self delegate] objectViewController:self badgeForObject:object];
+			
+			if (badgeRef)
+			{
+				NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
+				NSBitmapImageRep* bitmapImageRep = [[[NSBitmapImageRep alloc] initWithCGImage:badgeRef] autorelease];
+				NSImage* badge = [[[NSImage alloc] initWithSize:badgeSize] autorelease];
+				[badge addRepresentation:bitmapImageRep];
+				
+				[inCell setImage:badge];
+			}
+		}
 	}
 }
 

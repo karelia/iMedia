@@ -60,7 +60,7 @@
 {
 	[super concludeDragOperation:sender];
 	
-	NSLog(@"Something was successfully dragged into my view");
+	//NSLog(@"Something was successfully dragged into my view");
 	
 	// Let's see what it is
 	
