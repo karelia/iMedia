@@ -1856,7 +1856,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
 			buildSettings = {
-				ARCHS = i386;
 				RUN_CLANG_STATIC_ANALYZER = NO;
 			};
 			name = "Release10.6+";
