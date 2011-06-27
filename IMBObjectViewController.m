@@ -301,6 +301,8 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (void) awakeFromNib
 {
+	self.objectArrayController.delegate = self;
+	
 	// Configure the object views...
 	
 	[self _configureIconView];
@@ -1194,6 +1196,39 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 //		#endif
 	}
 	
+	// Badges filtering
+	
+	if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
+	{
+		if ([menu numberOfItems] > 0)
+		{
+			[menu addItem:[NSMenuItem separatorItem]];
+		}
+			 
+		item = [[NSMenuItem alloc] initWithTitle:@"Show All" action:@selector(showFiltered:) keyEquivalent:@""];
+		[item setTag:kIMBObjectFilterAll];
+		[item setTarget:self];
+		[item setOnStateImage:[NSImage imageNamed:@"NSMenuRadio"]];
+        [item setState: ibObjectFilter == kIMBObjectFilterAll ? NSOnState : NSOffState];
+		[menu addItem:item];
+		[item release];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Show Badged Only" action:@selector(showFiltered:) keyEquivalent:@""];
+		[item setTag:kIMBObjectFilterBadge];
+		[item setTarget:self];
+		[item setOnStateImage:[NSImage imageNamed:@"NSMenuRadio"]];
+        [item setState: ibObjectFilter == kIMBObjectFilterBadge ? NSOnState : NSOffState];
+		[menu addItem:item];
+		[item release];
+
+		item = [[NSMenuItem alloc] initWithTitle:@"Show Unbadged Only" action:@selector(showFiltered:) keyEquivalent:@""];
+		[item setTag:kIMBObjectFilterNoBadge];
+		[item setTarget:self];
+		[item setOnStateImage:[NSImage imageNamed:@"NSMenuRadio"]];
+        [item setState: ibObjectFilter == kIMBObjectFilterNoBadge ? NSOnState : NSOffState];
+		[menu addItem:item];
+		[item release];
+	}
 	// Give parser a chance to add menu items...
 	
 	IMBParser* parser = self.currentNode.parser;
@@ -1284,6 +1319,15 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	IMBNode* node = (IMBNode*)[inSender representedObject];
 	[_nodeViewController expandSelectedNode];
 	[_nodeViewController selectNode:node];
+}
+
+
+- (IBAction) showFiltered:(id)inSender
+{
+	ibObjectFilter = (IMBObjectFilter) [inSender tag];
+	[inSender setState:NSOnState];
+	[[self objectArrayController] rearrangeObjects];
+	[[self nodeViewController] setObjectContainerViewNeedsDisplay:YES];
 }
 
 
@@ -2283,6 +2327,36 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	// No-op; clicking is handled with more detail from the mouse operations.
 	// However we want to make sure our window becomes key with a click.
 	[[inSender window] makeKeyWindow];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark IMBObjectArrayControllerDelegate
+
+- (BOOL) filterObject:(IMBObject*)inObject
+{
+	id <IMBObjectViewControllerDelegate> delegate = nil;
+	
+	switch (ibObjectFilter) {
+		case kIMBObjectFilterAll:
+			return YES;
+			break;
+		case kIMBObjectFilterBadge:
+			delegate = [self delegate];
+			return ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)] &&
+					[delegate objectViewController:self badgeForObject:inObject]);
+			break;
+		case kIMBObjectFilterNoBadge:
+			delegate = [self delegate];
+			return ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)] &&
+					![delegate objectViewController:self badgeForObject:inObject]);
+			break;
+		default:
+			return YES;
+	}
 }
 
 

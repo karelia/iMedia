@@ -78,6 +78,17 @@
 
 #pragma mark 
 
+@interface IMBTestAppDelegate ()
+
+- (CGImageRef) badgeForObject:(IMBObject*) inObject;
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
 @implementation IMBTestAppDelegate
 
 @synthesize nodeViewController = _nodeViewController;
@@ -499,36 +510,13 @@
 
 - (CGImageRef) objectViewController:(IMBObjectViewController*) inController badgeForObject:(IMBObject*) inObject
 {
-	static CGImageRef badgeImage = NULL;
-	
 	// Suppress badges on skimmable objects like events or faces
 	if ([inController isKindOfClass:[IMBSkimmableObjectViewController class]])
 	{
 		return NULL;
 	}
 	
-	if ([[self usedObjects] valueForKey:[inObject identifier]])
-	{
-		if (!badgeImage)
-		{
-			NSString* imageName = @"badge_checkbox.png";
-			
-			NSString* path = [[NSBundle mainBundle] pathForResource:[imageName stringByDeletingPathExtension] ofType:[imageName pathExtension]];
-			if(path){
-				CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
-				
-				if(imageSource)
-				{
-					badgeImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
-					CFRelease(imageSource);
-					[(id) badgeImage autorelease];
-				}
-			}
-		}
-		return badgeImage;
-	} else {
-		return NULL;
-	}
+	return [self badgeForObject:inObject];
 }
 
 
@@ -578,10 +566,46 @@
 	{
 		[self.usedObjects setObject:object forKey:[object identifier]];
 	}
+	
 	[self.nodeViewController setObjectContainerViewNeedsDisplay:YES];
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark -
+#pragma mark Helper
+
+- (CGImageRef) badgeForObject:(IMBObject*) inObject
+{
+	static CGImageRef badgeImage = NULL;
+	
+	if ([[self usedObjects] valueForKey:[inObject identifier]])
+	{
+		if (!badgeImage)
+		{
+			NSString* imageName = @"badge_checkbox.png";
+			
+			NSString* path = [[NSBundle mainBundle] pathForResource:[imageName stringByDeletingPathExtension] ofType:[imageName pathExtension]];
+			if(path){
+				CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
+				
+				if(imageSource)
+				{
+					badgeImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
+					CFRelease(imageSource);
+					[(id) badgeImage autorelease];
+				}
+			}
+		}
+		return badgeImage;
+	} else {
+		return NULL;
+	}
+}
+
 @end
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

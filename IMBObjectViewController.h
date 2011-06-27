@@ -90,6 +90,13 @@ enum
 };
 typedef NSUInteger kIMBObjectViewType;
 
+typedef enum { 
+	kIMBObjectFilterAll = 0,
+	kIMBObjectFilterBadge,
+	kIMBObjectFilterNoBadge
+} 
+IMBObjectFilter;
+
 extern NSString* kIMBObjectImageRepresentationProperty;
 
 
@@ -130,6 +137,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 	IBOutlet NSSegmentedControl *ibSegments;
  	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
+	IBOutlet IMBObjectFilter ibObjectFilter;
 	NSUInteger _viewType;
 	double _iconSize;
 	

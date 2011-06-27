@@ -50,6 +50,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class IMBObject;
+@protocol IMBObjectArrayControllerDelegate;
+
 #pragma mark 
 
 @interface IMBObjectArrayController : NSArrayController
@@ -57,7 +62,7 @@
 	IBOutlet NSSearchField* ibSearchField;
 	NSArray* _searchableProperties;
 	NSString* _searchString;
-	IBOutlet id _delegate;
+	IBOutlet id <IMBObjectArrayControllerDelegate> _delegate;
 	id _newObject;
 }
 
@@ -77,7 +82,15 @@
 
 
 @protocol IMBObjectArrayControllerDelegate
+
+// Returns YES if the object passes the delegate's filter. NO otherwise.
+
+- (BOOL) filterObject:(IMBObject*)inObject;
+
+@optional
+
 - (id) proxyForObject:(id)inObject;
+
 @end
 
 
