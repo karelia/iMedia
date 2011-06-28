@@ -90,13 +90,6 @@
 	return self;
 }
 
-- (void) loadObjects:(NSArray*)inObjects
-{
-	[super loadObjects:inObjects];
-	[self _didFinish];
-}
-
-
 - (void) _loadObject:(IMBObject*)inObject
 {
     id parser = [inObject parser];
