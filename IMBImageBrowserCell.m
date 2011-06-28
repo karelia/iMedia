@@ -58,6 +58,12 @@
 #import "IMBCommon.h"
 #import "IMBObjectViewController.h"
 
+/* weak linking of types for layerForType to ensure 10.5 compatibility: */
+extern NSString *const IKImageBrowserCellBackgroundLayer __attribute__((weak_import));
+extern NSString *const IKImageBrowserCellForegroundLayer __attribute__((weak_import));
+extern NSString *const IKImageBrowserCellSelectionLayer __attribute__((weak_import));
+extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_import));
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

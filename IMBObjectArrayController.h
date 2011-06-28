@@ -62,7 +62,7 @@
 	IBOutlet NSSearchField* ibSearchField;
 	NSArray* _searchableProperties;
 	NSString* _searchString;
-	IBOutlet id <IMBObjectArrayControllerDelegate> _delegate;
+	IBOutlet <IMBObjectArrayControllerDelegate> _delegate;
 	id _newObject;
 }
 
@@ -81,7 +81,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@protocol IMBObjectArrayControllerDelegate
+@protocol IMBObjectArrayControllerDelegate <NSObject>
 
 // Returns YES if the object passes the delegate's filter. NO otherwise.
 
