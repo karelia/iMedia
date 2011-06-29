@@ -1205,7 +1205,12 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 			[menu addItem:[NSMenuItem separatorItem]];
 		}
 			 
-		item = [[NSMenuItem alloc] initWithTitle:@"Show All" action:@selector(showFiltered:) keyEquivalent:@""];
+		title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.showAll",
+			nil,IMBBundle(),
+			@"Show All",
+			@"Menu item in context menu of IMBObjectViewController");
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
 		[item setTag:kIMBObjectFilterAll];
 		[item setTarget:self];
 		[item setOnStateImage:[NSImage imageNamed:@"NSMenuRadio"]];
@@ -1213,7 +1218,12 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 		[menu addItem:item];
 		[item release];
 
-		item = [[NSMenuItem alloc] initWithTitle:@"Show Badged Only" action:@selector(showFiltered:) keyEquivalent:@""];
+		title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.showBadgedOnly",
+			nil,IMBBundle(),
+			@"Show Badged Only",
+			@"Menu item in context menu of IMBObjectViewController");
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
 		[item setTag:kIMBObjectFilterBadge];
 		[item setTarget:self];
 		[item setOnStateImage:[NSImage imageNamed:@"NSMenuRadio"]];
@@ -1221,7 +1231,12 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 		[menu addItem:item];
 		[item release];
 
-		item = [[NSMenuItem alloc] initWithTitle:@"Show Unbadged Only" action:@selector(showFiltered:) keyEquivalent:@""];
+		title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.showUnbadgedOnly",
+			nil,IMBBundle(),
+			@"Show Unbadged Only",
+			@"Menu item in context menu of IMBObjectViewController");
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
 		[item setTag:kIMBObjectFilterNoBadge];
 		[item setTarget:self];
 		[item setOnStateImage:[NSImage imageNamed:@"NSMenuRadio"]];
