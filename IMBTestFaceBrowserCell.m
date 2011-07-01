@@ -120,6 +120,12 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 			CALayer *layer = [CALayer layer];
 			layer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
 			
+			CALayer* superLayer = [super layerForType:type];
+			if (superLayer)
+			{
+				[layer addSublayer:superLayer];
+			}
+			
 			return layer;
 		}
 		

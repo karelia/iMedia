@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -41,7 +41,7 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
 // Author: Peter Baumgartner, Dan Wood, Christoph Priebe
@@ -78,10 +78,22 @@
 
 #pragma mark 
 
+@interface IMBTestAppDelegate ()
+
+- (CGImageRef) badgeForObject:(IMBObject*) inObject;
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
 @implementation IMBTestAppDelegate
 
 @synthesize nodeViewController = _nodeViewController;
 @synthesize objectViewController = _objectViewController;
+@synthesize usedObjects = _usedObjects;
 
 + (void)initialize
 {
@@ -89,8 +101,8 @@
 	
 	NSMutableDictionary *defaultDefaults
 	= [NSMutableDictionary dictionaryWithObjectsAndKeys:
-
-//	   [NSNumber numberWithBool:YES], @"WebIconDatabaseEnabled",
+	   
+	   //	   [NSNumber numberWithBool:YES], @"WebIconDatabaseEnabled",
 	   
 	   nil];
 	NSUserDefaultsController *controller = [NSUserDefaultsController sharedUserDefaultsController];
@@ -113,6 +125,8 @@
 	
 	[IMBConfig setShowsGroupNodes:YES];
 	[IMBConfig setUseGlobalViewType:NO];
+	
+	self.usedObjects = [NSMutableDictionary dictionary];
 	
 #if CUSTOM_USER_INTERFACE
 	
@@ -184,9 +198,13 @@
 	{
 		NSArray* mediaTypes = [NSArray arrayWithObjects:kIMBMediaTypeImage,kIMBMediaTypeAudio,kIMBMediaTypeMovie,kIMBMediaTypeLink,nil];
 		IMBPanelController* panelController = [IMBPanelController sharedPanelControllerWithDelegate:self mediaTypes:mediaTypes];
+		
+		// Set a handle onto the node view controller (need it later for notifying about badge changes)
+		self.nodeViewController = [(IMBObjectViewController*)[[panelController viewControllers] objectAtIndex:0] nodeViewController];
+		
 		[panelController showWindow:nil];
 		[panelController.window makeKeyAndOrderFront:nil];		// Test app, and stand-alone app, would want this to become key.
-
+		
 	}
 }
 
@@ -235,25 +253,25 @@
 #if LOG_PARSERS
 	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,parserClassname,inMediaType);
 #endif
-
+	
 	if ([parserClassname isEqualToString:@"IMBImageCaptureParser"])
 	{
 		return NO;
 	}
 	
-//	if ([parserClassname isEqualToString:@"IMBFlickrParser"])
-//	{
-//		// Quick check keychain.  Detailed fetching is below in "didLoadParser" though.
-//		SecKeychainItemRef item = nil;
-//		UInt32 stringLength;
-//		char* buffer;
-//		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
-//		if (err == noErr)
-//		{
-//			SecKeychainItemFreeContent(NULL, buffer);
-//		}
-//		result = (item != nil && err == noErr);
-//	}
+	//	if ([parserClassname isEqualToString:@"IMBFlickrParser"])
+	//	{
+	//		// Quick check keychain.  Detailed fetching is below in "didLoadParser" though.
+	//		SecKeychainItemRef item = nil;
+	//		UInt32 stringLength;
+	//		char* buffer;
+	//		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
+	//		if (err == noErr)
+	//		{
+	//			SecKeychainItemFreeContent(NULL, buffer);
+	//		}
+	//		result = (item != nil && err == noErr);
+	//	}
 	return result;
 }
 
@@ -484,9 +502,21 @@
 		IKImageBrowserView* iconView = [inController iconView];
 		
 		// Set some title attributes to mimic iPhoto titles for faces
-
+		
 		[iconView setValue:[IMBTestFaceBrowserCell titleAttributes] forKey:IKImageBrowserCellsTitleAttributesKey];
 	}
+}
+
+
+- (CGImageRef) objectViewController:(IMBObjectViewController*) inController badgeForObject:(IMBObject*) inObject
+{
+	// Suppress badges on skimmable objects like events or faces
+	if ([inController isKindOfClass:[IMBSkimmableObjectViewController class]])
+	{
+		return NULL;
+	}
+	
+	return [self badgeForObject:inObject];
 }
 
 
@@ -524,7 +554,58 @@
 	return defaultNodes;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Dragging Delegate
+
+- (void) concludeDragOperationForObjects:(NSArray*)inObjects
+{
+	for (IMBObject* object in inObjects)
+	{
+		[self.usedObjects setObject:object forKey:[object identifier]];
+	}
+	
+	[self.nodeViewController setObjectContainerViewNeedsDisplay:YES];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark -
+#pragma mark Helper
+
+- (CGImageRef) badgeForObject:(IMBObject*) inObject
+{
+	static CGImageRef badgeImage = NULL;
+	
+	if ([[self usedObjects] valueForKey:[inObject identifier]])
+	{
+		if (!badgeImage)
+		{
+			NSString* imageName = @"badge_checkbox.png";
+			
+			NSString* path = [[NSBundle mainBundle] pathForResource:[imageName stringByDeletingPathExtension] ofType:[imageName pathExtension]];
+			if(path){
+				CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
+				
+				if(imageSource)
+				{
+					badgeImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
+					CFRelease(imageSource);
+					[(id) badgeImage autorelease];
+				}
+			}
+		}
+		return badgeImage;
+	} else {
+		return NULL;
+	}
+}
+
 @end
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

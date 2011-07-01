@@ -17,7 +17,7 @@
  without limitation the rights to use, copy, modify, merge, publish,
  distribute, sublicense, and/or sell copies of the Software, and to permit
  persons to whom the Software is furnished to do so, subject to the following
- conditions:
+ conditions: 
  
  Redistributions of source code must retain the original terms stated here,
  including this list of conditions, the disclaimer noted below, and the
@@ -44,41 +44,31 @@
  */
 
 
-// Author: Dan Wood, Peter Baumgartner, Mike Abdullah
-
-
-#import "IMBImageItem.h"
+// Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#import "IMBTestTextView.h"
+#import "IMBObjectsPromise.h"
+#import "IMBTestAppDelegate.h"
 
-@interface IMBComboTextCell : NSTextFieldCell <IMBImageItem>
+
+@implementation IMBTestTextView
+
+- (void) concludeDragOperation:(id <NSDraggingInfo>)sender
 {
-	id _imageRepresentation;								
-	NSString* _imageRepresentationType;		
-	NSString* _title;
-	NSString* _subtitle;
-	CGImageRef _badge;				// An optional badge probably provided by host application 
-	BOOL _isDisabledFromDragging;
+	[super concludeDragOperation:sender];
 	
-	NSDictionary* _titleTextAttributes;
-	NSDictionary* _subtitleTextAttributes;
+	//NSLog(@"Something was successfully dragged into my view");
+	
+	// Let's see what it is
+	
+	NSPasteboard* pboard = [sender draggingPasteboard];
+	IMBObjectsPromise* objectsPromise = [IMBObjectsPromise promiseFromPasteboard:pboard];
+	NSArray* objects = [objectsPromise objects];
+	
+	[(IMBTestAppDelegate*) draggingDelegate concludeDragOperationForObjects:objects];
 }
 
-@property (retain) id imageRepresentation;	
-@property (retain) NSString* imageRepresentationType;
-
-@property (retain) NSString* title;
-@property (copy) NSDictionary* titleTextAttributes;
-
-@property (retain) NSString* subtitle;
-@property (copy) NSDictionary* subtitleTextAttributes;
-
-@property (readwrite) CGImageRef badge;
-
-@property (assign, setter=setDisabledFromDragging:) BOOL isDisabledFromDragging;
-
 @end
-
-//----------------------------------------------------------------------------------------------------------------------

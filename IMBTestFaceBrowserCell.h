@@ -51,9 +51,10 @@
 
 #import <Quartz/Quartz.h>
 #import <Cocoa/Cocoa.h>
+#import "IMBImageBrowserCell.h"
 
 
-@interface IMBTestFaceBrowserCell : IKImageBrowserCell {
+@interface IMBTestFaceBrowserCell : IMBImageBrowserCell {
 
 }
 
