@@ -74,6 +74,7 @@
 #import "IMBCommon.h"
 #import "IMBQLPreviewPanel.h"
 #import "IMBObjectsPromise.h"
+#import "IMBObjectArrayController.h"
 #import <Quartz/Quartz.h>
 
 
@@ -120,7 +121,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 #pragma mark 
 
 
-@interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate, NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
+@interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate, IMBObjectArrayControllerDelegate, NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 //#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 //<NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 //#else

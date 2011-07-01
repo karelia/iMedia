@@ -55,7 +55,6 @@
 #import "IMBObjectViewController.h"
 #import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
-#import "IMBObjectArrayController.h"
 #import "IMBFolderParser.h"
 #import "IMBConfig.h"
 #import "IMBParser.h"
@@ -2351,7 +2350,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 #pragma mark 
 #pragma mark IMBObjectArrayControllerDelegate
 
-- (BOOL) filterObject:(IMBObject*)inObject
+- (BOOL) objectArrayController:(IMBObjectArrayController*)inController filterObject:(IMBObject*)inObject
 {
 	id <IMBObjectViewControllerDelegate> delegate = nil;
 	

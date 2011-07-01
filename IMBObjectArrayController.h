@@ -62,11 +62,11 @@
 	IBOutlet NSSearchField* ibSearchField;
 	NSArray* _searchableProperties;
 	NSString* _searchString;
-	IBOutlet <IMBObjectArrayControllerDelegate> _delegate;
+	id <IMBObjectArrayControllerDelegate> _delegate;
 	id _newObject;
 }
 
-@property (assign) id delegate;
+@property (nonatomic, assign) IBOutlet id <IMBObjectArrayControllerDelegate> delegate;
 
 // Filtering...
 
@@ -85,7 +85,7 @@
 
 // Returns YES if the object passes the delegate's filter. NO otherwise.
 
-- (BOOL) filterObject:(IMBObject*)inObject;
+- (BOOL) objectArrayController:(IMBObjectArrayController*)inController filterObject:(IMBObject*)inObject;
 
 @optional
 
