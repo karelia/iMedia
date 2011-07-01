@@ -1,0 +1,21 @@
+Overview
+========
+
+This is the iMedia Browser framework that is used by a number of applications (and as the basis for a stand-alone utility).  Developers are encouraged to include this in their application as long as there is proper attribution.
+
+
+
+Compatibility
+========
+
+The master is currently at the "2.0" phase, with compatibility for 10.5 and 10.6.  For the older 1.x branch, which is not being maintained, you can get it from subversion:
+
+`svn checkout http://imedia.googlecode.com/svn/trunk/ imedia-read-only`
+
+Soon we plan on working on code that requires 10.6 and may take advantage of 10.7 features.  We will probably split off a branch for that development until it is stable, and then move that to master.  (We will have a 10.5-compatible branch available by that time.)
+
+
+Development
+========
+
+Developers are welcome to work on enhancements and fixes!  We are still using the old [Google Code issue tracker](http://code.google.com/p/imedia/issues/list) for now.  There are plenty of things that need to be done!
