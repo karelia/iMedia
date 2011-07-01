@@ -74,6 +74,7 @@
 #import "IMBCommon.h"
 #import "IMBQLPreviewPanel.h"
 #import "IMBObjectsPromise.h"
+#import "IMBObjectArrayController.h"
 #import <Quartz/Quartz.h>
 
 
@@ -90,6 +91,13 @@ enum
 };
 typedef NSUInteger kIMBObjectViewType;
 
+typedef enum { 
+	kIMBObjectFilterAll = 0,
+	kIMBObjectFilterBadge,
+	kIMBObjectFilterNoBadge
+} 
+IMBObjectFilter;
+
 extern NSString* kIMBObjectImageRepresentationProperty;
 
 
@@ -105,7 +113,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 @class IMBObject;
 @class IMBNode;
 @class IKImageBrowserView;
-
+@protocol IMBObjectViewControllerDelegate;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -113,7 +121,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 #pragma mark 
 
 
-@interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate, NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
+@interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate, IMBObjectArrayControllerDelegate, NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 //#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 //<NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 //#else
@@ -130,6 +138,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 	IBOutlet NSSegmentedControl *ibSegments;
  	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
+	IBOutlet IMBObjectFilter ibObjectFilter;
 	NSUInteger _viewType;
 	double _iconSize;
 	
@@ -214,6 +223,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 // Helpers...
 
+- (id <IMBObjectViewControllerDelegate>) delegate;
 - (IBAction) openSelectedObjects:(id)inSender;
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode;
 - (IBAction) quicklook:(id)inSender;
@@ -251,6 +261,10 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 extern NSString* const IMBObjectViewControllerSegmentedControlKey;		/* Segmented control for object view selection */
 
 - (void) objectViewController:(IMBObjectViewController*)inController didLoadViews:(NSDictionary*)inViews;
+
+// The delegate may provide a badge image to decorate the image of inObject
+
+- (CGImageRef) objectViewController:(IMBObjectViewController*) inController badgeForObject:(IMBObject*) inObject;
 
 @end
 

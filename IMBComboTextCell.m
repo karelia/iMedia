@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -84,6 +84,20 @@
 @synthesize subtitle = _subtitle;
 @synthesize subtitleTextAttributes = _subtitleTextAttributes;
 @synthesize isDisabledFromDragging = _isDisabledFromDragging;
+@dynamic badge;
+
+- (CGImageRef) badge
+{
+	return _badge;
+}
+
+
+- (void) setBadge:(CGImageRef) inBadge
+{
+	CGImageRelease(_badge);
+	_badge = inBadge;
+	CGImageRetain(_badge);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -94,21 +108,21 @@
 {
 	NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
 	[paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
-
+	
 	NSColor* titleColor = [self textColor];
 	NSColor* metadataColor = [[self textColor] colorWithAlphaComponent:0.4];
 	
 	self.titleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-		titleColor,NSForegroundColorAttributeName,
-		[NSFont systemFontOfSize:13.0],NSFontAttributeName,
-		paragraphStyle,NSParagraphStyleAttributeName,
-		nil] autorelease];
+								 titleColor,NSForegroundColorAttributeName,
+								 [NSFont systemFontOfSize:13.0],NSFontAttributeName,
+								 paragraphStyle,NSParagraphStyleAttributeName,
+								 nil] autorelease];
 	
 	self.subtitleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-		metadataColor,NSForegroundColorAttributeName,
-		[NSFont systemFontOfSize:11.0],NSFontAttributeName,
-		paragraphStyle,NSParagraphStyleAttributeName,
-		nil] autorelease];
+									metadataColor,NSForegroundColorAttributeName,
+									[NSFont systemFontOfSize:11.0],NSFontAttributeName,
+									paragraphStyle,NSParagraphStyleAttributeName,
+									nil] autorelease];
 }
 
 
@@ -187,7 +201,7 @@
 	result.subtitleTextAttributes = self.subtitleTextAttributes;
 	
 	result.isDisabledFromDragging = self.isDisabledFromDragging;
-
+	
     return result;
 }
 
@@ -236,7 +250,7 @@
 	{
 		CGFloat fx		 = inImageFrame.size.width / inWidth;
 		CGFloat fy		 = inImageFrame.size.height / inHeight;
-				f		 = MIN(fx,fy);
+		f		 = MIN(fx,fy);
 	}
 	
 	CGFloat x0		 = NSMidX(inImageFrame);
@@ -284,6 +298,17 @@
     [self willDrawImageInRect:rect context:context];
 	CGContextSetInterpolationQuality(context, kCGInterpolationHigh);	// artwork is pretty bad if you don't set this.
 	CGContextDrawImage(context,NSRectToCGRect(rect),inImage);
+	
+	if (_badge) 
+	{
+		NSRect badgeRect;
+		badgeRect.origin.x = rect.origin.x + rect.size.width - CGImageGetWidth(_badge) - 3;
+		badgeRect.origin.y = rect.origin.y + 3;
+		badgeRect.size.width  = CGImageGetWidth(_badge);
+		badgeRect.size.height = CGImageGetHeight(_badge);
+		CGContextDrawImage(context, NSRectToCGRect(badgeRect), _badge);
+	}
+	
 	CGContextRestoreGState(context);
 }
 
@@ -350,7 +375,7 @@
 			//CGImageRef image =  [imageRep CGImage];
 			//[nsImage release];
 			CGImageRef image = (CGImageRef) _imageRepresentation;
-
+			
             [self _drawImage:image withFrame:imageRect];
 		}
 		
@@ -363,7 +388,7 @@
             CFRelease(image);
         }
     }
-    	
+	
 	// Draw the title and subtitle...
 	
 	[self initTextAttributes];
