@@ -157,14 +157,14 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	NSMutableDictionary* stateDict = [NSMutableDictionary dictionary];
 	[stateDict setObject:expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
 
-	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+	NSMutableDictionary* classDict = [IMBConfig prefsForClass:[self class]];
 	[classDict setObject:stateDict forKey:kIMBMediaTypeImage];
 	[classDict setObject:stateDict forKey:kIMBMediaTypeAudio];
 	[classDict setObject:stateDict forKey:kIMBMediaTypeMovie];
 	[classDict setObject:stateDict forKey:kIMBMediaTypeLink];
 	[classDict setObject:stateDict forKey:kIMBMediaTypeContact];
 
-	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	[IMBConfig registerDefaultPrefs:classDict forClass:[self class]];
 	
 	[pool release];
 }

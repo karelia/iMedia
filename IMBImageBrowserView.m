@@ -179,10 +179,12 @@ enum IMBMouseOperation
 	
 	if (cellClass == nil)
 	{
+#if defined(MAC_OS_X_VERSION_10_6)
 		if (NSClassFromString(@"IKImageBrowserCell") != nil)
 		{
 			cellClass = [IMBImageBrowserCell class];
 		}
+#endif
 	}
 	
 	return cellClass;
@@ -220,6 +222,8 @@ enum IMBMouseOperation
 
 // This method is for 10.6 only. Create and return a cell. Please note that we must not autorelease here!
 
+#if defined(MAC_OS_X_VERSION_10_6)
+
 - (IKImageBrowserCell*) newCellForRepresentedItem:(id)inItem
 {
 	if (IMBRunningOnSnowLeopardOrNewer())		//  We don't allow for special cell in Leopard.
@@ -229,6 +233,7 @@ enum IMBMouseOperation
 	return [super newCellForRepresentedItem:inItem];
 }
 
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 

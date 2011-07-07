@@ -67,6 +67,8 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#if defined(MAC_OS_X_VERSION_10_6)
+
 @interface IKImageBrowserCell (NotPublicSoThisMightBeAProblemForTheMAS)
 
 - (void) setDataSource:(id)inDataSource;
@@ -80,10 +82,14 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 
 @end
 
+#endif
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
+
+#if defined(MAC_OS_X_VERSION_10_6)
 
 @implementation IMBImageBrowserCell
 
@@ -393,3 +399,4 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 
 @end
 
+#endif
