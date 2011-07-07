@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -239,11 +239,8 @@
 /* Begin PBXProject section */
 		6ABF72D10F939BB800B9179E /* Project object */ = {
 			isa = PBXProject;
-			attributes = {
-				LastUpgradeCheck = 0420;
-			};
 			buildConfigurationList = 6ABF72D40F939BB800B9179E /* Build configuration list for PBXProject "ObjectiveFlickr" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -322,7 +319,7 @@
 				ARCHS = i386;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_OBJC_GC = supported;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.5;
 			};
 			name = "Release10.6+";
 		};
@@ -331,6 +328,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = All;
 				ZERO_LINK = NO;
 			};
@@ -350,6 +348,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 2;
 				DYLIB_CURRENT_VERSION = 2;
 				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
@@ -361,8 +360,9 @@
 					"-framework",
 					AppKit,
 				);
+				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.6;
 				ZERO_LINK = NO;
 			};
 			name = "Release10.6+";
@@ -373,6 +373,8 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
 				ZERO_LINK = NO;
 			};
@@ -388,6 +390,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
@@ -401,8 +404,8 @@
 					"-framework",
 					AppKit,
 				);
+				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -416,6 +419,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
@@ -428,8 +432,8 @@
 					"-framework",
 					AppKit,
 				);
+				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -448,6 +452,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = All;
 				ZERO_LINK = NO;
 			};
@@ -479,7 +484,6 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -508,7 +512,7 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.5;
 			};
 			name = Release;
 		};
@@ -520,6 +524,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
 			};
 			name = Debug;
@@ -530,7 +535,9 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
 				ZERO_LINK = NO;
 			};
@@ -561,7 +568,7 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.5;
 			};
 			name = Test;
 		};
@@ -570,6 +577,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = All;
 				ZERO_LINK = NO;
 			};
@@ -585,6 +593,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
@@ -597,8 +606,8 @@
 					"-framework",
 					AppKit,
 				);
+				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
-				SDKROOT = macosx;
 			};
 			name = Test;
 		};
@@ -608,7 +617,9 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
 				ZERO_LINK = NO;
 			};
