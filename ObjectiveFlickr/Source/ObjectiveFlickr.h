@@ -25,9 +25,9 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "LFWebAPIKit.h"
-#import "OFUtilities.h"
-#import "OFXMLMapper.h"
+#import <ObjectiveFlickr/LFWebAPIKit.h>
+#import <ObjectiveFlickr/OFUtilities.h>
+#import <ObjectiveFlickr/OFXMLMapper.h>
 
 extern NSString *const OFFlickrSmallSquareSize;		// "s" - 75x75
 extern NSString *const OFFlickrThumbnailSize;		// "t" - 100 on longest side
