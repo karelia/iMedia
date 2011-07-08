@@ -60,7 +60,7 @@
 			<object class="NSWindowTemplate" id="406028090">
 				<int key="NSWindowStyleMask">159</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{18, 274}, {408, 853}}</string>
+				<string key="NSWindowRect">{{501, 229}, {600, 600}}</string>
 				<int key="NSWTFlags">-461896704</int>
 				<string key="NSWindowTitle">Media</string>
 				<string key="NSWindowClass">IMBPanel</string>
@@ -282,7 +282,7 @@
 						<object class="NSTabView" id="932620644">
 							<reference key="NSNextResponder" ref="962602319"/>
 							<int key="NSvFlags">18</int>
-							<string key="NSFrameSize">{408, 853}</string>
+							<string key="NSFrameSize">{600, 600}</string>
 							<reference key="NSSuperview" ref="962602319"/>
 							<reference key="NSWindow"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
@@ -298,7 +298,7 @@
 							<bool key="NSDrawsBackground">YES</bool>
 						</object>
 					</object>
-					<string key="NSFrameSize">{408, 853}</string>
+					<string key="NSFrameSize">{600, 600}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="932620644"/>
@@ -310,7 +310,7 @@
 			<object class="NSWindowTemplate" id="583279408">
 				<int key="NSWindowStyleMask">19</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{511, 356}, {310, 425}}</string>
+				<string key="NSWindowRect">{{501, 229}, {600, 600}}</string>
 				<int key="NSWTFlags">-260571136</int>
 				<string key="NSWindowTitle">About iMedia Browser</string>
 				<object class="NSMutableString" key="NSWindowClass">
@@ -344,10 +344,10 @@
 												<object class="NSTextView" id="1049882253">
 													<reference key="NSNextResponder" ref="753042742"/>
 													<int key="NSvFlags">2322</int>
-													<string key="NSFrameSize">{310, 268}</string>
+													<string key="NSFrameSize">{600, 268}</string>
 													<reference key="NSSuperview" ref="753042742"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="928391399"/>
+													<reference key="NSNextKeyView"/>
 													<object class="NSTextContainer" key="NSTextContainer" id="737716522">
 														<object class="NSLayoutManager" key="NSLayoutManager">
 															<object class="NSTextStorage" key="NSTextStorage">
@@ -364,7 +364,7 @@
 															<nil key="NSDelegate"/>
 														</object>
 														<reference key="NSTextView" ref="1049882253"/>
-														<double key="NSWidth">310</double>
+														<double key="NSWidth">600</double>
 														<int key="NSTCFlags">1</int>
 													</object>
 													<object class="NSTextViewSharedData" key="NSSharedData">
@@ -426,12 +426,12 @@
 														<int key="NSPreferredTextFinderStyle">0</int>
 													</object>
 													<int key="NSTVFlags">6</int>
-													<string key="NSMaxSize">{310, 10000000}</string>
+													<string key="NSMaxSize">{600, 10000000}</string>
 													<string key="NSMinize">{259, 268}</string>
 													<nil key="NSDelegate"/>
 												</object>
 											</object>
-											<string key="NSFrameSize">{310, 346}</string>
+											<string key="NSFrameSize">{600, 521}</string>
 											<reference key="NSSuperview" ref="1072710177"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="1049882253"/>
@@ -491,10 +491,10 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 											<double key="NSPercent">0.94565218687057495</double>
 										</object>
 									</object>
-									<string key="NSFrameSize">{310, 346}</string>
+									<string key="NSFrameSize">{600, 521}</string>
 									<reference key="NSSuperview" ref="623210614"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView" ref="753042742"/>
+									<reference key="NSNextKeyView" ref="928391399"/>
 									<int key="NSsFlags">133648</int>
 									<reference key="NSVScroller" ref="18003347"/>
 									<reference key="NSHScroller" ref="928391399"/>
@@ -680,7 +680,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 											</object>
 										</object>
 									</object>
-									<string key="NSFrame">{{10, 346}, {290, 80}}</string>
+									<string key="NSFrame">{{155, 521}, {290, 80}}</string>
 									<reference key="NSSuperview" ref="623210614"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="741599728"/>
@@ -690,7 +690,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 								<object class="NSBox" id="329565817">
 									<reference key="NSNextResponder" ref="623210614"/>
 									<int key="NSvFlags">266</int>
-									<string key="NSFrame">{{0, 344}, {310, 5}}</string>
+									<string key="NSFrame">{{0, 519}, {600, 5}}</string>
 									<reference key="NSSuperview" ref="623210614"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="425524129"/>
@@ -717,7 +717,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 									<bool key="NSTransparent">NO</bool>
 								</object>
 							</object>
-							<string key="NSFrameSize">{310, 441}</string>
+							<string key="NSFrameSize">{600, 616}</string>
 							<reference key="NSSuperview" ref="1022465604"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="329565817"/>
@@ -725,7 +725,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<string key="NSExtension">NSImageView</string>
 						</object>
 					</object>
-					<string key="NSFrameSize">{310, 425}</string>
+					<string key="NSFrameSize">{600, 600}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="623210614"/>
