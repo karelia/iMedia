@@ -56,7 +56,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-NSDictionary* IMBPreferencesDictionary(NSString* inHomeFolderPath,NSString* inPrefsFileName)
+// Private function to read contents of a prefs file at given path into a dinctionary...
+
+static NSDictionary* IMBPreferencesDictionary(NSString* inHomeFolderPath,NSString* inPrefsFileName)
 {
     NSString* path = [inHomeFolderPath stringByAppendingPathComponent:@"Library"];
     path = [path stringByAppendingPathComponent:@"Preferences"];
@@ -67,12 +69,33 @@ NSDictionary* IMBPreferencesDictionary(NSString* inHomeFolderPath,NSString* inPr
 }
 
 
+// Private function to access a certain value in the prefs dictionary...
+
+static CFTypeRef IMBGetValue(NSDictionary* inPrefsFileContents,CFStringRef inKey)
+{
+    CFTypeRef value = NULL;
+
+    if (inPrefsFileContents) 
+    {
+        id tmp = [inPrefsFileContents objectForKey:(NSString*)inKey];
+    
+        if (tmp)
+        {
+            value = (CFTypeRef) tmp;
+            CFRetain(value);
+        }
+    }
+    
+    return value;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
-CFPropertyListRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPrefsFileName)
+CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPrefsFileName)
 {
-    CFPropertyListRef value = nil;
+    CFTypeRef value = NULL;
     NSString* path;
     NSString* userName = NSUserName();
     
@@ -92,7 +115,7 @@ CFPropertyListRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPre
         path = [NSString stringWithFormat:@"/Users/%@",userName];
         
         NSDictionary* prefsFileContents = IMBPreferencesDictionary(path,(NSString*)inPrefsFileName);
-        if (prefsFileContents) value = (CFPropertyListRef) [[prefsFileContents objectForKey:(NSString*)inKey] retain];
+        value = IMBGetValue(prefsFileContents,inKey);
     }
 
     // It's possible that the other app is sandboxed as well, so we may need look for the prefs file 
@@ -107,7 +130,7 @@ CFPropertyListRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPre
         path = [path stringByAppendingPathComponent:@"Data"];
 
         NSDictionary* prefsFileContents = IMBPreferencesDictionary(path,(NSString*)inPrefsFileName);
-        if (prefsFileContents) value = (CFPropertyListRef) [[prefsFileContents objectForKey:(NSString*)inKey] retain];
+        value = IMBGetValue(prefsFileContents,inKey);
     }
     
     return value;

@@ -56,7 +56,7 @@
 // High level function that should be used instead of CFPreferencesCopyAppValue, because in  
 // sandboxed apps we need to work around problems of CFPreferencesCopyAppValue returning NULL...
  
-CFPropertyListRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPrefsFileName);
+CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPrefsFileName);
 
 
 //----------------------------------------------------------------------------------------------------------------------
