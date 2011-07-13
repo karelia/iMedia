@@ -117,7 +117,8 @@
 
 + (NSString*) safariPath
 {
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
+	NSString* path = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
+    return path;
 }
 
 
@@ -136,22 +137,17 @@
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	
-	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-	
-	if ([libraryPaths count] > 0)
-	{
-		NSString *libraryPath = [libraryPaths objectAtIndex:0];
+    NSString* userName = NSUserName();
+    NSString *libraryPath = [NSString stringWithFormat:@"/Users/%@/Library",userName];
+    NSString* path = [libraryPath stringByAppendingPathComponent:@"Safari/Bookmarks.plist"];
 
-		NSString* path = [libraryPath stringByAppendingPathComponent:@"Safari/Bookmarks.plist"];
-
-		if ([self isInstalled] && [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
-		{
-			IMBSafariBookmarkParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-			parser.mediaSource = path;
-			[parserInstances addObject:parser];
-			[parser release];
-		}
-	}
+    if ([self isInstalled] && [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
+    {
+        IMBSafariBookmarkParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+        parser.mediaSource = path;
+        [parserInstances addObject:parser];
+        [parser release];
+    }
 	
 	return parserInstances;
 }
