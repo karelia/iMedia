@@ -119,7 +119,8 @@
 
 + (NSString*) userSongsPath
 {
-	return [NSHomeDirectory() stringByAppendingPathComponent:@"Music/GarageBand"];
+	return [NSString stringWithFormat:@"/Users/%@/Music/GarageBand",NSUserName()];
+//	return [NSHomeDirectory() stringByAppendingPathComponent:@"Music/GarageBand"];
 }
 
 
