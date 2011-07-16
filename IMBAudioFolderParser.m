@@ -59,6 +59,7 @@
 #import "NSString+iMedia.h"
 #import "NSURL+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "IMBSandboxUtilities.h"
 #import "IMBNode.h"
 
 
@@ -161,10 +162,10 @@
 	if (comment && ![comment isEqualToString:@""])
 	{
 		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
-																   @"Comment",
-																   nil,IMBBundle(),
-																   @"Comment",
-																   @"Comment label in metadataDescription");
+            @"Comment",
+            nil,IMBBundle(),
+            @"Comment",
+            @"Comment label in metadataDescription");
 		
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",commentLabel,comment];
@@ -200,7 +201,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Music"];
+		self.mediaSource = [IMBHomeDirectory() stringByAppendingPathComponent:@"Music"];
 		self.displayPriority = 1;
 	}
 	
@@ -337,13 +338,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-		
-		if ([libraryPaths count] > 0)
-		{
-			NSString *libraryPath = [libraryPaths objectAtIndex:0];
-			self.mediaSource = [libraryPath stringByAppendingPathComponent:@"Sounds"];
-		}	
+		self.mediaSource = [IMBHomeDirectory() stringByAppendingPathComponent:@"Library/Sounds"];
 	}
 	
 	return self;

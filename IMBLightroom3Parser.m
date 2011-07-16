@@ -64,7 +64,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
-#import "IMBPreferencesCopyAppValue.h"
+#import "IMBSandboxUtilities.h"
 
 
 @interface IMBLightroom3Parser ()

@@ -62,7 +62,7 @@
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
-#import "IMBPreferencesCopyAppValue.h"
+#import "IMBSandboxUtilities.h"
 #import <Quartz/Quartz.h>
 
 

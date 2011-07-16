@@ -60,6 +60,8 @@
 #import "NSImage+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBNodeObject.h"
+#import "IMBSandboxUtilities.h"
+
 
 @interface IMBFireFoxParser ()
 + (NSString *)firefoxBookmarkPath;
@@ -117,23 +119,14 @@
 + (NSString *)firefoxBookmarkPath;
 {
 	NSString *result = nil;
-//	NSArray *libraryPaths1 = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
-//	NSArray *libraryPaths2 = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
-//	
-//	NSMutableArray *libraryPaths = [NSMutableArray arrayWithArray:libraryPaths1];
-//	[libraryPaths addObjectsFromArray:libraryPaths2];
-    
-    NSString *userName = NSUserName();
-    NSMutableArray *libraryPaths = [NSMutableArray arrayWithObjects:
-    
-        [NSString stringWithFormat:@"/Library"],
-        [NSString stringWithFormat:@"/Users/%@/Library",userName],
-        [NSString stringWithFormat:@"/Users/%@/Library/Containers/org.mozilla.firefox/Data/Library",userName],
 
-        [NSString stringWithFormat:@"/Library/Application Support"],
-        [NSString stringWithFormat:@"/Users/%@/Library/Application Support",userName],
-        [NSString stringWithFormat:@"/Users/%@/Library/Containers/org.mozilla.firefox/Data/Library/Application Support",userName],
-        
+    NSMutableArray *libraryPaths = [NSMutableArray arrayWithObjects:
+        @"/Library",
+        [IMBHomeDirectory() stringByAppendingPathComponent:@"Library"],
+        [IMBApplicationContainerDirectory(@"org.mozilla.firefox") stringByAppendingPathComponent:@"Library"],
+        @"/Library/Application Support",
+        [IMBHomeDirectory() stringByAppendingPathComponent:@"Library/Application Support"],
+        [IMBApplicationContainerDirectory(@"org.mozilla.firefox") stringByAppendingPathComponent:@"Library/Application Support"],
         nil];
     
 	NSFileManager *fm = [NSFileManager imb_threadSafeManager];

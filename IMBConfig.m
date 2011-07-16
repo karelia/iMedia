@@ -55,6 +55,7 @@
 #import "IMBConfig.h"
 #import "IMBCommon.h"
 #import "NSWorkspace+iMedia.h"
+#import "IMBSandboxUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -269,10 +270,8 @@ static BOOL sUseGlobalViewType = NO;
 
 + (void) registerDefaultValues
 {
-	NSString* path = [NSHomeDirectory() stringByAppendingPathComponent:@"Downloads"];	// brute force fallback
-	NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,NSUserDomainMask,YES);
-	if ([paths count] > 0) path = [paths objectAtIndex:0];
-	
+	NSString* path = [IMBHomeDirectory() stringByAppendingPathComponent:@"Downloads"];
+    	
 	[self registerDefaultPrefsValue:[NSNumber numberWithBool:YES] forKey:sIMBShowsGroupNodesKey];
 	[self registerDefaultPrefsValue:path forKey:sIMBDownloadFolderPathKey];
 	[self registerDefaultPrefsValue:[NSNumber numberWithInt:kIMBFlickrSizeSpecifierLarge] forKey:sIMBFlickrDownloadSizeKey];

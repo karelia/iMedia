@@ -60,6 +60,7 @@
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "IMBNodeObject.h"
+#import "IMBSandboxUtilities.h"
 #import <WebKit/WebKit.h>
 #import <Quartz/Quartz.h>
 
@@ -136,17 +137,23 @@
 + (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
-	
-    NSString* userName = NSUserName();
-    NSString *libraryPath = [NSString stringWithFormat:@"/Users/%@/Library",userName];
-    NSString* path = [libraryPath stringByAppendingPathComponent:@"Safari/Bookmarks.plist"];
+    
+    NSString* bookmarksSubpath = @"Library/Safari/Bookmarks.plist";
+    NSArray* paths = [NSArray arrayWithObjects:
+        [IMBHomeDirectory() stringByAppendingPathComponent:bookmarksSubpath],
+        [IMBApplicationContainerDirectory(@"com.apple.Safari") stringByAppendingPathComponent:bookmarksSubpath],
+        nil];
 
-    if ([self isInstalled] && [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
+    for (NSString* path in paths)
     {
-        IMBSafariBookmarkParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-        parser.mediaSource = path;
-        [parserInstances addObject:parser];
-        [parser release];
+        if ([self isInstalled] && [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
+        {
+            IMBSafariBookmarkParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+            parser.mediaSource = path;
+            [parserInstances addObject:parser];
+            [parser release];
+            break;
+        }
     }
 	
 	return parserInstances;

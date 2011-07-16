@@ -57,6 +57,7 @@
 #import "NSImage+iMedia.h"
 #import "IMBCommon.h"
 #import "IMBNode.h"
+#import "IMBSandboxUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -122,7 +123,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
+		self.mediaSource = [IMBHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
 		self.displayPriority = 1;
 	}
 	return self;
