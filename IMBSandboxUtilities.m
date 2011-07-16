@@ -50,15 +50,53 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#import "IMBPreferencesCopyAppValue.h"
+#import "IMBSandboxUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark
+
+
+// Replacement function for NSHomeDirectory...
+
+NSString* IMBHomeDirectory()
+{
+    return [NSString stringWithFormat:@"/Users/%@",NSUserName()];
+}
+
+
+// Convenience function for getting a path to an application container directory...
+
+NSString* IMBApplicationContainerDirectory(NSString* inBundleIdentifier)
+{
+    NSString* bundleIdentifier = inBundleIdentifier;
+    
+    if (bundleIdentifier == nil) 
+    {
+        bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    }
+    
+    NSString* appContainerDir = IMBHomeDirectory();
+    appContainerDir = [appContainerDir stringByAppendingPathComponent:@"Library"];
+    appContainerDir = [appContainerDir stringByAppendingPathComponent:@"Containers"];
+    appContainerDir = [appContainerDir stringByAppendingPathComponent:bundleIdentifier];
+    appContainerDir = [appContainerDir stringByAppendingPathComponent:@"Data"];
+    
+    return appContainerDir;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+
 // Private function to read contents of a prefs file at given path into a dinctionary...
 
-static NSDictionary* IMBPreferencesDictionary(NSString* inHomeFolderPath,NSString* inPrefsFileName)
+static NSDictionary* _IMBPreferencesDictionary(NSString* inHomeFolderPath,NSString* inPrefsFileName)
 {
     NSString* path = [inHomeFolderPath stringByAppendingPathComponent:@"Library"];
     path = [path stringByAppendingPathComponent:@"Preferences"];
@@ -71,7 +109,7 @@ static NSDictionary* IMBPreferencesDictionary(NSString* inHomeFolderPath,NSStrin
 
 // Private function to access a certain value in the prefs dictionary...
 
-static CFTypeRef IMBGetValue(NSDictionary* inPrefsFileContents,CFStringRef inKey)
+static CFTypeRef _IMBGetValue(NSDictionary* inPrefsFileContents,CFStringRef inKey)
 {
     CFTypeRef value = NULL;
 
@@ -90,20 +128,19 @@ static CFTypeRef IMBGetValue(NSDictionary* inPrefsFileContents,CFStringRef inKey
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+// High level function that should be used instead of CFPreferencesCopyAppValue, because in  
+// sandboxed apps we need to work around problems of CFPreferencesCopyAppValue returning NULL...
 
-
-CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPrefsFileName)
+CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdentifier)
 {
     CFTypeRef value = NULL;
     NSString* path;
-    NSString* userName = NSUserName();
     
     // First try the official API. If we get a value, then use it...
     
     if (value == nil)
     {
-        value = CFPreferencesCopyAppValue((CFStringRef)inKey,(CFStringRef)inPrefsFileName);
+        value = CFPreferencesCopyAppValue((CFStringRef)inKey,(CFStringRef)inBundleIdentifier);
     }
     
     // In sandboxed apps that may have failed tough, so try a workaround. If the app has the entitlement
@@ -112,10 +149,9 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPrefsFileNa
     
     if (value == nil)
     {
-        path = [NSString stringWithFormat:@"/Users/%@",userName];
-        
-        NSDictionary* prefsFileContents = IMBPreferencesDictionary(path,(NSString*)inPrefsFileName);
-        value = IMBGetValue(prefsFileContents,inKey);
+        path = IMBHomeDirectory();
+        NSDictionary* prefsFileContents = _IMBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
+        value = _IMBGetValue(prefsFileContents,inKey);
     }
 
     // It's possible that the other app is sandboxed as well, so we may need look for the prefs file 
@@ -123,14 +159,9 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPrefsFileNa
     
     if (value == nil)
     {
-        path = [NSString stringWithFormat:@"/Users/%@",userName];
-        path = [path stringByAppendingPathComponent:@"Library"];
-        path = [path stringByAppendingPathComponent:@"Containers"];
-        path = [path stringByAppendingPathComponent:(NSString*)inPrefsFileName];
-        path = [path stringByAppendingPathComponent:@"Data"];
-
-        NSDictionary* prefsFileContents = IMBPreferencesDictionary(path,(NSString*)inPrefsFileName);
-        value = IMBGetValue(prefsFileContents,inKey);
+        path = IMBApplicationContainerDirectory((NSString*)inBundleIdentifier);
+        NSDictionary* prefsFileContents = _IMBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
+        value = _IMBGetValue(prefsFileContents,inKey);
     }
     
     return value;

@@ -53,10 +53,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Replacement function for NSHomeDirectory...
+
+NSString* IMBHomeDirectory();
+
+// Convenience function for getting a path to an application container directory...
+
+NSString* IMBApplicationContainerDirectory(NSString* inBundleIdentifier);
+
 // High level function that should be used instead of CFPreferencesCopyAppValue, because in  
 // sandboxed apps we need to work around problems of CFPreferencesCopyAppValue returning NULL...
  
-CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inPrefsFileName);
+CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdentifier);
 
 
 //----------------------------------------------------------------------------------------------------------------------
