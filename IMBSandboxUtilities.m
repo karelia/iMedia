@@ -69,7 +69,7 @@ NSString* IMBHomeDirectory()
 
 // Convenience function for getting a path to an application container directory...
 
-NSString* IMBApplicationContainerDirectory(NSString* inBundleIdentifier)
+NSString* IMBApplicationContainerHomeDirectory(NSString* inBundleIdentifier)
 {
     NSString* bundleIdentifier = inBundleIdentifier;
     
@@ -159,7 +159,7 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdent
     
     if (value == nil)
     {
-        path = IMBApplicationContainerDirectory((NSString*)inBundleIdentifier);
+        path = IMBApplicationContainerHomeDirectory((NSString*)inBundleIdentifier);
         NSDictionary* prefsFileContents = _IMBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
         value = _IMBGetValue(prefsFileContents,inKey);
     }

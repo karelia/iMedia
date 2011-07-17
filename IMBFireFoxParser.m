@@ -123,10 +123,10 @@
     NSMutableArray *libraryPaths = [NSMutableArray arrayWithObjects:
         @"/Library",
         [IMBHomeDirectory() stringByAppendingPathComponent:@"Library"],
-        [IMBApplicationContainerDirectory(@"org.mozilla.firefox") stringByAppendingPathComponent:@"Library"],
+        [IMBApplicationContainerHomeDirectory(@"org.mozilla.firefox") stringByAppendingPathComponent:@"Library"],
         @"/Library/Application Support",
         [IMBHomeDirectory() stringByAppendingPathComponent:@"Library/Application Support"],
-        [IMBApplicationContainerDirectory(@"org.mozilla.firefox") stringByAppendingPathComponent:@"Library/Application Support"],
+        [IMBApplicationContainerHomeDirectory(@"org.mozilla.firefox") stringByAppendingPathComponent:@"Library/Application Support"],
         nil];
     
 	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
