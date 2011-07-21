@@ -18,4 +18,6 @@ Soon we plan on working on code that requires 10.6 and may take advantage of 10.
 Development
 ========
 
-Developers are welcome to work on enhancements and fixes!  We are still using the old [Google Code issue tracker](http://code.google.com/p/imedia/issues/list) for now.  There are plenty of things that need to be done!
+Developers are welcome to work on enhancements and fixes!  Please use the [GitHub issue tracker](https://github.com/karelia/imedia/issues); note that we are not done migrating issues from the old [Google Code issue tracker](http://code.google.com/p/imedia/issues/list).
+
+There are plenty of things that need to be done, and your help would be appreciated!
