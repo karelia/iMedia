@@ -143,6 +143,11 @@
             NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
             [inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
         }
+        
+        
+        // Resolve aliases before passing on to super. Issue #22
+        NSString *location = [[inObject location] stringByIterativelyResolvingSymlinkOrAlias];
+        [inObject setLocation:location];
 	}
     
 	[super _loadObject:inObject];
