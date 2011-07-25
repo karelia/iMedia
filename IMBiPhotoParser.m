@@ -353,7 +353,7 @@
 							  [subNodes count] > 1 ? 1 : 0;
 
 		IMBNode* photosNode = [subNodes objectAtIndex:photosNodeIndex];
-		[self populateNode:photosNode options:inOptions error:outError];
+		[self populateNode:photosNode options:inOptions error:&error];
 		inNode.objects = photosNode.objects;
 		
 		// Pre-populate events node with the same objects that photos node has
