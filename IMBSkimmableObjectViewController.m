@@ -208,17 +208,21 @@
 {
 	if (self.skimmingDelegate)
 	{
-		IMBNodeObject* item = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
-		
-		// Obtain path to image
-		NSString* imagePath = [_skimmingDelegate imagePathForKeyChildOfNodeObject:item userInfo:_userInfo];
-		
-		//NSLog(@"Object image path: %@", imagePath);
-		
-		// Now change the current image of our node object
-		[item setImageLocation:imagePath];
-		[item setNeedsImageRepresentation:YES];
-		[item loadThumbnail]; // Background thread
+		NSArray *objects = [ibObjectArrayController arrangedObjects];
+		if (inIndex < [objects count])
+		{
+			IMBNodeObject* item = [objects objectAtIndex:inIndex];
+			
+			// Obtain path to image
+			NSString* imagePath = [_skimmingDelegate imagePathForKeyChildOfNodeObject:item userInfo:_userInfo];
+			
+			//NSLog(@"Object image path: %@", imagePath);
+			
+			// Now change the current image of our node object
+			[item setImageLocation:imagePath];
+			[item setNeedsImageRepresentation:YES];
+			[item loadThumbnail]; // Background thread			
+		}
 	}
 	//NSLog(@"Mouse exited item at index %ld", (long) inIndex);
 }
@@ -227,42 +231,46 @@
 - (void) mouseSkimmedOnItemAtIndex:(NSInteger)inIndex atPoint:(NSPoint)inPoint
 {
 	if (self.skimmingDelegate) {
-		IMBNodeObject* item = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
-		
-		// Derive child object's index in node object from inPoint's relative position in frame
-		
-		NSRect skimmingFrame;
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-		if (IMBRunningOnSnowLeopardOrNewer())
+		NSArray *objects = [ibObjectArrayController arrangedObjects];
+		if (inIndex < [objects count])
 		{
-			skimmingFrame = [[[self iconView] cellForItemAtIndex:inIndex] frame];	// >= 10.6
-		}
-		else
-#endif
-		{
-			skimmingFrame = [[self iconView] itemFrameAtIndex:inIndex];
-		}
+			IMBNodeObject* item = [objects objectAtIndex:inIndex];
+			
+			// Derive child object's index in node object from inPoint's relative position in frame
+			
+			NSRect skimmingFrame;
+	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+			if (IMBRunningOnSnowLeopardOrNewer())
+			{
+				skimmingFrame = [[[self iconView] cellForItemAtIndex:inIndex] frame];	// >= 10.6
+			}
+			else
+	#endif
+			{
+				skimmingFrame = [[self iconView] itemFrameAtIndex:inIndex];
+			}
 
-		CGFloat xOffset = inPoint.x - skimmingFrame.origin.x;
-		NSUInteger objectCount = [_skimmingDelegate childrenCountOfNodeObject:item userInfo:_userInfo];
-		CGFloat widthPerObject = skimmingFrame.size.width / objectCount;
-		NSUInteger objectIndex = (NSUInteger) xOffset / widthPerObject;
-		
-		//NSLog(@"Object index: %lu", objectIndex);
-		
-		if (objectIndex != _previousImageIndex)
-		{
-			_previousImageIndex = objectIndex;
+			CGFloat xOffset = inPoint.x - skimmingFrame.origin.x;
+			NSUInteger objectCount = [_skimmingDelegate childrenCountOfNodeObject:item userInfo:_userInfo];
+			CGFloat widthPerObject = skimmingFrame.size.width / objectCount;
+			NSUInteger objectIndex = (NSUInteger) xOffset / widthPerObject;
 			
-			// Obtain path to image
-			NSString* imagePath = [_skimmingDelegate imagePathForChildOfNodeObject:item atIndex:objectIndex userInfo:_userInfo];
+			//NSLog(@"Object index: %lu", objectIndex);
 			
-			//NSLog(@"Object image path: %@", imagePath);
-			
-			// Now change the current image of our node object
-			[item setImageLocation:imagePath];
-			[item setNeedsImageRepresentation:YES];
-			[item loadThumbnail]; // Background thread
+			if (objectIndex != _previousImageIndex)
+			{
+				_previousImageIndex = objectIndex;
+				
+				// Obtain path to image
+				NSString* imagePath = [_skimmingDelegate imagePathForChildOfNodeObject:item atIndex:objectIndex userInfo:_userInfo];
+				
+				//NSLog(@"Object image path: %@", imagePath);
+				
+				// Now change the current image of our node object
+				[item setImageLocation:imagePath];
+				[item setNeedsImageRepresentation:YES];
+				[item loadThumbnail]; // Background thread
+			}
 		}
 	}
 }
