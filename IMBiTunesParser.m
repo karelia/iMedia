@@ -305,7 +305,7 @@
 		if ([inNode.subNodes count] > 0)
 		{
 			IMBNode* musicNode = [inNode.subNodes objectAtIndex:0];
-			[self populateNode:musicNode options:inOptions error:error];
+			[self populateNode:musicNode options:inOptions error:&error];
 			inNode.objects = musicNode.objects;
 		}
 	}
