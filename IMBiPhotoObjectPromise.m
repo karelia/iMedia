@@ -44,7 +44,7 @@
  */
 
 
-// Author: Pierre Bernard
+// Author: Pierre Bernard, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,10 +99,8 @@
         NSDictionary *plist = [parser plist];
         
         NSString *applicationVersionString = [plist objectForKey:@"Application Version"];
+        if (applicationVersionString) [metadata setObject:applicationVersionString forKey:@"Application Version"];
         
-        if (applicationVersionString != nil) {
-            [metadata setObject:applicationVersionString forKey:@"Application Version"];
-        }
         
         NSString *archivePathString = [plist objectForKey:@"Archive Path"];
         
@@ -130,10 +128,8 @@
                         pathString = [mastersPathString stringByAppendingPathComponent:suffix];
                         pathString = [pathString stringByIterativelyResolvingSymlinkOrAlias];
                     }
-                }
-                
-                if (pathString != nil) {
-                    [metadata setObject:pathString forKey:keyToFix];
+                    
+                    if (pathString) [metadata setObject:pathString forKey:keyToFix];
                 }
             }
         }
@@ -147,6 +143,11 @@
             NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
             [inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
         }
+        
+        
+        // Resolve aliases before passing on to super. Issue #22
+        NSString *location = [[inObject location] stringByIterativelyResolvingSymlinkOrAlias];
+        [inObject setLocation:location];
 	}
     
 	[super _loadObject:inObject];
