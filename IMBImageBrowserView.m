@@ -423,6 +423,25 @@ enum IMBMouseOperation
 	[super drawRect:rect];
 }
 
+// Fixed issue #24 (github):
+// For some reason the frame origin of the view is sometimes offset (by e.g. 50 pixels in y direction).
+// This leads to falsly calculated scrolling positions when changing the zoom factor for cells.
+
+- (void) reloadData
+{
+    // Ensure frame origin to be (0,0) (see method header)
+    
+    if (self.frame.origin.x > 0 || self.frame.origin.y > 0)
+    {
+        NSRect rect = self.frame;
+        rect.origin.x = 0.0;
+        rect.origin.y = 0.0;
+        
+        [self setFrame:rect];
+    }
+
+    [super reloadData];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
