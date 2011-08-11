@@ -313,6 +313,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					ppc,
+					i386,
+					x86_64,
+				);
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -335,6 +340,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
+				VALID_ARCHS = "ppc i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -368,6 +374,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
+				VALID_ARCHS = "ppc i386 x86_64";
 			};
 			name = Release;
 		};
@@ -548,6 +555,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = ObjectiveFlickr;
+				VALID_ARCHS = "ppc i386 x86_64";
 			};
 			name = Test;
 		};
