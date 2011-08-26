@@ -337,6 +337,7 @@
 					AppKit,
 				);
 				PRODUCT_NAME = ObjectiveFlickr;
+				SKIP_INSTALL = YES;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
@@ -365,6 +366,7 @@
 					AppKit,
 				);
 				PRODUCT_NAME = ObjectiveFlickr;
+				SKIP_INSTALL = YES;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
@@ -535,6 +537,7 @@
 					AppKit,
 				);
 				PRODUCT_NAME = ObjectiveFlickr;
+				SKIP_INSTALL = YES;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Test;
