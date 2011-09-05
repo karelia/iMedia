@@ -337,6 +337,7 @@
 					AppKit,
 				);
 				PRODUCT_NAME = ObjectiveFlickr;
+				SDKROOT = macosx10.6;
 				SKIP_INSTALL = YES;
 				VALID_ARCHS = "i386 x86_64";
 			};
@@ -366,6 +367,7 @@
 					AppKit,
 				);
 				PRODUCT_NAME = ObjectiveFlickr;
+				SDKROOT = macosx10.6;
 				SKIP_INSTALL = YES;
 				VALID_ARCHS = "i386 x86_64";
 			};
@@ -537,6 +539,7 @@
 					AppKit,
 				);
 				PRODUCT_NAME = ObjectiveFlickr;
+				SDKROOT = macosx10.6;
 				SKIP_INSTALL = YES;
 				VALID_ARCHS = "i386 x86_64";
 			};
