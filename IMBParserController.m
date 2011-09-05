@@ -541,25 +541,25 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 // Returns all loaded parsers...
 
-- (NSMutableArray*) loadedParsers
+- (NSArray *)loadedParsers
 {
-	NSMutableArray* parsers = nil;
+	NSMutableArray* result = nil;
 	
 	@synchronized(self)
 	{
 		if (_loadedParsers)
 		{
-			parsers = [NSMutableArray array];
+			result = [NSMutableArray array];
 			
 			for (NSString* mediaType in _loadedParsers)
 			{	
 				NSArray* parsersForMediaType = [_loadedParsers objectForKey:mediaType];
-				[parsers addObjectsFromArray:parsersForMediaType];
+				[result addObjectsFromArray:parsersForMediaType];
 			}
 		}
 	}
-		
-	return parsers;							
+    
+	return result;
 }
 
 

@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@
 // with the custom parsers (which were instantiated by the user or by loadCustomParsersFromPreferences)...
 
 - (NSMutableArray*) loadedParsersForMediaType:(NSString*)inMediaType; 
-- (NSMutableArray*) loadedParsers;
+- (NSArray *)loadedParsers;
 
 // Debugging support...
 
