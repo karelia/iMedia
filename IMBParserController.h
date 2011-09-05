@@ -64,6 +64,7 @@
 #pragma mark CLASSES
 
 @class IMBParser;
+@protocol IMBParserControllerDelegate;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,14 +75,14 @@
 @interface IMBParserController : NSObject
 {
 	NSMutableDictionary* _loadedParsers;
-	id _delegate;
+	id <IMBParserControllerDelegate> _delegate;
 	BOOL _loadingCustomParsers;
 }
 
 // Create singleton instance of the controller. Don't forget to set the delegate early in the app lifetime...
 
 + (IMBParserController*) sharedParserController;
-@property (assign) id delegate;
+@property (assign) id <IMBParserControllerDelegate> delegate;
 
 // Register parser classes. This should be called from the +load method of a parser class...
 
@@ -133,7 +134,7 @@
 
 #pragma mark 
 
-@protocol IMBParserControllerDelegate
+@protocol IMBParserControllerDelegate <NSObject>
 
 @optional
 
