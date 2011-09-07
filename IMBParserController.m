@@ -572,7 +572,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 // Logs the list of registered parser classes. Please note that these classes may not have been instantiated yet...
 
-- (void) logRegisteredParsers
+- (void) logRegisteredParserClasses
 {
 	NSMutableString* text = [NSMutableString string];
 	

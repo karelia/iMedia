@@ -120,7 +120,7 @@
 
 // Debugging support...
 
-- (void) logRegisteredParsers;
+- (void) logRegisteredParserClasses;
 - (void) logLoadedParsers;
 
 // External finding of an active parser
