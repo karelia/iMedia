@@ -93,7 +93,7 @@
 // Load all supported parsers. The delegate can restrict which parsers are loaded...
 
 - (void) loadParsers; 
-- (void) unloadParsers; 
+- (void) reset; 
 
 // Add/remove parser instances dynamically. These methods are useful for parsers that mimic dynamically appearing
 // content, e.g. connected devices (cameras, network volumes, etc)...

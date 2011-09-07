@@ -202,7 +202,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		
 		[[NSNotificationCenter defaultCenter]				// Unload parsers before we quit, so that custom have 
 			addObserver:self								// a chance to clean up (e.g. remove callbacks, etc...)
-			selector:@selector(unloadParsers) 
+			selector:@selector(reset) 
 			name:NSApplicationWillTerminateNotification 
 			object:nil];
 	}
@@ -214,7 +214,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[self unloadParsers];
+	[self reset];
 	[super dealloc];
 }
 
@@ -238,7 +238,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 {
 	// Get rid of existing parsers (as we are about to start from scratch)...
 	
-	[self unloadParsers];
+	[self reset];
 	
 	// Iterate over all registered parsers for each media type...
 		
@@ -299,7 +299,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 // Unload all parsers that are already loaded...
 
-- (void) unloadParsers
+- (void) reset
 {
 	if (_loadedParsers)
 	{
