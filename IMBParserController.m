@@ -598,7 +598,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 // Logs the list of loaded parsers. This list may differ from the registered classes (because the delegate denied
 // loading or custom parsers have been added)...
 
-- (void) logLoadedParsers
+- (void) logParsers
 {
 	NSMutableString* text = [NSMutableString string];
 	

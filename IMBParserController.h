@@ -121,7 +121,7 @@
 // Debugging support...
 
 - (void) logRegisteredParserClasses;
-- (void) logLoadedParsers;
+- (void) logParsers;
 
 // External finding of an active parser
 - (IMBParser *) registeredParserOfClass:(NSString *)className forMediaType:(NSString *)aMediaType;
