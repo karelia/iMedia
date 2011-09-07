@@ -107,11 +107,6 @@
 - (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
 - (BOOL) removeCustomParser:(IMBParser*)inParser;
 
-// Save info about the custom parsers to the preferences and restore custom parsers from the preferences...
-
-- (void) saveCustomParsersToPreferences;
-- (void) loadCustomParsersFromPreferences;
-
 // Returns an array of loaded parsers. This combines the regular parsers (which were instantiated by loadParsers)
 // with the custom parsers (which were instantiated by the user or by loadCustomParsersFromPreferences)...
 

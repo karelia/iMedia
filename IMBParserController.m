@@ -72,6 +72,15 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 #pragma mark
 
+
+@interface IMBParserController ()
+
+// Save info about the custom parsers to the preferences and restore custom parsers from the preferences...
+- (void) saveCustomParsersToPreferences;
+- (void) loadCustomParsersFromPreferences;
+
+@end
+
 @implementation IMBParserController
 
 @synthesize delegate = _delegate;
