@@ -116,7 +116,7 @@
 // with the custom parsers (which were instantiated by the user or by loadCustomParsersFromPreferences)...
 
 - (NSMutableArray*) loadedParsersForMediaType:(NSString*)inMediaType; 
-- (NSArray *)loadedParsers;
+- (NSArray *)parsers;
 
 // Debugging support...
 

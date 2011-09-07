@@ -541,7 +541,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 // Returns all loaded parsers...
 
-- (NSArray *)loadedParsers
+- (NSArray *)parsers
 {
 	NSMutableArray* result = nil;
 	
