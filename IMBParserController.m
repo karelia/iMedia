@@ -301,23 +301,20 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 - (void) reset
 {
-	if (_loadedParsers)
-	{
-		for (NSString* mediaType in _loadedParsers)
-		{
-			NSArray* parsers = [_loadedParsers objectForKey:mediaType];
-			
-			for (IMBParser* parser in parsers)
-			{
-				if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:willUnloadParser:forMediaType:)])
-				{
-					[_delegate parserController:self willUnloadParser:parser forMediaType:mediaType];
-				}
-			}
-		}
-		
-		IMBRelease(_loadedParsers)
-	}
+	for (NSString* mediaType in _loadedParsers)
+    {
+        NSArray* parsers = [_loadedParsers objectForKey:mediaType];
+        
+        for (IMBParser* parser in parsers)
+        {
+            if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:willUnloadParser:forMediaType:)])
+            {
+                [_delegate parserController:self willUnloadParser:parser forMediaType:mediaType];
+            }
+        }
+    }
+    
+    IMBRelease(_loadedParsers)
 }
 
 
