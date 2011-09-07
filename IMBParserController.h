@@ -119,9 +119,10 @@
 - (NSArray *)parsers;
 
 // Debugging support...
-
+#ifdef DEBUG
 - (void) logRegisteredParserClasses;
 - (void) logParsers;
+#endif
 
 // External finding of an active parser
 - (IMBParser *) registeredParserOfClass:(NSString *)className forMediaType:(NSString *)aMediaType;

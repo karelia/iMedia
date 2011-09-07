@@ -569,6 +569,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 #pragma mark
 #pragma mark Debugging
 
+#ifdef DEBUG
 
 // Logs the list of registered parser classes. Please note that these classes may not have been instantiated yet...
 
@@ -619,6 +620,8 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		
 	NSLog(@"%s\n\n%@\n",__FUNCTION__,text);
 }
+
+#endif
 
 - (IMBParser *) registeredParserOfClass:(NSString *)className forMediaType:(NSString *)aMediaType;
 {
