@@ -120,7 +120,7 @@
 #endif
 
 // External finding of an active parser
-- (IMBParser *) registeredParserOfClass:(NSString *)className forMediaType:(NSString *)aMediaType;
+- (IMBParser *) parserOfClass:(Class)class forMediaType:(NSString *)aMediaType;
 
 @end
 
