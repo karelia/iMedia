@@ -55,6 +55,8 @@
 #import "IMBiPhotoObjectPromise.h"
 #import "IMBiPhotoParser.h"
 
+#import "IMBParserController.h"
+
 #import "NSString+iMedia.h"
 
 
@@ -90,9 +92,38 @@
 	return self;
 }
 
+- (IMBParser *)parserForObject:(IMBObject *)object;
+{
+    IMBParser *result = [object parser];
+    if (result) return result;
+    
+    
+    // IMBObjectsPromise creates objects by unarchiving them. Unarchived objects do not contain a reference to their parser, only the parser type and media source. Thus, we have to guess at the parser here so clients can have access to it.
+    NSString *parserMediaType = object.parserMediaType;
+    NSString *parserMediaSource = object.parserMediaSource;
+    
+    if ((parserMediaType == nil) || (parserMediaSource == nil)) {
+        return nil;
+    }
+    
+    IMBParserController *parserController = [IMBParserController sharedParserController];
+    NSArray *loadedParsers = [parserController loadedParsersForMediaType:parserMediaType];
+    
+    for (IMBParser *parser in loadedParsers) {
+        if ([parser.mediaSource isEqualToString:parserMediaSource])
+        {
+            [object setParser:parser];
+            return parser;
+        }
+    }
+    
+    return nil;
+}
+
 - (void) _loadObject:(IMBObject*)inObject
 {
-    id parser = [inObject parser];
+    id parser = [self parserForObject:inObject];
+    
     
     if ([parser isKindOfClass:[IMBiPhotoParser class]]) {
         NSMutableDictionary *metadata = [NSMutableDictionary dictionaryWithDictionary:[inObject metadata]];
