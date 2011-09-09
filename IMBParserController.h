@@ -56,6 +56,8 @@
 // A parser is thus an extremely long-lived object, which can store state and talk to asynchronous APIs. This gives
 // developers the chance to implemenent parsers for web based services, Spotlight, Image Capture etc. Just before the
 // app quits the parsers are unloaded, at which time they can clean up...
+//
+// Although individual parsers are intended to work on background threads, IMBParserController instances are not threadsafe and should only be accessed from the main thread. Class methods for parser registration should be threadsafe
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,7 +94,6 @@
 
 // Load all supported parsers. The delegate can restrict which parsers are loaded...
 
-- (void) loadParsers; 
 - (void) reset; 
 
 // Add/remove parser instances dynamically. These methods are useful for parsers that mimic dynamically appearing
@@ -110,7 +111,7 @@
 // Returns an array of loaded parsers. This combines the regular parsers (which were instantiated by loadParsers)
 // with the custom parsers (which were instantiated by the user or by loadCustomParsersFromPreferences)...
 
-- (NSMutableArray*) loadedParsersForMediaType:(NSString*)inMediaType; 
+- (NSArray *)parsersForMediaType:(NSString *)mediaType;
 - (NSArray *)parsers;
 
 // Debugging support...

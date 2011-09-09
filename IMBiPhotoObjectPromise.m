@@ -107,7 +107,7 @@
     }
     
     IMBParserController *parserController = [IMBParserController sharedParserController];
-    NSArray *loadedParsers = [parserController loadedParsersForMediaType:parserMediaType];
+    NSArray *loadedParsers = [parserController parsersForMediaType:parserMediaType];
     
     for (IMBParser *parser in loadedParsers) {
         if ([parser.mediaSource isEqualToString:parserMediaSource])
