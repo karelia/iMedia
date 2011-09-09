@@ -80,7 +80,7 @@
 // The media source is usually a path pointing to the folder or database, but it could be an NSURL as well. 
 // However, it is always stored as a string, so that putting it into property lists (prefs) is easier...
 
-@property (retain) NSString* mediaSource;
+@property (copy) NSString* mediaSource;
 
 // The mediaType can be @"image",@"audio",@"movie",etc. IMBCommon.h contains constants for the type...
 
