@@ -456,16 +456,14 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	}
 	
 	// Ask the delegate if we are allowed to load the parser...
-	
-	if ([_delegate respondsToSelector:@selector(parserController:shouldLoadParser:forMediaType:)])
-	{
-		if (![_delegate parserController:self
-                        shouldLoadParser:NSStringFromClass([parser class])
-                            forMediaType:mediaType])
-        {
-            return NO;
-        }
-	}
+	if ([_delegate respondsToSelector:@selector(parserController:shouldLoadParser:)])
+    {
+        if (![_delegate parserController:self shouldLoadParser:parser]) return NO;
+    }
+    else
+    {
+        if (![parser canBeUsed]) return NO;
+    }
     
     
 	// Add it to the list
@@ -484,13 +482,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
     // Tell the delegate...
     if ([_delegate respondsToSelector:@selector(parserController:didLoadParser:forMediaType:)])
     {
-        BOOL loaded = [_delegate parserController:self didLoadParser:parser forMediaType:mediaType];
-        if (loaded) loaded = [parser canBeUsed];
-        if (!loaded)
-        {
-            [parsers removeLastObject];
-            return NO;
-        }
+        [_delegate parserController:self didLoadParser:parser forMediaType:mediaType];
     }
     
     return YES;
