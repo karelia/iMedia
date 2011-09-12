@@ -84,7 +84,7 @@
 
 // The mediaType can be @"image",@"audio",@"movie",etc. IMBCommon.h contains constants for the type...
 
-@property (copy) NSString* mediaType;
+@property (copy, readonly) NSString* mediaType;
 @property (getter=isCustom) BOOL custom;
 
 // ATTENTION: inOldNode is readonly and is only passed in for reference, but must not be modified by the parser in 
