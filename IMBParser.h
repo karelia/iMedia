@@ -148,6 +148,7 @@
 
 @interface IMBParser : NSObject <IMBParserProtocol>
 {
+  @private
 	NSString* _mediaSource;
 	NSString* _mediaType;
 	BOOL _custom;
