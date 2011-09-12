@@ -456,9 +456,10 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	}
 	
 	// Ask the delegate if we are allowed to load the parser...
-	if ([_delegate respondsToSelector:@selector(parserController:shouldLoadParser:)])
+	if ([_delegate respondsToSelector:@selector(parserController:willLoadParser:)])
     {
-        if (![_delegate parserController:self shouldLoadParser:parser]) return NO;
+        parser = [_delegate parserController:self willLoadParser:parser];
+        if (!parser) return NO;
     }
     else
     {

@@ -135,11 +135,9 @@
 
 @optional
 
-// Return NO to suppress loading a particular parser. Default (if you don't implement this method) is to return:
-//   [parser canBeUsed]
-// You likely want to replicate that check in your implementation
 // Handy place to finish setting up a parser such as Flickr
-- (BOOL)parserController:(IMBParserController *)controller shouldLoadParser:(IMBParser *)parser;
+// Return nil to suppress loading a particular parser. Default (if you don't implement this method) is to return nil if [parser canBeUsed] returns NO. You likely want to replicate that check in your implementation
+- (IMBParser *)parserController:(IMBParserController *)controller willLoadParser:(IMBParser *)parser;
 
 // Used to return a BOOL so that delegate could cancel the load. Now goes ignored, use one of the should methods instead
 - (void) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
