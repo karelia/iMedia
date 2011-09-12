@@ -79,7 +79,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 - (void) saveCustomParsersToPreferences;
 - (void) loadCustomParsersFromPreferences;
 
-- (BOOL)addParser:(IMBParser *)parser forMediaType:(NSString *)mediaType;
+- (BOOL)addParser:(IMBParser *)parser;
 - (BOOL)removeParser:(IMBParser *)inParser;
 
 @end
@@ -246,7 +246,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 					NSArray* parserInstances = [parserClass parserInstancesForMediaType:mediaType];
 					for (IMBParser *aParser in parserInstances)
                     {
-                        [self addParser:aParser forMediaType:mediaType];
+                        [self addParser:aParser];
                     }
 				}
 			}
@@ -275,7 +275,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 - (BOOL) addDynamicParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
 {
     [self parsersByMediaType]; // make sure all the regular and custom parsers are already loaded
-	return [self addParser:inParser forMediaType:inMediaType];
+	return [self addParser:inParser];
 }
 
 
@@ -440,10 +440,10 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	return result;
 }
 
-- (BOOL)addParser:(IMBParser *)parser forMediaType:(NSString *)mediaType
+- (BOOL)addParser:(IMBParser *)parser;
 {
     // Check if the parser is already in the list...
-	
+	NSString *mediaType = [parser mediaType];
 	NSMutableArray* parsers = [_loadedParsers objectForKey:mediaType];
 	
 	for (IMBParser *aParser in parsers)
