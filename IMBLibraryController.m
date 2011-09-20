@@ -396,7 +396,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 #if FUZZTHREADING
 #warning testing thread safety by jamming huge amounts of arbitrary reloads
-		[NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(debuggingForceReload:) userInfo:nil repeats:YES];
+		[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(debuggingForceReload:) userInfo:nil repeats:YES];
 #endif		
 	}
 	
@@ -406,14 +406,17 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #if FUZZTHREADING
 - (void) debuggingForceReload:(NSTimer*)theTimer
 {
-	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:self.rootNodes];
-	NSUInteger n = [rootNodes count];
+	[self reload];
 
-	for (NSInteger i=n-1; i>=0; i--)
-	{
-		IMBNode* node = [rootNodes objectAtIndex:i];
-		[self reloadNode:node];
-	}
+// Old test, below, caused explicitly adding new node clone for each of the top level nodes (e.g. libraries, pictures)
+//	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:self.rootNodes];
+//	NSUInteger n = [rootNodes count];
+//
+//	for (NSInteger i=n-1; i>=0; i--)
+//	{
+//		IMBNode* node = [rootNodes objectAtIndex:i];
+//		[self reloadNode:node];
+//	}
 }
 #endif
 
