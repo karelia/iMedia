@@ -60,38 +60,12 @@
 #import "IMBFlickrHeaderViewController.h"
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-//	We need this category to make the Flickr request block on the current thread
-//	and don't use the current thread's run loop. As discussed with Lukhnos D. Liu.
-@interface OFFlickrAPIRequest (private)
-- (void) setShouldWaitUntilDone: (BOOL) wait;
-@end
-
-@implementation OFFlickrAPIRequest (private)
-
-- (void) setShouldWaitUntilDone: (BOOL) wait {
-	[HTTPRequest setShouldWaitUntilDone:wait];
-}
-
-@end
-
-#pragma mark -
 
 //----------------------------------------------------------------------------------------------------------------------
 
 @interface IMBFlickrNode ()
-//	Flickr Handling:
-- (OFFlickrAPIRequest*) flickrRequestWithContext: (OFFlickrAPIContext*) context;
-- (void) setFlickrMethod: (NSString*) method arguments: (NSDictionary*) arguments;
-//	Properties:
-- (NSDictionary*) flickrResponse;
-- (void) setFlickrResponse: (NSDictionary*) response;
 //	Utilities:
-- (NSDictionary*) argumentsForFlickrCall;
-+ (NSString*) flickrMethodForMethodCode: (NSInteger) code;
 + (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query;
-+ (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
 @end
 
 #pragma mark -
@@ -106,7 +80,6 @@ NSString* const IMBFlickrNodeProperty_Method = @"method";
 NSString* const IMBFlickrNodeProperty_Query = @"query";
 NSString* const IMBFlickrNodeProperty_SortOrder = @"sortOrder";
 NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
-//NSString* const IMBFlickrNodeProperty_Title = @"title";
 
 
 #pragma mark
@@ -125,6 +98,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 - (id) copyWithZone: (NSZone*) inZone {
 	IMBFlickrNode* copy = [super copyWithZone:inZone];
 	copy.customNode = self.customNode;
+	copy.flickrResponse = self.flickrResponse;
 	copy.license = self.license;
 	copy.method = self.method;
 	copy.query = self.query;
@@ -142,7 +116,6 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	node.leaf = YES;
 	//node.parentNode = root;
 	node.parser = parser;
-	
 	
 	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
@@ -212,55 +185,18 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 }
 
 
-+ (IMBFlickrNode*) flickrNodeFromDict: (NSDictionary*) dict 
-							 rootNode: (IMBFlickrNode*) root
-							   parser: (IMBParser*) parser {
++ (IMBFlickrNode*) flickrNodeFromDictionary: (NSDictionary*) dictionary 
+								   rootNode: (IMBFlickrNode*) root
+									 parser: (IMBParser*) parser {
 	
-	if (!dict) return nil;
-	
-	//	extract node data from preferences dictionary...
-	NSInteger method = [[dict objectForKey:IMBFlickrNodeProperty_Method] intValue];
-	NSString* query = [dict objectForKey:IMBFlickrNodeProperty_Query];
-	NSString* title = query; //[dict objectForKey:IMBFlickrNodeProperty_Title];
-	
-	if (!query || !title) {
-		NSLog (@"Invalid Flickr parser user node dictionary.");
-		return nil;
-	}
-	
-	//	Flickr stuff...
 	IMBFlickrNode* node = [IMBFlickrNode flickrNodeForRoot:root parser:parser];
-	node.customNode = YES;
-	node.icon = [NSImage imageNamed:NSImageNameFolderSmart];
-	[node.icon setScalesWhenResized:YES];
-	[node.icon setSize:NSMakeSize(16.0, 16.0)];
-
-//	node.identifier = [IMBFlickrNode identifierWithMethod:method query:query];
-	node.identifier = [IMBFlickrNode identifierWithQueryParams:dict];
-	node.license = [[dict objectForKey:IMBFlickrNodeProperty_License] intValue];
-	node.mediaSource = node.identifier;
-	node.method = method;
-	node.name = title;
-	node.query = query;
-	node.sortOrder = [[dict objectForKey:IMBFlickrNodeProperty_SortOrder] intValue];
-	
-	IMBFlickrHeaderViewController* viewController = [IMBFlickrHeaderViewController headerViewControllerWithParser:(IMBFlickrParser*)parser owningNode:node];
-	viewController.queryParams = (NSMutableDictionary*)dict;
-	viewController.buttonAction = @selector(removeQuery:);
-	viewController.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.remove",nil,IMBBundle(),@"Remove",@"Button title in Flickr Options");
-	node.customHeaderViewController = viewController;
-
+	[node readPropertiesFromDictionary:dictionary];
 	return node;
 }
 
 
-+ (void) sendSelectNodeNotificationForDict:(NSDictionary*) dict {
-	
++ (void) sendSelectNodeNotificationForDict:(NSDictionary*) dict {	
 	if (dict) {
-//		NSInteger method = [[dict objectForKey:IMBFlickrNodeProperty_Method] intValue];
-//		NSString* query = [dict objectForKey:IMBFlickrNodeProperty_Query];
-//		NSString* identifier = [IMBFlickrNode identifierWithMethod:method query:query];
-
 		NSString* identifier = [IMBFlickrNode identifierWithQueryParams:dict];
 		[IMBNodeViewController selectNodeWithIdentifier:identifier];
 	}
@@ -268,55 +204,24 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 
 
 - (void) dealloc {
-	OFFlickrAPIRequest* request = [self.attributes objectForKey:@"flickrRequest"];
-	[request cancel];
-	
-	[(IMBFlickrHeaderViewController*)self.customHeaderViewController setOwningNode:nil];
-	
 	IMBRelease (_query);
+	IMBRelease (_flickrResponse);	
 	[super dealloc];
 }
 
 
-#pragma mark 
-#pragma mark Flickr Handling
-
-- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
-  didCompleteWithResponse: (NSDictionary*) inResponseDictionary {
-	
-	//	get the node we associated with the request in flickrRequestWithContext: ...
-	NSString* nodeIdentifier = inRequest.sessionInfo;
-	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.parser.mediaType];
-	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
-	
-	#ifdef VERBOSE
-		NSLog (@"Flickr request completed for node: %@", nodeIdentifier);
-	#endif
-	
-	//	save Flickr response in our iMB node for later population of the browser...
-	NSDictionary* response = [inResponseDictionary copy];
-	[node setFlickrResponse:response];
-	[response release];
-	
-	//	force reloading of the node holding the Flickr images...
-	[libController reloadNode:node];	
-}
-
-
-- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
-		 didFailWithError: (NSError*) inError {
-	
-	NSLog (@"flickrAPIRequest:didFailWithError: %@", inError);	
-	//	TODO: Error Handling
-}
-
-
 #pragma mark
-#pragma mark Flickr Handling
+#pragma mark Flickr Response Handling
 
-- (void) clearResponse {
-	[(NSMutableDictionary*)self.attributes removeObjectForKey:@"flickrResponse"];
+- (void) clearFlickrResponse {
+	self.flickrResponse = nil;
 }
+
+
+- (BOOL) hasFlickrResponse {
+	return _flickrResponse != nil;
+}
+
 
 // What about original size?
 
@@ -327,6 +232,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		// Note: medium is nil, so we can't put in a dictionary.  Original not specified in objective-flickr
 	return sizeLookup[flickrSizeSpecifier];
 }
+
 
 - (NSURL *)imageURLForDesiredSize:(IMBFlickrSizeSpecifier)size fromPhotoDict:(NSDictionary *)photoDict context:(OFFlickrAPIContext*) context;
 {
@@ -385,11 +291,8 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 }
 
 
-
-- (NSArray*) extractPhotosFromFlickrResponse: (NSDictionary*) response {
-	OFFlickrAPIRequest* flickrRequest = [self.attributes objectForKey:@"flickrRequest"];
-
-	IMBFlickrParser *parser = (IMBFlickrParser *)self.parser;
+- (NSArray*) extractPhotosFromFlickrResponse: (NSDictionary*) response context: (OFFlickrAPIContext*) context {
+	IMBFlickrParser* parser = (IMBFlickrParser*) self.parser;
 	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
 	self.displayedObjectCount = 0;
@@ -402,7 +305,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		BOOL canDownload = [[photoDict objectForKey:@"can_download"] boolValue];
 		if (canDownload)
 		{
-			obj.location = [self imageURLForDesiredSize:parser.desiredSize fromPhotoDict:photoDict context:flickrRequest.context];
+			obj.location = [self imageURLForDesiredSize:parser.desiredSize fromPhotoDict:photoDict context:context];
 		}
 		obj.shouldDisableTitle = !canDownload;
 
@@ -411,10 +314,10 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		// A lot of the metadata comes from the "extras" key we request
 		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
 		[metadata addEntriesFromDictionary:photoDict];		// give metaData the whole thing!
-		NSURL *webPageURL = [flickrRequest.context photoWebPageURLFromDictionary:photoDict];
+		NSURL *webPageURL = [context photoWebPageURLFromDictionary:photoDict];
 		[metadata setObject:webPageURL forKey:@"webPageURL"];
 		
-		NSURL *quickLookURL = [self imageURLForDesiredSize:kIMBFlickrSizeSpecifierMedium fromPhotoDict:photoDict context:flickrRequest.context];
+		NSURL *quickLookURL = [self imageURLForDesiredSize:kIMBFlickrSizeSpecifierMedium fromPhotoDict:photoDict context:context];
 		[metadata setObject:quickLookURL forKey:@"quickLookURL"];
 
 		// But give it a better 'description' without the nested item
@@ -458,7 +361,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 						 
 		obj.parser = self.parser;
 		
-		NSURL* thumbnailURL = [flickrRequest.context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
+		NSURL* thumbnailURL = [context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
 		obj.imageLocation = thumbnailURL;
 		obj.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 		obj.imageRepresentation = nil;	// Build lazily when needed
@@ -472,40 +375,9 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 }
 
 
-- (OFFlickrAPIRequest*) flickrRequestWithContext: (OFFlickrAPIContext*) context {
-	OFFlickrAPIRequest* request = [self.attributes objectForKey:@"flickrRequest"];
-	if (!request) {
-		//	create a Flickr request for the given iMB node...
-		request = [[OFFlickrAPIRequest alloc] initWithAPIContext:context];
-		[(NSMutableDictionary*)self.attributes setObject:request forKey:@"flickrRequest"];
-		request.requestTimeoutInterval = 60.0f;
-//		[request setShouldWaitUntilDone:YES];
-		[request release];
-		
-		//	we save the iMB node in the Flickr request for use in
-		//	flickrAPIRequest:didCompleteWithResponse: ...
-		request.sessionInfo = self.identifier;
-	}
-	return request;
-}
-
-
-- (NSDictionary*) flickrResponse {
-	return [self.attributes objectForKey:@"flickrResponse"];
-}
-
-
-- (BOOL) hasRequest {
-	return [self.attributes objectForKey:@"flickrRequest"] != nil;
-}
-
-
-- (BOOL) hasResponse {
-	return [self.attributes objectForKey:@"flickrResponse"] != nil;
-}
-
-
-- (void) processResponse {	
+- (void) processResponseForContext: (OFFlickrAPIContext*) context {	
+	if (!self.hasFlickrResponse) return;
+	
 	//	TODO: Instead of inserting the "load more" object at the end of the
 	//	array, we should probably associate a sort descriptor with the image view.
 	NSMutableArray* oldImages = [self.objects mutableCopy];
@@ -520,7 +392,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		[oldImages removeObject:loadMoreObject];
 	}
 	
-	NSMutableArray* newImages = [[self extractPhotosFromFlickrResponse:[self flickrResponse]] mutableCopy];
+	NSMutableArray* newImages = [[self extractPhotosFromFlickrResponse:[self flickrResponse] context:context] mutableCopy];
 	[newImages removeObjectsInArray:oldImages]; //	ensure that we have no doubles
 	
     if ( [oldImages count] ) {
@@ -539,51 +411,11 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 }
 
 
-- (void) setFlickrMethod: (NSString*) method
-			   arguments: (NSDictionary*) arguments {
-	
-	[(NSMutableDictionary*)self.attributes setObject:method forKey:@"flickrMethod"];
-	[(NSMutableDictionary*)self.attributes setObject:arguments forKey:@"flickrArguments"];
-}
-
-
-- (void) setFlickrResponse: (NSDictionary*) response {
-	[(NSMutableDictionary*)self.attributes setObject:response forKey:@"flickrResponse"];
-}
-
-
-- (void) startFlickrRequestWithContext_onMainThread: (OFFlickrAPIContext*) context {
-	OFFlickrAPIRequest* request = [self flickrRequestWithContext:context];
-	if (![request isRunning]) {			
-		[request setDelegate:self];	
-
-		//	compose and start Flickr request...
-		NSString* method = [IMBFlickrNode flickrMethodForMethodCode:self.method];
-		NSDictionary* arguments = [self argumentsForFlickrCall];
-		[request callAPIMethodWithGET:method arguments:arguments];
-		
-		#ifdef VERBOSE
-			NSLog (@"Start Flickr request for method %@", method);
-		#endif
-	}	
-}
-
-
-- (void) startLoadRequestWithContext: (OFFlickrAPIContext*) context {
-	[self performSelectorOnMainThread:@selector(startFlickrRequestWithContext_onMainThread:) withObject:context waitUntilDone:NO];
-}
-
-
-- (void) startLoadMoreRequestWithContext: (OFFlickrAPIContext*) context {
-	self.page = self.page + 1;
-	[self performSelectorOnMainThread:@selector(startFlickrRequestWithContext_onMainThread:) withObject:context waitUntilDone:NO];
-}
-
-
 #pragma mark
 #pragma mark Properties
 
 @synthesize customNode = _customNode;
+@synthesize flickrResponse = _flickrResponse;
 @synthesize license = _license;
 @synthesize method = _method;
 @synthesize page = _page;
@@ -656,15 +488,11 @@ typedef enum {
 	}
 	
 	//	limit the search to a specific number of items...
-#ifdef DEBUG
 	[arguments setObject:@"30" forKey:@"per_page"];
-#else
-	[arguments setObject:@"30" forKey:@"per_page"];
-#endif
 	
 	// We are only doing photos.  Maybe later we want to do videos?
 	[arguments setObject:@"photos" forKey:@"media"];
-
+	
 	// Extra metadata needed
 	// http://www.flickr.com/services/api/flickr.photos.search.html
 	[arguments setObject:@"description,license,owner_name,original_format,geo,tags,o_dims,url_o,url_l,url_m,url_s,usage" forKey:@"extras"];
@@ -683,85 +511,30 @@ typedef enum {
 }
 
 
-+ (NSString*) flickrMethodForMethodCode: (NSInteger) code {
-	if (code == IMBFlickrNodeMethod_TagSearch || code == IMBFlickrNodeMethod_TextSearch) {
-		return @"flickr.photos.search";
-	} else if (code == IMBFlickrNodeMethod_Recent) {
-		return @"flickr.photos.getRecent";
-	} else if (code == IMBFlickrNodeMethod_MostInteresting) {
-		return @"flickr.interestingness.getList";
-	} else if (code == IMBFlickrNodeMethod_GetInfo) {
-		return @"flickr.photos.getInfo";
-	}
-	NSLog (@"Can't find Flickr method for method code.");
-	return nil;
-}
-
-
-///	We construct here something like: 
-///	  IMBFlickrParser://flickr.photos.search/tag/macintosh,apple
-///
-///	TOOD: Maybe it's a better idea to just go with
-///	  [NSString uuid]
-///	and create something like:
-///	  IMBFlickrParser://12345678-12345-12345-12345678
-+ (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query {
-#if 0
-	//	EXPERIMENTAL...
-	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
-	return [NSString stringWithFormat:@"%@:/%@", parserClassName, [NSString uuid]];
-	//	...EXPERIMENTAL
-#else
-	NSString* flickrMethod = [self flickrMethodForMethodCode:method];
-	if (method == IMBFlickrNodeMethod_TagSearch) {
-		flickrMethod = [flickrMethod stringByAppendingString:@"/tag"];
-	} else if (method == IMBFlickrNodeMethod_TextSearch) {
-		flickrMethod = [flickrMethod stringByAppendingString:@"/text"];
-	} else if (method == IMBFlickrNodeMethod_Recent) {
-		flickrMethod = [flickrMethod stringByAppendingString:@"/recent"];
-	} else if (method == IMBFlickrNodeMethod_MostInteresting) {
-		flickrMethod = [flickrMethod stringByAppendingString:@"/interesting"];
-	}
-	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", flickrMethod, query];
-	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
-	return [NSString stringWithFormat:@"%@:/%@", parserClassName, albumPath];
-#endif
-}
-
-+ (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams {
-	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
-	NSString* uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
-	if (uuid == nil) uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_Query];
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,uuid];
-}
-
-#pragma mark -
-#pragma mark Utilities
-								  
 // From http://gist.github.com/101674
 
 + (NSString *)base58EncodedValue:(long long)num {
-  NSString *alphabet = @"123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-  int baseCount = [alphabet length];
-  NSString *encoded = @"";
-  while(num >= baseCount) {
-	  double div = num/baseCount;
-	  long long mod = (num - (baseCount * (long long)div));
-	  NSString *alphabetChar = [alphabet substringWithRange: NSMakeRange(mod, 1)];
-	  encoded = [NSString stringWithFormat: @"%@%@", alphabetChar, encoded];
-	  num = (long long)div;
-  }
-  
-  if(num) {
-	  encoded = [NSString stringWithFormat: @"%@%@", [alphabet substringWithRange: NSMakeRange(num, 1)], encoded];
-  }
-  return encoded;
+	NSString *alphabet = @"123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+	int baseCount = [alphabet length];
+	NSString *encoded = @"";
+	while(num >= baseCount) {
+		double div = num/baseCount;
+		long long mod = (num - (baseCount * (long long)div));
+		NSString *alphabetChar = [alphabet substringWithRange: NSMakeRange(mod, 1)];
+		encoded = [NSString stringWithFormat: @"%@%@", alphabetChar, encoded];
+		num = (long long)div;
+	}
+	
+	if(num) {
+		encoded = [NSString stringWithFormat: @"%@%@", [alphabet substringWithRange: NSMakeRange(num, 1)], encoded];
+	}
+	return encoded;
 }
-								  
-+ (NSString *)descriptionOfLicense:(int)aLicenseNumber
-{
-	NSString *result = nil;
-	switch(aLicenseNumber)
+
+
++ (NSString*) descriptionOfLicense: (int) aLicenseNumber {
+	NSString* result = nil;
+	switch (aLicenseNumber)
 	{
 		case IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialShareAlike:
 			result = @"Attribution-NonCommercial-ShareAlike License";
@@ -787,6 +560,73 @@ typedef enum {
 		result = [@"Creative Commons: " stringByAppendingString:result];
 	}
 	return result;
+}
+
+
+///	We construct here something like: 
+///	  IMBFlickrParser://flickr.photos.search/tag/macintosh,apple
+///
+///	TOOD: Maybe it's a better idea to just go with
+///	  [NSString uuid]
+///	and create something like:
+///	  IMBFlickrParser://12345678-12345-12345-12345678
++ (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query {
+#if 0
+	//	EXPERIMENTAL...
+	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
+	return [NSString stringWithFormat:@"%@:/%@", parserClassName, [NSString uuid]];
+	//	...EXPERIMENTAL
+#else
+	NSString* flickrMethod = [IMBFlickrParser flickrMethodForMethodCode:method];
+	if (method == IMBFlickrNodeMethod_TagSearch) {
+		flickrMethod = [flickrMethod stringByAppendingString:@"/tag"];
+	} else if (method == IMBFlickrNodeMethod_TextSearch) {
+		flickrMethod = [flickrMethod stringByAppendingString:@"/text"];
+	} else if (method == IMBFlickrNodeMethod_Recent) {
+		flickrMethod = [flickrMethod stringByAppendingString:@"/recent"];
+	} else if (method == IMBFlickrNodeMethod_MostInteresting) {
+		flickrMethod = [flickrMethod stringByAppendingString:@"/interesting"];
+	}
+	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", flickrMethod, query];
+	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
+	return [NSString stringWithFormat:@"%@:/%@", parserClassName, albumPath];
+#endif
+}
+
+
++ (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams {
+	NSString* parserClassName = NSStringFromClass ([IMBFlickrParser class]);
+	NSString* uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
+	if (uuid == nil) uuid = [inQueryParams objectForKey:IMBFlickrNodeProperty_Query];
+	return [NSString stringWithFormat:@"%@:/%@",parserClassName,uuid];
+}
+
+
+- (void) readPropertiesFromDictionary: (NSDictionary*) dictionary {
+	if (!dictionary) return;
+	
+	//	extract node data from preferences dictionary...
+	NSInteger method = [[dictionary objectForKey:IMBFlickrNodeProperty_Method] intValue];
+	NSString* query = [dictionary objectForKey:IMBFlickrNodeProperty_Query];
+	NSString* title = query;
+	
+	if (!query || !title) {
+		NSLog (@"Invalid Flickr parser user node dictionary.");
+		return;
+	}
+	
+	//	Flickr stuff...
+	self.customNode = YES;
+	self.icon = [NSImage imageNamed:NSImageNameFolderSmart];
+	[self.icon setScalesWhenResized:YES];
+	[self.icon setSize:NSMakeSize(16.0, 16.0)];
+	self.identifier = [IMBFlickrNode identifierWithQueryParams:dictionary];
+	self.license = [[dictionary objectForKey:IMBFlickrNodeProperty_License] intValue];
+	self.mediaSource = self.identifier;
+	self.method = method;
+	self.name = title;
+	self.query = query;
+	self.sortOrder = [[dictionary objectForKey:IMBFlickrNodeProperty_SortOrder] intValue];
 }
 
 @end

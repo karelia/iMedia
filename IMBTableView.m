@@ -72,11 +72,9 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-@interface NSTableView (ShutUpTheCompiler)
+@interface NSTableView (NotPublicSoThisMightBeAProblemForTheMAS)
 - (NSColor*) _highlightColorForCell:(NSCell*)inCell;
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -188,7 +186,7 @@ enum IMBMouseOperation
 		{
 			if (NSIntersectsRect(drawRect,clipRect))
 			{
-				[[_customBackgroundColors objectAtIndex:i%n] set];
+				[(NSColor*)[_customBackgroundColors objectAtIndex:i%n] set];
 				NSRectFillUsingOperation(drawRect,NSCompositeSourceOver);
 			}
 			

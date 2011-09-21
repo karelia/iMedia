@@ -72,6 +72,7 @@
 {
 	IBOutlet NSButton* _playButton;
 	QTMovie* _playingAudio;
+	IBOutlet NSTableView *_tableView;
 }
 
 // This is not currently invoked directly from any control's action, but 

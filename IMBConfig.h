@@ -74,6 +74,11 @@
 + (void) setUseGlobalViewType:(BOOL)inGlobalViewType;
 + (BOOL) useGlobalViewType;
 
+// Sets the global view type
+
++ (void) setGlobalViewType:(NSNumber*)inViewType;
++ (NSNumber*) globalViewType;
+
 // Sets path for the download folder for remote IMBObjects (e.g. from Flickr or camera devices)...
 
 + (void) setDownloadFolderPath:(NSString*)inPath;

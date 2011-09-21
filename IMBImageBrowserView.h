@@ -69,15 +69,25 @@
 @interface IMBImageBrowserView : IKImageBrowserView
 {
 	Class _cellClass;
+	NSRect _lastVisibleRect;			// So we can "scroll" a background image when scrolling
 	BOOL _dragSelectInProgress;
 	NSInteger _mouseOperation;
 	NSInteger _clickedObjectIndex;
 	IMBObject* _clickedObject;
+	
+	// Skimming 
+	NSTrackingArea* _trackingArea;	// Area where we track mouse move events
 }
 
 @property (assign) NSInteger mouseOperation;
 @property (assign) NSInteger clickedObjectIndex;
 @property (retain) IMBObject* clickedObject;
+
+- (void) enableSkimming;
+
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+- (NSUInteger) indexOfCellAtPoint:(NSPoint)inPoint;
+#endif
 
 @end
 

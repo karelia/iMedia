@@ -149,6 +149,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 }
 
++ (NSBundle*) bundle;
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
 
 // Library...
@@ -184,8 +185,13 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 // User Interface...
  
++ (Class) iconViewCellClass;
 - (NSImage*) icon;
 - (NSString*) displayName;
++ (CALayer*) iconViewBackgroundLayer;
+
++ (NSString*) objectCountFormatSingular;
++ (NSString*) objectCountFormatPlural;
 
 @property (retain) NSString* objectCountFormatSingular;
 @property (retain) NSString* objectCountFormatPlural;
@@ -222,17 +228,29 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 #pragma mark 
 
-@protocol IMBObjectViewControllerDelegate
+@protocol IMBObjectViewControllerDelegate <NSObject>
 
 @optional
 
-// If the delegate implements this method, then it can reequest a custom cell for the IKImageBrowserView...
+// If the delegate implements this method, then it can request a custom cell for the IKImageBrowserView...
 
 - (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController;
+
+// If the delegate implements this method, then it can its own backround layer for the IKImageBrowserView...
+
+- (CALayer*) imageBrowserBackgroundLayerForController:(IMBObjectViewController*)inController;
 
 // With this method the delegate can return a custom drag image for a drags starting from the IKImageBrowserView...
 
 - (NSImage*) draggedImageForController:(IMBObjectViewController*)inController draggedObjects:(NSArray*)inObjects;
+
+// With this method the delegate may add setup instructions for selected (sub)views of the controller.
+// The delegate is advised to be conservative with what to instruct as it may violate framework integrity.
+// The following views a currently provided for delegate setup:
+//
+extern NSString* const IMBObjectViewControllerSegmentedControlKey;		/* Segmented control for object view selection */
+
+- (void) objectViewController:(IMBObjectViewController*)inController didLoadViews:(NSDictionary*)inViews;
 
 @end
 

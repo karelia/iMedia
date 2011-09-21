@@ -345,7 +345,12 @@
 		}
 		else if ([_imageRepresentationType isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
         {
+			//NSImage *nsImage = [[NSImage alloc] initWithContentsOfFile:_imageRepresentation];
+			//NSBitmapImageRep *imageRep = [[nsImage representations] objectAtIndex:0];
+			//CGImageRef image =  [imageRep CGImage];
+			//[nsImage release];
 			CGImageRef image = (CGImageRef) _imageRepresentation;
+
             [self _drawImage:image withFrame:imageRect];
 		}
 		

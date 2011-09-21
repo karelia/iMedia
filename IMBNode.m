@@ -95,7 +95,6 @@
 
 @synthesize group = _group;
 @synthesize leaf = _leaf;
-@synthesize loading = _loading;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 @synthesize includedInPopup = _includedInPopup;
 @synthesize displayedObjectCount = _displayedObjectCount;
@@ -109,24 +108,6 @@
 // Badge icons...
 
 @synthesize badgeTypeNormal = _badgeTypeNormal;
-
-//- (void) setBadgeTypeNormal:(IMBBadgeType)badgeType;
-//{
-//	NSArray *strings = [NSArray arrayWithObjects:
-//						@"kIMBBadgeTypeNone",
-//						@"kIMBBadgeTypeLoading",
-//						@"kIMBBadgeTypeReload",
-//						@"kIMBBadgeTypeStop",
-//						@"kIMBBadgeTypeEject",
-//						@"kIMBBadgeTypeOffline", nil];
-//	
-//	if ([self.identifier isEqualToString:@"IMBFlickrParser://flickr.photos.getRecent/recent/30"])
-//	{
-//		NSLog(@"%p %@ setBadgeTypeNormal:%@", self, self.identifier, [strings objectAtIndex:badgeType]);
-//	}
-//	_badgeTypeNormal = badgeType;
-//}
-
 @synthesize badgeTypeMouseover = _badgeTypeMouseover;
 @synthesize badgeTarget = _badgeTarget;
 @synthesize badgeSelector = _badgeSelector;
@@ -134,9 +115,6 @@
 // Custom object view...
 
 @synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
-@synthesize customHeaderViewController = _customHeaderViewController;
-@synthesize customObjectViewController = _customObjectViewController;
-@synthesize customFooterViewController = _customFooterViewController;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -163,9 +141,6 @@
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
 		
 		self.shouldDisplayObjectView = YES;
-		self.customHeaderViewController = nil;
-		self.customObjectViewController = nil;
-		self.customFooterViewController = nil;
 	}
 	
 	return self;
@@ -203,9 +178,6 @@
 	copy.badgeSelector = self.badgeSelector;
 	
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
-	copy.customHeaderViewController = self.customHeaderViewController;
-	copy.customObjectViewController = self.customObjectViewController;
-	copy.customFooterViewController = self.customFooterViewController;
 	
 	// Create a shallow copy of objects array...
 	
@@ -256,9 +228,6 @@
 	IMBRelease(_parser);
 	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
-	IMBRelease(_customHeaderViewController);
-	IMBRelease(_customObjectViewController);
-	IMBRelease(_customFooterViewController);
 	
 	[super dealloc];
 }
@@ -431,28 +400,27 @@
 #pragma mark Helpers
 
 
-// Nodes are considered to be equal if their identifier match - even if we are looking at different instances
+// Nodes are considered to be equal if their identifiers match - even if we are looking at different instances
 // (object pointers). This is necessary as nodes are relatively short-lived objects that are replaced with new
 // instances often - a necessity in our multithreaded environment...
 
-- (BOOL) isEqual:(IMBNode*)inNode
+- (BOOL) isEqual:(id)aNode
 {
-	NSString* identifier1 = nil;
-	NSString* identifier2 = nil;
-	
-	if ([self respondsToSelector:@selector(identifier)])
-	{
-		identifier1 = self.identifier;
-	}
+    if (self == aNode)
+    {
+        return YES; // fast path
+    }
+    else if ([aNode isKindOfClass:[IMBNode class]]) // ImageKit sometimes compares us to strings
+    {
+        return [[self identifier] isEqualToString:[aNode identifier]];
+    }
+    
+    return NO;
+}
 
-	if ([inNode respondsToSelector:@selector(identifier)])
-	{
-		identifier2 = inNode.identifier;
-	}
-	
-	return identifier1 != nil && 
-		identifier2 != nil && 
-		[identifier1 isEqualToString:identifier2];
+- (NSUInteger)hash;
+{
+    return [[self identifier] hash];
 }
 
 
@@ -490,6 +458,19 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Set loading status for self and complete subtree...
+
+- (void) setLoading:(BOOL)inLoading
+{
+	_loading = inLoading;
+	
+	for (IMBNode* subnode in self.subNodes)
+	{
+		subnode.loading = inLoading;
+	}
+}
 
 
 // Check if this node or one of its ancestors is current loading in the background. In this case it will be 

@@ -123,5 +123,134 @@
 	return nsimage;
 }
 
++ (NSDictionary *)imb_metadataFromVideoAtURL:(NSURL*)inURL
+{
+	if (![inURL isFileURL]) {
+		return nil;
+	}
+	
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
+	
+	[metadata setObject:[inURL path] forKey:@"path"];
+	
+	MDItemRef item = NULL;
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		item = MDItemCreateWithURL(NULL,(CFURLRef)inURL); 
+	}
+	else
+#endif
+	{
+		item = MDItemCreate(NULL, (CFStringRef) [inURL path]);
+	}
+
+//	NSLog(@"%@", [NSMakeCollectable(MDItemCopyAttributeNames(item)) autorelease]);
+	
+	if (item)
+	{
+		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
+		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
+		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
+		
+		if (seconds)
+		{
+			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
+			CFRelease(seconds);
+		}
+		
+		if (width)
+		{
+			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
+			CFRelease(width);
+		}
+		
+		if (height)
+		{
+			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
+			CFRelease(height);
+		}
+		
+		CFRelease(item);
+	}
+	else
+	{
+		//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
+	}
+	
+	return metadata;
+}
+
++ (NSDictionary *)imb_metadataFromAudioAtURL:(NSURL*)inURL
+{
+	if (![inURL isFileURL]) {
+		return nil;
+	}
+	
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
+	
+	[metadata setObject:[inURL path] forKey:@"path"];
+	
+	MDItemRef item = NULL;
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		item = MDItemCreateWithURL(NULL,(CFURLRef)inURL); 
+	}
+	else
+#endif
+	{
+		item = MDItemCreate(NULL, (CFStringRef) [inURL path]);
+	}
+	
+//	NSLog(@"%@", [NSMakeCollectable(MDItemCopyAttributeNames(item)) autorelease]);
+
+	if (item)
+	{
+		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
+		CFArrayRef authors = MDItemCopyAttribute(item,kMDItemAuthors);
+		CFStringRef album = MDItemCopyAttribute(item,kMDItemAlbum);
+		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
+		
+		if (seconds)
+		{
+			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
+			CFRelease(seconds);
+		}
+		else
+		{
+			NSSound* sound = [[NSSound alloc] initWithContentsOfURL:inURL byReference:YES];
+			[metadata setObject:[NSNumber numberWithDouble:sound.duration] forKey:@"duration"]; 
+			[sound release];
+		}
+		
+		if (authors)
+		{
+			NSArray* artists = (NSArray*)authors;
+			if (artists.count > 0) [metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
+			CFRelease(authors);
+		}
+		
+		if (album)
+		{
+			[metadata setObject:(NSString*)album forKey:@"album"]; 
+			CFRelease(album);
+		}
+		
+		if (comment)
+		{
+			[metadata setObject:(NSString*)comment forKey:@"comment"]; 
+			CFRelease(comment);
+		}
+		
+		CFRelease(item);
+	}
+	else
+	{
+		//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
+	}
+	
+	return metadata;
+}
 
 @end

@@ -183,7 +183,9 @@
 		{
 			NSError *error = nil;
 			(void) [fm removeItemAtPath:newPath error:nil];
-			BOOL copied = [fm copyItemAtPath:self.databasePathOriginal toPath:newPath error:&error];
+			BOOL copied = (nil != self.databasePathOriginal)
+				&& (nil != newPath)
+				&& [fm copyItemAtPath:self.databasePathOriginal toPath:newPath error:&error];
 			if (!copied)
 			{
 				NSLog(@"Unable to copy Firefox bookmarks.");
@@ -337,6 +339,8 @@
 		}
 	}
 	
+	NSUInteger index = 0;
+
 	while ([rs next])
 	{		
 //		NSLog(@"%@>%@ '%@' %@", 
@@ -347,7 +351,6 @@
 
 		int theID = [rs intForColumn:@"id"];
 		NSString *theName = [rs stringForColumn:@"title"];
-		NSUInteger index = 0;
 		if (theName && ![theName isEqualToString:@""])	// make sure we have a title; otherwise bogus
 		{
 			IMBNode* node = [[[IMBNode alloc] init] autorelease];
@@ -371,7 +374,7 @@
 				IMBObject *object = [[[IMBNodeObject alloc] init] autorelease];
 				object.name = theName;
 				object.parser = self;
-				object.location = (id)node;
+				((IMBNodeObject*)object).representedNodeIdentifier = node.identifier;
 				
 				object.index = index++;
 				object.imageLocation = nil;

@@ -91,7 +91,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 @class IMBObject;
 @class IMBKQueue;
 @class IMBFSEventsWatcher;
-
+@class IMBObjectViewController;
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -60,7 +60,6 @@
 @interface IMBFlickrHeaderViewController : NSViewController
 {
 	IMBFlickrParser* _parser;
-	IMBFlickrNode* _owningNode;
 	NSMutableDictionary* _queryParams;
 	SEL _queryAction;
 	SEL _buttonAction;
@@ -70,14 +69,15 @@
 	IBOutlet NSButton* _button;
 }
 
-+ (IMBFlickrHeaderViewController*) headerViewControllerWithParser:(IMBFlickrParser*)inParser owningNode:(IMBFlickrNode*)inNode;
++ (IMBFlickrHeaderViewController*) headerViewControllerWithParser: (IMBFlickrParser*) inParser forNode: (IMBFlickrNode*) inNode;
 
+
+@property (readonly) BOOL canEdit;
 @property (assign) IMBFlickrParser* parser;
-@property (assign) IMBFlickrNode* owningNode;
-@property (retain) NSMutableDictionary* queryParams;
 @property (assign) SEL queryAction;
 @property (assign) SEL buttonAction;
 @property (retain) NSString* buttonTitle;
+
 
 - (IBAction) addQuery:(id)inSender;
 - (IBAction) editQuery:(id)inSender;

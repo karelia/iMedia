@@ -61,7 +61,6 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBMovieObject.h"
 #import "IMBNodeObject.h"
 #import "IMBObjectsPromise.h"
 #import "IMBImageBrowserCell.h"
@@ -80,6 +79,7 @@
 #import "IMBFlickrObject.h"
 #import "IMBFlickrNode.h"
 #import "NSFileManager+iMedia.h"
+#import "IMBButtonObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@
 
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
-static NSString* kPosterFrameKeyPath = @"arrangedObjects.posterFrame";
+static NSString* kQuickLookImageKeyPath = @"arrangedObjects.quickLookImage";
 static NSString* kObjectCountStringKey = @"objectCountString";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
@@ -97,6 +97,12 @@ NSString* kIMBPublicTitleListPasteboardType = @"imedia.title";
 NSString* kIMBPublicMetadataListPasteboardType = @"imedia.metadata";
 
 NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
+
+NSString* kGlobalViewTypeKeyPath = @"globalViewType";
+
+// Keys to be used by delegate
+
+NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl";	/* Segmented control for object view selection */
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -149,6 +155,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 
 @interface IMBObjectViewController ()
 
+- (CALayer*) iconViewBackgroundLayer;
 - (void) _configureIconView;
 - (void) _configureListView;
 - (void) _configureComboView;
@@ -250,10 +257,35 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 }
 
 
+// You may subclass this method to provide a custom image browser background layer.
+// Keep in mind though that a background layer provided by the library's delegate
+// will always overrule this one.
+
++ (CALayer*) iconViewBackgroundLayer
+{
+	return nil;
+}
+
+
++ (float) iconViewReloadDelay
+{
+	return 0.05;	// Delay in seconds
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
+
+- (id <IMBObjectViewControllerDelegate>) delegate
+{
+	return self.libraryController.delegate;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 - (id) initWithNibName:(NSString*)inNibName bundle:(NSBundle*)inBundle
 {
@@ -335,7 +367,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	[ibObjectArrayController retain];
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
-	[ibObjectArrayController addObserver:self forKeyPath:kPosterFrameKeyPath options:NSKeyValueObservingOptionNew context:(void*)kPosterFrameKeyPath];
+	[ibObjectArrayController addObserver:self forKeyPath:kQuickLookImageKeyPath options:NSKeyValueObservingOptionNew context:(void*)kQuickLookImageKeyPath];
 
 	// For tooltip display, we pay attention to changes in the icon view's scroller clip view, because 
 	// that will naturally indicate a change in visible items (unfortunately IKImageBrowserView's visibleItemIndexes
@@ -358,6 +390,22 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		 selector:@selector(_saveStateToPreferences) 
 		 name:NSApplicationWillTerminateNotification 
 		 object:nil];
+	
+	// Observe changes by other controllers to global view type preference if we use global view type
+	// so we can change our own view type accordingly
+	
+	if ([IMBConfig useGlobalViewType])
+	{
+		[IMBConfig addObserver:self forKeyPath:kGlobalViewTypeKeyPath options:0 context:(void*)kGlobalViewTypeKeyPath];
+	}
+	
+	// After all has been said and done delegate may do additional setup on selected (sub)views
+	
+	if ([[self delegate] respondsToSelector:@selector(objectViewController:didLoadViews:)])
+	{
+		NSDictionary* views = [NSDictionary dictionaryWithObjectsAndKeys:ibSegments, IMBObjectViewControllerSegmentedControlKey, nil];
+		[[self delegate] objectViewController:self didLoadViews:views];
+	}
 }
 
 // Do not remove this method. It isn't called directly by the framework, but is called by host applications. 
@@ -409,7 +457,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	
 	// Stop observing the array...
 	
-	[ibObjectArrayController removeObserver:self forKeyPath:kPosterFrameKeyPath];
+	[ibObjectArrayController removeObserver:self forKeyPath:kQuickLookImageKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
 	[ibObjectArrayController release];
@@ -429,7 +477,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		{
 //			NSLog(@"dealloc REMOVE [%p:%@'%@' removeObs…:%p 4kp:imageRep…", object,[object class],[object name], self);
             [object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
-            [object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
+            [object removeObserver:self forKeyPath:kIMBQuickLookImageProperty];
         }
     }
 	
@@ -457,15 +505,26 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	else if (inContext == (void*)kImageRepresentationKeyPath)
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadIconView) object:nil];
-		[self performSelector:@selector(_reloadIconView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[self performSelector:@selector(_reloadIconView) withObject:nil afterDelay:[[self class] iconViewReloadDelay] inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
 		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
-	else if (inContext == (void*)kPosterFrameKeyPath)
+	else if (inContext == (void*)kQuickLookImageKeyPath)
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
 		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+	}
+	
+	// The globally set view type in preferences was changed - adjust our own view type accordingly.
+	
+	else if (inContext == (void*)kGlobalViewTypeKeyPath && [IMBConfig useGlobalViewType])
+	{
+		// Don't use setViewType: here as it would cause an endless recursion
+		
+		[self willChangeValueForKey:@"viewType"];
+		_viewType = [[IMBConfig globalViewType] unsignedIntegerValue];
+		[self didChangeValueForKey:@"viewType"];
 	}
 	
 	// Find the row and reload it. Note that KVO notifications may be sent from a background thread (in this 
@@ -473,7 +532,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
 		
 	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty] ||
-			 [inKeyPath isEqualToString:kIMBPosterFrameProperty])
+			 [inKeyPath isEqualToString:kIMBQuickLookImageProperty])
 	{
 		IMBDynamicTableView* affectedTableView = (IMBDynamicTableView*)inContext;
 		NSInteger row = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inObject];
@@ -500,15 +559,6 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 - (IMBNode*) currentNode
 {
 	return [_nodeViewController selectedNode];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) delegate
-{
-	return self.libraryController.delegate;
 }
 
 
@@ -583,6 +633,17 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #pragma mark User Interface
 
 
+// The cell class to be used in the image browser view
+// (if not provided by the library controller's delegate).
+// You may overwrite this method in subclasses to provide your own view specific cell class.
+// Cell class must be kind of IKImageBrowserCell class.
+
++ (Class) iconViewCellClass
+{
+	return nil;
+}
+
+
 // Subclasses can override these methods to configure or customize look & feel of the various object views...
 
 - (void) _configureIconView
@@ -603,6 +664,31 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 //	}
 
 	[ibIconView setAllowsMultipleSelection:NO];
+
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+	if ([ibIconView respondsToSelector:@selector(setBackgroundLayer:)])
+	{
+		[ibIconView setBackgroundLayer:[self iconViewBackgroundLayer]];
+	}
+#endif
+}
+
+
+// Give the library's delegate a chance to provide a custom background layer (>= 10.6 only)
+
+- (CALayer*) iconViewBackgroundLayer
+{
+	id delegate = self.delegate;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(imageBrowserBackgroundLayerForController:)])
+		{
+			return [delegate imageBrowserBackgroundLayerForController:self];
+		}
+	}
+	
+	return [[self class ] iconViewBackgroundLayer];
 }
 
 
@@ -687,18 +773,13 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 {
 	[self willChangeValueForKey:@"canUseIconSize"];
 	_viewType = inViewType;
-	[IMBConfig setPrefsValue:[NSNumber numberWithUnsignedInteger:inViewType] forKey:@"globalViewType"];
+	[IMBConfig setGlobalViewType:[NSNumber numberWithUnsignedInteger:inViewType]];
 	[self didChangeValueForKey:@"canUseIconSize"];
 }
 
 
 - (NSUInteger) viewType
 {
-	if ([IMBConfig useGlobalViewType])
-	{
-		return [[IMBConfig prefsValueForKey:@"globalViewType"] unsignedIntegerValue];
-	}
-	
 	return _viewType;
 }
 
@@ -829,7 +910,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		[ibIconView removeAllToolTips];
 
 		[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
-		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:[[self class] iconViewReloadDelay] inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 
 		// Items loading into the view will cause a change in the scroller's clip view, which will cause the tooltips
 		// to be revised to suit only the current visible items.
@@ -1594,9 +1675,8 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
-			IMBNode* subnode = (IMBNode*)object.location;
-			NSString* identifier = subnode.identifier;
-			subnode = [self.libraryController nodeWithIdentifier:identifier];
+			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
+			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
 
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];
@@ -1852,7 +1932,7 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 		}
 	}
 	
-	return nil;
+	return [[self class ] iconViewCellClass];
 }
 
 
@@ -1912,10 +1992,10 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 	{
 		IMBComboTextCell* cell = (IMBComboTextCell*)inCell;
 		
-		if ([object isKindOfClass:[IMBMovieObject class]])
+		if (object.imageRepresentationType == IKImageBrowserQTMoviePathRepresentationType)
 		{
-			cell.imageRepresentation = (id) [(IMBMovieObject*)object posterFrame];
 			cell.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+			cell.imageRepresentation = (id) [object quickLookImage];
 		}
 		else
 		{
@@ -2043,11 +2123,11 @@ NSString* kIMBObjectImageRepresentationProperty = @"imageRepresentation";
 #endif
 NS_DURING
 		[object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
-		[object removeObserver:self forKeyPath:kIMBPosterFrameProperty];
+		[object removeObserver:self forKeyPath:kIMBQuickLookImageProperty];
 NS_HANDLER
 		// NSLog(@"Caught IMBObjectViewController exception trying to remove observer from %@", object);
 NS_ENDHANDLER
-		
+	
 		NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
 		for (IMBObjectThumbnailLoadOperation* op in ops)
 		{
@@ -2121,7 +2201,7 @@ NS_ENDHANDLER
 #endif
 
 		[object addObserver:self forKeyPath:kIMBObjectImageRepresentationProperty options:0 context:(void*)ibComboView];
-		[object addObserver:self forKeyPath:kIMBPosterFrameProperty options:0 context:(void*)ibComboView];
+		[object addObserver:self forKeyPath:kIMBQuickLookImageProperty options:0 context:(void*)ibComboView];
      }
 	
 	// Finally cache our old visible items set
@@ -2160,9 +2240,8 @@ NS_ENDHANDLER
 		
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
-			IMBNode* subnode = (IMBNode*)object.location;
-			NSString* identifier = subnode.identifier;
-			subnode = [self.libraryController nodeWithIdentifier:identifier];
+			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
+			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
 			
 			[_nodeViewController expandSelectedNode];
 			[_nodeViewController selectNode:subnode];

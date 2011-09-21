@@ -89,14 +89,20 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This subclass adds the addition apertureMetadata property, which stores the metadata coming from the database. 
-// it will later be augmented (lazily) by metadata read from the file itself (which is a fairly slow process).
-// That is why that step is only done lazily...
+// This subclass adds the addition absolutePyramidPath property, which stores the path to the pyramid containing image previews. 
 
 
 @implementation IMBLightroomObject
 
 @synthesize absolutePyramidPath = _absolutePyramidPath;
+
+- (id) init
+{
+	if ((self = [super init]) != nil) {
+	}
+	
+	return self;
+}
 
 - (id) initWithCoder:(NSCoder*)inCoder
 {
@@ -180,15 +186,12 @@ static NSArray* sSupportedUTIs = nil;
 - (BOOL) isFolderNode:(IMBNode*)inNode;
 - (BOOL) isCollectionNode:(IMBNode*)inNode;
 
-- (NSDictionary*) attributesWithRootFolder:(NSNumber*)inRootFolder
-								   idLocal:(NSNumber*)inIdLocal
-								  rootPath:(NSString*)inRootPath
-							  pathFromRoot:(NSString*)inPathFromRoot;
 - (NSNumber*) rootFolderFromAttributes:(NSDictionary*)inAttributes;
 - (NSNumber*) idLocalFromAttributes:(NSDictionary*)inAttributes;
 - (NSString*) rootPathFromAttributes:(NSDictionary*)inAttributes;
 - (NSString*) pathFromRootFromAttributes:(NSDictionary*)inAttributes;
 - (NSString*) absolutePathFromAttributes:(NSDictionary*)inAttributes;
+- (IMBLightroomNodeType) nodeTypeFromAttributes:(NSDictionary*)inAttributes;
 
 @end
 
@@ -296,7 +299,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
-	if (self = [super initWithMediaType:inMediaType])
+	if ((self = [super initWithMediaType:inMediaType]) != nil)
 	{
 		self.appPath = [[self class] lightroomPath];
 		_databases = [[NSMutableDictionary alloc] init];
@@ -432,6 +435,12 @@ static NSArray* sSupportedUTIs = nil;
 		[self populateObjectsForCollectionNode:inNode];
 	}
 	
+    else
+    {
+    	inNode.subNodes = [NSArray array];
+        inNode.objects = [NSArray array];
+    }
+
 	if (outError) *outError = error;
 	return error == nil;
 }
@@ -513,13 +522,14 @@ static NSArray* sSupportedUTIs = nil;
 			node.attributes = [self attributesWithRootFolder:id_local
 													 idLocal:id_local
 													rootPath:path
-												pathFromRoot:nil];
+												pathFromRoot:nil
+                                                    nodeType:IMBLightroomNodeTypeFolder];
 			node.leaf = NO;
 			
 			[subNodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-			object.location = (id)node;
+			object.representedNodeIdentifier = node.identifier;
 			object.name = name;
 			object.metadata = nil;
 			object.parser = self;
@@ -606,13 +616,15 @@ static NSArray* sSupportedUTIs = nil;
 				NSDictionary* attributes = [self attributesWithRootFolder:parentRootFolder
 																  idLocal:id_local
 																 rootPath:parentRootPath
-															 pathFromRoot:pathFromRoot];
+															 pathFromRoot:pathFromRoot
+                                                                 nodeType:IMBLightroomNodeTypeFolder];
+
 				node.attributes = attributes;
 				
 				NSString* path = [self absolutePathFromAttributes:attributes];
 				
 				IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-				object.location = (id)node;
+				object.representedNodeIdentifier = node.identifier;
 				object.name = node.name;
 				object.metadata = nil;
 				object.parser = self;
@@ -707,13 +719,15 @@ static NSArray* sSupportedUTIs = nil;
 			node.attributes = [self attributesWithRootFolder:nil
 													 idLocal:idLocal
 													rootPath:nil
-												pathFromRoot:nil];
+												pathFromRoot:nil
+                                                    nodeType:IMBLightroomNodeTypeCollection];
+
 			node.leaf = NO;
 			
 			[subNodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-			object.location = (id)node;
+			object.representedNodeIdentifier = node.identifier;
 			object.name = node.name;
 			object.metadata = nil;
 			object.parser = self;
@@ -1028,6 +1042,7 @@ static NSArray* sSupportedUTIs = nil;
 			break;
 	}
 	
+	CGImageRef rotatedImage = NULL;
 	CGColorSpaceRef colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
 	CGContextRef context = CGBitmapContextCreate(NULL,
 												 (orientationProperty < 5) ? w : h,
@@ -1036,17 +1051,19 @@ static NSArray* sSupportedUTIs = nil;
 												 0,
 												 colorSpace,
 												 kCGImageAlphaPremultipliedFirst);
-	CGContextSetAllowsAntialiasing(context, FALSE);
-	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
 	CGColorSpaceRelease(colorSpace);
-	
-	CGContextConcatCTM(context, transform);
-	CGContextDrawImage(context, CGRectMake(0, 0, w, h), imgRef);
-	
-	CGImageRef rotatedImage = CGBitmapContextCreateImage(context);
-	
-	CFRelease(context);
-	[NSMakeCollectable(rotatedImage) autorelease];
+												 
+	if (context)
+	{											 
+		CGContextSetAllowsAntialiasing(context, FALSE);
+		CGContextSetInterpolationQuality(context, kCGInterpolationNone);
+		CGContextConcatCTM(context, transform);
+		CGContextDrawImage(context, CGRectMake(0, 0, w, h), imgRef);
+		rotatedImage = CGBitmapContextCreateImage(context);
+		CFRelease(context);
+		
+		[NSMakeCollectable(rotatedImage) autorelease];
+	}
 	
 	return rotatedImage;
 }
@@ -1317,45 +1334,54 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSString* libraryPath = (NSString*) self.mediaSource;
 	NSString* libraryName = [self libraryName];
-	NSString* path = [NSString stringWithFormat:@"/%@(%i)",libraryName,[libraryPath hash]];
+	NSString* path = [NSString stringWithFormat:@"/%@(%lu)",libraryName,[libraryPath hash]];
 	return [self identifierForPath:path];
 }
 
 
 // Create an unique identifier from the idLocal. An example is "IMBLightroomParser://Peter(123)/folder/17"...
 
-- (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal
+- (NSString*) pathPrefixWithType:(NSString*)type
 {
 	NSString* libraryPath = (NSString*) self.mediaSource;
 	NSString* libraryName = [self libraryName];
-	NSString* path = [NSString stringWithFormat:@"/%@(%i)/folder/%@",libraryName,[libraryPath hash],inIdLocal];
+	NSString* pathPrefix = [NSString stringWithFormat:@"/%@(%lu)/%@/",libraryName,[libraryPath hash],type];
+	return pathPrefix;
+}
+
+- (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal
+{
+	NSString* identifierPrefix = [self pathPrefixWithType:@"folder"];
+	NSString* path = [identifierPrefix stringByAppendingString:[inIdLocal description]];
 	return [self identifierForPath:path];
 }
 
 
 - (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal
 {
-	NSString* libraryPath = (NSString*) self.mediaSource;
-	NSString* libraryName = [self libraryName];
-	NSString* path = [NSString stringWithFormat:@"/%@(%i)/collection/%@",libraryName,[libraryPath hash],inIdLocal];
+	NSString* identifierPrefix = [self pathPrefixWithType:@"collection"];
+	NSString* path = [identifierPrefix stringByAppendingString:[inIdLocal description]];
 	return [self identifierForPath:path];
 }
 
 
 // Node types...
 
-
 - (BOOL) isFolderNode:(IMBNode*)inNode
 {
-	NSString* identifier = inNode.identifier;
-	return [identifier rangeOfString:@"/folder"].location != NSNotFound;
+    NSDictionary* attributes = inNode.attributes;
+    IMBLightroomNodeType nodeType = [self nodeTypeFromAttributes:attributes];
+    
+    return (nodeType == IMBLightroomNodeTypeFolder);
 }
 
 
 - (BOOL) isCollectionNode:(IMBNode*)inNode
 {
-	NSString* identifier = inNode.identifier;
-	return [identifier rangeOfString:@"/collection"].location != NSNotFound;
+    NSDictionary* attributes = inNode.attributes;
+    IMBLightroomNodeType nodeType = [self nodeTypeFromAttributes:attributes];
+    
+    return (nodeType == IMBLightroomNodeTypeCollection);
 }
 
 
@@ -1370,13 +1396,15 @@ static NSArray* sSupportedUTIs = nil;
 								   idLocal:(NSNumber*)inIdLocal
 								  rootPath:(NSString*)inRootPath
 							  pathFromRoot:(NSString*)inPathFromRoot
+                                  nodeType:(IMBLightroomNodeType)inNodeType
 {
-	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:4];
+	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:5];
 	
 	[dictionary setValue:inRootFolder forKey:@"rootFolder"];
 	[dictionary setValue:inRootPath forKey:@"rootPath"];
 	[dictionary setValue:inIdLocal forKey:@"id_local"];
 	[dictionary setValue:inPathFromRoot forKey:@"pathFromRoot"];
+	[dictionary setValue:[NSNumber numberWithInt:inNodeType] forKey:@"nodeType"];
 	
 	return dictionary;
 }
@@ -1399,6 +1427,11 @@ static NSArray* sSupportedUTIs = nil;
 - (NSString*) pathFromRootFromAttributes:(NSDictionary*)inAttributes
 {
 	return [inAttributes objectForKey:@"pathFromRoot"];
+}
+
+- (IMBLightroomNodeType) nodeTypeFromAttributes:(NSDictionary*)inAttributes
+{
+	return [[inAttributes objectForKey:@"nodeType"] intValue];
 }
 
 - (NSString*) absolutePathFromAttributes:(NSDictionary*)inAttributes

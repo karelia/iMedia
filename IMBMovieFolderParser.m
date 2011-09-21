@@ -55,9 +55,10 @@
 #import "IMBMovieFolderParser.h"
 #import "IMBParserController.h"
 #import "IMBTimecodeTransformer.h"
-#import "IMBMovieObject.h"
+#import "IMBObject.h"
 #import "IMBCommon.h"
 #import <Quartz/Quartz.h>
+#import "NSDictionary+iMedia.h"
 #import "NSString+iMedia.h"
 #import "IMBNode.h"
 
@@ -101,7 +102,7 @@
 
 - (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex
 {
-	IMBObject* object = [[[IMBMovieObject alloc] init] autorelease];
+	IMBObject* object = [[[IMBObject alloc] init] autorelease];
 	object.location = (id)inPath;
 	object.name = inName;
 	object.parser = self;
@@ -173,55 +174,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSMutableString* description = [NSMutableString string];
-	NSNumber* duration = [inMetadata objectForKey:@"duration"];
-	NSNumber* width = [inMetadata objectForKey:@"width"];
-	NSNumber* height = [inMetadata objectForKey:@"height"];
-	NSString *path = [inMetadata objectForKey:@"path"];
-	NSString *comment = [inMetadata objectForKey:@"comment"];
-	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-
-	NSString *UTI = [NSString imb_UTIForFileAtPath:path];
-	NSString *kind = [NSString imb_descriptionForUTI:UTI];
-
-	if (kind)
-	{
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendString:kind];
-	}
-	
-	if (width != nil && height != nil)
-	{
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@×%@",width,height];
-	}
-	
-	if (duration)
-	{
-		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
-			@"Time",
-			nil,IMBBundle(),
-			@"Time",
-			@"Time label in metadataDescription");
-
-		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",durationLabel,durationString];
-	}
-
-	if (comment && ![comment isEqualToString:@""])
-	{
-		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
-																	@"Comment",
-																	nil,IMBBundle(),
-																	@"Comment",
-																	@"Comment label in metadataDescription");
-		
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",commentLabel,comment];
-	}
-	
-	return description;
+	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
 }
 
 

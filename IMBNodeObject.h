@@ -51,8 +51,7 @@
 
 
 #pragma mark HEADERS
-
-#import "IMBButtonObject.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,6 +62,16 @@
 // down the hierarchy... 
 
 @interface IMBNodeObject : IMBObject
+{
+	NSString* _representedNodeIdentifier;
+}
+
+// The identifier of the node this node object represents.
+// (We rather keep an identifier here than the node itself
+// because nodes are rather short-lived
+// (e.g. replaced when populated in background thread))
+
+@property (retain, readwrite) NSString* representedNodeIdentifier;	
 
 @end
 

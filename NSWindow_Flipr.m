@@ -245,7 +245,7 @@
 // All the magic happens here... drawing the flipping animation.
 
 - (void)drawRect:(NSRect)rect {
-	if (!initialWindow) {
+	if (!initialWindow || ![transitionFilter valueForKey:@"inputImage"]) {
 // If there's no window yet, we don't need to draw anything.
 		return;
 	}

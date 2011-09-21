@@ -59,6 +59,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CONSTANTS
+
+extern NSString* kIMBQuickLookImageProperty;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark CLASSES
 
 @class IMBParser;
@@ -83,6 +91,9 @@
 	NSDictionary* _metadata;
 	NSString* _metadataDescription;
 	IMBParser* _parser;
+    NSString *_parserClassName;
+    NSString *_parserMediaType;
+    NSString *_parserMediaSource;
 	NSUInteger _index;
 	
 	id _imageRepresentation;								
@@ -93,6 +104,10 @@
     BOOL _isLoadingThumbnail;
     BOOL _shouldDrawAdornments;
 	BOOL _shouldDisableTitle;
+	
+	// Generic image support through Quick Look
+	CGImageRef _quickLookImage;
+	BOOL _isLoadingQuickLookImage;
 }
 
 // Primary properties...
@@ -100,6 +115,9 @@
 @property (retain) id location;								// Path, URL, or other location info
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
+@property (copy, readonly) NSString* parserClassName;		// Name of the parser class which created this object
+@property (copy, readonly) NSString* parserMediaType;		// Media type for the parser class which created this object
+@property (copy, readonly) NSString* parserMediaSource;		// Media source for the parser class which created this object
 @property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
 @property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
 @property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)
@@ -115,11 +133,12 @@
 - (BOOL) isLocalFile;										// Is this object a local file
 - (NSString*) type;											// Returns type of file if possible
 - (NSString*) tooltipString;
+- (NSString*) identifier;
 
 // Derived Properties. See IKImageBrowserItem for documentation...
 
 @property (retain) id imageLocation;						// Optional url or path if different from location (e.g. lores thumbnail)
-@property (readonly) NSString* imageUID;
+@property (nonatomic, readonly) NSString* imageUID;
 @property (retain) id imageRepresentation;	
 @property (readonly) BOOL isSelectable;
 @property (readonly) BOOL isDraggable;
@@ -134,6 +153,8 @@
 - (BOOL) unloadThumbnail;
 - (void) loadMetadata;
 @property (assign) BOOL isLoadingThumbnail;
+- (CGImageRef) quickLookImage;
+- (void) setQuickLookImage:(CGImageRef)inImage;
 
 - (void) postProcessLocalURL:(NSURL*)localURL;
 

@@ -198,7 +198,6 @@ const NSString* kSearchStringContext = @"searchString";
 		// (c) The search is not case-sensitive.
 		
 		NSMutableArray* matchedObjects = [NSMutableArray arrayWithCapacity:[inObjects count]];
-		NSString* lowerCaseSearchString = [_searchString lowercaseString];
 /*
 		// Let's try to use Spotlight to help us if at all possible.  It will be a lot faster on large data sets.
 		// The trick is to figure out how to combine what the person searches for and the other constraints that we
@@ -271,24 +270,16 @@ const NSString* kSearchStringContext = @"searchString";
 
 					if (value != nil)
 					{
-						if ([value isKindOfClass:[NSString class]])
-						{
-							NSString* thisString = [(NSString*)value lowercaseString];
-							foundMatch = [thisString rangeOfString:lowerCaseSearchString].location != NSNotFound;
-						}
-						else
-						{
-							// We don't test for implementation of the search filtering method, because 
-							// runtime querying for every object could be expensive. The previous contract was
-							// that metadata values had to be NSString. The new contract is that metadata 
-							// values have to either be NSString or else implement this filter message.
-							//
-							// NOTE also that if the client has a custom metadata type. we won't even make assumptions
-							// about whether they want the lowercase string or not, we'll just let them dictate
-							// the entire matching policy based on the user's input string.
-							
-							foundMatch = [value matchesSearchFilterString:_searchString];
-						}
+						// We don't test for implementation of the search filtering method, because 
+						// runtime querying for every object could be expensive. The previous contract was
+						// that metadata values had to be NSString. The new contract is that metadata 
+						// values have to either be NSString or else implement this filter message.
+						//
+						// NOTE also that if the client has a custom metadata type. we won't even make assumptions
+						// about whether they want the lowercase string or not, we'll just let them dictate
+						// the entire matching policy based on the user's input string.
+						
+						foundMatch = [value imb_matchesSearchFilterString:_searchString];
 					}
 					
 					if (foundMatch)
@@ -315,3 +306,35 @@ const NSString* kSearchStringContext = @"searchString";
 
 
 @end
+
+
+
+@implementation NSString ( IMBOBjectArrayControllerFiltering )
+
+- (BOOL) imb_matchesSearchFilterString:(NSString*)searchString;
+{
+	BOOL foundMatch = [self rangeOfString:searchString options:NSCaseInsensitiveSearch].location != NSNotFound;
+	return foundMatch;
+}
+
+@end
+
+
+
+@implementation NSArray ( IMBOBjectArrayControllerFiltering )
+
+- (BOOL) imb_matchesSearchFilterString:(NSString*)searchString;
+{
+	// This might be too slow .... if we needed to cheat I suppose we could look for an exact string match?
+	for (id object in self)
+	{
+		if ([object imb_matchesSearchFilterString:searchString])
+		{
+			return YES;
+		}
+	}
+	return NO;
+}
+
+@end
+

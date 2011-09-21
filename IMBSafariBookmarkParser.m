@@ -234,6 +234,7 @@
 		node.groupType = inOldNode.groupType;
 		node.leaf = inOldNode.leaf;
 		node.parser = self;
+		node.isTopLevelNode = inOldNode.isTopLevelNode;
 	}
 	
 	// Watch the XML file. Whenever something in Safari changes, we have to replace the WHOLE tree   
@@ -510,7 +511,7 @@
 		object = [[[IMBNodeObject alloc] init] autorelease];
 		object.name = title;
 		object.parser = self;
-		object.location = (id)subnode;
+		((IMBNodeObject*)object).representedNodeIdentifier = subnode.identifier;
 	}
 	
 	return object;

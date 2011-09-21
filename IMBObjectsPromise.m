@@ -75,18 +75,6 @@
 NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.objects-promise";
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark
-
-// This subclass is used for local object files that can be returned immediately. In this case a promise isn't 
-// really necessary, but to make the architecture more consistent, this abstraction is used nonetheless... 
-
-@interface IMBLocalObjectsPromise : IMBObjectsPromise
-
-@end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -166,7 +154,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
 		_URLsByObject = [[inCoder decodeObjectForKey:@"URLsByObject"] mutableCopy];
-		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
+		self.destinationDirectoryPath = [inCoder decodeObjectForKey:@"destinationDirectoryPath"];
 		self.delegate = nil;
 		self.finishSelector = NULL;
 		self.error = nil;
@@ -183,6 +171,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 {
 	[inCoder encodeObject:self.objects forKey:@"objects"];
 	[inCoder encodeObject:_URLsByObject forKey:@"URLsByObject"];
+    [inCoder encodeObject:[self destinationDirectoryPath] forKey:@"destinationDirectoryPath"];
 }
 
 
@@ -428,6 +417,11 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
     }
 }
 
+- (NSString *)description;
+{
+    return [[super description] stringByAppendingFormat:@" destination: %@", [self destinationDirectoryPath]];
+}
+
 @end
 
 
@@ -490,16 +484,6 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	{	
         [self setFileURL:localURL error:nil forObject:inObject];
 		_objectCountLoaded++;
-		
-		// Now, copy this to the download folder path ... ?
-
-		if (self.destinationDirectoryPath)
-		{
-			NSString* fullPath = [self.destinationDirectoryPath stringByAppendingPathComponent:[[localURL path] lastPathComponent]];
-			NSError* error = nil;
-			[[NSFileManager imb_threadSafeManager] copyItemAtPath:[localURL path] toPath:fullPath error:&error];
-			if (error) NSLog(@"%@",error);
-		}
 	}
 	else
 	{

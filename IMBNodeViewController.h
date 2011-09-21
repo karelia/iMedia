@@ -99,6 +99,10 @@
 	IBOutlet NSView* ibObjectFooterView;
 	NSView* _standardObjectView;
 	NSView* _customObjectView;
+	
+	NSMutableDictionary* _customHeaderViewControllers;
+	NSMutableDictionary* _customObjectViewControllers;
+	NSMutableDictionary* _customFooterViewControllers;
 }
 
 + (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
@@ -145,7 +149,6 @@
 // Object Views...
 
 - (void) installObjectViewForNode:(IMBNode*)inNode;
-
 - (NSSize) minimumViewSize;
 
 // Saving/Restoring state...
@@ -157,6 +160,25 @@
 
 + (void) revealNodeWithIdentifier:(NSString*)inIdentifier;
 + (void) selectNodeWithIdentifier:(NSString*)inIdentifier;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@protocol IMBNodeViewControllerDelegate
+
+@optional
+
+// The delegate can supply its own object view controllers for certain nodes. 
+// If it chooses to do so, this overrides everything else...
+
+- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode;
 
 @end
 

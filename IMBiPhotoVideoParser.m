@@ -54,15 +54,30 @@
 
 #import "IMBiPhotoVideoParser.h"
 #import "IMBParserController.h"
+#import "IMBMovieViewController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBMovieObject.h"
+#import "IMBObject.h"
+#import "NSDictionary+iMedia.h"
 #import "NSString+iMedia.h"
+#import "NSURL+iMedia.h"
 //#import "IMBIconCache.h"
 //#import "NSWorkspace+iMedia.h"
 //#import "NSFileManager+iMedia.h"
 #import <Quartz/Quartz.h>
 #import "IMBTimecodeTransformer.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBiPhotoVideoParser ()
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,6 +100,25 @@
 	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
 	[pool drain];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) objectCountFormatSingular
+{
+	return [IMBMovieViewController objectCountFormatSingular];
+}
+
+
++ (NSString*) objectCountFormatPlural
+{
+	return [IMBMovieViewController objectCountFormatPlural];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 - (void)dealloc
 {
@@ -117,7 +151,7 @@
 
 - (Class) objectClass
 {
-	return [IMBMovieObject class];
+	return [IMBObject class];
 }
 
 
@@ -138,62 +172,11 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+// Returns the path to the movie
 
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+- (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey
 {
-	NSString* comment = [inMetadata objectForKey:@"Comment"];
-	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	NSString* width = [inMetadata objectForKey:@"width"];
-	NSString* height = [inMetadata objectForKey:@"height"];
-	NSString* duration = [inMetadata objectForKey:@"duration"];
-	NSString* type = [inMetadata objectForKey:@"ImageType"];		// like MooV
-	NSString* UTI = [NSString imb_UTIForFileType:type];
-	NSString* kind = [NSString imb_descriptionForUTI:UTI];
-	
-	// NSString *dateTimeInterval = [inMetadata objectForKey:@"DateAsTimerInterval"];
-
-	NSMutableString* description = [NSMutableString string];
-	
-	if (kind)
-	{
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendString:kind];
-	}
-	
-	if (width != nil && height != nil)
-	{		
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@×%@",width,height];
-	}
-	
-	if (duration)
-	{
-		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
-			@"Time",
-			nil,IMBBundle(),
-			@"Time",
-			@"Time label in metadataDescription");
-		
-		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",durationLabel,durationString];
-	}
-	
-	if (comment && ![comment isEqualToString:@""])
-	{
-		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
-			@"Comment",
-			nil,IMBBundle(),
-			@"Comment",
-			@"Comment label in metadataDescription");
-		
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",commentLabel,comment];
-	}
-	
-	return description;
+	return [self imagePathForImageKey:inImageKey];
 }
 
 
@@ -202,38 +185,20 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
-	[metadata setObject:inObject.location forKey:@"path"];
-
-	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inObject.location);
+	NSURL* videoURL = [inObject URL];
 	
-	if (item)
-	{
-		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
-		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
-		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
-		
-		if (seconds)
-		{
-			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
-			CFRelease(seconds);
-		}
-		
-		if (width)
-		{
-			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
-			CFRelease(width);
-		}
-		
-		if (height)
-		{
-			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
-			CFRelease(height);
-		}
-		
-		CFRelease(item);
+	if (videoURL == nil) {
+		return;
 	}
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
 	
+	// Do not load (key) movie specific metadata for node objects
+	// because it doesn't represent the nature of the object well enough.
+	
+	if (![inObject isKindOfClass:[IMBNodeObject class]])
+	{
+		[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
+	}
 	
 	NSString* description = [self metadataDescriptionForMetadata:metadata];
 	
@@ -250,6 +215,18 @@
 	}
 }
 
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	// Events, faces have other metadata than images
+	
+	if ([inMetadata objectForKey:@"PhotoCount"])		// Event, face, ...
+	{
+		return [self countableMetadataDescriptionForMetadata:inMetadata];
+	}
+	
+	// Movie
+	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -55,7 +55,6 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBMovieObject.h"
 #import "IMBObjectsPromise.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
@@ -63,6 +62,7 @@
 #import <Quartz/Quartz.h>
 #import <QTKit/QTKit.h>
 #import "NSURL+iMedia.h"
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -126,6 +126,7 @@
 {
 	IMBRelease(_mediaSource);
 	IMBRelease(_mediaType);
+
 	[super dealloc];
 }
 
@@ -134,6 +135,16 @@
 
 
 #pragma mark 
+
+// Convenience method
+
+- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier
+{
+	IMBLibraryController* libraryController =
+	[IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
+	
+	return [libraryController nodeWithIdentifier:inIdentifier];
+}
 
 
 // The following two methods must be overridden by subclasses...
@@ -427,6 +438,42 @@
 
 
 #pragma mark
+#pragma mark Custom Object UI
+
+
+// Controls whether object views should be installed for a given node. Can be overridden by parser subclasses...
+
+- (BOOL) shouldDisplayObjectViewForNode:(IMBNode*)inNode
+{
+	return YES;
+}
+
+
+// If a parser subclass wants custom UI for a specific node, then is should override one of the following methods...
+
+
+- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode
+{
+	return nil;
+}
+
+
+- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode
+{
+	return nil;
+}
+
+
+- (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 #pragma mark Helpers
 
 
@@ -438,10 +485,7 @@
 	
 	if (inURL)
 	{
-		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-		   nil];
-
-		NSAssert(inURL, @"Nil image source URL");
+		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:nil];
 		source = CGImageSourceCreateWithURL((CFURLRef)inURL,(CFDictionaryRef)options);
 		[NSMakeCollectable(source) autorelease];
 	}
@@ -469,7 +513,6 @@
 			   [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
 			   nil];
 			
-			NSAssert(source, @"Nil image source in _imageForURL:");
 			image = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
 			[NSMakeCollectable(image) autorelease];
 		}
@@ -477,11 +520,6 @@
 	
 	return image;
 }	
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 
 
 //----------------------------------------------------------------------------------------------------------------------

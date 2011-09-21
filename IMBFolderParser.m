@@ -134,7 +134,11 @@
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForPath:path];
 	newNode.displayPriority = self.displayPriority;			// get node's display priority from the folder parser
-	newNode.name = [fm displayNameAtPath:path];
+	
+	NSString *betterName = [fm displayNameAtPath:[path stringByDeletingPathExtension]];
+    betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+	newNode.name = betterName;
+	
 	newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 	[newNode.icon setScalesWhenResized:YES];
 	[newNode.icon setSize:NSMakeSize(16,16)];
@@ -237,7 +241,10 @@
 				
 				else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
 				{
-					IMBObject* object = [self objectForPath:path name:file index:index++];
+					NSString *betterName = [fm displayNameAtPath:[file stringByDeletingPathExtension]];
+					betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+					
+					IMBObject* object = [self objectForPath:path name:betterName index:index++];
 					[objects addObject:object];
 					inNode.displayedObjectCount++;
 				}
@@ -307,7 +314,7 @@
 // it is not intuitive to the user to have navigational objects like folders
 // in the object view.
 				IMBNodeObject* object = [[IMBNodeObject alloc] init];
-				object.location = (id)subnode;
+				object.representedNodeIdentifier = subnode.identifier;
 				object.name = name;
 				object.metadata = nil;
 				object.parser = self;
@@ -416,7 +423,7 @@
 			@"Reveal in Finder",
 			@"Menu item in context menu of IMBObjectViewController");
 		
-		IMBNode* node = (IMBNode*) [inObject location];
+		IMBNode* node = [self nodeWithIdentifier:((IMBNodeObject*)inObject).representedNodeIdentifier];
 		NSString* path = (NSString*) [node mediaSource];
 		
 		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];

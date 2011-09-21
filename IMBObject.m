@@ -44,7 +44,7 @@
  */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,17 +53,44 @@
 #pragma mark HEADERS
 
 #import "IMBObject.h"
+
+#import "IMBNode.h"
 #import "IMBObjectsPromise.h"
 #import "IMBParser.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
 #import "IMBObjectFifoCache.h"
+#import "IMBParserController.h"
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSURL+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "IMBSmartFolderNodeObject.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
+
+NSString* kIMBQuickLookImageProperty = @"quickLookImage";
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBObject ()
+
+@property (copy) NSString *parserClassName;
+@property (copy) NSString *parserMediaType;
+@property (copy) NSString *parserMediaSource;
+
+- (CGImageRef) _renderQuickLookImage;
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,6 +105,9 @@
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
 @synthesize parser = _parser;
+@synthesize parserClassName = _parserClassName;
+@synthesize parserMediaType = _parserMediaType;
+@synthesize parserMediaSource = _parserMediaSource;
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
 @synthesize shouldDisableTitle = _shouldDisableTitle;
@@ -89,6 +119,48 @@
 @synthesize isLoadingThumbnail = _isLoadingThumbnail;
 
 @synthesize metadataDescription = _metadataDescription;
+
+- (IMBParser*)parser
+{
+    if (_parser != nil) {
+        return [[_parser retain] autorelease];
+    }
+    
+    NSString *parserMediaType = self.parserMediaType;
+    NSString *parserMediaSource = self.parserMediaSource;
+    
+    if ((parserMediaType == nil) || (parserMediaSource == nil)) {
+        return nil;
+    }
+    
+    IMBParserController *parserController = [IMBParserController sharedParserController];
+    NSArray *loadedParsers = [parserController loadedParsersForMediaType:parserMediaType];
+    
+    for (IMBParser *parser in loadedParsers) {
+        if ([parser.mediaSource isEqualToString:parserMediaSource]) {
+            return parser;
+        }
+    }
+    
+    return nil;
+}
+
+- (void)setParser:(IMBParser *)parser
+{
+    if (parser != _parser) {
+        [self willChangeValueForKey:@"parser"];
+        
+        [_parser release];
+        _parser = [parser retain];
+        
+        self.parserClassName = NSStringFromClass([_parser class]);
+        self.parserMediaType = [_parser mediaType];
+        self.parserMediaSource = [_parser mediaSource];
+        
+        [self didChangeValueForKey:@"parser"];
+    }
+}
+
 /*
  DISCUSSION: METADATA DESCRIPTION
  
@@ -120,12 +192,14 @@
 
 - (id) init
 {
-	if (self = [super init])
+	if ((self = [super init]) != nil)
 	{
 		self.index = NSNotFound;
 		self.shouldDrawAdornments = YES;
 		self.needsImageRepresentation = YES;
 		self.shouldDisableTitle = NO;
+		_quickLookImage = NULL;
+		_isLoadingQuickLookImage = NO;
 	}
 	
 	return self;
@@ -134,10 +208,13 @@
 
 - (id) initWithCoder:(NSCoder*)inCoder
 {
-	if (self = [super init])
+	if ((self = [super init]) != nil)
 	{
 		self.location = [inCoder decodeObjectForKey:@"location"];
 		self.name = [inCoder decodeObjectForKey:@"name"];
+		self.parserClassName = [inCoder decodeObjectForKey:@"parserClassName"];
+		self.parserMediaType = [inCoder decodeObjectForKey:@"parserMediaType"];
+		self.parserMediaSource = [inCoder decodeObjectForKey:@"parserMediaSource"];
 		self.preliminaryMetadata = [inCoder decodeObjectForKey:@"preliminaryMetadata"];
 		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
 		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
@@ -155,6 +232,9 @@
 {
 	[inCoder encodeObject:self.location forKey:@"location"];
 	[inCoder encodeObject:self.name forKey:@"name"];
+	[inCoder encodeObject:self.parserClassName forKey:@"parserClassName"];
+	[inCoder encodeObject:self.parserMediaSource forKey:@"parserMediaSource"];
+	[inCoder encodeObject:self.parserMediaType forKey:@"parserMediaType"];
 	[inCoder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
 	[inCoder encodeObject:self.metadata forKey:@"metadata"];
 	[inCoder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
@@ -174,7 +254,10 @@
 	copy.metadata = self.metadata;
 	copy.metadataDescription = self.metadataDescription;
 	copy.parser = self.parser;
-	copy.index = self.index;
+    copy.parserClassName = self.parserClassName;
+	copy.parserMediaType = self.parserMediaType;
+	copy.parserMediaSource = self.parserMediaSource;
+    copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
 	copy.shouldDisableTitle = self.shouldDisableTitle;
 
@@ -196,9 +279,14 @@
 	IMBRelease(_metadata);
 	IMBRelease(_metadataDescription);
 	IMBRelease(_parser);
+	IMBRelease(_parserClassName);
+	IMBRelease(_parserMediaType);
+	IMBRelease(_parserMediaSource);
 	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
+
+	if (_quickLookImage) CGImageRelease(_quickLookImage);
 
 	[super dealloc];
 }
@@ -215,12 +303,27 @@
 
 - (NSString*) imageUID
 {
-	if (_imageLocation)
+    id location = [self imageLocation];
+    if (!location) location = [self location];
+    
+	if ([location isKindOfClass:[NSString class]])
 	{
-		return _imageLocation;
+		return location;
 	}
-		
-	return _location;
+	else if ([location isKindOfClass:[NSURL class]])
+	{
+		return [location path];
+	}
+	else if ([location isKindOfClass:[IMBNode class]])
+    {
+        return [location identifier];
+    }
+    else if ([location isKindOfClass:[NSNumber class]])
+    {
+        return [location description];
+    }
+    
+    return nil;
 }
 
 
@@ -297,6 +400,116 @@
 
 
 #pragma mark 
+#pragma mark Generic image support through Quick Look 
+
+
+// Setter retains the CGImage...
+
+- (void) setQuickLookImage:(CGImageRef)inImage
+{
+	[self willChangeValueForKey:kIMBQuickLookImageProperty];
+	
+	CGImageRef old = _quickLookImage;
+	_quickLookImage = CGImageRetain(inImage);
+	CGImageRelease(old);
+	
+	[self didChangeValueForKey:kIMBQuickLookImageProperty];
+}
+
+
+// The getter loads Quick Look image lazily (if it's not available). Since Quicklook doesn't like
+// being called on the main thread, we'll defer this to a background operation.
+// Please note that the unloadThumbnail method gets rid of the Quick Look image again
+// as the IMBObjectFifoCache clears out the oldest items...
+
+- (CGImageRef) quickLookImage
+{	
+	if (_quickLookImage == NULL)
+	{
+		if (_isLoadingQuickLookImage == NO)
+		{
+			_isLoadingQuickLookImage = YES;
+			
+			if ([NSThread isMainThread])
+			{
+				NSInvocationOperation* op = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(renderQuickLookImage) object:nil];
+				[[IMBOperationQueue sharedQueue] addOperation:op];
+				[op release];
+			}
+			else
+			{
+				self.quickLookImage = [self _renderQuickLookImage];
+			}
+		}	
+	}
+	
+	return _quickLookImage;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Render the image on a background thread and set the result back on the main thread...
+
+- (void) renderQuickLookImage
+{
+	CGImageRef image = [self _renderQuickLookImage];
+	[self performSelectorOnMainThread:@selector(_setQuickLookImage:) withObject:(id)image waitUntilDone:NO];
+}
+
+
+// Use Quick Look to render an image. Please note that Quicklook wants to be called on a background thread.
+// If Quicklook fail to generate an image (either not supported or corrupt file), then we will simply try to get
+// an icon image from the Finder as a fallback...
+
+- (CGImageRef) _renderQuickLookImage
+{	
+	NSString* path = nil;
+	NSURL* url = nil;
+	
+	if ([_location isKindOfClass:[NSString class]])
+	{
+		path = (NSString*)_location;
+		url = [NSURL fileURLWithPath:path];
+	}
+	else if ([_location isKindOfClass:[NSURL class]])
+	{
+		url = (NSURL*)_location;
+		path = [url path];
+	}
+	
+	CGImageRef image = [url imb_quicklookCGImage];
+	
+	if (image == NULL)
+	{
+		NSLog(@"%s Failed to create Quick Look image for file %@. Using generic file icon instead...",__FUNCTION__,self.name);
+		
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:[path pathExtension]];
+		[icon setSize:NSMakeSize(kIMBMaxThumbnailSize,kIMBMaxThumbnailSize)];
+		NSBitmapImageRep* rep = [icon imb_bitmap];
+		image = [rep CGImage];
+		
+		_shouldDrawAdornments = NO;
+	}
+	
+	return image;
+}
+
+
+// The setter is called on the main thread, so that KVO works correctly...
+
+- (void) _setQuickLookImage:(id)inImage
+{
+	self.quickLookImage = (CGImageRef)inImage;
+	_isLoadingQuickLookImage = NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 #pragma mark Asynchronous Loading
 
 
@@ -336,7 +549,7 @@
 	id old = _imageRepresentation;
 	_imageRepresentation = [inImageRepresentation retain];
 	[old release];
-	
+
 	self.imageVersion = _imageVersion + 1;
 	self.isLoadingThumbnail = NO;
 	
@@ -375,6 +588,7 @@
 	if ([sTypesThatCanBeUnloaded containsObject:self.imageRepresentationType])
 	{
 		self.imageRepresentation = nil;
+		self.quickLookImage = NULL;
 		unloaded = YES;
 	}
 	return unloaded;
@@ -592,6 +806,38 @@
 		}
 	}
 	return result;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This identifier string (just like IMBNode.identifier) can be used to uniquely identify an IMBObject. This can
+// be of use to host app developers who needs to cache usage info of media files in some dictionary when implementing
+// the badging delegate API. Simply using the path of a local file may not be reliable in those cases where a file
+// originated from a remote source and first had to be downloaded. For this reason using the identifier as a key
+// is more reliable...
+
+ 
+- (NSString*) identifier
+{
+	NSString* parserName = self.parserClassName;
+	NSString* location = nil;
+	
+	if ([self.location isKindOfClass:[NSString class]])
+	{
+		location = (NSString*)self.location;
+	}
+	else if ([self.location isKindOfClass:[NSURL class]])
+	{
+		location = [(NSURL*)self.location path];
+	}
+	else
+	{
+		location = [self.location description];
+	}
+
+	return [NSString stringWithFormat:@"%@/%@",parserName,location];
 }
 
 

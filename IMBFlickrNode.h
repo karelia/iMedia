@@ -67,8 +67,6 @@ extern NSString* const IMBFlickrNodeProperty_Query;
 extern NSString* const IMBFlickrNodeProperty_SortOrder;
 extern NSString* const IMBFlickrNodeProperty_UUID;
 
-//extern NSString* const IMBFlickrNodeProperty_Title;
-
 typedef enum {
 	IMBFlickrNodeMethod_TextSearch = 0,
 	IMBFlickrNodeMethod_TagSearch,
@@ -103,9 +101,10 @@ typedef enum {
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBFlickrNode: IMBNode <OFFlickrAPIRequestDelegate> {
+@interface IMBFlickrNode: IMBNode {
 	@private
 	BOOL _customNode;
+	NSDictionary* _flickrResponse;
 	IMBFlickrNodeLicense _license;
 	IMBFlickrNodeMethod _method;
 	NSInteger _page;
@@ -124,23 +123,25 @@ typedef enum {
 + (IMBFlickrNode*) flickrNodeForRoot: (IMBFlickrNode*) root
 							  parser: (IMBParser*) parser;
 
-+ (IMBFlickrNode*) flickrNodeFromDict: (NSDictionary*) dict 
-							 rootNode: (IMBFlickrNode*) root
-							   parser: (IMBParser*) parser;
++ (IMBFlickrNode*) flickrNodeFromDictionary: (NSDictionary*) dictionary 
+								   rootNode: (IMBFlickrNode*) root
+									 parser: (IMBParser*) parser;
 
 + (void) sendSelectNodeNotificationForDict:(NSDictionary*) dict;
 
 
-#pragma mark Flickr Handling
+#pragma mark Flickr Response Handling
 
-- (void) clearResponse;
-- (BOOL) hasRequest;
-- (BOOL) hasResponse;
-- (void) processResponse;
-- (void) startLoadRequestWithContext: (OFFlickrAPIContext*) context;
-- (void) startLoadMoreRequestWithContext: (OFFlickrAPIContext*) context;
+///	The iMB Flickr parser saves a response of a Flickr request here.
+@property (copy) NSDictionary* flickrResponse;
+@property (readonly) BOOL hasFlickrResponse;
 
-	
+- (void) clearFlickrResponse;
+
+///	Processes the 'flickrResponse' dictionary to fill the node with actual images.
+- (void) processResponseForContext: (OFFlickrAPIContext*) context;
+
+
 #pragma mark Properties
 
 @property (assign, getter=isCustomNode) BOOL customNode;
@@ -150,10 +151,13 @@ typedef enum {
 @property (copy) NSString* query;
 @property (assign) IMBFlickrNodeSortOrder sortOrder;
 
+
 #pragma mark Utilities
 
+- (NSDictionary*) argumentsForFlickrCall;
 + (NSString *)base58EncodedValue:(long long)num;
 + (NSString *)descriptionOfLicense:(int)aLicenseNumber;
-
++ (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
+- (void) readPropertiesFromDictionary: (NSDictionary*) dictionary;
 
 @end

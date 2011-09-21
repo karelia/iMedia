@@ -79,10 +79,7 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// Declare internal methods of superclass to shut up the compiler...
-
-@interface IKImageBrowserView ()
+@interface IKImageBrowserView (NotPublicSoThisMightBeAProblemForTheMAS)
 - (NSImage*) draggedImage;
 @end
 
@@ -199,14 +196,17 @@ enum IMBMouseOperation
 
 - (void) awakeFromNib
 {
-	_cellClass = [self _cellClass];
-	
-	if ([self respondsToSelector:@selector(setCellClass:)])
+	if (IMBRunningOnSnowLeopardOrNewer())	//  We don't allow for special cell in Leopard.
 	{
-		[self performSelector:@selector(setCellClass:) withObject:_cellClass];
+		_cellClass = [self _cellClass];
+		if ([self respondsToSelector:@selector(setCellClass:)])
+		{
+			[self performSelector:@selector(setCellClass:) withObject:_cellClass];
+		}
 	}
 
 	[self setConstrainsToOriginalSize:NO];
+	
 //	[self setValue:attributes forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];	
 //	[self setCellSize:NSMakeSize(44.0,22.0)];
 //	[self setIntercellSpacing:NSMakeSize(8.0,12.0)];
@@ -220,9 +220,13 @@ enum IMBMouseOperation
 
 // This method is for 10.6 only. Create and return a cell. Please note that we must not autorelease here!
 
-- (IKImageBrowserCell*) newCellForRepresentedItem:(id)inCell
+- (IKImageBrowserCell*) newCellForRepresentedItem:(id)inItem
 {
-	return [[_cellClass alloc] init];
+	if (IMBRunningOnSnowLeopardOrNewer())		//  We don't allow for special cell in Leopard.
+	{
+		return [[_cellClass alloc] init];
+	}
+	return [super newCellForRepresentedItem:inItem];
 }
 
 
@@ -390,6 +394,110 @@ enum IMBMouseOperation
 	self.clickedObject = nil;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Drawing 
+
+// override draw rect and force the background layer to redraw if the view did resize or did scroll 
+
+- (void) drawRect:(NSRect) rect
+{
+	if (IMBRunningOnSnowLeopardOrNewer())
+	{
+		//retrieve the visible area
+		NSRect visibleRect = [self visibleRect];
+		
+		//compare with the visible rect at the previous frame
+		if(!NSEqualRects(visibleRect, _lastVisibleRect)){
+			//we did scroll or resize, redraw the background
+			[[self backgroundLayer] setNeedsDisplay];
+			
+			//update last visible rect
+			_lastVisibleRect = visibleRect;
+		}
+	}
+	
+	[super drawRect:rect];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Skimming 
+
+// Add tracking area of size of my own bounds (make this view skimmable)
+
+- (void) updateTrackingArea
+{
+	NSTrackingAreaOptions trackingOptions = NSTrackingMouseEnteredAndExited |
+	NSTrackingMouseMoved |
+	NSTrackingActiveInActiveApp;
+	
+	NSTrackingArea* trackingArea = [[[NSTrackingArea alloc] initWithRect:[self bounds]
+																 options: trackingOptions
+																   owner:[self delegate]
+																userInfo:nil] autorelease];
+	if (trackingArea)
+	{
+		if (_trackingArea)
+		{
+			[self removeTrackingArea:_trackingArea];
+		}
+		_trackingArea = trackingArea;
+		[self addTrackingArea:trackingArea];
+		
+		//NSLog(@"Created new tracking area for %@", self);	
+	}
+}
+
+// Skimming is enabled by simply creating a suitable tracking area for the view
+
+- (void) enableSkimming
+{
+	[self updateTrackingArea];
+}
+
+
+// Keep mouse move tracking area in sync with view bounds.
+// (Callback from Cocoa whenever view bounds change
+// (will be called regardless whether this instance has any tracking areas or not))
+
+- (void) updateTrackingAreas
+{
+	if (_trackingArea && !NSEqualRects([_trackingArea rect], [self bounds]))
+	{
+		[self updateTrackingArea];
+	}	
+}
+
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+
+- (NSUInteger) indexOfCellAtPoint:(NSPoint)inPoint
+{	
+	NSIndexSet* visibleItemIndexes = [self visibleItemIndexes];	// >= 10.6
+	IKImageBrowserCell* cell = nil;
+	
+	NSUInteger index = [visibleItemIndexes firstIndex];
+
+	while (index != NSNotFound)
+	{
+		cell = [self cellForItemAtIndex:index];	// >= 10.6
+		
+		if (NSPointInRect(inPoint, cell.imageContainerFrame))
+		{
+			return index;
+		}
+		index = [visibleItemIndexes indexGreaterThanIndex:index];
+	}
+	return NSNotFound;
+}
+
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 

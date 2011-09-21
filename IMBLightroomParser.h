@@ -67,6 +67,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+typedef enum { 
+	kIMBLightroomNodeTypeUnspecified = 0,
+	IMBLightroomNodeTypeFolder,
+	IMBLightroomNodeTypeCollection
+} 
+IMBLightroomNodeType;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 @interface IMBLightroomObject : IMBObject
 {
 	NSString* _absolutePyramidPath;
@@ -112,6 +122,12 @@
 - (NSString*) rootNodeIdentifier;
 - (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
 - (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
+
+- (NSDictionary*) attributesWithRootFolder:(NSNumber*)inRootFolder
+								   idLocal:(NSNumber*)inIdLocal
+								  rootPath:(NSString*)inRootPath
+							  pathFromRoot:(NSString*)inPathFromRoot
+                                  nodeType:(IMBLightroomNodeType)inNodeType;
 
 - (NSImage*) largeFolderIcon;
 

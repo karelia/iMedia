@@ -55,6 +55,20 @@
 #import "IMBApertureAudioParser.h"
 #import "IMBParserController.h"
 #import "IMBObject.h"
+#import "NSDictionary+iMedia.h"
+#import "NSURL+iMedia.h"
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBApertureAudioParser ()
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+
+@end
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,24 +125,39 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-//	IMBEnhancedObject* object = (IMBEnhancedObject*)inObject;
-//	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-//	[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path checkSpotlightComments:NO]];
-//	NSString* description = [self metadataDescriptionForMetadata:metadata];
-//
-//	if ([NSThread isMainThread])
-//	{
-//		inObject.metadata = metadata;
-//		inObject.metadataDescription = description;
-//	}
-//	else
-//	{
-//		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-//		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-//		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-//	}
+	NSURL* audioURL = [inObject URL];
+	
+	if (audioURL == nil) {
+		return;
+	}
+	
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	
+	[metadata setObject:[inObject path] forKey:@"path"];
+	[metadata addEntriesFromDictionary:[NSURL imb_metadataFromAudioAtURL:audioURL]];
+	
+	NSString* description = [self metadataDescriptionForMetadata:metadata];
+	
+	if ([NSThread isMainThread])
+	{
+		inObject.metadata = metadata;
+		inObject.metadataDescription = description;
+	}
+	else
+	{
+		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+	}
 }
 
+
+// Convert metadata into human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return [NSDictionary imb_metadataDescriptionForAudioMetadata:inMetadata];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -60,7 +60,6 @@
 #import "IMBFlickrNode.h"
 #import "IMBFlickrObject.h"
 #import "IMBFlickrParser.h"
-//#import "IMBFlickrQueryEditor.h"
 #import "IMBFlickrHeaderViewController.h"
 #import "IMBIconCache.h"
 #import "IMBLibraryController.h"
@@ -74,10 +73,18 @@
 #import "IMBNodeObject.h"
 #import "IMBSmartFolderNodeObject.h"
 
+
+
+//#define VERBOSE
+
 //----------------------------------------------------------------------------------------------------------------------
 
 @interface IMBFlickrParser ()
-@property (retain) IMBFlickrQueryEditor* editor;
+//	Flickr Request Handling:
+- (void) cancelAllPendingFlickrRequests;
+- (BOOL) hasFlickrRequestForNode: (IMBFlickrNode*) node;
+- (void) startLoadRequestForFlickrNode: (IMBFlickrNode*) node;
+- (void) startLoadMoreRequestForFlickrNode: (IMBFlickrNode*) node;
 //	Query Persistence:
 - (NSArray*) instantiateCustomQueriesWithRoot: (IMBFlickrNode*) root;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
@@ -98,17 +105,20 @@
 
 - (void) dealloc {
 	_delegate = nil;
+	
+	[self cancelAllPendingFlickrRequests];
+	
 	IMBRelease (_customQueries);
-	IMBRelease (_editor);
 	IMBRelease (_flickrAPIKey);
 	IMBRelease (_flickrContext);
 	IMBRelease (_flickrSharedSecret);
+	IMBRelease (_flickrRequests);	
 	IMBRelease (_loadMoreButton);
 	[super dealloc];
 }
 
-- (BOOL)canBeUsed;
-{
+
+- (BOOL) canBeUsed {
 	BOOL result = (self.flickrAPIKey && ![self.flickrAPIKey isEqualToString:@""]
 			&& self.flickrSharedSecret && ![self.flickrSharedSecret isEqualToString:@""]);
 	// If these aren't available (provided by app delegate parserController:didLoadParser:forMediaType:)
@@ -125,8 +135,7 @@
 }
 
 
-- (IBAction) loadMoreImages: (id) sender {
-	
+- (IBAction) loadMoreImages: (id) sender {	
 	NSString* nodeIdentifier = nil;
 	if ([sender isKindOfClass:[IMBLoadMoreObject class]]) {
 		nodeIdentifier = [sender nodeIdentifier];
@@ -142,8 +151,7 @@
 	if (nodeIdentifier) {
 		IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
 		IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
-		
-		[node startLoadMoreRequestWithContext:_flickrContext];
+		[self startLoadMoreRequestForFlickrNode:node];
 	} else {
 		NSLog (@"Can't handle this kind of node.");
 	}
@@ -163,6 +171,7 @@
 	}
 }
 
+
 - (IBAction) copyFlickrPageURL: (id) sender {
 	if (![sender isKindOfClass:[NSMenuItem class]]) return;
 	
@@ -180,6 +189,7 @@
 		NSLog (@"Can't handle this kind of object.");
 	}
 }
+
 
 - (IBAction) copyAttribution: (id) sender {
 	if (![sender isKindOfClass:[NSMenuItem class]]) return;
@@ -222,6 +232,130 @@
 
 
 #pragma mark 
+#pragma mark Flickr Request Handling
+
+- (void) cancelAllPendingFlickrRequests {
+	for (OFFlickrAPIRequest* request in _flickrRequests.allValues) {
+		[request cancel];
+	}
+}
+
+
+- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
+  didCompleteWithResponse: (NSDictionary*) inResponseDictionary {
+	
+	//	get the node we associated with the request in flickrRequestWithContext: ...
+	NSString* nodeIdentifier = inRequest.sessionInfo;
+	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
+	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
+	
+	//	if the node does not exist any more, there is not much to do...
+	if (!node) return;
+		
+	#ifdef VERBOSE
+		NSLog (@"Flickr request completed for node '%@'.", nodeIdentifier);
+	#endif
+	
+	//	save Flickr response in our iMB node for later population of the browser...
+	[node setFlickrResponse:(inResponseDictionary) ? inResponseDictionary : [NSDictionary dictionary]];
+	
+	//	force reloading of the node holding the Flickr images...
+	[libController reloadNode:node];	
+}
+
+
+- (void) flickrAPIRequest: (OFFlickrAPIRequest*) inRequest 
+		 didFailWithError: (NSError*) inError {
+	
+	NSLog (@"flickrAPIRequest:didFailWithError: %@", inError);	
+	//	TODO: Error Handling
+}
+
+
++ (NSString*) flickrMethodForMethodCode: (NSInteger) code {
+	if (code == IMBFlickrNodeMethod_TagSearch || code == IMBFlickrNodeMethod_TextSearch) {
+		return @"flickr.photos.search";
+	} else if (code == IMBFlickrNodeMethod_Recent) {
+		return @"flickr.photos.getRecent";
+	} else if (code == IMBFlickrNodeMethod_MostInteresting) {
+		return @"flickr.interestingness.getList";
+	} else if (code == IMBFlickrNodeMethod_GetInfo) {
+		return @"flickr.photos.getInfo";
+	}
+	NSLog (@"Can't find Flickr method for method code.");
+	return nil;
+}
+
+
+- (OFFlickrAPIRequest*) flickrRequestWithNode: (IMBFlickrNode*) node {
+	
+	//	create our dictionary of flickr request lazily... 
+	if (_flickrRequests == nil) {
+		_flickrRequests = [[NSMutableDictionary alloc] init]; 
+	}
+	
+	OFFlickrAPIRequest* request = [_flickrRequests objectForKey:node.identifier];
+	if (!request) {
+		//	create a Flickr request for the given iMB node...
+		request = [[OFFlickrAPIRequest alloc] initWithAPIContext:_flickrContext];
+		[_flickrRequests setObject:request forKey:node.identifier];
+		request.requestTimeoutInterval = 60.0f;
+		//		[request setShouldWaitUntilDone:YES];
+		[request release];
+		
+		//	we save the iMB node in the Flickr request for use in
+		//	flickrAPIRequest:didCompleteWithResponse: ...
+		request.sessionInfo = node.identifier;
+	}
+	return request;
+}
+
+
+- (BOOL) hasFlickrRequestForNode: (IMBFlickrNode*) node {
+	if (!node) return NO;
+	OFFlickrAPIRequest* request = [_flickrRequests objectForKey:node.identifier];
+	return request != nil;
+}
+
+
+- (void) startLoadRequestForFlickrNode: (IMBFlickrNode*) node {
+	[self performSelectorOnMainThread:@selector(startLoadRequestForFlickrNode_onMainThread:) withObject:node waitUntilDone:NO];	
+}
+
+
+- (void) startLoadMoreRequestForFlickrNode: (IMBFlickrNode*) node {
+	node.page = node.page + 1;
+	[self performSelectorOnMainThread:@selector(startLoadRequestForFlickrNode_onMainThread:) withObject:node waitUntilDone:NO];	
+}
+
+
+- (void) startLoadRequestForFlickrNode_onMainThread: (IMBFlickrNode*) node {
+	if (!node) return;
+	
+	OFFlickrAPIRequest* request = [self flickrRequestWithNode:node];
+	if (![request isRunning]) {			
+		[request setDelegate:self];	
+		
+		//	Keep the 'populateNode:' loop quiet until we got our data. Also this will
+		//	ensure that the parser is not called again and again to populate the node.
+		if (node.objects == nil) {
+			node.subNodes = [NSArray array];
+			node.objects = [NSArray array];
+		}
+		
+		//	compose and start Flickr request...
+		NSString* method = [self.class flickrMethodForMethodCode:node.method];
+		NSDictionary* arguments = [node argumentsForFlickrCall];
+		[request callAPIMethodWithGET:method arguments:arguments];
+		
+#ifdef VERBOSE
+		NSLog (@"Start Flickr request for node '%@' method: '%@' and query: '%@'.", node.identifier, method, node.query);
+#endif
+	}	
+}
+
+
+#pragma mark 
 #pragma mark Parser Methods
 
 ///	Create an empty "Flickr" root node.
@@ -247,21 +381,9 @@
 	rootNode.subNodes = nil;
 	rootNode.objects = nil;
 
-	//	TODO: ???
 	rootNode.watcherType = kIMBWatcherTypeFirstCustom;
 	rootNode.watchedPath = (NSString*) rootNode.mediaSource;
-	
-	// The root node has a custom view that we are loading from a nib file...
-//	self.editor = [IMBFlickrQueryEditor flickrQueryEditorForParser:self];
-//	rootNode.customObjectView = self.editor.view;
-
-	IMBFlickrHeaderViewController* viewController = [IMBFlickrHeaderViewController headerViewControllerWithParser:self owningNode:rootNode];
-	viewController.queryAction = @selector(addQuery:);
-	viewController.buttonAction = @selector(addQuery:);
-	viewController.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.add",nil,IMBBundle(),@"Add",@"Button title in Flickr Options");
-
-	rootNode.customHeaderViewController = viewController;
-	
+		
 	return rootNode;
 }
 
@@ -284,14 +406,8 @@
 	IMBFlickrNode* updatedNode = [[inOldNode copy] autorelease];
 	
 	// If the old node was populated, then also populate the new node...
-	
 	IMBFlickrNode* inOldFlickrNode = (IMBFlickrNode*) inOldNode;
-//	if ([inOldFlickrNode hasRequest] || inOldFlickrNode.subNodes.count > 0 || inOldFlickrNode.objects.count > 0) {
-//		[self populateNode:updatedNode options:inOptions error:&error];
-//	}
-	
-	if ([inOldFlickrNode hasRequest] || inOldNode.isPopulated)
-	{
+	if ([self hasFlickrRequestForNode:inOldFlickrNode] || inOldNode.isPopulated) {
 		[self populateNewNode:updatedNode likeOldNode:inOldNode options:inOptions];
 	}
 
@@ -307,7 +423,11 @@
 	NSError* error = nil;
 	IMBFlickrNode* inFlickrNode = (IMBFlickrNode*) inNode;
 	
-	if (!inFlickrNode.mediaSource) {
+	#ifdef VERBOSE
+		NSLog (@"Populate node '%@', query '%@'", inFlickrNode.identifier, inFlickrNode.query);
+	#endif
+	
+	if (inFlickrNode.isTopLevelNode) {
 		//	populate root node...
 		NSArray* standardNodes = [NSArray arrayWithObjects:
 								  [IMBFlickrNode flickrNodeForRecentPhotosForRoot:inFlickrNode parser:self],
@@ -316,11 +436,10 @@
 		
 		// Put the queries into the objects, so that selecting top-level node will show queries as smart folders
 		NSUInteger index = 0;
-		NSMutableArray *objects = [NSMutableArray array];
-		for (IMBFlickrNode *node in inFlickrNode.subNodes)
-		{
+		NSMutableArray* objects = [NSMutableArray array];
+		for (IMBFlickrNode* node in inFlickrNode.subNodes) {
 			IMBSmartFolderNodeObject* object = [[IMBSmartFolderNodeObject alloc] init];
-			object.location = (id)node;
+			object.representedNodeIdentifier = node.identifier;
 			object.name = node.name;
 			object.metadata = nil;
 			object.parser = self;
@@ -337,18 +456,12 @@
 		inFlickrNode.objects = objects;
 	} else {
 		//	populate nodes with Flickr contents...
-		if ([inFlickrNode hasResponse]) {
-			[inFlickrNode processResponse];
-			[inFlickrNode clearResponse];
-		} else {
-			//	keep the 'populateNode:' loop quiet until we got our data...
-			if (inFlickrNode.objects == nil) {
-				inFlickrNode.subNodes = [NSArray array];
-				inFlickrNode.objects = [NSArray array];
-			}
-			
+		if ([inFlickrNode hasFlickrResponse]) {
+			[inFlickrNode processResponseForContext:_flickrContext];
+			[inFlickrNode clearFlickrResponse];
+		} else {			
 			//	the network access needs to be started on the main thread...
-			[inFlickrNode startLoadRequestWithContext:_flickrContext];
+			[self startLoadRequestForFlickrNode:inFlickrNode];
 		}
 	}
 		
@@ -479,13 +592,13 @@
 }
 
 
-// For Flickr we need a remote promise that downloads the files off the internet
+/// For Flickr we need a remote promise that downloads the files off the internet
 - (IMBObjectsPromise*) objectPromiseWithObjects: (NSArray*) inObjects {
 	return [[[IMBRemoteObjectsPromise alloc] initWithIMBObjects:inObjects] autorelease];
 }
 
-// Convert metadata into human readable string...
 
+/// Convert metadata into human readable string.
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
 	NSDictionary* metadata = inObject.preliminaryMetadata;
@@ -503,6 +616,7 @@
 		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
 	}
 }
+
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
@@ -558,12 +672,43 @@
 	return description;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode
+{
+	IMBFlickrHeaderViewController* controller = nil;
+	
+	// The root node has a custom view that we are loading from a nib file...
+
+	if ([inNode.identifier isEqualToString:[self identifierForPath:@"/"]])
+	{
+		controller = [IMBFlickrHeaderViewController headerViewControllerWithParser:self forNode:(IMBFlickrNode*)inNode];
+		controller.queryAction = @selector(addQuery:);
+		controller.buttonAction = @selector(addQuery:);
+		controller.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.add",nil,IMBBundle(),@"Add",@"Button title in Flickr Options");
+	}
+	else
+	{
+		controller = [IMBFlickrHeaderViewController headerViewControllerWithParser:self forNode:(IMBFlickrNode*)inNode];
+		controller.queryAction = @selector(editQuery:);
+		controller.buttonAction = @selector(removeQuery:);
+		controller.buttonTitle = NSLocalizedStringWithDefaultValue(@"IMBFlickrParser.button.remove",nil,IMBBundle(),@"Remove",@"Button title in Flickr Options");
+	}
+
+	return controller;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 #pragma mark Properties
 
 @synthesize customQueries = _customQueries;
 @synthesize delegate = _delegate;
-@synthesize editor = _editor;
 @synthesize flickrAPIKey = _flickrAPIKey;
 @synthesize flickrSharedSecret = _flickrSharedSecret;
 @synthesize desiredSize = _desiredSize;
@@ -571,6 +716,13 @@
 
 - (IMBLoadMoreObject*) loadMoreButton {
 	return _loadMoreButton;
+}
+
+
+- (IMBFlickrNode*) flickrRootNode {
+	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
+	IMBFlickrNode* root = (IMBFlickrNode*) [libController nodeWithIdentifier:[self identifierForPath:@"/"]];
+	return root;
 }
 
 
@@ -585,35 +737,52 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	
 	//	create nodes from settings...
 	for (NSDictionary* dict in self.customQueries) {
-		IMBFlickrNode* node = [IMBFlickrNode flickrNodeFromDict:dict rootNode:root parser:self];
+		//	try to copy all existing nodes...
+		NSString* identifier = [IMBFlickrNode identifierWithQueryParams:dict];
+		IMBFlickrNode* node = (IMBFlickrNode*)[root subNodeWithIdentifier:identifier];
+		
+		//	if node does not exists yet (add operation) create a new one...
+		if (!node) {
+			node = [IMBFlickrNode flickrNodeFromDictionary:dict rootNode:root parser:self];
+		} 
+		
 		if (node) {
 			[customNodes addObject:node];
 		}
 	}
-#if 0		
-	//	fallback to defaults, if no user nodes available...
-	if (customNodes.count == 0) {
-		NSLog (@"No useful user nodes available. Fallback to defaults.");
-		nodes = nil;
-		goto setupDefaults;
-	}
-#endif
 	
 	return customNodes;	
 }
 
 
-- (void) addCustomQuery:(NSDictionary*)inQueryParams {
-	if (inQueryParams){
-		[self.customQueries addObject:inQueryParams];
-	}
+- (void) addCustomQuery: (NSDictionary*) inQueryParams {
+	if (!inQueryParams) return;
+	[self.customQueries addObject:inQueryParams];
 }
 
 
-- (void) removeCustomQuery:(NSDictionary*)inQueryParams {
-	if (inQueryParams){
-		[self.customQueries removeObject:inQueryParams];
+- (void) removeCustomQuery: (NSDictionary*) inQueryParams {
+	if (!inQueryParams) return;
+
+	//	1) Remove the custom query from our preferences.
+	NSString* queryIdentifier = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
+	
+	NSDictionary* dictToBeRemoved = nil;
+	for (NSDictionary* dict in _customQueries) {
+		NSString* dictIdentifier = [IMBFlickrNode identifierWithQueryParams:dict];
+		if (dictIdentifier && [queryIdentifier hasSuffix:dictIdentifier]) {
+			dictToBeRemoved = dict;
+		}
 	}
+	
+	if (dictToBeRemoved) {
+		[_customQueries removeObject:dictToBeRemoved];			
+	}
+	
+	
+	//	2) Reload root node to show changes.
+	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
+	[libController reloadNode:self.flickrRootNode];	
 }
 
 
@@ -636,9 +805,32 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 
 - (void) reloadCustomQueries {
 	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
-	IMBFlickrNode* root = (IMBFlickrNode*) [libController nodeWithIdentifier:[self identifierForPath:@"/"]];
-	[libController reloadNode:root];	
+	[libController reloadNode:self.flickrRootNode];
 }
+	
+	
+- (void) reloadCustomQuery: (NSDictionary*) inQueryParams {
+	if (!inQueryParams) return;
+	NSString* nodeIdentifier = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
+	if (!nodeIdentifier) return;
+
+	IMBLibraryController* libController = [IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
+	
+	//	if the node does not exist any more, there is not much to do...
+	IMBFlickrNode* node = (IMBFlickrNode*) [libController nodeWithIdentifier:nodeIdentifier];
+	if (!node) return;
+	
+	//	update node with new query data...
+	[node readPropertiesFromDictionary:inQueryParams];
+	
+	//	clean existing results...
+	node.subNodes = nil;
+	node.objects = nil;
+	
+	//	force reloading of the node holding the Flickr images...
+	[libController reloadNode:node];	
+}
+
 
 
 - (void) saveCustomQueries {
@@ -647,5 +839,20 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	[IMBConfig setPrefs:prefs forClass:[self class]];
 }
 
+
+- (void) updateCustomQuery: (NSDictionary*) inQueryParams {
+	if (!inQueryParams) return;
+
+	NSString* queryIdentifier = [inQueryParams objectForKey:IMBFlickrNodeProperty_UUID];
+	NSUInteger count = _customQueries.count;
+	for (NSUInteger index = 0; index < count; index++) {
+		NSDictionary* dict = [_customQueries objectAtIndex:index];
+		NSString* dictIdentifier = [IMBFlickrNode identifierWithQueryParams:dict];
+		if (dictIdentifier && [queryIdentifier hasSuffix:dictIdentifier]) {
+			[_customQueries replaceObjectAtIndex:index withObject:inQueryParams];
+			break;
+		}
+	}
+}
 
 @end

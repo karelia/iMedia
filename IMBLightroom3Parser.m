@@ -205,13 +205,17 @@
 	foldersNode.name = foldersName;
 	foldersNode.icon = [self folderIcon];
 	foldersNode.parser = self;
-	//	foldersNode.attributes = [self attributesWithId:id_local path:nil];
+	foldersNode.attributes = [self attributesWithRootFolder:id_local
+                                                    idLocal:id_local
+                                                   rootPath:nil
+                                               pathFromRoot:nil
+                                                   nodeType:IMBLightroomNodeTypeFolder];
 	foldersNode.leaf = NO;
 	
 	[subNodes addObject:foldersNode];
 
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
-	foldersObject.location = (id)foldersNode;
+	foldersObject.representedNodeIdentifier = foldersNode.identifier;
 	foldersObject.name = foldersNode.name;
 	foldersObject.metadata = nil;
 	foldersObject.parser = self;
@@ -232,7 +236,7 @@
 																  @"Name of Collections node in IMBLightroomParser");
 	
 	IMBNode* collectionsNode = [[[IMBNode alloc] init] autorelease];
-	collectionsNode.identifier = [self identifierWithCollectionId:0];
+	collectionsNode.identifier = [self identifierWithCollectionId:[NSNumber numberWithLong:0]];
 	collectionsNode.name = collectionsName;
 	collectionsNode.icon = [self groupIcon];
 	collectionsNode.parser = self;
@@ -241,7 +245,7 @@
 	[subNodes addObject:collectionsNode];
 	
 	IMBNodeObject* collectionsObject = [[[IMBNodeObject alloc] init] autorelease];
-	collectionsObject.location = (id)collectionsNode;
+	collectionsObject.representedNodeIdentifier = collectionsNode.identifier;
 	collectionsObject.name = collectionsNode.name;
 	collectionsObject.metadata = nil;
 	collectionsObject.parser = self;
@@ -284,7 +288,7 @@
 {
 	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name"
 						@" FROM AgLibraryCollection alc"
-						@" WHERE creationId = 'com.adobe.ag.library.collection'"
+						@" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group') "
 						@" AND alc.parent IS NULL";
 	
 	return query;
@@ -295,7 +299,7 @@
 {
 	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name"
 						@" FROM AgLibraryCollection alc"
-						@" WHERE creationId = 'com.adobe.ag.library.collection'"
+                        @" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group') "
 						@" AND alc.parent = ?";
 	
 	return query;
@@ -472,8 +476,12 @@
 			headerLengthValue = NSSwapBigShortToHost(headerLengthValue);
 			dataLengthValue = NSSwapBigLongLongToHost(dataLengthValue);
 
-			NSData* jpegData = [data subdataWithRange:NSMakeRange(headerLengthValue + index, dataLengthValue)];
-
+			NSData* jpegData = nil;
+            
+            if ((index + headerLengthValue + dataLengthValue) < [data length]) {
+                [data subdataWithRange:NSMakeRange(index + headerLengthValue, dataLengthValue)];
+            }
+            
 			return jpegData;
 		}
 	}
@@ -520,12 +528,12 @@
 	if ([fileManager fileExistsAtPath:readOnlyDatabasePath]) {
 		error = nil;
 		NSDictionary *attributesOfCopy = [fileManager attributesOfItemAtPath:readOnlyDatabasePath error:&error];
-		if (error) (@"Unable to fetch attributes from %@: %@", readOnlyDatabasePath, error.localizedDescription);
+		if (error) NSLog (@"Unable to fetch attributes from %@: %@", readOnlyDatabasePath, error.localizedDescription);
 		NSDate *modDateOfCopy = [attributesOfCopy fileModificationDate];
 		
 		error = nil;
 		NSDictionary *attributesOfOrig = [fileManager attributesOfItemAtPath:databasePath error:&error];
-		if (error) (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
+		if (error) NSLog (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
 		NSDate *modDateOfOrig = [attributesOfOrig fileModificationDate];
 		
 		if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy]) {
@@ -535,7 +543,9 @@
 	
 	if (needToCopyFile) {
 		(void) [fileManager removeItemAtPath:readOnlyDatabasePath error:&error];
-		BOOL copied = [fileManager copyItemAtPath:databasePath toPath:readOnlyDatabasePath error:&error];
+		BOOL copied = (nil != databasePath)
+					&& (nil != readOnlyDatabasePath)
+					&& [fileManager copyItemAtPath:databasePath toPath:readOnlyDatabasePath error:&error];
 		
 		if (!copied) {
 			NSLog (@"Unable to copy database file at %@: %@", databasePath, error.localizedDescription);

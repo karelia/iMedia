@@ -59,6 +59,7 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBIconCache.h"
+#import "NSDictionary+iMedia.h"
 #import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
@@ -720,87 +721,7 @@
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	NSMutableString* description = [NSMutableString string];
-	NSNumber* duration = [inMetadata objectForKey:@"duration"];
-	NSString* artist = [inMetadata objectForKey:@"artist"];
-	NSString* album = [inMetadata objectForKey:@"album"];
-	NSString* comment = [inMetadata objectForKey:@"Comments"];
-	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	NSString* kind = [inMetadata objectForKey:@"Kind"];
-	NSNumber* width = [inMetadata objectForKey:@"Video Width"];
-	NSNumber* height = [inMetadata objectForKey:@"Video Height"];
-	NSNumber* hasVideo = [inMetadata objectForKey:@"Has Video"];
-	
-	if (hasVideo)
-	{
-		if (kind)
-		{
-			// Note: This "kind" will be a bit different from others, since it comes from dictionary.
-			// Thus we see "QuickTime movie file" rather than "QuickTime Movie" from other parsers,
-			// which gets the UTI description from the file.
-			if (description.length > 0) [description imb_appendNewline];
-			[description appendString:kind];
-		}
-		
-		if (width != nil && height != nil)
-		{
-			if (description.length > 0) [description imb_appendNewline];
-			[description appendFormat:@"%@×%@",width,height];
-		}
-	}
-	else
-	{
-		if (artist)
-		{
-			NSString* artistLabel = NSLocalizedStringWithDefaultValue(
-				@"Artist",
-				nil,IMBBundle(),
-				@"Artist",
-				@"Artist label in metadataDescription");
-
-			if (description.length > 0) [description imb_appendNewline];
-			[description appendFormat:@"%@: %@",artistLabel,artist];
-		}
-		
-		if (album)
-		{
-			NSString* albumLabel = NSLocalizedStringWithDefaultValue(
-				@"Album",
-				nil,IMBBundle(),
-				@"Album",
-				@"Album label in metadataDescription");
-
-			if (description.length > 0) [description imb_appendNewline];
-			[description appendFormat:@"%@: %@",albumLabel,album];
-		}
-	}
-
-	if (duration)
-	{
-		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
-			@"Time",
-			nil,IMBBundle(),
-			@"Time",
-			@"Time label in metadataDescription");
-
-		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",durationLabel,durationString];
-	}
-
-	if (comment && ![comment isEqualToString:@""])
-	{
-		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
-																	@"Comment",
-																	nil,IMBBundle(),
-																	@"Comment",
-																	@"Comment label in metadataDescription");
-		
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",commentLabel,comment];
-	}
-	
-	return description;
+	return [NSDictionary imb_metadataDescriptionForAudioMetadata:inMetadata];
 }
 
 

@@ -55,6 +55,11 @@
 #import "IMBTestAppDelegate.h"
 #import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
+#import <iMedia/IMBiPhotoEventObjectViewController.h>
+#import <iMedia/IMBFaceObjectViewController.h>
+#import "IMBTestiPhotoEventBrowserCell.h"
+#import "IMBTestFaceBrowserCell.h"
+#import "IMBTestFacesBackgroundLayer.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,7 +112,7 @@
 	// NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d",   MAC_OS_X_VERSION_MIN_REQUIRED, MAC_OS_X_VERSION_MAX_ALLOWED);
 	
 	[IMBConfig setShowsGroupNodes:YES];
-	[IMBConfig setUseGlobalViewType:YES];
+	[IMBConfig setUseGlobalViewType:NO];
 	
 #if CUSTOM_USER_INTERFACE
 	
@@ -401,6 +406,90 @@
 #if LOG_POPULATE_NODE
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
 #endif
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark IMBObjectViewControllerDelegate
+
+
+- (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController
+{
+	if ([inController isKindOfClass:[IMBiPhotoEventObjectViewController class]])
+	{
+		return [IMBTestiPhotoEventBrowserCell class];
+	}
+	if ([inController isKindOfClass:[IMBFaceObjectViewController class]])
+	{
+		return [IMBTestFaceBrowserCell class];
+	}
+	return nil;
+}
+
+
+- (CALayer*) imageBrowserBackgroundLayerForController:(IMBObjectViewController*)inController
+{
+	if ([inController isKindOfClass:[IMBiPhotoEventObjectViewController class]])
+	{
+		NSRect viewFrame = [[inController iconView] frame];
+		NSRect backgroundRect = NSMakeRect(0, 0, viewFrame.size.width, viewFrame.size.height);		
+		CALayer *backgroundLayer = [CALayer layer];
+		backgroundLayer.frame = *(CGRect*) &backgroundRect;
+		
+		CGFloat fillComponents[4] = {0.2, 0.2, 0.2, 1.0};
+		
+		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+		
+		CGColorRef color = CGColorCreate(colorSpace, fillComponents);
+		[backgroundLayer setBackgroundColor:color];
+		
+		return backgroundLayer;
+	}
+	
+	if ([inController isKindOfClass:[IMBFaceObjectViewController class]])
+	{
+		IMBTestFacesBackgroundLayer* backgroundLayer = [[[IMBTestFacesBackgroundLayer alloc] init] autorelease];
+		[[inController iconView] setBackgroundLayer:backgroundLayer];
+		[backgroundLayer setOwner:[inController iconView]];
+		
+		return backgroundLayer;
+	}
+	return nil;
+}
+
+
+- (void) objectViewController:(IMBObjectViewController*)inController didLoadViews:(NSDictionary*)inViews
+{
+	// Always show icon view when on events node (and hide view selection control)
+	
+	if ([inController isKindOfClass:[IMBiPhotoEventObjectViewController class]])
+	{
+		// This makes good sense only if we are not in "use global view type" mode
+		
+		if (![IMBConfig useGlobalViewType]) {
+			// Make sure the object view controller's preferences reflect the view type we want to show
+			// (preferences will later be loaded into object)
+			
+			NSMutableDictionary* preferences = [IMBConfig prefsForClass:inController.class];
+			[preferences setObject:[NSNumber numberWithUnsignedInteger:0] forKey:@"viewType"];
+			[IMBConfig setPrefs:preferences forClass:inController.class];
+			
+			// Hide the control
+			
+			NSSegmentedControl* segmentedControl = [inViews objectForKey:IMBObjectViewControllerSegmentedControlKey];
+			[segmentedControl setHidden:YES];
+		}
+	} else if ([inController isKindOfClass:[IMBFaceObjectViewController class]])
+	{
+		IKImageBrowserView* iconView = [inController iconView];
+		
+		// Set some title attributes to mimic iPhoto titles for faces
+
+		[iconView setValue:[IMBTestFaceBrowserCell titleAttributes] forKey:IKImageBrowserCellsTitleAttributesKey];
+	}
 }
 
 

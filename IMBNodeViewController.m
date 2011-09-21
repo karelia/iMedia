@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBNodeViewController.h"
+#import "IMBObjectViewController.h"
 #import "IMBLibraryController.h"
 #import "IMBNodeTreeController.h"
 #import "IMBOutlineView.h"
@@ -106,6 +107,10 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (CGFloat) minimumLibraryViewHeight;
 - (CGFloat) minimumObjectViewHeight;
 - (NSSize) minimumViewSize;
+
+- (NSViewController*) _customHeaderViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) _customObjectViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) _customFooterViewControllerForNode:(IMBNode*)inNode;
 
 @end
 
@@ -265,6 +270,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	IMBRelease(_expandedNodeIdentifiers);
 	IMBRelease(_standardObjectView);
 	IMBRelease(_customObjectView);
+	IMBRelease(_customHeaderViewControllers);
+	IMBRelease(_customObjectViewControllers);
+	IMBRelease(_customFooterViewControllers);
 	
 	[super dealloc];
 }
@@ -393,7 +401,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 {
 	NSMutableDictionary* stateDict = [self _preferences];
 	
-	self.expandedNodeIdentifiers = [stateDict objectForKey:@"expandedNodeIdentifiers"];
+	self.expandedNodeIdentifiers = [NSMutableArray arrayWithArray:[stateDict objectForKey:@"expandedNodeIdentifiers"]];
 	self.selectedNodeIdentifier = [stateDict objectForKey:@"selectedNodeIdentifier"];
 	
 	float splitviewPosition = [[stateDict objectForKey:@"splitviewPosition"] floatValue];
@@ -609,7 +617,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 		// If the node has a custom object view, then install it now...
 		
-//		[self installCustomObjectView:[newNode customObjectView]];
 		[self installObjectViewForNode:newNode];
 		
 		// If a completely different parser was selected, then notify the previous parser, that it is most
@@ -627,23 +634,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	[self __syncPopupMenuSelection];
 }
 
-
-/*  Optional - Different cells for each row
-    A different data cell can be returned for any particular tableColumn and item, or a cell that will be used for the entire row (a full width cell). The returned cell should properly implement copyWithZone:, since the cell may be copied by NSTableView. If the tableColumn is non-nil, you should return a cell, and generally you will want to default to returning the result from [tableColumn dataCellForRow:row].
-
-    When each row (identified by the item) is being drawn, this method will first be called with a nil tableColumn. At this time, you can return a cell that will be used to draw the entire row, acting like a group. If you do return a cell for the 'nil' tableColumn, be prepared to have the other corresponding datasource and delegate methods to be called with a 'nil' tableColumn value. If don't return a cell, the method will be called once for each tableColumn in the tableView, as usual.
-
-- (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item;
-{
-	NSCell *result = nil;
-	if (nil != tableColumn)
-	{
-		NSAssert([item isKindOfClass:[NSTreeNode class]], @"item not expected class");
-		return [[[IMBNodeCell alloc] initTextCell:@""] autorelease];
-	}
-	return result;
-}
-*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -663,7 +653,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		IMBFlickrNodeLicense license = [((IMBFlickrNode *)node) license];
 		if (license < IMBFlickrNodeLicense_Undefined) license = IMBFlickrNodeLicense_Undefined;
 		if (license > IMBFlickrNodeLicense_CommercialUse) license = IMBFlickrNodeLicense_CommercialUse;
-
+		// These are file names.  Ideally we should put localized AX Descriptions on them.
 		NSArray *names = [NSArray arrayWithObjects:@"any", @"CC", @"remix", @"commercial", nil];
 		NSString *fileName = [names objectAtIndex:license];
 		
@@ -1248,9 +1238,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) installObjectViewForNode:(IMBNode*)inNode
 {
-	NSViewController* headerViewController = [inNode customHeaderViewController];
-	NSViewController* objectViewController = [inNode customObjectViewController];
-	NSViewController* footerViewController = [inNode customFooterViewController];
+	NSViewController* headerViewController = [self _customHeaderViewControllerForNode:inNode];
+	NSViewController* objectViewController = [self _customObjectViewControllerForNode:inNode];
+	NSViewController* footerViewController = [self _customFooterViewControllerForNode:inNode];
 	
 	NSView* headerView = nil;
 	NSView* objectView = nil;
@@ -1337,6 +1327,147 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	{
 		[ibObjectContainerView setHidden:YES];
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// First check if we already have a customViewController for the given node. If not then ask the  
+// parser to create one for us. We will store it here for later use...
+
+
+- (NSViewController*) _customHeaderViewControllerForNode:(IMBNode*)inNode
+{
+	NSViewController* viewController = nil;
+	NSString* identifier = inNode.identifier;
+	id delegate = self.libraryController.delegate;
+	
+	if (identifier)
+	{
+		viewController = [_customHeaderViewControllers objectForKey:identifier];
+		
+		if (viewController == nil)
+		{
+			if (delegate != nil && [delegate respondsToSelector:@selector(customHeaderViewControllerForNode:)])
+			{
+				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customHeaderViewControllerForNode:inNode];
+			}
+
+			if (viewController == nil)
+			{
+				viewController = [inNode.parser customHeaderViewControllerForNode:inNode];
+			}
+			
+			if (_customHeaderViewControllers == nil && viewController != nil)
+			{
+				_customHeaderViewControllers = [[NSMutableDictionary alloc] init];
+			}
+
+			if (viewController) [_customHeaderViewControllers setObject:viewController forKey:identifier];
+			else [_customHeaderViewControllers removeObjectForKey:identifier];
+		}
+	}
+	
+	if (viewController)
+	{
+		if ([viewController isKindOfClass:[IMBObjectViewController class]])
+		{	
+			[(IMBObjectViewController*)viewController setNodeViewController:self];
+			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+		}
+	}
+	
+	return viewController;
+}
+
+
+- (NSViewController*) _customObjectViewControllerForNode:(IMBNode*)inNode
+{
+	NSViewController* viewController = nil;
+	NSString* identifier = inNode.identifier;
+	id delegate = self.libraryController.delegate;
+	
+	if (identifier)
+	{
+		viewController = [_customObjectViewControllers objectForKey:identifier];
+	
+		if (viewController == nil)
+		{
+			if (delegate != nil && [delegate respondsToSelector:@selector(customObjectViewControllerForNode:)])
+			{
+				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customObjectViewControllerForNode:inNode];
+			}
+			
+			if (viewController == nil)
+			{
+				viewController = [inNode.parser customObjectViewControllerForNode:inNode];
+			}
+
+			if (_customObjectViewControllers == nil && viewController != nil)
+			{
+				_customObjectViewControllers = [[NSMutableDictionary alloc] init];
+			}
+
+			if (viewController)
+			{
+				if ([viewController isKindOfClass:[IMBObjectViewController class]])
+				{	
+					[(IMBObjectViewController*)viewController setNodeViewController:self];
+					[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+				}
+				[_customObjectViewControllers setObject:viewController forKey:identifier];
+			}
+			else [_customObjectViewControllers removeObjectForKey:identifier];
+		}
+	}
+	
+	return viewController;
+}
+
+
+- (NSViewController*) _customFooterViewControllerForNode:(IMBNode*)inNode
+{
+	NSViewController* viewController = nil;
+	NSString* identifier = inNode.identifier;
+	id delegate = self.libraryController.delegate;
+	
+	if (identifier)
+	{
+		viewController = [_customFooterViewControllers objectForKey:identifier];
+	
+		if (viewController == nil)
+		{
+			if (delegate != nil && [delegate respondsToSelector:@selector(customFooterViewControllerForNode:)])
+			{
+				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customFooterViewControllerForNode:inNode];
+			}
+			
+			if (viewController == nil)
+			{
+				viewController = [inNode.parser customFooterViewControllerForNode:inNode];
+			}
+
+			if (_customFooterViewControllers == nil && viewController != nil)
+			{
+				_customFooterViewControllers = [[NSMutableDictionary alloc] init];
+			}
+
+			if (viewController) [_customFooterViewControllers setObject:viewController forKey:identifier];
+			else [_customFooterViewControllers removeObjectForKey:identifier];
+		}
+	}
+	
+	if (viewController)
+	{
+		if ([viewController isKindOfClass:[IMBObjectViewController class]])
+		{	
+			[(IMBObjectViewController*)viewController setNodeViewController:self];
+			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+		}
+	}
+
+	return viewController;
 }
 
 
