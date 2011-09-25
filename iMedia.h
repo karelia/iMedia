@@ -71,7 +71,6 @@
 #import <iMedia/IMBApertureParser.h>
 #import <iMedia/IMBLightroomParser.h>
 #import <iMedia/IMBImageCaptureParser.h>
-#import <iMedia/IMBFlickrParser.h>
 #import <iMedia/IMBGarageBandParser.h>
 
 // Controllers...
