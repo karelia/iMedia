@@ -44,7 +44,7 @@
  */
 
 
-// Author: Pierre Bernard
+// Author: Pierre Bernard, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -54,6 +54,8 @@
 
 #import "IMBiPhotoObjectPromise.h"
 #import "IMBiPhotoParser.h"
+
+#import "IMBParserController.h"
 
 #import "NSString+iMedia.h"
 
@@ -90,26 +92,46 @@
 	return self;
 }
 
-- (void) loadObjects:(NSArray*)inObjects
+- (IMBParser *)parserForObject:(IMBObject *)object;
 {
-	[super loadObjects:inObjects];
-	[self _didFinish];
+    IMBParser *result = [object parser];
+    if (result) return result;
+    
+    
+    // IMBObjectsPromise creates objects by unarchiving them. Unarchived objects do not contain a reference to their parser, only the parser type and media source. Thus, we have to guess at the parser here so clients can have access to it.
+    NSString *parserMediaType = object.parserMediaType;
+    NSString *parserMediaSource = object.parserMediaSource;
+    
+    if ((parserMediaType == nil) || (parserMediaSource == nil)) {
+        return nil;
+    }
+    
+    IMBParserController *parserController = [IMBParserController sharedParserController];
+    NSArray *loadedParsers = [parserController parsersForMediaType:parserMediaType];
+    
+    for (IMBParser *parser in loadedParsers) {
+        if ([parser.mediaSource isEqualToString:parserMediaSource])
+        {
+            [object setParser:parser];
+            return parser;
+        }
+    }
+    
+    return nil;
 }
-
 
 - (void) _loadObject:(IMBObject*)inObject
 {
-    id parser = [inObject parser];
+    id parser = [self parserForObject:inObject];
+    
     
     if ([parser isKindOfClass:[IMBiPhotoParser class]]) {
         NSMutableDictionary *metadata = [NSMutableDictionary dictionaryWithDictionary:[inObject metadata]];
         NSDictionary *plist = [parser plist];
         
         NSString *applicationVersionString = [plist objectForKey:@"Application Version"];
+        if (applicationVersionString) [metadata setObject:applicationVersionString forKey:@"Application Version"];
         
-        if (applicationVersionString != nil) {
-            [metadata setObject:applicationVersionString forKey:@"Application Version"];
-        }
         
         NSString *archivePathString = [plist objectForKey:@"Archive Path"];
         
@@ -137,10 +159,8 @@
                         pathString = [mastersPathString stringByAppendingPathComponent:suffix];
                         pathString = [pathString stringByIterativelyResolvingSymlinkOrAlias];
                     }
-                }
-                
-                if (pathString != nil) {
-                    [metadata setObject:pathString forKey:keyToFix];
+                    
+                    if (pathString) [metadata setObject:pathString forKey:keyToFix];
                 }
             }
         }
@@ -154,6 +174,11 @@
             NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
             [inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
         }
+        
+        
+        // Resolve aliases before passing on to super. Issue #22
+        NSString *location = [[inObject location] stringByIterativelyResolvingSymlinkOrAlias];
+        [inObject setLocation:location];
 	}
     
 	[super _loadObject:inObject];

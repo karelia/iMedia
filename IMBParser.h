@@ -80,11 +80,11 @@
 // The media source is usually a path pointing to the folder or database, but it could be an NSURL as well. 
 // However, it is always stored as a string, so that putting it into property lists (prefs) is easier...
 
-@property (retain) NSString* mediaSource;
+@property (copy) NSString* mediaSource;
 
 // The mediaType can be @"image",@"audio",@"movie",etc. IMBCommon.h contains constants for the type...
 
-@property (retain) NSString* mediaType;
+@property (copy, readonly) NSString* mediaType;
 @property (getter=isCustom) BOOL custom;
 
 // ATTENTION: inOldNode is readonly and is only passed in for reference, but must not be modified by the parser in 
@@ -148,6 +148,7 @@
 
 @interface IMBParser : NSObject <IMBParserProtocol>
 {
+  @private
 	NSString* _mediaSource;
 	NSString* _mediaType;
 	BOOL _custom;

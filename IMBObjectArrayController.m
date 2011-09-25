@@ -234,6 +234,14 @@ const NSString* kSearchStringContext = @"searchString";
 		{
 			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
+			// First check whether object passes our delegate's filter
+			// (e.g. used to display badged objects only)
+			
+			if (_delegate && ![_delegate objectArrayController:self filterObject:object])
+			{
+				continue;
+			}
+			
 			// For searching to work properly we should load object metadata if it isn't available yet,
 			// because the search might require keypaths like @"metadata.*"...
 

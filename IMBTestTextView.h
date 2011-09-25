@@ -17,7 +17,7 @@
  without limitation the rights to use, copy, modify, merge, publish,
  distribute, sublicense, and/or sell copies of the Software, and to permit
  persons to whom the Software is furnished to do so, subject to the following
- conditions:
+ conditions: 
  
  Redistributions of source code must retain the original terms stated here,
  including this list of conditions, the disclaimer noted below, and the
@@ -44,41 +44,17 @@
  */
 
 
-// Author: Dan Wood, Peter Baumgartner, Mike Abdullah
-
-
-#import "IMBImageItem.h"
+// Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#import <Cocoa/Cocoa.h>
 
-@interface IMBComboTextCell : NSTextFieldCell <IMBImageItem>
+
+@interface IMBTestTextView : NSTextView
 {
-	id _imageRepresentation;								
-	NSString* _imageRepresentationType;		
-	NSString* _title;
-	NSString* _subtitle;
-	CGImageRef _badge;				// An optional badge probably provided by host application 
-	BOOL _isDisabledFromDragging;
-	
-	NSDictionary* _titleTextAttributes;
-	NSDictionary* _subtitleTextAttributes;
+	IBOutlet id draggingDelegate;
 }
 
-@property (retain) id imageRepresentation;	
-@property (retain) NSString* imageRepresentationType;
-
-@property (retain) NSString* title;
-@property (copy) NSDictionary* titleTextAttributes;
-
-@property (retain) NSString* subtitle;
-@property (copy) NSDictionary* subtitleTextAttributes;
-
-@property (readwrite) CGImageRef badge;
-
-@property (assign, setter=setDisabledFromDragging:) BOOL isDisabledFromDragging;
-
 @end
-
-//----------------------------------------------------------------------------------------------------------------------

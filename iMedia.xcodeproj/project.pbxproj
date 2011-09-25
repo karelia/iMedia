@@ -23,6 +23,9 @@
 /* Begin PBXBuildFile section */
 		274DF618114EF0B200AC8C03 /* IMBImageItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 274DF616114EF0B200AC8C03 /* IMBImageItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		274DF619114EF0B200AC8C03 /* IMBImageItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 274DF617114EF0B200AC8C03 /* IMBImageItem.m */; };
+		3016783613B1F435000E57D2 /* IMBTestTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3016783513B1F435000E57D2 /* IMBTestTextView.m */; };
+		3016792913B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
+		3016792A13B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
 		3025E5631306877700706DB2 /* IMBiPhotoEventObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3025E5641306877700706DB2 /* IMBiPhotoEventObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3025E5621306877700706DB2 /* IMBiPhotoEventObjectViewController.m */; };
 		30394AB612DC64B400ACA531 /* ObjectiveFlickr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30394AB512DC64B400ACA531 /* ObjectiveFlickr.framework */; };
@@ -398,6 +401,9 @@
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		274DF616114EF0B200AC8C03 /* IMBImageItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageItem.h; sourceTree = "<group>"; };
 		274DF617114EF0B200AC8C03 /* IMBImageItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageItem.m; sourceTree = "<group>"; };
+		3016783413B1F435000E57D2 /* IMBTestTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestTextView.h; sourceTree = "<group>"; };
+		3016783513B1F435000E57D2 /* IMBTestTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestTextView.m; sourceTree = "<group>"; };
+		3016792813B225B9000E57D2 /* badge_checkbox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_checkbox.png; sourceTree = "<group>"; };
 		3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoEventObjectViewController.h; sourceTree = "<group>"; };
 		3025E5621306877700706DB2 /* IMBiPhotoEventObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoEventObjectViewController.m; sourceTree = "<group>"; };
 		30394AB512DC64B400ACA531 /* ObjectiveFlickr.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ObjectiveFlickr.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -665,7 +671,6 @@
 		D099326910111DCB00C527B7 /* NSString+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+iMedia.h"; sourceTree = "<group>"; };
 		D099328F1011227100C527B7 /* IMBImageFolderParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageFolderParser.h; sourceTree = "<group>"; };
 		D09932901011227100C527B7 /* IMBImageFolderParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageFolderParser.m; sourceTree = "<group>"; };
-		D0993294101124EE00C527B7 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
 		D0993302101197D100C527B7 /* IMBNodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeViewController.m; sourceTree = "<group>"; };
 		D0993303101197D100C527B7 /* IMBNodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeViewController.h; sourceTree = "<group>"; };
 		D099330B10119D8200C527B7 /* IMBNodeTreeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeTreeController.h; sourceTree = "<group>"; };
@@ -860,7 +865,6 @@
 		1058C7B2FEA5585E11CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D0993294101124EE00C527B7 /* libcrypto.dylib */,
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
 				D2F7E79907B2D74100F64583 /* CoreData.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
@@ -910,6 +914,7 @@
 		CEAF1F13125A7D8C001C3EBB /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				3016792813B225B9000E57D2 /* badge_checkbox.png */,
 				CE394AC11371A1F700EF0D1E /* cork-background.jpg */,
 				CEAF1FE4125A8B6A001C3EBB /* Credits.html */,
 				CEAF1F22125A7DBF001C3EBB /* iMedia.tiff */,
@@ -1327,6 +1332,8 @@
 				30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */,
 				30F90B371358521300D13233 /* IMBTestFacesBackgroundLayer.h */,
 				30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */,
+				3016783413B1F435000E57D2 /* IMBTestTextView.h */,
+				3016783513B1F435000E57D2 /* IMBTestTextView.m */,
 			);
 			name = "Test Application";
 			sourceTree = "<group>";
@@ -1712,6 +1719,7 @@
 				CE1AED33129C475200694472 /* js.tiff in Resources */,
 				CEF7A22412B1B71800DBE412 /* url_icon.tiff in Resources */,
 				CE394AC21371A1F700EF0D1E /* cork-background.jpg in Resources */,
+				3016792A13B225B9000E57D2 /* badge_checkbox.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1721,6 +1729,7 @@
 			files = (
 				305B64C71372EF6C009B53BD /* cork-background.jpg in Resources */,
 				D09933B71011B3CE00C527B7 /* IMBTestApp.xib in Resources */,
+				3016792913B225B9000E57D2 /* badge_checkbox.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1848,6 +1857,7 @@
 				30439224130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m in Sources */,
 				30F90B391358521300D13233 /* IMBTestFaceBrowserCell.m in Sources */,
 				30F90B3A1358521300D13233 /* IMBTestFacesBackgroundLayer.m in Sources */,
+				3016783613B1F435000E57D2 /* IMBTestTextView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1904,6 +1914,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
+				VALID_ARCHS = "ppc i386 x86_64";
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -1919,6 +1930,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
+				VALID_ARCHS = "ppc i386 x86_64";
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
@@ -2033,6 +2045,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
+				VALID_ARCHS = "ppc i386 x86_64";
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Test;

@@ -55,7 +55,6 @@
 #import "IMBObjectViewController.h"
 #import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
-#import "IMBObjectArrayController.h"
 #import "IMBFolderParser.h"
 #import "IMBConfig.h"
 #import "IMBParser.h"
@@ -301,6 +300,8 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (void) awakeFromNib
 {
+	self.objectArrayController.delegate = self;
+	
 	// Configure the object views...
 	
 	[self _configureIconView];
@@ -1200,6 +1201,54 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 //		#endif
 	}
 	
+	// Badges filtering
+	
+	if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
+	{
+		if ([menu numberOfItems] > 0)
+		{
+			[menu addItem:[NSMenuItem separatorItem]];
+		}
+			 
+		title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.showAll",
+			nil,IMBBundle(),
+			@"Show All",
+			@"Menu item in context menu of IMBObjectViewController");
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
+		[item setTag:kIMBObjectFilterAll];
+		[item setTarget:self];
+		[item setOnStateImage:[NSImage imageNamed:@"NSMenuRadio"]];
+        [item setState: ibObjectFilter == kIMBObjectFilterAll ? NSOnState : NSOffState];
+		[menu addItem:item];
+		[item release];
+
+		title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.showBadgedOnly",
+			nil,IMBBundle(),
+			@"Show Badged Only",
+			@"Menu item in context menu of IMBObjectViewController");
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
+		[item setTag:kIMBObjectFilterBadge];
+		[item setTarget:self];
+		[item setOnStateImage:[NSImage imageNamed:@"NSMenuRadio"]];
+        [item setState: ibObjectFilter == kIMBObjectFilterBadge ? NSOnState : NSOffState];
+		[menu addItem:item];
+		[item release];
+
+		title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.showUnbadgedOnly",
+			nil,IMBBundle(),
+			@"Show Unbadged Only",
+			@"Menu item in context menu of IMBObjectViewController");
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
+		[item setTag:kIMBObjectFilterNoBadge];
+		[item setTarget:self];
+		[item setOnStateImage:[NSImage imageNamed:@"NSMenuRadio"]];
+        [item setState: ibObjectFilter == kIMBObjectFilterNoBadge ? NSOnState : NSOffState];
+		[menu addItem:item];
+		[item release];
+	}
 	// Give parser a chance to add menu items...
 	
 	IMBParser* parser = self.currentNode.parser;
@@ -1290,6 +1339,15 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	IMBNode* node = (IMBNode*)[inSender representedObject];
 	[_nodeViewController expandSelectedNode];
 	[_nodeViewController selectNode:node];
+}
+
+
+- (IBAction) showFiltered:(id)inSender
+{
+	ibObjectFilter = (IMBObjectFilter) [inSender tag];
+	[inSender setState:NSOnState];
+	[[self objectArrayController] rearrangeObjects];
+	[[self nodeViewController] setObjectContainerViewNeedsDisplay:YES];
 }
 
 
@@ -2006,6 +2064,34 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 		cell.title = object.imageTitle;
 		cell.subtitle = object.metadataDescription;
 	}
+	
+	// Host app delegate may provide badge image here
+	
+	if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
+	{
+		// Combo view cell
+		if ([inCell respondsToSelector:@selector(setBadge:)])
+		{
+			[inCell setBadge:[[self delegate] objectViewController:self badgeForObject:object]];
+		}
+		
+		// List view icon cell
+		if ([inCell isKindOfClass:[NSImageCell class]] &&
+			[(NSString*)[inTableColumn identifier] isEqualToString:@"icon"])
+		{
+			CGImageRef badgeRef = [[self delegate] objectViewController:self badgeForObject:object];
+			
+			if (badgeRef)
+			{
+				NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
+				NSBitmapImageRep* bitmapImageRep = [[[NSBitmapImageRep alloc] initWithCGImage:badgeRef] autorelease];
+				NSImage* badge = [[[NSImage alloc] initWithSize:badgeSize] autorelease];
+				[badge addRepresentation:bitmapImageRep];
+				
+				[inCell setImage:badge];
+			}
+		}
+	}
 }
 
 
@@ -2265,6 +2351,36 @@ NS_ENDHANDLER
 	// No-op; clicking is handled with more detail from the mouse operations.
 	// However we want to make sure our window becomes key with a click.
 	[[inSender window] makeKeyWindow];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark IMBObjectArrayControllerDelegate
+
+- (BOOL) objectArrayController:(IMBObjectArrayController*)inController filterObject:(IMBObject*)inObject
+{
+	id <IMBObjectViewControllerDelegate> delegate = nil;
+	
+	switch (ibObjectFilter) {
+		case kIMBObjectFilterAll:
+			return YES;
+			break;
+		case kIMBObjectFilterBadge:
+			delegate = [self delegate];
+			return ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)] &&
+					[delegate objectViewController:self badgeForObject:inObject]);
+			break;
+		case kIMBObjectFilterNoBadge:
+			delegate = [self delegate];
+			return ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)] &&
+					![delegate objectViewController:self badgeForObject:inObject]);
+			break;
+		default:
+			return YES;
+	}
 }
 
 

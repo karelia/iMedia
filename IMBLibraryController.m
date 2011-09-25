@@ -449,7 +449,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
 
-	NSMutableArray* parsers = [[IMBParserController sharedParserController] loadedParsersForMediaType:self.mediaType];
+	NSArray* parsers = [[IMBParserController sharedParserController] parsersForMediaType:self.mediaType];
 	
 //	[self willChangeValueForKey:@"rootNodes"];
 //	[self.rootNodes removeAllObjects];

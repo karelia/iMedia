@@ -161,6 +161,12 @@
 + (void) revealNodeWithIdentifier:(NSString*)inIdentifier;
 + (void) selectNodeWithIdentifier:(NSString*)inIdentifier;
 
+// Use this method in your host app to tell the current object view (icon, list, or combo view)
+// that it needs to re-display itself (e.g. when a badge on an image needs to be updated)
+
+- (void) setObjectContainerViewNeedsDisplay:(BOOL)inFlag;
+
+
 @end
 
 

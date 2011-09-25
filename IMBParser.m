@@ -114,7 +114,7 @@
 	if (self = [super init])
 	{
 		self.mediaSource = nil;
-		self.mediaType = inMediaType;
+		_mediaType = [inMediaType copy];
 		self.custom = NO;
 	}
 	
