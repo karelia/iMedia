@@ -230,6 +230,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 	for (NSString* mediaType in self.mediaTypes)
 	{
+	NSLog(@"Loading view controller for type %@", mediaType);
 		// Load the library for each media type...
 		
 		libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];

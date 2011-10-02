@@ -1288,7 +1288,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	footerFrame.size.height = footerHeight;
 	ibObjectFooterView.frame = footerFrame;
 
-	if (footerView)
+	//if (footerView)
+	if (0)
 	{
 		[footerView setFrameSize:footerFrame.size];
 		[footerView addSubview:footerView];

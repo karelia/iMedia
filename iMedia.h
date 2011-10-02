@@ -72,6 +72,7 @@
 #import <iMedia/IMBLightroomParser.h>
 #import <iMedia/IMBImageCaptureParser.h>
 #import <iMedia/IMBGarageBandParser.h>
+#import <iMedia/IMBAppleMediaParser.h>
 
 // Controllers...
 
@@ -82,6 +83,9 @@
 #import <iMedia/IMBNodeViewController.h>
 #import <iMedia/IMBObjectViewController.h>
 #import <iMedia/IMBImageViewController.h>
+#import <iMedia/IMBSkimmableObjectViewController.h>
+#import <iMedia/IMBiPhotoEventObjectViewController.h>
+#import <iMedia/IMBFaceObjectViewController.h>
 #import <iMedia/IMBPanelController.h>
 
 // Views...

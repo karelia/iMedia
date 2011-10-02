@@ -70,7 +70,7 @@
 #define LOG_PARSERS 0
 #define LOG_CREATE_NODE 0
 #define LOG_POPULATE_NODE 0
-#define CUSTOM_USER_INTERFACE 0
+#define CUSTOM_USER_INTERFACE 1
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -467,14 +467,14 @@
 		return backgroundLayer;
 	}
 	
-	if ([inController isKindOfClass:[IMBFaceObjectViewController class]])
-	{
-		IMBTestFacesBackgroundLayer* backgroundLayer = [[[IMBTestFacesBackgroundLayer alloc] init] autorelease];
-		[[inController iconView] setBackgroundLayer:backgroundLayer];
-		[backgroundLayer setOwner:[inController iconView]];
-		
-		return backgroundLayer;
-	}
+//	if ([inController isKindOfClass:[IMBFaceObjectViewController class]])
+//	{
+//		IMBTestFacesBackgroundLayer* backgroundLayer = [[[IMBTestFacesBackgroundLayer alloc] init] autorelease];
+//		//[[inController iconView] setBackgroundLayer:backgroundLayer];
+//		[backgroundLayer setOwner:[inController iconView]];
+//		
+//		return backgroundLayer;
+//	}
 	return nil;
 }
 
