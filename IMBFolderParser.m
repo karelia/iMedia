@@ -309,7 +309,10 @@
 				[subnodes addObject:subnode];
 				[subnode release];
 
-#if 0
+#if 1
+// ERGH, Maybe we better just show these for now until we are able to do the desirable presentation of
+// all subfolder pictures when the user selects such a node
+
 // DCJ - I don't think nodes should show up in the objects list because
 // it is not intuitive to the user to have navigational objects like folders
 // in the object view.

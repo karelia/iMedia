@@ -76,11 +76,14 @@
 	// Fill everything with transparent pixels
 	CGRect bounds = CGContextGetClipBoundingBox(bitmapContext);
 	CGContextClearRect(bitmapContext, bounds);
-	
+
+#if 0
+Clipping should happen at a higher level, if desired not be given to the whims of the event node object itself	
 	// Set clipping path
 	float cornerRadius = squareSize / 10.0;
 	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithGraphicsPort:bitmapContext flipped:NO]];
 	[[NSBezierPath bezierPathWithRoundedRect:NSRectFromCGRect(bounds) xRadius: cornerRadius yRadius:cornerRadius] addClip];
+#endif
 	
 	// Move image in context to get desired image area to be in context bounds
 	CGRect imageBounds = CGRectMake((squareSize - imgWidth) / 2.0, 
