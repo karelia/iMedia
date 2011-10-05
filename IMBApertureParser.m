@@ -446,14 +446,14 @@
 		
 		if ([albumType isEqualToString:@"5"])
 		{
-			rootNodeIdentifier = [self identifierForId:albumId inSpace:nil];
+			rootNodeIdentifier = [[self identifierForId:albumId inSpace:nil] retain];
 		}
 
 		[pool drain];
 		
 		if (rootNodeIdentifier != nil)
 		{
-			return rootNodeIdentifier;
+			return [rootNodeIdentifier autorelease];
 		}
 	}
 
