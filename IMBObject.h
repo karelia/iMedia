@@ -153,7 +153,7 @@ extern NSString* kIMBQuickLookImageProperty;
 																	
 - (void) loadThumbnail;	
 - (BOOL) unloadThumbnail;
-- (void) loadMetadata;
+- (void) loadMetadata;  // observe .metadata property to know when finished
 @property (assign) BOOL isLoadingThumbnail;
 - (CGImageRef) quickLookImage;
 - (void) setQuickLookImage:(CGImageRef)inImage;
