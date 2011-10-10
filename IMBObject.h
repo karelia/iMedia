@@ -85,6 +85,7 @@ extern NSString* kIMBQuickLookImageProperty;
 <NSCopying,NSCoding,IMBImageItem>
 #endif
 {
+  @private
 	id _location;												
 	NSString* _name;
 	NSDictionary* _preliminaryMetadata;
@@ -96,6 +97,7 @@ extern NSString* kIMBQuickLookImageProperty;
     NSString *_parserMediaSource;
 	NSUInteger _index;
 	
+  @protected
 	id _imageRepresentation;								
 	NSString* _imageRepresentationType;		
 	BOOL _needsImageRepresentation;
