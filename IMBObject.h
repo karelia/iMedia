@@ -85,6 +85,7 @@ extern NSString* kIMBQuickLookImageProperty;
 <NSCopying,NSCoding,IMBImageItem>
 #endif
 {
+  @private
 	id _location;												
 	NSString* _name;
 	NSDictionary* _preliminaryMetadata;
@@ -96,6 +97,7 @@ extern NSString* kIMBQuickLookImageProperty;
     NSString *_parserMediaSource;
 	NSUInteger _index;
 	
+  @protected
 	id _imageRepresentation;								
 	NSString* _imageRepresentationType;		
 	BOOL _needsImageRepresentation;
@@ -151,7 +153,7 @@ extern NSString* kIMBQuickLookImageProperty;
 																	
 - (void) loadThumbnail;	
 - (BOOL) unloadThumbnail;
-- (void) loadMetadata;
+- (void) loadMetadata;  // observe .metadata property to know when finished
 @property (assign) BOOL isLoadingThumbnail;
 - (CGImageRef) quickLookImage;
 - (void) setQuickLookImage:(CGImageRef)inImage;

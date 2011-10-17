@@ -227,7 +227,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
 	[parserController setDelegate:self.delegate];
-	[parserController loadParsers];
 
 	for (NSString* mediaType in self.mediaTypes)
 	{

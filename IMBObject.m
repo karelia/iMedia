@@ -104,7 +104,6 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize name = _name;
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
-@synthesize parser = _parser;
 @synthesize parserClassName = _parserClassName;
 @synthesize parserMediaType = _parserMediaType;
 @synthesize parserMediaSource = _parserMediaSource;
@@ -120,31 +119,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 @synthesize metadataDescription = _metadataDescription;
 
-- (IMBParser*)parser
-{
-    if (_parser != nil) {
-        return [[_parser retain] autorelease];
-    }
-    
-    NSString *parserMediaType = self.parserMediaType;
-    NSString *parserMediaSource = self.parserMediaSource;
-    
-    if ((parserMediaType == nil) || (parserMediaSource == nil)) {
-        return nil;
-    }
-    
-    IMBParserController *parserController = [IMBParserController sharedParserController];
-    NSArray *loadedParsers = [parserController loadedParsersForMediaType:parserMediaType];
-    
-    for (IMBParser *parser in loadedParsers) {
-        if ([parser.mediaSource isEqualToString:parserMediaSource]) {
-            return parser;
-        }
-    }
-    
-    return nil;
-}
-
+@synthesize parser = _parser;
 - (void)setParser:(IMBParser *)parser
 {
     if (parser != _parser) {

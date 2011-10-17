@@ -442,13 +442,19 @@
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		NSString* albumType = [albumDict objectForKey:@"Album Type"];
 		NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
+		NSString* rootNodeIdentifier = nil;
 		
 		if ([albumType isEqualToString:@"5"])
 		{
-			return [self identifierForId:albumId inSpace:nil];
+			rootNodeIdentifier = [[self identifierForId:albumId inSpace:nil] retain];
 		}
 
 		[pool drain];
+		
+		if (rootNodeIdentifier != nil)
+		{
+			return [rootNodeIdentifier autorelease];
+		}
 	}
 
 	// Fallback if nothing is found...

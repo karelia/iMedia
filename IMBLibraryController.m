@@ -425,7 +425,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
 
-	NSMutableArray* parsers = [[IMBParserController sharedParserController] loadedParsersForMediaType:self.mediaType];
+	NSArray* parsers = [[IMBParserController sharedParserController] parsersForMediaType:self.mediaType];
 	
 	[self willChangeValueForKey:@"rootNodes"];
 	[self.rootNodes removeAllObjects];
@@ -707,10 +707,24 @@ static NSMutableDictionary* sLibraryControllers = nil;
             [nodes sortUsingSelector:@selector(compare:)];
         }
         
-        // Do an "atomic" replace of the changed nodes array, thus only causing a single KVO notification...
+		// Do an "atomic" replace of the changed nodes array, thus only causing a single KVO notification. 
+		// Please note the strange line setSubNodes:nil, which is a workaround for an nasty crashing bug deep  
+		// inside NSTreeController, where we get a zombie NSTreeControllerTreeNode is some cases. Apparently 
+		// the NSTreeController is very particular about us replacing the whole array in one go (maybe that 
+		// isn't entirely KVO compliant), and it gets confused with its NSTreeControllerTreeNode objects.
+		// The extra line (setting the array to nil) seems to clear out all NSTreeControllerTreeNodes and
+		// then they get rebuilt with the next line. Until we rework our own stuff, we'll stick with this 
+		// workaround...
 
-		if (parentNode) [parentNode setSubNodes:nodes];
-		else [self setRootNodes:nodes];
+		if (parentNode)
+		{
+			[parentNode setSubNodes:nil];		// Important workaround. Do not remove!
+			[parentNode setSubNodes:nodes];
+		}
+		else
+		{
+			[self setRootNodes:nodes];
+		}
 			
         // Hide empty group nodes that do not have any subnodes We are not using fast enumeration here because
         // we may need to mutate the array. Iteration backwards avoids index adjustment problems as we 
