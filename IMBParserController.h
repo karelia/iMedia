@@ -135,12 +135,20 @@
 
 @optional
 
-// Called once on main thread early in app lifetime, when all parsers are registered and loaded. 
-// Return NO to suppress loading a particular parser...
+// Handy place to finish setting up a parser such as Flickr
+// Return nil to suppress loading a particular parser. Default (if you don't implement this method) is to return nil if [parser canBeUsed] returns NO. You likely want to replicate that check in your implementation
+- (IMBParser *)parserController:(IMBParserController *)controller willLoadParser:(IMBParser *)parser;
 
-- (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString*)inParserClassName forMediaType:(NSString*)inMediaType;
-- (BOOL) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
+// Used to return a BOOL so that delegate could cancel the load. Now goes ignored, use one of the should methods instead
+- (void) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
+
 - (void) parserController:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
+
+
+#pragma mark Deprecated
+// Called before loading of registered parsers, but NOT for custom or dynamic parsers
+- (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString*)inParserClassName forMediaType:(NSString*)inMediaType;
+
 
 @end
 
