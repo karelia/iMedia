@@ -314,7 +314,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @implementation IMBLibraryController
 
 @synthesize mediaType = _mediaType;
-@synthesize rootNodes = _rootNodes;
+@synthesize subnodes = _subnodes;
 @synthesize options = _options;
 @synthesize delegate = _delegate;
 @synthesize watcherUKKQueue = _watcherUKKQueue;
@@ -360,8 +360,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (self = [super init])
 	{
 		self.mediaType = inMediaType;
-		self.rootNodes = [NSMutableArray array];
 		self.options = kIMBOptionNone;
+		self.subnodes = [NSMutableArray array];
 		
 		// Initialize file system watching...
 		
@@ -401,7 +401,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter] removeObserver:self];
 
 	IMBRelease(_mediaType);
-	IMBRelease(_rootNodes);
+	IMBRelease(_subnodes);
 	IMBRelease(_watcherUKKQueue);
 	IMBRelease(_watcherFSEvents);
 	IMBRelease(_watcherLock);
@@ -409,6 +409,55 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	IMBRelease(_watcherFSEventsPaths);
 
 	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Node Accessors
+
+- (NSUInteger) countOfSubnodes
+{
+	return [_subnodes count];
+}
+
+
+- (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex
+{
+	return [_subnodes objectAtIndex:inIndex];
+}
+
+
+- (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex
+{
+	if (inIndex <= self.countOfSubnodes)
+	{
+		[_subnodes insertObject:inNode atIndex:inIndex];
+	}
+	else
+	{
+		[_subnodes addObject:inNode];		// Convenience for adding at end with large index (e.g. NSNotFound)
+	}
+}
+
+
+- (void) removeObjectFromSubnodesAtIndex:(NSUInteger)inIndex
+{
+	if (inIndex < self.countOfSubnodes)
+	{
+		[_subnodes removeObjectAtIndex:inIndex];
+	}
+}
+
+
+- (void) replaceObjectInSubnodesAtIndex:(NSUInteger)inIndex withObject:(IMBNode*)inNode
+{
+	if (inIndex < self.countOfSubnodes)
+	{
+		[_subnodes replaceObjectAtIndex:inIndex withObject:inNode];
+	}
 }
 
 
@@ -428,7 +477,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	NSArray* parsers = [[IMBParserController sharedParserController] parsersForMediaType:self.mediaType];
 	
 	[self willChangeValueForKey:@"rootNodes"];
-	[self.rootNodes removeAllObjects];
+	[self.subnodes removeAllObjects];
 	[self didChangeValueForKey:@"rootNodes"];
 	
 	for (IMBParser* parser in parsers)
@@ -512,14 +561,34 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Check if the desired group node is already present. If yes return it, otherwise create and add it...
+// Find the correct insert index to make sure that array is sorted after insertion...
+
+- (NSUInteger) _insertIndexForNewNode:(IMBNode*)inNewNode inOldNodes:(NSArray*)inOldNodes
+{
+	NSUInteger i = 0;
+	
+	for (IMBNode* oldNode in inOldNodes)
+	{
+		if ([oldNode compare:inNewNode] == NSOrderedAscending)
+		{
+			i++;
+		}
+	}
+
+	return i;
+}
+
+
+// Return the group node (at root level) for a given node...
 
 - (IMBNode*) _groupNodeForNewNode:(IMBNode*)inNewNode
 {
 	NSUInteger groupType = inNewNode.groupType;
 	if (groupType ==  kIMBGroupTypeNone) return nil;
 	
-	for (IMBNode* node in _rootNodes)
+	// Check if the desired group node is already present. If yes return it...
+
+	for (IMBNode* node in _subnodes)
 	{
 		if (node.groupType == groupType)
 		{
@@ -527,11 +596,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 		
+	// Otherwise create a new group node...
+
 	IMBNode* groupNode = [[[IMBNode alloc] init] autorelease];
 	groupNode.group = YES;
 	groupNode.leaf = NO;
 	groupNode.parser = nil;
-	groupNode.subNodes = [NSMutableArray array];
+	groupNode.subnodes = [NSMutableArray array];
 	groupNode.objects = [NSMutableArray array];
 	
 	if (groupType == kIMBGroupTypeLibrary)
@@ -575,12 +646,20 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			@"group node display name");
 	}
 	
-	groupNode.parser = inNewNode.parser;	// Important to make lookup in -[IMBNode indexPath] work correctly!
+	// Important to make lookup in -[IMBNode indexPath] work correctly!
+	
+	groupNode.parser = inNewNode.parser;	
 
-	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:_rootNodes];
-	[rootNodes addObject:groupNode];
-	[rootNodes sortUsingSelector:@selector(compare:)];
-	self.rootNodes = rootNodes;
+	// Insert the new group node at the root level. Try to avoid sorting (in order not to confused the 
+	// NSTreeController) - instead insert at the correct location, thus making sorting obsolete...
+	
+	NSUInteger i = [self _insertIndexForNewNode:groupNode inOldNodes:self.subnodes];
+	[self insertObject:groupNode inSubnodesAtIndex:i];
+	
+//	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:_rootNodes];
+//	[rootNodes addObject:groupNode];
+//	[rootNodes sortUsingSelector:@selector(compare:)];
+//	self.rootNodes = rootNodes;
 
 	return groupNode;
 }
@@ -608,14 +687,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	if (inOldNode == nil && inNewNode == nil) return;
 	
-	// If we were given both old and new nodes, then the parentNode and identifiers must be the same. 
-	// If not log an error and throw an exception because this is a programmer error...
-	
-//	if (oldNode != nil && newNode != nil && oldNode.parentNode != newNode.parentNode && newNode.parentNode != nil)
-//	{
-//		NSLog(@"%s Error: parent of oldNode and newNode must be the same...",__FUNCTION__);
-//		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must be the same" userInfo:nil] raise];
-//	}
+	// If we were given both old and new nodes, then the identifiers must be the same. If not log an error 
+	// and throw an exception because this is a programmer error...
 	
 	if (inOldNode != nil && inNewNode != nil && ! [inOldNode.identifier isEqual:inNewNode.identifier])
 	{
@@ -640,6 +713,27 @@ static NSMutableDictionary* sLibraryControllers = nil;
         	
 	@try      
     {
+		// Update file watching...
+		
+		NSString* oldWatchedPath = inOldNode.watchedPath;
+		NSString* newWatchedPath = inNewNode.watchedPath;
+		
+		if (inOldNode != nil && oldWatchedPath != nil)
+		{
+			if (inOldNode.watcherType == kIMBWatcherTypeKQueue)
+				[self.watcherUKKQueue removePath:oldWatchedPath];
+			else if (inOldNode.watcherType == kIMBWatcherTypeFSEvent)
+				[self.watcherFSEvents removePath:oldWatchedPath];
+		}
+		
+		if (inNewNode != nil && newWatchedPath != nil)
+		{
+			if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
+				[self.watcherUKKQueue addPath:newWatchedPath];
+			else if (inNewNode.watcherType == kIMBWatcherTypeFSEvent)
+				[self.watcherFSEvents addPath:newWatchedPath];
+		}
+
         // Find out where we are supposed to replace the old with the new node. We have three different cases:
         //   1) Both old and new node are supplied, so we need to replace. 
         //   2) Only old node is supplied, so it needs to be removed. 
@@ -648,7 +742,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
         // are further complicated by the "group nodes" which are created dynamically in this method...
         
 		IMBNode* parentNode = [self nodeWithIdentifier:inParentNodeIdentifier];
-		BOOL shouldSortNodes = parentNode.isGroup;
 		
 		if (parentNode == nil)
 		{
@@ -657,97 +750,73 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				if (inOldNode) parentNode = [self _groupNodeForNewNode:inOldNode];
 				else if (inNewNode) parentNode = [self _groupNodeForNewNode:inNewNode];
 			}
-			
-			shouldSortNodes = YES;
 		}
 		
-		NSMutableArray* nodes = parentNode!=nil ?
-			[NSMutableArray arrayWithArray:parentNode.subNodes] :
-			[NSMutableArray arrayWithArray:self.rootNodes];
-			
-        // Remove the old node from the correct place (but remember its index). Also unregister from file watching...
-        
         NSUInteger index = NSNotFound;
-        NSString* watchedPath = nil;
         
-        if (inOldNode)
+        // Replace a old with a new node...
+        
+		if (inOldNode != nil && inNewNode != nil)
         {
-            if (watchedPath = inOldNode.watchedPath)
-            {
-                if (inOldNode.watcherType == kIMBWatcherTypeKQueue)
-                    [self.watcherUKKQueue removePath:watchedPath];
-                else if (inOldNode.watcherType == kIMBWatcherTypeFSEvent)
-                    [self.watcherFSEvents removePath:watchedPath];
-            }
-                
-            index = [nodes indexOfObjectIdenticalTo:inOldNode];
-            [nodes removeObjectIdenticalTo:inOldNode];
-        }
-        
-        // Insert the new node at the same index. Optionally register the node for file watching...
-            
-        if (inNewNode)
-        {
-            if (index == NSNotFound) index = nodes.count;
-            [nodes insertObject:inNewNode atIndex:index];
-            
-            if (watchedPath = inNewNode.watchedPath)
-            {
-                if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
-                    [self.watcherUKKQueue addPath:watchedPath];
-                else if (inNewNode.watcherType == kIMBWatcherTypeFSEvent)
-                    [self.watcherFSEvents addPath:watchedPath];
-            }
-        }
-        
-        // Sort the nodes so that they always appear in the same (stable) order...
-
-        if (shouldSortNodes)
-        {
-            [nodes sortUsingSelector:@selector(compare:)];
-        }
-        
-		// Do an "atomic" replace of the changed nodes array, thus only causing a single KVO notification. 
-		// Please note the strange line setSubNodes:nil, which is a workaround for an nasty crashing bug deep  
-		// inside NSTreeController, where we get a zombie NSTreeControllerTreeNode is some cases. Apparently 
-		// the NSTreeController is very particular about us replacing the whole array in one go (maybe that 
-		// isn't entirely KVO compliant), and it gets confused with its NSTreeControllerTreeNode objects.
-		// The extra line (setting the array to nil) seems to clear out all NSTreeControllerTreeNodes and
-		// then they get rebuilt with the next line. Until we rework our own stuff, we'll stick with this 
-		// workaround...
-
-		if (parentNode)
-		{
-			[parentNode setSubNodes:nil];		// Important workaround. Do not remove!
-			[parentNode setSubNodes:nodes];
+			if (parentNode)
+			{
+				index = [inOldNode index];
+				[parentNode replaceObjectInSubnodesAtIndex:index withObject:inNewNode];
+			}
+			else
+			{
+				index = [self.subnodes indexOfObjectIdenticalTo:inOldNode];
+				[self replaceObjectInSubnodesAtIndex:index withObject:inNewNode];
+			}
 		}
-		else
-		{
-			[self setRootNodes:nodes];
-		}
-			
-        // Hide empty group nodes that do not have any subnodes We are not using fast enumeration here because
-        // we may need to mutate the array. Iteration backwards avoids index adjustment problems as we 
-        // remove nodes...
+		
+        // Remove the old node from the correct place...
         
-        NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:self.rootNodes];
-        NSUInteger n = [rootNodes count];
+		else if (inOldNode != nil)
+        {
+			if (parentNode)
+			{
+				index = [inOldNode index];
+				[parentNode removeObjectFromSubnodesAtIndex:index];
+			}
+			else
+			{
+				index = [self.subnodes indexOfObjectIdenticalTo:inOldNode];
+				[self removeObjectFromSubnodesAtIndex:index];
+			}
+        }
+        
+        // Insert the new node at the correct (sorted) location...
+            
+        else if (inNewNode != nil)
+        {
+			NSArray* subnodes = parentNode ? parentNode.subnodes : self.subnodes;
+			index = [self _insertIndexForNewNode:inNewNode inOldNodes:subnodes];
+
+			if (parentNode)
+			{
+				[parentNode insertObject:inNewNode inSubnodesAtIndex:index];
+			}
+			else
+			{
+				[self insertObject:inNewNode inSubnodesAtIndex:index];
+			}
+        }
+        
+        // Remove empty group nodes (i.e. that do not have any subnodes).  We are not using fast enumeration  
+        // here because we may need to mutate the array. Iteration backwards avoids index adjustment problems  
+        // as we remove nodes...
+        
+        NSUInteger n = self.countOfSubnodes;
         
         for (NSInteger i=n-1; i>=0; i--)
         {
-            IMBNode* node = [rootNodes objectAtIndex:i];
+            IMBNode* node = [self.subnodes objectAtIndex:i];
             
-            if (node.isGroup && node.subNodes.count==0)
+            if (node.isGroup && node.countOfSubnodes == 0)
             {
-                [rootNodes removeObjectIdenticalTo:node];
+				[self removeObjectFromSubnodesAtIndex:i];
             }
-        }
-
-        NSUInteger m = [rootNodes count];
-        
-        if (n != m)
-        {
-            [self setRootNodes:rootNodes];
         }
 		
 		// Since setSubNodes: is a copy setter we need to get a pointer to the new instance before turning
@@ -765,7 +834,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
         _isReplacingNode = NO;
  	
 		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
-   }
+	}
 }
 
 
@@ -817,7 +886,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	BOOL shouldPopulateNode = 
 	
 //		inNode.isPopulated==NO &&
-		(inNode.subNodes==nil || inNode.objects==nil) && 
+		(inNode.subnodes==nil || inNode.objects==nil) && 
 		inNode.isLoading==NO && 
 		_isReplacingNode==NO;
 
@@ -1006,7 +1075,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath
 {
-	[self _reloadNodesWithWatchedPath:inPath nodes:self.rootNodes];
+	[self _reloadNodesWithWatchedPath:inPath nodes:self.subnodes];
 }	
 
 
@@ -1029,7 +1098,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 		else
 		{
-			[self _reloadNodesWithWatchedPath:inPath nodes:node.subNodes];
+			[self _reloadNodesWithWatchedPath:inPath nodes:node.subnodes];
 		}
 	}
 }
@@ -1039,14 +1108,14 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 // When unmounting a volume, we need to stop the file watcher, or unmounting will fail. In this case we have to walk
-// throughte node tree and check which nodes are affected. These nodes are removed from the tree. This will also
+// through the node tree and check which nodes are affected. These nodes are removed from the tree. This will also
 // take care of removing the offending file watcher...
 
 
 - (void) _willUnmountVolume:(NSNotification*)inNotification 
 {
 	NSString* volume = [[inNotification userInfo] objectForKey:@"NSDevicePath"];
-	[self _unmountNodes: self.rootNodes onVolume:volume];
+	[self _unmountNodes: self.subnodes onVolume:volume];
 }
 
 
@@ -1064,7 +1133,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 		else
 		{
-			[self _unmountNodes:node.subNodes onVolume:inVolume];
+			[self _unmountNodes:node.subnodes onVolume:inVolume];
 		}
 	}
 }
@@ -1087,7 +1156,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #pragma mark Custom Nodes
 
 
-- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath
+- (IMBParser*) addCustomNodeForFolder:(NSString*)inPath
 {
 	IMBParser* parser = nil;
 
@@ -1127,7 +1196,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // If we were given a root node with a custom parser, then this node is eligible for removal. Remove the parser
 // from the registered list and reload everything. After that the node will be gone...
 
-- (BOOL) removeCustomRootNode:(IMBNode*)inNode
+- (BOOL) removeCustomNode:(IMBNode*)inNode
 {
 	if (inNode.isTopLevelNode && inNode.parser.isCustom && !inNode.isLoading)
 	{
@@ -1150,7 +1219,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser
 {
-	for (IMBNode* node in self.rootNodes)
+	for (IMBNode* node in self.subnodes)
 	{
 		if (node.parser == inParser)
 		{
@@ -1158,7 +1227,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 		else if (node.isGroup)
 		{
-			for (IMBNode* subnode in node.subNodes)
+			for (IMBNode* subnode in node.subnodes)
 			{
 				if (subnode.parser == inParser)
 				{
@@ -1179,7 +1248,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 - (IMBNode*) _nodeWithIdentifier:(NSString*)inIdentifier inParentNode:(IMBNode*)inParentNode
 {
-	NSArray* nodes = inParentNode ? inParentNode.subNodes : self.rootNodes;
+	NSArray* nodes = inParentNode ? inParentNode.subnodes : self.subnodes;
 	
 	for (IMBNode* node in nodes)
 	{
@@ -1216,9 +1285,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	NSMutableString* text = [NSMutableString string];
 	
-	if (_rootNodes)
+	if (_subnodes)
 	{
-		for (IMBNode* node in _rootNodes)
+		for (IMBNode* node in _subnodes)
 		{
 			[text appendFormat:@"%@\n",[node description]];
 		}
@@ -1270,7 +1339,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		// Add all subnodes indented by one...
 		
-		for (IMBNode* subnode in inNode.subNodes)
+		for (IMBNode* subnode in inNode.subnodes)
 		{
 			[self _recursivelyAddItemsToMenu:inMenu withNode:subnode indentation:inIndentation+1 selector:inSelector target:inTarget];
 		}
@@ -1285,7 +1354,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	// Walk through all nodes...
 	
-	for (IMBNode* node in _rootNodes)
+	for (IMBNode* node in self.subnodes)
 	{
 		didAddSeparator = NO;
 		
