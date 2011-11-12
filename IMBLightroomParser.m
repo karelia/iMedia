@@ -437,7 +437,7 @@ static NSArray* sSupportedUTIs = nil;
 	
     else
     {
-    	inNode.subNodes = [NSArray array];
+    	inNode.subnodes = [NSMutableArray array];
         inNode.objects = [NSArray array];
     }
 
@@ -486,7 +486,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [NSMutableArray array];
 	NSMutableArray* objects = [NSMutableArray array];
 	inFoldersNode.displayedObjectCount = 0;
 	
@@ -526,7 +526,7 @@ static NSArray* sSupportedUTIs = nil;
                                                     nodeType:IMBLightroomNodeTypeFolder];
 			node.leaf = NO;
 			
-			[subNodes addObject:node];
+			[subnodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
 			object.representedNodeIdentifier = node.identifier;
@@ -546,7 +546,7 @@ static NSArray* sSupportedUTIs = nil;
 		[results close];
 	}
 	
-	inFoldersNode.subNodes = subNodes;
+	inFoldersNode.subnodes = subnodes;
 	inFoldersNode.objects = objects;
 }
 
@@ -561,7 +561,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [NSMutableArray array];
 	NSMutableArray* objects = [NSMutableArray array];
 	inParentNode.displayedObjectCount = 0;
 	
@@ -611,7 +611,7 @@ static NSArray* sSupportedUTIs = nil;
 
 				node.identifier = [self identifierWithFolderId:id_local];
 				
-				[subNodes addObject:node];
+				[subnodes addObject:node];
 			
 				NSDictionary* attributes = [self attributesWithRootFolder:parentRootFolder
 																  idLocal:id_local
@@ -639,7 +639,7 @@ static NSArray* sSupportedUTIs = nil;
 		[results close];
 	}
 	
-	inParentNode.subNodes = subNodes;
+	inParentNode.subnodes = subnodes;
 	inParentNode.objects = objects;
 }
 
@@ -656,7 +656,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add an empty subnodes array, to avoid endless loop, even if the following query returns no results...
 	
-	NSMutableArray* subNodes = [NSMutableArray arrayWithArray:inParentNode.subNodes];
+	NSMutableArray* subnodes = [NSMutableArray arrayWithArray:inParentNode.subnodes];
 	NSMutableArray* objects = [NSMutableArray arrayWithArray:inParentNode.objects];
 	inParentNode.displayedObjectCount = 0;
 	
@@ -724,7 +724,7 @@ static NSArray* sSupportedUTIs = nil;
 
 			node.leaf = NO;
 			
-			[subNodes addObject:node];
+			[subnodes addObject:node];
 			
 			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
 			object.representedNodeIdentifier = node.identifier;
@@ -742,7 +742,7 @@ static NSArray* sSupportedUTIs = nil;
 		[results close];
 	}
 	
-	inParentNode.subNodes = subNodes;
+	inParentNode.subnodes = subnodes;
 	inParentNode.objects = objects;
 }
 

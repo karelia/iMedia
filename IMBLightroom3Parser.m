@@ -185,7 +185,7 @@
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [NSMutableArray array];
 	NSMutableArray* objects = [NSMutableArray array];
 	inRootNode.displayedObjectCount = 0;
 	
@@ -212,7 +212,7 @@
                                                    nodeType:IMBLightroomNodeTypeFolder];
 	foldersNode.leaf = NO;
 	
-	[subNodes addObject:foldersNode];
+	[subnodes addObject:foldersNode];
 
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
 	foldersObject.representedNodeIdentifier = foldersNode.identifier;
@@ -242,7 +242,7 @@
 	collectionsNode.parser = self;
 	collectionsNode.leaf = NO;
 	
-	[subNodes addObject:collectionsNode];
+	[subnodes addObject:collectionsNode];
 	
 	IMBNodeObject* collectionsObject = [[[IMBNodeObject alloc] init] autorelease];
 	collectionsObject.representedNodeIdentifier = collectionsNode.identifier;
@@ -256,7 +256,7 @@
 	
 	[objects addObject:collectionsObject];
 	
-	inRootNode.subNodes = subNodes;
+	inRootNode.subnodes = subnodes;
 	inRootNode.objects = objects;
 
 	[super populateSubnodesForRootNode:collectionsNode];

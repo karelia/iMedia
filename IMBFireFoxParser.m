@@ -285,7 +285,7 @@
 		}
 		else
 		{
-			node.subNodes = [NSArray array];		// Empty subnodes/objects since we couldn't read it.
+			node.subnodes = [NSMutableArray array];		// Empty subnodes/objects since we couldn't read it.
 			node.objects = [NSArray array];
 		}
 	
@@ -320,7 +320,7 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {	
-	NSMutableArray *subNodes = [NSMutableArray array];
+	NSMutableArray *subnodes = [NSMutableArray array];
 	NSMutableArray *objects = [NSMutableArray array];
 
 	NSNumber *parentIDNumber = [inNode.attributes objectForKey:@"id"];
@@ -366,7 +366,7 @@
 			node.parser = self;
 			// ??? node.mediaSource = self.mediaSource;
 			node.identifier = [self identifierForPath:[NSString stringWithFormat:@"/%d/%@",theID, theName]];
-			[subNodes addObject:node];
+			[subnodes addObject:node];
 			
 			// Top level node?  Make sub-objects show up for these subnodes as well.
 			// if ([parentIDNumber intValue] == 1)
@@ -385,7 +385,7 @@
 			}
 		}
 	}
-	inNode.subNodes = subNodes;
+	inNode.subnodes = subnodes;
 
 	[rs close]; rs = nil;
 		
@@ -447,9 +447,9 @@
 	
 	
 	// Now do the recursion, now that we are done with the queries.  (I don't want to try queries within queries!)
-	for (IMBNode *subNode in inNode.subNodes)
+	for (IMBNode *subnode in inNode.subnodes)
 	{
-		[self populateNode:subNode options:inOptions error:outError];
+		[self populateNode:subnode options:inOptions error:outError];
 	}
 	
 

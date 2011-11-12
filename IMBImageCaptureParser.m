@@ -228,7 +228,7 @@
 	NSError* error = nil;
 	
 	if( !inNode.objects ||
-	   !inNode.subNodes )
+	   !inNode.subnodes )
 	{ // only populate if empty
 		
 		ICAObject object = [inNode.mediaSource intValue];
@@ -301,7 +301,7 @@
 		[subnodes addObject:deviceNode];
 	}
 	
-	inNode.subNodes = subnodes;
+	inNode.subnodes = subnodes;
 	inNode.objects = [NSArray array]; // prevent endless loop
 	
 	// now add any unlisted devices with an placeholder node
@@ -384,7 +384,7 @@
 		}
 		
 	}
-	inNode.subNodes = subnodes;
+	inNode.subnodes = subnodes;
 	inNode.objects = objects;
 	return [subnodes count] > 0;
 	

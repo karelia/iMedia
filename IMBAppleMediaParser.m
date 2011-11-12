@@ -603,7 +603,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [NSMutableArray array];
 	
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
@@ -617,37 +617,37 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSString* faceKeyPhotoKey = nil;
 	NSString* path = nil;
 	IMBNodeObject* object = nil;
-	NSString* subNodeType = @"Face";
+	NSString* subnodeType = @"Face";
 	
 	for (NSDictionary* faceDict in sortedFaces)
 	{
-		NSString* subNodeName = [faceDict objectForKey:@"name"];
+		NSString* subnodeName = [faceDict objectForKey:@"name"];
 		
-		if ([self shouldUseAlbumType:subNodeType] && 
+		if ([self shouldUseAlbumType:subnodeType] && 
 			[self shouldUseAlbum:faceDict images:inImages])
 		{
 			// Create subnode for this node...
 			
-			IMBNode* subNode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			
-			subNode.leaf = [self isLeafAlbumType:subNodeType];
-			subNode.icon = [self iconForAlbumType:subNodeType];
-			subNode.name = subNodeName;
-			subNode.mediaSource = self.mediaSource;
-			subNode.parser = self;
+			subnode.leaf = [self isLeafAlbumType:subnodeType];
+			subnode.icon = [self iconForAlbumType:subnodeType];
+			subnode.name = subnodeName;
+			subnode.mediaSource = self.mediaSource;
+			subnode.parser = self;
 			
 			// Keep a ref to face dictionary for potential later use
-			subNode.attributes = faceDict;
+			subnode.attributes = faceDict;
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node.
 			// Note that a faces dictionary always has a "key" key.
 			
-			NSNumber* subNodeId = [faceDict objectForKey:@"key"];
-			subNode.identifier = [self identifierForId:subNodeId inSpace:FACES_ID_SPACE];
+			NSNumber* subnodeId = [faceDict objectForKey:@"key"];
+			subnode.identifier = [self identifierForId:subnodeId inSpace:FACES_ID_SPACE];
 			
 			// Add the new subnode to its parent (inRootNode)...
 			
-			[subNodes addObject:subNode];
+			[subnodes addObject:subnode];
 			
 			// Now create the visual object and link it to subnode just created
 			
@@ -658,7 +658,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary
 			// because movies and images are not jointly displayed in iMedia browser
 			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:faceDict];
-			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subNode images:inImages]];
+			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 			
 			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
 			object.metadata = nil;								// Build lazily when needed (takes longer)
@@ -670,9 +670,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
-			object.representedNodeIdentifier = subNode.identifier;
+			object.representedNodeIdentifier = subnode.identifier;
 			object.location = (id)path;
-			object.name = subNode.name;
+			object.name = subnode.name;
 			object.parser = self;
 			object.index = index++;
 			
@@ -682,7 +682,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		}
 	}	
 	[pool drain];
-	inNode.subNodes = subNodes;
+	inNode.subnodes = subnodes;
 	inNode.objects = objects;
 	[objects release];
 }

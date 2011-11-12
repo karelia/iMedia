@@ -119,7 +119,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	
 	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
-	node.subNodes = nil;
+	node.subnodes = nil;
 	node.objects = nil;
 	
 	node.badgeTypeNormal = kIMBBadgeTypeReload;
@@ -174,7 +174,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	
 	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
-	node.subNodes = nil;
+	node.subnodes = nil;
 	node.objects = nil;
 	
 	node.badgeTypeNormal = kIMBBadgeTypeReload;

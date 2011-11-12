@@ -332,11 +332,11 @@
 	
 	if (inNode.isTopLevelNode && photosNodeIndex)
 	{
-		NSArray* subNodes = inNode.subNodes;
+		NSArray* subnodes = inNode.subnodes;
 		NSInteger pnIndex = [photosNodeIndex unsignedIntegerValue];
-		if (pnIndex < [subNodes count])	// Karelia case 136310, make sure offset exists
+		if (pnIndex < [subnodes count])	// Karelia case 136310, make sure offset exists
 		{
-			IMBNode* photosNode = [subNodes objectAtIndex:pnIndex];	// assumes subnodes exists same as albums!
+			IMBNode* photosNode = [subnodes objectAtIndex:pnIndex];	// assumes subnodes exists same as albums!
 			[self populateNode:photosNode options:inOptions error:outError];
 			inNode.objects = photosNode.objects;
 		}
@@ -526,11 +526,11 @@
 {	
 	IMBNode* eventsNode = nil;
 	
-	if (inNode.isTopLevelNode && [inNode.subNodes count]>0) {
+	if (inNode.isTopLevelNode && [inNode.subnodes count]>0) {
 		
 		// We should find the events node at index 0 but this logic is more bullet proof.
 		
-		for (IMBNode* node in inNode.subNodes) {
+		for (IMBNode* node in inNode.subnodes) {
 			
 			if ([self isEventsNode:node]) {
 				eventsNode = node;
@@ -691,7 +691,7 @@
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [NSMutableArray array];
 	
 	// Now parse the iPhoto XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
@@ -737,13 +737,13 @@
 			// Add the new album node to its parent (inRootNode)...
 			
 			
-			[subNodes addObject:albumNode];
+			[subnodes addObject:albumNode];
 		}
 		
 		[pool drain];
 	}
 	
-	inParentNode.subNodes = subNodes;
+	inParentNode.subnodes = subnodes;
 }
 
 
@@ -950,7 +950,7 @@
 		}
 		[pool drain];
 	}	
-	inNode.subNodes = subNodes;
+	inNode.subnodes = subNodes;
 	inNode.objects = objects;
 	[objects release];
 }
