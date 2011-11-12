@@ -78,7 +78,7 @@
 	NSDictionary* _attributes;
 	NSUInteger _groupType;
 	NSArray* _objects;
-	NSArray* _subNodes;
+	NSMutableArray* _subnodes;
 	NSInteger _displayedObjectCount;
 	NSUInteger _displayPriority;
 	
@@ -112,13 +112,21 @@
 @property (assign) NSUInteger groupType;			// Used for grouping root level nodes
 @property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
 
-// Node tree accessors. If the subNodes property is nil, that doesn't mean that there are no subNodes - instead it
-// means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
-// subNodes is an empty array, then there really aren't any subnodes.
+// Node tree accessors. If the subNodes property is nil, that doesn't mean that there are no subNodes - instead 
+// it means that the array hasn't been created yet and will be created lazily at a later time. If on the other  
+// hand subNodes is an empty array, then there really aren't any subnodes.
 
-@property (copy) NSArray* subNodes;				
+//@property (retain,readonly) NSArray* subnodes;	
+@property (retain) NSMutableArray* subnodes;	
+
+- (NSUInteger) countOfSubnodes;
+- (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;
+- (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex;
+- (void) removeObjectFromSubnodesAtIndex:(NSUInteger)inIndex;
+- (void) replaceObjectInSubnodesAtIndex:(NSUInteger)inIndex withObject:(IMBNode*)inNode;	
+		
 @property (assign,readonly) IMBNode* parentNode;
-@property (readonly) IMBNode* topLevelNode;
+@property (assign,readonly) IMBNode* topLevelNode;
 @property (assign) BOOL isTopLevelNode;
 
 // Object accessors. If the objects property is nil, that doesn't mean that there are no objects - instead it
@@ -172,10 +180,11 @@
 
 // Helper methods
 
+- (NSUInteger) index;
 - (NSIndexPath*) indexPath;
 - (NSComparisonResult) compare:(IMBNode*)inNode;
 - (BOOL) isPopulated;
-- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier;
+- (IMBNode*) subnodeWithIdentifier:(NSString*)inIdentfier;
 
 - (BOOL) isAncestorOfNode:(IMBNode*)inNode;
 - (BOOL) isDescendantOfNode:(IMBNode*)inNode;
