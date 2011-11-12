@@ -569,12 +569,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	for (IMBNode* oldNode in inOldNodes)
 	{
-		if ([oldNode compare:inNewNode] == NSOrderedAscending)
-		{
-			i++;
-		}
+		NSComparisonResult order = [oldNode compare:inNewNode];
+		if (order < 0) i++;
 	}
-
+	
 	return i;
 }
 
@@ -1158,7 +1156,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (IMBParser*) addCustomNodeForFolder:(NSString*)inPath
 {
-	IMBParser* parser = nil;
+	IMBFolderParser* parser = nil;
 
 	if (inPath)
 	{
@@ -1180,6 +1178,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 
 		parser.mediaSource = inPath;
+		parser.displayPriority = 0;
 		
 		// Register it with the IMBParserController...
 		
@@ -1189,7 +1188,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 	
-	return parser;
+	return (IMBParser*)parser;
 }
 
 

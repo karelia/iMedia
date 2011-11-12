@@ -498,11 +498,11 @@
 	
 	if (selfDisplayPriority > otherDisplayPriority)
 	{
-		return NSOrderedDescending;
+		return NSOrderedAscending;
 	}
 	else if (selfDisplayPriority < otherDisplayPriority)
 	{
-		return NSOrderedAscending;
+		return NSOrderedDescending;
 	}
 		
 	return [self.name imb_finderCompare:inNode.name];

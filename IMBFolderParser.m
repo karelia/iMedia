@@ -134,7 +134,8 @@
 	newNode.mediaSource = path;
 	newNode.identifier = [self identifierForPath:path];
 	newNode.displayPriority = self.displayPriority;			// get node's display priority from the folder parser
-	
+	if (self.custom) newNode.displayPriority = 0;			// custom nodes are always at bottom
+
 	NSString *betterName = [fm displayNameAtPath:[path stringByDeletingPathExtension]];
     betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 	newNode.name = betterName;
