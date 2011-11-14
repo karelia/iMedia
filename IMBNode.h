@@ -116,8 +116,7 @@
 // it means that the array hasn't been created yet and will be created lazily at a later time. If on the other  
 // hand subNodes is an empty array, then there really aren't any subnodes.
 
-//@property (retain,readonly) NSArray* subnodes;	
-@property (retain) NSMutableArray* subnodes;	
+@property (retain,readonly) NSArray* subnodes;	
 
 - (NSUInteger) countOfSubnodes;
 - (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;

@@ -120,6 +120,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 - (id) init
 {
 	if (self = [super init])
@@ -241,12 +242,12 @@
 #pragma mark Accessors
 
 
-- (void) setSubnodes:(NSMutableArray*)inSubnodes
-{
-	[_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
-	[inSubnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
-	self.atomic_subnodes = inSubnodes;
-}
+//- (void) setSubnodes:(NSMutableArray*)inSubnodes
+//{
+//	[_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
+//	[inSubnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
+//	self.atomic_subnodes = inSubnodes;
+//}
 
 
 - (NSArray*) subnodes
@@ -306,8 +307,8 @@
 	if (_subnodes != nil && inIndex < self.countOfSubnodes)
 	{
 		IMBNode* oldNode = [_subnodes objectAtIndex:inIndex];
-		
 		oldNode.parentNode = nil;
+		
 		[_subnodes replaceObjectAtIndex:inIndex withObject:inNode];
 		inNode.parentNode = self;
 	}

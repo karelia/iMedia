@@ -525,3 +525,35 @@
 
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@interface IMBNode ()
+@property (retain) NSMutableArray* atomic_subnodes;	
+@end
+
+
+@implementation IMBNode (Mutable)
+
+- (void) setSubnodes:(NSMutableArray*)inSubnodes
+{
+	[_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
+	[inSubnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
+	self.atomic_subnodes = inSubnodes;
+}
+
+- (NSArray*) subnodes
+{
+	return self.atomic_subnodes;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+

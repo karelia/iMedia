@@ -53,12 +53,12 @@
 #pragma mark HEADERS
 
 #import "IMBCommon.h"
+#import "IMBNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@class IMBNode;
 @class IMBObject;
 @class IMBObjectsPromise;
 
@@ -174,6 +174,17 @@
 - (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode;
 - (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode;
 
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Private writable accessor method only to be used by parser classes...
+
+
+@interface IMBNode (Mutable)
+@property (retain) NSMutableArray* subnodes;	
 @end
 
 
