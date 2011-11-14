@@ -138,7 +138,7 @@
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	NSMutableArray* subnodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [inRootNode mutableSubnodes];
 	NSMutableArray* objects = [NSMutableArray array];
 	inRootNode.displayedObjectCount = 0;
 	
@@ -179,7 +179,6 @@
 	
 	[objects addObject:foldersObject];
 
-	inRootNode.subnodes = subnodes;
 	inRootNode.objects = objects;
 	
 	// Add the Collections node...

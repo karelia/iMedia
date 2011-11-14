@@ -597,19 +597,22 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 				 withFaces:(NSDictionary*)inFaces
 					images:(NSDictionary*)inImages
 {
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
 	// Pull all information on faces from faces dictionary and face occurences in images
-	// into a faces array (sorted by name)
+	// into a faces array (sorted by name)...
+	
 	NSArray* sortedFaces = [self faces:inFaces collectedFromImages:inImages];
 	
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
-	NSMutableArray* subnodes = [NSMutableArray array];
+	
+	NSMutableArray* subnodes = [inNode mutableSubnodes];
 	
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
-	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
 	
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
 	
 	// Setup the loop
 	
@@ -636,11 +639,12 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			subnode.mediaSource = self.mediaSource;
 			subnode.parser = self;
 			
-			// Keep a ref to face dictionary for potential later use
+			// Keep a ref to face dictionary for potential later use...
+			
 			subnode.attributes = faceDict;
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node.
-			// Note that a faces dictionary always has a "key" key.
+			// Note that a faces dictionary always has a "key" key...
 			
 			NSNumber* subnodeId = [faceDict objectForKey:@"key"];
 			subnode.identifier = [self identifierForId:subnodeId inSpace:FACES_ID_SPACE];
@@ -656,7 +660,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			[object release];
 			
 			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary
-			// because movies and images are not jointly displayed in iMedia browser
+			// because movies and images are not jointly displayed in iMedia browser...
+			
 			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:faceDict];
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 			
@@ -664,10 +669,10 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			object.metadata = nil;								// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
 			
-			// Obtain key photo dictionary (key photo is displayed while not skimming)
+			// Obtain key photo dictionary (key photo is displayed while not skimming)...
+			
 			faceKeyPhotoKey = [object.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
 			NSDictionary* keyPhotoDict = [inImages objectForKey:faceKeyPhotoKey];
-			
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
 			object.representedNodeIdentifier = subnode.identifier;
@@ -681,8 +686,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			object.imageRepresentation = nil;
 		}
 	}	
+	
 	[pool drain];
-	inNode.subnodes = subnodes;
 	inNode.objects = objects;
 	[objects release];
 }

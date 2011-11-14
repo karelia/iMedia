@@ -202,7 +202,7 @@
 	
 	if (error == nil)
 	{
-		NSMutableArray* subnodes = [NSMutableArray array];
+		NSMutableArray* subnodes = [inNode mutableSubnodes];
 		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:files.count];
 		
 		inNode.displayedObjectCount = 0;
@@ -325,7 +325,6 @@
 			}
 		}
 		
-		inNode.subnodes = subnodes;
 		inNode.objects = objects;
 		inNode.leaf = [subnodes count] == 0;
 	}

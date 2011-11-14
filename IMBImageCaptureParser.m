@@ -287,10 +287,10 @@
 #pragma mark Internal handling
 #pragma mark Populate nodes with data returned from ICA:
 
-- (void) _addICADeviceList:(NSArray *) devices toNode:(IMBNode *)inNode
+- (void) _addICADeviceList:(NSArray*)devices toNode:(IMBNode*)inNode
 {
 	// we retrieved a device list
-	NSMutableArray *subnodes = [NSMutableArray array];
+	NSMutableArray *subnodes = [inNode mutableSubnodes];
 	NSMutableArray *deviceIdentifiers = [NSMutableArray array];
 	
 	for( NSDictionary *anDevice in devices )
@@ -301,7 +301,6 @@
 		[subnodes addObject:deviceNode];
 	}
 	
-	inNode.subnodes = subnodes;
 	inNode.objects = [NSArray array]; // prevent endless loop
 	
 	// now add any unlisted devices with an placeholder node
@@ -317,11 +316,11 @@
 // recursive creation of subtree nodes 
 // R: object had children
 
-- (BOOL) _addICATree:(NSArray *)subItems toNode:(IMBNode *)inNode
+- (BOOL) _addICATree:(NSArray*)subItems toNode:(IMBNode*)inNode
 {
 	DEBUGLOG( @"%s\n inNode %@",__PRETTY_FUNCTION__, inNode );
 
-	NSMutableArray *subnodes = [NSMutableArray array];
+	NSMutableArray *subnodes = [inNode mutableSubnodes];
 	NSMutableArray *objects = [NSMutableArray array];
 	
 	for( NSDictionary *anItem in subItems )
@@ -384,10 +383,9 @@
 		}
 		
 	}
-	inNode.subnodes = subnodes;
+
 	inNode.objects = objects;
 	return [subnodes count] > 0;
-	
 }
 
 - (void) _addICAObject:(NSDictionary *) anItem toObjectArray:(NSMutableArray *) objectArray

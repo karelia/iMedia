@@ -279,13 +279,14 @@
 		node.attributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:1] forKey:@"id"];
 		
 		self.database = [FMDatabase databaseWithPath:self.databasePathCurrent];
+		
 		if ([self openDatabase])
 		{
 			[self populateNode:node options:inOptions error:outError];		// populate the WHOLE thing.
 		}
 		else
 		{
-			node.subnodes = [NSMutableArray array];		// Empty subnodes/objects since we couldn't read it.
+			[[node mutableSubnodes] removeAllObjects];		// Empty subnodes/objects since we couldn't read it.
 			node.objects = [NSArray array];
 		}
 	
@@ -320,7 +321,7 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {	
-	NSMutableArray *subnodes = [NSMutableArray array];
+	NSMutableArray *subnodes = [inNode mutableSubnodes];
 	NSMutableArray *objects = [NSMutableArray array];
 
 	NSNumber *parentIDNumber = [inNode.attributes objectForKey:@"id"];
@@ -385,7 +386,6 @@
 			}
 		}
 	}
-	inNode.subnodes = subnodes;
 
 	[rs close]; rs = nil;
 		
