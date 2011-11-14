@@ -65,9 +65,15 @@
 #pragma mark
 
 @interface IMBNode ()
+
 @property (retain) NSMutableArray* atomic_subnodes;	
+- (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex;
+- (void) removeObjectFromSubnodesAtIndex:(NSUInteger)inIndex;
+- (void) replaceObjectInSubnodesAtIndex:(NSUInteger)inIndex withObject:(IMBNode*)inNode;	
+
 @property (assign,readwrite) IMBNode* parentNode;
 - (void) _recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray*)inIndexArray;
+
 @end
 
 
@@ -273,27 +279,17 @@
 
 - (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex
 {
-	if (_subnodes == nil)
-	{
-		self.atomic_subnodes = [NSMutableArray array];
-	}
-	
-	if (inIndex <= self.countOfSubnodes)
+	if (_subnodes != nil)
 	{
 		[_subnodes insertObject:inNode atIndex:inIndex];
+		inNode.parentNode = self;
 	}
-	else
-	{
-		[_subnodes addObject:inNode];	// Convenience for adding at end with large index (e.g. NSNotFound)
-	}
-	
-	inNode.parentNode = self;
 }
 
 
 - (void) removeObjectFromSubnodesAtIndex:(NSUInteger)inIndex
 {
-	if (_subnodes != nil && inIndex < self.countOfSubnodes)
+	if (_subnodes != nil)
 	{
 		IMBNode* node = [_subnodes objectAtIndex:inIndex];
 		node.parentNode = nil;
@@ -304,7 +300,7 @@
 
 - (void) replaceObjectInSubnodesAtIndex:(NSUInteger)inIndex withObject:(IMBNode*)inNode
 {
-	if (_subnodes != nil && inIndex < self.countOfSubnodes)
+	if (_subnodes != nil)
 	{
 		IMBNode* oldNode = [_subnodes objectAtIndex:inIndex];
 		oldNode.parentNode = nil;
@@ -312,6 +308,20 @@
 		[_subnodes replaceObjectAtIndex:inIndex withObject:inNode];
 		inNode.parentNode = self;
 	}
+}
+
+
+// This accessor is only to be used by parser classes and IMBLibraryController, i.e. those participants that
+// are offically allowed to mutate IMBNodes...
+
+- (NSMutableArray*) mutableSubnodes
+{
+	if (_subnodes == nil)
+	{
+		self.atomic_subnodes = [NSMutableArray array];
+	}
+
+	return [self mutableArrayValueForKey:@"subnodes"];
 }
 
 
