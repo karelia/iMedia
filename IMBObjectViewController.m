@@ -1025,7 +1025,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 			@"Open",
 			@"Menu item in context menu of IMBObjectViewController");
 		
-		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openSubNode:) keyEquivalent:@""];
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openSubnode:) keyEquivalent:@""];
 		[item setRepresentedObject:[inObject location]];
 		[item setTarget:self];
 		[menu addItem:item];
@@ -1328,7 +1328,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 }
 
 
-- (IBAction) openSubNode:(id)inSender
+- (IBAction) openSubnode:(id)inSender
 {
 	IMBNode* node = (IMBNode*)[inSender representedObject];
 	[_nodeViewController expandSelectedNode];

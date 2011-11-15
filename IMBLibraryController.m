@@ -817,7 +817,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
             }
         }
 		
-		// Since setSubNodes: is a copy setter we need to get a pointer to the new instance before turning
+		// Since setSubnodes: is a copy setter we need to get a pointer to the new instance before turning
 		// off the loading state...
 		
 		IMBNode* node = [self nodeWithIdentifier:inNewNode.identifier];

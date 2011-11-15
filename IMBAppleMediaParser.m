@@ -604,7 +604,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	
 	NSArray* sortedFaces = [self faces:inFaces collectedFromImages:inImages];
 	
-	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
+	// Create the subnodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
 	NSMutableArray* subnodes = [inNode mutableSubnodes];

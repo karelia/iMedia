@@ -65,8 +65,8 @@
 	
 	while (cur = [e nextObject])
 	{
-		IMBNode *subNode = [self recursivelyParseFolder:cur];
-		[node addItem:subNode];
+		IMBNode *subnode = [self recursivelyParseFolder:cur];
+		[node addItem:subnode];
 	}
 	
 	e = [[folder elementsForName:@"bookmark"] objectEnumerator];

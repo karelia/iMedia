@@ -117,7 +117,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	//node.parentNode = root;
 	node.parser = parser;
 	
-	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
+	//	Leaving subnodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
 //	node.subnodes = nil;
 	node.objects = nil;
@@ -172,7 +172,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	node.leaf = YES;	
 	node.attributes = [NSMutableDictionary dictionary];
 	
-	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
+	//	Leaving subnodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
 //	node.subnodes = nil;
 	node.objects = nil;

@@ -603,7 +603,7 @@
 	if (_parentNode)
 	{
 		[_parentNode _recursivelyWalkParentsAddingPathIndexTo:inIndexArray];
-//		NSUInteger index = [_parentNode.subNodes indexOfObjectIdenticalTo:self];
+//		NSUInteger index = [_parentNode.subnodes indexOfObjectIdenticalTo:self];
 //		[inIndexArray addObject:[NSNumber numberWithUnsignedInt:index]];
 		
 		NSUInteger index = 0;

@@ -688,7 +688,7 @@
 
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
 {
-	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
+	// Create the subnodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
 	NSMutableArray* subnodes = [inParentNode mutableSubnodes];
@@ -855,10 +855,10 @@
 
 - (void) populateEventsNode:(IMBNode*)inNode withEvents:(NSArray*)inEvents images:(NSDictionary*)inImages
 {
-	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
+	// Create the subnodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subNodes = [inNode mutableSubnodes];
+	NSMutableArray* subnodes = [inNode mutableSubnodes];
 	
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
@@ -869,7 +869,7 @@
 	// We saved a reference to the album dictionary when this node was created
 	// (ivar 'attributes') and now happily reuse it to save an outer loop (over album list) here.
 	
-	NSString* subNodeType = @"Event";
+	NSString* subnodeType = @"Event";
 	
 	// Events node is populated with node objects that represent events
 	
@@ -877,40 +877,40 @@
 	NSString* path = nil;
 	IMBiPhotoEventNodeObject* object = nil;
 	
-	for (NSDictionary* subNodeDict in inEvents)
+	for (NSDictionary* subnodeDict in inEvents)
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-		NSString* subNodeName = [subNodeDict objectForKey:@"RollName"];
+		NSString* subnodeName = [subnodeDict objectForKey:@"RollName"];
 		
-		if ([self shouldUseAlbumType:subNodeType] && 
-			[self shouldUseAlbum:subNodeDict images:inImages])
+		if ([self shouldUseAlbumType:subnodeType] && 
+			[self shouldUseAlbum:subnodeDict images:inImages])
 		{
 			// Create subnode for this node...
 			
-			IMBNode* subNode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			
-			subNode.leaf = [self isLeafAlbumType:subNodeType];
-			subNode.icon = [self iconForAlbumType:subNodeType];
-			subNode.name = subNodeName;
-			subNode.mediaSource = self.mediaSource;
-			subNode.parser = self;
+			subnode.leaf = [self isLeafAlbumType:subnodeType];
+			subnode.icon = [self iconForAlbumType:subnodeType];
+			subnode.name = subnodeName;
+			subnode.mediaSource = self.mediaSource;
+			subnode.parser = self;
 			
 			// Keep a ref to the subnode dictionary for potential later use
 			
-			subNode.attributes = subNodeDict;
+			subnode.attributes = subnodeDict;
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
 			// for backwards compatibility...
 			
-			NSNumber* subNodeId = [subNodeDict objectForKey:@"RollID"];
-			if (subNodeId == nil) subNodeId = [NSNumber numberWithInt:_fakeAlbumID++]; 
-			subNode.identifier = [self identifierForId:subNodeId inSpace:EVENTS_ID_SPACE];
+			NSNumber* subnodeId = [subnodeDict objectForKey:@"RollID"];
+			if (subnodeId == nil) subnodeId = [NSNumber numberWithInt:_fakeAlbumID++]; 
+			subnode.identifier = [self identifierForId:subnodeId inSpace:EVENTS_ID_SPACE];
 			
 			// Add the new subnode to its parent (inRootNode)...
 
-			[subNodes addObject:subNode];
+			[subnodes addObject:subnode];
 			
 			// Now create the visual object and link it to subnode just created...
 
@@ -921,8 +921,8 @@
 			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary because movies and 
 			// images are not jointly displayed in iMedia browser...
 			
-			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:subNodeDict];
-			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subNode images:inImages]];
+			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:subnodeDict];
+			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 
 			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
 			object.metadata = nil;								// Build lazily when needed (takes longer)
@@ -935,9 +935,9 @@
 			
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
-			object.representedNodeIdentifier = subNode.identifier;
+			object.representedNodeIdentifier = subnode.identifier;
 			object.location = (id)path;
-			object.name = subNode.name;
+			object.name = subnode.name;
 			object.parser = self;
 			object.index = index++;
 			

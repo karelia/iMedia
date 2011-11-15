@@ -703,7 +703,7 @@
 
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
 {
-	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
+	// Create the subnodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
 	NSMutableArray* subnodes = [inParentNode mutableSubnodes];

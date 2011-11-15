@@ -380,7 +380,7 @@
 	rootNode.isTopLevelNode = YES;
 	rootNode.groupType = kIMBGroupTypeInternet;
 	
-	//	Leaving subNodes and objects nil, will trigger a populateNode:options:error: 
+	//	Leaving subnodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
 //	rootNode.subnodes = nil;
 	rootNode.objects = nil;

@@ -271,7 +271,7 @@
 	{
 		newNode = [[self nodeCopy:inOldNode] autorelease];
 		// already done in copyNode:
-		// if ( [inOldNode.subNodes count] || [inOldNode.objects count]  )
+		// if ( [inOldNode.subnodes count] || [inOldNode.objects count]  )
 		// { 	// If the old node had subnodes, then look for subnodes in the new node...
 		// 	[self populateNode:newNode options:inOptions error:&error];
 		// }
