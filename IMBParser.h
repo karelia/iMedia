@@ -53,12 +53,12 @@
 #pragma mark HEADERS
 
 #import "IMBCommon.h"
+#import "IMBNode.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@class IMBNode;
 @class IMBObject;
 @class IMBObjectsPromise;
 

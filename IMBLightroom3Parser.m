@@ -185,7 +185,7 @@
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	NSMutableArray* subnodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [inRootNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray* objects = [NSMutableArray array];
 	inRootNode.displayedObjectCount = 0;
 	
@@ -256,7 +256,6 @@
 	
 	[objects addObject:collectionsObject];
 	
-	inRootNode.subnodes = subnodes;
 	inRootNode.objects = objects;
 
 	[super populateSubnodesForRootNode:collectionsNode];

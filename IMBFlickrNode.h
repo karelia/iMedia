@@ -160,4 +160,7 @@ typedef enum {
 + (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
 - (void) readPropertiesFromDictionary: (NSDictionary*) dictionary;
 
+// Puts subnodes back to nil, marking the receiver as unpopulated
+- (void) resetSubnodes;
+
 @end

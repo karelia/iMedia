@@ -729,7 +729,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		{
 			if (![IMBConfig isLibraryPath:path])
 			{
-				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+				IMBParser* parser = [self.libraryController addCustomNodeForFolder:path];
 				self.selectedNodeIdentifier = [parser identifierForPath:path];
 				result = YES;
 			}
@@ -1077,7 +1077,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		NSArray* paths = [inPanel filenames];
 		for (NSString* path in paths)
 		{
-			IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+			IMBParser* parser = [self.libraryController addCustomNodeForFolder:path];
 			self.selectedNodeIdentifier = [parser identifierForPath:path];
 		}	
 		
@@ -1101,7 +1101,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (IBAction) removeNode:(id)inSender
 {
 	IMBNode* node = [self selectedNode];
-	[self.libraryController removeCustomRootNode:node];
+	[self.libraryController removeCustomNode:node];
 }
 
 

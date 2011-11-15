@@ -597,6 +597,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 				 withFaces:(NSDictionary*)inFaces
 					images:(NSDictionary*)inImages
 {
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
 	// Pull all information on faces from faces dictionary and face occurences in images
 	// into a faces array (sorted by name)...
 	
@@ -604,14 +606,13 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	
 	// Create the subnodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
-	NSMutableArray* subnodes = [NSMutableArray array];
+	
+	NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
 	
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
 	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
-	
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
 	// Setup the loop
 	
@@ -638,7 +639,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			subnode.mediaSource = self.mediaSource;
 			subnode.parser = self;
 			
-			// Keep a ref to face dictionary for potential later use
+			// Keep a ref to face dictionary for potential later use...
+			
 			subnode.attributes = faceDict;
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node.
@@ -686,7 +688,6 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	}	
 	
 	[pool drain];
-	inNode.subnodes = subnodes;
 	inNode.objects = objects;
 	[objects release];
 }

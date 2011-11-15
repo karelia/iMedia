@@ -101,7 +101,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 @interface IMBLibraryController : NSObject
 {
 	NSString* _mediaType;
-	NSMutableArray* _rootNodes;
+	NSMutableArray* _subnodes;
 	IMBOptions _options;
 	id _delegate;
 
@@ -129,7 +129,10 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 // Node accessors (must only be called on the main thread)...
 
-@property (retain) NSMutableArray* rootNodes;			
+@property (nonatomic, copy, readonly) NSArray* subnodes;
+- (NSUInteger) countOfSubnodes;
+- (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;
+		
 - (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser;
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 
@@ -143,8 +146,8 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 // Custom nodes...
 
-- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath;
-- (BOOL) removeCustomRootNode:(IMBNode*)inNode;
+- (IMBParser*) addCustomNodeForFolder:(NSString*)inPath;
+- (BOOL) removeCustomNode:(IMBNode*)inNode;
 
 // Popup menu...
 

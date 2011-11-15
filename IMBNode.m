@@ -65,8 +65,10 @@
 #pragma mark
 
 @interface IMBNode ()
-@property (assign, readwrite) IMBNode* parentNode;
+
+@property (assign,readwrite) IMBNode* parentNode;
 - (void) _recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray*)inIndexArray;
+
 @end
 
 
@@ -87,7 +89,6 @@
 @synthesize displayPriority = _displayPriority;
 @synthesize attributes = _attributes;
 @synthesize objects = _objects;
-@synthesize subnodes = _subNodes;
 @synthesize parentNode = _parentNode;
 @synthesize isTopLevelNode = _isTopLevelNode;
 
@@ -119,6 +120,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 - (id) init
 {
 	if (self = [super init])
@@ -133,7 +135,6 @@
 		self.displayedObjectCount = -1;
 		
 		self.objects = nil;
-		self.subnodes = nil;
 		self.isTopLevelNode = NO;
 		
 		self.watcherType = kIMBWatcherTypeNone;
@@ -166,7 +167,6 @@
 	copy.includedInPopup = self.includedInPopup;
 	copy.displayedObjectCount = self.displayedObjectCount;
 	
-//	copy.parentNode = self.parentNode;			// Removed to avoid potentially dangling pointers (parentNode in not retained!)
 	copy.isTopLevelNode = self.isTopLevelNode;
 	copy.parser = self.parser;
 	copy.watcherType = self.watcherType;
@@ -194,7 +194,7 @@
 	
 	if (self.subnodes)
 	{
-		NSMutableArray* subnodes = [NSMutableArray arrayWithCapacity:self.subnodes.count];
+		NSMutableArray* subnodes = [copy mutableArrayForPopulatingSubnodes];
 
 		for (IMBNode* subnode in self.subnodes)
 		{
@@ -202,12 +202,6 @@
 			[subnodes addObject:copiedSubnode];
 			[copiedSubnode release];
 		}
-		
-		copy.subnodes = subnodes;
-	}
-	else 
-	{
-		copy.subnodes = nil;
 	}
 
 	return copy;
@@ -216,15 +210,16 @@
 
 - (void) dealloc
 {
-    [self setSubnodes:nil];		// Sub-nodes have a weak reference to self, so break that
+    [_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];		// Sub-nodes have a weak reference to self, so break that
 	
+    IMBRelease(_subnodes);
 	IMBRelease(_mediaSource);
 	IMBRelease(_identifier);
 	IMBRelease(_icon);
 	IMBRelease(_name);
 	IMBRelease(_attributes);
+	IMBRelease(_subnodes);
 	IMBRelease(_objects);
-	IMBRelease(_subNodes);
 	IMBRelease(_parser);
 	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
@@ -237,21 +232,70 @@
 
 
 #pragma mark
-#pragma mark Accessors
+#pragma mark Subnodes
 
-// Accessors for navigating up or down the node tree...
 
-- (void) setSubnodes:(NSArray*)inNodes
+- (NSArray*) subnodes
 {
-    [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
-    
-	NSArray* nodes = [inNodes copy];
-    [_subNodes release]; 
-	_subNodes = nodes;
-    
-    [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
+	return [[_subnodes copy] autorelease];
 }
 
+
+- (NSUInteger) countOfSubnodes
+{
+	return [_subnodes count];
+}
+
+
+- (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex
+{
+	return [_subnodes objectAtIndex:inIndex];
+}
+
+
+#pragma mark Populating Subnodes
+
+// These KVC-compliant mutation methods will be called by the array Cocoa generates for us from -mutableArrayForPopulatingSubnodes
+
+- (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex
+{
+	[_subnodes insertObject:inNode atIndex:inIndex];
+    inNode.parentNode = self;
+}
+
+
+- (void) removeObjectFromSubnodesAtIndex:(NSUInteger)inIndex
+{
+	IMBNode* node = [_subnodes objectAtIndex:inIndex];
+    node.parentNode = nil;
+    [_subnodes removeObjectAtIndex:inIndex];
+}
+
+
+- (void) replaceObjectInSubnodesAtIndex:(NSUInteger)inIndex withObject:(IMBNode*)inNode
+{
+	IMBNode* oldNode = [_subnodes objectAtIndex:inIndex];
+    oldNode.parentNode = nil;
+    
+    [_subnodes replaceObjectAtIndex:inIndex withObject:inNode];
+    inNode.parentNode = self;
+}
+
+
+// This accessor is only to be used by parser classes and IMBLibraryController, i.e. those participants that
+// are offically allowed to mutate IMBNodes...
+
+- (NSMutableArray*) mutableArrayForPopulatingSubnodes
+{
+	if (!_subnodes) _subnodes = [[NSMutableArray alloc] init];
+	return [self mutableArrayValueForKey:@"subnodes"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Readonly accessor to return the root of a node tree...
 
 - (IMBNode*) topLevelNode
 {
@@ -264,20 +308,6 @@
 	}
 		
 	return self;
-}
-
-
-// Node accessors. Use these for bindings the NSTreeController...
-
-- (NSUInteger) countOfSubnodes
-{
-	return [_subNodes count];
-}
-
-
-- (IMBNode*) objectInSubNodesAtIndex:(NSUInteger)inIndex
-{
-	return [_subNodes objectAtIndex:inIndex];
 }
 
 
@@ -323,7 +353,7 @@
 {
 	NSUInteger count = self.countOfShallowObjects;
 	
-	for (IMBNode* node in _subNodes)
+	for (IMBNode* node in self.subnodes)
 	{
 		count += node.countOfRecursiveObjects;
 	}
@@ -348,7 +378,7 @@
 	
 	NSUInteger index = inIndex - count;
 	
-	for (IMBNode* node in _subNodes)
+	for (IMBNode* node in self.subnodes)
 	{
 		IMBObject* object = [node objectInRecursiveObjectsAtIndex:index];
 		if (object) return object;
@@ -404,21 +434,21 @@
 // (object pointers). This is necessary as nodes are relatively short-lived objects that are replaced with new
 // instances often - a necessity in our multithreaded environment...
 
-- (BOOL) isEqual:(id)aNode
+- (BOOL) isEqual:(id)inNode
 {
-    if (self == aNode)
+    if (self == inNode)
     {
         return YES; // fast path
     }
-    else if ([aNode isKindOfClass:[IMBNode class]]) // ImageKit sometimes compares us to strings
+    else if ([inNode isKindOfClass:[IMBNode class]]) // ImageKit sometimes compares us to strings
     {
-        return [[self identifier] isEqualToString:[aNode identifier]];
+        return [[self identifier] isEqualToString:[inNode identifier]];
     }
     
     return NO;
 }
 
-- (NSUInteger)hash;
+- (NSUInteger) hash;
 {
     return [[self identifier] hash];
 }
@@ -446,11 +476,11 @@
 	
 	if (selfDisplayPriority > otherDisplayPriority)
 	{
-		return NSOrderedDescending;
+		return NSOrderedAscending;
 	}
 	else if (selfDisplayPriority < otherDisplayPriority)
 	{
-		return NSOrderedAscending;
+		return NSOrderedDescending;
 	}
 		
 	return [self.name imb_finderCompare:inNode.name];
@@ -485,6 +515,19 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Returns the sibling index of this node...
+
+- (NSUInteger) index
+{
+	if (_parentNode)
+	{
+		return [_parentNode.subnodes indexOfObjectIdenticalTo:self];
+	}
+	
+	return NSNotFound;
+}
 
 
 // Returns the path to this node as a NSIndexSet. Useful for working with NSTreeController and NSOutlineView...
@@ -555,7 +598,7 @@
 
 		NSUInteger index = 0;
 		
-		for (IMBNode* siblingNode in libraryController.rootNodes)
+		for (IMBNode* siblingNode in libraryController.subnodes)
 		{
 			if ([siblingNode.identifier isEqualToString:self.identifier])
 			{
@@ -667,6 +710,7 @@
 	if ([_objects count] > 0)
 	{
 		[description appendFormat:@"\n\t\tobjects = %u",[_objects count]];
+		
 		for (IMBObject* object in _objects)
 		{
 			[description appendFormat:@"\n\t\t\t%@",object.name];
@@ -675,10 +719,11 @@
 	
 	// Subnodes...
 	
-	if ([_subNodes count] > 0)
+	if ([_subnodes count] > 0)
 	{
-		[description appendFormat:@"\n\t\tsubnodes = %u",[_subNodes count]];
-		for (IMBNode* subnode in _subNodes)
+		[description appendFormat:@"\n\t\tsubnodes = %u",[_subnodes count]];
+		
+		for (IMBNode* subnode in _subnodes)
 		{
 			[description appendFormat:@"\n\t\t\t%@",subnode.name];
 		}

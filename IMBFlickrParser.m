@@ -338,8 +338,12 @@
 		
 		//	Keep the 'populateNode:' loop quiet until we got our data. Also this will
 		//	ensure that the parser is not called again and again to populate the node.
+		
+		if (node.subnodes == nil) {
+			[node mutableArrayForPopulatingSubnodes];
+		}
+		
 		if (node.objects == nil) {
-			node.subnodes = [NSArray array];
 			node.objects = [NSArray array];
 		}
 		
@@ -378,7 +382,6 @@
 	
 	//	Leaving subnodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
-	rootNode.subnodes = nil;
 	rootNode.objects = nil;
 
 	rootNode.watcherType = kIMBWatcherTypeFirstCustom;
@@ -429,10 +432,10 @@
 	
 	if (inFlickrNode.isTopLevelNode) {
 		//	populate root node...
-		NSArray* standardNodes = [NSArray arrayWithObjects:
-								  [IMBFlickrNode flickrNodeForRecentPhotosForRoot:inFlickrNode parser:self],
-								  [IMBFlickrNode flickrNodeForInterestingPhotosForRoot:inFlickrNode parser:self], nil];
-		inFlickrNode.subnodes = [standardNodes arrayByAddingObjectsFromArray:[self instantiateCustomQueriesWithRoot:inFlickrNode]];
+		NSMutableArray* subnodes = [inFlickrNode mutableArrayForPopulatingSubnodes];
+		[subnodes addObject:[IMBFlickrNode flickrNodeForRecentPhotosForRoot:inFlickrNode parser:self]];
+		[subnodes addObject:[IMBFlickrNode flickrNodeForInterestingPhotosForRoot:inFlickrNode parser:self]];
+		[subnodes addObjectsFromArray:[self instantiateCustomQueriesWithRoot:inFlickrNode]];
 		
 		// Put the queries into the objects, so that selecting top-level node will show queries as smart folders
 		NSUInteger index = 0;
@@ -824,7 +827,8 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	[node readPropertiesFromDictionary:inQueryParams];
 	
 	//	clean existing results...
-	node.subnodes = nil;
+	
+	[node resetSubnodes];
 	node.objects = nil;
 	
 	//	force reloading of the node holding the Flickr images...
