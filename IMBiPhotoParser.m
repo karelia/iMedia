@@ -897,7 +897,7 @@
 			subnode.parser = self;
 			
 			// Keep a ref to the subnode dictionary for potential later use
-			
+
 			subnode.attributes = subnodeDict;
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
@@ -918,9 +918,9 @@
 			[objects addObject:object];
 			[object release];
 			
-			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary because movies and 
-			// images are not jointly displayed in iMedia browser...
-			
+			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary
+			// because movies and images are not jointly displayed in iMedia browser
+
 			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:subnodeDict];
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 
