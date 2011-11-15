@@ -247,44 +247,13 @@
 #pragma mark 
 #pragma mark IMBParserController Delegate
 
-- (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString *)parserClassname forMediaType:(NSString*)inMediaType
-{
-	BOOL result = YES;
-#if LOG_PARSERS
-	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,parserClassname,inMediaType);
-#endif
-	
-	if ([parserClassname isEqualToString:@"IMBImageCaptureParser"])
-	{
-		return NO;
-	}
-	
-	//	if ([parserClassname isEqualToString:@"IMBFlickrParser"])
-	//	{
-	//		// Quick check keychain.  Detailed fetching is below in "didLoadParser" though.
-	//		SecKeychainItemRef item = nil;
-	//		UInt32 stringLength;
-	//		char* buffer;
-	//		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
-	//		if (err == noErr)
-	//		{
-	//			SecKeychainItemFreeContent(NULL, buffer);
-	//		}
-	//		result = (item != nil && err == noErr);
-	//	}
-	return result;
-}
-
-
-- (BOOL) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
+- (IMBParser *)parserController:(IMBParserController *)controller willLoadParser:(IMBParser *)parser;
 {
 #if LOG_PARSERS
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
 #endif
 	
-	BOOL loaded = YES;
-	
-	if ([inParser isKindOfClass:[IMBFlickrParser class]])
+    if ([parser isKindOfClass:[IMBFlickrParser class]])
 	{
 		// To test this, get your own API key from flickr (noncommercial at first, but you are planning
 		// on supporting flickr in iMedia on a commmercial app, you will have to apply for a commercial
@@ -294,7 +263,7 @@
 		// http://flickr.com/services/api/keys/apply
 		// If you already have an API key, you will find it here:  http://www.flickr.com/services/api/keys/
 		
-		IMBFlickrParser* flickrParser = (IMBFlickrParser*)inParser;
+		IMBFlickrParser* flickrParser = (IMBFlickrParser*)parser;
 		flickrParser.delegate = self;
 		
 		// For your actual app, you would put in the hard-wired strings here.
@@ -347,10 +316,39 @@
 		else
 		{
 			NSLog(@"%s Couldn't find 'flickr_api' account in keychain: status %d", __FUNCTION__, err);
-			loaded = NO;
 		}
 	}		// end IMBFlickrParser code
-	return loaded;
+    
+    if (![parser canBeUsed]) parser = nil;
+    return parser;
+}
+
+- (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString *)parserClassname forMediaType:(NSString*)inMediaType
+{
+	BOOL result = YES;
+#if LOG_PARSERS
+	NSLog(@"%s inParserClass=%@ inMediaType=%@",__FUNCTION__,parserClassname,inMediaType);
+#endif
+	
+	if ([parserClassname isEqualToString:@"IMBImageCaptureParser"])
+	{
+		return NO;
+	}
+	
+	//	if ([parserClassname isEqualToString:@"IMBFlickrParser"])
+	//	{
+	//		// Quick check keychain.  Detailed fetching is below in "didLoadParser" though.
+	//		SecKeychainItemRef item = nil;
+	//		UInt32 stringLength;
+	//		char* buffer;
+	//		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
+	//		if (err == noErr)
+	//		{
+	//			SecKeychainItemFreeContent(NULL, buffer);
+	//		}
+	//		result = (item != nil && err == noErr);
+	//	}
+	return result;
 }
 
 
