@@ -453,7 +453,8 @@ static NSArray* sSupportedUTIs = nil;
 
 - (void) didStopUsingParser
 {
-	@synchronized (self) {
+	@synchronized (self)
+	{
 		self.databases = nil;
 		self.thumbnailDatabases = nil;
 	}

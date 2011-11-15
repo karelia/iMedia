@@ -856,9 +856,7 @@
 
 // Create a subnode for each event and a corresponding visual object
 
-- (void) populateEventsNode:(IMBNode*)inNode 
-				 withEvents:(NSArray*)inEvents
-					 images:(NSDictionary*)inImages
+- (void) populateEventsNode:(IMBNode*)inNode withEvents:(NSArray*)inEvents images:(NSDictionary*)inImages
 {
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
@@ -869,7 +867,6 @@
 	// without creating an array we would cause an endless loop...
 	
 	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
-	
 	NSUInteger index = 0;
 	
 	// We saved a reference to the album dictionary when this node was created
@@ -903,6 +900,7 @@
 			subNode.parser = self;
 			
 			// Keep a ref to the subnode dictionary for potential later use
+			
 			subNode.attributes = subNodeDict;
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
@@ -917,14 +915,15 @@
 
 			[subNodes addObject:subNode];
 			
-			// Now create the visual object and link it to subnode just created
+			// Now create the visual object and link it to subnode just created...
 
 			object = [[IMBiPhotoEventNodeObject alloc] init];
 			[objects addObject:object];
 			[object release];
 			
-			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary
-			// because movies and images are not jointly displayed in iMedia browser
+			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary because movies and 
+			// images are not jointly displayed in iMedia browser...
+			
 			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:subNodeDict];
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subNode images:inImages]];
 
@@ -933,6 +932,7 @@
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
 			
 			// Obtain key photo dictionary (key photo is displayed while not skimming)
+			
 			eventKeyPhotoKey = [object.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
 			NSDictionary* keyPhotoDict = [inImages objectForKey:eventKeyPhotoKey];
 			
