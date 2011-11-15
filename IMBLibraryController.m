@@ -314,7 +314,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @implementation IMBLibraryController
 
 @synthesize mediaType = _mediaType;
-@synthesize subnodes = _subnodes;
 @synthesize options = _options;
 @synthesize delegate = _delegate;
 @synthesize watcherUKKQueue = _watcherUKKQueue;
@@ -361,7 +360,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		self.mediaType = inMediaType;
 		self.options = kIMBOptionNone;
-		self.subnodes = [NSMutableArray array];
+		_subnodes = [[NSMutableArray alloc] init];
 		
 		// Initialize file system watching...
 		
@@ -417,6 +416,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 #pragma mark 
 #pragma mark Node Accessors
+
+- (NSArray *) subnodes { return [[_subnodes copy] autorelease]; }
 
 - (NSUInteger) countOfSubnodes
 {
@@ -476,9 +477,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	NSArray* parsers = [[IMBParserController sharedParserController] parsersForMediaType:self.mediaType];
 	
-	[self willChangeValueForKey:@"rootNodes"];
-	[self.subnodes removeAllObjects];
-	[self didChangeValueForKey:@"rootNodes"];
+	[[self mutableArrayValueForKey:@"subnodes"] removeAllObjects];
 	
 	for (IMBParser* parser in parsers)
 	{

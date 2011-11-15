@@ -129,13 +129,9 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 // Node accessors (must only be called on the main thread)...
 
-@property (retain) NSMutableArray* subnodes;	
-
+@property (nonatomic, copy, readonly) NSArray* subnodes;
 - (NSUInteger) countOfSubnodes;
 - (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;
-- (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex;
-- (void) removeObjectFromSubnodesAtIndex:(NSUInteger)inIndex;
-- (void) replaceObjectInSubnodesAtIndex:(NSUInteger)inIndex withObject:(IMBNode*)inNode;	
 		
 - (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser;
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
