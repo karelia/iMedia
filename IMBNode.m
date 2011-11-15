@@ -66,11 +66,6 @@
 
 @interface IMBNode ()
 
-@property (retain) NSMutableArray* atomic_subnodes;	
-- (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex;
-- (void) removeObjectFromSubnodesAtIndex:(NSUInteger)inIndex;
-- (void) replaceObjectInSubnodesAtIndex:(NSUInteger)inIndex withObject:(IMBNode*)inNode;	
-
 @property (assign,readwrite) IMBNode* parentNode;
 - (void) _recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray*)inIndexArray;
 
@@ -94,7 +89,6 @@
 @synthesize displayPriority = _displayPriority;
 @synthesize attributes = _attributes;
 @synthesize objects = _objects;
-@synthesize atomic_subnodes = _subnodes;
 @synthesize parentNode = _parentNode;
 @synthesize isTopLevelNode = _isTopLevelNode;
 
@@ -141,7 +135,6 @@
 		self.displayedObjectCount = -1;
 		
 		self.objects = nil;
-		self.atomic_subnodes = nil;
 		self.isTopLevelNode = NO;
 		
 		self.watcherType = kIMBWatcherTypeNone;
@@ -201,21 +194,14 @@
 	
 	if (self.subnodes)
 	{
-		NSMutableArray* subnodes = [NSMutableArray arrayWithCapacity:self.countOfSubnodes];
+		NSMutableArray* subnodes = [copy mutableSubnodes];
 
 		for (IMBNode* subnode in self.subnodes)
 		{
 			IMBNode* copiedSubnode = [subnode copy];
 			[subnodes addObject:copiedSubnode];
-			copiedSubnode.parentNode = copy;
 			[copiedSubnode release];
 		}
-		
-		copy.atomic_subnodes = subnodes;
-	}
-	else 
-	{
-		copy.atomic_subnodes = nil;
 	}
 
 	return copy;
@@ -226,6 +212,7 @@
 {
     [_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];		// Sub-nodes have a weak reference to self, so break that
 	
+    IMBRelease(_subnodes);
 	IMBRelease(_mediaSource);
 	IMBRelease(_identifier);
 	IMBRelease(_icon);
@@ -245,7 +232,7 @@
 
 
 #pragma mark
-#pragma mark Accessors
+#pragma mark Subnodes
 
 
 //- (void) setSubnodes:(NSMutableArray*)inSubnodes
@@ -258,11 +245,8 @@
 
 - (NSArray*) subnodes
 {
-	return self.atomic_subnodes;
+	return [[_subnodes copy] autorelease];
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 - (NSUInteger) countOfSubnodes
@@ -277,37 +261,32 @@
 }
 
 
+#pragma mark Populating Subnodes
+
+// These KVC-compliant mutation methods will be called by the array Cocoa generates for us from -mutableSubnodes
+
 - (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex
 {
-	if (_subnodes != nil)
-	{
-		[_subnodes insertObject:inNode atIndex:inIndex];
-		inNode.parentNode = self;
-	}
+	[_subnodes insertObject:inNode atIndex:inIndex];
+    inNode.parentNode = self;
 }
 
 
 - (void) removeObjectFromSubnodesAtIndex:(NSUInteger)inIndex
 {
-	if (_subnodes != nil)
-	{
-		IMBNode* node = [_subnodes objectAtIndex:inIndex];
-		node.parentNode = nil;
-		[_subnodes removeObjectAtIndex:inIndex];
-	}
+	IMBNode* node = [_subnodes objectAtIndex:inIndex];
+    node.parentNode = nil;
+    [_subnodes removeObjectAtIndex:inIndex];
 }
 
 
 - (void) replaceObjectInSubnodesAtIndex:(NSUInteger)inIndex withObject:(IMBNode*)inNode
 {
-	if (_subnodes != nil)
-	{
-		IMBNode* oldNode = [_subnodes objectAtIndex:inIndex];
-		oldNode.parentNode = nil;
-		
-		[_subnodes replaceObjectAtIndex:inIndex withObject:inNode];
-		inNode.parentNode = self;
-	}
+	IMBNode* oldNode = [_subnodes objectAtIndex:inIndex];
+    oldNode.parentNode = nil;
+    
+    [_subnodes replaceObjectAtIndex:inIndex withObject:inNode];
+    inNode.parentNode = self;
 }
 
 
@@ -316,11 +295,7 @@
 
 - (NSMutableArray*) mutableSubnodes
 {
-	if (_subnodes == nil)
-	{
-		self.atomic_subnodes = [NSMutableArray array];
-	}
-
+	if (!_subnodes) _subnodes = [[NSMutableArray alloc] init];
 	return [self mutableArrayValueForKey:@"subnodes"];
 }
 
