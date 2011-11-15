@@ -630,7 +630,7 @@ typedef enum {
 }
 
 
-- (void) clearSubnodes
+- (void) resetSubnodes
 {
 	[self willChangeValueForKey:@"subnodes"];
 	IMBRelease(_subnodes);

@@ -159,6 +159,8 @@ typedef enum {
 + (NSString *)descriptionOfLicense:(int)aLicenseNumber;
 + (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
 - (void) readPropertiesFromDictionary: (NSDictionary*) dictionary;
-- (void) clearSubnodes;
+
+// Puts subnodes back to nil, marking the receiver as unpopulated
+- (void) resetSubnodes;
 
 @end

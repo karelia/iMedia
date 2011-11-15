@@ -829,7 +829,7 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	
 	//	clean existing results...
 	
-	[node clearSubnodes];
+	[node resetSubnodes];
 //	node.subnodes = nil;
 	node.objects = nil;
 	
