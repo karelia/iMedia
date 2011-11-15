@@ -194,7 +194,7 @@
 	
 	if (self.subnodes)
 	{
-		NSMutableArray* subnodes = [copy mutableSubnodes];
+		NSMutableArray* subnodes = [copy mutableArrayForPopulatingSubnodes];
 
 		for (IMBNode* subnode in self.subnodes)
 		{
@@ -263,7 +263,7 @@
 
 #pragma mark Populating Subnodes
 
-// These KVC-compliant mutation methods will be called by the array Cocoa generates for us from -mutableSubnodes
+// These KVC-compliant mutation methods will be called by the array Cocoa generates for us from -mutableArrayForPopulatingSubnodes
 
 - (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex
 {
@@ -293,7 +293,7 @@
 // This accessor is only to be used by parser classes and IMBLibraryController, i.e. those participants that
 // are offically allowed to mutate IMBNodes...
 
-- (NSMutableArray*) mutableSubnodes
+- (NSMutableArray*) mutableArrayForPopulatingSubnodes
 {
 	if (!_subnodes) _subnodes = [[NSMutableArray alloc] init];
 	return [self mutableArrayValueForKey:@"subnodes"];

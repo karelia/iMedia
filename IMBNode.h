@@ -128,7 +128,7 @@
 
 #pragma mark Populating Subnodes
 // For parser classes and IMBLibraryController, who need to modify nodes, use this method. By calling it, the node is marked as populated
-- (NSMutableArray*) mutableSubnodes;
+- (NSMutableArray*) mutableArrayForPopulatingSubnodes;
 		
 
 #pragma mark 

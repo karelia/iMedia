@@ -706,7 +706,7 @@
 	// Create the subnodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subnodes = [inParentNode mutableSubnodes];
+	NSMutableArray* subnodes = [inParentNode mutableArrayForPopulatingSubnodes];
 
 	// Now parse the Aperture XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...

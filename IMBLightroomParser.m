@@ -437,7 +437,7 @@ static NSArray* sSupportedUTIs = nil;
 	
     else
     {
-		[inNode mutableSubnodes];
+		[inNode mutableArrayForPopulatingSubnodes];
         inNode.objects = [NSArray array];
     }
 
@@ -487,7 +487,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	NSMutableArray* subnodes = [inFoldersNode mutableSubnodes];
+	NSMutableArray* subnodes = [inFoldersNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray* objects = [NSMutableArray array];
 	inFoldersNode.displayedObjectCount = 0;
 	
@@ -561,7 +561,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add subnodes array, even if nothing is found in database, so that we do not cause endless loop...
 	
-	NSMutableArray* subnodes = [inParentNode mutableSubnodes];
+	NSMutableArray* subnodes = [inParentNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray* objects = [NSMutableArray array];
 	inParentNode.displayedObjectCount = 0;
 	
@@ -655,7 +655,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	// Add an empty subnodes array, to avoid endless loop, even if the following query returns no results...
 	
-	NSMutableArray* subnodes = [inParentNode mutableSubnodes];
+	NSMutableArray* subnodes = [inParentNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray* objects = [NSMutableArray arrayWithArray:inParentNode.objects];
 	inParentNode.displayedObjectCount = 0;
 	

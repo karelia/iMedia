@@ -600,7 +600,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	groupNode.group = YES;
 	groupNode.leaf = NO;
 	groupNode.parser = nil;
-	[groupNode mutableSubnodes];
+	[groupNode mutableArrayForPopulatingSubnodes];
 	groupNode.objects = [NSMutableArray array];
 	
 	if (groupType == kIMBGroupTypeLibrary)
@@ -759,7 +759,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			if (parentNode)
 			{
 				index = [inOldNode index];
-				[[parentNode mutableSubnodes] replaceObjectAtIndex:index withObject:inNewNode];
+				[[parentNode mutableArrayForPopulatingSubnodes] replaceObjectAtIndex:index withObject:inNewNode];
 			}
 			else
 			{
@@ -775,7 +775,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			if (parentNode)
 			{
 				index = [inOldNode index];
-				[[parentNode mutableSubnodes] removeObjectAtIndex:index];
+				[[parentNode mutableArrayForPopulatingSubnodes] removeObjectAtIndex:index];
 			}
 			else
 			{
@@ -793,7 +793,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 			if (parentNode)
 			{
-				[[parentNode mutableSubnodes] insertObject:inNewNode atIndex:index];
+				[[parentNode mutableArrayForPopulatingSubnodes] insertObject:inNewNode atIndex:index];
 			}
 			else
 			{

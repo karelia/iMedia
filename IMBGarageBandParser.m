@@ -253,7 +253,7 @@
 	root.watcherType = kIMBWatcherTypeNone;
 	root.objects = [NSMutableArray array];	// the root node doesn't have any objects so we can populate it already!
 	
-	NSMutableArray* subnodes = [root mutableSubnodes];
+	NSMutableArray* subnodes = [root mutableArrayForPopulatingSubnodes];
 	
 	// Add unpopulated subnode for demo songs...
 	

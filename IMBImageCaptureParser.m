@@ -290,7 +290,7 @@
 - (void) _addICADeviceList:(NSArray*)devices toNode:(IMBNode*)inNode
 {
 	// we retrieved a device list
-	NSMutableArray *subnodes = [inNode mutableSubnodes];
+	NSMutableArray *subnodes = [inNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray *deviceIdentifiers = [NSMutableArray array];
 	
 	for( NSDictionary *anDevice in devices )
@@ -320,7 +320,7 @@
 {
 	DEBUGLOG( @"%s\n inNode %@",__PRETTY_FUNCTION__, inNode );
 
-	NSMutableArray *subnodes = [inNode mutableSubnodes];
+	NSMutableArray *subnodes = [inNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray *objects = [NSMutableArray array];
 	
 	for( NSDictionary *anItem in subItems )

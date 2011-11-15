@@ -380,7 +380,7 @@
 
 - (void) populateNode:(IMBNode*)inNode plist:(NSDictionary*)inPlist
 {
-	NSMutableArray* subnodes = [inNode mutableSubnodes];
+	NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray* objects = [NSMutableArray array];
 	
 	NSArray* childrenPlist = [inPlist objectForKey:@"Children"];

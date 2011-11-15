@@ -340,7 +340,7 @@
 		//	ensure that the parser is not called again and again to populate the node.
 		
 		if (node.subnodes == nil) {
-			[node mutableSubnodes];
+			[node mutableArrayForPopulatingSubnodes];
 		}
 		
 		if (node.objects == nil) {
@@ -433,7 +433,7 @@
 	
 	if (inFlickrNode.isTopLevelNode) {
 		//	populate root node...
-		NSMutableArray* subnodes = [inFlickrNode mutableSubnodes];
+		NSMutableArray* subnodes = [inFlickrNode mutableArrayForPopulatingSubnodes];
 		[subnodes addObject:[IMBFlickrNode flickrNodeForRecentPhotosForRoot:inFlickrNode parser:self]];
 		[subnodes addObject:[IMBFlickrNode flickrNodeForInterestingPhotosForRoot:inFlickrNode parser:self]];
 		[subnodes addObjectsFromArray:[self instantiateCustomQueriesWithRoot:inFlickrNode]];

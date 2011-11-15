@@ -286,7 +286,7 @@
 		}
 		else
 		{
-			[[node mutableSubnodes] removeAllObjects];		// Empty subnodes/objects since we couldn't read it.
+			[[node mutableArrayForPopulatingSubnodes] removeAllObjects];		// Empty subnodes/objects since we couldn't read it.
 			node.objects = [NSArray array];
 		}
 	
@@ -321,7 +321,7 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {	
-	NSMutableArray *subnodes = [inNode mutableSubnodes];
+	NSMutableArray *subnodes = [inNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray *objects = [NSMutableArray array];
 
 	NSNumber *parentIDNumber = [inNode.attributes objectForKey:@"id"];
