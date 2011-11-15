@@ -382,7 +382,6 @@
 	
 	//	Leaving subnodes and objects nil, will trigger a populateNode:options:error: 
 	//	as soon as the root node is opened.
-//	rootNode.subnodes = nil;
 	rootNode.objects = nil;
 
 	rootNode.watcherType = kIMBWatcherTypeFirstCustom;
@@ -830,7 +829,6 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 	//	clean existing results...
 	
 	[node resetSubnodes];
-//	node.subnodes = nil;
 	node.objects = nil;
 	
 	//	force reloading of the node holding the Flickr images...
