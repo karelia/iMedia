@@ -562,7 +562,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Find the correct insert index to make sure that array is sorted after insertion...
 
-- (NSUInteger) _insertIndexForNewNode:(IMBNode*)inNewNode inOldNodes:(NSArray*)inOldNodes
+- (NSUInteger) _insertionIndexForNewNode:(IMBNode*)inNewNode inOldNodes:(NSArray*)inOldNodes
 {
 	NSUInteger i = 0;
 	
@@ -650,7 +650,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	// Insert the new group node at the root level. Try to avoid sorting (in order not to confused the 
 	// NSTreeController) - instead insert at the correct location, thus making sorting obsolete...
 	
-	NSUInteger i = [self _insertIndexForNewNode:groupNode inOldNodes:self.subnodes];
+	NSUInteger i = [self _insertionIndexForNewNode:groupNode inOldNodes:self.subnodes];
 	[self insertObject:groupNode inSubnodesAtIndex:i];
 	
 //	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:_rootNodes];
@@ -788,7 +788,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
         else if (inNewNode != nil)
         {
 			NSArray* subnodes = parentNode ? parentNode.subnodes : self.subnodes;
-			index = [self _insertIndexForNewNode:inNewNode inOldNodes:subnodes];
+			index = [self _insertionIndexForNewNode:inNewNode inOldNodes:subnodes];
 
 			if (parentNode)
 			{
