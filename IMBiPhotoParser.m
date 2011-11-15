@@ -856,9 +856,7 @@
 
 // Create a subnode for each event and a corresponding visual object
 
-- (void) populateEventsNode:(IMBNode*)inNode 
-				 withEvents:(NSArray*)inEvents
-					 images:(NSDictionary*)inImages
+- (void) populateEventsNode:(IMBNode*)inNode withEvents:(NSArray*)inEvents images:(NSDictionary*)inImages
 {
 	// Create the subnodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
@@ -869,7 +867,6 @@
 	// without creating an array we would cause an endless loop...
 	
 	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
-	
 	NSUInteger index = 0;
 	
 	// We saved a reference to the album dictionary when this node was created
@@ -903,6 +900,7 @@
 			subnode.parser = self;
 			
 			// Keep a ref to the subnode dictionary for potential later use
+
 			subnode.attributes = subnodeDict;
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
@@ -917,7 +915,7 @@
 
 			[subnodes addObject:subnode];
 			
-			// Now create the visual object and link it to subnode just created
+			// Now create the visual object and link it to subnode just created...
 
 			object = [[IMBiPhotoEventNodeObject alloc] init];
 			[objects addObject:object];
@@ -925,6 +923,7 @@
 			
 			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary
 			// because movies and images are not jointly displayed in iMedia browser
+
 			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:subnodeDict];
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 
@@ -933,6 +932,7 @@
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
 			
 			// Obtain key photo dictionary (key photo is displayed while not skimming)
+			
 			eventKeyPhotoKey = [object.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
 			NSDictionary* keyPhotoDict = [inImages objectForKey:eventKeyPhotoKey];
 			
