@@ -324,7 +324,7 @@
 			}
 		}
 		
-		inNode.subNodes = subnodes;
+		inNode.subnodes = subnodes;
 		inNode.objects = objects;
 		inNode.leaf = [subnodes count] == 0;
 	}

@@ -388,7 +388,7 @@
 
 - (void) invalidateThumbnailsForNode:(IMBNode*)inNode
 {
-	for (IMBNode* node in inNode.subNodes)
+	for (IMBNode* node in inNode.subnodes)
 	{
 		[self invalidateThumbnailsForNode:node];
 	}
@@ -423,11 +423,11 @@
 	{
 		[self populateNode:inNewNode options:inOptions error:&error];
 		
-		for (IMBNode* oldSubNode in inOldNode.subNodes)
+		for (IMBNode* oldSubnode in inOldNode.subnodes)
 		{
-			NSString* identifier = oldSubNode.identifier;
-			IMBNode* newSubNode = [inNewNode subNodeWithIdentifier:identifier];
-			[self populateNewNode:newSubNode likeOldNode:oldSubNode options:inOptions];
+			NSString* identifier = oldSubnode.identifier;
+			IMBNode* newSubnode = [inNewNode subnodeWithIdentifier:identifier];
+			[self populateNewNode:newSubnode likeOldNode:oldSubnode options:inOptions];
 		}
 	}
 }

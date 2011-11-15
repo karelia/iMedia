@@ -303,9 +303,9 @@
 	
 	if (inNode.isTopLevelNode)
 	{
-		if ([inNode.subNodes count] > 0)
+		if ([inNode.subnodes count] > 0)
 		{
-			IMBNode* musicNode = [inNode.subNodes objectAtIndex:0];
+			IMBNode* musicNode = [inNode.subnodes objectAtIndex:0];
 			[self populateNode:musicNode options:inOptions error:outError];
 			inNode.objects = musicNode.objects;
 		}
@@ -556,10 +556,10 @@
 
 - (void) addSubNodesToNode:(IMBNode*)inParentNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
-	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
+	// Create the subnodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [NSMutableArray array];
 
 	// Now parse the iTunes XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
@@ -593,13 +593,13 @@
 
 			// Add the new album node to its parent (inRootNode)...
 			
-			[subNodes addObject:playlistNode];
+			[subnodes addObject:playlistNode];
 		}
 		
 		[pool drain];
 	}
 	
-	inParentNode.subNodes = subNodes;
+	inParentNode.subnodes = subnodes;
 }
 
 

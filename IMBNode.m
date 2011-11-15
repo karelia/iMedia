@@ -87,7 +87,7 @@
 @synthesize displayPriority = _displayPriority;
 @synthesize attributes = _attributes;
 @synthesize objects = _objects;
-@synthesize subNodes = _subNodes;
+@synthesize subnodes = _subNodes;
 @synthesize parentNode = _parentNode;
 @synthesize isTopLevelNode = _isTopLevelNode;
 
@@ -133,7 +133,7 @@
 		self.displayedObjectCount = -1;
 		
 		self.objects = nil;
-		self.subNodes = nil;
+		self.subnodes = nil;
 		self.isTopLevelNode = NO;
 		
 		self.watcherType = kIMBWatcherTypeNone;
@@ -192,22 +192,22 @@
 	
 	// Create a deep copy of the subnodes. This is essential to make background operations completely threadsafe...
 	
-	if (self.subNodes)
+	if (self.subnodes)
 	{
-		NSMutableArray* subNodes = [NSMutableArray arrayWithCapacity:self.subNodes.count];
+		NSMutableArray* subnodes = [NSMutableArray arrayWithCapacity:self.subnodes.count];
 
-		for (IMBNode* subnode in self.subNodes)
+		for (IMBNode* subnode in self.subnodes)
 		{
 			IMBNode* copiedSubnode = [subnode copy];
-			[subNodes addObject:copiedSubnode];
+			[subnodes addObject:copiedSubnode];
 			[copiedSubnode release];
 		}
 		
-		copy.subNodes = subNodes;
+		copy.subnodes = subnodes;
 	}
 	else 
 	{
-		copy.subNodes = nil;
+		copy.subnodes = nil;
 	}
 
 	return copy;
@@ -216,7 +216,7 @@
 
 - (void) dealloc
 {
-    [self setSubNodes:nil];		// Sub-nodes have a weak reference to self, so break that
+    [self setSubnodes:nil];		// Sub-nodes have a weak reference to self, so break that
 	
 	IMBRelease(_mediaSource);
 	IMBRelease(_identifier);
@@ -241,7 +241,7 @@
 
 // Accessors for navigating up or down the node tree...
 
-- (void) setSubNodes:(NSArray*)inNodes
+- (void) setSubnodes:(NSArray*)inNodes
 {
     [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
     
@@ -269,7 +269,7 @@
 
 // Node accessors. Use these for bindings the NSTreeController...
 
-- (NSUInteger) countOfSubNodes
+- (NSUInteger) countOfSubnodes
 {
 	return [_subNodes count];
 }
@@ -466,7 +466,7 @@
 {
 	_loading = inLoading;
 	
-	for (IMBNode* subnode in self.subNodes)
+	for (IMBNode* subnode in self.subnodes)
 	{
 		subnode.loading = inLoading;
 	}
@@ -527,12 +527,12 @@
 	if (_parentNode)
 	{
 		[_parentNode _recursivelyWalkParentsAddingPathIndexTo:inIndexArray];
-//		NSUInteger index = [_parentNode.subNodes indexOfObjectIdenticalTo:self];
+//		NSUInteger index = [_parentNode.subnodes indexOfObjectIdenticalTo:self];
 //		[inIndexArray addObject:[NSNumber numberWithUnsignedInt:index]];
 		
 		NSUInteger index = 0;
 		
-		for (IMBNode* siblingNode in _parentNode.subNodes)
+		for (IMBNode* siblingNode in _parentNode.subnodes)
 		{
 			if ([siblingNode.identifier isEqualToString:self.identifier])
 			{
@@ -582,22 +582,22 @@
 
 - (BOOL) isPopulated
 {
-	return self.subNodes != nil && self.objects !=nil;
+	return self.subnodes != nil && self.objects !=nil;
 }
 
 
 // Look in our node tree for a node with the specified identifier...
 
-- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentifier
+- (IMBNode*) subnodeWithIdentifier:(NSString*)inIdentifier
 {
 	if ([self.identifier isEqualToString:inIdentifier])
 	{
 		return self;
 	}
 	
-	for (IMBNode* subnode in self.subNodes)
+	for (IMBNode* subnode in self.subnodes)
 	{
-		IMBNode* found = [subnode subNodeWithIdentifier:inIdentifier];
+		IMBNode* found = [subnode subnodeWithIdentifier:inIdentifier];
 		if (found) return found;
 	}
 
@@ -630,7 +630,7 @@
 
 - (BOOL) isDescendantOfNode:(IMBNode*)inNode
 {
-	for (IMBNode* node in inNode.subNodes)
+	for (IMBNode* node in inNode.subnodes)
 	{
 		if ([self isEqual:node])
 		{

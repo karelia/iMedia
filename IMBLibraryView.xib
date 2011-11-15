@@ -50,7 +50,7 @@
 				<bool key="NSAutomaticallyPreparesContent">YES</bool>
 				<object class="_NSManagedProxy" key="_NSManagedProxy"/>
 				<bool key="NSPreservesSelection">YES</bool>
-				<string key="NSTreeContentChildrenKey">subNodes</string>
+				<string key="NSTreeContentChildrenKey">subnodes</string>
 				<string key="NSTreeContentLeafKey">isLeaf</string>
 			</object>
 			<object class="NSSplitView" id="99632755">

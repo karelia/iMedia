@@ -531,7 +531,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	groupNode.group = YES;
 	groupNode.leaf = NO;
 	groupNode.parser = nil;
-	groupNode.subNodes = [NSMutableArray array];
+	groupNode.subnodes = [NSMutableArray array];
 	groupNode.objects = [NSMutableArray array];
 	
 	if (groupType == kIMBGroupTypeLibrary)
@@ -662,7 +662,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 		
 		NSMutableArray* nodes = parentNode!=nil ?
-			[NSMutableArray arrayWithArray:parentNode.subNodes] :
+			[NSMutableArray arrayWithArray:parentNode.subnodes] :
 			[NSMutableArray arrayWithArray:self.rootNodes];
 			
         // Remove the old node from the correct place (but remember its index). Also unregister from file watching...
@@ -708,7 +708,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
         }
         
 		// Do an "atomic" replace of the changed nodes array, thus only causing a single KVO notification. 
-		// Please note the strange line setSubNodes:nil, which is a workaround for an nasty crashing bug deep  
+		// Please note the strange line setSubnodes:nil, which is a workaround for an nasty crashing bug deep  
 		// inside NSTreeController, where we get a zombie NSTreeControllerTreeNode is some cases. Apparently 
 		// the NSTreeController is very particular about us replacing the whole array in one go (maybe that 
 		// isn't entirely KVO compliant), and it gets confused with its NSTreeControllerTreeNode objects.
@@ -718,8 +718,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 		if (parentNode)
 		{
-			[parentNode setSubNodes:nil];		// Important workaround. Do not remove!
-			[parentNode setSubNodes:nodes];
+			[parentNode setSubnodes:nil];		// Important workaround. Do not remove!
+			[parentNode setSubnodes:nodes];
 		}
 		else
 		{
@@ -737,7 +737,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
         {
             IMBNode* node = [rootNodes objectAtIndex:i];
             
-            if (node.isGroup && node.subNodes.count==0)
+            if (node.isGroup && node.subnodes.count==0)
             {
                 [rootNodes removeObjectIdenticalTo:node];
             }
@@ -750,7 +750,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
             [self setRootNodes:rootNodes];
         }
 		
-		// Since setSubNodes: is a copy setter we need to get a pointer to the new instance before turning
+		// Since setSubnodes: is a copy setter we need to get a pointer to the new instance before turning
 		// off the loading state...
 		
 		IMBNode* node = [self nodeWithIdentifier:inNewNode.identifier];
@@ -817,7 +817,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	BOOL shouldPopulateNode = 
 	
 //		inNode.isPopulated==NO &&
-		(inNode.subNodes==nil || inNode.objects==nil) && 
+		(inNode.subnodes==nil || inNode.objects==nil) && 
 		inNode.isLoading==NO && 
 		_isReplacingNode==NO;
 
@@ -1029,7 +1029,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 		else
 		{
-			[self _reloadNodesWithWatchedPath:inPath nodes:node.subNodes];
+			[self _reloadNodesWithWatchedPath:inPath nodes:node.subnodes];
 		}
 	}
 }
@@ -1064,7 +1064,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 		else
 		{
-			[self _unmountNodes:node.subNodes onVolume:inVolume];
+			[self _unmountNodes:node.subnodes onVolume:inVolume];
 		}
 	}
 }
@@ -1158,7 +1158,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 		else if (node.isGroup)
 		{
-			for (IMBNode* subnode in node.subNodes)
+			for (IMBNode* subnode in node.subnodes)
 			{
 				if (subnode.parser == inParser)
 				{
@@ -1179,7 +1179,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 - (IMBNode*) _nodeWithIdentifier:(NSString*)inIdentifier inParentNode:(IMBNode*)inParentNode
 {
-	NSArray* nodes = inParentNode ? inParentNode.subNodes : self.rootNodes;
+	NSArray* nodes = inParentNode ? inParentNode.subnodes : self.rootNodes;
 	
 	for (IMBNode* node in nodes)
 	{
@@ -1270,7 +1270,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		// Add all subnodes indented by one...
 		
-		for (IMBNode* subnode in inNode.subNodes)
+		for (IMBNode* subnode in inNode.subnodes)
 		{
 			[self _recursivelyAddItemsToMenu:inMenu withNode:subnode indentation:inIndentation+1 selector:inSelector target:inTarget];
 		}
