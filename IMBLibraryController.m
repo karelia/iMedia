@@ -652,11 +652,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	NSUInteger i = [self _insertionIndexForNewNode:groupNode inOldNodes:self.subnodes];
 	[self insertObject:groupNode inSubnodesAtIndex:i];
-	
-//	NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:_rootNodes];
-//	[rootNodes addObject:groupNode];
-//	[rootNodes sortUsingSelector:@selector(compare:)];
-//	self.rootNodes = rootNodes;
 
 	return groupNode;
 }

@@ -235,14 +235,6 @@
 #pragma mark Subnodes
 
 
-//- (void) setSubnodes:(NSMutableArray*)inSubnodes
-//{
-//	[_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
-//	[inSubnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
-//	self.atomic_subnodes = inSubnodes;
-//}
-
-
 - (NSArray*) subnodes
 {
 	return [[_subnodes copy] autorelease];
