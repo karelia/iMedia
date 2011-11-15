@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,16 +112,27 @@
 @property (assign) NSUInteger groupType;			// Used for grouping root level nodes
 @property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
 
-// Node tree accessors. If the subNodes property is nil, that doesn't mean that there are no subnodes - instead 
-// it means that the array hasn't been created yet and will be created lazily at a later time. If on the other  
-// hand subnodes is an empty array, then there really aren't any subnodes.
 
+#pragma mark Subnodes
+
+// nil indicates that the subnodes have not yet been loaded, rather than there being no subnodes. The subnodes
+// will be created lazily at another time. If on the other hand .subnodes is an empty array, then loading has
+// already happend and found there to be no subnodes. The -isPopulated method performs this check, potentially
+// making your code more readable.
 @property (copy,readonly) NSArray* subnodes;	
+
+// For efficiency, you can use these KVC-compliant accessors if needed
 - (NSUInteger) countOfSubnodes;
 - (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;
 
-- (NSMutableArray*) mutableSubnodes;				// For parser classes and IMBLibraryController, who need to modify nodes
+
+#pragma mark Populating Subnodes
+// For parser classes and IMBLibraryController, who need to modify nodes, use this method. By calling it, the node is marked as populated
+- (NSMutableArray*) mutableSubnodes;
 		
+
+#pragma mark 
+
 @property (assign,readonly) IMBNode* parentNode;
 @property (assign,readonly) IMBNode* topLevelNode;
 @property (assign) BOOL isTopLevelNode;
