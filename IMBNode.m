@@ -582,7 +582,7 @@
 
 - (BOOL) isPopulated
 {
-	return self.subnodes != nil && self.objects !=nil;
+	return self.subnodes != nil && self.objects != nil;
 }
 
 
