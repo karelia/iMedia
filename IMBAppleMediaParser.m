@@ -291,7 +291,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
 {
-	return [[inNodeObject.preliminaryMetadata objectForKey:@"PhotoCount"] integerValue];
+//	return [[inNodeObject.preliminaryMetadata objectForKey:@"PhotoCount"] integerValue];
+	return [[inNodeObject.preliminaryMetadata objectForKey:@"KeyList"] count];	// More reliable for Aperture! Avoids out-of-bounds exceptions.
 }
 
 
