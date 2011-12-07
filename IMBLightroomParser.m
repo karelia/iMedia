@@ -1497,7 +1497,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* title = NSLocalizedStringWithDefaultValue(
 																@"IMBObjectViewController.menuItem.revealInFinder.Lightroom",
 																nil,IMBBundle(),
-																@"Reveal Master Image in Finder",
+																@"Show Master Image in Finder",
 																@"Menu item in context menu of IMBObjectViewController");
 			
 			[menuItem setTitle:title];

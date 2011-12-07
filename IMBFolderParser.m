@@ -406,7 +406,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Add a 'Reveal in Finder' command to the context menu...
+// Add a 'Show in Finder' command to the context menu...
 
 - (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject
 {
@@ -415,7 +415,7 @@
 		NSString* title = NSLocalizedStringWithDefaultValue(
 			@"IMBObjectViewController.menuItem.revealInFinder",
 			nil,IMBBundle(),
-			@"Reveal in Finder",
+			@"Show in Finder",
 			@"Menu item in context menu of IMBObjectViewController");
 		
 		IMBNode* node = [self nodeWithIdentifier:((IMBNodeObject*)inObject).representedNodeIdentifier];
@@ -435,7 +435,7 @@
 	NSString* title = NSLocalizedStringWithDefaultValue(
 		@"IMBObjectViewController.menuItem.revealInFinder",
 		nil,IMBBundle(),
-		@"Reveal in Finder",
+		@"Show in Finder",
 		@"Menu item in context menu of IMBObjectViewController");
 	
 	NSString* path = (NSString*) [inNode mediaSource];
