@@ -135,8 +135,9 @@
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			
-			// Check database version
-			
+			/*
+            // Check database version
+            // Commented out because in Sandvox case #159516 it's beachballing. Pierre advises this hack should fix it for now
 			NSNumber *databaseVersion = [parser databaseVersion];
 			
 			if (databaseVersion != nil) {
@@ -149,7 +150,7 @@
 					continue;
 				}
 			}
-			
+			*/
 			[parserInstances addObject:parser];
 		}
 	}
