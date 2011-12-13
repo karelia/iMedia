@@ -120,8 +120,8 @@
 - (void) logParsers;
 #endif
 
-// External finding of an active parser
-- (IMBParser *) parserOfClass:(Class)class forMediaType:(NSString *)aMediaType;
+// External finding of an active parser. Can't name the argument "class" as that breaks C++ apps linking against iMedia
+- (IMBParser *)parserOfClass:(Class)parserClass forMediaType:(NSString *)aMediaType;
 
 @end
 

@@ -1127,12 +1127,12 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 					[item release];
 				}
 				
-				// Reveal in Finder...
+				// Show in Finder...
 				
 				title = NSLocalizedStringWithDefaultValue(
 					@"IMBObjectViewController.menuItem.revealInFinder",
 					nil,IMBBundle(),
-					@"Reveal in Finder",
+					@"Show in Finder",
 					@"Menu item in context menu of IMBObjectViewController");
 				
 				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];

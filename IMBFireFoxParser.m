@@ -279,6 +279,7 @@
 		node.attributes = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:1] forKey:@"id"];
 		
 		self.database = [FMDatabase databaseWithPath:self.databasePathCurrent];
+		
 		if ([self openDatabase])
 		{
 			[self populateNode:node options:inOptions error:outError];		// populate the WHOLE thing.

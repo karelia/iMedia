@@ -453,7 +453,8 @@ static NSArray* sSupportedUTIs = nil;
 
 - (void) didStopUsingParser
 {
-	@synchronized (self) {
+	@synchronized (self)
+	{
 		self.databases = nil;
 		self.thumbnailDatabases = nil;
 	}
@@ -1496,7 +1497,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* title = NSLocalizedStringWithDefaultValue(
 																@"IMBObjectViewController.menuItem.revealInFinder.Lightroom",
 																nil,IMBBundle(),
-																@"Reveal Master Image in Finder",
+																@"Show Master Image in Finder",
 																@"Menu item in context menu of IMBObjectViewController");
 			
 			[menuItem setTitle:title];

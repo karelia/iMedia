@@ -269,6 +269,7 @@
 				// Now change the current image of our node object
 				[item setImageLocation:imagePath];
 				[item setNeedsImageRepresentation:YES];
+				[item setIsLoadingThumbnail:NO]; // Avoid race condition 
 				[item loadThumbnail]; // Background thread
 			}
 		}
