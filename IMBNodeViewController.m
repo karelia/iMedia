@@ -166,7 +166,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
 	
-	[pool release];
+	[pool drain];
 }
 
 
