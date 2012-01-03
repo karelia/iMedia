@@ -306,6 +306,6 @@ CGSize IMBImageItemGetSize(id <IMBImageItem> item)
         }
 	}
     
-    [pool release];
+    [pool drain];
     return result;
 }
