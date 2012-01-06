@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2011 by Karelia Software et al.
+ Copyright (c) 2005-2012 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2011 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2012 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -1497,7 +1497,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* title = NSLocalizedStringWithDefaultValue(
 																@"IMBObjectViewController.menuItem.revealInFinder.Lightroom",
 																nil,IMBBundle(),
-																@"Reveal Master Image in Finder",
+																@"Show Master Image in Finder",
 																@"Menu item in context menu of IMBObjectViewController");
 			
 			[menuItem setTitle:title];
