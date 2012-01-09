@@ -54,7 +54,7 @@
 
 // This helper class is being used by IMBRemoteObjectsPromise. Not for general use...
 
-@interface IMBURLDownloadOperation : NSOperation
+@interface IMBURLDownloadOperation : NSOperation <NSURLDownloadDelegate>
 {
 	id _delegate;
 	id _delegateReference;	
