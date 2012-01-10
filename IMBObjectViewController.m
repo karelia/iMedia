@@ -1038,7 +1038,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	{
 		id location = [inObject location];
 		NSURL* url = (NSURL*)location;
-		BOOL localFile = [location isKindOfClass:[NSString class]] || [location isKindOfClass:[NSURL class]] && [url isFileURL];
+		BOOL localFile = [location isKindOfClass:[NSString class]] || ([location isKindOfClass:[NSURL class]] && [url isFileURL]);
 		
 		if (localFile)
 		{
@@ -1072,7 +1072,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 				
 				// Open with editor app...
 				
-				if (appPath = [IMBConfig editorAppForMediaType:self.mediaType])
+				if ((appPath = [IMBConfig editorAppForMediaType:self.mediaType]))
 				{
 					title = NSLocalizedStringWithDefaultValue(
 						@"IMBObjectViewController.menuItem.openWithApp",
@@ -1092,7 +1092,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 				
 				// Open with viewer app...
 				
-				if (appPath = [IMBConfig viewerAppForMediaType:self.mediaType])
+				if ((appPath = [IMBConfig viewerAppForMediaType:self.mediaType]))
 				{
 					title = NSLocalizedStringWithDefaultValue(
 						@"IMBObjectViewController.menuItem.openWithApp",

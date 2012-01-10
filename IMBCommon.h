@@ -152,14 +152,24 @@ typedef NSUInteger IMBGroupType;
 #endif
 
 #define IMBRunningOnSnowLeopardOrNewer()	(NSAppKitVersionNumber >= NSAppKitVersionNumber10_6)
+
+#define IMB_COMPILING_WITH_LION_OR_NEWER_SDK  defined(MAC_OS_X_VERSION_10_7)
 #define IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK  defined(MAC_OS_X_VERSION_10_6)
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// We have to declare a fake prototypes because the 10.6 runtime interrogates our compliance with the protocol,
+// We have to declare a fake prototypes because the 10.6 / 10.7 runtime interrogates our compliance with the protocol,
 // rather that interrogating the presence of the particular method we implement...
+
+#if ! IMB_COMPILING_WITH_LION_OR_NEWER_SDK
+
+@protocol NSURLDownloadDelegate <NSObject> 
+@end
+
+#endif
+
 
 #if ! IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
 

@@ -672,7 +672,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
         
         if (inOldNode)
         {
-            if (watchedPath = inOldNode.watchedPath)
+            if ((watchedPath = inOldNode.watchedPath))
             {
                 if (inOldNode.watcherType == kIMBWatcherTypeKQueue)
                     [self.watcherUKKQueue removePath:watchedPath];
@@ -691,7 +691,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
             if (index == NSNotFound) index = nodes.count;
             [nodes insertObject:inNewNode atIndex:index];
             
-            if (watchedPath = inNewNode.watchedPath)
+            if ((watchedPath = inNewNode.watchedPath))
             {
                 if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
                     [self.watcherUKKQueue addPath:watchedPath];
@@ -934,9 +934,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		// First eliminate any existing rootPaths that are subpaths of a new path...
 		
-		NSUInteger n = [rootPaths count];
+		NSInteger n = [rootPaths count];
 		
-		for (NSUInteger i=n-1; i>=0; i--)
+		for (NSInteger i=n-1; i>=0; i--)
 		{
 			NSString* rootPath = [rootPaths objectAtIndex:i];
 			
