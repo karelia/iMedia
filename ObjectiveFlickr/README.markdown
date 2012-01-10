@@ -4,6 +4,25 @@ ObjectiveFlickr
 ObjectiveFlickr is a Flickr API framework designed for Mac and iPhone apps.
 
 
+OAuth Support
+=============
+ObjectiveFlickr now supports Flickr's new OAuth-based authentication process.
+I'll post more about it in the coming week. The SnapAndRun sample is updated
+to reflect the usage. A new Mac sample, OAuthTransitionMac, demonstrates
+how to use the new OAuth-based API and also how to migrate your existing
+auth tokens. OAuthTransitionMac uses ARC and therefore also shows how to 
+use ObjectiveFlickr, which is a non-ARC library, with an ARC app.
+
+iOS support in ObjectiveFlickr was developed mostly during the iPhone OS 2.0
+days and it shows. More update work will be required to reflect the changes
+in the iOS development process. Your contribution (like updating this
+README, submitting new samples or test cases) is greatly welcome -- and it
+will benefit the iOS open source development community, too!
+
+**Update**. Please refer to [my blog post](http://blog.lukhnos.org/post/11275346353/flickr-oauth-support-in-objectiveflickr)
+for the steps you need to take for the transition.
+
+
 What's New in 2.0
 =================
 
@@ -225,6 +244,11 @@ and also design your UI accordingly.
 Auth Considerations
 ===================
 
+**Deprecated**. The original authentication process is now deprecated by Flickr.
+Please refer to [my blog post](http://blog.lukhnos.org/post/11275346353/flickr-oauth-support-in-objectiveflickr)
+for the steps you need to take for the new setup.
+
+
 If your app does not just read public photos, your app will need to get 
 user permission for accessing their photos. You need to use Flickr's
 authentication/authorization mechanism (hereafter "auth" to cover both
@@ -249,8 +273,13 @@ aren't any ye olde mobile platform, we'll skip that one and go straight
 into the two major types of app auth.
 
 
-Desktop App Auth, the Old Way
------------------------------
+Desktop App Auth, the Old Way (Deprecated)
+------------------------------------------
+
+**Deprecated**. The original authentication process is now deprecated by Flickr.
+Please refer to [my blog post](http://blog.lukhnos.org/post/11275346353/flickr-oauth-support-in-objectiveflickr)
+for the steps you need to take for the new setup.
+
 
 Before, Mac developers were only interested in Desktop app auth. If you 
 have used any Mac Flickr app before (FlickrExport, HoudahGeo, Posterino, and
@@ -287,8 +316,13 @@ To map that into your app's internal workings, you need to do these:
    to which the user has grant you permission.
 
 
-iPhone App Auth and the New Way
--------------------------------
+iPhone App Auth and the New Way (Deprecated)
+--------------------------------------------
+
+**Deprecated**. The original authentication process is now deprecated by Flickr.
+Please refer to [my blog post](http://blog.lukhnos.org/post/11275346353/flickr-oauth-support-in-objectiveflickr)
+for the steps you need to take for the new setup.
+
 
 iPhone and iPod Touch posed a challenge to the auth model above: Opening
 up Mobile Safari then ask the forgetful user to come back is a bad idea.

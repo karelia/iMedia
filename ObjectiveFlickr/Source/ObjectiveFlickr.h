@@ -50,11 +50,15 @@ extern NSString *const OFFlickrDeletePermission;
 	NSString *photoWebPageSource;
 	NSString *authEndpoint;
     NSString *uploadEndpoint;
+    
+    NSString *oauthToken;
+    NSString *oauthTokenSecret;
 }
 - (id)initWithAPIKey:(NSString *)inKey sharedSecret:(NSString *)inSharedSecret;
 
-- (void)setAuthToken:(NSString *)inAuthToken;
-- (NSString *)authToken;
+// OAuth URL
+- (NSURL *)userAuthorizationURLWithRequestToken:(NSString *)inRequestToken requestedPermission:(NSString *)inPermission;
+
 
 // URL provisioning
 - (NSURL *)photoSourceURLFromDictionary:(NSDictionary *)inDictionary size:(NSString *)inSizeModifier;
@@ -62,6 +66,26 @@ extern NSString *const OFFlickrDeletePermission;
 - (NSURL *)loginURLFromFrobDictionary:(NSDictionary *)inFrob requestedPermission:(NSString *)inPermission;
 
 // API endpoints
+
+#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4
+@property (nonatomic, readonly) NSString *key;
+@property (nonatomic, readonly) NSString *sharedSecret;
+@property (nonatomic, retain) NSString *authToken;
+
+@property (nonatomic, retain) NSString *RESTAPIEndpoint;
+@property (nonatomic, retain) NSString *photoSource;
+@property (nonatomic, retain) NSString *photoWebPageSource;
+@property (nonatomic, retain) NSString *authEndpoint;
+@property (nonatomic, retain) NSString *uploadEndpoint;
+
+@property (nonatomic, retain) NSString *OAuthToken;
+@property (nonatomic, retain) NSString *OAuthTokenSecret;
+#else
+
+- (void)setAuthToken:(NSString *)inAuthToken;
+- (NSString *)authToken;
+
+
 - (void)setRESTAPIEndpoint:(NSString *)inEndpoint;
 - (NSString *)RESTAPIEndpoint;
 
@@ -74,16 +98,13 @@ extern NSString *const OFFlickrDeletePermission;
 - (void)setUploadEndpoint:(NSString *)inEndpoint;
 - (NSString *)uploadEndpoint;
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4
-@property (nonatomic, readonly) NSString *key;
-@property (nonatomic, readonly) NSString *sharedSecret;
-@property (nonatomic, retain) NSString *authToken;
+- (void)setOAuthToken:(NSString *)inToken;
+- (NSString *)OAuthToken;
 
-@property (nonatomic, retain) NSString *RESTAPIEndpoint;
-@property (nonatomic, retain) NSString *photoSource;
-@property (nonatomic, retain) NSString *photoWebPageSource;
-@property (nonatomic, retain) NSString *authEndpoint;
-@property (nonatomic, retain) NSString *uploadEndpoint;
+- (void)setOAuthTokenSecret:(NSString *)inTokenSecret;
+- (NSString *)OAuthTokenSecret;
+
+
 #endif
 @end
 
@@ -95,8 +116,17 @@ enum {
     OFFlickrAPIRequestConnectionError = 0x7fff0001,
     OFFlickrAPIRequestTimeoutError = 0x7fff0002,    
 	OFFlickrAPIRequestFaultyXMLResponseError = 0x7fff0003,
-    OFFlickrAPIRequestUnknownError = 0x7fff0042
+    
+    OFFlickrAPIRequestOAuthError = 0x7fff0004,
+
+    OFFlickrAPIRequestUnknownError = 0x7fff0042    
 };
+
+extern NSString *const OFFlickrAPIRequestOAuthErrorUserInfoKey;
+
+extern NSString *const OFFetchOAuthRequestTokenSession;
+extern NSString *const OFFetchOAuthAccessTokenSession;
+
 
 @class OFFlickrAPIRequest;
 
@@ -113,6 +143,10 @@ enum {
 #else
 - (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest imageUploadSentBytes:(unsigned int)inSentBytes totalBytes:(unsigned int)inTotalBytes;
 #endif
+
+- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest didObtainOAuthRequestToken:(NSString *)inRequestToken secret:(NSString *)inSecret;
+- (void)flickrAPIRequest:(OFFlickrAPIRequest *)inRequest didObtainOAuthAccessToken:(NSString *)inAccessToken secret:(NSString *)inSecret userFullName:(NSString *)inFullName userName:(NSString *)inUserName userNSID:(NSString *)inNSID;
+
 @end
 
 #if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4
@@ -130,20 +164,22 @@ typedef id OFFlickrAPIRequestDelegateType;
     id sessionInfo;
     
     NSString *uploadTempFilename;
+    
+    id oauthState;
 }
 - (id)initWithAPIContext:(OFFlickrAPIContext *)inContext;
 - (OFFlickrAPIContext *)context;
 
-- (OFFlickrAPIRequestDelegateType)delegate;
-- (void)setDelegate:(OFFlickrAPIRequestDelegateType)inDelegate;
-
-- (id)sessionInfo;
-- (void)setSessionInfo:(id)inInfo;
 
 - (NSTimeInterval)requestTimeoutInterval;
 - (void)setRequestTimeoutInterval:(NSTimeInterval)inTimeInterval;
 - (BOOL)isRunning;
 - (void)cancel;
+
+// oauth methods
+- (BOOL)fetchOAuthRequestTokenWithCallbackURL:(NSURL *)inCallbackURL;
+- (BOOL)fetchOAuthAccessTokenWithRequestToken:(NSString *)inRequestToken verifier:(NSString *)inVerifier;
+
 
 // elementary methods
 - (BOOL)callAPIMethodWithGET:(NSString *)inMethodName arguments:(NSDictionary *)inArguments;
@@ -157,5 +193,14 @@ typedef id OFFlickrAPIRequestDelegateType;
 @property (nonatomic, assign) OFFlickrAPIRequestDelegateType delegate;
 @property (nonatomic, retain) id sessionInfo;
 @property (nonatomic, assign) NSTimeInterval requestTimeoutInterval;
+#else
+
+- (OFFlickrAPIRequestDelegateType)delegate;
+- (void)setDelegate:(OFFlickrAPIRequestDelegateType)inDelegate;
+
+- (id)sessionInfo;
+- (void)setSessionInfo:(id)inInfo;
+
 #endif
+
 @end

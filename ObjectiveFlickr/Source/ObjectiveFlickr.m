@@ -43,6 +43,13 @@ NSString *const OFFlickrUploadTempFilenamePrefix = @"org.lukhnos.ObjectiveFlickr
 NSString *const OFFlickrAPIReturnedErrorDomain = @"com.flickr";
 NSString *const OFFlickrAPIRequestErrorDomain = @"org.lukhnos.ObjectiveFlickr";
 
+NSString *const OFFlickrAPIRequestOAuthErrorUserInfoKey = @"OAuthError";
+NSString *const OFFetchOAuthRequestTokenSession = @"FetchOAuthRequestToken";
+NSString *const OFFetchOAuthAccessTokenSession = @"FetchOAuthAccessToken";
+
+static NSString *const kEscapeChars = @"`~!@#$^&*()=+[]\\{}|;':\",/<>?";
+
+
 // compatibility typedefs
 #if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
 typedef unsigned int NSUInteger;
@@ -72,6 +79,9 @@ typedef unsigned int NSUInteger;
 	[authEndpoint release];
     [uploadEndpoint release];
     
+    [oauthToken release];
+    [oauthTokenSecret release];
+    
     [super dealloc];
 }
 
@@ -100,6 +110,18 @@ typedef unsigned int NSUInteger;
 - (NSString *)authToken
 {
     return authToken;
+}
+
+- (NSURL *)userAuthorizationURLWithRequestToken:(NSString *)inRequestToken requestedPermission:(NSString *)inPermission
+{
+    NSString *perms = @"";
+    
+    if ([inPermission length] > 0) {
+        perms = [NSString stringWithFormat:@"&perms=%@", inPermission];
+    }
+    
+    NSString *URLString = [NSString stringWithFormat:@"http://www.flickr.com/services/oauth/authorize?oauth_token=%@%@", inRequestToken, perms];
+    return [NSURL URLWithString:URLString];
 }
 
 - (NSURL *)photoSourceURLFromDictionary:(NSDictionary *)inDictionary size:(NSString *)inSizeModifier
@@ -215,6 +237,30 @@ typedef unsigned int NSUInteger;
     return uploadEndpoint;
 }
 
+- (void)setOAuthToken:(NSString *)inToken
+{
+    NSString *tmp = oauthToken;
+    oauthToken = [inToken copy];
+    [tmp release];    
+}
+
+- (NSString *)OAuthToken
+{
+    return oauthToken;
+}
+
+- (void)setOAuthTokenSecret:(NSString *)inSecret;
+{
+    NSString *tmp = oauthTokenSecret;
+    oauthTokenSecret = [inSecret copy];
+    [tmp release];    
+}
+
+- (NSString *)OAuthTokenSecret
+{
+    return oauthTokenSecret;
+}
+
 #if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4
 @synthesize key;
 @synthesize sharedSecret;
@@ -262,6 +308,67 @@ typedef unsigned int NSUInteger;
     }
     
     return [args componentsJoinedByString:@"&"];
+}
+
+- (NSDictionary *)signedOAuthHTTPQueryArguments:(NSDictionary *)inArguments baseURL:(NSURL *)inURL method:(NSString *)inMethod
+{
+    NSMutableDictionary *newArgs = [NSMutableDictionary dictionaryWithDictionary:inArguments];
+    [newArgs setObject:[OFGenerateUUIDString() substringToIndex:8] forKey:@"oauth_nonce"];
+    [newArgs setObject:[NSString stringWithFormat:@"%lu", (long)[[NSDate date] timeIntervalSince1970]] forKey:@"oauth_timestamp"];
+    [newArgs setObject:@"1.0" forKey:@"oauth_version"];
+    [newArgs setObject:@"HMAC-SHA1" forKey:@"oauth_signature_method"];
+    [newArgs setObject:key forKey:@"oauth_consumer_key"];
+    
+    if (![inArguments objectForKey:@"oauth_token"] && oauthToken) {
+        [newArgs setObject:oauthToken forKey:@"oauth_token"];
+    }
+    
+    NSString *signatureKey = nil;
+    if (oauthTokenSecret) {
+        signatureKey = [NSString stringWithFormat:@"%@&%@", sharedSecret, oauthTokenSecret];
+    }
+    else {
+        signatureKey = [NSString stringWithFormat:@"%@&", sharedSecret];
+    }
+    
+    NSMutableString *baseString = [NSMutableString string];
+    [baseString appendString:inMethod];
+    [baseString appendString:@"&"];
+    [baseString appendString:OFEscapedURLStringFromNSStringWithExtraEscapedChars([inURL absoluteString], kEscapeChars)];
+    
+    NSArray *sortedArgKeys = [[newArgs allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    [baseString appendString:@"&"];
+    
+    NSMutableArray *baseStrArgs = [NSMutableArray array];
+    NSEnumerator *kenum = [sortedArgKeys objectEnumerator];
+    NSString *k;
+    while ((k = [kenum nextObject]) != nil) {
+        [baseStrArgs addObject:[NSString stringWithFormat:@"%@=%@", k, OFEscapedURLStringFromNSStringWithExtraEscapedChars([newArgs objectForKey:k], kEscapeChars)]];
+    }
+    
+    [baseString appendString:OFEscapedURLStringFromNSStringWithExtraEscapedChars([baseStrArgs componentsJoinedByString:@"&"], kEscapeChars)];
+    
+    NSString *signature = OFHMACSha1Base64(signatureKey, baseString);
+    
+    [newArgs setObject:signature forKey:@"oauth_signature"];
+    return newArgs;
+}
+
+- (NSURL *)oauthURLFromBaseURL:(NSURL *)inURL method:(NSString *)inMethod arguments:(NSDictionary *)inArguments
+{
+    NSDictionary *newArgs = [self signedOAuthHTTPQueryArguments:inArguments baseURL:inURL method:inMethod];
+    NSMutableArray *queryArray = [NSMutableArray array];
+
+    NSEnumerator *kenum = [newArgs keyEnumerator];
+    NSString *k;
+    while ((k = [kenum nextObject]) != nil) {
+        [queryArray addObject:[NSString stringWithFormat:@"%@=%@", k, OFEscapedURLStringFromNSStringWithExtraEscapedChars([newArgs objectForKey:k], kEscapeChars)]];
+    }
+    
+    
+    NSString *newURLStringWithQuery = [NSString stringWithFormat:@"%@?%@", [inURL absoluteString], [queryArray componentsJoinedByString:@"&"]];
+    
+    return [NSURL URLWithString:newURLStringWithQuery];
 }
 @end
 
@@ -341,6 +448,31 @@ typedef unsigned int NSUInteger;
     [self cleanUpTempFile];
 }
 
+- (BOOL)fetchOAuthRequestTokenWithCallbackURL:(NSURL *)inCallbackURL
+{
+    if ([HTTPRequest isRunning]) {
+        return NO;
+    }
+
+    NSDictionary *paramsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:[inCallbackURL absoluteString], @"oauth_callback", nil];
+    NSURL *requestURL = [context oauthURLFromBaseURL:[NSURL URLWithString:@"http://www.flickr.com/services/oauth/request_token"] method:LFHTTPRequestGETMethod arguments:paramsDictionary];
+    [HTTPRequest setSessionInfo:OFFetchOAuthRequestTokenSession];
+    [HTTPRequest setContentType:nil];
+    return [HTTPRequest performMethod:LFHTTPRequestGETMethod onURL:requestURL withData:nil];
+}
+
+- (BOOL)fetchOAuthAccessTokenWithRequestToken:(NSString *)inRequestToken verifier:(NSString *)inVerifier
+{
+    if ([HTTPRequest isRunning]) {
+        return NO;
+    }
+    NSDictionary *paramsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:inRequestToken, @"oauth_token", inVerifier, @"oauth_verifier", nil];
+    NSURL *requestURL = [context oauthURLFromBaseURL:[NSURL URLWithString:@"http://www.flickr.com/services/oauth/access_token"] method:LFHTTPRequestGETMethod arguments:paramsDictionary];
+    [HTTPRequest setSessionInfo:OFFetchOAuthAccessTokenSession];
+    [HTTPRequest setContentType:nil];
+    return [HTTPRequest performMethod:LFHTTPRequestGETMethod onURL:requestURL withData:nil];
+}
+
 - (BOOL)callAPIMethodWithGET:(NSString *)inMethodName arguments:(NSDictionary *)inArguments
 {
     if ([HTTPRequest isRunning]) {
@@ -350,11 +482,43 @@ typedef unsigned int NSUInteger;
     // combine the parameters 
 	NSMutableDictionary *newArgs = inArguments ? [NSMutableDictionary dictionaryWithDictionary:inArguments] : [NSMutableDictionary dictionary];
 	[newArgs setObject:inMethodName forKey:@"method"];	
-	NSString *query = [context signedQueryFromArguments:newArgs];
-	NSString *URLString = [NSString stringWithFormat:@"%@?%@", [context RESTAPIEndpoint], query];
-	
-    [HTTPRequest setContentType:nil];
-	return [HTTPRequest performMethod:LFHTTPRequestGETMethod onURL:[NSURL URLWithString:URLString] withData:nil];
+
+    NSURL *requestURL = nil;
+    if ([context OAuthToken] && [context OAuthTokenSecret]) {
+        requestURL = [context oauthURLFromBaseURL:[NSURL URLWithString:[context RESTAPIEndpoint]] method:LFHTTPRequestGETMethod arguments:newArgs];
+    }
+    else {
+        NSString *query = [context signedQueryFromArguments:newArgs];
+        NSString *URLString = [NSString stringWithFormat:@"%@?%@", [context RESTAPIEndpoint], query];
+        requestURL = [NSURL URLWithString:URLString];
+    }
+    
+    if (requestURL) {
+        [HTTPRequest setContentType:nil];
+        return [HTTPRequest performMethod:LFHTTPRequestGETMethod onURL:requestURL withData:nil];        
+    }
+    return NO;
+}
+
+static NSData *NSDataFromOAuthPreferredWebForm(NSDictionary *formDictionary)
+{
+    NSMutableString *combinedDataString = [NSMutableString string];
+    NSEnumerator *enumerator = [formDictionary keyEnumerator];
+    
+    id key = [enumerator nextObject];
+    if (key) {
+        id value = [formDictionary objectForKey:key];
+        [combinedDataString appendString:[NSString stringWithFormat:@"%@=%@", 
+                                          [(NSString*)key stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
+                                          OFEscapedURLStringFromNSStringWithExtraEscapedChars(value, kEscapeChars)]];
+        
+		while ((key = [enumerator nextObject])) {
+			value = [formDictionary objectForKey:key];
+			[combinedDataString appendString:[NSString stringWithFormat:@"&%@=%@", [(NSString*)key stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], OFEscapedURLStringFromNSStringWithExtraEscapedChars(value, kEscapeChars)]];
+		}
+	}
+    
+    return [combinedDataString dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:NO];    
 }
 
 - (BOOL)callAPIMethodWithPOST:(NSString *)inMethodName arguments:(NSDictionary *)inArguments
@@ -366,9 +530,20 @@ typedef unsigned int NSUInteger;
     // combine the parameters 
 	NSMutableDictionary *newArgs = inArguments ? [NSMutableDictionary dictionaryWithDictionary:inArguments] : [NSMutableDictionary dictionary];
 	[newArgs setObject:inMethodName forKey:@"method"];	
-	NSString *arguments = [context signedQueryFromArguments:newArgs];
-    NSData *postData = [arguments dataUsingEncoding:NSUTF8StringEncoding];
-
+    
+    
+    NSData *postData = nil;
+    
+    if ([context OAuthToken] && [context OAuthTokenSecret]) {
+        NSDictionary *signedArgs = [context signedOAuthHTTPQueryArguments:newArgs baseURL:[NSURL URLWithString:[context RESTAPIEndpoint]] method:LFHTTPRequestPOSTMethod];
+        
+        postData = NSDataFromOAuthPreferredWebForm(signedArgs);
+    }
+    else {    
+        NSString *arguments = [context signedQueryFromArguments:newArgs];
+        postData = [arguments dataUsingEncoding:NSUTF8StringEncoding];
+    }
+    
 	[HTTPRequest setContentType:LFHTTPRequestWWWFormURLEncodedContentType];
 	return [HTTPRequest performMethod:LFHTTPRequestPOSTMethod onURL:[NSURL URLWithString:[context RESTAPIEndpoint]] withData:postData];
 }
@@ -379,12 +554,29 @@ typedef unsigned int NSUInteger;
         return NO;
     }
     
-    if (![[context authToken] length]) {
+    // get the api_sig
+    NSArray *argComponents = nil;
+    
+    if ([context OAuthToken] && [context OAuthTokenSecret]) {
+        NSMutableArray *newArgsComps = [NSMutableArray array];
+        NSDictionary *signedArgs = [context signedOAuthHTTPQueryArguments:(inArguments ? inArguments : [NSDictionary dictionary]) baseURL:[NSURL URLWithString:[context uploadEndpoint]] method:LFHTTPRequestPOSTMethod];
+        
+        NSEnumerator *keyEnum = [signedArgs keyEnumerator];
+        NSString *key;
+        while ((key = [keyEnum nextObject]) != nil) {
+            NSString *value = [signedArgs valueForKey:key];
+            [newArgsComps addObject:[NSArray arrayWithObjects:key, value, nil]];
+        }
+        
+        argComponents = newArgsComps;
+    }
+    else if ([[context authToken] length] > 0) {
+        argComponents = [[self context] signedArgumentComponentsFromArguments:(inArguments ? inArguments : [NSDictionary dictionary]) useURIEscape:NO];
+    }
+    else {
         return NO;
     }
-
-    // get the api_sig
-    NSArray *argComponents = [[self context] signedArgumentComponentsFromArguments:(inArguments ? inArguments : [NSDictionary dictionary]) useURIEscape:NO];
+    
     NSString *separator = OFGenerateUUIDString();
     NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", separator];
     
@@ -482,35 +674,79 @@ typedef unsigned int NSUInteger;
 #pragma mark LFHTTPRequest delegate methods
 - (void)httpRequestDidComplete:(LFHTTPRequest *)request
 {
-	NSDictionary *responseDictionary = [OFXMLMapper dictionaryMappedFromXMLData:[request receivedData]];	
-	NSDictionary *rsp = [responseDictionary objectForKey:@"rsp"];
-	NSString *stat = [rsp objectForKey:@"stat"];
-	
-	// this also fails when (responseDictionary, rsp, stat) == nil, so it's a guranteed way of checking the result
-	if (![stat isEqualToString:@"ok"]) {
-		NSDictionary *err = [rsp objectForKey:@"err"];
-		NSString *code = [err objectForKey:@"code"];
-		NSString *msg = [err objectForKey:@"msg"];
-	
-		NSError *toDelegateError;
-		if ([code length]) {
-			// intValue for 10.4-compatibility
-			toDelegateError = [NSError errorWithDomain:OFFlickrAPIReturnedErrorDomain code:[code intValue] userInfo:[msg length] ? [NSDictionary dictionaryWithObjectsAndKeys:msg, NSLocalizedFailureReasonErrorKey, nil] : nil];				
-		}
-		else {
-			toDelegateError = [NSError errorWithDomain:OFFlickrAPIRequestErrorDomain code:OFFlickrAPIRequestFaultyXMLResponseError userInfo:nil];
-		}
-			
-		if ([delegate respondsToSelector:@selector(flickrAPIRequest:didFailWithError:)]) {
-			[delegate flickrAPIRequest:self didFailWithError:toDelegateError];        
-		}
-		return;
-	}
+    if ([request sessionInfo] == OFFetchOAuthRequestTokenSession) {
+        [request setSessionInfo:nil];
+        
+        NSString *response = [[[NSString alloc] initWithData:[request receivedData] encoding:NSUTF8StringEncoding] autorelease];
 
-    [self cleanUpTempFile];
-    if ([delegate respondsToSelector:@selector(flickrAPIRequest:didCompleteWithResponse:)]) {
-		[delegate flickrAPIRequest:self didCompleteWithResponse:rsp];
-    }    
+        NSDictionary *params = OFExtractURLQueryParameter(response);
+        NSString *oat = [params objectForKey:@"oauth_token"];
+        NSString *oats = [params objectForKey:@"oauth_token_secret"];
+        if (!oat || !oats) {
+            NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:response, OFFlickrAPIRequestOAuthErrorUserInfoKey, nil];
+            NSError *error = [NSError errorWithDomain:OFFlickrAPIRequestErrorDomain code:OFFlickrAPIRequestOAuthError userInfo:userInfo];            
+            [delegate flickrAPIRequest:self didFailWithError:error];                
+        }
+        else {
+            NSAssert([delegate respondsToSelector:@selector(flickrAPIRequest:didObtainOAuthRequestToken:secret:)], @"Delegate must implement the method -flickrAPIRequest:didObtainOAuthRequestToken:secret: to handle OAuth request token callback");
+            
+            [delegate flickrAPIRequest:self didObtainOAuthRequestToken:oat secret:oats];
+        }
+    }
+    else if ([request sessionInfo] == OFFetchOAuthAccessTokenSession) {
+        [request setSessionInfo:nil];
+
+        NSString *response = [[[NSString alloc] initWithData:[request receivedData] encoding:NSUTF8StringEncoding] autorelease];
+        NSDictionary *params = OFExtractURLQueryParameter(response);
+        
+        NSString *fn = [params objectForKey:@"fullname"];
+        NSString *oat = [params objectForKey:@"oauth_token"];
+        NSString *oats = [params objectForKey:@"oauth_token_secret"];
+        NSString *nsid = [params objectForKey:@"user_nsid"];
+        NSString *un = [params objectForKey:@"username"];
+        if (!fn || !oat || !oats || !nsid || !un) {
+            NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:response, OFFlickrAPIRequestOAuthErrorUserInfoKey, nil];
+            NSError *error = [NSError errorWithDomain:OFFlickrAPIRequestErrorDomain code:OFFlickrAPIRequestOAuthError userInfo:userInfo];            
+            [delegate flickrAPIRequest:self didFailWithError:error];            
+        }
+        
+        else {
+            NSAssert([delegate respondsToSelector:@selector(flickrAPIRequest:didObtainOAuthAccessToken:secret:userFullName:userName:userNSID:)], @"Delegate must implement -flickrAPIRequest:didObtainOAuthAccessToken:secret:userFullName:userName:userNSID: to handle the obtained access token");
+            
+            [delegate flickrAPIRequest:self didObtainOAuthAccessToken:oat secret:oats userFullName:fn userName:un userNSID:nsid];
+        }
+    }
+    else {
+        NSDictionary *responseDictionary = [OFXMLMapper dictionaryMappedFromXMLData:[request receivedData]];	
+        NSDictionary *rsp = [responseDictionary objectForKey:@"rsp"];
+        NSString *stat = [rsp objectForKey:@"stat"];
+        
+        // this also fails when (responseDictionary, rsp, stat) == nil, so it's a guranteed way of checking the result
+        if (![stat isEqualToString:@"ok"]) {
+            NSDictionary *err = [rsp objectForKey:@"err"];
+            NSString *code = [err objectForKey:@"code"];
+            NSString *msg = [err objectForKey:@"msg"];
+        
+            NSError *toDelegateError;
+            if ([code length]) {
+                // intValue for 10.4-compatibility
+                toDelegateError = [NSError errorWithDomain:OFFlickrAPIReturnedErrorDomain code:[code intValue] userInfo:[msg length] ? [NSDictionary dictionaryWithObjectsAndKeys:msg, NSLocalizedFailureReasonErrorKey, nil] : nil];				
+            }
+            else {
+                toDelegateError = [NSError errorWithDomain:OFFlickrAPIRequestErrorDomain code:OFFlickrAPIRequestFaultyXMLResponseError userInfo:nil];
+            }
+                
+            if ([delegate respondsToSelector:@selector(flickrAPIRequest:didFailWithError:)]) {
+                [delegate flickrAPIRequest:self didFailWithError:toDelegateError];        
+            }
+            return;
+        }
+
+        [self cleanUpTempFile];
+        if ([delegate respondsToSelector:@selector(flickrAPIRequest:didCompleteWithResponse:)]) {
+            [delegate flickrAPIRequest:self didCompleteWithResponse:rsp];
+        }    
+    }
 }
 
 - (void)httpRequest:(LFHTTPRequest *)request didFailWithError:(NSString *)error
