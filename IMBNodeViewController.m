@@ -789,10 +789,16 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 // Called in response to a IMBNodesWillChangeNotification notification. Set a flag that helps us to do the right 
 // thing in the IMBOutlineView delegate methods. If nodes are currently being replaced, then we will allow any 
 // changes, because those changes were not initiated by user events...
+// And it will allow us to save any state information that might be unintentionally changed through the
+// replacements of nodes (remember that the libary controller has a binding with the outline view)
 
 - (void) _nodesWillChange
 {
-
+    // Since the replacing of nodes in the library controller will lead to side effects
+    // regarding the current scroll position of the outline view we have to save it here
+    // for later restauration
+    
+    _nodeOutlineViewSavedVisibleRectOrigin = [ibNodeOutlineView visibleRect].origin;
 }
 
 
@@ -881,6 +887,10 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	[self __updatePopupMenu];
 	[self __syncPopupMenuSelection];
+
+    // Restore scroll position of outline view (see _nodesWillChange for further explanation)
+    
+    [ibNodeOutlineView scrollPoint:_nodeOutlineViewSavedVisibleRectOrigin];
 
 	// We are done, now the user is once again in charge...
 	
@@ -1526,6 +1536,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (void) restoreState
 {
 	[self _loadStateFromPreferences];
+	[self _nodesWillChange];
 	[self _nodesDidChange];
 }
 
