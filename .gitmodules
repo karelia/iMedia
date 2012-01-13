@@ -1,0 +1,3 @@
+[submodule "ObjectiveFlickr"]
+	path = ObjectiveFlickr
+	url = git://github.com/lukhnos/objectiveflickr.git
