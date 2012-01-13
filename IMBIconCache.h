@@ -54,11 +54,11 @@
 
 typedef struct _IMBIconTypeMappingEntry
 {
-	NSString* fIconType;
-	NSString* fApplicationIconName;
-	NSString* fFallbackIconName;
-	NSString* fAlternateIconName;
-	NSString* fAlternateBundlePath;
+	__unsafe_unretained NSString* fIconType;
+	__unsafe_unretained NSString* fApplicationIconName;
+	__unsafe_unretained NSString* fFallbackIconName;
+	__unsafe_unretained NSString* fAlternateIconName;
+	__unsafe_unretained NSString* fAlternateBundlePath;
 } 
 IMBIconTypeMappingEntry;
 
