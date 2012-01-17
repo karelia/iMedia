@@ -803,8 +803,7 @@
 		NSString* replacement = @"/Data.noindex/";
 		NSScanner* aScanner =  [[NSScanner alloc] initWithString:imagePath];
 		
-		if ([aScanner scanString:pathPrefix intoString:nil] &&
-			[aScanner scanString:@"/Data/" intoString:nil] ||
+		if (([aScanner scanString:pathPrefix intoString:nil] && [aScanner scanString:@"/Data/" intoString:nil]) ||
 			[aScanner scanString:@"/Thumbnails/" intoString:nil])
 		{
 			NSString* suffixString = [imagePath substringFromIndex:[aScanner scanLocation]];

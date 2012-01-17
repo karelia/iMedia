@@ -683,8 +683,7 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
 		}  // end  lock
 	}
 	
-	if( !objectID && 
-	    [aNotification isEqualTo:(NSString *)kICANotificationTypeStoreAdded] || 
+	if( (!objectID && [aNotification isEqualTo:(NSString *)kICANotificationTypeStoreAdded]) || 
 	    [aNotification isEqualTo:(NSString *)kICANotificationTypeStoreRemoved] )
 	{ 
 		// Reload the device

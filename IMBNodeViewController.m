@@ -827,7 +827,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	NSMutableArray* expandedNodeIdentifiers = [NSMutableArray arrayWithArray:self.expandedNodeIdentifiers];
 	
-	while (count = [expandedNodeIdentifiers count])
+	while ((count = [expandedNodeIdentifiers count]))
 	{
 		rows = [ibNodeOutlineView numberOfRows];
 		
@@ -1060,7 +1060,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (BOOL) canAddNode
 {
 	IMBNode* node = [self selectedNode];
-	return node == nil || node.isGroup && node.groupType == kIMBGroupTypeFolder;
+	return node == nil || (node.isGroup && node.groupType == kIMBGroupTypeFolder);
 }
 
 
@@ -1148,7 +1148,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	// First we'll add standard menu items...
 	
-	if (inNode==nil || inNode.isGroup && inNode.groupType==kIMBGroupTypeFolder)
+	if (inNode==nil || (inNode.isGroup && inNode.groupType==kIMBGroupTypeFolder))
 	{
 		title = NSLocalizedStringWithDefaultValue(
 			@"IMBNodeViewController.menuItem.add",
