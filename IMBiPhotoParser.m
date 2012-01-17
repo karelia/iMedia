@@ -576,8 +576,12 @@
 
 - (BOOL) supportsPhotoStreamFeatureInVersion:(NSString *)inVersion
 {
-    NSComparisonResult compareResult = [inVersion imb_finderCompare:@"9.2.1"];
-	return (compareResult >= 0);
+    if (inVersion && inVersion.length > 0)
+    {
+        NSComparisonResult compareResult = [inVersion imb_finderCompare:@"9.2.1"];
+        return (compareResult >= 0);
+    }
+    return NO;
 }
 
 

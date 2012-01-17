@@ -849,7 +849,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSUInteger) indexOfAlbumInAlbumList:(NSArray*)inAlbumList passingTest:(SEL)predicateSelector
 {
-    // Transform predicate into one needed by -[indexOfObjectPassingTest]:
+    // Transform predicate into block (needed by -[indexOfObjectPassingTest]:)
     
     BOOL(^listPredicate)(id, NSUInteger, BOOL *) = ^(id albumDict, NSUInteger idx, BOOL *stop)
     {
