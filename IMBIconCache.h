@@ -52,13 +52,19 @@
 
 #pragma mark TYPEDEFS
 
+// Compatibility with pre-ARC compilers
+#ifndef __unsafe_unretained
+#define __unsafe_unretained 
+#endif
+
+// Because this is a struct, objects have to be marked as __unsafe_unretained so ARC apps linking to us don't freak out (even though iMedia itself remains manually managed)
 typedef struct _IMBIconTypeMappingEntry
 {
-	NSString* fIconType;
-	NSString* fApplicationIconName;
-	NSString* fFallbackIconName;
-	NSString* fAlternateIconName;
-	NSString* fAlternateBundlePath;
+	__unsafe_unretained NSString* fIconType;
+	__unsafe_unretained NSString* fApplicationIconName;
+	__unsafe_unretained NSString* fFallbackIconName;
+	__unsafe_unretained NSString* fAlternateIconName;
+	__unsafe_unretained NSString* fAlternateBundlePath;
 } 
 IMBIconTypeMappingEntry;
 
