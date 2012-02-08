@@ -675,10 +675,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
             inOldNode.objects = nil;
 
             // It may well be that inOldNode is already replaced by some other node (see issue #33).
-            // Make sure to treat that one to be the old node.
-            index = [nodes indexOfObjectPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
-                return [inOldNode isEqual:obj];
-            }];
+            // Make sure to treat that one to be the old node (nodes are equal but not necessarily identical).
+            
+            index = [nodes indexOfObject:inOldNode];
 
             if (index != NSNotFound)
             {
