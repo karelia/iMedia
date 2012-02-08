@@ -458,6 +458,8 @@
 		
 		CGColorRef color = CGColorCreate(colorSpace, fillComponents);
 		[backgroundLayer setBackgroundColor:color];
+        CFRelease(colorSpace);
+        CFRelease(color);
 		
 		return backgroundLayer;
 	}

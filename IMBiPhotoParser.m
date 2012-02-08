@@ -83,6 +83,7 @@
 - (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
 - (void) populateEventsNode:(IMBNode*)inNode withEvents:(NSArray*)inEvents images:(NSDictionary*)inImages;
+- (void) populatePhotoStreamNode:(IMBNode*)inNode images:(NSDictionary*)inImages;
 - (void) populateAlbumNode:(IMBNode*)inNode images:(NSDictionary*)inImages;
 
 @end
@@ -308,7 +309,7 @@
 	NSDictionary* images = [plist objectForKey:@"Master Image List"];
 	NSArray* albums = [plist objectForKey:@"List of Albums"];
 	
-	// Population of events and faces node fundamentally different from album node
+	// Population of events, faces, photo stream and regular album node fundamentally different
 	
 	if ([self isEventsNode:inNode]) {
 		NSArray* events = [plist objectForKey:@"List of Rolls"];
@@ -316,6 +317,8 @@
 	} else if ([self isFacesNode:inNode]) {
 		NSDictionary* faces = [plist objectForKey:@"List of Faces"];
 		[self populateFacesNode:inNode withFaces:faces images:images];
+	} else if ([self isPhotoStreamNode:inNode]) {
+		[self populatePhotoStreamNode:inNode images:images];
 	} else {
 		[self addSubNodesToNode:inNode albums:albums images:images]; 
 		[self populateAlbumNode:inNode images:images]; 
@@ -326,17 +329,15 @@
 	// which is implemented here, to achieve the desired "feel" in the browser...
 	
 	// Will find Photos node at same index in subnodes as in album list
-	
-	NSNumber* photosNodeIndex = nil;
-	[self allPhotosAlbumInAlbumList:albums atIndex:&photosNodeIndex];	// which offset was it found, in "List of Albums" Array
-	
-	if (inNode.isTopLevelNode && photosNodeIndex)
+	// which offset was it found, in "List of Albums" Array
+
+	NSUInteger photosNodeIndex = [self indexOfAllPhotosAlbumInAlbumList:albums];
+	if (inNode.isTopLevelNode && photosNodeIndex != NSNotFound)
 	{
 		NSArray* subNodes = inNode.subNodes;
-		NSInteger pnIndex = [photosNodeIndex unsignedIntegerValue];
-		if (pnIndex < [subNodes count])	// Karelia case 136310, make sure offset exists
+		if (photosNodeIndex < [subNodes count])	// Karelia case 136310, make sure offset exists
 		{
-			IMBNode* photosNode = [subNodes objectAtIndex:pnIndex];	// assumes subnodes exists same as albums!
+			IMBNode* photosNode = [subNodes objectAtIndex:photosNodeIndex];	// assumes subnodes exists same as albums!
 			[self populateNode:photosNode options:inOptions error:outError];
 			inNode.objects = photosNode.objects;
 		}
@@ -366,7 +367,9 @@
 
 - (void) watchedPathDidChange:(NSString*)inWatchedPath
 {
-	if ([inWatchedPath isEqual:self.mediaSource])
+    NSString *myMediaPath = [self.mediaSource stringByDeletingLastPathComponent];
+    
+	if ([inWatchedPath isEqual:myMediaPath])
 	{
 		@synchronized(self)
 		{
@@ -556,12 +559,29 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 // Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBiPhotoParser://AlbumId/17"...
 
 - (NSString*) identifierForId:(NSNumber*) inId inSpace:(NSString*) inIdSpace
 {
 	NSString* albumPath = [NSString stringWithFormat:@"/%@/%@", inIdSpace, inId];
 	return [self identifierForPath:albumPath];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// iPhoto supports Photo Stream through AlbumData.xml since version 9.2.1
+
+- (BOOL) supportsPhotoStreamFeatureInVersion:(NSString *)inVersion
+{
+    if (inVersion && inVersion.length > 0)
+    {
+        NSComparisonResult compareResult = [inVersion imb_finderCompare:@"9.2.1"];
+        return (compareResult >= 0);
+    }
+    return NO;
 }
 
 
@@ -585,10 +605,10 @@
 
 - (BOOL) shouldUseAlbum:(NSDictionary*)inAlbumDict images:(NSDictionary*)inImages
 {
-	// Usage of events or faces album is not determined here
+	// Usage of Events or Faces or Photo Stream album is not determined here
 	
 	NSUInteger albumId = [[inAlbumDict objectForKey:@"AlbumId"] unsignedIntegerValue];
-	if (albumId == EVENTS_NODE_ID || albumId == FACES_NODE_ID)
+	if (albumId == EVENTS_NODE_ID || albumId == FACES_NODE_ID || albumId == PHOTO_STREAM_NODE_ID)
 	{
 		return YES;
 	}
@@ -640,13 +660,15 @@
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
 		// iPhoto 7
-		{@"Faces",					@"sl-icon-small_people.tiff",			@"folder",	nil,				nil},
 		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
 		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
 		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
 		{@"Event",					@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
 		{@"Events",					@"sl-icon-small_events.tiff",			@"folder",	nil,				nil},
+		{@"Faces",					@"sl-icon-small_people.tiff",			@"folder",	nil,				nil},
+		{@"Flagged",				@"sl-icon-small_flag.tiff",				@"folder",	nil,				nil},
 		{@"Folder",					@"sl-icon-small_folder.tiff",			@"folder",	nil,				nil},
+		{@"Photo Stream",			@"sl-icon-small_photostream.tiff",		@"folder",	nil,				nil},
 		{@"Photocasts",				@"sl-icon-small_subscriptions.tiff",	@"folder",	nil,				nil},
 		{@"Photos",					@"sl-icon-small_library.tiff",			@"folder",	nil,				nil},
 		{@"Published",				@"sl-icon-small_publishedAlbum.tiff",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
@@ -679,7 +701,19 @@
 
 - (BOOL) isAllPhotosAlbum:(NSDictionary*)inAlbumDict
 {
-	return [(NSNumber*)[inAlbumDict objectForKey:@"Master"] unsignedIntegerValue] == 1;
+	return [(NSNumber *)[inAlbumDict objectForKey:@"Master"] unsignedIntegerValue] == 1;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (BOOL) isFlaggedAlbum:(NSDictionary*)inAlbumDict
+{
+    NSString *albumType = [inAlbumDict objectForKey:@"Album Type"];
+    
+	return ([albumType isEqualTo:@"Shelf"] ||        // iPhoto 8
+            [albumType isEqualTo:@"Flagged"]);       // iPhoto 9
 }
 
 
@@ -1007,6 +1041,104 @@
 		[pool drain];
 	}
 	
+    inNode.objects = objects;
+    [objects release];
+}
+
+
+//--------------------------------------------------------------------------------------------------
+// Returns array of all image dictionaries that belong to the Photo Stream (sorted by date).
+// It will also exclude duplicate objects in terms of the image's "PhotoStreamAssetId".
+
+- (NSArray *) photoStreamObjectsFromImages:(NSDictionary*)inImages
+{
+    NSMutableArray *photoStreamObjectDictionaries = [NSMutableArray array];
+    NSDictionary *imageDict = nil;
+    NSMutableSet *assetIds = [NSMutableSet set];
+	
+	for (NSString *imageKey in inImages)
+	{
+        imageDict = [inImages objectForKey:imageKey];
+		
+        // Being a member of Photo Stream is determined by having a non-empty Photo Stream asset id.
+        // Add objects with the same asset id only once.
+        
+        NSString *photoStreamAssetId = [imageDict objectForKey:@"PhotoStreamAssetId"];
+		if (photoStreamAssetId && photoStreamAssetId.length > 0 &&
+            ![assetIds member:photoStreamAssetId] &&
+            [self shouldUseObject:imageDict])
+		{
+            [assetIds addObject:photoStreamAssetId];
+            [photoStreamObjectDictionaries addObject:imageDict];
+        }
+    }
+    // After collecting all Photo Stream object dictionaries sort them by date
+    
+	NSSortDescriptor* dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"DateAsTimerInterval" ascending:YES];
+	NSArray* sortDescriptors = [NSArray arrayWithObject:dateDescriptor];
+	[dateDescriptor release];
+	
+    NSArray *sortedObjectDictionaries = [photoStreamObjectDictionaries sortedArrayUsingDescriptors:sortDescriptors];
+    
+    return sortedObjectDictionaries;
+}
+
+
+//--------------------------------------------------------------------------------------------------
+// Populates the Photo Stream node.
+
+- (void) populatePhotoStreamNode:(IMBNode*)inNode images:(NSDictionary*)inImages
+{
+    // Pull all Photo Stream objects from the inImages dictionary (should be master image list) sorted by date
+    
+    NSArray *sortedPhotoStreamObjectDictionaries = [self photoStreamObjectsFromImages:inImages];
+    
+	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
+	// because without creating an array we would cause an endless loop...
+	
+	NSMutableArray* subNodes = [NSMutableArray array];
+	
+	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
+	// without creating an array we would cause an endless loop...
+	
+	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
+	
+	// Populate the node with IMBVisualObjects for each image in the album
+	
+	NSUInteger index = 0;
+	Class objectClass = [self objectClass];
+	
+	for (NSDictionary *imageDict in sortedPhotoStreamObjectDictionaries)
+	{
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		
+        NSString* path = [imageDict objectForKey:@"ImagePath"];
+        NSString* name = [imageDict objectForKey:@"Caption"];
+        if ([name isEqualToString:@""])
+        {
+            name = [[path lastPathComponent] stringByDeletingPathExtension];	// fallback to filename
+        }
+        
+        IMBObject* object = [[objectClass alloc] init];
+        [objects addObject:object];
+        [object release];
+        
+        object.location = (id)path;
+        object.name = name;
+        object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
+        object.metadata = nil;					// Build lazily when needed (takes longer)
+        object.metadataDescription = nil;		// Build lazily when needed (takes longer)
+        object.parser = self;
+        object.index = index++;
+        
+        object.imageLocation = [self imageLocationForObject:imageDict];
+        object.imageRepresentationType = [self requestedImageRepresentationType];
+        object.imageRepresentation = nil;
+		
+		[pool drain];
+	}
+	
+	inNode.subNodes = subNodes;
     inNode.objects = objects;
     [objects release];
 }

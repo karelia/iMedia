@@ -64,6 +64,7 @@ CGImageRef createImageWithName(NSString* imageName)
 		
 		if(imageSource){
 			returnValue = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
+            CFRelease(imageSource);
 		}
 	}
 	
