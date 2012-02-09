@@ -267,6 +267,7 @@
 		node.groupType = inOldNode.groupType;
 		node.leaf = inOldNode.leaf;
 		node.parser = self;
+        node.isTopLevelNode = inOldNode.isTopLevelNode;
 	}
 	
 	// If we have more than one library then append the library name to the root node...
