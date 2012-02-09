@@ -610,7 +610,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
-	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
+	NSMutableArray* objects = [NSMutableArray array];
 	
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
@@ -689,7 +689,6 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	[pool drain];
 	inNode.subNodes = subNodes;
 	inNode.objects = objects;
-	[objects release];
 }
 
 
