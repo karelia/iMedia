@@ -421,7 +421,7 @@
 	
 	if (inOldNode.isPopulated)
 	{
-		[self populateNode:inNewNode options:inOptions error:&error];
+        [self populateNode:inNewNode options:inOptions error:&error];
 		
 		for (IMBNode* oldSubNode in inOldNode.subNodes)
 		{
