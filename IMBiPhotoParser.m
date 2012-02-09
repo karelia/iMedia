@@ -259,6 +259,7 @@
 		node.leaf = inOldNode.leaf;
 		node.parser = self;
 		node.attributes = inOldNode.attributes;
+        node.isTopLevelNode = inOldNode.isTopLevelNode;
 	}
 	
 	// If we have more than one library then append the library name to the root node...
@@ -865,7 +866,7 @@
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
-	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
+	NSMutableArray* objects = [NSMutableArray array];
 	NSUInteger index = 0;
 	
 	// We saved a reference to the album dictionary when this node was created
@@ -951,7 +952,6 @@
 	}	
 	inNode.subNodes = subNodes;
 	inNode.objects = objects;
-	[objects release];
 }
 
 
@@ -960,7 +960,7 @@
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
-	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
+	NSMutableArray* objects = [NSMutableArray array];
 	
 	// Populate the node with IMBVisualObjects for each image in the album
 	
@@ -1008,7 +1008,6 @@
 	}
 	
     inNode.objects = objects;
-    [objects release];
 }
 
 
