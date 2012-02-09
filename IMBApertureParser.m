@@ -786,7 +786,7 @@
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
-	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
+	NSMutableArray* objects = [NSMutableArray array];
 
 	// Look for the correct album in the Aperture XML plist. Once we find it, populate the node with IMBVisualObjects
 	// for each image in this album...
@@ -841,7 +841,6 @@
 		[pool1 drain];
     
     inNode.objects = objects;
-    [objects release];
 }
 
 
