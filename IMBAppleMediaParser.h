@@ -82,13 +82,15 @@
 #define EVENTS_ID_SPACE @"EventId"
 #define FACES_ID_SPACE  @"FaceId"
 #define ALBUMS_ID_SPACE @"AlbumId"
+#define PHOTO_STREAM_ID_SPACE @"PhotoStreamId"
 
 // Since we will add an events node to the list of iPhoto albums and a faces node to iPhoto and Aperture
 // we have to create (sub-)ids for them that are unique throughout their library. The ones chosen below
 // are very, very likely to be.
 
-#define EVENTS_NODE_ID UINT_MAX-4811	// Very, very unlikely this not to be unique throughout library
-#define FACES_NODE_ID  UINT_MAX-4812	// Very, very unlikely this not to be unique throughout library
+#define EVENTS_NODE_ID       UINT_MAX-4811	// Very, very unlikely this not to be unique throughout library
+#define FACES_NODE_ID        UINT_MAX-4812	// Very, very unlikely this not to be unique throughout library
+#define PHOTO_STREAM_NODE_ID UINT_MAX-4813	// Very, very unlikely this not to be unique throughout library
 
 // node object types of interest for skimming
 
@@ -124,10 +126,13 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 
 - (NSString*) identifierForId:(NSNumber*) inId inSpace:(NSString*) inIdSpace;
 
-// Returns the standard album of all photos ("Photos") found in the XML data file.
-// Also returns the index in the album list where the album was found.
+// Returns the index of the all photos album ("Photos") in given album list
 
-- (NSDictionary*) allPhotosAlbumInAlbumList:(NSArray*)inAlbumList atIndex:(NSNumber**)outIndex;
+- (NSUInteger) indexOfAllPhotosAlbumInAlbumList:(NSArray*)inAlbumList;
+
+// Returns the index of the flagged album ("Flagged") in given album list
+
+- (NSUInteger) indexOfFlaggedAlbumInAlbumList:(NSArray*)inAlbumList;
 
 // Returns whether inNode is the events node
 
@@ -136,6 +141,10 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 // Returns whether node provided is the faces node
 
 - (BOOL) isFacesNode:(IMBNode*)inNode;
+
+// Returns whether inNode is the Photo Stream node
+
+- (BOOL) isPhotoStreamNode:(IMBNode*)inNode;
 
 // Returns whether an album of this type exposes a disclosure triangle or not.
 // Takes care of album Types "Folder", "Faces" and "Events".

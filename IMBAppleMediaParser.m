@@ -80,7 +80,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSString*) imagePathForImageKey:(NSString*)inImageKey;
 - (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey;
-
+- (BOOL) supportsPhotoStreamFeatureInVersion:(NSString *)inVersion;
 @end
 
 
@@ -105,22 +105,23 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (void) addSpecialAlbumsToAlbumsInLibrary:(NSMutableDictionary*)inLibraryDict
 {	
-	NSArray* oldAlbumList = [inLibraryDict objectForKey:@"List of Albums"];		
+	NSArray* oldAlbumList = [inLibraryDict objectForKey:@"List of Albums"];
 	
-	if (oldAlbumList != nil && [oldAlbumList count]>0)
+    if (oldAlbumList != nil && [oldAlbumList count]>0)
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		
-		NSNumber* photosDictIndex = nil;
-		NSDictionary *photosDict = [self allPhotosAlbumInAlbumList:oldAlbumList atIndex:&photosDictIndex];
+        // To insert new albums like events and faces into the album list we have to re-create it mutable style
+        NSMutableArray *newAlbumList = [NSMutableArray arrayWithArray:oldAlbumList];
+        
+		NSUInteger insertionIndex = [self indexOfAllPhotosAlbumInAlbumList:oldAlbumList];
+        NSDictionary *photosDict = nil;
 		
-		if (photosDict && photosDictIndex)
+		if (insertionIndex != NSNotFound &&
+            (photosDict = [oldAlbumList objectAtIndex:insertionIndex]))
 		{
-			// To insert events and faces into the album list we have to re-create it mutable style
-			NSMutableArray *newAlbumList = [NSMutableArray arrayWithArray:oldAlbumList];
-			
-			// events album right before photos album
-			
+            // Events
+            
 			if ([inLibraryDict objectForKey:@"List of Rolls"])
 			{
 				NSNumber *eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
@@ -132,9 +133,11 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 										@"Events",  @"Album Type",
 										[photosDict objectForKey:@"Parent"], @"Parent", nil];
 				
-				[newAlbumList insertObject:events atIndex:[photosDictIndex unsignedIntegerValue]];
+                // events album right before photos album
+                
+				[newAlbumList insertObject:events atIndex:insertionIndex];
 				IMBRelease(events);
-				photosDictIndex = [NSNumber numberWithUnsignedInteger:[photosDictIndex unsignedIntegerValue] + 1];
+                insertionIndex++;
 			}
 			
 			// Faces album right after photos album
@@ -150,13 +153,33 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 									   @"Faces",  @"Album Type",
 									   [photosDict objectForKey:@"Parent"], @"Parent", nil];
 				
-				[newAlbumList insertObject:faces atIndex:[photosDictIndex unsignedIntegerValue] + 1];
+				[newAlbumList insertObject:faces atIndex:insertionIndex + 1];
 				IMBRelease(faces);
 			}
-			
-			// Replace the old albums array.
-			[inLibraryDict setValue:newAlbumList forKey:@"List of Albums"];
 		}
+			
+        // Photo Stream album right before Flagged album
+        
+        insertionIndex = [self indexOfFlaggedAlbumInAlbumList:newAlbumList];
+        if ([self supportsPhotoStreamFeatureInVersion:[inLibraryDict objectForKey:@"Application Version"]] &&
+            insertionIndex != NSNotFound)
+        {
+            NSNumber *albumId = [NSNumber numberWithUnsignedInt:PHOTO_STREAM_NODE_ID];
+            NSString *albumName = NSLocalizedStringWithDefaultValue(@"IMB.iPhotoParser.photostream", nil, IMBBundle(), @"Photo Stream", @"Photo Stream node shown in iPhoto library");
+            
+            NSDictionary* album = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                   albumId,   @"AlbumId",
+                                   albumName, @"AlbumName",
+                                   @"Photo Stream",  @"Album Type",
+                                   [photosDict objectForKey:@"Parent"], @"Parent", nil];
+            
+            [newAlbumList insertObject:album atIndex:insertionIndex];
+            IMBRelease(album);
+        }
+        
+        // Replace the old albums array.
+        
+        [inLibraryDict setValue:newAlbumList forKey:@"List of Albums"];
 		[pool drain];
 	}
 }
@@ -418,6 +441,28 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSLog(@"%s Please use a custom subclass of IMBAppleMediaParser...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBAppleMediaParser" userInfo:nil] raise];
 	
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is the "Flagged" album. Must be subclassed.
+
+- (BOOL) isFlaggedAlbum:(NSDictionary*)inAlbumDict
+{
+	NSLog(@"%s Please use a custom subclass of IMBAppleMediaParser...",__FUNCTION__);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBAppleMediaParser" userInfo:nil] raise];
+	
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns whether the parser supports Apple's Photo Stream feature
+// (which is usually dependent on the data delivered through AlbumData.xml or ApertureData.xml respectively)
+
+- (BOOL) supportsPhotoStreamFeatureInVersion:(NSString *)inVersion
+{
 	return NO;
 }
 
@@ -778,7 +823,10 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	} else if ([inAlbumType isEqualToString:@"Face"] || [inAlbumType isEqualToString:@"Faces"])
 	{
 		return FACES_ID_SPACE;
-	}
+	} else if ([inAlbumType isEqualToString:@"Photo Stream"])
+    {
+        return PHOTO_STREAM_ID_SPACE;
+    }
 	return ALBUMS_ID_SPACE;
 }
 
@@ -795,21 +843,42 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 
 //----------------------------------------------------------------------------------------------------------------------
-// Returns the standard album of all photos ("Photos") in its plist representation
+// Returns an album found in the album list in its plist representation based on a blocks boolean return value.
+// Will also return the index where it is to be found as reference.
 
-- (NSDictionary*) allPhotosAlbumInAlbumList:(NSArray*)inAlbumList atIndex:(NSNumber**)outIndex
+- (NSUInteger) indexOfAlbumInAlbumList:(NSArray*)inAlbumList passingTest:(SEL)predicateSelector
 {
-	NSUInteger i, count = [inAlbumList count];
-	for (i = 0; i < count; i++) 
-	{
-		NSDictionary* albumDict = [inAlbumList objectAtIndex:i];
-		if ([self isAllPhotosAlbum:albumDict])
+    // Transform predicate into block (needed by -[indexOfObjectPassingTest]:)
+    
+    BOOL(^listPredicate)(id, NSUInteger, BOOL *) = ^(id albumDict, NSUInteger idx, BOOL *stop)
+    {
+		if ([self performSelector:predicateSelector withObject:albumDict])
 		{
-			*outIndex = [NSNumber numberWithUnsignedInteger:i];
-			return albumDict;
+			*stop = YES;
+			return YES;
 		}
-	}
-	return nil;
+        return NO;
+    };
+    
+    return [inAlbumList indexOfObjectPassingTest:listPredicate];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the index of the all photos album ("Photos") in given album list
+
+- (NSUInteger) indexOfAllPhotosAlbumInAlbumList:(NSArray*)inAlbumList
+{
+    return [self indexOfAlbumInAlbumList:inAlbumList passingTest:@selector(isAllPhotosAlbum:)];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the index of the flagged album ("Flagged") in given album list
+
+- (NSUInteger) indexOfFlaggedAlbumInAlbumList:(NSArray*)inAlbumList
+{
+    return [self indexOfAlbumInAlbumList:inAlbumList passingTest:@selector(isFlaggedAlbum:)];
 }
 
 
@@ -823,14 +892,23 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns whether inNode has id x and belongs to id space y
+
+- (BOOL) isNode:(IMBNode*)inNode withId:(NSUInteger)inId inSpace:(NSString *)inIdSpace
+{	
+	NSNumber* nodeId = [NSNumber numberWithUnsignedInt:inId];
+	NSString* nodeIdentifier = [self identifierForId:nodeId inSpace:inIdSpace];
+	
+	return [inNode.identifier isEqualToString:nodeIdentifier];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // Returns whether inNode is the events node
 
 - (BOOL) isEventsNode:(IMBNode*)inNode
 {	
-	NSNumber* eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
-	NSString* eventsIdentifier = [self identifierForId:eventsId inSpace:EVENTS_ID_SPACE];
-	
-	return [inNode.identifier isEqualToString:eventsIdentifier];
+	return [self isNode:inNode withId:EVENTS_NODE_ID inSpace:EVENTS_ID_SPACE];
 }
 
 
@@ -839,10 +917,16 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (BOOL) isFacesNode:(IMBNode*)inNode
 {	
-	NSNumber* facesId= [NSNumber numberWithUnsignedInt:FACES_NODE_ID];
-	NSString* facesIdentifier = [self identifierForId:facesId inSpace:FACES_ID_SPACE];
-	
-	return [inNode.identifier isEqualToString:facesIdentifier];
+	return [self isNode:inNode withId:FACES_NODE_ID inSpace:FACES_ID_SPACE];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns whether inNode is the Photo Stream node
+
+- (BOOL) isPhotoStreamNode:(IMBNode*)inNode
+{	
+	return [self isNode:inNode withId:PHOTO_STREAM_NODE_ID inSpace:PHOTO_STREAM_ID_SPACE];
 }
 
 
