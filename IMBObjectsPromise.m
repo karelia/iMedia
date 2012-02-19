@@ -222,7 +222,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (NSURL*) fileURLForObject:(IMBObject*)inObject
 {
-	return [_URLsByObject objectForKey:inObject];
+    return [_URLsByObject objectForKey:[NSValue valueWithPointer:inObject]];
 }
 
 
@@ -394,8 +394,13 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
     // Drop down to CF to avoid copying keys
     if (URL)
     {
+        // SMELL(DCJ): Working around a Mountain Lion issue where storage of 
+        // objects keyed by the IMBObject value is unreliable. Using the address
+        // as the key seems to do the trick as a quick fix. Would be nice to revert
+        // to old behavior if e.g. it's discovered that it was a bug in Mountain
+        // Lion that has been addressed.
         CFDictionarySetValue((CFMutableDictionaryRef)_URLsByObject,
-                             object,
+                             [NSValue valueWithPointer:object],
                              (URL ? (id)URL : (id)error));
         
         
