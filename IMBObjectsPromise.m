@@ -127,12 +127,44 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
     return [[[IMBLocalObjectsPromise alloc] initWithIMBObjects:objects] autorelease];
 }
 
+static const void *IMBObjCRetainCallback(CFAllocatorRef allocator, const void *value)
+{
+	return [(id)value retain];
+}
+
+static void IMBObjCReleaseCallback(CFAllocatorRef allocator, const void *value)
+{
+	[(id)value release];
+}
+
+- (CFMutableDictionaryRef)newCustomCFDictionaryFromDictionary:(NSDictionary*)theDictionary
+{
+	// Set up our CF-based dictionary to manage mapping from IMBObject to resolved URL.
+	// We use a CF dictionary so we can retain the key objects (IMBObject) without risk
+	// of them being copied, as the IMBObject doesn't support hashing and equality testing
+	// to adequately match a copy with the original.
+	CFDictionaryKeyCallBacks objcKeyCallbacks = {0, IMBObjCRetainCallback, IMBObjCReleaseCallback, NULL, NULL, NULL};
+	CFDictionaryValueCallBacks objcValueCallbacks = {0, IMBObjCRetainCallback, IMBObjCReleaseCallback, NULL, NULL};
+	CFMutableDictionaryRef newDict = CFDictionaryCreateMutable(NULL, [theDictionary count], &objcKeyCallbacks, &objcValueCallbacks);
+	if (newDict != NULL)
+	{
+		for (id thisKey in [theDictionary allKeys])
+		{
+			id thisObject = [theDictionary objectForKey:thisKey];
+			CFDictionarySetValue(newDict, thisKey, thisObject);
+		}
+	}
+	return newDict;
+}
+
 - (id) initWithIMBObjects:(NSArray*)inObjects
 {
 	if (self = [super init])
 	{
 		self.objects = inObjects;
-		_URLsByObject = [[NSMutableDictionary alloc] initWithCapacity:inObjects.count];
+		
+		_URLsByObject = [self newCustomCFDictionaryFromDictionary:nil];
+		
 		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.error = nil;
 		self.delegate = nil;
@@ -146,13 +178,12 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	return self;
 }
 
-
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if (self = [super init])
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
-		_URLsByObject = [[inCoder decodeObjectForKey:@"URLsByObject"] mutableCopy];
+		_URLsByObject = [self newCustomCFDictionaryFromDictionary:[inCoder decodeObjectForKey:@"URLsByObject"]];
 		self.destinationDirectoryPath = [inCoder decodeObjectForKey:@"destinationDirectoryPath"];
 		self.delegate = nil;
 		self.finishSelector = NULL;
@@ -169,7 +200,12 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[inCoder encodeObject:self.objects forKey:@"objects"];
-	[inCoder encodeObject:_URLsByObject forKey:@"URLsByObject"];
+	
+	// I'm not sure exactly how NSCoding is used by all clients, so on the off-chance it could be persisted
+	// across launches and even end us up with a coded object from another version of the framework, we 
+	// always encode as plain NSDictionary and convert back to our custom CFDictionary on decode.
+	NSMutableDictionary* simpleDict = [NSMutableDictionary dictionaryWithDictionary:(NSMutableDictionary*)_URLsByObject];
+	[inCoder encodeObject:simpleDict forKey:@"URLsByObject"];
     [inCoder encodeObject:[self destinationDirectoryPath] forKey:@"destinationDirectoryPath"];
 }
 
@@ -179,7 +215,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	IMBObjectsPromise* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.objects = self.objects;
-	copy->_URLsByObject = [_URLsByObject mutableCopy];
+	copy->_URLsByObject = CFDictionaryCreateMutableCopy(NULL, 0, _URLsByObject);
 	copy.destinationDirectoryPath = self.destinationDirectoryPath;
 	copy.error = self.error;
 	copy.delegate = self.delegate;
@@ -194,7 +230,10 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	
 	IMBRelease(_objects);
-	IMBRelease(_URLsByObject);
+	if (_URLsByObject != NULL)
+	{
+		CFRelease(_URLsByObject);
+	}
 	IMBRelease(_destinationDirectoryPath);
 	IMBRelease(_delegate);
 	IMBRelease(_error);
@@ -222,7 +261,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (NSURL*) fileURLForObject:(IMBObject*)inObject
 {
-    return [_URLsByObject objectForKey:[NSValue valueWithPointer:inObject]];
+    return [(NSDictionary*)_URLsByObject objectForKey:inObject];
 }
 
 
@@ -394,14 +433,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
     // Drop down to CF to avoid copying keys
     if (URL)
     {
-        // SMELL(DCJ): Working around a Mountain Lion issue where storage of 
-        // objects keyed by the IMBObject value is unreliable. Using the address
-        // as the key seems to do the trick as a quick fix. Would be nice to revert
-        // to old behavior if e.g. it's discovered that it was a bug in Mountain
-        // Lion that has been addressed.
-        CFDictionarySetValue((CFMutableDictionaryRef)_URLsByObject,
-                             [NSValue valueWithPointer:object],
-                             (URL ? (id)URL : (id)error));
+        CFDictionarySetValue(_URLsByObject, object, (URL ? (const void*)URL : (const void*)error));
         
         
         // Post process.  We use this to embed metadata after the download. This is only really used by Flickr images right now

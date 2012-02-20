@@ -83,7 +83,7 @@ extern NSString* kIMBPasteboardTypeObjectsPromise;
 {
   @private
 	NSArray* _objects;
-	NSMutableDictionary* _URLsByObject;
+	CFMutableDictionaryRef _URLsByObject;
   @protected
 	NSString* _destinationDirectoryPath;
 	NSError* _error;
