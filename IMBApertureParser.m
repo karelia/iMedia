@@ -536,6 +536,16 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// Returns whether the album dictionary provided represents the "Flagged" album
+
+- (BOOL) isFlaggedAlbum:(NSDictionary*)inAlbumDict
+{
+    return [[inAlbumDict objectForKey:@"uuid"] isEqualToString:@"flaggedAlbum"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Icons for older Aperture versions...
 
@@ -582,7 +592,8 @@
 {
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
-		{@"v3-Faces",@"sl-icon-small_people.tiff",		@"folder",	nil,	nil},
+		{@"v3-Photo Stream",@"SL-stream.tiff",          @"folder",	nil,	nil},   // photo stream
+		{@"v3-Faces",@"sl-icon-small_people.tiff",		@"folder",	nil,	nil},   // faces
 		{@"v3-1",	@"SL-album.tiff",					@"folder",	nil,	nil},	// album
 		{@"v3-2",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// smart album
 		{@"v3-3",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// library **** ... 200X

@@ -88,6 +88,7 @@
 	NSString* _selectedNodeIdentifier;
 	NSMutableArray* _expandedNodeIdentifiers;
 	BOOL _isRestoringState;
+    NSPoint _nodeOutlineViewSavedVisibleRectOrigin;
 	IMBParser* _selectedParser;
 	
 	IBOutlet NSSplitView* ibSplitView;
