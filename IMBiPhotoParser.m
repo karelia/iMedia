@@ -481,6 +481,17 @@
 	
 	if (![inObject isKindOfClass:[IMBNodeObject class]])
 	{
+        NSString *path = inObject.path;
+        NSString *path2 = [@"~/Desktop/Currently processing Sandvox media.jpg" stringByExpandingTildeInPath];
+        
+        NSFileManager *manager = [[NSFileManager alloc] init];
+        [manager removeItemAtPath:path2 error:NULL];
+        if (![manager linkItemAtPath:path toPath:path2 error:NULL])
+        {
+            [manager copyItemAtPath:path toPath:path2 error:NULL];
+        }
+        [manager release];
+        
 		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
 	}
 	
