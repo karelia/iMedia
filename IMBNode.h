@@ -105,7 +105,7 @@
 // Primary properties for a node:
 
 @property (copy) NSString* mediaSource;				// Path or url
-@property (copy) NSString* identifier;				// Unique identfier of form parserClassName://path/to/node
+@property (copy) NSString* identifier;				// Unique identifier of form parserClassName://path/to/node
 @property (copy) NSString* name;					// Display name for user interface
 @property (retain) NSImage* icon;					// 16x16 icon for user interface
 @property (retain) NSDictionary* attributes;		// Optional metadata about the node
@@ -175,7 +175,7 @@
 - (NSIndexPath*) indexPath;
 - (NSComparisonResult) compare:(IMBNode*)inNode;
 - (BOOL) isPopulated;
-- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentfier;
+- (IMBNode*) subNodeWithIdentifier:(NSString*)identifier;
 
 - (BOOL) isAncestorOfNode:(IMBNode*)inNode;
 - (BOOL) isDescendantOfNode:(IMBNode*)inNode;
