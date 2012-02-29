@@ -138,7 +138,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 	IBOutlet NSSegmentedControl *ibSegments;
  	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
-	IBOutlet IMBObjectFilter ibObjectFilter;
+	IMBObjectFilter ibObjectFilter;
 	NSUInteger _viewType;
 	double _iconSize;
 	

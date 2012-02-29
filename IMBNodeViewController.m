@@ -797,7 +797,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
     // Due to an error in NSTreeController a node to be replaced by another node will not be released
     // by NSTreeController if it was currently selected. As a workaround we can safely unselect it here
     // before nodes are exchanged by the library controller because the node identifier
-    // of the currently selected node is saved in _selectedNodeIdentfiers anyways.
+    // of the currently selected node is saved in _selectedNodeIdentifiers anyways.
     
     [ibNodeTreeController setSelectionIndexPath:nil];
     
