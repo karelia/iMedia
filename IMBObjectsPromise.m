@@ -60,6 +60,8 @@
 #import "IMBConfig.h"
 #import "IMBOperationQueue.h"
 #import "IMBLibraryController.h"
+#import "IMBParser.h"
+#import "IMBParserController.h"
 #import "IMBURLDownloadOperation.h"
 #import "IMBURLGetSizeOperation.h"
 #import "NSFileManager+iMedia.h"
@@ -88,6 +90,8 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 - (void) loadObjects:(NSArray*)inObjects;
 - (void) _loadObject:(IMBObject*)inObject;
 - (void) _didFinish;
+
+- (IMBParser *)_parserForObject:(IMBObject *)object;
 
 @property (assign) SEL finishSelector;
 
@@ -276,7 +280,12 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	for (IMBObject* object in inObjects)
 	{
 		if (![object isKindOfClass:[IMBButtonObject class]])
-		{
+		{			
+			if (object.parser == nil)
+			{
+				object.parser = [self _parserForObject:object];
+			}
+			
 			[self _loadObject:object];
 		}
 	}
@@ -414,6 +423,34 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
             [self.delegate objectsPromise:self object:object didFailLoadingWithError:error];
         }
     }
+}
+
+- (IMBParser *)_parserForObject:(IMBObject *)object;
+{
+    IMBParser *result = [object parser];
+    if (result) return result;
+    
+    
+    // IMBObjectsPromise creates objects by unarchiving them. Unarchived objects do not contain a reference to their parser, only the parser type and media source. Thus, we have to guess at the parser here so clients can have access to it.
+    NSString *parserMediaType = object.parserMediaType;
+    NSString *parserMediaSource = object.parserMediaSource;
+    
+    if ((parserMediaType == nil) || (parserMediaSource == nil)) {
+        return nil;
+    }
+    
+    IMBParserController *parserController = [IMBParserController sharedParserController];
+    NSArray *loadedParsers = [parserController parsersForMediaType:parserMediaType];
+    
+    for (IMBParser *parser in loadedParsers) {
+        if ([parser.mediaSource isEqualToString:parserMediaSource])
+        {
+            [object setParser:parser];
+            return parser;
+        }
+    }
+    
+    return nil;
 }
 
 - (NSString *)description;
