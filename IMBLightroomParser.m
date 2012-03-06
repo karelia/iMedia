@@ -62,7 +62,9 @@
 #import "IMBLightroom1Parser.h"
 #import "IMBLightroom2Parser.h"
 #import "IMBLightroom3Parser.h"
+#import "IMBLightroom4Parser.h"
 #import "IMBLightroom3VideoParser.h"
+#import "IMBLightroom4VideoParser.h"
 #import "IMBIconCache.h"
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
@@ -281,9 +283,11 @@ static NSArray* sSupportedUTIs = nil;
 		[parserInstances addObjectsFromArray:[IMBLightroom1Parser concreteParserInstancesForMediaType:inMediaType]];
 		[parserInstances addObjectsFromArray:[IMBLightroom2Parser concreteParserInstancesForMediaType:inMediaType]];
 		[parserInstances addObjectsFromArray:[IMBLightroom3Parser concreteParserInstancesForMediaType:inMediaType]];
+		[parserInstances addObjectsFromArray:[IMBLightroom4Parser concreteParserInstancesForMediaType:inMediaType]];
 	}
 	else if ([kIMBMediaTypeMovie isEqualTo:inMediaType]) {
 		[parserInstances addObjectsFromArray:[IMBLightroom3VideoParser concreteParserInstancesForMediaType:inMediaType]];
+		[parserInstances addObjectsFromArray:[IMBLightroom4VideoParser concreteParserInstancesForMediaType:inMediaType]];
 	}
 			  
 	return parserInstances;
