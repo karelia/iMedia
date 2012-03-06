@@ -219,37 +219,6 @@
 	return [self imb_pathForURLString];
 }
 
-#if defined MAC_OS_X_VERSION_10_6 && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
-- (NSData *) imb_decodeBase64;
-{
-	return [self imb_decodeBase64WithNewlines: YES];
-}
-
-- (NSData *) imb_decodeBase64WithNewlines: (BOOL) encodedWithNewlines;
-{
-	// Create a memory buffer containing Base64 encoded string data
-	const char *UTF8String = [self UTF8String];
-	BIO * mem = BIO_new_mem_buf((void *)UTF8String, strlen(UTF8String));
-	
-	// Push a Base64 filter so that reading from the buffer decodes it
-	BIO * b64 = BIO_new(BIO_f_base64());
-	if (!encodedWithNewlines)
-		BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
-	mem = BIO_push(b64, mem);
-	
-	// Decode into an NSMutableData
-	NSMutableData * data = [NSMutableData data];
-	char inbuf[512];
-	NSInteger inlen;
-	while ((inlen = BIO_read(mem, inbuf, sizeof(inbuf))) > 0)
-		[data appendBytes: inbuf length: inlen];
-	
-	// Clean up and go home
-	BIO_free_all(mem);
-	return data;
-}
-#endif
-
 + (id)uuid
 {
 	CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
