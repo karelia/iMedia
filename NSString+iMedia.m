@@ -490,6 +490,14 @@
 			{
 				return nil;
 			}
+			if ([path isEqualToString:symlinkPath])
+			{
+				//
+				// Prevent looping
+				//
+				return path;
+			}
+
 			path = symlinkPath;
 		}
 		else
