@@ -1,3 +1,6 @@
 [submodule "ObjectiveFlickr"]
 	path = ObjectiveFlickr
 	url = git://github.com/lukhnos/objectiveflickr.git
+[submodule "XPCKit"]
+	path = XPCKit
+	url = git@github.com:iMediaSandboxing/XPCKit.git
