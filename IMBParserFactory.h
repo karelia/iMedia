@@ -68,14 +68,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark TYPES
-
-typedef void (^IMBCompletionBlock)(id inResult,NSError* inError);
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Lightweight class that uniquely identifies a parser. Instance of this class can be archived and sent over 
 // an XPC connection to create an IMBParser instance on the other side (XPC service)...
 
