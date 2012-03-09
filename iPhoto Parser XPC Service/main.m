@@ -12,6 +12,8 @@
 
 int main(int argc, const char *argv[])
 {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
 	[XPCService runServiceWithConnectionHandler:^(XPCConnection *connection){
 		[connection sendLog:@"TestService received a connection"];
         
@@ -36,5 +38,8 @@ int main(int argc, const char *argv[])
             
 		}];
 	}];
+
+	[pool drain];
+	
 	return 0;
 }
