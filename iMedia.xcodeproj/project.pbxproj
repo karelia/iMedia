@@ -211,7 +211,7 @@
 		D094A6FC122F813A0011084C /* iTunes10-icon-32.png in Resources */ = {isa = PBXBuildFile; fileRef = D094A6DC122F813A0011084C /* iTunes10-icon-32.png */; };
 		D09653BC150A280700B6C83D /* IMBParserFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D09653BA150A280700B6C83D /* IMBParserFactory.h */; };
 		D09653BD150A280700B6C83D /* IMBParserFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = D09653BB150A280700B6C83D /* IMBParserFactory.m */; };
-		D09653BF150A285E00B6C83D /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0F207C5150A23AA007E6FA2 /* XPCKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		D09653BF150A285E00B6C83D /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0F207C5150A23AA007E6FA2 /* XPCKit.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		D09653C0150A2DA300B6C83D /* IMBParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930C11010F6C100C527B7 /* IMBParser.m */; };
 		D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B41010F6C100C527B7 /* IMBCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09930C51010F6C100C527B7 /* IMBLibraryController.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B51010F6C100C527B7 /* IMBLibraryController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -619,7 +619,7 @@
 		D099330B10119D8200C527B7 /* IMBNodeTreeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeTreeController.h; sourceTree = "<group>"; };
 		D099333010119EA300C527B7 /* IMBNodeTreeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeTreeController.m; sourceTree = "<group>"; };
 		D099333210119F3400C527B7 /* IMBObjectArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectArrayController.m; sourceTree = "<group>"; };
-		D09933551011B26E00C527B7 /* iMedia2 Tester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "iMedia2 Tester.app"; path = iMediaTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D09933551011B26E00C527B7 /* iMediaTester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D09933571011B26E00C527B7 /* TestApp-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestApp-Info.plist"; sourceTree = "<group>"; };
 		D09933B11011B32B00C527B7 /* IMBTestAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestAppDelegate.h; sourceTree = "<group>"; };
 		D09933B21011B32B00C527B7 /* IMBTestAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestAppDelegate.m; sourceTree = "<group>"; };
@@ -753,7 +753,7 @@
 			isa = PBXGroup;
 			children = (
 				8DC2EF5B0486A6940098B216 /* iMedia.framework */,
-				D09933551011B26E00C527B7 /* iMedia2 Tester.app */,
+				D09933551011B26E00C527B7 /* iMediaTester.app */,
 				30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhotoParser.xpc */,
 			);
 			name = Products;
@@ -1543,7 +1543,7 @@
 			);
 			name = iMediaTester;
 			productName = TestApp;
-			productReference = D09933551011B26E00C527B7 /* iMedia2 Tester.app */;
+			productReference = D09933551011B26E00C527B7 /* iMediaTester.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -1847,7 +1847,6 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
-				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -1869,7 +1868,6 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
-				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -2036,7 +2034,6 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
-				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = framework;
 			};
