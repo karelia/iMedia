@@ -44,6 +44,11 @@
 		30F90B341358501A00D13233 /* IMBFaceObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B321358501A00D13233 /* IMBFaceObjectViewController.m */; };
 		30F90B391358521300D13233 /* IMBTestFaceBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */; };
 		30F90B3A1358521300D13233 /* IMBTestFacesBackgroundLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */; };
+		30FFEBEF150A08DB0009C1D0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		30FFEBF5150A08DC0009C1D0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30FFEBF3150A08DC0009C1D0 /* InfoPlist.strings */; };
+		30FFEBF8150A08DC0009C1D0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 30FFEBF7150A08DC0009C1D0 /* main.m */; };
+		30FFEBFE150A0AA70009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 30FFEBEC150A08DB0009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc */; };
+		30FFEC06150A11440009C1D0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30DE5448150661D400C06806 /* XPCKit.framework */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		8F47B39110C416050013ED25 /* IMBOrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */; };
 		8F47B39210C416050013ED25 /* IMBOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F47B39010C416050013ED25 /* IMBOrderedDictionary.m */; };
@@ -406,6 +411,27 @@
 			remoteGlobalIDString = 1EEDD0CE13DE9FAB00D5AEC3;
 			remoteInfo = XPCKit;
 		};
+		30FFEBFF150A0C0F0009C1D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 30FFEBEB150A08DB0009C1D0;
+			remoteInfo = "iPhoto Parser XPC Service";
+		};
+		30FFEC01150A0C220009C1D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1EEDD0CE13DE9FAB00D5AEC3;
+			remoteInfo = XPCKit;
+		};
+		30FFEC04150A113B0009C1D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1EEDD0CE13DE9FAB00D5AEC3;
+			remoteInfo = XPCKit;
+		};
 		CEC0F91C10852AF8002CE02E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
@@ -444,6 +470,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		30FFEBFD150A09780009C1D0 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/XPCServices;
+			dstSubfolderSpec = 1;
+			files = (
+				30FFEBFE150A0AA70009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D08E8FBA101A0F15005D8614 /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -485,6 +521,12 @@
 		30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestFaceBrowserCell.m; sourceTree = "<group>"; };
 		30F90B371358521300D13233 /* IMBTestFacesBackgroundLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestFacesBackgroundLayer.h; sourceTree = "<group>"; };
 		30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestFacesBackgroundLayer.m; sourceTree = "<group>"; };
+		30FFEBEC150A08DB0009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "com.karelia.iPhoto Parser XPC Service.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
+		30FFEBEE150A08DB0009C1D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		30FFEBF2150A08DC0009C1D0 /* iPhoto Parser XPC Service-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iPhoto Parser XPC Service-Info.plist"; sourceTree = "<group>"; };
+		30FFEBF4150A08DC0009C1D0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		30FFEBF6150A08DC0009C1D0 /* iPhoto Parser XPC Service-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iPhoto Parser XPC Service-Prefix.pch"; sourceTree = "<group>"; };
+		30FFEBF7150A08DC0009C1D0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32DBCF5E0370ADEE00C91783 /* iMedia.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.pch; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* iMedia.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iMedia.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -830,6 +872,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		30FFEBE9150A08DB0009C1D0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				30FFEC06150A11440009C1D0 /* XPCKit.framework in Frameworks */,
+				30FFEBEF150A08DB0009C1D0 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF560486A6940098B216 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -866,6 +917,7 @@
 			children = (
 				8DC2EF5B0486A6940098B216 /* iMedia.framework */,
 				D09933551011B26E00C527B7 /* iMedia2.app */,
+				30FFEBEC150A08DB0009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -881,6 +933,8 @@
 				08FB77AEFE84172EC02AAC07 /* Framework */,
 				D099334E1011B22600C527B7 /* Test Application */,
 				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
+				30FFEBF0150A08DB0009C1D0 /* iPhoto Parser XPC Service */,
+				30FFEBED150A08DB0009C1D0 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
 			name = iMedia;
@@ -963,6 +1017,33 @@
 				30DE5450150661D400C06806 /* XPCKitTests.octest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		30FFEBED150A08DB0009C1D0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				30FFEBEE150A08DB0009C1D0 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		30FFEBF0150A08DB0009C1D0 /* iPhoto Parser XPC Service */ = {
+			isa = PBXGroup;
+			children = (
+				30FFEBF7150A08DC0009C1D0 /* main.m */,
+				30FFEBF1150A08DC0009C1D0 /* Supporting Files */,
+			);
+			path = "iPhoto Parser XPC Service";
+			sourceTree = "<group>";
+		};
+		30FFEBF1150A08DC0009C1D0 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				30FFEBF2150A08DC0009C1D0 /* iPhoto Parser XPC Service-Info.plist */,
+				30FFEBF3150A08DC0009C1D0 /* InfoPlist.strings */,
+				30FFEBF6150A08DC0009C1D0 /* iPhoto Parser XPC Service-Prefix.pch */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		8F7945CB139518630066E133 /* iPhoto */ = {
@@ -1590,6 +1671,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		30FFEBEB150A08DB0009C1D0 /* iPhoto Parser XPC Service */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 30FFEBF9150A08DC0009C1D0 /* Build configuration list for PBXNativeTarget "iPhoto Parser XPC Service" */;
+			buildPhases = (
+				30FFEBE8150A08DB0009C1D0 /* Sources */,
+				30FFEBE9150A08DB0009C1D0 /* Frameworks */,
+				30FFEBEA150A08DB0009C1D0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				30FFEC05150A113B0009C1D0 /* PBXTargetDependency */,
+			);
+			name = "iPhoto Parser XPC Service";
+			productName = "iPhoto Parser XPC Service";
+			productReference = 30FFEBEC150A08DB0009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
 		8DC2EF4F0486A6940098B216 /* iMedia */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "iMedia" */;
@@ -1619,10 +1718,13 @@
 				D09933521011B26E00C527B7 /* Sources */,
 				D09933531011B26E00C527B7 /* Frameworks */,
 				D08E8FBA101A0F15005D8614 /* Copy Frameworks */,
+				30FFEBFD150A09780009C1D0 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				30FFEC02150A0C220009C1D0 /* PBXTargetDependency */,
+				30FFEC00150A0C0F0009C1D0 /* PBXTargetDependency */,
 				D07BF168104C423B00B6C87D /* PBXTargetDependency */,
 				D099345A1011B6FA00C527B7 /* PBXTargetDependency */,
 			);
@@ -1675,6 +1777,7 @@
 				8DC2EF4F0486A6940098B216 /* iMedia */,
 				D09933541011B26E00C527B7 /* iMedia2 Tester */,
 				D02CD49E1224F22400C773A2 /* genstrings */,
+				30FFEBEB150A08DB0009C1D0 /* iPhoto Parser XPC Service */,
 			);
 		};
 /* End PBXProject section */
@@ -1732,6 +1835,14 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		30FFEBEA150A08DB0009C1D0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				30FFEBF5150A08DC0009C1D0 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF520486A6940098B216 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1885,6 +1996,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		30FFEBE8150A08DB0009C1D0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				30FFEBF8150A08DC0009C1D0 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF540486A6940098B216 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2007,6 +2126,21 @@
 			name = XPCKit;
 			targetProxy = 30DE54561506629200C06806 /* PBXContainerItemProxy */;
 		};
+		30FFEC00150A0C0F0009C1D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 30FFEBEB150A08DB0009C1D0 /* iPhoto Parser XPC Service */;
+			targetProxy = 30FFEBFF150A0C0F0009C1D0 /* PBXContainerItemProxy */;
+		};
+		30FFEC02150A0C220009C1D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = XPCKit;
+			targetProxy = 30FFEC01150A0C220009C1D0 /* PBXContainerItemProxy */;
+		};
+		30FFEC05150A113B0009C1D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = XPCKit;
+			targetProxy = 30FFEC04150A113B0009C1D0 /* PBXContainerItemProxy */;
+		};
 		CEC0F91D10852AF8002CE02E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "ObjectiveFlickr (framework)";
@@ -2025,6 +2159,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		30FFEBF3150A08DC0009C1D0 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				30FFEBF4150A08DC0009C1D0 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		D02CD4CB1224F78E00C773A2 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -2098,6 +2240,84 @@
 				SDKROOT = macosx;
 			};
 			name = Release;
+		};
+		30FFEBFA150A08DC0009C1D0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "iPhoto Parser XPC Service/iPhoto Parser XPC Service-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "iPhoto Parser XPC Service/iPhoto Parser XPC Service-Info.plist";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "com.karelia.$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		30FFEBFB150A08DC0009C1D0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "iPhoto Parser XPC Service/iPhoto Parser XPC Service-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "iPhoto Parser XPC Service/iPhoto Parser XPC Service-Info.plist";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "com.karelia.$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Release;
+		};
+		30FFEBFC150A08DC0009C1D0 /* Test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "iPhoto Parser XPC Service/iPhoto Parser XPC Service-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "iPhoto Parser XPC Service/iPhoto Parser XPC Service-Info.plist";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "com.karelia.$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Test;
 		};
 		D02CD49F1224F22400C773A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2225,6 +2445,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		30FFEBF9150A08DC0009C1D0 /* Build configuration list for PBXNativeTarget "iPhoto Parser XPC Service" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				30FFEBFA150A08DC0009C1D0 /* Debug */,
+				30FFEBFB150A08DC0009C1D0 /* Release */,
+				30FFEBFC150A08DC0009C1D0 /* Test */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		D02CD4A91224F24200C773A2 /* Build configuration list for PBXAggregateTarget "genstrings" */ = {
 			isa = XCConfigurationList;
