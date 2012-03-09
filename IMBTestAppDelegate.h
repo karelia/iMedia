@@ -71,14 +71,14 @@
 {
 	IBOutlet NSWindow* ibWindow;
 	IBOutlet NSWindow* ibDragDestinationWindow;
-	IBOutlet IMBNodeViewController* _nodeViewController;
-	IBOutlet IMBObjectViewController* _objectViewController;
+//	IBOutlet IMBNodeViewController* _nodeViewController;
+//	IBOutlet IMBObjectViewController* _objectViewController;
 	
 	NSMutableDictionary* _usedObjects;		// Keep IMBObjects here that were dragged into the text view
 }
 
-@property (retain) IMBNodeViewController* nodeViewController;
-@property (retain) IMBObjectViewController* objectViewController;
+//@property (retain) IMBNodeViewController* nodeViewController;
+//@property (retain) IMBObjectViewController* objectViewController;
 @property (retain) NSMutableDictionary* usedObjects;
 
 - (IBAction) togglePanel:(id)inSender;
