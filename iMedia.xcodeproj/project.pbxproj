@@ -30,15 +30,13 @@
 		30394AC812DC665000ACA531 /* IMBSkimmableObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3043924B130D1DDC00DD1D34 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		305B64C71372EF6C009B53BD /* cork-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CE394AC11371A1F700EF0D1E /* cork-background.jpg */; };
-		30DE54551506624D00C06806 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30DE5448150661D400C06806 /* XPCKit.framework */; };
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30F90B2F13584FE700D13233 /* IMBAppleMediaParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B2D13584FE700D13233 /* IMBAppleMediaParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30F90B331358501A00D13233 /* IMBFaceObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30FFEBEF150A08DB0009C1D0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
 		30FFEBF5150A08DC0009C1D0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30FFEBF3150A08DC0009C1D0 /* InfoPlist.strings */; };
 		30FFEBF8150A08DC0009C1D0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 30FFEBF7150A08DC0009C1D0 /* main.m */; };
-		30FFEBFE150A0AA70009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 30FFEBEC150A08DB0009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc */; };
-		30FFEC06150A11440009C1D0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30DE5448150661D400C06806 /* XPCKit.framework */; };
+		30FFEBFE150A0AA70009C1D0 /* com.karelia.imedia.iPhotoParser.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhotoParser.xpc */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		8F47B39110C416050013ED25 /* IMBOrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */; };
 		8F47B39210C416050013ED25 /* IMBOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F47B39010C416050013ED25 /* IMBOrderedDictionary.m */; };
@@ -122,7 +120,6 @@
 		D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D052B0931053B0F700988F53 /* IMBProgressWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0C11053B4AB00988F53 /* IMBProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = D052B0C01053B4AB00988F53 /* IMBProgress.xib */; };
 		D05A9493102EB022005DF9CE /* IMBImageCaptureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D07BF171104C426000B6C87D /* ObjectiveFlickr.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D0CEC48C1047BF7A00FA2A31 /* ObjectiveFlickr.framework */; };
 		D08070BF10442CD700891137 /* IMBMovieViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070BD10442CD700891137 /* IMBMovieViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08070C310442CE100891137 /* IMBAudioViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070C110442CE100891137 /* IMBAudioViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08070C810442DAE00891137 /* IMBAudioView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070C710442DAE00891137 /* IMBAudioView.xib */; };
@@ -212,6 +209,10 @@
 		D094A6FA122F813A0011084C /* iTunes10-icon-30.png in Resources */ = {isa = PBXBuildFile; fileRef = D094A6DA122F813A0011084C /* iTunes10-icon-30.png */; };
 		D094A6FB122F813A0011084C /* iTunes10-icon-31.png in Resources */ = {isa = PBXBuildFile; fileRef = D094A6DB122F813A0011084C /* iTunes10-icon-31.png */; };
 		D094A6FC122F813A0011084C /* iTunes10-icon-32.png in Resources */ = {isa = PBXBuildFile; fileRef = D094A6DC122F813A0011084C /* iTunes10-icon-32.png */; };
+		D09653BC150A280700B6C83D /* IMBParserFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D09653BA150A280700B6C83D /* IMBParserFactory.h */; };
+		D09653BD150A280700B6C83D /* IMBParserFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = D09653BB150A280700B6C83D /* IMBParserFactory.m */; };
+		D09653BF150A285E00B6C83D /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0F207C5150A23AA007E6FA2 /* XPCKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		D09653C0150A2DA300B6C83D /* IMBParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930C11010F6C100C527B7 /* IMBParser.m */; };
 		D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B41010F6C100C527B7 /* IMBCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09930C51010F6C100C527B7 /* IMBLibraryController.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B51010F6C100C527B7 /* IMBLibraryController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09930C71010F6C100C527B7 /* IMBNode.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B71010F6C100C527B7 /* IMBNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -274,6 +275,8 @@
 		D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */; };
 		D0E96D1C104410BD0015979F /* IMBPanelController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E96D1A104410BD0015979F /* IMBPanelController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0F207C6150A23AA007E6FA2 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0F207C5150A23AA007E6FA2 /* XPCKit.framework */; };
+		D0F207C7150A23BA007E6FA2 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
 		D0F2DB9B1098262D004280C1 /* FMDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = D0F2DB941098262D004280C1 /* FMDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0F2DB9C1098262D004280C1 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = D0F2DB951098262D004280C1 /* FMDatabase.m */; };
 		D0F2DB9D1098262D004280C1 /* FMDatabaseAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = D0F2DB961098262D004280C1 /* FMDatabaseAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -286,48 +289,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		30DE5447150661D400C06806 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1EEDD0CF13DE9FAB00D5AEC3;
-			remoteInfo = XPCKit;
-		};
-		30DE5449150661D400C06806 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1EEDD02813DD485400D5AEC3;
-			remoteInfo = libXPCKit;
-		};
-		30DE544B150661D400C06806 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1EEDD05913DD48BB00D5AEC3;
-			remoteInfo = TestApp;
-		};
-		30DE544D150661D400C06806 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1EEDD07513DD48D800D5AEC3;
-			remoteInfo = TestService;
-		};
-		30DE544F150661D400C06806 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1EEDD03C13DD485400D5AEC3;
-			remoteInfo = XPCKitTests;
-		};
-		30DE54561506629200C06806 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 1EEDD0CE13DE9FAB00D5AEC3;
-			remoteInfo = XPCKit;
-		};
 		30FFEBFF150A0C0F0009C1D0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -335,54 +296,12 @@
 			remoteGlobalIDString = 30FFEBEB150A08DB0009C1D0;
 			remoteInfo = "iPhoto Parser XPC Service";
 		};
-		30FFEC01150A0C220009C1D0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 1EEDD0CE13DE9FAB00D5AEC3;
-			remoteInfo = XPCKit;
-		};
-		30FFEC04150A113B0009C1D0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 1EEDD0CE13DE9FAB00D5AEC3;
-			remoteInfo = XPCKit;
-		};
-		CEC0F91C10852AF8002CE02E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 6A8666480F9593B200325E1C;
-			remoteInfo = "ObjectiveFlickr (framework)";
-		};
-		D07BF167104C423B00B6C87D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 6A8666480F9593B200325E1C;
-			remoteInfo = "ObjectiveFlickr (framework)";
-		};
 		D09934591011B6FA00C527B7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = iMedia;
-		};
-		D0CEC48B1047BF7A00FA2A31 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6A8666490F9593B200325E1C;
-			remoteInfo = "ObjectiveFlickr (framework)";
-		};
-		D0CEC48D1047BF7A00FA2A31 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6ABF72E60F939BE600B9179E;
-			remoteInfo = "ObjectiveFlickr (library)";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -393,7 +312,7 @@
 			dstPath = Contents/XPCServices;
 			dstSubfolderSpec = 1;
 			files = (
-				30FFEBFE150A0AA70009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc in CopyFiles */,
+				30FFEBFE150A0AA70009C1D0 /* com.karelia.imedia.iPhotoParser.xpc in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,7 +322,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				D07BF171104C426000B6C87D /* ObjectiveFlickr.framework in Copy Frameworks */,
 				D08E8FB7101A0F0D005D8614 /* iMedia.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -427,7 +345,6 @@
 		30394AC712DC665000ACA531 /* IMBSkimmableObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBSkimmableObjectViewController.m; sourceTree = "<group>"; };
 		30439222130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestiPhotoEventBrowserCell.h; sourceTree = "<group>"; };
 		30439223130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestiPhotoEventBrowserCell.m; sourceTree = "<group>"; };
-		30DE543B150661D300C06806 /* XPCKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = XPCKit.xcodeproj; path = XPCKit/XPCKit.xcodeproj; sourceTree = "<group>"; };
 		30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoEventNodeObject.h; sourceTree = "<group>"; };
 		30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoEventNodeObject.m; sourceTree = "<group>"; };
 		30F90B2D13584FE700D13233 /* IMBAppleMediaParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAppleMediaParser.h; sourceTree = "<group>"; };
@@ -438,7 +355,7 @@
 		30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestFaceBrowserCell.m; sourceTree = "<group>"; };
 		30F90B371358521300D13233 /* IMBTestFacesBackgroundLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestFacesBackgroundLayer.h; sourceTree = "<group>"; };
 		30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestFacesBackgroundLayer.m; sourceTree = "<group>"; };
-		30FFEBEC150A08DB0009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "com.karelia.iPhoto Parser XPC Service.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
+		30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhotoParser.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.iPhotoParser.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		30FFEBEE150A08DB0009C1D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		30FFEBF2150A08DC0009C1D0 /* iPhoto Parser XPC Service-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iPhoto Parser XPC Service-Info.plist"; sourceTree = "<group>"; };
 		30FFEBF4150A08DC0009C1D0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -667,6 +584,8 @@
 		D094A6DA122F813A0011084C /* iTunes10-icon-30.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes10-icon-30.png"; sourceTree = "<group>"; };
 		D094A6DB122F813A0011084C /* iTunes10-icon-31.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes10-icon-31.png"; sourceTree = "<group>"; };
 		D094A6DC122F813A0011084C /* iTunes10-icon-32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes10-icon-32.png"; sourceTree = "<group>"; };
+		D09653BA150A280700B6C83D /* IMBParserFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBParserFactory.h; sourceTree = "<group>"; };
+		D09653BB150A280700B6C83D /* IMBParserFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBParserFactory.m; sourceTree = "<group>"; };
 		D09930B41010F6C100C527B7 /* IMBCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBCommon.h; sourceTree = "<group>"; };
 		D09930B51010F6C100C527B7 /* IMBLibraryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLibraryController.h; sourceTree = "<group>"; };
 		D09930B61010F6C100C527B7 /* IMBLibraryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLibraryController.m; sourceTree = "<group>"; };
@@ -700,7 +619,7 @@
 		D099330B10119D8200C527B7 /* IMBNodeTreeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeTreeController.h; sourceTree = "<group>"; };
 		D099333010119EA300C527B7 /* IMBNodeTreeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeTreeController.m; sourceTree = "<group>"; };
 		D099333210119F3400C527B7 /* IMBObjectArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectArrayController.m; sourceTree = "<group>"; };
-		D09933551011B26E00C527B7 /* iMedia2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMedia2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D09933551011B26E00C527B7 /* iMedia2 Tester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "iMedia2 Tester.app"; path = iMediaTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D09933571011B26E00C527B7 /* TestApp-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestApp-Info.plist"; sourceTree = "<group>"; };
 		D09933B11011B32B00C527B7 /* IMBTestAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestAppDelegate.h; sourceTree = "<group>"; };
 		D09933B21011B32B00C527B7 /* IMBTestAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestAppDelegate.m; sourceTree = "<group>"; };
@@ -716,7 +635,6 @@
 		D0B6FABA1043243800280DDC /* IMBAudioFolderParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAudioFolderParser.m; sourceTree = "<group>"; };
 		D0B6FABD1043246800280DDC /* IMBMovieFolderParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieFolderParser.h; sourceTree = "<group>"; };
 		D0B6FABE1043246800280DDC /* IMBMovieFolderParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieFolderParser.m; sourceTree = "<group>"; };
-		D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveFlickr.xcodeproj; path = ObjectiveFlickr/ObjectiveFlickr.xcodeproj; sourceTree = "<group>"; };
 		D0B779631047B65D00D12548 /* IMBFlickrParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrParser.h; sourceTree = "<group>"; };
 		D0B87F21103D998D00C48C6F /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.h; sourceTree = "<group>"; };
 		D0BE0A8A104802A7009AE844 /* IMBTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTableView.h; sourceTree = "<group>"; };
@@ -766,6 +684,7 @@
 		D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		D0E96D1A104410BD0015979F /* IMBPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPanelController.h; sourceTree = "<group>"; };
 		D0E96D1B104410BD0015979F /* IMBPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPanelController.m; sourceTree = "<group>"; };
+		D0F207C5150A23AA007E6FA2 /* XPCKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPCKit.framework; path = "../../Build/iMedia-cknnvoownszvthdyarfyazhrhtcj/Build/Products/Debug/XPCKit.framework"; sourceTree = "<group>"; };
 		D0F2DB941098262D004280C1 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = fmdb/src/FMDatabase.h; sourceTree = "<group>"; };
 		D0F2DB951098262D004280C1 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMDatabase.m; path = fmdb/src/FMDatabase.m; sourceTree = "<group>"; };
 		D0F2DB961098262D004280C1 /* FMDatabaseAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabaseAdditions.h; path = fmdb/src/FMDatabaseAdditions.h; sourceTree = "<group>"; };
@@ -793,8 +712,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30FFEC06150A11440009C1D0 /* XPCKit.framework in Frameworks */,
 				30FFEBEF150A08DB0009C1D0 /* Foundation.framework in Frameworks */,
+				D0F207C7150A23BA007E6FA2 /* iMedia.framework in Frameworks */,
+				D0F207C6150A23AA007E6FA2 /* XPCKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -802,14 +722,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30DE54551506624D00C06806 /* XPCKit.framework in Frameworks */,
-				30394ABC12DC64D700ACA531 /* ObjectiveFlickr.framework in Frameworks */,
 				D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */,
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
 				D09930FD1010FF9700C527B7 /* Quartz.framework in Frameworks */,
 				D0CA93E7104917A400725DA3 /* QTKit.framework in Frameworks */,
 				CEF69569106421CB005D7E72 /* QuickLook.framework in Frameworks */,
 				CEF6960010643A25005D7E72 /* WebKit.framework in Frameworks */,
+				30394ABC12DC64D700ACA531 /* ObjectiveFlickr.framework in Frameworks */,
+				D09653BF150A285E00B6C83D /* XPCKit.framework in Frameworks */,
 				D0F2DBCF1098270F004280C1 /* libsqlite3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -833,8 +753,8 @@
 			isa = PBXGroup;
 			children = (
 				8DC2EF5B0486A6940098B216 /* iMedia.framework */,
-				D09933551011B26E00C527B7 /* iMedia2.app */,
-				30FFEBEC150A08DB0009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc */,
+				D09933551011B26E00C527B7 /* iMedia2 Tester.app */,
+				30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhotoParser.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -924,22 +844,11 @@
 			name = Skimmable;
 			sourceTree = "<group>";
 		};
-		30DE543C150661D300C06806 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				30DE5448150661D400C06806 /* XPCKit.framework */,
-				30DE544A150661D400C06806 /* libXPCKit.a */,
-				30DE544C150661D400C06806 /* TestApp.app */,
-				30DE544E150661D400C06806 /* com.mustacheware.TestService.xpc */,
-				30DE5450150661D400C06806 /* XPCKitTests.octest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		30FFEBED150A08DB0009C1D0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				30FFEBEE150A08DB0009C1D0 /* Foundation.framework */,
+				D0F207C5150A23AA007E6FA2 /* XPCKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1176,8 +1085,6 @@
 				D08E8D8B1019EBFB005D8614 /* IMBFileWatcher */,
 				D08E8B5C1019C900005D8614 /* UKFileWatcher */,
 				D0F2DB91109825D3004280C1 /* FMDatabase */,
-				30DE543B150661D300C06806 /* XPCKit.xcodeproj */,
-				D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */,
 			);
 			name = "Third Party";
 			sourceTree = "<group>";
@@ -1323,6 +1230,8 @@
 		D09930F41010FD9900C527B7 /* Parsers */ = {
 			isa = PBXGroup;
 			children = (
+				D09653BA150A280700B6C83D /* IMBParserFactory.h */,
+				D09653BB150A280700B6C83D /* IMBParserFactory.m */,
 				D09930C01010F6C100C527B7 /* IMBParser.h */,
 				D09930C11010F6C100C527B7 /* IMBParser.m */,
 				D099320C1011158400C527B7 /* IMBFolderParser.h */,
@@ -1446,15 +1355,6 @@
 				8FC2089C11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m */,
 			);
 			name = Movie;
-			sourceTree = "<group>";
-		};
-		D0CEC4861047BF7A00FA2A31 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D0CEC48C1047BF7A00FA2A31 /* ObjectiveFlickr.framework */,
-				D0CEC48E1047BF7A00FA2A31 /* libObjectiveFlickr.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		D0F2DB91109825D3004280C1 /* FMDatabase */ = {
@@ -1582,15 +1482,16 @@
 				30F90B2F13584FE700D13233 /* IMBAppleMediaParser.h in Headers */,
 				30F90B331358501A00D13233 /* IMBFaceObjectViewController.h in Headers */,
 				8F7945CE139518CD0066E133 /* IMBiPhotoObjectPromise.h in Headers */,
+				D09653BC150A280700B6C83D /* IMBParserFactory.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		30FFEBEB150A08DB0009C1D0 /* iPhoto Parser XPC Service */ = {
+		30FFEBEB150A08DB0009C1D0 /* iPhotoParser */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 30FFEBF9150A08DC0009C1D0 /* Build configuration list for PBXNativeTarget "iPhoto Parser XPC Service" */;
+			buildConfigurationList = 30FFEBF9150A08DC0009C1D0 /* Build configuration list for PBXNativeTarget "iPhotoParser" */;
 			buildPhases = (
 				30FFEBE8150A08DB0009C1D0 /* Sources */,
 				30FFEBE9150A08DB0009C1D0 /* Frameworks */,
@@ -1599,11 +1500,10 @@
 			buildRules = (
 			);
 			dependencies = (
-				30FFEC05150A113B0009C1D0 /* PBXTargetDependency */,
 			);
-			name = "iPhoto Parser XPC Service";
+			name = iPhotoParser;
 			productName = "iPhoto Parser XPC Service";
-			productReference = 30FFEBEC150A08DB0009C1D0 /* com.karelia.iPhoto Parser XPC Service.xpc */;
+			productReference = 30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhotoParser.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
 		8DC2EF4F0486A6940098B216 /* iMedia */ = {
@@ -1618,8 +1518,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				30DE54571506629200C06806 /* PBXTargetDependency */,
-				CEC0F91D10852AF8002CE02E /* PBXTargetDependency */,
 			);
 			name = iMedia;
 			productInstallPath = "$(HOME)/Library/Frameworks";
@@ -1627,9 +1525,9 @@
 			productReference = 8DC2EF5B0486A6940098B216 /* iMedia.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		D09933541011B26E00C527B7 /* iMedia2 Tester */ = {
+		D09933541011B26E00C527B7 /* iMediaTester */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D099335B1011B27000C527B7 /* Build configuration list for PBXNativeTarget "iMedia2 Tester" */;
+			buildConfigurationList = D099335B1011B27000C527B7 /* Build configuration list for PBXNativeTarget "iMediaTester" */;
 			buildPhases = (
 				D09933511011B26E00C527B7 /* Resources */,
 				D09933521011B26E00C527B7 /* Sources */,
@@ -1640,14 +1538,12 @@
 			buildRules = (
 			);
 			dependencies = (
-				30FFEC02150A0C220009C1D0 /* PBXTargetDependency */,
 				30FFEC00150A0C0F0009C1D0 /* PBXTargetDependency */,
-				D07BF168104C423B00B6C87D /* PBXTargetDependency */,
 				D099345A1011B6FA00C527B7 /* PBXTargetDependency */,
 			);
-			name = "iMedia2 Tester";
+			name = iMediaTester;
 			productName = TestApp;
-			productReference = D09933551011B26E00C527B7 /* iMedia2.app */;
+			productReference = D09933551011B26E00C527B7 /* iMedia2 Tester.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -1679,77 +1575,15 @@
 			mainGroup = 0867D691FE84028FC02AAC07 /* iMedia */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = D0CEC4861047BF7A00FA2A31 /* Products */;
-					ProjectRef = D0B7785410470A9F00D12548 /* ObjectiveFlickr.xcodeproj */;
-				},
-				{
-					ProductGroup = 30DE543C150661D300C06806 /* Products */;
-					ProjectRef = 30DE543B150661D300C06806 /* XPCKit.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				8DC2EF4F0486A6940098B216 /* iMedia */,
-				D09933541011B26E00C527B7 /* iMedia2 Tester */,
+				30FFEBEB150A08DB0009C1D0 /* iPhotoParser */,
+				D09933541011B26E00C527B7 /* iMediaTester */,
 				D02CD49E1224F22400C773A2 /* genstrings */,
-				30FFEBEB150A08DB0009C1D0 /* iPhoto Parser XPC Service */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		30DE5448150661D400C06806 /* XPCKit.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = XPCKit.framework;
-			remoteRef = 30DE5447150661D400C06806 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30DE544A150661D400C06806 /* libXPCKit.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libXPCKit.a;
-			remoteRef = 30DE5449150661D400C06806 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30DE544C150661D400C06806 /* TestApp.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = TestApp.app;
-			remoteRef = 30DE544B150661D400C06806 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30DE544E150661D400C06806 /* com.mustacheware.TestService.xpc */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = com.mustacheware.TestService.xpc;
-			remoteRef = 30DE544D150661D400C06806 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30DE5450150661D400C06806 /* XPCKitTests.octest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = XPCKitTests.octest;
-			remoteRef = 30DE544F150661D400C06806 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		D0CEC48C1047BF7A00FA2A31 /* ObjectiveFlickr.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = ObjectiveFlickr.framework;
-			remoteRef = D0CEC48B1047BF7A00FA2A31 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		D0CEC48E1047BF7A00FA2A31 /* libObjectiveFlickr.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libObjectiveFlickr.a;
-			remoteRef = D0CEC48D1047BF7A00FA2A31 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		30FFEBEA150A08DB0009C1D0 /* Resources */ = {
@@ -1940,6 +1774,8 @@
 				8F47B39210C416050013ED25 /* IMBOrderedDictionary.m in Sources */,
 				CEAF1F2E125A7DE4001C3EBB /* NSWindow_Flipr.m in Sources */,
 				CEAF1F3C125A80D4001C3EBB /* IMBHoverButton.m in Sources */,
+				D09653BD150A280700B6C83D /* IMBParserFactory.m in Sources */,
+				D09653C0150A2DA300B6C83D /* IMBParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1955,35 +1791,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		30DE54571506629200C06806 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = XPCKit;
-			targetProxy = 30DE54561506629200C06806 /* PBXContainerItemProxy */;
-		};
 		30FFEC00150A0C0F0009C1D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 30FFEBEB150A08DB0009C1D0 /* iPhoto Parser XPC Service */;
+			target = 30FFEBEB150A08DB0009C1D0 /* iPhotoParser */;
 			targetProxy = 30FFEBFF150A0C0F0009C1D0 /* PBXContainerItemProxy */;
-		};
-		30FFEC02150A0C220009C1D0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = XPCKit;
-			targetProxy = 30FFEC01150A0C220009C1D0 /* PBXContainerItemProxy */;
-		};
-		30FFEC05150A113B0009C1D0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = XPCKit;
-			targetProxy = 30FFEC04150A113B0009C1D0 /* PBXContainerItemProxy */;
-		};
-		CEC0F91D10852AF8002CE02E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "ObjectiveFlickr (framework)";
-			targetProxy = CEC0F91C10852AF8002CE02E /* PBXContainerItemProxy */;
-		};
-		D07BF168104C423B00B6C87D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "ObjectiveFlickr (framework)";
-			targetProxy = D07BF167104C423B00B6C87D /* PBXContainerItemProxy */;
 		};
 		D099345A1011B6FA00C527B7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2028,6 +1839,10 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Build/iMedia-cknnvoownszvthdyarfyazhrhtcj/Build/Products/Debug\"",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
@@ -2046,6 +1861,10 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Build/iMedia-cknnvoownszvthdyarfyazhrhtcj/Build/Products/Debug\"",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
@@ -2081,6 +1900,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Build/iMedia-cknnvoownszvthdyarfyazhrhtcj/Build/Products/Debug\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -2100,7 +1923,7 @@
 				INFOPLIST_FILE = "iPhoto Parser XPC Service/iPhoto Parser XPC Service-Info.plist";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = "com.karelia.$(TARGET_NAME)";
+				PRODUCT_NAME = "com.karelia.imedia.$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Debug;
@@ -2112,6 +1935,10 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Build/iMedia-cknnvoownszvthdyarfyazhrhtcj/Build/Products/Debug\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2124,7 +1951,7 @@
 				INFOPLIST_FILE = "iPhoto Parser XPC Service/iPhoto Parser XPC Service-Info.plist";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = "com.karelia.$(TARGET_NAME)";
+				PRODUCT_NAME = "com.karelia.imedia.$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Release;
@@ -2136,6 +1963,10 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Build/iMedia-cknnvoownszvthdyarfyazhrhtcj/Build/Products/Debug\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -2148,7 +1979,7 @@
 				INFOPLIST_FILE = "iPhoto Parser XPC Service/iPhoto Parser XPC Service-Info.plist";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = "com.karelia.$(TARGET_NAME)";
+				PRODUCT_NAME = "com.karelia.imedia.$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Test;
@@ -2197,6 +2028,10 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Build/iMedia-cknnvoownszvthdyarfyazhrhtcj/Build/Products/Debug\"",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
@@ -2220,7 +2055,7 @@
 					"-framework",
 					AppKit,
 				);
-				PRODUCT_NAME = iMedia2;
+				PRODUCT_NAME = "${TARGET_NAME}";
 			};
 			name = Debug;
 		};
@@ -2237,7 +2072,7 @@
 					"-framework",
 					AppKit,
 				);
-				PRODUCT_NAME = iMedia2;
+				PRODUCT_NAME = "${TARGET_NAME}";
 			};
 			name = Release;
 		};
@@ -2253,7 +2088,7 @@
 					"-framework",
 					AppKit,
 				);
-				PRODUCT_NAME = iMedia2;
+				PRODUCT_NAME = "${TARGET_NAME}";
 			};
 			name = Test;
 		};
@@ -2280,7 +2115,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		30FFEBF9150A08DC0009C1D0 /* Build configuration list for PBXNativeTarget "iPhoto Parser XPC Service" */ = {
+		30FFEBF9150A08DC0009C1D0 /* Build configuration list for PBXNativeTarget "iPhotoParser" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				30FFEBFA150A08DC0009C1D0 /* Debug */,
@@ -2300,7 +2135,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D099335B1011B27000C527B7 /* Build configuration list for PBXNativeTarget "iMedia2 Tester" */ = {
+		D099335B1011B27000C527B7 /* Build configuration list for PBXNativeTarget "iMediaTester" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D09933581011B27000C527B7 /* Debug */,
