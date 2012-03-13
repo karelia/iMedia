@@ -196,11 +196,15 @@
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	
-	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];
-	files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
-	
-	if (error == nil)
+	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];	
+	if (files)
 	{
+		// Non-nil result from contentsOfDirectoryAtPath means we must ignore any value it put into error.
+		// It's likely to be an autoreleased, or zombie object that we can't trust the lifespan of.
+		error = nil;
+		
+		files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
+	
 		NSMutableArray* subnodes = [NSMutableArray array];
 		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:files.count];
 		
@@ -278,13 +282,16 @@
 				subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 				
 				// Should this folder be a leaf or not?  We are going to have to scan into the directory
-			
+				
 				NSArray* folderContents = [fm contentsOfDirectoryAtPath:folder error:&error];	// When we go 10.6 only, use better APIs.
 				BOOL hasSubDir = NO;
 				int fileCounter = 0;	// bail if this is a really full folder
 				
 				if (folderContents)
 				{
+					// As avoid, above propagating an error unless the response was nil
+					error = nil;
+					
 					for (NSString *isThisADirectory in folderContents)
 					{
 						NSString* path = [folder stringByAppendingPathComponent:isThisADirectory];
