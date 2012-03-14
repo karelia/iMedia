@@ -101,16 +101,16 @@ extern NSString* kIMBNodesDidChangeNotification;
 @interface IMBLibraryController : NSObject
 {
 	NSString* _mediaType;
-	NSMutableArray* _rootNodes;
-	IMBOptions _options;
+	NSMutableArray* _subnodes;
+//	IMBOptions _options;
 	id _delegate;
 
 	BOOL _isReplacingNode;
-	IMBKQueue* _watcherUKKQueue;
-	IMBFSEventsWatcher* _watcherFSEvents;
-	NSRecursiveLock* _watcherLock;
-	NSMutableArray* _watcherUKKQueuePaths;
-	NSMutableArray* _watcherFSEventsPaths;
+//	IMBKQueue* _watcherUKKQueue;
+//	IMBFSEventsWatcher* _watcherFSEvents;
+//	NSRecursiveLock* _watcherLock;
+//	NSMutableArray* _watcherUKKQueuePaths;
+//	NSMutableArray* _watcherFSEventsPaths;
 }
 
 // Create singleton instance of the controller. Don't forget to set the delegate early in the app lifetime...
@@ -121,38 +121,39 @@ extern NSString* kIMBNodesDidChangeNotification;
 // Accessors...
 
 @property (retain) NSString* mediaType;
-@property (assign) IMBOptions options;
+//@property (assign) IMBOptions options;
 @property (assign) id delegate;
-@property (retain) IMBKQueue* watcherUKKQueue;
-@property (retain) IMBFSEventsWatcher* watcherFSEvents;
+//@property (retain) IMBKQueue* watcherUKKQueue;
+//@property (retain) IMBFSEventsWatcher* watcherFSEvents;
 @property (readonly) BOOL isReplacingNode;
 
 // Node accessors (must only be called on the main thread)...
 
-@property (retain) NSMutableArray* rootNodes;			
-- (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser;
-- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
+@property (retain) NSMutableArray* subnodes;			
+//- (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser;
+//- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 
 // Loading...
 
 - (void) reload;
-- (void) reloadNode:(IMBNode*)inNode;
-- (void) reloadNode:(IMBNode*)inNode parser:(IMBParser*)inParser; // Low-level method (use reloadNode: if possible)
-- (void) populateNode:(IMBNode*)inNode;
-- (void) stopPopulatingNodeWithIdentifier:(NSString*)inNodeIdentifier;
+//- (void) reloadNode:(IMBNode*)inNode;
+//- (void) reloadNode:(IMBNode*)inNode parser:(IMBParser*)inParser; // Low-level method (use reloadNode: if possible)
+
+//- (void) populateNode:(IMBNode*)inNode;
+//- (void) stopPopulatingNodeWithIdentifier:(NSString*)inNodeIdentifier;
 
 // Custom nodes...
 
-- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath;
-- (BOOL) removeCustomRootNode:(IMBNode*)inNode;
+//- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath;
+//- (BOOL) removeCustomRootNode:(IMBNode*)inNode;
 
 // Popup menu...
 
-- (NSMenu*) menuWithSelector:(SEL)inSelector target:(id)inTarget addSeparators:(BOOL)inAddSeparator;
+//- (NSMenu*) menuWithSelector:(SEL)inSelector target:(id)inTarget addSeparators:(BOOL)inAddSeparator;
 
 // Debugging support...
 
-- (void) logNodes;
+//- (void) logNodes;
 
 @end
 
@@ -166,28 +167,30 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 @optional
 
+#warning TODO
+
 // The following delegate methods are called multiple times during the app lifetime. Return NO from the  
 // should methods to suppress an operation. The delegate methods are called on the main thread... 
 
-- (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser;
-- (void) libraryController:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser;
-- (void) libraryController:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser;
-
-- (BOOL) libraryController:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode;
-- (void) libraryController:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode;
-- (void) libraryController:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode;
+//- (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser;
+//- (void) libraryController:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser;
+//- (void) libraryController:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser;
+//
+//- (BOOL) libraryController:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode;
+//- (void) libraryController:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode;
+//- (void) libraryController:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode;
 
 // Called when the user right clicks a node or object. These methods give the delegate a chance to add 
 // custom menu items to the exisiting context menu...
 
-- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
-- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
+//- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
+//- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
 
 // Called when the user double clicks selected object in one of the object views. If the delegate chooses to
 // handle the event iteself it must return YES. If NO is returned, the framework will invoke the default event
 // handling behavior (downloading the files to standard loaction and opening in default app)...
 
-- (BOOL) libraryController:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
+//- (BOOL) libraryController:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
 
 @end
 

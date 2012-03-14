@@ -53,8 +53,8 @@
 #pragma mark HEADERS
 
 #import "IMBNode.h"
-//#import "IMBObject.h"
-//#import "IMBParser.h"
+#import "IMBObject.h"
+#import "IMBParser.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
 
@@ -79,34 +79,31 @@
 
 // Primary properties...
 
-@synthesize icon = _icon;
-@synthesize name = _name;
-@synthesize identifier = _identifier;
 @synthesize mediaSource = _mediaSource;
-@synthesize mediaType = _mediaType;
-
-@synthesize parentNode = _parentNode;
-@synthesize subnodes = _subnodes;
+@synthesize identifier = _identifier;
+@synthesize name = _name;
+@synthesize icon = _icon;
+@synthesize groupType = _groupType;
+@synthesize displayPriority = _displayPriority;
+@synthesize attributes = _attributes;
 @synthesize objects = _objects;
+@synthesize subNodes = _subNodes;
+@synthesize parentNode = _parentNode;
+@synthesize isTopLevelNode = _isTopLevelNode;
 
 // State information...
 
-@synthesize attributes = _attributes;
-@synthesize groupType = _groupType;
-@synthesize displayPriority = _displayPriority;
-@synthesize displayedObjectCount = _displayedObjectCount;
-@synthesize isTopLevelNode = _isTopLevelNode;
 @synthesize group = _group;
 @synthesize leaf = _leaf;
-@synthesize includedInPopup = _includedInPopup;
-@synthesize isUserAdded = _isUserAdded;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
+@synthesize includedInPopup = _includedInPopup;
+@synthesize displayedObjectCount = _displayedObjectCount;
 
 // Support for live watching...
 
-//@synthesize parser = _parser;
-//@synthesize watcherType = _watcherType;
-//@synthesize watchedPath = _watchedPath;
+@synthesize parser = _parser;
+@synthesize watcherType = _watcherType;
+@synthesize watchedPath = _watchedPath;
 
 // Badge icons...
 
@@ -115,12 +112,9 @@
 @synthesize badgeTarget = _badgeTarget;
 @synthesize badgeSelector = _badgeSelector;
 
-// Custom object views...
+// Custom object view...
 
 @synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
-@synthesize customHeaderViewController = _customHeaderViewController;
-@synthesize customObjectViewController = _customObjectViewController;
-@synthesize customFooterViewController = _customFooterViewController;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,83 +125,52 @@
 	{
 		self.groupType = kIMBGroupTypeNone;
 		self.displayPriority = 5;					// middle of the pack, default
-		self.displayedObjectCount = -1;
-
-		self.subnodes = nil;
-		self.objects = nil;
-
-		self.isTopLevelNode = NO;
 		self.group = NO;
 		self.leaf = NO;
 		self.loading = NO;
 		self.wantsRecursiveObjects = NO;
 		self.includedInPopup = YES;
-		self.isUserAdded = NO;
+		self.displayedObjectCount = -1;
 		
-//		self.watcherType = kIMBWatcherTypeNone;
+		self.objects = nil;
+		self.subNodes = nil;
+		self.isTopLevelNode = NO;
+		
+		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
 		
 		self.shouldDisplayObjectView = YES;
-		self.customHeaderViewController = nil;
-		self.customObjectViewController = nil;
-		self.customFooterViewController = nil;
 	}
 	
 	return self;
 }
 
 
-- (void) dealloc
-{
-    [self setSubnodes:nil];		// Sub-nodes have a weak reference to self, so break that
-	
-	IMBRelease(_icon);
-	IMBRelease(_name);
-	IMBRelease(_identifier);
-	IMBRelease(_mediaSource);
-	IMBRelease(_mediaType);
-	IMBRelease(_subnodes);
-	IMBRelease(_objects);
-	IMBRelease(_attributes);
-//	IMBRelease(_parser);
-//	IMBRelease(_watchedPath);
-	IMBRelease(_badgeTarget);
-	
-	[super dealloc];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 - (id) copyWithZone:(NSZone*)inZone
 {
 	IMBNode* copy = [[[self class] allocWithZone:inZone] init];
 
-	copy.icon = self.icon;
-	copy.name = self.name;
-	copy.identifier = self.identifier;
 	copy.mediaSource = self.mediaSource;
-	copy.mediaType = self.mediaType;
-
-//	copy.parentNode = self.parentNode;			// Removed to avoid potentially dangling pointers (parentNode in not retained!)
-
+	copy.identifier = self.identifier;
+	copy.name = self.name;
+	copy.icon = self.icon;
 	copy.attributes = self.attributes;
 	copy.groupType = self.groupType;
 	copy.displayPriority = self.displayPriority;
-	copy.displayedObjectCount = self.displayedObjectCount;
 	
-	copy.isTopLevelNode = self.isTopLevelNode;
 	copy.group = self.group;
 	copy.leaf = self.leaf;
 	copy.loading = self.loading;
-	copy.includedInPopup = self.includedInPopup;
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
+	copy.includedInPopup = self.includedInPopup;
+	copy.displayedObjectCount = self.displayedObjectCount;
 	
-//	copy.parser = self.parser;
-//	copy.watcherType = self.watcherType;
-//	copy.watchedPath = self.watchedPath;
+//	copy.parentNode = self.parentNode;			// Removed to avoid potentially dangling pointers (parentNode in not retained!)
+	copy.isTopLevelNode = self.isTopLevelNode;
+	copy.parser = self.parser;
+	copy.watcherType = self.watcherType;
+	copy.watchedPath = self.watchedPath;
 
 	copy.badgeTypeNormal = self.badgeTypeNormal;
 	copy.badgeTypeMouseover = self.badgeTypeMouseover;
@@ -215,9 +178,6 @@
 	copy.badgeSelector = self.badgeSelector;
 	
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
-	copy.customHeaderViewController = self.customHeaderViewController;
-	copy.customObjectViewController = self.customObjectViewController;
-	copy.customFooterViewController = self.customFooterViewController;
 	
 	// Create a shallow copy of objects array...
 	
@@ -232,91 +192,44 @@
 	
 	// Create a deep copy of the subnodes. This is essential to make background operations completely threadsafe...
 	
-	if (self.subnodes)
+	if (self.subNodes)
 	{
-		NSMutableArray* subnodes = [NSMutableArray arrayWithCapacity:self.subnodes.count];
+		NSMutableArray* subNodes = [NSMutableArray arrayWithCapacity:self.subNodes.count];
 
-		for (IMBNode* subnode in self.subnodes)
+		for (IMBNode* subnode in self.subNodes)
 		{
 			IMBNode* copiedSubnode = [subnode copy];
-			[subnodes addObject:copiedSubnode];
+			[subNodes addObject:copiedSubnode];
 			[copiedSubnode release];
 		}
 		
-		copy.subnodes = subnodes;
+		copy.subNodes = subNodes;
 	}
 	else 
 	{
-		copy.subnodes = nil;
+		copy.subNodes = nil;
 	}
 
 	return copy;
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) initWithCoder:(NSCoder*)inCoder
+- (void) dealloc
 {
-	if ((self = [super init]))
-	{
-		self.icon = [inCoder decodeObjectForKey:@"icon"];
-		self.name = [inCoder decodeObjectForKey:@"name"];
-		self.identifier = [inCoder decodeObjectForKey:@"identifier"];
-		self.mediaSource = [inCoder decodeObjectForKey:@"mediaSource"];
-		self.mediaType = [inCoder decodeObjectForKey:@"mediaType"];
-
-		self.attributes = [inCoder decodeObjectForKey:@"attributes"];
-		self.groupType = [inCoder decodeIntegerForKey:@"groupType"];
-		self.displayPriority = [inCoder decodeIntegerForKey:@"displayPriority"];
-		self.displayedObjectCount = [inCoder decodeIntegerForKey:@"displayedObjectCount"];
-		self.isTopLevelNode = [inCoder decodeBoolForKey:@"isTopLevelNode"];
-		self.group = [inCoder decodeBoolForKey:@"group"];
-		self.leaf = [inCoder decodeBoolForKey:@"leaf"];
-		self.loading = [inCoder decodeBoolForKey:@"loading"];
-		self.includedInPopup = [inCoder decodeBoolForKey:@"includedInPopup"];
-		self.isUserAdded = [inCoder decodeBoolForKey:@"isUserAdded"];
-		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
-
-		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
-		self.customHeaderViewController = [inCoder decodeObjectForKey:@"customHeaderViewController"];
-		self.customObjectViewController = [inCoder decodeObjectForKey:@"customObjectViewController"];
-		self.customFooterViewController = [inCoder decodeObjectForKey:@"customFooterViewController"];
-
-		#warning TODO subnodes and objects
-	}
+    [self setSubNodes:nil];		// Sub-nodes have a weak reference to self, so break that
 	
-	return self;
-}
-
-
-- (void) encodeWithCoder:(NSCoder*)inCoder
-{
-	[inCoder encodeObject:self.icon forKey:@"icon"];
-	[inCoder encodeObject:self.name forKey:@"name"];
-	[inCoder encodeObject:self.identifier forKey:@"identifier"];
-	[inCoder encodeObject:self.mediaSource forKey:@"mediaSource"];
-	[inCoder encodeObject:self.mediaType forKey:@"mediaType"];
+	IMBRelease(_mediaSource);
+	IMBRelease(_identifier);
+	IMBRelease(_icon);
+	IMBRelease(_name);
+	IMBRelease(_attributes);
+	IMBRelease(_objects);
+	IMBRelease(_subNodes);
+	IMBRelease(_parser);
+	IMBRelease(_watchedPath);
+	IMBRelease(_badgeTarget);
 	
-	[inCoder encodeObject:self.attributes forKey:@"attributes"];
-	[inCoder encodeInteger:self.groupType forKey:@"groupType"];
-	[inCoder encodeInteger:self.displayPriority forKey:@"displayPriority"];
-	[inCoder encodeInteger:self.displayedObjectCount forKey:@"displayedObjectCount"];
-	[inCoder encodeBool:self.isTopLevelNode forKey:@"isTopLevelNode"];
-	[inCoder encodeBool:self.isGroup forKey:@"group"];
-	[inCoder encodeBool:self.isLeaf forKey:@"leaf"];
-	[inCoder encodeBool:self.isLoading forKey:@"loading"];
-	[inCoder encodeBool:self.includedInPopup forKey:@"includedInPopup"];
-	[inCoder encodeBool:self.isUserAdded forKey:@"isUserAdded"];
-	[inCoder encodeBool:self.wantsRecursiveObjects forKey:@"wantsRecursiveObjects"];
-
-	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
-	[inCoder encodeObject:self.customHeaderViewController forKey:@"customHeaderViewController"];
-	[inCoder encodeObject:self.customObjectViewController forKey:@"customObjectViewController"];
-	[inCoder encodeObject:self.customFooterViewController forKey:@"customFooterViewController"];
-	
-	#warning TODO subnodes and objects
+	[super dealloc];
 }
 
 
@@ -328,15 +241,15 @@
 
 // Accessors for navigating up or down the node tree...
 
-- (void) setSubnodes:(NSArray*)inNodes
+- (void) setSubNodes:(NSArray*)inNodes
 {
-    [_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
+    [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
     
 	NSArray* nodes = [inNodes copy];
-    [_subnodes release]; 
-	_subnodes = nodes;
+    [_subNodes release]; 
+	_subNodes = nodes;
     
-    [_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
+    [_subNodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
 }
 
 
@@ -344,7 +257,7 @@
 {
 	if (_parentNode)
 	{
-		if (!_parentNode.isTopLevelNode)
+		if (!_parentNode.isGroup)
 		{
 			return [_parentNode topLevelNode];
 		}
@@ -356,15 +269,15 @@
 
 // Node accessors. Use these for bindings the NSTreeController...
 
-- (NSUInteger) countOfSubnodes
+- (NSUInteger) countOfSubNodes
 {
-	return [_subnodes count];
+	return [_subNodes count];
 }
 
 
-- (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex
+- (IMBNode*) objectInSubNodesAtIndex:(NSUInteger)inIndex
 {
-	return [_subnodes objectAtIndex:inIndex];
+	return [_subNodes objectAtIndex:inIndex];
 }
 
 
@@ -410,7 +323,7 @@
 {
 	NSUInteger count = self.countOfShallowObjects;
 	
-	for (IMBNode* node in _subnodes)
+	for (IMBNode* node in _subNodes)
 	{
 		count += node.countOfRecursiveObjects;
 	}
@@ -435,7 +348,7 @@
 	
 	NSUInteger index = inIndex - count;
 	
-	for (IMBNode* node in _subnodes)
+	for (IMBNode* node in _subNodes)
 	{
 		IMBObject* object = [node objectInRecursiveObjectsAtIndex:index];
 		if (object) return object;
@@ -488,24 +401,24 @@
 
 
 // Nodes are considered to be equal if their identifiers match - even if we are looking at different instances
-// This is necessary as nodes are relatively short-lived objects that are replaced with new instances often - 
-// a necessity in our multithreaded environment...
+// (object pointers). This is necessary as nodes are relatively short-lived objects that are replaced with new
+// instances often - a necessity in our multithreaded environment...
 
-- (BOOL) isEqual:(id)inNode
+- (BOOL) isEqual:(id)aNode
 {
-    if (self == inNode)
+    if (self == aNode)
     {
         return YES; // fast path
     }
-    else if ([inNode isKindOfClass:[IMBNode class]]) // ImageKit sometimes compares us to strings
+    else if ([aNode isKindOfClass:[IMBNode class]]) // ImageKit sometimes compares us to strings
     {
-        return [[self identifier] isEqualToString:[inNode identifier]];
+        return [[self identifier] isEqualToString:[aNode identifier]];
     }
     
     return NO;
 }
 
-- (NSUInteger) hash;
+- (NSUInteger)hash;
 {
     return [[self identifier] hash];
 }
@@ -553,7 +466,7 @@
 {
 	_loading = inLoading;
 	
-	for (IMBNode* subnode in self.subnodes)
+	for (IMBNode* subnode in self.subNodes)
 	{
 		subnode.loading = inLoading;
 	}
@@ -614,9 +527,12 @@
 	if (_parentNode)
 	{
 		[_parentNode _recursivelyWalkParentsAddingPathIndexTo:inIndexArray];
+//		NSUInteger index = [_parentNode.subNodes indexOfObjectIdenticalTo:self];
+//		[inIndexArray addObject:[NSNumber numberWithUnsignedInt:index]];
+		
 		NSUInteger index = 0;
 		
-		for (IMBNode* siblingNode in _parentNode.subnodes)
+		for (IMBNode* siblingNode in _parentNode.subNodes)
 		{
 			if ([siblingNode.identifier isEqualToString:self.identifier])
 			{
@@ -632,21 +548,23 @@
 	
 	else
 	{
-		#warning TODO
+		NSString* mediaType = _parser.mediaType;
+		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
+//		NSUInteger index = [libraryController.rootNodes indexOfObjectIdenticalTo:self];
+//		[inIndexArray addObject:[NSNumber numberWithUnsignedInt:index]];
+
+		NSUInteger index = 0;
 		
-//		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
-//		NSUInteger index = 0;
-//		
-//		for (IMBNode* node in libraryController.subnodes)
-//		{
-//			if ([node.identifier isEqualToString:self.identifier])
-//			{
-//				[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:index]];
-//				return;
-//			}
-//			
-//			index++;
-//		}
+		for (IMBNode* siblingNode in libraryController.rootNodes)
+		{
+			if ([siblingNode.identifier isEqualToString:self.identifier])
+			{
+				[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:index]];
+				return;
+			}
+			
+			index++;
+		}
 	}
 	
 	// Oops, we shouldn't be here...
@@ -664,22 +582,22 @@
 
 - (BOOL) isPopulated
 {
-	return self.subnodes != nil && self.objects !=nil;
+	return self.subNodes != nil && self.objects !=nil;
 }
 
 
 // Look in our node tree for a node with the specified identifier...
 
-- (IMBNode*) subnodeWithIdentifier:(NSString*)inIdentifier
+- (IMBNode*) subNodeWithIdentifier:(NSString*)inIdentifier
 {
 	if ([self.identifier isEqualToString:inIdentifier])
 	{
 		return self;
 	}
 	
-	for (IMBNode* subnode in self.subnodes)
+	for (IMBNode* subnode in self.subNodes)
 	{
-		IMBNode* found = [subnode subnodeWithIdentifier:inIdentifier];
+		IMBNode* found = [subnode subNodeWithIdentifier:inIdentifier];
 		if (found) return found;
 	}
 
@@ -712,7 +630,7 @@
 
 - (BOOL) isDescendantOfNode:(IMBNode*)inNode
 {
-	for (IMBNode* node in inNode.subnodes)
+	for (IMBNode* node in inNode.subNodes)
 	{
 		if ([self isEqual:node])
 		{
@@ -749,18 +667,18 @@
 	if ([_objects count] > 0)
 	{
 		[description appendFormat:@"\n\t\tobjects = %u",[_objects count]];
-//		for (IMBObject* object in _objects)
-//		{
-//			[description appendFormat:@"\n\t\t\t%@",object.name];
-//		}
+		for (IMBObject* object in _objects)
+		{
+			[description appendFormat:@"\n\t\t\t%@",object.name];
+		}
 	}
 	
 	// Subnodes...
 	
-	if ([_subnodes count] > 0)
+	if ([_subNodes count] > 0)
 	{
-		[description appendFormat:@"\n\t\tsubnodes = %u",[_subnodes count]];
-		for (IMBNode* subnode in _subnodes)
+		[description appendFormat:@"\n\t\tsubnodes = %u",[_subNodes count]];
+		for (IMBNode* subnode in _subNodes)
 		{
 			[description appendFormat:@"\n\t\t\t%@",subnode.name];
 		}

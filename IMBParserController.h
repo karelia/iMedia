@@ -65,7 +65,7 @@
 
 #pragma mark CLASSES
 
-@class IMBParser;
+@class IMBParserFactory;
 @protocol IMBParserControllerDelegate;
 
 
@@ -76,9 +76,9 @@
 
 @interface IMBParserController : NSObject
 {
-	NSMutableDictionary* _loadedParsers;
+	NSMutableDictionary* _loadedParserFactories;
 	id <IMBParserControllerDelegate> _delegate;
-	BOOL _loadingCustomParsers;
+//	BOOL _loadingCustomParsers;
 }
 
 // Create singleton instance of the controller. Don't forget to set the delegate early in the app lifetime...
@@ -86,42 +86,48 @@
 + (IMBParserController*) sharedParserController;
 @property (assign) id <IMBParserControllerDelegate> delegate;
 
-// Register parser classes. This should be called from the +load method of a parser class...
+// Register IMBParserFactory classes. This should be called from the +load method of a IMBParserFactory class...
 
-+ (void) registerParserClass:(Class)inParserClass forMediaType:(NSString*)inMediaType;
-+ (void) unregisterParserClass:(Class)inParserClass;
-+ (NSMutableSet*) registeredParserClassesForMediaType:(NSString*)inMediaType;
++ (void) registerParserFactoryClass:(Class)inParserFactoryClass forMediaType:(NSString*)inMediaType;
++ (void) unregisterParserFactoryClass:(Class)inParserFactoryClass;
++ (NSMutableSet*) registeredParserFactoryClassesForMediaType:(NSString*)inMediaType;
 
-// Load all supported parsers. The delegate can restrict which parsers are loaded...
+// Load all supported IMBParserFactories. The delegate can restrict which IMBParserFactories are loaded...
 
-- (void) reset; 
+- (void) loadParserFactories;
+- (void) unloadParserFactories;
+
+- (NSArray*) loadedParserFactoriesForMediaType:(NSString*)inMediaType;
+
+//- (void) reset; 
 
 // Add/remove parser instances dynamically. These methods are useful for parsers that mimic dynamically appearing
 // content, e.g. connected devices (cameras, network volumes, etc)...
 
-- (BOOL) addDynamicParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
-- (BOOL) removeDynamicParser:(IMBParser*)inParser;
+//- (BOOL) addDynamicParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
+//- (BOOL) removeDynamicParser:(IMBParser*)inParser;
 
 // Add/remove custom parsers. This is usually used for folder based parsers that are dragged into the outline view.
 // Please note that this method should be called after loadParsers...
 
-- (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
-- (BOOL) removeCustomParser:(IMBParser*)inParser;
+//- (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
+//- (BOOL) removeCustomParser:(IMBParser*)inParser;
 
 // Returns an array of loaded parsers. This combines the regular parsers (which were instantiated by loadParsers)
 // with the custom parsers (which were instantiated by the user or by loadCustomParsersFromPreferences)...
 
-- (NSArray *)parsersForMediaType:(NSString *)mediaType;
-- (NSArray *)parsers;
+//- (NSArray*) parserFactoriesForMediaType:(NSString *)mediaType;
+//- (NSArray*) parsersFactories;
 
 // Debugging support...
 #ifdef DEBUG
-- (void) logRegisteredParserClasses;
-- (void) logParsers;
+//- (void) logRegisteredParserClasses;
+//- (void) logParsers;
 #endif
 
 // External finding of an active parser. Can't name the argument "class" as that breaks C++ apps linking against iMedia
-- (IMBParser *)parserOfClass:(Class)parserClass forMediaType:(NSString *)aMediaType;
+
+//- (IMBParser*) parserOfClass:(Class)inParserClass forMediaType:(NSString*)inMediaType;
 
 @end
 
@@ -135,20 +141,9 @@
 
 @optional
 
-// Handy place to finish setting up a parser such as Flickr
-// Return nil to suppress loading a particular parser. Default (if you don't implement this method) is to return nil if [parser canBeUsed] returns NO. You likely want to replicate that check in your implementation
-- (IMBParser *)parserController:(IMBParserController *)controller willLoadParser:(IMBParser *)parser;
-
-// Used to return a BOOL so that delegate could cancel the load. Now goes ignored, use one of the should methods instead
-- (void) parserController:(IMBParserController*)inController didLoadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
-
-- (void) parserController:(IMBParserController*)inController willUnloadParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
-
-
-#pragma mark Deprecated
-// Called before loading of registered parsers, but NOT for custom or dynamic parsers
-- (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString*)inParserClassName forMediaType:(NSString*)inMediaType;
-
+- (BOOL) parserController:(IMBParserController*)inController shouldLoadParserFactoryWithIdentifier:(NSString*)inIdentifier;
+- (void) parserController:(IMBParserController*)inController didLoadParserFactory:(IMBParserFactory*)inParserFactory;
+- (void) parserController:(IMBParserController*)inController willUnloadParserFactory:(IMBParserFactory*)inParserFactory;
 
 @end
 

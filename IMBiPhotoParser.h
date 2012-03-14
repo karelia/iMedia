@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Jörg Jacobsen, Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,10 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBAppleMediaParser.h"
-
-
-//----------------------------------------------------------------------------------------------------------------------
+#import "IMBParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,19 +60,14 @@
 
 #pragma mark 
 
-@interface IMBiPhotoParser : IMBAppleMediaParser
+@interface IMBiPhotoParser : IMBParser
 {
 	NSString* _appPath;
 	BOOL _shouldDisplayLibraryName;
-	int _fakeAlbumID;					// for iPhoto2 compatibility
-	NSDateFormatter* _dateFormatter;
 }
 
 @property (retain) NSString* appPath;
 @property (assign) BOOL shouldDisplayLibraryName;
-@property (retain) NSDateFormatter* dateFormatter;
-
-- (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs; // public utility method to help extract keywords from numbers
 
 @end
 

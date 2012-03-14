@@ -54,17 +54,20 @@
 
 #import "IMBLibraryController.h"
 #import "IMBParserController.h"
-#import "IMBOperationQueue.h"
-#import "IMBParser.h"
+//#import "IMBOperationQueue.h"
+//#import "IMBParser.h"
 #import "IMBNode.h"
-#import "IMBCommon.h"
-#import "IMBConfig.h"
-#import "IMBKQueue.h"
-#import "IMBFSEventsWatcher.h"
-#import "IMBImageFolderParser.h"
-#import "IMBAudioFolderParser.h"
-#import "IMBMovieFolderParser.h"
+#import "IMBParserFactory.h"
+//#import "IMBCommon.h"
+//#import "IMBConfig.h"
+//#import "IMBKQueue.h"
+//#import "IMBFSEventsWatcher.h"
+//#import "IMBImageFolderParser.h"
+//#import "IMBAudioFolderParser.h"
+//#import "IMBMovieFolderParser.h"
 #import "NSWorkspace+iMedia.h"
+#import <XPCKit/XPCKit.h>
+#import <XPCKit/SBUtilities.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -102,33 +105,33 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // Private subclasses of NSOperation. The controller uses these internally to get background work done, but
 // we do not want to expose these operations to developers who use iMedia.framework in their applications...
 
-@interface IMBLibraryOperation : NSOperation
-{
-  @private
-	IMBLibraryController* _libraryController;
-	IMBParser* _parser;
-	IMBOptions _options;
-	IMBNode* _oldNode;		
-	IMBNode* _newNode;
-	NSString* _parentNodeIdentifier;
-}
-
-@property (retain) IMBLibraryController* libraryController;
-@property (retain) IMBParser* parser;
-@property (assign) IMBOptions options;
-@property (retain) IMBNode* oldNode;	
-@property (copy) IMBNode* newNode;		// Copied so that background operation can modify the node
-@property (copy) NSString* parentNodeIdentifier;		
-
-@end
-
-
-@interface IMBCreateNodeOperation : IMBLibraryOperation
-@end
-
-
-@interface IMBPopulateNodeOperation : IMBLibraryOperation
-@end
+//@interface IMBLibraryOperation : NSOperation
+//{
+//  @private
+//	IMBLibraryController* _libraryController;
+//	IMBParser* _parser;
+//	IMBOptions _options;
+//	IMBNode* _oldNode;		
+//	IMBNode* _newNode;
+//	NSString* _parentNodeIdentifier;
+//}
+//
+//@property (retain) IMBLibraryController* libraryController;
+//@property (retain) IMBParser* parser;
+//@property (assign) IMBOptions options;
+//@property (retain) IMBNode* oldNode;	
+//@property (copy) IMBNode* newNode;		// Copied so that background operation can modify the node
+//@property (copy) NSString* parentNodeIdentifier;		
+//
+//@end
+//
+//
+//@interface IMBCreateNodeOperation : IMBLibraryOperation
+//@end
+//
+//
+//@interface IMBPopulateNodeOperation : IMBLibraryOperation
+//@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,17 +139,17 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Private controller methods...
 
-@interface IMBLibraryController ()
-- (void) _didCreateNode:(IMBNode*)inNode;
-- (void) _didPopulateNode:(IMBNode*)inNode;
-- (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
-- (void) _presentError:(NSError*)inError;
-- (void) _coalescedUKKQueueCallback;
-- (void) _coalescedFSEventsCallback;
-- (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
-- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
-- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume;
-@end
+//@interface IMBLibraryController ()
+//- (void) _didCreateNode:(IMBNode*)inNode;
+//- (void) _didPopulateNode:(IMBNode*)inNode;
+//- (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
+//- (void) _presentError:(NSError*)inError;
+//- (void) _coalescedUKKQueueCallback;
+//- (void) _coalescedFSEventsCallback;
+//- (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
+//- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
+//- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume;
+//@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -161,7 +164,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //   IMBNode* oldNode (optional)
 //   NSError* error (optional)
 	
-	
+/*	
 @implementation IMBLibraryOperation
 
 @synthesize libraryController = _libraryController;
@@ -220,7 +223,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 }
 
 @end
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -228,7 +231,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // Create a new node here in this background operation. When done, pass back the result to the libraryController 
 // in the main thread...
 	
-	
+/*	
 @implementation IMBCreateNodeOperation
 
 - (void) main
@@ -253,7 +256,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 }
 
 @end
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -263,7 +266,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // appropriate notification is sent out. Listen to these notifications and cancel any queued operations
 // that are now obsolete...
 	
-	
+/*	
 @implementation IMBPopulateNodeOperation
 
 
@@ -304,7 +307,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 @end
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -314,11 +317,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @implementation IMBLibraryController
 
 @synthesize mediaType = _mediaType;
-@synthesize rootNodes = _rootNodes;
-@synthesize options = _options;
+@synthesize subnodes = _subnodes;
+//@synthesize options = _options;
 @synthesize delegate = _delegate;
-@synthesize watcherUKKQueue = _watcherUKKQueue;
-@synthesize watcherFSEvents = _watcherFSEvents;
+//@synthesize watcherUKKQueue = _watcherUKKQueue;
+//@synthesize watcherFSEvents = _watcherFSEvents;
 @synthesize isReplacingNode = _isReplacingNode;
 
 
@@ -360,21 +363,21 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (self = [super init])
 	{
 		self.mediaType = inMediaType;
-		self.rootNodes = [NSMutableArray array];
-		self.options = kIMBOptionNone;
+		self.subnodes = nil; //[NSMutableArray array];
+//		self.options = kIMBOptionNone;
+		_isReplacingNode = NO;
 		
 		// Initialize file system watching...
 		
-		self.watcherUKKQueue = [[[IMBKQueue alloc] init] autorelease];
-		self.watcherUKKQueue.delegate = self;
+//		self.watcherUKKQueue = [[[IMBKQueue alloc] init] autorelease];
+//		self.watcherUKKQueue.delegate = self;
+//		
+//		self.watcherFSEvents = [[[IMBFSEventsWatcher alloc] init] autorelease];
+//		self.watcherFSEvents.delegate = self;
 		
-		self.watcherFSEvents = [[[IMBFSEventsWatcher alloc] init] autorelease];
-		self.watcherFSEvents.delegate = self;
-		
-		_isReplacingNode = NO;
-		_watcherLock = [[NSRecursiveLock alloc] init];
-		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
-		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
+//		_watcherLock = [[NSRecursiveLock alloc] init];
+//		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
+//		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
 		
 		// When volume are unmounted we would like to be notified so that we can disable file watching for 
 		// those paths...
@@ -401,12 +404,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter] removeObserver:self];
 
 	IMBRelease(_mediaType);
-	IMBRelease(_rootNodes);
-	IMBRelease(_watcherUKKQueue);
-	IMBRelease(_watcherFSEvents);
-	IMBRelease(_watcherLock);
-	IMBRelease(_watcherUKKQueuePaths);
-	IMBRelease(_watcherFSEventsPaths);
+	IMBRelease(_subnodes);
+//	IMBRelease(_watcherUKKQueue);
+//	IMBRelease(_watcherFSEvents);
+//	IMBRelease(_watcherLock);
+//	IMBRelease(_watcherUKKQueuePaths);
+//	IMBRelease(_watcherFSEventsPaths);
 
 	[super dealloc];
 }
@@ -418,18 +421,52 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #pragma mark 
 #pragma mark Creating Nodes
 
+- (void) reload
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
+
+	if (self.subnodes == nil)
+	{
+		NSArray* factories = [[IMBParserController sharedParserController] loadedParserFactoriesForMediaType:self.mediaType];
+
+		for (IMBParserFactory* factory in factories)
+		{
+			XPCPerformSelectorAsync(factory.connection,factory,@selector(unpopulatedTopLevelNodesWitError:),nil,
+			
+				^(NSArray* inNodes,NSError* inError)
+				{
+					if (inError)
+					{
+						NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+					}
+					else if (inNodes)
+					{
+						NSLog(@"%s NODES:\n\n%@",__FUNCTION__,inNodes);
+					}
+				});		
+		}
+	}
+	else 
+	{
+
+	}
+}
+
+
+
+
 // This method triggers a full reload of all nodes. First remove all existing nodes. Then iterate over all 
 // loaded parsers (for our media type) and tell them to load nodes in a background operation...
-
+/*
 - (void) reload
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
 
 	NSArray* parsers = [[IMBParserController sharedParserController] parsersForMediaType:self.mediaType];
 	
-	[self willChangeValueForKey:@"rootNodes"];
-	[self.rootNodes removeAllObjects];
-	[self didChangeValueForKey:@"rootNodes"];
+	[self willChangeValueForKey:@"subnodes"];
+	[self.subnodes removeAllObjects];
+	[self didChangeValueForKey:@"subnodes"];
 	
 	for (IMBParser* parser in parsers)
 	{
@@ -459,7 +496,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -468,7 +505,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // Please note that this method causes the node (and all its subnodes) to be replaced at a later time in the main 
 // thread (once the background operation has concluded). Afterwards we have a different node instance! That way
 // we can handle various different cases, like subnodes appearing/dissappearing, or objects appearing/disappearing.
-
+/*
 - (void) reloadNode:(IMBNode*)inNode
 {
 	[self reloadNode:inNode parser:inNode.parser];
@@ -507,13 +544,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[operation release];
 	}	
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Check if the desired group node is already present. If yes return it, otherwise create and add it...
-
+/*
 - (IMBNode*) _groupNodeForNewNode:(IMBNode*)inNewNode
 {
 	NSUInteger groupType = inNewNode.groupType;
@@ -584,7 +621,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	return groupNode;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -593,7 +630,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // and the new node. Replace the old with the new node. The node we are given here can be a root node or a node
 // somewhere deep inside the tree. So we need to find the correct place where to put the new node. Note that the 
 // new node is registered with a file watcher (if desired) and the old node is unregistered...
-
+/*
 - (void) _replaceNode:(NSDictionary*)inOldAndNewNode
 {
 	IMBNode* oldNode = [inOldAndNewNode objectForKey:@"oldNode"];
@@ -781,11 +818,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
     }
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
+/*
 // This method is called on the main thread as a result of IMBCreateNodesOperation...
 
 - (void) _didCreateNode:(IMBNode*)inNode
@@ -798,18 +835,18 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	inNode.loading = NO;
 	inNode.badgeTypeNormal = kIMBBadgeTypeNone;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // This method is called on the main thread incase an error has occurred in an IMBLibraryOperation...
-
+/*
 - (void) _presentError:(NSError*)inError
 {
 	[NSApp presentError:inError];
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -825,7 +862,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // _replaceNode:, the delegate method outlineViewItemWillExpand: is automatically called - i.e. without the 
 // user actually clicking on a diclosure triangle. This seems to be some internal NSOutlineView behavior. 
 // Obviously we need to suppress populating in this case or we'll cause an endless loop...
-
+/*
 - (void) populateNode:(IMBNode*)inNode
 {
 	BOOL shouldPopulateNode = 
@@ -857,12 +894,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[operation release];
 	}	
 }
-
+*/
 
 // Check all pending operation if there is a populate operation concerning the node in question. If yes, then
 // cancel that one. Please note that this will probably have no effect if the operation is already executing - 
 // i.e. unless the parser class is cancel-aware and exits its inner loop early...
-
+/*
 - (void) stopPopulatingNodeWithIdentifier:(NSString*)inNodeIdentifier
 {
 	NSArray* operations = [[IMBOperationQueue sharedQueue] operations];
@@ -880,10 +917,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 }
-
+*/
 
 // Called back in the main thread as a result of IMBExpandNodeOperation...
-
+/*
 - (void) _didPopulateNode:(IMBNode*)inNode
 {
 	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:didPopulateNode:)])
@@ -894,7 +931,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	inNode.loading = NO;
 	inNode.badgeTypeNormal = kIMBBadgeTypeNone;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -906,7 +943,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // fire multiple times for a single change) we need to coalesce the calls. Please note that the parameter inPath  
 // is a different NSString instance every single time, so we cannot pass it as a param to the coalesced message 
 // (canceling wouldn't work). Instead we'll put it in an array, which is iterated in _coalescedFileWatcherCallback...
-
+/*
 - (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath
 {
 //	NSLog(@"%s path=%@",__FUNCTION__,inPath);
@@ -935,11 +972,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 }
-
+*/
 
 // Given an array of paths, filter out all paths that are subpaths of others in the array.
 // In other words only return the unique roots of a bunch of file system paths...
-
+/*
 + (NSArray*) _rootPathsForPaths:(NSArray*)inAllPaths
 {
 	NSMutableArray* rootPaths = [NSMutableArray array];
@@ -978,10 +1015,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	return (NSArray*) rootPaths;
 }
-
+*/
 
 // Pass the message on to the main thread...
-
+/*
 - (void) _coalescedUKKQueueCallback
 {
 	BOOL isMainThread = [NSThread isMainThread];
@@ -1047,7 +1084,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1056,7 +1093,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // throughte node tree and check which nodes are affected. These nodes are removed from the tree. This will also
 // take care of removing the offending file watcher...
 
-
+/*
 - (void) _willUnmountVolume:(NSNotification*)inNotification 
 {
 	NSString* volume = [[inNotification userInfo] objectForKey:@"NSDevicePath"];
@@ -1093,14 +1130,14 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[self reload];
 }
 
-
+*/
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
 #pragma mark Custom Nodes
 
-
+/*
 - (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath
 {
 	IMBParser* parser = nil;
@@ -1152,7 +1189,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 	return NO;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1162,7 +1199,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Returns the root node for the specified parser. Please note that group nodes (LIBRARIES,FOLDERS,INTERNET,etc)
 // are at the root level, so if we encounter one of those, we need to dig one level deeper...
-
+/*
 - (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser
 {
 	for (IMBNode* node in self.rootNodes)
@@ -1185,13 +1222,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	return nil;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Find the node with the specified identifier...
-	
+/*	
 - (IMBNode*) _nodeWithIdentifier:(NSString*)inIdentifier inParentNode:(IMBNode*)inParentNode
 {
 	NSArray* nodes = inParentNode ? inParentNode.subNodes : self.rootNodes;
@@ -1222,7 +1259,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	return nil;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1231,9 +1268,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	NSMutableString* text = [NSMutableString string];
 	
-	if (_rootNodes)
+	if (_subnodes)
 	{
-		for (IMBNode* node in _rootNodes)
+		for (IMBNode* node in _subnodes)
 		{
 			[text appendFormat:@"%@\n",[node description]];
 		}
@@ -1285,7 +1322,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		// Add all subnodes indented by one...
 		
-		for (IMBNode* subnode in inNode.subNodes)
+		for (IMBNode* subnode in inNode.subnodes)
 		{
 			[self _recursivelyAddItemsToMenu:inMenu withNode:subnode indentation:inIndentation+1 selector:inSelector target:inTarget];
 		}
@@ -1300,13 +1337,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	// Walk through all nodes...
 	
-	for (IMBNode* node in _rootNodes)
+	for (IMBNode* node in _subnodes)
 	{
 		didAddSeparator = NO;
 		
 		// For regular nodes add recursively indented menu items, with separators...
 		
-		if (node.parser.isCustom == NO)
+		if (node.isUserAdded == NO)
 		{
 			[self _recursivelyAddItemsToMenu:menu withNode:node indentation:0 selector:inSelector target:inTarget];
 			

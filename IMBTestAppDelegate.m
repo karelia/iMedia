@@ -53,13 +53,13 @@
 #pragma mark HEADERS
 
 #import "IMBTestAppDelegate.h"
-#import "IMBImageViewController.h"
+//#import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
-#import <iMedia/IMBiPhotoEventObjectViewController.h>
-#import <iMedia/IMBFaceObjectViewController.h>
-#import "IMBTestiPhotoEventBrowserCell.h"
-#import "IMBTestFaceBrowserCell.h"
-#import "IMBTestFacesBackgroundLayer.h"
+//#import <iMedia/IMBiPhotoEventObjectViewController.h>
+//#import <iMedia/IMBFaceObjectViewController.h>
+//#import "IMBTestiPhotoEventBrowserCell.h"
+//#import "IMBTestFaceBrowserCell.h"
+//#import "IMBTestFacesBackgroundLayer.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,7 +79,6 @@
 #pragma mark 
 
 @interface IMBTestAppDelegate ()
-
 //- (CGImageRef) badgeForObject:(IMBObject*) inObject;
 @end
 
@@ -95,9 +94,13 @@
 //@synthesize objectViewController = _objectViewController;
 @synthesize usedObjects = _usedObjects;
 
-+ (void)initialize
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) initialize
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
 	NSMutableDictionary *defaultDefaults
 	= [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -105,8 +108,8 @@
 	   //	   [NSNumber numberWithBool:YES], @"WebIconDatabaseEnabled",
 	   
 	   nil];
-	NSUserDefaultsController *controller = [NSUserDefaultsController sharedUserDefaultsController];
-	NSUserDefaults *defaults = [controller defaults];
+	NSUserDefaultsController* controller = [NSUserDefaultsController sharedUserDefaultsController];
+	NSUserDefaults* defaults = [controller defaults];
 	
 	[defaults registerDefaults:defaultDefaults];
 	[controller setInitialValues:defaultDefaults];
@@ -122,7 +125,7 @@
 
 - (void) awakeFromNib
 {
-/*
+
 	// NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d",   MAC_OS_X_VERSION_MIN_REQUIRED, MAC_OS_X_VERSION_MAX_ALLOWED);
 	
 	[IMBConfig setShowsGroupNodes:YES];
@@ -130,6 +133,26 @@
 	
 	self.usedObjects = [NSMutableDictionary dictionary];
 	
+
+
+#if 1
+	
+	IMBParserController* parserController = [IMBParserController sharedParserController];
+	[parserController setDelegate:self];
+	[parserController loadParserFactories];
+
+	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBMediaTypeImage];
+	[libraryController setDelegate:self];
+	[libraryController reload];
+	
+#endif	
+	
+	
+	
+	
+	
+	
+/*	
 #if CUSTOM_USER_INTERFACE
 	
 	// Load parsers...

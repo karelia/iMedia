@@ -126,7 +126,7 @@
 
 // To be overridden by subclasses...
 
-- (IMBNode*) unpopulatedTopLevelNodeWithName:(NSString*)inName error:(NSError**)outError
+- (IMBNode*) unpopulatedTopLevelNodeWithError:(NSError**)outError
 {
 	return nil;
 }

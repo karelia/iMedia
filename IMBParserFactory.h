@@ -71,10 +71,8 @@
 // Lightweight class that uniquely identifies a parser. Instance of this class can be archived and sent over 
 // an XPC connection to create an IMBParser instance on the other side (XPC service)...
 
-@interface IMBParserFactory : NSObject 
+@interface IMBParserFactory : NSObject <NSCoding>
 {
-	NSString* _identifier;
-	NSString* _parserClassName;
 	NSString* _mediaType;
 	NSURL* _mediaSource;
 	BOOL _isUserAdded;
@@ -84,21 +82,21 @@
 
 // Properties that uniquely define each factory...
 
-@property (copy) NSString* identifier;			// Used internally
-@property (copy) NSString* parserClassName;		// For instantiating parsers
-@property (copy) NSString* mediaType;			// See IMBCommon.h for available types
-@property (retain) NSURL* mediaSource;			// Source of given media objects
-@property BOOL isUserAdded;						// User added items can also be removed by the user again
++ (NSString*) mediaType;								// See IMBCommon.h for available types
++ (Class) parserClass;									// For instantiating parsers
++ (NSString*) identifier;								// Used in delegate methods and for connecting to XPC service
+
+@property (copy) NSString* mediaType;					// See IMBCommon.h for available types
+@property (retain) NSURL* mediaSource;					// Source of given media objects
+@property BOOL isUserAdded;								// User added items can also be removed by the user again
 
 // For communicating with the XPC service...
 
 @property (retain,readonly) XPCConnection* connection;	// Used internally...
 
-// The host app side calls this method to get the top level nodes for this IMBParserFactory. Since this requires 
-// a round trip to the XPC service, this is a purely asycnronous API with a completion block that receives the
-// resulting array...
+// Returns an array of new (unpopulated) top level nodes. This method is only called on the XPC service side...
 
-- (void) topLevelNodesWithCompletionBlock:(IMBCompletionBlock)inCompletionBlock;
+- (NSMutableArray*) unpopulatedTopLevelNodesWitError:(NSError**)outError;
 
 // This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses  
 // may opt to return more than one instance (e.g. Aperture may create one instance per library). This method

@@ -51,6 +51,7 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import <iMedia/IMBParserController.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,7 +68,7 @@
 
 @class IMBUserInterfaceController;
 
-@interface IMBTestAppDelegate : NSObject
+@interface IMBTestAppDelegate : NSObject <IMBParserControllerDelegate>
 {
 	IBOutlet NSWindow* ibWindow;
 	IBOutlet NSWindow* ibDragDestinationWindow;

@@ -63,25 +63,11 @@
 
 #pragma mark
 
-@interface IMBParserFactory ()
-@property (retain,readwrite) XPCConnection* atomic_connection;	// Used internally...
-@end
-
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark
-
 @implementation IMBParserFactory
 
-@synthesize identifier = _identifier;
-@synthesize parserClassName = _parserClassName;
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
 @synthesize isUserAdded = _isUserAdded;
-@synthesize atomic_connection = _connection;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -94,8 +80,6 @@
 {
 	if ((self = [super init]))
 	{
-		self.identifier = [inCoder decodeObjectForKey:@"identifier"];
-		self.parserClassName = [inCoder decodeObjectForKey:@"parserClassName"];
 		self.mediaType = [inCoder decodeObjectForKey:@"mediaType"];
 		self.mediaSource = [inCoder decodeObjectForKey:@"mediaSource"];
 		self.isUserAdded = [inCoder decodeBoolForKey:@"isUserAdded"];
@@ -107,8 +91,6 @@
 
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
-	[inCoder encodeObject:self.identifier forKey:@"identifier"];
-	[inCoder encodeObject:self.parserClassName forKey:@"parserClassName"];
 	[inCoder encodeObject:self.mediaType forKey:@"mediaType"];
 	[inCoder encodeObject:self.mediaSource forKey:@"mediaSource"];
 	[inCoder encodeBool:self.isUserAdded forKey:@"isUserAdded"];
@@ -122,8 +104,6 @@
 {
 	IMBParserFactory* copy = [[[self class] allocWithZone:inZone] init];
 	
-	copy.identifier = self.identifier;
-	copy.parserClassName = self.parserClassName;
 	copy.mediaType = self.mediaType;
 	copy.mediaSource = self.mediaSource;
 	copy.isUserAdded = self.isUserAdded;
@@ -134,10 +114,10 @@
 
 - (void) dealloc
 {
-	IMBRelease(_identifier);
-	IMBRelease(_parserClassName);
 	IMBRelease(_mediaType);
 	IMBRelease(_mediaSource);
+	IMBRelease(_connection);
+	
 	[super dealloc];
 }
 
@@ -145,13 +125,38 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// To be overridden in subclasses...
+
++ (NSString*) mediaType
+{
+	return nil;
+}
+
+
+// For instantiating IMBParsers...
+
++ (Class) parserClass
+{
+	return nil;
+}
+
+						
+// The identifier is used in delegate methods and for choosing the correct XPC service bundle...
+
++ (NSString*) identifier
+{
+	return nil;
+}
+
+
 // Create the connection lazily when needed...
 
 - (XPCConnection*) connection
 {
-	if (_connection == nil && SBIsSandboxed())
+	if (_connection == nil /*&& SBIsSandboxed()*/)
 	{
-		#warning TODO
+		NSString* identifier = [[self class] identifier];
+		_connection = [[XPCConnection alloc] initWithServiceName:identifier];
 	}
 	
 	return _connection;
@@ -167,7 +172,7 @@
 
 - (void) topLevelNodesWithCompletionBlock:(IMBCompletionBlock)inCompletionBlock
 {
-	XPCPerformSelectorAsync(self.connection,self,@selector(topLevelNodes),nil,inCompletionBlock);
+	XPCPerformSelectorAsync(self.connection,self,@selector(unpopulatedTopLevelNodesWitError:),nil,inCompletionBlock);
 							 
 							 
 //	// Copy completion block onto the heap to make it stick around until we need it...
@@ -237,7 +242,7 @@
 }
 
 
-- (NSMutableArray*) topLevelNodesWithError:(NSError**)outError
+- (NSArray*) unpopulatedTopLevelNodesWitError:(NSError**)outError
 {
 	NSError* error = nil;
 	NSMutableArray* topLevelNodes = nil;
@@ -258,8 +263,9 @@
 	}
 	
 	if (outError) *outError = error;
-	return topLevelNodes;
+	return (NSArray*)topLevelNodes;
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -270,10 +276,10 @@
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-	Class parserClass = NSClassFromString(self.parserClassName);
+	Class parserClass = [[self class] parserClass];
 	
 	IMBParser* parser = [[parserClass alloc] init];
-	parser.identifier = self.identifier;
+	parser.identifier = [[self class] identifier];
 	parser.mediaType = self.mediaType;
 	parser.mediaSource = self.mediaSource;
 	
