@@ -305,7 +305,6 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSDictionary* plist = self.plist;
 	NSDictionary* images = [plist objectForKey:@"Master Image List"];
 	NSArray* albums = [plist objectForKey:@"List of Albums"];
@@ -344,8 +343,7 @@
 		}
 	}
 	
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 
