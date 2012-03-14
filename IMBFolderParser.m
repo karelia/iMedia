@@ -272,7 +272,7 @@
             subnode.mediaSource = folder;
             subnode.identifier = [[self class] identifierForPath:folder];
             subnode.name = name;
-            subnode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+            subnode.icon = [ws iconForFile:folder];
             [subnode.icon setScalesWhenResized:YES];
             [subnode.icon setSize:NSMakeSize(16,16)];
             subnode.parser = self;
@@ -324,7 +324,7 @@
             object.index = index++;
             object.imageLocation = (id)folder;
             object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-            object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+            object.imageRepresentation = [ws iconForFile:folder];
 
             [objects addObject:object];
             [object release];
