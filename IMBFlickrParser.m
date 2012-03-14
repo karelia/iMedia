@@ -420,7 +420,6 @@
 // The supplied node is a private copy which may be modified here in the background operation. Parse the 
 // iPhoto XML file and create subnodes as needed...
 - (BOOL) populateNode: (IMBNode*) inNode options: (IMBOptions) inOptions error: (NSError**) outError {
-	NSError* error = nil;
 	IMBFlickrNode* inFlickrNode = (IMBFlickrNode*) inNode;
 	
 	#ifdef VERBOSE
@@ -465,8 +464,7 @@
 		}
 	}
 		
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 
