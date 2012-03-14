@@ -281,34 +281,34 @@
             
             // Should this folder be a leaf or not?  We are going to have to scan into the directory
             
-            NSArray* folderContents = [fm contentsOfDirectoryAtPath:folder error:outError];	// When we go 10.6 only, use better APIs.
+            // Errors at this level are not critical enough to pass up to the user. Doing so 
+            // would cause e.g. a single unreadable folder in the middle of a huge list to cause 
+            // the entire list to be hidden because of the failure of this method.
+            //
+            // WARNING: If you do decide to propagate these errors in the future, be sure that they
+            // are retained outside the scope of the current local autorelease pool, or else they
+            // will be returned as potential zombies to the client.
+            NSArray* folderContents = [fm contentsOfDirectoryAtPath:folder error:NULL];	// When we go 10.6 only, use better APIs.
             BOOL hasSubDir = NO;
             int fileCounter = 0;	// bail if this is a really full folder
             
-            if (folderContents)
+            for (NSString *isThisADirectory in folderContents)
             {
-                for (NSString *isThisADirectory in folderContents)
+                NSString* path = [folder stringByAppendingPathComponent:isThisADirectory];
+                [fm fileExistsAtPath:path isDirectory:&hasSubDir];
+                fileCounter++;
+                
+                // Would it be faster to use attributesOfItemAtPath:error: ????
+                if (hasSubDir)
                 {
-                    NSString* path = [folder stringByAppendingPathComponent:isThisADirectory];
-                    [fm fileExistsAtPath:path isDirectory:&hasSubDir];
-                    fileCounter++;
-                    
-                    // Would it be faster to use attributesOfItemAtPath:error: ????
-                    if (hasSubDir)
-                    {
-                        hasSubDir = YES;
-                        break;	// Yes, found a subdir, so we want a disclosure triangle on this
-                    }
-                    else if (fileCounter > 100)
-                    {
-                        hasSubDir = YES;	// just in case, assume there is a subfolder there
-                        break;
-                    }
+                    hasSubDir = YES;
+                    break;	// Yes, found a subdir, so we want a disclosure triangle on this
                 }
-            }
-            else
-            {
-                result = NO;
+                else if (fileCounter > 100)
+                {
+                    hasSubDir = YES;	// just in case, assume there is a subfolder there
+                    break;
+                }
             }
             
             subnode.leaf = !hasSubDir;	// if it doesn't have a subdirectory, treat it as a leaf
