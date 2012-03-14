@@ -189,157 +189,155 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
-	NSFileManager* fm = [NSFileManager imb_threadSafeManager];
-	NSWorkspace* ws = [NSWorkspace imb_threadSafeWorkspace];
-	NSError* error = nil;
 	NSString* folder = inNode.mediaSource;
+	NSFileManager* fm = [NSFileManager imb_threadSafeManager];
+	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:outError];	
+	if (!files) return NO;
+    
+    
+    NSWorkspace* ws = [NSWorkspace imb_threadSafeWorkspace];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	
-	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];	
-	if (files)
-	{
-		// Non-nil result from contentsOfDirectoryAtPath means we must ignore any value it put into error.
-		// It's likely to be an autoreleased, or zombie object that we can't trust the lifespan of.
-		error = nil;
-		
-		files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
 	
-		NSMutableArray* subnodes = [NSMutableArray array];
-		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:files.count];
-		
-		inNode.displayedObjectCount = 0;
-		
-		NSMutableArray* folders = [NSMutableArray array];
-	
-		for (NSString* file in files)
-		{
-			if (index%32 == 0)
-			{
-				IMBDrain(pool);
-				pool = [[NSAutoreleasePool alloc] init];
-			}
-			
-			// Hidden file system items (e.g. ".thumbnails") will be skipped...
-			
-			if (![file hasPrefix:@"."])	
-			{
-				NSString* path = [folder stringByAppendingPathComponent:file];
-				
-				// For folders will be handled later. Just remember it for now...
-				BOOL isDir = NO;
-				if ([fm fileExistsAtPath:path isDirectory:&isDir] && isDir) 
-				{
-					if (![IMBConfig isLibraryPath:path])
-					{
-						[folders addObject:path];
-					}
-					else
-					{
-						// NSLog(@"IGNORING LIBRARY PATH: %@", path);
-					}
+    files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
 
-				}
-				
-				// Create an IMBVisualObject for each qualifying file...
-				
-				else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
-				{
-					NSString *betterName = [fm displayNameAtPath:[file stringByDeletingPathExtension]];
-					betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
-					
-					IMBObject* object = [self objectForPath:path name:betterName index:index++];
-					[objects addObject:object];
-					inNode.displayedObjectCount++;
-				}
-			}
-		}
-		
-		// Add a subnode and an IMBNodeObject for each folder...
-				
-		for (NSString* folder in folders)
-		{
-			if (index%32 == 0)
-			{
-				IMBDrain(pool);
-				pool = [[NSAutoreleasePool alloc] init];
-			}
-			
-			NSString* name = [fm displayNameAtPath:folder];
-			BOOL isPackage = [ws isFilePackageAtPath:folder];
-			
-			if (!isPackage)
-			{
-				IMBNode* subnode = [[IMBNode alloc] init];
-				subnode.mediaSource = folder;
-				subnode.identifier = [[self class] identifierForPath:folder];
-				subnode.name = name;
-				subnode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
-				[subnode.icon setScalesWhenResized:YES];
-				[subnode.icon setSize:NSMakeSize(16,16)];
-				subnode.parser = self;
-				subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
-				subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
-				
-				// Should this folder be a leaf or not?  We are going to have to scan into the directory
-				
-				NSArray* folderContents = [fm contentsOfDirectoryAtPath:folder error:&error];	// When we go 10.6 only, use better APIs.
-				BOOL hasSubDir = NO;
-				int fileCounter = 0;	// bail if this is a really full folder
-				
-				if (folderContents)
-				{
-					// As avoid, above propagating an error unless the response was nil
-					error = nil;
-					
-					for (NSString *isThisADirectory in folderContents)
-					{
-						NSString* path = [folder stringByAppendingPathComponent:isThisADirectory];
-						[fm fileExistsAtPath:path isDirectory:&hasSubDir];
-						fileCounter++;
-						
-						// Would it be faster to use attributesOfItemAtPath:error: ????
-						if (hasSubDir)
-						{
-							hasSubDir = YES;
-							break;	// Yes, found a subdir, so we want a disclosure triangle on this
-						}
-						else if (fileCounter > 100)
-						{
-							hasSubDir = YES;	// just in case, assume there is a subfolder there
-							break;
-						}
-					}
-				}
-				subnode.leaf = !hasSubDir;	// if it doesn't have a subdirectory, treat it as a leaf
-				subnode.includedInPopup = NO;
-				[subnodes addObject:subnode];
-				[subnode release];
+    NSMutableArray* subnodes = [NSMutableArray array];
+    NSMutableArray* objects = [NSMutableArray arrayWithCapacity:files.count];
+    
+    inNode.displayedObjectCount = 0;
+    
+    NSMutableArray* folders = [NSMutableArray array];
 
-				IMBNodeObject* object = [[IMBNodeObject alloc] init];
-				object.representedNodeIdentifier = subnode.identifier;
-				object.name = name;
-				object.metadata = nil;
-				object.parser = self;
-				object.index = index++;
-				object.imageLocation = (id)folder;
-				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-				object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+    for (NSString* file in files)
+    {
+        if (index%32 == 0)
+        {
+            IMBDrain(pool);
+            pool = [[NSAutoreleasePool alloc] init];
+        }
+        
+        // Hidden file system items (e.g. ".thumbnails") will be skipped...
+        
+        if (![file hasPrefix:@"."])	
+        {
+            NSString* path = [folder stringByAppendingPathComponent:file];
+            
+            // For folders will be handled later. Just remember it for now...
+            BOOL isDir = NO;
+            if ([fm fileExistsAtPath:path isDirectory:&isDir] && isDir) 
+            {
+                if (![IMBConfig isLibraryPath:path])
+                {
+                    [folders addObject:path];
+                }
+                else
+                {
+                    // NSLog(@"IGNORING LIBRARY PATH: %@", path);
+                }
 
-				[objects addObject:object];
-				[object release];
-			}
-		}
-		
-		inNode.subNodes = subnodes;
-		inNode.objects = objects;
-		inNode.leaf = [subnodes count] == 0;
-	}
+            }
+            
+            // Create an IMBVisualObject for each qualifying file...
+            
+            else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
+            {
+                NSString *betterName = [fm displayNameAtPath:[file stringByDeletingPathExtension]];
+                betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+                
+                IMBObject* object = [self objectForPath:path name:betterName index:index++];
+                [objects addObject:object];
+                inNode.displayedObjectCount++;
+            }
+        }
+    }
+    
+    // Add a subnode and an IMBNodeObject for each folder...
+    BOOL result = YES;
+    
+    for (NSString* folder in folders)
+    {
+        if (index%32 == 0)
+        {
+            IMBDrain(pool);
+            pool = [[NSAutoreleasePool alloc] init];
+        }
+        
+        NSString* name = [fm displayNameAtPath:folder];
+        BOOL isPackage = [ws isFilePackageAtPath:folder];
+        
+        if (!isPackage)
+        {
+            IMBNode* subnode = [[IMBNode alloc] init];
+            subnode.mediaSource = folder;
+            subnode.identifier = [[self class] identifierForPath:folder];
+            subnode.name = name;
+            subnode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+            [subnode.icon setScalesWhenResized:YES];
+            [subnode.icon setSize:NSMakeSize(16,16)];
+            subnode.parser = self;
+            subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
+            subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
+            
+            // Should this folder be a leaf or not?  We are going to have to scan into the directory
+            
+            NSArray* folderContents = [fm contentsOfDirectoryAtPath:folder error:outError];	// When we go 10.6 only, use better APIs.
+            BOOL hasSubDir = NO;
+            int fileCounter = 0;	// bail if this is a really full folder
+            
+            if (folderContents)
+            {
+                for (NSString *isThisADirectory in folderContents)
+                {
+                    NSString* path = [folder stringByAppendingPathComponent:isThisADirectory];
+                    [fm fileExistsAtPath:path isDirectory:&hasSubDir];
+                    fileCounter++;
+                    
+                    // Would it be faster to use attributesOfItemAtPath:error: ????
+                    if (hasSubDir)
+                    {
+                        hasSubDir = YES;
+                        break;	// Yes, found a subdir, so we want a disclosure triangle on this
+                    }
+                    else if (fileCounter > 100)
+                    {
+                        hasSubDir = YES;	// just in case, assume there is a subfolder there
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                result = NO;
+            }
+            
+            subnode.leaf = !hasSubDir;	// if it doesn't have a subdirectory, treat it as a leaf
+            subnode.includedInPopup = NO;
+            [subnodes addObject:subnode];
+            [subnode release];
+
+            IMBNodeObject* object = [[IMBNodeObject alloc] init];
+            object.representedNodeIdentifier = subnode.identifier;
+            object.name = name;
+            object.metadata = nil;
+            object.parser = self;
+            object.index = index++;
+            object.imageLocation = (id)folder;
+            object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+            object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
+
+            [objects addObject:object];
+            [object release];
+        }
+    }
+    
+    inNode.subNodes = subnodes;
+    inNode.objects = objects;
+    inNode.leaf = [subnodes count] == 0;
 	
 	IMBDrain(pool);
 					
-	if (outError) *outError = error;
-	return error == nil;
+	return result;
 }
 
 
