@@ -249,6 +249,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	else
 	{
 		[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
+
+		// If we failed then the _oldNode is still good but needs to have its status updated 
+		self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
 	}
 }
 
@@ -286,6 +289,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		else
 		{
 			[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
+			
+			// If we failed then the _oldNode is still good but needs to have its status updated 
+			self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
 		}
 	}
 }

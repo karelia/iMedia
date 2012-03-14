@@ -196,11 +196,15 @@
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	
-	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];
-	files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
-	
-	if (error == nil)
+	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:&error];	
+	if (files)
 	{
+		// Non-nil result from contentsOfDirectoryAtPath means we must ignore any value it put into error.
+		// It's likely to be an autoreleased, or zombie object that we can't trust the lifespan of.
+		error = nil;
+		
+		files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
+	
 		NSMutableArray* subnodes = [NSMutableArray array];
 		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:files.count];
 		
@@ -278,8 +282,16 @@
 				subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 				
 				// Should this folder be a leaf or not?  We are going to have to scan into the directory
-			
-				NSArray* folderContents = [fm contentsOfDirectoryAtPath:folder error:&error];	// When we go 10.6 only, use better APIs.
+				
+				// Errors at this level are not critical enough to pass up to the user. Doing so 
+				// would cause e.g. a single unreadable folder in the middle of a huge list to cause 
+				// the entire list to be hidden because of the failure of this method.
+				//
+				// WARNING: If you do decide to propagate these errors in the future, be sure that they
+				// are retained outside the scope of the current local autorelease pool, or else they
+				// will be returned as potential zombies to the client.
+				NSArray* folderContents = [fm contentsOfDirectoryAtPath:folder error:NULL];	// When we go 10.6 only, use better APIs.
+
 				BOOL hasSubDir = NO;
 				int fileCounter = 0;	// bail if this is a really full folder
 				
@@ -330,9 +342,13 @@
 	}
 	
 	IMBDrain(pool);
-					
-	if (outError) *outError = error;
-	return error == nil;
+
+	if (outError && error)
+	{
+		*outError = error;
+	}
+	
+	return (error == nil);
 }
 
 
