@@ -241,7 +241,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	IMBNode* newNode = [parser nodeWithOldNode:self.oldNode options:self.options error:&error];
     self.newNode = newNode;
 	
-	if (error == nil)
+	if (newNode)
 	{
 		[self performSelectorOnMainThread:@selector(_didCreateNode:) withObject:newNode];
 		[self doReplacement];
