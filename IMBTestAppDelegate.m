@@ -53,13 +53,13 @@
 #pragma mark HEADERS
 
 #import "IMBTestAppDelegate.h"
-#import "IMBImageViewController.h"
+//#import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
-#import <iMedia/IMBiPhotoEventObjectViewController.h>
-#import <iMedia/IMBFaceObjectViewController.h>
-#import "IMBTestiPhotoEventBrowserCell.h"
-#import "IMBTestFaceBrowserCell.h"
-#import "IMBTestFacesBackgroundLayer.h"
+//#import <iMedia/IMBiPhotoEventObjectViewController.h>
+//#import <iMedia/IMBFaceObjectViewController.h>
+//#import "IMBTestiPhotoEventBrowserCell.h"
+//#import "IMBTestFaceBrowserCell.h"
+//#import "IMBTestFacesBackgroundLayer.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,8 +79,7 @@
 #pragma mark 
 
 @interface IMBTestAppDelegate ()
-
-- (CGImageRef) badgeForObject:(IMBObject*) inObject;
+//- (CGImageRef) badgeForObject:(IMBObject*) inObject;
 @end
 
 
@@ -91,13 +90,17 @@
 
 @implementation IMBTestAppDelegate
 
-@synthesize nodeViewController = _nodeViewController;
-@synthesize objectViewController = _objectViewController;
+//@synthesize nodeViewController = _nodeViewController;
+//@synthesize objectViewController = _objectViewController;
 @synthesize usedObjects = _usedObjects;
 
-+ (void)initialize
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) initialize
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
 	NSMutableDictionary *defaultDefaults
 	= [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -105,8 +108,8 @@
 	   //	   [NSNumber numberWithBool:YES], @"WebIconDatabaseEnabled",
 	   
 	   nil];
-	NSUserDefaultsController *controller = [NSUserDefaultsController sharedUserDefaultsController];
-	NSUserDefaults *defaults = [controller defaults];
+	NSUserDefaultsController* controller = [NSUserDefaultsController sharedUserDefaultsController];
+	NSUserDefaults* defaults = [controller defaults];
 	
 	[defaults registerDefaults:defaultDefaults];
 	[controller setInitialValues:defaultDefaults];
@@ -122,6 +125,7 @@
 
 - (void) awakeFromNib
 {
+
 	// NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d",   MAC_OS_X_VERSION_MIN_REQUIRED, MAC_OS_X_VERSION_MAX_ALLOWED);
 	
 	[IMBConfig setShowsGroupNodes:YES];
@@ -129,6 +133,26 @@
 	
 	self.usedObjects = [NSMutableDictionary dictionary];
 	
+
+
+#if 1
+	
+	IMBParserController* parserController = [IMBParserController sharedParserController];
+	[parserController setDelegate:self];
+	[parserController loadParserFactories];
+
+	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBMediaTypeImage];
+	[libraryController setDelegate:self];
+	[libraryController reload];
+	
+#endif	
+	
+	
+	
+	
+	
+	
+/*	
 #if CUSTOM_USER_INTERFACE
 	
 	// Load parsers...
@@ -174,6 +198,7 @@
 	[self togglePanel:nil];
 	
 #endif
+*/
 }
 
 
@@ -181,6 +206,7 @@
 
 - (IBAction) togglePanel:(id)inSender
 {
+/*
 	if ([IMBPanelController isSharedPanelControllerLoaded])
 	{
 		IMBPanelController* controller = [IMBPanelController sharedPanelController];
@@ -207,11 +233,13 @@
 		[panelController.window makeKeyAndOrderFront:nil];		// Test app, and stand-alone app, would want this to become key.
 		
 	}
+*/	
 }
 
 
 - (IBAction) toggleDragDestinationWindow:(id)inSender
 {
+/*
 	if (ibDragDestinationWindow.isVisible)
 	{
 		[ibDragDestinationWindow orderOut:inSender];
@@ -220,6 +248,7 @@
 	{
 		[ibDragDestinationWindow makeKeyAndOrderFront:inSender];
 	}
+*/	
 }
 
 
@@ -227,8 +256,10 @@
 
 - (void) applicationWillTerminate:(NSNotification*)inNotification
 {
+/*
 	NSString* frame = NSStringFromRect(ibWindow.frame);
 	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
+*/	
 }
 
 
@@ -236,8 +267,10 @@
 
 - (void) dealloc
 {
+/*
 	IMBRelease(_nodeViewController);
 	IMBRelease(_objectViewController);
+*/	
 	[super dealloc];
 }
 
@@ -247,7 +280,7 @@
 
 #pragma mark 
 #pragma mark IMBParserController Delegate
-
+/*
 - (IMBParser *)parserController:(IMBParserController *)controller willLoadParser:(IMBParser *)parser;
 {
 #if LOG_PARSERS
@@ -359,7 +392,7 @@
 	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
 #endif
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -367,7 +400,7 @@
 #pragma mark 
 #pragma mark IMBLibraryController Delegate
 
-
+/*
 - (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
 {
 #if LOG_CREATE_NODE
@@ -392,11 +425,11 @@
 	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
 #endif
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
+/*
 - (BOOL) libraryController:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
 {
 #if LOG_POPULATE_NODE
@@ -421,7 +454,7 @@
 	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
 #endif
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -429,7 +462,7 @@
 #pragma mark 
 #pragma mark IMBObjectViewControllerDelegate
 
-
+/*
 - (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController
 {
 	if ([inController isKindOfClass:[IMBiPhotoEventObjectViewController class]])
@@ -519,14 +552,14 @@
 	
 	return [self badgeForObject:inObject];
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark
 #pragma mark IMBFlickrParser Delegate
-
+/*
 - (NSArray*) flickrParserSetupDefaultQueries:(IMBFlickrParser*)inFlickrParser
 {
 	NSMutableArray* defaultNodes = [NSMutableArray array];
@@ -554,7 +587,7 @@
 	
 	return defaultNodes;
 }
-
+*/
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -563,20 +596,21 @@
 
 - (void) concludeDragOperationForObjects:(NSArray*)inObjects
 {
+/*	
 	for (IMBObject* object in inObjects)
 	{
 		[self.usedObjects setObject:object forKey:[object identifier]];
 	}
 	
 	[self.nodeViewController setObjectContainerViewNeedsDisplay:YES];
+*/
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark -
 #pragma mark Helper
-
+/*
 - (CGImageRef) badgeForObject:(IMBObject*) inObject
 {
 	static CGImageRef badgeImage = NULL;
@@ -604,7 +638,7 @@
 		return NULL;
 	}
 }
-
+*/
 @end
 
 

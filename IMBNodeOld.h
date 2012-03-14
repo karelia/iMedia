@@ -61,7 +61,7 @@
 #pragma mark CLASSES
 
 @class IMBObject;
-//@class IMBParser;
+@class IMBParser;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,76 +69,61 @@
 
 #pragma mark 
 
-@interface IMBNode : NSObject <NSCopying,NSCoding>
+@interface IMBNode : NSObject <NSCopying>
 {
-	// Primary properties...
-
+	NSString* _mediaSource;
+	NSString* _identifier;
 	NSImage* _icon;
 	NSString* _name;
-	NSString* _identifier;
-	NSURL* _mediaSource;
-	NSString* _mediaType;
-	
-	IMBNode* _parentNode;	// not retained!
-	NSArray* _subnodes;
-	NSArray* _objects;
-
-	// State information...
-
 	NSDictionary* _attributes;
 	NSUInteger _groupType;
-	NSUInteger _displayPriority;
+	NSArray* _objects;
+	NSArray* _subNodes;
 	NSInteger _displayedObjectCount;
+	NSUInteger _displayPriority;
+	
+	IMBNode* _parentNode;	// not retained!
 	BOOL _isTopLevelNode;
 	BOOL _group;
 	BOOL _leaf;
 	BOOL _loading;
-	BOOL _includedInPopup;
-	BOOL _isUserAdded;
 	BOOL _wantsRecursiveObjects;
+	BOOL _includedInPopup;
 	
-//	IMBParser* _parser;
-//	IMBWatcherType _watcherType;
-//	NSString* _watchedPath;
+	IMBParser* _parser;
+	IMBWatcherType _watcherType;
+	NSString* _watchedPath;
 
-	// Badges...
-	
 	IMBBadgeType _badgeTypeNormal;
 	IMBBadgeType _badgeTypeMouseover;
 	id _badgeTarget;
 	SEL _badgeSelector;
 
-	// Custom object views...
-	
 	BOOL _shouldDisplayObjectView;
-	NSViewController* _customHeaderViewController;
-	NSViewController* _customObjectViewController;
-	NSViewController* _customFooterViewController;
 }
 
 // Primary properties for a node:
 
-@property (retain) NSImage* icon;					// 16x16 icon for user interface
-@property (copy) NSString* name;					// Display name for user interface
+@property (copy) NSString* mediaSource;				// Path or url
 @property (copy) NSString* identifier;				// Unique identifier of form parserClassName://path/to/node
-@property (copy) NSURL* mediaSource;				// Only toplevel nodes need this property
-@property (retain) NSString* mediaType;				// See IMBCommon.h
-@property (retain) NSDictionary* attributes;		// Optional metadata about a node
-@property (assign) NSUInteger groupType;			// Used for grouping toplevel nodes
+@property (copy) NSString* name;					// Display name for user interface
+@property (retain) NSImage* icon;					// 16x16 icon for user interface
+@property (retain) NSDictionary* attributes;		// Optional metadata about the node
+@property (assign) NSUInteger groupType;			// Used for grouping root level nodes
 @property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
 
-// Node tree accessors. If the subnodes property is nil, that doesn't mean that there are no subnodes - instead it
+// Node tree accessors. If the subNodes property is nil, that doesn't mean that there are no subNodes - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
-// subnodes is an empty array, then there really aren't any subnodes...
+// subNodes is an empty array, then there really aren't any subnodes.
 
-@property (copy) NSArray* subnodes;				
+@property (copy) NSArray* subNodes;				
 @property (assign,readonly) IMBNode* parentNode;
 @property (readonly) IMBNode* topLevelNode;
 @property (assign) BOOL isTopLevelNode;
 
 // Object accessors. If the objects property is nil, that doesn't mean that there are no objects - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
-// objects is an empty array, then there really aren't any objects...
+// objects is an empty array, then there really aren't any objects.
 
 @property (retain) NSArray* objects;
 
@@ -164,15 +149,14 @@
 @property (assign,getter=isGroup) BOOL group;
 @property (assign,getter=isLeaf) BOOL leaf;
 @property (assign,getter=isLoading) BOOL loading;
-@property (assign) BOOL includedInPopup;
-@property (assign) BOOL isUserAdded;
 @property (assign) BOOL wantsRecursiveObjects;
+@property (assign) BOOL includedInPopup;
 
 // Support for live watching and asynchronous nodes
 
-//@property (retain) IMBParser* parser;
-//@property (assign) IMBWatcherType watcherType;
-//@property (copy) NSString* watchedPath;
+@property (retain) IMBParser* parser;
+@property (assign) IMBWatcherType watcherType;
+@property (copy) NSString* watchedPath;
 
 // Support for node badge icon/button. Set the normal and the mouseover icon with the IMBadgeType. 
 // The selector gets sent to the target when the badge is clicked.
@@ -185,20 +169,16 @@
 // Indicates whether a node wants to display an object view. Default is YES, but can be changed...
 
 @property (assign) BOOL shouldDisplayObjectView;	
-@property (assign) NSViewController* customHeaderViewController;	
-@property (assign) NSViewController* customObjectViewController;	
-@property (assign) NSViewController* customFooterViewController;	
 
 // Helper methods
 
+- (NSIndexPath*) indexPath;
 - (NSComparisonResult) compare:(IMBNode*)inNode;
+- (BOOL) isPopulated;
+- (IMBNode*) subNodeWithIdentifier:(NSString*)identifier;
+
 - (BOOL) isAncestorOfNode:(IMBNode*)inNode;
 - (BOOL) isDescendantOfNode:(IMBNode*)inNode;
-
-- (NSIndexPath*) indexPath;
-- (IMBNode*) subnodeWithIdentifier:(NSString*)identifier;
-- (BOOL) isPopulated;
-
 
 @end
 

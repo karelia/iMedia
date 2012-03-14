@@ -62,81 +62,72 @@
 
 @class IMBNode;
 @class IMBObject;
+@class XPCConnection;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+// Lightweight class that uniquely identifies a parser. Instance of this class can be archived and sent over 
+// an XPC connection to create an IMBParser instance on the other side (XPC service)...
 
-@protocol IMBParserProtocol
-
-// Together these parameters uniquely specify a parser instance. The values are taken from IMBParserFacrtory...
-
-@required
-
-@property (copy) NSString* identifier;	
-@property (copy) NSString* mediaType;	
-@property (retain) NSURL* mediaSource;	
-
-// The following four methods are at the heart of parser classes and must be implemented. They will be called on
-// on the XPC service side: Together they create the iMedia data model tree, which gets serialized and sent back
-// to the host app, where it is given to and owned by the IMBLibraryController. The first method is only called
-// once at startup to create an empty toplevel node, while the remaining 3 methods may be called multiple times...
-
-@required
-
-- (IMBNode*) unpopulatedTopLevelNodeWithError:(NSError**)outError;
-- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError;
-- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError;
-- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError;
-
-// The following three methods are used to load thumbnails or metadata, or create a security-scoped bookmark for  
-// full media file access. They are called on the XPC service side...
-
-@required
-
-- (NSData*) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError;
-- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError;
-- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError;
-
-// These two optional methods are called on the XPC service side just before a parser starts its work (the four 
-// methods above), or after it stops its work (e.g. by the user deselecting a node). The parser can read in or
-// discard cached data as appropriate...
-
-@optional
-
-//- (void) willStartUsingParser;
-//- (void) didStopUsingParser;
-
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBParser : NSObject <IMBParserProtocol>
+@interface IMBParserFactory : NSObject <NSCoding>
 {
-	@private
-	
-	NSString* _identifier;
 	NSString* _mediaType;
 	NSURL* _mediaSource;
+	BOOL _isUserAdded;
+	
+	XPCConnection* _connection;
 }
 
-// Helpers for subclasses...
+// Properties that uniquely define each factory...
 
-- (NSString*) identifierForPath:(NSString*)inPath;
++ (NSString*) mediaType;								// See IMBCommon.h for available types
++ (Class) parserClass;									// For instantiating parsers
++ (NSString*) identifier;								// Used in delegate methods and for connecting to XPC service
 
-//- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions;
+@property (copy) NSString* mediaType;					// See IMBCommon.h for available types
+@property (retain) NSURL* mediaSource;					// Source of given media objects
+@property BOOL isUserAdded;								// User added items can also be removed by the user again
 
+// For communicating with the XPC service...
+
+@property (retain,readonly) XPCConnection* connection;	// Used internally...
+
+// Returns an array of new (unpopulated) top level nodes. This method is only called on the XPC service side...
+
+- (NSMutableArray*) unpopulatedTopLevelNodesWitError:(NSError**)outError;
+
+// This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses  
+// may opt to return more than one instance (e.g. Aperture may create one instance per library). This method
+// is only called on the XPC service side...
+
+- (NSArray*) parserInstancesWithError:(NSError**)outError;
+
+// Called when the user right-clicks in the iMedia UI. Here the IMBParserFactory has a chance to add custom   
+// menu items of its own, that go beyond the functionality of the standard items added by the controllers.
+// These methods are only called on the host app side...
+
+- (void) willShowContextMenu:(NSMenu*)ioMenu forNode:(IMBNode*)inNode;
+- (void) willShowContextMenu:(NSMenu*)ioMenu forObject:(IMBObject*)inObject;
+
+// Nodes that do not want the standard object views can use custom user intefaces. The following methods   
+// provide the mechanics of creating custom view controllers Subclasses should override them to return an   
+// appropriate view controller. These methods are only called on the host app side...
+
+- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode;
+
+//- (BOOL) shouldDisplayObjectViewForNode:(IMBNode*)inNode;	
+
+// Helpers...
+
+//- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
+//- (void) invalidateThumbnails;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
 

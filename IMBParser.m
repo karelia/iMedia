@@ -53,15 +53,15 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
-#import "IMBNode.h"
-#import "IMBObject.h"
-#import "IMBObjectsPromise.h"
-#import "IMBLibraryController.h"
-#import "NSString+iMedia.h"
-#import "NSData+SKExtensions.h"
-#import <Quartz/Quartz.h>
-#import <QTKit/QTKit.h>
-#import "NSURL+iMedia.h"
+//#import "IMBNode.h"
+//#import "IMBObject.h"
+//#import "IMBObjectsPromise.h"
+//#import "IMBLibraryController.h"
+//#import "NSString+iMedia.h"
+//#import "NSData+SKExtensions.h"
+//#import <Quartz/Quartz.h>
+//#import <QTKit/QTKit.h>
+//#import "NSURL+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,8 +71,8 @@
 
 @interface IMBParser ()
 
-- (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL;
-- (CGImageRef) _imageForURL:(NSURL*)inURL;
+//+ (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL;
+//+ (CGImageRef) _imageForURL:(NSURL*)inURL;
 
 @end
 
@@ -84,9 +84,9 @@
 
 @implementation IMBParser
 
-@synthesize mediaSource = _mediaSource;
+@synthesize identifier = _identifier;
 @synthesize mediaType = _mediaType;
-@synthesize custom = _custom;
+@synthesize mediaSource = _mediaSource;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -94,28 +94,14 @@
 
 #pragma mark 
 
-// The default implementation just returns a single parser instance. Subclasses like iPhoto, Aperture, or Lightroom
-// may opt to return multiple instances (preconfigured with correct mediaSource) if multiple libraries are detected...
 
-+ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
-{
-	IMBParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-	NSArray* parserInstances = [NSArray arrayWithObject:parser];
-	[parser release];
-	return parserInstances;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) initWithMediaType:(NSString*)inMediaType
+- (id) init
 {
 	if (self = [super init])
 	{
+		self.identifier = nil;
+		self.mediaType = nil;
 		self.mediaSource = nil;
-		_mediaType = [inMediaType copy];
-		self.custom = NO;
 	}
 	
 	return self;
@@ -124,9 +110,9 @@
 
 - (void) dealloc
 {
+	IMBRelease(_identifier);
 	IMBRelease(_mediaSource);
 	IMBRelease(_mediaType);
-
 	[super dealloc];
 }
 
@@ -135,45 +121,43 @@
 
 
 #pragma mark 
-
-// Convenience method
-
-- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier
-{
-	IMBLibraryController* libraryController =
-	[IMBLibraryController sharedLibraryControllerWithMediaType:[self mediaType]];
-	
-	return [libraryController nodeWithIdentifier:inIdentifier];
-}
+#pragma mark Node Creation
 
 
-// The following two methods must be overridden by subclasses...
+// To be overridden by subclasses...
 
-- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
+- (IMBNode*) unpopulatedTopLevelNodeWithError:(NSError**)outError
 {
 	return nil;
 }
 
 
-- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	return NO;
+	return nil;
+}
+
+
+- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	return nil;
+}
+
+
+- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	return nil;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Optional methods that do nothing in the base class and can be overridden in subclasses, e.g. to update  
-// or get rid of cached data...
+// Optional methods that do nothing in the base class and can be overridden in subclasses, e.g. to   
+// updateor get rid of cached data...
 
-- (BOOL)canBeUsed;
-{
-	return YES;
-}
-
-
-- (void) willUseParser
+/*
+- (void) willStartUsingParser
 {
 
 }
@@ -183,62 +167,59 @@
 {
 
 }
+*/
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) watchedPathDidChange:(NSString*)inWatchedPath
+#pragma mark
+#pragma mark Object Access
+
+
+// To be overridden by subclasses...
+
+- (NSData*) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-
+	return nil;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This helper method can be used by subclasses to construct identifiers of form "classname://path/to/node"...
- 
-- (NSString*) identifierForPath:(NSString*)inPath
+// To be overridden by subclasses...
+
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	NSString* parserClassName = NSStringFromClass([self class]);
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
-}
-
-
-+ (NSString*) identifierForPath:(NSString*)inPath
-{
-	NSString* parserClassName = NSStringFromClass(self);
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
-
+	return nil;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This method can be overridden by subclasses if the default promise is not useful...
+// To be overridden by subclasses...
 
-- (IMBObjectsPromise*) objectPromiseWithObjects:(NSArray*)inObjects
+- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return [IMBObjectsPromise promiseWithLocalIMBObjects:inObjects];
+	return nil;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-#pragma mark 
-
-
-- (id) loadThumbnailForObject:(IMBObject*)inObject
+/*
++ (id) loadThumbnailForObject:(IMBObject*)ioObject
 {
 	id imageRepresentation = nil;
-	NSString* type = inObject.imageRepresentationType;
+	NSString* type = ioObject.imageRepresentationType;
 	NSString* path = nil;
 	NSURL* url = nil;
 	
 	// Get path/url location of our object...
 	
-	id location = inObject.imageLocation;
-	if (location == nil) location = inObject.location;
+	id location = ioObject.imageLocation;
+	if (location == nil) location = ioObject.location;
 
 	if ([location isKindOfClass:[NSString class]])
 	{
@@ -288,9 +269,9 @@
 		// If this is the type, we should already have an image representation, so let's try NOT 
 		// doing this code that was here before.
 		// So just leave the imageRepresentation here nil so it doesn't get set.
-		if (!inObject.imageRepresentation)
+		if (!ioObject.imageRepresentation)
 		{
-			NSLog(@"##### %p Warning; IKImageBrowserNSImageRepresentationType with a nil imageRepresentation", inObject);
+			NSLog(@"##### %p Warning; IKImageBrowserNSImageRepresentationType with a nil imageRepresentation",ioObject);
 		}
 		
 //		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
@@ -360,7 +341,7 @@
 	
 	if (imageRepresentation)
 	{
-		[inObject 
+		[ioObject 
 			performSelectorOnMainThread:@selector(setImageRepresentation:) 
 			withObject:imageRepresentation 
 			waitUntilDone:NO 
@@ -369,45 +350,7 @@
 	
 	return imageRepresentation;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) loadMetadataForObject:(IMBObject*)inObject
-{
-	// to be overridden by subclasses. This method may be called on a background thread, so subclasses need to
-	// take appropriate safety measures...
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Invalidate the thumbnails for all object in this node tree. That way thumbnails are forced to be re-generated...
-
-- (void) invalidateThumbnailsForNode:(IMBNode*)inNode
-{
-	for (IMBNode* node in inNode.subNodes)
-	{
-		[self invalidateThumbnailsForNode:node];
-	}
-	
-	for (IMBObject* object in inNode.objects)
-	{
-		object.needsImageRepresentation = YES;
-		object.imageVersion = object.imageVersion + 1;
-	}
-}
-
-
-- (void) invalidateThumbnails
-{
-	IMBLibraryController* controller = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
-	IMBNode* rootNode = [controller topLevelNodeForParser:self];
-	[self invalidateThumbnailsForNode:rootNode];
-}
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -415,70 +358,30 @@
 // This helper method makes sure that the new node tree is pre-populated as deep as the old one was. Obviously
 // this is a recursive method that descends into the tree as far as necessary to recreate the state...
 
-- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions
-{
-	NSError* error = nil;
-	
-	if (inOldNode.isPopulated)
-	{
-        [self populateNode:inNewNode options:inOptions error:&error];
-		
-		for (IMBNode* oldSubNode in inOldNode.subNodes)
-		{
-			NSString* identifier = oldSubNode.identifier;
-			IMBNode* newSubNode = [inNewNode subNodeWithIdentifier:identifier];
-			[self populateNewNode:newSubNode likeOldNode:oldSubNode options:inOptions];
-		}
-	}
-}
+//- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions
+//{
+//	NSError* error = nil;
+//	
+//	if (inOldNode.isPopulated)
+//	{
+//		[self populateNode:inNewNode options:inOptions error:&error];
+//		
+//		for (IMBNode* oldSubnode in inOldNode.subnodes)
+//		{
+//			NSString* identifier = oldSubnode.identifier;
+//			IMBNode* newSubnode = [inNewNode subnodeWithIdentifier:identifier];
+//			[self populateNewNode:newSubnode likeOldNode:oldSubnode options:inOptions];
+//		}
+//	}
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark
-#pragma mark Custom Object UI
-
-
-// Controls whether object views should be installed for a given node. Can be overridden by parser subclasses...
-
-- (BOOL) shouldDisplayObjectViewForNode:(IMBNode*)inNode
-{
-	return YES;
-}
-
-
-// If a parser subclass wants custom UI for a specific node, then is should override one of the following methods...
-
-
-- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode
-{
-	return nil;
-}
-
-
-- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode
-{
-	return nil;
-}
-
-
-- (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode
-{
-	return nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark
-#pragma mark Helpers
 
 
 // Returns an autoreleased source for the given url...
-
-- (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL
+/*
++ (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL
 {
 	CGImageSourceRef source = NULL;
 	
@@ -491,11 +394,11 @@
 	
 	return source;
 }
-
+*/
 	
 // Returns an autoreleased image for the given url...
-
-- (CGImageRef) _imageForURL:(NSURL*)inURL
+/*
++ (CGImageRef) _imageForURL:(NSURL*)inURL
 {
 	CGImageRef image = NULL;
 	
@@ -519,9 +422,27 @@
 	
 	return image;
 }	
+*/
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Helpers
+
+
+// This helper method can be used by subclasses to construct identifiers of form "classname://path/to/node"...
+ 
+- (NSString*) identifierForPath:(NSString*)inPath
+{
+	NSString* parserClassName = NSStringFromClass([self class]);
+	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 @end
+
+

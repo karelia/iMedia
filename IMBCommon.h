@@ -127,6 +127,15 @@ typedef NSUInteger IMBGroupType;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark TYPES
+
+//#define IMBCompletionBlock XPCReturnValueHandler
+typedef void (^IMBCompletionBlock)(id inResult,NSError* inError);
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark MACROS
 
 #ifndef IMBRelease
@@ -145,13 +154,20 @@ typedef NSUInteger IMBGroupType;
 // Version checks in a centralized location for easy safe-adoption of features conditional on running OS version
 
 #ifndef NSAppKitVersionNumber10_6
-#define NSAppKitVersionNumber10_6 1000	// NOTE(jalkut): I don't think this is exactly right, my 10.6.1 system reports 1038.1,
-										// but it's "good enough" in that it's higher than 10.5's version of 949.x,
-										// and it was the constant already in use in the source code.
-										// (I'm guessing it was a pre-GM Snow Leopard version number)
+#define NSAppKitVersionNumber10_6 1038
+#endif
+
+#ifndef NSAppKitVersionNumber10_7
+#define NSAppKitVersionNumber10_7 1138
+#endif
+
+#ifndef NSAppKitVersionNumber10_7_2
+#define NSAppKitVersionNumber10_7_2 1138.23
 #endif
 
 #define IMBRunningOnSnowLeopardOrNewer()	(NSAppKitVersionNumber >= NSAppKitVersionNumber10_6)
+#define IMBRunningOnLionOrNewer()			(NSAppKitVersionNumber >= NSAppKitVersionNumber10_7)
+#define IMBRunningOnLion1073OrNewer()		(NSAppKitVersionNumber > NSAppKitVersionNumber10_7_2)
 
 #define IMB_COMPILING_WITH_LION_OR_NEWER_SDK  defined(MAC_OS_X_VERSION_10_7)
 #define IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK  defined(MAC_OS_X_VERSION_10_6)
@@ -193,7 +209,8 @@ typedef NSUInteger IMBGroupType;
 
 // Flickr sizes
 
-typedef enum { 
+typedef enum
+{ 
 	kIMBFlickrSizeSpecifierOriginal = 0,
 	kIMBFlickrSizeSpecifierSmall,		// 240 longest
 	kIMBFlickrSizeSpecifierMedium,		// 500 longest
