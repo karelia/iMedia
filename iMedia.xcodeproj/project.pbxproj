@@ -766,10 +766,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				D09933AF1011B2CD00C527B7 /* Cocoa.framework in Frameworks */,
-				D099335C1011B28500C527B7 /* iMedia.framework in Frameworks */,
-				CEF695C91064341C005D7E72 /* Security.framework in Frameworks */,
-				30394AB612DC64B400ACA531 /* ObjectiveFlickr.framework in Frameworks */,
 				3043924B130D1DDC00DD1D34 /* Quartz.framework in Frameworks */,
+				CEF695C91064341C005D7E72 /* Security.framework in Frameworks */,
+				D099335C1011B28500C527B7 /* iMedia.framework in Frameworks */,
+				30394AB612DC64B400ACA531 /* ObjectiveFlickr.framework in Frameworks */,
 				D0CB91931510A46A007716FA /* XPCKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -790,7 +790,6 @@
 		0867D691FE84028FC02AAC07 /* iMedia */ = {
 			isa = PBXGroup;
 			children = (
-				D0CB91941510A48E007716FA /* XPCKit.framework */,
 				D0760AC210C5027100F2119C /* IMBProject.xcconfig */,
 				D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */,
 				D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */,
@@ -877,6 +876,7 @@
 			children = (
 				30FFEBEE150A08DB0009C1D0 /* Foundation.framework */,
 				D0F207C5150A23AA007E6FA2 /* XPCKit.framework */,
+				D0CB91941510A48E007716FA /* XPCKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2101,6 +2101,7 @@
 				GCC_ENABLE_OBJC_GC = unsupported;
 				INFOPLIST_FILE = "TestApp-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -2122,6 +2123,7 @@
 				GCC_ENABLE_OBJC_GC = unsupported;
 				INFOPLIST_FILE = "TestApp-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -2142,6 +2144,7 @@
 				);
 				INFOPLIST_FILE = "TestApp-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
