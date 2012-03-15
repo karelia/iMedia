@@ -139,7 +139,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Private controller methods...
 
-//@interface IMBLibraryController ()
+@interface IMBLibraryController ()
+- (void) _loadUnpopulatedTopLevelNodes;
+- (void) _reloadExistingNodes;
 //- (void) _didCreateNode:(IMBNode*)inNode;
 //- (void) _didPopulateNode:(IMBNode*)inNode;
 //- (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
@@ -149,7 +151,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //- (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
 //- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
 //- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume;
-//@end
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -419,7 +421,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 #pragma mark 
-#pragma mark Creating Nodes
+#pragma mark Loading Nodes
+
 
 - (void) reload
 {
@@ -427,6 +430,17 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	if (self.subnodes == nil)
 	{
+		[self _loadUnpopulatedTopLevelNodes];
+	}
+	else 
+	{
+		[self _reloadExistingNodes];
+	}
+}
+
+
+- (void) _loadUnpopulatedTopLevelNodes
+{
 		NSArray* factories = [[IMBParserController sharedParserController] loadedParserFactoriesForMediaType:self.mediaType];
 
 		for (IMBParserFactory* factory in factories)
@@ -441,30 +455,38 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					}
 					else if (inNodes)
 					{
-						// Insert new node into self.subnodes...
-						
-						// JUST TEMP: for testing sandbox, remove these 3 lines later...
-						
-						IMBNode* node = [inNodes lastObject];
-						NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:node.mediaSource];
-						if (plist == nil) NSLog(@"SANDBOX ACTIVE");
+						for (IMBNode* node in inNodes)
+						{
+							node.parserFactory = factory;
+							// TODO: Insert node into self.subnodes...
+
+							// JUST TEMP: for testing sandbox, remove these 2 lines later...
+							NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:node.mediaSource];
+							if (plist == nil) NSLog(@"SANDBOX ACTIVE");
+						}
 					}
 				});		
 		}
-	}
-	else 
+}
+
+
+- (void) _reloadExistingNodes
+{
+	for (IMBNode* oldNode in self.subnodes)
 	{
-//		for (IMBNode* oldNode in self.subnodes)
-//		{
-//			XPCPerformSelectorAsync(factory.connection,factory,@selector(reloadNode:),oldNode,
-//			
-//				^(IMBNode* newNode,NSError* inError)
-//				{
-//					// Replace old with new node...
-//				});		
-//		}
+		IMBParserFactory* factory = oldNode.parserFactory;
+		XPCPerformSelectorAsync(factory.connection,factory,@selector(reloadNode:error:),oldNode,
+		
+			^(IMBNode* newNode,NSError* inError)
+			{
+				newNode.parserFactory = factory;
+				// TODO: Replace old with new node...
+			});		
 	}
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 
