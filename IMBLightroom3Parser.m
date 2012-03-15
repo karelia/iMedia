@@ -543,6 +543,8 @@
 	
 	if (needToCopyFile) {
 		(void) [fileManager removeItemAtPath:readOnlyDatabasePath error:&error];
+        
+        error = nil;    // needed for if either path is nil
 		BOOL copied = (nil != databasePath)
 					&& (nil != readOnlyDatabasePath)
 					&& [fileManager copyItemAtPath:databasePath toPath:readOnlyDatabasePath error:&error];
