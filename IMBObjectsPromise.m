@@ -750,8 +750,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	{
 		if ([url isFileURL])
         {
-            NSError* error = nil;
-            [mgr removeItemAtPath:[url path] error:&error];
+            [mgr removeItemAtPath:[url path] error:NULL];
         }
 	}
 	
