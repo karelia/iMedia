@@ -54,7 +54,7 @@
 
 #import "IMBNode.h"
 //#import "IMBObject.h"
-//#import "IMBParser.h"
+#import "IMBParserFactory.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
 
@@ -84,7 +84,6 @@
 @synthesize identifier = _identifier;
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
-@synthesize parserIdentifier = _parserIdentifier;
 
 @synthesize parentNode = _parentNode;
 @synthesize subnodes = _subnodes;
@@ -102,10 +101,13 @@
 @synthesize includedInPopup = _includedInPopup;
 @synthesize isUserAdded = _isUserAdded;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
+@synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
 
-// Support for live watching...
+// Info about our parser...
 
-//@synthesize parser = _parser;
+@synthesize parserIdentifier = _parserIdentifier;
+@synthesize parserFactory = _parserFactory;
+
 //@synthesize watcherType = _watcherType;
 //@synthesize watchedPath = _watchedPath;
 
@@ -115,13 +117,6 @@
 @synthesize badgeTypeMouseover = _badgeTypeMouseover;
 @synthesize badgeTarget = _badgeTarget;
 @synthesize badgeSelector = _badgeSelector;
-
-// Custom object views...
-
-@synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
-@synthesize customHeaderViewController = _customHeaderViewController;
-@synthesize customObjectViewController = _customObjectViewController;
-@synthesize customFooterViewController = _customFooterViewController;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -141,18 +136,14 @@
 		self.group = NO;
 		self.leaf = NO;
 		self.loading = NO;
-		self.wantsRecursiveObjects = NO;
-		self.includedInPopup = YES;
 		self.isUserAdded = NO;
+		self.includedInPopup = YES;
+		self.wantsRecursiveObjects = NO;
+		self.shouldDisplayObjectView = YES;
 		
 //		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
-		
-		self.shouldDisplayObjectView = YES;
-		self.customHeaderViewController = nil;
-		self.customObjectViewController = nil;
-		self.customFooterViewController = nil;
 	}
 	
 	return self;
@@ -168,11 +159,11 @@
 	IMBRelease(_identifier);
 	IMBRelease(_mediaType);
 	IMBRelease(_mediaSource);
-	IMBRelease(_parserIdentifier);
 	IMBRelease(_subnodes);
 	IMBRelease(_objects);
 	IMBRelease(_attributes);
-//	IMBRelease(_parser);
+	IMBRelease(_parserFactory);
+	IMBRelease(_parserIdentifier);
 //	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
 	
@@ -192,23 +183,22 @@
 	copy.identifier = self.identifier;
 	copy.mediaType = self.mediaType;
 	copy.mediaSource = self.mediaSource;
-	copy.parserIdentifier = self.parserIdentifier;
-
-//	copy.parentNode = self.parentNode;			// Removed to avoid potentially dangling pointers (parentNode in not retained!)
 
 	copy.attributes = self.attributes;
 	copy.groupType = self.groupType;
 	copy.displayPriority = self.displayPriority;
 	copy.displayedObjectCount = self.displayedObjectCount;
-	
 	copy.isTopLevelNode = self.isTopLevelNode;
 	copy.group = self.group;
 	copy.leaf = self.leaf;
 	copy.loading = self.loading;
 	copy.includedInPopup = self.includedInPopup;
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
+	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
 	
-//	copy.parser = self.parser;
+	copy.parserFactory = self.parserFactory;
+	copy.parserIdentifier = self.parserIdentifier;
+	
 //	copy.watcherType = self.watcherType;
 //	copy.watchedPath = self.watchedPath;
 
@@ -216,11 +206,6 @@
 	copy.badgeTypeMouseover = self.badgeTypeMouseover;
 	copy.badgeTarget = self.badgeTarget;
 	copy.badgeSelector = self.badgeSelector;
-	
-	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
-	copy.customHeaderViewController = self.customHeaderViewController;
-	copy.customObjectViewController = self.customObjectViewController;
-	copy.customFooterViewController = self.customFooterViewController;
 	
 	// Create a shallow copy of objects array...
 	
@@ -282,11 +267,7 @@
 		self.includedInPopup = [inCoder decodeBoolForKey:@"includedInPopup"];
 		self.isUserAdded = [inCoder decodeBoolForKey:@"isUserAdded"];
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
-
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
-		self.customHeaderViewController = [inCoder decodeObjectForKey:@"customHeaderViewController"];
-		self.customObjectViewController = [inCoder decodeObjectForKey:@"customObjectViewController"];
-		self.customFooterViewController = [inCoder decodeObjectForKey:@"customFooterViewController"];
 
 		#warning TODO subnodes and objects
 	}
@@ -315,11 +296,7 @@
 	[inCoder encodeBool:self.includedInPopup forKey:@"includedInPopup"];
 	[inCoder encodeBool:self.isUserAdded forKey:@"isUserAdded"];
 	[inCoder encodeBool:self.wantsRecursiveObjects forKey:@"wantsRecursiveObjects"];
-
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
-	[inCoder encodeObject:self.customHeaderViewController forKey:@"customHeaderViewController"];
-	[inCoder encodeObject:self.customObjectViewController forKey:@"customObjectViewController"];
-	[inCoder encodeObject:self.customFooterViewController forKey:@"customFooterViewController"];
 	
 	#warning TODO subnodes and objects
 }

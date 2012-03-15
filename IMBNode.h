@@ -61,7 +61,7 @@
 #pragma mark CLASSES
 
 @class IMBObject;
-//@class IMBParser;
+@class IMBParserFactory;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,7 +78,6 @@
 	NSString* _identifier;
 	NSString* _mediaType;
 	NSURL* _mediaSource;
-	NSString* _parserIdentifier;
 	
 	IMBNode* _parentNode;	// not retained!
 	NSArray* _subnodes;
@@ -97,8 +96,13 @@
 	BOOL _includedInPopup;
 	BOOL _isUserAdded;
 	BOOL _wantsRecursiveObjects;
+	BOOL _shouldDisplayObjectView;
 	
-//	IMBParser* _parser;
+	// Info about our parser...
+	
+	IMBParserFactory* _parserFactory;
+	NSString* _parserIdentifier;
+
 //	IMBWatcherType _watcherType;
 //	NSString* _watchedPath;
 
@@ -108,13 +112,6 @@
 	IMBBadgeType _badgeTypeMouseover;
 	id _badgeTarget;
 	SEL _badgeSelector;
-
-	// Custom object views...
-	
-	BOOL _shouldDisplayObjectView;
-	NSViewController* _customHeaderViewController;
-	NSViewController* _customObjectViewController;
-	NSViewController* _customFooterViewController;
 }
 
 // Primary properties for a node:
@@ -124,11 +121,11 @@
 @property (copy) NSString* identifier;				// Unique identifier of form parserClassName://path/to/node
 @property (retain) NSString* mediaType;				// See IMBCommon.h
 @property (retain) NSURL* mediaSource;				// Only toplevel nodes need this property
-@property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
 
 @property (retain) NSDictionary* attributes;		// Optional metadata about a node
 @property (assign) NSUInteger groupType;			// Used for grouping toplevel nodes
 @property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
+@property (assign) BOOL shouldDisplayObjectView;	
 
 // Node tree accessors. If the subnodes property is nil, that doesn't mean that there are no subnodes - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
@@ -171,9 +168,11 @@
 @property (assign) BOOL isUserAdded;
 @property (assign) BOOL wantsRecursiveObjects;
 
-// Support for live watching and asynchronous nodes
+// Info about our parser...
 
-//@property (retain) IMBParser* parser;
+@property (retain) IMBParserFactory* parserFactory;
+@property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
+
 //@property (assign) IMBWatcherType watcherType;
 //@property (copy) NSString* watchedPath;
 
@@ -184,13 +183,6 @@
 @property (assign) IMBBadgeType badgeTypeMouseover;
 @property (retain) id badgeTarget;
 @property (assign) SEL badgeSelector;
-
-// Indicates whether a node wants to display an object view. Default is YES, but can be changed...
-
-@property (assign) BOOL shouldDisplayObjectView;	
-@property (assign) NSViewController* customHeaderViewController;	
-@property (assign) NSViewController* customObjectViewController;	
-@property (assign) NSViewController* customFooterViewController;	
 
 // Helper methods
 
