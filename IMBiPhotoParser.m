@@ -81,14 +81,74 @@
 	node.icon = icon;
 	node.name = @"iPhoto";
 	node.identifier = [self identifierForPath:@"/"];
-	node.mediaSource = self.mediaSource;
 	node.mediaType = self.mediaType;
+	node.mediaSource = self.mediaSource;
+	node.parserIdentifier = self.identifier;
 	node.groupType = kIMBGroupTypeLibrary;
 	node.isTopLevelNode = YES;
 	node.group = NO;
 	node.leaf = NO;
 	
+	// JUST TEMP: remove these 2 lines later...
+	
+//	NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:self.mediaSource];
+//	node.attributes = plist;
+	
 	return node;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	return inNode;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	return inNode;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	return inNode;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSData*) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return nil;
 }
 
 

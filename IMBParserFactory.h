@@ -62,6 +62,7 @@
 
 @class IMBNode;
 @class IMBObject;
+@class IMBParser;
 @class XPCConnection;
 
 
@@ -94,15 +95,18 @@
 
 @property (retain,readonly) XPCConnection* connection;	// Used internally...
 
-// Returns an array of new (unpopulated) top level nodes. This method is only called on the XPC service side...
-
-- (NSMutableArray*) unpopulatedTopLevelNodesWitError:(NSError**)outError;
-
 // This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses  
 // may opt to return more than one instance (e.g. Aperture may create one instance per library). This method
 // is only called on the XPC service side...
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError;
+- (IMBParser*) parserWithIdentifier:(NSString*)inIdentifier;
+
+// Returns an array of new (unpopulated) top level nodes. This method is only called on the XPC service side...
+
+- (NSMutableArray*) unpopulatedTopLevelNodesWithError:(NSError**)outError;
+
+- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError;
 
 // Called when the user right-clicks in the iMedia UI. Here the IMBParserFactory has a chance to add custom   
 // menu items of its own, that go beyond the functionality of the standard items added by the controllers.

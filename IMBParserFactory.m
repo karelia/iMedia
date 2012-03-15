@@ -54,6 +54,7 @@
 
 #import "IMBParserFactory.h"
 #import "IMBParser.h"
+#import "IMBNode.h"
 #import <XPCKit/XPCKit.h>
 #import <XPCKit/SBUtilities.h>
 
@@ -167,82 +168,55 @@
 
 
 #pragma mark
-#pragma mark Toplevel Nodes
+#pragma mark Parser Work
 
 
-- (void) topLevelNodesWithCompletionBlock:(IMBCompletionBlock)inCompletionBlock
+// This method is called on the XPC service side. The default implementation just returns a single parser instance. 
+// Subclasses like iPhoto, Aperture, or Lightroom may opt to return multiple instances (preconfigured with correct 
+// mediaSource) if multiple libraries are detected...
+
+- (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-	XPCPerformSelectorAsync(self.connection,self,@selector(unpopulatedTopLevelNodesWitError:),nil,inCompletionBlock);
-							 
-							 
-//	// Copy completion block onto the heap to make it stick around until we need it...
-//	
-//	IMBCompletionBlock completionBlock = [inCompletionBlock copy];
-//
-//	// If we are running sandboxed on Lion (or newer), then send a request for the top-level nodes to our XPC
-//	// service and once the results come in, hand them to the supplied completion block. In case of an error 
-//	// or crash call the error block instead...
-//	
-//	if (SBIsSandboxed())
-//	{
-//		XPCMessage* message = [XPCMessage messageWithObjectsAndKeys:
-//			self,@"IMBParserFactory",
-//			@"topLevelNodes",@"operation",
-//			nil];
-//
-//		[self.connection sendMessage:message withReply:^(XPCMessage* inReply)
-//		{
-//			id result = [inReply objectForKey:@"result"];
-//			NSError* error = [inReply objectForKey:@"error"];
-//			
-//			completionBlock(result,error);
-//			[completionBlock release];
-//		}
-//		errorHandler:^(NSError* inError)
-//		{
-//			completionBlock(nil,inError);
-//			[completionBlock release];
-//		}];
-//	}
-//	
-//	// If we are not sandboxed (e.g. running on Snow Leopard) we'll just do the work inside our own process,
-//	// but asynchronously via GCD queues. Once again the result is handed over to the completion block...
-//	
-//	else
-//	{
-//		dispatch_queue_t currentQueue = dispatch_get_current_queue();
-//		dispatch_retain(currentQueue);
-//		
-//		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0),^()
-//		{
-//			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-//			NSError* error = nil;
-//			NSArray* parsers = [self parserInstancesWithError:&error];
-//			NSMutableArray* topLevelNodes = [NSMutableArray arrayWithCapacity:parsers.count];
-//			
-//			for (IMBParser* parser in parsers)
-//			{
-//				if (error == nil)
-//				{
-//					IMBNode* node = [parser unpopulatedTopLevelNodeWithError:&error];
-//					[topLevelNodes addObject:node];
-//				}
-//			}
-//			
-//			dispatch_async(currentQueue,^()
-//			{
-//				completionBlock(topLevelNodes,error);
-//				[completionBlock release];
-//				dispatch_release(currentQueue);
-//			});
-//			
-//			[pool release];
-//		});
-//	}
+	Class parserClass = [[self class] parserClass];
+	
+	IMBParser* parser = [[parserClass alloc] init];
+	parser.identifier = [[self class] identifier];
+	parser.mediaType = self.mediaType;
+	parser.mediaSource = self.mediaSource;
+	
+	NSArray* parsers = [NSArray arrayWithObject:parser];
+	[parser release];
+	
+	return parsers;
 }
 
 
-- (NSArray*) unpopulatedTopLevelNodesWitError:(NSError**)outError
+// Returns a particular parser with given identifier...
+
+- (IMBParser*) parserWithIdentifier:(NSString*)inIdentifier
+{
+	NSError* error = nil;
+	NSArray* parsers = [self parserInstancesWithError:&error];
+	
+	if (error == nil)
+	{
+		for (IMBParser* parser in parsers)
+		{
+			if ([parser.identifier isEqualToString:inIdentifier])
+			{
+				return parser;
+			}
+		}
+	}
+	
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSArray*) unpopulatedTopLevelNodesWithError:(NSError**)outError
 {
 	NSError* error = nil;
 	NSMutableArray* topLevelNodes = nil;
@@ -270,23 +244,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This method is called on the XPC service side. The default implementation just returns a single parser instance. 
-// Subclasses like iPhoto, Aperture, or Lightroom may opt to return multiple instances (preconfigured with correct 
-// mediaSource) if multiple libraries are detected...
-
-- (NSArray*) parserInstancesWithError:(NSError**)outError
+- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	Class parserClass = [[self class] parserClass];
-	
-	IMBParser* parser = [[parserClass alloc] init];
-	parser.identifier = [[self class] identifier];
-	parser.mediaType = self.mediaType;
-	parser.mediaSource = self.mediaSource;
-	
-	NSArray* parsers = [NSArray arrayWithObject:parser];
-	[parser release];
-	
-	return parsers;
+	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
+	IMBNode* newNode = [parser reloadNode:inNode error:outError];
+	return newNode;
 }
 
 
