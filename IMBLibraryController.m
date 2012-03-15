@@ -67,7 +67,7 @@
 //#import "IMBMovieFolderParser.h"
 #import "NSWorkspace+iMedia.h"
 #import <XPCKit/XPCKit.h>
-#import <XPCKit/SBUtilities.h>
+#import "SBUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------

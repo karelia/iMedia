@@ -60,7 +60,7 @@
 #import "NSFileManager+iMedia.h"
 #import "IMBConfig.h"
 
-#import <XPCKit/SBUtilities.h>
+#import "SBUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------

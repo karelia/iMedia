@@ -55,7 +55,7 @@
 #import "IMBParserFactory.h"
 #import "IMBParser.h"
 #import <XPCKit/XPCKit.h>
-#import <XPCKit/SBUtilities.h>
+#import "SBUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
