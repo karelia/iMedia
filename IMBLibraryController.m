@@ -274,12 +274,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	if (self.isCancelled == NO)
 	{
-		NSError* error = nil;
-        
 		// This was using _paser ivar directly before with indication given as to it being necessary, so I'm switching to the proper accessor to see if it fixes my crash - Mike Abdullah
         IMBParser *parser = [self parser];
         [parser willUseParser];
 		
+        NSError* error = nil;
         if ([parser populateNode:self.newNode options:self.options error:&error])
 		{
 			[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.newNode];
