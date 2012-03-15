@@ -76,8 +76,9 @@
 	NSImage* _icon;
 	NSString* _name;
 	NSString* _identifier;
-	NSURL* _mediaSource;
 	NSString* _mediaType;
+	NSURL* _mediaSource;
+	NSString* _parserIdentifier;
 	
 	IMBNode* _parentNode;	// not retained!
 	NSArray* _subnodes;
@@ -121,8 +122,10 @@
 @property (retain) NSImage* icon;					// 16x16 icon for user interface
 @property (copy) NSString* name;					// Display name for user interface
 @property (copy) NSString* identifier;				// Unique identifier of form parserClassName://path/to/node
-@property (copy) NSURL* mediaSource;				// Only toplevel nodes need this property
 @property (retain) NSString* mediaType;				// See IMBCommon.h
+@property (retain) NSURL* mediaSource;				// Only toplevel nodes need this property
+@property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
+
 @property (retain) NSDictionary* attributes;		// Optional metadata about a node
 @property (assign) NSUInteger groupType;			// Used for grouping toplevel nodes
 @property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list

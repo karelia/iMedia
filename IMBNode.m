@@ -82,8 +82,9 @@
 @synthesize icon = _icon;
 @synthesize name = _name;
 @synthesize identifier = _identifier;
-@synthesize mediaSource = _mediaSource;
 @synthesize mediaType = _mediaType;
+@synthesize mediaSource = _mediaSource;
+@synthesize parserIdentifier = _parserIdentifier;
 
 @synthesize parentNode = _parentNode;
 @synthesize subnodes = _subnodes;
@@ -165,8 +166,9 @@
 	IMBRelease(_icon);
 	IMBRelease(_name);
 	IMBRelease(_identifier);
-	IMBRelease(_mediaSource);
 	IMBRelease(_mediaType);
+	IMBRelease(_mediaSource);
+	IMBRelease(_parserIdentifier);
 	IMBRelease(_subnodes);
 	IMBRelease(_objects);
 	IMBRelease(_attributes);
@@ -188,8 +190,9 @@
 	copy.icon = self.icon;
 	copy.name = self.name;
 	copy.identifier = self.identifier;
-	copy.mediaSource = self.mediaSource;
 	copy.mediaType = self.mediaType;
+	copy.mediaSource = self.mediaSource;
+	copy.parserIdentifier = self.parserIdentifier;
 
 //	copy.parentNode = self.parentNode;			// Removed to avoid potentially dangling pointers (parentNode in not retained!)
 
@@ -264,8 +267,9 @@
 		self.icon = [inCoder decodeObjectForKey:@"icon"];
 		self.name = [inCoder decodeObjectForKey:@"name"];
 		self.identifier = [inCoder decodeObjectForKey:@"identifier"];
-		self.mediaSource = [inCoder decodeObjectForKey:@"mediaSource"];
 		self.mediaType = [inCoder decodeObjectForKey:@"mediaType"];
+		self.mediaSource = [inCoder decodeObjectForKey:@"mediaSource"];
+		self.parserIdentifier = [inCoder decodeObjectForKey:@"parserIdentifier"];
 
 		self.attributes = [inCoder decodeObjectForKey:@"attributes"];
 		self.groupType = [inCoder decodeIntegerForKey:@"groupType"];
@@ -296,8 +300,9 @@
 	[inCoder encodeObject:self.icon forKey:@"icon"];
 	[inCoder encodeObject:self.name forKey:@"name"];
 	[inCoder encodeObject:self.identifier forKey:@"identifier"];
-	[inCoder encodeObject:self.mediaSource forKey:@"mediaSource"];
 	[inCoder encodeObject:self.mediaType forKey:@"mediaType"];
+	[inCoder encodeObject:self.mediaSource forKey:@"mediaSource"];
+	[inCoder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
 	
 	[inCoder encodeObject:self.attributes forKey:@"attributes"];
 	[inCoder encodeInteger:self.groupType forKey:@"groupType"];
