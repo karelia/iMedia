@@ -528,12 +528,12 @@
 	if ([fileManager fileExistsAtPath:readOnlyDatabasePath]) {
 		error = nil;
 		NSDictionary *attributesOfCopy = [fileManager attributesOfItemAtPath:readOnlyDatabasePath error:&error];
-		if (error) NSLog (@"Unable to fetch attributes from %@: %@", readOnlyDatabasePath, error.localizedDescription);
+		if (!attributesOfCopy) NSLog (@"Unable to fetch attributes from %@: %@", readOnlyDatabasePath, error.localizedDescription);
 		NSDate *modDateOfCopy = [attributesOfCopy fileModificationDate];
 		
 		error = nil;
 		NSDictionary *attributesOfOrig = [fileManager attributesOfItemAtPath:databasePath error:&error];
-		if (error) NSLog (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
+		if (attributesOfOrig) NSLog (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
 		NSDate *modDateOfOrig = [attributesOfOrig fileModificationDate];
 		
 		if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy]) {
@@ -543,6 +543,8 @@
 	
 	if (needToCopyFile) {
 		(void) [fileManager removeItemAtPath:readOnlyDatabasePath error:&error];
+        
+        error = nil;    // needed for if either path is nil
 		BOOL copied = (nil != databasePath)
 					&& (nil != readOnlyDatabasePath)
 					&& [fileManager copyItemAtPath:databasePath toPath:readOnlyDatabasePath error:&error];

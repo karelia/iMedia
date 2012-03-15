@@ -352,7 +352,7 @@
 
 	// Start playing it...
 	
-	if (error == nil)
+	if (movie)
 	{
 		[movie gotoBeginning];
 		[movie play];
