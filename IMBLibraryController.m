@@ -431,7 +431,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 		for (IMBParserFactory* factory in factories)
 		{
-			XPCPerformSelectorAsync(factory.connection,factory,@selector(unpopulatedTopLevelNodesWitError:),nil,
+			XPCPerformSelectorAsync(factory.connection,factory,@selector(unpopulatedTopLevelNodesWithError:),nil,
 			
 				^(NSArray* inNodes,NSError* inError)
 				{
@@ -441,14 +441,28 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					}
 					else if (inNodes)
 					{
-						NSLog(@"%s NODES:\n\n%@",__FUNCTION__,inNodes);
+						// Insert new node into self.subnodes...
+						
+						// JUST TEMP: for testing sandbox, remove these 3 lines later...
+						
+						IMBNode* node = [inNodes lastObject];
+						NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:node.mediaSource];
+						if (plist == nil) NSLog(@"SANDBOX ACTIVE");
 					}
 				});		
 		}
 	}
 	else 
 	{
-
+//		for (IMBNode* oldNode in self.subnodes)
+//		{
+//			XPCPerformSelectorAsync(factory.connection,factory,@selector(reloadNode:),oldNode,
+//			
+//				^(IMBNode* newNode,NSError* inError)
+//				{
+//					// Replace old with new node...
+//				});		
+//		}
 	}
 }
 
