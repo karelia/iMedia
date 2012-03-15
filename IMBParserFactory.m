@@ -153,7 +153,7 @@
 
 - (XPCConnection*) connection
 {
-	if (_connection == nil /*&& SBIsSandboxed()*/)
+	if (_connection == nil && SBIsSandboxed())
 	{
 		NSString* identifier = [[self class] identifier];
 		_connection = [[XPCConnection alloc] initWithServiceName:identifier];
