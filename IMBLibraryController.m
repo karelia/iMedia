@@ -146,6 +146,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
 - (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume;
+- (void) _registerNodeForFileSystemNotificationsIfNeeded:(IMBNode*)theNode;
+- (void) _unregisterNodeForFileSystemNotificationsIfNeeded:(IMBNode*)theNode;
+- (void) _unregisterAllFileSystemNotifications;
 @end
 
 
@@ -428,7 +431,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	NSArray* parsers = [[IMBParserController sharedParserController] parsersForMediaType:self.mediaType];
 
 	// Unregister for any existing file system notifications
-	[self unregisterAllFileSystemNotifications];
+	[self _unregisterAllFileSystemNotifications];
 
 	[self willChangeValueForKey:@"rootNodes"];
 	[self.rootNodes removeAllObjects];
@@ -596,7 +599,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //
 // Note: Are KQueue type watches even used anymore? Maybe we can eliminate that.
 
-- (void) registerNodeForFileSystemNotificationsIfNeeded:(IMBNode*)theNode
+- (void) _registerNodeForFileSystemNotificationsIfNeeded:(IMBNode*)theNode
 {
 	NSString* watchedPath = theNode.watchedPath;
 	if (watchedPath)
@@ -608,7 +611,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 }
 
-- (void) unregisterNodeForFileSystemNotificationsIfNeeded:(IMBNode*)theNode
+- (void) _unregisterNodeForFileSystemNotificationsIfNeeded:(IMBNode*)theNode
 {
 	NSString* watchedPath = theNode.watchedPath;
 	if (watchedPath)
@@ -620,7 +623,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 }
 
-- (void) unregisterAllFileSystemNotifications
+- (void) _unregisterAllFileSystemNotifications
 {
 	[self.watcherUKKQueue removeAllPaths];
 	[self.watcherFSEvents removeAllPaths];
@@ -705,7 +708,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
         // Remove the old node from the correct place (but remember its index). Also unregister from file watching...
 
         NSUInteger index = NSNotFound;
-        NSString* watchedPath = nil;
 
         if (inOldNode)
         {
@@ -721,7 +723,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
                 inOldNode = [nodes objectAtIndex:index];
             }
 
-			[self unregisterNodeForFileSystemNotificationsIfNeeded:inOldNode];
+			[self _unregisterNodeForFileSystemNotificationsIfNeeded:inOldNode];
 
             if (index != NSNotFound)
             {
@@ -736,7 +738,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
             if (index == NSNotFound) index = nodes.count;
             [nodes insertObject:inNewNode atIndex:index];
 
-			[self registerNodeForFileSystemNotificationsIfNeeded:inNewNode];
+			[self _registerNodeForFileSystemNotificationsIfNeeded:inNewNode];
         }
 
         // Sort the nodes so that they always appear in the same (stable) order...
