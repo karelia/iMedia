@@ -136,6 +136,10 @@ extern NSString* kIMBNodesDidChangeNotification;
 // Loading...
 
 - (void) reload;
+- (void) populateSubnodesOfNode:(IMBNode*)inNode;
+- (void) populateObjectsOfNode:(IMBNode*)inNode;
+
+
 //- (void) reloadNode:(IMBNode*)inNode;
 //- (void) reloadNode:(IMBNode*)inNode parser:(IMBParser*)inParser; // Low-level method (use reloadNode: if possible)
 

@@ -141,25 +141,25 @@
 	
 	// Population of events, faces, photo stream and regular album node fundamentally different
 	
-	if ([self isEventsNode:inNode])
-	{
-		NSArray* events = [plist objectForKey:@"List of Rolls"];
-		[self populateEventsNode:inNode withEvents:events images:images];
-	} 
-	else if ([self isFacesNode:inNode])
-	{
-		NSDictionary* faces = [plist objectForKey:@"List of Faces"];
-		[self populateFacesNode:inNode withFaces:faces images:images];
-	} 
-	else if ([self isPhotoStreamNode:inNode])
-	{
-		[self populatePhotoStreamNode:inNode images:images];
-	} 
-	else
-	{
+//	if ([self isEventsNode:inNode])
+//	{
+//		NSArray* events = [plist objectForKey:@"List of Rolls"];
+//		[self populateEventsNode:inNode withEvents:events images:images];
+//	} 
+//	else if ([self isFacesNode:inNode])
+//	{
+//		NSDictionary* faces = [plist objectForKey:@"List of Faces"];
+//		[self populateFacesNode:inNode withFaces:faces images:images];
+//	} 
+//	else if ([self isPhotoStreamNode:inNode])
+//	{
+//		[self populatePhotoStreamNode:inNode images:images];
+//	} 
+//	else
+//	{
 		[self addSubNodesToNode:inNode albums:albums images:images]; 
-		[self populateAlbumNode:inNode images:images]; 
-	}
+//		[self populateAlbumNode:inNode images:images]; 
+//	}
 
 	// If we are populating the root nodes, then also populate the "Photos" node and mirror its
 	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,

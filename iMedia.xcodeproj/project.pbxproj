@@ -301,6 +301,12 @@
 		D0E96C3715132B0C004F3EE7 /* IMBObjectFifoCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D01038E31071E111007C88D7 /* IMBObjectFifoCache.m */; };
 		D0E96C3815133146004F3EE7 /* IMBSmartFolderNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA8A04A12D3EC70008CD7CB /* IMBSmartFolderNodeObject.m */; };
 		D0E96C3915133187004F3EE7 /* IMBNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D010384B10714CB3007C88D7 /* IMBNodeObject.m */; };
+		D0E96C3A15139874004F3EE7 /* NSString+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D099326810111DCB00C527B7 /* NSString+iMedia.m */; };
+		D0E96C3C1513988C004F3EE7 /* NSImage+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D049F0091034993E003CC49C /* NSImage+iMedia.m */; };
+		D0E96C3D15139892004F3EE7 /* NSView+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D0363E7B11D3787800E0579F /* NSView+iMedia.m */; };
+		D0E96C3E15139897004F3EE7 /* NSURL+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */; };
+		D0E96C3F151398BB004F3EE7 /* NSDictionary+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CE6E4211F6FD54005EE5B4 /* NSDictionary+iMedia.m */; };
+		D0E96C40151398CA004F3EE7 /* IMBTimecodeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CA961410498F7C00725DA3 /* IMBTimecodeTransformer.m */; };
 		D0E96D1C104410BD0015979F /* IMBPanelController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E96D1A104410BD0015979F /* IMBPanelController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0F207C6150A23AA007E6FA2 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0F207C5150A23AA007E6FA2 /* XPCKit.framework */; };
 		D0F207C7150A23BA007E6FA2 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
@@ -1884,6 +1890,12 @@
 				D0E96C3715132B0C004F3EE7 /* IMBObjectFifoCache.m in Sources */,
 				D0E96C3815133146004F3EE7 /* IMBSmartFolderNodeObject.m in Sources */,
 				D0E96C3915133187004F3EE7 /* IMBNodeObject.m in Sources */,
+				D0E96C3A15139874004F3EE7 /* NSString+iMedia.m in Sources */,
+				D0E96C3C1513988C004F3EE7 /* NSImage+iMedia.m in Sources */,
+				D0E96C3D15139892004F3EE7 /* NSView+iMedia.m in Sources */,
+				D0E96C3E15139897004F3EE7 /* NSURL+iMedia.m in Sources */,
+				D0E96C3F151398BB004F3EE7 /* NSDictionary+iMedia.m in Sources */,
+				D0E96C40151398CA004F3EE7 /* IMBTimecodeTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

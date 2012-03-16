@@ -459,6 +459,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					{
 						node.parserMessenger = messenger;
 						// TODO: Insert node into self.subnodes...
+						[self performSelectorOnMainThread:@selector(populateSubnodesOfNode:) withObject:node waitUntilDone:NO];
 					}
 				}
 			});		
@@ -475,10 +476,63 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 			^(IMBNode* newNode,NSError* inError)
 			{
-				newNode.parserMessenger = messenger;
-				// TODO: Replace old with new node...
+				if (inError)
+				{
+					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				}
+				else if (newNode)
+				{
+					newNode.parserMessenger = messenger;
+					// TODO: Replace old with new node...
+				}
 			});		
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) populateSubnodesOfNode:(IMBNode*)inNode
+{
+	IMBParserMessenger* messenger = inNode.parserMessenger;
+	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(populateSubnodesOfNode:error:),inNode,
+	
+		^(IMBNode* newNode,NSError* inError)
+		{
+			if (inError)
+			{
+				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+			}
+			else if (newNode)
+			{
+				newNode.parserMessenger = messenger;
+				// TODO: Replace old with new node...
+			}
+		});		
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) populateObjectsOfNode:(IMBNode*)inNode
+{
+	IMBParserMessenger* messenger = inNode.parserMessenger;
+	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(populateObjectsOfNode:error:),inNode,
+	
+		^(IMBNode* newNode,NSError* inError)
+		{
+			if (inError)
+			{
+				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+			}
+			else if (newNode)
+			{
+				newNode.parserMessenger = messenger;
+				// TODO: Replace old with new node...
+			}
+		});		
 }
 
 
