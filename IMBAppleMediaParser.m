@@ -198,7 +198,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 {
 	NSDictionary* result = nil;
 	NSError* error = nil;
-	NSString* path = (NSString*)self.mediaSource;
+	NSString* path = [self.mediaSource path];
 	
 	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
 	{
