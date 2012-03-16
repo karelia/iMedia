@@ -205,7 +205,7 @@
 				
 				IMBiPhotoParser* parser = (IMBiPhotoParser*)[self newParser];
 				
-				parser.identifier = [NSString stringWithFormat:@"%@/%@",[[self class] identifier],path];
+				parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
 				parser.mediaType = self.mediaType;
 				parser.mediaSource = [NSURL fileURLWithPath:path];
 				parser.appPath = self.iPhotoPath;
