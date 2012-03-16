@@ -136,7 +136,7 @@
 
 // For instantiating IMBParsers...
 
-+ (Class) parserClass
++ (NSString*) parserClassName
 {
 	return nil;
 }
@@ -147,6 +147,14 @@
 + (NSString*) identifier
 {
 	return nil;
+}
+
+
+// Convenience method for getting the parser class...
+
+- (Class) parserClass
+{
+	return NSClassFromString([[self class] parserClassName]);
 }
 
 
@@ -177,9 +185,7 @@
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-	Class parserClass = [[self class] parserClass];
-	
-	IMBParser* parser = [[parserClass alloc] init];
+	IMBParser* parser = [[[self parserClass] alloc] init];
 	parser.identifier = [[self class] identifier];
 	parser.mediaType = self.mediaType;
 	parser.mediaSource = self.mediaSource;

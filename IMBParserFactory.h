@@ -84,12 +84,16 @@
 // Properties that uniquely define each factory...
 
 + (NSString*) mediaType;								// See IMBCommon.h for available types
-+ (Class) parserClass;									// For instantiating parsers
++ (NSString*) parserClassName;							// For instantiating parsers
 + (NSString*) identifier;								// Used in delegate methods and for connecting to XPC service
 
 @property (copy) NSString* mediaType;					// See IMBCommon.h for available types
 @property (retain) NSURL* mediaSource;					// Source of given media objects
 @property BOOL isUserAdded;								// User added items can also be removed by the user again
+
+// For instantiating parsers...
+
+- (Class) parserClass;
 
 // For communicating with the XPC service...
 
