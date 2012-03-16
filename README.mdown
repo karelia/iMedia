@@ -8,11 +8,19 @@ This is the iMedia Browser framework that is used by a number of applications (a
 Compatibility
 ========
 
-The master is currently at the "2.0" phase, with compatibility for 10.5 and 10.6.  For the older 1.x branch, which is not being maintained, you can get it from subversion:
+### 2.5
+
+Out of the box (the `master` branch), iMedia supports OS X 10.6 Snow Leopard and later. It is suitable for both 32 and 64 bit apps.
+
+### 2.1
+
+For apps still supporting OS X 10.5 Leopard, we continue to support the existing iMedia 2.1 codebase on the `maintain-leopard-compatible` branch.
+
+### 1.x
+
+For the older 1.x branch, which is not being maintained, you can get it from subversion:
 
 `svn checkout http://imedia.googlecode.com/svn/trunk/ imedia-read-only`
-
-Soon we plan on working on code that requires 10.6 and may take advantage of 10.7 features.  We will probably split off a branch for that development until it is stable, and then move that to master.  (We will have a 10.5-compatible branch available by that time.)
 
 
 Development

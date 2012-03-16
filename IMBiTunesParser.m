@@ -289,7 +289,6 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSDictionary* plist = self.plist;
 	NSArray* playlists = [plist objectForKey:@"Playlists"];
 	NSDictionary* tracks = [plist objectForKey:@"Tracks"];
@@ -311,8 +310,7 @@
 		}
 	}
 	
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 

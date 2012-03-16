@@ -272,8 +272,6 @@
  
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
-	NSError* error = nil;
-	
 	if (inNode.isTopLevelNode)
 	{
 		NSDictionary* plist = [self plist];
@@ -281,8 +279,7 @@
 		[self didStopUsingParser];
 	}
 
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 

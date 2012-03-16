@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2012 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2012 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom3Parser.h"
+#import "IMBLightroom4Parser.h"
 
 #import <Quartz/Quartz.h>
 
@@ -66,16 +66,14 @@
 #import "NSWorkspace+iMedia.h"
 
 
-@interface IMBLightroom3Parser ()
-
-+ (NSString*)cloneDatabase:(NSString*)databasePath;
+@interface IMBLightroom4Parser ()
 
 - (NSNumber*) databaseVersion;
 
 @end
 
 
-@implementation IMBLightroom3Parser
+@implementation IMBLightroom4Parser
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -84,7 +82,7 @@
 
 + (NSString*) lightroomPath
 {
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom3"];
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom4"];
 }
 
 
@@ -94,7 +92,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3");
+	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom4");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -102,7 +100,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3");
+		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom4");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);
@@ -130,27 +128,26 @@
 				dataPath = nil;
 			}
 			
-			IMBLightroom3Parser* parser = [[[[self class] alloc] initWithMediaType:inMediaType] autorelease];
+			IMBLightroom4Parser* parser = [[[[self class] alloc] initWithMediaType:inMediaType] autorelease];
 			parser.mediaSource = libraryPath;
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			
-			/*
-            // Check database version
-            // Commented out because in Sandvox case #159516 it's beachballing. Pierre advises this hack should fix it for now
+			// Check database version
+			
 			NSNumber *databaseVersion = [parser databaseVersion];
 			
 			if (databaseVersion != nil) {
 				long databaseVersionLong = [databaseVersion longValue];
 				
-				if (databaseVersionLong < 300025) {
+				if (databaseVersionLong < 400020) {
 					continue;
 				}
-				else if (databaseVersionLong >= 400000) {
+				else if (databaseVersionLong >= 500000) {
 					continue;
 				}
 			}
-			*/
+			
 			[parserInstances addObject:parser];
 		}
 	}
@@ -165,9 +162,9 @@
 	
 	if (database != nil) {		
 		NSString* query =	@" SELECT value"
-							@" FROM Adobe_variablesTable avt"
-							@" WHERE avt.name = ?"
-							@" LIMIT 1";
+		@" FROM Adobe_variablesTable avt"
+		@" WHERE avt.name = ?"
+		@" LIMIT 1";
 		
 		FMResultSet* results = [database executeQuery:query, @"Adobe_DBVersion"];
 		
@@ -214,7 +211,7 @@
 	foldersNode.leaf = NO;
 	
 	[subNodes addObject:foldersNode];
-
+	
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
 	foldersObject.representedNodeIdentifier = foldersNode.identifier;
 	foldersObject.name = foldersNode.name;
@@ -226,7 +223,7 @@
 	foldersObject.imageRepresentation = [self largeFolderIcon];
 	
 	[objects addObject:foldersObject];
-
+	
 	
 	// Add the Collections node...
 	
@@ -259,7 +256,7 @@
 	
 	inRootNode.subNodes = subNodes;
 	inRootNode.objects = objects;
-
+	
 	[super populateSubnodesForRootNode:collectionsNode];
 }
 
@@ -267,8 +264,8 @@
 - (NSString*) rootFolderQuery
 {
 	NSString* query =	@" SELECT id_local, absolutePath, name"
-						@" FROM AgLibraryRootFolder"
-						@" ORDER BY name ASC";
+	@" FROM AgLibraryRootFolder"
+	@" ORDER BY name ASC";
 	
 	return query;
 }
@@ -276,10 +273,10 @@
 - (NSString*) folderNodesQuery
 {
 	NSString* query =	@" SELECT id_local, pathFromRoot"
-						@" FROM AgLibraryFolder"
-						@" WHERE rootFolder = ?"
-						@" AND (pathFromRoot LIKE ? AND NOT (pathFromRoot LIKE ?))"
-						@" ORDER BY pathFromRoot ASC";
+	@" FROM AgLibraryFolder"
+	@" WHERE rootFolder = ?"
+	@" AND (pathFromRoot LIKE ? AND NOT (pathFromRoot LIKE ?))"
+	@" ORDER BY pathFromRoot ASC";
 	
 	
 	return query;
@@ -288,9 +285,12 @@
 - (NSString*) rootCollectionNodesQuery
 {
 	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name"
-						@" FROM AgLibraryCollection alc"
-						@" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group') "
-						@" AND alc.parent IS NULL";
+	@" FROM AgLibraryCollection alc"
+	@" WHERE (creationId = 'com.adobe.ag.library.collection'"
+	@"   OR creationId = 'com.adobe.ag.library.group'"
+	@"   OR creationId = 'com.adobe.ag.library.smart_collection'"
+	@" ) "
+	@" AND alc.parent IS NULL";
 	
 	return query;
 }
@@ -299,9 +299,12 @@
 - (NSString*) collectionNodesQuery
 {
 	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name"
-						@" FROM AgLibraryCollection alc"
-                        @" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group') "
-						@" AND alc.parent = ?";
+	@" FROM AgLibraryCollection alc"
+	@" WHERE (creationId = 'com.adobe.ag.library.collection'"
+	@"   OR creationId = 'com.adobe.ag.library.group'"
+	@"   OR creationId = 'com.adobe.ag.library.smart_collection'"
+	@" ) "
+	@" AND alc.parent = ?";
 	
 	return query;
 }
@@ -310,17 +313,17 @@
 - (NSString*) folderObjectsQuery
 {
 	NSString* query =	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
-						@"			iptc.caption"
-						@" FROM AgLibraryFile alf"
-						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
-						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
-						@" WHERE alf.folder in ( "
-						@"		SELECT id_local"
-						@"		FROM AgLibraryFolder"
-						@"		WHERE id_local = ? OR (rootFolder = ? AND (pathFromRoot IS NULL OR pathFromRoot = ''))"
-						@" )"
-						@" AND ai.fileFormat <> 'VIDEO'"
-						@" ORDER BY ai.captureTime ASC";
+	@"			iptc.caption"
+	@" FROM AgLibraryFile alf"
+	@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
+	@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+	@" WHERE alf.folder in ( "
+	@"		SELECT id_local"
+	@"		FROM AgLibraryFolder"
+	@"		WHERE id_local = ? OR (rootFolder = ? AND (pathFromRoot IS NULL OR pathFromRoot = ''))"
+	@" )"
+	@" AND ai.fileFormat <> 'VIDEO'"
+	@" ORDER BY ai.captureTime ASC";
 	
 	return query;
 }
@@ -328,17 +331,17 @@
 - (NSString*) collectionObjectsQuery
 {
 	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-						@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
-						@"			iptc.caption"
-						@" FROM AgLibraryFile aif"
-						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
-						@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
-						@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
-						@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"
-						@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
-						@" WHERE alci.collection = ?"
-						@" AND ai.fileFormat <> 'VIDEO'"
-						@" ORDER BY ai.captureTime ASC";
+	@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+	@"			iptc.caption"
+	@" FROM AgLibraryFile aif"
+	@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
+	@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
+	@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
+	@" INNER JOIN AgLibraryCollectionImage alci ON ai.id_local = alci.image"
+	@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+	@" WHERE alci.collection = ?"
+	@" AND ai.fileFormat <> 'VIDEO'"
+	@" ORDER BY ai.captureTime ASC";
 	
 	return query;
 }
@@ -398,14 +401,14 @@
 		NSString* pathToIcon = [pathToResources stringByAppendingPathComponent:@"collectionCreation.png"];
 		NSImage* image = [[[NSImage alloc] initByReferencingFile:pathToIcon] autorelease];
 		image = [image imb_imageCroppedToRect:NSMakeRect(1,1,19,16)];
-	
+		
 		if (image == nil) {
 			image = [NSImage imb_sharedGenericFolderIcon];
 		}
-	
+		
 		collectionIcon = [image copy];
 	}
-
+	
 	return collectionIcon;
 }
 
@@ -417,12 +420,12 @@
 	
 	if (database != nil) {	
 		NSString* query =	@" SELECT alf.id_global uuid, ids.digest"
-							@" FROM Adobe_imageDevelopSettings ids"
-							@" INNER JOIN Adobe_images ai ON ai.id_local = ids.image"
-							@" INNER JOIN AgLibraryFile alf on alf.id_local = ai.rootFile"
-							@" WHERE ids.image = ?"
-							@" ORDER BY alf.id_global ASC"
-							@" LIMIT 1";
+		@" FROM Adobe_imageDevelopSettings ids"
+		@" INNER JOIN Adobe_images ai ON ai.id_local = ids.image"
+		@" INNER JOIN AgLibraryFile alf on alf.id_local = ai.rootFile"
+		@" WHERE ids.image = ?"
+		@" ORDER BY alf.id_global ASC"
+		@" LIMIT 1";
 		
 		FMResultSet* results = [database executeQuery:query, idLocal];
 		
@@ -433,7 +436,7 @@
 		
 		[results close];
 	}
-		
+	
 	if ((uuid != nil) && (digest != nil)) {
 		NSString* prefixOne = [uuid substringToIndex:1];
 		NSString* prefixFour = [uuid substringToIndex:4];
@@ -453,16 +456,16 @@
 	if (absolutePyramidPath != nil) {
 		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
 		
-//		'AgHg'					-- a magic marker
-//		header length			-- 2 bytes, big endian includes marker and length
-//		version					-- 1 byte, zero for now
-//		kind					-- 1 bytes, 0 == string, 1 == blob
-//		data length				-- 8 bytes, big endian
-//		data padding length		-- 8 bytes, big endian
-//		name					-- zero terminated
-//		< padding for rest of header >
-//		< data >
-//		< data padding >
+		//		'AgHg'					-- a magic marker
+		//		header length			-- 2 bytes, big endian includes marker and length
+		//		version					-- 1 byte, zero for now
+		//		kind					-- 1 bytes, 0 == string, 1 == blob
+		//		data length				-- 8 bytes, big endian
+		//		data padding length		-- 8 bytes, big endian
+		//		name					-- zero terminated
+		//		< padding for rest of header >
+		//		< data >
+		//		< data padding >
 		
 		const char pattern[4] = { 0x41, 0x67, 0x48, 0x67 };
 		NSUInteger index = [data lastIndexOfBytes:pattern length:4];
@@ -473,10 +476,10 @@
 			
 			[data getBytes:&headerLengthValue range:NSMakeRange(index + 4, 2)];
 			[data getBytes:&dataLengthValue range:NSMakeRange(index + 4 + 2 + 1 + 1, 8)];
-
+			
 			headerLengthValue = NSSwapBigShortToHost(headerLengthValue);
 			dataLengthValue = NSSwapBigLongLongToHost(dataLengthValue);
-
+			
 			NSData* jpegData = nil;
             
             if ((index + headerLengthValue + dataLengthValue) < [data length]) {
@@ -493,8 +496,7 @@
 - (FMDatabase*) libraryDatabase
 {
 	NSString* databasePath = (NSString*)self.mediaSource;
-	NSString* readOnlyDatabasePath = [[self class] cloneDatabase:databasePath];
-	FMDatabase* database = [FMDatabase databaseWithPath:readOnlyDatabasePath];
+	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
 	
 	[database setLogsErrors:YES];
 	
@@ -512,52 +514,6 @@
 	[database setLogsErrors:YES];
 	
 	return database;
-}
-
-+ (NSString*)cloneDatabase:(NSString*)databasePath
-{
-	// BEGIN ugly hack to work around Lightroom locking its database
-	
-	NSString *basePath = [databasePath stringByDeletingPathExtension];	
-	NSString *pathExtension = [databasePath pathExtension];	
-	NSString *readOnlyDatabasePath = [[NSString stringWithFormat:@"%@-readOnly", basePath] stringByAppendingPathExtension:pathExtension];
-	
-	NSFileManager *fileManager = [NSFileManager imb_threadSafeManager];
-	BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
-	NSError* error;
-	
-	if ([fileManager fileExistsAtPath:readOnlyDatabasePath]) {
-		error = nil;
-		NSDictionary *attributesOfCopy = [fileManager attributesOfItemAtPath:readOnlyDatabasePath error:&error];
-		if (!attributesOfCopy) NSLog (@"Unable to fetch attributes from %@: %@", readOnlyDatabasePath, error.localizedDescription);
-		NSDate *modDateOfCopy = [attributesOfCopy fileModificationDate];
-		
-		error = nil;
-		NSDictionary *attributesOfOrig = [fileManager attributesOfItemAtPath:databasePath error:&error];
-		if (attributesOfOrig) NSLog (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
-		NSDate *modDateOfOrig = [attributesOfOrig fileModificationDate];
-		
-		if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy]) {
-			needToCopyFile = NO;
-		}
-	}
-	
-	if (needToCopyFile) {
-		(void) [fileManager removeItemAtPath:readOnlyDatabasePath error:&error];
-        
-        error = nil;    // needed for if either path is nil
-		BOOL copied = (nil != databasePath)
-					&& (nil != readOnlyDatabasePath)
-					&& [fileManager copyItemAtPath:databasePath toPath:readOnlyDatabasePath error:&error];
-		
-		if (!copied) {
-			NSLog (@"Unable to copy database file at %@: %@", databasePath, error.localizedDescription);
-		}
-	}
-	
-	// END ugly hack
-	
-	return readOnlyDatabasePath;
 }
 
 @end
