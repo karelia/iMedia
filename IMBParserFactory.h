@@ -69,8 +69,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Lightweight class that uniquely identifies a parser. Instance of this class can be archived and sent over 
-// an XPC connection to create an IMBParser instance on the other side (XPC service)...
+// Lightweight class that lives on both the host app and the XPC service side. Instances of this class can  
+// be archived and sent over an XPC connection.  This class basically ties both sides (app and XPC service) 
+// together and communicates knowledge (class type) and state (instance properties)...
 
 @interface IMBParserFactory : NSObject <NSCoding>
 {
@@ -91,26 +92,51 @@
 @property (retain) NSURL* mediaSource;					// Source of given media objects
 @property BOOL isUserAdded;								// User added items can also be removed by the user again
 
-// For instantiating parsers...
-
-- (Class) parserClass;
-
 // For communicating with the XPC service...
 
-@property (retain,readonly) XPCConnection* connection;	// Used internally...
+@property (retain,readonly) XPCConnection* connection;	// Used internally
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// The following methods are only called from an XPC service process...
+
+@interface IMBParserFactory (XPCMethods)
 
 // This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses  
-// may opt to return more than one instance (e.g. Aperture may create one instance per library). This method
-// is only called on the XPC service side...
+// may opt to return more than one instance (e.g. Aperture may create one instance per library). Must be 
+// overridden by subclasses..
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError;
+
+// Convenience method to access (potentially also create) a particular parser instance...
+
 - (IMBParser*) parserWithIdentifier:(NSString*)inIdentifier;
 
-// Returns an array of new (unpopulated) top level nodes. This method is only called on the XPC service side...
+// Factory method for instantiating a single parser...
+
+- (IMBParser*) newParser;
+
+// The following four methods correspond to the ones in the IMBParserProtocol. Here the work is simply 
+// delegated to the appropriate IMBParser instance...
 
 - (NSMutableArray*) unpopulatedTopLevelNodesWithError:(NSError**)outError;
-
+- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError;
+- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError;
 - (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// The following methods are only called by the iMedia framework from the host application process...
+
+@interface IMBParserFactory (AppMethods)
 
 // Called when the user right-clicks in the iMedia UI. Here the IMBParserFactory has a chance to add custom   
 // menu items of its own, that go beyond the functionality of the standard items added by the controllers.

@@ -183,7 +183,7 @@
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-	NSMutableArray* parsers = [NSMutableArray array];;
+	NSMutableArray* parsers = [NSMutableArray array];
 	
 	if ([self isInstalled])
 	{
@@ -200,7 +200,7 @@
 			{
 				// Create a parser instance preconfigure with that path...
 				
-				IMBiPhotoParser* parser = [[[self parserClass] alloc] init];
+				IMBiPhotoParser* parser = (IMBiPhotoParser*)[self newParser];
 				
 				parser.identifier = [NSString stringWithFormat:@"%@/%@",[[self class] identifier],path];
 				parser.mediaType = self.mediaType;

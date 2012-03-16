@@ -74,9 +74,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark
-
-
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if ((self = [super init]))
@@ -150,14 +147,6 @@
 }
 
 
-// Convenience method for getting the parser class...
-
-- (Class) parserClass
-{
-	return NSClassFromString([[self class] parserClassName]);
-}
-
-
 // Create the connection lazily when needed...
 
 - (XPCConnection*) connection
@@ -172,11 +161,15 @@
 }
 
 
+@end
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark
-#pragma mark Parser Work
+
+@implementation IMBParserFactory (XPCMethods)
 
 
 // This method is called on the XPC service side. The default implementation just returns a single parser instance. 
@@ -185,7 +178,7 @@
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-	IMBParser* parser = [[[self parserClass] alloc] init];
+	IMBParser* parser = [self newParser];
 	parser.identifier = [[self class] identifier];
 	parser.mediaType = self.mediaType;
 	parser.mediaSource = self.mediaSource;
@@ -219,8 +212,20 @@
 }
 
 
+// Factory method for instantiating a parser...
+
+- (IMBParser*) newParser
+{
+	Class parserClass = NSClassFromString([[self class] parserClassName]);
+	return [[parserClass alloc] init];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
+
+// The following four methods are simply wrappers that access the appropriate IMBParser instances and 
+// then simply call the same method on those instances...
 
 - (NSArray*) unpopulatedTopLevelNodesWithError:(NSError**)outError
 {
@@ -247,22 +252,36 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
+	return [parser populateSubnodesOfNode:inNode error:outError];
+}
+
+
+- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
+	return [parser populateObjectsOfNode:inNode error:outError];
+}
 
 
 - (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	IMBNode* newNode = [parser reloadNode:inNode error:outError];
-	return newNode;
+	return [parser reloadNode:inNode error:outError];
 }
+
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark
-#pragma mark Custom UI
+
+@implementation IMBParserFactory (AppMethods)
 
 
 // These two methods can be overrridden by subclasses to add custom menu items...
