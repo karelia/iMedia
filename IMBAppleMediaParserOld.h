@@ -68,7 +68,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "IMBParser.h"
-//#import "IMBSkimmableObjectViewController.h"
+#import "IMBSkimmableObjectViewController.h"
 #import "IMBNodeObject.h"
 
 
@@ -102,14 +102,14 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 
 #pragma mark -
 
-@interface IMBAppleMediaParser : IMBParser /*<IMBSkimmableObjectViewControllerDelegate>*/
+@interface IMBAppleMediaParser : IMBParser <IMBSkimmableObjectViewControllerDelegate>
 {
 	NSDictionary* _plist;
 	NSDate* _modificationDate;
 }
 
-@property (retain,readonly) NSDictionary* plist;
-@property (retain,readonly) NSDate* modificationDate;
+@property (retain) NSDictionary* plist;
+@property (retain) NSDate* modificationDate;
 
 
 // Returns IKImageBrowserCGImageRepresentationType
@@ -173,10 +173,10 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 
 // Events and Faces have other metadata than images or movies
 
-//- (NSString*) countableMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+- (NSString*) countableMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 // Convert metadata into a human readable string...
 
-//- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 @end

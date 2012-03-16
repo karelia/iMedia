@@ -43,33 +43,55 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
  */
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark HEADERS
+
 #import "IMBSmartFolderNodeObject.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 @implementation IMBSmartFolderNodeObject
 
-+ (NSImage *)icon;		// usable from other places for a smart folder
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSImage*) icon		// usable from other places for a smart folder
 {
 	static NSImage *sSmartFolderImage = nil;
-	if (!sSmartFolderImage)
+	
+	if (sSmartFolderImage == nil)
 	{
 		// Get high-resolution version of smart folder icon directly from CoreTypes
+		
 		NSBundle* coreTypes = [NSBundle	bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
+		
 		if (coreTypes)
 		{
 			NSString* smartPath = [coreTypes pathForResource:@"SmartFolderIcon.icns" ofType:nil];
+			
 			if (smartPath)
 			{
 				sSmartFolderImage = [[NSImage alloc] initWithContentsOfFile:smartPath];
 			}
 		}
-		if (!sSmartFolderImage)
+		
+		if (sSmartFolderImage == nil)
 		{
-			sSmartFolderImage = [[NSImage imageNamed:NSImageNameFolderSmart] retain];		// fall-back low-resolution version :-(
+			sSmartFolderImage = [[NSImage imageNamed:NSImageNameFolderSmart] retain];	// fall-back low-resolution version :-(
 		}
 	}
 	return sSmartFolderImage;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Override to show a folder icon ALWAYS instead of a generic file icon...
 
@@ -77,6 +99,9 @@
 {
 	return [IMBSmartFolderNodeObject icon];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 @end

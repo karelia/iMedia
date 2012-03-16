@@ -50,42 +50,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-/*
- DISCUSSION: METADATA DESCRIPTION
- 
- Metadata descripton is built up on a per-parser basis; see imb_imageMetadataDescriptionForMetadata
- and metadataDescriptionForMetadata for most implementations.
- 
- When an attribute is available and appropriate, it is shown; otherwise it is not shown.
- We don't show a "Label: " for the attribute if its context is obvious.
- 
- In order to be consistent, this is the expected order that items are shown.  If we wanted to change
- this, we would have to change a bunch of code.
- 
- No-Download indicator (Flickr)
- Owner (Flickr)
- Type (Images except for Flickr, Video, not Audio)
- Artist (Audio)
- Album (Audio)
- Width x Height (Image, Video)
- Duration (Audio, Video)
- Date -- NOTE -- THERE ARE PROBABLY SOME PARSERS WHERE I STILL NEED TO INCLUDE THIS
- Comment (when available; file-based parsers should get from Finder comments)
- Tags (Flickr) --  CAN WE GET THESE FOR IPHOTO, OTHERS TOO?
- 
- Maybe add License for Flickr, perhaps others from EXIF data?
- */
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark HEADERS
 
 #import "IMBObject.h"
+
 #import "IMBNode.h"
 #import "IMBObjectsPromise.h"
-#import "IMBParserFactory.h"
+#import "IMBParser.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
@@ -113,9 +84,11 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 #pragma mark 
 
 @interface IMBObject ()
-//@property (copy) NSString *parserClassName;
-//@property (copy) NSString *parserMediaType;
-//@property (copy) NSString *parserMediaSource;
+
+@property (copy) NSString *parserClassName;
+@property (copy) NSString *parserMediaType;
+@property (copy) NSString *parserMediaSource;
+
 - (CGImageRef) _renderQuickLookImage;
 @end
 
@@ -131,11 +104,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize name = _name;
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
-@synthesize parserIdentifier = _parserIdentifier;
-@synthesize parserFactory = _parserFactory;
-//@synthesize parserClassName = _parserClassName;
-//@synthesize parserMediaType = _parserMediaType;
-//@synthesize parserMediaSource = _parserMediaSource;
+@synthesize parserClassName = _parserClassName;
+@synthesize parserMediaType = _parserMediaType;
+@synthesize parserMediaSource = _parserMediaSource;
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
 @synthesize shouldDisableTitle = _shouldDisableTitle;
@@ -148,6 +119,48 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 @synthesize metadataDescription = _metadataDescription;
 
+@synthesize parser = _parser;
+- (void)setParser:(IMBParser *)parser
+{
+    if (parser != _parser) {
+        [self willChangeValueForKey:@"parser"];
+        
+        [_parser release];
+        _parser = [parser retain];
+        
+        self.parserClassName = NSStringFromClass([_parser class]);
+        self.parserMediaType = [_parser mediaType];
+        self.parserMediaSource = [_parser mediaSource];
+        
+        [self didChangeValueForKey:@"parser"];
+    }
+}
+
+/*
+ DISCUSSION: METADATA DESCRIPTION
+ 
+ Metadata descripton is built up on a per-parser basis; see imb_imageMetadataDescriptionForMetadata
+ and metadataDescriptionForMetadata for most implementations.
+ 
+ When an attribute is available and appropriate, it is shown; otherwise it is not shown.
+ We don't show a "Label: " for the attribute if its context is obvious.
+ 
+ In order to be consistent, this is the expected order that items are shown.  If we wanted to change
+ this, we would have to change a bunch of code.
+ 
+ No-Download indicator (Flickr)
+ Owner (Flickr)
+ Type (Images except for Flickr, Video, not Audio)
+ Artist (Audio)
+ Album (Audio)
+ Width x Height (Image, Video)
+ Duration (Audio, Video)
+ Date -- NOTE -- THERE ARE PROBABLY SOME PARSERS WHERE I STILL NEED TO INCLUDE THIS
+ Comment (when available; file-based parsers should get from Finder comments)
+ Tags (Flickr) --  CAN WE GET THESE FOR IPHOTO, OTHERS TOO?
+ 
+ Maybe add License for Flickr, perhaps others from EXIF data?
+ */
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -168,44 +181,18 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 }
 
 
-- (void) dealloc
-{
-	IMBRelease(_location);
-	IMBRelease(_name);
-	IMBRelease(_preliminaryMetadata);
-	IMBRelease(_metadata);
-	IMBRelease(_metadataDescription);
-	IMBRelease(_parserIdentifier);
-	IMBRelease(_parserFactory);
-//	IMBRelease(_parserClassName);
-//	IMBRelease(_parserMediaType);
-//	IMBRelease(_parserMediaSource);
-	IMBRelease(_imageLocation);
-	IMBRelease(_imageRepresentation);
-	IMBRelease(_imageRepresentationType);
-
-	if (_quickLookImage) CGImageRelease(_quickLookImage);
-
-	[super dealloc];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if ((self = [super init]) != nil)
 	{
 		self.location = [inCoder decodeObjectForKey:@"location"];
 		self.name = [inCoder decodeObjectForKey:@"name"];
+		self.parserClassName = [inCoder decodeObjectForKey:@"parserClassName"];
+		self.parserMediaType = [inCoder decodeObjectForKey:@"parserMediaType"];
+		self.parserMediaSource = [inCoder decodeObjectForKey:@"parserMediaSource"];
 		self.preliminaryMetadata = [inCoder decodeObjectForKey:@"preliminaryMetadata"];
 		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
 		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
-		self.parserIdentifier = [inCoder decodeObjectForKey:@"parserIdentifier"];
-//		self.parserClassName = [inCoder decodeObjectForKey:@"parserClassName"];
-//		self.parserMediaType = [inCoder decodeObjectForKey:@"parserMediaType"];
-//		self.parserMediaSource = [inCoder decodeObjectForKey:@"parserMediaSource"];
 		self.index = [inCoder decodeIntegerForKey:@"index"];
 		self.shouldDrawAdornments = [inCoder decodeBoolForKey:@"shouldDrawAdornments"];
 		self.shouldDisableTitle = [inCoder decodeBoolForKey:@"shouldDisableTitle"];
@@ -220,20 +207,16 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 {
 	[inCoder encodeObject:self.location forKey:@"location"];
 	[inCoder encodeObject:self.name forKey:@"name"];
+	[inCoder encodeObject:self.parserClassName forKey:@"parserClassName"];
+	[inCoder encodeObject:self.parserMediaSource forKey:@"parserMediaSource"];
+	[inCoder encodeObject:self.parserMediaType forKey:@"parserMediaType"];
 	[inCoder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
 	[inCoder encodeObject:self.metadata forKey:@"metadata"];
 	[inCoder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
-	[inCoder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
-//	[inCoder encodeObject:self.parserClassName forKey:@"parserClassName"];
-//	[inCoder encodeObject:self.parserMediaSource forKey:@"parserMediaSource"];
-//	[inCoder encodeObject:self.parserMediaType forKey:@"parserMediaType"];
 	[inCoder encodeInteger:self.index forKey:@"index"];
 	[inCoder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
 	[inCoder encodeBool:self.shouldDisableTitle forKey:@"shouldDisableTitle"];
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 - (id) copyWithZone:(NSZone*)inZone
@@ -245,11 +228,10 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	copy.preliminaryMetadata = self.preliminaryMetadata;
 	copy.metadata = self.metadata;
 	copy.metadataDescription = self.metadataDescription;
-	copy.parserIdentifier = self.parserIdentifier;
-	copy.parserFactory = self.parserFactory;
-//  copy.parserClassName = self.parserClassName;
-//	copy.parserMediaType = self.parserMediaType;
-//	copy.parserMediaSource = self.parserMediaSource;
+	copy.parser = self.parser;
+    copy.parserClassName = self.parserClassName;
+	copy.parserMediaType = self.parserMediaType;
+	copy.parserMediaSource = self.parserMediaSource;
     copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
 	copy.shouldDisableTitle = self.shouldDisableTitle;
@@ -261,6 +243,27 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	copy.imageVersion = self.imageVersion;
 	
 	return copy;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_location);
+	IMBRelease(_name);
+	IMBRelease(_preliminaryMetadata);
+	IMBRelease(_metadata);
+	IMBRelease(_metadataDescription);
+	IMBRelease(_parser);
+	IMBRelease(_parserClassName);
+	IMBRelease(_parserMediaType);
+	IMBRelease(_parserMediaSource);
+	IMBRelease(_imageLocation);
+	IMBRelease(_imageRepresentation);
+	IMBRelease(_imageRepresentationType);
+
+	if (_quickLookImage) CGImageRelease(_quickLookImage);
+
+	[super dealloc];
 }
 
 
@@ -303,16 +306,14 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (NSString*) imageTitle
 {
-	NSString* name = self.name;
-	
-	if (name==nil || [name isEqualToString:@""])
+	NSString *name = self.name;
+	if (!name || [name isEqualToString:@""])
 	{
 		name = NSLocalizedStringWithDefaultValue(
-			@"IMBObject.untitled",
-			nil,
-			IMBBundle(),
-			@"untitled",
-			@"placeholder for untitled image");
+												 @"IMBObject.untitled",
+												 nil,IMBBundle(),
+												 @"untitled",
+												 @"placeholder for untitled image");
 	}
 	return name;
 }
@@ -325,6 +326,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 {
 	if (self.needsImageRepresentation)
 	{
+		// we may have logging down in this method of IMBObject
 		[self loadThumbnail];
 	}
 	
@@ -380,13 +382,13 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (void) setQuickLookImage:(CGImageRef)inImage
 {
-//	[self willChangeValueForKey:kIMBQuickLookImageProperty];
-//	
-//	CGImageRef old = _quickLookImage;
-//	_quickLookImage = CGImageRetain(inImage);
-//	CGImageRelease(old);
-//	
-//	[self didChangeValueForKey:kIMBQuickLookImageProperty];
+	[self willChangeValueForKey:kIMBQuickLookImageProperty];
+	
+	CGImageRef old = _quickLookImage;
+	_quickLookImage = CGImageRetain(inImage);
+	CGImageRelease(old);
+	
+	[self didChangeValueForKey:kIMBQuickLookImageProperty];
 }
 
 
@@ -397,24 +399,24 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (CGImageRef) quickLookImage
 {	
-//	if (_quickLookImage == NULL)
-//	{
-//		if (_isLoadingQuickLookImage == NO)
-//		{
-//			_isLoadingQuickLookImage = YES;
-//			
-//			if ([NSThread isMainThread])
-//			{
-//				NSInvocationOperation* op = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(renderQuickLookImage) object:nil];
-//				[[IMBOperationQueue sharedQueue] addOperation:op];
-//				[op release];
-//			}
-//			else
-//			{
-//				self.quickLookImage = [self _renderQuickLookImage];
-//			}
-//		}	
-//	}
+	if (_quickLookImage == NULL)
+	{
+		if (_isLoadingQuickLookImage == NO)
+		{
+			_isLoadingQuickLookImage = YES;
+			
+			if ([NSThread isMainThread])
+			{
+				NSInvocationOperation* op = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(renderQuickLookImage) object:nil];
+				[[IMBOperationQueue sharedQueue] addOperation:op];
+				[op release];
+			}
+			else
+			{
+				self.quickLookImage = [self _renderQuickLookImage];
+			}
+		}	
+	}
 	
 	return _quickLookImage;
 }
@@ -427,8 +429,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (void) renderQuickLookImage
 {
-//	CGImageRef image = [self _renderQuickLookImage];
-//	[self performSelectorOnMainThread:@selector(_setQuickLookImage:) withObject:(id)image waitUntilDone:NO];
+	CGImageRef image = [self _renderQuickLookImage];
+	[self performSelectorOnMainThread:@selector(_setQuickLookImage:) withObject:(id)image waitUntilDone:NO];
 }
 
 
@@ -438,36 +440,35 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (CGImageRef) _renderQuickLookImage
 {	
-	return NULL;
-//	NSString* path = nil;
-//	NSURL* url = nil;
-//	
-//	if ([_location isKindOfClass:[NSString class]])
-//	{
-//		path = (NSString*)_location;
-//		url = [NSURL fileURLWithPath:path];
-//	}
-//	else if ([_location isKindOfClass:[NSURL class]])
-//	{
-//		url = (NSURL*)_location;
-//		path = [url path];
-//	}
-//	
-//	CGImageRef image = [url imb_quicklookCGImage];
-//	
-//	if (image == NULL)
-//	{
-//		NSLog(@"%s Failed to create Quick Look image for file %@. Using generic file icon instead...",__FUNCTION__,self.name);
-//		
-//		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:[path pathExtension]];
-//		[icon setSize:NSMakeSize(kIMBMaxThumbnailSize,kIMBMaxThumbnailSize)];
-//		NSBitmapImageRep* rep = [icon imb_bitmap];
-//		image = [rep CGImage];
-//		
-//		_shouldDrawAdornments = NO;
-//	}
-//	
-//	return image;
+	NSString* path = nil;
+	NSURL* url = nil;
+	
+	if ([_location isKindOfClass:[NSString class]])
+	{
+		path = (NSString*)_location;
+		url = [NSURL fileURLWithPath:path];
+	}
+	else if ([_location isKindOfClass:[NSURL class]])
+	{
+		url = (NSURL*)_location;
+		path = [url path];
+	}
+	
+	CGImageRef image = [url imb_quicklookCGImage];
+	
+	if (image == NULL)
+	{
+		NSLog(@"%s Failed to create Quick Look image for file %@. Using generic file icon instead...",__FUNCTION__,self.name);
+		
+		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:[path pathExtension]];
+		[icon setSize:NSMakeSize(kIMBMaxThumbnailSize,kIMBMaxThumbnailSize)];
+		NSBitmapImageRep* rep = [icon imb_bitmap];
+		image = [rep CGImage];
+		
+		_shouldDrawAdornments = NO;
+	}
+	
+	return image;
 }
 
 
@@ -475,8 +476,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (void) _setQuickLookImage:(id)inImage
 {
-//	self.quickLookImage = (CGImageRef)inImage;
-//	_isLoadingQuickLookImage = NO;
+	self.quickLookImage = (CGImageRef)inImage;
+	_isLoadingQuickLookImage = NO;
 }
 
 
@@ -491,29 +492,27 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (void) loadMetadata
 {
-//	if (!self.metadata)
-//	{
-//		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
-//		operation.options = kIMBLoadMetadata;
-//		
-//		[[IMBOperationQueue sharedQueue] addOperation:operation];			
-//		
-//	}
+	if (!self.metadata)
+	{
+		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
+		operation.options = kIMBLoadMetadata;
+		
+		[[IMBOperationQueue sharedQueue] addOperation:operation];			
+		
+	}
 }
-
-
 - (void) loadThumbnail
 {
-//	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
-//	{
-//		self.isLoadingThumbnail = YES;
-//		// NSLog(@"Queueing load of %@", self.name);
-//		
-//		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
-//		operation.options = kIMBLoadMetadata | kIMBLoadThumbnail;		// get metadata if needed also.
-//		
-//		[[IMBOperationQueue sharedQueue] addOperation:operation];			
-//	}
+	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
+	{
+		self.isLoadingThumbnail = YES;
+		// NSLog(@"Queueing load of %@", self.name);
+		
+		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
+		operation.options = kIMBLoadMetadata | kIMBLoadThumbnail;		// get metadata if needed also.
+		
+		[[IMBOperationQueue sharedQueue] addOperation:operation];			
+	}
 }
 
 
@@ -533,6 +532,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	{
 		self.needsImageRepresentation = NO;
 		[IMBObjectFifoCache addObject:self];
+		
+//		NSUInteger n = [IMBObjectFifoCache count];
+//		NSLog(@"%s = %p (%d)",__FUNCTION__,inImageRepresentation,(int)n);
 	}
 }
 
@@ -543,9 +545,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 {
 	BOOL unloaded = NO;
 	
-	static NSSet* sTypesThatCanBeUnloaded = nil;
-	
-	if (sTypesThatCanBeUnloaded == nil)
+	static NSSet *sTypesThatCanBeUnloaded = nil;
+	if (!sTypesThatCanBeUnloaded)
 	{
 		sTypesThatCanBeUnloaded = [[NSSet alloc] initWithObjects:
 			IKImageBrowserPathRepresentationType,				/* NSString */
@@ -554,16 +555,17 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 			IKImageBrowserQCCompositionPathRepresentationType,	/* NSString or NSURL */
 			IKImageBrowserQuickLookPathRepresentationType,		/* NSString or NSURL*/
 			IKImageBrowserIconRefPathRepresentationType,		/* NSString */
-			nil];
+								   nil];
 	}
 
+	
+	
 	if ([sTypesThatCanBeUnloaded containsObject:self.imageRepresentationType])
 	{
 		self.imageRepresentation = nil;
 		self.quickLookImage = NULL;
 		unloaded = YES;
 	}
-	
 	return unloaded;
 }
 
@@ -583,42 +585,43 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 // For when we target 10.6, IMBObjects should really implement NSPasteboardWriting as it's a near perfect fit. Until then, its methods are still highly useful for support...
 
-- (NSArray*) writableTypesForPasteboard:(NSPasteboard*)inPasteboard
+- (NSArray *)writableTypesForPasteboard:(NSPasteboard *)pasteboard;
 {
-	return nil;
-//    return [NSArray arrayWithObjects:
-//		kIMBPasteboardTypeObjectsPromise,
-//		NSFilesPromisePboardType,
-//		([self isLocalFile]?kUTTypeFileURL:kUTTypeURL), 
-//		nil]; 
+    // Try declaring promise AFTER the other types
+    return [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilesPromisePboardType,
+            ([self isLocalFile] ? kUTTypeFileURL : kUTTypeURL), 
+                     
+                     // Also our own special metadata types that clients can make use of
+            //kIMBPublicTitleListPasteboardType, kIMBPublicMetadataListPasteboardType,
+                     
+                     nil]; 
+    // Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilenamesPboardType,nil]
+    
+    
 }
 
-
-- (id) pasteboardPropertyListForType:(NSString*)inType
+- (id)pasteboardPropertyListForType:(NSString *)type;
 {
-//    if ([inType isEqualToString:(NSString *)kUTTypeURL] ||
-//        [inType isEqualToString:(NSString *)kUTTypeFileURL] ||
-//        [inType isEqualToString:NSURLPboardType] ||
-//        [inType isEqualToString:@"CorePasteboardFlavorType 0x6675726C"])
-//    {
-//        return [[self URL] absoluteString];
-//    }
-//    else if ([inType isEqualToString:NSFilenamesPboardType])
-//    {
-//        return [NSArray arrayWithObject:[self path]];
-//    }
+    if ([type isEqualToString:(NSString *)kUTTypeURL] ||
+        [type isEqualToString:(NSString *)kUTTypeFileURL] ||
+        [type isEqualToString:NSURLPboardType] ||
+        [type isEqualToString:@"CorePasteboardFlavorType 0x6675726C"])
+    {
+        return [[self URL] absoluteString];
+    }
+    else if ([type isEqualToString:NSFilenamesPboardType])
+    {
+        return [NSArray arrayWithObject:[self path]];
+    }
     
     return nil;
 }
 
-
-//  This ought to be implemented at some point
-/*
-- (NSPasteboardWritingOptions) writingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
+/*  This ought to be implemented at some point
+- (NSPasteboardWritingOptions)writingOptionsForType:(NSString *)type pasteboard:(NSPasteboard *)pasteboard;
 {
     
-}
-*/
+}*/
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -793,7 +796,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
  
 - (NSString*) identifier
 {
-	NSString* parserName = [[self.parserFactory class] parserClassName];
+	NSString* parserName = self.parserClassName;
 	NSString* location = nil;
 	
 	if ([self.location isKindOfClass:[NSString class]])
@@ -818,7 +821,14 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (NSString*) description
 {
-	return self.identifier;
+	return [NSString stringWithFormat:@"%@ %@",
+			[super description],
+			// NSStringFromClass([self class]),
+		self.location
+			// ,
+		//self.name, 
+		//self.metadata
+			];
 }
 
 

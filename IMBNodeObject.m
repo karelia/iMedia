@@ -112,9 +112,11 @@
 {
 	NSString* imageUID = [super imageUID];
 	
-	if (imageUID) {
+	if (imageUID)
+	{
 		return imageUID;
 	}
+	
 	return [self representedNodeIdentifier];
 }
 

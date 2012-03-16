@@ -43,13 +43,24 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
  */
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark HEADERS
+
 #import <Cocoa/Cocoa.h>
 #import "IMBNodeObject.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 @interface IMBSmartFolderNodeObject : IMBNodeObject
 
 + (NSImage *)icon;		// usable from other places for a smart folder
 
-
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
