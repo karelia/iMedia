@@ -52,23 +52,23 @@
 
 #pragma mark HEADERS
 
-#import "IMBParserFactory.h"
+#import "IMBParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBiPhotoParserFactory : IMBParserFactory
+@interface IMBiPhotoParserMessenger : IMBParserMessenger
 
 @end
 
 
-@interface IMBiPhotoImageParserFactory : IMBiPhotoParserFactory
+@interface IMBiPhotoImageParserMessenger : IMBiPhotoParserMessenger
 
 @end
 
 
-@interface IMBiPhotoMovieParserFactory : IMBiPhotoParserFactory
+@interface IMBiPhotoMovieParserMessenger : IMBiPhotoParserMessenger
 
 @end
 

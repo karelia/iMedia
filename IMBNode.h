@@ -61,7 +61,7 @@
 #pragma mark CLASSES
 
 @class IMBObject;
-@class IMBParserFactory;
+@class IMBParserMessenger;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@
 	
 	// Info about our parser...
 	
-	IMBParserFactory* _parserFactory;
+	IMBParserMessenger* _parserMessenger;
 	NSString* _parserIdentifier;
 
 //	IMBWatcherType _watcherType;
@@ -170,7 +170,7 @@
 
 // Info about our parser...
 
-@property (retain) IMBParserFactory* parserFactory;
+@property (retain) IMBParserMessenger* parserMessenger;
 @property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
 
 //@property (assign) IMBWatcherType watcherType;

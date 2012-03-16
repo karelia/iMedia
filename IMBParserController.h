@@ -65,7 +65,7 @@
 
 #pragma mark CLASSES
 
-@class IMBParserFactory;
+@class IMBParserMessenger;
 @protocol IMBParserControllerDelegate;
 
 
@@ -76,7 +76,7 @@
 
 @interface IMBParserController : NSObject
 {
-	NSMutableDictionary* _loadedParserFactories;
+	NSMutableDictionary* _loadedParserMessengers;
 	id <IMBParserControllerDelegate> _delegate;
 //	BOOL _loadingCustomParsers;
 }
@@ -86,18 +86,18 @@
 + (IMBParserController*) sharedParserController;
 @property (assign) id <IMBParserControllerDelegate> delegate;
 
-// Register IMBParserFactory classes. This should be called from the +load method of a IMBParserFactory class...
+// Register IMBParserMessenger classes. This should be called from the +load method of a IMBParserMessenger class...
 
-+ (void) registerParserFactoryClass:(Class)inParserFactoryClass forMediaType:(NSString*)inMediaType;
-+ (void) unregisterParserFactoryClass:(Class)inParserFactoryClass;
-+ (NSMutableSet*) registeredParserFactoryClassesForMediaType:(NSString*)inMediaType;
++ (void) registerParserMessengerClass:(Class)inParserMessengerClass forMediaType:(NSString*)inMediaType;
++ (void) unregisterParserMessengerClass:(Class)inParserMessengerClass;
++ (NSMutableSet*) registeredParserMessengerClassesForMediaType:(NSString*)inMediaType;
 
 // Load all supported IMBParserFactories. The delegate can restrict which IMBParserFactories are loaded...
 
-- (void) loadParserFactories;
-- (void) unloadParserFactories;
+- (void) loadParserMessengers;
+- (void) unloadParserMessengers;
 
-- (NSArray*) loadedParserFactoriesForMediaType:(NSString*)inMediaType;
+- (NSArray*) loadedParserMessengersForMediaType:(NSString*)inMediaType;
 
 //- (void) reset; 
 
@@ -141,9 +141,9 @@
 
 @optional
 
-- (BOOL) parserController:(IMBParserController*)inController shouldLoadParserFactoryWithIdentifier:(NSString*)inIdentifier;
-- (void) parserController:(IMBParserController*)inController didLoadParserFactory:(IMBParserFactory*)inParserFactory;
-- (void) parserController:(IMBParserController*)inController willUnloadParserFactory:(IMBParserFactory*)inParserFactory;
+- (BOOL) parserController:(IMBParserController*)inController shouldLoadParserMessengerWithIdentifier:(NSString*)inIdentifier;
+- (void) parserController:(IMBParserController*)inController didLoadParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (void) parserController:(IMBParserController*)inController willUnloadParserMessenger:(IMBParserMessenger*)inParserMessenger;
 
 @end
 

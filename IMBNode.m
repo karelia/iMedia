@@ -54,7 +54,7 @@
 
 #import "IMBNode.h"
 //#import "IMBObject.h"
-#import "IMBParserFactory.h"
+#import "IMBParserMessenger.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
 
@@ -106,7 +106,7 @@
 // Info about our parser...
 
 @synthesize parserIdentifier = _parserIdentifier;
-@synthesize parserFactory = _parserFactory;
+@synthesize parserMessenger = _parserMessenger;
 
 //@synthesize watcherType = _watcherType;
 //@synthesize watchedPath = _watchedPath;
@@ -162,7 +162,7 @@
 	IMBRelease(_subnodes);
 	IMBRelease(_objects);
 	IMBRelease(_attributes);
-	IMBRelease(_parserFactory);
+	IMBRelease(_parserMessenger);
 	IMBRelease(_parserIdentifier);
 //	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
@@ -196,7 +196,7 @@
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
 	
-	copy.parserFactory = self.parserFactory;
+	copy.parserMessenger = self.parserMessenger;
 	copy.parserIdentifier = self.parserIdentifier;
 	
 //	copy.watcherType = self.watcherType;

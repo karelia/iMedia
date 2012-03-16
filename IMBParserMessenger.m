@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBParserFactory.h"
+#import "IMBParserMessenger.h"
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import <XPCKit/XPCKit.h>
@@ -64,7 +64,7 @@
 
 #pragma mark
 
-@implementation IMBParserFactory
+@implementation IMBParserMessenger
 
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
@@ -100,7 +100,7 @@
 
 - (id) copyWithZone:(NSZone*)inZone
 {
-	IMBParserFactory* copy = [[[self class] allocWithZone:inZone] init];
+	IMBParserMessenger* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.mediaType = self.mediaType;
 	copy.mediaSource = self.mediaSource;
@@ -169,7 +169,7 @@
 
 #pragma mark
 
-@implementation IMBParserFactory (XPCMethods)
+@implementation IMBParserMessenger (XPC)
 
 
 // This method is called on the XPC service side. The default implementation just returns a single parser instance. 
@@ -281,7 +281,7 @@
 
 #pragma mark
 
-@implementation IMBParserFactory (AppMethods)
+@implementation IMBParserMessenger (App)
 
 
 // These two methods can be overrridden by subclasses to add custom menu items...

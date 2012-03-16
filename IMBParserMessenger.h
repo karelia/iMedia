@@ -73,12 +73,11 @@
 // be archived and sent over an XPC connection.  This class basically ties both sides (app and XPC service) 
 // together and communicates knowledge (class type) and state (instance properties)...
 
-@interface IMBParserFactory : NSObject <NSCoding>
+@interface IMBParserMessenger : NSObject <NSCoding>
 {
 	NSString* _mediaType;
 	NSURL* _mediaSource;
 	BOOL _isUserAdded;
-	
 	XPCConnection* _connection;
 }
 
@@ -104,7 +103,7 @@
 
 // The following methods are only called from an XPC service process...
 
-@interface IMBParserFactory (XPCMethods)
+@interface IMBParserMessenger (XPC)
 
 // This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses  
 // may opt to return more than one instance (e.g. Aperture may create one instance per library). Must be 
@@ -112,11 +111,12 @@
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError;
 
-// Convenience method to access (potentially also create) a particular parser instance...
+// Convenience method to access (potentially also create) a particular parser instance. Should not be over-
+// ridden in subclasses...
 
 - (IMBParser*) parserWithIdentifier:(NSString*)inIdentifier;
 
-// Factory method for instantiating a single parser...
+// Factory method for instantiating a single parser. Should not be over ridden in subclasses..
 
 - (IMBParser*) newParser;
 
@@ -136,7 +136,7 @@
 
 // The following methods are only called by the iMedia framework from the host application process...
 
-@interface IMBParserFactory (AppMethods)
+@interface IMBParserMessenger (App)
 
 // Called when the user right-clicks in the iMedia UI. Here the IMBParserFactory has a chance to add custom   
 // menu items of its own, that go beyond the functionality of the standard items added by the controllers.

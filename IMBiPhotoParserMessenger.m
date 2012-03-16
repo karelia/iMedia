@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBiPhotoParserFactory.h"
+#import "IMBiPhotoParserMessenger.h"
 #import "IMBiPhotoImageParser.h"
 #import "IMBiPhotoMovieParser.h"
 #import "IMBParserController.h"
@@ -70,7 +70,7 @@
 
 // Specify parameters for image subclass and register it...
  
-@implementation IMBiPhotoImageParserFactory
+@implementation IMBiPhotoImageParserMessenger
 
 + (NSString*) mediaType
 {
@@ -90,7 +90,7 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserFactoryClass:self forMediaType:[self mediaType]];
+	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
 	[pool drain];
 }
 
@@ -104,7 +104,7 @@
 
 // Specify parameters for movie subclass and register it...
  
-@implementation IMBiPhotoMovieParserFactory
+@implementation IMBiPhotoMovieParserMessenger
 
 + (NSString*) mediaType
 {
@@ -124,7 +124,7 @@
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserFactoryClass:self forMediaType:[self mediaType]];
+	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
 	[pool drain];
 }
 
@@ -136,7 +136,7 @@
 
 #pragma mark 
 
-@implementation IMBiPhotoParserFactory
+@implementation IMBiPhotoParserMessenger
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -176,6 +176,9 @@
 {
 	return [self iPhotoPath] != nil;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // This method is called on the XPC service side. Discover the path to the AlbumData.xml file and create  

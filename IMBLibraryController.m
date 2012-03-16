@@ -57,7 +57,7 @@
 //#import "IMBOperationQueue.h"
 //#import "IMBParser.h"
 #import "IMBNode.h"
-#import "IMBParserFactory.h"
+#import "IMBParserMessenger.h"
 //#import "IMBCommon.h"
 //#import "IMBConfig.h"
 //#import "IMBKQueue.h"
@@ -441,32 +441,28 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _loadUnpopulatedTopLevelNodes
 {
-		NSArray* factories = [[IMBParserController sharedParserController] loadedParserFactoriesForMediaType:self.mediaType];
+	NSArray* messengers = [[IMBParserController sharedParserController] loadedParserMessengersForMediaType:self.mediaType];
 
-		for (IMBParserFactory* factory in factories)
-		{
-			XPCPerformSelectorAsync(factory.connection,factory,@selector(unpopulatedTopLevelNodesWithError:),nil,
-			
-				^(NSArray* inNodes,NSError* inError)
+	for (IMBParserMessenger* messenger in messengers)
+	{
+		XPCPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodesWithError:),nil,
+		
+			^(NSArray* inNodes,NSError* inError)
+			{
+				if (inError)
 				{
-					if (inError)
+					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				}
+				else if (inNodes)
+				{
+					for (IMBNode* node in inNodes)
 					{
-						NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+						node.parserMessenger = messenger;
+						// TODO: Insert node into self.subnodes...
 					}
-					else if (inNodes)
-					{
-						for (IMBNode* node in inNodes)
-						{
-							node.parserFactory = factory;
-							// TODO: Insert node into self.subnodes...
-
-							// JUST TEMP: for testing sandbox, remove these 2 lines later...
-							NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:node.mediaSource];
-							if (plist == nil) NSLog(@"SANDBOX ACTIVE");
-						}
-					}
-				});		
-		}
+				}
+			});		
+	}
 }
 
 
@@ -474,12 +470,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	for (IMBNode* oldNode in self.subnodes)
 	{
-		IMBParserFactory* factory = oldNode.parserFactory;
-		XPCPerformSelectorAsync(factory.connection,factory,@selector(reloadNode:error:),oldNode,
+		IMBParserMessenger* messenger = oldNode.parserMessenger;
+		XPCPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNode:error:),oldNode,
 		
 			^(IMBNode* newNode,NSError* inError)
 			{
-				newNode.parserFactory = factory;
+				newNode.parserMessenger = messenger;
 				// TODO: Replace old with new node...
 			});		
 	}
