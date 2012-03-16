@@ -426,7 +426,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
 
 	NSArray* parsers = [[IMBParserController sharedParserController] parsersForMediaType:self.mediaType];
-	
+
+	// Unregister for any existing file system notifications
+	[self unregisterAllFileSystemNotifications];
+
 	[self willChangeValueForKey:@"rootNodes"];
 	[self.rootNodes removeAllObjects];
 	[self didChangeValueForKey:@"rootNodes"];
@@ -588,6 +591,40 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// Centralize the registration and deregistration of file system changes, so we 
+// can be more accountable to making sure we properly deregister when reloading.
+//
+// Note: Are KQueue type watches even used anymore? Maybe we can eliminate that.
+
+- (void) registerNodeForFileSystemNotificationsIfNeeded:(IMBNode*)theNode
+{
+	NSString* watchedPath = theNode.watchedPath;
+	if (watchedPath)
+	{
+		if (theNode.watcherType == kIMBWatcherTypeKQueue)
+			[self.watcherUKKQueue addPath:watchedPath];
+		else if (theNode.watcherType == kIMBWatcherTypeFSEvent)
+			[self.watcherFSEvents addPath:watchedPath];
+	}
+}
+
+- (void) unregisterNodeForFileSystemNotificationsIfNeeded:(IMBNode*)theNode
+{
+	NSString* watchedPath = theNode.watchedPath;
+	if (watchedPath)
+	{
+		if (theNode.watcherType == kIMBWatcherTypeKQueue)
+			[self.watcherUKKQueue removePath:watchedPath];
+		else if (theNode.watcherType == kIMBWatcherTypeFSEvent)
+			[self.watcherFSEvents removePath:watchedPath];
+	}
+}
+
+- (void) unregisterAllFileSystemNotifications
+{
+	[self.watcherUKKQueue removeAllPaths];
+	[self.watcherFSEvents removeAllPaths];
+}
 
 // This method is called on the main thread as a result of any IMBLibraryOperation. We are given both the old  
 // and the new node. Replace the old with the new node. The node we are given here can be a root node or a node
@@ -684,13 +721,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
                 inOldNode = [nodes objectAtIndex:index];
             }
 
-            if ((watchedPath = inOldNode.watchedPath))
-            {
-                if (inOldNode.watcherType == kIMBWatcherTypeKQueue)
-                    [self.watcherUKKQueue removePath:watchedPath];
-                else if (inOldNode.watcherType == kIMBWatcherTypeFSEvent)
-                    [self.watcherFSEvents removePath:watchedPath];
-            }
+			[self unregisterNodeForFileSystemNotificationsIfNeeded:inOldNode];
 
             if (index != NSNotFound)
             {
@@ -705,13 +736,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
             if (index == NSNotFound) index = nodes.count;
             [nodes insertObject:inNewNode atIndex:index];
 
-            if ((watchedPath = inNewNode.watchedPath))
-            {
-                if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
-                    [self.watcherUKKQueue addPath:watchedPath];
-                else if (inNewNode.watcherType == kIMBWatcherTypeFSEvent)
-                    [self.watcherFSEvents addPath:watchedPath];
-            }
+			[self registerNodeForFileSystemNotificationsIfNeeded:inNewNode];
         }
 
         // Sort the nodes so that they always appear in the same (stable) order...
