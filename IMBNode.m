@@ -269,7 +269,12 @@
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
 
-		#warning TODO subnodes and objects
+		NSMutableArray* subnodes = [inCoder decodeObjectForKey:@"subnodes"];
+		if (subnodes) self.subnodes = subnodes;
+		
+		NSMutableArray* objects = [inCoder decodeObjectForKey:@"objects"];
+		if (objects) self.objects = objects;
+		
 	}
 	
 	return self;
@@ -298,7 +303,15 @@
 	[inCoder encodeBool:self.wantsRecursiveObjects forKey:@"wantsRecursiveObjects"];
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
 	
-	#warning TODO subnodes and objects
+	if (self.subnodes)
+	{
+		[inCoder encodeObject:self.subnodes forKey:@"subnodes"];
+	}
+
+	if (self.objects)
+	{
+		[inCoder encodeObject:self.objects forKey:@"objects"];
+	}
 }
 
 
