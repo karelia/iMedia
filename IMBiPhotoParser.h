@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
+#import "IMBAppleMediaParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,14 +60,19 @@
 
 #pragma mark 
 
-@interface IMBiPhotoParser : IMBParser
+@interface IMBiPhotoParser : IMBAppleMediaParser
 {
 	NSString* _appPath;
 	BOOL _shouldDisplayLibraryName;
+	int _fakeAlbumID;					// for iPhoto2 compatibility
+	NSDateFormatter* _dateFormatter;
 }
 
 @property (retain) NSString* appPath;
 @property (assign) BOOL shouldDisplayLibraryName;
+@property (retain) NSDateFormatter* dateFormatter;
+
+//- (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs; // public utility method to help extract keywords from numbers
 
 @end
 
