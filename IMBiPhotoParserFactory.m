@@ -77,9 +77,9 @@
 	return kIMBMediaTypeImage;
 }
 
-+ (Class) parserClass
++ (NSString*) parserClassName
 {
-	return [IMBiPhotoImageParser class];
+	return @"IMBiPhotoImageParser";
 }
 					
 + (NSString*) identifier
@@ -111,9 +111,9 @@
 	return kIMBMediaTypeMovie;
 }
 
-+ (Class) parserClass
++ (NSString*) parserClassName
 {
-	return [IMBiPhotoMovieParser class];
+	return @"IMBiPhotoMovieParser";
 }
 						
 + (NSString*) identifier
@@ -200,8 +200,7 @@
 			{
 				// Create a parser instance preconfigure with that path...
 				
-				Class parserClass = [[self class] parserClass];
-				IMBiPhotoParser* parser = [[parserClass alloc] init];
+				IMBiPhotoParser* parser = [[[self parserClass] alloc] init];
 				
 				parser.identifier = [NSString stringWithFormat:@"%@/%@",[[self class] identifier],path];
 				parser.mediaType = self.mediaType;
