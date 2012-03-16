@@ -819,8 +819,6 @@
 		0867D691FE84028FC02AAC07 /* iMedia */ = {
 			isa = PBXGroup;
 			children = (
-				D0E96C3115124CE4004F3EE7 /* AppKit.framework */,
-				30E7772215110D1600413AEF /* Security.framework */,
 				D0760AC210C5027100F2119C /* IMBProject.xcconfig */,
 				D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */,
 				D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */,
@@ -916,6 +914,8 @@
 			isa = PBXGroup;
 			children = (
 				30FFEBEE150A08DB0009C1D0 /* Foundation.framework */,
+				D0E96C3115124CE4004F3EE7 /* AppKit.framework */,
+				30E7772215110D1600413AEF /* Security.framework */,
 				D0F207C5150A23AA007E6FA2 /* XPCKit.framework */,
 			);
 			name = Frameworks;
