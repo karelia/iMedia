@@ -138,7 +138,7 @@
 
 @interface IMBParserMessenger (App)
 
-// Called when the user right-clicks in the iMedia UI. Here the IMBParserFactory has a chance to add custom   
+// Called when the user right-clicks in the iMedia UI. Here the IMBParserMessenger has a chance to add custom   
 // menu items of its own, that go beyond the functionality of the standard items added by the controllers.
 // These methods are only called on the host app side...
 
