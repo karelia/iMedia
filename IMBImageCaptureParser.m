@@ -224,9 +224,7 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	DEBUGLOG( @"%s\n inNode %@",__PRETTY_FUNCTION__, inNode );
-	
-	NSError* error = nil;
-	
+		
 	if( !inNode.objects ||
 	   !inNode.subNodes )
 	{ // only populate if empty
@@ -254,8 +252,7 @@
 		}	
 	}
 	
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
