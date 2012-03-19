@@ -106,24 +106,24 @@
 @interface IMBParserMessenger (XPC)
 
 // This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses  
-// may opt to return more than one instance (e.g. Aperture may create one instance per library). Must be 
+// may opt to return more than one instance (e.g. Aperture may create one instance per library). MUST be 
 // overridden by subclasses..
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError;
 
-// Convenience method to access (potentially also create) a particular parser instance. Should not be over-
+// Convenience method to access (potentially also create) a particular parser instance. Should NOT be over-
 // ridden in subclasses...
 
 - (IMBParser*) parserWithIdentifier:(NSString*)inIdentifier;
 
-// Factory method for instantiating a single parser. Should not be over ridden in subclasses..
+// Factory method for instantiating a single parser. Should NOT be over ridden in subclasses..
 
 - (IMBParser*) newParser;
 
 // The following four methods correspond to the ones in the IMBParserProtocol. Here the work is simply 
-// delegated to the appropriate IMBParser instance...
+// delegated to the appropriate IMBParser instance. Should NOT be overridden in subclasses...
 
-- (NSMutableArray*) unpopulatedTopLevelNodesWithError:(NSError**)outError;
+- (NSMutableArray*) unpopulatedTopLevelNodes:(NSError**)outError;
 - (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError;
 - (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError;
 - (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError;

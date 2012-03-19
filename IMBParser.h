@@ -86,10 +86,10 @@
 
 @required
 
-- (IMBNode*) unpopulatedTopLevelNodeWithError:(NSError**)outError;
-- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError;
-- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError;
-- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError;
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError;
+- (void) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError;
+- (void) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError;
+- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError;
 
 // The following three methods are used to load thumbnails or metadata, or create a security-scoped bookmark for  
 // full media file access. They are called on the XPC service side...

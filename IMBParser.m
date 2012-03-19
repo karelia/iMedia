@@ -126,27 +126,27 @@
 
 // To be overridden by subclasses...
 
-- (IMBNode*) unpopulatedTopLevelNodeWithError:(NSError**)outError
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
 	return nil;
 }
 
 
-- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	return nil;
+
 }
 
 
-- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	return nil;
+
 }
 
 
-- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	return nil;
+
 }
 
 

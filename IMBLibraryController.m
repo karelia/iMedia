@@ -445,7 +445,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	for (IMBParserMessenger* messenger in messengers)
 	{
-		XPCPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodesWithError:),nil,
+		XPCPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodes:),nil,
 		
 			^(NSArray* inNodes,NSError* inError)
 			{

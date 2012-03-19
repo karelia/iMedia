@@ -102,7 +102,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBNode*) unpopulatedTopLevelNodeWithError:(NSError**)outError
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
 	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
 	[icon setScalesWhenResized:YES];
@@ -132,7 +132,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
 	NSDictionary* plist = self.plist;
@@ -181,25 +181,24 @@
 //	}
 	
 	if (outError) *outError = error;
-	return inNode;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	return inNode;
+
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	return inNode;
+
 }
 
 

@@ -227,7 +227,7 @@
 // The following four methods are simply wrappers that access the appropriate IMBParser instances and 
 // then simply call the same method on those instances...
 
-- (NSArray*) unpopulatedTopLevelNodesWithError:(NSError**)outError
+- (NSArray*) unpopulatedTopLevelNodes:(NSError**)outError
 {
 	NSError* error = nil;
 	NSMutableArray* topLevelNodes = nil;
@@ -241,7 +241,7 @@
 		{
 			if (error == nil)
 			{
-				IMBNode* node = [parser unpopulatedTopLevelNodeWithError:&error];
+				IMBNode* node = [parser unpopulatedTopLevelNode:&error];
 				[topLevelNodes addObject:node];
 			}
 		}
@@ -255,21 +255,24 @@
 - (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	return [parser populateSubnodesOfNode:inNode error:outError];
+	[parser populateSubnodesOfNode:inNode error:outError];
+	return inNode;
 }
 
 
 - (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	return [parser populateObjectsOfNode:inNode error:outError];
+	[parser populateObjectsOfNode:inNode error:outError];
+	return inNode;
 }
 
 
 - (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	return [parser reloadNode:inNode error:outError];
+	[parser reloadNode:inNode error:outError];
+	return inNode;
 }
 
 
