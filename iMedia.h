@@ -63,6 +63,11 @@
 
 // Parsers...
 
+#import <iMedia/IMBParserMessenger.h>
+#import <iMedia/IMBFolderParserMessenger.h>
+#import <iMedia/IMBImageFolderParserMessenger.h>
+#import <iMedia/IMBiPhotoParserMessenger.h>
+
 //#import <iMedia/IMBParser.h>
 //#import <iMedia/IMBFolderParser.h>
 //#import <iMedia/IMBImageFolderParser.h>
