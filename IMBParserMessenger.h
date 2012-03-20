@@ -73,7 +73,7 @@
 // be archived and sent over an XPC connection.  This class basically ties both sides (app and XPC service) 
 // together and communicates knowledge (class type) and state (instance properties)...
 
-@interface IMBParserMessenger : NSObject <NSCoding>
+@interface IMBParserMessenger : NSObject <NSCoding,NSCopying>
 {
 	NSString* _mediaType;
 	NSURL* _mediaSource;

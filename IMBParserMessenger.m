@@ -74,6 +74,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		self.mediaType = [[self class] mediaType];
+		self.mediaSource = nil;
+		self.isUserAdded = NO;	
+	}
+	
+	return self;
+}
+
+- (void) dealloc
+{
+	IMBRelease(_mediaType);
+	IMBRelease(_mediaSource);
+	IMBRelease(_connection);
+	
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if ((self = [super init]))
@@ -107,16 +132,6 @@
 	copy.isUserAdded = self.isUserAdded;
 	
 	return copy;
-}
-
-
-- (void) dealloc
-{
-	IMBRelease(_mediaType);
-	IMBRelease(_mediaSource);
-	IMBRelease(_connection);
-	
-	[super dealloc];
 }
 
 
@@ -242,7 +257,7 @@
 			if (error == nil)
 			{
 				IMBNode* node = [parser unpopulatedTopLevelNode:&error];
-				[topLevelNodes addObject:node];
+				if (node) [topLevelNodes addObject:node];
 			}
 		}
 	}
