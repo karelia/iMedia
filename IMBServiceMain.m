@@ -72,13 +72,15 @@ int main(int argc, const char *argv[])
 	{
 		[inConnection setEventHandler:^(XPCMessage* inMessage, XPCConnection* inConnection)
 		{
+			NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
             XPCMessage* reply = [inMessage invoke];
             
             if (reply)
 			{
 				[inConnection sendMessage:reply];
 			}	
-                
+			
+			[pool2 drain];
 		}];
 	}];
 	
