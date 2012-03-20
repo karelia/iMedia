@@ -191,9 +191,12 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 	{
 //		_loadingCustomParsers = NO;
 		
-		[[NSNotificationCenter defaultCenter]				// Unload parsers before we quit, so that custom have 
-			addObserver:self								// a chance to clean up (e.g. remove callbacks, etc...)
-			selector:@selector(reset) 
+		// Unload all IMBParserMessengers before we quit, so that they have a chance to clean up 
+		// (e.g. remove callbacks, etc...)
+		
+		[[NSNotificationCenter defaultCenter]				 
+			addObserver:self								
+			selector:@selector(unloadParserMessengers) 
 			name:NSApplicationWillTerminateNotification 
 			object:nil];
 	}
