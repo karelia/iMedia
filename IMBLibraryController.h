@@ -100,12 +100,11 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 @interface IMBLibraryController : NSObject
 {
-	NSString* _mediaType;
 	NSMutableArray* _subnodes;
-//	IMBOptions _options;
+	BOOL _isReplacingNode;
+	NSString* _mediaType;
 	id _delegate;
 
-	BOOL _isReplacingNode;
 //	IMBKQueue* _watcherUKKQueue;
 //	IMBFSEventsWatcher* _watcherFSEvents;
 //	NSRecursiveLock* _watcherLock;
@@ -120,30 +119,26 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 // Accessors...
 
-@property (retain) NSString* mediaType;
-//@property (assign) IMBOptions options;
 @property (assign) id delegate;
+@property (retain) NSString* mediaType;
+@property (readonly) BOOL isReplacingNode;
 //@property (retain) IMBKQueue* watcherUKKQueue;
 //@property (retain) IMBFSEventsWatcher* watcherFSEvents;
-@property (readonly) BOOL isReplacingNode;
-
-// Node accessors (must only be called on the main thread)...
-
-@property (retain) NSMutableArray* subnodes;			
-//- (IMBNode*) topLevelNodeForParser:(IMBParser*)inParser;
-//- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 
 // Loading...
 
 - (void) reload;
+- (void) reloadNode:(IMBNode*)inOldNode;
 - (void) populateSubnodesOfNode:(IMBNode*)inNode;
 - (void) populateObjectsOfNode:(IMBNode*)inNode;
 
+// Node accessors (must only be called on the main thread)...
 
-//- (void) reloadNode:(IMBNode*)inNode;
-//- (void) reloadNode:(IMBNode*)inNode parser:(IMBParser*)inParser; // Low-level method (use reloadNode: if possible)
+@property (retain,readonly) NSMutableArray* subnodes;			
+- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
+- (IMBNode*) topLevelNodeForParserIdentifier:(NSString*)inParserIdentifier;
+- (void) logNodes;
 
-//- (void) populateNode:(IMBNode*)inNode;
 //- (void) stopPopulatingNodeWithIdentifier:(NSString*)inNodeIdentifier;
 
 // Custom nodes...
@@ -153,11 +148,8 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 // Popup menu...
 
-//- (NSMenu*) menuWithSelector:(SEL)inSelector target:(id)inTarget addSeparators:(BOOL)inAddSeparator;
+- (NSMenu*) menuWithSelector:(SEL)inSelector target:(id)inTarget addSeparators:(BOOL)inAddSeparator;
 
-// Debugging support...
-
-//- (void) logNodes;
 
 @end
 

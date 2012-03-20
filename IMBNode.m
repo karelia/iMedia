@@ -65,8 +65,12 @@
 #pragma mark
 
 @interface IMBNode ()
-@property (assign, readwrite) IMBNode* parentNode;
+
+@property (assign,readwrite) IMBNode* parentNode;
+@property (retain) NSArray* atomic_subnodes;				
+
 - (void) _recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray*)inIndexArray;
+
 @end
 
 
@@ -86,7 +90,7 @@
 @synthesize mediaSource = _mediaSource;
 
 @synthesize parentNode = _parentNode;
-@synthesize subnodes = _subnodes;
+@synthesize atomic_subnodes = _subnodes;
 @synthesize objects = _objects;
 
 // State information...
@@ -120,6 +124,10 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
 
 - (id) init
 {
@@ -274,7 +282,6 @@
 		
 		NSMutableArray* objects = [inCoder decodeObjectForKey:@"objects"];
 		if (objects) self.objects = objects;
-		
 	}
 	
 	return self;
@@ -319,34 +326,24 @@
 
 
 #pragma mark
-#pragma mark Accessors
+#pragma mark Subnodes
 
-// Accessors for navigating up or down the node tree...
 
 - (void) setSubnodes:(NSArray*)inNodes
 {
     [_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:nil];
-    
-	NSArray* nodes = [inNodes copy];
-    [_subnodes release]; 
-	_subnodes = nodes;
-    
+    self.atomic_subnodes = inNodes;
     [_subnodes makeObjectsPerformSelector:@selector(setParentNode:) withObject:self];
 }
 
 
-- (IMBNode*) topLevelNode
+- (NSArray*) subnodes
 {
-	if (_parentNode)
-	{
-		if (!_parentNode.isTopLevelNode)
-		{
-			return [_parentNode topLevelNode];
-		}
-	}
-		
-	return self;
+	return self.atomic_subnodes;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Node accessors. Use these for bindings the NSTreeController...
@@ -363,7 +360,81 @@
 }
 
 
+- (void) insertObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex
+{
+	if (_subnodes == nil)
+	{
+		self.atomic_subnodes = [NSMutableArray arrayWithCapacity:1];
+	}
+	
+	if (inIndex <= _subnodes.count)
+	{
+		[_subnodes insertObject:inNode atIndex:inIndex];
+		inNode.parentNode = self;
+	}
+	else 
+	{
+		NSLog(@"%s ERROR trying to insert node at illegal index!",__FUNCTION__);
+		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: trying to insert node at illegal index" userInfo:nil] raise];
+	}
+}
+
+
+- (void) removeObjectFromSubnodesAtIndex:(NSUInteger)inIndex
+{
+	if (inIndex < _subnodes.count)
+	{
+		IMBNode* node = [_subnodes objectAtIndex:inIndex];
+		node.parentNode = nil;
+		[_subnodes removeObjectAtIndex:inIndex];
+	}
+	else 
+	{
+		NSLog(@"%s ERROR trying to remove node at illegal index!",__FUNCTION__);
+		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: trying to remove node at illegal index" userInfo:nil] raise];
+	}
+}
+
+
+- (void) replaceObject:(IMBNode*)inNode inSubnodesAtIndex:(NSUInteger)inIndex
+{
+	if (inIndex < _subnodes.count)
+	{
+		IMBNode* node = [_subnodes objectAtIndex:inIndex];
+		node.parentNode = nil;
+		[_subnodes replaceObjectAtIndex:inIndex withObject:inNode];
+		inNode.parentNode = self;
+	}
+	else 
+	{
+		NSLog(@"%s ERROR trying to replace node at illegal index!",__FUNCTION__);
+		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: trying to replace node at illegal index" userInfo:nil] raise];
+	}
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// This accessor is only to be used by parser classes and IMBLibraryController, i.e. those participants that
+// are offically allowed to mutate IMBNodes...
+
+- (NSMutableArray*) mutableArrayForPopulatingSubnodes
+{
+	if (_subnodes == nil)
+	{
+		self.atomic_subnodes = [NSMutableArray arrayWithCapacity:1];
+	}
+	
+	return [self mutableArrayValueForKey:@"subnodes"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Objects
 
 
 // Shallow object accessors. Use these for binding the NSArrayController. This only returns the objects that are
@@ -482,9 +553,9 @@
 #pragma mark Helpers
 
 
-// Nodes are considered to be equal if their identifiers match - even if we are looking at different instances
-// This is necessary as nodes are relatively short-lived objects that are replaced with new instances often - 
-// a necessity in our multithreaded environment...
+// Nodes are considered to be equal if their identifiers match - even if we are looking at different 
+// instances. This is necessary as nodes are relatively short-lived objects that are replaced with   
+// new instances often - a necessity in our multithreaded environment...
 
 - (BOOL) isEqual:(id)inNode
 {
@@ -499,6 +570,7 @@
     
     return NO;
 }
+
 
 - (NSUInteger) hash;
 {
@@ -539,30 +611,20 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+// This method find the correction insertion index for a new subnode, so that the resulting array of 
+// subnodes is correctly ordered...
 
-
-// Set loading status for self and complete subtree...
-
-- (void) setLoading:(BOOL)inLoading
++ (NSUInteger) insertionIndexForNode:(IMBNode*)inSubnode inSubnodes:(NSArray*)inSubnodes
 {
-	_loading = inLoading;
+	NSUInteger i = 0;
 	
-	for (IMBNode* subnode in self.subnodes)
+	for (IMBNode* subnode in inSubnodes)
 	{
-		subnode.loading = inLoading;
+		NSComparisonResult order = [subnode compare:inSubnode];
+		if (order < 0) i++;
 	}
-}
-
-
-// Check if this node or one of its ancestors is current loading in the background. In this case it will be 
-// replaced shortly and is not considered to be eligible for a new background operation...
-
-- (BOOL) isLoading
-{
-	if (_loading) return YES;
-	if (_parentNode) return [_parentNode isLoading];
-	return NO;
+	
+	return i;
 }
 
 
@@ -627,21 +689,19 @@
 	
 	else
 	{
-		#warning TODO
+		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
+		NSUInteger index = 0;
 		
-//		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType];
-//		NSUInteger index = 0;
-//		
-//		for (IMBNode* node in libraryController.subnodes)
-//		{
-//			if ([node.identifier isEqualToString:self.identifier])
-//			{
-//				[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:index]];
-//				return;
-//			}
-//			
-//			index++;
-//		}
+		for (IMBNode* node in libraryController.subnodes)
+		{
+			if ([node.identifier isEqualToString:self.identifier])
+			{
+				[inIndexArray addObject:[NSNumber numberWithUnsignedInteger:index]];
+				return;
+			}
+			
+			index++;
+		}
 	}
 	
 	// Oops, we shouldn't be here...
@@ -727,23 +787,88 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Walk towards the root of the tree until we find the top-level node. Please note that this may not be the 
+// root of the tree itself, since top-level nodes may be subnodes of a group node...
+
+- (IMBNode*) topLevelNode
+{
+	if (self.isTopLevelNode)
+	{
+		return self;
+	}
+	
+	if (_parentNode)
+	{
+		return [_parentNode topLevelNode];
+	}
+		
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Set loading status for self and complete subtree...
+
+- (void) setLoading:(BOOL)inLoading
+{
+	_loading = inLoading;
+	
+	for (IMBNode* subnode in self.subnodes)
+	{
+		subnode.loading = inLoading;
+	}
+}
+
+
+// Check if this node or one of its ancestors is current loading in the background. In this case it will be 
+// replaced shortly and is not considered to be eligible for a new background operation...
+
+- (BOOL) isLoading
+{
+	if (_loading) return YES;
+	if (_parentNode) return [_parentNode isLoading];
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark
 #pragma mark Debugging
+
+// Subnodes are indented by one tab...
+	
+- (NSString*) indentString
+{
+	if (_parentNode)
+	{
+		return [[_parentNode indentString] stringByAppendingString:@"\t"];
+	}
+	
+	return @"";
+}
+
 
 - (NSString*) description
 {
 	// Basic info...
 	
-	NSMutableString* description = [NSMutableString stringWithFormat:@"\tIMBNode (%@) \n\t\tidentifier = %@ \n\t\tattributes = %@",
+	NSMutableString* description = [NSMutableString stringWithFormat:@"%@%@ (%@)",
+		self.indentString,
 		self.name,
-		self.identifier,
-		self.attributes];
+		self.identifier];
 	
 	// Objects...
 	
-	if ([_objects count] > 0)
+	if (_objects.count > 0)
 	{
-		[description appendFormat:@"\n\t\tobjects = %u",[_objects count]];
+		[description appendFormat:@"\n%@\tobjects = %u",
+			self.indentString,
+			_objects.count];
+			
 //		for (IMBObject* object in _objects)
 //		{
 //			[description appendFormat:@"\n\t\t\t%@",object.name];
@@ -752,12 +877,11 @@
 	
 	// Subnodes...
 	
-	if ([_subnodes count] > 0)
+	if (_subnodes.count > 0)
 	{
-		[description appendFormat:@"\n\t\tsubnodes = %u",[_subnodes count]];
 		for (IMBNode* subnode in _subnodes)
 		{
-			[description appendFormat:@"\n\t\t\t%@",subnode.name];
+			[description appendFormat:@"\n%@",subnode.description];
 		}
 	}
 	

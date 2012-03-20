@@ -80,7 +80,7 @@
 	NSURL* _mediaSource;
 	
 	IMBNode* _parentNode;	// not retained!
-	NSArray* _subnodes;
+	NSMutableArray* _subnodes;
 	NSArray* _objects;
 
 	// State information...
@@ -131,10 +131,14 @@
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
 // subnodes is an empty array, then there really aren't any subnodes...
 
-@property (copy) NSArray* subnodes;				
+@property (retain,readonly) NSArray* subnodes;				
 @property (assign,readonly) IMBNode* parentNode;
-@property (readonly) IMBNode* topLevelNode;
-@property (assign) BOOL isTopLevelNode;
+- (NSUInteger) countOfSubnodes;
+
+// For parser classes and IMBLibraryController, who need to modify nodes, use this method. By calling it, the node 
+// is marked as populated...
+
+- (NSMutableArray*) mutableArrayForPopulatingSubnodes;
 
 // Object accessors. If the objects property is nil, that doesn't mean that there are no objects - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
@@ -167,6 +171,7 @@
 @property (assign) BOOL includedInPopup;
 @property (assign) BOOL isUserAdded;
 @property (assign) BOOL wantsRecursiveObjects;
+@property (assign) BOOL isTopLevelNode;
 
 // Info about our parser...
 
@@ -187,10 +192,12 @@
 // Helper methods
 
 - (NSComparisonResult) compare:(IMBNode*)inNode;
++ (NSUInteger) insertionIndexForNode:(IMBNode*)inSubnode inSubnodes:(NSArray*)inSubnodes;
 - (BOOL) isAncestorOfNode:(IMBNode*)inNode;
 - (BOOL) isDescendantOfNode:(IMBNode*)inNode;
 
 - (NSIndexPath*) indexPath;
+- (IMBNode*) topLevelNode;
 - (IMBNode*) subnodeWithIdentifier:(NSString*)identifier;
 - (BOOL) isPopulated;
 
