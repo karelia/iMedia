@@ -253,18 +253,27 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			
 				^(NSArray* inNodes,NSError* inError)
 				{
-					if (inError)
+					dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
 					{
-						NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-					}
-					else if (inNodes)
-					{
-						for (IMBNode* node in inNodes)
+						if (inError)
 						{
-							node.parserMessenger = messenger;
-							[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+							NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
 						}
-					}
+						else if (inNodes)
+						{
+							for (IMBNode* node in inNodes)
+							{
+								node.parserMessenger = messenger;
+								[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+
+								// JUST TEMP:
+								if (!node.isLeaf)
+								{
+									[self performSelectorOnMainThread:@selector(populateSubnodesOfNode:) withObject:node waitUntilDone:NO];
+								}
+							}
+						}
+					});
 				});		
 		}
 	}
@@ -292,15 +301,18 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
-			if (inError)
+			dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
 			{
-				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-			}
-			else if (inNewNode)
-			{
-				inNewNode.parserMessenger = messenger;
-				[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
-			}
+				if (inError)
+				{
+					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				}
+				else if (inNewNode)
+				{
+					inNewNode.parserMessenger = messenger;
+					[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+				}
+			});
 		});		
 }
 
@@ -322,15 +334,27 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
-			if (inError)
+			dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
 			{
-				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-			}
-			else if (inNewNode)
-			{
-				inNewNode.parserMessenger = messenger;
-				[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
-			}
+				if (inError)
+				{
+					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				}
+				else if (inNewNode)
+				{
+					inNewNode.parserMessenger = messenger;
+					[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+
+					// JUST TEMP:
+					for (IMBNode* node in inNewNode.subnodes)
+					{
+						if (!node.isLeaf)
+						{
+							[self performSelectorOnMainThread:@selector(populateSubnodesOfNode:) withObject:node waitUntilDone:NO];
+						}
+					}
+				}
+			});
 		});		
 }
 
@@ -352,15 +376,18 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
-			if (inError)
+			dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
 			{
-				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-			}
-			else if (inNewNode)
-			{
-				inNewNode.parserMessenger = messenger;
-				[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
-			}
+				if (inError)
+				{
+					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				}
+				else if (inNewNode)
+				{
+					inNewNode.parserMessenger = messenger;
+					[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+				}
+			});
 		});		
 }
 
@@ -478,11 +505,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		NSLog(@"--------------------------------------------------------------------------------------------");
 		[self logNodes];
-							
-		if (!inNewNode.isLeaf)
-		{
-			[self performSelectorOnMainThread:@selector(populateSubnodesOfNode:) withObject:inNewNode waitUntilDone:NO];
-		}
 	}
 }
 
