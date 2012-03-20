@@ -52,8 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBImageFolderParser.h"
-#import "NSImage+iMedia.h"
+#import "IMBFolderParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,30 +60,31 @@
 
 #pragma mark 
 
-@implementation IMBImageFolderParser
+// This parser scans any folder for image files...
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-/*
-// Return metadata specific to image files...
-
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
-{
-	return [NSImage imb_metadataFromImageAtPath:inPath checkSpotlightComments:YES];
-}
-
-
-// Convert metadata into human readable string...
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
-}
-*/
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
+@interface IMBImageFolderParserMessenger : IMBFolderParserMessenger
 @end
+
+// This subclass looks only in "~/Pictures"...
+
+@interface IMBPicturesFolderParserMessenger : IMBImageFolderParserMessenger
+@end
+
+// This subclass looks only in "/Library/Desktop Pictures"...
+
+@interface IMBDesktopPicturesFolderParserMessenger : IMBImageFolderParserMessenger
+@end
+
+// This subclass looks only in "/Library/User Pictures"...
+
+@interface IMBUserPicturesFolderParserMessenger : IMBImageFolderParserMessenger
+@end
+
+// This subclass looks only in "/Library/Application Support/Apple/iChat Icons"...
+
+@interface IMBiChatIconsFolderParserMessenger : IMBImageFolderParserMessenger
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+

@@ -52,8 +52,9 @@
 
 #pragma mark HEADERS
 
-#import "IMBImageFolderParser.h"
-#import "NSImage+iMedia.h"
+#import "IMBImageFolderParserMessenger.h"
+#import "IMBParserController.h"
+#import "SBUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,30 +62,134 @@
 
 #pragma mark 
 
-@implementation IMBImageFolderParser
+@implementation IMBImageFolderParserMessenger
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-/*
-// Return metadata specific to image files...
-
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
++ (NSString*) mediaType
 {
-	return [NSImage imb_metadataFromImageAtPath:inPath checkSpotlightComments:YES];
+	return kIMBMediaTypeImage;
 }
 
-
-// Convert metadata into human readable string...
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+- (id) init
 {
-	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
+	if ((self = [super init]))
+	{
+		self.fileUTI = (NSString*)kUTTypeImage;		// Restrict this parser to image files...
+		self.mediaType = [[self class] mediaType];
+	}
+	
+	return self;
 }
-*/
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBPicturesFolderParserMessenger
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+	[pool drain];
+}
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		NSString* path = [SBHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
+		self.mediaSource = [NSURL fileURLWithPath:path];
+		self.displayPriority = 1;
+	}
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBDesktopPicturesFolderParserMessenger
+
++ (void) load
+{
+//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+//	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+//	[pool drain];
+}
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		self.mediaSource = [NSURL fileURLWithPath:@"/Library/Desktop Pictures"];
+	}
+	
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBUserPicturesFolderParserMessenger
+
++ (void) load
+{
+//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+//	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+//	[pool drain];
+}
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		self.mediaSource = [NSURL fileURLWithPath:@"/Library/User Pictures"];
+	}
+	
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBiChatIconsFolderParserMessenger
+
++ (void) load
+{
+//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+//	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+//	[pool drain];
+}
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		self.mediaSource = [NSURL fileURLWithPath:@"/Library/Application Support/Apple/iChat Icons"];
+	}
+	
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------

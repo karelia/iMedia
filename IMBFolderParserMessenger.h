@@ -52,8 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBImageFolderParser.h"
-#import "NSImage+iMedia.h"
+#import "IMBParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,30 +60,23 @@
 
 #pragma mark 
 
-@implementation IMBImageFolderParser
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-/*
-// Return metadata specific to image files...
-
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
+// This parser class creates nodes for a folder and populates it with files that conform to the specified uti...
+ 
+@interface IMBFolderParserMessenger : IMBParserMessenger
 {
-	return [NSImage imb_metadataFromImageAtPath:inPath checkSpotlightComments:YES];
+	NSString* _fileUTI;
+	NSUInteger _displayPriority;
 }
 
+@property (retain) NSString* fileUTI;
+@property (assign) NSUInteger displayPriority;
 
-// Convert metadata into human readable string...
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
-}
-*/
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+//- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
+//- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+//- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
