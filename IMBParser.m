@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBParser.h"
+#import "NSWorkspace+iMedia.h"
 //#import "IMBNode.h"
 //#import "IMBObject.h"
 //#import "IMBObjectsPromise.h"
@@ -437,6 +438,26 @@
 {
 	NSString* parserClassName = NSStringFromClass([self class]);
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This method makes sure that we have an image with a bitmap representation that can be archived...
+
+- (NSImage*) iconForPath:(NSString*)inPath
+{
+	NSWorkspace* workspace = [NSWorkspace imb_threadSafeWorkspace];
+
+	NSImage* image = [workspace iconForFile:inPath];
+	[image setSize:NSMakeSize(16,16)];
+	NSData* tiff = [image TIFFRepresentation];
+//	NSBitmapImageRep* bitmap = [NSBitmapImageRep imageRepWithData:tiff];
+	
+	NSImage* icon = [[[NSImage alloc] initWithData:tiff] autorelease];
+	[icon setSize:NSMakeSize(16,16)];
+	return icon;
 }
 
 

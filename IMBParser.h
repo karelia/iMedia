@@ -130,6 +130,7 @@
 // Helpers for subclasses...
 
 - (NSString*) identifierForPath:(NSString*)inPath;
+- (NSImage*) iconForPath:(NSString*)inPath;
 
 //- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions;
 

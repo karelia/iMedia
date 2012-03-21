@@ -58,7 +58,6 @@
 #import "IMBObject.h"
 #import "IMBNodeObject.h"
 #import "NSFileManager+iMedia.h"
-#import "NSWorkspace+iMedia.h"
 #import "NSString+iMedia.h"
 #import <Quartz/Quartz.h>
 
@@ -127,12 +126,8 @@
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 
-	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(16,16)];
-
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-	node.icon = icon;
+	node.icon = [self iconForPath:path];;
 	node.name = name;
 	node.identifier = [self identifierForPath:path];
 	node.mediaType = self.mediaType;
@@ -179,7 +174,6 @@
 {
 	NSError* error = nil;
 	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
-	NSWorkspace* workspace = [NSWorkspace imb_threadSafeWorkspace];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	
@@ -219,12 +213,8 @@
 				
 				if (![IMBConfig isLibraryPath:path])
 				{
-					NSImage* icon = [workspace iconForFile:path];
-					[icon setScalesWhenResized:YES];
-					[icon setSize:NSMakeSize(16,16)];
-
 					IMBNode* subnode = [[IMBNode alloc] init];
-					subnode.icon = icon;
+					subnode.icon = [self iconForPath:path];
 					subnode.name = name;
 					subnode.identifier = [self identifierForPath:path];
 					subnode.mediaType = self.mediaType;
