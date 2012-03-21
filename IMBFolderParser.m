@@ -118,6 +118,13 @@
 	
 	if (!exists || !directory) 
 	{
+		if (outError)
+		{
+			NSString* description = [NSString stringWithFormat:@"Folder doesn't exist: %@",path];
+			NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
+			*outError = [NSError errorWithDomain:kIMBErrorDomain code:dirNFErr userInfo:info];
+		}
+		
 		return nil;
 	}	
 
