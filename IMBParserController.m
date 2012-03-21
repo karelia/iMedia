@@ -263,12 +263,18 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 
 - (void) unloadParserMessengers
 {
-	for (NSString* mediaType in _loadedParserMessengers)
+	NSArray* keys = [_loadedParserMessengers allKeys];
+	NSUInteger n = [keys count];
+	
+	for (NSUInteger i=0; i<n; i++)
     {
+		NSString* mediaType = [keys objectAtIndex:i];
         NSArray* parserMessengers = [_loadedParserMessengers objectForKey:mediaType];
-        
-        for (IMBParserMessenger* parserMessenger in parserMessengers)
+        NSUInteger m = parserMessengers.count;
+		
+        for (NSUInteger j=0; j<m; j++)
         {
+			IMBParserMessenger* parserMessenger = [parserMessengers objectAtIndex:0];
 			[self removeParserMessenger:parserMessenger];
         }
     }
