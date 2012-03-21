@@ -84,7 +84,7 @@
 					
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.iPhoto.image";
+	return @"com.karelia.imedia.iPhoto";
 }
 
 + (void) load
@@ -118,7 +118,7 @@
 						
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.iPhoto.movie";
+	return @"com.karelia.imedia.iPhoto";
 }
 
 + (void) load
