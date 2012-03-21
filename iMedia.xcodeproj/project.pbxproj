@@ -130,6 +130,8 @@
 		D08070C810442DAE00891137 /* IMBAudioView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070C710442DAE00891137 /* IMBAudioView.xib */; };
 		D08070CA10442DC800891137 /* IMBMovieView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070C910442DC800891137 /* IMBMovieView.xib */; };
 		D08070EA10442F0500891137 /* IMBPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070E910442F0500891137 /* IMBPanel.xib */; };
+		D081099D1519AF3B00201850 /* IMBAudioFolderParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = D081099B1519AF3B00201850 /* IMBAudioFolderParserMessenger.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D081099E1519AF3B00201850 /* IMBAudioFolderParserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = D081099C1519AF3B00201850 /* IMBAudioFolderParserMessenger.m */; };
 		D08C5C9E104862540068FF07 /* IMBTextFieldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08E8B701019C916005D8614 /* UKFNSubscribeFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8B721019C916005D8614 /* UKFSEventsWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B6A1019C916005D8614 /* UKFSEventsWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -545,6 +547,10 @@
 		D08070C710442DAE00891137 /* IMBAudioView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBAudioView.xib; sourceTree = "<group>"; };
 		D08070C910442DC800891137 /* IMBMovieView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBMovieView.xib; sourceTree = "<group>"; };
 		D08070E910442F0500891137 /* IMBPanel.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBPanel.xib; sourceTree = "<group>"; };
+		D081099B1519AF3B00201850 /* IMBAudioFolderParserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAudioFolderParserMessenger.h; sourceTree = "<group>"; };
+		D081099C1519AF3B00201850 /* IMBAudioFolderParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAudioFolderParserMessenger.m; sourceTree = "<group>"; };
+		D08109A01519AF5800201850 /* IMBMovieFolderParserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieFolderParserMessenger.h; sourceTree = "<group>"; };
+		D08109A11519AF5800201850 /* IMBMovieFolderParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieFolderParserMessenger.m; sourceTree = "<group>"; };
 		D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTextFieldCell.h; sourceTree = "<group>"; };
 		D08C5C9D104862540068FF07 /* IMBTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTextFieldCell.m; sourceTree = "<group>"; };
 		D08E8B661019C916005D8614 /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UKFileWatcher.h; sourceTree = "<group>"; };
@@ -1423,6 +1429,10 @@
 				D0E96CE015189FAC004F3EE7 /* IMBFolderParserMessenger.m */,
 				D0E96CE41518A296004F3EE7 /* IMBImageFolderParserMessenger.h */,
 				D0E96CE51518A297004F3EE7 /* IMBImageFolderParserMessenger.m */,
+				D081099B1519AF3B00201850 /* IMBAudioFolderParserMessenger.h */,
+				D081099C1519AF3B00201850 /* IMBAudioFolderParserMessenger.m */,
+				D08109A01519AF5800201850 /* IMBMovieFolderParserMessenger.h */,
+				D08109A11519AF5800201850 /* IMBMovieFolderParserMessenger.m */,
 				D099320C1011158400C527B7 /* IMBFolderParser.h */,
 				D099320D1011158400C527B7 /* IMBFolderParser.m */,
 				D099328F1011227100C527B7 /* IMBImageFolderParser.h */,
@@ -1618,6 +1628,7 @@
 				D0E96C35151324F6004F3EE7 /* IMBObject.h in Headers */,
 				D0E96CE115189FAC004F3EE7 /* IMBFolderParserMessenger.h in Headers */,
 				D0E96CE61518A297004F3EE7 /* IMBImageFolderParserMessenger.h in Headers */,
+				D081099D1519AF3B00201850 /* IMBAudioFolderParserMessenger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1962,6 +1973,7 @@
 				D0E96C40151398CA004F3EE7 /* IMBTimecodeTransformer.m in Sources */,
 				D0E96CE215189FAC004F3EE7 /* IMBFolderParserMessenger.m in Sources */,
 				D0E96CE71518A297004F3EE7 /* IMBImageFolderParserMessenger.m in Sources */,
+				D081099E1519AF3B00201850 /* IMBAudioFolderParserMessenger.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

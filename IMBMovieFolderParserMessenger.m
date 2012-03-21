@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBImageFolderParserMessenger.h"
+#import "IMBMovieFolderParserMessenger.h"
 #import "IMBParserController.h"
 #import "SBUtilities.h"
 
@@ -62,18 +62,18 @@
 
 #pragma mark 
 
-@implementation IMBImageFolderParserMessenger
+@implementation IMBMovieFolderParserMessenger
 
 + (NSString*) mediaType
 {
-	return kIMBMediaTypeImage;
+	return kIMBMediaTypeMovie;
 }
 
 - (id) init
 {
 	if ((self = [super init]))
 	{
-		self.fileUTI = (NSString*)kUTTypeImage;		// Restrict this parser to image files...
+		self.fileUTI = (NSString*)kUTTypeMovie;		// Restrict this parser to movie files...
 		self.mediaType = [[self class] mediaType];
 	}
 	
@@ -120,9 +120,9 @@
 
 + (void) load
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
-	[pool drain];
+//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+//	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+//	[pool drain];
 }
 
 - (id) init
@@ -147,9 +147,9 @@
 
 + (void) load
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
-	[pool drain];
+//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+//	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+//	[pool drain];
 }
 
 - (id) init
@@ -174,9 +174,9 @@
 
 + (void) load
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
-	[pool drain];
+//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+//	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+//	[pool drain];
 }
 
 - (id) init

@@ -52,8 +52,9 @@
 
 #pragma mark HEADERS
 
-#import "IMBImageFolderParserMessenger.h"
+#import "IMBAudioFolderParserMessenger.h"
 #import "IMBParserController.h"
+#import "NSWorkspace+iMedia.h"
 #import "SBUtilities.h"
 
 
@@ -62,18 +63,18 @@
 
 #pragma mark 
 
-@implementation IMBImageFolderParserMessenger
+@implementation IMBAudioFolderParserMessenger
 
 + (NSString*) mediaType
 {
-	return kIMBMediaTypeImage;
+	return kIMBMediaTypeAudio;
 }
 
 - (id) init
 {
 	if ((self = [super init]))
 	{
-		self.fileUTI = (NSString*)kUTTypeImage;		// Restrict this parser to image files...
+		self.fileUTI = (NSString*)kUTTypeAudio;		// Restrict this parser to audio files...
 		self.mediaType = [[self class] mediaType];
 	}
 	
@@ -88,7 +89,7 @@
 
 #pragma mark 
 
-@implementation IMBPicturesFolderParserMessenger
+@implementation IMBMusicFolderParserMessenger
 
 + (void) load
 {
@@ -101,7 +102,7 @@
 {
 	if ((self = [super init]))
 	{
-		NSString* path = [SBHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
+		NSString* path = [SBHomeDirectory() stringByAppendingPathComponent:@"Music"];
 		self.mediaSource = [NSURL fileURLWithPath:path];
 		self.displayPriority = 1;
 	}
@@ -116,7 +117,7 @@
 
 #pragma mark 
 
-@implementation IMBDesktopPicturesFolderParserMessenger
+@implementation IMBiLifeSoundEffectsFolderParserMessenger
 
 + (void) load
 {
@@ -129,7 +130,7 @@
 {
 	if ((self = [super init]))
 	{
-		self.mediaSource = [NSURL fileURLWithPath:@"/Library/Desktop Pictures"];
+		self.mediaSource = [NSURL fileURLWithPath:@"/Library/Audio/Apple Loops/Apple/iLife Sound Effects"];
 	}
 	
 	return self;
@@ -143,7 +144,7 @@
 
 #pragma mark 
 
-@implementation IMBUserPicturesFolderParserMessenger
+@implementation IMBAppleLoopsForGarageBandFolderParserMessenger
 
 + (void) load
 {
@@ -156,7 +157,7 @@
 {
 	if ((self = [super init]))
 	{
-		self.mediaSource = [NSURL fileURLWithPath:@"/Library/User Pictures"];
+		self.mediaSource = [NSURL fileURLWithPath:@"/Library/Audio/Apple Loops/Apple/Apple Loops for GarageBand"];
 	}
 	
 	return self;
@@ -170,7 +171,40 @@
 
 #pragma mark 
 
-@implementation IMBiChatIconsFolderParserMessenger
+@implementation IMBiMovieSoundEffectsFolderParserMessenger
+
++ (id) folderPath
+{
+	NSString* path = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
+	return [path stringByAppendingPathComponent:@"/Contents/Resources/Sound Effects"];
+}
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	if ([self folderPath]) [IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+	[pool drain];
+}
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		self.mediaSource = [NSURL fileURLWithPath:[[self class] folderPath]];
+	}
+	
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBLibrarySoundsFolderParserMessenger
 
 + (void) load
 {
@@ -183,7 +217,13 @@
 {
 	if ((self = [super init]))
 	{
-		self.mediaSource = [NSURL fileURLWithPath:@"/Library/Application Support/Apple/iChat Icons"];
+		NSArray* libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask,YES);
+		
+		if ([libraryPaths count] > 0)
+		{
+			NSString* libraryPath = [[libraryPaths objectAtIndex:0] stringByAppendingPathComponent:@"Sounds"];
+			self.mediaSource = [NSURL fileURLWithPath:libraryPath];
+		}	
 	}
 	
 	return self;
