@@ -92,7 +92,7 @@
 + (void) unregisterParserMessengerClass:(Class)inParserMessengerClass;
 + (NSMutableSet*) registeredParserMessengerClassesForMediaType:(NSString*)inMediaType;
 
-// Load all supported IMBParserFactories. The delegate can restrict which IMBParserFactories are loaded...
+// Load all supported IMBParserMessenger. The delegate can restrict which IMBParserMessengers are loaded...
 
 - (void) loadParserMessengers;
 - (void) unloadParserMessengers;
