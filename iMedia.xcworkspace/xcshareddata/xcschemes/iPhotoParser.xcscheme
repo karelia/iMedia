@@ -15,7 +15,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "30FFEBEB150A08DB0009C1D0"
                BuildableName = "com.karelia.imedia.iPhoto.image.xpc"
-               BlueprintName = "com.karelia.imedia.iPhoto.image"
+               BlueprintName = "com.karelia.imedia.iPhoto"
                ReferencedContainer = "container:iMedia.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
