@@ -65,24 +65,14 @@
 @interface IMBMovieFolderParserMessenger : IMBFolderParserMessenger
 @end
 
-// This subclass looks only in "~/Pictures"...
+// This subclass looks only in "~/Movies"...
 
-@interface IMBPicturesFolderParserMessenger : IMBMovieFolderParserMessenger
+@interface IMBMoviesFolderParserMessenger : IMBMovieFolderParserMessenger
 @end
 
-// This subclass looks only in "/Library/Desktop Pictures"...
+// Photo booth takes movies
 
-@interface IMBDesktopPicturesFolderParserMessenger : IMBMovieFolderParserMessenger
-@end
-
-// This subclass looks only in "/Library/User Pictures"...
-
-@interface IMBUserPicturesFolderParserMessenger : IMBMovieFolderParserMessenger
-@end
-
-// This subclass looks only in "/Library/Application Support/Apple/iChat Icons"...
-
-@interface IMBiChatIconsFolderParserMessenger : IMBMovieFolderParserMessenger
+@interface IMBPhotoBoothMoviesFolderParserMessenger : IMBMovieFolderParserMessenger
 @end
 
 

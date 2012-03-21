@@ -88,7 +88,7 @@
 
 #pragma mark 
 
-@implementation IMBPicturesFolderParserMessenger
+@implementation IMBMoviesFolderParserMessenger
 
 + (void) load
 {
@@ -101,7 +101,7 @@
 {
 	if ((self = [super init]))
 	{
-		NSString* path = [SBHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
+		NSString* path = [SBHomeDirectory() stringByAppendingPathComponent:@"Movies"];
 		self.mediaSource = [NSURL fileURLWithPath:path];
 		self.displayPriority = 1;
 	}
@@ -116,74 +116,24 @@
 
 #pragma mark 
 
-@implementation IMBDesktopPicturesFolderParserMessenger
+@implementation IMBPhotoBoothMoviesFolderParserMessenger
 
 + (void) load
 {
-//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-//	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
-//	[pool drain];
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+	[pool drain];
 }
 
 - (id) init
 {
 	if ((self = [super init]))
 	{
-		self.mediaSource = [NSURL fileURLWithPath:@"/Library/Desktop Pictures"];
-	}
-	
-	return self;
-}
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@implementation IMBUserPicturesFolderParserMessenger
-
-+ (void) load
-{
-//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-//	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
-//	[pool drain];
-}
-
-- (id) init
-{
-	if ((self = [super init]))
-	{
-		self.mediaSource = [NSURL fileURLWithPath:@"/Library/User Pictures"];
-	}
-	
-	return self;
-}
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@implementation IMBiChatIconsFolderParserMessenger
-
-+ (void) load
-{
-//	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-//	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
-//	[pool drain];
-}
-
-- (id) init
-{
-	if ((self = [super init]))
-	{
-		self.mediaSource = [NSURL fileURLWithPath:@"/Library/Application Support/Apple/iChat Icons"];
+		NSString* path = [[SBHomeDirectory()
+			stringByAppendingPathComponent:@"Pictures"]
+			stringByAppendingPathComponent:@"Photo Booth"];
+			
+		self.mediaSource = [NSURL fileURLWithPath:path];
 	}
 	
 	return self;

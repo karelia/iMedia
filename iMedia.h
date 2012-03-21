@@ -67,7 +67,7 @@
 #import <iMedia/IMBFolderParserMessenger.h>
 #import <iMedia/IMBImageFolderParserMessenger.h>
 #import <iMedia/IMBAudioFolderParserMessenger.h>
-//#import <iMedia/IMBMovieFolderParserMessenger.h>
+#import <iMedia/IMBMovieFolderParserMessenger.h>
 #import <iMedia/IMBiPhotoParserMessenger.h>
 
 //#import <iMedia/IMBParser.h>
