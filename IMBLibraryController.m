@@ -269,7 +269,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 								// JUST TEMP:
 								if (!node.isLeaf)
 								{
-									[self performSelectorOnMainThread:@selector(populateSubnodesOfNode:) withObject:node waitUntilDone:NO];
+									[self performSelector:@selector(populateSubnodesOfNode:) withObject:node afterDelay:0.1];
 								}
 							}
 						}
@@ -350,7 +350,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					{
 						if (!node.isLeaf)
 						{
-							[self performSelectorOnMainThread:@selector(populateSubnodesOfNode:) withObject:node waitUntilDone:NO];
+							[self performSelector:@selector(populateSubnodesOfNode:) withObject:node afterDelay:0.1];
 						}
 					}
 				}
