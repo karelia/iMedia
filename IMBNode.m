@@ -68,6 +68,7 @@
 
 @property (assign,readwrite) IMBNode* parentNode;
 @property (retain) NSArray* atomic_subnodes;				
+@property (retain) IMBParserMessenger* atomic_parserMessenger;				
 
 - (void) _recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray*)inIndexArray;
 
@@ -110,7 +111,7 @@
 // Info about our parser...
 
 @synthesize parserIdentifier = _parserIdentifier;
-@synthesize parserMessenger = _parserMessenger;
+@synthesize atomic_parserMessenger = _parserMessenger;
 
 //@synthesize watcherType = _watcherType;
 //@synthesize watchedPath = _watchedPath;
@@ -319,6 +320,59 @@
 	{
 		[inCoder encodeObject:self.objects forKey:@"objects"];
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Accessors
+
+// Set loading status for self and complete subtree...
+
+- (void) setLoading:(BOOL)inLoading
+{
+	_loading = inLoading;
+	
+	for (IMBNode* subnode in self.subnodes)
+	{
+		subnode.loading = inLoading;
+	}
+}
+
+
+// Check if this node or one of its ancestors is current loading in the background. In this case it will be 
+// replaced shortly and is not considered to be eligible for a new background operation...
+
+- (BOOL) isLoading
+{
+	if (_loading) return YES;
+	if (_parentNode) return [_parentNode isLoading];
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Make sure that the parserMessenger is set on self and complete subtree. This is really important, as nodes
+// are pretty much unusable if the parserMessenger wasn't set when we received a new node from an XPC service...
+
+- (void) setParserMessenger:(IMBParserMessenger*)inParserMessenger
+{
+	self.atomic_parserMessenger = inParserMessenger;
+	
+	for (IMBNode* subnode in self.subnodes)
+	{
+		[subnode setParserMessenger:inParserMessenger];
+	}
+}
+
+
+- (IMBParserMessenger*) parserMessenger
+{
+	return self.atomic_parserMessenger;
 }
 
 
@@ -803,33 +857,6 @@
 	}
 		
 	return nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Set loading status for self and complete subtree...
-
-- (void) setLoading:(BOOL)inLoading
-{
-	_loading = inLoading;
-	
-	for (IMBNode* subnode in self.subnodes)
-	{
-		subnode.loading = inLoading;
-	}
-}
-
-
-// Check if this node or one of its ancestors is current loading in the background. In this case it will be 
-// replaced shortly and is not considered to be eligible for a new background operation...
-
-- (BOOL) isLoading
-{
-	if (_loading) return YES;
-	if (_parentNode) return [_parentNode isLoading];
-	return NO;
 }
 
 
