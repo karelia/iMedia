@@ -52,41 +52,29 @@
 
 #pragma mark HEADERS
 
-#import <XPCKit/XPCKit.h>
+#import "IMBFolderParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark
+#pragma mark 
 
+// This parser scans any folder for image files...
 
-// This is a generic main function for all our XPC services. It simply tries to invoke the message and 
-// sends back any result and/or error...
+@interface IMBMovieFolderParserMessenger : IMBFolderParserMessenger
+@end
 
-int main(int argc, const char *argv[])
-{
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    
-	[XPCService runServiceWithConnectionHandler:^(XPCConnection* inConnection)
-	{
-		[inConnection setEventHandler:^(XPCMessage* inMessage, XPCConnection* inConnection)
-		{
-            XPCMessage* reply = [inMessage invoke];
-            
-            if (reply)
-			{
-				[inConnection sendMessage:reply];
-			}	
-                
-		}];
-	}];
-	
-	[pool drain];
-	return 0;
-}
+// This subclass looks only in "~/Movies"...
+
+@interface IMBMoviesFolderParserMessenger : IMBMovieFolderParserMessenger
+@end
+
+// Photo booth takes movies
+
+@interface IMBPhotoBoothMoviesFolderParserMessenger : IMBMovieFolderParserMessenger
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
 

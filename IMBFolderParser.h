@@ -66,14 +66,20 @@
 {
 	NSString* _fileUTI;
 	NSUInteger _displayPriority;
+	BOOL _isUserAdded;
 }
 
 @property (retain) NSString* fileUTI;
 @property (assign) NSUInteger displayPriority;
+@property BOOL isUserAdded;	
 
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
-- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
+//- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
+//- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+//- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
+
+// Helpers...
+
+- (NSUInteger) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError;
 
 @end
 

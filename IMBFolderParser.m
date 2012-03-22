@@ -58,9 +58,9 @@
 #import "IMBObject.h"
 #import "IMBNodeObject.h"
 #import "NSFileManager+iMedia.h"
-#import "NSWorkspace+iMedia.h"
 #import "NSString+iMedia.h"
 #import <Quartz/Quartz.h>
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,16 +72,19 @@
 
 @synthesize fileUTI = _fileUTI;
 @synthesize displayPriority = _displayPriority;
+@synthesize isUserAdded = _isUserAdded;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) initWithMediaType:(NSString*)inMediaType
+- (id) init
 {
-	if (self = [super initWithMediaType:inMediaType])
+	if ((self = [super init]))
 	{
 		self.fileUTI = nil;
 		self.displayPriority = 5;	// default middle-of-the-pack priority
+		self.isUserAdded = NO;
 	}
 	
 	return self;
@@ -100,11 +103,211 @@
 #pragma mark 
 #pragma mark Parser Methods
 
+
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
+{
+	NSError* error = nil;
+	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
+	NSURL* url = self.mediaSource;
+	NSString* path = [[url path] stringByStandardizingPath];
+	
+	// Check if the folder exists. If not then do not return a node...
+	
+	BOOL exists,directory;
+	exists = [fileManager fileExistsAtPath:path isDirectory:&directory];
+	
+	if (!exists || !directory) 
+	{
+		if (outError)
+		{
+			NSString* description = [NSString stringWithFormat:@"Folder doesn't exist: %@",path];
+			NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
+			*outError = [NSError errorWithDomain:kIMBErrorDomain code:dirNFErr userInfo:info];
+		}
+		
+		return nil;
+	}	
+
+	// Create an empty root node (unpopulated and without subnodes)...
+	
+	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
+    name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+
+	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	node.icon = [self iconForPath:path];;
+	node.name = name;
+	node.identifier = [self identifierForPath:path];
+	node.mediaType = self.mediaType;
+	node.mediaSource = url;
+	node.isTopLevelNode = YES;
+	node.leaf = NO;
+	node.displayPriority = self.displayPriority;
+	node.isUserAdded = self.isUserAdded;
+	node.parserIdentifier = self.identifier;
+	
+	if (node.isTopLevelNode)
+	{
+		node.groupType = kIMBGroupTypeFolder;
+		node.includedInPopup = YES;
+	}
+	else
+	{
+		node.groupType = kIMBGroupTypeNone;
+		node.includedInPopup = NO;
+	}
+	
+	// Enable FSEvents based file watching for root nodes...
+	
+//	if (node.isTopLevelNode)
+//	{
+//		node.watcherType = kIMBWatcherTypeFSEvent;
+//		node.watchedPath = path;
+//	}
+//	else
+//	{
+//		node.watcherType = kIMBWatcherTypeNone;
+//		node.watchedPath = inOldNode.watchedPath;
+//	}
+	
+	if (outError) *outError = error;
+	return node;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	NSError* error = nil;
+	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
+	NSAutoreleasePool* pool = nil;
+	NSInteger index = 0;
+	
+	NSArray* urls = [fileManager contentsOfDirectoryAtURL:
+		inNode.mediaSource 
+		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLLocalizedNameKey,NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
+		options:NSDirectoryEnumerationSkipsHiddenFiles 
+		error:&error];
+
+	if (error == nil)
+	{
+		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
+	
+		for (NSURL* url in urls)
+		{
+			if (index%32 == 0)
+			{
+				IMBDrain(pool);
+				pool = [[NSAutoreleasePool alloc] init];
+			}
+
+			NSString* name = nil;
+			[url getResourceValue:&name forKey:NSURLLocalizedNameKey error:&error];
+			if (error) break;
+			
+			NSNumber* folder = nil;
+			[url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:&error];
+			if (error) break;
+
+			NSNumber* package = nil;
+			[url getResourceValue:&package forKey:NSURLIsPackageKey error:&error];
+			if (error) break;
+			
+			if ([folder boolValue]==YES && [package boolValue]==NO)
+			{
+				NSString* path = [url path];
+				
+				if (![IMBConfig isLibraryPath:path])
+				{
+					IMBNode* subnode = [[IMBNode alloc] init];
+					subnode.icon = [self iconForPath:path];
+					subnode.name = name;
+					subnode.identifier = [self identifierForPath:path];
+					subnode.mediaType = self.mediaType;
+					subnode.mediaSource = url;
+					subnode.isTopLevelNode = NO;
+					subnode.parserIdentifier = self.identifier;
+					subnode.groupType = kIMBGroupTypeFolder;
+					subnode.includedInPopup = NO;
+//					subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
+//					subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
+
+					NSUInteger countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
+					subnode.leaf = countOfSubfolders == 0;
+					if (error) break;
+					
+					[subnodes addObject:subnode];
+					[subnode release];
+				}
+				else
+				{
+					// NSLog(@"IGNORING LIBRARY PATH: %@", path);
+				}
+			}
+			
+			index++;
+		}
+	}
+	
+	IMBDrain(pool);
+	if (outError) *outError = error;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
+{
+
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
+{
+
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSData*) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // If we were not suplied an old node, then we will just create an empty root node. If on the other hand we were
 // given a node, then we will try to recreate the same node as faithfully as possible. That means is should be 
 // the node with the same position/identifier, and if it was populated before, then it should also be populated 
 // afterwards...
-
+/*
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
@@ -179,14 +382,14 @@
 	if (outError) *outError = error;
 	return newNode;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // The supplied node is a private copy which may be modified here in the background operation. Scan the folder
 // for folder or for files that match our desired UTI and create an IMBObject for each file that qualifies...
-
+/*
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSFileManager* fm = [NSFileManager imb_threadSafeManager];
@@ -334,14 +537,14 @@
 	if (outError) *outError = error;
 	return error == nil;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
 #pragma mark Helpers
-
+/*
 // To be overridden by subclass...
 	
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
@@ -356,11 +559,11 @@
 {
 	return nil;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
+/*
 - (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
 {
 	IMBObject* object = [[[IMBObject alloc] init] autorelease];
@@ -401,58 +604,47 @@
 		}
 	}
 }
+*/
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Add a 'Show in Finder' command to the context menu...
+// Return the number of (visible) subfolders in a given folder...
 
-- (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject
+- (NSUInteger) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError
 {
-	if ([inObject isKindOfClass:[IMBNodeObject class]])
+	NSError* error = nil;
+	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
+	NSUInteger count = 0;
+	
+	NSArray* urls = [fileManager contentsOfDirectoryAtURL:
+		inFolderURL 
+		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
+		options:NSDirectoryEnumerationSkipsHiddenFiles 
+		error:&error];
+
+	if (error == nil)
 	{
-		NSString* title = NSLocalizedStringWithDefaultValue(
-			@"IMBObjectViewController.menuItem.revealInFinder",
-			nil,IMBBundle(),
-			@"Show in Finder",
-			@"Menu item in context menu of IMBObjectViewController");
-		
-		IMBNode* node = [self nodeWithIdentifier:((IMBNodeObject*)inObject).representedNodeIdentifier];
-		NSString* path = (NSString*) [node mediaSource];
-		
-		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
-		[item setRepresentedObject:path];
-		[item setTarget:self];
-		[inMenu addItem:item];
-		[item release];
+		for (NSURL* url in urls)
+		{
+			NSNumber* folder = nil;
+			[url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:&error];
+			if (error) break;
+
+			NSNumber* package = nil;
+			[url getResourceValue:&package forKey:NSURLIsPackageKey error:&error];
+			if (error) break;
+			
+			if ([folder boolValue]==YES && [package boolValue]==NO)
+			{
+				count++;
+			}
+		}
 	}
-}
 
-
-- (void) willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode
-{
-	NSString* title = NSLocalizedStringWithDefaultValue(
-		@"IMBObjectViewController.menuItem.revealInFinder",
-		nil,IMBBundle(),
-		@"Show in Finder",
-		@"Menu item in context menu of IMBObjectViewController");
-	
-	NSString* path = (NSString*) [inNode mediaSource];
-	
-	NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
-	[item setRepresentedObject:path];
-	[item setTarget:self];
-	[inMenu addItem:item];
-	[item release];
-}
-
-
-- (IBAction) revealInFinder:(id)inSender
-{
-	NSString* path = (NSString*)[inSender representedObject];
-	NSString* folder = [path stringByDeletingLastPathComponent];
-	[[NSWorkspace imb_threadSafeWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
+	if (outError) *outError = error;
+	return count;
 }
 
 

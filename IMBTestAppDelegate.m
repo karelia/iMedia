@@ -139,7 +139,7 @@
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
 	[parserController setDelegate:self];
-	[parserController loadParserFactories];
+	[parserController loadParserMessengers];
 
 	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBMediaTypeImage];
 	[libraryController setDelegate:self];

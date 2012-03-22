@@ -65,7 +65,7 @@
 
 #pragma mark CLASSES
 
-@class IMBParserFactory;
+@class IMBParserMessenger;
 @protocol IMBParserControllerDelegate;
 
 
@@ -76,9 +76,8 @@
 
 @interface IMBParserController : NSObject
 {
-	NSMutableDictionary* _loadedParserFactories;
+	NSMutableDictionary* _loadedParserMessengers;
 	id <IMBParserControllerDelegate> _delegate;
-//	BOOL _loadingCustomParsers;
 }
 
 // Create singleton instance of the controller. Don't forget to set the delegate early in the app lifetime...
@@ -86,48 +85,22 @@
 + (IMBParserController*) sharedParserController;
 @property (assign) id <IMBParserControllerDelegate> delegate;
 
-// Register IMBParserFactory classes. This should be called from the +load method of a IMBParserFactory class...
+// Register IMBParserMessenger classes. This should be called from the +load method of a IMBParserMessenger class...
 
-+ (void) registerParserFactoryClass:(Class)inParserFactoryClass forMediaType:(NSString*)inMediaType;
-+ (void) unregisterParserFactoryClass:(Class)inParserFactoryClass;
-+ (NSMutableSet*) registeredParserFactoryClassesForMediaType:(NSString*)inMediaType;
++ (void) registerParserMessengerClass:(Class)inParserMessengerClass forMediaType:(NSString*)inMediaType;
++ (void) unregisterParserMessengerClass:(Class)inParserMessengerClass;
++ (NSMutableSet*) registeredParserMessengerClassesForMediaType:(NSString*)inMediaType;
 
-// Load all supported IMBParserFactories. The delegate can restrict which IMBParserFactories are loaded...
+// Load all supported IMBParserMessenger. The delegate can restrict which IMBParserMessengers are loaded...
 
-- (void) loadParserFactories;
-- (void) unloadParserFactories;
+- (void) loadParserMessengers;
+- (void) unloadParserMessengers;
+- (NSArray*) loadedParserMessengersForMediaType:(NSString*)inMediaType;
 
-- (NSArray*) loadedParserFactoriesForMediaType:(NSString*)inMediaType;
+// Adds/removes IMBParserMessenger. This is mainly used for dragging folders into the IMBOutlineView...
 
-//- (void) reset; 
-
-// Add/remove parser instances dynamically. These methods are useful for parsers that mimic dynamically appearing
-// content, e.g. connected devices (cameras, network volumes, etc)...
-
-//- (BOOL) addDynamicParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
-//- (BOOL) removeDynamicParser:(IMBParser*)inParser;
-
-// Add/remove custom parsers. This is usually used for folder based parsers that are dragged into the outline view.
-// Please note that this method should be called after loadParsers...
-
-//- (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
-//- (BOOL) removeCustomParser:(IMBParser*)inParser;
-
-// Returns an array of loaded parsers. This combines the regular parsers (which were instantiated by loadParsers)
-// with the custom parsers (which were instantiated by the user or by loadCustomParsersFromPreferences)...
-
-//- (NSArray*) parserFactoriesForMediaType:(NSString *)mediaType;
-//- (NSArray*) parsersFactories;
-
-// Debugging support...
-#ifdef DEBUG
-//- (void) logRegisteredParserClasses;
-//- (void) logParsers;
-#endif
-
-// External finding of an active parser. Can't name the argument "class" as that breaks C++ apps linking against iMedia
-
-//- (IMBParser*) parserOfClass:(Class)inParserClass forMediaType:(NSString*)inMediaType;
+- (BOOL) addUserAddedParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (BOOL) removeUserAddedParserMessenger:(IMBParserMessenger*)inParserMessenger;
 
 @end
 
@@ -141,9 +114,9 @@
 
 @optional
 
-- (BOOL) parserController:(IMBParserController*)inController shouldLoadParserFactoryWithIdentifier:(NSString*)inIdentifier;
-- (void) parserController:(IMBParserController*)inController didLoadParserFactory:(IMBParserFactory*)inParserFactory;
-- (void) parserController:(IMBParserController*)inController willUnloadParserFactory:(IMBParserFactory*)inParserFactory;
+- (BOOL) parserController:(IMBParserController*)inController shouldLoadParserMessengerWithIdentifier:(NSString*)inIdentifier;
+- (void) parserController:(IMBParserController*)inController didLoadParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (void) parserController:(IMBParserController*)inController willUnloadParserMessenger:(IMBParserMessenger*)inParserMessenger;
 
 @end
 

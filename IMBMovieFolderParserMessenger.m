@@ -44,73 +44,102 @@
 */
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Common...
-
-#import <iMedia/IMBCommon.h>
-#import <iMedia/IMBConfig.h>
-#import <iMedia/IMBOperationQueue.h>
-#import <iMedia/IMBIconCache.h>
-
-// Model...
-
-#import <iMedia/IMBNode.h>
-#import <iMedia/IMBObject.h>
-#import <iMedia/IMBObjectsPromise.h>
-#import <iMedia/IMBFlickrNode.h>
-
-// Parsers...
-
-#import <iMedia/IMBParserMessenger.h>
-#import <iMedia/IMBFolderParserMessenger.h>
-#import <iMedia/IMBImageFolderParserMessenger.h>
-#import <iMedia/IMBAudioFolderParserMessenger.h>
-#import <iMedia/IMBMovieFolderParserMessenger.h>
-#import <iMedia/IMBiPhotoParserMessenger.h>
-
-//#import <iMedia/IMBParser.h>
-//#import <iMedia/IMBFolderParser.h>
-//#import <iMedia/IMBImageFolderParser.h>
-//#import <iMedia/IMBiPhotoParser.h>
-//#import <iMedia/IMBiTunesParser.h>
-//#import <iMedia/IMBApertureParser.h>
-//#import <iMedia/IMBLightroomParser.h>
-//#import <iMedia/IMBImageCaptureParser.h>
-//#import <iMedia/IMBFlickrParser.h>
-//#import <iMedia/IMBGarageBandParser.h>
-
-// Controllers...
-
-#import <iMedia/IMBParserController.h>
-#import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBNodeTreeController.h>
-#import <iMedia/IMBObjectArrayController.h>
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBImageViewController.h>
-#import <iMedia/IMBPanelController.h>
-
-// Views...
-
-#import <iMedia/IMBOutlineView.h>
-#import <iMedia/IMBNodeCell.h>
-#import <iMedia/IMBTableView.h>
-#import <iMedia/IMBComboTableView.h>
-#import <iMedia/IMBImageBrowserView.h>
-
-// Categories...
-
-#import <iMedia/NSFileManager+iMedia.h>
-#import <iMedia/NSWorkspace+iMedia.h>
-#import <iMedia/NSString+iMedia.h>
-#import <iMedia/NSImage+iMedia.h>
-//#import <iMedia/NSDictionary+iMedia.h>
-//#import <iMedia/NSView+iMedia.h>
-#import <iMedia/NSURL+iMedia.h>
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark HEADERS
+
+#import "IMBMovieFolderParserMessenger.h"
+#import "IMBParserController.h"
+#import "SBUtilities.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBMovieFolderParserMessenger
+
++ (NSString*) mediaType
+{
+	return kIMBMediaTypeMovie;
+}
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		self.fileUTI = (NSString*)kUTTypeMovie;		// Restrict this parser to movie files...
+		self.mediaType = [[self class] mediaType];
+	}
+	
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBMoviesFolderParserMessenger
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+	[pool drain];
+}
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		NSString* path = [SBHomeDirectory() stringByAppendingPathComponent:@"Movies"];
+		self.mediaSource = [NSURL fileURLWithPath:path];
+		self.displayPriority = 1;
+	}
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBPhotoBoothMoviesFolderParserMessenger
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+	[pool drain];
+}
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		NSString* path = [[SBHomeDirectory()
+			stringByAppendingPathComponent:@"Pictures"]
+			stringByAppendingPathComponent:@"Photo Booth"];
+			
+		self.mediaSource = [NSURL fileURLWithPath:path];
+	}
+	
+	return self;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------

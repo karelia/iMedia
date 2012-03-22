@@ -102,7 +102,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBNode*) unpopulatedTopLevelNodeWithError:(NSError**)outError
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
 	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
 	[icon setScalesWhenResized:YES];
@@ -132,7 +132,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
 	NSDictionary* plist = self.plist;
@@ -141,25 +141,25 @@
 	
 	// Population of events, faces, photo stream and regular album node fundamentally different
 	
-	if ([self isEventsNode:inNode])
-	{
-		NSArray* events = [plist objectForKey:@"List of Rolls"];
-		[self populateEventsNode:inNode withEvents:events images:images];
-	} 
-	else if ([self isFacesNode:inNode])
-	{
-		NSDictionary* faces = [plist objectForKey:@"List of Faces"];
-		[self populateFacesNode:inNode withFaces:faces images:images];
-	} 
-	else if ([self isPhotoStreamNode:inNode])
-	{
-		[self populatePhotoStreamNode:inNode images:images];
-	} 
-	else
-	{
+//	if ([self isEventsNode:inNode])
+//	{
+//		NSArray* events = [plist objectForKey:@"List of Rolls"];
+//		[self populateEventsNode:inNode withEvents:events images:images];
+//	} 
+//	else if ([self isFacesNode:inNode])
+//	{
+//		NSDictionary* faces = [plist objectForKey:@"List of Faces"];
+//		[self populateFacesNode:inNode withFaces:faces images:images];
+//	} 
+//	else if ([self isPhotoStreamNode:inNode])
+//	{
+//		[self populatePhotoStreamNode:inNode images:images];
+//	} 
+//	else
+//	{
 		[self addSubNodesToNode:inNode albums:albums images:images]; 
-		[self populateAlbumNode:inNode images:images]; 
-	}
+//		[self populateAlbumNode:inNode images:images]; 
+//	}
 
 	// If we are populating the root nodes, then also populate the "Photos" node and mirror its
 	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,
@@ -181,25 +181,24 @@
 //	}
 	
 	if (outError) *outError = error;
-	return inNode;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	return inNode;
+
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	return inNode;
+
 }
 
 
@@ -443,7 +442,7 @@
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subnodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [inParentNode mutableArrayForPopulatingSubnodes];
 	
 	// Now parse the iPhoto XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
@@ -488,14 +487,11 @@
 			
 			// Add the new album node to its parent (inRootNode)...
 			
-			
 			[subnodes addObject:albumNode];
 		}
 		
 		[pool drain];
 	}
-	
-	inParentNode.subnodes = subnodes;
 }
 
 

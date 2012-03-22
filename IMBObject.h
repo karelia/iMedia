@@ -69,7 +69,7 @@ extern NSString* kIMBQuickLookImageProperty;
 
 #pragma mark CLASSES
 
-@class IMBParserFactory;
+@class IMBParserMessenger;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ extern NSString* kIMBQuickLookImageProperty;
 	NSDictionary* _metadata;
 	NSString* _metadataDescription;
     NSString* _parserIdentifier;
-	IMBParserFactory* _parserFactory;
+	IMBParserMessenger* _parserMessenger;
 //    NSString* _parserClassName;
 //    NSString* _parserMediaType;
 //    NSString* _parserMediaSource;
@@ -122,9 +122,9 @@ extern NSString* kIMBQuickLookImageProperty;
 
 //@property (copy, readonly) NSString* parserClassName;		// Name of the parser which created this object
 //@property (copy, readonly) NSString* parserMediaType;		// Media type for the parser which created this object
-//@property (copy, readonly) NSString* parserMediaSource;		// Media source for the parser which created this object
+//@property (copy, readonly) NSString* parserMediaSource;	// Media source for the parser which created this object
 @property (retain) NSString* parserIdentifier;				// Indentifier of IMBParser that created this object
-@property (retain) IMBParserFactory* parserFactory;			// IMBParserFactory that created this object
+@property (retain) IMBParserMessenger* parserMessenger;		// IMBParserMessenger that created this object
 
 @property (assign) NSUInteger index;						// Index of object in the array (optional)
 @property (assign) BOOL shouldDrawAdornments;				// YES if border/shadow should be drawn

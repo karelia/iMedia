@@ -52,24 +52,37 @@
 
 #pragma mark HEADERS
 
-#import "IMBParserFactory.h"
+#import "IMBFolderParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBiPhotoParserFactory : IMBParserFactory
+#pragma mark 
 
+// This parser scans any folder for image files...
+
+@interface IMBImageFolderParserMessenger : IMBFolderParserMessenger
 @end
 
+// This subclass looks only in "~/Pictures"...
 
-@interface IMBiPhotoImageParserFactory : IMBiPhotoParserFactory
-
+@interface IMBPicturesFolderParserMessenger : IMBImageFolderParserMessenger
 @end
 
+// This subclass looks only in "/Library/Desktop Pictures"...
 
-@interface IMBiPhotoMovieParserFactory : IMBiPhotoParserFactory
+@interface IMBDesktopPicturesFolderParserMessenger : IMBImageFolderParserMessenger
+@end
 
+// This subclass looks only in "/Library/User Pictures"...
+
+@interface IMBUserPicturesFolderParserMessenger : IMBImageFolderParserMessenger
+@end
+
+// This subclass looks only in "/Library/Application Support/Apple/iChat Icons"...
+
+@interface IMBiChatIconsFolderParserMessenger : IMBImageFolderParserMessenger
 @end
 
 

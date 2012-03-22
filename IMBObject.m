@@ -85,7 +85,7 @@
 #import "IMBObject.h"
 #import "IMBNode.h"
 #import "IMBObjectsPromise.h"
-#import "IMBParserFactory.h"
+#import "IMBParserMessenger.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
@@ -132,7 +132,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
 @synthesize parserIdentifier = _parserIdentifier;
-@synthesize parserFactory = _parserFactory;
+@synthesize parserMessenger = _parserMessenger;
 //@synthesize parserClassName = _parserClassName;
 //@synthesize parserMediaType = _parserMediaType;
 //@synthesize parserMediaSource = _parserMediaSource;
@@ -176,7 +176,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	IMBRelease(_metadata);
 	IMBRelease(_metadataDescription);
 	IMBRelease(_parserIdentifier);
-	IMBRelease(_parserFactory);
+	IMBRelease(_parserMessenger);
 //	IMBRelease(_parserClassName);
 //	IMBRelease(_parserMediaType);
 //	IMBRelease(_parserMediaSource);
@@ -246,7 +246,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	copy.metadata = self.metadata;
 	copy.metadataDescription = self.metadataDescription;
 	copy.parserIdentifier = self.parserIdentifier;
-	copy.parserFactory = self.parserFactory;
+	copy.parserMessenger = self.parserMessenger;
 //  copy.parserClassName = self.parserClassName;
 //	copy.parserMediaType = self.parserMediaType;
 //	copy.parserMediaSource = self.parserMediaSource;
@@ -793,7 +793,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
  
 - (NSString*) identifier
 {
-	NSString* parserName = [[self.parserFactory class] parserClassName];
+	NSString* parserName = [[self.parserMessenger class] parserClassName];
 	NSString* location = nil;
 	
 	if ([self.location isKindOfClass:[NSString class]])

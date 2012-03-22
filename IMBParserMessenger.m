@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBParserFactory.h"
+#import "IMBParserMessenger.h"
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import <XPCKit/XPCKit.h>
@@ -64,11 +64,36 @@
 
 #pragma mark
 
-@implementation IMBParserFactory
+@implementation IMBParserMessenger
 
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
 @synthesize isUserAdded = _isUserAdded;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		self.mediaType = [[self class] mediaType];
+		self.mediaSource = nil;
+		self.isUserAdded = NO;	
+	}
+	
+	return self;
+}
+
+- (void) dealloc
+{
+	IMBRelease(_mediaType);
+	IMBRelease(_mediaSource);
+	IMBRelease(_connection);
+	
+	[super dealloc];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -100,23 +125,13 @@
 
 - (id) copyWithZone:(NSZone*)inZone
 {
-	IMBParserFactory* copy = [[[self class] allocWithZone:inZone] init];
+	IMBParserMessenger* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.mediaType = self.mediaType;
 	copy.mediaSource = self.mediaSource;
 	copy.isUserAdded = self.isUserAdded;
 	
 	return copy;
-}
-
-
-- (void) dealloc
-{
-	IMBRelease(_mediaType);
-	IMBRelease(_mediaSource);
-	IMBRelease(_connection);
-	
-	[super dealloc];
 }
 
 
@@ -169,7 +184,7 @@
 
 #pragma mark
 
-@implementation IMBParserFactory (XPCMethods)
+@implementation IMBParserMessenger (XPC)
 
 
 // This method is called on the XPC service side. The default implementation just returns a single parser instance. 
@@ -227,7 +242,7 @@
 // The following four methods are simply wrappers that access the appropriate IMBParser instances and 
 // then simply call the same method on those instances...
 
-- (NSArray*) unpopulatedTopLevelNodesWithError:(NSError**)outError
+- (NSArray*) unpopulatedTopLevelNodes:(NSError**)outError
 {
 	NSError* error = nil;
 	NSMutableArray* topLevelNodes = nil;
@@ -241,8 +256,8 @@
 		{
 			if (error == nil)
 			{
-				IMBNode* node = [parser unpopulatedTopLevelNodeWithError:&error];
-				[topLevelNodes addObject:node];
+				IMBNode* node = [parser unpopulatedTopLevelNode:&error];
+				if (node) [topLevelNodes addObject:node];
 			}
 		}
 	}
@@ -255,21 +270,24 @@
 - (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	return [parser populateSubnodesOfNode:inNode error:outError];
+	[parser populateSubnodesOfNode:inNode error:outError];
+	return inNode;
 }
 
 
 - (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	return [parser populateObjectsOfNode:inNode error:outError];
+	[parser populateObjectsOfNode:inNode error:outError];
+	return inNode;
 }
 
 
 - (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	return [parser reloadNode:inNode error:outError];
+	[parser reloadNode:inNode error:outError];
+	return inNode;
 }
 
 
@@ -281,7 +299,7 @@
 
 #pragma mark
 
-@implementation IMBParserFactory (AppMethods)
+@implementation IMBParserMessenger (App)
 
 
 // These two methods can be overrridden by subclasses to add custom menu items...
