@@ -276,38 +276,35 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			
 				^(NSArray* inNodes,NSError* inError)
 				{
-					dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
+					// Display any errors that might have occurred...
+					
+					if (inError)
 					{
-						// Display any errors that might have occurred...
-						
-						if (inError)
+						NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+						[NSApp presentError:inError];
+					}
+					
+					// Insert the new top-level nodes into our data model...
+					
+					else if (inNodes)
+					{
+						for (IMBNode* node in inNodes)
 						{
-							NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-							[NSApp presentError:inError];
-						}
-						
-						// Insert the new top-level nodes into our data model...
-						
-						else if (inNodes)
-						{
-							for (IMBNode* node in inNodes)
+							node.parserMessenger = messenger;
+							[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+
+							if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
 							{
-								node.parserMessenger = messenger;
-								[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+								[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
+							}
 
-								if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
-								{
-									[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
-								}
-
-								// JUST TEMP:
-								if (!node.isLeaf)
-								{
-									[self performSelector:@selector(populateSubnodesOfNode:) withObject:node afterDelay:0.1];
-								}
+							// JUST TEMP:
+							if (!node.isLeaf)
+							{
+								[self performSelector:@selector(populateSubnodesOfNode:) withObject:node afterDelay:0.1];
 							}
 						}
-					});
+					}
 				});		
 		}
 	}
@@ -359,29 +356,26 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
-			dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
+			// Display any errors that might have occurred...
+					
+			if (inError)
 			{
-				// Display any errors that might have occurred...
-						
-				if (inError)
-				{
-					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-					[NSApp presentError:inError];
-				}
-				
-				// Replace the old with the new node...
-						
-				else if (inNewNode)
-				{
-					inNewNode.parserMessenger = messenger;
-					[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				[NSApp presentError:inError];
+			}
+			
+			// Replace the old with the new node...
+					
+			else if (inNewNode)
+			{
+				inNewNode.parserMessenger = messenger;
+				[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
 
-					if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
-					{
-						[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
-					}
+				if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+				{
+					[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
 				}
-			});
+			}
 		});		
 }
 
@@ -420,38 +414,35 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
-			dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
+			// Display any errors that might have occurred...
+					
+			if (inError)
 			{
-				// Display any errors that might have occurred...
-						
-				if (inError)
+				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				[NSApp presentError:inError];
+			}
+			
+			// Replace the old with the new node...
+					
+			else if (inNewNode)
+			{
+				inNewNode.parserMessenger = messenger;
+				[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+
+				if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
 				{
-					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-					[NSApp presentError:inError];
+					[_delegate libraryController:self didPopulateNode:inNewNode];
 				}
-				
-				// Replace the old with the new node...
-						
-				else if (inNewNode)
+
+				// JUST TEMP:
+				for (IMBNode* node in inNewNode.subnodes)
 				{
-					inNewNode.parserMessenger = messenger;
-					[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
-
-					if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
+					if (!node.isLeaf)
 					{
-						[_delegate libraryController:self didPopulateNode:inNewNode];
-					}
-
-					// JUST TEMP:
-					for (IMBNode* node in inNewNode.subnodes)
-					{
-						if (!node.isLeaf)
-						{
-							[self performSelector:@selector(populateSubnodesOfNode:) withObject:node afterDelay:0.1];
-						}
+						[self performSelector:@selector(populateSubnodesOfNode:) withObject:node afterDelay:0.1];
 					}
 				}
-			});
+			}
 		});		
 }
 
@@ -490,29 +481,26 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
-			dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
+			// Display any errors that might have occurred...
+					
+			if (inError)
 			{
-				// Display any errors that might have occurred...
-						
-				if (inError)
-				{
-					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-					[NSApp presentError:inError];
-				}
+				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				[NSApp presentError:inError];
+			}
 
-				// Replace the old with the new node...
-						
-				else if (inNewNode)
-				{
-					inNewNode.parserMessenger = messenger;
-					[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+			// Replace the old with the new node...
+					
+			else if (inNewNode)
+			{
+				inNewNode.parserMessenger = messenger;
+				[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
 
-					if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
-					{
-						[_delegate libraryController:self didPopulateNode:inNewNode];
-					}
+				if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
+				{
+					[_delegate libraryController:self didPopulateNode:inNewNode];
 				}
-			});
+			}
 		});		
 }
 
@@ -552,7 +540,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		// TODO
 		
 		// Get the parent node. If the parent node for a top level node doesn't exist yet, 
-		// then create an appropriate group node...
+		// then create an appropriate group node. Once we have the parent node, get its
+		// subnodes array. This is where we need to do our work...
 		
 		IMBNode* parentNode = [self nodeWithIdentifier:inParentNodeIdentifier];
 		
@@ -561,8 +550,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			if (inOldNode) parentNode = [self _groupNodeForTopLevelNode:inOldNode];
 			else if (inNewNode) parentNode = [self _groupNodeForTopLevelNode:inNewNode];
 		}
-		
-		// Get the subnodes array...
 		
 		NSMutableArray* subnodes = nil;
 		if (parentNode) subnodes = [parentNode mutableArrayForPopulatingSubnodes];
@@ -660,7 +647,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	groupNode.includedInPopup = YES;
 	groupNode.parserIdentifier = nil;
 	groupNode.parserMessenger = nil;
-//	groupNode.parser = inNewNode.parser;	// Important to make lookup in -[IMBNode indexPath] work correctly!
 	
 	if (groupType == kIMBGroupTypeLibrary)
 	{
