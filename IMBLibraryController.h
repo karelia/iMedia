@@ -139,8 +139,6 @@ extern NSString* kIMBNodesDidChangeNotification;
 - (IMBNode*) topLevelNodeForParserIdentifier:(NSString*)inParserIdentifier;
 - (void) logNodes;
 
-//- (void) stopPopulatingNodeWithIdentifier:(NSString*)inNodeIdentifier;
-
 // Custom nodes...
 
 //- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath;
@@ -177,14 +175,14 @@ extern NSString* kIMBNodesDidChangeNotification;
 // Called when the user right clicks a node or object. These methods give the delegate a chance to add 
 // custom menu items to the exisiting context menu...
 
-//- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
-//- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
+- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode;
+- (void) libraryController:(IMBLibraryController*)inController willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject;
 
 // Called when the user double clicks selected object in one of the object views. If the delegate chooses to
-// handle the event iteself it must return YES. If NO is returned, the framework will invoke the default event
+// handle the event itself it must return YES. If NO is returned, the framework will invoke the default event
 // handling behavior (downloading the files to standard loaction and opening in default app)...
 
-//- (BOOL) libraryController:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
+- (BOOL) libraryController:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
 
 @end
 

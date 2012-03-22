@@ -283,6 +283,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 						if (inError)
 						{
 							NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+							[NSApp presentError:inError];
 						}
 						
 						// Insert the new top-level nodes into our data model...
@@ -365,6 +366,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				if (inError)
 				{
 					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+					[NSApp presentError:inError];
 				}
 				
 				// Replace the old with the new node...
@@ -425,6 +427,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				if (inError)
 				{
 					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+					[NSApp presentError:inError];
 				}
 				
 				// Replace the old with the new node...
@@ -494,6 +497,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				if (inError)
 				{
 					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+					[NSApp presentError:inError];
 				}
 
 				// Replace the old with the new node...
@@ -545,7 +549,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
     {
 		// Update file watching...
 		
-		#warning TODO
+		// TODO
 		
 		// Get the parent node. If the parent node for a top level node doesn't exist yet, 
 		// then create an appropriate group node...
@@ -717,117 +721,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-
-
-// This method triggers a full reload of all nodes. First remove all existing nodes. Then iterate over all 
-// loaded parsers (for our media type) and tell them to load nodes in a background operation...
-/*
-- (void) reload
-{
-	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
-
-	NSArray* parsers = [[IMBParserController sharedParserController] parsersForMediaType:self.mediaType];
-	
-	[self willChangeValueForKey:@"subnodes"];
-	[self.subnodes removeAllObjects];
-	[self didChangeValueForKey:@"subnodes"];
-	
-	for (IMBParser* parser in parsers)
-	{
-		BOOL shouldCreateNode = YES;
-
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:shouldCreateNodeWithParser:)])
-		{
-			shouldCreateNode = [_delegate libraryController:self shouldCreateNodeWithParser:parser];
-		}
-		
-		if (shouldCreateNode)
-		{
-			if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willCreateNodeWithParser:)])
-			{
-				[_delegate libraryController:self willCreateNodeWithParser:parser];
-			}
-
-			IMBCreateNodeOperation* operation = [[IMBCreateNodeOperation alloc] init];
-			operation.libraryController = self;
-			operation.parser = parser;
-			operation.options = self.options;
-			operation.oldNode = nil;
-			operation.parentNodeIdentifier = nil;
-			
-			[[IMBOperationQueue sharedQueue] addOperation:operation];
-			[operation release];
-		}
-	}
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// If the delegate allows reloading, then create a background operation that causes the parser to create a new node. 
-// Please note that this method causes the node (and all its subnodes) to be replaced at a later time in the main 
-// thread (once the background operation has concluded). Afterwards we have a different node instance! That way
-// we can handle various different cases, like subnodes appearing/dissappearing, or objects appearing/disappearing.
-/*
-- (void) reloadNode:(IMBNode*)inNode
-{
-	[self reloadNode:inNode parser:inNode.parser];
-}
-
-
-- (void) reloadNode:(IMBNode*)inNode parser:(IMBParser*)inParser
-{
-	BOOL shouldCreateNode = _isReplacingNode==NO;
-
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:shouldCreateNodeWithParser:)])
-	{
-		shouldCreateNode = [_delegate libraryController:self shouldCreateNodeWithParser:inNode.parser];
-	}
-	
-	if (shouldCreateNode)
-	{
-		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
-
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willCreateNodeWithParser:)])
-		{
-			[_delegate libraryController:self willCreateNodeWithParser:inNode.parser];
-		}
-
-		inNode.loading = YES;
-		inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
-		
-		IMBCreateNodeOperation* operation = [[IMBCreateNodeOperation alloc] init];
-		operation.libraryController = self;
-		operation.parser = inParser;
-		operation.options = self.options;
-		operation.oldNode = inNode;
-		operation.parentNodeIdentifier = inNode.parentNode.identifier;
-		
-		[[IMBOperationQueue sharedQueue] addOperation:operation];
-		[operation release];
-	}	
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // This method is called on the main thread as a result of any IMBLibraryOperation. We are given both the old  
 // and the new node. Replace the old with the new node. The node we are given here can be a root node or a node
 // somewhere deep inside the tree. So we need to find the correct place where to put the new node. Note that the 
 // new node is registered with a file watcher (if desired) and the old node is unregistered...
+
 /*
-- (void) _replaceNode:(NSDictionary*)inOldAndNewNode
-{
-	IMBNode* oldNode = [inOldAndNewNode objectForKey:@"oldNode"];
-	IMBNode* newNode = [inOldAndNewNode objectForKey:@"newNode"];
-    NSString* parentNodeIdentifier = [inOldAndNewNode objectForKey:@"parentNodeIdentifier"];
-	
-    [self _replaceNode:oldNode withNode:newNode parentNodeIdentifier:parentNodeIdentifier];
-}
-
-
 - (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier
 {
 	if (inOldNode == nil && inNewNode == nil) return;
@@ -1004,116 +903,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
     }
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-/*
-// This method is called on the main thread as a result of IMBCreateNodesOperation...
-
-- (void) _didCreateNode:(IMBNode*)inNode
-{
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:didCreateNode:withParser:)])
-	{
-		[_delegate libraryController:self didCreateNode:inNode withParser:inNode.parser];
-	}
-	
-	inNode.loading = NO;
-	inNode.badgeTypeNormal = kIMBBadgeTypeNone;
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This method is called on the main thread incase an error has occurred in an IMBLibraryOperation...
-/*
-- (void) _presentError:(NSError*)inError
-{
-	[NSApp presentError:inError];
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// If a node doesn't have any subnodes yet, we need to create the subnodes lazily when this node is expanded.
-// Also ask the delegate whether we are allowed to do so. Create an operation and put it on the queue to
-// execute this job in the background.
-
-// Please note the flag _isReplacingNode: It guards us from an unwanted recursion, as are being replaced in 
-// _replaceNode:, the delegate method outlineViewItemWillExpand: is automatically called - i.e. without the 
-// user actually clicking on a diclosure triangle. This seems to be some internal NSOutlineView behavior. 
-// Obviously we need to suppress populating in this case or we'll cause an endless loop...
-/*
-- (void) populateNode:(IMBNode*)inNode
-{
-	BOOL shouldPopulateNode = 
-	
-//		inNode.isPopulated==NO &&
-		(inNode.subNodes==nil || inNode.objects==nil) && 
-		inNode.isLoading==NO && 
-		_isReplacingNode==NO;
-
-	if (shouldPopulateNode)
-	{
-		if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willPopulateNode:)])
-		{
-			[_delegate libraryController:self willPopulateNode:inNode];
-		}
-
-		inNode.loading = YES;
-		inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
-		
-		IMBPopulateNodeOperation* operation = [[IMBPopulateNodeOperation alloc] init];
-		operation.libraryController = self;
-		operation.parser = inNode.parser;
-		operation.options = self.options;
-		operation.oldNode = inNode;
-		operation.newNode = inNode;		// This will automatically create a copy!
-		operation.parentNodeIdentifier = inNode.parentNode.identifier;
-		
-		[[IMBOperationQueue sharedQueue] addOperation:operation];
-		[operation release];
-	}	
-}
-*/
-
-// Check all pending operation if there is a populate operation concerning the node in question. If yes, then
-// cancel that one. Please note that this will probably have no effect if the operation is already executing - 
-// i.e. unless the parser class is cancel-aware and exits its inner loop early...
-/*
-- (void) stopPopulatingNodeWithIdentifier:(NSString*)inNodeIdentifier
-{
-	NSArray* operations = [[IMBOperationQueue sharedQueue] operations];
-	
-	for (NSOperation* operation in operations)
-	{
-		if ([operation isKindOfClass:[IMBPopulateNodeOperation class]])
-		{
-			IMBPopulateNodeOperation* populateOperation = (IMBPopulateNodeOperation*)operation;
-			
-			if ([populateOperation.oldNode.identifier isEqualToString:inNodeIdentifier])
-			{
-				[populateOperation cancel];
-			}
-		}
-	}
-}
-*/
-
-// Called back in the main thread as a result of IMBExpandNodeOperation...
-/*
-- (void) _didPopulateNode:(IMBNode*)inNode
-{
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:didPopulateNode:)])
-	{
-		[_delegate libraryController:self didPopulateNode:inNode];
-	}
-
-	inNode.loading = NO;
-	inNode.badgeTypeNormal = kIMBBadgeTypeNone;
 }
 */
 
