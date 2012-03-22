@@ -86,12 +86,12 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 #pragma mark CLASSES
 
-@class IMBParser;
 @class IMBNode;
 @class IMBObject;
-@class IMBKQueue;
-@class IMBFSEventsWatcher;
-@class IMBObjectViewController;
+@class IMBParserMessenger;
+//@class IMBKQueue;
+//@class IMBFSEventsWatcher;
+//@class IMBObjectViewController;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -163,18 +163,16 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 @optional
 
-#warning TODO
-
 // The following delegate methods are called multiple times during the app lifetime. Return NO from the  
 // should methods to suppress an operation. The delegate methods are called on the main thread... 
 
-//- (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser;
-//- (void) libraryController:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser;
-//- (void) libraryController:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser;
-//
-//- (BOOL) libraryController:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode;
-//- (void) libraryController:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode;
-//- (void) libraryController:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode;
+- (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (void) libraryController:(IMBLibraryController*)inController willCreateNodeWithParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (void) libraryController:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParserMessenger:(IMBParserMessenger*)inParserMessenger;
+
+- (BOOL) libraryController:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode;
+- (void) libraryController:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode;
+- (void) libraryController:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode;
 
 // Called when the user right clicks a node or object. These methods give the delegate a chance to add 
 // custom menu items to the exisiting context menu...

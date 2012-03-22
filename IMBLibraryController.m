@@ -88,6 +88,10 @@ NSString* kIMBNodesWillReloadNotification = @"IMBNodesWillReloadNotification";
 NSString* kIMBNodesWillChangeNotification = @"IMBNodesWillChangeNotification";
 NSString* kIMBNodesDidChangeNotification = @"IMBNodesDidChangeNotification";
 
+#ifndef RESPONDS
+#define RESPONDS(delegate,selector) (delegate!=nil && [delegate respondsToSelector:selector])
+#endif 
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -243,28 +247,57 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
 
+	// First call: create unpopulated top level nodes...
+	
 	if (self.subnodes == nil)
 	{
 		NSArray* messengers = [[IMBParserController sharedParserController] loadedParserMessengersForMediaType:self.mediaType];
 
 		for (IMBParserMessenger* messenger in messengers)
 		{
+			// Ask delegate whether we should create nodes with this IMBParserMessenger...
+			
+			if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
+			{
+				if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
+				{
+					continue;
+				}
+			}
+			
+			// Create top-level nodes...
+			
+			if (RESPONDS(_delegate,@selector(libraryController:willCreateNodeWithParserMessenger:)))
+			{
+				[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
+			}
+			
 			XPCPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodes:),nil,
 			
 				^(NSArray* inNodes,NSError* inError)
 				{
 					dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
 					{
+						// Display any errors that might have occurred...
+						
 						if (inError)
 						{
 							NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
 						}
+						
+						// Insert the new top-level nodes into our data model...
+						
 						else if (inNodes)
 						{
 							for (IMBNode* node in inNodes)
 							{
 								node.parserMessenger = messenger;
 								[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+
+								if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+								{
+									[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
+								}
 
 								// JUST TEMP:
 								if (!node.isLeaf)
@@ -277,6 +310,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				});		
 		}
 	}
+	
+	// Subsequent calls: reload existing nodes...
+	
 	else 
 	{
 		for (IMBNode* oldNode in self.subnodes)
@@ -287,30 +323,61 @@ static NSMutableDictionary* sLibraryControllers = nil;
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Reload the specified node. This is done by a XPC service on our behalf. Once the service is done, it 
 // will send back a reply with the new node as a result and call the completion block...
 
 - (void) reloadNode:(IMBNode*)inOldNode
 {
+	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
+	IMBParserMessenger* messenger = inOldNode.parserMessenger;
+	
+	// Ask delegate whether we should reload a node with this IMBParserMessenger...
+			
+	if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
+	{
+		if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
+		{
+			return;
+		}
+	}
+	
+	// Start reloading this node...
+			
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willCreateNodeWithParserMessenger:)])
+	{
+		[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
+	}
+			
 	inOldNode.loading = YES;
 	inOldNode.badgeTypeNormal = kIMBBadgeTypeLoading;
 
-	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
-	IMBParserMessenger* messenger = inOldNode.parserMessenger;
 	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNode:error:),inOldNode,
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
 			dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
 			{
+				// Display any errors that might have occurred...
+						
 				if (inError)
 				{
 					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
 				}
+				
+				// Replace the old with the new node...
+						
 				else if (inNewNode)
 				{
 					inNewNode.parserMessenger = messenger;
 					[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+
+					if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+					{
+						[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
+					}
 				}
 			});
 		});		
@@ -325,6 +392,23 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) populateSubnodesOfNode:(IMBNode*)inNode
 {
+	// Ask delegate whether we should populate this node...
+			
+	if (RESPONDS(_delegate,@selector(libraryController:shouldPopulateNode:)))
+	{
+		if (![_delegate libraryController:self shouldPopulateNode:inNode])
+		{
+			return;
+		}
+	}
+	
+	// Start populating this node...
+	
+	if (RESPONDS(_delegate,@selector(libraryController:willPopulateNode:)))
+	{
+		[_delegate libraryController:self willPopulateNode:inNode];
+	}
+			
 	inNode.loading = YES;
 	inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
 
@@ -336,14 +420,24 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
 			{
+				// Display any errors that might have occurred...
+						
 				if (inError)
 				{
 					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
 				}
+				
+				// Replace the old with the new node...
+						
 				else if (inNewNode)
 				{
 					inNewNode.parserMessenger = messenger;
 					[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+
+					if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
+					{
+						[_delegate libraryController:self didPopulateNode:inNewNode];
+					}
 
 					// JUST TEMP:
 					for (IMBNode* node in inNewNode.subnodes)
@@ -367,6 +461,23 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) populateObjectsOfNode:(IMBNode*)inNode
 {
+	// Ask delegate whether we should populate this node...
+			
+	if (RESPONDS(_delegate,@selector(libraryController:shouldPopulateNode:)))
+	{
+		if (![_delegate libraryController:self shouldPopulateNode:inNode])
+		{
+			return;
+		}
+	}
+	
+	// Start populating this node...
+	
+	if (RESPONDS(_delegate,@selector(libraryController:willPopulateNode:)))
+	{
+		[_delegate libraryController:self willPopulateNode:inNode];
+	}
+			
 	inNode.loading = YES;
 	inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
 
@@ -378,14 +489,24 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			dispatch_async(dispatch_get_main_queue(),^() // JUST TEMP until XPCKit is fixed
 			{
+				// Display any errors that might have occurred...
+						
 				if (inError)
 				{
 					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
 				}
+
+				// Replace the old with the new node...
+						
 				else if (inNewNode)
 				{
 					inNewNode.parserMessenger = messenger;
 					[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+
+					if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
+					{
+						[_delegate libraryController:self didPopulateNode:inNewNode];
+					}
 				}
 			});
 		});		
@@ -1261,6 +1382,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 #pragma mark 
 #pragma mark File Watching
+
 
 // A file watcher has fired for one of the paths we have registered. Since file watchers (especially UKKQueue can 
 // fire multiple times for a single change) we need to coalesce the calls. Please note that the parameter inPath  
