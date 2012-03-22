@@ -75,15 +75,18 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 
 @interface IMBParserController ()
 
-// Save info about the custom messengers to the preferences and restore custom parsers from the preferences...
-
-//- (void) saveCustomParsersToPreferences;
-//- (void) loadCustomParsersFromPreferences;
-
 - (BOOL) addParserMessenger:(IMBParserMessenger*)inParserMessenger;
 - (BOOL) removeParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (void) saveUserAddedParserMessengersToPreferences;
+- (void) loadUserAddedParserMessengersFromPreferences;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 
 
 @implementation IMBParserController
@@ -189,11 +192,15 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 {
 	if (self = [super init])
 	{
-//		_loadingCustomParsers = NO;
-		
 		// Unload all IMBParserMessengers before we quit, so that they have a chance to clean up 
 		// (e.g. remove callbacks, etc...)
 		
+		[[NSNotificationCenter defaultCenter]				 
+			addObserver:self								
+			selector:@selector(saveUserAddedParserMessengersToPreferences) 
+			name:NSApplicationWillTerminateNotification 
+			object:nil];
+
 		[[NSNotificationCenter defaultCenter]				 
 			addObserver:self								
 			selector:@selector(unloadParserMessengers) 
@@ -252,7 +259,7 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 	
 	// Finally load the custom parsers from the preferences and append those to our list...
 	
-//	[self loadCustomParsersFromPreferences];
+	[self loadUserAddedParserMessengersFromPreferences];
 }
 
 
@@ -295,168 +302,6 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Makes sure the parsers are loaded
-
-//- (NSMutableDictionary*) parsersByMediaType;
-//{
-//    if (_loadedParserMessengers == nil) 
-//	{
-//		[self unloadParserMessengers];
-//	}
-//	
-//    return _loadedParserMessengers;
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-/*
-// Adds the specified parser to the list of loaded parsers. Please note that this will fail if either the parser
-// is already in the list (we do not want duplicates) or if the delegate denied the loading...
-
-- (BOOL) addDynamicParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
-{
-    [self parsersByMediaType]; // make sure all the regular and custom parsers are already loaded
-	return [self addParser:inParser];
-}
-
-
-// Removes a parser instance from the list of loaded parsers...
-
-- (BOOL) removeDynamicParser:(IMBParser*)inParser
-{
-	return [self removeParser:inParser];
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Adds the parser as a custom parser to the list of loaded parsers and saves the resulting list to the prefs...
-/*
-- (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType
-{
-	BOOL didAdd = [self addDynamicParser:inParser forMediaType:inMediaType];
-	
-	if (didAdd)
-	{
-		inParser.custom = YES;
-		[self saveCustomParsersToPreferences];
-	}
-	
-	return didAdd;
-}
-
-
-// Removes a custom parser from the list of loaded parsers and saves the resulting list to the prefs...
-
-- (BOOL) removeCustomParser:(IMBParser*)inParser
-{
-	BOOL didRemove = NO;
-	BOOL isCustom = inParser.isCustom;
-
-	if (isCustom)
-	{
-		didRemove = [self removeDynamicParser:inParser];
-		
-		if (didRemove)
-		{
-			[self saveCustomParsersToPreferences];
-		}
-	}
-	
-	return didRemove;
-
-//	NSString* mediaType = inParser.mediaType;
-//	NSMutableArray* parsers = [self loadedParsersForMediaType:mediaType];
-//	BOOL exists = [parsers indexOfObjectIdenticalTo:inParser] != NSNotFound;
-//	BOOL custom = inParser.isCustom;
-//	
-//	if (exists && custom) 
-//	{
-//		if (_delegate != nil && [_delegate respondsToSelector:@selector(parserController:willUnloadParser:forMediaType:)])
-//		{
-//			[_delegate parserController:self willUnloadParser:inParser forMediaType:mediaType];
-//		}
-//		
-//		[parsers removeObject:inParser];
-//		[self saveCustomParsersToPreferences];
-//		return YES;
-//	}	
-//	
-//	return NO;	
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-/*
-// Create a list containing information about all loaded custom parsers. This list is stored in the prefs...
-
-- (void) saveCustomParsersToPreferences
-{
-	if (_loadedParsers != nil && _loadingCustomParsers == NO)
-	{
-		NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
-		NSMutableArray* customParsers = [NSMutableArray array];
-		
-		for (NSString* mediaType in _loadedParsers)
-		{
-			NSArray* parsers = [_loadedParsers objectForKey:mediaType];
-			
-			for (IMBParser* parser in parsers)
-			{
-				if (parser.isCustom)
-				{
-					NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
-						NSStringFromClass([parser class]),@"className",
-						parser.mediaSource,@"mediaSource",
-						parser.mediaType,@"mediaType",
-						nil];
-						
-					[customParsers addObject:info];	
-				}
-			}
-		}
-		
-		[prefs setObject:customParsers forKey:@"customParsers"];
-		[IMBConfig setPrefs:prefs forClass:[self class]];
-	}
-}
-
-
-// Restore the custom parser instances from the list which was stored in the prefs. The flag _loadingCustomParsers
-// is used to skip the saveCustomParsersToPreferences method call when calling addCustomParser:forMediaType: which
-// is totally useless while we are loading from the prefs...
-
-- (void) loadCustomParsersFromPreferences
-{
-	_loadingCustomParsers = YES;
-	
-	NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
-	NSArray* customParsers = [prefs objectForKey:@"customParsers"];
-	
-	for (NSDictionary* info in customParsers)
-	{
-		Class parserClass = NSClassFromString([info objectForKey:@"className"]);
-		NSString* mediaType = [info objectForKey:@"mediaType"];
-		IMBParser* parser = [[parserClass alloc] initWithMediaType:mediaType];
-		
-		parser.mediaSource = [info objectForKey:@"mediaSource"];
-		parser.custom = YES;
-		
-		[self addCustomParser:parser forMediaType:parser.mediaType];
-		[parser release];
-	}
-	
-	_loadingCustomParsers = NO;
-}
-*/
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 - (BOOL) addParserMessenger:(IMBParserMessenger*)inParserMessenger
 {
     // Check if inParserFactory is already in the list. If yes then bail out early...
@@ -469,7 +314,7 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 		if ([parserMessenger.mediaSource isEqual:inParserMessenger.mediaSource] && 
 			[parserMessenger.mediaType isEqual:inParserMessenger.mediaType])
 		{
-			return YES;
+			return NO;
 		}
 	}
 	
@@ -538,108 +383,93 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (NSArray *)parsersForMediaType:(NSString *)mediaType;
-//{
-//    NSMutableDictionary *parsers = [self parsersByMediaType];
-//    return [[[parsers objectForKey:mediaType] copy] autorelease];   // copy so clients don't get to see any mutations
-//}
-
-
-// Returns all loaded parsers...
-
-//- (NSArray *)parsers
-//{
-//    [self parsersByMediaType];  // make sure is loaded
-//	NSMutableArray* result = nil;
-//	
-//    result = [NSMutableArray array];
-//    
-//    for (NSString* mediaType in _loadedParsers)
-//    {	
-//        NSArray* parsersForMediaType = [_loadedParsers objectForKey:mediaType];
-//        [result addObjectsFromArray:parsersForMediaType];
-//    }
-//    
-//	return result;
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-/*
 #pragma mark
-#pragma mark Debugging
+#pragma mark User Added Folders
 
-#ifdef DEBUG
 
-// Logs the list of registered parser classes. Please note that these classes may not have been instantiated yet...
+// Adds a IMBParserMessenger list of loaded IMBParserMessengers and saves the resulting list to the prefs...
 
-- (void) logRegisteredParserClasses
+- (BOOL) addUserAddedParserMessenger:(IMBParserMessenger*)inParserMessenger
 {
-	NSMutableString* text = [NSMutableString string];
+	inParserMessenger.isUserAdded = YES;
 	
-	if (sRegisteredParserClasses)
+	BOOL didAdd = [self addParserMessenger:inParserMessenger];
+	
+	if (didAdd)
 	{
-		for (NSString* mediaType in sRegisteredParserClasses)
+		[self saveUserAddedParserMessengersToPreferences];
+	}
+	
+	return didAdd;
+}
+
+
+// Removes a IMBParserMessenger list of loaded IMBParserMessengers and saves the resulting list to the prefs...
+
+- (BOOL) removeUserAddedParserMessenger:(IMBParserMessenger*)inParserMessenger
+{
+	BOOL didRemove = NO;
+
+	if (inParserMessenger.isUserAdded)
+	{
+		didRemove = [self removeParserMessenger:inParserMessenger];
+		
+		if (didRemove)
 		{
-			[text appendFormat:@"\tmediaType = %@\n",mediaType];
-			
-			NSSet* parserClasses = [sRegisteredParserClasses objectForKey:mediaType];
-			
-			for (Class parserClass in parserClasses)
-			{
-				[text appendFormat:@"\t\t%@\n",NSStringFromClass(parserClass)];
-			}
+			[self saveUserAddedParserMessengersToPreferences];
 		}
 	}
-		
-	NSLog(@"%s\n\n%@\n",__FUNCTION__,text);
+	
+	return didRemove;
 }
 
 
-// Logs the list of loaded parsers. This list may differ from the registered classes (because the delegate denied
-// loading or custom parsers have been added)...
+// Create a list containing information about all loaded custom parsers. This list is stored in the prefs...
 
-- (void) logParsers
+- (void) saveUserAddedParserMessengersToPreferences
 {
-	NSMutableString* text = [NSMutableString string];
-	
-	if (_loadedParsers)
+	if (_loadedParserMessengers)
 	{
-		for (NSString* mediaType in _loadedParsers)
+		NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
+		NSMutableArray* userAddedParserMessengers = [NSMutableArray array];
+		
+		for (NSString* mediaType in _loadedParserMessengers)
 		{
-			[text appendFormat:@"\tmediaType = %@\n",mediaType];
+			NSArray* parsersMessengers = [self loadedParserMessengersForMediaType:mediaType];
 			
-			NSArray* parsers = [_loadedParsers objectForKey:mediaType];
-			
-			for (IMBParser* parser in parsers)
+			for (IMBParserMessenger* parsersMessenger in parsersMessengers)
 			{
-				[text appendFormat:@"\t\t%@\n",[parser description]];
+				if (parsersMessenger.isUserAdded)
+				{
+					NSData* data = [NSKeyedArchiver archivedDataWithRootObject:parsersMessenger];
+					[userAddedParserMessengers addObject:data];
+				}
 			}
 		}
-	}
 		
-	NSLog(@"%s\n\n%@\n",__FUNCTION__,text);
+		[prefs setObject:userAddedParserMessengers forKey:@"userAddedParserMessengers"];
+		[IMBConfig setPrefs:prefs forClass:[self class]];
+	}
 }
 
-#endif
 
-- (IMBParser *) parserOfClass:(Class)class forMediaType:(NSString *)aMediaType;
+// Restore the custom parser instances from the list which was stored in the prefs. The flag _loadingCustomParsers
+// is used to skip the saveCustomParsersToPreferences method call when calling addCustomParser:forMediaType: which
+// is totally useless while we are loading from the prefs...
+
+- (void) loadUserAddedParserMessengersFromPreferences
 {
-    NSParameterAssert(class);
-    
-    NSArray *parsers = [[self parsersByMediaType] objectForKey:aMediaType];
-    for (IMBParser* parser in parsers)
-    {
-        if ([parser isMemberOfClass:class])
-        {
-            return parser;
-        }
-    }
-    
-	return nil;
+	NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
+	NSArray* userAddedParserMessengers = [prefs objectForKey:@"userAddedParserMessengers"];
+	
+	for (NSData* data in userAddedParserMessengers)
+	{
+		IMBParserMessenger* parsersMessenger = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+		[self addParserMessenger:parsersMessenger];
+	}
 }
-*/
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

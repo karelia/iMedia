@@ -78,7 +78,6 @@
 {
 	NSMutableDictionary* _loadedParserMessengers;
 	id <IMBParserControllerDelegate> _delegate;
-//	BOOL _loadingCustomParsers;
 }
 
 // Create singleton instance of the controller. Don't forget to set the delegate early in the app lifetime...
@@ -96,38 +95,12 @@
 
 - (void) loadParserMessengers;
 - (void) unloadParserMessengers;
-
 - (NSArray*) loadedParserMessengersForMediaType:(NSString*)inMediaType;
 
-//- (void) reset; 
+// Adds/removes IMBParserMessenger. This is mainly used for dragging folders into the IMBOutlineView...
 
-// Add/remove parser instances dynamically. These methods are useful for parsers that mimic dynamically appearing
-// content, e.g. connected devices (cameras, network volumes, etc)...
-
-//- (BOOL) addDynamicParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
-//- (BOOL) removeDynamicParser:(IMBParser*)inParser;
-
-// Add/remove custom parsers. This is usually used for folder based parsers that are dragged into the outline view.
-// Please note that this method should be called after loadParsers...
-
-//- (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
-//- (BOOL) removeCustomParser:(IMBParser*)inParser;
-
-// Returns an array of loaded parsers. This combines the regular parsers (which were instantiated by loadParsers)
-// with the custom parsers (which were instantiated by the user or by loadCustomParsersFromPreferences)...
-
-//- (NSArray*) parserFactoriesForMediaType:(NSString *)mediaType;
-//- (NSArray*) parsersFactories;
-
-// Debugging support...
-#ifdef DEBUG
-//- (void) logRegisteredParserClasses;
-//- (void) logParsers;
-#endif
-
-// External finding of an active parser. Can't name the argument "class" as that breaks C++ apps linking against iMedia
-
-//- (IMBParser*) parserOfClass:(Class)inParserClass forMediaType:(NSString*)inMediaType;
+- (BOOL) addUserAddedParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (BOOL) removeUserAddedParserMessenger:(IMBParserMessenger*)inParserMessenger;
 
 @end
 
