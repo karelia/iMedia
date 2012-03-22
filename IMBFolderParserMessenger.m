@@ -54,8 +54,11 @@
 
 #import "IMBFolderParserMessenger.h"
 #import "IMBFolderParser.h"
+#import "SBUtilities.h"
+#import <XPCKit/XPCKit.h>
+
 //#import "IMBConfig.h"
-//#import "IMBNode.h"
+#import "IMBNode.h"
 //#import "IMBObject.h"
 //#import "IMBNodeObject.h"
 //#import "NSFileManager+iMedia.h"
@@ -181,25 +184,23 @@
 #pragma mark App Methods
 
 
+// Add a 'Show in Finder' command to the context menu...
+
 - (void) willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode
 {
-//	NSString* title = NSLocalizedStringWithDefaultValue(
-//		@"IMBObjectViewController.menuItem.revealInFinder",
-//		nil,IMBBundle(),
-//		@"Show in Finder",
-//		@"Menu item in context menu of IMBObjectViewController");
-//	
-//	NSString* path = (NSString*) [inNode mediaSource];
-//	
-//	NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
-//	[item setRepresentedObject:path];
-//	[item setTarget:self];
-//	[inMenu addItem:item];
-//	[item release];
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBObjectViewController.menuItem.revealInFinder",
+		nil,IMBBundle(),
+		@"Show in Finder",
+		@"Menu item in context menu of IMBObjectViewController");
+	
+	NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
+	[item setRepresentedObject:inNode.mediaSource];
+	[item setTarget:self];
+	[inMenu addItem:item];
+	[item release];
 }
 
-
-// Add a 'Show in Finder' command to the context menu...
 
 - (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject
 {
@@ -225,9 +226,10 @@
 
 - (IBAction) revealInFinder:(id)inSender
 {
-//	NSString* path = (NSString*)[inSender representedObject];
-//	NSString* folder = [path stringByDeletingLastPathComponent];
-//	[[NSWorkspace imb_threadSafeWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
+	NSURL* url = (NSURL*)[inSender representedObject];
+	NSString* path = [url path];
+	NSString* folder = [path stringByDeletingLastPathComponent];
+	[[NSWorkspace sharedWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
 }
 
 
