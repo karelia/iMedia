@@ -892,9 +892,7 @@
 	
 	if (_objects.count > 0)
 	{
-		[description appendFormat:@"\n%@\tobjects = %u",
-			self.indentString,
-			_objects.count];
+		[description appendFormat:@" ... %u objects",_objects.count];
 			
 //		for (IMBObject* object in _objects)
 //		{
