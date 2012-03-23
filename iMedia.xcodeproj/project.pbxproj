@@ -290,6 +290,10 @@
 		D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */; };
+		D0E69CD0151C5576002FE181 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D0E69CD2151C5581002FE181 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D0E69CD5151C5989002FE181 /* NSKeyedArchiver+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E69CD3151C5989002FE181 /* NSKeyedArchiver+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0E69CD6151C5989002FE181 /* NSKeyedArchiver+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E69CD4151C5989002FE181 /* NSKeyedArchiver+iMedia.m */; };
 		D0E96BCA151104B8004F3EE7 /* XPCKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D0F207C5150A23AA007E6FA2 /* XPCKit.framework */; };
 		D0E96C2B15122F86004F3EE7 /* IMBAppleMediaParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E96C2A15122F86004F3EE7 /* IMBAppleMediaParser.m */; };
 		D0E96C2C151243D2004F3EE7 /* IMBiPhotoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CB9175150F7753007716FA /* IMBiPhotoParser.m */; };
@@ -753,6 +757,8 @@
 		D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBApertureParser.h; sourceTree = "<group>"; };
 		D0D635EB1035B4C500FF8631 /* IMBApertureParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBApertureParser.m; sourceTree = "<group>"; };
 		D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		D0E69CD3151C5989002FE181 /* NSKeyedArchiver+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSKeyedArchiver+iMedia.h"; sourceTree = "<group>"; };
+		D0E69CD4151C5989002FE181 /* NSKeyedArchiver+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSKeyedArchiver+iMedia.m"; sourceTree = "<group>"; };
 		D0E96BCB15110535004F3EE7 /* iMediaTester.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = iMediaTester.entitlements; sourceTree = "<group>"; };
 		D0E96C2915122F86004F3EE7 /* IMBAppleMediaParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAppleMediaParser.h; sourceTree = "<group>"; };
 		D0E96C2A15122F86004F3EE7 /* IMBAppleMediaParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAppleMediaParser.m; sourceTree = "<group>"; };
@@ -798,6 +804,7 @@
 				30FFEBEF150A08DB0009C1D0 /* Foundation.framework in Frameworks */,
 				D0E96C3215124CE4004F3EE7 /* AppKit.framework in Frameworks */,
 				30E777241511E83800413AEF /* Security.framework in Frameworks */,
+				D0E69CD0151C5576002FE181 /* Quartz.framework in Frameworks */,
 				D0F207C7150A23BA007E6FA2 /* iMedia.framework in Frameworks */,
 				D0F207C6150A23AA007E6FA2 /* XPCKit.framework in Frameworks */,
 			);
@@ -840,6 +847,7 @@
 				D0E96CF71518C9BF004F3EE7 /* Foundation.framework in Frameworks */,
 				D0E96CF81518C9BF004F3EE7 /* AppKit.framework in Frameworks */,
 				D0E96CF91518C9BF004F3EE7 /* Security.framework in Frameworks */,
+				D0E69CD2151C5581002FE181 /* Quartz.framework in Frameworks */,
 				D0E96CFA1518C9BF004F3EE7 /* iMedia.framework in Frameworks */,
 				D0E96CFB1518C9BF004F3EE7 /* XPCKit.framework in Frameworks */,
 			);
@@ -1361,6 +1369,8 @@
 				D0363E7B11D3787800E0579F /* NSView+iMedia.m */,
 				CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */,
 				CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */,
+				D0E69CD3151C5989002FE181 /* NSKeyedArchiver+iMedia.h */,
+				D0E69CD4151C5989002FE181 /* NSKeyedArchiver+iMedia.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -1630,6 +1640,7 @@
 				D0E96CE61518A297004F3EE7 /* IMBImageFolderParserMessenger.h in Headers */,
 				D081099D1519AF3B00201850 /* IMBAudioFolderParserMessenger.h in Headers */,
 				D08109A5151A03E700201850 /* IMBMovieFolderParserMessenger.h in Headers */,
+				D0E69CD5151C5989002FE181 /* NSKeyedArchiver+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1976,6 +1987,7 @@
 				D0E96CE71518A297004F3EE7 /* IMBImageFolderParserMessenger.m in Sources */,
 				D081099E1519AF3B00201850 /* IMBAudioFolderParserMessenger.m in Sources */,
 				D08109A4151A03E300201850 /* IMBMovieFolderParserMessenger.m in Sources */,
+				D0E69CD6151C5989002FE181 /* NSKeyedArchiver+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

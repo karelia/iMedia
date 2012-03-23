@@ -47,71 +47,100 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Common...
-
-#import <iMedia/IMBCommon.h>
-#import <iMedia/IMBConfig.h>
-#import <iMedia/IMBOperationQueue.h>
-#import <iMedia/IMBIconCache.h>
-
-// Model...
-
-#import <iMedia/IMBNode.h>
-#import <iMedia/IMBObject.h>
-#import <iMedia/IMBObjectsPromise.h>
-#import <iMedia/IMBFlickrNode.h>
-
-// Parsers...
-
-#import <iMedia/IMBParserMessenger.h>
-#import <iMedia/IMBFolderParserMessenger.h>
-#import <iMedia/IMBImageFolderParserMessenger.h>
-#import <iMedia/IMBAudioFolderParserMessenger.h>
-#import <iMedia/IMBMovieFolderParserMessenger.h>
-#import <iMedia/IMBiPhotoParserMessenger.h>
-
-//#import <iMedia/IMBParser.h>
-//#import <iMedia/IMBFolderParser.h>
-//#import <iMedia/IMBImageFolderParser.h>
-//#import <iMedia/IMBiPhotoParser.h>
-//#import <iMedia/IMBiTunesParser.h>
-//#import <iMedia/IMBApertureParser.h>
-//#import <iMedia/IMBLightroomParser.h>
-//#import <iMedia/IMBImageCaptureParser.h>
-//#import <iMedia/IMBFlickrParser.h>
-//#import <iMedia/IMBGarageBandParser.h>
-
-// Controllers...
-
-#import <iMedia/IMBParserController.h>
-#import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBNodeTreeController.h>
-#import <iMedia/IMBObjectArrayController.h>
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBImageViewController.h>
-#import <iMedia/IMBPanelController.h>
-
-// Views...
-
-#import <iMedia/IMBOutlineView.h>
-#import <iMedia/IMBNodeCell.h>
-#import <iMedia/IMBTableView.h>
-#import <iMedia/IMBComboTableView.h>
-#import <iMedia/IMBImageBrowserView.h>
-
-// Categories...
-
-#import <iMedia/NSFileManager+iMedia.h>
-#import <iMedia/NSWorkspace+iMedia.h>
-#import <iMedia/NSString+iMedia.h>
-#import <iMedia/NSImage+iMedia.h>
-//#import <iMedia/NSDictionary+iMedia.h>
-//#import <iMedia/NSView+iMedia.h>
-#import <iMedia/NSURL+iMedia.h>
-#import <iMedia/NSKeyedArchiver+iMedia.h>
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark HEADERS
+
+#import "NSKeyedArchiver+iMedia.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@implementation NSKeyedArchiver (iMedia)
+
+
+// Convert the image to NSData and encode that as an object...
+
+- (void) encodeCGImage:(CGImageRef)inImage forKey:(NSString*)inKey
+{
+	if (inImage != nil && inKey != nil)
+	{
+		NSMutableData* data = [NSMutableData data];
+		CGImageDestinationRef dest = CGImageDestinationCreateWithData((CFMutableDataRef)data,kUTTypePNG,1,NULL);
+		
+		if (dest)
+		{
+			CGImageDestinationAddImage(dest,inImage,NULL);
+			CGImageDestinationFinalize(dest);
+			CFRelease(dest);
+		}
+		
+		[self encodeObject:data forKey:inKey];
+	}
+}
+
+
+// If we do not have any representations, then add one before archiving the image...
+
+- (void) encodeNSImage:(NSImage*)inImage forKey:(NSString*)inKey
+{
+	if ([[inImage representations] count] == 0)
+	{
+		NSData* tiff = [inImage TIFFRepresentation];
+		NSBitmapImageRep* bitmap = [NSBitmapImageRep imageRepWithData:tiff];
+		[inImage addRepresentation:bitmap];
+	}
+	
+	[self encodeObject:inImage forKey:inKey];
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@implementation NSKeyedUnarchiver (iMedia)
+
+
+// Decode data blob and convert it to a CGImageRef...
+
+- (CGImageRef) decodeCGImageForKey:(NSString*)inKey
+{
+	CGImageRef image = NULL;
+	CGImageSourceRef source = NULL;
+	NSData* data = [self decodeObjectForKey:inKey];
+	
+	if (data)
+	{
+		if ((source = CGImageSourceCreateWithData((CFDataRef)data,NULL)))
+		{
+			image = CGImageSourceCreateImageAtIndex(source,0,NULL);
+			CFRelease(source);
+		}
+	}
+	
+	return image;
+}
+
+
+// Decode NSImage (as generic object) and typecast it...
+
+- (NSImage*) decodeNSImageForKey:(NSString*)inKey
+{
+	return (NSImage*)[self decodeObjectForKey:inKey];
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------

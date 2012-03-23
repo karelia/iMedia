@@ -47,69 +47,41 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Common...
+// Author: Peter Baumgartner
 
-#import <iMedia/IMBCommon.h>
-#import <iMedia/IMBConfig.h>
-#import <iMedia/IMBOperationQueue.h>
-#import <iMedia/IMBIconCache.h>
 
-// Model...
+//----------------------------------------------------------------------------------------------------------------------
 
-#import <iMedia/IMBNode.h>
-#import <iMedia/IMBObject.h>
-#import <iMedia/IMBObjectsPromise.h>
-#import <iMedia/IMBFlickrNode.h>
 
-// Parsers...
+#pragma mark HEADERS
 
-#import <iMedia/IMBParserMessenger.h>
-#import <iMedia/IMBFolderParserMessenger.h>
-#import <iMedia/IMBImageFolderParserMessenger.h>
-#import <iMedia/IMBAudioFolderParserMessenger.h>
-#import <iMedia/IMBMovieFolderParserMessenger.h>
-#import <iMedia/IMBiPhotoParserMessenger.h>
+#import <Cocoa/Cocoa.h>
 
-//#import <iMedia/IMBParser.h>
-//#import <iMedia/IMBFolderParser.h>
-//#import <iMedia/IMBImageFolderParser.h>
-//#import <iMedia/IMBiPhotoParser.h>
-//#import <iMedia/IMBiTunesParser.h>
-//#import <iMedia/IMBApertureParser.h>
-//#import <iMedia/IMBLightroomParser.h>
-//#import <iMedia/IMBImageCaptureParser.h>
-//#import <iMedia/IMBFlickrParser.h>
-//#import <iMedia/IMBGarageBandParser.h>
 
-// Controllers...
+//----------------------------------------------------------------------------------------------------------------------
 
-#import <iMedia/IMBParserController.h>
-#import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBNodeTreeController.h>
-#import <iMedia/IMBObjectArrayController.h>
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBImageViewController.h>
-#import <iMedia/IMBPanelController.h>
 
-// Views...
+#pragma mark
 
-#import <iMedia/IMBOutlineView.h>
-#import <iMedia/IMBNodeCell.h>
-#import <iMedia/IMBTableView.h>
-#import <iMedia/IMBComboTableView.h>
-#import <iMedia/IMBImageBrowserView.h>
+@interface NSKeyedArchiver (iMedia)
 
-// Categories...
+- (void) encodeCGImage:(CGImageRef)inImage forKey:(NSString*)inKey;
+- (void) encodeNSImage:(NSImage*)inImage forKey:(NSString*)inKey;
 
-#import <iMedia/NSFileManager+iMedia.h>
-#import <iMedia/NSWorkspace+iMedia.h>
-#import <iMedia/NSString+iMedia.h>
-#import <iMedia/NSImage+iMedia.h>
-//#import <iMedia/NSDictionary+iMedia.h>
-//#import <iMedia/NSView+iMedia.h>
-#import <iMedia/NSURL+iMedia.h>
-#import <iMedia/NSKeyedArchiver+iMedia.h>
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@interface NSKeyedUnarchiver (iMedia)
+
+- (CGImageRef) decodeCGImageForKey:(NSString*)inKey;
+- (NSImage*) decodeNSImageForKey:(NSString*)inKey;
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
