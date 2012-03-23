@@ -102,6 +102,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
 	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
@@ -141,29 +143,29 @@
 	
 	// Population of events, faces, photo stream and regular album node fundamentally different
 	
-//	if ([self isEventsNode:inNode])
-//	{
-//		NSArray* events = [plist objectForKey:@"List of Rolls"];
-//		[self populateEventsNode:inNode withEvents:events images:images];
-//	} 
-//	else if ([self isFacesNode:inNode])
-//	{
-//		NSDictionary* faces = [plist objectForKey:@"List of Faces"];
-//		[self populateFacesNode:inNode withFaces:faces images:images];
-//	} 
-//	else if ([self isPhotoStreamNode:inNode])
-//	{
-//		[self populatePhotoStreamNode:inNode images:images];
-//	} 
-//	else
-//	{
+	if ([self isEventsNode:inNode])
+	{
+		NSArray* events = [plist objectForKey:@"List of Rolls"];
+		[self populateEventsNode:inNode withEvents:events images:images];
+	} 
+	else if ([self isFacesNode:inNode])
+	{
+		NSDictionary* faces = [plist objectForKey:@"List of Faces"];
+		[self populateFacesNode:inNode withFaces:faces images:images];
+	} 
+	else if ([self isPhotoStreamNode:inNode])
+	{
+		[self populatePhotoStreamNode:inNode images:images];
+	} 
+	else
+	{
 		[self addSubNodesToNode:inNode albums:albums images:images]; 
-//		[self populateAlbumNode:inNode images:images]; 
-//	}
+		[self populateAlbumNode:inNode images:images]; 
+	}
 
-	// If we are populating the root nodes, then also populate the "Photos" node and mirror its
-	// objects array into the objects array of the root node. Please note that this is non-standard parser behavior,
-	// which is implemented here, to achieve the desired "feel" in the browser...
+	// If we are populating the root nodes, then also populate the "Photos" node and mirror its objects array 
+	// into the objects array of the root node. Please note that this is non-standard parser behavior, which is 
+	// implemented here, to achieve the desired "feel" in the browser...
 	
 	// Will find Photos node at same index in subnodes as in album list
 	// which offset was it found, in "List of Albums" Array
@@ -171,10 +173,10 @@
 //	NSUInteger photosNodeIndex = [self indexOfAllPhotosAlbumInAlbumList:albums];
 //	if (inNode.isTopLevelNode && photosNodeIndex != NSNotFound)
 //	{
-//		NSArray* subNodes = inNode.subNodes;
-//		if (photosNodeIndex < [subNodes count])	// Karelia case 136310, make sure offset exists
+//		NSArray* subnodes = inNode.subnodes;
+//		if (photosNodeIndex < [subnodes count])	// Karelia case 136310, make sure offset exists
 //		{
-//			IMBNode* photosNode = [subNodes objectAtIndex:photosNodeIndex];	// assumes subnodes exists same as albums!
+//			IMBNode* photosNode = [subnodes objectAtIndex:photosNodeIndex];	// assumes subnodes exists same as albums!
 //			[self populateNode:photosNode options:inOptions error:outError];
 //			inNode.objects = photosNode.objects;
 //		}
