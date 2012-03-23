@@ -145,16 +145,11 @@
 		D08E8B771019C99B005D8614 /* IMBFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B761019C99B005D8614 /* IMBFileWatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08E8C001019D0E7005D8614 /* UKMainThreadProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8BFE1019D0E7005D8614 /* UKMainThreadProxy.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8D2B1019E89E005D8614 /* IMBKQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8D291019E89E005D8614 /* IMBKQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D08E8D2C1019E89E005D8614 /* IMBKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D2A1019E89E005D8614 /* IMBKQueue.m */; };
-		D08E8D2E1019E8A5005D8614 /* IMBFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D2D1019E8A5005D8614 /* IMBFileWatcher.m */; };
 		D08E8D311019E97B005D8614 /* UK_IMB_RenameBegin.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8D2F1019E97B005D8614 /* UK_IMB_RenameBegin.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8D321019E97B005D8614 /* UK_IMB_RenameEnd.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8D301019E97B005D8614 /* UK_IMB_RenameEnd.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8D331019EA4F005D8614 /* UKFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B661019C916005D8614 /* UKFileWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		D08E8D7D1019EAB8005D8614 /* IMBFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D7B1019EAB8005D8614 /* IMBFNSubscribeFileWatcher.m */; };
 		D08E8D7E1019EAB8005D8614 /* IMBFNSubscribeFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8D7C1019EAB8005D8614 /* IMBFNSubscribeFileWatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08E8D811019EB09005D8614 /* IMBFSEventsWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8D7F1019EB09005D8614 /* IMBFSEventsWatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D08E8D821019EB09005D8614 /* IMBFSEventsWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D801019EB09005D8614 /* IMBFSEventsWatcher.m */; };
-		D08E8D851019EB4D005D8614 /* IMBMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D831019EB4D005D8614 /* IMBMainThreadProxy.m */; };
 		D08E8D861019EB4D005D8614 /* IMBMainThreadProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8D841019EB4D005D8614 /* IMBMainThreadProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08E8FB7101A0F0D005D8614 /* iMedia.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
 		D08F82B411E4A1C1006E618E /* IMBQLPreviewPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1946,11 +1941,6 @@
 			files = (
 				D09931EB1011132300C527B7 /* IMBCommon.m in Sources */,
 				D09931A910110E8900C527B7 /* IMBConfig.m in Sources */,
-				D08E8D2C1019E89E005D8614 /* IMBKQueue.m in Sources */,
-				D08E8D2E1019E8A5005D8614 /* IMBFileWatcher.m in Sources */,
-				D08E8D7D1019EAB8005D8614 /* IMBFNSubscribeFileWatcher.m in Sources */,
-				D08E8D821019EB09005D8614 /* IMBFSEventsWatcher.m in Sources */,
-				D08E8D851019EB4D005D8614 /* IMBMainThreadProxy.m in Sources */,
 				D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */,
 				D0F2DB9C1098262D004280C1 /* FMDatabase.m in Sources */,
 				D0F2DB9E1098262D004280C1 /* FMDatabaseAdditions.m in Sources */,
@@ -2058,10 +2048,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../../Library/Developer/Xcode/DerivedData/iMedia-eziqmohtzkxjywecdgfphvntbmzs/Build/Products/Debug\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
@@ -2077,10 +2064,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../../Library/Developer/Xcode/DerivedData/iMedia-eziqmohtzkxjywecdgfphvntbmzs/Build/Products/Debug\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
@@ -2228,10 +2212,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../../Library/Developer/Xcode/DerivedData/iMedia-eziqmohtzkxjywecdgfphvntbmzs/Build/Products/Debug\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
