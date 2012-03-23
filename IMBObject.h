@@ -80,8 +80,6 @@ extern NSString* kIMBQuickLookImageProperty;
 
 @interface IMBObject : NSObject <NSCopying,NSCoding,IMBImageItem,QLPreviewItem,NSPasteboardWriting>
 {
-  @private
-  
 	id _location;												
 	NSString* _name;
 	NSDictionary* _preliminaryMetadata;
@@ -89,23 +87,18 @@ extern NSString* kIMBQuickLookImageProperty;
 	NSString* _metadataDescription;
     NSString* _parserIdentifier;
 	IMBParserMessenger* _parserMessenger;
-//    NSString* _parserClassName;
-//    NSString* _parserMediaType;
-//    NSString* _parserMediaSource;
-	NSUInteger _index;
 	
-  @protected
-  
+	NSUInteger _index;
+    BOOL _shouldDrawAdornments;
+	BOOL _shouldDisableTitle;
+    BOOL _isLoadingThumbnail;
+	
+	id _imageLocation;
 	id _imageRepresentation;								
 	NSString* _imageRepresentationType;		
 	BOOL _needsImageRepresentation;
 	NSUInteger _imageVersion;
-	id _imageLocation;
-    BOOL _isLoadingThumbnail;
-    BOOL _shouldDrawAdornments;
-	BOOL _shouldDisableTitle;
 	
-	// Generic image support through Quick Look
 	CGImageRef _quickLookImage;
 	BOOL _isLoadingQuickLookImage;
 }
@@ -119,18 +112,16 @@ extern NSString* kIMBQuickLookImageProperty;
 @property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
 @property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
 @property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)
-
-//@property (copy, readonly) NSString* parserClassName;		// Name of the parser which created this object
-//@property (copy, readonly) NSString* parserMediaType;		// Media type for the parser which created this object
-//@property (copy, readonly) NSString* parserMediaSource;	// Media source for the parser which created this object
-@property (retain) NSString* parserIdentifier;				// Indentifier of IMBParser that created this object
+@property (retain) NSString* parserIdentifier;				// Identifier of IMBParser that created this object
 @property (retain) IMBParserMessenger* parserMessenger;		// IMBParserMessenger that created this object
+
+// Helpers...
 
 @property (assign) NSUInteger index;						// Index of object in the array (optional)
 @property (assign) BOOL shouldDrawAdornments;				// YES if border/shadow should be drawn
 @property (assign) BOOL shouldDisableTitle;					// YES if title should be shown as disabled (e.g. not draggable)
-
-// Helpers...
+@property (readonly) BOOL isSelectable;
+@property (readonly) BOOL isDraggable;
 
 - (NSString*) path;											// Convert location to path
 - (NSURL*) URL;												// Convert location to url
@@ -138,18 +129,16 @@ extern NSString* kIMBQuickLookImageProperty;
 - (NSString*) type;											// Returns type of file if possible
 - (NSString*) tooltipString;
 
-// Derived Properties. See IKImageBrowserItem for documentation...
+// Derived Properties. See IKImageBrowserItem for documentation.   
+// These methods are used for displaying in an IKImageBrowserView...
 
 @property (retain) id imageLocation;						// Optional url or path if different from location (e.g. lores thumbnail)
-@property (nonatomic, readonly) NSString* imageUID;
 @property (retain) id imageRepresentation;	
-@property (assign) BOOL needsImageRepresentation;
 @property (retain) NSString* imageRepresentationType;
-@property (readonly) NSString* imageTitle;
+@property (assign) BOOL needsImageRepresentation;
 @property (assign) NSUInteger imageVersion;
-
-@property (readonly) BOOL isSelectable;
-@property (readonly) BOOL isDraggable;
+@property (nonatomic, readonly) NSString* imageUID;
+@property (readonly) NSString* imageTitle;
 
 // Asynchronous loading of thumbnails...
 																	

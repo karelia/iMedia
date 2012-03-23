@@ -96,6 +96,7 @@
 #import "NSWorkspace+iMedia.h"
 #import "NSURL+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "NSKeyedArchiver+iMedia.h"
 #import "IMBSmartFolderNodeObject.h"
 
 
@@ -152,14 +153,17 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
+
 - (id) init
 {
-	if ((self = [super init]) != nil)
+	if ((self = [super init]))
 	{
-		self.index = NSNotFound;
-		self.shouldDrawAdornments = YES;
-		self.needsImageRepresentation = YES;
-		self.shouldDisableTitle = NO;
+		_index = NSNotFound;
+		_shouldDrawAdornments = YES;
+		_needsImageRepresentation = YES;
+		_shouldDisableTitle = NO;
 		_quickLookImage = NULL;
 		_isLoadingQuickLookImage = NO;
 	}
@@ -177,14 +181,11 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	IMBRelease(_metadataDescription);
 	IMBRelease(_parserIdentifier);
 	IMBRelease(_parserMessenger);
-//	IMBRelease(_parserClassName);
-//	IMBRelease(_parserMediaType);
-//	IMBRelease(_parserMediaSource);
+	
 	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
-
-	if (_quickLookImage) CGImageRelease(_quickLookImage);
+	CGImageRelease(_quickLookImage);
 
 	[super dealloc];
 }
@@ -195,21 +196,27 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (id) initWithCoder:(NSCoder*)inCoder
 {
+	NSKeyedUnarchiver* coder = (NSKeyedUnarchiver*)inCoder;
+	
 	if ((self = [super init]) != nil)
 	{
-		self.location = [inCoder decodeObjectForKey:@"location"];
-		self.name = [inCoder decodeObjectForKey:@"name"];
-		self.preliminaryMetadata = [inCoder decodeObjectForKey:@"preliminaryMetadata"];
-		self.metadata = [inCoder decodeObjectForKey:@"metadata"];
-		self.metadataDescription = [inCoder decodeObjectForKey:@"metadataDescription"];
-		self.parserIdentifier = [inCoder decodeObjectForKey:@"parserIdentifier"];
-//		self.parserClassName = [inCoder decodeObjectForKey:@"parserClassName"];
-//		self.parserMediaType = [inCoder decodeObjectForKey:@"parserMediaType"];
-//		self.parserMediaSource = [inCoder decodeObjectForKey:@"parserMediaSource"];
-		self.index = [inCoder decodeIntegerForKey:@"index"];
-		self.shouldDrawAdornments = [inCoder decodeBoolForKey:@"shouldDrawAdornments"];
-		self.shouldDisableTitle = [inCoder decodeBoolForKey:@"shouldDisableTitle"];
-		self.needsImageRepresentation = YES;
+		self.location = [coder decodeObjectForKey:@"location"];
+		self.name = [coder decodeObjectForKey:@"name"];
+		self.preliminaryMetadata = [coder decodeObjectForKey:@"preliminaryMetadata"];
+		self.metadata = [coder decodeObjectForKey:@"metadata"];
+		self.metadataDescription = [coder decodeObjectForKey:@"metadataDescription"];
+		self.parserIdentifier = [coder decodeObjectForKey:@"parserIdentifier"];
+
+		self.index = [coder decodeIntegerForKey:@"index"];
+		self.shouldDrawAdornments = [coder decodeBoolForKey:@"shouldDrawAdornments"];
+		self.shouldDisableTitle = [coder decodeBoolForKey:@"shouldDisableTitle"];
+		self.isLoadingThumbnail = [coder decodeBoolForKey:@"isLoadingThumbnail"];
+		
+		self.imageLocation = [coder decodeObjectForKey:@"imageLocation"];
+		self.imageRepresentation = (id)[coder decodeCGImageForKey:@"imageRepresentation"];
+		self.imageRepresentationType = [coder decodeObjectForKey:@"imageRepresentationType"];
+		self.needsImageRepresentation = [coder decodeBoolForKey:@"needsImageRepresentation"];
+		self.imageVersion = [coder decodeIntegerForKey:@"imageVersion"];
 	}
 	
 	return self;
@@ -218,18 +225,25 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
-	[inCoder encodeObject:self.location forKey:@"location"];
-	[inCoder encodeObject:self.name forKey:@"name"];
-	[inCoder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
-	[inCoder encodeObject:self.metadata forKey:@"metadata"];
-	[inCoder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
-	[inCoder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
-//	[inCoder encodeObject:self.parserClassName forKey:@"parserClassName"];
-//	[inCoder encodeObject:self.parserMediaSource forKey:@"parserMediaSource"];
-//	[inCoder encodeObject:self.parserMediaType forKey:@"parserMediaType"];
-	[inCoder encodeInteger:self.index forKey:@"index"];
-	[inCoder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
-	[inCoder encodeBool:self.shouldDisableTitle forKey:@"shouldDisableTitle"];
+	NSKeyedArchiver* coder = (NSKeyedArchiver*)inCoder;
+	
+	[coder encodeObject:self.location forKey:@"location"];
+	[coder encodeObject:self.name forKey:@"name"];
+	[coder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
+	[coder encodeObject:self.metadata forKey:@"metadata"];
+	[coder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
+	[coder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
+
+	[coder encodeInteger:self.index forKey:@"index"];
+	[coder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
+	[coder encodeBool:self.shouldDisableTitle forKey:@"shouldDisableTitle"];
+	[coder encodeBool:self.isLoadingThumbnail forKey:@"isLoadingThumbnail"];
+
+	[coder encodeObject:self.imageLocation forKey:@"imageLocation"];
+	[coder encodeCGImage:(CGImageRef)self.imageRepresentation forKey:@"imageRepresentation"];
+	[coder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
+	[coder encodeBool:self.needsImageRepresentation forKey:@"needsImageRepresentation"];
+	[coder encodeInteger:self.imageVersion forKey:@"imageVersion"];
 }
 
 
@@ -247,12 +261,11 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	copy.metadataDescription = self.metadataDescription;
 	copy.parserIdentifier = self.parserIdentifier;
 	copy.parserMessenger = self.parserMessenger;
-//  copy.parserClassName = self.parserClassName;
-//	copy.parserMediaType = self.parserMediaType;
-//	copy.parserMediaSource = self.parserMediaSource;
+	
     copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
 	copy.shouldDisableTitle = self.shouldDisableTitle;
+	copy.isLoadingThumbnail = self.isLoadingThumbnail;
 
 	copy.imageLocation = self.imageLocation;
 	copy.imageRepresentation = self.imageRepresentation;
