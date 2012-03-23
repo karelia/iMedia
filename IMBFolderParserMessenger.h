@@ -71,10 +71,6 @@
 @property (retain) NSString* fileUTI;
 @property (assign) NSUInteger displayPriority;
 
-//- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath;
-//- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
-//- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
-
 @end
 
 

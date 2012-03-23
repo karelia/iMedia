@@ -70,8 +70,6 @@
 
 @implementation IMBMovieFolderParser
 
-@synthesize timecodeTransformer = _timecodeTransformer;
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -83,7 +81,6 @@
 	if (self = [super initWithMediaType:inMediaType])
 	{
 		self.fileUTI = (NSString*)kUTTypeMovie; 
-		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
 	}
 	
 	return self;
@@ -92,7 +89,6 @@
 
 - (void) dealloc
 {
-	IMBRelease(_timecodeTransformer);
 	[super dealloc];
 }
 
@@ -170,14 +166,6 @@
 }
 
 
-// Convert metadata into human readable string...
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
-}
-
-
 @end
 
 
@@ -214,6 +202,11 @@
 
 @end
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 
 @implementation IMBPhotoBoothMoviesFolderParser
 

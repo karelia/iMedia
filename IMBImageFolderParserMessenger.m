@@ -55,6 +55,7 @@
 #import "IMBImageFolderParserMessenger.h"
 #import "IMBParserController.h"
 #import "SBUtilities.h"
+#import "NSImage+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,6 +107,11 @@
 		self.displayPriority = 1;
 	}
 	return self;
+}
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 @end

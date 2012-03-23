@@ -59,7 +59,7 @@
 
 //#import "IMBConfig.h"
 #import "IMBNode.h"
-//#import "IMBObject.h"
+#import "IMBObject.h"
 //#import "IMBNodeObject.h"
 //#import "NSFileManager+iMedia.h"
 //#import "NSWorkspace+iMedia.h"
@@ -85,6 +85,7 @@
 {
 	return @"IMBFolderParser";
 }
+
 					
 + (NSString*) identifier
 {
@@ -105,6 +106,7 @@
 	
 	return self;
 }
+
 
 - (void) dealloc
 {

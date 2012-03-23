@@ -58,24 +58,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark CLASSES
-
-@class IMBTimecodeTransformer;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark 
 
 // This parser scans any folder for movie files...
 
 @interface IMBMovieFolderParser : IMBFolderParser
-{
-	IMBTimecodeTransformer* _timecodeTransformer;
-}
-
-@property (retain) IMBTimecodeTransformer* timecodeTransformer;
 
 @end
 

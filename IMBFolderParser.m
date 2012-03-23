@@ -553,23 +553,17 @@
 }
 
 
-// To be overridden by subclass...
-	
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	return nil;
-}
 */
 
 //----------------------------------------------------------------------------------------------------------------------
 
-/*
+
 - (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
 {
 	IMBObject* object = [[[IMBObject alloc] init] autorelease];
 	object.location = (id)inPath;
 	object.name = inName;
-	object.parser = self;
+	object.parserIdentifier = self.identifier;
 	object.index = inIndex;
 	
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
@@ -586,25 +580,25 @@
 
 - (void) loadMetadataForObject:(IMBObject*)inObject
 {
-	if (![inObject isKindOfClass:[IMBNodeObject class]])
-	{
-		NSDictionary* metadata = [self metadataForFileAtPath:inObject.path];
-		NSString* description = [self metadataDescriptionForMetadata:metadata];
-		
-		if ([NSThread isMainThread])
-		{
-			inObject.metadata = metadata;
-			inObject.metadataDescription = description;
-		}
-		else
-		{
-			NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-			[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-			[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-		}
-	}
+//	if (![inObject isKindOfClass:[IMBNodeObject class]])
+//	{
+//		NSDictionary* metadata = [self metadataForFileAtPath:inObject.path];
+//		NSString* description = [self metadataDescriptionForMetadata:metadata];
+//		
+//		if ([NSThread isMainThread])
+//		{
+//			inObject.metadata = metadata;
+//			inObject.metadataDescription = description;
+//		}
+//		else
+//		{
+//			NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
+//			[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
+//			[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
+//		}
+//	}
 }
-*/
+
 
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -73,14 +73,6 @@
 {
 	return [NSImage imb_metadataFromImageAtPath:inPath checkSpotlightComments:YES];
 }
-
-
-// Convert metadata into human readable string...
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
-}
 */
 
 

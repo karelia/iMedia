@@ -54,7 +54,9 @@
 
 #import "IMBAudioFolderParserMessenger.h"
 #import "IMBParserController.h"
+#import "IMBTimecodeTransformer.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSString+iMedia.h"
 #import "SBUtilities.h"
 
 
@@ -65,10 +67,12 @@
 
 @implementation IMBAudioFolderParserMessenger
 
+
 + (NSString*) mediaType
 {
 	return kIMBMediaTypeAudio;
 }
+
 
 - (id) init
 {
@@ -76,9 +80,79 @@
 	{
 		self.fileUTI = (NSString*)kUTTypeAudio;		// Restrict this parser to audio files...
 		self.mediaType = [[self class] mediaType];
+		_timecodeTransformer = [[IMBTimecodeTransformer alloc] init];
 	}
 	
 	return self;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_timecodeTransformer);
+	[super dealloc];
+}
+
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSMutableString* description = [NSMutableString string];
+	NSNumber* duration = [inMetadata objectForKey:@"duration"];
+	NSString* artist = [inMetadata objectForKey:@"artist"];
+	NSString* album = [inMetadata objectForKey:@"album"];
+	NSString* comment = [inMetadata objectForKey:@"comment"];
+	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+	if (artist)
+	{
+		NSString* artistLabel = NSLocalizedStringWithDefaultValue(
+			@"Artist",
+			nil,IMBBundle(),
+			@"Artist",
+			@"Artist label in metadataDescription");
+
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",artistLabel,artist];
+	}
+	
+	if (album)
+	{
+		NSString* albumLabel = NSLocalizedStringWithDefaultValue(
+			@"Album",
+			nil,IMBBundle(),
+			@"Album",
+			@"Album label in metadataDescription");
+
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",albumLabel,album];
+	}
+	
+	if (duration)
+	{
+		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
+
+		NSString* durationString = [_timecodeTransformer transformedValue:duration];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
+	}
+
+	if (comment && ![comment isEqualToString:@""])
+	{
+		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
+			@"Comment",
+			nil,IMBBundle(),
+			@"Comment",
+			@"Comment label in metadataDescription");
+		
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",commentLabel,comment];
+	}
+	
+	return description;
 }
 
 @end

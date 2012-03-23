@@ -55,6 +55,7 @@
 #import "IMBMovieFolderParserMessenger.h"
 #import "IMBParserController.h"
 #import "SBUtilities.h"
+#import "NSDictionary+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,6 +79,11 @@
 	}
 	
 	return self;
+}
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
 }
 
 @end
