@@ -51,7 +51,7 @@
 #import "NSWorkspace+iMedia.h"
 #import <QuickLook/QuickLook.h>
 
-@implementation NSURL (imedia)
+@implementation NSURL (iMedia)
 
 // Quicklook methods to create images from non-image files...
 // (Should be called on a background thread.)
@@ -106,7 +106,7 @@
 	{
 		NSSize size = NSZeroSize;
 		size.width = CGImageGetWidth(cgimage);
-		size.height = CGImageGetWidth(cgimage);
+		size.height = CGImageGetHeight(cgimage);
 		
 		nsimage = [[[NSImage alloc] initWithSize:size] autorelease];
 		

@@ -49,7 +49,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface NSURL (imedia)
+@interface NSURL (iMedia)
 
 - (CGImageRef) imb_quicklookCGImage;
 - (NSImage*) imb_quicklookNSImage;
