@@ -79,16 +79,15 @@
 @property (copy) NSString* mediaType;	
 @property (retain) NSURL* mediaSource;	
 
-// The following four methods are at the heart of parser classes and must be implemented. They will be called on
+// The following three methods are at the heart of parser classes and must be implemented. They will be called on
 // on the XPC service side: Together they create the iMedia data model tree, which gets serialized and sent back
 // to the host app, where it is given to and owned by the IMBLibraryController. The first method is only called
-// once at startup to create an empty toplevel node, while the remaining 3 methods may be called multiple times...
+// once at startup to create an empty toplevel node, while the remaining 2 methods may be called multiple times...
 
 @required
 
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError;
-- (void) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError;
-- (void) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError;
+- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError;
 - (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError;
 
 // The following three methods are used to load thumbnails or metadata, or create a security-scoped bookmark for  

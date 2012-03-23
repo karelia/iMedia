@@ -267,18 +267,10 @@
 }
 
 
-- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (IMBNode*) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	[parser populateSubnodesOfNode:inNode error:outError];
-	return inNode;
-}
-
-
-- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
-{
-	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	[parser populateObjectsOfNode:inNode error:outError];
+	[parser populateNode:inNode error:outError];
 	return inNode;
 }
 
@@ -345,6 +337,17 @@
 //{
 //	return YES;
 //}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Override in subclass...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return @"";
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

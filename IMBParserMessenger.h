@@ -124,8 +124,7 @@
 // delegated to the appropriate IMBParser instance. Should NOT be overridden in subclasses...
 
 - (NSMutableArray*) unpopulatedTopLevelNodes:(NSError**)outError;
-- (IMBNode*) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError;
-- (IMBNode*) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError;
+- (IMBNode*) populateNode:(IMBNode*)inNode error:(NSError**)outError;
 - (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError;
 
 @end
@@ -155,7 +154,9 @@
 
 //- (BOOL) shouldDisplayObjectViewForNode:(IMBNode*)inNode;	
 
-// Helpers...
+// Convert metadata dictionary into human readable form...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 //- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 //- (void) invalidateThumbnails;

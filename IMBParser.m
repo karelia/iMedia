@@ -133,13 +133,7 @@
 }
 
 
-- (void) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
-{
-
-}
-
-
-- (void) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 
 }
