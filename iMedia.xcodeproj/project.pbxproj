@@ -869,7 +869,6 @@
 		0867D691FE84028FC02AAC07 /* iMedia */ = {
 			isa = PBXGroup;
 			children = (
-				3089F94A151C8FDD00D56DC0 /* XPCKit.framework */,
 				D0760AC210C5027100F2119C /* IMBProject.xcconfig */,
 				D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */,
 				D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */,
@@ -970,6 +969,7 @@
 				30FFEBEE150A08DB0009C1D0 /* Foundation.framework */,
 				D0E96C3115124CE4004F3EE7 /* AppKit.framework */,
 				30E7772215110D1600413AEF /* Security.framework */,
+				3089F94A151C8FDD00D56DC0 /* XPCKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
