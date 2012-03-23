@@ -53,7 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBNode.h"
-//#import "IMBObject.h"
+#import "IMBObject.h"
 #import "IMBParserMessenger.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
@@ -883,8 +883,9 @@
 {
 	// Basic info...
 	
-	NSMutableString* description = [NSMutableString stringWithFormat:@"%@%@ (%@)",
+	NSMutableString* description = [NSMutableString stringWithFormat:@"%@%@ \"%@\" (%@)",
 		self.indentString,
+		NSStringFromClass([self class]),
 		self.name,
 		self.identifier];
 	
@@ -894,10 +895,10 @@
 	{
 		[description appendFormat:@" ... %u objects",_objects.count];
 			
-//		for (IMBObject* object in _objects)
-//		{
-//			[description appendFormat:@"\n\t\t\t%@",object.name];
-//		}
+		for (IMBObject* object in _objects)
+		{
+			[description appendFormat:@"\n%@\t%@ \"%@\"",self.indentString,NSStringFromClass([object class]),object.name];
+		}
 	}
 	
 	// Subnodes...
