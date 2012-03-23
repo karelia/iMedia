@@ -132,7 +132,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
 	NSDictionary* plist = self.plist;
@@ -181,15 +181,6 @@
 //	}
 	
 	if (outError) *outError = error;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
-{
-
 }
 
 

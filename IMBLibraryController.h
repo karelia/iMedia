@@ -129,8 +129,7 @@ extern NSString* kIMBNodesDidChangeNotification;
 
 - (void) reload;
 - (void) reloadNode:(IMBNode*)inOldNode;
-- (void) populateSubnodesOfNode:(IMBNode*)inNode;
-- (void) populateObjectsOfNode:(IMBNode*)inNode;
+- (void) populateNode:(IMBNode*)inNode;
 
 // Node accessors (must only be called on the main thread)...
 

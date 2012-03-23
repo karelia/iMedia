@@ -58,6 +58,7 @@
 #import "IMBObject.h"
 #import "IMBNodeObject.h"
 #import "NSFileManager+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 #import "NSString+iMedia.h"
 #import <Quartz/Quartz.h>
 
@@ -177,12 +178,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) populateSubnodesOfNode:(IMBNode*)inNode error:(NSError**)outError
+- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
 	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
+	
+	// Scan the folder for files and directories...
 	
 	NSArray* urls = [fileManager contentsOfDirectoryAtURL:
 		inNode.mediaSource 
@@ -193,7 +196,10 @@
 	if (error == nil)
 	{
 		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
-	
+		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:urls.count];
+		NSMutableArray* folders = [NSMutableArray array];
+		inNode.displayedObjectCount = 0;
+		
 		for (NSURL* url in urls)
 		{
 			if (index%32 == 0)
@@ -202,43 +208,30 @@
 				pool = [[NSAutoreleasePool alloc] init];
 			}
 
-			NSString* name = nil;
-			[url getResourceValue:&name forKey:NSURLLocalizedNameKey error:&error];
+			// Get some info about the file or folder...
+			
+			NSString* path = [url path];
+
+			NSString* localizedName = nil;
+			[url getResourceValue:&localizedName forKey:NSURLLocalizedNameKey error:&error];
 			if (error) break;
 			
-			NSNumber* folder = nil;
-			[url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:&error];
+			NSNumber* isDirectory = nil;
+			[url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error];
 			if (error) break;
 
-			NSNumber* package = nil;
-			[url getResourceValue:&package forKey:NSURLIsPackageKey error:&error];
+			NSNumber* isPackage = nil;
+			[url getResourceValue:&isPackage forKey:NSURLIsPackageKey error:&error];
 			if (error) break;
 			
-			if ([folder boolValue]==YES && [package boolValue]==NO)
+			// If we found a folder (that is not a package, then remember it for later. Folders will be added
+			// after regular files...
+			
+			if ([isDirectory boolValue] && ![isPackage boolValue])
 			{
-				NSString* path = [url path];
-				
 				if (![IMBConfig isLibraryPath:path])
 				{
-					IMBNode* subnode = [[IMBNode alloc] init];
-					subnode.icon = [self iconForPath:path];
-					subnode.name = name;
-					subnode.identifier = [self identifierForPath:path];
-					subnode.mediaType = self.mediaType;
-					subnode.mediaSource = url;
-					subnode.isTopLevelNode = NO;
-					subnode.parserIdentifier = self.identifier;
-					subnode.groupType = kIMBGroupTypeFolder;
-					subnode.includedInPopup = NO;
-//					subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
-//					subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
-
-					NSUInteger countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
-					subnode.leaf = countOfSubfolders == 0;
-					if (error) break;
-					
-					[subnodes addObject:subnode];
-					[subnode release];
+					[folders addObject:url];
 				}
 				else
 				{
@@ -246,21 +239,68 @@
 				}
 			}
 			
-			index++;
+			// Regular files are added immediately (if they have the correct UTI)...
+			
+			else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
+			{
+				IMBObject* object = [self objectForPath:path name:localizedName index:index++];
+				[objects addObject:object];
+				inNode.displayedObjectCount++;
+			}
 		}
+				
+		// Now we can actually handle the folders. Add a subnode and an IMBNodeObject for each folder...
+				
+		for (NSURL* url in folders)
+		{
+			if (index%32 == 0)
+			{
+				IMBDrain(pool);
+				pool = [[NSAutoreleasePool alloc] init];
+			}
+			
+			NSString* path = [url path];
+			NSString* name = [fileManager displayNameAtPath:path];
+//			NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
+			NSUInteger countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
+			if (error) break;
+			
+			IMBNode* subnode = [[IMBNode alloc] init];
+			subnode.icon = [self iconForPath:path];
+			subnode.name = name;
+			subnode.identifier = [self identifierForPath:path];
+			subnode.mediaType = self.mediaType;
+			subnode.mediaSource = url;
+			subnode.isTopLevelNode = NO;
+			subnode.parserIdentifier = self.identifier;
+			subnode.groupType = kIMBGroupTypeFolder;
+			subnode.includedInPopup = NO;
+//			subnode.watchedPath = folder;				// These two lines are important to make file watching work for nested 
+//			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
+			subnode.leaf = countOfSubfolders == 0;
+			[subnodes addObject:subnode];
+			[subnode release];
+
+//			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+//			object.representedNodeIdentifier = subnode.identifier;
+////			object.location = (id)path;
+//			object.name = name;
+//			object.metadata = nil;
+//			object.parserIdentifier = self.identifier;
+//			object.index = index++;
+////			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; 
+////			object.imageLocation = path;
+////			object.imageRepresentation = icon;
+//			[objects addObject:object];
+//			[object release];
+		}
+		
+		inNode.objects = objects;
+		inNode.leaf = [subnodes count] == 0;
 	}
 	
 	IMBDrain(pool);
 	if (outError) *outError = error;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) populateObjectsOfNode:(IMBNode*)inNode error:(NSError**)outError
-{
-
 }
 
 

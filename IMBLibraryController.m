@@ -110,18 +110,18 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // Private controller methods...
 
 @interface IMBLibraryController ()
+
 @property (retain,readwrite) NSMutableArray* subnodes;			
 - (NSMutableArray*) mutableArrayForPopulatingSubnodes;
-- (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
 - (IMBNode*) _groupNodeForTopLevelNode:(IMBNode*)inNewNode;
-//- (void) _didCreateNode:(IMBNode*)inNode;
-//- (void) _didPopulateNode:(IMBNode*)inNode;
-//- (void) _presentError:(NSError*)inError;
+- (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
+
 //- (void) _coalescedUKKQueueCallback;
 //- (void) _coalescedFSEventsCallback;
 //- (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
 //- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
 //- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume;
+
 @end
 
 
@@ -301,7 +301,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 							// JUST TEMP:
 							if (!node.isLeaf)
 							{
-								[self performSelector:@selector(populateSubnodesOfNode:) withObject:node afterDelay:0.1];
+								[self performSelector:@selector(populateNode:) withObject:node afterDelay:0.1];
 							}
 						}
 					}
@@ -383,10 +383,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Populate the subnodes of the specified node. This is done by a XPC service on our behalf. Once the  
-// service is done, it will send back a reply with the new node as a result and call the completion block...
+// Populate the specified node. This is done by a XPC service on our behalf. Once the service is done, 
+// it will send back a reply with the new node as a result and call the completion block...
 
-- (void) populateSubnodesOfNode:(IMBNode*)inNode
+- (void) populateNode:(IMBNode*)inNode
 {
 	// Ask delegate whether we should populate this node...
 			
@@ -410,7 +410,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	NSString* parentNodeIdentifier = inNode.parentNode.identifier;
 	IMBParserMessenger* messenger = inNode.parserMessenger;
-	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(populateSubnodesOfNode:error:),inNode,
+	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(populateNode:error:),inNode,
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
@@ -439,7 +439,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				{
 					if (!node.isLeaf)
 					{
-						[self performSelector:@selector(populateSubnodesOfNode:) withObject:node afterDelay:0.1];
+						[self performSelector:@selector(populateNode:) withObject:node afterDelay:0.1];
 					}
 				}
 			}
@@ -450,58 +450,85 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Populate the objects of the specified node. This is done by a XPC service on our behalf. Once the  
-// service is done, it will send back a reply with the new node as a result and call the completion block...
+// Returns the correct group node for a given top-level node. Return nil if we did not provide a top-level
+// node or if its groupType wasn't specified. If the group node doesn't exist yet, it will be newly created...
 
-- (void) populateObjectsOfNode:(IMBNode*)inNode
+- (IMBNode*) _groupNodeForTopLevelNode:(IMBNode*)inNewNode
 {
-	// Ask delegate whether we should populate this node...
-			
-	if (RESPONDS(_delegate,@selector(libraryController:shouldPopulateNode:)))
+	NSUInteger groupType = inNewNode.groupType;
+	if (groupType ==  kIMBGroupTypeNone) return nil;
+	if (inNewNode.isTopLevelNode == NO) return nil;
+	
+	for (IMBNode* node in _subnodes)
 	{
-		if (![_delegate libraryController:self shouldPopulateNode:inNode])
+		if (node.groupType == groupType && node.group == YES)
 		{
-			return;
+			return node;
 		}
 	}
+
+	IMBNode* groupNode = [[[IMBNode alloc] init] autorelease];
+	groupNode.mediaType = self.mediaType;
+	groupNode.group = YES;
+	groupNode.leaf = NO;
+	groupNode.isUserAdded = NO;
+	groupNode.includedInPopup = YES;
+	groupNode.parserIdentifier = nil;
+	groupNode.parserMessenger = nil;
 	
-	// Start populating this node...
-	
-	if (RESPONDS(_delegate,@selector(libraryController:willPopulateNode:)))
+	if (groupType == kIMBGroupTypeLibrary)
 	{
-		[_delegate libraryController:self willPopulateNode:inNode];
+		groupNode.groupType = kIMBGroupTypeLibrary;
+		groupNode.identifier = @"group://LIBRARIES";
+		groupNode.name =  NSLocalizedStringWithDefaultValue(
+			@"IMBLibraryController.groupnode.libraries",
+			nil,IMBBundle(),
+			@"LIBRARIES",
+			@"group node display name");
 	}
-			
-	inNode.loading = YES;
-	inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
-
-	NSString* parentNodeIdentifier = inNode.parentNode.identifier;
-	IMBParserMessenger* messenger = inNode.parserMessenger;
-	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(populateObjectsOfNode:error:),inNode,
+	else if (groupType == kIMBGroupTypeFolder)
+	{
+		groupNode.groupType = kIMBGroupTypeFolder;
+		groupNode.identifier = @"group://FOLDERS";
+		groupNode.name = NSLocalizedStringWithDefaultValue(
+			@"IMBLibraryController.groupnode.folders",
+			nil,IMBBundle(),
+			@"FOLDERS",
+			@"group node display name");
+	}
+	else if (groupType == kIMBGroupTypeSearches)
+	{
+		groupNode.groupType = kIMBGroupTypeSearches;
+		groupNode.identifier = @"group://SEARCHES";
+		groupNode.name = NSLocalizedStringWithDefaultValue(
+			@"IMBLibraryController.groupnode.searches",
+			nil,IMBBundle(),
+			@"SEARCHES",
+			@"group node display name");
+	}
+	else if (groupType == kIMBGroupTypeInternet)
+	{
+		groupNode.groupType = kIMBGroupTypeInternet;
+		groupNode.identifier = @"group://INTERNET";
+		groupNode.name = NSLocalizedStringWithDefaultValue(
+			@"IMBLibraryController.groupnode.internet",
+			nil,IMBBundle(),
+			@"INTERNET",
+			@"group node display name");
+	}
 	
-		^(IMBNode* inNewNode,NSError* inError)
-		{
-			// Display any errors that might have occurred...
-					
-			if (inError)
-			{
-				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-				[NSApp presentError:inError];
-			}
+	// Mark the newly created group node as populated...
+	
+	[groupNode mutableArrayForPopulatingSubnodes];
+	groupNode.objects = [NSMutableArray array];
 
-			// Replace the old with the new node...
-					
-			else if (inNewNode)
-			{
-				inNewNode.parserMessenger = messenger;
-				[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+	// Insert the new group node at the correct location (so that we get a stable sort order)...
+	
+	NSMutableArray* subnodes = [self mutableArrayForPopulatingSubnodes];
+	NSUInteger index = [IMBNode insertionIndexForNode:groupNode inSubnodes:subnodes];
+	[subnodes insertObject:groupNode atIndex:index];
 
-				if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
-				{
-					[_delegate libraryController:self didPopulateNode:inNewNode];
-				}
-			}
-		});		
+	return groupNode;
 }
 
 
@@ -616,91 +643,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		// JUST TEMP:
 		[self logNodes];
 	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Returns the correct group node for a given top-level node. Return nil if we did not provide a top-level
-// node or if its groupType wasn't specified. If the group node doesn't exist yet, it will be newly created...
-
-- (IMBNode*) _groupNodeForTopLevelNode:(IMBNode*)inNewNode
-{
-	NSUInteger groupType = inNewNode.groupType;
-	if (groupType ==  kIMBGroupTypeNone) return nil;
-	if (inNewNode.isTopLevelNode == NO) return nil;
-	
-	for (IMBNode* node in _subnodes)
-	{
-		if (node.groupType == groupType && node.group == YES)
-		{
-			return node;
-		}
-	}
-
-	IMBNode* groupNode = [[[IMBNode alloc] init] autorelease];
-	groupNode.mediaType = self.mediaType;
-	groupNode.group = YES;
-	groupNode.leaf = NO;
-	groupNode.isUserAdded = NO;
-	groupNode.includedInPopup = YES;
-	groupNode.parserIdentifier = nil;
-	groupNode.parserMessenger = nil;
-	
-	if (groupType == kIMBGroupTypeLibrary)
-	{
-		groupNode.groupType = kIMBGroupTypeLibrary;
-		groupNode.identifier = @"group://LIBRARIES";
-		groupNode.name =  NSLocalizedStringWithDefaultValue(
-			@"IMBLibraryController.groupnode.libraries",
-			nil,IMBBundle(),
-			@"LIBRARIES",
-			@"group node display name");
-	}
-	else if (groupType == kIMBGroupTypeFolder)
-	{
-		groupNode.groupType = kIMBGroupTypeFolder;
-		groupNode.identifier = @"group://FOLDERS";
-		groupNode.name = NSLocalizedStringWithDefaultValue(
-			@"IMBLibraryController.groupnode.folders",
-			nil,IMBBundle(),
-			@"FOLDERS",
-			@"group node display name");
-	}
-	else if (groupType == kIMBGroupTypeSearches)
-	{
-		groupNode.groupType = kIMBGroupTypeSearches;
-		groupNode.identifier = @"group://SEARCHES";
-		groupNode.name = NSLocalizedStringWithDefaultValue(
-			@"IMBLibraryController.groupnode.searches",
-			nil,IMBBundle(),
-			@"SEARCHES",
-			@"group node display name");
-	}
-	else if (groupType == kIMBGroupTypeInternet)
-	{
-		groupNode.groupType = kIMBGroupTypeInternet;
-		groupNode.identifier = @"group://INTERNET";
-		groupNode.name = NSLocalizedStringWithDefaultValue(
-			@"IMBLibraryController.groupnode.internet",
-			nil,IMBBundle(),
-			@"INTERNET",
-			@"group node display name");
-	}
-	
-	// Mark the newly created group node as populated...
-	
-	[groupNode mutableArrayForPopulatingSubnodes];
-	groupNode.objects = [NSMutableArray array];
-
-	// Insert the new group node at the correct location (so that we get a stable sort order)...
-	
-	NSMutableArray* subnodes = [self mutableArrayForPopulatingSubnodes];
-	NSUInteger index = [IMBNode insertionIndexForNode:groupNode inSubnodes:subnodes];
-	[subnodes insertObject:groupNode atIndex:index];
-
-	return groupNode;
 }
 
 
