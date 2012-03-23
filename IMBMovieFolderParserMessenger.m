@@ -70,6 +70,11 @@
 	return kIMBMediaTypeMovie;
 }
 
++ (NSString*) parserClassName
+{
+	return @"IMBMovieFolderParser";
+}
+					
 - (id) init
 {
 	if ((self = [super init]))

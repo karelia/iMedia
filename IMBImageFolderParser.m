@@ -59,24 +59,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
 @implementation IMBImageFolderParser
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-/*
 // Return metadata specific to image files...
 
 - (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
 {
 	return [NSImage imb_metadataFromImageAtPath:inPath checkSpotlightComments:YES];
 }
-*/
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-@end

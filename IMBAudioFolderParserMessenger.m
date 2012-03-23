@@ -74,6 +74,12 @@
 }
 
 
++ (NSString*) parserClassName
+{
+	return @"IMBAudioFolderParser";
+}
+					
+
 - (id) init
 {
 	if ((self = [super init]))

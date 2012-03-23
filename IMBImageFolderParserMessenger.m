@@ -70,6 +70,11 @@
 	return kIMBMediaTypeImage;
 }
 
++ (NSString*) parserClassName
+{
+	return @"IMBImageFolderParser";
+}
+					
 - (id) init
 {
 	if ((self = [super init]))

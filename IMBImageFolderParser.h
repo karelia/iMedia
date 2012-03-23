@@ -58,8 +58,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
 // This parser scans any folder for image files...
 
 @interface IMBImageFolderParser : IMBFolderParser

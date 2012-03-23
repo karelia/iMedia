@@ -58,28 +58,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
 // This parser scans any folder for movie files...
 
 @interface IMBMovieFolderParser : IMBFolderParser
 
 @end
-
-
-// This subclass looks only in "~/Movies"...
-
-@interface IMBMoviesFolderParser : IMBMovieFolderParser
-
-@end
-
-// Photo booth takes movies
-
-@interface IMBPhotoBoothMoviesFolderParser : IMBMovieFolderParser
-
-@end
-
-
 
 
 //----------------------------------------------------------------------------------------------------------------------
