@@ -110,7 +110,6 @@
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[super encodeWithCoder:inCoder];
-	
 	[inCoder encodeObject:self.representedNodeIdentifier forKey:@"representedNodeIdentifier"];
 }
 

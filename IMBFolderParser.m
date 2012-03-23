@@ -261,7 +261,7 @@
 			
 			NSString* path = [url path];
 			NSString* name = [fileManager displayNameAtPath:path];
-//			NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
+			NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 			NSUInteger countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
 			if (error) break;
 			
@@ -281,18 +281,18 @@
 			[subnodes addObject:subnode];
 			[subnode release];
 
-//			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
-//			object.representedNodeIdentifier = subnode.identifier;
-////			object.location = (id)path;
-//			object.name = name;
-//			object.metadata = nil;
-//			object.parserIdentifier = self.identifier;
-//			object.index = index++;
-////			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; 
-////			object.imageLocation = path;
-////			object.imageRepresentation = icon;
-//			[objects addObject:object];
-//			[object release];
+			IMBNodeObject* object = [[IMBNodeObject alloc] init];
+			object.representedNodeIdentifier = subnode.identifier;
+			object.location = (id)path;
+			object.name = name;
+			object.metadata = nil;
+			object.parserIdentifier = self.identifier;
+			object.index = index++;
+			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; 
+			object.imageLocation = path;
+			object.imageRepresentation = icon;
+			[objects addObject:object];
+			[object release];
 		}
 		
 		inNode.objects = objects;
