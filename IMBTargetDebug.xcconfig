@@ -7,7 +7,7 @@
 // You may have to relaunch XCode and clean you project to build with the new settings. Please verify that Xcode
 // is now referencing your own set of xcconfig files.
 
-ONLY_ACTIVE_ARCH = YES
+ONLY_ACTIVE_ARCH = NO
 
 COPY_PHASE_STRIP = NO
 GCC_ENABLE_FIX_AND_CONTINUE = YES
