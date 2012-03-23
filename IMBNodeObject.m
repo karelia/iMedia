@@ -71,13 +71,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// IMBNodeObject are represented in the user interface as folder icons. Since these are prerendered and 
-// do not have a rectangular shape, we do not want to draw a border and shadow around it...
-
 - (id) init
 {
 	if (self = [super init])
 	{
+		// IMBNodeObject are represented in the user interface as folder icons. Since these are prerendered  
+		// and do not have a rectangular shape, we do not want to draw a border and shadow around it...
+
 		self.shouldDrawAdornments = NO;
 		self.shouldDisableTitle = NO;
 	}
@@ -121,9 +121,7 @@
 - (id) copyWithZone:(NSZone*)inZone
 {
 	IMBNodeObject* copy = [super copyWithZone:inZone];
-	
 	copy.representedNodeIdentifier = self.representedNodeIdentifier;
-	
 	return copy;
 }
 
