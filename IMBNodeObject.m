@@ -72,7 +72,7 @@
 
 
 // IMBNodeObject are represented in the user interface as folder icons. Since these are prerendered and 
-// do not have a rectangular shape, we do not want to draw a broder and shadow around it...
+// do not have a rectangular shape, we do not want to draw a border and shadow around it...
 
 - (id) init
 {
@@ -83,6 +83,48 @@
 	}
 	
 	return self;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_representedNodeIdentifier);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]))
+	{
+		self.representedNodeIdentifier = [inCoder decodeObjectForKey:@"representedNodeIdentifier"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeObject:self.representedNodeIdentifier forKey:@"representedNodeIdentifier"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBNodeObject* copy = [super copyWithZone:inZone];
+	
+	copy.representedNodeIdentifier = self.representedNodeIdentifier;
+	
+	return copy;
 }
 
 
@@ -126,43 +168,6 @@
 - (NSImage*) icon
 {
 	return [NSImage imb_sharedGenericFolderIcon];
-}
-
-
-- (id) initWithCoder:(NSCoder*)inCoder
-{
-	if (self = [super initWithCoder:inCoder])
-	{
-		self.representedNodeIdentifier = [inCoder decodeObjectForKey:@"representedNodeIdentifier"];
-	}
-	
-	return self;
-}
-
-
-- (void) encodeWithCoder:(NSCoder*)inCoder
-{
-	[super encodeWithCoder:inCoder];
-	
-	[inCoder encodeObject:self.representedNodeIdentifier forKey:@"representedNodeIdentifier"];
-}
-
-
-- (id) copyWithZone:(NSZone*)inZone
-{
-	IMBNodeObject* copy = [super copyWithZone:inZone];
-	
-	copy.representedNodeIdentifier = self.representedNodeIdentifier;
-	
-	return copy;
-}
-
-
-- (void) dealloc
-{
-	IMBRelease(_representedNodeIdentifier);
-	
-	[super dealloc];
 }
 
 

@@ -67,12 +67,7 @@
 	NSString* _representedNodeIdentifier;
 }
 
-// The identifier of the node this node object represents.
-// (We rather keep an identifier here than the node itself
-// because nodes are rather short-lived
-// (e.g. replaced when populated in background thread))
-
-@property (retain, readwrite) NSString* representedNodeIdentifier;	
+@property (retain) NSString* representedNodeIdentifier;	
 
 @end
 

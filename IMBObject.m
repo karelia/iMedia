@@ -198,7 +198,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 {
 	NSKeyedUnarchiver* coder = (NSKeyedUnarchiver*)inCoder;
 	
-	if ((self = [super init]) != nil)
+	if ((self = [super init]))
 	{
 		self.location = [coder decodeObjectForKey:@"location"];
 		self.name = [coder decodeObjectForKey:@"name"];
