@@ -63,7 +63,6 @@
 #import <Quartz/Quartz.h>
 
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -135,7 +134,7 @@
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-	node.icon = [self iconForPath:path];;
+	node.icon = [self iconForPath:path];
 	node.name = name;
 	node.identifier = [self identifierForPath:path];
 	node.mediaType = self.mediaType;
@@ -301,15 +300,6 @@
 	
 	IMBDrain(pool);
 	if (outError) *outError = error;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
-{
-
 }
 
 

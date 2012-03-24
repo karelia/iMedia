@@ -125,7 +125,7 @@
 
 - (NSMutableArray*) unpopulatedTopLevelNodes:(NSError**)outError;
 - (IMBNode*) populateNode:(IMBNode*)inNode error:(NSError**)outError;
-- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError;
+- (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError;
 
 @end
 

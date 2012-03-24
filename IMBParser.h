@@ -82,13 +82,14 @@
 // The following three methods are at the heart of parser classes and must be implemented. They will be called on
 // on the XPC service side: Together they create the iMedia data model tree, which gets serialized and sent back
 // to the host app, where it is given to and owned by the IMBLibraryController. The first method is only called
-// once at startup to create an empty toplevel node, while the remaining 2 methods may be called multiple times...
+// once at startup to create an empty toplevel node, while the second method may be called multiple times. The
+// third method has a generic implementation that may be sufficient for most subclasses...
 
 @required
 
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError;
 - (void) populateNode:(IMBNode*)inNode error:(NSError**)outError;
-- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError;
+- (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError;
 
 // The following three methods are used to load thumbnails or metadata, or create a security-scoped bookmark for  
 // full media file access. They are called on the XPC service side...
@@ -130,8 +131,6 @@
 
 - (NSString*) identifierForPath:(NSString*)inPath;
 - (NSImage*) iconForPath:(NSString*)inPath;
-
-//- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions;
 
 
 @end

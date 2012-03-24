@@ -919,3 +919,24 @@
 
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@implementation IMBNode (Private)
+
+// Clear the subnodes and objects array. The node is now unpopulated again. Only to be called by parsers 
+// that are about to re-populate a node...
+
+- (void) unpopulate
+{
+	self.subnodes = nil;
+	self.objects = nil;
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+

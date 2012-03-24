@@ -54,7 +54,7 @@
 
 #import "IMBParser.h"
 #import "NSWorkspace+iMedia.h"
-//#import "IMBNode.h"
+#import "IMBNode.h"
 //#import "IMBObject.h"
 //#import "IMBObjectsPromise.h"
 //#import "IMBLibraryController.h"
@@ -74,6 +74,10 @@
 
 //+ (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL;
 //+ (CGImageRef) _imageForURL:(NSURL*)inURL;
+
+- (NSArray*) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode;
+- (void) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode identifiers:(NSMutableArray*)inIdentifiers;
+- (void) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError;
 
 @end
 
@@ -139,9 +143,81 @@
 }
 
 
-- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
-{
+//----------------------------------------------------------------------------------------------------------------------
 
+
+// This generic implementation may be sufficient for most subclasses. First remember how deeply the node  
+// tree was populated. Then recreate this node. Finally repopulate the node tree to the same depth...
+
+- (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError
+{
+	NSError* error = nil;
+	IMBNode* newNode = nil;
+	NSArray* identifiers = [self _identifiersOfPopulatedSubnodesOfNode:inNode];
+
+	if (inNode.isTopLevelNode)
+	{
+		newNode = [self unpopulatedTopLevelNode:&error];
+	}
+	else
+	{
+		newNode = inNode;
+	}
+	
+	if (newNode)
+	{
+		[self _populateNodeTree:newNode populatedNodeIdentifiers:identifiers error:&error];
+	}
+	
+	if (outError) *outError = error;
+	return newNode;
+}
+
+
+// Gather the identifiers of all populated subnodes...
+
+- (NSArray*) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode
+{
+	NSMutableArray* identifiers = [NSMutableArray array];
+	[self _identifiersOfPopulatedSubnodesOfNode:inNode identifiers:identifiers];
+	return (NSArray*)identifiers;
+}
+
+- (void) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode identifiers:(NSMutableArray*)inIdentifiers
+{
+	if (inNode.isPopulated)
+	{
+		[inIdentifiers addObject:inNode.identifier];
+		
+		for (IMBNode* subnode in inNode.subnodes)
+		{
+			[self _identifiersOfPopulatedSubnodesOfNode:subnode identifiers:inIdentifiers];
+		}
+	}
+}
+
+
+// 
+- (void) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError
+{
+	NSError* error = nil;
+
+	if ([inPopulatedNodeIdentifiers indexOfObject:inNode.identifier] != NSNotFound)
+	{
+		[inNode unpopulate];
+		[self populateNode:inNode error:&error];
+		
+		if (error == nil)
+		{
+			for (IMBNode* subnode in inNode.subnodes)
+			{
+				[self _populateNodeTree:subnode populatedNodeIdentifiers:inPopulatedNodeIdentifiers error:&error];
+				if (error) break;
+			}
+		}
+	}
+	
+	if (outError) *outError = error;
 }
 
 

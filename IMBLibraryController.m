@@ -315,7 +315,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	{
 		for (IMBNode* oldNode in self.subnodes)
 		{
-			[self reloadNode:oldNode];
+			[self reloadNodeTree:oldNode];
 		}
 	}
 }
@@ -327,7 +327,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // Reload the specified node. This is done by a XPC service on our behalf. Once the service is done, it 
 // will send back a reply with the new node as a result and call the completion block...
 
-- (void) reloadNode:(IMBNode*)inOldNode
+- (void) reloadNodeTree:(IMBNode*)inOldNode
 {
 	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
 	IMBParserMessenger* messenger = inOldNode.parserMessenger;
@@ -352,7 +352,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	inOldNode.loading = YES;
 	inOldNode.badgeTypeNormal = kIMBBadgeTypeLoading;
 
-	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNode:error:),inOldNode,
+	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNodeTree:error:),inOldNode,
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{

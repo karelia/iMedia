@@ -275,11 +275,10 @@
 }
 
 
-- (IMBNode*) reloadNode:(IMBNode*)inNode error:(NSError**)outError
+- (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	[parser reloadNode:inNode error:outError];
-	return inNode;
+	return [parser reloadNodeTree:inNode error:outError];
 }
 
 
