@@ -822,7 +822,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 		location = [self.location description];
 	}
 
-	return [NSString stringWithFormat:@"%@/%@",parserName,location];
+	return [NSString stringWithFormat:@"%@:/%@",parserName,location];
 }
 
 
