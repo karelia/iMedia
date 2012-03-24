@@ -101,6 +101,11 @@
 
 @implementation IMBMoviesFolderParserMessenger
 
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.Movies";
+}
+
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -128,6 +133,11 @@
 #pragma mark 
 
 @implementation IMBPhotoBoothMoviesFolderParserMessenger
+
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.PhotoBoothMovies";
+}
 
 + (void) load
 {

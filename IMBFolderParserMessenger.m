@@ -86,8 +86,14 @@
 	return @"IMBFolderParser";
 }
 
-					
+
 + (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder";
+}
+
+
++ (NSString*) xpcSerivceIdentifier
 {
 	return @"com.karelia.imedia.folder";
 }

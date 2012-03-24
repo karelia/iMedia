@@ -161,6 +161,11 @@
 	return nil;
 }
 
++ (NSString*) xpcSerivceIdentifier
+{
+	return [self identifier];
+}
+
 
 // Create the connection lazily when needed...
 
@@ -168,7 +173,7 @@
 {
 	if (_connection == nil && SBIsSandboxed())
 	{
-		NSString* identifier = [[self class] identifier];
+		NSString* identifier = [[self class] xpcSerivceIdentifier];
 		_connection = [[XPCConnection alloc] initWithServiceName:identifier];
 	}
 	

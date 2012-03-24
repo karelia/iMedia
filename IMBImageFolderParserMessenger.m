@@ -96,6 +96,11 @@
 
 @implementation IMBPicturesFolderParserMessenger
 
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.Pictures";
+}
+
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -129,6 +134,11 @@
 
 @implementation IMBDesktopPicturesFolderParserMessenger
 
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.DesktopPictures";
+}
+
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -156,6 +166,11 @@
 
 @implementation IMBUserPicturesFolderParserMessenger
 
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.UserPictures";
+}
+
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -182,6 +197,11 @@
 #pragma mark 
 
 @implementation IMBiChatIconsFolderParserMessenger
+
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.iChatIcons";
+}
 
 + (void) load
 {

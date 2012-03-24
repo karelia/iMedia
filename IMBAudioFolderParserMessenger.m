@@ -171,6 +171,11 @@
 
 @implementation IMBMusicFolderParserMessenger
 
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.Music";
+}
+
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -199,6 +204,11 @@
 
 @implementation IMBiLifeSoundEffectsFolderParserMessenger
 
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.iLifeSoundEffects";
+}
+
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -226,6 +236,11 @@
 
 @implementation IMBAppleLoopsForGarageBandFolderParserMessenger
 
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.AppleLoopsForGarageBand";
+}
+
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -252,6 +267,11 @@
 #pragma mark 
 
 @implementation IMBiMovieSoundEffectsFolderParserMessenger
+
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.iMovieSoundEffects";
+}
 
 + (id) folderPath
 {
@@ -285,6 +305,11 @@
 #pragma mark 
 
 @implementation IMBLibrarySoundsFolderParserMessenger
+
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.folder.LibrarySounds";
+}
 
 + (void) load
 {
