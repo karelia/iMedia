@@ -57,6 +57,7 @@
 //#import "IMBOperationQueue.h"
 //#import "IMBParser.h"
 #import "IMBNode.h"
+#import "IMBObject.h"
 #import "IMBParserMessenger.h"
 //#import "IMBCommon.h"
 #import "IMBConfig.h"
@@ -113,6 +114,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @property (retain,readwrite) NSMutableArray* subnodes;			
 - (NSMutableArray*) mutableArrayForPopulatingSubnodes;
+- (void) _setParserMessenger:(IMBParserMessenger*)inMessenger nodeTree:(IMBNode*)inNode;
 - (IMBNode*) _groupNodeForTopLevelNode:(IMBNode*)inNewNode;
 - (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
 
@@ -368,7 +370,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					
 			else if (inNewNode)
 			{
-				inNewNode.parserMessenger = messenger;
+				[self _setParserMessenger:messenger nodeTree:inNewNode];
 				[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
 
 				if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
@@ -426,7 +428,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					
 			else if (inNewNode)
 			{
-				inNewNode.parserMessenger = messenger;
+				[self _setParserMessenger:messenger nodeTree:inNewNode];
 				[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
 
 				if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
@@ -444,6 +446,25 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				}
 			}
 		});		
+}
+
+
+// Recursively set the parserMessenger on all nodes and objects in this subtree. Without the pointer to
+// the IMBParserMessenger these object would be pretty much unusable in the future...
+
+- (void) _setParserMessenger:(IMBParserMessenger*)inMessenger nodeTree:(IMBNode*)inNode
+{
+	inNode.parserMessenger = inMessenger;
+	
+	for (IMBObject* object in inNode.objects)
+	{
+		object.parserMessenger = inMessenger;
+	}
+	
+	for (IMBNode* subnode in inNode.subnodes)
+	{
+		[self _setParserMessenger:inMessenger nodeTree:subnode];
+	}
 }
 
 

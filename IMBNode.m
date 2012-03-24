@@ -68,8 +68,6 @@
 
 @property (assign,readwrite) IMBNode* parentNode;
 @property (retain) NSArray* atomic_subnodes;				
-@property (retain) IMBParserMessenger* atomic_parserMessenger;				
-
 - (void) _recursivelyWalkParentsAddingPathIndexTo:(NSMutableArray*)inIndexArray;
 
 @end
@@ -111,7 +109,7 @@
 // Info about our parser...
 
 @synthesize parserIdentifier = _parserIdentifier;
-@synthesize atomic_parserMessenger = _parserMessenger;
+@synthesize parserMessenger = _parserMessenger;
 
 //@synthesize watcherType = _watcherType;
 //@synthesize watchedPath = _watchedPath;
@@ -350,29 +348,6 @@
 	if (_loading) return YES;
 	if (_parentNode) return [_parentNode isLoading];
 	return NO;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Make sure that the parserMessenger is set on self and complete subtree. This is really important, as nodes
-// are pretty much unusable if the parserMessenger wasn't set when we received a new node from an XPC service...
-
-- (void) setParserMessenger:(IMBParserMessenger*)inParserMessenger
-{
-	self.atomic_parserMessenger = inParserMessenger;
-	
-	for (IMBNode* subnode in self.subnodes)
-	{
-		[subnode setParserMessenger:inParserMessenger];
-	}
-}
-
-
-- (IMBParserMessenger*) parserMessenger
-{
-	return self.atomic_parserMessenger;
 }
 
 
@@ -893,11 +868,11 @@
 	
 	if (_objects.count > 0)
 	{
-		[description appendFormat:@" ... %u objects",_objects.count];
+		[description appendFormat:@" - %u",_objects.count];
 			
 		for (IMBObject* object in _objects)
 		{
-			[description appendFormat:@"\n%@\t%@ \"%@\"",self.indentString,NSStringFromClass([object class]),object.name];
+			[description appendFormat:@"\n%@\t%@ \"%@\" (%@)",self.indentString,NSStringFromClass([object class]),object.name,object.identifier];
 		}
 	}
 	
