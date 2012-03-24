@@ -280,6 +280,27 @@
 
 #pragma mark 
 #pragma mark IMBParserController Delegate
+
+
+- (BOOL) parserController:(IMBParserController*)inController shouldLoadParserMessengerWithIdentifier:(NSString*)inIdentifier
+{
+	if ([inIdentifier isEqualToString:@"com.karelia.imedia.folder.DesktopPictures"])
+	{
+		return NO;
+	}
+	else if ([inIdentifier isEqualToString:@"com.karelia.imedia.folder.UserPictures"])
+	{
+		return NO;
+	}
+	else if ([inIdentifier isEqualToString:@"com.karelia.imedia.folder.iChatIcons"])
+	{
+		return NO;
+	}
+	
+	return YES;
+}
+
+
 /*
 - (IMBParser *)parserController:(IMBParserController *)controller willLoadParser:(IMBParser *)parser;
 {
