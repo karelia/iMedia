@@ -90,7 +90,7 @@
 
 @implementation IMBTestAppDelegate
 
-//@synthesize nodeViewController = _nodeViewController;
+@synthesize nodeViewController = _nodeViewController;
 //@synthesize objectViewController = _objectViewController;
 @synthesize usedObjects = _usedObjects;
 
@@ -135,24 +135,24 @@
 	
 
 
-#if 1
-	
-	IMBParserController* parserController = [IMBParserController sharedParserController];
-	[parserController setDelegate:self];
-	[parserController loadParserMessengers];
-
-	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBMediaTypeImage];
-	[libraryController setDelegate:self];
-	[libraryController reload];
-	
-#endif	
-	
-	
+//#if 1
+//	
+//	IMBParserController* parserController = [IMBParserController sharedParserController];
+//	[parserController setDelegate:self];
+//	[parserController loadParserMessengers];
+//
+//	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBMediaTypeImage];
+//	[libraryController setDelegate:self];
+//	[libraryController reload];
+//	
+//#endif	
 	
 	
 	
 	
-/*	
+	
+	
+	
 #if CUSTOM_USER_INTERFACE
 	
 	// Load parsers...
@@ -198,7 +198,7 @@
 	[self togglePanel:nil];
 	
 #endif
-*/
+
 }
 
 
@@ -206,7 +206,6 @@
 
 - (IBAction) togglePanel:(id)inSender
 {
-/*
 	if ([IMBPanelController isSharedPanelControllerLoaded])
 	{
 		IMBPanelController* controller = [IMBPanelController sharedPanelController];
@@ -227,13 +226,12 @@
 		IMBPanelController* panelController = [IMBPanelController sharedPanelControllerWithDelegate:self mediaTypes:mediaTypes];
 		
 		// Set a handle onto the node view controller (need it later for notifying about badge changes)
-		self.nodeViewController = [(IMBObjectViewController*)[[panelController viewControllers] objectAtIndex:0] nodeViewController];
+//		self.nodeViewController = [(IMBObjectViewController*)[[panelController viewControllers] objectAtIndex:0] nodeViewController];
 		
 		[panelController showWindow:nil];
 		[panelController.window makeKeyAndOrderFront:nil];		// Test app, and stand-alone app, would want this to become key.
 		
 	}
-*/	
 }
 
 
@@ -267,10 +265,8 @@
 
 - (void) dealloc
 {
-/*
 	IMBRelease(_nodeViewController);
-	IMBRelease(_objectViewController);
-*/	
+//	IMBRelease(_objectViewController);
 	[super dealloc];
 }
 

@@ -221,13 +221,13 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 {
 	IMBLibraryController* libraryController = nil;
 	IMBNodeViewController* nodeViewController = nil;
-	IMBObjectViewController* objectViewController = nil;
+//	IMBObjectViewController* objectViewController = nil;
 	
 	// Load the parsers...
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
 	[parserController setDelegate:self.delegate];
-
+	
 	for (NSString* mediaType in self.mediaTypes)
 	{
 		// Load the library for each media type...
@@ -239,17 +239,17 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		
 		nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
 		
-		Class ovc = [sRegisteredViewControllerClasses objectForKey:mediaType];
-		objectViewController = (IMBObjectViewController*) [ovc viewControllerForLibraryController:libraryController];
+//		Class ovc = [sRegisteredViewControllerClasses objectForKey:mediaType];
+//		objectViewController = (IMBObjectViewController*) [ovc viewControllerForLibraryController:libraryController];
 
 		// Store the object view controller in an array. Note that the node view controller is attached 
 		// to the object view controller, so we do not need to store it separately...
 		
-		if (objectViewController)
-		{
-			objectViewController.nodeViewController = nodeViewController;
-			[self.viewControllers addObject:objectViewController];
-		}
+//		if (objectViewController)
+//		{
+//			objectViewController.nodeViewController = nodeViewController;
+//			[self.viewControllers addObject:objectViewController];
+//		}
 	}
 }
 

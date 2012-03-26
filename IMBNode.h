@@ -134,6 +134,7 @@
 @property (retain,readonly) NSArray* subnodes;				
 @property (assign,readonly) IMBNode* parentNode;
 - (NSUInteger) countOfSubnodes;
+- (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;
 
 // For parser classes and IMBLibraryController, who need to modify nodes, use this method. By calling it, the node 
 // is marked as populated...

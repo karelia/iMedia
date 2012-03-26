@@ -123,7 +123,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 @implementation IMBNodeViewController
 
 @synthesize libraryController = _libraryController;
-@synthesize nodeTreeController = ibNodeTreeController;
+//@synthesize nodeTreeController = ibNodeTreeController;
 @synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
 @synthesize expandedNodeIdentifiers = _expandedNodeIdentifiers;
 @synthesize selectedParser = _selectedParser;
@@ -234,9 +234,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 	// Observe changes to the libary node tree...
 	
-	[ibNodeTreeController retain];
-	[ibNodeTreeController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
-	[ibNodeTreeController addObserver:self forKeyPath:kSelectionKey options:0 context:(void*)kSelectionKey];
+//	[ibNodeTreeController retain];
+//	[ibNodeTreeController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
+//	[ibNodeTreeController addObserver:self forKeyPath:kSelectionKey options:0 context:(void*)kSelectionKey];
 
 	// Set the cell class on the outline view...
 	
@@ -261,9 +261,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[self _stopObservingLibraryController];
 
-	[ibNodeTreeController removeObserver:self forKeyPath:kArrangedObjectsKey];
-	[ibNodeTreeController removeObserver:self forKeyPath:kSelectionKey];
-	[ibNodeTreeController release];
+//	[ibNodeTreeController removeObserver:self forKeyPath:kArrangedObjectsKey];
+//	[ibNodeTreeController removeObserver:self forKeyPath:kSelectionKey];
+//	[ibNodeTreeController release];
 	
 	IMBRelease(_libraryController);
 	IMBRelease(_selectedNodeIdentifier);
@@ -295,24 +295,28 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	[self _loadStateFromPreferences];
 	
 	// Register the the outline view as a dragging destination if we want to accept new folders
-	if ([[_libraryController delegate] respondsToSelector:@selector(allowsFolderDropForMediaType:)]) {
+	
+	if ([[_libraryController delegate] respondsToSelector:@selector(allowsFolderDropForMediaType:)])
+	{
 		// This method returns a BOOL, and seeing as the delegate doesn't have a protocol and we don't
 		// have one to cast to, we can't use performSelector.., so will use an invocation.
+		
 		BOOL allowsDrop;
-		NSString *mediaType = _libraryController.mediaType;
-		NSMethodSignature *methodSignature = [[_libraryController delegate] methodSignatureForSelector:@selector(allowsFolderDropForMediaType:)]; 
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+		NSString* mediaType = self.mediaType;
+		NSMethodSignature* methodSignature = [[_libraryController delegate] methodSignatureForSelector:@selector(allowsFolderDropForMediaType:)]; 
+		NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
 		[invocation setSelector:@selector(allowsFolderDropForMediaType:)];
 		[invocation setArgument:&mediaType atIndex:2]; // First actual arg
-		
 		[invocation invokeWithTarget:[_libraryController delegate]];
-		
 		[invocation getReturnValue:&allowsDrop];
 		
-		if (allowsDrop) {
+		if (allowsDrop)
+		{
 			[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
 		}
-	} else {
+	} 
+	else
+	{
 		[ibNodeOutlineView registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
 	}
 	
@@ -413,6 +417,307 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 
 #pragma mark 
+#pragma mark NSOutlineViewDataSource
+
+
+- (NSInteger) outlineView:(NSOutlineView*)inOutlineView numberOfChildrenOfItem:(id)inItem
+{
+	if (inItem == nil)
+	{
+		return [_libraryController countOfSubnodes];
+	}
+	else
+	{
+		return [(IMBNode*)inItem countOfSubnodes];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) outlineView:(NSOutlineView*)inOutlineView child:(NSInteger)inIndex ofItem:(id)inItem
+{
+	if (inItem == nil)
+	{
+		return [_libraryController objectInSubnodesAtIndex:inIndex];
+	}
+	else
+	{
+		return [(IMBNode*)inItem objectInSubnodesAtIndex:inIndex];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (BOOL) outlineView:(NSOutlineView*)inOutlineView isItemExpandable:(id)inItem
+{
+	if (inItem == nil)
+	{
+		return YES;
+	}
+	else
+	{
+		return ![(IMBNode*)inItem isLeaf];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Check if we have any folder paths in the dragging pasteboard...
+
+- (NSDragOperation) outlineView:(NSOutlineView*)inOutlineView validateDrop:(id<NSDraggingInfo>)inInfo proposedItem:(id)inItem proposedChildIndex:(NSInteger)inIndex
+{
+	NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
+	BOOL exists,directory;
+	
+	for (NSString* path in paths)
+	{
+		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
+		
+		if (exists && directory)
+		{
+			[inOutlineView setDropItem:nil dropChildIndex:NSOutlineViewDropOnItemIndex]; // Target the whole view
+			return NSDragOperationCopy;
+		}
+	}
+
+	return NSDragOperationNone;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// For each folder path that was dropped onto the outline view create a new custom parser. Then reload the library...
+ 
+- (BOOL) outlineView:(NSOutlineView*)inOutlineView acceptDrop:(id<NSDraggingInfo>)inInfo item:(id)inItem childIndex:(NSInteger)inIndex
+{
+	BOOL result = NO;
+    NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
+	BOOL exists,directory;
+	
+	for (NSString* path in paths)
+	{
+		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
+		
+		if (exists && directory)
+		{
+			if (![IMBConfig isLibraryPath:path])
+			{
+//				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+//				self.selectedNodeIdentifier = [parser identifierForPath:path];
+//				result = YES;
+			}
+		}	
+	}		
+	
+	[inOutlineView.window makeFirstResponder:inOutlineView];
+	[self.libraryController reload];
+	return result;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark NSOutlineView Delegate
+
+
+// If the user is  expanding an item in the IMBOutlineView then ask the delegate of the library controller if 
+// we are allowed to expand the node. If expansion was not triggered by a user event, but by the controllers
+// then always allow it...
+
+- (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldExpandItem:(id)inItem
+{
+	BOOL shouldExpand = YES;
+	
+	if (!_isRestoringState)
+	{
+		id delegate = self.libraryController.delegate;
+		
+		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
+		{
+			IMBNode* node = [inItem representedObject];
+			shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
+		}
+	}
+	
+	return shouldExpand;
+}
+
+
+// Expanding was allowed, so instruct the library controller to add subnodes to the node if necessary...
+
+- (void) outlineViewItemWillExpand:(NSNotification*)inNotification
+{
+	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
+	IMBNode* node = [item representedObject];
+	[self.libraryController populateNode:node];
+}
+
+
+// When nodes were expanded or collapsed, then store the current state of the user interface. Also cancel any
+// pending populate operation for the nodes that were just collapsed...
+	
+
+- (void) _setExpandedNodeIdentifiers
+{
+	if (!_isRestoringState && !self.libraryController.isReplacingNode)
+	{
+		self.expandedNodeIdentifiers = [self _expandedNodeIdentifiers];
+	}
+}
+
+
+- (void) outlineViewItemDidExpand:(NSNotification*)inNotification
+{
+	[self _setExpandedNodeIdentifiers];
+}
+
+
+- (void) outlineViewItemDidCollapse:(NSNotification*)inNotification
+{
+	[self _setExpandedNodeIdentifiers];
+
+//	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
+//	IMBNode* node = [item representedObject];
+//	
+//	[self.libraryController stopPopulatingNodeWithIdentifier:node.identifier];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Ask the library delegate if we may change the selection.
+
+- (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldSelectItem:(id)inItem
+{
+	BOOL shouldSelect = YES;
+
+	if (!_isRestoringState)
+	{
+		IMBNode* node = [inItem representedObject];
+		id delegate = self.libraryController.delegate;
+		
+		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
+		{
+			shouldSelect = [delegate libraryController:self.libraryController shouldPopulateNode:node];
+		}
+		
+		if (node.isGroup)
+		{
+			shouldSelect = NO;
+		}
+	}
+	
+	return shouldSelect;	
+}
+
+
+// If the selection just changed due to a direct user event (clicking), then instruct the library controller 
+// to populate the node (if necessary) and remember the identifier of the selected node...
+
+- (void) outlineViewSelectionDidChange:(NSNotification*)inNotification;
+{
+//	if (!_isRestoringState && !self.libraryController.isReplacingNode)
+//	{
+//		NSInteger row = [ibNodeOutlineView selectedRow];
+//		id item = row>=0 ? [ibNodeOutlineView itemAtRow:row] : nil;
+//		IMBNode* newNode = [item representedObject];
+//
+//		// Stop loading the old node's contents, assuming we don't need them anymore. Instead populated the
+//		// newly selected node...
+//		
+//		[self.libraryController stopPopulatingNodeWithIdentifier:self.selectedNodeIdentifier];
+//
+//		if (newNode)
+//		{
+//			[self.libraryController populateNode:newNode];
+//			self.selectedNodeIdentifier = newNode.identifier;
+//		}
+//
+//		// If the node has a custom object view, then install it now...
+//		
+//		[self installObjectViewForNode:newNode];
+//		
+//		// If a completely different parser was selected, then notify the previous parser, that it is most
+//		// likely no longer needed any can get rid of its cached data...
+//		
+//		if (self.selectedParser != newNode.parser)
+//		{
+//			[self.selectedParser didStopUsingParser];
+//			self.selectedParser = newNode.parser;
+//		}
+//	}
+//
+//	// Sync the selection of the popup menu...
+//	
+//	[self __syncPopupMenuSelection];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Note: According to WWDC Session 110, this is called a LOT so it's not good for delayed loading...
+
+- (void) outlineView:(NSOutlineView*)inOutlineView willDisplayCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inTableColumn item:(id)inItem
+{	
+	IMBNode* node = [inItem representedObject];
+	IMBNodeCell* cell = (IMBNodeCell*)inCell;
+
+	[cell setImage:node.icon];
+	[cell setBadgeType:node.badgeTypeNormal];
+	
+	if ([node respondsToSelector:@selector(license)])
+	{
+		IMBFlickrNodeLicense license = [((IMBFlickrNode *)node) license];
+		if (license < IMBFlickrNodeLicense_Undefined) license = IMBFlickrNodeLicense_Undefined;
+		if (license > IMBFlickrNodeLicense_CommercialUse) license = IMBFlickrNodeLicense_CommercialUse;
+		// These are file names.  Ideally we should put localized AX Descriptions on them.
+		NSArray *names = [NSArray arrayWithObjects:@"any", @"CC", @"remix", @"commercial", nil];
+		NSString *fileName = [names objectAtIndex:license];
+		
+		if (license)
+		{
+			NSImage *image = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:fileName ofType:@"pdf"]] autorelease];
+			[image setScalesWhenResized:YES];
+			[image setSize:NSMakeSize(16.0,16.0)];
+			[cell setExtraImage:image];
+		}
+		else
+		{
+			[cell setExtraImage:nil];
+		}
+	}
+	else
+	{
+		[cell setExtraImage:nil];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+-(BOOL) outlineView:(NSOutlineView*)inOutlineView isGroupItem:(id)inItem
+{
+	IMBNode* node = [inItem representedObject];
+	return node.isGroup;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 #pragma mark NSSplitView Delegate
 
 
@@ -498,254 +803,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 
 #pragma mark 
-#pragma mark NSOutlineView Delegate
-
-
-// If the user is  expanding an item in the IMBOutlineView then ask the delegate of the library controller if 
-// we are allowed to expand the node. If expansion was not triggered by a user event, but by the controllers
-// then always allow it...
-
-- (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldExpandItem:(id)inItem
-{
-	BOOL shouldExpand = YES;
-	
-	if (!_isRestoringState)
-	{
-		id delegate = self.libraryController.delegate;
-		
-		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
-		{
-			IMBNode* node = [inItem representedObject];
-			shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
-		}
-	}
-	
-	return shouldExpand;
-}
-
-
-// Expanding was allowed, so instruct the library controller to add subnodes to the node if necessary...
-
-- (void) outlineViewItemWillExpand:(NSNotification*)inNotification
-{
-	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
-	IMBNode* node = [item representedObject];
-	[self.libraryController populateNode:node];
-}
-
-
-// When nodes were expanded or collapsed, then store the current state of the user interface. Also cancel any
-// pending populate operation for the nodes that were just collapsed...
-	
-
-- (void) _setExpandedNodeIdentifiers
-{
-	if (!_isRestoringState && !self.libraryController.isReplacingNode)
-	{
-		self.expandedNodeIdentifiers = [self _expandedNodeIdentifiers];
-	}
-}
-
-
-- (void) outlineViewItemDidExpand:(NSNotification*)inNotification
-{
-	[self _setExpandedNodeIdentifiers];
-}
-
-
-- (void) outlineViewItemDidCollapse:(NSNotification*)inNotification
-{
-	[self _setExpandedNodeIdentifiers];
-
-	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
-	IMBNode* node = [item representedObject];
-	
-	[self.libraryController stopPopulatingNodeWithIdentifier:node.identifier];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Ask the library delegate if we may change the selection.
-
-- (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldSelectItem:(id)inItem
-{
-	BOOL shouldSelect = YES;
-
-	if (!_isRestoringState)
-	{
-		IMBNode* node = [inItem representedObject];
-		id delegate = self.libraryController.delegate;
-		
-		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
-		{
-			shouldSelect = [delegate libraryController:self.libraryController shouldPopulateNode:node];
-		}
-		
-		if (node.isGroup)
-		{
-			shouldSelect = NO;
-		}
-	}
-	
-	return shouldSelect;	
-}
-
-
-// If the selection just changed due to a direct user event (clicking), then instruct the library controller 
-// to populate the node (if necessary) and remember the identifier of the selected node...
-
-- (void) outlineViewSelectionDidChange:(NSNotification*)inNotification;
-{
-	if (!_isRestoringState && !self.libraryController.isReplacingNode)
-	{
-		NSInteger row = [ibNodeOutlineView selectedRow];
-		id item = row>=0 ? [ibNodeOutlineView itemAtRow:row] : nil;
-		IMBNode* newNode = [item representedObject];
-
-		// Stop loading the old node's contents, assuming we don't need them anymore. Instead populated the
-		// newly selected node...
-		
-		[self.libraryController stopPopulatingNodeWithIdentifier:self.selectedNodeIdentifier];
-
-		if (newNode)
-		{
-			[self.libraryController populateNode:newNode];
-			self.selectedNodeIdentifier = newNode.identifier;
-		}
-
-		// If the node has a custom object view, then install it now...
-		
-		[self installObjectViewForNode:newNode];
-		
-		// If a completely different parser was selected, then notify the previous parser, that it is most
-		// likely no longer needed any can get rid of its cached data...
-		
-		if (self.selectedParser != newNode.parser)
-		{
-			[self.selectedParser didStopUsingParser];
-			self.selectedParser = newNode.parser;
-		}
-	}
-
-	// Sync the selection of the popup menu...
-	
-	[self __syncPopupMenuSelection];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Note: According to WWDC Session 110, this is called a LOT so it's not good for delayed loading...
-
-- (void) outlineView:(NSOutlineView*)inOutlineView willDisplayCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inTableColumn item:(id)inItem
-{	
-	IMBNode* node = [inItem representedObject];
-	IMBNodeCell* cell = (IMBNodeCell*)inCell;
-
-	[cell setImage:node.icon];
-	[cell setBadgeType:node.badgeTypeNormal];
-	
-	if ([node respondsToSelector:@selector(license)])
-	{
-		IMBFlickrNodeLicense license = [((IMBFlickrNode *)node) license];
-		if (license < IMBFlickrNodeLicense_Undefined) license = IMBFlickrNodeLicense_Undefined;
-		if (license > IMBFlickrNodeLicense_CommercialUse) license = IMBFlickrNodeLicense_CommercialUse;
-		// These are file names.  Ideally we should put localized AX Descriptions on them.
-		NSArray *names = [NSArray arrayWithObjects:@"any", @"CC", @"remix", @"commercial", nil];
-		NSString *fileName = [names objectAtIndex:license];
-		
-		if (license)
-		{
-			NSImage *image = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:fileName ofType:@"pdf"]] autorelease];
-			[image setScalesWhenResized:YES];
-			[image setSize:NSMakeSize(16.0,16.0)];
-			[cell setExtraImage:image];
-		}
-		else
-		{
-			[cell setExtraImage:nil];
-		}
-	}
-	else
-	{
-		[cell setExtraImage:nil];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
--(BOOL) outlineView:(NSOutlineView*)inOutlineView isGroupItem:(id)inItem
-{
-	IMBNode* node = [inItem representedObject];
-	return node.isGroup;
-}
-
-
-#pragma mark NSOutlineViewDataSource
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Check if we have any folder paths in the dragging pasteboard...
-
-- (NSDragOperation) outlineView:(NSOutlineView*)inOutlineView validateDrop:(id<NSDraggingInfo>)inInfo proposedItem:(id)inItem proposedChildIndex:(NSInteger)inIndex
-{
-	NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
-	BOOL exists,directory;
-	
-	for (NSString* path in paths)
-	{
-		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
-		
-		if (exists && directory)
-		{
-			[inOutlineView setDropItem:nil dropChildIndex:NSOutlineViewDropOnItemIndex]; // Target the whole view
-			return NSDragOperationCopy;
-		}
-	}
-
-	return NSDragOperationNone;
-}
-
-
-// For each folder path that was dropped onto the outline view create a new custom parser. Then reload the library...
- 
-- (BOOL) outlineView:(NSOutlineView*)inOutlineView acceptDrop:(id<NSDraggingInfo>)inInfo item:(id)inItem childIndex:(NSInteger)inIndex
-{
-	BOOL result = NO;
-    NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
-	BOOL exists,directory;
-	
-	for (NSString* path in paths)
-	{
-		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
-		
-		if (exists && directory)
-		{
-			if (![IMBConfig isLibraryPath:path])
-			{
-				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
-				self.selectedNodeIdentifier = [parser identifierForPath:path];
-				result = YES;
-			}
-		}	
-	}		
-	
-	[inOutlineView.window makeFirstResponder:inOutlineView];
-	[self.libraryController reload];
-	return result;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
 #pragma mark Saving & Restoring State
 
 
@@ -799,7 +856,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
     // before nodes are exchanged by the library controller because the node identifier
     // of the currently selected node is saved in _selectedNodeIdentifiers anyways.
     
-    [ibNodeTreeController setSelectionIndexPath:nil];
+//    [ibNodeTreeController setSelectionIndexPath:nil];
     
     // Since the replacing of nodes in the library controller will lead to side effects
     // regarding the current scroll position of the outline view we have to save it here
@@ -914,27 +971,27 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) selectNode:(IMBNode*)inNode
 {
-	if (inNode)
-	{	
-		if (inNode.isGroup)
-		{
-			[ibNodeTreeController setSelectionIndexPaths:nil];
-		}
-		else
-		{
-			NSIndexPath* indexPath = inNode.indexPath;
-			[ibNodeTreeController setSelectionIndexPath:indexPath];
-			
-			// Not redundant! Needed if selection doesn't change due to previous line!
-			[self.libraryController populateNode:inNode]; 
-//			[self installCustomObjectView:[inNode customObjectView]];
-			[self installObjectViewForNode:inNode];
-		}
-	}	
-	else
-	{
-		[ibNodeTreeController setSelectionIndexPaths:nil];
-	}
+//	if (inNode)
+//	{	
+//		if (inNode.isGroup)
+//		{
+//			[ibNodeTreeController setSelectionIndexPaths:nil];
+//		}
+//		else
+//		{
+//			NSIndexPath* indexPath = inNode.indexPath;
+//			[ibNodeTreeController setSelectionIndexPath:indexPath];
+//			
+//			// Not redundant! Needed if selection doesn't change due to previous line!
+//			[self.libraryController populateNode:inNode]; 
+////			[self installCustomObjectView:[inNode customObjectView]];
+//			[self installObjectViewForNode:inNode];
+//		}
+//	}	
+//	else
+//	{
+//		[ibNodeTreeController setSelectionIndexPaths:nil];
+//	}
 }
 
 
@@ -943,12 +1000,12 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (IMBNode*) selectedNode
 {
-	NSArray* selectedNodes = [ibNodeTreeController selectedObjects];
-	
-	if ([selectedNodes count] > 0)
-	{
-		return [selectedNodes objectAtIndex:0];
-	}
+//	NSArray* selectedNodes = [ibNodeTreeController selectedObjects];
+//	
+//	if ([selectedNodes count] > 0)
+//	{
+//		return [selectedNodes objectAtIndex:0];
+//	}
 	
 	return nil;
 }
@@ -1081,7 +1138,20 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	[panel setResolvesAliases:YES];
 
 	NSWindow* window = [ibSplitView window];
-	[panel beginSheetForDirectory:nil file:nil types:nil modalForWindow:window modalDelegate:self didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:) contextInfo:NULL];
+	[panel beginSheetModalForWindow:window completionHandler:^(NSInteger result)
+	{
+//		if (result == NSFileHandlingPanelOKButton)
+//		{
+//			NSArray* urls = [panel urls];
+//			for (NSURL* url in urls)
+//			{
+//				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+//				self.selectedNodeIdentifier = [parser identifierForPath:path];
+//			}	
+//			
+//			[self.libraryController reload];
+//		}
+	}];
 }
 
 
@@ -1089,17 +1159,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 - (void) openPanelDidEnd:(NSOpenPanel*)inPanel returnCode:(int)inReturnCode contextInfo:(void*)inContextInfo
 {
-	if (inReturnCode == NSOKButton)
-	{
-		NSArray* paths = [inPanel filenames];
-		for (NSString* path in paths)
-		{
-			IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
-			self.selectedNodeIdentifier = [parser identifierForPath:path];
-		}	
-		
-		[self.libraryController reload];
-	}
 }
 
 
@@ -1110,15 +1169,16 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (BOOL) canRemoveNode
 {
-	IMBNode* node = [self selectedNode];
-	return node.isTopLevelNode && node.parser.isCustom && !node.isLoading;
+	return NO;
+//	IMBNode* node = [self selectedNode];
+//	return node.isTopLevelNode && node.parser.isCustom && !node.isLoading;
 }
 
 
 - (IBAction) removeNode:(id)inSender
 {
-	IMBNode* node = [self selectedNode];
-	[self.libraryController removeCustomRootNode:node];
+//	IMBNode* node = [self selectedNode];
+//	[self.libraryController removeCustomRootNode:node];
 }
 
 
@@ -1136,8 +1196,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (IBAction) reloadNode:(id)inSender
 {
-	IMBNode* node = [self selectedNode];
-	[self.libraryController reloadNode:node];
+//	IMBNode* node = [self selectedNode];
+//	[self.libraryController reloadNode:node];
 }
 
 
@@ -1150,7 +1210,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (NSMenu*) menuForNode:(IMBNode*)inNode
 {
 	NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"contextMenu"] autorelease];
-	NSMenuItem* item = nil;
+/*	NSMenuItem* item = nil;
 	NSString* title = nil;
 	
 	// First we'll add standard menu items...
@@ -1212,7 +1272,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	{
 		[delegate libraryController:self.libraryController willShowContextMenu:menu forNode:inNode];
 	}
-	
+*/	
 	return menu;
 }
 
@@ -1357,43 +1417,43 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (NSViewController*) _customHeaderViewControllerForNode:(IMBNode*)inNode
 {
 	NSViewController* viewController = nil;
-	NSString* identifier = inNode.identifier;
-	id delegate = self.libraryController.delegate;
-	
-	if (identifier)
-	{
-		viewController = [_customHeaderViewControllers objectForKey:identifier];
-		
-		if (viewController == nil)
-		{
-			if (delegate != nil && [delegate respondsToSelector:@selector(customHeaderViewControllerForNode:)])
-			{
-				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customHeaderViewControllerForNode:inNode];
-			}
-
-			if (viewController == nil)
-			{
-				viewController = [inNode.parser customHeaderViewControllerForNode:inNode];
-			}
-			
-			if (_customHeaderViewControllers == nil && viewController != nil)
-			{
-				_customHeaderViewControllers = [[NSMutableDictionary alloc] init];
-			}
-
-			if (viewController) [_customHeaderViewControllers setObject:viewController forKey:identifier];
-			else [_customHeaderViewControllers removeObjectForKey:identifier];
-		}
-	}
-	
-	if (viewController)
-	{
-		if ([viewController isKindOfClass:[IMBObjectViewController class]])
-		{	
-			[(IMBObjectViewController*)viewController setNodeViewController:self];
-			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
-		}
-	}
+//	NSString* identifier = inNode.identifier;
+//	id delegate = self.libraryController.delegate;
+//	
+//	if (identifier)
+//	{
+//		viewController = [_customHeaderViewControllers objectForKey:identifier];
+//		
+//		if (viewController == nil)
+//		{
+//			if (delegate != nil && [delegate respondsToSelector:@selector(customHeaderViewControllerForNode:)])
+//			{
+//				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customHeaderViewControllerForNode:inNode];
+//			}
+//
+//			if (viewController == nil)
+//			{
+//				viewController = [inNode.parser customHeaderViewControllerForNode:inNode];
+//			}
+//			
+//			if (_customHeaderViewControllers == nil && viewController != nil)
+//			{
+//				_customHeaderViewControllers = [[NSMutableDictionary alloc] init];
+//			}
+//
+//			if (viewController) [_customHeaderViewControllers setObject:viewController forKey:identifier];
+//			else [_customHeaderViewControllers removeObjectForKey:identifier];
+//		}
+//	}
+//	
+//	if (viewController)
+//	{
+//		if ([viewController isKindOfClass:[IMBObjectViewController class]])
+//		{	
+//			[(IMBObjectViewController*)viewController setNodeViewController:self];
+//			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+//		}
+//	}
 	
 	return viewController;
 }
@@ -1402,42 +1462,42 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (NSViewController*) _customObjectViewControllerForNode:(IMBNode*)inNode
 {
 	NSViewController* viewController = nil;
-	NSString* identifier = inNode.identifier;
-	id delegate = self.libraryController.delegate;
-	
-	if (identifier)
-	{
-		viewController = [_customObjectViewControllers objectForKey:identifier];
-	
-		if (viewController == nil)
-		{
-			if (delegate != nil && [delegate respondsToSelector:@selector(customObjectViewControllerForNode:)])
-			{
-				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customObjectViewControllerForNode:inNode];
-			}
-			
-			if (viewController == nil)
-			{
-				viewController = [inNode.parser customObjectViewControllerForNode:inNode];
-			}
-
-			if (_customObjectViewControllers == nil && viewController != nil)
-			{
-				_customObjectViewControllers = [[NSMutableDictionary alloc] init];
-			}
-
-			if (viewController)
-			{
-				if ([viewController isKindOfClass:[IMBObjectViewController class]])
-				{	
-					[(IMBObjectViewController*)viewController setNodeViewController:self];
-					[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
-				}
-				[_customObjectViewControllers setObject:viewController forKey:identifier];
-			}
-			else [_customObjectViewControllers removeObjectForKey:identifier];
-		}
-	}
+//	NSString* identifier = inNode.identifier;
+//	id delegate = self.libraryController.delegate;
+//	
+//	if (identifier)
+//	{
+//		viewController = [_customObjectViewControllers objectForKey:identifier];
+//	
+//		if (viewController == nil)
+//		{
+//			if (delegate != nil && [delegate respondsToSelector:@selector(customObjectViewControllerForNode:)])
+//			{
+//				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customObjectViewControllerForNode:inNode];
+//			}
+//			
+//			if (viewController == nil)
+//			{
+//				viewController = [inNode.parser customObjectViewControllerForNode:inNode];
+//			}
+//
+//			if (_customObjectViewControllers == nil && viewController != nil)
+//			{
+//				_customObjectViewControllers = [[NSMutableDictionary alloc] init];
+//			}
+//
+//			if (viewController)
+//			{
+//				if ([viewController isKindOfClass:[IMBObjectViewController class]])
+//				{	
+//					[(IMBObjectViewController*)viewController setNodeViewController:self];
+//					[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+//				}
+//				[_customObjectViewControllers setObject:viewController forKey:identifier];
+//			}
+//			else [_customObjectViewControllers removeObjectForKey:identifier];
+//		}
+//	}
 	
 	return viewController;
 }
@@ -1446,43 +1506,43 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (NSViewController*) _customFooterViewControllerForNode:(IMBNode*)inNode
 {
 	NSViewController* viewController = nil;
-	NSString* identifier = inNode.identifier;
-	id delegate = self.libraryController.delegate;
-	
-	if (identifier)
-	{
-		viewController = [_customFooterViewControllers objectForKey:identifier];
-	
-		if (viewController == nil)
-		{
-			if (delegate != nil && [delegate respondsToSelector:@selector(customFooterViewControllerForNode:)])
-			{
-				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customFooterViewControllerForNode:inNode];
-			}
-			
-			if (viewController == nil)
-			{
-				viewController = [inNode.parser customFooterViewControllerForNode:inNode];
-			}
-
-			if (_customFooterViewControllers == nil && viewController != nil)
-			{
-				_customFooterViewControllers = [[NSMutableDictionary alloc] init];
-			}
-
-			if (viewController) [_customFooterViewControllers setObject:viewController forKey:identifier];
-			else [_customFooterViewControllers removeObjectForKey:identifier];
-		}
-	}
-	
-	if (viewController)
-	{
-		if ([viewController isKindOfClass:[IMBObjectViewController class]])
-		{	
-			[(IMBObjectViewController*)viewController setNodeViewController:self];
-			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
-		}
-	}
+//	NSString* identifier = inNode.identifier;
+//	id delegate = self.libraryController.delegate;
+//	
+//	if (identifier)
+//	{
+//		viewController = [_customFooterViewControllers objectForKey:identifier];
+//	
+//		if (viewController == nil)
+//		{
+//			if (delegate != nil && [delegate respondsToSelector:@selector(customFooterViewControllerForNode:)])
+//			{
+//				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customFooterViewControllerForNode:inNode];
+//			}
+//			
+//			if (viewController == nil)
+//			{
+//				viewController = [inNode.parser customFooterViewControllerForNode:inNode];
+//			}
+//
+//			if (_customFooterViewControllers == nil && viewController != nil)
+//			{
+//				_customFooterViewControllers = [[NSMutableDictionary alloc] init];
+//			}
+//
+//			if (viewController) [_customFooterViewControllers setObject:viewController forKey:identifier];
+//			else [_customFooterViewControllers removeObjectForKey:identifier];
+//		}
+//	}
+//	
+//	if (viewController)
+//	{
+//		if ([viewController isKindOfClass:[IMBObjectViewController class]])
+//		{	
+//			[(IMBObjectViewController*)viewController setNodeViewController:self];
+//			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
+//		}
+//	}
 
 	return viewController;
 }
