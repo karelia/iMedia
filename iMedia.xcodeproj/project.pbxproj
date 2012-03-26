@@ -30,7 +30,7 @@
 		30394AC812DC665000ACA531 /* IMBSkimmableObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3043924B130D1DDC00DD1D34 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		305B64C71372EF6C009B53BD /* cork-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CE394AC11371A1F700EF0D1E /* cork-background.jpg */; };
-		3089F949151C8ECB00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F948151C8ECB00D56DC0 /* XPCKit.framework */; };
+		3089F949151C8ECB00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F948151C8ECB00D56DC0 /* XPCKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		3089F94B151C8FDD00D56DC0 /* XPCKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F94C151C91CE00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F94D151C91E400D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };

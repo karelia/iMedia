@@ -40,6 +40,11 @@ BOOL SBIsSandboxed()
 	static BOOL sIsSandboxed = NO;
 	static dispatch_once_t sIsSandboxedToken = 0;
 
+#warning App will not work on OS X 10.7 to 10.7.2 because it will still be sandboxed but not return accordingly
+    if (!IMBRunningOnLion1073OrNewer()) {
+        return NO;
+    }
+    
     dispatch_once(&sIsSandboxedToken,
     ^{
 		SecCodeRef codeRef = NULL;
@@ -184,3 +189,61 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark
+
+
+// Dispatch a message with optional argument object to a target object asynchronously.
+// When connnection (which must be an XPCConnection) is not nil the message will be transfered
+// to XPC service for execution (i.e. target and object must conform to NSCoding when connection is not nil).
+// When connection is nil (e.g. running on Snow Leopard) message will be dispatched asynchronously via GCD.
+
+void SBPerformSelectorAsync(id inConnection,
+                            id inTarget, SEL inSelector, id inObject,
+                            SBReturnValueHandler inReturnHandler)
+{
+    // If we are running sandboxed on Lion (or newer), then send a request to perform selector on target to our XPC
+    // service and hand the results to the supplied return handler block...
+    
+    if (inConnection && [inConnection respondsToSelector:@selector(sendSelector:withTarget:Object:returnValueHandler:)] )
+    {
+        [inConnection sendSelector:inSelector
+                        withTarget:inTarget
+                            object:inObject
+                returnValueHandler:inReturnHandler];
+    }
+    
+    // If we are not sandboxed (e.g. running on Snow Leopard) we'll just do the work directly (but asynchronously)
+    // via GCD queues. Once again the result is handed over to the return handler block...
+    
+    else
+    {
+        // Copy target and object so they are dispatched under same premises as XPC (XPC uses archiving)
+        
+        id targetCopy = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:inTarget]];
+        id objectCopy = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:inObject]];
+        
+        dispatch_queue_t currentQueue = dispatch_get_current_queue();
+        dispatch_retain(currentQueue);
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0),^()
+                       {
+                           NSError* error = nil;
+                           id result = nil;
+                           
+                           if (objectCopy) {
+                               result = [targetCopy performSelector:inSelector withObject:objectCopy withObject:(id)&error];
+                           } else {
+                               result = [targetCopy performSelector:inSelector withObject:(id)&error];
+                           }
+                           
+                           dispatch_async(currentQueue,^()
+                                          {
+                                              inReturnHandler(result, error);
+                                              dispatch_release(currentQueue);
+                                          });
+                       });
+    }
+}
+
+
