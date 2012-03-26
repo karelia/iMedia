@@ -92,7 +92,6 @@
 	IMBParser* _selectedParser;
 	
 	IBOutlet NSSplitView* ibSplitView;
-//	IBOutlet IMBNodeTreeController* ibNodeTreeController;
 	IBOutlet IMBOutlineView* ibNodeOutlineView;
 	IBOutlet NSPopUpButton* ibNodePopupButton;
 	IBOutlet NSView* ibObjectHeaderView;

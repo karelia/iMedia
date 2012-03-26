@@ -123,7 +123,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 @implementation IMBNodeViewController
 
 @synthesize libraryController = _libraryController;
-//@synthesize nodeTreeController = ibNodeTreeController;
 @synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
 @synthesize expandedNodeIdentifiers = _expandedNodeIdentifiers;
 @synthesize selectedParser = _selectedParser;
@@ -232,12 +231,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		name:kIMBSelectNodeWithIdentifierNotification 
 		object:nil];
 
-	// Observe changes to the libary node tree...
-	
-//	[ibNodeTreeController retain];
-//	[ibNodeTreeController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
-//	[ibNodeTreeController addObserver:self forKeyPath:kSelectionKey options:0 context:(void*)kSelectionKey];
-
 	// Set the cell class on the outline view...
 	
 	NSArray* columns = [ibNodeOutlineView tableColumns];
@@ -260,10 +253,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[self _stopObservingLibraryController];
-
-//	[ibNodeTreeController removeObserver:self forKeyPath:kArrangedObjectsKey];
-//	[ibNodeTreeController removeObserver:self forKeyPath:kSelectionKey];
-//	[ibNodeTreeController release];
 	
 	IMBRelease(_libraryController);
 	IMBRelease(_selectedNodeIdentifier);
@@ -587,7 +576,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 //	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
 //	IMBNode* node = (IMBNode*)item; 
-//	
 //	[self.libraryController stopPopulatingNodeWithIdentifier:node.identifier];
 }
 
@@ -646,7 +634,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 //		// If the node has a custom object view, then install it now...
 //		
 //		[self installObjectViewForNode:newNode];
-//		
+		
 //		// If a completely different parser was selected, then notify the previous parser, that it is most
 //		// likely no longer needed any can get rid of its cached data...
 //		
@@ -980,9 +968,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		{
 			NSInteger row = [ibNodeOutlineView rowForItem:inNode];
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-
-//			NSIndexPath* indexPath = inNode.indexPath;
-//			[ibNodeTreeController setSelectionIndexPath:indexPath];
 			
 			// Not redundant! Needed if selection doesn't change due to previous line!
 			[self.libraryController populateNode:inNode]; 
@@ -992,7 +977,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	}	
 	else
 	{
-//		[ibNodeTreeController setSelectionIndexPaths:nil];
 		[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
 	}
 }
@@ -1003,12 +987,12 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (IMBNode*) selectedNode
 {
-//	NSArray* selectedNodes = [ibNodeTreeController selectedObjects];
-//	
-//	if ([selectedNodes count] > 0)
-//	{
-//		return [selectedNodes objectAtIndex:0];
-//	}
+	NSInteger row = [ibNodeOutlineView selectedRow];
+	
+	if (row != NSNotFound)
+	{
+		return [ibNodeOutlineView nodeAtRow:row];
+	}
 	
 	return nil;
 }
@@ -1017,21 +1001,17 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Expand the selected node...
+	
 - (void) expandSelectedNode
 {
-	// Expand the selected node...
-	
-	NSInteger rows = [ibNodeOutlineView numberOfRows];
-	
-	for (NSInteger i=0; i<rows; i++)
+	NSInteger row = [ibNodeOutlineView selectedRow];
+
+	if (row != NSNotFound)
 	{
-		if ([ibNodeOutlineView isRowSelected:i])
-		{
-			id item = [ibNodeOutlineView itemAtRow:i];
-			[ibNodeOutlineView expandItem:item];
-			[self _setExpandedNodeIdentifiers];
-			break;
-		}
+		id item = [ibNodeOutlineView itemAtRow:row];
+		[ibNodeOutlineView expandItem:item];
+		[self _setExpandedNodeIdentifiers];
 	}
 }
 
@@ -1318,95 +1298,95 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) installObjectViewForNode:(IMBNode*)inNode
 {
-	NSViewController* headerViewController = [self _customHeaderViewControllerForNode:inNode];
-	NSViewController* objectViewController = [self _customObjectViewControllerForNode:inNode];
-	NSViewController* footerViewController = [self _customFooterViewControllerForNode:inNode];
-	
-	NSView* headerView = nil;
-	NSView* objectView = nil;
-	NSView* footerView = nil;
-	
-	CGFloat totalHeight = ibObjectContainerView.superview.frame.size.height;
-	CGFloat headerHeight = 0.0;
-	CGFloat footerHeight = 0.0;
-	
-	// First remove all currently installed object views...
-	
-	[ibObjectHeaderView imb_removeAllSubviews];
-	[ibObjectContainerView imb_removeAllSubviews];
-	[ibObjectFooterView imb_removeAllSubviews];
-	
-	// Install optional header view...
-	
-	if (headerViewController != nil)
-	{
-		headerView = [headerViewController view];
-		headerHeight = headerView.frame.size.height;
-	}
-
-	NSRect headerFrame = ibObjectHeaderView.frame;
-	headerFrame.origin.y = NSMaxY(headerFrame) - headerHeight;
-	headerFrame.size.height = headerHeight;
-	ibObjectHeaderView.frame = headerFrame;
-
-	if (headerView)
-	{		
-		[headerView setFrameSize:headerFrame.size];
-		[ibObjectHeaderView addSubview:headerView];
-	}
-			
-	// Install optional footer view...
-	
-	if (footerViewController != nil)
-	{
-		NSView* footerView = [footerViewController view];
-		footerHeight = footerView.frame.size.height;
-	}
-	
-	NSRect footerFrame = ibObjectFooterView.frame;
-	footerFrame.origin.y = NSMaxY(footerFrame) - footerHeight;
-	footerFrame.size.height = footerHeight;
-	ibObjectFooterView.frame = footerFrame;
-
-	if (footerView)
-	{
-		[footerView setFrameSize:footerFrame.size];
-		[footerView addSubview:footerView];
-	}
-
-	// Finally install the object view itself (unless told not to)...
-	
-	BOOL shouldDisplayObjectView = YES;
-	if (inNode) shouldDisplayObjectView = inNode.shouldDisplayObjectView;
-	
-	if (shouldDisplayObjectView)
-	{
-		if (objectViewController != nil)
-		{
-			objectView = [objectViewController view];
-		}
-		else
-		{
-			objectView = self.standardObjectView;
-		}
-			
-		NSRect objectFrame = ibObjectContainerView.frame;
-		objectFrame.size.height = totalHeight - headerHeight - footerHeight;
-		objectFrame.origin.y = footerHeight;
-		ibObjectContainerView.frame = objectFrame;
-
-		if (objectView)
-		{
-			[objectView setFrame:[ibObjectContainerView bounds]];
-			[ibObjectContainerView addSubview:objectView];
-		}
-		
-		[ibObjectContainerView setHidden:NO];
-	}
-	else
-	{
-		[ibObjectContainerView setHidden:YES];
-	}
+//	NSViewController* headerViewController = [self _customHeaderViewControllerForNode:inNode];
+//	NSViewController* objectViewController = [self _customObjectViewControllerForNode:inNode];
+//	NSViewController* footerViewController = [self _customFooterViewControllerForNode:inNode];
+//	
+//	NSView* headerView = nil;
+//	NSView* objectView = nil;
+//	NSView* footerView = nil;
+//	
+//	CGFloat totalHeight = ibObjectContainerView.superview.frame.size.height;
+//	CGFloat headerHeight = 0.0;
+//	CGFloat footerHeight = 0.0;
+//	
+//	// First remove all currently installed object views...
+//	
+//	[ibObjectHeaderView imb_removeAllSubviews];
+//	[ibObjectContainerView imb_removeAllSubviews];
+//	[ibObjectFooterView imb_removeAllSubviews];
+//	
+//	// Install optional header view...
+//	
+//	if (headerViewController != nil)
+//	{
+//		headerView = [headerViewController view];
+//		headerHeight = headerView.frame.size.height;
+//	}
+//
+//	NSRect headerFrame = ibObjectHeaderView.frame;
+//	headerFrame.origin.y = NSMaxY(headerFrame) - headerHeight;
+//	headerFrame.size.height = headerHeight;
+//	ibObjectHeaderView.frame = headerFrame;
+//
+//	if (headerView)
+//	{		
+//		[headerView setFrameSize:headerFrame.size];
+//		[ibObjectHeaderView addSubview:headerView];
+//	}
+//			
+//	// Install optional footer view...
+//	
+//	if (footerViewController != nil)
+//	{
+//		NSView* footerView = [footerViewController view];
+//		footerHeight = footerView.frame.size.height;
+//	}
+//	
+//	NSRect footerFrame = ibObjectFooterView.frame;
+//	footerFrame.origin.y = NSMaxY(footerFrame) - footerHeight;
+//	footerFrame.size.height = footerHeight;
+//	ibObjectFooterView.frame = footerFrame;
+//
+//	if (footerView)
+//	{
+//		[footerView setFrameSize:footerFrame.size];
+//		[footerView addSubview:footerView];
+//	}
+//
+//	// Finally install the object view itself (unless told not to)...
+//	
+//	BOOL shouldDisplayObjectView = YES;
+//	if (inNode) shouldDisplayObjectView = inNode.shouldDisplayObjectView;
+//	
+//	if (shouldDisplayObjectView)
+//	{
+//		if (objectViewController != nil)
+//		{
+//			objectView = [objectViewController view];
+//		}
+//		else
+//		{
+//			objectView = self.standardObjectView;
+//		}
+//			
+//		NSRect objectFrame = ibObjectContainerView.frame;
+//		objectFrame.size.height = totalHeight - headerHeight - footerHeight;
+//		objectFrame.origin.y = footerHeight;
+//		ibObjectContainerView.frame = objectFrame;
+//
+//		if (objectView)
+//		{
+//			[objectView setFrame:[ibObjectContainerView bounds]];
+//			[ibObjectContainerView addSubview:objectView];
+//		}
+//		
+//		[ibObjectContainerView setHidden:NO];
+//	}
+//	else
+//	{
+//		[ibObjectContainerView setHidden:YES];
+//	}
 }
 
 
@@ -1647,20 +1627,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	
 	// Now find the row of our node. Expand it and return it row number...
 	
-	NSInteger n = [ibNodeOutlineView numberOfRows];
-		
-	for (NSInteger i=0; i<n; i++)
-	{
-		IMBNode* node = [self _nodeAtRow:i];
-		
-		if (node == inNode)
-		{
-			[ibNodeOutlineView expandItem:[ibNodeOutlineView itemAtRow:i]];
-			return i;
-		}
-	}
-	
-	return NSNotFound;
+	NSInteger row = [ibNodeOutlineView rowForItem:inNode];
+	if (inNode) [ibNodeOutlineView expandItem:inNode];
+	return row;
 }
 
 
@@ -1704,12 +1673,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		[self expandSelectedNode];
 		
 		IMBNode* node = [_libraryController nodeWithIdentifier:identifier];
-		
-		if (node)
-		{
-			[self selectNode:node];
-		}
-		
+		if (node) [self selectNode:node];
 		self.selectedNodeIdentifier = identifier;
 	}
 }
