@@ -71,7 +71,7 @@
 #pragma mark CLASSES
 
 @class IMBLibraryController;
-@class IMBNodeTreeController;
+//@class IMBNodeTreeController;
 @class IMBOutlineView;
 @class IMBParser;
 @class IMBNode;
@@ -82,7 +82,7 @@
 
 #pragma mark 
 
-@interface IMBNodeViewController : NSViewController
+@interface IMBNodeViewController : NSViewController <NSOutlineViewDataSource,NSOutlineViewDelegate,NSSplitViewDelegate>
 {
 	IMBLibraryController* _libraryController;
 	NSString* _selectedNodeIdentifier;
@@ -92,7 +92,6 @@
 	IMBParser* _selectedParser;
 	
 	IBOutlet NSSplitView* ibSplitView;
-	IBOutlet IMBNodeTreeController* ibNodeTreeController;
 	IBOutlet IMBOutlineView* ibNodeOutlineView;
 	IBOutlet NSPopUpButton* ibNodePopupButton;
 	IBOutlet NSView* ibObjectHeaderView;
@@ -115,7 +114,7 @@
 
 // Nodes (sourcelist)...
 
-@property (readonly) IMBNodeTreeController* nodeTreeController;
+//@property (readonly) IMBNodeTreeController* nodeTreeController;
 @property (readonly) IMBOutlineView* nodeOutlineView;
 @property (readonly) NSPopUpButton* nodePopupButton;
 @property (readonly) NSView* objectHeaderView;

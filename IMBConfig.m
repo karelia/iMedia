@@ -62,7 +62,7 @@
 
 #pragma mark CONSTANTS
 
-static NSString* sIMBPrefsKeyFormat = @"iMedia2_%@";
+static NSString* sIMBPrefsKeyFormat = @"iMedia3_%@";
 static NSString* sIMBShowsGroupNodesKey = @"showsGroupNodes";
 //static NSString* sIMBUseGlobalViewTypeKey = @"useGlobalViewType";
 static NSString* sIMBDownloadFolderPathKey = @"downloadFolderPath";
@@ -313,18 +313,19 @@ static BOOL sUseGlobalViewType = NO;
 
 static NSMutableSet *sLibraryPaths = nil;
 
-+ (void)registerLibraryPath:(NSString *)aPath
++ (void) registerLibraryPath:(NSString*)inPath
 {
 	if (nil == sLibraryPaths)
 	{
 		sLibraryPaths = [NSMutableSet new];
 	}
-	[sLibraryPaths addObject:aPath];
+	
+	[sLibraryPaths addObject:inPath];
 }
 
-+ (BOOL) isLibraryPath:(NSString *)aPath
++ (BOOL) isLibraryPath:(NSString*)inPath
 {
-	return [sLibraryPaths containsObject:aPath];
+	return [sLibraryPaths containsObject:inPath];
 }
 
 // Future: We may need a method that loops through the library paths and asks if the given

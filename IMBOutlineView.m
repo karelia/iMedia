@@ -95,6 +95,21 @@
 }
 
 
+- (void) dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+
+	IMBRelease(_subviewsInVisibleRows);
+	IMBRelease(_draggingPrompt);
+	IMBRelease(_textCell);
+ 
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void) awakeFromNib
 {
 	self.draggingPrompt = NSLocalizedStringWithDefaultValue(
@@ -128,18 +143,6 @@
 }
 
 
-- (void) dealloc
-{
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-
-	IMBRelease(_subviewsInVisibleRows);
-	IMBRelease(_draggingPrompt);
-	IMBRelease(_textCell);
- 
-	[super dealloc];
-}
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -168,10 +171,21 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void) viewWillDraw
 {
 	[super viewWillDraw];
+	[self showProgressWheels];
+}
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) showProgressWheels
+{
 	// First get rid of any progress indicators that are not currently visible or no longer needed...
 	
 	NSRect visibleRect = self.visibleRect;
@@ -181,8 +195,7 @@
 	for (NSString* row in _subviewsInVisibleRows)
 	{
 		NSInteger i = [row intValue];
-		id item = [self itemAtRow:i];
-		IMBNode* node = [item representedObject];
+		IMBNode* node = [self nodeAtRow:i];
 		
 		if (!NSLocationInRange(i,visibleRows) || node.badgeTypeNormal != kIMBBadgeTypeLoading)
 		{
@@ -199,8 +212,7 @@
 	
 	for (NSInteger i=visibleRows.location; i<visibleRows.location+visibleRows.length; i++)
 	{
-		id item = [self itemAtRow:i];
-		IMBNode* node = [item representedObject];
+		IMBNode* node = [self nodeAtRow:i];
 		NSString* row = [NSString stringWithFormat:@"%d",i];
 		NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 		
@@ -282,8 +294,7 @@
 	
 	if (i>=0 && i<n)
 	{
-		id item = [self itemAtRow:i];
-		node = [item representedObject];
+		node = [self nodeAtRow:i];
 	}
 
 	IMBNodeViewController* controller = (IMBNodeViewController*) self.delegate;
@@ -291,6 +302,16 @@
 	return [controller menuForNode:node];
 }
 			
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IMBNode*) nodeAtRow:(NSInteger)inRow
+{
+	id item = [self itemAtRow:inRow];
+	return (IMBNode*)item;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

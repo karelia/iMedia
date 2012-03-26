@@ -299,12 +299,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 							{
 								[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
 							}
-
-							// JUST TEMP:
-							if (!node.isLeaf)
-							{
-								[self performSelector:@selector(populateNode:) withObject:node afterDelay:0.1];
-							}
 						}
 					}
 				});		
@@ -331,6 +325,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) reloadNodeTree:(IMBNode*)inOldNode
 {
+	if ([inOldNode isGroup]) return;
+
 	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
 	IMBParserMessenger* messenger = inOldNode.parserMessenger;
 	
@@ -390,6 +386,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) populateNode:(IMBNode*)inNode
 {
+	if ([inNode isGroup]) return;
+	if ([inNode isPopulated]) return;
+	
 	// Ask delegate whether we should populate this node...
 			
 	if (RESPONDS(_delegate,@selector(libraryController:shouldPopulateNode:)))
@@ -434,15 +433,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
 				{
 					[_delegate libraryController:self didPopulateNode:inNewNode];
-				}
-
-				// JUST TEMP:
-				for (IMBNode* node in inNewNode.subnodes)
-				{
-					if (!node.isLeaf)
-					{
-						[self performSelector:@selector(populateNode:) withObject:node afterDelay:0.1];
-					}
 				}
 			}
 		});		
@@ -496,6 +486,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	groupNode.includedInPopup = YES;
 	groupNode.parserIdentifier = nil;
 	groupNode.parserMessenger = nil;
+	groupNode.loading = NO;
+	groupNode.badgeTypeNormal = kIMBBadgeTypeNone;
 	
 	if (groupType == kIMBGroupTypeLibrary)
 	{
