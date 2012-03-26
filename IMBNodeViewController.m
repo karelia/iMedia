@@ -543,7 +543,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		
 		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
 		{
-			IMBNode* node = [inItem representedObject];
+			IMBNode* node = (IMBNode*)inItem;
 			shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
 		}
 	}
@@ -557,7 +557,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (void) outlineViewItemWillExpand:(NSNotification*)inNotification
 {
 	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
-	IMBNode* node = [item representedObject];
+	IMBNode* node = (IMBNode*)item; 
 	[self.libraryController populateNode:node];
 }
 
@@ -586,7 +586,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	[self _setExpandedNodeIdentifiers];
 
 //	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
-//	IMBNode* node = [item representedObject];
+//	IMBNode* node = (IMBNode*)item; 
 //	
 //	[self.libraryController stopPopulatingNodeWithIdentifier:node.identifier];
 }
@@ -603,7 +603,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 	if (!_isRestoringState)
 	{
-		IMBNode* node = [inItem representedObject];
+		IMBNode* node = (IMBNode*)inItem;
 		id delegate = self.libraryController.delegate;
 		
 		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
@@ -626,23 +626,23 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) outlineViewSelectionDidChange:(NSNotification*)inNotification;
 {
-//	if (!_isRestoringState && !self.libraryController.isReplacingNode)
-//	{
-//		NSInteger row = [ibNodeOutlineView selectedRow];
-//		id item = row>=0 ? [ibNodeOutlineView itemAtRow:row] : nil;
-//		IMBNode* newNode = [item representedObject];
-//
-//		// Stop loading the old node's contents, assuming we don't need them anymore. Instead populated the
-//		// newly selected node...
-//		
+	if (!_isRestoringState && !self.libraryController.isReplacingNode)
+	{
+		NSInteger row = [ibNodeOutlineView selectedRow];
+		IMBNode* newNode = row>=0 ? [ibNodeOutlineView nodeAtRow:row] : nil;
+
+		// Stop loading the old node's contents, assuming we don't need them anymore. Instead populated the
+		// newly selected node...
+		
 //		[self.libraryController stopPopulatingNodeWithIdentifier:self.selectedNodeIdentifier];
-//
-//		if (newNode)
-//		{
-//			[self.libraryController populateNode:newNode];
-//			self.selectedNodeIdentifier = newNode.identifier;
-//		}
-//
+
+		if (newNode)
+		{
+			[self.libraryController populateNode:newNode];
+			self.selectedNodeIdentifier = newNode.identifier;
+			[ibNodeOutlineView showProgressWheels];
+		}
+
 //		// If the node has a custom object view, then install it now...
 //		
 //		[self installObjectViewForNode:newNode];
@@ -655,11 +655,11 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 //			[self.selectedParser didStopUsingParser];
 //			self.selectedParser = newNode.parser;
 //		}
-//	}
-//
-//	// Sync the selection of the popup menu...
-//	
-//	[self __syncPopupMenuSelection];
+	}
+
+	// Sync the selection of the popup menu...
+	
+	[self __syncPopupMenuSelection];
 }
 
 
@@ -670,10 +670,11 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) outlineView:(NSOutlineView*)inOutlineView willDisplayCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inTableColumn item:(id)inItem
 {	
-	IMBNode* node = [inItem representedObject];
+	IMBNode* node = (IMBNode*)inItem; 
 	IMBNodeCell* cell = (IMBNodeCell*)inCell;
 
 	[cell setImage:node.icon];
+	[cell setTitle:node.name];
 	[cell setBadgeType:node.badgeTypeNormal];
 	
 	if ([node respondsToSelector:@selector(license)])
@@ -709,7 +710,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 -(BOOL) outlineView:(NSOutlineView*)inOutlineView isGroupItem:(id)inItem
 {
-	IMBNode* node = [inItem representedObject];
+	IMBNode* node = (IMBNode*)inItem; 
 	return node.isGroup;
 }
 
@@ -821,7 +822,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		
 		if ([ibNodeOutlineView isItemExpanded:item])
 		{
-			IMBNode* node = [item representedObject];
+			IMBNode* node = (IMBNode*)item; 
 			[expandedNodeIdentifiers addObject:node.identifier];
 		}
 	}
@@ -834,9 +835,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (IMBNode*) _nodeAtRow:(NSInteger)inRow
 {
-	id item = [ibNodeOutlineView itemAtRow:inRow];
-	IMBNode* node = [item representedObject];
-	return node;
+	return [ibNodeOutlineView nodeAtRow:inRow];
 }
 
 
@@ -971,27 +970,31 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) selectNode:(IMBNode*)inNode
 {
-//	if (inNode)
-//	{	
-//		if (inNode.isGroup)
-//		{
-//			[ibNodeTreeController setSelectionIndexPaths:nil];
-//		}
-//		else
-//		{
+	if (inNode)
+	{	
+		if (inNode.isGroup)
+		{
+			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
+		}
+		else
+		{
+			NSInteger row = [ibNodeOutlineView rowForItem:inNode];
+			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+
 //			NSIndexPath* indexPath = inNode.indexPath;
 //			[ibNodeTreeController setSelectionIndexPath:indexPath];
-//			
-//			// Not redundant! Needed if selection doesn't change due to previous line!
-//			[self.libraryController populateNode:inNode]; 
-////			[self installCustomObjectView:[inNode customObjectView]];
+			
+			// Not redundant! Needed if selection doesn't change due to previous line!
+			[self.libraryController populateNode:inNode]; 
+//			[self installCustomObjectView:[inNode customObjectView]];
 //			[self installObjectViewForNode:inNode];
-//		}
-//	}	
-//	else
-//	{
+		}
+	}	
+	else
+	{
 //		[ibNodeTreeController setSelectionIndexPaths:nil];
-//	}
+		[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
+	}
 }
 
 
