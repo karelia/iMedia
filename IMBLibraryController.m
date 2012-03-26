@@ -486,6 +486,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	groupNode.includedInPopup = YES;
 	groupNode.parserIdentifier = nil;
 	groupNode.parserMessenger = nil;
+	groupNode.loading = NO;
+	groupNode.badgeTypeNormal = kIMBBadgeTypeNone;
 	
 	if (groupType == kIMBGroupTypeLibrary)
 	{
