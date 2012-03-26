@@ -68,6 +68,12 @@
 #import "IMBQLPreviewPanel.h"
 #import "NSWorkspace+iMedia.h"
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
+
 NSString* kIMBImageBrowserShowTitlesNotification = @"IMBImageBrowserShowTitlesNotification";
 
 
@@ -77,28 +83,42 @@ NSString* kIMBImageBrowserShowTitlesNotification = @"IMBImageBrowserShowTitlesNo
 #pragma mark GLOBALS
 
 static IMBPanelController* sSharedPanelController = nil;
-static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
+static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark 
+
 @implementation IMBBackgroundImageView
-- (BOOL) isOpaque { return YES; }
+
+- (BOOL) isOpaque
+{
+	return YES;
+}
+
 @end
 
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
 
 @interface IMBPanelController ()
-- (void)setupInfoWindow;
+- (void) setupInfoWindow;
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @implementation IMBPanelController
 
 @synthesize delegate = _delegate;
 @synthesize mediaTypes = _mediaTypes;
-@synthesize viewControllers = _viewControllers;
+@synthesize nodeViewControllers = _nodeViewControllers;
 @synthesize loadedLibraries = _loadedLibraries;
 @synthesize oldMediaType = _oldMediaType;
 
@@ -108,18 +128,18 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 // Register the view controller class...
 
-+ (void) registerViewControllerClass:(Class)inViewControllerClass forMediaType:(NSString*)inMediaType
++ (void) registerObjectViewControllerClass:(Class)inObjectViewControllerClass forMediaType:(NSString*)inMediaType
 {
 	@synchronized ([self class])
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		
-		if (sRegisteredViewControllerClasses == nil)
+		if (sRegisteredObjectViewControllerClasses == nil)
 		{
-			sRegisteredViewControllerClasses = [[NSMutableDictionary alloc] init];
+			sRegisteredObjectViewControllerClasses = [[NSMutableDictionary alloc] init];
 		}
 		
-		[sRegisteredViewControllerClasses setObject:inViewControllerClass forKey:inMediaType];
+		[sRegisteredObjectViewControllerClasses setObject:inObjectViewControllerClass forKey:inMediaType];
 		
 		[pool drain];
 	}
@@ -185,7 +205,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 {
 	if (self = [super initWithWindowNibName:@"IMBPanel"])
 	{
-		self.viewControllers = [NSMutableArray array];
+		self.nodeViewControllers = [NSMutableArray array];
 		self.loadedLibraries = [NSMutableDictionary dictionary];
 		
 		[[NSNotificationCenter defaultCenter] 
@@ -204,7 +224,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
 	IMBRelease(_mediaTypes);
-	IMBRelease(_viewControllers);
+	IMBRelease(_nodeViewControllers);
 	IMBRelease(_loadedLibraries);
 	IMBRelease(_oldMediaType);
 	
@@ -227,6 +247,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
 	[parserController setDelegate:self.delegate];
+	[parserController loadParserMessengers];
 	
 	for (NSString* mediaType in self.mediaTypes)
 	{
@@ -235,9 +256,10 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
 		[libraryController setDelegate:self.delegate];
 
-		// Create the view controllers for each media type...
+		// Create the top-level view controller (IMBNodeViewController) for each media type...
 		
 		nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
+		[self.nodeViewControllers addObject:nodeViewController];
 		
 //		Class ovc = [sRegisteredViewControllerClasses objectForKey:mediaType];
 //		objectViewController = (IMBObjectViewController*) [ovc viewControllerForLibraryController:libraryController];
@@ -256,9 +278,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 // Walk through the array and retrieve the correct controller...
 
-- (IMBObjectViewController*) objectViewControllerForMediaType:(NSString*)inMediaType
+- (IMBNodeViewController*) nodeViewControllerForMediaType:(NSString*)inMediaType
 {
-	for (IMBObjectViewController* controller in self.viewControllers)
+	for (IMBNodeViewController* controller in self.nodeViewControllers)
 	{
 		if ([controller.mediaType isEqualToString:inMediaType])
 		{
@@ -276,7 +298,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 - (void) windowDidLoad
 {
     // There's generally no need for the media browser to be key window
-    [(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded:YES];
+    [(NSPanel*)self.window setBecomesKeyOnlyIfNeeded:YES];
     
 	[ibTabView setDelegate:self];
 	[ibToolbar setAllowsUserCustomization:NO];
@@ -314,11 +336,10 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	
 	NSSize largestMinimumSize = NSMakeSize(0,0);
 	
-	for (IMBObjectViewController* objectViewController in self.viewControllers)
+	for (IMBNodeViewController* nodeViewController in self.nodeViewControllers)
 	{
-		IMBNodeViewController* nodeViewController = objectViewController.nodeViewController;
+//		IMBNodeViewController* nodeViewController = objectViewController.nodeViewController;
 		NSString* mediaType = nodeViewController.mediaType;
-
 		NSView* nodeView = [nodeViewController view];
 		[nodeView setFrame:[ibTabView bounds]];
 		
@@ -326,10 +347,12 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		// suit the most restrictive controller...
 
 		NSSize thisNodeViewMinimumSize = [nodeViewController minimumViewSize];
+		
 		if (thisNodeViewMinimumSize.height > largestMinimumSize.height)
 		{
 			largestMinimumSize.height = thisNodeViewMinimumSize.height;
 		}
+		
 		if (thisNodeViewMinimumSize.width > largestMinimumSize.width)
 		{
 			largestMinimumSize.width = thisNodeViewMinimumSize.width;
@@ -337,9 +360,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		
 		// Install the views in the window hierarchy...
 		
-		NSView* objectView = [objectViewController view];
-		nodeViewController.standardObjectView = objectView;
-		[nodeViewController installObjectViewForNode:nil];
+//		NSView* objectView = [objectViewController view];
+//		nodeViewController.standardObjectView = objectView;
+//		[nodeViewController installObjectViewForNode:nil];
 
 		NSTabViewItem* item = [[NSTabViewItem alloc] initWithIdentifier:mediaType];
 		[item setLabel:mediaType];
@@ -350,7 +373,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		// Now that the view hierarchy is established, restore any previously known state...
 		
 		[nodeViewController restoreState];
-		[objectViewController restoreState];
+//		[objectViewController restoreState];
 	}
 		
 	// Restore window size and selected tab...
@@ -399,6 +422,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[IMBConfig setPrefsValue:[NSNumber numberWithInt:displayMode] forKey:@"toolbarDisplayMode"];
 }
 
+
 - (void) restoreStateFromPreferences
 {
 	NSString* frame = [IMBConfig prefsValueForKey:@"windowFrame"];
@@ -422,7 +446,8 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 #pragma mark 
 #pragma mark Info Window
 
-- (void)setupInfoWindow
+
+- (void) setupInfoWindow
 {
 	// set up special button
 	NSButton *but = [[self window] standardWindowButton:NSWindowCloseButton];
@@ -536,7 +561,8 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	};
 }
 
-- (IBAction)showWindow:(id)sender;
+
+- (IBAction) showWindow:(id)sender
 {
 	// If we are actually showing the back of the window, flip to the front.
 	if ([ibInfoWindow isVisible])
@@ -549,27 +575,32 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	}
 }
 
-- (BOOL)infoWindowIsVisible
+
+- (BOOL) infoWindowIsVisible
 {
 	return [ibInfoWindow isVisible];
 }
 
-- (NSWindow *)infoWindow;
+
+- (NSWindow*) infoWindow
 {
 	return ibInfoWindow;
 }
 
-- (IBAction) info:(id)sender
+
+- (IBAction) info:(id)inSender
 {
 	[ibInfoWindow setFrame:[[self window] frame] display:NO];
 	[[self window] flipToShowWindow:ibInfoWindow forward:YES reflectInto:ibBackgroundImageView];
 }
 
-- (IBAction) flipBack:(id)sender
+
+- (IBAction) flipBack:(id)inSender
 {
 	[[self window] setFrame:[ibInfoWindow frame] display:NO];	// not really needed unless window is resized
 	[ibInfoWindow flipToShowWindow:[self window] forward:NO reflectInto:nil];
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -577,16 +608,20 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 #pragma mark 
 #pragma mark NSToolbarDelegate
 
+
 - (int) toolbarDisplayMode
 {
 	int displayMode = [ibToolbar displayMode];
 	if (0 == displayMode) displayMode = NSToolbarDisplayModeIconAndLabel;
 	return displayMode;
 }
+
+
 - (void) setToolbarDisplayMode:(int)aMode
 {
 	[ibToolbar setDisplayMode:aMode];
 }
+
 
 - (BOOL)toolbarIsSmall
 {
@@ -595,11 +630,13 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	return (sizeMode == NSToolbarSizeModeSmall);
 }
 
+
 - (void) setToolbarIsSmall:(BOOL)aFlag
 {
 	int sizeMode = (aFlag ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
 	[ibToolbar setSizeMode:sizeMode];
 }
+
 
 - (BOOL)prefersFilenamesInPhotoBasedBrowsers
 {
@@ -608,6 +645,7 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	return flag;
 }
 
+
 - (void) setPrefersFilenamesInPhotoBasedBrowsers:(BOOL)aFlag
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBImageBrowserShowTitlesNotification object:
@@ -615,9 +653,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 	[IMBConfig setPrefsValue:[NSNumber numberWithBool:aFlag] forKey:@"prefersFilenamesInPhotoBasedBrowsers"];
 }
-
-
-
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -650,12 +685,13 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	NSImage* icon = nil;
 	NSString* name = nil;
 	
-	for (IMBObjectViewController* controller in self.viewControllers)
+	for (IMBNodeViewController* nodeViewControllers in self.nodeViewControllers)
 	{
-		if ([controller.mediaType isEqualToString:inIdentifier])
+		if ([nodeViewControllers.mediaType isEqualToString:inIdentifier])
 		{
-			name = [controller displayName];
-			icon = [controller icon];
+			#warning TODO
+//			name = [nodeViewControllers displayName];
+//			icon = [nodeViewControllers icon];
 			[icon setScalesWhenResized:YES];
 			[icon setSize:NSMakeSize(32,32)];
 		}
@@ -718,11 +754,12 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	
 	// Notify the controllers...
 
-	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
-	[oldController willHideView];
-
-	IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
-	[newController willShowView];
+#warning TODO
+//	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
+//	[oldController willHideView];
+//
+//	IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
+//	[newController willShowView];
 		
 	// Notify the delegate...
 
@@ -746,11 +783,12 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	[ibToolbar setSelectedItemIdentifier:newMediaType];
 	// Notify the controllers...
 
-	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
-	[oldController didHideView];
-
-	IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
-	[newController didShowView];
+#warning TODO
+//	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
+//	[oldController didHideView];
+//
+//	IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
+//	[newController didShowView];
 
 	// Notify the delegate...
 
@@ -779,9 +817,10 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	
     if([key isEqual:@" "])
 	{
-		NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
-		IMBObjectViewController* controller = [self objectViewControllerForMediaType:mediaType];
-        [controller quicklook:self];
+#warning TODO
+//		NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
+//		IMBObjectViewController* controller = [self objectViewControllerForMediaType:mediaType];
+//        [controller quicklook:self];
     } 
 	else
 	{
@@ -798,10 +837,11 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 - (void) beginPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
-	NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
-	IMBObjectViewController* controller = [self objectViewControllerForMediaType:mediaType];
-    inPanel.delegate = controller;
-    inPanel.dataSource = controller;
+#warning TODO
+//	NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
+//	IMBObjectViewController* controller = [self objectViewControllerForMediaType:mediaType];
+//    inPanel.delegate = controller;
+//    inPanel.dataSource = controller;
 }
 
 

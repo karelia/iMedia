@@ -55,17 +55,24 @@
 #import "IMBCommon.h"
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CONSTANTS
+
 extern NSString* kIMBImageBrowserShowTitlesNotification;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark CLASSES
 	
-@class IMBObjectViewController;
+@class IMBNodeViewController;
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
 
 @interface IMBBackgroundImageView : NSImageView
 
@@ -78,27 +85,27 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 
 @interface IMBPanelController : NSWindowController
 {
-	IBOutlet NSTabView*		ibTabView;
-	IBOutlet NSToolbar*		ibToolbar;		// should track the ibTabView
-	IBOutlet NSWindow*		ibInfoWindow;
-	IBOutlet NSTextView*	ibInfoTextView;
+	IBOutlet NSTabView* ibTabView;
+	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
+	IBOutlet NSWindow* ibInfoWindow;
+	IBOutlet NSTextView* ibInfoTextView;
 	IBOutlet IMBBackgroundImageView *ibBackgroundImageView;
 	
 	// Items that we will localize from code so we don't need multiple nibs
-	IBOutlet NSTextField	*ibGridPrompt;
-	IBOutlet NSTextField	*ibToolbarPrompt;
-	IBOutlet NSButton		*ibShowTitles;
-	IBOutlet NSPopUpButton	*ibToolbarPopup;
-	IBOutlet NSButton		*ibSmallSize;
+	IBOutlet NSTextField* ibGridPrompt;
+	IBOutlet NSTextField* ibToolbarPrompt;
+	IBOutlet NSButton* ibShowTitles;
+	IBOutlet NSPopUpButton* ibToolbarPopup;
+	IBOutlet NSButton* ibSmallSize;
 
 	id _delegate;
 	NSArray* _mediaTypes;
-	NSMutableArray* _viewControllers;
+	NSMutableArray* _nodeViewControllers;
 	NSMutableDictionary* _loadedLibraries;
 	NSString* _oldMediaType;
 }
 
-+ (void) registerViewControllerClass:(Class)inViewControllerClass forMediaType:(NSString*)inMediaType;
++ (void) registerObjectViewControllerClass:(Class)inObjectViewControllerClass forMediaType:(NSString*)inMediaType;
 
 + (IMBPanelController*) sharedPanelController;
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
@@ -107,12 +114,12 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 
 @property (assign) id delegate;
 @property (retain) NSArray* mediaTypes;
-@property (retain) NSMutableArray* viewControllers;
+@property (retain) NSMutableArray* nodeViewControllers;
 @property (retain) NSMutableDictionary* loadedLibraries;
 @property (retain) NSString* oldMediaType;
 
 - (void) loadControllers;
-- (IMBObjectViewController*) objectViewControllerForMediaType:(NSString*)inMediaType;
+- (IMBNodeViewController*) nodeViewControllerForMediaType:(NSString*)inMediaType;
 - (IBAction) hideWindow:(id)inSender;
 
 - (void) saveStateToPreferences;
