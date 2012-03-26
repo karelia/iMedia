@@ -325,6 +325,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) reloadNodeTree:(IMBNode*)inOldNode
 {
+	if ([inOldNode isGroup]) return;
+
 	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
 	IMBParserMessenger* messenger = inOldNode.parserMessenger;
 	
@@ -384,6 +386,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) populateNode:(IMBNode*)inNode
 {
+	if ([inNode isGroup]) return;
+	if ([inNode isPopulated]) return;
+	
 	// Ask delegate whether we should populate this node...
 			
 	if (RESPONDS(_delegate,@selector(libraryController:shouldPopulateNode:)))
