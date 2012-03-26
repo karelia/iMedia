@@ -205,7 +205,7 @@ void SBPerformSelectorAsync(id inConnection,
     // If we are running sandboxed on Lion (or newer), then send a request to perform selector on target to our XPC
     // service and hand the results to the supplied return handler block...
     
-    if (inConnection && [inConnection respondsToSelector:@selector(sendSelector:withTarget:Object:returnValueHandler:)] )
+    if (inConnection && [inConnection respondsToSelector:@selector(sendSelector:withTarget:object:returnValueHandler:)] )
     {
         [inConnection sendSelector:inSelector
                         withTarget:inTarget
