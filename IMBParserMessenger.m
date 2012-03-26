@@ -174,7 +174,6 @@
 	if (_connection == nil && SBIsSandboxed())
 	{
 		NSString* identifier = [[self class] xpcSerivceIdentifier];
-        NSLog(@"Will instantiate new XPCConnection");
 		_connection = [[NSClassFromString(@"XPCConnection") alloc] initWithServiceName:identifier];
 	}
 	

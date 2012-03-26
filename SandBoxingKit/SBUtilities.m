@@ -17,7 +17,7 @@
 //  limitations under the License.
 //
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -28,6 +28,13 @@
 #import <Security/SecRequirement.h>
 #import <sys/types.h>
 #import <pwd.h>
+
+@interface NSObject()
+
+// Prototype for XPCConnection instance method to silence compiler warning
+-(void)sendSelector:(SEL)inSelector withTarget:(id)inTarget object:(id)inObject returnValueHandler:(SBReturnValueHandler)inReturnHandler;
+
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
