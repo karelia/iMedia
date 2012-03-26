@@ -683,7 +683,6 @@
 			object.representedNodeIdentifier = subnode.identifier;
 			object.location = (id)path;         // TODO: probably will have to use document scoped bookmark here
 			object.name = subnode.name;
-#warning Peter, please confirm that parserIdentifier on the IMBObject is meant to be the identifier property on parser  
 			object.parserIdentifier = [self identifier];
 			object.index = index++;
 			
