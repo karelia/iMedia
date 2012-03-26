@@ -51,6 +51,7 @@
 
 
 @class IMBTextFieldCell;
+@class IMBNode;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,6 +66,9 @@
 
 @property (retain) NSString* draggingPrompt;
 @property (retain) IMBTextFieldCell* textCell;
+
+- (IMBNode*) nodeAtRow:(NSInteger)inRow;
+- (void) showProgressWheels;
 
 @end
 
