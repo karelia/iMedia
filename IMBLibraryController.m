@@ -299,12 +299,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 							{
 								[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
 							}
-
-							// JUST TEMP:
-							if (!node.isLeaf)
-							{
-								[self performSelector:@selector(populateNode:) withObject:node afterDelay:0.1];
-							}
 						}
 					}
 				});		
@@ -434,15 +428,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
 				{
 					[_delegate libraryController:self didPopulateNode:inNewNode];
-				}
-
-				// JUST TEMP:
-				for (IMBNode* node in inNewNode.subnodes)
-				{
-					if (!node.isLeaf)
-					{
-						[self performSelector:@selector(populateNode:) withObject:node afterDelay:0.1];
-					}
 				}
 			}
 		});		
