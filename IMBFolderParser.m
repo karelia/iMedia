@@ -242,7 +242,7 @@
 			
 			else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
 			{
-				IMBObject* object = [self objectForPath:path name:localizedName index:index++];
+				IMBObject* object = [self objectForURL:url name:localizedName index:index++];
 				[objects addObject:object];
 				inNode.displayedObjectCount++;
 			}
@@ -282,13 +282,13 @@
 
 			IMBNodeObject* object = [[IMBNodeObject alloc] init];
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)path;
+			object.location = (id)url;
 			object.name = name;
 			object.metadata = nil;
 			object.parserIdentifier = self.identifier;
 			object.index = index++;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; 
-			object.imageLocation = path;
+			object.imageLocation = (id)url;
 			object.imageRepresentation = icon;
 			[objects addObject:object];
 			[object release];
@@ -588,16 +588,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
+- (IMBObject*) objectForURL:(NSString*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
 {
 	IMBObject* object = [[[IMBObject alloc] init] autorelease];
-	object.location = (id)inPath;
+	object.location = (id)inURL;
 	object.name = inName;
 	object.parserIdentifier = self.identifier;
 	object.index = inIndex;
 	
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
-	object.imageLocation = inPath;
+	object.imageLocation = inURL;
 	object.imageRepresentation = nil;		// will be loaded lazily when needed
 	object.metadata = nil;					// will be loaded lazily when needed
 	

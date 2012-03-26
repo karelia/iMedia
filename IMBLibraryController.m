@@ -274,7 +274,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
 			}
 			
-			XPCPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodes:),nil,
+			SBPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodes:),nil,
 			
 				^(NSArray* inNodes,NSError* inError)
 				{
@@ -354,7 +354,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	inOldNode.loading = YES;
 	inOldNode.badgeTypeNormal = kIMBBadgeTypeLoading;
 
-	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNodeTree:error:),inOldNode,
+	SBPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNodeTree:error:),inOldNode,
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
@@ -412,7 +412,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	NSString* parentNodeIdentifier = inNode.parentNode.identifier;
 	IMBParserMessenger* messenger = inNode.parserMessenger;
-	XPCPerformSelectorAsync(messenger.connection,messenger,@selector(populateNode:error:),inNode,
+	SBPerformSelectorAsync(messenger.connection,messenger,@selector(populateNode:error:),inNode,
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{

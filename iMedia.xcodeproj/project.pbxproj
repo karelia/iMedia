@@ -30,10 +30,11 @@
 		30394AC812DC665000ACA531 /* IMBSkimmableObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3043924B130D1DDC00DD1D34 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		305B64C71372EF6C009B53BD /* cork-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CE394AC11371A1F700EF0D1E /* cork-background.jpg */; };
-		3089F949151C8ECB00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F948151C8ECB00D56DC0 /* XPCKit.framework */; };
+		3089F949151C8ECB00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F948151C8ECB00D56DC0 /* XPCKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		3089F94B151C8FDD00D56DC0 /* XPCKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F94C151C91CE00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F94D151C91E400D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		3089F9791520BD6900D56DC0 /* IMBiPhotoEventNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */; };
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771E1511055900413AEF /* SBUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E7771C1511055800413AEF /* SBUtilities.h */; };
 		30E7771F1511055900413AEF /* SBUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E7771D1511055800413AEF /* SBUtilities.m */; };
@@ -261,15 +262,6 @@
 		D0C2DAF21024178E001B1198 /* IMBObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0C2DB6D1024DBCC001B1198 /* IMBLibraryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */; };
 		D0C2DD0F1025905A001B1198 /* IMBImageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D0C9118815208EBE006655C9 /* IMBNodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993302101197D100C527B7 /* IMBNodeViewController.m */; };
-		D0C9118A15209109006655C9 /* IMBNodeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D049EF5410346C1C003CC49C /* IMBNodeCell.m */; };
-		D0C9118B1520921B006655C9 /* IMBPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E96D1B104410BD0015979F /* IMBPanelController.m */; };
-		D0C9118C152093FA006655C9 /* IMBOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993930101236AB00C527B7 /* IMBOutlineView.m */; };
-		D0C9118D152093FF006655C9 /* IMBPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = F331802511E6D25D00BDABC2 /* IMBPanel.m */; };
-		D0C9118E15209403006655C9 /* IMBTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BE0A8B104802A7009AE844 /* IMBTableView.m */; };
-		D0C9118F15209407006655C9 /* IMBDynamicTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF687181062DAF0005D7E72 /* IMBDynamicTableView.m */; };
-		D0C9119015209415006655C9 /* IMBTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D08C5C9D104862540068FF07 /* IMBTextFieldCell.m */; };
-		D0C9119115209426006655C9 /* IMBButtonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */; };
 		D0CA93E7104917A400725DA3 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0CA93E6104917A400725DA3 /* QTKit.framework */; };
 		D0CA9427104932CD00725DA3 /* IMBiTunesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0CA94C91049455B00725DA3 /* itunes-icon-audiobooks.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94B91049455B00725DA3 /* itunes-icon-audiobooks.png */; };
@@ -1230,8 +1222,8 @@
 				D0E96C34151324F6004F3EE7 /* IMBObject.m */,
 				D010384A10714CB3007C88D7 /* IMBNodeObject.h */,
 				D010384B10714CB3007C88D7 /* IMBNodeObject.m */,
-				D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */,
-				D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */,
+				30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */,
+				30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */,
 				CEA8A04912D3EC70008CD7CB /* IMBSmartFolderNodeObject.h */,
 				CEA8A04A12D3EC70008CD7CB /* IMBSmartFolderNodeObject.m */,
 				D01038E21071E111007C88D7 /* IMBObjectFifoCache.h */,
@@ -1503,10 +1495,10 @@
 				D09930B81010F6C100C527B7 /* IMBNodeOld.m */,
 				D09930B91010F6C100C527B7 /* IMBObjectOld.h */,
 				D09930BA1010F6C100C527B7 /* IMBObjectOld.m */,
+				D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */,
+				D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */,
 				D032CB78109A2F4A00D84782 /* IMBMovieObject.h */,
 				D032CB79109A2F4A00D84782 /* IMBMovieObject.m */,
-				30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */,
-				30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */,
 				D04FFEB9103BE81600104EB8 /* IMBObjectsPromise.h */,
 				D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */,
 				D0103889107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h */,
@@ -1948,6 +1940,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3089F9791520BD6900D56DC0 /* IMBiPhotoEventNodeObject.m in Sources */,
 				D09931EB1011132300C527B7 /* IMBCommon.m in Sources */,
 				D09931A910110E8900C527B7 /* IMBConfig.m in Sources */,
 				D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */,
@@ -1990,15 +1983,6 @@
 				D0B3137A151CA594003CB231 /* IMBiPhotoImageParser.m in Sources */,
 				D0B3137B151CA594003CB231 /* IMBiPhotoMovieParser.m in Sources */,
 				D0B3137C151CA594003CB231 /* IMBAppleMediaParser.m in Sources */,
-				D0C9118815208EBE006655C9 /* IMBNodeViewController.m in Sources */,
-				D0C9118A15209109006655C9 /* IMBNodeCell.m in Sources */,
-				D0C9118B1520921B006655C9 /* IMBPanelController.m in Sources */,
-				D0C9118C152093FA006655C9 /* IMBOutlineView.m in Sources */,
-				D0C9118D152093FF006655C9 /* IMBPanel.m in Sources */,
-				D0C9118E15209403006655C9 /* IMBTableView.m in Sources */,
-				D0C9118F15209407006655C9 /* IMBDynamicTableView.m in Sources */,
-				D0C9119015209415006655C9 /* IMBTextFieldCell.m in Sources */,
-				D0C9119115209426006655C9 /* IMBButtonObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

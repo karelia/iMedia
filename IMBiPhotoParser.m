@@ -54,6 +54,7 @@
 
 #import "IMBiPhotoParser.h"
 #import "IMBNode.h"
+#import "IMBiPhotoEventNodeObject.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSString+iMedia.h"
@@ -598,11 +599,11 @@
 
 - (void) populateEventsNode:(IMBNode*)inNode withEvents:(NSArray*)inEvents images:(NSDictionary*)inImages
 {
-/*	
+	
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
 	
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
@@ -654,7 +655,7 @@
 			
 			// Add the new subnode to its parent (inRootNode)...
 
-			[subNodes addObject:subnode];
+			[subnodes addObject:subnode];
 			
 			// Now create the visual object and link it to subnode just created...
 
@@ -680,20 +681,19 @@
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)path;
-			object.name = subNode.name;
-			object.parser = self;
+			object.location = (id)path;         // TODO: probably will have to use document scoped bookmark here
+			object.name = subnode.name;
+			object.parserIdentifier = [self identifier];
 			object.index = index++;
 			
-			object.imageLocation = [self imageLocationForObject:keyPhotoDict];
+			object.imageLocation = [self imageLocationForObject:keyPhotoDict];  // TODO: probably will have to use document scoped bookmark here
 			object.imageRepresentationType = [self requestedImageRepresentationType];
 			object.imageRepresentation = nil;
 		}
 		[pool drain];
 	}	
-	inNode.subNodes = subNodes;
 	inNode.objects = objects;
-*/	
+	
 }
 
 

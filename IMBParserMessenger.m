@@ -169,12 +169,12 @@
 
 // Create the connection lazily when needed...
 
-- (XPCConnection*) connection
+- (id) connection
 {
 	if (_connection == nil && SBIsSandboxed())
 	{
 		NSString* identifier = [[self class] xpcSerivceIdentifier];
-		_connection = [[XPCConnection alloc] initWithServiceName:identifier];
+		_connection = [[NSClassFromString(@"XPCConnection") alloc] initWithServiceName:identifier];
 	}
 	
 	return _connection;

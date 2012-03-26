@@ -76,7 +76,7 @@
 // Helpers...
 
 - (NSUInteger) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError;
-- (IMBObject*) objectForPath:(NSString*)inPath name:(NSString*)inName index:(NSUInteger)inIndex;
+- (IMBObject*) objectForURL:(NSURL*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
 
 @end
 
