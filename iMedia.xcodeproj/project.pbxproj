@@ -262,6 +262,13 @@
 		D0C2DAF21024178E001B1198 /* IMBObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0C2DB6D1024DBCC001B1198 /* IMBLibraryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0C2DB6C1024DBCC001B1198 /* IMBLibraryView.xib */; };
 		D0C2DD0F1025905A001B1198 /* IMBImageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0C911BF1520CFEE006655C9 /* IMBPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E96D1B104410BD0015979F /* IMBPanelController.m */; };
+		D0C911C11520CFF3006655C9 /* IMBNodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993302101197D100C527B7 /* IMBNodeViewController.m */; };
+		D0C911C21520D00A006655C9 /* IMBButtonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */; };
+		D0C911C31520D016006655C9 /* IMBNodeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D049EF5410346C1C003CC49C /* IMBNodeCell.m */; };
+		D0C911C41520D3D2006655C9 /* IMBPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = F331802511E6D25D00BDABC2 /* IMBPanel.m */; };
+		D0C911C51520D3DB006655C9 /* IMBOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993930101236AB00C527B7 /* IMBOutlineView.m */; };
+		D0C911C61520D3FC006655C9 /* IMBTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D08C5C9D104862540068FF07 /* IMBTextFieldCell.m */; };
 		D0CA93E7104917A400725DA3 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0CA93E6104917A400725DA3 /* QTKit.framework */; };
 		D0CA9427104932CD00725DA3 /* IMBiTunesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0CA94C91049455B00725DA3 /* itunes-icon-audiobooks.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94B91049455B00725DA3 /* itunes-icon-audiobooks.png */; };
@@ -1222,6 +1229,8 @@
 				D0E96C34151324F6004F3EE7 /* IMBObject.m */,
 				D010384A10714CB3007C88D7 /* IMBNodeObject.h */,
 				D010384B10714CB3007C88D7 /* IMBNodeObject.m */,
+				D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */,
+				D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */,
 				30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */,
 				30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */,
 				CEA8A04912D3EC70008CD7CB /* IMBSmartFolderNodeObject.h */,
@@ -1495,8 +1504,6 @@
 				D09930B81010F6C100C527B7 /* IMBNodeOld.m */,
 				D09930B91010F6C100C527B7 /* IMBObjectOld.h */,
 				D09930BA1010F6C100C527B7 /* IMBObjectOld.m */,
-				D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */,
-				D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */,
 				D032CB78109A2F4A00D84782 /* IMBMovieObject.h */,
 				D032CB79109A2F4A00D84782 /* IMBMovieObject.m */,
 				D04FFEB9103BE81600104EB8 /* IMBObjectsPromise.h */,
@@ -1983,6 +1990,13 @@
 				D0B3137A151CA594003CB231 /* IMBiPhotoImageParser.m in Sources */,
 				D0B3137B151CA594003CB231 /* IMBiPhotoMovieParser.m in Sources */,
 				D0B3137C151CA594003CB231 /* IMBAppleMediaParser.m in Sources */,
+				D0C911BF1520CFEE006655C9 /* IMBPanelController.m in Sources */,
+				D0C911C11520CFF3006655C9 /* IMBNodeViewController.m in Sources */,
+				D0C911C21520D00A006655C9 /* IMBButtonObject.m in Sources */,
+				D0C911C31520D016006655C9 /* IMBNodeCell.m in Sources */,
+				D0C911C41520D3D2006655C9 /* IMBPanel.m in Sources */,
+				D0C911C51520D3DB006655C9 /* IMBOutlineView.m in Sources */,
+				D0C911C61520D3FC006655C9 /* IMBTextFieldCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
