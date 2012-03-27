@@ -232,6 +232,12 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+- (Class) objectClass
+{
+	return [IMBObject class];
+}
+
+
 // Returns the events node that should be subnode of our root node.
 // Returns nil if there is none.
 
