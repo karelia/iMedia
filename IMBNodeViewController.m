@@ -179,9 +179,6 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
 + (void) registerNodeViewControllerClass:(Class)inNodeViewControllerClass forMediaType:(NSString*)inMediaType
 {
 	@synchronized ([self class])
@@ -247,6 +244,27 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
+- (void) dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[self _stopObservingLibraryController];
+	
+	IMBRelease(_libraryController);
+	IMBRelease(_selectedNodeIdentifier);
+	IMBRelease(_expandedNodeIdentifiers);
+	IMBRelease(_standardObjectView);
+	IMBRelease(_customObjectView);
+	IMBRelease(_customHeaderViewControllers);
+	IMBRelease(_customObjectViewControllers);
+	IMBRelease(_customFooterViewControllers);
+	
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void) awakeFromNib
 {
 	// We need to save preferences before tha app quits...
@@ -284,24 +302,6 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	[ibNodePopupButton removeAllItems];
 	[self __updatePopupMenu];
-}
-
-
-- (void) dealloc
-{
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[self _stopObservingLibraryController];
-	
-	IMBRelease(_libraryController);
-	IMBRelease(_selectedNodeIdentifier);
-	IMBRelease(_expandedNodeIdentifiers);
-	IMBRelease(_standardObjectView);
-	IMBRelease(_customObjectView);
-	IMBRelease(_customHeaderViewControllers);
-	IMBRelease(_customObjectViewControllers);
-	IMBRelease(_customFooterViewControllers);
-	
-	[super dealloc];
 }
 
 
@@ -350,12 +350,6 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
-- (NSString*) mediaType
-{
-	return self.libraryController.mediaType;
-}
-
-
 - (void) _startObservingLibraryController
 {
 	[[NSNotificationCenter defaultCenter] 
@@ -386,10 +380,17 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
+- (NSString*) mediaType
+{
+	return self.libraryController.mediaType;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
+#pragma mark Preferences
 
 
 - (NSMutableDictionary*) _preferences
