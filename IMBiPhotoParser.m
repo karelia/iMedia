@@ -171,17 +171,17 @@
 	// Will find Photos node at same index in subnodes as in album list
 	// which offset was it found, in "List of Albums" Array
 
-//	NSUInteger photosNodeIndex = [self indexOfAllPhotosAlbumInAlbumList:albums];
-//	if (inNode.isTopLevelNode && photosNodeIndex != NSNotFound)
-//	{
-//		NSArray* subnodes = inNode.subnodes;
-//		if (photosNodeIndex < [subnodes count])	// Karelia case 136310, make sure offset exists
-//		{
-//			IMBNode* photosNode = [subnodes objectAtIndex:photosNodeIndex];	// assumes subnodes exists same as albums!
-//			[self populateNode:photosNode options:inOptions error:outError];
-//			inNode.objects = photosNode.objects;
-//		}
-//	}
+	NSUInteger photosNodeIndex = [self indexOfAllPhotosAlbumInAlbumList:albums];
+	if (inNode.isTopLevelNode && photosNodeIndex != NSNotFound)
+	{
+		NSArray* subnodes = inNode.subnodes;
+		if (photosNodeIndex < [subnodes count])	// Karelia case 136310, make sure offset exists
+		{
+			IMBNode* photosNode = [subnodes objectAtIndex:photosNodeIndex];	// assumes subnodes exists same as albums!
+			[self populateNode:photosNode error:outError];
+			inNode.objects = photosNode.objects;
+		}
+	}
 	
 	if (outError) *outError = error;
 }
