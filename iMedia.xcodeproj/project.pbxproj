@@ -138,6 +138,13 @@
 		D08109A5151A03E700201850 /* IMBMovieFolderParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = D08109A01519AF5800201850 /* IMBMovieFolderParserMessenger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08109A8151A054E00201850 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
 		D08109A9151A055800201850 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		D08247B11521C8C500033850 /* IMBObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C2DAF11024178E001B1198 /* IMBObjectViewController.m */; };
+		D08247B21521CD6400033850 /* IMBOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930BD1010F6C100C527B7 /* IMBOperationQueue.m */; };
+		D08247B31521CD6E00033850 /* IMBProgressWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D052B0941053B0F700988F53 /* IMBProgressWindowController.m */; };
+		D08247B41521CD9A00033850 /* IMBObjectThumbnailLoadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D010388A107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.m */; };
+		D08247B51521CDA600033850 /* IMBObjectsPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */; };
+		D08247B61521CDDA00033850 /* IMBURLGetSizeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */; };
+		D08247B71521CDDA00033850 /* IMBURLDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */; };
 		D08C5C9E104862540068FF07 /* IMBTextFieldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08E8B701019C916005D8614 /* UKFNSubscribeFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8B721019C916005D8614 /* UKFSEventsWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B6A1019C916005D8614 /* UKFSEventsWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -2055,6 +2062,13 @@
 				D0C911EA15219621006655C9 /* IMBMovieNodeViewController.m in Sources */,
 				D0C911EE1521965C006655C9 /* IMBAudioNodeViewController.m in Sources */,
 				D0C911F2152196FE006655C9 /* IMBLinkNodeViewController.m in Sources */,
+				D08247B11521C8C500033850 /* IMBObjectViewController.m in Sources */,
+				D08247B21521CD6400033850 /* IMBOperationQueue.m in Sources */,
+				D08247B31521CD6E00033850 /* IMBProgressWindowController.m in Sources */,
+				D08247B41521CD9A00033850 /* IMBObjectThumbnailLoadOperation.m in Sources */,
+				D08247B51521CDA600033850 /* IMBObjectsPromise.m in Sources */,
+				D08247B61521CDDA00033850 /* IMBURLGetSizeOperation.m in Sources */,
+				D08247B71521CDDA00033850 /* IMBURLDownloadOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
