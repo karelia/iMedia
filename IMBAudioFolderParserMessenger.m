@@ -322,13 +322,8 @@
 {
 	if ((self = [super init]))
 	{
-		NSArray* libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask,YES);
-		
-		if ([libraryPaths count] > 0)
-		{
-			NSString* libraryPath = [[libraryPaths objectAtIndex:0] stringByAppendingPathComponent:@"Sounds"];
-			self.mediaSource = [NSURL fileURLWithPath:libraryPath];
-		}	
+		NSString* path = [SBHomeDirectory() stringByAppendingPathComponent:@"Library/Sounds"];
+		self.mediaSource = [NSURL fileURLWithPath:path];
 	}
 	
 	return self;

@@ -195,8 +195,8 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 // User Interface...
  
 + (Class) iconViewCellClass;
-- (NSImage*) icon;
-- (NSString*) displayName;
+//- (NSImage*) icon;
+//- (NSString*) displayName;
 + (CALayer*) iconViewBackgroundLayer;
 
 + (NSString*) objectCountFormatSingular;

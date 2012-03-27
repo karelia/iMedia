@@ -125,19 +125,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSImage*) icon
-{
-	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iPhoto"];
-}
-
-- (NSString*) displayName
-{
-	return NSLocalizedStringWithDefaultValue(
-		@"IMBImageViewController.displayName",
-		nil,IMBBundle(),
-		@"Images",
-		@"mediaType display name");
-}
+//- (NSImage*) icon
+//{
+//	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iPhoto"];
+//}
+//
+//- (NSString*) displayName
+//{
+//	return NSLocalizedStringWithDefaultValue(
+//		@"IMBImageViewController.displayName",
+//		nil,IMBBundle(),
+//		@"Images",
+//		@"mediaType display name");
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------

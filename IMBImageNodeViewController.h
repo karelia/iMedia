@@ -68,13 +68,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark CLASSES
+#pragma mark HEADERS
 
-@class IMBLibraryController;
-//@class IMBNodeTreeController;
-@class IMBOutlineView;
-@class IMBParser;
-@class IMBNode;
+#import "IMBNodeViewController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,117 +78,9 @@
 
 #pragma mark 
 
-@interface IMBNodeViewController : NSViewController <NSOutlineViewDataSource,NSOutlineViewDelegate,NSSplitViewDelegate>
-{
-	IMBLibraryController* _libraryController;
-	NSString* _selectedNodeIdentifier;
-	NSMutableArray* _expandedNodeIdentifiers;
-	BOOL _isRestoringState;
-    NSPoint _nodeOutlineViewSavedVisibleRectOrigin;
-	IMBParser* _selectedParser;
-	
-	IBOutlet NSSplitView* ibSplitView;
-	IBOutlet IMBOutlineView* ibNodeOutlineView;
-	IBOutlet NSPopUpButton* ibNodePopupButton;
-	IBOutlet NSView* ibObjectHeaderView;
-	IBOutlet NSView* ibObjectContainerView;
-	IBOutlet NSView* ibObjectFooterView;
-	NSView* _standardObjectView;
-	NSView* _customObjectView;
-	
-	NSMutableDictionary* _customHeaderViewControllers;
-	NSMutableDictionary* _customObjectViewControllers;
-	NSMutableDictionary* _customFooterViewControllers;
-}
-
-+ (void) registerNodeViewControllerClass:(Class)inNodeViewControllerClass forMediaType:(NSString*)inMediaType;
-+ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
-
-// Library...
-
-@property (retain) IMBLibraryController* libraryController;
-@property (readonly) NSString* mediaType;
-
-// Nodes (sourcelist)...
-
-//@property (readonly) IMBNodeTreeController* nodeTreeController;
-@property (readonly) IMBOutlineView* nodeOutlineView;
-@property (readonly) NSPopUpButton* nodePopupButton;
-@property (readonly) NSView* objectHeaderView;
-@property (readonly) NSView* objectContainerView;
-@property (readonly) NSView* objectFooterView;
-@property (retain) NSView* standardObjectView;
-@property (retain) NSView* customObjectView;
-
-@property (retain) NSString* selectedNodeIdentifier;
-@property (retain) NSMutableArray* expandedNodeIdentifiers;
-@property (readonly) IMBNode* selectedNode;
-@property (retain) IMBParser* selectedParser;
-
-- (void) selectNode:(IMBNode*)inNode;
-- (void) expandSelectedNode;
-
-// Context menu support...
-
-- (NSMenu*) menuForNode:(IMBNode*)inNode;
-
-// Actions...
-
-- (BOOL) canReloadNode;
-- (IBAction) reloadNode:(id)inSender;
-
-- (BOOL) canAddNode;
-- (IBAction) addNode:(id)inSender;
-
-- (BOOL) canRemoveNode;
-- (IBAction) removeNode:(id)inSender;
-
-// User interface...
-
-- (NSImage*) icon;
-- (NSString*) displayName;
-
-- (void) installObjectViewForNode:(IMBNode*)inNode;
-- (NSSize) minimumViewSize;
-
-// Saving/Restoring state...
-
-- (void) restoreState;	
-- (void) saveState;	
-
-// These methods work via notification and affect all instances of IMBNodeViewController...
-
-+ (void) revealNodeWithIdentifier:(NSString*)inIdentifier;
-+ (void) selectNodeWithIdentifier:(NSString*)inIdentifier;
-
-// Use this method in your host app to tell the current object view (icon, list, or combo view)
-// that it needs to re-display itself (e.g. when a badge on an image needs to be updated)
-
-- (void) setObjectContainerViewNeedsDisplay:(BOOL)inFlag;
-
+@interface IMBImageNodeViewController : IMBNodeViewController
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@protocol IMBNodeViewControllerDelegate
-
-@optional
-
-// The delegate can supply its own object view controllers for certain nodes. 
-// If it chooses to do so, this overrides everything else...
-
-- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode;
-- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode;
-- (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-

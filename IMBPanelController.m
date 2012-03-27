@@ -205,7 +205,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 {
 	if (self = [super initWithWindowNibName:@"IMBPanel"])
 	{
-		self.nodeViewControllers = [NSMutableArray array];
+		self.nodeViewControllers = [NSMutableDictionary dictionary];
 		self.loadedLibraries = [NSMutableDictionary dictionary];
 		
 		[[NSNotificationCenter defaultCenter] 
@@ -259,7 +259,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		// Create the top-level view controller (IMBNodeViewController) for each media type...
 		
 		nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
-		[self.nodeViewControllers addObject:nodeViewController];
+		[self.nodeViewControllers setObject:nodeViewController forKey:mediaType];
 		
 //		Class ovc = [sRegisteredViewControllerClasses objectForKey:mediaType];
 //		objectViewController = (IMBObjectViewController*) [ovc viewControllerForLibraryController:libraryController];
@@ -276,19 +276,11 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 }
 
 
-// Walk through the array and retrieve the correct controller...
+// Retrieve the correct controller...
 
 - (IMBNodeViewController*) nodeViewControllerForMediaType:(NSString*)inMediaType
 {
-	for (IMBNodeViewController* controller in self.nodeViewControllers)
-	{
-		if ([controller.mediaType isEqualToString:inMediaType])
-		{
-			return controller;
-		}
-	}
-	
-	return nil;
+	return [self.nodeViewControllers objectForKey:inMediaType];
 }
 
 
@@ -297,7 +289,12 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (void) windowDidLoad
 {
-    // There's generally no need for the media browser to be key window
+	// Make sure that add tabs to the window doesn't trigger premature library loading. We want to do this lazily...
+	
+	_isLoadingWindow = YES;
+	
+    // There's generally no need for the media browser to be key window...
+	
     [(NSPanel*)self.window setBecomesKeyOnlyIfNeeded:YES];
     
 	[ibTabView setDelegate:self];
@@ -336,10 +333,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	NSSize largestMinimumSize = NSMakeSize(0,0);
 	
-	for (IMBNodeViewController* nodeViewController in self.nodeViewControllers)
+	for (NSString* mediaType in self.nodeViewControllers)
 	{
-//		IMBNodeViewController* nodeViewController = objectViewController.nodeViewController;
-		NSString* mediaType = nodeViewController.mediaType;
+		IMBNodeViewController* nodeViewController = [_nodeViewControllers objectForKey:mediaType];
 		NSView* nodeView = [nodeViewController view];
 		[nodeView setFrame:[ibTabView bounds]];
 		
@@ -378,6 +374,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		
 	// Restore window size and selected tab...
 	
+	_isLoadingWindow = NO;
+
 	[self.window setContentMinSize:largestMinimumSize];
 	[self restoreStateFromPreferences];
 }
@@ -682,20 +680,12 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (NSToolbarItem*) toolbar:(NSToolbar*)inToolbar itemForItemIdentifier:(NSString*)inIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
-	NSImage* icon = nil;
-	NSString* name = nil;
-	
-	for (IMBNodeViewController* nodeViewControllers in self.nodeViewControllers)
-	{
-		if ([nodeViewControllers.mediaType isEqualToString:inIdentifier])
-		{
-			#warning TODO
-//			name = [nodeViewControllers displayName];
-//			icon = [nodeViewControllers icon];
-			[icon setScalesWhenResized:YES];
-			[icon setSize:NSMakeSize(32,32)];
-		}
-	}
+	IMBNodeViewController* nodeViewController = [self nodeViewControllerForMediaType:inIdentifier];
+
+	NSString* name = [nodeViewController displayName];
+	NSImage* icon = [nodeViewController icon];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(32,32)];
 
 	NSToolbarItem* item = [[[NSToolbarItem alloc] initWithItemIdentifier:inIdentifier] autorelease];
 	if (icon) [item setImage:icon];
@@ -740,37 +730,40 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (void) tabView:(NSTabView*)inTabView willSelectTabViewItem:(NSTabViewItem*)inTabViewItem
 {
-	self.oldMediaType = inTabView.selectedTabViewItem.identifier;
-	NSString* newMediaType = inTabViewItem.identifier;
-
-	// If the library for the new tab has been loaded yet then do it now...
-	
-	if ([_loadedLibraries objectForKey:newMediaType] == nil)
+	if (!_isLoadingWindow)
 	{
-		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:newMediaType];
-		[libraryController reload];
-		[_loadedLibraries setObject:newMediaType forKey:newMediaType];
-	}
-	
-	// Notify the controllers...
+		self.oldMediaType = inTabView.selectedTabViewItem.identifier;
+		NSString* newMediaType = inTabViewItem.identifier;
 
-#warning TODO
-//	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
-//	[oldController willHideView];
-//
-//	IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
-//	[newController willShowView];
+		// If the library for the new tab has been loaded yet then do it now...
 		
-	// Notify the delegate...
+		if ([_loadedLibraries objectForKey:newMediaType] == nil)
+		{
+			IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:newMediaType];
+			[libraryController reload];
+			[_loadedLibraries setObject:newMediaType forKey:newMediaType];
+		}
+		
+		// Notify the controllers...
 
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willHidePanelForMediaType:)])
-	{
-		[_delegate panelController:self willHidePanelForMediaType:_oldMediaType];
-	}
+		#warning TODO
+//		IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
+//		[oldController willHideView];
+//
+//		IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
+//		[newController willShowView];
+		
+		// Notify the delegate...
 
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willShowPanelForMediaType:)])
-	{
-		[_delegate panelController:self willShowPanelForMediaType:newMediaType];
+		if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willHidePanelForMediaType:)])
+		{
+			[_delegate panelController:self willHidePanelForMediaType:_oldMediaType];
+		}
+
+		if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willShowPanelForMediaType:)])
+		{
+			[_delegate panelController:self willShowPanelForMediaType:newMediaType];
+		}
 	}
 }
 
@@ -783,7 +776,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	[ibToolbar setSelectedItemIdentifier:newMediaType];
 	// Notify the controllers...
 
-#warning TODO
+	#warning TODO
 //	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
 //	[oldController didHideView];
 //

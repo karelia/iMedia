@@ -81,6 +81,14 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark GLOBALS
+
+static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 // Private methods...
@@ -139,6 +147,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+
 // Set default preferences to make sure that group nodes are initially expanded and the user sees all root nodes...
 
 + (void) initialize
@@ -172,6 +182,43 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (void) registerNodeViewControllerClass:(Class)inNodeViewControllerClass forMediaType:(NSString*)inMediaType
+{
+	@synchronized ([self class])
+	{
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		
+		if (sRegisteredNodeViewControllerClasses == nil)
+		{
+			sRegisteredNodeViewControllerClasses = [[NSMutableDictionary alloc] init];
+		}
+		
+		[sRegisteredNodeViewControllerClasses setObject:inNodeViewControllerClass forKey:inMediaType];
+		
+		[pool drain];
+	}
+}
+
+
++ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
+{
+	// Create a viewController of appropriate class type...
+	
+	NSString* mediaType = inLibraryController.mediaType;
+	Class nodeViewControllerClass = [sRegisteredNodeViewControllerClasses objectForKey:mediaType];
+	IMBNodeViewController* controller = [[[nodeViewControllerClass alloc] initWithNibName:[self nibName] bundle:[self bundle]] autorelease];
+
+	// Load the view *before* setting the libraryController, so that outlets are set before we load the preferences...
+
+	[controller view];										
+	controller.libraryController = inLibraryController;		
+	return controller;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 + (NSBundle*) bundle
 {
 	return [NSBundle bundleForClass:[self class]];
@@ -181,15 +228,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 + (NSString*) nibName
 {
 	return @"IMBLibraryView";
-}
-
-
-+ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
-{
-	IMBNodeViewController* controller = [[[self alloc] initWithNibName:[self nibName] bundle:[self bundle]] autorelease];
-	[controller view];										// Load the view *before* setting the libraryController, 
-	controller.libraryController = inLibraryController;		// so that outlets are set before we load the preferences.
-	return controller;
 }
 
 
@@ -1293,7 +1331,22 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 
 #pragma mark 
-#pragma mark Object Views
+#pragma mark User Interface
+
+
+- (NSImage*) icon
+{
+	return nil;	// Must be overridden by subclass
+}
+
+
+- (NSString*) displayName
+{
+	return nil;	// Must be overridden by subclass
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (void) installObjectViewForNode:(IMBNode*)inNode
