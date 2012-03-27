@@ -133,15 +133,22 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 @synthesize libraryController = _libraryController;
 @synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
 @synthesize expandedNodeIdentifiers = _expandedNodeIdentifiers;
-@synthesize selectedParser = _selectedParser;
+//@synthesize selectedParser = _selectedParser;
 
 @synthesize nodeOutlineView = ibNodeOutlineView;
 @synthesize nodePopupButton = ibNodePopupButton;
-@synthesize objectHeaderView = ibObjectHeaderView;
+@synthesize headerContainerView = ibHeaderContainerView;
 @synthesize objectContainerView = ibObjectContainerView;
-@synthesize objectFooterView = ibObjectFooterView;
-@synthesize standardObjectView = _standardObjectView;
-@synthesize customObjectView = _customObjectView;
+@synthesize footerContainerView = ibFooterContainerView;
+//@synthesize standardObjectView = _standardObjectView;
+//@synthesize customObjectView = _customObjectView;
+
+@synthesize standardHeaderViewController = _standardHeaderViewController;
+@synthesize standardObjectViewController = _standardObjectViewController;
+@synthesize standardFooterViewController = _standardFooterViewController;
+@synthesize headerViewController = _headerViewController;
+@synthesize objectViewController = _objectViewController;
+@synthesize footerViewController = _footerViewController;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -252,11 +259,18 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	IMBRelease(_libraryController);
 	IMBRelease(_selectedNodeIdentifier);
 	IMBRelease(_expandedNodeIdentifiers);
-	IMBRelease(_standardObjectView);
-	IMBRelease(_customObjectView);
-	IMBRelease(_customHeaderViewControllers);
-	IMBRelease(_customObjectViewControllers);
-	IMBRelease(_customFooterViewControllers);
+//	IMBRelease(_standardObjectView);
+//	IMBRelease(_customObjectView);
+//	IMBRelease(_customHeaderViewControllers);
+//	IMBRelease(_customObjectViewControllers);
+//	IMBRelease(_customFooterViewControllers);
+
+	IMBRelease(_standardHeaderViewController);
+	IMBRelease(_standardObjectViewController);
+	IMBRelease(_standardFooterViewController);
+	IMBRelease(_headerViewController);
+	IMBRelease(_objectViewController);
+	IMBRelease(_footerViewController);
 	
 	[super dealloc];
 }
@@ -380,9 +394,24 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (NSString*) mediaType
 {
 	return self.libraryController.mediaType;
+}
+
+
+- (NSImage*) icon
+{
+	return nil;	// Must be overridden by subclass
+}
+
+
+- (NSString*) displayName
+{
+	return nil;	// Must be overridden by subclass
 }
 
 
@@ -670,9 +699,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 			[ibNodeOutlineView showProgressWheels];
 		}
 
-//		// If the node has a custom object view, then install it now...
-//		
-//		[self installObjectViewForNode:newNode];
+		// Install the object view controller...
+		
+		[self installObjectViewForNode:newNode];
 		
 //		// If a completely different parser was selected, then notify the previous parser, that it is most
 //		// likely no longer needed any can get rid of its cached data...
@@ -1011,7 +1040,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 			// Not redundant! Needed if selection doesn't change due to previous line!
 			[self.libraryController populateNode:inNode]; 
 //			[self installCustomObjectView:[inNode customObjectView]];
-//			[self installObjectViewForNode:inNode];
+			[self installObjectViewForNode:inNode];
 		}
 	}	
 	else
@@ -1332,115 +1361,108 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 
 #pragma mark 
-#pragma mark User Interface
-
-
-- (NSImage*) icon
-{
-	return nil;	// Must be overridden by subclass
-}
-
-
-- (NSString*) displayName
-{
-	return nil;	// Must be overridden by subclass
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
+#pragma mark Object View
 
 
 - (void) installObjectViewForNode:(IMBNode*)inNode
 {
+	IMBNode* node = self.selectedNode;
+	IMBParserMessenger* parserMessenger = node.parserMessenger;
+
 //	NSViewController* headerViewController = [self _customHeaderViewControllerForNode:inNode];
 //	NSViewController* objectViewController = [self _customObjectViewControllerForNode:inNode];
 //	NSViewController* footerViewController = [self _customFooterViewControllerForNode:inNode];
-//	
-//	NSView* headerView = nil;
-//	NSView* objectView = nil;
-//	NSView* footerView = nil;
-//	
-//	CGFloat totalHeight = ibObjectContainerView.superview.frame.size.height;
-//	CGFloat headerHeight = 0.0;
-//	CGFloat footerHeight = 0.0;
-//	
-//	// First remove all currently installed object views...
-//	
-//	[ibObjectHeaderView imb_removeAllSubviews];
-//	[ibObjectContainerView imb_removeAllSubviews];
-//	[ibObjectFooterView imb_removeAllSubviews];
-//	
-//	// Install optional header view...
-//	
-//	if (headerViewController != nil)
-//	{
-//		headerView = [headerViewController view];
-//		headerHeight = headerView.frame.size.height;
-//	}
-//
-//	NSRect headerFrame = ibObjectHeaderView.frame;
-//	headerFrame.origin.y = NSMaxY(headerFrame) - headerHeight;
-//	headerFrame.size.height = headerHeight;
-//	ibObjectHeaderView.frame = headerFrame;
-//
-//	if (headerView)
-//	{		
-//		[headerView setFrameSize:headerFrame.size];
-//		[ibObjectHeaderView addSubview:headerView];
-//	}
-//			
-//	// Install optional footer view...
-//	
-//	if (footerViewController != nil)
-//	{
-//		NSView* footerView = [footerViewController view];
-//		footerHeight = footerView.frame.size.height;
-//	}
-//	
-//	NSRect footerFrame = ibObjectFooterView.frame;
-//	footerFrame.origin.y = NSMaxY(footerFrame) - footerHeight;
-//	footerFrame.size.height = footerHeight;
-//	ibObjectFooterView.frame = footerFrame;
-//
-//	if (footerView)
-//	{
-//		[footerView setFrameSize:footerFrame.size];
-//		[footerView addSubview:footerView];
-//	}
-//
-//	// Finally install the object view itself (unless told not to)...
-//	
-//	BOOL shouldDisplayObjectView = YES;
-//	if (inNode) shouldDisplayObjectView = inNode.shouldDisplayObjectView;
-//	
-//	if (shouldDisplayObjectView)
-//	{
-//		if (objectViewController != nil)
-//		{
-//			objectView = [objectViewController view];
-//		}
-//		else
-//		{
-//			objectView = self.standardObjectView;
-//		}
-//			
-//		NSRect objectFrame = ibObjectContainerView.frame;
-//		objectFrame.size.height = totalHeight - headerHeight - footerHeight;
-//		objectFrame.origin.y = footerHeight;
-//		ibObjectContainerView.frame = objectFrame;
-//
-//		if (objectView)
-//		{
-//			[objectView setFrame:[ibObjectContainerView bounds]];
-//			[ibObjectContainerView addSubview:objectView];
-//		}
-//		
-//		[ibObjectContainerView setHidden:NO];
-//	}
-//	else
-//	{
-//		[ibObjectContainerView setHidden:YES];
-//	}
+	
+	NSViewController* headerViewController = [parserMessenger customHeaderViewControllerForNode:node];
+	if (headerViewController == nil) headerViewController = self.standardHeaderViewController;
+	self.headerViewController = headerViewController;
+	
+	NSViewController* objectViewController = [parserMessenger customObjectViewControllerForNode:node];
+	if (objectViewController == nil) objectViewController = self.standardObjectViewController;
+	self.objectViewController = objectViewController;
+	
+	NSViewController* footerViewController = [parserMessenger customFooterViewControllerForNode:node];
+	if (footerViewController == nil) footerViewController = self.standardFooterViewController;
+	self.footerViewController = footerViewController;
+	
+	NSView* headerView = nil;
+	NSView* objectView = nil;
+	NSView* footerView = nil;
+	
+	CGFloat totalHeight = ibObjectContainerView.superview.frame.size.height;
+	CGFloat headerHeight = 0.0;
+	CGFloat footerHeight = 0.0;
+	
+	// First remove all currently installed object views...
+	
+	[ibHeaderContainerView imb_removeAllSubviews];
+	[ibObjectContainerView imb_removeAllSubviews];
+	[ibFooterContainerView imb_removeAllSubviews];
+	
+	// Install optional header view...
+	
+	if (headerViewController != nil)
+	{
+		headerView = [headerViewController view];
+		headerHeight = headerView.frame.size.height;
+	}
+
+	NSRect headerFrame = ibHeaderContainerView.frame;
+	headerFrame.origin.y = NSMaxY(headerFrame) - headerHeight;
+	headerFrame.size.height = headerHeight;
+	ibHeaderContainerView.frame = headerFrame;
+
+	if (headerView)
+	{		
+		[headerView setFrameSize:headerFrame.size];
+		[ibHeaderContainerView addSubview:headerView];
+	}
+			
+	// Install optional footer view...
+	
+	if (footerViewController != nil)
+	{
+		footerView = [footerViewController view];
+		footerHeight = footerView.frame.size.height;
+	}
+	
+	NSRect footerFrame = ibFooterContainerView.frame;
+	footerFrame.origin.y = NSMaxY(footerFrame) - footerHeight;
+	footerFrame.size.height = footerHeight;
+	ibFooterContainerView.frame = footerFrame;
+
+	if (footerView)
+	{
+		[footerView setFrameSize:footerFrame.size];
+		[ibFooterContainerView addSubview:footerView];
+	}
+
+	// Finally install the object view itself (unless told not to)...
+	
+	BOOL shouldDisplayObjectView = YES;
+	if (inNode) shouldDisplayObjectView = inNode.shouldDisplayObjectView;
+	
+	if (objectViewController != nil && shouldDisplayObjectView)
+	{
+		objectView = [objectViewController view];
+
+		NSRect objectFrame = ibObjectContainerView.frame;
+		objectFrame.size.height = totalHeight - headerHeight - footerHeight;
+		objectFrame.origin.y = footerHeight;
+		ibObjectContainerView.frame = objectFrame;
+
+		if (objectView)
+		{
+			[objectView setFrame:[ibObjectContainerView bounds]];
+			[ibObjectContainerView addSubview:objectView];
+		}
+		
+		[ibObjectContainerView setHidden:NO];
+	}
+	else
+	{
+		[ibObjectContainerView setHidden:YES];
+	}
 }
 
 
