@@ -654,7 +654,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
 		
 		// JUST TEMP:
-		[self logNodes];
+//		[self logNodes];
+
+		if (inNewNode)
+		{
+			NSString* description = [inNewNode description];
+			NSLog(@"-------------------------------------------------------------------------------\n\n%@\n\n",description);
+		}	
 	}
 }
 
