@@ -269,6 +269,14 @@
 		D0C911C51520D3DB006655C9 /* IMBOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0993930101236AB00C527B7 /* IMBOutlineView.m */; };
 		D0C911C61520D3FC006655C9 /* IMBTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D08C5C9D104862540068FF07 /* IMBTextFieldCell.m */; };
 		D0C911C815210390006655C9 /* ObjectiveFlickr.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D0C911C71521038F006655C9 /* ObjectiveFlickr.framework */; };
+		D0C911E5152195B2006655C9 /* IMBImageNodeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C911E3152195B2006655C9 /* IMBImageNodeViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0C911E6152195B2006655C9 /* IMBImageNodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C911E4152195B2006655C9 /* IMBImageNodeViewController.m */; };
+		D0C911E915219621006655C9 /* IMBMovieNodeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C911E715219621006655C9 /* IMBMovieNodeViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0C911EA15219621006655C9 /* IMBMovieNodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C911E815219621006655C9 /* IMBMovieNodeViewController.m */; };
+		D0C911ED1521965C006655C9 /* IMBAudioNodeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C911EB1521965C006655C9 /* IMBAudioNodeViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0C911EE1521965C006655C9 /* IMBAudioNodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C911EC1521965C006655C9 /* IMBAudioNodeViewController.m */; };
+		D0C911F1152196FE006655C9 /* IMBLinkNodeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C911EF152196FD006655C9 /* IMBLinkNodeViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0C911F2152196FE006655C9 /* IMBLinkNodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C911F0152196FD006655C9 /* IMBLinkNodeViewController.m */; };
 		D0CA93E7104917A400725DA3 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0CA93E6104917A400725DA3 /* QTKit.framework */; };
 		D0CA9427104932CD00725DA3 /* IMBiTunesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0CA94C91049455B00725DA3 /* itunes-icon-audiobooks.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CA94B91049455B00725DA3 /* itunes-icon-audiobooks.png */; };
@@ -717,6 +725,14 @@
 		D0C2DD0C1025905A001B1198 /* IMBImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageViewController.m; sourceTree = "<group>"; };
 		D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageViewController.h; sourceTree = "<group>"; };
 		D0C911C71521038F006655C9 /* ObjectiveFlickr.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ObjectiveFlickr.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0C911E3152195B2006655C9 /* IMBImageNodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageNodeViewController.h; sourceTree = "<group>"; };
+		D0C911E4152195B2006655C9 /* IMBImageNodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageNodeViewController.m; sourceTree = "<group>"; };
+		D0C911E715219621006655C9 /* IMBMovieNodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieNodeViewController.h; sourceTree = "<group>"; };
+		D0C911E815219621006655C9 /* IMBMovieNodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieNodeViewController.m; sourceTree = "<group>"; };
+		D0C911EB1521965C006655C9 /* IMBAudioNodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAudioNodeViewController.h; sourceTree = "<group>"; };
+		D0C911EC1521965C006655C9 /* IMBAudioNodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAudioNodeViewController.m; sourceTree = "<group>"; };
+		D0C911EF152196FD006655C9 /* IMBLinkNodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLinkNodeViewController.h; sourceTree = "<group>"; };
+		D0C911F0152196FD006655C9 /* IMBLinkNodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLinkNodeViewController.m; sourceTree = "<group>"; };
 		D0CA93E6104917A400725DA3 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
 		D0CA9425104932CD00725DA3 /* IMBiTunesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiTunesParser.h; sourceTree = "<group>"; };
 		D0CA9426104932CD00725DA3 /* IMBiTunesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiTunesParser.m; sourceTree = "<group>"; };
@@ -1258,6 +1274,14 @@
 				D099333210119F3400C527B7 /* IMBObjectArrayController.m */,
 				D0993303101197D100C527B7 /* IMBNodeViewController.h */,
 				D0993302101197D100C527B7 /* IMBNodeViewController.m */,
+				D0C911E3152195B2006655C9 /* IMBImageNodeViewController.h */,
+				D0C911E4152195B2006655C9 /* IMBImageNodeViewController.m */,
+				D0C911EB1521965C006655C9 /* IMBAudioNodeViewController.h */,
+				D0C911EC1521965C006655C9 /* IMBAudioNodeViewController.m */,
+				D0C911E715219621006655C9 /* IMBMovieNodeViewController.h */,
+				D0C911E815219621006655C9 /* IMBMovieNodeViewController.m */,
+				D0C911EF152196FD006655C9 /* IMBLinkNodeViewController.h */,
+				D0C911F0152196FD006655C9 /* IMBLinkNodeViewController.m */,
 				D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */,
 				D0C2DAF11024178E001B1198 /* IMBObjectViewController.m */,
 				D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */,
@@ -1646,6 +1670,10 @@
 				D081099D1519AF3B00201850 /* IMBAudioFolderParserMessenger.h in Headers */,
 				D08109A5151A03E700201850 /* IMBMovieFolderParserMessenger.h in Headers */,
 				D0E69CD5151C5989002FE181 /* NSKeyedArchiver+iMedia.h in Headers */,
+				D0C911E5152195B2006655C9 /* IMBImageNodeViewController.h in Headers */,
+				D0C911E915219621006655C9 /* IMBMovieNodeViewController.h in Headers */,
+				D0C911ED1521965C006655C9 /* IMBAudioNodeViewController.h in Headers */,
+				D0C911F1152196FE006655C9 /* IMBLinkNodeViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1999,6 +2027,10 @@
 				D0C911C41520D3D2006655C9 /* IMBPanel.m in Sources */,
 				D0C911C51520D3DB006655C9 /* IMBOutlineView.m in Sources */,
 				D0C911C61520D3FC006655C9 /* IMBTextFieldCell.m in Sources */,
+				D0C911E6152195B2006655C9 /* IMBImageNodeViewController.m in Sources */,
+				D0C911EA15219621006655C9 /* IMBMovieNodeViewController.m in Sources */,
+				D0C911EE1521965C006655C9 /* IMBAudioNodeViewController.m in Sources */,
+				D0C911F2152196FE006655C9 /* IMBLinkNodeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

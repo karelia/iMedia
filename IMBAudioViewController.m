@@ -144,19 +144,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSImage*) icon
-{
-	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
-}
-
-- (NSString*) displayName
-{
-	return NSLocalizedStringWithDefaultValue(
-		@"IMBAudioViewController.displayName",
-		nil,IMBBundle(),
-		@"Audio",
-		@"mediaType display name");
-}
+//- (NSImage*) icon
+//{
+//	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
+//}
+//
+//- (NSString*) displayName
+//{
+//	return NSLocalizedStringWithDefaultValue(
+//		@"IMBAudioViewController.displayName",
+//		nil,IMBBundle(),
+//		@"Audio",
+//		@"mediaType display name");
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------

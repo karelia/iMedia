@@ -746,16 +746,16 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSImage*) icon
-{
-	return nil;	// Must be overridden by subclass
-}
-
-
-- (NSString*) displayName
-{
-	return nil;	// Must be overridden by subclass
-}
+//- (NSImage*) icon
+//{
+//	return nil;	// Must be overridden by subclass
+//}
+//
+//
+//- (NSString*) displayName
+//{
+//	return nil;	// Must be overridden by subclass
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------

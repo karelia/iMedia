@@ -124,22 +124,23 @@
 	return @"IMBLinkView";
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSImage*) icon
-{
-	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.Safari"];
-}
-
-- (NSString*) displayName
-{
-	return NSLocalizedStringWithDefaultValue(
-		@"IMBLinkViewController.displayName",
-		nil,IMBBundle(),
-		@"Links",
-		@"mediaType display name");
-}
+//- (NSImage*) icon
+//{
+//	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.Safari"];
+//}
+//
+//- (NSString*) displayName
+//{
+//	return NSLocalizedStringWithDefaultValue(
+//		@"IMBLinkViewController.displayName",
+//		nil,IMBBundle(),
+//		@"Links",
+//		@"mediaType display name");
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------

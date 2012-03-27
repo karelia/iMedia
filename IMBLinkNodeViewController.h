@@ -46,18 +46,12 @@
 
 // Author: Peter Baumgartner
 
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark HEADERS
 
-#import "IMBMovieViewController.h"
-#import "IMBObjectArrayController.h"
-#import "IMBPanelController.h"
-#import "IMBCommon.h"
-#import "IMBConfig.h"
-#import "NSWorkspace+iMedia.h"
+#import "IMBNodeViewController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,111 +59,10 @@
 
 #pragma mark 
 
-@implementation IMBMovieViewController
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-+ (void) load
-{
-	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeMovie];
-}
-
-
-+ (void) initialize
-{
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
-	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeIcon] forKey:@"viewType"];
-	[classDict setObject:[NSNumber numberWithDouble:0.5] forKey:@"iconSize"];
-	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
-	[pool drain];
-}
-
-
-- (void) awakeFromNib
-{
-	[super awakeFromNib];
-
-	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
-		@"name",
-		nil];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-+ (NSString*) mediaType
-{
-	return kIMBMediaTypeMovie;
-}
-
-+ (NSString*) nibName
-{
-	return @"IMBMovieView";
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (NSImage*) icon
-//{
-//	NSBundle* coreTypes = [NSBundle	bundleWithPath:@"/System/Library/CoreServices/CoreTypes.bundle"];
-//	NSString* path = [coreTypes pathForResource:@"ToolbarMovieFolderIcon.icns" ofType:nil];
-//	return [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
-//}
-//
-//
-//- (NSString*) displayName
-//{
-//	return NSLocalizedStringWithDefaultValue(
-//		@"IMBMovieViewController.displayName",
-//		nil,IMBBundle(),
-//		@"Movies",
-//		@"mediaType display name");
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-+ (NSString*) objectCountFormatSingular
-{
-	return NSLocalizedStringWithDefaultValue(
-		@"IMBMovieViewController.countFormatSingular",
-		nil,IMBBundle(),
-		@"%d movie",
-		@"Format string for object count in singluar");
-}
-
-
-+ (NSString*) objectCountFormatPlural
-{
-	return NSLocalizedStringWithDefaultValue(
-		@"IMBMovieViewController.countFormatPlural",
-		nil,IMBBundle(),
-		@"%d movies",
-		@"Format string for object count in plural");
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) willHideView
-{
-	// Pretty nasty hack to make any movie that is currently playing inline stop. So far
-	// I couldn't find anything else that worked, so we'll have to use this for now...
-	
-	[ibIconView mouseDown:nil];			
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+@interface IMBLinkNodeViewController : IMBNodeViewController
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
 

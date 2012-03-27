@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner, Mike Abdullah
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,115 +52,48 @@
 
 #pragma mark HEADERS
 
-#import "IMBCommon.h"
+#import "IMBLinkNodeViewController.h"
+#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-#pragma mark CONSTANTS
-
-extern NSString* kIMBImageBrowserShowTitlesNotification;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark CLASSES
-	
-@class IMBNodeViewController;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-@interface IMBBackgroundImageView : NSImageView
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark 
 
-@interface IMBPanelController : NSWindowController
-{
-	IBOutlet NSTabView* ibTabView;
-	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
-	IBOutlet NSWindow* ibInfoWindow;
-	IBOutlet NSTextView* ibInfoTextView;
-	IBOutlet IMBBackgroundImageView *ibBackgroundImageView;
-	
-	// Items that we will localize from code so we don't need multiple nibs
-	IBOutlet NSTextField* ibGridPrompt;
-	IBOutlet NSTextField* ibToolbarPrompt;
-	IBOutlet NSButton* ibShowTitles;
-	IBOutlet NSPopUpButton* ibToolbarPopup;
-	IBOutlet NSButton* ibSmallSize;
+@implementation IMBLinkNodeViewController
 
-	id _delegate;
-	NSArray* _mediaTypes;
-	NSMutableDictionary* _nodeViewControllers;
-	NSMutableDictionary* _loadedLibraries;
-	NSString* _oldMediaType;
-	BOOL _isLoadingWindow;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) load
+{
+	[self registerNodeViewControllerClass:self forMediaType:kIMBMediaTypeLink];
 }
 
-+ (void) registerObjectViewControllerClass:(Class)inObjectViewControllerClass forMediaType:(NSString*)inMediaType;
 
-+ (IMBPanelController*) sharedPanelController;
-+ (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
-+ (BOOL) isSharedPanelControllerLoaded;
-+ (void) cleanupSharedPanelController;
-
-@property (assign) id delegate;
-@property (retain) NSArray* mediaTypes;
-@property (retain) NSMutableDictionary* nodeViewControllers;
-@property (retain) NSMutableDictionary* loadedLibraries;
-@property (retain) NSString* oldMediaType;
-
-- (void) loadControllers;
-- (IMBNodeViewController*) nodeViewControllerForMediaType:(NSString*)inMediaType;
-- (IBAction) hideWindow:(id)inSender;
-
-- (void) saveStateToPreferences;
-- (void) restoreStateFromPreferences;
-
-- (IBAction) info:(id)sender;
-- (IBAction) flipBack:(id)sender;
-- (BOOL)infoWindowIsVisible;
-- (NSWindow *)infoWindow;
-
-@end
+//----------------------------------------------------------------------------------------------------------------------
 
 
-// By declaring as a category, we:
-//  A)  Don't export an NSTabViewDelegate to host applications (thereby perhaps introducing warnings)
-//  B)  Keep IB able to parse the file
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-@interface IMBPanelController (NSTabViewDelegate) <NSTabViewDelegate>
-@end
-#endif
+- (NSImage*) icon
+{
+	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.Safari"];
+}
+
+
+- (NSString*) displayName
+{
+	return NSLocalizedStringWithDefaultValue(
+		@"IMBLinkViewController.displayName",
+		nil,IMBBundle(),
+		@"Links",
+		@"mediaType display name");
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-@protocol IMBPanelDelegate
-
-@optional
-
-- (BOOL) panelController:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
-- (void) panelController:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
-- (void) panelController:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
-- (void) panelController:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
-- (void) panelController:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
-
 @end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
 
