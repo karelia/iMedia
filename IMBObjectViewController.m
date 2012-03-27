@@ -53,31 +53,31 @@
 #pragma mark HEADERS
 
 #import "IMBObjectViewController.h"
-#import "IMBNodeViewController.h"
+//#import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
-#import "IMBFolderParser.h"
+//#import "IMBFolderParser.h"
 #import "IMBConfig.h"
-#import "IMBParser.h"
+#import "IMBParserMessenger.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBNodeObject.h"
-#import "IMBObjectsPromise.h"
-#import "IMBImageBrowserCell.h"
+//#import "IMBObjectsPromise.h"
+//#import "IMBImageBrowserCell.h"
 #import "IMBProgressWindowController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSView+iMedia.h"
-#import "NSString+iMedia.h"
+//#import "NSString+iMedia.h"
 #import "IMBDynamicTableView.h"
-#import "IMBComboTextCell.h"
-#import "IMBObject.h"
+//#import "IMBComboTextCell.h"
+//#import "IMBObject.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
-#import "IMBQLPreviewPanel.h"
-#import <Carbon/Carbon.h>
-#import "IMBFlickrObject.h"
-#import "IMBFlickrNode.h"
-#import "NSFileManager+iMedia.h"
+//#import "IMBQLPreviewPanel.h"
+//#import <Carbon/Carbon.h>
+//#import "IMBFlickrObject.h"
+//#import "IMBFlickrNode.h"
+//#import "NSFileManager+iMedia.h"
 #import "IMBButtonObject.h"
 
 
@@ -183,7 +183,8 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 @implementation IMBObjectViewController
 
 @synthesize libraryController = _libraryController;
-@synthesize nodeViewController = _nodeViewController;
+@synthesize currentNode = _currentNode;
+//@synthesize nodeViewController = _nodeViewController;
 @synthesize objectArrayController = ibObjectArrayController;
 @synthesize progressWindowController = _progressWindowController;
 
@@ -466,7 +467,8 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	// Other cleanup...
 
 	IMBRelease(_libraryController);
-	IMBRelease(_nodeViewController);
+//	IMBRelease(_nodeViewController);
+	IMBRelease(_currentNode);
 	IMBRelease(_progressWindowController);
 	IMBRelease(_dropDestinationURL);
 	IMBRelease(_clickedObject);
@@ -557,19 +559,6 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IMBNode*) currentNode
-{
-	return [_nodeViewController selectedNode];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Persistence 
-
-
 - (void) setLibraryController:(IMBLibraryController*)inLibraryController
 {
 	id old = _libraryController;
@@ -587,6 +576,19 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+//- (IMBNode*) currentNode
+//{
+//	return [_nodeViewController selectedNode];
+//}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Persistence 
 
 
 - (NSMutableDictionary*) _preferences
@@ -820,13 +822,13 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	_iconSize = inIconSize;
 	[IMBConfig setPrefsValue:[NSNumber numberWithDouble:inIconSize] forKey:@"globalIconSize"];
 	
-	NSSize size = [ibIconView cellSize];
-	IMBParser* parser = self.currentNode.parser;
-	
-	if ([parser respondsToSelector:@selector(didChangeIconSize:objectView:)])
-	{
-		[parser didChangeIconSize:size objectView:ibIconView];
-	}
+//	NSSize size = [ibIconView cellSize];
+//	IMBParser* parser = self.currentNode.parser;
+//	
+//	if ([parser respondsToSelector:@selector(didChangeIconSize:objectView:)])
+//	{
+//		[parser didChangeIconSize:size objectView:ibIconView];
+//	}
 
 	// Update the views. The row height of the combo view needs to be adjusted accordingly...
 	
@@ -1245,11 +1247,11 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	}
 	// Give parser a chance to add menu items...
 	
-	IMBParser* parser = self.currentNode.parser;
+	IMBParserMessenger* parserMessenger = self.currentNode.parserMessenger;
 	
-	if ([parser respondsToSelector:@selector(willShowContextMenu:forObject:)])
+	if ([parserMessenger respondsToSelector:@selector(willShowContextMenu:forObject:)])
 	{
-		[parser willShowContextMenu:menu forObject:inObject];
+		[parserMessenger willShowContextMenu:menu forObject:inObject];
 	}
 	
 	// Give delegate a chance to add custom menu items...
@@ -1267,16 +1269,16 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (IBAction) openInSourceApp:(id)inSender
 {
-	IMBObject* object = (IMBObject*) [inSender representedObject];
-	NSString* path = [object path];
-	NSString* app = nil;
-	
-	if ([object.parser respondsToSelector:@selector(appPath)])
-	{
-		app = [object.parser performSelector:@selector(appPath)];
-	}
-	
-	[[NSWorkspace imb_threadSafeWorkspace] openFile:path withApplication:app];
+//	IMBObject* object = (IMBObject*) [inSender representedObject];
+//	NSString* path = [object path];
+//	NSString* app = nil;
+//	
+//	if ([object.parser respondsToSelector:@selector(appPath)])
+//	{
+//		app = [object.parser performSelector:@selector(appPath)];
+//	}
+//	
+//	[[NSWorkspace imb_threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 
@@ -1305,11 +1307,11 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (IBAction) download:(id)inSender
 {
-	IMBParser* parser = self.currentNode.parser;
-	NSArray* objects = [ibObjectArrayController selectedObjects];
-	IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
-	[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
-    [promise start];
+//	IMBParser* parser = self.currentNode.parser;
+//	NSArray* objects = [ibObjectArrayController selectedObjects];
+//	IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
+//	[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+//    [promise start];
 }
 
 
@@ -1330,18 +1332,18 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (IBAction) openSubNode:(id)inSender
 {
-	IMBNode* node = (IMBNode*)[inSender representedObject];
-	[_nodeViewController expandSelectedNode];
-	[_nodeViewController selectNode:node];
+//	IMBNode* node = (IMBNode*)[inSender representedObject];
+//	[_nodeViewController expandSelectedNode];
+//	[_nodeViewController selectNode:node];
 }
 
 
 - (IBAction) showFiltered:(id)inSender
 {
-	ibObjectFilter = (IMBObjectFilter) [inSender tag];
-	[inSender setState:NSOnState];
-	[[self objectArrayController] rearrangeObjects];
-	[[self nodeViewController] setObjectContainerViewNeedsDisplay:YES];
+//	ibObjectFilter = (IMBObjectFilter) [inSender tag];
+//	[inSender setState:NSOnState];
+//	[[self objectArrayController] rearrangeObjects];
+//	[[self nodeViewController] setObjectContainerViewNeedsDisplay:YES];
 }
 
 
@@ -1369,13 +1371,13 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode
 {
-	if (inSelectedNode)
-	{
-		IMBParser* parser = inSelectedNode.parser;
-		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
-		[promise setDelegate:self completionSelector:@selector(_openLocalURLs:)];
-        [promise start];
-	}
+//	if (inSelectedNode)
+//	{
+//		IMBParser* parser = inSelectedNode.parser;
+//		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
+//		[promise setDelegate:self completionSelector:@selector(_openLocalURLs:)];
+//        [promise start];
+//	}
 }
 
 
@@ -1590,14 +1592,14 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	
 	if (node)
 	{
-		IMBParser* parser = node.parser;
-		NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
-		NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];
-		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
-		promise.destinationDirectoryPath = [inDestination path];
-		
-		[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
-        [promise start];
+//		IMBParser* parser = node.parser;
+//		NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
+//		NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];
+//		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
+//		promise.destinationDirectoryPath = [inDestination path];
+//		
+//		[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
+//        [promise start];
 	}
 }
 
@@ -1727,11 +1729,11 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 		
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
-			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
-			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
-
-			[_nodeViewController expandSelectedNode];
-			[_nodeViewController selectNode:subnode];
+//			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
+//			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
+//
+//			[_nodeViewController expandSelectedNode];
+//			[_nodeViewController selectNode:subnode];
 		}
 		else if ([object isKindOfClass:[IMBButtonObject class]])
 		{
@@ -1810,9 +1812,9 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (NSUInteger) writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
-	IMBNode* node = self.currentNode;
+//	IMBNode* node = self.currentNode;
 	NSUInteger itemsWritten = 0;
-	
+/*	
 	if (node)
 	{
 		NSIndexSet* indexes = [self filteredDraggingIndexes:inIndexes]; 
@@ -1954,9 +1956,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 			}
 		}
 	}
-	
+*/	
 	return itemsWritten;	
 }
+
 
 // IKImageBrowserDataSource method. Calls down to our support method used by combo view and browser view.
 
@@ -2033,6 +2036,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
+/*	
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
 	
 	if (object.metadata == nil)
@@ -2086,6 +2090,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 			}
 		}
 	}
+*/	
 }
 
 
@@ -2294,43 +2299,43 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
-	IMBLibraryController* controller = self.libraryController;
-	id delegate = controller.delegate;
-	BOOL didHandleEvent = NO;
-	
-	if (delegate)
-	{
-		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
-		{
-			IMBNode* node = self.currentNode;
-			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
-		}
-	}
-	
-	if (!didHandleEvent)
-	{
-		NSArray* objects = [ibObjectArrayController arrangedObjects];
-		NSUInteger row = [(NSTableView*)inSender clickedRow];
-		IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
-		
-		if ([object isKindOfClass:[IMBNodeObject class]])
-		{
-			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
-			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
-			
-			[_nodeViewController expandSelectedNode];
-			[_nodeViewController selectNode:subnode];
-		}
-		else if ([object isKindOfClass:[IMBButtonObject class]])
-		{
-			[(IMBButtonObject*)object sendDoubleClickAction];
-		}
-		else
-		{
-			[self openSelectedObjects:inSender];
-		}	
-	}	
+//	IMBLibraryController* controller = self.libraryController;
+//	id delegate = controller.delegate;
+//	BOOL didHandleEvent = NO;
+//	
+//	if (delegate)
+//	{
+//		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
+//		{
+//			IMBNode* node = self.currentNode;
+//			NSArray* objects = [ibObjectArrayController selectedObjects];
+//			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
+//		}
+//	}
+//	
+//	if (!didHandleEvent)
+//	{
+//		NSArray* objects = [ibObjectArrayController arrangedObjects];
+//		NSUInteger row = [(NSTableView*)inSender clickedRow];
+//		IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
+//		
+//		if ([object isKindOfClass:[IMBNodeObject class]])
+//		{
+//			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
+//			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
+//			
+//			[_nodeViewController expandSelectedNode];
+//			[_nodeViewController selectNode:subnode];
+//		}
+//		else if ([object isKindOfClass:[IMBButtonObject class]])
+//		{
+//			[(IMBButtonObject*)object sendDoubleClickAction];
+//		}
+//		else
+//		{
+//			[self openSelectedObjects:inSender];
+//		}	
+//	}	
 }
 
 

@@ -91,7 +91,8 @@ enum
 };
 typedef NSUInteger kIMBObjectViewType;
 
-typedef enum { 
+typedef enum
+{ 
 	kIMBObjectFilterAll = 0,
 	kIMBObjectFilterBadge,
 	kIMBObjectFilterNoBadge
@@ -106,14 +107,15 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 #pragma mark CLASSES
 
+@class IMBNode;
+@class IMBObject;
 @class IMBLibraryController;
 @class IMBNodeViewController;
 @class IMBObjectArrayController;
 @class IMBProgressWindowController;
-@class IMBObject;
-@class IMBNode;
 @class IKImageBrowserView;
 @protocol IMBObjectViewControllerDelegate;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -121,16 +123,11 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 #pragma mark 
 
 
-@interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate, IMBObjectArrayControllerDelegate, NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
-//#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-//<NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
-//#else
-//<NSPasteboardItemDataProvider>
-//#endif
+@interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate,IMBObjectArrayControllerDelegate,NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 {
 	IMBLibraryController* _libraryController;
-	IMBNodeViewController* _nodeViewController;
-	IMBProgressWindowController* _progressWindowController;
+//	IMBNodeViewController* _nodeViewController;
+	IMBNode* _currentNode;
 		
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
 	IBOutlet NSTabView* ibTabView;
@@ -144,18 +141,14 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 	
 	NSString* _objectCountFormatSingular;
 	NSString* _objectCountFormatPlural;
+	NSMutableSet* _observedVisibleItems;
+	
 	BOOL _isDragging;
-	
-	NSMutableSet *_observedVisibleItems;
-	
-	NSURL *_dropDestinationURL;
-	
-	NSIndexSet *_draggedIndexes;	// save the index set of what is dragged (from a table view) for NSFilesPromisePboardType
-	
-	// For table views, to know which one was actually clicked upon for dragging
-	NSInteger _clickedObjectIndex;
+	NSURL* _dropDestinationURL;
+	NSIndexSet* _draggedIndexes;	// save the index set of what is dragged (from a table view) for NSFilesPromisePboardType
+	NSInteger _clickedObjectIndex;	// For table views, to know which one was actually clicked upon for dragging
 	IMBObject* _clickedObject;
-
+	IMBProgressWindowController* _progressWindowController;
 }
 
 + (NSBundle*) bundle;
@@ -164,9 +157,9 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 // Library...
 
 @property (retain) IMBLibraryController* libraryController;
-@property (retain) IMBNodeViewController* nodeViewController;
+//@property (retain) IMBNodeViewController* nodeViewController;
 @property (readonly) NSString* mediaType;
-@property (readonly) IMBNode* currentNode;
+@property (retain) IMBNode* currentNode;
 
 // Objects (media files)...
 
