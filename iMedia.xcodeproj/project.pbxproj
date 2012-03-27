@@ -958,19 +958,6 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
-		3025E560130686EB00706DB2 /* Skimmable */ = {
-			isa = PBXGroup;
-			children = (
-				30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */,
-				30394AC712DC665000ACA531 /* IMBSkimmableObjectViewController.m */,
-				3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */,
-				3025E5621306877700706DB2 /* IMBiPhotoEventObjectViewController.m */,
-				30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */,
-				30F90B321358501A00D13233 /* IMBFaceObjectViewController.m */,
-			);
-			name = Skimmable;
-			sourceTree = "<group>";
-		};
 		30E77715151104A900413AEF /* SandBoxingKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -1188,6 +1175,72 @@
 			name = Flickr;
 			sourceTree = "<group>";
 		};
+		D08247AC1521BB0700033850 /* Backend */ = {
+			isa = PBXGroup;
+			children = (
+				D09930C21010F6C100C527B7 /* IMBParserController.h */,
+				D09930C31010F6C100C527B7 /* IMBParserController.m */,
+				D09930B51010F6C100C527B7 /* IMBLibraryController.h */,
+				D09930B61010F6C100C527B7 /* IMBLibraryController.m */,
+				D099330B10119D8200C527B7 /* IMBNodeTreeController.h */,
+				D099333010119EA300C527B7 /* IMBNodeTreeController.m */,
+				D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */,
+				D099333210119F3400C527B7 /* IMBObjectArrayController.m */,
+			);
+			name = Backend;
+			sourceTree = "<group>";
+		};
+		D08247AE1521BB1B00033850 /* Node View */ = {
+			isa = PBXGroup;
+			children = (
+				D0993303101197D100C527B7 /* IMBNodeViewController.h */,
+				D0993302101197D100C527B7 /* IMBNodeViewController.m */,
+				D0C911E3152195B2006655C9 /* IMBImageNodeViewController.h */,
+				D0C911E4152195B2006655C9 /* IMBImageNodeViewController.m */,
+				D0C911EB1521965C006655C9 /* IMBAudioNodeViewController.h */,
+				D0C911EC1521965C006655C9 /* IMBAudioNodeViewController.m */,
+				D0C911E715219621006655C9 /* IMBMovieNodeViewController.h */,
+				D0C911E815219621006655C9 /* IMBMovieNodeViewController.m */,
+				D0C911EF152196FD006655C9 /* IMBLinkNodeViewController.h */,
+				D0C911F0152196FD006655C9 /* IMBLinkNodeViewController.m */,
+			);
+			name = "Node View";
+			sourceTree = "<group>";
+		};
+		D08247AF1521BB2C00033850 /* Window */ = {
+			isa = PBXGroup;
+			children = (
+				D0E96D1A104410BD0015979F /* IMBPanelController.h */,
+				D0E96D1B104410BD0015979F /* IMBPanelController.m */,
+				D052B0931053B0F700988F53 /* IMBProgressWindowController.h */,
+				D052B0941053B0F700988F53 /* IMBProgressWindowController.m */,
+			);
+			name = Window;
+			sourceTree = "<group>";
+		};
+		D08247B01521BB3900033850 /* Object View */ = {
+			isa = PBXGroup;
+			children = (
+				D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */,
+				D0C2DAF11024178E001B1198 /* IMBObjectViewController.m */,
+				D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */,
+				D0C2DD0C1025905A001B1198 /* IMBImageViewController.m */,
+				D08070C110442CE100891137 /* IMBAudioViewController.h */,
+				D08070C210442CE100891137 /* IMBAudioViewController.m */,
+				D08070BD10442CD700891137 /* IMBMovieViewController.h */,
+				D08070BE10442CD700891137 /* IMBMovieViewController.m */,
+				CEF6970610643D60005D7E72 /* IMBLinkViewController.h */,
+				CEF6970710643D60005D7E72 /* IMBLinkViewController.m */,
+				30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */,
+				30394AC712DC665000ACA531 /* IMBSkimmableObjectViewController.m */,
+				3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */,
+				3025E5621306877700706DB2 /* IMBiPhotoEventObjectViewController.m */,
+				30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */,
+				30F90B321358501A00D13233 /* IMBFaceObjectViewController.m */,
+			);
+			name = "Object View";
+			sourceTree = "<group>";
+		};
 		D08E8B5A1019C8EF005D8614 /* Third Party */ = {
 			isa = PBXGroup;
 			children = (
@@ -1263,39 +1316,10 @@
 		D09930F21010FD5D00C527B7 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				3025E560130686EB00706DB2 /* Skimmable */,
-				D09930C21010F6C100C527B7 /* IMBParserController.h */,
-				D09930C31010F6C100C527B7 /* IMBParserController.m */,
-				D09930B51010F6C100C527B7 /* IMBLibraryController.h */,
-				D09930B61010F6C100C527B7 /* IMBLibraryController.m */,
-				D099330B10119D8200C527B7 /* IMBNodeTreeController.h */,
-				D099333010119EA300C527B7 /* IMBNodeTreeController.m */,
-				D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */,
-				D099333210119F3400C527B7 /* IMBObjectArrayController.m */,
-				D0993303101197D100C527B7 /* IMBNodeViewController.h */,
-				D0993302101197D100C527B7 /* IMBNodeViewController.m */,
-				D0C911E3152195B2006655C9 /* IMBImageNodeViewController.h */,
-				D0C911E4152195B2006655C9 /* IMBImageNodeViewController.m */,
-				D0C911EB1521965C006655C9 /* IMBAudioNodeViewController.h */,
-				D0C911EC1521965C006655C9 /* IMBAudioNodeViewController.m */,
-				D0C911E715219621006655C9 /* IMBMovieNodeViewController.h */,
-				D0C911E815219621006655C9 /* IMBMovieNodeViewController.m */,
-				D0C911EF152196FD006655C9 /* IMBLinkNodeViewController.h */,
-				D0C911F0152196FD006655C9 /* IMBLinkNodeViewController.m */,
-				D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */,
-				D0C2DAF11024178E001B1198 /* IMBObjectViewController.m */,
-				D0C2DD0D1025905A001B1198 /* IMBImageViewController.h */,
-				D0C2DD0C1025905A001B1198 /* IMBImageViewController.m */,
-				D08070C110442CE100891137 /* IMBAudioViewController.h */,
-				D08070C210442CE100891137 /* IMBAudioViewController.m */,
-				D08070BD10442CD700891137 /* IMBMovieViewController.h */,
-				D08070BE10442CD700891137 /* IMBMovieViewController.m */,
-				CEF6970610643D60005D7E72 /* IMBLinkViewController.h */,
-				CEF6970710643D60005D7E72 /* IMBLinkViewController.m */,
-				D0E96D1A104410BD0015979F /* IMBPanelController.h */,
-				D0E96D1B104410BD0015979F /* IMBPanelController.m */,
-				D052B0931053B0F700988F53 /* IMBProgressWindowController.h */,
-				D052B0941053B0F700988F53 /* IMBProgressWindowController.m */,
+				D08247AC1521BB0700033850 /* Backend */,
+				D08247AF1521BB2C00033850 /* Window */,
+				D08247AE1521BB1B00033850 /* Node View */,
+				D08247B01521BB3900033850 /* Object View */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
