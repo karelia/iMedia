@@ -225,6 +225,25 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 }
 
 
++ (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
+{
+	// Create a viewController of appropriate class type...
+	
+	NSString* mediaType = inLibraryController.mediaType;
+	Class objectViewControllerClass = [sRegisteredObjectViewControllerClasses objectForKey:mediaType];
+
+    NSString* nibName = [objectViewControllerClass nibName];
+    NSBundle* bundle = [objectViewControllerClass bundle];
+	IMBObjectViewController* objectViewController = [[[objectViewControllerClass alloc] initWithNibName:nibName bundle:bundle] autorelease];
+    
+	// Load the view *before* setting the libraryController, so that outlets are set before we load the preferences...
+    
+	[objectViewController view];										
+	objectViewController.libraryController = inLibraryController;		
+	return objectViewController;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -480,15 +499,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBObjectViewController" userInfo:nil] raise];
 	
 	return nil;
-}
-
-
-+ (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
-{
-	IMBObjectViewController* controller = [[[[self class] alloc] initWithNibName:[self nibName] bundle:[self bundle]] autorelease];
-	[controller view];										// Load the view *before* setting the libraryController, 
-	controller.libraryController = inLibraryController;		// so that outlets are set before we load the preferences.
-	return controller;
 }
 
 
