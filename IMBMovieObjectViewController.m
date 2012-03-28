@@ -52,16 +52,11 @@
 
 #pragma mark HEADERS
 
-#import "IMBLinkViewController.h"
-#import "IMBNodeViewController.h"
+#import "IMBMovieObjectViewController.h"
 #import "IMBObjectArrayController.h"
-#import "IMBPanelController.h"
+//#import "IMBPanelController.h"
 #import "IMBCommon.h"
 #import "IMBConfig.h"
-#import "IMBNode.h"
-#import "IMBObject.h"
-//#import "IMBNodeObject.h"
-#import "IMBFolderParser.h"
 #import "NSWorkspace+iMedia.h"
 
 
@@ -70,7 +65,7 @@
 
 #pragma mark 
 
-@implementation IMBLinkViewController
+@implementation IMBMovieObjectViewController
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,7 +73,7 @@
 
 + (void) load
 {
-	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeLink];
+	[IMBObjectViewController registerObjectViewControllerClass:[self class] forMediaType:kIMBMediaTypeMovie];
 }
 
 
@@ -86,7 +81,7 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
-	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeList] forKey:@"viewType"];
+	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeIcon] forKey:@"viewType"];
 	[classDict setObject:[NSNumber numberWithDouble:0.5] forKey:@"iconSize"];
 	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
 	[pool drain];
@@ -96,18 +91,10 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	
+
 	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
 		@"name",
-		@"metadata.artist",
-		@"metadata.album",
 		nil];
-}
-
-
-- (void) dealloc
-{
-	[super dealloc];
 }
 
 
@@ -116,31 +103,13 @@
 
 + (NSString*) mediaType
 {
-	return kIMBMediaTypeLink;
+	return kIMBMediaTypeMovie;
 }
 
 + (NSString*) nibName
 {
-	return @"IMBLinkView";
+	return @"IMBMovieObjectViewController";
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (NSImage*) icon
-//{
-//	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.Safari"];
-//}
-//
-//- (NSString*) displayName
-//{
-//	return NSLocalizedStringWithDefaultValue(
-//		@"IMBLinkViewController.displayName",
-//		nil,IMBBundle(),
-//		@"Links",
-//		@"mediaType display name");
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -149,76 +118,37 @@
 + (NSString*) objectCountFormatSingular
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"IMBLinkViewController.countFormatSingular",
+		@"IMBMovieViewController.countFormatSingular",
 		nil,IMBBundle(),
-		@"%d URL",
+		@"%d movie",
 		@"Format string for object count in singluar");
 }
+
 
 + (NSString*) objectCountFormatPlural
 {
 	return NSLocalizedStringWithDefaultValue(
-		@"IMBLinkViewController.countFormatPlural",
+		@"IMBMovieViewController.countFormatPlural",
 		nil,IMBBundle(),
-		@"%d URLs",
+		@"%d movies",
 		@"Format string for object count in plural");
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
 
-// The Links panel doesn't have an icon view... Or Combo View
 
-- (void) setViewType:(NSUInteger)inViewType
+- (void) willHideView
 {
-	if (inViewType < 1) inViewType = 1;
-	if (inViewType > 1) inViewType = 1;
-	[super setViewType:inViewType];
-}
-
-
-- (NSUInteger) viewType
-{
-	NSUInteger viewType = [super viewType];
-	if (viewType < 1) viewType = 1;
-	if (viewType > 1) viewType = 1;
-	return viewType;
+	// Pretty nasty hack to make any movie that is currently playing inline stop. So far
+	// I couldn't find anything else that worked, so we'll have to use this for now...
+	
+	[ibIconView mouseDown:nil];			
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-- (IBAction) quicklook:(id)inSender
-{
-	// Don't try to do quicklook for links
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark NSTableViewDelegate
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Dragging
-
-
-//
-// The link view controller vends objects that have urls to web resources, not local files.
-//
-
-- (BOOL) writesLocalFilesToPasteboard
-{
-	return NO;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 @end
 

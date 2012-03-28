@@ -52,21 +52,108 @@
 
 #pragma mark HEADERS
 
-#import "IMBObjectViewController.h"
-
+#import "IMBImageObjectViewController.h"
+#import "IMBObjectArrayController.h"
+//#import "IMBPanelController.h"
+#import "IMBCommon.h"
+#import "IMBConfig.h"
+#import "IMBObjectsPromise.h"
+#import "NSWorkspace+iMedia.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
 
-@interface IMBImageViewController : IMBObjectViewController
-{
-	IBOutlet NSTableView *_tableView;
-}
-
-@end
+@implementation IMBImageObjectViewController
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) load
+{
+	[IMBObjectViewController registerObjectViewControllerClass:[self class] forMediaType:kIMBMediaTypeImage];
+}
+
+
++ (void) initialize
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
+	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeIcon] forKey:@"viewType"];
+	[classDict setObject:[NSNumber numberWithDouble:0.5] forKey:@"iconSize"];
+	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	[pool drain];
+}
+
+
+- (void) awakeFromNib
+{
+	[super awakeFromNib];
+		 
+	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
+		@"name",
+		@"metadata.Comment",
+		@"metadata.ImagePath",
+		@"metadata.iMediaKeywords",
+		nil];
+
+	[[[_tableView tableColumnWithIdentifier:@"name"] headerCell] setStringValue:NSLocalizedStringWithDefaultValue(
+        @"IMBImageViewController.tableColumn.name", 
+        nil,
+        IMBBundle(), 
+        @"Name", 
+        @"Column title - should be a short word")];
+        
+	[[[_tableView tableColumnWithIdentifier:@"size"] headerCell] setStringValue:NSLocalizedStringWithDefaultValue(
+        @"IMBImageViewController.tableColumn.size", 
+        nil,
+        IMBBundle(), 
+        @"Size", 
+        @"Column title - should be a short word")];	
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) mediaType
+{
+	return kIMBMediaTypeImage;
+}
+
++ (NSString*) nibName
+{
+	return @"IMBImageObjectViewController";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) objectCountFormatSingular
+{
+	return NSLocalizedStringWithDefaultValue(
+		@"IMBImageViewController.countFormatSingular",
+		nil,IMBBundle(),
+		@"%d image",
+		@"Format string for object count in singluar");
+}
+
+
++ (NSString*) objectCountFormatPlural
+{
+	return NSLocalizedStringWithDefaultValue(
+		@"IMBImageViewController.countFormatPlural",
+		nil,IMBBundle(),
+		@"%d images",
+		@"Format string for object count in plural");
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end
 
