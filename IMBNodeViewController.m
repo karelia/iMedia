@@ -231,7 +231,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 + (NSString*) nibName
 {
-	return @"IMBLibraryView";
+	return @"IMBNodeViewController";
 }
 
 
