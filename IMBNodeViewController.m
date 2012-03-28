@@ -701,6 +701,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 		// Install the object view controller...
 		
+        [(IMBObjectViewController*)self.objectViewController setCurrentNode:newNode];
 		[self installObjectViewForNode:newNode];
 		
 //		// If a completely different parser was selected, then notify the previous parser, that it is most
@@ -1031,6 +1032,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		if (inNode.isGroup)
 		{
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
+			[self installObjectViewForNode:nil];
 		}
 		else
 		{
@@ -1045,6 +1047,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	else
 	{
 		[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
+        [self installObjectViewForNode:nil];
 	}
 }
 
