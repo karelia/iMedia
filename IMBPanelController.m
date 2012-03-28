@@ -56,13 +56,9 @@
 #import "IMBParserController.h"
 #import "IMBLibraryController.h"
 #import "IMBNodeViewController.h"
-#import "IMBImageViewController.h"
-#import "IMBAudioViewController.h"
-#import "IMBMovieViewController.h"
-#import "IMBLinkViewController.h"
+#import "IMBObjectViewController.h"
 #import "IMBHoverButton.h"
 #import "NSWindow_Flipr.h"
-
 #import "IMBConfig.h"
 #import "IMBCommon.h"
 #import "IMBQLPreviewPanel.h"
@@ -217,7 +213,7 @@ static IMBPanelController* sSharedPanelController = nil;
 {
 	IMBLibraryController* libraryController = nil;
 	IMBNodeViewController* nodeViewController = nil;
-//	IMBObjectViewController* objectViewController = nil;
+	IMBObjectViewController* objectViewController = nil;
 	
 	// Load the parsers...
 	
@@ -232,22 +228,13 @@ static IMBPanelController* sSharedPanelController = nil;
 		libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
 		[libraryController setDelegate:self.delegate];
 
-		// Create the top-level view controller (IMBNodeViewController) for each media type...
+		// Create the top-level view controller (IMBNodeViewController) with attached standard
+            // object view (IMBObjectViewController) for each media type...
 		
-		nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
-		[self.nodeViewControllers setObject:nodeViewController forKey:mediaType];
-		
-//		Class ovc = [sRegisteredViewControllerClasses objectForKey:mediaType];
-//		objectViewController = (IMBObjectViewController*) [ovc viewControllerForLibraryController:libraryController];
-
-		// Store the object view controller in an array. Note that the node view controller is attached 
-		// to the object view controller, so we do not need to store it separately...
-		
-//		if (objectViewController)
-//		{
-//			objectViewController.nodeViewController = nodeViewController;
-//			[self.viewControllers addObject:objectViewController];
-//		}
+            nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
+            objectViewController = [IMBObjectViewController viewControllerForLibraryController:libraryController];
+            nodeViewController.standardObjectViewController = objectViewController;
+            [self.nodeViewControllers setObject:nodeViewController forKey:mediaType];
 	}
 }
 
