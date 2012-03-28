@@ -1020,9 +1020,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Selecting a node requires two parts. First the node needs to be selected in the NSTreeController. This will
-// be directly reflected in the selection of the NSOutlineView and the NSPopUpButton. The second part is that
-// a previously empty nodes needs to be populated by the libraryController...
+// Selecting a node requires several things. First the node needs to be selected in the NSOutlineView/NSPopupButton.
+// It also needs to be populated (if it wasn't populated before). And third, the objec view needs to be installed
+// and filled with objects...
 
 - (void) selectNode:(IMBNode*)inNode
 {
@@ -1036,10 +1036,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			NSInteger row = [ibNodeOutlineView rowForItem:inNode];
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-			
-			// Not redundant! Needed if selection doesn't change due to previous line!
-			[self.libraryController populateNode:inNode]; 
-//			[self installCustomObjectView:[inNode customObjectView]];
+			if (!inNode.isPopulated) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
+
+			[(IMBObjectViewController*)self.objectViewController setCurrentNode:inNode];
 			[self installObjectViewForNode:inNode];
 		}
 	}	
