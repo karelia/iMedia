@@ -153,6 +153,8 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 + (NSBundle*) bundle;
 + (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
++ (void) registerObjectViewControllerClass:(Class)inObjectViewControllerClass forMediaType:(NSString*)inMediaType;
+
 
 // Library...
 
@@ -177,7 +179,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 @property (assign) double iconSize;
 @property (readonly) BOOL canUseIconSize;
 
-@property (retain) NSURL *dropDestinationURL;
+@property (retain) NSURL* dropDestinationURL;
 
 @property (assign) NSInteger clickedObjectIndex;
 @property (retain) IMBObject* clickedObject;

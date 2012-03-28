@@ -106,8 +106,6 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 	BOOL _isLoadingWindow;
 }
 
-+ (void) registerObjectViewControllerClass:(Class)inObjectViewControllerClass forMediaType:(NSString*)inMediaType;
-
 + (IMBPanelController*) sharedPanelController;
 + (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
 + (BOOL) isSharedPanelControllerLoaded;
@@ -155,6 +153,7 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 - (BOOL) panelController:(IMBPanelController*)inController shouldShowPanelForMediaType:(NSString*)inMediaType;
 - (void) panelController:(IMBPanelController*)inController willShowPanelForMediaType:(NSString*)inMediaType;
 - (void) panelController:(IMBPanelController*)inController didShowPanelForMediaType:(NSString*)inMediaType;
+
 - (void) panelController:(IMBPanelController*)inController willHidePanelForMediaType:(NSString*)inMediaType;
 - (void) panelController:(IMBPanelController*)inController didHidePanelForMediaType:(NSString*)inMediaType;
 

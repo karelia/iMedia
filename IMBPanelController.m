@@ -83,7 +83,6 @@ NSString* kIMBImageBrowserShowTitlesNotification = @"IMBImageBrowserShowTitlesNo
 #pragma mark GLOBALS
 
 static IMBPanelController* sSharedPanelController = nil;
-static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -121,29 +120,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 @synthesize nodeViewControllers = _nodeViewControllers;
 @synthesize loadedLibraries = _loadedLibraries;
 @synthesize oldMediaType = _oldMediaType;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Register the view controller class...
-
-+ (void) registerObjectViewControllerClass:(Class)inObjectViewControllerClass forMediaType:(NSString*)inMediaType
-{
-	@synchronized ([self class])
-	{
-		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		
-		if (sRegisteredObjectViewControllerClasses == nil)
-		{
-			sRegisteredObjectViewControllerClasses = [[NSMutableDictionary alloc] init];
-		}
-		
-		[sRegisteredObjectViewControllerClasses setObject:inObjectViewControllerClass forKey:inMediaType];
-		
-		[pool drain];
-	}
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------
