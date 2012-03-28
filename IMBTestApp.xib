@@ -45,7 +45,7 @@
 				<array class="NSMutableArray" key="NSMenuItems">
 					<object class="NSMenuItem" id="694149608">
 						<reference key="NSMenu" ref="649796088"/>
-						<string key="NSTitle">iMedia2</string>
+						<string key="NSTitle">iMediaTester</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<object class="NSCustomResource" key="NSOnImage" id="756751024">
@@ -58,11 +58,11 @@
 						</object>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="110575045">
-							<string key="NSTitle">iMedia2</string>
+							<string key="NSTitle">iMediaTester</string>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="238522557">
 									<reference key="NSMenu" ref="110575045"/>
-									<string key="NSTitle">About iMedia2</string>
+									<string key="NSTitle">About iMediaTester</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="756751024"/>
@@ -113,7 +113,7 @@
 								</object>
 								<object class="NSMenuItem" id="755159360">
 									<reference key="NSMenu" ref="110575045"/>
-									<string key="NSTitle">Hide iMedia2</string>
+									<string key="NSTitle">Hide iMediaTester</string>
 									<string key="NSKeyEquiv">h</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -149,7 +149,7 @@
 								</object>
 								<object class="NSMenuItem" id="632727374">
 									<reference key="NSMenu" ref="110575045"/>
-									<string key="NSTitle">Quit iMedia2</string>
+									<string key="NSTitle">Quit iMediaTester</string>
 									<string key="NSKeyEquiv">q</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -357,7 +357,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{8, 422}, {408, 725}}</string>
 				<int key="NSWTFlags">1677722624</int>
-				<string key="NSWindowTitle">iMedia 2</string>
+				<string key="NSWindowTitle">iMedia 3</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
@@ -366,9 +366,10 @@
 					<int key="NSvFlags">256</int>
 					<string key="NSFrameSize">{408, 725}</string>
 					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -382,7 +383,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="600832429">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSScrollView" id="616245303">
@@ -398,7 +399,7 @@
 											<int key="NSvFlags">2322</int>
 											<string key="NSFrameSize">{509, 14}</string>
 											<reference key="NSSuperview" ref="922417597"/>
-											<reference key="NSNextKeyView" ref="854472632"/>
+											<reference key="NSNextKeyView" ref="557746345"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="581406560">
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
@@ -481,9 +482,7 @@
 													<integer value="5"/>
 													<object class="NSURL">
 														<nil key="NS.base"/>
-														<object class="NSMutableString" key="NS.relative">
-															<characters key="NS.bytes">file://localhost/Applications/Xcode.app/Contents/SharedFrameworks/DVTKit.framework/Resources/DVTIbeamCursor.tiff</characters>
-														</object>
+														<string key="NS.relative">file://localhost/Applications/Xcode.app/Contents/SharedFrameworks/DVTKit.framework/Resources/DVTIbeamCursor.tiff</string>
 													</object>
 												</array>
 											</array>
@@ -500,7 +499,6 @@
 									<int key="NSvFlags">256</int>
 									<string key="NSFrame">{{495, 1}, {15, 550}}</string>
 									<reference key="NSSuperview" ref="616245303"/>
-									<reference key="NSNextKeyView"/>
 									<reference key="NSTarget" ref="616245303"/>
 									<string key="NSAction">_doScroller:</string>
 									<double key="NSCurValue">1</double>
@@ -521,7 +519,7 @@
 							</array>
 							<string key="NSFrame">{{-1, -1}, {511, 552}}</string>
 							<reference key="NSSuperview" ref="600832429"/>
-							<reference key="NSNextKeyView" ref="557746345"/>
+							<reference key="NSNextKeyView" ref="922417597"/>
 							<int key="NSsFlags">133138</int>
 							<reference key="NSVScroller" ref="854472632"/>
 							<reference key="NSHScroller" ref="557746345"/>
@@ -529,7 +527,6 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{509, 550}</string>
-					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="616245303"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
@@ -1117,6 +1114,75 @@
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
+					<string key="className">IMBNodeViewController</string>
+					<string key="superclassName">NSViewController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="addNode:">id</string>
+						<string key="reloadNode:">id</string>
+						<string key="removeNode:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="addNode:">
+							<string key="name">addNode:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="reloadNode:">
+							<string key="name">reloadNode:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="removeNode:">
+							<string key="name">removeNode:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="ibFooterContainerView">NSView</string>
+						<string key="ibHeaderContainerView">NSView</string>
+						<string key="ibNodeOutlineView">IMBOutlineView</string>
+						<string key="ibNodePopupButton">NSPopUpButton</string>
+						<string key="ibObjectContainerView">NSView</string>
+						<string key="ibSplitView">NSSplitView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="ibFooterContainerView">
+							<string key="name">ibFooterContainerView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ibHeaderContainerView">
+							<string key="name">ibHeaderContainerView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ibNodeOutlineView">
+							<string key="name">ibNodeOutlineView</string>
+							<string key="candidateClassName">IMBOutlineView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ibNodePopupButton">
+							<string key="name">ibNodePopupButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ibObjectContainerView">
+							<string key="name">ibObjectContainerView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ibSplitView">
+							<string key="name">ibSplitView</string>
+							<string key="candidateClassName">NSSplitView</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/IMBNodeViewController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">IMBOutlineView</string>
+					<string key="superclassName">NSOutlineView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/IMBOutlineView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">IMBTestAppDelegate</string>
 					<string key="superclassName">NSObject</string>
 					<dictionary class="NSMutableDictionary" key="actions">
@@ -1134,10 +1200,15 @@
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="_nodeViewController">IMBNodeViewController</string>
 						<string key="ibDragDestinationWindow">NSWindow</string>
 						<string key="ibWindow">NSWindow</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="_nodeViewController">
+							<string key="name">_nodeViewController</string>
+							<string key="candidateClassName">IMBNodeViewController</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="ibDragDestinationWindow">
 							<string key="name">ibDragDestinationWindow</string>
 							<string key="candidateClassName">NSWindow</string>
