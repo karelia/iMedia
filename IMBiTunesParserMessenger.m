@@ -66,6 +66,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark GLOBALS
+
+static NSMutableArray* sParsers = nil;
+static dispatch_once_t sOnceToken = 0;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 @implementation IMBiTunesParserMessenger
@@ -118,42 +127,44 @@
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-	NSMutableArray* parsers = [NSMutableArray array];
-	
-	if ([self isInstalled])
-	{
-		CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
-		NSArray* libraries = (NSArray*)recentLibraries;
-		
-		for (NSString* library in libraries)
+    dispatch_once(&sOnceToken,
+    ^{
+		if ([self isInstalled])
 		{
-			NSURL* url = [NSURL URLWithString:library];
-			NSString* path = [url path];
-			BOOL changed;
+			CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
+			NSArray* libraries = (NSArray*)recentLibraries;
+			sParsers = [[NSMutableArray alloc] initWithCapacity:libraries.count];
 			
-			if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
+			for (NSString* library in libraries)
 			{
-				// Create a parser instance preconfigure with that path...
+				NSURL* url = [NSURL URLWithString:library];
+				NSString* path = [url path];
+				BOOL changed;
 				
-				IMBiTunesAudioParser* parser = (IMBiTunesAudioParser*)[self newParser];
-				parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
-				parser.mediaType = self.mediaType;
-				parser.mediaSource = url;
-				parser.appPath = self.iTunesPath;
-				parser.shouldDisplayLibraryName = libraries.count > 1;
+				if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
+				{
+					// Create a parser instance preconfigure with that path...
+					
+					IMBiTunesAudioParser* parser = (IMBiTunesAudioParser*)[self newParser];
+					parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
+					parser.mediaType = self.mediaType;
+					parser.mediaSource = url;
+					parser.appPath = self.iTunesPath;
+					parser.shouldDisplayLibraryName = libraries.count > 1;
 
-				[parsers addObject:parser];
-				[parser release];
+					[sParsers addObject:parser];
+					[parser release];
 
-				// Exclude enclosing folder from being displayed by IMBFolderParser...
-				
-				NSString* libraryPath = [path stringByDeletingLastPathComponent];
-				[IMBConfig registerLibraryPath:libraryPath];
+					// Exclude enclosing folder from being displayed by IMBFolderParser...
+					
+					NSString* libraryPath = [path stringByDeletingLastPathComponent];
+					[IMBConfig registerLibraryPath:libraryPath];
+				}
 			}
 		}
-	}
-	
-	return (NSArray*)parsers;
+	});
+
+	return (NSArray*)sParsers;
 }
 
 
