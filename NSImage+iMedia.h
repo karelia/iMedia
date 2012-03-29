@@ -60,6 +60,7 @@
 
 + (NSImage *) imb_sharedGenericFileIcon;						// Shared instance - can only have one size!
 + (NSImage *) imb_sharedGenericFolderIcon;						// Shared instance - can only have one size!
++ (NSImage *) imb_sharedLargeGenericFolderIcon;					// Shared instance - can only have one size!
 + (NSImage *) imb_genericFolderIcon;							// Copied instance - can have any size
 	
 - (NSImage *) imb_imageCroppedToRect:(NSRect)inCropRect;		// new instance

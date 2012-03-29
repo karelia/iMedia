@@ -271,6 +271,25 @@
 	return sGenericFolderIcon;
 }
 
++ (NSImage *) imb_sharedLargeGenericFolderIcon
+{
+	static NSImage *sLargeGenericFolderIcon = nil;
+	
+	if (sLargeGenericFolderIcon == nil)
+	{
+		sLargeGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
+		[sLargeGenericFolderIcon setScalesWhenResized:YES];
+		[sLargeGenericFolderIcon setSize:NSMakeSize(128,128)];
+	}
+	
+	if (sLargeGenericFolderIcon == nil)
+	{
+		sLargeGenericFolderIcon = [NSImage imageNamed:@"folder"];	// NSImageNameFolder in 10.6 and up... does it work in 10.5 ?
+	}
+	
+	return sLargeGenericFolderIcon;
+}
+
 + (NSImage *) imb_sharedGenericFileIcon
 {
 	static NSImage *sGenericFileIcon = nil;
