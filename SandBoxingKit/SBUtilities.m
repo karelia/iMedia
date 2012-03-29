@@ -23,11 +23,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark HEADERS
+
 #import "SBUtilities.h"
 #import <Security/SecCode.h>
 #import <Security/SecRequirement.h>
 #import <sys/types.h>
 #import <pwd.h>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 
 @interface NSObject()
 
@@ -40,6 +48,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark
+
 // Check if the host app is sandboxed. This code is based on suggestions from the FrameworksIT mailing list...
 
 BOOL SBIsSandboxed()
@@ -48,7 +58,8 @@ BOOL SBIsSandboxed()
 	static dispatch_once_t sIsSandboxedToken = 0;
 
 #warning App will not work on OS X 10.7 to 10.7.2 because it will still be sandboxed but not return accordingly
-    if (!IMBRunningOnLion1073OrNewer()) {
+    if (!IMBRunningOnLion1073OrNewer())
+	{
         return NO;
     }
     
@@ -197,6 +208,7 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 #pragma mark
 
 
@@ -252,5 +264,21 @@ void SBPerformSelectorAsync(id inConnection,
                        });
     }
 }
+
+
+// Here's the same thing as an Objective-C wrapper (for those devs that do not like using pure C functions)...
+ 							
+@implementation NSObject (SBPerformSelectorAsync)
+
+- (void) performAsyncSelector:(SEL)inSelector withObject:(id)inObject onConnection:(id)inConnection completionHandler:(SBReturnValueHandler)inCompletionHandler
+{
+	SBPerformSelectorAsync(inConnection,self,inSelector,inObject,inCompletionHandler);
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 
