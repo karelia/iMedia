@@ -179,7 +179,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 @implementation IMBObjectViewController
 
 @synthesize libraryController = _libraryController;
-//@synthesize nodeViewController = _nodeViewController;
 @synthesize currentNode = _currentNode;
 @synthesize objectArrayController = ibObjectArrayController;
 @synthesize progressWindowController = _progressWindowController;
@@ -289,7 +288,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	// Other cleanup...
 
 	IMBRelease(_libraryController);
-//	IMBRelease(_nodeViewController);
 	IMBRelease(_currentNode);
 	IMBRelease(_progressWindowController);
 	IMBRelease(_dropDestinationURL);
@@ -614,15 +612,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//- (IMBNode*) currentNode
-//{
-//	return [_nodeViewController selectedNode];
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark 
 #pragma mark Persistence 
 
@@ -794,21 +783,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 {
 	// To be overridden by subclass...
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (NSImage*) icon
-//{
-//	return nil;	// Must be overridden by subclass
-//}
-//
-//
-//- (NSString*) displayName
-//{
-//	return nil;	// Must be overridden by subclass
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1008,21 +982,23 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 - (void) __updateTooltips
 {
 	// IKImageBrowserView doesn't support "visibleItemIndexes" on < 10.6
+	
 	if (IMBRunningOnSnowLeopardOrNewer())
 	{
 		// To update ToolTips we always remove any existing tooltips and update with the new list of visible icon indexes
 		[ibIconView removeAllToolTips];
 		
 		NSArray* objects = ibObjectArrayController.arrangedObjects;
-		NSIndexSet* theseIndexes = [ibIconView visibleItemIndexes];
-		NSUInteger currentIndex = [theseIndexes firstIndex];
-		while (currentIndex != NSNotFound)
+		NSIndexSet* indexes = [ibIconView visibleItemIndexes];
+		NSUInteger index = [indexes firstIndex];
+		
+		while (index != NSNotFound)
 		{
-			IMBObject* thisObject = [objects objectAtIndex:currentIndex];
-			NSRect rect = [ibIconView itemFrameAtIndex:currentIndex];
-			[ibIconView addToolTipRect:rect owner:thisObject userData:NULL];
+			IMBObject* object = [objects objectAtIndex:index];
+			NSRect rect = [ibIconView itemFrameAtIndex:index];
+			[ibIconView addToolTipRect:rect owner:object userData:NULL];
 
-			currentIndex = [theseIndexes indexGreaterThanIndex:currentIndex];
+			index = [indexes indexGreaterThanIndex:index];
 		}
 	}
 }
@@ -1082,6 +1058,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
+			#warning TODO
+			
 //			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
 //			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
 //
@@ -1165,6 +1143,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (NSUInteger) writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
+	#warning TODO
+
 //	IMBNode* node = self.currentNode;
 	NSUInteger itemsWritten = 0;
 /*	
@@ -1389,6 +1369,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
+	#warning TODO
 /*	
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
 	
@@ -1652,6 +1633,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
+	#warning TODO
+
 //	IMBLibraryController* controller = self.libraryController;
 //	id delegate = controller.delegate;
 //	BOOL didHandleEvent = NO;
@@ -1785,6 +1768,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 				// Open with source app. Commented out for now as apps like iPhoto do not seem to be able to open
 				// and display images within its own libary. All it does is display a cryptic error message...
 				
+	#warning TODO
+
 //				if ([inObject.parser respondsToSelector:@selector(appPath)])
 //				{
 //					if (appPath = [inObject.parser performSelector:@selector(appPath)])
@@ -2003,6 +1988,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (IBAction) openInSourceApp:(id)inSender
 {
+	#warning TODO
+
 //	IMBObject* object = (IMBObject*) [inSender representedObject];
 //	NSString* path = [object path];
 //	NSString* app = nil;
@@ -2105,6 +2092,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode
 {
+	#warning TODO
+
 //	if (inSelectedNode)
 //	{
 //		IMBParser* parser = inSelectedNode.parser;
@@ -2326,6 +2315,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	if (node)
 	{
+	#warning TODO
+
 //		IMBParser* parser = node.parser;
 //		NSArray *arrangedObjects = [ibObjectArrayController arrangedObjects];
 //		NSArray *objects = [arrangedObjects objectsAtIndexes:self.draggedIndexes];

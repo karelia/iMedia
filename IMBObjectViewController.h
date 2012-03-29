@@ -159,7 +159,6 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 // Library...
 
 @property (retain) IMBLibraryController* libraryController;
-//@property (retain) IMBNodeViewController* nodeViewController;
 @property (readonly) NSString* mediaType;
 @property (retain) IMBNode* currentNode;
 
@@ -190,8 +189,6 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 // User Interface...
  
 + (Class) iconViewCellClass;
-//- (NSImage*) icon;
-//- (NSString*) displayName;
 + (CALayer*) iconViewBackgroundLayer;
 
 + (NSString*) objectCountFormatSingular;
