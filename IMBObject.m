@@ -522,8 +522,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 				else
 				{
 					self.imageRepresentation = inPopulatedObject.imageRepresentation;
-					self.metadata = inPopulatedObject.metadata;
-					self.metadataDescription = inPopulatedObject.metadataDescription;
+					if (self.metadata == nil) self.metadata = inPopulatedObject.metadata;
+					if (self.metadataDescription == nil) self.metadataDescription = inPopulatedObject.metadataDescription;
 					self.isLoadingThumbnail = NO;
 				}
 			});
