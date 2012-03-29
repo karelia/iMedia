@@ -283,7 +283,7 @@
 			IMBNodeObject* object = [[IMBNodeObject alloc] init];
 			object.representedNodeIdentifier = subnode.identifier;
 			object.location = (id)url;
-			object.imageLocation = (id)url;
+//			object.imageLocation = (id)url;
 			object.name = name;
 			object.metadata = nil;
 			object.parserIdentifier = self.identifier;
@@ -298,16 +298,6 @@
 	
 	IMBDrain(pool);
 	if (outError) *outError = error;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	if (outError) *outError = nil;
-	return NULL;
 }
 
 
@@ -549,7 +539,7 @@
 				object.metadata = nil;
 				object.parser = self;
 				object.index = index++;
-				object.imageLocation = (id)folder;
+//				object.imageLocation = (id)folder;
 				object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
 				object.imageRepresentation = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:folder];
 
@@ -598,7 +588,7 @@
 	object.index = inIndex;
 	
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
-	object.imageLocation = inURL;
+//	object.imageLocation = inURL;
 	object.imageRepresentation = nil;		// will be loaded lazily when needed
 	object.metadata = nil;					// will be loaded lazily when needed
 	
