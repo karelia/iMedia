@@ -1,6 +1,6 @@
 #!/bin/bash
-if [ -d "../.git" ]; then
-REPOS_INCLUDING_SUBMODULES=`find .. -name ".gitmodules"`
+if [ -d ".git" ]; then
+REPOS_INCLUDING_SUBMODULES=`find . -name ".gitmodules"`
 SCRIPT_PATH=`pwd`
 for FILEPATH in $REPOS_INCLUDING_SUBMODULES
 do

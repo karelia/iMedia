@@ -171,17 +171,17 @@
 	// Will find Photos node at same index in subnodes as in album list
 	// which offset was it found, in "List of Albums" Array
 
-//	NSUInteger photosNodeIndex = [self indexOfAllPhotosAlbumInAlbumList:albums];
-//	if (inNode.isTopLevelNode && photosNodeIndex != NSNotFound)
-//	{
-//		NSArray* subnodes = inNode.subnodes;
-//		if (photosNodeIndex < [subnodes count])	// Karelia case 136310, make sure offset exists
-//		{
-//			IMBNode* photosNode = [subnodes objectAtIndex:photosNodeIndex];	// assumes subnodes exists same as albums!
-//			[self populateNode:photosNode options:inOptions error:outError];
-//			inNode.objects = photosNode.objects;
-//		}
-//	}
+	NSUInteger photosNodeIndex = [self indexOfAllPhotosAlbumInAlbumList:albums];
+	if (inNode.isTopLevelNode && photosNodeIndex != NSNotFound)
+	{
+		NSArray* subnodes = inNode.subnodes;
+		if (photosNodeIndex < [subnodes count])	// Karelia case 136310, make sure offset exists
+		{
+			IMBNode* photosNode = [subnodes objectAtIndex:photosNodeIndex];	// assumes subnodes exists same as albums!
+			[self populateNode:photosNode error:outError];
+			inNode.objects = photosNode.objects;
+		}
+	}
 	
 	if (outError) *outError = error;
 }
@@ -231,6 +231,12 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+- (Class) objectClass
+{
+	return [IMBObject class];
+}
+
 
 // Returns the events node that should be subnode of our root node.
 // Returns nil if there is none.
@@ -681,12 +687,12 @@
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)path;         // TODO: probably will have to use document scoped bookmark here
+			object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
 			object.name = subnode.name;
 			object.parserIdentifier = [self identifier];
 			object.index = index++;
 			
-			object.imageLocation = [self imageLocationForObject:keyPhotoDict];  // TODO: probably will have to use document scoped bookmark here
+			object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:keyPhotoDict] isDirectory:NO];
 			object.imageRepresentationType = [self requestedImageRepresentationType];
 			object.imageRepresentation = nil;
 		}
@@ -699,7 +705,7 @@
 
 - (void) populateAlbumNode:(IMBNode*)inNode images:(NSDictionary*)inImages
 {
-/*
+
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
@@ -734,15 +740,16 @@
 			[objects addObject:object];
 			[object release];
 			
-			object.location = (id)path;
+			object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
 			object.name = name;
 			object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
 			object.metadata = nil;					// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;		// Build lazily when needed (takes longer)
-			object.parser = self;
+			object.parserIdentifier = [self identifier];
 			object.index = index++;
 			
-			object.imageLocation = [self imageLocationForObject:imageDict];
+            
+			object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:imageDict] isDirectory:NO];
 			object.imageRepresentationType = [self requestedImageRepresentationType];
 			object.imageRepresentation = nil;
 		}
@@ -751,7 +758,7 @@
 	}
 	
     inNode.objects = objects;
-*/
+
 }
 
 
@@ -798,7 +805,7 @@
 
 - (void) populatePhotoStreamNode:(IMBNode*)inNode images:(NSDictionary*)inImages
 {
-/*
+
     // Pull all Photo Stream objects from the inImages dictionary (should be master image list) sorted by date
     
     NSArray *sortedPhotoStreamObjectDictionaries = [self photoStreamObjectsFromImages:inImages];
@@ -806,7 +813,7 @@
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subnodes = [NSMutableArray array];
+	[inNode mutableArrayForPopulatingSubnodes];
 	
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
@@ -833,25 +840,24 @@
         [objects addObject:object];
         [object release];
         
-        object.location = (id)path;
+        object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
         object.name = name;
         object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
         object.metadata = nil;					// Build lazily when needed (takes longer)
         object.metadataDescription = nil;		// Build lazily when needed (takes longer)
-        object.parser = self;
+        object.parserIdentifier = [self identifier];
         object.index = index++;
         
-        object.imageLocation = [self imageLocationForObject:imageDict];
+        object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:imageDict] isDirectory:NO];
         object.imageRepresentationType = [self requestedImageRepresentationType];
         object.imageRepresentation = nil;
 		
 		[pool drain];
 	}
 	
-	inNode.subnodes = subnodes;
     inNode.objects = objects;
     [objects release];
-*/
+
 }
 
 
