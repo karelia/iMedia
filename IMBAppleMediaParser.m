@@ -648,7 +648,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 				 withFaces:(NSDictionary*)inFaces
 					images:(NSDictionary*)inImages
 {
-/*
+
 	// Pull all information on faces from faces dictionary and face occurences in images
 	// into a faces array (sorted by name)...
 	
@@ -656,7 +656,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
-	NSMutableArray* subnodes = [NSMutableArray array];
+    
+	NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
 	
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
@@ -670,6 +671,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSUInteger index = 0;
 	NSString* faceKeyPhotoKey = nil;
 	NSString* path = nil;
+	NSString* thumbnailPath = nil;
 	IMBNodeObject* object = nil;
 	NSString* subNodeType = @"Face";
 	
@@ -726,21 +728,21 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)path;
+			object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
 			object.name = subnode.name;
-			object.parser = self;
+			object.parserIdentifier = [self identifier];
 			object.index = index++;
 			
-			object.imageLocation = [self imagePathForFaceIndex:[faceDict objectForKey:@"key image face index"] inImageWithKey:faceKeyPhotoKey];
+			thumbnailPath = [self imagePathForFaceIndex:[faceDict objectForKey:@"key image face index"]
+                                         inImageWithKey:faceKeyPhotoKey];
+			object.imageLocation = (id)[NSURL fileURLWithPath:thumbnailPath isDirectory:NO];
 			object.imageRepresentationType = [self requestedImageRepresentationType];
 			object.imageRepresentation = nil;
 		}
 	}	
 	
 	[pool drain];
-	inNode.subnodes = subnodes;
 	inNode.objects = objects;
-*/	
 }
 
 
@@ -894,8 +896,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSString*) requestedImageRepresentationType
 {
-	return nil;
-//	return IKImageBrowserCGImageRepresentationType;
+	return IKImageBrowserCGImageRepresentationType;
 }
 
 

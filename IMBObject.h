@@ -125,6 +125,7 @@ extern NSString* kIMBQuickLookImageProperty;
 
 - (NSString*) path;											// Convert location to path
 - (NSURL*) URL;												// Convert location to url
+- (NSURL*) imageLocationURL;                                // Convert imageLocation to url
 - (BOOL) isLocalFile;										// Is this object a local file
 - (NSString*) type;											// Returns type of file if possible
 - (NSString*) tooltipString;

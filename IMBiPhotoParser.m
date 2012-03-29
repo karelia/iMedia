@@ -199,15 +199,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	return nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	return nil;

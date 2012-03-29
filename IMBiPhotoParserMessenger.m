@@ -66,6 +66,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark GLOBALS
+
+static NSMutableArray* sParsers = nil;
+static dispatch_once_t sOnceToken = 0;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 // Specify parameters for image subclass and register it...
@@ -186,42 +195,44 @@
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-	NSMutableArray* parsers = [NSMutableArray array];
+    dispatch_once(&sOnceToken,
+    ^{
+        if ([self isInstalled])
+        {
+            CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
+            NSArray* libraries = (NSArray*)recentLibraries;
+			sParsers = [[NSMutableArray alloc] initWithCapacity:libraries.count];
+            
+            for (NSString* library in libraries)
+            {
+                NSURL* url = [NSURL URLWithString:library];
+                NSString* path = [url path];
+                BOOL changed;
+                
+                if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
+                {
+                    // Create a parser instance preconfigure with that path...
+                    
+                    IMBiPhotoParser* parser = (IMBiPhotoParser*)[self newParser];
+                    
+                    parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
+                    parser.mediaType = self.mediaType;
+                    parser.mediaSource = [NSURL fileURLWithPath:path];
+                    parser.appPath = self.iPhotoPath;
+                    
+                    [sParsers addObject:parser];
+                    [parser release];
+                    
+                    // Exclude enclosing folder from being displayed by IMBFolderParser...
+                    
+                    NSString* libraryPath = [path stringByDeletingLastPathComponent];
+                    [IMBConfig registerLibraryPath:libraryPath];
+                }
+            }
+        }
+	});
 	
-	if ([self isInstalled])
-	{
-		CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
-		NSArray* libraries = (NSArray*)recentLibraries;
-		
-		for (NSString* library in libraries)
-		{
-			NSURL* url = [NSURL URLWithString:library];
-			NSString* path = [url path];
-			BOOL changed;
-			
-			if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
-			{
-				// Create a parser instance preconfigure with that path...
-				
-				IMBiPhotoParser* parser = (IMBiPhotoParser*)[self newParser];
-				
-				parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
-				parser.mediaType = self.mediaType;
-				parser.mediaSource = [NSURL fileURLWithPath:path];
-				parser.appPath = self.iPhotoPath;
-				
-				[parsers addObject:parser];
-				[parser release];
-
-				// Exclude enclosing folder from being displayed by IMBFolderParser...
-				
-				NSString* libraryPath = [path stringByDeletingLastPathComponent];
-				[IMBConfig registerLibraryPath:libraryPath];
-			}
-		}
-	}
-	
-	return (NSArray*)parsers;
+	return (NSArray*)sParsers;
 }
 
 

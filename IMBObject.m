@@ -696,6 +696,25 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 }
 
 
+// Convert imageLocation to url...
+
+- (NSURL*) imageLocationURL
+{
+	NSURL* url = nil;
+	
+	if ([_imageLocation isKindOfClass:[NSURL class]])
+	{
+		url = (NSURL*)_imageLocation;
+	}
+	else if ([_imageLocation isKindOfClass:[NSString class]])
+	{
+		url = [NSURL fileURLWithPath:(NSString*)_imageLocation];
+	}
+	
+	return url;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

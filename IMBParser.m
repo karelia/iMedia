@@ -55,7 +55,7 @@
 #import "IMBParser.h"
 #import "NSWorkspace+iMedia.h"
 #import "IMBNode.h"
-//#import "IMBObject.h"
+#import "IMBObject.h"
 //#import "IMBObjectsPromise.h"
 //#import "IMBLibraryController.h"
 //#import "NSString+iMedia.h"
@@ -247,12 +247,53 @@
 #pragma mark Object Access
 
 
-// To be overridden by subclasses...
+// Creates a thumbnail for image based parsers, i.e. either -location or -imageLocation of inObject created by
+// that parser must point to an image. If imageLocation is set then the corresponding image is returned.
+// Otherwise a downsized image based on -location is returned.
+// !! You must override this method if neither -location nor -imageLocation of inObjects created by your parser 
+// point to image objects !!
 
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	if (outError) *outError = nil;
-	return nil;
+	NSError* error = nil;
+	CGImageRef thumbnail = NULL;
+	NSURL* url = [inObject imageLocation] ? [inObject imageLocationURL] : [inObject URL];
+	CGImageSourceRef source = NULL;
+    
+    source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
+	
+	if (source)
+	{
+        if ([inObject imageLocation])
+        {
+            thumbnail = CGImageSourceCreateImageAtIndex(source,0,NULL);
+        } else {
+            NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     (id)kCFBooleanTrue,kCGImageSourceCreateThumbnailFromImageIfAbsent,
+                                     (id)[NSNumber numberWithInteger:256],kCGImageSourceThumbnailMaxPixelSize,
+                                     (id)kCFBooleanTrue,kCGImageSourceCreateThumbnailWithTransform,
+                                     nil];
+            
+            thumbnail = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
+        }
+        CFRelease(source);
+	} else {
+        NSString* description = [NSString stringWithFormat:@"URL not found: %@",url];
+        NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
+        error = [NSError errorWithDomain:kIMBErrorDomain code:fnfErr userInfo:info];
+    }
+    
+    if (thumbnail)
+    {
+        [NSMakeCollectable(thumbnail) autorelease];
+    } else {
+        NSString* description = [NSString stringWithFormat:@"Could not create image from URL: %@",url];
+        NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
+        error = [NSError errorWithDomain:kIMBErrorDomain code:0 userInfo:info];
+    }
+	
+	if (outError) *outError = error;
+	return (id)thumbnail;
 }
 
 

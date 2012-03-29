@@ -283,7 +283,7 @@
 			IMBNodeObject* object = [[IMBNodeObject alloc] init];
 			object.representedNodeIdentifier = subnode.identifier;
 			object.location = (id)url;
-			object.imageLocation = (id)url;
+			object.imageLocation = nil;     // Thumbnails will be created on the fly
 			object.name = name;
 			object.metadata = nil;
 			object.parserIdentifier = self.identifier;
@@ -568,7 +568,7 @@
 	object.index = inIndex;
 	
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
-	object.imageLocation = inURL;
+	object.imageLocation = nil;             // thumbnails will be created on the fly
 	object.imageRepresentation = nil;		// will be loaded lazily when needed
 	object.metadata = nil;					// will be loaded lazily when needed
 	
