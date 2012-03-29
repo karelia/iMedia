@@ -162,6 +162,18 @@
 
 // Override to show a folder icon ALWAYS instead of a generic file icon...
 
+- (NSString*) imageRepresentationType
+{
+	return IKImageBrowserNSImageRepresentationType;
+}
+
+
+- (id) imageRepresentation
+{
+	return [NSImage imb_sharedLargeGenericFolderIcon];
+}
+
+
 - (NSImage*) icon
 {
 	return [NSImage imb_sharedGenericFolderIcon];

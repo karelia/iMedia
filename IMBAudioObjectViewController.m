@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBAudioViewController.h"
+#import "IMBAudioObjectViewController.h"
 #import "IMBNodeViewController.h"
 #import "IMBObjectArrayController.h"
 #import "IMBPanelController.h"
@@ -72,7 +72,7 @@
 
 #pragma mark 
 
-@implementation IMBAudioViewController
+@implementation IMBAudioObjectViewController
 
 @synthesize playingAudio = _playingAudio;
 
@@ -82,7 +82,7 @@
 
 + (void) load
 {
-	[IMBPanelController registerViewControllerClass:[self class] forMediaType:kIMBMediaTypeAudio];
+	[IMBObjectViewController registerObjectViewControllerClass:[self class] forMediaType:kIMBMediaTypeAudio];
 }
 
 
@@ -137,26 +137,8 @@
 
 + (NSString*) nibName
 {
-	return @"IMBAudioView";
+	return @"IMBAudioObjectViewController";
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (NSImage*) icon
-//{
-//	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
-//}
-//
-//- (NSString*) displayName
-//{
-//	return NSLocalizedStringWithDefaultValue(
-//		@"IMBAudioViewController.displayName",
-//		nil,IMBBundle(),
-//		@"Audio",
-//		@"mediaType display name");
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------

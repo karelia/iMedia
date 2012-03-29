@@ -71,9 +71,9 @@
 #pragma mark CLASSES
 
 @class IMBLibraryController;
-//@class IMBNodeTreeController;
+@class NSObjectViewController;
 @class IMBOutlineView;
-@class IMBParser;
+//@class IMBParser;
 @class IMBNode;
 
 
@@ -84,25 +84,33 @@
 
 @interface IMBNodeViewController : NSViewController <NSOutlineViewDataSource,NSOutlineViewDelegate,NSSplitViewDelegate>
 {
+	IBOutlet NSSplitView* ibSplitView;
+	IBOutlet IMBOutlineView* ibNodeOutlineView;
+	IBOutlet NSPopUpButton* ibNodePopupButton;
+	IBOutlet NSView* ibHeaderContainerView;
+	IBOutlet NSView* ibObjectContainerView;
+	IBOutlet NSView* ibFooterContainerView;
+	
 	IMBLibraryController* _libraryController;
 	NSString* _selectedNodeIdentifier;
 	NSMutableArray* _expandedNodeIdentifiers;
 	BOOL _isRestoringState;
     NSPoint _nodeOutlineViewSavedVisibleRectOrigin;
-	IMBParser* _selectedParser;
+//	IMBParser* _selectedParser;
 	
-	IBOutlet NSSplitView* ibSplitView;
-	IBOutlet IMBOutlineView* ibNodeOutlineView;
-	IBOutlet NSPopUpButton* ibNodePopupButton;
-	IBOutlet NSView* ibObjectHeaderView;
-	IBOutlet NSView* ibObjectContainerView;
-	IBOutlet NSView* ibObjectFooterView;
-	NSView* _standardObjectView;
-	NSView* _customObjectView;
+	NSViewController* _standardHeaderViewController;
+	NSViewController* _standardObjectViewController;
+	NSViewController* _standardFooterViewController;
+	NSViewController* _headerViewController;
+	NSViewController* _objectViewController;
+	NSViewController* _footerViewController;
 	
-	NSMutableDictionary* _customHeaderViewControllers;
-	NSMutableDictionary* _customObjectViewControllers;
-	NSMutableDictionary* _customFooterViewControllers;
+//	NSView* _standardObjectView;
+//	NSView* _customObjectView;
+//	
+//	NSMutableDictionary* _customHeaderViewControllers;
+//	NSMutableDictionary* _customObjectViewControllers;
+//	NSMutableDictionary* _customFooterViewControllers;
 }
 
 + (void) registerNodeViewControllerClass:(Class)inNodeViewControllerClass forMediaType:(NSString*)inMediaType;
@@ -111,23 +119,24 @@
 // Library...
 
 @property (retain) IMBLibraryController* libraryController;
-@property (readonly) NSString* mediaType;
 
-// Nodes (sourcelist)...
+- (NSString*) mediaType;
+- (NSImage*) icon;
+- (NSString*) displayName;
 
-//@property (readonly) IMBNodeTreeController* nodeTreeController;
+
 @property (readonly) IMBOutlineView* nodeOutlineView;
 @property (readonly) NSPopUpButton* nodePopupButton;
-@property (readonly) NSView* objectHeaderView;
+@property (readonly) NSView* headerContainerView;
 @property (readonly) NSView* objectContainerView;
-@property (readonly) NSView* objectFooterView;
-@property (retain) NSView* standardObjectView;
-@property (retain) NSView* customObjectView;
+@property (readonly) NSView* footerContainerView;
+//@property (retain) NSView* standardObjectView;
+//@property (retain) NSView* customObjectView;
 
 @property (retain) NSString* selectedNodeIdentifier;
 @property (retain) NSMutableArray* expandedNodeIdentifiers;
 @property (readonly) IMBNode* selectedNode;
-@property (retain) IMBParser* selectedParser;
+//@property (retain) IMBParser* selectedParser;
 
 - (void) selectNode:(IMBNode*)inNode;
 - (void) expandSelectedNode;
@@ -147,10 +156,15 @@
 - (BOOL) canRemoveNode;
 - (IBAction) removeNode:(id)inSender;
 
-// User interface...
+// Object Views...
 
-- (NSImage*) icon;
-- (NSString*) displayName;
+@property (retain) NSViewController* standardHeaderViewController;
+@property (retain) NSViewController* standardObjectViewController;
+@property (retain) NSViewController* standardFooterViewController;
+
+@property (retain) NSViewController* headerViewController;
+@property (retain) NSViewController* objectViewController;
+@property (retain) NSViewController* footerViewController;
 
 - (void) installObjectViewForNode:(IMBNode*)inNode;
 - (NSSize) minimumViewSize;
@@ -166,7 +180,7 @@
 + (void) selectNodeWithIdentifier:(NSString*)inIdentifier;
 
 // Use this method in your host app to tell the current object view (icon, list, or combo view)
-// that it needs to re-display itself (e.g. when a badge on an image needs to be updated)
+// that it needs to re-display itself (e.g. when a badge on an image needs to be updated)...
 
 - (void) setObjectContainerViewNeedsDisplay:(BOOL)inFlag;
 

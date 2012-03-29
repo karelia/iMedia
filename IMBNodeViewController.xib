@@ -70,6 +70,7 @@
 												<string key="NSFrameSize">{407, 236}</string>
 												<reference key="NSSuperview" ref="433744218"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="462286590"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="_NSCornerView" key="NSCornerView">
 													<nil key="NSNextResponder"/>
@@ -189,6 +190,7 @@
 										<string key="NSFrame">{{392, 1}, {15, 192}}</string>
 										<reference key="NSSuperview" ref="461347093"/>
 										<reference key="NSWindow"/>
+										<reference key="NSNextKeyView" ref="694317584"/>
 										<reference key="NSTarget" ref="461347093"/>
 										<string key="NSAction">_doScroller:</string>
 										<double key="NSPercent">0.98461538553237915</double>
@@ -199,6 +201,7 @@
 										<string key="NSFrame">{{-100, -100}, {393, 15}}</string>
 										<reference key="NSSuperview" ref="461347093"/>
 										<reference key="NSWindow"/>
+										<reference key="NSNextKeyView" ref="433744218"/>
 										<int key="NSsFlags">1</int>
 										<reference key="NSTarget" ref="461347093"/>
 										<string key="NSAction">_doScroller:</string>
@@ -208,7 +211,7 @@
 								<string key="NSFrame">{{-1, 0}, {409, 238}}</string>
 								<reference key="NSSuperview" ref="1006945435"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="433744218"/>
+								<reference key="NSNextKeyView" ref="367049939"/>
 								<int key="NSsFlags">133682</int>
 								<reference key="NSVScroller" ref="462286590"/>
 								<reference key="NSHScroller" ref="367049939"/>
@@ -221,6 +224,7 @@
 								<string key="NSFrame">{{17, 201}, {374, 26}}</string>
 								<reference key="NSSuperview" ref="1006945435"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView" ref="642917069"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSPopUpButtonCell" key="NSCell" id="96670894">
 									<int key="NSCellFlags">-2076049856</int>
@@ -291,6 +295,7 @@
 						<string key="NSFrameSize">{408, 237}</string>
 						<reference key="NSSuperview" ref="99632755"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="461347093"/>
 						<string key="NSClassName">NSView</string>
 					</object>
 					<object class="NSCustomView" id="642917069">
@@ -304,6 +309,7 @@
 								<string key="NSFrameSize">{408, 44}</string>
 								<reference key="NSSuperview" ref="642917069"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<string key="NSClassName">NSView</string>
 							</object>
 							<object class="NSCustomView" id="1046674344">
@@ -312,6 +318,7 @@
 								<string key="NSFrame">{{0, 401}, {408, 44}}</string>
 								<reference key="NSSuperview" ref="642917069"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView" ref="823626724"/>
 								<string key="NSClassName">NSView</string>
 							</object>
 							<object class="NSCustomView" id="823626724">
@@ -320,18 +327,21 @@
 								<string key="NSFrame">{{0, 44}, {408, 357}}</string>
 								<reference key="NSSuperview" ref="642917069"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView" ref="532808405"/>
 								<string key="NSClassName">NSView</string>
 							</object>
 						</object>
 						<string key="NSFrame">{{0, 246}, {408, 445}}</string>
 						<reference key="NSSuperview" ref="99632755"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="1046674344"/>
 						<string key="NSClassName">NSView</string>
 					</object>
 				</object>
 				<string key="NSFrameSize">{408, 691}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
+				<reference key="NSNextKeyView" ref="1006945435"/>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -379,19 +389,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">ibObjectFooterView</string>
+						<string key="label">ibFooterContainerView</string>
 						<reference key="source" ref="1021"/>
 						<reference key="destination" ref="532808405"/>
 					</object>
-					<int key="connectionID">601</int>
+					<int key="connectionID">603</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">ibObjectHeaderView</string>
+						<string key="label">ibHeaderContainerView</string>
 						<reference key="source" ref="1021"/>
 						<reference key="destination" ref="1046674344"/>
 					</object>
-					<int key="connectionID">602</int>
+					<int key="connectionID">604</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -648,7 +658,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">602</int>
+			<int key="maxID">604</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -699,19 +709,19 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>ibFooterContainerView</string>
+							<string>ibHeaderContainerView</string>
 							<string>ibNodeOutlineView</string>
 							<string>ibNodePopupButton</string>
 							<string>ibObjectContainerView</string>
-							<string>ibObjectFooterView</string>
-							<string>ibObjectHeaderView</string>
 							<string>ibSplitView</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSView</string>
+							<string>NSView</string>
 							<string>IMBOutlineView</string>
 							<string>NSPopUpButton</string>
-							<string>NSView</string>
-							<string>NSView</string>
 							<string>NSView</string>
 							<string>NSSplitView</string>
 						</object>
@@ -720,15 +730,23 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>ibFooterContainerView</string>
+							<string>ibHeaderContainerView</string>
 							<string>ibNodeOutlineView</string>
 							<string>ibNodePopupButton</string>
 							<string>ibObjectContainerView</string>
-							<string>ibObjectFooterView</string>
-							<string>ibObjectHeaderView</string>
 							<string>ibSplitView</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ibFooterContainerView</string>
+								<string key="candidateClassName">NSView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ibHeaderContainerView</string>
+								<string key="candidateClassName">NSView</string>
+							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">ibNodeOutlineView</string>
 								<string key="candidateClassName">IMBOutlineView</string>
@@ -739,14 +757,6 @@
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">ibObjectContainerView</string>
-								<string key="candidateClassName">NSView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">ibObjectFooterView</string>
-								<string key="candidateClassName">NSView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">ibObjectHeaderView</string>
 								<string key="candidateClassName">NSView</string>
 							</object>
 							<object class="IBToOneOutletInfo">

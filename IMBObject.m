@@ -98,6 +98,7 @@
 #import "NSImage+iMedia.h"
 #import "NSKeyedArchiver+iMedia.h"
 #import "IMBSmartFolderNodeObject.h"
+#import "SBUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -117,6 +118,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 //@property (copy) NSString *parserClassName;
 //@property (copy) NSString *parserMediaType;
 //@property (copy) NSString *parserMediaSource;
+@property (retain) id atomic_imageRepresentation;
+@property (assign) BOOL isLoadingThumbnail;
 - (CGImageRef) _renderQuickLookImage;
 @end
 
@@ -142,6 +145,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize shouldDisableTitle = _shouldDisableTitle;
 
 @synthesize imageLocation = _imageLocation;
+@synthesize atomic_imageRepresentation = _imageRepresentation;
 @synthesize imageRepresentationType = _imageRepresentationType;
 @synthesize needsImageRepresentation = _needsImageRepresentation;
 @synthesize imageVersion = _imageVersion;
@@ -357,7 +361,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 }
 
 
-- (BOOL) needsImageRepresentation	// Override simple accessor - also return YES if no actual image rep data.
+// Override simple accessor - also return YES if no actual image rep data...
+
+- (BOOL) needsImageRepresentation	
 {
 	return _needsImageRepresentation || (_imageRepresentation == nil);
 }
@@ -500,33 +506,33 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 #pragma mark Asynchronous Loading
 
 
-// If the image representation isn't available yet, then trigger an asynchronous loading operation...
-
-- (void) loadMetadata
-{
-//	if (!self.metadata)
-//	{
-//		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
-//		operation.options = kIMBLoadMetadata;
-//		
-//		[[IMBOperationQueue sharedQueue] addOperation:operation];			
-//		
-//	}
-}
-
+// If the image representation isn't available yet, then trigger asynchronous loading. When the results come in,
+// copy the properties from the incoming object. Do not replace the old object here, as that would unecessarily
+// upset the NSArrayController. Redrawing of the view will be triggered automatically...
 
 - (void) loadThumbnail
 {
-//	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
-//	{
-//		self.isLoadingThumbnail = YES;
-//		// NSLog(@"Queueing load of %@", self.name);
-//		
-//		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
-//		operation.options = kIMBLoadMetadata | kIMBLoadThumbnail;		// get metadata if needed also.
-//		
-//		[[IMBOperationQueue sharedQueue] addOperation:operation];			
-//	}
+	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
+	{
+		self.isLoadingThumbnail = YES;
+		
+		IMBParserMessenger* messenger = self.parserMessenger;
+		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadThumbnailAndMetadataForObject:error:),self,
+		
+			^(IMBObject* inPopulatedObject,NSError* inError)
+			{
+				if (inError)
+				{
+					NSLog(@"%s Error trying to load thumbnail of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+				}
+				else
+				{
+					self.imageRepresentation = inPopulatedObject.imageRepresentation;
+					self.metadata = inPopulatedObject.metadata;
+					self.isLoadingThumbnail = NO;
+				}
+			});
+	}
 }
 
 
@@ -535,12 +541,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (void) setImageRepresentation:(id)inImageRepresentation
 {
-	id old = _imageRepresentation;
-	_imageRepresentation = [inImageRepresentation retain];
-	[old release];
-
+	self.atomic_imageRepresentation = inImageRepresentation;
 	self.imageVersion = _imageVersion + 1;
-	self.isLoadingThumbnail = NO;
 	
 	if (inImageRepresentation)
 	{
@@ -556,28 +558,42 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 {
 	BOOL unloaded = NO;
 	
-	static NSSet* sTypesThatCanBeUnloaded = nil;
-	
-	if (sTypesThatCanBeUnloaded == nil)
-	{
-		sTypesThatCanBeUnloaded = [[NSSet alloc] initWithObjects:
-			IKImageBrowserPathRepresentationType,				/* NSString */
-			IKImageBrowserNSURLRepresentationType,				/* NSURL */
-			IKImageBrowserQTMoviePathRepresentationType,		/* NSString or NSURL */
-			IKImageBrowserQCCompositionPathRepresentationType,	/* NSString or NSURL */
-			IKImageBrowserQuickLookPathRepresentationType,		/* NSString or NSURL*/
-			IKImageBrowserIconRefPathRepresentationType,		/* NSString */
-			nil];
-	}
-
-	if ([sTypesThatCanBeUnloaded containsObject:self.imageRepresentationType])
-	{
+//	static NSSet* sTypesThatCanBeUnloaded = nil;
+//	
+//	if (sTypesThatCanBeUnloaded == nil)
+//	{
+//		sTypesThatCanBeUnloaded = [[NSSet alloc] initWithObjects:
+//			IKImageBrowserPathRepresentationType,				/* NSString */
+//			IKImageBrowserNSURLRepresentationType,				/* NSURL */
+//			IKImageBrowserQTMoviePathRepresentationType,		/* NSString or NSURL */
+//			IKImageBrowserQCCompositionPathRepresentationType,	/* NSString or NSURL */
+//			IKImageBrowserQuickLookPathRepresentationType,		/* NSString or NSURL*/
+//			IKImageBrowserIconRefPathRepresentationType,		/* NSString */
+//			nil];
+//	}
+//
+//	if ([sTypesThatCanBeUnloaded containsObject:self.imageRepresentationType])
+//	{
 		self.imageRepresentation = nil;
+		self.metadata = nil;
 		self.quickLookImage = NULL;
 		unloaded = YES;
-	}
+//	}
 	
 	return unloaded;
+}
+
+
+- (void) loadMetadata
+{
+//	if (self.metadata == nil)
+//	{
+//		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
+//		operation.options = kIMBLoadMetadata;
+//		
+//		[[IMBOperationQueue sharedQueue] addOperation:operation];			
+//		
+//	}
 }
 
 

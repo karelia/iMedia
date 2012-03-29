@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBImageFolderParser.h"
+#import "IMBObject.h"
 #import "NSImage+iMedia.h"
 
 
@@ -61,14 +62,57 @@
 
 @implementation IMBImageFolderParser
 
-// Return metadata specific to image files...
 
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Creates a thumbnail for our image file...
+
+- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return [NSImage imb_metadataFromImageAtPath:inPath checkSpotlightComments:YES];
+	NSError* error = nil;
+	CGImageRef thumbnail = NULL;
+	NSURL* url = inObject.URL;
+	CGImageSourceRef source = NULL;
+	
+	if (error == nil)
+	{
+		source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
+	}
+	
+	if (error == nil)
+	{
+		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+			(id)kCFBooleanTrue,kCGImageSourceCreateThumbnailFromImageIfAbsent,
+			(id)[NSNumber numberWithInteger:256],kCGImageSourceThumbnailMaxPixelSize,
+			(id)kCFBooleanTrue,kCGImageSourceCreateThumbnailWithTransform,
+			nil];
+			
+		thumbnail = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
+		[NSMakeCollectable(thumbnail) autorelease];
+	}
+	
+	if (source) CFRelease(source);
+	
+	if (outError) *outError = error;
+	return (id)thumbnail;
 }
-
-@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Return metadata specific to image files...
+
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	NSString* path = inObject.path;
+	if (outError) *outError = nil;
+	return [NSImage imb_metadataFromImageAtPath:path checkSpotlightComments:YES];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end

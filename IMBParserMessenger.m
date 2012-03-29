@@ -55,6 +55,7 @@
 #import "IMBParserMessenger.h"
 #import "IMBParser.h"
 #import "IMBNode.h"
+#import "IMBObject.h"
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
 
@@ -284,6 +285,32 @@
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	return [parser reloadNodeTree:inNode error:outError];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This method is used to load thumbnail and metadata for a given IMBObject. No need to override this method,
+// as the real work is done by two methods in IMBParser subclasses...
+
+- (IMBObject*) loadThumbnailAndMetadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	NSError* error = nil;
+	IMBParser* parser = [self parserWithIdentifier:inObject.parserIdentifier];
+	
+	if (error == nil)
+	{
+		inObject.imageRepresentation = [parser thumbnailForObject:inObject error:&error];
+	}
+
+	if (error == nil)
+	{
+		inObject.metadata = [parser metadataForObject:inObject error:&error];
+	}
+	
+	if (outError) *outError = error;
+	return (error == nil) ? inObject : nil;
 }
 
 

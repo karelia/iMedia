@@ -56,13 +56,9 @@
 #import "IMBParserController.h"
 #import "IMBLibraryController.h"
 #import "IMBNodeViewController.h"
-#import "IMBImageViewController.h"
-#import "IMBAudioViewController.h"
-#import "IMBMovieViewController.h"
-#import "IMBLinkViewController.h"
+#import "IMBObjectViewController.h"
 #import "IMBHoverButton.h"
 #import "NSWindow_Flipr.h"
-
 #import "IMBConfig.h"
 #import "IMBCommon.h"
 #import "IMBQLPreviewPanel.h"
@@ -83,7 +79,6 @@ NSString* kIMBImageBrowserShowTitlesNotification = @"IMBImageBrowserShowTitlesNo
 #pragma mark GLOBALS
 
 static IMBPanelController* sSharedPanelController = nil;
-static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -121,29 +116,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 @synthesize nodeViewControllers = _nodeViewControllers;
 @synthesize loadedLibraries = _loadedLibraries;
 @synthesize oldMediaType = _oldMediaType;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Register the view controller class...
-
-+ (void) registerObjectViewControllerClass:(Class)inObjectViewControllerClass forMediaType:(NSString*)inMediaType
-{
-	@synchronized ([self class])
-	{
-		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		
-		if (sRegisteredObjectViewControllerClasses == nil)
-		{
-			sRegisteredObjectViewControllerClasses = [[NSMutableDictionary alloc] init];
-		}
-		
-		[sRegisteredObjectViewControllerClasses setObject:inObjectViewControllerClass forKey:inMediaType];
-		
-		[pool drain];
-	}
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -241,7 +213,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 {
 	IMBLibraryController* libraryController = nil;
 	IMBNodeViewController* nodeViewController = nil;
-//	IMBObjectViewController* objectViewController = nil;
+	IMBObjectViewController* objectViewController = nil;
 	
 	// Load the parsers...
 	
@@ -256,22 +228,13 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
 		[libraryController setDelegate:self.delegate];
 
-		// Create the top-level view controller (IMBNodeViewController) for each media type...
+		// Create the top-level view controller (IMBNodeViewController) with attached standard
+            // object view (IMBObjectViewController) for each media type...
 		
-		nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
-		[self.nodeViewControllers setObject:nodeViewController forKey:mediaType];
-		
-//		Class ovc = [sRegisteredViewControllerClasses objectForKey:mediaType];
-//		objectViewController = (IMBObjectViewController*) [ovc viewControllerForLibraryController:libraryController];
-
-		// Store the object view controller in an array. Note that the node view controller is attached 
-		// to the object view controller, so we do not need to store it separately...
-		
-//		if (objectViewController)
-//		{
-//			objectViewController.nodeViewController = nodeViewController;
-//			[self.viewControllers addObject:objectViewController];
-//		}
+            nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
+            objectViewController = [IMBObjectViewController viewControllerForLibraryController:libraryController];
+            nodeViewController.standardObjectViewController = objectViewController;
+            [self.nodeViewControllers setObject:nodeViewController forKey:mediaType];
 	}
 }
 
@@ -303,30 +266,53 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	[self setupInfoWindow];
 	
 	[ibGridPrompt setStringValue:NSLocalizedStringWithDefaultValue(
-																   @"IMB.option.gridPrompt", nil,IMBBundle(),
-																   @"Photo Grids:", @"back of window")];
+		@"IMB.option.gridPrompt",
+		nil,
+		IMBBundle(),
+		@"Photo Grids:",
+		@"back of window")];
+		
 	[ibToolbarPrompt setStringValue:NSLocalizedStringWithDefaultValue(
-																   @"IMB.option.toolbar", nil,IMBBundle(),
-																   @"Toolbar:", @"back of window")];
+		@"IMB.option.toolbar", 
+		nil,
+		IMBBundle(),
+		@"Toolbar:", 
+		@"back of window")];
+		
 	[ibShowTitles setTitle:NSLocalizedStringWithDefaultValue(
-																	  @"IMB.option.showTitles", nil,IMBBundle(),
-																	  @"Show Titles", @"back of window checkbox")];
+		@"IMB.option.showTitles", 
+		nil,
+		IMBBundle(),
+		@"Show Titles", 
+		@"back of window checkbox")];
+		
 	[ibSmallSize setTitle:NSLocalizedStringWithDefaultValue(
-																   @"IMB.option.smallSize", nil,IMBBundle(),
-																   @"Small size", @"back of window checkbox")];
+		@"IMB.option.smallSize", 
+		nil,
+		IMBBundle(),
+		@"Small size", 
+		@"back of window checkbox")];
 	
-	[[ibToolbarPopup itemAtIndex:0]
-	 setTitle:NSLocalizedStringWithDefaultValue(
-												@"IMB.option.toolbarSize.iconAndText", nil,IMBBundle(),
-												@"Icon & Text", @"back of window toolbar popup menu item")];
-	[[ibToolbarPopup itemAtIndex:1]
-	 setTitle:NSLocalizedStringWithDefaultValue(
-												@"IMB.option.toolbarSize.iconOnly", nil,IMBBundle(),
-												@"Icon Only", @"back of window toolbar popup menu item")];
-	[[ibToolbarPopup itemAtIndex:2]
-	 setTitle:NSLocalizedStringWithDefaultValue(
-												@"IMB.option.toolbarSize.textOnly", nil,IMBBundle(),
-												@"Text Only", @"back of window toolbar popup menu item")];
+	[[ibToolbarPopup itemAtIndex:0] setTitle:NSLocalizedStringWithDefaultValue(
+		@"IMB.option.toolbarSize.iconAndText", 
+		nil,
+		IMBBundle(),
+		@"Icon & Text", 
+		@"back of window toolbar popup menu item")];
+		
+	[[ibToolbarPopup itemAtIndex:1] setTitle:NSLocalizedStringWithDefaultValue(
+		@"IMB.option.toolbarSize.iconOnly", 
+		nil,
+		IMBBundle(),
+		@"Icon Only", 
+		@"back of window toolbar popup menu item")];
+		
+	[[ibToolbarPopup itemAtIndex:2] setTitle:NSLocalizedStringWithDefaultValue(
+		@"IMB.option.toolbarSize.textOnly", 
+		nil,
+		IMBBundle(),
+		@"Text Only", 
+		@"back of window toolbar popup menu item")];
 
 	// Create a tab for each controller and install the subviews in it. We query each node controller for its 
 	// minimum size so we can be sure to constrain our panel's minimum to suit the most restrictive controller...
@@ -358,7 +344,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		
 //		NSView* objectView = [objectViewController view];
 //		nodeViewController.standardObjectView = objectView;
-//		[nodeViewController installObjectViewForNode:nil];
+		[nodeViewController installObjectViewForNode:nil];
 
 		NSTabViewItem* item = [[NSTabViewItem alloc] initWithIdentifier:mediaType];
 		[item setLabel:mediaType];

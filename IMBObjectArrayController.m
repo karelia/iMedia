@@ -245,10 +245,12 @@ const NSString* kSearchStringContext = @"searchString";
 			// For searching to work properly we should load object metadata if it isn't available yet,
 			// because the search might require keypaths like @"metadata.*"...
 
-			if (searching && object.metadata == nil)
-			{
-				[object.parser loadMetadataForObject:object];
-			}
+            #warning TODO
+            
+//			if (searching && object.metadata == nil)
+//			{
+//				[object.parser loadMetadataForObject:object];
+//			}
 
 			// Give the delegate a chance to enhance an object or totally replace it with a proxy object.
 			// This way an object can be customized or made more rich...

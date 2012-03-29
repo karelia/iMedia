@@ -85,12 +85,21 @@
 
 #import <iMedia/IMBParserController.h>
 #import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBNodeTreeController.h>
 #import <iMedia/IMBObjectArrayController.h>
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBImageViewController.h>
+
 #import <iMedia/IMBPanelController.h>
+
+#import <iMedia/IMBNodeViewController.h>
+#import <iMedia/IMBImageNodeViewController.h>
+#import <iMedia/IMBAudioNodeViewController.h>
+#import <iMedia/IMBMovieNodeViewController.h>
+#import <iMedia/IMBLinkNodeViewController.h>
+
+#import <iMedia/IMBObjectViewController.h>
+#import <iMedia/IMBImageObjectViewController.h>
+#import <iMedia/IMBAudioObjectViewController.h>
+#import <iMedia/IMBMovieObjectViewController.h>
+#import <iMedia/IMBLinkObjectViewController.h>
 
 // Views...
 
