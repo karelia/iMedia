@@ -1390,12 +1390,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			cell.imageRepresentationType = object.imageRepresentationType;
 		}
 		
-//		if (object.metadata != nil && object.metadataDescription == nil)
-//		{
-//			IMBParserMessenger* parserMessenger = object.parserMessenger;
-//			object.metadataDescription = [parserMessenger metadataDescriptionForMetadata:object.metadata];
-//		}
-
 		cell.title = object.imageTitle;
 		cell.subtitle = object.metadataDescription;
 	}
@@ -1439,7 +1433,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			}
 		}
 	}
-	
 }
 
 
