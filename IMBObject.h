@@ -98,9 +98,6 @@ extern NSString* kIMBQuickLookImageProperty;
 	NSString* _imageRepresentationType;		
 	BOOL _needsImageRepresentation;
 	NSUInteger _imageVersion;
-	
-	CGImageRef _quickLookImage;
-	BOOL _isLoadingQuickLookImage;
 }
 
 // Primary properties...
@@ -148,9 +145,6 @@ extern NSString* kIMBQuickLookImageProperty;
 @property (readonly) BOOL isLoadingThumbnail;
 
 - (void) loadMetadata;  // observe .metadata property to know when finished
-- (CGImageRef) quickLookImage;
-- (void) setQuickLookImage:(CGImageRef)inImage;
-
 - (void) postProcessLocalURL:(NSURL*)inLocalURL;
 
 @end

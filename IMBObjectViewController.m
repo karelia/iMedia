@@ -1366,6 +1366,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 - (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
+	NSString* columnIdentifier = [inTableColumn identifier];
 	
 	// If we are in combo view, then assign thumbnail, title, subd subtitle (metadataDescription). If they are
 	// not available yet, then load them lazily (in that case we'll end up here again once they are available)...
@@ -1373,18 +1374,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	if ([inCell isKindOfClass:[IMBComboTextCell class]])
 	{
 		IMBComboTextCell* cell = (IMBComboTextCell*)inCell;
-
-		if (object.imageRepresentationType == IKImageBrowserQTMoviePathRepresentationType)
-		{
-			cell.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
-			cell.imageRepresentation = (id) [object quickLookImage];
-		}
-		else
-		{
-			cell.imageRepresentation = object.imageRepresentation;
-			cell.imageRepresentationType = object.imageRepresentationType;
-		}
-		
+		cell.imageRepresentation = object.imageRepresentation;
+		cell.imageRepresentationType = object.imageRepresentationType;
 		cell.title = object.imageTitle;
 		cell.subtitle = object.metadataDescription;
 	}
@@ -1392,7 +1383,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	// If we are in list view and don't have metadata yet, then load it lazily. We'll end up here again once 
 	// they are available...
 	
-	if (![object isKindOfClass:[IMBNodeObject class]] && [(NSString*)[inTableColumn identifier] isEqualToString:@"size"])
+	if ([columnIdentifier isEqualToString:@"size"] && ![object isKindOfClass:[IMBNodeObject class]])
 	{
 		if (object.metadata == nil)
 		{
@@ -1400,22 +1391,18 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		}
 	}
 	
-	// Host app delegate may provide badge image here...
+	// Host app delegate may provide badge image here. In the list view the icon will be replaced in the NSImageCell...
 	
 	if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
 	{
 		CGImageRef badgeRef = [[self delegate] objectViewController:self badgeForObject:object];
 			
-		// Combo view cell...
-		
 		if ([inCell respondsToSelector:@selector(setBadge:)])
 		{
 			[inCell setBadge:badgeRef];
 		}
-		
-		// List view icon cell...
-		
-		if ([inCell isKindOfClass:[NSImageCell class]] && [(NSString*)[inTableColumn identifier] isEqualToString:@"icon"])
+
+		if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
 		{
 			if (badgeRef)
 			{

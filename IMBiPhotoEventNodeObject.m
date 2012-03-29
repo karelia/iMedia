@@ -118,19 +118,19 @@
 
 // Set a processed image instead of the image provided
 
-- (void) setQuickLookImage:(CGImageRef)inImage
-{
-	CGImageRef image = NULL;
-	if (inImage)
-	{
-		image = [self newProcessedImageFromImage:inImage];
-		if (image) inImage = image;
-	}
-	
-	[super setQuickLookImage:inImage];
-	
-	if (image) CGImageRelease(image);
-}
+//- (void) setQuickLookImage:(CGImageRef)inImage
+//{
+//	CGImageRef image = NULL;
+//	if (inImage)
+//	{
+//		image = [self newProcessedImageFromImage:inImage];
+//		if (image) inImage = image;
+//	}
+//	
+//	[super setQuickLookImage:inImage];
+//	
+//	if (image) CGImageRelease(image);
+//}
 
 
 @end
