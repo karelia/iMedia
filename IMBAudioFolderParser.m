@@ -71,8 +71,8 @@
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	NSError* error = nil;
-	CGImageRef thumbnail = NULL;
-	
+	NSURL* url = inObject.URL;
+	CGImageRef thumbnail = [url imb_quicklookCGImage];
 	if (outError) *outError = error;
 	return (id)thumbnail;
 }
