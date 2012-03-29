@@ -145,6 +145,8 @@
 		D08247B51521CDA600033850 /* IMBObjectsPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */; };
 		D08247B61521CDDA00033850 /* IMBURLGetSizeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */; };
 		D08247B71521CDDA00033850 /* IMBURLDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */; };
+		D08640821524464200B4FD7F /* IMBDisableTitleToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */; };
+		D08640841524467000B4FD7F /* IMBMetadataTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CE6E1C11F6FA09005EE5B4 /* IMBMetadataTransformer.m */; };
 		D08C5C9E104862540068FF07 /* IMBTextFieldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08E8B701019C916005D8614 /* UKFNSubscribeFileWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B681019C916005D8614 /* UKFNSubscribeFileWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		D08E8B721019C916005D8614 /* UKFSEventsWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = D08E8B6A1019C916005D8614 /* UKFSEventsWatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -2093,6 +2095,8 @@
 				D08F7B8215235E5300505395 /* IMBTableView.m in Sources */,
 				D08F7B8315235EA400505395 /* IMBImageItem.m in Sources */,
 				D08F7B841523605400505395 /* IMBObjectArrayController.m in Sources */,
+				D08640821524464200B4FD7F /* IMBDisableTitleToColorTransformer.m in Sources */,
+				D08640841524467000B4FD7F /* IMBMetadataTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
