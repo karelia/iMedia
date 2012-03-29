@@ -56,6 +56,7 @@
 #import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "IMBNodeObject.h"
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
 
@@ -294,7 +295,8 @@
 // This method is used to load thumbnail and metadata for a given IMBObject. No need to override this method,
 // as the real work is done by two methods in IMBParser subclasses...
 
-- (IMBObject*) loadThumbnailAndMetadataForObject:(IMBObject*)inObject error:(NSError**)outError
+
+- (IMBObject*) loadThumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inObject.parserIdentifier];
@@ -304,11 +306,48 @@
 		inObject.imageRepresentation = [parser thumbnailForObject:inObject error:&error];
 	}
 
+	if (outError) *outError = error;
+	return (error == nil) ? inObject : nil;
+}
+
+
+- (IMBObject*) loadMetadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	NSError* error = nil;
+	IMBParser* parser = [self parserWithIdentifier:inObject.parserIdentifier];
+	
 	if (error == nil)
 	{
 		inObject.metadata = [parser metadataForObject:inObject error:&error];
 	}
+
+	if (error == nil)
+	{
+		if (![inObject isKindOfClass:[IMBNodeObject class]])
+		{
+			inObject.metadataDescription = [self metadataDescriptionForMetadata:inObject.metadata];
+		}
+	}
+
+	if (outError) *outError = error;
+	return (error == nil) ? inObject : nil;
+}
+
+
+- (IMBObject*) loadThumbnailAndMetadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	NSError* error = nil;
 	
+	if (error == nil)
+	{
+		[self loadThumbnailForObject:inObject error:&error];
+	}
+
+	if (error == nil)
+	{
+		[self loadMetadataForObject:inObject error:&error];
+	}
+
 	if (outError) *outError = error;
 	return (error == nil) ? inObject : nil;
 }

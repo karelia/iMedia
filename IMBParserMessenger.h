@@ -130,6 +130,8 @@
 
 // Loads thumbnail (CGImageRef) and metadata (NSDictionary) for a given object. Should NOT be overridden in subclasses...
 
+- (IMBObject*) loadThumbnailForObject:(IMBObject*)inObject error:(NSError**)outError;
+- (IMBObject*) loadMetadataForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (IMBObject*) loadThumbnailAndMetadataForObject:(IMBObject*)inObject error:(NSError**)outError;
 
 @end
