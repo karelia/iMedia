@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBAudioFolderParser.h"
+#import "IMBObject.h"
 #import "NSURL+iMedia.h"
 
 
@@ -61,16 +62,36 @@
 
 @implementation IMBAudioFolderParser
 
-// Return metadata specific to audio files...
 
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Creates a thumbnail for our image file...
+
+- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return [NSURL imb_metadataFromAudioAtURL:[NSURL fileURLWithPath:inPath]];
+	NSError* error = nil;
+	CGImageRef thumbnail = NULL;
+	
+	if (outError) *outError = error;
+	return (id)thumbnail;
 }
-
-@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Return metadata specific to audio files...
+
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	NSURL* url = inObject.URL;
+	if (outError) *outError = nil;
+	return [NSURL imb_metadataFromAudioAtURL:url];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end

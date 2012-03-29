@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBMovieFolderParser.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,16 +67,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Creates a thumbnail for our image file...
+
+- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	NSError* error = nil;
+	CGImageRef thumbnail = NULL;
+	
+	if (outError) *outError = error;
+	return (id)thumbnail;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Return metadata specific to movie files...
 
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-	MDItemRef item = MDItemCreate(NULL,(CFStringRef)inPath);
+	NSString* path = inObject.path;
+	MDItemRef item = MDItemCreate(NULL,(CFStringRef)path);
 	
 	if (item)
 	{
-		[metadata setObject:inPath forKey:@"path"];
+		[metadata setObject:path forKey:@"path"];
 		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
 		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
 		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
@@ -113,6 +130,8 @@
 	}
 	
 	return metadata;
+
+	if (outError) *outError = nil;
 }
 
 
@@ -120,4 +139,3 @@
 
 
 @end
-

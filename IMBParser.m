@@ -249,7 +249,7 @@
 
 // To be overridden by subclasses...
 
-- (NSData*) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
+- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	return nil;
 }

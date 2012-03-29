@@ -260,7 +260,7 @@
 			
 			NSString* path = [url path];
 			NSString* name = [fileManager displayNameAtPath:path];
-			NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
+//			NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 			NSUInteger countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
 			if (error) break;
 			
@@ -283,13 +283,11 @@
 			IMBNodeObject* object = [[IMBNodeObject alloc] init];
 			object.representedNodeIdentifier = subnode.identifier;
 			object.location = (id)url;
+			object.imageLocation = (id)url;
 			object.name = name;
 			object.metadata = nil;
 			object.parserIdentifier = self.identifier;
 			object.index = index++;
-			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType; 
-			object.imageLocation = (id)url;
-			object.imageRepresentation = icon;
 			[objects addObject:object];
 			[object release];
 		}
@@ -306,9 +304,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSData*) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
+- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return nil;
+	if (outError) *outError = nil;
+	return NULL;
 }
 
 
@@ -317,7 +316,8 @@
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return nil;
+	if (outError) *outError = nil;
+	return [NSDictionary dictionary];
 }
 
 
@@ -326,6 +326,7 @@
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+	if (outError) *outError = nil;
 	return nil;
 }
 
@@ -333,7 +334,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// If we were not suplied an old node, then we will just create an empty root node. If on the other hand we were
+// If we were not supplied an old node, then we will just create an empty root node. If on the other hand we were
 // given a node, then we will try to recreate the same node as faithfully as possible. That means is should be 
 // the node with the same position/identifier, and if it was populated before, then it should also be populated 
 // afterwards...

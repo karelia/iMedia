@@ -128,6 +128,10 @@
 - (IMBNode*) populateNode:(IMBNode*)inNode error:(NSError**)outError;
 - (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError;
 
+// Loads thumbnail (CGImageRef) and metadata (NSDictionary) for a given object. Should NOT be overridden in subclasses...
+
+- (IMBObject*) loadThumbnailAndMetadataForObject:(IMBObject*)inObject error:(NSError**)outError;
+
 @end
 
 

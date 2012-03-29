@@ -96,7 +96,7 @@
 
 @required
 
-- (NSData*) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError;
+- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError;
 
