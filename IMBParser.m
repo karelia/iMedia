@@ -260,8 +260,6 @@
 	NSURL* url = [inObject imageLocation] ? [inObject imageLocationURL] : [inObject URL];
 	CGImageSourceRef source = NULL;
     
-    NSLog(@"Thumbnail URL: %@", url);
-	
     source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
 	
 	if (source)
