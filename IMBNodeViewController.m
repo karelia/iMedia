@@ -74,8 +74,9 @@
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kSelectionKey = @"selection";
 
-static NSString* kIMBRevealNodeWithIdentifierNotification = @"IMBRevealNodeWithIdentifierNotification";
-static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithIdentifierNotification";
+static NSString* kIMBRevealNodeWithIdentifierNotification = @"IMBRevealNodeWithIdentifier";
+static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithIdentifier";
+NSString* kIMBExpandAndSelectNodeWithIdentifierNotification = @"IMBExpandAndSelectNodeNodeWithIdentifier";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -299,6 +300,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		addObserver:self 
 		selector:@selector(_selectNodeWithIdentifier:) 
 		name:kIMBSelectNodeWithIdentifierNotification 
+		object:nil];
+
+	[[NSNotificationCenter defaultCenter] 
+		addObserver:self 
+		selector:@selector(_expandAndSelectNodeWithIdentifier:) 
+		name:kIMBExpandAndSelectNodeWithIdentifierNotification 
 		object:nil];
 
 	// Set the cell class on the outline view...
@@ -1753,6 +1760,24 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		IMBNode* node = [_libraryController nodeWithIdentifier:identifier];
 		if (node) [self selectNode:node];
 		self.selectedNodeIdentifier = identifier;
+	}
+}
+
+
+// Called when the user double clicks an IMBNodeObject. Since there is no direct connection from the 
+// IMBObjectViewController to IMBNodeViewController, we'll use a notification and check here if it 
+// really concern us...
+
+- (void) _expandAndSelectNodeWithIdentifier:(NSNotification*)inNotification
+{
+	NSDictionary* userInfo = [inNotification userInfo];
+	IMBNode* node = (IMBNode*)[userInfo objectForKey:@"node"];
+	IMBObjectViewController* objectViewController = (IMBObjectViewController*)[userInfo objectForKey:@"objectViewController"];
+
+	if (objectViewController == self.objectViewController && node != nil)
+	{
+		[self _revealNode:node];
+		[self selectNode:node];
 	}
 }
 
