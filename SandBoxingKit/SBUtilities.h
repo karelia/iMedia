@@ -23,13 +23,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark HEADERS
+
 #import <Cocoa/Cocoa.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-typedef void (^SBReturnValueHandler)(id, NSError *);
+#pragma mark TYPES
+
+typedef void (^SBReturnValueHandler)(id, NSError*);
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Returns YES if the app is running in a sandbox...
@@ -51,12 +58,30 @@ NSString* SBApplicationContainerHomeDirectory(NSString* inBundleIdentifier);
  
 CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdentifier);
 
-// Dispatch a message with optional argument object to a target object asynchronously.
-// When connnection (which must be an XPCConnection) is not nil the message will be transfered
-// to XPC service for execution (i.e. target and object must conform to NSCoding when connection is not nil).
-// When connection is nil (e.g. running on Snow Leopard) message will be dispatched asynchronously via GCD.
 
-void SBPerformSelectorAsync(id inConnection,
-                            id inTarget, SEL inSelector, id inObject,
-                            SBReturnValueHandler inCompletionHandler);
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Dispatch a message with optional argument object to a target object asynchronously. When connnection
+// (which must be an XPCConnection) is not nil the message will be transfered to XPC service for execution 
+// (i.e. target and object must conform to NSCoding when connection is not nil). When connection is nil 
+// (e.g. running on Snow Leopard) message will be dispatched asynchronously via GCD...
+
+void SBPerformSelectorAsync(
+	id inConnection,
+    id inTarget,
+	SEL inSelector, 
+	id inObject,
+	SBReturnValueHandler inCompletionHandler);
+
+
+// Here's the same thing as an Objective-C wrapper (for those devs that do not like using pure C functions)...
+ 							
+@interface NSObject (SBPerformSelectorAsync)
+
+- (void) performAsyncSelector:(SEL)inSelector withObject:(id)inObject onConnection:(id)inConnection completionHandler:(SBReturnValueHandler)inCompletionHandler;
+
+@end
+
+
 //----------------------------------------------------------------------------------------------------------------------

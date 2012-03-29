@@ -55,6 +55,48 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D0E96CEE1518C9BF004F3EE7"
+               BuildableName = "com.karelia.imedia.folder.xpc"
+               BlueprintName = "com.karelia.imedia.folder"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "30FFEBEB150A08DB0009C1D0"
+               BuildableName = "com.karelia.imedia.iPhoto.xpc"
+               BlueprintName = "com.karelia.imedia.iPhoto"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D0F2DDBC152485130059DF8D"
+               BuildableName = "com.karelia.imedia.iTunes.xpc"
+               BlueprintName = "com.karelia.imedia.iTunes"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "D09933541011B26E00C527B7"
                BuildableName = "iMediaTester.app"
                BlueprintName = "iMediaTester"

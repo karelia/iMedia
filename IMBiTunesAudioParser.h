@@ -52,7 +52,15 @@
 
 #pragma mark HEADERS
 
-#import "IMBiTunesParser.h"
+#import "IMBParser.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CLASSES
+
+@class IMBTimecodeTransformer;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,7 +68,22 @@
 
 #pragma mark 
 
-@interface IMBiTunesVideoParser : IMBiTunesParser
+@interface IMBiTunesAudioParser : IMBParser
+{
+	NSString* _appPath;
+	NSDictionary* _plist;
+	NSDate* _modificationDate;
+	BOOL _shouldDisplayLibraryName;
+	NSInteger _version;
+	IMBTimecodeTransformer* _timecodeTransformer;
+}
+
+@property (retain) NSString* appPath;
+@property (retain,readonly) NSDictionary* plist;
+@property (retain) NSDate* modificationDate;
+@property (assign) BOOL shouldDisplayLibraryName;
+@property (assign) NSInteger version;
+@property (retain) IMBTimecodeTransformer* timecodeTransformer;
 
 @end
 

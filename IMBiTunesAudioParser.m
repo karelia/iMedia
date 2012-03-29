@@ -53,7 +53,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBiTunesParser.h"
+#import "IMBiTunesAudioParser.h"
 #import "IMBConfig.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
@@ -64,6 +64,7 @@
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBTimecodeTransformer.h"
+#import "NSURL+iMedia.h"
 #import <Quartz/Quartz.h>
 
 
@@ -72,14 +73,16 @@
 
 #pragma mark 
 
-@interface IMBiTunesParser ()
+@interface IMBiTunesAudioParser ()
+
+@property (retain) NSDictionary* atomic_plist;
 
 - (NSString*) identifierWithPersistentID:(NSString*)inPersistentID;
 - (BOOL) shoudlUsePlaylist:(NSDictionary*)inPlaylistDict;
 - (BOOL) shouldUseTrack:(NSDictionary*)inTrackDict;
 - (BOOL) isLeafPlaylist:(NSDictionary*)inPlaylistDict;
 - (NSImage*) iconForPlaylist:(NSDictionary*)inPlaylistDict;
-- (void) addSubNodesToNode:(IMBNode*)inParentNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks;
+- (void) addSubnodesToNode:(IMBNode*)inParentNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks;
 - (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks;
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
@@ -91,10 +94,10 @@
 
 #pragma mark 
 
-@implementation IMBiTunesParser
+@implementation IMBiTunesAudioParser
 
 @synthesize appPath = _appPath;
-@synthesize plist = _plist;
+@synthesize atomic_plist = _plist;
 @synthesize modificationDate = _modificationDate;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize version = _version;
@@ -104,81 +107,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Register this parser, so that it gets automatically loaded...
-
-+ (void) load
+- (id) init
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool drain];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Check if iTunes is installed...
-
-+ (NSString*) iTunesPath
-{
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iTunes"];
-}
-
-
-+ (BOOL) isInstalled
-{
-	return [self iTunesPath] != nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Look at the iApps preferences file and find all iTunes libraries. Create a parser instance for each libary...
-
-+ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
-{
-	NSMutableArray* parserInstances = [NSMutableArray array];
-
-	if ([self isInstalled])
+	if ((self = [super init]))
 	{
-		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
-		NSArray* libraries = (NSArray*)recentLibraries;
-			
-		for (NSString* library in libraries)
-		{
-			NSURL* url = [NSURL URLWithString:library];
-			NSString* path = [url path];
-			BOOL changed;
-			(void) [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
-
-			NSString *libraryPath = [path stringByDeletingLastPathComponent];	// folder containing .xml file
-			[IMBConfig registerLibraryPath:libraryPath];
-
-			IMBiTunesParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-			parser.mediaSource = path;
-			parser.shouldDisplayLibraryName = libraries.count > 1;
-			[parserInstances addObject:parser];
-			[parser release];
-		}
-		
-		if (recentLibraries) CFRelease(recentLibraries);
-	}
-	
-	return parserInstances;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) initWithMediaType:(NSString*)inMediaType
-{
-	if (self = [super initWithMediaType:inMediaType])
-	{
-		self.appPath = [[self class] iTunesPath];
-		self.plist = nil;
-		self.modificationDate = nil;
 		self.version = 0;
 		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
 	}
@@ -203,6 +135,122 @@
 #pragma mark 
 #pragma mark Parser Methods
 
+
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
+{
+	NSString* path = [self.mediaSource path];
+
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16.0,16.0)];
+	
+	// Create an empty (unpopulated) root node...
+	
+	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	node.icon = icon;
+	node.name = @"iTunes";
+	node.identifier = [self identifierForPath:@"/"];
+	node.mediaType = self.mediaType;
+	node.mediaSource = self.mediaSource;
+	node.parserIdentifier = self.identifier;
+	node.groupType = kIMBGroupTypeLibrary;
+	node.isTopLevelNode = YES;
+	node.group = NO;
+	node.leaf = NO;
+
+	// If we have more than one library then append the library name to the root node...
+	
+	if (self.shouldDisplayLibraryName)
+	{
+		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,name];
+	}
+
+	// Watch the XML file. Whenever something in iTunes changes, we have to replace the WHOLE tree from  
+	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
+	
+//	node.watcherType = kIMBWatcherTypeFSEvent;
+//	node.watchedPath = [path stringByDeletingLastPathComponent];
+	
+	return node;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	NSError* error = nil;
+	NSDictionary* plist = self.plist;
+	NSArray* playlists = [plist objectForKey:@"Playlists"];
+	NSDictionary* tracks = [plist objectForKey:@"Tracks"];
+	
+	[self addSubnodesToNode:inNode playlists:playlists tracks:tracks]; 
+	[self populateNode:inNode playlists:playlists tracks:tracks]; 
+
+	// If we are populating the top-level node, then also populate the "Music" node (first subnode) and mirror 
+	// its objects array into the objects array of the root node. Please note that this is non-standard parser 
+	// behavior, which is implemented here, to achieve the desired "feel" in the browser...
+	
+	if (inNode.isTopLevelNode)
+	{
+		if ([inNode.subnodes count] > 0)
+		{
+			IMBNode* musicNode = [inNode.subnodes objectAtIndex:0];
+			[self populateNode:musicNode  error:&error];
+			inNode.objects = musicNode.objects;
+		}
+	}
+	
+	if (outError) *outError = error;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+//- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
+//{
+//
+//}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Try to get the cover art from directly from the audio file via Quicklook...
+
+- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	NSError* error = nil;
+	NSURL* url = inObject.URL;
+	CGImageRef thumbnail = [url imb_quicklookCGImage];
+	if (outError) *outError = error;
+	return (id)thumbnail;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return nil;
+}
+
+
+
+/*
 - (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
@@ -279,14 +327,14 @@
 	if (outError) *outError = error;
 	return node;
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // The supplied node is a private copy which may be modified here in the background operation. Parse the 
 // iTunes XML file and create subnodes as needed...
-
+/*
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSError* error = nil;
@@ -329,7 +377,7 @@
 		self.plist = nil;
 	}	
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -342,9 +390,9 @@
 
 - (NSDictionary*) plist
 {
-	NSDictionary* plist = nil;
 	NSError* error = nil;
-	NSString* path = (NSString*)self.mediaSource;
+	NSURL* url = self.mediaSource;
+	NSString* path = [url path];
 	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 	
@@ -352,20 +400,18 @@
 	{
 		if ([self.modificationDate compare:modificationDate] == NSOrderedAscending)
 		{
-			self.plist = nil;
+			self.atomic_plist = nil;
 		}
 		
 		if (_plist == nil)
 		{
-			self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
+			self.atomic_plist = [NSDictionary dictionaryWithContentsOfURL:url];
 			self.modificationDate = modificationDate;
 			self.version = [[_plist objectForKey:@"Application Version"] intValue];
 		}
-		
-		plist = [[_plist retain] autorelease];
 	}
 	
-	return plist;
+	return self.atomic_plist;
 }
 
 
@@ -554,12 +600,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) addSubNodesToNode:(IMBNode*)inParentNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
+- (void) addSubnodesToNode:(IMBNode*)inParentNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [inParentNode mutableArrayForPopulatingSubnodes];
 
 	// Now parse the iTunes XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
@@ -582,7 +628,7 @@
 			playlistNode.icon = [self iconForPlaylist:playlistDict];
 			playlistNode.name = albumName;
 			playlistNode.mediaSource = self.mediaSource;
-			playlistNode.parser = self;
+			playlistNode.parserIdentifier = self.identifier;
 
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
@@ -593,43 +639,23 @@
 
 			// Add the new album node to its parent (inRootNode)...
 			
-			[subNodes addObject:playlistNode];
+			[subnodes addObject:playlistNode];
 		}
 		
 		[pool drain];
 	}
-	
-	inParentNode.subNodes = subNodes;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (Class) objectClass
-{
-	return [IMBObject class];
-}
-
-
-- (NSString*) requestedImageRepresentationType
-{
-	return IKImageBrowserCGImageRepresentationType;
-}
-
-
 - (void) populateNode:(IMBNode*)inNode playlists:(NSArray*)inPlaylists tracks:(NSDictionary*)inTracks
 {
-	// Select the correct imageRepresentationType for our mediaType...
-	
-	NSString* imageRepresentationType = [self requestedImageRepresentationType];
-		
 	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
 	// without creating an array we would cause an endless loop...
 	
-	NSMutableArray* objects = [[NSMutableArray alloc] initWithArray:inNode.objects];
-
-	Class objectClass = [self objectClass];
+	NSMutableArray* objects = [NSMutableArray array];
     
 	// Look for the correct playlist in the iTunes XML plist. Once we find it, populate the node with IMBVisualObjects
 	// for each song in this playlist...
@@ -658,27 +684,23 @@
 					NSString* name = [trackDict objectForKey:@"Name"];
 					NSString* location = [trackDict objectForKey:@"Location"];
 					NSURL* url = [NSURL URLWithString:location];
-					NSString* path = [url path];
-					BOOL isFileURL = [url isFileURL];
 					
 					// Create an object...
 					
-					IMBObject* object = [[objectClass alloc] init];
+					IMBObject* object = [[IMBObject alloc] init];
 					[objects addObject:object];
 					[object release];
 
 					// For local files path is preferred (as we gain automatic support for some context menu items).
 					// For remote files we'll use a URL (less context menu support)...
 					
-					if (isFileURL) object.location = (id)path;
-					else object.location = (id)url;
-					
+					object.location = (id)url;
 					object.name = name;
-					object.parser = self;
+					object.parserIdentifier = self.identifier;
 					object.index = index++;
 					
-					object.imageLocation = path;
-					object.imageRepresentationType = imageRepresentationType; 
+					object.imageLocation = (id)url;
+					object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
 					object.imageRepresentation = nil;	// will be loaded lazily when needed
 
 					// Add metadata and convert the duration property to seconds. Also note that the original
@@ -713,7 +735,6 @@
 	}
     
     inNode.objects = objects;
-    [objects release];
 }
 
 

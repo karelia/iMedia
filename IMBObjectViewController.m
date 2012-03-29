@@ -67,6 +67,7 @@
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
 #import "IMBButtonObject.h"
+#import "IMBComboTextCell.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1364,24 +1365,20 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 #pragma mark NSTableViewDelegate
 
 
-// If the object for the cell that we are about to display doesn't have any metadata yet, then load it lazily...
+// If the object for the cell that we are about to display doesn't have any metadata yet, then load it lazily.
 // Note: According to WWDC Session 110, this is called a LOT so it's not good for delayed loading...
 
 - (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
-	#warning TODO
-/*	
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
 	
-	if (object.metadata == nil)
-	{
-		[object.parser loadMetadataForObject:object];
-	}
+	// If we are in combo view, then assign thumbnail, title, subd subtitle (metadataDescription). If they are
+	// not available yet, then load them lazily (in that case we'll end up here again once they are available)...
 	
 	if ([inCell isKindOfClass:[IMBComboTextCell class]])
 	{
 		IMBComboTextCell* cell = (IMBComboTextCell*)inCell;
-		
+
 		if (object.imageRepresentationType == IKImageBrowserQTMoviePathRepresentationType)
 		{
 			cell.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
@@ -1397,22 +1394,34 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		cell.subtitle = object.metadataDescription;
 	}
 	
-	// Host app delegate may provide badge image here
+	// If we are in list view and don't have metadata yet, then load it lazily. We'll end up here again once 
+	// they are available...
+	
+	if (![object isKindOfClass:[IMBNodeObject class]] && [(NSString*)[inTableColumn identifier] isEqualToString:@"size"])
+	{
+		if (object.metadata == nil)
+		{
+			[object loadMetadata];
+		}
+	}
+	
+	// Host app delegate may provide badge image here...
 	
 	if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
 	{
-		// Combo view cell
+		CGImageRef badgeRef = [[self delegate] objectViewController:self badgeForObject:object];
+			
+		// Combo view cell...
+		
 		if ([inCell respondsToSelector:@selector(setBadge:)])
 		{
-			[inCell setBadge:[[self delegate] objectViewController:self badgeForObject:object]];
+			[inCell setBadge:badgeRef];
 		}
 		
-		// List view icon cell
-		if ([inCell isKindOfClass:[NSImageCell class]] &&
-			[(NSString*)[inTableColumn identifier] isEqualToString:@"icon"])
+		// List view icon cell...
+		
+		if ([inCell isKindOfClass:[NSImageCell class]] && [(NSString*)[inTableColumn identifier] isEqualToString:@"icon"])
 		{
-			CGImageRef badgeRef = [[self delegate] objectViewController:self badgeForObject:object];
-			
 			if (badgeRef)
 			{
 				NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
@@ -1424,7 +1433,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			}
 		}
 	}
-*/	
 }
 
 
@@ -1449,12 +1457,12 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 }
 
 
-//- (BOOL) tableView:(NSTableView*)inTableView shouldTrackCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inColumn row:(NSInteger)inRow
-//{
-//	NSArray* objects = [ibObjectArrayController arrangedObjects];
-//	IMBObject* object = [objects objectAtIndex:inRow];
-//	return [object isSelectable];
-//}
+- (BOOL) tableView:(NSTableView*)inTableView shouldTrackCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inColumn row:(NSInteger)inRow
+{
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	IMBObject* object = [objects objectAtIndex:inRow];
+	return [object isSelectable];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

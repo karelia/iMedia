@@ -304,26 +304,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	if (outError) *outError = nil;
-	return [NSDictionary dictionary];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	if (outError) *outError = nil;
-	return nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // If we were not supplied an old node, then we will just create an empty root node. If on the other hand we were
 // given a node, then we will try to recreate the same node as faithfully as possible. That means is should be 
 // the node with the same position/identifier, and if it was populated before, then it should also be populated 
@@ -594,32 +574,6 @@
 	
 	return object;
 }
-
-
-// Loaded lazily when actually needed for display. This method may be called on a background thread, 
-// so setters should only be called to the main thread...
-
-- (void) loadMetadataForObject:(IMBObject*)inObject
-{
-//	if (![inObject isKindOfClass:[IMBNodeObject class]])
-//	{
-//		NSDictionary* metadata = [self metadataForFileAtPath:inObject.path];
-//		NSString* description = [self metadataDescriptionForMetadata:metadata];
-//		
-//		if ([NSThread isMainThread])
-//		{
-//			inObject.metadata = metadata;
-//			inObject.metadataDescription = description;
-//		}
-//		else
-//		{
-//			NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-//			[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-//			[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-//		}
-//	}
-}
-
 
 
 //----------------------------------------------------------------------------------------------------------------------

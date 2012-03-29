@@ -52,91 +52,26 @@
 
 #pragma mark HEADERS
 
-#import "IMBMovieFolderParser.h"
-#import "NSURL+iMedia.h"
-#import "IMBObject.h"
+#import "IMBParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-@implementation IMBMovieFolderParser
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Creates a thumbnail for our image file...
-
-- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	NSError* error = nil;
-	NSURL* url = inObject.URL;
-	CGImageRef thumbnail = [url imb_quicklookCGImage];
-	if (outError) *outError = error;
-	return (id)thumbnail;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Return metadata specific to movie files...
-
-- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-	NSString* path = inObject.path;
-	MDItemRef item = MDItemCreate(NULL,(CFStringRef)path);
-	
-	if (item)
-	{
-		[metadata setObject:path forKey:@"path"];
-		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
-		CFNumberRef width = MDItemCopyAttribute(item,kMDItemPixelWidth);
-		CFNumberRef height = MDItemCopyAttribute(item,kMDItemPixelHeight);
-		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
-
-		if (seconds)
-		{
-			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
-			CFRelease(seconds);
-		}
-
-		if (width)
-		{
-			[metadata setObject:(NSNumber*)width forKey:@"width"]; 
-			CFRelease(width);
-		}
-		
-		if (height)
-		{
-			[metadata setObject:(NSNumber*)height forKey:@"height"]; 
-			CFRelease(height);
-		}
-	
-		if (comment)
-		{
-			[metadata setObject:(NSString*)comment forKey:@"comment"]; 
-			CFRelease(comment);
-		}
-		
-		CFRelease(item);
-	}
-	else
-	{
-//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
-	}
-	
-	return metadata;
-
-	if (outError) *outError = nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+@interface IMBiTunesParserMessenger : IMBParserMessenger
 
 @end
+
+
+@interface IMBiTunesAudioParserMessenger : IMBiTunesParserMessenger
+
+@end
+
+
+@interface IMBiTunesMovieParserMessenger : IMBiTunesParserMessenger
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+

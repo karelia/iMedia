@@ -126,7 +126,6 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 @interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate,IMBObjectArrayControllerDelegate,NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 {
 	IMBLibraryController* _libraryController;
-//	IMBNodeViewController* _nodeViewController;
 	IMBNode* _currentNode;
 		
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
