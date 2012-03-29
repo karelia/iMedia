@@ -894,8 +894,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSString*) requestedImageRepresentationType
 {
-	return nil;
-//	return IKImageBrowserCGImageRepresentationType;
+	return IKImageBrowserCGImageRepresentationType;
 }
 
 
