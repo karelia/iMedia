@@ -251,6 +251,7 @@
 
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+	if (outError) *outError = nil;
 	return nil;
 }
 
@@ -262,6 +263,7 @@
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+	if (outError) *outError = nil;
 	return nil;
 }
 
@@ -273,6 +275,7 @@
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+	if (outError) *outError = nil;
 	return nil;
 }
 
