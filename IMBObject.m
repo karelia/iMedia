@@ -115,9 +115,6 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 #pragma mark 
 
 @interface IMBObject ()
-//@property (copy) NSString *parserClassName;
-//@property (copy) NSString *parserMediaType;
-//@property (copy) NSString *parserMediaSource;
 @property (retain) id atomic_imageRepresentation;
 @property (assign) BOOL isLoadingThumbnail;
 - (CGImageRef) _renderQuickLookImage;
@@ -137,9 +134,6 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize metadata = _metadata;
 @synthesize parserIdentifier = _parserIdentifier;
 @synthesize parserMessenger = _parserMessenger;
-//@synthesize parserClassName = _parserClassName;
-//@synthesize parserMediaType = _parserMediaType;
-//@synthesize parserMediaSource = _parserMediaSource;
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
 @synthesize shouldDisableTitle = _shouldDisableTitle;
@@ -529,6 +523,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 				{
 					self.imageRepresentation = inPopulatedObject.imageRepresentation;
 					self.metadata = inPopulatedObject.metadata;
+					self.metadataDescription = inPopulatedObject.metadataDescription;
 					self.isLoadingThumbnail = NO;
 				}
 			});
@@ -586,14 +581,24 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (void) loadMetadata
 {
-//	if (self.metadata == nil)
-//	{
-//		IMBObjectThumbnailLoadOperation* operation = [[[IMBObjectThumbnailLoadOperation alloc] initWithObject:self] autorelease];
-//		operation.options = kIMBLoadMetadata;
-//		
-//		[[IMBOperationQueue sharedQueue] addOperation:operation];			
-//		
-//	}
+	if (self.metadata == nil && !self.isLoadingThumbnail)
+	{
+		IMBParserMessenger* messenger = self.parserMessenger;
+		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadMetadataForObject:error:),self,
+		
+			^(IMBObject* inPopulatedObject,NSError* inError)
+			{
+				if (inError)
+				{
+					NSLog(@"%s Error trying to load metadata of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+				}
+				else
+				{
+					self.metadata = inPopulatedObject.metadata;
+					self.metadataDescription = inPopulatedObject.metadataDescription;
+				}
+			});
+	}
 }
 
 
