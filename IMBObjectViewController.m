@@ -1888,6 +1888,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			nil,IMBBundle(),
 			@"Show All",
 			@"Menu item in context menu of IMBObjectViewController");
+			
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
 		[item setTag:kIMBObjectFilterAll];
 		[item setTarget:self];
@@ -1901,6 +1902,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			nil,IMBBundle(),
 			@"Show Badged Only",
 			@"Menu item in context menu of IMBObjectViewController");
+			
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
 		[item setTag:kIMBObjectFilterBadge];
 		[item setTarget:self];
@@ -1914,6 +1916,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			nil,IMBBundle(),
 			@"Show Unbadged Only",
 			@"Menu item in context menu of IMBObjectViewController");
+			
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
 		[item setTag:kIMBObjectFilterNoBadge];
 		[item setTarget:self];
@@ -2008,123 +2011,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //	[[self nodeViewController] setObjectContainerViewNeedsDisplay:YES];
 }
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Opening
-
-- (void) expandNodeObject:(IMBObject*)inObject
-{
-	if ([inObject isKindOfClass:[IMBNodeObject class]])
-	{
-		NSString* identifier = ((IMBNodeObject*)inObject).representedNodeIdentifier;
-		IMBNode* node = [self.libraryController nodeWithIdentifier:identifier];
-
-		[[NSNotificationCenter defaultCenter] 
-			postNotificationName:kIMBExpandAndSelectNodeWithIdentifierNotification 
-			object:nil 
-			userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
-				self,@"objectViewController",
-				node,@"node",
-				nil]];
-	}
-}
-
-
-// Open the selected objects...
-
-- (IBAction) openSelectedObjects:(id)inSender
-{
-	NSArray* objects = [ibObjectArrayController selectedObjects];
-	[self openObjects:objects];
-}
-
-
-// Open the specified objects. Please note that in sandboxed applications (which usually do not have the necessary
-// rights to access arbitrary media files) this requires an asynchronous round trip to an XPC service. Once we do
-// get the bookmark, we can resolve it to a URL that we can access. Open it in the default app...
-	
-
-- (void) openObjects:(NSArray*)inObjects
-{
-	NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
-	if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
-
-	for (IMBObject* object in inObjects)
-	{
-		[object requestBookmarkWithCompletionBlock:^(NSError* inError)
-		{
-			if (inError)
-			{
-				[NSApp presentError:inError];
-			}
-			else
-			{
-				NSURL* url = [object urlByResolvingBookmark];
-				[url startAccessingSecurityScopedResource];
-				if (appPath) [[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
-				else [[NSWorkspace imb_threadSafeWorkspace] openURL:url];
-				[url stopAccessingSecurityScopedResource];
-			}
-		}];
-	}
-	
-//		IMBParser* parser = inSelectedNode.parser;
-//		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
-//		[promise setDelegate:self completionSelector:@selector(_openLocalURLs:)];
-//        [promise start];
-}
-
-/*
-// Post process.
-
-- (void) _postProcessDownload:(IMBObjectsPromise*)inObjectsPromise
-{
-	if ([inObjectsPromise isKindOfClass:[NSError class]])	// overloaded... error object
-	{
-		[NSApp presentError:(NSError*)inObjectsPromise];
-	}
-}
-
-
-// "Local" means that for whatever the object represents, opening it now requires no network or other time-intensive
-// procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to
-// IMBObjects that refer strictly to a web link, where "opening" them just means loading them in a browser...
-
-- (void) _openLocalURLs:(IMBObjectsPromise*)inObjectPromise
-{
-	if ([inObjectPromise isKindOfClass:[NSError class]])	// overloaded... error object
-	{
-		[NSApp presentError:(NSError*)inObjectPromise];
-	}
-	else
-	{
-		[self _postProcessDownload:inObjectPromise];		// first do our post-processing
-		
-		for (NSURL* url in inObjectPromise.fileURLs)
-		{
-			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
-			
-			if ([url isKindOfClass:[NSURL class]])
-			{
-				NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
-				if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
-
-				if ([self writesLocalFilesToPasteboard] && appPath != nil)
-				{
-					[[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
-				}
-				else
-				{
-					[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
-				}
-			}
-		}
-	}
-}
-*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -2374,6 +2260,126 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 }
 
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Opening
+
+// Double-clicking and IMBNodeObject (folder icon) in the object view expands and selects the represented node. 
+// The result is that we are drilling into that "folder"...
+
+- (void) expandNodeObject:(IMBNodeObject*)inNodeObject
+{
+	if ([inNodeObject isKindOfClass:[IMBNodeObject class]])
+	{
+		NSString* identifier = inNodeObject.representedNodeIdentifier;
+		IMBNode* node = [self.libraryController nodeWithIdentifier:identifier];
+
+		[[NSNotificationCenter defaultCenter] 
+			postNotificationName:kIMBExpandAndSelectNodeWithIdentifierNotification 
+			object:nil 
+			userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+				self,@"objectViewController",
+				node,@"node",
+				nil]];
+	}
+}
+
+
+// Open the selected objects...
+
+- (IBAction) openSelectedObjects:(id)inSender
+{
+	NSArray* objects = [ibObjectArrayController selectedObjects];
+	[self openObjects:objects];
+}
+
+
+// Open the specified objects. Please note that in sandboxed applications (which usually do not have the necessary
+// rights to access arbitrary media files) this requires an asynchronous round trip to an XPC service. Once we do
+// get the bookmark, we can resolve it to a URL that we can access. Open it in the default app...
+	
+
+- (void) openObjects:(NSArray*)inObjects
+{
+	NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
+	if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
+
+	for (IMBObject* object in inObjects)
+	{
+		[object requestBookmarkWithCompletionBlock:^(NSError* inError)
+		{
+			if (inError)
+			{
+				[NSApp presentError:inError];
+			}
+			else
+			{
+				NSURL* url = [object urlByResolvingBookmark];
+				[url startAccessingSecurityScopedResource];
+				if (appPath) [[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+				else [[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+				[url stopAccessingSecurityScopedResource];
+			}
+		}];
+	}
+	
+//		IMBParser* parser = inSelectedNode.parser;
+//		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
+//		[promise setDelegate:self completionSelector:@selector(_openLocalURLs:)];
+//        [promise start];
+}
+
+/*
+// Post process.
+
+- (void) _postProcessDownload:(IMBObjectsPromise*)inObjectsPromise
+{
+	if ([inObjectsPromise isKindOfClass:[NSError class]])	// overloaded... error object
+	{
+		[NSApp presentError:(NSError*)inObjectsPromise];
+	}
+}
+
+
+// "Local" means that for whatever the object represents, opening it now requires no network or other time-intensive
+// procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to
+// IMBObjects that refer strictly to a web link, where "opening" them just means loading them in a browser...
+
+- (void) _openLocalURLs:(IMBObjectsPromise*)inObjectPromise
+{
+	if ([inObjectPromise isKindOfClass:[NSError class]])	// overloaded... error object
+	{
+		[NSApp presentError:(NSError*)inObjectPromise];
+	}
+	else
+	{
+		[self _postProcessDownload:inObjectPromise];		// first do our post-processing
+		
+		for (NSURL* url in inObjectPromise.fileURLs)
+		{
+			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
+			
+			if ([url isKindOfClass:[NSURL class]])
+			{
+				NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
+				if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
+
+				if ([self writesLocalFilesToPasteboard] && appPath != nil)
+				{
+					[[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+				}
+				else
+				{
+					[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+				}
+			}
+		}
+	}
+}
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 

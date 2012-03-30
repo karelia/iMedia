@@ -343,7 +343,7 @@
 	{
         NSString* description = [NSString stringWithFormat:@"Could not create bookmark for non file URL: %@",fileURL];
         NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
-        error = [NSError errorWithDomain:kIMBErrorDomain code:0 userInfo:info];
+        error = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];
 	}
 	
 	if (outError) *outError = error;
@@ -520,54 +520,6 @@
 //	}
 //}
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Returns an autoreleased source for the given url...
-/*
-+ (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL
-{
-	CGImageSourceRef source = NULL;
-	
-	if (inURL)
-	{
-		NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:nil];
-		source = CGImageSourceCreateWithURL((CFURLRef)inURL,(CFDictionaryRef)options);
-		[NSMakeCollectable(source) autorelease];
-	}
-	
-	return source;
-}
-*/
-	
-// Returns an autoreleased image for the given url...
-/*
-+ (CGImageRef) _imageForURL:(NSURL*)inURL
-{
-	CGImageRef image = NULL;
-	
-	if (inURL)
-	{
-		CGImageSourceRef source = [self _imageSourceForURL:inURL];
-
-		if (source)
-		{
-			NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-			   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailWithTransform,
-			   (id)kCFBooleanFalse,(id)kCGImageSourceCreateThumbnailFromImageIfAbsent,
-			   (id)kCFBooleanTrue,(id)kCGImageSourceCreateThumbnailFromImageAlways,	// bug in rotation so let's use the full size always
-			   [NSNumber numberWithInteger:kIMBMaxThumbnailSize],(id)kCGImageSourceThumbnailMaxPixelSize, 
-			   nil];
-			
-			image = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
-			[NSMakeCollectable(image) autorelease];
-		}
-	}
-	
-	return image;
-}	
-*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
