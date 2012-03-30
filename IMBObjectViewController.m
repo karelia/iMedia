@@ -302,7 +302,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		{
 //			NSLog(@"dealloc REMOVE [%p:%@'%@' removeObs…:%p 4kp:imageRep…", object,[object class],[object name], self);
             [object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
-            [object removeObserver:self forKeyPath:kIMBQuickLookImageProperty];
         }
     }
 	
@@ -564,8 +563,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	// case, we know they will be) We should only update the UI on the main thread, and in addition, we use 
 	// NSRunLoopCommonModes to make sure the UI updates when a modal window is up...
 		
-	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty] ||
-			 [inKeyPath isEqualToString:kIMBQuickLookImageProperty])
+	else if ([inKeyPath isEqualToString:kIMBObjectImageRepresentationProperty])
 	{
 		IMBDynamicTableView* affectedTableView = (IMBDynamicTableView*)inContext;
 		NSInteger row = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:inObject];
@@ -1547,7 +1545,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //		NSLog(@"changedVis…:… REMOVE [%p:%@'%@' removeObs…:%p 4kp:imageRep…", object,[object class],[object name], self);
 #endif
 		[object removeObserver:self forKeyPath:kIMBObjectImageRepresentationProperty];
-		[object removeObserver:self forKeyPath:kIMBQuickLookImageProperty];
 		
 		NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
 		for (IMBObjectThumbnailLoadOperation* op in ops)
@@ -1622,7 +1619,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 #endif
 
 		[object addObserver:self forKeyPath:kIMBObjectImageRepresentationProperty options:0 context:(void*)ibComboView];
-		[object addObserver:self forKeyPath:kIMBQuickLookImageProperty options:0 context:(void*)ibComboView];
      }
 	
 	// Finally cache our old visible items set
