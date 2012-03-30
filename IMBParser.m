@@ -593,16 +593,23 @@
 - (NSData*) bookmarkForLocalFileObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	NSError* error = nil;
-	NSURL* baseURL = inObject.bookmarkBaseURL;
-	NSURL* fileURL = [inObject.URL fileReferenceURL];
+//	NSURL* baseURL = nil; //inObject.bookmarkBaseURL;
+	NSURL* fileURL = inObject.URL;
 	NSData* bookmark = nil;
 	
 	if ([fileURL isFileURL])
 	{
+	/*
+		NSURLBookmarkCreationOptions options = 
+			NSURLBookmarkCreationMinimalBookmark |
+//			NSURLBookmarkCreationWithSecurityScope |
+//			NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess |
+			NSURLBookmarkCreationPreferFileIDResolution;
+	*/		
 		bookmark = [fileURL 
-			bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
+			bookmarkDataWithOptions:0 //options
 			includingResourceValuesForKeys:nil
-			relativeToURL:baseURL 
+			relativeToURL:nil
 			error:&error];
 	}
 	else
