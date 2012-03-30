@@ -217,7 +217,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 - (id <IMBObjectViewControllerDelegate>) delegate;
 - (void) expandNodeObject:(IMBObject*)inObject;
 - (IBAction) openSelectedObjects:(id)inSender;
-- (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode;
+- (void) openObjects:(NSArray*)inObjects;
 - (IBAction) quicklook:(id)inSender;
 
 //- (IBAction) tableViewWasDoubleClicked:(id)inSender;

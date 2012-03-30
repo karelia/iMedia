@@ -2037,36 +2037,47 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (IBAction) openSelectedObjects:(id)inSender
 {
-	IMBNode* node = self.currentNode;
 	NSArray* objects = [ibObjectArrayController selectedObjects];
-	[self openObjects:objects inSelectedNode:node];
+	[self openObjects:objects];
 }
 
 
-// Open the specified objects. Double-clicking opens the files (with the default app). Please note that 
-// IMBObjects are first passed through an IMBObjectsPromise (which is returned by the parser), because 
-// the resources to be opened may not yet be available. In this case the promise object loads them 
-// asynchronously and calls _openLocalURLs: once the load has finished...
+// Open the specified objects. Please note that in sandboxed applications (which usually do not have the necessary
+// rights to access arbitrary media files) this requires an asynchronous round trip to an XPC service. Once we do
+// get the bookmark, we can resolve it to a URL that we can access. Open it in the default app...
 	
 
-- (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode
+- (void) openObjects:(NSArray*)inObjects
 {
-	#warning TODO
+	NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
+	if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
 
-//	if (inSelectedNode)
-//	{
+	for (IMBObject* object in inObjects)
+	{
+		[object requestBookmarkWithCompletionBlock:^(NSError* inError)
+		{
+			if (inError)
+			{
+				[NSApp presentError:inError];
+			}
+			else
+			{
+				NSURL* url = [object urlByResolvingBookmark];
+				[url startAccessingSecurityScopedResource];
+				if (appPath) [[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+				else [[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+				[url stopAccessingSecurityScopedResource];
+			}
+		}];
+	}
+	
 //		IMBParser* parser = inSelectedNode.parser;
 //		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
 //		[promise setDelegate:self completionSelector:@selector(_openLocalURLs:)];
 //        [promise start];
-//	}
 }
 
-
-#pragma mark
-#pragma mark Post-download action
-
-
+/*
 // Post process.
 
 - (void) _postProcessDownload:(IMBObjectsPromise*)inObjectsPromise
@@ -2113,7 +2124,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		}
 	}
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
