@@ -304,6 +304,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Since we know that we have local files we can use the helper method supplied by the base class...
+
+- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return [self bookmarkForLocalFileObject:inObject error:outError];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // If we were not supplied an old node, then we will just create an empty root node. If on the other hand we were
 // given a node, then we will try to recreate the same node as faithfully as possible. That means is should be 
 // the node with the same position/identifier, and if it was populated before, then it should also be populated 

@@ -199,13 +199,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
+}
+
+
+
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	return nil;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError

@@ -131,8 +131,10 @@
 
 - (NSString*) identifierForPath:(NSString*)inPath;
 - (NSImage*) iconForPath:(NSString*)inPath;
+
 - (CGImageRef) thumbnailFromLocalImageFileForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (CGImageRef) thumbnailFromQuicklookForObject:(IMBObject*)inObject error:(NSError**)outError;
+- (NSData*) bookmarkForLocalFileObject:(IMBObject*)inObject error:(NSError**)outError;
 
 @end
 
