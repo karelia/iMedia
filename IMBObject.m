@@ -859,7 +859,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 // Resolve the bookmark and return a URL that we can access in the host application...
 
-- (NSURL*) urlByResolvingBookmark
+- (NSURL*) URLByResolvingBookmark
 {
 	NSError* error = nil;
 	BOOL isStale = NO;

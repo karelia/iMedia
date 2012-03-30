@@ -153,7 +153,7 @@ extern NSString* kIMBQuickLookImageProperty;
 // Security Scoped Bookmark Support...
 
 - (void) requestBookmarkWithCompletionBlock:(void(^)(NSError*))inCompletionBlock;
-- (NSURL*) urlByResolvingBookmark;
+- (NSURL*) URLByResolvingBookmark;
 
 @property (retain) NSURL* bookmarkBaseURL;
 @property (retain) NSData* bookmark;
