@@ -844,6 +844,42 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 				else
 				{
 					self.bookmark = inBookmark;
+					
+					// First receive the normal bookmark and resolve it to a NSURL. This punches a hole into
+					// the sandbox for this launch session. But this hole doesn't persistent across relaunches.
+					// To achieve this, we need to convert it to a security scoped app bookmark...
+					
+//					NSData* appScopedBookmark = nil;
+//					NSError* error = nil;
+//					BOOL isStale = NO;
+//					
+//					NSURL* url = [NSURL 
+//						URLByResolvingBookmarkData:inBookmark 
+//						options:0 
+//						relativeToURL:nil
+//						bookmarkDataIsStale:&isStale 
+//						error:&error];
+//					
+//					if (error == nil)
+//					{
+//						NSURLBookmarkCreationOptions options = 
+//							NSURLBookmarkCreationMinimalBookmark |
+//							NSURLBookmarkCreationWithSecurityScope |
+//							NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess;
+//				
+//						appScopedBookmark = [url 
+//							bookmarkDataWithOptions:options
+//							includingResourceValuesForKeys:nil
+//							relativeToURL:nil
+//							error:&error];
+//					}
+//					
+//					if (error == nil)
+//					{
+//						self.bookmark = appScopedBookmark;
+//					}
+//					
+//					inError = error;
 				}
 				
 				inCompletionBlock(inError);
@@ -859,7 +895,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 // Resolve the bookmark and return a URL that we can access in the host application...
 
-- (NSURL*) urlByResolvingBookmark
+- (NSURL*) URLByResolvingBookmark
 {
 	NSError* error = nil;
 	BOOL isStale = NO;
@@ -869,8 +905,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	{
 		url = [NSURL 
 			URLByResolvingBookmarkData:self.bookmark 
-			options:NSURLBookmarkResolutionWithSecurityScope|NSURLBookmarkResolutionWithoutUI 
-			relativeToURL:self.bookmarkBaseURL 
+			options:0
+			relativeToURL:nil
 			bookmarkDataIsStale:&isStale 
 			error:&error];
 	}

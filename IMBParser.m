@@ -73,12 +73,10 @@
 
 @interface IMBParser ()
 
-//+ (CGImageSourceRef) _imageSourceForURL:(NSURL*)inURL;
-//+ (CGImageRef) _imageForURL:(NSURL*)inURL;
-
 - (NSArray*) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode;
 - (void) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode identifiers:(NSMutableArray*)inIdentifiers;
 - (void) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError;
+- (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector;
 
 @end
 
@@ -134,13 +132,18 @@
 
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
+	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	if (outError) *outError = nil;
 	return nil;
 }
 
 
+// To be overridden by subclasses...
+
 - (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-
+	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	if (outError) *outError = nil;
 }
 
 
@@ -248,106 +251,33 @@
 #pragma mark Object Access
 
 
-// The default implementation create a thumbnail for local image files. If inObject does not represent a local
-// image file, then this method MUST be overridden in the subclass...
+// To be overridden by subclasses...
 
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-//	if (outError) *outError = nil;
-//	return nil;
-
-	return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
-
-//	NSError* error = nil;
-//	CGImageRef thumbnail = NULL;
-//	NSURL* url = [inObject imageLocation] ? [inObject imageLocationURL] : [inObject URL];
-//	CGImageSourceRef source = NULL;
-//    
-//    source = CGImageSourceCreateWithURL((CFURLRef)url,NULL);
-//	
-//	if (source)
-//	{
-//        if ([inObject imageLocation])
-//        {
-//            thumbnail = CGImageSourceCreateImageAtIndex(source,0,NULL);
-//        } 
-//		else 
-//		{
-//            NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-//                                     (id)kCFBooleanTrue,kCGImageSourceCreateThumbnailFromImageIfAbsent,
-//                                     (id)[NSNumber numberWithInteger:256],kCGImageSourceThumbnailMaxPixelSize,
-//                                     (id)kCFBooleanTrue,kCGImageSourceCreateThumbnailWithTransform,
-//                                     nil];
-//            
-//            thumbnail = CGImageSourceCreateThumbnailAtIndex(source,0,(CFDictionaryRef)options);
-//        }
-//        CFRelease(source);
-//	} 
-//	else 
-//	{
-//        NSString* description = [NSString stringWithFormat:@"URL not found: %@",url];
-//        NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
-//        error = [NSError errorWithDomain:kIMBErrorDomain code:fnfErr userInfo:info];
-//    }
-//    
-//    if (thumbnail)
-//    {
-//        [NSMakeCollectable(thumbnail) autorelease];
-//    } 
-//	else 
-//	{
-//        NSString* description = [NSString stringWithFormat:@"Could not create image from URL: %@",url];
-//        NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
-//        error = [NSError errorWithDomain:kIMBErrorDomain code:0 userInfo:info];
-//    }
-//	
-//	if (outError) *outError = error;
-//	return (id)thumbnail;
+	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	if (outError) *outError = nil;
+	return nil;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 // To be overridden by subclasses...
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
 	return nil;
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This is a generic implementation for creating a security scoped bookmark oflocal media files. If assumes  
-// that the url to the local file is stored in inObject.location. May be overridden by subclasses...
+// To be overridden by subclasses...
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	NSError* error = nil;
-	NSURL* baseURL = inObject.bookmarkBaseURL;
-	NSURL* fileURL = inObject.URL;
-	NSData* bookmark = nil;
-	
-	if ([fileURL isFileURL])
-	{
-		bookmark = [fileURL 
-			bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
-			includingResourceValuesForKeys:nil
-			relativeToURL:baseURL 
-			error:&error];
-	}
-	else
-	{
-        NSString* description = [NSString stringWithFormat:@"Could not create bookmark for non file URL: %@",fileURL];
-        NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
-        error = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];
-	}
-	
-	if (outError) *outError = error;
-	return bookmark;
+	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	if (outError) *outError = nil;
+	return nil;
 }
 
 
@@ -658,6 +588,56 @@
 	CGImageRef thumbnail = [url imb_quicklookCGImage];
 	if (outError) *outError = error;
 	return thumbnail;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This is a generic implementation for creating a security scoped bookmark of local media files. It assumes  
+// that the url to the local file is stored in inObject.location. May be overridden by subclasses...
+
+- (NSData*) bookmarkForLocalFileObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	NSError* error = nil;
+//	NSURL* baseURL = nil; //inObject.bookmarkBaseURL;
+	NSURL* fileURL = inObject.URL;
+	NSData* bookmark = nil;
+	
+	if ([fileURL isFileURL])
+	{
+	/*
+		NSURLBookmarkCreationOptions options = 
+			NSURLBookmarkCreationMinimalBookmark |
+//			NSURLBookmarkCreationWithSecurityScope |
+//			NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess |
+			NSURLBookmarkCreationPreferFileIDResolution;
+	*/		
+		bookmark = [fileURL 
+			bookmarkDataWithOptions:0 //options
+			includingResourceValuesForKeys:nil
+			relativeToURL:nil
+			error:&error];
+	}
+	else
+	{
+        NSString* description = [NSString stringWithFormat:@"Could not create bookmark for non file URL: %@",fileURL];
+        NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
+        error = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];
+	}
+	
+	if (outError) *outError = error;
+	return bookmark;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector
+{
+	NSString* reason = [NSString stringWithFormat:@"Abstract base class: Please override method %@ in subclass",NSStringFromSelector(inSelector)];
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:reason userInfo:nil] raise];
 }
 
 

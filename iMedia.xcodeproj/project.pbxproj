@@ -841,7 +841,6 @@
 		D0F2DDB6152475C00059DF8D /* IMBiTunesParserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiTunesParserMessenger.h; sourceTree = "<group>"; };
 		D0F2DDB7152475C00059DF8D /* IMBiTunesParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiTunesParserMessenger.m; sourceTree = "<group>"; };
 		D0F2DDCB152485130059DF8D /* com.karelia.imedia.iTunes.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.iTunes.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
-		D0F2DDCC152485130059DF8D /* com.karelia.imedia.iPhoto copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "com.karelia.imedia.iPhoto copy-Info.plist"; path = "/Users/peter/Dev/Karelia/iMedia3/com.karelia.imedia.iPhoto copy-Info.plist"; sourceTree = "<absolute>"; };
 		D0F2DDCD1524859A0059DF8D /* com.karelia.imedia.iTunes.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = com.karelia.imedia.iTunes.entitlements; sourceTree = "<group>"; };
 		D0FC9516108213A800973FEE /* IMBiTunesMovieParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiTunesMovieParser.h; sourceTree = "<group>"; };
 		D0FC9517108213A800973FEE /* IMBiTunesMovieParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiTunesMovieParser.m; sourceTree = "<group>"; };
@@ -953,7 +952,6 @@
 				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
 				30FFEBED150A08DB0009C1D0 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
-				D0F2DDCC152485130059DF8D /* com.karelia.imedia.iPhoto copy-Info.plist */,
 			);
 			name = iMedia;
 			sourceTree = "<group>";
