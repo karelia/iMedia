@@ -1139,16 +1139,32 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (NSUInteger) writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
-	#warning TODO
+	NSIndexSet* indexes = [self filteredDraggingIndexes:inIndexes]; 
+	NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes];
+	NSMutableArray* pasteboardItems = [NSMutableArray arrayWithCapacity:objects.count];
+	NSArray* types = [NSArray arrayWithObjects:kIMBObjectPasteboardType,(NSString*)kUTTypeFileURL,nil];
+	
+	for (IMBObject* object in objects)
+	{
+		NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
+		[item setDataProvider:object forTypes:types];
+		[pasteboardItems addObject:item];
+		[item release];
+	}
+	
+	[inPasteboard clearContents];
+	[inPasteboard writeObjects:pasteboardItems];
+	return pasteboardItems.count;
 
-//	IMBNode* node = self.currentNode;
+
+/*
+	IMBNode* node = self.currentNode;
 	NSUInteger itemsWritten = 0;
-/*	
+	NSIndexSet* indexes = [self filteredDraggingIndexes:inIndexes]; 
+	NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes];
+	
 	if (node)
 	{
-		NSIndexSet* indexes = [self filteredDraggingIndexes:inIndexes]; 
-		NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes];
-		
 		if ([objects count] > 0)
 		{
 			IMBParser* parser = node.parser;
@@ -1286,7 +1302,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		}
 	}
 */	
-	return itemsWritten;	
+//	return itemsWritten;	
 }
 
 
