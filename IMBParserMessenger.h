@@ -134,6 +134,10 @@
 - (IMBObject*) loadMetadataForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (IMBObject*) loadThumbnailAndMetadataForObject:(IMBObject*)inObject error:(NSError**)outError;
 
+// Creates a security scoped bookmark for accessing the media file in the non-privilegded app process...
+
+- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError;
+
 @end
 
 

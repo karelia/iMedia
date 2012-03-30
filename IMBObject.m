@@ -98,6 +98,7 @@
 #import "NSImage+iMedia.h"
 #import "NSKeyedArchiver+iMedia.h"
 #import "IMBSmartFolderNodeObject.h"
+#import "IMBConfig.h"
 #import "SBUtilities.h"
 
 
@@ -131,6 +132,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize name = _name;
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
+@synthesize metadataDescription = _metadataDescription;
 @synthesize parserIdentifier = _parserIdentifier;
 @synthesize parserMessenger = _parserMessenger;
 @synthesize index = _index;
@@ -144,7 +146,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize imageVersion = _imageVersion;
 @synthesize isLoadingThumbnail = _isLoadingThumbnail;
 
-@synthesize metadataDescription = _metadataDescription;
+@synthesize bookmarkBaseURL = _bookmarkBaseURL;
+@synthesize bookmark = _bookmark;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -181,6 +184,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
 
+	IMBRelease(_bookmarkBaseURL);
+	IMBRelease(_bookmark);
+	
 	[super dealloc];
 }
 
@@ -211,6 +217,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 		self.imageRepresentationType = [coder decodeObjectForKey:@"imageRepresentationType"];
 		self.needsImageRepresentation = [coder decodeBoolForKey:@"needsImageRepresentation"];
 		self.imageVersion = [coder decodeIntegerForKey:@"imageVersion"];
+
+		self.bookmarkBaseURL = [coder decodeObjectForKey:@"bookmarkBaseURL"];
+		self.bookmark = [coder decodeObjectForKey:@"bookmark"];
 	}
 	
 	return self;
@@ -238,6 +247,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	[coder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
 	[coder encodeBool:self.needsImageRepresentation forKey:@"needsImageRepresentation"];
 	[coder encodeInteger:self.imageVersion forKey:@"imageVersion"];
+
+	[coder encodeObject:self.bookmarkBaseURL forKey:@"bookmarkBaseURL"];
+	[coder encodeObject:self.bookmark forKey:@"bookmark"];
 }
 
 
@@ -266,6 +278,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	copy.imageRepresentationType = self.imageRepresentationType;
 	copy.needsImageRepresentation = self.needsImageRepresentation;
 	copy.imageVersion = self.imageVersion;
+
+	copy.bookmarkBaseURL = self.bookmarkBaseURL;
+	copy.bookmark = self.bookmark;
 	
 	return copy;
 }
@@ -385,10 +400,10 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) postProcessLocalURL:(NSURL*)localURL
-{
-	// For overriding by subclass
-}
+//- (void) postProcessLocalURL:(NSURL*)localURL
+//{
+//	// For overriding by subclass
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -797,6 +812,70 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 - (NSString*) view:(NSView*)inView stringForToolTip:(NSToolTipTag)inTag point:(NSPoint)inPoint userData:(void*)inUserData
 {
 	return [self tooltipString];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Bookmark Support
+
+
+// Request a bookmark and execute the completion block once it is available. This usually requires an  
+// asynchronous round trip to an XPC service, but if the bookmark is already available, the completion 
+// block is called immediately...
+
+- (void) requestBookmarkWithCompletionBlock:(void(^)(NSError*))inCompletionBlock
+{
+	if (self.bookmark == nil)
+	{
+		[inCompletionBlock copy];
+		self.bookmarkBaseURL = [IMBConfig bookmarkBaseURL];
+		IMBParserMessenger* messenger = self.parserMessenger;
+		SBPerformSelectorAsync(messenger.connection,messenger,@selector(bookmarkForObject:error:),self,
+		
+			^(NSData* inBookmark,NSError* inError)
+			{
+				if (inError)
+				{
+					NSLog(@"%s Error trying to load bookmark of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+				}
+				else
+				{
+					self.bookmark = inBookmark;
+				}
+				
+				inCompletionBlock(inError);
+				[inCompletionBlock release];
+			});
+	}
+	else
+	{
+		inCompletionBlock(nil);
+	}
+}
+
+
+// Resolve the bookmark and return a URL that we can access in the host application...
+
+- (NSURL*) urlByResolvingBookmark
+{
+	NSError* error = nil;
+	BOOL isStale = NO;
+	NSURL* url = nil;
+	
+	if (self.bookmark)
+	{
+		url = [NSURL 
+			URLByResolvingBookmarkData:self.bookmark 
+			options:NSURLBookmarkResolutionWithSecurityScope|NSURLBookmarkResolutionWithoutUI 
+			relativeToURL:self.bookmarkBaseURL 
+			bookmarkDataIsStale:&isStale 
+			error:&error];
+	}
+	
+	return url;
 }
 
 

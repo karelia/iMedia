@@ -321,12 +321,33 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// To be overridden by subclasses...
+// This is a generic implementation for creating a security scoped bookmark oflocal media files. If assumes  
+// that the url to the local file is stored in inObject.location. May be overridden by subclasses...
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	if (outError) *outError = nil;
-	return nil;
+	NSError* error = nil;
+	NSURL* baseURL = inObject.bookmarkBaseURL;
+	NSURL* fileURL = inObject.URL;
+	NSData* bookmark = nil;
+	
+	if ([fileURL isFileURL])
+	{
+		bookmark = [fileURL 
+			bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
+			includingResourceValuesForKeys:nil
+			relativeToURL:baseURL 
+			error:&error];
+	}
+	else
+	{
+        NSString* description = [NSString stringWithFormat:@"Could not create bookmark for non file URL: %@",fileURL];
+        NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
+        error = [NSError errorWithDomain:kIMBErrorDomain code:0 userInfo:info];
+	}
+	
+	if (outError) *outError = error;
+	return bookmark;
 }
 
 
