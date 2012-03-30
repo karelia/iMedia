@@ -400,7 +400,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
         
         
         // Post process.  We use this to embed metadata after the download. This is only really used by Flickr images right now
-        [object postProcessLocalURL:URL];
+//        [object postProcessLocalURL:URL];
         
         if ([self.delegate respondsToSelector:@selector(objectsPromise:object:didFinishLoadingAtURL:)])
         {

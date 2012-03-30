@@ -72,6 +72,16 @@
 
 #pragma mark 
 
+@interface IMBObjectViewController ()
+- (IBAction) tableViewWasDoubleClicked:(id)inSender;
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
 @implementation IMBAudioObjectViewController
 
 @synthesize playingAudio = _playingAudio;
