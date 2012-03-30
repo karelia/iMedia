@@ -353,6 +353,16 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	IMBParser* parser = [self parserWithIdentifier:inObject.parserIdentifier];
+	return [parser bookmarkForObject:inObject error:outError];
+}
+
+
 @end
 
 

@@ -335,6 +335,41 @@ static NSMutableSet *sLibraryPaths = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This method returns a URL to a file that we know we'll have read access to. This is needed when creating or 
+// resolving (document relative) security scoped bookmarks (SSB) in sandboxed applications. In the case of iMedia
+// we need to use SSBs to transport file access rights from priviledged XPC services to the non-priviledged 
+// host application. Normally application SSB would be a perfect fit, but application SSB do not work across
+// process boundaries. For this reason we need to use document SSBs, but there is a problem. They only work relative
+// to a document URL that we have read access to. This is what this method is for. It creates a fake "document" 
+// URL that we'll use to make the API happy...
+
++ (NSURL*) bookmarkBaseURL
+{
+	static NSURL* sBookmarkBaseURL = nil;
+	static dispatch_once_t sOnceToken = 0;
+	
+    dispatch_once(&sOnceToken,
+    ^{
+		// Create the URL...
+	
+		NSString* bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+		NSString* path = [NSHomeDirectory() stringByAppendingFormat:@"/Library/Preferences/%@.plist",bundleIdentifier];
+		sBookmarkBaseURL = [[NSURL fileURLWithPath:path] retain];
+	
+		// Make sure that the file exists...
+	
+		NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+		[userDefaults setBool:YES forKey:@"bookmarkBaseURL"];
+		[userDefaults synchronize];
+	});
+	    
+    return sBookmarkBaseURL;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 
 @end
  

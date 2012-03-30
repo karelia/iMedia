@@ -160,10 +160,15 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 @property (retain) IMBLibraryController* libraryController;
 @property (readonly) NSString* mediaType;
 @property (retain) IMBNode* currentNode;
+@property (readonly) IMBObjectArrayController* objectArrayController;
+
+// Saving/Restoring state...
+
+- (void) restoreState;	
+- (void) saveState;	
 
 // Objects (media files)...
 
-@property (readonly) IMBObjectArrayController* objectArrayController;
 @property (retain) IMBProgressWindowController* progressWindowController;
 
 // Views...
@@ -203,11 +208,6 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 - (void) willHideView;
 - (void) didHideView;
 
-// Saving/Restoring state...
-
-- (void) restoreState;	
-- (void) saveState;	
-
 // Context menu support...
 
 - (NSMenu*) menuForObject:(IMBObject*)inObject;
@@ -215,11 +215,12 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 // Helpers...
 
 - (id <IMBObjectViewControllerDelegate>) delegate;
+- (void) expandNodeObject:(IMBObject*)inObject;
 - (IBAction) openSelectedObjects:(id)inSender;
-- (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode;
+- (void) openObjects:(NSArray*)inObjects;
 - (IBAction) quicklook:(id)inSender;
 
-- (IBAction) tableViewWasDoubleClicked:(id)inSender;
+//- (IBAction) tableViewWasDoubleClicked:(id)inSender;
 
 @end
 

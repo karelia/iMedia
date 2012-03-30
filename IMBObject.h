@@ -99,8 +99,8 @@ extern NSString* kIMBQuickLookImageProperty;
 	BOOL _needsImageRepresentation;
 	NSUInteger _imageVersion;
 	
-	CGImageRef _quickLookImage;
-	BOOL _isLoadingQuickLookImage;
+	NSURL* _bookmarkBaseURL;
+	NSData* _bookmark;
 }
 
 // Primary properties...
@@ -148,10 +148,16 @@ extern NSString* kIMBQuickLookImageProperty;
 @property (readonly) BOOL isLoadingThumbnail;
 
 - (void) loadMetadata;  // observe .metadata property to know when finished
-- (CGImageRef) quickLookImage;
-- (void) setQuickLookImage:(CGImageRef)inImage;
+//- (void) postProcessLocalURL:(NSURL*)inLocalURL;
 
-- (void) postProcessLocalURL:(NSURL*)inLocalURL;
+// Security Scoped Bookmark Support...
+
+- (void) requestBookmarkWithCompletionBlock:(void(^)(NSError*))inCompletionBlock;
+- (NSURL*) urlByResolvingBookmark;
+
+@property (retain) NSURL* bookmarkBaseURL;
+@property (retain) NSData* bookmark;
+
 
 @end
 

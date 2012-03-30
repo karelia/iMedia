@@ -68,6 +68,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CONSTANTS
+
+extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark CLASSES
 
 @class IMBLibraryController;

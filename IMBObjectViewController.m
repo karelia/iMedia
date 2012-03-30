@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBObjectViewController.h"
+#import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
 #import "IMBConfig.h"
 #import "IMBParserMessenger.h"
@@ -1059,13 +1060,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		
 		if ([object isKindOfClass:[IMBNodeObject class]])
 		{
-			#warning TODO
-			
-//			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
-//			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
-//
-//			[_nodeViewController expandSelectedNode];
-//			[_nodeViewController selectNode:subnode];
+			[self expandNodeObject:object];
 		}
 		else if ([object isKindOfClass:[IMBButtonObject class]])
 		{
@@ -1371,6 +1366,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 - (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
+	NSString* columnIdentifier = [inTableColumn identifier];
 	
 	// If we are in combo view, then assign thumbnail, title, subd subtitle (metadataDescription). If they are
 	// not available yet, then load them lazily (in that case we'll end up here again once they are available)...
@@ -1378,18 +1374,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	if ([inCell isKindOfClass:[IMBComboTextCell class]])
 	{
 		IMBComboTextCell* cell = (IMBComboTextCell*)inCell;
-
-		if (object.imageRepresentationType == IKImageBrowserQTMoviePathRepresentationType)
-		{
-			cell.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
-			cell.imageRepresentation = (id) [object quickLookImage];
-		}
-		else
-		{
-			cell.imageRepresentation = object.imageRepresentation;
-			cell.imageRepresentationType = object.imageRepresentationType;
-		}
-		
+		cell.imageRepresentation = object.imageRepresentation;
+		cell.imageRepresentationType = object.imageRepresentationType;
 		cell.title = object.imageTitle;
 		cell.subtitle = object.metadataDescription;
 	}
@@ -1397,7 +1383,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	// If we are in list view and don't have metadata yet, then load it lazily. We'll end up here again once 
 	// they are available...
 	
-	if (![object isKindOfClass:[IMBNodeObject class]] && [(NSString*)[inTableColumn identifier] isEqualToString:@"size"])
+	if ([columnIdentifier isEqualToString:@"size"] && ![object isKindOfClass:[IMBNodeObject class]])
 	{
 		if (object.metadata == nil)
 		{
@@ -1405,22 +1391,18 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		}
 	}
 	
-	// Host app delegate may provide badge image here...
+	// Host app delegate may provide badge image here. In the list view the icon will be replaced in the NSImageCell...
 	
 	if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
 	{
 		CGImageRef badgeRef = [[self delegate] objectViewController:self badgeForObject:object];
 			
-		// Combo view cell...
-		
 		if ([inCell respondsToSelector:@selector(setBadge:)])
 		{
 			[inCell setBadge:badgeRef];
 		}
-		
-		// List view icon cell...
-		
-		if ([inCell isKindOfClass:[NSImageCell class]] && [(NSString*)[inTableColumn identifier] isEqualToString:@"icon"])
+
+		if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
 		{
 			if (badgeRef)
 			{
@@ -1637,49 +1619,43 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 
 // Doubleclicking a row opens the selected items. This may trigger a download if the user selected remote objects.
-// First give the delefate a chance to handle the double click...
+// First give the delegate a chance to handle the double click...
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
-	#warning TODO
-
-//	IMBLibraryController* controller = self.libraryController;
-//	id delegate = controller.delegate;
-//	BOOL didHandleEvent = NO;
-//	
-//	if (delegate)
-//	{
-//		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
-//		{
-//			IMBNode* node = self.currentNode;
-//			NSArray* objects = [ibObjectArrayController selectedObjects];
-//			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
-//		}
-//	}
-//	
-//	if (!didHandleEvent)
-//	{
-//		NSArray* objects = [ibObjectArrayController arrangedObjects];
-//		NSUInteger row = [(NSTableView*)inSender clickedRow];
-//		IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
-//		
-//		if ([object isKindOfClass:[IMBNodeObject class]])
-//		{
-//			NSString* identifier = ((IMBNodeObject*)object).representedNodeIdentifier;
-//			IMBNode* subnode = [self.libraryController nodeWithIdentifier:identifier];
-//			
-//			[_nodeViewController expandSelectedNode];
-//			[_nodeViewController selectNode:subnode];
-//		}
-//		else if ([object isKindOfClass:[IMBButtonObject class]])
-//		{
-//			[(IMBButtonObject*)object sendDoubleClickAction];
-//		}
-//		else
-//		{
-//			[self openSelectedObjects:inSender];
-//		}	
-//	}	
+	IMBLibraryController* controller = self.libraryController;
+	id delegate = controller.delegate;
+	BOOL didHandleEvent = NO;
+	
+	if (delegate)
+	{
+		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
+		{
+			IMBNode* node = self.currentNode;
+			NSArray* objects = [ibObjectArrayController selectedObjects];
+			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
+		}
+	}
+	
+	if (!didHandleEvent)
+	{
+		NSArray* objects = [ibObjectArrayController arrangedObjects];
+		NSUInteger row = [(NSTableView*)inSender clickedRow];
+		IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
+		
+		if ([object isKindOfClass:[IMBNodeObject class]])
+		{
+			[self expandNodeObject:object];
+		}
+		else if ([object isKindOfClass:[IMBButtonObject class]])
+		{
+			[(IMBButtonObject*)object sendDoubleClickAction];
+		}
+		else
+		{
+			[self openSelectedObjects:inSender];
+		}	
+	}	
 }
 
 
@@ -1773,32 +1749,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			
 			if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
 			{
-				// Open with source app. Commented out for now as apps like iPhoto do not seem to be able to open
-				// and display images within its own libary. All it does is display a cryptic error message...
-				
-	#warning TODO
-
-//				if ([inObject.parser respondsToSelector:@selector(appPath)])
-//				{
-//					if (appPath = [inObject.parser performSelector:@selector(appPath)])
-//					{
-//						title = NSLocalizedStringWithDefaultValue(
-//							@"IMBObjectViewController.menuItem.openWithApp",
-//							nil,IMBBundle(),
-//							@"Open With %@",
-//							@"Menu item in context menu of IMBObjectViewController");
-//						
-//						appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
-//						title = [NSString stringWithFormat:title,appName];	
-//
-//						item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInSourceApp:) keyEquivalent:@""];
-//						[item setRepresentedObject:inObject];
-//						[item setTarget:self];
-//						[menu addItem:item];
-//						[item release];
-//					}
-//				}
-				
 				// Open with editor app...
 				
 				if ((appPath = [IMBConfig editorAppForMediaType:self.mediaType]))
@@ -1938,6 +1888,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			nil,IMBBundle(),
 			@"Show All",
 			@"Menu item in context menu of IMBObjectViewController");
+			
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
 		[item setTag:kIMBObjectFilterAll];
 		[item setTarget:self];
@@ -1951,6 +1902,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			nil,IMBBundle(),
 			@"Show Badged Only",
 			@"Menu item in context menu of IMBObjectViewController");
+			
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
 		[item setTag:kIMBObjectFilterBadge];
 		[item setTarget:self];
@@ -1964,6 +1916,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			nil,IMBBundle(),
 			@"Show Unbadged Only",
 			@"Menu item in context menu of IMBObjectViewController");
+			
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(showFiltered:) keyEquivalent:@""];
 		[item setTag:kIMBObjectFilterNoBadge];
 		[item setTarget:self];
@@ -1991,23 +1944,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	}
 	
 	return menu;
-}
-
-
-- (IBAction) openInSourceApp:(id)inSender
-{
-	#warning TODO
-
-//	IMBObject* object = (IMBObject*) [inSender representedObject];
-//	NSString* path = [object path];
-//	NSString* app = nil;
-//	
-//	if ([object.parser respondsToSelector:@selector(appPath)])
-//	{
-//		app = [object.parser performSelector:@selector(appPath)];
-//	}
-//	
-//	[[NSWorkspace imb_threadSafeWorkspace] openFile:path withApplication:app];
 }
 
 
@@ -2073,94 +2009,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //	[inSender setState:NSOnState];
 //	[[self objectArrayController] rearrangeObjects];
 //	[[self nodeViewController] setObjectContainerViewNeedsDisplay:YES];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Opening
-
-// Open the selected objects...
-
-- (IBAction) openSelectedObjects:(id)inSender
-{
-	IMBNode* node = self.currentNode;
-	NSArray* objects = [ibObjectArrayController selectedObjects];
-	[self openObjects:objects inSelectedNode:node];
-}
-
-
-// Open the specified objects. Double-clicking opens the files (with the default app). Please note that 
-// IMBObjects are first passed through an IMBObjectsPromise (which is returned by the parser), because 
-// the resources to be opened may not yet be available. In this case the promise object loads them 
-// asynchronously and calls _openLocalURLs: once the load has finished...
-	
-
-- (void) openObjects:(NSArray*)inObjects inSelectedNode:(IMBNode*)inSelectedNode
-{
-	#warning TODO
-
-//	if (inSelectedNode)
-//	{
-//		IMBParser* parser = inSelectedNode.parser;
-//		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
-//		[promise setDelegate:self completionSelector:@selector(_openLocalURLs:)];
-//        [promise start];
-//	}
-}
-
-
-#pragma mark
-#pragma mark Post-download action
-
-
-// Post process.
-
-- (void) _postProcessDownload:(IMBObjectsPromise*)inObjectsPromise
-{
-	if ([inObjectsPromise isKindOfClass:[NSError class]])	// overloaded... error object
-	{
-		[NSApp presentError:(NSError*)inObjectsPromise];
-	}
-}
-
-
-// "Local" means that for whatever the object represents, opening it now requires no network or other time-intensive
-// procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to
-// IMBObjects that refer strictly to a web link, where "opening" them just means loading them in a browser...
-
-- (void) _openLocalURLs:(IMBObjectsPromise*)inObjectPromise
-{
-	if ([inObjectPromise isKindOfClass:[NSError class]])	// overloaded... error object
-	{
-		[NSApp presentError:(NSError*)inObjectPromise];
-	}
-	else
-	{
-		[self _postProcessDownload:inObjectPromise];		// first do our post-processing
-		
-		for (NSURL* url in inObjectPromise.fileURLs)
-		{
-			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
-			
-			if ([url isKindOfClass:[NSURL class]])
-			{
-				NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
-				if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
-
-				if ([self writesLocalFilesToPasteboard] && appPath != nil)
-				{
-					[[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
-				}
-				else
-				{
-					[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
-				}
-			}
-		}
-	}
 }
 
 
@@ -2412,6 +2260,126 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 }
 
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Opening
+
+// Double-clicking and IMBNodeObject (folder icon) in the object view expands and selects the represented node. 
+// The result is that we are drilling into that "folder"...
+
+- (void) expandNodeObject:(IMBNodeObject*)inNodeObject
+{
+	if ([inNodeObject isKindOfClass:[IMBNodeObject class]])
+	{
+		NSString* identifier = inNodeObject.representedNodeIdentifier;
+		IMBNode* node = [self.libraryController nodeWithIdentifier:identifier];
+
+		[[NSNotificationCenter defaultCenter] 
+			postNotificationName:kIMBExpandAndSelectNodeWithIdentifierNotification 
+			object:nil 
+			userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+				self,@"objectViewController",
+				node,@"node",
+				nil]];
+	}
+}
+
+
+// Open the selected objects...
+
+- (IBAction) openSelectedObjects:(id)inSender
+{
+	NSArray* objects = [ibObjectArrayController selectedObjects];
+	[self openObjects:objects];
+}
+
+
+// Open the specified objects. Please note that in sandboxed applications (which usually do not have the necessary
+// rights to access arbitrary media files) this requires an asynchronous round trip to an XPC service. Once we do
+// get the bookmark, we can resolve it to a URL that we can access. Open it in the default app...
+	
+
+- (void) openObjects:(NSArray*)inObjects
+{
+	NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
+	if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
+
+	for (IMBObject* object in inObjects)
+	{
+		[object requestBookmarkWithCompletionBlock:^(NSError* inError)
+		{
+			if (inError)
+			{
+				[NSApp presentError:inError];
+			}
+			else
+			{
+				NSURL* url = [object urlByResolvingBookmark];
+				[url startAccessingSecurityScopedResource];
+				if (appPath) [[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+				else [[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+				[url stopAccessingSecurityScopedResource];
+			}
+		}];
+	}
+	
+//		IMBParser* parser = inSelectedNode.parser;
+//		IMBObjectsPromise* promise = [parser objectPromiseWithObjects:inObjects];
+//		[promise setDelegate:self completionSelector:@selector(_openLocalURLs:)];
+//        [promise start];
+}
+
+/*
+// Post process.
+
+- (void) _postProcessDownload:(IMBObjectsPromise*)inObjectsPromise
+{
+	if ([inObjectsPromise isKindOfClass:[NSError class]])	// overloaded... error object
+	{
+		[NSApp presentError:(NSError*)inObjectsPromise];
+	}
+}
+
+
+// "Local" means that for whatever the object represents, opening it now requires no network or other time-intensive
+// procedure to obtain the usable object content. The term "local" is slightly misleading when it comes to
+// IMBObjects that refer strictly to a web link, where "opening" them just means loading them in a browser...
+
+- (void) _openLocalURLs:(IMBObjectsPromise*)inObjectPromise
+{
+	if ([inObjectPromise isKindOfClass:[NSError class]])	// overloaded... error object
+	{
+		[NSApp presentError:(NSError*)inObjectPromise];
+	}
+	else
+	{
+		[self _postProcessDownload:inObjectPromise];		// first do our post-processing
+		
+		for (NSURL* url in inObjectPromise.fileURLs)
+		{
+			// In case of an error getting a URL, the promise may have put an NSError in the stack instead
+			
+			if ([url isKindOfClass:[NSURL class]])
+			{
+				NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
+				if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
+
+				if ([self writesLocalFilesToPasteboard] && appPath != nil)
+				{
+					[[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+				}
+				else
+				{
+					[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+				}
+			}
+		}
+	}
+}
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 

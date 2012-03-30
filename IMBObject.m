@@ -98,6 +98,7 @@
 #import "NSImage+iMedia.h"
 #import "NSKeyedArchiver+iMedia.h"
 #import "IMBSmartFolderNodeObject.h"
+#import "IMBConfig.h"
 #import "SBUtilities.h"
 
 
@@ -117,7 +118,6 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @interface IMBObject ()
 @property (retain) id atomic_imageRepresentation;
 @property (assign) BOOL isLoadingThumbnail;
-- (CGImageRef) _renderQuickLookImage;
 @end
 
 
@@ -132,6 +132,7 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize name = _name;
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
+@synthesize metadataDescription = _metadataDescription;
 @synthesize parserIdentifier = _parserIdentifier;
 @synthesize parserMessenger = _parserMessenger;
 @synthesize index = _index;
@@ -145,7 +146,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 @synthesize imageVersion = _imageVersion;
 @synthesize isLoadingThumbnail = _isLoadingThumbnail;
 
-@synthesize metadataDescription = _metadataDescription;
+@synthesize bookmarkBaseURL = _bookmarkBaseURL;
+@synthesize bookmark = _bookmark;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -162,8 +164,6 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 		_shouldDrawAdornments = YES;
 		_needsImageRepresentation = YES;
 		_shouldDisableTitle = NO;
-		_quickLookImage = NULL;
-		_isLoadingQuickLookImage = NO;
 	}
 	
 	return self;
@@ -183,8 +183,10 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
-	CGImageRelease(_quickLookImage);
 
+	IMBRelease(_bookmarkBaseURL);
+	IMBRelease(_bookmark);
+	
 	[super dealloc];
 }
 
@@ -215,6 +217,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 		self.imageRepresentationType = [coder decodeObjectForKey:@"imageRepresentationType"];
 		self.needsImageRepresentation = [coder decodeBoolForKey:@"needsImageRepresentation"];
 		self.imageVersion = [coder decodeIntegerForKey:@"imageVersion"];
+
+		self.bookmarkBaseURL = [coder decodeObjectForKey:@"bookmarkBaseURL"];
+		self.bookmark = [coder decodeObjectForKey:@"bookmark"];
 	}
 	
 	return self;
@@ -242,6 +247,9 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	[coder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
 	[coder encodeBool:self.needsImageRepresentation forKey:@"needsImageRepresentation"];
 	[coder encodeInteger:self.imageVersion forKey:@"imageVersion"];
+
+	[coder encodeObject:self.bookmarkBaseURL forKey:@"bookmarkBaseURL"];
+	[coder encodeObject:self.bookmark forKey:@"bookmark"];
 }
 
 
@@ -270,9 +278,132 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	copy.imageRepresentationType = self.imageRepresentationType;
 	copy.needsImageRepresentation = self.needsImageRepresentation;
 	copy.imageVersion = self.imageVersion;
+
+	copy.bookmarkBaseURL = self.bookmarkBaseURL;
+	copy.bookmark = self.bookmark;
 	
 	return copy;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Asynchronous Loading
+
+
+// If the image representation isn't available yet, then trigger asynchronous loading. When the results come in,
+// copy the properties from the incoming object. Do not replace the old object here, as that would unecessarily
+// upset the NSArrayController. Redrawing of the view will be triggered automatically...
+
+- (void) loadThumbnail
+{
+	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
+	{
+		self.isLoadingThumbnail = YES;
+		
+		IMBParserMessenger* messenger = self.parserMessenger;
+		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadThumbnailAndMetadataForObject:error:),self,
+		
+			^(IMBObject* inPopulatedObject,NSError* inError)
+			{
+				if (inError)
+				{
+					NSLog(@"%s Error trying to load thumbnail of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+				}
+				else
+				{
+					self.imageRepresentation = inPopulatedObject.imageRepresentation;
+					if (self.metadata == nil) self.metadata = inPopulatedObject.metadata;
+					if (self.metadataDescription == nil) self.metadataDescription = inPopulatedObject.metadataDescription;
+					self.isLoadingThumbnail = NO;
+				}
+			});
+	}
+}
+
+
+// Unload the imageRepresentation to save some memory, if it's something that can be rebuilt.
+
+- (BOOL) unloadThumbnail
+{
+	BOOL unloaded = NO;
+	
+//	static NSSet* sTypesThatCanBeUnloaded = nil;
+//	
+//	if (sTypesThatCanBeUnloaded == nil)
+//	{
+//		sTypesThatCanBeUnloaded = [[NSSet alloc] initWithObjects:
+//			IKImageBrowserPathRepresentationType,				/* NSString */
+//			IKImageBrowserNSURLRepresentationType,				/* NSURL */
+//			IKImageBrowserQTMoviePathRepresentationType,		/* NSString or NSURL */
+//			IKImageBrowserQCCompositionPathRepresentationType,	/* NSString or NSURL */
+//			IKImageBrowserQuickLookPathRepresentationType,		/* NSString or NSURL*/
+//			IKImageBrowserIconRefPathRepresentationType,		/* NSString */
+//			nil];
+//	}
+//
+//	if ([sTypesThatCanBeUnloaded containsObject:self.imageRepresentationType])
+//	{
+		self.imageRepresentation = nil;
+		self.metadata = nil;
+		unloaded = YES;
+//	}
+	
+	return unloaded;
+}
+
+
+// Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out of the   
+// cache and are thus unloaded...
+
+- (void) setImageRepresentation:(id)inImageRepresentation
+{
+	self.atomic_imageRepresentation = inImageRepresentation;
+	self.imageVersion = _imageVersion + 1;
+	
+	if (inImageRepresentation)
+	{
+		self.needsImageRepresentation = NO;
+		[IMBObjectFifoCache addObject:self];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) loadMetadata
+{
+	if (self.metadata == nil && !self.isLoadingThumbnail)
+	{
+		IMBParserMessenger* messenger = self.parserMessenger;
+		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadMetadataForObject:error:),self,
+		
+			^(IMBObject* inPopulatedObject,NSError* inError)
+			{
+				if (inError)
+				{
+					NSLog(@"%s Error trying to load metadata of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+				}
+				else
+				{
+					self.metadata = inPopulatedObject.metadata;
+					self.metadataDescription = inPopulatedObject.metadataDescription;
+				}
+			});
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+//- (void) postProcessLocalURL:(NSURL*)localURL
+//{
+//	// For overriding by subclass
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -343,6 +474,17 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 }
 
 
+// Override simple accessor - also return YES if no actual image rep data...
+
+- (BOOL) needsImageRepresentation	
+{
+	return _needsImageRepresentation || (_imageRepresentation == nil);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (BOOL) isSelectable 
 {
 	return YES;
@@ -352,14 +494,6 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 - (BOOL) isDraggable
 {
 	return YES;
-}
-
-
-// Override simple accessor - also return YES if no actual image rep data...
-
-- (BOOL) needsImageRepresentation	
-{
-	return _needsImageRepresentation || (_imageRepresentation == nil);
 }
 
 
@@ -379,232 +513,6 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 - (NSString*) previewItemTitle
 {
 	return self.name;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Generic image support through Quick Look 
-
-
-// Setter retains the CGImage...
-
-- (void) setQuickLookImage:(CGImageRef)inImage
-{
-//	[self willChangeValueForKey:kIMBQuickLookImageProperty];
-//	
-//	CGImageRef old = _quickLookImage;
-//	_quickLookImage = CGImageRetain(inImage);
-//	CGImageRelease(old);
-//	
-//	[self didChangeValueForKey:kIMBQuickLookImageProperty];
-}
-
-
-// The getter loads Quick Look image lazily (if it's not available). Since Quicklook doesn't like
-// being called on the main thread, we'll defer this to a background operation.
-// Please note that the unloadThumbnail method gets rid of the Quick Look image again
-// as the IMBObjectFifoCache clears out the oldest items...
-
-- (CGImageRef) quickLookImage
-{	
-//	if (_quickLookImage == NULL)
-//	{
-//		if (_isLoadingQuickLookImage == NO)
-//		{
-//			_isLoadingQuickLookImage = YES;
-//			
-//			if ([NSThread isMainThread])
-//			{
-//				NSInvocationOperation* op = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(renderQuickLookImage) object:nil];
-//				[[IMBOperationQueue sharedQueue] addOperation:op];
-//				[op release];
-//			}
-//			else
-//			{
-//				self.quickLookImage = [self _renderQuickLookImage];
-//			}
-//		}	
-//	}
-	
-	return _quickLookImage;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Render the image on a background thread and set the result back on the main thread...
-
-- (void) renderQuickLookImage
-{
-//	CGImageRef image = [self _renderQuickLookImage];
-//	[self performSelectorOnMainThread:@selector(_setQuickLookImage:) withObject:(id)image waitUntilDone:NO];
-}
-
-
-// Use Quick Look to render an image. Please note that Quicklook wants to be called on a background thread.
-// If Quicklook fail to generate an image (either not supported or corrupt file), then we will simply try to get
-// an icon image from the Finder as a fallback...
-
-- (CGImageRef) _renderQuickLookImage
-{	
-	return NULL;
-//	NSString* path = nil;
-//	NSURL* url = nil;
-//	
-//	if ([_location isKindOfClass:[NSString class]])
-//	{
-//		path = (NSString*)_location;
-//		url = [NSURL fileURLWithPath:path];
-//	}
-//	else if ([_location isKindOfClass:[NSURL class]])
-//	{
-//		url = (NSURL*)_location;
-//		path = [url path];
-//	}
-//	
-//	CGImageRef image = [url imb_quicklookCGImage];
-//	
-//	if (image == NULL)
-//	{
-//		NSLog(@"%s Failed to create Quick Look image for file %@. Using generic file icon instead...",__FUNCTION__,self.name);
-//		
-//		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:[path pathExtension]];
-//		[icon setSize:NSMakeSize(kIMBMaxThumbnailSize,kIMBMaxThumbnailSize)];
-//		NSBitmapImageRep* rep = [icon imb_bitmap];
-//		image = [rep CGImage];
-//		
-//		_shouldDrawAdornments = NO;
-//	}
-//	
-//	return image;
-}
-
-
-// The setter is called on the main thread, so that KVO works correctly...
-
-- (void) _setQuickLookImage:(id)inImage
-{
-//	self.quickLookImage = (CGImageRef)inImage;
-//	_isLoadingQuickLookImage = NO;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Asynchronous Loading
-
-
-// If the image representation isn't available yet, then trigger asynchronous loading. When the results come in,
-// copy the properties from the incoming object. Do not replace the old object here, as that would unecessarily
-// upset the NSArrayController. Redrawing of the view will be triggered automatically...
-
-- (void) loadThumbnail
-{
-	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
-	{
-		self.isLoadingThumbnail = YES;
-		
-		IMBParserMessenger* messenger = self.parserMessenger;
-		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadThumbnailAndMetadataForObject:error:),self,
-		
-			^(IMBObject* inPopulatedObject,NSError* inError)
-			{
-				if (inError)
-				{
-					NSLog(@"%s Error trying to load thumbnail of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
-				}
-				else
-				{
-					self.imageRepresentation = inPopulatedObject.imageRepresentation;
-					if (self.metadata == nil) self.metadata = inPopulatedObject.metadata;
-					if (self.metadataDescription == nil) self.metadataDescription = inPopulatedObject.metadataDescription;
-					self.isLoadingThumbnail = NO;
-				}
-			});
-	}
-}
-
-
-// Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out of the   
-// cache and are thus unloaded...
-
-- (void) setImageRepresentation:(id)inImageRepresentation
-{
-	self.atomic_imageRepresentation = inImageRepresentation;
-	self.imageVersion = _imageVersion + 1;
-	
-	if (inImageRepresentation)
-	{
-		self.needsImageRepresentation = NO;
-		[IMBObjectFifoCache addObject:self];
-	}
-}
-
-
-// Unload the imageRepresentation to save some memory, if it's something that can be rebuilt.
-
-- (BOOL) unloadThumbnail
-{
-	BOOL unloaded = NO;
-	
-//	static NSSet* sTypesThatCanBeUnloaded = nil;
-//	
-//	if (sTypesThatCanBeUnloaded == nil)
-//	{
-//		sTypesThatCanBeUnloaded = [[NSSet alloc] initWithObjects:
-//			IKImageBrowserPathRepresentationType,				/* NSString */
-//			IKImageBrowserNSURLRepresentationType,				/* NSURL */
-//			IKImageBrowserQTMoviePathRepresentationType,		/* NSString or NSURL */
-//			IKImageBrowserQCCompositionPathRepresentationType,	/* NSString or NSURL */
-//			IKImageBrowserQuickLookPathRepresentationType,		/* NSString or NSURL*/
-//			IKImageBrowserIconRefPathRepresentationType,		/* NSString */
-//			nil];
-//	}
-//
-//	if ([sTypesThatCanBeUnloaded containsObject:self.imageRepresentationType])
-//	{
-		self.imageRepresentation = nil;
-		self.metadata = nil;
-		self.quickLookImage = NULL;
-		unloaded = YES;
-//	}
-	
-	return unloaded;
-}
-
-
-- (void) loadMetadata
-{
-	if (self.metadata == nil && !self.isLoadingThumbnail)
-	{
-		IMBParserMessenger* messenger = self.parserMessenger;
-		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadMetadataForObject:error:),self,
-		
-			^(IMBObject* inPopulatedObject,NSError* inError)
-			{
-				if (inError)
-				{
-					NSLog(@"%s Error trying to load metadata of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
-				}
-				else
-				{
-					self.metadata = inPopulatedObject.metadata;
-					self.metadataDescription = inPopulatedObject.metadataDescription;
-				}
-			});
-	}
-}
-
-
-- (void) postProcessLocalURL:(NSURL*)localURL
-{
-	// For overriding by subclass
 }
 
 
@@ -904,6 +812,70 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 - (NSString*) view:(NSView*)inView stringForToolTip:(NSToolTipTag)inTag point:(NSPoint)inPoint userData:(void*)inUserData
 {
 	return [self tooltipString];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Bookmark Support
+
+
+// Request a bookmark and execute the completion block once it is available. This usually requires an  
+// asynchronous round trip to an XPC service, but if the bookmark is already available, the completion 
+// block is called immediately...
+
+- (void) requestBookmarkWithCompletionBlock:(void(^)(NSError*))inCompletionBlock
+{
+	if (self.bookmark == nil)
+	{
+		[inCompletionBlock copy];
+		self.bookmarkBaseURL = [IMBConfig bookmarkBaseURL];
+		IMBParserMessenger* messenger = self.parserMessenger;
+		SBPerformSelectorAsync(messenger.connection,messenger,@selector(bookmarkForObject:error:),self,
+		
+			^(NSData* inBookmark,NSError* inError)
+			{
+				if (inError)
+				{
+					NSLog(@"%s Error trying to load bookmark of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+				}
+				else
+				{
+					self.bookmark = inBookmark;
+				}
+				
+				inCompletionBlock(inError);
+				[inCompletionBlock release];
+			});
+	}
+	else
+	{
+		inCompletionBlock(nil);
+	}
+}
+
+
+// Resolve the bookmark and return a URL that we can access in the host application...
+
+- (NSURL*) urlByResolvingBookmark
+{
+	NSError* error = nil;
+	BOOL isStale = NO;
+	NSURL* url = nil;
+	
+	if (self.bookmark)
+	{
+		url = [NSURL 
+			URLByResolvingBookmarkData:self.bookmark 
+			options:NSURLBookmarkResolutionWithSecurityScope|NSURLBookmarkResolutionWithoutUI 
+			relativeToURL:self.bookmarkBaseURL 
+			bookmarkDataIsStale:&isStale 
+			error:&error];
+	}
+	
+	return url;
 }
 
 
