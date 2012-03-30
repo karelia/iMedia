@@ -530,11 +530,18 @@
 
 // This helper method can be used by subclasses to construct identifiers of form "classname://path/to/node"...
  
-+ (NSString*) identifierForPath:(NSString*)inPath
+- (NSString*) identifierForPath:(NSString*)inPath
 {
-	NSString* parserClassName = NSStringFromClass(self);
+	NSString* parserClassName = NSStringFromClass([self class]);
 	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
 }
+
+
+//+ (NSString*) identifierForPath:(NSString*)inPath
+//{
+//	NSString* parserClassName = NSStringFromClass(self);
+//	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
