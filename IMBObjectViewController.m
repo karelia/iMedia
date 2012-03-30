@@ -2304,9 +2304,10 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (void) openObjects:(NSArray*)inObjects
 {
-	NSString* appPath = [IMBConfig editorAppForMediaType:self.mediaType];
-	if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
-
+	NSString* appPath = nil;
+//	if (appPath == nil) appPath = [IMBConfig editorAppForMediaType:self.mediaType];
+//	if (appPath == nil) appPath = [IMBConfig viewerAppForMediaType:self.mediaType];
+	
 	for (IMBObject* object in inObjects)
 	{
 		[object requestBookmarkWithCompletionBlock:^(NSError* inError)
@@ -2317,11 +2318,15 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			}
 			else
 			{
-				NSURL* url = [object urlByResolvingBookmark];
-				[url startAccessingSecurityScopedResource];
-				if (appPath) [[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
-				else [[NSWorkspace imb_threadSafeWorkspace] openURL:url];
-				[url stopAccessingSecurityScopedResource];
+				NSURL* url = [object URLByResolvingBookmark];
+				
+				if (url)
+				{
+//					[url startAccessingSecurityScopedResource];
+					if (appPath) [[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+					else [[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+//					[url stopAccessingSecurityScopedResource];
+				}
 			}
 		}];
 	}
