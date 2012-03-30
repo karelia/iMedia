@@ -66,6 +66,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Return a CGImageRef thumbnail for our image file...
+
+- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
+}
+
+
 // Return metadata specific to image files...
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError

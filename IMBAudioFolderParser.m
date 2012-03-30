@@ -66,15 +66,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Creates a thumbnail for our image file...
+// Creates a thumbnail for our audio file. Use Quicklook to access the cover art...
 
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	NSError* error = nil;
-	NSURL* url = inObject.URL;
-	CGImageRef thumbnail = [url imb_quicklookCGImage];
-	if (outError) *outError = error;
-	return (id)thumbnail;
+	return (id)[self thumbnailFromQuicklookForObject:inObject error:outError];
 }
 
 
