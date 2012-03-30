@@ -61,7 +61,7 @@
 
 #pragma mark CONSTANTS
 
-extern NSString* kIMBQuickLookImageProperty;
+extern NSString* kIMBObjectPasteboardType;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ extern NSString* kIMBQuickLookImageProperty;
 // IMBObject encapsulates information about a single media item (e.g. image file or audio file). The location 
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
 
-@interface IMBObject : NSObject <NSCopying,NSCoding,IMBImageItem,QLPreviewItem,NSPasteboardWriting>
+@interface IMBObject : NSObject <NSCopying,NSCoding,IMBImageItem,QLPreviewItem,NSPasteboardWriting,NSPasteboardItemDataProvider>
 {
 	id _location;												
 	NSString* _name;

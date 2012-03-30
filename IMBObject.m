@@ -107,7 +107,7 @@
 
 #pragma mark CONSTANTS
 
-NSString* kIMBQuickLookImageProperty = @"quickLookImage";
+NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -520,50 +520,108 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 
 #pragma mark 
-#pragma mark Pasteboard Writing
+#pragma mark Pasteboard Protocol
 
-
-// For when we target 10.6, IMBObjects should really implement NSPasteboardWriting as it's a near perfect fit. Until then, its methods are still highly useful for support...
 
 - (NSArray*) writableTypesForPasteboard:(NSPasteboard*)inPasteboard
 {
-	return nil;
-//    return [NSArray arrayWithObjects:
-//		kIMBPasteboardTypeObjectsPromise,
-//		NSFilesPromisePboardType,
-//		([self isLocalFile]?kUTTypeFileURL:kUTTypeURL), 
-//		nil]; 
+    return [NSArray arrayWithObjects:
+		kIMBObjectPasteboardType,
+		kUTTypeFileURL, 
+		nil]; 
+}
+
+
+- (NSPasteboardWritingOptions) writingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
+{
+	return NSPasteboardWritingPromised;
 }
 
 
 - (id) pasteboardPropertyListForType:(NSString*)inType
 {
-//    if ([inType isEqualToString:(NSString *)kUTTypeURL] ||
-//        [inType isEqualToString:(NSString *)kUTTypeFileURL] ||
-//        [inType isEqualToString:NSURLPboardType] ||
-//        [inType isEqualToString:@"CorePasteboardFlavorType 0x6675726C"])
-//    {
-//        return [[self URL] absoluteString];
-//    }
-//    else if ([inType isEqualToString:NSFilenamesPboardType])
-//    {
-//        return [NSArray arrayWithObject:[self path]];
-//    }
-    
+    if ([inType isEqualToString:kIMBObjectPasteboardType])
+	{
+        return [NSKeyedArchiver archivedDataWithRootObject:self];
+    }
+//	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
+//	{
+//		return self.URL;
+//	}
+	
     return nil;
 }
 
 
-//  This ought to be implemented at some point
-/*
-- (NSPasteboardWritingOptions) writingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
+- (void) pasteboard:(NSPasteboard*)inPasteboard item:(NSPasteboardItem*)inItem provideDataForType:(NSString*)inType
 {
-    
+    if ([inType isEqualToString:(NSString*)kIMBObjectPasteboardType])
+	{
+	
+	}
+	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
+	{
+		dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
+		{
+			[self requestBookmarkWithCompletionBlock:^(NSError* inError)
+			{
+				if (inError)
+				{
+					[NSApp presentError:inError];
+				}
+				else
+				{
+					NSURL* url = [self URLByResolvingBookmark];
+					if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
+				}
+			}];
+		});
+	}
 }
-*/
+
+
+- (void) pasteboardFinishedWithDataProvider:(NSPasteboard*)inPasteboard
+{
+
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSArray*) readableTypesForPasteboard:(NSPasteboard*)inPasteboard
+{
+    static NSArray* readableTypes = nil;
+	
+    if (readableTypes == nil)
+	{
+        readableTypes = [[NSArray alloc] initWithObjects:kIMBObjectPasteboardType,kUTTypeFileURL,nil];
+    }
+	
+    return readableTypes;
+}
+
+
++ (NSPasteboardReadingOptions) readingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
+{
+    if ([inType isEqualToString:kIMBObjectPasteboardType])
+	{
+        return NSPasteboardReadingAsKeyedArchive;
+    }
+    else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
+	{
+        return NSPasteboardReadingAsString;
+    }
+	
+    return 0;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Helpers
 
 
 // Convert location to path...
