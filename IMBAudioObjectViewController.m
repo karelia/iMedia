@@ -291,7 +291,10 @@
 		{
 			[[NSNotificationCenter defaultCenter] removeObserver:self name:QTMovieDidEndNotification object:nil];	
 			[self.audioPlayer stop];
+
+			[self willChangeValueForKey:@"isPlaying"];
 			self.audioPlayer = nil;	
+			[self didChangeValueForKey:@"isPlaying"];
 		}
 	}
 }
@@ -352,7 +355,10 @@
 		{
 			[movie gotoBeginning];
 			[movie play];
+			
+			[self willChangeValueForKey:@"isPlaying"];
 			self.audioPlayer = movie;
+			[self didChangeValueForKey:@"isPlaying"];
 		}
 		
 		// Handle errors...
