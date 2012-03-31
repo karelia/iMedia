@@ -84,7 +84,7 @@
 
 @implementation IMBAudioObjectViewController
 
-@synthesize playingAudio = _playingAudio;
+@synthesize audioPlayer = _audioPlayer;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,6 +107,9 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
@@ -117,27 +120,39 @@
 		@"metadata.album",
 		nil];
 										  
-	[[[_tableView tableColumnWithIdentifier:@"name"] headerCell] setStringValue:
-		NSLocalizedStringWithDefaultValue(@"IMBAudioViewController.tableColumn.name", nil,IMBBundle(), @"Name", @"Column title - should be a short word")
-	 ];
-	[[[_tableView tableColumnWithIdentifier:@"artist"] headerCell] setStringValue:
-		NSLocalizedStringWithDefaultValue(@"IMBAudioViewController.tableColumn.artist", nil,IMBBundle(), @"Artist", @"Column title - should be a short word")
-	 ];
-	[[[_tableView tableColumnWithIdentifier:@"duration"] headerCell] setStringValue:
-		NSLocalizedStringWithDefaultValue(@"IMBAudioViewController.tableColumn.time", nil,IMBBundle(), @"Time", @"Column title - should be a short word")
-	 ];
+	[[[ibListView tableColumnWithIdentifier:@"name"] headerCell] setStringValue:NSLocalizedStringWithDefaultValue(
+		@"IMBAudioViewController.tableColumn.name", 
+		nil,IMBBundle(), 
+		@"Name", 
+		@"Column title - should be a short word")];
+			
+	[[[ibListView tableColumnWithIdentifier:@"artist"] headerCell] setStringValue: NSLocalizedStringWithDefaultValue(
+		@"IMBAudioViewController.tableColumn.artist", 
+		nil,IMBBundle(), 
+		@"Artist", 
+		@"Column title - should be a short word")];
+			
+	[[[ibListView tableColumnWithIdentifier:@"duration"] headerCell] setStringValue: NSLocalizedStringWithDefaultValue(
+		@"IMBAudioViewController.tableColumn.time", 
+		nil,IMBBundle(), 
+		@"Time", 
+		@"Column title - should be a short word")];
 }
 
 
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	IMBRelease(_playingAudio);
+	IMBRelease(_audioPlayer);
 	[super dealloc];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Customize Subclass
 
 
 + (NSString*) mediaType
@@ -149,9 +164,6 @@
 {
 	return @"IMBAudioObjectViewController";
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 + (NSString*) objectCountFormatSingular
@@ -198,34 +210,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Stop playing audio as we are leaving this panel...
-
-- (void) willHideView
-{
-	[self.playingAudio stop];
-	self.playingAudio = nil;
-}
-
-
-- (IBAction) quicklook:(id)inSender
-{
-	if (IMBRunningOnSnowLeopardOrNewer())
-	{
-		[self setIsPlaying:NO];
-		[super quicklook:inSender];
-	}
-	else	// Don't quicklook on 10.5 .. instead, play the current selection.
-	{
-		[self startPlayingSelection:inSender];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark 
-#pragma mark NSTableViewDelegate
+#pragma mark Play Audio
  
 
 // Upon doubleclick start playing the selection (or opens a folder in case of IMBNodeObject)...
@@ -256,13 +242,13 @@
 
 - (void) tableViewSelectionDidChange:(NSNotification*)inNotification
 {
-	if (self.playingAudio.rate > 0.0)
+	if (self.audioPlayer.rate > 0.0)
 	{
 		[self startPlayingSelection:nil];
 	}
 	else
 	{
-		self.playingAudio = nil;
+		self.audioPlayer = nil;
 	}
 }
 
@@ -270,45 +256,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) setIsPlaying:(BOOL)shouldPlay
-{
-	if ([self isPlaying] != shouldPlay)
-	{
-		if (shouldPlay)
-		{
-			// starts playing with the current selection
-			NSArray* objects = [ibObjectArrayController arrangedObjects];
-			NSIndexSet* rows = [[self listView] selectedRowIndexes];
-			NSUInteger row = [rows firstIndex];
-				
-			if (row != NSNotFound && row < [objects count])
-			{
-				IMBObject* object = (IMBObject*) [objects objectAtIndex:row];
-				
-				// Sets self.playingAudio 
-				[self playAudioObject:object];
-			}
-		}
-		else
-		{
-			[[NSNotificationCenter defaultCenter] removeObserver:self name:QTMovieDidEndNotification object:nil];	
-			[self.playingAudio stop];
-			self.playingAudio = nil;	
-		}
-	}
-}
-
-
-- (BOOL) isPlaying
-{
-	return (self.playingAudio != nil);
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Invoked e.g. when double-clicking on a specific song file. First stop any audio that may currently be playing.
+// Invoked e.g. when double-clicking on a specific audio file. First stop any audio that may currently be playing.
 // Start playing whatever the current selection is...
 
 - (IBAction) startPlayingSelection:(id)inSender
@@ -318,39 +266,106 @@
 }
 
 
-- (void) playAudioObject:(IMBObject*)inObject
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Starts playing with the current selection...
+			
+- (void) setIsPlaying:(BOOL)inPlaying
 {
-	// GarageBand files require special attention as the "playable" file resides inside the document package...
-	
-	NSString* path = [inObject path];
-
-	if ([[[path pathExtension] lowercaseString] isEqualToString:@"band"])
+	if ([self isPlaying] != inPlaying)
 	{
-		NSString* output = [path stringByAppendingPathComponent:@"Output/Output.aif"];
-		BOOL exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:output];
-		if (exists) path = output;
-	}
-
-	// Create a QTMovie for the selected item...
-	
-	NSError* error = nil;
-	QTMovie* movie = [QTMovie movieWithFile:path error:&error];
-	
-	[[NSNotificationCenter defaultCenter] 
-		addObserver:self 
-		selector:@selector(_movieDidEnd:) 
-		name:QTMovieDidEndNotification 
-		object:movie];
-
-	// Start playing it...
-	
-	if (error == nil)
-	{
-		[movie gotoBeginning];
-		[movie play];
-		self.playingAudio = movie;
+		if (inPlaying)
+		{
+			NSArray* objects = [ibObjectArrayController arrangedObjects];
+			NSIndexSet* rows = [[self listView] selectedRowIndexes];
+			NSUInteger row = [rows firstIndex];
+				
+			if (row != NSNotFound && row < [objects count])
+			{
+				IMBObject* object = (IMBObject*) [objects objectAtIndex:row];
+				[self playAudioObject:object];
+			}
+		}
+		else
+		{
+			[[NSNotificationCenter defaultCenter] removeObserver:self name:QTMovieDidEndNotification object:nil];	
+			[self.audioPlayer stop];
+			self.audioPlayer = nil;	
+		}
 	}
 }
+
+
+- (BOOL) isPlaying
+{
+	return (self.audioPlayer != nil);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) playAudioObject:(IMBObject*)inObject
+{
+	// Since we may be running in a sandbox, we have to request a bookmark and resolve, in order to gain 
+	// access to the audio file...
+	
+	[inObject requestBookmarkWithCompletionBlock:^(NSError* inError)
+	{
+		NSError* error = inError;
+		NSString* path = nil;
+		QTMovie* movie = nil;
+		
+		// Get the path to the audio file. GarageBand files require special attention as the "playable"  
+		// file resides inside the document package...
+			
+		if (error == nil)
+		{
+			NSURL* url = [inObject URLByResolvingBookmark];
+			path = [url path];
+			
+			if ([[[path pathExtension] lowercaseString] isEqualToString:@"band"])
+			{
+				NSString* output = [path stringByAppendingPathComponent:@"Output/Output.aif"];
+				BOOL exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:output];
+				if (exists) path = output;
+			}
+		}	
+
+		// Create a QTMovie for the selected item...
+			
+		if (error == nil)
+		{
+			movie = [QTMovie movieWithFile:path error:&error];
+			
+			[[NSNotificationCenter defaultCenter] 
+				addObserver:self 
+				selector:@selector(_movieDidEnd:) 
+				name:QTMovieDidEndNotification 
+				object:movie];
+		}
+		
+		// Start playing it...
+		
+		if (error == nil)
+		{
+			[movie gotoBeginning];
+			[movie play];
+			self.audioPlayer = movie;
+		}
+		
+		// Handle errors...
+		
+		if (error)
+		{
+			[NSApp presentError:error];
+		}
+	}];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // When regular playback stops at end of file, reset our state so that highlight disappears on button...
@@ -358,6 +373,30 @@
 - (void) _movieDidEnd:(NSNotification*)inNotification
 {
 	[self setIsPlaying:NO];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Stop playing audio when we are leaving this panel...
+
+- (void) willHideView
+{
+	[self.audioPlayer stop];
+	self.audioPlayer = nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Stop playing audio when Quicklook panel is shown...
+
+- (IBAction) quicklook:(id)inSender
+{
+	[self setIsPlaying:NO];
+	[super quicklook:inSender];
 }
 
 
