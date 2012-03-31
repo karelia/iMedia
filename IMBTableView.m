@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -72,9 +75,11 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 @interface NSTableView (NotPublicSoThisMightBeAProblemForTheMAS)
 - (NSColor*) _highlightColorForCell:(NSCell*)inCell;
 @end
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -141,6 +146,7 @@ enum IMBMouseOperation
 #pragma mark Drawing
 
 #ifndef MAS
+
 // This is a private internal method. If it no longer going to be called, there's no harm in proving an override...
 // It might be possible to actually define this (but not call superclass) if we want to force a custom color.
 
@@ -160,6 +166,7 @@ enum IMBMouseOperation
 	
 	return color;
 }
+
 #endif
 
 
@@ -266,12 +273,12 @@ enum IMBMouseOperation
 		[self setNeedsDisplayInRect:[self rectOfRow:_clickedObjectIndex]];
 	}
 	
-	// In case of a normal object start selecting or dragging...
+	// In case of a normal object start selecting or dragging. Indicate what object was clicked upon so  
+	// thatdragging can happen to the clicked object, which is not necessarily the same row as one of 
+	// the selection row(s)...
 	
 	else 
 	{
-		// Indicate what object was clicked upon so that dragging can happen to the clicked object,
-		// which is not necessarily the same row as one of the selection row(s).
 		IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
 		[objectViewController setClickedObject:self.clickedObject];
 		[objectViewController setClickedObjectIndex:self.clickedObjectIndex];
@@ -280,6 +287,9 @@ enum IMBMouseOperation
 		[super mouseDown:inEvent];
 	}
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Careful -- this only works in special cases; see
@@ -308,6 +318,9 @@ enum IMBMouseOperation
 		// Ignore drag if we don't have a draggable object
 	}
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (void) mouseUp:(NSEvent*)inEvent
@@ -341,18 +354,12 @@ enum IMBMouseOperation
 	self.clickedObject = nil;
 }
 
-- (void) draggedImage:(NSImage*)inImage endedAt:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
-{
-	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
-	[controller draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Ask the IMBNodeViewController (which is our delegate) to return a context menu for the clicked node. If  
-// the user clicked on the background node is nil...
+// Ask the IMBNodeViewController (which is our delegate) to return a context menu for the clicked node.   
+// If the user clicked on the background node is nil...
 
 - (NSMenu*) menuForEvent:(NSEvent*)inEvent
 {
