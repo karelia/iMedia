@@ -281,8 +281,6 @@ enum IMBMouseOperation
 	{
 		IMBObjectViewController* objectViewController = (IMBObjectViewController*) self.delegate;
 		[objectViewController setClickedObject:self.clickedObject];
-		[objectViewController setClickedObjectIndex:self.clickedObjectIndex];
-		
 		_mouseOperation = kMouseOperationNone;
 		[super mouseDown:inEvent];
 	}

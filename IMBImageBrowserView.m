@@ -338,10 +338,10 @@ enum IMBMouseOperation
 		_mouseOperation = kMouseOperationNone;
 	}
 
-	// For parity with TableView; not really needed since selection is changed anyhow
+	// For parity with TableView - not really needed since selection is changed anyhow...
+	
 	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
 	[controller setClickedObject:self.clickedObject];
-	[controller setClickedObjectIndex:self.clickedObjectIndex];
 
 	[super mouseDown:inEvent];
 }
@@ -367,8 +367,6 @@ enum IMBMouseOperation
 	
 	else if (_clickedObject)
 	{
-		[self.delegate setDropDestinationURL:nil];		// initialize to nil so we know drag has just started
-		
 		if ([_clickedObject isDraggable])
 		{
 			[super mouseDragged:inEvent];
