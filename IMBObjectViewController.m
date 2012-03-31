@@ -1499,10 +1499,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		
 	else
 	{
-		id location = [inObject location];
-		NSURL* url = (NSURL*)location;
-//		BOOL localFile = [location isKindOfClass:[NSString class]] || ([location isKindOfClass:[NSURL class]] && [url isFileURL]);
-		
 		if (inObject.isLocalFile)
 		{
 			NSString* path = [inObject path];
