@@ -64,11 +64,11 @@
 	
 	// Let's see what it is
 	
-	NSPasteboard* pboard = [sender draggingPasteboard];
-	IMBObjectsPromise* objectsPromise = [IMBObjectsPromise promiseFromPasteboard:pboard];
-	NSArray* objects = [objectsPromise objects];
-	
-	[(IMBTestAppDelegate*) draggingDelegate concludeDragOperationForObjects:objects];
+//	NSPasteboard* pboard = [sender draggingPasteboard];
+//	IMBObjectsPromise* objectsPromise = [IMBObjectsPromise promiseFromPasteboard:pboard];
+//	NSArray* objects = [objectsPromise objects];
+//	
+//	[(IMBTestAppDelegate*) draggingDelegate concludeDragOperationForObjects:objects];
 }
 
 @end
