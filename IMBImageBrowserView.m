@@ -98,17 +98,23 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-- (void) _init	// support method shared by both
+
+#pragma mark
+
+
+// Common init code shared by init methods...
+
+- (void) _init
 {
 	_mouseOperation = kMouseOperationNone;
 	_clickedObjectIndex = NSNotFound;
 	_clickedObject = nil;
 	
 	[[NSNotificationCenter defaultCenter]				// Unload parsers before we quit, so that custom have 
-	 addObserver:self								// a chance to clean up (e.g. remove callbacks, etc...)
-	 selector:@selector(showTitlesStateChanged:) 
-	 name:kIMBImageBrowserShowTitlesNotification 
-	 object:nil];
+		addObserver:self								// a chance to clean up (e.g. remove callbacks, etc...)
+		selector:@selector(showTitlesStateChanged:) 
+		name:kIMBImageBrowserShowTitlesNotification 
+		object:nil];
 
 	// Set up initial value
 	NSString* filenames = [IMBConfig prefsValueForKey:@"prefersFilenamesInPhotoBasedBrowsers"];
@@ -117,22 +123,25 @@ enum IMBMouseOperation
 	[self setCellsStyleMask: mask];
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder;
+
+- (id) initWithCoder:(NSCoder*)inCoder
 {
-	if (self = [super initWithCoder:aDecoder])
+	if ((self = [super initWithCoder:inCoder]))
 	{
 		[self _init];
 	}
+	
 	return self;
 }
 
 
-- (id) initWithFrame:(NSRect) frame;
+- (id) initWithFrame:(NSRect)inFrame
 {
-	if (self = [super initWithFrame:frame])
+	if ((self = [super initWithFrame:inFrame]))
 	{
 		[self _init];
 	}
+	
 	return self;
 }
 
@@ -145,15 +154,49 @@ enum IMBMouseOperation
 	[super dealloc];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
-- (void) showTitlesStateChanged:(NSNotification *)aNotification
+
+// Make the browser use our own custom cell class...
+
+- (void) awakeFromNib
 {
-	id obj = [aNotification object];
-	BOOL showTitle = [obj boolValue];
+	if (IMBRunningOnSnowLeopardOrNewer())	//  We don't allow for special cell in Leopard.
+	{
+		_cellClass = [self _cellClass];
+		if ([self respondsToSelector:@selector(setCellClass:)])
+		{
+			[self performSelector:@selector(setCellClass:) withObject:_cellClass];
+		}
+	}
+
+	[self setConstrainsToOriginalSize:NO];
+	
+//	[self setValue:attributes forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];	
+//	[self setCellSize:NSMakeSize(44.0,22.0)];
+//	[self setIntercellSpacing:NSMakeSize(8.0,12.0)];
+//	[self setAnimates:NO];
+//	[self setWantsLayer:NO];
+
+//	NSColor* selectionColor = [NSColor selectedTextBackgroundColor];
+//	[self setValue:selectionColor forKey:IKImageBrowserSelectionColorKey];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+- (void) showTitlesStateChanged:(NSNotification*)inNotification
+{
+	id object = [inNotification object];
+	BOOL showTitle = [object boolValue];
 	int mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
 	[self setCellsStyleMask: mask];
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -192,32 +235,6 @@ enum IMBMouseOperation
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Make the browser use our own custom cell class...
-
-- (void) awakeFromNib
-{
-	if (IMBRunningOnSnowLeopardOrNewer())	//  We don't allow for special cell in Leopard.
-	{
-		_cellClass = [self _cellClass];
-		if ([self respondsToSelector:@selector(setCellClass:)])
-		{
-			[self performSelector:@selector(setCellClass:) withObject:_cellClass];
-		}
-	}
-
-	[self setConstrainsToOriginalSize:NO];
-	
-//	[self setValue:attributes forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];	
-//	[self setCellSize:NSMakeSize(44.0,22.0)];
-//	[self setIntercellSpacing:NSMakeSize(8.0,12.0)];
-//	[self setAnimates:NO];
-//	[self setWantsLayer:NO];
-
-//	NSColor* selectionColor = [NSColor selectedTextBackgroundColor];
-//	[self setValue:selectionColor forKey:IKImageBrowserSelectionColorKey];
-}
-
-
 // This method is for 10.6 only. Create and return a cell. Please note that we must not autorelease here!
 
 - (IKImageBrowserCell*) newCellForRepresentedItem:(id)inItem
@@ -239,6 +256,9 @@ enum IMBMouseOperation
 {
 	return NSDragOperationCopy;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // When creating the drag image first give the delegate of our controller a chance to create a custom drag image.
@@ -327,6 +347,9 @@ enum IMBMouseOperation
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (void) mouseDragged:(NSEvent*)inEvent;
 {
 	// If a button was clicked then track that button and highlight it when inside...
@@ -360,6 +383,9 @@ enum IMBMouseOperation
 		[super mouseDragged:inEvent];
 	}
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (void) mouseUp:(NSEvent*)inEvent
@@ -423,6 +449,10 @@ enum IMBMouseOperation
 	[super drawRect:rect];
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Fixed issue #24 (github):
 // For some reason the frame origin of the view is sometimes offset (by e.g. 50 pixels in y direction).
 // This leads to falsly calculated scrolling positions when changing the zoom factor for cells.
@@ -442,6 +472,7 @@ enum IMBMouseOperation
 
     [super reloadData];
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -520,7 +551,7 @@ enum IMBMouseOperation
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
+/*
 #pragma mark
 #pragma mark Dragging Promise Support
 
@@ -535,7 +566,7 @@ enum IMBMouseOperation
 {
 	[self.delegate draggedImage:inImage endedAt:inScreenPoint operation:inOperation];
 }
-
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
