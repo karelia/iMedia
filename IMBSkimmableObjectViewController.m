@@ -89,7 +89,7 @@
 	return @"IMBImageView";		// Looks like we don't need an extra @"IMBSkimmableView.xib"
 }
 
-+ (float) iconViewReloadDelay
++ (double) iconViewReloadDelay
 {
 	return 0.00;	// Delay in seconds. Default delay is decreased for proper skimming user exerience.
 }
