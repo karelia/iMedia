@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner, Mike Abdullah
 
 
@@ -86,6 +89,13 @@ static IMBPanelController* sSharedPanelController = nil;
 
 #pragma mark 
 
+// This is a private class in the user interface of IMBPanelController. Used in the xib file...
+
+@interface IMBBackgroundImageView : NSImageView
+
+@end
+
+
 @implementation IMBBackgroundImageView
 
 - (BOOL) isOpaque
@@ -102,12 +112,16 @@ static IMBPanelController* sSharedPanelController = nil;
 #pragma mark 
 
 @interface IMBPanelController ()
+@property (retain) NSString* oldMediaType;
 - (void) setupInfoWindow;
+- (IBAction) flipBackToMainWindow:(id)inSender;
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark 
 
 @implementation IMBPanelController
 
@@ -122,6 +136,8 @@ static IMBPanelController* sSharedPanelController = nil;
 
 
 #pragma mark 
+#pragma mark Instantiation
+
 
 // Convenience method for loading/initializing the shared panel controller with default media types and no delegate
 
@@ -172,6 +188,8 @@ static IMBPanelController* sSharedPanelController = nil;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark 
 
 - (id) init
 {
@@ -229,12 +247,12 @@ static IMBPanelController* sSharedPanelController = nil;
 		[libraryController setDelegate:self.delegate];
 
 		// Create the top-level view controller (IMBNodeViewController) with attached standard
-            // object view (IMBObjectViewController) for each media type...
-		
-            nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
-            objectViewController = [IMBObjectViewController viewControllerForLibraryController:libraryController];
-            nodeViewController.standardObjectViewController = objectViewController;
-            [self.nodeViewControllers setObject:nodeViewController forKey:mediaType];
+		// object view (IMBObjectViewController) for each media type...
+	
+		nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
+		objectViewController = [IMBObjectViewController viewControllerForLibraryController:libraryController];
+		nodeViewController.standardObjectViewController = objectViewController;
+		[self.nodeViewControllers setObject:nodeViewController forKey:mediaType];
 	}
 }
 
@@ -342,8 +360,6 @@ static IMBPanelController* sSharedPanelController = nil;
 		
 		// Install the views in the window hierarchy...
 		
-//		NSView* objectView = [objectViewController view];
-//		nodeViewController.standardObjectView = objectView;
 		[nodeViewController installObjectViewForNode:nil];
 
 		NSTabViewItem* item = [[NSTabViewItem alloc] initWithIdentifier:mediaType];
@@ -381,13 +397,7 @@ static IMBPanelController* sSharedPanelController = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IBAction) hideWindow:(id)inSender
-{
-	[self.window orderOut:nil];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
+#pragma mark 
 
 
 - (void) saveStateToPreferences
@@ -424,11 +434,40 @@ static IMBPanelController* sSharedPanelController = nil;
 	[ibToolbar setSizeMode:sizeMode];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
-#pragma mark Info Window
+#pragma mark Show/Hide
+
+// If we are actually showing the back of the window, flip to the front...
+
+- (IBAction) showWindow:(id)inSender
+{
+	if (self.isInfoWindowVisible)
+	{
+		[self flipBackToMainWindow:inSender];
+	}
+	else
+	{
+		[super showWindow:inSender];
+	}
+}
+
+
+// Provide a "symmetric" name to -showWindow...
+
+- (IBAction) hideWindow:(id)inSender
+{
+	[self.window orderOut:nil];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 
 
 - (void) setupInfoWindow
@@ -441,7 +480,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	NSButton *iButton = [[[IMBHoverButton alloc] initWithFrame:NSMakeRect(frame.origin.x + containerWidth - 11 - 11,frame.origin.y+2,11,11)] autorelease];
 	[iButton setAutoresizingMask:NSViewMinYMargin|NSViewMinXMargin];
 	
-	[iButton setAction:@selector(info:)];
+	[iButton setAction:@selector(showInfoWindow:)];
 	[iButton setTarget:self];
 	[container addSubview:iButton];
 	
@@ -504,6 +543,7 @@ static IMBPanelController* sSharedPanelController = nil;
 			@"HTML style text shown on credits for iMedia");
 		
 		// Localize some stuff.  Note that we're working in HTML here so watch for & < >
+		
 		[htmlString replaceOccurrencesOfString:@"{IMB.introduction}"
 									withString:imediaDescription
 									   options:0
@@ -536,50 +576,30 @@ static IMBPanelController* sSharedPanelController = nil;
 	[[ibInfoTextView textStorage] setAttributedString:attr];
 	
 	// set up cursors in text
+	
 	NSEnumerator* attrRuns = [[[ibInfoTextView textStorage] attributeRuns] objectEnumerator];
 	NSTextStorage* run;
-	while ((run = [attrRuns nextObject])) {
-		if ([run attribute:NSLinkAttributeName atIndex:0 effectiveRange:NULL]) {
+	while ((run = [attrRuns nextObject]))
+	{
+		if ([run attribute:NSLinkAttributeName atIndex:0 effectiveRange:NULL])
+		{
 			[run addAttribute:NSCursorAttributeName value:[NSCursor pointingHandCursor] range:NSMakeRange(0,[run length])];
 		}
 	};
 }
 
 
-- (IBAction) showWindow:(id)sender
-{
-	// If we are actually showing the back of the window, flip to the front.
-	if ([ibInfoWindow isVisible])
-	{
-		[self flipBack:sender];
-	}
-	else
-	{
-		[super showWindow:sender];
-	}
-}
+//----------------------------------------------------------------------------------------------------------------------
 
 
-- (BOOL) infoWindowIsVisible
-{
-	return [ibInfoWindow isVisible];
-}
-
-
-- (NSWindow*) infoWindow
-{
-	return ibInfoWindow;
-}
-
-
-- (IBAction) info:(id)inSender
+- (IBAction) showInfoWindow:(id)inSender
 {
 	[ibInfoWindow setFrame:[[self window] frame] display:NO];
 	[[self window] flipToShowWindow:ibInfoWindow forward:YES reflectInto:ibBackgroundImageView];
 }
 
 
-- (IBAction) flipBack:(id)inSender
+- (IBAction) flipBackToMainWindow:(id)inSender
 {
 	[[self window] setFrame:[ibInfoWindow frame] display:NO];	// not really needed unless window is resized
 	[ibInfoWindow flipToShowWindow:[self window] forward:NO reflectInto:nil];
@@ -589,53 +609,110 @@ static IMBPanelController* sSharedPanelController = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (BOOL) isInfoWindowVisible
+{
+	return [ibInfoWindow isVisible];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
-#pragma mark NSToolbarDelegate
+#pragma mark NSTabViewDelegate
 
 
-- (int) toolbarDisplayMode
+// Ask the delegate whether we are allowed to switch to another media type...
+
+- (BOOL) tabView:(NSTabView*)inTabView shouldSelectTabViewItem:(NSTabViewItem*)inTabViewItem
 {
-	int displayMode = [ibToolbar displayMode];
-	if (0 == displayMode) displayMode = NSToolbarDisplayModeIconAndLabel;
-	return displayMode;
+	NSString* mediaType = inTabViewItem.identifier;
+	
+	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:shouldShowPanelForMediaType:)])
+	{
+		return [_delegate panelController:self shouldShowPanelForMediaType:mediaType];
+	}
+	
+	return YES;
 }
 
 
-- (void) setToolbarDisplayMode:(int)aMode
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// We are about to switch tabs...
+
+- (void) tabView:(NSTabView*)inTabView willSelectTabViewItem:(NSTabViewItem*)inTabViewItem
 {
-	[ibToolbar setDisplayMode:aMode];
+	if (!_isLoadingWindow)
+	{
+		self.oldMediaType = inTabView.selectedTabViewItem.identifier;
+		NSString* newMediaType = inTabViewItem.identifier;
+
+		// If the library for the new tab has been loaded yet then do it now...
+		
+		if ([_loadedLibraries objectForKey:newMediaType] == nil)
+		{
+			IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:newMediaType];
+			[libraryController reload];
+			[_loadedLibraries setObject:newMediaType forKey:newMediaType];
+		}
+		
+		// Notify the controllers...
+
+		IMBNodeViewController* oldNodeViewController = [self nodeViewControllerForMediaType:_oldMediaType];
+		IMBObjectViewController* oldObjectViewController = (IMBObjectViewController*)oldNodeViewController.objectViewController;
+		[oldObjectViewController willHideView];
+		
+		IMBNodeViewController* newNodeViewController = [self nodeViewControllerForMediaType:newMediaType];
+		IMBObjectViewController* newObjectViewController = (IMBObjectViewController*)newNodeViewController.objectViewController;
+		[newObjectViewController willShowView];
+		
+		// Notify the delegate...
+
+		if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willHidePanelForMediaType:)])
+		{
+			[_delegate panelController:self willHidePanelForMediaType:_oldMediaType];
+		}
+
+		if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willShowPanelForMediaType:)])
+		{
+			[_delegate panelController:self willShowPanelForMediaType:newMediaType];
+		}
+	}
 }
 
 
-- (BOOL)toolbarIsSmall
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Notify the delegate that we did switch...
+
+- (void) tabView:(NSTabView*)inTabView didSelectTabViewItem:(NSTabViewItem*)inTabViewItem
 {
-	int sizeMode = 	[ibToolbar sizeMode];
-	if (0 == sizeMode) sizeMode = NSToolbarSizeModeRegular;
-	return (sizeMode == NSToolbarSizeModeSmall);
-}
+	NSString* newMediaType = inTabViewItem.identifier;
+	[ibToolbar setSelectedItemIdentifier:newMediaType];
+	// Notify the controllers...
 
+	IMBNodeViewController* oldNodeViewController = [self nodeViewControllerForMediaType:_oldMediaType];
+	IMBObjectViewController* oldObjectViewController = (IMBObjectViewController*)oldNodeViewController.objectViewController;
+	[oldObjectViewController didHideView];
 
-- (void) setToolbarIsSmall:(BOOL)aFlag
-{
-	int sizeMode = (aFlag ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
-	[ibToolbar setSizeMode:sizeMode];
-}
+	IMBNodeViewController* newNodeViewController = [self nodeViewControllerForMediaType:newMediaType];
+	IMBObjectViewController* newObjectViewController = (IMBObjectViewController*)newNodeViewController.objectViewController;
+	[newObjectViewController didShowView];
 
+	// Notify the delegate...
 
-- (BOOL)prefersFilenamesInPhotoBasedBrowsers
-{
-	NSString* filenames = [IMBConfig prefsValueForKey:@"prefersFilenamesInPhotoBasedBrowsers"];
-	BOOL flag = (nil == filenames) ? YES : [filenames boolValue];
-	return flag;
-}
+	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didHidePanelForMediaType:)])
+	{
+		[_delegate panelController:self didHidePanelForMediaType:_oldMediaType];
+	}
 
-
-- (void) setPrefersFilenamesInPhotoBasedBrowsers:(BOOL)aFlag
-{
-	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBImageBrowserShowTitlesNotification object:
-	 [NSNumber numberWithBool:aFlag]];
-
-	[IMBConfig setPrefsValue:[NSNumber numberWithBool:aFlag] forKey:@"prefersFilenamesInPhotoBasedBrowsers"];
+	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didShowPanelForMediaType:)])
+	{
+		[_delegate panelController:self didShowPanelForMediaType:newMediaType];
+	}
 }
 
 
@@ -683,6 +760,9 @@ static IMBPanelController* sSharedPanelController = nil;
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (IBAction) selectTabViewItemWithIdentifier:(id)inSender
 {
 	NSToolbarItem* item = (NSToolbarItem*)inSender;
@@ -693,93 +773,55 @@ static IMBPanelController* sSharedPanelController = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-#pragma mark NSTabViewDelegate
-
-
-// Ask the delegate whether we are allowed to switch to another media type...
-
-- (BOOL) tabView:(NSTabView*)inTabView shouldSelectTabViewItem:(NSTabViewItem*)inTabViewItem
+- (void) setToolbarDisplayMode:(int)aMode
 {
-	NSString* mediaType = inTabViewItem.identifier;
-	
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:shouldShowPanelForMediaType:)])
-	{
-		return [_delegate panelController:self shouldShowPanelForMediaType:mediaType];
-	}
-	
-	return YES;
+	[ibToolbar setDisplayMode:aMode];
 }
 
 
-// We are about to switch tabs...
-
-- (void) tabView:(NSTabView*)inTabView willSelectTabViewItem:(NSTabViewItem*)inTabViewItem
+- (int) toolbarDisplayMode
 {
-	if (!_isLoadingWindow)
-	{
-		self.oldMediaType = inTabView.selectedTabViewItem.identifier;
-		NSString* newMediaType = inTabViewItem.identifier;
-
-		// If the library for the new tab has been loaded yet then do it now...
-		
-		if ([_loadedLibraries objectForKey:newMediaType] == nil)
-		{
-			IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:newMediaType];
-			[libraryController reload];
-			[_loadedLibraries setObject:newMediaType forKey:newMediaType];
-		}
-		
-		// Notify the controllers...
-
-		#warning TODO
-//		IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
-//		[oldController willHideView];
-//
-//		IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
-//		[newController willShowView];
-		
-		// Notify the delegate...
-
-		if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willHidePanelForMediaType:)])
-		{
-			[_delegate panelController:self willHidePanelForMediaType:_oldMediaType];
-		}
-
-		if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:willShowPanelForMediaType:)])
-		{
-			[_delegate panelController:self willShowPanelForMediaType:newMediaType];
-		}
-	}
+	int displayMode = [ibToolbar displayMode];
+	if (0 == displayMode) displayMode = NSToolbarDisplayModeIconAndLabel;
+	return displayMode;
 }
 
 
-// Notify the delegate that we did switch...
+//----------------------------------------------------------------------------------------------------------------------
 
-- (void) tabView:(NSTabView*)inTabView didSelectTabViewItem:(NSTabViewItem*)inTabViewItem
+
+- (void) setToolbarIsSmall:(BOOL)aFlag
 {
-	NSString* newMediaType = inTabViewItem.identifier;
-	[ibToolbar setSelectedItemIdentifier:newMediaType];
-	// Notify the controllers...
+	int sizeMode = (aFlag ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
+	[ibToolbar setSizeMode:sizeMode];
+}
 
-	#warning TODO
-//	IMBObjectViewController* oldController = [self objectViewControllerForMediaType:_oldMediaType];
-//	[oldController didHideView];
-//
-//	IMBObjectViewController* newController = [self objectViewControllerForMediaType:newMediaType];
-//	[newController didShowView];
 
-	// Notify the delegate...
+- (BOOL)toolbarIsSmall
+{
+	int sizeMode = 	[ibToolbar sizeMode];
+	if (0 == sizeMode) sizeMode = NSToolbarSizeModeRegular;
+	return (sizeMode == NSToolbarSizeModeSmall);
+}
 
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didHidePanelForMediaType:)])
-	{
-		[_delegate panelController:self didHidePanelForMediaType:_oldMediaType];
-	}
 
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didShowPanelForMediaType:)])
-	{
-		[_delegate panelController:self didShowPanelForMediaType:newMediaType];
-	}
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) setPrefersFilenamesInPhotoBasedBrowsers:(BOOL)aFlag
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBImageBrowserShowTitlesNotification object:
+	 [NSNumber numberWithBool:aFlag]];
+
+	[IMBConfig setPrefsValue:[NSNumber numberWithBool:aFlag] forKey:@"prefersFilenamesInPhotoBasedBrowsers"];
+}
+
+
+- (BOOL)prefersFilenamesInPhotoBasedBrowsers
+{
+	NSString* filenames = [IMBConfig prefsValueForKey:@"prefersFilenamesInPhotoBasedBrowsers"];
+	BOOL flag = (nil == filenames) ? YES : [filenames boolValue];
+	return flag;
 }
 
 
@@ -796,10 +838,10 @@ static IMBPanelController* sSharedPanelController = nil;
 	
     if([key isEqual:@" "])
 	{
-#warning TODO
-//		NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
-//		IMBObjectViewController* controller = [self objectViewControllerForMediaType:mediaType];
-//        [controller quicklook:self];
+		NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
+		IMBNodeViewController* nodeViewController = [self nodeViewControllerForMediaType:mediaType];
+		IMBObjectViewController* objectViewController = (IMBObjectViewController*)nodeViewController.objectViewController;
+		[objectViewController quicklook:self];
     } 
 	else
 	{
@@ -816,11 +858,11 @@ static IMBPanelController* sSharedPanelController = nil;
 
 - (void) beginPreviewPanelControl:(QLPreviewPanel*)inPanel
 {
-#warning TODO
-//	NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
-//	IMBObjectViewController* controller = [self objectViewControllerForMediaType:mediaType];
-//    inPanel.delegate = controller;
-//    inPanel.dataSource = controller;
+	NSString* mediaType = [[ibTabView selectedTabViewItem] identifier];
+	IMBNodeViewController* nodeViewController = [self nodeViewControllerForMediaType:mediaType];
+	IMBObjectViewController* objectViewController = (IMBObjectViewController*)nodeViewController.objectViewController;
+	inPanel.delegate = objectViewController;
+	inPanel.dataSource = objectViewController;
 }
 
 

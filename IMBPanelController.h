@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner, Mike Abdullah
 
 
@@ -73,23 +76,15 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-@interface IMBBackgroundImageView : NSImageView
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
 #pragma mark 
 
-@interface IMBPanelController : NSWindowController
+@interface IMBPanelController : NSWindowController <NSTabViewDelegate>
 {
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet NSToolbar* ibToolbar;		// should track the ibTabView
 	IBOutlet NSWindow* ibInfoWindow;
 	IBOutlet NSTextView* ibInfoTextView;
-	IBOutlet IMBBackgroundImageView *ibBackgroundImageView;
+	IBOutlet NSImageView *ibBackgroundImageView;
 	
 	// Items that we will localize from code so we don't need multiple nibs
 	IBOutlet NSTextField* ibGridPrompt;
@@ -106,39 +101,37 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 	BOOL _isLoadingWindow;
 }
 
-+ (IMBPanelController*) sharedPanelController;
-+ (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
-+ (BOOL) isSharedPanelControllerLoaded;
-+ (void) cleanupSharedPanelController;
+// Properties...
 
 @property (assign) id delegate;
 @property (retain) NSArray* mediaTypes;
 @property (retain) NSMutableDictionary* nodeViewControllers;
 @property (retain) NSMutableDictionary* loadedLibraries;
-@property (retain) NSString* oldMediaType;
+
+// Instantiation...
+
++ (IMBPanelController*) sharedPanelController;
++ (IMBPanelController*) sharedPanelControllerWithDelegate:(id)inDelegate mediaTypes:(NSArray*)inMediaTypes;
++ (BOOL) isSharedPanelControllerLoaded;
++ (void) cleanupSharedPanelController;
 
 - (void) loadControllers;
 - (IMBNodeViewController*) nodeViewControllerForMediaType:(NSString*)inMediaType;
-- (IBAction) hideWindow:(id)inSender;
+
+// Persistence...
 
 - (void) saveStateToPreferences;
 - (void) restoreStateFromPreferences;
 
-- (IBAction) info:(id)sender;
-- (IBAction) flipBack:(id)sender;
-- (BOOL)infoWindowIsVisible;
-- (NSWindow *)infoWindow;
+// Show/hide the panel...
+
+- (IBAction) showWindow:(id)inSender;
+- (IBAction) hideWindow:(id)inSender;
+
+- (IBAction) showInfoWindow:(id)inSender;
+- (BOOL) isInfoWindowVisible;
 
 @end
-
-
-// By declaring as a category, we:
-//  A)  Don't export an NSTabViewDelegate to host applications (thereby perhaps introducing warnings)
-//  B)  Keep IB able to parse the file
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-@interface IMBPanelController (NSTabViewDelegate) <NSTabViewDelegate>
-@end
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
