@@ -36,19 +36,8 @@
 
 
 #pragma mark
+#pragma mark Sandbox Check
 
-@interface NSObject()
-
-// Prototype for XPCConnection instance method to silence compiler warning
--(void)sendSelector:(SEL)inSelector withTarget:(id)inTarget object:(id)inObject returnValueHandler:(SBReturnValueHandler)inReturnHandler;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark
 
 // Check if the host app is sandboxed. This code is based on suggestions from the FrameworksIT mailing list...
 
@@ -57,30 +46,27 @@ BOOL SBIsSandboxed()
 	static BOOL sIsSandboxed = NO;
 	static dispatch_once_t sIsSandboxedToken = 0;
 
-#warning App will not work on OS X 10.7 to 10.7.2 because it will still be sandboxed but not return accordingly
-    if (!IMBRunningOnLion1073OrNewer())
-	{
-        return NO;
-    }
-    
     dispatch_once(&sIsSandboxedToken,
     ^{
-		SecCodeRef codeRef = NULL;
-		SecCodeCopySelf(kSecCSDefaultFlags,&codeRef);
-
-		if (codeRef != NULL)
+		if (IMBRunningOnLionOrNewer())
 		{
-			SecRequirementRef reqRef = NULL;
-			SecRequirementCreateWithString(CFSTR("entitlement[\"com.apple.security.app-sandbox\"] exists"),kSecCSDefaultFlags,&reqRef);
+			SecCodeRef codeRef = NULL;
+			SecCodeCopySelf(kSecCSDefaultFlags,&codeRef);
 
-			if (reqRef != NULL)
+			if (codeRef != NULL)
 			{
-				OSStatus status = SecCodeCheckValidity(codeRef,kSecCSDefaultFlags,reqRef);
-				
-				if (status == noErr)
+				SecRequirementRef reqRef = NULL;
+				SecRequirementCreateWithString(CFSTR("entitlement[\"com.apple.security.app-sandbox\"] exists"),kSecCSDefaultFlags,&reqRef);
+
+				if (reqRef != NULL)
 				{
-					sIsSandboxed = YES;
-				};
+					OSStatus status = SecCodeCheckValidity(codeRef,kSecCSDefaultFlags,reqRef);
+					
+					if (status == noErr)
+					{
+						sIsSandboxed = YES;
+					};
+				}
 			}
 		}
     });
@@ -93,6 +79,7 @@ BOOL SBIsSandboxed()
 
 
 #pragma mark
+#pragma mark Directory Access
 
 
 // Replacement function for NSHomeDirectory...
@@ -130,6 +117,7 @@ NSString* SBApplicationContainerHomeDirectory(NSString* inBundleIdentifier)
 
 
 #pragma mark
+#pragma mark Preferences Access
 
 
 // Private function to read contents of a prefs file at given path into a dinctionary...
@@ -210,21 +198,32 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
 
 
 #pragma mark
+#pragma mark XPC Abstraction
 
 
-// Dispatch a message with optional argument object to a target object asynchronously.
-// When connnection (which must be an XPCConnection) is not nil the message will be transfered
-// to XPC service for execution (i.e. target and object must conform to NSCoding when connection is not nil).
-// When connection is nil (e.g. running on Snow Leopard) message will be dispatched asynchronously via GCD.
+// Prototype for XPCConnection instance method to silence compiler warning on untyped connection object (which is  
+// used because of weak linking XPCKit)...
 
-void SBPerformSelectorAsync(id inConnection,
-                            id inTarget, SEL inSelector, id inObject,
-                            SBReturnValueHandler inReturnHandler)
+@interface NSObject()
+-(void) sendSelector:(SEL)inSelector withTarget:(id)inTarget object:(id)inObject returnValueHandler:(SBReturnValueHandler)inReturnHandler;
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Dispatch a message with optional argument object to a target object asynchronously. When connnection (which must 
+// be an XPCConnection) is supplied the message will be transferred to an XPC service for execution. Please note  
+// that inTarget and inObject must conform to NSCoding for this to work, or they cannot be sent across the connection. 
+// When connection is nil (e.g. running on Snow Leopard) message will be dispatched asynchronously via GCD, but the 
+// behaviour will be similar...
+
+void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObject,SBReturnValueHandler inReturnHandler)
 {
     // If we are running sandboxed on Lion (or newer), then send a request to perform selector on target to our XPC
     // service and hand the results to the supplied return handler block...
     
-    if (inConnection && [inConnection respondsToSelector:@selector(sendSelector:withTarget:object:returnValueHandler:)] )
+    if (inConnection && [inConnection respondsToSelector:@selector(sendSelector:withTarget:object:returnValueHandler:)])
     {
         [inConnection sendSelector:inSelector
                         withTarget:inTarget
@@ -233,12 +232,11 @@ void SBPerformSelectorAsync(id inConnection,
     }
     
     // If we are not sandboxed (e.g. running on Snow Leopard) we'll just do the work directly (but asynchronously)
-    // via GCD queues. Once again the result is handed over to the return handler block...
-    
+    // via GCD queues. Once again the result is handed over to the return handler block. Please note that we are 
+	// copying inTarget and inObject so they are dispatched under same premises as XPC (XPC uses archiving)...
+   
     else
     {
-        // Copy target and object so they are dispatched under same premises as XPC (XPC uses archiving)
-        
         id targetCopy = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:inTarget]];
         id objectCopy = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:inObject]];
         
@@ -246,24 +244,30 @@ void SBPerformSelectorAsync(id inConnection,
         dispatch_retain(currentQueue);
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0),^()
-                       {
-                           NSError* error = nil;
-                           id result = nil;
-                           
-                           if (objectCopy) {
-                               result = [targetCopy performSelector:inSelector withObject:objectCopy withObject:(id)&error];
-                           } else {
-                               result = [targetCopy performSelector:inSelector withObject:(id)&error];
-                           }
-                           
-                           dispatch_async(currentQueue,^()
-                                          {
-                                              inReturnHandler(result, error);
-                                              dispatch_release(currentQueue);
-                                          });
-                       });
+		{
+			NSError* error = nil;
+			id result = nil;
+
+			if (objectCopy)
+			{
+				result = [targetCopy performSelector:inSelector withObject:objectCopy withObject:(id)&error];
+			} 
+			else
+			{
+				result = [targetCopy performSelector:inSelector withObject:(id)&error];
+			}
+
+			dispatch_async(currentQueue,^()
+			{
+				inReturnHandler(result, error);
+				dispatch_release(currentQueue);
+			});
+	   });
     }
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Here's the same thing as an Objective-C wrapper (for those devs that do not like using pure C functions)...

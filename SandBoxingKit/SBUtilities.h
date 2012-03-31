@@ -31,14 +31,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark TYPES
-
-typedef void (^SBReturnValueHandler)(id, NSError*);
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Returns YES if the app is running in a sandbox...
 
 BOOL SBIsSandboxed(void);
@@ -62,10 +54,13 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Dispatch a message with optional argument object to a target object asynchronously. When connnection
-// (which must be an XPCConnection) is not nil the message will be transfered to XPC service for execution 
-// (i.e. target and object must conform to NSCoding when connection is not nil). When connection is nil 
-// (e.g. running on Snow Leopard) message will be dispatched asynchronously via GCD...
+// Dispatch a message with optional argument object to a target object asynchronously. When connnection (which must 
+// be an XPCConnection) is supplied the message will be transferred to an XPC service for execution. Please note  
+// that inTarget and inObject must conform to NSCoding for this to work, or they cannot be sent across the connection. 
+// When connection is nil (e.g. running on Snow Leopard) message will be dispatched asynchronously via GCD, but the 
+// behaviour will be similar...
+
+typedef void (^SBReturnValueHandler)(id,NSError*);
 
 void SBPerformSelectorAsync(
 	id inConnection,
@@ -74,13 +69,10 @@ void SBPerformSelectorAsync(
 	id inObject,
 	SBReturnValueHandler inCompletionHandler);
 
-
-// Here's the same thing as an Objective-C wrapper (for those devs that do not like using pure C functions)...
+// Here's the same thing as an Objective-C wrapper (for those developers that do not like using pure C functions)...
  							
 @interface NSObject (SBPerformSelectorAsync)
-
 - (void) performAsyncSelector:(SEL)inSelector withObject:(id)inObject onConnection:(id)inConnection completionHandler:(SBReturnValueHandler)inCompletionHandler;
-
 @end
 
 
