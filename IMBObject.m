@@ -117,7 +117,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 @interface IMBObject ()
 @property (retain) id atomic_imageRepresentation;
-@property (assign) BOOL isLoadingThumbnail;
+@property (retain) NSData* atomic_bookmark;
 @end
 
 
@@ -129,12 +129,14 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @implementation IMBObject
 
 @synthesize location = _location;
+@synthesize atomic_bookmark = _bookmark;
 @synthesize name = _name;
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
 @synthesize metadataDescription = _metadataDescription;
 @synthesize parserIdentifier = _parserIdentifier;
 @synthesize parserMessenger = _parserMessenger;
+
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
 @synthesize shouldDisableTitle = _shouldDisableTitle;
@@ -144,16 +146,13 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @synthesize imageRepresentationType = _imageRepresentationType;
 @synthesize needsImageRepresentation = _needsImageRepresentation;
 @synthesize imageVersion = _imageVersion;
-@synthesize isLoadingThumbnail = _isLoadingThumbnail;
-
-@synthesize bookmarkBaseURL = _bookmarkBaseURL;
-@synthesize bookmark = _bookmark;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 #pragma mark 
+#pragma mark Lifetime
 
 
 - (id) init
@@ -162,8 +161,10 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	{
 		_index = NSNotFound;
 		_shouldDrawAdornments = YES;
-		_needsImageRepresentation = YES;
 		_shouldDisableTitle = NO;
+		_isLoadingThumbnail = NO;
+		_needsImageRepresentation = YES;
+		_imageVersion = 0;
 	}
 	
 	return self;
@@ -173,6 +174,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 - (void) dealloc
 {
 	IMBRelease(_location);
+	IMBRelease(_bookmark);
 	IMBRelease(_name);
 	IMBRelease(_preliminaryMetadata);
 	IMBRelease(_metadata);
@@ -183,9 +185,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
-
-	IMBRelease(_bookmarkBaseURL);
-	IMBRelease(_bookmark);
 	
 	[super dealloc];
 }
@@ -201,6 +200,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	if ((self = [super init]))
 	{
 		self.location = [coder decodeObjectForKey:@"location"];
+		self.atomic_bookmark = [coder decodeObjectForKey:@"bookmark"];
 		self.name = [coder decodeObjectForKey:@"name"];
 		self.preliminaryMetadata = [coder decodeObjectForKey:@"preliminaryMetadata"];
 		self.metadata = [coder decodeObjectForKey:@"metadata"];
@@ -210,16 +210,13 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.index = [coder decodeIntegerForKey:@"index"];
 		self.shouldDrawAdornments = [coder decodeBoolForKey:@"shouldDrawAdornments"];
 		self.shouldDisableTitle = [coder decodeBoolForKey:@"shouldDisableTitle"];
-		self.isLoadingThumbnail = [coder decodeBoolForKey:@"isLoadingThumbnail"];
 		
 		self.imageLocation = [coder decodeObjectForKey:@"imageLocation"];
 		self.imageRepresentation = (id)[coder decodeCGImageForKey:@"imageRepresentation"];
 		self.imageRepresentationType = [coder decodeObjectForKey:@"imageRepresentationType"];
 		self.needsImageRepresentation = [coder decodeBoolForKey:@"needsImageRepresentation"];
 		self.imageVersion = [coder decodeIntegerForKey:@"imageVersion"];
-
-		self.bookmarkBaseURL = [coder decodeObjectForKey:@"bookmarkBaseURL"];
-		self.bookmark = [coder decodeObjectForKey:@"bookmark"];
+		_isLoadingThumbnail = [coder decodeBoolForKey:@"isLoadingThumbnail"];
 	}
 	
 	return self;
@@ -231,6 +228,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	NSKeyedArchiver* coder = (NSKeyedArchiver*)inCoder;
 	
 	[coder encodeObject:self.location forKey:@"location"];
+	[coder encodeObject:self.bookmark forKey:@"bookmark"];
 	[coder encodeObject:self.name forKey:@"name"];
 	[coder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
 	[coder encodeObject:self.metadata forKey:@"metadata"];
@@ -240,16 +238,13 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeInteger:self.index forKey:@"index"];
 	[coder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
 	[coder encodeBool:self.shouldDisableTitle forKey:@"shouldDisableTitle"];
-	[coder encodeBool:self.isLoadingThumbnail forKey:@"isLoadingThumbnail"];
 
 	[coder encodeObject:self.imageLocation forKey:@"imageLocation"];
 	[coder encodeCGImage:(CGImageRef)self.imageRepresentation forKey:@"imageRepresentation"];
 	[coder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
 	[coder encodeBool:self.needsImageRepresentation forKey:@"needsImageRepresentation"];
 	[coder encodeInteger:self.imageVersion forKey:@"imageVersion"];
-
-	[coder encodeObject:self.bookmarkBaseURL forKey:@"bookmarkBaseURL"];
-	[coder encodeObject:self.bookmark forKey:@"bookmark"];
+	[coder encodeBool:self.isLoadingThumbnail forKey:@"isLoadingThumbnail"];
 }
 
 
@@ -261,6 +256,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	IMBObject* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.location = self.location;
+	copy.atomic_bookmark = self.bookmark;
 	copy.name = self.name;
 	copy.preliminaryMetadata = self.preliminaryMetadata;
 	copy.metadata = self.metadata;
@@ -271,349 +267,15 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
     copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
 	copy.shouldDisableTitle = self.shouldDisableTitle;
-	copy.isLoadingThumbnail = self.isLoadingThumbnail;
 
 	copy.imageLocation = self.imageLocation;
 	copy.imageRepresentation = self.imageRepresentation;
 	copy.imageRepresentationType = self.imageRepresentationType;
 	copy.needsImageRepresentation = self.needsImageRepresentation;
 	copy.imageVersion = self.imageVersion;
-
-	copy.bookmarkBaseURL = self.bookmarkBaseURL;
-	copy.bookmark = self.bookmark;
+	_isLoadingThumbnail = self.isLoadingThumbnail;
 	
 	return copy;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Asynchronous Loading
-
-
-// If the image representation isn't available yet, then trigger asynchronous loading. When the results come in,
-// copy the properties from the incoming object. Do not replace the old object here, as that would unecessarily
-// upset the NSArrayController. Redrawing of the view will be triggered automatically...
-
-- (void) loadThumbnail
-{
-	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
-	{
-		self.isLoadingThumbnail = YES;
-		
-		IMBParserMessenger* messenger = self.parserMessenger;
-		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadThumbnailAndMetadataForObject:error:),self,
-		
-			^(IMBObject* inPopulatedObject,NSError* inError)
-			{
-				if (inError)
-				{
-					NSLog(@"%s Error trying to load thumbnail of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
-				}
-				else
-				{
-					self.imageRepresentation = inPopulatedObject.imageRepresentation;
-					if (self.metadata == nil) self.metadata = inPopulatedObject.metadata;
-					if (self.metadataDescription == nil) self.metadataDescription = inPopulatedObject.metadataDescription;
-					self.isLoadingThumbnail = NO;
-				}
-			});
-	}
-}
-
-
-// Unload the imageRepresentation to save some memory, if it's something that can be rebuilt.
-
-- (BOOL) unloadThumbnail
-{
-	BOOL unloaded = NO;
-	
-//	static NSSet* sTypesThatCanBeUnloaded = nil;
-//	
-//	if (sTypesThatCanBeUnloaded == nil)
-//	{
-//		sTypesThatCanBeUnloaded = [[NSSet alloc] initWithObjects:
-//			IKImageBrowserPathRepresentationType,				/* NSString */
-//			IKImageBrowserNSURLRepresentationType,				/* NSURL */
-//			IKImageBrowserQTMoviePathRepresentationType,		/* NSString or NSURL */
-//			IKImageBrowserQCCompositionPathRepresentationType,	/* NSString or NSURL */
-//			IKImageBrowserQuickLookPathRepresentationType,		/* NSString or NSURL*/
-//			IKImageBrowserIconRefPathRepresentationType,		/* NSString */
-//			nil];
-//	}
-//
-//	if ([sTypesThatCanBeUnloaded containsObject:self.imageRepresentationType])
-//	{
-		self.imageRepresentation = nil;
-		self.metadata = nil;
-		unloaded = YES;
-//	}
-	
-	return unloaded;
-}
-
-
-// Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out of the   
-// cache and are thus unloaded...
-
-- (void) setImageRepresentation:(id)inImageRepresentation
-{
-	self.atomic_imageRepresentation = inImageRepresentation;
-	self.imageVersion = _imageVersion + 1;
-	
-	if (inImageRepresentation)
-	{
-		self.needsImageRepresentation = NO;
-		[IMBObjectFifoCache addObject:self];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) loadMetadata
-{
-	if (self.metadata == nil && !self.isLoadingThumbnail)
-	{
-		IMBParserMessenger* messenger = self.parserMessenger;
-		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadMetadataForObject:error:),self,
-		
-			^(IMBObject* inPopulatedObject,NSError* inError)
-			{
-				if (inError)
-				{
-					NSLog(@"%s Error trying to load metadata of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
-				}
-				else
-				{
-					self.metadata = inPopulatedObject.metadata;
-					self.metadataDescription = inPopulatedObject.metadataDescription;
-				}
-			});
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (void) postProcessLocalURL:(NSURL*)localURL
-//{
-//	// For overriding by subclass
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark IKImageBrowserItem Protocol
-
-
-// Use the path or URL as the unique identifier...
-
-- (NSString*) imageUID
-{
-    id location = [self imageLocation];
-    if (!location) location = [self location];
-    
-	if ([location isKindOfClass:[NSString class]])
-	{
-		return location;
-	}
-	else if ([location isKindOfClass:[NSURL class]])
-	{
-		return [location path];
-	}
-	else if ([location isKindOfClass:[IMBNode class]])
-    {
-        return [location identifier];
-    }
-    else if ([location isKindOfClass:[NSNumber class]])
-    {
-        return [location description];
-    }
-    
-    return nil;
-}
-
-
-// The name of the object will be used as the title in IKImageBrowserView and tables.
-
-- (NSString*) imageTitle
-{
-	NSString* name = self.name;
-	
-	if (name==nil || [name isEqualToString:@""])
-	{
-		name = NSLocalizedStringWithDefaultValue(
-			@"IMBObject.untitled",
-			nil,
-			IMBBundle(),
-			@"untitled",
-			@"placeholder for untitled image");
-	}
-	return name;
-}
-
-
-// When this method is called we assume that the object is about to be displayed. So this could be a 
-// possible hook for lazily loading thumbnail and metadata...
-
-- (id) imageRepresentation
-{
-	if (self.needsImageRepresentation)
-	{
-		[self loadThumbnail];
-	}
-	
-	return [[_imageRepresentation retain] autorelease];
-}
-
-
-// Override simple accessor - also return YES if no actual image rep data...
-
-- (BOOL) needsImageRepresentation	
-{
-	return _needsImageRepresentation || (_imageRepresentation == nil);
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (BOOL) isSelectable 
-{
-	return YES;
-}
-
-
-- (BOOL) isDraggable
-{
-	return YES;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark QLPreviewItem Protocol 
-
-
-- (NSURL*) previewItemURL
-{
-	return self.URL;
-}
-
-
-- (NSString*) previewItemTitle
-{
-	return self.name;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Pasteboard Protocol
-
-
-- (NSArray*) writableTypesForPasteboard:(NSPasteboard*)inPasteboard
-{
-    return [NSArray arrayWithObjects:
-		kIMBObjectPasteboardType,
-		kUTTypeFileURL, 
-		nil]; 
-}
-
-
-- (NSPasteboardWritingOptions) writingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
-{
-	return NSPasteboardWritingPromised;
-}
-
-
-- (id) pasteboardPropertyListForType:(NSString*)inType
-{
-    if ([inType isEqualToString:kIMBObjectPasteboardType])
-	{
-        return [NSKeyedArchiver archivedDataWithRootObject:self];
-    }
-//	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
-//	{
-//		return self.URL;
-//	}
-	
-    return nil;
-}
-
-
-- (void) pasteboard:(NSPasteboard*)inPasteboard item:(NSPasteboardItem*)inItem provideDataForType:(NSString*)inType
-{
-    if ([inType isEqualToString:(NSString*)kIMBObjectPasteboardType])
-	{
-	
-	}
-	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
-	{
-		dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
-		{
-			[self requestBookmarkWithCompletionBlock:^(NSError* inError)
-			{
-				if (inError)
-				{
-					[NSApp presentError:inError];
-				}
-				else
-				{
-					NSURL* url = [self URLByResolvingBookmark];
-					if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
-				}
-			}];
-		});
-	}
-}
-
-
-- (void) pasteboardFinishedWithDataProvider:(NSPasteboard*)inPasteboard
-{
-
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-+ (NSArray*) readableTypesForPasteboard:(NSPasteboard*)inPasteboard
-{
-    static NSArray* readableTypes = nil;
-	
-    if (readableTypes == nil)
-	{
-        readableTypes = [[NSArray alloc] initWithObjects:kIMBObjectPasteboardType,kUTTypeFileURL,nil];
-    }
-	
-    return readableTypes;
-}
-
-
-+ (NSPasteboardReadingOptions) readingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
-{
-    if ([inType isEqualToString:kIMBObjectPasteboardType])
-	{
-        return NSPasteboardReadingAsKeyedArchive;
-    }
-    else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
-	{
-        return NSPasteboardReadingAsString;
-    }
-	
-    return 0;
 }
 
 
@@ -656,25 +318,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	else if ([_location isKindOfClass:[NSString class]])
 	{
 		url = [NSURL fileURLWithPath:(NSString*)_location];
-	}
-	
-	return url;
-}
-
-
-// Convert imageLocation to url...
-
-- (NSURL*) imageLocationURL
-{
-	NSURL* url = nil;
-	
-	if ([_imageLocation isKindOfClass:[NSURL class]])
-	{
-		url = (NSURL*)_imageLocation;
-	}
-	else if ([_imageLocation isKindOfClass:[NSString class]])
-	{
-		url = [NSURL fileURLWithPath:(NSString*)_imageLocation];
 	}
 	
 	return url;
@@ -877,7 +520,359 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 
 #pragma mark 
-#pragma mark Bookmark Support
+#pragma mark IKImageBrowserItem Protocol
+
+
+// Return a unique identifier for IKImageBrowserView...
+
+- (NSString*) imageUID
+{
+    return self.identifier;
+}
+
+
+// When this method is called we assume that the object is about to be displayed. 
+// So this could be a  possible hook for lazily loading thumbnail and metadata...
+
+- (id) imageRepresentation
+{
+	if (self.needsImageRepresentation)
+	{
+		[self loadThumbnail];
+	}
+	
+	return [[_imageRepresentation retain] autorelease];
+}
+
+
+// Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out of the   
+// cache and are thus unloaded...
+
+- (void) setImageRepresentation:(id)inImageRepresentation
+{
+	self.atomic_imageRepresentation = inImageRepresentation;
+	self.imageVersion = _imageVersion + 1;
+	
+	if (inImageRepresentation)
+	{
+		self.needsImageRepresentation = NO;
+		[IMBObjectFifoCache addObject:self];
+	}
+}
+
+
+// The name of the object will be used as the title in IKImageBrowserView and tables...
+
+- (NSString*) imageTitle
+{
+	NSString* name = self.name;
+	
+	if (name==nil || [name isEqualToString:@""])
+	{
+		name = NSLocalizedStringWithDefaultValue(
+			@"IMBObject.untitled",
+			nil,
+			IMBBundle(),
+			@"untitled",
+			@"placeholder for untitled image");
+	}
+	
+	return name;
+}
+
+
+// May be overridden by subclasses...
+
+- (BOOL) isSelectable 
+{
+	return YES;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Override simple accessor - also return YES if no actual image rep data...
+
+- (BOOL) needsImageRepresentation	
+{
+	return _needsImageRepresentation || (_imageRepresentation == nil);
+}
+
+
+// Can this object be dragged from the iMediaBrowser?
+
+- (BOOL) isDraggable
+{
+	return YES;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Convert imageLocation to url...
+
+- (NSURL*) imageLocationURL
+{
+	NSURL* url = nil;
+	
+	if ([_imageLocation isKindOfClass:[NSURL class]])
+	{
+		url = (NSURL*)_imageLocation;
+	}
+	else if ([_imageLocation isKindOfClass:[NSString class]])
+	{
+		url = [NSURL fileURLWithPath:(NSString*)_imageLocation];
+	}
+	
+	return url;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark NSPasteboard Protocols
+
+
+// Writing to the pasteboard...
+
+- (NSArray*) writableTypesForPasteboard:(NSPasteboard*)inPasteboard
+{
+    return [NSArray arrayWithObjects:
+		kIMBObjectPasteboardType,
+		kUTTypeFileURL, 
+		nil]; 
+}
+
+
+- (NSPasteboardWritingOptions) writingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
+{
+	return NSPasteboardWritingPromised;
+}
+
+
+- (id) pasteboardPropertyListForType:(NSString*)inType
+{
+    if ([inType isEqualToString:kIMBObjectPasteboardType])
+	{
+        return [NSKeyedArchiver archivedDataWithRootObject:self];
+    }
+//	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
+//	{
+//		return self.URL;
+//	}
+	
+    return nil;
+}
+
+
+- (void) pasteboard:(NSPasteboard*)inPasteboard item:(NSPasteboardItem*)inItem provideDataForType:(NSString*)inType
+{
+    if ([inType isEqualToString:(NSString*)kIMBObjectPasteboardType])
+	{
+	
+	}
+	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
+	{
+		dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
+		{
+			[self requestBookmarkWithCompletionBlock:^(NSError* inError)
+			{
+				if (inError)
+				{
+					[NSApp presentError:inError];
+				}
+				else
+				{
+					NSURL* url = [self URLByResolvingBookmark];
+					if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
+				}
+			}];
+		});
+	}
+}
+
+
+- (void) pasteboardFinishedWithDataProvider:(NSPasteboard*)inPasteboard
+{
+
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Reading from the pasteboard...
+
++ (NSArray*) readableTypesForPasteboard:(NSPasteboard*)inPasteboard
+{
+    static NSArray* readableTypes = nil;
+	
+    if (readableTypes == nil)
+	{
+        readableTypes = [[NSArray alloc] initWithObjects:kIMBObjectPasteboardType,kUTTypeFileURL,nil];
+    }
+	
+    return readableTypes;
+}
+
+
++ (NSPasteboardReadingOptions) readingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
+{
+    if ([inType isEqualToString:kIMBObjectPasteboardType])
+	{
+        return NSPasteboardReadingAsKeyedArchive;
+    }
+    else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
+	{
+        return NSPasteboardReadingAsString;
+    }
+	
+    return 0;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark QLPreviewItem Protocol 
+
+
+- (NSURL*) previewItemURL
+{
+	return self.URL;
+}
+
+
+- (NSString*) previewItemTitle
+{
+	return self.name;
+}
+
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Lazy Loading
+
+@implementation IMBObject (LazyLoading)
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// If the image representation isn't available yet, then trigger asynchronous loading. When the results come in,
+// copy the properties from the incoming object. Do not replace the old object here, as that would unecessarily
+// upset the NSArrayController. Redrawing of the view will be triggered automatically...
+
+- (void) loadThumbnail
+{
+	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
+	{
+		_isLoadingThumbnail = YES;
+		
+		IMBParserMessenger* messenger = self.parserMessenger;
+		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadThumbnailAndMetadataForObject:error:),self,
+		
+			^(IMBObject* inPopulatedObject,NSError* inError)
+			{
+				if (inError)
+				{
+					NSLog(@"%s Error trying to load thumbnail of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+				}
+				else
+				{
+					self.imageRepresentation = inPopulatedObject.imageRepresentation;
+					if (self.metadata == nil) self.metadata = inPopulatedObject.metadata;
+					if (self.metadataDescription == nil) self.metadataDescription = inPopulatedObject.metadataDescription;
+					_isLoadingThumbnail = NO;
+				}
+			});
+	}
+}
+
+
+// Unload the imageRepresentation to save some memory...
+
+- (void) unloadThumbnail
+{
+	self.imageRepresentation = nil;
+}
+
+
+- (BOOL) isLoadingThumbnail
+{
+	return _isLoadingThumbnail;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This method load metadata only. It is useful for the list view, which doesn't display any thumbnails. The
+// icon and combo view need bath thumbnail and metadata, so they should use the loadThumbnail method instead...
+
+- (void) loadMetadata
+{
+	if (self.metadata == nil && !self.isLoadingThumbnail)
+	{
+		IMBParserMessenger* messenger = self.parserMessenger;
+		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadMetadataForObject:error:),self,
+		
+			^(IMBObject* inPopulatedObject,NSError* inError)
+			{
+				if (inError)
+				{
+					NSLog(@"%s Error trying to load metadata of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+				}
+				else
+				{
+					self.metadata = inPopulatedObject.metadata;
+					self.metadataDescription = inPopulatedObject.metadataDescription;
+				}
+			});
+	}
+}
+
+
+// Unload the metadata to save some memory...
+
+- (void) unloadMetadata
+{
+	self.metadata = nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+//- (void) postProcessLocalURL:(NSURL*)localURL
+//{
+//	// For overriding by subclass
+//}
+
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark File Access
+
+@implementation IMBObject (FileAccess)
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Request a bookmark and execute the completion block once it is available. This usually requires an  
@@ -889,7 +884,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	if (self.bookmark == nil)
 	{
 		[inCompletionBlock copy];
-		self.bookmarkBaseURL = [IMBConfig bookmarkBaseURL];
 		IMBParserMessenger* messenger = self.parserMessenger;
 		SBPerformSelectorAsync(messenger.connection,messenger,@selector(bookmarkForObject:error:),self,
 		
@@ -901,7 +895,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 				}
 				else
 				{
-					self.bookmark = inBookmark;
+					self.atomic_bookmark = inBookmark;
 					
 					// First receive the normal bookmark and resolve it to a NSURL. This punches a hole into
 					// the sandbox for this launch session. But this hole doesn't persistent across relaunches.
@@ -951,6 +945,9 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Resolve the bookmark and return a URL that we can access in the host application...
 
 - (NSURL*) URLByResolvingBookmark
@@ -959,10 +956,10 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	BOOL isStale = NO;
 	NSURL* url = nil;
 	
-	if (self.bookmark)
+	if (self.atomic_bookmark)
 	{
 		url = [NSURL 
-			URLByResolvingBookmarkData:self.bookmark 
+			URLByResolvingBookmarkData:self.atomic_bookmark 
 			options:0
 			relativeToURL:nil
 			bookmarkDataIsStale:&isStale 
@@ -970,6 +967,15 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	}
 	
 	return url;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSData*) bookmark
+{
+	return self.atomic_bookmark;
 }
 
 
