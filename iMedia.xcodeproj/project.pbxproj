@@ -126,7 +126,6 @@
 		D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D052B0931053B0F700988F53 /* IMBProgressWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0C11053B4AB00988F53 /* IMBProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = D052B0C01053B4AB00988F53 /* IMBProgress.xib */; };
-		D05A9493102EB022005DF9CE /* IMBImageCaptureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0680C3C1518CCCE00CED506 /* com.karelia.imedia.folder.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.folder.xpc */; };
 		D08070BF10442CD700891137 /* IMBMovieObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08070C310442CE100891137 /* IMBAudioObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070C110442CE100891137 /* IMBAudioObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -591,8 +590,6 @@
 		D052B0931053B0F700988F53 /* IMBProgressWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBProgressWindowController.h; sourceTree = "<group>"; };
 		D052B0941053B0F700988F53 /* IMBProgressWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBProgressWindowController.m; sourceTree = "<group>"; };
 		D052B0C01053B4AB00988F53 /* IMBProgress.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBProgress.xib; sourceTree = "<group>"; };
-		D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageCaptureParser.h; sourceTree = "<group>"; };
-		D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageCaptureParser.m; sourceTree = "<group>"; };
 		D05A94A4102EB14A005DF9CE /* ICADevices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICADevices.framework; path = System/Library/Frameworks/ICADevices.framework; sourceTree = SDKROOT; };
 		D0760AC210C5027100F2119C /* IMBProject.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBProject.xcconfig; sourceTree = SOURCE_ROOT; };
 		D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieObjectViewController.h; sourceTree = "<group>"; };
@@ -1041,6 +1038,10 @@
 			children = (
 				D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */,
 				D0D635EB1035B4C500FF8631 /* IMBApertureParser.m */,
+				D0467BAE112C220F00C1AA4E /* IMBApertureAudioParser.h */,
+				D0467BAF112C220F00C1AA4E /* IMBApertureAudioParser.m */,
+				D0467BB2112C223600C1AA4E /* IMBApertureVideoParser.h */,
+				D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */,
 				8FCA063D12368342009072AE /* IMBApertureHeaderView.xib */,
 				8FCA064012368388009072AE /* IMBApertureHeaderViewController.h */,
 				8FCA064112368388009072AE /* IMBApertureHeaderViewController.m */,
@@ -1105,6 +1106,8 @@
 				8FC2559710A851C500F19642 /* IMBLightroom2Parser.m */,
 				8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */,
 				8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */,
+				8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */,
+				8FC2089C11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m */,
 				8F93177C10A9FC53002CDB19 /* IMBPyramidObjectPromise.h */,
 				8F93177D10A9FC53002CDB19 /* IMBPyramidObjectPromise.m */,
 				8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */,
@@ -1343,13 +1346,11 @@
 				D09930C11010F6C100C527B7 /* IMBParser.m */,
 				D0CB9165150F59BD007716FA /* Folders */,
 				D0CB9166150F59CE007716FA /* iPhoto */,
-				D0F2DDB4152473500059DF8D /* iTunes */,
 				8FCA063F12368367009072AE /* Aperture */,
 				D02E53C510A5558800B205BD /* Lightroom */,
+				D0F2DDB4152473500059DF8D /* iTunes */,
+				D0B6FAA21043227A00280DDC /* GarageBand */,
 				D032CE8A109B311A00D84782 /* Flickr */,
-				D09933491011AE6B00C527B7 /* ImageCapture */,
-				D0B6FAA21043227A00280DDC /* Audio */,
-				D0B6FAA31043228C00280DDC /* Movie */,
 				CEF695D5106434DB005D7E72 /* Links */,
 			);
 			name = Parsers;
@@ -1400,15 +1401,6 @@
 			name = Categories;
 			sourceTree = "<group>";
 		};
-		D09933491011AE6B00C527B7 /* ImageCapture */ = {
-			isa = PBXGroup;
-			children = (
-				D05A9491102EB022005DF9CE /* IMBImageCaptureParser.h */,
-				D05A9492102EB022005DF9CE /* IMBImageCaptureParser.m */,
-			);
-			name = ImageCapture;
-			sourceTree = "<group>";
-		};
 		D099334E1011B22600C527B7 /* Test Application */ = {
 			isa = PBXGroup;
 			children = (
@@ -1430,28 +1422,13 @@
 			name = "Test Application";
 			sourceTree = "<group>";
 		};
-		D0B6FAA21043227A00280DDC /* Audio */ = {
+		D0B6FAA21043227A00280DDC /* GarageBand */ = {
 			isa = PBXGroup;
 			children = (
 				D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */,
 				D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */,
-				D0467BAE112C220F00C1AA4E /* IMBApertureAudioParser.h */,
-				D0467BAF112C220F00C1AA4E /* IMBApertureAudioParser.m */,
 			);
-			name = Audio;
-			sourceTree = "<group>";
-		};
-		D0B6FAA31043228C00280DDC /* Movie */ = {
-			isa = PBXGroup;
-			children = (
-				D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */,
-				D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */,
-				D0467BB2112C223600C1AA4E /* IMBApertureVideoParser.h */,
-				D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */,
-				8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */,
-				8FC2089C11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m */,
-			);
-			name = Movie;
+			name = GarageBand;
 			sourceTree = "<group>";
 		};
 		D0CB9165150F59BD007716FA /* Folders */ = {
@@ -1504,6 +1481,8 @@
 				30F90B2E13584FE700D13233 /* IMBAppleMediaParserOld.m */,
 				D0CD1E52101A452A000FA505 /* IMBiPhotoParserOld.h */,
 				D0CD1E53101A452A000FA505 /* IMBiPhotoParserOld.m */,
+				D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */,
+				D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */,
 				8F7945CC139518CD0066E133 /* IMBiPhotoObjectPromise.h */,
 				8F7945CD139518CD0066E133 /* IMBiPhotoObjectPromise.m */,
 			);
@@ -1672,7 +1651,6 @@
 				D0CD1E54101A452A000FA505 /* IMBiPhotoParserOld.h in Headers */,
 				D0C2DAF21024178E001B1198 /* IMBObjectViewController.h in Headers */,
 				D0C2DD0F1025905A001B1198 /* IMBImageObjectViewController.h in Headers */,
-				D05A9493102EB022005DF9CE /* IMBImageCaptureParser.h in Headers */,
 				D049EF5510346C1C003CC49C /* IMBNodeCell.h in Headers */,
 				D049F00A1034993E003CC49C /* NSImage+iMedia.h in Headers */,
 				D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */,
