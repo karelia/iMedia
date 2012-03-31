@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -58,8 +61,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// IMBObjectFifoCache implements a cache of limited size that automatically unloads the thumbnails of  
-// oldest objects in the cache, so that we do not consume too much memory and start swapping...
+// IMBObjectFifoCache implements a cache of limited size that automatically unloads the thumbnails/metadata   
+// of the oldest IMBObjects in the cache, so that we do not consume too much memory and start swapping...
 
 @interface IMBObjectFifoCache : NSObject
 {
