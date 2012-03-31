@@ -63,7 +63,6 @@
 #pragma mark GLOBALS
 
 static NSUInteger sCacheSize = 512;
-static IMBObjectFifoCache* sSharedCache = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,18 +91,15 @@ static IMBObjectFifoCache* sSharedCache = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-+ (IMBObjectFifoCache*) threadSafeSharedCache
++ (IMBObjectFifoCache*) sharedCache
 {
-	if (sSharedCache == nil)
-	{
-		@synchronized(self)
-		{
-			if (sSharedCache == nil)
-			{
-				sSharedCache = [[IMBObjectFifoCache alloc] init];
-			}
-		}
-	}
+	static IMBObjectFifoCache* sSharedCache = nil;
+	static dispatch_once_t sOnceToken = 0;
+	
+    dispatch_once(&sOnceToken,
+    ^{
+		sSharedCache = [[IMBObjectFifoCache alloc] init];
+	});
 	
 	return sSharedCache;
 }
@@ -141,7 +137,8 @@ static IMBObjectFifoCache* sSharedCache = nil;
 		while ([_objects count] > sCacheSize)
 		{
 			IMBObject* object = [_objects objectAtIndex:0];
-			(void) [object unloadThumbnail];
+			[object unloadThumbnail];
+			[object unloadMetadata];
 			[_objects removeObjectAtIndex:0];
 		}
 	}
@@ -159,25 +156,15 @@ static IMBObjectFifoCache* sSharedCache = nil;
 {
 	[_objects addObject:inObject];
 	[self _removeOldestObjects];
-	
-//	NSLog(@"%s count = %d",__FUNCTION__,(int)[_objects count]);
 }
 
 
 + (void) addObject:(IMBObject*)inObject
 {
-	if ([NSThread isMainThread])
-	{							
-		[[self threadSafeSharedCache] _addObject:inObject];
-	}
-	else
+	dispatch_async(dispatch_get_main_queue(),^()
 	{
-		[[self threadSafeSharedCache] 
-			performSelectorOnMainThread:@selector(_addObject:) 
-			withObject:inObject 
-			waitUntilDone:NO 
-			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-	}
+		[[self sharedCache] _addObject:inObject];
+	});
 }
 
 
@@ -191,11 +178,13 @@ static IMBObjectFifoCache* sSharedCache = nil;
 
 - (void) _removeObject:(IMBObject*)inObject
 {
+	[inObject unloadThumbnail];
+	[inObject unloadMetadata];
+
 	if (_objects != nil)
 	{
 		while ([_objects indexOfObject:inObject])
 		{
-			(void) [inObject unloadThumbnail];
 			[_objects removeObject:inObject];
 		}
 	}
@@ -204,18 +193,10 @@ static IMBObjectFifoCache* sSharedCache = nil;
 
 + (void) removeObject:(IMBObject*)inObject
 {
-	if ([NSThread isMainThread])
-	{							
-		[[self threadSafeSharedCache] _removeObject:inObject];
-	}
-	else
+	dispatch_async(dispatch_get_main_queue(),^()
 	{
-		[[self threadSafeSharedCache] 
-			performSelectorOnMainThread:@selector(_removeObject:) 
-			withObject:inObject 
-			waitUntilDone:NO 
-			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-	}
+		[[self sharedCache] _removeObject:inObject];
+	});
 }
 
 
@@ -227,23 +208,16 @@ static IMBObjectFifoCache* sSharedCache = nil;
 - (void) _removeAllObjects
 {
 	[_objects makeObjectsPerformSelector:@selector(unloadThumbnail)];
+	[_objects makeObjectsPerformSelector:@selector(unloadMetadata)];
 }
 
 
 + (void) removeAllObjects
 {
-	if ([NSThread isMainThread])
-	{							
-		[[self threadSafeSharedCache] _removeAllObjects];
-	}
-	else
+	dispatch_async(dispatch_get_main_queue(),^()
 	{
-		[[self threadSafeSharedCache] 
-			performSelectorOnMainThread:@selector(_removeAllObjects) 
-			withObject:nil 
-			waitUntilDone:NO 
-			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-	}
+		[[self sharedCache] _removeAllObjects];
+	});
 }
 
 
@@ -262,7 +236,14 @@ static IMBObjectFifoCache* sSharedCache = nil;
 
 + (NSUInteger) count
 {
-	return [[self threadSafeSharedCache] _count];
+	__block NSUInteger count = 0;
+
+	dispatch_sync(dispatch_get_main_queue(),^()
+	{
+		count = [[self sharedCache] _count];
+	});
+
+	return count;
 }
 
 

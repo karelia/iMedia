@@ -59,7 +59,7 @@
 
 
 // IMBObjectFifoCache implements a cache of limited size that automatically unloads the thumbnails of  
-// oldest objects in the cache, so that we do not consume to much memory and start swapping...
+// oldest objects in the cache, so that we do not consume too much memory and start swapping...
 
 @interface IMBObjectFifoCache : NSObject
 {
