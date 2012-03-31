@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -54,10 +57,7 @@
 
 #import "IMBMovieObjectViewController.h"
 #import "IMBObjectArrayController.h"
-//#import "IMBPanelController.h"
-#import "IMBCommon.h"
 #import "IMBConfig.h"
-#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -101,6 +101,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+#pragma mark Customize Subclass
+
+
 + (NSString*) mediaType
 {
 	return kIMBMediaTypeMovie;
@@ -110,9 +114,6 @@
 {
 	return @"IMBMovieObjectViewController";
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 + (NSString*) objectCountFormatSingular
@@ -132,18 +133,6 @@
 		nil,IMBBundle(),
 		@"%d movies",
 		@"Format string for object count in plural");
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) willHideView
-{
-	// Pretty nasty hack to make any movie that is currently playing inline stop. So far
-	// I couldn't find anything else that worked, so we'll have to use this for now...
-	
-	[ibIconView mouseDown:nil];			
 }
 
 

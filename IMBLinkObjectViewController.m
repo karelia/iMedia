@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -53,16 +56,9 @@
 #pragma mark HEADERS
 
 #import "IMBLinkObjectViewController.h"
-#import "IMBNodeViewController.h"
 #import "IMBObjectArrayController.h"
-//#import "IMBPanelController.h"
-#import "IMBCommon.h"
 #import "IMBConfig.h"
-#import "IMBNode.h"
 #import "IMBObject.h"
-//#import "IMBNodeObject.h"
-#import "IMBFolderParser.h"
-#import "NSWorkspace+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -114,6 +110,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+#pragma mark Customize Subclass
+
+
 + (NSString*) mediaType
 {
 	return kIMBMediaTypeLink;
@@ -123,9 +123,6 @@
 {
 	return @"IMBLinkObjectViewController";
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 + (NSString*) objectCountFormatSingular
@@ -147,8 +144,10 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
 
-// The Links panel doesn't have an icon view... Or Combo View
+
+// The Links panel doesn't have an icon or combo view
 
 - (void) setViewType:(NSUInteger)inViewType
 {
@@ -180,23 +179,30 @@
 
 
 #pragma mark 
-#pragma mark NSTableViewDelegate
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
 #pragma mark Dragging
 
 
-//
-// The link view controller vends objects that have urls to web resources, not local files.
-//
+// The link view controller vends objects that have urls to web resources, not local files. 
+// So we can put the web urls onto the pastboard directly. No need to do anything fancy...
 
-- (BOOL) writesLocalFilesToPasteboard
+- (NSUInteger) writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
-	return NO;
+	NSIndexSet* indexes = [self filteredDraggingIndexes:inIndexes]; 
+	NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes];
+	NSMutableArray* pasteboardItems = [NSMutableArray arrayWithCapacity:objects.count];
+	
+	for (IMBObject* object in objects)
+	{
+		NSURL* url = object.URL;
+		NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
+		if (url) [item setString:[url absoluteString] forType:(NSString*)kUTTypeURL];
+		[pasteboardItems addObject:item];
+		[item release];
+	}
+	
+	[inPasteboard clearContents];
+	[inPasteboard writeObjects:pasteboardItems];
+	return pasteboardItems.count;
 }
 
 
