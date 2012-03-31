@@ -216,7 +216,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.imageRepresentationType = [coder decodeObjectForKey:@"imageRepresentationType"];
 		self.needsImageRepresentation = [coder decodeBoolForKey:@"needsImageRepresentation"];
 		self.imageVersion = [coder decodeIntegerForKey:@"imageVersion"];
-		_isLoadingThumbnail = [coder decodeBoolForKey:@"isLoadingThumbnail"];
 	}
 	
 	return self;
@@ -244,7 +243,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
 	[coder encodeBool:self.needsImageRepresentation forKey:@"needsImageRepresentation"];
 	[coder encodeInteger:self.imageVersion forKey:@"imageVersion"];
-	[coder encodeBool:self.isLoadingThumbnail forKey:@"isLoadingThumbnail"];
 }
 
 
@@ -273,7 +271,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	copy.imageRepresentationType = self.imageRepresentationType;
 	copy.needsImageRepresentation = self.needsImageRepresentation;
 	copy.imageVersion = self.imageVersion;
-	_isLoadingThumbnail = self.isLoadingThumbnail;
 	
 	return copy;
 }
@@ -545,8 +542,8 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 }
 
 
-// Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out of the   
-// cache and are thus unloaded...
+// Store the imageRepresentation and add this object to the fifo cache. Older objects
+//  get bumped out off cache and are thus unloaded...
 
 - (void) setImageRepresentation:(id)inImageRepresentation
 {
