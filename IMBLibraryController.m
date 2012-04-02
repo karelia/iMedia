@@ -54,12 +54,12 @@
 
 #import "IMBLibraryController.h"
 #import "IMBParserController.h"
-//#import "IMBOperationQueue.h"
-//#import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBParserMessenger.h"
-//#import "IMBCommon.h"
+#import "IMBImageFolderParserMessenger.h"
+#import "IMBAudioFolderParserMessenger.h"
+#import "IMBMovieFolderParserMessenger.h"
 #import "IMBConfig.h"
 //#import "IMBKQueue.h"
 //#import "IMBFSEventsWatcher.h"
@@ -257,51 +257,53 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 		for (IMBParserMessenger* messenger in messengers)
 		{
-			// Ask delegate whether we should create nodes with this IMBParserMessenger...
+			[self createTopLevelNodeWithParserMessenger:messenger];
 			
-			if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
-			{
-				if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
-				{
-					continue;
-				}
-			}
-			
-			// Create top-level nodes...
-			
-			if (RESPONDS(_delegate,@selector(libraryController:willCreateNodeWithParserMessenger:)))
-			{
-				[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
-			}
-			
-			SBPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodes:),nil,
-			
-				^(NSArray* inNodes,NSError* inError)
-				{
-					// Display any errors that might have occurred...
-					
-					if (inError)
-					{
-						NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-						[NSApp presentError:inError];
-					}
-					
-					// Insert the new top-level nodes into our data model...
-					
-					else if (inNodes)
-					{
-						for (IMBNode* node in inNodes)
-						{
-							node.parserMessenger = messenger;
-							[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
-
-							if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
-							{
-								[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
-							}
-						}
-					}
-				});		
+//			// Ask delegate whether we should create nodes with this IMBParserMessenger...
+//			
+//			if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
+//			{
+//				if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
+//				{
+//					continue;
+//				}
+//			}
+//			
+//			// Create top-level nodes...
+//			
+//			if (RESPONDS(_delegate,@selector(libraryController:willCreateNodeWithParserMessenger:)))
+//			{
+//				[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
+//			}
+//			
+//			SBPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodes:),nil,
+//			
+//				^(NSArray* inNodes,NSError* inError)
+//				{
+//					// Display any errors that might have occurred...
+//					
+//					if (inError)
+//					{
+//						NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+//						[NSApp presentError:inError];
+//					}
+//					
+//					// Insert the new top-level nodes into our data model...
+//					
+//					else if (inNodes)
+//					{
+//						for (IMBNode* node in inNodes)
+//						{
+//							node.parserMessenger = messenger;
+//							[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+//
+//							if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+//							{
+//								[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
+//							}
+//						}
+//					}
+//				});		
 		}
 	}
 	
@@ -320,58 +322,50 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Reload the specified node. This is done by a XPC service on our behalf. Once the service is done, it 
-// will send back a reply with the new node as a result and call the completion block...
-
-- (void) reloadNodeTree:(IMBNode*)inOldNode
+- (void) createTopLevelNodeWithParserMessenger:(IMBParserMessenger*)inParserMessenger
 {
-	if ([inOldNode isGroup]) return;
-
-	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
-	IMBParserMessenger* messenger = inOldNode.parserMessenger;
+	// Ask delegate whether we should create nodes with this IMBParserMessenger...
 	
-	// Ask delegate whether we should reload a node with this IMBParserMessenger...
-			
 	if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
 	{
-		if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
+		if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:inParserMessenger])
 		{
 			return;
 		}
 	}
 	
-	// Start reloading this node...
-			
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willCreateNodeWithParserMessenger:)])
-	{
-		[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
-	}
-			
-	inOldNode.loading = YES;
-	inOldNode.badgeTypeNormal = kIMBBadgeTypeLoading;
-
-	SBPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNodeTree:error:),inOldNode,
+	// Create top-level nodes...
 	
-		^(IMBNode* inNewNode,NSError* inError)
+	if (RESPONDS(_delegate,@selector(libraryController:willCreateNodeWithParserMessenger:)))
+	{
+		[_delegate libraryController:self willCreateNodeWithParserMessenger:inParserMessenger];
+	}
+	
+	SBPerformSelectorAsync(inParserMessenger.connection,inParserMessenger,@selector(unpopulatedTopLevelNodes:),nil,
+	
+		^(NSArray* inNodes,NSError* inError)
 		{
 			// Display any errors that might have occurred...
-					
+			
 			if (inError)
 			{
 				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
 				[NSApp presentError:inError];
 			}
 			
-			// Replace the old with the new node...
-					
-			else if (inNewNode)
+			// Insert the new top-level nodes into our data model...
+			
+			else if (inNodes)
 			{
-				[self _setParserMessenger:messenger nodeTree:inNewNode];
-				[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
-
-				if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+				for (IMBNode* node in inNodes)
 				{
-					[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
+					node.parserMessenger = inParserMessenger;
+					[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+
+					if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+					{
+						[_delegate libraryController:self didCreateNode:node withParserMessenger:inParserMessenger];
+					}
 				}
 			}
 		});		
@@ -437,6 +431,70 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			}
 		});		
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Reload the specified node. This is done by a XPC service on our behalf. Once the service is done, it 
+// will send back a reply with the new node as a result and call the completion block...
+
+- (void) reloadNodeTree:(IMBNode*)inOldNode
+{
+	if ([inOldNode isGroup]) return;
+
+	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
+	IMBParserMessenger* messenger = inOldNode.parserMessenger;
+	
+	// Ask delegate whether we should reload a node with this IMBParserMessenger...
+			
+	if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
+	{
+		if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
+		{
+			return;
+		}
+	}
+	
+	// Start reloading this node...
+			
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willCreateNodeWithParserMessenger:)])
+	{
+		[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
+	}
+			
+	inOldNode.loading = YES;
+	inOldNode.badgeTypeNormal = kIMBBadgeTypeLoading;
+
+	SBPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNodeTree:error:),inOldNode,
+	
+		^(IMBNode* inNewNode,NSError* inError)
+		{
+			// Display any errors that might have occurred...
+					
+			if (inError)
+			{
+				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				[NSApp presentError:inError];
+			}
+			
+			// Replace the old with the new node...
+					
+			else if (inNewNode)
+			{
+				[self _setParserMessenger:messenger nodeTree:inNewNode];
+				[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+
+				if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+				{
+					[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
+				}
+			}
+		});		
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Recursively set the parserMessenger on all nodes and objects in this subtree. Without the pointer to
@@ -562,7 +620,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (inOldNode != nil && inNewNode != nil && ![inOldNode.identifier isEqual:inNewNode.identifier])
 	{
 		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must have same identifiers" userInfo:nil] raise];
+		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: oldNode and newNode must have same identifiers" userInfo:nil] raise];
 	}
 	
 	// Tell user interface that we are going to modify the data model...
@@ -654,13 +712,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
 		
 		// JUST TEMP:
-//		[self logNodes];
 
-		if (inNewNode)
-		{
-			NSString* description = [inNewNode description];
-			NSLog(@"-------------------------------------------------------------------------------\n\n%@\n\n",description);
-		}	
+//		if (inNewNode)
+//		{
+//			NSString* description = [inNewNode description];
+//			NSLog(@"-------------------------------------------------------------------------------\n\n%@\n\n",description);
+//		}	
 	}
 }
 
@@ -1318,12 +1375,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #pragma mark 
 #pragma mark Custom Nodes
 
-/*
-- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath
-{
-	IMBParser* parser = nil;
 
-	if (inPath)
+- (IMBParserMessenger*) addUserAddedNodeForFolder:(NSURL*)inFolderURL
+{
+	IMBParserMessenger* parserMessenger = nil;
+
+	if (inFolderURL)
 	{
 		// Create an IMBFolderParser for our media type...
 		
@@ -1331,46 +1388,48 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		if ([mediaType isEqualToString:kIMBMediaTypeImage])
 		{
-			parser = [[[IMBImageFolderParser alloc] initWithMediaType:mediaType] autorelease];
+			parserMessenger = [[[IMBImageFolderParserMessenger alloc] init] autorelease];
 		}
 		else if ([mediaType isEqualToString:kIMBMediaTypeAudio])
 		{
-			parser = [[[IMBAudioFolderParser alloc] initWithMediaType:mediaType] autorelease];
+			parserMessenger = [[[IMBAudioFolderParserMessenger alloc] init] autorelease];
 		}
 		else if ([mediaType isEqualToString:kIMBMediaTypeMovie])
 		{
-			parser = [[[IMBMovieFolderParser alloc] initWithMediaType:mediaType] autorelease];
+			parserMessenger = [[[IMBMovieFolderParserMessenger alloc] init] autorelease];
 		}
 
-		parser.mediaSource = inPath;
+		parserMessenger.mediaSource = inFolderURL;
+		parserMessenger.isUserAdded = YES;
 		
-		// Register it with the IMBParserController...
+		// Register it with the IMBParserController and reload...
 		
-		if (parser)
+		if (parserMessenger)
 		{
-			[[IMBParserController sharedParserController] addCustomParser:parser forMediaType:mediaType];
+			[[IMBParserController sharedParserController] addUserAddedParserMessenger:parserMessenger];
+			[self createTopLevelNodeWithParserMessenger:parserMessenger];
 		}
 	}
 	
-	return parser;
+	return parserMessenger;
 }
 
 
 // If we were given a root node with a custom parser, then this node is eligible for removal. Remove the parser
 // from the registered list and reload everything. After that the node will be gone...
 
-- (BOOL) removeCustomRootNode:(IMBNode*)inNode
+- (BOOL) removeUserAddedNode:(IMBNode*)inNode
 {
-	if (inNode.isTopLevelNode && inNode.parser.isCustom && !inNode.isLoading)
+	if (inNode.isTopLevelNode && inNode.isUserAdded && !inNode.isLoading)
 	{
-		[[IMBParserController sharedParserController] removeCustomParser:inNode.parser];
-		[self reload];
+		[[IMBParserController sharedParserController] removeUserAddedParserMessenger:inNode.parserMessenger];
+		[self _replaceNode:inNode withNode:nil parentNodeIdentifier:inNode.parentNode.identifier];
 		return YES;
 	}
 		
 	return NO;
 }
-*/
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

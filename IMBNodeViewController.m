@@ -55,7 +55,7 @@
 #import "IMBNodeViewController.h"
 #import "IMBObjectViewController.h"
 #import "IMBLibraryController.h"
-#import "IMBNodeTreeController.h"
+#import "IMBParserMessenger.h"
 #import "IMBOutlineView.h"
 #import "IMBConfig.h"
 #import "IMBParser.h"
@@ -573,9 +573,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			if (![IMBConfig isLibraryPath:path])
 			{
-//				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+				[self.libraryController addUserAddedNodeForFolder:[NSURL fileURLWithPath:path]];
 //				self.selectedNodeIdentifier = [parser identifierForPath:path];
-//				result = YES;
+				result = YES;
 			}
 		}	
 	}		
@@ -1188,7 +1188,10 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
-// Choose a folder...
+// Choose a folder. Please note: due to a bug in NSOpenPanel when running in a sandbox, we cannot currently use
+// beginSheetModalForWindow:. This results in a zero-size window being attached to our panel. Calling runModal
+// seems to work fine, even if the user experience is diminished. Work for now. Also note that the entitlement 
+// com.apple.security.files.user-selected.read-write is required for host app for the NSOpenPanel to show up...
 	
 - (IBAction) addNode:(id)inSender
 {
@@ -1197,28 +1200,20 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	[panel setCanChooseFiles:NO];
 	[panel setResolvesAliases:YES];
 
-	NSWindow* window = [ibSplitView window];
-	[panel beginSheetModalForWindow:window completionHandler:^(NSInteger result)
-	{
-//		if (result == NSFileHandlingPanelOKButton)
-//		{
-//			NSArray* urls = [panel urls];
-//			for (NSURL* url in urls)
-//			{
-//				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+	NSInteger result = [panel runModal];
+//	[panel beginSheetModalForWindow:ibSplitView.window completionHandler:^(NSInteger result)
+//	{
+		if (result == NSFileHandlingPanelOKButton)
+		{
+			NSArray* urls = [panel URLs];
+			for (NSURL* url in urls)
+			{
+				
+				[self.libraryController addUserAddedNodeForFolder:url];
 //				self.selectedNodeIdentifier = [parser identifierForPath:path];
-//			}	
-//			
-//			[self.libraryController reload];
-//		}
-	}];
-}
-
-
-// Add a root node for this each folder and the reload the library...
-	
-- (void) openPanelDidEnd:(NSOpenPanel*)inPanel returnCode:(int)inReturnCode contextInfo:(void*)inContextInfo
-{
+			}	
+		}
+//	}];
 }
 
 
@@ -1229,16 +1224,15 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (BOOL) canRemoveNode
 {
-	return NO;
-//	IMBNode* node = [self selectedNode];
-//	return node.isTopLevelNode && node.parser.isCustom && !node.isLoading;
+	IMBNode* node = [self selectedNode];
+	return node.isTopLevelNode && node.isUserAdded && !node.isLoading;
 }
 
 
 - (IBAction) removeNode:(id)inSender
 {
-//	IMBNode* node = [self selectedNode];
-//	[self.libraryController removeCustomRootNode:node];
+	IMBNode* node = [self selectedNode];
+	[self.libraryController removeUserAddedNode:node];
 }
 
 
@@ -1256,8 +1250,8 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (IBAction) reloadNode:(id)inSender
 {
-//	IMBNode* node = [self selectedNode];
-//	[self.libraryController reloadNode:node];
+	IMBNode* node = [self selectedNode];
+	[self.libraryController reloadNodeTree:node];
 }
 
 
@@ -1270,7 +1264,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (NSMenu*) menuForNode:(IMBNode*)inNode
 {
 	NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"contextMenu"] autorelease];
-/*	NSMenuItem* item = nil;
+	NSMenuItem* item = nil;
 	NSString* title = nil;
 	
 	// First we'll add standard menu items...
@@ -1289,7 +1283,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		[item release];
 	}
 	
-	if (inNode!=nil && inNode.parser.isCustom && !inNode.isLoading)
+	if (inNode!=nil && inNode.isUserAdded && !inNode.isLoading)
 	{
 		title = NSLocalizedStringWithDefaultValue(
 			@"IMBNodeViewController.menuItem.remove",
@@ -1319,9 +1313,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	// Then the parser can add custom menu items...
 	
-	if ([inNode.parser respondsToSelector:@selector(willShowContextMenu:forNode:)])
+	if ([inNode.parserMessenger respondsToSelector:@selector(willShowContextMenu:forNode:)])
 	{
-		[inNode.parser willShowContextMenu:menu forNode:inNode];
+		[inNode.parserMessenger willShowContextMenu:menu forNode:inNode];
 	}
 	
 	// Finally give the delegate a chance to add menu items...
@@ -1332,7 +1326,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	{
 		[delegate libraryController:self.libraryController willShowContextMenu:menu forNode:inNode];
 	}
-*/	
+	
 	return menu;
 }
 

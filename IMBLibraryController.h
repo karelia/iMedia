@@ -128,8 +128,10 @@ extern NSString* kIMBNodesDidChangeNotification;
 // Loading...
 
 - (void) reload;
-- (void) reloadNodeTree:(IMBNode*)inOldNode;
+
+- (void) createTopLevelNodeWithParserMessenger:(IMBParserMessenger*)inParserMessenger;
 - (void) populateNode:(IMBNode*)inNode;
+- (void) reloadNodeTree:(IMBNode*)inOldNode;
 
 // Node accessors (must only be called on the main thread)...
 
@@ -138,12 +140,13 @@ extern NSString* kIMBNodesDidChangeNotification;
 - (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 - (IMBNode*) topLevelNodeForParserIdentifier:(NSString*)inParserIdentifier;
+
 - (void) logNodes;
 
-// Custom nodes...
+// User added nodes...
 
-//- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath;
-//- (BOOL) removeCustomRootNode:(IMBNode*)inNode;
+- (IMBParserMessenger*) addUserAddedNodeForFolder:(NSURL*)inFolderURL;
+- (BOOL) removeUserAddedNode:(IMBNode*)inNode;
 
 // Popup menu...
 
