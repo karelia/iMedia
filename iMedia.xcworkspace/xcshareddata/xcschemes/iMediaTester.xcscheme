@@ -97,6 +97,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D054AFEE152984FA00EBFA1C"
+               BuildableName = "com.karelia.imedia.GarageBand.xpc"
+               BlueprintName = "com.karelia.imedia.GarageBand"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "D09933541011B26E00C527B7"
                BuildableName = "iMediaTester.app"
                BlueprintName = "iMediaTester"

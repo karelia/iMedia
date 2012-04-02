@@ -47,71 +47,37 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Common...
-
-#import <iMedia/IMBCommon.h>
-#import <iMedia/IMBConfig.h>
-#import <iMedia/IMBOperationQueue.h>
-#import <iMedia/IMBIconCache.h>
-
-// Model...
-
-#import <iMedia/IMBNode.h>
-#import <iMedia/IMBObject.h>
-#import <iMedia/IMBObjectsPromise.h>
-#import <iMedia/IMBFlickrNode.h>
-
-// Parsers...
-
-#import <iMedia/IMBParserMessenger.h>
-#import <iMedia/IMBFolderParserMessenger.h>
-#import <iMedia/IMBImageFolderParserMessenger.h>
-#import <iMedia/IMBAudioFolderParserMessenger.h>
-#import <iMedia/IMBMovieFolderParserMessenger.h>
-#import <iMedia/IMBiPhotoParserMessenger.h>
-#import <iMedia/IMBiTunesParserMessenger.h>
-#import <iMedia/IMBGarageBandParserMessenger.h>
-
-// Controllers...
-
-#import <iMedia/IMBParserController.h>
-#import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBObjectArrayController.h>
-
-#import <iMedia/IMBPanelController.h>
-
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBImageNodeViewController.h>
-#import <iMedia/IMBAudioNodeViewController.h>
-#import <iMedia/IMBMovieNodeViewController.h>
-#import <iMedia/IMBLinkNodeViewController.h>
-
-#import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBImageObjectViewController.h>
-#import <iMedia/IMBAudioObjectViewController.h>
-#import <iMedia/IMBMovieObjectViewController.h>
-#import <iMedia/IMBLinkObjectViewController.h>
-
-// Views...
-
-#import <iMedia/IMBOutlineView.h>
-#import <iMedia/IMBNodeCell.h>
-#import <iMedia/IMBTableView.h>
-#import <iMedia/IMBComboTableView.h>
-#import <iMedia/IMBImageBrowserView.h>
-
-// Categories...
-
-#import <iMedia/NSFileManager+iMedia.h>
-#import <iMedia/NSWorkspace+iMedia.h>
-#import <iMedia/NSString+iMedia.h>
-#import <iMedia/NSImage+iMedia.h>
-//#import <iMedia/NSDictionary+iMedia.h>
-//#import <iMedia/NSView+iMedia.h>
-#import <iMedia/NSURL+iMedia.h>
-#import <iMedia/NSKeyedArchiver+iMedia.h>
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark HEADERS
+
+#import "IMBParserMessenger.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CLASSES
+
+@class IMBTimecodeTransformer;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@interface IMBGarageBandParserMessenger : IMBParserMessenger
+{
+	IMBTimecodeTransformer* _timecodeTransformer;
+}
+
+@property (retain) IMBTimecodeTransformer* timecodeTransformer;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
 

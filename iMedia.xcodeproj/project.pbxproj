@@ -126,6 +126,18 @@
 		D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D052B0931053B0F700988F53 /* IMBProgressWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0C11053B4AB00988F53 /* IMBProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = D052B0C01053B4AB00988F53 /* IMBProgress.xib */; };
+		D054AFEA152984C300EBFA1C /* IMBGarageBandParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = D054AFE8152984C300EBFA1C /* IMBGarageBandParserMessenger.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D054AFEB152984C300EBFA1C /* IMBGarageBandParserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = D054AFE9152984C300EBFA1C /* IMBGarageBandParserMessenger.m */; };
+		D054AFF0152984FA00EBFA1C /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		D054AFF2152984FA00EBFA1C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		D054AFF3152984FA00EBFA1C /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
+		D054AFF4152984FA00EBFA1C /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
+		D054AFF5152984FA00EBFA1C /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D054AFF6152984FA00EBFA1C /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D054AFF7152984FA00EBFA1C /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		D054AFFF1529927E00EBFA1C /* com.karelia.imedia.GarageBand.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D054AFFD152984FA00EBFA1C /* com.karelia.imedia.GarageBand.xpc */; };
+		D054B000152992A400EBFA1C /* com.karelia.imedia.GarageBand.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D054AFED152984ED00EBFA1C /* com.karelia.imedia.GarageBand.entitlements */; };
+		D054B0011529A65100EBFA1C /* IMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */; };
 		D0680C3C1518CCCE00CED506 /* com.karelia.imedia.folder.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.folder.xpc */; };
 		D08070BF10442CD700891137 /* IMBMovieObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08070C310442CE100891137 /* IMBAudioObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070C110442CE100891137 /* IMBAudioObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -364,7 +376,7 @@
 		D0F2DBA01098262D004280C1 /* FMResultSet.h in Headers */ = {isa = PBXBuildFile; fileRef = D0F2DB991098262D004280C1 /* FMResultSet.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0F2DBA11098262D004280C1 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = D0F2DB9A1098262D004280C1 /* FMResultSet.m */; };
 		D0F2DBCF1098270F004280C1 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D0F2DBCE1098270F004280C1 /* libsqlite3.dylib */; };
-		D0F2DDB8152475C00059DF8D /* IMBiTunesParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = D0F2DDB6152475C00059DF8D /* IMBiTunesParserMessenger.h */; };
+		D0F2DDB8152475C00059DF8D /* IMBiTunesParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = D0F2DDB6152475C00059DF8D /* IMBiTunesParserMessenger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0F2DDB9152475C00059DF8D /* IMBiTunesParserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = D0F2DDB7152475C00059DF8D /* IMBiTunesParserMessenger.m */; };
 		D0F2DDBA15247B010059DF8D /* IMBiTunesAudioParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CA9426104932CD00725DA3 /* IMBiTunesAudioParser.m */; };
 		D0F2DDBB15247B080059DF8D /* IMBiTunesMovieParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0FC9517108213A800973FEE /* IMBiTunesMovieParser.m */; };
@@ -412,6 +424,7 @@
 			dstPath = Contents/XPCServices;
 			dstSubfolderSpec = 1;
 			files = (
+				D054AFFF1529927E00EBFA1C /* com.karelia.imedia.GarageBand.xpc in Copy XPCServices */,
 				D0F2DDCF152486360059DF8D /* com.karelia.imedia.iTunes.xpc in Copy XPCServices */,
 				D0680C3C1518CCCE00CED506 /* com.karelia.imedia.folder.xpc in Copy XPCServices */,
 				30FFEBFE150A0AA70009C1D0 /* com.karelia.imedia.iPhoto.xpc in Copy XPCServices */,
@@ -590,6 +603,10 @@
 		D052B0931053B0F700988F53 /* IMBProgressWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBProgressWindowController.h; sourceTree = "<group>"; };
 		D052B0941053B0F700988F53 /* IMBProgressWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBProgressWindowController.m; sourceTree = "<group>"; };
 		D052B0C01053B4AB00988F53 /* IMBProgress.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBProgress.xib; sourceTree = "<group>"; };
+		D054AFE8152984C300EBFA1C /* IMBGarageBandParserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBGarageBandParserMessenger.h; sourceTree = "<group>"; };
+		D054AFE9152984C300EBFA1C /* IMBGarageBandParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBGarageBandParserMessenger.m; sourceTree = "<group>"; };
+		D054AFED152984ED00EBFA1C /* com.karelia.imedia.GarageBand.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.GarageBand.entitlements; sourceTree = "<group>"; };
+		D054AFFD152984FA00EBFA1C /* com.karelia.imedia.GarageBand.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.GarageBand.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		D05A94A4102EB14A005DF9CE /* ICADevices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICADevices.framework; path = System/Library/Frameworks/ICADevices.framework; sourceTree = SDKROOT; };
 		D0760AC210C5027100F2119C /* IMBProject.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBProject.xcconfig; sourceTree = SOURCE_ROOT; };
 		D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieObjectViewController.h; sourceTree = "<group>"; };
@@ -885,6 +902,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D054AFF1152984FA00EBFA1C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D054AFF2152984FA00EBFA1C /* Foundation.framework in Frameworks */,
+				D054AFF3152984FA00EBFA1C /* AppKit.framework in Frameworks */,
+				D054AFF4152984FA00EBFA1C /* Security.framework in Frameworks */,
+				D054AFF5152984FA00EBFA1C /* Quartz.framework in Frameworks */,
+				D054AFF6152984FA00EBFA1C /* iMedia.framework in Frameworks */,
+				D054AFF7152984FA00EBFA1C /* XPCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D09933531011B26E00C527B7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -933,6 +963,7 @@
 				30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhoto.xpc */,
 				D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.folder.xpc */,
 				D0F2DDCB152485130059DF8D /* com.karelia.imedia.iTunes.xpc */,
+				D054AFFD152984FA00EBFA1C /* com.karelia.imedia.GarageBand.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1425,6 +1456,9 @@
 		D0B6FAA21043227A00280DDC /* GarageBand */ = {
 			isa = PBXGroup;
 			children = (
+				D054AFED152984ED00EBFA1C /* com.karelia.imedia.GarageBand.entitlements */,
+				D054AFE8152984C300EBFA1C /* IMBGarageBandParserMessenger.h */,
+				D054AFE9152984C300EBFA1C /* IMBGarageBandParserMessenger.m */,
 				D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */,
 				D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */,
 			);
@@ -1734,6 +1768,7 @@
 				D0C911ED1521965C006655C9 /* IMBAudioNodeViewController.h in Headers */,
 				D0C911F1152196FE006655C9 /* IMBLinkNodeViewController.h in Headers */,
 				D0F2DDB8152475C00059DF8D /* IMBiTunesParserMessenger.h in Headers */,
+				D054AFEA152984C300EBFA1C /* IMBGarageBandParserMessenger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1775,6 +1810,23 @@
 			productName = iMedia;
 			productReference = 8DC2EF5B0486A6940098B216 /* iMedia.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		D054AFEE152984FA00EBFA1C /* com.karelia.imedia.GarageBand */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D054AFFA152984FA00EBFA1C /* Build configuration list for PBXNativeTarget "com.karelia.imedia.GarageBand" */;
+			buildPhases = (
+				D054AFEF152984FA00EBFA1C /* Sources */,
+				D054AFF1152984FA00EBFA1C /* Frameworks */,
+				D054AFF8152984FA00EBFA1C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = com.karelia.imedia.GarageBand;
+			productName = "iPhoto Parser XPC Service";
+			productReference = D054AFFD152984FA00EBFA1C /* com.karelia.imedia.GarageBand.xpc */;
+			productType = "com.apple.product-type.bundle";
 		};
 		D09933541011B26E00C527B7 /* iMediaTester */ = {
 			isa = PBXNativeTarget;
@@ -1868,6 +1920,7 @@
 				D0E96CEE1518C9BF004F3EE7 /* com.karelia.imedia.folder */,
 				30FFEBEB150A08DB0009C1D0 /* com.karelia.imedia.iPhoto */,
 				D0F2DDBC152485130059DF8D /* com.karelia.imedia.iTunes */,
+				D054AFEE152984FA00EBFA1C /* com.karelia.imedia.GarageBand */,
 				D02CD49E1224F22400C773A2 /* genstrings */,
 			);
 		};
@@ -2003,6 +2056,14 @@
 				CEF7A22412B1B71800DBE412 /* url_icon.tiff in Resources */,
 				CE394AC21371A1F700EF0D1E /* cork-background.jpg in Resources */,
 				3016792A13B225B9000E57D2 /* badge_checkbox.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D054AFF8152984FA00EBFA1C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D054B000152992A400EBFA1C /* com.karelia.imedia.GarageBand.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2142,6 +2203,16 @@
 				D0F2DDBA15247B010059DF8D /* IMBiTunesAudioParser.m in Sources */,
 				D0F2DDBB15247B080059DF8D /* IMBiTunesMovieParser.m in Sources */,
 				D04179981526D22B006C9E98 /* IMBTestTextView.m in Sources */,
+				D054AFEB152984C300EBFA1C /* IMBGarageBandParserMessenger.m in Sources */,
+				D054B0011529A65100EBFA1C /* IMBGarageBandParser.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D054AFEF152984FA00EBFA1C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D054AFF0152984FA00EBFA1C /* SBServiceMain.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2333,6 +2404,64 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				PRODUCT_NAME = genstrings;
 				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		D054AFFB152984FA00EBFA1C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = com.karelia.imedia.GarageBand;
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		D054AFFC152984FA00EBFA1C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = com.karelia.imedia.GarageBand;
+				WRAPPER_EXTENSION = xpc;
 			};
 			name = Release;
 		};
@@ -2529,6 +2658,15 @@
 			buildConfigurations = (
 				D02CD49F1224F22400C773A2 /* Debug */,
 				D02CD4A01224F22400C773A2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D054AFFA152984FA00EBFA1C /* Build configuration list for PBXNativeTarget "com.karelia.imedia.GarageBand" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D054AFFB152984FA00EBFA1C /* Debug */,
+				D054AFFC152984FA00EBFA1C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

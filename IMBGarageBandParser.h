@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -52,15 +55,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBFolderParser.h"
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark CLASSES
-
-@class IMBTimecodeTransformer;
+#import "IMBAudioFolderParser.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,12 +63,12 @@
 
 #pragma mark 
 
-@interface IMBGarageBandParser : IMBFolderParser
+@interface IMBGarageBandParser : IMBAudioFolderParser
 {
-	IMBTimecodeTransformer* _timecodeTransformer;
+	NSString* _appPath;
 }
 
-@property (retain) IMBTimecodeTransformer* timecodeTransformer;
+@property (retain) NSString* appPath;
 
 @end
 
