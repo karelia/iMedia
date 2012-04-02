@@ -27,5 +27,7 @@
 		<key>ServiceType</key>
 		<string>Application</string>
 	</dict>
+	<key>LSBackgroundOnly</key>
+	<true/>
 </dict>
 </plist>
