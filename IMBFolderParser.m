@@ -133,6 +133,8 @@
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 
+	NSUInteger countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
+
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	node.icon = [self iconForPath:path];
 	node.name = name;
@@ -140,7 +142,7 @@
 	node.mediaType = self.mediaType;
 	node.mediaSource = url;
 	node.isTopLevelNode = YES;
-	node.leaf = NO;
+	node.leaf = countOfSubfolders == 0;
 	node.displayPriority = self.displayPriority;
 	node.isUserAdded = self.isUserAdded;
 	node.parserIdentifier = self.identifier;
