@@ -89,13 +89,13 @@
 
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.folder";
+	return @"com.karelia.imedia.Folder";
 }
 
 
 + (NSString*) xpcSerivceIdentifier
 {
-	return @"com.karelia.imedia.folder";
+	return @"com.karelia.imedia.Folder";
 }
 
 

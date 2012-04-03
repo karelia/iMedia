@@ -136,14 +136,62 @@
 		D054AFF6152984FA00EBFA1C /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
 		D054AFF7152984FA00EBFA1C /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		D054AFFF1529927E00EBFA1C /* com.karelia.imedia.GarageBand.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D054AFFD152984FA00EBFA1C /* com.karelia.imedia.GarageBand.xpc */; };
-		D054B000152992A400EBFA1C /* com.karelia.imedia.GarageBand.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D054AFED152984ED00EBFA1C /* com.karelia.imedia.GarageBand.entitlements */; };
 		D054B0011529A65100EBFA1C /* IMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */; };
 		D05D398F152A280F00E30C43 /* IMBFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D2D1019E8A5005D8614 /* IMBFileWatcher.m */; };
 		D05D3990152A280F00E30C43 /* IMBKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D2A1019E89E005D8614 /* IMBKQueue.m */; };
 		D05D3991152A280F00E30C43 /* IMBFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D7B1019EAB8005D8614 /* IMBFNSubscribeFileWatcher.m */; };
 		D05D3992152A280F00E30C43 /* IMBFSEventsWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D801019EB09005D8614 /* IMBFSEventsWatcher.m */; };
 		D05D3993152A280F00E30C43 /* IMBMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D831019EB4D005D8614 /* IMBMainThreadProxy.m */; };
-		D0680C3C1518CCCE00CED506 /* com.karelia.imedia.folder.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.folder.xpc */; };
+		D05D399F152ACD1300E30C43 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		D05D39A1152ACD1300E30C43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		D05D39A2152ACD1300E30C43 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
+		D05D39A3152ACD1300E30C43 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
+		D05D39A4152ACD1300E30C43 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D05D39A5152ACD1300E30C43 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D05D39A6152ACD1300E30C43 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		D05D39B0152ACD2400E30C43 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		D05D39B2152ACD2400E30C43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		D05D39B3152ACD2400E30C43 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
+		D05D39B4152ACD2400E30C43 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
+		D05D39B5152ACD2400E30C43 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D05D39B6152ACD2400E30C43 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D05D39B7152ACD2400E30C43 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		D05D39C1152ACD3300E30C43 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		D05D39C3152ACD3300E30C43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		D05D39C4152ACD3300E30C43 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
+		D05D39C5152ACD3300E30C43 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
+		D05D39C6152ACD3300E30C43 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D05D39C7152ACD3300E30C43 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D05D39C8152ACD3300E30C43 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		D05D39D2152ACD5E00E30C43 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		D05D39D4152ACD5E00E30C43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		D05D39D5152ACD5E00E30C43 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
+		D05D39D6152ACD5E00E30C43 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
+		D05D39D7152ACD5E00E30C43 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D05D39D8152ACD5E00E30C43 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D05D39D9152ACD5E00E30C43 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		D05D39E3152ACD6800E30C43 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		D05D39E5152ACD6800E30C43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		D05D39E6152ACD6800E30C43 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
+		D05D39E7152ACD6800E30C43 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
+		D05D39E8152ACD6800E30C43 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D05D39E9152ACD6800E30C43 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D05D39EA152ACD6800E30C43 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		D05D39F4152ACD8800E30C43 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		D05D39F6152ACD8800E30C43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		D05D39F7152ACD8800E30C43 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
+		D05D39F8152ACD8800E30C43 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
+		D05D39F9152ACD8800E30C43 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D05D39FA152ACD8800E30C43 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D05D39FB152ACD8800E30C43 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		D05D3A07152AD0D000E30C43 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		D05D3A09152AD0D000E30C43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		D05D3A0A152AD0D000E30C43 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
+		D05D3A0B152AD0D000E30C43 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
+		D05D3A0C152AD0D000E30C43 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		D05D3A0D152AD0D000E30C43 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		D05D3A0E152AD0D000E30C43 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		D0680C3C1518CCCE00CED506 /* com.karelia.imedia.Folder.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.Folder.xpc */; };
 		D08070BF10442CD700891137 /* IMBMovieObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08070C310442CE100891137 /* IMBAudioObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070C110442CE100891137 /* IMBAudioObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08070C810442DAE00891137 /* IMBAudioObjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D08070C710442DAE00891137 /* IMBAudioObjectViewController.xib */; };
@@ -341,7 +389,6 @@
 		D0CB917B150F832B007716FA /* IMBNode.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CB9179150F832B007716FA /* IMBNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0CB917C150F832B007716FA /* IMBNode.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CB917A150F832B007716FA /* IMBNode.m */; };
 		D0CB9188150F9977007716FA /* IMBLibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930B61010F6C100C527B7 /* IMBLibraryController.m */; };
-		D0CB91911510A35C007716FA /* com.karelia.imedia.iPhoto.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D0CB918D1510A23D007716FA /* com.karelia.imedia.iPhoto.entitlements */; };
 		D0CD1E54101A452A000FA505 /* IMBiPhotoParserOld.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CD1E52101A452A000FA505 /* IMBiPhotoParserOld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0CE6E1D11F6FA09005EE5B4 /* IMBMetadataTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E1B11F6FA09005EE5B4 /* IMBMetadataTransformer.h */; };
 		D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -371,7 +418,6 @@
 		D0E96CF81518C9BF004F3EE7 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
 		D0E96CF91518C9BF004F3EE7 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
 		D0E96CFA1518C9BF004F3EE7 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
-		D0E96D031518CA4E004F3EE7 /* com.karelia.imedia.folder.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D0E96CEA1518C97B004F3EE7 /* com.karelia.imedia.folder.entitlements */; };
 		D0E96D1C104410BD0015979F /* IMBPanelController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E96D1A104410BD0015979F /* IMBPanelController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0F207C7150A23BA007E6FA2 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
 		D0F2DB9B1098262D004280C1 /* FMDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = D0F2DB941098262D004280C1 /* FMDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -392,7 +438,6 @@
 		D0F2DDC3152485130059DF8D /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		D0F2DDC4152485130059DF8D /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
 		D0F2DDC5152485130059DF8D /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
-		D0F2DDCE1524859A0059DF8D /* com.karelia.imedia.iTunes.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D0F2DDCD1524859A0059DF8D /* com.karelia.imedia.iTunes.entitlements */; };
 		D0F2DDCF152486360059DF8D /* com.karelia.imedia.iTunes.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D0F2DDCB152485130059DF8D /* com.karelia.imedia.iTunes.xpc */; };
 		D0FC9518108213A800973FEE /* IMBiTunesMovieParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0FC9516108213A800973FEE /* IMBiTunesMovieParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FCD9ABB410C677FF0092F441 /* IMBLoadMoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */; };
@@ -431,7 +476,7 @@
 			files = (
 				D054AFFF1529927E00EBFA1C /* com.karelia.imedia.GarageBand.xpc in Copy XPCServices */,
 				D0F2DDCF152486360059DF8D /* com.karelia.imedia.iTunes.xpc in Copy XPCServices */,
-				D0680C3C1518CCCE00CED506 /* com.karelia.imedia.folder.xpc in Copy XPCServices */,
+				D0680C3C1518CCCE00CED506 /* com.karelia.imedia.Folder.xpc in Copy XPCServices */,
 				30FFEBFE150A0AA70009C1D0 /* com.karelia.imedia.iPhoto.xpc in Copy XPCServices */,
 			);
 			name = "Copy XPCServices";
@@ -613,6 +658,20 @@
 		D054AFED152984ED00EBFA1C /* com.karelia.imedia.GarageBand.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.GarageBand.entitlements; sourceTree = "<group>"; };
 		D054AFFD152984FA00EBFA1C /* com.karelia.imedia.GarageBand.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.GarageBand.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		D05A94A4102EB14A005DF9CE /* ICADevices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ICADevices.framework; path = System/Library/Frameworks/ICADevices.framework; sourceTree = SDKROOT; };
+		D05D39AC152ACD1300E30C43 /* com.karelia.imedia.Aperture.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.Aperture.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05D39BD152ACD2400E30C43 /* com.karelia.imedia.Lightroom.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.Lightroom.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05D39CE152ACD3300E30C43 /* com.karelia.imedia.Flickr.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.Flickr.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05D39DF152ACD5E00E30C43 /* com.karelia.imedia.Safari.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.Safari.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05D39F0152ACD6800E30C43 /* com.karelia.imedia.Firefox.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.Firefox.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05D3A01152ACD8800E30C43 /* com.karelia.imedia.FSEvents.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.FSEvents.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05D3A13152AD0D000E30C43 /* com.karelia.imedia.OmniWeb.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.OmniWeb.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05D3A15152AD27300E30C43 /* com.karelia.imedia.Aperture.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Aperture.entitlements; sourceTree = "<group>"; };
+		D05D3A16152AD28400E30C43 /* com.karelia.imedia.Lightroom.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Lightroom.entitlements; sourceTree = "<group>"; };
+		D05D3A17152AD29700E30C43 /* com.karelia.imedia.Flickr.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Flickr.entitlements; sourceTree = "<group>"; };
+		D05D3A18152AD2A500E30C43 /* com.karelia.imedia.Safari.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Safari.entitlements; sourceTree = "<group>"; };
+		D05D3A19152AD2B400E30C43 /* com.karelia.imedia.FireFox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.FireFox.entitlements; sourceTree = "<group>"; };
+		D05D3A1A152AD2CB00E30C43 /* com.karelia.imedia.OmniWeb.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.OmniWeb.entitlements; sourceTree = "<group>"; };
+		D05D3A1B152AD30500E30C43 /* com.karelia.imedia.FSEvents.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.FSEvents.entitlements; sourceTree = "<group>"; };
 		D0760AC210C5027100F2119C /* IMBProject.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBProject.xcconfig; sourceTree = SOURCE_ROOT; };
 		D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieObjectViewController.h; sourceTree = "<group>"; };
 		D08070BE10442CD700891137 /* IMBMovieObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieObjectViewController.m; sourceTree = "<group>"; };
@@ -846,8 +905,8 @@
 		D0E96CE015189FAC004F3EE7 /* IMBFolderParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFolderParserMessenger.m; sourceTree = "<group>"; };
 		D0E96CE41518A296004F3EE7 /* IMBImageFolderParserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageFolderParserMessenger.h; sourceTree = "<group>"; };
 		D0E96CE51518A297004F3EE7 /* IMBImageFolderParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageFolderParserMessenger.m; sourceTree = "<group>"; };
-		D0E96CEA1518C97B004F3EE7 /* com.karelia.imedia.folder.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = com.karelia.imedia.folder.entitlements; sourceTree = "<group>"; };
-		D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.folder.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.folder.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0E96CEA1518C97B004F3EE7 /* com.karelia.imedia.Folder.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = com.karelia.imedia.Folder.entitlements; sourceTree = "<group>"; };
+		D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.Folder.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.Folder.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0E96D1A104410BD0015979F /* IMBPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPanelController.h; sourceTree = "<group>"; };
 		D0E96D1B104410BD0015979F /* IMBPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPanelController.m; sourceTree = "<group>"; };
 		D0F2DB941098262D004280C1 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = fmdb/src/FMDatabase.h; sourceTree = "<group>"; };
@@ -920,6 +979,97 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D05D39A0152ACD1300E30C43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39A1152ACD1300E30C43 /* Foundation.framework in Frameworks */,
+				D05D39A2152ACD1300E30C43 /* AppKit.framework in Frameworks */,
+				D05D39A3152ACD1300E30C43 /* Security.framework in Frameworks */,
+				D05D39A4152ACD1300E30C43 /* Quartz.framework in Frameworks */,
+				D05D39A5152ACD1300E30C43 /* iMedia.framework in Frameworks */,
+				D05D39A6152ACD1300E30C43 /* XPCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39B1152ACD2400E30C43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39B2152ACD2400E30C43 /* Foundation.framework in Frameworks */,
+				D05D39B3152ACD2400E30C43 /* AppKit.framework in Frameworks */,
+				D05D39B4152ACD2400E30C43 /* Security.framework in Frameworks */,
+				D05D39B5152ACD2400E30C43 /* Quartz.framework in Frameworks */,
+				D05D39B6152ACD2400E30C43 /* iMedia.framework in Frameworks */,
+				D05D39B7152ACD2400E30C43 /* XPCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39C2152ACD3300E30C43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39C3152ACD3300E30C43 /* Foundation.framework in Frameworks */,
+				D05D39C4152ACD3300E30C43 /* AppKit.framework in Frameworks */,
+				D05D39C5152ACD3300E30C43 /* Security.framework in Frameworks */,
+				D05D39C6152ACD3300E30C43 /* Quartz.framework in Frameworks */,
+				D05D39C7152ACD3300E30C43 /* iMedia.framework in Frameworks */,
+				D05D39C8152ACD3300E30C43 /* XPCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39D3152ACD5E00E30C43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39D4152ACD5E00E30C43 /* Foundation.framework in Frameworks */,
+				D05D39D5152ACD5E00E30C43 /* AppKit.framework in Frameworks */,
+				D05D39D6152ACD5E00E30C43 /* Security.framework in Frameworks */,
+				D05D39D7152ACD5E00E30C43 /* Quartz.framework in Frameworks */,
+				D05D39D8152ACD5E00E30C43 /* iMedia.framework in Frameworks */,
+				D05D39D9152ACD5E00E30C43 /* XPCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39E4152ACD6800E30C43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39E5152ACD6800E30C43 /* Foundation.framework in Frameworks */,
+				D05D39E6152ACD6800E30C43 /* AppKit.framework in Frameworks */,
+				D05D39E7152ACD6800E30C43 /* Security.framework in Frameworks */,
+				D05D39E8152ACD6800E30C43 /* Quartz.framework in Frameworks */,
+				D05D39E9152ACD6800E30C43 /* iMedia.framework in Frameworks */,
+				D05D39EA152ACD6800E30C43 /* XPCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39F5152ACD8800E30C43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39F6152ACD8800E30C43 /* Foundation.framework in Frameworks */,
+				D05D39F7152ACD8800E30C43 /* AppKit.framework in Frameworks */,
+				D05D39F8152ACD8800E30C43 /* Security.framework in Frameworks */,
+				D05D39F9152ACD8800E30C43 /* Quartz.framework in Frameworks */,
+				D05D39FA152ACD8800E30C43 /* iMedia.framework in Frameworks */,
+				D05D39FB152ACD8800E30C43 /* XPCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D3A08152AD0D000E30C43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D3A09152AD0D000E30C43 /* Foundation.framework in Frameworks */,
+				D05D3A0A152AD0D000E30C43 /* AppKit.framework in Frameworks */,
+				D05D3A0B152AD0D000E30C43 /* Security.framework in Frameworks */,
+				D05D3A0C152AD0D000E30C43 /* Quartz.framework in Frameworks */,
+				D05D3A0D152AD0D000E30C43 /* iMedia.framework in Frameworks */,
+				D05D3A0E152AD0D000E30C43 /* XPCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D09933531011B26E00C527B7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -966,9 +1116,16 @@
 				8DC2EF5B0486A6940098B216 /* iMedia.framework */,
 				D09933551011B26E00C527B7 /* iMediaTester.app */,
 				30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhoto.xpc */,
-				D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.folder.xpc */,
+				D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.Folder.xpc */,
 				D0F2DDCB152485130059DF8D /* com.karelia.imedia.iTunes.xpc */,
 				D054AFFD152984FA00EBFA1C /* com.karelia.imedia.GarageBand.xpc */,
+				D05D39AC152ACD1300E30C43 /* com.karelia.imedia.Aperture.xpc */,
+				D05D39BD152ACD2400E30C43 /* com.karelia.imedia.Lightroom.xpc */,
+				D05D39CE152ACD3300E30C43 /* com.karelia.imedia.Flickr.xpc */,
+				D05D39DF152ACD5E00E30C43 /* com.karelia.imedia.Safari.xpc */,
+				D05D39F0152ACD6800E30C43 /* com.karelia.imedia.Firefox.xpc */,
+				D05D3A01152ACD8800E30C43 /* com.karelia.imedia.FSEvents.xpc */,
+				D05D3A13152AD0D000E30C43 /* com.karelia.imedia.OmniWeb.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1082,6 +1239,7 @@
 				8FCA064012368388009072AE /* IMBApertureHeaderViewController.h */,
 				8FCA064112368388009072AE /* IMBApertureHeaderViewController.m */,
 				CE6524C11253AF47003A9AA0 /* warning.tiff */,
+				D05D3A15152AD27300E30C43 /* com.karelia.imedia.Aperture.entitlements */,
 			);
 			name = Aperture;
 			sourceTree = "<group>";
@@ -1108,27 +1266,19 @@
 			name = Flipr;
 			sourceTree = "<group>";
 		};
-		CEF695D5106434DB005D7E72 /* Links */ = {
+		CEF695D5106434DB005D7E72 /* OmniWeb */ = {
 			isa = PBXGroup;
 			children = (
-				D0403B4F10918C03000F0AE1 /* IMBSafariBookmarkParser.h */,
-				D0403B5010918C03000F0AE1 /* IMBSafariBookmarkParser.m */,
 				CEF695D9106434FD005D7E72 /* IMBXBELParser.h */,
 				CEF695DA106434FE005D7E72 /* IMBXBELParser.m */,
 				CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */,
 				CEF695DC106434FE005D7E72 /* IMBOmniWebParser.h */,
 				CEF695DD106434FE005D7E72 /* IMBOmniWebParser.m */,
-				CEF695DE106434FE005D7E72 /* IMBFireFoxParser.h */,
-				CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */,
-				CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */,
-				CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */,
-				CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */,
-				CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */,
-				CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */,
 				CE1AED32129C475200694472 /* js.tiff */,
 				CEF7A22312B1B71800DBE412 /* url_icon.tiff */,
+				D05D3A1A152AD2CB00E30C43 /* com.karelia.imedia.OmniWeb.entitlements */,
 			);
-			name = Links;
+			name = OmniWeb;
 			sourceTree = "<group>";
 		};
 		D02E53C510A5558800B205BD /* Lightroom */ = {
@@ -1148,6 +1298,7 @@
 				8F93177D10A9FC53002CDB19 /* IMBPyramidObjectPromise.m */,
 				8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */,
 				8F47B39010C416050013ED25 /* IMBOrderedDictionary.m */,
+				D05D3A16152AD28400E30C43 /* com.karelia.imedia.Lightroom.entitlements */,
 			);
 			name = Lightroom;
 			sourceTree = "<group>";
@@ -1177,8 +1328,34 @@
 				CEF6539A117E5C28003FF1A5 /* remix.pdf */,
 				CEF6539B117E5C28003FF1A5 /* sharealike.pdf */,
 				CEF65425117E64FA003FF1A5 /* any.pdf */,
+				D05D3A17152AD29700E30C43 /* com.karelia.imedia.Flickr.entitlements */,
 			);
 			name = Flickr;
+			sourceTree = "<group>";
+		};
+		D05D3A03152AD05C00E30C43 /* Safari */ = {
+			isa = PBXGroup;
+			children = (
+				D0403B4F10918C03000F0AE1 /* IMBSafariBookmarkParser.h */,
+				D0403B5010918C03000F0AE1 /* IMBSafariBookmarkParser.m */,
+				D05D3A18152AD2A500E30C43 /* com.karelia.imedia.Safari.entitlements */,
+			);
+			name = Safari;
+			sourceTree = "<group>";
+		};
+		D05D3A04152AD07400E30C43 /* FireFox */ = {
+			isa = PBXGroup;
+			children = (
+				CEF695DE106434FE005D7E72 /* IMBFireFoxParser.h */,
+				CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */,
+				CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */,
+				CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */,
+				CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */,
+				CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */,
+				CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */,
+				D05D3A19152AD2B400E30C43 /* com.karelia.imedia.FireFox.entitlements */,
+			);
+			name = FireFox;
 			sourceTree = "<group>";
 		};
 		D08247AC1521BB0700033850 /* Backend */ = {
@@ -1192,6 +1369,7 @@
 				D099333010119EA300C527B7 /* IMBNodeTreeController.m */,
 				D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */,
 				D099333210119F3400C527B7 /* IMBObjectArrayController.m */,
+				D05D3A1B152AD30500E30C43 /* com.karelia.imedia.FSEvents.entitlements */,
 			);
 			name = Backend;
 			sourceTree = "<group>";
@@ -1387,7 +1565,9 @@
 				D0F2DDB4152473500059DF8D /* iTunes */,
 				D0B6FAA21043227A00280DDC /* GarageBand */,
 				D032CE8A109B311A00D84782 /* Flickr */,
-				CEF695D5106434DB005D7E72 /* Links */,
+				D05D3A03152AD05C00E30C43 /* Safari */,
+				D05D3A04152AD07400E30C43 /* FireFox */,
+				CEF695D5106434DB005D7E72 /* OmniWeb */,
 			);
 			name = Parsers;
 			sourceTree = "<group>";
@@ -1489,7 +1669,7 @@
 				D0B6FABA1043243800280DDC /* IMBAudioFolderParser.m */,
 				D0B6FABD1043246800280DDC /* IMBMovieFolderParser.h */,
 				D0B6FABE1043246800280DDC /* IMBMovieFolderParser.m */,
-				D0E96CEA1518C97B004F3EE7 /* com.karelia.imedia.folder.entitlements */,
+				D0E96CEA1518C97B004F3EE7 /* com.karelia.imedia.Folder.entitlements */,
 			);
 			name = Folders;
 			sourceTree = "<group>";
@@ -1833,6 +2013,125 @@
 			productReference = D054AFFD152984FA00EBFA1C /* com.karelia.imedia.GarageBand.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
+		D05D399D152ACD1300E30C43 /* com.karelia.imedia.Aperture */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05D39A9152ACD1300E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Aperture" */;
+			buildPhases = (
+				D05D399E152ACD1300E30C43 /* Sources */,
+				D05D39A0152ACD1300E30C43 /* Frameworks */,
+				D05D39A7152ACD1300E30C43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = com.karelia.imedia.Aperture;
+			productName = "iPhoto Parser XPC Service";
+			productReference = D05D39AC152ACD1300E30C43 /* com.karelia.imedia.Aperture.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
+		D05D39AE152ACD2400E30C43 /* com.karelia.imedia.Lightroom */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05D39BA152ACD2400E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Lightroom" */;
+			buildPhases = (
+				D05D39AF152ACD2400E30C43 /* Sources */,
+				D05D39B1152ACD2400E30C43 /* Frameworks */,
+				D05D39B8152ACD2400E30C43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = com.karelia.imedia.Lightroom;
+			productName = "iPhoto Parser XPC Service";
+			productReference = D05D39BD152ACD2400E30C43 /* com.karelia.imedia.Lightroom.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
+		D05D39BF152ACD3300E30C43 /* com.karelia.imedia.Flickr */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05D39CB152ACD3300E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Flickr" */;
+			buildPhases = (
+				D05D39C0152ACD3300E30C43 /* Sources */,
+				D05D39C2152ACD3300E30C43 /* Frameworks */,
+				D05D39C9152ACD3300E30C43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = com.karelia.imedia.Flickr;
+			productName = "iPhoto Parser XPC Service";
+			productReference = D05D39CE152ACD3300E30C43 /* com.karelia.imedia.Flickr.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
+		D05D39D0152ACD5E00E30C43 /* com.karelia.imedia.Safari */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05D39DC152ACD5E00E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Safari" */;
+			buildPhases = (
+				D05D39D1152ACD5E00E30C43 /* Sources */,
+				D05D39D3152ACD5E00E30C43 /* Frameworks */,
+				D05D39DA152ACD5E00E30C43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = com.karelia.imedia.Safari;
+			productName = "iPhoto Parser XPC Service";
+			productReference = D05D39DF152ACD5E00E30C43 /* com.karelia.imedia.Safari.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
+		D05D39E1152ACD6800E30C43 /* com.karelia.imedia.Firefox */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05D39ED152ACD6800E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Firefox" */;
+			buildPhases = (
+				D05D39E2152ACD6800E30C43 /* Sources */,
+				D05D39E4152ACD6800E30C43 /* Frameworks */,
+				D05D39EB152ACD6800E30C43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = com.karelia.imedia.Firefox;
+			productName = "iPhoto Parser XPC Service";
+			productReference = D05D39F0152ACD6800E30C43 /* com.karelia.imedia.Firefox.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
+		D05D39F2152ACD8800E30C43 /* com.karelia.imedia.FSEvents */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05D39FE152ACD8800E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.FSEvents" */;
+			buildPhases = (
+				D05D39F3152ACD8800E30C43 /* Sources */,
+				D05D39F5152ACD8800E30C43 /* Frameworks */,
+				D05D39FC152ACD8800E30C43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = com.karelia.imedia.FSEvents;
+			productName = "iPhoto Parser XPC Service";
+			productReference = D05D3A01152ACD8800E30C43 /* com.karelia.imedia.FSEvents.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
+		D05D3A05152AD0D000E30C43 /* com.karelia.imedia.OmniWeb */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05D3A10152AD0D000E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.OmniWeb" */;
+			buildPhases = (
+				D05D3A06152AD0D000E30C43 /* Sources */,
+				D05D3A08152AD0D000E30C43 /* Frameworks */,
+				D05D3A0F152AD0D000E30C43 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = com.karelia.imedia.OmniWeb;
+			productName = "iPhoto Parser XPC Service";
+			productReference = D05D3A13152AD0D000E30C43 /* com.karelia.imedia.OmniWeb.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
 		D09933541011B26E00C527B7 /* iMediaTester */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D099335B1011B27000C527B7 /* Build configuration list for PBXNativeTarget "iMediaTester" */;
@@ -1855,9 +2154,9 @@
 			productReference = D09933551011B26E00C527B7 /* iMediaTester.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D0E96CEE1518C9BF004F3EE7 /* com.karelia.imedia.folder */ = {
+		D0E96CEE1518C9BF004F3EE7 /* com.karelia.imedia.Folder */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D0E96CFE1518C9BF004F3EE7 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.folder" */;
+			buildConfigurationList = D0E96CFE1518C9BF004F3EE7 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Folder" */;
 			buildPhases = (
 				D0E96CEF1518C9BF004F3EE7 /* Sources */,
 				D0E96CF61518C9BF004F3EE7 /* Frameworks */,
@@ -1867,9 +2166,9 @@
 			);
 			dependencies = (
 			);
-			name = com.karelia.imedia.folder;
+			name = com.karelia.imedia.Folder;
 			productName = "iPhoto Parser XPC Service";
-			productReference = D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.folder.xpc */;
+			productReference = D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.Folder.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
 		D0F2DDBC152485130059DF8D /* com.karelia.imedia.iTunes */ = {
@@ -1922,10 +2221,17 @@
 			targets = (
 				8DC2EF4F0486A6940098B216 /* iMedia */,
 				D09933541011B26E00C527B7 /* iMediaTester */,
-				D0E96CEE1518C9BF004F3EE7 /* com.karelia.imedia.folder */,
+				D0E96CEE1518C9BF004F3EE7 /* com.karelia.imedia.Folder */,
 				30FFEBEB150A08DB0009C1D0 /* com.karelia.imedia.iPhoto */,
+				D05D399D152ACD1300E30C43 /* com.karelia.imedia.Aperture */,
+				D05D39AE152ACD2400E30C43 /* com.karelia.imedia.Lightroom */,
+				D05D39BF152ACD3300E30C43 /* com.karelia.imedia.Flickr */,
 				D0F2DDBC152485130059DF8D /* com.karelia.imedia.iTunes */,
 				D054AFEE152984FA00EBFA1C /* com.karelia.imedia.GarageBand */,
+				D05D39D0152ACD5E00E30C43 /* com.karelia.imedia.Safari */,
+				D05D39E1152ACD6800E30C43 /* com.karelia.imedia.Firefox */,
+				D05D3A05152AD0D000E30C43 /* com.karelia.imedia.OmniWeb */,
+				D05D39F2152ACD8800E30C43 /* com.karelia.imedia.FSEvents */,
 				D02CD49E1224F22400C773A2 /* genstrings */,
 			);
 		};
@@ -1936,7 +2242,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D0CB91911510A35C007716FA /* com.karelia.imedia.iPhoto.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2068,7 +2373,55 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D054B000152992A400EBFA1C /* com.karelia.imedia.GarageBand.entitlements in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39A7152ACD1300E30C43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39B8152ACD2400E30C43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39C9152ACD3300E30C43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39DA152ACD5E00E30C43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39EB152ACD6800E30C43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39FC152ACD8800E30C43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D3A0F152AD0D000E30C43 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2086,7 +2439,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D0E96D031518CA4E004F3EE7 /* com.karelia.imedia.folder.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2094,7 +2446,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D0F2DDCE1524859A0059DF8D /* com.karelia.imedia.iTunes.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2226,6 +2577,62 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D05D399E152ACD1300E30C43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D399F152ACD1300E30C43 /* SBServiceMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39AF152ACD2400E30C43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39B0152ACD2400E30C43 /* SBServiceMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39C0152ACD3300E30C43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39C1152ACD3300E30C43 /* SBServiceMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39D1152ACD5E00E30C43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39D2152ACD5E00E30C43 /* SBServiceMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39E2152ACD6800E30C43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39E3152ACD6800E30C43 /* SBServiceMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D39F3152ACD8800E30C43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D39F4152ACD8800E30C43 /* SBServiceMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05D3A06152AD0D000E30C43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05D3A07152AD0D000E30C43 /* SBServiceMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D09933521011B26E00C527B7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2261,7 +2668,7 @@
 		};
 		D0680C3B1518CCA900CED506 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D0E96CEE1518C9BF004F3EE7 /* com.karelia.imedia.folder */;
+			target = D0E96CEE1518C9BF004F3EE7 /* com.karelia.imedia.Folder */;
 			targetProxy = D0680C3A1518CCA900CED506 /* PBXContainerItemProxy */;
 		};
 		D0F2DDD1152486820059DF8D /* PBXTargetDependency */ = {
@@ -2444,7 +2851,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = com.karelia.imedia.GarageBand;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Debug;
@@ -2470,7 +2877,413 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = com.karelia.imedia.GarageBand;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Release;
+		};
+		D05D39AA152ACD1300E30C43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		D05D39AB152ACD1300E30C43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Release;
+		};
+		D05D39BB152ACD2400E30C43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		D05D39BC152ACD2400E30C43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Release;
+		};
+		D05D39CC152ACD3300E30C43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		D05D39CD152ACD3300E30C43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Release;
+		};
+		D05D39DD152ACD5E00E30C43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		D05D39DE152ACD5E00E30C43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Release;
+		};
+		D05D39EE152ACD6800E30C43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		D05D39EF152ACD6800E30C43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Release;
+		};
+		D05D39FF152ACD8800E30C43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		D05D3A00152ACD8800E30C43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Release;
+		};
+		D05D3A11152AD0D000E30C43 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		D05D3A12152AD0D000E30C43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Release;
@@ -2544,7 +3357,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = com.karelia.imedia.folder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Debug;
@@ -2570,7 +3383,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = com.karelia.imedia.folder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Release;
@@ -2602,7 +3415,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = com.karelia.imedia.iTunes;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Debug;
@@ -2628,7 +3441,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = com.karelia.imedia.iTunes;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Release;
@@ -2681,6 +3494,69 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		D05D39A9152ACD1300E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Aperture" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05D39AA152ACD1300E30C43 /* Debug */,
+				D05D39AB152ACD1300E30C43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D05D39BA152ACD2400E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Lightroom" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05D39BB152ACD2400E30C43 /* Debug */,
+				D05D39BC152ACD2400E30C43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D05D39CB152ACD3300E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Flickr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05D39CC152ACD3300E30C43 /* Debug */,
+				D05D39CD152ACD3300E30C43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D05D39DC152ACD5E00E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Safari" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05D39DD152ACD5E00E30C43 /* Debug */,
+				D05D39DE152ACD5E00E30C43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D05D39ED152ACD6800E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Firefox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05D39EE152ACD6800E30C43 /* Debug */,
+				D05D39EF152ACD6800E30C43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D05D39FE152ACD8800E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.FSEvents" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05D39FF152ACD8800E30C43 /* Debug */,
+				D05D3A00152ACD8800E30C43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D05D3A10152AD0D000E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.OmniWeb" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05D3A11152AD0D000E30C43 /* Debug */,
+				D05D3A12152AD0D000E30C43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D099335B1011B27000C527B7 /* Build configuration list for PBXNativeTarget "iMediaTester" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -2690,7 +3566,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D0E96CFE1518C9BF004F3EE7 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.folder" */ = {
+		D0E96CFE1518C9BF004F3EE7 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Folder" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D0E96CFF1518C9BF004F3EE7 /* Debug */,
