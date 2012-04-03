@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -53,7 +56,7 @@
 #pragma mark ABSTRACT
 
 // This subclass of NSViewController is responsible for the lower half of a browser window, i.e. the object views.
-// It loads the views and handles things like view options and their presistence. Please note that this controller   
+// It loads the views and handles things like view options and their persistence. Please note that this controller   
 // is the delegate of all views, so do not modify those delegates. If you do need delegate messages for various  
 // events, then use the delegate methods of IMBLibraryController.
 
@@ -63,7 +66,7 @@
 // backend controller, while IMBObjectViewController is a frontend controller.
 
 // ATTENTION: This is an abstract base class. Do not use an instance of this class, but use a specific subclass
-// like IMBPhotosViewController or IMBMusicViewController instead...
+// like IMBImageObjectViewController or IMBAudioObjectViewController instead...
 
 
 //----------------------------------------------------------------------------------------------------------------------

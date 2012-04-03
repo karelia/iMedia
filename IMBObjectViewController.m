@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -604,9 +607,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	{
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadIconView) object:nil];
 		[self performSelector:@selector(_reloadIconView) withObject:nil afterDelay:[[self class] iconViewReloadDelay] inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-
-//		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadComboView) object:nil];
-//		[self performSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	
 	// The globally set view type in preferences was changed - adjust our own view type accordingly. Please note 
@@ -632,15 +632,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		{
 			[ibComboView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
 		}
-		
-//		if (NSNotFound != row)
-//		{
-//			[ibComboView 
-//				performSelectorOnMainThread:@selector(_reloadRow:) 
-//				withObject:[NSNumber numberWithInt:row] 
-//				waitUntilDone:NO modes:[NSArray 
-//				arrayWithObject:NSRunLoopCommonModes]];
-//		}
     }
 	else
 	{
@@ -1060,7 +1051,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 // implement the protocol, since we use bindings. But this is for the benefit of
 // -[IMBImageBrowserView mouseDragged:] ... I hope it's OK that we are ignoring the inView parameter.
 
-- (id /*IKImageBrowserItem*/) imageBrowser:(IKImageBrowserView*)inView itemAtIndex:(NSUInteger)inIndex
+- (id) imageBrowser:(IKImageBrowserView*)inView itemAtIndex:(NSUInteger)inIndex
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
 	return object;
@@ -1612,22 +1603,17 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	if ([inObject isSelectable])
 	{
-//		#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-		if (IMBRunningOnSnowLeopardOrNewer())
-		{
-			title = NSLocalizedStringWithDefaultValue(
-				@"IMBObjectViewController.menuItem.quickLook",
-				nil,IMBBundle(),
-				@"Quick Look",
-				@"Menu item in context menu of IMBObjectViewController");
-				
-			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
-			[item setRepresentedObject:inObject];
-			[item setTarget:self];
-			[menu addItem:item];
-			[item release];
-		}
-//		#endif
+		title = NSLocalizedStringWithDefaultValue(
+			@"IMBObjectViewController.menuItem.quickLook",
+			nil,IMBBundle(),
+			@"Quick Look",
+			@"Menu item in context menu of IMBObjectViewController");
+			
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
+		[item setRepresentedObject:inObject];
+		[item setTarget:self];
+		[menu addItem:item];
+		[item release];
 	}
 	
 	// Badges filtering
@@ -1681,7 +1667,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		[menu addItem:item];
 		[item release];
 	}
-	// Give parser a chance to add menu items...
+	
+	// Give the IMBParserMessenger a chance to add menu items...
 	
 	IMBParserMessenger* parserMessenger = self.currentNode.parserMessenger;
 	
