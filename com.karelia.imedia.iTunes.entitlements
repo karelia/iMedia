@@ -7,6 +7,9 @@
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
 	<key>com.apple.security.temporary-exception.files.absolute-path.read-write</key>
-	<string>//</string>
+	<array>
+		<string>/Volumes/</string>
+		<string>/Users/</string>
+	</array>
 </dict>
 </plist>
