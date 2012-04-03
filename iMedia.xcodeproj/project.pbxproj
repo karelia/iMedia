@@ -322,7 +322,6 @@
 		D099324910111A2900C527B7 /* NSWorkspace+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D099324510111A2900C527B7 /* NSWorkspace+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D099326B10111DCB00C527B7 /* NSString+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D099326910111DCB00C527B7 /* NSString+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0993305101197D100C527B7 /* IMBNodeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0993303101197D100C527B7 /* IMBNodeViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D099330C10119D8200C527B7 /* IMBNodeTreeController.h in Headers */ = {isa = PBXBuildFile; fileRef = D099330B10119D8200C527B7 /* IMBNodeTreeController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D099335C1011B28500C527B7 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
 		D09933AF1011B2CD00C527B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		D09933B31011B32B00C527B7 /* IMBTestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D09933B21011B32B00C527B7 /* IMBTestAppDelegate.m */; };
@@ -807,8 +806,6 @@
 		D09932901011227100C527B7 /* IMBImageFolderParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageFolderParser.m; sourceTree = "<group>"; };
 		D0993302101197D100C527B7 /* IMBNodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeViewController.m; sourceTree = "<group>"; };
 		D0993303101197D100C527B7 /* IMBNodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeViewController.h; sourceTree = "<group>"; };
-		D099330B10119D8200C527B7 /* IMBNodeTreeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBNodeTreeController.h; sourceTree = "<group>"; };
-		D099333010119EA300C527B7 /* IMBNodeTreeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBNodeTreeController.m; sourceTree = "<group>"; };
 		D099333210119F3400C527B7 /* IMBObjectArrayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectArrayController.m; sourceTree = "<group>"; };
 		D09933551011B26E00C527B7 /* iMediaTester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMediaTester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D09933571011B26E00C527B7 /* TestApp-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestApp-Info.plist"; sourceTree = "<group>"; };
@@ -1365,8 +1362,6 @@
 				D09930C31010F6C100C527B7 /* IMBParserController.m */,
 				D09930B51010F6C100C527B7 /* IMBLibraryController.h */,
 				D09930B61010F6C100C527B7 /* IMBLibraryController.m */,
-				D099330B10119D8200C527B7 /* IMBNodeTreeController.h */,
-				D099333010119EA300C527B7 /* IMBNodeTreeController.m */,
 				D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */,
 				D099333210119F3400C527B7 /* IMBObjectArrayController.m */,
 				D05D3A1B152AD30500E30C43 /* com.karelia.imedia.FSEvents.entitlements */,
@@ -1853,7 +1848,6 @@
 				D099324910111A2900C527B7 /* NSWorkspace+iMedia.h in Headers */,
 				D099326B10111DCB00C527B7 /* NSString+iMedia.h in Headers */,
 				D0993305101197D100C527B7 /* IMBNodeViewController.h in Headers */,
-				D099330C10119D8200C527B7 /* IMBNodeTreeController.h in Headers */,
 				D0993931101236AB00C527B7 /* IMBOutlineView.h in Headers */,
 				D08E8B701019C916005D8614 /* UKFNSubscribeFileWatcher.h in Headers */,
 				D08E8B721019C916005D8614 /* UKFSEventsWatcher.h in Headers */,
