@@ -53,26 +53,11 @@
 #pragma mark HEADERS
 
 #import "IMBGarageBandParser.h"
-#import "IMBConfig.h"
-#import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBIconCache.h"
-#import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
-#import "IMBTimecodeTransformer.h"
-#import <Quartz/Quartz.h>
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBGarageBandParser ()
-- (IMBNode*) _unpopulatedRootNodes;
-@end
+#import "SBUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,76 +67,17 @@
 
 @implementation IMBGarageBandParser
 
-@synthesize timecodeTransformer = _timecodeTransformer;
+@synthesize appPath = _appPath;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Register this parser, so that it gets automatically loaded...
-
-+ (void) load
+- (id) init
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeAudio];
-	[pool drain];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Check if GarageBand is installed...
-
-+ (NSString*) garageBandPath
-{
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.GarageBand"];
-}
-
-
-+ (BOOL) isInstalled
-{
-	return [self garageBandPath] != nil;
-}
-
-
-// Paths to important folders containing songs...
-
-+ (NSString*) userSongsPath
-{
-	return [NSHomeDirectory() stringByAppendingPathComponent:@"Music/GarageBand"];
-}
-
-
-+ (NSString*) demoSongsPath
-{
-	return @"/Library/Application Support/GarageBand/GarageBand Demo Songs/GarageBand Demo Songs/";
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// If GarageBand is installed, then create a parser instance...
-
-+ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
-{
-	if ([IMBGarageBandParser isInstalled])
-	{
-		IMBGarageBandParser* parser = [[[IMBGarageBandParser alloc] initWithMediaType:inMediaType] autorelease];
-		return [NSArray arrayWithObject:parser];
-	}
-	
-	return nil;
-}
-
-
-- (id) initWithMediaType:(NSString*)inMediaType
-{
-	if (self = [super initWithMediaType:inMediaType])
+	if ((self = [super init]))
 	{
 		self.fileUTI = @"com.apple.garageband.project"; 
-		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
 	}
 	
 	return self;
@@ -160,7 +86,7 @@
 
 - (void) dealloc
 {
-	IMBRelease(_timecodeTransformer);
+	IMBRelease(_appPath);
 	[super dealloc];
 }
 
@@ -172,44 +98,26 @@
 #pragma mark Parser Methods
 
 
-- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
-	IMBNode* node = nil;
-	NSError* error = nil;
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16.0,16.0)];
 	
-	// Create a root node...
+	// Create an empty (unpopulated) root node...
 	
-	if (inOldNode == nil)
-	{
-		node = [self _unpopulatedRootNodes];
-	}
-	
-	// Or copy a subnode...
-	
-	else
-	{
-		node = [[[IMBNode alloc] init] autorelease];
-		
-		node.mediaSource = self.mediaSource;
-		node.identifier = inOldNode.identifier;
-		node.name = inOldNode.name;
-		node.icon = inOldNode.icon;
-		node.attributes = inOldNode.attributes;
-		node.groupType = inOldNode.groupType;
-		node.leaf = inOldNode.leaf;
-		node.parser = self;
-		node.watcherType = inOldNode.watcherType;
-		node.watchedPath = inOldNode.watchedPath;
-	}
+	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	node.icon = icon;
+	node.name = @"GarageBand";
+	node.identifier = [self identifierForPath:@"/"];
+	node.mediaType = self.mediaType;
+	node.mediaSource = self.mediaSource;
+	node.parserIdentifier = self.identifier;
+	node.groupType = kIMBGroupTypeLibrary;
+	node.isTopLevelNode = YES;
+	node.group = NO;
+	node.leaf = NO;
 
-	// If the old node was populated, then also populate the new node...
-	
-	if (inOldNode.isPopulated)
-	{
-		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
-	}
-	
-	if (outError) *outError = error;
 	return node;
 }
 
@@ -217,94 +125,77 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-#pragma mark Helper Methods
+// Paths to important folders containing songs...
 
-
-- (IMBNode*) _unpopulatedRootNodes
+- (NSString*) userSongsPath
 {
-	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:[IMBGarageBandParser garageBandPath]];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(16.0,16.0)];
-	
-	NSString* demoSongsName = NSLocalizedStringWithDefaultValue(
-		@"IMBGarageBandParser.demosongs.name",
-		nil,IMBBundle(),
-		@"Demo Songs",
-		@"Name of node in IMBGarageBandParser");
-	
-	NSString* userSongsName = NSLocalizedStringWithDefaultValue(
-		@"IMBGarageBandParser.usersongs.name",
-		nil,IMBBundle(),
-		@"My Compositions",
-		@"Name of node in IMBGarageBandParser");
-	
-	// Create Garageband root node...
-	
-	NSMutableArray* subNodes = [NSMutableArray array];
-	
-	IMBNode* root = [[[IMBNode alloc] init] autorelease];
-	root.mediaSource = nil;
-	root.identifier = [self identifierForPath:@"/"];
-	root.icon = icon;
-	root.name = @"GarageBand";
-	root.groupType = kIMBGroupTypeLibrary;
-	root.leaf = NO;
-	root.isTopLevelNode = YES;
-	root.parser = self;
-	root.watcherType = kIMBWatcherTypeNone;
-	root.objects = [NSMutableArray array];	// the root node doesn't have any objects so we can populate it already!
-	
-	// Add unpopulated subnode for demo songs...
-	
-	NSString* demoSongsPath = [IMBGarageBandParser demoSongsPath];
+	return [SBHomeDirectory() stringByAppendingPathComponent:@"Music/GarageBand"];
+}
 
-	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath])
+
+- (NSString*) demoSongsPath
+{
+	return @"/Library/Application Support/GarageBand/GarageBand Demo Songs/GarageBand Demo Songs/";
+}
+
+
+- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+{
+	if (inNode.isTopLevelNode)
 	{
-		IMBNode* demo = [[[IMBNode alloc] init] autorelease];
-		demo.mediaSource = demoSongsPath;
-		demo.identifier = [self identifierForPath:demoSongsPath];
-		demo.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:demoSongsPath];
-		[demo.icon setScalesWhenResized:YES];
-		[demo.icon setSize:NSMakeSize(16,16)];
-		demo.name = demoSongsName;
-		demo.groupType = kIMBGroupTypeNone;
-		demo.leaf = YES;
-		demo.parser = self;
-		demo.watcherType = kIMBWatcherTypeFSEvent;
-		demo.watchedPath = demoSongsPath;
-
-		[subNodes addObject:demo];
-	}
-	
-	// Add unpopulated subnode for user songs...
-	
-	NSString* userSongsPath = [IMBGarageBandParser userSongsPath];
-
-	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath])
-	{
-		IMBNode* user = [[[IMBNode alloc] init] autorelease];
-		user.mediaSource = userSongsPath;
-		user.identifier = [self identifierForPath:userSongsPath];
-		user.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:userSongsPath];
-		[user.icon setScalesWhenResized:YES];
-		[user.icon setSize:NSMakeSize(16,16)];
-
-		user.name = userSongsName;
-		user.groupType = kIMBGroupTypeNone;
-		user.leaf = YES;
-		user.parser = self;
-		user.watcherType = kIMBWatcherTypeFSEvent;
-		user.watchedPath = userSongsPath;
+		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
+		NSString* userSongsPath = [self userSongsPath];
+		NSString* demoSongsPath = [self demoSongsPath];
+		BOOL isDirectory = NO;
+			
+		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath isDirectory:&isDirectory])
+		{
+			NSString* userSongsName = NSLocalizedStringWithDefaultValue(
+				@"IMBGarageBandParser.usersongs.name",
+				nil,IMBBundle(),
+				@"My Compositions",
+				@"Name of node in IMBGarageBandParser");
 		
-		[IMBConfig registerLibraryPath:userSongsPath];
+			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+			subnode.identifier = [self identifierForPath:userSongsPath];
+			subnode.icon = [self iconForPath:userSongsPath];
+			subnode.name = userSongsName;
+			subnode.mediaType = self.mediaType;
+			subnode.mediaSource = [NSURL fileURLWithPath:userSongsPath];
+			subnode.parserIdentifier = self.identifier;
+			subnode.isTopLevelNode = NO;
+			subnode.includedInPopup = YES;
+			subnode.leaf = YES;
+			[subnodes addObject:subnode];
+		}
+		
+		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath isDirectory:&isDirectory])
+		{
+			NSString* demoSongsName = NSLocalizedStringWithDefaultValue(
+				@"IMBGarageBandParser.demosongs.name",
+				nil,IMBBundle(),
+				@"Demo Songs",
+				@"Name of node in IMBGarageBandParser");
 
-		[subNodes addObject:user];
+			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+			subnode.identifier = [self identifierForPath:userSongsPath];
+			subnode.icon = [self iconForPath:demoSongsPath];
+			subnode.name = demoSongsName;
+			subnode.mediaType = self.mediaType;
+			subnode.mediaSource = [NSURL fileURLWithPath:demoSongsPath];
+			subnode.parserIdentifier = self.identifier;
+			subnode.isTopLevelNode = NO;
+			subnode.includedInPopup = YES;
+			subnode.leaf = YES;
+			[subnodes addObject:subnode];
+		}
+
+		if (outError) *outError = nil;
 	}
-	
-	root.subNodes = subNodes;
-
-	return root;
+	else
+	{
+		[super populateNode:inNode error:outError];
+	}
 }
 
 
@@ -313,14 +204,15 @@
 
 // Return metadata specific to GarageBand files...
 
-- (NSDictionary*) metadataForFileAtPath:(NSString*)inPath
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	NSString* path = [inPath stringByAppendingPathComponent:@"Output/metadata.plist"];
+	NSString* path = inObject.path;
+	path = [path stringByAppendingPathComponent:@"Output/metadata.plist"];
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithContentsOfFile:path];
 	
 	if (metadata)
 	{
-		[metadata setObject:inPath forKey:@"path"];
+		[metadata setObject:path forKey:@"path"];
 
 		NSNumber* duration = [metadata objectForKey:@"com_apple_garageband_metadata_songDuration"];
 		[metadata setObject:duration forKey:@"duration"];
@@ -332,57 +224,8 @@
 		[metadata setObject:album forKey:@"album"];
 	}
 	
+	if (outError) *outError = nil;
 	return metadata;
-}
-
-
-// Convert metadata into human readable string...
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	NSMutableString* description = [NSMutableString string];
-	NSNumber* duration = [inMetadata objectForKey:@"duration"];
-	NSString* artist = [inMetadata objectForKey:@"artist"];
-	NSString* album = [inMetadata objectForKey:@"album"];
-	
-	if (artist)
-	{
-		NSString* artistLabel = NSLocalizedStringWithDefaultValue(
-			@"Artist",
-			nil,IMBBundle(),
-			@"Artist",
-			@"Artist label in metadataDescription");
-
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",artistLabel,artist];
-	}
-	
-	if (album)
-	{
-		NSString* albumLabel = NSLocalizedStringWithDefaultValue(
-			@"Album",
-			nil,IMBBundle(),
-			@"Album",
-			@"Album label in metadataDescription");
-
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",albumLabel,album];
-	}
-	
-	if (duration)
-	{
-		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
-			@"Time",
-			nil,IMBBundle(),
-			@"Time",
-			@"Time label in metadataDescription");
-
-		NSString* durationString = [_timecodeTransformer transformedValue:duration];
-		if (description.length > 0) [description imb_appendNewline];
-		[description appendFormat:@"%@: %@",durationLabel,durationString];
-	}
-	
-	return description;
 }
 
 

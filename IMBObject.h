@@ -61,7 +61,7 @@
 
 #pragma mark CONSTANTS
 
-extern NSString* kIMBQuickLookImageProperty;
+extern NSString* kIMBObjectPasteboardType;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,15 +78,18 @@ extern NSString* kIMBQuickLookImageProperty;
 // IMBObject encapsulates information about a single media item (e.g. image file or audio file). The location 
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
 
-@interface IMBObject : NSObject <NSCopying,NSCoding,IMBImageItem,QLPreviewItem,NSPasteboardWriting>
+@interface IMBObject : NSObject <NSCopying,NSCoding,IMBImageItem,NSPasteboardWriting,NSPasteboardReading,NSPasteboardItemDataProvider,QLPreviewItem>
 {
 	id _location;												
+	NSData* _bookmark;
 	NSString* _name;
+	
 	NSDictionary* _preliminaryMetadata;
 	NSDictionary* _metadata;
 	NSString* _metadataDescription;
-    NSString* _parserIdentifier;
+	
 	IMBParserMessenger* _parserMessenger;
+    NSString* _parserIdentifier;
 	
 	NSUInteger _index;
     BOOL _shouldDrawAdornments;
@@ -98,66 +101,112 @@ extern NSString* kIMBQuickLookImageProperty;
 	NSString* _imageRepresentationType;		
 	BOOL _needsImageRepresentation;
 	NSUInteger _imageVersion;
-	
-	NSURL* _bookmarkBaseURL;
-	NSData* _bookmark;
 }
-
-// Primary properties...
 
 @property (retain) id location;								// Path, URL, or other location info
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
 @property (readonly) NSString* identifier;					// Unique identifier for this object
+
 @property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
 @property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
 @property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)
+
+@property (retain) IMBParserMessenger* parserMessenger;		// IMBParserMessenger that is responsible for this object
 @property (retain) NSString* parserIdentifier;				// Identifier of IMBParser that created this object
-@property (retain) IMBParserMessenger* parserMessenger;		// IMBParserMessenger that created this object
 
-// Helpers...
 
-@property (assign) NSUInteger index;						// Index of object in the array (optional)
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+// Visual appearance...
+
 @property (assign) BOOL shouldDrawAdornments;				// YES if border/shadow should be drawn
 @property (assign) BOOL shouldDisableTitle;					// YES if title should be shown as disabled (e.g. not draggable)
-@property (readonly) BOOL isSelectable;
-@property (readonly) BOOL isDraggable;
-
-- (NSString*) path;											// Convert location to path
-- (NSURL*) URL;												// Convert location to url
-- (NSURL*) imageLocationURL;                                // Convert imageLocation to url
-- (BOOL) isLocalFile;										// Is this object a local file
-- (NSString*) type;											// Returns type of file if possible
 - (NSString*) tooltipString;
 
-// Derived Properties. See IKImageBrowserItem for documentation.   
-// These methods are used for displaying in an IKImageBrowserView...
+// Index of the file in the array. Setting this property is optional, but highly recommended as it speeds things up...
 
-@property (retain) id imageLocation;						// Optional url or path if different from location (e.g. lores thumbnail)
-@property (retain) id imageRepresentation;	
+@property (assign) NSUInteger index;					
+
+// Convenience accessors for the file...
+
+- (NSString*) path;											// Converts self.location to a path
+- (NSURL*) URL;												// Converts self.location to a url
+- (NSString*) type;											// Returns UTI of file if possible
+- (BOOL) isLocalFile;										// Is this object a local file
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+// To display IMBObjects in an IKImageBrowserView, we need to implement the (informal) protocol IKImageBrowserItem...
+
+@property (nonatomic,readonly) NSString* imageUID;
 @property (retain) NSString* imageRepresentationType;
-@property (assign) BOOL needsImageRepresentation;
+@property (retain) id imageRepresentation;	
 @property (assign) NSUInteger imageVersion;
-@property (nonatomic, readonly) NSString* imageUID;
 @property (readonly) NSString* imageTitle;
+@property (readonly) BOOL isSelectable;
 
-// Asynchronous loading of thumbnails...
-																	
+// The following methods are not part of the IKImageBrowserItem protocol, but act in a supporting manner...
+
+@property (assign) BOOL needsImageRepresentation;			// Set to YES if an existing thumbnail should be reloaded
+@property (readonly) BOOL isDraggable;						// Can this object be dragged from iMediaBrowser?
+
+@property (retain) id imageLocation;						// Optional url if different from location (e.g. lores thumbnail)
+- (NSURL*) imageLocationURL;                                // Convert imageLocation to url
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+// Use the following methods to lazily and asyncronously load thumbnails and metadata as they become visible. 
+// Observe the properties imageRepresentation or metadata to find out when loading has finished...
+
+@interface IMBObject (LazyLoading)
+
 - (void) loadThumbnail;	
-- (BOOL) unloadThumbnail;
-@property (readonly) BOOL isLoadingThumbnail;
+- (void) unloadThumbnail;
+- (BOOL) isLoadingThumbnail;
 
-- (void) loadMetadata;  // observe .metadata property to know when finished
+- (void) loadMetadata; 
+- (void) unloadMetadata;
+
 //- (void) postProcessLocalURL:(NSURL*)inLocalURL;
 
-// Security Scoped Bookmark Support...
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+// To access the real media file from a (sandboxed) host application, you cannot use the location or URL property
+// of IMBObject. First, the object might not represent a local file, but a remote resource (e.g. on the internet)
+// that needs to be downloaded first. And second, if your host app is sandboxed, having the NSURL to a local file
+// would not do you any good, as your app wouldn't be allowed to access this file. 
+
+// Instead use the methods below to request a bookmark. This is an asynchronous operation (which also automatically 
+// downloads any remote resources to your harddisk). When you receive the bookmark in the completion block and 
+// resolve it to a NSURL, the PowerBox authorized your app to access this file for the current launch session.
+// In that respect it acts similarly to NSOpenPanel or drag & drop from the Finder.
+
+@interface IMBObject (FileAccess)
 
 - (void) requestBookmarkWithCompletionBlock:(void(^)(NSError*))inCompletionBlock;
 - (NSURL*) URLByResolvingBookmark;
 
-@property (retain) NSURL* bookmarkBaseURL;
-@property (retain) NSData* bookmark;
-
+@property (retain,readonly) NSData* bookmark;
 
 @end
 

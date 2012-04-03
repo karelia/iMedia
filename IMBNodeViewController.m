@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -55,7 +58,7 @@
 #import "IMBNodeViewController.h"
 #import "IMBObjectViewController.h"
 #import "IMBLibraryController.h"
-#import "IMBNodeTreeController.h"
+#import "IMBParserMessenger.h"
 #import "IMBOutlineView.h"
 #import "IMBConfig.h"
 #import "IMBParser.h"
@@ -134,15 +137,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 @synthesize libraryController = _libraryController;
 @synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
 @synthesize expandedNodeIdentifiers = _expandedNodeIdentifiers;
-//@synthesize selectedParser = _selectedParser;
 
 @synthesize nodeOutlineView = ibNodeOutlineView;
 @synthesize nodePopupButton = ibNodePopupButton;
 @synthesize headerContainerView = ibHeaderContainerView;
 @synthesize objectContainerView = ibObjectContainerView;
 @synthesize footerContainerView = ibFooterContainerView;
-//@synthesize standardObjectView = _standardObjectView;
-//@synthesize customObjectView = _customObjectView;
 
 @synthesize standardHeaderViewController = _standardHeaderViewController;
 @synthesize standardObjectViewController = _standardObjectViewController;
@@ -260,12 +260,6 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	IMBRelease(_libraryController);
 	IMBRelease(_selectedNodeIdentifier);
 	IMBRelease(_expandedNodeIdentifiers);
-//	IMBRelease(_standardObjectView);
-//	IMBRelease(_customObjectView);
-//	IMBRelease(_customHeaderViewControllers);
-//	IMBRelease(_customObjectViewControllers);
-//	IMBRelease(_customFooterViewControllers);
-
 	IMBRelease(_standardHeaderViewController);
 	IMBRelease(_standardObjectViewController);
 	IMBRelease(_standardFooterViewController);
@@ -573,9 +567,10 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			if (![IMBConfig isLibraryPath:path])
 			{
-//				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+				[self.libraryController addUserAddedNodeForFolder:[NSURL fileURLWithPath:path]];
+				#warning TODO
 //				self.selectedNodeIdentifier = [parser identifierForPath:path];
-//				result = YES;
+				result = YES;
 			}
 		}	
 	}		
@@ -648,10 +643,6 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (void) outlineViewItemDidCollapse:(NSNotification*)inNotification
 {
 	[self _setExpandedNodeIdentifiers];
-
-//	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
-//	IMBNode* node = (IMBNode*)item; 
-//	[self.libraryController stopPopulatingNodeWithIdentifier:node.identifier];
 }
 
 
@@ -693,11 +684,6 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	{
 		NSInteger row = [ibNodeOutlineView selectedRow];
 		IMBNode* newNode = row>=0 ? [ibNodeOutlineView nodeAtRow:row] : nil;
-
-		// Stop loading the old node's contents, assuming we don't need them anymore. Instead populated the
-		// newly selected node...
-		
-//		[self.libraryController stopPopulatingNodeWithIdentifier:self.selectedNodeIdentifier];
 
 		if (newNode)
 		{
@@ -906,25 +892,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Called in response to a IMBNodesWillChangeNotification notification. Set a flag that helps us to do the right 
-// thing in the IMBOutlineView delegate methods. If nodes are currently being replaced, then we will allow any 
-// changes, because those changes were not initiated by user events...
-// And it will allow us to save any state information that might be unintentionally changed through the
-// replacements of nodes (remember that the libary controller has a binding with the outline view)
+// Called in response to a IMBNodesWillChangeNotification notification. Since the replacing of nodes in the 
+// IMBLibraryController will lead to side effects regarding the current scroll position of the outline view  
+// we have to save it here for later restoration...
 
 - (void) _nodesWillChange
 {
-    // Due to an error in NSTreeController a node to be replaced by another node will not be released
-    // by NSTreeController if it was currently selected. As a workaround we can safely unselect it here
-    // before nodes are exchanged by the library controller because the node identifier
-    // of the currently selected node is saved in _selectedNodeIdentifiers anyways.
-    
-//    [ibNodeTreeController setSelectionIndexPath:nil];
-    
-    // Since the replacing of nodes in the library controller will lead to side effects
-    // regarding the current scroll position of the outline view we have to save it here
-    // for later restauration
-    
     _nodeOutlineViewSavedVisibleRectOrigin = [ibNodeOutlineView visibleRect].origin;
 }
 
@@ -946,7 +919,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	[ibNodeOutlineView reloadData];
 	
-	// Temporarily disable storing of saved state (we only want that when the user actuall clicks in the UI...
+	// Temporarily disable storing of saved state (we only want that when the user actually clicks in the UI...
 	
 	_isRestoringState = YES;
 	
@@ -1188,7 +1161,10 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
-// Choose a folder...
+// Choose a folder. Please note: due to a bug in NSOpenPanel when running in a sandbox, we cannot currently use
+// beginSheetModalForWindow:. This results in a zero-size window being attached to our panel. Calling runModal
+// seems to work fine, even if the user experience is diminished. Work for now. Also note that the entitlement 
+// com.apple.security.files.user-selected.read-write is required for host app for the NSOpenPanel to show up...
 	
 - (IBAction) addNode:(id)inSender
 {
@@ -1197,28 +1173,20 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	[panel setCanChooseFiles:NO];
 	[panel setResolvesAliases:YES];
 
-	NSWindow* window = [ibSplitView window];
-	[panel beginSheetModalForWindow:window completionHandler:^(NSInteger result)
-	{
-//		if (result == NSFileHandlingPanelOKButton)
-//		{
-//			NSArray* urls = [panel urls];
-//			for (NSURL* url in urls)
-//			{
-//				IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
+	NSInteger result = [panel runModal];
+//	[panel beginSheetModalForWindow:ibSplitView.window completionHandler:^(NSInteger result)
+//	{
+		if (result == NSFileHandlingPanelOKButton)
+		{
+			NSArray* urls = [panel URLs];
+			for (NSURL* url in urls)
+			{
+				
+				[self.libraryController addUserAddedNodeForFolder:url];
 //				self.selectedNodeIdentifier = [parser identifierForPath:path];
-//			}	
-//			
-//			[self.libraryController reload];
-//		}
-	}];
-}
-
-
-// Add a root node for this each folder and the reload the library...
-	
-- (void) openPanelDidEnd:(NSOpenPanel*)inPanel returnCode:(int)inReturnCode contextInfo:(void*)inContextInfo
-{
+			}	
+		}
+//	}];
 }
 
 
@@ -1229,16 +1197,15 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (BOOL) canRemoveNode
 {
-	return NO;
-//	IMBNode* node = [self selectedNode];
-//	return node.isTopLevelNode && node.parser.isCustom && !node.isLoading;
+	IMBNode* node = [self selectedNode];
+	return node.isTopLevelNode && node.isUserAdded && !node.isLoading;
 }
 
 
 - (IBAction) removeNode:(id)inSender
 {
-//	IMBNode* node = [self selectedNode];
-//	[self.libraryController removeCustomRootNode:node];
+	IMBNode* node = [self selectedNode];
+	[self.libraryController removeUserAddedNode:node];
 }
 
 
@@ -1256,8 +1223,8 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (IBAction) reloadNode:(id)inSender
 {
-//	IMBNode* node = [self selectedNode];
-//	[self.libraryController reloadNode:node];
+	IMBNode* node = [self selectedNode];
+	[self.libraryController reloadNodeTree:node];
 }
 
 
@@ -1270,7 +1237,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (NSMenu*) menuForNode:(IMBNode*)inNode
 {
 	NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"contextMenu"] autorelease];
-/*	NSMenuItem* item = nil;
+	NSMenuItem* item = nil;
 	NSString* title = nil;
 	
 	// First we'll add standard menu items...
@@ -1289,7 +1256,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		[item release];
 	}
 	
-	if (inNode!=nil && inNode.parser.isCustom && !inNode.isLoading)
+	if (inNode!=nil && inNode.isUserAdded && !inNode.isLoading)
 	{
 		title = NSLocalizedStringWithDefaultValue(
 			@"IMBNodeViewController.menuItem.remove",
@@ -1319,9 +1286,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	// Then the parser can add custom menu items...
 	
-	if ([inNode.parser respondsToSelector:@selector(willShowContextMenu:forNode:)])
+	if ([inNode.parserMessenger respondsToSelector:@selector(willShowContextMenu:forNode:)])
 	{
-		[inNode.parser willShowContextMenu:menu forNode:inNode];
+		[inNode.parserMessenger willShowContextMenu:menu forNode:inNode];
 	}
 	
 	// Finally give the delegate a chance to add menu items...
@@ -1332,7 +1299,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	{
 		[delegate libraryController:self.libraryController willShowContextMenu:menu forNode:inNode];
 	}
-*/	
+	
 	return menu;
 }
 

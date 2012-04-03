@@ -54,18 +54,15 @@
 
 #import "IMBLibraryController.h"
 #import "IMBParserController.h"
-//#import "IMBOperationQueue.h"
-//#import "IMBParser.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBParserMessenger.h"
-//#import "IMBCommon.h"
+#import "IMBImageFolderParserMessenger.h"
+#import "IMBAudioFolderParserMessenger.h"
+#import "IMBMovieFolderParserMessenger.h"
 #import "IMBConfig.h"
-//#import "IMBKQueue.h"
-//#import "IMBFSEventsWatcher.h"
-//#import "IMBImageFolderParser.h"
-//#import "IMBAudioFolderParser.h"
-//#import "IMBMovieFolderParser.h"
+#import "IMBKQueue.h"
+#import "IMBFSEventsWatcher.h"
 #import "NSWorkspace+iMedia.h"
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
@@ -117,6 +114,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _setParserMessenger:(IMBParserMessenger*)inMessenger nodeTree:(IMBNode*)inNode;
 - (IMBNode*) _groupNodeForTopLevelNode:(IMBNode*)inNewNode;
 - (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
+
+//@property (retain) IMBKQueue* watcherUKKQueue;
+//@property (retain) IMBFSEventsWatcher* watcherFSEvents;
 
 //- (void) _coalescedUKKQueueCallback;
 //- (void) _coalescedFSEventsCallback;
@@ -188,15 +188,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		// Initialize file system watching...
 		
-//		self.watcherUKKQueue = [[[IMBKQueue alloc] init] autorelease];
-//		self.watcherUKKQueue.delegate = self;
-//		
-//		self.watcherFSEvents = [[[IMBFSEventsWatcher alloc] init] autorelease];
-//		self.watcherFSEvents.delegate = self;
+		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
+		_watcherUKKQueue = [[IMBKQueue alloc] init];
+		_watcherUKKQueue.delegate = self;
+		
+		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
+		_watcherFSEvents = [[IMBFSEventsWatcher alloc] init];
+		_watcherFSEvents.delegate = self;
 		
 //		_watcherLock = [[NSRecursiveLock alloc] init];
-//		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
-//		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
 		
 		// When volume are unmounted we would like to be notified so that we can disable file watching for 
 		// those paths...
@@ -224,11 +224,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	IMBRelease(_mediaType);
 	IMBRelease(_subnodes);
-//	IMBRelease(_watcherUKKQueue);
-//	IMBRelease(_watcherFSEvents);
+	IMBRelease(_watcherUKKQueue);
+	IMBRelease(_watcherFSEvents);
 //	IMBRelease(_watcherLock);
-//	IMBRelease(_watcherUKKQueuePaths);
-//	IMBRelease(_watcherFSEventsPaths);
+	IMBRelease(_watcherUKKQueuePaths);
+	IMBRelease(_watcherFSEventsPaths);
 
 	[super dealloc];
 }
@@ -257,51 +257,53 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 		for (IMBParserMessenger* messenger in messengers)
 		{
-			// Ask delegate whether we should create nodes with this IMBParserMessenger...
+			[self createTopLevelNodeWithParserMessenger:messenger];
 			
-			if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
-			{
-				if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
-				{
-					continue;
-				}
-			}
-			
-			// Create top-level nodes...
-			
-			if (RESPONDS(_delegate,@selector(libraryController:willCreateNodeWithParserMessenger:)))
-			{
-				[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
-			}
-			
-			SBPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodes:),nil,
-			
-				^(NSArray* inNodes,NSError* inError)
-				{
-					// Display any errors that might have occurred...
-					
-					if (inError)
-					{
-						NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-						[NSApp presentError:inError];
-					}
-					
-					// Insert the new top-level nodes into our data model...
-					
-					else if (inNodes)
-					{
-						for (IMBNode* node in inNodes)
-						{
-							node.parserMessenger = messenger;
-							[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
-
-							if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
-							{
-								[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
-							}
-						}
-					}
-				});		
+//			// Ask delegate whether we should create nodes with this IMBParserMessenger...
+//			
+//			if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
+//			{
+//				if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
+//				{
+//					continue;
+//				}
+//			}
+//			
+//			// Create top-level nodes...
+//			
+//			if (RESPONDS(_delegate,@selector(libraryController:willCreateNodeWithParserMessenger:)))
+//			{
+//				[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
+//			}
+//			
+//			SBPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodes:),nil,
+//			
+//				^(NSArray* inNodes,NSError* inError)
+//				{
+//					// Display any errors that might have occurred...
+//					
+//					if (inError)
+//					{
+//						NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+//						[NSApp presentError:inError];
+//					}
+//					
+//					// Insert the new top-level nodes into our data model...
+//					
+//					else if (inNodes)
+//					{
+//						for (IMBNode* node in inNodes)
+//						{
+//							node.parserMessenger = messenger;
+//							[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+//
+//							if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+//							{
+//								[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
+//							}
+//						}
+//					}
+//				});		
 		}
 	}
 	
@@ -320,58 +322,50 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Reload the specified node. This is done by a XPC service on our behalf. Once the service is done, it 
-// will send back a reply with the new node as a result and call the completion block...
-
-- (void) reloadNodeTree:(IMBNode*)inOldNode
+- (void) createTopLevelNodeWithParserMessenger:(IMBParserMessenger*)inParserMessenger
 {
-	if ([inOldNode isGroup]) return;
-
-	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
-	IMBParserMessenger* messenger = inOldNode.parserMessenger;
+	// Ask delegate whether we should create nodes with this IMBParserMessenger...
 	
-	// Ask delegate whether we should reload a node with this IMBParserMessenger...
-			
 	if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
 	{
-		if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
+		if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:inParserMessenger])
 		{
 			return;
 		}
 	}
 	
-	// Start reloading this node...
-			
-	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willCreateNodeWithParserMessenger:)])
-	{
-		[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
-	}
-			
-	inOldNode.loading = YES;
-	inOldNode.badgeTypeNormal = kIMBBadgeTypeLoading;
-
-	SBPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNodeTree:error:),inOldNode,
+	// Create top-level nodes...
 	
-		^(IMBNode* inNewNode,NSError* inError)
+	if (RESPONDS(_delegate,@selector(libraryController:willCreateNodeWithParserMessenger:)))
+	{
+		[_delegate libraryController:self willCreateNodeWithParserMessenger:inParserMessenger];
+	}
+	
+	SBPerformSelectorAsync(inParserMessenger.connection,inParserMessenger,@selector(unpopulatedTopLevelNodes:),nil,
+	
+		^(NSArray* inNodes,NSError* inError)
 		{
 			// Display any errors that might have occurred...
-					
+			
 			if (inError)
 			{
 				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
 				[NSApp presentError:inError];
 			}
 			
-			// Replace the old with the new node...
-					
-			else if (inNewNode)
+			// Insert the new top-level nodes into our data model...
+			
+			else if (inNodes)
 			{
-				[self _setParserMessenger:messenger nodeTree:inNewNode];
-				[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
-
-				if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+				for (IMBNode* node in inNodes)
 				{
-					[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
+					node.parserMessenger = inParserMessenger;
+					[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+
+					if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+					{
+						[_delegate libraryController:self didCreateNode:node withParserMessenger:inParserMessenger];
+					}
 				}
 			}
 		});		
@@ -437,6 +431,70 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			}
 		});		
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Reload the specified node. This is done by a XPC service on our behalf. Once the service is done, it 
+// will send back a reply with the new node as a result and call the completion block...
+
+- (void) reloadNodeTree:(IMBNode*)inOldNode
+{
+	if ([inOldNode isGroup]) return;
+
+	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
+	IMBParserMessenger* messenger = inOldNode.parserMessenger;
+	
+	// Ask delegate whether we should reload a node with this IMBParserMessenger...
+			
+	if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
+	{
+		if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
+		{
+			return;
+		}
+	}
+	
+	// Start reloading this node...
+			
+	if (_delegate != nil && [_delegate respondsToSelector:@selector(libraryController:willCreateNodeWithParserMessenger:)])
+	{
+		[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
+	}
+			
+	inOldNode.loading = YES;
+	inOldNode.badgeTypeNormal = kIMBBadgeTypeLoading;
+
+	SBPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNodeTree:error:),inOldNode,
+	
+		^(IMBNode* inNewNode,NSError* inError)
+		{
+			// Display any errors that might have occurred...
+					
+			if (inError)
+			{
+				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+				[NSApp presentError:inError];
+			}
+			
+			// Replace the old with the new node...
+					
+			else if (inNewNode)
+			{
+				[self _setParserMessenger:messenger nodeTree:inNewNode];
+				[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+
+				if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+				{
+					[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
+				}
+			}
+		});		
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Recursively set the parserMessenger on all nodes and objects in this subtree. Without the pointer to
@@ -562,7 +620,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (inOldNode != nil && inNewNode != nil && ![inOldNode.identifier isEqual:inNewNode.identifier])
 	{
 		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must have same identifiers" userInfo:nil] raise];
+		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: oldNode and newNode must have same identifiers" userInfo:nil] raise];
 	}
 	
 	// Tell user interface that we are going to modify the data model...
@@ -575,9 +633,26 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	@try      
     {
-		// Update file watching...
+		// Update file system observing...
 		
-		// TODO
+		NSString* oldWatchedPath = inOldNode.watchedPath;
+		NSString* newWatchedPath = inNewNode.watchedPath;
+		
+		if (inOldNode != nil && oldWatchedPath != nil)
+		{
+			if (inOldNode.watcherType == kIMBWatcherTypeKQueue)
+				[_watcherUKKQueue removePath:oldWatchedPath];
+			else if (inOldNode.watcherType == kIMBWatcherTypeFSEvent)
+				[_watcherFSEvents removePath:oldWatchedPath];
+		}
+		
+		if (inNewNode != nil && newWatchedPath != nil)
+		{
+			if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
+				[_watcherUKKQueue addPath:newWatchedPath];
+			else if (inNewNode.watcherType == kIMBWatcherTypeFSEvent)
+				[_watcherFSEvents addPath:newWatchedPath];
+		}
 		
 		// Get the parent node. If the parent node for a top level node doesn't exist yet, 
 		// then create an appropriate group node. Once we have the parent node, get its
@@ -654,13 +729,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
 		
 		// JUST TEMP:
-//		[self logNodes];
 
-		if (inNewNode)
-		{
-			NSString* description = [inNewNode description];
-			NSLog(@"-------------------------------------------------------------------------------\n\n%@\n\n",description);
-		}	
+//		if (inNewNode)
+//		{
+//			NSString* description = [inNewNode description];
+//			NSLog(@"-------------------------------------------------------------------------------\n\n%@\n\n",description);
+//		}	
 	}
 }
 
@@ -1117,120 +1191,132 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 #pragma mark 
-#pragma mark File Watching
+#pragma mark User Added Nodes
+
+
+- (IMBParserMessenger*) addUserAddedNodeForFolder:(NSURL*)inFolderURL
+{
+	IMBParserMessenger* parserMessenger = nil;
+
+	if (inFolderURL)
+	{
+		// Create an IMBFolderParser for our media type...
+		
+		NSString* mediaType = self.mediaType;
+		
+		if ([mediaType isEqualToString:kIMBMediaTypeImage])
+		{
+			parserMessenger = [[[IMBImageFolderParserMessenger alloc] init] autorelease];
+		}
+		else if ([mediaType isEqualToString:kIMBMediaTypeAudio])
+		{
+			parserMessenger = [[[IMBAudioFolderParserMessenger alloc] init] autorelease];
+		}
+		else if ([mediaType isEqualToString:kIMBMediaTypeMovie])
+		{
+			parserMessenger = [[[IMBMovieFolderParserMessenger alloc] init] autorelease];
+		}
+
+		parserMessenger.mediaSource = inFolderURL;
+		parserMessenger.isUserAdded = YES;
+		
+		// Register it with the IMBParserController and reload...
+		
+		if (parserMessenger)
+		{
+			[[IMBParserController sharedParserController] addUserAddedParserMessenger:parserMessenger];
+			[self createTopLevelNodeWithParserMessenger:parserMessenger];
+		}
+	}
+	
+	return parserMessenger;
+}
+
+
+// If we were given a root node with a custom parser, then this node is eligible for removal. Remove the parser
+// from the registered list and reload everything. After that the node will be gone...
+
+- (BOOL) removeUserAddedNode:(IMBNode*)inNode
+{
+	if (inNode.isTopLevelNode && inNode.isUserAdded && !inNode.isLoading)
+	{
+		[[IMBParserController sharedParserController] removeUserAddedParserMessenger:inNode.parserMessenger];
+		[self _replaceNode:inNode withNode:nil parentNodeIdentifier:inNode.parentNode.identifier];
+		return YES;
+	}
+		
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Observe File System Changes
 
 
 // A file watcher has fired for one of the paths we have registered. Since file watchers (especially UKKQueue can 
 // fire multiple times for a single change) we need to coalesce the calls. Please note that the parameter inPath  
 // is a different NSString instance every single time, so we cannot pass it as a param to the coalesced message 
 // (canceling wouldn't work). Instead we'll put it in an array, which is iterated in _coalescedFileWatcherCallback...
-/*
+
 - (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath
 {
 //	NSLog(@"%s path=%@",__FUNCTION__,inPath);
 	
 	if ([inNotificationName isEqualToString:IMBFileWatcherWriteNotification])
 	{
-		if (inWatcher == _watcherUKKQueue)
+		dispatch_async(dispatch_get_current_queue(),^()
 		{
-			[_watcherLock lock];
-			if ([_watcherUKKQueuePaths indexOfObject:inPath] == NSNotFound) [_watcherUKKQueuePaths addObject:inPath];
-			[_watcherLock unlock];
-			
-			SEL method = @selector(_coalescedUKKQueueCallback);
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
-			[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-		}
-		else if (inWatcher == _watcherFSEvents)
-		{
-			[_watcherLock lock];
-			if ([_watcherFSEventsPaths indexOfObject:inPath] == NSNotFound) [_watcherFSEventsPaths addObject:inPath];
-			[_watcherLock unlock];
-
-			SEL method = @selector(_coalescedFSEventsCallback);
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
-			[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-		}
-	}
-}
-*/
-
-// Given an array of paths, filter out all paths that are subpaths of others in the array.
-// In other words only return the unique roots of a bunch of file system paths...
-/*
-+ (NSArray*) _rootPathsForPaths:(NSArray*)inAllPaths
-{
-	NSMutableArray* rootPaths = [NSMutableArray array];
-	
-	for (NSString* newPath in inAllPaths)
-	{
-		// First eliminate any existing rootPaths that are subpaths of a new path...
-		
-		NSInteger n = [rootPaths count];
-		
-		for (NSInteger i=n-1; i>=0; i--)
-		{
-			NSString* rootPath = [rootPaths objectAtIndex:i];
-			
-			if ([rootPath hasPrefix:newPath])
+			if (inWatcher == _watcherUKKQueue)
 			{
-				[rootPaths removeObjectAtIndex:i];
+				if ([_watcherUKKQueuePaths indexOfObject:inPath] == NSNotFound)
+				{
+					[_watcherUKKQueuePaths addObject:inPath];
+				}
+				
+				SEL method = @selector(_coalescedUKKQueueCallback);
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
+				[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 			}
-		}
-		
-		// Add a new path if it is not a subpath (or equal) of another existing path...
-		
-		BOOL shouldAdd = YES;
-
-		for (NSString* rootPath in rootPaths)
-		{
-			if ([newPath hasPrefix:rootPath])
+			else if (inWatcher == _watcherFSEvents)
 			{
-				shouldAdd = NO;
-				break;
+				if ([_watcherFSEventsPaths indexOfObject:inPath] == NSNotFound)
+				{
+					[_watcherFSEventsPaths addObject:inPath];
+				}
+				
+				SEL method = @selector(_coalescedFSEventsCallback);
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
+				[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 			}
-		}
-		
-		if (shouldAdd) [rootPaths addObject:newPath];
-	}
-	
-	return (NSArray*) rootPaths;
+		});
+	}	
 }
-*/
+
 
 // Pass the message on to the main thread...
-/*
+
 - (void) _coalescedUKKQueueCallback
 {
-	BOOL isMainThread = [NSThread isMainThread];
-	
-	[_watcherLock lock];
-	
 	for (NSString* path in _watcherUKKQueuePaths)
 	{
-		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
-		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
+		[self _reloadNodesWithWatchedPath:path];
 	}
 	
 	[_watcherUKKQueuePaths removeAllObjects];
-	[_watcherLock unlock];
 }	
 
 
 - (void) _coalescedFSEventsCallback
 {
-	BOOL isMainThread = [NSThread isMainThread];
-	
-	[_watcherLock lock];
-	
 	for (NSString* path in _watcherFSEventsPaths)
 	{
-		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
-		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
+		[self _reloadNodesWithWatchedPath:path];
 	}
 	
 	[_watcherFSEventsPaths removeAllObjects];
-	[_watcherLock unlock];
 }	
 
 
@@ -1238,7 +1324,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath
 {
-	[self _reloadNodesWithWatchedPath:inPath nodes:self.rootNodes];
+	[self _reloadNodesWithWatchedPath:inPath nodes:self.subnodes];
 }	
 
 
@@ -1252,33 +1338,33 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		if ([nodePath isEqualToString:watchedPath])
 		{
-			if ([node.parser respondsToSelector:@selector(watchedPathDidChange:)])
-			{
-				[node.parser watchedPathDidChange:watchedPath];
-			}
+//			if ([node.parser respondsToSelector:@selector(watchedPathDidChange:)])
+//			{
+//				[node.parser watchedPathDidChange:watchedPath];
+//			}
 				
-			[self reloadNode:node];
+			[self reloadNodeTree:node];
 		}
 		else
 		{
-			[self _reloadNodesWithWatchedPath:inPath nodes:node.subNodes];
+			[self _reloadNodesWithWatchedPath:inPath nodes:node.subnodes];
 		}
 	}
 }
-*/
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // When unmounting a volume, we need to stop the file watcher, or unmounting will fail. In this case we have to walk
-// throughte node tree and check which nodes are affected. These nodes are removed from the tree. This will also
+// through the node tree and check which nodes are affected. These nodes are removed from the tree. This will also
 // take care of removing the offending file watcher...
 
-/*
+
 - (void) _willUnmountVolume:(NSNotification*)inNotification 
 {
 	NSString* volume = [[inNotification userInfo] objectForKey:@"NSDevicePath"];
-	[self _unmountNodes: self.rootNodes onVolume:volume];
+	[self _unmountNodes: self.subnodes onVolume:volume];
 }
 
 
@@ -1286,17 +1372,16 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	for (IMBNode* node in inNodes)
 	{
-		NSString* path = node.watchedPath;
 		IMBWatcherType type =  node.watcherType;
+		NSString* path = node.watchedPath;
 		
-		if ((type == kIMBWatcherTypeKQueue || type == kIMBWatcherTypeFSEvent) && [path hasPrefix:inVolume])
+		if (type != kIMBWatcherTypeNone && [path hasPrefix:inVolume])
 		{
-			NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:node,@"oldNode",nil];
-			[self _replaceNode:info];
+			[self _replaceNode:node withNode:nil parentNodeIdentifier:node.parentNode.identifier];
 		}
 		else
 		{
-			[self _unmountNodes:node.subNodes onVolume:inVolume];
+			[self _unmountNodes:node.subnodes onVolume:inVolume];
 		}
 	}
 }
@@ -1311,66 +1396,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	[self reload];
 }
 
-*/
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Custom Nodes
-
-/*
-- (IMBParser*) addCustomRootNodeForFolder:(NSString*)inPath
-{
-	IMBParser* parser = nil;
-
-	if (inPath)
-	{
-		// Create an IMBFolderParser for our media type...
-		
-		NSString* mediaType = self.mediaType;
-		
-		if ([mediaType isEqualToString:kIMBMediaTypeImage])
-		{
-			parser = [[[IMBImageFolderParser alloc] initWithMediaType:mediaType] autorelease];
-		}
-		else if ([mediaType isEqualToString:kIMBMediaTypeAudio])
-		{
-			parser = [[[IMBAudioFolderParser alloc] initWithMediaType:mediaType] autorelease];
-		}
-		else if ([mediaType isEqualToString:kIMBMediaTypeMovie])
-		{
-			parser = [[[IMBMovieFolderParser alloc] initWithMediaType:mediaType] autorelease];
-		}
-
-		parser.mediaSource = inPath;
-		
-		// Register it with the IMBParserController...
-		
-		if (parser)
-		{
-			[[IMBParserController sharedParserController] addCustomParser:parser forMediaType:mediaType];
-		}
-	}
-	
-	return parser;
-}
-
-
-// If we were given a root node with a custom parser, then this node is eligible for removal. Remove the parser
-// from the registered list and reload everything. After that the node will be gone...
-
-- (BOOL) removeCustomRootNode:(IMBNode*)inNode
-{
-	if (inNode.isTopLevelNode && inNode.parser.isCustom && !inNode.isLoading)
-	{
-		[[IMBParserController sharedParserController] removeCustomParser:inNode.parser];
-		[self reload];
-		return YES;
-	}
-		
-	return NO;
-}
-*/
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -245,7 +245,7 @@
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return nil;
+	return [self bookmarkForLocalFileObject:inObject error:outError];
 }
 
 

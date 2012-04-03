@@ -44,17 +44,40 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark HEADERS
 
-@interface IMBNodeTreeController : NSTreeController
+#import "IMBParserMessenger.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CLASSES
+
+@class IMBTimecodeTransformer;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@interface IMBGarageBandParserMessenger : IMBParserMessenger
+{
+	IMBTimecodeTransformer* _timecodeTransformer;
+}
+
+@property (retain) IMBTimecodeTransformer* timecodeTransformer;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
+

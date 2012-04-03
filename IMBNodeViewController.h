@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -81,7 +84,6 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 @class IMBLibraryController;
 @class NSObjectViewController;
 @class IMBOutlineView;
-//@class IMBParser;
 @class IMBNode;
 
 
@@ -104,7 +106,6 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 	NSMutableArray* _expandedNodeIdentifiers;
 	BOOL _isRestoringState;
     NSPoint _nodeOutlineViewSavedVisibleRectOrigin;
-//	IMBParser* _selectedParser;
 	
 	NSViewController* _standardHeaderViewController;
 	NSViewController* _standardObjectViewController;
@@ -112,13 +113,6 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 	NSViewController* _headerViewController;
 	NSViewController* _objectViewController;
 	NSViewController* _footerViewController;
-	
-//	NSView* _standardObjectView;
-//	NSView* _customObjectView;
-//	
-//	NSMutableDictionary* _customHeaderViewControllers;
-//	NSMutableDictionary* _customObjectViewControllers;
-//	NSMutableDictionary* _customFooterViewControllers;
 }
 
 + (void) registerNodeViewControllerClass:(Class)inNodeViewControllerClass forMediaType:(NSString*)inMediaType;
@@ -138,13 +132,10 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 @property (readonly) NSView* headerContainerView;
 @property (readonly) NSView* objectContainerView;
 @property (readonly) NSView* footerContainerView;
-//@property (retain) NSView* standardObjectView;
-//@property (retain) NSView* customObjectView;
 
 @property (retain) NSString* selectedNodeIdentifier;
 @property (retain) NSMutableArray* expandedNodeIdentifiers;
 @property (readonly) IMBNode* selectedNode;
-//@property (retain) IMBParser* selectedParser;
 
 - (void) selectNode:(IMBNode*)inNode;
 - (void) expandSelectedNode;

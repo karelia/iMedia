@@ -410,7 +410,7 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 			n = kevent( queueFD, NULL, 0, &ev, 1, &timeout );
 			if( n > 0 )
 			{
-				NSLog( @"KEVENT returned %ld", n );
+				NSLog( @"KEVENT returned %ld", (long)n );
 				if( ev.filter == EVFILT_VNODE )
 				{
 					NSLog( @"KEVENT filter is EVFILT_VNODE" );

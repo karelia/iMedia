@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -54,7 +57,6 @@
 
 #import "IMBImageObjectViewController.h"
 #import "IMBObjectArrayController.h"
-//#import "IMBPanelController.h"
 #import "IMBCommon.h"
 #import "IMBConfig.h"
 #import "IMBObjectsPromise.h"

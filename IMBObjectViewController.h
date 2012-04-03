@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -53,7 +56,7 @@
 #pragma mark ABSTRACT
 
 // This subclass of NSViewController is responsible for the lower half of a browser window, i.e. the object views.
-// It loads the views and handles things like view options and their presistence. Please note that this controller   
+// It loads the views and handles things like view options and their persistence. Please note that this controller   
 // is the delegate of all views, so do not modify those delegates. If you do need delegate messages for various  
 // events, then use the delegate methods of IMBLibraryController.
 
@@ -63,7 +66,7 @@
 // backend controller, while IMBObjectViewController is a frontend controller.
 
 // ATTENTION: This is an abstract base class. Do not use an instance of this class, but use a specific subclass
-// like IMBPhotosViewController or IMBMusicViewController instead...
+// like IMBImageObjectViewController or IMBAudioObjectViewController instead...
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,8 +102,6 @@ typedef enum
 } 
 IMBObjectFilter;
 
-extern NSString* kIMBObjectImageRepresentationProperty;
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -109,6 +110,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 @class IMBNode;
 @class IMBObject;
+@class IMBNodeObject;
 @class IMBLibraryController;
 @class IMBNodeViewController;
 @class IMBObjectArrayController;
@@ -123,55 +125,68 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 #pragma mark 
 
 
-@interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate,IMBObjectArrayControllerDelegate,NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
+@interface IMBObjectViewController : NSViewController <IMBObjectArrayControllerDelegate,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
 {
+	// Backend...
+	
 	IMBLibraryController* _libraryController;
 	IMBNode* _currentNode;
-		
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
+	IMBObjectFilter _objectFilter;
+	
+	// User Interface...
+	
 	IBOutlet NSTabView* ibTabView;
 	IBOutlet IKImageBrowserView* ibIconView;
-	IBOutlet NSSegmentedControl *ibSegments;
  	IBOutlet NSTableView* ibListView;
 	IBOutlet NSTableView* ibComboView;
-	IMBObjectFilter ibObjectFilter;
+	IBOutlet NSSegmentedControl* ibSegments;
+	
 	NSUInteger _viewType;
 	double _iconSize;
-	
 	NSString* _objectCountFormatSingular;
 	NSString* _objectCountFormatPlural;
 	NSMutableSet* _observedVisibleItems;
 	
-	BOOL _isDragging;
-	NSURL* _dropDestinationURL;
-	NSIndexSet* _draggedIndexes;	// save the index set of what is dragged (from a table view) for NSFilesPromisePboardType
-	NSInteger _clickedObjectIndex;	// For table views, to know which one was actually clicked upon for dragging
+	// Event Handling...
+	
 	IMBObject* _clickedObject;
-	IMBProgressWindowController* _progressWindowController;
+//	IMBProgressWindowController* _progressWindowController;
 }
 
-+ (NSBundle*) bundle;
-+ (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
+// Subclasses can register themselves here from threir +load method at this central registry. We also have a 
+// central factory method to create an IMBObjectViewController by media type...
+
 + (void) registerObjectViewControllerClass:(Class)inObjectViewControllerClass forMediaType:(NSString*)inMediaType;
++ (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
 
+// Customize Subclasses. Overriding these methods lets you define your subclass identity...
+ 
++ (NSString*) mediaType;						// required
++ (NSString*) nibName;							// required
++ (NSString*) objectCountFormatSingular;		// required
++ (NSString*) objectCountFormatPlural;			// required
 
-// Library...
++ (Class) iconViewCellClass;					// optional
++ (CALayer*) iconViewBackgroundLayer;			// optional
+
+// Backend: An IMBObjectViewController must be connected to a IMBLibraryController. The currentNode is set from 
+// the outside, wheneven a node is selected in the NSOutlineView of a IMBNodeViewController. This in turn fills  
+// the IMBObjectArrayController with content...
 
 @property (retain) IMBLibraryController* libraryController;
-@property (readonly) NSString* mediaType;
+- (NSString*) mediaType;
+- (id<IMBObjectViewControllerDelegate>) delegate;
+
 @property (retain) IMBNode* currentNode;
 @property (readonly) IMBObjectArrayController* objectArrayController;
 
-// Saving/Restoring state...
+// Persistence...
 
 - (void) restoreState;	
 - (void) saveState;	
 
-// Objects (media files)...
-
-@property (retain) IMBProgressWindowController* progressWindowController;
-
-// Views...
+// User Interface...
 
 @property (readonly) NSTabView* tabView;
 @property (readonly) IKImageBrowserView* iconView;
@@ -182,45 +197,41 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 @property (assign) double iconSize;
 @property (readonly) BOOL canUseIconSize;
 
-@property (retain) NSURL* dropDestinationURL;
-
-@property (assign) NSInteger clickedObjectIndex;
-@property (retain) IMBObject* clickedObject;
-@property (retain) NSIndexSet *draggedIndexes;
-
-- (void) unbindViews;	
-
-// User Interface...
- 
-+ (Class) iconViewCellClass;
-+ (CALayer*) iconViewBackgroundLayer;
-
-+ (NSString*) objectCountFormatSingular;
-+ (NSString*) objectCountFormatPlural;
-
+@property (readonly) NSString* objectCountString;
 @property (retain) NSString* objectCountFormatSingular;
 @property (retain) NSString* objectCountFormatPlural;
-@property (readonly) NSString* objectCountString;
 
-- (void) willShowView;
+- (void) willShowView;	// Called when an object view is shown
 - (void) didShowView;
 
-- (void) willHideView;
+- (void) willHideView;	// Called when an object view is hidden
 - (void) didHideView;
 
-// Context menu support...
+- (void) unbindViews;	// Can be used by host application to tear down bindings before a window is closed (useful to break retain cycles!)
+
+// Event Handling
+
+@property (retain) IMBObject* clickedObject;
 
 - (NSMenu*) menuForObject:(IMBObject*)inObject;
+- (NSIndexSet*) filteredDraggingIndexes:(NSIndexSet*)inIndexes;
+- (NSUInteger) writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard;
 
-// Helpers...
+//@property (retain) IMBProgressWindowController* progressWindowController;
 
-- (id <IMBObjectViewControllerDelegate>) delegate;
-- (void) expandNodeObject:(IMBObject*)inObject;
+// Open Media Files...
+
+- (void) expandNodeObject:(IMBNodeObject*)inNodeObject;
 - (IBAction) openSelectedObjects:(id)inSender;
 - (void) openObjects:(NSArray*)inObjects;
+
+// Quicklook...
+
 - (IBAction) quicklook:(id)inSender;
 
-//- (IBAction) tableViewWasDoubleClicked:(id)inSender;
+
+
+
 
 @end
 
@@ -234,11 +245,15 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 @optional
 
+// The delegate may provide a badge to decorate the thumbnail of inObject...
+
+- (CGImageRef) objectViewController:(IMBObjectViewController*)inController badgeForObject:(IMBObject*)inObject;
+
 // If the delegate implements this method, then it can request a custom cell for the IKImageBrowserView...
 
 - (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController;
 
-// If the delegate implements this method, then it can its own backround layer for the IKImageBrowserView...
+// If the delegate implements this method, then it can create its own backround layer for the IKImageBrowserView...
 
 - (CALayer*) imageBrowserBackgroundLayerForController:(IMBObjectViewController*)inController;
 
@@ -249,14 +264,10 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 // With this method the delegate may add setup instructions for selected (sub)views of the controller.
 // The delegate is advised to be conservative with what to instruct as it may violate framework integrity.
 // The following views a currently provided for delegate setup:
-//
+
 extern NSString* const IMBObjectViewControllerSegmentedControlKey;		/* Segmented control for object view selection */
 
 - (void) objectViewController:(IMBObjectViewController*)inController didLoadViews:(NSDictionary*)inViews;
-
-// The delegate may provide a badge image to decorate the image of inObject
-
-- (CGImageRef) objectViewController:(IMBObjectViewController*) inController badgeForObject:(IMBObject*) inObject;
 
 @end
 

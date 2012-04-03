@@ -56,8 +56,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D0E96CEE1518C9BF004F3EE7"
-               BuildableName = "com.karelia.imedia.folder.xpc"
-               BlueprintName = "com.karelia.imedia.folder"
+               BuildableName = "com.karelia.imedia.Folder.xpc"
+               BlueprintName = "com.karelia.imedia.Folder"
                ReferencedContainer = "container:iMedia.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -83,9 +83,121 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D05D399D152ACD1300E30C43"
+               BuildableName = "com.karelia.imedia.Aperture.xpc"
+               BlueprintName = "com.karelia.imedia.Aperture"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D05D39AE152ACD2400E30C43"
+               BuildableName = "com.karelia.imedia.Lightroom.xpc"
+               BlueprintName = "com.karelia.imedia.Lightroom"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D05D39BF152ACD3300E30C43"
+               BuildableName = "com.karelia.imedia.Flickr.xpc"
+               BlueprintName = "com.karelia.imedia.Flickr"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "D0F2DDBC152485130059DF8D"
                BuildableName = "com.karelia.imedia.iTunes.xpc"
                BlueprintName = "com.karelia.imedia.iTunes"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D054AFEE152984FA00EBFA1C"
+               BuildableName = "com.karelia.imedia.GarageBand.xpc"
+               BlueprintName = "com.karelia.imedia.GarageBand"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D05D39D0152ACD5E00E30C43"
+               BuildableName = "com.karelia.imedia.Safari.xpc"
+               BlueprintName = "com.karelia.imedia.Safari"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D05D39E1152ACD6800E30C43"
+               BuildableName = "com.karelia.imedia.Firefox.xpc"
+               BlueprintName = "com.karelia.imedia.Firefox"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D05D3A05152AD0D000E30C43"
+               BuildableName = "com.karelia.imedia.OmniWeb.xpc"
+               BlueprintName = "com.karelia.imedia.OmniWeb"
+               ReferencedContainer = "container:iMedia.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D05D39F2152ACD8800E30C43"
+               BuildableName = "com.karelia.imedia.FSEvents.xpc"
+               BlueprintName = "com.karelia.imedia.FSEvents"
                ReferencedContainer = "container:iMedia.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

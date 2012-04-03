@@ -22,13 +22,13 @@
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
 	following copyright notice: Copyright (c) 2005-2012 by Karelia Software et al.
- 
+
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
 	terms stated here, including this list of conditions, the disclaimer noted
 	below, and the aforementioned copyright notice, or b) the aforementioned
 	copyright notice and a link to karelia.com/imedia.
- 
+
 	Neither the name of Karelia Software, nor Sandvox, nor the names of
 	contributors to iMedia Browser may be used to endorse or promote products
 	derived from the Software without prior and express written permission from
@@ -41,13 +41,10 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,10 +52,24 @@
 
 #pragma mark HEADERS
 
-#import "IMBLinkObjectViewController.h"
-#import "IMBObjectArrayController.h"
+#import "IMBGarageBandParserMessenger.h"
+#import "IMBGarageBandParser.h"
+#import "IMBParserController.h"
+#import "IMBTimecodeTransformer.h"
+#import "NSWorkspace+iMedia.h"
+#import "NSFileManager+iMedia.h"
+#import "NSString+iMedia.h"
 #import "IMBConfig.h"
-#import "IMBObject.h"
+#import "SBUtilities.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark GLOBALS
+
+static NSMutableArray* sParsers = nil;
+static dispatch_once_t sOnceToken = 0;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,7 +77,9 @@
 
 #pragma mark 
 
-@implementation IMBLinkObjectViewController
+@implementation IMBGarageBandParserMessenger
+
+@synthesize timecodeTransformer = _timecodeTransformer;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,35 +87,50 @@
 
 + (void) load
 {
-	[IMBObjectViewController registerObjectViewControllerClass:[self class] forMediaType:kIMBMediaTypeLink];
-}
-
-
-+ (void) initialize
-{
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	NSMutableDictionary* classDict = [NSMutableDictionary dictionary];
-	[classDict setObject:[NSNumber numberWithUnsignedInteger:kIMBObjectViewTypeList] forKey:@"viewType"];
-	[classDict setObject:[NSNumber numberWithDouble:0.5] forKey:@"iconSize"];
-	[IMBConfig registerDefaultPrefs:classDict forClass:self.class];
+	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
 	[pool drain];
 }
 
 
-- (void) awakeFromNib
++ (NSString*) mediaType
 {
-	[super awakeFromNib];
+	return kIMBMediaTypeAudio;
+}
+
+
++ (NSString*) parserClassName
+{
+	return @"IMBGarageBandParser";
+}
 	
-	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
-		@"name",
-		@"metadata.artist",
-		@"metadata.album",
-		nil];
+									
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.GarageBand";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		self.mediaSource = nil;	// Will be discovered in XPC service
+		self.mediaType = [[self class] mediaType];
+		self.isUserAdded = NO;
+		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
+	}
+	
+	return self;
 }
 
 
 - (void) dealloc
 {
+	IMBRelease(_timecodeTransformer);
 	[super dealloc];
 }
 
@@ -110,103 +138,102 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-#pragma mark Customize Subclass
+// Check if GarageBand is installed...
 
-
-+ (NSString*) mediaType
++ (NSString*) garageBandPath
 {
-	return kIMBMediaTypeLink;
-}
-
-+ (NSString*) nibName
-{
-	return @"IMBLinkObjectViewController";
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.GarageBand"];
 }
 
 
-+ (NSString*) objectCountFormatSingular
++ (BOOL) isInstalled
 {
-	return NSLocalizedStringWithDefaultValue(
-		@"IMBLinkViewController.countFormatSingular",
-		nil,IMBBundle(),
-		@"%d URL",
-		@"Format string for object count in singluar");
-}
-
-+ (NSString*) objectCountFormatPlural
-{
-	return NSLocalizedStringWithDefaultValue(
-		@"IMBLinkViewController.countFormatPlural",
-		nil,IMBBundle(),
-		@"%d URLs",
-		@"Format string for object count in plural");
+	return [self garageBandPath] != nil;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// The Links panel doesn't have an icon or combo view
+// This method is called on the XPC service side. Discover the path to the AlbumData.xml file and create  
+// an IMBParser instance preconfigured with that path...
 
-- (void) setViewType:(NSUInteger)inViewType
+- (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-	if (inViewType < 1) inViewType = 1;
-	if (inViewType > 1) inViewType = 1;
-	[super setViewType:inViewType];
-}
+    dispatch_once(&sOnceToken,
+    ^{
+		if ([[self class] isInstalled])
+		{
+			sParsers = [[NSMutableArray alloc] initWithCapacity:1];
 
+			IMBGarageBandParser* parser = (IMBGarageBandParser*)[self newParser];
+			parser.identifier = [[self class] identifier];
+			parser.mediaType = self.mediaType;
+			parser.mediaSource = nil;
+			parser.appPath = [[self class] garageBandPath];
+			[sParsers addObject:parser];
+			[parser release];
+		}
+	});
 
-- (NSUInteger) viewType
-{
-	NSUInteger viewType = [super viewType];
-	if (viewType < 1) viewType = 1;
-	if (viewType > 1) viewType = 1;
-	return viewType;
+	return (NSArray*)sParsers;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (IBAction) quicklook:(id)inSender
+// Convert metadata into human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
-	// Don't try to do quicklook for links
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Dragging
-
-
-// The link view controller vends objects that have urls to web resources, not local files. 
-// So we can put the web urls onto the pastboard directly. No need to do anything fancy...
-
-- (NSUInteger) writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
-{
-	NSIndexSet* indexes = [self filteredDraggingIndexes:inIndexes]; 
-	NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes];
-	NSMutableArray* pasteboardItems = [NSMutableArray arrayWithCapacity:objects.count];
+	NSMutableString* description = [NSMutableString string];
+	NSNumber* duration = [inMetadata objectForKey:@"duration"];
+	NSString* artist = [inMetadata objectForKey:@"artist"];
+	NSString* album = [inMetadata objectForKey:@"album"];
 	
-	for (IMBObject* object in objects)
+	if (artist)
 	{
-		NSURL* url = object.URL;
-		NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
-		if (url) [item setString:[url absoluteString] forType:(NSString*)kUTTypeURL];
-		[pasteboardItems addObject:item];
-		[item release];
+		NSString* artistLabel = NSLocalizedStringWithDefaultValue(
+			@"Artist",
+			nil,IMBBundle(),
+			@"Artist",
+			@"Artist label in metadataDescription");
+
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",artistLabel,artist];
 	}
 	
-	[inPasteboard clearContents];
-	[inPasteboard writeObjects:pasteboardItems];
-	return pasteboardItems.count;
+	if (album)
+	{
+		NSString* albumLabel = NSLocalizedStringWithDefaultValue(
+			@"Album",
+			nil,IMBBundle(),
+			@"Album",
+			@"Album label in metadataDescription");
+
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",albumLabel,album];
+	}
+	
+	if (duration)
+	{
+		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
+
+		NSString* durationString = [_timecodeTransformer transformedValue:duration];
+		if (description.length > 0) [description imb_appendNewline];
+		[description appendFormat:@"%@: %@",durationLabel,durationString];
+	}
+	
+	return description;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-@end
 
+@end

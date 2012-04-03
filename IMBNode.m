@@ -111,8 +111,10 @@
 @synthesize parserIdentifier = _parserIdentifier;
 @synthesize parserMessenger = _parserMessenger;
 
-//@synthesize watcherType = _watcherType;
-//@synthesize watchedPath = _watchedPath;
+// Observing file system changes...
+
+@synthesize watcherType = _watcherType;
+@synthesize watchedPath = _watchedPath;
 
 // Badge icons...
 
@@ -148,7 +150,7 @@
 		self.wantsRecursiveObjects = NO;
 		self.shouldDisplayObjectView = YES;
 		
-//		self.watcherType = kIMBWatcherTypeNone;
+		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
 	}
@@ -171,7 +173,7 @@
 	IMBRelease(_attributes);
 	IMBRelease(_parserMessenger);
 	IMBRelease(_parserIdentifier);
-//	IMBRelease(_watchedPath);
+	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
 	
 	[super dealloc];
@@ -206,8 +208,8 @@
 	copy.parserMessenger = self.parserMessenger;
 	copy.parserIdentifier = self.parserIdentifier;
 	
-//	copy.watcherType = self.watcherType;
-//	copy.watchedPath = self.watchedPath;
+	copy.watcherType = self.watcherType;
+	copy.watchedPath = self.watchedPath;
 
 	copy.badgeTypeNormal = self.badgeTypeNormal;
 	copy.badgeTypeMouseover = self.badgeTypeMouseover;
@@ -276,6 +278,9 @@
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
 
+		self.watcherType = [inCoder decodeIntegerForKey:@"watcherType"];
+		self.watchedPath = [inCoder decodeObjectForKey:@"watchedPath"];
+
 		NSMutableArray* subnodes = [inCoder decodeObjectForKey:@"subnodes"];
 		if (subnodes) self.subnodes = subnodes;
 		
@@ -308,6 +313,9 @@
 	[inCoder encodeBool:self.isUserAdded forKey:@"isUserAdded"];
 	[inCoder encodeBool:self.wantsRecursiveObjects forKey:@"wantsRecursiveObjects"];
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
+
+	[inCoder encodeInteger:self.watcherType forKey:@"watcherType"];
+	[inCoder encodeObject:self.watchedPath forKey:@"watchedPath"];
 	
 	if (self.subnodes)
 	{
