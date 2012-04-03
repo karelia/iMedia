@@ -403,9 +403,7 @@ static NSArray* sSupportedUTIs = nil;
 // The supplied node is a private copy which may be modified here in the background operation...
 
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
-{
-	NSError* error = nil;
-	
+{	
 	// Create subnodes for the root node as needed...
 	
 	if ([inNode isTopLevelNode])
@@ -445,8 +443,7 @@ static NSArray* sSupportedUTIs = nil;
         inNode.objects = [NSArray array];
     }
 
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 
