@@ -61,11 +61,8 @@
 #import "IMBAudioFolderParserMessenger.h"
 #import "IMBMovieFolderParserMessenger.h"
 #import "IMBConfig.h"
-//#import "IMBKQueue.h"
-//#import "IMBFSEventsWatcher.h"
-//#import "IMBImageFolderParser.h"
-//#import "IMBAudioFolderParser.h"
-//#import "IMBMovieFolderParser.h"
+#import "IMBKQueue.h"
+#import "IMBFSEventsWatcher.h"
 #import "NSWorkspace+iMedia.h"
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
@@ -117,6 +114,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _setParserMessenger:(IMBParserMessenger*)inMessenger nodeTree:(IMBNode*)inNode;
 - (IMBNode*) _groupNodeForTopLevelNode:(IMBNode*)inNewNode;
 - (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
+
+//@property (retain) IMBKQueue* watcherUKKQueue;
+//@property (retain) IMBFSEventsWatcher* watcherFSEvents;
 
 //- (void) _coalescedUKKQueueCallback;
 //- (void) _coalescedFSEventsCallback;
@@ -188,15 +188,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		// Initialize file system watching...
 		
-//		self.watcherUKKQueue = [[[IMBKQueue alloc] init] autorelease];
-//		self.watcherUKKQueue.delegate = self;
-//		
-//		self.watcherFSEvents = [[[IMBFSEventsWatcher alloc] init] autorelease];
-//		self.watcherFSEvents.delegate = self;
+		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
+		_watcherUKKQueue = [[IMBKQueue alloc] init];
+		_watcherUKKQueue.delegate = self;
+		
+		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
+		_watcherFSEvents = [[IMBFSEventsWatcher alloc] init];
+		_watcherFSEvents.delegate = self;
 		
 //		_watcherLock = [[NSRecursiveLock alloc] init];
-//		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
-//		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
 		
 		// When volume are unmounted we would like to be notified so that we can disable file watching for 
 		// those paths...
@@ -224,11 +224,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	IMBRelease(_mediaType);
 	IMBRelease(_subnodes);
-//	IMBRelease(_watcherUKKQueue);
-//	IMBRelease(_watcherFSEvents);
+	IMBRelease(_watcherUKKQueue);
+	IMBRelease(_watcherFSEvents);
 //	IMBRelease(_watcherLock);
-//	IMBRelease(_watcherUKKQueuePaths);
-//	IMBRelease(_watcherFSEventsPaths);
+	IMBRelease(_watcherUKKQueuePaths);
+	IMBRelease(_watcherFSEventsPaths);
 
 	[super dealloc];
 }
@@ -633,9 +633,26 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	@try      
     {
-		// Update file watching...
+		// Update file system observing...
 		
-		// TODO
+		NSString* oldWatchedPath = inOldNode.watchedPath;
+		NSString* newWatchedPath = inNewNode.watchedPath;
+		
+		if (inOldNode != nil && oldWatchedPath != nil)
+		{
+			if (inOldNode.watcherType == kIMBWatcherTypeKQueue)
+				[_watcherUKKQueue removePath:oldWatchedPath];
+			else if (inOldNode.watcherType == kIMBWatcherTypeFSEvent)
+				[_watcherFSEvents removePath:oldWatchedPath];
+		}
+		
+		if (inNewNode != nil && newWatchedPath != nil)
+		{
+			if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
+				[_watcherUKKQueue addPath:newWatchedPath];
+			else if (inNewNode.watcherType == kIMBWatcherTypeFSEvent)
+				[_watcherFSEvents addPath:newWatchedPath];
+		}
 		
 		// Get the parent node. If the parent node for a top level node doesn't exist yet, 
 		// then create an appropriate group node. Once we have the parent node, get its
@@ -1174,206 +1191,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 #pragma mark 
-#pragma mark File Watching
-
-
-// A file watcher has fired for one of the paths we have registered. Since file watchers (especially UKKQueue can 
-// fire multiple times for a single change) we need to coalesce the calls. Please note that the parameter inPath  
-// is a different NSString instance every single time, so we cannot pass it as a param to the coalesced message 
-// (canceling wouldn't work). Instead we'll put it in an array, which is iterated in _coalescedFileWatcherCallback...
-/*
-- (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath
-{
-//	NSLog(@"%s path=%@",__FUNCTION__,inPath);
-	
-	if ([inNotificationName isEqualToString:IMBFileWatcherWriteNotification])
-	{
-		if (inWatcher == _watcherUKKQueue)
-		{
-			[_watcherLock lock];
-			if ([_watcherUKKQueuePaths indexOfObject:inPath] == NSNotFound) [_watcherUKKQueuePaths addObject:inPath];
-			[_watcherLock unlock];
-			
-			SEL method = @selector(_coalescedUKKQueueCallback);
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
-			[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-		}
-		else if (inWatcher == _watcherFSEvents)
-		{
-			[_watcherLock lock];
-			if ([_watcherFSEventsPaths indexOfObject:inPath] == NSNotFound) [_watcherFSEventsPaths addObject:inPath];
-			[_watcherLock unlock];
-
-			SEL method = @selector(_coalescedFSEventsCallback);
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
-			[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-		}
-	}
-}
-*/
-
-// Given an array of paths, filter out all paths that are subpaths of others in the array.
-// In other words only return the unique roots of a bunch of file system paths...
-/*
-+ (NSArray*) _rootPathsForPaths:(NSArray*)inAllPaths
-{
-	NSMutableArray* rootPaths = [NSMutableArray array];
-	
-	for (NSString* newPath in inAllPaths)
-	{
-		// First eliminate any existing rootPaths that are subpaths of a new path...
-		
-		NSInteger n = [rootPaths count];
-		
-		for (NSInteger i=n-1; i>=0; i--)
-		{
-			NSString* rootPath = [rootPaths objectAtIndex:i];
-			
-			if ([rootPath hasPrefix:newPath])
-			{
-				[rootPaths removeObjectAtIndex:i];
-			}
-		}
-		
-		// Add a new path if it is not a subpath (or equal) of another existing path...
-		
-		BOOL shouldAdd = YES;
-
-		for (NSString* rootPath in rootPaths)
-		{
-			if ([newPath hasPrefix:rootPath])
-			{
-				shouldAdd = NO;
-				break;
-			}
-		}
-		
-		if (shouldAdd) [rootPaths addObject:newPath];
-	}
-	
-	return (NSArray*) rootPaths;
-}
-*/
-
-// Pass the message on to the main thread...
-/*
-- (void) _coalescedUKKQueueCallback
-{
-	BOOL isMainThread = [NSThread isMainThread];
-	
-	[_watcherLock lock];
-	
-	for (NSString* path in _watcherUKKQueuePaths)
-	{
-		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
-		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
-	}
-	
-	[_watcherUKKQueuePaths removeAllObjects];
-	[_watcherLock unlock];
-}	
-
-
-- (void) _coalescedFSEventsCallback
-{
-	BOOL isMainThread = [NSThread isMainThread];
-	
-	[_watcherLock lock];
-	
-	for (NSString* path in _watcherFSEventsPaths)
-	{
-		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
-		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
-	}
-	
-	[_watcherFSEventsPaths removeAllObjects];
-	[_watcherLock unlock];
-}	
-
-
-// Now look for all nodes that are interested in that path and reload them...
-
-- (void) _reloadNodesWithWatchedPath:(NSString*)inPath
-{
-	[self _reloadNodesWithWatchedPath:inPath nodes:self.rootNodes];
-}	
-
-
-- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes
-{
-	NSString* watchedPath = [inPath stringByStandardizingPath];
-	
-	for (IMBNode* node in inNodes)
-	{
-		NSString* nodePath = [(NSString*)node.watchedPath stringByStandardizingPath];
-		
-		if ([nodePath isEqualToString:watchedPath])
-		{
-			if ([node.parser respondsToSelector:@selector(watchedPathDidChange:)])
-			{
-				[node.parser watchedPathDidChange:watchedPath];
-			}
-				
-			[self reloadNode:node];
-		}
-		else
-		{
-			[self _reloadNodesWithWatchedPath:inPath nodes:node.subNodes];
-		}
-	}
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// When unmounting a volume, we need to stop the file watcher, or unmounting will fail. In this case we have to walk
-// throughte node tree and check which nodes are affected. These nodes are removed from the tree. This will also
-// take care of removing the offending file watcher...
-
-/*
-- (void) _willUnmountVolume:(NSNotification*)inNotification 
-{
-	NSString* volume = [[inNotification userInfo] objectForKey:@"NSDevicePath"];
-	[self _unmountNodes: self.rootNodes onVolume:volume];
-}
-
-
-- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume 
-{
-	for (IMBNode* node in inNodes)
-	{
-		NSString* path = node.watchedPath;
-		IMBWatcherType type =  node.watcherType;
-		
-		if ((type == kIMBWatcherTypeKQueue || type == kIMBWatcherTypeFSEvent) && [path hasPrefix:inVolume])
-		{
-			NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:node,@"oldNode",nil];
-			[self _replaceNode:info];
-		}
-		else
-		{
-			[self _unmountNodes:node.subNodes onVolume:inVolume];
-		}
-	}
-}
-
-
-// When a new volume is mounted, we have to assume that it contains a folder or library that we are interested in.
-// Currently we are simply reloading everything, but in the future we could possibly be more intelligent about it 
-// and reload just those nodes that are required and keep everything else intact...
-
-- (void) _didMountVolume:(NSNotification*)inNotification 
-{
-	[self reload];
-}
-
-*/
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Custom Nodes
+#pragma mark User Added Nodes
 
 
 - (IMBParserMessenger*) addUserAddedNodeForFolder:(NSURL*)inFolderURL
@@ -1428,6 +1246,154 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 		
 	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Observe File System Changes
+
+
+// A file watcher has fired for one of the paths we have registered. Since file watchers (especially UKKQueue can 
+// fire multiple times for a single change) we need to coalesce the calls. Please note that the parameter inPath  
+// is a different NSString instance every single time, so we cannot pass it as a param to the coalesced message 
+// (canceling wouldn't work). Instead we'll put it in an array, which is iterated in _coalescedFileWatcherCallback...
+
+- (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath
+{
+//	NSLog(@"%s path=%@",__FUNCTION__,inPath);
+	
+	if ([inNotificationName isEqualToString:IMBFileWatcherWriteNotification])
+	{
+		dispatch_async(dispatch_get_current_queue(),^()
+		{
+			if (inWatcher == _watcherUKKQueue)
+			{
+				if ([_watcherUKKQueuePaths indexOfObject:inPath] == NSNotFound)
+				{
+					[_watcherUKKQueuePaths addObject:inPath];
+				}
+				
+				SEL method = @selector(_coalescedUKKQueueCallback);
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
+				[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+			}
+			else if (inWatcher == _watcherFSEvents)
+			{
+				if ([_watcherFSEventsPaths indexOfObject:inPath] == NSNotFound)
+				{
+					[_watcherFSEventsPaths addObject:inPath];
+				}
+				
+				SEL method = @selector(_coalescedFSEventsCallback);
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
+				[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+			}
+		});
+	}	
+}
+
+
+// Pass the message on to the main thread...
+
+- (void) _coalescedUKKQueueCallback
+{
+	for (NSString* path in _watcherUKKQueuePaths)
+	{
+		[self _reloadNodesWithWatchedPath:path];
+	}
+	
+	[_watcherUKKQueuePaths removeAllObjects];
+}	
+
+
+- (void) _coalescedFSEventsCallback
+{
+	for (NSString* path in _watcherFSEventsPaths)
+	{
+		[self _reloadNodesWithWatchedPath:path];
+	}
+	
+	[_watcherFSEventsPaths removeAllObjects];
+}	
+
+
+// Now look for all nodes that are interested in that path and reload them...
+
+- (void) _reloadNodesWithWatchedPath:(NSString*)inPath
+{
+	[self _reloadNodesWithWatchedPath:inPath nodes:self.subnodes];
+}	
+
+
+- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes
+{
+	NSString* watchedPath = [inPath stringByStandardizingPath];
+	
+	for (IMBNode* node in inNodes)
+	{
+		NSString* nodePath = [(NSString*)node.watchedPath stringByStandardizingPath];
+		
+		if ([nodePath isEqualToString:watchedPath])
+		{
+//			if ([node.parser respondsToSelector:@selector(watchedPathDidChange:)])
+//			{
+//				[node.parser watchedPathDidChange:watchedPath];
+//			}
+				
+			[self reloadNodeTree:node];
+		}
+		else
+		{
+			[self _reloadNodesWithWatchedPath:inPath nodes:node.subnodes];
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// When unmounting a volume, we need to stop the file watcher, or unmounting will fail. In this case we have to walk
+// through the node tree and check which nodes are affected. These nodes are removed from the tree. This will also
+// take care of removing the offending file watcher...
+
+
+- (void) _willUnmountVolume:(NSNotification*)inNotification 
+{
+	NSString* volume = [[inNotification userInfo] objectForKey:@"NSDevicePath"];
+	[self _unmountNodes: self.subnodes onVolume:volume];
+}
+
+
+- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume 
+{
+	for (IMBNode* node in inNodes)
+	{
+		IMBWatcherType type =  node.watcherType;
+		NSString* path = node.watchedPath;
+		
+		if (type != kIMBWatcherTypeNone && [path hasPrefix:inVolume])
+		{
+			[self _replaceNode:node withNode:nil parentNodeIdentifier:node.parentNode.identifier];
+		}
+		else
+		{
+			[self _unmountNodes:node.subnodes onVolume:inVolume];
+		}
+	}
+}
+
+
+// When a new volume is mounted, we have to assume that it contains a folder or library that we are interested in.
+// Currently we are simply reloading everything, but in the future we could possibly be more intelligent about it 
+// and reload just those nodes that are required and keep everything else intact...
+
+- (void) _didMountVolume:(NSNotification*)inNotification 
+{
+	[self reload];
 }
 
 

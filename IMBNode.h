@@ -103,8 +103,10 @@
 	IMBParserMessenger* _parserMessenger;
 	NSString* _parserIdentifier;
 
-//	IMBWatcherType _watcherType;
-//	NSString* _watchedPath;
+	// Observing file system changes...
+	
+	IMBWatcherType _watcherType;
+	NSString* _watchedPath;
 
 	// Badges...
 	
@@ -179,8 +181,10 @@
 @property (retain) IMBParserMessenger* parserMessenger;
 @property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
 
-//@property (assign) IMBWatcherType watcherType;
-//@property (copy) NSString* watchedPath;
+// Observing file system changes...
+
+@property (assign) IMBWatcherType watcherType;
+@property (copy) NSString* watchedPath;
 
 // Support for node badge icon/button. Set the normal and the mouseover icon with the IMBadgeType. 
 // The selector gets sent to the target when the badge is clicked.

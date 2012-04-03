@@ -138,6 +138,11 @@
 		D054AFFF1529927E00EBFA1C /* com.karelia.imedia.GarageBand.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D054AFFD152984FA00EBFA1C /* com.karelia.imedia.GarageBand.xpc */; };
 		D054B000152992A400EBFA1C /* com.karelia.imedia.GarageBand.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = D054AFED152984ED00EBFA1C /* com.karelia.imedia.GarageBand.entitlements */; };
 		D054B0011529A65100EBFA1C /* IMBGarageBandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D02D17591081CF3B00142E8A /* IMBGarageBandParser.m */; };
+		D05D398F152A280F00E30C43 /* IMBFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D2D1019E8A5005D8614 /* IMBFileWatcher.m */; };
+		D05D3990152A280F00E30C43 /* IMBKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D2A1019E89E005D8614 /* IMBKQueue.m */; };
+		D05D3991152A280F00E30C43 /* IMBFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D7B1019EAB8005D8614 /* IMBFNSubscribeFileWatcher.m */; };
+		D05D3992152A280F00E30C43 /* IMBFSEventsWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D801019EB09005D8614 /* IMBFSEventsWatcher.m */; };
+		D05D3993152A280F00E30C43 /* IMBMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D08E8D831019EB4D005D8614 /* IMBMainThreadProxy.m */; };
 		D0680C3C1518CCCE00CED506 /* com.karelia.imedia.folder.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.folder.xpc */; };
 		D08070BF10442CD700891137 /* IMBMovieObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08070C310442CE100891137 /* IMBAudioObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070C110442CE100891137 /* IMBAudioObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2205,6 +2210,11 @@
 				D04179981526D22B006C9E98 /* IMBTestTextView.m in Sources */,
 				D054AFEB152984C300EBFA1C /* IMBGarageBandParserMessenger.m in Sources */,
 				D054B0011529A65100EBFA1C /* IMBGarageBandParser.m in Sources */,
+				D05D398F152A280F00E30C43 /* IMBFileWatcher.m in Sources */,
+				D05D3990152A280F00E30C43 /* IMBKQueue.m in Sources */,
+				D05D3991152A280F00E30C43 /* IMBFNSubscribeFileWatcher.m in Sources */,
+				D05D3992152A280F00E30C43 /* IMBFSEventsWatcher.m in Sources */,
+				D05D3993152A280F00E30C43 /* IMBMainThreadProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
