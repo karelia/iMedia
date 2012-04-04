@@ -281,42 +281,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 
 #pragma mark -
-#pragma mark Custom view controller support
-/*
-- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode
-{
-	// Use custom view for events
-	
-    if ([self isEventsNode:inNode])
-	{
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-								  kIMBiPhotoNodeObjectTypeEvent, @"nodeObjectType", nil];
-		
-		NSViewController* viewController = [[[IMBiPhotoEventObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];
-		[viewController view];
-		return viewController;
-	}
-	
-    if ([self isFacesNode:inNode])
-	{
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-								  kIMBiPhotoNodeObjectTypeFace, @"nodeObjectType", nil];
-		
-		NSViewController* viewController = [[[IMBFaceObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];
-		[viewController view];
-		return viewController;
-	}
-	
-	return [super customObjectViewControllerForNode:inNode];
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark -
 #pragma mark IMBSkimmableObjectViewControllerDelegate
-/*
+
 - (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
 {
 //	return [[inNodeObject.preliminaryMetadata objectForKey:@"PhotoCount"] integerValue];
@@ -331,13 +297,13 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	// Faces
 	if ([[inUserInfo objectForKey:@"nodeObjectType"] isEqualToString:kIMBiPhotoNodeObjectTypeFace])
 	{
-		// Get this face's data describing its occurence in the inIndex'th image 
+		// Get the metadata of the nth image in which this face occurs 
 		NSDictionary* imageFaceMetadata = [[[inNodeObject preliminaryMetadata] objectForKey:@"ImageFaceMetadataList"] objectAtIndex:inIndex];
 		
-		// Get this face's index inside of this image
+		// What is the number of this face inside of this image?
 		NSNumber* faceIndex = [imageFaceMetadata objectForKey:@"face index"];
 		
-		// Finally, get the path to this face's occurence
+		// A clipped image of this face in this image is stored in the filesystem
 		NSString* imagePath = [self imagePathForFaceIndex:faceIndex inImageWithKey:imageKey];
 		
 		//NSLog(@"Skimming controller asked delegate for image path and receives: %@", imagePath);
@@ -369,7 +335,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	// Events
 	return [self imagePathForImageKey:imageKey];
 }
-*/
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

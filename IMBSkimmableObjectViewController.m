@@ -155,6 +155,12 @@
 
 // Designated initializer
 
+- (id) init
+{
+	return [self initWithNibName:[[self class] nibName] bundle:[[self class] bundle] delegate:nil userInfo:nil];
+}
+
+
 - (id) initWithDelegate:(id <IMBSkimmableObjectViewControllerDelegate>)inDelegate userInfo:(NSDictionary*)inUserInfo
 {
 	return [self initWithNibName:[[self class] nibName] bundle:[[self class] bundle] delegate:inDelegate userInfo:inUserInfo];
