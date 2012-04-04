@@ -103,6 +103,7 @@
 		D0129A2A124C97A600EBEB45 /* NSDictionary+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E4111F6FD54005EE5B4 /* NSDictionary+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D023460610CA5E2C00E14112 /* load-more-normal.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D023460410CA5E2C00E14112 /* load-more-normal.pdf */; };
 		D023460710CA5E2C00E14112 /* load-more-pressed.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D023460510CA5E2C00E14112 /* load-more-pressed.pdf */; };
+		D029C3CF152B41F000B1A02B /* IMBFSEventsService.m in Sources */ = {isa = PBXBuildFile; fileRef = D029C3CE152B41F000B1A02B /* IMBFSEventsService.m */; };
 		D02CD4CD1224F78E00C773A2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D02CD4CB1224F78E00C773A2 /* Localizable.strings */; };
 		D02D175A1081CF3B00142E8A /* IMBGarageBandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D02D17581081CF3B00142E8A /* IMBGarageBandParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
@@ -177,7 +178,6 @@
 		D05D39E8152ACD6800E30C43 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		D05D39E9152ACD6800E30C43 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
 		D05D39EA152ACD6800E30C43 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
-		D05D39F4152ACD8800E30C43 /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
 		D05D39F6152ACD8800E30C43 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
 		D05D39F7152ACD8800E30C43 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E96C3115124CE4004F3EE7 /* AppKit.framework */; };
 		D05D39F8152ACD8800E30C43 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30E7772215110D1600413AEF /* Security.framework */; };
@@ -239,6 +239,15 @@
 		D08F7B8315235EA400505395 /* IMBImageItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 274DF617114EF0B200AC8C03 /* IMBImageItem.m */; };
 		D08F7B841523605400505395 /* IMBObjectArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D099333210119F3400C527B7 /* IMBObjectArrayController.m */; };
 		D08F82B411E4A1C1006E618E /* IMBQLPreviewPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0904DA8152CA51F003FDD08 /* IMBFileSystemObserver.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904DA6152CA51F003FDD08 /* IMBFileSystemObserver.h */; };
+		D0904DA9152CA51F003FDD08 /* IMBFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = D0904DA7152CA51F003FDD08 /* IMBFileSystemObserver.m */; };
+		D0904DAB152CAA4A003FDD08 /* com.karelia.imedia.Aperture.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39AC152ACD1300E30C43 /* com.karelia.imedia.Aperture.xpc */; };
+		D0904DAC152CAA4A003FDD08 /* com.karelia.imedia.Lightroom.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39BD152ACD2400E30C43 /* com.karelia.imedia.Lightroom.xpc */; };
+		D0904DAD152CAA4A003FDD08 /* com.karelia.imedia.Flickr.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39CE152ACD3300E30C43 /* com.karelia.imedia.Flickr.xpc */; };
+		D0904DAE152CAA4A003FDD08 /* com.karelia.imedia.Safari.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39DF152ACD5E00E30C43 /* com.karelia.imedia.Safari.xpc */; };
+		D0904DAF152CAA4A003FDD08 /* com.karelia.imedia.Firefox.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39F0152ACD6800E30C43 /* com.karelia.imedia.Firefox.xpc */; };
+		D0904DB0152CAA4A003FDD08 /* com.karelia.imedia.FSEvents.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D3A01152ACD8800E30C43 /* com.karelia.imedia.FSEvents.xpc */; };
+		D0904DB1152CAA4A003FDD08 /* com.karelia.imedia.OmniWeb.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D3A13152AD0D000E30C43 /* com.karelia.imedia.OmniWeb.xpc */; };
 		D0941A75105E24DD0092B2F1 /* iTunes9-icon-01.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A55105E24DD0092B2F1 /* iTunes9-icon-01.png */; };
 		D0941A76105E24DD0092B2F1 /* iTunes9-icon-02.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A56105E24DD0092B2F1 /* iTunes9-icon-02.png */; };
 		D0941A77105E24DD0092B2F1 /* iTunes9-icon-03.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A57105E24DD0092B2F1 /* iTunes9-icon-03.png */; };
@@ -473,6 +482,13 @@
 			dstPath = Contents/XPCServices;
 			dstSubfolderSpec = 1;
 			files = (
+				D0904DAB152CAA4A003FDD08 /* com.karelia.imedia.Aperture.xpc in Copy XPCServices */,
+				D0904DAC152CAA4A003FDD08 /* com.karelia.imedia.Lightroom.xpc in Copy XPCServices */,
+				D0904DAD152CAA4A003FDD08 /* com.karelia.imedia.Flickr.xpc in Copy XPCServices */,
+				D0904DAE152CAA4A003FDD08 /* com.karelia.imedia.Safari.xpc in Copy XPCServices */,
+				D0904DAF152CAA4A003FDD08 /* com.karelia.imedia.Firefox.xpc in Copy XPCServices */,
+				D0904DB0152CAA4A003FDD08 /* com.karelia.imedia.FSEvents.xpc in Copy XPCServices */,
+				D0904DB1152CAA4A003FDD08 /* com.karelia.imedia.OmniWeb.xpc in Copy XPCServices */,
 				D054AFFF1529927E00EBFA1C /* com.karelia.imedia.GarageBand.xpc in Copy XPCServices */,
 				D0F2DDCF152486360059DF8D /* com.karelia.imedia.iTunes.xpc in Copy XPCServices */,
 				D0680C3C1518CCCE00CED506 /* com.karelia.imedia.Folder.xpc in Copy XPCServices */,
@@ -614,6 +630,7 @@
 		D01038E31071E111007C88D7 /* IMBObjectFifoCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = IMBObjectFifoCache.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		D023460410CA5E2C00E14112 /* load-more-normal.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "load-more-normal.pdf"; sourceTree = "<group>"; };
 		D023460510CA5E2C00E14112 /* load-more-pressed.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "load-more-pressed.pdf"; sourceTree = "<group>"; };
+		D029C3CE152B41F000B1A02B /* IMBFSEventsService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFSEventsService.m; sourceTree = "<group>"; };
 		D02CD4CC1224F78E00C773A2 /* en */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		D02CD5C71225138400C773A2 /* de */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
 		D02CD5C81225138800C773A2 /* fr */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = SOURCE_ROOT; };
@@ -710,6 +727,8 @@
 		D08E8D831019EB4D005D8614 /* IMBMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMainThreadProxy.m; sourceTree = "<group>"; };
 		D08E8D841019EB4D005D8614 /* IMBMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMainThreadProxy.h; sourceTree = "<group>"; };
 		D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBQLPreviewPanel.h; sourceTree = "<group>"; };
+		D0904DA6152CA51F003FDD08 /* IMBFileSystemObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFileSystemObserver.h; sourceTree = "<group>"; };
+		D0904DA7152CA51F003FDD08 /* IMBFileSystemObserver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFileSystemObserver.m; sourceTree = "<group>"; };
 		D0941A55105E24DD0092B2F1 /* iTunes9-icon-01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-01.png"; sourceTree = "<group>"; };
 		D0941A56105E24DD0092B2F1 /* iTunes9-icon-02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-02.png"; sourceTree = "<group>"; };
 		D0941A57105E24DD0092B2F1 /* iTunes9-icon-03.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-03.png"; sourceTree = "<group>"; };
@@ -1364,6 +1383,9 @@
 				D09930B61010F6C100C527B7 /* IMBLibraryController.m */,
 				D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */,
 				D099333210119F3400C527B7 /* IMBObjectArrayController.m */,
+				D0904DA6152CA51F003FDD08 /* IMBFileSystemObserver.h */,
+				D0904DA7152CA51F003FDD08 /* IMBFileSystemObserver.m */,
+				D029C3CE152B41F000B1A02B /* IMBFSEventsService.m */,
 				D05D3A1B152AD30500E30C43 /* com.karelia.imedia.FSEvents.entitlements */,
 			);
 			name = Backend;
@@ -1948,6 +1970,7 @@
 				D0C911F1152196FE006655C9 /* IMBLinkNodeViewController.h in Headers */,
 				D0F2DDB8152475C00059DF8D /* IMBiTunesParserMessenger.h in Headers */,
 				D054AFEA152984C300EBFA1C /* IMBGarageBandParserMessenger.h in Headers */,
+				D0904DA8152CA51F003FDD08 /* IMBFileSystemObserver.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2560,6 +2583,7 @@
 				D05D3991152A280F00E30C43 /* IMBFNSubscribeFileWatcher.m in Sources */,
 				D05D3992152A280F00E30C43 /* IMBFSEventsWatcher.m in Sources */,
 				D05D3993152A280F00E30C43 /* IMBMainThreadProxy.m in Sources */,
+				D0904DA9152CA51F003FDD08 /* IMBFileSystemObserver.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2615,7 +2639,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D05D39F4152ACD8800E30C43 /* SBServiceMain.m in Sources */,
+				D029C3CF152B41F000B1A02B /* IMBFSEventsService.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
