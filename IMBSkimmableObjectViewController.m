@@ -55,7 +55,7 @@
 #import "IMBPanelController.h"
 #import "IMBNodeViewController.h"
 #import	"IMBSkimmableObjectViewController.h"
-#import "IMBNodeObject.h"
+#import "IMBSkimmableObject.h"
 #import "IMBConfig.h"
 
 
@@ -211,16 +211,12 @@
 		NSArray *objects = [ibObjectArrayController arrangedObjects];
 		if (inIndex < [objects count])
 		{
-			IMBNodeObject* item = [objects objectAtIndex:inIndex];
+			IMBSkimmableObject* item = [objects objectAtIndex:inIndex];
+            
+            [item resetCurrentSkimmingIndex];
 			
-			// Obtain path to image
-			NSString* imagePath = [_skimmingDelegate imagePathForKeyChildOfNodeObject:item userInfo:_userInfo];
-			
-			//NSLog(@"Object image path: %@", imagePath);
-			
-			// Now change the current image of our node object
-			[item setImageLocation:imagePath];
 			[item setNeedsImageRepresentation:YES];
+            [item setIsLoadingThumbnail:NO]; // Avoid race condition 
 			[item loadThumbnail]; // Background thread			
 		}
 	}
@@ -234,7 +230,7 @@
 		NSArray *objects = [ibObjectArrayController arrangedObjects];
 		if (inIndex < [objects count])
 		{
-			IMBNodeObject* item = [objects objectAtIndex:inIndex];
+			IMBSkimmableObject* item = [objects objectAtIndex:inIndex];
 			
 			// Derive child object's index in node object from inPoint's relative position in frame
 			
@@ -251,7 +247,7 @@
 			}
 
 			CGFloat xOffset = inPoint.x - skimmingFrame.origin.x;
-			NSUInteger objectCount = [_skimmingDelegate childrenCountOfNodeObject:item userInfo:_userInfo];
+			NSUInteger objectCount = [item imageCount];
 			CGFloat widthPerObject = skimmingFrame.size.width / objectCount;
 			NSUInteger objectIndex = (NSUInteger) xOffset / widthPerObject;
 			
@@ -261,13 +257,8 @@
 			{
 				_previousImageIndex = objectIndex;
 				
-				// Obtain path to image
-				NSString* imagePath = [_skimmingDelegate imagePathForChildOfNodeObject:item atIndex:objectIndex userInfo:_userInfo];
-				
-				//NSLog(@"Object image path: %@", imagePath);
-				
-				// Now change the current image of our node object
-				[item setImageLocation:imagePath];
+                item.currentSkimmingIndex = objectIndex;
+
 				[item setNeedsImageRepresentation:YES];
 				[item setIsLoadingThumbnail:NO]; // Avoid race condition 
 				[item loadThumbnail]; // Background thread
