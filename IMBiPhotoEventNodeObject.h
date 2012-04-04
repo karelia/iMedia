@@ -50,10 +50,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 #import <Cocoa/Cocoa.h>
-#import "IMBNodeObject.h"
+#import "IMBSkimmableObject.h"
 
 
-@interface IMBiPhotoEventNodeObject : IMBNodeObject {
+@interface IMBiPhotoEventNodeObject : IMBSkimmableObject {
 }
 
 @end
