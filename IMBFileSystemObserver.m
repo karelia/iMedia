@@ -71,6 +71,8 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#warning TODO: implement 10.6 comaptibilty
+
 #pragma mark 
 
 @implementation IMBFileSystemObserver
@@ -193,7 +195,7 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 
 - (void) sendDidChangeNotificationForPath:(NSString*)inPath
 {
-	NSLog(@"RECEIVED CHANGE FOR PATH %@",inPath);
+//	NSLog(@"RECEIVED CHANGE FOR PATH %@",inPath);
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBPathDidChangeNotification object:inPath];
 }
 
