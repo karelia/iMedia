@@ -101,6 +101,7 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 
 -(void) dealloc
 {
+	if (dispatchQueue) dispatch_release(dispatchQueue);
 	[self removeAllPaths];
     [eventStreams release];
     [super dealloc];
@@ -108,8 +109,24 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 
 -(void) finalize
 {
+	if (dispatchQueue) dispatch_release(dispatchQueue);
 	[self removeAllPaths];
     [super finalize];
+}
+
+// -----------------------------------------------------------------------------
+//  queue:
+// -----------------------------------------------------------------------------
+
+- (void) setDispatchQueue:(dispatch_queue_t)queue
+{
+	dispatch_retain(queue);
+	dispatchQueue = queue;
+}
+
+- (dispatch_queue_t) dispatchQueue
+{
+	return dispatchQueue;
 }
 
 // -----------------------------------------------------------------------------
@@ -213,7 +230,9 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 
 	if (stream)
 	{
-		FSEventStreamScheduleWithRunLoop(stream,CFRunLoopGetMain(),kCFRunLoopCommonModes);
+		if (dispatchQueue) FSEventStreamSetDispatchQueue(stream,dispatchQueue);  
+		else FSEventStreamScheduleWithRunLoop(stream,CFRunLoopGetMain(),kCFRunLoopCommonModes);
+
 		FSEventStreamStart(stream);
 
 		@synchronized (self)

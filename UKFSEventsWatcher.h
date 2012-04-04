@@ -31,9 +31,13 @@
 	CFTimeInterval				latency;			// Time that must pass before events are being sent.
 	FSEventStreamCreateFlags	flags;				// See FSEvents.h
     NSMutableDictionary*		eventStreams;		// List of FSEventStreamRef pointers in NSValues, with the pathnames as their keys.
+	dispatch_queue_t			dispatchQueue;
 }
 
 + (id) sharedFileWatcher;
+
+- (void) setDispatchQueue:(dispatch_queue_t)queue;
+- (dispatch_queue_t) dispatchQueue;
 
 - (void) setLatency:(CFTimeInterval)latency;
 - (CFTimeInterval) latency;
