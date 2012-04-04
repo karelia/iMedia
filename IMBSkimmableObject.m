@@ -59,6 +59,36 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark - NSCoding
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		_currentSkimmingIndex = [inCoder decodeIntegerForKey:@"currentSkimmingIndex"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeInteger:_currentSkimmingIndex forKey:@"currentSkimmingIndex"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark - Skimming 
+
+//----------------------------------------------------------------------------------------------------------------------
 // Returns the number of images to be skimmed through. Must be subclassed.
 
 - (NSUInteger) imageCount
@@ -93,7 +123,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#pragma - Helper
+#pragma mark - Helper
 
 //----------------------------------------------------------------------------------------------------------------------
 // Returns the image location that corresponds to the skimming index provided. Must be subclassed.
