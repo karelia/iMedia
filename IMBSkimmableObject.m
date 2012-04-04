@@ -59,6 +59,21 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// We don't want no shared image representations like default behavior in super class (we are not folders)
+
+- (NSImage *) sharedImageRepresentation
+{
+	return nil;
+}
+
+
+- (NSString*) imageRepresentationType
+{
+	return [[_imageRepresentationType retain] autorelease];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark - NSCoding
 
