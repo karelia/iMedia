@@ -54,7 +54,7 @@
 #import "IMBAppleMediaParser.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBNode.h"
-#import "IMBNodeObject.h"
+#import "IMBFaceNodeObject.h"
 //#import "IMBiPhotoEventObjectViewController.h"
 //#import "IMBFaceObjectViewController.h"
 #import "IMBImageObjectViewController.h"
@@ -707,7 +707,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			
 			// Now create the visual object and link it to subnode just created
 			
-			object = [[IMBNodeObject alloc] init];
+			object = [[IMBFaceNodeObject alloc] init];
 			[objects addObject:object];
 			[object release];
 			
