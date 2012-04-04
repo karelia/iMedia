@@ -578,10 +578,14 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 					imageFaceMetadataList = [NSMutableArray array];
 					[faceDict setObject:imageFaceMetadataList forKey:@"ImageFaceMetadataList"];
 				}
+                NSNumber *faceIndex = [imageFaceDict objectForKey:@"face index"];
+                NSString *path = [self imagePathForFaceIndex:faceIndex inImageWithKey:imageDictKey];
 				imageFaceMetadata = [NSDictionary dictionaryWithObjectsAndKeys:
 									 imageDictKey, @"image key",
-									 [imageFaceDict objectForKey:@"face index"], @"face index",
-									 [imageDict objectForKey:@"DateAsTimerInterval"], @"DateAsTimerInterval", nil];
+									 faceIndex, @"face index",
+									 [imageDict objectForKey:@"DateAsTimerInterval"], @"DateAsTimerInterval",
+                                     path, @"path",
+                                     nil];
 				
 				[imageFaceMetadataList addObject:imageFaceMetadata];
 				
@@ -693,7 +697,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			subnode.parserIdentifier = self.identifier;
 			
 			// Keep a ref to face dictionary for potential later use
-			subnode.attributes = faceDict;
+			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  faceDict, @"nodeSource",
+                                  [self nodeTypeForNode:subnode], @"nodeType", nil];
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node.
 			// Note that a faces dictionary always has a "key" key...
@@ -938,5 +944,15 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	return [self isNode:inNode withId:PHOTO_STREAM_NODE_ID inSpace:PHOTO_STREAM_ID_SPACE];
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns node types for events node and faces node. nil otherwise.
+
+- (NSString *)nodeTypeForNode:(IMBNode *)inNode
+{
+    if ([self isEventsNode:inNode]) return kIMBiPhotoNodeObjectTypeEvent;
+    if ([self isFacesNode:inNode]) return kIMBiPhotoNodeObjectTypeFace;
+    return nil;
+}
 
 @end
