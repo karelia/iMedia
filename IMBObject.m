@@ -212,10 +212,18 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.shouldDisableTitle = [coder decodeBoolForKey:@"shouldDisableTitle"];
 		
 		self.imageLocation = [coder decodeObjectForKey:@"imageLocation"];
-		self.imageRepresentation = (id)[coder decodeCGImageForKey:@"imageRepresentation"];
 		self.imageRepresentationType = [coder decodeObjectForKey:@"imageRepresentationType"];
 		self.needsImageRepresentation = [coder decodeBoolForKey:@"needsImageRepresentation"];
 		self.imageVersion = [coder decodeIntegerForKey:@"imageVersion"];
+
+		if ([self.imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+		{
+			self.imageRepresentation = (id)[coder decodeCGImageForKey:@"imageRepresentation"];
+		}
+		else if ([self.imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
+		{
+			self.imageRepresentation = [coder decodeObjectForKey:@"imageRepresentation"];
+		}
 	}
 	
 	return self;
@@ -239,10 +247,18 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeBool:self.shouldDisableTitle forKey:@"shouldDisableTitle"];
 
 	[coder encodeObject:self.imageLocation forKey:@"imageLocation"];
-	[coder encodeCGImage:(CGImageRef)self.imageRepresentation forKey:@"imageRepresentation"];
 	[coder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
 	[coder encodeBool:self.needsImageRepresentation forKey:@"needsImageRepresentation"];
 	[coder encodeInteger:self.imageVersion forKey:@"imageVersion"];
+
+	if ([self.imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+	{
+		[coder encodeCGImage:(CGImageRef)self.imageRepresentation forKey:@"imageRepresentation"];
+	}
+	else if ([self.imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
+	{
+		[coder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
+	}
 }
 
 
