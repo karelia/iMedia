@@ -467,11 +467,6 @@
 			albumNode.mediaSource = self.mediaSource;
 			albumNode.parserIdentifier = self.identifier;
 			
-			// Keep a ref to the album dictionary for later use when we populate this node
-			// so we don't have to loop through the whole album list again to find it.
-			
-			albumNode.attributes = albumDict;
-			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
 			// for backwards compatibility...
@@ -479,6 +474,13 @@
 			NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
 			if (albumId == nil) albumId = [NSNumber numberWithInt:_fakeAlbumID++]; 
 			albumNode.identifier = [self identifierForId:albumId inSpace:albumIdSpace];
+			
+			// Keep a ref to the album dictionary for later use when we populate this node
+			// so we don't have to loop through the whole album list again to find it.
+			
+			albumNode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    albumDict, @"nodeSource", nil];
+//                                    [self nodeTypeForNode:albumNode], @"nodeType", nil];
 			
 			// Add the new album node to its parent (inRootNode)...
 			
@@ -540,7 +542,7 @@
 {
 	// We saved a reference to the album dictionary when this node was created
 	// (ivar 'attributes') and now happily reuse it here.
-	NSDictionary* albumDict = inNode.attributes;	
+	NSDictionary* albumDict = [inNode.attributes objectForKey:@"nodeSource"];
 	
 	// Determine images relevant to this view.
 	// Note that everything regarding 'ImageFaceMetadata' is only relevant
@@ -644,7 +646,9 @@
 			
 			// Keep a ref to the subnode dictionary for potential later use
 			
-			subnode.attributes = subnodeDict;
+			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  subnodeDict, @"nodeSource",
+                                  [self nodeTypeForNode:subnode], @"nodeType", nil];
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
@@ -714,7 +718,7 @@
 	// We saved a reference to the album dictionary when this node was created
 	// (ivar 'attributes') and now happily reuse it to save an outer loop (over album list) here.
 	
-	NSDictionary* albumDict = inNode.attributes;	
+	NSDictionary* albumDict = [inNode.attributes objectForKey:@"nodeSource"];
 	NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
 	
 	for (NSString* key in imageKeys)

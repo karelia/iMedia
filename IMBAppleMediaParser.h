@@ -146,6 +146,10 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 
 - (BOOL) isPhotoStreamNode:(IMBNode*)inNode;
 
+// Returns node types for events node and faces node. nil otherwise.
+
+- (NSString *)nodeTypeForNode:(IMBNode *)inNode;
+
 // Returns whether an album of this type exposes a disclosure triangle or not.
 // Takes care of album Types "Folder", "Faces" and "Events".
 // Subclass for more specific behavior.
