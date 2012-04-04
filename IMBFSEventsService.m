@@ -80,7 +80,7 @@ static dispatch_queue_t sDispatchQueue = NULL;
 
 -(void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotification forPath:(NSString*)inPath
 {
-	[sConnection sendLog:[NSString stringWithFormat:@"DETECTED CHANGE FOR PATH %@",inPath]];
+//	[sConnection sendLog:[NSString stringWithFormat:@"DETECTED CHANGE FOR PATH %@",inPath]];
 	
 	[sConnection sendMessage:[XPCMessage messageWithObjectsAndKeys:
 		@"pathDidChange",@"operation",
@@ -119,21 +119,21 @@ int main(int argc, const char *argv[])
 			{
 				xpc_transaction_begin();
 				sConnection = [inConnection retain];
-				[sConnection sendLog:@"STARTING FSEVENTS SERVICE"];
+//				[sConnection sendLog:@"STARTING FSEVENTS SERVICE"];
 			}
 			else if ([operation isEqual:@"addPath"])
 			{
-				[sConnection sendLog:[NSString stringWithFormat:@"ADDING PATH %@",path]];
+//				[sConnection sendLog:[NSString stringWithFormat:@"ADDING PATH %@",path]];
 				[[IMBFSEventsWatcher sharedFileWatcher] addPath:path];
 			}
 			else if ([operation isEqual:@"removePath"])
 			{
-				[sConnection sendLog:[NSString stringWithFormat:@"REMOVING PATH %@",path]];
+//				[sConnection sendLog:[NSString stringWithFormat:@"REMOVING PATH %@",path]];
 				[[IMBFSEventsWatcher sharedFileWatcher] removePath:path];
 			}
 			else if ([operation isEqual:@"stop"])
 			{
-				[sConnection sendLog:@"STOPPING FSEVENTS SERVICE"];
+//				[sConnection sendLog:@"STOPPING FSEVENTS SERVICE"];
 				IMBRelease(sConnection);
 				xpc_transaction_end();
 			}
