@@ -27,6 +27,10 @@
 		3025E5631306877700706DB2 /* IMBiPhotoEventObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30394ABC12DC64D700ACA531 /* ObjectiveFlickr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30394AB512DC64B400ACA531 /* ObjectiveFlickr.framework */; };
 		30394AC812DC665000ACA531 /* IMBSkimmableObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		303FFD3D152B43280026B8CF /* IMBSkimmableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 303FFD3B152B43280026B8CF /* IMBSkimmableObject.h */; };
+		303FFD3E152B43280026B8CF /* IMBSkimmableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 303FFD3C152B43280026B8CF /* IMBSkimmableObject.m */; };
+		303FFD3F152B43280026B8CF /* IMBSkimmableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 303FFD3C152B43280026B8CF /* IMBSkimmableObject.m */; };
+		303FFD40152B43280026B8CF /* IMBSkimmableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 303FFD3C152B43280026B8CF /* IMBSkimmableObject.m */; };
 		3043924B130D1DDC00DD1D34 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		305B64C71372EF6C009B53BD /* cork-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CE394AC11371A1F700EF0D1E /* cork-background.jpg */; };
 		3089F949151C8ECB00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F948151C8ECB00D56DC0 /* XPCKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -510,6 +514,8 @@
 		30394AB512DC64B400ACA531 /* ObjectiveFlickr.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ObjectiveFlickr.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBSkimmableObjectViewController.h; sourceTree = "<group>"; };
 		30394AC712DC665000ACA531 /* IMBSkimmableObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBSkimmableObjectViewController.m; sourceTree = "<group>"; };
+		303FFD3B152B43280026B8CF /* IMBSkimmableObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBSkimmableObject.h; sourceTree = "<group>"; };
+		303FFD3C152B43280026B8CF /* IMBSkimmableObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBSkimmableObject.m; sourceTree = "<group>"; };
 		30439222130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestiPhotoEventBrowserCell.h; sourceTree = "<group>"; };
 		30439223130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestiPhotoEventBrowserCell.m; sourceTree = "<group>"; };
 		3089F948151C8ECB00D56DC0 /* XPCKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPCKit.framework; path = "../../../../Library/Developer/Xcode/DerivedData/iMedia-eziqmohtzkxjywecdgfphvntbmzs/Build/Products/Debug/XPCKit.framework"; sourceTree = "<group>"; };
@@ -1479,6 +1485,8 @@
 				D0E96C34151324F6004F3EE7 /* IMBObject.m */,
 				D010384A10714CB3007C88D7 /* IMBNodeObject.h */,
 				D010384B10714CB3007C88D7 /* IMBNodeObject.m */,
+				303FFD3B152B43280026B8CF /* IMBSkimmableObject.h */,
+				303FFD3C152B43280026B8CF /* IMBSkimmableObject.m */,
 				D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */,
 				D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */,
 				30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */,
@@ -1948,6 +1956,7 @@
 				D0C911F1152196FE006655C9 /* IMBLinkNodeViewController.h in Headers */,
 				D0F2DDB8152475C00059DF8D /* IMBiTunesParserMessenger.h in Headers */,
 				D054AFEA152984C300EBFA1C /* IMBGarageBandParserMessenger.h in Headers */,
+				303FFD3D152B43280026B8CF /* IMBSkimmableObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2467,6 +2476,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D08109A9151A055800201850 /* SBServiceMain.m in Sources */,
+				303FFD3F152B43280026B8CF /* IMBSkimmableObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2560,6 +2570,7 @@
 				D05D3991152A280F00E30C43 /* IMBFNSubscribeFileWatcher.m in Sources */,
 				D05D3992152A280F00E30C43 /* IMBFSEventsWatcher.m in Sources */,
 				D05D3993152A280F00E30C43 /* IMBMainThreadProxy.m in Sources */,
+				303FFD3E152B43280026B8CF /* IMBSkimmableObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2576,6 +2587,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D05D399F152ACD1300E30C43 /* SBServiceMain.m in Sources */,
+				303FFD40152B43280026B8CF /* IMBSkimmableObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
