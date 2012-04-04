@@ -62,7 +62,7 @@
 #import "IMBMovieFolderParserMessenger.h"
 #import "IMBConfig.h"
 #import "IMBKQueue.h"
-#import "IMBFSEventsWatcher.h"
+#import "IMBFileSystemObserver.h"
 #import "NSWorkspace+iMedia.h"
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
@@ -111,18 +111,14 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @property (retain,readwrite) NSMutableArray* subnodes;			
 - (NSMutableArray*) mutableArrayForPopulatingSubnodes;
+
 - (void) _setParserMessenger:(IMBParserMessenger*)inMessenger nodeTree:(IMBNode*)inNode;
 - (IMBNode*) _groupNodeForTopLevelNode:(IMBNode*)inNewNode;
 - (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
 
-//@property (retain) IMBKQueue* watcherUKKQueue;
-//@property (retain) IMBFSEventsWatcher* watcherFSEvents;
-
-//- (void) _coalescedUKKQueueCallback;
-//- (void) _coalescedFSEventsCallback;
-//- (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
-//- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
-//- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume;
+- (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
+- (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
+- (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume;
 
 @end
 
@@ -137,8 +133,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 @synthesize mediaType = _mediaType;
 @synthesize subnodes = _subnodes;
 @synthesize delegate = _delegate;
-//@synthesize watcherUKKQueue = _watcherUKKQueue;
-//@synthesize watcherFSEvents = _watcherFSEvents;
 @synthesize isReplacingNode = _isReplacingNode;
 
 
@@ -186,20 +180,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		self.subnodes = nil; //[NSMutableArray array];
 		_isReplacingNode = NO;
 		
-		// Initialize file system watching...
+		// Listen to changes on the file system...
 		
-		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
-		_watcherUKKQueue = [[IMBKQueue alloc] init];
-		_watcherUKKQueue.delegate = self;
-		
-		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
-		_watcherFSEvents = [[IMBFSEventsWatcher alloc] init];
-		_watcherFSEvents.delegate = self;
-		
-//		_watcherLock = [[NSRecursiveLock alloc] init];
-		
-		// When volume are unmounted we would like to be notified so that we can disable file watching for 
-		// those paths...
+		[[NSNotificationCenter defaultCenter]
+			addObserver:self 
+			selector:@selector(pathDidChange:)
+			name:kIMBPathDidChangeNotification 
+			object:nil];
+			
+		// When volume are unmounted we would like to be notified so that we can stop listening for those paths...
 		
 		[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter]
 			addObserver:self 
@@ -220,16 +209,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter] removeObserver:self];
 
 	IMBRelease(_mediaType);
 	IMBRelease(_subnodes);
-	IMBRelease(_watcherUKKQueue);
-	IMBRelease(_watcherFSEvents);
-//	IMBRelease(_watcherLock);
-	IMBRelease(_watcherUKKQueuePaths);
-	IMBRelease(_watcherFSEventsPaths);
-
 	[super dealloc];
 }
 
@@ -258,52 +242,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		for (IMBParserMessenger* messenger in messengers)
 		{
 			[self createTopLevelNodeWithParserMessenger:messenger];
-			
-//			// Ask delegate whether we should create nodes with this IMBParserMessenger...
-//			
-//			if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
-//			{
-//				if (![_delegate libraryController:self shouldCreateNodeWithParserMessenger:messenger])
-//				{
-//					continue;
-//				}
-//			}
-//			
-//			// Create top-level nodes...
-//			
-//			if (RESPONDS(_delegate,@selector(libraryController:willCreateNodeWithParserMessenger:)))
-//			{
-//				[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
-//			}
-//			
-//			SBPerformSelectorAsync(messenger.connection,messenger,@selector(unpopulatedTopLevelNodes:),nil,
-//			
-//				^(NSArray* inNodes,NSError* inError)
-//				{
-//					// Display any errors that might have occurred...
-//					
-//					if (inError)
-//					{
-//						NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-//						[NSApp presentError:inError];
-//					}
-//					
-//					// Insert the new top-level nodes into our data model...
-//					
-//					else if (inNodes)
-//					{
-//						for (IMBNode* node in inNodes)
-//						{
-//							node.parserMessenger = messenger;
-//							[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
-//
-//							if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
-//							{
-//								[_delegate libraryController:self didCreateNode:node withParserMessenger:messenger];
-//							}
-//						}
-//					}
-//				});		
 		}
 	}
 	
@@ -638,20 +576,17 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		NSString* oldWatchedPath = inOldNode.watchedPath;
 		NSString* newWatchedPath = inNewNode.watchedPath;
 		
-		if (inOldNode != nil && oldWatchedPath != nil)
+		if (![oldWatchedPath isEqualToString:newWatchedPath])
 		{
-			if (inOldNode.watcherType == kIMBWatcherTypeKQueue)
-				[_watcherUKKQueue removePath:oldWatchedPath];
-			else if (inOldNode.watcherType == kIMBWatcherTypeFSEvent)
-				[_watcherFSEvents removePath:oldWatchedPath];
-		}
-		
-		if (inNewNode != nil && newWatchedPath != nil)
-		{
-			if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
-				[_watcherUKKQueue addPath:newWatchedPath];
-			else if (inNewNode.watcherType == kIMBWatcherTypeFSEvent)
-				[_watcherFSEvents addPath:newWatchedPath];
+			if (oldWatchedPath != nil && inOldNode.watcherType == kIMBWatcherTypeFSEvent)
+			{
+				[[IMBFileSystemObserver sharedObserver] removePath:oldWatchedPath];
+			}
+			
+			if (newWatchedPath != nil && inNewNode.watcherType == kIMBWatcherTypeFSEvent)
+			{
+				[[IMBFileSystemObserver sharedObserver] addPath:newWatchedPath];
+			}
 		}
 		
 		// Get the parent node. If the parent node for a top level node doesn't exist yet, 
@@ -738,194 +673,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 }
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This method is called on the main thread as a result of any IMBLibraryOperation. We are given both the old  
-// and the new node. Replace the old with the new node. The node we are given here can be a root node or a node
-// somewhere deep inside the tree. So we need to find the correct place where to put the new node. Note that the 
-// new node is registered with a file watcher (if desired) and the old node is unregistered...
-
-/*
-- (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier
-{
-	if (inOldNode == nil && inNewNode == nil) return;
-
-	// If we were given both old and new nodes, then the parentNode and identifiers must be the same. 
-	// If not log an error and throw an exception because this is a programmer error...
-
-//	if (oldNode != nil && newNode != nil && oldNode.parentNode != newNode.parentNode && newNode.parentNode != nil)
-//	{
-//		NSLog(@"%s Error: parent of oldNode and newNode must be the same...",__FUNCTION__);
-//		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must be the same" userInfo:nil] raise];
-//	}
-
-	if (inOldNode != nil && inNewNode != nil && ! [inOldNode.identifier isEqual:inNewNode.identifier])
-	{
-		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must have same identifiers" userInfo:nil] raise];
-	}
-
-	// Workaround for special behavior of IMBImageCaptureParser, which replaces root nodes several times  
-	// as devices get hotplugged. We should probably remove this once IMBImageCaptureParser gets rewritten...
-	
-	if (inOldNode == nil && inNewNode != nil)	 
-	{										
-		IMBNode* node = [self nodeWithIdentifier:inNewNode.identifier];
-		if (node) inOldNode = node;
-	}
-
-	// Tell IMBUserInterfaceController that we are going to modify the data model...
-
-	_isReplacingNode = YES;
-
-	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillChangeNotification object:self];
-
-	@try      
-    {
-        // Find out where we are supposed to replace the old with the new node. We have three different cases:
-        //   1) Both old and new node are supplied, so we need to replace. 
-        //   2) Only old node is supplied, so it needs to be removed. 
-        //   3) Only new node is supplied so it needs to be inserted.
-        // We also have to distinguish between root of the tree and somewhere in the middle of the tree. Things 
-        // are further complicated by the "group nodes" which are created dynamically in this method...
-
-		IMBNode* parentNode = [self nodeWithIdentifier:inParentNodeIdentifier];
-		BOOL shouldSortNodes = parentNode.isGroup;
-
-		if (parentNode == nil)
-		{
-			if ([IMBConfig showsGroupNodes])
-			{
-				if (inOldNode) parentNode = [self _groupNodeForNewNode:inOldNode];
-				else if (inNewNode) parentNode = [self _groupNodeForNewNode:inNewNode];
-			}
-			
-			shouldSortNodes = YES;
-		}
-
-		NSMutableArray* nodes = parentNode!=nil ?
-        [NSMutableArray arrayWithArray:parentNode.subNodes] :
-        [NSMutableArray arrayWithArray:self.rootNodes];
-
-        // Remove the old node from the correct place (but remember its index). Also unregister from file watching...
-
-        NSUInteger index = NSNotFound;
-        NSString* watchedPath = nil;
-
-        if (inOldNode)
-        {
-            inOldNode.objects = nil;
-
-            // It may well be that inOldNode is already replaced by some other node (see issue #33).
-            // Make sure to treat that one to be the old node (nodes are equal but not necessarily identical).
-            
-            index = [nodes indexOfObject:inOldNode];
-
-            if (index != NSNotFound)
-            {
-                inOldNode = [nodes objectAtIndex:index];
-            }
-
-            if ((watchedPath = inOldNode.watchedPath))
-            {
-                if (inOldNode.watcherType == kIMBWatcherTypeKQueue)
-                    [self.watcherUKKQueue removePath:watchedPath];
-                else if (inOldNode.watcherType == kIMBWatcherTypeFSEvent)
-                    [self.watcherFSEvents removePath:watchedPath];
-            }
-
-            if (index != NSNotFound)
-            {
-                [nodes removeObjectAtIndex:index];
-            }
-        }
-
-        // Insert the new node at the same index. Optionally register the node for file watching...
-
-        if (inNewNode)
-        {
-            if (index == NSNotFound) index = nodes.count;
-            [nodes insertObject:inNewNode atIndex:index];
-
-            if ((watchedPath = inNewNode.watchedPath))
-            {
-                if (inNewNode.watcherType == kIMBWatcherTypeKQueue)
-                    [self.watcherUKKQueue addPath:watchedPath];
-                else if (inNewNode.watcherType == kIMBWatcherTypeFSEvent)
-                    [self.watcherFSEvents addPath:watchedPath];
-            }
-        }
-
-        // Sort the nodes so that they always appear in the same (stable) order...
-
-        if (shouldSortNodes)
-        {
-            [nodes sortUsingSelector:@selector(compare:)];
-        }
-
-		// Do an "atomic" replace of the changed nodes array, thus only causing a single KVO notification. 
-		// Please note the strange line setSubNodes:nil, which is a workaround for an nasty crashing bug deep  
-		// inside NSTreeController, where we get a zombie NSTreeControllerTreeNode is some cases. Apparently 
-		// the NSTreeController is very particular about us replacing the whole array in one go (maybe that 
-		// isn't entirely KVO compliant), and it gets confused with its NSTreeControllerTreeNode objects.
-		// The extra line (setting the array to nil) seems to clear out all NSTreeControllerTreeNodes and
-		// then they get rebuilt with the next line. Until we rework our own stuff, we'll stick with this 
-		// workaround...
-
-		if (parentNode)
-		{
-			[parentNode setSubNodes:nil];		// Important workaround. Do not remove!
-			[parentNode setSubNodes:nodes];
-		}
-		else
-		{
-			[self setRootNodes:nodes];
-		}
-
-        // Hide empty group nodes that do not have any subnodes We are not using fast enumeration here because
-        // we may need to mutate the array. Iteration backwards avoids index adjustment problems as we 
-        // remove nodes...
-
-        NSMutableArray* rootNodes = [NSMutableArray arrayWithArray:self.rootNodes];
-        NSUInteger n = [rootNodes count];
-
-        for (NSInteger i=n-1; i>=0; i--)
-        {
-            IMBNode* node = [rootNodes objectAtIndex:i];
-            
-            if (node.isGroup && node.subNodes.count==0)
-            {
-                [rootNodes removeObjectIdenticalTo:node];
-            }
-        }
-
-        NSUInteger m = [rootNodes count];
-
-        if (n != m)
-        {
-            [self setRootNodes:rootNodes];
-        }
-
-		// Since setSubNodes: is a copy setter we need to get a pointer to the new instance before turning
-		// off the loading state...
-
-		IMBNode* node = [self nodeWithIdentifier:inNewNode.identifier];
-		node.loading = NO;
-		node.badgeTypeNormal = kIMBBadgeTypeNone;
-	}
-
-	// We are now done...
-
-    @finally
-    {
-        _isReplacingNode = NO;
-
-		[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesDidChangeNotification object:self];
-    }
-}
-*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1256,68 +1003,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #pragma mark Observe File System Changes
 
 
-// A file watcher has fired for one of the paths we have registered. Since file watchers (especially UKKQueue can 
-// fire multiple times for a single change) we need to coalesce the calls. Please note that the parameter inPath  
-// is a different NSString instance every single time, so we cannot pass it as a param to the coalesced message 
-// (canceling wouldn't work). Instead we'll put it in an array, which is iterated in _coalescedFileWatcherCallback...
+// Something on the file system has changed. Reload all nodes that are concerned by this event...
 
-- (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath
+- (void) pathDidChange:(NSNotification*)inNotification 
 {
-//	NSLog(@"%s path=%@",__FUNCTION__,inPath);
-	
-	if ([inNotificationName isEqualToString:IMBFileWatcherWriteNotification])
-	{
-		dispatch_async(dispatch_get_current_queue(),^()
-		{
-			if (inWatcher == _watcherUKKQueue)
-			{
-				if ([_watcherUKKQueuePaths indexOfObject:inPath] == NSNotFound)
-				{
-					[_watcherUKKQueuePaths addObject:inPath];
-				}
-				
-				SEL method = @selector(_coalescedUKKQueueCallback);
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
-				[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-			}
-			else if (inWatcher == _watcherFSEvents)
-			{
-				if ([_watcherFSEventsPaths indexOfObject:inPath] == NSNotFound)
-				{
-					[_watcherFSEventsPaths addObject:inPath];
-				}
-				
-				SEL method = @selector(_coalescedFSEventsCallback);
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:nil];
-				[self performSelector:method withObject:nil afterDelay:1.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-			}
-		});
-	}	
+	NSString* path = [inNotification object];
+	[self _reloadNodesWithWatchedPath:path];
 }
-
-
-// Pass the message on to the main thread...
-
-- (void) _coalescedUKKQueueCallback
-{
-	for (NSString* path in _watcherUKKQueuePaths)
-	{
-		[self _reloadNodesWithWatchedPath:path];
-	}
-	
-	[_watcherUKKQueuePaths removeAllObjects];
-}	
-
-
-- (void) _coalescedFSEventsCallback
-{
-	for (NSString* path in _watcherFSEventsPaths)
-	{
-		[self _reloadNodesWithWatchedPath:path];
-	}
-	
-	[_watcherFSEventsPaths removeAllObjects];
-}	
 
 
 // Now look for all nodes that are interested in that path and reload them...
