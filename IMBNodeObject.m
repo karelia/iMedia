@@ -168,9 +168,22 @@
 }
 
 
-- (id) imageRepresentation
+- (NSImage *) sharedImageRepresentation
 {
 	return [NSImage imb_sharedLargeGenericFolderIcon];
+}
+
+
+- (id) imageRepresentation
+{
+    NSImage *imageRep;
+    
+    if ((imageRep = [self sharedImageRepresentation]))
+    {
+        return imageRep;
+    }
+    
+	return [super imageRepresentation];
 }
 
 
