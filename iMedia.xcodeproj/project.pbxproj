@@ -455,30 +455,6 @@
 		FCD9ABB410C677FF0092F441 /* IMBLoadMoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		30FFEBFF150A0C0F0009C1D0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 30FFEBEB150A08DB0009C1D0;
-			remoteInfo = "iPhoto Parser XPC Service";
-		};
-		D0680C3A1518CCA900CED506 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D0E96CEE1518C9BF004F3EE7;
-			remoteInfo = com.karelia.imedia.folder;
-		};
-		D0F2DDD0152486820059DF8D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D0F2DDBC152485130059DF8D;
-			remoteInfo = com.karelia.imedia.iTunes;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		30FFEBFD150A09780009C1D0 /* Copy XPCServices */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -2158,9 +2134,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				D0680C3B1518CCA900CED506 /* PBXTargetDependency */,
-				30FFEC00150A0C0F0009C1D0 /* PBXTargetDependency */,
-				D0F2DDD1152486820059DF8D /* PBXTargetDependency */,
 			);
 			name = iMediaTester;
 			productName = TestApp;
@@ -2691,24 +2664,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		30FFEC00150A0C0F0009C1D0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 30FFEBEB150A08DB0009C1D0 /* com.karelia.imedia.iPhoto */;
-			targetProxy = 30FFEBFF150A0C0F0009C1D0 /* PBXContainerItemProxy */;
-		};
-		D0680C3B1518CCA900CED506 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D0E96CEE1518C9BF004F3EE7 /* com.karelia.imedia.Folder */;
-			targetProxy = D0680C3A1518CCA900CED506 /* PBXContainerItemProxy */;
-		};
-		D0F2DDD1152486820059DF8D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D0F2DDBC152485130059DF8D /* com.karelia.imedia.iTunes */;
-			targetProxy = D0F2DDD0152486820059DF8D /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		D02CD4CB1224F78E00C773A2 /* Localizable.strings */ = {
