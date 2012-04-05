@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner, Mike Abdullah
 
 
@@ -87,29 +90,31 @@
 @synthesize identifier = _identifier;
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
+@synthesize attributes = _attributes;
+@synthesize groupType = _groupType;
+
+// Subnodes & Objects...
 
 @synthesize parentNode = _parentNode;
 @synthesize atomic_subnodes = _subnodes;
 @synthesize objects = _objects;
 
-// State information...
-
-@synthesize attributes = _attributes;
-@synthesize groupType = _groupType;
-@synthesize displayPriority = _displayPriority;
-@synthesize displayedObjectCount = _displayedObjectCount;
-@synthesize isTopLevelNode = _isTopLevelNode;
-@synthesize group = _group;
-@synthesize leaf = _leaf;
-@synthesize includedInPopup = _includedInPopup;
-@synthesize isUserAdded = _isUserAdded;
-@synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
-@synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
-
 // Info about our parser...
 
 @synthesize parserIdentifier = _parserIdentifier;
 @synthesize parserMessenger = _parserMessenger;
+
+// State information...
+
+@synthesize displayPriority = _displayPriority;
+@synthesize displayedObjectCount = _displayedObjectCount;
+@synthesize isTopLevelNode = _isTopLevelNode;
+@synthesize isGroupNode = _isGroupNode;
+@synthesize isLeafNode = _isLeafNode;
+@synthesize isUserAdded = _isUserAdded;
+@synthesize isIncludedInPopup = _isIncludedInPopup;
+@synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
+@synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
 
 // Observing file system changes...
 
@@ -134,19 +139,19 @@
 {
 	if (self = [super init])
 	{
+		self.subnodes = nil;
+		self.objects = nil;
+
 		self.groupType = kIMBGroupTypeNone;
 		self.displayPriority = 5;					// middle of the pack, default
 		self.displayedObjectCount = -1;
 
-		self.subnodes = nil;
-		self.objects = nil;
-
+		self.isGroupNode = NO;
 		self.isTopLevelNode = NO;
-		self.group = NO;
-		self.leaf = NO;
-		self.loading = NO;
+		self.isLeafNode = NO;
+		self.isLoading = NO;
 		self.isUserAdded = NO;
-		self.includedInPopup = YES;
+		self.isIncludedInPopup = YES;
 		self.wantsRecursiveObjects = NO;
 		self.shouldDisplayObjectView = YES;
 		
@@ -168,9 +173,9 @@
 	IMBRelease(_identifier);
 	IMBRelease(_mediaType);
 	IMBRelease(_mediaSource);
+	IMBRelease(_attributes);
 	IMBRelease(_subnodes);
 	IMBRelease(_objects);
-	IMBRelease(_attributes);
 	IMBRelease(_parserMessenger);
 	IMBRelease(_parserIdentifier);
 	IMBRelease(_watchedPath);
@@ -192,21 +197,22 @@
 	copy.identifier = self.identifier;
 	copy.mediaType = self.mediaType;
 	copy.mediaSource = self.mediaSource;
-
 	copy.attributes = self.attributes;
 	copy.groupType = self.groupType;
-	copy.displayPriority = self.displayPriority;
-	copy.displayedObjectCount = self.displayedObjectCount;
-	copy.isTopLevelNode = self.isTopLevelNode;
-	copy.group = self.group;
-	copy.leaf = self.leaf;
-	copy.loading = self.loading;
-	copy.includedInPopup = self.includedInPopup;
-	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
-	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
 	
 	copy.parserMessenger = self.parserMessenger;
 	copy.parserIdentifier = self.parserIdentifier;
+	
+	copy.displayPriority = self.displayPriority;
+	copy.displayedObjectCount = self.displayedObjectCount;
+	copy.isGroupNode = self.isGroupNode;
+	copy.isTopLevelNode = self.isTopLevelNode;
+	copy.isLeafNode = self.isLeafNode;
+	copy.isLoading = self.isLoading;
+	copy.isUserAdded = self.isUserAdded;
+	copy.isIncludedInPopup = self.isIncludedInPopup;
+	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
+	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
 	
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -263,18 +269,19 @@
 		self.identifier = [inCoder decodeObjectForKey:@"identifier"];
 		self.mediaType = [inCoder decodeObjectForKey:@"mediaType"];
 		self.mediaSource = [inCoder decodeObjectForKey:@"mediaSource"];
-		self.parserIdentifier = [inCoder decodeObjectForKey:@"parserIdentifier"];
-
 		self.attributes = [inCoder decodeObjectForKey:@"attributes"];
 		self.groupType = [inCoder decodeIntegerForKey:@"groupType"];
+		
+		self.parserIdentifier = [inCoder decodeObjectForKey:@"parserIdentifier"];
+
 		self.displayPriority = [inCoder decodeIntegerForKey:@"displayPriority"];
 		self.displayedObjectCount = [inCoder decodeIntegerForKey:@"displayedObjectCount"];
+		self.isGroupNode = [inCoder decodeBoolForKey:@"isGroupNode"];
 		self.isTopLevelNode = [inCoder decodeBoolForKey:@"isTopLevelNode"];
-		self.group = [inCoder decodeBoolForKey:@"group"];
-		self.leaf = [inCoder decodeBoolForKey:@"leaf"];
-		self.loading = [inCoder decodeBoolForKey:@"loading"];
-		self.includedInPopup = [inCoder decodeBoolForKey:@"includedInPopup"];
+		self.isLeafNode = [inCoder decodeBoolForKey:@"isLeafNode"];
+		self.isLoading = [inCoder decodeBoolForKey:@"isLoading"];
 		self.isUserAdded = [inCoder decodeBoolForKey:@"isUserAdded"];
+		self.isIncludedInPopup = [inCoder decodeBoolForKey:@"isIncludedInPopup"];
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
 
@@ -299,18 +306,19 @@
 	[inCoder encodeObject:self.identifier forKey:@"identifier"];
 	[inCoder encodeObject:self.mediaType forKey:@"mediaType"];
 	[inCoder encodeObject:self.mediaSource forKey:@"mediaSource"];
-	[inCoder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
-	
 	[inCoder encodeObject:self.attributes forKey:@"attributes"];
 	[inCoder encodeInteger:self.groupType forKey:@"groupType"];
+
+	[inCoder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
+	
 	[inCoder encodeInteger:self.displayPriority forKey:@"displayPriority"];
 	[inCoder encodeInteger:self.displayedObjectCount forKey:@"displayedObjectCount"];
+	[inCoder encodeBool:self.isGroupNode forKey:@"isGroupNode"];
 	[inCoder encodeBool:self.isTopLevelNode forKey:@"isTopLevelNode"];
-	[inCoder encodeBool:self.isGroup forKey:@"group"];
-	[inCoder encodeBool:self.isLeaf forKey:@"leaf"];
-	[inCoder encodeBool:self.isLoading forKey:@"loading"];
-	[inCoder encodeBool:self.includedInPopup forKey:@"includedInPopup"];
+	[inCoder encodeBool:self.isLeafNode forKey:@"isLeafNode"];
+	[inCoder encodeBool:self.isLoading forKey:@"isLoading"];
 	[inCoder encodeBool:self.isUserAdded forKey:@"isUserAdded"];
+	[inCoder encodeBool:self.isIncludedInPopup forKey:@"isIncludedInPopup"];
 	[inCoder encodeBool:self.wantsRecursiveObjects forKey:@"wantsRecursiveObjects"];
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
 
@@ -337,13 +345,13 @@
 
 // Set loading status for self and complete subtree...
 
-- (void) setLoading:(BOOL)inLoading
+- (void) setIsLoading:(BOOL)inLoading
 {
-	_loading = inLoading;
+	_isLoading = inLoading;
 	
 	for (IMBNode* subnode in self.subnodes)
 	{
-		subnode.loading = inLoading;
+		subnode.isLoading = inLoading;
 	}
 }
 
@@ -353,7 +361,7 @@
 
 - (BOOL) isLoading
 {
-	if (_loading) return YES;
+	if (_isLoading) return YES;
 	if (_parentNode) return [_parentNode isLoading];
 	return NO;
 }

@@ -120,8 +120,8 @@
 	node.parserIdentifier = self.identifier;
 	node.groupType = kIMBGroupTypeLibrary;
 	node.isTopLevelNode = YES;
-	node.group = NO;
-	node.leaf = NO;
+	node.isGroupNode = NO;
+	node.isLeafNode = NO;
 	
 	// JUST TEMP: remove these 2 lines later...
 	
@@ -461,7 +461,7 @@
 			
 			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
 			
-			albumNode.leaf = [self isLeafAlbumType:albumType];
+			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
 			albumNode.icon = [self iconForAlbumType:albumType];
 			albumNode.name = albumName;
 			albumNode.mediaSource = self.mediaSource;
@@ -638,7 +638,7 @@
 			
 			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			
-			subnode.leaf = [self isLeafAlbumType:subNodeType];
+			subnode.isLeafNode = [self isLeafAlbumType:subNodeType];
 			subnode.icon = [self iconForAlbumType:subNodeType];
 			subnode.name = subnodeName;
 			subnode.mediaSource = self.mediaSource;

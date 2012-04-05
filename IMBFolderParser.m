@@ -145,7 +145,7 @@
 	node.mediaType = self.mediaType;
 	node.mediaSource = url;
 	node.isTopLevelNode = YES;
-	node.leaf = countOfSubfolders == 0;
+	node.isLeafNode = countOfSubfolders == 0;
 	node.displayPriority = self.displayPriority;
 	node.isUserAdded = self.isUserAdded;
 	node.parserIdentifier = self.identifier;
@@ -153,12 +153,12 @@
 	if (node.isTopLevelNode)
 	{
 		node.groupType = kIMBGroupTypeFolder;
-		node.includedInPopup = YES;
+		node.isIncludedInPopup = YES;
 	}
 	else
 	{
 		node.groupType = kIMBGroupTypeNone;
-		node.includedInPopup = NO;
+		node.isIncludedInPopup = NO;
 	}
 	
 	// Enable FSEvents based file watching for root nodes...
@@ -269,10 +269,10 @@
 			subnode.isTopLevelNode = NO;
 			subnode.parserIdentifier = self.identifier;
 			subnode.groupType = kIMBGroupTypeFolder;
-			subnode.includedInPopup = NO;
+			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = path;					// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
-			subnode.leaf = countOfSubfolders == 0;
+			subnode.isLeafNode = countOfSubfolders == 0;
 			[subnodes addObject:subnode];
 			[subnode release];
 
@@ -289,7 +289,7 @@
 		}
 		
 		inNode.objects = objects;
-		inNode.leaf = [subnodes count] == 0;
+		inNode.isLeafNode = [subnodes count] == 0;
 	}
 	
 	IMBDrain(pool);

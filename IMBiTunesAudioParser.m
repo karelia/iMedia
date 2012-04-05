@@ -155,8 +155,8 @@
 	node.parserIdentifier = self.identifier;
 	node.groupType = kIMBGroupTypeLibrary;
 	node.isTopLevelNode = YES;
-	node.group = NO;
-	node.leaf = NO;
+	node.isGroupNode = NO;
+	node.isLeafNode = NO;
 
 	// If we have more than one library then append the library name to the root node...
 	
@@ -624,7 +624,7 @@
 			
 			IMBNode* playlistNode = [[[IMBNode alloc] init] autorelease];
 			
-			playlistNode.leaf = [self isLeafPlaylist:playlistDict];
+			playlistNode.isLeafNode = [self isLeafPlaylist:playlistDict];
 			playlistNode.icon = [self iconForPlaylist:playlistDict];
 			playlistNode.name = albumName;
 			playlistNode.mediaSource = self.mediaSource;

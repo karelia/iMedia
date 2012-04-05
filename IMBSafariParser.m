@@ -144,8 +144,8 @@
 	node.parserIdentifier = self.identifier;
 	node.groupType = kIMBGroupTypeLibrary;
 	node.isTopLevelNode = YES;
-	node.group = NO;
-	node.leaf = NO;
+	node.isGroupNode = NO;
+	node.isLeafNode = NO;
 
 	// Watch the XML file. Whenever something in iTunes changes, we have to replace the WHOLE tree from  
 	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
@@ -351,7 +351,7 @@
 		subnode.mediaSource = self.mediaSource;
 		subnode.mediaType = self.mediaType;
 		subnode.parserIdentifier = self.identifier;
-		subnode.leaf = [self isLeafPlist:inPlist];
+		subnode.isLeafNode = [self isLeafPlist:inPlist];
 		subnode.identifier = [self identifierForPlist:inPlist];
 		subnode.icon = icon;
 		subnode.name = title;
@@ -395,7 +395,7 @@
 	else if ([type isEqualToString:@"WebBookmarkTypeList"])
 	{
 		IMBNode* subnode = [self subnodeForPlist:inPlist];
-		subnode.includedInPopup = NO;
+		subnode.isIncludedInPopup = NO;
 
 		NSString* title = [inPlist objectForKey:@"Title"];		// Capitalized for list, lowercase for leaves?
 

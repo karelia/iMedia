@@ -656,7 +656,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			
 			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			
-			subnode.leaf = [self isLeafAlbumType:subNodeType];
+			subnode.isLeafNode = [self isLeafAlbumType:subNodeType];
 			subnode.icon = [self iconForAlbumType:subNodeType];
 			subnode.name = subnodeName;
 			subnode.mediaSource = self.mediaSource;

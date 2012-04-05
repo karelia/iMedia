@@ -318,7 +318,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) populateNode:(IMBNode*)inNode
 {
-	if ([inNode isGroup]) return;
+	if ([inNode isGroupNode]) return;
 	if ([inNode isPopulated]) return;
 	
 	// Ask delegate whether we should populate this node...
@@ -338,7 +338,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[_delegate libraryController:self willPopulateNode:inNode];
 	}
 			
-	inNode.loading = YES;
+	inNode.isLoading = YES;
 	inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
 
 	NSString* parentNodeIdentifier = inNode.parentNode.identifier;
@@ -379,7 +379,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) reloadNodeTree:(IMBNode*)inOldNode
 {
-	if ([inOldNode isGroup]) return;
+	if ([inOldNode isGroupNode]) return;
 
 	NSString* parentNodeIdentifier = inOldNode.parentNode.identifier;
 	IMBParserMessenger* messenger = inOldNode.parserMessenger;
@@ -401,7 +401,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[_delegate libraryController:self willCreateNodeWithParserMessenger:messenger];
 	}
 			
-	inOldNode.loading = YES;
+	inOldNode.isLoading = YES;
 	inOldNode.badgeTypeNormal = kIMBBadgeTypeLoading;
 
 	SBPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNodeTree:error:),inOldNode,
@@ -468,7 +468,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	for (IMBNode* node in _subnodes)
 	{
-		if (node.groupType == groupType && node.group == YES)
+		if (node.groupType == groupType && node.isGroupNode == YES)
 		{
 			return node;
 		}
@@ -476,13 +476,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	IMBNode* groupNode = [[[IMBNode alloc] init] autorelease];
 	groupNode.mediaType = self.mediaType;
-	groupNode.group = YES;
-	groupNode.leaf = NO;
+	groupNode.isGroupNode = YES;
+	groupNode.isLeafNode = NO;
 	groupNode.isUserAdded = NO;
-	groupNode.includedInPopup = YES;
+	groupNode.isIncludedInPopup = YES;
 	groupNode.parserIdentifier = nil;
 	groupNode.parserMessenger = nil;
-	groupNode.loading = NO;
+	groupNode.isLoading = NO;
 	groupNode.badgeTypeNormal = kIMBBadgeTypeNone;
 	
 	if (groupType == kIMBGroupTypeLibrary)
@@ -635,7 +635,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		if (inNewNode)
 		{
-			inNewNode.loading = NO;
+			inNewNode.isLoading = NO;
 			inNewNode.badgeTypeNormal = kIMBBadgeTypeNone;
 		}
 		
@@ -647,7 +647,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		for (IMBNode* node in rootNodes)
 		{
-            if (node.isGroup && node.countOfSubnodes == 0)
+            if (node.isGroupNode && node.countOfSubnodes == 0)
             {
 				[emptyGroupNodes addObject:node];
 			}
@@ -809,7 +809,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	for (IMBNode* node in self.subnodes)
 	{
-		if (node.isGroup)
+		if (node.isGroupNode)
 		{
 			for (IMBNode* subnode in node.subnodes)
 			{
@@ -842,7 +842,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		 selector:(SEL)inSelector 
 		 target:(id)inTarget
 {
-	if (inNode!=nil && inNode.includedInPopup)
+	if (inNode!=nil && inNode.isIncludedInPopup)
 	{
 		// Create a menu item with the node name...
 		
@@ -852,7 +852,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:name action:nil keyEquivalent:@""];
 
-		if (inNode.isGroup) 
+		if (inNode.isGroupNode) 
 		{
 			[item setTarget:inTarget];						// Group nodes get a dummy action that will be disabled
 			[item setAction:@selector(__dummyAction:)];		// in - [IMBNodeViewController validateMenuItem:]

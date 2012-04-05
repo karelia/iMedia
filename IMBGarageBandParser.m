@@ -118,8 +118,8 @@
 	node.parserIdentifier = self.identifier;
 	node.groupType = kIMBGroupTypeLibrary;
 	node.isTopLevelNode = YES;
-	node.group = NO;
-	node.leaf = NO;
+	node.isGroupNode = NO;
+	node.isLeafNode = NO;
 
 	return node;
 }
@@ -167,8 +167,8 @@
 			subnode.mediaSource = [NSURL fileURLWithPath:userSongsPath];
 			subnode.parserIdentifier = self.identifier;
 			subnode.isTopLevelNode = NO;
-			subnode.includedInPopup = YES;
-			subnode.leaf = YES;
+			subnode.isIncludedInPopup = YES;
+			subnode.isLeafNode = YES;
 			[subnodes addObject:subnode];
 		}
 		
@@ -188,8 +188,8 @@
 			subnode.mediaSource = [NSURL fileURLWithPath:demoSongsPath];
 			subnode.parserIdentifier = self.identifier;
 			subnode.isTopLevelNode = NO;
-			subnode.includedInPopup = YES;
-			subnode.leaf = YES;
+			subnode.isIncludedInPopup = YES;
+			subnode.isLeafNode = YES;
 			[subnodes addObject:subnode];
 		}
 

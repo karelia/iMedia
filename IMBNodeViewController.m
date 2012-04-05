@@ -518,7 +518,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	}
 	else
 	{
-		return ![(IMBNode*)inItem isLeaf];
+		return ![(IMBNode*)inItem isLeafNode];
 	}
 }
 
@@ -665,7 +665,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 			shouldSelect = [delegate libraryController:self.libraryController shouldPopulateNode:node];
 		}
 		
-		if (node.isGroup)
+		if (node.isGroupNode)
 		{
 			shouldSelect = NO;
 		}
@@ -761,7 +761,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 -(BOOL) outlineView:(NSOutlineView*)inOutlineView isGroupItem:(id)inItem
 {
 	IMBNode* node = (IMBNode*)inItem; 
-	return node.isGroup;
+	return node.isGroupNode;
 }
 
 
@@ -964,7 +964,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		node = [self _nodeAtRow:i];
 		identifier = node.identifier;
 		
-		if (selectedNodeIdentifier == nil && node.isGroup == NO)
+		if (selectedNodeIdentifier == nil && node.isGroupNode == NO)
 		{
 			selectedNodeIdentifier = identifier;
 		}
@@ -1009,7 +1009,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 {
 	if (inNode)
 	{	
-		if (inNode.isGroup)
+		if (inNode.isGroupNode)
 		{
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
 			[self installObjectViewForNode:nil];
@@ -1157,7 +1157,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (BOOL) canAddNode
 {
 	IMBNode* node = [self selectedNode];
-	return node == nil || (node.isGroup && node.groupType == kIMBGroupTypeFolder);
+	return node == nil || (node.isGroupNode && node.groupType == kIMBGroupTypeFolder);
 }
 
 
@@ -1217,7 +1217,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (BOOL) canReloadNode
 {
 	IMBNode* node = [self selectedNode];
-	return node!=nil && !node.isGroup && !node.isLoading;
+	return node!=nil && !node.isGroupNode && !node.isLoading;
 }
 
 
@@ -1242,7 +1242,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	// First we'll add standard menu items...
 	
-	if (inNode==nil || (inNode.isGroup && inNode.groupType==kIMBGroupTypeFolder))
+	if (inNode==nil || (inNode.isGroupNode && inNode.groupType==kIMBGroupTypeFolder))
 	{
 		title = NSLocalizedStringWithDefaultValue(
 			@"IMBNodeViewController.menuItem.add",
@@ -1270,7 +1270,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		[item release];
 	}
 	
-	if (inNode!=nil && !inNode.isGroup && !inNode.isLoading)
+	if (inNode!=nil && !inNode.isGroupNode && !inNode.isLoading)
 	{
 		title = NSLocalizedStringWithDefaultValue(
 			@"IMBNodeViewController.menuItem.reload",

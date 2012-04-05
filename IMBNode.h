@@ -44,7 +44,10 @@
 */
 
 
-// Author: Peter Baumgartner
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,31 +81,34 @@
 	NSString* _identifier;
 	NSString* _mediaType;
 	NSURL* _mediaSource;
-	
-	IMBNode* _parentNode;	// not retained!
-	NSMutableArray* _subnodes;
-	NSArray* _objects;
-
-	// State information...
-
 	NSDictionary* _attributes;
 	NSUInteger _groupType;
-	NSUInteger _displayPriority;
-	NSInteger _displayedObjectCount;
-	BOOL _isTopLevelNode;
-	BOOL _group;
-	BOOL _leaf;
-	BOOL _loading;
-	BOOL _includedInPopup;
-	BOOL _isUserAdded;
-	BOOL _wantsRecursiveObjects;
-	BOOL _shouldDisplayObjectView;
 	
+	// Subnodes & Objects...
+	
+	NSMutableArray* _subnodes;
+	NSArray* _objects;
+	IMBNode* _parentNode;	// not retained!
+
 	// Info about our parser...
 	
 	IMBParserMessenger* _parserMessenger;
 	NSString* _parserIdentifier;
 
+	// State information...
+
+	NSUInteger _displayPriority;
+	NSInteger _displayedObjectCount;
+	
+	BOOL _isGroupNode;
+	BOOL _isTopLevelNode;
+	BOOL _isLeafNode;
+	BOOL _isLoading;
+	BOOL _isUserAdded;
+	BOOL _isIncludedInPopup;
+	BOOL _wantsRecursiveObjects;
+	BOOL _shouldDisplayObjectView;
+	
 	// Observing file system changes...
 	
 	IMBWatcherType _watcherType;
@@ -116,6 +122,10 @@
 	SEL _badgeSelector;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Primary properties for a node:
 
 @property (retain) NSImage* icon;					// 16x16 icon for user interface
@@ -123,18 +133,24 @@
 @property (copy) NSString* identifier;				// Unique identifier of form parserClassName://path/to/node
 @property (retain) NSString* mediaType;				// See IMBCommon.h
 @property (retain) NSURL* mediaSource;				// Only toplevel nodes need this property
-
 @property (retain) NSDictionary* attributes;		// Optional metadata about a node
 @property (assign) NSUInteger groupType;			// Used for grouping toplevel nodes
-@property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
-@property (assign) BOOL shouldDisplayObjectView;	
+
+// Info about our parser...
+
+@property (retain) IMBParserMessenger* parserMessenger;
+@property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Node tree accessors. If the subnodes property is nil, that doesn't mean that there are no subnodes - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
 // subnodes is an empty array, then there really aren't any subnodes...
 
-@property (retain,readonly) NSArray* subnodes;				
-@property (assign,readonly) IMBNode* parentNode;
+@property (retain,readonly) NSArray* subnodes;		
+		
 - (NSUInteger) countOfSubnodes;
 - (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;
 
@@ -142,6 +158,14 @@
 // is marked as populated...
 
 - (NSMutableArray*) mutableArrayForPopulatingSubnodes;
+
+// The parentNode is not retained!
+
+@property (assign,readonly) IMBNode* parentNode;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Object accessors. If the objects property is nil, that doesn't mean that there are no objects - instead it
 // means that the array hasn't been created yet and will be created lazily at a later time. If on the other hand 
@@ -160,26 +184,27 @@
 
 // This property can be used by parsers if the real object count differs from what the NSArrayController sees. 
 // An example would be a folder based parser. If a folder contains 3 images and 3 subfolders, then 6 objects 
-// are reported by the NSArrayController, but we really only want 3 image displayed in the user interface.
+// are reported by the NSArrayController, but we really only want "3 images" displayed in the user interface.
 // If property is left at the uninitialized value of -1, then countOfBindableObjects is used as is. If a parser
 // chooses to write a non negative value into this property, then this number is displayed instead...
  
 @property (assign) NSInteger displayedObjectCount;
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // State information about a node...
 
-@property (assign,getter=isGroup) BOOL group;
-@property (assign,getter=isLeaf) BOOL leaf;
-@property (assign,getter=isLoading) BOOL loading;
-@property (assign) BOOL includedInPopup;
-@property (assign) BOOL isUserAdded;
-@property (assign) BOOL wantsRecursiveObjects;
+@property (assign) BOOL isGroupNode;
 @property (assign) BOOL isTopLevelNode;
-
-// Info about our parser...
-
-@property (retain) IMBParserMessenger* parserMessenger;
-@property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
+@property (assign) BOOL isLeafNode;
+@property (assign) BOOL isLoading;
+@property (assign) BOOL isUserAdded;
+@property (assign) BOOL isIncludedInPopup;
+@property (assign) BOOL wantsRecursiveObjects;
+@property (assign) BOOL shouldDisplayObjectView;	
+@property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
 
 // Observing file system changes...
 
@@ -193,6 +218,10 @@
 @property (assign) IMBBadgeType badgeTypeMouseover;
 @property (retain) id badgeTarget;
 @property (assign) SEL badgeSelector;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 // Helper methods
 
