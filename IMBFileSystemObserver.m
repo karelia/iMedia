@@ -56,8 +56,10 @@
 #pragma mark HEADERS
 
 #import "IMBFileSystemObserver.h"
-#import <XPCKit/XPCKit.h>
+#import "IMBFileWatcher.h"
+#import "IMBFSEventsWatcher.h"
 #import "SBUtilities.h"
+#import <XPCKit/XPCKit.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +73,18 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#warning TODO: implement 10.6 comaptibilty
+#pragma mark 
+
+// Private methods...
+
+@interface IMBFileSystemObserver ()
+- (void) _setupXPCService;
+- (void) _setupFSEventsWatcher;
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 #pragma mark 
 
@@ -105,41 +118,22 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Initialize file system observing. If sandboxed then use the XPC service, otherwise use do it directly...
+		
 - (id) init
 {
 	if ((self = [super init]))
 	{
-		// Set default delay...
+		_notificationDelay = 2.0;
 		
-		_notificationDelay = 3.0;
-		
-		// Launch the FSEvents XPC service and establish a connection to it...
-		
-		_connection = [[XPCConnection alloc] initWithServiceName:@"com.karelia.imedia.FSEvents"];
-		
-		// Install a global event handler to receive replies. For each pathDidChange reply we'll get,  
-		// we will send out a notification on the main thread that any interested parties (probably 
-		// the IMBLibraryController) can listen to...
-		
-		_connection.eventHandler = ^(XPCMessage* inMessage,XPCConnection *inConnection)
+		if (SBIsSandboxed())
 		{
-			NSString* operation = [inMessage objectForKey:@"operation"];
-			NSString* path = [inMessage objectForKey:@"path"];
-                
-			if ([operation isEqual:@"pathDidChange"])
-			{
-				dispatch_async(dispatch_get_main_queue(),^()
-				{
-					SEL method = @selector(sendDidChangeNotificationForPath:);
-					[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:path];
-					[self performSelector:method withObject:path afterDelay:_notificationDelay];
-				});
-			}
-		};
-
-		// Init the FSEvents service...
-		
-		[_connection sendMessage:[XPCMessage messageWithObjectsAndKeys:@"start",@"operation",nil]];
+			[self _setupXPCService];
+		}
+		else
+		{
+			[self _setupFSEventsWatcher];
+		}
 	}
 	
 	return self;
@@ -151,9 +145,58 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 - (void) dealloc
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[_connection sendMessage:[XPCMessage messageWithObjectsAndKeys:@"stop",@"operation",nil]];
-	IMBRelease(_connection);
+	
+	if (_connection)
+	{
+		[_connection sendMessage:[XPCMessage messageWithObjectsAndKeys:@"stop",@"operation",nil]];
+		IMBRelease(_connection);
+	}
+	
 	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// In a sandboxed Lion app we'll use an XPC service that will stay around for the filetime of the app...
+
+- (void) _setupXPCService
+{
+	// Launch the FSEvents XPC service and establish a connection to it...
+	
+	_connection = [[XPCConnection alloc] initWithServiceName:@"com.karelia.imedia.FSEvents"];
+	
+	// Install a global event handler to receive replies. For each pathDidChange reply we'll get,  
+	// we will send out a notification on the main thread that any interested parties (probably 
+	// the IMBLibraryController) can listen to...
+	
+	_connection.eventHandler = ^(XPCMessage* inMessage,XPCConnection *inConnection)
+	{
+		NSString* operation = [inMessage objectForKey:@"operation"];
+		NSString* path = [inMessage objectForKey:@"path"];
+			
+		if ([operation isEqual:@"pathDidChange"])
+		{
+			dispatch_async(dispatch_get_main_queue(),^()
+			{	
+				[self sendDidChangeNotificationForPath:path];
+			});
+		}
+	};
+
+	// Init the FSEvents service...
+	
+	[_connection sendMessage:[XPCMessage messageWithObjectsAndKeys:@"start",@"operation",nil]];
+}
+
+
+// On 10.6 we will create a watcher and handle everything directly here in our own process...
+
+- (void) _setupFSEventsWatcher
+{
+	[[IMBFSEventsWatcher sharedFileWatcher] setDelegate:self];
+	[[IMBFSEventsWatcher sharedFileWatcher] setDispatchQueue:dispatch_get_main_queue()];
 }
 
 
@@ -166,10 +209,17 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 {
 	if (inPath)
 	{
-		[_connection sendMessage:[XPCMessage messageWithObjectsAndKeys:
-			@"addPath",@"operation",
-			inPath,@"path",
-			nil]];
+		if (_connection)
+		{
+			[_connection sendMessage:[XPCMessage messageWithObjectsAndKeys:
+				@"addPath",@"operation",
+				inPath,@"path",
+				nil]];
+		}
+		else
+		{
+			[[IMBFSEventsWatcher sharedFileWatcher] addPath:inPath];
+		}
 	}
 }
 
@@ -180,10 +230,17 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 {
 	if (inPath)
 	{
-		[_connection sendMessage:[XPCMessage messageWithObjectsAndKeys:
-			@"removePath",@"operation",
-			inPath,@"path",
-			nil]];
+		if (_connection)
+		{
+			[_connection sendMessage:[XPCMessage messageWithObjectsAndKeys:
+				@"removePath",@"operation",
+				inPath,@"path",
+				nil]];
+		}
+		else
+		{
+			[[IMBFSEventsWatcher sharedFileWatcher] removePath:inPath];
+		}
 	}
 }
 
@@ -191,9 +248,25 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Send a notification to interested parties...
+// This callback is only used on 10.6. When sandboxed on Lion everything is handled by the XPC service...
+
+- (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotification forPath:(NSString*)inPath
+{
+	[self sendDidChangeNotificationForPath:inPath];
+}
+
+
+// Send a notification to interested parties (taking the coalescing delay into account)...
 
 - (void) sendDidChangeNotificationForPath:(NSString*)inPath
+{
+	SEL method = @selector(_sendDidChangeNotificationForPath:);
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:method object:inPath];
+	[self performSelector:method withObject:inPath afterDelay:_notificationDelay];
+}
+
+
+- (void) _sendDidChangeNotificationForPath:(NSString*)inPath
 {
 //	NSLog(@"RECEIVED CHANGE FOR PATH %@",inPath);
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBPathDidChangeNotification object:inPath];
