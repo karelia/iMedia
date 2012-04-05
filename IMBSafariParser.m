@@ -44,7 +44,10 @@
 */
 
 
-// Author: Peter Baumgartner
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Author: Peter Baumgartner, Dan Wood
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,15 +56,12 @@
 #pragma mark HEADERS
 
 #import "IMBSafariParser.h"
-#import "IMBParserController.h"
 #import "IMBNode.h"
 #import "IMBLinkObject.h"
+#import "IMBNodeObject.h"
+#import "NSImage+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
-#import "NSImage+iMedia.h"
-#import "IMBNodeObject.h"
-#import <WebKit/WebKit.h>
-#import <Quartz/Quartz.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -183,80 +183,6 @@
 {
 	return nil;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
-//{
-//	NSError* error = nil;
-//	
-//	// Oops no path, can't create a root node. This is bad...
-//	
-//	if (self.mediaSource == nil)
-//	{
-//		return nil;
-//	}
-//	
-//	// Create an (unpopulated) root node...
-//	
-//	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-//	
-//	if (inOldNode == nil)		// implicit command to create the empty root node
-//	{
-//		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
-//		[icon setScalesWhenResized:YES];
-//		[icon setSize:NSMakeSize(16.0,16.0)];
-//
-//		node.mediaSource = self.mediaSource;
-//		node.identifier = [self identifierForPath:@"/"];
-//		node.name = @"Safari";
-//		node.icon = icon;
-//		node.groupType = kIMBGroupTypeLibrary;
-//		node.leaf = NO;
-//		node.isTopLevelNode = YES;
-//		node.parser = self;
-//		node.objects = [NSMutableArray array];	// Note that we don't set subnodes, which means node not populated yet.
-//	}
-//	
-//	// Or an subnode...  Creates a clone of an old node
-//	
-//	else
-//	{
-//		node.mediaSource = self.mediaSource;
-//		node.identifier = inOldNode.identifier;
-//		node.name = inOldNode.name;
-//		node.icon = inOldNode.icon;
-//		node.groupType = inOldNode.groupType;
-//		node.leaf = inOldNode.leaf;
-//		node.parser = self;
-//		node.isTopLevelNode = inOldNode.isTopLevelNode;
-//	}
-//	
-//	// Watch the XML file. Whenever something in Safari changes, we have to replace the WHOLE tree   
-//	// from the root node down, as we have no way of finding WHAT has changed in Safari...
-//	
-//	if (node.isTopLevelNode)
-//	{
-//		node.watcherType = kIMBWatcherTypeFSEvent;
-//		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
-//	}
-//	else
-//	{
-//		node.watcherType = kIMBWatcherTypeNone;
-//	}
-//	
-//	// If the old node was populated, then also populate the new node...
-//	
-//	if (inOldNode.isPopulated)
-//	{
-//		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
-//	}
-//	
-//	if (outError) *outError = error;
-//	return node;
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
