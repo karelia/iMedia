@@ -78,7 +78,7 @@ static dispatch_queue_t sDispatchQueue = NULL;
 
 @implementation IMBFSEventsWatcherDelegate
 
--(void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotification forPath:(NSString*)inPath
+- (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotification forPath:(NSString*)inPath
 {
 //	[sConnection sendLog:[NSString stringWithFormat:@"DETECTED CHANGE FOR PATH %@",inPath]];
 	
@@ -97,7 +97,7 @@ static dispatch_queue_t sDispatchQueue = NULL;
 #pragma mark
 
 
-int main(int argc, const char *argv[])
+int main(int argc,const char *argv[])
 {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
