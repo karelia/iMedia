@@ -220,7 +220,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		{
 			self.imageRepresentation = (id)[coder decodeCGImageForKey:@"imageRepresentation"];
 		}
-		else if ([self.imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
+		else
 		{
 			self.imageRepresentation = [coder decodeObjectForKey:@"imageRepresentation"];
 		}
@@ -255,7 +255,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	{
 		[coder encodeCGImage:(CGImageRef)self.imageRepresentation forKey:@"imageRepresentation"];
 	}
-	else if ([self.imageRepresentationType isEqualToString:IKImageBrowserNSImageRepresentationType])
+	else
 	{
 		[coder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
 	}
