@@ -53,15 +53,14 @@
 #pragma mark HEADERS
 
 #import "IMBLightroom2Parser.h"
-
-#import <Quartz/Quartz.h>
-
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "SBUtilities.h"
+#import <Quartz/Quartz.h>
 
 
 @implementation IMBLightroom2Parser
@@ -83,7 +82,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom2");
+	CFStringRef recentLibrariesList = SBPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom2");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -91,7 +90,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom2");
+		CFPropertyListRef activeLibraryPath = SBPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom2");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);
@@ -121,6 +120,7 @@
 			
 			IMBLightroom2Parser* parser = [[[self class] alloc] init];
 			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
+			parser.mediaType = inMediaType;
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			

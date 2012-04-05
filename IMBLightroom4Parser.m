@@ -65,6 +65,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "SBUtilities.h"
 #import <Quartz/Quartz.h>
 
 
@@ -103,7 +104,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom4");
+	CFStringRef recentLibrariesList = SBPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom4");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -111,7 +112,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom4");
+		CFPropertyListRef activeLibraryPath = SBPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom4");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);
@@ -141,6 +142,7 @@
 			
 			IMBLightroom4Parser* parser = [[[[self class] alloc] init] autorelease];
 			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
+			parser.mediaType = inMediaType;
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			
@@ -505,7 +507,7 @@
 
 - (FMDatabase*) libraryDatabase
 {
-	NSString* databasePath = (NSString*)self.mediaSource;
+	NSString* databasePath = [self.mediaSource path];
 	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
 	
 	[database setLogsErrors:YES];
@@ -515,7 +517,7 @@
 
 - (FMDatabase*) previewsDatabase
 {
-	NSString* mainDatabasePath = (NSString*)self.mediaSource;
+	NSString* mainDatabasePath = [self.mediaSource path];
 	NSString* rootPath = [mainDatabasePath stringByDeletingPathExtension];
 	NSString* previewPackagePath = [[NSString stringWithFormat:@"%@ Previews", rootPath] stringByAppendingPathExtension:@"lrdata"];
 	NSString* previewDatabasePath = [[previewPackagePath stringByAppendingPathComponent:@"previews"] stringByAppendingPathExtension:@"db"];

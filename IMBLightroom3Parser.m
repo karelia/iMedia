@@ -65,7 +65,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
-
+#import "SBUtilities.h"
 #import <Quartz/Quartz.h>
 
 
@@ -105,7 +105,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3");
+	CFStringRef recentLibrariesList = SBPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -113,7 +113,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3");
+		CFPropertyListRef activeLibraryPath = SBPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);
@@ -143,6 +143,7 @@
 			
 			IMBLightroom3Parser* parser = [[[[self class] alloc] init] autorelease];
 			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
+			parser.mediaType = inMediaType;
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			
@@ -501,7 +502,7 @@
 
 - (FMDatabase*) libraryDatabase
 {
-	NSString* databasePath = (NSString*)self.mediaSource;
+	NSString* databasePath = [self.mediaSource path];
 	NSString* readOnlyDatabasePath = [[self class] cloneDatabase:databasePath];
 	FMDatabase* database = [FMDatabase databaseWithPath:readOnlyDatabasePath];
 	
@@ -512,7 +513,7 @@
 
 - (FMDatabase*) previewsDatabase
 {
-	NSString* mainDatabasePath = (NSString*)self.mediaSource;
+	NSString* mainDatabasePath = [self.mediaSource path];
 	NSString* rootPath = [mainDatabasePath stringByDeletingPathExtension];
 	NSString* previewPackagePath = [[NSString stringWithFormat:@"%@ Previews", rootPath] stringByAppendingPathExtension:@"lrdata"];
 	NSString* previewDatabasePath = [[previewPackagePath stringByAppendingPathComponent:@"previews"] stringByAppendingPathExtension:@"db"];

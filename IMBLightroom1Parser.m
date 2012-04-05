@@ -53,10 +53,10 @@
 #pragma mark HEADERS
 
 #import "IMBLightroom1Parser.h"
-
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "SBUtilities.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
+	CFStringRef recentLibrariesList = SBPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
 																(CFStringRef)@"com.adobe.Lightroom");
 	
 	if (recentLibrariesList) {
@@ -91,7 +91,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
+		CFPropertyListRef activeLibraryPath = SBPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
 																		(CFStringRef)@"com.adobe.Lightroom");
 		
 		if (activeLibraryPath) {
@@ -122,6 +122,7 @@
 			
 			IMBLightroom1Parser* parser = [[[self class] alloc] init];
 			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
+			parser.mediaType = inMediaType;
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			

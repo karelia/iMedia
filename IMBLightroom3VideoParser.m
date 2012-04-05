@@ -44,7 +44,10 @@
  */
 
 
-// Author: Peter Baumgartner
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Author: Pierre Bernard
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,17 +61,6 @@
 #import "NSDictionary+iMedia.h"
 #import "NSURL+iMedia.h"
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBLightroom3VideoParser ()
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
-
-@end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -76,6 +68,10 @@
 #pragma mark 
 
 @implementation IMBLightroom3VideoParser
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 - (NSString*) folderObjectsQuery
 {
@@ -95,6 +91,7 @@
 	return query;
 }
 
+
 - (NSString*) collectionObjectsQuery
 {
 	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
@@ -113,6 +110,7 @@
 	return query;
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -121,38 +119,24 @@
 // This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
 // Please note that this method may be called on a background thread...
 
-- (void) loadMetadataForObject:(IMBObject*)inObject
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+	NSMutableDictionary* metadata = nil;
 	NSURL* videoURL = [inObject URL];
 	
-	if (videoURL == nil) {
-		return;
-	}
-	
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
-	
-	[metadata setObject:[inObject path] forKey:@"path"];
-	[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
-	
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-	
-	if ([NSThread isMainThread])
+	if (videoURL)
 	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
+		metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+		[metadata setObject:[inObject path] forKey:@"path"];
+		[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
 	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-	}
+
+	if (outError) *outError = nil;
+	return metadata;
 }
 
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
-}
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 @end

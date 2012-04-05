@@ -197,7 +197,7 @@ static dispatch_once_t sOnceToken = 0;
 
 + (NSString*) mediaType
 {
-	return kIMBMediaTypeAudio;
+	return kIMBMediaTypeImage;
 }
 
 + (NSString*) parserClassName

@@ -153,7 +153,6 @@ static NSArray* sSupportedUTIs = nil;
 	if ((self = [super init]))
 	{
 		self.appPath = [[self class] lightroomPath];
-		self.mediaType = [[self class] mediaType];
 		
 		_databases = [[NSMutableDictionary alloc] init];
 		_thumbnailDatabases = [[NSMutableDictionary alloc] init];		
@@ -1106,7 +1105,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (NSString*) libraryName
 {
-	NSString* path = (NSString*)self.mediaSource;
+	NSString* path = [self.mediaSource path];
 	NSString* name = [[path lastPathComponent] stringByDeletingPathExtension];
 	return name;
 }
@@ -1116,7 +1115,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (FMDatabase*) libraryDatabase
 {
-	NSString* databasePath = (NSString*)self.mediaSource;
+	NSString* databasePath = [self.mediaSource path];
 	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
 	
 	[database setLogsErrors:YES];
@@ -1126,7 +1125,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (FMDatabase*) previewsDatabase
 {
-	NSString* databasePath = (NSString*)self.mediaSource;
+	NSString* databasePath = [self.mediaSource path];
 	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
 	
 	[database setLogsErrors:YES];
@@ -1183,7 +1182,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (NSString*) rootNodeIdentifier
 {
-	NSString* libraryPath = (NSString*) self.mediaSource;
+	NSString* libraryPath = [self.mediaSource path];
 	NSString* libraryName = [self libraryName];
 	NSString* path = [NSString stringWithFormat:@"/%@(%lu)",libraryName,[libraryPath hash]];
 	return [self identifierForPath:path];
@@ -1194,7 +1193,7 @@ static NSArray* sSupportedUTIs = nil;
 
 - (NSString*) pathPrefixWithType:(NSString*)type
 {
-	NSString* libraryPath = (NSString*) self.mediaSource;
+	NSString* libraryPath = [self.mediaSource path];
 	NSString* libraryName = [self libraryName];
 	NSString* pathPrefix = [NSString stringWithFormat:@"/%@(%lu)/%@/",libraryName,[libraryPath hash],type];
 	return pathPrefix;
