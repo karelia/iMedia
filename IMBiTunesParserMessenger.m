@@ -122,7 +122,7 @@ static dispatch_once_t sOnceToken = 0;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This method is called on the XPC service side. Discover the path to the AlbumData.xml file and create  
+// This method is called on the XPC service side. Discover the path to the iTunesLibrary.xml file and create  
 // an IMBParser instance preconfigured with that path...
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
