@@ -52,10 +52,10 @@
 
 #pragma mark HEADERS
 
-#import "IMBSafariBookmarkParser.h"
+#import "IMBSafariParser.h"
 #import "IMBParserController.h"
 #import "IMBNode.h"
-#import "IMBObject.h"
+#import "IMBLinkObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
@@ -67,7 +67,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBSafariBookmarkParser ()
+@interface IMBSafariParser ()
 - (NSDictionary*) plist;
 - (NSString*) identifierForPlist:(NSDictionary*)inPlist;
 - (BOOL) isLeafPlist:(NSDictionary*)inPlist;
@@ -82,7 +82,7 @@
 
 #pragma mark 
 
-@implementation IMBSafariBookmarkParser
+@implementation IMBSafariParser
 
 @synthesize appPath = _appPath;
 @synthesize plist = _plist;
@@ -93,78 +93,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-+ (void) load
+- (id) init
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
-	// Register this parser, so that it gets automatically loaded...
-
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeLink];
-
-	// Force the WebIconDatabase to be created on main thread - some webkit versions seem to complain when 
-	// it's not the case...
-	// NOT Enabled for now... Doesn't work, and makes App Store reject us.
-	// [WebIconDatabase performSelectorOnMainThread:@selector(sharedIconDatabase) withObject:nil waitUntilDone:YES];
-
-	[pool drain];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Check if Safari is installed...
-
-+ (NSString*) safariPath
-{
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.Safari"];
-}
-
-
-+ (BOOL) isInstalled
-{
-	return [self safariPath] != nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Create a single parser instance for Safari bookmarks (if Safari is installed)...
-
-+ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
-{
-	NSMutableArray* parserInstances = [NSMutableArray array];
-	
-	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-	
-	if ([libraryPaths count] > 0)
+	if ((self = [super init]))
 	{
-		NSString *libraryPath = [libraryPaths objectAtIndex:0];
-
-		NSString* path = [libraryPath stringByAppendingPathComponent:@"Safari/Bookmarks.plist"];
-
-		if ([self isInstalled] && [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
-		{
-			IMBSafariBookmarkParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-			parser.mediaSource = path;
-			[parserInstances addObject:parser];
-			[parser release];
-		}
-	}
-	
-	return parserInstances;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) initWithMediaType:(NSString*)inMediaType
-{
-	if (self = [super initWithMediaType:inMediaType])
-	{
-		self.appPath = [[self class] safariPath];
+		self.appPath = nil;
 		self.plist = nil;
 		self.modificationDate = nil;
 		self.safariFaviconCache = [NSMutableDictionary dictionary];
@@ -180,7 +113,6 @@
 	IMBRelease(_plist);
 	IMBRelease(_modificationDate);
 	IMBRelease(_safariFaviconCache);
-	
 	[super dealloc];
 }
 
@@ -191,73 +123,36 @@
 #pragma mark 
 #pragma mark Parser Methods
 
-- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
+
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
-	NSError* error = nil;
+	NSURL* url = (NSURL*)self.mediaSource;
+	NSString* path = [url path];
+
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16.0,16.0)];
 	
-	// Oops no path, can't create a root node. This is bad...
-	
-	if (self.mediaSource == nil)
-	{
-		return nil;
-	}
-	
-	// Create an (unpopulated) root node...
+	// Create an empty (unpopulated) root node...
 	
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-	
-	if (inOldNode == nil)		// implicit command to create the empty root node
-	{
-		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
-		[icon setScalesWhenResized:YES];
-		[icon setSize:NSMakeSize(16.0,16.0)];
+	node.icon = icon;
+	node.name = @"Safari";
+	node.identifier = [self identifierForPath:@"/"];
+	node.mediaType = self.mediaType;
+	node.mediaSource = self.mediaSource;
+	node.parserIdentifier = self.identifier;
+	node.groupType = kIMBGroupTypeLibrary;
+	node.isTopLevelNode = YES;
+	node.group = NO;
+	node.leaf = NO;
 
-		node.mediaSource = self.mediaSource;
-		node.identifier = [self identifierForPath:@"/"];
-		node.name = @"Safari";
-		node.icon = icon;
-		node.groupType = kIMBGroupTypeLibrary;
-		node.leaf = NO;
-		node.isTopLevelNode = YES;
-		node.parser = self;
-		node.objects = [NSMutableArray array];	// Note that we don't set subnodes, which means node not populated yet.
-	}
+	// Watch the XML file. Whenever something in iTunes changes, we have to replace the WHOLE tree from  
+	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
 	
-	// Or an subnode...  Creates a clone of an old node
+	node.watcherType = kIMBWatcherTypeFSEvent;
+	node.watchedPath = [path stringByDeletingLastPathComponent];
 	
-	else
-	{
-		node.mediaSource = self.mediaSource;
-		node.identifier = inOldNode.identifier;
-		node.name = inOldNode.name;
-		node.icon = inOldNode.icon;
-		node.groupType = inOldNode.groupType;
-		node.leaf = inOldNode.leaf;
-		node.parser = self;
-		node.isTopLevelNode = inOldNode.isTopLevelNode;
-	}
-	
-	// Watch the XML file. Whenever something in Safari changes, we have to replace the WHOLE tree   
-	// from the root node down, as we have no way of finding WHAT has changed in Safari...
-	
-	if (node.isTopLevelNode)
-	{
-		node.watcherType = kIMBWatcherTypeFSEvent;
-		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
-	}
-	else
-	{
-		node.watcherType = kIMBWatcherTypeNone;
-	}
-	
-	// If the old node was populated, then also populate the new node...
-	
-	if (inOldNode.isPopulated)
-	{
-		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
-	}
-	
-	if (outError) *outError = error;
 	return node;
 }
 
@@ -265,12 +160,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Once the root node is selected or expanded, parse the whole tree at once, as we are only dealing with a 
-// relatively small data set. In this case strict lazy loading on a node by node basis doesn't make sense,
-// as it would require loading the plist form disk multiple times, which would probably outweight the benefits
-// of lazy loading...
- 
-- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
 	
@@ -278,27 +168,95 @@
 	{
 		NSDictionary* plist = [self plist];
 		[self populateNode:inNode plist:plist];
-		[self didStopUsingParser];
 	}
 
 	if (outError) *outError = error;
-	return error == nil;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// When the parser is deselected, then get rid of the cached plist data. It will be loaded into memory lazily 
-// once it is needed again...
+// Since we know that we have local files we can use the helper method supplied by the base class...
 
-- (void) didStopUsingParser
+- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	@synchronized(self)
-	{
-		self.plist = nil;
-	}	
+	return nil;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+//- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
+//{
+//	NSError* error = nil;
+//	
+//	// Oops no path, can't create a root node. This is bad...
+//	
+//	if (self.mediaSource == nil)
+//	{
+//		return nil;
+//	}
+//	
+//	// Create an (unpopulated) root node...
+//	
+//	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+//	
+//	if (inOldNode == nil)		// implicit command to create the empty root node
+//	{
+//		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
+//		[icon setScalesWhenResized:YES];
+//		[icon setSize:NSMakeSize(16.0,16.0)];
+//
+//		node.mediaSource = self.mediaSource;
+//		node.identifier = [self identifierForPath:@"/"];
+//		node.name = @"Safari";
+//		node.icon = icon;
+//		node.groupType = kIMBGroupTypeLibrary;
+//		node.leaf = NO;
+//		node.isTopLevelNode = YES;
+//		node.parser = self;
+//		node.objects = [NSMutableArray array];	// Note that we don't set subnodes, which means node not populated yet.
+//	}
+//	
+//	// Or an subnode...  Creates a clone of an old node
+//	
+//	else
+//	{
+//		node.mediaSource = self.mediaSource;
+//		node.identifier = inOldNode.identifier;
+//		node.name = inOldNode.name;
+//		node.icon = inOldNode.icon;
+//		node.groupType = inOldNode.groupType;
+//		node.leaf = inOldNode.leaf;
+//		node.parser = self;
+//		node.isTopLevelNode = inOldNode.isTopLevelNode;
+//	}
+//	
+//	// Watch the XML file. Whenever something in Safari changes, we have to replace the WHOLE tree   
+//	// from the root node down, as we have no way of finding WHAT has changed in Safari...
+//	
+//	if (node.isTopLevelNode)
+//	{
+//		node.watcherType = kIMBWatcherTypeFSEvent;
+//		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
+//	}
+//	else
+//	{
+//		node.watcherType = kIMBWatcherTypeNone;
+//	}
+//	
+//	// If the old node was populated, then also populate the new node...
+//	
+//	if (inOldNode.isPopulated)
+//	{
+//		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
+//	}
+//	
+//	if (outError) *outError = error;
+//	return node;
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -315,7 +273,8 @@
 {
 	NSDictionary* plist = nil;
 	NSError* error = nil;
-	NSString* path = (NSString*)self.mediaSource;
+	NSURL* url = (NSURL*)self.mediaSource;
+	NSString* path = [url path];
 	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
 	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 	
@@ -328,7 +287,7 @@
 		
 		if (_plist == nil)
 		{
-			self.plist = [NSDictionary dictionaryWithContentsOfFile:(NSString*)self.mediaSource];
+			self.plist = [NSDictionary dictionaryWithContentsOfURL:url];
 			self.modificationDate = modificationDate;
 		}
 		
@@ -361,9 +320,11 @@
 	if ([type isEqualToString:@"WebBookmarkTypeList"])
 	{
 		NSArray* childrenPlist = [inPlist objectForKey:@"Children"];
+		
 		for (NSDictionary* childPlist in childrenPlist)
 		{
 			type = [childPlist objectForKey:@"WebBookmarkType"];
+			
 			if ([type isEqualToString:@"WebBookmarkTypeList"])
 			{
 				isLeaf = NO;
@@ -380,7 +341,7 @@
 
 - (void) populateNode:(IMBNode*)inNode plist:(NSDictionary*)inPlist
 {
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray* objects = [NSMutableArray array];
 	
 	NSArray* childrenPlist = [inPlist objectForKey:@"Children"];
@@ -394,42 +355,44 @@
 		{
 			if ([inNode isTopLevelNode])
 			{
-				NSImage *newImage = nil;
+				NSImage* newImage = nil;
+				
 				if ([subnode.name isEqualToString:@"BookmarksMenu"])
 				{
-					// Localize and get special icon
 					subnode.name = NSLocalizedStringWithDefaultValue(
-							  @"IMBSafariBookmarkParser.bookmarksMenu",
-							  nil,IMBBundle(),
-							  @"Bookmarks Menu",
-							  @"top-level bookmark name");
-					newImage = [NSImage imb_imageResourceNamed:@"tiny_menu.tiff"
-										   fromApplication:@"com.apple.Safari"
-												fallbackTo:nil];
+						@"IMBSafariBookmarkParser.bookmarksMenu",
+						nil,IMBBundle(),
+						@"Bookmarks Menu",
+						@"top-level bookmark name");
+							  
+					newImage = [NSImage 
+						imb_imageResourceNamed:@"tiny_menu.tiff"
+						fromApplication:@"com.apple.Safari"
+						fallbackTo:nil];
 					
 				}
 				else if ([subnode.name isEqualToString:@"BookmarksBar"])
 				{
-					// Localize and get special icon
 					subnode.name = NSLocalizedStringWithDefaultValue(
-							  @"IMBSafariBookmarkParser.bookmarksBar",
-							  nil,IMBBundle(),
-							  @"Bookmarks Bar",
-							  @"top-level bookmark name");
+						@"IMBSafariBookmarkParser.bookmarksBar",
+						nil,IMBBundle(),
+						@"Bookmarks Bar",
+						@"top-level bookmark name");
 					
-					newImage = [NSImage imb_imageResourceNamed:@"FavoritesBar.tif"
-										   fromApplication:@"com.apple.Safari"
-												fallbackTo:nil];
+					newImage = [NSImage 
+						imb_imageResourceNamed:@"FavoritesBar.tif"
+						fromApplication:@"com.apple.Safari"
+						fallbackTo:nil];
 				}
+				
 				if (newImage)
 				{
 					subnode.icon = newImage;
 				}
-				
 			}
 			
 			[self populateNode:subnode plist:childPlist];
-			[subNodes addObject:subnode];
+			[subnodes addObject:subnode];
 		}	
 		
 		IMBObject* object = [self objectForPlist:childPlist];
@@ -441,7 +404,6 @@
 		}
 	}
 	
-	inNode.subNodes = subNodes;
 	inNode.objects = objects;
 }
 
@@ -452,8 +414,8 @@
 - (IMBNode*) subnodeForPlist:(NSDictionary*)inPlist 
 {
 	IMBNode* subnode = nil;
-	
 	NSString* type = [inPlist objectForKey:@"WebBookmarkType"];
+	
 	if ([type isEqualToString:@"WebBookmarkTypeList"])
 	{
 		NSString* title = [inPlist objectForKey:@"Title"];
@@ -461,7 +423,8 @@
 
 		subnode = [[[IMBNode alloc] init] autorelease];
 		subnode.mediaSource = self.mediaSource;
-		subnode.parser = self;
+		subnode.mediaType = self.mediaType;
+		subnode.parserIdentifier = self.identifier;
 		subnode.leaf = [self isLeafPlist:inPlist];
 		subnode.identifier = [self identifierForPlist:inPlist];
 		subnode.icon = icon;
@@ -478,8 +441,8 @@
 - (IMBObject*) objectForPlist:(NSDictionary*)inPlist 
 {
 	IMBObject* object = nil;
-	
 	NSString* type = [inPlist objectForKey:@"WebBookmarkType"];
+	
 	if ([type isEqualToString:@"WebBookmarkTypeLeaf"])
 	{
 		NSDictionary* uri = [inPlist objectForKey:@"URIDictionary"];
@@ -487,7 +450,8 @@
 		NSString* urlString = [inPlist objectForKey:@"URLString"];
 		NSURL* url = [NSURL URLWithString:urlString];
 				
-		object = [[[IMBObject alloc] init] autorelease];
+		object = [[[IMBLinkObject alloc] init] autorelease];
+		
 		if (url)
 		{
 			object.location = (id)url;
@@ -498,8 +462,9 @@
 			object.location = urlString;	// url may not have been formed from string
 			object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 		}
+		
 		object.name = title;
-		object.parser = self;
+		object.parserIdentifier = self.identifier;
 	}
 	else if ([type isEqualToString:@"WebBookmarkTypeList"])
 	{
@@ -510,7 +475,7 @@
 
 		object = [[[IMBNodeObject alloc] init] autorelease];
 		object.name = title;
-		object.parser = self;
+		object.parserIdentifier = self.identifier;
 		((IMBNodeObject*)object).representedNodeIdentifier = subnode.identifier;
 	}
 	

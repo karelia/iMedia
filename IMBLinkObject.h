@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -52,24 +55,16 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
+#import "IMBObject.h"
+#import <Quartz/Quartz.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBSafariBookmarkParser : IMBParser 
-{
-	NSString* _appPath;
-	NSDictionary* _plist;
-	NSDate* _modificationDate;
-	NSMutableDictionary* _safariFaviconCache;
-}
+// IMBLinkObject overrides a couple of methods to provide special behaviour for links (URLs)...
 
-@property (retain) NSString* appPath;
-@property (retain) NSDictionary* plist;
-@property (retain) NSDate* modificationDate;
-@property (retain) NSMutableDictionary* safariFaviconCache;
+@interface IMBLinkObject : IMBObject
 
 @end
 
