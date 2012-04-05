@@ -69,6 +69,10 @@
 
 @property (retain) NSString* representedNodeIdentifier;	
 
+// May be subclassed (e.g. to return nil to reinforce non-shared image representations like in IMBObject)
+
+- (NSImage *) sharedImageRepresentation;
+
 @end
 
 

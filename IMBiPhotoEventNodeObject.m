@@ -50,14 +50,53 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 #import "IMBiPhotoEventNodeObject.h"
+#import "IMBiPhotoParser.h"
+#import "IMBParserMessenger.h"
 
 
 @implementation IMBiPhotoEventNodeObject
 
 
+#pragma mark - IMBSkimmableObject must subclass
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the image location that corresponds to the skimming index provided
+
+- (id) imageLocationAtSkimmingIndex:(NSUInteger)skimmingIndex
+{
+	NSString* imageKey = [[self.preliminaryMetadata objectForKey:@"KeyList"] objectAtIndex:skimmingIndex];
+	IMBiPhotoParser *parser = (IMBiPhotoParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
+
+    return [NSURL fileURLWithPath:[parser imagePathForImageKey:imageKey] isDirectory:NO];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the image location of the key image
+
+- (id) keyImageLocation
+{
+	NSString* imageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
+	IMBiPhotoParser *parser = (IMBiPhotoParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
+	
+    return [NSURL fileURLWithPath:[parser imagePathForImageKey:imageKey] isDirectory:NO];
+}
+
+
+- (NSUInteger) imageCount
+{
+	return [[self.preliminaryMetadata objectForKey:@"KeyList"] count];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark - Image representation
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // Key image and skimmed images of events are processed by Core Graphics before display
 
 - (CGImageRef) newProcessedImageFromImage:(CGImageRef)inImage
@@ -97,6 +136,7 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
 // Set a processed image instead of the image provided
 
 - (void) setImageRepresentation:(id)inObject

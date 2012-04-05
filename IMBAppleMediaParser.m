@@ -54,10 +54,10 @@
 #import "IMBAppleMediaParser.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBNode.h"
-#import "IMBNodeObject.h"
+#import "IMBFaceNodeObject.h"
 //#import "IMBiPhotoEventObjectViewController.h"
 //#import "IMBFaceObjectViewController.h"
-//#import "IMBImageViewController.h"
+#import "IMBImageObjectViewController.h"
 #import "NSImage+iMedia.h"
 #import "NSString+iMedia.h"
 
@@ -281,42 +281,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 
 #pragma mark -
-#pragma mark Custom view controller support
-/*
-- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode
-{
-	// Use custom view for events
-	
-    if ([self isEventsNode:inNode])
-	{
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-								  kIMBiPhotoNodeObjectTypeEvent, @"nodeObjectType", nil];
-		
-		NSViewController* viewController = [[[IMBiPhotoEventObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];
-		[viewController view];
-		return viewController;
-	}
-	
-    if ([self isFacesNode:inNode])
-	{
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-								  kIMBiPhotoNodeObjectTypeFace, @"nodeObjectType", nil];
-		
-		NSViewController* viewController = [[[IMBFaceObjectViewController alloc] initWithDelegate:self userInfo:userInfo] autorelease];
-		[viewController view];
-		return viewController;
-	}
-	
-	return [super customObjectViewControllerForNode:inNode];
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark -
 #pragma mark IMBSkimmableObjectViewControllerDelegate
-/*
+
 - (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
 {
 //	return [[inNodeObject.preliminaryMetadata objectForKey:@"PhotoCount"] integerValue];
@@ -331,13 +297,13 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	// Faces
 	if ([[inUserInfo objectForKey:@"nodeObjectType"] isEqualToString:kIMBiPhotoNodeObjectTypeFace])
 	{
-		// Get this face's data describing its occurence in the inIndex'th image 
+		// Get the metadata of the nth image in which this face occurs 
 		NSDictionary* imageFaceMetadata = [[[inNodeObject preliminaryMetadata] objectForKey:@"ImageFaceMetadataList"] objectAtIndex:inIndex];
 		
-		// Get this face's index inside of this image
+		// What is the number of this face inside of this image?
 		NSNumber* faceIndex = [imageFaceMetadata objectForKey:@"face index"];
 		
-		// Finally, get the path to this face's occurence
+		// A clipped image of this face in this image is stored in the filesystem
 		NSString* imagePath = [self imagePathForFaceIndex:faceIndex inImageWithKey:imageKey];
 		
 		//NSLog(@"Skimming controller asked delegate for image path and receives: %@", imagePath);
@@ -369,7 +335,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	// Events
 	return [self imagePathForImageKey:imageKey];
 }
-*/
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -578,10 +544,14 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 					imageFaceMetadataList = [NSMutableArray array];
 					[faceDict setObject:imageFaceMetadataList forKey:@"ImageFaceMetadataList"];
 				}
+                NSNumber *faceIndex = [imageFaceDict objectForKey:@"face index"];
+                NSString *path = [self imagePathForFaceIndex:faceIndex inImageWithKey:imageDictKey];
 				imageFaceMetadata = [NSDictionary dictionaryWithObjectsAndKeys:
 									 imageDictKey, @"image key",
-									 [imageFaceDict objectForKey:@"face index"], @"face index",
-									 [imageDict objectForKey:@"DateAsTimerInterval"], @"DateAsTimerInterval", nil];
+									 faceIndex, @"face index",
+									 [imageDict objectForKey:@"DateAsTimerInterval"], @"DateAsTimerInterval",
+                                     path, @"path",
+                                     nil];
 				
 				[imageFaceMetadataList addObject:imageFaceMetadata];
 				
@@ -693,7 +663,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			subnode.parserIdentifier = self.identifier;
 			
 			// Keep a ref to face dictionary for potential later use
-			subnode.attributes = faceDict;
+			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  faceDict, @"nodeSource",
+                                  [self nodeTypeForNode:subnode], @"nodeType", nil];
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node.
 			// Note that a faces dictionary always has a "key" key...
@@ -707,7 +679,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			
 			// Now create the visual object and link it to subnode just created
 			
-			object = [[IMBNodeObject alloc] init];
+			object = [[IMBFaceNodeObject alloc] init];
 			[objects addObject:object];
 			[object release];
 			
@@ -750,68 +722,68 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 #pragma mark Object description
 
 
-//+ (NSString*) objectCountFormatSingular
-//{
-//	return [IMBImageViewController objectCountFormatSingular];
-//}
-//
-//
-//+ (NSString*) objectCountFormatPlural
-//{
-//	return [IMBImageViewController objectCountFormatPlural];
-//}
++ (NSString*) objectCountFormatSingular
+{
+	return [IMBImageObjectViewController objectCountFormatSingular];
+}
+
+
++ (NSString*) objectCountFormatPlural
+{
+	return [IMBImageObjectViewController objectCountFormatPlural];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // Events and Faces have other metadata than images or movies
 
-//- (NSString*) countableMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
-//{
-//	NSMutableString* metaDesc = [NSMutableString string];
-//	
-//	NSNumber* count = [inMetadata objectForKey:@"PhotoCount"];
-//	if (count)
-//	{
-//		NSString* formatString = [count intValue] > 1 ?
-//		[[self class] objectCountFormatPlural] :
-//		[[self class] objectCountFormatSingular];
-//		
-//		[metaDesc appendFormat:formatString, [count intValue]];
-//	}
-//	
-//	NSNumber* dateAsTimerInterval = [inMetadata objectForKey:@"RollDateAsTimerInterval"];
-//	if (dateAsTimerInterval)
-//	{
-//		[metaDesc imb_appendNewline];
-//		NSDate* eventDate = [NSDate dateWithTimeIntervalSinceReferenceDate:[dateAsTimerInterval doubleValue]];
-//		
-//		NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-//		[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-//		[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
-//		
-//		[metaDesc appendFormat:@"%@", [formatter stringFromDate:eventDate]];
-//		
-//		[formatter release];
-//	}
-//	return metaDesc;
-//}
+- (NSString*) countableMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSMutableString* metaDesc = [NSMutableString string];
+	
+	NSNumber* count = [inMetadata objectForKey:@"PhotoCount"];
+	if (count)
+	{
+		NSString* formatString = [count intValue] > 1 ?
+		[[self class] objectCountFormatPlural] :
+		[[self class] objectCountFormatSingular];
+		
+		[metaDesc appendFormat:formatString, [count intValue]];
+	}
+	
+	NSNumber* dateAsTimerInterval = [inMetadata objectForKey:@"RollDateAsTimerInterval"];
+	if (dateAsTimerInterval)
+	{
+		[metaDesc imb_appendNewline];
+		NSDate* eventDate = [NSDate dateWithTimeIntervalSinceReferenceDate:[dateAsTimerInterval doubleValue]];
+		
+		NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+		[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+		[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
+		
+		[metaDesc appendFormat:@"%@", [formatter stringFromDate:eventDate]];
+		
+		[formatter release];
+	}
+	return metaDesc;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // Convert metadata into a human readable string...
 
-//- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-//{
-//	// Events and Faces have other metadata than images
-//	
-//	if ([inMetadata objectForKey:@"PhotoCount"])		// Event, face, ...
-//	{
-//		return [self countableMetadataDescriptionForMetadata:inMetadata];
-//	}
-//	
-//	// Image
-//	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
-//}
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	// Events and Faces have other metadata than images
+	
+	if ([inMetadata objectForKey:@"PhotoCount"])		// Event, face, ...
+	{
+		return [self countableMetadataDescriptionForMetadata:inMetadata];
+	}
+	
+	// Image
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -938,5 +910,15 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	return [self isNode:inNode withId:PHOTO_STREAM_NODE_ID inSpace:PHOTO_STREAM_ID_SPACE];
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns node types for events node and faces node. nil otherwise.
+
+- (NSString *)nodeTypeForNode:(IMBNode *)inNode
+{
+    if ([self isEventsNode:inNode]) return kIMBiPhotoNodeObjectTypeEvent;
+    if ([self isFacesNode:inNode]) return kIMBiPhotoNodeObjectTypeFace;
+    return nil;
+}
 
 @end
