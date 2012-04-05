@@ -141,10 +141,9 @@
 	node.identifier = [self identifierForPath:@"/"];
 	node.mediaType = self.mediaType;
 	node.mediaSource = self.mediaSource;
-	node.parserIdentifier = self.identifier;
 	node.groupType = kIMBGroupTypeLibrary;
+	node.parserIdentifier = self.identifier;
 	node.isTopLevelNode = YES;
-	node.isGroupNode = NO;
 	node.isLeafNode = NO;
 
 	// Watch the XML file. Whenever something in iTunes changes, we have to replace the WHOLE tree from  

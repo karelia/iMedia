@@ -117,10 +117,9 @@
 	node.identifier = [self identifierForPath:@"/"];
 	node.mediaType = self.mediaType;
 	node.mediaSource = self.mediaSource;
-	node.parserIdentifier = self.identifier;
 	node.groupType = kIMBGroupTypeLibrary;
+	node.parserIdentifier = self.identifier;
 	node.isTopLevelNode = YES;
-	node.isGroupNode = NO;
 	node.isLeafNode = NO;
 	
 	// JUST TEMP: remove these 2 lines later...

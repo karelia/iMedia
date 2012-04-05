@@ -477,6 +477,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	IMBNode* groupNode = [[[IMBNode alloc] init] autorelease];
 	groupNode.mediaType = self.mediaType;
 	groupNode.isGroupNode = YES;
+	groupNode.isTopLevelNode = NO;
 	groupNode.isLeafNode = NO;
 	groupNode.isUserAdded = NO;
 	groupNode.isIncludedInPopup = YES;

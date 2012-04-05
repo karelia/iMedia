@@ -152,10 +152,9 @@
 	node.identifier = [self identifierForPath:@"/"];
 	node.mediaType = self.mediaType;
 	node.mediaSource = self.mediaSource;
-	node.parserIdentifier = self.identifier;
 	node.groupType = kIMBGroupTypeLibrary;
+	node.parserIdentifier = self.identifier;
 	node.isTopLevelNode = YES;
-	node.isGroupNode = NO;
 	node.isLeafNode = NO;
 
 	// If we have more than one library then append the library name to the root node...
