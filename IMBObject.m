@@ -392,67 +392,22 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Return a small generic icon for this file. Is the icon cached by NSWorkspace, or should be provide some 
-// caching ourself?
+// Return a small generic icon for this file. This icon is displayed in the list view...
 
 - (NSImage*) icon
 {
-	static NSImage *sJavaScriptIcon = nil;
-	static NSImage *sURLIcon = nil;
+	NSImage* icon = nil;
 	
-	if (!sJavaScriptIcon)
+	if (self.imageRepresentationType == IKImageBrowserNSImageRepresentationType)
 	{
-		NSBundle* ourBundle = [NSBundle bundleForClass:[self class]];
-		NSString* pathToImage = [ourBundle pathForResource:@"js" ofType:@"tiff"];
-		sJavaScriptIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
-		
-		pathToImage = [ourBundle pathForResource:@"url_icon" ofType:@"tiff"];
-		sURLIcon = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+		icon = self.imageRepresentation;
 	}
-
-	NSImage *result = nil;
-	if (IKImageBrowserNSImageRepresentationType == self.imageRepresentationType)
+	else if ([self isLocalFile])
 	{
-		result = self.imageRepresentation;
+		icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:self.type];
 	}
-	else
-	{
-		if ([[[self location] description] hasPrefix:@"javascript:"])	// special icon for JavaScript bookmarklets
-		{
-			result = sJavaScriptIcon;
-		}
-		else if ([[[self location] description] hasPrefix:@"place:"])	// special icon for Firefox bookmarklets, so they match look
-		{
-			result = [IMBSmartFolderNodeObject icon];
-		}
-		else if ([self isLocalFile])
-		{
-			NSString *type = [self type];
-			result = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:type];
-		}
-		else
-		{
-			result = sURLIcon;
-			// WebIconDatabase is not app-store friendly, and it doesn't actually work!
-//			result = [[WebIconDatabase sharedIconDatabase] 
-//					iconForURL:[self.URL absoluteString]
-//					withSize:NSMakeSize(16,16)
-//					cache:YES];	// Strangely, cache isn't even used in the webkit implementation
-			
-			/*
-			 We are never getting anything other than the default globe for remote URLs.
-			 We know that iconForURL: is getting past the enabled check becuase it does return a file URL.
-			 So either iconForPageURL or webGetNSImage is failing in this source code of webkit.
-			 
-			 if (Image* image = iconDatabase()->iconForPageURL(URL, IntSize(size)))
-				if (NSImage *icon = webGetNSImage(image, size))
-					return icon;
-			*/
-			
-			// NSLog(@"%p icon for %@", result, [self.URL absoluteString]);
-		}
-	}
-	return result;
+	
+	return icon;
 }
 
 
