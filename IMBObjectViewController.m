@@ -1601,7 +1601,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	// QuickLook...
 	
-	if ([inObject isSelectable])
+	if ([inObject isSelectable] && [inObject previewItemURL] != nil)
 	{
 		title = NSLocalizedStringWithDefaultValue(
 			@"IMBObjectViewController.menuItem.quickLook",
@@ -2128,8 +2128,14 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 				
 				if (url)
 				{
-					if (appPath) [[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
-					else [[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+					if (appPath != nil && [url isFileURL])
+					{
+						[[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+					}
+					else
+					{
+						[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+					}
 				}
 			}
 		}];
