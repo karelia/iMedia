@@ -55,108 +55,21 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
 #import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark CLASSES
+// This subclass adds the addition absolutePyramidPath property, which stores the path to the pyramid 
+// containing image previews...
 
-@class FMDatabase;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-typedef enum
-{ 
-	kIMBLightroomNodeTypeUnspecified = 0,
-	IMBLightroomNodeTypeFolder,
-	IMBLightroomNodeTypeCollection
-} 
-IMBLightroomNodeType;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBLightroomParser : IMBParser
+@interface IMBLightroomObject : IMBObject
 {
-	NSString* _appPath;
-	NSString* _dataPath;
-	BOOL _shouldDisplayLibraryName;
-
-	// We keep a separate FMDatabase instance for each thread that we are invoked from.
-	// SQLite is basically threadsafe, but I have seen issues when using the same database
-	// instance across multiple threads, and we can't predict which thread we will be called on.
-	NSMutableDictionary* _databases;
-	NSMutableDictionary* _thumbnailDatabases;
-	NSSize _thumbnailSize;
+	NSString* _absolutePyramidPath;
 }
 
-@property (retain) NSString* appPath;
-@property (retain) NSString* dataPath;
-@property (assign) BOOL shouldDisplayLibraryName;
-@property (nonatomic, retain) NSMutableDictionary *databases;
-@property (nonatomic, retain) NSMutableDictionary *thumbnailDatabases;
-@property (retain,readonly) FMDatabase* database;
-@property (retain,readonly) FMDatabase* thumbnailDatabase;
-
-+ (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
-
-- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
-
-- (NSString*) rootNodeIdentifier;
-- (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
-- (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
-
-- (NSDictionary*) attributesWithRootFolder:(NSNumber*)inRootFolder
-								   idLocal:(NSNumber*)inIdLocal
-								  rootPath:(NSString*)inRootPath
-							  pathFromRoot:(NSString*)inPathFromRoot
-                                  nodeType:(IMBLightroomNodeType)inNodeType;
-
-- (NSImage*) largeFolderIcon;
-
-// Returns a cached FMDatabase for the current thread
-- (FMDatabase*) database;
-- (FMDatabase*) thumbnailDatabase;
-
-// Unconditionally creates an autoreleased FMDatabase instance. Used 
-// by the above caching accessors to instantiate as needed per-thread.
-- (FMDatabase*) libraryDatabase;
-- (FMDatabase*) previewsDatabase;
-
-- (NSString*)pyramidPathForImage:(NSNumber*)idLocal;
-- (NSData*)previewDataForObject:(IMBObject*)inObject;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-@interface IMBLightroomParser (Abstract)
-
-+ (NSString*) lightroomPath;
-+ (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
-
-- (NSString*) rootFolderQuery;
-- (NSString*) folderNodesQuery;
-
-- (NSString*) rootCollectionNodesQuery;
-- (NSString*) collectionNodesQuery;
-
-- (NSString*) folderObjectsQuery;
-- (NSString*) collectionObjectsQuery;
-
-- (NSImage*) folderIcon;
-- (NSImage*) groupIcon;
-- (NSImage*) collectionIcon;
+@property (retain) NSString* absolutePyramidPath;
 
 @end
 

@@ -44,6 +44,9 @@
  */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Pierre Bernard
 
 
@@ -53,9 +56,7 @@
 #pragma mark HEADERS
 
 #import "IMBLightroom3Parser.h"
-
-#import <Quartz/Quartz.h>
-
+#import "IMBLightroomObject.h"
 #import "FMDatabase.h"
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
@@ -65,17 +66,27 @@
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 
+#import <Quartz/Quartz.h>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 
 @interface IMBLightroom3Parser ()
-
 + (NSString*)cloneDatabase:(NSString*)databasePath;
-
 - (NSNumber*) databaseVersion;
-
 @end
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
 @implementation IMBLightroom3Parser
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -116,7 +127,7 @@
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	
-	if ([self isInstalled]) {
+	if ([self lightroomPath] != nil) {
 		NSArray* libraryPaths = [self libraryPaths];
 		
 		for (NSString* libraryPath in libraryPaths) {
@@ -130,8 +141,8 @@
 				dataPath = nil;
 			}
 			
-			IMBLightroom3Parser* parser = [[[[self class] alloc] initWithMediaType:inMediaType] autorelease];
-			parser.mediaSource = libraryPath;
+			IMBLightroom3Parser* parser = [[[[self class] alloc] init] autorelease];
+			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			
@@ -185,7 +196,7 @@
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode
 {
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subnodes = [inRootNode mutableArrayForPopulatingSubnodes];
 	NSMutableArray* objects = [NSMutableArray array];
 	inRootNode.displayedObjectCount = 0;
 	
@@ -204,21 +215,21 @@
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
 	foldersNode.name = foldersName;
 	foldersNode.icon = [self folderIcon];
-	foldersNode.parser = self;
+	foldersNode.parserIdentifier = self.identifier;
 	foldersNode.attributes = [self attributesWithRootFolder:id_local
                                                     idLocal:id_local
                                                    rootPath:nil
                                                pathFromRoot:nil
                                                    nodeType:IMBLightroomNodeTypeFolder];
-	foldersNode.leaf = NO;
+	foldersNode.isLeafNode = NO;
 	
-	[subNodes addObject:foldersNode];
+	[subnodes addObject:foldersNode];
 
 	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
 	foldersObject.representedNodeIdentifier = foldersNode.identifier;
 	foldersObject.name = foldersNode.name;
 	foldersObject.metadata = nil;
-	foldersObject.parser = self;
+	foldersObject.parserIdentifier = self.identifier;
 	foldersObject.index = 0;
 	foldersObject.imageLocation = (id)self.mediaSource;
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
@@ -239,16 +250,16 @@
 	collectionsNode.identifier = [self identifierWithCollectionId:[NSNumber numberWithLong:0]];
 	collectionsNode.name = collectionsName;
 	collectionsNode.icon = [self groupIcon];
-	collectionsNode.parser = self;
-	collectionsNode.leaf = NO;
+	collectionsNode.parserIdentifier = self.identifier;
+	collectionsNode.isLeafNode = NO;
 	
-	[subNodes addObject:collectionsNode];
+	[subnodes addObject:collectionsNode];
 	
 	IMBNodeObject* collectionsObject = [[[IMBNodeObject alloc] init] autorelease];
 	collectionsObject.representedNodeIdentifier = collectionsNode.identifier;
 	collectionsObject.name = collectionsNode.name;
 	collectionsObject.metadata = nil;
-	collectionsObject.parser = self;
+	collectionsObject.parserIdentifier = self.identifier;
 	collectionsObject.index = 1;
 	collectionsObject.imageLocation = (id)self.mediaSource;
 	collectionsObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
@@ -256,7 +267,6 @@
 	
 	[objects addObject:collectionsObject];
 	
-	inRootNode.subNodes = subNodes;
 	inRootNode.objects = objects;
 
 	[super populateSubnodesForRootNode:collectionsNode];

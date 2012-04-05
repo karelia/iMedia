@@ -106,7 +106,7 @@
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	
-	if ([self isInstalled]) {
+	if ([self lightroomPath] != nil) {
 		NSArray* libraryPaths = [self libraryPaths];
 		
 		for (NSString* libraryPath in libraryPaths) {
@@ -120,8 +120,8 @@
 				dataPath = nil;
 			}
 			
-			IMBLightroom1Parser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-			parser.mediaSource = libraryPath;
+			IMBLightroom1Parser* parser = [[[self class] alloc] init];
+			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
 			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			

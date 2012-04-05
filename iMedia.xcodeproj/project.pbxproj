@@ -242,13 +242,24 @@
 		D0904DF0152D7182003FDD08 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
 		D0904DF1152D7183003FDD08 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
 		D0904DF2152D7183003FDD08 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
-		D0904DF6152D7478003FDD08 /* IMBSafariParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904DF4152D7478003FDD08 /* IMBSafariParserMessenger.h */; };
+		D0904DF6152D7478003FDD08 /* IMBSafariParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904DF4152D7478003FDD08 /* IMBSafariParserMessenger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0904DF7152D7478003FDD08 /* IMBSafariParserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = D0904DF5152D7478003FDD08 /* IMBSafariParserMessenger.m */; };
 		D0904E03152D83EA003FDD08 /* IMBSafariParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0403B5010918C03000F0AE1 /* IMBSafariParser.m */; };
 		D0904E07152D936C003FDD08 /* IMBLinkObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904E05152D936B003FDD08 /* IMBLinkObject.h */; };
 		D0904E08152D936C003FDD08 /* IMBLinkObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D0904E06152D936B003FDD08 /* IMBLinkObject.m */; };
 		D0904E2A152DB2BE003FDD08 /* IMBLightroom4Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904E26152DB2BE003FDD08 /* IMBLightroom4Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0904E2C152DB2BE003FDD08 /* IMBLightroom4VideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904E28152DB2BE003FDD08 /* IMBLightroom4VideoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0904E31152DB590003FDD08 /* IMBLightroomObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904E2F152DB58F003FDD08 /* IMBLightroomObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0904E32152DB590003FDD08 /* IMBLightroomObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D0904E30152DB590003FDD08 /* IMBLightroomObject.m */; };
+		D0904E35152DB73D003FDD08 /* IMBLightroomParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904E33152DB73D003FDD08 /* IMBLightroomParserMessenger.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0904E37152DD0B2003FDD08 /* IMBLightroomParserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = D0904E34152DB73D003FDD08 /* IMBLightroomParserMessenger.m */; };
+		D0904E38152DD328003FDD08 /* IMBLightroomParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D635E91035B4C500FF8631 /* IMBLightroomParser.m */; };
+		D0904E39152DD554003FDD08 /* IMBLightroom1Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC2560F10A8706000F19642 /* IMBLightroom1Parser.m */; };
+		D0904E3A152DD554003FDD08 /* IMBLightroom2Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC2559710A851C500F19642 /* IMBLightroom2Parser.m */; };
+		D0904E3B152DD554003FDD08 /* IMBLightroom3Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */; };
+		D0904E3C152DD554003FDD08 /* IMBLightroom3VideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FC2089C11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m */; };
+		D0904E3D152DD554003FDD08 /* IMBLightroom4Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0904E27152DB2BE003FDD08 /* IMBLightroom4Parser.m */; };
+		D0904E3E152DD554003FDD08 /* IMBLightroom4VideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0904E29152DB2BE003FDD08 /* IMBLightroom4VideoParser.m */; };
 		D0941A75105E24DD0092B2F1 /* iTunes9-icon-01.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A55105E24DD0092B2F1 /* iTunes9-icon-01.png */; };
 		D0941A76105E24DD0092B2F1 /* iTunes9-icon-02.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A56105E24DD0092B2F1 /* iTunes9-icon-02.png */; };
 		D0941A77105E24DD0092B2F1 /* iTunes9-icon-03.png in Resources */ = {isa = PBXBuildFile; fileRef = D0941A57105E24DD0092B2F1 /* iTunes9-icon-03.png */; };
@@ -730,6 +741,10 @@
 		D0904E27152DB2BE003FDD08 /* IMBLightroom4Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom4Parser.m; sourceTree = "<group>"; };
 		D0904E28152DB2BE003FDD08 /* IMBLightroom4VideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom4VideoParser.h; sourceTree = "<group>"; };
 		D0904E29152DB2BE003FDD08 /* IMBLightroom4VideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom4VideoParser.m; sourceTree = "<group>"; };
+		D0904E2F152DB58F003FDD08 /* IMBLightroomObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroomObject.h; sourceTree = "<group>"; };
+		D0904E30152DB590003FDD08 /* IMBLightroomObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroomObject.m; sourceTree = "<group>"; };
+		D0904E33152DB73D003FDD08 /* IMBLightroomParserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroomParserMessenger.h; sourceTree = "<group>"; };
+		D0904E34152DB73D003FDD08 /* IMBLightroomParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroomParserMessenger.m; sourceTree = "<group>"; };
 		D0941A55105E24DD0092B2F1 /* iTunes9-icon-01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-01.png"; sourceTree = "<group>"; };
 		D0941A56105E24DD0092B2F1 /* iTunes9-icon-02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-02.png"; sourceTree = "<group>"; };
 		D0941A57105E24DD0092B2F1 /* iTunes9-icon-03.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunes9-icon-03.png"; sourceTree = "<group>"; };
@@ -1430,6 +1445,8 @@
 		D0904DF3152D73F8003FDD08 /* Old */ = {
 			isa = PBXGroup;
 			children = (
+				D0904E33152DB73D003FDD08 /* IMBLightroomParserMessenger.h */,
+				D0904E34152DB73D003FDD08 /* IMBLightroomParserMessenger.m */,
 				D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */,
 				D0D635E91035B4C500FF8631 /* IMBLightroomParser.m */,
 				8FC2560E10A8706000F19642 /* IMBLightroom1Parser.h */,
@@ -1444,6 +1461,8 @@
 				D0904E27152DB2BE003FDD08 /* IMBLightroom4Parser.m */,
 				D0904E28152DB2BE003FDD08 /* IMBLightroom4VideoParser.h */,
 				D0904E29152DB2BE003FDD08 /* IMBLightroom4VideoParser.m */,
+				D0904E2F152DB58F003FDD08 /* IMBLightroomObject.h */,
+				D0904E30152DB590003FDD08 /* IMBLightroomObject.m */,
 				8F93177C10A9FC53002CDB19 /* IMBPyramidObjectPromise.h */,
 				8F93177D10A9FC53002CDB19 /* IMBPyramidObjectPromise.m */,
 				8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */,
@@ -1946,6 +1965,8 @@
 				D0904E07152D936C003FDD08 /* IMBLinkObject.h in Headers */,
 				D0904E2A152DB2BE003FDD08 /* IMBLightroom4Parser.h in Headers */,
 				D0904E2C152DB2BE003FDD08 /* IMBLightroom4VideoParser.h in Headers */,
+				D0904E31152DB590003FDD08 /* IMBLightroomObject.h in Headers */,
+				D0904E35152DB73D003FDD08 /* IMBLightroomParserMessenger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2568,6 +2589,15 @@
 				D0904DF7152D7478003FDD08 /* IMBSafariParserMessenger.m in Sources */,
 				D0904E03152D83EA003FDD08 /* IMBSafariParser.m in Sources */,
 				D0904E08152D936C003FDD08 /* IMBLinkObject.m in Sources */,
+				D0904E32152DB590003FDD08 /* IMBLightroomObject.m in Sources */,
+				D0904E37152DD0B2003FDD08 /* IMBLightroomParserMessenger.m in Sources */,
+				D0904E38152DD328003FDD08 /* IMBLightroomParser.m in Sources */,
+				D0904E39152DD554003FDD08 /* IMBLightroom1Parser.m in Sources */,
+				D0904E3A152DD554003FDD08 /* IMBLightroom2Parser.m in Sources */,
+				D0904E3B152DD554003FDD08 /* IMBLightroom3Parser.m in Sources */,
+				D0904E3C152DD554003FDD08 /* IMBLightroom3VideoParser.m in Sources */,
+				D0904E3D152DD554003FDD08 /* IMBLightroom4Parser.m in Sources */,
+				D0904E3E152DD554003FDD08 /* IMBLightroom4VideoParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
