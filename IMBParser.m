@@ -482,15 +482,14 @@
 - (NSImage*) iconForPath:(NSString*)inPath
 {
 	NSWorkspace* workspace = [NSWorkspace imb_threadSafeWorkspace];
-
 	NSImage* image = [workspace iconForFile:inPath];
 	[image setSize:NSMakeSize(16,16)];
-	NSData* tiff = [image TIFFRepresentation];
-//	NSBitmapImageRep* bitmap = [NSBitmapImageRep imageRepWithData:tiff];
+	return image;
 	
-	NSImage* icon = [[[NSImage alloc] initWithData:tiff] autorelease];
-	[icon setSize:NSMakeSize(16,16)];
-	return icon;
+//	NSData* tiff = [image TIFFRepresentation];
+//	NSImage* icon = [[[NSImage alloc] initWithData:tiff] autorelease];
+//	[icon setSize:NSMakeSize(16,16)];
+//	return icon;
 }
 
 
