@@ -69,7 +69,7 @@
 
 int main(int argc, const char *argv[])
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
     
 	[XPCService runServiceWithConnectionHandler:^(XPCConnection* inConnection)
 	{
@@ -77,14 +77,27 @@ int main(int argc, const char *argv[])
 		{
 			NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
 
-            XPCMessage* reply = [inMessage invoke];
-            if (reply) [inReplyConnection sendMessage:reply];
+			@try
+			{
+				XPCMessage* reply = [inMessage invoke];
+				if (reply) [inReplyConnection sendMessage:reply];
+			}
+			@catch (NSException* inException)
+			{
+				NSString* text = [NSString stringWithFormat:@"Uncaught exception %@: %@\n\n%@\n\n",
+					inException.name,
+					inException.reason,
+					[[inException callStackSymbols] componentsJoinedByString:@"\n"]];
+				
+				NSLog(@"%@",text);
+				[inReplyConnection sendLog:text];
+			}
 			
 			[pool2 drain];
 		}];
 	}];
 	
-	[pool drain];
+	[pool1 drain];
 	return 0;
 }
 
