@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -70,15 +73,12 @@ int main(int argc, const char *argv[])
     
 	[XPCService runServiceWithConnectionHandler:^(XPCConnection* inConnection)
 	{
-		[inConnection setEventHandler:^(XPCMessage* inMessage, XPCConnection* inConnection)
+		[inConnection setEventHandler:^(XPCMessage* inMessage, XPCConnection* inReplyConnection)
 		{
 			NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
+
             XPCMessage* reply = [inMessage invoke];
-            
-            if (reply)
-			{
-				[inConnection sendMessage:reply];
-			}	
+            if (reply) [inReplyConnection sendMessage:reply];
 			
 			[pool2 drain];
 		}];
