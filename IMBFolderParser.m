@@ -266,13 +266,13 @@
 			subnode.identifier = [self identifierForPath:path];
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = url;
-			subnode.isTopLevelNode = NO;
 			subnode.parserIdentifier = self.identifier;
+			subnode.isTopLevelNode = NO;
+			subnode.isLeafNode = countOfSubfolders == 0;
 			subnode.groupType = kIMBGroupTypeFolder;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = path;					// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
-			subnode.isLeafNode = countOfSubfolders == 0;
 			[subnodes addObject:subnode];
 			[subnode release];
 
