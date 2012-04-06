@@ -58,6 +58,10 @@
 
 #import <iMedia/IMBNode.h>
 #import <iMedia/IMBObject.h>
+#import <iMedia/IMBNodeObject.h>
+#import <iMedia/IMBFolderObject.h>
+#import <iMedia/IMBButtonObject.h>
+#import <iMedia/IMBLinkObject.h>
 #import <iMedia/IMBObjectsPromise.h>
 #import <iMedia/IMBFlickrNode.h>
 
