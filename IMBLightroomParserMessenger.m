@@ -132,7 +132,7 @@ static dispatch_once_t sOnceToken = 0;
 }
 
 
-+ (NSString*) xpcIdentifier
++ (NSString*) xpcSerivceIdentifier
 {
 	return @"com.karelia.imedia.Lightroom";
 }
