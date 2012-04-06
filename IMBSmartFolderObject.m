@@ -49,23 +49,26 @@
 
 #pragma mark HEADERS
 
-#import "IMBSmartFolderNodeObject.h"
+#import "IMBSmartFolderObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@implementation IMBSmartFolderNodeObject
+@implementation IMBSmartFolderObject
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-+ (NSImage*) icon		// usable from other places for a smart folder
+// Usable from other places for a smart folder...
+
++ (NSImage*) icon		
 {
-	static NSImage *sSmartFolderImage = nil;
-	
-	if (sSmartFolderImage == nil)
+	static NSImage* sSmartFolderImage = nil;
+	static dispatch_once_t sOnceToken = 0;
+
+	dispatch_once(&sOnceToken, ^()
 	{
 		// Get high-resolution version of smart folder icon directly from CoreTypes
 		
@@ -81,11 +84,14 @@
 			}
 		}
 		
+		// Fall-back low-resolution version :-(
+		
 		if (sSmartFolderImage == nil)
 		{
-			sSmartFolderImage = [[NSImage imageNamed:NSImageNameFolderSmart] retain];	// fall-back low-resolution version :-(
+			sSmartFolderImage = [[NSImage imageNamed:NSImageNameFolderSmart] retain];	
 		}
-	}
+	});
+
 	return sSmartFolderImage;
 }
 
@@ -93,11 +99,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Override to show a folder icon ALWAYS instead of a generic file icon...
+// Override to ALWAYS show a smart folder icon...
+
+- (NSString*) imageRepresentationType
+{
+	return IKImageBrowserNSImageRepresentationType;
+}
+
+
+- (id) imageRepresentation
+{
+	return [IMBSmartFolderObject icon];
+}
+
 
 - (NSImage*) icon
 {
-	return [IMBSmartFolderNodeObject icon];
+	static NSImage* sIcon = nil;
+	static dispatch_once_t sOnceToken = 0;
+
+	dispatch_once(&sOnceToken, ^()
+	{
+		sIcon = [[IMBSmartFolderObject icon] copy];
+		[sIcon setSize:NSMakeSize(16.0,16.0)];
+	});
+	
+	return sIcon;
 }
 
 

@@ -50,15 +50,15 @@
 #pragma mark HEADERS
 
 #import <Cocoa/Cocoa.h>
-#import "IMBNodeObject.h"
+#import "IMBFolderObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBSmartFolderNodeObject : IMBNodeObject
+@interface IMBSmartFolderObject : IMBFolderObject
 
-+ (NSImage *)icon;		// usable from other places for a smart folder
++ (NSImage*) icon;		// usable from other places for a smart folder
 
 @end
 

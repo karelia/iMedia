@@ -97,7 +97,7 @@
 #import "NSURL+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSKeyedArchiver+iMedia.h"
-#import "IMBSmartFolderNodeObject.h"
+#import "IMBSmartFolderObject.h"
 #import "IMBConfig.h"
 #import "SBUtilities.h"
 

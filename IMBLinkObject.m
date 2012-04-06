@@ -57,7 +57,7 @@
 
 #import "IMBLinkObject.h"
 #import "NSWorkspace+iMedia.h"
-#import "IMBSmartFolderNodeObject.h"
+#import "IMBSmartFolderObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@
 		}
 		else if ([[[self location] description] hasPrefix:@"place:"])	// special icon for Firefox bookmarklets, so they match look
 		{
-			result = [IMBSmartFolderNodeObject icon];
+			result = [IMBSmartFolderObject icon];
 		}
 		else if ([self isLocalFile])
 		{
