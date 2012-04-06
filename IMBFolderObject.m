@@ -94,4 +94,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Override to avoid trouble when traing to encode with wrong imageRepresentationType...
+
+- (void) setAtomic_imageRepresentation:(id)inImageRepresentation
+{
+	_imageRepresentation = nil;
+}
+
+- (id) atomic_imageRepresentation
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @end
