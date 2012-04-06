@@ -58,7 +58,7 @@
 #import "IMBSafariParser.h"
 #import "IMBNode.h"
 #import "IMBLinkObject.h"
-#import "IMBNodeObject.h"
+#import "IMBFolderObject.h"
 #import "NSImage+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
@@ -398,10 +398,10 @@
 
 		NSString* title = [inPlist objectForKey:@"Title"];		// Capitalized for list, lowercase for leaves?
 
-		object = [[[IMBNodeObject alloc] init] autorelease];
+		object = [[[IMBFolderObject alloc] init] autorelease];
 		object.name = title;
 		object.parserIdentifier = self.identifier;
-		((IMBNodeObject*)object).representedNodeIdentifier = subnode.identifier;
+		((IMBFolderObject*)object).representedNodeIdentifier = subnode.identifier;
 	}
 	
 	return object;

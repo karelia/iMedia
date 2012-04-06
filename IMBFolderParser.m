@@ -59,7 +59,7 @@
 #import "IMBConfig.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "IMBNodeObject.h"
+#import "IMBFolderObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSString+iMedia.h"
@@ -276,10 +276,9 @@
 			[subnodes addObject:subnode];
 			[subnode release];
 
-			IMBNodeObject* object = [[IMBNodeObject alloc] init];
+			IMBFolderObject* object = [[IMBFolderObject alloc] init];
 			object.representedNodeIdentifier = subnode.identifier;
 			object.location = (id)url;
-			object.imageLocation = nil;     // Thumbnails will be created on the fly
 			object.name = name;
 			object.metadata = nil;
 			object.parserIdentifier = self.identifier;
