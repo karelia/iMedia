@@ -342,7 +342,7 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Try to get the cover art from directly from the audio file via Quicklook...
+// Build a thumbnail for our object...
 
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {

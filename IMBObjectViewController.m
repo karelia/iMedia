@@ -889,7 +889,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	{
 		// Remove all tool tips before we start the reload, because there is a narrow window during reload when we have
 		// our old tooltips configured and they refer to OLD objects in the icon view. This is a window for crashing 
-		// if the system attempts to communicate with ta tooltip's owner which is being removed from the view...
+		// if the system attempts to communicate with the tooltip's owner which is being removed from the view...
 		
 		[ibIconView removeAllToolTips];
 

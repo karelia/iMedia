@@ -514,7 +514,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 
 // Store the imageRepresentation and add this object to the fifo cache. Older objects
-//  get bumped out off cache and are thus unloaded...
+// get bumped out off cache and are thus unloaded...
 
 - (void) setImageRepresentation:(id)inImageRepresentation
 {
