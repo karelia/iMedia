@@ -199,7 +199,6 @@
 	copy.mediaSource = self.mediaSource;
 	copy.attributes = self.attributes;
 	copy.groupType = self.groupType;
-	
 	copy.parserMessenger = self.parserMessenger;
 	copy.parserIdentifier = self.parserIdentifier;
 	
@@ -264,14 +263,12 @@
 {
 	if ((self = [super init]))
 	{
-		self.icon = [inCoder decodeObjectForKey:@"icon"];
 		self.name = [inCoder decodeObjectForKey:@"name"];
 		self.identifier = [inCoder decodeObjectForKey:@"identifier"];
 		self.mediaType = [inCoder decodeObjectForKey:@"mediaType"];
 		self.mediaSource = [inCoder decodeObjectForKey:@"mediaSource"];
 		self.attributes = [inCoder decodeObjectForKey:@"attributes"];
 		self.groupType = [inCoder decodeIntegerForKey:@"groupType"];
-		
 		self.parserIdentifier = [inCoder decodeObjectForKey:@"parserIdentifier"];
 
 		self.displayPriority = [inCoder decodeIntegerForKey:@"displayPriority"];
@@ -293,6 +290,19 @@
 		
 		NSMutableArray* objects = [inCoder decodeObjectForKey:@"objects"];
 		if (objects) self.objects = objects;
+		
+		// Optimization: The icon is built from a single (small) image representation. See comments in method below...
+		
+//		self.icon = [inCoder decodeObjectForKey:@"icon"];
+
+		NSImageRep* iconRepresentation = [inCoder decodeObjectForKey:@"iconRepresentation"];
+		
+		if (iconRepresentation)
+		{
+			NSImage* icon = [[[NSImage alloc] init] autorelease];
+			[icon addRepresentation:iconRepresentation];
+			self.icon = icon;
+		}
 	}
 	
 	return self;
@@ -301,14 +311,12 @@
 
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
-	[inCoder encodeObject:self.icon forKey:@"icon"];
 	[inCoder encodeObject:self.name forKey:@"name"];
 	[inCoder encodeObject:self.identifier forKey:@"identifier"];
 	[inCoder encodeObject:self.mediaType forKey:@"mediaType"];
 	[inCoder encodeObject:self.mediaSource forKey:@"mediaSource"];
 	[inCoder encodeObject:self.attributes forKey:@"attributes"];
 	[inCoder encodeInteger:self.groupType forKey:@"groupType"];
-
 	[inCoder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
 	
 	[inCoder encodeInteger:self.displayPriority forKey:@"displayPriority"];
@@ -325,23 +333,36 @@
 	[inCoder encodeInteger:self.watcherType forKey:@"watcherType"];
 	[inCoder encodeObject:self.watchedPath forKey:@"watchedPath"];
 	
-	if (self.subnodes)
-	{
-		[inCoder encodeObject:self.subnodes forKey:@"subnodes"];
-	}
+	if (self.subnodes) [inCoder encodeObject:self.subnodes forKey:@"subnodes"];
+	if (self.objects) [inCoder encodeObject:self.objects forKey:@"objects"];
+	
+	// Encoding the icon needs special attention. We only need 16x16 pixels, but the NSImage contains multiple 
+	// high resolution representations. Instead of encoding them all, we'll simply encode the smallest one...
+	
+//	[inCoder encodeObject:self.icon forKey:@"icon"];
 
-	if (self.objects)
+	NSImage* icon = self.icon;
+	NSArray* reps = [icon representations];
+	NSImageRep* smallestRep = nil;
+	CGFloat smallestWidth = HUGE_VALF;
+	
+	for (NSImageRep* rep in reps)
 	{
-		[inCoder encodeObject:self.objects forKey:@"objects"];
+		NSSize size = rep.size;
+		
+		if (size.width < smallestWidth)
+		{
+			smallestWidth = size.width;
+			smallestRep = rep;
+		}
 	}
+	
+	if (smallestRep) [inCoder encodeObject:smallestRep forKey:@"iconRepresentation"];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-#pragma mark
-#pragma mark Accessors
 
 // Set loading status for self and complete subtree...
 
