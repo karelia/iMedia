@@ -161,6 +161,7 @@ extern NSString* kIMBObjectPasteboardType;
 @property (retain) id imageLocation;						// Optional url if different from location (e.g. lores thumbnail)
 - (NSURL*) imageLocationURL;                                // Convert imageLocation to url
 
+
 @end
 
 

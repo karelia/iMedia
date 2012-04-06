@@ -116,8 +116,8 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 #pragma mark 
 
 @interface IMBObject ()
-@property (retain) id atomic_imageRepresentation;
 @property (retain) NSData* atomic_bookmark;
+@property (retain) id atomic_imageRepresentation;
 @end
 
 
@@ -218,11 +218,11 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 		if ([self.imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
 		{
-			self.imageRepresentation = (id)[coder decodeCGImageForKey:@"imageRepresentation"];
+			self.atomic_imageRepresentation = (id)[coder decodeCGImageForKey:@"imageRepresentation"];
 		}
 		else
 		{
-			self.imageRepresentation = [coder decodeObjectForKey:@"imageRepresentation"];
+			self.atomic_imageRepresentation = [coder decodeObjectForKey:@"imageRepresentation"];
 		}
 	}
 	
@@ -251,13 +251,16 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeBool:self.needsImageRepresentation forKey:@"needsImageRepresentation"];
 	[coder encodeInteger:self.imageVersion forKey:@"imageVersion"];
 
-	if ([self.imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+	if (self.atomic_imageRepresentation)
 	{
-		[coder encodeCGImage:(CGImageRef)self.imageRepresentation forKey:@"imageRepresentation"];
-	}
-	else
-	{
-		[coder encodeObject:self.imageRepresentation forKey:@"imageRepresentation"];
+		if ([self.imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+		{
+			[coder encodeCGImage:(CGImageRef)self.atomic_imageRepresentation forKey:@"imageRepresentation"];
+		}
+		else
+		{
+			[coder encodeObject:self.atomic_imageRepresentation forKey:@"imageRepresentation"];
+		}
 	}
 }
 
@@ -283,7 +286,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	copy.shouldDisableTitle = self.shouldDisableTitle;
 
 	copy.imageLocation = self.imageLocation;
-	copy.imageRepresentation = self.imageRepresentation;
+	copy.atomic_imageRepresentation = self.atomic_imageRepresentation;
 	copy.imageRepresentationType = self.imageRepresentationType;
 	copy.needsImageRepresentation = self.needsImageRepresentation;
 	copy.imageVersion = self.imageVersion;
@@ -512,20 +515,9 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	return [[_imageRepresentation retain] autorelease];
 }
 
-
-// Store the imageRepresentation and add this object to the fifo cache. Older objects
-// get bumped out off cache and are thus unloaded...
-
 - (void) setImageRepresentation:(id)inImageRepresentation
 {
 	self.atomic_imageRepresentation = inImageRepresentation;
-	self.imageVersion = _imageVersion + 1;
-	
-	if (inImageRepresentation)
-	{
-		self.needsImageRepresentation = NO;
-		[IMBObjectFifoCache addObject:self];
-	}
 }
 
 
@@ -737,6 +729,22 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out off cache 
+// and are thus unloaded...
+
+- (void) storeReceivedImageRepresentation:(id)inImageRepresentation
+{
+	self.imageRepresentation = inImageRepresentation;
+	self.imageVersion = _imageVersion + 1;
+	
+	if (inImageRepresentation)
+	{
+		self.needsImageRepresentation = NO;
+		[IMBObjectFifoCache addObject:self];
+	}
+}
+
+
 // If the image representation isn't available yet, then trigger asynchronous loading. When the results come in,
 // copy the properties from the incoming object. Do not replace the old object here, as that would unecessarily
 // upset the NSArrayController. Redrawing of the view will be triggered automatically...
@@ -758,7 +766,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 				}
 				else
 				{
-					self.imageRepresentation = inPopulatedObject.imageRepresentation;
+					[self storeReceivedImageRepresentation:inPopulatedObject.imageRepresentation];
 					if (self.metadata == nil) self.metadata = inPopulatedObject.metadata;
 					if (self.metadataDescription == nil) self.metadataDescription = inPopulatedObject.metadataDescription;
 					_isLoadingThumbnail = NO;
