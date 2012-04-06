@@ -106,6 +106,7 @@ IMBLightroomNodeType;
 @property (retain,readonly) FMDatabase* database;
 @property (retain,readonly) FMDatabase* thumbnailDatabase;
 
++ (NSString*) identifier;
 + (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;

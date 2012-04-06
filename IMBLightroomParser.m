@@ -178,6 +178,14 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Subclasses must return a unique identifier...
+
++ (NSString*) identifier
+{
+	return nil;
+}
+
+
 // Helper method that converts single string into an array of paths...
 
 + (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths
@@ -240,12 +248,14 @@ static NSArray* sSupportedUTIs = nil;
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	node.icon = icon;
 	node.name = @"Lightroom";
-	node.mediaSource = self.mediaSource;
 	node.identifier = [self rootNodeIdentifier];
+	node.mediaSource = self.mediaSource;
+	node.mediaType = self.mediaType;
 	node.parserIdentifier = self.identifier;
 	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 	node.groupType = kIMBGroupTypeLibrary;
+	node.isIncludedInPopup = YES;
 
 	// If necessary append the name of the library...
 	

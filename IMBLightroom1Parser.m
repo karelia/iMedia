@@ -76,6 +76,17 @@
 }
 
 
+// Unique identifier for this parser...
+
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.Lightroom1";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Return an array to Lightroom library files...
 
 + (NSArray*) libraryPaths
@@ -121,6 +132,7 @@
 			}
 			
 			IMBLightroom1Parser* parser = [[[self class] alloc] init];
+			parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],libraryPath];
 			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
 			parser.mediaType = inMediaType;
 			parser.dataPath = dataPath;

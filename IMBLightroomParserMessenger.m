@@ -132,6 +132,35 @@ static dispatch_once_t sOnceToken = 0;
 }
 
 
++ (NSString*) xpcIdentifier
+{
+	return @"com.karelia.imedia.Lightroom";
+}
+
+
++ (NSString*) identifier
+{
+	if ([IMBLightroom4Parser lightroomPath])
+	{
+		return [IMBLightroom4Parser identifier];
+	}
+	else if ([IMBLightroom3Parser lightroomPath])
+	{
+		return [IMBLightroom3Parser identifier];
+	}
+	else if ([IMBLightroom2Parser lightroomPath])
+	{
+		return [IMBLightroom2Parser identifier];
+	}
+	else if ([IMBLightroom1Parser lightroomPath])
+	{
+		return [IMBLightroom1Parser identifier];
+	}
+	
+	return nil;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -202,14 +231,26 @@ static dispatch_once_t sOnceToken = 0;
 
 + (NSString*) parserClassName
 {
-	return @"IMBLightroomParser";
+	if ([IMBLightroom4Parser lightroomPath])
+	{
+		return @"IMBLightroom4Parser";
+	}
+	else if ([IMBLightroom3Parser lightroomPath])
+	{
+		return @"IMBLightroom3Parser";
+	}
+	else if ([IMBLightroom2Parser lightroomPath])
+	{
+		return @"IMBLightroom2Parser";
+	}
+	else if ([IMBLightroom1Parser lightroomPath])
+	{
+		return @"IMBLightroom1Parser";
+	}
+	
+	return nil;
 }
 					
-+ (NSString*) identifier
-{
-	return @"com.karelia.imedia.Lightroom";
-}
-
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -236,14 +277,18 @@ static dispatch_once_t sOnceToken = 0;
 
 + (NSString*) parserClassName
 {
-	return @"IMBLightroomVideoParser";
+	if ([IMBLightroom4Parser lightroomPath])
+	{
+		return @"IMBLightroom4VideoParser";
+	}
+	else if ([IMBLightroom3Parser lightroomPath])
+	{
+		return @"IMBLightroom3VideoParser";
+	}
+	
+	return nil;
 }
 						
-+ (NSString*) identifier
-{
-	return @"com.karelia.imedia.Lightroom";
-}
-
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];

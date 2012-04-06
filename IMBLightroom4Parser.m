@@ -98,6 +98,17 @@
 }
 
 
+// Unique identifier for this parser...
+
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.Lightroom4";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Return an array to Lightroom library files...
 
 + (NSArray*) libraryPaths
@@ -141,6 +152,7 @@
 			}
 			
 			IMBLightroom4Parser* parser = [[[[self class] alloc] init] autorelease];
+			parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],libraryPath];
 			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
 			parser.mediaType = inMediaType;
 			parser.dataPath = dataPath;
@@ -269,7 +281,7 @@
 	
 	inRootNode.objects = objects;
 	
-	[super populateSubnodesForRootNode:collectionsNode];
+//	[super populateSubnodesForRootNode:collectionsNode];
 }
 
 
