@@ -73,11 +73,15 @@
 	if (inImage != nil && inKey != nil)
 	{
 		NSMutableData* data = [NSMutableData data];
-		CGImageDestinationRef dest = CGImageDestinationCreateWithData((CFMutableDataRef)data,kUTTypePNG,1,NULL);
+		CGImageDestinationRef dest = CGImageDestinationCreateWithData((CFMutableDataRef)data,kUTTypeJPEG,1,NULL);
 		
 		if (dest)
 		{
-			CGImageDestinationAddImage(dest,inImage,NULL);
+			NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+				[NSNumber numberWithFloat:0.7],(id)kCGImageDestinationLossyCompressionQuality,
+				nil];
+				
+			CGImageDestinationAddImage(dest,inImage,(CFDictionaryRef)options);
 			CGImageDestinationFinalize(dest);
 			CFRelease(dest);
 		}
