@@ -281,7 +281,7 @@
 	
 	inRootNode.objects = objects;
 	
-//	[super populateSubnodesForRootNode:collectionsNode];
+	[super populateSubnodesForRootNode:collectionsNode];
 }
 
 
