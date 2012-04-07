@@ -183,71 +183,64 @@
 
 + (NSDictionary *)imb_metadataFromAudioAtURL:(NSURL*)inURL
 {
-	if (![inURL isFileURL]) {
-		return nil;
-	}
+	NSMutableDictionary* metadata = nil;
 	
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-	
-	[metadata setObject:[inURL path] forKey:@"path"];
-	
-	MDItemRef item = NULL;
-#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-	if (IMBRunningOnSnowLeopardOrNewer())
+	if ([inURL isFileURL])
 	{
-		item = MDItemCreateWithURL(NULL,(CFURLRef)inURL); 
-	}
-	else
-#endif
-	{
-		item = MDItemCreate(NULL, (CFStringRef) [inURL path]);
-	}
-	
-//	NSLog(@"%@", [NSMakeCollectable(MDItemCopyAttributeNames(item)) autorelease]);
+		MDItemRef item =  MDItemCreateWithURL(NULL,(CFURLRef)inURL); 
 
-	if (item)
-	{
-		CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
-		CFArrayRef authors = MDItemCopyAttribute(item,kMDItemAuthors);
-		CFStringRef album = MDItemCopyAttribute(item,kMDItemAlbum);
-		CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
-		
-		if (seconds)
+		if (item)
 		{
-			[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
-			CFRelease(seconds);
+			metadata = [NSMutableDictionary dictionary];
+
+			NSString* path = [inURL path];
+			CFNumberRef seconds = MDItemCopyAttribute(item,kMDItemDurationSeconds);
+			CFArrayRef authors = MDItemCopyAttribute(item,kMDItemAuthors);
+			CFStringRef album = MDItemCopyAttribute(item,kMDItemAlbum);
+			CFStringRef comment = MDItemCopyAttribute(item,kMDItemFinderComment);
+
+			if (path)
+			{
+				[metadata setObject:path forKey:@"path"];
+			}
+			
+			if (seconds)
+			{
+				[metadata setObject:(NSNumber*)seconds forKey:@"duration"]; 
+				CFRelease(seconds);
+			}
+			else
+			{
+				NSSound* sound = [[NSSound alloc] initWithContentsOfURL:inURL byReference:YES];
+				[metadata setObject:[NSNumber numberWithDouble:sound.duration] forKey:@"duration"]; 
+				[sound release];
+			}
+			
+			if (authors)
+			{
+				NSArray* artists = (NSArray*)authors;
+				if (artists.count > 0) [metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
+				CFRelease(authors);
+			}
+			
+			if (album)
+			{
+				[metadata setObject:(NSString*)album forKey:@"album"]; 
+				CFRelease(album);
+			}
+			
+			if (comment)
+			{
+				[metadata setObject:(NSString*)comment forKey:@"comment"]; 
+				CFRelease(comment);
+			}
+			
+			CFRelease(item);
 		}
 		else
 		{
-			NSSound* sound = [[NSSound alloc] initWithContentsOfURL:inURL byReference:YES];
-			[metadata setObject:[NSNumber numberWithDouble:sound.duration] forKey:@"duration"]; 
-			[sound release];
+			//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
 		}
-		
-		if (authors)
-		{
-			NSArray* artists = (NSArray*)authors;
-			if (artists.count > 0) [metadata setObject:[artists objectAtIndex:0] forKey:@"artist"]; 
-			CFRelease(authors);
-		}
-		
-		if (album)
-		{
-			[metadata setObject:(NSString*)album forKey:@"album"]; 
-			CFRelease(album);
-		}
-		
-		if (comment)
-		{
-			[metadata setObject:(NSString*)comment forKey:@"comment"]; 
-			CFRelease(comment);
-		}
-		
-		CFRelease(item);
-	}
-	else
-	{
-		//		NSLog(@"Nil from MDItemCreate for %@ exists?%d", inPath, [[NSFileManager imb_threadSafeManager] fileExistsAtPath:inPath]);
 	}
 	
 	return metadata;

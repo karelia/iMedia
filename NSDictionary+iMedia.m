@@ -98,6 +98,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 + (NSString*)imb_metadataDescriptionForMovieMetadata:(NSDictionary*)inMetadata
 {
 	NSMutableString* description = [NSMutableString string];
@@ -111,11 +112,13 @@
 	NSString* type = [inMetadata objectForKey:@"ImageType"];		// like MooV
 	NSString* UTI = nil;
 
-	if (type != nil) {
+	if (type != nil)
+	{
 		UTI = [NSString imb_UTIForFileType:type];
 	}
 	
-	if (UTI == nil) {
+	if (UTI == nil)
+	{
 		UTI = [NSString imb_UTIForFileAtPath:path];
 	}
 	
@@ -136,10 +139,10 @@
 	if (duration)
 	{
 		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
-																	@"Time",
-																	nil,IMBBundle(),
-																	@"Time",
-																	@"Time label in metadataDescription");
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
 		
 		NSValueTransformer *timecodeTransformer = [NSValueTransformer valueTransformerForName:NSStringFromClass([IMBTimecodeTransformer class])];
 		NSString* durationString = [timecodeTransformer transformedValue:duration];
@@ -150,10 +153,10 @@
 	if (comment && ![comment isEqualToString:@""])
 	{
 		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
-																   @"Comment",
-																   nil,IMBBundle(),
-																   @"Comment",
-																   @"Comment label in metadataDescription");
+			@"Comment",
+			nil,IMBBundle(),
+			@"Comment",
+			@"Comment label in metadataDescription");
 		
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",commentLabel,comment];
@@ -161,6 +164,10 @@
 	
 	return description;
 }	
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 + (NSString*)imb_metadataDescriptionForAudioMetadata:(NSDictionary*)inMetadata
 {
@@ -197,10 +204,10 @@
 		if (artist)
 		{
 			NSString* artistLabel = NSLocalizedStringWithDefaultValue(
-																	  @"Artist",
-																	  nil,IMBBundle(),
-																	  @"Artist",
-																	  @"Artist label in metadataDescription");
+				@"Artist",
+				nil,IMBBundle(),
+				@"Artist",
+				@"Artist label in metadataDescription");
 			
 			if (description.length > 0) [description imb_appendNewline];
 			[description appendFormat:@"%@: %@",artistLabel,artist];
@@ -209,10 +216,10 @@
 		if (album)
 		{
 			NSString* albumLabel = NSLocalizedStringWithDefaultValue(
-																	 @"Album",
-																	 nil,IMBBundle(),
-																	 @"Album",
-																	 @"Album label in metadataDescription");
+				@"Album",
+				nil,IMBBundle(),
+				@"Album",
+				@"Album label in metadataDescription");
 			
 			if (description.length > 0) [description imb_appendNewline];
 			[description appendFormat:@"%@: %@",albumLabel,album];
@@ -222,10 +229,10 @@
 	if (duration)
 	{
 		NSString* durationLabel = NSLocalizedStringWithDefaultValue(
-																	@"Time",
-																	nil,IMBBundle(),
-																	@"Time",
-																	@"Time label in metadataDescription");
+			@"Time",
+			nil,IMBBundle(),
+			@"Time",
+			@"Time label in metadataDescription");
 		
 		NSValueTransformer *timecodeTransformer = [NSValueTransformer valueTransformerForName:NSStringFromClass([IMBTimecodeTransformer class])];
 		NSString* durationString = [timecodeTransformer transformedValue:duration];
@@ -236,10 +243,10 @@
 	if (comment && ![comment isEqualToString:@""])
 	{
 		NSString* commentLabel = NSLocalizedStringWithDefaultValue(
-																   @"Comment",
-																   nil,IMBBundle(),
-																   @"Comment",
-																   @"Comment label in metadataDescription");
+			@"Comment",
+			nil,IMBBundle(),
+			@"Comment",
+			@"Comment label in metadataDescription");
 		
 		if (description.length > 0) [description imb_appendNewline];
 		[description appendFormat:@"%@: %@",commentLabel,comment];
@@ -251,16 +258,26 @@
 @end
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @implementation NSMutableDictionary (iMedia)
 
 - (void) imb_safeSetObject:(id)inObject forKey:(id)inKey
 {
-	if (inObject != nil) {
+	if (inObject != nil)
+	{
 		[self setObject:inObject forKey:inKey];
 	}
-	else {
+	else
+	{
 		[self removeObjectForKey:inKey];
 	}
 }
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+

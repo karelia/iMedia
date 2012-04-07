@@ -67,7 +67,6 @@
 
 @implementation IMBAudioFolderParserMessenger
 
-
 + (NSString*) mediaType
 {
 	return kIMBMediaTypeAudio;
@@ -86,6 +85,17 @@
 	{
 		self.fileUTI = (NSString*)kUTTypeAudio;		// Restrict this parser to audio files...
 		self.mediaType = [[self class] mediaType];
+		_timecodeTransformer = [[IMBTimecodeTransformer alloc] init];
+	}
+	
+	return self;
+}
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]))
+	{
 		_timecodeTransformer = [[IMBTimecodeTransformer alloc] init];
 	}
 	
