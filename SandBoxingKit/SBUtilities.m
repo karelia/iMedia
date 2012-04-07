@@ -257,9 +257,15 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
 				result = [targetCopy performSelector:inSelector withObject:(id)&error];
 			}
 
+			// Copy the results and send them back to the caller. This provides the exact same workflow as with XPC.
+			// This is extremely useful for debugging purposes, but leads to a performance hit in non-sandboxed
+			// host apps. For this reason the following line may be commented out once our code base is stable...
+			
+			result = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:result]];
+			
 			dispatch_async(currentQueue,^()
 			{
-				inReturnHandler(result, error);
+				inReturnHandler(result,error);
 				dispatch_release(currentQueue);
 			});
 	   });
