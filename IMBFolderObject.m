@@ -91,9 +91,6 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Override to avoid trouble when traing to encode with wrong imageRepresentationType...
 
 - (void) setAtomic_imageRepresentation:(id)inImageRepresentation
@@ -104,6 +101,17 @@
 - (id) atomic_imageRepresentation
 {
 	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Override to do nothing...
+
+- (void) loadThumbnail
+{
+
 }
 
 
