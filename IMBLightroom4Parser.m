@@ -59,7 +59,7 @@
 #import "IMBLightroomObject.h"
 #import "FMDatabase.h"
 #import "IMBNode.h"
-#import "IMBNodeObject.h"
+#import "IMBFolderObject.h"
 #import "IMBObject.h"
 #import "NSData+SKExtensions.h"
 #import "NSFileManager+iMedia.h"
@@ -225,6 +225,7 @@
 	IMBNode* foldersNode = [[[IMBNode alloc] init] autorelease];
 	foldersNode.mediaSource = self.mediaSource;
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
+	foldersNode.parserIdentifier = self.identifier;
 	foldersNode.name = foldersName;
 	foldersNode.icon = [self folderIcon];
 	foldersNode.parserIdentifier = self.identifier;
@@ -237,7 +238,7 @@
 	
 	[subnodes addObject:foldersNode];
 	
-	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
+	IMBFolderObject* foldersObject = [[[IMBFolderObject alloc] init] autorelease];
 	foldersObject.representedNodeIdentifier = foldersNode.identifier;
 	foldersObject.name = foldersNode.name;
 	foldersObject.metadata = nil;
@@ -267,7 +268,7 @@
 	
 	[subnodes addObject:collectionsNode];
 	
-	IMBNodeObject* collectionsObject = [[[IMBNodeObject alloc] init] autorelease];
+	IMBFolderObject* collectionsObject = [[[IMBFolderObject alloc] init] autorelease];
 	collectionsObject.representedNodeIdentifier = collectionsNode.identifier;
 	collectionsObject.name = collectionsNode.name;
 	collectionsObject.metadata = nil;
@@ -507,7 +508,7 @@
 			NSData* jpegData = nil;
             
             if ((index + headerLengthValue + dataLengthValue) < [data length]) {
-                [data subdataWithRange:NSMakeRange(index + headerLengthValue, dataLengthValue)];
+                jpegData = [data subdataWithRange:NSMakeRange(index + headerLengthValue, dataLengthValue)];
             }
             
 			return jpegData;

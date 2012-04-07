@@ -59,7 +59,7 @@
 #import "IMBLightroomObject.h"
 #import "FMDatabase.h"
 #import "IMBNode.h"
-#import "IMBNodeObject.h"
+#import "IMBFolderObject.h"
 #import "IMBObject.h"
 #import "NSData+SKExtensions.h"
 #import "NSFileManager+iMedia.h"
@@ -238,7 +238,7 @@
 	
 	[subnodes addObject:foldersNode];
 
-	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
+	IMBFolderObject* foldersObject = [[[IMBFolderObject alloc] init] autorelease];
 	foldersObject.representedNodeIdentifier = foldersNode.identifier;
 	foldersObject.name = foldersNode.name;
 	foldersObject.metadata = nil;
@@ -268,7 +268,7 @@
 	
 	[subnodes addObject:collectionsNode];
 	
-	IMBNodeObject* collectionsObject = [[[IMBNodeObject alloc] init] autorelease];
+	IMBFolderObject* collectionsObject = [[[IMBFolderObject alloc] init] autorelease];
 	collectionsObject.representedNodeIdentifier = collectionsNode.identifier;
 	collectionsObject.name = collectionsNode.name;
 	collectionsObject.metadata = nil;

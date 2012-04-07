@@ -54,7 +54,7 @@
 
 #import "IMBLightroom2Parser.h"
 #import "IMBNode.h"
-#import "IMBNodeObject.h"
+#import "IMBFolderObject.h"
 #import "IMBObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
@@ -179,7 +179,7 @@
 	
 	[subnodes addObject:foldersNode];
 	
-	IMBNodeObject* foldersObject = [[[IMBNodeObject alloc] init] autorelease];
+	IMBFolderObject* foldersObject = [[[IMBFolderObject alloc] init] autorelease];
 	foldersObject.representedNodeIdentifier = foldersNode.identifier;
 	foldersObject.name = foldersNode.name;
 	foldersObject.metadata = nil;

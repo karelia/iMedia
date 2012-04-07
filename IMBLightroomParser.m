@@ -65,7 +65,7 @@
 #import "IMBLightroom4VideoParser.h"
 #import "IMBIconCache.h"
 #import "IMBNode.h"
-#import "IMBNodeObject.h"
+#import "IMBFolderObject.h"
 #import "IMBObject.h"
 #import "IMBObjectsPromise.h"
 #import "IMBOrderedDictionary.h"
@@ -497,7 +497,7 @@ static NSArray* sSupportedUTIs = nil;
 			
 			[subnodes addObject:node];
 			
-			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+			IMBFolderObject* object = [[[IMBFolderObject alloc] init] autorelease];
 			object.representedNodeIdentifier = node.identifier;
 			object.name = name;
 			object.metadata = nil;
@@ -591,7 +591,7 @@ static NSArray* sSupportedUTIs = nil;
 				
 				NSString* path = [self absolutePathFromAttributes:attributes];
 				
-				IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+				IMBFolderObject* object = [[[IMBFolderObject alloc] init] autorelease];
 				object.representedNodeIdentifier = node.identifier;
 				object.name = node.name;
 				object.metadata = nil;
@@ -693,7 +693,7 @@ static NSArray* sSupportedUTIs = nil;
 			
 			[subnodes addObject:node];
 			
-			IMBNodeObject* object = [[[IMBNodeObject alloc] init] autorelease];
+			IMBFolderObject* object = [[[IMBFolderObject alloc] init] autorelease];
 			object.representedNodeIdentifier = node.identifier;
 			object.name = node.name;
 			object.metadata = nil;
