@@ -66,6 +66,16 @@
 
 #pragma mark
 
+//@interface IMBParserMessenger ()
+//- (void) _setParserIdentifier:(IMBParser*)inParser onNodeTree:(IMBNode*)inNode;
+//@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
 @implementation IMBParserMessenger
 
 @synthesize mediaType = _mediaType;
@@ -264,6 +274,7 @@
 			if (error == nil)
 			{
 				IMBNode* node = [parser unpopulatedTopLevelNode:&error];
+				[self _setParserIdentifier:parser onNodeTree:node];
 				if (node) [topLevelNodes addObject:node];
 			}
 		}
@@ -278,6 +289,7 @@
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	[parser populateNode:inNode error:outError];
+	[self _setParserIdentifier:parser onNodeTree:inNode];
 	return inNode;
 }
 
@@ -285,7 +297,34 @@
 - (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	return [parser reloadNodeTree:inNode error:outError];
+	IMBNode* node = [parser reloadNodeTree:inNode error:outError];
+	[self _setParserIdentifier:parser onNodeTree:node];
+	return node;
+}
+
+
+// Since it is absolutely essential that all IMBNodes and IMBObjects have their parserIdentifier set correctly,
+// we'll use the following helper method to make sure of that and remove the burden from the parser developers.
+// Simply call this method on any node that we get from a IMBParser instance...
+
+- (void) _setParserIdentifier:(IMBParser*)inParser onNodeTree:(IMBNode*)inNode
+{
+	if (inNode)
+	{
+		NSString* identifier = inParser.identifier;
+		
+		inNode.parserIdentifier = identifier;
+		
+		for (IMBObject* object in inNode.objects)
+		{
+			object.parserIdentifier = identifier;
+		}
+		
+		for (IMBNode* subnode in inNode.subnodes)
+		{
+			[self _setParserIdentifier:inParser onNodeTree:subnode];
+		}
+	}
 }
 
 
