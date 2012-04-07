@@ -405,15 +405,16 @@ static IMBPanelController* sSharedPanelController = nil;
 	NSString* frame = NSStringFromRect(self.window.frame);
 	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
 	
-	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
-	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
-
 	int sizeMode = 	[ibToolbar sizeMode];
 	BOOL isSmall = (sizeMode == NSToolbarSizeModeSmall);
 	[IMBConfig setPrefsValue:[NSNumber numberWithBool:isSmall] forKey:@"toolbarIsSmall"];
 	
 	NSToolbarDisplayMode displayMode = [ibToolbar displayMode];
 	[IMBConfig setPrefsValue:[NSNumber numberWithInt:displayMode] forKey:@"toolbarDisplayMode"];
+
+	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
+	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
+
 }
 
 
@@ -422,9 +423,6 @@ static IMBPanelController* sSharedPanelController = nil;
 	NSString* frame = [IMBConfig prefsValueForKey:@"windowFrame"];
 	if (frame) [self.window setFrame:NSRectFromString(frame) display:YES animate:NO];
 
-	NSString* mediaType = [IMBConfig prefsValueForKey:@"selectedMediaType"];
-	if (mediaType) [ibTabView selectTabViewItemWithIdentifier:mediaType];
-
 	NSString* toolbarDisplayMode = [IMBConfig prefsValueForKey:@"toolbarDisplayMode"];
 	if (toolbarDisplayMode) [ibToolbar setDisplayMode:[toolbarDisplayMode intValue]];
 
@@ -432,6 +430,22 @@ static IMBPanelController* sSharedPanelController = nil;
 	BOOL small = (nil == toolbarIsSmall) ? NO : [toolbarIsSmall boolValue];
 	int sizeMode = (small ? NSToolbarSizeModeSmall : NSToolbarSizeModeRegular);
 	[ibToolbar setSizeMode:sizeMode];
+
+	NSString* mediaType = [IMBConfig prefsValueForKey:@"selectedMediaType"];
+	NSTabViewItem* tabViewItem = [ibTabView selectedTabViewItem];
+
+	if (mediaType)
+	{
+		if ([tabViewItem.identifier isEqualToString:mediaType])
+		{
+			[self tabView:ibTabView willSelectTabViewItem:tabViewItem];
+			[self tabView:ibTabView didSelectTabViewItem:tabViewItem];
+		}
+		else
+		{
+			[ibTabView selectTabViewItemWithIdentifier:mediaType];
+		}
+	}
 }
 
 
@@ -690,28 +704,32 @@ static IMBPanelController* sSharedPanelController = nil;
 
 - (void) tabView:(NSTabView*)inTabView didSelectTabViewItem:(NSTabViewItem*)inTabViewItem
 {
-	NSString* newMediaType = inTabViewItem.identifier;
-	[ibToolbar setSelectedItemIdentifier:newMediaType];
-	// Notify the controllers...
-
-	IMBNodeViewController* oldNodeViewController = [self nodeViewControllerForMediaType:_oldMediaType];
-	IMBObjectViewController* oldObjectViewController = (IMBObjectViewController*)oldNodeViewController.objectViewController;
-	[oldObjectViewController didHideView];
-
-	IMBNodeViewController* newNodeViewController = [self nodeViewControllerForMediaType:newMediaType];
-	IMBObjectViewController* newObjectViewController = (IMBObjectViewController*)newNodeViewController.objectViewController;
-	[newObjectViewController didShowView];
-
-	// Notify the delegate...
-
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didHidePanelForMediaType:)])
+	if (!_isLoadingWindow)
 	{
-		[_delegate panelController:self didHidePanelForMediaType:_oldMediaType];
-	}
+		NSString* newMediaType = inTabViewItem.identifier;
+		[ibToolbar setSelectedItemIdentifier:newMediaType];
+		
+		// Notify the controllers...
 
-	if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didShowPanelForMediaType:)])
-	{
-		[_delegate panelController:self didShowPanelForMediaType:newMediaType];
+		IMBNodeViewController* oldNodeViewController = [self nodeViewControllerForMediaType:_oldMediaType];
+		IMBObjectViewController* oldObjectViewController = (IMBObjectViewController*)oldNodeViewController.objectViewController;
+		[oldObjectViewController didHideView];
+
+		IMBNodeViewController* newNodeViewController = [self nodeViewControllerForMediaType:newMediaType];
+		IMBObjectViewController* newObjectViewController = (IMBObjectViewController*)newNodeViewController.objectViewController;
+		[newObjectViewController didShowView];
+
+		// Notify the delegate...
+
+		if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didHidePanelForMediaType:)])
+		{
+			[_delegate panelController:self didHidePanelForMediaType:_oldMediaType];
+		}
+
+		if (_delegate!=nil && [_delegate respondsToSelector:@selector(panelController:didShowPanelForMediaType:)])
+		{
+			[_delegate panelController:self didShowPanelForMediaType:newMediaType];
+		}
 	}
 }
 
