@@ -192,6 +192,8 @@
 			[subnodes addObject:subnode];
 		}
 
+		inNode.objects = [NSMutableArray arrayWithCapacity:0];	// Important to mark node as populated!
+		
 		if (outError) *outError = nil;
 	}
 	else
