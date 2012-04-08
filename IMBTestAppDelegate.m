@@ -125,35 +125,14 @@
 
 - (void) awakeFromNib
 {
-
 	// NSLog(@"MAC OS X VERSION MIN REQUIRED = %d, MAC OS X VERSION MAX ALLOWED = %d",   MAC_OS_X_VERSION_MIN_REQUIRED, MAC_OS_X_VERSION_MAX_ALLOWED);
 	
 	[IMBConfig setShowsGroupNodes:YES];
 	[IMBConfig setUseGlobalViewType:NO];
 	
 	self.usedObjects = [NSMutableDictionary dictionary];
-	
 
-
-//#if 1
-//	
-//	IMBParserController* parserController = [IMBParserController sharedParserController];
-//	[parserController setDelegate:self];
-//	[parserController loadParserMessengers];
-//
-//	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:kIMBMediaTypeImage];
-//	[libraryController setDelegate:self];
-//	[libraryController reload];
-//	
-//#endif	
-	
-	
-	
-	
-	
-	
-	
-#if CUSTOM_USER_INTERFACE
+	#if CUSTOM_USER_INTERFACE
 	
 	// Load parsers...
 	
@@ -191,15 +170,18 @@
 	[libraryController reload];
 	[ibWindow makeKeyAndOrderFront:nil];
 	
-#else
+	#else
 	
 	// Just open the standard iMedia panel...
 	
 	[self togglePanel:nil];
 	
-#endif
+	#endif
 
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Toggle panel visibility...
@@ -235,9 +217,11 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (IBAction) toggleDragDestinationWindow:(id)inSender
 {
-/*
 	if (ibDragDestinationWindow.isVisible)
 	{
 		[ibDragDestinationWindow orderOut:inSender];
@@ -246,18 +230,18 @@
 	{
 		[ibDragDestinationWindow makeKeyAndOrderFront:inSender];
 	}
-*/	
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Perform cleanup and save window frame to prefs...
 
 - (void) applicationWillTerminate:(NSNotification*)inNotification
 {
-/*
 	NSString* frame = NSStringFromRect(ibWindow.frame);
 	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
-*/	
 }
 
 
@@ -278,6 +262,8 @@
 #pragma mark IMBParserController Delegate
 
 
+// Make sure that unwanted parser classes aren't even loaded...
+
 - (BOOL) parserController:(IMBParserController*)inController shouldLoadParserMessengerWithIdentifier:(NSString*)inIdentifier
 {
 	if ([inIdentifier isEqualToString:@"com.karelia.imedia.folder.DesktopPictures"])
@@ -296,6 +282,24 @@
 	return YES;
 }
 
+
+// User this delegate method to configure an IMBParserMessenger before it's being used for the first time...
+
+- (void) parserController:(IMBParserController*)inController didLoadParserMessenger:(IMBParserMessenger*)inParserMessenger;
+{
+
+}
+
+
+// Here custom stuff done in the previous method can be cleaned up again...
+
+- (void) parserController:(IMBParserController*)inController willUnloadParserMessenger:(IMBParserMessenger*)inParserMessenger;
+{
+
+}
+
+
+// Old methods:
 
 /*
 - (IMBParser *)parserController:(IMBParserController *)controller willLoadParser:(IMBParser *)parser;
@@ -417,61 +421,42 @@
 #pragma mark 
 #pragma mark IMBLibraryController Delegate
 
-/*
-- (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParser:(IMBParser*)inParser
+
+- (BOOL) libraryController:(IMBLibraryController*)inController shouldCreateNodeWithParserMessenger:(IMBParserMessenger*)inParserMessenger
 {
-#if LOG_CREATE_NODE
-	NSLog(@"%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
-#endif
-	
 	return YES;
 }
 
 
-- (void) libraryController:(IMBLibraryController*)inController willCreateNodeWithParser:(IMBParser*)inParser
+- (void) libraryController:(IMBLibraryController*)inController willCreateNodeWithParserMessenger:(IMBParserMessenger*)inParserMessenger
 {
-#if LOG_CREATE_NODE
-	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
-#endif
+
 }
 
 
-- (void) libraryController:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParser:(IMBParser*)inParser
+- (void) libraryController:(IMBLibraryController*)inController didCreateNode:(IMBNode*)inNode withParserMessenger:(IMBParserMessenger*)inParserMessenger
 {
-#if LOG_CREATE_NODE
-	NSLog(@"		%s inParser=%@",__FUNCTION__,NSStringFromClass(inParser.class));
-#endif
+
 }
-*/
 
-//----------------------------------------------------------------------------------------------------------------------
 
-/*
 - (BOOL) libraryController:(IMBLibraryController*)inController shouldPopulateNode:(IMBNode*)inNode
 {
-#if LOG_POPULATE_NODE
-	NSLog(@"%s inNode=%@",__FUNCTION__,inNode.name);
-#endif
-	
 	return YES;
 }
 
 
 - (void) libraryController:(IMBLibraryController*)inController willPopulateNode:(IMBNode*)inNode
 {
-#if LOG_POPULATE_NODE
-	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
-#endif
+
 }
 
 
 - (void) libraryController:(IMBLibraryController*)inController didPopulateNode:(IMBNode*)inNode
 {
-#if LOG_POPULATE_NODE
-	NSLog(@"		%s inNode=%@",__FUNCTION__,inNode.name);
-#endif
+
 }
-*/
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
