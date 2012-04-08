@@ -131,6 +131,17 @@ static dispatch_once_t sOnceToken = 0;
 }
 
 
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]))
+	{
+		self.timecodeTransformer = [[[IMBTimecodeTransformer alloc] init] autorelease];
+	}
+	
+	return self;
+}
+
+
 - (void) dealloc
 {
 	IMBRelease(_timecodeTransformer);
