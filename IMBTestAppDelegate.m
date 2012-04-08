@@ -52,9 +52,10 @@
 
 #pragma mark HEADERS
 
-#import "IMBTestAppDelegate.h"
-//#import "IMBImageViewController.h"
 #import <iMedia/iMedia.h>
+#import "IMBTestAppDelegate.h"
+#import "SBUtilities.h"
+//#import "IMBImageViewController.h"
 //#import <iMedia/IMBiPhotoEventObjectViewController.h>
 //#import <iMedia/IMBFaceObjectViewController.h>
 //#import "IMBTestiPhotoEventBrowserCell.h"
@@ -132,6 +133,13 @@
 	
 	self.usedObjects = [NSMutableDictionary dictionary];
 
+	if (SBIsSandboxed())
+	{
+		NSString* title = ibDragDestinationWindow.title;
+		title = [NSString stringWithFormat:@"%@ (SANDBOXED)",title];
+		ibDragDestinationWindow.title = title;
+	}
+	
 	#if CUSTOM_USER_INTERFACE
 	
 	// Load parsers...
