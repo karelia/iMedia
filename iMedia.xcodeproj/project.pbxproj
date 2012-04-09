@@ -97,6 +97,7 @@
 		CEF6970810643D60005D7E72 /* IMBLinkObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6970610643D60005D7E72 /* IMBLinkObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEF7A22412B1B71800DBE412 /* url_icon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEF7A22312B1B71800DBE412 /* url_icon.tiff */; };
 		D006CFF115331CC900C53C23 /* IMBNoteIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D006CFF015331CC900C53C23 /* IMBNoteIcon.icns */; };
+		D006CFF41533502200C53C23 /* IMBStopIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D006CFF31533502200C53C23 /* IMBStopIcon.icns */; };
 		D00D0AA912258E4A000924AE /* IMBFlickrHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */; };
 		D00D0AAA12258E4A000924AE /* IMBFlickrHeaderViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */; };
 		D00D0D271226A813000924AE /* IMBPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = F331802411E6D25D00BDABC2 /* IMBPanel.h */; };
@@ -612,6 +613,7 @@
 		CEF6970710643D60005D7E72 /* IMBLinkObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLinkObjectViewController.m; sourceTree = "<group>"; };
 		CEF7A22312B1B71800DBE412 /* url_icon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = url_icon.tiff; sourceTree = "<group>"; };
 		D006CFF015331CC900C53C23 /* IMBNoteIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = IMBNoteIcon.icns; sourceTree = "<group>"; };
+		D006CFF31533502200C53C23 /* IMBStopIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = IMBStopIcon.icns; sourceTree = "<group>"; };
 		D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBFlickrHeaderView.xib; sourceTree = "<group>"; };
 		D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrHeaderViewController.h; sourceTree = "<group>"; };
 		D00D0AA812258E4A000924AE /* IMBFlickrHeaderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrHeaderViewController.m; sourceTree = "<group>"; };
@@ -1256,6 +1258,22 @@
 			name = OmniWeb;
 			sourceTree = "<group>";
 		};
+		D006CFF51533503200C53C23 /* Alert Popovers */ = {
+			isa = PBXGroup;
+			children = (
+				D024A32115319CCD005B6C0A /* IMBPopover.h */,
+				D024A32215319CCD005B6C0A /* IMBPopover.m */,
+				D024A31715319CB4005B6C0A /* IMBAlertPopover.h */,
+				D024A31815319CB4005B6C0A /* IMBAlertPopover.m */,
+				D024A31915319CB4005B6C0A /* IMBAlertPopoverViewController.h */,
+				D024A31A15319CB4005B6C0A /* IMBAlertPopoverViewController.m */,
+				D024A31B15319CB4005B6C0A /* IMBAlertPopoverViewController.xib */,
+				D006CFF015331CC900C53C23 /* IMBNoteIcon.icns */,
+				D006CFF31533502200C53C23 /* IMBStopIcon.icns */,
+			);
+			name = "Alert Popovers";
+			sourceTree = "<group>";
+		};
 		D02E53C510A5558800B205BD /* Lightroom */ = {
 			isa = PBXGroup;
 			children = (
@@ -1418,6 +1436,7 @@
 				D08E8D8B1019EBFB005D8614 /* IMBFileWatcher */,
 				D08E8B5C1019C900005D8614 /* UKFileWatcher */,
 				D0F2DB91109825D3004280C1 /* FMDatabase */,
+				D006CFF51533503200C53C23 /* Alert Popovers */,
 			);
 			name = "Third Party";
 			sourceTree = "<group>";
@@ -1546,14 +1565,6 @@
 				D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */,
 				CEAF1F39125A80D4001C3EBB /* IMBHoverButton.h */,
 				CEAF1F3A125A80D4001C3EBB /* IMBHoverButton.m */,
-				D024A32115319CCD005B6C0A /* IMBPopover.h */,
-				D024A32215319CCD005B6C0A /* IMBPopover.m */,
-				D024A31715319CB4005B6C0A /* IMBAlertPopover.h */,
-				D024A31815319CB4005B6C0A /* IMBAlertPopover.m */,
-				D024A31915319CB4005B6C0A /* IMBAlertPopoverViewController.h */,
-				D024A31A15319CB4005B6C0A /* IMBAlertPopoverViewController.m */,
-				D024A31B15319CB4005B6C0A /* IMBAlertPopoverViewController.xib */,
-				D006CFF015331CC900C53C23 /* IMBNoteIcon.icns */,
 			);
 			name = Views;
 			sourceTree = SOURCE_ROOT;
@@ -2392,6 +2403,7 @@
 				D0A13AA715301E8A005513CD /* missing-thumbnail.jpg in Resources */,
 				D024A32015319CB4005B6C0A /* IMBAlertPopoverViewController.xib in Resources */,
 				D006CFF115331CC900C53C23 /* IMBNoteIcon.icns in Resources */,
+				D006CFF41533502200C53C23 /* IMBStopIcon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
