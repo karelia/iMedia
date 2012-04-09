@@ -730,7 +730,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 
 // Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out off cache 
-// and are thus unloaded...
+// and are thus unloaded. Please note that missing thumbnails will be replaced with a generic image...
 
 - (void) storeReceivedImageRepresentation:(id)inImageRepresentation
 {
@@ -741,6 +741,11 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	{
 		self.needsImageRepresentation = NO;
 		[IMBObjectFifoCache addObject:self];
+	}
+	else
+	{
+		self.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+		self.imageRepresentation = [NSImage imageNamed:@"missing-thumbnail"];
 	}
 }
 
