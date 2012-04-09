@@ -506,7 +506,7 @@ static IMBPanelController* sSharedPanelController = nil;
 	iButton = [[[IMBHoverButton alloc] initWithFrame:NSMakeRect(frame.origin.x + containerWidth - 11 - 11,frame.origin.y+2,11,11)] autorelease];
 	[iButton setAutoresizingMask:NSViewMinYMargin|NSViewMinXMargin];
 	
-	[iButton setAction:@selector(flipBack:)];
+	[iButton setAction:@selector(flipBackToMainWindow:)];
 	[iButton setTarget:self];
 	[container addSubview:iButton];
 	
