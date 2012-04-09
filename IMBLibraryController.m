@@ -320,6 +320,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	if ([inNode isGroupNode]) return;
 	if ([inNode isPopulated]) return;
+	if ([inNode error]) return;
 	
 	// Ask delegate whether we should populate this node...
 			
@@ -347,25 +348,40 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
-			// Display any errors that might have occurred...
-					
-			if (inError)
+			// Got a new node. Do some consistency checks (was it populated correctly)...
+			
+			if (inError == nil)
 			{
-				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-				[NSApp presentError:inError];
+				if (inNewNode != nil && !inNewNode.isPopulated)
+				{
+					NSString* title = @"Programmer Error";
+					NSString* description = [NSString stringWithFormat:
+						@"The node '%@' returned by the parser %@ was not populated correctly.\n\nEither subnodes or objects is still nil.",
+						inNode.name,
+						inNewNode.parserIdentifier];
+						
+					NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
+						title,@"title",
+						description,NSLocalizedDescriptionKey,
+						nil];
+						
+					inError = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];
+				}
 			}
 			
+			// Store any errors so that a badge can be displayed...
+			
+			if (inError) NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+			inNewNode.error = inError;
+			
 			// Replace the old with the new node...
-					
-			else if (inNewNode)
-			{
-				[self _setParserMessenger:messenger nodeTree:inNewNode];
-				[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+			
+			[self _setParserMessenger:messenger nodeTree:inNewNode];
+			[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
 
-				if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
-				{
-					[_delegate libraryController:self didPopulateNode:inNewNode];
-				}
+			if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
+			{
+				[_delegate libraryController:self didPopulateNode:inNewNode];
 			}
 		});		
 }
