@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -54,6 +57,7 @@
 
 #import "IMBNodeCell.h"
 #import "IMBNode.h"
+#import "IMBAlertPopover.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,11 +66,11 @@
 #pragma mark CONSTANTS
 
 #define kIconImageSize		16.0
-#define kImageOriginXOffset 3
-#define kImageOriginYOffset 0
-#define kTextOriginXOffset	2
-#define kTextOriginYOffset	1
-#define kTextHeightAdjust	4
+#define kImageOriginXOffset 3.0
+#define kImageOriginYOffset 0.0
+#define kTextOriginXOffset	3.0
+#define kTextOriginYOffset	2.0
+#define kTextHeightAdjust	4.0
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,8 +80,10 @@
 
 @implementation IMBNodeCell
 
-@synthesize image = _image;
-@synthesize extraImage = _extraImage;
+@synthesize isGroupCell = _isGroupCell;
+@synthesize icon = _icon;
+@synthesize badgeIcon = _badgeIcon;
+@synthesize badgeError = _badgeError;
 @synthesize badgeType = _badgeType;
 
 
@@ -88,28 +94,25 @@
 {
 	if (self = [super init])
 	{
-		[self setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
 		[self setTruncatesLastVisibleLine:YES];
+		
+		_badgeType = 0;
+		_clickedRect = NSZeroRect;
+		
+		[self setTarget:self];
+		[self setAction:@selector(showPopover:)];
 	}
 	
 	return self;
 }
 
 
-- (id) copyWithZone:(NSZone*)inZone
-{
-    IMBNodeCell* cell = (IMBNodeCell*) [super copyWithZone:inZone];
-    cell->_image = [_image retain];
-	cell->_extraImage = [_extraImage retain];
-	cell->_badgeType = _badgeType;
-    return cell;
-}
-
-
 - (void) dealloc
 {
-	IMBRelease(_image);
- 	IMBRelease(_extraImage);
+	IMBRelease(_icon);
+ 	IMBRelease(_badgeIcon);
+ 	IMBRelease(_badgeError);
+	
    [super dealloc];
 }
 
@@ -117,84 +120,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-
-
-- (NSRect) imageRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
-{	
-	NSRect imageRect = inBounds;
-	
-	imageRect.origin.x += kImageOriginXOffset;
-	imageRect.origin.y -= kImageOriginYOffset;
-	imageRect.size = [_image size];
-
-	if (inFlipped)
-		imageRect.origin.y += ceil(0.5 * (inBounds.size.height + imageRect.size.height));
-	else
-		imageRect.origin.y += ceil(0.5 * (inBounds.size.height - imageRect.size.height));
-
-	return imageRect;
-}
-
-
-- (NSRect) titleRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
-{	
-	// the cell has an image: draw the normal item cell
-	NSRect imageFrame;
-
-	NSSize imageSize = [_image size];
-	NSDivideRect(inBounds, &imageFrame, &inBounds, 3 + imageSize.width, NSMinXEdge);
-
-	imageFrame.origin.x += kImageOriginXOffset;
-	imageFrame.origin.y -= kImageOriginYOffset;
-	imageFrame.size = imageSize;
-	
-	imageFrame.origin.y += ceil((inBounds.size.height - imageFrame.size.height) / 2);
-	
-	NSRect titleRect = inBounds;
-	titleRect.origin.x += kTextOriginXOffset;
-	titleRect.origin.y += kTextOriginYOffset;
-	titleRect.size.width -= 19.0;
-	titleRect.size.height -= kTextHeightAdjust;
-
-	return titleRect;
-}
-
-
-- (NSRect) badgeRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
-{	
-	NSRect badgeRect = inBounds;
-	
-	badgeRect.origin.x = NSMaxX(inBounds) - kImageOriginXOffset - 16.0;
-	badgeRect.origin.y -= kImageOriginYOffset;
-	badgeRect.size = NSMakeSize(16.0,16.0);
-
-	if (inFlipped)
-		badgeRect.origin.y += ceil(0.5 * (inBounds.size.height + badgeRect.size.height));
-	else
-		badgeRect.origin.y += ceil(0.5 * (inBounds.size.height - badgeRect.size.height));
-
-	return badgeRect;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (BOOL) isGroupCell
+- (id) copyWithZone:(NSZone*)inZone
 {
-    return (self.image == nil && self.title.length > 0);
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSSize) cellSize
-{
-    NSSize cellSize = [super cellSize];
-    cellSize.width += (_image ? [_image size].width : 0) + 3;
-    return cellSize;
+    IMBNodeCell* cell = (IMBNodeCell*) [super copyWithZone:inZone];
+	
+    cell->_isGroupCell = _isGroupCell;
+    cell->_icon = [_icon retain];
+	cell->_badgeIcon = [_badgeIcon retain];
+	cell->_badgeError = [_badgeError retain];
+	cell->_badgeType = _badgeType;
+	cell->_clickedRect = _clickedRect;
+	
+    return cell;
 }
 
 
@@ -208,88 +145,233 @@
 {
 	BOOL isFlipped = inControlView.isFlipped;
 
-	// If we have an image then draw cell contents in several steps...
+	// Set title font and color...
 	
-	if (_image)
+	if ([self isGroupCell])
 	{
-		NSRect imageRect = [self imageRectForBounds:inFrame flipped:isFlipped];
-		[_image compositeToPoint:imageRect.origin operation:NSCompositeSourceOver];
-
-		NSRect titleRect = [self titleRectForBounds:inFrame flipped:isFlipped];
-		[super drawWithFrame:titleRect inView:inControlView];
-		if (_extraImage)	// show it at the right edge of the text area
-		{
-			NSPoint pointForExtraImage = NSMakePoint(NSMaxX(titleRect)-16.0, NSMinY(imageRect));
-			[_extraImage compositeToPoint:pointForExtraImage operation:NSCompositeSourceOver];
-		}
- 
-   }
-	
-	// Otherwise let the superclass do the drawing (but center the text vertically)...
-	
-	else 
+		self.font = [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]];
+		self.textColor = [NSColor disabledControlTextColor];
+	}
+	else
 	{
-//		if ([self isGroupCell])
-//		{
-//			CGFloat yOffset = -2.0;
-			inFrame.origin.y -= 2.0;
-			[super drawWithFrame:inFrame inView:inControlView];
-//		}
+		self.font = [NSFont systemFontOfSize:[NSFont systemFontSize]];
+		self.textColor = [NSColor controlTextColor];
 	}
 
-	// Add the spinning wheel subview if we are currently loading a node...
+	// Draw the image...
 	
-//	NSImageNameRefreshTemplate
-//	NSImageNameRefreshFreestandingTemplate
+	if (_icon)
+	{
+		NSRect iconRect = [self imageRectForBounds:inFrame flipped:isFlipped];
+		[_icon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:isFlipped hints:nil];
+	}
 	
-//	NSRect badgeRect = [self badgeRectForBounds:inFrame flipped:isFlipped];
-//	NSImage* badge = [NSImage imageNamed:NSImageNameFollowLinkFreestandingTemplate];
-//	[badge compositeToPoint:badgeRect.origin operation:NSCompositeSourceOver fraction:0.5];
+	// Draw the title...
+	
+	NSRect titleRect = [self titleRectForBounds:inFrame flipped:isFlipped];
+	[super drawWithFrame:titleRect inView:inControlView];
+	
+	// Draw the badge...
+	
+	if (_badgeIcon != nil && !_isGroupCell)
+	{
+		NSRect badgeRect = [self badgeRectForBounds:inFrame flipped:isFlipped];
+		[_badgeIcon drawInRect:badgeRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:isFlipped hints:nil];
+	}
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) editWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate event:(NSEvent*)inEvent
-{
-	NSRect titleRect = [self titleRectForBounds:inFrame];
-	[super editWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate event:inEvent];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) selectWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate start:(NSInteger)inStart length:(NSInteger)inLength
-{
-	NSRect titleRect = [self titleRectForBounds:inFrame];
-	[super selectWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate start:inStart length:inLength];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// In 10.5, we need you to implement this method for blocking drag and drop of a given cell. So NSCell hit testing 
-// will determine if a row can be dragged or not. NSTableView calls this cell method when starting a drag, if the 
-// hit cell returns NSCellHitTrackableArea, the particular row will be tracked instead of dragged...
-
-- (NSUInteger) hitTestForEvent:(NSEvent *)event inRect:(NSRect)cellFrame ofView:(NSView *)controlView
-{
-	NSInteger result = NSCellHitContentArea;
+- (NSRect) imageRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
+{	
+	NSRect imageRect = inBounds;
 	
-//	NSOutlineView* hostingOutlineView = (NSOutlineView*)[self controlView];
-//	if (hostingOutlineView)
-//	{
-//		NSInteger selectedRow = [hostingOutlineView selectedRow];
-//		BaseNode* node = [[hostingOutlineView itemAtRow:selectedRow] representedObject];
-//
-//		if (![node isDraggable])	// is the node isDraggable (i.e. non-file system based objects)
-//			result = NSCellHitTrackableArea;
-//	}
+	imageRect.origin.x += kImageOriginXOffset;
+	imageRect.origin.y -= kImageOriginYOffset;
+	imageRect.size = NSMakeSize(kIconImageSize,kIconImageSize);
+
+	if (inFlipped)
+	{
+		imageRect.origin.y += ceil(0.5 * (inBounds.size.height - imageRect.size.height));
+	}
+	else
+	{
+		imageRect.origin.y -= ceil(0.5 * (inBounds.size.height - imageRect.size.height));
+	}
+
+	return imageRect;
+}
+
+
+- (NSRect) titleRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
+{	
+	NSRect titleRect = inBounds;
+
+	if (self.isGroupCell)
+	{
+		titleRect.origin.x -= 3.0;
+		titleRect.origin.y += inFlipped ? 4.0 : -4.0;
+		titleRect.size.height -= kTextHeightAdjust;
+	}
+	else
+	{
+		titleRect.origin.x += kTextOriginXOffset + kIconImageSize + kTextOriginXOffset;
+		titleRect.origin.y += kTextOriginYOffset;
+		titleRect.size.width -= kIconImageSize + kTextOriginXOffset;
+		titleRect.size.height -= kTextHeightAdjust;
 		
-	return result;
+		if (_badgeIcon)
+		{
+			titleRect.size.width -= kIconImageSize + kTextOriginXOffset;
+		}
+	}
+
+	return titleRect;
+}
+
+
+- (NSRect) badgeRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped
+{	
+	NSRect badgeRect = inBounds;
+	badgeRect.origin.x = NSMaxX(inBounds) - kIconImageSize + kImageOriginXOffset;
+	badgeRect.origin.y -= kImageOriginYOffset;
+	badgeRect.size = NSMakeSize(kIconImageSize,kIconImageSize);
+
+	if (inFlipped)
+	{
+		badgeRect.origin.y += ceil(0.5 * (inBounds.size.height - badgeRect.size.height));
+	}
+	else
+	{
+		badgeRect.origin.y -= ceil(0.5 * (inBounds.size.height - badgeRect.size.height));
+	}
+	
+	return badgeRect;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (BOOL) isGroupCell
+{
+	return _isGroupCell;
+//    return (self.icon == nil && self.title.length > 0);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSSize) cellSize
+{
+    NSSize cellSize = [super cellSize];
+    cellSize.width += (_icon ? [_icon size].width : 0) + 3;
+    return cellSize;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+
+//- (void) editWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate event:(NSEvent*)inEvent
+//{
+//	NSRect titleRect = [self titleRectForBounds:inFrame];
+//	[super editWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate event:inEvent];
+//}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+//- (void) selectWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate start:(NSInteger)inStart length:(NSInteger)inLength
+//{
+//	NSRect titleRect = [self titleRectForBounds:inFrame];
+//	[super selectWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate start:inStart length:inLength];
+//}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Check if we clicked on a badge icon...
+
+- (NSUInteger) hitTestForEvent:(NSEvent*)inEvent inRect:(NSRect)inCellFrame ofView:(NSView*)inControlView
+{
+	if (_badgeIcon)
+	{
+		NSPoint mouse = [inControlView convertPoint:[inEvent locationInWindow] fromView:nil];
+		NSRect badgeRect = [self badgeRectForBounds:inCellFrame flipped:inControlView.isFlipped];
+		
+		if (NSPointInRect(mouse,badgeRect))
+		{
+			return NSCellHitContentArea | NSCellHitTrackableArea;
+		}
+	}
+	
+	return NSCellHitNone;
+}
+
+
++ (BOOL) prefersTrackingUntilMouseUp
+{
+     return YES;
+}
+
+
+- (BOOL) trackMouse:(NSEvent*)inEvent inRect:(NSRect)inCellFrame ofView:(NSView*)inControlView untilMouseUp:(BOOL)flag
+{
+    [self setControlView:inControlView];
+ 
+	BOOL isFlipped = inControlView.isFlipped;
+	NSRect badgeRect = [self badgeRectForBounds:inCellFrame flipped:isFlipped];
+	BOOL inside = NO;
+	
+    while ([inEvent type] != NSLeftMouseUp)
+	{
+        NSPoint point = [inControlView convertPoint:[inEvent locationInWindow] fromView:nil];
+        inside = NSMouseInRect(point,badgeRect,isFlipped);
+
+        if ([inEvent type] == NSMouseEntered || [inEvent type] == NSMouseExited)
+		{
+            [NSApp sendEvent:inEvent];
+        }
+
+        inEvent = [[inControlView window] nextEventMatchingMask:(NSLeftMouseUpMask | NSLeftMouseDraggedMask | NSMouseEnteredMask | NSMouseExitedMask)];
+    }
+ 
+    if (inside)
+	{
+		_clickedRect = badgeRect;
+		[self showPopover:nil];
+    }
+ 
+    return YES;
+}
+
+// If so then display an alert. On Lion we'll use a modeless popover, on earlier system just use a modal NSAlert...
+
+- (IBAction) showPopover:(id)inSender
+{
+	if (_badgeError)
+	{
+		if (IMBRunningOnLionOrNewer())
+		{
+			NSString* title = [[_badgeError userInfo] objectForKey:@"title"];
+			NSString* description = [[_badgeError userInfo] objectForKey:NSLocalizedDescriptionKey];
+			IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
+			[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
+		}
+		else
+		{
+			[NSApp presentError:_badgeError];
+		}
+	}
 }
 
 

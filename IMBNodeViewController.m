@@ -723,11 +723,17 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	IMBNode* node = (IMBNode*)inItem; 
 	IMBNodeCell* cell = (IMBNodeCell*)inCell;
 
-	[cell setImage:node.icon];
-	[cell setTitle:node.name];
-	[cell setBadgeType:node.badgeTypeNormal];
+	cell.isGroupCell = node.isGroupNode;
+	cell.icon = node.icon;
+	cell.title = node.name;
+	cell.badgeType = node.badgeTypeNormal;
 	
-	if ([node respondsToSelector:@selector(license)])
+	if (node.error)
+	{
+		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
+		cell.badgeError = node.error;
+	}
+	else if ([node respondsToSelector:@selector(license)])
 	{
 		IMBFlickrNodeLicense license = [((IMBFlickrNode *)node) license];
 		if (license < IMBFlickrNodeLicense_Undefined) license = IMBFlickrNodeLicense_Undefined;
@@ -741,17 +747,26 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 			NSImage *image = [[[NSImage alloc] initByReferencingFile:[IMBBundle() pathForResource:fileName ofType:@"pdf"]] autorelease];
 			[image setScalesWhenResized:YES];
 			[image setSize:NSMakeSize(16.0,16.0)];
-			[cell setExtraImage:image];
+			cell.badgeIcon = image;
 		}
 		else
 		{
-			[cell setExtraImage:nil];
+			cell.badgeIcon = nil;
 		}
 	}
 	else
 	{
-		[cell setExtraImage:nil];
+		cell.badgeIcon = nil;
 	}
+}
+
+
+// If we have a badge icon, clicking on that icon should be enabled...
+
+- (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldTrackCell:(NSCell*)inCell forTableColumn:(NSTableColumn*)inTableColumn item:(id)inItem
+{
+	IMBNodeCell* cell = (IMBNodeCell*)inCell;
+	return cell.badgeIcon != nil;
 }
 
 

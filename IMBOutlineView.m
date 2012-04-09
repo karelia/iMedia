@@ -56,6 +56,7 @@
 #import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
 #import "IMBNode.h"
+#import "IMBNodeCell.h"
 #import "IMBTextFieldCell.h"
 
 
@@ -150,15 +151,9 @@
 
 - (NSRect) badgeRectForRow:(NSInteger)inRow
 {
-	NSRect cellRect = NSIntersectionRect([self rectOfRow:inRow],self.visibleRect);
-	
-	NSRect badgeRect = cellRect;
-	badgeRect.size.width = 16.0;
-	badgeRect.size.height = 16.0;
-	badgeRect.origin.x = NSMaxX(cellRect) - badgeRect.size.width - 4.0;
-	badgeRect.origin.y += floor(0.5*(cellRect.size.height-badgeRect.size.height));
-		
-	return badgeRect;	
+	IMBNodeCell* cell = (IMBNodeCell*)[self preparedCellAtColumn:0 row:inRow];
+	NSRect bounds = NSInsetRect([self rectOfRow:inRow],9.0,0.0);
+	return [cell badgeRectForBounds:bounds flipped:YES];
 }
 
 

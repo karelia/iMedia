@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -52,18 +55,26 @@
 
 @interface IMBNodeCell : NSTextFieldCell
 {
-	NSImage* _image;
-	NSImage* _extraImage;
+	BOOL _isGroupCell;
+	NSImage* _icon;
+	NSImage* _badgeIcon;
+	NSError* _badgeError;
 	NSUInteger _badgeType;
+	
+	NSRect _clickedRect;
 }
 
-@property (retain) NSImage* image;
-@property (retain) NSImage* extraImage;
+@property BOOL isGroupCell;
+@property (retain) NSImage* icon;
+@property (retain) NSImage* badgeIcon;
+@property (retain) NSError* badgeError;
 @property (assign) NSUInteger badgeType;
 
 - (NSRect) imageRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped;
 - (NSRect) titleRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped;
 - (NSRect) badgeRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped;
+
+- (IBAction) showPopover:(id)inSender;
 
 @end
 
