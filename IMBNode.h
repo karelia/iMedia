@@ -120,6 +120,10 @@
 	IMBBadgeType _badgeTypeMouseover;
 	id _badgeTarget;
 	SEL _badgeSelector;
+	
+	// Errors...
+	
+	NSError* _error;
 }
 
 
@@ -218,6 +222,10 @@
 @property (assign) IMBBadgeType badgeTypeMouseover;
 @property (retain) id badgeTarget;
 @property (assign) SEL badgeSelector;
+
+// Errors...
+	
+@property (retain) NSError* error;
 
 
 //----------------------------------------------------------------------------------------------------------------------

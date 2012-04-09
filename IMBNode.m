@@ -128,6 +128,10 @@
 @synthesize badgeTarget = _badgeTarget;
 @synthesize badgeSelector = _badgeSelector;
 
+// Errors...
+
+@synthesize error = _error;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -180,6 +184,7 @@
 	IMBRelease(_parserIdentifier);
 	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
+	IMBRelease(_error);
 	
 	[super dealloc];
 }
@@ -212,6 +217,7 @@
 	copy.isIncludedInPopup = self.isIncludedInPopup;
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
+	copy.error = self.error;
 	
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -220,6 +226,7 @@
 	copy.badgeTypeMouseover = self.badgeTypeMouseover;
 	copy.badgeTarget = self.badgeTarget;
 	copy.badgeSelector = self.badgeSelector;
+
 	
 	// Create a shallow copy of objects array...
 	
@@ -281,6 +288,7 @@
 		self.isIncludedInPopup = [inCoder decodeBoolForKey:@"isIncludedInPopup"];
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
+		self.error = [inCoder decodeObjectForKey:@"error"];
 
 		self.watcherType = [inCoder decodeIntegerForKey:@"watcherType"];
 		self.watchedPath = [inCoder decodeObjectForKey:@"watchedPath"];
@@ -329,6 +337,7 @@
 	[inCoder encodeBool:self.isIncludedInPopup forKey:@"isIncludedInPopup"];
 	[inCoder encodeBool:self.wantsRecursiveObjects forKey:@"wantsRecursiveObjects"];
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
+	[inCoder encodeObject:self.error forKey:@"error"];
 
 	[inCoder encodeInteger:self.watcherType forKey:@"watcherType"];
 	[inCoder encodeObject:self.watchedPath forKey:@"watchedPath"];
