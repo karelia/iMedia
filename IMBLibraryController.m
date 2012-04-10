@@ -283,17 +283,38 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 		^(NSArray* inNodes,NSError* inError)
 		{
-			// Display any errors that might have occurred...
+			// Got a new node. Do some consistency checks (was it populated correctly)...
 			
-			if (inError)
+			if (inError == nil)
 			{
 				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-				[NSApp presentError:inError];
+			}
+			else
+			{
+				for (IMBNode* node in inNodes)
+				{
+					if (node.isPopulated)
+					{
+						NSString* title = @"Programmer Error";
+						NSString* description = [NSString stringWithFormat:
+							@"The node '%@' returned by the parser %@ should not be populated, yet.\n\nEither subnodes or objects is already set!",
+							node.name,
+							node.parserIdentifier];
+							
+						NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
+							title,@"title",
+							description,NSLocalizedDescriptionKey,
+							nil];
+							
+						node.error = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];
+						if (node.error) NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,node.error);
+					}
+				}
 			}
 			
 			// Insert the new top-level nodes into our data model...
 			
-			else if (inNodes)
+			if (inNodes)
 			{
 				for (IMBNode* node in inNodes)
 				{
