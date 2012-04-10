@@ -117,6 +117,7 @@ static NSArray* sSupportedUTIs = nil;
 - (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
 - (BOOL) isFolderNode:(IMBNode*)inNode;
 - (BOOL) isCollectionNode:(IMBNode*)inNode;
+- (BOOL) isRootCollectionNode:(IMBNode*)inNode;
 
 - (NSNumber*) rootFolderFromAttributes:(NSDictionary*)inAttributes;
 - (NSNumber*) idLocalFromAttributes:(NSDictionary*)inAttributes;
@@ -314,6 +315,12 @@ static NSArray* sSupportedUTIs = nil;
 		[self populateSubnodesForCollectionNode:inNode];
 		[self populateObjectsForCollectionNode:inNode];
 	}
+	
+	else if ([self isRootCollectionNode:inNode])
+	{
+		[self populateSubnodesForCollectionNode:inNode];
+	}
+	
     else
     {
 		[inNode mutableArrayForPopulatingSubnodes];
@@ -391,7 +398,11 @@ static NSArray* sSupportedUTIs = nil;
 			}
 		}
 	}
-
+	
+	if (imageRepresentation == NULL) {
+		imageRepresentation = [super thumbnailFromLocalImageFileForObject:inObject error:&error];
+	}
+		 
 	if (outError) *outError = error;
 	return (id)imageRepresentation;
 }
@@ -931,7 +942,6 @@ static NSArray* sSupportedUTIs = nil;
 	object.metadataDescription = nil;			// Build lazily when needed (takes longer)
 	object.parserIdentifier = self.identifier;
 	object.index = inIndex;
-	object.imageLocation = (id)inPath;
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 	object.imageRepresentation = nil;
 	
@@ -1063,6 +1073,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
+	NSData* jpegData = nil;
 	
 	if (absolutePyramidPath != nil) {
 		FMDatabase *database = [self thumbnailDatabase];
@@ -1090,9 +1101,8 @@ static NSArray* sSupportedUTIs = nil;
 					double dataLength = [results doubleForColumn:@"dataLength"];
 					
 					NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
-					NSData* jpegData = [data subdataWithRange:NSMakeRange(dataOffset, dataLength)];
 					
-					return jpegData;
+					jpegData = [data subdataWithRange:NSMakeRange(dataOffset, dataLength)];
 				}
 				
 				[results close];
@@ -1100,7 +1110,7 @@ static NSArray* sSupportedUTIs = nil;
 		}
 	}
 	
-	return nil;
+	return jpegData;
 }
 
 
@@ -1242,6 +1252,14 @@ static NSArray* sSupportedUTIs = nil;
     IMBLightroomNodeType nodeType = [self nodeTypeFromAttributes:attributes];
     
     return (nodeType == IMBLightroomNodeTypeCollection);
+}
+
+- (BOOL) isRootCollectionNode:(IMBNode*)inNode
+{
+    NSDictionary* attributes = inNode.attributes;
+    IMBLightroomNodeType nodeType = [self nodeTypeFromAttributes:attributes];
+    
+    return (nodeType == IMBLightroomNodeTypeRootCollection);
 }
 
 

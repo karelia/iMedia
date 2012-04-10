@@ -74,7 +74,8 @@ typedef enum
 { 
 	kIMBLightroomNodeTypeUnspecified = 0,
 	IMBLightroomNodeTypeFolder,
-	IMBLightroomNodeTypeCollection
+	IMBLightroomNodeTypeCollection,
+	IMBLightroomNodeTypeRootCollection
 } 
 IMBLightroomNodeType;
 

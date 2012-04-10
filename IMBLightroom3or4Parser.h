@@ -44,9 +44,6 @@
  */
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Author: Pierre Bernard
 
 
@@ -55,16 +52,15 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom3or4Parser.h"
+#import "IMBLightroomParser.h"
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-@interface IMBLightroom4Parser : IMBLightroom3or4Parser
+@interface IMBLightroom3or4Parser : IMBLightroomParser
 {
 	
 }
+
+- (NSNumber*) databaseVersion;
 
 @end
 

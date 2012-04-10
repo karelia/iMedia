@@ -98,6 +98,8 @@
 		CEF7A22412B1B71800DBE412 /* url_icon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEF7A22312B1B71800DBE412 /* url_icon.tiff */; };
 		D006CFF115331CC900C53C23 /* IMBNoteIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D006CFF015331CC900C53C23 /* IMBNoteIcon.icns */; };
 		D006CFF41533502200C53C23 /* IMBStopIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D006CFF31533502200C53C23 /* IMBStopIcon.icns */; };
+		D006CFF81534084C00C53C23 /* IMBLightroom3or4Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = D006CFF61534084C00C53C23 /* IMBLightroom3or4Parser.h */; };
+		D006CFF91534084C00C53C23 /* IMBLightroom3or4Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = D006CFF71534084C00C53C23 /* IMBLightroom3or4Parser.m */; };
 		D00D0AA912258E4A000924AE /* IMBFlickrHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */; };
 		D00D0AAA12258E4A000924AE /* IMBFlickrHeaderViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */; };
 		D00D0D271226A813000924AE /* IMBPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = F331802411E6D25D00BDABC2 /* IMBPanel.h */; };
@@ -614,6 +616,8 @@
 		CEF7A22312B1B71800DBE412 /* url_icon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = url_icon.tiff; sourceTree = "<group>"; };
 		D006CFF015331CC900C53C23 /* IMBNoteIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = IMBNoteIcon.icns; sourceTree = "<group>"; };
 		D006CFF31533502200C53C23 /* IMBStopIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = IMBStopIcon.icns; sourceTree = "<group>"; };
+		D006CFF61534084C00C53C23 /* IMBLightroom3or4Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom3or4Parser.h; sourceTree = "<group>"; };
+		D006CFF71534084C00C53C23 /* IMBLightroom3or4Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom3or4Parser.m; sourceTree = "<group>"; };
 		D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBFlickrHeaderView.xib; sourceTree = "<group>"; };
 		D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrHeaderViewController.h; sourceTree = "<group>"; };
 		D00D0AA812258E4A000924AE /* IMBFlickrHeaderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrHeaderViewController.m; sourceTree = "<group>"; };
@@ -1285,6 +1289,8 @@
 				8FC2560F10A8706000F19642 /* IMBLightroom1Parser.m */,
 				8FC2559610A851C500F19642 /* IMBLightroom2Parser.h */,
 				8FC2559710A851C500F19642 /* IMBLightroom2Parser.m */,
+				D006CFF61534084C00C53C23 /* IMBLightroom3or4Parser.h */,
+				D006CFF71534084C00C53C23 /* IMBLightroom3or4Parser.m */,
 				8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */,
 				8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */,
 				8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */,
@@ -1991,6 +1997,7 @@
 				D024A31C15319CB4005B6C0A /* IMBAlertPopover.h in Headers */,
 				D024A31E15319CB4005B6C0A /* IMBAlertPopoverViewController.h in Headers */,
 				D024A32315319CCD005B6C0A /* IMBPopover.h in Headers */,
+				D006CFF81534084C00C53C23 /* IMBLightroom3or4Parser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2627,6 +2634,7 @@
 				D024A31D15319CB4005B6C0A /* IMBAlertPopover.m in Sources */,
 				D024A31F15319CB4005B6C0A /* IMBAlertPopoverViewController.m in Sources */,
 				D024A32415319CCD005B6C0A /* IMBPopover.m in Sources */,
+				D006CFF91534084C00C53C23 /* IMBLightroom3or4Parser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
