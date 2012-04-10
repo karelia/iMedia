@@ -285,7 +285,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			// Got a new node. Do some consistency checks (was it populated correctly)...
 			
-			if (inError == nil)
+			if (inError)
 			{
 				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
 			}
