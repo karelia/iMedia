@@ -364,7 +364,15 @@
 		{
 			NSString* title = [[_badgeError userInfo] objectForKey:@"title"];
 			NSString* description = [[_badgeError userInfo] objectForKey:NSLocalizedDescriptionKey];
+			NSString* ok = @"   OK   ";
+
 			IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
+			
+			[alert addButtonWithTitle:ok block:^()
+			{
+				[alert close];
+			}];
+			
 			[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
 		}
 		else
