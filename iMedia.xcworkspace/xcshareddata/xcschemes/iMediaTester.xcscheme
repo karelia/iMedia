@@ -183,7 +183,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D05D3A05152AD0D000E30C43"
                BuildableName = "com.karelia.imedia.OmniWeb.xpc"
-               BlueprintName = "com.karelia.imedia.OmniWeb"
+               BlueprintName = "com.karelia.imedia.Chrome"
                ReferencedContainer = "container:iMedia.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

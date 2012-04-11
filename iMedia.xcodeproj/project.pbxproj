@@ -691,7 +691,7 @@
 		D05D3A17152AD29700E30C43 /* com.karelia.imedia.Flickr.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Flickr.entitlements; sourceTree = "<group>"; };
 		D05D3A18152AD2A500E30C43 /* com.karelia.imedia.Safari.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Safari.entitlements; sourceTree = "<group>"; };
 		D05D3A19152AD2B400E30C43 /* com.karelia.imedia.FireFox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.FireFox.entitlements; sourceTree = "<group>"; };
-		D05D3A1A152AD2CB00E30C43 /* com.karelia.imedia.OmniWeb.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.OmniWeb.entitlements; sourceTree = "<group>"; };
+		D05D3A1A152AD2CB00E30C43 /* com.karelia.imedia.Chrome.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Chrome.entitlements; sourceTree = "<group>"; };
 		D05D3A1B152AD30500E30C43 /* com.karelia.imedia.FSEvents.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.FSEvents.entitlements; sourceTree = "<group>"; };
 		D0760AC210C5027100F2119C /* IMBProject.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBProject.xcconfig; sourceTree = SOURCE_ROOT; };
 		D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieObjectViewController.h; sourceTree = "<group>"; };
@@ -1247,19 +1247,13 @@
 			name = Flipr;
 			sourceTree = "<group>";
 		};
-		CEF695D5106434DB005D7E72 /* OmniWeb */ = {
+		CEF695D5106434DB005D7E72 /* Chrome */ = {
 			isa = PBXGroup;
 			children = (
-				CEF695D9106434FD005D7E72 /* IMBXBELParser.h */,
-				CEF695DA106434FE005D7E72 /* IMBXBELParser.m */,
-				CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */,
-				CEF695DC106434FE005D7E72 /* IMBOmniWebParser.h */,
-				CEF695DD106434FE005D7E72 /* IMBOmniWebParser.m */,
-				CE1AED32129C475200694472 /* js.tiff */,
-				CEF7A22312B1B71800DBE412 /* url_icon.tiff */,
-				D05D3A1A152AD2CB00E30C43 /* com.karelia.imedia.OmniWeb.entitlements */,
+				D05D3A1A152AD2CB00E30C43 /* com.karelia.imedia.Chrome.entitlements */,
+				D0878B441535540800115988 /* Old */,
 			);
-			name = OmniWeb;
+			name = Chrome;
 			sourceTree = "<group>";
 		};
 		D006CFF51533503200C53C23 /* Alert Popovers */ = {
@@ -1432,6 +1426,20 @@
 			name = "Object View";
 			sourceTree = "<group>";
 		};
+		D0878B441535540800115988 /* Old */ = {
+			isa = PBXGroup;
+			children = (
+				CEF695D9106434FD005D7E72 /* IMBXBELParser.h */,
+				CEF695DA106434FE005D7E72 /* IMBXBELParser.m */,
+				CEF695DB106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt */,
+				CEF695DC106434FE005D7E72 /* IMBOmniWebParser.h */,
+				CEF695DD106434FE005D7E72 /* IMBOmniWebParser.m */,
+				CE1AED32129C475200694472 /* js.tiff */,
+				CEF7A22312B1B71800DBE412 /* url_icon.tiff */,
+			);
+			name = Old;
+			sourceTree = "<group>";
+		};
 		D08E8B5A1019C8EF005D8614 /* Third Party */ = {
 			isa = PBXGroup;
 			children = (
@@ -1591,7 +1599,7 @@
 				D032CE8A109B311A00D84782 /* Flickr */,
 				D05D3A03152AD05C00E30C43 /* Safari */,
 				D05D3A04152AD07400E30C43 /* FireFox */,
-				CEF695D5106434DB005D7E72 /* OmniWeb */,
+				CEF695D5106434DB005D7E72 /* Chrome */,
 			);
 			name = Parsers;
 			sourceTree = "<group>";
@@ -2159,9 +2167,9 @@
 			productReference = D05D3A01152ACD8800E30C43 /* com.karelia.imedia.FSEvents.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
-		D05D3A05152AD0D000E30C43 /* com.karelia.imedia.OmniWeb */ = {
+		D05D3A05152AD0D000E30C43 /* com.karelia.imedia.Chrome */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D05D3A10152AD0D000E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.OmniWeb" */;
+			buildConfigurationList = D05D3A10152AD0D000E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Chrome" */;
 			buildPhases = (
 				D05D3A06152AD0D000E30C43 /* Sources */,
 				D05D3A08152AD0D000E30C43 /* Frameworks */,
@@ -2171,7 +2179,7 @@
 			);
 			dependencies = (
 			);
-			name = com.karelia.imedia.OmniWeb;
+			name = com.karelia.imedia.Chrome;
 			productName = "iPhoto Parser XPC Service";
 			productReference = D05D3A13152AD0D000E30C43 /* com.karelia.imedia.OmniWeb.xpc */;
 			productType = "com.apple.product-type.bundle";
@@ -2271,7 +2279,7 @@
 				D054AFEE152984FA00EBFA1C /* com.karelia.imedia.GarageBand */,
 				D05D39D0152ACD5E00E30C43 /* com.karelia.imedia.Safari */,
 				D05D39E1152ACD6800E30C43 /* com.karelia.imedia.Firefox */,
-				D05D3A05152AD0D000E30C43 /* com.karelia.imedia.OmniWeb */,
+				D05D3A05152AD0D000E30C43 /* com.karelia.imedia.Chrome */,
 				D05D39F2152ACD8800E30C43 /* com.karelia.imedia.FSEvents */,
 				D02CD49E1224F22400C773A2 /* genstrings */,
 			);
@@ -3599,7 +3607,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D05D3A10152AD0D000E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.OmniWeb" */ = {
+		D05D3A10152AD0D000E30C43 /* Build configuration list for PBXNativeTarget "com.karelia.imedia.Chrome" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D05D3A11152AD0D000E30C43 /* Debug */,
