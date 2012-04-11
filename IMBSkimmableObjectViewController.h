@@ -50,26 +50,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 #import "IMBObjectViewController.h"
-#import "IMBNodeObject.h"
-
-#pragma mark ABSTRACT
-
-// The skimmable object view controller retrieves some node object specific information
-// from its delegate. The reason why we do not implement this protocol directly on the node object class itself
-// is that it may be stored in a format (eg. some sub node from a parser's property list) which is better suited
-// for the parser to be evaluated when needed (lazy evaluation).
-// Nonetheless, the IMBNodeObject may hold this information for the parser (IMBNodeObject.attributes).
-// See IMBiPhotoParser for an implementation of the protocol.
- 
-@protocol IMBSkimmableObjectViewControllerDelegate <NSObject>
-
-- (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo;
-
-- (NSString*) imagePathForChildOfNodeObject:(IMBNodeObject*)inNodeObject atIndex:(NSUInteger)inIndex userInfo:(NSDictionary*)inUserInfo;
-
-- (NSString*) imagePathForKeyChildOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo;
-
-@end
 
 #pragma mark ABSTRACT
 
@@ -86,12 +66,7 @@
 
 	NSUInteger _previousNodeObjectIndex;	// Index of node object the mouse was over on last mouse move
 	NSUInteger _previousImageIndex;			// Index of image in node object that was last displayed when skimming
-	id <IMBSkimmableObjectViewControllerDelegate> _skimmingDelegate;
 	NSDictionary* _userInfo;
 }
-
-@property(retain, readwrite) id <IMBSkimmableObjectViewControllerDelegate> skimmingDelegate;
-
-- (id) initWithDelegate:(id <IMBSkimmableObjectViewControllerDelegate>)inDelegate userInfo:(NSDictionary*)inUserInfo;
 
 @end

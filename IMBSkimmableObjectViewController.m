@@ -61,8 +61,6 @@
 
 @implementation IMBSkimmableObjectViewController
 
-@synthesize skimmingDelegate = _skimmingDelegate;
-
 //----------------------------------------------------------------------------------------------------------------------
 
 //TODO: Do we really need default prefs for this controller?
@@ -119,18 +117,15 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-- (id) initWithNibName:(NSString *)inNibName
-				bundle:(NSBundle *)inBundle
-			  delegate:(id <IMBSkimmableObjectViewControllerDelegate>)inDelegate
-			  userInfo:(NSDictionary*)inUserInfo
+// Designated initializer
+
+- (id) init
 {
-	if (self = [super initWithNibName:inNibName bundle:inBundle])
+    NSString *nibName = [[self class] nibName];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    
+	if (self = [super initWithNibName:nibName bundle:bundle])
 	{
-		self.skimmingDelegate = inDelegate;
-		
-		_userInfo = inUserInfo;
-		[_userInfo retain];
-		
 		// Prepare for skimming
 		_previousNodeObjectIndex = NSNotFound;
 		
@@ -150,20 +145,6 @@
 	}
 	
 	return self;
-}
-
-
-// Designated initializer
-
-- (id) init
-{
-	return [self initWithNibName:[[self class] nibName] bundle:[[self class] bundle] delegate:nil userInfo:nil];
-}
-
-
-- (id) initWithDelegate:(id <IMBSkimmableObjectViewControllerDelegate>)inDelegate userInfo:(NSDictionary*)inUserInfo
-{
-	return [self initWithNibName:[[self class] nibName] bundle:[[self class] bundle] delegate:inDelegate userInfo:inUserInfo];
 }
 
 
@@ -212,65 +193,60 @@
 // Stop Skimming on the identified item. Restore key image in cell.
 - (void) mouseExitedItemAtIndex:(NSInteger) inIndex
 {
-	if (self.skimmingDelegate)
-	{
-		NSArray *objects = [ibObjectArrayController arrangedObjects];
-		if (inIndex < [objects count])
-		{
-			IMBSkimmableObject* item = [objects objectAtIndex:inIndex];
-            
-            [item resetCurrentSkimmingIndex];
-			
-			[item setNeedsImageRepresentation:YES];
-            [item setIsLoadingThumbnail:NO]; // Avoid race condition 
-			[item loadThumbnail]; // Background thread			
-		}
-	}
+    NSArray *objects = [ibObjectArrayController arrangedObjects];
+    if (inIndex < [objects count])
+    {
+        IMBSkimmableObject* item = [objects objectAtIndex:inIndex];
+        
+        [item resetCurrentSkimmingIndex];
+        
+        [item setNeedsImageRepresentation:YES];
+        [item setIsLoadingThumbnail:NO]; // Avoid race condition 
+        [item loadThumbnail]; // Background thread			
+    }
 	//NSLog(@"Mouse exited item at index %ld", (long) inIndex);
 }
 
 // Load the next thumbnail if mouse was moved sufficiently
 - (void) mouseSkimmedOnItemAtIndex:(NSInteger)inIndex atPoint:(NSPoint)inPoint
 {
-	if (self.skimmingDelegate) {
-		NSArray *objects = [ibObjectArrayController arrangedObjects];
-		if (inIndex < [objects count])
-		{
-			IMBSkimmableObject* item = [objects objectAtIndex:inIndex];
-			
-			// Derive child object's index in node object from inPoint's relative position in frame
-			
-			NSRect skimmingFrame;
-	#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-			if (IMBRunningOnSnowLeopardOrNewer())
-			{
-				skimmingFrame = [[[self iconView] cellForItemAtIndex:inIndex] frame];	// >= 10.6
-			}
-			else
-	#endif
-			{
-				skimmingFrame = [[self iconView] itemFrameAtIndex:inIndex];
-			}
-
-			CGFloat xOffset = inPoint.x - skimmingFrame.origin.x;
-			NSUInteger objectCount = [item imageCount];
-			CGFloat widthPerObject = skimmingFrame.size.width / objectCount;
-			NSUInteger objectIndex = (NSUInteger) xOffset / widthPerObject;
-			
-			//NSLog(@"Object index: %lu", objectIndex);
-			
-			if (objectIndex != _previousImageIndex)
-			{
-				_previousImageIndex = objectIndex;
-				
-                item.currentSkimmingIndex = objectIndex;
-
-				[item setNeedsImageRepresentation:YES];
-				[item setIsLoadingThumbnail:NO]; // Avoid race condition 
-				[item loadThumbnail]; // Background thread
-			}
-		}
-	}
+    NSArray *objects = [ibObjectArrayController arrangedObjects];
+    if (inIndex < [objects count])
+    {
+        IMBSkimmableObject* item = [objects objectAtIndex:inIndex];
+        
+        // Derive child object's index in node object from inPoint's relative position in frame
+        
+        NSRect skimmingFrame;
+#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
+        if (IMBRunningOnSnowLeopardOrNewer())
+        {
+            skimmingFrame = [[[self iconView] cellForItemAtIndex:inIndex] frame];	// >= 10.6
+        }
+        else
+#endif
+        {
+            skimmingFrame = [[self iconView] itemFrameAtIndex:inIndex];
+        }
+        
+        CGFloat xOffset = inPoint.x - skimmingFrame.origin.x;
+        NSUInteger objectCount = [item imageCount];
+        CGFloat widthPerObject = skimmingFrame.size.width / objectCount;
+        NSUInteger objectIndex = (NSUInteger) xOffset / widthPerObject;
+        
+        //NSLog(@"Object index: %lu", objectIndex);
+        
+        if (objectIndex != _previousImageIndex)
+        {
+            _previousImageIndex = objectIndex;
+            
+            item.currentSkimmingIndex = objectIndex;
+            
+            [item setNeedsImageRepresentation:YES];
+            [item setIsLoadingThumbnail:NO]; // Avoid race condition 
+            [item loadThumbnail]; // Background thread
+        }
+    }
 }
 
 - (void) mouseMoved:(NSEvent *)anEvent
