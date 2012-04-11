@@ -83,9 +83,6 @@
     
     if ([[self class] isEventsNode:inNode])
     {
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  kIMBiPhotoNodeObjectTypeEvent, @"nodeObjectType", nil];
-        
         NSViewController* viewController = [[[IMBiPhotoEventObjectViewController alloc] init] autorelease];
         [viewController view];
         return viewController;
@@ -93,9 +90,6 @@
     
     if ([[self class] isFacesNode:inNode])
     {
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  kIMBiPhotoNodeObjectTypeFace, @"nodeObjectType", nil];
-        
         NSViewController* viewController = [[[IMBFaceObjectViewController alloc] init] autorelease];
         [viewController view];
         return viewController;
