@@ -145,6 +145,39 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark 
+#pragma mark QLPreviewItem Protocol 
+
+
+// Request the URL to our processed preview data. Since this is an asynchronous operation, but we have to return
+// synchronously for this protocol method, we'll wrap the calls in a dispatch_sync to a background queue...
+
+- (NSURL*) previewItemURL
+{
+	__block NSURL* url = nil;
+	
+	dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
+	{
+		[self requestBookmarkWithCompletionBlock:^(NSError* inError)
+		{
+			if (inError)
+			{
+				[NSApp presentError:inError];
+			}
+			else
+			{
+				url = [self URLByResolvingBookmark];
+			}
+		}];
+	});
+
+	return url;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @end
 
 
