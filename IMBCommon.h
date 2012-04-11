@@ -82,6 +82,7 @@ enum
 	kIMBBadgeTypeNone,
 	kIMBBadgeTypeLoading,
 	kIMBBadgeTypeReload,
+	kIMBBadgeTypeWarning,
 	kIMBBadgeTypeStop,
 	kIMBBadgeTypeEject,
 	kIMBBadgeTypeOffline
@@ -110,6 +111,26 @@ enum
 	kIMBGroupTypeNone
 };
 typedef NSUInteger IMBGroupType;
+
+// Error codes...
+
+enum 
+{
+	kIMBErrorNone = 0,
+	
+	// General errors...
+	
+	kIMBErrorInvalidState,
+	kIMBErrorFileAccessDenied,
+	kIMBErrorNetworkNotReachable,
+	
+	// IMBObject level errors...
+	
+	kIMBErrorThumbnailNotAvailable,
+	kIMBErrorMetadataNotAvailable,
+	kIMBErrorFileNotAvailable,
+};
+typedef NSUInteger IMBErrorCode;
 
 
 //----------------------------------------------------------------------------------------------------------------------

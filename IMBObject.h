@@ -90,6 +90,7 @@ extern NSString* kIMBObjectPasteboardType;
 	
 	IMBParserMessenger* _parserMessenger;
     NSString* _parserIdentifier;
+	NSError* _error;
 	
 	NSUInteger _index;
     BOOL _shouldDrawAdornments;
@@ -114,6 +115,7 @@ extern NSString* kIMBObjectPasteboardType;
 
 @property (retain) IMBParserMessenger* parserMessenger;		// IMBParserMessenger that is responsible for this object
 @property (retain) NSString* parserIdentifier;				// Identifier of IMBParser that created this object
+@property (retain) NSError* error;							// Per object error...
 
 
 //----------------------------------------------------------------------------------------------------------------------

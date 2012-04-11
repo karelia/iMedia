@@ -94,6 +94,7 @@
 	
 	IMBParserMessenger* _parserMessenger;
 	NSString* _parserIdentifier;
+	NSError* _error;
 
 	// State information...
 
@@ -120,10 +121,6 @@
 	IMBBadgeType _badgeTypeMouseover;
 	id _badgeTarget;
 	SEL _badgeSelector;
-	
-	// Errors...
-	
-	NSError* _error;
 }
 
 
@@ -144,6 +141,7 @@
 
 @property (retain) IMBParserMessenger* parserMessenger;
 @property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
+@property (retain) NSError* error;					// Per node error
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -222,10 +220,6 @@
 @property (assign) IMBBadgeType badgeTypeMouseover;
 @property (retain) id badgeTarget;
 @property (assign) SEL badgeSelector;
-
-// Errors...
-	
-@property (retain) NSError* error;
 
 
 //----------------------------------------------------------------------------------------------------------------------

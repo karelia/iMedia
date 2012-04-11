@@ -103,6 +103,7 @@
 
 @synthesize parserIdentifier = _parserIdentifier;
 @synthesize parserMessenger = _parserMessenger;
+@synthesize error = _error;
 
 // State information...
 
@@ -127,10 +128,6 @@
 @synthesize badgeTypeMouseover = _badgeTypeMouseover;
 @synthesize badgeTarget = _badgeTarget;
 @synthesize badgeSelector = _badgeSelector;
-
-// Errors...
-
-@synthesize error = _error;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -182,9 +179,9 @@
 	IMBRelease(_objects);
 	IMBRelease(_parserMessenger);
 	IMBRelease(_parserIdentifier);
+	IMBRelease(_error);
 	IMBRelease(_watchedPath);
 	IMBRelease(_badgeTarget);
-	IMBRelease(_error);
 	
 	[super dealloc];
 }
@@ -206,6 +203,7 @@
 	copy.groupType = self.groupType;
 	copy.parserMessenger = self.parserMessenger;
 	copy.parserIdentifier = self.parserIdentifier;
+	copy.error = self.error;
 	
 	copy.displayPriority = self.displayPriority;
 	copy.displayedObjectCount = self.displayedObjectCount;
@@ -217,7 +215,6 @@
 	copy.isIncludedInPopup = self.isIncludedInPopup;
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
-	copy.error = self.error;
 	
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -277,6 +274,7 @@
 		self.attributes = [inCoder decodeObjectForKey:@"attributes"];
 		self.groupType = [inCoder decodeIntegerForKey:@"groupType"];
 		self.parserIdentifier = [inCoder decodeObjectForKey:@"parserIdentifier"];
+		self.error = [inCoder decodeObjectForKey:@"error"];
 
 		self.displayPriority = [inCoder decodeIntegerForKey:@"displayPriority"];
 		self.displayedObjectCount = [inCoder decodeIntegerForKey:@"displayedObjectCount"];
@@ -288,7 +286,6 @@
 		self.isIncludedInPopup = [inCoder decodeBoolForKey:@"isIncludedInPopup"];
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
-		self.error = [inCoder decodeObjectForKey:@"error"];
 
 		self.watcherType = [inCoder decodeIntegerForKey:@"watcherType"];
 		self.watchedPath = [inCoder decodeObjectForKey:@"watchedPath"];
@@ -326,6 +323,7 @@
 	[inCoder encodeObject:self.attributes forKey:@"attributes"];
 	[inCoder encodeInteger:self.groupType forKey:@"groupType"];
 	[inCoder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
+	[inCoder encodeObject:self.error forKey:@"error"];
 	
 	[inCoder encodeInteger:self.displayPriority forKey:@"displayPriority"];
 	[inCoder encodeInteger:self.displayedObjectCount forKey:@"displayedObjectCount"];
@@ -337,7 +335,6 @@
 	[inCoder encodeBool:self.isIncludedInPopup forKey:@"isIncludedInPopup"];
 	[inCoder encodeBool:self.wantsRecursiveObjects forKey:@"wantsRecursiveObjects"];
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
-	[inCoder encodeObject:self.error forKey:@"error"];
 
 	[inCoder encodeInteger:self.watcherType forKey:@"watcherType"];
 	[inCoder encodeObject:self.watchedPath forKey:@"watchedPath"];

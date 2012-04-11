@@ -134,8 +134,10 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
 @synthesize metadataDescription = _metadataDescription;
+
 @synthesize parserIdentifier = _parserIdentifier;
 @synthesize parserMessenger = _parserMessenger;
+@synthesize error = _error;
 
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
@@ -179,8 +181,10 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	IMBRelease(_preliminaryMetadata);
 	IMBRelease(_metadata);
 	IMBRelease(_metadataDescription);
+	
 	IMBRelease(_parserIdentifier);
 	IMBRelease(_parserMessenger);
+	IMBRelease(_error);
 	
 	IMBRelease(_imageLocation);
 	IMBRelease(_imageRepresentation);
@@ -206,6 +210,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.metadata = [coder decodeObjectForKey:@"metadata"];
 		self.metadataDescription = [coder decodeObjectForKey:@"metadataDescription"];
 		self.parserIdentifier = [coder decodeObjectForKey:@"parserIdentifier"];
+		self.error = [inCoder decodeObjectForKey:@"error"];
 
 		self.index = [coder decodeIntegerForKey:@"index"];
 		self.shouldDrawAdornments = [coder decodeBoolForKey:@"shouldDrawAdornments"];
@@ -241,6 +246,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeObject:self.metadata forKey:@"metadata"];
 	[coder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
 	[coder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
+	[coder encodeObject:self.error forKey:@"error"];
 
 	[coder encodeInteger:self.index forKey:@"index"];
 	[coder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
@@ -278,8 +284,10 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	copy.preliminaryMetadata = self.preliminaryMetadata;
 	copy.metadata = self.metadata;
 	copy.metadataDescription = self.metadataDescription;
+
 	copy.parserIdentifier = self.parserIdentifier;
 	copy.parserMessenger = self.parserMessenger;
+	copy.error = self.error;
 	
     copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
