@@ -73,6 +73,14 @@
 }
 
 
+// Need to set this flag from skimmable controller while skimming
+
+- (void) setIsLoadingThumbnail:(BOOL)inIsLoadingThumbnail
+{
+    _isLoadingThumbnail = inIsLoadingThumbnail;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark - NSCoding

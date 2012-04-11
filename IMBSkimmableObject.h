@@ -75,4 +75,8 @@
 
 - (id) keyImageLocation;
 
+// Need to set this flag from skimmable controller while skimming
+
+- (void) setIsLoadingThumbnail:(BOOL)inIsLoadingThumbnail;
+
 @end
