@@ -205,4 +205,21 @@
 	return readOnlyDatabasePath;
 }
 
+- (BOOL) checkDatabaseVersion
+{
+ NSNumber *databaseVersion = [self databaseVersion];
+
+ if (databaseVersion != nil) {
+ long databaseVersionLong = [databaseVersion longValue];
+
+ if (databaseVersionLong < 300025) {
+ return NO;
+}
+ else if (databaseVersionLong >= 400000) {
+ return NO;
+}
+}
+
+ return YES;
+}
 @end
