@@ -85,6 +85,7 @@
 NSString* kIMBNodesWillReloadNotification = @"IMBNodesWillReloadNotification";
 NSString* kIMBNodesWillChangeNotification = @"IMBNodesWillChangeNotification";
 NSString* kIMBNodesDidChangeNotification = @"IMBNodesDidChangeNotification";
+NSString* kIMBDidCreateTopLevelNodeNotification = @"IMBDidCreateTopLevelNodeNotification";
 
 #ifndef RESPONDS
 #define RESPONDS(delegate,selector) (delegate!=nil && [delegate respondsToSelector:selector])
@@ -325,6 +326,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					{
 						[_delegate libraryController:self didCreateNode:node withParserMessenger:inParserMessenger];
 					}
+					
+					[[NSNotificationCenter defaultCenter] postNotificationName:kIMBDidCreateTopLevelNodeNotification object:node];
 				}
 			}
 		});		

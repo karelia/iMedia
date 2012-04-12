@@ -67,6 +67,7 @@
 @interface IMBLightroomObject : IMBObject
 {
 	NSString* _absolutePyramidPath;
+	BOOL _isLoadingQuicklookPreview;
 }
 
 @property (retain) NSString* absolutePyramidPath;

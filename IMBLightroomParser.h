@@ -96,7 +96,6 @@ IMBLightroomNodeType;
 	// instance across multiple threads, and we can't predict which thread we will be called on.
 	NSMutableDictionary* _databases;
 	NSMutableDictionary* _thumbnailDatabases;
-	NSSize _thumbnailSize;
 }
 
 @property (retain) NSString* appPath;
@@ -134,7 +133,7 @@ IMBLightroomNodeType;
 - (FMDatabase*) previewsDatabase;
 
 - (NSString*)pyramidPathForImage:(NSNumber*)idLocal;
-- (NSData*)previewDataForObject:(IMBObject*)inObject;
+- (NSData*)previewDataForObject:(IMBObject*)inObject maximumSize:(NSNumber*)maximumSize;
 
 @end
 

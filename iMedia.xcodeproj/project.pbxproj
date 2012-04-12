@@ -236,7 +236,7 @@
 		D0904DAE152CAA4A003FDD08 /* com.karelia.imedia.Safari.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39DF152ACD5E00E30C43 /* com.karelia.imedia.Safari.xpc */; };
 		D0904DAF152CAA4A003FDD08 /* com.karelia.imedia.Firefox.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39F0152ACD6800E30C43 /* com.karelia.imedia.Firefox.xpc */; };
 		D0904DB0152CAA4A003FDD08 /* com.karelia.imedia.FSEvents.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D3A01152ACD8800E30C43 /* com.karelia.imedia.FSEvents.xpc */; };
-		D0904DB1152CAA4A003FDD08 /* com.karelia.imedia.OmniWeb.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D3A13152AD0D000E30C43 /* com.karelia.imedia.OmniWeb.xpc */; };
+		D0904DB1152CAA4A003FDD08 /* com.karelia.imedia.Chrome.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D3A13152AD0D000E30C43 /* com.karelia.imedia.Chrome.xpc */; };
 		D0904DD8152D6F57003FDD08 /* ObjectiveFlickr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0C911C71521038F006655C9 /* ObjectiveFlickr.framework */; };
 		D0904DD9152D6F79003FDD08 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		D0904DDA152D6FBD003FDD08 /* XPCKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
@@ -482,7 +482,7 @@
 				D0904DAE152CAA4A003FDD08 /* com.karelia.imedia.Safari.xpc in Copy XPCServices */,
 				D0904DAF152CAA4A003FDD08 /* com.karelia.imedia.Firefox.xpc in Copy XPCServices */,
 				D0904DB0152CAA4A003FDD08 /* com.karelia.imedia.FSEvents.xpc in Copy XPCServices */,
-				D0904DB1152CAA4A003FDD08 /* com.karelia.imedia.OmniWeb.xpc in Copy XPCServices */,
+				D0904DB1152CAA4A003FDD08 /* com.karelia.imedia.Chrome.xpc in Copy XPCServices */,
 				D054AFFF1529927E00EBFA1C /* com.karelia.imedia.GarageBand.xpc in Copy XPCServices */,
 				D0F2DDCF152486360059DF8D /* com.karelia.imedia.iTunes.xpc in Copy XPCServices */,
 				D0680C3C1518CCCE00CED506 /* com.karelia.imedia.Folder.xpc in Copy XPCServices */,
@@ -685,7 +685,7 @@
 		D05D39DF152ACD5E00E30C43 /* com.karelia.imedia.Safari.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.Safari.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		D05D39F0152ACD6800E30C43 /* com.karelia.imedia.Firefox.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.Firefox.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		D05D3A01152ACD8800E30C43 /* com.karelia.imedia.FSEvents.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.FSEvents.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
-		D05D3A13152AD0D000E30C43 /* com.karelia.imedia.OmniWeb.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.OmniWeb.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05D3A13152AD0D000E30C43 /* com.karelia.imedia.Chrome.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.Chrome.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		D05D3A15152AD27300E30C43 /* com.karelia.imedia.Aperture.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Aperture.entitlements; sourceTree = "<group>"; };
 		D05D3A16152AD28400E30C43 /* com.karelia.imedia.Lightroom.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Lightroom.entitlements; sourceTree = "<group>"; };
 		D05D3A17152AD29700E30C43 /* com.karelia.imedia.Flickr.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Flickr.entitlements; sourceTree = "<group>"; };
@@ -1137,7 +1137,7 @@
 				D05D39DF152ACD5E00E30C43 /* com.karelia.imedia.Safari.xpc */,
 				D05D39F0152ACD6800E30C43 /* com.karelia.imedia.Firefox.xpc */,
 				D05D3A01152ACD8800E30C43 /* com.karelia.imedia.FSEvents.xpc */,
-				D05D3A13152AD0D000E30C43 /* com.karelia.imedia.OmniWeb.xpc */,
+				D05D3A13152AD0D000E30C43 /* com.karelia.imedia.Chrome.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2181,7 +2181,7 @@
 			);
 			name = com.karelia.imedia.Chrome;
 			productName = "iPhoto Parser XPC Service";
-			productReference = D05D3A13152AD0D000E30C43 /* com.karelia.imedia.OmniWeb.xpc */;
+			productReference = D05D3A13152AD0D000E30C43 /* com.karelia.imedia.Chrome.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
 		D09933541011B26E00C527B7 /* iMediaTester */ = {
