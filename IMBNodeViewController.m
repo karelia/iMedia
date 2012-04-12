@@ -694,8 +694,8 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 		// Install the object view controller...
 		
-        [(IMBObjectViewController*)self.objectViewController setCurrentNode:newNode];
 		[self installObjectViewForNode:newNode];
+        [(IMBObjectViewController*)self.objectViewController setCurrentNode:newNode];
 		
 //		// If a completely different parser was selected, then notify the previous parser, that it is most
 //		// likely no longer needed any can get rid of its cached data...
@@ -1035,8 +1035,8 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 			if (!inNode.isPopulated) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
 
-			[(IMBObjectViewController*)self.objectViewController setCurrentNode:inNode];
 			[self installObjectViewForNode:inNode];
+			[(IMBObjectViewController*)self.objectViewController setCurrentNode:inNode];
 		}
 	}	
 	else
