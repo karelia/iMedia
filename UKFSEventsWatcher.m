@@ -238,6 +238,10 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 
 -(void) removePath: (NSString*)path
 {
+	// Ensure we are removing a folder, not a file inside the desired folder. This matches
+	// the normalization done in addPath to make sure removePath for the same path will succeed.
+	path = [self pathToParentFolderOfFile:path];
+
     NSValue* value = nil;
 	
     @synchronized (self)
