@@ -337,6 +337,9 @@
 
 - (IMBObject*) loadThumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+#warning TODO: We need a *generic* mechanism to provide the ParserMessenger to all IMBObjects in the XPC service
+    inObject.parserMessenger = self;
+    
 	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inObject.parserIdentifier];
 	
