@@ -157,7 +157,6 @@ static NSArray* sSupportedUTIs = nil;
 		
 		_databases = [[NSMutableDictionary alloc] init];
 		_thumbnailDatabases = [[NSMutableDictionary alloc] init];		
-		_thumbnailSize = NSZeroSize;
 		
 		[self supportedUTIs];	// Init early and in the main thread!
 	}
@@ -355,7 +354,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSError* error = nil;
 	CGImageRef imageRepresentation = nil;
-	NSData *jpegData = [self previewDataForObject:inObject];
+	NSData *jpegData = [self previewDataForObject:inObject maximumSize:[NSNumber numberWithFloat:256.0]];
 	
 	if (jpegData != nil) {
 		CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
@@ -369,6 +368,13 @@ static NSArray* sSupportedUTIs = nil;
 		[NSMakeCollectable(imageRepresentation) autorelease];
 		
 		if (imageRepresentation) {
+#if 0
+			CGFloat width = CGImageGetWidth(imageRepresentation);
+			CGFloat height = CGImageGetHeight(imageRepresentation);
+
+			NSLog(@"width: %f, height: %f", width, height);
+#endif
+			
 			IMBLightroomObject *lightroomObject = (IMBLightroomObject*)inObject;
 			NSString *orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];
 			
@@ -436,6 +442,84 @@ static NSArray* sSupportedUTIs = nil;
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+	NSData* jpegData = [self previewDataForObject:inObject maximumSize:nil];
+
+	if (jpegData != nil) {
+		IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
+		NSString* orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];;
+		NSString* fileName = [[(NSString*)inObject.location lastPathComponent] stringByDeletingPathExtension];
+		NSString* jpegPath = [[[NSFileManager imb_threadSafeManager] imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
+		NSURL* jpegURL = [NSURL fileURLWithPath:jpegPath];
+		BOOL success = NO;
+		
+		if ((orientation == nil) || [orientation isEqual:@"AB"]) {
+			success = [jpegData writeToFile:jpegPath atomically:YES];
+		}
+		else {
+			CGImageSourceRef jpegSource = CGImageSourceCreateWithData((CFDataRef)jpegData, NULL);
+			
+			if (jpegSource != NULL) {
+				CGImageRef jpegImage = CGImageSourceCreateImageAtIndex(jpegSource, 0, NULL);
+				
+				if (jpegImage != NULL) {
+					CGImageDestinationRef destination = CGImageDestinationCreateWithURL((CFURLRef)jpegURL, (CFStringRef)@"public.jpeg", 1, nil);
+					
+					if (destination != NULL) {
+						NSInteger orientationProperty = 2;
+						
+						if ([orientation isEqual:@"BC"]) {
+							orientationProperty = 6;
+						}
+						else if ([orientation isEqual:@"CD"]) {
+							orientationProperty = 4;
+						}
+						else if ([orientation isEqual:@"DA"]) {
+							orientationProperty = 8;
+						}
+						else if ([orientation isEqual:@"CB"]) {
+							orientationProperty = 5;
+						}
+						else if ([orientation isEqual:@"DC"]) {
+							orientationProperty = 3;
+						}
+						else if ([orientation isEqual:@"AD"]) {
+							orientationProperty = 7;
+						}
+						
+						NSDictionary* metadata = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:orientationProperty]
+																			 forKey:((NSString*)kCGImagePropertyOrientation)];
+						CGImageDestinationAddImage(destination, jpegImage, (CFDictionaryRef)metadata);
+						
+						success = CGImageDestinationFinalize(destination);
+						
+						CFRelease(destination);
+					}
+					
+					CGImageRelease(jpegImage);
+				}
+				
+				CFRelease(jpegSource);
+			}
+		}
+		
+		if (success) {
+			NSError* error = nil;
+			NSData* bookmark = nil;
+			
+			bookmark = [jpegURL 
+						bookmarkDataWithOptions:0 //options
+						includingResourceValuesForKeys:nil
+						relativeToURL:nil
+						error:&error];
+			
+			if (outError != NULL) {
+				*outError = error;
+			}
+			
+			return bookmark;
+		}
+	}
+	
 	return [self bookmarkForLocalFileObject:inObject error:outError];
 }
 
@@ -952,15 +1036,6 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) objectViewDidChangeIconSize:(NSSize)inSize
-{
-//	if (_thumbnailSize.width<inSize.width || _thumbnailSize.height<inSize.height)
-//	{
-//		_thumbnailSize = inSize;
-//		[self invalidateThumbnails];
-//	}	
-}
-
 - (CGImageRef)imageRotated:(CGImageRef)imgRef forOrientation:(NSInteger)orientationProperty
 {
 	CGFloat w = CGImageGetWidth(imgRef);
@@ -1069,7 +1144,7 @@ static NSArray* sSupportedUTIs = nil;
 	return pyramidPath;
 }
 
-- (NSData*)previewDataForObject:(IMBObject*)inObject
+- (NSData*)previewDataForObject:(IMBObject*)inObject maximumSize:(NSNumber*)maximumSize
 {
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
@@ -1079,22 +1154,34 @@ static NSArray* sSupportedUTIs = nil;
 		FMDatabase *database = [self thumbnailDatabase];
 		
 		if (database != nil) {
-			NSNumber* targetWidth = [NSNumber numberWithDouble:_thumbnailSize.width];
-			NSNumber* targetHeight = [NSNumber numberWithDouble:_thumbnailSize.height];
 			NSDictionary* metadata = [lightroomObject preliminaryMetadata];
 			NSNumber* idLocal = [metadata objectForKey:@"idLocal"];
 			
 			@synchronized (database) {
-				NSString* query =	@" SELECT pcpl.dataOffset, pcpl.dataLength"
-									@" FROM Adobe_images ai"
-									@" INNER JOIN Adobe_previewCachePyramidLevels pcpl ON pcpl.pyramid = ai.pyramidIDCache"
-									@" WHERE ai.id_local = ?"
-									@" AND pcpl.height >= ?"
-									@" AND pcpl.width >= ?"
-									@" ORDER BY pcpl.height, pcpl.width ASC"
-									@" LIMIT 1";
+				FMResultSet* results = nil;
 				
-				FMResultSet* results = [database executeQuery:query, idLocal, targetWidth, targetHeight];
+				if (maximumSize != nil) {
+					NSString* query =	@" SELECT pcpl.dataOffset, pcpl.dataLength"
+										@" FROM Adobe_images ai"
+										@" INNER JOIN Adobe_previewCachePyramidLevels pcpl ON pcpl.pyramid = ai.pyramidIDCache"
+										@" WHERE ai.id_local = ?"
+										@" AND pcpl.height <= ?"
+										@" AND pcpl.width <= ?"
+										@" ORDER BY pcpl.height, pcpl.width DESC"
+										@" LIMIT 1";
+					
+					results = [database executeQuery:query, idLocal, maximumSize, maximumSize];
+				}
+				else {
+					NSString* query =	@" SELECT pcpl.dataOffset, pcpl.dataLength"
+										@" FROM Adobe_images ai"
+										@" INNER JOIN Adobe_previewCachePyramidLevels pcpl ON pcpl.pyramid = ai.pyramidIDCache"
+										@" WHERE ai.id_local = ?"
+										@" ORDER BY pcpl.height, pcpl.width DESC"
+										@" LIMIT 1";
+					
+					results = [database executeQuery:query, idLocal];
+				}
 				
 				if ([results next]) {				
 					double dataOffset = [results doubleForColumn:@"dataOffset"];

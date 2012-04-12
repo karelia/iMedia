@@ -150,28 +150,31 @@
 
 
 // Request the URL to our processed preview data. Since this is an asynchronous operation, but we have to return
-// synchronously for this protocol method, we'll wrap the calls in a dispatch_sync to a background queue...
+// synchronously for this protocol method, we'll wrap the calls in a dispatch_sync to a background queue, and 
+// there we wait until we get the bookmark...
 
 - (NSURL*) previewItemURL
 {
-	__block NSURL* url = nil;
-	
-	dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
+	if (self.bookmark == nil)
 	{
-		[self requestBookmarkWithCompletionBlock:^(NSError* inError)
+		if (!_isLoadingQuicklookPreview)
 		{
-			if (inError)
+			_isLoadingQuicklookPreview = YES;
+			 
+			dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
 			{
-				[NSApp presentError:inError];
-			}
-			else
-			{
-				url = [self URLByResolvingBookmark];
-			}
-		}];
-	});
-
-	return url;
+				[self requestBookmarkWithCompletionBlock:^(NSError* inError)
+				{
+					if (inError) [NSApp performSelectorOnMainThread:@selector(presentError:) withObject:inError waitUntilDone:NO];
+				}];
+				
+				while (self.bookmark == nil) {};
+				_isLoadingQuicklookPreview = NO;
+			});
+		}
+	}
+	
+	return [self URLByResolvingBookmark];
 }
 
 

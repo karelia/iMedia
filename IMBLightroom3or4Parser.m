@@ -455,7 +455,7 @@
 	return nil;
 }
 
-- (NSData*)previewDataForObject:(IMBObject*)inObject
+- (NSData*)previewDataForObject:(IMBObject*)inObject maximumSize:(NSNumber*)maximumSize
 {	
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
@@ -475,9 +475,20 @@
 		//		< data padding >
 		
 		const char pattern[4] = { 0x41, 0x67, 0x48, 0x67 };
-		NSUInteger index = [data lastIndexOfBytes:pattern length:4];
 		
-		if (index != NSNotFound) {
+		NSUInteger index = NSNotFound;
+		
+		if (maximumSize == nil) {
+			index = [data lastIndexOfBytes:pattern length:4];
+		}
+		else {
+			index = [data indexOfBytes:pattern length:4];
+		}
+
+		NSData* previousData = nil;
+		CGFloat maximumSizeFloat = [maximumSize floatValue];
+		
+		while (index != NSNotFound) {
 			unsigned short headerLengthValue; // size 2
 			unsigned long long dataLengthValue; // size 8
 			
@@ -488,13 +499,49 @@
 			dataLengthValue = NSSwapBigLongLongToHost(dataLengthValue);
 			
 			NSData* jpegData = nil;
-            
+			
             if ((index + headerLengthValue + dataLengthValue) < [data length]) {
                 jpegData = [data subdataWithRange:NSMakeRange(index + headerLengthValue, dataLengthValue)];
             }
             
+			if (maximumSize == nil) {
+				return jpegData;
+			}
+			
+			if (jpegData != nil) {
+				CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
+				
+				if (source != NULL) {
+					CGImageRef imageRepresentation = CGImageSourceCreateImageAtIndex(source, 0, NULL);
+					
+					CFRelease(source);
+					
+					if (imageRepresentation != NULL) {
+						CGFloat width = CGImageGetWidth(imageRepresentation);
+						CGFloat height = CGImageGetHeight(imageRepresentation);
+						
+						CFRelease(imageRepresentation);
+						
+						if ((width > maximumSizeFloat) || (height > maximumSizeFloat)) {
+							if (previousData == nil) {
+								previousData = jpegData;
+							}
+							
+							break;
+						}
+					}
+					
+					previousData = jpegData;
+					index = [data indexOfBytes:pattern length:4 options:0 range:NSMakeRange(index + 4, [data length] - index - 4)];
+					
+					continue;
+				}
+			}
+			
 			return jpegData;
 		}
+		
+		return previousData;
 	}
 	
 	return nil;
