@@ -198,22 +198,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	if (inObject.imageLocation)
-	{
-		NSURL* url = (NSURL*)inObject.imageLocation;
-		NSData* data = [NSData dataWithContentsOfURL:url];
-		return data;
-	}
-	else
-	{
-		return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
-	}
-}
-
-
-
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	return nil;
