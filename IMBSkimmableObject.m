@@ -125,22 +125,11 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
-// Sets the current skimming index and thus also sets imageLocation accordingly
-
-- (void) setCurrentSkimmingIndex:(NSUInteger)currentSkimmingIndex
-{
-    _currentSkimmingIndex = currentSkimmingIndex;
-    self.imageLocation = [self imageLocationAtSkimmingIndex:currentSkimmingIndex];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
 // Sets the current skimming index to NSNotFound and restores the key image in imageLocation
 
 - (void) resetCurrentSkimmingIndex
 {
     _currentSkimmingIndex = NSNotFound;
-    self.imageLocation = [self keyImageLocation];
 }
 
 
@@ -150,6 +139,8 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 // Returns the image location that corresponds to the skimming index provided. Must be subclassed.
+// Note: This method must only be invoked in an XPC service (because implementations will most likely
+//       take advantage of the parser associated with this object).
 
 - (id) imageLocationAtSkimmingIndex:(NSUInteger)skimmingIndex
 {
