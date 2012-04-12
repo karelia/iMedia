@@ -79,6 +79,7 @@
 extern NSString* kIMBNodesWillReloadNotification;
 extern NSString* kIMBNodesWillChangeNotification;
 extern NSString* kIMBNodesDidChangeNotification;
+extern NSString* kIMBDidCreateTopLevelNodeNotification;
 
 
 //----------------------------------------------------------------------------------------------------------------------

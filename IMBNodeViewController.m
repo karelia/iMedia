@@ -567,9 +567,13 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			if (![IMBConfig isLibraryPath:path])
 			{
+				[[NSNotificationCenter defaultCenter]
+					addObserver:self
+					selector:@selector(_didCreateTopLevelNode:) 
+					name:kIMBDidCreateTopLevelNodeNotification 
+					object:nil];
+
 				[self.libraryController addUserAddedNodeForFolder:[NSURL fileURLWithPath:path]];
-				#warning TODO
-//				self.selectedNodeIdentifier = [parser identifierForPath:path];
 				result = YES;
 			}
 		}	
@@ -578,6 +582,18 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	[inOutlineView.window makeFirstResponder:inOutlineView];
 	[self.libraryController reload];
 	return result;
+}
+
+
+// When the new node has arrived (asynchronous operation) then select it and stop listening...
+
+- (void) _didCreateTopLevelNode:(NSNotification*)inNotification
+{
+	IMBNode* node = (IMBNode*)inNotification.object;
+	self.selectedNodeIdentifier = node.identifier;
+	[self selectNode:node];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:kIMBDidCreateTopLevelNodeNotification object:nil];
 }
 
 
@@ -1189,19 +1205,21 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	[panel setResolvesAliases:YES];
 
 	NSInteger result = [panel runModal];
-//	[panel beginSheetModalForWindow:ibSplitView.window completionHandler:^(NSInteger result)
-//	{
-		if (result == NSFileHandlingPanelOKButton)
+
+	if (result == NSFileHandlingPanelOKButton)
+	{
+		NSArray* urls = [panel URLs];
+		for (NSURL* url in urls)
 		{
-			NSArray* urls = [panel URLs];
-			for (NSURL* url in urls)
-			{
-				
-				[self.libraryController addUserAddedNodeForFolder:url];
-//				self.selectedNodeIdentifier = [parser identifierForPath:path];
-			}	
-		}
-//	}];
+			[[NSNotificationCenter defaultCenter]
+				addObserver:self
+				selector:@selector(_didCreateTopLevelNode:) 
+				name:kIMBDidCreateTopLevelNodeNotification 
+				object:nil];
+
+			[self.libraryController addUserAddedNodeForFolder:url];
+		}	
+	}
 }
 
 
