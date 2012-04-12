@@ -300,6 +300,11 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (void) dealloc
 {
+    // Views from IB also have bindings with the object array controller and must be
+    // unbound *before* the controller is deallocated
+    
+    [self unbindViews];
+    
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	// Cancel any scheduled messages...
