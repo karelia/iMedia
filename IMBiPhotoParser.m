@@ -200,7 +200,16 @@
 
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
+	if (inObject.imageLocation)
+	{
+		NSURL* url = (NSURL*)inObject.imageLocation;
+		NSData* data = [NSData dataWithContentsOfURL:url];
+		return data;
+	}
+	else
+	{
+		return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
+	}
 }
 
 
