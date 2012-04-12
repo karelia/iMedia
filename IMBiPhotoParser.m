@@ -478,8 +478,8 @@
 			// so we don't have to loop through the whole album list again to find it.
 			
 			albumNode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    albumDict, @"nodeSource", nil];
-//                                    [self nodeTypeForNode:albumNode], @"nodeType", nil];
+                                    albumDict, @"nodeSource",
+                                    [self nodeTypeForNode:albumNode], @"nodeType", nil];
 			
 			// Add the new album node to its parent (inRootNode)...
 			
