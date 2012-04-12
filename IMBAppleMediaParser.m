@@ -443,6 +443,25 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 #pragma mark -
 #pragma mark Image location
 
+- (id)thumbnailForObject:(IMBObject *)inObject error:(NSError **)outError
+{
+    // imageLocation of a skimmable node object might be out of sync with its current skimming index
+    // (the image location for a skimming index must only be set where the parser is available)
+    
+    if ([inObject isKindOfClass:NSClassFromString(@"IMBSkimmableObject")])
+    {
+        IMBSkimmableObject *skimmableObject = (IMBSkimmableObject *)inObject;
+        if (skimmableObject.currentSkimmingIndex != NSNotFound)
+        {
+            skimmableObject.imageLocation = [skimmableObject imageLocationAtSkimmingIndex:skimmableObject.currentSkimmingIndex];
+        } else {
+            skimmableObject.imageLocation = [skimmableObject keyImageLocation];
+        }
+    }
+    return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // The image location represents an image path to the image to be used for display inside of the browser (a preview of
 // of the original image). By default we use the path to the image's thumbnail (key: "ThumbPath").
