@@ -84,7 +84,7 @@
 
 + (NSString*) nibName
 {
-	return @"IMBImageView";		// Looks like we don't need an extra @"IMBSkimmableView.xib"
+	return @"IMBImageObjectViewController";	// Looks like we don't need an extra @"IMBSkimmableObjectViewController.xib"
 }
 
 + (double) iconViewReloadDelay
