@@ -779,7 +779,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 				}
 				else
 				{
-					[self storeReceivedImageRepresentation:inPopulatedObject.imageRepresentation];
+					[self storeReceivedImageRepresentation:inPopulatedObject.atomic_imageRepresentation];
 					if (self.metadata == nil) self.metadata = inPopulatedObject.metadata;
 					if (self.metadataDescription == nil) self.metadataDescription = inPopulatedObject.metadataDescription;
 					_isLoadingThumbnail = NO;
