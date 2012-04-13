@@ -282,7 +282,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
         [parser willUseParser];
 		
         NSError* error = nil;
-        if ([parser populateNode:self.newNode options:self.options error:&error])
+        if ([parser populateNode:self.replacementNode options:self.options error:&error])
 		{
 			[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.replacementNode];
 			[self doReplacement];
