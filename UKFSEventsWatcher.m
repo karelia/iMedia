@@ -218,10 +218,6 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 
 		@synchronized (self)
 		{
-			// eventStreams should not already contain the given path. If it does, it implies
-			// the client has inappropriately added the same path twice, leading to redundant
-			// abuse of FSEvents.
-			NSAssert([eventStreams objectForKey:path] == nil, @"Attempted to add a path to UKFSEventsWatcher that is already registered: %@", path);
 			[eventStreams setObject:[NSValue valueWithPointer:stream] forKey:path];
 		}	
 	}	
