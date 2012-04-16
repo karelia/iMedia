@@ -156,6 +156,7 @@
 	NSString* databasePath = [self.mediaSource path];
 	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
 	
+//	[database setTraceExecution:YES];
 	[database setLogsErrors:YES];
 	
 	return database;
