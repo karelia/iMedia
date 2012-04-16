@@ -56,11 +56,11 @@
 #import "IMBTestAppDelegate.h"
 #import "SBUtilities.h"
 //#import "IMBImageViewController.h"
-//#import <iMedia/IMBiPhotoEventObjectViewController.h>
-//#import <iMedia/IMBFaceObjectViewController.h>
-//#import "IMBTestiPhotoEventBrowserCell.h"
-//#import "IMBTestFaceBrowserCell.h"
-//#import "IMBTestFacesBackgroundLayer.h"
+#import <iMedia/IMBiPhotoEventObjectViewController.h>
+#import <iMedia/IMBFaceObjectViewController.h>
+#import "IMBTestiPhotoEventBrowserCell.h"
+#import "IMBTestFaceBrowserCell.h"
+#import "IMBTestFacesBackgroundLayer.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@
 #pragma mark 
 
 @interface IMBTestAppDelegate ()
-//- (CGImageRef) badgeForObject:(IMBObject*) inObject;
+- (CGImageRef) badgeForObject:(IMBObject*) inObject;
 @end
 
 
@@ -472,7 +472,7 @@
 #pragma mark 
 #pragma mark IMBObjectViewControllerDelegate
 
-/*
+
 - (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController
 {
 	if ([inController isKindOfClass:[IMBiPhotoEventObjectViewController class]])
@@ -562,7 +562,7 @@
 	
 	return [self badgeForObject:inObject];
 }
-*/
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -606,21 +606,21 @@
 
 - (void) concludeDragOperationForObjects:(NSArray*)inObjects
 {
-/*	
+	
 	for (IMBObject* object in inObjects)
 	{
 		[self.usedObjects setObject:object forKey:[object identifier]];
 	}
 	
 	[self.nodeViewController setObjectContainerViewNeedsDisplay:YES];
-*/
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark -
 #pragma mark Helper
-/*
+
 - (CGImageRef) badgeForObject:(IMBObject*) inObject
 {
 	static CGImageRef badgeImage = NULL;
@@ -648,7 +648,7 @@
 		return NULL;
 	}
 }
-*/
+
 @end
 
 
