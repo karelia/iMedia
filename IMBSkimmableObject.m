@@ -59,6 +59,19 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Makes sure that currentSkimmingIndex is reset
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        [self resetCurrentSkimmingIndex];
+    }
+    return self;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // We don't want no shared image representations like default behavior in super class (we are not folders)
 
 - (NSImage *) sharedImageRepresentation
