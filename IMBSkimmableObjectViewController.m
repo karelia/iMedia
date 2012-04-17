@@ -200,9 +200,14 @@
         
         [item resetCurrentSkimmingIndex];
         
+        // Will not load thumbnail if these two flags are not set accordingly
+        
         [item setNeedsImageRepresentation:YES];
-        [item setIsLoadingThumbnail:NO]; // Avoid race condition 
-        [item loadThumbnail]; // Background thread			
+        [item setIsLoadingThumbnail:NO]; // Avoid race condition
+        
+        [item loadThumbnail]; // Background thread or XPC service		
+        
+        [item setNeedsImageRepresentation:NO];
     }
 	//NSLog(@"Mouse exited item at index %ld", (long) inIndex);
 }
@@ -242,10 +247,15 @@
             
             item.currentSkimmingIndex = objectIndex;
             
+            // Will not load thumbnail if these two flags are not set accordingly
+            
             [item setNeedsImageRepresentation:YES];
-            [item setIsLoadingThumbnail:NO]; // Avoid race condition 
-            [item loadThumbnail]; // Background thread
-        }
+            [item setIsLoadingThumbnail:NO]; // Avoid race condition
+            
+            [item loadThumbnail]; // Background thread or XPC service
+
+            [item setNeedsImageRepresentation:NO];
+}
     }
 }
 

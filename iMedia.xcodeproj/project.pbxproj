@@ -24,6 +24,9 @@
 		274DF618114EF0B200AC8C03 /* IMBImageItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 274DF616114EF0B200AC8C03 /* IMBImageItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3016792913B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
 		3016792A13B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
+		30203EDC153C546900CFE91B /* IMBTestiPhotoEventBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30439223130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m */; };
+		30203EDD153C546900CFE91B /* IMBTestFaceBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */; };
+		30203EDE153C546900CFE91B /* IMBTestFacesBackgroundLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */; };
 		3025E5631306877700706DB2 /* IMBiPhotoEventObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30394AC812DC665000ACA531 /* IMBSkimmableObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		303FFD6A152CBC3B0026B8CF /* IMBSkimmableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 303FFD68152CBC3B0026B8CF /* IMBSkimmableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2714,6 +2717,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30203EDC153C546900CFE91B /* IMBTestiPhotoEventBrowserCell.m in Sources */,
+				30203EDD153C546900CFE91B /* IMBTestFaceBrowserCell.m in Sources */,
+				30203EDE153C546900CFE91B /* IMBTestFacesBackgroundLayer.m in Sources */,
 				D09933B31011B32B00C527B7 /* IMBTestAppDelegate.m in Sources */,
 				D09934341011B63600C527B7 /* main.m in Sources */,
 			);

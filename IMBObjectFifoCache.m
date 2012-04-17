@@ -157,8 +157,17 @@ static NSUInteger sCacheSize = 512;
 
 - (void) _addObject:(IMBObject*)inObject
 {
-	[_objects addObject:inObject];
-	[self _removeOldestObjects];
+    // Do not add an object that is already in the cache (e.g. when skimming)
+    // (Instead just move it to the end of the cache so it is "last out")
+    
+    NSUInteger index = [_objects indexOfObjectIdenticalTo:inObject];
+    
+    [inObject retain];
+    if (index != NSNotFound) [_objects removeObjectAtIndex:index];
+    [_objects addObject:inObject];
+    [inObject release];
+    
+    [self _removeOldestObjects];
 }
 
 
