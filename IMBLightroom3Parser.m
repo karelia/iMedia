@@ -111,6 +111,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+
 // Return an array to Lightroom library files...
 
 + (NSArray*) libraryPaths
@@ -141,6 +142,7 @@
 	NSString* readOnlyDatabasePath = [[self class] cloneDatabase:databasePath];
 	FMDatabase* database = [FMDatabase databaseWithPath:readOnlyDatabasePath];
 	
+//	[database setTraceExecution:YES];
 	[database setLogsErrors:YES];
 	
 	return database;
@@ -207,19 +209,20 @@
 
 - (BOOL) checkDatabaseVersion
 {
- NSNumber *databaseVersion = [self databaseVersion];
+	NSNumber *databaseVersion = [self databaseVersion];
+	
+	if (databaseVersion != nil) {
+		long databaseVersionLong = [databaseVersion longValue];
+		
+		if (databaseVersionLong < 300025) {
+			return NO;
+		}
+		else if (databaseVersionLong >= 400000) {
+			return NO;
+		}
+	}
+	
+	return YES;
+}
 
- if (databaseVersion != nil) {
- long databaseVersionLong = [databaseVersion longValue];
-
- if (databaseVersionLong < 300025) {
- return NO;
-}
- else if (databaseVersionLong >= 400000) {
- return NO;
-}
-}
-
- return YES;
-}
 @end
