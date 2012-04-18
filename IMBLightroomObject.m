@@ -168,7 +168,7 @@
 					if (inError) [NSApp performSelectorOnMainThread:@selector(presentError:) withObject:inError waitUntilDone:NO];
 				}];
 				
-				while (self.bookmark == nil) {};
+				[self waitForBookmark];
 				_isLoadingQuicklookPreview = NO;
 			});
 		}
