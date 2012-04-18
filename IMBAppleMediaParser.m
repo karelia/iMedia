@@ -466,8 +466,13 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	if (inObject.imageLocation)
 	{
 		NSURL* url = (NSURL*)inObject.imageLocation;
-		NSData* data = [NSData dataWithContentsOfURL:url];
-		return data;
+		if ([inObject.imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+        {
+            return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
+        } else {
+            NSData* data = [NSData dataWithContentsOfURL:url];
+            return data;
+        }
 	}
 	else
 	{
