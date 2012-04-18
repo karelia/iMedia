@@ -686,7 +686,7 @@
 			object.index = index++;
 			
 			object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:keyPhotoDict] isDirectory:NO];
-			object.imageRepresentationType = [self requestedImageRepresentationType];
+			object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 			object.imageRepresentation = nil;
 		}
 		[pool drain];
