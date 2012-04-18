@@ -204,9 +204,11 @@
 }
 
 
+// Since we know that we have local files we can use the helper method supplied by the base class...
+
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return nil;
+	return [self bookmarkForLocalFileObject:inObject error:outError];
 }
 
 
