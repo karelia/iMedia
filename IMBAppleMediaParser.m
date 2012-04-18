@@ -458,10 +458,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
             skimmableObject.imageLocation = [skimmableObject keyImageLocation];
         }
     }
-
-#warning TODO: With using the URL contents directly for events we now lose images with rounded corners but that may be solved via a specific browser cell
     
-    // IKImageBrowser can deal with NSData type (IKImageBrowserNSDataRepresentationType)
+    // IKImageBrowser can also deal with NSData type (IKImageBrowserNSDataRepresentationType)
     
 	if (inObject.imageLocation)
 	{
