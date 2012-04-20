@@ -595,7 +595,7 @@
 				{
 					badgeImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
 					CFRelease(imageSource);
-					[(id) badgeImage autorelease];
+//					[(id) badgeImage autorelease];
 				}
 			}
 		}
