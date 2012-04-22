@@ -132,7 +132,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	if (self = [super init])
 	{
 		self.objects = inObjects;
-		_URLsByObject = [[NSMutableDictionary alloc] initWithCapacity:inObjects.count];
+		_URLsByObject = [[NSMapTable mapTableWithStrongToStrongObjects] retain];
 		self.destinationDirectoryPath = [IMBConfig downloadFolderPath];
 		self.error = nil;
 		self.delegate = nil;
@@ -152,7 +152,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	if (self = [super init])
 	{
 		self.objects = [inCoder decodeObjectForKey:@"objects"];
-		_URLsByObject = [[inCoder decodeObjectForKey:@"URLsByObject"] mutableCopy];
+		_URLsByObject = [[inCoder decodeObjectForKey:@"URLsByObject"] retain];
 		self.destinationDirectoryPath = [inCoder decodeObjectForKey:@"destinationDirectoryPath"];
 		self.delegate = nil;
 		self.finishSelector = NULL;
@@ -179,7 +179,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	IMBObjectsPromise* copy = [[[self class] allocWithZone:inZone] init];
 	
 	copy.objects = self.objects;
-	copy->_URLsByObject = [_URLsByObject mutableCopy];
+	copy->_URLsByObject = [_URLsByObject copy];
 	copy.destinationDirectoryPath = self.destinationDirectoryPath;
 	copy.error = self.error;
 	copy.delegate = self.delegate;
@@ -391,12 +391,9 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 
 - (void)setFileURL:(NSURL *)URL error:(NSError *)error forObject:(IMBObject *)object;
 {
-    // Drop down to CF to avoid copying keys
     if (URL)
     {
-        CFDictionarySetValue((CFMutableDictionaryRef)_URLsByObject,
-                             object,
-                             (URL ? (id)URL : (id)error));
+        [_URLsByObject setObject:(URL ? (id)URL : (id)error) forKey:object];
         
         
         // Post process.  We use this to embed metadata after the download. This is only really used by Flickr images right now
