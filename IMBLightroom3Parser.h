@@ -52,10 +52,10 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroomParser.h"
+#import "IMBLightroom3or4Parser.h"
 
 
-@interface IMBLightroom3Parser : IMBLightroomParser
+@interface IMBLightroom3Parser : IMBLightroom3or4Parser
 {
 	
 }
