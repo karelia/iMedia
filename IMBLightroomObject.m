@@ -56,6 +56,7 @@
 #pragma mark HEADERS
 
 #import "IMBLightroomObject.h"
+#import "IMBParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,6 +67,7 @@
 @implementation IMBLightroomObject
 
 @synthesize absolutePyramidPath = _absolutePyramidPath;
+@synthesize idLocal = _idLocal;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,6 +87,7 @@
 - (void) dealloc
 {
 	IMBRelease(_absolutePyramidPath);
+	IMBRelease(_idLocal);
 	[super dealloc];
 }
 
@@ -97,6 +100,7 @@
 	if ((self = [super initWithCoder:inCoder]) != nil)
 	{
 		self.absolutePyramidPath = [inCoder decodeObjectForKey:@"absolutePyramidPath"];
+		self.idLocal = [inCoder decodeObjectForKey:@"idLocal"];
 	}
 	
 	return self;
@@ -108,6 +112,7 @@
 	[super encodeWithCoder:inCoder];
 	
 	[inCoder encodeObject:self.absolutePyramidPath forKey:@"absolutePyramidPath"];
+	[inCoder encodeObject:self.idLocal forKey:@"idLocal"];
 }
 
 
@@ -118,6 +123,7 @@
 {
 	IMBLightroomObject* copy = [super copyWithZone:inZone];
 	copy.absolutePyramidPath = self.absolutePyramidPath;
+	copy.idLocal = self.idLocal;
 	return copy;
 }
 
@@ -131,16 +137,25 @@
 
 // Use the path to the pyramid file as the unique identifier...
 
-- (NSString*) imageUID
+- (NSString*) identifier
 {
-	if (_absolutePyramidPath != nil)
-	{
-		return _absolutePyramidPath;
+	/*
+	NSString* absolutePyramidPath = self.absolutePyramidPath;
+	
+	if (absolutePyramidPath != nil) {
+		NSString* parserName = [[self.parserMessenger class] parserClassName];
+	
+		return [NSString stringWithFormat:@"%@:/%@", parserName, absolutePyramidPath];
 	}
 	
-	return [super imageUID];
+	return [super identifier];
+	*/
+	
+	NSString* identifier = [super identifier];
+	
+	// Account for virtual copies
+	return [NSString stringWithFormat:@"%@/%@", identifier, self.idLocal];
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -159,18 +174,26 @@
 	{
 		if (!_isLoadingQuicklookPreview)
 		{
+			NSLock *lock = [[NSLock alloc] init];
+			
 			_isLoadingQuicklookPreview = YES;
 			 
 			dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
 			{
+				[lock lock];
+				
 				[self requestBookmarkWithCompletionBlock:^(NSError* inError)
 				{
+					[lock unlock];
+					
 					if (inError) [NSApp performSelectorOnMainThread:@selector(presentError:) withObject:inError waitUntilDone:NO];
 				}];
-				
-				while (self.bookmark == nil) {};
-				_isLoadingQuicklookPreview = NO;
 			});
+			
+			[lock lock];
+			[lock release];
+			
+			_isLoadingQuicklookPreview = NO;
 		}
 	}
 	
