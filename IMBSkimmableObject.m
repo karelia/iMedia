@@ -80,6 +80,14 @@
 }
 
 
+// Can't use object's identifier here, since it will be the Key image's URL which might be same for different faces
+
+- (NSString *)imageUID
+{
+    return [self representedNodeIdentifier];
+}
+
+
 - (NSString*) imageRepresentationType
 {
 	return [[_imageRepresentationType retain] autorelease];

@@ -645,6 +645,9 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	}
 	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
 	{
+        // Must use concurrent queue (main queue is serial) to get bookmark and wait for that bookmark
+        // at the same time (must wait since getting a bookmark is always asynchronous)
+        
 		dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
 		{
 			[self requestBookmarkWithCompletionBlock:^(NSError* inError)
@@ -659,6 +662,10 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 					if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
 				}
 			}];
+            
+            // Wait in one thread of queue until bookmark is set from other thread of same queue
+            
+            [self waitForBookmark];
 		});
 	}
 }
@@ -859,6 +866,14 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 #pragma mark File Access
 
 @implementation IMBObject (FileAccess)
+
+
+// Convenience: Will return once bookmark is set
+
+- (void) waitForBookmark
+{
+    while (self.bookmark == nil) {};
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

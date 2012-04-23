@@ -157,6 +157,7 @@
 	return [NSString stringWithFormat:@"%@/%@", identifier, self.idLocal];
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -174,26 +175,18 @@
 	{
 		if (!_isLoadingQuicklookPreview)
 		{
-			NSLock *lock = [[NSLock alloc] init];
-			
 			_isLoadingQuicklookPreview = YES;
 			 
 			dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
 			{
-				[lock lock];
-				
 				[self requestBookmarkWithCompletionBlock:^(NSError* inError)
 				{
-					[lock unlock];
-					
 					if (inError) [NSApp performSelectorOnMainThread:@selector(presentError:) withObject:inError waitUntilDone:NO];
 				}];
+
+				[self waitForBookmark];
+				_isLoadingQuicklookPreview = NO;
 			});
-			
-			[lock lock];
-			[lock release];
-			
-			_isLoadingQuicklookPreview = NO;
 		}
 	}
 	

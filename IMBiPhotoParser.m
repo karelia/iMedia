@@ -204,9 +204,11 @@
 }
 
 
+// Since we know that we have local files we can use the helper method supplied by the base class...
+
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return nil;
+	return [self bookmarkForLocalFileObject:inObject error:outError];
 }
 
 
@@ -684,7 +686,7 @@
 			object.index = index++;
 			
 			object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:keyPhotoDict] isDirectory:NO];
-			object.imageRepresentationType = [self requestedImageRepresentationType];
+			object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 			object.imageRepresentation = nil;
 		}
 		[pool drain];
