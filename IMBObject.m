@@ -868,17 +868,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @implementation IMBObject (FileAccess)
 
 
-// Convenience: Will return once bookmark is set
-
-- (void) waitForBookmark
-{
-    while (self.bookmark == nil) {};
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Request a bookmark and execute the completion block once it is available. This usually requires an  
 // asynchronous round trip to an XPC service, but if the bookmark is already available, the completion 
 // block is called immediately...
@@ -946,6 +935,17 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	{
 		inCompletionBlock(nil);
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Convenience: Will return once bookmark is set
+
+- (void) waitForBookmark
+{
+    while (self.bookmark == nil) {};
 }
 
 

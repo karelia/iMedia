@@ -206,8 +206,8 @@ extern NSString* kIMBObjectPasteboardType;
 
 @interface IMBObject (FileAccess)
 
-- (void) waitForBookmark;
 - (void) requestBookmarkWithCompletionBlock:(void(^)(NSError*))inCompletionBlock;
+- (void) waitForBookmark;
 - (NSURL*) URLByResolvingBookmark;
 
 @property (retain,readonly) NSData* bookmark;
