@@ -66,15 +66,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark GLOBALS
-
-static NSMutableArray* sParsers = nil;
-static dispatch_once_t sOnceToken = 0;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark 
 
 // Specify parameters for image subclass and register it...
