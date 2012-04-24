@@ -100,19 +100,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Register this parser, so that it gets automatically loaded...
-
-+ (void) load
-{
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeImage];
-	[pool drain];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Check if Aperture is installed...
 
 + (NSString*) aperturePath
@@ -214,94 +201,6 @@
 
 #pragma mark 
 #pragma mark Parser Methods
-
-- (IMBNode*) nodeWithOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions error:(NSError**)outError
-{
-	NSError* error = nil;
-	
-	// Oops no path, can't create a root node. This is bad...
-	
-	if (self.mediaSource == nil)
-	{
-		return nil;
-	}
-	
-	// Create a root node...
-	
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-	
-	if (inOldNode == nil)
-	{
-		NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];;
-		[icon setScalesWhenResized:YES];
-		[icon setSize:NSMakeSize(16.0,16.0)];
-		
-		node.mediaSource = self.mediaSource;
-		node.identifier = [self rootNodeIdentifier];
-		node.name = @"Aperture";
-		node.icon = icon;
-		node.parser = self;
-		node.isTopLevelNode = YES;
-		node.groupType = kIMBGroupTypeLibrary;
-
-		if (self.placeholderParser)
-		{
-			node.leaf = YES;
-			node.shouldDisplayObjectView = NO;
-		}
-		else
-		{
-			node.leaf = NO;			
-		}
-	}
-	
-	// Or a subnode...
-	
-	else
-	{
-		node.mediaSource = self.mediaSource;
-		node.identifier = inOldNode.identifier;
-		node.name = inOldNode.name;
-		node.icon = inOldNode.icon;
-		node.groupType = inOldNode.groupType;
-		node.leaf = inOldNode.leaf;
-		node.parser = self;
-        node.isTopLevelNode = inOldNode.isTopLevelNode;
-	}
-	
-	// If we have more than one library then append the library name to the root node...
-	
-	if (node.isTopLevelNode && self.shouldDisplayLibraryName)
-	{
-		NSString* path = (NSString*)node.mediaSource;
-		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
-		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,name];
-	}
-	
-	// Watch the XML file. Whenever something in Aperture changes, we have to replace the
-	// WHOLE node tree, as we have no way of finding WHAT has changed inside the library...
-	
-	if (node.isTopLevelNode)
-	{
-		node.watcherType = kIMBWatcherTypeFSEvent;
-		node.watchedPath = [(NSString*)node.mediaSource stringByDeletingLastPathComponent];
-	}
-	else
-	{
-		node.watcherType = kIMBWatcherTypeNone;
-	}
-	
-	// If the old node was populated, then also populate the new node...
-	
-	if (inOldNode.isPopulated)
-	{
-		[self populateNewNode:node likeOldNode:inOldNode options:inOptions];
-	}
-	
-	if (outError) *outError = error;
-	return node;
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
