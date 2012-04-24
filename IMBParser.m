@@ -57,6 +57,7 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "NSURL+iMedia.h"
+#import "IMBParserMessenger.h"
 //#import "IMBObjectsPromise.h"
 //#import "IMBLibraryController.h"
 //#import "NSString+iMedia.h"
@@ -472,6 +473,38 @@
 //	NSString* parserClassName = NSStringFromClass(self);
 //	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
 //}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This identifier string for IMBObject (just like IMBNode.identifier) can be used to uniquely identify an IMBObject. 
+// This can be of use to host app developers who needs to cache usage info of media files in some dictionary when 
+// implementing the badging delegate API. Simply using the path of a local file may not be reliable in those cases 
+// where a file originated from a remote source and first had to be downloaded. For this reason using the identifier 
+// as a key is more reliable...
+
+ 
+- (NSString*) identifierForObject:(IMBObject*)inObject
+{
+	NSString* parserName = NSStringFromClass([self class]);
+	NSString* location = nil;
+	
+	if ([inObject.location isKindOfClass:[NSString class]])
+	{
+		location = (NSString*)inObject.location;
+	}
+	else if ([inObject.location isKindOfClass:[NSURL class]])
+	{
+		location = [(NSURL*)inObject.location path];
+	}
+	else
+	{
+		location = [inObject.location description];
+	}
+
+	return [NSString stringWithFormat:@"%@:/%@",parserName,location];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

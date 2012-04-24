@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Author: Pierre Bernard
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,27 +55,21 @@
 
 #pragma mark HEADERS
 
-#import "IMBObject.h"
+#import <Cocoa/Cocoa.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This subclass adds the addition absolutePyramidPath property, which stores the path to the pyramid 
-// containing image previews...
+#pragma mark
 
-@interface IMBLightroomObject : IMBObject
-{
-	NSString* _absolutePyramidPath;
-	NSNumber* _idLocal;
-	BOOL _isLoadingQuicklookPreview;
-}
+@interface NSPasteboard (iMedia)
 
-@property (retain) NSString* absolutePyramidPath;
-@property (retain) NSNumber* idLocal;
+- (NSArray*) IMBObjects;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
 

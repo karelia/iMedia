@@ -56,6 +56,7 @@
 #pragma mark HEADERS
 
 #import "IMBLightroomObject.h"
+#import "IMBParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,6 +67,7 @@
 @implementation IMBLightroomObject
 
 @synthesize absolutePyramidPath = _absolutePyramidPath;
+@synthesize idLocal = _idLocal;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,6 +87,7 @@
 - (void) dealloc
 {
 	IMBRelease(_absolutePyramidPath);
+	IMBRelease(_idLocal);
 	[super dealloc];
 }
 
@@ -97,6 +100,7 @@
 	if ((self = [super initWithCoder:inCoder]) != nil)
 	{
 		self.absolutePyramidPath = [inCoder decodeObjectForKey:@"absolutePyramidPath"];
+		self.idLocal = [inCoder decodeObjectForKey:@"idLocal"];
 	}
 	
 	return self;
@@ -108,6 +112,7 @@
 	[super encodeWithCoder:inCoder];
 	
 	[inCoder encodeObject:self.absolutePyramidPath forKey:@"absolutePyramidPath"];
+	[inCoder encodeObject:self.idLocal forKey:@"idLocal"];
 }
 
 
@@ -118,27 +123,8 @@
 {
 	IMBLightroomObject* copy = [super copyWithZone:inZone];
 	copy.absolutePyramidPath = self.absolutePyramidPath;
+	copy.idLocal = self.idLocal;
 	return copy;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark IKImageBrowserItem Protocol
-
-
-// Use the path to the pyramid file as the unique identifier...
-
-- (NSString*) imageUID
-{
-	if (_absolutePyramidPath != nil)
-	{
-		return _absolutePyramidPath;
-	}
-	
-	return [super imageUID];
 }
 
 
@@ -167,7 +153,7 @@
 				{
 					if (inError) [NSApp performSelectorOnMainThread:@selector(presentError:) withObject:inError waitUntilDone:NO];
 				}];
-				
+
 				[self waitForBookmark];
 				_isLoadingQuicklookPreview = NO;
 			});

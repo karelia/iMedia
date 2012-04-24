@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Author: Pierre Bernard
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,27 +55,41 @@
 
 #pragma mark HEADERS
 
+#import "NSPasteboard+iMedia.h"
 #import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This subclass adds the addition absolutePyramidPath property, which stores the path to the pyramid 
-// containing image previews...
+#pragma mark
 
-@interface IMBLightroomObject : IMBObject
-{
-	NSString* _absolutePyramidPath;
-	NSNumber* _idLocal;
-	BOOL _isLoadingQuicklookPreview;
-}
-
-@property (retain) NSString* absolutePyramidPath;
-@property (retain) NSNumber* idLocal;
-
-@end
+@implementation NSPasteboard (iMedia)
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Get all IMBObjects from the pasteboard...
+
+- (NSArray*) IMBObjects
+{
+	NSArray* items = self.pasteboardItems;
+	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:items.count];
+	
+	for (NSPasteboardItem* item in items)
+	{
+		NSData* data = [item dataForType:kIMBObjectPasteboardType];
+		IMBObject* object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+		if (object) [objects addObject:object];
+	}
+	
+	return (NSArray*) objects;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end
 

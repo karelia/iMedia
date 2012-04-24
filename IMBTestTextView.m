@@ -44,31 +44,44 @@
  */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark HEADERS
+
+
 #import "IMBTestTextView.h"
-#import "IMBObjectsPromise.h"
 #import "IMBTestAppDelegate.h"
+#import "NSPasteboard+iMedia.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 @implementation IMBTestTextView
 
-- (void) concludeDragOperation:(id <NSDraggingInfo>)sender
+- (void) concludeDragOperation:(id<NSDraggingInfo>)inSender
 {
-	[super concludeDragOperation:sender];
+	[super concludeDragOperation:inSender];
 	
-	//NSLog(@"Something was successfully dragged into my view");
+	// Get an array of IMBObjects from the dragging pasteboard...
 	
-	// Let's see what it is
+	NSPasteboard* pasteboard = [inSender draggingPasteboard];
+	NSArray* objects = [pasteboard IMBObjects];
+
+	// Tell the app delegate so that it can update its badge cache with these objects...
 	
-//	NSPasteboard* pboard = [sender draggingPasteboard];
-//	IMBObjectsPromise* objectsPromise = [IMBObjectsPromise promiseFromPasteboard:pboard];
-//	NSArray* objects = [objectsPromise objects];
-//	
-//	[(IMBTestAppDelegate*) draggingDelegate concludeDragOperationForObjects:objects];
+	[(IMBTestAppDelegate*) draggingDelegate concludeDragOperationForObjects:objects];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @end

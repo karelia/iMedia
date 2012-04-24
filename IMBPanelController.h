@@ -118,6 +118,11 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 - (void) loadControllers;
 - (IMBNodeViewController*) nodeViewControllerForMediaType:(NSString*)inMediaType;
 
+// Current view...
+
+- (NSString*) currentMediaType;
+- (IMBNodeViewController*) currentNodeViewController;
+
 // Persistence...
 
 - (void) saveStateToPreferences;

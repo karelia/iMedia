@@ -323,7 +323,7 @@
 	object.index = inIndex;
 	
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
-	object.imageLocation = nil;             // thumbnails will be created on the fly
+	object.imageLocation = nil;             // will be loaded lazily when needed
 	object.imageRepresentation = nil;		// will be loaded lazily when needed
 	object.metadata = nil;					// will be loaded lazily when needed
 	

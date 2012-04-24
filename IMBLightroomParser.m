@@ -107,6 +107,7 @@ static NSArray* sSupportedUTIs = nil;
 - (NSArray*) supportedUTIs;
 - (BOOL) canOpenImageFileAtPath:(NSString*)inPath;
 - (IMBObject*) objectWithPath:(NSString*)inPath
+					  idLocal:(NSNumber*)idLocal
 						 name:(NSString*)inName
 				  pyramidPath:(NSString*)inPyramidPath
 					 metadata:(NSDictionary*)inMetadata
@@ -355,7 +356,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSError* error = nil;
 	CGImageRef imageRepresentation = nil;
 	NSData *jpegData = [self previewDataForObject:inObject maximumSize:[NSNumber numberWithFloat:256.0]];
-	
+
 	if (jpegData != nil) {
 		CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
 		
@@ -404,10 +405,33 @@ static NSArray* sSupportedUTIs = nil;
 			}
 		}
 	}
-	
-	if (imageRepresentation == NULL) {
-		imageRepresentation = [super thumbnailFromLocalImageFileForObject:inObject error:&error];
+	else {
+		NSString* title = NSLocalizedStringWithDefaultValue(
+															@"IMB.IMBLightroomParser.ThumbnailNotAvailableTitle",
+															nil,
+															IMBBundle(),
+															@"Processed image not found.\n",
+															@"Message to export when Pyramid file is missing");
+		
+		NSString* description  = NSLocalizedStringWithDefaultValue(
+																   @"IMB.IMBLightroomParser.ThumbnailNotAvailableDescription",
+																   nil,
+																   IMBBundle(),
+																   @"Please launch Lightroom and select the menu command Library > Previews > Render 1:1 Previews.",
+																   @"Message to export when Pyramid file is missing");
+		
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+								  title, @"title",
+								  description, NSLocalizedDescriptionKey,
+								  nil];
+		
+		
+		inObject.error = [NSError errorWithDomain:kIMBErrorDomain code:kIMBErrorThumbnailNotAvailable userInfo:userInfo];
 	}
+	
+//	if (imageRepresentation == NULL) {
+//		imageRepresentation = [super thumbnailFromLocalImageFileForObject:inObject error:&error];
+//	}
 		 
 	if (outError) *outError = error;
 	return (id)imageRepresentation;
@@ -884,6 +908,7 @@ static NSArray* sSupportedUTIs = nil;
 				}
 				
 				IMBObject* object = [self objectWithPath:path
+												 idLocal:idLocal
 													name:name
 											 pyramidPath:pyramidPath
 												metadata:metadata
@@ -958,6 +983,7 @@ static NSArray* sSupportedUTIs = nil;
 				}
 				
 				IMBObject* object = [self objectWithPath:path
+												 idLocal:idLocal
 													name:name
 											 pyramidPath:pyramidPath
 												metadata:metadata
@@ -1010,6 +1036,7 @@ static NSArray* sSupportedUTIs = nil;
 // Create a new IMBObject with the specified properties...
 
 - (IMBObject*) objectWithPath:(NSString*)inPath
+					  idLocal:(NSNumber*)idLocal
 						 name:(NSString*)inName
 				  pyramidPath:(NSString*)inPyramidPath
 					 metadata:(NSDictionary*)inMetadata
@@ -1019,6 +1046,7 @@ static NSArray* sSupportedUTIs = nil;
 	NSString* absolutePyramidPath = (inPyramidPath != nil) ? [self.dataPath stringByAppendingPathComponent:inPyramidPath] : nil;
 
 	object.absolutePyramidPath = absolutePyramidPath;
+	object.idLocal = idLocal;
 	object.location = (id)inPath;
 	object.name = inName;
 	object.preliminaryMetadata = inMetadata;	// This metadata was in the XML file and is available immediately
@@ -1409,6 +1437,27 @@ static NSArray* sSupportedUTIs = nil;
 	}
 	
 	return rootPath;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Object Identifiers
+
+
+- (NSString*) identifierForObject:(IMBObject*)inObject
+{
+	NSString* identifier = [super identifierForObject:inObject];
+	
+	if ([inObject isKindOfClass:[IMBLightroomObject class]])
+	{
+		NSNumber* idLocal = [(IMBLightroomObject*)inObject idLocal];
+		identifier = [NSString stringWithFormat:@"%@/%@",identifier,idLocal];
+	}
+	
+	return identifier;
 }
 
 
