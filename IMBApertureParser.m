@@ -114,77 +114,71 @@
 }
 
 
+// Returns name of library
+
++ (NSString *)libraryName
+{
+    return @"Aperture";
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
 // Look at the iApps preferences file and find all iPhoto libraries. Create a parser instance for each libary...
 
-+ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
-{
-	NSMutableArray* parserInstances = [NSMutableArray array];
-
-	if ([self isInstalled])
-	{
-		CFArrayRef apertureLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.iApps");
-		NSArray* libraries = (NSArray*)apertureLibraries;
-
-		for (NSString* library in libraries)
-		{
-			NSURL* url = [NSURL URLWithString:library];
-			NSString* path = [url path];
-			BOOL changed;
-			(void) [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
-
-			IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-			parser.mediaSource = path;
-			parser.shouldDisplayLibraryName = libraries.count > 1;
-			[parserInstances addObject:parser];
-			[parser release];
-		}
-		
-		if (apertureLibraries) CFRelease(apertureLibraries);
-		
-		if ([parserInstances count] == 0) {
-			NSArray *keys = [NSArray arrayWithObjects:@"RKXMLExportManagerMode", @"LibraryPath", nil];
-			NSDictionary *preferences = (NSDictionary*) CFPreferencesCopyMultiple((CFArrayRef)keys, 
-																				   (CFStringRef)@"com.apple.Aperture", 
-																				   kCFPreferencesCurrentUser, 
-																				   kCFPreferencesAnyHost);
-			preferences = [NSMakeCollectable(preferences) autorelease];	
-
-			NSString *exportManagerMode = [preferences objectForKey:[keys objectAtIndex:0]];
-			NSString *libraryPath = [preferences objectForKey:[keys objectAtIndex:1]];
-			
-			if ((libraryPath != nil) && ([@"RKXMLExportManagerExportNeverKey" isEqual:exportManagerMode])) {
-				IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
-				parser.placeholderParser = YES;
-				parser.mediaSource = libraryPath;
-				parser.shouldDisplayLibraryName = NO;
-				[parserInstances addObject:parser];
-				[parser release];
-			}
-		}
-	}
-	
-	return parserInstances;
-}
-
+//+ (NSArray*) parserInstancesForMediaType:(NSString*)inMediaType
+//{
+//	NSMutableArray* parserInstances = [NSMutableArray array];
+//
+//	if ([self isInstalled])
+//	{
+//		CFArrayRef apertureLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.iApps");
+//		NSArray* libraries = (NSArray*)apertureLibraries;
+//
+//		for (NSString* library in libraries)
+//		{
+//			NSURL* url = [NSURL URLWithString:library];
+//			NSString* path = [url path];
+//			BOOL changed;
+//			(void) [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
+//
+//			IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+//			parser.mediaSource = path;
+//			parser.shouldDisplayLibraryName = libraries.count > 1;
+//			[parserInstances addObject:parser];
+//			[parser release];
+//		}
+//		
+//		if (apertureLibraries) CFRelease(apertureLibraries);
+//		
+//		if ([parserInstances count] == 0) {
+//			NSArray *keys = [NSArray arrayWithObjects:@"RKXMLExportManagerMode", @"LibraryPath", nil];
+//			NSDictionary *preferences = (NSDictionary*) CFPreferencesCopyMultiple((CFArrayRef)keys, 
+//																				   (CFStringRef)@"com.apple.Aperture", 
+//																				   kCFPreferencesCurrentUser, 
+//																				   kCFPreferencesAnyHost);
+//			preferences = [NSMakeCollectable(preferences) autorelease];	
+//
+//			NSString *exportManagerMode = [preferences objectForKey:[keys objectAtIndex:0]];
+//			NSString *libraryPath = [preferences objectForKey:[keys objectAtIndex:1]];
+//			
+//			if ((libraryPath != nil) && ([@"RKXMLExportManagerExportNeverKey" isEqual:exportManagerMode])) {
+//				IMBApertureParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
+//				parser.placeholderParser = YES;
+//				parser.mediaSource = libraryPath;
+//				parser.shouldDisplayLibraryName = NO;
+//				[parserInstances addObject:parser];
+//				[parser release];
+//			}
+//		}
+//	}
+//	
+//	return parserInstances;
+//}
+//
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) initWithMediaType:(NSString*)inMediaType
-{
-	if ((self = [super initWithMediaType:inMediaType]) != nil)
-	{
-		self.appPath = [[self class] aperturePath];
-		self.plist = nil;
-		self.modificationDate = nil;
-		self.version = 0;
-	}
-	
-	return self;
-}
 
 
 - (void) dealloc
@@ -208,7 +202,7 @@
 // The supplied node is a private copy which may be modified here in the background operation. Parse the 
 // iPhoto XML file and create subnodes as needed...
 
-- (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
+- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
 	NSDictionary* plist = self.plist;
@@ -226,36 +220,6 @@
 	}
 
 	if (outError) *outError = error;
-	return error == nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// When the parser is deselected, then get rid of the cached plist data. It will be loaded into memory lazily 
-// once it is needed again...
-
-- (void) didStopUsingParser
-{
-	@synchronized(self)
-	{
-		self.plist = nil;
-	}	
-}
-
-
-// When the XML file has changed then get rid of our cached plist...
-
-- (void) watchedPathDidChange:(NSString*)inWatchedPath
-{
-	if ([inWatchedPath isEqual:self.mediaSource])
-	{
-		@synchronized(self)
-		{
-			self.plist = nil;
-		}	
-	}
 }
 
 
@@ -303,7 +267,7 @@
 
 - (NSString*) identifierForId:(NSNumber*) inId inSpace:(NSString*) inIdSpace
 {
-	NSString* path = (NSString*) self.mediaSource;
+	NSString* path = [(NSURL *) self.mediaSource path];
 	NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
 	
 	NSString* nodePath = nil;
@@ -616,7 +580,7 @@
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method, 
 	// because without creating an array we would cause an endless loop...
 	
-	NSMutableArray* subNodes = [NSMutableArray array];
+	NSMutableArray* subNodes = [inParentNode mutableArrayForPopulatingSubnodes];
 
 	// Now parse the Aperture XML plist and look for albums whose parent matches our parent node. We are 
 	// only going to add subnodes that are direct children of inParentNode...
@@ -641,11 +605,11 @@
 			
 			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
 			
-			albumNode.leaf = [self isLeafAlbumType:albumType];
+			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
 			albumNode.icon = [self iconForAlbumType:albumType];
 			albumNode.name = albumName;
 			albumNode.mediaSource = self.mediaSource;
-			albumNode.parser = self;
+			albumNode.parserIdentifier = self.identifier;
 
 			// Keep a ref to the album dictionary for later use when we populate this node
 			// so we don't have to loop through the whole album list again to find it.
@@ -664,8 +628,6 @@
 		
 		[pool drain];
 	}
-	
-	inParentNode.subNodes = subNodes;
 }
 
 
@@ -720,7 +682,7 @@
 			
 				if (objectDict!=nil && [self shouldUseObject:mediaType])
 				{
-					NSString* imagePath = [objectDict objectForKey:@"ImagePath"];
+					NSString* path = [objectDict objectForKey:@"ImagePath"];
 					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [objectDict objectForKey:@"Caption"];
                     NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:objectDict];
@@ -731,15 +693,15 @@
 					[objects addObject:object];
 					[object release];
 
-					object.location = (id)imagePath;
+					object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
 					object.name = caption;
 					object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
 					object.metadata = nil;                              // Build lazily when needed (takes longer)
 					object.metadataDescription = nil;                   // Build lazily when needed (takes longer)
-					object.parser = self;
+					object.parserIdentifier = self.identifier;
 					object.index = index++;
 
-					object.imageLocation = (thumbPath!=nil) ? thumbPath : imagePath;
+					object.imageLocation = thumbPath ? [NSURL fileURLWithPath:thumbPath isDirectory:NO] : object.location;
 					object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 					object.imageRepresentation = nil;
 				}

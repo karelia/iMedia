@@ -74,6 +74,13 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// Returns name of library
+
++ (NSString *)libraryName
+{
+    return @"iPhoto";
+}
+
 
 - (id) init
 {
@@ -103,35 +110,6 @@
 
 
 #pragma mark 
-
-- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
-{
-	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(16.0,16.0)];
-		
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-	node.icon = icon;
-	node.name = @"iPhoto";
-	node.identifier = [self identifierForPath:@"/"];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
-	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
-	node.isLeafNode = NO;
-	
-	// JUST TEMP: remove these 2 lines later...
-	
-//	NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:self.mediaSource];
-//	node.attributes = plist;
-	
-	return node;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
 
 - (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
@@ -442,7 +420,9 @@
 		NSString* albumType = [albumDict objectForKey:@"Album Type"];
 		NSString* albumName = [albumDict objectForKey:@"AlbumName"];
 		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
+        
 		NSString* albumIdSpace = [self idSpaceForAlbumType:albumType];
+        
 		// parent always from same id space for non top-level albums
 		NSString* parentIdentifier = parentId ? [self identifierForId:parentId inSpace:albumIdSpace] : [self identifierForPath:@"/"];
 		

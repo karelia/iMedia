@@ -52,6 +52,7 @@
 #pragma mark HEADERS
 
 #import "IMBAppleMediaParser.h"
+#import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBNode.h"
 #import "IMBFaceNodeObject.h"
@@ -97,6 +98,35 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 @synthesize appPath = _appPath;
 @synthesize atomic_plist = _plist;
 @synthesize modificationDate = _modificationDate;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
+{
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16.0,16.0)];
+    
+	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	node.icon = icon;
+	node.name = [[self class] libraryName];
+	node.identifier = [self identifierForPath:@"/"];
+	node.mediaType = self.mediaType;
+	node.mediaSource = self.mediaSource;
+	node.groupType = kIMBGroupTypeLibrary;
+	node.parserIdentifier = self.identifier;
+	node.isTopLevelNode = YES;
+	node.isLeafNode = NO;
+	
+	// JUST TEMP: remove these 2 lines later...
+	
+    //	NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:self.mediaSource];
+    //	node.attributes = plist;
+	
+	return node;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -342,6 +372,20 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 #pragma mark -
 #pragma mark To be subclassed
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns name of library. Must be subclassed.
+
++ (NSString*) libraryName
+{
+    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+	NSLog(@"%@", errMsg);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
+	
+	return nil;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Create an identifier from the provided id and id space. An example is "IMBiPhotoParser://FaceId/17"...
