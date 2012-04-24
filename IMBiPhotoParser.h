@@ -62,13 +62,11 @@
 
 @interface IMBiPhotoParser : IMBAppleMediaParser
 {
-	NSString* _appPath;
 	BOOL _shouldDisplayLibraryName;
 	int _fakeAlbumID;					// for iPhoto2 compatibility
 	NSDateFormatter* _dateFormatter;
 }
 
-@property (retain) NSString* appPath;
 @property (assign) BOOL shouldDisplayLibraryName;
 @property (retain) NSDateFormatter* dateFormatter;
 

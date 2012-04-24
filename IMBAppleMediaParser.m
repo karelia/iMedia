@@ -94,6 +94,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 @implementation IMBAppleMediaParser
 
+@synthesize appPath = _appPath;
 @synthesize atomic_plist = _plist;
 @synthesize modificationDate = _modificationDate;
 

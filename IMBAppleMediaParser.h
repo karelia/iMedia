@@ -104,10 +104,12 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 
 @interface IMBAppleMediaParser : IMBParser /*<IMBSkimmableObjectViewControllerDelegate>*/
 {
+	NSString* _appPath;
 	NSDictionary* _plist;
 	NSDate* _modificationDate;
 }
 
+@property (retain) NSString* appPath;
 @property (retain,readonly) NSDictionary* plist;
 @property (retain,readonly) NSDate* modificationDate;
 

@@ -93,7 +93,6 @@
 @implementation IMBApertureParser
 
 @synthesize placeholderParser = _placeholderParser;
-@synthesize appPath = _appPath;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize version = _version;
 

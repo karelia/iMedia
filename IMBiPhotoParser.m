@@ -68,7 +68,6 @@
 
 @implementation IMBiPhotoParser
 
-@synthesize appPath = _appPath;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize dateFormatter = _dateFormatter;
 
