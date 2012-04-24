@@ -132,36 +132,6 @@
 
 
 #pragma mark 
-#pragma mark IKImageBrowserItem Protocol
-
-
-// Use the path to the pyramid file as the unique identifier...
-
-- (NSString*) identifier
-{
-	/*
-	NSString* absolutePyramidPath = self.absolutePyramidPath;
-	
-	if (absolutePyramidPath != nil) {
-		NSString* parserName = [[self.parserMessenger class] parserClassName];
-	
-		return [NSString stringWithFormat:@"%@:/%@", parserName, absolutePyramidPath];
-	}
-	
-	return [super identifier];
-	*/
-	
-	NSString* identifier = [super identifier];
-	
-	// Account for virtual copies
-	return [NSString stringWithFormat:@"%@/%@", identifier, self.idLocal];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
 #pragma mark QLPreviewItem Protocol 
 
 

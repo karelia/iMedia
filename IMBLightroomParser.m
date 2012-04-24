@@ -1442,6 +1442,27 @@ static NSArray* sSupportedUTIs = nil;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark 
+#pragma mark Object Identifiers
+
+
+- (NSString*) identifierForObject:(IMBObject*)inObject
+{
+	NSString* identifier = [super identifierForObject:inObject];
+	
+	if ([inObject isKindOfClass:[IMBLightroomObject class]])
+	{
+		NSNumber* idLocal = [(IMBLightroomObject*)inObject idLocal];
+		identifier = [NSString stringWithFormat:@"%@/%@",identifier,idLocal];
+	}
+	
+	return identifier;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 /*
 // For Lightroom we need a promise that splits the pyramid file
 - (IMBObjectsPromise*) objectPromiseWithObjects: (NSArray*) inObjects
