@@ -633,6 +633,25 @@ static IMBPanelController* sSharedPanelController = nil;
 
 
 #pragma mark 
+#pragma mark Current View
+
+
+- (NSString*) currentMediaType
+{
+	return ibTabView.selectedTabViewItem.identifier;
+}
+
+
+- (IMBNodeViewController*) currentNodeViewController
+{
+	return [self nodeViewControllerForMediaType:self.currentMediaType];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 #pragma mark NSTabViewDelegate
 
 
