@@ -604,47 +604,51 @@
 #pragma mark
 #pragma mark Dragging Delegate
 
+
 - (void) concludeDragOperationForObjects:(NSArray*)inObjects
 {
-	
 	for (IMBObject* object in inObjects)
 	{
-		[self.usedObjects setObject:object forKey:[object identifier]];
+		[self.usedObjects setObject:object forKey:object.identifier];
 	}
 	
-	[self.nodeViewController setObjectContainerViewNeedsDisplay:YES];
-
+	IMBNodeViewController* controller = [[IMBPanelController sharedPanelController] currentNodeViewController];
+	[controller setObjectContainerViewNeedsDisplay:YES];
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark -
 #pragma mark Helper
 
-- (CGImageRef) badgeForObject:(IMBObject*) inObject
+- (CGImageRef) badgeForObject:(IMBObject*)inObject
 {
 	static CGImageRef badgeImage = NULL;
 	
-	if ([[self usedObjects] valueForKey:[inObject identifier]])
+	if ([self.usedObjects valueForKey:inObject.identifier])
 	{
-		if (!badgeImage)
+		if (badgeImage == NULL)
 		{
 			NSString* imageName = @"badge_checkbox.png";
-			
 			NSString* path = [[NSBundle mainBundle] pathForResource:[imageName stringByDeletingPathExtension] ofType:[imageName pathExtension]];
-			if(path){
+
+			if(path)
+			{
 				CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
 				
 				if(imageSource)
 				{
 					badgeImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
 					CFRelease(imageSource);
-					[(id) badgeImage autorelease];
 				}
 			}
 		}
+		
 		return badgeImage;
-	} else {
+	} 
+	else
+	{
 		return NULL;
 	}
 }
@@ -654,6 +658,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 #pragma mark -
 #pragma mark Debugging Convenience
 
@@ -661,7 +666,8 @@
 
 /*!	Override debugDescription so it's easier to use the debugger.  Not compiled for non-debug versions.
  */
-@implementation NSDictionary ( OverrideDebug )
+ 
+@implementation NSDictionary (OverrideDebug)
 
 - (NSString *)debugDescription
 {
@@ -670,7 +676,8 @@
 
 @end
 
-@implementation NSArray ( OverrideDebug )
+
+@implementation NSArray (OverrideDebug)
 
 - (NSString *)debugDescription
 {
@@ -687,7 +694,8 @@
 
 @end
 
-@implementation NSSet ( OverrideDebug )
+
+@implementation NSSet (OverrideDebug)
 
 - (NSString *)debugDescription
 {
@@ -696,7 +704,8 @@
 
 @end
 
-@implementation NSData ( description )
+
+@implementation NSData (description)
 
 - (NSString *)description
 {
