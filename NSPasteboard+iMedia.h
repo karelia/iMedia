@@ -41,13 +41,13 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
- */
+*/
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Author: Jörg Jacobsen
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,33 +55,21 @@
 
 #pragma mark HEADERS
 
-
-#import "IMBTestTextView.h"
-#import "IMBTestAppDelegate.h"
-#import "NSPasteboard+iMedia.h"
+#import <Cocoa/Cocoa.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@implementation IMBTestTextView
+#pragma mark
 
-- (void) concludeDragOperation:(id<NSDraggingInfo>)inSender
-{
-	[super concludeDragOperation:inSender];
-	
-	// Get an array of IMBObjects from the dragging pasteboard...
-	
-	NSPasteboard* pasteboard = [inSender draggingPasteboard];
-	NSArray* objects = [pasteboard IMBObjects];
+@interface NSPasteboard (iMedia)
 
-	// Tell the app delegate so that it can update its badge cache with these objects...
-	
-	[(IMBTestAppDelegate*) draggingDelegate concludeDragOperationForObjects:objects];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+- (NSArray*) IMBObjects;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+

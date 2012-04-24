@@ -379,6 +379,8 @@
 		D0B779651047B65D00D12548 /* IMBFlickrParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B779631047B65D00D12548 /* IMBFlickrParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0B87F22103D998D00C48C6F /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B87F21103D998D00C48C6F /* iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0BE0A8C104802A7009AE844 /* IMBTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = D0BE0A8A104802A7009AE844 /* IMBTableView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0BF38B71546970900DC1FFC /* NSPasteboard+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0BF38B51546970900DC1FFC /* NSPasteboard+iMedia.h */; };
+		D0BF38B81546970900DC1FFC /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BF38B61546970900DC1FFC /* NSPasteboard+iMedia.m */; };
 		D0BF8C69103F32700014B3B7 /* IMBImageBrowserCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0C2DAA210240C0B001B1198 /* IMBImageObjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0C2DAA110240C0B001B1198 /* IMBImageObjectViewController.xib */; };
 		D0C2DAF21024178E001B1198 /* IMBObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0C2DAF01024178E001B1198 /* IMBObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -869,6 +871,8 @@
 		D0B87F21103D998D00C48C6F /* iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.h; sourceTree = "<group>"; };
 		D0BE0A8A104802A7009AE844 /* IMBTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTableView.h; sourceTree = "<group>"; };
 		D0BE0A8B104802A7009AE844 /* IMBTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTableView.m; sourceTree = "<group>"; };
+		D0BF38B51546970900DC1FFC /* NSPasteboard+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPasteboard+iMedia.h"; sourceTree = "<group>"; };
+		D0BF38B61546970900DC1FFC /* NSPasteboard+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPasteboard+iMedia.m"; sourceTree = "<group>"; };
 		D0BF8C67103F32700014B3B7 /* IMBImageBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageBrowserCell.h; sourceTree = "<group>"; };
 		D0BF8C68103F32700014B3B7 /* IMBImageBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageBrowserCell.m; sourceTree = "<group>"; };
 		D0C2DAA110240C0B001B1198 /* IMBImageObjectViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBImageObjectViewController.xib; sourceTree = "<group>"; };
@@ -1648,6 +1652,8 @@
 				CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */,
 				D0E69CD3151C5989002FE181 /* NSKeyedArchiver+iMedia.h */,
 				D0E69CD4151C5989002FE181 /* NSKeyedArchiver+iMedia.m */,
+				D0BF38B51546970900DC1FFC /* NSPasteboard+iMedia.h */,
+				D0BF38B61546970900DC1FFC /* NSPasteboard+iMedia.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -2009,6 +2015,7 @@
 				D024A31E15319CB4005B6C0A /* IMBAlertPopoverViewController.h in Headers */,
 				D024A32315319CCD005B6C0A /* IMBPopover.h in Headers */,
 				D006CFF81534084C00C53C23 /* IMBLightroom3or4Parser.h in Headers */,
+				D0BF38B71546970900DC1FFC /* NSPasteboard+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2646,6 +2653,7 @@
 				D024A31F15319CB4005B6C0A /* IMBAlertPopoverViewController.m in Sources */,
 				D024A32415319CCD005B6C0A /* IMBPopover.m in Sources */,
 				D006CFF91534084C00C53C23 /* IMBLightroom3or4Parser.m in Sources */,
+				D0BF38B81546970900DC1FFC /* NSPasteboard+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3357,7 +3365,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = iMediaTester.entitlements;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_OBJC_GC = unsupported;
 				INFOPLIST_FILE = "TestApp-Info.plist";
@@ -3378,7 +3385,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = iMediaTester.entitlements;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_OBJC_GC = unsupported;
 				INFOPLIST_FILE = "TestApp-Info.plist";

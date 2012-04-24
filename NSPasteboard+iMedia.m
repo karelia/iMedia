@@ -41,13 +41,13 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
- */
+*/
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Author: Jörg Jacobsen
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,29 +55,36 @@
 
 #pragma mark HEADERS
 
-
-#import "IMBTestTextView.h"
-#import "IMBTestAppDelegate.h"
 #import "NSPasteboard+iMedia.h"
+#import "IMBObject.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@implementation IMBTestTextView
+#pragma mark
 
-- (void) concludeDragOperation:(id<NSDraggingInfo>)inSender
+@implementation NSPasteboard (iMedia)
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Get all IMBObjects from the pasteboard...
+
+- (NSArray*) IMBObjects
 {
-	[super concludeDragOperation:inSender];
+	NSArray* items = self.pasteboardItems;
+	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:items.count];
 	
-	// Get an array of IMBObjects from the dragging pasteboard...
+	for (NSPasteboardItem* item in items)
+	{
+		NSData* data = [item dataForType:kIMBObjectPasteboardType];
+		IMBObject* object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+		if (object) [objects addObject:object];
+	}
 	
-	NSPasteboard* pasteboard = [inSender draggingPasteboard];
-	NSArray* objects = [pasteboard IMBObjects];
-
-	// Tell the app delegate so that it can update its badge cache with these objects...
-	
-	[(IMBTestAppDelegate*) draggingDelegate concludeDragOperationForObjects:objects];
+	return (NSArray*) objects;
 }
 
 
@@ -85,3 +92,4 @@
 
 
 @end
+
