@@ -97,7 +97,7 @@ return kIMBMediaTypeImage;
 
 #pragma mark 
 
-// Specify parameters for movie subclass and register it...
+// Specify parameters for video subclass and register it...
 
 @implementation IMBApertureVideoParserMessenger
 
@@ -116,6 +116,40 @@ return kIMBMediaTypeImage;
 + (NSString*) parserClassName
 {
 	return @"IMBApertureVideoParser";
+}
+
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.Aperture";
+}
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+// Specify parameters for video subclass and register it...
+
+@implementation IMBApertureAudioParserMessenger
+
++ (void) load
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+	[pool drain];
+}
+
++ (NSString*) mediaType
+{
+	return kIMBMediaTypeAudio;
+}
+
++ (NSString*) parserClassName
+{
+	return @"IMBApertureAudioParser";
 }
 
 + (NSString*) identifier

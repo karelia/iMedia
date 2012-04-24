@@ -73,3 +73,8 @@
 @end
 
 
+@interface IMBApertureAudioParserMessenger : IMBApertureParserMessenger
+
+@end
+
+
