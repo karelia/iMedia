@@ -193,14 +193,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
-#pragma mark Parser Methods
+#pragma mark -
+#pragma mark IMBParserProtocol
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-// The supplied node is a private copy which may be modified here in the background operation. Parse the 
-// iPhoto XML file and create subnodes as needed...
+//
 
 - (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
@@ -225,7 +222,9 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#pragma mark -
 
+//----------------------------------------------------------------------------------------------------------------------
 // Placeholder parsers provide their own custom header view...
 
 - (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode

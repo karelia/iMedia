@@ -166,32 +166,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
-{
-
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	return nil;
-}
-
-
-// Since we know that we have local files we can use the helper method supplied by the base class...
-
-- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	return [self bookmarkForLocalFileObject:inObject error:outError];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark 
 #pragma mark Helper Methods
 
@@ -241,6 +215,14 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Returns the identifier of the root node.
+
+- (NSString*) rootNodeIdentifier
+{
+    return [self identifierForPath:@"/"];
+}
 
 
 // Create an identifier from the AlbumID that is stored in the XML file. An example is "IMBiPhotoParser://AlbumId/17"...

@@ -82,6 +82,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 - (NSString*) imagePathForImageKey:(NSString*)inImageKey;
 - (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey;
 - (BOOL) supportsPhotoStreamFeatureInVersion:(NSString *)inVersion;
+- (NSString *) rootNodeIdentifier;
 
 @property (retain) NSDictionary* atomic_plist;
 @property (retain,readwrite) NSDate* modificationDate;
@@ -98,35 +99,6 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 @synthesize appPath = _appPath;
 @synthesize atomic_plist = _plist;
 @synthesize modificationDate = _modificationDate;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
-{
-	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(16.0,16.0)];
-    
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-	node.icon = icon;
-	node.name = [[self class] libraryName];
-	node.identifier = [self identifierForPath:@"/"];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
-	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
-	node.isLeafNode = NO;
-	
-	// JUST TEMP: remove these 2 lines later...
-	
-    //	NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:self.mediaSource];
-    //	node.attributes = plist;
-	
-	return node;
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -312,6 +284,68 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 
 #pragma mark -
+#pragma mark IMBParserProtocol
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
+{
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16.0,16.0)];
+    
+	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	node.icon = icon;
+	node.name = [[self class] libraryName];
+	node.identifier = [self rootNodeIdentifier];
+	node.mediaType = self.mediaType;
+	node.mediaSource = self.mediaSource;
+	node.groupType = kIMBGroupTypeLibrary;
+	node.parserIdentifier = self.identifier;
+	node.isTopLevelNode = YES;
+	node.isLeafNode = NO;
+	
+	// JUST TEMP: remove these 2 lines later...
+	
+    //	NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:self.mediaSource];
+    //	node.attributes = plist;
+	
+	return node;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+
+- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
+{
+    
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Since we know that we have local files we can use the helper method supplied by the base class...
+
+- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	return [self bookmarkForLocalFileObject:inObject error:outError];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark -
 #pragma mark IMBSkimmableObjectViewControllerDelegate
 
 - (NSUInteger) childrenCountOfNodeObject:(IMBNodeObject*)inNodeObject userInfo:(NSDictionary*)inUserInfo
@@ -378,6 +412,19 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 // Returns name of library. Must be subclassed.
 
 + (NSString*) libraryName
+{
+    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+	NSLog(@"%@", errMsg);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
+	
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the identifier of the root node. Must be subclassed.
+
+- (NSString*) rootNodeIdentifier
 {
     NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
 	NSLog(@"%@", errMsg);
