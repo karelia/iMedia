@@ -610,16 +610,19 @@
 			albumNode.mediaSource = self.mediaSource;
 			albumNode.parserIdentifier = self.identifier;
 
-			// Keep a ref to the album dictionary for later use when we populate this node
-			// so we don't have to loop through the whole album list again to find it.
-			
-			albumNode.attributes = albumDict;
-			
 			// Set the node's identifier. This is needed later to link it to the correct parent node...
 			
 			NSNumber* albumId = [albumDict objectForKey:@"AlbumId"];
 			albumNode.identifier = [self identifierForId:albumId inSpace:[self idSpaceForAlbumType:albumType]];
-
+            
+			// Keep a ref to the album dictionary for later use when we populate this node
+			// so we don't have to loop through the whole album list again to find it.
+			
+			albumNode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    albumDict, @"nodeSource",
+                                    [self nodeTypeForNode:albumNode], @"nodeType", nil];
+			
+			
 			// Add the new album node to its parent (inRootNode)...
 			
 			[subNodes addObject:albumNode];
@@ -667,7 +670,7 @@
 	// We saved a reference to the album dictionary when this node was created
 	// (ivar 'attributes') and now happily reuse it to save an outer loop (over album list) here.
 	
-	NSDictionary* albumDict = inNode.attributes;	
+	NSDictionary* albumDict = [inNode.attributes objectForKey:@"nodeSource"];
 
 		NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
 //			NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
