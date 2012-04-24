@@ -53,7 +53,6 @@
 #pragma mark HEADERS
 
 #import "IMBApertureVideoParser.h"
-#import "IMBParserController.h"
 #import "IMBObject.h"
 #import "NSDictionary+iMedia.h"
 #import "NSURL+iMedia.h"
@@ -77,19 +76,6 @@
 #pragma mark 
 
 @implementation IMBApertureVideoParser
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Register this parser, so that it gets automatically loaded...
-
-+ (void) load
-{
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[IMBParserController registerParserClass:self forMediaType:kIMBMediaTypeMovie];
-	[pool drain];
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------
