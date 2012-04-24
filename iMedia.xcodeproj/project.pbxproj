@@ -53,6 +53,8 @@
 		30FD644B1546A0C90036BDE2 /* IMBApertureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D635EB1035B4C500FF8631 /* IMBApertureParser.m */; };
 		30FD644C1546A0D00036BDE2 /* IMBApertureAudioParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0467BAF112C220F00C1AA4E /* IMBApertureAudioParser.m */; };
 		30FD644D1546A1070036BDE2 /* IMBApertureVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */; };
+		30FD64661546AF6E0036BDE2 /* NSPasteboard+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 30FD64641546AF6E0036BDE2 /* NSPasteboard+iMedia.h */; };
+		30FD64671546AF6E0036BDE2 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 30FD64651546AF6E0036BDE2 /* NSPasteboard+iMedia.m */; };
 		30FFEBFE150A0AA70009C1D0 /* com.karelia.imedia.iPhoto.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = 30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhoto.xpc */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		8F47B39110C416050013ED25 /* IMBOrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */; };
@@ -548,6 +550,8 @@
 		30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestFacesBackgroundLayer.m; sourceTree = "<group>"; };
 		30FD64451545833A0036BDE2 /* IMBApertureParserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBApertureParserMessenger.h; sourceTree = "<group>"; };
 		30FD64461545833A0036BDE2 /* IMBApertureParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBApertureParserMessenger.m; sourceTree = "<group>"; };
+		30FD64641546AF6E0036BDE2 /* NSPasteboard+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPasteboard+iMedia.h"; sourceTree = "<group>"; };
+		30FD64651546AF6E0036BDE2 /* NSPasteboard+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSPasteboard+iMedia.m"; sourceTree = "<group>"; };
 		30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhoto.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.iPhoto.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		30FFEBEE150A08DB0009C1D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		32DBCF5E0370ADEE00C91783 /* iMedia.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.pch; sourceTree = "<group>"; };
@@ -1653,6 +1657,8 @@
 		D099323410111A1600C527B7 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				30FD64641546AF6E0036BDE2 /* NSPasteboard+iMedia.h */,
+				30FD64651546AF6E0036BDE2 /* NSPasteboard+iMedia.m */,
 				D099324310111A2900C527B7 /* NSFileManager+iMedia.h */,
 				D099324410111A2900C527B7 /* NSFileManager+iMedia.m */,
 				D099324510111A2900C527B7 /* NSWorkspace+iMedia.h */,
@@ -2027,6 +2033,7 @@
 				D024A32315319CCD005B6C0A /* IMBPopover.h in Headers */,
 				D006CFF81534084C00C53C23 /* IMBLightroom3or4Parser.h in Headers */,
 				30FD64471545833A0036BDE2 /* IMBApertureParserMessenger.h in Headers */,
+				30FD64661546AF6E0036BDE2 /* NSPasteboard+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2668,6 +2675,7 @@
 				30FD644B1546A0C90036BDE2 /* IMBApertureParser.m in Sources */,
 				30FD644C1546A0D00036BDE2 /* IMBApertureAudioParser.m in Sources */,
 				30FD644D1546A1070036BDE2 /* IMBApertureVideoParser.m in Sources */,
+				30FD64671546AF6E0036BDE2 /* NSPasteboard+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
