@@ -48,6 +48,11 @@
 		30E7771F1511055900413AEF /* SBUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E7771D1511055800413AEF /* SBUtilities.m */; };
 		30F90B2F13584FE700D13233 /* IMBAppleMediaParserOld.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B2D13584FE700D13233 /* IMBAppleMediaParserOld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30F90B331358501A00D13233 /* IMBFaceObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		30FD64471545833A0036BDE2 /* IMBApertureParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = 30FD64451545833A0036BDE2 /* IMBApertureParserMessenger.h */; };
+		30FD64481545833A0036BDE2 /* IMBApertureParserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = 30FD64461545833A0036BDE2 /* IMBApertureParserMessenger.m */; };
+		30FD644B1546A0C90036BDE2 /* IMBApertureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D635EB1035B4C500FF8631 /* IMBApertureParser.m */; };
+		30FD644C1546A0D00036BDE2 /* IMBApertureAudioParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0467BAF112C220F00C1AA4E /* IMBApertureAudioParser.m */; };
+		30FD644D1546A1070036BDE2 /* IMBApertureVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */; };
 		30FFEBFE150A0AA70009C1D0 /* com.karelia.imedia.iPhoto.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = 30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhoto.xpc */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		8F47B39110C416050013ED25 /* IMBOrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */; };
@@ -541,6 +546,8 @@
 		30F90B361358521300D13233 /* IMBTestFaceBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestFaceBrowserCell.m; sourceTree = "<group>"; };
 		30F90B371358521300D13233 /* IMBTestFacesBackgroundLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestFacesBackgroundLayer.h; sourceTree = "<group>"; };
 		30F90B381358521300D13233 /* IMBTestFacesBackgroundLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestFacesBackgroundLayer.m; sourceTree = "<group>"; };
+		30FD64451545833A0036BDE2 /* IMBApertureParserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBApertureParserMessenger.h; sourceTree = "<group>"; };
+		30FD64461545833A0036BDE2 /* IMBApertureParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBApertureParserMessenger.m; sourceTree = "<group>"; };
 		30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhoto.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.karelia.imedia.iPhoto.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		30FFEBEE150A08DB0009C1D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		32DBCF5E0370ADEE00C91783 /* iMedia.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iMedia.pch; sourceTree = "<group>"; };
@@ -1191,6 +1198,19 @@
 			path = XPCKit/XPCKit/ThirdParty/SandBoxingKit;
 			sourceTree = "<group>";
 		};
+		30FD644A154587ED0036BDE2 /* Apple */ = {
+			isa = PBXGroup;
+			children = (
+				303FFD6D152CBC690026B8CF /* IMBAppleMediaParserMessenger.h */,
+				303FFD6E152CBC690026B8CF /* IMBAppleMediaParserMessenger.m */,
+				D0E96C2915122F86004F3EE7 /* IMBAppleMediaParser.h */,
+				D0E96C2A15122F86004F3EE7 /* IMBAppleMediaParser.m */,
+				8FCA063F12368367009072AE /* Aperture */,
+				D0CB9166150F59CE007716FA /* iPhoto */,
+			);
+			name = Apple;
+			sourceTree = "<group>";
+		};
 		30FFEBED150A08DB0009C1D0 /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1213,6 +1233,8 @@
 		8FCA063F12368367009072AE /* Aperture */ = {
 			isa = PBXGroup;
 			children = (
+				30FD64451545833A0036BDE2 /* IMBApertureParserMessenger.h */,
+				30FD64461545833A0036BDE2 /* IMBApertureParserMessenger.m */,
 				D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */,
 				D0D635EB1035B4C500FF8631 /* IMBApertureParser.m */,
 				D0467BAE112C220F00C1AA4E /* IMBApertureAudioParser.h */,
@@ -1594,8 +1616,7 @@
 				D09930C01010F6C100C527B7 /* IMBParser.h */,
 				D09930C11010F6C100C527B7 /* IMBParser.m */,
 				D0CB9165150F59BD007716FA /* Folders */,
-				D0CB9166150F59CE007716FA /* iPhoto */,
-				8FCA063F12368367009072AE /* Aperture */,
+				30FD644A154587ED0036BDE2 /* Apple */,
 				D02E53C510A5558800B205BD /* Lightroom */,
 				D0F2DDB4152473500059DF8D /* iTunes */,
 				D0B6FAA21043227A00280DDC /* GarageBand */,
@@ -1716,8 +1737,6 @@
 				30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */,
 				303FFD74152CBD000026B8CF /* IMBFaceNodeObject.h */,
 				303FFD75152CBD000026B8CF /* IMBFaceNodeObject.m */,
-				303FFD6D152CBC690026B8CF /* IMBAppleMediaParserMessenger.h */,
-				303FFD6E152CBC690026B8CF /* IMBAppleMediaParserMessenger.m */,
 				D0CB9167150F5A52007716FA /* IMBiPhotoParserMessenger.h */,
 				D0CB9168150F5A52007716FA /* IMBiPhotoParserMessenger.m */,
 				D0CB9174150F7753007716FA /* IMBiPhotoParser.h */,
@@ -1726,8 +1745,6 @@
 				D0CB916C150F75AE007716FA /* IMBiPhotoImageParser.m */,
 				D0CB916D150F75AE007716FA /* IMBiPhotoMovieParser.h */,
 				D0CB916E150F75AE007716FA /* IMBiPhotoMovieParser.m */,
-				D0E96C2915122F86004F3EE7 /* IMBAppleMediaParser.h */,
-				D0E96C2A15122F86004F3EE7 /* IMBAppleMediaParser.m */,
 				D0CB918D1510A23D007716FA /* com.karelia.imedia.iPhoto.entitlements */,
 				D0CB9173150F7714007716FA /* Old */,
 			);
@@ -2009,6 +2026,7 @@
 				D024A31E15319CB4005B6C0A /* IMBAlertPopoverViewController.h in Headers */,
 				D024A32315319CCD005B6C0A /* IMBPopover.h in Headers */,
 				D006CFF81534084C00C53C23 /* IMBLightroom3or4Parser.h in Headers */,
+				30FD64471545833A0036BDE2 /* IMBApertureParserMessenger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2646,6 +2664,10 @@
 				D024A31F15319CB4005B6C0A /* IMBAlertPopoverViewController.m in Sources */,
 				D024A32415319CCD005B6C0A /* IMBPopover.m in Sources */,
 				D006CFF91534084C00C53C23 /* IMBLightroom3or4Parser.m in Sources */,
+				30FD64481545833A0036BDE2 /* IMBApertureParserMessenger.m in Sources */,
+				30FD644B1546A0C90036BDE2 /* IMBApertureParser.m in Sources */,
+				30FD644C1546A0D00036BDE2 /* IMBApertureAudioParser.m in Sources */,
+				30FD644D1546A1070036BDE2 /* IMBApertureVideoParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3357,7 +3379,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = iMediaTester.entitlements;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_OBJC_GC = unsupported;
 				INFOPLIST_FILE = "TestApp-Info.plist";
@@ -3378,7 +3399,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = iMediaTester.entitlements;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_OBJC_GC = unsupported;
 				INFOPLIST_FILE = "TestApp-Info.plist";
