@@ -178,6 +178,13 @@ return kIMBMediaTypeImage;
 	return @"com.apple.Aperture";
 }
 
+// Returns the key for Aperture libraries in com.apple.iApps
+
++ (NSString *) librariesKey
+{
+	return @"ApertureLibraries";
+}
+
 
 // Returns the list of parsers this messenger instantiated
 

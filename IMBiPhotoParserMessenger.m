@@ -149,6 +149,12 @@
 	return @"com.apple.iPhoto";
 }
 
+// Returns the key for iPhoto libraries in com.apple.iApps
+
++ (NSString *) librariesKey
+{
+	return @"iPhotoRecentDatabases";
+}
 
 // Returns the list of parsers this messenger instantiated
 

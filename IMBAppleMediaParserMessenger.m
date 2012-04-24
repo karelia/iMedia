@@ -99,6 +99,18 @@
 }
 
 
+// Returns the key for (iPhoto/Aperture) libraries in com.apple.iApps. Must be subclassed.
+
++ (NSString *) librariesKey
+{
+    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+	NSLog(@"%@", errMsg);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
+	
+	return nil;
+}
+
+
 // Check if App is installed (iPhoto or Aperture)
 
 + (NSString*) appPath
@@ -146,12 +158,13 @@
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-    NSMutableArray *parsers = [[self class] parsers];
-    dispatch_once([[self class] onceTokenRef],
+    Class messengerClass = [self class];
+    NSMutableArray *parsers = [messengerClass parsers];
+    dispatch_once([messengerClass onceTokenRef],
                   ^{
-                      if ([[self class] isInstalled])
+                      if ([messengerClass isInstalled])
                       {
-                          CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
+                          CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)[messengerClass librariesKey],(CFStringRef)@"com.apple.iApps");
                           NSArray* libraries = (NSArray*)recentLibraries;
                           
                           for (NSString* library in libraries)
@@ -169,7 +182,7 @@
                                   parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
                                   parser.mediaType = self.mediaType;
                                   parser.mediaSource = [NSURL fileURLWithPath:path];
-                                  parser.appPath = [[self class ] appPath];
+                                  parser.appPath = [messengerClass appPath];
                                   
                                   [parsers addObject:parser];
                                   [parser release];
