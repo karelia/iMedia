@@ -151,6 +151,35 @@ static dispatch_once_t sOnceToken = 0;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Returns the bundle identifier of iPhoto
+
++ (NSString *) bundleIdentifier
+{
+	return @"com.apple.iPhoto";
+}
+
+
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    return parsers;
+}
+
+
+// Returns the dispatch-once token
+
++ (dispatch_once_t *)onceTokenRef
+{
+    static dispatch_once_t onceToken = 0;
+    
+    return &onceToken;
+}
+
+
 - (id) init
 {
 	if ((self = [super init]))
@@ -167,72 +196,6 @@ static dispatch_once_t sOnceToken = 0;
 - (void) dealloc
 {
 	[super dealloc];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Check if iPhoto is installed...
-
-- (NSString*) iPhotoPath
-{
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iPhoto"];
-}
-
-
-- (BOOL) isInstalled
-{
-	return [self iPhotoPath] != nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This method is called on the XPC service side. Discover the path to the AlbumData.xml file and create  
-// an IMBParser instance preconfigured with that path...
-
-- (NSArray*) parserInstancesWithError:(NSError**)outError
-{
-    dispatch_once(&sOnceToken,
-    ^{
-        if ([self isInstalled])
-        {
-            CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
-            NSArray* libraries = (NSArray*)recentLibraries;
-			sParsers = [[NSMutableArray alloc] initWithCapacity:libraries.count];
-            
-            for (NSString* library in libraries)
-            {
-                NSURL* url = [NSURL URLWithString:library];
-                NSString* path = [url path];
-                BOOL changed;
-                
-                if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
-                {
-                    // Create a parser instance preconfigure with that path...
-                    
-                    IMBiPhotoParser* parser = (IMBiPhotoParser*)[self newParser];
-                    
-                    parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
-                    parser.mediaType = self.mediaType;
-                    parser.mediaSource = [NSURL fileURLWithPath:path];
-                    parser.appPath = self.iPhotoPath;
-                    
-                    [sParsers addObject:parser];
-                    [parser release];
-                    
-                    // Exclude enclosing folder from being displayed by IMBFolderParser...
-                    
-                    NSString* libraryPath = [path stringByDeletingLastPathComponent];
-                    [IMBConfig registerLibraryPath:libraryPath];
-                }
-            }
-        }
-	});
-	
-	return (NSArray*)sParsers;
 }
 
 

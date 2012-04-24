@@ -49,6 +49,10 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#import "SBUtilities.h"
+#import "NSWorkspace+iMedia.h"
+#import "NSFileManager+iMedia.h"
+#import "IMBConfig.h"
 #import "IMBAppleMediaParserMessenger.h"
 #import "IMBAppleMediaParser.h"
 #import "IMBNode.h"
@@ -57,6 +61,56 @@
 
 
 @implementation IMBAppleMediaParserMessenger
+
+
+// Returns the list of parsers this messenger instantiated. Array should be static. Must be subclassed.
+
++ (NSMutableArray *)parsers
+{
+    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+	NSLog(@"%@", errMsg);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
+	
+	return nil;
+}
+
+// Returns the dispatch-once token. Token must be static. Must be subclassed.
+
++ (dispatch_once_t *)onceTokenRef
+{
+    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+	NSLog(@"%@", errMsg);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
+	
+	return 0;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+// Returns the bundle identifier of the associated app. Must be subclassed.
+
++ (NSString *) bundleIdentifier
+{
+    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+	NSLog(@"%@", errMsg);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
+	
+	return nil;
+}
+
+
+// Check if App is installed (iPhoto or Aperture)
+
++ (NSString*) appPath
+{
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:[self bundleIdentifier]];
+}
+
+
++ (BOOL) isInstalled
+{
+	return [self appPath] != nil;
+}
 
 
 + (BOOL) isEventsNode:(IMBNode *)inNode
@@ -68,6 +122,68 @@
 + (BOOL) isFacesNode:(IMBNode *)inNode
 {
     return [[inNode.attributes objectForKey:@"nodeType"] isEqual:kIMBiPhotoNodeObjectTypeFace];
+}
+
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		self.mediaSource = nil;	// Will be discovered in XPC service
+		self.mediaType = [[self class] mediaType];
+		self.isUserAdded = NO;
+	}
+	
+	return self;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This method is called on the XPC service side. Discover the path to the AlbumData.xml file and create  
+// an IMBParser instance preconfigured with that path...
+
+- (NSArray*) parserInstancesWithError:(NSError**)outError
+{
+    NSMutableArray *parsers = [[self class] parsers];
+    dispatch_once([[self class] onceTokenRef],
+                  ^{
+                      if ([[self class] isInstalled])
+                      {
+                          CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
+                          NSArray* libraries = (NSArray*)recentLibraries;
+                          
+                          for (NSString* library in libraries)
+                          {
+                              NSURL* url = [NSURL URLWithString:library];
+                              NSString* path = [url path];
+                              BOOL changed;
+                              
+                              if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
+                              {
+                                  // Create a parser instance preconfigure with that path...
+                                  
+                                  IMBAppleMediaParser* parser = (IMBAppleMediaParser*)[self newParser];
+                                  
+                                  parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
+                                  parser.mediaType = self.mediaType;
+                                  parser.mediaSource = [NSURL fileURLWithPath:path];
+                                  parser.appPath = [[self class ] appPath];
+                                  
+                                  [parsers addObject:parser];
+                                  [parser release];
+                                  
+                                  // Exclude enclosing folder from being displayed by IMBFolderParser...
+                                  
+                                  NSString* libraryPath = [path stringByDeletingLastPathComponent];
+                                  [IMBConfig registerLibraryPath:libraryPath];
+                              }
+                          }
+                      }
+                  });
+	
+	return (NSArray*)parsers;
 }
 
 
