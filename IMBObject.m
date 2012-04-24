@@ -131,6 +131,8 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @synthesize location = _location;
 @synthesize atomic_bookmark = _bookmark;
 @synthesize name = _name;
+@synthesize identifier = _identifier;
+
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
 @synthesize metadataDescription = _metadataDescription;
@@ -178,6 +180,8 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	IMBRelease(_location);
 	IMBRelease(_bookmark);
 	IMBRelease(_name);
+	IMBRelease(_identifier);
+	
 	IMBRelease(_preliminaryMetadata);
 	IMBRelease(_metadata);
 	IMBRelease(_metadataDescription);
@@ -206,11 +210,13 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.location = [coder decodeObjectForKey:@"location"];
 		self.atomic_bookmark = [coder decodeObjectForKey:@"bookmark"];
 		self.name = [coder decodeObjectForKey:@"name"];
+		self.identifier = [coder decodeObjectForKey:@"identifier"];
+		self.error = [inCoder decodeObjectForKey:@"error"];
+
 		self.preliminaryMetadata = [coder decodeObjectForKey:@"preliminaryMetadata"];
 		self.metadata = [coder decodeObjectForKey:@"metadata"];
 		self.metadataDescription = [coder decodeObjectForKey:@"metadataDescription"];
 		self.parserIdentifier = [coder decodeObjectForKey:@"parserIdentifier"];
-		self.error = [inCoder decodeObjectForKey:@"error"];
 
 		self.index = [coder decodeIntegerForKey:@"index"];
 		self.shouldDrawAdornments = [coder decodeBoolForKey:@"shouldDrawAdornments"];
@@ -242,11 +248,13 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeObject:self.location forKey:@"location"];
 	[coder encodeObject:self.bookmark forKey:@"bookmark"];
 	[coder encodeObject:self.name forKey:@"name"];
+	[coder encodeObject:self.identifier forKey:@"identifier"];
+	[coder encodeObject:self.error forKey:@"error"];
+
 	[coder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
 	[coder encodeObject:self.metadata forKey:@"metadata"];
 	[coder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
 	[coder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
-	[coder encodeObject:self.error forKey:@"error"];
 
 	[coder encodeInteger:self.index forKey:@"index"];
 	[coder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
@@ -281,13 +289,15 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	copy.location = self.location;
 	copy.atomic_bookmark = self.bookmark;
 	copy.name = self.name;
+	copy.identifier = self.identifier;
+	copy.error = self.error;
+
 	copy.preliminaryMetadata = self.preliminaryMetadata;
 	copy.metadata = self.metadata;
 	copy.metadataDescription = self.metadataDescription;
 
 	copy.parserIdentifier = self.parserIdentifier;
 	copy.parserMessenger = self.parserMessenger;
-	copy.error = self.error;
 	
     copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
@@ -419,38 +429,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	}
 	
 	return icon;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This identifier string (just like IMBNode.identifier) can be used to uniquely identify an IMBObject. This can
-// be of use to host app developers who needs to cache usage info of media files in some dictionary when implementing
-// the badging delegate API. Simply using the path of a local file may not be reliable in those cases where a file
-// originated from a remote source and first had to be downloaded. For this reason using the identifier as a key
-// is more reliable...
-
- 
-- (NSString*) identifier
-{
-	NSString* parserName = [[self.parserMessenger class] parserClassName];
-	NSString* location = nil;
-	
-	if ([self.location isKindOfClass:[NSString class]])
-	{
-		location = (NSString*)self.location;
-	}
-	else if ([self.location isKindOfClass:[NSURL class]])
-	{
-		location = [(NSURL*)self.location path];
-	}
-	else
-	{
-		location = [self.location description];
-	}
-
-	return [NSString stringWithFormat:@"%@:/%@",parserName,location];
 }
 
 
@@ -605,67 +583,34 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 #pragma mark NSPasteboard Protocols
 
 
-// Writing to the pasteboard...
-
-- (NSArray*) writableTypesForPasteboard:(NSPasteboard*)inPasteboard
-{
-    return [NSArray arrayWithObjects:
-		kIMBObjectPasteboardType,
-		kUTTypeFileURL, 
-		nil]; 
-}
-
-
-- (NSPasteboardWritingOptions) writingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
-{
-	return NSPasteboardWritingPromised;
-}
-
-
-- (id) pasteboardPropertyListForType:(NSString*)inType
-{
-    if ([inType isEqualToString:kIMBObjectPasteboardType])
-	{
-        return [NSKeyedArchiver archivedDataWithRootObject:self];
-    }
-//	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
-//	{
-//		return self.URL;
-//	}
-	
-    return nil;
-}
-
-
 - (void) pasteboard:(NSPasteboard*)inPasteboard item:(NSPasteboardItem*)inItem provideDataForType:(NSString*)inType
 {
+	// For IMBObjects simply use self...
+	
     if ([inType isEqualToString:(NSString*)kIMBObjectPasteboardType])
 	{
-	
+		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:self];
+		[inItem setData:data forType:(NSString*)kIMBObjectPasteboardType];
 	}
+	
+	// Request the bookmark. Since this is an asynchronous operation - but we need to return with a result
+	// synchronously, we'll wrap the whole thing in a dispatch_sync on a background queue and wait for the 
+	// result there. Please note that it is important to use a concurrent background queue. We cannot do this
+	// on the main queue, or the completion block of requestBookmarkWithCompletionBlock: would never fire.
+	// Once we have the bookmark, we cn resolve it to a URL (thus punching a hole in the sandbox) and return it...
+	
 	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
 	{
-        // Must use concurrent queue (main queue is serial) to get bookmark and wait for that bookmark
-        // at the same time (must wait since getting a bookmark is always asynchronous)
-        
 		dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
 		{
 			[self requestBookmarkWithCompletionBlock:^(NSError* inError)
 			{
-				if (inError)
-				{
-					[NSApp presentError:inError];
-				}
-				else
-				{
-					NSURL* url = [self URLByResolvingBookmark];
-					if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
-				}
+				if (inError) [NSApp presentError:inError];
 			}];
             
-            // Wait in one thread of queue until bookmark is set from other thread of same queue
-            
             [self waitForBookmark];
+			NSURL* url = [self URLByResolvingBookmark];
+			if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
 		});
 	}
 }
@@ -674,39 +619,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 - (void) pasteboardFinishedWithDataProvider:(NSPasteboard*)inPasteboard
 {
 
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Reading from the pasteboard...
-
-+ (NSArray*) readableTypesForPasteboard:(NSPasteboard*)inPasteboard
-{
-    static NSArray* readableTypes = nil;
-	
-    if (readableTypes == nil)
-	{
-        readableTypes = [[NSArray alloc] initWithObjects:kIMBObjectPasteboardType,kUTTypeFileURL,nil];
-    }
-	
-    return readableTypes;
-}
-
-
-+ (NSPasteboardReadingOptions) readingOptionsForType:(NSString*)inType pasteboard:(NSPasteboard*)inPasteboard
-{
-    if ([inType isEqualToString:kIMBObjectPasteboardType])
-	{
-        return NSPasteboardReadingAsKeyedArchive;
-    }
-    else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
-	{
-        return NSPasteboardReadingAsString;
-    }
-	
-    return 0;
 }
 
 

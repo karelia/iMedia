@@ -78,11 +78,12 @@ extern NSString* kIMBObjectPasteboardType;
 // IMBObject encapsulates information about a single media item (e.g. image file or audio file). The location 
 // property uniquely identifies the item. In the case of files it could be a path or NSURL...
 
-@interface IMBObject : NSObject <NSCopying,NSCoding,IMBImageItem,NSPasteboardWriting,NSPasteboardReading,NSPasteboardItemDataProvider,QLPreviewItem>
+@interface IMBObject : NSObject <NSCopying,NSCoding,IMBImageItem,QLPreviewItem,NSPasteboardItemDataProvider>
 {
 	id _location;												
 	NSData* _bookmark;
 	NSString* _name;
+	NSString* _identifier;
 	
 	NSDictionary* _preliminaryMetadata;
 	NSDictionary* _metadata;
@@ -107,7 +108,7 @@ extern NSString* kIMBObjectPasteboardType;
 @property (retain) id location;								// Path, URL, or other location info
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
-@property (readonly) NSString* identifier;					// Unique identifier for this object
+@property (retain) NSString* identifier;					// Unique identifier for this object
 
 @property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
 @property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
