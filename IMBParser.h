@@ -130,6 +130,7 @@
 // Helpers for subclasses...
 
 - (NSString*) identifierForPath:(NSString*)inPath;
+- (NSString*) identifierForObject:(IMBObject*)inObject;
 - (NSImage*) iconForPath:(NSString*)inPath;
 
 - (CGImageRef) thumbnailFromLocalImageFileForObject:(IMBObject*)inObject error:(NSError**)outError;

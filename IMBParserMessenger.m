@@ -68,6 +68,7 @@
 
 //@interface IMBParserMessenger ()
 //- (void) _setParserIdentifier:(IMBParser*)inParser onNodeTree:(IMBNode*)inNode;
+//- (void) _setObjectIdentifierWithParser:(IMBParser*)inParser onNodeTree:(IMBNode*)inNode;
 //@end
 
 
@@ -274,7 +275,7 @@
 			if (error == nil)
 			{
 				IMBNode* node = [parser unpopulatedTopLevelNode:&error];
-				[self _setParserIdentifier:parser onNodeTree:node];
+				[self _setParserIdentifierWithParser:parser onNodeTree:node];
 				if (node) [topLevelNodes addObject:node];
 			}
 		}
@@ -289,7 +290,8 @@
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	[parser populateNode:inNode error:outError];
-	[self _setParserIdentifier:parser onNodeTree:inNode];
+	[self _setParserIdentifierWithParser:parser onNodeTree:inNode];
+	[self _setObjectIdentifierWithParser:parser onNodeTree:inNode];
 	return inNode;
 }
 
@@ -298,7 +300,8 @@
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	IMBNode* node = [parser reloadNodeTree:inNode error:outError];
-	[self _setParserIdentifier:parser onNodeTree:node];
+	[self _setParserIdentifierWithParser:parser onNodeTree:node];
+	[self _setObjectIdentifierWithParser:parser onNodeTree:inNode];
 	return node;
 }
 
@@ -307,7 +310,7 @@
 // we'll use the following helper method to make sure of that and remove the burden from the parser developers.
 // Simply call this method on any node that we get from a IMBParser instance...
 
-- (void) _setParserIdentifier:(IMBParser*)inParser onNodeTree:(IMBNode*)inNode
+- (void) _setParserIdentifierWithParser:(IMBParser*)inParser onNodeTree:(IMBNode*)inNode
 {
 	if (inNode)
 	{
@@ -322,7 +325,27 @@
 		
 		for (IMBNode* subnode in inNode.subnodes)
 		{
-			[self _setParserIdentifier:inParser onNodeTree:subnode];
+			[self _setParserIdentifierWithParser:inParser onNodeTree:subnode];
+		}
+	}
+}
+
+
+// Having object.identifier is also essential, so we should rely on the parser developer to do this. We'll
+// use the following helper method to make sure of that and remove the burden from the parser developers...
+
+- (void) _setObjectIdentifierWithParser:(IMBParser*)inParser onNodeTree:(IMBNode*)inNode 
+{
+	if (inNode)
+	{
+		for (IMBObject* object in inNode.objects)
+		{
+			object.identifier = [inParser identifierForObject:object];
+		}
+		
+		for (IMBNode* subnode in inNode.subnodes)
+		{
+			[self _setObjectIdentifierWithParser:inParser onNodeTree:subnode];
 		}
 	}
 }
