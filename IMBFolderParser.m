@@ -207,8 +207,6 @@
         
         // Get some info about the file or folder...
         
-        NSString* path = [url path];
-        
         // Errors at this level are not critical enough to pass up to the user. Doing so 
         // would cause e.g. a single unreadable folder in the middle of a huge list to cause 
         // the entire list to be hidden because of the failure of this method.
@@ -231,6 +229,7 @@
         // If we found a folder (that is not a package, then remember it for later. Folders will be added
         // after regular files...
         
+        NSString* path = [url path];
         if ([isDirectory boolValue] && ![isPackage boolValue])
         {
             if (![IMBConfig isLibraryPath:path])
