@@ -354,7 +354,7 @@
 		
 		// Start playing it...
 		
-		if (error == nil)
+		if (movie)
 		{
 			[movie gotoBeginning];
 			[movie play];
@@ -366,7 +366,7 @@
 		
 		// Handle errors...
 		
-		if (error)
+		else
 		{
 			[NSApp presentError:error];
 		}
