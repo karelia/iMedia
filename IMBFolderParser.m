@@ -136,7 +136,7 @@
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 
-	NSUInteger countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
+	NSUInteger countOfSubfolders = [[self countOfSubfoldersInFolder:url error:&error] unsignedIntegerValue];
 
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	node.icon = [self iconForPath:path];
@@ -261,8 +261,8 @@
         
         NSString* path = [url path];
         NSString* name = [fileManager displayNameAtPath:path];
-        NSUInteger countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
-        if (error) break;
+        NSNumber *countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
+        if (!countOfSubfolders) break;
         
         IMBNode* subnode = [[IMBNode alloc] init];
         subnode.icon = [self iconForPath:path];
@@ -272,7 +272,7 @@
         subnode.mediaSource = url;
         subnode.parserIdentifier = self.identifier;
         subnode.isTopLevelNode = NO;
-        subnode.isLeafNode = countOfSubfolders == 0;
+        subnode.isLeafNode = [countOfSubfolders unsignedIntegerValue] == 0;
         subnode.groupType = kIMBGroupTypeFolder;
         subnode.isIncludedInPopup = NO;
         subnode.watchedPath = path;					// These two lines are important to make file watching work for nested 
@@ -339,39 +339,34 @@
 
 // Return the number of (visible) subfolders in a given folder...
 
-- (NSUInteger) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError
+- (NSNumber *) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
-	NSUInteger count = 0;
-	
 	NSArray* urls = [fileManager contentsOfDirectoryAtURL:
 		inFolderURL 
 		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
-		options:NSDirectoryEnumerationSkipsHiddenFiles 
-		error:&error];
+                                                  options:NSDirectoryEnumerationSkipsHiddenFiles 
+                                                    error:outError];
+    
+	if (!urls) return nil;
+	
+	NSUInteger count = 0;
+	for (NSURL* url in urls)
+    {
+        NSNumber* folder = nil;
+        if (![url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:outError]) return nil;
+        
+        NSNumber* package = nil;
+        if (![url getResourceValue:&package forKey:NSURLIsPackageKey error:outError]) return nil;
+        
+        if ([folder boolValue]==YES && [package boolValue]==NO)
+        {
+            count++;
+        }
+    }
 
-	if (error == nil)
-	{
-		for (NSURL* url in urls)
-		{
-			NSNumber* folder = nil;
-			[url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:&error];
-			if (error) break;
-
-			NSNumber* package = nil;
-			[url getResourceValue:&package forKey:NSURLIsPackageKey error:&error];
-			if (error) break;
-			
-			if ([folder boolValue]==YES && [package boolValue]==NO)
-			{
-				count++;
-			}
-		}
-	}
-
-	if (outError) *outError = error;
-	return count;
+	if (outError) *outError = nil;
+	return [NSNumber numberWithUnsignedInteger:count];
 }
 
 
