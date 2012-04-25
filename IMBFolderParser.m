@@ -215,16 +215,13 @@
         // are retained outside the scope of the current local autorelease pool, or else they
         // will be returned as potential zombies to the client.
         NSString* localizedName = nil;
-        [url getResourceValue:&localizedName forKey:NSURLLocalizedNameKey error:&error];
-        if (error) continue;
+        if (![url getResourceValue:&localizedName forKey:NSURLLocalizedNameKey error:NULL]) continue;
         
         NSNumber* isDirectory = nil;
-        [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error];
-        if (error) continue;
+        if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:NULL]) continue;
         
         NSNumber* isPackage = nil;
-        [url getResourceValue:&isPackage forKey:NSURLIsPackageKey error:&error];
-        if (error) continue;
+        if (![url getResourceValue:&isPackage forKey:NSURLIsPackageKey error:NULL]) continue;
         
         // If we found a folder (that is not a package, then remember it for later. Folders will be added
         // after regular files...
