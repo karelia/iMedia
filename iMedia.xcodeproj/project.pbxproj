@@ -31,7 +31,7 @@
 		30394AC812DC665000ACA531 /* IMBSkimmableObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		303FFD6A152CBC3B0026B8CF /* IMBSkimmableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 303FFD68152CBC3B0026B8CF /* IMBSkimmableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		303FFD6B152CBC3B0026B8CF /* IMBSkimmableObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 303FFD69152CBC3B0026B8CF /* IMBSkimmableObject.m */; };
-		303FFD6F152CBC690026B8CF /* IMBAppleMediaParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = 303FFD6D152CBC690026B8CF /* IMBAppleMediaParserMessenger.h */; };
+		303FFD6F152CBC690026B8CF /* IMBAppleMediaParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = 303FFD6D152CBC690026B8CF /* IMBAppleMediaParserMessenger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		303FFD70152CBC690026B8CF /* IMBAppleMediaParserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = 303FFD6E152CBC690026B8CF /* IMBAppleMediaParserMessenger.m */; };
 		303FFD71152CBC9F0026B8CF /* IMBiPhotoEventObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3025E5621306877700706DB2 /* IMBiPhotoEventObjectViewController.m */; };
 		303FFD72152CBC9F0026B8CF /* IMBFaceObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F90B321358501A00D13233 /* IMBFaceObjectViewController.m */; };
@@ -1905,6 +1905,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				303FFD6F152CBC690026B8CF /* IMBAppleMediaParserMessenger.h in Headers */,
 				D0B87F22103D998D00C48C6F /* iMedia.h in Headers */,
 				D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */,
 				D09931AA10110E8900C527B7 /* IMBConfig.h in Headers */,
@@ -2020,7 +2021,6 @@
 				D054AFEA152984C300EBFA1C /* IMBGarageBandParserMessenger.h in Headers */,
 				D0904DA8152CA51F003FDD08 /* IMBFileSystemObserver.h in Headers */,
 				303FFD6A152CBC3B0026B8CF /* IMBSkimmableObject.h in Headers */,
-				303FFD6F152CBC690026B8CF /* IMBAppleMediaParserMessenger.h in Headers */,
 				303FFD76152CBD000026B8CF /* IMBFaceNodeObject.h in Headers */,
 				D0904DF6152D7478003FDD08 /* IMBSafariParserMessenger.h in Headers */,
 				D0904E07152D936C003FDD08 /* IMBLinkObject.h in Headers */,
