@@ -484,10 +484,10 @@
 // where a file originated from a remote source and first had to be downloaded. For this reason using the identifier 
 // as a key is more reliable...
 
- 
+
 - (NSString*) identifierForObject:(IMBObject*)inObject
 {
-	NSString* parserName = NSStringFromClass([self class]);
+	NSString* parserName = [self objectIdentifierPrefix];
 	NSString* location = nil;
 	
 	if ([inObject.location isKindOfClass:[NSString class]])
@@ -504,6 +504,19 @@
 	}
 
 	return [NSString stringWithFormat:@"%@:/%@",parserName,location];
+}
+
+
+// This method should be overridden by subclasses to return an apprpriate prefix for IMBObject identifiers. Refer
+// to the method identifierForObject: to see how it is used. Historically we used class names as the prefix. 
+// However, during the evolution of iMedia class names can change and identifier string would thus also change. 
+// This is undesirable, as thing that depend of the immutability of identifier strings would break. One such 
+// example are the object badges, which use object identifiers. To guarrantee backward compatibilty, a parser 
+// class can override this method to return a prefix that matches the historic class name...
+
+- (NSString*) objectIdentifierPrefix
+{
+	return NSStringFromClass([self class]);
 }
 
 
