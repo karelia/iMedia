@@ -141,10 +141,10 @@
 
 // To be overridden by subclasses...
 
-- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
-	if (outError) *outError = nil;
+	return YES; // never reached due to the exception, mind!
 }
 
 

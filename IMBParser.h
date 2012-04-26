@@ -88,7 +88,7 @@
 @required
 
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError;
-- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError;
+- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError;
 - (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError;
 
 // The following three methods are used to load thumbnails or metadata, or create a security-scoped bookmark for  

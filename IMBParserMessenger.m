@@ -289,10 +289,11 @@
 - (IMBNode*) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	[parser populateNode:inNode error:outError];
-	[self _setParserIdentifierWithParser:parser onNodeTree:inNode];
+	
+    BOOL success = [parser populateNode:inNode error:outError];
+    [self _setParserIdentifierWithParser:parser onNodeTree:inNode];
 	[self _setObjectIdentifierWithParser:parser onNodeTree:inNode];
-	return inNode;
+	return (success ? inNode : nil);
 }
 
 

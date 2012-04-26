@@ -111,9 +111,8 @@
 
 #pragma mark 
 
-- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSDictionary* plist = self.plist;
 	NSDictionary* images = [plist objectForKey:@"Master Image List"];
 	NSArray* albums = [plist objectForKey:@"List of Albums"];
@@ -159,7 +158,7 @@
 		}
 	}
 	
-	if (outError) *outError = error;
+	return YES;
 }
 
 

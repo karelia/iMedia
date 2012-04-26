@@ -178,9 +178,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSDictionary* plist = self.plist;
 	NSArray* playlists = [plist objectForKey:@"Playlists"];
 	NSDictionary* tracks = [plist objectForKey:@"Tracks"];
@@ -192,17 +191,19 @@
 	// its objects array into the objects array of the root node. Please note that this is non-standard parser 
 	// behavior, which is implemented here, to achieve the desired "feel" in the browser...
 	
+    BOOL result = YES;
+    
 	if (inNode.isTopLevelNode)
 	{
 		if ([inNode.subnodes count] > 0)
 		{
 			IMBNode* musicNode = [inNode.subnodes objectAtIndex:0];
-			[self populateNode:musicNode  error:&error];
+			result = [self populateNode:musicNode error:outError];
 			inNode.objects = musicNode.objects;
 		}
 	}
 	
-	if (outError) *outError = error;
+	return result;
 }
 
 
