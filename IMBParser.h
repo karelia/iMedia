@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -100,16 +103,6 @@
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError;
 
-// These two optional methods are called on the XPC service side just before a parser starts its work (the four 
-// methods above), or after it stops its work (e.g. by the user deselecting a node). The parser can read in or
-// discard cached data as appropriate...
-
-@optional
-
-//- (void) willStartUsingParser;
-//- (void) didStopUsingParser;
-
-
 @end
 
 
@@ -132,7 +125,7 @@
 - (NSString*) identifierForPath:(NSString*)inPath;
 - (NSString*) identifierForObject:(IMBObject*)inObject;
 - (NSImage*) iconForPath:(NSString*)inPath;
-- (NSString*) objectIdentifierPrefix;
+- (NSString*) identifierPrefix;
 
 - (CGImageRef) thumbnailFromLocalImageFileForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (CGImageRef) thumbnailFromQuicklookForObject:(IMBObject*)inObject error:(NSError**)outError;
