@@ -108,7 +108,7 @@
 
 - (NSString*) identifierForPath:(NSString*)inPath;
 - (NSString*) identifierForObject:(IMBObject*)inObject;
-- (NSImage*) iconForPath:(NSString*)inPath;
+- (NSImage*) iconForItemAtURL:(NSURL*)url error:(NSError **)error;
 - (NSString*) identifierPrefix;
 
 - (CGImageRef) thumbnailFromLocalImageFileForObject:(IMBObject*)inObject error:(NSError**)outError;
@@ -142,7 +142,7 @@
 
 // Returns a minimal image for a given file system item that can be used as an icon for IMBNode...
 
-- (NSImage*) iconForPath:(NSString*)inPath;
+- (NSImage*) iconForItemAtURL:(NSURL*)url error:(NSError **)error;
 
 // Default implementation for getting thumbnails...
 

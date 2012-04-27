@@ -137,7 +137,7 @@
 	NSNumber* countOfSubfolders = [self countOfSubfoldersInFolder:url error:nil];
 
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-	node.icon = [self iconForPath:path];
+	node.icon = [self iconForItemAtURL:url error:NULL];
 	node.name = name;
 	node.identifier = [self identifierForPath:path];
 	node.mediaType = self.mediaType;
@@ -263,12 +263,13 @@
             NSNumber* countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
 			if (countOfSubfolders == nil) continue;
 			
-			NSString* path = [url path];
-			
-            IMBNode* subnode = [[IMBNode alloc] init];
-			subnode.icon = [self iconForPath:path];
+			IMBNode* subnode = [[IMBNode alloc] init];
+			subnode.icon = [self iconForItemAtURL:url error:NULL];
 			subnode.name = name;
+			
+            NSString* path = [url path];
 			subnode.identifier = [self identifierForPath:path];
+            
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = url;
 			subnode.parserIdentifier = self.identifier;
@@ -278,7 +279,8 @@
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = path;					// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
-			[subnodes addObject:subnode];
+			
+            [subnodes addObject:subnode];
 			[subnode release];
 
 			IMBFolderObject* object = [[IMBFolderObject alloc] init];
