@@ -140,9 +140,8 @@
 	if ([self isInstalled])
 	{
 		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
-		NSArray* libraries = (NSArray*)recentLibraries;
 		
-		for (NSString* library in libraries)
+		for (NSString* library in (NSArray*)recentLibraries)
 		{
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
@@ -155,7 +154,7 @@
 			
 				IMBiPhotoParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 				parser.mediaSource = path;
-				parser.shouldDisplayLibraryName = libraries.count > 1;
+				parser.shouldDisplayLibraryName = CFArrayGetCount(recentLibraries) > 1;
 				[parserInstances addObject:parser];
 				[parser release];
 			}
