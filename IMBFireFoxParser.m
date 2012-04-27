@@ -163,21 +163,19 @@
 	// The stupid workaround is to make a copy of the sqlite file, and check there!
 	// However just in case the source file has not changed, we'll check modification dates.
 	//
-	newPath = [[[NSFileManager imb_threadSafeManager] imb_sharedTemporaryFolder:@"firefox"] stringByAppendingPathComponent:@"places.sqlite"];
+	newPath = [[fm imb_sharedTemporaryFolder:@"firefox"] stringByAppendingPathComponent:@"places.sqlite"];
 	if (![newPath isEqualToString:self.databasePathCurrent])	// if we are trying to open the copy, don't allow that.
 	{
 		BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
-		if ([fm fileExistsAtPath:newPath])
-		{
-			NSError *error = nil;
-			NSDictionary *attr = [fm attributesOfItemAtPath:newPath error:&error];
+		NSDictionary *attr = [fm attributesOfItemAtPath:newPath error:NULL];
+        
+        if (attr)
+        {
 			NSDate *modDateOfCopy = [attr fileModificationDate];
-			attr = [fm attributesOfItemAtPath:self.databasePathOriginal error:&error];
-			NSDate *modDateOfOrig = [attr fileModificationDate];
-			if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy])
-			{
-				needToCopyFile = NO;
-			}
+			attr = [fm attributesOfItemAtPath:self.databasePathOriginal error:NULL];
+            
+            NSDate *modDateOfOrig = [attr fileModificationDate];
+            needToCopyFile = [modDateOfOrig isEqualToDate:modDateOfCopy];
 		}
 		if (needToCopyFile)
 		{
