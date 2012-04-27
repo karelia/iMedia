@@ -257,8 +257,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// The following four methods are simply wrappers that access the appropriate IMBParser instances and 
-// then simply call the same method on those instances...
+// The following three methods are simply wrappers that access the appropriate IMBParser instances and then 
+// simply call the same method on those instances. Please note that they do some additional work that is really 
+// essential for the iMedia framework to work properly (IMBNode.parserIdentifier, IMBObject.parserIdentifier, 
+// and IMBObject.identifier need to be set), so we'll do this here and do not rely on the parser developer 
+// doing the right thing...
 
 - (NSArray*) unpopulatedTopLevelNodes:(NSError**)outError
 {
@@ -275,8 +278,12 @@
 			if (error == nil)
 			{
 				IMBNode* node = [parser unpopulatedTopLevelNode:&error];
-				[self _setParserIdentifierWithParser:parser onNodeTree:node];
-				if (node) [topLevelNodes addObject:node];
+				
+				if (node) 
+				{
+					[self _setParserIdentifierWithParser:parser onNodeTree:node];
+					[topLevelNodes addObject:node];
+				}
 			}
 		}
 	}
