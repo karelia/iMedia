@@ -467,11 +467,9 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	if ([localURL isFileURL])
 	{
-		BOOL exists,directory;
-		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:[localURL path] isDirectory:&directory];
-		
-		if (!exists || directory)
-		{
+        NSNumber *isFile;
+        if (![localURL getResourceValue:&isFile forKey:NSURLIsRegularFileKey error:NULL] || ![isFile boolValue])
+        {
 			localURL = nil;
 		}
 	}
