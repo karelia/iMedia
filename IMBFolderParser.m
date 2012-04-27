@@ -109,33 +109,20 @@
 
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
-	NSError* error = nil;
 	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
 	NSURL* url = self.mediaSource;
 	NSString* path = [[url path] stringByStandardizingPath];
 	
-	// Check if the folder exists. If not then do not return a node...
 	
-	BOOL exists,directory;
-	exists = [fileManager fileExistsAtPath:path isDirectory:&directory];
-	
-	if (!exists || !directory) 
-	{
-		NSString* description = [NSString stringWithFormat:@"Folder doesn't exist: %@",path];
-		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
-		error = [NSError errorWithDomain:NSOSStatusErrorDomain code:dirNFErr userInfo:info];
-		
-		if (outError) *outError = error;
-		return nil;
-	}	
-
+    // Check if the folder exists. If not then do not return a node...
+	NSNumber* hasSubfolders = [self directoryHasVisibleSubfolders:url error:outError];
+    if (!hasSubfolders) return nil;	
+    
+    
 	// Create an empty root node (unpopulated and without subnodes)...
 	
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
-
-	NSNumber* hasSubfolders = [self directoryHasVisibleSubfolders:url error:outError];
-    if (!hasSubfolders) return nil;
 
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
     
@@ -166,7 +153,6 @@
 	node.watcherType = kIMBWatcherTypeFSEvent;
 	node.watchedPath = path;
 	
-	if (outError) *outError = error;
 	return node;
 }
 
