@@ -141,7 +141,9 @@
 			BOOL success = NO;
 			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
 			NSString* fileName = [[(NSString*)lightroomObject.location lastPathComponent] stringByDeletingPathExtension];
-			NSString* jpegPath = [[[NSFileManager imb_threadSafeManager] imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
+            NSFileManager *fileManager = [[NSFileManager alloc] init];
+			NSString* jpegPath = [[[fileManager imb_threadSafeManager] imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
+            [fileManager release];
 			
 			if ((orientation == nil) || [orientation isEqual:@"AB"]) {
 				success = [jpegData writeToFile:jpegPath atomically:YES];
@@ -213,7 +215,7 @@
 	
 	if (placeholderImageUrl != nil) {
 		NSString *placeholderImagePath = [placeholderImageUrl path];
-		NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+		NSFileManager *fm = [[[NSFileManager alloc] init] autorelease];
 
 		if ([fm isReadableFileAtPath:placeholderImagePath]) {
 			return placeholderImageUrl;
@@ -259,8 +261,10 @@
 		attributes:attributes2] 
 		autorelease]];
 		
-	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	NSFileManager *fm = [[NSFileManager alloc] init];
 	NSString *jpegPath = [[fm imb_uniqueTemporaryFile:@"LightroomPlaceholder"] stringByAppendingPathExtension:@"jpg"];
+    [fm release];
+    
 	NSSize imageSize = NSMakeSize(640.0,480.0);
 	NSRect imageBounds =  NSMakeRect(0.0,0.0,imageSize.width,imageSize.height);
 	

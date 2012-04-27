@@ -1498,8 +1498,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		if (inObject.isLocalFile)
 		{
 			NSString* path = [inObject path];
-			
-			if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
+			NSFileManager *fileManager = [[NSFileManager alloc] init];
+            
+			if ([fileManager fileExistsAtPath:path])
 			{
 				// Open with editor app...
 				
@@ -1511,7 +1512,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
-					appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
+					appName = [fileManager displayNameAtPath:appPath];
 					title = [NSString stringWithFormat:title,appName];	
 
 					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInEditorApp:) keyEquivalent:@""];
@@ -1531,7 +1532,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
-					appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
+					appName = [fileManager displayNameAtPath:appPath];
 					title = [NSString stringWithFormat:title,appName];	
 
 					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInViewerApp:) keyEquivalent:@""];
@@ -1572,6 +1573,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 				[menu addItem:item];
 				[item release];
 			}
+            
+            [fileManager release];
 		}
 		
 		// Remote URL object can be downloaded or opened in a web browser...

@@ -638,10 +638,11 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 				// If we don't have a download folder yet, then use temporary directory...
 				
 				NSString* downloadFolderPath = self.destinationDirectoryPath;
-				
-				if (downloadFolderPath == nil)
+				NSFileManager *fileManager = [[NSFileManager alloc] init];
+                
+                if (downloadFolderPath == nil)
 				{
-					downloadFolderPath = [[NSFileManager imb_threadSafeManager] imb_sharedTemporaryFolder:@"downloads"];
+                    downloadFolderPath = [fileManager imb_sharedTemporaryFolder:@"downloads"];
 				}
 				
 				NSString* filename = [[url path] lastPathComponent];
@@ -668,12 +669,14 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 				// If we already have a local file, and the option key is not down, then use the local file...
 				
 				unsigned eventModifierFlags = [[NSApp currentEvent] modifierFlags];				
-				if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:localPath]
+				if ([fileManager fileExistsAtPath:localPath]
 					&& 0 == (eventModifierFlags & NSAlternateKeyMask))
 				{
 					downloadOp.localPath = localPath;	// Indicate already-ready local path, meaning that no download needs to actually happen
 					[self didFinish:downloadOp];
 				}
+                
+                [fileManager release];
 				
 				// This will be a real download.  Make sure we have the progress window showing now.
 				// Show the progress, which is indeterminate for now as we do not know the file sizes yet...

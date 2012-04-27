@@ -145,9 +145,10 @@
 		{
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
+            NSFileManager *fileManger = [[NSFileManager alloc] init];
+            
 			BOOL changed;
-			
-			if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
+			if ([fileManger imb_fileExistsAtPath:&path wasChanged:&changed])
 			{
 				NSString *libraryPath = [path stringByDeletingLastPathComponent];	// folder containing .xml file
 				[IMBConfig registerLibraryPath:libraryPath];
@@ -158,6 +159,8 @@
 				[parserInstances addObject:parser];
 				[parser release];
 			}
+            
+            [fileManger release];
 		}
 		
 		if (recentLibraries) CFRelease(recentLibraries);
@@ -222,7 +225,7 @@
 		return nil;
 	}
 	
-	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path] == NO)
+	if (![[NSURL fileURLWithPath:path] checkResourceIsReachableAndReturnError:NULL])
 	{
 		return nil;
 	}

@@ -670,6 +670,8 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 
 - (BOOL) isLocalFile
 {
+    BOOL result = NO;
+    
 	if ([_location isKindOfClass:[NSURL class]])
 	{
 		return [(NSURL*)_location isFileURL];
@@ -677,10 +679,12 @@ NSString* kIMBQuickLookImageProperty = @"quickLookImage";
 	else if ([_location isKindOfClass:[NSString class]])
 	{
 		NSString* path = (NSString*)_location;
-		return [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path];
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+		result = [fileManager fileExistsAtPath:path];
+        [fileManager release];
 	}
 	
-	return NO;
+	return result;
 }
 
 

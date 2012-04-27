@@ -146,10 +146,10 @@
 	if (inNode.isTopLevelNode)
 	{
 		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
-		NSString* userSongsPath = [self userSongsPath];
-		NSString* demoSongsPath = [self demoSongsPath];
+		NSFileManager *fileManager = [[NSFileManager alloc] init];
 			
-		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath])
+		NSString* userSongsPath = [self userSongsPath];
+		if ([fileManager fileExistsAtPath:userSongsPath])
 		{
 			NSString* userSongsName = NSLocalizedStringWithDefaultValue(
 				@"IMBGarageBandParser.usersongs.name",
@@ -170,7 +170,8 @@
 			[subnodes addObject:subnode];
 		}
 		
-		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath])
+		NSString* demoSongsPath = [self demoSongsPath];
+        if ([fileManager fileExistsAtPath:demoSongsPath])
 		{
 			NSString* demoSongsName = NSLocalizedStringWithDefaultValue(
 				@"IMBGarageBandParser.demosongs.name",
@@ -191,6 +192,7 @@
 			[subnodes addObject:subnode];
 		}
 
+        [fileManager release];
 		inNode.objects = [NSMutableArray arrayWithCapacity:0];	// Important to mark node as populated!
 		
 		return YES;
