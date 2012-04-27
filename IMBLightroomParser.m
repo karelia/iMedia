@@ -1317,7 +1317,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSString* libraryPath = [self.mediaSource path];
 	NSString* libraryName = [self libraryName];
-	NSString* path = [NSString stringWithFormat:@"/%@(%lu)",libraryName,[libraryPath hash]];
+	NSString* path = [NSString stringWithFormat:@"/%@(%u)",libraryName,[libraryPath hash]];
 	return [self identifierForPath:path];
 }
 
@@ -1328,7 +1328,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSString* libraryPath = [self.mediaSource path];
 	NSString* libraryName = [self libraryName];
-	NSString* pathPrefix = [NSString stringWithFormat:@"/%@(%lu)/%@/",libraryName,[libraryPath hash],type];
+	NSString* pathPrefix = [NSString stringWithFormat:@"/%@(%u)/%@/",libraryName,[libraryPath hash],type];
 	return pathPrefix;
 }
 

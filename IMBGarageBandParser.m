@@ -192,7 +192,7 @@
 			[subnodes addObject:subnode];
 		}
 
-//		inNode.objects = [NSMutableArray arrayWithCapacity:0];	// Important to mark node as populated!
+		inNode.objects = [NSMutableArray arrayWithCapacity:0];	// Important to mark node as populated!
 		
 		return YES;
 	}

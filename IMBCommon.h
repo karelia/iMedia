@@ -120,7 +120,9 @@ enum
 	
 	// General errors...
 	
+	kIMBErrorUnknown,
 	kIMBErrorInvalidState,
+	kIMBErrorItemNotFound,
 	kIMBErrorFileAccessDenied,
 	kIMBErrorNetworkNotReachable,
 	

@@ -121,13 +121,11 @@
 	
 	if (!exists || !directory) 
 	{
-		if (outError)
-		{
-			NSString* description = [NSString stringWithFormat:@"Folder doesn't exist: %@",path];
-			NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
-			*outError = [NSError errorWithDomain:kIMBErrorDomain code:dirNFErr userInfo:info];
-		}
+		NSString* description = [NSString stringWithFormat:@"Folder doesn't exist: %@",path];
+		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:description,NSLocalizedDescriptionKey,nil];
+		error = [NSError errorWithDomain:NSOSStatusErrorDomain code:dirNFErr userInfo:info];
 		
+		if (outError) *outError = error;
 		return nil;
 	}	
 
@@ -136,7 +134,7 @@
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 
-	NSUInteger countOfSubfolders = [[self countOfSubfoldersInFolder:url error:&error] unsignedIntegerValue];
+	NSNumber* countOfSubfolders = [self countOfSubfoldersInFolder:url error:nil];
 
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	node.icon = [self iconForPath:path];
@@ -145,7 +143,7 @@
 	node.mediaType = self.mediaType;
 	node.mediaSource = url;
 	node.isTopLevelNode = YES;
-	node.isLeafNode = countOfSubfolders == 0;
+	node.isLeafNode = [countOfSubfolders unsignedIntegerValue] == 0;
 	node.displayPriority = self.displayPriority;
 	node.isUserAdded = self.isUserAdded;
 	node.parserIdentifier = self.identifier;
@@ -176,9 +174,12 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
+	NSError* error = nil;
 	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
+	BOOL ok;
+    BOOL result = YES;
 	
 	// Scan the folder for files and directories...
 	
@@ -186,10 +187,9 @@
 		inNode.mediaSource 
 		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLLocalizedNameKey,NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
 		options:NSDirectoryEnumerationSkipsHiddenFiles 
-		error:outError];
+		error:&error];
 
-    BOOL result = urls != nil;
-	if (result)
+	if (urls)
 	{
 		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
 		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:urls.count];
@@ -206,20 +206,23 @@
 
 			// Get some info about the file or folder...
 			
-			NSString* path = [url path];
-
 			NSString* localizedName = nil;
-			if (![url getResourceValue:&localizedName forKey:NSURLLocalizedNameKey error:outError]) break;
+			ok = [url getResourceValue:&localizedName forKey:NSURLLocalizedNameKey error:&error];
+			if (!ok) continue;
 			
 			NSNumber* isDirectory = nil;
-			if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:outError]) break;
+			ok = [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error];
+			if (!ok) continue;
 
 			NSNumber* isPackage = nil;
-			if (![url getResourceValue:&isPackage forKey:NSURLIsPackageKey error:outError]) break;
+			ok = [url getResourceValue:&isPackage forKey:NSURLIsPackageKey error:&error];
+			if (!ok) continue;
 			
 			// If we found a folder (that is not a package, then remember it for later. Folders will be added
 			// after regular files...
 			
+			NSString* path = [url path];
+
 			if ([isDirectory boolValue] && ![isPackage boolValue])
 			{
 				if (![IMBConfig isLibraryPath:path])
@@ -242,6 +245,8 @@
 			}
 		}
 				
+		IMBDrain(pool);
+
 		// Now we can actually handle the folders. Add a subnode and an IMBNodeObject for each folder...
 				
 		for (NSURL* url in folders)
@@ -254,12 +259,8 @@
 			
 			NSString* path = [url path];
 			NSString* name = [fileManager displayNameAtPath:path];
-			NSNumber *countOfSubfolders = [self countOfSubfoldersInFolder:url error:outError];
-			if (!countOfSubfolders)
-            {
-                result = NO;
-                break;
-            }
+			NSNumber* countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
+			if (countOfSubfolders == nil) continue;
 			
 			IMBNode* subnode = [[IMBNode alloc] init];
 			subnode.icon = [self iconForPath:path];
@@ -269,7 +270,7 @@
 			subnode.mediaSource = url;
 			subnode.parserIdentifier = self.identifier;
 			subnode.isTopLevelNode = NO;
-			subnode.isLeafNode = ([countOfSubfolders unsignedIntegerValue] == 0);
+			subnode.isLeafNode = [countOfSubfolders unsignedIntegerValue] == 0;
 			subnode.groupType = kIMBGroupTypeFolder;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = path;					// These two lines are important to make file watching work for nested 
@@ -291,8 +292,12 @@
 		inNode.objects = objects;
 		inNode.isLeafNode = [subnodes count] == 0;
 	}
+	else
+    {
+        result = NO;
+    }
 	
-	IMBDrain(pool);
+    IMBDrain(pool);
 	return result;
 }
 
@@ -337,34 +342,38 @@
 
 // Return the number of (visible) subfolders in a given folder...
 
-- (NSNumber *) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError
+- (NSNumber*) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError
 {
 	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
+	NSUInteger count = 0;
+	BOOL ok;
+	
 	NSArray* urls = [fileManager contentsOfDirectoryAtURL:
 		inFolderURL 
 		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
-                                                  options:NSDirectoryEnumerationSkipsHiddenFiles 
-                                                    error:outError];
-    
-	if (!urls) return nil;
-	
-	NSUInteger count = 0;
-	for (NSURL* url in urls)
-    {
-        NSNumber* folder = nil;
-        if (![url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:outError]) return nil;
-        
-        NSNumber* package = nil;
-        if (![url getResourceValue:&package forKey:NSURLIsPackageKey error:outError]) return nil;
-        
-        if ([folder boolValue]==YES && [package boolValue]==NO)
-        {
-            count++;
-        }
-    }
+		options:NSDirectoryEnumerationSkipsHiddenFiles 
+		error:outError];
 
-	if (outError) *outError = nil;
-	return [NSNumber numberWithUnsignedInteger:count];
+	if (urls)
+	{
+		for (NSURL* url in urls)
+		{
+			NSNumber* folder = nil;
+			ok = [url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:NULL];
+			if (!ok) continue;
+
+			NSNumber* package = nil;
+			ok = [url getResourceValue:&package forKey:NSURLIsPackageKey error:NULL];
+			if (!ok) continue;
+			
+			if ([folder boolValue]==YES && [package boolValue]==NO)
+			{
+				count++;
+			}
+		}
+	}
+
+	return (urls ? [NSNumber numberWithUnsignedInteger:count] : nil);
 }
 
 

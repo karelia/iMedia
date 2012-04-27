@@ -413,7 +413,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 + (NSString*) libraryName
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
 	NSLog(@"%@", errMsg);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
 	
@@ -426,7 +426,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSString*) rootNodeIdentifier
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
 	NSLog(@"%@", errMsg);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
 	
