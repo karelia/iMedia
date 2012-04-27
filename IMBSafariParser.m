@@ -161,16 +161,13 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	NSError* error = nil;
-	
 	if (inNode.isTopLevelNode)
 	{
 		NSDictionary* plist = [self plist];
 		[self populateNode:inNode plist:plist];
 	}
 
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 

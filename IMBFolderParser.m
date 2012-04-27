@@ -167,6 +167,7 @@
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	BOOL ok;
+    BOOL result = YES;
 	
 	// Scan the folder for files and directories...
 	
@@ -176,7 +177,7 @@
 		options:NSDirectoryEnumerationSkipsHiddenFiles 
 		error:&error];
 
-	if (error == nil)
+	if (urls)
 	{
 		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
 		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:urls.count];
@@ -279,10 +280,13 @@
 		inNode.objects = objects;
 		inNode.isLeafNode = [subnodes count] == 0;
 	}
+	else
+    {
+        result = NO;
+    }
 	
-	IMBDrain(pool);
-	if (outError) *outError = error;
-	return error == nil;
+    IMBDrain(pool);
+	return result;
 }
 
 
