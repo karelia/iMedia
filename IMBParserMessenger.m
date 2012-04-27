@@ -288,20 +288,53 @@
 
 - (IMBNode*) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
+	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	[parser populateNode:inNode error:outError];
-	[self _setParserIdentifierWithParser:parser onNodeTree:inNode];
-	[self _setObjectIdentifierWithParser:parser onNodeTree:inNode];
-	return inNode;
+	BOOL success = [parser populateNode:inNode error:&error];
+	
+	IMBNode* node = success ? inNode : nil;
+	
+	if (node)
+	{
+		[self _setParserIdentifierWithParser:parser onNodeTree:node];
+		[self _setObjectIdentifierWithParser:parser onNodeTree:node];
+	}
+	
+	if (success == NO && error == nil)
+	{
+		NSString* title = @"Programmer Error";
+		
+		NSString* description = [NSString stringWithFormat:
+			@"%@ returned NO while trying to populate the node '%@' But it didn't return and error.\n\nThis is a programmer error that should be corrected.",
+			NSStringFromClass([parser class]),
+			inNode.name];
+			
+		NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
+			title,@"title",
+			description,NSLocalizedDescriptionKey,
+			nil];
+			
+		error = [NSError errorWithDomain:kIMBErrorDomain code:kIMBErrorInvalidState userInfo:info];
+	}
+	
+	if (outError) *outError = error;
+	return node;
 }
 
 
 - (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError
 {
+	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
-	IMBNode* node = [parser reloadNodeTree:inNode error:outError];
-	[self _setParserIdentifierWithParser:parser onNodeTree:node];
-	[self _setObjectIdentifierWithParser:parser onNodeTree:inNode];
+	IMBNode* node = [parser reloadNodeTree:inNode error:&error];
+	
+	if (node)
+	{
+		[self _setParserIdentifierWithParser:parser onNodeTree:node];
+		[self _setObjectIdentifierWithParser:parser onNodeTree:node];
+	}
+	
+	if (outError) *outError = error;
 	return node;
 }
 

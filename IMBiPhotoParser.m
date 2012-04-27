@@ -111,7 +111,7 @@
 
 #pragma mark 
 
-- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
 	NSDictionary* plist = self.plist;
@@ -160,6 +160,7 @@
 	}
 	
 	if (outError) *outError = error;
+	return error == nil;
 }
 
 

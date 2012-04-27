@@ -141,7 +141,7 @@
 }
 
 
-- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	if (inNode.isTopLevelNode)
 	{
@@ -192,13 +192,14 @@
 			[subnodes addObject:subnode];
 		}
 
-//		inNode.objects = [NSMutableArray arrayWithCapacity:0];	// Important to mark node as populated!
+		inNode.objects = [NSMutableArray arrayWithCapacity:0];	// Important to mark node as populated!
 		
 		if (outError) *outError = nil;
+		return YES;
 	}
 	else
 	{
-		[super populateNode:inNode error:outError];
+		return [super populateNode:inNode error:outError];
 	}
 }
 

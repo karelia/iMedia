@@ -159,7 +159,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
 	
@@ -170,6 +170,7 @@
 	}
 
 	if (outError) *outError = error;
+	return error == nil;
 }
 
 
