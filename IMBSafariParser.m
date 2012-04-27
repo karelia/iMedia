@@ -195,11 +195,10 @@
 - (NSDictionary*) plist
 {
 	NSDictionary* plist = nil;
-	NSError* error = nil;
 	NSURL* url = (NSURL*)self.mediaSource;
-	NSString* path = [url path];
-	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
-	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
+	
+    NSDate* modificationDate;
+    if (![url getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:NULL]) modificationDate = nil;
 	
 	@synchronized(self)
 	{
