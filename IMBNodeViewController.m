@@ -531,13 +531,13 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (NSDragOperation) outlineView:(NSOutlineView*)inOutlineView validateDrop:(id<NSDraggingInfo>)inInfo proposedItem:(id)inItem proposedChildIndex:(NSInteger)inIndex
 {
 	NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
-	BOOL exists,directory;
 	
 	for (NSString* path in paths)
 	{
-		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
-		
-		if (exists && directory)
+        NSURL *aURL = [NSURL fileURLWithPath:path isDirectory:YES];
+        
+        NSNumber *isDirectory;
+        if ([aURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:NULL] && [isDirectory boolValue])
 		{
 			[inOutlineView setDropItem:nil dropChildIndex:NSOutlineViewDropOnItemIndex]; // Target the whole view
 			return NSDragOperationCopy;
@@ -557,17 +557,15 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 {
 	BOOL result = NO;
     NSArray* paths = [[inInfo draggingPasteboard] propertyListForType:NSFilenamesPboardType];
-	BOOL exists,directory;
 	
 	for (NSString* path in paths)
 	{
-		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path isDirectory:&directory];
-		
-		if (exists && directory)
+		NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
+        
+        NSNumber *isDirectory;
+        if ([url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:NULL] && [isDirectory boolValue])
 		{
-            NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
-            
-			if (![IMBConfig isLibraryAtURL:url])
+            if (![IMBConfig isLibraryAtURL:url])
 			{
 				[[NSNotificationCenter defaultCenter]
 					addObserver:self
