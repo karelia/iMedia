@@ -72,11 +72,16 @@
 
 #pragma mark 
 
-@protocol IMBParserProtocol
+@interface IMBParser : NSObject
+{
+	@private
+	
+	NSString* _identifier;
+	NSString* _mediaType;
+	NSURL* _mediaSource;
+}
 
 // Together these parameters uniquely specify a parser instance. The values are taken from IMBParserFacrtory...
-
-@required
 
 @property (copy) NSString* identifier;	
 @property (copy) NSString* mediaType;	
@@ -88,8 +93,6 @@
 // once at startup to create an empty toplevel node, while the second method may be called multiple times. The
 // third method has a generic implementation that may be sufficient for most subclasses...
 
-@required
-
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError;
 - (void) populateNode:(IMBNode*)inNode error:(NSError**)outError;
 - (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError;
@@ -97,28 +100,9 @@
 // The following three methods are used to load thumbnails or metadata, or create a security-scoped bookmark for  
 // full media file access. They are called on the XPC service side...
 
-@required
-
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError;
-
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBParser : NSObject <IMBParserProtocol>
-{
-	@private
-	
-	NSString* _identifier;
-	NSString* _mediaType;
-	NSURL* _mediaSource;
-}
 
 // Helpers for subclasses...
 
@@ -129,6 +113,44 @@
 
 - (CGImageRef) thumbnailFromLocalImageFileForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (CGImageRef) thumbnailFromQuicklookForObject:(IMBObject*)inObject error:(NSError**)outError;
+- (NSData*) bookmarkForLocalFileObject:(IMBObject*)inObject error:(NSError**)outError;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+// Helper method for subclasses...
+
+@interface IMBParser (Helpers)
+
+// Can be used to construct IMBNode identifiers...
+
+- (NSString*) identifierForPath:(NSString*)inPath;
+
+// Can be used to construct IMBObject identifiers...
+
+- (NSString*) identifierForObject:(IMBObject*)inObject;
+
+// Subclasses may want to override this method to provide a backward compatible string. 
+// See further comments in implementation file...
+
+- (NSString*) identifierPrefix;
+
+// Returns a minimal image for a given file system item that can be used as an icon for IMBNode...
+
+- (NSImage*) iconForPath:(NSString*)inPath;
+
+// Default implementation for getting thumbnails...
+
+- (CGImageRef) thumbnailFromLocalImageFileForObject:(IMBObject*)inObject error:(NSError**)outError;
+- (CGImageRef) thumbnailFromQuicklookForObject:(IMBObject*)inObject error:(NSError**)outError;
+
+// Default implementation for getting a bookmark for an existing local file...
+
 - (NSData*) bookmarkForLocalFileObject:(IMBObject*)inObject error:(NSError**)outError;
 
 @end
