@@ -116,7 +116,6 @@
 
 + (NSString *)firefoxBookmarkPath;
 {
-	NSString *result = nil;
 	NSArray *libraryPaths1 = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
 	NSArray *libraryPaths2 = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
 	
@@ -128,28 +127,28 @@
 	{
 		NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
 		NSString *profilesPath = [firefoxPath stringByAppendingPathComponent:@"Profiles"];
-		BOOL isDir;
-		if ([fm fileExistsAtPath:profilesPath isDirectory:&isDir] && isDir)
-		{
-			NSDirectoryEnumerator *e = [fm enumeratorAtPath:profilesPath];
-			[e skipDescendents];
-			NSString *filename = nil;
-			while ( filename = [e nextObject] )
-			{
-				if ( ![filename hasPrefix:@"."] )
-				{
-					NSString *profilePath = [profilesPath stringByAppendingPathComponent:filename];
-					NSString *bookmarkPath = [profilePath stringByAppendingPathComponent:@"places.sqlite"];
-					if ([fm fileExistsAtPath:bookmarkPath isDirectory:&isDir] && !isDir)
-					{
-						result = bookmarkPath;	// just stop on the first profile we find.  Should be good enough!
-						return result;
-					}
-				}
-			}
-		}
+        NSURL *profilesURL = [NSURL fileURLWithPath:profilesPath isDirectory:YES];
+        
+        NSDirectoryEnumerator *e = [fm enumeratorAtURL:profilesURL
+                            includingPropertiesForKeys:nil
+                                               options:NSDirectoryEnumerationSkipsHiddenFiles
+                                          errorHandler:NULL];
+        
+        [e skipDescendents];
+        
+        NSURL *aProfileURL = nil;
+        while ( aProfileURL = [e nextObject] )
+        {
+            NSURL *bookmarkURL = [aProfileURL URLByAppendingPathComponent:@"places.sqlite"];
+            
+            NSNumber *isFile;
+            if ([bookmarkURL getResourceValue:&isFile forKey:NSURLIsRegularFileKey error:NULL] && [isFile boolValue])
+            {
+                return [bookmarkURL path];	// just stop on the first profile we find.  Should be good enough!
+            }
+        }
 	}
-	return result;
+	return nil;
 }
 
 
