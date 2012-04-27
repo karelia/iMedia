@@ -179,6 +179,7 @@
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	BOOL ok;
+    BOOL result = YES;
 	
 	// Scan the folder for files and directories...
 	
@@ -188,7 +189,7 @@
 		options:NSDirectoryEnumerationSkipsHiddenFiles 
 		error:&error];
 
-	if (error == nil)
+	if (urls)
 	{
 		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
 		NSMutableArray* objects = [NSMutableArray arrayWithCapacity:urls.count];
@@ -291,10 +292,13 @@
 		inNode.objects = objects;
 		inNode.isLeafNode = [subnodes count] == 0;
 	}
+	else
+    {
+        result = NO;
+    }
 	
-	IMBDrain(pool);
-	if (outError) *outError = error;
-	return error == nil;
+    IMBDrain(pool);
+	return result;
 }
 
 
@@ -340,7 +344,6 @@
 
 - (NSNumber*) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
 	NSUInteger count = 0;
 	BOOL ok;
@@ -349,18 +352,18 @@
 		inFolderURL 
 		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
 		options:NSDirectoryEnumerationSkipsHiddenFiles 
-		error:&error];
+		error:outError];
 
-	if (error == nil)
+	if (urls)
 	{
 		for (NSURL* url in urls)
 		{
 			NSNumber* folder = nil;
-			ok = [url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:&error];
+			ok = [url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:NULL];
 			if (!ok) continue;
 
 			NSNumber* package = nil;
-			ok = [url getResourceValue:&package forKey:NSURLIsPackageKey error:&error];
+			ok = [url getResourceValue:&package forKey:NSURLIsPackageKey error:NULL];
 			if (!ok) continue;
 			
 			if ([folder boolValue]==YES && [package boolValue]==NO)
@@ -370,8 +373,7 @@
 		}
 	}
 
-	if (outError) *outError = error;
-	return [NSNumber numberWithUnsignedInteger:count];
+	return (urls ? [NSNumber numberWithUnsignedInteger:count] : nil);
 }
 
 

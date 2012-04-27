@@ -201,7 +201,6 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSDictionary* plist = self.plist;
 	NSDictionary* images = [plist objectForKey:@"Master Image List"];
 	
@@ -216,8 +215,7 @@
 		[self populateNode:inNode albums:albums images:images]; 
 	}
 
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 
