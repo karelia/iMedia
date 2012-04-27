@@ -148,9 +148,8 @@
 		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
 		NSString* userSongsPath = [self userSongsPath];
 		NSString* demoSongsPath = [self demoSongsPath];
-		BOOL isDirectory = NO;
 			
-		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath isDirectory:&isDirectory])
+		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath])
 		{
 			NSString* userSongsName = NSLocalizedStringWithDefaultValue(
 				@"IMBGarageBandParser.usersongs.name",
@@ -171,7 +170,7 @@
 			[subnodes addObject:subnode];
 		}
 		
-		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath isDirectory:&isDirectory])
+		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath])
 		{
 			NSString* demoSongsName = NSLocalizedStringWithDefaultValue(
 				@"IMBGarageBandParser.demosongs.name",

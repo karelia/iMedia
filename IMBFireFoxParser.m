@@ -101,8 +101,9 @@
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	
 	NSString *bookmarkPath = [self firefoxBookmarkPath];
-	NSFileManager *fm = [NSFileManager imb_threadSafeManager];	// File manager, not flying meat!
-	if ([self isInstalled] && bookmarkPath && [fm fileExistsAtPath:bookmarkPath] && [fm isReadableFileAtPath:bookmarkPath])
+	NSFileManager *fileManager = [[NSFileManager alloc] init];
+    
+	if ([self isInstalled] && bookmarkPath && [fileManager fileExistsAtPath:bookmarkPath] && [fileManager isReadableFileAtPath:bookmarkPath])
 	{
 		IMBFireFoxParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 		parser.databasePathOriginal = bookmarkPath;
@@ -111,6 +112,8 @@
 		[parserInstances addObject:parser];
 		[parser release];
 	}
+    
+    [fileManager release];
 	return parserInstances;
 }
 
@@ -156,7 +159,7 @@
 
 - (void) copyDatabase;		// try to copy the database and store in copy.
 {
-	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	NSFileManager *fm = [[NSFileManager alloc] init];
 	NSString *newPath = nil;	// copy destination if we have to copy the file
 	
 	// null result set means we couldn't open it ... it's probably busy.
@@ -202,6 +205,8 @@
 	{
 		self.database = nil;	// don't try to open; couldn't open copy
 	}
+    
+    [fm release];
 }
 
 - (BOOL)openDatabase;
