@@ -125,7 +125,7 @@
 	NSMutableArray *libraryPaths = [NSMutableArray arrayWithArray:libraryPaths1];
 	[libraryPaths addObjectsFromArray:libraryPaths2];
 
-	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	NSFileManager *fm = [[NSFileManager alloc] init];
 	for (NSString *path in libraryPaths)
 	{
 		NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
@@ -147,10 +147,13 @@
             NSNumber *isFile;
             if ([bookmarkURL getResourceValue:&isFile forKey:NSURLIsRegularFileKey error:NULL] && [isFile boolValue])
             {
+                [fm release];
                 return [bookmarkURL path];	// just stop on the first profile we find.  Should be good enough!
             }
         }
 	}
+    
+    [fm release];
 	return nil;
 }
 
