@@ -741,17 +741,15 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	// Trash any files that we already have...
 	
-	NSFileManager* mgr = [NSFileManager imb_threadSafeManager];
+	NSFileManager* mgr = [[NSFileManager alloc] init];
 	
     // TODO: This would run faster if iterated _URLsByObject directly since would skip objects that hadn't loaded
 	for (NSURL* url in self.fileURLs)
 	{
-		if ([url isFileURL])
-        {
-            NSError* error = nil;
-            [mgr removeItemAtPath:[url path] error:&error];
-        }
+		[mgr removeItemAtURL:url error:NULL];
 	}
+    
+    [mgr release];
 	
 	// Cleanup...
 	
