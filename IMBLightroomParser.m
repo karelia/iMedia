@@ -281,8 +281,6 @@ static NSArray* sSupportedUTIs = nil;
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	NSError* error = nil;
-	
 	// Create subnodes for the root node as needed...
 	
 	if ([inNode isTopLevelNode])
@@ -327,8 +325,7 @@ static NSArray* sSupportedUTIs = nil;
         inNode.objects = [NSArray array];
     }
 
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 

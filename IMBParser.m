@@ -140,7 +140,7 @@
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
-	if (outError) *outError = nil;
+	if (outError) *outError = nil; // never reached due to the exception, mind!
 	return YES;
 }
 
