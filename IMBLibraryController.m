@@ -389,23 +389,35 @@ static NSMutableDictionary* sLibraryControllers = nil;
 						description,NSLocalizedDescriptionKey,
 						nil];
 						
-					inError = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];
+					inError = [NSError errorWithDomain:kIMBErrorDomain code:kIMBErrorInvalidState userInfo:info];
 				}
 			}
 			
-			// Store any errors so that a badge can be displayed...
-			
 			if (inError) NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-			inNewNode.error = inError;
 			
-			// Replace the old with the new node...
+			// If populating was successful we got a new node. Set the parserMessenger, and then  
+			// replace the old with the new node...
 			
-			[self _setParserMessenger:messenger nodeTree:inNewNode];
-			[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
-
-			if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
+			if (inNewNode)
 			{
-				[_delegate libraryController:self didPopulateNode:inNewNode];
+				inNewNode.error = inError;
+				[self _setParserMessenger:messenger nodeTree:inNewNode];
+				[self _replaceNode:inNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
+			
+				if (RESPONDS(_delegate,@selector(libraryController:didPopulateNode:)))
+				{
+					[_delegate libraryController:self didPopulateNode:inNewNode];
+				}
+			}
+			
+			// If populating failed, then we'll have to keep the old node, but we'll clear the loading 
+			// state and store an error instead (which is displayed as an alert badge)...
+			
+			else
+			{
+				inNode.isLoading = NO;
+				inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
+				inNode.error = inError;
 			}
 		});		
 }

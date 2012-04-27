@@ -137,7 +137,7 @@
 
 - (NSUInteger) imageCount
 {
-    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %@] must be subclassed", [self className], _cmd];
+    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %s] must be subclassed", [self className], (char *)_cmd];
 	NSLog(@"%@", errorMessage);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errorMessage userInfo:nil] raise];
 	
@@ -165,7 +165,7 @@
 
 - (id) imageLocationAtSkimmingIndex:(NSUInteger)skimmingIndex
 {
-    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %@] must be subclassed", [self className], _cmd];
+    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %s] must be subclassed", [self className], (char *)_cmd];
 	NSLog(@"%@", errorMessage);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errorMessage userInfo:nil] raise];
 	
@@ -178,7 +178,7 @@
 
 - (id) keyImageLocation
 {
-    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %@] must be subclassed", [self className], _cmd];
+    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %s] must be subclassed", [self className], (char *)_cmd];
 	NSLog(@"%@", errorMessage);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errorMessage userInfo:nil] raise];
 	

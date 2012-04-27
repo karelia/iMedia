@@ -279,7 +279,7 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
 	
@@ -328,6 +328,7 @@ static NSArray* sSupportedUTIs = nil;
     }
 
 	if (outError) *outError = error;
+	return error == nil;
 }
 
 
@@ -1319,7 +1320,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSString* libraryPath = [self.mediaSource path];
 	NSString* libraryName = [self libraryName];
-	NSString* path = [NSString stringWithFormat:@"/%@(%lu)",libraryName,[libraryPath hash]];
+	NSString* path = [NSString stringWithFormat:@"/%@(%u)",libraryName,[libraryPath hash]];
 	return [self identifierForPath:path];
 }
 
@@ -1330,7 +1331,7 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSString* libraryPath = [self.mediaSource path];
 	NSString* libraryName = [self libraryName];
-	NSString* pathPrefix = [NSString stringWithFormat:@"/%@(%lu)/%@/",libraryName,[libraryPath hash],type];
+	NSString* pathPrefix = [NSString stringWithFormat:@"/%@(%u)/%@/",libraryName,[libraryPath hash],type];
 	return pathPrefix;
 }
 

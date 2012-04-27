@@ -67,7 +67,7 @@
 
 + (NSMutableArray *)parsers
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
 	NSLog(@"%@", errMsg);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
 	
@@ -78,7 +78,7 @@
 
 + (dispatch_once_t *)onceTokenRef
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
 	NSLog(@"%@", errMsg);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
 	
@@ -91,7 +91,7 @@
 
 + (NSString *) bundleIdentifier
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
 	NSLog(@"%@", errMsg);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
 	
@@ -103,7 +103,7 @@
 
 + (NSString *) librariesKey
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%@: Please use a custom subclass of %@...", _cmd, [self className]];
+    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
 	NSLog(@"%@", errMsg);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
 	

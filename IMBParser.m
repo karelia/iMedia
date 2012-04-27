@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Peter Baumgartner
 
 
@@ -58,13 +61,6 @@
 #import "IMBObject.h"
 #import "NSURL+iMedia.h"
 #import "IMBParserMessenger.h"
-//#import "IMBObjectsPromise.h"
-//#import "IMBLibraryController.h"
-//#import "NSString+iMedia.h"
-//#import "NSData+SKExtensions.h"
-//#import <Quartz/Quartz.h>
-//#import <QTKit/QTKit.h>
-//#import "NSURL+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -141,10 +137,11 @@
 
 // To be overridden by subclasses...
 
-- (void) populateNode:(IMBNode*)inNode error:(NSError**)outError
+- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
+	return YES;
 }
 
 
@@ -229,25 +226,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Optional methods that do nothing in the base class and can be overridden in subclasses, e.g. to   
-// updateor get rid of cached data...
-
-/*
-- (void) willStartUsingParser
-{
-
-}
-
-
-- (void) didStopUsingParser
-{
-
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark
 #pragma mark Object Access
 
@@ -284,176 +262,6 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-/*
-+ (id) loadThumbnailForObject:(IMBObject*)ioObject
-{
-	id imageRepresentation = nil;
-	NSString* type = ioObject.imageRepresentationType;
-	NSString* path = nil;
-	NSURL* url = nil;
-	
-	// Get path/url location of our object...
-	
-	id location = ioObject.imageLocation;
-	if (location == nil) location = ioObject.location;
-
-	if ([location isKindOfClass:[NSString class]])
-	{
-		path = (NSString*)location;
-		url = [NSURL fileURLWithPath:path];
-	}	
-	else if ([location isKindOfClass:[NSURL class]])
-	{
-		url = (NSURL*)location;
-		path = [url path];
-	}
-	
-	// Get the uti for out object...
-	
-	NSString* uti = [NSString imb_UTIForFileAtPath:path];
-	
-	// Path...
-	
-	if ([type isEqualToString:IKImageBrowserPathRepresentationType])
-	{
-		imageRepresentation = path;	
-	}
-	else if ([type isEqualToString:IKImageBrowserQTMoviePathRepresentationType])
-	{
-		imageRepresentation = path;	
-	}
-	else if ([type isEqualToString:IKImageBrowserIconRefPathRepresentationType])
-	{
-		imageRepresentation = path;	
-	}
-	else if ([type isEqualToString:IKImageBrowserQuickLookPathRepresentationType])
-	{
-		imageRepresentation = path;	
-	}
-	
-	// URL...
-	
-	else if ([type isEqualToString:IKImageBrowserNSURLRepresentationType])
-	{
-		imageRepresentation = url;	
-	}
-	
-	// NSImage...
-	
-	else if ([type isEqualToString:IKImageBrowserNSImageRepresentationType])
-	{
-		// If this is the type, we should already have an image representation, so let's try NOT 
-		// doing this code that was here before.
-		// So just leave the imageRepresentation here nil so it doesn't get set.
-		if (!ioObject.imageRepresentation)
-		{
-			NSLog(@"##### %p Warning; IKImageBrowserNSImageRepresentationType with a nil imageRepresentation",ioObject);
-		}
-		
-//		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
-//		{
-//			imageRepresentation = [[[NSImage alloc] initByReferencingURL:url] autorelease];
-//		}
-//		else
-//		{
-//			imageRepresentation = [url imb_quicklookNSImage];
-//		}	
-	}
-	
-	// CGImage...
-	
-	else if ([type isEqualToString:IKImageBrowserCGImageRepresentationType])
-	{
-		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
-		{
-			imageRepresentation = (id)[self _imageForURL:url];
-		}
-		else
-		{
-			imageRepresentation = (id)[url imb_quicklookCGImage];
-		}
-	}
-	
-	// CGImageSourceRef...
-	
-	else if ([type isEqualToString:IKImageBrowserCGImageSourceRepresentationType])
-	{
-		CGImageSourceRef source = [self _imageSourceForURL:url];
-		imageRepresentation = (id)source;
-	}
-	
-	// NSData...
-	
-	else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
-	{
-		NSData* data = [NSData dataWithContentsOfURL:url];
-		imageRepresentation = data;
-	}
-	
-	// NSBitmapImageRep...
-	
-	else if ([type isEqualToString:IKImageBrowserNSBitmapImageRepresentationType])
-	{
-		if (UTTypeConformsTo((CFStringRef)uti,kUTTypeImage))
-		{
-			CGImageRef image = [self _imageForURL:url];
-			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
-		}
-		else
-		{
-			CGImageRef image = [url imb_quicklookCGImage];
-			imageRepresentation = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
-		}
-	}
-	
-	// QTMovie...
-	
-	else if ([type isEqualToString:IKImageBrowserQTMovieRepresentationType])
-	{
-		NSLog(@"loadThumbnailForObject: what do to with IKImageBrowserQTMovieRepresentationType");
-	}
-
-	// Return the result to the main thread...
-	
-	if (imageRepresentation)
-	{
-		[ioObject 
-			performSelectorOnMainThread:@selector(setImageRepresentation:) 
-			withObject:imageRepresentation 
-			waitUntilDone:NO 
-			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-	}
-	
-	return imageRepresentation;
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This helper method makes sure that the new node tree is pre-populated as deep as the old one was. Obviously
-// this is a recursive method that descends into the tree as far as necessary to recreate the state...
-
-//- (void) populateNewNode:(IMBNode*)inNewNode likeOldNode:(const IMBNode*)inOldNode options:(IMBOptions)inOptions
-//{
-//	NSError* error = nil;
-//	
-//	if (inOldNode.isPopulated)
-//	{
-//		[self populateNode:inNewNode options:inOptions error:&error];
-//		
-//		for (IMBNode* oldSubnode in inOldNode.subnodes)
-//		{
-//			NSString* identifier = oldSubnode.identifier;
-//			IMBNode* newSubnode = [inNewNode subnodeWithIdentifier:identifier];
-//			[self populateNewNode:newSubnode likeOldNode:oldSubnode options:inOptions];
-//		}
-//	}
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
 
 #pragma mark
 #pragma mark Helpers
@@ -463,16 +271,9 @@
  
 - (NSString*) identifierForPath:(NSString*)inPath
 {
-	NSString* parserClassName = NSStringFromClass([self class]);
-	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
+	NSString* prefix = [self identifierPrefix];
+	return [NSString stringWithFormat:@"%@:/%@",prefix,inPath];
 }
-
-
-//+ (NSString*) identifierForPath:(NSString*)inPath
-//{
-//	NSString* parserClassName = NSStringFromClass(self);
-//	return [NSString stringWithFormat:@"%@:/%@",parserClassName,inPath];
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -484,10 +285,10 @@
 // where a file originated from a remote source and first had to be downloaded. For this reason using the identifier 
 // as a key is more reliable...
 
- 
+
 - (NSString*) identifierForObject:(IMBObject*)inObject
 {
-	NSString* parserName = NSStringFromClass([self class]);
+	NSString* prefix = [self identifierPrefix];
 	NSString* location = nil;
 	
 	if ([inObject.location isKindOfClass:[NSString class]])
@@ -503,7 +304,20 @@
 		location = [inObject.location description];
 	}
 
-	return [NSString stringWithFormat:@"%@:/%@",parserName,location];
+	return [NSString stringWithFormat:@"%@:/%@",prefix,location];
+}
+
+
+// This method should be overridden by subclasses to return an appropriate prefix for IMBObject identifiers. Refer
+// to the method identifierForObject: to see how it is used. Historically we used class names as the prefix. 
+// However, during the evolution of iMedia class names can change and identifier string would thus also change. 
+// This is undesirable, as thing that depend of the immutability of identifier strings would break. One such 
+// example are the object badges, which use object identifiers. To guarrantee backward compatibilty, a parser 
+// class can override this method to return a prefix that matches the historic class name...
+
+- (NSString*) identifierPrefix
+{
+	return NSStringFromClass([self class]);
 }
 
 
