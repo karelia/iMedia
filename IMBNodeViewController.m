@@ -565,7 +565,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		
 		if (exists && directory)
 		{
-			if (![IMBConfig isLibraryPath:path])
+            NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
+            
+			if (![IMBConfig isLibraryAtURL:url])
 			{
 				[[NSNotificationCenter defaultCenter]
 					addObserver:self
@@ -573,7 +575,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 					name:kIMBDidCreateTopLevelNodeNotification 
 					object:nil];
 
-				[self.libraryController addUserAddedNodeForFolder:[NSURL fileURLWithPath:path]];
+				[self.libraryController addUserAddedNodeForFolder:url];
 				result = YES;
 			}
 		}	

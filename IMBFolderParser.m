@@ -220,11 +220,9 @@
 			// If we found a folder (that is not a package, then remember it for later. Folders will be added
 			// after regular files...
 			
-			NSString* path = [url path];
-
 			if ([isDirectory boolValue] && ![isPackage boolValue])
 			{
-				if (![IMBConfig isLibraryPath:path])
+				if (![IMBConfig isLibraryAtURL:url])
 				{
 					[folders addObject:url];
 				}
@@ -236,7 +234,7 @@
 			
 			// Regular files are added immediately (if they have the correct UTI)...
 			
-			else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
+			else if ([NSString imb_doesFileAtPath:[url path] conformToUTI:_fileUTI])
 			{
 				IMBObject* object = [self objectForURL:url name:localizedName index:index++];
 				[objects addObject:object];
