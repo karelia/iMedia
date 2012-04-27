@@ -78,7 +78,7 @@
 
 // Helpers...
 
-- (NSNumber*) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError;
+- (NSNumber*) directoryHasVisibleSubfolders:(NSURL*)directory error:(NSError**)outError;
 - (IMBObject*) objectForURL:(NSURL*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
 
 @end

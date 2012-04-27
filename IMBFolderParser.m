@@ -134,16 +134,18 @@
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 
-	NSNumber* countOfSubfolders = [self countOfSubfoldersInFolder:url error:nil];
+	NSNumber* hasSubfolders = [self directoryHasVisibleSubfolders:url error:outError];
+    if (!hasSubfolders) return nil;
 
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+    
 	node.icon = [self iconForPath:path];
 	node.name = name;
 	node.identifier = [self identifierForPath:path];
 	node.mediaType = self.mediaType;
 	node.mediaSource = url;
 	node.isTopLevelNode = YES;
-	node.isLeafNode = [countOfSubfolders unsignedIntegerValue] == 0;
+	node.isLeafNode = [hasSubfolders boolValue];
 	node.displayPriority = self.displayPriority;
 	node.isUserAdded = self.isUserAdded;
 	node.parserIdentifier = self.identifier;
@@ -258,8 +260,8 @@
 			
 			NSString* path = [url path];
 			NSString* name = [fileManager displayNameAtPath:path];
-			NSNumber* countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
-			if (countOfSubfolders == nil) continue;
+			NSNumber* hasSubfolders = [self directoryHasVisibleSubfolders:url error:&error];
+			if (!hasSubfolders) continue;
 			
 			IMBNode* subnode = [[IMBNode alloc] init];
 			subnode.icon = [self iconForPath:path];
@@ -269,7 +271,7 @@
 			subnode.mediaSource = url;
 			subnode.parserIdentifier = self.identifier;
 			subnode.isTopLevelNode = NO;
-			subnode.isLeafNode = [countOfSubfolders unsignedIntegerValue] == 0;
+			subnode.isLeafNode = [hasSubfolders boolValue];
 			subnode.groupType = kIMBGroupTypeFolder;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = path;					// These two lines are important to make file watching work for nested 
@@ -336,42 +338,49 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Return the number of (visible) subfolders in a given folder...
+// @YES if there is at least one visible subfolder
+// @NO if there are definitely none, perhaps because the URL isn't even a directory
+// nil if couldn't tell, in which case error pointer is filled in
 
-- (NSNumber*) countOfSubfoldersInFolder:(NSURL*)inFolderURL error:(NSError**)outError
+- (NSNumber*) directoryHasVisibleSubfolders:(NSURL*)directory error:(NSError**)outError;
 {
-	NSError* error = nil;
 	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
-	NSUInteger count = 0;
-	BOOL ok;
+	NSArray* contents = [fileManager contentsOfDirectoryAtURL:directory 
+                                   includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
+                                                      options:NSDirectoryEnumerationSkipsHiddenFiles 
+                                                        error:outError];
+    
+	if (!contents) return nil;
 	
-	NSArray* urls = [fileManager contentsOfDirectoryAtURL:
-		inFolderURL 
-		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
-		options:NSDirectoryEnumerationSkipsHiddenFiles 
-		error:&error];
-
-	if (error == nil)
-	{
-		for (NSURL* url in urls)
-		{
-			NSNumber* folder = nil;
-			ok = [url getResourceValue:&folder forKey:NSURLIsDirectoryKey error:&error];
-			if (!ok) continue;
-
-			NSNumber* package = nil;
-			ok = [url getResourceValue:&package forKey:NSURLIsPackageKey error:&error];
-			if (!ok) continue;
-			
-			if ([folder boolValue]==YES && [package boolValue]==NO)
-			{
-				count++;
-			}
-		}
-	}
-
-	if (outError) *outError = error;
-	return [NSNumber numberWithUnsignedInteger:count];
+    
+    BOOL knowForSure = YES;
+	for (NSURL* url in contents)
+    {
+        NSNumber* isFolder = nil;
+        NSError *error;
+        BOOL ok = [url getResourceValue:&isFolder forKey:NSURLIsDirectoryKey error:&error];
+        
+        if (ok)
+        {
+            // Can stop looking as soon as a folder is found
+            if ([isFolder boolValue])
+            {
+                NSNumber* isPackage = nil;
+                ok = [url getResourceValue:&isPackage forKey:NSURLIsPackageKey error:&error];
+                
+                if (ok && ![isPackage boolValue]) return [NSNumber numberWithBool:YES];
+            }
+        }
+        
+        // If no subfolders are found, return the last error if there was one
+        if (!ok)
+        {
+            knowForSure = NO;
+            if (outError) *outError = error;
+        }
+    }
+    
+    return (knowForSure ? [NSNumber numberWithBool:NO] : nil);
 }
 
 
