@@ -234,8 +234,11 @@
 			
 			// Regular files are added immediately (if they have the correct UTI)...
 			
-			else if ([NSString imb_doesFileAtPath:[url path] conformToUTI:_fileUTI])
-			{
+            NSString *type;
+            ok = [url getResourceValue:&type forKey:NSURLTypeIdentifierKey error:&error];
+			
+            if (ok && UTTypeConformsTo((CFStringRef)type, (CFStringRef)_fileUTI))
+            {
 				IMBObject* object = [self objectForURL:url name:localizedName index:index++];
 				[objects addObject:object];
 				inNode.displayedObjectCount++;
