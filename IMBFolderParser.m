@@ -257,12 +257,15 @@
 				pool = [[NSAutoreleasePool alloc] init];
 			}
 			
-			NSString* path = [url path];
-			NSString* name = [fileManager displayNameAtPath:path];
-			NSNumber* countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
+			NSString* name;
+			if (![url getResourceValue:&name forKey:NSURLLocalizedNameKey error:&error]) continue;
+			
+            NSNumber* countOfSubfolders = [self countOfSubfoldersInFolder:url error:&error];
 			if (countOfSubfolders == nil) continue;
 			
-			IMBNode* subnode = [[IMBNode alloc] init];
+			NSString* path = [url path];
+			
+            IMBNode* subnode = [[IMBNode alloc] init];
 			subnode.icon = [self iconForPath:path];
 			subnode.name = name;
 			subnode.identifier = [self identifierForPath:path];
