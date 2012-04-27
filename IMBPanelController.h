@@ -135,6 +135,7 @@ extern NSString* kIMBImageBrowserShowTitlesNotification;
 
 - (IBAction) showInfoWindow:(id)inSender;
 - (BOOL) isInfoWindowVisible;
+- (NSWindow *)infoWindow;
 
 @end
 

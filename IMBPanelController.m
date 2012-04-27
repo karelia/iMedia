@@ -619,6 +619,10 @@ static IMBPanelController* sSharedPanelController = nil;
 	[ibInfoWindow flipToShowWindow:[self window] forward:NO reflectInto:nil];
 }
 
+- (NSWindow *)infoWindow;
+{
+    return ibInfoWindow;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
