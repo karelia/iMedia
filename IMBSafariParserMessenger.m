@@ -159,7 +159,8 @@ static dispatch_once_t sOnceToken = 0;
     dispatch_once(&sOnceToken,
     ^{
 		NSString* bookmarkFilePath = [SBHomeDirectory() stringByAppendingPathComponent:@"Library/Safari/Bookmarks.plist"];
-		BOOL bookmarkFileExists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:bookmarkFilePath];
+        NSURL *bookmarkFileURL = [NSURL fileURLWithPath:bookmarkFilePath];
+		BOOL bookmarkFileExists = [bookmarkFileURL checkResourceIsReachableAndReturnError:NULL];
 		
 		if ([[self class] isInstalled] && bookmarkFileExists)
 		{
@@ -168,7 +169,7 @@ static dispatch_once_t sOnceToken = 0;
 			IMBSafariParser* parser = (IMBSafariParser*)[self newParser];
 			parser.identifier = [[self class] identifier];
 			parser.mediaType = self.mediaType;
-			parser.mediaSource = [NSURL fileURLWithPath:bookmarkFilePath];
+			parser.mediaSource = bookmarkFileURL;
 			parser.appPath = [[self class] safariPath];
 			[sParsers addObject:parser];
 			[parser release];
