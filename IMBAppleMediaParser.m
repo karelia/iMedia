@@ -203,9 +203,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSError* error = nil;
 	NSString* path = [self.mediaSource path];
 	
-	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
-	{
-		NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
+	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
+    if (metadata)
+    {
 		NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 		
 		@synchronized(self)
