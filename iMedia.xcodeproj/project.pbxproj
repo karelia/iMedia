@@ -67,11 +67,6 @@
 		8FC2561010A8706000F19642 /* IMBLightroom1Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FC2560E10A8706000F19642 /* IMBLightroom1Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FCA063E12368342009072AE /* IMBApertureHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8FCA063D12368342009072AE /* IMBApertureHeaderView.xib */; };
 		8FCA064212368388009072AE /* IMBApertureHeaderViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FCA064012368388009072AE /* IMBApertureHeaderViewController.h */; };
-		8FCA064312368388009072AE /* IMBApertureHeaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FCA064112368388009072AE /* IMBApertureHeaderViewController.m */; };
-		8FF314C515063F6900A76AA2 /* IMBLightroom4Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FF314C315063F6900A76AA2 /* IMBLightroom4Parser.h */; };
-		8FF314C615063F6900A76AA2 /* IMBLightroom4Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FF314C415063F6900A76AA2 /* IMBLightroom4Parser.m */; };
-		8FF314CC15064BC700A76AA2 /* IMBLightroom4VideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FF314CA15064BC700A76AA2 /* IMBLightroom4VideoParser.h */; };
-		8FF314CD15064BC700A76AA2 /* IMBLightroom4VideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FF314CB15064BC700A76AA2 /* IMBLightroom4VideoParser.m */; };
 		8FFCBFD010A8CD9C00377C33 /* IMBLightroom3Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE1AED33129C475200694472 /* js.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE1AED32129C475200694472 /* js.tiff */; };
@@ -578,10 +573,6 @@
 		8FCA063D12368342009072AE /* IMBApertureHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IMBApertureHeaderView.xib; sourceTree = "<group>"; };
 		8FCA064012368388009072AE /* IMBApertureHeaderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBApertureHeaderViewController.h; sourceTree = "<group>"; };
 		8FCA064112368388009072AE /* IMBApertureHeaderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBApertureHeaderViewController.m; sourceTree = "<group>"; };
-		8FF314C315063F6900A76AA2 /* IMBLightroom4Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom4Parser.h; sourceTree = "<group>"; };
-		8FF314C415063F6900A76AA2 /* IMBLightroom4Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom4Parser.m; sourceTree = "<group>"; };
-		8FF314CA15064BC700A76AA2 /* IMBLightroom4VideoParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom4VideoParser.h; sourceTree = "<group>"; };
-		8FF314CB15064BC700A76AA2 /* IMBLightroom4VideoParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom4VideoParser.m; sourceTree = "<group>"; };
 		8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLightroom3Parser.h; sourceTree = "<group>"; };
 		8FFCBFCF10A8CD9C00377C33 /* IMBLightroom3Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLightroom3Parser.m; sourceTree = "<group>"; };
 		CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBURLGetSizeOperation.h; sourceTree = "<group>"; };
@@ -1337,10 +1328,6 @@
 				D0904E30152DB590003FDD08 /* IMBLightroomObject.m */,
 				D0904DF3152D73F8003FDD08 /* Old */,
 				D05D3A16152AD28400E30C43 /* com.karelia.imedia.Lightroom.entitlements */,
-				8F93177C10A9FC53002CDB19 /* IMBPyramidObjectPromise.h */,
-				8F93177D10A9FC53002CDB19 /* IMBPyramidObjectPromise.m */,
-				8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */,
-				8F47B39010C416050013ED25 /* IMBOrderedDictionary.m */,
 			);
 			name = Lightroom;
 			sourceTree = "<group>";
@@ -1781,12 +1768,8 @@
 				D0CD1E53101A452A000FA505 /* IMBiPhotoParserOld.m */,
 				D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */,
 				D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */,
-				D0467BB2112C223600C1AA4E /* IMBApertureVideoParser.h */,
-				D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */,
-				8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */,
-				8FC2089C11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m */,
-				8FF314CA15064BC700A76AA2 /* IMBLightroom4VideoParser.h */,
-				8FF314CB15064BC700A76AA2 /* IMBLightroom4VideoParser.m */,
+				8F7945CC139518CD0066E133 /* IMBiPhotoObjectPromise.h */,
+				8F7945CD139518CD0066E133 /* IMBiPhotoObjectPromise.m */,
 			);
 			name = Old;
 			sourceTree = "<group>";
