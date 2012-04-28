@@ -159,7 +159,7 @@
 		
 			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			subnode.identifier = [self identifierForPath:userSongsPath];
-			subnode.icon = [self iconForPath:userSongsPath];
+			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:userSongsPath isDirectory:isDirectory] error:NULL];
 			subnode.name = userSongsName;
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = [NSURL fileURLWithPath:userSongsPath];
@@ -181,7 +181,7 @@
 
 			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			subnode.identifier = [self identifierForPath:userSongsPath];
-			subnode.icon = [self iconForPath:demoSongsPath];
+			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:demoSongsPath isDirectory:isDirectory] error:NULL];
 			subnode.name = demoSongsName;
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = [NSURL fileURLWithPath:demoSongsPath];

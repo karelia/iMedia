@@ -323,9 +323,9 @@ static NSMutableSet *sLibraryPaths = nil;
 	[sLibraryPaths addObject:inPath];
 }
 
-+ (BOOL) isLibraryPath:(NSString*)inPath
++ (BOOL) isLibraryAtURL:(NSURL *)url;
 {
-	return [sLibraryPaths containsObject:inPath];
+	return [url isFileURL] && [sLibraryPaths containsObject:[url path]];
 }
 
 // Future: We may need a method that loops through the library paths and asks if the given
