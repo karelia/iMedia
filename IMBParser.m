@@ -289,22 +289,8 @@
 - (NSString*) identifierForObject:(IMBObject*)inObject
 {
 	NSString* prefix = [self identifierPrefix];
-	NSString* location = nil;
 	
-	if ([inObject.location isKindOfClass:[NSString class]])
-	{
-		location = (NSString*)inObject.location;
-	}
-	else if ([inObject.location isKindOfClass:[NSURL class]])
-	{
-		location = [(NSURL*)inObject.location path];
-	}
-	else
-	{
-		location = [inObject.location description];
-	}
-
-	return [NSString stringWithFormat:@"%@:/%@",prefix,location];
+	return [NSString stringWithFormat:@"%@:/%@",prefix,inObject.location];
 }
 
 

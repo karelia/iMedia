@@ -376,7 +376,7 @@
 		
 		if (url)
 		{
-			object.location = (id)url;
+			object.location = url;
 			object.imageRepresentationType = IKImageBrowserNSURLRepresentationType;
 		}
 		else

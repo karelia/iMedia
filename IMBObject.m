@@ -324,18 +324,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 - (NSString*) path
 {
-	NSString* path = nil;
-	
-	if ([_location isKindOfClass:[NSURL class]])
-	{
-		path = [(NSURL*)_location path];
-	}
-	else if ([_location isKindOfClass:[NSString class]])
-	{
-		path = (NSString*)_location;
-	}
-	
-	return path;
+	return [_location path];
 }
 
 
@@ -343,18 +332,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 - (NSURL*) URL
 {
-	NSURL* url = nil;
-	
-	if ([_location isKindOfClass:[NSURL class]])
-	{
-		url = (NSURL*)_location;
-	}
-	else if ([_location isKindOfClass:[NSString class]])
-	{
-		url = [NSURL fileURLWithPath:(NSString*)_location];
-	}
-	
-	return url;
+	return _location;
 }
 
 
@@ -363,17 +341,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 - (BOOL) isLocalFile
 {
-	if ([_location isKindOfClass:[NSURL class]])
-	{
-		return [(NSURL*)_location isFileURL];
-	}
-	else if ([_location isKindOfClass:[NSString class]])
-	{
-		NSString* path = (NSString*)_location;
-		return [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path];
-	}
-	
-	return NO;
+	return [(NSURL*)_location isFileURL];
 }
 
 
