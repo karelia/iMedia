@@ -733,7 +733,7 @@
 	
 	if (![inObject isKindOfClass:[IMBNodeObject class]])
 	{
-		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
+		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtURL:inObject.URL checkSpotlightComments:NO]];
 	}
     
 	NSString* description = [self metadataDescriptionForMetadata:metadata];

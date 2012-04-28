@@ -452,7 +452,7 @@ static NSArray* sSupportedUTIs = nil;
 	{
 		IMBLightroomObject* object = (IMBLightroomObject*)inObject;
 		metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path checkSpotlightComments:NO]];
+		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtURL:object.URL checkSpotlightComments:NO]];
 	}
 
 	return metadata;
