@@ -73,8 +73,6 @@
 
 - (NSComparisonResult)imb_finderCompare:(NSString *)aString;
 
-- (NSString *)imb_resolvedPath;
-
 @end
 
 @interface NSMutableString (iMedia)

@@ -348,12 +348,12 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 - (NSString*) type
 {
 	NSString* uti = nil;
-	NSString* path = [[self URL] path];
-	NSString* extension = [path pathExtension];
+	NSURL *url = [self URL];
+	NSString* extension = [url pathExtension];
 		
-	if ([self isLocalFile])
+	if ([url isFileURL])
 	{
-		uti = [NSString imb_UTIForFileAtPath:path];
+		uti = [NSString imb_UTIForFileAtPath:[url path]];
 	}
 	else if (extension != nil)
 	{
@@ -362,8 +362,8 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 	if (uti != nil && [NSString imb_doesUTI:uti conformsToUTI:(NSString*)kUTTypeAliasFile])
 	{
-		path = [path imb_resolvedPath];
-		uti = [NSString imb_UTIForFileAtPath:path];
+		url = [url imb_URLByResolvingSymlinksAndBookmarkFilesInPath];
+		uti = (url ? [NSString imb_UTIForFileAtPath:[url path]] : nil);
 	}
 	
 	return uti;
