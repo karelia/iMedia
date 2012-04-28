@@ -673,8 +673,6 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 					downloadOp.localPath = localPath;	// Indicate already-ready local path, meaning that no download needs to actually happen
 					[self didFinish:downloadOp];
 				}
-                
-                [fileManager release];
 				
 				// This will be a real download.  Make sure we have the progress window showing now.
 				// Show the progress, which is indeterminate for now as we do not know the file sizes yet...
@@ -685,6 +683,8 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 					[self.getSizeOperations addObject:getSizeOp];
 					[self.downloadOperations addObject:downloadOp];
 				}
+                
+                [fileManager release];
 			}
 		}
 	}
