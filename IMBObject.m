@@ -331,15 +331,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (BOOL) isLocalFile
-{
-	return [(NSURL*)_location isFileURL];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Since an object may or may not point to a local file we have to assume that we are dealing with a remote file. 
 // For this reason we may have to use the file extension to guess the uti of the object. Obviously this can fail 
 // if we do not have an extension, or if we are not dealing with files or urls at all, e.g. with image capture 
@@ -383,7 +374,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	{
 		icon = self.imageRepresentation;
 	}
-	else if ([self isLocalFile])
+	else if ([[self URL] isFileURL])
 	{
 		icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:self.type];
 	}

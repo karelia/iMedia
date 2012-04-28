@@ -101,7 +101,7 @@
 		{
 			result = [IMBSmartFolderObject icon];
 		}
-		else if ([self isLocalFile])
+		else if ([[self URL] isFileURL])
 		{
 			NSString *type = [self type];
 			result = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:type];
