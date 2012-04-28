@@ -679,7 +679,7 @@
 		return NSOrderedAscending;
 	}
 		
-	return [self.name imb_finderCompare:inNode.name];
+	return [self.name localizedStandardCompare:inNode.name];
 }
 
 

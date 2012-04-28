@@ -71,8 +71,6 @@
 
 + (NSString *)imb_stringFromStarRating:(NSUInteger)aRating;
 
-- (NSComparisonResult)imb_finderCompare:(NSString *)aString;
-
 - (NSString *)imb_resolvedPath;
 
 @end
