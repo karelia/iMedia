@@ -136,7 +136,6 @@ extern NSString* kIMBObjectPasteboardType;
 
 // Convenience accessors for the file...
 
-- (NSString*) path;											// Converts self.location to a path
 - (NSURL*) URL;												// Converts self.location to a url
 - (NSString*) type;											// Returns UTI of file if possible
 - (BOOL) isLocalFile;										// Is this object a local file

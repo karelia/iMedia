@@ -320,14 +320,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 #pragma mark Helpers
 
 
-// Convert location to path...
-
-- (NSString*) path
-{
-	return [_location path];
-}
-
-
 // Convert location to url...
 
 - (NSURL*) URL
@@ -356,7 +348,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 - (NSString*) type
 {
 	NSString* uti = nil;
-	NSString* path = [self path];
+	NSString* path = [[self URL] path];
 	NSString* extension = [path pathExtension];
 		
 	if ([self isLocalFile])
