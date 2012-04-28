@@ -381,7 +381,7 @@
 		}
 		else
 		{
-			object.location = urlString;	// url may not have been formed from string
+			object.location = [NSURL fileURLWithPath:urlString];	// url may not have been formed from string
 			object.imageRepresentationType = IKImageBrowserPathRepresentationType;
 		}
 		

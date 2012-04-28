@@ -469,7 +469,7 @@ static NSArray* sSupportedUTIs = nil;
 	if (jpegData != nil) {
 		IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 		NSString* orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];;
-		NSString* fileName = [[(NSString*)inObject.location lastPathComponent] stringByDeletingPathExtension];
+		NSString* fileName = [[(NSURL*)inObject.location lastPathComponent] stringByDeletingPathExtension];
 		NSString* jpegPath = [[[NSFileManager imb_threadSafeManager] imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
 		NSURL* jpegURL = [NSURL fileURLWithPath:jpegPath];
 		BOOL success = NO;
@@ -1045,7 +1045,7 @@ static NSArray* sSupportedUTIs = nil;
 
 	object.absolutePyramidPath = absolutePyramidPath;
 	object.idLocal = idLocal;
-	object.location = (id)inPath;
+	object.location = [NSURL fileURLWithPath:inPath];
 	object.name = inName;
 	object.preliminaryMetadata = inMetadata;	// This metadata was in the XML file and is available immediately
 	object.metadata = nil;						// Build lazily when needed (takes longer)
