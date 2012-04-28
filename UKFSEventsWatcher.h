@@ -31,7 +31,7 @@
 	CFTimeInterval				latency;			// Time that must pass before events are being sent.
 	FSEventStreamCreateFlags	flags;				// See FSEvents.h
     NSMutableDictionary*		eventStreams;		// List of FSEventStreamRef pointers in NSValues, with the pathnames as their keys.
-	NSMutableDictionary*		pathReferenceCounts;// To support a client adding the same path multiple times, we 
+	NSCountedSet*				eventStreamPaths;	// To support a client adding the same path multiple times, we 
 													// count the number of times it's been added, and only remove when 
 													// the number goes to zero...
 }
@@ -44,8 +44,20 @@
 - (void) setFSEventStreamCreateFlags:(FSEventStreamCreateFlags)flags;
 - (FSEventStreamCreateFlags) fsEventStreamCreateFlags;
 
-// UKFileWatcher defines the methods: addPath: removePath: and delegate accessors.
-- (void) removeAllPaths;
+// UKFileWatcher defines the methods: addPath: removePath: removeAllPaths: and delegate accessors.
+//
+// Our implementation differs from the basic UKFileWatcher protocol in that calls to 
+// addPath and removePath are expected to be balanced so that if for example addPath:
+// is called twice with the same path, it should be called twice with removePath: to 
+// effect the actual ending of the FSEvent observation.
+//
+// removeAllPaths ensures that every watched path is no longer watched, regardless
+// of the number of times addPath: has been called on a given path.
+//
+
+- (void) addPath: (NSString*)path;
+- (void) removePath: (NSString*)path;
+- (void)	removeAllPaths;
 
 @end
 
