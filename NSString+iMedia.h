@@ -71,8 +71,6 @@
 
 + (NSString *)imb_stringFromStarRating:(NSUInteger)aRating;
 
-- (NSComparisonResult)imb_finderCompare:(NSString *)aString;
-
 @end
 
 @interface NSMutableString (iMedia)
