@@ -1617,7 +1617,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			@"Quick Look",
 			@"Menu item in context menu of IMBObjectViewController");
 			
-		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@""];
+		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@"y"];
+		[item setKeyEquivalentModifierMask:NSCommandKeyMask];
 		[item setRepresentedObject:inObject];
 		[item setTarget:self];
 		[menu addItem:item];
