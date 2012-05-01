@@ -259,7 +259,7 @@
 	float width = radius;
 	float height = originalRect.size.height/2;
 	float dist = 1600; // visual distance to flipping window, 1600 looks about right. You could try radius*5, too.
-	float angle = direction*M_PI*time;
+	float angle = direction*3.14159265358979323846264338327950288*time;
 	float px1 = radius*cos(angle);
 	float pz = radius*sin(angle);
 	float pz1 = dist+pz;
