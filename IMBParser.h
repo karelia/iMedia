@@ -104,17 +104,6 @@
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError;
 
-// Helpers for subclasses...
-
-- (NSString*) identifierForPath:(NSString*)inPath;
-- (NSString*) identifierForObject:(IMBObject*)inObject;
-- (NSImage*) iconForPath:(NSString*)inPath;
-- (NSString*) identifierPrefix;
-
-- (CGImageRef) thumbnailFromLocalImageFileForObject:(IMBObject*)inObject error:(NSError**)outError;
-- (CGImageRef) thumbnailFromQuicklookForObject:(IMBObject*)inObject error:(NSError**)outError;
-- (NSData*) bookmarkForLocalFileObject:(IMBObject*)inObject error:(NSError**)outError;
-
 @end
 
 
