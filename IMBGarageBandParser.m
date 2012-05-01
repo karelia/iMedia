@@ -211,13 +211,13 @@
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	NSString* path = inObject.path;
-	path = [path stringByAppendingPathComponent:@"Output/metadata.plist"];
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+	NSURL *url = inObject.URL;
+	url = [url URLByAppendingPathComponent:@"Output/metadata.plist"];
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithContentsOfURL:url];
 	
 	if (metadata)
 	{
-		[metadata setObject:path forKey:@"path"];
+		[metadata setObject:[url path] forKey:@"path"];
 
 		NSNumber* duration = [metadata objectForKey:@"com_apple_garageband_metadata_songDuration"];
 		[metadata setObject:duration forKey:@"duration"];

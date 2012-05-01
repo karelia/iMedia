@@ -276,7 +276,7 @@
 
 			IMBFolderObject* object = [[IMBFolderObject alloc] init];
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)url;
+			object.location = url;
 			object.name = name;
 			object.metadata = nil;
 			object.parserIdentifier = self.identifier;
@@ -316,10 +316,10 @@
 #pragma mark Helpers
 
 
-- (IMBObject*) objectForURL:(NSString*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
+- (IMBObject*) objectForURL:(NSURL*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
 {
 	IMBObject* object = [[[IMBObject alloc] init] autorelease];
-	object.location = (id)inURL;
+	object.location = inURL;
 	object.name = inName;
 	object.parserIdentifier = self.identifier;
 	object.index = inIndex;

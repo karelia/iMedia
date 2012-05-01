@@ -119,7 +119,7 @@
 	
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
 	
-	[metadata setObject:[inObject path] forKey:@"path"];
+	[metadata setObject:[audioURL path] forKey:@"path"];
 	[metadata addEntriesFromDictionary:[NSURL imb_metadataFromAudioAtURL:audioURL]];
 	
 	NSString* description = [self metadataDescriptionForMetadata:metadata];

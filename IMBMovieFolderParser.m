@@ -84,7 +84,7 @@
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
-	NSString* path = inObject.path;
+	NSString* path = [[inObject URL] path];
 	MDItemRef item = MDItemCreate(NULL,(CFStringRef)path);
 	
 	if (item)

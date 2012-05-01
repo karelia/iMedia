@@ -641,7 +641,7 @@
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+			object.location = [NSURL fileURLWithPath:path isDirectory:NO];
 			object.name = subnode.name;
 			object.parserIdentifier = [self identifier];
 			object.index = index++;
@@ -694,7 +694,7 @@
 			[objects addObject:object];
 			[object release];
 			
-			object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+			object.location = [NSURL fileURLWithPath:path isDirectory:NO];
 			object.name = name;
 			object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
 			object.metadata = nil;					// Build lazily when needed (takes longer)
@@ -794,7 +794,7 @@
         [objects addObject:object];
         [object release];
         
-        object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+        object.location = [NSURL fileURLWithPath:path isDirectory:NO];
         object.name = name;
         object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
         object.metadata = nil;					// Build lazily when needed (takes longer)

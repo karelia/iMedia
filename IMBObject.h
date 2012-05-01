@@ -76,11 +76,11 @@ extern NSString* kIMBObjectPasteboardType;
 
 
 // IMBObject encapsulates information about a single media item (e.g. image file or audio file). The location 
-// property uniquely identifies the item. In the case of files it could be a path or NSURL...
+// property uniquely identifies the item.
 
 @interface IMBObject : NSObject <NSCopying,NSCoding,IMBImageItem,QLPreviewItem,NSPasteboardItemDataProvider>
 {
-	id _location;												
+	NSURL *_location;												
 	NSData* _bookmark;
 	NSString* _name;
 	NSString* _identifier;
@@ -105,7 +105,7 @@ extern NSString* kIMBObjectPasteboardType;
 	NSUInteger _imageVersion;
 }
 
-@property (retain) id location;								// Path, URL, or other location info
+@property (copy) NSURL *location;
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
 @property (retain) NSString* identifier;					// Unique identifier for this object
@@ -136,10 +136,8 @@ extern NSString* kIMBObjectPasteboardType;
 
 // Convenience accessors for the file...
 
-- (NSString*) path;											// Converts self.location to a path
 - (NSURL*) URL;												// Converts self.location to a url
 - (NSString*) type;											// Returns UTI of file if possible
-- (BOOL) isLocalFile;										// Is this object a local file
 
 
 //----------------------------------------------------------------------------------------------------------------------

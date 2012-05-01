@@ -555,7 +555,7 @@
 					// For local files path is preferred (as we gain automatic support for some context menu items).
 					// For remote files we'll use a URL (less context menu support)...
 					
-					object.location = (id)url;
+					object.location = url;
 					object.name = name;
 					object.parserIdentifier = self.identifier;
 					object.index = index++;

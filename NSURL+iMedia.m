@@ -44,7 +44,7 @@
 */
 
 
-// Author: Dan Wood
+// Author: Dan Wood, Mike Abdullah
 
 
 #import "NSURL+iMedia.h"
@@ -244,6 +244,37 @@
 	}
 	
 	return metadata;
+}
+
+#pragma mark Aliases
+
+- (NSURL *)imb_URLByResolvingBookmarkFilesInPath;
+{
+    // Resolve any bookmarks higher up the chain first
+    NSURL *parent = [self URLByDeletingLastPathComponent];
+    if (parent != self)
+    {
+        NSURL *resolvedParent = [parent imb_URLByResolvingBookmarkFilesInPath];
+        if (!resolvedParent) return nil;
+        
+        if (resolvedParent != parent) self = [resolvedParent URLByAppendingPathComponent:[self lastPathComponent]];
+    }
+    
+    
+    NSData *bookmarkData = [NSURL bookmarkDataWithContentsOfURL:self error:NULL];
+    if (!bookmarkData) return self;
+    
+    return [NSURL URLByResolvingBookmarkData:bookmarkData
+                                     options:NSURLBookmarkResolutionWithoutUI
+                               relativeToURL:nil
+                         bookmarkDataIsStale:NULL error:NULL];
+}
+
+- (NSURL *)imb_URLByResolvingSymlinksAndBookmarkFilesInPath;
+{
+    // Bookmark resolution will invisibly handle symlinks, so do that first
+    NSURL *result = [self imb_URLByResolvingBookmarkFilesInPath];
+    return [result URLByResolvingSymlinksInPath];
 }
 
 @end

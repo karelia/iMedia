@@ -320,64 +320,11 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 #pragma mark Helpers
 
 
-// Convert location to path...
-
-- (NSString*) path
-{
-	NSString* path = nil;
-	
-	if ([_location isKindOfClass:[NSURL class]])
-	{
-		path = [(NSURL*)_location path];
-	}
-	else if ([_location isKindOfClass:[NSString class]])
-	{
-		path = (NSString*)_location;
-	}
-	
-	return path;
-}
-
-
 // Convert location to url...
 
 - (NSURL*) URL
 {
-	NSURL* url = nil;
-	
-	if ([_location isKindOfClass:[NSURL class]])
-	{
-		url = (NSURL*)_location;
-	}
-	else if ([_location isKindOfClass:[NSString class]])
-	{
-		url = [NSURL fileURLWithPath:(NSString*)_location];
-	}
-	
-	return url;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (BOOL) isLocalFile
-{
-    BOOL result = NO;
-    
-	if ([_location isKindOfClass:[NSURL class]])
-	{
-		return [(NSURL*)_location isFileURL];
-	}
-	else if ([_location isKindOfClass:[NSString class]])
-	{
-		NSString* path = (NSString*)_location;
-        NSFileManager *fileManager = [[NSFileManager alloc] init];
-		result = [fileManager fileExistsAtPath:path];
-        [fileManager release];
-	}
-	
-	return result;
+	return _location;
 }
 
 
@@ -392,12 +339,12 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 - (NSString*) type
 {
 	NSString* uti = nil;
-	NSString* path = [self path];
-	NSString* extension = [path pathExtension];
+	NSURL *url = [self URL];
+	NSString* extension = [url pathExtension];
 		
-	if ([self isLocalFile])
+	if ([url isFileURL])
 	{
-		uti = [NSString imb_UTIForFileAtPath:path];
+		uti = [NSString imb_UTIForFileAtPath:[url path]];
 	}
 	else if (extension != nil)
 	{
@@ -406,8 +353,8 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 	if (uti != nil && [NSString imb_doesUTI:uti conformsToUTI:(NSString*)kUTTypeAliasFile])
 	{
-		path = [path imb_resolvedPath];
-		uti = [NSString imb_UTIForFileAtPath:path];
+		url = [url imb_URLByResolvingSymlinksAndBookmarkFilesInPath];
+		uti = (url ? [NSString imb_UTIForFileAtPath:[url path]] : nil);
 	}
 	
 	return uti;
@@ -427,7 +374,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	{
 		icon = self.imageRepresentation;
 	}
-	else if ([self isLocalFile])
+	else if ([[self URL] isFileURL])
 	{
 		icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:self.type];
 	}

@@ -831,7 +831,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+			object.location = [NSURL fileURLWithPath:path isDirectory:NO];
 			object.name = subnode.name;
 			object.parserIdentifier = [self identifier];
 			object.index = index++;
