@@ -289,22 +289,8 @@
 - (NSString*) identifierForObject:(IMBObject*)inObject
 {
 	NSString* prefix = [self identifierPrefix];
-	NSString* location = nil;
 	
-	if ([inObject.location isKindOfClass:[NSString class]])
-	{
-		location = (NSString*)inObject.location;
-	}
-	else if ([inObject.location isKindOfClass:[NSURL class]])
-	{
-		location = [(NSURL*)inObject.location path];
-	}
-	else
-	{
-		location = [inObject.location description];
-	}
-
-	return [NSString stringWithFormat:@"%@:/%@",prefix,location];
+	return [NSString stringWithFormat:@"%@:/%@",prefix,inObject.location];
 }
 
 
@@ -326,17 +312,15 @@
 
 // This method makes sure that we have an image with a bitmap representation that can be archived...
 
-- (NSImage*) iconForPath:(NSString*)inPath
+- (NSImage*) iconForItemAtURL:(NSURL*)url error:(NSError **)error;
 {
-	NSWorkspace* workspace = [NSWorkspace imb_threadSafeWorkspace];
-	NSImage* image = [workspace iconForFile:inPath];
-	[image setSize:NSMakeSize(16,16)];
-	return image;
-	
-//	NSData* tiff = [image TIFFRepresentation];
-//	NSImage* icon = [[[NSImage alloc] initWithData:tiff] autorelease];
-//	[icon setSize:NSMakeSize(16,16)];
-//	return icon;
+    NSImage *result;
+    if (![url getResourceValue:&result forKey:NSURLEffectiveIconKey error:error]) return nil;
+    NSAssert(url != nil, @"Getting NSURLEffectiveIconKey suceeded, but with a nil image, which isn't documented");
+    
+    result = [result copy]; // since we're about to mutate
+	[result setSize:NSMakeSize(16,16)];
+	return [result autorelease];
 }
 
 

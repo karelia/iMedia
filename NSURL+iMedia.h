@@ -44,7 +44,7 @@
 */
 
 
-// Author: Dan Wood
+// Author: Dan Wood, Mike Abdullah
 
 #import <Cocoa/Cocoa.h>
 
@@ -56,5 +56,11 @@
 
 + (NSDictionary *)imb_metadataFromVideoAtURL:(NSURL*)inURL;
 + (NSDictionary *)imb_metadataFromAudioAtURL:(NSURL*)inURL;
+
+
+#pragma mark Aliases
+// Like -URLByResolvingSymlinksInPath, but handles any aliases in the path too. Returns nil upon resolution error
+- (NSURL *)imb_URLByResolvingSymlinksAndBookmarkFilesInPath;
+
 
 @end

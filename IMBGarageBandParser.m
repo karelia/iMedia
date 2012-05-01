@@ -160,7 +160,7 @@
 		
 			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			subnode.identifier = [self identifierForPath:userSongsPath];
-			subnode.icon = [self iconForPath:userSongsPath];
+			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:userSongsPath isDirectory:isDirectory] error:NULL];
 			subnode.name = userSongsName;
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = [NSURL fileURLWithPath:userSongsPath];
@@ -181,7 +181,7 @@
 
 			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			subnode.identifier = [self identifierForPath:userSongsPath];
-			subnode.icon = [self iconForPath:demoSongsPath];
+			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:demoSongsPath isDirectory:isDirectory] error:NULL];
 			subnode.name = demoSongsName;
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = [NSURL fileURLWithPath:demoSongsPath];
@@ -210,13 +210,13 @@
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	NSString* path = inObject.path;
-	path = [path stringByAppendingPathComponent:@"Output/metadata.plist"];
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+	NSURL *url = inObject.URL;
+	url = [url URLByAppendingPathComponent:@"Output/metadata.plist"];
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithContentsOfURL:url];
 	
 	if (metadata)
 	{
-		[metadata setObject:path forKey:@"path"];
+		[metadata setObject:[url path] forKey:@"path"];
 
 		NSNumber* duration = [metadata objectForKey:@"com_apple_garageband_metadata_songDuration"];
 		[metadata setObject:duration forKey:@"duration"];

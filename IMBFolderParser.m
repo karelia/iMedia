@@ -125,8 +125,7 @@
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-    
-	node.icon = [self iconForPath:path];
+	node.icon = [self iconForItemAtURL:url error:NULL];
 	node.name = name;
 	node.identifier = [self identifierForPath:path];
 	node.mediaType = self.mediaType;
@@ -209,11 +208,9 @@
 			// If we found a folder (that is not a package, then remember it for later. Folders will be added
 			// after regular files...
 			
-			NSString* path = [url path];
-
 			if ([isDirectory boolValue] && ![isPackage boolValue])
 			{
-				if (![IMBConfig isLibraryPath:path])
+				if (![IMBConfig isLibraryAtURL:url])
 				{
 					[folders addObject:url];
 				}
@@ -225,8 +222,11 @@
 			
 			// Regular files are added immediately (if they have the correct UTI)...
 			
-			else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
-			{
+            NSString *type;
+            ok = [url getResourceValue:&type forKey:NSURLTypeIdentifierKey error:&error];
+			
+            if (ok && UTTypeConformsTo((CFStringRef)type, (CFStringRef)_fileUTI))
+            {
 				IMBObject* object = [self objectForURL:url name:localizedName index:index++];
 				[objects addObject:object];
 				inNode.displayedObjectCount++;
@@ -245,15 +245,19 @@
 				pool = [[NSAutoreleasePool alloc] init];
 			}
 			
-			NSString* path = [url path];
-			NSString* name = [fileManager displayNameAtPath:path];
+			NSString* name;
+			if (![url getResourceValue:&name forKey:NSURLLocalizedNameKey error:&error]) continue;
+			
 			NSNumber* hasSubfolders = [self directoryHasVisibleSubfolders:url error:&error];
 			if (!hasSubfolders) continue;
 			
 			IMBNode* subnode = [[IMBNode alloc] init];
-			subnode.icon = [self iconForPath:path];
+			subnode.icon = [self iconForItemAtURL:url error:NULL];
 			subnode.name = name;
+			
+            NSString* path = [url path];
 			subnode.identifier = [self identifierForPath:path];
+            
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = url;
 			subnode.parserIdentifier = self.identifier;
@@ -263,12 +267,13 @@
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = path;					// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;	// subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
-			[subnodes addObject:subnode];
+			
+            [subnodes addObject:subnode];
 			[subnode release];
 
 			IMBFolderObject* object = [[IMBFolderObject alloc] init];
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)url;
+			object.location = url;
 			object.name = name;
 			object.metadata = nil;
 			object.parserIdentifier = self.identifier;
@@ -308,10 +313,10 @@
 #pragma mark Helpers
 
 
-- (IMBObject*) objectForURL:(NSString*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
+- (IMBObject*) objectForURL:(NSURL*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
 {
 	IMBObject* object = [[[IMBObject alloc] init] autorelease];
-	object.location = (id)inURL;
+	object.location = inURL;
 	object.name = inName;
 	object.parserIdentifier = self.identifier;
 	object.index = inIndex;

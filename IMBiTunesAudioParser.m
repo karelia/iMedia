@@ -251,11 +251,11 @@
 
 - (NSDictionary*) plist
 {
-	NSError* error = nil;
 	NSURL* url = self.mediaSource;
-	NSString* path = [url path];
-	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
-	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
+	
+    NSDate* modificationDate;
+    if (![url getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:NULL]) modificationDate = nil;
+    
 	
 	@synchronized(self)
 	{
@@ -555,7 +555,7 @@
 					// For local files path is preferred (as we gain automatic support for some context menu items).
 					// For remote files we'll use a URL (less context menu support)...
 					
-					object.location = (id)url;
+					object.location = url;
 					object.name = name;
 					object.parserIdentifier = self.identifier;
 					object.index = index++;

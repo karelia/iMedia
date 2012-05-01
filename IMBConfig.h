@@ -100,7 +100,7 @@
 // Library Paths
 
 + (void)registerLibraryPath:(NSString *)aPath;
-+ (BOOL) isLibraryPath:(NSString *)aPath;
++ (BOOL) isLibraryAtURL:(NSURL *)url;
 
 // Set default prefs values...
 
