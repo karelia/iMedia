@@ -1485,7 +1485,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			@"Menu item in context menu of IMBObjectViewController");
 		
 		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openSubNode:) keyEquivalent:@""];
-		[item setRepresentedObject:[inObject location]];
+		[item setRepresentedObject:[(IMBNodeObject*)inObject representedNodeIdentifier]];
 		[item setTarget:self];
 		[menu addItem:item];
 		[item release];
@@ -1807,9 +1807,18 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (IBAction) openSubNode:(id)inSender
 {
-//	IMBNode* node = (IMBNode*)[inSender representedObject];
-//	[_nodeViewController expandSelectedNode];
-//	[_nodeViewController selectNode:node];
+	NSString* identifier = (NSString*)[inSender representedObject];
+	IMBNode* node = [[IMBLibraryController sharedLibraryControllerWithMediaType:self.mediaType] nodeWithIdentifier:identifier];
+
+	NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
+		self,@"objectViewController",
+		node,@"node",
+		nil];
+			
+	[[NSNotificationCenter defaultCenter] 
+		postNotificationName:kIMBExpandAndSelectNodeWithIdentifierNotification 
+		object:nil 
+		userInfo:info];
 }
 
 
