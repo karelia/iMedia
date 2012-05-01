@@ -78,9 +78,8 @@
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	NSString* path = inObject.path;
 	if (outError) *outError = nil;
-	return [NSImage imb_metadataFromImageAtPath:path checkSpotlightComments:YES];
+	return [NSImage imb_metadataFromImageAtURL:inObject.URL checkSpotlightComments:YES];
 }
 
 

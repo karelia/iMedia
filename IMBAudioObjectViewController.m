@@ -320,22 +320,21 @@
 	[inObject requestBookmarkWithCompletionBlock:^(NSError* inError)
 	{
 		NSError* error = inError;
-		NSString* path = nil;
+		NSURL* url = nil;
 		QTMovie* movie = nil;
 		
-		// Get the path to the audio file. GarageBand files require special attention as the "playable"  
+		// Get the URL for the audio file. GarageBand files require special attention as the "playable"  
 		// file resides inside the document package...
 			
 		if (error == nil)
 		{
-			NSURL* url = [inObject URLByResolvingBookmark];
-			path = [url path];
+			url = [inObject URLByResolvingBookmark];
 			
-			if ([[[path pathExtension] lowercaseString] isEqualToString:@"band"])
+			if ([[[url pathExtension] lowercaseString] isEqualToString:@"band"])
 			{
-				NSString* output = [path stringByAppendingPathComponent:@"Output/Output.aif"];
-				BOOL exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:output];
-				if (exists) path = output;
+				NSURL* output = [url URLByAppendingPathComponent:@"Output/Output.aif"];
+				BOOL exists = [url checkResourceIsReachableAndReturnError:NULL];
+				if (exists) url = output;
 			}
 		}	
 
@@ -343,7 +342,7 @@
 			
 		if (error == nil)
 		{
-			movie = [QTMovie movieWithFile:path error:&error];
+			movie = [QTMovie movieWithURL:url error:&error];
 			
 			[[NSNotificationCenter defaultCenter] 
 				addObserver:self 

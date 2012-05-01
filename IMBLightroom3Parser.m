@@ -168,29 +168,34 @@
 	NSString *basePath = [databasePath stringByDeletingPathExtension];	
 	NSString *pathExtension = [databasePath pathExtension];	
 	NSString *readOnlyDatabasePath = [[NSString stringWithFormat:@"%@-readOnly", basePath] stringByAppendingPathExtension:pathExtension];
-	
-	NSFileManager *fileManager = [NSFileManager imb_threadSafeManager];
+	NSURL *readOnlyDatabaseURL = [NSURL fileURLWithPath:readOnlyDatabasePath isDirectory:NO];
 	BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
-	NSError* error;
 	
-	if ([fileManager fileExistsAtPath:readOnlyDatabasePath]) {
-		error = nil;
-		NSDictionary *attributesOfCopy = [fileManager attributesOfItemAtPath:readOnlyDatabasePath error:&error];
-		if (!attributesOfCopy) NSLog (@"Unable to fetch attributes for %@: %@", readOnlyDatabasePath, error.localizedDescription);
-		NSDate *modDateOfCopy = [attributesOfCopy fileModificationDate];
-		
-		error = nil;
-		NSDictionary *attributesOfOrig = [fileManager attributesOfItemAtPath:databasePath error:&error];
-		if (attributesOfOrig) NSLog (@"Unable to fetch attributes for %@: %@", databasePath, error.localizedDescription);
-		NSDate *modDateOfOrig = [attributesOfOrig fileModificationDate];
-		
-		if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy]) {
-			needToCopyFile = NO;
+    NSDate *modDateOfCopy;
+    NSError* error;
+	if ([readOnlyDatabaseURL getResourceValue:&modDateOfCopy forKey:NSURLContentModificationDateKey error:&error])
+    {		
+		NSURL *databaseURL = [NSURL fileURLWithPath:databasePath isDirectory:NO];
+        
+		NSDate *modDateOfOrig;
+        if ([databaseURL getResourceValue:&modDateOfOrig forKey:NSURLContentModificationDateKey error:&error])
+		{
+            if ([modDateOfOrig isEqualToDate:modDateOfCopy]) needToCopyFile = NO;
 		}
+        else
+        {
+            NSLog (@"Unable to fetch attributes for %@: %@", databasePath, error.localizedDescription);
+        }
 	}
+    else if (![[error domain] isEqualToString:NSCocoaErrorDomain] && [error code] != NSFileNoSuchFileError)
+    {
+        NSLog (@"Unable to fetch attributes for %@: %@", readOnlyDatabasePath, error.localizedDescription);
+    }
 	
-	if (needToCopyFile) {
-		(void) [fileManager removeItemAtPath:readOnlyDatabasePath error:&error];
+	if (needToCopyFile)
+    {
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+		(void) [fileManager removeItemAtURL:readOnlyDatabaseURL error:&error];
         
         error = nil;    // needed for if either path is nil
 		BOOL copied = (nil != databasePath)
@@ -200,6 +205,8 @@
 		if (!copied) {
 			NSLog (@"Unable to copy database file at %@: %@", databasePath, error.localizedDescription);
 		}
+        
+        [fileManager release];
 	}
 	
 	// END ugly hack

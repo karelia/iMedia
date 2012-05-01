@@ -55,7 +55,7 @@
 + (NSImage *)imb_imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle;
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
-+ (NSDictionary *)imb_metadataFromImageAtPath:(NSString *)aPath checkSpotlightComments:(BOOL)aCheckSpotlight;
++ (NSDictionary *)imb_metadataFromImageAtURL:(NSURL *)url checkSpotlightComments:(BOOL)aCheckSpotlight;
 + (NSString*) imb_imageMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
 + (NSImage *) imb_sharedGenericFileIcon;						// Shared instance - can only have one size!

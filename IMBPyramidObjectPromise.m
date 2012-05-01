@@ -140,7 +140,7 @@
 		if (index != NSNotFound) {
 			BOOL success = NO;
 			NSData* jpegData = [data subdataWithRange:NSMakeRange(index, [data length] - index)];
-			NSString* fileName = [[(NSString*)lightroomObject.location lastPathComponent] stringByDeletingPathExtension];
+			NSString* fileName = [[lightroomObject.location lastPathComponent] stringByDeletingPathExtension];
 			NSString* jpegPath = [[[NSFileManager imb_threadSafeManager] imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
 			
 			if ((orientation == nil) || [orientation isEqual:@"AB"]) {

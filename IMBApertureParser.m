@@ -694,7 +694,7 @@
 					[objects addObject:object];
 					[object release];
 
-					object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+					object.location = [NSURL fileURLWithPath:path isDirectory:NO];
 					object.name = caption;
 					object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
 					object.metadata = nil;                              // Build lazily when needed (takes longer)
@@ -733,7 +733,7 @@
 	
 	if (![inObject isKindOfClass:[IMBNodeObject class]])
 	{
-		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
+		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtURL:inObject.URL checkSpotlightComments:NO]];
 	}
     
 	NSString* description = [self metadataDescriptionForMetadata:metadata];

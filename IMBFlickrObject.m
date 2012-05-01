@@ -84,26 +84,21 @@
 	{
 		// The is our temp download folder...
 		
-		NSString* folder = [[NSFileManager imb_threadSafeManager] imb_sharedTemporaryFolder:@"quicklook"];
-
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+		NSString* folder = [fileManager imb_sharedTemporaryFolder:@"quicklook"];
+        [fileManager release];
+        
 		// Build a path for the download file...
 		
-		NSString* filename = [[quickLookURL path] lastPathComponent];
-		NSString* path = [folder stringByAppendingPathComponent:filename];
+		previewItemURL = [NSURL fileURLWithPath:folder isDirectory:YES];
+        previewItemURL = [previewItemURL URLByAppendingPathComponent:[quickLookURL lastPathComponent]];
 		
 		// If the file is already there, then use it...
-		
-		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
-		{
-			previewItemURL = [NSURL fileURLWithPath:path];
-		}
-
 		// If not, then download it...
-	
-		else
+        
+		if (![previewItemURL checkResourceIsReachableAndReturnError:NULL])
 		{
 			NSData* data = [NSData dataWithContentsOfURL:quickLookURL];
-			previewItemURL = [NSURL fileURLWithPath:path];
 			[data writeToURL:previewItemURL atomically:NO];
 		}
 	}
