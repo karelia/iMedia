@@ -289,8 +289,9 @@
 - (NSString*) identifierForObject:(IMBObject*)inObject
 {
 	NSString* prefix = [self identifierPrefix];
-	
-	return [NSString stringWithFormat:@"%@:/%@",prefix,inObject.location];
+	NSString* path = [inObject.location path];
+	NSString* identifier = [NSString stringWithFormat:@"%@:/%@",prefix,path];
+	return identifier;
 }
 
 
