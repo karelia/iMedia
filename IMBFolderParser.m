@@ -112,11 +112,10 @@
 	NSURL* url = self.mediaSource;
 	NSString* path = [[url path] stringByStandardizingPath];
 	
-	
     // Check if the folder exists. If not then do not return a node...
+
 	NSNumber* hasSubfolders = [self directoryHasVisibleSubfolders:url error:outError];
     if (!hasSubfolders) return nil;	
-    
     
 	// Create an empty root node (unpopulated and without subnodes)...
 	
@@ -132,7 +131,7 @@
 	node.mediaType = self.mediaType;
 	node.mediaSource = url;
 	node.isTopLevelNode = YES;
-	node.isLeafNode = [hasSubfolders boolValue];
+	node.isLeafNode = ![hasSubfolders boolValue];
 	node.displayPriority = self.displayPriority;
 	node.isUserAdded = self.isUserAdded;
 	node.parserIdentifier = self.identifier;
@@ -265,7 +264,7 @@
 			subnode.mediaSource = url;
 			subnode.parserIdentifier = self.identifier;
 			subnode.isTopLevelNode = NO;
-			subnode.isLeafNode = [hasSubfolders boolValue];
+			subnode.isLeafNode = ![hasSubfolders boolValue];
 			subnode.groupType = kIMBGroupTypeFolder;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = path;					// These two lines are important to make file watching work for nested 
