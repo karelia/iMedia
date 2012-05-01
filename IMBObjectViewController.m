@@ -1815,10 +1815,10 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (IBAction) showFiltered:(id)inSender
 {
-//	ibObjectFilter = (IMBObjectFilter) [inSender tag];
-//	[inSender setState:NSOnState];
-//	[[self objectArrayController] rearrangeObjects];
-//	[[self nodeViewController] setObjectContainerViewNeedsDisplay:YES];
+	_objectFilter = (IMBObjectFilter)[inSender tag];
+	[inSender setState:NSOnState];
+	[[self objectArrayController] rearrangeObjects];
+	[self.view setNeedsDisplay:YES];
 }
 
 
