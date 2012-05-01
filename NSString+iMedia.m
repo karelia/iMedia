@@ -117,13 +117,16 @@
 	
 	if (nil == result)	// not found, figure out if it's a directory or not
 	{
-		NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+		NSFileManager *fm = [[NSFileManager alloc] init];
+        
 		BOOL isDirectory;
 		if ( [fm fileExistsAtPath:anAbsolutePath isDirectory:&isDirectory] )
 		{
 			// TODO: Really should use -[NSWorkspace isFilePackageAtPath:] to possibly return either kUTTypePackage or kUTTypeFolder
 			result = isDirectory ? (NSString *)kUTTypeDirectory : (NSString *)kUTTypeData;
 		}
+        
+        [fm release];
 	}
 	
 	// Will return nil if file doesn't exist.

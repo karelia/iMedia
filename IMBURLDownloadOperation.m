@@ -164,8 +164,9 @@
 	
 	if (self.localPath)
 	{
-		NSError* error = nil;
-		[[NSFileManager imb_threadSafeManager] removeItemAtPath:self.localPath error:&error];
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+		[fileManager removeItemAtPath:self.localPath error:NULL];
+        [fileManager release];
 	}
 	
 	self.delegate = nil;

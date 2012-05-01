@@ -215,11 +215,13 @@ static NSArray* sSupportedUTIs = nil;
             if ([path hasSuffix:@"\","])
             {
 				path = [path substringWithRange:NSMakeRange(1, [path length] - 3)];
+                NSFileManager *fileManager = [[NSFileManager alloc] init];
  
 				BOOL exists,changed;
-				exists = [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
+				exists = [fileManager imb_fileExistsAtPath:&path wasChanged:&changed];
 				if (exists) [inLibraryPaths addObject:path];
-				
+                
+                [fileManager release];
                 path = @"";
             }
         }
@@ -470,7 +472,9 @@ static NSArray* sSupportedUTIs = nil;
 		IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 		NSString* orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];;
 		NSString* fileName = [[inObject.location lastPathComponent] stringByDeletingPathExtension];
-		NSString* jpegPath = [[[NSFileManager imb_threadSafeManager] imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+		NSString* jpegPath = [[fileManager imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
+        [fileManager release];
 		NSURL* jpegURL = [NSURL fileURLWithPath:jpegPath];
 		BOOL success = NO;
 		

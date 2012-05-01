@@ -146,11 +146,10 @@
 	if (inNode.isTopLevelNode)
 	{
 		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
-		NSString* userSongsPath = [self userSongsPath];
-		NSString* demoSongsPath = [self demoSongsPath];
-		BOOL isDirectory = NO;
+		NSFileManager *fileManager = [[NSFileManager alloc] init];
 			
-		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath isDirectory:&isDirectory])
+		NSString* userSongsPath = [self userSongsPath];
+		if ([fileManager fileExistsAtPath:userSongsPath])
 		{
 			NSString* userSongsName = NSLocalizedStringWithDefaultValue(
 				@"IMBGarageBandParser.usersongs.name",
@@ -160,7 +159,7 @@
 		
 			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			subnode.identifier = [self identifierForPath:userSongsPath];
-			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:userSongsPath isDirectory:isDirectory] error:NULL];
+			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:userSongsPath isDirectory:YES] error:NULL];
 			subnode.name = userSongsName;
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = [NSURL fileURLWithPath:userSongsPath];
@@ -171,7 +170,8 @@
 			[subnodes addObject:subnode];
 		}
 		
-		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath isDirectory:&isDirectory])
+		NSString* demoSongsPath = [self demoSongsPath];
+        if ([fileManager fileExistsAtPath:demoSongsPath])
 		{
 			NSString* demoSongsName = NSLocalizedStringWithDefaultValue(
 				@"IMBGarageBandParser.demosongs.name",
@@ -181,7 +181,7 @@
 
 			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			subnode.identifier = [self identifierForPath:userSongsPath];
-			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:demoSongsPath isDirectory:isDirectory] error:NULL];
+			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:demoSongsPath isDirectory:YES] error:NULL];
 			subnode.name = demoSongsName;
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = [NSURL fileURLWithPath:demoSongsPath];
@@ -192,6 +192,7 @@
 			[subnodes addObject:subnode];
 		}
 
+        [fileManager release];
 		inNode.objects = [NSMutableArray arrayWithCapacity:0];	// Important to mark node as populated!
 		
 		return YES;

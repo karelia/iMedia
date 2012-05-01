@@ -1510,7 +1510,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
-					appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
+					NSFileManager *fileManager = [[NSFileManager alloc] init];
+					appName = [fileManager displayNameAtPath:appPath];
+					[fileManager release];
 					title = [NSString stringWithFormat:title,appName];	
 
 					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInEditorApp:) keyEquivalent:@""];
@@ -1530,7 +1532,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 						@"Open With %@",
 						@"Menu item in context menu of IMBObjectViewController");
 					
-					appName = [[NSFileManager imb_threadSafeManager] displayNameAtPath:appPath];
+                    NSFileManager *fileManager = [[NSFileManager alloc] init];
+					appName = [fileManager displayNameAtPath:appPath];
+                    [fileManager release];
 					title = [NSString stringWithFormat:title,appName];	
 
 					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInViewerApp:) keyEquivalent:@""];

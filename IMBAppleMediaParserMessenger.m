@@ -171,9 +171,10 @@
                           {
                               NSURL* url = [NSURL URLWithString:library];
                               NSString* path = [url path];
-                              BOOL changed;
+                              NSFileManager *fileManager = [[NSFileManager alloc] init];
                               
-                              if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
+                              BOOL changed;
+                              if ([fileManager imb_fileExistsAtPath:&path wasChanged:&changed])
                               {
                                   // Create a parser instance preconfigure with that path...
                                   
@@ -192,6 +193,8 @@
                                   NSString* libraryPath = [path stringByDeletingLastPathComponent];
                                   [IMBConfig registerLibraryPath:libraryPath];
                               }
+                              
+                              [fileManager release];
                           }
                       }
                   });

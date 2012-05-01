@@ -109,7 +109,6 @@
 
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
-	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
 	NSURL* url = self.mediaSource;
 	NSString* path = [[url path] stringByStandardizingPath];
 	
@@ -121,8 +120,10 @@
     
 	// Create an empty root node (unpopulated and without subnodes)...
 	
+	NSFileManager* fileManager = [[NSFileManager alloc] init];
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+    [fileManager release];
 
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	node.icon = [self iconForItemAtURL:url error:NULL];
@@ -162,7 +163,7 @@
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
-	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
+	NSFileManager* fileManager = [[NSFileManager alloc] init];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	BOOL ok;
@@ -175,6 +176,8 @@
 		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLLocalizedNameKey,NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
 		options:NSDirectoryEnumerationSkipsHiddenFiles 
 		error:&error];
+    
+    [fileManager release];
 
 	if (urls)
 	{
@@ -339,11 +342,14 @@
 
 - (NSNumber*) directoryHasVisibleSubfolders:(NSURL*)directory error:(NSError**)outError;
 {
-	NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
+	NSFileManager* fileManager = [[NSFileManager alloc] init];
+    
 	NSArray* contents = [fileManager contentsOfDirectoryAtURL:directory 
                                    includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
                                                       options:NSDirectoryEnumerationSkipsHiddenFiles 
                                                         error:outError];
+    
+    [fileManager release];
     
 	if (!contents) return nil;
 	
