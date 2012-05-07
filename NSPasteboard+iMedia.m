@@ -88,6 +88,24 @@
 }
 
 
+// Get all NSURLs from the pasteboard...
+
+- (NSArray*) fileURLs
+{
+	NSArray* items = self.pasteboardItems;
+	NSMutableArray* urls = [NSMutableArray arrayWithCapacity:items.count];
+	
+	for (NSPasteboardItem* item in items)
+	{
+		NSString* str = [item stringForType:(NSString*)kUTTypeFileURL];
+		NSURL* url = [NSURL URLWithString:str];
+		if (url) [urls addObject:url];
+	}
+	
+	return (NSArray*) urls;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
