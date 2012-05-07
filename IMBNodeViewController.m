@@ -135,6 +135,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 @implementation IMBNodeViewController
 
 @synthesize libraryController = _libraryController;
+@synthesize delegate = _delegate;
 @synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
 @synthesize expandedNodeIdentifiers = _expandedNodeIdentifiers;
 
@@ -1380,31 +1381,28 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	NSUInteger viewType = [(IMBObjectViewController*)self.objectViewController viewType];
 	double iconSize = [(IMBObjectViewController*)self.objectViewController iconSize];
 	
-	// If necessary swap standard and custom view controllers...
+	// If necessary swap standard and custom view controllers. If nothing has changed we can bail out early 
+	// and avoid the expensive work below...
 	
-	IMBNode* node = self.selectedNode;
-	IMBParserMessenger* parserMessenger = node.parserMessenger;
 	BOOL didSwapViewControllers = NO;
 	
 	NSViewController* oldHeaderViewController = self.headerViewController;
-	NSViewController* headerViewController = [parserMessenger customHeaderViewControllerForNode:node];
-	if (headerViewController == nil) headerViewController = self.standardHeaderViewController;
-	self.headerViewController = headerViewController;
-	if (oldHeaderViewController != headerViewController) didSwapViewControllers = YES;
+	NSViewController* newHeaderViewController = [self _customHeaderViewControllerForNode:(IMBNode*)inNode];
+	if (newHeaderViewController == nil) newHeaderViewController = self.standardHeaderViewController;
+	self.headerViewController = newHeaderViewController;
+	if (oldHeaderViewController != newHeaderViewController) didSwapViewControllers = YES;
 	
 	NSViewController* oldObjectViewController = self.objectViewController;
-	NSViewController* objectViewController = [parserMessenger customObjectViewControllerForNode:node];
-	if (objectViewController == nil) objectViewController = self.standardObjectViewController;
-	self.objectViewController = objectViewController;
-	if (oldObjectViewController != objectViewController) didSwapViewControllers = YES;
+	NSViewController* newObjectViewController = [self _customObjectViewControllerForNode:inNode];
+	if (newObjectViewController == nil) newObjectViewController = self.standardObjectViewController;
+	self.objectViewController = newObjectViewController;
+	if (oldObjectViewController != newObjectViewController) didSwapViewControllers = YES;
 	
 	NSViewController* oldFooterViewController = self.footerViewController;
-	NSViewController* footerViewController = [parserMessenger customFooterViewControllerForNode:node];
-	if (footerViewController == nil) footerViewController = self.standardFooterViewController;
-	self.footerViewController = footerViewController;
-	if (oldFooterViewController != footerViewController) didSwapViewControllers = YES;
-	
-	// If nothing has changed we can bail out early and avoid the work below...
+	NSViewController* newFooterViewController = [self _customFooterViewControllerForNode:inNode];
+	if (newFooterViewController == nil) newFooterViewController = self.standardFooterViewController;
+	self.footerViewController = newFooterViewController;
+	if (oldFooterViewController != newFooterViewController) didSwapViewControllers = YES;
 	
 	if (!didSwapViewControllers)
 	{
@@ -1414,8 +1412,8 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	// Restore view type and icon size on the new objectViewController instance, thus guarranteeing that 
 	// the visual appearance stays the same...
 	
-	[(IMBObjectViewController*)objectViewController setViewType:viewType];
-	[(IMBObjectViewController*)objectViewController setIconSize:iconSize];
+	[(IMBObjectViewController*)self.objectViewController setViewType:viewType];
+	[(IMBObjectViewController*)self.objectViewController setIconSize:iconSize];
 	
 	// Remove all currently installed object views...
 	
@@ -1433,9 +1431,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	CGFloat headerHeight = 0.0;
 	CGFloat footerHeight = 0.0;
 	
-	if (headerViewController != nil)
+	if (self.headerViewController != nil)
 	{
-		headerView = [headerViewController view];
+		headerView = [self.headerViewController view];
 		headerHeight = headerView.frame.size.height;
 	}
 
@@ -1452,9 +1450,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 			
 	// Install optional footer view...
 	
-	if (footerViewController != nil)
+	if (self.footerViewController != nil)
 	{
-		footerView = [footerViewController view];
+		footerView = [self.footerViewController view];
 		footerHeight = footerView.frame.size.height;
 	}
 	
@@ -1474,9 +1472,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	BOOL shouldDisplayObjectView = YES;
 	if (inNode) shouldDisplayObjectView = inNode.shouldDisplayObjectView;
 	
-	if (objectViewController != nil && shouldDisplayObjectView)
+	if (self.objectViewController != nil && shouldDisplayObjectView)
 	{
-		objectView = [objectViewController view];
+		objectView = [self.objectViewController view];
 
 		NSRect objectFrame = ibObjectContainerView.frame;
 		objectFrame.size.height = totalHeight - headerHeight - footerHeight;
@@ -1501,51 +1499,21 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// First check if we already have a customViewController for the given node. If not then ask the  
-// parser to create one for us. We will store it here for later use...
-
-
 - (NSViewController*) _customHeaderViewControllerForNode:(IMBNode*)inNode
 {
 	NSViewController* viewController = nil;
-//	NSString* identifier = inNode.identifier;
-//	id delegate = self.libraryController.delegate;
-//	
-//	if (identifier)
-//	{
-//		viewController = [_customHeaderViewControllers objectForKey:identifier];
-//		
-//		if (viewController == nil)
-//		{
-//			if (delegate != nil && [delegate respondsToSelector:@selector(customHeaderViewControllerForNode:)])
-//			{
-//				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customHeaderViewControllerForNode:inNode];
-//			}
-//
-//			if (viewController == nil)
-//			{
-//				viewController = [inNode.parser customHeaderViewControllerForNode:inNode];
-//			}
-//			
-//			if (_customHeaderViewControllers == nil && viewController != nil)
-//			{
-//				_customHeaderViewControllers = [[NSMutableDictionary alloc] init];
-//			}
-//
-//			if (viewController) [_customHeaderViewControllers setObject:viewController forKey:identifier];
-//			else [_customHeaderViewControllers removeObjectForKey:identifier];
-//		}
-//	}
-//	
-//	if (viewController)
-//	{
-//		if ([viewController isKindOfClass:[IMBObjectViewController class]])
-//		{	
-//			[(IMBObjectViewController*)viewController setNodeViewController:self];
-//			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
-//		}
-//	}
+	IMBParserMessenger* parserMessenger = inNode.parserMessenger;
 	
+	if ([(id)_delegate respondsToSelector:@selector(nodeViewController:customHeaderViewControllerForNode:)])
+	{
+		viewController = [_delegate nodeViewController:self customHeaderViewControllerForNode:inNode];
+	}
+	
+	if (viewController == nil)
+	{
+		viewController = [parserMessenger customHeaderViewControllerForNode:inNode];
+	}
+
 	return viewController;
 }
 
@@ -1553,43 +1521,18 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (NSViewController*) _customObjectViewControllerForNode:(IMBNode*)inNode
 {
 	NSViewController* viewController = nil;
-//	NSString* identifier = inNode.identifier;
-//	id delegate = self.libraryController.delegate;
-//	
-//	if (identifier)
-//	{
-//		viewController = [_customObjectViewControllers objectForKey:identifier];
-//	
-//		if (viewController == nil)
-//		{
-//			if (delegate != nil && [delegate respondsToSelector:@selector(customObjectViewControllerForNode:)])
-//			{
-//				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customObjectViewControllerForNode:inNode];
-//			}
-//			
-//			if (viewController == nil)
-//			{
-//				viewController = [inNode.parser customObjectViewControllerForNode:inNode];
-//			}
-//
-//			if (_customObjectViewControllers == nil && viewController != nil)
-//			{
-//				_customObjectViewControllers = [[NSMutableDictionary alloc] init];
-//			}
-//
-//			if (viewController)
-//			{
-//				if ([viewController isKindOfClass:[IMBObjectViewController class]])
-//				{	
-//					[(IMBObjectViewController*)viewController setNodeViewController:self];
-//					[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
-//				}
-//				[_customObjectViewControllers setObject:viewController forKey:identifier];
-//			}
-//			else [_customObjectViewControllers removeObjectForKey:identifier];
-//		}
-//	}
-	
+	IMBParserMessenger* parserMessenger = inNode.parserMessenger;
+
+	if ([(id)_delegate respondsToSelector:@selector(nodeViewController:customObjectViewControllerForNode:)])
+	{
+		viewController = [_delegate nodeViewController:self customObjectViewControllerForNode:inNode];
+	}
+
+	if (viewController == nil) 
+	{
+		viewController = [parserMessenger customObjectViewControllerForNode:inNode];
+	}
+
 	return viewController;
 }
 
@@ -1597,43 +1540,17 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (NSViewController*) _customFooterViewControllerForNode:(IMBNode*)inNode
 {
 	NSViewController* viewController = nil;
-//	NSString* identifier = inNode.identifier;
-//	id delegate = self.libraryController.delegate;
-//	
-//	if (identifier)
-//	{
-//		viewController = [_customFooterViewControllers objectForKey:identifier];
-//	
-//		if (viewController == nil)
-//		{
-//			if (delegate != nil && [delegate respondsToSelector:@selector(customFooterViewControllerForNode:)])
-//			{
-//				viewController = [(id<IMBNodeViewControllerDelegate>)delegate customFooterViewControllerForNode:inNode];
-//			}
-//			
-//			if (viewController == nil)
-//			{
-//				viewController = [inNode.parser customFooterViewControllerForNode:inNode];
-//			}
-//
-//			if (_customFooterViewControllers == nil && viewController != nil)
-//			{
-//				_customFooterViewControllers = [[NSMutableDictionary alloc] init];
-//			}
-//
-//			if (viewController) [_customFooterViewControllers setObject:viewController forKey:identifier];
-//			else [_customFooterViewControllers removeObjectForKey:identifier];
-//		}
-//	}
-//	
-//	if (viewController)
-//	{
-//		if ([viewController isKindOfClass:[IMBObjectViewController class]])
-//		{	
-//			[(IMBObjectViewController*)viewController setNodeViewController:self];
-//			[(IMBObjectViewController*)viewController setLibraryController:self.libraryController];
-//		}
-//	}
+	IMBParserMessenger* parserMessenger = inNode.parserMessenger;
+	
+	if ([(id)_delegate respondsToSelector:@selector(nodeViewController:customFooterViewControllerForNode:)])
+	{
+		viewController = [_delegate nodeViewController:self customFooterViewControllerForNode:inNode];
+	}
+
+	if (viewController == nil) 
+	{
+		viewController = [parserMessenger customFooterViewControllerForNode:inNode];
+	}
 
 	return viewController;
 }
