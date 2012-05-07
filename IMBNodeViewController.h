@@ -118,7 +118,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 }
 
 + (void) registerNodeViewControllerClass:(Class)inNodeViewControllerClass forMediaType:(NSString*)inMediaType;
-+ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
++ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController delegate:(id<IMBNodeViewControllerDelegate>)inDelegate;
 
 
 // Library...

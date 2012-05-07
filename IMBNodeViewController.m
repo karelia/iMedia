@@ -206,14 +206,15 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
-+ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
++ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController delegate:(id<IMBNodeViewControllerDelegate>)inDelegate
 {
 	// Create a viewController of appropriate class type...
 	
 	NSString* mediaType = inLibraryController.mediaType;
 	Class nodeViewControllerClass = [sRegisteredNodeViewControllerClasses objectForKey:mediaType];
 	IMBNodeViewController* controller = [[[nodeViewControllerClass alloc] initWithNibName:[self nibName] bundle:[self bundle]] autorelease];
-
+	controller.delegate = inDelegate;
+	
 	// Load the view *before* setting the libraryController, so that outlets are set before we load the preferences...
 
 	[controller view];										
@@ -1403,6 +1404,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	if (newFooterViewController == nil) newFooterViewController = self.standardFooterViewController;
 	self.footerViewController = newFooterViewController;
 	if (oldFooterViewController != newFooterViewController) didSwapViewControllers = YES;
+
+	id delegate = [(IMBObjectViewController*)self.standardObjectViewController delegate];
+	[(IMBObjectViewController*)newObjectViewController setDelegate:delegate];
 	
 	if (!didSwapViewControllers)
 	{

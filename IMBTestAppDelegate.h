@@ -52,15 +52,9 @@
 
 #import <Cocoa/Cocoa.h>
 #import <iMedia/IMBParserController.h>
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark CLASSES
-
-@class IMBNodeViewController;
-@class IMBObjectViewController;
+#import <iMedia/IMBLibraryController.h>
+#import <iMedia/IMBNodeViewController.h>
+#import <iMedia/IMBObjectViewController.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,7 +62,7 @@
 
 @class IMBUserInterfaceController;
 
-@interface IMBTestAppDelegate : NSObject <IMBParserControllerDelegate>
+@interface IMBTestAppDelegate : NSObject <IMBParserControllerDelegate,IMBLibraryControllerDelegate,IMBNodeViewControllerDelegate,IMBObjectViewControllerDelegate>
 {
 	IBOutlet NSWindow* ibWindow;
 	IBOutlet NSWindow* ibDragDestinationWindow;

@@ -133,6 +133,7 @@ IMBObjectFilter;
 	IMBNode* _currentNode;
 	IBOutlet IMBObjectArrayController* ibObjectArrayController;
 	IMBObjectFilter _objectFilter;
+	id<IMBObjectViewControllerDelegate> _delegate;
 	
 	// User Interface...
 	
@@ -158,7 +159,7 @@ IMBObjectFilter;
 // central factory method to create an IMBObjectViewController by media type...
 
 + (void) registerObjectViewControllerClass:(Class)inObjectViewControllerClass forMediaType:(NSString*)inMediaType;
-+ (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
++ (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController delegate:(id<IMBObjectViewControllerDelegate>)inDelegate;
 
 // Customize Subclasses. Overriding these methods lets you define your subclass identity...
  
@@ -176,7 +177,7 @@ IMBObjectFilter;
 
 @property (retain) IMBLibraryController* libraryController;
 - (NSString*) mediaType;
-- (id<IMBObjectViewControllerDelegate>) delegate;
+@property (assign) id<IMBObjectViewControllerDelegate> delegate;
 
 @property (retain) IMBNode* currentNode;
 @property (readonly) IMBObjectArrayController* objectArrayController;
@@ -228,10 +229,6 @@ IMBObjectFilter;
 // Quicklook...
 
 - (IBAction) quicklook:(id)inSender;
-
-
-
-
 
 @end
 

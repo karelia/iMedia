@@ -133,6 +133,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 @implementation IMBObjectViewController
 
 @synthesize libraryController = _libraryController;
+@synthesize delegate = _delegate;
 @synthesize currentNode = _currentNode;
 
 @synthesize objectArrayController = ibObjectArrayController;
@@ -180,7 +181,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 // This factory method relies of the registry above. It creates an IMBObjectViewController for the mediaType
 // of the given IMBLibraryController. The class of the subview is automatically chosen by mediaType...
 
-+ (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController
++ (IMBObjectViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController delegate:(id<IMBObjectViewControllerDelegate>)inDelegate
 {
 	// Create a viewController of appropriate class type...
 	
@@ -190,7 +191,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
     NSString* nibName = [objectViewControllerClass nibName];
     NSBundle* bundle = [objectViewControllerClass bundle];
 	IMBObjectViewController* objectViewController = [[[objectViewControllerClass alloc] initWithNibName:nibName bundle:bundle] autorelease];
-    
+    objectViewController.delegate = inDelegate;
+
 	// Load the view *before* setting the libraryController, so that outlets are set before we load the preferences...
     
 	[objectViewController view];										
@@ -456,10 +458,10 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	// After all has been said and done delegate may do additional setup on selected (sub)views
 	
-	if ([[self delegate] respondsToSelector:@selector(objectViewController:didLoadViews:)])
+	if ([self.delegate respondsToSelector:@selector(objectViewController:didLoadViews:)])
 	{
 		NSDictionary* views = [NSDictionary dictionaryWithObjectsAndKeys:ibSegments, IMBObjectViewControllerSegmentedControlKey, nil];
-		[[self delegate] objectViewController:self didLoadViews:views];
+		[self.delegate objectViewController:self didLoadViews:views];
 	}
 }
 
@@ -517,15 +519,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 - (NSString*) mediaType
 {
 	return self.libraryController.mediaType;
-}
-
-
-// The delegate object is the same as the libraryController's delegate object. 
-// As a convenience, cast to IMBObjectViewControllerDelegate...
-
-- (id <IMBObjectViewControllerDelegate>) delegate
-{
-	return self.libraryController.delegate;
 }
 
 
@@ -700,17 +693,12 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (CALayer*) iconViewBackgroundLayer
 {
-	id delegate = self.delegate;
-	
-	if (delegate)
+	if ([self.delegate respondsToSelector:@selector(imageBrowserBackgroundLayerForController:)])
 	{
-		if ([delegate respondsToSelector:@selector(imageBrowserBackgroundLayerForController:)])
-		{
-			return [delegate imageBrowserBackgroundLayerForController:self];
-		}
+		return [self.delegate imageBrowserBackgroundLayerForController:self];
 	}
 	
-	return [[self class ] iconViewBackgroundLayer];
+	return [[self class] iconViewBackgroundLayer];
 }
 
 
@@ -994,17 +982,14 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 - (void) imageBrowser:(IKImageBrowserView*)inView cellWasDoubleClickedAtIndex:(NSUInteger)inIndex
 {
 	IMBLibraryController* controller = self.libraryController;
-	id delegate = self.delegate;
+	id delegate = controller.delegate;
 	BOOL didHandleEvent = NO;
 	
-	if (delegate)
+	if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
 	{
-		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
-		{
-			IMBNode* node = self.currentNode;
-			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
-		}
+		IMBNode* node = self.currentNode;
+		NSArray* objects = [ibObjectArrayController selectedObjects];
+		didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
 	}
 	
 	if (!didHandleEvent && inIndex != NSNotFound)
@@ -1087,14 +1072,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (Class) imageBrowserCellClassForController:(IMBObjectViewController*)inController
 {
-	id delegate = self.delegate;
-	
-	if (delegate)
+	if ([self.delegate respondsToSelector:@selector(imageBrowserCellClassForController:)])
 	{
-		if ([delegate respondsToSelector:@selector(imageBrowserCellClassForController:)])
-		{
-			return [delegate imageBrowserCellClassForController:self];
-		}
+		return [self.delegate imageBrowserCellClassForController:self];
 	}
 	
 	return [[self class ] iconViewCellClass];
@@ -1163,9 +1143,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	// Host app delegate may provide badge image here. In the list view the icon will be replaced in the NSImageCell...
 	
-	if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
+	if ([self.delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
 	{
-		CGImageRef badgeRef = [[self delegate] objectViewController:self badgeForObject:object];
+		CGImageRef badgeRef = [self.delegate objectViewController:self badgeForObject:object];
 			
 		if ([inCell respondsToSelector:@selector(setBadge:)])
 		{
@@ -1384,14 +1364,11 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	id delegate = controller.delegate;
 	BOOL didHandleEvent = NO;
 	
-	if (delegate)
+	if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
 	{
-		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
-		{
-			IMBNode* node = self.currentNode;
-			NSArray* objects = [ibObjectArrayController selectedObjects];
-			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
-		}
+		IMBNode* node = self.currentNode;
+		NSArray* objects = [ibObjectArrayController selectedObjects];
+		didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
 	}
 	
 	if (!didHandleEvent)
@@ -1435,7 +1412,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (BOOL) objectArrayController:(IMBObjectArrayController*)inController filterObject:(IMBObject*)inObject
 {
-	id <IMBObjectViewControllerDelegate> delegate = [self delegate];
+	id <IMBObjectViewControllerDelegate> delegate = self.delegate;
 	
 	switch (_objectFilter)
 	{
@@ -1627,7 +1604,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	// Badges filtering
 	
-	if ([[self delegate] respondsToSelector:@selector(objectViewController:badgeForObject:)])
+	if ([self.delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
 	{
 		if ([menu numberOfItems] > 0)
 		{
@@ -1688,9 +1665,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	// Give delegate a chance to add custom menu items...
 	
-	id delegate = self.delegate;
+	id delegate = self.libraryController.delegate;
 	
-	if (delegate!=nil && [delegate respondsToSelector:@selector(libraryController:willShowContextMenu:forObject:)])
+	if ([delegate respondsToSelector:@selector(libraryController:willShowContextMenu:forObject:)])
 	{
 		[delegate libraryController:self.libraryController willShowContextMenu:menu forObject:inObject];
 	}
