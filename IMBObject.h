@@ -138,6 +138,7 @@ extern NSString* kIMBObjectPasteboardType;
 
 - (NSURL*) URL;												// Converts self.location to a url
 - (NSString*) type;											// Returns UTI of file if possible
+- (NSString*) mediaType;					
 
 
 //----------------------------------------------------------------------------------------------------------------------

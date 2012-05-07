@@ -364,6 +364,17 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Convenience accessor for the mediaType...
+
+- (NSString*) mediaType
+{
+	return self.parserMessenger.mediaType;
+}
+
+					
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Return a small generic icon for this file. This icon is displayed in the list view...
 
 - (NSImage*) icon
