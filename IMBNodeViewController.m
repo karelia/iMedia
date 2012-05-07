@@ -1379,6 +1379,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 {
 	// Remember current view type and icon size...
 	
+	BOOL shouldRestoreAppearance = self.objectViewController != nil;
 	NSUInteger viewType = [(IMBObjectViewController*)self.objectViewController viewType];
 	double iconSize = [(IMBObjectViewController*)self.objectViewController iconSize];
 	
@@ -1416,8 +1417,11 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	// Restore view type and icon size on the new objectViewController instance, thus guarranteeing that 
 	// the visual appearance stays the same...
 	
-	[(IMBObjectViewController*)self.objectViewController setViewType:viewType];
-	[(IMBObjectViewController*)self.objectViewController setIconSize:iconSize];
+	if (shouldRestoreAppearance)
+	{
+		[(IMBObjectViewController*)self.objectViewController setViewType:viewType];
+		[(IMBObjectViewController*)self.objectViewController setIconSize:iconSize];
+	}
 	
 	// Remove all currently installed object views...
 	
