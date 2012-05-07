@@ -1375,24 +1375,55 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (void) installObjectViewForNode:(IMBNode*)inNode
 {
+	// Remember current view type and icon size...
+	
+	NSUInteger viewType = [(IMBObjectViewController*)self.objectViewController viewType];
+	double iconSize = [(IMBObjectViewController*)self.objectViewController iconSize];
+	
+	// If necessary swap standard and custom view controllers...
+	
 	IMBNode* node = self.selectedNode;
 	IMBParserMessenger* parserMessenger = node.parserMessenger;
-
-//	NSViewController* headerViewController = [self _customHeaderViewControllerForNode:inNode];
-//	NSViewController* objectViewController = [self _customObjectViewControllerForNode:inNode];
-//	NSViewController* footerViewController = [self _customFooterViewControllerForNode:inNode];
+	BOOL didSwapViewControllers = NO;
 	
+	NSViewController* oldHeaderViewController = self.headerViewController;
 	NSViewController* headerViewController = [parserMessenger customHeaderViewControllerForNode:node];
 	if (headerViewController == nil) headerViewController = self.standardHeaderViewController;
 	self.headerViewController = headerViewController;
+	if (oldHeaderViewController != headerViewController) didSwapViewControllers = YES;
 	
+	NSViewController* oldObjectViewController = self.objectViewController;
 	NSViewController* objectViewController = [parserMessenger customObjectViewControllerForNode:node];
 	if (objectViewController == nil) objectViewController = self.standardObjectViewController;
 	self.objectViewController = objectViewController;
+	if (oldObjectViewController != objectViewController) didSwapViewControllers = YES;
 	
+	NSViewController* oldFooterViewController = self.footerViewController;
 	NSViewController* footerViewController = [parserMessenger customFooterViewControllerForNode:node];
 	if (footerViewController == nil) footerViewController = self.standardFooterViewController;
 	self.footerViewController = footerViewController;
+	if (oldFooterViewController != footerViewController) didSwapViewControllers = YES;
+	
+	// If nothing has changed we can bail out early and avoid the work below...
+	
+	if (!didSwapViewControllers)
+	{
+		return;
+	}
+	
+	// Restore view type and icon size on the new objectViewController instance, thus guarranteeing that 
+	// the visual appearance stays the same...
+	
+	[(IMBObjectViewController*)objectViewController setViewType:viewType];
+	[(IMBObjectViewController*)objectViewController setIconSize:iconSize];
+	
+	// Remove all currently installed object views...
+	
+	[ibHeaderContainerView imb_removeAllSubviews];
+	[ibObjectContainerView imb_removeAllSubviews];
+	[ibFooterContainerView imb_removeAllSubviews];
+	
+	// Install optional header view...
 	
 	NSView* headerView = nil;
 	NSView* objectView = nil;
@@ -1401,14 +1432,6 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	CGFloat totalHeight = ibObjectContainerView.superview.frame.size.height;
 	CGFloat headerHeight = 0.0;
 	CGFloat footerHeight = 0.0;
-	
-	// First remove all currently installed object views...
-	
-	[ibHeaderContainerView imb_removeAllSubviews];
-	[ibObjectContainerView imb_removeAllSubviews];
-	[ibFooterContainerView imb_removeAllSubviews];
-	
-	// Install optional header view...
 	
 	if (headerViewController != nil)
 	{
