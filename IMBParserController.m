@@ -246,9 +246,15 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 				{
 					shouldLoad = [_delegate parserController:self shouldLoadParserMessengerWithIdentifier:[parserMessengerClass identifier]];
 				}
-				
+
 				if (shouldLoad)
 				{
+					if ([_delegate respondsToSelector:@selector(parserController:replacementClassForParserMessengerClass:)])
+					{
+						Class newClass = [_delegate parserController:self replacementClassForParserMessengerClass:parserMessengerClass];
+						if (newClass) parserMessengerClass = newClass;
+					}
+				
 					IMBParserMessenger* parserMessenger = [[parserMessengerClass alloc] init];
 					[self addParserMessenger:parserMessenger];
 					[parserMessenger release];
