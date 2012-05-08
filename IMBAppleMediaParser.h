@@ -177,12 +177,4 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 
 - (void) populateFacesNode:(IMBNode*)inNode withFaces:(NSDictionary*)inFaces images:(NSDictionary*)inImages;
 
-// Events and Faces have other metadata than images or movies
-
-//- (NSString*) countableMetadataDescriptionForMetadata:(NSDictionary*)inMetadata;
-
-// Convert metadata into a human readable string...
-
-//- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
-
 @end

@@ -52,10 +52,13 @@
 #import "SBUtilities.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
 #import "IMBConfig.h"
 #import "IMBAppleMediaParserMessenger.h"
 #import "IMBAppleMediaParser.h"
 #import "IMBNode.h"
+#import "IMBImageObjectViewController.h"
 #import "IMBiPhotoEventObjectViewController.h"
 #import "IMBFaceObjectViewController.h"
 
@@ -151,8 +154,6 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
 // This method is called on the XPC service side. Discover the path to the AlbumData.xml file and create  
 // an IMBParser instance preconfigured with that path...
 
@@ -200,6 +201,74 @@
                   });
 	
 	return (NSArray*)parsers;
+}
+
+
+#pragma mark -
+#pragma mark Object description
+
+
++ (NSString*) objectCountFormatSingular
+{
+	return [IMBImageObjectViewController objectCountFormatSingular];
+}
+
+
++ (NSString*) objectCountFormatPlural
+{
+	return [IMBImageObjectViewController objectCountFormatPlural];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Events and Faces have other metadata than images or movies
+
+- (NSString*) _countableMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSMutableString* metaDesc = [NSMutableString string];
+	
+	NSNumber* count = [inMetadata objectForKey:@"PhotoCount"];
+	if (count)
+	{
+		NSString* formatString = [count intValue] > 1 ?
+		[[self class] objectCountFormatPlural] :
+		[[self class] objectCountFormatSingular];
+		
+		[metaDesc appendFormat:formatString, [count intValue]];
+	}
+	
+	NSNumber* dateAsTimerInterval = [inMetadata objectForKey:@"RollDateAsTimerInterval"];
+	if (dateAsTimerInterval)
+	{
+		[metaDesc imb_appendNewline];
+		NSDate* eventDate = [NSDate dateWithTimeIntervalSinceReferenceDate:[dateAsTimerInterval doubleValue]];
+		
+		NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+		[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+		[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
+		
+		[metaDesc appendFormat:@"%@", [formatter stringFromDate:eventDate]];
+		
+		[formatter release];
+	}
+	return metaDesc;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Convert metadata into a human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	// Events and Faces have other metadata than images
+	
+	if ([inMetadata objectForKey:@"PhotoCount"])		// Event, face, ...
+	{
+		return [self _countableMetadataDescriptionForMetadata:inMetadata];
+	}
+	
+	// Image
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 
