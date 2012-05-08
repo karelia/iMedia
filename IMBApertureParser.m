@@ -719,40 +719,4 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
-// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
-// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
-// Please note that this method may be called on a background thread...
-
-- (void) loadMetadataForObject:(IMBObject*)inObject
-{
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
-	
-	// Do not load (key) image specific metadata for node objects
-	// because it doesn't represent the nature of the object well enough.
-	
-	if (![inObject isKindOfClass:[IMBNodeObject class]])
-	{
-		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtURL:inObject.URL checkSpotlightComments:NO]];
-	}
-    
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-
-	if ([NSThread isMainThread])
-	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
-	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 @end
