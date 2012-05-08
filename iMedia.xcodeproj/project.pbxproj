@@ -53,7 +53,7 @@
 		30FD644B1546A0C90036BDE2 /* IMBApertureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D635EB1035B4C500FF8631 /* IMBApertureParser.m */; };
 		30FD644C1546A0D00036BDE2 /* IMBApertureAudioParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0467BAF112C220F00C1AA4E /* IMBApertureAudioParser.m */; };
 		30FD644D1546A1070036BDE2 /* IMBApertureVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */; };
-		30FD64661546AF6E0036BDE2 /* NSPasteboard+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 30FD64641546AF6E0036BDE2 /* NSPasteboard+iMedia.h */; };
+		30FD64661546AF6E0036BDE2 /* NSPasteboard+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 30FD64641546AF6E0036BDE2 /* NSPasteboard+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30FD64671546AF6E0036BDE2 /* NSPasteboard+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 30FD64651546AF6E0036BDE2 /* NSPasteboard+iMedia.m */; };
 		30FD646B1546BAE90036BDE2 /* IMBApertureHeaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FCA064112368388009072AE /* IMBApertureHeaderViewController.m */; };
 		30FFEBFE150A0AA70009C1D0 /* com.karelia.imedia.iPhoto.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = 30FFEBEC150A08DB0009C1D0 /* com.karelia.imedia.iPhoto.xpc */; };
@@ -62,7 +62,7 @@
 		8F47B39210C416050013ED25 /* IMBOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F47B39010C416050013ED25 /* IMBOrderedDictionary.m */; };
 		8F7945CE139518CD0066E133 /* IMBiPhotoObjectPromise.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F7945CC139518CD0066E133 /* IMBiPhotoObjectPromise.h */; };
 		8F93177E10A9FC53002CDB19 /* IMBPyramidObjectPromise.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F93177C10A9FC53002CDB19 /* IMBPyramidObjectPromise.h */; };
-		8FC2089D11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */; };
+		8FC2089D11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FC2559910A851C500F19642 /* IMBLightroom2Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FC2559610A851C500F19642 /* IMBLightroom2Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FC2561010A8706000F19642 /* IMBLightroom1Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FC2560E10A8706000F19642 /* IMBLightroom1Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FCA063E12368342009072AE /* IMBApertureHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8FCA063D12368342009072AE /* IMBApertureHeaderView.xib */; };
@@ -78,7 +78,7 @@
 		CE69E9DF114B05EA0016E5E0 /* firefox_bookmarksToolbar.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DA114B05EA0016E5E0 /* firefox_bookmarksToolbar.png */; };
 		CE69E9E0114B05EA0016E5E0 /* firefox_unfiledBookmarks.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DB114B05EA0016E5E0 /* firefox_unfiledBookmarks.png */; };
 		CE69E9E1114B05EA0016E5E0 /* firefox_tag.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9DC114B05EA0016E5E0 /* firefox_tag.png */; };
-		CE6B664D124D440C00E44811 /* IMBDisableTitleToColorTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */; };
+		CE6B664D124D440C00E44811 /* IMBDisableTitleToColorTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = CE28E51A124192A800B00F3D /* IMBDisableTitleToColorTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEA8A04B12D3EC70008CD7CB /* IMBSmartFolderObject.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA8A04912D3EC70008CD7CB /* IMBSmartFolderObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEAF1F25125A7DBF001C3EBB /* iMedia.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1F22125A7DBF001C3EBB /* iMedia.tiff */; };
 		CEAF1F26125A7DBF001C3EBB /* i.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1F23125A7DBF001C3EBB /* i.tiff */; };
@@ -109,11 +109,11 @@
 		CEF7A22412B1B71800DBE412 /* url_icon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEF7A22312B1B71800DBE412 /* url_icon.tiff */; };
 		D006CFF115331CC900C53C23 /* IMBNoteIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D006CFF015331CC900C53C23 /* IMBNoteIcon.icns */; };
 		D006CFF41533502200C53C23 /* IMBStopIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = D006CFF31533502200C53C23 /* IMBStopIcon.icns */; };
-		D006CFF81534084C00C53C23 /* IMBLightroom3or4Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = D006CFF61534084C00C53C23 /* IMBLightroom3or4Parser.h */; };
+		D006CFF81534084C00C53C23 /* IMBLightroom3or4Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = D006CFF61534084C00C53C23 /* IMBLightroom3or4Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D006CFF91534084C00C53C23 /* IMBLightroom3or4Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = D006CFF71534084C00C53C23 /* IMBLightroom3or4Parser.m */; };
 		D00D0AA912258E4A000924AE /* IMBFlickrHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */; };
 		D00D0AAA12258E4A000924AE /* IMBFlickrHeaderViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */; };
-		D00D0D271226A813000924AE /* IMBPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = F331802411E6D25D00BDABC2 /* IMBPanel.h */; };
+		D00D0D271226A813000924AE /* IMBPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = F331802411E6D25D00BDABC2 /* IMBPanel.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D010384C10714CB3007C88D7 /* IMBNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D010384A10714CB3007C88D7 /* IMBNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D010388B107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D0103889107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D01038E41071E111007C88D7 /* IMBObjectFifoCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D01038E21071E111007C88D7 /* IMBObjectFifoCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -136,7 +136,7 @@
 		D032CB7A109A2F4A00D84782 /* IMBMovieObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D032CB78109A2F4A00D84782 /* IMBMovieObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D032CE41109B2F2200D84782 /* Flickr.png in Resources */ = {isa = PBXBuildFile; fileRef = D032CE40109B2F2200D84782 /* Flickr.png */; };
 		D032CE47109B301100D84782 /* IMBFlickrNode.h in Headers */ = {isa = PBXBuildFile; fileRef = D032CE42109B301100D84782 /* IMBFlickrNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D0363E7C11D3787800E0579F /* NSView+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0363E7A11D3787800E0579F /* NSView+iMedia.h */; };
+		D0363E7C11D3787800E0579F /* NSView+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0363E7A11D3787800E0579F /* NSView+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D03C2840108265C300BD55CF /* IMBiPhotoVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0403B5110918C03000F0AE1 /* IMBSafariParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0403B4F10918C03000F0AE1 /* IMBSafariParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D04083C81235490F005375FC /* IMBFlickrObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D04083C61235490F005375FC /* IMBFlickrObject.h */; };
@@ -151,6 +151,11 @@
 		D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D052B0931053B0F700988F53 /* IMBProgressWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0C11053B4AB00988F53 /* IMBProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = D052B0C01053B4AB00988F53 /* IMBProgress.xib */; };
+		D052EB881558F64300D16C55 /* IMBFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D099320C1011158400C527B7 /* IMBFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D052EB891558F64300D16C55 /* IMBImageFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D099328F1011227100C527B7 /* IMBImageFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D052EB8A1558F64300D16C55 /* IMBAudioFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FAB91043243800280DDC /* IMBAudioFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D052EB8B1558F64300D16C55 /* IMBMovieFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B6FABD1043246800280DDC /* IMBMovieFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D052EB8C1558F64F00D16C55 /* IMBAppleMediaParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E96C2915122F86004F3EE7 /* IMBAppleMediaParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D054AFEA152984C300EBFA1C /* IMBGarageBandParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = D054AFE8152984C300EBFA1C /* IMBGarageBandParserMessenger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D054AFEB152984C300EBFA1C /* IMBGarageBandParserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = D054AFE9152984C300EBFA1C /* IMBGarageBandParserMessenger.m */; };
 		D054AFF0152984FA00EBFA1C /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
@@ -239,7 +244,7 @@
 		D08F7B8315235EA400505395 /* IMBImageItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 274DF617114EF0B200AC8C03 /* IMBImageItem.m */; };
 		D08F7B841523605400505395 /* IMBObjectArrayController.m in Sources */ = {isa = PBXBuildFile; fileRef = D099333210119F3400C527B7 /* IMBObjectArrayController.m */; };
 		D08F82B411E4A1C1006E618E /* IMBQLPreviewPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D0904DA8152CA51F003FDD08 /* IMBFileSystemObserver.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904DA6152CA51F003FDD08 /* IMBFileSystemObserver.h */; };
+		D0904DA8152CA51F003FDD08 /* IMBFileSystemObserver.h in Headers */ = {isa = PBXBuildFile; fileRef = D0904DA6152CA51F003FDD08 /* IMBFileSystemObserver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0904DA9152CA51F003FDD08 /* IMBFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = D0904DA7152CA51F003FDD08 /* IMBFileSystemObserver.m */; };
 		D0904DAB152CAA4A003FDD08 /* com.karelia.imedia.Aperture.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39AC152ACD1300E30C43 /* com.karelia.imedia.Aperture.xpc */; };
 		D0904DAC152CAA4A003FDD08 /* com.karelia.imedia.Lightroom.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39BD152ACD2400E30C43 /* com.karelia.imedia.Lightroom.xpc */; };
@@ -434,7 +439,7 @@
 		D0CB917C150F832B007716FA /* IMBNode.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CB917A150F832B007716FA /* IMBNode.m */; };
 		D0CB9188150F9977007716FA /* IMBLibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930B61010F6C100C527B7 /* IMBLibraryController.m */; };
 		D0CD1E54101A452A000FA505 /* IMBiPhotoParserOld.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CD1E52101A452A000FA505 /* IMBiPhotoParserOld.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D0CE6E1D11F6FA09005EE5B4 /* IMBMetadataTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E1B11F6FA09005EE5B4 /* IMBMetadataTransformer.h */; };
+		D0CE6E1D11F6FA09005EE5B4 /* IMBMetadataTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E1B11F6FA09005EE5B4 /* IMBMetadataTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */; };
@@ -2035,6 +2040,11 @@
 				D006CFF81534084C00C53C23 /* IMBLightroom3or4Parser.h in Headers */,
 				30FD64471545833A0036BDE2 /* IMBApertureParserMessenger.h in Headers */,
 				30FD64661546AF6E0036BDE2 /* NSPasteboard+iMedia.h in Headers */,
+				D052EB881558F64300D16C55 /* IMBFolderParser.h in Headers */,
+				D052EB891558F64300D16C55 /* IMBImageFolderParser.h in Headers */,
+				D052EB8A1558F64300D16C55 /* IMBAudioFolderParser.h in Headers */,
+				D052EB8B1558F64300D16C55 /* IMBMovieFolderParser.h in Headers */,
+				D052EB8C1558F64F00D16C55 /* IMBAppleMediaParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

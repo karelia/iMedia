@@ -65,7 +65,11 @@
 
 @interface NSPasteboard (iMedia)
 
-- (NSArray*) IMBObjects;
+- (BOOL) imb_containsIMBObjects;
+- (NSArray*) imb_IMBObjects;
+
+- (BOOL) imb_containsFileURLs;
+- (NSArray*) imb_fileURLs;
 
 @end
 

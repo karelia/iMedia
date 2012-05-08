@@ -95,8 +95,6 @@
 	
 	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
 		@"name",
-		@"metadata.artist",
-		@"metadata.album",
 		nil];
 }
 

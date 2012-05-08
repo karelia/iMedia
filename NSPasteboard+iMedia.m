@@ -70,9 +70,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Check if we have any IMBObjects on the pasteboard...
+
+- (BOOL) imb_containsIMBObjects
+{
+	NSArray* types = [self types];
+	return [types containsObject:kIMBObjectPasteboardType];
+}
+
+
 // Get all IMBObjects from the pasteboard...
 
-- (NSArray*) IMBObjects
+- (NSArray*) imb_IMBObjects
 {
 	NSArray* items = self.pasteboardItems;
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:items.count];
@@ -85,6 +94,36 @@
 	}
 	
 	return (NSArray*) objects;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Check if we have any file NSURLs on the pasteboard...
+
+- (BOOL) imb_containsFileURLs
+{
+	NSArray* types = [self types];
+	return [types containsObject:(NSString*)kUTTypeFileURL];
+}
+
+
+// Get all NSURLs from the pasteboard...
+
+- (NSArray*) imb_fileURLs
+{
+	NSArray* items = self.pasteboardItems;
+	NSMutableArray* urls = [NSMutableArray arrayWithCapacity:items.count];
+	
+	for (NSPasteboardItem* item in items)
+	{
+		NSString* str = [item stringForType:(NSString*)kUTTypeFileURL];
+		NSURL* url = [NSURL URLWithString:str];
+		if (url) [urls addObject:url];
+	}
+	
+	return (NSArray*) urls;
 }
 
 

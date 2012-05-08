@@ -99,6 +99,9 @@
 		@"metadata.Comment",
 		@"metadata.ImagePath",
 		@"metadata.iMediaKeywords",
+		@"preliminaryMetadata.Comment",
+		@"preliminaryMetadata.ImagePath",
+		@"preliminaryMetadata.iMediaKeywords",
 		nil];
 
 	[[[_tableView tableColumnWithIdentifier:@"name"] headerCell] setStringValue:NSLocalizedStringWithDefaultValue(

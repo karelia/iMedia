@@ -73,8 +73,8 @@
 	// Get an array of IMBObjects from the dragging pasteboard...
 	
 	NSPasteboard* pasteboard = [inSender draggingPasteboard];
-	NSArray* objects = [pasteboard IMBObjects];
-
+	NSArray* objects = [pasteboard imb_IMBObjects];
+	
 	// Tell the app delegate so that it can update its badge cache with these objects...
 	
 	[(IMBTestAppDelegate*) draggingDelegate concludeDragOperationForObjects:objects];
