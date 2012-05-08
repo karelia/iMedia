@@ -429,10 +429,7 @@
 
 	if (error == nil)
 	{
-		if (![inObject isKindOfClass:[IMBNodeObject class]])
-		{
-			inObject.metadataDescription = [self metadataDescriptionForMetadata:inObject.metadata];
-		}
+        inObject.metadataDescription = [self metadataDescriptionForMetadata:inObject.metadata];
 	}
 
 	if (outError) *outError = error;
