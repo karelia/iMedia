@@ -86,8 +86,20 @@ return kIMBMediaTypeImage;
 
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.Aperture";
+	return @"com.karelia.imedia.Aperture.image";
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the dispatch-once token
+
++ (dispatch_once_t *)onceTokenRef
+{
+    static dispatch_once_t onceToken = 0;
+    
+    return &onceToken;
+}
+
 
 @end
 
@@ -118,10 +130,23 @@ return kIMBMediaTypeImage;
 	return @"IMBApertureVideoParser";
 }
 
+
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.Aperture";
+	return @"com.karelia.imedia.Aperture.movie";
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the dispatch-once token
+
++ (dispatch_once_t *)onceTokenRef
+{
+    static dispatch_once_t onceToken = 0;
+    
+    return &onceToken;
+}
+
 
 @end
 
@@ -154,7 +179,7 @@ return kIMBMediaTypeImage;
 
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.Aperture";
+	return @"com.karelia.imedia.Aperture.audio";
 }
 
 @end
@@ -183,6 +208,15 @@ return kIMBMediaTypeImage;
 + (NSString *) librariesKey
 {
 	return @"ApertureLibraries";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Both image and movie use the same xpc service, so override this method...
+
++ (NSString*) xpcSerivceIdentifier
+{
+	return @"com.karelia.imedia.Aperture";
 }
 
 

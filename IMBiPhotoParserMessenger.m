@@ -56,6 +56,7 @@
 #import "IMBiPhotoImageParser.h"
 #import "IMBiPhotoMovieParser.h"
 #import "IMBParserController.h"
+#import "IMBMovieObjectViewController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBConfig.h"
@@ -84,8 +85,20 @@
 					
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.iPhoto";
+	return @"com.karelia.imedia.iPhoto.image";
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the dispatch-once token
+
++ (dispatch_once_t *)onceTokenRef
+{
+    static dispatch_once_t onceToken = 0;
+    
+    return &onceToken;
+}
+
 
 + (void) load
 {
@@ -118,8 +131,20 @@
 						
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.iPhoto";
+	return @"com.karelia.imedia.iPhoto.movie";
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the dispatch-once token
+
++ (dispatch_once_t *)onceTokenRef
+{
+    static dispatch_once_t onceToken = 0;
+    
+    return &onceToken;
+}
+
 
 + (void) load
 {
@@ -127,6 +152,23 @@
 	[IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
 	[pool drain];
 }
+
+
+#pragma mark -
+#pragma mark Object description
+
+
++ (NSString*) objectCountFormatSingular
+{
+	return [IMBMovieObjectViewController objectCountFormatSingular];
+}
+
+
++ (NSString*) objectCountFormatPlural
+{
+	return [IMBMovieObjectViewController objectCountFormatPlural];
+}
+
 
 @end
 
@@ -155,6 +197,15 @@
 {
 	return @"iPhotoRecentDatabases";
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// Both image and movie use the same xpc service, so override this method...
+
++ (NSString*) xpcSerivceIdentifier
+{
+	return @"com.karelia.imedia.iPhoto";
+}
+
 
 // Returns the list of parsers this messenger instantiated
 
