@@ -121,6 +121,8 @@
 		@"name",
 		@"metadata.artist",
 		@"metadata.album",
+		@"preliminaryMetadata.artist",
+		@"preliminaryMetadata.album",
 		nil];
 										  
 	[[[ibListView tableColumnWithIdentifier:@"name"] headerCell] setStringValue:NSLocalizedStringWithDefaultValue(
