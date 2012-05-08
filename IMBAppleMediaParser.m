@@ -332,7 +332,21 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return nil;
+	if (outError) *outError = nil;
+    
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	
+	// Do not load (key) image specific metadata for node objects
+	// because it doesn't represent the nature of the object well enough.
+	
+	if (![inObject isKindOfClass:[IMBNodeObject class]])
+	{
+		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtURL:inObject.URL checkSpotlightComments:NO]];
+	}
+    
+// JJ TODO: How about keywords? Only for iPhoto or also for Aperture?
+    
+    return metadata;
 }
 
 
