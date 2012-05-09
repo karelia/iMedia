@@ -44,9 +44,6 @@
 */
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Author: Christoph Priebe
 
 
@@ -55,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBParser.h"
+#import "IMBParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,17 +60,22 @@
 
 #pragma mark 
 
-// This parser class creates nodes for a folder and populates it with files that conform to the specified uti...
+@class IMBLoadMoreObject;
+
+// This parser class creates nodes for a Flickr query and populates it with results of that query.
  
-@interface IMBFlickrParser : IMBParser
+@interface IMBFlickrParserMessenger : IMBParserMessenger {
+    @private
+	IMBFlickrSizeSpecifier _desiredSize;
+	IMBLoadMoreObject* _loadMoreButton;
+}
 
-// Helpers...
+#pragma mark Properties
 
-- (IMBObject*) objectForURL:(NSURL*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
+@property (assign) IMBFlickrSizeSpecifier desiredSize;
 
-#pragma mark Flickr Request Handling
-
-+ (NSString*) flickrMethodForMethodCode: (NSInteger) code;
+///	A button object holding the 'load more' button.
+@property (readonly) IMBLoadMoreObject* loadMoreButton;
 
 @end
 

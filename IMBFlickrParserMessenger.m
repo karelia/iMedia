@@ -44,9 +44,6 @@
 */
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Author: Christoph Priebe
 
 
@@ -55,15 +52,18 @@
 
 #pragma mark HEADERS
 
+#import <XPCKit/XPCKit.h>
+
 #import "IMBConfig.h"
-#import "IMBFlickrNode.h"
+#import "IMBFlickrParserMessenger.h"
 #import "IMBFlickrParser.h"
+#import "IMBFolderParser.h"
+#import "IMBLoadMoreObject.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
-#import "NSFileManager+iMedia.h"
-#import "NSWorkspace+iMedia.h"
-#import "NSString+iMedia.h"
-#import <Quartz/Quartz.h>
+#import "IMBParserController.h"
+#import "SBUtilities.h"
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,110 +71,99 @@
 
 #pragma mark 
 
-@implementation IMBFlickrParser
+@implementation IMBFlickrParserMessenger
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) mediaType
+{
+	return kIMBMediaTypeImage;
+}
+
++ (NSString*) parserClassName
+{
+	return @"IMBFlickrParser";
+}
+
+
++ (NSString*) identifier
+{
+	return @"com.karelia.imedia.Flickr";
+}
+
+
++ (NSString*) xpcSerivceIdentifier
+{
+	return @"com.karelia.imedia.Flickr";
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (void) load
+{
+    @autoreleasepool {
+        [IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+    }
+}
+
+
 - (id) init
 {
 	if ((self = [super init]))
-	{
+    {
+		// setup desired size to get, from delegate
+		self.desiredSize = [IMBConfig flickrDownloadSize];
+
+        //	lazy initialize the 'load more' button...
+        if (_loadMoreButton == nil) {
+            _loadMoreButton = [[IMBLoadMoreObject alloc] init];
+            _loadMoreButton.clickAction = @selector (loadMoreImages:);
+            _loadMoreButton.parserMessenger = self;
+            _loadMoreButton.target = self;
+        }
 	}
 	
 	return self;
 }
 
+
 - (void) dealloc
 {
+	IMBRelease (_loadMoreButton);
 	[super dealloc];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#pragma mark
-#pragma mark Flickr Request Handling
 
-+ (NSString*) flickrMethodForMethodCode: (NSInteger) code {
-	if (code == IMBFlickrNodeMethod_TagSearch || code == IMBFlickrNodeMethod_TextSearch) {
-		return @"flickr.photos.search";
-	} else if (code == IMBFlickrNodeMethod_Recent) {
-		return @"flickr.photos.getRecent";
-	} else if (code == IMBFlickrNodeMethod_MostInteresting) {
-		return @"flickr.interestingness.getList";
-	} else if (code == IMBFlickrNodeMethod_GetInfo) {
-		return @"flickr.photos.getInfo";
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]))
+	{
 	}
-	NSLog (@"Can't find Flickr method for method code.");
-	return nil;
+	
+	return self;
 }
 
 
-#pragma mark 
-#pragma mark Parser Methods
-
-- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
+- (void) encodeWithCoder:(NSCoder*)inCoder
 {
-	//	load Flickr icon...
-	NSBundle* ourBundle = [NSBundle bundleForClass:[IMBNode class]];
-	NSString* pathToImage = [ourBundle pathForResource:@"Flickr" ofType:@"png"];
-	NSImage* icon = [[[NSImage alloc] initWithContentsOfFile:pathToImage] autorelease];
-	
-    // Create an empty root node (unpopulated and without subnodes)...
-	
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-	node.icon = icon;
-	node.name = @"Flickr";
-	node.identifier = [self identifierForPath:@"/"];
-	node.mediaType = self.mediaType;
-	node.mediaSource = nil;
-	node.isTopLevelNode = YES;
-	node.isLeafNode = NO;
-	node.parserIdentifier = self.identifier;
-	node.groupType = kIMBGroupTypeInternet;
-	
-	if (node.isTopLevelNode)
-	{
-		node.groupType = kIMBGroupTypeFolder;
-		node.isIncludedInPopup = YES;
-	}
-	else
-	{
-		node.groupType = kIMBGroupTypeNone;
-		node.isIncludedInPopup = NO;
-	}
-	
-	return node;
+	[super encodeWithCoder:inCoder];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
+- (id) copyWithZone:(NSZone*)inZone
 {
-    if (inNode.isTopLevelNode) {
-        IMBFlickrNode* rootNode = (IMBFlickrNode*) inNode;
-
-        NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
-        [subnodes addObject:[IMBFlickrNode flickrNodeForRecentPhotosForRoot:rootNode parser:self]];
-        [subnodes addObject:[IMBFlickrNode flickrNodeForInterestingPhotosForRoot:rootNode parser:self]];
-    }
-    
-    return YES;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Since we know that we have local files we can use the helper method supplied by the base class...
-
-- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	return [self bookmarkForLocalFileObject:inObject error:outError];
+	IMBFlickrParserMessenger* copy = (IMBFlickrParserMessenger*)[super copyWithZone:inZone];
+	
+	return copy;
 }
 
 
@@ -182,23 +171,82 @@
 
 
 #pragma mark 
-#pragma mark Helpers
+#pragma mark Properties
+
+@synthesize desiredSize = _desiredSize;
+
+- (IMBLoadMoreObject*) loadMoreButton {
+	return _loadMoreButton;
+}
 
 
-- (IMBObject*) objectForURL:(NSURL*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
+#pragma mark 
+#pragma mark XPC Methods
+
+- (NSArray*) parserInstancesWithError:(NSError**)outError
 {
-	IMBObject* object = [[[IMBObject alloc] init] autorelease];
-	object.location = inURL;
-	object.name = inName;
-	object.parserIdentifier = self.identifier;
-	object.index = inIndex;
+	IMBFlickrParser* parser = (IMBFlickrParser*)[self newParser];
+	parser.identifier = [[self class] identifier];
+	parser.mediaType = self.mediaType;
+	parser.mediaSource = self.mediaSource;
 	
-	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
-	object.imageLocation = nil;             // will be loaded lazily when needed
-	object.imageRepresentation = nil;		// will be loaded lazily when needed
-	object.metadata = nil;					// will be loaded lazily when needed
+	NSArray* parsers = [NSArray arrayWithObject:parser];
+	[parser release];
+	return parsers;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark App Methods
+
+// Add a 'Show in Finder' command to the context menu...
+- (void) willShowContextMenu:(NSMenu*)inMenu forNode:(IMBNode*)inNode
+{
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBObjectViewController.menuItem.revealInFinder",
+		nil,IMBBundle(),
+		@"Show in Finder",
+		@"Menu item in context menu of IMBObjectViewController");
 	
-	return object;
+	NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
+	[item setRepresentedObject:inNode.mediaSource];
+	[item setTarget:self];
+	[inMenu addItem:item];
+	[item release];
+}
+
+
+- (void) willShowContextMenu:(NSMenu*)inMenu forObject:(IMBObject*)inObject
+{
+//	if ([inObject isKindOfClass:[IMBNodeObject class]])
+//	{
+//		NSString* title = NSLocalizedStringWithDefaultValue(
+//			@"IMBObjectViewController.menuItem.revealInFinder",
+//			nil,IMBBundle(),
+//			@"Show in Finder",
+//			@"Menu item in context menu of IMBObjectViewController");
+//		
+//		IMBNode* node = [self nodeWithIdentifier:((IMBNodeObject*)inObject).representedNodeIdentifier];
+//		NSString* path = (NSString*) [node mediaSource];
+//		
+//		NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
+//		[item setRepresentedObject:path];
+//		[item setTarget:self];
+//		[inMenu addItem:item];
+//		[item release];
+//	}
+}
+
+
+- (IBAction) revealInFinder:(id)inSender
+{
+	NSURL* url = (NSURL*)[inSender representedObject];
+	NSString* path = [url path];
+	NSString* folder = [path stringByDeletingLastPathComponent];
+	[[NSWorkspace sharedWorkspace] selectFile:path inFileViewerRootedAtPath:folder];
 }
 
 
