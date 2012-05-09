@@ -122,29 +122,18 @@
 	NSString* pathToImage = [ourBundle pathForResource:@"Flickr" ofType:@"png"];
 	NSImage* icon = [[[NSImage alloc] initWithContentsOfFile:pathToImage] autorelease];
 	
-    // Create an empty root node (unpopulated and without subnodes)...
-	
+    //  create an empty root node (unpopulated and without subnodes)...	
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	node.groupType = kIMBGroupTypeInternet;	
 	node.icon = icon;
-	node.name = @"Flickr";
 	node.identifier = [self identifierForPath:@"/"];
+	node.isIncludedInPopup = YES;
+	node.isLeafNode = NO;
+	node.isTopLevelNode = YES;
 	node.mediaType = self.mediaType;
 	node.mediaSource = nil;
-	node.isTopLevelNode = YES;
-	node.isLeafNode = NO;
+	node.name = @"Flickr";
 	node.parserIdentifier = self.identifier;
-	node.groupType = kIMBGroupTypeInternet;
-	
-	if (node.isTopLevelNode)
-	{
-		node.groupType = kIMBGroupTypeFolder;
-		node.isIncludedInPopup = YES;
-	}
-	else
-	{
-		node.groupType = kIMBGroupTypeNone;
-		node.isIncludedInPopup = NO;
-	}
 	
 	return node;
 }
@@ -158,9 +147,13 @@
     if (inNode.isTopLevelNode) {
         IMBFlickrNode* rootNode = (IMBFlickrNode*) inNode;
 
+        //  add subnodes...
         NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
         [subnodes addObject:[IMBFlickrNode flickrNodeForRecentPhotosForRoot:rootNode parser:self]];
         [subnodes addObject:[IMBFlickrNode flickrNodeForInterestingPhotosForRoot:rootNode parser:self]];
+
+        //  add objects...
+        rootNode.objects = [NSMutableArray array];
     }
     
     return YES;
