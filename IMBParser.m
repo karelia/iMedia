@@ -59,6 +59,7 @@
 #import "NSWorkspace+iMedia.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "NSObject+iMedia.h"
 #import "NSURL+iMedia.h"
 #import "IMBParserMessenger.h"
 
@@ -73,7 +74,6 @@
 - (NSArray*) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode;
 - (void) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode identifiers:(NSMutableArray*)inIdentifiers;
 - (void) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError;
-- (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector;
 
 @end
 
@@ -129,7 +129,7 @@
 
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
 	return nil;
 }
@@ -139,7 +139,7 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil; // never reached due to the exception, mind!
 	return YES;
 }
@@ -234,7 +234,7 @@
 
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
 	return nil;
 }
@@ -244,7 +244,7 @@
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
 	return nil;
 }
@@ -254,7 +254,7 @@
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
 	return nil;
 }
@@ -459,16 +459,6 @@
 	
 	if (outError) *outError = error;
 	return bookmark;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector
-{
-	NSString* reason = [NSString stringWithFormat:@"Abstract base class: Please override method %@ in subclass",NSStringFromSelector(inSelector)];
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:reason userInfo:nil] raise];
 }
 
 

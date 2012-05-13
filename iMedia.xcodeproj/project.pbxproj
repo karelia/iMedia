@@ -46,6 +46,8 @@
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771E1511055900413AEF /* SBUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E7771C1511055800413AEF /* SBUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771F1511055900413AEF /* SBUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E7771D1511055800413AEF /* SBUtilities.m */; };
+		30F61B6A155D4A4D0092A99C /* NSObject+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F61B68155D4A4D0092A99C /* NSObject+iMedia.h */; };
+		30F61B6B155D4A4D0092A99C /* NSObject+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F61B69155D4A4D0092A99C /* NSObject+iMedia.m */; };
 		30F90B2F13584FE700D13233 /* IMBAppleMediaParserOld.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B2D13584FE700D13233 /* IMBAppleMediaParserOld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30F90B331358501A00D13233 /* IMBFaceObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30FD64471545833A0036BDE2 /* IMBApertureParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = 30FD64451545833A0036BDE2 /* IMBApertureParserMessenger.h */; };
@@ -542,6 +544,8 @@
 		30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoEventNodeObject.m; sourceTree = "<group>"; };
 		30E7771C1511055800413AEF /* SBUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBUtilities.h; path = SandBoxingKit/SBUtilities.h; sourceTree = SOURCE_ROOT; };
 		30E7771D1511055800413AEF /* SBUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBUtilities.m; path = SandBoxingKit/SBUtilities.m; sourceTree = SOURCE_ROOT; };
+		30F61B68155D4A4D0092A99C /* NSObject+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+iMedia.h"; sourceTree = "<group>"; };
+		30F61B69155D4A4D0092A99C /* NSObject+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+iMedia.m"; sourceTree = "<group>"; };
 		30F90B2D13584FE700D13233 /* IMBAppleMediaParserOld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAppleMediaParserOld.h; sourceTree = "<group>"; };
 		30F90B2E13584FE700D13233 /* IMBAppleMediaParserOld.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAppleMediaParserOld.m; sourceTree = "<group>"; };
 		30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFaceObjectViewController.h; sourceTree = "<group>"; };
@@ -1677,6 +1681,8 @@
 				CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */,
 				D0E69CD3151C5989002FE181 /* NSKeyedArchiver+iMedia.h */,
 				D0E69CD4151C5989002FE181 /* NSKeyedArchiver+iMedia.m */,
+				30F61B68155D4A4D0092A99C /* NSObject+iMedia.h */,
+				30F61B69155D4A4D0092A99C /* NSObject+iMedia.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -2037,6 +2043,7 @@
 				D052EB8A1558F64300D16C55 /* IMBAudioFolderParser.h in Headers */,
 				D052EB8B1558F64300D16C55 /* IMBMovieFolderParser.h in Headers */,
 				D052EB8C1558F64F00D16C55 /* IMBAppleMediaParser.h in Headers */,
+				30F61B6A155D4A4D0092A99C /* NSObject+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2680,6 +2687,7 @@
 				30FD644D1546A1070036BDE2 /* IMBApertureVideoParser.m in Sources */,
 				30FD646B1546BAE90036BDE2 /* IMBApertureHeaderViewController.m in Sources */,
 				30FD64671546AF6E0036BDE2 /* NSPasteboard+iMedia.m in Sources */,
+				30F61B6B155D4A4D0092A99C /* NSObject+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

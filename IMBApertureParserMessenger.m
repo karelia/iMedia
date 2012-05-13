@@ -91,6 +91,18 @@ return kIMBMediaTypeImage;
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    return parsers;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // Returns the dispatch-once token
 
 + (dispatch_once_t *)onceTokenRef
@@ -138,6 +150,18 @@ return kIMBMediaTypeImage;
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    return parsers;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // Returns the dispatch-once token
 
 + (dispatch_once_t *)onceTokenRef
@@ -176,6 +200,29 @@ return kIMBMediaTypeImage;
 {
 	return @"IMBApertureAudioParser";
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    return parsers;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the dispatch-once token
+
++ (dispatch_once_t *)onceTokenRef
+{
+    static dispatch_once_t onceToken = 0;
+    
+    return &onceToken;
+}
+
 
 + (NSString*) identifier
 {
@@ -217,27 +264,6 @@ return kIMBMediaTypeImage;
 + (NSString*) xpcSerivceIdentifier
 {
 	return @"com.karelia.imedia.Aperture";
-}
-
-
-// Returns the list of parsers this messenger instantiated
-
-+ (NSMutableArray *)parsers
-{
-    static NSMutableArray *parsers = nil;
-    
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
-    return parsers;
-}
-
-
-// Returns the dispatch-once token
-
-+ (dispatch_once_t *)onceTokenRef
-{
-    static dispatch_once_t onceToken = 0;
-    
-    return &onceToken;
 }
 
 

@@ -90,6 +90,18 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    return parsers;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // Returns the dispatch-once token
 
 + (dispatch_once_t *)onceTokenRef
@@ -132,6 +144,18 @@
 + (NSString*) identifier
 {
 	return @"com.karelia.imedia.iPhoto.movie";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    return parsers;
 }
 
 
@@ -204,27 +228,6 @@
 + (NSString*) xpcSerivceIdentifier
 {
 	return @"com.karelia.imedia.iPhoto";
-}
-
-
-// Returns the list of parsers this messenger instantiated
-
-+ (NSMutableArray *)parsers
-{
-    static NSMutableArray *parsers = nil;
-    
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
-    return parsers;
-}
-
-
-// Returns the dispatch-once token
-
-+ (dispatch_once_t *)onceTokenRef
-{
-    static dispatch_once_t onceToken = 0;
-    
-    return &onceToken;
 }
 
 
