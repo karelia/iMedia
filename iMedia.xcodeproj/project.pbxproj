@@ -44,7 +44,7 @@
 		3089F94D151C91E400D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F9791520BD6900D56DC0 /* IMBiPhotoEventNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */; };
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		30E7771E1511055900413AEF /* SBUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E7771C1511055800413AEF /* SBUtilities.h */; };
+		30E7771E1511055900413AEF /* SBUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E7771C1511055800413AEF /* SBUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771F1511055900413AEF /* SBUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E7771D1511055800413AEF /* SBUtilities.m */; };
 		30F90B2F13584FE700D13233 /* IMBAppleMediaParserOld.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B2D13584FE700D13233 /* IMBAppleMediaParserOld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30F90B331358501A00D13233 /* IMBFaceObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30F90B311358501A00D13233 /* IMBFaceObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -115,7 +115,6 @@
 		D00D0AAA12258E4A000924AE /* IMBFlickrHeaderViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D00D0AA712258E4A000924AE /* IMBFlickrHeaderViewController.h */; };
 		D00D0D271226A813000924AE /* IMBPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = F331802411E6D25D00BDABC2 /* IMBPanel.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D010384C10714CB3007C88D7 /* IMBNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D010384A10714CB3007C88D7 /* IMBNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D010388B107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D0103889107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D01038E41071E111007C88D7 /* IMBObjectFifoCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D01038E21071E111007C88D7 /* IMBObjectFifoCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0129A2A124C97A600EBEB45 /* NSDictionary+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0CE6E4111F6FD54005EE5B4 /* NSDictionary+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D023460610CA5E2C00E14112 /* load-more-normal.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D023460410CA5E2C00E14112 /* load-more-normal.pdf */; };
@@ -133,7 +132,6 @@
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
 		D02E53C810A5563500B205BD /* NSData+SKExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = D02E53C610A5563500B205BD /* NSData+SKExtensions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D02E53C910A5563500B205BD /* NSData+SKExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = D02E53C710A5563500B205BD /* NSData+SKExtensions.m */; };
-		D032CB7A109A2F4A00D84782 /* IMBMovieObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D032CB78109A2F4A00D84782 /* IMBMovieObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D032CE41109B2F2200D84782 /* Flickr.png in Resources */ = {isa = PBXBuildFile; fileRef = D032CE40109B2F2200D84782 /* Flickr.png */; };
 		D032CE47109B301100D84782 /* IMBFlickrNode.h in Headers */ = {isa = PBXBuildFile; fileRef = D032CE42109B301100D84782 /* IMBFlickrNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0363E7C11D3787800E0579F /* NSView+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0363E7A11D3787800E0579F /* NSView+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -147,7 +145,6 @@
 		D049F00A1034993E003CC49C /* NSImage+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0081034993E003CC49C /* NSImage+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0401034A86B003CC49C /* IMBIconCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D049F0411034A86B003CC49C /* IMBIconCache.m */; };
-		D04FFEBB103BE81600104EB8 /* IMBObjectsPromise.h in Headers */ = {isa = PBXBuildFile; fileRef = D04FFEB9103BE81600104EB8 /* IMBObjectsPromise.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D052B0931053B0F700988F53 /* IMBProgressWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0C11053B4AB00988F53 /* IMBProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = D052B0C01053B4AB00988F53 /* IMBProgress.xib */; };
@@ -357,7 +354,6 @@
 		D09653D2150A748700B6C83D /* IMBParserController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930C31010F6C100C527B7 /* IMBParserController.m */; };
 		D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B41010F6C100C527B7 /* IMBCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09930C51010F6C100C527B7 /* IMBLibraryController.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B51010F6C100C527B7 /* IMBLibraryController.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D09930C91010F6C100C527B7 /* IMBObjectOld.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B91010F6C100C527B7 /* IMBObjectOld.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09930CB1010F6C100C527B7 /* IMBObjectArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09930CC1010F6C100C527B7 /* IMBOperationQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930BC1010F6C100C527B7 /* IMBOperationQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09930D01010F6C100C527B7 /* IMBParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930C01010F6C100C527B7 /* IMBParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1915,7 +1911,6 @@
 				D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */,
 				D09931AA10110E8900C527B7 /* IMBConfig.h in Headers */,
 				D09930CC1010F6C100C527B7 /* IMBOperationQueue.h in Headers */,
-				D09930C91010F6C100C527B7 /* IMBObjectOld.h in Headers */,
 				D09930D01010F6C100C527B7 /* IMBParser.h in Headers */,
 				D09930D21010F6C100C527B7 /* IMBParserController.h in Headers */,
 				D09930C51010F6C100C527B7 /* IMBLibraryController.h in Headers */,
@@ -1945,7 +1940,6 @@
 				D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */,
 				D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */,
 				D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */,
-				D04FFEBB103BE81600104EB8 /* IMBObjectsPromise.h in Headers */,
 				D0BF8C69103F32700014B3B7 /* IMBImageBrowserCell.h in Headers */,
 				D0E96D1C104410BD0015979F /* IMBPanelController.h in Headers */,
 				D08070BF10442CD700891137 /* IMBMovieObjectViewController.h in Headers */,
@@ -1965,7 +1959,6 @@
 				CEF695E6106434FE005D7E72 /* IMBOmniWebParser.h in Headers */,
 				CEF6970810643D60005D7E72 /* IMBLinkObjectViewController.h in Headers */,
 				D010384C10714CB3007C88D7 /* IMBNodeObject.h in Headers */,
-				D010388B107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.h in Headers */,
 				D01038E41071E111007C88D7 /* IMBObjectFifoCache.h in Headers */,
 				D02D175A1081CF3B00142E8A /* IMBGarageBandParser.h in Headers */,
 				D0FC9518108213A800973FEE /* IMBiTunesMovieParser.h in Headers */,
@@ -1974,7 +1967,6 @@
 				D0F2DB9B1098262D004280C1 /* FMDatabase.h in Headers */,
 				D0F2DB9D1098262D004280C1 /* FMDatabaseAdditions.h in Headers */,
 				D0F2DBA01098262D004280C1 /* FMResultSet.h in Headers */,
-				D032CB7A109A2F4A00D84782 /* IMBMovieObject.h in Headers */,
 				D032CE47109B301100D84782 /* IMBFlickrNode.h in Headers */,
 				D02E53C810A5563500B205BD /* NSData+SKExtensions.h in Headers */,
 				8FC2559910A851C500F19642 /* IMBLightroom2Parser.h in Headers */,
