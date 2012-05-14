@@ -41,7 +41,7 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,6 @@
 
 #pragma mark HEADERS
 
-#import "NSPasteboard+iMedia.h"
 #import "IMBPasteboardItem.h"
 #import "IMBObject.h"
 
@@ -63,69 +62,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark
+#pragma mark 
 
-@implementation NSPasteboard (iMedia)
+@implementation IMBPasteboardItem
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Check if we have any IMBObjects on the pasteboard...
-
-- (BOOL) imb_containsIMBObjects
-{
-	NSArray* types = [self types];
-	return [types containsObject:kIMBObjectPasteboardType];
-}
-
-
-// Get all IMBObjects from the pasteboard. Please note that we won't go through pasteboard:item:provideDataForType:
-// here, to avoid archiving/dearchiving the IMBObject and losing some properties in the process. Instead we'll 
-// simply access the *original* IMBObject that is attached to the IMBPasteboardItem...
-
-- (NSArray*) imb_IMBObjects
-{
-	NSArray* items = self.pasteboardItems;
-	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:items.count];
-	
-	for (IMBPasteboardItem* item in items)
-	{
-		IMBObject* object = [item object];
-		if (object) [objects addObject:object];
-	}
-	
-	return (NSArray*) objects;
-}
+@synthesize object = _object;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Check if we have any file NSURLs on the pasteboard...
-
-- (BOOL) imb_containsFileURLs
+- (id) init
 {
-	NSArray* types = [self types];
-	return [types containsObject:(NSString*)kUTTypeFileURL];
+	if (self = [super init])
+	{
+		_object = nil;
+	}
+	
+	return self;
 }
 
 
-// Get all NSURLs from the pasteboard...
-
-- (NSArray*) imb_fileURLs
+- (void) dealloc
 {
-	NSArray* items = self.pasteboardItems;
-	NSMutableArray* urls = [NSMutableArray arrayWithCapacity:items.count];
-	
-	for (NSPasteboardItem* item in items)
-	{
-		NSString* str = [item stringForType:(NSString*)kUTTypeFileURL];
-		NSURL* url = [NSURL URLWithString:str];
-		if (url) [urls addObject:url];
-	}
-	
-	return (NSArray*) urls;
+	IMBRelease(_object);
+	[super dealloc];
 }
 
 
@@ -133,4 +94,3 @@
 
 
 @end
-

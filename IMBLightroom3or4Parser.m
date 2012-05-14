@@ -62,6 +62,7 @@
 #import "IMBFolderObject.h"
 #import "IMBObject.h"
 #import "NSData+SKExtensions.h"
+#import "NSObject+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
@@ -75,8 +76,6 @@
 #pragma mark
 
 @interface IMBLightroom3or4Parser ()
-
-+ (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector;
 
 - (NSNumber*) databaseVersion;
 
@@ -98,7 +97,7 @@
 
 + (NSString*) lightroomPath
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 
 	return nil;
 }
@@ -108,7 +107,7 @@
 
 + (NSString*) identifier
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 
 	return nil;
 }
@@ -121,7 +120,7 @@
 
 + (NSArray*) libraryPaths
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
 }
@@ -563,26 +562,16 @@
 
 - (FMDatabase*) libraryDatabase
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
 }
 
 - (FMDatabase*) previewsDatabase
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-+ (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector
-{
-	NSString* reason = [NSString stringWithFormat:@"Abstract base class: Please override method %@ in subclass",NSStringFromSelector(inSelector)];
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:reason userInfo:nil] raise];
 }
 
 

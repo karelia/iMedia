@@ -50,6 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 #import "SBUtilities.h"
+#import "NSObject+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
@@ -70,21 +71,15 @@
 
 + (NSMutableArray *)parsers
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
-	NSLog(@"%@", errMsg);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
-	
-	return nil;
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+    return nil;
 }
 
 // Returns the dispatch-once token. Token must be static. Must be subclassed.
 
 + (dispatch_once_t *)onceTokenRef
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
-	NSLog(@"%@", errMsg);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
-	
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return 0;
 }
 
@@ -94,10 +89,7 @@
 
 + (NSString *) bundleIdentifier
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
-	NSLog(@"%@", errMsg);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
-	
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return nil;
 }
 
@@ -106,10 +98,7 @@
 
 + (NSString *) librariesKey
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
-	NSLog(@"%@", errMsg);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
-	
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return nil;
 }
 

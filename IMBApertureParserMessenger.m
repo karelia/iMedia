@@ -86,8 +86,32 @@ return kIMBMediaTypeImage;
 
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.Aperture";
+	return @"com.karelia.imedia.Aperture.image";
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    return parsers;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the dispatch-once token
+
++ (dispatch_once_t *)onceTokenRef
+{
+    static dispatch_once_t onceToken = 0;
+    
+    return &onceToken;
+}
+
 
 @end
 
@@ -118,10 +142,35 @@ return kIMBMediaTypeImage;
 	return @"IMBApertureVideoParser";
 }
 
+
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.Aperture";
+	return @"com.karelia.imedia.Aperture.movie";
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    return parsers;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the dispatch-once token
+
++ (dispatch_once_t *)onceTokenRef
+{
+    static dispatch_once_t onceToken = 0;
+    
+    return &onceToken;
+}
+
 
 @end
 
@@ -152,9 +201,32 @@ return kIMBMediaTypeImage;
 	return @"IMBApertureAudioParser";
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    return parsers;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the dispatch-once token
+
++ (dispatch_once_t *)onceTokenRef
+{
+    static dispatch_once_t onceToken = 0;
+    
+    return &onceToken;
+}
+
+
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.Aperture";
+	return @"com.karelia.imedia.Aperture.audio";
 }
 
 @end
@@ -186,24 +258,12 @@ return kIMBMediaTypeImage;
 }
 
 
-// Returns the list of parsers this messenger instantiated
+//----------------------------------------------------------------------------------------------------------------------
+// Both image and movie use the same xpc service, so override this method...
 
-+ (NSMutableArray *)parsers
++ (NSString*) xpcSerivceIdentifier
 {
-    static NSMutableArray *parsers = nil;
-    
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
-    return parsers;
-}
-
-
-// Returns the dispatch-once token
-
-+ (dispatch_once_t *)onceTokenRef
-{
-    static dispatch_once_t onceToken = 0;
-    
-    return &onceToken;
+	return @"com.karelia.imedia.Aperture";
 }
 
 

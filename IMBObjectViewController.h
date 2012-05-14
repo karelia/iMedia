@@ -76,7 +76,6 @@
 
 #import "IMBCommon.h"
 #import "IMBQLPreviewPanel.h"
-#import "IMBObjectsPromise.h"
 #import "IMBObjectArrayController.h"
 #import <Quartz/Quartz.h>
 

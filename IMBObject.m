@@ -84,7 +84,6 @@
 
 #import "IMBObject.h"
 #import "IMBNode.h"
-#import "IMBObjectsPromise.h"
 #import "IMBParserMessenger.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"

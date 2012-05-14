@@ -73,6 +73,7 @@
 #import "IMBButtonObject.h"
 #import "IMBComboTextCell.h"
 #import "IMBImageBrowserCell.h"
+#import "IMBPasteboardItem.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1236,6 +1237,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#warning TODO migrate away from IMBOperationQueue and IMBObjectThumbnailLoadOperation
+
+
 // We pre-load the images in batches. Assumes that we only have one client table view.  If we were to add another 
 // IMBDynamicTableView client, we would need to deal with this architecture a bit since we have ivars here about 
 // which rows are visible.
@@ -1850,7 +1854,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	for (IMBObject* object in objects)
 	{
-		NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
+		IMBPasteboardItem* item = [[IMBPasteboardItem alloc] init];
+		[item setObject:object];
 		[item setDataProvider:object forTypes:types];
 		[pasteboardItems addObject:item];
 		[item release];
