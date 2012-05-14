@@ -43,9 +43,6 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-//	Objective Flickr
-#import <ObjectiveFlickr/ObjectiveFlickr.h>
-
 //	iMedia
 #import <iMedia/IMBNode.h>
 
@@ -74,6 +71,18 @@ typedef enum {
 	IMBFlickrNodeLicense_CommercialUse
 } IMBFlickrNodeLicense;
 
+///	License kinds and ids as found under http://www.flickr.com/services/api/flickr.photos.licenses.getInfo.html
+typedef enum {
+	IMBFlickrNodeFlickrLicenseID_Undefined = 0,
+	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialShareAlike = 1,
+	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercial = 2,
+	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialNoDerivs = 3,
+	IMBFlickrNodeFlickrLicenseID_Attribution = 4,
+	IMBFlickrNodeFlickrLicenseID_AttributionShareAlike = 5,
+	IMBFlickrNodeFlickrLicenseID_AttributionNoDerivs = 6,
+	IMBFlickrNodeFlickrLicenseID_NoKnownCopyrightRestrictions = 7
+} IMBFlickrNodeFlickrLicenseID;
+
 typedef enum {
 	IMBFlickrNodeSortOrder_Undefined = 0,
 	IMBFlickrNodeSortOrder_DatePostedDesc,
@@ -94,7 +103,6 @@ typedef enum {
 @interface IMBFlickrNode: IMBNode <NSCopying, NSCoding> {
 	@private
 	BOOL _customNode;
-	NSDictionary* _flickrResponse;
 	IMBFlickrNodeLicense _license;
 	IMBFlickrNodeMethod _method;
 	NSInteger _page;
@@ -120,18 +128,6 @@ typedef enum {
 + (void) sendSelectNodeNotificationForDict: (NSDictionary*) dict;
 
 
-#pragma mark Flickr Response Handling
-
-///	The iMB Flickr parser saves a response of a Flickr request here.
-@property (copy) NSDictionary* flickrResponse;
-@property (readonly) BOOL hasFlickrResponse;
-
-- (void) clearFlickrResponse;
-
-///	Processes the 'flickrResponse' dictionary to fill the node with actual images.
-- (void) processResponseForContext: (OFFlickrAPIContext*) context;
-
-
 #pragma mark Properties
 
 @property (assign, getter=isCustomNode) BOOL customNode;
@@ -144,7 +140,6 @@ typedef enum {
 
 #pragma mark Utilities
 
-- (NSDictionary*) argumentsForFlickrCall;
 + (NSString*) base58EncodedValue: (long long) num;
 + (NSString*) descriptionOfLicense: (int) aLicenseNumber;
 + (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;

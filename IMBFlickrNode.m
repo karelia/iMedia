@@ -89,7 +89,6 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 - (id) initWithCoder: (NSCoder*) inCoder {
 	if ((self = [super initWithCoder:inCoder])) {
         self.customNode = [inCoder decodeBoolForKey:@"customNode"];
-        self.flickrResponse = [inCoder decodeObjectForKey:@"flickrResponse"];
         self.license = [inCoder decodeIntegerForKey:@"license"];
         self.method = [inCoder decodeIntegerForKey:@"method"];
         self.page = [inCoder decodeIntegerForKey:@"page"];
@@ -104,7 +103,6 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 - (id) copyWithZone: (NSZone*) inZone {
 	IMBFlickrNode* copy = [super copyWithZone:inZone];
 	copy.customNode = self.customNode;
-	copy.flickrResponse = self.flickrResponse;
 	copy.license = self.license;
 	copy.method = self.method;
 	copy.page = self.page;
@@ -118,7 +116,6 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	[super encodeWithCoder:inCoder];
 
 	[inCoder encodeBool:self.customNode forKey:@"customNode"];
-	[inCoder encodeObject:self.flickrResponse forKey:@"flickrResponse"];
 	[inCoder encodeInteger:self.license forKey:@"license"];
 	[inCoder encodeInteger:self.method forKey:@"method"];
 	[inCoder encodeInteger:self.page forKey:@"page"];
@@ -221,208 +218,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 
 - (void) dealloc {
 	IMBRelease (_query);
-	IMBRelease (_flickrResponse);	
 	[super dealloc];
-}
-
-
-#pragma mark
-#pragma mark Flickr Response Handling
-
-- (void) clearFlickrResponse {
-	self.flickrResponse = nil;
-}
-
-
-- (BOOL) hasFlickrResponse {
-	return _flickrResponse != nil;
-}
-
-
-// What about original size?
-
-- (NSString *)flickrSizeFromFlickrSizeSpecifier:(IMBFlickrSizeSpecifier)flickrSizeSpecifier
-{
-	NSAssert(flickrSizeSpecifier >= kIMBFlickrSizeSpecifierOriginal && flickrSizeSpecifier <= kIMBFlickrSizeSpecifierLarge, @"Illegal size for flickr");
-	NSString *sizeLookup[] = { @"o", OFFlickrSmallSize, OFFlickrMediumSize, OFFlickrLargeSize };
-		// Note: medium is nil, so we can't put in a dictionary.  Original not specified in objective-flickr
-	return sizeLookup[flickrSizeSpecifier];
-}
-
-
-- (NSURL *)imageURLForDesiredSize:(IMBFlickrSizeSpecifier)size fromPhotoDict:(NSDictionary *)photoDict context:(OFFlickrAPIContext*) context;
-{
-	NSURL* imageURL = nil;
-	if (!imageURL && kIMBFlickrSizeSpecifierOriginal == size)
-	{
-		if ([photoDict objectForKey:@"url_o"])
-		{
-			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_o"]];
-		}
-		else
-		{
-			size = kIMBFlickrSizeSpecifierLarge;		// downgrade to requesting large if no original
-		}
-	}
-	if (!imageURL && kIMBFlickrSizeSpecifierLarge == size)
-	{
-		if ([photoDict objectForKey:@"url_l"])
-		{
-			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_l"]];
-		}
-		else
-		{
-			size = kIMBFlickrSizeSpecifierMedium;		// downgrade to requesting medium if no large
-		}
-	}
-	
-	if (!imageURL && kIMBFlickrSizeSpecifierMedium == size)
-	{
-		if ([photoDict objectForKey:@"url_m"])
-		{
-			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_m"]];
-		}
-		else
-		{
-			size = kIMBFlickrSizeSpecifierSmall;		// downgrade to requesting medium if no large
-		}
-	}
-	
-	if (!imageURL && kIMBFlickrSizeSpecifierSmall == size)
-	{
-		if ([photoDict objectForKey:@"url_s"])
-		{
-			imageURL = [NSURL URLWithString:[photoDict objectForKey:@"url_s"]];
-		}
-	}
-	
-	// Fallback.  Really we should have it by now! But search for Edward & Bella Icon has no medium size!
-	if (!imageURL)
-	{
-		// build up URL programatically 
-		NSString *flickrSize = [self flickrSizeFromFlickrSizeSpecifier:size];
-		imageURL = [context photoSourceURLFromDictionary:photoDict size:flickrSize];
-	}
-	return imageURL;	
-}
-
-
-- (NSArray*) extractPhotosFromFlickrResponse: (NSDictionary*) response context: (OFFlickrAPIContext*) context {
-	IMBFlickrParserMessenger* parserMessenger = (IMBFlickrParserMessenger*) self.parserMessenger;
-	NSArray* photos = [response valueForKeyPath:@"photos.photo"];
-	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:photos.count];
-	self.displayedObjectCount = 0;
-	
-	for (NSDictionary* photoDict in photos) {
-
-		IMBFlickrObject* obj = [[IMBFlickrObject alloc] init];
-		
-		// Only store a location if we are allowed to download
-		BOOL canDownload = [[photoDict objectForKey:@"can_download"] boolValue];
-		if (canDownload)
-		{
-			obj.location = [self imageURLForDesiredSize:parserMessenger.desiredSize fromPhotoDict:photoDict context:context];
-		}
-		obj.shouldDisableTitle = !canDownload;
-
-		obj.name = [photoDict objectForKey:@"title"];
-		
-		// A lot of the metadata comes from the "extras" key we request
-		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
-		[metadata addEntriesFromDictionary:photoDict];		// give metaData the whole thing!
-		NSURL *webPageURL = [context photoWebPageURLFromDictionary:photoDict];
-		[metadata setObject:webPageURL forKey:@"webPageURL"];
-		
-		NSURL *quickLookURL = [self imageURLForDesiredSize:kIMBFlickrSizeSpecifierMedium fromPhotoDict:photoDict context:context];
-		[metadata setObject:quickLookURL forKey:@"quickLookURL"];
-
-		// But give it a better 'description' without the nested item
-		NSString *descHTML = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
-		if (descHTML)
-		{
-			NSData *HTMLData = [descHTML dataUsingEncoding:NSUTF8StringEncoding];
-			NSDictionary *options = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:NSUTF8StringEncoding] forKey:NSCharacterEncodingDocumentOption];
-			NSAttributedString *descAttributed = [[[NSAttributedString alloc] initWithHTML:HTMLData options:options documentAttributes:nil] autorelease];
-			if (descAttributed)
-			{
-				NSString *desc = [descAttributed string];
-				if (nil != desc) [metadata setObject:desc forKey:@"comment"];
-			}
-#ifdef DEBUG
-			else NSLog(@"Unable to make attributed string out of %@", descHTML);
-#endif
-		}
-
-		NSString *can_download = [photoDict objectForKey:@"can_download"];
-		NSString *license = [photoDict objectForKey:@"license"];
-		NSString *ownerName = [photoDict objectForKey:@"ownername"];
-		NSString *photoID = [photoDict objectForKey:@"id"];
-		id width = [metadata objectForKey:@"width_o"];
-		if (width == nil) width = [metadata objectForKey:@"width_l"];
-		if (width == nil) width = [metadata objectForKey:@"width_m"];
-		if (width == nil) width = [metadata objectForKey:@"width_s"];
-		id height = [metadata objectForKey:@"height_o"];
-		if (height == nil) height = [metadata objectForKey:@"height_l"];
-		if (height == nil) height = [metadata objectForKey:@"height_m"];
-		if (height == nil) height = [metadata objectForKey:@"height_s"];
-		
-		if (nil != can_download)	[metadata setObject:can_download forKey:@"can_download"];
-		if (nil != license)			[metadata setObject:license forKey:@"license"];
-		if (nil != ownerName)		[metadata setObject:ownerName forKey:@"ownername"];
-		if (nil != photoID)			[metadata setObject:photoID forKey:@"id"];
-		if (nil != width)			[metadata setObject:width forKey:@"width"];
-		if (nil != height)			[metadata setObject:height forKey:@"height"];
-
-		obj.preliminaryMetadata = [NSDictionary dictionaryWithDictionary:metadata];
-						 
-		obj.parserMessenger = self.parserMessenger;
-		
-		NSURL* thumbnailURL = [context photoSourceURLFromDictionary:photoDict size:OFFlickrThumbnailSize];
-		obj.imageLocation = thumbnailURL;
-		obj.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
-		obj.imageRepresentation = nil;	// Build lazily when needed
-		
-		[objects addObject:obj];
-		[obj release];
-		self.displayedObjectCount++;
-	}
-	
-	return objects;
-}
-
-
-- (void) processResponseForContext: (OFFlickrAPIContext*) context {	
-	if (!self.hasFlickrResponse) return;
-	
-	//	TODO: Instead of inserting the "load more" object at the end of the array, we should probably associate a sort descriptor with the image view.
-	NSMutableArray* oldImages = [self.objects mutableCopy];
-	IMBLoadMoreObject* loadMoreObject = nil;
-	for (id object in oldImages) {
-		if ([object isKindOfClass:[IMBLoadMoreObject class]]) {
-			loadMoreObject = object;
-			break;
-		}
-	}
-	if (loadMoreObject) {		
-		[oldImages removeObject:loadMoreObject];
-	}
-	
-	NSMutableArray* newImages = [[self extractPhotosFromFlickrResponse:[self flickrResponse] context:context] mutableCopy];
-	[newImages removeObjectsInArray:oldImages]; //	ensure that we have no doubles
-	
-    if ( [oldImages count] ) {
-        [newImages insertObjects:oldImages atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, oldImages.count)]];
-    }
-	
-	//	add 'load more' button...
-	IMBLoadMoreObject* loadMoreButton = ((IMBFlickrParserMessenger*) self.parserMessenger).loadMoreButton;
-	loadMoreButton.nodeIdentifier = self.identifier;
-	[newImages addObject:loadMoreButton];
-
-	self.objects = newImages;
-	
-	[newImages release];
-	[oldImages release];
 }
 
 
@@ -430,7 +226,6 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 #pragma mark Properties
 
 @synthesize customNode = _customNode;
-@synthesize flickrResponse = _flickrResponse;
 @synthesize license = _license;
 @synthesize method = _method;
 @synthesize page = _page;
@@ -440,87 +235,6 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 
 #pragma mark
 #pragma mark Utilities
-
-///	License kinds and ids as found under http://www.flickr.com/services/api/flickr.photos.licenses.getInfo.html
-typedef enum {
-	IMBFlickrNodeFlickrLicenseID_Undefined = 0,
-	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialShareAlike = 1,
-	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercial = 2,
-	IMBFlickrNodeFlickrLicenseID_AttributionNonCommercialNoDerivs = 3,
-	IMBFlickrNodeFlickrLicenseID_Attribution = 4,
-	IMBFlickrNodeFlickrLicenseID_AttributionShareAlike = 5,
-	IMBFlickrNodeFlickrLicenseID_AttributionNoDerivs = 6,
-	IMBFlickrNodeFlickrLicenseID_NoKnownCopyrightRestrictions = 7
-} IMBFlickrNodeFlickrLicenseID;
-
-
-///	Make the properties of the receiver into a dictionary with keys and values that can be directly passed to the Flick method call. Have a look at http://www.flickr.com/services/api/flickr.photos.search.html for details and arguments of a search query.
-- (NSDictionary*) argumentsForFlickrCall {
-	NSMutableDictionary* arguments = [NSMutableDictionary dictionary];
-	
-	//	build query arguments based on method...
-	if (self.query) {
-		if (self.method == IMBFlickrNodeMethod_TagSearch) {
-			[arguments setObject:self.query forKey:@"tags"];
-			[arguments setObject:@"all" forKey:@"tag_mode"];
-		} else if (self.method == IMBFlickrNodeMethod_TextSearch) {
-			[arguments setObject:self.query forKey:@"text"];
-		}
-	}
-	
-	//	translate our user kinds into Flickr license kind ids...
-	if (self.license == IMBFlickrNodeLicense_CreativeCommons) {
-		[arguments setObject:[NSString stringWithFormat:@"%d", IMBFlickrNodeFlickrLicenseID_Attribution] forKey:@"license"];
-	} else if (self.license == IMBFlickrNodeLicense_DerivativeWorks) {
-		[arguments setObject:[NSString stringWithFormat:@"%d", self.license] forKey:@"license"];
-	} else if (self.license == IMBFlickrNodeLicense_CommercialUse) {
-		[arguments setObject:[NSString stringWithFormat:@"%d", IMBFlickrNodeFlickrLicenseID_NoKnownCopyrightRestrictions] forKey:@"license"];
-	}
-	
-	//	determine sort order...
-	NSString* sortOrder = nil;
-	if (self.sortOrder == IMBFlickrNodeSortOrder_DatePostedDesc) {
-		sortOrder = @"date-posted-desc";
-	} else if (self.sortOrder == IMBFlickrNodeSortOrder_DatePostedAsc) {
-		sortOrder = @"date-posted-asc";		
-	} else if (self.sortOrder == IMBFlickrNodeSortOrder_DateTakenAsc) {
-		sortOrder = @"date-taken-asc";		
-	} else if (self.sortOrder == IMBFlickrNodeSortOrder_DateTakenDesc) {
-		sortOrder = @"date-taken-desc";		
-	} else if (self.sortOrder == IMBFlickrNodeSortOrder_InterestingnessDesc) {
-		sortOrder = @"interestingness-desc";		
-	} else if (self.sortOrder == IMBFlickrNodeSortOrder_InterestingnessAsc) {
-		sortOrder = @"interestingness-asc";		
-	} else if (self.sortOrder == IMBFlickrNodeSortOrder_Relevance) {
-		sortOrder = @"relevance";		
-	}
-	if (sortOrder) {
-		[arguments setObject:sortOrder forKey:@"sort"];
-	}
-	
-	//	limit the search to a specific number of items...
-	[arguments setObject:@"30" forKey:@"per_page"];
-	
-	// We are only doing photos.  Maybe later we want to do videos?
-	[arguments setObject:@"photos" forKey:@"media"];
-	
-	// Extra metadata needed
-	// http://www.flickr.com/services/api/flickr.photos.search.html
-	[arguments setObject:@"description,license,owner_name,original_format,geo,tags,o_dims,url_o,url_l,url_m,url_s,usage" forKey:@"extras"];
-	// Useful keys we can get from this:
-	// description -> array with ... description
-	// original_format -> originalformat, orignalsecret
-	// url_o,l, m, s ... URL to get the various sizes.  (url_l is not really documented, but works if needed.)
-	// usage: can_download (& others)
-	// Example of a photo that can't be downloaded: THE DECEIVING title.
-	
-	//	load the specified page...
-	NSString* page = [NSString stringWithFormat:@"%d", self.page + 1];
-	[arguments setObject:page forKey:@"page"];
-	
-	return arguments;
-}
-
 
 /// From http://gist.github.com/101674
 + (NSString*) base58EncodedValue: (long long) num {

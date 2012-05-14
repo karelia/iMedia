@@ -105,6 +105,74 @@
 #pragma mark
 #pragma mark Flickr Request Handling
 
+///	Make the properties of the receiver into a dictionary with keys and values that can be directly passed to the Flick method call. Have a look at http://www.flickr.com/services/api/flickr.photos.search.html for details and arguments of a search query.
+- (NSDictionary*) argumentsForNode: (IMBFlickrNode*) node {
+	NSMutableDictionary* arguments = [NSMutableDictionary dictionary];
+	
+	//	build query arguments based on method...
+	if (node.query) {
+		if (node.method == IMBFlickrNodeMethod_TagSearch) {
+			[arguments setObject:node.query forKey:@"tags"];
+			[arguments setObject:@"all" forKey:@"tag_mode"];
+		} else if (node.method == IMBFlickrNodeMethod_TextSearch) {
+			[arguments setObject:node.query forKey:@"text"];
+		}
+	}
+	
+	//	translate our user kinds into Flickr license kind ids...
+	if (node.license == IMBFlickrNodeLicense_CreativeCommons) {
+		[arguments setObject:[NSString stringWithFormat:@"%d", IMBFlickrNodeFlickrLicenseID_Attribution] forKey:@"license"];
+	} else if (node.license == IMBFlickrNodeLicense_DerivativeWorks) {
+		[arguments setObject:[NSString stringWithFormat:@"%d", node.license] forKey:@"license"];
+	} else if (node.license == IMBFlickrNodeLicense_CommercialUse) {
+		[arguments setObject:[NSString stringWithFormat:@"%d", IMBFlickrNodeFlickrLicenseID_NoKnownCopyrightRestrictions] forKey:@"license"];
+	}
+	
+	//	determine sort order...
+	NSString* sortOrder = nil;
+	if (node.sortOrder == IMBFlickrNodeSortOrder_DatePostedDesc) {
+		sortOrder = @"date-posted-desc";
+	} else if (node.sortOrder == IMBFlickrNodeSortOrder_DatePostedAsc) {
+		sortOrder = @"date-posted-asc";		
+	} else if (node.sortOrder == IMBFlickrNodeSortOrder_DateTakenAsc) {
+		sortOrder = @"date-taken-asc";		
+	} else if (node.sortOrder == IMBFlickrNodeSortOrder_DateTakenDesc) {
+		sortOrder = @"date-taken-desc";		
+	} else if (node.sortOrder == IMBFlickrNodeSortOrder_InterestingnessDesc) {
+		sortOrder = @"interestingness-desc";		
+	} else if (node.sortOrder == IMBFlickrNodeSortOrder_InterestingnessAsc) {
+		sortOrder = @"interestingness-asc";		
+	} else if (node.sortOrder == IMBFlickrNodeSortOrder_Relevance) {
+		sortOrder = @"relevance";		
+	}
+	if (sortOrder) {
+		[arguments setObject:sortOrder forKey:@"sort"];
+	}
+	
+	//	limit the search to a specific number of items...
+	[arguments setObject:@"30" forKey:@"per_page"];
+	
+	// We are only doing photos.  Maybe later we want to do videos?
+	[arguments setObject:@"photos" forKey:@"media"];
+	
+	// Extra metadata needed
+	// http://www.flickr.com/services/api/flickr.photos.search.html
+	[arguments setObject:@"description,license,owner_name,original_format,geo,tags,o_dims,url_o,url_l,url_m,url_s,usage" forKey:@"extras"];
+	// Useful keys we can get from this:
+	// description -> array with ... description
+	// original_format -> originalformat, orignalsecret
+	// url_o,l, m, s ... URL to get the various sizes.  (url_l is not really documented, but works if needed.)
+	// usage: can_download (& others)
+	// Example of a photo that can't be downloaded: THE DECEIVING title.
+	
+	//	load the specified page...
+	NSString* page = [NSString stringWithFormat:@"%d", node.page + 1];
+	[arguments setObject:page forKey:@"page"];
+	
+	return arguments;
+}
+
+
 - (void) executeFlickRequestForNode: (IMBFlickrNode*) node {
     if (!node) return;
     
@@ -124,7 +192,7 @@
 
     //	determine request contents...
     NSString* method = [self.class flickrMethodForMethodCode:node.method];
-    NSDictionary* arguments = [node argumentsForFlickrCall];
+    NSDictionary* arguments = [self argumentsForNode:node];
     #ifdef VERBOSE
         NSLog (@"Flickr request created for method '%@' and arguments: %@", method, arguments);
     #endif
@@ -171,6 +239,44 @@
 
 #pragma mark
 #pragma mark Flickr Response Handling
+
+#if 0
+///	Processes the 'flickrResponse' dictionary to fill the node with actual images.
+- (void) processResponseForContext: (OFFlickrAPIContext*) context {	
+	if (!self.hasFlickrResponse) return;
+	
+	//	TODO: Instead of inserting the "load more" object at the end of the array, we should probably associate a sort descriptor with the image view.
+	NSMutableArray* oldImages = [self.objects mutableCopy];
+	IMBLoadMoreObject* loadMoreObject = nil;
+	for (id object in oldImages) {
+		if ([object isKindOfClass:[IMBLoadMoreObject class]]) {
+			loadMoreObject = object;
+			break;
+		}
+	}
+	if (loadMoreObject) {		
+		[oldImages removeObject:loadMoreObject];
+	}
+	
+	NSMutableArray* newImages = [[self extractPhotosFromFlickrResponse:[self flickrResponse] context:context] mutableCopy];
+	[newImages removeObjectsInArray:oldImages]; //	ensure that we have no doubles
+	
+    if ( [oldImages count] ) {
+        [newImages insertObjects:oldImages atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, oldImages.count)]];
+    }
+	
+	//	add 'load more' button...
+	IMBLoadMoreObject* loadMoreButton = ((IMBFlickrParserMessenger*) self.parserMessenger).loadMoreButton;
+	loadMoreButton.nodeIdentifier = self.identifier;
+	[newImages addObject:loadMoreButton];
+    
+	self.objects = newImages;
+	
+	[newImages release];
+	[oldImages release];
+}
+#endif
+
 
 - (NSArray*) extractPhotosFromFlickrResponseForParserMessenger: (IMBFlickrParserMessenger*) parserMessenger {
     NSDictionary* response = self.response;
