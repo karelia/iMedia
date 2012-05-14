@@ -67,7 +67,6 @@
 #import "IMBNode.h"
 #import "IMBFolderObject.h"
 #import "IMBObject.h"
-#import "IMBObjectsPromise.h"
 #import "IMBOrderedDictionary.h"
 #import "IMBParserController.h"
 //#import "IMBPyramidObjectPromise.h"
