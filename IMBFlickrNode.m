@@ -43,17 +43,12 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
-// Author: Christoph Priebe
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
 //	iMedia
 #import "IMBFlickrNode.h"
 #import "IMBFlickrObject.h"
 #import "IMBFlickrParser.h"
 #import "IMBFlickrParserMessenger.h"
+#import "IMBFlickrSession.h"
 #import "IMBLibraryController.h"
 #import "IMBLoadMoreObject.h"
 #import "NSString+iMedia.h"
@@ -62,8 +57,6 @@
 
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
 @interface IMBFlickrNode ()
 //	Utilities:
 + (NSString*) identifierWithMethod: (NSInteger) method query: (NSString*) query;
@@ -71,9 +64,6 @@
 
 #pragma mark -
 
-//----------------------------------------------------------------------------------------------------------------------
-
-//	Some additions to the iMB node useful for Flickr handling:
 @implementation IMBFlickrNode
 
 NSString* const IMBFlickrNodeProperty_License = @"license";
@@ -87,11 +77,26 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 #pragma mark Construction
 
 - (id) init {
-	if (self = [super init]) {
+	if ((self = [super init])) {
 		self.license = IMBFlickrNodeLicense_Undefined;
 		self.method = IMBFlickrNodeMethod_TextSearch;
 		self.sortOrder = IMBFlickrNodeSortOrder_InterestingnessDesc;		
 	}
+	return self;
+}
+
+
+- (id) initWithCoder: (NSCoder*) inCoder {
+	if ((self = [super initWithCoder:inCoder])) {
+        self.customNode = [inCoder decodeBoolForKey:@"customNode"];
+        self.flickrResponse = [inCoder decodeObjectForKey:@"flickrResponse"];
+        self.license = [inCoder decodeIntegerForKey:@"license"];
+        self.method = [inCoder decodeIntegerForKey:@"method"];
+        self.page = [inCoder decodeIntegerForKey:@"page"];
+        self.query = [inCoder decodeObjectForKey:@"query"];
+        self.sortOrder = [inCoder decodeIntegerForKey:@"sortOrder"];
+	}
+	
 	return self;
 }
 
@@ -102,12 +107,25 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 	copy.flickrResponse = self.flickrResponse;
 	copy.license = self.license;
 	copy.method = self.method;
-	copy.query = self.query;
 	copy.page = self.page;
+	copy.query = self.query;
 	copy.sortOrder = self.sortOrder;
 	return copy;
 }
-	
+
+
+- (void) encodeWithCoder: (NSCoder*) inCoder {
+	[super encodeWithCoder:inCoder];
+
+	[inCoder encodeBool:self.customNode forKey:@"customNode"];
+	[inCoder encodeObject:self.flickrResponse forKey:@"flickrResponse"];
+	[inCoder encodeInteger:self.license forKey:@"license"];
+	[inCoder encodeInteger:self.method forKey:@"method"];
+	[inCoder encodeInteger:self.page forKey:@"page"];
+	[inCoder encodeObject:self.query forKey:@"query"];
+	[inCoder encodeInteger:self.sortOrder forKey:@"sortOrder"];
+}
+
 
 + (IMBFlickrNode*) genericFlickrNodeForRoot: (IMBFlickrNode*) root
 									 parser: (IMBParser*) parser {
@@ -504,21 +522,20 @@ typedef enum {
 }
 
 
-// From http://gist.github.com/101674
-
-+ (NSString *)base58EncodedValue:(long long)num {
-	NSString *alphabet = @"123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+/// From http://gist.github.com/101674
++ (NSString*) base58EncodedValue: (long long) num {
+	NSString* alphabet = @"123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
 	int baseCount = [alphabet length];
-	NSString *encoded = @"";
-	while(num >= baseCount) {
+	NSString* encoded = @"";
+	while (num >= baseCount) {
 		double div = num/baseCount;
 		long long mod = (num - (baseCount * (long long)div));
-		NSString *alphabetChar = [alphabet substringWithRange: NSMakeRange(mod, 1)];
+		NSString* alphabetChar = [alphabet substringWithRange: NSMakeRange(mod, 1)];
 		encoded = [NSString stringWithFormat: @"%@%@", alphabetChar, encoded];
 		num = (long long)div;
 	}
 	
-	if(num) {
+	if (num) {
 		encoded = [NSString stringWithFormat: @"%@%@", [alphabet substringWithRange: NSMakeRange(num, 1)], encoded];
 	}
 	return encoded;
@@ -570,7 +587,7 @@ typedef enum {
 	return [NSString stringWithFormat:@"%@:/%@", parserClassName, [NSString uuid]];
 	//	...EXPERIMENTAL
 #else
-	NSString* flickrMethod = [IMBFlickrParser flickrMethodForMethodCode:method];
+	NSString* flickrMethod = [IMBFlickrSession flickrMethodForMethodCode:method];
 	if (method == IMBFlickrNodeMethod_TagSearch) {
 		flickrMethod = [flickrMethod stringByAppendingString:@"/tag"];
 	} else if (method == IMBFlickrNodeMethod_TextSearch) {

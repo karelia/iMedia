@@ -43,80 +43,41 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
+//  System
+#import <Quartz/Quartz.h>
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Author: Christoph Priebe
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark HEADERS
-
+//  iMedia
 #import "IMBConfig.h"
 #import "IMBFlickrNode.h"
 #import "IMBFlickrParser.h"
+#import "IMBFlickrSession.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSString+iMedia.h"
-#import <Quartz/Quartz.h>
 
 
-//----------------------------------------------------------------------------------------------------------------------
 
-
-#pragma mark 
+//#define VERBOSE
 
 @implementation IMBFlickrParser
 
+#pragma mark 
+#pragma mark Construction & Destruction
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) init
-{
-	if ((self = [super init]))
-	{
-	}
-	
-	return self;
-}
-
-- (void) dealloc
-{
+- (void) dealloc {
+	IMBRelease (_flickrAPIKey);
+	IMBRelease (_flickrContext);
+	IMBRelease (_flickrSharedSecret);
 	[super dealloc];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-#pragma mark
-#pragma mark Flickr Request Handling
-
-+ (NSString*) flickrMethodForMethodCode: (NSInteger) code {
-	if (code == IMBFlickrNodeMethod_TagSearch || code == IMBFlickrNodeMethod_TextSearch) {
-		return @"flickr.photos.search";
-	} else if (code == IMBFlickrNodeMethod_Recent) {
-		return @"flickr.photos.getRecent";
-	} else if (code == IMBFlickrNodeMethod_MostInteresting) {
-		return @"flickr.interestingness.getList";
-	} else if (code == IMBFlickrNodeMethod_GetInfo) {
-		return @"flickr.photos.getInfo";
-	}
-	NSLog (@"Can't find Flickr method for method code.");
-	return nil;
 }
 
 
 #pragma mark 
 #pragma mark Parser Methods
 
-- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
-{
+- (IMBNode*) unpopulatedTopLevelNode: (NSError**) outError {
 	//	load Flickr icon...
 	NSBundle* ourBundle = [NSBundle bundleForClass:[IMBNode class]];
 	NSString* pathToImage = [ourBundle pathForResource:@"Flickr" ofType:@"png"];
@@ -139,63 +100,120 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+- (BOOL) populateNode: (IMBNode*) inNode error: (NSError**) outError {
+    IMBFlickrNode* inFlickrNode = (IMBFlickrNode*) inNode;
 
-
-- (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
-{
-    if (inNode.isTopLevelNode) {
-        IMBFlickrNode* rootNode = (IMBFlickrNode*) inNode;
-
+    if (inFlickrNode.isTopLevelNode) {
         //  add subnodes...
         NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
-        [subnodes addObject:[IMBFlickrNode flickrNodeForRecentPhotosForRoot:rootNode parser:self]];
-        [subnodes addObject:[IMBFlickrNode flickrNodeForInterestingPhotosForRoot:rootNode parser:self]];
+        [subnodes addObject:[IMBFlickrNode flickrNodeForRecentPhotosForRoot:inFlickrNode parser:self]];
+        [subnodes addObject:[IMBFlickrNode flickrNodeForInterestingPhotosForRoot:inFlickrNode parser:self]];
 
         //  add objects...
-        rootNode.objects = [NSMutableArray array];
+        inFlickrNode.objects = [NSMutableArray array];
+    } else {
+        xpc_transaction_begin ();
+
+        //	lazy initialize the flickr context...
+        if (_flickrContext == nil) {
+            //  failing to setup the Flickr API key and shared secret is an implementation error...
+            NSAssert (self.flickrAPIKey, @"Flickr API key property not set!");
+            NSAssert (self.flickrSharedSecret, @"Flickr shared secret property not set!");
+            _flickrContext = [[OFFlickrAPIContext alloc] initWithAPIKey:self.flickrAPIKey sharedSecret:self.flickrSharedSecret];
+        }	
+
+        //  we have no subnodes...
+        [inFlickrNode mutableArrayForPopulatingSubnodes];
+        
+        //  run flickr request...
+        IMBFlickrSession* session = [[IMBFlickrSession alloc] initWithFlickrContext:_flickrContext];
+        [session executeFlickRequestForNode:inFlickrNode];
+        
+        //  evaluate the response...
+        if (!session.error) {
+            #ifdef VERBOSE
+                NSLog (@"RESPONSE: %@", session.response);
+            #endif
+            NSArray* objects = [session extractPhotosFromFlickrResponseForParserMessenger:(IMBFlickrParserMessenger*)inFlickrNode.parserMessenger];
+            inFlickrNode.objects = objects;    
+        } else {
+            if (outError) *outError = [[session.error copy] autorelease];
+        }
+        [session release];                
+
+        xpc_transaction_end ();
     }
     
     return YES;
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Since we know that we have local files we can use the helper method supplied by the base class...
-
-- (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
-{
-	return [self bookmarkForLocalFileObject:inObject error:outError];
+- (NSData*) bookmarkForObject: (IMBObject*) inObject error: (NSError**) outError {
+	if (outError) *outError = nil;
+	return nil;
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+- (NSDictionary*) metadataForObject: (IMBObject*) inObject error: (NSError**) outError {
+	if (outError) *outError = nil;
+	return nil;
+}
+
+
+- (id) thumbnailForObject: (IMBObject*) inObject error: (NSError**) outError {
+	if (outError) *outError = nil;
+    
+    xpc_transaction_begin ();
+
+    //  determine preview URL...
+    NSString* thumbnailURLString = [inObject.preliminaryMetadata objectForKey:@"url_m"];
+    if (!thumbnailURLString) thumbnailURLString = [inObject.preliminaryMetadata objectForKey:@"url_s"];
+    if (!thumbnailURLString) thumbnailURLString = [inObject.preliminaryMetadata objectForKey:@"url_l"];
+    if (!thumbnailURLString) {
+        NSString* title = @"Flickr Error";
+        NSString* description = @"Can't determine image preview URL.";
+        
+        NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
+                              title,@"title",
+                              description,NSLocalizedDescriptionKey,
+                              nil];
+        
+        NSError* error = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];        
+        if (*outError) *outError = error;
+
+        return nil;
+    }
+
+    //  load image at preview URL...
+    CGImageRef image = NULL;
+    NSURL* thumbnailURL = [NSURL URLWithString:thumbnailURLString];
+    CGImageSourceRef source = CGImageSourceCreateWithURL ((CFURLRef)thumbnailURL, NULL);
+    if (source) {
+        image = CGImageSourceCreateImageAtIndex (source, 0, NULL);
+        [NSMakeCollectable(image) autorelease];
+        CFRelease (source);
+    } else {
+        NSString* title = @"Flickr Image Loading Error";
+        NSString* description = @"Can't determine image source.";
+        
+        NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
+                              title,@"title",
+                              description,NSLocalizedDescriptionKey,
+                              nil];
+        
+        NSError* error = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];        
+        if (*outError) *outError = error;
+    }
+    return (id) image;
+
+    xpc_transaction_end ();
+}
 
 
 #pragma mark 
-#pragma mark Helpers
+#pragma mark Properties
 
-
-- (IMBObject*) objectForURL:(NSURL*)inURL name:(NSString*)inName index:(NSUInteger)inIndex;
-{
-	IMBObject* object = [[[IMBObject alloc] init] autorelease];
-	object.location = inURL;
-	object.name = inName;
-	object.parserIdentifier = self.identifier;
-	object.index = inIndex;
-	
-	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
-	object.imageLocation = nil;             // will be loaded lazily when needed
-	object.imageRepresentation = nil;		// will be loaded lazily when needed
-	object.metadata = nil;					// will be loaded lazily when needed
-	
-	return object;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
+@synthesize flickrAPIKey = _flickrAPIKey;
+@synthesize flickrSharedSecret = _flickrSharedSecret;
 
 @end

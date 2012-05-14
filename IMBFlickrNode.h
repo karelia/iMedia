@@ -43,19 +43,11 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
-// Author: Christoph Priebe
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
 //	Objective Flickr
 #import <ObjectiveFlickr/ObjectiveFlickr.h>
 
 //	iMedia
 #import <iMedia/IMBNode.h>
-
-//----------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -94,14 +86,12 @@ typedef enum {
 } IMBFlickrNodeSortOrder;
 
 /**
- *	Flickr parser custom node.
- *
- *	@date 2009-09-21 Start implementing this class (cp).
+ *	Flickr parser custom node holding some additions to the iMB node construct queries to Flickr.
  *
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 2.0
  */
-@interface IMBFlickrNode: IMBNode {
+@interface IMBFlickrNode: IMBNode <NSCopying, NSCoding> {
 	@private
 	BOOL _customNode;
 	NSDictionary* _flickrResponse;
@@ -127,7 +117,7 @@ typedef enum {
 								   rootNode: (IMBFlickrNode*) root
 									 parser: (IMBParser*) parser;
 
-+ (void) sendSelectNodeNotificationForDict:(NSDictionary*) dict;
++ (void) sendSelectNodeNotificationForDict: (NSDictionary*) dict;
 
 
 #pragma mark Flickr Response Handling
@@ -155,8 +145,8 @@ typedef enum {
 #pragma mark Utilities
 
 - (NSDictionary*) argumentsForFlickrCall;
-+ (NSString *)base58EncodedValue:(long long)num;
-+ (NSString *)descriptionOfLicense:(int)aLicenseNumber;
++ (NSString*) base58EncodedValue: (long long) num;
++ (NSString*) descriptionOfLicense: (int) aLicenseNumber;
 + (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
 - (void) readPropertiesFromDictionary: (NSDictionary*) dictionary;
 
