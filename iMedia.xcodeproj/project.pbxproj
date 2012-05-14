@@ -70,7 +70,6 @@
 		8FCA063E12368342009072AE /* IMBApertureHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8FCA063D12368342009072AE /* IMBApertureHeaderView.xib */; };
 		8FCA064212368388009072AE /* IMBApertureHeaderViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FCA064012368388009072AE /* IMBApertureHeaderViewController.h */; };
 		8FFCBFD010A8CD9C00377C33 /* IMBLightroom3Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8FFCBFCE10A8CD9C00377C33 /* IMBLightroom3Parser.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE1AED33129C475200694472 /* js.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE1AED32129C475200694472 /* js.tiff */; };
 		CE394AC21371A1F700EF0D1E /* cork-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CE394AC11371A1F700EF0D1E /* cork-background.jpg */; };
 		CE3EC9A2124AAC0700D8435B /* NSURL+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -147,7 +146,8 @@
 		D049F00A1034993E003CC49C /* NSImage+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0081034993E003CC49C /* NSImage+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0401034A86B003CC49C /* IMBIconCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D049F0411034A86B003CC49C /* IMBIconCache.m */; };
-		D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D04EF036156109EB0045E18A /* IMBPasteboardItem.h in Headers */ = {isa = PBXBuildFile; fileRef = D04EF034156109EB0045E18A /* IMBPasteboardItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D04EF037156109EB0045E18A /* IMBPasteboardItem.m in Sources */ = {isa = PBXBuildFile; fileRef = D04EF035156109EB0045E18A /* IMBPasteboardItem.m */; };
 		D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D052B0931053B0F700988F53 /* IMBProgressWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0C11053B4AB00988F53 /* IMBProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = D052B0C01053B4AB00988F53 /* IMBProgress.xib */; };
 		D052EB881558F64300D16C55 /* IMBFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D099320C1011158400C527B7 /* IMBFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -211,9 +211,6 @@
 		D08247B21521CD6400033850 /* IMBOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = D09930BD1010F6C100C527B7 /* IMBOperationQueue.m */; };
 		D08247B31521CD6E00033850 /* IMBProgressWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D052B0941053B0F700988F53 /* IMBProgressWindowController.m */; };
 		D08247B41521CD9A00033850 /* IMBObjectThumbnailLoadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D010388A107152A9007C88D7 /* IMBObjectThumbnailLoadOperation.m */; };
-		D08247B51521CDA600033850 /* IMBObjectsPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */; };
-		D08247B61521CDDA00033850 /* IMBURLGetSizeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */; };
-		D08247B71521CDDA00033850 /* IMBURLDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */; };
 		D08640821524464200B4FD7F /* IMBDisableTitleToColorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = CE28E51B124192A800B00F3D /* IMBDisableTitleToColorTransformer.m */; };
 		D08640841524467000B4FD7F /* IMBMetadataTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CE6E1C11F6FA09005EE5B4 /* IMBMetadataTransformer.m */; };
 		D08C5C9E104862540068FF07 /* IMBTextFieldCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D08C5C9C104862540068FF07 /* IMBTextFieldCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -688,6 +685,8 @@
 		D049F0091034993E003CC49C /* NSImage+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSImage+iMedia.m"; sourceTree = "<group>"; };
 		D049F0401034A86B003CC49C /* IMBIconCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBIconCache.h; sourceTree = "<group>"; };
 		D049F0411034A86B003CC49C /* IMBIconCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBIconCache.m; sourceTree = "<group>"; };
+		D04EF034156109EB0045E18A /* IMBPasteboardItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPasteboardItem.h; sourceTree = "<group>"; };
+		D04EF035156109EB0045E18A /* IMBPasteboardItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPasteboardItem.m; sourceTree = "<group>"; };
 		D04FFEB9103BE81600104EB8 /* IMBObjectsPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectsPromise.h; sourceTree = "<group>"; };
 		D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectsPromise.m; sourceTree = "<group>"; };
 		D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBURLDownloadOperation.h; sourceTree = "<group>"; };
@@ -1557,6 +1556,8 @@
 				303FFD68152CBC3B0026B8CF /* IMBSkimmableObject.h */,
 				303FFD69152CBC3B0026B8CF /* IMBSkimmableObject.m */,
 				D01038E21071E111007C88D7 /* IMBObjectFifoCache.h */,
+				D04EF034156109EB0045E18A /* IMBPasteboardItem.h */,
+				D04EF035156109EB0045E18A /* IMBPasteboardItem.m */,
 				D01038E31071E111007C88D7 /* IMBObjectFifoCache.m */,
 				D0A13AA615301E89005513CD /* missing-thumbnail.jpg */,
 				D0CB9178150F82E7007716FA /* Old */,
@@ -1955,7 +1956,6 @@
 				D08C5C9E104862540068FF07 /* IMBTextFieldCell.h in Headers */,
 				D0CA9427104932CD00725DA3 /* IMBiTunesAudioParser.h in Headers */,
 				D0CA961510498F7C00725DA3 /* IMBTimecodeTransformer.h in Headers */,
-				D052AFD210538B7B00988F53 /* IMBURLDownloadOperation.h in Headers */,
 				D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */,
 				D09FD77F105586BC00E328C7 /* IMBImageBrowserView.h in Headers */,
 				CEF686B51062D0BD005D7E72 /* IMBComboTableView.h in Headers */,
@@ -1993,7 +1993,6 @@
 				D00D0D271226A813000924AE /* IMBPanel.h in Headers */,
 				D04083C81235490F005375FC /* IMBFlickrObject.h in Headers */,
 				8FCA064212368388009072AE /* IMBApertureHeaderViewController.h in Headers */,
-				CE09F303124823020094EC48 /* IMBURLGetSizeOperation.h in Headers */,
 				CE3EC9A2124AAC0700D8435B /* NSURL+iMedia.h in Headers */,
 				D0129A2A124C97A600EBEB45 /* NSDictionary+iMedia.h in Headers */,
 				CE6B664D124D440C00E44811 /* IMBDisableTitleToColorTransformer.h in Headers */,
@@ -2044,6 +2043,7 @@
 				D052EB8B1558F64300D16C55 /* IMBMovieFolderParser.h in Headers */,
 				D052EB8C1558F64F00D16C55 /* IMBAppleMediaParser.h in Headers */,
 				30F61B6A155D4A4D0092A99C /* NSObject+iMedia.h in Headers */,
+				D04EF036156109EB0045E18A /* IMBPasteboardItem.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2632,9 +2632,6 @@
 				D08247B21521CD6400033850 /* IMBOperationQueue.m in Sources */,
 				D08247B31521CD6E00033850 /* IMBProgressWindowController.m in Sources */,
 				D08247B41521CD9A00033850 /* IMBObjectThumbnailLoadOperation.m in Sources */,
-				D08247B51521CDA600033850 /* IMBObjectsPromise.m in Sources */,
-				D08247B61521CDDA00033850 /* IMBURLGetSizeOperation.m in Sources */,
-				D08247B71521CDDA00033850 /* IMBURLDownloadOperation.m in Sources */,
 				D08F7B72152309A800505395 /* IMBImageObjectViewController.m in Sources */,
 				D08F7B73152309A800505395 /* IMBAudioObjectViewController.m in Sources */,
 				D08F7B74152309A800505395 /* IMBMovieObjectViewController.m in Sources */,
@@ -2688,6 +2685,7 @@
 				30FD646B1546BAE90036BDE2 /* IMBApertureHeaderViewController.m in Sources */,
 				30FD64671546AF6E0036BDE2 /* NSPasteboard+iMedia.m in Sources */,
 				30F61B6B155D4A4D0092A99C /* NSObject+iMedia.m in Sources */,
+				D04EF037156109EB0045E18A /* IMBPasteboardItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
