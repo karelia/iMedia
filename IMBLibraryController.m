@@ -251,10 +251,18 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 	else
 	{
-		[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
+		// Quick work-around for issue raised in https://github.com/karelia/iMedia/issues/61
+		// Because the behavior before was to quietly ignore errors that didn't generate an actual error
+		// object, let's perpetuate that for now to avoid the troublesome repeat error dialogs 
+		// that occur when e.g. a customer has deleted a custom image folder source without removing
+		// it first in iMedia...
+		if (error != nil)
+		{
+			[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
 
-		// If we failed then the _oldNode is still good but needs to have its status updated 
-		self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
+			// If we failed then the _oldNode is still good but needs to have its status updated 
+			self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
+		}
 	}
 }
 
