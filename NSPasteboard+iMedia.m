@@ -56,6 +56,7 @@
 #pragma mark HEADERS
 
 #import "NSPasteboard+iMedia.h"
+#import "IMBPasteboardItem.h"
 #import "IMBObject.h"
 
 
@@ -79,17 +80,18 @@
 }
 
 
-// Get all IMBObjects from the pasteboard...
+// Get all IMBObjects from the pasteboard. Please note that we won't go through pasteboard:item:provideDataForType:
+// here, to avoid archiving/dearchiving the IMBObject and losing some properties in the process. Instead we'll 
+// simply access the *original* IMBObject that is attached to the IMBPasteboardItem...
 
 - (NSArray*) imb_IMBObjects
 {
 	NSArray* items = self.pasteboardItems;
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:items.count];
 	
-	for (NSPasteboardItem* item in items)
+	for (IMBPasteboardItem* item in items)
 	{
-		NSData* data = [item dataForType:kIMBObjectPasteboardType];
-		IMBObject* object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+		IMBObject* object = [item object];
 		if (object) [objects addObject:object];
 	}
 	
