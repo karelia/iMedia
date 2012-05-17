@@ -48,7 +48,7 @@ BOOL SBIsSandboxed()
 
     dispatch_once(&sIsSandboxedToken,
     ^{
-		if (IMBRunningOnLionOrNewer())
+		if (NSAppKitVersionNumber >= 1138) // Are we running on Lion?
 		{
 			SecCodeRef codeRef = NULL;
 			SecCodeCopySelf(kSecCSDefaultFlags,&codeRef);
