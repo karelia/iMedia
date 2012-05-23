@@ -1237,19 +1237,13 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#warning TODO migrate away from IMBOperationQueue and IMBObjectThumbnailLoadOperation
-
-
 // We pre-load the images in batches. Assumes that we only have one client table view.  If we were to add another 
 // IMBDynamicTableView client, we would need to deal with this architecture a bit since we have ivars here about 
-// which rows are visible.
+// which rows are visible...
 
-
-- (void) dynamicTableView:(IMBDynamicTableView *)tableView changedVisibleRowsFromRange:(NSRange)oldVisibleRows toRange:(NSRange)newVisibleRows
+- (void) dynamicTableView:(IMBDynamicTableView*)inTableView changedVisibleRowsFromRange:(NSRange)inOldVisibleRows toRange:(NSRange)inNewVisibleRows
 {
-	BOOL wantsThumbnails = [tableView wantsThumbnails];
-	
-	NSArray *newVisibleItems = [[ibObjectArrayController arrangedObjects] subarrayWithRange:newVisibleRows];
+	NSArray *newVisibleItems = [[ibObjectArrayController arrangedObjects] subarrayWithRange:inNewVisibleRows];
 	NSMutableSet *newVisibleItemsSetRetained = [[NSMutableSet alloc] initWithArray:newVisibleItems];
 	
 	NSMutableSet *itemsNoLongerVisible	= [NSMutableSet set];
@@ -1261,96 +1255,22 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	[itemsNoLongerVisible setSet:_observedVisibleItems];
 	[itemsNoLongerVisible minusSet:newVisibleItemsSetRetained];
 
-//	NSLog(@"old Rows: %@", ([_observedVisibleItems count] ? [_observedVisibleItems description] : @"--"));
-//	NSLog(@"new rows: %@", ([newVisibleItems count] ? [newVisibleItems description] : @"--"));
-//	NSLog(@"Newly visible: %@", ([itemsNewlyVisible count] ? [itemsNewlyVisible description] : @"--"));
-//	NSLog(@"Now NOT visbl: %@", ([itemsNoLongerVisible count] ? [itemsNoLongerVisible description] : @"--"));
-	
-	// With items going away, stop observing  and lower their queue priority if they are still queued
+	// With items going away, stop observing...
 	
     for (IMBObject* object in itemsNoLongerVisible)
 	{
-#ifdef DEBUG
-//		NSLog(@"changedVis…:… REMOVE [%p:%@'%@' removeObs…:%p 4kp:imageRep…", object,[object class],[object name], self);
-#endif
 		[object removeObserver:self forKeyPath:kIMBObjectImageRepresentationKey];
-		
-		NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
-		for (IMBObjectThumbnailLoadOperation* op in ops)
-		{
-			if ([op isKindOfClass:[IMBObjectThumbnailLoadOperation class]])
-			{
-				IMBObject* loadingObject = [op object];
-				if (loadingObject == object)
-				{
-					//NSLog(@"Lowering priority of load of %@", loadingObject.name);
-					[op setQueuePriority:NSOperationQueuePriorityVeryLow];		// re-prioritize lower
-					break;
-				}
-			}
-		}
     }
 	
-    // With newly visible items, observe them and kick off a request to load the image
+    // With newly visible items, start observing...
 	
     for (IMBObject* object in itemsNewlyVisible)
 	{
-		if ((wantsThumbnails && [object needsImageRepresentation])		// don't auto-load just by asking for imageRepresentation
-			|| (nil == object.metadata))
-		{
-			// Check if it is already queued -- if it's there already, bump up priority & adjust operation flag
-			
-			IMBObjectThumbnailLoadOperation *foundOperation = nil;
-			
-			NSArray *ops = [[IMBOperationQueue sharedQueue] operations];
-			for (IMBObjectThumbnailLoadOperation* op in ops)
-			{
-				if ([op isKindOfClass:[IMBObjectThumbnailLoadOperation class]])
-				{
-					IMBObject *loadingObject = [op object];
-					if (loadingObject == object)
-					{
-						foundOperation = op;
-						break;
-					}
-				}
-			}
-			
-			if (foundOperation)
-			{
-				//NSLog(@"Raising priority of load of %@", [foundOperation object].name);
-				
-				NSUInteger operationMask = kIMBLoadMetadata;
-				if (wantsThumbnails)
-				{
-					operationMask |= kIMBLoadThumbnail;
-				}
-				foundOperation.options |= operationMask;		// make sure we have the appropriate loading option set
-				[foundOperation setQueuePriority:NSOperationQueuePriorityNormal];		// re-prioritize back to normal
-			}
-			else
-			{
-				if (wantsThumbnails)
-				{
-					[object loadThumbnail];	// make sure we load it, though it probably got loaded above
-				}
-				else
-				{
-					[object loadMetadata];
-				}
-			}
-		}
-		
-		// Add observer always to balance
-		
-#ifdef DEBUG
-//		NSLog(@"changedVis…:… _ADD__ [%p:%@'%@' addObs…:%p 4kp:imageRep…", object, [object class],[object name], self);
-#endif
-
 		[object addObserver:self forKeyPath:kIMBObjectImageRepresentationKey options:0 context:(void*)kIMBObjectImageRepresentationKey];
      }
 	
-	// Finally cache our old visible items set
+	// Finally cache our old visible items set...
+	
 	[_observedVisibleItems release];
     _observedVisibleItems = newVisibleItemsSetRetained;
 }
