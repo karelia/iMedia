@@ -55,7 +55,7 @@
 
 #pragma mark HEADERS
 
-#import <Cocoa/Cocoa.h>
+#import "IMBParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,13 +63,27 @@
 
 #pragma mark
 
-@interface NSPasteboard (iMedia)
+// Public methods for use in host applications...
+
+@interface NSPasteboard (iMediaPublic)
 
 - (BOOL) imb_containsIMBObjects;
 - (NSArray*) imb_IMBObjects;
 
 - (BOOL) imb_containsFileURLs;
 - (NSArray*) imb_fileURLs;
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Private methods (only used by iMedia framework)...
+
+@interface NSPasteboard (iMediaInternal)
+
+- (void) imb_setParserMessenger:(IMBParserMessenger*)inParserMessenger;
 
 @end
 
