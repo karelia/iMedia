@@ -59,6 +59,7 @@
 #import "IMBObjectArrayController.h"
 #import "IMBConfig.h"
 #import "IMBObject.h"
+#import "NSPasteboard+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -188,9 +189,12 @@
 	NSIndexSet* indexes = [self filteredDraggingIndexes:inIndexes]; 
 	NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes];
 	NSMutableArray* pasteboardItems = [NSMutableArray arrayWithCapacity:objects.count];
+	IMBParserMessenger* parserMessenger = nil;
 	
 	for (IMBObject* object in objects)
 	{
+		parserMessenger = object.parserMessenger;
+		
 		NSURL* url = object.URL;
 		NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
 		if (url) [item setString:[url absoluteString] forType:(NSString*)kUTTypeURL];
@@ -200,6 +204,8 @@
 	
 	[inPasteboard clearContents];
 	[inPasteboard writeObjects:pasteboardItems];
+	[inPasteboard imb_setParserMessenger:parserMessenger];
+
 	return pasteboardItems.count;
 }
 

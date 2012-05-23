@@ -146,8 +146,6 @@
 		D049F00A1034993E003CC49C /* NSImage+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0081034993E003CC49C /* NSImage+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0401034A86B003CC49C /* IMBIconCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049F0431034A86B003CC49C /* IMBIconCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D049F0411034A86B003CC49C /* IMBIconCache.m */; };
-		D04EF036156109EB0045E18A /* IMBPasteboardItem.h in Headers */ = {isa = PBXBuildFile; fileRef = D04EF034156109EB0045E18A /* IMBPasteboardItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D04EF037156109EB0045E18A /* IMBPasteboardItem.m in Sources */ = {isa = PBXBuildFile; fileRef = D04EF035156109EB0045E18A /* IMBPasteboardItem.m */; };
 		D052B0951053B0F700988F53 /* IMBProgressWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = D052B0931053B0F700988F53 /* IMBProgressWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D052B0C11053B4AB00988F53 /* IMBProgress.xib in Resources */ = {isa = PBXBuildFile; fileRef = D052B0C01053B4AB00988F53 /* IMBProgress.xib */; };
 		D052EB881558F64300D16C55 /* IMBFolderParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D099320C1011158400C527B7 /* IMBFolderParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -685,8 +683,6 @@
 		D049F0091034993E003CC49C /* NSImage+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSImage+iMedia.m"; sourceTree = "<group>"; };
 		D049F0401034A86B003CC49C /* IMBIconCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBIconCache.h; sourceTree = "<group>"; };
 		D049F0411034A86B003CC49C /* IMBIconCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBIconCache.m; sourceTree = "<group>"; };
-		D04EF034156109EB0045E18A /* IMBPasteboardItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPasteboardItem.h; sourceTree = "<group>"; };
-		D04EF035156109EB0045E18A /* IMBPasteboardItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPasteboardItem.m; sourceTree = "<group>"; };
 		D04FFEB9103BE81600104EB8 /* IMBObjectsPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBObjectsPromise.h; sourceTree = "<group>"; };
 		D04FFEBA103BE81600104EB8 /* IMBObjectsPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBObjectsPromise.m; sourceTree = "<group>"; };
 		D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBURLDownloadOperation.h; sourceTree = "<group>"; };
@@ -1556,8 +1552,6 @@
 				303FFD68152CBC3B0026B8CF /* IMBSkimmableObject.h */,
 				303FFD69152CBC3B0026B8CF /* IMBSkimmableObject.m */,
 				D01038E21071E111007C88D7 /* IMBObjectFifoCache.h */,
-				D04EF034156109EB0045E18A /* IMBPasteboardItem.h */,
-				D04EF035156109EB0045E18A /* IMBPasteboardItem.m */,
 				D01038E31071E111007C88D7 /* IMBObjectFifoCache.m */,
 				D0A13AA615301E89005513CD /* missing-thumbnail.jpg */,
 				D0CB9178150F82E7007716FA /* Old */,
@@ -2043,7 +2037,6 @@
 				D052EB8B1558F64300D16C55 /* IMBMovieFolderParser.h in Headers */,
 				D052EB8C1558F64F00D16C55 /* IMBAppleMediaParser.h in Headers */,
 				30F61B6A155D4A4D0092A99C /* NSObject+iMedia.h in Headers */,
-				D04EF036156109EB0045E18A /* IMBPasteboardItem.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2685,7 +2678,6 @@
 				30FD646B1546BAE90036BDE2 /* IMBApertureHeaderViewController.m in Sources */,
 				30FD64671546AF6E0036BDE2 /* NSPasteboard+iMedia.m in Sources */,
 				30F61B6B155D4A4D0092A99C /* NSObject+iMedia.m in Sources */,
-				D04EF037156109EB0045E18A /* IMBPasteboardItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

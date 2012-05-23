@@ -66,6 +66,7 @@
 #import "IMBProgressWindowController.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSPasteboard+iMedia.h"
 #import "NSView+iMedia.h"
 #import "IMBDynamicTableView.h"
 #import "IMBOperationQueue.h"
@@ -73,7 +74,6 @@
 #import "IMBButtonObject.h"
 #import "IMBComboTextCell.h"
 #import "IMBImageBrowserCell.h"
-#import "IMBPasteboardItem.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1819,7 +1819,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 #pragma mark Dragging
 
 
-// Filter the dragged indexes to only include the selectable (and thus draggable) ones.
+// Filter the dragged indexes to only include the selectable (and thus draggable) ones...
 
 - (NSIndexSet*) filteredDraggingIndexes:(NSIndexSet*)inIndexes
 {
@@ -1839,11 +1839,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 }
 
 
-// Encapsulate all dragged objects in a promise, archive it and put it on the pasteboard. The client can then
-// start loading the objects in the promise and iterate over the resulting files...
-//
-// This method is used for both imageBrowser:writeItemsAtIndexes:toPasteboard: and tableView:writeRowsWithIndexes:toPasteboard:
-
+// This method is used for both the IKImageBrowserView (icon view) and the NSTableView (list and combo view).
+// Encapsulate all objects in IMBPasteboardItem and promise the kUTTypeFileURL type...
 
 - (NSUInteger) writeItemsAtIndexes:(NSIndexSet*)inIndexes toPasteboard:(NSPasteboard*)inPasteboard
 {
@@ -1851,11 +1848,13 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes];
 	NSMutableArray* pasteboardItems = [NSMutableArray arrayWithCapacity:objects.count];
 	NSArray* types = [NSArray arrayWithObjects:kIMBObjectPasteboardType,(NSString*)kUTTypeFileURL,nil];
+	IMBParserMessenger* parserMessenger = nil;
 	
 	for (IMBObject* object in objects)
 	{
-		IMBPasteboardItem* item = [[IMBPasteboardItem alloc] init];
-		[item setObject:object];
+		parserMessenger = object.parserMessenger;
+		
+		NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
 		[item setDataProvider:object forTypes:types];
 		[pasteboardItems addObject:item];
 		[item release];
@@ -1863,208 +1862,10 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	[inPasteboard clearContents];
 	[inPasteboard writeObjects:pasteboardItems];
-	return pasteboardItems.count;
-
-
-/*
-	IMBNode* node = self.currentNode;
-	NSUInteger itemsWritten = 0;
-	NSIndexSet* indexes = [self filteredDraggingIndexes:inIndexes]; 
-	NSArray* objects = [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes];
+	[inPasteboard imb_setParserMessenger:parserMessenger];
 	
-	if (node)
-	{
-		if ([objects count] > 0)
-		{
-			IMBParser* parser = node.parser;
-
-			// Promise data for all of the objects being dragged. (In 10.6, each index will be extracted one-by-one.)
-			IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
-			if ([promise.objects count] > 0)	// if not downloadable, these won't appear in objects list
-			{
-				NSData* promiseData = [NSKeyedArchiver archivedDataWithRootObject:promise];
-				
-				NSArray* declaredTypes = nil;
-				
-				// We currently use a mix of 10.5 and 10.6 style pasteboard behaviors.
-				//
-				// 10.6 affords us the opportunity to write multiple items on the pasteboard at once, 
-				// which is ideal especially when we are writing URLs, for which there was no sanctioned 
-				// method of writing multiple to the pasteboard in 10.5.
-				//
-				// Because the 10.6 method of providing a list of filenames is also provide a list of URLs,
-				// it means we can fill both cases in 10.6 by simply providing URLs. But in order to promise
-				// URLs lazily we have to set an array of NSPasteboardItem on the pasteboard, with each item 
-				// set to callback to us as data provider.
-				//
-				//
-				//  NOTE: FOR NOW, WE ARE SHORT-CIRCUITING THIS BRANCH, AND NOT DOING ANY 10.6 PASTEBOARD WORK.
-				//  WE MAY WANT TO REVISIT THIS WHEN WE HAVE A 10.6-ONLY API.
-				//
-				if (NO && IMBRunningOnSnowLeopardOrNewer())
-				{				
-					(void) [inPasteboard clearContents];
-					NSMutableArray* itemArray = [NSMutableArray arrayWithCapacity:[indexes count]];
-					
-					// Create an array of NSPasteboardItem, each with a promise to fulfill data in the provider callback
-					NSUInteger thisIndex = [indexes firstIndex];
-					while (thisIndex != NSNotFound)
-					{
-						IMBObject* thisObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
-						if (thisObject != nil)
-						{
-							// Allocate class indirectly since we compiling against the 10.5 SDK, not the 10.6
-							NSPasteboardItem* thisItem = [[[NSClassFromString(@"NSPasteboardItem") alloc] init] autorelease];
-							
-							// We need to be declare kUTTypeFileURL in order to get file drags to work as expected to e.g. the Finder,
-							// but we have to be careful not to declare kUTTypeFileURL for e.g. bookmark URLs. We might want to put this 
-							// in the objects themself, but for now to get things working let's consult a method on ourselves that subclasses
-							// can override if they don't create file URLs.
-							NSArray* whichTypes = nil;
-							if ([self writesLocalFilesToPasteboard])	// are we putting references to the files on the pasteboard?
-							{
-								whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,(NSString*)kUTTypeFileURL,nil];
-							}
-							else
-							{
-								whichTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeURL,nil];
-							}
-							
-							[thisItem setDataProvider:self forTypes:whichTypes];
-							[thisItem setString:[NSString stringWithFormat:@"%d", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
-							[thisItem setString:thisObject.name forType:kIMBPublicTitleListPasteboardType];
-							[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetadataListPasteboardType];
-							[thisItem setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];
-							[itemArray addObject:thisItem];
-						}
-						
-						thisIndex = [indexes indexGreaterThanIndex:thisIndex];
-					}
-					
-					[inPasteboard writeObjects:itemArray];			// write array of NSPasteboardItems.
-				}
-				else
-				{
-					// On 10.5, we vend the object promise as well as promises for filenames and a URL.
-					// We don't manually set NSFilenamesPboardType or NSURLPboardType, so we'll be asked to provide
-					// concrete filenames or a single URL in the callback pasteboard:provideDataForType:
-					NSMutableArray *fileTypes = [NSMutableArray array];
-					NSMutableArray *titles = [NSMutableArray array];
-					NSMutableArray *metadatas = [NSMutableArray array];
-					
-					if ([self writesLocalFilesToPasteboard])
-					{
-						// Try declaring promise AFTER the other types
-						declaredTypes = [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilesPromisePboardType,NSFilenamesPboardType, 
-										 
-										 // Also our own special metadata types that clients can make use of
-										 kIMBPublicTitleListPasteboardType, kIMBPublicMetadataListPasteboardType,
-										 
-										 nil]; 
-						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilenamesPboardType,nil]
-						
-						NSUInteger thisIndex = [indexes firstIndex];
-						while (thisIndex != NSNotFound)
-						{
-							IMBObject *object = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
-							NSString *path = [object path];
-							NSString *type = [path pathExtension];
-							if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
-							if (object.metadata && object.name)
-							{
-								// Keep all 3 items in sync, so the arrays are of the same length.
-								[fileTypes addObject:type];
-								[titles addObject:object.name];
-								[metadatas addObject:object.metadata];								
-							}
-							
-							thisIndex = [indexes indexGreaterThanIndex:thisIndex];
-						}
-					}
-					else
-					{
-						declaredTypes = [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSURLPboardType,kUTTypeURL,nil];
-					}
-					
-					[inPasteboard declareTypes:declaredTypes owner:self];
-					[inPasteboard setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];
-					if ([fileTypes count])
-					{
-						BOOL wasSet = NO;
-						wasSet = [inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", NSFilesPromisePboardType, fileTypes);
-						wasSet = [inPasteboard setPropertyList:titles forType:kIMBPublicTitleListPasteboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitleListPasteboardType, titles);
-						wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetadataListPasteboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetadataListPasteboardType, metadatas);
-
-//						#ifdef DEBUG
-//						NSLog(@"Titles on pasteboard: %@", titles);
-//						NSLog(@"MetaData on pasteboard: %@", metadatas);
-//						#endif
-					}
-				}
-				
-				_isDragging = YES;
-				itemsWritten = objects.count;
-			}
-		}
-	}
-*/	
-//	return itemsWritten;	
+	return pasteboardItems.count;
 }
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// SpeedLimit http://mschrag.github.com/ is a good way to debug this....
-
-//- (void) objectsPromise:(IMBObjectsPromise*)inObjectPromise didProgress:(double)inFraction;
-//{
-//	IMBProgressWindowController *progressWindowController = [self progressWindowController];
-//
-//    if (!progressWindowController)
-//    {
-//        IMBProgressWindowController* controller = [[[IMBProgressWindowController alloc] init] autorelease];
-//        
-//        NSString* title = NSLocalizedStringWithDefaultValue(
-//                                                            @"IMBObjectViewController.progress.title",
-//                                                            nil,IMBBundle(),
-//                                                            @"Downloading Media Files",
-//                                                            @"Window title of progress panel of IMBObjectViewController");
-//        
-//        NSString* message = NSLocalizedStringWithDefaultValue(
-//                                                              @"IMBObjectViewController.progress.message.preparing",
-//                                                              nil,IMBBundle(),
-//                                                              @"Preparing…",
-//                                                              @"Text message in progress panel of IMBObjectViewController");
-//        
-//        // Make sure the window is at a higher window level than our view's window, so it doesn't get hidden
-//        [[controller window] setLevel:[[[self view] window] level] + 1];
-//        
-//        [controller setTitle:title];
-//        [controller setMessage:message];
-//        [controller.progressBar startAnimation:nil];
-//        [controller setCancelTarget:inObjectPromise];
-//        [controller setCancelAction:@selector(cancel:)];
-//        [controller.cancelButton setEnabled:YES];
-//        [controller.window makeKeyAndOrderFront:nil];
-//        
-//        progressWindowController = self.progressWindowController = controller;
-//    }
-//    
-//	[progressWindowController setProgress:inFraction];
-//	[progressWindowController setMessage:@""];
-//	[progressWindowController.cancelButton setEnabled:YES];
-//}
-
-
-//- (void) objectsPromiseDidFinish:(IMBObjectsPromise*)inObjectPromise
-//{
-//	[[self.progressWindowController window] orderOut:nil];
-//	self.progressWindowController = nil;
-//}
 
 
 //----------------------------------------------------------------------------------------------------------------------

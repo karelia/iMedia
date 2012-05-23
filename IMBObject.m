@@ -546,21 +546,13 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 - (void) pasteboard:(NSPasteboard*)inPasteboard item:(NSPasteboardItem*)inItem provideDataForType:(NSString*)inType
 {
-	// For IMBObjects simply use self...
-	
-    if ([inType isEqualToString:(NSString*)kIMBObjectPasteboardType])
-	{
-		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:self];
-		[inItem setData:data forType:(NSString*)kIMBObjectPasteboardType];
-	}
-	
 	// Request the bookmark. Since this is an asynchronous operation - but we need to return with a result
 	// synchronously, we'll wrap the whole thing in a dispatch_sync on a background queue and wait for the 
 	// result there. Please note that it is important to use a concurrent background queue. We cannot do this
 	// on the main queue, or the completion block of requestBookmarkWithCompletionBlock: would never fire.
 	// Once we have the bookmark, we cn resolve it to a URL (thus punching a hole in the sandbox) and return it...
 	
-	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
+	if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
 	{
 		dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
 		{
@@ -574,12 +566,14 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 			if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
 		});
 	}
-}
-
-
-- (void) pasteboardFinishedWithDataProvider:(NSPasteboard*)inPasteboard
-{
-
+	
+	// For IMBObjects simply use self...
+	
+    else if ([inType isEqualToString:(NSString*)kIMBObjectPasteboardType])
+	{
+		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:self];
+		[inItem setData:data forType:(NSString*)kIMBObjectPasteboardType];
+	}
 }
 
 
