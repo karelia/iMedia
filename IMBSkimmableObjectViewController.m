@@ -58,6 +58,11 @@
 #import "IMBSkimmableObject.h"
 #import "IMBConfig.h"
 
+@interface IMBSkimmableObjectViewController ()
+
+- (void) loadThumbnailForItem:(IMBSkimmableObject *)item;
+
+@end
 
 @implementation IMBSkimmableObjectViewController
 
@@ -200,14 +205,7 @@
         
         [item resetCurrentSkimmingIndex];
         
-        // Will not load thumbnail if these two flags are not set accordingly
-        
-        [item setNeedsImageRepresentation:YES];
-        [item setIsLoadingThumbnail:NO]; // Avoid race condition
-        
-        [item loadThumbnail]; // Background thread or XPC service		
-        
-        [item setNeedsImageRepresentation:NO];
+        [self loadThumbnailForItem:item];
     }
 	//NSLog(@"Mouse exited item at index %ld", (long) inIndex);
 }
@@ -247,15 +245,8 @@
             
             item.currentSkimmingIndex = objectIndex;
             
-            // Will not load thumbnail if these two flags are not set accordingly
-            
-            [item setNeedsImageRepresentation:YES];
-            [item setIsLoadingThumbnail:NO]; // Avoid race condition
-            
-            [item loadThumbnail]; // Background thread or XPC service
-
-            [item setNeedsImageRepresentation:NO];
-}
+            [self loadThumbnailForItem:item];
+        }
     }
 }
 
@@ -297,6 +288,24 @@
 	_previousNodeObjectIndex = hoverIndex;
 	
 	[super mouseMoved:anEvent];
+}
+
+#pragma mark Helper
+
+- (void) loadThumbnailForItem:(IMBSkimmableObject *)item
+{
+    // Will not load thumbnail if these two flags are not set accordingly
+    
+    [item setNeedsImageRepresentation:YES];
+    [item setIsLoadingThumbnail:NO]; // Avoid race condition
+    
+    // These two properties are ballast when archiving the item and will be set anew by loadThumbnail anyhow
+    item.imageRepresentation = nil;
+    item.preliminaryMetadata = nil;
+    
+    [item loadThumbnail]; // Background thread or XPC service
+    
+    [item setNeedsImageRepresentation:NO];
 }
 
 @end
