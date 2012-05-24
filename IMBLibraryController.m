@@ -260,13 +260,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			[self createTopLevelNodesWithParserMessenger:messenger];
 		}
-
-//		#warning TODO this doesn't work for toplevel nodes that need to dissappear or appear
-//		
-//		for (IMBNode* oldNode in self.subnodes)
-//		{
-//			[self reloadNodeTree:oldNode];
-//		}
 	}
 }
 
@@ -508,11 +501,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _reloadTopLevelNodes
 {
-	for (IMBNode* node in self.subnodes)
+	NSArray* subnodes = [[self.subnodes copy] autorelease];
+	
+	for (IMBNode* node in subnodes)
 	{
 		if (node.isGroupNode)
 		{
-			for (IMBNode* node2 in node.subnodes)
+			NSArray* subnodes2 = [[node.subnodes copy] autorelease];
+			
+			for (IMBNode* node2 in subnodes2)
 			{
 				[self _reloadTopLevelNode:node2];
 			}
