@@ -115,6 +115,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) _setParserMessenger:(IMBParserMessenger*)inMessenger nodeTree:(IMBNode*)inNode;
 - (IMBNode*) _groupNodeForTopLevelNode:(IMBNode*)inNewNode;
+- (void) _reloadTopLevelNodes;
+- (void) _reloadTopLevelNode:(IMBNode*)inNode;
 - (void) _replaceNode:(IMBNode*)inOldNode withNode:(IMBNode*)inNewNode parentNodeIdentifier:(NSString*)inParentNodeIdentifier;
 
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath;
@@ -232,28 +234,39 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) reload
 {
+	NSArray* messengers = [[IMBParserController sharedParserController] loadedParserMessengersForMediaType:self.mediaType];
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
 
 	// First call: create unpopulated top level nodes...
 	
 	if (self.subnodes == nil)
 	{
-		NSArray* messengers = [[IMBParserController sharedParserController] loadedParserMessengersForMediaType:self.mediaType];
-
 		for (IMBParserMessenger* messenger in messengers)
 		{
-			[self createTopLevelNodeWithParserMessenger:messenger];
+			[self createTopLevelNodesWithParserMessenger:messenger];
 		}
 	}
 	
-	// Subsequent calls: reload existing nodes...
+	// Subsequent calls: reload existing nodes. This requires several steps. Reload the existing toplevel nodes.
+	// This will also get rid of existing top-level nodes that should no longer be there. Then we need to create
+	// and insert any new top-level nodes that haven't existed before. ...
 	
 	else 
 	{
-		for (IMBNode* oldNode in self.subnodes)
+		[self _reloadTopLevelNodes];
+	
+		for (IMBParserMessenger* messenger in messengers)
 		{
-			[self reloadNodeTree:oldNode];
+			[self createTopLevelNodesWithParserMessenger:messenger];
 		}
+
+//		#warning TODO this doesn't work for toplevel nodes that need to dissappear or appear
+//		
+//		for (IMBNode* oldNode in self.subnodes)
+//		{
+//			[self reloadNodeTree:oldNode];
+//		}
 	}
 }
 
@@ -261,7 +274,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) createTopLevelNodeWithParserMessenger:(IMBParserMessenger*)inParserMessenger
+- (void) createTopLevelNodesWithParserMessenger:(IMBParserMessenger*)inParserMessenger
 {
 	// Ask delegate whether we should create nodes with this IMBParserMessenger...
 	
@@ -319,9 +332,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			{
 				for (IMBNode* node in inNodes)
 				{
-					node.parserMessenger = inParserMessenger;
-					[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
-
+					if ([self nodeWithIdentifier:node.identifier] == nil)
+					{
+						node.parserMessenger = inParserMessenger;
+						[self _replaceNode:nil withNode:node parentNodeIdentifier:nil];
+					}
+					
 					if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
 					{
 						[_delegate libraryController:self didCreateNode:node withParserMessenger:inParserMessenger];
@@ -481,6 +497,56 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				}
 			}
 		});		
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Reload all of our top-level nodes. Please note that we may have to look one level deep, if the 
+// nodes on the root level are group nodes...
+
+- (void) _reloadTopLevelNodes
+{
+	for (IMBNode* node in self.subnodes)
+	{
+		if (node.isGroupNode)
+		{
+			for (IMBNode* node2 in node.subnodes)
+			{
+				[self _reloadTopLevelNode:node2];
+			}
+		}
+		else 
+		{
+			[self _reloadTopLevelNode:node];
+		}
+	}
+}
+
+
+// If the node still has a right right to exist then reload it. Otherwise remove from our data model...
+
+- (void) _reloadTopLevelNode:(IMBNode*)inNode
+{
+	if (inNode.isTopLevelNode)
+	{
+		BOOL shouldReload = YES;
+		
+		if (RESPONDS(_delegate,@selector(libraryController:shouldCreateNodeWithParserMessenger:)))
+		{
+			shouldReload = [_delegate libraryController:self shouldCreateNodeWithParserMessenger:inNode.parserMessenger];
+		}
+		
+		if (shouldReload)
+		{
+			[self reloadNodeTree:inNode];
+		}
+		else
+		{
+			[self _replaceNode:inNode withNode:nil parentNodeIdentifier:inNode.parentNode.identifier];
+		}
+	}
 }
 
 
@@ -1025,7 +1091,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		if (parserMessenger)
 		{
 			[[IMBParserController sharedParserController] addUserAddedParserMessenger:parserMessenger];
-			[self createTopLevelNodeWithParserMessenger:parserMessenger];
+			[self createTopLevelNodesWithParserMessenger:parserMessenger];
 		}
 	}
 	
