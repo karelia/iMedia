@@ -70,7 +70,8 @@
 typedef enum { 
 	kIMBLightroomNodeTypeUnspecified = 0,
 	IMBLightroomNodeTypeFolder,
-	IMBLightroomNodeTypeCollection
+	IMBLightroomNodeTypeCollection,
+	IMBLightroomNodeTypeRootCollection
 } 
 IMBLightroomNodeType;
 
@@ -80,12 +81,13 @@ IMBLightroomNodeType;
 @interface IMBLightroomObject : IMBObject
 {
 	NSString* _absolutePyramidPath;
+	NSNumber* _idLocal;
 }
 
 @property (retain) NSString* absolutePyramidPath;
+@property (retain) NSNumber* idLocal;
 
 @end
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -141,7 +143,7 @@ IMBLightroomNodeType;
 - (FMDatabase*) previewsDatabase;
 
 - (NSString*)pyramidPathForImage:(NSNumber*)idLocal;
-- (NSData*)previewDataForObject:(IMBObject*)inObject;
+- (NSData*)previewDataForObject:(IMBObject*)inObject maximumSize:(NSNumber*)maximumSize;
 
 @end
 

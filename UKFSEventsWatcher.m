@@ -63,7 +63,7 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 //		Singleton accessor.
 // -----------------------------------------------------------------------------
 
-+(id) sharedFileWatcher
++ (id) sharedFileWatcher
 {
 	static UKFSEventsWatcher* sSharedFileWatcher = nil;
 	static NSString* sSharedFileWatcherMutex = @"UKFSEventsWatcher";
@@ -83,13 +83,14 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 //  * CONSTRUCTOR:
 // -----------------------------------------------------------------------------
 
--(id) init
+- (id) init
 {
     if (self = [super init])
 	{
 		latency = 1.0;
 		flags = kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagWatchRoot;
 		eventStreams = [[NSMutableDictionary alloc] init];
+		eventStreamPaths = [[NSCountedSet alloc] init];
     }
 	
     return self;
@@ -99,14 +100,15 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 //  * DESTRUCTOR:
 // -----------------------------------------------------------------------------
 
--(void) dealloc
+- (void) dealloc
 {
 	[self removeAllPaths];
     [eventStreams release];
+	[eventStreamPaths release];
     [super dealloc];
 }
 
--(void) finalize
+- (void) finalize
 {
 	[self removeAllPaths];
     [super finalize];
@@ -157,7 +159,7 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 //		Mutator for file watcher delegate.
 // -----------------------------------------------------------------------------
 
--(void) setDelegate: (id)newDelegate
+- (void) setDelegate:(id)newDelegate
 {
     delegate = newDelegate;
 }
@@ -167,7 +169,7 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 //		Accessor for file watcher delegate.
 // -----------------------------------------------------------------------------
 
--(id)   delegate
+- (id) delegate
 {
     return delegate;
 }
@@ -192,82 +194,146 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 	return inPath;		
 }
 
-// -----------------------------------------------------------------------------
-//  addPath:
-//		Start watching the folder at the specified path. 
-// -----------------------------------------------------------------------------
-
--(void) addPath: (NSString*)path
+- (BOOL) _registerFSEventsObserverForPath:(NSString*)path
 {
-	path = [self pathToParentFolderOfFile:path];
-	NSArray* paths = [NSArray arrayWithObject:path];
-				
+	BOOL succeeded = YES;
 	FSEventStreamContext context;
 	context.version = 0;
 	context.info = (void*) self;
 	context.retain = NULL;
 	context.release = NULL;
 	context.copyDescription = NULL;
-				
-	FSEventStreamRef stream = FSEventStreamCreate(NULL,&FSEventCallback,&context,(CFArrayRef)paths,kFSEventStreamEventIdSinceNow,latency,flags);
+
+	NSArray* pathArray = [NSArray arrayWithObject:path];
+	FSEventStreamRef stream = FSEventStreamCreate(NULL,&FSEventCallback,&context,(CFArrayRef)pathArray,kFSEventStreamEventIdSinceNow,latency,flags);
 
 	if (stream)
 	{
 		FSEventStreamScheduleWithRunLoop(stream,CFRunLoopGetMain(),kCFRunLoopCommonModes);
 		FSEventStreamStart(stream);
 
-		@synchronized (self)
-		{
-			[eventStreams setObject:[NSValue valueWithPointer:stream] forKey:path];
-		}	
+		[eventStreams setObject:[NSValue valueWithPointer:stream] forKey:path];
 	}	
 	else
 	{
-        NSLog( @"UKFSEventsWatcher addPath:%@ failed",path);
+		NSLog( @"UKFSEventsWatcher _registerFSEventObserverForPath:%@ failed",path);
+		succeeded = NO;
 	}
+	
+	return succeeded;
+}
+
+// -----------------------------------------------------------------------------
+//  addPath:
+//		Start watching the folder at the specified path, or if we are already watching
+//		the path, increase its count in eventStreamPaths
+// -----------------------------------------------------------------------------
+
+- (void) addPath:(NSString*)path
+{
+	path = [self pathToParentFolderOfFile:path];
+
+	// Do we already have a stream scheduled for this path?
+	// NOTE: Synchronize the whole thing so we don't run the risk of the current count changing while 
+	// we're busy updating it with our new addition.
+	@synchronized (self)
+	{
+		BOOL succeeded = YES;
+		
+		NSUInteger currentRegistrationCount = [eventStreamPaths countForObject:path];
+		if (currentRegistrationCount == 0)
+		{
+			succeeded = [self _registerFSEventsObserverForPath:path];
+		}		
+		
+		if (succeeded)
+		{
+			[eventStreamPaths addObject:path];
+		}
+	}
+}
+
+- (void) _unregisterFSEventStream:(FSEventStreamRef)stream
+{
+	FSEventStreamStop(stream);
+	FSEventStreamInvalidate(stream);
+	FSEventStreamRelease(stream);
 }
 
 // -----------------------------------------------------------------------------
 //  removePath:
-//		Stop watching the folder at the specified path.
+//		Decrease the watch count for the given path, and if the count has gone 
+//		to zero, stop watching the given path.
 // -----------------------------------------------------------------------------
 
--(void) removePath: (NSString*)path
+- (void) removePath:(NSString*)path
 {
-    NSValue* value = nil;
-	
+	// Ensure we are removing a folder, not a file inside the desired folder. This matches
+	// the normalization done in addPath to make sure removePath for the same path will succeed.
+	path = [self pathToParentFolderOfFile:path];
+
+    NSValue* valueToRemove = nil;
+		
     @synchronized (self)
     {
-        value = [[[eventStreams objectForKey:path] retain] autorelease];
-        [eventStreams removeObjectForKey:path];
+		// We are sometimes asked to removePath on a path that we were never asked to add. That's 
+		// OK - it just means they are being extra-certain before (probably) adding it for the 
+		// first time...
+		NSUInteger currentRegistrationCount = [eventStreamPaths countForObject:path];
+		if (currentRegistrationCount > 0)
+		{
+			[eventStreamPaths removeObject:path];
+			
+			NSUInteger newRegistrationCount = [eventStreamPaths countForObject:path];
+			
+			// Clear everything out if we've gone to zero
+			if (newRegistrationCount == 0)
+			{
+				valueToRemove = [[[eventStreams objectForKey:path] retain] autorelease];
+				[eventStreams removeObjectForKey:path];				
+			}
+		}
     }
     
-	if (value)
+	if (valueToRemove)
 	{
-		FSEventStreamRef stream = [value pointerValue];
+		FSEventStreamRef stream = [valueToRemove pointerValue];
 		
 		if (stream)
 		{
-			FSEventStreamStop(stream);
-			FSEventStreamInvalidate(stream);
-			FSEventStreamRelease(stream);
+			[self _unregisterFSEventStream:stream];
 		}
 	}
 }
 
 // -----------------------------------------------------------------------------
 //  removeAllPaths:
-//		Stop watching all known folders.
+//		Stop watching all known paths.
 // -----------------------------------------------------------------------------
 
--(void) removeAllPaths
+- (void) removeAllPaths
 {
-    NSEnumerator* paths = [[eventStreams allKeys] objectEnumerator];
-	NSString* path;
-	
-	while (path = [paths nextObject])
+	@synchronized (self)
 	{
-		[self removePath:path];
+		// We don't really need the paths, we just need the open FSEventStreamRefs.
+		// Unregister them all indiscriminately, then remove all objects from 
+		// our tracking collections.
+		
+		NSEnumerator* eventStreamEnum = [[eventStreams allValues] objectEnumerator];
+		NSValue* thisEventStreamPointer = nil;
+		
+		while (thisEventStreamPointer = [eventStreamEnum nextObject])
+		{
+			FSEventStreamRef stream = [thisEventStreamPointer pointerValue];
+
+			if (stream)
+			{
+				[self _unregisterFSEventStream:stream];				
+			}
+		}
+		
+		[eventStreams removeAllObjects];
+		[eventStreamPaths removeAllObjects];
 	}
 }
 
