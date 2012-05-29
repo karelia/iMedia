@@ -53,7 +53,10 @@
 #import "IMBSkimmableObject.h"
 
 
-@interface IMBiPhotoEventNodeObject : IMBSkimmableObject {
+@interface IMBiPhotoEventNodeObject : IMBSkimmableObject
+{    
+    // The key under which the image can be found by the iPhoto parser
+    NSString *_currentImageKey;
 }
 
 @end

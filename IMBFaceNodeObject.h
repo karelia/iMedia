@@ -53,5 +53,12 @@
 #import "IMBSkimmableObject.h"
 
 @interface IMBFaceNodeObject : IMBSkimmableObject
+{
+    // The key under which the image where the current face occours can be found by the corresponding parser
+    NSString *_currentImageKey;
+    
+    // The index of the current face in the image where it occurs
+    NSNumber *_currentFaceIndex;
+}
 
 @end

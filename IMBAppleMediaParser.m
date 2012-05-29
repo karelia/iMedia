@@ -560,12 +560,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
     if ([inObject isKindOfClass:NSClassFromString(@"IMBSkimmableObject")])
     {
         IMBSkimmableObject *skimmableObject = (IMBSkimmableObject *)inObject;
-        if (skimmableObject.currentSkimmingIndex != NSNotFound)
-        {
-            skimmableObject.imageLocation = [skimmableObject imageLocationAtSkimmingIndex:skimmableObject.currentSkimmingIndex];
-        } else {
-            skimmableObject.imageLocation = [skimmableObject keyImageLocation];
-        }
+        
+        skimmableObject.imageLocation = [skimmableObject imageLocationForCurrentSkimmingIndex];
     }
     
     // IKImageBrowser can also deal with NSData type (IKImageBrowserNSDataRepresentationType)
@@ -787,7 +783,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSString* faceKeyPhotoKey = nil;
 	NSString* path = nil;
 	NSString* thumbnailPath = nil;
-	IMBNodeObject* object = nil;
+	IMBFaceNodeObject* object = nil;
 	NSString* subNodeType = @"Face";
 	
 	for (NSDictionary* faceDict in sortedFaces)
@@ -835,6 +831,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 			
 			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
+            [object resetCurrentSkimmingIndex];                 // Must be done *after* preliminaryMetadata is set
 			object.metadata = nil;								// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
 			

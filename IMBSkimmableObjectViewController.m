@@ -298,12 +298,8 @@
     
     [item setNeedsImageRepresentation:YES];
     [item setIsLoadingThumbnail:NO]; // Avoid race condition
-    
-    // These two properties are ballast when archiving the item and will be set anew by loadThumbnail anyhow
-    item.imageRepresentation = nil;
-    item.preliminaryMetadata = nil;
-    
-    [item loadThumbnail]; // Background thread or XPC service
+
+    [item fastLoadThumbnail]; // Background thread or XPC service
     
     [item setNeedsImageRepresentation:NO];
 }

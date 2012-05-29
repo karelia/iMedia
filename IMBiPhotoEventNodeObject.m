@@ -53,11 +53,82 @@
 #import "IMBiPhotoParser.h"
 #import "IMBParserMessenger.h"
 
+@interface IMBiPhotoEventNodeObject ()
+
+@property(retain) NSString *currentImageKey;
+
+@end
+
 
 @implementation IMBiPhotoEventNodeObject
 
+@synthesize currentImageKey = _currentImageKey;
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		self.currentImageKey = [inCoder decodeObjectForKey:@"currentImageKey"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeObject:self.currentImageKey forKey:@"currentImageKey"];
+}
+
 
 #pragma mark - IMBSkimmableObject must subclass
+
+
+- (void) setCurrentSkimmingIndex:(NSUInteger)currentSkimmingIndex
+{
+    [super setCurrentSkimmingIndex:currentSkimmingIndex];
+    
+    if (currentSkimmingIndex != NSNotFound)
+    {
+        // We are currently skimming on the image
+        
+        _currentImageKey = [[self.preliminaryMetadata objectForKey:@"KeyList"] objectAtIndex:currentSkimmingIndex];
+    } else {
+        // We just initialized the object or left the image while skimming and thus restore the key image
+        
+        _currentImageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
+    }
+}
+
+
+// Returns a sparse copy of self that carrys just enough data to load its thumbnail.
+// Self must have a current image key set because copy cannot provide thumbnail otherwise.
+//
+- (IMBSkimmableObject *)thumbnailProvider
+{
+    // Copy must have a current image key set to be able to provide thumbnail
+    NSAssert1(self.currentImageKey != nil, @"Must set current image key on skimmable object %@ before loading thumbnail", self);
+    
+    IMBiPhotoEventNodeObject *copy = [[[IMBiPhotoEventNodeObject alloc] init] autorelease];
+    copy.imageRepresentationType = self.imageRepresentationType;
+    copy.currentImageKey = self.currentImageKey;
+    copy.parserIdentifier = self.parserIdentifier;
+    
+    return copy;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the image location that corresponds to the current skimming index
+
+- (id) imageLocationForCurrentSkimmingIndex
+{
+	IMBiPhotoParser *parser = (IMBiPhotoParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
+    
+    return [NSURL fileURLWithPath:[parser imagePathForImageKey:_currentImageKey] isDirectory:NO];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
