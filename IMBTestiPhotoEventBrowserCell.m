@@ -68,36 +68,40 @@
 
 - (void) imbSetTitleColors
 {
-	CGFloat points = [self imbPointSize];	// we need to get the whole font thing since we have to set the whole attributes
-	
-	NSMutableDictionary *attributes1 = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize:points] forKey:NSFontAttributeName];
-	NSMutableDictionary *attributes2 = [NSMutableDictionary dictionaryWithDictionary:attributes1];
-	
-	// Now set the title color
-	
-	if (_imbShouldDisableTitle)
-	{
-		[attributes1 setObject:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4] forKey:NSForegroundColorAttributeName];
-		[attributes2 setObject:[NSColor colorWithCalibratedWhite:1.0 alpha:0.5] forKey:NSForegroundColorAttributeName];
-	}
-	else
-	{
-		[attributes1 setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
-		[attributes2 setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
-	}
-	
+    if (!areTitleColorsSet)
+    {
+        CGFloat points = [self imbPointSize];	// we need to get the whole font thing since we have to set the whole attributes
+        
+        NSMutableDictionary *attributes1 = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize:points] forKey:NSFontAttributeName];
+        NSMutableDictionary *attributes2 = [NSMutableDictionary dictionaryWithDictionary:attributes1];
+        
+        // Now set the title color
+        
+        if (_imbShouldDisableTitle)
+        {
+            [attributes1 setObject:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4] forKey:NSForegroundColorAttributeName];
+            [attributes2 setObject:[NSColor colorWithCalibratedWhite:1.0 alpha:0.5] forKey:NSForegroundColorAttributeName];
+        }
+        else
+        {
+            [attributes1 setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
+            [attributes2 setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
+        }
+        
 #if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-	if (IMBRunningOnSnowLeopardOrNewer())
-	{
-		[[self imageBrowserView] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
-		[[self imageBrowserView] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
-	}
-	else
+        if (IMBRunningOnSnowLeopardOrNewer())
+        {
+            [[self imageBrowserView] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
+            [[self imageBrowserView] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
+        }
+        else
 #endif
-	{
-		[[self parent] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
-		[[self parent] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
-	}	
+        {
+            [[self parent] setValue:attributes1  forKey:IKImageBrowserCellsTitleAttributesKey];
+            [[self parent] setValue:attributes2 forKey:IKImageBrowserCellsHighlightedTitleAttributesKey];
+        }
+        areTitleColorsSet = YES;
+    }
 }
 
 
