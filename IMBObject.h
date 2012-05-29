@@ -184,6 +184,11 @@ extern NSString* kIMBObjectPasteboardType;
 - (void) loadMetadata; 
 - (void) unloadMetadata;
 
+// Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out off cache 
+// and are thus unloaded. Please note that missing thumbnails will be replaced with a generic image...
+
+- (void) storeReceivedImageRepresentation:(id)inImageRepresentation;
+
 //- (void) postProcessLocalURL:(NSURL*)inLocalURL;
 
 @end

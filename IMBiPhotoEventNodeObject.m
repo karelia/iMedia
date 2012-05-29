@@ -99,7 +99,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Key image and skimmed images of events are processed by Core Graphics before display
 
-- (CGImageRef) newProcessedImageFromImage:(CGImageRef)inImage
+- (CGImageRef) processedImageFromImage:(CGImageRef)inImage
 {
 	long imgWidth = CGImageGetWidth(inImage);
 	long imgHeight = CGImageGetHeight(inImage);
@@ -129,6 +129,7 @@
 	CGContextDrawImage(bitmapContext, imageBounds, inImage);
 	
 	CGImageRef image = CGBitmapContextCreateImage(bitmapContext);
+    [(id)image autorelease];
 	
 	CGContextRelease(bitmapContext);
 	
@@ -139,20 +140,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Set a processed image instead of the image provided
 
-- (void) setImageRepresentation:(id)inObject
+- (void) storeReceivedImageRepresentation:(id)inImageRepresentation
 {
-	NSString* type = self.imageRepresentationType;
-
-	CGImageRef image = NULL;
-	if (inObject && [type isEqualToString:IKImageBrowserCGImageRepresentationType])
-	{
-		image = [self newProcessedImageFromImage:(CGImageRef)inObject];
-		if (image) inObject = (id) image;
-	}
-	
-	[super setImageRepresentation:inObject];
-	
-	if (image) CGImageRelease(image);
+    if ([self.imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+    {
+//        NSData *data = inImageRepresentation;
+//        CGImageSourceRef imageSource = CGImageSourceCreateWithData((CFDataRef)data,NULL);
+//        CGImageRef image = NULL;
+//		if (imageSource)
+//		{
+//			image = CGImageSourceCreateImageAtIndex(imageSource,0,NULL);
+//			CFRelease(imageSource);
+//		}
+//        if (image)
+        {
+            inImageRepresentation = (id)[self processedImageFromImage:(CGImageRef)inImageRepresentation];
+        }
+    }
+    [super storeReceivedImageRepresentation:inImageRepresentation];
 }
 
 
@@ -163,7 +168,7 @@
 //	CGImageRef image = NULL;
 //	if (inImage)
 //	{
-//		image = [self newProcessedImageFromImage:inImage];
+//		image = [self processedImageFromImage:inImage];
 //		if (image) inImage = image;
 //	}
 //	
