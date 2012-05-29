@@ -116,7 +116,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 @interface IMBObject ()
 @property (retain) NSData* atomic_bookmark;
-@property (retain) id atomic_imageRepresentation;
 @end
 
 

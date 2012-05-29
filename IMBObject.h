@@ -151,6 +151,7 @@ extern NSString* kIMBObjectPasteboardType;
 @property (nonatomic,readonly) NSString* imageUID;
 @property (retain) NSString* imageRepresentationType;
 @property (retain) id imageRepresentation;	
+@property (retain) id atomic_imageRepresentation;
 @property (assign) NSUInteger imageVersion;
 @property (readonly) NSString* imageTitle;
 @property (readonly) BOOL isSelectable;
