@@ -192,6 +192,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (IBAction) reload:(id)inSender
+{
+	NSString* mediaType = [[IMBPanelController sharedPanelController] currentMediaType];
+	[[IMBLibraryController sharedLibraryControllerWithMediaType:mediaType] reload];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Toggle panel visibility...
 
 - (IBAction) togglePanel:(id)inSender
