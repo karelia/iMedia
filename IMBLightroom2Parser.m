@@ -62,6 +62,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "IMBPreferencesCopyAppValue.h"
 
 
 @implementation IMBLightroom2Parser
@@ -83,7 +84,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom2");
+	CFStringRef recentLibrariesList = IMBPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom2");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -91,7 +92,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom2");
+		CFPropertyListRef activeLibraryPath = IMBPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom2");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);

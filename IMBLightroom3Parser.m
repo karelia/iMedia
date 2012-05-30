@@ -64,6 +64,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "IMBPreferencesCopyAppValue.h"
 
 
 @interface IMBLightroom3Parser ()
@@ -92,7 +93,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3");
+	CFStringRef recentLibrariesList = IMBPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -100,7 +101,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3");
+		CFPropertyListRef activeLibraryPath = IMBPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);

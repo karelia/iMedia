@@ -352,6 +352,8 @@
 		D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0D635EF1035B4C500FF8631 /* IMBApertureParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0D635EB1035B4C500FF8631 /* IMBApertureParser.m */; };
 		D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */; };
+		D0DE73F413CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.h in Headers */ = {isa = PBXBuildFile; fileRef = D0DE73F213CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.h */; };
+		D0DE73F513CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.m in Sources */ = {isa = PBXBuildFile; fileRef = D0DE73F313CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.m */; };
 		D0E96D1C104410BD0015979F /* IMBPanelController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E96D1A104410BD0015979F /* IMBPanelController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0E96D1D104410BD0015979F /* IMBPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E96D1B104410BD0015979F /* IMBPanelController.m */; };
 		D0F2DB9B1098262D004280C1 /* FMDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = D0F2DB941098262D004280C1 /* FMDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -773,6 +775,8 @@
 		D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBApertureParser.h; sourceTree = "<group>"; };
 		D0D635EB1035B4C500FF8631 /* IMBApertureParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBApertureParser.m; sourceTree = "<group>"; };
 		D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		D0DE73F213CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPreferencesCopyAppValue.h; sourceTree = "<group>"; };
+		D0DE73F313CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPreferencesCopyAppValue.m; sourceTree = "<group>"; };
 		D0E96D1A104410BD0015979F /* IMBPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBPanelController.h; sourceTree = "<group>"; };
 		D0E96D1B104410BD0015979F /* IMBPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBPanelController.m; sourceTree = "<group>"; };
 		D0F2DB941098262D004280C1 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabase.h; path = fmdb/src/FMDatabase.h; sourceTree = "<group>"; };
@@ -1337,6 +1341,8 @@
 				D0363E7B11D3787800E0579F /* NSView+iMedia.m */,
 				CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */,
 				CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */,
+				D0DE73F213CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.h */,
+				D0DE73F313CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -1548,6 +1554,7 @@
 				8FF314C515063F6900A76AA2 /* IMBLightroom4Parser.h in Headers */,
 				8FF314CC15064BC700A76AA2 /* IMBLightroom4VideoParser.h in Headers */,
 				8FA4275E154EB93C00F75E13 /* IMBLightroom3or4Parser.h in Headers */,
+				D0DE73F413CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1911,6 +1918,7 @@
 				8FF314C615063F6900A76AA2 /* IMBLightroom4Parser.m in Sources */,
 				8FF314CD15064BC700A76AA2 /* IMBLightroom4VideoParser.m in Sources */,
 				8FA4275F154EB93C00F75E13 /* IMBLightroom3or4Parser.m in Sources */,
+				D0DE73F513CD84DB00C5AF8D /* IMBPreferencesCopyAppValue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

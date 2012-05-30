@@ -64,6 +64,7 @@
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBTimecodeTransformer.h"
+#import "IMBPreferencesCopyAppValue.h"
 #import <Quartz/Quartz.h>
 
 
@@ -142,7 +143,7 @@
 
 	if ([self isInstalled])
 	{
-		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
+		CFArrayRef recentLibraries = IMBPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
 		NSArray* libraries = (NSArray*)recentLibraries;
 			
 		for (NSString* library in libraries)

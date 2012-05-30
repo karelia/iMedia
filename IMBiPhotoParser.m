@@ -64,6 +64,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSString+iMedia.h"
+#import "IMBPreferencesCopyAppValue.h"
 #import <Quartz/Quartz.h>
 
 
@@ -139,9 +140,9 @@
 	
 	if ([self isInstalled])
 	{
-		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
+		CFArrayRef recentLibraries = IMBPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
 		NSArray* libraries = (NSArray*)recentLibraries;
-		
+        
 		for (NSString* library in libraries)
 		{
 			NSURL* url = [NSURL URLWithString:library];

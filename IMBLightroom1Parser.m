@@ -57,6 +57,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "IMBPreferencesCopyAppValue.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,7 +83,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
+	CFStringRef recentLibrariesList = IMBPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
 																(CFStringRef)@"com.adobe.Lightroom");
 	
 	if (recentLibrariesList) {
@@ -91,7 +92,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
+		CFPropertyListRef activeLibraryPath = IMBPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
 																		(CFStringRef)@"com.adobe.Lightroom");
 		
 		if (activeLibraryPath) {
