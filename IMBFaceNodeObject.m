@@ -69,6 +69,18 @@
 @synthesize currentFaceIndex = _currentFaceIndex;
 
 
+#pragma mark - Lifecycle
+
+
+- (void) dealloc
+{
+	IMBRelease(_currentImageKey);
+	IMBRelease(_currentFaceIndex);
+    
+	[super dealloc];
+}
+
+
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if (self = [super initWithCoder:inCoder])
@@ -87,6 +99,16 @@
 	
 	[inCoder encodeObject:self.currentImageKey forKey:@"currentImageKey"];
 	[inCoder encodeObject:self.currentFaceIndex forKey:@"currentFaceIndex"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBFaceNodeObject* copy = [super copyWithZone:inZone];
+	
+	copy.currentImageKey = self.currentImageKey;
+	copy.currentFaceIndex = self.currentFaceIndex;
+	return copy;
 }
 
 

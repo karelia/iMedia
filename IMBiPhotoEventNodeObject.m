@@ -64,6 +64,18 @@
 
 @synthesize currentImageKey = _currentImageKey;
 
+
+#pragma mark - Lifecycle
+
+
+- (void) dealloc
+{
+	IMBRelease(_currentImageKey);
+
+	[super dealloc];
+}
+
+
 - (id) initWithCoder:(NSCoder*)inCoder
 {
 	if (self = [super initWithCoder:inCoder])
@@ -80,6 +92,15 @@
 	[super encodeWithCoder:inCoder];
 	
 	[inCoder encodeObject:self.currentImageKey forKey:@"currentImageKey"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBiPhotoEventNodeObject* copy = [super copyWithZone:inZone];
+	
+	copy.currentImageKey = self.currentImageKey;
+	return copy;
 }
 
 
