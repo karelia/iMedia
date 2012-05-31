@@ -120,7 +120,7 @@
 {
 	NSString *result = nil;
 
-    NSMutableArray *libraryFolders = [NSMutableArray arrayWithObjects:
+    NSArray *libraryFolders = [NSArray arrayWithObjects:
         [NSURL fileURLWithPath:@"/Library" isDirectory:YES],
         [IMBHomeDirectoryURL() URLByAppendingPathComponent:@"Library"],
         [IMBApplicationContainerHomeDirectoryURL(@"org.mozilla.firefox") URLByAppendingPathComponent:@"Library"],
