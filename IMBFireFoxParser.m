@@ -120,38 +120,35 @@
 {
 	NSString *result = nil;
 
-    NSMutableArray *libraryPaths = [NSMutableArray arrayWithObjects:
-        @"/Library",
-        [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Library"],
-        [[IMBApplicationContainerHomeDirectoryURL(@"org.mozilla.firefox") path] stringByAppendingPathComponent:@"Library"],
-        @"/Library/Application Support",
-        [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Library/Application Support"],
-        [[IMBApplicationContainerHomeDirectoryURL(@"org.mozilla.firefox") path] stringByAppendingPathComponent:@"Library/Application Support"],
+    NSMutableArray *libraryFolders = [NSMutableArray arrayWithObjects:
+        [NSURL fileURLWithPath:@"/Library" isDirectory:YES],
+        [IMBHomeDirectoryURL() URLByAppendingPathComponent:@"Library"],
+        [IMBApplicationContainerHomeDirectoryURL(@"org.mozilla.firefox") URLByAppendingPathComponent:@"Library"],
+        [NSURL fileURLWithPath:@"/Library/Application Support" isDirectory:YES],
+        [IMBHomeDirectoryURL() URLByAppendingPathComponent:@"Library/Application Support"],
+        [IMBApplicationContainerHomeDirectoryURL(@"org.mozilla.firefox") URLByAppendingPathComponent:@"Library/Application Support"],
         nil];
     
 	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
-	for (NSString *path in libraryPaths)
+	for (NSURL *aURL in libraryFolders)
 	{
-		NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
-		NSString *profilesPath = [firefoxPath stringByAppendingPathComponent:@"Profiles"];
+		NSURL *profilesURL = [aURL URLByAppendingPathComponent:@"Firefox/Profiles"];
 		BOOL isDir;
-		if ([fm fileExistsAtPath:profilesPath isDirectory:&isDir] && isDir)
+		if ([fm fileExistsAtPath:[profilesURL path] isDirectory:&isDir] && isDir)
 		{
-			NSDirectoryEnumerator *e = [fm enumeratorAtPath:profilesPath];
-			[e skipDescendents];
-			NSString *filename = nil;
-			while ( filename = [e nextObject] )
-			{
-				if ( ![filename hasPrefix:@"."] )
-				{
-					NSString *profilePath = [profilesPath stringByAppendingPathComponent:filename];
-					NSString *bookmarkPath = [profilePath stringByAppendingPathComponent:@"places.sqlite"];
-					if ([fm fileExistsAtPath:bookmarkPath isDirectory:&isDir] && !isDir)
-					{
-						result = bookmarkPath;	// just stop on the first profile we find.  Should be good enough!
-						return result;
-					}
-				}
+			NSArray *profileURLs = [fm contentsOfDirectoryAtURL:profilesURL
+                                     includingPropertiesForKeys:nil
+                                                        options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                          error:NULL];
+            
+			for (NSURL *aProfileURL in profileURLs)
+            {
+                NSURL *bookmarkURL = [aProfileURL URLByAppendingPathComponent:@"places.sqlite"];
+                if ([fm fileExistsAtPath:[bookmarkURL path] isDirectory:&isDir] && !isDir)
+                {
+                    result = [bookmarkURL path];	// just stop on the first profile we find.  Should be good enough!
+                    return result;
+                }
 			}
 		}
 	}
