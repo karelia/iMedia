@@ -342,7 +342,10 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Library/Sounds"];
+		NSFileManager *fileManager = [[NSFileManager alloc] init];
+        NSURL *source = [fileManager URLForDirectory:NSLibraryDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:NULL];
+        self.mediaSource = [[source URLByAppendingPathComponent:@"Sounds"] path];
+		[fileManager release];
 	}
 	
 	return self;
