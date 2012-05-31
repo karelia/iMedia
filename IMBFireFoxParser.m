@@ -121,12 +121,12 @@
 	NSString *result = nil;
 
     NSArray *libraryFolders = [NSArray arrayWithObjects:
-        [NSURL fileURLWithPath:@"/Library" isDirectory:YES],
-        [IMBHomeDirectoryURL() URLByAppendingPathComponent:@"Library"],
-        [IMBApplicationContainerHomeDirectoryURL(@"org.mozilla.firefox") URLByAppendingPathComponent:@"Library"],
-        [NSURL fileURLWithPath:@"/Library/Application Support" isDirectory:YES],
-        [IMBHomeDirectoryURL() URLByAppendingPathComponent:@"Library/Application Support"],
         [IMBApplicationContainerHomeDirectoryURL(@"org.mozilla.firefox") URLByAppendingPathComponent:@"Library/Application Support"],
+        [IMBHomeDirectoryURL() URLByAppendingPathComponent:@"Library/Application Support"],
+        [NSURL fileURLWithPath:@"/Library/Application Support" isDirectory:YES],
+        [IMBApplicationContainerHomeDirectoryURL(@"org.mozilla.firefox") URLByAppendingPathComponent:@"Library"],
+        [IMBHomeDirectoryURL() URLByAppendingPathComponent:@"Library"],
+        [NSURL fileURLWithPath:@"/Library" isDirectory:YES],
         nil];
     
 	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
