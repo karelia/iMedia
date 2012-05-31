@@ -52,6 +52,8 @@
 
 #import "IMBSandboxUtilities.h"
 
+#include <pwd.h>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -63,7 +65,9 @@
 
 NSString* IMBHomeDirectory()
 {
-    return [NSString stringWithFormat:@"/Users/%@",NSUserName()];
+    const char *home = getpwuid(getuid())->pw_dir;
+    NSString *result = [NSString stringWithUTF8String:home];
+    return result;
 }
 
 
