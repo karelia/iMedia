@@ -61,7 +61,7 @@ NSURL* IMBHomeDirectoryURL();
 // Convenience function for getting a path to an application container directory. Returns the home
 // directory of a given sandboxed app container. User nil for the current application...
 
-NSString* IMBApplicationContainerHomeDirectory(NSString* inBundleIdentifier);
+NSURL* IMBApplicationContainerHomeDirectoryURL(NSString* inBundleIdentifier);
 
 // High level function that should be used instead of CFPreferencesCopyAppValue, because in  
 // sandboxed apps we need to work around problems of CFPreferencesCopyAppValue returning NULL...

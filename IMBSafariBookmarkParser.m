@@ -141,7 +141,7 @@
     NSString* bookmarksSubpath = @"Library/Safari/Bookmarks.plist";
     NSArray* paths = [NSArray arrayWithObjects:
         [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:bookmarksSubpath],
-        [IMBApplicationContainerHomeDirectory(@"com.apple.Safari") stringByAppendingPathComponent:bookmarksSubpath],
+        [[IMBApplicationContainerHomeDirectoryURL(@"com.apple.Safari") path] stringByAppendingPathComponent:bookmarksSubpath],
         nil];
 
     for (NSString* path in paths)

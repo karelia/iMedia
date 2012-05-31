@@ -75,7 +75,7 @@ NSURL* IMBHomeDirectoryURL()
 
 // Convenience function for getting a path to an application container directory...
 
-NSString* IMBApplicationContainerHomeDirectory(NSString* inBundleIdentifier)
+NSURL* IMBApplicationContainerHomeDirectoryURL(NSString* inBundleIdentifier)
 {
     NSString* bundleIdentifier = inBundleIdentifier;
     
@@ -84,13 +84,12 @@ NSString* IMBApplicationContainerHomeDirectory(NSString* inBundleIdentifier)
         bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     }
     
-    NSString* appContainerDir = [IMBHomeDirectoryURL() path];
-    appContainerDir = [appContainerDir stringByAppendingPathComponent:@"Library"];
-    appContainerDir = [appContainerDir stringByAppendingPathComponent:@"Containers"];
-    appContainerDir = [appContainerDir stringByAppendingPathComponent:bundleIdentifier];
-    appContainerDir = [appContainerDir stringByAppendingPathComponent:@"Data"];
+    NSURL* result = IMBHomeDirectoryURL();
+    result = [result URLByAppendingPathComponent:@"Library/Containers"];
+    result = [result URLByAppendingPathComponent:bundleIdentifier];
+    result = [result URLByAppendingPathComponent:@"Data"];
     
-    return appContainerDir;
+    return result;
 }
 
 
@@ -165,7 +164,7 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdent
     
     if (value == nil)
     {
-        path = IMBApplicationContainerHomeDirectory((NSString*)inBundleIdentifier);
+        path = [IMBApplicationContainerHomeDirectoryURL((NSString*)inBundleIdentifier) path];
         NSDictionary* prefsFileContents = _IMBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
         value = _IMBGetValue(prefsFileContents,inKey);
     }
