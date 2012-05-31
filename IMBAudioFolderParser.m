@@ -288,6 +288,9 @@
 
 + (id) folderPath
 {
+    // Give up when sandboxed; Apple will never want us to poke around inside another app's bundle
+    if (IMBIsSandboxed()) return nil;
+    
 	NSString* path = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.iMovie"];
 	return [path stringByAppendingPathComponent:@"/Contents/Resources/Sound Effects"];
 }
