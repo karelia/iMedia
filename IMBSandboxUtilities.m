@@ -63,10 +63,12 @@
 
 // Replacement function for NSHomeDirectory...
 
-NSString* IMBHomeDirectory()
+NSURL* IMBHomeDirectoryURL()
 {
     const char *home = getpwuid(getuid())->pw_dir;
-    NSString *result = [NSString stringWithUTF8String:home];
+    NSString *path = [[NSString alloc] initWithUTF8String:home];
+    NSURL *result = [NSURL fileURLWithPath:path isDirectory:YES];
+    [path release];
     return result;
 }
 
@@ -82,7 +84,7 @@ NSString* IMBApplicationContainerHomeDirectory(NSString* inBundleIdentifier)
         bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     }
     
-    NSString* appContainerDir = IMBHomeDirectory();
+    NSString* appContainerDir = [IMBHomeDirectoryURL() path];
     appContainerDir = [appContainerDir stringByAppendingPathComponent:@"Library"];
     appContainerDir = [appContainerDir stringByAppendingPathComponent:@"Containers"];
     appContainerDir = [appContainerDir stringByAppendingPathComponent:bundleIdentifier];
@@ -153,7 +155,7 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdent
     
     if (value == nil)
     {
-        path = IMBHomeDirectory();
+        path = [IMBHomeDirectoryURL() path];
         NSDictionary* prefsFileContents = _IMBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
         value = _IMBGetValue(prefsFileContents,inKey);
     }

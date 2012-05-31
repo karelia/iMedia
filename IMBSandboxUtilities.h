@@ -56,7 +56,7 @@
 // Replacement function for NSHomeDirectory: Always return the REAL home directory of the current
 // user, even if the app is sandboxed...
 
-NSString* IMBHomeDirectory();
+NSURL* IMBHomeDirectoryURL();
 
 // Convenience function for getting a path to an application container directory. Returns the home
 // directory of a given sandboxed app container. User nil for the current application...

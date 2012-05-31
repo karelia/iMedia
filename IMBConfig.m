@@ -270,7 +270,7 @@ static BOOL sUseGlobalViewType = NO;
 
 + (void) registerDefaultValues
 {
-	NSString* path = [IMBHomeDirectory() stringByAppendingPathComponent:@"Downloads"];
+	NSString* path = [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Downloads"];
     	
 	[self registerDefaultPrefsValue:[NSNumber numberWithBool:YES] forKey:sIMBShowsGroupNodesKey];
 	[self registerDefaultPrefsValue:path forKey:sIMBDownloadFolderPathKey];

@@ -123,7 +123,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [IMBHomeDirectory() stringByAppendingPathComponent:@"Pictures"];
+		self.mediaSource = [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Pictures"];
 		self.displayPriority = 1;
 	}
 	return self;

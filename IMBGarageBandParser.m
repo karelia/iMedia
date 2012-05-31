@@ -120,7 +120,7 @@
 
 + (NSString*) userSongsPath
 {
-	return [IMBHomeDirectory() stringByAppendingPathComponent:@"Music/GarageBand"];
+	return [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Music/GarageBand"];
 }
 
 

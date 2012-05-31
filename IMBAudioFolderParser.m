@@ -201,7 +201,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [IMBHomeDirectory() stringByAppendingPathComponent:@"Music"];
+		self.mediaSource = [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Music"];
 		self.displayPriority = 1;
 	}
 	
@@ -338,7 +338,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [IMBHomeDirectory() stringByAppendingPathComponent:@"Library/Sounds"];
+		self.mediaSource = [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Library/Sounds"];
 	}
 	
 	return self;
