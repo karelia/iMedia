@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 #import <Cocoa/Cocoa.h>
@@ -67,6 +67,10 @@ NSString* IMBApplicationContainerHomeDirectory(NSString* inBundleIdentifier);
 // sandboxed apps we need to work around problems of CFPreferencesCopyAppValue returning NULL...
  
 CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdentifier);
+
+// Have a guess at whether we're sandboxed
+
+BOOL IMBIsSandboxed();
 
 
 //----------------------------------------------------------------------------------------------------------------------

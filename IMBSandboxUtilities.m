@@ -44,7 +44,7 @@
  */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -175,3 +175,13 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdent
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+
+BOOL IMBIsSandboxed()
+{
+    NSString *home = NSHomeDirectory();
+    NSURL *realHome = IMBHomeDirectoryURL();
+    return ![[home stringByStandardizingPath] isEqualToString:[realHome path]];
+}
+
