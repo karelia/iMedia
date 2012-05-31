@@ -84,6 +84,7 @@ extern NSString* kIMBObjectPasteboardType;
 	NSData* _bookmark;
 	NSString* _name;
 	NSString* _identifier;
+	NSString* _persistentResourceIdentifier;
 	
 	NSDictionary* _preliminaryMetadata;
 	NSDictionary* _metadata;
@@ -109,6 +110,7 @@ extern NSString* kIMBObjectPasteboardType;
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
 @property (retain) NSString* identifier;					// Unique identifier for this object
+@property (retain) NSString* persistentResourceIdentifier;  // Unique persistent resource identifier for this object
 
 @property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
 @property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
