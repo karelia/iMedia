@@ -201,7 +201,11 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Music"];
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+        NSURL *source = [fileManager URLForDirectory:NSMusicDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:NULL];
+        self.mediaSource = [source path];
+		[fileManager release];
+        
 		self.displayPriority = 1;
 	}
 	
