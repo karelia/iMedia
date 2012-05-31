@@ -85,11 +85,13 @@
 @end
 
 // This subclass looks only in "/Library/Audio/Apple Loops/Apple/iLife Sound Effects"...
+// SANDBOXING: Requires temporary read-only entitlement
 
 @interface IMBiLifeSoundEffectsFolderParser : IMBAudioFolderParser
 @end
 
 // This subclass looks only in "/Library/Audio/Apple Loops/Apple/Apple Loops for GarageBand"...
+// SANDBOXING: Requires temporary read-only entitlement
 
 @interface IMBAppleLoopsForGarageBandFolderParser : IMBAudioFolderParser
 @end
