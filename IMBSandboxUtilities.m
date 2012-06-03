@@ -145,7 +145,7 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdent
     
     if (value == nil)
     {
-        value = CFPreferencesCopyAppValue((CFStringRef)inKey,(CFStringRef)inBundleIdentifier);
+        value = CFPreferencesCopyAppValue(inKey, inBundleIdentifier);
     }
     
     // In sandboxed apps that may have failed though, so try a workaround. If the app has the entitlement
