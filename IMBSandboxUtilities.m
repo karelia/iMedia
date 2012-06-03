@@ -73,26 +73,6 @@ NSURL* IMBHomeDirectoryURL()
 }
 
 
-// Convenience function for getting a path to an application container directory...
-
-NSURL* IMBApplicationContainerHomeDirectoryURL(NSString* inBundleIdentifier)
-{
-    NSString* bundleIdentifier = inBundleIdentifier;
-    
-    if (bundleIdentifier == nil) 
-    {
-        bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    }
-    
-    NSURL* result = IMBHomeDirectoryURL();
-    result = [result URLByAppendingPathComponent:@"Library/Containers"];
-    result = [result URLByAppendingPathComponent:bundleIdentifier];
-    result = [result URLByAppendingPathComponent:@"Data"];
-    
-    return result;
-}
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
