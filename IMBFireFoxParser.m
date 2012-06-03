@@ -213,7 +213,7 @@
 - (BOOL)openDatabase;
 {
 	BOOL result = NO;
-	if ([self.database open])	// Later, we could maybe do openWithFlags: SQLITE_OPEN_READONLY for speed
+	if ([self.database openWithFlags:SQLITE_OPEN_READONLY])
 	{
 		[self.database setBusyRetryTimeout:10];
 		result = YES;

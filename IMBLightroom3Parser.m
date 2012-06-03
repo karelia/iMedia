@@ -113,6 +113,8 @@
 
 - (BOOL) checkDatabaseVersion
 {
+	/*
+	// Commented out because in Sandvox case #159516 it's beachballing. Pierre advises this hack should fix it for now
 	NSNumber *databaseVersion = [self databaseVersion];
 	
 	if (databaseVersion != nil) {
@@ -124,7 +126,7 @@
 		else if (databaseVersionLong >= 400000) {
 			return NO;
 		}
-	}
+	}*/
 	
 	return YES;
 }

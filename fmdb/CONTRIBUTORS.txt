@@ -19,5 +19,17 @@ Phong Long
 Nathan Stitt
 Dan Wright
 OZLB
+Matt Stevens
+Jens Alfke
+Pascal Pfiffner
+Augie Fackler
+David E. Wheeler
+Casey Fleser
+Jeff Meininger
+Pascal Pfiffner
+Dave DeLong
+Drarok Ithaqua
+Chris Dolan
+Sriram Patil
 
 Aaaaannnd, Gus Mueller (that's me!)
