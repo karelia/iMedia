@@ -148,7 +148,7 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdent
         value = CFPreferencesCopyAppValue((CFStringRef)inKey,(CFStringRef)inBundleIdentifier);
     }
     
-    // In sandboxed apps that may have failed tough, so try a workaround. If the app has the entitlement
+    // In sandboxed apps that may have failed though, so try a workaround. If the app has the entitlement
     // com.apple.security.temporary-exception.files.absolute-path.read-only for a wide enough part of the
     // file system, we can read the prefs file ourself and parse it manually...
     
