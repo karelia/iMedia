@@ -88,6 +88,7 @@
 @end
 
 // Photo booth takes movies
+// SANDBOXING: Requires com.apple.security.assets.pictures.read-only entitlement or read-write equivalent, and for the user not to have made that folder a symlink to someplace else that's forbidden
 
 @interface IMBPhotoBoothMoviesFolderParser : IMBMovieFolderParser
 

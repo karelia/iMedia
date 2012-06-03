@@ -238,10 +238,10 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [[NSHomeDirectory()
-							 stringByAppendingPathComponent:@"Pictures"]
-								stringByAppendingPathComponent:@"Photo Booth"];
-
+        NSFileManager *fileMananger = [[NSFileManager alloc] init];
+        NSURL *source = [fileMananger URLForDirectory:NSPicturesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:NULL];
+		self.mediaSource = [[source URLByAppendingPathComponent:@"Photo Booth"] path];
+        [fileMananger release];
 	}
 	
 	return self;
