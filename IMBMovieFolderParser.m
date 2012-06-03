@@ -199,7 +199,7 @@
 }
 
 
-// Set the folder path to the ~/Pictures...
+// Set the folder path to the ~/Movies...
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
@@ -228,7 +228,7 @@
 }
 
 
-// Set the folder path to the ~/Pictures...
+// Set the folder path to the ~/Pictures/Photo Booth...
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
