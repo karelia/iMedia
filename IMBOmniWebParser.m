@@ -69,8 +69,7 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-        NSString* appSupport = [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Library/Application Support"];
-        NSString* bookmarks = [appSupport stringByAppendingPathComponent:@"OmniWeb 5/Bookmarks.html"];
+        NSString* bookmarks = [[IMBHomeDirectoryURL() path] stringByAppendingPathComponent:@"Library/Application Support/OmniWeb 5/Bookmarks.html"];
 		self.mediaSource = bookmarks;
 	}
     

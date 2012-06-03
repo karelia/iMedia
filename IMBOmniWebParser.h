@@ -50,6 +50,10 @@
 #import <Cocoa/Cocoa.h>
 #import "IMBParser.h"
 
+
+// SANDBOXING: Requires read-only access, relative to home directory to:
+//  /Library/Application Support/OmniWeb 5/Bookmarks.html
+
 @interface IMBOmniWebParser : IMBParser 
 {
 
