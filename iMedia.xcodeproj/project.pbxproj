@@ -92,16 +92,16 @@
 		CEAF1F3B125A80D4001C3EBB /* IMBHoverButton.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAF1F39125A80D4001C3EBB /* IMBHoverButton.h */; };
 		CEAF1F3C125A80D4001C3EBB /* IMBHoverButton.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAF1F3A125A80D4001C3EBB /* IMBHoverButton.m */; };
 		CEAF1FE5125A8B6A001C3EBB /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1FE4125A8B6A001C3EBB /* Credits.html */; };
-		CED51F82157C094500FBA3EC /* FMDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = CED51F77157C094500FBA3EC /* FMDatabase.h */; };
+		CED51F82157C094500FBA3EC /* FMDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = CED51F77157C094500FBA3EC /* FMDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CED51F83157C094500FBA3EC /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = CED51F78157C094500FBA3EC /* FMDatabase.m */; };
 		CED51F84157C094500FBA3EC /* FMDatabaseAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = CED51F79157C094500FBA3EC /* FMDatabaseAdditions.h */; };
 		CED51F85157C094500FBA3EC /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = CED51F7A157C094500FBA3EC /* FMDatabaseAdditions.m */; };
-		CED51F86157C094500FBA3EC /* FMDatabasePool.h in Headers */ = {isa = PBXBuildFile; fileRef = CED51F7B157C094500FBA3EC /* FMDatabasePool.h */; };
+		CED51F86157C094500FBA3EC /* FMDatabasePool.h in Headers */ = {isa = PBXBuildFile; fileRef = CED51F7B157C094500FBA3EC /* FMDatabasePool.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CED51F87157C094500FBA3EC /* FMDatabasePool.m in Sources */ = {isa = PBXBuildFile; fileRef = CED51F7C157C094500FBA3EC /* FMDatabasePool.m */; };
 		CED51F88157C094500FBA3EC /* FMDatabaseQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = CED51F7D157C094500FBA3EC /* FMDatabaseQueue.h */; };
 		CED51F89157C094500FBA3EC /* FMDatabaseQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = CED51F7E157C094500FBA3EC /* FMDatabaseQueue.m */; };
 		CED51F8A157C094500FBA3EC /* fmdb.m in Sources */ = {isa = PBXBuildFile; fileRef = CED51F7F157C094500FBA3EC /* fmdb.m */; };
-		CED51F8B157C094500FBA3EC /* FMResultSet.h in Headers */ = {isa = PBXBuildFile; fileRef = CED51F80157C094500FBA3EC /* FMResultSet.h */; };
+		CED51F8B157C094500FBA3EC /* FMResultSet.h in Headers */ = {isa = PBXBuildFile; fileRef = CED51F80157C094500FBA3EC /* FMResultSet.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CED51F8C157C094500FBA3EC /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = CED51F81157C094500FBA3EC /* FMResultSet.m */; };
 		CEF6539C117E5C29003FF1A5 /* Attribute.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65395117E5C28003FF1A5 /* Attribute.pdf */; };
 		CEF6539D117E5C29003FF1A5 /* CC.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65396117E5C28003FF1A5 /* CC.pdf */; };
@@ -1461,6 +1461,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CED51F86157C094500FBA3EC /* FMDatabasePool.h in Headers */,
+				CED51F8B157C094500FBA3EC /* FMResultSet.h in Headers */,
+				CED51F82157C094500FBA3EC /* FMDatabase.h in Headers */,
 				D0B87F22103D998D00C48C6F /* iMedia.h in Headers */,
 				D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */,
 				D09931AA10110E8900C527B7 /* IMBConfig.h in Headers */,
@@ -1566,11 +1569,8 @@
 				8FF314CC15064BC700A76AA2 /* IMBLightroom4VideoParser.h in Headers */,
 				8FA4275E154EB93C00F75E13 /* IMBLightroom3or4Parser.h in Headers */,
 				D0DE73F413CD84DB00C5AF8D /* IMBSandboxUtilities.h in Headers */,
-				CED51F82157C094500FBA3EC /* FMDatabase.h in Headers */,
 				CED51F84157C094500FBA3EC /* FMDatabaseAdditions.h in Headers */,
-				CED51F86157C094500FBA3EC /* FMDatabasePool.h in Headers */,
 				CED51F88157C094500FBA3EC /* FMDatabaseQueue.h in Headers */,
-				CED51F8B157C094500FBA3EC /* FMResultSet.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
