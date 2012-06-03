@@ -205,7 +205,11 @@
 {
 	if (self = [super initWithMediaType:inMediaType])
 	{
-		self.mediaSource = [NSHomeDirectory() stringByAppendingPathComponent:@"Movies"];
+        NSFileManager *fileMananger = [[NSFileManager alloc] init];
+        NSURL *source = [fileMananger URLForDirectory:NSMoviesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:NULL];
+		self.mediaSource = [source path];
+        [fileMananger release];
+        
 		self.displayPriority = 1;
 	}
 	

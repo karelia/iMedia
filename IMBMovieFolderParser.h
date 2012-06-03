@@ -81,6 +81,7 @@
 
 
 // This subclass looks only in "~/Movies"...
+// SANDBOXING: Requires com.apple.security.assets.movies.read-only entitlement or read-write equivalent
 
 @interface IMBMoviesFolderParser : IMBMovieFolderParser
 
