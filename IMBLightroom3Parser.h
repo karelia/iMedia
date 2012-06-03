@@ -55,6 +55,11 @@
 #import "IMBLightroom3or4Parser.h"
 
 
+// SANDBOXING: Requires com.apple.security.assets.pictures.read-only entitlment (provided user hasn't moved their photos elsewhere). Also read-only access, relative to home directory for:
+//
+//  * /Library/Containers/com.adobe.Lightroom3/Data/Library/Preferences/com.adobe.Lightroom3.plist
+//  * /Library/Preferences/com.adobe.Lightroom3.plist
+
 @interface IMBLightroom3Parser : IMBLightroom3or4Parser
 {
 	
