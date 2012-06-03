@@ -114,7 +114,7 @@ static NSDictionary* _IMBPreferencesDictionary(NSString* inHomeFolderPath,NSStri
 
 // Private function to access a certain value in the prefs dictionary...
 
-static CFTypeRef _IMBGetValue(NSDictionary* inPrefsFileContents,CFStringRef inKey)
+static CFTypeRef _IMBCopyValue(NSDictionary* inPrefsFileContents,CFStringRef inKey)
 {
     CFTypeRef value = NULL;
 
@@ -156,7 +156,7 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdent
     {
         path = [IMBHomeDirectoryURL() path];
         NSDictionary* prefsFileContents = _IMBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
-        value = _IMBGetValue(prefsFileContents,inKey);
+        value = _IMBCopyValue(prefsFileContents,inKey);
     }
 
     // It's possible that the other app is sandboxed as well, so we may need look for the prefs file 
@@ -166,7 +166,7 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdent
     {
         path = [IMBApplicationContainerHomeDirectoryURL((NSString*)inBundleIdentifier) path];
         NSDictionary* prefsFileContents = _IMBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
-        value = _IMBGetValue(prefsFileContents,inKey);
+        value = _IMBCopyValue(prefsFileContents,inKey);
     }
     
     return value;
