@@ -139,7 +139,6 @@ static CFTypeRef _IMBCopyValue(NSDictionary* inPrefsFileContents,CFStringRef inK
 CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdentifier)
 {
     CFTypeRef value = NULL;
-    NSString* path;
     
     // First try the official API. If we get a value, then use it...
     
@@ -154,19 +153,46 @@ CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdent
     
     if (value == nil)
     {
-        path = [IMBHomeDirectoryURL() path];
-        NSDictionary* prefsFileContents = _IMBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
-        value = _IMBCopyValue(prefsFileContents,inKey);
-    }
-
-    // It's possible that the other app is sandboxed as well, so we may need look for the prefs file 
-    // in its container directory...
-    
-    if (value == nil)
-    {
-        path = [IMBApplicationContainerHomeDirectoryURL((NSString*)inBundleIdentifier) path];
-        NSDictionary* prefsFileContents = _IMBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
-        value = _IMBCopyValue(prefsFileContents,inKey);
+        // Start out by assuming the other app is sandboxed
+        NSString *path = [@"Library/Containers/%@/Data/Library/Preferences/%@.plist" stringByReplacingOccurrencesOfString:@"%@"
+                                                                                                               withString:(NSString *)inBundleIdentifier];
+        
+        NSURL *home = IMBHomeDirectoryURL();
+        NSURL *prefURL = [home URLByAppendingPathComponent:path];
+        
+        NSError *error;
+        NSData *data = [[NSData alloc] initWithContentsOfURL:prefURL options:0 error:&error];
+        
+        if (data)
+        {
+            NSDictionary *prefs = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL];
+            [data release];
+            
+            if ([prefs isKindOfClass:[NSDictionary class]])
+            {
+                return _IMBCopyValue(prefs, inKey);
+            }
+        }
+        else if ([error code] == NSFileReadNoSuchFileError && [[error domain] isEqualToString:NSCocoaErrorDomain])
+        {
+            // If pref file didn't exist in sandbox, it's likely because the app isn't sandboxed yet, so have a look at regular Preferences folder
+            path = [@"Library/Preferences/%@.plist" stringByReplacingOccurrencesOfString:@"%@"
+                                                                              withString:(NSString *)inBundleIdentifier];
+            
+            prefURL = [home URLByAppendingPathComponent:path];
+            data = [[NSData alloc] initWithContentsOfURL:prefURL options:0 error:NULL];
+            
+            if (data)
+            {
+                NSDictionary *prefs = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL];
+                [data release];
+                
+                if ([prefs isKindOfClass:[NSDictionary class]])
+                {
+                    return _IMBCopyValue(prefs, inKey);
+                }
+            }
+        }
     }
     
     return value;

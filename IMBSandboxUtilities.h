@@ -63,8 +63,12 @@ NSURL* IMBHomeDirectoryURL();
 
 NSURL* IMBApplicationContainerHomeDirectoryURL(NSString* inBundleIdentifier);
 
-// High level function that should be used instead of CFPreferencesCopyAppValue, because in  
-// sandboxed apps we need to work around problems of CFPreferencesCopyAppValue returning NULL...
+// SANDBOXING: Call this instead of CFPreferencesCopyAppValue() to read pref file outside of our sandbox. Requires read-only access, relative to home directory for:
+//
+//  * /Library/Containers/%@/Data/Library/Preferences/%@.plist
+//  * /Library/Preferences/%@.plist
+//
+// where %@ is the app's bundle identifier
  
 CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdentifier);
 
