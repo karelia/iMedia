@@ -742,8 +742,9 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 {
 	if (self.bookmark == nil)
 	{
-		[inCompletionBlock copy];
+		void (^completionBlock)(NSError*) = [inCompletionBlock copy];
 		IMBParserMessenger* messenger = self.parserMessenger;
+		
 		SBPerformSelectorAsync(messenger.connection,messenger,@selector(bookmarkForObject:error:),self,
 		
 			^(NSData* inBookmark,NSError* inError)
@@ -755,46 +756,10 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 				else
 				{
 					self.atomic_bookmark = inBookmark;
-					
-					// First receive the normal bookmark and resolve it to a NSURL. This punches a hole into
-					// the sandbox for this launch session. But this hole doesn't persistent across relaunches.
-					// To achieve this, we need to convert it to a security scoped app bookmark...
-					
-//					NSData* appScopedBookmark = nil;
-//					NSError* error = nil;
-//					BOOL isStale = NO;
-//					
-//					NSURL* url = [NSURL 
-//						URLByResolvingBookmarkData:inBookmark 
-//						options:0 
-//						relativeToURL:nil
-//						bookmarkDataIsStale:&isStale 
-//						error:&error];
-//					
-//					if (error == nil)
-//					{
-//						NSURLBookmarkCreationOptions options = 
-//							NSURLBookmarkCreationMinimalBookmark |
-//							NSURLBookmarkCreationWithSecurityScope |
-//							NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess;
-//				
-//						appScopedBookmark = [url 
-//							bookmarkDataWithOptions:options
-//							includingResourceValuesForKeys:nil
-//							relativeToURL:nil
-//							error:&error];
-//					}
-//					
-//					if (error == nil)
-//					{
-//						self.bookmark = appScopedBookmark;
-//					}
-//					
-//					inError = error;
 				}
 				
-				inCompletionBlock(inError);
-				[inCompletionBlock release];
+				completionBlock(inError);
+				[completionBlock release];
 			});
 	}
 	else
