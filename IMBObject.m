@@ -130,6 +130,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @synthesize atomic_bookmark = _bookmark;
 @synthesize name = _name;
 @synthesize identifier = _identifier;
+@synthesize persistentResourceIdentifier = _persistentResourceIdentifier;
 
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
@@ -179,6 +180,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	IMBRelease(_bookmark);
 	IMBRelease(_name);
 	IMBRelease(_identifier);
+	IMBRelease(_persistentResourceIdentifier);
 	
 	IMBRelease(_preliminaryMetadata);
 	IMBRelease(_metadata);
@@ -209,6 +211,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.atomic_bookmark = [coder decodeObjectForKey:@"bookmark"];
 		self.name = [coder decodeObjectForKey:@"name"];
 		self.identifier = [coder decodeObjectForKey:@"identifier"];
+		self.persistentResourceIdentifier = [coder decodeObjectForKey:@"persistentResourceIdentifier"];
 		self.error = [inCoder decodeObjectForKey:@"error"];
 
 		self.preliminaryMetadata = [coder decodeObjectForKey:@"preliminaryMetadata"];
@@ -247,6 +250,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeObject:self.bookmark forKey:@"bookmark"];
 	[coder encodeObject:self.name forKey:@"name"];
 	[coder encodeObject:self.identifier forKey:@"identifier"];
+	[coder encodeObject:self.persistentResourceIdentifier forKey:@"persistentResourceIdentifier"];
 	[coder encodeObject:self.error forKey:@"error"];
 
 	[coder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
@@ -288,6 +292,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	copy.atomic_bookmark = self.bookmark;
 	copy.name = self.name;
 	copy.identifier = self.identifier;
+	copy.persistentResourceIdentifier = self.persistentResourceIdentifier;
 	copy.error = self.error;
 
 	copy.preliminaryMetadata = self.preliminaryMetadata;
@@ -316,6 +321,15 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 #pragma mark 
 #pragma mark Helpers
+
+//- (void) setIdentifier:(NSString *)identifier
+//{
+//    if (identifier == nil) {
+//        NSLog(@"Nil identifier");
+//    } else {
+//        _identifier = identifier;
+//    }
+//}
 
 
 // Convert location to url...

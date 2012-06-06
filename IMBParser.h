@@ -124,10 +124,25 @@
 
 - (NSString*) identifierForObject:(IMBObject*)inObject;
 
+// Returns an identifier for the resource that self denotes and that is meant to be persistent across launches
+// (e.g. when host app developers need to persist usage info of media files when implementing the badging delegate API).
+// This standard implementation is based on file reference URLs - so it will only work for file based URLs.
+// Subclass to adjust to the needs of your parser.
+
+- (NSString*) persistentResourceIdentifierForObject:(IMBObject*)inObject;
+
+// Returns the form of the persistent resource identifier for inObject that was used in iMedia2.
+// You can use this string to compare against your app's stored identifiers and convert them to
+// their new identifiers (persistentResourceIdentifierForObject:).
+// NOTE: This method should only be invoked for such purpose. It might be removed from the framework
+//       in future versions.
+
+- (NSString*) iMedia2PersistentResourceIdentifierForObject:(IMBObject*)inObject;
+
 // Subclasses may want to override this method to provide a backward compatible string. 
 // See further comments in implementation file...
 
-- (NSString*) identifierPrefix;
+- (NSString*) iMedia2PersistentResourceIdentifierPrefix;
 
 // Returns a minimal image for a given file system item that can be used as an icon for IMBNode...
 
