@@ -73,6 +73,10 @@
 		CE394AC21371A1F700EF0D1E /* cork-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CE394AC11371A1F700EF0D1E /* cork-background.jpg */; };
 		CE3EC9A2124AAC0700D8435B /* NSURL+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE3EC9A3124AAC0700D8435B /* NSURL+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */; };
+		CE433954157FE11B00C834BC /* FMDatabasePool.h in Headers */ = {isa = PBXBuildFile; fileRef = CE433950157FE11B00C834BC /* FMDatabasePool.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE433955157FE11B00C834BC /* FMDatabasePool.m in Sources */ = {isa = PBXBuildFile; fileRef = CE433951157FE11B00C834BC /* FMDatabasePool.m */; };
+		CE433956157FE11B00C834BC /* FMDatabaseQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = CE433952157FE11B00C834BC /* FMDatabaseQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE433957157FE11B00C834BC /* FMDatabaseQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = CE433953157FE11B00C834BC /* FMDatabaseQueue.m */; };
 		CE6524C21253AF47003A9AA0 /* warning.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE6524C11253AF47003A9AA0 /* warning.tiff */; };
 		CE69CDC41149D0B50016E5E0 /* IMBFireFoxParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF695DF106434FE005D7E72 /* IMBFireFoxParser.m */; };
 		CE69E9DD114B05EA0016E5E0 /* firefox_allBookmarks.png in Resources */ = {isa = PBXBuildFile; fileRef = CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */; };
@@ -483,6 +487,10 @@
 		CE394AC11371A1F700EF0D1E /* cork-background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "cork-background.jpg"; sourceTree = "<group>"; };
 		CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+iMedia.h"; sourceTree = "<group>"; };
 		CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+iMedia.m"; sourceTree = "<group>"; };
+		CE433950157FE11B00C834BC /* FMDatabasePool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabasePool.h; path = fmdb/src/FMDatabasePool.h; sourceTree = "<group>"; };
+		CE433951157FE11B00C834BC /* FMDatabasePool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMDatabasePool.m; path = fmdb/src/FMDatabasePool.m; sourceTree = "<group>"; };
+		CE433952157FE11B00C834BC /* FMDatabaseQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FMDatabaseQueue.h; path = fmdb/src/FMDatabaseQueue.h; sourceTree = "<group>"; };
+		CE433953157FE11B00C834BC /* FMDatabaseQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FMDatabaseQueue.m; path = fmdb/src/FMDatabaseQueue.m; sourceTree = "<group>"; };
 		CE6524C11253AF47003A9AA0 /* warning.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = warning.tiff; sourceTree = "<group>"; };
 		CE69E9D8114B05EA0016E5E0 /* firefox_allBookmarks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_allBookmarks.png; sourceTree = "<group>"; };
 		CE69E9D9114B05EA0016E5E0 /* firefox_bookmarksMenu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firefox_bookmarksMenu.png; sourceTree = "<group>"; };
@@ -1430,6 +1438,10 @@
 				D0F2DB981098262D004280C1 /* fmdb.m */,
 				D0F2DB991098262D004280C1 /* FMResultSet.h */,
 				D0F2DB9A1098262D004280C1 /* FMResultSet.m */,
+				CE433950157FE11B00C834BC /* FMDatabasePool.h */,
+				CE433951157FE11B00C834BC /* FMDatabasePool.m */,
+				CE433952157FE11B00C834BC /* FMDatabaseQueue.h */,
+				CE433953157FE11B00C834BC /* FMDatabaseQueue.m */,
 			);
 			name = FMDatabase;
 			sourceTree = "<group>";
@@ -1441,6 +1453,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE433954157FE11B00C834BC /* FMDatabasePool.h in Headers */,
+				CE433956157FE11B00C834BC /* FMDatabaseQueue.h in Headers */,
 				D0B87F22103D998D00C48C6F /* iMedia.h in Headers */,
 				D09930C41010F6C100C527B7 /* IMBCommon.h in Headers */,
 				D09931AA10110E8900C527B7 /* IMBConfig.h in Headers */,
@@ -1911,6 +1925,8 @@
 				8FF314C615063F6900A76AA2 /* IMBLightroom4Parser.m in Sources */,
 				8FF314CD15064BC700A76AA2 /* IMBLightroom4VideoParser.m in Sources */,
 				8FA4275F154EB93C00F75E13 /* IMBLightroom3or4Parser.m in Sources */,
+				CE433955157FE11B00C834BC /* FMDatabasePool.m in Sources */,
+				CE433957157FE11B00C834BC /* FMDatabaseQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
