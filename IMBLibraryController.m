@@ -193,13 +193,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			
 		// When volume are unmounted we would like to be notified so that we can stop listening for those paths...
 		
-		[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter]
+		[[[NSWorkspace sharedWorkspace] notificationCenter]
 			addObserver:self 
 			selector:@selector(_willUnmountVolume:)
 			name:NSWorkspaceWillUnmountNotification 
 			object:nil];
 			
-		[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter]
+		[[[NSWorkspace sharedWorkspace] notificationCenter]
 			addObserver:self 
 			selector:@selector(_didMountVolume:)
 			name:NSWorkspaceDidMountNotification 
@@ -1180,28 +1180,48 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	for (IMBNode* node in inNodes)
 	{
-		IMBWatcherType type =  node.watcherType;
-		NSString* path = node.watchedPath;
-		
-		if (type != kIMBWatcherTypeNone && [path hasPrefix:inVolume])
+		if (node.isGroupNode)
 		{
-			[self _replaceNode:node withNode:nil parentNodeIdentifier:node.parentNode.identifier];
+			[self _unmountNodes:node.subnodes onVolume:inVolume];
 		}
 		else
 		{
-			[self _unmountNodes:node.subnodes onVolume:inVolume];
+			NSURL* url = node.mediaSource;
+			NSString* path = [[url path] stringByStandardizingPath];
+			
+			if ([path hasPrefix:inVolume])
+			{
+				[self _replaceNode:node withNode:nil parentNodeIdentifier:node.parentNode.identifier];
+			}
 		}
 	}
 }
 
 
-// When a new volume is mounted, we have to assume that it contains a folder or library that we are interested in.
-// Currently we are simply reloading everything, but in the future we could possibly be more intelligent about it 
-// and reload just those nodes that are required and keep everything else intact...
+// When a new volume is mounted, go through all messengers and check if this concerns us here. If yes, then
+// request the top-level node...
 
 - (void) _didMountVolume:(NSNotification*)inNotification 
 {
-	[self reload];
+	NSString* volume = [[inNotification userInfo] objectForKey:@"NSDevicePath"];
+	NSArray* messengers = [[IMBParserController sharedParserController] loadedParserMessengersForMediaType:self.mediaType];
+	BOOL didPostNotification = NO;
+
+	for (IMBParserMessenger* messenger in messengers)
+	{
+		NSURL* url = messenger.mediaSource;
+		NSString* path = [[url path] stringByStandardizingPath];
+		
+		if ([path hasPrefix:volume])
+		{
+			if (!didPostNotification)
+			{
+				[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
+			}
+			
+			[self createTopLevelNodesWithParserMessenger:messenger];
+		}
+	}
 }
 
 
