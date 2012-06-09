@@ -473,8 +473,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					
 			if (inError)
 			{
-				NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-				[NSApp presentError:inError];
+				dispatch_async(dispatch_get_main_queue(),^()
+				{
+					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+					[NSApp presentError:inError];
+				});
 			}
 			
 			// Replace the old with the new node...

@@ -571,7 +571,13 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		{
 			[self requestBookmarkWithCompletionBlock:^(NSError* inError)
 			{
-				if (inError) [NSApp presentError:inError];
+				if (inError)
+				{
+					dispatch_async(dispatch_get_main_queue(),^()
+					{
+						[NSApp presentError:inError];
+					});
+				}
 			}];
             
             [self waitForBookmark];
