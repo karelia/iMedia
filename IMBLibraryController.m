@@ -479,14 +479,21 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			
 			// Replace the old with the new node...
 					
-			else if (inNewNode)
+			else 
 			{
-				[self _setParserMessenger:messenger nodeTree:inNewNode];
+				if (inNewNode)
+				{
+					[self _setParserMessenger:messenger nodeTree:inNewNode];
+				}
+				
 				[self _replaceNode:inOldNode withNode:inNewNode parentNodeIdentifier:parentNodeIdentifier];
 
-				if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+				if (inNewNode)
 				{
-					[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
+					if (RESPONDS(_delegate,@selector(libraryController:didCreateNode:withParserMessenger:)))
+					{
+						[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
+					}
 				}
 			}
 		});		

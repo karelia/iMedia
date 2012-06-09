@@ -355,22 +355,25 @@
 - (NSNumber*) directoryHasVisibleSubfolders:(NSURL*)directory error:(NSError**)outError;
 {
 	NSFileManager* fileManager = [[NSFileManager alloc] init];
-    
+	
 	NSArray* contents = [fileManager contentsOfDirectoryAtURL:directory 
                                    includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
                                                       options:NSDirectoryEnumerationSkipsHiddenFiles 
                                                         error:outError];
-    
     [fileManager release];
     
-	if (!contents) return nil;
+	if (!contents)
+	{
+		// Mask out file not found error. Disappearing folders are not considered an error here!
+		if (outError!=nil && [*outError code] == 260) *outError = nil;
+		return nil;
+	}
 	
-    
     BOOL knowForSure = YES;
 	for (NSURL* url in contents)
     {
         NSNumber* isFolder = nil;
-        NSError *error;
+		NSError* error = nil;
         BOOL ok = [url getResourceValue:&isFolder forKey:NSURLIsDirectoryKey error:&error];
         
         if (ok)
