@@ -421,6 +421,8 @@
 			albumNode.name = albumName;
 			albumNode.mediaSource = self.mediaSource;
 			albumNode.parserIdentifier = self.identifier;
+			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
@@ -598,6 +600,9 @@
 			subnode.name = subnodeName;
 			subnode.mediaSource = self.mediaSource;
 			subnode.parserIdentifier = self.identifier;
+			subnode.isIncludedInPopup = NO;
+			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			subnode.watcherType = kIMBWatcherTypeNone;  // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
 			// Keep a ref to the subnode dictionary for potential later use
 			

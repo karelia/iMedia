@@ -309,6 +309,14 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 	
+	// Enable FSEvents based file watching for root nodes...
+	
+	node.watcherType = kIMBWatcherTypeFSEvent;
+    
+	NSURL* url = self.mediaSource;
+	NSString* path = [[url path] stringByDeletingLastPathComponent];
+	node.watchedPath = path;
+	
 	// JUST TEMP: remove these 2 lines later...
 	
     //	NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:self.mediaSource];
@@ -802,6 +810,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			subnode.name = subnodeName;
 			subnode.mediaSource = self.mediaSource;
 			subnode.parserIdentifier = self.identifier;
+			subnode.isIncludedInPopup = NO;
+			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			subnode.watcherType = kIMBWatcherTypeNone;  // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
 			// Keep a ref to face dictionary for potential later use
 			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
