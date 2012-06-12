@@ -621,6 +621,8 @@
 			albumNode.name = albumName;
 			albumNode.mediaSource = self.mediaSource;
 			albumNode.parserIdentifier = self.identifier;
+			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 
 			// Set the node's identifier. This is needed later to link it to the correct parent node...
 			
