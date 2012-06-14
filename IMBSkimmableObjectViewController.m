@@ -234,18 +234,22 @@
         
         CGFloat xOffset = inPoint.x - skimmingFrame.origin.x;
         NSUInteger objectCount = [item imageCount];
-        CGFloat widthPerObject = skimmingFrame.size.width / objectCount;
-        NSUInteger objectIndex = (NSUInteger) xOffset / widthPerObject;
         
-        //NSLog(@"Object index: %lu", objectIndex);
-        
-        if (objectIndex != _previousImageIndex)
+        if (objectCount > 0)
         {
-            _previousImageIndex = objectIndex;
+            CGFloat widthPerObject = skimmingFrame.size.width / objectCount;
+            NSUInteger objectIndex = (NSUInteger) xOffset / widthPerObject;
             
-            item.currentSkimmingIndex = objectIndex;
+            //NSLog(@"Object index: %lu", objectIndex);
             
-            [self loadThumbnailForItem:item];
+            if (objectIndex != _previousImageIndex)
+            {
+                _previousImageIndex = objectIndex;
+                
+                item.currentSkimmingIndex = objectIndex;
+                
+                [self loadThumbnailForItem:item];
+            }
         }
     }
 }
