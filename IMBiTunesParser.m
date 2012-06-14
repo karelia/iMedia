@@ -143,7 +143,7 @@
 
 	if ([self isInstalled])
 	{
-		CFArrayRef recentLibraries = IMBPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
+		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
 		NSArray* libraries = (NSArray*)recentLibraries;
 			
 		for (NSString* library in libraries)

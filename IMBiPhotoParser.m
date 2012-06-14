@@ -140,7 +140,7 @@
 	
 	if ([self isInstalled])
 	{
-		CFArrayRef recentLibraries = IMBPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
+		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
 		NSArray* libraries = (NSArray*)recentLibraries;
         
 		for (NSString* library in libraries)

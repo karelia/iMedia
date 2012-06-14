@@ -83,7 +83,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = IMBPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
+	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
 																(CFStringRef)@"com.adobe.Lightroom");
 	
 	if (recentLibrariesList) {
@@ -92,7 +92,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = IMBPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
+		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
 																		(CFStringRef)@"com.adobe.Lightroom");
 		
 		if (activeLibraryPath) {

@@ -140,7 +140,7 @@
 
 	if ([self isInstalled])
 	{
-		CFArrayRef apertureLibraries = IMBPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.iApps");
+		CFArrayRef apertureLibraries = CFPreferencesCopyAppValue((CFStringRef)@"ApertureLibraries",(CFStringRef)@"com.apple.iApps");
 		NSArray* libraries = (NSArray*)apertureLibraries;
 
 		for (NSString* library in libraries)

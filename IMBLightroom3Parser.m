@@ -93,7 +93,7 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = IMBPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3");
+	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3");
 	
 	if (recentLibrariesList) {
         [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
@@ -101,7 +101,7 @@
 	}
 	
     if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = IMBPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3");
+		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3");
 		
 		if (activeLibraryPath) {
 			CFRelease(activeLibraryPath);

@@ -58,15 +58,6 @@
 
 NSURL* IMBHomeDirectoryURL();
 
-// SANDBOXING: Call this instead of CFPreferencesCopyAppValue() to read pref file outside of our sandbox. Requires read-only access, relative to home directory for:
-//
-//  * /Library/Containers/%@/Data/Library/Preferences/%@.plist
-//  * /Library/Preferences/%@.plist
-//
-// where %@ is the app's bundle identifier
- 
-CFTypeRef IMBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdentifier);
-
 // Have a guess at whether we're sandboxed
 
 BOOL IMBIsSandboxed();
