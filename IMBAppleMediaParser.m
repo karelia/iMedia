@@ -581,6 +581,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
         {
             return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
         } else {
+            inObject.imageRepresentationType = IKImageBrowserNSDataRepresentationType;
             NSData* data = [NSData dataWithContentsOfURL:url];
             return data;
         }
