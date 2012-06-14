@@ -123,14 +123,21 @@
     {
         // We are currently skimming on the image
         
-        _currentImageKey = [[self.preliminaryMetadata objectForKey:@"KeyList"] objectAtIndex:skimmingIndex];
-        
-        // Get the metadata of the nth image in which this face occurs 
-        NSDictionary* imageFaceMetadata = [[[self preliminaryMetadata] objectForKey:@"ImageFaceMetadataList"] objectAtIndex:skimmingIndex];
-        
-        // What is the number of this face inside of this image?
-        _currentFaceIndex = [imageFaceMetadata objectForKey:@"face index"];
-        
+        NSArray *keyList = [self.preliminaryMetadata objectForKey:@"KeyList"];
+        NSArray *metadataList = [[self preliminaryMetadata] objectForKey:@"ImageFaceMetadataList"];
+
+        if (keyList.count > skimmingIndex && metadataList.count > skimmingIndex)
+        {
+            _currentImageKey = [keyList objectAtIndex:skimmingIndex];
+            
+            // Get the metadata of the nth image in which this face occurs 
+            NSDictionary* imageFaceMetadata = [metadataList objectAtIndex:skimmingIndex];
+            
+            // What is the number of this face inside of this image?
+            _currentFaceIndex = [imageFaceMetadata objectForKey:@"face index"];
+        } else {
+            NSLog(@"Cannot provide any data for skimming index %d", skimmingIndex);
+        }
     } else {
         // We just initialized the object or left the image while skimming and thus restore the key image
         
