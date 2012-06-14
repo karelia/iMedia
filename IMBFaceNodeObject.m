@@ -136,7 +136,7 @@
             // What is the number of this face inside of this image?
             _currentFaceIndex = [imageFaceMetadata objectForKey:@"face index"];
         } else {
-            NSLog(@"Cannot provide any data for skimming index %d", skimmingIndex);
+            NSLog(@"Cannot provide any data for skimming index %lu", (unsigned long)skimmingIndex);
         }
     } else {
         // We just initialized the object or left the image while skimming and thus restore the key image
