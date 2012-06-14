@@ -58,10 +58,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// SANDBOXING: Requires com.apple.security.assets.pictures.read-only entitlement (provided user hasn't moved their photos elsewhere). Also read-only access, relative to home directory for:
+// SANDBOXING: Requires com.apple.security.assets.pictures.read-only entitlement (provided user hasn't moved their photos elsewhere). Also com.apple.security.temporary-exception.shared-preference.read-only for:
 //
-//  * /Library/Containers/com.apple.iApps/Data/Library/Preferences/com.apple.iApps.plist
-//  * /Library/Preferences/com.apple.iApps.plist
+//  * com.apple.iApps
+//  * com.apple.Aperture
 
 #pragma mark 
 
