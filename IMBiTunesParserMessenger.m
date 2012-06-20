@@ -212,6 +212,8 @@ static dispatch_once_t sMovieOnceToken = 0;
                 
                 [fileManager release];
 			}
+			
+			if (recentLibraries) CFRelease(recentLibraries);
 		}
 	});
 
@@ -295,6 +297,8 @@ static dispatch_once_t sMovieOnceToken = 0;
                 
                 [fileManager release];
 			}
+			
+			if (recentLibraries) CFRelease(recentLibraries);
 		}
 	});
 
