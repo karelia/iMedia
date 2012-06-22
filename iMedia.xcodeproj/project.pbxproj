@@ -142,6 +142,7 @@
 		D04179981526D22B006C9E98 /* IMBTestTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3016783513B1F435000E57D2 /* IMBTestTextView.m */; };
 		D0467BB0112C220F00C1AA4E /* IMBApertureAudioParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0467BAE112C220F00C1AA4E /* IMBApertureAudioParser.h */; };
 		D0467BB4112C223600C1AA4E /* IMBApertureVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0467BB2112C223600C1AA4E /* IMBApertureVideoParser.h */; };
+		D049C4E015947C29006EDA0C /* ObjectiveFlickr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0C911C71521038F006655C9 /* ObjectiveFlickr.framework */; };
 		D049EF5510346C1C003CC49C /* IMBNodeCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D049EF5310346C1C003CC49C /* IMBNodeCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049F00A1034993E003CC49C /* NSImage+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0081034993E003CC49C /* NSImage+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D049F0421034A86B003CC49C /* IMBIconCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0401034A86B003CC49C /* IMBIconCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1009,6 +1010,7 @@
 				CEF6960010643A25005D7E72 /* WebKit.framework in Frameworks */,
 				D0904DDC152D700E003FDD08 /* Security.framework in Frameworks */,
 				D0904DD9152D6F79003FDD08 /* XPCKit.framework in Frameworks */,
+				D049C4E015947C29006EDA0C /* ObjectiveFlickr.framework in Frameworks */,
 				D0F2DBCF1098270F004280C1 /* libsqlite3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
