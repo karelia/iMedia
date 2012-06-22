@@ -103,6 +103,18 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+- (void) dealloc
+{
+	IMBRelease(_appPath);
+	IMBRelease(_plist);
+	IMBRelease(_modificationDate);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 #pragma mark -
 #pragma mark Parsing
 
