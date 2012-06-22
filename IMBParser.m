@@ -73,7 +73,7 @@
 
 - (NSArray*) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode;
 - (void) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode identifiers:(NSMutableArray*)inIdentifiers;
-- (void) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError;
+- (BOOL) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError;
 
 @end
 
@@ -200,7 +200,7 @@
 
 
 // 
-- (void) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError
+- (BOOL) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError
 {
 	NSError* error = nil;
 
@@ -220,6 +220,7 @@
 	}
 	
 	if (outError) *outError = error;
+	return error == nil;
 }
 
 
