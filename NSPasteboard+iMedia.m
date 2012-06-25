@@ -56,8 +56,15 @@
 #pragma mark HEADERS
 
 #import "NSPasteboard+iMedia.h"
-#import "IMBPasteboardItem.h"
 #import "IMBObject.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark GLOBALS
+
+static IMBParserMessenger* sDraggingParserMessenger = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,7 +72,27 @@
 
 #pragma mark
 
-@implementation NSPasteboard (iMedia)
+@implementation NSPasteboard (iMediaInternal)
+
+// This method must be called when putting IMBObjects on teh pasteboard. Since the parserMessenger is not
+// encoded by IMBObject, we need to keep this info around separately, so that we can assign the property 
+// again when the IMBObjects are pulled from the pasteboard (see imb_IMBObjects method)...
+
+- (void) imb_setParserMessenger:(IMBParserMessenger*)inParserMessenger
+{
+	sDraggingParserMessenger = inParserMessenger;
+}
+
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@implementation NSPasteboard (iMediaPublic)
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -80,18 +107,21 @@
 }
 
 
-// Get all IMBObjects from the pasteboard. Please note that we won't go through pasteboard:item:provideDataForType:
-// here, to avoid archiving/dearchiving the IMBObject and losing some properties in the process. Instead we'll 
-// simply access the *original* IMBObject that is attached to the IMBPasteboardItem...
+// Get all IMBObjects from the pasteboard. Please note that IMBObjects are archived/unarchived without their
+// IMBPArserMessenger. However the messenger is essential so we need to restore it from teh remembered pointer
+// in sDraggingParserMessenger. This should suffice, since there can only be a single messenger involved in 
+// a dragging operation...
 
 - (NSArray*) imb_IMBObjects
 {
 	NSArray* items = self.pasteboardItems;
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:items.count];
 	
-	for (IMBPasteboardItem* item in items)
+	for (NSPasteboardItem* item in items)
 	{
-		IMBObject* object = [item object];
+		NSData* data = [item dataForType:kIMBObjectPasteboardType];
+		IMBObject* object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+		object.parserMessenger = sDraggingParserMessenger;
 		if (object) [objects addObject:object];
 	}
 	
@@ -133,4 +163,3 @@
 
 
 @end
-

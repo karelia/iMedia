@@ -51,6 +51,10 @@
 
 
 #import "IMBSkimmableObject.h"
+#import "NSObject+iMedia.h"
+#import "IMBiPhotoEventNodeObject.h"
+#import "IMBParserMessenger.h"
+#import "SBUtilities.h"
 
 
 @implementation IMBSkimmableObject
@@ -128,6 +132,50 @@
 }
 
 
+// Returns a sparse copy of self that carrys just enough data to load its thumbnail. Must be subclassed.
+// This is for performance reasons.
+//
+- (IMBSkimmableObject *)thumbnailProvider
+{
+    [self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+    return nil;
+}
+
+
+// If the image representation isn't available yet, then trigger asynchronous loading based on a sparse copy
+// of self (only vital ivars for thumbnail loading are set - this should be much faster). When the results come in,
+// copy the thumbnail from the incoming object. Do not replace the old object here, as that would unecessarily
+// upset the NSArrayController. Redrawing of the view will be triggered automatically...
+// 
+- (void) fastLoadThumbnail
+{
+	if (self.needsImageRepresentation && !self.isLoadingThumbnail)
+	{
+		_isLoadingThumbnail = YES;
+		
+        IMBParserMessenger* messenger = self.parserMessenger;
+        
+        // Use more lightweight copy of self to load thumbnail to save CPU cycles when archiving/unarchiving
+        IMBSkimmableObject *copy = [self thumbnailProvider];
+        
+        SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadThumbnailForObject:error:),copy,
+                               
+                               ^(IMBObject* inPopulatedObject,NSError* inError)
+                               {
+                                   if (inError)
+                                   {
+                                       NSLog(@"%s Error trying to load thumbnail of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+                                   }
+                                   else
+                                   {
+                                       [self storeReceivedImageRepresentation:inPopulatedObject.atomic_imageRepresentation];
+                                       _isLoadingThumbnail = NO;
+                                   }
+                               });
+	}
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark - Skimming 
@@ -150,13 +198,28 @@
 
 - (void) resetCurrentSkimmingIndex
 {
-    _currentSkimmingIndex = NSNotFound;
+    self.currentSkimmingIndex = NSNotFound;
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark - Helper
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the image location that corresponds to the objects current skimming index. Must be subclassed.
+// Note: This method must only be invoked in an XPC service (because implementations will most likely
+//       take advantage of the parser associated with this object).
+
+- (id) imageLocationForCurrentSkimmingIndex
+{
+    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %s] must be subclassed", [self className], (char *)_cmd];
+	NSLog(@"%@", errorMessage);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errorMessage userInfo:nil] raise];
+	
+	return nil;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Returns the image location that corresponds to the skimming index provided. Must be subclassed.

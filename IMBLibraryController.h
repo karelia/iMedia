@@ -120,7 +120,7 @@ extern NSString* kIMBDidCreateTopLevelNodeNotification;
 
 - (void) reload;
 
-- (void) createTopLevelNodeWithParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (void) createTopLevelNodesWithParserMessenger:(IMBParserMessenger*)inParserMessenger;
 - (void) populateNode:(IMBNode*)inNode;
 - (void) reloadNodeTree:(IMBNode*)inOldNode;
 

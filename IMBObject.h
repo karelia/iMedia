@@ -84,6 +84,7 @@ extern NSString* kIMBObjectPasteboardType;
 	NSData* _bookmark;
 	NSString* _name;
 	NSString* _identifier;
+	NSString* _persistentResourceIdentifier;
 	
 	NSDictionary* _preliminaryMetadata;
 	NSDictionary* _metadata;
@@ -109,6 +110,7 @@ extern NSString* kIMBObjectPasteboardType;
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
 @property (retain) NSString* identifier;					// Unique identifier for this object
+@property (retain) NSString* persistentResourceIdentifier;  // Unique persistent resource identifier for this object
 
 @property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
 @property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
@@ -151,6 +153,7 @@ extern NSString* kIMBObjectPasteboardType;
 @property (nonatomic,readonly) NSString* imageUID;
 @property (retain) NSString* imageRepresentationType;
 @property (retain) id imageRepresentation;	
+@property (retain) id atomic_imageRepresentation;
 @property (assign) NSUInteger imageVersion;
 @property (readonly) NSString* imageTitle;
 @property (readonly) BOOL isSelectable;
@@ -183,6 +186,11 @@ extern NSString* kIMBObjectPasteboardType;
 
 - (void) loadMetadata; 
 - (void) unloadMetadata;
+
+// Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out off cache 
+// and are thus unloaded. Please note that missing thumbnails will be replaced with a generic image...
+
+- (void) storeReceivedImageRepresentation:(id)inImageRepresentation;
 
 //- (void) postProcessLocalURL:(NSURL*)inLocalURL;
 

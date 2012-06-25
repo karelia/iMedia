@@ -192,6 +192,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (IBAction) reload:(id)inSender
+{
+	NSString* mediaType = [[IMBPanelController sharedPanelController] currentMediaType];
+	[[IMBLibraryController sharedLibraryControllerWithMediaType:mediaType] reload];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Toggle panel visibility...
 
 - (IBAction) togglePanel:(id)inSender
@@ -533,9 +543,11 @@
 {
 	for (IMBObject* object in inObjects)
 	{
-		[self.usedObjects setObject:object forKey:object.identifier];
+        if (object.persistentResourceIdentifier)
+        {
+            [self.usedObjects setObject:object forKey:object.persistentResourceIdentifier];
+        }
 	}
-	
 	IMBNodeViewController* controller = [[IMBPanelController sharedPanelController] currentNodeViewController];
 	[controller setObjectContainerViewNeedsDisplay:YES];
 }
@@ -550,7 +562,7 @@
 {
 	static CGImageRef badgeImage = NULL;
 	
-	if ([self.usedObjects valueForKey:inObject.identifier])
+	if (inObject.persistentResourceIdentifier && [self.usedObjects valueForKey:inObject.persistentResourceIdentifier])
 	{
 		if (badgeImage == NULL)
 		{

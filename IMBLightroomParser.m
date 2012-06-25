@@ -1447,10 +1447,27 @@ static NSArray* sSupportedUTIs = nil;
 #pragma mark 
 #pragma mark Object Identifiers
 
+// Identifier must account for "virtual copies" of original resources in Lightroom
 
 - (NSString*) identifierForObject:(IMBObject*)inObject
 {
 	NSString* identifier = [super identifierForObject:inObject];
+	
+	if ([inObject isKindOfClass:[IMBLightroomObject class]])
+	{
+		NSNumber* idLocal = [(IMBLightroomObject*)inObject idLocal];
+		identifier = [NSString stringWithFormat:@"%@/%@",identifier,idLocal];
+	}
+	
+	return identifier;
+}
+
+
+// Identifier must account for "virtual copies" of original resources in Lightroom
+
+- (NSString *)persistentResourceIdentifierForObject:(IMBObject *)inObject
+{
+	NSString* identifier = [super persistentResourceIdentifierForObject:inObject];
 	
 	if ([inObject isKindOfClass:[IMBLightroomObject class]])
 	{

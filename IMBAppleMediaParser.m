@@ -103,6 +103,18 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+- (void) dealloc
+{
+	IMBRelease(_appPath);
+	IMBRelease(_plist);
+	IMBRelease(_modificationDate);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 #pragma mark -
 #pragma mark Parsing
 
@@ -308,6 +320,14 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	node.parserIdentifier = self.identifier;
 	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
+	
+	// Enable FSEvents based file watching for root nodes...
+	
+	node.watcherType = kIMBWatcherTypeFSEvent;
+    
+	NSURL* url = self.mediaSource;
+	NSString* path = [[url path] stringByDeletingLastPathComponent];
+	node.watchedPath = path;
 	
 	// JUST TEMP: remove these 2 lines later...
 	
@@ -560,12 +580,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
     if ([inObject isKindOfClass:NSClassFromString(@"IMBSkimmableObject")])
     {
         IMBSkimmableObject *skimmableObject = (IMBSkimmableObject *)inObject;
-        if (skimmableObject.currentSkimmingIndex != NSNotFound)
-        {
-            skimmableObject.imageLocation = [skimmableObject imageLocationAtSkimmingIndex:skimmableObject.currentSkimmingIndex];
-        } else {
-            skimmableObject.imageLocation = [skimmableObject keyImageLocation];
-        }
+        
+        skimmableObject.imageLocation = [skimmableObject imageLocationForCurrentSkimmingIndex];
     }
     
     // IKImageBrowser can also deal with NSData type (IKImageBrowserNSDataRepresentationType)
@@ -577,6 +593,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
         {
             return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
         } else {
+            inObject.imageRepresentationType = IKImageBrowserNSDataRepresentationType;
             NSData* data = [NSData dataWithContentsOfURL:url];
             return data;
         }
@@ -787,7 +804,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSString* faceKeyPhotoKey = nil;
 	NSString* path = nil;
 	NSString* thumbnailPath = nil;
-	IMBNodeObject* object = nil;
+	IMBFaceNodeObject* object = nil;
 	NSString* subNodeType = @"Face";
 	
 	for (NSDictionary* faceDict in sortedFaces)
@@ -806,6 +823,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			subnode.name = subnodeName;
 			subnode.mediaSource = self.mediaSource;
 			subnode.parserIdentifier = self.identifier;
+			subnode.isIncludedInPopup = NO;
+			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			subnode.watcherType = kIMBWatcherTypeNone;  // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
 			// Keep a ref to face dictionary for potential later use
 			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -835,6 +855,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 			
 			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
+            [object resetCurrentSkimmingIndex];                 // Must be done *after* preliminaryMetadata is set
 			object.metadata = nil;								// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
 			

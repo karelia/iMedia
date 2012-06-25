@@ -76,6 +76,7 @@
 //@property (retain) IMBObjectViewController* objectViewController;
 @property (retain) NSMutableDictionary* usedObjects;
 
+- (IBAction) reload:(id)inSender;
 - (IBAction) togglePanel:(id)inSender;
 - (IBAction) toggleDragDestinationWindow:(id)inSender;
 - (void) concludeDragOperationForObjects:(NSArray*)inObjects;

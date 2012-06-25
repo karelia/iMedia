@@ -133,7 +133,7 @@
 		}
 	}
 	
-	return image;
+	return (CGImageRef)[NSMakeCollectable(image) autorelease];
 }
 
 

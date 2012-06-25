@@ -381,6 +381,7 @@
 		for (IMBObject* object in inNode.objects)
 		{
 			object.identifier = [inParser identifierForObject:object];
+			object.persistentResourceIdentifier = [inParser persistentResourceIdentifierForObject:object];
 		}
 		
 		for (IMBNode* subnode in inNode.subnodes)
