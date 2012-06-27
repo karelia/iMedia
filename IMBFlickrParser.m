@@ -160,6 +160,11 @@
 }
 
 
+- (NSString*) persistentResourceIdentifierForObject: (IMBObject*) inObject {
+    return [[[inObject URL] fileReferenceURL] absoluteString];
+}
+
+
 - (id) thumbnailForObject: (IMBObject*) inObject error: (NSError**) outError {
 	if (outError) *outError = nil;
     

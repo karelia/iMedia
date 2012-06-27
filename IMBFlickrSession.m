@@ -51,7 +51,7 @@
 
 
 
-#define VERBOSE
+//#define VERBOSE
 
 //	We need this to make the Flickr request don't use the run loop and block on the current thread. As discussed with Lukhnos D. Liu (author of Objective Flickr).
 @interface OFFlickrAPIRequest (private)
@@ -302,7 +302,7 @@
 		obj.name = [photoDict objectForKey:@"title"];
 		
 		// A lot of the metadata comes from the "extras" key we request
-		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
+		NSMutableDictionary* metadata = [NSMutableDictionary dictionary];
 		[metadata addEntriesFromDictionary:photoDict];		// give metaData the whole thing!
 		NSURL* webPageURL = [_flickrContextWeakRef photoWebPageURLFromDictionary:photoDict];
 		[metadata setObject:webPageURL forKey:@"webPageURL"];
@@ -321,7 +321,7 @@
 				if (nil != desc) [metadata setObject:desc forKey:@"comment"];
 			}
             #ifdef VERBOSE
-                else NSLog(@"Unable to make attributed string out of %@", descHTML);
+                else NSLog (@"Unable to make attributed string out of %@", descHTML);
             #endif
 		}
         
@@ -416,6 +416,7 @@
 		NSString* flickrSize = [self flickrSizeFromFlickrSizeSpecifier:size];
 		imageURL = [context photoSourceURLFromDictionary:photoDict size:flickrSize];
 	}
+    
 	return imageURL;	
 }
 
