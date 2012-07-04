@@ -46,30 +46,45 @@
 //	Objective Flickr
 #import <ObjectiveFlickr/ObjectiveFlickr.h>
 
-//  iMedia
-#import "IMBParser.h"
 
 
+@class IMBFlickrNode;
+@class IMBFlickrParserMessenger;
 
 /**
- *	This parser class creates nodes for a Flickr search query.
+ *	The flickr session encapsualtes all Flickr request and response handling.
  *
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 3.0
  */
-@interface IMBFlickrParser: IMBParser {
+@interface IMBFlickrSession: NSObject <OFFlickrAPIRequestDelegate> {
     @private
-	NSString* _flickrAPIKey;
-	OFFlickrAPIContext* _flickrContext;
-	NSString* _flickrSharedSecret;
+    NSError* _error;
+	OFFlickrAPIContext* __weak _flickrContextWeakRef;    
+    OFFlickrAPIRequest* _request;
+    NSDictionary* _response;
 }
+
+#pragma mark Construction
+
+- (id) initWithFlickrContext: (OFFlickrAPIContext*) context;
+
+
+#pragma mark Flickr Request Handling
+
++ (NSString*) flickrMethodForMethodCode: (NSInteger) code;
+
+- (void) executeFlickRequestForNode: (IMBFlickrNode*) node;
+
+
+#pragma mark Flickr Response Handling
+
+- (NSArray*) extractPhotosFromFlickrResponseForParserMessenger: (IMBFlickrParserMessenger*) parserMessenger;
+
 
 #pragma mark Properties
 
-///	The API key given to you by Flickr. Must be set to use this parser.
-@property (copy) NSString* flickrAPIKey;
-
-///	The shared secret given to you by Flickr. Must be set to use this parser.
-@property (copy) NSString* flickrSharedSecret;
+@property (copy) NSError* error;
+@property (copy) NSDictionary* response;
 
 @end

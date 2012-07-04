@@ -1,0 +1,21 @@
+#KNOWN BUGS AND LIMITATIONS
+
+- No spining process indicator while downloading thubnails.
+- Currently the combo view works better than IKImageBrowser view
+- IKImageBrowser issues:
+  - No incremental loding. Images are shown after _all_ thumbnails have been downloaded.
+  - Often one and the same image is showing up on several spots in the browser. The combow view is showing unique images, though.
+- Once a request has been started, there is no way to cancel it.
+  
+  
+#GENERAL
+- In SandBoxingKit/SBService-Info.plist, under the key
+
+    <key>XPCService</key>
+
+  we need
+  
+    <key>RunLoopType</key>
+  	<string>NSRunLoop</string>
+  
+  to make Objective Flickr work.

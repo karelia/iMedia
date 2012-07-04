@@ -43,33 +43,43 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-//	Objective Flickr
-#import <ObjectiveFlickr/ObjectiveFlickr.h>
-
-//  iMedia
-#import "IMBParser.h"
+//  Media Browser
+#import "IMBParserMessenger.h"
 
 
+
+@class IMBLoadMoreObject;
 
 /**
- *	This parser class creates nodes for a Flickr search query.
+ *	This parser messenger handles the Flickr parser.
  *
  *	@author  Christoph Priebe (cp)
  *	@since   iMedia 3.0
  */
-@interface IMBFlickrParser: IMBParser {
+@interface IMBFlickrParserMessenger: IMBParserMessenger {
     @private
+	IMBFlickrSizeSpecifier _desiredSize;
 	NSString* _flickrAPIKey;
-	OFFlickrAPIContext* _flickrContext;
 	NSString* _flickrSharedSecret;
+	IMBLoadMoreObject* _loadMoreButton;
 }
 
 #pragma mark Properties
+
+@property (assign) IMBFlickrSizeSpecifier desiredSize;
 
 ///	The API key given to you by Flickr. Must be set to use this parser.
 @property (copy) NSString* flickrAPIKey;
 
 ///	The shared secret given to you by Flickr. Must be set to use this parser.
 @property (copy) NSString* flickrSharedSecret;
+
+///	A button object holding the 'load more' button.
+@property (readonly) IMBLoadMoreObject* loadMoreButton;
+
+
+#pragma mark Utilities
+
+- (void) loadFlickrAPIKeyAndSharedSecretFromKeychain;
 
 @end
