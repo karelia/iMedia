@@ -1134,9 +1134,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	// If we are in list view and don't have metadata yet, then load it lazily. We'll end up here again once 
 	// they are available...
 	
-	if ([columnIdentifier isEqualToString:@"size"] && ![object isKindOfClass:[IMBNodeObject class]])
+	if ([columnIdentifier isEqualToString:@"size"] || [columnIdentifier isEqualToString:@"duration"])
 	{
-		if (object.metadata == nil)
+		if (object.metadata == nil && ![object isKindOfClass:[IMBNodeObject class]])
 		{
 			[object loadMetadata];
 		}
