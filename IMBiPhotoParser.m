@@ -705,6 +705,15 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is the "Events" album.
+
+- (BOOL) isEventsAlbum:(NSDictionary*)inAlbumDict
+{
+	return [[inAlbumDict objectForKey:@"Album Type"] isEqualToString:@"Events"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (BOOL) isFlaggedAlbum:(NSDictionary*)inAlbumDict
