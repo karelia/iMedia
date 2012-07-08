@@ -1375,155 +1375,158 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	NSString* appName = nil;;
 	NSString* type = nil;
 	
-	// For node objects (folders) provide a menu item to drill down the hierarchy...
-	
-	if ([inObject isKindOfClass:[IMBNodeObject class]])
+	if (inObject)
 	{
-		title = NSLocalizedStringWithDefaultValue(
-			@"IMBObjectViewController.menuItem.open",
-			nil,IMBBundle(),
-			@"Open",
-			@"Menu item in context menu of IMBObjectViewController");
+		// For node objects (folders) provide a menu item to drill down the hierarchy...
 		
-		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openSubNode:) keyEquivalent:@""];
-		[item setRepresentedObject:[(IMBNodeObject*)inObject representedNodeIdentifier]];
-		[item setTarget:self];
-		[menu addItem:item];
-		[item release];
-	}
-	
-	// For local file object (path or url) add menu items to open the file (in editor and/or viewer apps)...
+		if ([inObject isKindOfClass:[IMBNodeObject class]])
+		{
+			title = NSLocalizedStringWithDefaultValue(
+				@"IMBObjectViewController.menuItem.open",
+				nil,IMBBundle(),
+				@"Open",
+				@"Menu item in context menu of IMBObjectViewController");
+			
+			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openSubNode:) keyEquivalent:@""];
+			[item setRepresentedObject:[(IMBNodeObject*)inObject representedNodeIdentifier]];
+			[item setTarget:self];
+			[menu addItem:item];
+			[item release];
+		}
 		
-	else
-	{
-        NSURL *location = [inObject location];
-		if ([location isFileURL])
-		{			
-			if ([location checkResourceIsReachableAndReturnError:NULL])
+		// For local file object (path or url) add menu items to open the file (in editor and/or viewer apps)...
+			
+		else
+		{
+			NSURL *location = [inObject location];
+			if ([location isFileURL])
+			{			
+				if ([location checkResourceIsReachableAndReturnError:NULL])
+				{
+					// Open with editor app...
+					
+					if ((appPath = [IMBConfig editorAppForMediaType:self.mediaType]))
+					{
+						title = NSLocalizedStringWithDefaultValue(
+							@"IMBObjectViewController.menuItem.openWithApp",
+							nil,IMBBundle(),
+							@"Open With %@",
+							@"Menu item in context menu of IMBObjectViewController");
+						
+						NSFileManager *fileManager = [[NSFileManager alloc] init];
+						appName = [fileManager displayNameAtPath:appPath];
+						[fileManager release];
+						title = [NSString stringWithFormat:title,appName];	
+
+						item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInEditorApp:) keyEquivalent:@""];
+						[item setRepresentedObject:inObject];
+						[item setTarget:self];
+						[menu addItem:item];
+						[item release];
+					}
+					
+					// Open with viewer app...
+					
+					if ((appPath = [IMBConfig viewerAppForMediaType:self.mediaType]))
+					{
+						title = NSLocalizedStringWithDefaultValue(
+							@"IMBObjectViewController.menuItem.openWithApp",
+							nil,IMBBundle(),
+							@"Open With %@",
+							@"Menu item in context menu of IMBObjectViewController");
+						
+						NSFileManager *fileManager = [[NSFileManager alloc] init];
+						appName = [fileManager displayNameAtPath:appPath];
+						[fileManager release];
+						title = [NSString stringWithFormat:title,appName];	
+
+						item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInViewerApp:) keyEquivalent:@""];
+						[item setRepresentedObject:inObject];
+						[item setTarget:self];
+						[menu addItem:item];
+						[item release];
+					}
+					
+					// Open with default app determined by OS...
+					
+					else if ([[NSWorkspace imb_threadSafeWorkspace] getInfoForFile:[location path] application:&appPath type:&type])
+					{
+						title = NSLocalizedStringWithDefaultValue(
+							@"IMBObjectViewController.menuItem.openWithFinder",
+							nil,IMBBundle(),
+							@"Open with Finder",
+							@"Menu item in context menu of IMBObjectViewController");
+
+						item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInApp:) keyEquivalent:@""];
+						[item setRepresentedObject:inObject];
+						[item setTarget:self];
+						[menu addItem:item];
+						[item release];
+					}
+					
+					// Show in Finder...
+					
+					title = NSLocalizedStringWithDefaultValue(
+						@"IMBObjectViewController.menuItem.revealInFinder",
+						nil,IMBBundle(),
+						@"Show in Finder",
+						@"Menu item in context menu of IMBObjectViewController");
+					
+					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
+					[item setRepresentedObject:inObject];
+					[item setTarget:self];
+					[menu addItem:item];
+					[item release];
+				}
+			}
+			
+			// Remote URL object can be downloaded or opened in a web browser...
+			
+			else
 			{
-				// Open with editor app...
-				
-				if ((appPath = [IMBConfig editorAppForMediaType:self.mediaType]))
-				{
-					title = NSLocalizedStringWithDefaultValue(
-						@"IMBObjectViewController.menuItem.openWithApp",
-						nil,IMBBundle(),
-						@"Open With %@",
-						@"Menu item in context menu of IMBObjectViewController");
-					
-					NSFileManager *fileManager = [[NSFileManager alloc] init];
-					appName = [fileManager displayNameAtPath:appPath];
-					[fileManager release];
-					title = [NSString stringWithFormat:title,appName];	
-
-					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInEditorApp:) keyEquivalent:@""];
-					[item setRepresentedObject:inObject];
-					[item setTarget:self];
-					[menu addItem:item];
-					[item release];
-				}
-				
-				// Open with viewer app...
-				
-				if ((appPath = [IMBConfig viewerAppForMediaType:self.mediaType]))
-				{
-					title = NSLocalizedStringWithDefaultValue(
-						@"IMBObjectViewController.menuItem.openWithApp",
-						nil,IMBBundle(),
-						@"Open With %@",
-						@"Menu item in context menu of IMBObjectViewController");
-					
-                    NSFileManager *fileManager = [[NSFileManager alloc] init];
-					appName = [fileManager displayNameAtPath:appPath];
-                    [fileManager release];
-					title = [NSString stringWithFormat:title,appName];	
-
-					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInViewerApp:) keyEquivalent:@""];
-					[item setRepresentedObject:inObject];
-					[item setTarget:self];
-					[menu addItem:item];
-					[item release];
-				}
-				
-				// Open with default app determined by OS...
-				
-				else if ([[NSWorkspace imb_threadSafeWorkspace] getInfoForFile:[location path] application:&appPath type:&type])
-				{
-					title = NSLocalizedStringWithDefaultValue(
-						@"IMBObjectViewController.menuItem.openWithFinder",
-						nil,IMBBundle(),
-						@"Open with Finder",
-						@"Menu item in context menu of IMBObjectViewController");
-
-					item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInApp:) keyEquivalent:@""];
-					[item setRepresentedObject:inObject];
-					[item setTarget:self];
-					[menu addItem:item];
-					[item release];
-				}
-				
-				// Show in Finder...
-				
 				title = NSLocalizedStringWithDefaultValue(
-					@"IMBObjectViewController.menuItem.revealInFinder",
+					@"IMBObjectViewController.menuItem.download",
 					nil,IMBBundle(),
-					@"Show in Finder",
+					@"Download",
 					@"Menu item in context menu of IMBObjectViewController");
 				
-				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(revealInFinder:) keyEquivalent:@""];
-				[item setRepresentedObject:inObject];
+				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(download:) keyEquivalent:@""];
+				[item setRepresentedObject:location];
+				[item setTarget:self];
+				[menu addItem:item];
+				[item release];
+				
+				title = NSLocalizedStringWithDefaultValue(
+					@"IMBObjectViewController.menuItem.openInBrowser",
+					nil,IMBBundle(),
+					@"Open With Browser",
+					@"Menu item in context menu of IMBObjectViewController");
+				
+				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInBrowser:) keyEquivalent:@""];
+				[item setRepresentedObject:location];
 				[item setTarget:self];
 				[menu addItem:item];
 				[item release];
 			}
 		}
+	
+		// QuickLook...
 		
-		// Remote URL object can be downloaded or opened in a web browser...
-		
-		else
+		if ([inObject isSelectable] && [inObject previewItemURL] != nil)
 		{
 			title = NSLocalizedStringWithDefaultValue(
-				@"IMBObjectViewController.menuItem.download",
+				@"IMBObjectViewController.menuItem.quickLook",
 				nil,IMBBundle(),
-				@"Download",
+				@"Quick Look",
 				@"Menu item in context menu of IMBObjectViewController");
-			
-			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(download:) keyEquivalent:@""];
-			[item setRepresentedObject:location];
-			[item setTarget:self];
-			[menu addItem:item];
-			[item release];
-			
-			title = NSLocalizedStringWithDefaultValue(
-				@"IMBObjectViewController.menuItem.openInBrowser",
-				nil,IMBBundle(),
-				@"Open With Browser",
-				@"Menu item in context menu of IMBObjectViewController");
-			
-			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(openInBrowser:) keyEquivalent:@""];
-			[item setRepresentedObject:location];
+				
+			item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@"y"];
+			[item setKeyEquivalentModifierMask:NSCommandKeyMask];
+			[item setRepresentedObject:inObject];
 			[item setTarget:self];
 			[menu addItem:item];
 			[item release];
 		}
-	}
-	
-	// QuickLook...
-	
-	if ([inObject isSelectable] && [inObject previewItemURL] != nil)
-	{
-		title = NSLocalizedStringWithDefaultValue(
-			@"IMBObjectViewController.menuItem.quickLook",
-			nil,IMBBundle(),
-			@"Quick Look",
-			@"Menu item in context menu of IMBObjectViewController");
-			
-		item = [[NSMenuItem alloc] initWithTitle:title action:@selector(quicklook:) keyEquivalent:@"y"];
-		[item setKeyEquivalentModifierMask:NSCommandKeyMask];
-		[item setRepresentedObject:inObject];
-		[item setTarget:self];
-		[menu addItem:item];
-		[item release];
 	}
 	
 	// Badges filtering
@@ -1596,7 +1599,14 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		[delegate libraryController:self.libraryController willShowContextMenu:menu forObject:inObject];
 	}
 	
-	return menu;
+	// Return the menu...
+	
+	if ([menu numberOfItems] > 0)
+	{
+		return menu;
+	}
+	
+	return nil;
 }
 
 
