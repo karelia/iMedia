@@ -140,7 +140,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
             (photosDict = [oldAlbumList objectAtIndex:insertionIndex]))
 		{
             // Events
-            
+			
+			#warning Temporarily removed Events node to avoid problems. Jörg needs to fix this.
+ /*           
 			if ([inLibraryDict objectForKey:@"List of Rolls"])
 			{
 				NSNumber *eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
@@ -158,7 +160,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 				IMBRelease(events);
                 insertionIndex++;
 			}
-			
+*/			
 			// Faces album right after photos album
 			
 			if ([inLibraryDict objectForKey:@"List of Faces"])

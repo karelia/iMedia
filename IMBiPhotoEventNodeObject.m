@@ -111,11 +111,13 @@
 {
     [super setCurrentSkimmingIndex:currentSkimmingIndex];
     
-    if (currentSkimmingIndex != NSNotFound)
+	NSArray* keyList = [self.preliminaryMetadata objectForKey:@"KeyList"];
+	
+    if (currentSkimmingIndex < keyList.count)
     {
         // We are currently skimming on the image
         
-        _currentImageKey = [[self.preliminaryMetadata objectForKey:@"KeyList"] objectAtIndex:currentSkimmingIndex];
+        _currentImageKey = [keyList objectAtIndex:currentSkimmingIndex];
     } else {
         // We just initialized the object or left the image while skimming and thus restore the key image
         

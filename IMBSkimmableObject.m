@@ -117,7 +117,8 @@
 {
 	if (self = [super initWithCoder:inCoder])
 	{
-		_currentSkimmingIndex = [inCoder decodeIntegerForKey:@"currentSkimmingIndex"];
+		int64_t index = [inCoder decodeInt64ForKey:@"currentSkimmingIndex"];
+		self.currentSkimmingIndex = (NSUInteger)index;
 	}
 	
 	return self;
@@ -127,9 +128,27 @@
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[super encodeWithCoder:inCoder];
-	
-	[inCoder encodeInteger:_currentSkimmingIndex forKey:@"currentSkimmingIndex"];
+	int64_t index = (int64_t)self.currentSkimmingIndex;
+	[inCoder encodeInt64:index forKey:@"currentSkimmingIndex"];
 }
+
+
+//- (id) initWithCoder:(NSCoder*)inCoder
+//{
+//	if (self = [super initWithCoder:inCoder])
+//	{
+//		self.currentSkimmingIndex = [inCoder decodeIntegerForKey:@"currentSkimmingIndex"];
+//	}
+//	
+//	return self;
+//}
+//
+//
+//- (void) encodeWithCoder:(NSCoder*)inCoder
+//{
+//	[super encodeWithCoder:inCoder];
+//	[inCoder encodeInteger:self.currentSkimmingIndex forKey:@"currentSkimmingIndex"];
+//}
 
 
 // Returns a sparse copy of self that carrys just enough data to load its thumbnail. Must be subclassed.
