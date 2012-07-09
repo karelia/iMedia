@@ -1096,7 +1096,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	[panel beginSheetModalForWindow:[ibSplitView window] completionHandler:^(NSInteger result) {
         
         // Add a root node for this each folder and the reload the library...
-        if (result == NSOKButton)
+        if (result == NSFileHandlingPanelOKButton)
         {
             NSArray* paths = [panel filenames];
             for (NSString* path in paths)
