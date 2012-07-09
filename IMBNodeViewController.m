@@ -1098,9 +1098,10 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
         // Add a root node for this each folder and the reload the library...
         if (result == NSFileHandlingPanelOKButton)
         {
-            NSArray* paths = [panel filenames];
-            for (NSString* path in paths)
+            NSArray *urls = [panel URLs];
+            for (NSURL *aURL in urls)
             {
+                NSString *path = [aURL path];
                 IMBParser* parser = [self.libraryController addCustomRootNodeForFolder:path];
                 self.selectedNodeIdentifier = [parser identifierForPath:path];
             }	
