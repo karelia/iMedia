@@ -364,7 +364,6 @@
 		D0FC9518108213A800973FEE /* IMBiTunesVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0FC9516108213A800973FEE /* IMBiTunesVideoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0FC9519108213A800973FEE /* IMBiTunesVideoParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0FC9517108213A800973FEE /* IMBiTunesVideoParser.m */; };
 		FC30D0261309777300463E52 /* IMBFlickrParser.m in Sources */ = {isa = PBXBuildFile; fileRef = FC30D0251309777300463E52 /* IMBFlickrParser.m */; };
-		FC8E8ED3157CFFA200B533B3 /* iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0B87F21103D998D00C48C6F /* iMedia.h */; };
 		FCD9ABB410C677FF0092F441 /* IMBLoadMoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */; };
 		FCD9ABB510C677FF0092F441 /* IMBLoadMoreObject.m in Sources */ = {isa = PBXBuildFile; fileRef = FCD9ABB310C677FF0092F441 /* IMBLoadMoreObject.m */; };
 /* End PBXBuildFile section */
@@ -1550,7 +1549,6 @@
 				8FF314C515063F6900A76AA2 /* IMBLightroom4Parser.h in Headers */,
 				8FF314CC15064BC700A76AA2 /* IMBLightroom4VideoParser.h in Headers */,
 				8FA4275E154EB93C00F75E13 /* IMBLightroom3or4Parser.h in Headers */,
-				FC8E8ED3157CFFA200B533B3 /* iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1603,7 +1601,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "iMedia" */;
 			compatibilityVersion = "Xcode 3.2";
