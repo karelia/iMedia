@@ -228,7 +228,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-- (NSImage*) iconForFolderID:(int)aFolderID;
+- (NSImage*) iconForFolderID:(NSInteger)aFolderID;
 {
 	NSImage *result = nil;
 	NSString* filename = nil;
