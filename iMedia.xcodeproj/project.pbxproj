@@ -795,6 +795,7 @@
 		FC30D0251309777300463E52 /* IMBFlickrParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrParser.m; sourceTree = "<group>"; };
 		FC32F01F130C47F100966FFD /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FC850F8D14C71EEE00CC6ACA /* cs */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FC8E8ED2157CFFA200B533B3 /* no */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = no; path = no.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FCAA9638134227D700EA1A3A /* nl */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLoadMoreObject.h; sourceTree = "<group>"; };
 		FCD9ABB310C677FF0092F441 /* IMBLoadMoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLoadMoreObject.m; sourceTree = "<group>"; };
@@ -1607,7 +1608,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "iMedia" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1627,6 +1628,7 @@
 				pt_BR,
 				zh_CN,
 				cs,
+				no,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* iMedia */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -1969,6 +1971,7 @@
 				CE1DE6481386E2E600C3F780 /* pt_BR */,
 				CE87008C146204E300CAFED2 /* zh_CN */,
 				FC850F8D14C71EEE00CC6ACA /* cs */,
+				FC8E8ED2157CFFA200B533B3 /* no */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1988,7 +1991,6 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
-				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -2006,7 +2008,6 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
-				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -2079,7 +2080,6 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
-				SDKROOT = macosx10.6;
 				VALID_ARCHS = "i386 x86_64";
 				WRAPPER_EXTENSION = framework;
 			};
