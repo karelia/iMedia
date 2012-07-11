@@ -128,11 +128,9 @@
 	imageRect.origin.y -= kImageOriginYOffset;
 	imageRect.size = [_image size];
 
-	if (inFlipped)
-		imageRect.origin.y += ceil(0.5 * (inBounds.size.height + imageRect.size.height));
-	else
-		imageRect.origin.y += ceil(0.5 * (inBounds.size.height - imageRect.size.height));
-
+    // Vertically center the image
+	imageRect.origin.y += ceil(0.5 * (inBounds.size.height - imageRect.size.height));
+    
 	return imageRect;
 }
 
@@ -213,14 +211,14 @@
 	if (_image)
 	{
 		NSRect imageRect = [self imageRectForBounds:inFrame flipped:isFlipped];
-		[_image compositeToPoint:imageRect.origin operation:NSCompositeSourceOver];
+        [_image drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
 
 		NSRect titleRect = [self titleRectForBounds:inFrame flipped:isFlipped];
 		[super drawWithFrame:titleRect inView:inControlView];
 		if (_extraImage)	// show it at the right edge of the text area
 		{
-			NSPoint pointForExtraImage = NSMakePoint(NSMaxX(titleRect)-16.0, NSMinY(imageRect));
-			[_extraImage compositeToPoint:pointForExtraImage operation:NSCompositeSourceOver];
+			NSRect rectForExtraImage = {NSMakePoint(NSMaxX(titleRect)-16.0, NSMinY(imageRect)), [_extraImage size]};
+			[_extraImage drawInRect:rectForExtraImage fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
 		}
  
    }
