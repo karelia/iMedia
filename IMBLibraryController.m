@@ -619,7 +619,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		if (theNode.watcherType == kIMBWatcherTypeKQueue)
 			[self.watcherUKKQueue addPath:watchedPath];
 		else if (theNode.watcherType == kIMBWatcherTypeFSEvent)
-			[self.watcherFSEvents addPath:watchedPath];
+			[self.watcherFSEvents addURL:[NSURL fileURLWithPath:watchedPath] error:NULL];
 	}
 }
 

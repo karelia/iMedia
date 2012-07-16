@@ -175,26 +175,36 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 }
 
 // -----------------------------------------------------------------------------
-//  parentFolderForFilePath:
+//  pathToParentFolderOfFile:error:
 //		We need to supply a folder to FSEvents, so if we were passed a path  
 //		to a file, then convert it to the parent folder path...
 // -----------------------------------------------------------------------------
 
-- (NSString*) pathToParentFolderOfFile:(NSString*)inPath
+- (NSString*) pathToParentFolderOfFile:(NSURL *)url error:(NSError **)error;
 {
-	BOOL directory;
-	BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:inPath isDirectory:&directory];
-	BOOL package = [[NSWorkspace sharedWorkspace] isFilePackageAtPath:inPath];
-	
-	if (exists && directory==NO && package==NO)
+    NSDictionary *properties = [url resourceValuesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey, NSURLIsPackageKey, nil] error:error];
+    if (!properties) return nil;
+    
+    if (![[properties objectForKey:NSURLIsDirectoryKey] boolValue] || [[properties objectForKey:NSURLIsPackageKey] boolValue])
 	{
-		inPath = [inPath stringByDeletingLastPathComponent];
+		NSURL *parent;
+        if ([url getResourceValue:&parent forKey:NSURLParentDirectoryURLKey error:error])
+        {
+            return [self pathToParentFolderOfFile:parent error:error];
+        }
+        else
+        {
+            return nil;
+        }
 	}
 	
-	return inPath;		
+    NSAssert([url isFileURL], @"Somehow a non-file URL slipped past -resourceValuesForKeys:error:");
+	NSString *result = [url path];
+    NSAssert(result, @"Somehow we have a file URL with nil path: %@", url); // I think this might be possible with file ref URLs
+    return result;
 }
 
-- (BOOL) _registerFSEventsObserverForPath:(NSString*)path
+- (BOOL) _registerFSEventsObserverForPath:(NSString*)path error:(NSError **)error
 {
 	BOOL succeeded = YES;
 	FSEventStreamContext context;
@@ -209,14 +219,34 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 
 	if (stream)
 	{
-		FSEventStreamScheduleWithRunLoop(stream,CFRunLoopGetMain(),kCFRunLoopCommonModes);
-		FSEventStreamStart(stream);
-
-		[eventStreams setObject:[NSValue valueWithPointer:stream] forKey:path];
-	}	
+        CFRunLoopRef runLoop = CFRunLoopGetMain();
+		FSEventStreamScheduleWithRunLoop(stream, runLoop, kCFRunLoopCommonModes);
+		succeeded = FSEventStreamStart(stream);
+        
+        if (succeeded)
+        {
+            [eventStreams setObject:[NSValue valueWithPointer:stream] forKey:path];
+        }
+        else
+        {
+            FSEventStreamUnscheduleFromRunLoop(stream, runLoop, kCFRunLoopCommonModes);
+            FSEventStreamRelease(stream);
+            
+            if (error)
+            {
+                NSDictionary *userInfo = [NSDictionary dictionaryWithObject:path forKey:NSFilePathErrorKey];
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:userInfo];
+            }
+        }
+	}
 	else
 	{
-		NSLog( @"UKFSEventsWatcher _registerFSEventObserverForPath:%@ failed",path);
+		if (error)
+        {
+            NSDictionary *userInfo = [NSDictionary dictionaryWithObject:path forKey:NSFilePathErrorKey];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:userInfo];
+        }
+        
 		succeeded = NO;
 	}
 	
@@ -224,14 +254,15 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 }
 
 // -----------------------------------------------------------------------------
-//  addPath:
+//  addURL:error:
 //		Start watching the folder at the specified path, or if we are already watching
 //		the path, increase its count in eventStreamPaths
 // -----------------------------------------------------------------------------
 
-- (void) addPath:(NSString*)path
+- (BOOL)addURL:(NSURL *)url error:(NSError **)error;
 {
-	path = [self pathToParentFolderOfFile:path];
+	NSString *path = [self pathToParentFolderOfFile:url error:error];
+    if (!path) return NO;
 
 	// Do we already have a stream scheduled for this path?
 	// NOTE: Synchronize the whole thing so we don't run the risk of the current count changing while 
@@ -243,13 +274,15 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 		NSUInteger currentRegistrationCount = [eventStreamPaths countForObject:path];
 		if (currentRegistrationCount == 0)
 		{
-			succeeded = [self _registerFSEventsObserverForPath:path];
+			succeeded = [self _registerFSEventsObserverForPath:path error:error];
 		}		
 		
 		if (succeeded)
 		{
 			[eventStreamPaths addObject:path];
 		}
+        
+        return succeeded;
 	}
 }
 
@@ -270,7 +303,9 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 {
 	// Ensure we are removing a folder, not a file inside the desired folder. This matches
 	// the normalization done in addPath to make sure removePath for the same path will succeed.
-	path = [self pathToParentFolderOfFile:path];
+    // FIXME: There's no guarantee from the filesystem that -pathToParentFolderOfFile:… will return the same result when called again, so really we need a better mechanism for this
+	path = [self pathToParentFolderOfFile:[NSURL fileURLWithPath:path] error:NULL];
+    if (!path) return;
 
     NSValue* valueToRemove = nil;
 		

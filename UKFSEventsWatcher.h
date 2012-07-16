@@ -44,7 +44,7 @@
 - (void) setFSEventStreamCreateFlags:(FSEventStreamCreateFlags)flags;
 - (FSEventStreamCreateFlags) fsEventStreamCreateFlags;
 
-// UKFileWatcher defines the methods: addPath: removePath: removeAllPaths: and delegate accessors.
+// UKFileWatcher defines the methods: addURL:error: removePath: removeAllPaths: and delegate accessors.
 //
 // Our implementation differs from the basic UKFileWatcher protocol in that calls to 
 // addPath and removePath are expected to be balanced so that if for example addPath:
@@ -55,7 +55,7 @@
 // of the number of times addPath: has been called on a given path.
 //
 
-- (void) addPath: (NSString*)path;
+- (BOOL)addURL:(NSURL *)url error:(NSError **)error;
 - (void) removePath: (NSString*)path;
 - (void)	removeAllPaths;
 
