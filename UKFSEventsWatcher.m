@@ -88,7 +88,7 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
     if (self = [super init])
 	{
 		latency = 1.0;
-		flags = kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagWatchRoot;
+		flags = kFSEventStreamCreateFlagUseCFTypes;
 		eventStreams = [[NSMutableDictionary alloc] init];
 		eventStreamPaths = [[NSCountedSet alloc] init];
     }
