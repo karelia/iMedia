@@ -135,10 +135,10 @@
 }
 
 
-- (NSString*) demoSongsPath
-{
-	return @"/Library/Application Support/GarageBand/GarageBand Demo Songs/GarageBand Demo Songs/";
-}
+//- (NSString*) demoSongsPath
+//{
+//	return @"/Library/Application Support/GarageBand/GarageBand Demo Songs/";
+//}
 
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
@@ -170,27 +170,27 @@
 			[subnodes addObject:subnode];
 		}
 		
-		NSString* demoSongsPath = [self demoSongsPath];
-        if ([fileManager fileExistsAtPath:demoSongsPath])
-		{
-			NSString* demoSongsName = NSLocalizedStringWithDefaultValue(
-				@"IMBGarageBandParser.demosongs.name",
-				nil,IMBBundle(),
-				@"Demo Songs",
-				@"Name of node in IMBGarageBandParser");
-
-			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
-			subnode.identifier = [self identifierForPath:userSongsPath];
-			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:demoSongsPath isDirectory:YES] error:NULL];
-			subnode.name = demoSongsName;
-			subnode.mediaType = self.mediaType;
-			subnode.mediaSource = [NSURL fileURLWithPath:demoSongsPath];
-			subnode.parserIdentifier = self.identifier;
-			subnode.isTopLevelNode = NO;
-			subnode.isIncludedInPopup = YES;
-			subnode.isLeafNode = YES;
-			[subnodes addObject:subnode];
-		}
+//		NSString* demoSongsPath = [self demoSongsPath];
+//        if ([fileManager fileExistsAtPath:demoSongsPath])
+//		{
+//			NSString* demoSongsName = NSLocalizedStringWithDefaultValue(
+//				@"IMBGarageBandParser.demosongs.name",
+//				nil,IMBBundle(),
+//				@"Demo Songs",
+//				@"Name of node in IMBGarageBandParser");
+//
+//			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+//			subnode.identifier = [self identifierForPath:userSongsPath];
+//			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:demoSongsPath isDirectory:YES] error:NULL];
+//			subnode.name = demoSongsName;
+//			subnode.mediaType = self.mediaType;
+//			subnode.mediaSource = [NSURL fileURLWithPath:demoSongsPath];
+//			subnode.parserIdentifier = self.identifier;
+//			subnode.isTopLevelNode = NO;
+//			subnode.isIncludedInPopup = YES;
+//			subnode.isLeafNode = YES;
+//			[subnodes addObject:subnode];
+//		}
 
         [fileManager release];
 		inNode.objects = [NSMutableArray arrayWithCapacity:0];	// Important to mark node as populated!
