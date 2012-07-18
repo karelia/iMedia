@@ -54,9 +54,7 @@
 
 // SANDBOXING: Requires read-only temporary entitlement, relative to home directory for:
 //  * /Library/Containers/org.mozilla.firefox/Data/Library/Application Support/Firefox/Profiles/
-//  * /Library/Containers/org.mozilla.firefox/Data/Library/Firefox/Profiles/
 //  * /Library/Application Support/Firefox/Profiles/
-//  * /Library/Firefox/Profiles/
 
 @interface IMBFireFoxParser : IMBParser 
 {

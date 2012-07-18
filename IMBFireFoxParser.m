@@ -124,11 +124,7 @@
 
     NSArray *libraryFolders = [NSArray arrayWithObjects:    // as taken from .h
                                [homeDir URLByAppendingPathComponent:@"Library/Containers/org.mozilla.firefox/Data/Library/Application Support/Firefox/Profiles/"],
-                               [homeDir URLByAppendingPathComponent:@"Library/Containers/org.mozilla.firefox/Data/Library/Firefox/Profiles"],
                                [homeDir URLByAppendingPathComponent:@"Library/Application Support/Firefox/Profiles/"],
-                               [homeDir URLByAppendingPathComponent:@"Library/Firefox/Profiles/"],
-                               [NSURL fileURLWithPath:@"/Library/Application Support/Firefox/Profiles" isDirectory:YES],
-                               [NSURL fileURLWithPath:@"/Library/Firefox/Profiles" isDirectory:YES],
                                nil];
     
 	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
