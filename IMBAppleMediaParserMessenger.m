@@ -186,6 +186,8 @@
                               
                               [fileManager release];
                           }
+						  
+						if (recentLibraries) CFRelease(recentLibraries);
                       }
                   });
 	
