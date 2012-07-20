@@ -55,9 +55,12 @@
 #import "IMBParserController.h"
 #import "IMBParser.h"
 #import "IMBApertureParserMessenger.h"
+#import "NSFileManager+iMedia.h"
+#import "IMBAppleMediaParser.h"
+#import "IMBConfig.h"
+#import "SBUtilities.h"
 
 
-//----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -274,5 +277,82 @@ return kIMBMediaTypeImage;
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#warning TODO Jörg, take a look at this
+
+// This override of the same method in the superclass is just temporary, because Aperture 3.3 apparently doesn't
+// reliably write its library paths to com.apple.iApps.plist anymore. However, this information can be found in
+// com.apple.Aperture.plist, so we'll look in both places, combine the results (filtering out any duplicates) and
+// proceed from there. 
+
+// TODO: Jörg, please take a look at this and find a better workable solution for the future...
+
+- (NSArray*) parserInstancesWithError:(NSError**)outError
+{
+    Class messengerClass = [self class];
+    NSMutableArray *parsers = [messengerClass parsers];
+    dispatch_once([messengerClass onceTokenRef],
+	^{
+		if ([messengerClass isInstalled])
+		{
+			CFArrayRef recentLibraries1 = SBPreferencesCopyAppValue((CFStringRef)[messengerClass librariesKey],(CFStringRef)@"com.apple.iApps");
+			CFArrayRef recentLibraries2 = SBPreferencesCopyAppValue((CFStringRef)@"RecentLibraries",(CFStringRef)@"com.apple.Aperture");
+			NSMutableArray* libraries = [NSMutableArray arrayWithArray:(NSArray*)recentLibraries1];
+
+			for (NSString* path in (NSArray*)recentLibraries2)
+			{
+				if ([path hasSuffix:@".aplibrary"])
+				{
+					path = [path stringByAppendingPathComponent:@"ApertureData.xml"];
+					
+					if ([libraries indexOfObject:path] == NSNotFound)
+					{
+						[libraries addObject:path];
+					}
+				}
+			}
+
+			for (NSString* library in libraries)
+			{
+				NSURL* url = [NSURL URLWithString:library];
+				NSString* path = [url path];
+				NSFileManager *fileManager = [[NSFileManager alloc] init];
+
+				BOOL changed;
+				if ([fileManager imb_fileExistsAtPath:&path wasChanged:&changed])
+				{
+					// Create a parser instance preconfigure with that path...
+
+					IMBAppleMediaParser* parser = (IMBAppleMediaParser*)[self newParser];
+
+					parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
+					parser.mediaType = self.mediaType;
+					parser.mediaSource = [NSURL fileURLWithPath:path];
+					parser.appPath = [messengerClass appPath];
+
+					[parsers addObject:parser];
+					[parser release];
+
+					// Exclude enclosing folder from being displayed by IMBFolderParser...
+
+					NSString* libraryPath = [path stringByDeletingLastPathComponent];
+					[IMBConfig registerLibraryPath:libraryPath];
+				}
+
+				[fileManager release];
+			}
+
+			if (recentLibraries1) CFRelease(recentLibraries1);
+			if (recentLibraries2) CFRelease(recentLibraries2);
+		}
+	});
+	
+	return (NSArray*)parsers;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @end
