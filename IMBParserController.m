@@ -355,7 +355,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 {
 	if (_loadedParsers != nil && _loadingCustomParsers == NO)
 	{
-		NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
+		NSMutableDictionary* prefs = [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:[self class]]];
 		NSMutableArray* customParsers = [NSMutableArray array];
 		
 		for (NSString* mediaType in _loadedParsers)
@@ -391,7 +391,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 {
 	_loadingCustomParsers = YES;
 	
-	NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
+	NSDictionary* prefs = [IMBConfig prefsForClass:[self class]];
 	NSArray* customParsers = [prefs objectForKey:@"customParsers"];
 	
 	for (NSDictionary* info in customParsers)
