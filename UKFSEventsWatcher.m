@@ -286,6 +286,11 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 	}
 }
 
+- (void)addPath:(NSString *)path
+{
+    [self addURL:[NSURL fileURLWithPath:path] error:NULL];
+}
+
 - (void) _unregisterFSEventStream:(FSEventStreamRef)stream
 {
 	FSEventStreamStop(stream);

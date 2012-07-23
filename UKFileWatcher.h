@@ -30,7 +30,7 @@
 
 // +(id) sharedFileWatcher;			// Singleton accessor. Not officially part of the protocol, but use this name if you provide a singleton.
 
-- (BOOL)addURL:(NSURL *)url error:(NSError **)error;
+-(void) addPath: (NSString*)path;
 -(void) removePath: (NSString*)path;
 -(void)	removeAllPaths;
 
