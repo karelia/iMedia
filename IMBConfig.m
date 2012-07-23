@@ -134,9 +134,9 @@ static BOOL sUseGlobalViewType = NO;
 // Return a mutable copy of the class specific preference dictionary. If it doesn't exist yet, then return an
 // empty dictionary...
 
-+ (NSMutableDictionary*) prefsForClass:(Class)inClass
++ (NSDictionary *)prefsForClass:(Class)inClass
 {
-	return [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:NSStringFromClass(inClass)]];
+	return [self prefsValueForKey:NSStringFromClass(inClass)];
 }
 
 
