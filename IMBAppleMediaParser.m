@@ -136,13 +136,41 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		NSUInteger insertionIndex = [self indexOfAllPhotosAlbumInAlbumList:oldAlbumList];
         NSDictionary *photosDict = nil;
 		
+        NSDictionary *eventsDict = nil;
+		
+        // Starting Aperture 3.3 there is no "Photos" album in ApertureData.xml anymore, so we must reconstruct it ourselves
+        
+        if (insertionIndex == NSNotFound)
+        {
+            // Photos album right after Projects in Aperture (Projects synonym to Events)
+            // Photos album in iPhoto should be already there
+            
+            insertionIndex = [self indexOfEventsAlbumInAlbumList:oldAlbumList];
+            
+            if (insertionIndex != NSNotFound &&
+                (eventsDict = [oldAlbumList objectAtIndex:insertionIndex]))
+            {
+				NSNumber *allPhotosId = [NSNumber numberWithUnsignedInt:ALL_PHOTOS_NODE_ID];
+				NSString *allPhotosName = NSLocalizedStringWithDefaultValue(@"IMB.ApertureParser.allPhotos", nil, IMBBundle(), @"Photos", @"All photos node shown in Aperture library");
+                NSDictionary* allPhotos = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                           allPhotosId,   @"AlbumId",
+                                           allPhotosName, @"AlbumName",
+                                           @"94",  @"Album Type",
+                                           [eventsDict objectForKey:@"Parent"], @"Parent", nil];
+				
+                // events album right before photos album
+                
+				[newAlbumList insertObject:allPhotos atIndex:insertionIndex];
+				IMBRelease(allPhotos);
+                insertionIndex++;
+            }
+        }
+        
 		if (insertionIndex != NSNotFound &&
             (photosDict = [oldAlbumList objectAtIndex:insertionIndex]))
 		{
             // Events
 			
-			#warning Temporarily removed Events node to avoid problems. Jörg needs to fix this.
- /*           
 			if ([inLibraryDict objectForKey:@"List of Rolls"])
 			{
 				NSNumber *eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
@@ -160,7 +188,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 				IMBRelease(events);
                 insertionIndex++;
 			}
-*/			
+			
 			// Faces album right after photos album
 			
 			if ([inLibraryDict objectForKey:@"List of Faces"])
@@ -539,6 +567,18 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 // Returns whether inAlbumDict is the "Photos" album. Must be subclassed.
 
 - (BOOL) isAllPhotosAlbum:(NSDictionary*)inAlbumDict
+{
+	NSLog(@"%s Please use a custom subclass of IMBAppleMediaParser...",__FUNCTION__);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBAppleMediaParser" userInfo:nil] raise];
+	
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is the "Events" (aka "Projects") album. Must be subclassed.
+
+- (BOOL) isEventsAlbum:(NSDictionary*)inAlbumDict
 {
 	NSLog(@"%s Please use a custom subclass of IMBAppleMediaParser...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBAppleMediaParser" userInfo:nil] raise];
@@ -951,6 +991,16 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 - (NSUInteger) indexOfAllPhotosAlbumInAlbumList:(NSArray*)inAlbumList
 {
     return [self indexOfAlbumInAlbumList:inAlbumList passingTest:@selector(isAllPhotosAlbum:)];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the index of the projects album ("Projects") in given album list
+// Projects are to Aperture what events are to iPhoto - hence the method name for coherence
+
+- (NSUInteger) indexOfEventsAlbumInAlbumList:(NSArray*)inAlbumList
+{
+    return [self indexOfAlbumInAlbumList:inAlbumList passingTest:@selector(isEventsAlbum:)];
 }
 
 
