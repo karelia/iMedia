@@ -117,11 +117,11 @@
     {
         // We are currently skimming on the image
         
-        _currentImageKey = [keyList objectAtIndex:currentSkimmingIndex];
+        self.currentImageKey = [keyList objectAtIndex:currentSkimmingIndex];
     } else {
         // We just initialized the object or left the image while skimming and thus restore the key image
         
-        _currentImageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
+        self.currentImageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
     }
 }
 
