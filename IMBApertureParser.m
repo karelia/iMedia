@@ -121,6 +121,16 @@
     return @"Aperture";
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the key under which the master resource is found inside its metadata dictionary in ApertureData.xml
+// (this key may vary for different media types. Default is the key for image media types).
+// Override for specific media type parsers if necessary.
+
++ (NSString *)objectLocationKey
+{
+    return @"ImagePath";
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -705,7 +715,7 @@
 			
 				if (objectDict!=nil && [self shouldUseObject:mediaType])
 				{
-					NSString* path = [objectDict objectForKey:@"ImagePath"];
+					NSString* path = [objectDict objectForKey:[[self class] objectLocationKey]];
 					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [objectDict objectForKey:@"Caption"];
                     NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:objectDict];
@@ -725,7 +735,7 @@
 					object.index = index++;
 
 					object.imageLocation = thumbPath ? [NSURL fileURLWithPath:thumbPath isDirectory:NO] : object.location;
-					object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+					object.imageRepresentationType = [self requestedImageRepresentationType];
 					object.imageRepresentation = nil;
 				}
 				
