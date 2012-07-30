@@ -296,18 +296,20 @@
 		NSMutableArray* objects = [inCoder decodeObjectForKey:@"objects"];
 		if (objects) self.objects = objects;
 		
+#warning TODO Peter, to account for retina displays I returned to keeping all image representations. We may have to cash icons in the app now. Did not notice any performance decrease though
+        
 		// Optimization: The icon is built from a single (small) image representation. See comments in method below...
 		
-//		self.icon = [inCoder decodeObjectForKey:@"icon"];
+		self.icon = [inCoder decodeObjectForKey:@"icon"];
 
-		NSImageRep* iconRepresentation = [inCoder decodeObjectForKey:@"iconRepresentation"];
-		
-		if (iconRepresentation)
-		{
-			NSImage* icon = [[[NSImage alloc] init] autorelease];
-			[icon addRepresentation:iconRepresentation];
-			self.icon = icon;
-		}
+//		NSImageRep* iconRepresentation = [inCoder decodeObjectForKey:@"iconRepresentation"];
+//		
+//		if (iconRepresentation)
+//		{
+//			NSImage* icon = [[[NSImage alloc] init] autorelease];
+//			[icon addRepresentation:iconRepresentation];
+//			self.icon = icon;
+//		}
 	}
 	
 	return self;
@@ -342,28 +344,30 @@
 	if (self.subnodes) [inCoder encodeObject:self.subnodes forKey:@"subnodes"];
 	if (self.objects) [inCoder encodeObject:self.objects forKey:@"objects"];
 	
-	// Encoding the icon needs special attention. We only need 16x16 pixels, but the NSImage contains multiple 
+#warning TODO Peter, to account for retina displays I returned to keeping all image representations. We may have to cash icons in the app now. Did not notice any performance decrease though
+    
+	// Encoding the icon needs special attention. We only need 16x16 pixels, but the NSImage contains multiple
 	// high resolution representations. Instead of encoding them all, we'll simply encode the smallest one...
 	
-//	[inCoder encodeObject:self.icon forKey:@"icon"];
+	[inCoder encodeObject:self.icon forKey:@"icon"];
 
-	NSImage* icon = self.icon;
-	NSArray* reps = [icon representations];
-	NSImageRep* smallestRep = nil;
-	CGFloat smallestWidth = HUGE_VALF;
-	
-	for (NSImageRep* rep in reps)
-	{
-		NSSize size = rep.size;
-		
-		if (size.width < smallestWidth)
-		{
-			smallestWidth = size.width;
-			smallestRep = rep;
-		}
-	}
-	
-	if (smallestRep) [inCoder encodeObject:smallestRep forKey:@"iconRepresentation"];
+//	NSImage* icon = self.icon;
+//	NSArray* reps = [icon representations];
+//	NSImageRep* smallestRep = nil;
+//	CGFloat smallestWidth = HUGE_VALF;
+//	
+//	for (NSImageRep* rep in reps)
+//	{
+//		NSSize size = rep.size;
+//		
+//		if (size.width < smallestWidth)
+//		{
+//			smallestWidth = size.width;
+//			smallestRep = rep;
+//		}
+//	}
+//	
+//	if (smallestRep) [inCoder encodeObject:smallestRep forKey:@"iconRepresentation"];
 }
 
 
