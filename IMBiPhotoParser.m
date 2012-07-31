@@ -714,6 +714,15 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is an "Event" album.
+
+- (BOOL) isEventAlbum:(NSDictionary*)inAlbumDict
+{
+	return [[inAlbumDict objectForKey:@"Album Type"] isEqualToString:@"Event"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (BOOL) isFlaggedAlbum:(NSDictionary*)inAlbumDict
@@ -726,7 +735,8 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
+// NOTE: This method is neither being used to add events sub nodes nor to add faces sub nodes.
+//       This is done in their respective populate methods.
 
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
 {
@@ -749,7 +759,8 @@
 		// parent always from same id space for non top-level albums
 		NSString* parentIdentifier = parentId ? [self identifierForId:parentId inSpace:albumIdSpace] : [self identifierForPath:@"/"];
 		
-		if ([self shouldUseAlbumType:albumType] && 
+		if (![self isEventAlbum:albumDict] &&
+            [self shouldUseAlbumType:albumType] &&
 			[inParentNode.identifier isEqualToString:parentIdentifier] && 
 			[self shouldUseAlbum:albumDict images:inImages])
 		{
