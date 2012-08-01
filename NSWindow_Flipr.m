@@ -259,7 +259,7 @@
 	CGFloat width = radius;
 	CGFloat height = originalRect.size.height/2;
 	CGFloat dist = 1600; // visual distance to flipping window, 1600 looks about right. You could try radius*5, too.
-	CGFloat angle = direction*3.14159265358979323846264338327950288*time;
+	CGFloat angle = direction*M_PI*time;
 	CGFloat px1 = radius*cos(angle);
 	CGFloat pz = radius*sin(angle);
 	CGFloat pz1 = dist+pz;

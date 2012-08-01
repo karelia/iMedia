@@ -193,7 +193,7 @@ enum IMBMouseOperation
 {
 	id object = [inNotification object];
 	BOOL showTitle = [object boolValue];
-	int mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
+	NSUInteger mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
 	[self setCellsStyleMask: mask];
 }
 
