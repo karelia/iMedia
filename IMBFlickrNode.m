@@ -256,7 +256,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 }
 
 
-+ (NSString*) descriptionOfLicense: (int) aLicenseNumber {
++ (NSString*) descriptionOfLicense: (NSInteger) aLicenseNumber {
 	NSString* result = nil;
 	switch (aLicenseNumber)
 	{

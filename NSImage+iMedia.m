@@ -165,7 +165,7 @@
 	NSString* path = [inMetadata objectForKey:@"path"];
 	NSString* comment = [inMetadata objectForKey:@"comment"];
 	NSArray* keywords = [inMetadata objectForKey:@"iMediaKeywords"];
-	int rating = [[inMetadata objectForKey:@"Rating"] intValue];
+	NSInteger rating = [[inMetadata objectForKey:@"Rating"] integerValue];
 
 	if (comment == nil) comment = [inMetadata objectForKey:@"Comment"];	// uppercase from iPhoto
 	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];

@@ -195,9 +195,9 @@
 
 - (CGImageRef) processedImageFromImage:(CGImageRef)inImage
 {
-	long imgWidth = CGImageGetWidth(inImage);
-	long imgHeight = CGImageGetHeight(inImage);
-	long squareSize = MIN(imgWidth, imgHeight);
+	size_t imgWidth = CGImageGetWidth(inImage);
+	size_t imgHeight = CGImageGetHeight(inImage);
+	size_t squareSize = MIN(imgWidth, imgHeight);
 	
 	CGContextRef bitmapContext = CGBitmapContextCreate(NULL, 
 													   squareSize, 
@@ -211,7 +211,7 @@
 	CGContextClearRect(bitmapContext, bounds);
 	
 	// Set clipping path
-	float cornerRadius = squareSize / 10.0;
+	CGFloat cornerRadius = squareSize / 10.0;
 	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithGraphicsPort:bitmapContext flipped:NO]];
 	[[NSBezierPath bezierPathWithRoundedRect:NSRectFromCGRect(bounds) xRadius: cornerRadius yRadius:cornerRadius] addClip];
 	
