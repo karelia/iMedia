@@ -175,7 +175,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	NSMutableDictionary* stateDict = [NSMutableDictionary dictionary];
 	[stateDict setObject:expandedNodeIdentifiers forKey:@"expandedNodeIdentifiers"];
 
-	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+	NSMutableDictionary* classDict = [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:self.class]];
 	[classDict setObject:stateDict forKey:kIMBMediaTypeImage];
 	[classDict setObject:stateDict forKey:kIMBMediaTypeAudio];
 	[classDict setObject:stateDict forKey:kIMBMediaTypeMovie];
@@ -427,14 +427,14 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (NSMutableDictionary*) _preferences
 {
-	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+	NSDictionary* classDict = [IMBConfig prefsForClass:self.class];
 	return [NSMutableDictionary dictionaryWithDictionary:[classDict objectForKey:self.mediaType]];
 }
 
 
 - (void) _setPreferences:(NSMutableDictionary*)inDict
 {
-	NSMutableDictionary* classDict = [IMBConfig prefsForClass:self.class];
+	NSMutableDictionary* classDict = [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:self.class]];
 	if (inDict) [classDict setObject:inDict forKey:self.mediaType];
 	[IMBConfig setPrefs:classDict forClass:self.class];
 }
