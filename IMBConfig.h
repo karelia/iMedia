@@ -61,7 +61,7 @@
 // Class specific accessors for iMedia preferences (use these methods from iMedia controller classes)...
 
 + (void)registerDefaultPrefs:(NSDictionary *)inClassDict forClass:(Class)inClass;
-+ (void) setPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass;
++ (void)setPrefs:(NSDictionary *)inClassDict forClass:(Class)inClass;
 + (NSMutableDictionary*) prefsForClass:(Class)inClass;
 
 // Determines whether Group labels are visible in the node view (IMBOutlineView)...
