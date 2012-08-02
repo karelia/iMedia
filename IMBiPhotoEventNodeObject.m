@@ -216,8 +216,8 @@
 	[[NSBezierPath bezierPathWithRoundedRect:NSRectFromCGRect(bounds) xRadius: cornerRadius yRadius:cornerRadius] addClip];
 	
 	// Move image in context to get desired image area to be in context bounds
-	CGRect imageBounds = CGRectMake((squareSize - imgWidth) / 2.0, 
-									(squareSize - imgHeight) / 2.0, 
+	CGRect imageBounds = CGRectMake(((NSInteger)(squareSize - imgWidth)) / 2.0,   // Will be negative or zero
+									((NSInteger)(squareSize - imgHeight)) / 2.0,  // Will be negative or zero
 									imgWidth, imgHeight);
 	
 	CGContextDrawImage(bitmapContext, imageBounds, inImage);
