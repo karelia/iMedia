@@ -466,7 +466,7 @@
 			// Make sure the object view controller's preferences reflect the view type we want to show
 			// (preferences will later be loaded into object)
 			
-			NSMutableDictionary* preferences = [IMBConfig prefsForClass:inController.class];
+			NSMutableDictionary* preferences = [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:inController.class]];
 			[preferences setObject:[NSNumber numberWithUnsignedInteger:0] forKey:@"viewType"];
 			[IMBConfig setPrefs:preferences forClass:inController.class];
 			
