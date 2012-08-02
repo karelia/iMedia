@@ -117,7 +117,7 @@ static BOOL sUseGlobalViewType = NO;
 
 // Store the specified dictionary in the iMedia section of the preferences under its class name...
 
-+ (void) registerDefaultPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass
++ (void)registerDefaultPrefs:(NSDictionary *)inClassDict forClass:(Class)inClass
 {
 	[self registerDefaultPrefsValue:inClassDict forKey:NSStringFromClass(inClass)];
 }
