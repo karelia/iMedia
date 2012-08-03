@@ -67,7 +67,6 @@
 #import "IMBNode.h"
 #import "IMBFolderObject.h"
 #import "IMBObject.h"
-#import "IMBObjectsPromise.h"
 #import "IMBOrderedDictionary.h"
 #import "IMBParserController.h"
 //#import "IMBPyramidObjectPromise.h"
@@ -215,11 +214,13 @@ static NSArray* sSupportedUTIs = nil;
             if ([path hasSuffix:@"\","])
             {
 				path = [path substringWithRange:NSMakeRange(1, [path length] - 3)];
+                NSFileManager *fileManager = [[NSFileManager alloc] init];
  
 				BOOL exists,changed;
-				exists = [[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed];
+				exists = [fileManager imb_fileExistsAtPath:&path wasChanged:&changed];
 				if (exists) [inLibraryPaths addObject:path];
-				
+                
+                [fileManager release];
                 path = @"";
             }
         }
@@ -281,8 +282,6 @@ static NSArray* sSupportedUTIs = nil;
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	NSError* error = nil;
-	
 	// Create subnodes for the root node as needed...
 	
 	if ([inNode isTopLevelNode])
@@ -327,8 +326,7 @@ static NSArray* sSupportedUTIs = nil;
         inNode.objects = [NSArray array];
     }
 
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 
@@ -455,7 +453,7 @@ static NSArray* sSupportedUTIs = nil;
 	{
 		IMBLightroomObject* object = (IMBLightroomObject*)inObject;
 		metadata = [NSMutableDictionary dictionaryWithDictionary:object.preliminaryMetadata];
-		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:object.path checkSpotlightComments:NO]];
+		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtURL:object.URL checkSpotlightComments:NO]];
 	}
 
 	return metadata;
@@ -472,8 +470,10 @@ static NSArray* sSupportedUTIs = nil;
 	if (jpegData != nil) {
 		IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 		NSString* orientation = [[lightroomObject preliminaryMetadata] objectForKey:@"orientation"];;
-		NSString* fileName = [[(NSString*)inObject.location lastPathComponent] stringByDeletingPathExtension];
-		NSString* jpegPath = [[[NSFileManager imb_threadSafeManager] imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
+		NSString* fileName = [[inObject.location lastPathComponent] stringByDeletingPathExtension];
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+		NSString* jpegPath = [[fileManager imb_uniqueTemporaryFile:fileName] stringByAppendingPathExtension:@"jpg"];
+        [fileManager release];
 		NSURL* jpegURL = [NSURL fileURLWithPath:jpegPath];
 		BOOL success = NO;
 		
@@ -1048,7 +1048,7 @@ static NSArray* sSupportedUTIs = nil;
 
 	object.absolutePyramidPath = absolutePyramidPath;
 	object.idLocal = idLocal;
-	object.location = (id)inPath;
+	object.location = [NSURL fileURLWithPath:inPath];
 	object.name = inName;
 	object.preliminaryMetadata = inMetadata;	// This metadata was in the XML file and is available immediately
 	object.metadata = nil;						// Build lazily when needed (takes longer)
@@ -1447,10 +1447,27 @@ static NSArray* sSupportedUTIs = nil;
 #pragma mark 
 #pragma mark Object Identifiers
 
+// Identifier must account for "virtual copies" of original resources in Lightroom
 
 - (NSString*) identifierForObject:(IMBObject*)inObject
 {
 	NSString* identifier = [super identifierForObject:inObject];
+	
+	if ([inObject isKindOfClass:[IMBLightroomObject class]])
+	{
+		NSNumber* idLocal = [(IMBLightroomObject*)inObject idLocal];
+		identifier = [NSString stringWithFormat:@"%@/%@",identifier,idLocal];
+	}
+	
+	return identifier;
+}
+
+
+// Identifier must account for "virtual copies" of original resources in Lightroom
+
+- (NSString *)persistentResourceIdentifierForObject:(IMBObject *)inObject
+{
+	NSString* identifier = [super persistentResourceIdentifierForObject:inObject];
 	
 	if ([inObject isKindOfClass:[IMBLightroomObject class]])
 	{

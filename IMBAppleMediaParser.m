@@ -103,6 +103,18 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+- (void) dealloc
+{
+	IMBRelease(_appPath);
+	IMBRelease(_plist);
+	IMBRelease(_modificationDate);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 #pragma mark -
 #pragma mark Parsing
 
@@ -124,11 +136,41 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		NSUInteger insertionIndex = [self indexOfAllPhotosAlbumInAlbumList:oldAlbumList];
         NSDictionary *photosDict = nil;
 		
+        NSDictionary *eventsDict = nil;
+		
+        // Starting Aperture 3.3 there is no "Photos" album in ApertureData.xml anymore, so we must reconstruct it ourselves
+        
+        if (insertionIndex == NSNotFound)
+        {
+            // Photos album right after Projects in Aperture (Projects synonym to Events)
+            // Photos album in iPhoto should be already there
+            
+            insertionIndex = [self indexOfEventsAlbumInAlbumList:oldAlbumList];
+            
+            if (insertionIndex != NSNotFound &&
+                (eventsDict = [oldAlbumList objectAtIndex:insertionIndex]))
+            {
+				NSNumber *allPhotosId = [NSNumber numberWithUnsignedInt:ALL_PHOTOS_NODE_ID];
+				NSString *allPhotosName = NSLocalizedStringWithDefaultValue(@"IMB.ApertureParser.allPhotos", nil, IMBBundle(), @"Photos", @"All photos node shown in Aperture library");
+                NSDictionary* allPhotos = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                           allPhotosId,   @"AlbumId",
+                                           allPhotosName, @"AlbumName",
+                                           @"94",  @"Album Type",
+                                           [eventsDict objectForKey:@"Parent"], @"Parent", nil];
+				
+                // events album right before photos album
+                
+				[newAlbumList insertObject:allPhotos atIndex:insertionIndex];
+				IMBRelease(allPhotos);
+                insertionIndex++;
+            }
+        }
+        
 		if (insertionIndex != NSNotFound &&
             (photosDict = [oldAlbumList objectAtIndex:insertionIndex]))
 		{
             // Events
-            
+			
 			if ([inLibraryDict objectForKey:@"List of Rolls"])
 			{
 				NSNumber *eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
@@ -203,9 +245,12 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSError* error = nil;
 	NSString* path = [self.mediaSource path];
 	
-	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path])
-	{
-		NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+	NSDictionary* metadata = [fileManager attributesOfItemAtPath:path error:&error];
+    [fileManager release];
+    
+    if (metadata)
+    {
 		NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
 		
 		@synchronized(self)
@@ -306,6 +351,14 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 	
+	// Enable FSEvents based file watching for root nodes...
+	
+	node.watcherType = kIMBWatcherTypeFSEvent;
+    
+	NSURL* url = self.mediaSource;
+	NSString* path = [[url path] stringByDeletingLastPathComponent];
+	node.watchedPath = path;
+	
 	// JUST TEMP: remove these 2 lines later...
 	
     //	NSDictionary* plist = [NSDictionary dictionaryWithContentsOfURL:self.mediaSource];
@@ -329,7 +382,21 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	return nil;
+	if (outError) *outError = nil;
+    
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	
+	// Do not load (key) image specific metadata for node objects
+	// because it doesn't represent the nature of the object well enough.
+	
+	if (![inObject isKindOfClass:[IMBNodeObject class]])
+	{
+		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtURL:inObject.URL checkSpotlightComments:NO]];
+	}
+    
+// JJ TODO: How about keywords? Only for iPhoto or also for Aperture?
+    
+    return metadata;
 }
 
 
@@ -509,6 +576,18 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is the "Events" (aka "Projects") album. Must be subclassed.
+
+- (BOOL) isEventsAlbum:(NSDictionary*)inAlbumDict
+{
+	NSLog(@"%s Please use a custom subclass of IMBAppleMediaParser...",__FUNCTION__);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBAppleMediaParser" userInfo:nil] raise];
+	
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // Returns whether inAlbumDict is the "Flagged" album. Must be subclassed.
 
 - (BOOL) isFlaggedAlbum:(NSDictionary*)inAlbumDict
@@ -543,12 +622,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
     if ([inObject isKindOfClass:NSClassFromString(@"IMBSkimmableObject")])
     {
         IMBSkimmableObject *skimmableObject = (IMBSkimmableObject *)inObject;
-        if (skimmableObject.currentSkimmingIndex != NSNotFound)
-        {
-            skimmableObject.imageLocation = [skimmableObject imageLocationAtSkimmingIndex:skimmableObject.currentSkimmingIndex];
-        } else {
-            skimmableObject.imageLocation = [skimmableObject keyImageLocation];
-        }
+        
+        skimmableObject.imageLocation = [skimmableObject imageLocationForCurrentSkimmingIndex];
     }
     
     // IKImageBrowser can also deal with NSData type (IKImageBrowserNSDataRepresentationType)
@@ -560,6 +635,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
         {
             return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
         } else {
+            inObject.imageRepresentationType = IKImageBrowserNSDataRepresentationType;
             NSData* data = [NSData dataWithContentsOfURL:url];
             return data;
         }
@@ -770,7 +846,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSString* faceKeyPhotoKey = nil;
 	NSString* path = nil;
 	NSString* thumbnailPath = nil;
-	IMBNodeObject* object = nil;
+	IMBFaceNodeObject* object = nil;
 	NSString* subNodeType = @"Face";
 	
 	for (NSDictionary* faceDict in sortedFaces)
@@ -789,6 +865,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			subnode.name = subnodeName;
 			subnode.mediaSource = self.mediaSource;
 			subnode.parserIdentifier = self.identifier;
+			subnode.isIncludedInPopup = NO;
+			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			subnode.watcherType = kIMBWatcherTypeNone;  // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
 			// Keep a ref to face dictionary for potential later use
 			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -818,6 +897,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 			
 			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
+            [object resetCurrentSkimmingIndex];                 // Must be done *after* preliminaryMetadata is set
 			object.metadata = nil;								// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
 			
@@ -828,7 +908,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+			object.location = [NSURL fileURLWithPath:path isDirectory:NO];
 			object.name = subnode.name;
 			object.parserIdentifier = [self identifier];
 			object.index = index++;
@@ -843,74 +923,6 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	
 	[pool drain];
 	inNode.objects = objects;
-}
-
-
-#pragma mark -
-#pragma mark Object description
-
-
-+ (NSString*) objectCountFormatSingular
-{
-	return [IMBImageObjectViewController objectCountFormatSingular];
-}
-
-
-+ (NSString*) objectCountFormatPlural
-{
-	return [IMBImageObjectViewController objectCountFormatPlural];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// Events and Faces have other metadata than images or movies
-
-- (NSString*) countableMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	NSMutableString* metaDesc = [NSMutableString string];
-	
-	NSNumber* count = [inMetadata objectForKey:@"PhotoCount"];
-	if (count)
-	{
-		NSString* formatString = [count intValue] > 1 ?
-		[[self class] objectCountFormatPlural] :
-		[[self class] objectCountFormatSingular];
-		
-		[metaDesc appendFormat:formatString, [count intValue]];
-	}
-	
-	NSNumber* dateAsTimerInterval = [inMetadata objectForKey:@"RollDateAsTimerInterval"];
-	if (dateAsTimerInterval)
-	{
-		[metaDesc imb_appendNewline];
-		NSDate* eventDate = [NSDate dateWithTimeIntervalSinceReferenceDate:[dateAsTimerInterval doubleValue]];
-		
-		NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-		[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-		[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
-		
-		[metaDesc appendFormat:@"%@", [formatter stringFromDate:eventDate]];
-		
-		[formatter release];
-	}
-	return metaDesc;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// Convert metadata into a human readable string...
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	// Events and Faces have other metadata than images
-	
-	if ([inMetadata objectForKey:@"PhotoCount"])		// Event, face, ...
-	{
-		return [self countableMetadataDescriptionForMetadata:inMetadata];
-	}
-	
-	// Image
-	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 
@@ -979,6 +991,16 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 - (NSUInteger) indexOfAllPhotosAlbumInAlbumList:(NSArray*)inAlbumList
 {
     return [self indexOfAlbumInAlbumList:inAlbumList passingTest:@selector(isAllPhotosAlbum:)];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the index of the projects album ("Projects") in given album list
+// Projects are to Aperture what events are to iPhoto - hence the method name for coherence
+
+- (NSUInteger) indexOfEventsAlbumInAlbumList:(NSArray*)inAlbumList
+{
+    return [self indexOfAlbumInAlbumList:inAlbumList passingTest:@selector(isEventsAlbum:)];
 }
 
 

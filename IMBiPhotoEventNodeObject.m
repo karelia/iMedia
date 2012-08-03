@@ -53,11 +53,105 @@
 #import "IMBiPhotoParser.h"
 #import "IMBParserMessenger.h"
 
+@interface IMBiPhotoEventNodeObject ()
+
+@property(retain) NSString *currentImageKey;
+
+@end
+
 
 @implementation IMBiPhotoEventNodeObject
 
+@synthesize currentImageKey = _currentImageKey;
+
+
+#pragma mark - Lifecycle
+
+
+- (void) dealloc
+{
+	IMBRelease(_currentImageKey);
+
+	[super dealloc];
+}
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		self.currentImageKey = [inCoder decodeObjectForKey:@"currentImageKey"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeObject:self.currentImageKey forKey:@"currentImageKey"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBiPhotoEventNodeObject* copy = [super copyWithZone:inZone];
+	
+	copy.currentImageKey = self.currentImageKey;
+	return copy;
+}
+
 
 #pragma mark - IMBSkimmableObject must subclass
+
+
+- (void) setCurrentSkimmingIndex:(NSUInteger)currentSkimmingIndex
+{
+    [super setCurrentSkimmingIndex:currentSkimmingIndex];
+    
+	NSArray* keyList = [self.preliminaryMetadata objectForKey:@"KeyList"];
+	
+    if (currentSkimmingIndex < keyList.count)
+    {
+        // We are currently skimming on the image
+        
+        self.currentImageKey = [keyList objectAtIndex:currentSkimmingIndex];
+    } else {
+        // We just initialized the object or left the image while skimming and thus restore the key image
+        
+        self.currentImageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
+    }
+}
+
+
+// Returns a sparse copy of self that carrys just enough data to load its thumbnail.
+// Self must have a current image key set because copy cannot provide thumbnail otherwise.
+//
+- (IMBSkimmableObject *)thumbnailProvider
+{
+    // Copy must have a current image key set to be able to provide thumbnail
+    NSAssert1(self.currentImageKey != nil, @"Must set current image key on skimmable object %@ before loading thumbnail", self);
+    
+    IMBiPhotoEventNodeObject *copy = [[[IMBiPhotoEventNodeObject alloc] init] autorelease];
+    copy.imageRepresentationType = self.imageRepresentationType;
+    copy.currentImageKey = self.currentImageKey;
+    copy.parserIdentifier = self.parserIdentifier;
+    
+    return copy;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the image location that corresponds to the current skimming index
+
+- (id) imageLocationForCurrentSkimmingIndex
+{
+	IMBiPhotoParser *parser = (IMBiPhotoParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
+    
+    return [NSURL fileURLWithPath:[parser imagePathForImageKey:_currentImageKey] isDirectory:NO];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,11 +193,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Key image and skimmed images of events are processed by Core Graphics before display
 
-- (CGImageRef) newProcessedImageFromImage:(CGImageRef)inImage
+- (CGImageRef) processedImageFromImage:(CGImageRef)inImage
 {
-	long imgWidth = CGImageGetWidth(inImage);
-	long imgHeight = CGImageGetHeight(inImage);
-	long squareSize = MIN(imgWidth, imgHeight);
+	size_t imgWidth = CGImageGetWidth(inImage);
+	size_t imgHeight = CGImageGetHeight(inImage);
+	size_t squareSize = MIN(imgWidth, imgHeight);
 	
 	CGContextRef bitmapContext = CGBitmapContextCreate(NULL, 
 													   squareSize, 
@@ -117,18 +211,19 @@
 	CGContextClearRect(bitmapContext, bounds);
 	
 	// Set clipping path
-	float cornerRadius = squareSize / 10.0;
+	CGFloat cornerRadius = squareSize / 10.0;
 	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithGraphicsPort:bitmapContext flipped:NO]];
 	[[NSBezierPath bezierPathWithRoundedRect:NSRectFromCGRect(bounds) xRadius: cornerRadius yRadius:cornerRadius] addClip];
 	
 	// Move image in context to get desired image area to be in context bounds
-	CGRect imageBounds = CGRectMake((squareSize - imgWidth) / 2.0, 
-									(squareSize - imgHeight) / 2.0, 
+	CGRect imageBounds = CGRectMake(((NSInteger)(squareSize - imgWidth)) / 2.0,   // Will be negative or zero
+									((NSInteger)(squareSize - imgHeight)) / 2.0,  // Will be negative or zero
 									imgWidth, imgHeight);
 	
 	CGContextDrawImage(bitmapContext, imageBounds, inImage);
 	
 	CGImageRef image = CGBitmapContextCreateImage(bitmapContext);
+    [(id)image autorelease];
 	
 	CGContextRelease(bitmapContext);
 	
@@ -139,20 +234,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Set a processed image instead of the image provided
 
-- (void) setImageRepresentation:(id)inObject
+- (void) storeReceivedImageRepresentation:(id)inImageRepresentation
 {
-	NSString* type = self.imageRepresentationType;
-
-	CGImageRef image = NULL;
-	if (inObject && [type isEqualToString:IKImageBrowserCGImageRepresentationType])
-	{
-		image = [self newProcessedImageFromImage:(CGImageRef)inObject];
-		if (image) inObject = (id) image;
-	}
-	
-	[super setImageRepresentation:inObject];
-	
-	if (image) CGImageRelease(image);
+    if ([self.imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
+    {
+//        NSData *data = inImageRepresentation;
+//        CGImageSourceRef imageSource = CGImageSourceCreateWithData((CFDataRef)data,NULL);
+//        CGImageRef image = NULL;
+//		if (imageSource)
+//		{
+//			image = CGImageSourceCreateImageAtIndex(imageSource,0,NULL);
+//			CFRelease(imageSource);
+//		}
+//        if (image)
+        {
+            inImageRepresentation = (id)[self processedImageFromImage:(CGImageRef)inImageRepresentation];
+        }
+    }
+    [super storeReceivedImageRepresentation:inImageRepresentation];
 }
 
 
@@ -163,7 +262,7 @@
 //	CGImageRef image = NULL;
 //	if (inImage)
 //	{
-//		image = [self newProcessedImageFromImage:inImage];
+//		image = [self processedImageFromImage:inImage];
 //		if (image) inImage = image;
 //	}
 //	

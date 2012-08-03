@@ -52,15 +52,9 @@
 
 #import <Cocoa/Cocoa.h>
 #import <iMedia/IMBParserController.h>
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark CLASSES
-
-@class IMBNodeViewController;
-@class IMBObjectViewController;
+#import <iMedia/IMBLibraryController.h>
+#import <iMedia/IMBNodeViewController.h>
+#import <iMedia/IMBObjectViewController.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,7 +62,7 @@
 
 @class IMBUserInterfaceController;
 
-@interface IMBTestAppDelegate : NSObject <IMBParserControllerDelegate>
+@interface IMBTestAppDelegate : NSObject <IMBParserControllerDelegate,IMBLibraryControllerDelegate,IMBNodeViewControllerDelegate,IMBObjectViewControllerDelegate>
 {
 	IBOutlet NSWindow* ibWindow;
 	IBOutlet NSWindow* ibDragDestinationWindow;
@@ -82,6 +76,7 @@
 //@property (retain) IMBObjectViewController* objectViewController;
 @property (retain) NSMutableDictionary* usedObjects;
 
+- (IBAction) reload:(id)inSender;
 - (IBAction) togglePanel:(id)inSender;
 - (IBAction) toggleDragDestinationWindow:(id)inSender;
 - (void) concludeDragOperationForObjects:(NSArray*)inObjects;

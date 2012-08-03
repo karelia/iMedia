@@ -62,17 +62,57 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark
+#pragma mark GLOBALS
 
-@implementation NSPasteboard (iMedia)
+static IMBParserMessenger* sDraggingParserMessenger = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Get all IMBObjects from the pasteboard...
+#pragma mark
 
-- (NSArray*) IMBObjects
+@implementation NSPasteboard (iMediaInternal)
+
+// This method must be called when putting IMBObjects on teh pasteboard. Since the parserMessenger is not
+// encoded by IMBObject, we need to keep this info around separately, so that we can assign the property 
+// again when the IMBObjects are pulled from the pasteboard (see imb_IMBObjects method)...
+
+- (void) imb_setParserMessenger:(IMBParserMessenger*)inParserMessenger
+{
+	sDraggingParserMessenger = inParserMessenger;
+}
+
+
+@end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@implementation NSPasteboard (iMediaPublic)
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Check if we have any IMBObjects on the pasteboard...
+
+- (BOOL) imb_containsIMBObjects
+{
+	NSArray* types = [self types];
+	return [types containsObject:kIMBObjectPasteboardType];
+}
+
+
+// Get all IMBObjects from the pasteboard. Please note that IMBObjects are archived/unarchived without their
+// IMBPArserMessenger. However the messenger is essential so we need to restore it from teh remembered pointer
+// in sDraggingParserMessenger. This should suffice, since there can only be a single messenger involved in 
+// a dragging operation...
+
+- (NSArray*) imb_IMBObjects
 {
 	NSArray* items = self.pasteboardItems;
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:items.count];
@@ -81,6 +121,7 @@
 	{
 		NSData* data = [item dataForType:kIMBObjectPasteboardType];
 		IMBObject* object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+		object.parserMessenger = sDraggingParserMessenger;
 		if (object) [objects addObject:object];
 	}
 	
@@ -91,5 +132,34 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@end
+// Check if we have any file NSURLs on the pasteboard...
 
+- (BOOL) imb_containsFileURLs
+{
+	NSArray* types = [self types];
+	return [types containsObject:(NSString*)kUTTypeFileURL];
+}
+
+
+// Get all NSURLs from the pasteboard...
+
+- (NSArray*) imb_fileURLs
+{
+	NSArray* items = self.pasteboardItems;
+	NSMutableArray* urls = [NSMutableArray arrayWithCapacity:items.count];
+	
+	for (NSPasteboardItem* item in items)
+	{
+		NSString* str = [item stringForType:(NSString*)kUTTypeFileURL];
+		NSURL* url = [NSURL URLWithString:str];
+		if (url) [urls addObject:url];
+	}
+	
+	return (NSArray*) urls;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end

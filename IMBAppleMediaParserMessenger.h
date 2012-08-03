@@ -53,4 +53,7 @@
 
 @interface IMBAppleMediaParserMessenger : IMBParserMessenger
 
++ (NSString*) appPath;
++ (BOOL) isInstalled;
+
 @end

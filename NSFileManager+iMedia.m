@@ -53,32 +53,6 @@
 
 @implementation NSFileManager (iMedia)
 
-+ (NSFileManager *)imb_threadSafeManager
-{
-	NSFileManager*	instance = nil;
-	
-	@synchronized([self class])
-	{
-		static NSMutableDictionary* sPerThreadInstances = nil;
-		
-		if (sPerThreadInstances == nil)
-		{
-			sPerThreadInstances = [[NSMutableDictionary alloc] init];
-		}
-		
-		NSString *threadID = [NSString stringWithFormat:@"%p",[NSThread currentThread]];
-		instance = [sPerThreadInstances objectForKey:threadID];
-		
-		if (instance == nil)
-		{
-			instance = [[[NSFileManager alloc] init] autorelease];
-			[sPerThreadInstances setObject:instance forKey:threadID];
-		}	 
-	}
-
-	return instance;	
-}
-
 - (BOOL)imb_createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes
 {
 	if ([path isAbsolutePath])

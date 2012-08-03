@@ -151,7 +151,13 @@
 			{
 				[self requestBookmarkWithCompletionBlock:^(NSError* inError)
 				{
-					if (inError) [NSApp performSelectorOnMainThread:@selector(presentError:) withObject:inError waitUntilDone:NO];
+					if (inError) 
+					{
+						dispatch_async(dispatch_get_main_queue(),^()
+						{
+							[NSApp presentError:inError];
+						});
+					}
 				}];
 
 				[self waitForBookmark];

@@ -140,25 +140,27 @@
 	if ([self isInstalled])
 	{
 		CFArrayRef recentLibraries = CFPreferencesCopyAppValue((CFStringRef)@"iPhotoRecentDatabases",(CFStringRef)@"com.apple.iApps");
-		NSArray* libraries = (NSArray*)recentLibraries;
 		
-		for (NSString* library in libraries)
+		for (NSString* library in (NSArray*)recentLibraries)
 		{
 			NSURL* url = [NSURL URLWithString:library];
 			NSString* path = [url path];
+            NSFileManager *fileManger = [[NSFileManager alloc] init];
+            
 			BOOL changed;
-			
-			if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
+			if ([fileManger imb_fileExistsAtPath:&path wasChanged:&changed])
 			{
 				NSString *libraryPath = [path stringByDeletingLastPathComponent];	// folder containing .xml file
 				[IMBConfig registerLibraryPath:libraryPath];
 			
 				IMBiPhotoParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 				parser.mediaSource = path;
-				parser.shouldDisplayLibraryName = libraries.count > 1;
+				parser.shouldDisplayLibraryName = CFArrayGetCount(recentLibraries) > 1;
 				[parserInstances addObject:parser];
 				[parser release];
 			}
+            
+            [fileManger release];
 		}
 		
 		if (recentLibraries) CFRelease(recentLibraries);
@@ -223,7 +225,7 @@
 		return nil;
 	}
 	
-	if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:path] == NO)
+	if (![[NSURL fileURLWithPath:path] checkResourceIsReachableAndReturnError:NULL])
 	{
 		return nil;
 	}

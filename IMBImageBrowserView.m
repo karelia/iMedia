@@ -119,7 +119,7 @@ enum IMBMouseOperation
 	// Set up initial value
 	NSString* filenames = [IMBConfig prefsValueForKey:@"prefersFilenamesInPhotoBasedBrowsers"];
 	BOOL showTitle = (nil == filenames) ? YES : [filenames boolValue];
-	int mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
+	NSUInteger mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
 	[self setCellsStyleMask: mask];
 }
 
@@ -193,7 +193,7 @@ enum IMBMouseOperation
 {
 	id object = [inNotification object];
 	BOOL showTitle = [object boolValue];
-	int mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
+	NSUInteger mask = showTitle ? IKCellsStyleTitled : IKCellsStyleNone;
 	[self setCellsStyleMask: mask];
 }
 
@@ -577,8 +577,9 @@ enum IMBMouseOperation
 {
 	IMBObjectViewController* controller = (IMBObjectViewController*) self.delegate;
     NSString* key = [inEvent charactersIgnoringModifiers];
+	NSUInteger modifiers = [inEvent modifierFlags];
 	
-    if([key isEqual:@" "])
+    if([key isEqual:@"y"] && (modifiers&NSCommandKeyMask)!=0)
 	{
         [controller quicklook:self];
     } 

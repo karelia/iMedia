@@ -51,7 +51,6 @@
 
 @interface NSFileManager (iMedia)
 
-+ (NSFileManager *)imb_threadSafeManager;
 - (BOOL)imb_isPathHidden:(NSString *)path;
 - (BOOL)imb_createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
 - (NSString *)imb_pathResolved:(NSString *)path;

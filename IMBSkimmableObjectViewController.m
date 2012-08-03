@@ -58,6 +58,11 @@
 #import "IMBSkimmableObject.h"
 #import "IMBConfig.h"
 
+@interface IMBSkimmableObjectViewController ()
+
+- (void) loadThumbnailForItem:(IMBSkimmableObject *)item;
+
+@end
 
 @implementation IMBSkimmableObjectViewController
 
@@ -200,14 +205,7 @@
         
         [item resetCurrentSkimmingIndex];
         
-        // Will not load thumbnail if these two flags are not set accordingly
-        
-        [item setNeedsImageRepresentation:YES];
-        [item setIsLoadingThumbnail:NO]; // Avoid race condition
-        
-        [item loadThumbnail]; // Background thread or XPC service		
-        
-        [item setNeedsImageRepresentation:NO];
+        [self loadThumbnailForItem:item];
     }
 	//NSLog(@"Mouse exited item at index %ld", (long) inIndex);
 }
@@ -236,26 +234,23 @@
         
         CGFloat xOffset = inPoint.x - skimmingFrame.origin.x;
         NSUInteger objectCount = [item imageCount];
-        CGFloat widthPerObject = skimmingFrame.size.width / objectCount;
-        NSUInteger objectIndex = (NSUInteger) xOffset / widthPerObject;
         
-        //NSLog(@"Object index: %lu", objectIndex);
-        
-        if (objectIndex != _previousImageIndex)
+        if (objectCount > 0)
         {
-            _previousImageIndex = objectIndex;
+            CGFloat widthPerObject = skimmingFrame.size.width / objectCount;
+            NSUInteger objectIndex = (NSUInteger) xOffset / widthPerObject;
             
-            item.currentSkimmingIndex = objectIndex;
+            //NSLog(@"Object index: %lu", objectIndex);
             
-            // Will not load thumbnail if these two flags are not set accordingly
-            
-            [item setNeedsImageRepresentation:YES];
-            [item setIsLoadingThumbnail:NO]; // Avoid race condition
-            
-            [item loadThumbnail]; // Background thread or XPC service
-
-            [item setNeedsImageRepresentation:NO];
-}
+            if (objectIndex != _previousImageIndex)
+            {
+                _previousImageIndex = objectIndex;
+                
+                item.currentSkimmingIndex = objectIndex;
+                
+                [self loadThumbnailForItem:item];
+            }
+        }
     }
 }
 
@@ -297,6 +292,20 @@
 	_previousNodeObjectIndex = hoverIndex;
 	
 	[super mouseMoved:anEvent];
+}
+
+#pragma mark Helper
+
+- (void) loadThumbnailForItem:(IMBSkimmableObject *)item
+{
+    // Will not load thumbnail if these two flags are not set accordingly
+    
+    [item setNeedsImageRepresentation:YES];
+    [item setIsLoadingThumbnail:NO]; // Avoid race condition
+
+    [item fastLoadThumbnail]; // Background thread or XPC service
+    
+    [item setNeedsImageRepresentation:NO];
 }
 
 @end

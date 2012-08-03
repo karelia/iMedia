@@ -51,13 +51,132 @@
 
 
 #import "IMBFaceNodeObject.h"
+#import "NSObject+iMedia.h"
 #import "IMBAppleMediaParser.h"
 #import "IMBParserMessenger.h"
 
+@interface IMBFaceNodeObject ()
+
+@property(retain) NSString *currentImageKey;
+@property(retain) NSNumber *currentFaceIndex;
+
+@end
+
+
 @implementation IMBFaceNodeObject
+
+@synthesize currentImageKey = _currentImageKey;
+@synthesize currentFaceIndex = _currentFaceIndex;
+
+
+#pragma mark - Lifecycle
+
+
+- (void) dealloc
+{
+	IMBRelease(_currentImageKey);
+	IMBRelease(_currentFaceIndex);
+    
+	[super dealloc];
+}
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if (self = [super initWithCoder:inCoder])
+	{
+		self.currentImageKey = [inCoder decodeObjectForKey:@"currentImageKey"];
+		self.currentFaceIndex = [inCoder decodeObjectForKey:@"currentFaceIndex"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeObject:self.currentImageKey forKey:@"currentImageKey"];
+	[inCoder encodeObject:self.currentFaceIndex forKey:@"currentFaceIndex"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBFaceNodeObject* copy = [super copyWithZone:inZone];
+	
+	copy.currentImageKey = self.currentImageKey;
+	copy.currentFaceIndex = self.currentFaceIndex;
+	return copy;
+}
 
 
 #pragma mark - IMBSkimmableObject must subclass
+
+
+- (void) setCurrentSkimmingIndex:(NSUInteger)skimmingIndex
+{
+    [super setCurrentSkimmingIndex:skimmingIndex];
+    
+    if (skimmingIndex != NSNotFound)
+    {
+        // We are currently skimming on the image
+        
+        NSArray *keyList = [self.preliminaryMetadata objectForKey:@"KeyList"];
+        NSArray *metadataList = [[self preliminaryMetadata] objectForKey:@"ImageFaceMetadataList"];
+
+        if (keyList.count > skimmingIndex && metadataList.count > skimmingIndex)
+        {
+            self.currentImageKey = [keyList objectAtIndex:skimmingIndex];
+            
+            // Get the metadata of the nth image in which this face occurs 
+            NSDictionary* imageFaceMetadata = [metadataList objectAtIndex:skimmingIndex];
+            
+            // What is the number of this face inside of this image?
+            self.currentFaceIndex = [imageFaceMetadata objectForKey:@"face index"];
+        } else {
+            NSLog(@"Cannot provide any data for skimming index %lu", (unsigned long)skimmingIndex);
+        }
+    } else {
+        // We just initialized the object or left the image while skimming and thus restore the key image
+        
+        self.currentImageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
+        
+        // What is the number of this face inside of this image?
+        self.currentFaceIndex = [[self preliminaryMetadata] objectForKey:@"key image face index"];
+    }
+}
+
+
+// Returns a sparse copy of self that carrys just enough data to load its thumbnail.
+// Self must have a current image key and face index set because copy cannot provide thumbnail otherwise.
+//
+- (IMBSkimmableObject *)thumbnailProvider
+{
+    // Copy must have a current image key and face index set to be able to provide thumbnail
+    NSAssert1(self.currentImageKey != nil, @"Must set current image key on skimmable object %@ before loading thumbnail", self);
+    NSAssert1(self.currentFaceIndex != nil, @"Must set current face index on skimmable object %@ before loading thumbnail", self);
+    
+    IMBFaceNodeObject *copy = [[[IMBFaceNodeObject alloc] init] autorelease];
+    copy.imageRepresentationType = self.imageRepresentationType;
+    copy.currentImageKey = self.currentImageKey;
+    copy.currentFaceIndex = self.currentFaceIndex;
+    copy.parserIdentifier = self.parserIdentifier;
+    
+    return copy;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the image location that corresponds to the current skimming index
+
+- (id) imageLocationForCurrentSkimmingIndex
+{
+	IMBAppleMediaParser *parser = (IMBAppleMediaParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
+    
+    return [NSURL fileURLWithPath:[parser imagePathForFaceIndex:self.currentFaceIndex inImageWithKey:self.currentImageKey] isDirectory:NO];
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

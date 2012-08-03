@@ -59,6 +59,7 @@
 #import "NSWorkspace+iMedia.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
+#import "NSObject+iMedia.h"
 #import "NSURL+iMedia.h"
 #import "IMBParserMessenger.h"
 
@@ -72,8 +73,7 @@
 
 - (NSArray*) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode;
 - (void) _identifiersOfPopulatedSubnodesOfNode:(IMBNode*)inNode identifiers:(NSMutableArray*)inIdentifiers;
-- (void) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError;
-- (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector;
+- (BOOL) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError;
 
 @end
 
@@ -129,7 +129,7 @@
 
 - (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
 	return nil;
 }
@@ -139,8 +139,8 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
-	if (outError) *outError = nil;
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+	if (outError) *outError = nil; // never reached due to the exception, mind!
 	return YES;
 }
 
@@ -200,7 +200,7 @@
 
 
 // 
-- (void) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError
+- (BOOL) _populateNodeTree:(IMBNode*)inNode populatedNodeIdentifiers:(NSArray*)inPopulatedNodeIdentifiers error:(NSError**)outError
 {
 	NSError* error = nil;
 
@@ -220,6 +220,7 @@
 	}
 	
 	if (outError) *outError = error;
+	return error == nil;
 }
 
 
@@ -234,7 +235,7 @@
 
 - (id) thumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
 	return nil;
 }
@@ -244,7 +245,7 @@
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
 	return nil;
 }
@@ -254,9 +255,97 @@
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	[self _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	if (outError) *outError = nil;
 	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Identifiers
+
+
+// This helper method can be used by subclasses to construct identifiers of form "classname://path/to/node"...
+ 
+- (NSString*) identifierForPath:(NSString*)inPath
+{
+	NSString* prefix = [self iMedia2PersistentResourceIdentifierPrefix];
+	return [NSString stringWithFormat:@"%@:/%@",prefix,inPath];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This identifier string for IMBObject (just like IMBNode.identifier) can be used to uniquely identify an IMBObject
+// throughout a session. If you need a persistent identifier that identifies the resource associated with an IMBObject
+// use persistentResourceIdentifierForObject: instead.
+
+- (NSString*) identifierForObject:(IMBObject*)inObject
+{
+	NSString* parserClassName = NSStringFromClass([self class]);
+    NSUInteger libraryHash = [[[self mediaSource] path] hash];
+	NSString* path = [inObject.location path];
+	NSString* identifier = [NSString stringWithFormat:@"%@:%d/%@",parserClassName,libraryHash,path];
+	return identifier;
+}
+
+
+// Returns an identifier for the resource that self denotes and that is meant to be persistent across launches of the app
+// (e.g. when host app developers need to persist usage info of media files when implementing the badging delegate API).
+// This standard implementation is based on file reference URLs - so it will only work for file based URLs that denote
+// existing files.
+// Subclass to adjust to the needs of your parser.
+
+- (NSString*) persistentResourceIdentifierForObject:(IMBObject*)inObject
+{
+	NSURL* url = [inObject URL];
+	
+	if ([url isFileURL])
+	{
+		url = [url fileReferenceURL];
+	}
+
+    if (url)
+    {
+        return [url absoluteString];
+    } 
+	else
+	{
+        NSLog(@"Could not create persistent resource identifier for %@: resource %@ is not a file or does not exist",inObject,url);
+        return nil;
+    }
+}
+
+
+// Returns the form of the persistent resource identifier for inObject that was used in iMedia2 (which has some
+// shortcomings). You can use this string to compare against your app's stored identifiers and convert them to
+// their new identifiers (persistentResourceIdentifierForObject:).
+// NOTE: This method should only be invoked for such purpose. It might be removed from the framework
+//       in future versions.
+
+- (NSString*) iMedia2PersistentResourceIdentifierForObject:(IMBObject*)inObject
+{
+	NSString* prefix = [self iMedia2PersistentResourceIdentifierPrefix];
+	NSString* path = [inObject.location path];
+	NSString* identifier = [NSString stringWithFormat:@"%@/%@",prefix,path];
+	return identifier;
+}
+
+
+// This method should be overridden by subclasses to return an appropriate prefix for IMBObject identifiers. Refer
+// to the method iMedia2PersistentResourceIdentifierForObject: to see how it is used. Historically we used class names
+// as the prefix. However, during the evolution of iMedia class names can change and identifier string would thus
+// also change. Being non-persistent this is undesirable, as thing that depend of the immutability of identifier strings
+// would break. One such example is object badges, which use such identifiers. To gain backward compatibilty, a parser 
+// class can override this method to return a prefix that matches the historic class name used in iMedia2
+
+- (NSString*) iMedia2PersistentResourceIdentifierPrefix
+{
+	return NSStringFromClass([self class]);
 }
 
 
@@ -267,76 +356,17 @@
 #pragma mark Helpers
 
 
-// This helper method can be used by subclasses to construct identifiers of form "classname://path/to/node"...
- 
-- (NSString*) identifierForPath:(NSString*)inPath
-{
-	NSString* prefix = [self identifierPrefix];
-	return [NSString stringWithFormat:@"%@:/%@",prefix,inPath];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// This identifier string for IMBObject (just like IMBNode.identifier) can be used to uniquely identify an IMBObject. 
-// This can be of use to host app developers who needs to cache usage info of media files in some dictionary when 
-// implementing the badging delegate API. Simply using the path of a local file may not be reliable in those cases 
-// where a file originated from a remote source and first had to be downloaded. For this reason using the identifier 
-// as a key is more reliable...
-
-
-- (NSString*) identifierForObject:(IMBObject*)inObject
-{
-	NSString* prefix = [self identifierPrefix];
-	NSString* location = nil;
-	
-	if ([inObject.location isKindOfClass:[NSString class]])
-	{
-		location = (NSString*)inObject.location;
-	}
-	else if ([inObject.location isKindOfClass:[NSURL class]])
-	{
-		location = [(NSURL*)inObject.location path];
-	}
-	else
-	{
-		location = [inObject.location description];
-	}
-
-	return [NSString stringWithFormat:@"%@:/%@",prefix,location];
-}
-
-
-// This method should be overridden by subclasses to return an appropriate prefix for IMBObject identifiers. Refer
-// to the method identifierForObject: to see how it is used. Historically we used class names as the prefix. 
-// However, during the evolution of iMedia class names can change and identifier string would thus also change. 
-// This is undesirable, as thing that depend of the immutability of identifier strings would break. One such 
-// example are the object badges, which use object identifiers. To guarrantee backward compatibilty, a parser 
-// class can override this method to return a prefix that matches the historic class name...
-
-- (NSString*) identifierPrefix
-{
-	return NSStringFromClass([self class]);
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // This method makes sure that we have an image with a bitmap representation that can be archived...
 
-- (NSImage*) iconForPath:(NSString*)inPath
+- (NSImage*) iconForItemAtURL:(NSURL*)url error:(NSError **)error;
 {
-	NSWorkspace* workspace = [NSWorkspace imb_threadSafeWorkspace];
-	NSImage* image = [workspace iconForFile:inPath];
-	[image setSize:NSMakeSize(16,16)];
-	return image;
-	
-//	NSData* tiff = [image TIFFRepresentation];
-//	NSImage* icon = [[[NSImage alloc] initWithData:tiff] autorelease];
-//	[icon setSize:NSMakeSize(16,16)];
-//	return icon;
+    NSImage *result;
+    if (![url getResourceValue:&result forKey:NSURLEffectiveIconKey error:error]) return nil;
+    NSAssert(url != nil, @"Getting NSURLEffectiveIconKey suceeded, but with a nil image, which isn't documented");
+    
+    result = [result copy]; // since we're about to mutate
+	[result setSize:NSMakeSize(16,16)];
+	return [result autorelease];
 }
 
 
@@ -474,16 +504,6 @@
 	
 	if (outError) *outError = error;
 	return bookmark;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector
-{
-	NSString* reason = [NSString stringWithFormat:@"Abstract base class: Please override method %@ in subclass",NSStringFromSelector(inSelector)];
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:reason userInfo:nil] raise];
 }
 
 

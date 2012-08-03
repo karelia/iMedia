@@ -62,6 +62,7 @@
 #import "IMBFolderObject.h"
 #import "IMBObject.h"
 #import "NSData+SKExtensions.h"
+#import "NSObject+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
@@ -75,8 +76,6 @@
 #pragma mark
 
 @interface IMBLightroom3or4Parser ()
-
-+ (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector;
 
 - (NSNumber*) databaseVersion;
 
@@ -98,7 +97,7 @@
 
 + (NSString*) lightroomPath
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 
 	return nil;
 }
@@ -108,7 +107,7 @@
 
 + (NSString*) identifier
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 
 	return nil;
 }
@@ -121,7 +120,7 @@
 
 + (NSArray*) libraryPaths
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
 }
@@ -137,10 +136,12 @@
 			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
 								   stringByAppendingString:@" Previews"]
 								  stringByAppendingPathExtension:@"lrdata"];
-			NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
 			
-			BOOL isDirectory;
-			if (!([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory)) {
+            NSURL *dataURL = [NSURL fileURLWithPath:dataPath isDirectory:YES];
+			
+			NSNumber *isDirectory;
+			if (![dataURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:NULL] || ![isDirectory boolValue])
+            {
 				dataPath = nil;
 			}
 			
@@ -561,26 +562,29 @@
 
 - (FMDatabase*) libraryDatabase
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
 }
 
 - (FMDatabase*) previewsDatabase
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+// This method must return an appropriate prefix for IMBObject identifiers. Refer to the method
+// -[IMBParser iMedia2PersistentResourceIdentifierForObject:] to see how it is used. Historically we used class names as the prefix. 
+// However, during the evolution of iMedia class names can change and identifier string would thus also change. 
+// This is undesirable, as things that depend of the immutability of identifier strings would break. One such 
+// example are the object badges, which use object identifiers. To guarrantee backward compatibilty, a parser 
+// class must override this method to return a prefix that matches the historic class name...
 
-
-+ (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector
+- (NSString*) iMedia2PersistentResourceIdentifierPrefix
 {
-	NSString* reason = [NSString stringWithFormat:@"Abstract base class: Please override method %@ in subclass",NSStringFromSelector(inSelector)];
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:reason userInfo:nil] raise];
+	return @"IMBLightroom3Parser";
 }
 
 

@@ -113,7 +113,6 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSDictionary* plist = self.plist;
 	NSDictionary* images = [plist objectForKey:@"Master Image List"];
 	NSArray* albums = [plist objectForKey:@"List of Albums"];
@@ -147,6 +146,7 @@
 	// Will find Photos node at same index in subnodes as in album list
 	// which offset was it found, in "List of Albums" Array
 
+    BOOL result = YES;
 	NSUInteger photosNodeIndex = [self indexOfAllPhotosAlbumInAlbumList:albums];
 	if (inNode.isTopLevelNode && photosNodeIndex != NSNotFound)
 	{
@@ -154,13 +154,12 @@
 		if (photosNodeIndex < [subnodes count])	// Karelia case 136310, make sure offset exists
 		{
 			IMBNode* photosNode = [subnodes objectAtIndex:photosNodeIndex];	// assumes subnodes exists same as albums!
-			[self populateNode:photosNode error:outError];
+			result = [self populateNode:photosNode error:outError];
 			inNode.objects = photosNode.objects;
 		}
 	}
 	
-	if (outError) *outError = error;
-	return error == nil;
+	return result;
 }
 
 
@@ -244,7 +243,7 @@
 {
     if (inVersion && inVersion.length > 0)
     {
-        NSComparisonResult compareResult = [inVersion imb_finderCompare:@"9.2.1"];
+        NSComparisonResult compareResult = [inVersion localizedStandardCompare:@"9.2.1"];
         return (compareResult >= 0);
     }
     return NO;
@@ -372,6 +371,24 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is the "Events" album.
+
+- (BOOL) isEventsAlbum:(NSDictionary*)inAlbumDict
+{
+	return [[inAlbumDict objectForKey:@"Album Type"] isEqualToString:@"Events"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is an "Event" album.
+
+- (BOOL) isEventAlbum:(NSDictionary*)inAlbumDict
+{
+	return [[inAlbumDict objectForKey:@"Album Type"] isEqualToString:@"Event"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (BOOL) isFlaggedAlbum:(NSDictionary*)inAlbumDict
@@ -384,7 +401,8 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
+// NOTE: This method is neither being used to add events sub nodes nor to add faces sub nodes.
+//       This is done in their respective populate methods.
 
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
 {
@@ -407,9 +425,10 @@
 		NSString* albumIdSpace = [self idSpaceForAlbumType:albumType];
         
 		// parent always from same id space for non top-level albums
-		NSString* parentIdentifier = parentId ? [self identifierForId:parentId inSpace:albumIdSpace] : [self identifierForPath:@"/"];
+		NSString* parentIdentifier = parentId ? [self identifierForId:parentId inSpace:albumIdSpace] : [self rootNodeIdentifier];
 		
-		if ([self shouldUseAlbumType:albumType] && 
+		if (![self isEventAlbum:albumDict] &&
+            [self shouldUseAlbumType:albumType] &&
 			[inParentNode.identifier isEqualToString:parentIdentifier] && 
 			[self shouldUseAlbum:albumDict images:inImages])
 		{
@@ -422,6 +441,8 @@
 			albumNode.name = albumName;
 			albumNode.mediaSource = self.mediaSource;
 			albumNode.parserIdentifier = self.identifier;
+			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
@@ -599,6 +620,9 @@
 			subnode.name = subnodeName;
 			subnode.mediaSource = self.mediaSource;
 			subnode.parserIdentifier = self.identifier;
+			subnode.isIncludedInPopup = NO;
+			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			subnode.watcherType = kIMBWatcherTypeNone;  // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
 			// Keep a ref to the subnode dictionary for potential later use
 			
@@ -631,6 +655,7 @@
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 
 			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
+            [object resetCurrentSkimmingIndex];                 // Must be done *after* preliminaryMetadata is set
 			object.metadata = nil;								// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
 			
@@ -642,7 +667,7 @@
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
 			
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+			object.location = [NSURL fileURLWithPath:path isDirectory:NO];
 			object.name = subnode.name;
 			object.parserIdentifier = [self identifier];
 			object.index = index++;
@@ -695,7 +720,7 @@
 			[objects addObject:object];
 			[object release];
 			
-			object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+			object.location = [NSURL fileURLWithPath:path isDirectory:NO];
 			object.name = name;
 			object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
 			object.metadata = nil;					// Build lazily when needed (takes longer)
@@ -795,7 +820,7 @@
         [objects addObject:object];
         [object release];
         
-        object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+        object.location = [NSURL fileURLWithPath:path isDirectory:NO];
         object.name = name;
         object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
         object.metadata = nil;					// Build lazily when needed (takes longer)

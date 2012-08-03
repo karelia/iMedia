@@ -84,7 +84,6 @@
 
 #import "IMBObject.h"
 #import "IMBNode.h"
-#import "IMBObjectsPromise.h"
 #import "IMBParserMessenger.h"
 #import "IMBCommon.h"
 #import "IMBOperationQueue.h"
@@ -117,7 +116,6 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 @interface IMBObject ()
 @property (retain) NSData* atomic_bookmark;
-@property (retain) id atomic_imageRepresentation;
 @end
 
 
@@ -132,6 +130,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @synthesize atomic_bookmark = _bookmark;
 @synthesize name = _name;
 @synthesize identifier = _identifier;
+@synthesize persistentResourceIdentifier = _persistentResourceIdentifier;
 
 @synthesize preliminaryMetadata = _preliminaryMetadata;
 @synthesize metadata = _metadata;
@@ -181,6 +180,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	IMBRelease(_bookmark);
 	IMBRelease(_name);
 	IMBRelease(_identifier);
+	IMBRelease(_persistentResourceIdentifier);
 	
 	IMBRelease(_preliminaryMetadata);
 	IMBRelease(_metadata);
@@ -211,6 +211,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.atomic_bookmark = [coder decodeObjectForKey:@"bookmark"];
 		self.name = [coder decodeObjectForKey:@"name"];
 		self.identifier = [coder decodeObjectForKey:@"identifier"];
+		self.persistentResourceIdentifier = [coder decodeObjectForKey:@"persistentResourceIdentifier"];
 		self.error = [inCoder decodeObjectForKey:@"error"];
 
 		self.preliminaryMetadata = [coder decodeObjectForKey:@"preliminaryMetadata"];
@@ -249,6 +250,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeObject:self.bookmark forKey:@"bookmark"];
 	[coder encodeObject:self.name forKey:@"name"];
 	[coder encodeObject:self.identifier forKey:@"identifier"];
+	[coder encodeObject:self.persistentResourceIdentifier forKey:@"persistentResourceIdentifier"];
 	[coder encodeObject:self.error forKey:@"error"];
 
 	[coder encodeObject:self.preliminaryMetadata forKey:@"preliminaryMetadata"];
@@ -290,6 +292,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	copy.atomic_bookmark = self.bookmark;
 	copy.name = self.name;
 	copy.identifier = self.identifier;
+	copy.persistentResourceIdentifier = self.persistentResourceIdentifier;
 	copy.error = self.error;
 
 	copy.preliminaryMetadata = self.preliminaryMetadata;
@@ -319,61 +322,21 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 #pragma mark 
 #pragma mark Helpers
 
-
-// Convert location to path...
-
-- (NSString*) path
-{
-	NSString* path = nil;
-	
-	if ([_location isKindOfClass:[NSURL class]])
-	{
-		path = [(NSURL*)_location path];
-	}
-	else if ([_location isKindOfClass:[NSString class]])
-	{
-		path = (NSString*)_location;
-	}
-	
-	return path;
-}
+//- (void) setIdentifier:(NSString *)identifier
+//{
+//    if (identifier == nil) {
+//        NSLog(@"Nil identifier");
+//    } else {
+//        _identifier = identifier;
+//    }
+//}
 
 
 // Convert location to url...
 
 - (NSURL*) URL
 {
-	NSURL* url = nil;
-	
-	if ([_location isKindOfClass:[NSURL class]])
-	{
-		url = (NSURL*)_location;
-	}
-	else if ([_location isKindOfClass:[NSString class]])
-	{
-		url = [NSURL fileURLWithPath:(NSString*)_location];
-	}
-	
-	return url;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (BOOL) isLocalFile
-{
-	if ([_location isKindOfClass:[NSURL class]])
-	{
-		return [(NSURL*)_location isFileURL];
-	}
-	else if ([_location isKindOfClass:[NSString class]])
-	{
-		NSString* path = (NSString*)_location;
-		return [[NSFileManager imb_threadSafeManager] fileExistsAtPath:path];
-	}
-	
-	return NO;
+	return _location;
 }
 
 
@@ -388,12 +351,12 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 - (NSString*) type
 {
 	NSString* uti = nil;
-	NSString* path = [self path];
-	NSString* extension = [path pathExtension];
+	NSURL *url = [self URL];
+	NSString* extension = [url pathExtension];
 		
-	if ([self isLocalFile])
+	if ([url isFileURL])
 	{
-		uti = [NSString imb_UTIForFileAtPath:path];
+		uti = [NSString imb_UTIForFileAtPath:[url path]];
 	}
 	else if (extension != nil)
 	{
@@ -402,14 +365,25 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 	if (uti != nil && [NSString imb_doesUTI:uti conformsToUTI:(NSString*)kUTTypeAliasFile])
 	{
-		path = [path imb_resolvedPath];
-		uti = [NSString imb_UTIForFileAtPath:path];
+		url = [url imb_URLByResolvingSymlinksAndBookmarkFilesInPath];
+		uti = (url ? [NSString imb_UTIForFileAtPath:[url path]] : nil);
 	}
 	
 	return uti;
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Convenience accessor for the mediaType...
+
+- (NSString*) mediaType
+{
+	return self.parserMessenger.mediaType;
+}
+
+					
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -423,7 +397,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	{
 		icon = self.imageRepresentation;
 	}
-	else if ([self isLocalFile])
+	else if ([[self URL] isFileURL])
 	{
 		icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFileType:self.type];
 	}
@@ -585,27 +559,25 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 - (void) pasteboard:(NSPasteboard*)inPasteboard item:(NSPasteboardItem*)inItem provideDataForType:(NSString*)inType
 {
-	// For IMBObjects simply use self...
-	
-    if ([inType isEqualToString:(NSString*)kIMBObjectPasteboardType])
-	{
-		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:self];
-		[inItem setData:data forType:(NSString*)kIMBObjectPasteboardType];
-	}
-	
 	// Request the bookmark. Since this is an asynchronous operation - but we need to return with a result
 	// synchronously, we'll wrap the whole thing in a dispatch_sync on a background queue and wait for the 
 	// result there. Please note that it is important to use a concurrent background queue. We cannot do this
 	// on the main queue, or the completion block of requestBookmarkWithCompletionBlock: would never fire.
 	// Once we have the bookmark, we cn resolve it to a URL (thus punching a hole in the sandbox) and return it...
 	
-	else if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
+	if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
 	{
 		dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
 		{
 			[self requestBookmarkWithCompletionBlock:^(NSError* inError)
 			{
-				if (inError) [NSApp presentError:inError];
+				if (inError)
+				{
+					dispatch_async(dispatch_get_main_queue(),^()
+					{
+						[NSApp presentError:inError];
+					});
+				}
 			}];
             
             [self waitForBookmark];
@@ -613,12 +585,14 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 			if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
 		});
 	}
-}
-
-
-- (void) pasteboardFinishedWithDataProvider:(NSPasteboard*)inPasteboard
-{
-
+	
+	// For IMBObjects simply use self...
+	
+    else if ([inType isEqualToString:(NSString*)kIMBObjectPasteboardType])
+	{
+		NSData* data = [NSKeyedArchiver archivedDataWithRootObject:self];
+		[inItem setData:data forType:(NSString*)kIMBObjectPasteboardType];
+	}
 }
 
 
@@ -788,8 +762,9 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 {
 	if (self.bookmark == nil)
 	{
-		[inCompletionBlock copy];
+		void (^completionBlock)(NSError*) = [inCompletionBlock copy];
 		IMBParserMessenger* messenger = self.parserMessenger;
+		
 		SBPerformSelectorAsync(messenger.connection,messenger,@selector(bookmarkForObject:error:),self,
 		
 			^(NSData* inBookmark,NSError* inError)
@@ -801,46 +776,10 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 				else
 				{
 					self.atomic_bookmark = inBookmark;
-					
-					// First receive the normal bookmark and resolve it to a NSURL. This punches a hole into
-					// the sandbox for this launch session. But this hole doesn't persistent across relaunches.
-					// To achieve this, we need to convert it to a security scoped app bookmark...
-					
-//					NSData* appScopedBookmark = nil;
-//					NSError* error = nil;
-//					BOOL isStale = NO;
-//					
-//					NSURL* url = [NSURL 
-//						URLByResolvingBookmarkData:inBookmark 
-//						options:0 
-//						relativeToURL:nil
-//						bookmarkDataIsStale:&isStale 
-//						error:&error];
-//					
-//					if (error == nil)
-//					{
-//						NSURLBookmarkCreationOptions options = 
-//							NSURLBookmarkCreationMinimalBookmark |
-//							NSURLBookmarkCreationWithSecurityScope |
-//							NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess;
-//				
-//						appScopedBookmark = [url 
-//							bookmarkDataWithOptions:options
-//							includingResourceValuesForKeys:nil
-//							relativeToURL:nil
-//							error:&error];
-//					}
-//					
-//					if (error == nil)
-//					{
-//						self.bookmark = appScopedBookmark;
-//					}
-//					
-//					inError = error;
 				}
 				
-				inCompletionBlock(inError);
-				[inCompletionBlock release];
+				completionBlock(inError);
+				[completionBlock release];
 			});
 	}
 	else

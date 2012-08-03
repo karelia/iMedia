@@ -85,6 +85,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 @class NSObjectViewController;
 @class IMBOutlineView;
 @class IMBNode;
+@protocol IMBNodeViewControllerDelegate;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,6 +107,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 	NSMutableArray* _expandedNodeIdentifiers;
 	BOOL _isRestoringState;
     NSPoint _nodeOutlineViewSavedVisibleRectOrigin;
+	id<IMBNodeViewControllerDelegate> _delegate;
 	
 	NSViewController* _standardHeaderViewController;
 	NSViewController* _standardObjectViewController;
@@ -116,7 +118,8 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 }
 
 + (void) registerNodeViewControllerClass:(Class)inNodeViewControllerClass forMediaType:(NSString*)inMediaType;
-+ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController;
++ (IMBNodeViewController*) viewControllerForLibraryController:(IMBLibraryController*)inLibraryController delegate:(id<IMBNodeViewControllerDelegate>)inDelegate;
+
 
 // Library...
 
@@ -126,19 +129,29 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 - (NSImage*) icon;
 - (NSString*) displayName;
 
+// Delegate...
 
-@property (readonly) IMBOutlineView* nodeOutlineView;
-@property (readonly) NSPopUpButton* nodePopupButton;
-@property (readonly) NSView* headerContainerView;
-@property (readonly) NSView* objectContainerView;
-@property (readonly) NSView* footerContainerView;
+@property (assign) id<IMBNodeViewControllerDelegate> delegate;
+
+// Saving/Restoring state...
+
+- (void) restoreState;	
+- (void) saveState;	
+
+
+// Selecting a node...
+
+- (void) selectNode:(IMBNode*)inNode;
+- (IMBNode*) selectedNode;
+
+- (void) expandSelectedNode;
 
 @property (retain) NSString* selectedNodeIdentifier;
 @property (retain) NSMutableArray* expandedNodeIdentifiers;
-@property (readonly) IMBNode* selectedNode;
 
-- (void) selectNode:(IMBNode*)inNode;
-- (void) expandSelectedNode;
++ (void) revealNodeWithIdentifier:(NSString*)inIdentifier;	// These methods work via notification and affect
++ (void) selectNodeWithIdentifier:(NSString*)inIdentifier;	// all instances of IMBNodeViewController...
+
 
 // Context menu support...
 
@@ -155,6 +168,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 - (BOOL) canRemoveNode;
 - (IBAction) removeNode:(id)inSender;
 
+
 // Object Views...
 
 @property (retain) NSViewController* standardHeaderViewController;
@@ -168,20 +182,19 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 - (void) installObjectViewForNode:(IMBNode*)inNode;
 - (NSSize) minimumViewSize;
 
-// Saving/Restoring state...
-
-- (void) restoreState;	
-- (void) saveState;	
-
-// These methods work via notification and affect all instances of IMBNodeViewController...
-
-+ (void) revealNodeWithIdentifier:(NSString*)inIdentifier;
-+ (void) selectNodeWithIdentifier:(NSString*)inIdentifier;
-
 // Use this method in your host app to tell the current object view (icon, list, or combo view)
 // that it needs to re-display itself (e.g. when a badge on an image needs to be updated)...
 
 - (void) setObjectContainerViewNeedsDisplay:(BOOL)inFlag;
+
+
+// View accessors...
+
+@property (readonly) IMBOutlineView* nodeOutlineView;
+@property (readonly) NSPopUpButton* nodePopupButton;
+@property (readonly) NSView* headerContainerView;
+@property (readonly) NSView* objectContainerView;
+@property (readonly) NSView* footerContainerView;
 
 
 @end
@@ -199,9 +212,9 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 // The delegate can supply its own object view controllers for certain nodes. 
 // If it chooses to do so, this overrides everything else...
 
-- (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode;
-- (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode;
-- (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) nodeViewController:(IMBNodeViewController*)inNodeViewController customHeaderViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) nodeViewController:(IMBNodeViewController*)inNodeViewController customObjectViewControllerForNode:(IMBNode*)inNode;
+- (NSViewController*) nodeViewController:(IMBNodeViewController*)inNodeViewController customFooterViewControllerForNode:(IMBNode*)inNode;
 
 @end
 

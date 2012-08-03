@@ -246,9 +246,15 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 				{
 					shouldLoad = [_delegate parserController:self shouldLoadParserMessengerWithIdentifier:[parserMessengerClass identifier]];
 				}
-				
+
 				if (shouldLoad)
 				{
+					if ([_delegate respondsToSelector:@selector(parserController:replacementClassForParserMessengerClass:)])
+					{
+						Class newClass = [_delegate parserController:self replacementClassForParserMessengerClass:parserMessengerClass];
+						if (newClass) parserMessengerClass = newClass;
+					}
+				
 					IMBParserMessenger* parserMessenger = [[parserMessengerClass alloc] init];
 					[self addParserMessenger:parserMessenger];
 					[parserMessenger release];
@@ -430,7 +436,7 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 {
 	if (_loadedParserMessengers)
 	{
-		NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
+		NSMutableDictionary* prefs = [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:self.class]];
 		NSMutableArray* userAddedParserMessengers = [NSMutableArray array];
 		
 		for (NSString* mediaType in _loadedParserMessengers)
@@ -459,7 +465,7 @@ static NSMutableDictionary* sRegisteredParserMessengerClasses = nil;
 
 - (void) loadUserAddedParserMessengersFromPreferences
 {
-	NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
+	NSMutableDictionary* prefs = [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:self.class]];
 	NSArray* userAddedParserMessengers = [prefs objectForKey:@"userAddedParserMessengers"];
 	
 	for (NSData* data in userAddedParserMessengers)

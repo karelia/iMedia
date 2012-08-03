@@ -249,8 +249,9 @@ static IMBPanelController* sSharedPanelController = nil;
 		// Create the top-level view controller (IMBNodeViewController) with attached standard
 		// object view (IMBObjectViewController) for each media type...
 	
-		nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
-		objectViewController = [IMBObjectViewController viewControllerForLibraryController:libraryController];
+		nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController delegate:self.delegate];
+		objectViewController = [IMBObjectViewController viewControllerForLibraryController:libraryController delegate:self.delegate];
+		
 		nodeViewController.standardObjectViewController = objectViewController;
 		[self.nodeViewControllers setObject:nodeViewController forKey:mediaType];
 	}

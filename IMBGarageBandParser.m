@@ -135,10 +135,10 @@
 }
 
 
-- (NSString*) demoSongsPath
-{
-	return @"/Library/Application Support/GarageBand/GarageBand Demo Songs/GarageBand Demo Songs/";
-}
+//- (NSString*) demoSongsPath
+//{
+//	return @"/Library/Application Support/GarageBand/GarageBand Demo Songs/";
+//}
 
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
@@ -146,11 +146,10 @@
 	if (inNode.isTopLevelNode)
 	{
 		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
-		NSString* userSongsPath = [self userSongsPath];
-		NSString* demoSongsPath = [self demoSongsPath];
-		BOOL isDirectory = NO;
+		NSFileManager *fileManager = [[NSFileManager alloc] init];
 			
-		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:userSongsPath isDirectory:&isDirectory])
+		NSString* userSongsPath = [self userSongsPath];
+		if ([fileManager fileExistsAtPath:userSongsPath])
 		{
 			NSString* userSongsName = NSLocalizedStringWithDefaultValue(
 				@"IMBGarageBandParser.usersongs.name",
@@ -160,7 +159,7 @@
 		
 			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
 			subnode.identifier = [self identifierForPath:userSongsPath];
-			subnode.icon = [self iconForPath:userSongsPath];
+			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:userSongsPath isDirectory:YES] error:NULL];
 			subnode.name = userSongsName;
 			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = [NSURL fileURLWithPath:userSongsPath];
@@ -171,30 +170,31 @@
 			[subnodes addObject:subnode];
 		}
 		
-		if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:demoSongsPath isDirectory:&isDirectory])
-		{
-			NSString* demoSongsName = NSLocalizedStringWithDefaultValue(
-				@"IMBGarageBandParser.demosongs.name",
-				nil,IMBBundle(),
-				@"Demo Songs",
-				@"Name of node in IMBGarageBandParser");
+//		NSString* demoSongsPath = [self demoSongsPath];
+//        if ([fileManager fileExistsAtPath:demoSongsPath])
+//		{
+//			NSString* demoSongsName = NSLocalizedStringWithDefaultValue(
+//				@"IMBGarageBandParser.demosongs.name",
+//				nil,IMBBundle(),
+//				@"Demo Songs",
+//				@"Name of node in IMBGarageBandParser");
+//
+//			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+//			subnode.identifier = [self identifierForPath:userSongsPath];
+//			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:demoSongsPath isDirectory:YES] error:NULL];
+//			subnode.name = demoSongsName;
+//			subnode.mediaType = self.mediaType;
+//			subnode.mediaSource = [NSURL fileURLWithPath:demoSongsPath];
+//			subnode.parserIdentifier = self.identifier;
+//			subnode.isTopLevelNode = NO;
+//			subnode.isIncludedInPopup = YES;
+//			subnode.isLeafNode = YES;
+//			[subnodes addObject:subnode];
+//		}
 
-			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
-			subnode.identifier = [self identifierForPath:userSongsPath];
-			subnode.icon = [self iconForPath:demoSongsPath];
-			subnode.name = demoSongsName;
-			subnode.mediaType = self.mediaType;
-			subnode.mediaSource = [NSURL fileURLWithPath:demoSongsPath];
-			subnode.parserIdentifier = self.identifier;
-			subnode.isTopLevelNode = NO;
-			subnode.isIncludedInPopup = YES;
-			subnode.isLeafNode = YES;
-			[subnodes addObject:subnode];
-		}
-
+        [fileManager release];
 		inNode.objects = [NSMutableArray arrayWithCapacity:0];	// Important to mark node as populated!
 		
-		if (outError) *outError = nil;
 		return YES;
 	}
 	else
@@ -211,13 +211,13 @@
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	NSString* path = inObject.path;
-	path = [path stringByAppendingPathComponent:@"Output/metadata.plist"];
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+	NSURL *url = inObject.URL;
+	url = [url URLByAppendingPathComponent:@"Output/metadata.plist"];
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithContentsOfURL:url];
 	
 	if (metadata)
 	{
-		[metadata setObject:path forKey:@"path"];
+		[metadata setObject:[url path] forKey:@"path"];
 
 		NSNumber* duration = [metadata objectForKey:@"com_apple_garageband_metadata_songDuration"];
 		[metadata setObject:duration forKey:@"duration"];

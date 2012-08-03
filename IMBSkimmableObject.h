@@ -67,6 +67,9 @@
 
 - (NSUInteger) imageCount;
 
+// Returns the image location that corresponds to the current skimming index. Must be subclassed.
+- (id) imageLocationForCurrentSkimmingIndex;
+
 // Returns the image location that corresponds to the skimming index provided. Must be subclassed.
 
 - (id) imageLocationAtSkimmingIndex:(NSUInteger)skimmingIndex;
@@ -79,4 +82,10 @@
 
 - (void) setIsLoadingThumbnail:(BOOL)inIsLoadingThumbnail;
 
+// If the image representation isn't available yet, then trigger asynchronous loading based on a sparse copy
+// of self (only vital ivars for thumbnail loading are set - this should be much faster). When the results come in,
+// copy the thumbnail from the incoming object. Do not replace the old object here, as that would unecessarily
+// upset the NSArrayController. Redrawing of the view will be triggered automatically...
+
+- (void) fastLoadThumbnail;
 @end

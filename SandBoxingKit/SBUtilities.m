@@ -48,7 +48,7 @@ BOOL SBIsSandboxed()
 
     dispatch_once(&sIsSandboxedToken,
     ^{
-		if (IMBRunningOnLionOrNewer())
+		if (NSAppKitVersionNumber >= 1138) // Are we running on Lion?
 		{
 			SecCodeRef codeRef = NULL;
 			SecCodeCopySelf(kSecCSDefaultFlags,&codeRef);
@@ -135,7 +135,7 @@ static NSDictionary* _SBPreferencesDictionary(NSString* inHomeFolderPath,NSStrin
 
 // Private function to access a certain value in the prefs dictionary...
 
-static CFTypeRef _SBGetValue(NSDictionary* inPrefsFileContents,CFStringRef inKey)
+static CFTypeRef _SBCopyValue(NSDictionary* inPrefsFileContents,CFStringRef inKey)
 {
     CFTypeRef value = NULL;
 
@@ -177,7 +177,7 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
     {
         path = SBHomeDirectory();
         NSDictionary* prefsFileContents = _SBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
-        value = _SBGetValue(prefsFileContents,inKey);
+        value = _SBCopyValue(prefsFileContents,inKey);
     }
 
     // It's possible that the other app is sandboxed as well, so we may need look for the prefs file 
@@ -187,7 +187,7 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
     {
         path = SBApplicationContainerHomeDirectory((NSString*)inBundleIdentifier);
         NSDictionary* prefsFileContents = _SBPreferencesDictionary(path,(NSString*)inBundleIdentifier);
-        value = _SBGetValue(prefsFileContents,inKey);
+        value = _SBCopyValue(prefsFileContents,inKey);
     }
     
     return value;

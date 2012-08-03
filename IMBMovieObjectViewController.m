@@ -94,6 +94,10 @@
 
 	ibObjectArrayController.searchableProperties = [NSArray arrayWithObjects:
 		@"name",
+		@"metadata.artist",
+		@"metadata.Comment",
+		@"preliminaryMetadata.artist",
+		@"preliminaryMetadata.Comment",
 		nil];
 }
 

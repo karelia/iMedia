@@ -62,8 +62,8 @@
 	CIFilter* transitionFilter;
 	NSShadow* shadow;
 	FliprAnimation* animation;
-	float direction;				// this will be 1 (forward) or -1 (backward).
-	float frameTime;				// time for last drawRect:
+	CGFloat direction;				// this will be 1 (forward) or -1 (backward).
+	NSTimeInterval frameTime;				// time for last drawRect:
 }
 @end
 
@@ -200,13 +200,13 @@
 // This is probably redundant...
 		[animation setCurrentProgress:0.0];
 		[flipr orderWindow:NSWindowBelow relativeTo:[finalWindow windowNumber]];
-		float duration = DURATION;
+		NSTimeInterval duration = DURATION;
 // Slow down by a factor of 5 if the shift key is down.
 		if ([[NSApp currentEvent] modifierFlags]&NSShiftKeyMask) {
 			duration *= 5.0;
 		}
 // We accumulate drawing time and draw a second frame at the point where the rotation starts to show.
-		float totalTime = frameTime;
+		NSTimeInterval totalTime = frameTime;
 		[animation setCurrentProgress:DURATION/15];
 // Now we update the screen and the second frame appears, boom! :-)
 		NSEnableScreenUpdates();
@@ -252,19 +252,19 @@
 // For calculating the draw time...
 	AbsoluteTime startTime = UpTime();
 // time will vary from 0.0 to 1.0. 0.5 means halfway.
-	float time = [animation currentValue];
+	NSTimeInterval time = [animation currentValue];
 // This code was adapted from http://www.macs.hw.ac.uk/~rpointon/osx/coreimage.html by Robert Pointon.
 // First we calculate the perspective.
-	float radius = originalRect.size.width/2;
-	float width = radius;
-	float height = originalRect.size.height/2;
-	float dist = 1600; // visual distance to flipping window, 1600 looks about right. You could try radius*5, too.
-	float angle = direction*3.14159265358979323846264338327950288*time;
-	float px1 = radius*cos(angle);
-	float pz = radius*sin(angle);
-	float pz1 = dist+pz;
-	float px2 = -px1;
-	float pz2 = dist-pz;
+	CGFloat radius = originalRect.size.width/2;
+	CGFloat width = radius;
+	CGFloat height = originalRect.size.height/2;
+	CGFloat dist = 1600; // visual distance to flipping window, 1600 looks about right. You could try radius*5, too.
+	CGFloat angle = direction*M_PI*time;
+	CGFloat px1 = radius*cos(angle);
+	CGFloat pz = radius*sin(angle);
+	CGFloat pz1 = dist+pz;
+	CGFloat px2 = -px1;
+	CGFloat pz2 = dist-pz;
 	if (time>0.5) {
 // At this point,  we need to swap in the final image, for the second half of the animation.
 		if (finalImage) {
@@ -272,14 +272,14 @@
 			[finalImage release];
 			finalImage = nil;
 		}
-		float ss;
+		CGFloat ss;
 		ss = px1; px1 = px2; px2 = ss;
 		ss = pz1; pz1 = pz2; pz2 = ss;
 	}
-	float sx1 = dist*px1/pz1;
-	float sy1 = dist*height/pz1;
-	float sx2 = dist*px2/pz2;
-	float sy2 = dist*height/pz2;
+	CGFloat sx1 = dist*px1/pz1;
+	CGFloat sy1 = dist*height/pz1;
+	CGFloat sx2 = dist*px2/pz2;
+	CGFloat sy2 = dist*height/pz2;
 // Everything is set up, we pass the perspective to the CoreImage filter
 	[transitionFilter setValue:[CIVector vectorWithX:width+sx1 Y:height+sy1] forKey:@"inputTopRight"];
 	[transitionFilter setValue:[CIVector vectorWithX:width+sx2 Y:height+sy2] forKey:@"inputTopLeft" ];

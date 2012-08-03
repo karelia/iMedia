@@ -500,11 +500,9 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	if ([localURL isFileURL])
 	{
-		BOOL exists,directory;
-		exists = [[NSFileManager imb_threadSafeManager] fileExistsAtPath:[localURL path] isDirectory:&directory];
-		
-		if (!exists || directory)
-		{
+        NSNumber *isFile;
+        if (![localURL getResourceValue:&isFile forKey:NSURLIsRegularFileKey error:NULL] || ![isFile boolValue])
+        {
 			localURL = nil;
 		}
 	}
@@ -671,10 +669,11 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 				// If we don't have a download folder yet, then use temporary directory...
 				
 				NSString* downloadFolderPath = self.destinationDirectoryPath;
-				
-				if (downloadFolderPath == nil)
+				NSFileManager *fileManager = [[NSFileManager alloc] init];
+                
+                if (downloadFolderPath == nil)
 				{
-					downloadFolderPath = [[NSFileManager imb_threadSafeManager] imb_sharedTemporaryFolder:@"downloads"];
+                    downloadFolderPath = [fileManager imb_sharedTemporaryFolder:@"downloads"];
 				}
 				
 				NSString* filename = [[url path] lastPathComponent];
@@ -701,7 +700,7 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 				// If we already have a local file, and the option key is not down, then use the local file...
 				
 				unsigned eventModifierFlags = [[NSApp currentEvent] modifierFlags];				
-				if ([[NSFileManager imb_threadSafeManager] fileExistsAtPath:localPath]
+				if ([fileManager fileExistsAtPath:localPath]
 					&& 0 == (eventModifierFlags & NSAlternateKeyMask))
 				{
 					downloadOp.localPath = localPath;	// Indicate already-ready local path, meaning that no download needs to actually happen
@@ -717,6 +716,8 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 					[self.getSizeOperations addObject:getSizeOp];
 					[self.downloadOperations addObject:downloadOp];
 				}
+                
+                [fileManager release];
 			}
 		}
 	}
@@ -776,16 +777,15 @@ NSString* kIMBPasteboardTypeObjectsPromise = @"com.karelia.imedia.pasteboard.obj
 	
 	// Trash any files that we already have...
 	
-	NSFileManager* mgr = [NSFileManager imb_threadSafeManager];
+	NSFileManager* mgr = [[NSFileManager alloc] init];
 	
     // TODO: This would run faster if iterated _URLsByObject directly since would skip objects that hadn't loaded
 	for (NSURL* url in self.fileURLs)
 	{
-		if ([url isFileURL])
-        {
-            [mgr removeItemAtPath:[url path] error:NULL];
-        }
+		[mgr removeItemAtURL:url error:NULL];
 	}
+    
+    [mgr release];
 	
 	// Cleanup...
 	

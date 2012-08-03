@@ -43,78 +43,28 @@
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
 */
 
-
-// Author: Christoph Priebe
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//	System
-#import <Cocoa/Cocoa.h>
-
 //	Objective Flickr
 #import <ObjectiveFlickr/ObjectiveFlickr.h>
 
-//	iMedia
-#import "IMBNode.h"
+//  iMedia
 #import "IMBParser.h"
 
-//----------------------------------------------------------------------------------------------------------------------
 
-@class IMBFlickrNode;
-@class IMBLoadMoreObject;
-@class OFFlickrAPIContext;
 
 /**
- *	iMedia parser to read public Flickr images.
- *	
- *	You need to supply your own Flickr API key and shared secret to use this 
- *	parser. Apply for key and secret at: http://flickr.com/services/api/keys/apply
- *
- *	Set the API key and shared secret in the IMBParserController delegate method
- *	parserController:didLoadParser:forMediaType: See the iMedia Test Application for 
- *	an example.
- *
- *
- *	@date 2009-08-24 Start implementing this class (cp).
+ *	This parser class creates nodes for a Flickr search query.
  *
  *	@author  Christoph Priebe (cp)
- *	@since   iMedia 2.0
+ *	@since   iMedia 3.0
  */
-@interface IMBFlickrParser: IMBParser <OFFlickrAPIRequestDelegate> {
-	@private
-	IMBFlickrSizeSpecifier _desiredSize;
-	NSMutableArray* _customQueries;
-	NSMutableDictionary* _flickrRequests;
-	id _delegate;
+@interface IMBFlickrParser: IMBParser {
+    @private
 	NSString* _flickrAPIKey;
 	OFFlickrAPIContext* _flickrContext;
 	NSString* _flickrSharedSecret;
-	IMBLoadMoreObject* _loadMoreButton;
 }
 
-#pragma mark Actions
-
-- (IBAction) loadMoreImages: (id) sender;
-
-- (IBAction) openFlickrPage: (id) sender;
-
-- (IBAction) removeNode: (id) sender;
-
-
-#pragma mark Flickr Request Handling
-
-+ (NSString*) flickrMethodForMethodCode: (NSInteger) code;
-
-
 #pragma mark Properties
-
-@property (assign) IMBFlickrSizeSpecifier desiredSize;
-
-@property (retain) NSMutableArray* customQueries;
-
-@property (assign) id delegate;
 
 ///	The API key given to you by Flickr. Must be set to use this parser.
 @property (copy) NSString* flickrAPIKey;
@@ -122,39 +72,4 @@
 ///	The shared secret given to you by Flickr. Must be set to use this parser.
 @property (copy) NSString* flickrSharedSecret;
 
-///	Returns the root node of the Flickr subtree.
-@property (readonly) IMBFlickrNode* flickrRootNode;
-
-///	A button object holding the 'load more' button.
-@property (readonly) IMBLoadMoreObject* loadMoreButton;
-
-
-#pragma mark Query Persistence
-
-- (void) addCustomQuery: (NSDictionary*) inQueryParams;
-- (void) removeCustomQuery: (NSDictionary*) inQueryParams;
-- (void) updateCustomQuery: (NSDictionary*) inQueryParams;
-
-- (void) loadCustomQueries;
-- (void) saveCustomQueries;
-- (void) reloadCustomQueries;
-- (void) reloadCustomQuery: (NSDictionary*) inQueryParams;
-
 @end
-
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-#pragma mark 
-
-@protocol IMBFlickrParserDelegate
-
-@optional
-
-- (NSArray*) flickrParserSetupDefaultQueries: (IMBFlickrParser*) IMBFlickrParser;
-
-@end
-
-//----------------------------------------------------------------------------------------------------------------------
-

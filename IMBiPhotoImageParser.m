@@ -66,4 +66,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This method must return an appropriate prefix for IMBObject identifiers. Refer to the method
+// -[IMBParser iMedia2PersistentResourceIdentifierForObject:] to see how it is used. Historically we used class names as the prefix. 
+// However, during the evolution of iMedia class names can change and identifier string would thus also change. 
+// This is undesirable, as things that depend of the immutability of identifier strings would break. One such 
+// example are the object badges, which use object identifiers. To guarrantee backward compatibilty, a parser 
+// class must override this method to return a prefix that matches the historic class name...
+
+- (NSString*) iMedia2PersistentResourceIdentifierPrefix
+{
+	return @"IMBiPhotoParser";
+}
+
+
 @end

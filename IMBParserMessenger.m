@@ -381,6 +381,7 @@
 		for (IMBObject* object in inNode.objects)
 		{
 			object.identifier = [inParser identifierForObject:object];
+			object.persistentResourceIdentifier = [inParser persistentResourceIdentifierForObject:object];
 		}
 		
 		for (IMBNode* subnode in inNode.subnodes)
@@ -400,7 +401,6 @@
 
 - (IMBObject*) loadThumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-#warning TODO: We need a *generic* mechanism to provide the ParserMessenger to all IMBObjects in the XPC service
     inObject.parserMessenger = self;
     
 	NSError* error = nil;
@@ -418,6 +418,8 @@
 
 - (IMBObject*) loadMetadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+    inObject.parserMessenger = self;
+    
 	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inObject.parserIdentifier];
 	
@@ -428,10 +430,7 @@
 
 	if (error == nil)
 	{
-		if (![inObject isKindOfClass:[IMBNodeObject class]])
-		{
-			inObject.metadataDescription = [self metadataDescriptionForMetadata:inObject.metadata];
-		}
+        inObject.metadataDescription = [self metadataDescriptionForMetadata:inObject.metadata];
 	}
 
 	if (outError) *outError = error;
@@ -441,6 +440,8 @@
 
 - (IMBObject*) loadThumbnailAndMetadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+    inObject.parserMessenger = self;
+    
 	NSError* error = nil;
 	
 	if (error == nil)
@@ -463,6 +464,8 @@
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError
 {
+    inObject.parserMessenger = self;
+    
 	IMBParser* parser = [self parserWithIdentifier:inObject.parserIdentifier];
 	return [parser bookmarkForObject:inObject error:outError];
 }

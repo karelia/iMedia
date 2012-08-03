@@ -50,12 +50,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 #import "SBUtilities.h"
+#import "NSObject+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
 #import "IMBConfig.h"
 #import "IMBAppleMediaParserMessenger.h"
 #import "IMBAppleMediaParser.h"
 #import "IMBNode.h"
+#import "IMBImageObjectViewController.h"
 #import "IMBiPhotoEventObjectViewController.h"
 #import "IMBFaceObjectViewController.h"
 
@@ -67,21 +71,15 @@
 
 + (NSMutableArray *)parsers
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
-	NSLog(@"%@", errMsg);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
-	
-	return nil;
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+    return nil;
 }
 
 // Returns the dispatch-once token. Token must be static. Must be subclassed.
 
 + (dispatch_once_t *)onceTokenRef
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
-	NSLog(@"%@", errMsg);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
-	
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return 0;
 }
 
@@ -91,10 +89,7 @@
 
 + (NSString *) bundleIdentifier
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
-	NSLog(@"%@", errMsg);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
-	
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return nil;
 }
 
@@ -103,10 +98,7 @@
 
 + (NSString *) librariesKey
 {
-    NSString *errMsg = [NSString stringWithFormat:@"%s: Please use a custom subclass of %@...", (char *)_cmd, [self className]];
-	NSLog(@"%@", errMsg);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errMsg userInfo:nil] raise];
-	
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return nil;
 }
 
@@ -151,8 +143,6 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
 // This method is called on the XPC service side. Discover the path to the AlbumData.xml file and create  
 // an IMBParser instance preconfigured with that path...
 
@@ -171,9 +161,10 @@
                           {
                               NSURL* url = [NSURL URLWithString:library];
                               NSString* path = [url path];
-                              BOOL changed;
+                              NSFileManager *fileManager = [[NSFileManager alloc] init];
                               
-                              if ([[NSFileManager imb_threadSafeManager] imb_fileExistsAtPath:&path wasChanged:&changed])
+                              BOOL changed;
+                              if ([fileManager imb_fileExistsAtPath:&path wasChanged:&changed])
                               {
                                   // Create a parser instance preconfigure with that path...
                                   
@@ -192,11 +183,83 @@
                                   NSString* libraryPath = [path stringByDeletingLastPathComponent];
                                   [IMBConfig registerLibraryPath:libraryPath];
                               }
+                              
+                              [fileManager release];
                           }
+						  
+						if (recentLibraries) CFRelease(recentLibraries);
                       }
                   });
 	
 	return (NSArray*)parsers;
+}
+
+
+#pragma mark -
+#pragma mark Object description
+
+
++ (NSString*) objectCountFormatSingular
+{
+	return [IMBImageObjectViewController objectCountFormatSingular];
+}
+
+
++ (NSString*) objectCountFormatPlural
+{
+	return [IMBImageObjectViewController objectCountFormatPlural];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Events and Faces have other metadata than images or movies
+
+- (NSString*) _countableMetadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	NSMutableString* metaDesc = [NSMutableString string];
+	
+	NSNumber* count = [inMetadata objectForKey:@"PhotoCount"];
+	if (count)
+	{
+		NSString* formatString = [count intValue] > 1 ?
+		[[self class] objectCountFormatPlural] :
+		[[self class] objectCountFormatSingular];
+		
+		[metaDesc appendFormat:formatString, [count intValue]];
+	}
+	
+	NSNumber* dateAsTimerInterval = [inMetadata objectForKey:@"RollDateAsTimerInterval"];
+	if (dateAsTimerInterval)
+	{
+		[metaDesc imb_appendNewline];
+		NSDate* eventDate = [NSDate dateWithTimeIntervalSinceReferenceDate:[dateAsTimerInterval doubleValue]];
+		
+		NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+		[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+		[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
+		
+		[metaDesc appendFormat:@"%@", [formatter stringFromDate:eventDate]];
+		
+		[formatter release];
+	}
+	return metaDesc;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Convert metadata into a human readable string...
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	// Events and Faces have other metadata than images
+	
+	if ([inMetadata objectForKey:@"PhotoCount"])		// Event, face, ...
+	{
+		return [self _countableMetadataDescriptionForMetadata:inMetadata];
+	}
+	
+	// Image
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
 }
 
 
@@ -213,14 +276,12 @@
     if ([[self class] isEventsNode:inNode])
     {
         NSViewController* viewController = [[[IMBiPhotoEventObjectViewController alloc] init] autorelease];
-        [viewController view];
         return viewController;
     }
     
     if ([[self class] isFacesNode:inNode])
     {
         NSViewController* viewController = [[[IMBFaceObjectViewController alloc] init] autorelease];
-        [viewController view];
         return viewController;
     }
     

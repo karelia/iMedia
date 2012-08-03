@@ -192,6 +192,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (IBAction) reload:(id)inSender
+{
+	NSString* mediaType = [[IMBPanelController sharedPanelController] currentMediaType];
+	[[IMBLibraryController sharedLibraryControllerWithMediaType:mediaType] reload];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Toggle panel visibility...
 
 - (IBAction) togglePanel:(id)inSender
@@ -310,82 +320,6 @@
 // Old methods:
 
 /*
-- (IMBParser *)parserController:(IMBParserController *)controller willLoadParser:(IMBParser *)parser;
-{
-#if LOG_PARSERS
-	NSLog(@"%s inParser=%@ inMediaType=%@",__FUNCTION__,NSStringFromClass(inParser.class),inMediaType);
-#endif
-	
-    if ([parser isKindOfClass:[IMBFlickrParser class]])
-	{
-		// To test this, get your own API key from flickr (noncommercial at first, but you are planning
-		// on supporting flickr in iMedia on a commmercial app, you will have to apply for a commercial
-		// API key at least 30 days before shipping)
-		
-		// Supply your own Flickr API key and shared secret, or apply for key and secret at:
-		// http://flickr.com/services/api/keys/apply
-		// If you already have an API key, you will find it here:  http://www.flickr.com/services/api/keys/
-		
-		IMBFlickrParser* flickrParser = (IMBFlickrParser*)parser;
-		flickrParser.delegate = self;
-		
-		// For your actual app, you would put in the hard-wired strings here.
-		
-		flickrParser.flickrAPIKey = nil;
-		flickrParser.flickrSharedSecret = nil;
-		
-		// For this test application, we will ask for the flickr key out of the keychain.
-		//
-		// To put in a key into your keychain, create a new keychain item in Keychain Access.
-		// Give it the name of "flickr_api" with the key as the account name, and the secret as the password.
-		
-		SecKeychainItemRef item = nil;
-		UInt32 stringLength;
-		char* buffer;
-		OSStatus err = SecKeychainFindGenericPassword(NULL,10,"flickr_api",0,nil,&stringLength,(void**)&buffer,&item);
-		if (noErr == err)
-		{
-			if (stringLength > 0)
-			{
-				flickrParser.flickrSharedSecret = [[[NSString alloc] initWithBytes:buffer length:stringLength encoding:NSUTF8StringEncoding] autorelease];
-				
-				// now get the 'account'
-				
-				SecKeychainAttribute attributes[8];
-				SecKeychainAttributeList list;
-				
-				attributes[0].tag = kSecAccountItemAttr;
-				list.count = 1;
-				list.attr = attributes;
-				//SecKeychainAttribute attr = list.attr[0];
-				
-				err = SecKeychainItemCopyContent (item, NULL, &list, NULL, NULL);
-				
-				// make it clear that this is the beginning of a new keychain item
-				
-				if (err == noErr)
-				{
-					flickrParser.flickrAPIKey = [[[NSString alloc] initWithBytes:attributes[0].data length:attributes[0].length encoding:NSUTF8StringEncoding] autorelease];
-					SecKeychainItemFreeContent (&list, NULL);
-				}
-				else NSLog(@"%s unable to fetch 'flickr_api' account from keychain: status %d", __FUNCTION__, err);
-			}
-			else
-			{
-				NSLog(@"%s Empty password for 'flickr_api' account in keychain: status %d", __FUNCTION__, err);
-			}
-			SecKeychainItemFreeContent(NULL, buffer);
-		}
-		else
-		{
-			NSLog(@"%s Couldn't find 'flickr_api' account in keychain: status %d", __FUNCTION__, err);
-		}
-	}		// end IMBFlickrParser code
-    
-    if (![parser canBeUsed]) parser = nil;
-    return parser;
-}
-
 - (BOOL) parserController:(IMBParserController*)inController shouldLoadParser:(NSString *)parserClassname forMediaType:(NSString*)inMediaType
 {
 	BOOL result = YES;
@@ -532,7 +466,7 @@
 			// Make sure the object view controller's preferences reflect the view type we want to show
 			// (preferences will later be loaded into object)
 			
-			NSMutableDictionary* preferences = [IMBConfig prefsForClass:inController.class];
+			NSMutableDictionary* preferences = [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:inController.class]];
 			[preferences setObject:[NSNumber numberWithUnsignedInteger:0] forKey:@"viewType"];
 			[IMBConfig setPrefs:preferences forClass:inController.class];
 			
@@ -609,9 +543,11 @@
 {
 	for (IMBObject* object in inObjects)
 	{
-		[self.usedObjects setObject:object forKey:object.identifier];
+        if (object.persistentResourceIdentifier)
+        {
+            [self.usedObjects setObject:object forKey:object.persistentResourceIdentifier];
+        }
 	}
-	
 	IMBNodeViewController* controller = [[IMBPanelController sharedPanelController] currentNodeViewController];
 	[controller setObjectContainerViewNeedsDisplay:YES];
 }
@@ -626,7 +562,7 @@
 {
 	static CGImageRef badgeImage = NULL;
 	
-	if ([self.usedObjects valueForKey:inObject.identifier])
+	if (inObject.persistentResourceIdentifier && [self.usedObjects valueForKey:inObject.persistentResourceIdentifier])
 	{
 		if (badgeImage == NULL)
 		{

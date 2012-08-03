@@ -114,9 +114,17 @@
 
 @optional
 
+// Standard delegate method to control loading and unloading of IMBParserMessenger classes...
+
 - (BOOL) parserController:(IMBParserController*)inController shouldLoadParserMessengerWithIdentifier:(NSString*)inIdentifier;
 - (void) parserController:(IMBParserController*)inController didLoadParserMessenger:(IMBParserMessenger*)inParserMessenger;
 - (void) parserController:(IMBParserController*)inController willUnloadParserMessenger:(IMBParserMessenger*)inParserMessenger;
+
+// This delegate method gives host apps a chance to swap IMBParserMessenger classes. This allows the 
+// host app to customize by subclassing and making sure with this method that the subclass is used 
+// instead of the original class...
+
+- (Class) parserController:(IMBParserController*)inController replacementClassForParserMessengerClass:(Class)inParserMessengerClass; 
 
 @end
 

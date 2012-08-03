@@ -121,6 +121,16 @@
     return @"Aperture";
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the key under which the master resource is found inside its metadata dictionary in ApertureData.xml
+// (this key may vary for different media types. Default is the key for image media types).
+// Override for specific media type parsers if necessary.
+
++ (NSString *)objectLocationKey
+{
+    return @"ImagePath";
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -183,9 +193,6 @@
 
 - (void) dealloc
 {
-	IMBRelease(_appPath);
-	IMBRelease(_plist);
-	IMBRelease(_modificationDate);
 	[super dealloc];
 }
 
@@ -199,9 +206,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 //
 
+// This method must return an appropriate prefix for IMBObject identifiers. Refer to the method
+// -[IMBParser iMedia2PersistentResourceIdentifierForObject:] to see how it is used. Historically we used class names as the prefix. 
+// However, during the evolution of iMedia class names can change and identifier string would thus also change. 
+// This is undesirable, as things that depend of the immutability of identifier strings would break. One such 
+// example are the object badges, which use object identifiers. To guarrantee backward compatibilty, a parser 
+// class must override this method to return a prefix that matches the historic class name...
+
+- (NSString*) iMedia2PersistentResourceIdentifierPrefix
+{
+	return @"IMBApertureParser";
+}
+
+
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSDictionary* plist = self.plist;
 	NSDictionary* images = [plist objectForKey:@"Master Image List"];
 	
@@ -216,8 +235,7 @@
 		[self populateNode:inNode albums:albums images:images]; 
 	}
 
-	if (outError) *outError = error;
-	return error == nil;
+	return YES;
 }
 
 
@@ -392,7 +410,17 @@
 
 - (BOOL) isAllPhotosAlbum:(NSDictionary*)inAlbumDict
 {
-	return [[inAlbumDict objectForKey:@"uuid"] isEqualToString:@"allPhotosAlbum"];
+	return ([[inAlbumDict objectForKey:@"uuid"] isEqualToString:@"allPhotosAlbum"] ||
+            [[inAlbumDict objectForKey:@"Album Type"] isEqualToString:@"94"]);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is the "Events" (aka "Projects") album.
+
+- (BOOL) isEventsAlbum:(NSDictionary*)inAlbumDict
+{
+	return [[inAlbumDict objectForKey:@"Album Type"] isEqualToString:@"97"];
 }
 
 
@@ -455,7 +483,7 @@
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
 		{@"v3-Photo Stream",@"SL-stream.tiff",          @"folder",	nil,	nil},   // photo stream
-		{@"v3-Faces",@"sl-icon-small_people.tiff",		@"folder",	nil,	nil},   // faces
+		{@"v3-Faces",@"SL-faces.tiff",                  @"folder",	nil,	nil},   // faces
 		{@"v3-1",	@"SL-album.tiff",					@"folder",	nil,	nil},	// album
 		{@"v3-2",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// smart album
 		{@"v3-3",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// library **** ... 200X
@@ -610,6 +638,8 @@
 			albumNode.name = albumName;
 			albumNode.mediaSource = self.mediaSource;
 			albumNode.parserIdentifier = self.identifier;
+			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 
 			// Set the node's identifier. This is needed later to link it to the correct parent node...
 			
@@ -685,7 +715,7 @@
 			
 				if (objectDict!=nil && [self shouldUseObject:mediaType])
 				{
-					NSString* path = [objectDict objectForKey:@"ImagePath"];
+					NSString* path = [objectDict objectForKey:[[self class] objectLocationKey]];
 					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [objectDict objectForKey:@"Caption"];
                     NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:objectDict];
@@ -696,7 +726,7 @@
 					[objects addObject:object];
 					[object release];
 
-					object.location = (id)[NSURL fileURLWithPath:path isDirectory:NO];
+					object.location = [NSURL fileURLWithPath:path isDirectory:NO];
 					object.name = caption;
 					object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
 					object.metadata = nil;                              // Build lazily when needed (takes longer)
@@ -705,7 +735,7 @@
 					object.index = index++;
 
 					object.imageLocation = thumbPath ? [NSURL fileURLWithPath:thumbPath isDirectory:NO] : object.location;
-					object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+					object.imageRepresentationType = [self requestedImageRepresentationType];
 					object.imageRepresentation = nil;
 				}
 				
@@ -715,42 +745,6 @@
 		[pool1 drain];
     
     inNode.objects = objects;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
-// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
-// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
-// Please note that this method may be called on a background thread...
-
-- (void) loadMetadataForObject:(IMBObject*)inObject
-{
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
-	
-	// Do not load (key) image specific metadata for node objects
-	// because it doesn't represent the nature of the object well enough.
-	
-	if (![inObject isKindOfClass:[IMBNodeObject class]])
-	{
-		[metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtPath:inObject.path checkSpotlightComments:NO]];
-	}
-    
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-
-	if ([NSThread isMainThread])
-	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
-	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-	}
 }
 
 

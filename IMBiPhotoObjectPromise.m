@@ -56,6 +56,7 @@
 #import "IMBiPhotoParser.h"
 
 #import "NSString+iMedia.h"
+#import "NSURL+iMedia.h"
 
 
 // TODO: should subclassed methods be public?
@@ -123,7 +124,7 @@
                         NSString *suffix = [thumbPathString substringFromIndex:thumbnailsPathStringLength];
                         
                         pathString = [mastersPathString stringByAppendingPathComponent:suffix];
-                        pathString = [pathString stringByIterativelyResolvingSymlinkOrAlias];
+                        pathString = [[[NSURL fileURLWithPath:pathString] imb_URLByResolvingSymlinksAndBookmarkFilesInPath] path];
                     }
                     
                     if (pathString) [metadata setObject:pathString forKey:keyToFix];
@@ -143,8 +144,8 @@
         
         
         // Resolve aliases before passing on to super. Issue #22
-        NSString *location = [[inObject location] stringByIterativelyResolvingSymlinkOrAlias];
-        [inObject setLocation:location];
+        NSURL *location = [[NSURL fileURLWithPath:[inObject location]] imb_URLByResolvingSymlinksAndBookmarkFilesInPath];
+        [inObject setLocation:[location path]];
 	}
     
 	[super _loadObject:inObject];

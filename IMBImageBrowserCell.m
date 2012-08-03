@@ -256,8 +256,8 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 		CALayer *placeHolderLayer = [CALayer layer];
 		placeHolderLayer.frame = *(CGRect*) &relativeImageFrame;
 		
-		CGFloat fillComponents[4] = {1.0, 1.0, 1.0, 0.3};
-		CGFloat strokeComponents[4] = {1.0, 1.0, 1.0, 0.9};
+		CGFloat fillComponents[4] = {0.9, 0.9, 0.9, 0.3};   // Light gray
+		CGFloat strokeComponents[4] = {0.6, 0.6, 0.6, 0.9}; // medium gray
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		
 		//set a background color

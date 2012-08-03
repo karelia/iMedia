@@ -59,8 +59,8 @@
 #import "IMBObjectArrayController.h"
 #import "IMBCommon.h"
 #import "IMBConfig.h"
-#import "IMBObjectsPromise.h"
 #import "NSWorkspace+iMedia.h"
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -99,6 +99,9 @@
 		@"metadata.Comment",
 		@"metadata.ImagePath",
 		@"metadata.iMediaKeywords",
+		@"preliminaryMetadata.Comment",
+		@"preliminaryMetadata.ImagePath",
+		@"preliminaryMetadata.iMediaKeywords",
 		nil];
 
 	[[[_tableView tableColumnWithIdentifier:@"name"] headerCell] setStringValue:NSLocalizedStringWithDefaultValue(

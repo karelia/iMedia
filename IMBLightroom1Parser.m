@@ -124,10 +124,12 @@
 			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
 								   stringByAppendingString:@" Previews"]
 								  stringByAppendingPathExtension:@"lrdata"];
-			NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
+            
+            NSURL *dataURL = [NSURL fileURLWithPath:dataPath isDirectory:YES];
 			
-			BOOL isDirectory;
-			if (!([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory)) {
+			NSNumber *isDirectory;
+			if (![dataURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:NULL] || ![isDirectory boolValue])
+            {
 				dataPath = nil;
 			}
 			

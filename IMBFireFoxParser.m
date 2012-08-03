@@ -101,8 +101,9 @@
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	
 	NSString *bookmarkPath = [self firefoxBookmarkPath];
-	NSFileManager *fm = [NSFileManager imb_threadSafeManager];	// File manager, not flying meat!
-	if ([self isInstalled] && bookmarkPath && [fm fileExistsAtPath:bookmarkPath] && [fm isReadableFileAtPath:bookmarkPath])
+	NSFileManager *fileManager = [[NSFileManager alloc] init];
+    
+	if ([self isInstalled] && bookmarkPath && [fileManager fileExistsAtPath:bookmarkPath] && [fileManager isReadableFileAtPath:bookmarkPath])
 	{
 		IMBFireFoxParser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 		parser.databasePathOriginal = bookmarkPath;
@@ -111,73 +112,75 @@
 		[parserInstances addObject:parser];
 		[parser release];
 	}
+    
+    [fileManager release];
 	return parserInstances;
 }
 
 + (NSString *)firefoxBookmarkPath;
 {
-	NSString *result = nil;
 	NSArray *libraryPaths1 = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
 	NSArray *libraryPaths2 = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask | NSLocalDomainMask, YES);
 	
 	NSMutableArray *libraryPaths = [NSMutableArray arrayWithArray:libraryPaths1];
 	[libraryPaths addObjectsFromArray:libraryPaths2];
 
-	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	NSFileManager *fm = [[NSFileManager alloc] init];
 	for (NSString *path in libraryPaths)
 	{
 		NSString *firefoxPath = [path stringByAppendingPathComponent:@"Firefox"];
 		NSString *profilesPath = [firefoxPath stringByAppendingPathComponent:@"Profiles"];
-		BOOL isDir;
-		if ([fm fileExistsAtPath:profilesPath isDirectory:&isDir] && isDir)
-		{
-			NSDirectoryEnumerator *e = [fm enumeratorAtPath:profilesPath];
-			[e skipDescendents];
-			NSString *filename = nil;
-			while ( filename = [e nextObject] )
-			{
-				if ( ![filename hasPrefix:@"."] )
-				{
-					NSString *profilePath = [profilesPath stringByAppendingPathComponent:filename];
-					NSString *bookmarkPath = [profilePath stringByAppendingPathComponent:@"places.sqlite"];
-					if ([fm fileExistsAtPath:bookmarkPath isDirectory:&isDir] && !isDir)
-					{
-						result = bookmarkPath;	// just stop on the first profile we find.  Should be good enough!
-						return result;
-					}
-				}
-			}
-		}
+        NSURL *profilesURL = [NSURL fileURLWithPath:profilesPath isDirectory:YES];
+        
+        NSDirectoryEnumerator *e = [fm enumeratorAtURL:profilesURL
+                            includingPropertiesForKeys:nil
+                                               options:NSDirectoryEnumerationSkipsHiddenFiles
+                                          errorHandler:NULL];
+        
+        [e skipDescendents];
+        
+        NSURL *aProfileURL = nil;
+        while ( aProfileURL = [e nextObject] )
+        {
+            NSURL *bookmarkURL = [aProfileURL URLByAppendingPathComponent:@"places.sqlite"];
+            
+            NSNumber *isFile;
+            if ([bookmarkURL getResourceValue:&isFile forKey:NSURLIsRegularFileKey error:NULL] && [isFile boolValue])
+            {
+                [fm release];
+                return [bookmarkURL path];	// just stop on the first profile we find.  Should be good enough!
+            }
+        }
 	}
-	return result;
+    
+    [fm release];
+	return nil;
 }
 
 
 
 - (void) copyDatabase;		// try to copy the database and store in copy.
 {
-	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	NSFileManager *fm = [[NSFileManager alloc] init];
 	NSString *newPath = nil;	// copy destination if we have to copy the file
 	
 	// null result set means we couldn't open it ... it's probably busy.
 	// The stupid workaround is to make a copy of the sqlite file, and check there!
 	// However just in case the source file has not changed, we'll check modification dates.
 	//
-	newPath = [[[NSFileManager imb_threadSafeManager] imb_sharedTemporaryFolder:@"firefox"] stringByAppendingPathComponent:@"places.sqlite"];
+	newPath = [[fm imb_sharedTemporaryFolder:@"firefox"] stringByAppendingPathComponent:@"places.sqlite"];
 	if (![newPath isEqualToString:self.databasePathCurrent])	// if we are trying to open the copy, don't allow that.
 	{
 		BOOL needToCopyFile = YES;		// probably we will need to copy but let's check
-		if ([fm fileExistsAtPath:newPath])
-		{
-			NSError *error = nil;
-			NSDictionary *attr = [fm attributesOfItemAtPath:newPath error:&error];
+		NSDictionary *attr = [fm attributesOfItemAtPath:newPath error:NULL];
+        
+        if (attr)
+        {
 			NSDate *modDateOfCopy = [attr fileModificationDate];
-			attr = [fm attributesOfItemAtPath:self.databasePathOriginal error:&error];
-			NSDate *modDateOfOrig = [attr fileModificationDate];
-			if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy])
-			{
-				needToCopyFile = NO;
-			}
+			attr = [fm attributesOfItemAtPath:self.databasePathOriginal error:NULL];
+            
+            NSDate *modDateOfOrig = [attr fileModificationDate];
+            needToCopyFile = [modDateOfOrig isEqualToDate:modDateOfCopy];
 		}
 		if (needToCopyFile)
 		{
@@ -204,6 +207,8 @@
 	{
 		self.database = nil;	// don't try to open; couldn't open copy
 	}
+    
+    [fm release];
 }
 
 - (BOOL)openDatabase;
@@ -228,7 +233,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-- (NSImage*) iconForFolderID:(int)aFolderID;
+- (NSImage*) iconForFolderID:(NSInteger)aFolderID;
 {
 	NSImage *result = nil;
 	NSString* filename = nil;

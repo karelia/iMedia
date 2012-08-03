@@ -180,7 +180,6 @@
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	NSError* error = nil;
 	NSDictionary* plist = self.plist;
 	NSArray* playlists = [plist objectForKey:@"Playlists"];
 	NSDictionary* tracks = [plist objectForKey:@"Tracks"];
@@ -192,18 +191,19 @@
 	// its objects array into the objects array of the root node. Please note that this is non-standard parser 
 	// behavior, which is implemented here, to achieve the desired "feel" in the browser...
 	
+    BOOL result = YES;
+    
 	if (inNode.isTopLevelNode)
 	{
 		if ([inNode.subnodes count] > 0)
 		{
 			IMBNode* musicNode = [inNode.subnodes objectAtIndex:0];
-			[self populateNode:musicNode  error:&error];
+			result = [self populateNode:musicNode error:outError];
 			inNode.objects = musicNode.objects;
 		}
 	}
 	
-	if (outError) *outError = error;
-	return error == nil;
+	return result;
 }
 
 
@@ -251,11 +251,11 @@
 
 - (NSDictionary*) plist
 {
-	NSError* error = nil;
 	NSURL* url = self.mediaSource;
-	NSString* path = [url path];
-	NSDictionary* metadata = [[NSFileManager imb_threadSafeManager] attributesOfItemAtPath:path error:&error];
-	NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
+	
+    NSDate* modificationDate;
+    if (![url getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:NULL]) modificationDate = nil;
+    
 	
 	@synchronized(self)
 	{
@@ -273,6 +273,22 @@
 	}
 	
 	return self.atomic_plist;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This method must return an appropriate prefix for IMBObject identifiers. Refer to the method
+// -[IMBParser iMedia2PersistentResourceIdentifierForObject:] to see how it is used. Historically we used class names as the prefix. 
+// However, during the evolution of iMedia class names can change and identifier string would thus also change. 
+// This is undesirable, as things that depend of the immutability of identifier strings would break. One such 
+// example are the object badges, which use object identifiers. To guarrantee backward compatibilty, a parser 
+// class must override this method to return a prefix that matches the historic class name...
+
+- (NSString*) iMedia2PersistentResourceIdentifierPrefix
+{
+	return @"IMBiTunesParser";
 }
 
 
@@ -555,7 +571,7 @@
 					// For local files path is preferred (as we gain automatic support for some context menu items).
 					// For remote files we'll use a URL (less context menu support)...
 					
-					object.location = (id)url;
+					object.location = url;
 					object.name = name;
 					object.parserIdentifier = self.identifier;
 					object.index = index++;

@@ -55,6 +55,7 @@
 
 @interface IMBTestiPhotoEventBrowserCell : IMBImageBrowserCell {
 
+    BOOL areTitleColorsSet;     // Do not set title colors more than once (expensive - would otherwise happen on skimming)
 }
 
 @end
