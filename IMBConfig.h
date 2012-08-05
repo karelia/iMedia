@@ -103,11 +103,6 @@
 + (BOOL) isLibraryPath:(NSString *)aPath;
 
 
-// Set default prefs values...
-
-+ (void) registerDefaultValues;
-
-
 @end
 
 

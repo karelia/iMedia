@@ -295,7 +295,7 @@ static BOOL sUseGlobalViewType = NO;
 	[self registerDefaultPrefsValue:editorAppPaths forKey:sIMBEditorAppPathsKey];
 }
 
-+ (void)load		// register default values automatically
++ (void)initialize		// register default values automatically
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	[self registerDefaultValues];
