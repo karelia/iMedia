@@ -96,12 +96,6 @@
 @interface IMBAppleLoopsForGarageBandFolderParser : IMBAudioFolderParser
 @end
 
-// This subclass looks only in "iMovie.app/Contents/Resources/Sound Effects"...
-// SANDBOXING: Not registered as the iMovie app could be anywhere, thwarting any attempt at a temporary entitlement
-
-@interface IMBiMovieSoundEffectsFolderParser : IMBAudioFolderParser
-@end
-
 // This subclass looks only in "~/Library/Sounds"...
 
 @interface IMBLibrarySoundsFolderParser : IMBAudioFolderParser
