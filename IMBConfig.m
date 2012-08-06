@@ -107,6 +107,12 @@ static BOOL sUseGlobalViewType = NO;
 
 + (id) prefsValueForKey:(NSString*)inKey
 {
+    // This method is the bottlneck for all iMedia prefs reading. To speed app launch times, hold off registering defaults until as late as possible by doing it here (I found +initialize gets called too early)
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self registerDefaultValues];
+    });
+    
 	NSString* key = [NSString stringWithFormat:sIMBPrefsKeyFormat,inKey];
 	return [[NSUserDefaults standardUserDefaults] objectForKey:key];
 }
@@ -294,13 +300,6 @@ static BOOL sUseGlobalViewType = NO;
 	NSMutableDictionary* editorAppPaths = [NSMutableDictionary dictionary];
 	if (photoshop) [editorAppPaths setObject:photoshop forKey:kIMBMediaTypeImage];
 	[self registerDefaultPrefsValue:editorAppPaths forKey:sIMBEditorAppPathsKey];
-}
-
-+ (void)initialize		// register default values automatically
-{
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-	[self registerDefaultValues];
-	[pool drain];
 }
 
 //----------------------------------------------------------------------------------------------------------------------
