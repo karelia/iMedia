@@ -113,7 +113,7 @@
 
 			if ([width integerValue] != 0 && [height integerValue] != 0)
 			{
-				result = [NSString stringWithFormat:@"%d×%d",[width integerValue],[height integerValue]];
+				result = [NSString stringWithFormat:@"%ld×%ld",(long)[width integerValue],(long)[height integerValue]];
 			} else {
 				result = @"";
 			}

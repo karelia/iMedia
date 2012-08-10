@@ -915,7 +915,7 @@
 	
 	if (_objects.count > 0)
 	{
-		[description appendFormat:@" - %u",_objects.count];
+		[description appendFormat:@" - %lu",(unsigned long) _objects.count];
 			
 		for (IMBObject* object in _objects)
 		{

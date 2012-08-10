@@ -289,7 +289,7 @@
 	NSString* parserClassName = NSStringFromClass([self class]);
     NSUInteger libraryHash = [[[self mediaSource] path] hash];
 	NSString* path = [inObject.location path];
-	NSString* identifier = [NSString stringWithFormat:@"%@:%d/%@",parserClassName,libraryHash,path];
+	NSString* identifier = [NSString stringWithFormat:@"%@:%lu/%@",parserClassName,(unsigned long)libraryHash,path];
 	return identifier;
 }
 
