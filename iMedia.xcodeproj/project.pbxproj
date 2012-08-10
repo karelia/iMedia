@@ -2335,6 +2335,7 @@
 				ja,
 				pt_BR,
 				zh_CN,
+				cs,
 				no,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* iMedia */;
@@ -2839,6 +2840,7 @@
 				FCEFB40C135332530043CBEB /* ja */,
 				CE1DE6481386E2E600C3F780 /* pt_BR */,
 				CE87008C146204E300CAFED2 /* zh_CN */,
+				FC850F8D14C71EEE00CC6ACA /* cs */,
 				3091F6B415C9508E005019A1 /* no */,
 			);
 			name = Localizable.strings;

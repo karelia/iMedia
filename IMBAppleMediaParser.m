@@ -135,6 +135,36 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
         
 		NSUInteger insertionIndex = [self indexOfAllPhotosAlbumInAlbumList:oldAlbumList];
         NSDictionary *photosDict = nil;
+        NSDictionary *eventsDict = nil;
+		
+        // Starting Aperture 3.3 there is no "Photos" album in ApertureData.xml anymore, so we must reconstruct it ourselves
+        
+        if (insertionIndex == NSNotFound)
+        {
+            // Photos album right after Projects in Aperture (Projects synonym to Events)
+            // Photos album in iPhoto should be already there
+            
+            insertionIndex = [self indexOfEventsAlbumInAlbumList:oldAlbumList];
+            
+            if (insertionIndex != NSNotFound &&
+                (eventsDict = [oldAlbumList objectAtIndex:insertionIndex]))
+            {
+				NSNumber *allPhotosId = [NSNumber numberWithUnsignedInt:ALL_PHOTOS_NODE_ID];
+				NSString *allPhotosName = NSLocalizedStringWithDefaultValue(@"IMB.ApertureParser.allPhotos", nil, IMBBundle(), @"Photos", @"All photos node shown in Aperture library");
+                NSDictionary* allPhotos = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                           allPhotosId,   @"AlbumId",
+                                           allPhotosName, @"AlbumName",
+                                           @"94",  @"Album Type",
+                                           [eventsDict objectForKey:@"Parent"], @"Parent", nil];
+				
+                // events album right before photos album
+                
+				[newAlbumList insertObject:allPhotos atIndex:insertionIndex];
+				IMBRelease(allPhotos);
+                insertionIndex++;
+            }
+        }
+        
 		
         NSDictionary *eventsDict = nil;
 		
