@@ -1046,7 +1046,12 @@
 			
 			object.location = (id)path;
 			object.name = name;
-			object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
+            
+            NSMutableDictionary *metadata = [imageDict mutableCopy];
+            [metadata setObject:key forKey:@"iPhotoKey"];   // so pasteboard-writing code can retrieve it later
+			object.preliminaryMetadata = metadata;	// This metadata from the XML file is available immediately
+            [metadata release];
+            
 			object.metadata = nil;					// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;		// Build lazily when needed (takes longer)
 			object.parser = self;
@@ -1164,5 +1169,21 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark Pasteboard
+
+- (void)didWriteObjects:(NSArray *)objects toPasteboard:(NSPasteboard *)pasteboard;
+{
+    [super didWriteObjects:objects toPasteboard:pasteboard];
+    
+    // Pretend we're iPhoto and write its custom metadata pasteboard type
+    [pasteboard addTypes:[NSArray arrayWithObject:@"ImageDataListPboardType"] owner:nil];
+    
+    NSArray *values = [objects valueForKey:@"preliminaryMetadata"];
+    NSArray *keys = [values valueForKey:@"iPhotoKey"];
+    NSDictionary *dataList = [[NSDictionary alloc] initWithObjects:values forKeys:keys];
+    [pasteboard setPropertyList:dataList forType:@"ImageDataListPboardType"];
+    [dataList release];
+}
 
 @end
