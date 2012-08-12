@@ -107,47 +107,6 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// While we're building with a pre-10.6 SDK, we need to declare some 10.6 pasteboard stuff that we'll use 
-// conditionally if we detect we are running on 10.6 or later.
-
-#if !defined(MAC_OS_X_VERSION_10_6)
-
-#pragma mark 
-
-@interface NSPasteboard (IMBObjectViewControllerSnowLeopard)
-
-- (NSInteger)clearContents;
-- (BOOL)writeObjects:(NSArray *)objects;
-
-@end
-
-@class NSPasteboardItem;
-
-#pragma mark 
-
-@interface NSObject (IMBObjectViewControllerSnowLeopard)
-
-- (BOOL)setDataProvider:(id /*<NSPasteboardItemDataProvider>*/)dataProvider forTypes:(NSArray *)types;
-- (BOOL)setString:(NSString *)string forType:(NSString *)type;
-- (NSString *)stringForType:(NSString *)type;
-- (NSData *)dataForType:(NSString *)type;
-
-@end
-
-// A 10.6+ attribute on IKImageBrowserView, which we use to implement smarter toolTip configuration
-
-@interface IKImageBrowserView (IKImageBrowserViewSnowLeopard)
-
-- (NSIndexSet *)visibleItemIndexes;
-
-@end
-
-#endif
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark 
 
 // Private methods...
