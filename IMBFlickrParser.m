@@ -785,7 +785,7 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 
 
 - (void) loadCustomQueries {
-	NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
+	NSDictionary* prefs = [IMBConfig prefsForClass:[self class]];
 	
 	//	try to read user defaults...
 	NSArray* nodes = [prefs objectForKey:IMBFlickrParserPrefKey_CustomQueries];
@@ -832,7 +832,7 @@ NSString* const IMBFlickrParserPrefKey_CustomQueries = @"customQueries";
 
 
 - (void) saveCustomQueries {
-	NSMutableDictionary* prefs = [IMBConfig prefsForClass:[self class]];
+	NSMutableDictionary* prefs = [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:[self class]]];
 	[prefs setObject:self.customQueries forKey:IMBFlickrParserPrefKey_CustomQueries];
 	[IMBConfig setPrefs:prefs forClass:[self class]];
 }

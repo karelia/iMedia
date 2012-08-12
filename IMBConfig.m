@@ -107,6 +107,12 @@ static BOOL sUseGlobalViewType = NO;
 
 + (id) prefsValueForKey:(NSString*)inKey
 {
+    // This method is the bottlneck for all iMedia prefs reading. To speed app launch times, hold off registering defaults until as late as possible by doing it here (I found +initialize gets called too early)
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self registerDefaultValues];
+    });
+    
 	NSString* key = [NSString stringWithFormat:sIMBPrefsKeyFormat,inKey];
 	return [[NSUserDefaults standardUserDefaults] objectForKey:key];
 }
@@ -117,7 +123,7 @@ static BOOL sUseGlobalViewType = NO;
 
 // Store the specified dictionary in the iMedia section of the preferences under its class name...
 
-+ (void) registerDefaultPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass
++ (void)registerDefaultPrefs:(NSDictionary *)inClassDict forClass:(Class)inClass
 {
 	[self registerDefaultPrefsValue:inClassDict forKey:NSStringFromClass(inClass)];
 }
@@ -125,7 +131,7 @@ static BOOL sUseGlobalViewType = NO;
 
 // Store the specified dictionary in the iMedia section of the preferences under its class name...
 
-+ (void) setPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass
++ (void)setPrefs:(NSDictionary *)inClassDict forClass:(Class)inClass
 {
 	[self setPrefsValue:inClassDict forKey:NSStringFromClass(inClass)];
 }
@@ -134,9 +140,9 @@ static BOOL sUseGlobalViewType = NO;
 // Return a mutable copy of the class specific preference dictionary. If it doesn't exist yet, then return an
 // empty dictionary...
 
-+ (NSMutableDictionary*) prefsForClass:(Class)inClass
++ (NSDictionary *)prefsForClass:(Class)inClass
 {
-	return [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:NSStringFromClass(inClass)]];
+	return [self prefsValueForKey:NSStringFromClass(inClass)];
 }
 
 
@@ -294,13 +300,6 @@ static BOOL sUseGlobalViewType = NO;
 	NSMutableDictionary* editorAppPaths = [NSMutableDictionary dictionary];
 	if (photoshop) [editorAppPaths setObject:photoshop forKey:kIMBMediaTypeImage];
 	[self registerDefaultPrefsValue:editorAppPaths forKey:sIMBEditorAppPathsKey];
-}
-
-+ (void)load		// register default values automatically
-{
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-	[self registerDefaultValues];
-	[pool drain];
 }
 
 //----------------------------------------------------------------------------------------------------------------------

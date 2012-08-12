@@ -591,7 +591,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (NSMutableDictionary*) _preferences
 {
-	return [IMBConfig prefsForClass:self.class];
+	return [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:self.class]];
 }
 
 
