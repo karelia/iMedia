@@ -1865,10 +1865,8 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 										 nil]; 
 						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilenamesPboardType,nil]
 						
-						NSUInteger thisIndex = [indexes firstIndex];
-						while (thisIndex != NSNotFound)
+						for (IMBObject *object in [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes])
 						{
-							IMBObject *object = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
 							NSString *path = [object path];
 							NSString *type = [path pathExtension];
 							if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
@@ -1879,8 +1877,6 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 								[titles addObject:object.name];
 								[metadatas addObject:object.metadata];								
 							}
-							
-							thisIndex = [indexes indexGreaterThanIndex:thisIndex];
 						}
 					}
 					else
