@@ -1816,8 +1816,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 						IMBObject* thisObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
 						if (thisObject != nil)
 						{
-							// Allocate class indirectly since we compiling against the 10.5 SDK, not the 10.6
-							NSPasteboardItem* thisItem = [[[NSClassFromString(@"NSPasteboardItem") alloc] init] autorelease];
+							NSPasteboardItem* thisItem = [[[NSPasteboardItem alloc] init] autorelease];
 							
 							// We need to be declare kUTTypeFileURL in order to get file drags to work as expected to e.g. the Finder,
 							// but we have to be careful not to declare kUTTypeFileURL for e.g. bookmark URLs. We might want to put this 
