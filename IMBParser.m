@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -468,6 +468,11 @@
 	return nil;
 }
 
+
+#pragma mark
+#pragma mark Pasteboard
+
+- (void)didWriteObjects:(NSArray *)objects toPasteboard:(NSPasteboard *)pasteboard; { }
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -173,6 +173,10 @@
 - (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode;
 - (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode;
 - (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode;
+
+// Informs that some of the receiver's IMBObjects have been written to a pasteboard. Could use this to add some
+// extra parser-specific data to the pasteboard. Default implementation does nothing.
+- (void)didWriteObjects:(NSArray *)objects toPasteboard:(NSPasteboard *)pasteboard;
 
 @end
 

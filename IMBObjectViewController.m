@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1902,6 +1902,8 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 //						#endif
 					}
 				}
+                
+                [parser didWriteObjects:promise.objects toPasteboard:inPasteboard];
 				
 				_isDragging = YES;
 				itemsWritten = objects.count;
