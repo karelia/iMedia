@@ -385,13 +385,18 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 - (void) saveStateToPreferences
 {
-	NSString* frame = NSStringFromRect(self.window.frame);
-	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
-	
 	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
 	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
 
-	int sizeMode = 	[ibToolbar sizeMode];
+	[self saveWindowStateToPreferences];
+}
+
+- (void)saveWindowStateToPreferences;
+{
+    NSString* frame = NSStringFromRect(self.window.frame);
+	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
+	
+    int sizeMode = 	[ibToolbar sizeMode];
 	BOOL isSmall = (sizeMode == NSToolbarSizeModeSmall);
 	[IMBConfig setPrefsValue:[NSNumber numberWithBool:isSmall] forKey:@"toolbarIsSmall"];
 	
