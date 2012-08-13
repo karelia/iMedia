@@ -190,12 +190,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	if (self = [super init])
 	{
 		_loadingCustomParsers = NO;
-		
-		[[NSNotificationCenter defaultCenter]				// Unload parsers before we quit, so that custom have 
-			addObserver:self								// a chance to clean up (e.g. remove callbacks, etc...)
-			selector:@selector(reset) 
-			name:NSApplicationWillTerminateNotification 
-			object:nil];
 	}
 	
 	return self;
