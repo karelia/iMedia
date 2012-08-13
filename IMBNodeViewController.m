@@ -197,19 +197,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) initWithNibName:(NSString*)inNibName bundle:(NSBundle*)inBundle
-{
-	if (self = [super initWithNibName:inNibName bundle:inBundle])
-	{
-		_selectedNodeIdentifier = nil;
-		_expandedNodeIdentifiers = nil;
-		_isRestoringState = NO;
-	}
-	
-	return self;
-}
-
-
 - (void) awakeFromNib
 {
 	// We need to save preferences before tha app quits...
