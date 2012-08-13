@@ -390,10 +390,14 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 - (void) saveStateToPreferences
 {
-	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
-	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
-
+    [self saveSelectedMedaiaTypeToPreferences];
 	[self saveWindowStateToPreferences];
+}
+
+- (void)saveSelectedMedaiaTypeToPreferences;
+{
+    NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
+	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
 }
 
 - (void)saveWindowStateToPreferences;
@@ -773,6 +777,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	{
 		[_delegate panelController:self didShowPanelForMediaType:newMediaType];
 	}
+    
+    // Record the state
+    [self saveSelectedMedaiaTypeToPreferences];
 }
 
 
