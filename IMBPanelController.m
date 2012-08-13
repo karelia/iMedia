@@ -355,8 +355,13 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		
 	// Restore window size and selected tab...
 	
-	[self.window setContentMinSize:largestMinimumSize];
+    NSWindow *window = [self window];
+	[window setContentMinSize:largestMinimumSize];
 	[self restoreStateFromPreferences];
+    
+    // Keep an eye out for changes
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveWindowStateToPreferences) name:NSWindowDidMoveNotification object:window];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveWindowStateToPreferences) name:NSWindowDidResizeNotification object:window];
 }
 
 
