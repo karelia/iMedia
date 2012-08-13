@@ -529,6 +529,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 	if (!_isRestoringState && !self.libraryController.isReplacingNode)
 	{
 		self.expandedNodeIdentifiers = [self _expandedNodeIdentifiers];
+        
+        // Persist
+        [self _saveStateToPreferences];
 	}
 }
 
