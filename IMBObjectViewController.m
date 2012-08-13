@@ -90,6 +90,7 @@ static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
 static NSString* kQuickLookImageKeyPath = @"arrangedObjects.quickLookImage";
 static NSString* kObjectCountStringKey = @"objectCountString";
+static NSString * const kSelectionObservationKeyPath = @"selectionIndexes";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
 NSString* kIMBPublicTitleListPasteboardType = @"imedia.title";
@@ -326,6 +327,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
 	[ibObjectArrayController addObserver:self forKeyPath:kQuickLookImageKeyPath options:NSKeyValueObservingOptionNew context:(void*)kQuickLookImageKeyPath];
+    [ibObjectArrayController addObserver:self forKeyPath:kSelectionObservationKeyPath options:0 context:kSelectionObservationKeyPath];
 
 	// For tooltip display, we pay attention to changes in the icon view's scroller clip view, because 
 	// that will naturally indicate a change in visible items (unfortunately IKImageBrowserView's visibleItemIndexes
@@ -414,7 +416,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	}
 	
 	// Stop observing the array...
-	
+	[ibObjectArrayController removeObserver:self forKeyPath:kSelectionObservationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kQuickLookImageKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
@@ -503,6 +505,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 				waitUntilDone:NO modes:[NSArray 
 				arrayWithObject:NSRunLoopCommonModes]];
 		}
+    }
+    else if (inContext == kSelectionObservationKeyPath)
+    {
+        [self _saveStateToPreferences];
     }
 	else
 	{
