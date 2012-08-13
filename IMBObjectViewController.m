@@ -576,7 +576,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (void) _loadStateFromPreferences
 {
-	NSMutableDictionary* stateDict = [self _preferences];
+	NSDictionary* stateDict = [IMBConfig prefsForClass:self.class];
 	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntegerValue];
 	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
 	
