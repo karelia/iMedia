@@ -343,14 +343,6 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 		}
 	}
 
-	// We need to save preferences before the app quits...
-	
-	[[NSNotificationCenter defaultCenter] 
-		 addObserver:self 
-		 selector:@selector(_saveStateToPreferences) 
-		 name:NSApplicationWillTerminateNotification 
-		 object:nil];
-	
 	// Observe changes by other controllers to global view type preference if we use global view type
 	// so we can change our own view type accordingly
 	
