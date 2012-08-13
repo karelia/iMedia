@@ -123,7 +123,17 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 @synthesize libraryController = _libraryController;
 @synthesize nodeTreeController = ibNodeTreeController;
+
 @synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
+- (void)setSelectedNodeIdentifier:(NSString *)identifier;
+{
+    identifier = [identifier copy];
+    [_selectedNodeIdentifier release]; _selectedNodeIdentifier = identifier;
+    
+    // Persist
+    [self _saveStateToPreferences];
+}
+
 @synthesize expandedNodeIdentifiers = _expandedNodeIdentifiers;
 @synthesize selectedParser = _selectedParser;
 
