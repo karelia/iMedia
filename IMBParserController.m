@@ -198,7 +198,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 - (void) dealloc
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[self reset];
 	[super dealloc];
 }
