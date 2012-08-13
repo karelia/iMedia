@@ -620,7 +620,7 @@
 	if ([self count] > 20)
 	{
 		NSArray *subArray = [self subarrayWithRange:NSMakeRange(0,20)];
-		return [NSString stringWithFormat:@"%@ [... %d items]", [subArray description], [self count]];
+		return [NSString stringWithFormat:@"%@ [... %lu items]", [subArray description], (unsigned long)[self count]];
 	}
 	else
 	{
