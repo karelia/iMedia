@@ -90,6 +90,7 @@ static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
 static NSString* kQuickLookImageKeyPath = @"arrangedObjects.quickLookImage";
 static NSString* kObjectCountStringKey = @"objectCountString";
+static NSString * const kSelectionObservationKeyPath = @"selectionIndexes";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
 NSString* kIMBPublicTitleListPasteboardType = @"imedia.title";
@@ -146,12 +147,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 @synthesize objectArrayController = ibObjectArrayController;
 @synthesize progressWindowController = _progressWindowController;
 
-@synthesize viewType = _viewType;
 @synthesize tabView = ibTabView;
 @synthesize iconView = ibIconView;
 @synthesize listView = ibListView;
 @synthesize comboView = ibComboView;
-@synthesize iconSize = _iconSize;
 
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
@@ -328,6 +327,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
 	[ibObjectArrayController addObserver:self forKeyPath:kQuickLookImageKeyPath options:NSKeyValueObservingOptionNew context:(void*)kQuickLookImageKeyPath];
+    [ibObjectArrayController addObserver:self forKeyPath:kSelectionObservationKeyPath options:0 context:kSelectionObservationKeyPath];
 
 	// For tooltip display, we pay attention to changes in the icon view's scroller clip view, because 
 	// that will naturally indicate a change in visible items (unfortunately IKImageBrowserView's visibleItemIndexes
@@ -343,14 +343,6 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 		}
 	}
 
-	// We need to save preferences before the app quits...
-	
-	[[NSNotificationCenter defaultCenter] 
-		 addObserver:self 
-		 selector:@selector(_saveStateToPreferences) 
-		 name:NSApplicationWillTerminateNotification 
-		 object:nil];
-	
 	// Observe changes by other controllers to global view type preference if we use global view type
 	// so we can change our own view type accordingly
 	
@@ -416,7 +408,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	}
 	
 	// Stop observing the array...
-	
+	[ibObjectArrayController removeObserver:self forKeyPath:kSelectionObservationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kQuickLookImageKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
@@ -506,6 +498,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 				arrayWithObject:NSRunLoopCommonModes]];
 		}
     }
+    else if (inContext == kSelectionObservationKeyPath)
+    {
+        [self _saveStateToPreferences];
+    }
 	else
 	{
 		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
@@ -576,7 +572,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (void) _loadStateFromPreferences
 {
-	NSMutableDictionary* stateDict = [self _preferences];
+	NSDictionary* stateDict = [IMBConfig prefsForClass:self.class];
 	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntegerValue];
 	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
 	
@@ -728,6 +724,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	[self willChangeValueForKey:@"canUseIconSize"];
 	_viewType = inViewType;
 	[IMBConfig setGlobalViewType:[NSNumber numberWithUnsignedInteger:inViewType]];
+    
+    // Persist
+    [self _saveStateToPreferences];
+    
 	[self didChangeValueForKey:@"canUseIconSize"];
 }
 
@@ -813,6 +813,9 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	// Tooltips in the icon view need to be rebuilt...
 	
 	[self _updateTooltips];
+    
+    // Persist
+    [self _saveStateToPreferences];
 }
 
 
