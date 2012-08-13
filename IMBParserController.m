@@ -198,7 +198,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 - (void) dealloc
 {
-	[self reset];
+	[self reset];   // -reset calls through to the delegate. A proper client will have set the delegate to nil if this is being deallocated though
 	[super dealloc];
 }
 
