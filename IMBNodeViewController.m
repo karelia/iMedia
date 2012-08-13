@@ -94,7 +94,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (void) _setPreferences:(NSMutableDictionary*)inDict;
 - (void) _saveStateToPreferences;
 - (void) _loadStateFromPreferences;
-- (NSMutableArray*) _expandedNodeIdentifiers;
 
 - (void) _nodesWillChange;
 - (void) _nodesDidChange;
@@ -388,7 +387,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 {
 	NSDictionary* stateDict = [IMBConfig prefsForClass:self.class];
 	
-	self.expandedNodeIdentifiers = [NSMutableArray arrayWithArray:[stateDict objectForKey:@"expandedNodeIdentifiers"]];
+	self.expandedNodeIdentifiers = [stateDict objectForKey:@"expandedNodeIdentifiers"];
 	self.selectedNodeIdentifier = [stateDict objectForKey:@"selectedNodeIdentifier"];
 	
 	float splitviewPosition = [[stateDict objectForKey:@"splitviewPosition"] floatValue];
@@ -752,7 +751,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 // Get the identifiers of all currently expanded nodes. The result is a flat array, which is needed in the method
 // _restoreUserInterfaceState to try to restore the state of the user interface...
 
-- (NSMutableArray*) _expandedNodeIdentifiers
+- (NSArray*) _expandedNodeIdentifiers
 {
 	NSMutableArray* expandedNodeIdentifiers = [NSMutableArray array];
 	
