@@ -210,13 +210,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 {
 	// We need to save preferences before tha app quits...
 	
-	[[NSNotificationCenter defaultCenter] 
-		addObserver:self 
-		selector:@selector(_saveStateToPreferences) 
-		name:NSApplicationWillTerminateNotification 
-		object:nil];
-	
-	[[NSNotificationCenter defaultCenter] 
+	[[NSNotificationCenter defaultCenter]
 		addObserver:self 
 		selector:@selector(_revealNodeWithIdentifier:) 
 		name:kIMBRevealNodeWithIdentifierNotification 
