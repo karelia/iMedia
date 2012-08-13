@@ -3,6 +3,16 @@ Overview
 
 This is the iMedia Browser framework that is used by a number of applications (and as the basis for a stand-alone utility).  Developers are encouraged to include this in their application as long as there is proper attribution.
 
+Sandboxing
+==========
+
+We are in the process of getting iMedia sandbox-friendly on the `sandbox-compatibility` branch. It is working with the following caveats:
+
+* Search the headers for `SANDBOXING` to make sure your app has the entitlements iMedia needs
+* Custom folders are not supported yet. If the user drags one in, the browser will lose access to it the next time the OS boots
+* iMovie Sound Effects have been removed on the basis that Apple doesn't want us poking around another app's resources
+
+There is also a longer-term effort in the `iMediaSandboxing` fork to farm out parsing to XPC processes.
 
 
 Compatibility
