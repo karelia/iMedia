@@ -524,7 +524,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 // pending populate operation for the nodes that were just collapsed...
 	
 
-- (void) _setExpandedNodeIdentifiers
+- (void) _setExpandedNodeIdentifiersFromOutlineView
 {
 	if (!_isRestoringState && !self.libraryController.isReplacingNode)
 	{
@@ -535,13 +535,13 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) outlineViewItemDidExpand:(NSNotification*)inNotification
 {
-	[self _setExpandedNodeIdentifiers];
+	[self _setExpandedNodeIdentifiersFromOutlineView];
 }
 
 
 - (void) outlineViewItemDidCollapse:(NSNotification*)inNotification
 {
-	[self _setExpandedNodeIdentifiers];
+	[self _setExpandedNodeIdentifiersFromOutlineView];
 
 	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
 	IMBNode* node = [item representedObject];
@@ -968,7 +968,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		{
 			id item = [ibNodeOutlineView itemAtRow:i];
 			[ibNodeOutlineView expandItem:item];
-			[self _setExpandedNodeIdentifiers];
+			[self _setExpandedNodeIdentifiersFromOutlineView];
 			break;
 		}
 	}
@@ -1605,7 +1605,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		IMBNode* node = [_libraryController nodeWithIdentifier:identifier];
 		NSInteger i = [self _revealNode:node];
 		if (i != NSNotFound) [ibNodeOutlineView scrollRowToVisible:i];
-		[self _setExpandedNodeIdentifiers];
+		[self _setExpandedNodeIdentifiersFromOutlineView];
 	}
 }
 
