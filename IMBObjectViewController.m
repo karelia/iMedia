@@ -146,12 +146,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 @synthesize objectArrayController = ibObjectArrayController;
 @synthesize progressWindowController = _progressWindowController;
 
-@synthesize viewType = _viewType;
 @synthesize tabView = ibTabView;
 @synthesize iconView = ibIconView;
 @synthesize listView = ibListView;
 @synthesize comboView = ibComboView;
-@synthesize iconSize = _iconSize;
 
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
@@ -728,6 +726,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	[self willChangeValueForKey:@"canUseIconSize"];
 	_viewType = inViewType;
 	[IMBConfig setGlobalViewType:[NSNumber numberWithUnsignedInteger:inViewType]];
+    
+    // Persist
+    [self _saveStateToPreferences];
+    
 	[self didChangeValueForKey:@"canUseIconSize"];
 }
 
@@ -813,6 +815,9 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	// Tooltips in the icon view need to be rebuilt...
 	
 	[self _updateTooltips];
+    
+    // Persist
+    [self _saveStateToPreferences];
 }
 
 
