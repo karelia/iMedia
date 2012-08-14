@@ -38,7 +38,7 @@ Recent Release Notes
 
 ### 2.5.1
 
-* The `+[IMBConfig registerDefaults]` method has been made private. You should have no need to call it in your app as `IMBConfig` automatically runs that routine the first time it is used
+* The `+[IMBConfig registerDefaultValues]` method has been made private. You should have no need to call it in your app as `IMBConfig` automatically runs that routine the first time it is used
 
 
 Development
