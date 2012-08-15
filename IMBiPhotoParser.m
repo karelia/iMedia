@@ -68,7 +68,6 @@
 
 @implementation IMBiPhotoParser
 
-@synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize dateFormatter = _dateFormatter;
 
 

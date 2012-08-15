@@ -99,6 +99,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 @synthesize appPath = _appPath;
 @synthesize atomic_plist = _plist;
 @synthesize modificationDate = _modificationDate;
+@synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
 
 //----------------------------------------------------------------------------------------------------------------------

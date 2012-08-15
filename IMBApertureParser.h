@@ -63,12 +63,10 @@
 @interface IMBApertureParser : IMBAppleMediaParser
 {
 	BOOL _placeholderParser;
-	BOOL _shouldDisplayLibraryName;
 	NSInteger _version;
 }
 
 @property (assign) BOOL placeholderParser;
-@property (assign) BOOL shouldDisplayLibraryName;
 @property (assign) NSInteger version;
 
 @end
