@@ -48,6 +48,17 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import <unistd.h>
+
+// Enumeration of access permissions in nomenclatura of access() function
+typedef enum
+{
+    kIMBAccessRead = R_OK,
+    kIMBAccessWrite = W_OK,
+    kIMBAccessExecute = X_OK,
+    kIMBPathExists = F_OK
+} IMBAccessPermission;
+
 
 @interface NSFileManager (iMedia)
 
@@ -65,5 +76,6 @@
 - (NSString*) imb_relativePathToVolumeAtPath:(NSString*)inPath;
 - (BOOL) imb_fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
 - (NSString *) imb_generateUniqueFileNameAtPath:(NSString *)path base:(NSString *)basename extension:(NSString *)extension;
+- (BOOL) imb_isPath:(NSString *)inPath accessible:(IMBAccessPermission) inPermission;
 
 @end

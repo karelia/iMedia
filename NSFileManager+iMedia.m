@@ -308,5 +308,10 @@
 }
 
 
+- (BOOL) imb_isPath:(NSString *)inPath accessible:(IMBAccessPermission)inPermission
+{
+    return (access([inPath cStringUsingEncoding:NSUTF8StringEncoding], inPermission) == 0);
+}
+
 
 @end
