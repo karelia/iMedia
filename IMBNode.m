@@ -116,6 +116,7 @@
 @synthesize isIncludedInPopup = _isIncludedInPopup;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 @synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
+@synthesize isAccessible = _isAccessible;
 
 // Observing file system changes...
 
