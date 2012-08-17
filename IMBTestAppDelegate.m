@@ -55,7 +55,7 @@
 #import <iMedia/iMedia.h>
 #import "IMBTestAppDelegate.h"
 #import "SBUtilities.h"
-//#import "IMBImageViewController.h"
+#import "IMBImageObjectViewController.h"
 #import <iMedia/IMBiPhotoEventObjectViewController.h>
 #import <iMedia/IMBFaceObjectViewController.h>
 #import "IMBTestiPhotoEventBrowserCell.h"
@@ -146,7 +146,7 @@
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
 	[parserController setDelegate:self];
-	[parserController loadParsers];
+	[parserController loadParserMessengers];
 	
 	// Create libraries (singleton per mediaType)...
 	
@@ -155,13 +155,13 @@
 	
 	// Link the user interface (possible multiple instances) to the	singleton library...
 	
-	self.nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
+	self.nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController delegate:self];
 	NSView* nodeView = self.nodeViewController.view;
 	
-	self.objectViewController = [IMBImageViewController viewControllerForLibraryController:libraryController];
-	self.objectViewController.nodeViewController = self.nodeViewController;
-	NSView* objectView = self.objectViewController.view;
-	self.nodeViewController.standardObjectView = objectView;
+    IMBObjectViewController* objectViewController =
+    [IMBImageObjectViewController viewControllerForLibraryController:libraryController
+                                                            delegate:self];
+    self.nodeViewController.standardObjectViewController = objectViewController;
 	[self.nodeViewController installObjectViewForNode:nil];
 	
 	[nodeView setFrame:[ibWindow.contentView bounds]];
