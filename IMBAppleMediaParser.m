@@ -250,6 +250,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSDictionary* metadata = [fileManager attributesOfItemAtPath:path error:&error];
     [fileManager release];
     
+    NSLog(@"%@ metadata:\n%@", path, metadata);
+    
     if (metadata)
     {
 		NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
@@ -342,6 +344,14 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	[icon setSize:NSMakeSize(16.0,16.0)];
     
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+
+    // Being sandboxed the app may yet not have entitlements to access this top level node
+    
+    node.isAccessible = [[NSFileManager defaultManager] imb_isPath:[self.mediaSource path]
+                                                        accessible:kIMBAccessRead | kIMBAccessWrite];
+    
+//    NSLog(@"Node %@ is %@accessible", node, node.isAccessible ? @"" : @"NOT ");
+    
 	node.icon = icon;
 	node.name = [[self class] libraryName];
 	node.identifier = [self rootNodeIdentifier];
@@ -351,6 +361,21 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	node.parserIdentifier = self.identifier;
 	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
+	
+	if (node.isTopLevelNode)
+	{
+        
+#warning Display of node accessibility is preliminary
+        
+        if (self.shouldDisplayLibraryName)
+        {
+            NSString* path = (NSString*)[node.mediaSource path];
+            NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+            node.name = [NSString stringWithFormat:@"%@%@ (%@)",node.name, node.isAccessible ? @"" : @": no access!", name];
+        } else {
+            node.name = [NSString stringWithFormat:@"%@%@",node.name, node.isAccessible ? @"" : @": no access!"];
+        }
+	}
 	
 	// Enable FSEvents based file watching for root nodes...
 	
