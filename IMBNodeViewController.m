@@ -389,7 +389,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) _loadStateFromPreferences
 {
-	NSDictionary* stateDict = [IMBConfig prefsForClass:self.class];
+	NSDictionary* stateDict = [[IMBConfig prefsForClass:self.class] objectForKey:self.mediaType];
 	
 	self.expandedNodeIdentifiers = [stateDict objectForKey:@"expandedNodeIdentifiers"];
 	self.selectedNodeIdentifier = [stateDict objectForKey:@"selectedNodeIdentifier"];
