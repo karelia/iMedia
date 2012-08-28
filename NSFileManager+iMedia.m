@@ -274,7 +274,7 @@
 				{
 					if (!exists)
 					{
-						newPath = [[NSString stringWithFormat:@"/Volumes/%@ %i",volName,i] stringByAppendingPathComponent:relPath];
+						newPath = [[NSString stringWithFormat:@"/Volumes/%@ %d",volName,(int)i] stringByAppendingPathComponent:relPath];
 						exists = [self fileExistsAtPath:newPath];
 						if (exists) break;
 					}

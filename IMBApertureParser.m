@@ -279,11 +279,13 @@
 	NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
 	
 	NSString* nodePath = nil;
+	unsigned long hash = (unsigned long)[path hash];
+	
 	if (inIdSpace)
 	{
-		nodePath = [NSString stringWithFormat:@"/%i/%@/%@/%@",[path hash],libraryName,inIdSpace,inId];
+		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@/%@",hash,libraryName,inIdSpace,inId];
 	} else {
-		nodePath = [NSString stringWithFormat:@"/%i/%@/%@",[path hash],libraryName,inId];
+		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@",hash,libraryName,inId];
 	}
 	
 	return [self identifierForPath:nodePath];
