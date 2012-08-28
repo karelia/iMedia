@@ -99,6 +99,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 @synthesize appPath = _appPath;
 @synthesize atomic_plist = _plist;
 @synthesize modificationDate = _modificationDate;
+@synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,13 +137,41 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		NSUInteger insertionIndex = [self indexOfAllPhotosAlbumInAlbumList:oldAlbumList];
         NSDictionary *photosDict = nil;
 		
+        NSDictionary *eventsDict = nil;
+		
+        // Starting Aperture 3.3 there is no "Photos" album in ApertureData.xml anymore, so we must reconstruct it ourselves
+        
+        if (insertionIndex == NSNotFound)
+        {
+            // Photos album right after Projects in Aperture (Projects synonym to Events)
+            // Photos album in iPhoto should be already there
+            
+            insertionIndex = [self indexOfEventsAlbumInAlbumList:oldAlbumList];
+            
+            if (insertionIndex != NSNotFound &&
+                (eventsDict = [oldAlbumList objectAtIndex:insertionIndex]))
+            {
+				NSNumber *allPhotosId = [NSNumber numberWithUnsignedInt:ALL_PHOTOS_NODE_ID];
+				NSString *allPhotosName = NSLocalizedStringWithDefaultValue(@"IMB.ApertureParser.allPhotos", nil, IMBBundle(), @"Photos", @"All photos node shown in Aperture library");
+                NSDictionary* allPhotos = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                           allPhotosId,   @"AlbumId",
+                                           allPhotosName, @"AlbumName",
+                                           @"94",  @"Album Type",
+                                           [eventsDict objectForKey:@"Parent"], @"Parent", nil];
+				
+                // events album right before photos album
+                
+				[newAlbumList insertObject:allPhotos atIndex:insertionIndex];
+				IMBRelease(allPhotos);
+                insertionIndex++;
+            }
+        }
+        
 		if (insertionIndex != NSNotFound &&
             (photosDict = [oldAlbumList objectAtIndex:insertionIndex]))
 		{
             // Events
 			
-			#warning Temporarily removed Events node to avoid problems. Jörg needs to fix this.
- /*           
 			if ([inLibraryDict objectForKey:@"List of Rolls"])
 			{
 				NSNumber *eventsId = [NSNumber numberWithUnsignedInt:EVENTS_NODE_ID];
@@ -160,7 +189,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 				IMBRelease(events);
                 insertionIndex++;
 			}
-*/			
+			
 			// Faces album right after photos album
 			
 			if ([inLibraryDict objectForKey:@"List of Faces"])
@@ -220,6 +249,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
     NSFileManager *fileManager = [[NSFileManager alloc] init];
 	NSDictionary* metadata = [fileManager attributesOfItemAtPath:path error:&error];
     [fileManager release];
+    
+    NSLog(@"%@ metadata:\n%@", path, metadata);
     
     if (metadata)
     {
@@ -313,6 +344,14 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	[icon setSize:NSMakeSize(16.0,16.0)];
     
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+
+    // Being sandboxed the app may yet not have entitlements to access this top level node
+    
+    node.isAccessible = [[NSFileManager defaultManager] imb_isPath:[self.mediaSource path]
+                                                        accessible:kIMBAccessRead | kIMBAccessWrite];
+    
+//    NSLog(@"Node %@ is %@accessible", node, node.isAccessible ? @"" : @"NOT ");
+    
 	node.icon = icon;
 	node.name = [[self class] libraryName];
 	node.identifier = [self rootNodeIdentifier];
@@ -322,6 +361,21 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	node.parserIdentifier = self.identifier;
 	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
+	
+	if (node.isTopLevelNode)
+	{
+        
+#warning Display of node accessibility is preliminary
+        
+        if (self.shouldDisplayLibraryName)
+        {
+            NSString* path = (NSString*)[node.mediaSource path];
+            NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+            node.name = [NSString stringWithFormat:@"%@%@ (%@)",node.name, node.isAccessible ? @"" : @": no access!", name];
+        } else {
+            node.name = [NSString stringWithFormat:@"%@%@",node.name, node.isAccessible ? @"" : @": no access!"];
+        }
+	}
 	
 	// Enable FSEvents based file watching for root nodes...
 	
@@ -539,6 +593,18 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 // Returns whether inAlbumDict is the "Photos" album. Must be subclassed.
 
 - (BOOL) isAllPhotosAlbum:(NSDictionary*)inAlbumDict
+{
+	NSLog(@"%s Please use a custom subclass of IMBAppleMediaParser...",__FUNCTION__);
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBAppleMediaParser" userInfo:nil] raise];
+	
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is the "Events" (aka "Projects") album. Must be subclassed.
+
+- (BOOL) isEventsAlbum:(NSDictionary*)inAlbumDict
 {
 	NSLog(@"%s Please use a custom subclass of IMBAppleMediaParser...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBAppleMediaParser" userInfo:nil] raise];
@@ -951,6 +1017,16 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 - (NSUInteger) indexOfAllPhotosAlbumInAlbumList:(NSArray*)inAlbumList
 {
     return [self indexOfAlbumInAlbumList:inAlbumList passingTest:@selector(isAllPhotosAlbum:)];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the index of the projects album ("Projects") in given album list
+// Projects are to Aperture what events are to iPhoto - hence the method name for coherence
+
+- (NSUInteger) indexOfEventsAlbumInAlbumList:(NSArray*)inAlbumList
+{
+    return [self indexOfAlbumInAlbumList:inAlbumList passingTest:@selector(isEventsAlbum:)];
 }
 
 

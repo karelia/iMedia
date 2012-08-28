@@ -70,8 +70,16 @@
 	if (pathToOtherApp)
 	{
 		NSBundle *otherApp = [NSBundle bundleWithPath:pathToOtherApp];
-		NSString *pathToImage = [otherApp pathForResource:[name stringByDeletingPathExtension] ofType:[name pathExtension]];
-		image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+        
+        // Use imageForResource: if available to take advantage of possibly additionally available high res representations
+        
+        if ([otherApp respondsToSelector:@selector(imageForResource:)])
+        {
+            image = [otherApp imageForResource:[name stringByDeletingPathExtension]];
+        } else {
+            NSString *pathToImage = [otherApp pathForResource:[name stringByDeletingPathExtension] ofType:[name pathExtension]];
+            image = [[[NSImage alloc] initWithContentsOfFile:pathToImage] autorelease];
+        }
 	}
 	
 	if (image==nil && imageInOurBundle!=nil)
@@ -80,7 +88,7 @@
 		NSString *pathToImage = [ourBundle pathForResource:[imageInOurBundle stringByDeletingPathExtension] ofType:[imageInOurBundle pathExtension]];
 		image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
 	}
-	return [image autorelease];
+	return image;
 }
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
@@ -157,7 +165,7 @@
 	NSString* path = [inMetadata objectForKey:@"path"];
 	NSString* comment = [inMetadata objectForKey:@"comment"];
 	NSArray* keywords = [inMetadata objectForKey:@"iMediaKeywords"];
-	int rating = [[inMetadata objectForKey:@"Rating"] intValue];
+	NSInteger rating = [[inMetadata objectForKey:@"Rating"] integerValue];
 
 	if (comment == nil) comment = [inMetadata objectForKey:@"Comment"];	// uppercase from iPhoto
 	if (comment) comment = [comment stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];

@@ -208,7 +208,7 @@
 	for (NSInteger i=visibleRows.location; i<visibleRows.location+visibleRows.length; i++)
 	{
 		IMBNode* node = [self nodeAtRow:i];
-		NSString* row = [NSString stringWithFormat:@"%d",(int)i];
+		NSString* row = [NSString stringWithFormat:@"%ld",(long)i];
 		NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 		
 		if (node != nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)

@@ -55,7 +55,7 @@
 #import <iMedia/iMedia.h>
 #import "IMBTestAppDelegate.h"
 #import "SBUtilities.h"
-//#import "IMBImageViewController.h"
+#import "IMBImageObjectViewController.h"
 #import <iMedia/IMBiPhotoEventObjectViewController.h>
 #import <iMedia/IMBFaceObjectViewController.h>
 #import "IMBTestiPhotoEventBrowserCell.h"
@@ -146,7 +146,7 @@
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
 	[parserController setDelegate:self];
-	[parserController loadParsers];
+	[parserController loadParserMessengers];
 	
 	// Create libraries (singleton per mediaType)...
 	
@@ -155,13 +155,13 @@
 	
 	// Link the user interface (possible multiple instances) to the	singleton library...
 	
-	self.nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController];
+	self.nodeViewController = [IMBNodeViewController viewControllerForLibraryController:libraryController delegate:self];
 	NSView* nodeView = self.nodeViewController.view;
 	
-	self.objectViewController = [IMBImageViewController viewControllerForLibraryController:libraryController];
-	self.objectViewController.nodeViewController = self.nodeViewController;
-	NSView* objectView = self.objectViewController.view;
-	self.nodeViewController.standardObjectView = objectView;
+    IMBObjectViewController* objectViewController =
+    [IMBImageObjectViewController viewControllerForLibraryController:libraryController
+                                                            delegate:self];
+    self.nodeViewController.standardObjectViewController = objectViewController;
 	[self.nodeViewController installObjectViewForNode:nil];
 	
 	[nodeView setFrame:[ibWindow.contentView bounds]];
@@ -466,7 +466,7 @@
 			// Make sure the object view controller's preferences reflect the view type we want to show
 			// (preferences will later be loaded into object)
 			
-			NSMutableDictionary* preferences = [IMBConfig prefsForClass:inController.class];
+			NSMutableDictionary* preferences = [NSMutableDictionary dictionaryWithDictionary:[IMBConfig prefsForClass:inController.class]];
 			[preferences setObject:[NSNumber numberWithUnsignedInteger:0] forKey:@"viewType"];
 			[IMBConfig setPrefs:preferences forClass:inController.class];
 			
@@ -620,7 +620,7 @@
 	if ([self count] > 20)
 	{
 		NSArray *subArray = [self subarrayWithRange:NSMakeRange(0,20)];
-		return [NSString stringWithFormat:@"%@ [... %d items]", [subArray description], [self count]];
+		return [NSString stringWithFormat:@"%@ [... %lu items]", [subArray description], (unsigned long)[self count]];
 	}
 	else
 	{

@@ -174,6 +174,7 @@
                                   parser.mediaType = self.mediaType;
                                   parser.mediaSource = [NSURL fileURLWithPath:path];
                                   parser.appPath = [messengerClass appPath];
+                                  parser.shouldDisplayLibraryName = libraries.count > 1;
                                   
                                   [parsers addObject:parser];
                                   [parser release];

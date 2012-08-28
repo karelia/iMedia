@@ -116,6 +116,7 @@
 @synthesize isIncludedInPopup = _isIncludedInPopup;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 @synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
+@synthesize isAccessible = _isAccessible;
 
 // Observing file system changes...
 
@@ -155,6 +156,7 @@
 		self.isIncludedInPopup = YES;
 		self.wantsRecursiveObjects = NO;
 		self.shouldDisplayObjectView = YES;
+        self.isAccessible = YES;
 		
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
@@ -215,6 +217,7 @@
 	copy.isIncludedInPopup = self.isIncludedInPopup;
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
+	copy.isAccessible = self.isAccessible;
 	
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -286,6 +289,7 @@
 		self.isIncludedInPopup = [inCoder decodeBoolForKey:@"isIncludedInPopup"];
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
+		self.isAccessible = [inCoder decodeBoolForKey:@"isAccessible"];
 
 		self.watcherType = [inCoder decodeIntegerForKey:@"watcherType"];
 		self.watchedPath = [inCoder decodeObjectForKey:@"watchedPath"];
@@ -296,18 +300,20 @@
 		NSMutableArray* objects = [inCoder decodeObjectForKey:@"objects"];
 		if (objects) self.objects = objects;
 		
+#warning TODO Peter, to account for retina displays I returned to keeping all image representations. We may have to cash icons in the app now. Did not notice any performance decrease though
+        
 		// Optimization: The icon is built from a single (small) image representation. See comments in method below...
 		
-//		self.icon = [inCoder decodeObjectForKey:@"icon"];
+		self.icon = [inCoder decodeObjectForKey:@"icon"];
 
-		NSImageRep* iconRepresentation = [inCoder decodeObjectForKey:@"iconRepresentation"];
-		
-		if (iconRepresentation)
-		{
-			NSImage* icon = [[[NSImage alloc] init] autorelease];
-			[icon addRepresentation:iconRepresentation];
-			self.icon = icon;
-		}
+//		NSImageRep* iconRepresentation = [inCoder decodeObjectForKey:@"iconRepresentation"];
+//		
+//		if (iconRepresentation)
+//		{
+//			NSImage* icon = [[[NSImage alloc] init] autorelease];
+//			[icon addRepresentation:iconRepresentation];
+//			self.icon = icon;
+//		}
 	}
 	
 	return self;
@@ -335,6 +341,7 @@
 	[inCoder encodeBool:self.isIncludedInPopup forKey:@"isIncludedInPopup"];
 	[inCoder encodeBool:self.wantsRecursiveObjects forKey:@"wantsRecursiveObjects"];
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
+	[inCoder encodeBool:self.isAccessible forKey:@"isAccessible"];
 
 	[inCoder encodeInteger:self.watcherType forKey:@"watcherType"];
 	[inCoder encodeObject:self.watchedPath forKey:@"watchedPath"];
@@ -342,28 +349,30 @@
 	if (self.subnodes) [inCoder encodeObject:self.subnodes forKey:@"subnodes"];
 	if (self.objects) [inCoder encodeObject:self.objects forKey:@"objects"];
 	
-	// Encoding the icon needs special attention. We only need 16x16 pixels, but the NSImage contains multiple 
+#warning TODO Peter, to account for retina displays I returned to keeping all image representations. We may have to cash icons in the app now. Did not notice any performance decrease though
+    
+	// Encoding the icon needs special attention. We only need 16x16 pixels, but the NSImage contains multiple
 	// high resolution representations. Instead of encoding them all, we'll simply encode the smallest one...
 	
-//	[inCoder encodeObject:self.icon forKey:@"icon"];
+	[inCoder encodeObject:self.icon forKey:@"icon"];
 
-	NSImage* icon = self.icon;
-	NSArray* reps = [icon representations];
-	NSImageRep* smallestRep = nil;
-	CGFloat smallestWidth = HUGE_VALF;
-	
-	for (NSImageRep* rep in reps)
-	{
-		NSSize size = rep.size;
-		
-		if (size.width < smallestWidth)
-		{
-			smallestWidth = size.width;
-			smallestRep = rep;
-		}
-	}
-	
-	if (smallestRep) [inCoder encodeObject:smallestRep forKey:@"iconRepresentation"];
+//	NSImage* icon = self.icon;
+//	NSArray* reps = [icon representations];
+//	NSImageRep* smallestRep = nil;
+//	CGFloat smallestWidth = HUGE_VALF;
+//	
+//	for (NSImageRep* rep in reps)
+//	{
+//		NSSize size = rep.size;
+//		
+//		if (size.width < smallestWidth)
+//		{
+//			smallestWidth = size.width;
+//			smallestRep = rep;
+//		}
+//	}
+//	
+//	if (smallestRep) [inCoder encodeObject:smallestRep forKey:@"iconRepresentation"];
 }
 
 
@@ -911,7 +920,7 @@
 	
 	if (_objects.count > 0)
 	{
-		[description appendFormat:@" - %lu",(unsigned long)_objects.count];
+		[description appendFormat:@" - %lu",(unsigned long) _objects.count];
 			
 		for (IMBObject* object in _objects)
 		{

@@ -274,7 +274,7 @@
 				{
 					if (!exists)
 					{
-						newPath = [[NSString stringWithFormat:@"/Volumes/%@ %d",volName,(int)i] stringByAppendingPathComponent:relPath];
+						newPath = [[NSString stringWithFormat:@"/Volumes/%@ %lu",volName, (unsigned long)i] stringByAppendingPathComponent:relPath];
 						exists = [self fileExistsAtPath:newPath];
 						if (exists) break;
 					}
@@ -307,6 +307,11 @@
     return result;
 }
 
+
+- (BOOL) imb_isPath:(NSString *)inPath accessible:(IMBAccessPermission)inPermission
+{
+    return (access([inPath cStringUsingEncoding:NSUTF8StringEncoding], inPermission) == 0);
+}
 
 
 @end

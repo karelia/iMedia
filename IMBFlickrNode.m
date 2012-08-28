@@ -239,7 +239,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 /// From http://gist.github.com/101674
 + (NSString*) base58EncodedValue: (long long) num {
 	NSString* alphabet = @"123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	int baseCount = [alphabet length];
+	NSInteger baseCount = [alphabet length];
 	NSString* encoded = @"";
 	while (num >= baseCount) {
 		double div = num/baseCount;
@@ -256,7 +256,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 }
 
 
-+ (NSString*) descriptionOfLicense: (int) aLicenseNumber {
++ (NSString*) descriptionOfLicense: (NSInteger) aLicenseNumber {
 	NSString* result = nil;
 	switch (aLicenseNumber)
 	{

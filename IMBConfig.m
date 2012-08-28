@@ -117,7 +117,7 @@ static BOOL sUseGlobalViewType = NO;
 
 // Store the specified dictionary in the iMedia section of the preferences under its class name...
 
-+ (void) registerDefaultPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass
++ (void)registerDefaultPrefs:(NSDictionary *)inClassDict forClass:(Class)inClass
 {
 	[self registerDefaultPrefsValue:inClassDict forKey:NSStringFromClass(inClass)];
 }
@@ -125,7 +125,7 @@ static BOOL sUseGlobalViewType = NO;
 
 // Store the specified dictionary in the iMedia section of the preferences under its class name...
 
-+ (void) setPrefs:(NSMutableDictionary*)inClassDict forClass:(Class)inClass
++ (void)setPrefs:(NSDictionary *)inClassDict forClass:(Class)inClass
 {
 	[self setPrefsValue:inClassDict forKey:NSStringFromClass(inClass)];
 }
@@ -134,9 +134,9 @@ static BOOL sUseGlobalViewType = NO;
 // Return a mutable copy of the class specific preference dictionary. If it doesn't exist yet, then return an
 // empty dictionary...
 
-+ (NSMutableDictionary*) prefsForClass:(Class)inClass
++ (NSDictionary *)prefsForClass:(Class)inClass
 {
-	return [NSMutableDictionary dictionaryWithDictionary:[self prefsValueForKey:NSStringFromClass(inClass)]];
+	return [self prefsValueForKey:NSStringFromClass(inClass)];
 }
 
 

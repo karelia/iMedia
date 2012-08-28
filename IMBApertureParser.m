@@ -93,7 +93,6 @@
 @implementation IMBApertureParser
 
 @synthesize placeholderParser = _placeholderParser;
-@synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize version = _version;
 
 
@@ -119,6 +118,16 @@
 + (NSString *)libraryName
 {
     return @"Aperture";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the key under which the master resource is found inside its metadata dictionary in ApertureData.xml
+// (this key may vary for different media types. Default is the key for image media types).
+// Override for specific media type parsers if necessary.
+
++ (NSString *)objectLocationKey
+{
+    return @"ImagePath";
 }
 
 
@@ -279,13 +288,12 @@
 	NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
 	
 	NSString* nodePath = nil;
-	unsigned long hash = (unsigned long)[path hash];
 	
 	if (inIdSpace)
 	{
-		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@/%@",hash,libraryName,inIdSpace,inId];
+		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@/%@",(unsigned long)[path hash],libraryName,inIdSpace,inId];
 	} else {
-		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@",hash,libraryName,inId];
+		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@",(unsigned long)[path hash],libraryName,inId];
 	}
 	
 	return [self identifierForPath:nodePath];
@@ -402,7 +410,17 @@
 
 - (BOOL) isAllPhotosAlbum:(NSDictionary*)inAlbumDict
 {
-	return [[inAlbumDict objectForKey:@"uuid"] isEqualToString:@"allPhotosAlbum"];
+	return ([[inAlbumDict objectForKey:@"uuid"] isEqualToString:@"allPhotosAlbum"] ||
+            [[inAlbumDict objectForKey:@"Album Type"] isEqualToString:@"94"]);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is the "Events" (aka "Projects") album.
+
+- (BOOL) isEventsAlbum:(NSDictionary*)inAlbumDict
+{
+	return [[inAlbumDict objectForKey:@"Album Type"] isEqualToString:@"97"];
 }
 
 
@@ -465,7 +483,7 @@
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
 		{@"v3-Photo Stream",@"SL-stream.tiff",          @"folder",	nil,	nil},   // photo stream
-		{@"v3-Faces",@"sl-icon-small_people.tiff",		@"folder",	nil,	nil},   // faces
+		{@"v3-Faces",@"SL-faces.tiff",                  @"folder",	nil,	nil},   // faces
 		{@"v3-1",	@"SL-album.tiff",					@"folder",	nil,	nil},	// album
 		{@"v3-2",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// smart album
 		{@"v3-3",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// library **** ... 200X
@@ -697,7 +715,7 @@
 			
 				if (objectDict!=nil && [self shouldUseObject:mediaType])
 				{
-					NSString* path = [objectDict objectForKey:@"ImagePath"];
+					NSString* path = [objectDict objectForKey:[[self class] objectLocationKey]];
 					NSString* thumbPath = [objectDict objectForKey:@"ThumbPath"];
 					NSString* caption   = [objectDict objectForKey:@"Caption"];
                     NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:objectDict];
@@ -717,7 +735,7 @@
 					object.index = index++;
 
 					object.imageLocation = thumbPath ? [NSURL fileURLWithPath:thumbPath isDirectory:NO] : object.location;
-					object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+					object.imageRepresentationType = [self requestedImageRepresentationType];
 					object.imageRepresentation = nil;
 				}
 				

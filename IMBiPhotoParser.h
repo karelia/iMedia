@@ -62,12 +62,10 @@
 
 @interface IMBiPhotoParser : IMBAppleMediaParser
 {
-	BOOL _shouldDisplayLibraryName;
 	int _fakeAlbumID;					// for iPhoto2 compatibility
 	NSDateFormatter* _dateFormatter;
 }
 
-@property (assign) BOOL shouldDisplayLibraryName;
 @property (retain) NSDateFormatter* dateFormatter;
 
 //- (NSArray *)iMediaKeywordsFromIDs:(NSArray *)keywordIDs; // public utility method to help extract keywords from numbers

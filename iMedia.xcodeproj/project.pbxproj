@@ -43,6 +43,16 @@
 		3089F94C151C91CE00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F94D151C91E400D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F9791520BD6900D56DC0 /* IMBiPhotoEventNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */; };
+		3091F6B515C9508E005019A1 /* IMBCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B41010F6C100C527B7 /* IMBCommon.h */; };
+		3091F6B715C9508E005019A1 /* IMBConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = D09931A810110E8900C527B7 /* IMBConfig.h */; };
+		3091F6B915C9508E005019A1 /* IMBOperationQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930BC1010F6C100C527B7 /* IMBOperationQueue.h */; };
+		3091F6BB15C9508E005019A1 /* IMBIconCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0401034A86B003CC49C /* IMBIconCache.h */; };
+		3091F6BD15C9508E005019A1 /* IMBURLGetSizeOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */; };
+		3091F6BE15C9508E005019A1 /* IMBURLGetSizeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */; };
+		3091F6BF15C9508E005019A1 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; };
+		3091F6C015C9508E005019A1 /* IMBURLDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */; };
+		3091F6C115C9508E005019A1 /* IMBImageItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 274DF616114EF0B200AC8C03 /* IMBImageItem.h */; };
+		3091F6C315C9508E005019A1 /* IMBQLPreviewPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */; };
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771E1511055900413AEF /* SBUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E7771C1511055800413AEF /* SBUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771F1511055900413AEF /* SBUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E7771D1511055800413AEF /* SBUtilities.m */; };
@@ -544,6 +554,7 @@
 		30439222130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestiPhotoEventBrowserCell.h; sourceTree = "<group>"; };
 		30439223130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestiPhotoEventBrowserCell.m; sourceTree = "<group>"; };
 		3089F94A151C8FDD00D56DC0 /* XPCKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XPCKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3091F6B415C9508E005019A1 /* no */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = no; path = no.lproj/Localizable.strings; sourceTree = "<group>"; };
 		30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoEventNodeObject.h; sourceTree = "<group>"; };
 		30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoEventNodeObject.m; sourceTree = "<group>"; };
 		30E7771C1511055800413AEF /* SBUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBUtilities.h; path = SandBoxingKit/SBUtilities.h; sourceTree = SOURCE_ROOT; };
@@ -2059,6 +2070,14 @@
 				FC1484121598881A00F6FDB8 /* IMBFlickrParserMessenger.h in Headers */,
 				FC1484161598881A00F6FDB8 /* IMBFlickrSession.h in Headers */,
 				FC14841B1598884E00F6FDB8 /* IMBLoadMoreObject.h in Headers */,
+				3091F6B515C9508E005019A1 /* IMBCommon.h in Headers */,
+				3091F6B715C9508E005019A1 /* IMBConfig.h in Headers */,
+				3091F6B915C9508E005019A1 /* IMBOperationQueue.h in Headers */,
+				3091F6BB15C9508E005019A1 /* IMBIconCache.h in Headers */,
+				3091F6BD15C9508E005019A1 /* IMBURLGetSizeOperation.h in Headers */,
+				3091F6BF15C9508E005019A1 /* IMBURLDownloadOperation.h in Headers */,
+				3091F6C115C9508E005019A1 /* IMBImageItem.h in Headers */,
+				3091F6C315C9508E005019A1 /* IMBQLPreviewPanel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2315,6 +2334,7 @@
 				ja,
 				pt_BR,
 				zh_CN,
+				no,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* iMedia */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -2706,6 +2726,8 @@
 				FC14841C1598884E00F6FDB8 /* IMBLoadMoreObject.m in Sources */,
 				FC14841D1598886000F6FDB8 /* IMBFlickrNode.m in Sources */,
 				FC14841E1598887700F6FDB8 /* IMBFlickrParser.m in Sources */,
+				3091F6BE15C9508E005019A1 /* IMBURLGetSizeOperation.m in Sources */,
+				3091F6C015C9508E005019A1 /* IMBURLDownloadOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2816,6 +2838,7 @@
 				FCEFB40C135332530043CBEB /* ja */,
 				CE1DE6481386E2E600C3F780 /* pt_BR */,
 				CE87008C146204E300CAFED2 /* zh_CN */,
+				3091F6B415C9508E005019A1 /* no */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

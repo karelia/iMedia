@@ -111,12 +111,10 @@
 			NSNumber* width = [metadata objectForKey:@"width"];
 			NSNumber* height = [metadata objectForKey:@"height"];
 
-			if ([width intValue] != 0 && [height intValue] != 0)
+			if ([width integerValue] != 0 && [height integerValue] != 0)
 			{
-				result = [NSString stringWithFormat:@"%d×%d",[width intValue],[height intValue]];
-			}
-			else
-			{
+				result = [NSString stringWithFormat:@"%ld×%ld",(long)[width integerValue],(long)[height integerValue]];
+			} else {
 				result = @"";
 			}
 

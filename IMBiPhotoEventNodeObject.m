@@ -117,11 +117,11 @@
     {
         // We are currently skimming on the image
         
-        _currentImageKey = [keyList objectAtIndex:currentSkimmingIndex];
+        self.currentImageKey = [keyList objectAtIndex:currentSkimmingIndex];
     } else {
         // We just initialized the object or left the image while skimming and thus restore the key image
         
-        _currentImageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
+        self.currentImageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
     }
 }
 
@@ -195,9 +195,9 @@
 
 - (CGImageRef) processedImageFromImage:(CGImageRef)inImage
 {
-	long imgWidth = CGImageGetWidth(inImage);
-	long imgHeight = CGImageGetHeight(inImage);
-	long squareSize = MIN(imgWidth, imgHeight);
+	size_t imgWidth = CGImageGetWidth(inImage);
+	size_t imgHeight = CGImageGetHeight(inImage);
+	size_t squareSize = MIN(imgWidth, imgHeight);
 	
 	CGContextRef bitmapContext = CGBitmapContextCreate(NULL, 
 													   squareSize, 
@@ -211,13 +211,13 @@
 	CGContextClearRect(bitmapContext, bounds);
 	
 	// Set clipping path
-	float cornerRadius = squareSize / 10.0;
+	CGFloat cornerRadius = squareSize / 10.0;
 	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithGraphicsPort:bitmapContext flipped:NO]];
 	[[NSBezierPath bezierPathWithRoundedRect:NSRectFromCGRect(bounds) xRadius: cornerRadius yRadius:cornerRadius] addClip];
 	
 	// Move image in context to get desired image area to be in context bounds
-	CGRect imageBounds = CGRectMake((squareSize - imgWidth) / 2.0, 
-									(squareSize - imgHeight) / 2.0, 
+	CGRect imageBounds = CGRectMake(((NSInteger)(squareSize - imgWidth)) / 2.0,   // Will be negative or zero
+									((NSInteger)(squareSize - imgHeight)) / 2.0,  // Will be negative or zero
 									imgWidth, imgHeight);
 	
 	CGContextDrawImage(bitmapContext, imageBounds, inImage);

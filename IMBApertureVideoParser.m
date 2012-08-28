@@ -79,6 +79,17 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns the key under which the master resource is found inside its metadata dictionary in ApertureData.xml
+// (this key may vary for different media types. Default is the key for image media types).
+// Override here for Aperture movies.
+
++ (NSString *)objectLocationKey
+{
+    return @"OriginalPath";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // This method must return an appropriate prefix for IMBObject identifiers. Refer to the method
