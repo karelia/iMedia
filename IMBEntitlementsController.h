@@ -79,7 +79,7 @@
 // User inteface to grant access to part of the file system. Returns a bookmark for the folder that the user
 // actually selected or nil in case of Cancel...
 
-- (void) presentConfirmationUserInterfaceForURL:(NSURL*)inSuggestedURL;
+- (BOOL) presentConfirmationUserInterfaceForURL:(NSURL*)inSuggestedURL;
 
 // Accessor method. Returns a security scoped bookmark, if the user has granted acccess to this part of the
 // file system. Please note that the bookmark may point to an ancestor of the specified URL. If the user

@@ -209,34 +209,53 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 #pragma mark User Interface
 
 
-- (void) presentConfirmationUserInterfaceForURL:(NSURL*)inSuggestedURL
+- (BOOL) presentConfirmationUserInterfaceForURL:(NSURL*)inSuggestedURL
 {
 	NSOpenPanel* panel = [NSOpenPanel openPanel];
-	// configure...
 	panel.canChooseDirectories = YES;
 	panel.allowsMultipleSelection = NO;
 	panel.canCreateDirectories = NO;
 	
-	panel.title = @"Confirm Read Access";
-	panel.prompt = @"Confirm";
-//	panel.nameFieldLabel = @""
-	panel.message = @"Click the confirm button to grant read access to your media files.";
+	panel.title = NSLocalizedStringWithDefaultValue(
+		@"IMBEntitlementsController.openPanel.title",
+		nil,
+		IMBBundle(),
+		@"Grant Access to Media Files",
+		@"NSOpenPanel title");
+
+	panel.message = NSLocalizedStringWithDefaultValue(
+		@"IMBEntitlementsController.openPanel.message",
+		nil,
+		IMBBundle(),
+		@"The application does not have the necessary rights to access your media files. Click the \"Confirm\" button to grant access to your media files.\n\nIf your media files are scattered throughout the file system, you may want to navigate up the file system hierarchy, before clicking the \"Confirm\" button.",
+		@"NSOpenPanel message");
+				
+	panel.prompt = NSLocalizedStringWithDefaultValue(
+		@"IMBEntitlementsController.openPanel.prompt",
+		nil,
+		IMBBundle(),
+		@"Confirm",
+		@"NSOpenPanel button");
+
 	panel.accessoryView = nil;
-	
+
 	[panel setDirectoryURL:inSuggestedURL];
-	[panel beginWithCompletionHandler:^(NSInteger inButton)
+	NSInteger button = [panel runModal];
+	
+	if (button == NSOKButton)
 	{
-		if (inButton == NSOKButton)
-		{
-			NSURL* url = [panel URL];
+		NSURL* url = [panel URL];
 			
-			if ([self confirmedBookmarkForURL:url] == nil)
-			{
-				NSData* bookmark = [self appScopedBookmarkForURL:url];
-				[self.bookmarks setObject:bookmark forKey:url];
-			}
+		if ([self confirmedBookmarkForURL:url] == nil)
+		{
+			NSData* bookmark = [self appScopedBookmarkForURL:url];
+			[self.bookmarks setObject:bookmark forKey:url];
 		}
-	}];
+		
+		return YES;
+	}
+	
+	return NO;
 }
 
 
