@@ -748,8 +748,15 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	if (node.error)
 	{
+		cell.badgeType = kIMBBadgeTypeWarning;
 		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
 		cell.badgeError = node.error;
+	}
+	else if (!node.isAccessible)
+	{
+		cell.badgeType = kIMBBadgeTypeNoAccessRights;
+		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
+		cell.badgeError = nil;
 	}
 	else if ([node respondsToSelector:@selector(license)])
 	{

@@ -85,7 +85,8 @@ enum
 	kIMBBadgeTypeWarning,
 	kIMBBadgeTypeStop,
 	kIMBBadgeTypeEject,
-	kIMBBadgeTypeOffline
+	kIMBBadgeTypeOffline,
+	kIMBBadgeTypeNoAccessRights
 };
 typedef NSUInteger IMBBadgeType;
 
