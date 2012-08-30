@@ -81,6 +81,7 @@
 
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
+@synthesize accessRightBookmark = _accessRightBookmark;
 @synthesize isUserAdded = _isUserAdded;
 
 
@@ -93,6 +94,7 @@
 	{
 		self.mediaType = [[self class] mediaType];
 		self.mediaSource = nil;
+		self.accessRightBookmark = nil;
 		self.isUserAdded = NO;	
 	}
 	
@@ -103,6 +105,7 @@
 {
 	IMBRelease(_mediaType);
 	IMBRelease(_mediaSource);
+	IMBRelease(_accessRightBookmark);
 	IMBRelease(_connection);
 	
 	[super dealloc];
@@ -118,6 +121,7 @@
 	{
 		self.mediaType = [inCoder decodeObjectForKey:@"mediaType"];
 		self.mediaSource = [inCoder decodeObjectForKey:@"mediaSource"];
+		self.accessRightBookmark = [inCoder decodeObjectForKey:@"accessRightBookmark"];
 		self.isUserAdded = [inCoder decodeBoolForKey:@"isUserAdded"];
 	}
 	
@@ -129,6 +133,7 @@
 {
 	[inCoder encodeObject:self.mediaType forKey:@"mediaType"];
 	[inCoder encodeObject:self.mediaSource forKey:@"mediaSource"];
+	[inCoder encodeObject:self.accessRightBookmark forKey:@"accessRightBookmark"];
 	[inCoder encodeBool:self.isUserAdded forKey:@"isUserAdded"];
 }
 
@@ -142,6 +147,7 @@
 	
 	copy.mediaType = self.mediaType;
 	copy.mediaSource = self.mediaSource;
+	copy.accessRightBookmark = self.accessRightBookmark;
 	copy.isUserAdded = self.isUserAdded;
 	
 	return copy;

@@ -77,6 +77,7 @@
 {
 	NSString* _mediaType;
 	NSURL* _mediaSource;
+	NSData* _accessRightBookmark;
 	BOOL _isUserAdded;
 	id _connection;
 }
@@ -89,6 +90,7 @@
 
 @property (copy) NSString* mediaType;						// See IMBCommon.h for available types
 @property (retain) NSURL* mediaSource;						// Source of given media objects
+@property (retain) NSData* accessRightBookmark;				// Bookmark that grants access to part of the file system
 @property BOOL isUserAdded;									// User added items can also be removed by the user again
 
 // For communicating with the XPC service...
