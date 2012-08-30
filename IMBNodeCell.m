@@ -58,6 +58,9 @@
 #import "IMBNodeCell.h"
 #import "IMBNode.h"
 #import "IMBAlertPopover.h"
+#import "IMBNodeViewController.h"
+#import "IMBLibraryController.h"
+#import "IMBEntitlementsController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -324,6 +327,9 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (BOOL) trackMouse:(NSEvent*)inEvent inRect:(NSRect)inCellFrame ofView:(NSView*)inControlView untilMouseUp:(BOOL)flag
 {
     [self setControlView:inControlView];
@@ -348,38 +354,98 @@
     if (inside)
 	{
 		_clickedRect = badgeRect;
-		[self showPopover:nil];
+
+		if (_badgeError)
+		{
+			[self showErrorPopover:nil];
+		}
+		else if (_badgeType == kIMBBadgeTypeNoAccessRights)
+		{
+			[self showAccessRightsPopover:nil];
+		}
     }
  
     return YES;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // If so then display an alert. On Lion we'll use a modeless popover, on earlier system just use a modal NSAlert...
 
-- (IBAction) showPopover:(id)inSender
+- (IBAction) showErrorPopover:(id)inSender
 {
-	if (_badgeError)
+	if (IMBRunningOnLionOrNewer())
 	{
-		if (IMBRunningOnLionOrNewer())
-		{
-			NSString* title = [[_badgeError userInfo] objectForKey:@"title"];
-			NSString* description = [[_badgeError userInfo] objectForKey:NSLocalizedDescriptionKey];
-			NSString* ok = @"   OK   ";
+		NSString* title = [[_badgeError userInfo] objectForKey:@"title"];
+		NSString* description = [[_badgeError userInfo] objectForKey:NSLocalizedDescriptionKey];
+		NSString* ok = @"   OK   ";
 
-			IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
-			
-			[alert addButtonWithTitle:ok block:^()
-			{
-				[alert close];
-			}];
-			
-			[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
-		}
-		else
+		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
+		
+		[alert addButtonWithTitle:ok block:^()
 		{
-			[NSApp presentError:_badgeError];
-		}
+			[alert close];
+		}];
+		
+		[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
 	}
+	else
+	{
+		[NSApp presentError:_badgeError];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IBAction) showAccessRightsPopover:(id)inSender
+{
+	NSString* libraryName = self.title;
+
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBNodeCell.grantAccessRightsTitle",
+		nil,
+		IMBBundle(),
+		@"Access to Media Files Not Allowed",
+		@"Alert title");
+
+	NSString* format = NSLocalizedStringWithDefaultValue(
+		@"IMBNodeCell.grantAccessRightsMessage",
+		nil,
+		IMBBundle(),
+		@"The application does not have the necessary rights to access the media files in %@.\n\n Click the \"Grant Access\" button to allow the application to access these media files.",
+		@"Alert message");
+		
+	NSString* ok = NSLocalizedStringWithDefaultValue(
+		@"IMBNodeCell.grantAccessRightsButton",
+		nil,
+		IMBBundle(),
+		@"Grant Access",
+		@"Alert button");
+
+	NSString* message = [NSString stringWithFormat:format,libraryName];
+	IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
+	
+	[alert addButtonWithTitle:ok block:^()
+	{
+		NSOutlineView* view = (NSOutlineView*)self.controlView;
+		IMBNodeViewController* nodeViewController = (IMBNodeViewController*)[view delegate];
+		IMBLibraryController* libraryController = [nodeViewController libraryController];
+		NSArray* urls = [libraryController urlsOfTopLevelNodesWithoutAccessRights];
+		NSURL* url = [[IMBEntitlementsController sharedEntitlementsController] commonAncestorForURLs:urls];
+
+		if ([[IMBEntitlementsController sharedEntitlementsController] presentConfirmationUserInterfaceForURL:url])
+		{
+			[libraryController reload];
+		}
+		
+		[alert close];
+	}];
+	
+	[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
 }
 
 
