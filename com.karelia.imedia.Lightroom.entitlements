@@ -4,10 +4,12 @@
 <dict>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
-	<key>com.apple.security.temporary-exception.files.absolute-path.read-write</key>
+	<key>com.apple.security.temporary-exception.shared-preference.read-only</key>
 	<array>
-		<string>/Volumes/</string>
-		<string>/Users/</string>
+		<string>com.adobe.Lightroom</string>
+		<string>com.adobe.Lightroom2</string>
+		<string>com.adobe.Lightroom3</string>
+		<string>com.adobe.Lightroom4</string>
 	</array>
 </dict>
 </plist>
