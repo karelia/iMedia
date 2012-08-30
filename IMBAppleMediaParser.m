@@ -364,16 +364,13 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	
 	if (node.isTopLevelNode)
 	{
-        
-#warning Display of node accessibility is preliminary
-        
-        if (self.shouldDisplayLibraryName)
+		if (self.shouldDisplayLibraryName)
         {
             NSString* path = (NSString*)[node.mediaSource path];
-            NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
-            node.name = [NSString stringWithFormat:@"%@%@ (%@)",node.name, node.isAccessible ? @"" : @": no access!", name];
+            NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+            node.name = [NSString stringWithFormat:@"%@ (%@)",node.name, libraryName];
         } else {
-            node.name = [NSString stringWithFormat:@"%@%@",node.name, node.isAccessible ? @"" : @": no access!"];
+            node.name = [NSString stringWithFormat:@"%@",node.name];
         }
 	}
 	
