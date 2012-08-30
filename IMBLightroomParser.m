@@ -241,6 +241,8 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSError* error = nil;
 
+	NSString* libraryPath = [self.mediaSource path];
+	
 	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16.0,16.0)];
@@ -266,11 +268,17 @@ static NSArray* sSupportedUTIs = nil;
 		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,[self libraryName]];
 	}
 
+    // Being sandboxed the app may yet not have entitlements to access this top level node
+    
+    node.isAccessible = [[NSFileManager defaultManager]
+		imb_isPath:libraryPath
+        accessible:kIMBAccessRead|kIMBAccessWrite];
+    
 	// Watch the root node. Whenever something in Lightroom changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding out WHAT has changed in Lightroom...
 	
 	node.watcherType = kIMBWatcherTypeFSEvent;
-	node.watchedPath = [self.mediaSource path];
+	node.watchedPath = libraryPath;
 
 	if (outError) *outError = error;
 	return node;

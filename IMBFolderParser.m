@@ -147,6 +147,12 @@
 		node.isIncludedInPopup = NO;
 	}
 	
+    // Being sandboxed the app may yet not have entitlements to access this top level node
+    
+    node.isAccessible = [[NSFileManager defaultManager]
+		imb_isPath:path
+        accessible:kIMBAccessRead|kIMBAccessWrite];
+    
 	// Enable FSEvents based file watching for root nodes...
 	
 	node.watcherType = kIMBWatcherTypeFSEvent;
