@@ -56,6 +56,7 @@
 #pragma mark HEADERS
 
 #import "IMBAccessRightsController.h"
+#import "NSFileManager+iMedia.h"
 #import "IMBConfig.h"
 
 
@@ -169,12 +170,16 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 	NSError* error = nil;
 	BOOL stale = NO;
 		
-	return [NSURL
+	NSURL* url = [NSURL
 		URLByResolvingBookmarkData:inBookmark
 		options:NSURLBookmarkResolutionWithSecurityScope|NSURLBookmarkResolutionWithoutUI
 		relativeToURL:nil
 		bookmarkDataIsStale:&stale
 		error:&error];
+
+	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
+		
+	return url;
 }
 
 
@@ -191,6 +196,14 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 	{
 		NSURL* url = [self _urlForBookmark:bookmark];
 		[url startAccessingSecurityScopedResource];
+
+		NSString* path = [url path];
+		
+		BOOL accessible = [[NSFileManager defaultManager]
+			imb_isPath:path
+			accessible:kIMBAccessRead|kIMBAccessWrite];
+	
+		NSLog(@"%s path=%@ accessible=%d",__FUNCTION__,path,accessible);
 	}
 }
 
@@ -253,6 +266,13 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 	if (button == NSOKButton)
 	{
 		NSURL* url = [panel URL];
+		NSString* path = [url path];
+		
+		BOOL accessible = [[NSFileManager defaultManager]
+			imb_isPath:path
+			accessible:kIMBAccessRead|kIMBAccessWrite];
+	
+		NSLog(@"%s path=%@ accessible=%d",__FUNCTION__,path,accessible);
 			
 		if ([self confirmedBookmarkForURL:url] == nil)
 		{
@@ -343,6 +363,8 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 		includingResourceValuesForKeys:nil
 		relativeToURL:nil
 		error:&error];
+
+	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
 		
 	return bookmark;
 }

@@ -59,6 +59,7 @@
 #import "IMBNodeObject.h"
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
+#import "NSFileManager+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -220,11 +221,19 @@
 		NSError* error = nil;
 		BOOL stale = NO;
 		
-		[NSURL URLByResolvingBookmarkData:bookmark
+		NSURL* url = [NSURL URLByResolvingBookmarkData:bookmark
 			options:0
 			relativeToURL:nil
 			bookmarkDataIsStale:&stale
 			error:&error];
+			
+		NSString* path = [url path];
+		
+		BOOL accessible = [[NSFileManager defaultManager]
+			imb_isPath:path
+			accessible:kIMBAccessRead|kIMBAccessWrite];
+	
+		NSLog(@"%s path %@ accessible %d",__FUNCTION__,path,accessible);
 	}
 }
 
