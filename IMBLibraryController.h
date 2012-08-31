@@ -132,6 +132,8 @@ extern NSString* kIMBDidCreateTopLevelNodeNotification;
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 - (IMBNode*) topLevelNodeForParserIdentifier:(NSString*)inParserIdentifier;
 
+- (NSArray*) urlsOfTopLevelNodesWithoutAccessRights;
+
 - (void) logNodes;
 
 // User added nodes...

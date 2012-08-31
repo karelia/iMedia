@@ -889,6 +889,34 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Find all toplevel nodes that are not readable (because of sandbox access rights)...
+
+- (void) _addNodesWithoutAccessRights:(NSArray*)inNodes urls:(NSMutableArray*)inURLs
+{
+	for (IMBNode* node in inNodes)
+	{
+		if (node.isGroupNode)
+		{
+			[self _addNodesWithoutAccessRights:node.subnodes urls:inURLs];
+		}
+		else if (!node.isAccessible)
+		{
+			[inURLs addObject:node.mediaSource];
+		}
+	}
+}
+
+- (NSArray*) urlsOfTopLevelNodesWithoutAccessRights
+{
+	NSMutableArray* urls = [NSMutableArray array];
+	[self _addNodesWithoutAccessRights:_subnodes urls:urls];
+	return urls;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 
