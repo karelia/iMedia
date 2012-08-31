@@ -56,6 +56,7 @@
 #pragma mark HEADERS
 
 #import "IMBPanelController.h"
+#import "IMBAccessRightsController.h"
 #import "IMBParserController.h"
 #import "IMBLibraryController.h"
 #import "IMBNodeViewController.h"
@@ -233,6 +234,10 @@ static IMBPanelController* sSharedPanelController = nil;
 	IMBNodeViewController* nodeViewController = nil;
 	IMBObjectViewController* objectViewController = nil;
 	
+	// Load the access rights bookmarks to grant access to parts of the file system...
+	
+	[IMBAccessRightsController sharedAccessRightsController];
+
 	// Load the parsers...
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];

@@ -61,6 +61,7 @@
 #import "IMBTestiPhotoEventBrowserCell.h"
 #import "IMBTestFaceBrowserCell.h"
 #import "IMBTestFacesBackgroundLayer.h"
+#import "IMBAccessRightsController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -141,6 +142,10 @@
 	}
 	
 	#if CUSTOM_USER_INTERFACE
+	
+	// Load the access rights bookmarks to grant access to parts of the file system...
+	
+	[IMBAccessRightsController sharedAccessRightsController];
 	
 	// Load parsers...
 	
