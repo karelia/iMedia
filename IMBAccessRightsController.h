@@ -64,14 +64,14 @@
 
 #pragma mark 
 
-@interface IMBEntitlementsController : NSObject
+@interface IMBAccessRightsController : NSViewController
 {
-	NSMutableDictionary* _bookmarks;
+	NSMutableArray* _bookmarks;
 }
 
 // Create singleton instance of the controller...
 
-+ (IMBEntitlementsController*) sharedEntitlementsController;
++ (IMBAccessRightsController*) sharedAccessRightsController;
 
 - (void) loadFromPrefs;
 - (void) saveToPrefs;
@@ -84,6 +84,8 @@
 // Accessor method. Returns a security scoped bookmark, if the user has granted acccess to this part of the
 // file system. Please note that the bookmark may point to an ancestor of the specified URL. If the user
 // hasn't granted access, then nil may be returned...
+
+@property (retain) NSMutableArray* bookmarks;
 
 - (NSData*) confirmedBookmarkForURL:(NSURL*)inURL;
 

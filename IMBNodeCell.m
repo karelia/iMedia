@@ -60,7 +60,7 @@
 #import "IMBAlertPopover.h"
 #import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
-#import "IMBEntitlementsController.h"
+#import "IMBAccessRightsController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -435,9 +435,9 @@
 		IMBNodeViewController* nodeViewController = (IMBNodeViewController*)[view delegate];
 		IMBLibraryController* libraryController = [nodeViewController libraryController];
 		NSArray* urls = [libraryController urlsOfTopLevelNodesWithoutAccessRights];
-		NSURL* url = [[IMBEntitlementsController sharedEntitlementsController] commonAncestorForURLs:urls];
+		NSURL* url = [[IMBAccessRightsController sharedAccessRightsController] commonAncestorForURLs:urls];
 
-		if ([[IMBEntitlementsController sharedEntitlementsController] presentConfirmationUserInterfaceForURL:url])
+		if ([[IMBAccessRightsController sharedAccessRightsController] presentConfirmationUserInterfaceForURL:url])
 		{
 			[libraryController reload];
 		}
