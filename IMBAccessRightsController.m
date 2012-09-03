@@ -104,15 +104,15 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 
 + (IMBAccessRightsController*) sharedAccessRightsController;
 {
-	static IMBAccessRightsController* sSharedEntitlementsController = nil;
+	static IMBAccessRightsController* sSharedAccessRightsController = nil;
 	static dispatch_once_t sOnceToken = 0;
 
     dispatch_once(&sOnceToken,
     ^{
-		sSharedEntitlementsController = [[IMBAccessRightsController alloc] init];
+		sSharedAccessRightsController = [[IMBAccessRightsController alloc] init];
 	});
 
- 	return sSharedEntitlementsController;
+	return sSharedAccessRightsController;
 }
 
 
