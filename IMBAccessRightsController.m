@@ -272,8 +272,6 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Helper method to resolve a regular bookmark to a URL...
-
 - (NSData*) bookmarkForURL:(NSURL*)inURL
 {
 	NSError* error = nil;
@@ -289,6 +287,8 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 	return bookmark;
 }
 
+
+// Helper method to resolve a regular bookmark to a URL...
 
 - (NSURL*) _urlForBookmark:(NSData*)inBookmark
 {
