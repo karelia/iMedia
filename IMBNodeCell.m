@@ -62,6 +62,9 @@
 #import "IMBLibraryController.h"
 #import "IMBAccessRightsController.h"
 #import "IMBAccessRightsViewController.h"
+#import "IMBOutlineView.h"
+#import "SBUtilities.h"
+#import "IMBParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -435,19 +438,29 @@
 	
 	[alert addButtonWithTitle:ok block:^()
 	{
-		NSOutlineView* view = (NSOutlineView*)self.controlView;
-		IMBNodeViewController* nodeViewController = (IMBNodeViewController*)[view delegate];
-		IMBLibraryController* libraryController = [nodeViewController libraryController];
-		NSArray* urls = [libraryController urlsOfTopLevelNodesWithoutAccessRights];
-		NSURL* url = [[IMBAccessRightsController sharedAccessRightsController] commonAncestorForURLs:urls];
+//		IMBOutlineView* view = (IMBOutlineView*)self.controlView;
+//		IMBNodeViewController* nodeViewController = (IMBNodeViewController*)[view delegate];
+//		IMBLibraryController* libraryController = [nodeViewController libraryController];
+		
+		IMBNode* node = self.node;
+		NSURL* url = node.mediaSource;
 		IMBAccessRightsViewController* controller = [[[IMBAccessRightsViewController alloc] init] autorelease];
 		url = [controller showForURL:url];
 		
 		if (url)
 		{
+			IMBParserMessenger* messenger = node.parserMessenger;
 			NSData* bookmark = [[IMBAccessRightsController sharedAccessRightsController] bookmarkForURL:url];
-			[[IMBAccessRightsController sharedAccessRightsController] addBookmark:bookmark];
-			[libraryController reload];
+
+			SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+	
+				^(NSURL* inURL,NSError* inError)
+				{
+					if (inURL != nil && inError == nil)
+					{
+						[[IMBLibraryController sharedLibraryControllerWithMediaType:node.mediaType] reloadNodeTree:node];
+					}
+				});
 		}
 		
 		[alert close];
