@@ -288,6 +288,7 @@
 	NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
 	
 	NSString* nodePath = nil;
+	
 	if (inIdSpace)
 	{
 		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@/%@",(unsigned long)[path hash],libraryName,inIdSpace,inId];

@@ -44,117 +44,56 @@
 */
 
 
-// Author: Peter Baumgartner
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Author: Peter Baumgartner, Jörg Jacobson
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
-	
-#import "IMBTimecodeTransformer.h"
-	
+#pragma mark ABSTRACT
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark
-
-@implementation IMBTimecodeTransformer
+// This singleton controller is responsible for letting the user grant read/write access to parts of the file system.
+// This access is persistent. The controller provides the UI, storage, and accessor methods...
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Register the transformer...
+#pragma mark 
 
-+ (void) load
+@interface IMBEntitlementsController : NSObject
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	IMBTimecodeTransformer* transformer = [[IMBTimecodeTransformer alloc] init];
-	[NSValueTransformer setValueTransformer:transformer forName:NSStringFromClass(self)];
-	[transformer release];
-	[pool drain];
+	NSMutableDictionary* _bookmarks;
 }
 
+// Create singleton instance of the controller...
 
-//----------------------------------------------------------------------------------------------------------------------
++ (IMBEntitlementsController*) sharedEntitlementsController;
 
+- (void) loadFromPrefs;
+- (void) saveToPrefs;
 
-+ (Class) transformedValueClass
-{
-	return [NSString class];
-}
+// User inteface to grant access to part of the file system. Returns a bookmark for the folder that the user
+// actually selected or nil in case of Cancel...
 
+- (void) presentConfirmationUserInterfaceForURL:(NSURL*)inSuggestedURL;
 
-+ (BOOL) allowsReverseTransformation
-{
-	return YES;
-}
-		
+// Accessor method. Returns a security scoped bookmark, if the user has granted acccess to this part of the
+// file system. Please note that the bookmark may point to an ancestor of the specified URL. If the user
+// hasn't granted access, then nil may be returned...
 
-//----------------------------------------------------------------------------------------------------------------------
+- (NSData*) confirmedBookmarkForURL:(NSURL*)inURL;
 
+// Helper methods...
 
-// Convert from NSNumber to NSString...
-
-- (id) transformedValue:(id)inValue
-{
-	id result = nil;
-	
-	if (inValue)
-	{
-		if ([inValue respondsToSelector:@selector(doubleValue)]) 
-		{
-			double t = [inValue doubleValue];
-			int T = (int) t;
-			
-			int HH = T / 3600;
-			int MM = (T / 60) % 60;
-			int SS = T % 60;
-			
-			if (HH > 0)
-			{
-				result = [NSString stringWithFormat:@"%ld:%ld:%02ld",(long)HH,(long)MM,(long)SS];
-			}	
-			else
-			{
-				result = [NSString stringWithFormat:@"%ld:%02ld",(long)MM,(long)SS];
-			}	
-		}
-	}
-	
-	return result;
-}
-
-
-// Convert from NSString to NSNumber...
-
-- (id) reverseTransformedValue:(id)inValue
-{
-	double t = 0.0;
-	
-	if (inValue != nil && [inValue isKindOfClass:[NSString class]])
-	{
-		NSArray* parts = [(NSString*)inValue componentsSeparatedByString:@":"];
-		NSInteger n = [parts count];
-		double multiplier = 1.0;
-		
-		for (NSInteger i=n-1; i>=0; i--)
-		{
-			NSString* string = [parts objectAtIndex:i];
-			double value = [string doubleValue];
-			t += value * multiplier;
-			multiplier *= 60.0;
-		}
-	}
-	
-	return [NSNumber numberWithDouble:t];
-}
-	
-
-//----------------------------------------------------------------------------------------------------------------------
-
+- (NSURL*) commonAncestorForURLs:(NSArray*)inURLs;								// Finds the common ancestor folder for an array of urls
 
 @end
-	
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
