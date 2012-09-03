@@ -53,9 +53,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+@class IMBNode;
+
 @interface IMBNodeCell : NSTextFieldCell
 {
 	BOOL _isGroupCell;
+	IMBNode* _node;
 	NSImage* _icon;
 	NSImage* _badgeIcon;
 	NSError* _badgeError;
@@ -65,6 +68,7 @@
 }
 
 @property BOOL isGroupCell;
+@property (retain) IMBNode* node;
 @property (retain) NSImage* icon;
 @property (retain) NSImage* badgeIcon;
 @property (retain) NSError* badgeError;

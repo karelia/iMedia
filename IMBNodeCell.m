@@ -85,6 +85,7 @@
 @implementation IMBNodeCell
 
 @synthesize isGroupCell = _isGroupCell;
+@synthesize node = _node;
 @synthesize icon = _icon;
 @synthesize badgeIcon = _badgeIcon;
 @synthesize badgeError = _badgeError;
@@ -113,6 +114,7 @@
 
 - (void) dealloc
 {
+	IMBRelease(_node);
 	IMBRelease(_icon);
  	IMBRelease(_badgeIcon);
  	IMBRelease(_badgeError);
@@ -129,6 +131,7 @@
     IMBNodeCell* cell = (IMBNodeCell*) [super copyWithZone:inZone];
 	
     cell->_isGroupCell = _isGroupCell;
+    cell->_node = [_node retain];
     cell->_icon = [_icon retain];
 	cell->_badgeIcon = [_badgeIcon retain];
 	cell->_badgeError = [_badgeError retain];

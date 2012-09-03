@@ -742,6 +742,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	IMBNodeCell* cell = (IMBNodeCell*)inCell;
 
 	cell.isGroupCell = node.isGroupNode;
+	cell.node = node;
 	cell.icon = node.icon;
 	cell.title = node.name;
 	cell.badgeType = node.badgeTypeNormal;
