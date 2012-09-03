@@ -61,6 +61,7 @@
 #import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
 #import "IMBAccessRightsController.h"
+#import "IMBAccessRightsViewController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -436,9 +437,13 @@
 		IMBLibraryController* libraryController = [nodeViewController libraryController];
 		NSArray* urls = [libraryController urlsOfTopLevelNodesWithoutAccessRights];
 		NSURL* url = [[IMBAccessRightsController sharedAccessRightsController] commonAncestorForURLs:urls];
-
-		if ([[IMBAccessRightsController sharedAccessRightsController] presentConfirmationUserInterfaceForURL:url])
+		IMBAccessRightsViewController* controller = [[[IMBAccessRightsViewController alloc] init] autorelease];
+		url = [controller showForURL:url];
+		
+		if (url)
 		{
+			NSData* bookmark = [[IMBAccessRightsController sharedAccessRightsController] bookmarkForURL:url];
+			[[IMBAccessRightsController sharedAccessRightsController] addBookmark:bookmark];
 			[libraryController reload];
 		}
 		
