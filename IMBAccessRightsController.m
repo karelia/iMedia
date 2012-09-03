@@ -181,14 +181,9 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
     {
         if (![self hasBookmarkForURL:url])
         {
-            if ([url startAccessingSecurityScopedResource])
-            {
-                [self.bookmarks addObject:inBookmark];                
-                [self saveToPrefs];
-            } else {
-                // Could not access resource for whatever reason
-                return nil;
-            }
+            [self.bookmarks addObject:inBookmark];
+            [self saveToPrefs];
+            
             return url;
         }
     }
@@ -244,7 +239,8 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 	{
         aURL = [self _urlForBookmark:bookmark];
         anSSB = [self _appScopedBookmarkForURL:aURL];
-        [SSBs addObject:anSSB];
+        
+        if (anSSB) [SSBs addObject:anSSB];
     }
 	[IMBConfig setPrefsValue:SSBs forKey:kBookmarksPrefsKey];
 }
