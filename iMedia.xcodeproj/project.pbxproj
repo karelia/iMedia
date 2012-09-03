@@ -382,6 +382,8 @@
 		D09934341011B63600C527B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D09934331011B63600C527B7 /* main.m */; };
 		D0993931101236AB00C527B7 /* IMBOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = D099392F101236AB00C527B7 /* IMBOutlineView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09FD77F105586BC00E328C7 /* IMBImageBrowserView.h in Headers */ = {isa = PBXBuildFile; fileRef = D09FD77D105586BC00E328C7 /* IMBImageBrowserView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0A00A9915F47A7100596789 /* IMBAccessRightsViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0A00A9715F47A7100596789 /* IMBAccessRightsViewController.h */; };
+		D0A00A9A15F47A7100596789 /* IMBAccessRightsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0A00A9815F47A7100596789 /* IMBAccessRightsViewController.m */; };
 		D0A13A9F152F29C9005513CD /* IMBFolderObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D0A13A9D152F29C8005513CD /* IMBFolderObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0A13AA0152F29C9005513CD /* IMBFolderObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D0A13A9E152F29C8005513CD /* IMBFolderObject.m */; };
 		D0A13AA715301E8A005513CD /* missing-thumbnail.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D0A13AA615301E89005513CD /* missing-thumbnail.jpg */; };
@@ -892,6 +894,8 @@
 		D0993930101236AB00C527B7 /* IMBOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBOutlineView.m; sourceTree = "<group>"; };
 		D09FD77D105586BC00E328C7 /* IMBImageBrowserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageBrowserView.h; sourceTree = "<group>"; };
 		D09FD77E105586BC00E328C7 /* IMBImageBrowserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageBrowserView.m; sourceTree = "<group>"; };
+		D0A00A9715F47A7100596789 /* IMBAccessRightsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAccessRightsViewController.h; sourceTree = "<group>"; };
+		D0A00A9815F47A7100596789 /* IMBAccessRightsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAccessRightsViewController.m; sourceTree = "<group>"; };
 		D0A13A9D152F29C8005513CD /* IMBFolderObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFolderObject.h; sourceTree = "<group>"; };
 		D0A13A9E152F29C8005513CD /* IMBFolderObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFolderObject.m; sourceTree = "<group>"; };
 		D0A13AA615301E89005513CD /* missing-thumbnail.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "missing-thumbnail.jpg"; sourceTree = "<group>"; };
@@ -1434,8 +1438,6 @@
 				D09930B61010F6C100C527B7 /* IMBLibraryController.m */,
 				D09930BB1010F6C100C527B7 /* IMBObjectArrayController.h */,
 				D099333210119F3400C527B7 /* IMBObjectArrayController.m */,
-				D0DC63F415ECAB9400DAD84E /* IMBAccessRightsController.h */,
-				D0DC63F715ECC10600DAD84E /* IMBAccessRightsController.m */,
 				D0904DA6152CA51F003FDD08 /* IMBFileSystemObserver.h */,
 				D0904DA7152CA51F003FDD08 /* IMBFileSystemObserver.m */,
 				D029C3CE152B41F000B1A02B /* IMBFSEventsService.m */,
@@ -1605,6 +1607,7 @@
 				D08247AF1521BB2C00033850 /* Window */,
 				D08247AE1521BB1B00033850 /* Node View */,
 				D08247B01521BB3900033850 /* Object View */,
+				D0A00A9515F47A4E00596789 /* Access Rights */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -1741,6 +1744,17 @@
 				3016783513B1F435000E57D2 /* IMBTestTextView.m */,
 			);
 			name = "Test Application";
+			sourceTree = "<group>";
+		};
+		D0A00A9515F47A4E00596789 /* Access Rights */ = {
+			isa = PBXGroup;
+			children = (
+				D0DC63F415ECAB9400DAD84E /* IMBAccessRightsController.h */,
+				D0DC63F715ECC10600DAD84E /* IMBAccessRightsController.m */,
+				D0A00A9715F47A7100596789 /* IMBAccessRightsViewController.h */,
+				D0A00A9815F47A7100596789 /* IMBAccessRightsViewController.m */,
+			);
+			name = "Access Rights";
 			sourceTree = "<group>";
 		};
 		D0B6FAA21043227A00280DDC /* GarageBand */ = {
@@ -2088,6 +2102,7 @@
 				3091F6C115C9508E005019A1 /* IMBImageItem.h in Headers */,
 				3091F6C315C9508E005019A1 /* IMBQLPreviewPanel.h in Headers */,
 				D0DC63F515ECAB9400DAD84E /* IMBAccessRightsController.h in Headers */,
+				D0A00A9915F47A7100596789 /* IMBAccessRightsViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2740,6 +2755,7 @@
 				3091F6BE15C9508E005019A1 /* IMBURLGetSizeOperation.m in Sources */,
 				3091F6C015C9508E005019A1 /* IMBURLDownloadOperation.m in Sources */,
 				D0DC63F815ECC10600DAD84E /* IMBAccessRightsController.m in Sources */,
+				D0A00A9A15F47A7100596789 /* IMBAccessRightsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

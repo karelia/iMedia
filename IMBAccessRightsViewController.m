@@ -53,48 +53,112 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark ABSTRACT
+#pragma mark HEADERS
 
-// This singleton controller is responsible for letting the user grant read/write access to parts of the file system.
-// This access is persistent...
+#import "IMBAccessRightsViewController.h"
+#import "NSFileManager+iMedia.h"
+#import "IMBConfig.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark
 
-@interface IMBAccessRightsController : NSObject
+@implementation IMBAccessRightsViewController
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Lifetime
+
+
++ (NSBundle*) bundle
 {
-	NSMutableArray* _bookmarks;
+	return [NSBundle bundleForClass:[self class]];
 }
 
-// Create singleton instance of the controller...
 
-+ (IMBAccessRightsController*) sharedAccessRightsController;
-
-// Accessor method. Returns a security scoped bookmark, if the user has granted acccess to this part of the
-// file system. Please note that the bookmark may point to an ancestor of the specified URL. If the user
-// hasn't granted access, then nil may be returned...
-
-@property (retain) NSMutableArray* bookmarks;
-
-- (BOOL) hasBookmarkForURL:(NSURL*)inURL;
-- (NSURL*) addBookmark:(NSData*)inBookmark;
-
-// Persistence...
-
-- (void) loadFromPrefs;
-- (void) saveToPrefs;
-
-// Helper methods...
-
-- (NSURL*) commonAncestorForURLs:(NSArray*)inURLs;	// Finds the common ancestor folder for an array of urls
-- (NSData*) bookmarkForURL:(NSURL*)inURL;
-
-@end
++ (NSString*) nibName
+{
+	return @"IMBAccessRightsController";
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+- (id) init
+{
+	if (self = [super initWithNibName:[[self class] nibName] bundle:[[self class] bundle]])
+	{
+
+	}
+	
+	return self;
+}
+
+
+- (void) dealloc
+{
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark User Interface
+
+
+- (NSURL*) showForURL:(NSURL*)inSuggestedURL
+{
+	NSOpenPanel* panel = [NSOpenPanel openPanel];
+	panel.canChooseDirectories = YES;
+	panel.allowsMultipleSelection = NO;
+	panel.canCreateDirectories = NO;
+	
+	panel.title = NSLocalizedStringWithDefaultValue(
+		@"IMBEntitlementsController.openPanel.title",
+		nil,
+		IMBBundle(),
+		@"Grant Access to Media Files",
+		@"NSOpenPanel title");
+
+	panel.message = NSLocalizedStringWithDefaultValue(
+		@"IMBEntitlementsController.openPanel.message",
+		nil,
+		IMBBundle(),
+		@"Click the \"Confirm\" button to grant access to your media files.",
+		@"NSOpenPanel message");
+				
+	panel.prompt = NSLocalizedStringWithDefaultValue(
+		@"IMBEntitlementsController.openPanel.prompt",
+		nil,
+		IMBBundle(),
+		@"Confirm",
+		@"NSOpenPanel button");
+
+	panel.accessoryView = self.view;
+
+	[panel setDirectoryURL:inSuggestedURL];
+	NSInteger button = [panel runModal];
+	
+	if (button == NSOKButton)
+	{
+		NSURL* url = [panel URL];
+		return url;
+	}
+	
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end
 

@@ -56,7 +56,7 @@
 #pragma mark ABSTRACT
 
 // This singleton controller is responsible for letting the user grant read/write access to parts of the file system.
-// This access is persistent...
+// This access is persistent. The controller provides the UI, storage, and accessor methods...
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,33 +64,12 @@
 
 #pragma mark 
 
-@interface IMBAccessRightsController : NSObject
-{
-	NSMutableArray* _bookmarks;
-}
+@interface IMBAccessRightsViewController : NSViewController
 
-// Create singleton instance of the controller...
+// User inteface to grant access to part of the file system. Returns a url for the folder that the user
+// actually selected or nil in case of Cancel...
 
-+ (IMBAccessRightsController*) sharedAccessRightsController;
-
-// Accessor method. Returns a security scoped bookmark, if the user has granted acccess to this part of the
-// file system. Please note that the bookmark may point to an ancestor of the specified URL. If the user
-// hasn't granted access, then nil may be returned...
-
-@property (retain) NSMutableArray* bookmarks;
-
-- (BOOL) hasBookmarkForURL:(NSURL*)inURL;
-- (NSURL*) addBookmark:(NSData*)inBookmark;
-
-// Persistence...
-
-- (void) loadFromPrefs;
-- (void) saveToPrefs;
-
-// Helper methods...
-
-- (NSURL*) commonAncestorForURLs:(NSArray*)inURLs;	// Finds the common ancestor folder for an array of urls
-- (NSData*) bookmarkForURL:(NSURL*)inURL;
+- (NSURL*) showForURL:(NSURL*)inSuggestedURL;
 
 @end
 
