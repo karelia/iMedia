@@ -112,8 +112,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 		sSharedEntitlementsController = [[IMBAccessRightsController alloc] init];
 	});
 
-    NSAssert([NSThread isMainThread], @"IMBEntitlementsController should only accessed from the main thread");
-	return sSharedEntitlementsController;
+ 	return sSharedEntitlementsController;
 }
 
 
