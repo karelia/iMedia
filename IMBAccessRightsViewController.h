@@ -62,14 +62,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+#pragma mark CLASSES
+
+@class IMBNode;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 @interface IMBAccessRightsViewController : NSViewController
+{
+	BOOL _isOpen;
+}
 
 // User inteface to grant access to part of the file system. Returns a url for the folder that the user
 // actually selected or nil in case of Cancel...
 
-- (NSURL*) showForURL:(NSURL*)inSuggestedURL;
++ (IMBAccessRightsViewController*) sharedViewController;
+
+- (void) grantAccessRightsForNode:(IMBNode*)inNode;
 
 @end
 
