@@ -138,7 +138,12 @@
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError;
 
-@end
+// Adds the access rights for a given folder to the XPC service. The service is responsible for persisting this
+// access right...
+
+- (NSURL*) addAccessRightsBookmark:(NSData*)inBookmark error:(NSError**)outError;
+
+ @end
 
 
 //----------------------------------------------------------------------------------------------------------------------

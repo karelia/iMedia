@@ -60,12 +60,11 @@
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
 #import "NSFileManager+iMedia.h"
+#import "IMBAccessRightsController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-#pragma mark
 
 //@interface IMBParserMessenger ()
 //- (void) _setParserIdentifier:(IMBParser*)inParser onNodeTree:(IMBNode*)inNode;
@@ -498,6 +497,17 @@
     
 	IMBParser* parser = [self parserWithIdentifier:inObject.parserIdentifier];
 	return [parser bookmarkForObject:inObject error:outError];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSURL*) addAccessRightsBookmark:(NSData*)inBookmark error:(NSError**)outError
+{
+	NSURL* url = [[IMBAccessRightsController sharedAccessRightsController] addBookmark:inBookmark];
+	if (outError) *outError = nil;
+	return url;
 }
 
 
