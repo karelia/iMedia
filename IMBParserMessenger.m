@@ -82,7 +82,6 @@
 
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
-@synthesize accessRightBookmarks = _accessRightBookmarks;
 @synthesize isUserAdded = _isUserAdded;
 
 
@@ -95,7 +94,6 @@
 	{
 		self.mediaType = [[self class] mediaType];
 		self.mediaSource = nil;
-		self.accessRightBookmarks = nil;
 		self.isUserAdded = NO;	
 	}
 	
@@ -106,7 +104,6 @@
 {
 	IMBRelease(_mediaType);
 	IMBRelease(_mediaSource);
-	IMBRelease(_accessRightBookmarks);
 	IMBRelease(_connection);
 	
 	[super dealloc];
@@ -122,7 +119,6 @@
 	{
 		self.mediaType = [inCoder decodeObjectForKey:@"mediaType"];
 		self.mediaSource = [inCoder decodeObjectForKey:@"mediaSource"];
-		self.accessRightBookmarks = [inCoder decodeObjectForKey:@"accessRightBookmark"];
 		self.isUserAdded = [inCoder decodeBoolForKey:@"isUserAdded"];
 	}
 	
@@ -134,7 +130,6 @@
 {
 	[inCoder encodeObject:self.mediaType forKey:@"mediaType"];
 	[inCoder encodeObject:self.mediaSource forKey:@"mediaSource"];
-	[inCoder encodeObject:self.accessRightBookmarks forKey:@"accessRightBookmark"];
 	[inCoder encodeBool:self.isUserAdded forKey:@"isUserAdded"];
 }
 
@@ -148,7 +143,6 @@
 	
 	copy.mediaType = self.mediaType;
 	copy.mediaSource = self.mediaSource;
-	copy.accessRightBookmarks = self.accessRightBookmarks;
 	copy.isUserAdded = self.isUserAdded;
 	
 	return copy;
@@ -214,28 +208,28 @@
 
 // Helper method to resolve any attached bookmarks, thus giving the XPC service access to parts of the file system...
 
-- (void) _resolveAccessRightsBookmarks
-{
-	for (NSData* bookmark in self.accessRightBookmarks)
-	{
-		NSError* error = nil;
-		BOOL stale = NO;
-		
-		NSURL* url = [NSURL URLByResolvingBookmarkData:bookmark
-			options:0
-			relativeToURL:nil
-			bookmarkDataIsStale:&stale
-			error:&error];
-			
-		NSString* path = [url path];
-		
-		BOOL accessible = [[NSFileManager defaultManager]
-			imb_isPath:path
-			accessible:kIMBAccessRead|kIMBAccessWrite];
-	
-		NSLog(@"%s path %@ accessible %d",__FUNCTION__,path,accessible);
-	}
-}
+//- (void) _resolveAccessRightsBookmarks
+//{
+//	for (NSData* bookmark in self.accessRightBookmarks)
+//	{
+//		NSError* error = nil;
+//		BOOL stale = NO;
+//		
+//		NSURL* url = [NSURL URLByResolvingBookmarkData:bookmark
+//			options:0
+//			relativeToURL:nil
+//			bookmarkDataIsStale:&stale
+//			error:&error];
+//			
+//		NSString* path = [url path];
+//		
+//		BOOL accessible = [[NSFileManager defaultManager]
+//			imb_isPath:path
+//			accessible:kIMBAccessRead|kIMBAccessWrite];
+//	
+//		NSLog(@"%s path %@ accessible %d",__FUNCTION__,path,accessible);
+//	}
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -301,8 +295,6 @@
 
 - (NSArray*) unpopulatedTopLevelNodes:(NSError**)outError
 {
-	[self _resolveAccessRightsBookmarks];
-	
 	NSError* error = nil;
 	NSMutableArray* topLevelNodes = nil;
 	NSArray* parsers = [self parserInstancesWithError:&error];
@@ -333,8 +325,6 @@
 
 - (IMBNode*) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
-	[self _resolveAccessRightsBookmarks];
-
 	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	BOOL success = [parser populateNode:inNode error:&error];
@@ -371,8 +361,6 @@
 
 - (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError
 {
-	[self _resolveAccessRightsBookmarks];
-
 	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	IMBNode* node = [parser reloadNodeTree:inNode error:&error];
@@ -443,8 +431,6 @@
 
 - (IMBObject*) loadThumbnailForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	[self _resolveAccessRightsBookmarks];
-
     inObject.parserMessenger = self;
     
 	NSError* error = nil;
@@ -462,8 +448,6 @@
 
 - (IMBObject*) loadMetadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	[self _resolveAccessRightsBookmarks];
-
     inObject.parserMessenger = self;
     
 	NSError* error = nil;
@@ -486,8 +470,6 @@
 
 - (IMBObject*) loadThumbnailAndMetadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
-	[self _resolveAccessRightsBookmarks];
-
     inObject.parserMessenger = self;
     
 	NSError* error = nil;
