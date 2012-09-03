@@ -124,7 +124,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes;
 - (void) _unmountNodes:(NSArray*)inNodes onVolume:(NSString*)inVolume;
 
-- (void) _attachAccessRightsBookmarksToParserMessenger:(IMBParserMessenger*)inParserMessenger;
+//- (void) _attachAccessRightsBookmarksToParserMessenger:(IMBParserMessenger*)inParserMessenger;
 
 @end
 
@@ -282,10 +282,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		}
 	}
 	
-	// Check if we have an access right book for this parserMessenger, and if so attach it...
-	
-	[self _attachAccessRightsBookmarksToParserMessenger:inParserMessenger];
-	
 	// Create top-level nodes...
 	
 	if (RESPONDS(_delegate,@selector(libraryController:willCreateNodeWithParserMessenger:)))
@@ -385,7 +381,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	NSString* parentNodeIdentifier = inNode.parentNode.identifier;
 	IMBParserMessenger* messenger = inNode.parserMessenger;
-	[self _attachAccessRightsBookmarksToParserMessenger:messenger];
 	SBPerformSelectorAsync(messenger.connection,messenger,@selector(populateNode:error:),inNode,
 	
 		^(IMBNode* inNewNode,NSError* inError)
@@ -811,11 +806,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 // Check if we have an access right book for this parserMessenger, and if so attach it...
 	
-- (void) _attachAccessRightsBookmarksToParserMessenger:(IMBParserMessenger*)inParserMessenger
-{
-	NSArray* bookmarks = [[IMBAccessRightsController sharedAccessRightsController] bookmarks];
-	inParserMessenger.accessRightBookmarks = bookmarks;
-}
+//- (void) _attachAccessRightsBookmarksToParserMessenger:(IMBParserMessenger*)inParserMessenger
+//{
+//	NSArray* bookmarks = [[IMBAccessRightsController sharedAccessRightsController] bookmarks];
+//	inParserMessenger.accessRightBookmarks = bookmarks;
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
