@@ -361,6 +361,9 @@
 - (NSNumber*) directoryHasVisibleSubfolders:(NSURL*)directory error:(NSError**)outError;
 {
 	NSFileManager* fileManager = [[NSFileManager alloc] init];
+
+    BOOL accessible = [[NSFileManager defaultManager] imb_isPath:[directory path] accessible:kIMBAccessRead|kIMBAccessWrite];
+	if (!accessible) return [NSNumber numberWithBool:NO];
 	
 	NSArray* contents = [fileManager contentsOfDirectoryAtURL:directory 
                                    includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
