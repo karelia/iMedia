@@ -362,13 +362,13 @@
 	{
 		_clickedRect = badgeRect;
 
-		if (_badgeError)
-		{
-			[self showErrorPopover:nil];
-		}
-		else if (_badgeType == kIMBBadgeTypeNoAccessRights)
+		if (_badgeType == kIMBBadgeTypeNoAccessRights)
 		{
 			[self showAccessRightsPopover:nil];
+		}
+		else if (_badgeError)
+		{
+			[self showErrorPopover:nil];
 		}
     }
  
