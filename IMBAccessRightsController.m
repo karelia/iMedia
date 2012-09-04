@@ -207,13 +207,13 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 {
 	NSArray* bookmarks = [IMBConfig prefsValueForKey:kBookmarksPrefsKey];
 	self.bookmarks = [NSMutableArray arrayWithArray:bookmarks];
-	
+    
 	for (NSData* bookmark in self.bookmarks)
 	{
-		NSURL* url = [self _urlForBookmark:bookmark];
+		NSURL* url = [self _urlForAppScopedBookmark:bookmark];
 		BOOL started = [url startAccessingSecurityScopedResource];
 
-        // For debugging purposes
+        // TODO/JJ: For debugging purposes (remove later)
         
 		NSString* path = [url path];
 		
