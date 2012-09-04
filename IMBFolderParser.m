@@ -122,8 +122,9 @@
 	NSFileManager* fileManager = [[NSFileManager alloc] init];
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
-    [fileManager release];
-
+	BOOL isAccessible = [fileManager imb_isPath:path accessible:kIMBAccessRead|kIMBAccessWrite];
+	[fileManager release];
+	
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 	node.icon = [self iconForItemAtURL:url error:NULL];
 	node.name = name;
@@ -149,14 +150,13 @@
 	
     // Being sandboxed the app may yet not have entitlements to access this top level node
     
-    node.isAccessible = [[NSFileManager defaultManager]
-		imb_isPath:path
-        accessible:kIMBAccessRead|kIMBAccessWrite];
-    
+    node.isAccessible = isAccessible;
+		
 	// Enable FSEvents based file watching for root nodes...
 	
 	node.watcherType = kIMBWatcherTypeFSEvent;
 	node.watchedPath = path;
+	
 	
 	return node;
 }
@@ -181,7 +181,7 @@
 		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLLocalizedNameKey,NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
 		options:NSDirectoryEnumerationSkipsHiddenFiles 
 		error:&error];
-    
+
     [fileManager release];
 
 	if (urls)
@@ -361,6 +361,9 @@
 - (NSNumber*) directoryHasVisibleSubfolders:(NSURL*)directory error:(NSError**)outError;
 {
 	NSFileManager* fileManager = [[NSFileManager alloc] init];
+
+    BOOL accessible = [[NSFileManager defaultManager] imb_isPath:[directory path] accessible:kIMBAccessRead|kIMBAccessWrite];
+	if (!accessible) return [NSNumber numberWithBool:NO];
 	
 	NSArray* contents = [fileManager contentsOfDirectoryAtURL:directory 
                                    includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 

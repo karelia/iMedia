@@ -56,8 +56,21 @@
 #pragma mark HEADERS
 
 #import "IMBAccessRightsViewController.h"
+#import "IMBAccessRightsController.h"
+#import "IMBLibraryController.h"
+#import "IMBNode.h"
+#import "IMBParserMessenger.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBConfig.h"
+#import "SBUtilities.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark TYPES
+
+typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -90,6 +103,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Returns a singleton instance of the IMBEntitlementsController...
+
++ (IMBAccessRightsViewController*) sharedViewController;
+{
+	static IMBAccessRightsViewController* sSharedViewController = nil;
+	static dispatch_once_t sOnceToken = 0;
+
+    dispatch_once(&sOnceToken,
+    ^{
+		sSharedViewController = [[IMBAccessRightsViewController alloc] init];
+	});
+
+ 	return sSharedViewController;
+}
+
+
 - (id) init
 {
 	if (self = [super initWithNibName:[[self class] nibName] bundle:[[self class] bundle]])
@@ -114,46 +143,103 @@
 #pragma mark User Interface
 
 
-- (NSURL*) showForURL:(NSURL*)inSuggestedURL
+- (void) _showForSuggestedURL:(NSURL*)inSuggestedURL completionHandler:(IMBOpenPanelCompletionHandler)inCompletionBlock;
 {
-	NSOpenPanel* panel = [NSOpenPanel openPanel];
-	panel.canChooseDirectories = YES;
-	panel.allowsMultipleSelection = NO;
-	panel.canCreateDirectories = NO;
-	
-	panel.title = NSLocalizedStringWithDefaultValue(
-		@"IMBEntitlementsController.openPanel.title",
-		nil,
-		IMBBundle(),
-		@"Grant Access to Media Files",
-		@"NSOpenPanel title");
-
-	panel.message = NSLocalizedStringWithDefaultValue(
-		@"IMBEntitlementsController.openPanel.message",
-		nil,
-		IMBBundle(),
-		@"Click the \"Confirm\" button to grant access to your media files.",
-		@"NSOpenPanel message");
-				
-	panel.prompt = NSLocalizedStringWithDefaultValue(
-		@"IMBEntitlementsController.openPanel.prompt",
-		nil,
-		IMBBundle(),
-		@"Confirm",
-		@"NSOpenPanel button");
-
-	panel.accessoryView = self.view;
-
-	[panel setDirectoryURL:inSuggestedURL];
-	NSInteger button = [panel runModal];
-	
-	if (button == NSOKButton)
+	if (_isOpen == NO)
 	{
-		NSURL* url = [panel URL];
-		return url;
-	}
+		_isOpen = YES;
 	
-	return nil;
+		NSOpenPanel* panel = [[[NSOpenPanel alloc] init] autorelease];
+		panel.canChooseDirectories = YES;
+		panel.allowsMultipleSelection = NO;
+		panel.canCreateDirectories = NO;
+		
+		panel.title = NSLocalizedStringWithDefaultValue(
+			@"IMBEntitlementsController.openPanel.title",
+			nil,
+			IMBBundle(),
+			@"Grant Access to Media Files",
+			@"NSOpenPanel title");
+
+		panel.message = NSLocalizedStringWithDefaultValue(
+			@"IMBEntitlementsController.openPanel.message",
+			nil,
+			IMBBundle(),
+			@"Click the \"Confirm\" button to grant access to your media files.",
+			@"NSOpenPanel message");
+					
+		panel.prompt = NSLocalizedStringWithDefaultValue(
+			@"IMBEntitlementsController.openPanel.prompt",
+			nil,
+			IMBBundle(),
+			@"Confirm",
+			@"NSOpenPanel button");
+
+		panel.accessoryView = self.view;
+		[panel setDirectoryURL:inSuggestedURL];
+		
+		IMBOpenPanelCompletionHandler completionBlock = [inCompletionBlock copy];
+
+		[panel beginWithCompletionHandler:^(NSInteger button)
+		{
+			if (button == NSFileHandlingPanelOKButton)
+			{
+				NSURL* url = [panel URL];
+				
+//				NSString* path = [url path];
+//				NSInteger mode = [[NSFileManager defaultManager] imb_modeForPath:path];
+//				BOOL accessible = [[NSFileManager defaultManager] imb_isPath:path accessible:kIMBAccessRead|kIMBAccessWrite];
+//				NSLog(@"%s path=%@ mode=%x accessible=%d",__FUNCTION__,path,(int)mode,(int)accessible);
+				
+				completionBlock(url);
+			}
+			else
+			{
+				completionBlock(nil);
+			}
+			
+			[completionBlock release];
+			_isOpen = NO;
+		}];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Show an NSOpenPanel and let the user select a folder. This punches a hole into the sandbox. Then create a
+// bookmark for this folder and send it to as many XPC services as possible, thus transferring the access rights
+// to the XPC service processes. The XPC service processes are then responsible for persisting these access rights...
+
+- (void) grantAccessRightsForNode:(IMBNode*)inNode
+{
+	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
+	NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
+	NSArray* urls = [libraryController urlsForNodes:nodes];
+	NSURL* proposedURL = [[IMBAccessRightsController sharedAccessRightsController] commonAncestorForURLs:urls];
+		
+	[self _showForSuggestedURL:proposedURL completionHandler:^(NSURL* inGrantedURL)
+	{
+		if (inGrantedURL)
+		{
+			NSData* bookmark = [[IMBAccessRightsController sharedAccessRightsController] bookmarkForURL:inGrantedURL];
+			
+			for (IMBNode* node in nodes)
+			{
+				IMBParserMessenger* messenger = node.parserMessenger;
+				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+			
+					^(NSURL* inReceivedURL,NSError* inError)
+					{
+						if (inError == nil)
+						{
+							[libraryController reloadNodeTree:node];
+						}
+					});
+			}
+		}
+	}];
 }
 
 

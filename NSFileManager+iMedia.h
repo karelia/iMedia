@@ -77,5 +77,6 @@ typedef enum
 - (BOOL) imb_fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
 - (NSString *) imb_generateUniqueFileNameAtPath:(NSString *)path base:(NSString *)basename extension:(NSString *)extension;
 - (BOOL) imb_isPath:(NSString *)inPath accessible:(IMBAccessPermission) inPermission;
+- (NSInteger) imb_modeForPath:(NSString *)inPath;
 
 @end

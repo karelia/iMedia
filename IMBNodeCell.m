@@ -362,13 +362,13 @@
 	{
 		_clickedRect = badgeRect;
 
-		if (_badgeError)
-		{
-			[self showErrorPopover:nil];
-		}
-		else if (_badgeType == kIMBBadgeTypeNoAccessRights)
+		if (_badgeType == kIMBBadgeTypeNoAccessRights)
 		{
 			[self showAccessRightsPopover:nil];
+		}
+		else if (_badgeError)
+		{
+			[self showErrorPopover:nil];
 		}
     }
  
@@ -438,31 +438,7 @@
 	
 	[alert addButtonWithTitle:ok block:^()
 	{
-//		IMBOutlineView* view = (IMBOutlineView*)self.controlView;
-//		IMBNodeViewController* nodeViewController = (IMBNodeViewController*)[view delegate];
-//		IMBLibraryController* libraryController = [nodeViewController libraryController];
-		
-		IMBNode* node = self.node;
-		NSURL* url = node.mediaSource;
-		IMBAccessRightsViewController* controller = [[[IMBAccessRightsViewController alloc] init] autorelease];
-		url = [controller showForURL:url];
-		
-		if (url)
-		{
-			IMBParserMessenger* messenger = node.parserMessenger;
-			NSData* bookmark = [[IMBAccessRightsController sharedAccessRightsController] bookmarkForURL:url];
-
-			SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
-	
-				^(NSURL* inURL,NSError* inError)
-				{
-					if (inURL != nil && inError == nil)
-					{
-						[[IMBLibraryController sharedLibraryControllerWithMediaType:node.mediaType] reloadNodeTree:node];
-					}
-				});
-		}
-		
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:self.node];
 		[alert close];
 	}];
 	
