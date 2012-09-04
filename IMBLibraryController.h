@@ -132,7 +132,8 @@ extern NSString* kIMBDidCreateTopLevelNodeNotification;
 - (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 - (IMBNode*) topLevelNodeForParserIdentifier:(NSString*)inParserIdentifier;
 
-- (NSArray*) urlsOfTopLevelNodesWithoutAccessRights;
+- (NSArray*) topLevelNodesWithoutAccessRights;
+- (NSArray*) urlsForNodes:(NSArray*)inNodes;
 
 - (void) logNodes;
 

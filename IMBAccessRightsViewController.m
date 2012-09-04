@@ -209,28 +209,35 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 
 // Show an NSOpenPanel and let the user select a folder. This punches a hole into the sandbox. Then create a
-// bookmark for this folder and send it to the XPC service, thus transferring the access right to the XPC
-// service process. The XPC service process is then responsible for persisting this access right...
+// bookmark for this folder and send it to as many XPC services as possible, thus transferring the access rights
+// to the XPC service processes. The XPC service processes are then responsible for persisting these access rights...
 
 - (void) grantAccessRightsForNode:(IMBNode*)inNode
 {
-	NSURL* proposedURL = inNode.mediaSource;
+	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
+	NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
+	NSArray* urls = [libraryController urlsForNodes:nodes];
+	NSURL* proposedURL = [[IMBAccessRightsController sharedAccessRightsController] commonAncestorForURLs:urls];
 		
 	[self _showForSuggestedURL:proposedURL completionHandler:^(NSURL* inGrantedURL)
 	{
 		if (inGrantedURL)
 		{
-			IMBParserMessenger* messenger = inNode.parserMessenger;
 			NSData* bookmark = [[IMBAccessRightsController sharedAccessRightsController] bookmarkForURL:inGrantedURL];
-			SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
-		
-				^(NSURL* inReceivedURL,NSError* inError)
-				{
-					if (inReceivedURL != nil && inError == nil)
+			
+			for (IMBNode* node in nodes)
+			{
+				IMBParserMessenger* messenger = node.parserMessenger;
+				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+			
+					^(NSURL* inReceivedURL,NSError* inError)
 					{
-						[[IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType] reloadNodeTree:inNode];
-					}
-				});
+						if (inError == nil)
+						{
+							[libraryController reloadNodeTree:node];
+						}
+					});
+			}
 		}
 	}];
 }
