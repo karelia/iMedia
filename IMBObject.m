@@ -143,6 +143,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
 @synthesize shouldDisableTitle = _shouldDisableTitle;
+@synthesize isAccessible = _isAccessible;
 
 @synthesize imageLocation = _imageLocation;
 @synthesize atomic_imageRepresentation = _imageRepresentation;
@@ -166,6 +167,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		_shouldDrawAdornments = YES;
 		_shouldDisableTitle = NO;
 		_isLoadingThumbnail = NO;
+		_isAccessible = YES;
 		_needsImageRepresentation = YES;
 		_imageVersion = 0;
 	}
@@ -222,6 +224,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.index = [coder decodeIntegerForKey:@"index"];
 		self.shouldDrawAdornments = [coder decodeBoolForKey:@"shouldDrawAdornments"];
 		self.shouldDisableTitle = [coder decodeBoolForKey:@"shouldDisableTitle"];
+		self.isAccessible = [coder decodeBoolForKey:@"isAccessible"];
 		
 		self.imageLocation = [coder decodeObjectForKey:@"imageLocation"];
 		self.imageRepresentationType = [coder decodeObjectForKey:@"imageRepresentationType"];
@@ -261,6 +264,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeInteger:self.index forKey:@"index"];
 	[coder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
 	[coder encodeBool:self.shouldDisableTitle forKey:@"shouldDisableTitle"];
+	[coder encodeBool:self.isAccessible forKey:@"isAccessible"];
 
 	[coder encodeObject:self.imageLocation forKey:@"imageLocation"];
 	[coder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
@@ -305,6 +309,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
     copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
 	copy.shouldDisableTitle = self.shouldDisableTitle;
+	copy.isAccessible = self.isAccessible;
 
 	copy.imageLocation = self.imageLocation;
 	copy.atomic_imageRepresentation = self.atomic_imageRepresentation;
