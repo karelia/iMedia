@@ -143,7 +143,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 #pragma mark User Interface
 
 
-- (void) _beginSheetModalForWindow:(NSWindow*)inWindow suggestedURL:(NSURL*)inSuggestedURL completionHandler:(IMBOpenPanelCompletionHandler)inCompletionBlock;
+- (void) _showForSuggestedURL:(NSURL*)inSuggestedURL completionHandler:(IMBOpenPanelCompletionHandler)inCompletionBlock;
 {
 	if (_isOpen == NO)
 	{
@@ -181,11 +181,16 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 		IMBOpenPanelCompletionHandler completionBlock = [inCompletionBlock copy];
 
 		[panel beginWithCompletionHandler:^(NSInteger button)
-//		[panel beginSheetModalForWindow:inWindow completionHandler:^(NSInteger button)
 		{
 			if (button == NSFileHandlingPanelOKButton)
 			{
 				NSURL* url = [panel URL];
+				
+//				NSString* path = [url path];
+//				NSInteger mode = [[NSFileManager defaultManager] imb_modeForPath:path];
+//				BOOL accessible = [[NSFileManager defaultManager] imb_isPath:path accessible:kIMBAccessRead|kIMBAccessWrite];
+//				NSLog(@"%s path=%@ mode=%x accessible=%d",__FUNCTION__,path,(int)mode,(int)accessible);
+				
 				completionBlock(url);
 			}
 			else
@@ -211,7 +216,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 {
 	NSURL* proposedURL = inNode.mediaSource;
 		
-	[self _beginSheetModalForWindow:nil suggestedURL:proposedURL completionHandler:^(NSURL* inGrantedURL)
+	[self _showForSuggestedURL:proposedURL completionHandler:^(NSURL* inGrantedURL)
 	{
 		if (inGrantedURL)
 		{
