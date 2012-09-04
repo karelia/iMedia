@@ -336,12 +336,12 @@
 		[self _setObjectIdentifierWithParser:parser onNodeTree:node];
 	}
 	
-	if (success == NO && error == nil)
+	if (node.isAccessible && success == NO && error == nil)
 	{
 		NSString* title = @"Programmer Error";
 		
 		NSString* description = [NSString stringWithFormat:
-			@"%@ returned NO while trying to populate the node '%@' But it didn't return and error.\n\nThis is a programmer error that should be corrected.",
+			@"%@ returned NO while trying to populate the node '%@' But it didn't return an error.\n\nThis is a programmer error that should be corrected.",
 			NSStringFromClass([parser class]),
 			inNode.name];
 			
