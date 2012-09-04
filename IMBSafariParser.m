@@ -146,6 +146,8 @@
 	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 
+	[self checkAccessRightsForNode:node];
+	
 	// Watch the XML file. Whenever something in iTunes changes, we have to replace the WHOLE tree from  
 	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
 	

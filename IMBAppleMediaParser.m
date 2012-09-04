@@ -345,10 +345,6 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
     
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
 
-    // Being sandboxed the app may yet not have entitlements to access this top level node
-    
-    node.isAccessible = [[NSFileManager defaultManager] imb_isPath:[self.mediaSource path]
-                                                        accessible:kIMBAccessRead | kIMBAccessWrite];
     
 //    NSLog(@"Node %@ is %@accessible", node, node.isAccessible ? @"" : @"NOT ");
     
@@ -374,6 +370,10 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
         }
 	}
 	
+    // Being sandboxed the app may yet not have entitlements to access this top level node
+    
+	[self checkAccessRightsForNode:node];
+
 	// Enable FSEvents based file watching for root nodes...
 	
 	node.watcherType = kIMBWatcherTypeFSEvent;

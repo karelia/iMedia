@@ -270,9 +270,7 @@ static NSArray* sSupportedUTIs = nil;
 
     // Being sandboxed the app may yet not have entitlements to access this top level node
     
-    node.isAccessible = [[NSFileManager defaultManager]
-		imb_isPath:libraryPath
-        accessible:kIMBAccessRead|kIMBAccessWrite];
+    [self checkAccessRightsForNode:node];
     
 	// Watch the root node. Whenever something in Lightroom changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding out WHAT has changed in Lightroom...

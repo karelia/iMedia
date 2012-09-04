@@ -167,9 +167,7 @@
 
     // Being sandboxed the app may yet not have entitlements to access this top level node
     
-    node.isAccessible = [[NSFileManager defaultManager]
-		imb_isPath:path
-        accessible:kIMBAccessRead|kIMBAccessWrite];
+    [self checkAccessRightsForNode:node];
     
 	// Watch the XML file. Whenever something in iTunes changes, we have to replace the WHOLE tree from  
 	// the root node down, as we have no way of finding WHAT has changed in iTunes...

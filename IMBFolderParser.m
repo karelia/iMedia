@@ -122,7 +122,6 @@
 	NSFileManager* fileManager = [[NSFileManager alloc] init];
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
-	BOOL isAccessible = [fileManager imb_isPath:path accessible:kIMBAccessRead|kIMBAccessWrite];
 	[fileManager release];
 	
 	IMBNode* node = [[[IMBNode alloc] init] autorelease];
@@ -150,7 +149,7 @@
 	
     // Being sandboxed the app may yet not have entitlements to access this top level node
     
-    node.isAccessible = isAccessible;
+	[self checkAccessRightsForNode:node];
 		
 	// Enable FSEvents based file watching for root nodes...
 	
