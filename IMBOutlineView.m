@@ -211,7 +211,7 @@
 		NSString* row = [NSString stringWithFormat:@"%ld",(long)i];
 		NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 		
-		if (node != nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)
+		if (node != nil && node.isAccessible && node.badgeTypeNormal == kIMBBadgeTypeLoading)
 		{
 			NSRect badgeRect = [self badgeRectForRow:i];
 
