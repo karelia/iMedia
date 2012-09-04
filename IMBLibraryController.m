@@ -685,11 +685,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	// If we were given both old and new nodes, then the identifiers must be the same. If not log an error 
 	// and throw an exception because this is a programmer error...
 	
-	if (inOldNode != nil && inNewNode != nil && ![inOldNode.identifier isEqual:inNewNode.identifier])
-	{
-		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: oldNode and newNode must have same identifiers" userInfo:nil] raise];
-	}
+//	if (inOldNode != nil && inNewNode != nil && ![inOldNode.identifier isEqual:inNewNode.identifier])
+//	{
+//		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
+//		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: oldNode and newNode must have same identifiers" userInfo:nil] raise];
+//	}
 	
 	// Tell user interface that we are going to modify the data model...
 	
