@@ -220,7 +220,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 	
 	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
 	NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
-	NSArray* urls = [libraryController urlsForNodes:nodes];
+	NSArray* urls = [libraryController libraryRootURLsForNodes:nodes];
 	NSURL* proposedURL = [[IMBAccessRightsController sharedAccessRightsController] commonAncestorForURLs:urls];
 		
 	[self _showForSuggestedURL:proposedURL completionHandler:^(NSURL* inGrantedURL)
