@@ -211,17 +211,17 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 	for (NSData* bookmark in self.bookmarks)
 	{
 		NSURL* url = [self _urlForAppScopedBookmark:bookmark];
-		BOOL started = [url startAccessingSecurityScopedResource];
+		/*BOOL started =*/ [url startAccessingSecurityScopedResource];
 
         // TODO/JJ: For debugging purposes (remove later)
         
-		NSString* path = [url path];
-		
-		BOOL accessible = [[NSFileManager defaultManager]
-			imb_isPath:path
-			accessible:kIMBAccessRead|kIMBAccessWrite];
-	
-		NSLog(@"%s path=%@ started=%d accessible=%d",__FUNCTION__,path,started,accessible);
+//		NSString* path = [url path];
+//		
+//		BOOL accessible = [[NSFileManager defaultManager]
+//			imb_isPath:path
+//			accessible:kIMBAccessRead|kIMBAccessWrite];
+//	
+//		NSLog(@"%s path=%@ started=%d accessible=%d",__FUNCTION__,path,started,accessible);
 	}
 }
 
@@ -285,7 +285,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 		relativeToURL:nil
 		error:&error];
 
-	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
+//	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
 		
 	return bookmark;
 }
@@ -305,7 +305,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 		bookmarkDataIsStale:&stale
 		error:&error];
 
-	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
+//	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
 		
 	return url;
 }
@@ -326,7 +326,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 		relativeToURL:nil
 		error:&error];
 
-	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
+//	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
 		
 	return bookmark;
 }
@@ -346,7 +346,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 		bookmarkDataIsStale:&stale
 		error:&error];
 
-	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
+//	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
 		
 	return url;
 }
