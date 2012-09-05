@@ -287,26 +287,7 @@
 
 
 #pragma mark 
-
-
-//- (void) editWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate event:(NSEvent*)inEvent
-//{
-//	NSRect titleRect = [self titleRectForBounds:inFrame];
-//	[super editWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate event:inEvent];
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (void) selectWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate start:(NSInteger)inStart length:(NSInteger)inLength
-//{
-//	NSRect titleRect = [self titleRectForBounds:inFrame];
-//	[super selectWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate start:inStart length:inLength];
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
+#pragma mark Event Handling
 
 
 // Check if we clicked on a badge icon...
@@ -362,11 +343,7 @@
 	{
 		_clickedRect = badgeRect;
 
-		if (_badgeType == kIMBBadgeTypeNoAccessRights)
-		{
-			[self showAccessRightsPopover:nil];
-		}
-		else if (_badgeError)
+		if (_badgeError)
 		{
 			[self showErrorPopover:nil];
 		}

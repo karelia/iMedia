@@ -39,25 +39,29 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSCustomView" id="406056700">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="NSTextField" id="892925318">
 						<reference key="NSNextResponder" ref="406056700"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{66, 5}, {435, 72}}</string>
+						<string key="NSFrame">{{66, 12}, {435, 72}}</string>
 						<reference key="NSSuperview" ref="406056700"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<string key="NSAntiCompressionPriority">{250, 750}</string>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="184151238">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">272760832</int>
-							<string type="base64-UTF8" key="NSContents">VG8gZ2l2ZSB0aGUgYXBwbGljYXRpb24gYWNjZXNzIHRvIHlvdXIgbWVkaWEgZmlsZXMgY2xpY2sgdGhl
-ICJDb25maXJtIiBidXR0b24uIAoKSWYgeW91ciBtZWRpYSBmaWxlcyBhcmUgc2NhdHRlcmVkIGFjcm9z
-cyB5b3VyIGhhcmQgZGlzaywgeW91IG1heSB3YW50IHRvIG5hdmlnYXRlIHVwIGFuZCBzZWxlY3QgdGhl
-IHdob2xlIGhhcmQgZGlzaywgYmVmb3JlIGNsaWNraW5nIHRoZSAiQ29uZmlybSIgIGJ1dHRvbi4</string>
+							<string type="base64-UTF8" key="NSContents">VGhlIGFwcGxpY2F0aW9uIGRvZXMgbm90IGhhdmUgdGhlIG5lY2Vzc2FyeSByaWdodHMgdG8gYWNjZXNz
+IHlvdXIgbWVkaWEgZmlsZXMuIFRvIGdpdmUgdGhlIGFwcGxpY2F0aW9uIGFjY2VzcyB0byB5b3VyIG1l
+ZGlhIGZpbGVzIGNsaWNrIHRoZSAiQ29uZmlybSIgYnV0dG9uLiAKCklmIHlvdXIgbWVkaWEgZmlsZXMg
+YXJlIHNjYXR0ZXJlZCBhY3Jvc3MgeW91ciBoYXJkIGRpc2ssIHlvdSBtYXkgd2FudCB0byBuYXZpZ2F0
+ZSB1cCBhbmQgc2VsZWN0IHRoZSB3aG9sZSBoYXJkIGRpc2ssIGJlZm9yZSBjbGlja2luZyB0aGUgIkNv
+bmZpcm0iICBidXR0b24uA</string>
 							<object class="NSFont" key="NSSupport">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">11</double>
@@ -90,8 +94,9 @@ IHdob2xlIGhhcmQgZGlzaywgYmVmb3JlIGNsaWNraW5nIHRoZSAiQ29uZmlybSIgIGJ1dHRvbi4</str
 					<object class="NSTextField" id="1059538923">
 						<reference key="NSNextResponder" ref="406056700"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{66, 92}, {435, 17}}</string>
+						<string key="NSFrame">{{66, 99}, {435, 17}}</string>
 						<reference key="NSSuperview" ref="406056700"/>
+						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="892925318"/>
 						<string key="NSReuseIdentifierKey">_NS:1535</string>
 						<bool key="NSEnabled">YES</bool>
@@ -126,8 +131,9 @@ IHdob2xlIGhhcmQgZGlzaywgYmVmb3JlIGNsaWNraW5nIHRoZSAiQ29uZmlybSIgIGJ1dHRvbi4</str
 								<string>NeXT TIFF v4.0 pasteboard type</string>
 							</object>
 						</object>
-						<string key="NSFrame">{{11, 62}, {48, 48}}</string>
+						<string key="NSFrame">{{11, 69}, {48, 48}}</string>
 						<reference key="NSSuperview" ref="406056700"/>
+						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="1059538923"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="NSEnabled">YES</bool>
@@ -136,7 +142,7 @@ IHdob2xlIGhhcmQgZGlzaywgYmVmb3JlIGNsaWNraW5nIHRoZSAiQ29uZmlybSIgIGJ1dHRvbi4</str
 							<int key="NSCellFlags2">33554432</int>
 							<object class="NSCustomResource" key="NSContents">
 								<string key="NSClassName">NSImage</string>
-								<string key="NSResourceName">IMBStopIcon</string>
+								<string key="NSResourceName">warning.tiff</string>
 							</object>
 							<string key="NSCellIdentifier">_NS:9</string>
 							<int key="NSAlign">0</int>
@@ -148,7 +154,9 @@ IHdob2xlIGhhcmQgZGlzaywgYmVmb3JlIGNsaWNraW5nIHRoZSAiQ29uZmlybSIgIGJ1dHRvbi4</str
 						<bool key="NSEditable">YES</bool>
 					</object>
 				</object>
-				<string key="NSFrameSize">{518, 122}</string>
+				<string key="NSFrameSize">{518, 129}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="885681567"/>
 				<string key="NSReuseIdentifierKey">_NS:9</string>
 				<string key="NSClassName">NSView</string>
@@ -293,7 +301,19 @@ IHdob2xlIGhhcmQgZGlzaywgYmVmb3JlIGNsaWNraW5nIHRoZSAiQ29uZmlybSIgIGJ1dHRvbi4</str
 			<nil key="sourceID"/>
 			<int key="maxID">612</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes"/>
+		<object class="IBClassDescriber" key="IBDocument.Classes">
+			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<object class="IBPartialClassDescription">
+					<string key="className">IMBAccessRightsController</string>
+					<string key="superclassName">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/IMBAccessRightsController.h</string>
+					</object>
+				</object>
+			</object>
+		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
@@ -307,7 +327,7 @@ IHdob2xlIGhhcmQgZGlzaywgYmVmb3JlIGNsaWNraW5nIHRoZSAiQ29uZmlybSIgIGJ1dHRvbi4</str
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NS.key.0">IMBStopIcon</string>
+			<string key="NS.key.0">warning.tiff</string>
 			<string key="NS.object.0">{128, 128}</string>
 		</object>
 	</data>
