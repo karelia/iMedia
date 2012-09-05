@@ -161,6 +161,16 @@ static dispatch_once_t sOnceToken = 0;
 }
 
 
+- (NSURL *)libraryRootURLForMediaSource:(NSURL *)inMediaSource
+{
+    if (inMediaSource)
+    {
+        return [inMediaSource URLByDeletingLastPathComponent];
+    }
+    return [super libraryRootURLForMediaSource:inMediaSource];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
