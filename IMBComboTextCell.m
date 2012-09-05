@@ -272,17 +272,10 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-#pragma mark Drawing
-
-
-- (NSRect) _badgeRectForImageRect:(NSRect)inImageRect
+- (NSRect) badgeRectForImageRect:(NSRect)inImageRect
 {
 	NSRect badgeRect;
-	NSSize badgeSize = NSMakeSize(20.0,20.0);
+	NSSize badgeSize = NSMakeSize(18.0,18.0);
 	badgeRect.origin.x = inImageRect.origin.x + inImageRect.size.width - badgeSize.width - 3;
 	badgeRect.origin.y = inImageRect.origin.y + 3;
 	badgeRect.size.width  = badgeSize.width;
@@ -290,6 +283,13 @@
 	
 	return badgeRect;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+#pragma mark Drawing
 
 
 // Please note that we have to temporarily modify the CTM because the tableview
@@ -319,7 +319,7 @@
 	
 	if (_badge) 
 	{
-		NSRect badgeRect = [self _badgeRectForImageRect:rect];
+		NSRect badgeRect = [self badgeRectForImageRect:rect];
 		CGContextDrawImage(context, NSRectToCGRect(badgeRect), _badge);
 	}
 	
