@@ -1064,6 +1064,10 @@ static NSArray* sSupportedUTIs = nil;
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 	object.imageRepresentation = nil;
 	
+    // Check whether we have access to this resource's location
+    
+    [self checkAccessRightsForObject:object];
+    
 	return object;
 }
 
