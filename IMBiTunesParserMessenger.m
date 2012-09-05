@@ -85,8 +85,6 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 @implementation IMBiTunesParserMessenger
 
-@synthesize mediaSourceSuffix = _mediaSourceSuffix;
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -117,7 +115,6 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 - (void) dealloc
 {
-	IMBRelease(_mediaSourceSuffix);
 	[super dealloc];
 }
 
@@ -129,7 +126,7 @@ static dispatch_once_t sMovieOnceToken = 0;
 {
 	if ((self = [super initWithCoder:inCoder]))
 	{
-		self.mediaSourceSuffix = [inCoder decodeObjectForKey:@"mediaSourceSuffix"];
+        // decode additional properties here
 	}
 	
 	return self;
@@ -139,14 +136,17 @@ static dispatch_once_t sMovieOnceToken = 0;
 - (void) encodeWithCoder:(NSCoder*)inCoder
 {
 	[super encodeWithCoder:inCoder];
-	[inCoder encodeObject:self.mediaSourceSuffix forKey:@"mediaSourceSuffix"];
+    
+    // encode additional properties here
 }
 
 
 - (id) copyWithZone:(NSZone*)inZone
 {
 	IMBiTunesParserMessenger* copy = (IMBiTunesParserMessenger*)[super copyWithZone:inZone];
-	copy.mediaSourceSuffix = self.mediaSourceSuffix;
+    
+    // Copy additional properties here
+    
 	return copy;
 }
 
@@ -165,6 +165,18 @@ static dispatch_once_t sMovieOnceToken = 0;
 - (BOOL) isInstalled
 {
 	return [self iTunesPath] != nil;
+}
+
+
+// Library root is parent directory of library XML file
+
+- (NSURL *)libraryRootURLForMediaSource:(NSURL *)inMediaSource
+{
+    if (inMediaSource)
+    {
+        return [inMediaSource URLByDeletingLastPathComponent];
+    }
+    return [super libraryRootURLForMediaSource:inMediaSource];
 }
 
 
@@ -219,7 +231,6 @@ static dispatch_once_t sMovieOnceToken = 0;
 			{
 				NSURL* url = [NSURL URLWithString:library];
 				NSString* path = [url path];
-				NSString* folderPath = [path stringByDeletingLastPathComponent];
                 NSFileManager *fileManager = [[NSFileManager alloc] init];
 				
                 BOOL changed;
@@ -230,8 +241,7 @@ static dispatch_once_t sMovieOnceToken = 0;
 					IMBiTunesAudioParser* parser = (IMBiTunesAudioParser*)[self newParser];
 					parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
 					parser.mediaType = self.mediaType;
-					parser.mediaSource = [NSURL fileURLWithPath:folderPath];
-					parser.mediaSourceSuffix = [path lastPathComponent];
+					parser.mediaSource = url;
 					parser.appPath = self.iTunesPath;
 					parser.shouldDisplayLibraryName = libraries.count > 1;
 
@@ -240,7 +250,8 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 					// Exclude enclosing folder from being displayed by IMBFolderParser...
 					
-					[IMBConfig registerLibraryPath:folderPath];
+					NSString* libraryPath = [path stringByDeletingLastPathComponent];
+					[IMBConfig registerLibraryPath:libraryPath];
 				}
                 
                 [fileManager release];
@@ -305,7 +316,6 @@ static dispatch_once_t sMovieOnceToken = 0;
 			{
 				NSURL* url = [NSURL URLWithString:library];
 				NSString* path = [url path];
-				NSString* folderPath = [path stringByDeletingLastPathComponent];
                 NSFileManager *fileManager = [[NSFileManager alloc] init];
 				
                 BOOL changed;
@@ -316,8 +326,7 @@ static dispatch_once_t sMovieOnceToken = 0;
 					IMBiTunesMovieParser* parser = (IMBiTunesMovieParser*)[self newParser];
 					parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
 					parser.mediaType = self.mediaType;
-					parser.mediaSource = [NSURL fileURLWithPath:folderPath];
-					parser.mediaSourceSuffix = [path lastPathComponent];
+					parser.mediaSource = url;
 					parser.appPath = self.iTunesPath;
 					parser.shouldDisplayLibraryName = libraries.count > 1;
 
@@ -326,7 +335,8 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 					// Exclude enclosing folder from being displayed by IMBFolderParser...
 					
-					[IMBConfig registerLibraryPath:folderPath];
+					NSString* libraryPath = [path stringByDeletingLastPathComponent];
+					[IMBConfig registerLibraryPath:libraryPath];
 				}
                 
                 [fileManager release];

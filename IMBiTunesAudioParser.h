@@ -76,11 +76,9 @@
 	BOOL _shouldDisplayLibraryName;
 	NSInteger _version;
 	IMBTimecodeTransformer* _timecodeTransformer;
-	NSString* _mediaSourceSuffix;
 }
 
 @property (retain) NSString* appPath;
-@property (retain) NSString* mediaSourceSuffix;
 @property (retain,readonly) NSDictionary* plist;
 @property (retain) NSDate* modificationDate;
 @property (assign) BOOL shouldDisplayLibraryName;

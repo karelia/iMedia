@@ -161,6 +161,8 @@ static dispatch_once_t sOnceToken = 0;
 }
 
 
+// Library root is parent directory of catalog file
+
 - (NSURL *)libraryRootURLForMediaSource:(NSURL *)inMediaSource
 {
     if (inMediaSource)
