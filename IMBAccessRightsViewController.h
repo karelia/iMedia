@@ -85,6 +85,9 @@
 - (void) grantAccessRightsForNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler;
 - (void) grantAccessRightsForNode:(IMBNode*)inNode;
 
+- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler;
+- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode;
+
 @end
 
 

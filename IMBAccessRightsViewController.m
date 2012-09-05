@@ -58,9 +58,10 @@
 #import "IMBAccessRightsViewController.h"
 #import "IMBAccessRightsController.h"
 #import "IMBLibraryController.h"
-#import "IMBNode.h"
 #import "IMBParserMessenger.h"
 #import "NSFileManager+iMedia.h"
+#import "IMBNode.h"
+#import "IMBObject.h"
 #import "IMBConfig.h"
 #import "SBUtilities.h"
 
@@ -264,6 +265,66 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 - (void) grantAccessRightsForNode:(IMBNode*)inNode
 {
 	[self grantAccessRightsForNode:inNode completionHandler:^{}];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler
+{
+	if (inNode.objects.count > 0)
+	{
+		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
+		void(^completionHandler)(void) = [inCompletionHandler copy];
+
+		// Get ancestor folder that encloses all objects for this node (usually the selected node)...
+		
+		NSMutableArray* urls = [NSMutableArray arrayWithCapacity:inNode.objects.count];
+		
+		for (IMBObject* object in inNode.objects)
+		{
+			if (!object.isAccessible)
+			{
+				[urls addObject:object.location];
+			}
+		}
+		
+		NSURL* proposedURL = [[IMBAccessRightsController sharedAccessRightsController] commonAncestorForURLs:urls];
+		
+		// Show an NSOpenPanel to grant access to this folder...
+		
+		[self _showForSuggestedURL:proposedURL completionHandler:^(NSURL* inGrantedURL)
+		{
+			if (inGrantedURL)
+			{
+				NSData* bookmark = [[IMBAccessRightsController sharedAccessRightsController] bookmarkForURL:inGrantedURL];
+				
+				IMBParserMessenger* messenger = inNode.parserMessenger;
+				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+				
+					^(NSURL* inReceivedURL,NSError* inError)
+					{
+						if (inError == nil)
+						{
+							[libraryController reloadNodeTree:inNode];
+							completionHandler();
+							[completionHandler release];
+						}
+					});
+			}
+			else
+			{
+				[completionHandler release];
+			}
+		}];
+	}
+}
+
+
+- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode
+{
+	[self grantAccessRightsForObjectsOfNode:inNode completionHandler:^{}];
 }
 
 
