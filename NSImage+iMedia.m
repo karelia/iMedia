@@ -92,37 +92,66 @@
 }
 
 
-// Returns an image from our own bundle. Image is autoreleased...
+// Returns an NSImage from our own bundle...
 
 + (NSImage*) imb_imageNamed:(NSString*)inName
 {
-	NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
-	NSString* path = [bundle pathForResource:inName ofType:nil];
-	NSImage* image = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+	static NSMutableDictionary* sImageCache = nil;
+	static dispatch_once_t sOnceToken;
+	
+	dispatch_once(&sOnceToken,^()
+	{
+		sImageCache = [[NSMutableDictionary alloc] init];
+	});
+	
+	NSImage* image = (NSImage*)[sImageCache objectForKey:inName];
+	
+	if (image == nil)
+	{
+		NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
+		NSString* path = [bundle pathForResource:inName ofType:nil];
+		image = [[NSImage alloc] initWithContentsOfFile:path];
+		[sImageCache setObject:image forKey:inName];
+	}
+	
 	return image;
 }
 
 
-// Returns an image ref from our own bundle. Image ref is autoreleased...
+// Returns a CGImage from our own bundle...
 
-+ (CGImageRef)imb_imageRefNamed:(NSString*)inName
++ (CGImageRef) imb_CGImageNamed:(NSString*)inName
 {
-    NSString* path = [[NSBundle bundleForClass:[IMBNode class]] pathForResource:[inName stringByDeletingPathExtension]
-                                                                         ofType:[inName pathExtension]];
-    
-    if(path)
-    {
-        CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
+	static NSMutableDictionary* sImageCache = nil;
+	static dispatch_once_t sOnceToken;
+	
+	dispatch_once(&sOnceToken,^()
+	{
+		sImageCache = [[NSMutableDictionary alloc] init];
+	});
+
+	CGImageRef image = (CGImageRef)[sImageCache objectForKey:inName];
+
+	if (image == nil)
+	{
+		NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
+		NSString* path = [bundle pathForResource:inName ofType:nil];
+		
+		if (path)
+		{
+			CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
         
-        if(imageSource)
-        {
-            CGImageRef imageRef = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
-            CFRelease(imageSource);
-            return (CGImageRef)[(id)imageRef autorelease];
-        }
-        return NULL;
-    }
-    return NULL;
+			if (imageSource)
+			{
+				image = CGImageSourceCreateImageAtIndex(imageSource,0,NULL);
+				[sImageCache setObject:(id)image forKey:inName];
+				CGImageRelease(image);
+				CFRelease(imageSource);
+			}
+		}
+	}
+
+	return image;
 }
 
 

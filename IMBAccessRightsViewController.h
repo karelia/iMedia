@@ -75,6 +75,8 @@
 @interface IMBAccessRightsViewController : NSViewController
 {
 	BOOL _isOpen;
+	IBOutlet NSTextField* _warningTitle;
+	IBOutlet NSTextField* _warningMessage;
 }
 
 // User inteface to grant access to part of the file system. Returns a url for the folder that the user

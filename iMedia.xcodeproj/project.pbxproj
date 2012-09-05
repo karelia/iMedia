@@ -204,7 +204,7 @@
 		D05D3A0C152AD0D000E30C43 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		D05D3A0D152AD0D000E30C43 /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
 		D05D3A0E152AD0D000E30C43 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
-		D065383615EFDC810081D8D3 /* IMBAccessRightsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D065383515EFDC810081D8D3 /* IMBAccessRightsController.xib */; };
+		D065383615EFDC810081D8D3 /* IMBAccessRightsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D065383515EFDC810081D8D3 /* IMBAccessRightsViewController.xib */; };
 		D0680C3C1518CCCE00CED506 /* com.karelia.imedia.Folder.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D0E96D021518C9BF004F3EE7 /* com.karelia.imedia.Folder.xpc */; };
 		D08070BF10442CD700891137 /* IMBMovieObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D08070C310442CE100891137 /* IMBAudioObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D08070C110442CE100891137 /* IMBAudioObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -733,7 +733,7 @@
 		D05D3A19152AD2B400E30C43 /* com.karelia.imedia.FireFox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.FireFox.entitlements; sourceTree = "<group>"; };
 		D05D3A1A152AD2CB00E30C43 /* com.karelia.imedia.Chrome.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.Chrome.entitlements; sourceTree = "<group>"; };
 		D05D3A1B152AD30500E30C43 /* com.karelia.imedia.FSEvents.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = com.karelia.imedia.FSEvents.entitlements; sourceTree = "<group>"; };
-		D065383515EFDC810081D8D3 /* IMBAccessRightsController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IMBAccessRightsController.xib; sourceTree = "<group>"; };
+		D065383515EFDC810081D8D3 /* IMBAccessRightsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IMBAccessRightsViewController.xib; sourceTree = "<group>"; };
 		D0760AC210C5027100F2119C /* IMBProject.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IMBProject.xcconfig; sourceTree = SOURCE_ROOT; };
 		D08070BD10442CD700891137 /* IMBMovieObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieObjectViewController.h; sourceTree = "<group>"; };
 		D08070BE10442CD700891137 /* IMBMovieObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieObjectViewController.m; sourceTree = "<group>"; };
@@ -1646,7 +1646,7 @@
 				D08070C710442DAE00891137 /* IMBAudioObjectViewController.xib */,
 				D08070C910442DC800891137 /* IMBMovieObjectViewController.xib */,
 				CEF696FD10643CF4005D7E72 /* IMBLinkObjectViewController.xib */,
-				D065383515EFDC810081D8D3 /* IMBAccessRightsController.xib */,
+				D065383515EFDC810081D8D3 /* IMBAccessRightsViewController.xib */,
 				D052B0C01053B4AB00988F53 /* IMBProgress.xib */,
 				D08070E910442F0500891137 /* IMBPanel.xib */,
 				D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */,
@@ -2517,7 +2517,7 @@
 				D024A32015319CB4005B6C0A /* IMBAlertPopoverViewController.xib in Resources */,
 				D006CFF115331CC900C53C23 /* IMBNoteIcon.icns in Resources */,
 				D006CFF41533502200C53C23 /* IMBStopIcon.icns in Resources */,
-				D065383615EFDC810081D8D3 /* IMBAccessRightsController.xib in Resources */,
+				D065383615EFDC810081D8D3 /* IMBAccessRightsViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

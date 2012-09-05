@@ -97,7 +97,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 + (NSString*) nibName
 {
-	return @"IMBAccessRightsController";
+	return @"IMBAccessRightsViewController";
 }
 
 
@@ -150,35 +150,49 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 	{
 		_isOpen = YES;
 	
-		NSOpenPanel* panel = [[[NSOpenPanel alloc] init] autorelease];
+		NSOpenPanel* panel = [NSOpenPanel openPanel];
 		panel.canChooseDirectories = YES;
 		panel.allowsMultipleSelection = NO;
 		panel.canCreateDirectories = NO;
 		
+		panel.accessoryView = self.view;
+		[panel setDirectoryURL:inSuggestedURL];
+
 		panel.title = NSLocalizedStringWithDefaultValue(
-			@"IMBEntitlementsController.openPanel.title",
+			@"IMBAccessRightsViewController.openPanel.title",
 			nil,
 			IMBBundle(),
-			@"Grant Access to Media Files",
+			@"Confirm Access to Media Files",
 			@"NSOpenPanel title");
 
 		panel.message = NSLocalizedStringWithDefaultValue(
-			@"IMBEntitlementsController.openPanel.message",
+			@"IMBAccessRightsViewController.openPanel.message",
 			nil,
 			IMBBundle(),
 			@"Click the \"Confirm\" button to grant access to your media files.",
 			@"NSOpenPanel message");
 					
 		panel.prompt = NSLocalizedStringWithDefaultValue(
-			@"IMBEntitlementsController.openPanel.prompt",
+			@"IMBAccessRightsViewController.openPanel.prompt",
 			nil,
 			IMBBundle(),
 			@"Confirm",
 			@"NSOpenPanel button");
 
-		panel.accessoryView = self.view;
-		[panel setDirectoryURL:inSuggestedURL];
-		
+		_warningTitle.stringValue = NSLocalizedStringWithDefaultValue(
+			@"IMBAccessRightsViewController.openPanel.title",
+			nil,
+			IMBBundle(),
+			@"Confirm Access to Media Files",
+			@"NSOpenPanel title");
+
+		_warningMessage.stringValue = NSLocalizedStringWithDefaultValue(
+			@"IMBAccessRightsViewController.openPanel.description",
+			nil,
+			IMBBundle(),
+			@"The application does not have the necessary rights to access your media files. To give the application access to your media files click the \"Confirm\" button.\n\nIf your media files are scattered across your hard disk, you may want to navigate up and select the whole hard disk, before clicking the \"Confirm\" button.",
+			@"NSOpenPanel title");
+
 		IMBOpenPanelCompletionHandler completionBlock = [inCompletionBlock copy];
 
 		[panel beginWithCompletionHandler:^(NSInteger button)
@@ -186,12 +200,6 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			if (button == NSFileHandlingPanelOKButton)
 			{
 				NSURL* url = [panel URL];
-				
-//				NSString* path = [url path];
-//				NSInteger mode = [[NSFileManager defaultManager] imb_modeForPath:path];
-//				BOOL accessible = [[NSFileManager defaultManager] imb_isPath:path accessible:kIMBAccessRead|kIMBAccessWrite];
-//				NSLog(@"%s path=%@ mode=%x accessible=%d",__FUNCTION__,path,(int)mode,(int)accessible);
-				
 				completionBlock(url);
 			}
 			else
