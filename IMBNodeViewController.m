@@ -315,6 +315,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		IMBNodeCell* cell = [[[IMBNodeCell alloc] init] autorelease];	
 		[column setDataCell:cell];	
 	}
+
+	[ibNodeOutlineView setTarget:self];
+	[ibNodeOutlineView setAction:@selector(outlineViewWasClicked:)];
 		
 	// Build the initial contents of the node popup...
 	
@@ -720,11 +723,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 				[self.libraryController populateNode:newNode];
 				[ibNodeOutlineView showProgressWheels];
 			}
-			else
-			{
-				[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
-			}
-			
+
 			self.selectedNodeIdentifier = newNode.identifier;
 		}
 
@@ -746,6 +745,21 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	// Sync the selection of the popup menu...
 	
 	[self __syncPopupMenuSelection];
+}
+
+
+// If a row was clicked without changing the selection, also check for acces rights, and bring up the
+// prompt to grant access right if needed...
+
+- (IBAction) outlineViewWasClicked:(id)inSender
+{
+	NSInteger row = [ibNodeOutlineView clickedRow];
+	IMBNode* newNode = row>=0 ? [ibNodeOutlineView nodeAtRow:row] : nil;
+		
+	if (newNode != nil && newNode.isAccessible == NO)
+	{
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
+	}
 }
 
 
