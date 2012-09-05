@@ -275,8 +275,22 @@
 #pragma mark Drawing
 
 
+- (NSRect) _badgeRectForImageRect:(NSRect)inImageRect
+{
+	NSRect badgeRect;
+	NSSize badgeSize = NSMakeSize(20.0,20.0);
+	badgeRect.origin.x = inImageRect.origin.x + inImageRect.size.width - badgeSize.width - 3;
+	badgeRect.origin.y = inImageRect.origin.y + 3;
+	badgeRect.size.width  = badgeSize.width;
+	badgeRect.size.height = badgeSize.height;
+	
+	return badgeRect;
+}
+
+
 // Please note that we have to temporarily modify the CTM because the tableview
 // is flipped... You should restore the gstate afterwards
+
 - (void) willDrawImageInRect:(NSRect)rect context:(CGContextRef)context;
 {
 	CGContextSaveGState(context);
@@ -301,11 +315,7 @@
 	
 	if (_badge) 
 	{
-		NSRect badgeRect;
-		badgeRect.origin.x = rect.origin.x + rect.size.width - CGImageGetWidth(_badge) - 3;
-		badgeRect.origin.y = rect.origin.y + 3;
-		badgeRect.size.width  = CGImageGetWidth(_badge);
-		badgeRect.size.height = CGImageGetHeight(_badge);
+		NSRect badgeRect = [self _badgeRectForImageRect:rect];
 		CGContextDrawImage(context, NSRectToCGRect(badgeRect), _badge);
 	}
 	
