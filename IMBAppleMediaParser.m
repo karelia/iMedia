@@ -166,8 +166,6 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
         }
         
 		
-        NSDictionary *eventsDict = nil;
-		
         // Starting Aperture 3.3 there is no "Photos" album in ApertureData.xml anymore, so we must reconstruct it ourselves
         
         if (insertionIndex == NSNotFound)
