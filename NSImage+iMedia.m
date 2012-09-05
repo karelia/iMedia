@@ -91,6 +91,18 @@
 	return image;
 }
 
+
+// Returns an image from our own bundle. Image is autoreleased...
+
++ (NSImage*) imb_imageNamed:(NSString*)inName
+{
+	NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
+	NSString* path = [bundle pathForResource:inName ofType:nil];
+	NSImage* image = [[[NSImage alloc] initWithContentsOfFile:path] autorelease];
+	return image;
+}
+
+
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
 + (NSDictionary *)imb_metadataFromImageAtURL:(NSURL *)url checkSpotlightComments:(BOOL)aCheckSpotlight;
 {
