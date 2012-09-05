@@ -177,6 +177,13 @@
 //- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 //- (void) invalidateThumbnails;
 
+// Returns the URL that represents the root of this parser messenger's library.
+// This is not necessarily identical to the mediaSource of a library.
+// Its implementation defaults to inMediaSource but may be overriden for a more appropriate URL
+// (e.g. parent directory of mediaSource for Lightroom).
+
+- (NSURL*) libraryRootURLForMediaSource:(NSURL*)inMediaSource;
+
 @end
 
 

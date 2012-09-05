@@ -174,6 +174,7 @@
 	return nil;
 }
 
+
 + (NSString*) xpcSerivceIdentifier
 {
 	return [self identifier];
@@ -575,6 +576,21 @@
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
 	return @"";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Returns the URL that represents the root of this parser messenger's library.
+// This is not necessarily identical to the mediaSource of a library.
+// Its implementation defaults to inMediaSource but may be overriden for a more appropriate URL
+// (e.g. parent directory of inMediaSource for Lightroom).
+// NOTE: We cannot access the messenger's own mediaSource property here because it's not set in the app.
+
+- (NSURL*) libraryRootURLForMediaSource:(NSURL*)inMediaSource
+{
+    return inMediaSource;
 }
 
 
