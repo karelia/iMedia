@@ -58,6 +58,7 @@
 #import "IMBNodeViewController.h"
 #import "IMBObjectViewController.h"
 #import "IMBLibraryController.h"
+#import "IMBAccessRightsViewController.h"
 #import "IMBParserMessenger.h"
 #import "IMBOutlineView.h"
 #import "IMBConfig.h"
@@ -705,9 +706,17 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 		if (newNode)
 		{
-			[self.libraryController populateNode:newNode];
+			if (newNode.isAccessible)
+			{
+				[self.libraryController populateNode:newNode];
+				[ibNodeOutlineView showProgressWheels];
+			}
+			else
+			{
+				[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
+			}
+			
 			self.selectedNodeIdentifier = newNode.identifier;
-			[ibNodeOutlineView showProgressWheels];
 		}
 
 		// Install the object view controller...
