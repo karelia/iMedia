@@ -614,14 +614,19 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldExpandItem:(id)inItem
 {
 	BOOL shouldExpand = YES;
+	IMBNode* node = (IMBNode*)inItem;
 	
-	if (!_isRestoringState)
+	if (!node.isAccessible)
+	{
+		shouldExpand = NO;
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+	}
+	else if (!_isRestoringState)
 	{
 		id delegate = self.libraryController.delegate;
 		
 		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
 		{
-			IMBNode* node = (IMBNode*)inItem;
 			shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
 		}
 	}
@@ -635,8 +640,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (void) outlineViewItemWillExpand:(NSNotification*)inNotification
 {
 	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
-	IMBNode* node = (IMBNode*)item; 
-	[self.libraryController populateNode:node];
+	IMBNode* node = (IMBNode*)item;
+	
+	if (node.isAccessible)
+	{
+		[self.libraryController populateNode:node];
+	}
 }
 
 

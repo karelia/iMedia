@@ -82,6 +82,7 @@
 
 + (IMBAccessRightsViewController*) sharedViewController;
 
+- (void) grantAccessRightsForNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler;
 - (void) grantAccessRightsForNode:(IMBNode*)inNode;
 
 @end

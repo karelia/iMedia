@@ -212,8 +212,11 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 // bookmark for this folder and send it to as many XPC services as possible, thus transferring the access rights
 // to the XPC service processes. The XPC service processes are then responsible for persisting these access rights...
 
-- (void) grantAccessRightsForNode:(IMBNode*)inNode
+- (void) grantAccessRightsForNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler
 {
+	void(^completionHandler)(void) = [inCompletionHandler copy];
+	__block NSInteger completionCount = 0;
+	
 	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
 	NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
 	NSArray* urls = [libraryController urlsForNodes:nodes];
@@ -227,6 +230,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			
 			for (IMBNode* node in nodes)
 			{
+				node.badgeTypeNormal = kIMBBadgeTypeLoading;
 				IMBParserMessenger* messenger = node.parserMessenger;
 				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
 			
@@ -235,11 +239,31 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 						if (inError == nil)
 						{
 							[libraryController reloadNodeTree:node];
+							
+							completionCount++;
+							
+							if (completionCount == nodes.count)
+							{
+								completionHandler();
+								[completionHandler release];
+							}
 						}
 					});
 			}
 		}
+		else
+		{
+			[completionHandler release];
+		}
 	}];
+}
+
+
+// Convenience method with emtpy completion handler...
+
+- (void) grantAccessRightsForNode:(IMBNode*)inNode
+{
+	[self grantAccessRightsForNode:inNode completionHandler:^{}];
 }
 
 
