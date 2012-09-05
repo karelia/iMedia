@@ -80,7 +80,7 @@
 - (IMBNode*) unpopulatedTopLevelNode: (NSError**) outError {
 	//	load Flickr icon...
 	NSBundle* ourBundle = [NSBundle bundleForClass:[IMBNode class]];
-	NSString* pathToImage = [ourBundle pathForResource:@"Flickr" ofType:@"png"];
+	NSString* pathToImage = [ourBundle pathForResource:@"Flickr" ofType:@"tiff"];
 	NSImage* icon = [[[NSImage alloc] initWithContentsOfFile:pathToImage] autorelease];
 	
     //  create an empty root node (unpopulated and without subnodes)...	
