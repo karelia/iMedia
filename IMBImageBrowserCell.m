@@ -57,6 +57,7 @@
 #import "IMBNode.h"
 #import "IMBCommon.h"
 #import "IMBObjectViewController.h"
+#import "NSImage+iMedia.h"
 
 /* weak linking of types for layerForType to ensure 10.5 compatibility: */
 extern NSString *const IKImageBrowserCellBackgroundLayer __attribute__((weak_import));
@@ -302,8 +303,8 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
         
         if (!item.isAccessible)
         {
-            // TODO/JJ: Replace nil with appropriate image ref
-            [layer addSublayer: [self imb_layerWithBadge:nil inRect:relativeImageFrame]];
+            CGImageRef warningImageRef = [NSImage imb_imageRefNamed:@"warning.tiff"];
+            [layer addSublayer: [self imb_layerWithBadge:warningImageRef inRect:relativeImageFrame]];
         }
         
         // Display any kind of badge if host app wants us to (should not exceed 16x16 points)
@@ -410,10 +411,11 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
         badgeLayer = [CALayer layer];
         [badgeLayer setContents:(id)inBadge];
         
-        badgeLayer.frame = CGRectMake(inRect.origin.x + inRect.size.width - CGImageGetWidth(inBadge) - 3,
+        NSUInteger squareSize = 18;
+        badgeLayer.frame = CGRectMake(inRect.origin.x + inRect.size.width - squareSize - 3,
                                       inRect.origin.y + 3,
-                                      CGImageGetWidth(inBadge),
-                                      CGImageGetHeight(inBadge));
+                                      squareSize,
+                                      squareSize);
     }
     return badgeLayer;
 }
