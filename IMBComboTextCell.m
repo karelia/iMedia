@@ -84,7 +84,10 @@
 @synthesize subtitle = _subtitle;
 @synthesize subtitleTextAttributes = _subtitleTextAttributes;
 @synthesize isDisabledFromDragging = _isDisabledFromDragging;
-@dynamic badge;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 - (CGImageRef) badge
 {
@@ -92,12 +95,13 @@
 }
 
 
-- (void) setBadge:(CGImageRef) inBadge
+- (void) setBadge:(CGImageRef)inBadge
 {
-	CGImageRelease(_badge);
-	_badge = inBadge;
-	CGImageRetain(_badge);
+	CGImageRef old = _badge;
+	_badge = CGImageRetain(inBadge);
+	CGImageRelease(old);
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
