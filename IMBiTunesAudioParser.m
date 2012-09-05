@@ -511,6 +511,7 @@
 			playlistNode.icon = [self iconForPlaylist:playlistDict];
 			playlistNode.name = albumName;
 			playlistNode.mediaSource = self.mediaSource;
+			playlistNode.mediaType = self.mediaType;
 			playlistNode.parserIdentifier = self.identifier;
 
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
