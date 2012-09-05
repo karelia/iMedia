@@ -62,8 +62,13 @@
 
 
 @interface IMBiTunesParserMessenger : IMBParserMessenger
+{
+	NSString* _mediaSourceSuffix;
+}
 
-@end
+@property (retain) NSString* mediaSourceSuffix;
+
+ @end
 
 
 @interface IMBiTunesAudioParserMessenger : IMBiTunesParserMessenger

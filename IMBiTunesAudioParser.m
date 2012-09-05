@@ -102,6 +102,7 @@
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize version = _version;
 @synthesize timecodeTransformer = _timecodeTransformer;
+@synthesize mediaSourceSuffix = _mediaSourceSuffix;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,6 +126,7 @@
 	IMBRelease(_plist);
 	IMBRelease(_modificationDate);
 	IMBRelease(_timecodeTransformer);
+	IMBRelease(_mediaSourceSuffix);
 	[super dealloc];
 }
 
@@ -255,7 +257,7 @@
 
 - (NSDictionary*) plist
 {
-	NSURL* url = self.mediaSource;
+	NSURL* url = [self.mediaSource URLByAppendingPathComponent:self.mediaSourceSuffix];
 	
     NSDate* modificationDate;
     if (![url getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:NULL]) modificationDate = nil;

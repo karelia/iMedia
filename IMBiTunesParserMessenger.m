@@ -85,6 +85,8 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 @implementation IMBiTunesParserMessenger
 
+@synthesize mediaSourceSuffix = _mediaSourceSuffix;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -115,7 +117,37 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 - (void) dealloc
 {
+	IMBRelease(_mediaSourceSuffix);
 	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]))
+	{
+		self.mediaSourceSuffix = [inCoder decodeObjectForKey:@"mediaSourceSuffix"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	[inCoder encodeObject:self.mediaSourceSuffix forKey:@"mediaSourceSuffix"];
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBiTunesParserMessenger* copy = (IMBiTunesParserMessenger*)[super copyWithZone:inZone];
+	copy.mediaSourceSuffix = self.mediaSourceSuffix;
+	return copy;
 }
 
 
@@ -187,6 +219,7 @@ static dispatch_once_t sMovieOnceToken = 0;
 			{
 				NSURL* url = [NSURL URLWithString:library];
 				NSString* path = [url path];
+				NSString* folderPath = [path stringByDeletingLastPathComponent];
                 NSFileManager *fileManager = [[NSFileManager alloc] init];
 				
                 BOOL changed;
@@ -197,7 +230,8 @@ static dispatch_once_t sMovieOnceToken = 0;
 					IMBiTunesAudioParser* parser = (IMBiTunesAudioParser*)[self newParser];
 					parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
 					parser.mediaType = self.mediaType;
-					parser.mediaSource = url;
+					parser.mediaSource = [NSURL fileURLWithPath:folderPath];
+					parser.mediaSourceSuffix = [path lastPathComponent];
 					parser.appPath = self.iTunesPath;
 					parser.shouldDisplayLibraryName = libraries.count > 1;
 
@@ -206,8 +240,7 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 					// Exclude enclosing folder from being displayed by IMBFolderParser...
 					
-					NSString* libraryPath = [path stringByDeletingLastPathComponent];
-					[IMBConfig registerLibraryPath:libraryPath];
+					[IMBConfig registerLibraryPath:folderPath];
 				}
                 
                 [fileManager release];
@@ -272,6 +305,7 @@ static dispatch_once_t sMovieOnceToken = 0;
 			{
 				NSURL* url = [NSURL URLWithString:library];
 				NSString* path = [url path];
+				NSString* folderPath = [path stringByDeletingLastPathComponent];
                 NSFileManager *fileManager = [[NSFileManager alloc] init];
 				
                 BOOL changed;
@@ -282,7 +316,8 @@ static dispatch_once_t sMovieOnceToken = 0;
 					IMBiTunesMovieParser* parser = (IMBiTunesMovieParser*)[self newParser];
 					parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
 					parser.mediaType = self.mediaType;
-					parser.mediaSource = url;
+					parser.mediaSource = [NSURL fileURLWithPath:folderPath];
+					parser.mediaSourceSuffix = [path lastPathComponent];
 					parser.appPath = self.iTunesPath;
 					parser.shouldDisplayLibraryName = libraries.count > 1;
 
@@ -291,8 +326,7 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 					// Exclude enclosing folder from being displayed by IMBFolderParser...
 					
-					NSString* libraryPath = [path stringByDeletingLastPathComponent];
-					[IMBConfig registerLibraryPath:libraryPath];
+					[IMBConfig registerLibraryPath:folderPath];
 				}
                 
                 [fileManager release];
