@@ -303,7 +303,7 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
         
         if (!item.isAccessible)
         {
-            CGImageRef warningImageRef = [NSImage imb_imageRefNamed:@"warning.tiff"];
+            CGImageRef warningImageRef = [NSImage imb_CGImageNamed:@"warning.tiff"];
             [layer addSublayer: [self imb_layerWithBadge:warningImageRef inRect:relativeImageFrame]];
         }
         

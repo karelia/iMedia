@@ -1154,7 +1154,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		{
 			if (!object.isAccessible)
 			{
-				CGImageRef warning = [NSImage imb_imageRefNamed:@"warning.tiff"];
+				CGImageRef warning = [NSImage imb_CGImageNamed:@"warning.tiff"];
 				[inCell setBadge:warning];
 			}
 			else 
