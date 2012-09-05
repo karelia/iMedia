@@ -68,6 +68,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSPasteboard+iMedia.h"
 #import "NSView+iMedia.h"
+#import "NSImage+iMedia.h"
 #import "IMBDynamicTableView.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
@@ -1155,7 +1156,12 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 		if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
 		{
-			if (badgeRef)
+			if (!object.isAccessible)
+			{
+				NSImage* warning = [NSImage imb_imageNamed:@"warning.tiff"];
+				[inCell setImage:warning];
+			}
+			else if (badgeRef)
 			{
 				NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
 				NSBitmapImageRep* bitmapImageRep = [[[NSBitmapImageRep alloc] initWithCGImage:badgeRef] autorelease];
