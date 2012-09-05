@@ -103,6 +103,29 @@
 }
 
 
+// Returns an image ref from our own bundle. Image ref is autoreleased...
+
++ (CGImageRef)imb_imageRefNamed:(NSString*)inName
+{
+    NSString* path = [[NSBundle bundleForClass:[IMBNode class]] pathForResource:[inName stringByDeletingPathExtension]
+                                                                         ofType:[inName pathExtension]];
+    
+    if(path)
+    {
+        CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
+        
+        if(imageSource)
+        {
+            CGImageRef imageRef = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
+            CFRelease(imageSource);
+            return (CGImageRef)[(id)imageRef autorelease];
+        }
+        return NULL;
+    }
+    return NULL;
+}
+
+
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
 + (NSDictionary *)imb_metadataFromImageAtURL:(NSURL *)url checkSpotlightComments:(BOOL)aCheckSpotlight;
 {
