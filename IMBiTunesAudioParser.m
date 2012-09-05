@@ -586,6 +586,10 @@
 					object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
 					object.imageRepresentation = nil;	// will be loaded lazily when needed
 
+					// Check if we have access rights to this file...
+					
+					[self checkAccessRightsForObject:object];
+					
 					// Add metadata and convert the duration property to seconds. Also note that the original
 					// key "Total Time" is not bindings compatible as it contains a space...
 					
