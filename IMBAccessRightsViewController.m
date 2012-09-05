@@ -97,7 +97,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 + (NSString*) nibName
 {
-	return @"IMBAccessRightsController";
+	return @"IMBAccessRightsViewController";
 }
 
 
