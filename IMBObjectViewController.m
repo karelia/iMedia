@@ -1152,7 +1152,15 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			
 		if ([inCell respondsToSelector:@selector(setBadge:)])
 		{
-			[inCell setBadge:badgeRef];
+			if (!object.isAccessible)
+			{
+				CGImageRef warning = [NSImage imb_imageRefNamed:@"warning.tiff"];
+				[inCell setBadge:warning];
+			}
+			else 
+			{
+				[inCell setBadge:badgeRef];
+			}
 		}
 
 		if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
