@@ -932,7 +932,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	for (IMBNode* node in inNodes)
 	{
-        NSURL* libraryRootURL = [node.parserMessenger libraryRootURLForMediaSource:node.mediaSource];
+        NSURL* libraryRootURL = [node libraryRootURL];
 		if (libraryRootURL)
 		{
 			[urls addObject:libraryRootURL];
