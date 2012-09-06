@@ -87,7 +87,7 @@
 @synthesize mediaSource = _mediaSource;
 @synthesize mediaType = _mediaType;
 @synthesize custom = _custom;
-
+@synthesize bookmark = _bookmark;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -251,6 +251,28 @@
 		path = [url path];
 	}
 	
+  NSURL* sourceURL = nil;
+  if (self.bookmark != nil)
+  {
+    NSError* bookmarkResolvingOutError = nil;
+    sourceURL = [NSURL URLByResolvingBookmarkData:self.bookmark
+                                          options: NSURLBookmarkResolutionWithSecurityScope
+                                    relativeToURL: nil
+                              bookmarkDataIsStale: NO
+                                            error: &bookmarkResolvingOutError];
+    if (bookmarkResolvingOutError != nil)
+    {
+      NSLog(@"Failed to resolve bookmark data: %@",
+            [bookmarkResolvingOutError localizedFailureReason]);
+    }
+  }
+  if (sourceURL != nil)
+  { 
+    if (![sourceURL imb_startAccessingSecurityScopedResource])
+      sourceURL = nil;
+  }
+  
+  
 	// Get the uti for out object...
 	
 	NSString* uti = [NSString imb_UTIForFileAtPath:path];
@@ -367,6 +389,8 @@
 			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	
+  [sourceURL imb_stopAccessingSecurityScopedResource];
+  
 	return imageRepresentation;
 }
 

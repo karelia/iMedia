@@ -286,11 +286,29 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (self.isCancelled == NO)
 	{
 		// This was using _paser ivar directly before with indication given as to it being necessary, so I'm switching to the proper accessor to see if it fixes my crash - Mike Abdullah
-        IMBParser *parser = [self parser];
-        [parser willUseParser];
-		
-        NSError* error = nil;
-        if ([parser populateNode:self.replacementNode options:self.options error:&error])
+    IMBParser *parser = [self parser];
+    [parser willUseParser];
+
+    NSURL* securityScopedURL = nil;
+    if (parser.bookmark != nil)
+    {
+      NSError* error = nil;
+      securityScopedURL = [NSURL URLByResolvingBookmarkData:[parser bookmark]
+                                                    options: NSURLBookmarkResolutionWithSecurityScope
+                                              relativeToURL: nil
+                                        bookmarkDataIsStale: NO
+                                                      error: &error];
+      if (error != nil)
+        securityScopedURL = nil;      
+      if (securityScopedURL != nil)
+      {
+        if (![securityScopedURL imb_startAccessingSecurityScopedResource])
+          securityScopedURL = nil;
+      }
+    }
+
+    NSError* error = nil;
+    if ([parser populateNode:self.replacementNode options:self.options error:&error])
 		{
 			[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.replacementNode];
 			[self doReplacement];
@@ -302,6 +320,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			// If we failed then the _oldNode is still good but needs to have its status updated 
 			self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
 		}
+    
+    [securityScopedURL imb_stopAccessingSecurityScopedResource];
 	}
 }
 
