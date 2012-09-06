@@ -101,28 +101,6 @@
 #pragma mark Parser Methods
 
 
-- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
-{
-	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(16.0,16.0)];
-	
-	// Create an empty (unpopulated) root node...
-	
-	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
-	node.icon = icon;
-	node.name = @"GarageBand";
-	node.identifier = [self identifierForPath:@"/"];
-	node.groupType = kIMBGroupTypeLibrary;
-	node.isLeafNode = NO;
-
-	return node;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Paths to important folders containing songs...
 
 - (NSString*) userSongsPath
@@ -135,6 +113,38 @@
 //{
 //	return @"/Library/Application Support/GarageBand/GarageBand Demo Songs/";
 //}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
+{
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16.0,16.0)];
+	
+	// Need to set this before instatiating the node, so that check for access rights works correctly...
+	
+	self.mediaSource = [NSURL fileURLWithPath:[self userSongsPath]];
+
+	// Create an empty (unpopulated) root node...
+	
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
+	node.icon = icon;
+	node.name = @"GarageBand";
+	node.identifier = [self identifierForPath:@"/"];
+	node.groupType = kIMBGroupTypeLibrary;
+	node.isLeafNode = NO;
+	node.mediaType = self.mediaType;
+	node.parserIdentifier = self.identifier;
+	node.isTopLevelNode = YES;
+
+	return node;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
@@ -160,6 +170,11 @@
 			subnode.mediaSource = [NSURL fileURLWithPath:userSongsPath];
 			subnode.isIncludedInPopup = YES;
 			subnode.isLeafNode = YES;
+			subnode.mediaType = self.mediaType;
+			subnode.parserIdentifier = self.identifier;
+			subnode.isTopLevelNode = NO;
+
+
 			[subnodes addObject:subnode];
 		}
 		
