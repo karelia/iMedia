@@ -135,6 +135,19 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Library root is parent directory of metadata XML file
+
+- (NSURL *)libraryRootURLForMediaSource:(NSURL *)inMediaSource
+{
+    if (inMediaSource)
+    {
+        return [inMediaSource URLByDeletingLastPathComponent];
+    }
+    return [super libraryRootURLForMediaSource:inMediaSource];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // This method is called on the XPC service side. Discover the path to the AlbumData.xml file and create  
 // an IMBParser instance preconfigured with that path...
 
