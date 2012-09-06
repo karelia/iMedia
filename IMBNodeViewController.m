@@ -1188,6 +1188,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 {
 	NSString* identifier = (NSString*) ibNodePopupButton.selectedItem.representedObject;
 	IMBNode* node = [self.libraryController nodeWithIdentifier:identifier];
+	
+	if (!node.isAccessible)
+	{
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+	}
+	
 	[self selectNode:node];
 }
 
