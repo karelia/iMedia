@@ -519,8 +519,10 @@
 - (void) checkAccessRightsForNode:(IMBNode*)inNode
 {
 	NSFileManager* manager = [[NSFileManager alloc] init];
-    inNode.isAccessible = [manager imb_isPath:[inNode.mediaSource path]  accessible:kIMBAccessRead|kIMBAccessWrite];
+    inNode.isAccessible = [manager imb_isPath:[[inNode libraryRootURL] path]  accessible:kIMBAccessRead|kIMBAccessWrite];
 	[manager release];
+    
+    NSLog(@"Access to %@: %@", [[inNode libraryRootURL] path], inNode.isAccessible ? @"YES" : @"NO");
 }
 
 
