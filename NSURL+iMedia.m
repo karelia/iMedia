@@ -253,4 +253,49 @@
 	return metadata;
 }
 
+
+- (NSComparisonResult)imb_finderCompare:(NSURL *)aURL
+{
+	SInt32 compareResult;
+	
+	CFIndex lhsLen = [[self.path lastPathComponent] length];
+	CFIndex rhsLen = [[aURL.path lastPathComponent] length];
+	
+	UniChar *lhsBuf = malloc(lhsLen * sizeof(UniChar));
+	UniChar *rhsBuf = malloc(rhsLen * sizeof(UniChar));
+	
+	[[self.path lastPathComponent] getCharacters:lhsBuf];
+	[[aURL.path lastPathComponent] getCharacters:rhsBuf];
+	
+	(void) UCCompareTextDefault(kUCCollateComposeInsensitiveMask | kUCCollateWidthInsensitiveMask | kUCCollateCaseInsensitiveMask | kUCCollateDigitsOverrideMask | kUCCollateDigitsAsNumberMask| kUCCollatePunctuationSignificantMask,lhsBuf,lhsLen,rhsBuf,rhsLen,NULL,&compareResult);
+	
+	free(lhsBuf);
+	free(rhsBuf);
+	
+	return (CFComparisonResult) compareResult;
+}
+
+#pragma mark -
+#pragma mark Sandboxing
+
+- (BOOL)imb_startAccessingSecurityScopedResource
+{
+  if ([self respondsToSelector:@selector(startAccessingSecurityScopedResource)])
+  {
+    return [self startAccessingSecurityScopedResource];
+  }
+  else
+  {
+    return YES;
+  }
+}
+
+- (void)imb_stopAccessingSecurityScopedResource
+{
+  if ([self respondsToSelector:@selector(stopAccessingSecurityScopedResource)])
+  {
+    [self stopAccessingSecurityScopedResource];
+  }
+}
+
 @end
