@@ -226,16 +226,24 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 	void(^completionHandler)(void) = [inCompletionHandler copy];
 	__block NSInteger completionCount = 0;
 	
+	// Calculate the best possible folder to select...
+	
 	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
 	NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
 	NSArray* urls = [libraryController libraryRootURLsForNodes:nodes];
-	NSURL* proposedURL = [[IMBAccessRightsController sharedAccessRightsController] commonAncestorForURLs:urls];
-		
+	NSURL* proposedURL = [IMBAccessRightsController commonAncestorForURLs:urls];
+	
+	// Show an NSOpenPanel with this folder...
+	
 	[self _showForSuggestedURL:proposedURL completionHandler:^(NSURL* inGrantedURL)
 	{
 		if (inGrantedURL)
 		{
-			NSData* bookmark = [[IMBAccessRightsController sharedAccessRightsController] bookmarkForURL:inGrantedURL];
+			// Create bookmark...
+			
+			NSData* bookmark = [IMBAccessRightsController bookmarkForURL:inGrantedURL];
+			
+			// Send it to XPC services of all nodes that do not have access rights (thus blessing the XPC services)...
 			
 			for (IMBNode* node in nodes)
 			{
@@ -298,7 +306,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			}
 		}
 		
-		NSURL* proposedURL = [[IMBAccessRightsController sharedAccessRightsController] commonAncestorForURLs:urls];
+		NSURL* proposedURL = [IMBAccessRightsController commonAncestorForURLs:urls];
 		
 		// Show an NSOpenPanel to grant access to this folder...
 		
@@ -306,7 +314,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 		{
 			if (inGrantedURL)
 			{
-				NSData* bookmark = [[IMBAccessRightsController sharedAccessRightsController] bookmarkForURL:inGrantedURL];
+				NSData* bookmark = [IMBAccessRightsController bookmarkForURL:inGrantedURL];
 				
 				IMBParserMessenger* messenger = inNode.parserMessenger;
 				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
